@@ -137,6 +137,11 @@ jobs:
 
       - name: Publish to Cloudflare Pages
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        # We're inside a pnpm workspace at the repo root, so a bare
+        # `pnpm add wrangler` (which wrangler-action runs to install Wrangler)
+        # bails out with ERR_PNPM_ADDING_TO_ROOT. Allow it just for this step.
+        env:
+          NPM_CONFIG_IGNORE_WORKSPACE_ROOT_CHECK: 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
