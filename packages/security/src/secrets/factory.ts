@@ -146,7 +146,10 @@ export function detectHeadless(): { headless: boolean; reasons: ReadonlyArray<st
   if (process.env.GRAPHORIN_HEADLESS === '1') reasons.push('GRAPHORIN_HEADLESS=1');
   if (!process.stdout.isTTY) reasons.push('stdout is not a TTY');
   if (!process.stdin.isTTY) reasons.push('stdin is not a TTY');
-  if (process.env.CI) reasons.push(`CI env (CI=${process.env.CI})`);
+  // Note the presence of `CI` but not its value — the value can carry
+  // host metadata (runner name, branch, build URL) that CI providers
+  // sometimes embed and that should not land in console output.
+  if (process.env.CI) reasons.push('CI env detected');
   if (process.env.KUBERNETES_SERVICE_HOST) reasons.push('Kubernetes context');
   if (process.env.DOCKER_CONTAINER || existsSync('/.dockerenv')) {
     reasons.push('Docker container detected');

@@ -24,6 +24,7 @@ import type {
 import { LocalProviderInsecureTransportError, ProviderStreamParseError } from '../errors/errors.js';
 import { callJsonHttp, makeStreamStartEvent, toOpenAIChatMessages } from '../internal/http.js';
 import { parseNdJsonStream } from '../internal/sse.js';
+import { stripTrailingSlashes } from '../internal/url-utils.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
 import {
@@ -90,7 +91,7 @@ export function ollamaAdapter(options: OllamaAdapterOptions): Provider {
     ...options.capabilities,
   };
   const chatPath = options.chatPath ?? '/api/chat';
-  const url = `${baseUrl.replace(/\/+$/, '')}${chatPath}`;
+  const url = `${stripTrailingSlashes(baseUrl)}${chatPath}`;
   return {
     name: providerName,
     modelId: options.model,

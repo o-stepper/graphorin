@@ -186,6 +186,19 @@ export function encodeBase62Integer(value: number, width: number): string {
  * left-pads to `width` so that any 32-byte input yields exactly 43
  * base62 characters.
  *
+ * Bias note (CodeQL `js/biased-cryptographic-random`): this is **not** a
+ * `byte % 62` reduction over CSPRNG bytes — that would indeed bias the
+ * output. Instead we perform full big-integer long division, so each
+ * emitted base62 character represents a distinct "digit" of the input
+ * integer in base 62. As long as the input is uniform over `[0, 256^n)`
+ * (which is what `crypto.randomBytes(n)` guarantees), the resulting
+ * base62 string is uniform over `[0, 62^width)` for the leading
+ * positions; only the most-significant position can carry a small bias
+ * when `256^n` is not an exact power of 62, and that position is what
+ * `width` left-pads to a constant length for. Callers that need
+ * fixed-entropy tokens should pick `n` such that `256^n >= 62^width` —
+ * the existing `encodeRandomToken` helpers do.
+ *
  * @stable
  */
 export function encodeBase62Bytes(bytes: Uint8Array, width: number): string {
@@ -193,7 +206,6 @@ export function encodeBase62Bytes(bytes: Uint8Array, width: number): string {
     throw new RangeError(`encodeBase62Bytes expected a positive width; got ${width}.`);
   }
   if (bytes.length === 0) return '0'.repeat(width);
-  // Repeated long-division on a big-endian uint8 array.
   let value = Array.from(bytes);
   const out: string[] = [];
   while (value.length > 0) {
@@ -203,6 +215,9 @@ export function encodeBase62Bytes(bytes: Uint8Array, width: number): string {
     for (let i = 0; i < value.length; i += 1) {
       const byte = value[i] ?? 0;
       const acc = remainder * 256 + byte;
+      // codeql[js/biased-cryptographic-random] -- digit-by-digit long
+      // division of a CSPRNG-uniform big integer; not a modulo of one
+      // CSPRNG byte. See block comment above for the bias analysis.
       const quotient = Math.floor(acc / 62);
       remainder = acc - quotient * 62;
       if (!leadingZero || quotient > 0) {

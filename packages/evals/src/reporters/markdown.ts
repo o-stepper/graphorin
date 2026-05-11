@@ -41,7 +41,7 @@ export function renderMarkdownReport<I, O>(report: EvalReport<I, O>): string {
     lines.push(`### \`${r.caseId}\` _(\`${r.durationMs}\` ms)_`);
     lines.push('');
     for (const f of failures) {
-      const reason = (f.result.reason ?? '_no reason_').replace(/\|/g, '\\|');
+      const reason = escapeMarkdownInline(f.result.reason ?? '_no reason_');
       lines.push(`- **${f.scorer}** — ${reason}`);
     }
     lines.push('');
@@ -51,4 +51,15 @@ export function renderMarkdownReport<I, O>(report: EvalReport<I, O>): string {
     lines.push('');
   }
   return lines.join('\n');
+}
+
+/**
+ * Escape characters that would break a Markdown table row when rendered
+ * inline. Backslashes must be escaped first so that an existing trailing
+ * `\` in the input cannot combine with our inserted `\|` to form a
+ * literal pipe. Newlines are flattened to spaces because table cells
+ * cannot contain hard line breaks.
+ */
+function escapeMarkdownInline(value: string): string {
+  return value.replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
 }
