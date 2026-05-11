@@ -66,7 +66,15 @@ describe('createProgressIO', () => {
   });
 
   it('surfaces ProgressWriteError on filesystem failure', async () => {
-    const io = createProgressIO({ artifactRoot: '/dev/null/nope' });
+    // Pick a guaranteed-unwritable path per platform. On POSIX
+    // `/dev/null` is a character device, so any attempt to create a
+    // file *under* it (`/dev/null/nope/...`) fails with ENOTDIR.
+    // On Windows there is no `/dev/null`; instead address the NUL
+    // device with the same trick — `NUL\\nope` cannot be used as a
+    // directory either. Either path produces a non-OK fs result that
+    // the progress IO surfaces as a `ProgressWriteError`.
+    const artifactRoot = process.platform === 'win32' ? 'NUL\\nope' : '/dev/null/nope';
+    const io = createProgressIO({ artifactRoot });
     await expect(async () => io.write('r', 'x', { role: 'p' })).rejects.toThrowError(
       ProgressWriteError,
     );
