@@ -78,7 +78,6 @@ jobs:
         with:
           args: >-
             --no-progress
-            --exclude-mail
             --include-fragments
             --exclude '^https?://(?!127\.0\.0\.1:8765)'
             --base http://127.0.0.1:8765/
