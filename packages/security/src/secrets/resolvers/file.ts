@@ -19,6 +19,28 @@ function expandTilde(p: string): string {
 }
 
 /**
+ * Strip the leading `/` from `/C:/path/to/file` on Windows.
+ *
+ * RFC 3986 `file://` URLs always start the path component with `/`,
+ * so a portable URL of a Windows file looks like
+ * `file:///C:/Users/foo/bar.txt` and the SecretRef parser yields a
+ * `path` of `/C:/Users/foo/bar.txt`. Node's filesystem APIs on Win32
+ * want the OS-native form `C:\Users\foo\bar.txt` (or `C:/...`); the
+ * leading `/` makes `path.isAbsolute()` return `false` and the
+ * resolver then mis-treats the value as relative-to-cwd. Strip the
+ * leading slash whenever the path matches `/<drive-letter>:[\\/]`.
+ *
+ * POSIX paths (`/abs/path/...`) are returned unchanged; bare drive
+ * paths (`C:\...`) likewise.
+ */
+function stripWindowsUrlSlash(p: string): string {
+  if (process.platform === 'win32' && /^\/[A-Za-z]:[\\/]/.test(p)) {
+    return p.slice(1);
+  }
+  return p;
+}
+
+/**
  * Resolver for the `file:` scheme. Reads a plaintext file and returns
  * the trimmed content as a `SecretValue`.
  *
@@ -42,7 +64,7 @@ export const fileResolver: SecretResolver = {
         "file: ref must include a path (e.g. 'file:/abs/path' or 'file:./relative').",
       );
     }
-    const path = expandTilde(parsed.path);
+    const path = expandTilde(stripWindowsUrlSlash(parsed.path));
     const encoding = (getQueryParam(parsed, 'encoding') as BufferEncoding | undefined) ?? 'utf8';
     const warnOnPermissions = getQueryParam(parsed, 'warnOnPermissions') !== '0';
     let absolute = path;

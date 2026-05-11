@@ -156,7 +156,23 @@ if (data.noNetwork) {
       });
       return;
     }
-    const mod = await import(data.code.module);
+    // \`import()\` in ESM context requires a URL when the specifier is
+    // not a bare module identifier. On POSIX an absolute path like
+    // \`/abs/foo.mjs\` happens to be accepted, but on Windows the
+    // OS-native form \`C:\\abs\\foo.mjs\` is parsed as scheme \`C\`
+    // and \`import()\` throws \`Only URLs with a scheme in: file,
+    // data, ... are supported\`. Normalise to a \`file://\` URL via
+    // \`pathToFileURL\` so callers can keep passing OS-native paths.
+    const { pathToFileURL: __ptfu } = require('node:url');
+    const __moduleSpec = String(data.code.module);
+    const __moduleUrl =
+      __moduleSpec.startsWith('file:') ||
+      __moduleSpec.startsWith('data:') ||
+      __moduleSpec.startsWith('node:') ||
+      (!__moduleSpec.startsWith('/') && !/^[A-Za-z]:[\\\\/]/.test(__moduleSpec))
+        ? __moduleSpec
+        : __ptfu(__moduleSpec).href;
+    const mod = await import(__moduleUrl);
     const fn = mod[data.code.export];
     if (typeof fn !== 'function') {
       parentPort.postMessage({

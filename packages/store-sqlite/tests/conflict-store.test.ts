@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createSqliteStore, SqliteConflictStore } from '../src/index.js';
 
@@ -8,7 +10,7 @@ async function open(): Promise<{
   store: Awaited<ReturnType<typeof createSqliteStore>>;
   close: () => Promise<void>;
 }> {
-  const dir = await mkdtemp('/tmp/graphorin-conflict-store-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-conflict-store-'));
   const store = await createSqliteStore({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
   await store.init();
   return {

@@ -41,14 +41,22 @@ jobs:
       - name: Lint (Biome)
         run: pnpm lint
 
+      # Use the turbo-aware aliases (`pnpm typecheck` / `pnpm test` /
+      # `pnpm build`) rather than `pnpm -r ...`. Turbo honours the
+      # `dependsOn: ["^build"]` rule in turbo.json, so producers like
+      # `@graphorin/core` get built before downstream packages
+      # typecheck against their published `dist/*.d.ts`. `pnpm -r`
+      # parallelises by topological order but never produces those
+      # build artifacts, which is why typecheck used to fail with
+      # `TS2307: Cannot find module '@graphorin/core'`.
       - name: Typecheck
-        run: pnpm -r typecheck
+        run: pnpm typecheck
 
       - name: Test
-        run: pnpm -r test
+        run: pnpm test
 
       - name: Build
-        run: pnpm -r build
+        run: pnpm build
 
       - name: Benchmark smoke + cost regression + doc guards
         run: pnpm run benchmark:ci
