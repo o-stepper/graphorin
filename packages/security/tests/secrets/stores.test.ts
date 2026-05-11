@@ -170,27 +170,45 @@ describe('EncryptedFileSecretsStore', () => {
     rmSync(workDir, { recursive: true, force: true });
   });
 
-  it('round-trips secrets through the AES-256-GCM bundle', async () => {
-    const passphrase = SecretValue.fromString('strong-master-passphrase');
-    const store = new EncryptedFileSecretsStore({
-      path: join(workDir, 'secrets.kse'),
-      passphrase,
-    });
-    await store.set('openai_api_key', 'sk-test');
-    expect((await store.get('openai_api_key'))?.reveal()).toBe('sk-test');
-    const list = await store.list();
-    expect(list.map((m) => m.key)).toEqual(['openai_api_key']);
-  });
+  // EncryptedFileSecretsStore derives its AES-256-GCM key through
+  // Argon2id (m=64MiB, t=3). On a fast local box this completes
+  // in ~300 ms; on shared GitHub-hosted runners the same KDF
+  // routinely takes 3-8 s per call (timed out at the vitest
+  // default 5 s budget on macos-latest). Give every test that
+  // does at least one set/get a 30 s timeout so the Argon2id
+  // bound work has comfortable headroom without compromising the
+  // production parameters.
+  const KDF_TEST_TIMEOUT_MS = 30_000;
 
-  it('throws SecretRequiredError on require() when missing', async () => {
-    const passphrase = SecretValue.fromString('strong-master-passphrase');
-    const store = new EncryptedFileSecretsStore({
-      path: join(workDir, 'secrets.kse'),
-      passphrase,
-    });
-    await store.set('foo', 'bar');
-    await expect(store.require('missing')).rejects.toBeInstanceOf(SecretRequiredError);
-  });
+  it(
+    'round-trips secrets through the AES-256-GCM bundle',
+    async () => {
+      const passphrase = SecretValue.fromString('strong-master-passphrase');
+      const store = new EncryptedFileSecretsStore({
+        path: join(workDir, 'secrets.kse'),
+        passphrase,
+      });
+      await store.set('openai_api_key', 'sk-test');
+      expect((await store.get('openai_api_key'))?.reveal()).toBe('sk-test');
+      const list = await store.list();
+      expect(list.map((m) => m.key)).toEqual(['openai_api_key']);
+    },
+    KDF_TEST_TIMEOUT_MS,
+  );
+
+  it(
+    'throws SecretRequiredError on require() when missing',
+    async () => {
+      const passphrase = SecretValue.fromString('strong-master-passphrase');
+      const store = new EncryptedFileSecretsStore({
+        path: join(workDir, 'secrets.kse'),
+        passphrase,
+      });
+      await store.set('foo', 'bar');
+      await expect(store.require('missing')).rejects.toBeInstanceOf(SecretRequiredError);
+    },
+    KDF_TEST_TIMEOUT_MS,
+  );
 
   it('list returns an empty array before the bundle exists', async () => {
     const passphrase = SecretValue.fromString('strong-master-passphrase');
@@ -201,16 +219,20 @@ describe('EncryptedFileSecretsStore', () => {
     expect(await store.list()).toEqual([]);
   });
 
-  it('rejects a bundle decrypted with the wrong passphrase', async () => {
-    const writer = new EncryptedFileSecretsStore({
-      path: join(workDir, 'secrets.kse'),
-      passphrase: SecretValue.fromString('correct'),
-    });
-    await writer.set('foo', 'bar');
-    const reader = new EncryptedFileSecretsStore({
-      path: join(workDir, 'secrets.kse'),
-      passphrase: SecretValue.fromString('wrong'),
-    });
-    await expect(reader.get('foo')).rejects.toThrow(/Authentication tag mismatch/);
-  });
+  it(
+    'rejects a bundle decrypted with the wrong passphrase',
+    async () => {
+      const writer = new EncryptedFileSecretsStore({
+        path: join(workDir, 'secrets.kse'),
+        passphrase: SecretValue.fromString('correct'),
+      });
+      await writer.set('foo', 'bar');
+      const reader = new EncryptedFileSecretsStore({
+        path: join(workDir, 'secrets.kse'),
+        passphrase: SecretValue.fromString('wrong'),
+      });
+      await expect(reader.get('foo')).rejects.toThrow(/Authentication tag mismatch/);
+    },
+    KDF_TEST_TIMEOUT_MS,
+  );
 });

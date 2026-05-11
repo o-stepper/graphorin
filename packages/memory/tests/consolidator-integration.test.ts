@@ -7,6 +7,8 @@
  */
 
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { Provider, ProviderRequest, ProviderResponse, SessionScope } from '@graphorin/core';
 import {
   createSqliteStore,
@@ -18,7 +20,7 @@ import { describe, expect, it } from 'vitest';
 import { createMemory } from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
-  const dir = await mkdtemp('/tmp/graphorin-consolidator-int-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-consolidator-int-'));
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,
     skipSqliteVec: true,

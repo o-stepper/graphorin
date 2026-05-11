@@ -1,3 +1,6 @@
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CipherPeerMissingError, resolvePassphrase } from '../src/encryption/index.js';
 
@@ -124,9 +127,7 @@ describe('encryption hooks', () => {
 
   it('openAuditDatabase fails fast when the cipher peer is missing', async () => {
     const { openAuditDatabase } = await import('../src/audit-db.js');
-    const dir = await import('node:fs/promises').then((m) =>
-      m.mkdtemp('/tmp/graphorin-audit-missing-'),
-    );
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-audit-missing-'));
     await expect(
       openAuditDatabase({
         path: `${dir}/audit.db`,
@@ -145,9 +146,7 @@ describe('encryption hooks', () => {
 
   it('openAuditDatabase rethrows non-cipher errors from the loader', async () => {
     const { openAuditDatabase } = await import('../src/audit-db.js');
-    const dir = await import('node:fs/promises').then((m) =>
-      m.mkdtemp('/tmp/graphorin-audit-nonpeer-'),
-    );
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-audit-nonpeer-'));
     await expect(
       openAuditDatabase({
         path: `${dir}/audit.db`,

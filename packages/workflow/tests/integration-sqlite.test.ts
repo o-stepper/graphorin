@@ -10,6 +10,8 @@
  */
 
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { collect } from '@graphorin/core';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
@@ -17,7 +19,7 @@ import { describe, expect, it } from 'vitest';
 import { createNode, createWorkflow, Directive, latestValue, pause } from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
-  const dir = await mkdtemp('/tmp/graphorin-workflow-integration-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-workflow-integration-'));
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,
     skipSqliteVec: true,

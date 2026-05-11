@@ -1,9 +1,11 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createSqliteStore, type GraphorinSqliteStore } from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
-  const dir = await mkdtemp('/tmp/graphorin-store-sqlite-stores-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-stores-'));
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,
     skipSqliteVec: true,
