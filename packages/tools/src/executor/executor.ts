@@ -113,6 +113,17 @@ export interface ExecutorOptions {
   /** Pluggable imperative patterns override. */
   readonly imperativePatterns?: ReadonlyArray<ImperativePattern>;
   /**
+   * Override for the imperative-pattern scan budget (ms). The
+   * scanner returns `null` (= timed out, strip-pass skipped) when
+   * it exceeds this budget; the production default of `5` ms is
+   * sufficient on hot paths but can flake on cold-start CI runners
+   * where V8 JIT warm-up + shared-CPU jitter routinely pushes the
+   * first scan above 5 ms. Tests that need deterministic strip
+   * behaviour on noisy runners can raise this to e.g. `250` ms.
+   * Defaults to `5` ms (production-safe).
+   */
+  readonly imperativeBudgetMs?: number;
+  /**
    * Sink for tool execution events; the agent runtime forwards these
    * into `agent.stream(...)`. Receives every `tool.execute.*` variant
    * emitted by the executor (start, progress, partial, end, error).
@@ -766,6 +777,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       toolName: tool.name,
       ...(tool.failClosed === true ? { failClosed: true } : {}),
       ...(opts.imperativePatterns !== undefined ? { patterns: opts.imperativePatterns } : {}),
+      ...(opts.imperativeBudgetMs !== undefined ? { budgetMs: opts.imperativeBudgetMs } : {}),
     });
     if (sanitization.patternsHit.length > 0) {
       for (const pattern of sanitization.patternsHit) {

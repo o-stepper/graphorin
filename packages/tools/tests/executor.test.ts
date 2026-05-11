@@ -367,7 +367,13 @@ describe('ToolExecutor — inbound sanitization integration', () => {
       }),
       { kind: 'skill', skillName: 'shady', trustLevel: 'untrusted' },
     );
-    const executor = createToolExecutor({ registry });
+    // 250 ms scan budget: the 5 ms production default flakes on
+    // cold-start CI runners (V8 JIT warm-up + shared-CPU jitter
+    // routinely pushes the first scan above 5 ms on hosted macOS /
+    // Windows). The strip-pass behaviour itself is what we're
+    // asserting; production hot-path performance is covered by
+    // `pnpm run benchmark:ci`.
+    const executor = createToolExecutor({ registry, imperativeBudgetMs: 250 });
     const completed = await executor.executeBatch({
       calls: [{ toolCallId: 'c1', toolName: 'fetcher', args: {} }],
       runContext: makeRunContext(),

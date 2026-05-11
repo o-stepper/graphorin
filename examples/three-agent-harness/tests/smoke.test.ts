@@ -78,11 +78,16 @@ describe('examples/three-agent-harness — smoke', () => {
     expect(result.plannerArtifact.seq).toBe(1);
 
     expect(result.generatorArtifacts.length).toBeGreaterThanOrEqual(1);
+    // Use the OS-specific separator so the regex matches both POSIX
+    // (`progress/generator.001.txt`) and Windows
+    // (`progress\generator.001.txt`) artifact paths.
+    const sep = process.platform === 'win32' ? '\\\\' : '/';
+    const generatorPathRe = new RegExp(`${sep}generator\\.\\d{3}\\.txt$`);
     for (const ref of result.generatorArtifacts) {
       const gstat = await stat(ref.path);
       expect(gstat.isFile()).toBe(true);
       expect(ref.role).toBe('generator');
-      expect(ref.path).toMatch(/\/generator\.\d{3}\.txt$/);
+      expect(ref.path).toMatch(generatorPathRe);
     }
     const firstGenerator = result.generatorArtifacts[0];
     expect(firstGenerator).toBeDefined();
