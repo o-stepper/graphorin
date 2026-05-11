@@ -60,7 +60,7 @@ jobs:
             --offline
             --no-progress
             --include-fragments
-            --base ./documentation/.vitepress/dist
+            --base ${{ github.workspace }}/documentation/.vitepress/dist
             ./documentation/.vitepress/dist/**/*.html
           fail: true
         env:
