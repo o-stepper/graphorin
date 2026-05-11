@@ -1,0 +1,292 @@
+# @graphorin/mcp
+
+> Model Context Protocol client for the Graphorin framework.
+
+`@graphorin/mcp` ships the typed MCP client used by Graphorin
+agents, the standalone server, and the CLI. The package wraps the
+official `@modelcontextprotocol/sdk@^1.29.0` client primitives and
+adds the Graphorin-specific glue: the `toTools()` adapter that
+bridges MCP tool descriptors into the typed Graphorin tool
+registry, the inbound prompt-injection sanitization defaults for
+MCP-derived tools, the structured-content + outputSchema
+round-trip with backward-compatible TextContent mirror, the
+deferred-loading auto-default at the 10-tool threshold, the
+collision-strategy + per-server priority handoff to the tool
+registry, an `EventStore` contract for resumable Streamable HTTP
+sessions, and the OAuth bridge that resolves bearer headers from
+the existing outbound OAuth subsystem in `@graphorin/security`.
+
+## Highlights
+
+- **Three transports out of the box.** `'stdio'` is the primary
+  transport for local MCP servers started as a child process;
+  `'streamable-http'` is the current default for remote servers
+  with optional Streamable HTTP session support; `'sse'` is the
+  deprecated legacy transport, kept for back-compat with servers
+  that have not migrated yet (the runtime emits one WARN per
+  process on selection).
+- **Typed `MCPClient` surface.** `listTools` / `listResources` /
+  `listPrompts` / `callTool` / `readResource` / `getPrompt` /
+  `close` plus the strategy-aware `toTools(...)` adapter.
+- **Strict default for MCP-derived tools.** Every `Tool` produced
+  by `MCPClient.toTools()` defaults to the
+  `'detect-and-strip-and-wrap'` inbound prompt-injection
+  sanitization policy (mirrored on tool-result bodies at execution
+  time) and the `'sandboxed'` sandbox policy. The trust class is
+  pinned to `'mcp-derived'` so the agent runtime's per-step
+  preamble fires regardless of body-level overrides.
+- **Auto-deferral at the 10-tool threshold.** When the MCP
+  server's `listTools()` returns more than `deferLoadingThreshold`
+  entries (default `10`), the per-server default flips
+  `defer_loading: true` for every produced tool; an INFO-log
+  records the threshold and the tool names; the
+  `tool.retrieval.deferred.total` counter is incremented per
+  affected tool.
+- **Structured-content round-trip.** When the MCP server
+  advertises an `outputSchema` on a tool definition (per the
+  current MCP spec) and returns `structuredContent` on `callTool`,
+  the adapter validates the structured form against the converted
+  Zod-compatible schema and surfaces it as the typed `Tool.execute`
+  output. The unstructured `content[]` is preserved in
+  `ToolReturn.contentParts` (including the backward-compatible
+  `TextContent` mirror); pre-spec servers that emit only `content[]`
+  fall through to the legacy concatenated-text behaviour.
+- **Collision resolution at the registry boundary.** The client
+  exposes `serverIdentity`, `collisionStrategy` (default
+  `'auto-prefix'`), and the optional per-client `priority` field;
+  the registry consumes the trio when its strategy-aware
+  `assertNoDuplicates(strategy, ctx)` overload runs.
+- **OAuth integration.** `createOAuthAuthorizationProvider({...})`
+  wraps the existing `refreshOAuthSession(...)` helper from
+  `@graphorin/security/oauth`, resolves the bearer header on every
+  request, debounces concurrent refreshes via the OAuth
+  subsystem's in-flight de-duplication, and emits the
+  `mcp.auth.expired` lifecycle event when a refresh fails.
+- **Resumable streaming sessions.** The `EventStore` interface and
+  the default `InMemoryEventStore` (capacity `1024`) implement the
+  Streamable HTTP `Mcp-Session-Id` + `Last-Event-ID` resume
+  handshake. Pluggable adapters (a SQLite-backed store from
+  `@graphorin/store-sqlite` for cross-restart durability) follow
+  the same interface.
+
+## Stable sub-paths
+
+```ts
+import { createMCPClient } from '@graphorin/mcp/client';
+import { InMemoryEventStore } from '@graphorin/mcp/event-store';
+import { createOAuthAuthorizationProvider } from '@graphorin/mcp/oauth';
+import {
+  formatMCPServerName,
+  validateMCPServerConfig,
+} from '@graphorin/mcp/helpers';
+import { MCPConnectionError, MCPProtocolError } from '@graphorin/mcp/errors';
+import type {
+  MCPTransportConfig,
+  ServerIdentity,
+} from '@graphorin/mcp/transport';
+```
+
+## Quick start
+
+```ts
+import { createMCPClient } from '@graphorin/mcp';
+
+// Local MCP server over stdio.
+const fileSystem = await createMCPClient({
+  transport: {
+    kind: 'stdio',
+    command: 'pnpm',
+    args: ['dlx', '@modelcontextprotocol/server-filesystem', '/Users/me/Documents'],
+  },
+});
+
+// Remote MCP server over Streamable HTTP.
+const issues = await createMCPClient({
+  transport: {
+    kind: 'streamable-http',
+    url: 'https://issues.example.com/mcp',
+    headers: { Authorization: 'Bearer ${TOKEN}' },
+  },
+});
+
+const tools = [
+  ...(await fileSystem.toTools({ namespace: 'fs' })),
+  ...(await issues.toTools({ namespace: 'issues' })),
+];
+
+// `tools` is ready to register with `@graphorin/tools`'s
+// `createToolRegistry({...})`; the agent runtime consumes the
+// resulting registry as part of its per-step planner.
+
+await fileSystem.close();
+await issues.close();
+```
+
+## Inbound sanitization policy reference
+
+The per-server `inboundSanitization` field controls how
+imperative-pattern matches in tool result bodies (and tool
+descriptions, at registration time) are handled:
+
+| Policy                          | Description                                                                 |
+|---------------------------------|-----------------------------------------------------------------------------|
+| `'pass-through'`                | No scan; bytes-equal forwarding (use only for trusted in-house servers).    |
+| `'detect-and-flag'`             | Scan; emit a flag span attribute + audit row but do not modify the body.    |
+| `'detect-and-strip'`            | Replace each match with the `[REDACTED:imperative-pattern]` literal token.  |
+| `'detect-and-wrap'`             | Wrap the body in `<<<untrusted_content>>>` without stripping matches.       |
+| `'detect-and-strip-and-wrap'`   | **Default for MCP-derived tools.** Both strip matches and wrap the body.    |
+
+Tool descriptions are always sanitized at registration time using
+the `'detect-and-strip'` variant of the configured policy (the
+wrap envelope is reserved for tool-result bodies inside the
+conversation history; the description goes into the per-step tool
+catalogue verbatim aside from the strip pass).
+
+## OAuth integration
+
+The package re-exports the OAuth library functions as the
+operator-facing CLI helpers `mcpAuthLogin`, `mcpAuthListSessions`,
+`mcpAuthRefresh`, `mcpAuthRevoke`, and `mcpAuthStatus`. They wrap
+the lower-level `loginInteractive`, `listOAuthSessions`,
+`refreshOAuthSession`, `revokeOAuthSession`, and `getOAuthStatus`
+helpers in `@graphorin/security/oauth`. The corresponding CLI
+binaries land in Phase 15.
+
+```ts
+import {
+  createInMemoryOAuthServerStore,
+  loginInteractive,
+} from '@graphorin/security/oauth';
+import {
+  createOAuthAuthorizationProvider,
+  createMCPClient,
+} from '@graphorin/mcp';
+
+const storage = createInMemoryOAuthServerStore();
+await loginInteractive({
+  serverId: 'issues-mcp',
+  serverUrl: 'https://issues.example.com/mcp',
+  storage,
+});
+
+const authProvider = createOAuthAuthorizationProvider({
+  serverId: 'issues-mcp',
+  storage,
+});
+
+const issues = await createMCPClient({
+  transport: {
+    kind: 'streamable-http',
+    url: 'https://issues.example.com/mcp',
+    headers: { Authorization: await authProvider.resolveHeader() },
+  },
+  authProvider,
+});
+```
+
+## Resumable streaming sessions
+
+When the MCP server advertises Streamable HTTP session support on
+`initialize`, the client persists the assigned `Mcp-Session-Id`
+header and replays missed events from the configured
+`EventStore` after a transient disconnect (per the Streamable HTTP
+resume handshake the spec defines). The default
+`InMemoryEventStore` keeps a per-session ring buffer of `1024`
+events; the buffer is fixed-size so the runtime degrades
+gracefully under sustained pressure. For cross-restart
+durability, point the client at a SQLite-backed `EventStore` from
+`@graphorin/store-sqlite`.
+
+```ts
+import { InMemoryEventStore, createMCPClient } from '@graphorin/mcp';
+
+const eventStore = new InMemoryEventStore({ capacity: 4096 });
+
+const issues = await createMCPClient({
+  transport: { kind: 'streamable-http', url: 'https://issues.example.com/mcp' },
+  eventStore,
+});
+```
+
+### Reverse-proxy operational note
+
+When a Graphorin client connects to a Streamable HTTP MCP server
+through a reverse proxy (nginx, HAProxy, AWS ALB, Cloudflare, GCP
+Load Balancer), the proxy MUST be configured to disable response
+buffering on the SSE-style streaming response. Without the
+directive the symptoms are:
+
+- The client never receives `tool.execute.progress` /
+  `tool.execute.partial` events until the tool completes (defeats
+  the streaming purpose).
+- The connection appears to hang from the client side until the
+  proxy buffer is full.
+- Intermediate keep-alive timeouts fire because the proxy thinks
+  the connection is idle.
+
+#### Canonical nginx snippet
+
+```nginx
+location /mcp {
+  proxy_buffering off;
+  proxy_cache off;
+  chunked_transfer_encoding on;
+  proxy_read_timeout 600s;
+}
+```
+
+#### Analogous notes for other reverse proxies
+
+- **AWS ALB.** Enable stickiness, raise the idle-timeout to at
+  least 600 s, and confirm WebSocket-style upgrade compatibility
+  is enabled.
+- **Cloudflare.** Disable "Always Online" caching for the MCP
+  route and raise the proxy timeout via Cloudflare Tunnel.
+- **GCP Load Balancer.** Configure the backend service with
+  `connectionDraining.drainingTimeoutSec >= 600` and
+  `timeoutSec >= 600`.
+
+## Errors
+
+Every error class extends `GraphorinMCPError` and carries a
+stable lowercase `kind` discriminator and an actionable `hint`
+field where applicable:
+
+- `MCPConnectionError`               — transport could not be established or was dropped.
+- `MCPProtocolError`                 — JSON-RPC / MCP protocol-level error.
+- `MCPAuthError`                     — authentication / authorization failure.
+- `MCPToolNotFoundError`             — the requested tool is not registered with the server.
+- `MCPCallTimeoutError`              — tool call exceeded the configured timeout (variant `'session-lost'` for the resume-handshake-lost path).
+- `MCPCancelledError`                — call was cancelled by an `AbortSignal`.
+- `MCPInvalidConfigError`            — the supplied `MCPTransportConfig` is invalid.
+- `MCPTransportNotSupportedError`    — the supplied configuration requested an unsupported transport / capability combination (variant `'transport-resumable-not-supported'` for resumable sessions on `'stdio'` / `'sse'`).
+
+## Acceptance & testing
+
+- 109 unit + integration + property tests run under Vitest with
+  no network calls (verified by the workspace
+  `pnpm run check-no-network` script).
+- Integration tests use the SDK's `InMemoryTransport` linked-pair
+  + a configurable in-process `Server` fixture; no child
+  processes are spawned and no network round-trips happen during
+  the test run.
+- Coverage thresholds: 80 % statements, 80 % lines, 80 %
+  functions, 70 % branches.
+
+## Dependencies
+
+| Dependency                       | Pin              | Purpose                                       |
+|----------------------------------|------------------|-----------------------------------------------|
+| `@modelcontextprotocol/sdk`      | `^1.29.0`        | Underlying MCP client + transport primitives. |
+| `@graphorin/core`                | workspace        | `Tool` / `MessageContent` / `ZodLikeSchema`.  |
+| `@graphorin/security`            | workspace        | OAuth client + lifecycle event surface.       |
+| `@graphorin/observability`       | workspace        | Imperative-pattern catalogue.                 |
+| `@graphorin/tools`               | workspace        | Inbound sanitization helper + counter registry. |
+
+## License
+
+MIT — © 2026 Oleksiy Stepurenko.
+
+---
+
+**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

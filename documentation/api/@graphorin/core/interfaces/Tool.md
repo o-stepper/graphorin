@@ -1,0 +1,97 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / Tool
+
+# Interface: Tool\&lt;TInput, TOutput, TDeps\&gt;
+
+Defined in: packages/core/src/contracts/tool.ts:35
+
+Pluggable function call exposed to an LLM. Concrete `Tool` instances
+are produced by the `tool({...})` factory in `@graphorin/tools` and
+by the MCP / Skills loaders. The interface lives in core because every
+package above the persistence layer (agent runtime, workflow engine,
+server, sessions, observability, …) carries `Tool[]` references on
+its public surface.
+
+The interface is intentionally minimal — extension fields covered by
+later phases (per-tool `secretsAllowed` ACL, inbound sanitization
+policy, result truncation strategy, streaming hint, …) are added
+**additively** by their owning packages so that v0.1 consumers can
+type their tool list against `Tool<...>` today without having to
+worry about future fields.
+
+## Stable
+
+## Extended by
+
+- [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `TInput` | `unknown` |
+| `TOutput` | `unknown` |
+| `TDeps` | `unknown` |
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-defer_loading"></a> `defer_loading?` | `readonly` | `boolean` | Defer the tool from the per-step catalogue until the model invokes the built-in `tool_search` to look it up. Tools with deferred loading are not advertised to the model on every step, which keeps the input-token cost bounded for installations with dozens of MCP-derived tools. **Default** `false` | packages/core/src/contracts/tool.ts:93 |
+| <a id="property-description"></a> `description` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:37 |
+| <a id="property-examples"></a> `examples?` | `readonly` | readonly [`ToolExample`](/api/@graphorin/core/interfaces/ToolExample.md)\&lt;`TInput`, `TOutput`\&gt;[] | Worked examples shown to the model alongside the tool's description. Bounded `[1, 5]` — overflow emits a one-time WARN at registration. Each example's `input` and `output` is validated against the tool's `inputSchema` / `outputSchema`. | packages/core/src/contracts/tool.ts:111 |
+| <a id="property-exampleseagerlyrendered"></a> `examplesEagerlyRendered?` | `readonly` | `boolean` | Render examples eagerly (every step) regardless of `defer_loading`. When undefined the runtime applies the auto-rule: `defer_loading: true` ⇒ `false`; `defer_loading: false` ⇒ `true`; neither ⇒ `undefined` (the agent runtime decides at assembly time). | packages/core/src/contracts/tool.ts:118 |
+| <a id="property-executionmode"></a> `executionMode?` | `readonly` | `"parallel"` \| `"sequential"` | Sequential execution mode hints. Tools tagged `'sequential'` are never executed in parallel with each other; the executor serializes them inside the per-step batch. **Default** `'parallel'` | packages/core/src/contracts/tool.ts:59 |
+| <a id="property-failclosed"></a> `failClosed?` | `readonly` | `boolean` | When `true`, an inbound-sanitization hit returns `ToolError({ kind: 'inbound_sanitization_blocked' })` instead of forwarding the (sanitized) result. Intended for regulated deployments. **Default** `false` | packages/core/src/contracts/tool.ts:83 |
+| <a id="property-idempotencykey"></a> `idempotencyKey?` | `readonly` | (`input`, `ctx`) => `string` \| `Promise`\&lt;`string`\&gt; | Optional callback returning a deterministic dedup key per `(input, ctx)` tuple. REQUIRED-by-WARN for `'side-effecting'` / `'external-stateful'` tools. The framework does not validate determinism — that is the operator's contract. | packages/core/src/contracts/tool.ts:132 |
+| <a id="property-inboundsanitization"></a> `inboundSanitization?` | `readonly` | [`InboundSanitizationPolicy`](/api/@graphorin/core/type-aliases/InboundSanitizationPolicy.md) | Inbound prompt-injection sanitization policy. | packages/core/src/contracts/tool.ts:75 |
+| <a id="property-inputschema"></a> `inputSchema` | `readonly` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\&lt;`TInput`\&gt; | - | packages/core/src/contracts/tool.ts:38 |
+| <a id="property-maxresulttokens"></a> `maxResultTokens?` | `readonly` | `number` | Maximum number of tokens the assembled tool result may carry into the conversation history. `0` disables the cap (logs a one-time WARN at registration). Counted against text-shaped output and text-shaped `contentParts` entries; non-text parts pass through. **Default** `16384` | packages/core/src/contracts/tool.ts:102 |
+| <a id="property-memoryguardtier"></a> `memoryGuardTier?` | `readonly` | [`MemoryGuardTier`](/api/@graphorin/core/type-aliases/MemoryGuardTier.md) | Memory-modification guard tier (DEC-153). | packages/core/src/contracts/tool.ts:73 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:36 |
+| <a id="property-needsapproval"></a> `needsApproval?` | `readonly` | `boolean` \| ((`input`, `ctx`) => `boolean` \| `Promise`\&lt;`boolean`\&gt;) | Either a static boolean or a predicate consulted at runtime against the realized input. `true` means the runtime suspends the run with a `tool.approval.requested` event before the tool executes. | packages/core/src/contracts/tool.ts:45 |
+| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\&lt;`TOutput`, `unknown`\&gt; | - | packages/core/src/contracts/tool.ts:39 |
+| <a id="property-preferredmodel"></a> `preferredModel?` | `readonly` | \| [`ModelHint`](/api/@graphorin/core/type-aliases/ModelHint.md) \| [`ModelSpec`](/api/@graphorin/core/type-aliases/ModelSpec.md) | Per-tool author-time model hint. Either a cost-tier vocabulary literal (`'fast' | 'balanced' | 'smart'`) OR an explicit `ModelSpec` that always wins over the agent-side tier mapping. | packages/core/src/contracts/tool.ts:149 |
+| <a id="property-sandboxpolicy"></a> `sandboxPolicy?` | `readonly` | [`SandboxPolicy`](/api/@graphorin/core/type-aliases/SandboxPolicy.md) | Sandbox isolation level. Defaults are picked by `@graphorin/security`. | packages/core/src/contracts/tool.ts:49 |
+| <a id="property-secretsallowed"></a> `secretsAllowed?` | `readonly` | readonly `string`[] | Per-tool secrets ACL. Tool execution is wrapped in a scope where `ctx.secrets.require(...)` only resolves keys present here. Empty / undefined means the tool may not request any secret. | packages/core/src/contracts/tool.ts:65 |
+| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Sensitivity ceiling of the tool's input + output payload. Used by the redaction validator to decide whether the result may flow to a given sink (provider / exporter). | packages/core/src/contracts/tool.ts:71 |
+| <a id="property-sideeffectclass"></a> `sideEffectClass?` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | REQUIRED side-effect classification. v0.1 transition mode emits a one-time WARN per tool name on missing classification and applies the conservative deferred default `'side-effecting'`; v0.2 may promote the WARN to a registration error. | packages/core/src/contracts/tool.ts:125 |
+| <a id="property-streaminghint"></a> `streamingHint?` | `readonly` | `true` | Opt-in flag for streaming-tool execution. The `?: true` typing rejects `streamingHint: false` on purpose — absence is the canonical "non-streaming" signal preserving v0.1 behaviour. When `true`, `Tool.execute(...)` may call `ctx.streamContent(...)` / `ctx.reportProgress(...)` and may return `Promise<void>`. | packages/core/src/contracts/tool.ts:143 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | Free-form labels surfaced to operators and to the model. | packages/core/src/contracts/tool.ts:51 |
+| <a id="property-truncationstrategy"></a> `truncationStrategy?` | `readonly` | [`TruncationStrategy`](/api/@graphorin/core/type-aliases/TruncationStrategy.md) | Truncation strategy applied when `maxResultTokens` is exceeded. | packages/core/src/contracts/tool.ts:104 |
+
+## Methods
+
+### execute()
+
+```ts
+execute(input, ctx): Promise<
+  | void
+  | TOutput
+| ToolReturn<TOutput>>;
+```
+
+Defined in: packages/core/src/contracts/tool.ts:157
+
+Execute the tool. Concrete implementations may return either a raw
+`TOutput` or a `ToolReturn<TOutput>` envelope when extra content
+parts (images, files, …) need to be appended to the conversation.
+Streaming-hint tools may also return `void` once the per-chunk
+buffer has been populated.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | `TInput` |
+| `ctx` | [`ToolExecutionContext`](/api/@graphorin/core/interfaces/ToolExecutionContext.md)\&lt;`TDeps`\&gt; |
+
+#### Returns
+
+`Promise`\<
+  \| `void`
+  \| `TOutput`
+  \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt;\>

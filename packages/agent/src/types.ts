@@ -1,0 +1,362 @@
+/**
+ * Public types for the agent runtime. The interfaces sit in a
+ * dedicated module so consumers can import them without pulling in
+ * the loop implementation.
+ *
+ * @packageDocumentation
+ */
+
+import type {
+  AgentEvent,
+  AgentResult,
+  CheckpointStore,
+  HandoffFilter,
+  Message,
+  ModelHint,
+  ModelSpec,
+  ProgressArtifactRef,
+  Provider,
+  ReasoningRetention,
+  RunContext,
+  RunState,
+  Sensitivity,
+  StopCondition,
+  Tool,
+  ToolChoice,
+  Tracer,
+} from '@graphorin/core';
+import type {
+  ContextEngineConfig,
+  Memory,
+  PostCompactionHook as MemoryPostCompactionHook,
+} from '@graphorin/memory';
+import type { AgentFallbackPolicy } from './fallback/index.js';
+import type { FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
+import type { CausalityMonitorConfig } from './lateral-leak/causality-monitor.js';
+import type { MergeGuardConfig } from './lateral-leak/merge-guard.js';
+import type { ProtocolGuardConfig } from './lateral-leak/protocol-guard.js';
+import type { ProgressReadOptions, ProgressWriteOptions } from './progress/index.js';
+
+/**
+ * Forward-compatible type alias for the input accepted by
+ * `Agent.stream / run / steer / followUp`. v0.1 ships with the
+ * canonical text + multimodal Message shape; future versions may
+ * add structured inputs.
+ *
+ * @stable
+ */
+export type AgentInput = string | Message | ReadonlyArray<Message>;
+
+/**
+ * Output type specification.
+ *
+ * @stable
+ */
+export interface OutputSpec<TOutput> {
+  readonly kind: 'text' | 'structured';
+  /** Optional Zod schema for structured output validation. */
+  readonly schema?: { parse(value: unknown): TOutput };
+  /** Optional description shown to the model alongside the schema. */
+  readonly description?: string;
+}
+
+/**
+ * Per-step override hook. Receives the current `RunContext` and may
+ * return overrides applied to the next provider call only.
+ *
+ * @stable
+ */
+export type PrepareStepHook<TDeps = unknown> = (
+  ctx: RunContext<TDeps>,
+) => Promise<PrepareStepOverrides<TDeps>> | PrepareStepOverrides<TDeps>;
+
+/** @stable */
+export interface PrepareStepOverrides<TDeps = unknown> {
+  readonly provider?: Provider;
+  readonly tools?: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+  readonly toolChoice?: ToolChoice;
+  readonly temperature?: number;
+  readonly maxTokens?: number;
+}
+
+/**
+ * Input guardrail predicate.
+ *
+ * @stable
+ */
+export type InputGuardrail = (input: AgentInput) => Promise<GuardrailVerdict> | GuardrailVerdict;
+
+/** @stable */
+export type OutputGuardrail<TOutput = unknown> = (
+  output: TOutput,
+) => Promise<GuardrailVerdict> | GuardrailVerdict;
+
+/** @stable */
+export type GuardrailVerdict =
+  | { readonly trip: false }
+  | { readonly trip: true; readonly reason?: string; readonly name?: string };
+
+/**
+ * Compaction post-hook factory accepted by `createAgent({...})`.
+ * Re-exported from `@graphorin/memory` here for ergonomic typing.
+ *
+ * @stable
+ */
+export type PostCompactionHook = MemoryPostCompactionHook;
+
+/**
+ * Skill-registry shape consumed by the agent loop. Implementations
+ * live in `@graphorin/skills`. We accept any structurally-compatible
+ * value to avoid the heavyweight peer dependency on the typing
+ * surface.
+ *
+ * @stable
+ */
+export interface SkillsRegistryLike {
+  list?(): ReadonlyArray<unknown>;
+}
+
+/**
+ * Handoff target entry accepted by `createAgent({ handoffs })`.
+ * Either a bare {@link Agent} reference (default filter applied) or
+ * an explicit `{ target, inputFilter? }` envelope.
+ *
+ * @stable
+ */
+export type HandoffEntry<TDeps = unknown> =
+  | Agent<TDeps, unknown>
+  | {
+      readonly target: Agent<TDeps, unknown>;
+      readonly inputFilter?: HandoffFilter;
+    };
+
+/**
+ * The full options object accepted by {@link createAgent}.
+ *
+ * @stable
+ */
+export interface AgentConfig<TDeps = unknown, TOutput = string> {
+  readonly name: string;
+  readonly instructions: string | ((ctx: RunContext<TDeps>) => string | Promise<string>);
+  readonly provider: Provider;
+  readonly tools?: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+  readonly skills?: SkillsRegistryLike;
+  readonly memory?: Memory;
+  readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
+  readonly outputType?: OutputSpec<TOutput>;
+  readonly guardrails?: {
+    readonly input?: ReadonlyArray<InputGuardrail>;
+    readonly output?: ReadonlyArray<OutputGuardrail<TOutput>>;
+  };
+  readonly stopWhen?: StopCondition;
+  readonly toolChoice?: ToolChoice;
+  readonly prepareStep?: PrepareStepHook<TDeps>;
+  readonly contextEngine?: ContextEngineConfig;
+  readonly maxParallelTools?: number;
+  readonly fallbackModels?: ReadonlyArray<ModelSpec>;
+  readonly fallbackPolicy?: AgentFallbackPolicy;
+  readonly preferredModel?: ModelHint | ModelSpec;
+  readonly modelTierMap?: Partial<Record<ModelHint, ModelSpec>>;
+  readonly modelTierAutoClassification?: boolean;
+  /**
+   * Per-agent override of the per-provider auto-detected
+   * {@link ReasoningRetention} default. Wins over the provider-
+   * level default when both are present. The agent runtime feeds
+   * the effective value into every `provider.stream(...)` call so
+   * the wire-correct contract is honoured per RB-42 / suggested
+   * DEC-158 / suggested ADR-046.
+   */
+  readonly reasoningRetention?: ReasoningRetention;
+  readonly causalityMonitor?: CausalityMonitorConfig;
+  readonly mergeGuard?: MergeGuardConfig;
+  readonly protocolGuard?: ProtocolGuardConfig;
+  readonly tracer?: Tracer;
+  readonly checkpointStore?: CheckpointStore;
+  readonly sensitivity?: Sensitivity;
+  readonly sessionId?: string;
+  readonly userId?: string;
+  readonly deps?: TDeps;
+}
+
+/**
+ * Single approval decision attached to a {@link ResumeDirective}.
+ * Mirrors the directive surface the HITL caller supplies on resume
+ * (per `Command(approval: { granted, reason? })` in the agent-loop
+ * reference, renamed to `Directive` per Graphorin's own naming).
+ *
+ * @stable
+ */
+export interface ApprovalDecision {
+  readonly toolCallId: string;
+  readonly granted: boolean;
+  readonly reason?: string;
+}
+
+/**
+ * Resume directive accepted by `agent.run(input | RunState, { directive })`.
+ *
+ * The library-mode pickup pattern is: the operator stores the
+ * suspended `RunState` from the previous `agent.run(...)` call,
+ * waits for the user / cron / webhook to resolve the pending
+ * approval, and re-invokes `agent.run(savedState, { directive: {
+ * approvals: [...] } })` to resume.
+ *
+ * @stable
+ */
+export interface ResumeDirective {
+  readonly approvals?: ReadonlyArray<ApprovalDecision>;
+}
+
+/**
+ * Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
+ *
+ * @stable
+ */
+export interface AgentCallOptions<TDeps> {
+  readonly deps?: TDeps;
+  readonly signal?: AbortSignal;
+  readonly sessionId?: string;
+  readonly userId?: string;
+  /**
+   * HITL resume directive. Supplied alongside a `RunState` to
+   * resolve any approvals that were pending when the previous
+   * `agent.run(...)` call suspended.
+   */
+  readonly directive?: ResumeDirective;
+}
+
+/**
+ * `agent.toTool({...})` options.
+ *
+ * @stable
+ */
+export interface AgentToToolOptions {
+  readonly name?: string;
+  readonly description?: string;
+  readonly exposeTurns?: 'final' | 'all' | 'none';
+  readonly secretsInheritance?: 'inherit-allowlist' | 'isolated' | 'forward-explicit';
+  readonly inheritSecrets?: ReadonlyArray<string>;
+  readonly inputFilter?: HandoffFilter;
+}
+
+/**
+ * Cancellation options accepted by `agent.abort({...})`.
+ *
+ * @stable
+ */
+export interface AbortOptions {
+  /** Wait for the current step to complete before stopping. */
+  readonly drain?: boolean;
+  /**
+   * What to do with approvals that were already requested but not
+   * resolved at abort time.
+   *
+   * - `'deny'` (default) — auto-deny pending approvals.
+   * - `'hold'`            — keep the approvals on `RunState.pendingApprovals`.
+   * - `'fail'`            — reject the run with `RunError(code: 'run-aborted')`.
+   */
+  readonly onPendingApprovals?: 'deny' | 'hold' | 'fail';
+}
+
+/**
+ * `agent.compact({...})` options.
+ *
+ * @stable
+ */
+export interface CompactOptions {
+  readonly source?: 'manual' | 'pre-step';
+  readonly preserveRecentTurns?: number;
+}
+
+/**
+ * Result of `agent.compact({...})`.
+ *
+ * @stable
+ */
+export interface CompactionApiResult {
+  readonly beforeTokens: number;
+  readonly afterTokens: number;
+  readonly summaryTokens: number;
+  readonly durationMs: number;
+  readonly hooksFiredCount: number;
+  readonly summary: string;
+}
+
+/**
+ * Per-call shape accepted by `Agent.fanOut(...)`. Mirrors the
+ * pure-function {@link FanOutOptions} but omits the runtime-supplied
+ * identifiers — the `Agent` instance carries those.
+ *
+ * @stable
+ */
+export interface AgentFanOutOptions<TOutput = unknown> {
+  readonly children: ReadonlyArray<{
+    readonly agentId: string;
+    readonly invoke: () => Promise<TOutput>;
+  }>;
+  readonly maxConcurrentChildren?: number;
+  readonly perBudget?: PerChildBudget;
+  readonly mergeStrategy?: MergeStrategy<TOutput>;
+  readonly signal?: AbortSignal;
+}
+
+/**
+ * Progress IO surface exposed on the `Agent` instance. The methods
+ * default the `runId` cursor to the in-flight run when present, so
+ * callers can use them inside an `agent.run(...)` boundary without
+ * repeating the cursor.
+ *
+ * @stable
+ */
+export interface AgentProgressIO {
+  write(content: string, options?: ProgressWriteOptions): Promise<ProgressArtifactRef>;
+  read(options?: ProgressReadOptions): Promise<ReadonlyArray<ProgressArtifactRef>>;
+}
+
+/**
+ * Public agent surface returned by {@link createAgent}.
+ *
+ * @stable
+ */
+export interface Agent<TDeps = unknown, TOutput = string> {
+  readonly id: string;
+  readonly config: AgentConfig<TDeps, TOutput>;
+  stream(
+    input: AgentInput | RunState,
+    options?: AgentCallOptions<TDeps>,
+  ): AsyncIterable<AgentEvent<TOutput>>;
+  run(
+    input: AgentInput | RunState,
+    options?: AgentCallOptions<TDeps>,
+  ): Promise<AgentResult<TOutput>>;
+  steer(message: AgentInput): void;
+  followUp(message: AgentInput): void;
+  abort(options?: AbortOptions): void;
+  toTool(options?: AgentToToolOptions): Tool<{ readonly input: string }, TOutput, TDeps>;
+  compact(options?: CompactOptions): Promise<CompactionApiResult>;
+  /**
+   * Convenience wrapper around the standalone `runFanOut(...)`. The
+   * returned `FanOutResult` carries per-child status + the merged
+   * output. Per-child failures are captured in `children[].status`
+   * — this method never throws on a child failure (the merge
+   * strategy decides whether to propagate).
+   */
+  fanOut<TFanOutOutput = unknown>(
+    options: AgentFanOutOptions<TFanOutOutput>,
+  ): Promise<FanOutResult<TFanOutOutput>>;
+  /**
+   * Structured handoff-artifact APIs. Persists / reads UTF-8 text
+   * artifacts under the configured artifact root; cross-run reads
+   * require an explicit `runId` cursor on the read options.
+   */
+  readonly progress: AgentProgressIO;
+}
+
+export type {
+  ChildResult,
+  FanOutOptions,
+  FanOutResult,
+  MergeStrategy,
+  PerChildBudget,
+} from './fanout/index.js';
+export type { ProgressIO, ProgressReadOptions, ProgressWriteOptions } from './progress/index.js';

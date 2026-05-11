@@ -1,0 +1,178 @@
+/* =============================================================
+   Graphorin documentation — VitePress theme overrides
+
+   Palette is sourced from the landing-page CSS at
+   https://graphorin.com/styles.css so the docs feel like one
+   continuous site. The accent is the deep terracotta that
+   matches the official logo (#E8590C).
+   ============================================================= */
+
+:root {
+  /* Brand (terracotta — matches the logo and landing accent) */
+  --vp-c-brand-1: #ff7a2e;
+  --vp-c-brand-2: #e8590c;
+  --vp-c-brand-3: #b8460a;
+  --vp-c-brand-soft: rgba(232, 89, 12, 0.18);
+
+  /* Notes / tips / warnings — keep terracotta on the warm side */
+  --vp-c-note-1: var(--vp-c-brand-1);
+
+  /* Typography */
+  --vp-font-family-base:
+    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --vp-font-family-mono:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+
+  /* Layout */
+  --vp-layout-max-width: 1440px;
+
+  /* Home page hero gradient (subtle terracotta wash on graphite) */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #ff7a2e 30%, #e8590c);
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    rgba(232, 89, 12, 0.4) 50%,
+    rgba(255, 122, 46, 0.18) 50%
+  );
+  --vp-home-hero-image-filter: blur(72px);
+}
+
+/* ---------- Dark theme — graphite surfaces ---------- */
+.dark {
+  /* Surface */
+  --vp-c-bg: #0b0b0d;
+  --vp-c-bg-alt: #131316;
+  --vp-c-bg-elv: #1a1a1e;
+  --vp-c-bg-soft: #131316;
+
+  /* Borders */
+  --vp-c-border: #26262c;
+  --vp-c-divider: #1f1f24;
+  --vp-c-gutter: #0f0f12;
+
+  /* Text */
+  --vp-c-text-1: #f4f4f6;
+  --vp-c-text-2: #b8b8bd;
+  --vp-c-text-3: #76767e;
+
+  /* Custom blocks (tip/info/warning/danger) anchored to the terracotta */
+  --vp-c-tip-1: var(--vp-c-brand-1);
+  --vp-c-tip-2: var(--vp-c-brand-2);
+  --vp-c-tip-3: var(--vp-c-brand-3);
+  --vp-c-tip-soft: var(--vp-c-brand-soft);
+
+  /* Code blocks */
+  --vp-code-block-bg: #131316;
+  --vp-code-bg: rgba(232, 89, 12, 0.1);
+  --vp-code-color: #ff7a2e;
+
+  /* Buttons */
+  --vp-button-brand-bg: var(--vp-c-brand-2);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-1);
+  --vp-button-brand-active-bg: var(--vp-c-brand-3);
+  --vp-button-brand-text: #ffffff;
+  --vp-button-brand-hover-text: #ffffff;
+  --vp-button-brand-active-text: #ffffff;
+  --vp-button-brand-border: var(--vp-c-brand-2);
+  --vp-button-brand-hover-border: var(--vp-c-brand-1);
+  --vp-button-brand-active-border: var(--vp-c-brand-3);
+
+  /* Selection */
+  --vp-c-selection-bg: rgba(232, 89, 12, 0.45);
+}
+
+/* ---------- Light theme — kept legible but with the same warm accent ---------- */
+:root:not(.dark) {
+  --vp-c-bg: #fbfbfc;
+  --vp-c-bg-alt: #f4f4f6;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #f4f4f6;
+  --vp-c-text-1: #15151a;
+  --vp-c-text-2: #4f4f57;
+  --vp-c-text-3: #76767e;
+  --vp-c-border: #e2e2e6;
+  --vp-c-divider: #ececef;
+}
+
+/* ---------- Scrollbar tint ---------- */
+.dark html {
+  scrollbar-color: #2a2a30 var(--vp-c-bg);
+}
+
+/* ---------- Nav — site title: darker terracotta by default, lighter on hover (like graphorin.com) ---------- */
+.VPNavBarTitle .title {
+  color: var(--vp-c-brand-2);
+}
+
+.VPNavBarTitle .title:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* ---------- Hero polish ---------- */
+.VPHero .name,
+.VPHero .text {
+  letter-spacing: -0.02em;
+}
+
+.VPHero .tagline {
+  color: var(--vp-c-text-2);
+}
+
+/* ---------- Inline framework-version pill ---------- */
+.framework-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.78em;
+  font-weight: 600;
+  border: 1px solid rgba(232, 89, 12, 0.35);
+  white-space: nowrap;
+}
+
+.framework-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--vp-c-brand-2);
+  box-shadow: 0 0 12px rgba(232, 89, 12, 0.65);
+}
+
+/* ---------- Mermaid block — match graphite surface ---------- */
+.graphorin-mermaid {
+  background: var(--vp-c-bg-alt);
+  border: 1px solid var(--vp-c-border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem 1.35rem;
+  overflow: visible;
+}
+
+.graphorin-mermaid svg {
+  overflow: visible;
+  max-height: none;
+}
+
+.graphorin-mermaid foreignObject {
+  overflow: visible;
+}
+
+/* ---------- Footer — small caps, muted ---------- */
+.VPFooter {
+  border-top: 1px solid var(--vp-c-border);
+  background: var(--vp-c-bg-alt);
+}
+
+/* ---------- Code blocks: gentler corners, slightly tighter line height ---------- */
+.vp-doc div[class*='language-'] {
+  border-radius: 12px;
+}
+
+.vp-doc div[class*='language-'] code {
+  line-height: 1.55;
+}

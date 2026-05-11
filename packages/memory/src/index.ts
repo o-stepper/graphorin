@@ -1,0 +1,220 @@
+/**
+ * `@graphorin/memory` — six-tier memory system for the Graphorin
+ * framework.
+ *
+ * Phase 10a deliverables:
+ *
+ *  - The {@link createMemory} facade that wires every six-tier sub-
+ *    module + the nine memory tools + the search reranker + the
+ *    context-engine + consolidator interface stubs.
+ *  - Six tier sub-modules under `./tiers`: {@link WorkingMemory},
+ *    {@link SessionMemory}, {@link EpisodicMemory}, {@link SemanticMemory},
+ *    {@link ProceduralMemory}, {@link SharedMemory}.
+ *  - Nine memory tools under `./tools`: `block_append`, `block_replace`,
+ *    `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
+ *    `fact_forget`, `recall_episodes`, `conversation_search`.
+ *  - The hybrid search composition under `./search`, including the
+ *    built-in {@link RRFReranker} (k=60 default) and the
+ *    {@link ReRanker} contract.
+ *  - The embedder migration runner under `./migration`
+ *    ({@link migrateEmbedder} with three coexistence policies).
+ *  - Typed errors under `./errors`.
+ *
+ * Forward-looking surfaces (for ergonomic typing today):
+ *
+ *  - {@link MemoryContextBlocks} + {@link CompileOptions} from `./context-engine`.
+ *  - {@link Consolidator}, {@link ConsolidatorTriggerSpec},
+ *    {@link ConsolidatorTier} from `./consolidator`.
+ *
+ * @packageDocumentation
+ */
+
+/** Canonical version constant. Mirrors the `package.json` version. */
+export const VERSION = '0.1.0';
+
+export * from './conflict/index.js';
+export {
+  BudgetExceededError,
+  CONSOLIDATOR_TIER_DEFAULTS,
+  type Consolidator,
+  type ConsolidatorBudgetSnapshot,
+  type ConsolidatorCatchupPolicy,
+  type ConsolidatorCeilings,
+  type ConsolidatorConfig,
+  type ConsolidatorLastRuns,
+  type ConsolidatorPhase,
+  type ConsolidatorStatus,
+  type ConsolidatorTier,
+  type ConsolidatorTriggerReason,
+  type ConsolidatorTriggerSpec,
+  type CreateConsolidatorOptions,
+  CustomTierMisconfiguredError,
+  createConsolidator,
+  createConsolidatorPlaceholder,
+  type OnBudgetExceed,
+  type ParsedTrigger,
+  type PhaseListener,
+  type PhaseOutcome,
+  ProviderNotConfiguredError,
+  parseTriggerSpec,
+  type RegisterTriggersOptions,
+  type RegisterTriggersResult,
+  reasonFromTrigger,
+  registerConsolidatorTriggers,
+  type SchedulerLike,
+  type TriggerDeclarationLike,
+} from './consolidator/index.js';
+export {
+  _getLocaleFallbackWarningsForTesting,
+  _resetLocaleFallbackWarningsForTesting,
+  type AllocationResult,
+  type AnnotatedPart,
+  type AssembledPrompt,
+  type AssembleInput,
+  type AutoCompactionDefault,
+  type AutoRecallConfig,
+  type AutoRecallStrategy,
+  type AutoRecallStrategyContext,
+  type AutoRecallTriggerResult,
+  type AutoRecallTriggers,
+  adaptTokenCounter,
+  allocateTokenBudget,
+  allocateToolCatalogue,
+  annotate,
+  BASE_TEMPLATE_EN_FULL,
+  BASE_TEMPLATE_EN_MINIMAL,
+  type BaseTemplateFragments,
+  buildSummarizerPrompt,
+  CONTENT_ORIGIN_ATTR,
+  type CompactionConfig,
+  type CompactionContext,
+  type CompactionMetadataPayload,
+  type CompactionResult,
+  type CompactionSource,
+  type CompactionStrategy,
+  type CompactionSummarizer,
+  type CompactionSummaryTemplate,
+  type CompactionTriggerConfig,
+  type CompileOptions,
+  type CompileScope,
+  type ContentAnnotation,
+  type ContentOrigin,
+  type ContextEngine,
+  type ContextEngineConfig,
+  type ContextLocalePack,
+  type ContextTokenCounter,
+  composeInboundPreamble,
+  composeLayer1,
+  composeLayer2,
+  composeLayer4Skills,
+  countMessageTokens,
+  createContextEngine,
+  DEFAULT_LAYER_PRIORITY,
+  DEFAULT_PRESERVE_RECENT_TURNS,
+  DEFAULT_RESERVED_FOR_COMPACTION,
+  DEFAULT_RESERVED_FOR_RESPONSE,
+  DEFAULT_THRESHOLD_RATIO,
+  defaultLocaleHeuristicStrategy,
+  defineAutoRecallStrategy,
+  defineContextLocalePack,
+  type ExecuteCompactionInput,
+  effectiveAcceptsSensitivity,
+  enLocalePack,
+  executeCompaction,
+  gatherMemoryMetadata,
+  HEURISTIC_TOKEN_COUNTER,
+  INBOUND_SANITIZATION_PREAMBLE_EN,
+  INBOUND_TRUST_ATTR,
+  type InboundSanitizationPreamble,
+  type InboundTrust,
+  type LayerAllocation,
+  type LayerCandidate,
+  type LayerConfig,
+  type LayerId,
+  type LazyLoadedToolEntry,
+  type LocaleResolverLogger,
+  type MemoryBaseMode,
+  type MemoryContextBlocks,
+  type MemoryMetadataDeps,
+  type NamedPostCompactionHook,
+  NON_INBOUND_ORIGINS,
+  type OverflowMode,
+  type PartialContextLocalePack,
+  type PartitionResult,
+  type PostCompactionHook,
+  type PostCompactionHookContext,
+  type PrivacyConfig,
+  type PrivacyDecision,
+  type PrivacyDecisionReason,
+  type PrivacyFilterContext,
+  partitionBySensitivity,
+  privacyDecide,
+  type RenderedTemplate,
+  type ResolvedContextEngineConfig,
+  reanchorPersonaBlock,
+  reanchorPinnedFacts,
+  reanchorProjectRules,
+  renderFinalSummary,
+  renderMessageText,
+  renderMetadataBlock,
+  resolveAutoCompactionDefault,
+  resolveLocalePack,
+  resolveTriggerThreshold,
+  type SkillMetadataCard,
+  SUMMARY_TEMPLATE_NAME,
+  SUMMARY_TEMPLATE_VERSION,
+  shouldFireInboundPreamble,
+  type ToolBudgetEntry,
+  type ToolCatalogueInput,
+  type ToolCatalogueResult,
+  type ToolRanker,
+  toSpanAttributes,
+  truncateToTokens,
+  updateLazyLoadedSet,
+} from './context-engine/index.js';
+export * from './errors/index.js';
+export {
+  type CreateMemoryOptions,
+  createMemory,
+  type Memory,
+} from './facade.js';
+export type {
+  ConflictAuditDecision,
+  ConflictAuditInputLike,
+  ConflictAuditStage,
+  ConflictMemoryStoreExt,
+  ConsolidatorMemoryStoreExt,
+  ConsolidatorRunFinish,
+  ConsolidatorRunInput,
+  ConsolidatorStatePatch,
+  ConsolidatorStateRow,
+  DecayMemoryStoreExt,
+  DlqBatchInput,
+  DlqBatchRow,
+  EmbeddedWriteOptions,
+  EmbeddingMetaRegistryLike,
+  EpisodicMemoryStoreExt,
+  MemoryStoreAdapter,
+  PendingConflictInputLike,
+  PendingConflictRowLike,
+  SemanticMemoryStoreExt,
+  SessionMemoryStoreExt,
+  SessionMessageRecord,
+} from './internal/storage-adapter.js';
+export * from './migration/index.js';
+export * from './search/index.js';
+export * from './tiers/index.js';
+export {
+  buildMemoryTools,
+  createBlockAppendTool,
+  createBlockReplaceTool,
+  createBlockRethinkTool,
+  createConversationSearchTool,
+  createFactForgetTool,
+  createFactRememberTool,
+  createFactSearchTool,
+  createFactSupersedeTool,
+  createRecallEpisodesTool,
+  type MemoryToolDeps,
+  type ScopeResolver,
+} from './tools/index.js';

@@ -1,0 +1,128 @@
+{
+  "name": "@graphorin/provider",
+  "version": "0.1.0",
+  "description": "Vendor-neutral LLM provider layer for the Graphorin framework. Ships the canonical Provider interface, the Vercel AI SDK adapter (default cloud path), three local-LLM adapters (direct Ollama HTTP, llama-server HTTP, and a generic OpenAI-compatible adapter for LMStudio / LocalAI / vLLM / Together-style endpoints), the shared LocalProviderTrust classifier (loopback / private / public-tls / public-cleartext), the canonical-order middleware composer (withTracing / withRetry / withRateLimit / withCostLimit / withCostTracking / withFallback / withRedaction), the pluggable TokenCounter dispatcher (js-tiktoken default plus per-vendor native counters and a heuristic fallback), the per-provider model-tier auto-classifier (fast / balanced / smart), and the production startup hook that fails fast when withRedaction is missing.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/provider",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/provider"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "provider",
+    "llm",
+    "vercel-ai-sdk",
+    "ollama",
+    "llama-cpp",
+    "openai-compatible",
+    "middleware",
+    "retry",
+    "fallback",
+    "rate-limit",
+    "cost-limit",
+    "redaction",
+    "token-counter",
+    "tiktoken",
+    "local-first"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./adapters/vercel": {
+      "types": "./dist/adapters/vercel.d.ts",
+      "import": "./dist/adapters/vercel.js"
+    },
+    "./adapters/ollama": {
+      "types": "./dist/adapters/ollama.d.ts",
+      "import": "./dist/adapters/ollama.js"
+    },
+    "./adapters/llamacpp-server": {
+      "types": "./dist/adapters/llamacpp-server.d.ts",
+      "import": "./dist/adapters/llamacpp-server.js"
+    },
+    "./adapters/openai-compatible": {
+      "types": "./dist/adapters/openai-compatible.d.ts",
+      "import": "./dist/adapters/openai-compatible.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware/index.d.ts",
+      "import": "./dist/middleware/index.js"
+    },
+    "./counters": {
+      "types": "./dist/counters/index.d.ts",
+      "import": "./dist/counters/index.js"
+    },
+    "./trust": {
+      "types": "./dist/trust/index.d.ts",
+      "import": "./dist/trust/index.js"
+    },
+    "./model-tier": {
+      "types": "./dist/model-tier/index.d.ts",
+      "import": "./dist/model-tier/index.js"
+    },
+    "./reasoning": {
+      "types": "./dist/reasoning/index.d.ts",
+      "import": "./dist/reasoning/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*"
+  },
+  "peerDependencies": {
+    "ai": "^7.0.0-beta.76",
+    "js-tiktoken": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ai": {
+      "optional": true
+    },
+    "js-tiktoken": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.0",
+    "js-tiktoken": "^1.0.21"
+  }
+}

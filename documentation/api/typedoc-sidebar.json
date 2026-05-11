@@ -1,0 +1,3783 @@
+[
+  {
+    "text": "@graphorin/agent",
+    "link": "/api/@graphorin/agent/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/agent/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentResolutionError",
+                "link": "/api/@graphorin/agent/errors/classes/AgentResolutionError.md"
+              },
+              {
+                "text": "AgentRuntimeError",
+                "link": "/api/@graphorin/agent/errors/classes/AgentRuntimeError.md"
+              },
+              {
+                "text": "EvaluatorOptimizerConfigError",
+                "link": "/api/@graphorin/agent/errors/classes/EvaluatorOptimizerConfigError.md"
+              },
+              {
+                "text": "InvalidAgentConfigError",
+                "link": "/api/@graphorin/agent/errors/classes/InvalidAgentConfigError.md"
+              },
+              {
+                "text": "InvalidPreferredModelError",
+                "link": "/api/@graphorin/agent/errors/classes/InvalidPreferredModelError.md"
+              },
+              {
+                "text": "MergeBlockedError",
+                "link": "/api/@graphorin/agent/errors/classes/MergeBlockedError.md"
+              },
+              {
+                "text": "MultipleHandoffsInStepError",
+                "link": "/api/@graphorin/agent/errors/classes/MultipleHandoffsInStepError.md"
+              },
+              {
+                "text": "ProgressWriteError",
+                "link": "/api/@graphorin/agent/errors/classes/ProgressWriteError.md"
+              },
+              {
+                "text": "ProtocolInjectionRejectError",
+                "link": "/api/@graphorin/agent/errors/classes/ProtocolInjectionRejectError.md"
+              },
+              {
+                "text": "ProviderMiddlewareOrderError",
+                "link": "/api/@graphorin/agent/errors/classes/ProviderMiddlewareOrderError.md"
+              },
+              {
+                "text": "RunStateMalformedError",
+                "link": "/api/@graphorin/agent/errors/classes/RunStateMalformedError.md"
+              },
+              {
+                "text": "RunStateVersionUnsupportedError",
+                "link": "/api/@graphorin/agent/errors/classes/RunStateVersionUnsupportedError.md"
+              },
+              {
+                "text": "ToolNotFoundError",
+                "link": "/api/@graphorin/agent/errors/classes/ToolNotFoundError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentRuntimeErrorCode",
+                "link": "/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "evaluator-optimizer",
+        "link": "/api/@graphorin/agent/evaluator-optimizer/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "EvaluatorOptimizerOptions",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOptions.md"
+              },
+              {
+                "text": "EvaluatorOptimizerOutcome",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md"
+              },
+              {
+                "text": "EvaluatorOutcome",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOutcome.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "EvaluatorCallable",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/type-aliases/EvaluatorCallable.md"
+              },
+              {
+                "text": "GeneratorCallable",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/type-aliases/GeneratorCallable.md"
+              },
+              {
+                "text": "Rubric",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/type-aliases/Rubric.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "evaluatorOptimizer",
+                "link": "/api/@graphorin/agent/evaluator-optimizer/functions/evaluatorOptimizer.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "factory",
+        "link": "/api/@graphorin/agent/factory/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createAgent",
+                "link": "/api/@graphorin/agent/factory/functions/createAgent.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "fallback",
+        "link": "/api/@graphorin/agent/fallback/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentFallbackEligibility",
+                "link": "/api/@graphorin/agent/fallback/interfaces/AgentFallbackEligibility.md"
+              },
+              {
+                "text": "AgentFallbackPolicy",
+                "link": "/api/@graphorin/agent/fallback/interfaces/AgentFallbackPolicy.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentFallbackReason",
+                "link": "/api/@graphorin/agent/fallback/type-aliases/AgentFallbackReason.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "isAgentFallbackEligible",
+                "link": "/api/@graphorin/agent/fallback/functions/isAgentFallbackEligible.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "fanout",
+        "link": "/api/@graphorin/agent/fanout/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ChildResult",
+                "link": "/api/@graphorin/agent/fanout/interfaces/ChildResult.md"
+              },
+              {
+                "text": "FanOutOptions",
+                "link": "/api/@graphorin/agent/fanout/interfaces/FanOutOptions.md"
+              },
+              {
+                "text": "FanOutResult",
+                "link": "/api/@graphorin/agent/fanout/interfaces/FanOutResult.md"
+              },
+              {
+                "text": "PerChildBudget",
+                "link": "/api/@graphorin/agent/fanout/interfaces/PerChildBudget.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MergeStrategy",
+                "link": "/api/@graphorin/agent/fanout/type-aliases/MergeStrategy.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "runFanOut",
+                "link": "/api/@graphorin/agent/fanout/functions/runFanOut.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "filters",
+        "link": "/api/@graphorin/agent/filters/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "DescribedFilter",
+                "link": "/api/@graphorin/agent/filters/interfaces/DescribedFilter.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "FILTER_KIND_CUSTOM",
+                "link": "/api/@graphorin/agent/filters/variables/FILTER_KIND_CUSTOM.md"
+              },
+              {
+                "text": "filters",
+                "link": "/api/@graphorin/agent/filters/variables/filters.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "bySensitivity",
+                "link": "/api/@graphorin/agent/filters/functions/bySensitivity.md"
+              },
+              {
+                "text": "compose",
+                "link": "/api/@graphorin/agent/filters/functions/compose.md"
+              },
+              {
+                "text": "custom",
+                "link": "/api/@graphorin/agent/filters/functions/custom.md"
+              },
+              {
+                "text": "defaultHandoffFilter",
+                "link": "/api/@graphorin/agent/filters/functions/defaultHandoffFilter.md"
+              },
+              {
+                "text": "full",
+                "link": "/api/@graphorin/agent/filters/functions/full.md"
+              },
+              {
+                "text": "lastN",
+                "link": "/api/@graphorin/agent/filters/functions/lastN.md"
+              },
+              {
+                "text": "lastUser",
+                "link": "/api/@graphorin/agent/filters/functions/lastUser.md"
+              },
+              {
+                "text": "stripReasoning",
+                "link": "/api/@graphorin/agent/filters/functions/stripReasoning.md"
+              },
+              {
+                "text": "stripSensitiveOutputs",
+                "link": "/api/@graphorin/agent/filters/functions/stripSensitiveOutputs.md"
+              },
+              {
+                "text": "stripToolCalls",
+                "link": "/api/@graphorin/agent/filters/functions/stripToolCalls.md"
+              },
+              {
+                "text": "summary",
+                "link": "/api/@graphorin/agent/filters/functions/summary.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "lateral-leak",
+        "link": "/api/@graphorin/agent/lateral-leak/"
+      },
+      {
+        "text": "preferred-model",
+        "link": "/api/@graphorin/agent/preferred-model/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "PreferredModelResolution",
+                "link": "/api/@graphorin/agent/preferred-model/interfaces/PreferredModelResolution.md"
+              },
+              {
+                "text": "ResolvePreferredModelInput",
+                "link": "/api/@graphorin/agent/preferred-model/interfaces/ResolvePreferredModelInput.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "pickTopTierAcrossTools",
+                "link": "/api/@graphorin/agent/preferred-model/functions/pickTopTierAcrossTools.md"
+              },
+              {
+                "text": "resolvePreferredModel",
+                "link": "/api/@graphorin/agent/preferred-model/functions/resolvePreferredModel.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "progress",
+        "link": "/api/@graphorin/agent/progress/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ProgressIO",
+                "link": "/api/@graphorin/agent/progress/interfaces/ProgressIO.md"
+              },
+              {
+                "text": "ProgressIOConfig",
+                "link": "/api/@graphorin/agent/progress/interfaces/ProgressIOConfig.md"
+              },
+              {
+                "text": "ProgressReadOptions",
+                "link": "/api/@graphorin/agent/progress/interfaces/ProgressReadOptions.md"
+              },
+              {
+                "text": "ProgressWriteOptions",
+                "link": "/api/@graphorin/agent/progress/interfaces/ProgressWriteOptions.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createProgressIO",
+                "link": "/api/@graphorin/agent/progress/functions/createProgressIO.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "run-state",
+        "link": "/api/@graphorin/agent/run-state/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SerializedRunState",
+                "link": "/api/@graphorin/agent/run-state/interfaces/SerializedRunState.md"
+              },
+              {
+                "text": "SerializeRunStateOptions",
+                "link": "/api/@graphorin/agent/run-state/interfaces/SerializeRunStateOptions.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "RUN_STATE_SCHEMA_MAJOR_SUPPORTED",
+                "link": "/api/@graphorin/agent/run-state/variables/RUN_STATE_SCHEMA_MAJOR_SUPPORTED.md"
+              },
+              {
+                "text": "RUN_STATE_SCHEMA_VERSION",
+                "link": "/api/@graphorin/agent/run-state/variables/RUN_STATE_SCHEMA_VERSION.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "addModelUsage",
+                "link": "/api/@graphorin/agent/run-state/functions/addModelUsage.md"
+              },
+              {
+                "text": "aggregateUsageFromByModel",
+                "link": "/api/@graphorin/agent/run-state/functions/aggregateUsageFromByModel.md"
+              },
+              {
+                "text": "completedToolCallsFromState",
+                "link": "/api/@graphorin/agent/run-state/functions/completedToolCallsFromState.md"
+              },
+              {
+                "text": "createInitialRunState",
+                "link": "/api/@graphorin/agent/run-state/functions/createInitialRunState.md"
+              },
+              {
+                "text": "deserializeRunState",
+                "link": "/api/@graphorin/agent/run-state/functions/deserializeRunState.md"
+              },
+              {
+                "text": "runStateFromJSON",
+                "link": "/api/@graphorin/agent/run-state/functions/runStateFromJSON.md"
+              },
+              {
+                "text": "runStateToJSON",
+                "link": "/api/@graphorin/agent/run-state/functions/runStateToJSON.md"
+              },
+              {
+                "text": "serializeRunState",
+                "link": "/api/@graphorin/agent/run-state/functions/serializeRunState.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/cli",
+    "link": "/api/@graphorin/cli/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "commands",
+        "link": "/api/@graphorin/cli/commands/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/client",
+    "link": "/api/@graphorin/client/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "client",
+        "link": "/api/@graphorin/client/client/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinClient",
+                "link": "/api/@graphorin/client/client/classes/GraphorinClient.md"
+              }
+            ]
+          },
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinClientOptions",
+                "link": "/api/@graphorin/client/client/interfaces/GraphorinClientOptions.md"
+              },
+              {
+                "text": "Subscription",
+                "link": "/api/@graphorin/client/client/interfaces/Subscription.md"
+              },
+              {
+                "text": "SubscriptionMetadata",
+                "link": "/api/@graphorin/client/client/interfaces/SubscriptionMetadata.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SubscriptionTarget",
+                "link": "/api/@graphorin/client/client/type-aliases/SubscriptionTarget.md"
+              },
+              {
+                "text": "TransportPreference",
+                "link": "/api/@graphorin/client/client/type-aliases/TransportPreference.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/client/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AuthFailedError",
+                "link": "/api/@graphorin/client/errors/classes/AuthFailedError.md"
+              },
+              {
+                "text": "ClientAbortedError",
+                "link": "/api/@graphorin/client/errors/classes/ClientAbortedError.md"
+              },
+              {
+                "text": "ClientNotConnectedError",
+                "link": "/api/@graphorin/client/errors/classes/ClientNotConnectedError.md"
+              },
+              {
+                "text": "GraphorinClientError",
+                "link": "/api/@graphorin/client/errors/classes/GraphorinClientError.md"
+              },
+              {
+                "text": "InvalidServerFrameError",
+                "link": "/api/@graphorin/client/errors/classes/InvalidServerFrameError.md"
+              },
+              {
+                "text": "ProtocolViolationError",
+                "link": "/api/@graphorin/client/errors/classes/ProtocolViolationError.md"
+              },
+              {
+                "text": "SubprotocolMismatchError",
+                "link": "/api/@graphorin/client/errors/classes/SubprotocolMismatchError.md"
+              },
+              {
+                "text": "SubscriptionNotFoundError",
+                "link": "/api/@graphorin/client/errors/classes/SubscriptionNotFoundError.md"
+              },
+              {
+                "text": "TransportFailedError",
+                "link": "/api/@graphorin/client/errors/classes/TransportFailedError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinClientErrorKind",
+                "link": "/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "reconnect",
+        "link": "/api/@graphorin/client/reconnect/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "BackoffPolicy",
+                "link": "/api/@graphorin/client/reconnect/interfaces/BackoffPolicy.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "computeBackoffMs",
+                "link": "/api/@graphorin/client/reconnect/functions/computeBackoffMs.md"
+              },
+              {
+                "text": "sleep",
+                "link": "/api/@graphorin/client/reconnect/functions/sleep.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "transport",
+        "link": "/api/@graphorin/client/transport/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/core",
+    "link": "/api/@graphorin/core/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "channels",
+        "link": "/api/@graphorin/core/channels/"
+      },
+      {
+        "text": "contracts",
+        "link": "/api/@graphorin/core/contracts/"
+      },
+      {
+        "text": "types",
+        "link": "/api/@graphorin/core/types/"
+      },
+      {
+        "text": "utils",
+        "link": "/api/@graphorin/core/utils/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/embedder-ollama",
+    "link": "/api/@graphorin/embedder-ollama/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "OllamaEmbedder",
+            "link": "/api/@graphorin/embedder-ollama/classes/OllamaEmbedder.md"
+          },
+          {
+            "text": "OllamaEmbedderError",
+            "link": "/api/@graphorin/embedder-ollama/classes/OllamaEmbedderError.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "OllamaEmbedderOptions",
+            "link": "/api/@graphorin/embedder-ollama/interfaces/OllamaEmbedderOptions.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "DEFAULT_OLLAMA_BASE_URL",
+            "link": "/api/@graphorin/embedder-ollama/variables/DEFAULT_OLLAMA_BASE_URL.md"
+          },
+          {
+            "text": "DEFAULT_OLLAMA_MODEL",
+            "link": "/api/@graphorin/embedder-ollama/variables/DEFAULT_OLLAMA_MODEL.md"
+          },
+          {
+            "text": "KNOWN_OLLAMA_MODEL_DIMS",
+            "link": "/api/@graphorin/embedder-ollama/variables/KNOWN_OLLAMA_MODEL_DIMS.md"
+          },
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/embedder-ollama/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "canonicalConfigHash",
+            "link": "/api/@graphorin/embedder-ollama/functions/canonicalConfigHash.md"
+          },
+          {
+            "text": "createOllamaEmbedder",
+            "link": "/api/@graphorin/embedder-ollama/functions/createOllamaEmbedder.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/embedder-transformersjs",
+    "link": "/api/@graphorin/embedder-transformersjs/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "EmbedderModelLoadError",
+            "link": "/api/@graphorin/embedder-transformersjs/classes/EmbedderModelLoadError.md"
+          },
+          {
+            "text": "TransformersJsEmbedder",
+            "link": "/api/@graphorin/embedder-transformersjs/classes/TransformersJsEmbedder.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "TransformersJsEmbedderOptions",
+            "link": "/api/@graphorin/embedder-transformersjs/interfaces/TransformersJsEmbedderOptions.md"
+          }
+        ]
+      },
+      {
+        "text": "Type Aliases",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "FeatureExtractor",
+            "link": "/api/@graphorin/embedder-transformersjs/type-aliases/FeatureExtractor.md"
+          },
+          {
+            "text": "PipelineFactory",
+            "link": "/api/@graphorin/embedder-transformersjs/type-aliases/PipelineFactory.md"
+          },
+          {
+            "text": "Pooling",
+            "link": "/api/@graphorin/embedder-transformersjs/type-aliases/Pooling.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/embedder-transformersjs/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "_resetPipelineFactoryCacheForTesting",
+            "link": "/api/@graphorin/embedder-transformersjs/functions/resetPipelineFactoryCacheForTesting.md"
+          },
+          {
+            "text": "canonicalConfigHash",
+            "link": "/api/@graphorin/embedder-transformersjs/functions/canonicalConfigHash.md"
+          },
+          {
+            "text": "createTransformersJsEmbedder",
+            "link": "/api/@graphorin/embedder-transformersjs/functions/createTransformersJsEmbedder.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/eslint-plugin",
+    "link": "/api/@graphorin/eslint-plugin/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "DiscoveredTool",
+            "link": "/api/@graphorin/eslint-plugin/interfaces/DiscoveredTool.md"
+          },
+          {
+            "text": "LintFinding",
+            "link": "/api/@graphorin/eslint-plugin/interfaces/LintFinding.md"
+          },
+          {
+            "text": "ToolGraderScore",
+            "link": "/api/@graphorin/eslint-plugin/interfaces/ToolGraderScore.md"
+          }
+        ]
+      },
+      {
+        "text": "Type Aliases",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "LintFindingKind",
+            "link": "/api/@graphorin/eslint-plugin/type-aliases/LintFindingKind.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "AMBIGUOUS_PARAMETER_NAMES",
+            "link": "/api/@graphorin/eslint-plugin/variables/AMBIGUOUS_PARAMETER_NAMES.md"
+          },
+          {
+            "text": "configs",
+            "link": "/api/@graphorin/eslint-plugin/variables/configs.md"
+          },
+          {
+            "text": "default",
+            "link": "/api/@graphorin/eslint-plugin/variables/default.md"
+          },
+          {
+            "text": "meta",
+            "link": "/api/@graphorin/eslint-plugin/variables/meta.md"
+          },
+          {
+            "text": "PARAMETER_NAMING_OPT_OUT_TAGS",
+            "link": "/api/@graphorin/eslint-plugin/variables/PARAMETER_NAMING_OPT_OUT_TAGS.md"
+          },
+          {
+            "text": "PLACEHOLDER_DESCRIPTIONS",
+            "link": "/api/@graphorin/eslint-plugin/variables/PLACEHOLDER_DESCRIPTIONS.md"
+          },
+          {
+            "text": "rules",
+            "link": "/api/@graphorin/eslint-plugin/variables/rules.md"
+          },
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/eslint-plugin/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "discoverToolCallsInSource",
+            "link": "/api/@graphorin/eslint-plugin/functions/discoverToolCallsInSource.md"
+          },
+          {
+            "text": "gradeTool",
+            "link": "/api/@graphorin/eslint-plugin/functions/gradeTool.md"
+          },
+          {
+            "text": "runToolRules",
+            "link": "/api/@graphorin/eslint-plugin/functions/runToolRules.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/evals",
+    "link": "/api/@graphorin/evals/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "cli",
+        "link": "/api/@graphorin/evals/cli/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "WriteReportsOptions",
+                "link": "/api/@graphorin/evals/cli/interfaces/WriteReportsOptions.md"
+              },
+              {
+                "text": "WrittenReport",
+                "link": "/api/@graphorin/evals/cli/interfaces/WrittenReport.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ReporterFormat",
+                "link": "/api/@graphorin/evals/cli/type-aliases/ReporterFormat.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "exitOnFailures",
+                "link": "/api/@graphorin/evals/cli/functions/exitOnFailures.md"
+              },
+              {
+                "text": "writeReports",
+                "link": "/api/@graphorin/evals/cli/functions/writeReports.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "loaders",
+        "link": "/api/@graphorin/evals/loaders/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "groupAndExtract",
+                "link": "/api/@graphorin/evals/loaders/functions/groupAndExtract.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "reporters",
+        "link": "/api/@graphorin/evals/reporters/"
+      },
+      {
+        "text": "scorers",
+        "link": "/api/@graphorin/evals/scorers/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/mcp",
+    "link": "/api/@graphorin/mcp/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "client",
+        "link": "/api/@graphorin/mcp/client/"
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/mcp/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinMCPError",
+                "link": "/api/@graphorin/mcp/errors/classes/GraphorinMCPError.md"
+              },
+              {
+                "text": "MCPAuthError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPAuthError.md"
+              },
+              {
+                "text": "MCPCallTimeoutError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPCallTimeoutError.md"
+              },
+              {
+                "text": "MCPCancelledError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPCancelledError.md"
+              },
+              {
+                "text": "MCPConnectionError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPConnectionError.md"
+              },
+              {
+                "text": "MCPInvalidConfigError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPInvalidConfigError.md"
+              },
+              {
+                "text": "MCPProtocolError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPProtocolError.md"
+              },
+              {
+                "text": "MCPToolNotFoundError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPToolNotFoundError.md"
+              },
+              {
+                "text": "MCPTransportNotSupportedError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPTransportNotSupportedError.md"
+              }
+            ]
+          },
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MCPErrorMetadata",
+                "link": "/api/@graphorin/mcp/errors/interfaces/MCPErrorMetadata.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MCPErrorKind",
+                "link": "/api/@graphorin/mcp/errors/type-aliases/MCPErrorKind.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "event-store",
+        "link": "/api/@graphorin/mcp/event-store/"
+      },
+      {
+        "text": "helpers",
+        "link": "/api/@graphorin/mcp/helpers/"
+      },
+      {
+        "text": "oauth",
+        "link": "/api/@graphorin/mcp/oauth/"
+      },
+      {
+        "text": "transport",
+        "link": "/api/@graphorin/mcp/transport/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/memory",
+    "link": "/api/@graphorin/memory/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "conflict",
+        "link": "/api/@graphorin/memory/conflict/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "enLocalePack",
+                "link": "/api/@graphorin/memory/conflict/variables/enLocalePack.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/memory/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "EmbedderMigrationAbortedError",
+                "link": "/api/@graphorin/memory/errors/classes/EmbedderMigrationAbortedError.md"
+              },
+              {
+                "text": "EmbedderMigrationLockedError",
+                "link": "/api/@graphorin/memory/errors/classes/EmbedderMigrationLockedError.md"
+              },
+              {
+                "text": "EmbedderMigrationStateError",
+                "link": "/api/@graphorin/memory/errors/classes/EmbedderMigrationStateError.md"
+              },
+              {
+                "text": "EmbedderRegistrationError",
+                "link": "/api/@graphorin/memory/errors/classes/EmbedderRegistrationError.md"
+              },
+              {
+                "text": "GraphorinMemoryError",
+                "link": "/api/@graphorin/memory/errors/classes/GraphorinMemoryError.md"
+              },
+              {
+                "text": "MemoryToolDeniedError",
+                "link": "/api/@graphorin/memory/errors/classes/MemoryToolDeniedError.md"
+              },
+              {
+                "text": "WorkingBlockOverflowError",
+                "link": "/api/@graphorin/memory/errors/classes/WorkingBlockOverflowError.md"
+              },
+              {
+                "text": "WorkingBlockReplaceMismatchError",
+                "link": "/api/@graphorin/memory/errors/classes/WorkingBlockReplaceMismatchError.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "facade",
+        "link": "/api/@graphorin/memory/facade/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CreateMemoryOptions",
+                "link": "/api/@graphorin/memory/facade/interfaces/CreateMemoryOptions.md"
+              },
+              {
+                "text": "Memory",
+                "link": "/api/@graphorin/memory/facade/interfaces/Memory.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createMemory",
+                "link": "/api/@graphorin/memory/facade/functions/createMemory.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "migration",
+        "link": "/api/@graphorin/memory/migration/"
+      },
+      {
+        "text": "search",
+        "link": "/api/@graphorin/memory/search/"
+      },
+      {
+        "text": "tiers",
+        "link": "/api/@graphorin/memory/tiers/"
+      },
+      {
+        "text": "tools",
+        "link": "/api/@graphorin/memory/tools/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "buildMemoryTools",
+                "link": "/api/@graphorin/memory/tools/functions/buildMemoryTools.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/observability",
+    "link": "/api/@graphorin/observability/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "cost",
+        "link": "/api/@graphorin/observability/cost/"
+      },
+      {
+        "text": "eval",
+        "link": "/api/@graphorin/observability/eval/"
+      },
+      {
+        "text": "exporters",
+        "link": "/api/@graphorin/observability/exporters/"
+      },
+      {
+        "text": "gen-ai",
+        "link": "/api/@graphorin/observability/gen-ai/"
+      },
+      {
+        "text": "logger",
+        "link": "/api/@graphorin/observability/logger/"
+      },
+      {
+        "text": "openinference",
+        "link": "/api/@graphorin/observability/openinference/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "OpenInferenceSpanKind",
+                "link": "/api/@graphorin/observability/openinference/type-aliases/OpenInferenceSpanKind.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "OPEN_INFERENCE_EXCLUDED_TYPES",
+                "link": "/api/@graphorin/observability/openinference/variables/OPEN_INFERENCE_EXCLUDED_TYPES.md"
+              },
+              {
+                "text": "OPEN_INFERENCE_KIND_TABLE",
+                "link": "/api/@graphorin/observability/openinference/variables/OPEN_INFERENCE_KIND_TABLE.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "emitOpenInferenceKind",
+                "link": "/api/@graphorin/observability/openinference/functions/emitOpenInferenceKind.md"
+              },
+              {
+                "text": "openInferenceKindFor",
+                "link": "/api/@graphorin/observability/openinference/functions/openInferenceKindFor.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "redaction",
+        "link": "/api/@graphorin/observability/redaction/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "imperative-patterns",
+            "link": "/api/@graphorin/observability/redaction/imperative-patterns/",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Interfaces",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "ImperativePattern",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ImperativePattern.md"
+                  },
+                  {
+                    "text": "ScanResult",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ScanResult.md"
+                  }
+                ]
+              },
+              {
+                "text": "Type Aliases",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "ImperativePatternName",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/type-aliases/ImperativePatternName.md"
+                  }
+                ]
+              },
+              {
+                "text": "Variables",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "BUILT_IN_IMPERATIVE_PATTERNS",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/variables/BUILT_IN_IMPERATIVE_PATTERNS.md"
+                  },
+                  {
+                    "text": "IMPERATIVE_PREFILTER_SUBSTRINGS",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/variables/IMPERATIVE_PREFILTER_SUBSTRINGS.md"
+                  }
+                ]
+              },
+              {
+                "text": "Functions",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "scanImperativePatterns",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/functions/scanImperativePatterns.md"
+                  },
+                  {
+                    "text": "stripImperativePatterns",
+                    "link": "/api/@graphorin/observability/redaction/imperative-patterns/functions/stripImperativePatterns.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "patterns",
+            "link": "/api/@graphorin/observability/redaction/patterns/",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Interfaces",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "RedactionPattern",
+                    "link": "/api/@graphorin/observability/redaction/patterns/interfaces/RedactionPattern.md"
+                  }
+                ]
+              },
+              {
+                "text": "Type Aliases",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "BuiltInPatternName",
+                    "link": "/api/@graphorin/observability/redaction/patterns/type-aliases/BuiltInPatternName.md"
+                  },
+                  {
+                    "text": "PatternCategory",
+                    "link": "/api/@graphorin/observability/redaction/patterns/type-aliases/PatternCategory.md"
+                  }
+                ]
+              },
+              {
+                "text": "Variables",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "ALL_BUILT_IN_PATTERNS",
+                    "link": "/api/@graphorin/observability/redaction/patterns/variables/ALL_BUILT_IN_PATTERNS.md"
+                  },
+                  {
+                    "text": "BUILT_IN_PATTERNS",
+                    "link": "/api/@graphorin/observability/redaction/patterns/variables/BUILT_IN_PATTERNS.md"
+                  },
+                  {
+                    "text": "OPT_IN_PATTERNS",
+                    "link": "/api/@graphorin/observability/redaction/patterns/variables/OPT_IN_PATTERNS.md"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "replay",
+        "link": "/api/@graphorin/observability/replay/"
+      },
+      {
+        "text": "telemetry",
+        "link": "/api/@graphorin/observability/telemetry/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "TelemetryStatus",
+                "link": "/api/@graphorin/observability/telemetry/interfaces/TelemetryStatus.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "announceTelemetryPosture",
+                "link": "/api/@graphorin/observability/telemetry/functions/announceTelemetryPosture.md"
+              },
+              {
+                "text": "enableTelemetry",
+                "link": "/api/@graphorin/observability/telemetry/functions/enableTelemetry.md"
+              },
+              {
+                "text": "getTelemetryStatus",
+                "link": "/api/@graphorin/observability/telemetry/functions/getTelemetryStatus.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "tracer",
+        "link": "/api/@graphorin/observability/tracer/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/pricing",
+    "link": "/api/@graphorin/pricing/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "snapshot",
+        "link": "/api/@graphorin/pricing/snapshot/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/protocol",
+    "link": "/api/@graphorin/protocol/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "client-message",
+        "link": "/api/@graphorin/protocol/client-message/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ClientMessage",
+                "link": "/api/@graphorin/protocol/client-message/type-aliases/ClientMessage.md"
+              },
+              {
+                "text": "ClientMessageId",
+                "link": "/api/@graphorin/protocol/client-message/type-aliases/ClientMessageId.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ClientMessageSchema",
+                "link": "/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "isCancelledNotification",
+                "link": "/api/@graphorin/protocol/client-message/functions/isCancelledNotification.md"
+              },
+              {
+                "text": "isInitializeRequest",
+                "link": "/api/@graphorin/protocol/client-message/functions/isInitializeRequest.md"
+              },
+              {
+                "text": "isPingRequest",
+                "link": "/api/@graphorin/protocol/client-message/functions/isPingRequest.md"
+              },
+              {
+                "text": "isRunCancelRequest",
+                "link": "/api/@graphorin/protocol/client-message/functions/isRunCancelRequest.md"
+              },
+              {
+                "text": "isSubscribeRequest",
+                "link": "/api/@graphorin/protocol/client-message/functions/isSubscribeRequest.md"
+              },
+              {
+                "text": "isUnsubscribeRequest",
+                "link": "/api/@graphorin/protocol/client-message/functions/isUnsubscribeRequest.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "close-codes",
+        "link": "/api/@graphorin/protocol/close-codes/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinCloseReason",
+                "link": "/api/@graphorin/protocol/close-codes/type-aliases/GraphorinCloseReason.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CLOSE_CODE_VALUES",
+                "link": "/api/@graphorin/protocol/close-codes/variables/CLOSE_CODE_VALUES.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "closeCodeFor",
+                "link": "/api/@graphorin/protocol/close-codes/functions/closeCodeFor.md"
+              },
+              {
+                "text": "closeCodeReason",
+                "link": "/api/@graphorin/protocol/close-codes/functions/closeCodeReason.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "server-message",
+        "link": "/api/@graphorin/protocol/server-message/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ServerErrorFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerErrorFrame.md"
+              },
+              {
+                "text": "ServerEventFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerEventFrame.md"
+              },
+              {
+                "text": "ServerLifecycleFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerLifecycleFrame.md"
+              },
+              {
+                "text": "ServerMessage",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerMessage.md"
+              },
+              {
+                "text": "ServerPongFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerPongFrame.md"
+              },
+              {
+                "text": "ServerReplayMarkerFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerReplayMarkerFrame.md"
+              },
+              {
+                "text": "ServerRpcFailure",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerRpcFailure.md"
+              },
+              {
+                "text": "ServerRpcSuccess",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerRpcSuccess.md"
+              },
+              {
+                "text": "ServerSubscribedFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerSubscribedFrame.md"
+              },
+              {
+                "text": "ServerUnsubscribedFrame",
+                "link": "/api/@graphorin/protocol/server-message/type-aliases/ServerUnsubscribedFrame.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "RPC_ERROR_CODES",
+                "link": "/api/@graphorin/protocol/server-message/variables/RPC_ERROR_CODES.md"
+              },
+              {
+                "text": "ServerMessageSchema",
+                "link": "/api/@graphorin/protocol/server-message/variables/ServerMessageSchema.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "isErrorFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isErrorFrame.md"
+              },
+              {
+                "text": "isEventFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isEventFrame.md"
+              },
+              {
+                "text": "isLifecycleFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isLifecycleFrame.md"
+              },
+              {
+                "text": "isPongFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isPongFrame.md"
+              },
+              {
+                "text": "isReplayMarkerFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isReplayMarkerFrame.md"
+              },
+              {
+                "text": "isRpcFailure",
+                "link": "/api/@graphorin/protocol/server-message/functions/isRpcFailure.md"
+              },
+              {
+                "text": "isRpcSuccess",
+                "link": "/api/@graphorin/protocol/server-message/functions/isRpcSuccess.md"
+              },
+              {
+                "text": "isSubscribedFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isSubscribedFrame.md"
+              },
+              {
+                "text": "isUnsubscribedFrame",
+                "link": "/api/@graphorin/protocol/server-message/functions/isUnsubscribedFrame.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "subprotocol",
+        "link": "/api/@graphorin/protocol/subprotocol/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "PROTOCOL_VERSION",
+                "link": "/api/@graphorin/protocol/subprotocol/variables/PROTOCOL_VERSION.md"
+              },
+              {
+                "text": "SUBPROTOCOL_NAME",
+                "link": "/api/@graphorin/protocol/subprotocol/variables/SUBPROTOCOL_NAME.md"
+              },
+              {
+                "text": "TICKET_SUBPROTOCOL_PREFIX",
+                "link": "/api/@graphorin/protocol/subprotocol/variables/TICKET_SUBPROTOCOL_PREFIX.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "formatTicketSubprotocol",
+                "link": "/api/@graphorin/protocol/subprotocol/functions/formatTicketSubprotocol.md"
+              },
+              {
+                "text": "negotiateSubprotocol",
+                "link": "/api/@graphorin/protocol/subprotocol/functions/negotiateSubprotocol.md"
+              },
+              {
+                "text": "parseTicketSubprotocol",
+                "link": "/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/provider",
+    "link": "/api/@graphorin/provider/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "adapters",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "llamacpp-server",
+            "link": "/api/@graphorin/provider/adapters/llamacpp-server/",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Interfaces",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "LlamaCppServerAdapterOptions",
+                    "link": "/api/@graphorin/provider/adapters/llamacpp-server/interfaces/LlamaCppServerAdapterOptions.md"
+                  }
+                ]
+              },
+              {
+                "text": "Variables",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "DEFAULT_LLAMACPP_SERVER_BASE_URL",
+                    "link": "/api/@graphorin/provider/adapters/llamacpp-server/variables/DEFAULT_LLAMACPP_SERVER_BASE_URL.md"
+                  }
+                ]
+              },
+              {
+                "text": "Functions",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "llamaCppServerAdapter",
+                    "link": "/api/@graphorin/provider/adapters/llamacpp-server/functions/llamaCppServerAdapter.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "ollama",
+            "link": "/api/@graphorin/provider/adapters/ollama/",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Interfaces",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "OllamaAdapterOptions",
+                    "link": "/api/@graphorin/provider/adapters/ollama/interfaces/OllamaAdapterOptions.md"
+                  }
+                ]
+              },
+              {
+                "text": "Variables",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "DEFAULT_OLLAMA_BASE_URL",
+                    "link": "/api/@graphorin/provider/adapters/ollama/variables/DEFAULT_OLLAMA_BASE_URL.md"
+                  }
+                ]
+              },
+              {
+                "text": "Functions",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "ollamaAdapter",
+                    "link": "/api/@graphorin/provider/adapters/ollama/functions/ollamaAdapter.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "openai-compatible",
+            "link": "/api/@graphorin/provider/adapters/openai-compatible/",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Interfaces",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "OpenAICompatibleAdapterOptions",
+                    "link": "/api/@graphorin/provider/adapters/openai-compatible/interfaces/OpenAICompatibleAdapterOptions.md"
+                  }
+                ]
+              },
+              {
+                "text": "Functions",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "openAICompatibleAdapter",
+                    "link": "/api/@graphorin/provider/adapters/openai-compatible/functions/openAICompatibleAdapter.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "vercel",
+            "link": "/api/@graphorin/provider/adapters/vercel/",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "Interfaces",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "AISDKChunk",
+                    "link": "/api/@graphorin/provider/adapters/vercel/interfaces/AISDKChunk.md"
+                  },
+                  {
+                    "text": "LanguageModelLike",
+                    "link": "/api/@graphorin/provider/adapters/vercel/interfaces/LanguageModelLike.md"
+                  },
+                  {
+                    "text": "VercelAdapterOptions",
+                    "link": "/api/@graphorin/provider/adapters/vercel/interfaces/VercelAdapterOptions.md"
+                  },
+                  {
+                    "text": "VercelRuntimeOverrides",
+                    "link": "/api/@graphorin/provider/adapters/vercel/interfaces/VercelRuntimeOverrides.md"
+                  }
+                ]
+              },
+              {
+                "text": "Functions",
+                "collapsed": true,
+                "items": [
+                  {
+                    "text": "__resetVercelRuntimeCache",
+                    "link": "/api/@graphorin/provider/adapters/vercel/functions/resetVercelRuntimeCache.md"
+                  },
+                  {
+                    "text": "vercelAdapter",
+                    "link": "/api/@graphorin/provider/adapters/vercel/functions/vercelAdapter.md"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "counters",
+        "link": "/api/@graphorin/provider/counters/"
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/provider/errors/"
+      },
+      {
+        "text": "middleware",
+        "link": "/api/@graphorin/provider/middleware/"
+      },
+      {
+        "text": "model-tier",
+        "link": "/api/@graphorin/provider/model-tier/"
+      },
+      {
+        "text": "reasoning",
+        "link": "/api/@graphorin/provider/reasoning/"
+      },
+      {
+        "text": "trust",
+        "link": "/api/@graphorin/provider/trust/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/provider-llamacpp-node",
+    "link": "/api/@graphorin/provider-llamacpp-node/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "LlamaCppNativeCounter",
+            "link": "/api/@graphorin/provider-llamacpp-node/classes/LlamaCppNativeCounter.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "LlamaCppNativeCounterOptions",
+            "link": "/api/@graphorin/provider-llamacpp-node/interfaces/LlamaCppNativeCounterOptions.md"
+          },
+          {
+            "text": "LlamaCppNodeAdapterOptions",
+            "link": "/api/@graphorin/provider-llamacpp-node/interfaces/LlamaCppNodeAdapterOptions.md"
+          },
+          {
+            "text": "LlamaCppNodeRuntimeOverrides",
+            "link": "/api/@graphorin/provider-llamacpp-node/interfaces/LlamaCppNodeRuntimeOverrides.md"
+          },
+          {
+            "text": "LlamaInstance",
+            "link": "/api/@graphorin/provider-llamacpp-node/interfaces/LlamaInstance.md"
+          },
+          {
+            "text": "LlamaModelInstance",
+            "link": "/api/@graphorin/provider-llamacpp-node/interfaces/LlamaModelInstance.md"
+          },
+          {
+            "text": "LlamaSessionInstance",
+            "link": "/api/@graphorin/provider-llamacpp-node/interfaces/LlamaSessionInstance.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/provider-llamacpp-node/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "llamaCppNodeAdapter",
+            "link": "/api/@graphorin/provider-llamacpp-node/functions/llamaCppNodeAdapter.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/reranker-llm",
+    "link": "/api/@graphorin/reranker-llm/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "LlmReRanker",
+            "link": "/api/@graphorin/reranker-llm/classes/LlmReRanker.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "LlmRerankerOptions",
+            "link": "/api/@graphorin/reranker-llm/interfaces/LlmRerankerOptions.md"
+          },
+          {
+            "text": "ScoringPrompt",
+            "link": "/api/@graphorin/reranker-llm/interfaces/ScoringPrompt.md"
+          },
+          {
+            "text": "ScoringPromptInput",
+            "link": "/api/@graphorin/reranker-llm/interfaces/ScoringPromptInput.md"
+          }
+        ]
+      },
+      {
+        "text": "Type Aliases",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "PassageExtractor",
+            "link": "/api/@graphorin/reranker-llm/type-aliases/PassageExtractor.md"
+          },
+          {
+            "text": "ScoringPromptBuilder",
+            "link": "/api/@graphorin/reranker-llm/type-aliases/ScoringPromptBuilder.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "defaultScoringPrompt",
+            "link": "/api/@graphorin/reranker-llm/variables/defaultScoringPrompt.md"
+          },
+          {
+            "text": "RERANKER_ID",
+            "link": "/api/@graphorin/reranker-llm/variables/RERANKER_ID.md"
+          },
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/reranker-llm/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "createLlmReranker",
+            "link": "/api/@graphorin/reranker-llm/functions/createLlmReranker.md"
+          },
+          {
+            "text": "defaultPassageExtractor",
+            "link": "/api/@graphorin/reranker-llm/functions/defaultPassageExtractor.md"
+          },
+          {
+            "text": "mergeAndDedupe",
+            "link": "/api/@graphorin/reranker-llm/functions/mergeAndDedupe.md"
+          },
+          {
+            "text": "normalizeScore",
+            "link": "/api/@graphorin/reranker-llm/functions/normalizeScore.md"
+          },
+          {
+            "text": "parseIntegerResponse",
+            "link": "/api/@graphorin/reranker-llm/functions/parseIntegerResponse.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/reranker-transformersjs",
+    "link": "/api/@graphorin/reranker-transformersjs/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "CrossEncoderLoadError",
+            "link": "/api/@graphorin/reranker-transformersjs/classes/CrossEncoderLoadError.md"
+          },
+          {
+            "text": "TransformersJsReRanker",
+            "link": "/api/@graphorin/reranker-transformersjs/classes/TransformersJsReRanker.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "ClassifierResult",
+            "link": "/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md"
+          },
+          {
+            "text": "CrossEncoderRerankerOptions",
+            "link": "/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderRerankerOptions.md"
+          }
+        ]
+      },
+      {
+        "text": "Type Aliases",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "CrossEncoderPipeline",
+            "link": "/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipeline.md"
+          },
+          {
+            "text": "CrossEncoderPipelineFactory",
+            "link": "/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipelineFactory.md"
+          },
+          {
+            "text": "LocaleTag",
+            "link": "/api/@graphorin/reranker-transformersjs/type-aliases/LocaleTag.md"
+          },
+          {
+            "text": "PassageExtractor",
+            "link": "/api/@graphorin/reranker-transformersjs/type-aliases/PassageExtractor.md"
+          },
+          {
+            "text": "RerankerDtype",
+            "link": "/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "DEFAULT_ENGLISH_MODEL",
+            "link": "/api/@graphorin/reranker-transformersjs/variables/DEFAULT_ENGLISH_MODEL.md"
+          },
+          {
+            "text": "DEFAULT_MULTILINGUAL_MODEL",
+            "link": "/api/@graphorin/reranker-transformersjs/variables/DEFAULT_MULTILINGUAL_MODEL.md"
+          },
+          {
+            "text": "RERANKER_ID",
+            "link": "/api/@graphorin/reranker-transformersjs/variables/RERANKER_ID.md"
+          },
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/reranker-transformersjs/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "_resetPipelineFactoryCacheForTesting",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/resetPipelineFactoryCacheForTesting.md"
+          },
+          {
+            "text": "createCrossEncoderReranker",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/createCrossEncoderReranker.md"
+          },
+          {
+            "text": "defaultPassageExtractor",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/defaultPassageExtractor.md"
+          },
+          {
+            "text": "extractPairScores",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/extractPairScores.md"
+          },
+          {
+            "text": "loadDefaultPipelineFactory",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/loadDefaultPipelineFactory.md"
+          },
+          {
+            "text": "mergeAndDedupe",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/mergeAndDedupe.md"
+          },
+          {
+            "text": "pickRerankerModel",
+            "link": "/api/@graphorin/reranker-transformersjs/functions/pickRerankerModel.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/secret-1password",
+    "link": "/api/@graphorin/secret-1password/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "OpCliError",
+            "link": "/api/@graphorin/secret-1password/classes/OpCliError.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "OnePasswordResolverOptions",
+            "link": "/api/@graphorin/secret-1password/interfaces/OnePasswordResolverOptions.md"
+          },
+          {
+            "text": "OpCli",
+            "link": "/api/@graphorin/secret-1password/interfaces/OpCli.md"
+          },
+          {
+            "text": "OpCliReadOptions",
+            "link": "/api/@graphorin/secret-1password/interfaces/OpCliReadOptions.md"
+          },
+          {
+            "text": "OpCliReadResult",
+            "link": "/api/@graphorin/secret-1password/interfaces/OpCliReadResult.md"
+          }
+        ]
+      },
+      {
+        "text": "Type Aliases",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "OpCliErrorKind",
+            "link": "/api/@graphorin/secret-1password/type-aliases/OpCliErrorKind.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "onePasswordResolver",
+            "link": "/api/@graphorin/secret-1password/variables/onePasswordResolver.md"
+          },
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/secret-1password/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "createDefaultOpCli",
+            "link": "/api/@graphorin/secret-1password/functions/createDefaultOpCli.md"
+          },
+          {
+            "text": "createOnePasswordResolver",
+            "link": "/api/@graphorin/secret-1password/functions/createOnePasswordResolver.md"
+          },
+          {
+            "text": "normalizeOpUri",
+            "link": "/api/@graphorin/secret-1password/functions/normalizeOpUri.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/security",
+    "link": "/api/@graphorin/security/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "audit",
+        "link": "/api/@graphorin/security/audit/"
+      },
+      {
+        "text": "auth",
+        "link": "/api/@graphorin/security/auth/"
+      },
+      {
+        "text": "guard",
+        "link": "/api/@graphorin/security/guard/"
+      },
+      {
+        "text": "guardrails",
+        "link": "/api/@graphorin/security/guardrails/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "guardrails",
+                "link": "/api/@graphorin/security/guardrails/variables/guardrails.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "languageWhitelist",
+                "link": "/api/@graphorin/security/guardrails/functions/languageWhitelist.md"
+              },
+              {
+                "text": "llmModeration",
+                "link": "/api/@graphorin/security/guardrails/functions/llmModeration.md"
+              },
+              {
+                "text": "maxLength",
+                "link": "/api/@graphorin/security/guardrails/functions/maxLength.md"
+              },
+              {
+                "text": "outputModeration",
+                "link": "/api/@graphorin/security/guardrails/functions/outputModeration.md"
+              },
+              {
+                "text": "piiDetection",
+                "link": "/api/@graphorin/security/guardrails/functions/piiDetection.md"
+              },
+              {
+                "text": "promptInjectionHeuristics",
+                "link": "/api/@graphorin/security/guardrails/functions/promptInjectionHeuristics.md"
+              },
+              {
+                "text": "toolUsageValidator",
+                "link": "/api/@graphorin/security/guardrails/functions/toolUsageValidator.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "hardening",
+        "link": "/api/@graphorin/security/hardening/"
+      },
+      {
+        "text": "oauth",
+        "link": "/api/@graphorin/security/oauth/"
+      },
+      {
+        "text": "sandbox",
+        "link": "/api/@graphorin/security/sandbox/"
+      },
+      {
+        "text": "secrets",
+        "link": "/api/@graphorin/security/secrets/"
+      },
+      {
+        "text": "supply-chain",
+        "link": "/api/@graphorin/security/supply-chain/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/server",
+    "link": "/api/@graphorin/server/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "commentary",
+        "link": "/api/@graphorin/server/commentary/"
+      },
+      {
+        "text": "config",
+        "link": "/api/@graphorin/server/config/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ServerConfigSpec",
+                "link": "/api/@graphorin/server/config/interfaces/ServerConfigSpec.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "DeliveryCommentaryPolicyConfig",
+                "link": "/api/@graphorin/server/config/type-aliases/DeliveryCommentaryPolicyConfig.md"
+              },
+              {
+                "text": "IdempotencyRequireKeyMode",
+                "link": "/api/@graphorin/server/config/type-aliases/IdempotencyRequireKeyMode.md"
+              },
+              {
+                "text": "SecretRefString",
+                "link": "/api/@graphorin/server/config/type-aliases/SecretRefString.md"
+              },
+              {
+                "text": "SecretsSource",
+                "link": "/api/@graphorin/server/config/type-aliases/SecretsSource.md"
+              },
+              {
+                "text": "ServerConfigInput",
+                "link": "/api/@graphorin/server/config/type-aliases/ServerConfigInput.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ServerConfigSchema",
+                "link": "/api/@graphorin/server/config/variables/ServerConfigSchema.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "defineConfig",
+                "link": "/api/@graphorin/server/config/functions/defineConfig.md"
+              },
+              {
+                "text": "parseServerConfig",
+                "link": "/api/@graphorin/server/config/functions/parseServerConfig.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "consolidator",
+        "link": "/api/@graphorin/server/consolidator/"
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/server/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentNotFoundError",
+                "link": "/api/@graphorin/server/errors/classes/AgentNotFoundError.md"
+              },
+              {
+                "text": "ConfigInvalidError",
+                "link": "/api/@graphorin/server/errors/classes/ConfigInvalidError.md"
+              },
+              {
+                "text": "GraphorinServerError",
+                "link": "/api/@graphorin/server/errors/classes/GraphorinServerError.md"
+              },
+              {
+                "text": "IdempotencyConflictError",
+                "link": "/api/@graphorin/server/errors/classes/IdempotencyConflictError.md"
+              },
+              {
+                "text": "IdempotencyKeyRequiredError",
+                "link": "/api/@graphorin/server/errors/classes/IdempotencyKeyRequiredError.md"
+              },
+              {
+                "text": "LifecycleDoubleStartError",
+                "link": "/api/@graphorin/server/errors/classes/LifecycleDoubleStartError.md"
+              },
+              {
+                "text": "LifecycleNotStartedError",
+                "link": "/api/@graphorin/server/errors/classes/LifecycleNotStartedError.md"
+              },
+              {
+                "text": "MigrationFailedError",
+                "link": "/api/@graphorin/server/errors/classes/MigrationFailedError.md"
+              },
+              {
+                "text": "PrebindEncryptionPeerMissingError",
+                "link": "/api/@graphorin/server/errors/classes/PrebindEncryptionPeerMissingError.md"
+              },
+              {
+                "text": "PrebindEncryptionRequiredError",
+                "link": "/api/@graphorin/server/errors/classes/PrebindEncryptionRequiredError.md"
+              },
+              {
+                "text": "PrebindPepperMissingError",
+                "link": "/api/@graphorin/server/errors/classes/PrebindPepperMissingError.md"
+              },
+              {
+                "text": "PrebindSecretUnresolvableError",
+                "link": "/api/@graphorin/server/errors/classes/PrebindSecretUnresolvableError.md"
+              },
+              {
+                "text": "RouteHandlerMissingError",
+                "link": "/api/@graphorin/server/errors/classes/RouteHandlerMissingError.md"
+              },
+              {
+                "text": "ShutdownTimeoutError",
+                "link": "/api/@graphorin/server/errors/classes/ShutdownTimeoutError.md"
+              },
+              {
+                "text": "WorkflowNotFoundError",
+                "link": "/api/@graphorin/server/errors/classes/WorkflowNotFoundError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinServerErrorCode",
+                "link": "/api/@graphorin/server/errors/type-aliases/GraphorinServerErrorCode.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "health",
+        "link": "/api/@graphorin/server/health/"
+      },
+      {
+        "text": "metrics",
+        "link": "/api/@graphorin/server/metrics/"
+      },
+      {
+        "text": "middleware",
+        "link": "/api/@graphorin/server/middleware/"
+      },
+      {
+        "text": "registry",
+        "link": "/api/@graphorin/server/registry/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentRegistry",
+                "link": "/api/@graphorin/server/registry/classes/AgentRegistry.md"
+              },
+              {
+                "text": "WorkflowRegistry",
+                "link": "/api/@graphorin/server/registry/classes/WorkflowRegistry.md"
+              }
+            ]
+          },
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentRegistration",
+                "link": "/api/@graphorin/server/registry/interfaces/AgentRegistration.md"
+              },
+              {
+                "text": "AgentSummary",
+                "link": "/api/@graphorin/server/registry/interfaces/AgentSummary.md"
+              },
+              {
+                "text": "ServerAgentLike",
+                "link": "/api/@graphorin/server/registry/interfaces/ServerAgentLike.md"
+              },
+              {
+                "text": "ServerWorkflowLike",
+                "link": "/api/@graphorin/server/registry/interfaces/ServerWorkflowLike.md"
+              },
+              {
+                "text": "WorkflowRegistration",
+                "link": "/api/@graphorin/server/registry/interfaces/WorkflowRegistration.md"
+              },
+              {
+                "text": "WorkflowSummary",
+                "link": "/api/@graphorin/server/registry/interfaces/WorkflowSummary.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "replay",
+        "link": "/api/@graphorin/server/replay/"
+      },
+      {
+        "text": "sse",
+        "link": "/api/@graphorin/server/sse/"
+      },
+      {
+        "text": "triggers",
+        "link": "/api/@graphorin/server/triggers/"
+      },
+      {
+        "text": "ws",
+        "link": "/api/@graphorin/server/ws/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ParseSubjectResult",
+                "link": "/api/@graphorin/server/ws/type-aliases/ParseSubjectResult.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "isSubjectAllowed",
+                "link": "/api/@graphorin/server/ws/functions/isSubjectAllowed.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/sessions",
+    "link": "/api/@graphorin/sessions/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "agent-registry",
+        "link": "/api/@graphorin/sessions/agent-registry/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentRegistry",
+                "link": "/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md"
+              }
+            ]
+          },
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "RegisterAgentOptions",
+                "link": "/api/@graphorin/sessions/agent-registry/interfaces/RegisterAgentOptions.md"
+              },
+              {
+                "text": "RetireAgentOptions",
+                "link": "/api/@graphorin/sessions/agent-registry/interfaces/RetireAgentOptions.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentRegistryLookup",
+                "link": "/api/@graphorin/sessions/agent-registry/type-aliases/AgentRegistryLookup.md"
+              },
+              {
+                "text": "DeleteAgentOptions",
+                "link": "/api/@graphorin/sessions/agent-registry/type-aliases/DeleteAgentOptions.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "cassette",
+        "link": "/api/@graphorin/sessions/cassette/"
+      },
+      {
+        "text": "commentary",
+        "link": "/api/@graphorin/sessions/commentary/"
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/sessions/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AgentNotFoundError",
+                "link": "/api/@graphorin/sessions/errors/classes/AgentNotFoundError.md"
+              },
+              {
+                "text": "CassetteArtifactMissingError",
+                "link": "/api/@graphorin/sessions/errors/classes/CassetteArtifactMissingError.md"
+              },
+              {
+                "text": "CassetteCursorViolationError",
+                "link": "/api/@graphorin/sessions/errors/classes/CassetteCursorViolationError.md"
+              },
+              {
+                "text": "CassetteFormatInvalidError",
+                "link": "/api/@graphorin/sessions/errors/classes/CassetteFormatInvalidError.md"
+              },
+              {
+                "text": "CassetteIdempotencyMismatchError",
+                "link": "/api/@graphorin/sessions/errors/classes/CassetteIdempotencyMismatchError.md"
+              },
+              {
+                "text": "CassetteSchemaMismatchError",
+                "link": "/api/@graphorin/sessions/errors/classes/CassetteSchemaMismatchError.md"
+              },
+              {
+                "text": "ReplayAccessDeniedError",
+                "link": "/api/@graphorin/sessions/errors/classes/ReplayAccessDeniedError.md"
+              },
+              {
+                "text": "SessionError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionError.md"
+              },
+              {
+                "text": "SessionExportChecksumMismatchError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionExportChecksumMismatchError.md"
+              },
+              {
+                "text": "SessionExportEncryptionRequiredError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionExportEncryptionRequiredError.md"
+              },
+              {
+                "text": "SessionExportFormatInvalidError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionExportFormatInvalidError.md"
+              },
+              {
+                "text": "SessionExportSchemaTooNewError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionExportSchemaTooNewError.md"
+              },
+              {
+                "text": "SessionExportSchemaUnsupportedError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionExportSchemaUnsupportedError.md"
+              },
+              {
+                "text": "SessionNotFoundError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionNotFoundError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SessionErrorCode",
+                "link": "/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "export",
+        "link": "/api/@graphorin/sessions/export/"
+      },
+      {
+        "text": "facade",
+        "link": "/api/@graphorin/sessions/facade/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "AssistantMessage",
+                "link": "/api/@graphorin/sessions/facade/interfaces/AssistantMessage.md"
+              },
+              {
+                "text": "CreateSessionManagerOptions",
+                "link": "/api/@graphorin/sessions/facade/interfaces/CreateSessionManagerOptions.md"
+              },
+              {
+                "text": "Session",
+                "link": "/api/@graphorin/sessions/facade/interfaces/Session.md"
+              },
+              {
+                "text": "SessionCounters",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SessionCounters.md"
+              },
+              {
+                "text": "SessionExportOptions",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SessionExportOptions.md"
+              },
+              {
+                "text": "SessionManager",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SessionManager.md"
+              },
+              {
+                "text": "SessionMemoryFacade",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SessionMemoryFacade.md"
+              },
+              {
+                "text": "SessionRecordCassetteOptions",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SessionRecordCassetteOptions.md"
+              },
+              {
+                "text": "SystemMessage",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SystemMessage.md"
+              },
+              {
+                "text": "ToolMessage",
+                "link": "/api/@graphorin/sessions/facade/interfaces/ToolMessage.md"
+              },
+              {
+                "text": "UserMessage",
+                "link": "/api/@graphorin/sessions/facade/interfaces/UserMessage.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MessageContent",
+                "link": "/api/@graphorin/sessions/facade/type-aliases/MessageContent.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createSessionManager",
+                "link": "/api/@graphorin/sessions/facade/functions/createSessionManager.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "migrations",
+        "link": "/api/@graphorin/sessions/migrations/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ExportMigrator",
+                "link": "/api/@graphorin/sessions/migrations/interfaces/ExportMigrator.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "_resetExportMigratorsForTesting",
+                "link": "/api/@graphorin/sessions/migrations/functions/resetExportMigratorsForTesting.md"
+              },
+              {
+                "text": "listExportMigrators",
+                "link": "/api/@graphorin/sessions/migrations/functions/listExportMigrators.md"
+              },
+              {
+                "text": "migrateExport",
+                "link": "/api/@graphorin/sessions/migrations/functions/migrateExport.md"
+              },
+              {
+                "text": "registerExportMigrator",
+                "link": "/api/@graphorin/sessions/migrations/functions/registerExportMigrator.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "replay",
+        "link": "/api/@graphorin/sessions/replay/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/skills",
+    "link": "/api/@graphorin/skills/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "activation",
+        "link": "/api/@graphorin/skills/activation/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "isSlashCommand",
+                "link": "/api/@graphorin/skills/activation/functions/isSlashCommand.md"
+              },
+              {
+                "text": "parseSlashCommand",
+                "link": "/api/@graphorin/skills/activation/functions/parseSlashCommand.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/skills/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinSkillsError",
+                "link": "/api/@graphorin/skills/errors/classes/GraphorinSkillsError.md"
+              },
+              {
+                "text": "InputFilterRequiredError",
+                "link": "/api/@graphorin/skills/errors/classes/InputFilterRequiredError.md"
+              },
+              {
+                "text": "SkillFrontmatterConflictError",
+                "link": "/api/@graphorin/skills/errors/classes/SkillFrontmatterConflictError.md"
+              },
+              {
+                "text": "SkillLoadError",
+                "link": "/api/@graphorin/skills/errors/classes/SkillLoadError.md"
+              },
+              {
+                "text": "SkillManifestParseError",
+                "link": "/api/@graphorin/skills/errors/classes/SkillManifestParseError.md"
+              },
+              {
+                "text": "SkillNameCollisionError",
+                "link": "/api/@graphorin/skills/errors/classes/SkillNameCollisionError.md"
+              },
+              {
+                "text": "SkillRequiredFieldMissingError",
+                "link": "/api/@graphorin/skills/errors/classes/SkillRequiredFieldMissingError.md"
+              },
+              {
+                "text": "SkillRuntimeCompatError",
+                "link": "/api/@graphorin/skills/errors/classes/SkillRuntimeCompatError.md"
+              },
+              {
+                "text": "SlashCommandParseError",
+                "link": "/api/@graphorin/skills/errors/classes/SlashCommandParseError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinSkillsErrorKind",
+                "link": "/api/@graphorin/skills/errors/type-aliases/GraphorinSkillsErrorKind.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "frontmatter",
+        "link": "/api/@graphorin/skills/frontmatter/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SplitSkillMd",
+                "link": "/api/@graphorin/skills/frontmatter/interfaces/SplitSkillMd.md"
+              },
+              {
+                "text": "ValidatedFrontmatter",
+                "link": "/api/@graphorin/skills/frontmatter/interfaces/ValidatedFrontmatter.md"
+              },
+              {
+                "text": "ValidateFrontmatterOptions",
+                "link": "/api/@graphorin/skills/frontmatter/interfaces/ValidateFrontmatterOptions.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "isRuntimeCompatSatisfied",
+                "link": "/api/@graphorin/skills/frontmatter/functions/isRuntimeCompatSatisfied.md"
+              },
+              {
+                "text": "parseAllowedToolsValue",
+                "link": "/api/@graphorin/skills/frontmatter/functions/parseAllowedToolsValue.md"
+              },
+              {
+                "text": "parseFrontmatterYaml",
+                "link": "/api/@graphorin/skills/frontmatter/functions/parseFrontmatterYaml.md"
+              },
+              {
+                "text": "parseHandoffInputFilter",
+                "link": "/api/@graphorin/skills/frontmatter/functions/parseHandoffInputFilter.md"
+              },
+              {
+                "text": "parseToolsField",
+                "link": "/api/@graphorin/skills/frontmatter/functions/parseToolsField.md"
+              },
+              {
+                "text": "resolveSkillField",
+                "link": "/api/@graphorin/skills/frontmatter/functions/resolveSkillField.md"
+              },
+              {
+                "text": "splitSkillMd",
+                "link": "/api/@graphorin/skills/frontmatter/functions/splitSkillMd.md"
+              },
+              {
+                "text": "validateFrontmatter",
+                "link": "/api/@graphorin/skills/frontmatter/functions/validateFrontmatter.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "loader",
+        "link": "/api/@graphorin/skills/loader/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "LoadSkillOptions",
+                "link": "/api/@graphorin/skills/loader/interfaces/LoadSkillOptions.md"
+              },
+              {
+                "text": "LoadSkillsOptions",
+                "link": "/api/@graphorin/skills/loader/interfaces/LoadSkillsOptions.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "loadSkillFromSource",
+                "link": "/api/@graphorin/skills/loader/functions/loadSkillFromSource.md"
+              },
+              {
+                "text": "loadSkills",
+                "link": "/api/@graphorin/skills/loader/functions/loadSkills.md"
+              },
+              {
+                "text": "requireHandoffInputFilter",
+                "link": "/api/@graphorin/skills/loader/functions/requireHandoffInputFilter.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "migration",
+        "link": "/api/@graphorin/skills/migration/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "MigrateFrontmatterOptions",
+                "link": "/api/@graphorin/skills/migration/interfaces/MigrateFrontmatterOptions.md"
+              },
+              {
+                "text": "MigrationResult",
+                "link": "/api/@graphorin/skills/migration/interfaces/MigrationResult.md"
+              },
+              {
+                "text": "MigrationRewrite",
+                "link": "/api/@graphorin/skills/migration/interfaces/MigrationRewrite.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "migrateFrontmatter",
+                "link": "/api/@graphorin/skills/migration/functions/migrateFrontmatter.md"
+              },
+              {
+                "text": "sortKeysAnthropicFirst",
+                "link": "/api/@graphorin/skills/migration/functions/sortKeysAnthropicFirst.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "registry",
+        "link": "/api/@graphorin/skills/registry/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ActivationRequest",
+                "link": "/api/@graphorin/skills/registry/interfaces/ActivationRequest.md"
+              },
+              {
+                "text": "ParsedActivationTrigger",
+                "link": "/api/@graphorin/skills/registry/interfaces/ParsedActivationTrigger.md"
+              },
+              {
+                "text": "RegisteredToolDeclaration",
+                "link": "/api/@graphorin/skills/registry/interfaces/RegisteredToolDeclaration.md"
+              },
+              {
+                "text": "SkillRegistry",
+                "link": "/api/@graphorin/skills/registry/interfaces/SkillRegistry.md"
+              },
+              {
+                "text": "SkillRegistryOptions",
+                "link": "/api/@graphorin/skills/registry/interfaces/SkillRegistryOptions.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createSkillRegistry",
+                "link": "/api/@graphorin/skills/registry/functions/createSkillRegistry.md"
+              },
+              {
+                "text": "parseActivationTrigger",
+                "link": "/api/@graphorin/skills/registry/functions/parseActivationTrigger.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "spec",
+        "link": "/api/@graphorin/skills/spec/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "GraphorinMappingEntry",
+                "link": "/api/@graphorin/skills/spec/interfaces/GraphorinMappingEntry.md"
+              },
+              {
+                "text": "KnownFieldEntry",
+                "link": "/api/@graphorin/skills/spec/interfaces/KnownFieldEntry.md"
+              },
+              {
+                "text": "SpecSnapshot",
+                "link": "/api/@graphorin/skills/spec/interfaces/SpecSnapshot.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "FieldStability",
+                "link": "/api/@graphorin/skills/spec/type-aliases/FieldStability.md"
+              },
+              {
+                "text": "GraphorinFieldPolicy",
+                "link": "/api/@graphorin/skills/spec/type-aliases/GraphorinFieldPolicy.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "_setSpecSnapshotForTesting",
+                "link": "/api/@graphorin/skills/spec/functions/setSpecSnapshotForTesting.md"
+              },
+              {
+                "text": "compareAuthorSpecHint",
+                "link": "/api/@graphorin/skills/spec/functions/compareAuthorSpecHint.md"
+              },
+              {
+                "text": "getGraphorinMapping",
+                "link": "/api/@graphorin/skills/spec/functions/getGraphorinMapping.md"
+              },
+              {
+                "text": "getKnownField",
+                "link": "/api/@graphorin/skills/spec/functions/getKnownField.md"
+              },
+              {
+                "text": "getSpecSnapshot",
+                "link": "/api/@graphorin/skills/spec/functions/getSpecSnapshot.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/store-sqlite",
+    "link": "/api/@graphorin/store-sqlite/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "connection",
+        "link": "/api/@graphorin/store-sqlite/connection/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SqliteVecMissingError",
+                "link": "/api/@graphorin/store-sqlite/connection/classes/SqliteVecMissingError.md"
+              },
+              {
+                "text": "WalCheckpointManager",
+                "link": "/api/@graphorin/store-sqlite/connection/classes/WalCheckpointManager.md"
+              }
+            ]
+          },
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "BetterSqlite3Database",
+                "link": "/api/@graphorin/store-sqlite/connection/interfaces/BetterSqlite3Database.md"
+              },
+              {
+                "text": "BetterSqlite3Statement",
+                "link": "/api/@graphorin/store-sqlite/connection/interfaces/BetterSqlite3Statement.md"
+              },
+              {
+                "text": "OpenConnectionOptions",
+                "link": "/api/@graphorin/store-sqlite/connection/interfaces/OpenConnectionOptions.md"
+              },
+              {
+                "text": "SqliteConnection",
+                "link": "/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "BetterSqlite3Constructor",
+                "link": "/api/@graphorin/store-sqlite/connection/type-aliases/BetterSqlite3Constructor.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "WAL_HARDENING_PRAGMAS",
+                "link": "/api/@graphorin/store-sqlite/connection/variables/WAL_HARDENING_PRAGMAS.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "_resetDriverCacheForTesting",
+                "link": "/api/@graphorin/store-sqlite/connection/functions/resetDriverCacheForTesting.md"
+              },
+              {
+                "text": "openConnection",
+                "link": "/api/@graphorin/store-sqlite/connection/functions/openConnection.md"
+              },
+              {
+                "text": "readPragma",
+                "link": "/api/@graphorin/store-sqlite/connection/functions/readPragma.md"
+              },
+              {
+                "text": "readWalSize",
+                "link": "/api/@graphorin/store-sqlite/connection/functions/readWalSize.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "encryption",
+        "link": "/api/@graphorin/store-sqlite/encryption/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CipherPeerMissingError",
+                "link": "/api/@graphorin/store-sqlite/encryption/classes/CipherPeerMissingError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "EncryptionCipher",
+                "link": "/api/@graphorin/store-sqlite/encryption/type-aliases/EncryptionCipher.md"
+              },
+              {
+                "text": "EncryptionConfig",
+                "link": "/api/@graphorin/store-sqlite/encryption/type-aliases/EncryptionConfig.md"
+              },
+              {
+                "text": "PassphraseResolver",
+                "link": "/api/@graphorin/store-sqlite/encryption/type-aliases/PassphraseResolver.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "loadCipherDriver",
+                "link": "/api/@graphorin/store-sqlite/encryption/functions/loadCipherDriver.md"
+              },
+              {
+                "text": "resolvePassphrase",
+                "link": "/api/@graphorin/store-sqlite/encryption/functions/resolvePassphrase.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "migrations",
+        "link": "/api/@graphorin/store-sqlite/migrations/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "_resetDynamicMigrationsForTesting",
+                "link": "/api/@graphorin/store-sqlite/migrations/functions/resetDynamicMigrationsForTesting.md"
+              },
+              {
+                "text": "listAppliedMigrations",
+                "link": "/api/@graphorin/store-sqlite/migrations/functions/listAppliedMigrations.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/store-sqlite-encrypted",
+    "link": "/api/@graphorin/store-sqlite-encrypted/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "Classes",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "EncryptedStorePeerMissingError",
+            "link": "/api/@graphorin/store-sqlite-encrypted/classes/EncryptedStorePeerMissingError.md"
+          }
+        ]
+      },
+      {
+        "text": "Interfaces",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "CipherIntegrityCheckResult",
+            "link": "/api/@graphorin/store-sqlite-encrypted/interfaces/CipherIntegrityCheckResult.md"
+          },
+          {
+            "text": "EncryptDatabaseOptions",
+            "link": "/api/@graphorin/store-sqlite-encrypted/interfaces/EncryptDatabaseOptions.md"
+          },
+          {
+            "text": "EncryptDatabaseResult",
+            "link": "/api/@graphorin/store-sqlite-encrypted/interfaces/EncryptDatabaseResult.md"
+          },
+          {
+            "text": "RekeyDatabaseOptions",
+            "link": "/api/@graphorin/store-sqlite-encrypted/interfaces/RekeyDatabaseOptions.md"
+          },
+          {
+            "text": "RekeyDatabaseResult",
+            "link": "/api/@graphorin/store-sqlite-encrypted/interfaces/RekeyDatabaseResult.md"
+          }
+        ]
+      },
+      {
+        "text": "Type Aliases",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "EncryptionCipher",
+            "link": "/api/@graphorin/store-sqlite-encrypted/type-aliases/EncryptionCipher.md"
+          }
+        ]
+      },
+      {
+        "text": "Variables",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "DEFAULT_CIPHER",
+            "link": "/api/@graphorin/store-sqlite-encrypted/variables/DEFAULT_CIPHER.md"
+          },
+          {
+            "text": "VERSION",
+            "link": "/api/@graphorin/store-sqlite-encrypted/variables/VERSION.md"
+          }
+        ]
+      },
+      {
+        "text": "Functions",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "_resetCipherPeerCacheForTesting",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/resetCipherPeerCacheForTesting.md"
+          },
+          {
+            "text": "_setCipherPeerForTesting",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/setCipherPeerForTesting.md"
+          },
+          {
+            "text": "cipherIntegrityCheck",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/cipherIntegrityCheck.md"
+          },
+          {
+            "text": "createEncryptedConnection",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/createEncryptedConnection.md"
+          },
+          {
+            "text": "encodePassphraseForPragma",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/encodePassphraseForPragma.md"
+          },
+          {
+            "text": "encryptDatabase",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/encryptDatabase.md"
+          },
+          {
+            "text": "loadCipherPeer",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/loadCipherPeer.md"
+          },
+          {
+            "text": "pragmaSequenceForCipher",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/pragmaSequenceForCipher.md"
+          },
+          {
+            "text": "rekeyDatabase",
+            "link": "/api/@graphorin/store-sqlite-encrypted/functions/rekeyDatabase.md"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/tools",
+    "link": "/api/@graphorin/tools/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "audit",
+        "link": "/api/@graphorin/tools/audit/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ToolAuditActor",
+                "link": "/api/@graphorin/tools/audit/interfaces/ToolAuditActor.md"
+              },
+              {
+                "text": "ToolAuditEvent",
+                "link": "/api/@graphorin/tools/audit/interfaces/ToolAuditEvent.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ToolAuditAction",
+                "link": "/api/@graphorin/tools/audit/type-aliases/ToolAuditAction.md"
+              },
+              {
+                "text": "ToolAuditDecision",
+                "link": "/api/@graphorin/tools/audit/type-aliases/ToolAuditDecision.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "_getToolAuditListenerCountForTesting",
+                "link": "/api/@graphorin/tools/audit/functions/getToolAuditListenerCountForTesting.md"
+              },
+              {
+                "text": "_resetToolAuditListenersForTesting",
+                "link": "/api/@graphorin/tools/audit/functions/resetToolAuditListenersForTesting.md"
+              },
+              {
+                "text": "createRegisteredEvent",
+                "link": "/api/@graphorin/tools/audit/functions/createRegisteredEvent.md"
+              },
+              {
+                "text": "emitToolAudit",
+                "link": "/api/@graphorin/tools/audit/functions/emitToolAudit.md"
+              },
+              {
+                "text": "onToolAudit",
+                "link": "/api/@graphorin/tools/audit/functions/onToolAudit.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "builder",
+        "link": "/api/@graphorin/tools/builder/"
+      },
+      {
+        "text": "built-in",
+        "link": "/api/@graphorin/tools/built-in/"
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/tools/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "DuplicateToolNameError",
+                "link": "/api/@graphorin/tools/errors/classes/DuplicateToolNameError.md"
+              },
+              {
+                "text": "GraphorinToolsError",
+                "link": "/api/@graphorin/tools/errors/classes/GraphorinToolsError.md"
+              },
+              {
+                "text": "InvalidExampleError",
+                "link": "/api/@graphorin/tools/errors/classes/InvalidExampleError.md"
+              },
+              {
+                "text": "InvalidPreferredModelError",
+                "link": "/api/@graphorin/tools/errors/classes/InvalidPreferredModelError.md"
+              },
+              {
+                "text": "InvalidSideEffectClassError",
+                "link": "/api/@graphorin/tools/errors/classes/InvalidSideEffectClassError.md"
+              },
+              {
+                "text": "ToolCollisionError",
+                "link": "/api/@graphorin/tools/errors/classes/ToolCollisionError.md"
+              },
+              {
+                "text": "ToolExecutionAggregateError",
+                "link": "/api/@graphorin/tools/errors/classes/ToolExecutionAggregateError.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "executor",
+        "link": "/api/@graphorin/tools/executor/"
+      },
+      {
+        "text": "inbound",
+        "link": "/api/@graphorin/tools/inbound/"
+      },
+      {
+        "text": "registry",
+        "link": "/api/@graphorin/tools/registry/"
+      },
+      {
+        "text": "result",
+        "link": "/api/@graphorin/tools/result/"
+      },
+      {
+        "text": "streaming",
+        "link": "/api/@graphorin/tools/streaming/"
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/triggers",
+    "link": "/api/@graphorin/triggers/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "cron",
+        "link": "/api/@graphorin/triggers/cron/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CronParseError",
+                "link": "/api/@graphorin/triggers/cron/classes/CronParseError.md"
+              }
+            ]
+          },
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "ParsedCron",
+                "link": "/api/@graphorin/triggers/cron/interfaces/ParsedCron.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "nextFireAfter",
+                "link": "/api/@graphorin/triggers/cron/functions/nextFireAfter.md"
+              },
+              {
+                "text": "parseCron",
+                "link": "/api/@graphorin/triggers/cron/functions/parseCron.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "text": "@graphorin/workflow",
+    "link": "/api/@graphorin/workflow/",
+    "collapsed": true,
+    "items": [
+      {
+        "text": "checkpoint-store-memory",
+        "link": "/api/@graphorin/workflow/checkpoint-store-memory/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "InMemoryCheckpointStore",
+                "link": "/api/@graphorin/workflow/checkpoint-store-memory/classes/InMemoryCheckpointStore.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "errors",
+        "link": "/api/@graphorin/workflow/errors/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Classes",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CheckpointNotFoundError",
+                "link": "/api/@graphorin/workflow/errors/classes/CheckpointNotFoundError.md"
+              },
+              {
+                "text": "ConcurrentResumeError",
+                "link": "/api/@graphorin/workflow/errors/classes/ConcurrentResumeError.md"
+              },
+              {
+                "text": "InvalidChannelWriteError",
+                "link": "/api/@graphorin/workflow/errors/classes/InvalidChannelWriteError.md"
+              },
+              {
+                "text": "InvalidWorkflowConfigError",
+                "link": "/api/@graphorin/workflow/errors/classes/InvalidWorkflowConfigError.md"
+              },
+              {
+                "text": "MultiWriteError",
+                "link": "/api/@graphorin/workflow/errors/classes/MultiWriteError.md"
+              },
+              {
+                "text": "NodeExecutionError",
+                "link": "/api/@graphorin/workflow/errors/classes/NodeExecutionError.md"
+              },
+              {
+                "text": "ReducerError",
+                "link": "/api/@graphorin/workflow/errors/classes/ReducerError.md"
+              },
+              {
+                "text": "ResumeWithoutSuspensionError",
+                "link": "/api/@graphorin/workflow/errors/classes/ResumeWithoutSuspensionError.md"
+              },
+              {
+                "text": "ThreadNotFoundError",
+                "link": "/api/@graphorin/workflow/errors/classes/ThreadNotFoundError.md"
+              },
+              {
+                "text": "UnknownNodeError",
+                "link": "/api/@graphorin/workflow/errors/classes/UnknownNodeError.md"
+              },
+              {
+                "text": "WorkflowAbortedError",
+                "link": "/api/@graphorin/workflow/errors/classes/WorkflowAbortedError.md"
+              },
+              {
+                "text": "WorkflowError",
+                "link": "/api/@graphorin/workflow/errors/classes/WorkflowError.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "WorkflowErrorCode",
+                "link": "/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "factory",
+        "link": "/api/@graphorin/workflow/factory/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createWorkflow",
+                "link": "/api/@graphorin/workflow/factory/functions/createWorkflow.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "text": "node",
+        "link": "/api/@graphorin/workflow/node/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createNode",
+                "link": "/api/@graphorin/workflow/node/functions/createNode.md"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

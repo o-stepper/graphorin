@@ -1,0 +1,24 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/cli](/api/@graphorin/cli/index.md) / [](/api/@graphorin/cli/README.md) / SkillsAuditOptions
+
+# Interface: SkillsAuditOptions
+
+Defined in: packages/cli/src/commands/skills.ts:142
+
+## Stable
+
+## Extends
+
+- [`SkillsCommonOptions`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md)
+
+## Properties
+
+| Property | Modifier | Type | Description | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`SkillsCommonOptions`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md#property-json) | packages/cli/src/internal/output.ts:71 |
+| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam — capture JSON documents instead of writing to stdout. | [`SkillsCommonOptions`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
+| <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`SkillsCommonOptions`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md#property-noninteractive) | packages/cli/src/internal/output.ts:73 |
+| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam — capture human lines instead of writing to stderr. | [`SkillsCommonOptions`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/SkillsCommonOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |

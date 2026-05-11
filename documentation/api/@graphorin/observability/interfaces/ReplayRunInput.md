@@ -1,0 +1,26 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/observability](/api/@graphorin/observability/index.md) / [](/api/@graphorin/observability/README.md) / ReplayRunInput
+
+# Interface: ReplayRunInput
+
+Defined in: packages/observability/src/replay/types.ts:105
+
+Per-call options consumed by `Replay.run(...)`.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-actor"></a> `actor?` | `readonly` | \{ `id`: `string`; `kind`: `"agent"` \| `"system"` \| `"token"` \| `"cli"`; \} | packages/observability/src/replay/types.ts:111 |
+| `actor.id` | `readonly` | `string` | packages/observability/src/replay/types.ts:42 |
+| `actor.kind` | `readonly` | `"agent"` \| `"system"` \| `"token"` \| `"cli"` | packages/observability/src/replay/types.ts:42 |
+| <a id="property-fromspanid"></a> `fromSpanId?` | `readonly` | `string` | packages/observability/src/replay/types.ts:110 |
+| <a id="property-minsensitivity"></a> `minSensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | packages/observability/src/replay/types.ts:109 |
+| <a id="property-mode"></a> `mode?` | `readonly` | [`ReplayMode`](/api/@graphorin/observability/type-aliases/ReplayMode.md) | packages/observability/src/replay/types.ts:108 |
+| <a id="property-source"></a> `source` | `readonly` | \| `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> \| `Iterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> | packages/observability/src/replay/types.ts:106 |
+| <a id="property-target"></a> `target` | `readonly` | `string` | packages/observability/src/replay/types.ts:107 |

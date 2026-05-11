@@ -1,0 +1,119 @@
+{
+  "name": "@graphorin/tools",
+  "version": "0.1.0",
+  "description": "Tools surface for the Graphorin framework: typed `tool({...})` builder backed by Zod schemas, ToolRegistry with strategy-aware collision resolution and deferred-loading support, ToolExecutor with parallel/sequential dispatch, approval flow, sandbox enforcement (via @graphorin/security), per-tool secrets ACL, memory-modification guard wiring, hard-kill cancellation with grace, single-round tool repair, inbound prompt-injection sanitization, four-strategy result truncation, streaming tool execution (progress + partial chunks with bounded backpressure), four-class side-effect taxonomy with idempotency-key callbacks, per-tool model-tier hints, and built-in `tool_search` for tool retrieval at scale.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/tools",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/tools"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "tools",
+    "tool-registry",
+    "tool-executor",
+    "zod",
+    "approval-flow",
+    "sandbox",
+    "tool-repair",
+    "inbound-sanitization",
+    "deferred-loading",
+    "tool-search",
+    "side-effect-class",
+    "idempotency",
+    "streaming-tools"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./builder": {
+      "types": "./dist/builder/index.d.ts",
+      "import": "./dist/builder/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.js"
+    },
+    "./executor": {
+      "types": "./dist/executor/index.d.ts",
+      "import": "./dist/executor/index.js"
+    },
+    "./streaming": {
+      "types": "./dist/streaming/index.d.ts",
+      "import": "./dist/streaming/index.js"
+    },
+    "./inbound": {
+      "types": "./dist/inbound/index.d.ts",
+      "import": "./dist/inbound/index.js"
+    },
+    "./result": {
+      "types": "./dist/result/index.d.ts",
+      "import": "./dist/result/index.js"
+    },
+    "./built-in": {
+      "types": "./dist/built-in/index.d.ts",
+      "import": "./dist/built-in/index.js"
+    },
+    "./audit": {
+      "types": "./dist/audit/index.d.ts",
+      "import": "./dist/audit/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/security": "workspace:*"
+  },
+  "peerDependencies": {
+    "zod": "^3.23.0 || ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": false
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.0",
+    "zod": "^3.25.0"
+  }
+}

@@ -1,0 +1,191 @@
+import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+import { loadSkillFromSource, loadSkills } from '../src/loader/index.js';
+
+let tmpRoot: string;
+
+beforeAll(async () => {
+  tmpRoot = await mkdir(join(tmpdir(), `graphorin-skills-tests-${Date.now()}`), {
+    recursive: true,
+  }).then(async (path) => path ?? join(tmpdir(), `graphorin-skills-tests-${Date.now()}`));
+});
+
+afterAll(async () => {
+  if (tmpRoot !== undefined) {
+    await rm(tmpRoot, { recursive: true, force: true });
+  }
+});
+
+async function makeSkillDir(
+  name: string,
+  manifest: string,
+  resources: ReadonlyArray<{ path: string; content: string }> = [],
+): Promise<string> {
+  const dir = join(tmpRoot, name);
+  await mkdir(dir, { recursive: true });
+  await writeFile(join(dir, 'SKILL.md'), manifest, 'utf8');
+  for (const r of resources) {
+    const target = join(dir, r.path);
+    await mkdir(join(target, '..'), { recursive: true });
+    await writeFile(target, r.content, 'utf8');
+  }
+  return dir;
+}
+
+describe('loadSkillFromSource — folder', () => {
+  it('parses a minimal Anthropic-base skill verbatim', async () => {
+    const dir = await makeSkillDir(
+      'minimal',
+      [
+        '---',
+        'name: minimal',
+        'description: A minimal skill that loads with zero graphorin-specific changes.',
+        '---',
+        'BODY',
+      ].join('\n'),
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
+    expect(skill.metadata.name).toBe('minimal');
+    expect(skill.metadata.disableModelInvocation).toBe(false);
+    // Skills that did not declare graphorin-trust-level resolve to
+    // 'unknown' per Phase 08 § Risks & mitigations.
+    expect(skill.metadata.graphorinTrustLevel).toBe('unknown');
+    expect(skill.metadata.graphorinSignaturePresent).toBe(false);
+  });
+
+  it('three-tier loading: metadata available without reading body / resources', async () => {
+    const dir = await makeSkillDir(
+      'three-tier',
+      [
+        '---',
+        'name: three-tier',
+        'description: Demonstrates three-tier progressive disclosure.',
+        '---',
+        'BODY',
+      ].join('\n'),
+      [{ path: 'examples/example.txt', content: 'example content' }],
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
+    // Tier 1 — metadata is parsed at load time.
+    expect(skill.metadata.name).toBe('three-tier');
+    // Tier 2 — body is resolved lazily and cached.
+    const body1 = await skill.body();
+    expect(body1.trim()).toBe('BODY');
+    const body2 = await skill.body();
+    expect(body2).toBe(body1);
+    // Tier 3 — resources are listed lazily; bytes are only read on
+    // explicit `read()`.
+    const resources = await skill.resources();
+    expect(resources.map((r) => r.relativePath)).toContain('examples/example.txt');
+    const example = resources.find((r) => r.relativePath === 'examples/example.txt');
+    expect(example).toBeDefined();
+    const text = await example?.readText();
+    expect(text).toBe('example content');
+  });
+
+  it('extended skill: untrusted trust level + handoff filter declaration are surfaced', async () => {
+    const dir = await makeSkillDir(
+      'extended',
+      [
+        '---',
+        'name: extended',
+        'description: Untrusted skill with a declared handoff input filter.',
+        'graphorin-trust-level: untrusted',
+        'graphorin-handoff-input-filter: lastUser',
+        'graphorin-tools:',
+        '  - name: read_file',
+        '  - name: write_file',
+        '---',
+        'BODY',
+      ].join('\n'),
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
+    expect(skill.metadata.graphorinTrustLevel).toBe('untrusted');
+    expect(skill.metadata.graphorinHandoffInputFilter).toEqual({ kind: 'lastUser' });
+    expect(skill.toolDeclarations()).toEqual([{ name: 'read_file' }, { name: 'write_file' }]);
+  });
+
+  it('untrusted + missing handoff filter triggers a warn diagnostic', async () => {
+    const dir = await makeSkillDir(
+      'untrusted-no-filter',
+      [
+        '---',
+        'name: untrusted-no-filter',
+        'description: An untrusted skill without a declared handoff input filter.',
+        'graphorin-trust-level: untrusted',
+        '---',
+      ].join('\n'),
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
+    const diag = skill.diagnostics().find((d) => d.kind === 'untrusted-handoff-filter-required');
+    expect(diag?.severity).toBe('warn');
+  });
+
+  it('throws when SKILL.md is missing', async () => {
+    const dir = join(tmpRoot, 'missing-skill');
+    await mkdir(dir, { recursive: true });
+    await expect(loadSkillFromSource({ kind: 'folder', path: dir })).rejects.toThrowError(
+      /SKILL.md is missing/u,
+    );
+  });
+
+  it('throws when required field is missing', async () => {
+    const dir = await makeSkillDir(
+      'no-name',
+      ['---', 'description: missing name', '---'].join('\n'),
+    );
+    await expect(loadSkillFromSource({ kind: 'folder', path: dir })).rejects.toThrowError(
+      /required field 'name'/u,
+    );
+  });
+});
+
+describe('loadSkillFromSource — inline', () => {
+  it('loads an inline skill without touching the filesystem', async () => {
+    const skill = await loadSkillFromSource({
+      kind: 'inline',
+      skill: {
+        skillMd: [
+          '---',
+          'name: inline-skill',
+          'description: An inline skill used by tests.',
+          '---',
+          'INLINE BODY',
+        ].join('\n'),
+        resources: [{ path: 'doc.txt', content: 'inline-resource' }],
+      },
+    });
+    expect(skill.metadata.name).toBe('inline-skill');
+    expect(await skill.body()).toContain('INLINE BODY');
+    const resources = await skill.resources();
+    expect(resources.map((r) => r.relativePath)).toEqual(['doc.txt']);
+    expect(resources[0]).toBeDefined();
+    expect(await resources[0]?.readText()).toBe('inline-resource');
+  });
+});
+
+describe('loadSkills', () => {
+  it('logs and continues when a single source fails (default)', async () => {
+    const goodDir = await makeSkillDir(
+      'good',
+      ['---', 'name: good', 'description: ok', '---'].join('\n'),
+    );
+    const skills = await loadSkills([
+      { kind: 'folder', path: goodDir },
+      { kind: 'folder', path: join(tmpRoot, 'does-not-exist') },
+    ]);
+    expect(skills.map((s) => s.metadata.name)).toEqual(['good']);
+  });
+
+  it('throws on the first failure when throwOnSourceError is true', async () => {
+    await expect(
+      loadSkills([{ kind: 'folder', path: join(tmpRoot, 'definitely-missing') }], {
+        throwOnSourceError: true,
+      }),
+    ).rejects.toThrowError();
+  });
+});

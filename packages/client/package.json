@@ -1,0 +1,87 @@
+{
+  "name": "@graphorin/client",
+  "version": "0.1.0",
+  "description": "Reference TypeScript client for the Graphorin standalone server. Wraps the WebSocket subprotocol `graphorin.protocol.v1` (with the optional Server-Sent Events fallback for proxy-restricted environments) behind an ergonomic `GraphorinClient` class: `connect()`, `subscribe({ target, id })` returning an async-iterable subscription, `cancel(runId, opts)`, `resume(runId, directive)`, `ping()`, `disconnect()`. Handles the browser ticket flow (single-use ticket attached as a `ticket.<value>` `Sec-WebSocket-Protocol` token), exponential-backoff reconnect with `lastEventId` resume against the server replay buffer, and Zod-validated frame parsing on both directions. Browser-friendly: zero Node-only dependencies; the only runtime dependencies are `@graphorin/protocol` and `zod`. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/client",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/client"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "client",
+    "websocket",
+    "sse",
+    "browser-friendly",
+    "ticket-flow",
+    "reconnect"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/graphorin-client.d.ts",
+      "import": "./dist/graphorin-client.js"
+    },
+    "./transport": {
+      "types": "./dist/transport/index.d.ts",
+      "import": "./dist/transport/index.js"
+    },
+    "./reconnect": {
+      "types": "./dist/reconnect.d.ts",
+      "import": "./dist/reconnect.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/protocol": "workspace:*",
+    "zod": "^3.25.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/security": "workspace:*",
+    "@graphorin/server": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@types/ws": "^8.18.1",
+    "ws": "^8.20.0"
+  }
+}

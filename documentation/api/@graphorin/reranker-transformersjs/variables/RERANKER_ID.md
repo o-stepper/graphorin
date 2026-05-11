@@ -1,0 +1,15 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-transformersjs](/api/@graphorin/reranker-transformersjs/index.md) / RERANKER\_ID
+
+# Variable: RERANKER\_ID
+
+```ts
+const RERANKER_ID: "transformersjs-cross-encoder";
+```
+
+Defined in: packages/reranker-transformersjs/src/reranker.ts:81
+
+## Stable

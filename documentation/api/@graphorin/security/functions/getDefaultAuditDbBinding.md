@@ -1,0 +1,25 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / getDefaultAuditDbBinding
+
+# Function: getDefaultAuditDbBinding()
+
+```ts
+function getDefaultAuditDbBinding(): 
+  | AuditDbBindingId
+  | undefined;
+```
+
+Defined in: packages/security/src/audit/audit-db.ts:166
+
+Read the identifier of the active default binding. Returns
+`undefined` if no binding has been registered.
+
+## Returns
+
+  \| [`AuditDbBindingId`](/api/@graphorin/security/type-aliases/AuditDbBindingId.md)
+  \| `undefined`
+
+## Stable

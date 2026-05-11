@@ -1,0 +1,18 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/server](/api/@graphorin/server/index.md) / [](/api/@graphorin/server/README.md) / RunStatus
+
+# Type Alias: RunStatus
+
+```ts
+type RunStatus = "pending" | "running" | "completed" | "failed" | "aborted";
+```
+
+Defined in: packages/server/src/runtime/run-state.ts:23
+
+Stable status discriminator for a run snapshot. Mirrors the values
+exposed on the public REST surface.
+
+## Stable

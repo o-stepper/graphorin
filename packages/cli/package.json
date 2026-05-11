@@ -1,0 +1,79 @@
+{
+  "name": "@graphorin/cli",
+  "version": "0.1.0",
+  "description": "Operator CLI for the Graphorin framework. Phase 14a ships the minimal `graphorin` binary with three commands: `graphorin start` (boot the standalone server with lifecycle hooks + pre-bind validation + storage migrations + audit log), `graphorin init` (interactive prompts for cloud-upload consent, opt-in storage encryption, and one-shot bootstrap-token issuance; --non-interactive accepts every option as flags or env vars), and `graphorin migrate` (idempotent storage migrations against the configured SQLite store). Phase 15 extends the same binary with `doctor`, `token`, `secrets`, `storage`, `audit`, `memory`, `consolidator`, `triggers`, `auth`, `pricing`, `skills`, `traces`, `migrate-export`, `guard`, and `telemetry`. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/cli",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "cli",
+    "graphorin-start",
+    "graphorin-init",
+    "graphorin-migrate"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "graphorin": "./dist/bin/graphorin.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./commands": {
+      "types": "./dist/commands/index.d.ts",
+      "import": "./dist/commands/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/eslint-plugin": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/pricing": "workspace:*",
+    "@graphorin/security": "workspace:*",
+    "@graphorin/server": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/skills": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "commander": "^10.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/store-sqlite-encrypted": "workspace:*"
+  }
+}

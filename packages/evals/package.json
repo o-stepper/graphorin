@@ -1,0 +1,81 @@
+{
+  "name": "@graphorin/evals",
+  "version": "0.1.0",
+  "description": "Eval framework for the Graphorin framework. Ships scorer libraries (`code/` exact-match, regex, JSON path, predicates; `llm/` LLM-judge; `prebuilt/` toxicity / factuality / helpfulness), dataset loaders (JSONL, CSV, from-traces, generic iterable), reporters (terminal, markdown, JSON, JUnit XML), a parallel runner with `concurrency` config, and regression detection that compares the current run against a stored baseline. Builds on the eval primitives shipped from `@graphorin/observability` (RB-17 / DEC-152 — full orchestrator lives here, post-MVP, decoupled from the core observability bundle so consumers do not pay the dataset / reporter cost when only the inline runner is needed). Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/evals",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/evals"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "evals",
+    "evaluation",
+    "scorers",
+    "llm-judge",
+    "datasets",
+    "reporters",
+    "regression-detection"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./scorers": {
+      "types": "./dist/scorers/index.d.ts",
+      "import": "./dist/scorers/index.js"
+    },
+    "./loaders": {
+      "types": "./dist/loaders/index.d.ts",
+      "import": "./dist/loaders/index.js"
+    },
+    "./reporters": {
+      "types": "./dist/reporters/index.d.ts",
+      "import": "./dist/reporters/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli/index.d.ts",
+      "import": "./dist/cli/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":dependencyDashboard", ":pinDigests"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "schedule": ["before 6am on Monday"],
+  "timezone": "Europe/Kyiv",
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "schedule": ["at any time"]
+  },
+  "packageRules": [
+    {
+      "matchPackagePrefixes": ["@graphorin/"],
+      "automerge": false,
+      "groupName": "graphorin"
+    },
+    {
+      "matchPackageNames": ["sqlite-vec"],
+      "rangeStrategy": "pin",
+      "description": "Pre-v1; tilde-pinned per DEC-132."
+    },
+    {
+      "matchPackageNames": ["better-sqlite3", "better-sqlite3-multiple-ciphers"],
+      "groupName": "sqlite",
+      "automerge": false
+    },
+    {
+      "matchPackageNames": ["@huggingface/transformers"],
+      "description": "Pin to v4 family; v2 (@xenova/transformers) is rejected per DEC-132.",
+      "allowedVersions": "^4"
+    },
+    {
+      "matchPackageNames": ["ai"],
+      "description": "Vercel AI SDK v7 beta. Track latest beta per DEC-132.",
+      "allowedVersions": "^7.0.0-beta"
+    },
+    {
+      "matchPackageNames": ["@modelcontextprotocol/sdk"],
+      "description": "MCP SDK; Streamable HTTP primary per RB-13."
+    }
+  ],
+  "ignorePaths": ["**/node_modules/**", "**/dist/**"]
+}

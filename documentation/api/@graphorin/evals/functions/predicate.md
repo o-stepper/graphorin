@@ -1,0 +1,32 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / predicate
+
+# Function: predicate()
+
+```ts
+function predicate<I, O>(options): Scorer<I, O>;
+```
+
+Defined in: evals/src/scorers/code/predicate.ts:21
+
+## Type Parameters
+
+| Type Parameter | Default type |
+| ------ | ------ |
+| `I` | `unknown` |
+| `O` | `unknown` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `options` | [`PredicateOptions`](/api/@graphorin/evals/interfaces/PredicateOptions.md)\&lt;`I`, `O`\&gt; |
+
+## Returns
+
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
+
+## Stable

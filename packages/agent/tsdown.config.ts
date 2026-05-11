@@ -1,0 +1,40 @@
+import { defineConfig } from 'tsdown';
+
+export default defineConfig({
+  entry: [
+    'src/index.ts',
+    'src/factory.ts',
+    'src/run-state/index.ts',
+    'src/filters/index.ts',
+    'src/fallback/index.ts',
+    'src/preferred-model/index.ts',
+    'src/fanout/index.ts',
+    'src/evaluator-optimizer/index.ts',
+    'src/progress/index.ts',
+    'src/lateral-leak/index.ts',
+    'src/errors/index.ts',
+  ],
+  format: ['esm'],
+  platform: 'node',
+  target: 'node22',
+  outputOptions: {
+    entryFileNames: '[name].js',
+    chunkFileNames: '[name]-[hash].js',
+    preserveModules: true,
+    preserveModulesRoot: 'src',
+  },
+  dts: true,
+  clean: true,
+  sourcemap: true,
+  treeshake: true,
+  external: [
+    '@graphorin/core',
+    '@graphorin/memory',
+    '@graphorin/observability',
+    '@graphorin/provider',
+    '@graphorin/security',
+    '@graphorin/sessions',
+    '@graphorin/skills',
+    '@graphorin/tools',
+  ],
+});

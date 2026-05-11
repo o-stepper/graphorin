@@ -1,0 +1,24 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AgentCancellingEvent
+
+# Interface: AgentCancellingEvent
+
+Defined in: packages/core/src/types/agent-event.ts:285
+
+Emitted at the moment `agent.abort({ ... })` is called, before any
+pending tool / provider calls have terminated. Subscribers use this
+to render "cancelling..." UI before the run actually winds down.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-drain"></a> `drain` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:288 |
+| <a id="property-onpendingapprovals"></a> `onPendingApprovals` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | packages/core/src/types/agent-event.ts:289 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:287 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.cancelling"` | packages/core/src/types/agent-event.ts:286 |

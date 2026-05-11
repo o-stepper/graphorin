@@ -1,0 +1,74 @@
+# GitHub Actions release workflow distribution template (Phase 15).
+#
+# Drives Changesets-based releases of the @graphorin/* packages with
+# Sigstore provenance attached on every published tarball. Mirrors the
+# release pipeline the framework itself uses.
+#
+# Required repository secrets:
+#   - NPM_TOKEN  — npm registry token with publish access.
+#
+# Drop into `.github/workflows/release.yml`.
+#
+# @stable
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build + publish via Changesets
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: pnpm install (frozen)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm -r run build
+
+      - name: Run all tests
+        run: pnpm -r run test
+        env:
+          CI: "true"
+
+      - name: Verify no implicit network calls (DEC-154)
+        run: pnpm run check-no-network
+
+      - name: Create Release Pull Request or publish
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+          version: pnpm version
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"

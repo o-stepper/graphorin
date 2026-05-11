@@ -1,0 +1,5 @@
+# multi-agent-crew
+
+## 0.1.0
+
+Initial release of the multi-agent crew acceptance example. Wires a supervisor + 2 specialised worker agents (`worker-a` researcher / `worker-b` writer) through `createAgent({ handoffs: [...] })` so the agent runtime auto-generates `transfer_to_<worker>` tools and emits a `HandoffRecord` per transfer; ships a deterministic per-role stub `Provider` so the smoke test runs hermetically in well under 30 s; demonstrates every RB-33 acceptance scenario end-to-end against a single shared `SessionManager` (`kind: 'agent'` + `kind: 'handoff'` JSONL export records, per-agent attribution via `session.list({ agentId })`, registry placeholder reconstruction after `agents.delete(...)`, sub-agent secrets isolation per DEC-137, and the `compose(lastN(10), stripReasoning())` handoff `inputFilter` default per DEC-146 / RB-40); and includes a small in-tree `SecretValue` wrapper (`./src/secret-stub.ts`) so the example's secrets-isolation invariant runs without taking a `@graphorin/security` dependency.

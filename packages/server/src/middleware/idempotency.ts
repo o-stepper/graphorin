@@ -1,0 +1,251 @@
+/**
+ * REST `Idempotency-Key` middleware per IETF
+ * draft-ietf-httpapi-idempotency-key-header-07. Layers an LRU
+ * read-cache over a durable {@link IdempotencyStore} so:
+ *
+ * - Replays of a successful request return the cached response body
+ *   AND the original status code, with a synthetic
+ *   `Idempotency-Replayed: true` header so clients can distinguish
+ *   the cached path.
+ * - Replays of a key with a different request body return `409
+ *   Conflict` and a typed error body (per ADR-036 / DEC-142).
+ * - 5xx + 408 + 429 + 503 responses are NOT cached so transient
+ *   errors do not pin the operator into a non-recoverable state.
+ *
+ * Streaming endpoints (`/v1/agents/:id/stream`,
+ * `/v1/workflows/:id/execute` when invoked with the `stream=true`
+ * query) cache only the initial 202 + `runId` envelope; the actual
+ * event stream is replayed via the WebSocket layer (Phase 14b).
+ *
+ * @packageDocumentation
+ */
+
+import type { IdempotencyRecord, IdempotencyStore } from '@graphorin/store-sqlite';
+import type { Context, MiddlewareHandler } from 'hono';
+
+import type { ServerConfigSpec } from '../config.js';
+import type { ServerVariables } from '../internal/context.js';
+import { fingerprintRequest } from '../internal/json.js';
+
+const HEADER_NAME = 'idempotency-key';
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE']);
+// Status codes the IETF draft + Stripe convention exclude from
+// idempotent caching (always retry-eligible).
+const NON_CACHEABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+const KEY_RE = /^[A-Za-z0-9_\-:]{8,255}$/;
+
+/**
+ * Options accepted by {@link createIdempotencyMiddleware}.
+ *
+ * @stable
+ */
+export interface IdempotencyMiddlewareOptions {
+  readonly store: IdempotencyStore;
+  readonly config: ServerConfigSpec['server']['idempotency'];
+  /** Wall-clock provider; tests inject a deterministic generator. */
+  readonly now?: () => number;
+}
+
+interface CacheEntry {
+  readonly record: IdempotencyRecord;
+  readonly cachedAt: number;
+}
+
+/**
+ * @stable
+ */
+export function createIdempotencyMiddleware(
+  options: IdempotencyMiddlewareOptions,
+): MiddlewareHandler<{ Variables: ServerVariables }> {
+  const { store, config } = options;
+  if (!config.enabled) {
+    return async (_, next) => {
+      await next();
+    };
+  }
+  const now = options.now ?? Date.now;
+  const lru = new SimpleLru<string, CacheEntry>(config.lruCacheSize);
+
+  return async (c, next) => {
+    if (SAFE_METHODS.has(c.req.method.toUpperCase())) {
+      await next();
+      return;
+    }
+    const key = c.req.header(HEADER_NAME)?.trim();
+    if (key === undefined || key.length === 0) {
+      if (config.requireKey === 'enforce') {
+        return c.json(
+          {
+            error: 'idempotency-key-required',
+            message: 'Idempotency-Key header is required for this endpoint.',
+            hint: "Set 'Idempotency-Key: <uuid>' on the request.",
+          },
+          400,
+        );
+      }
+      // 'warn' / 'off' — pass-through with a hint header.
+      if (config.requireKey === 'warn') {
+        c.header('Idempotency-Status', 'header-missing');
+      }
+      await next();
+      return;
+    }
+    if (!KEY_RE.test(key)) {
+      return c.json(
+        {
+          error: 'idempotency-key-required',
+          message: 'Idempotency-Key must be 8-255 chars of [A-Za-z0-9_:-].',
+        },
+        400,
+      );
+    }
+    c.set('state', { ...c.get('state'), idempotencyKey: key });
+    const fingerprint = await computeFingerprint(c);
+    const cached = lru.get(key);
+    let record: IdempotencyRecord | null;
+    if (cached !== undefined && now() - cached.cachedAt < 5 * 60 * 1000) {
+      record = cached.record;
+    } else {
+      record = await store.get(key);
+      if (record !== null) {
+        lru.set(key, { record, cachedAt: now() });
+      }
+    }
+    if (record !== null) {
+      if (config.checkBodyFingerprint && record.requestHash !== fingerprint) {
+        return c.json(
+          {
+            error: 'idempotency-conflict',
+            message: `Idempotency-Key '${key}' was previously used with a different request body.`,
+          },
+          409,
+        );
+      }
+      if (record.expiresAt > now()) {
+        c.set('state', { ...c.get('state'), idempotencyReplay: true });
+        const headers = record.responseHeaders ?? {};
+        for (const [name, value] of Object.entries(headers)) {
+          c.header(name, value);
+        }
+        c.header('Idempotency-Replayed', 'true');
+        return new Response(JSON.stringify(record.response), {
+          status: record.statusCode,
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json',
+            'Idempotency-Replayed': 'true',
+          },
+        });
+      }
+      // Expired — fall through to re-execute.
+      lru.delete(key);
+      await store.delete(key);
+    }
+
+    await next();
+
+    const status = c.res.status;
+    if (NON_CACHEABLE_STATUS.has(status)) {
+      // Retry-eligible — leave nothing in the cache.
+      return;
+    }
+    const responseBody = await captureJsonResponse(c);
+    if (responseBody === null) {
+      // Non-JSON or empty body — skip caching to keep the schema
+      // simple; clients that need response replay can use bodied
+      // POSTs.
+      return;
+    }
+    const responseHeaders = collectResponseHeaders(c);
+    const record_: IdempotencyRecord = {
+      key,
+      requestHash: fingerprint,
+      statusCode: status,
+      response: responseBody,
+      ...(responseHeaders !== undefined ? { responseHeaders } : {}),
+      createdAt: now(),
+      expiresAt: now() + config.ttlSeconds * 1000,
+    };
+    try {
+      await store.put(record_);
+      lru.set(key, { record: record_, cachedAt: now() });
+    } catch {
+      // Best-effort cache. Persistence failures must not break the
+      // hot path — operators see them via the audit log + logger.
+    }
+  };
+}
+
+async function computeFingerprint(c: Context<{ Variables: ServerVariables }>): Promise<string> {
+  let body: unknown = null;
+  const ct = c.req.header('content-type');
+  if (ct?.toLowerCase().includes('application/json')) {
+    try {
+      body = await c.req.json();
+    } catch {
+      body = await c.req.text();
+    }
+  } else {
+    body = await c.req.text();
+  }
+  return fingerprintRequest(c.req.method, c.req.path, body);
+}
+
+async function captureJsonResponse(
+  c: Context<{ Variables: ServerVariables }>,
+): Promise<unknown | null> {
+  if (c.res === undefined) return null;
+  const contentType = c.res.headers.get('content-type') ?? '';
+  if (!contentType.toLowerCase().includes('application/json')) return null;
+  try {
+    const cloned = c.res.clone();
+    const text = await cloned.text();
+    if (text.length === 0) return null;
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+function collectResponseHeaders(
+  c: Context<{ Variables: ServerVariables }>,
+): Readonly<Record<string, string>> | undefined {
+  if (c.res === undefined) return undefined;
+  const out: Record<string, string> = {};
+  c.res.headers.forEach((value, name) => {
+    if (name.toLowerCase() === 'content-length') return;
+    out[name] = value;
+  });
+  return Object.keys(out).length === 0 ? undefined : Object.freeze(out);
+}
+
+class SimpleLru<K, V> {
+  readonly #capacity: number;
+  readonly #map: Map<K, V> = new Map();
+
+  constructor(capacity: number) {
+    this.#capacity = Math.max(1, capacity);
+  }
+
+  get(key: K): V | undefined {
+    const value = this.#map.get(key);
+    if (value === undefined) return undefined;
+    this.#map.delete(key);
+    this.#map.set(key, value);
+    return value;
+  }
+
+  set(key: K, value: V): void {
+    if (this.#map.has(key)) this.#map.delete(key);
+    this.#map.set(key, value);
+    while (this.#map.size > this.#capacity) {
+      const oldestKey = this.#map.keys().next().value as K | undefined;
+      if (oldestKey === undefined) break;
+      this.#map.delete(oldestKey);
+    }
+  }
+
+  delete(key: K): boolean {
+    return this.#map.delete(key);
+  }
+}

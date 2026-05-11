@@ -1,0 +1,24 @@
+import { defineConfig } from 'tsdown';
+
+export default defineConfig({
+  entry: [
+    'src/index.ts',
+    'src/types/index.ts',
+    'src/contracts/index.ts',
+    'src/utils/index.ts',
+    'src/channels/index.ts',
+  ],
+  format: ['esm'],
+  platform: 'node',
+  target: 'node22',
+  outputOptions: {
+    entryFileNames: '[name].js',
+    chunkFileNames: '[name]-[hash].js',
+    preserveModules: true,
+    preserveModulesRoot: 'src',
+  },
+  dts: true,
+  clean: true,
+  sourcemap: true,
+  treeshake: true,
+});

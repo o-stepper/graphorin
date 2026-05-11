@@ -1,0 +1,64 @@
+{
+  "name": "@graphorin/embedder-ollama",
+  "version": "0.1.0",
+  "description": "First-class opt-in alternative to @graphorin/embedder-transformersjs for the Graphorin framework. Wraps the local Ollama HTTP API to produce dense embeddings via models such as `nomic-embed-text` (768-dim, multilingual default), `mxbai-embed-large` (1024-dim), `snowflake-arctic-embed` (1024-dim), and `bge-m3` (1024-dim). Implements the `EmbedderProvider` contract with a deterministic configHash that includes the model digest reported by `POST /api/show`, so a model upgrade in the same Ollama instance produces a different embedder_id and the multi-table per-embedder vec0 layout in `@graphorin/store-sqlite` triggers a clean migration path.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/embedder-ollama",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/embedder-ollama"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "embeddings",
+    "ollama",
+    "nomic-embed-text",
+    "bge-m3",
+    "local-first"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/store-sqlite": "workspace:*"
+  }
+}

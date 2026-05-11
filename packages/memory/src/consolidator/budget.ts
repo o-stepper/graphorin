@@ -1,0 +1,236 @@
+/**
+ * Cost-budget enforcement for the consolidator. The tracker is a
+ * pure in-memory state machine: it owns the day-bucketed counters
+ * (token + cost), the UTC reset semantics, and the `onExceed`
+ * dispatch.
+ *
+ * The tracker does not perform any I/O — operators surface the live
+ * counters via `Consolidator.status()` and the persisted snapshot is
+ * derived from `consolidator_runs` rows.
+ *
+ * @packageDocumentation
+ */
+
+import { BudgetExceededError } from './errors.js';
+import type { ConsolidatorPhase, OnBudgetExceed } from './types.js';
+
+/**
+ * @stable
+ */
+export interface BudgetSnapshot {
+  readonly tokensUsedToday: number;
+  readonly costUsedToday: number;
+  readonly tokensRemaining: number;
+  readonly costRemaining: number;
+  readonly resetAt: string;
+  readonly paused: boolean;
+}
+
+/**
+ * @stable
+ */
+export interface BudgetCheck {
+  readonly allowed: boolean;
+  readonly reason?: 'paused' | 'tokens-exceeded' | 'cost-exceeded';
+}
+
+/**
+ * @stable
+ */
+export interface BudgetTrackerOptions {
+  readonly maxTokensPerDay: number;
+  readonly maxCostPerDay: number;
+  readonly onExceed: OnBudgetExceed;
+  readonly resetSemantics: 'utc' | 'local' | 'sliding-24h';
+  readonly now?: () => number;
+}
+
+/**
+ * Per-instance budget tracker. The runtime creates one tracker per
+ * consolidator and resets the day counters lazily on the next phase
+ * invocation.
+ *
+ * @stable
+ */
+export class BudgetTracker {
+  readonly #now: () => number;
+  readonly #resetSemantics: 'utc' | 'local' | 'sliding-24h';
+  readonly #onExceed: OnBudgetExceed;
+  #maxTokensPerDay: number;
+  #maxCostPerDay: number;
+  #bucketStart: number;
+  #tokens = 0;
+  #cost = 0;
+  #paused = false;
+  #pausedReason: 'tokens-exceeded' | 'cost-exceeded' | null = null;
+
+  constructor(opts: BudgetTrackerOptions) {
+    this.#now = opts.now ?? Date.now;
+    this.#resetSemantics = opts.resetSemantics;
+    this.#onExceed = opts.onExceed;
+    this.#maxTokensPerDay = opts.maxTokensPerDay;
+    this.#maxCostPerDay = opts.maxCostPerDay;
+    this.#bucketStart = bucketStart(this.#now(), this.#resetSemantics);
+  }
+
+  /**
+   * Replace the active ceilings. Used by `Consolidator.setTier(...)`.
+   *
+   * @stable
+   */
+  reconfigure(opts: { maxTokensPerDay: number; maxCostPerDay: number }): void {
+    this.#maxTokensPerDay = opts.maxTokensPerDay;
+    this.#maxCostPerDay = opts.maxCostPerDay;
+    if (this.#paused) {
+      const tokensOk = this.#tokens <= this.#maxTokensPerDay;
+      const costOk = this.#cost <= this.#maxCostPerDay;
+      if (tokensOk && costOk) {
+        this.#paused = false;
+        this.#pausedReason = null;
+      }
+    }
+  }
+
+  /**
+   * Return whether the supplied phase may run right now.
+   *
+   * @stable
+   */
+  precheck(phase: ConsolidatorPhase): BudgetCheck {
+    this.#maybeReset();
+    if (phase === 'light') return { allowed: true };
+    if (this.#paused) {
+      const reason = this.#pausedReason ?? 'cost-exceeded';
+      return { allowed: false, reason };
+    }
+    if (this.#maxTokensPerDay <= 0) {
+      return { allowed: false, reason: 'tokens-exceeded' };
+    }
+    if (this.#maxCostPerDay <= 0) {
+      return { allowed: false, reason: 'cost-exceeded' };
+    }
+    return { allowed: true };
+  }
+
+  /**
+   * Record consumption. Returns the post-record state — `paused` is
+   * `true` when the spend pushed past a ceiling under
+   * `onExceed: 'pause'`.
+   *
+   * Throws {@link BudgetExceededError} when the configured behaviour
+   * is `'throw'`.
+   *
+   * @stable
+   */
+  record(args: { phase: ConsolidatorPhase; tokens: number; costUsd: number }): BudgetSnapshot {
+    this.#maybeReset();
+    this.#tokens += Math.max(0, args.tokens);
+    this.#cost += Math.max(0, args.costUsd);
+    if (this.#tokens > this.#maxTokensPerDay) {
+      this.#handleBreach(args.phase, 'tokens', this.#tokens, this.#maxTokensPerDay);
+    }
+    if (this.#cost > this.#maxCostPerDay) {
+      this.#handleBreach(args.phase, 'cost', this.#cost, this.#maxCostPerDay);
+    }
+    return this.snapshot();
+  }
+
+  /**
+   * Read-only snapshot. Surfaced through `Consolidator.status()`.
+   *
+   * @stable
+   */
+  snapshot(): BudgetSnapshot {
+    this.#maybeReset();
+    return Object.freeze({
+      tokensUsedToday: this.#tokens,
+      costUsedToday: this.#cost,
+      tokensRemaining: Math.max(0, this.#maxTokensPerDay - this.#tokens),
+      costRemaining: Math.max(0, this.#maxCostPerDay - this.#cost),
+      resetAt: new Date(nextBucketStart(this.#bucketStart, this.#resetSemantics)).toISOString(),
+      paused: this.#paused,
+    });
+  }
+
+  /**
+   * Force a reset. Used by tests + manual operator action.
+   *
+   * @stable
+   */
+  reset(): void {
+    this.#tokens = 0;
+    this.#cost = 0;
+    this.#paused = false;
+    this.#pausedReason = null;
+    this.#bucketStart = bucketStart(this.#now(), this.#resetSemantics);
+  }
+
+  #handleBreach(
+    phase: ConsolidatorPhase,
+    resource: 'tokens' | 'cost',
+    actual: number,
+    budget: number,
+  ): void {
+    if (this.#onExceed === 'throw') {
+      throw new BudgetExceededError({ phase, resource, actual, budget });
+    }
+    if (this.#onExceed === 'pause') {
+      this.#paused = true;
+      this.#pausedReason = resource === 'tokens' ? 'tokens-exceeded' : 'cost-exceeded';
+    }
+  }
+
+  #maybeReset(): void {
+    const now = this.#now();
+    const currentBucket = bucketStart(now, this.#resetSemantics);
+    if (currentBucket !== this.#bucketStart) {
+      this.#bucketStart = currentBucket;
+      this.#tokens = 0;
+      this.#cost = 0;
+      this.#paused = false;
+      this.#pausedReason = null;
+    }
+  }
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Compute the start of the current bucket (ms epoch) for the
+ * supplied reset semantics. UTC midnight is the production default
+ * per ADR-038.
+ *
+ * @internal
+ */
+export function bucketStart(now: number, semantics: 'utc' | 'local' | 'sliding-24h'): number {
+  switch (semantics) {
+    case 'utc': {
+      const d = new Date(now);
+      return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    }
+    case 'local': {
+      const d = new Date(now);
+      return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    }
+    case 'sliding-24h':
+      return now;
+  }
+}
+
+/**
+ * Compute the next reset boundary (ms epoch).
+ *
+ * @internal
+ */
+export function nextBucketStart(
+  bucket: number,
+  semantics: 'utc' | 'local' | 'sliding-24h',
+): number {
+  switch (semantics) {
+    case 'utc':
+    case 'local':
+      return bucket + DAY_MS;
+    case 'sliding-24h':
+      return bucket + DAY_MS;
+  }
+}

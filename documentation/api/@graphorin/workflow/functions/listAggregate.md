@@ -1,0 +1,34 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / listAggregate
+
+# Function: listAggregate()
+
+```ts
+function listAggregate<T>(opts?): ListAggregate<T>;
+```
+
+Defined in: packages/core/dist/channels/channels.d.ts:126
+
+Construct a `ListAggregate` channel.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts?` | \{ `default?`: readonly `T`[]; \} |
+| `opts.default?` | readonly `T`[] |
+
+## Returns
+
+[`ListAggregate`](/api/@graphorin/workflow/interfaces/ListAggregate.md)\&lt;`T`\&gt;
+
+## Stable

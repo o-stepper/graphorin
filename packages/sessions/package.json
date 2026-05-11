@@ -1,0 +1,109 @@
+{
+  "name": "@graphorin/sessions",
+  "version": "0.1.0",
+  "description": "Hybrid facade-with-state session module for the Graphorin framework: createSession() facade that wraps @graphorin/memory.session for message CRUD (single source of truth), AgentRegistry singleton with register / retire / delete / placeholder semantics, automatic handoff records with input-filter + secrets-inheritance metadata, workflow-run attachments, JSONL session export schema 1.0 (sentinel header + footer, N-2 backwards-compat, lenient-forward-parse, opt-in --hash / --sign / --encrypt), tool-cassette schema 1.0 (graphorin-tool-cassette/1.0) with substitution-vs-live replay policy honouring per-tool sideEffectClass, sanitized-by-default replay with audit + 30-day TTL + traces:read[:sanitized|:raw] scopes, and per-message commentary-phase trace sanitization at the session-output boundary.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/sessions",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/sessions"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "sessions",
+    "session-management",
+    "agent-registry",
+    "multi-agent",
+    "handoff",
+    "jsonl",
+    "session-export",
+    "session-replay",
+    "tool-cassette",
+    "deterministic-replay",
+    "commentary-sanitization",
+    "audit-log"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./facade": {
+      "types": "./dist/facade.d.ts",
+      "import": "./dist/facade.js"
+    },
+    "./agent-registry": {
+      "types": "./dist/agent-registry.d.ts",
+      "import": "./dist/agent-registry.js"
+    },
+    "./commentary": {
+      "types": "./dist/commentary/index.d.ts",
+      "import": "./dist/commentary/index.js"
+    },
+    "./export": {
+      "types": "./dist/export/index.d.ts",
+      "import": "./dist/export/index.js"
+    },
+    "./replay": {
+      "types": "./dist/replay/index.d.ts",
+      "import": "./dist/replay/index.js"
+    },
+    "./cassette": {
+      "types": "./dist/cassette/index.d.ts",
+      "import": "./dist/cassette/index.js"
+    },
+    "./migrations": {
+      "types": "./dist/migrations/index.d.ts",
+      "import": "./dist/migrations/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/security": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/embedder-transformersjs": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.9.0"
+  }
+}

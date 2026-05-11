@@ -1,0 +1,179 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/memory](/api/@graphorin/memory/index.md) / [](/api/@graphorin/memory/README.md) / SessionMemoryStoreExt
+
+# Interface: SessionMemoryStoreExt
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:103
+
+Extension of the typed `SessionMemoryStore` with optional
+token-cache + vector-search + cursor-aware reader helpers that
+storage adapters may expose.
+
+## Stable
+
+## Extends
+
+- [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md)
+
+## Methods
+
+### list()
+
+```ts
+list(scope, opts?): Promise<readonly Message[]>;
+```
+
+Defined in: packages/core/dist/contracts/memory-store.d.ts:51
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `opts?` | [`SessionListOptions`](/api/@graphorin/core/interfaces/SessionListOptions.md) |
+
+#### Returns
+
+`Promise`\&lt;readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\&gt;
+
+#### Inherited from
+
+[`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md).[`list`](/api/@graphorin/core/interfaces/SessionMemoryStore.md#list)
+
+***
+
+### listMessagesSince()?
+
+```ts
+optional listMessagesSince(
+   scope, 
+   lastMessageId, 
+limit): Promise<readonly SessionMessageRecord[]>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:122
+
+List messages for the supplied scope past the optional
+`lastMessageId` cursor, oldest-first, capped at `limit`. Used by
+the consolidator's standard phase to advance the per-scope
+idempotency cursor without rereading already-processed turns.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `lastMessageId` | `string` \| `null` |
+| `limit` | `number` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionMessageRecord`](/api/@graphorin/memory/interfaces/SessionMessageRecord.md)[]\&gt;
+
+***
+
+### push()
+
+```ts
+push(scope, message): Promise<MessageRef>;
+```
+
+Defined in: packages/core/dist/contracts/memory-store.d.ts:50
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `message` | [`Message`](/api/@graphorin/core/type-aliases/Message.md) |
+
+#### Returns
+
+`Promise`\&lt;[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\&gt;
+
+#### Inherited from
+
+[`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md).[`push`](/api/@graphorin/core/interfaces/SessionMemoryStore.md#push)
+
+***
+
+### search()
+
+```ts
+search(
+   scope, 
+   query, 
+opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
+```
+
+Defined in: packages/core/dist/contracts/memory-store.d.ts:52
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `query` | `string` |
+| `opts?` | [`MemorySearchOptions`](/api/@graphorin/core/interfaces/MemorySearchOptions.md) |
+
+#### Returns
+
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+
+#### Inherited from
+
+[`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md).[`search`](/api/@graphorin/core/interfaces/SessionMemoryStore.md#search)
+
+***
+
+### searchVector()?
+
+```ts
+optional searchVector(
+   scope, 
+   embedding, 
+   embedderId, 
+topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:104
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `embedding` | `Float32Array` |
+| `embedderId` | `string` |
+| `topK` | `number` |
+
+#### Returns
+
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+
+***
+
+### totalCachedTokens()?
+
+```ts
+optional totalCachedTokens(scope): Promise<number | null>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:115
+
+Sum of `session_messages.token_count` for the supplied scope.
+Returns `null` when the cache is empty / partially populated so
+callers can fall back to a heuristic. Surfaced per DEC-131.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+
+#### Returns
+
+`Promise`\&lt;`number` \| `null`\&gt;

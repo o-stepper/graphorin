@@ -1,0 +1,104 @@
+{
+  "name": "@graphorin/skills",
+  "version": "0.1.0",
+  "description": "Skills surface for the Graphorin framework: loader for the SKILL.md packaging format with three-tier progressive disclosure (metadata / body / resources), frontmatter validator implementing the field-resolution algorithm and conflict policy from ADR-043, registry with auto-activation + slash-command activation, supply-chain hardening (signature verification + `--ignore-scripts` enforcement via @graphorin/security), sandbox-tier propagation for untrusted skills, handoff input-filter declaration recognition, and idempotent migrate-frontmatter library.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/skills",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/skills"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "skills",
+    "skill-loader",
+    "skill-registry",
+    "frontmatter",
+    "yaml",
+    "progressive-disclosure",
+    "supply-chain",
+    "sandbox",
+    "ed25519",
+    "signature-verification",
+    "migration"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./loader": {
+      "types": "./dist/loader/index.d.ts",
+      "import": "./dist/loader/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.js"
+    },
+    "./frontmatter": {
+      "types": "./dist/frontmatter/index.d.ts",
+      "import": "./dist/frontmatter/index.js"
+    },
+    "./migration": {
+      "types": "./dist/migration/index.d.ts",
+      "import": "./dist/migration/index.js"
+    },
+    "./spec": {
+      "types": "./dist/spec/index.d.ts",
+      "import": "./dist/spec/index.js"
+    },
+    "./activation": {
+      "types": "./dist/activation/index.d.ts",
+      "import": "./dist/activation/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./anthropic-spec-snapshot.json": "./anthropic-spec-snapshot.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "anthropic-spec-snapshot.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/security": "workspace:*",
+    "@graphorin/tools": "workspace:*",
+    "yaml": "^2.8.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.0",
+    "zod": "^3.25.0"
+  }
+}

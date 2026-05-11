@@ -1,0 +1,38 @@
+import { defineConfig } from 'tsdown';
+
+export default defineConfig({
+  entry: [
+    'src/index.ts',
+    'src/secrets/index.ts',
+    'src/auth/index.ts',
+    'src/audit/index.ts',
+    'src/sandbox/index.ts',
+    'src/guard/index.ts',
+    'src/guardrails/index.ts',
+    'src/hardening/index.ts',
+    'src/oauth/index.ts',
+    'src/supply-chain/index.ts',
+  ],
+  format: ['esm'],
+  platform: 'node',
+  target: 'node22',
+  outputOptions: {
+    entryFileNames: '[name].js',
+    chunkFileNames: '[name]-[hash].js',
+    preserveModules: true,
+    preserveModulesRoot: 'src',
+  },
+  dts: true,
+  clean: true,
+  sourcemap: true,
+  treeshake: true,
+  external: [
+    '@napi-rs/keyring',
+    '@node-rs/argon2',
+    'better-sqlite3-multiple-ciphers',
+    'dockerode',
+    'isolated-vm',
+    'openid-client',
+    'yaml',
+  ],
+});

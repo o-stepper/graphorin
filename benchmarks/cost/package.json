@@ -1,0 +1,50 @@
+{
+  "name": "@graphorin/benchmark-cost",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Token-cost regression suite for the Graphorin framework. Records tokens per conversation per scenario and asserts < 10 % increase between runs. Pulls model pricing from the bundled @graphorin/pricing snapshot. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/cost",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/cost"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "memory-evaluation"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:run": "node ./dist/runner.js",
+    "benchmark:smoke": "node ./dist/runner.js --smoke"
+  },
+  "dependencies": {
+    "js-tiktoken": "^1.0.21",
+    "@graphorin/core": "workspace:*",
+    "@graphorin/pricing": "workspace:*",
+    "@graphorin/provider": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-cost": "./dist/runner.js"
+  }
+}

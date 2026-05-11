@@ -1,0 +1,62 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/skills](/api/@graphorin/skills/index.md) / [](/api/@graphorin/skills/README.md) / SkillResource
+
+# Interface: SkillResource
+
+Defined in: packages/skills/src/types/index.ts:242
+
+Lazy resource accessor returned by [Skill.resources](/api/@graphorin/skills/interfaces/Skill.md#resources). The
+loader does not read the file off disk until `.read()` is invoked.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-mediatype"></a> `mediaType?` | `readonly` | `string` | packages/skills/src/types/index.ts:245 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/skills/src/types/index.ts:243 |
+| <a id="property-relativepath"></a> `relativePath` | `readonly` | `string` | packages/skills/src/types/index.ts:244 |
+
+## Methods
+
+### read()
+
+```ts
+read(signal?): Promise<Uint8Array<ArrayBufferLike>>;
+```
+
+Defined in: packages/skills/src/types/index.ts:246
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `signal?` | `AbortSignal` |
+
+#### Returns
+
+`Promise`\<`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\>
+
+***
+
+### readText()
+
+```ts
+readText(signal?): Promise<string>;
+```
+
+Defined in: packages/skills/src/types/index.ts:247
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `signal?` | `AbortSignal` |
+
+#### Returns
+
+`Promise`\&lt;`string`\&gt;

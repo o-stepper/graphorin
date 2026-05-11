@@ -1,0 +1,24 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/observability](/api/@graphorin/observability/index.md) / [](/api/@graphorin/observability/README.md) / ReplayLogConfig
+
+# Interface: ReplayLogConfig
+
+Defined in: packages/observability/src/replay/config.ts:14
+
+Shape consumed by `observability.replayLog.*`.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-autoprune"></a> `autoPrune?` | `readonly` | \{ `enabled`: `boolean`; `schedule?`: `string`; \} | Auto-prune toggle. When enabled, the framework runs a daily background job that deletes files older than `retentionDays`. The job is wired through `@graphorin/triggers` (Phase 05) / `@graphorin/server` (Phase 14); in library mode the consumer must run `pruneTraces(...)` manually. **Default** `{ enabled: true, schedule: '0 4 * * *' }` | packages/observability/src/replay/config.ts:35 |
+| `autoPrune.enabled` | `readonly` | `boolean` | - | packages/observability/src/replay/config.ts:36 |
+| `autoPrune.schedule?` | `readonly` | `string` | - | packages/observability/src/replay/config.ts:37 |
+| <a id="property-encryption"></a> `encryption?` | `readonly` | `"off"` \| `"aes256gcm"` | Encryption-at-rest toggle. `'off'` (default) writes plain JSONL; the opt-in `'aes256gcm'` mode hooks into the encryption-at-rest passphrase chain (Phase 16 deliverable). **Default** `'off'` | packages/observability/src/replay/config.ts:46 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | Root directory for the JSONL trace files. Required when the replay log is enabled. | packages/observability/src/replay/config.ts:19 |
+| <a id="property-retentiondays"></a> `retentionDays?` | `readonly` | `number` | Retention window in days. `0` keeps every file forever. **Default** `30` | packages/observability/src/replay/config.ts:25 |

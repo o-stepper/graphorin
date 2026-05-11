@@ -1,0 +1,27 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / StreamMode
+
+# Type Alias: StreamMode
+
+```ts
+type StreamMode = 
+  | "values"
+  | "updates"
+  | "messages"
+  | "tasks"
+  | "checkpoints"
+  | "debug"
+  | "custom";
+```
+
+Defined in: packages/workflow/src/types.ts:60
+
+Stream emission modes accepted by `workflow.execute(input, { stream })`.
+The default is `values`. The `messages` mode is reserved for future
+tighter integration with the LLM message channel and currently
+behaves as `updates`.
+
+## Stable
