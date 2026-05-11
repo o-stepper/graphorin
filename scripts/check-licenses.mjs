@@ -152,6 +152,20 @@ const DEPENDENCY_EXCEPTIONS = new Map([
       reason: 'transitive via sharp; dynamically linked, source available upstream',
     },
   ],
+  // khroma 0.x ships without a `license` field in its manifest. Pulled
+  // in transitively via `@mermaid-js/mermaid-mindmap@9.3.0` -> mermaid
+  // (docs site only; never imported by published @graphorin/*
+  // packages). Upstream repo (fabiospampinato/khroma) carries an MIT
+  // LICENSE file, and current khroma (1.x+) declares
+  // "license": "MIT" — bumping mermaid-mindmap upstream is tracked
+  // separately. Build-/docs-time only; no runtime exposure.
+  [
+    'khroma',
+    {
+      license: null,
+      reason: 'manifest missing license field; upstream LICENSE is MIT (verified); docs-time only',
+    },
+  ],
 ]);
 
 /**
