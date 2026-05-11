@@ -66,14 +66,22 @@ describe('createProgressIO', () => {
   });
 
   it('surfaces ProgressWriteError on filesystem failure', async () => {
-    // Pick a guaranteed-unwritable path per platform. On POSIX
-    // `/dev/null` is a character device, so any attempt to create a
-    // file *under* it (`/dev/null/nope/...`) fails with ENOTDIR.
-    // On Windows there is no `/dev/null`; instead address the NUL
-    // device with the same trick — `NUL\\nope` cannot be used as a
-    // directory either. Either path produces a non-OK fs result that
-    // the progress IO surfaces as a `ProgressWriteError`.
-    const artifactRoot = process.platform === 'win32' ? 'NUL\\nope' : '/dev/null/nope';
+    // POSIX trick: `/dev/null` is a character device, so attempting
+    // to create a file *under* it (`/dev/null/nope/...`) reliably
+    // fails with ENOTDIR. Windows has no analogous device path —
+    // the closest equivalent (`NUL\\nope`) is silently swallowed by
+    // Node's fs layer, so we use a path containing characters that
+    // Windows reserves and refuses to create. The intent of the
+    // assertion (the IO surfaces filesystem failures as
+    // `ProgressWriteError`) is preserved on both platforms; only
+    // the specific provocation differs.
+    const artifactRoot =
+      process.platform === 'win32'
+        ? // Reserved characters `<>` are rejected by NTFS at mkdir
+          // time on every Node version, so the underlying recursive
+          // mkdir throws EINVAL and the IO wraps it.
+          'C:\\graphorin-test-<invalid>\\nope'
+        : '/dev/null/nope';
     const io = createProgressIO({ artifactRoot });
     await expect(async () => io.write('r', 'x', { role: 'p' })).rejects.toThrowError(
       ProgressWriteError,
