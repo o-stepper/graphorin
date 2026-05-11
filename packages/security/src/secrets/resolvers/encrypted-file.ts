@@ -210,6 +210,19 @@ function expandTilde(p: string): string {
 }
 
 /**
+ * Strip the leading `/` from `/C:/path/to/file` on Windows so the
+ * RFC 3986 `file://` URL path (which always starts with `/`) round-
+ * trips to an OS-native Windows path. See the matching helper in
+ * `./file.ts` for the rationale.
+ */
+function stripWindowsUrlSlash(p: string): string {
+  if (process.platform === 'win32' && /^\/[A-Za-z]:[\\/]/.test(p)) {
+    return p.slice(1);
+  }
+  return p;
+}
+
+/**
  * Look up a value inside the bundle by JSON-pointer-or-shorthand
  * fragment. `#field` is shorthand for `/field`; `#/path/to/field`
  * walks nested objects per RFC 6901.
@@ -296,7 +309,7 @@ export const encryptedFileResolver: SecretResolver = {
 
     let bundle: Buffer;
     try {
-      bundle = await readFile(expandTilde(parsed.path));
+      bundle = await readFile(expandTilde(stripWindowsUrlSlash(parsed.path)));
     } catch (err) {
       throw new SecretResolutionError(
         'encrypted-file',

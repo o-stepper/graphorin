@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -35,7 +36,13 @@ describe('encrypted-file: resolver', () => {
     await store.set('openai_api_key', 'sk-from-encfile');
 
     process.env.GRAPHORIN_MASTER_PASSPHRASE = 'master-pass';
-    const value = await resolveSecret(`encrypted-file://${path}#openai_api_key`);
+    // Use `pathToFileURL(...).href` to get a portable RFC-compliant
+    // `file://`-style URL (`encrypted-file:` shares the same path
+    // grammar). The replace re-targets the `file:` scheme prefix at
+    // `encrypted-file:` so the test still exercises the
+    // `encrypted-file://...` route end-to-end on every OS.
+    const url = pathToFileURL(path).href.replace(/^file:/, 'encrypted-file:');
+    const value = await resolveSecret(`${url}#openai_api_key`);
     expect(value.reveal()).toBe('sk-from-encfile');
     expect(value.source?.resolver).toBe('encrypted-file');
   });
@@ -49,23 +56,25 @@ describe('encrypted-file: resolver', () => {
     await store.set('foo', 'bar');
 
     process.env.GRAPHORIN_MASTER_PASSPHRASE_FILE = passphraseFile;
-    const value = await resolveSecret(`encrypted-file://${path}#foo`);
+    const url = pathToFileURL(path).href.replace(/^file:/, 'encrypted-file:');
+    const value = await resolveSecret(`${url}#foo`);
     expect(value.reveal()).toBe('bar');
   });
 
   it('refuses to resolve when no passphrase is configured', async () => {
     const path = join(workDir, 'secrets.kse');
     writeFileSync(path, 'placeholder');
-    await expect(resolveSecret(`encrypted-file://${path}#foo`)).rejects.toThrow(
-      SecretResolutionError,
-    );
+    const url = pathToFileURL(path).href.replace(/^file:/, 'encrypted-file:');
+    await expect(resolveSecret(`${url}#foo`)).rejects.toThrow(SecretResolutionError);
   });
 
   it('throws with a helpful message when the file is missing', async () => {
     process.env.GRAPHORIN_MASTER_PASSPHRASE = 'no-bundle';
-    await expect(
-      resolveSecret(`encrypted-file://${join(workDir, 'missing.kse')}#foo`),
-    ).rejects.toThrow(SecretResolutionError);
+    const url = pathToFileURL(join(workDir, 'missing.kse')).href.replace(
+      /^file:/,
+      'encrypted-file:',
+    );
+    await expect(resolveSecret(`${url}#foo`)).rejects.toThrow(SecretResolutionError);
   });
 
   it('throws with empty path', async () => {
