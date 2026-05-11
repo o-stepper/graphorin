@@ -28,6 +28,8 @@ jobs:
   release:
     name: Version & publish via Changesets
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -52,13 +54,13 @@ jobs:
         run: pnpm run mvp-readiness
 
       - name: Skip publish — NPM_TOKEN not provisioned yet
-        if: ${{ secrets.NPM_TOKEN == '' }}
+        if: ${{ env.NPM_TOKEN == '' }}
         run: |
           echo "::warning title=Release skipped::Repository secret NPM_TOKEN is not set; running in dry-run mode."
           pnpm -r publish --dry-run --access public --no-git-checks
 
       - name: Create Release PR or Publish
-        if: ${{ secrets.NPM_TOKEN != '' }}
+        if: ${{ env.NPM_TOKEN != '' }}
         uses: changesets/action@v1
         with:
           publish: pnpm release
@@ -67,5 +69,5 @@ jobs:
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ env.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
