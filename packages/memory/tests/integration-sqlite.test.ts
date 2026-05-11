@@ -13,6 +13,8 @@
  */
 
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 import { createMemory, defineBlock } from '../src/index.js';
@@ -21,7 +23,7 @@ import { createStubEmbedder } from './fixtures/in-memory-store.js';
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
 async function makeStore(opts: { withVec?: boolean } = {}): Promise<GraphorinSqliteStore> {
-  const dir = await mkdtemp('/tmp/graphorin-memory-integration-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-memory-integration-'));
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,
     skipSqliteVec: opts.withVec !== true,

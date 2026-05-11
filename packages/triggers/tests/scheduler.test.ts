@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   _resetLibModeWarningForTesting,
@@ -53,7 +55,7 @@ class FakeClock {
 }
 
 async function makeStore(): Promise<import('@graphorin/core/contracts').TriggerStore> {
-  const dir = await mkdtemp('/tmp/graphorin-triggers-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-triggers-'));
   const { createSqliteStore } = await import('@graphorin/store-sqlite');
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,

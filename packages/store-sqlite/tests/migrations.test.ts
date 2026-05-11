@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { openConnection } from '../src/connection.js';
 import {
@@ -21,7 +23,7 @@ describe('migrations', () => {
   });
 
   it('applies every migration on a clean DB and is idempotent on re-run', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-mig-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-'));
     const path = `${dir}/db.sqlite`;
     const conn = await openConnection({ path, skipSqliteVec: true });
     const applied = runMigrations(conn);
@@ -93,7 +95,7 @@ describe('migrations', () => {
       sql: 'CREATE TABLE IF NOT EXISTS extra (id TEXT PRIMARY KEY);',
       owner: 'test',
     });
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-mig2-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig2-'));
     const conn = await openConnection({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -108,7 +110,7 @@ describe('migrations', () => {
   });
 
   it('migration_state row supports resumable per-record vector migration cursor', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-mig-state-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-state-'));
     const conn = await openConnection({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -214,7 +216,7 @@ describe('migrations', () => {
   });
 
   it('runner rolls back a failing migration and rejects edits to a previously-applied migration', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-mig-fail-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-fail-'));
     const conn = await openConnection({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -253,7 +255,7 @@ describe('migrations', () => {
 
   it('runner detects after-the-fact edits to an already-applied migration', async () => {
     _resetDynamicMigrationsForTesting();
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-mig-edit-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-edit-'));
     const conn = await openConnection({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -288,7 +290,7 @@ describe('migrations', () => {
   });
 
   it('FTS5 multilingual tokenizer indexes Russian + English + URLs + emails + diacritics', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-fts-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-fts-'));
     const conn = await openConnection({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,

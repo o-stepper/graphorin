@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   createOllamaEmbedder,
@@ -265,7 +267,7 @@ describe('lock-on-first integration with @graphorin/store-sqlite', () => {
   it('per-model embedder_id is distinct for each Ollama family', async () => {
     // Use mkdtemp to keep the test self-contained; we import store-sqlite
     // dynamically because it's a sibling workspace package.
-    const dir = await mkdtemp('/tmp/graphorin-ollama-lock-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-ollama-lock-'));
     const { createSqliteStore } = await import('@graphorin/store-sqlite');
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
@@ -299,7 +301,7 @@ describe('lock-on-first integration with @graphorin/store-sqlite', () => {
   });
 
   it('lock-on-first rejects a second incompatible Ollama embedder', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-ollama-lock2-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-ollama-lock2-'));
     const { createSqliteStore } = await import('@graphorin/store-sqlite');
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
