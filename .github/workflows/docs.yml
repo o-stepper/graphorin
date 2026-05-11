@@ -1,18 +1,20 @@
 name: Docs
 
-# Docs builds + deploys are temporarily decoupled from the
-# fast-feedback PR / push lane. The link-check + TypeDoc build is
-# ~5 minutes per run and was burning CI minutes on every commit
-# while the docs site itself has no PR-blocking signal value.
-# Re-enable `push` / `pull_request` triggers once the Cloudflare
-# Pages project (`graphorin-docs`) and the
-# `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets are
-# settled and the link-check is part of release readiness rather
-# than per-commit feedback.
+# Docs build + link check is part of the per-commit signal so any
+# regression in the docs pipeline (typedoc input, vitepress config,
+# pnpm overrides feeding vite/esbuild, …) is caught at PR time, not
+# on the next nightly schedule. The deploy job below stays gated on
+# `push` to `main`, so PR runs only execute the build + link-check
+# stages.
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
   schedule:
-    # Nightly at 03:11 UTC so docs drift is still caught daily.
+    # Nightly at 03:11 UTC so docs drift on long-quiet branches is
+    # still caught daily even when no PR has touched the tree.
     - cron: '11 3 * * *'
 
 # The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and
