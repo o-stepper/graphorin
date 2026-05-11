@@ -1,11 +1,19 @@
 name: Docs
 
+# Docs builds + deploys are temporarily decoupled from the
+# fast-feedback PR / push lane. The link-check + TypeDoc build is
+# ~5 minutes per run and was burning CI minutes on every commit
+# while the docs site itself has no PR-blocking signal value.
+# Re-enable `push` / `pull_request` triggers once the Cloudflare
+# Pages project (`graphorin-docs`) and the
+# `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets are
+# settled and the link-check is part of release readiness rather
+# than per-commit feedback.
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
+  schedule:
+    # Nightly at 03:11 UTC so docs drift is still caught daily.
+    - cron: '11 3 * * *'
 
 # The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and
 # `CLOUDFLARE_ACCOUNT_ID` repository secrets. Until those secrets are
@@ -137,6 +145,11 @@ jobs:
 
       - name: Publish to Cloudflare Pages
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        # We're inside a pnpm workspace at the repo root, so a bare
+        # `pnpm add wrangler` (which wrangler-action runs to install Wrangler)
+        # bails out with ERR_PNPM_ADDING_TO_ROOT. Allow it just for this step.
+        env:
+          NPM_CONFIG_IGNORE_WORKSPACE_ROOT_CHECK: 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}

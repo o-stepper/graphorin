@@ -24,6 +24,18 @@ describe('applyProcessHardening', () => {
   });
 
   it('sets the desired umask and records the previous value', () => {
+    if (process.platform === 'win32') {
+      // POSIX-only: Windows has no umask concept; `process.umask()`
+      // always returns 0 there and the call is a no-op. The hardening
+      // module already records `umask: null` on win32 internally —
+      // mirror that here so the assertion is portable.
+      const status = applyProcessHardening({ umask: 0o077 });
+      expect(status.applied).toBe(true);
+      // The status preserves the request shape on win32; the on-disk
+      // confidentiality guarantee on Windows comes from NTFS ACLs +
+      // userprofile location rather than POSIX umask.
+      return;
+    }
     const status = applyProcessHardening({ umask: 0o077 });
     expect(status.applied).toBe(true);
     expect(status.umask).toBe(0o077);

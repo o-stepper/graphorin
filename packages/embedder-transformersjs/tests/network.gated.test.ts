@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createTransformersJsEmbedder } from '../src/index.js';
 
@@ -17,7 +19,7 @@ const enabled = process.env['RUN_NETWORK_TESTS'] === '1';
 
 describe.skipIf(!enabled)('transformersjs embedder — network-gated', () => {
   it('downloads the default model on first use and reuses the cache on second use', async () => {
-    const cacheDir = await mkdtemp('/tmp/graphorin-tjs-network-');
+    const cacheDir = await mkdtemp(join(tmpdir(), 'graphorin-tjs-network-'));
     process.env['GRAPHORIN_CACHE_DIR'] = cacheDir;
     try {
       const first = createTransformersJsEmbedder({

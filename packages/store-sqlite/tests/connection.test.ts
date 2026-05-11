@@ -1,3 +1,6 @@
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   openConnection,
@@ -21,9 +24,7 @@ describe('openConnection', () => {
   });
 
   it('applies every WAL hardening pragma to a file-backed DB', async () => {
-    const dir = await import('node:fs/promises').then((m) =>
-      m.mkdtemp('/tmp/graphorin-store-sqlite-'),
-    );
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-'));
     const path = `${dir}/wal.db`;
     const conn = await openConnection({
       path,
@@ -61,9 +62,7 @@ describe('openConnection', () => {
   });
 
   it('readWalSize returns a non-negative number for file-backed databases', async () => {
-    const dir = await import('node:fs/promises').then((m) =>
-      m.mkdtemp('/tmp/graphorin-store-sqlite-wal-size-'),
-    );
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-wal-size-'));
     const conn = await openConnection({
       path: `${dir}/wal-size.db`,
       skipSqliteVec: true,
@@ -85,14 +84,15 @@ describe('openConnection', () => {
   });
 
   it('opening a non-existent path creates parent directories recursively', async () => {
-    const tmp = await import('node:fs/promises').then((m) =>
-      m.mkdtemp('/tmp/graphorin-store-sqlite-mkdirp-'),
-    );
+    const tmp = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mkdirp-'));
     const conn = await openConnection({
-      path: `${tmp}/deep/nested/dirs/db.sqlite`,
+      path: join(tmp, 'deep', 'nested', 'dirs', 'db.sqlite'),
       skipSqliteVec: true,
     });
-    expect(conn.path).toMatch(/deep\/nested\/dirs\/db\.sqlite$/);
+    // Match using the OS-specific separator so the assertion is
+    // portable across POSIX (`/`) and Windows (`\`).
+    const sep = process.platform === 'win32' ? '\\\\' : '/';
+    expect(conn.path).toMatch(new RegExp(`deep${sep}nested${sep}dirs${sep}db\\.sqlite$`));
     conn.close();
   });
 });

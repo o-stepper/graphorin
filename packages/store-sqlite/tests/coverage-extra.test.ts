@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   CipherPeerMissingError,
@@ -8,7 +10,7 @@ import {
 } from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
-  const dir = await mkdtemp('/tmp/graphorin-store-sqlite-extra-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-extra-'));
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,
     skipSqliteVec: true,
@@ -19,7 +21,7 @@ async function makeStore(): Promise<GraphorinSqliteStore> {
 
 describe('extra coverage', () => {
   it('audit-db: rejects encryption.enabled = false', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-audit-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-audit-'));
     await expect(
       openAuditDatabase({
         path: `${dir}/audit.db`,
@@ -29,7 +31,7 @@ describe('extra coverage', () => {
   });
 
   it('audit-db: opens with a stub driver and applies pragma key + WAL', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-audit-ok-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-audit-ok-'));
     const calls: string[] = [];
     class FakeDriver {
       open = true;

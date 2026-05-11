@@ -11,13 +11,15 @@
  */
 
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { createMemory } from '@graphorin/memory';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 import { createSessionManager } from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
-  const dir = await mkdtemp('/tmp/graphorin-sessions-integration-');
+  const dir = await mkdtemp(join(tmpdir(), 'graphorin-sessions-integration-'));
   const store = await createSqliteStore({
     path: `${dir}/db.sqlite`,
     skipSqliteVec: true,

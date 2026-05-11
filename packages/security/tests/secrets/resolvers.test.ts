@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -74,7 +75,13 @@ describe('file: resolver', () => {
   it('reads a UTF-8 file and trims the trailing newline', async () => {
     const path = join(workDir, 'secret.txt');
     await writeFile(path, 'hello-world\n', { mode: 0o600 });
-    const value = await resolveSecret(`file://${path}`);
+    // `pathToFileURL` builds a portable `file://` URL on every
+    // platform: on POSIX it yields `file:///tmp/...` and on Windows
+    // `file:///C:/Users/...`. The naked `file://${path}` template
+    // happens to work on POSIX (because POSIX paths start with `/`)
+    // but produces `file://C:\Users\...` on Windows, which the
+    // SecretRef parser then mis-reads as an authority with no path.
+    const value = await resolveSecret(pathToFileURL(path).href);
     expect(value.reveal()).toBe('hello-world');
   });
 
@@ -83,13 +90,19 @@ describe('file: resolver', () => {
     await mkdir(dir);
     const path = join(dir, 'secret');
     await writeFile(path, 'pct-encoded', { mode: 0o600 });
-    const ref = `file://${path.replace(/ /g, '%20')}`;
+    // `pathToFileURL` already percent-encodes spaces (and any other
+    // reserved characters), so the assertion below is the same shape
+    // on every platform without manual `.replace(/ /g, '%20')`.
+    const ref = pathToFileURL(path).href;
+    expect(ref).toContain('%20');
     const value = await resolveSecret(ref);
     expect(value.reveal()).toBe('pct-encoded');
   });
 
   it('throws SecretResolutionError when the file is missing', async () => {
-    await expect(resolveSecret(`file://${workDir}/missing`)).rejects.toThrow(SecretResolutionError);
+    await expect(resolveSecret(pathToFileURL(join(workDir, 'missing')).href)).rejects.toThrow(
+      SecretResolutionError,
+    );
   });
 });
 

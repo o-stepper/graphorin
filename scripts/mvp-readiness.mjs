@@ -9,9 +9,9 @@
  * Gates (run sequentially; first failure aborts the run):
  *
  *   1. lint              — `pnpm lint`              (Biome, repo-wide)
- *   2. typecheck         — `pnpm -r typecheck`      (tsc --noEmit per package)
- *   3. build             — `pnpm -r build`          (tsdown across the workspace)
- *   4. test              — `pnpm -r test`           (vitest across the workspace)
+ *   2. typecheck         — `pnpm typecheck`         (turbo run typecheck; `dependsOn: ["^build"]`)
+ *   3. build             — `pnpm build`             (turbo run build; tsdown across the workspace)
+ *   4. test              — `pnpm test`              (turbo run test; vitest across the workspace)
  *   5. check-no-network  — `pnpm run check-no-network` (zero-default-telemetry promise)
  *   6. check-anthropic-spec — `pnpm run check-anthropic-spec` (Skills format snapshot drift)
  *   7. check-licenses    — `pnpm run check-licenses`   (SPDX allowlist enforcement)
@@ -180,11 +180,18 @@ async function main() {
   const json = flags.json === true;
   const skipBuild = flags['skip-build'] === true;
 
+  // Use the turbo-aware aliases for typecheck / build / test instead of
+  // `pnpm -r ...`. The `typecheck` and `test` tasks declare
+  // `dependsOn: ["^build"]` in turbo.json, so producers (e.g.
+  // `@graphorin/core`) are built first and consumers can resolve
+  // `dist/*.d.ts` types. Plain `pnpm -r typecheck` is
+  // topology-aware but never produces those build artifacts, which
+  // surfaces as `TS2307: Cannot find module '@graphorin/core'`.
   const gates = [
     { label: 'lint', kind: 'cmd', cmd: 'pnpm', args: ['lint'] },
-    { label: 'typecheck', kind: 'cmd', cmd: 'pnpm', args: ['-r', 'typecheck'] },
-    !skipBuild && { label: 'build', kind: 'cmd', cmd: 'pnpm', args: ['-r', 'build'] },
-    !skipBuild && { label: 'test', kind: 'cmd', cmd: 'pnpm', args: ['-r', 'test'] },
+    { label: 'typecheck', kind: 'cmd', cmd: 'pnpm', args: ['typecheck'] },
+    !skipBuild && { label: 'build', kind: 'cmd', cmd: 'pnpm', args: ['build'] },
+    !skipBuild && { label: 'test', kind: 'cmd', cmd: 'pnpm', args: ['test'] },
     {
       label: 'check-no-network',
       kind: 'cmd',
