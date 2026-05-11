@@ -1,10 +1,12 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { createSqliteStore } from '../src/index.js';
 
 describe('vec0 integration via sqlite-vec', () => {
   it('lazy-creates per-embedder vec0 tables and writes/reads vectors', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-vec-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
     });
@@ -56,7 +58,7 @@ describe('vec0 integration via sqlite-vec', () => {
   });
 
   it('preexisting per-embedder vec0 tables are not recreated by VectorTableManager', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-vec-precreate-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-precreate-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
     await store.init();
 
@@ -137,7 +139,7 @@ describe('vec0 integration via sqlite-vec', () => {
   });
 
   it('rejects writes when the embedding vector dim does not match the registered dim', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-vec-dim-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-dim-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
     await store.init();
     const meta = store.embeddings.registerOrReturn({
@@ -170,7 +172,7 @@ describe('vec0 integration via sqlite-vec', () => {
   });
 
   it('rejects writes that reference an unregistered embedder_id', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-store-sqlite-vec-bad-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-bad-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
     });
