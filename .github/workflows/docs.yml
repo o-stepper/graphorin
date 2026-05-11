@@ -53,18 +53,43 @@ jobs:
       - name: Build documentation site (sync + TypeDoc + VitePress + llms.txt)
         run: pnpm --filter @graphorin/docs run build:site
 
-      - name: Offline link check (lychee)
+      # VitePress emits site-root-relative URLs (/guide, /reference/changelog, …)
+      # because `cleanUrls: true` is on. Plain offline lychee resolves those as
+      # file:/// at the filesystem root, and a vanilla static server can't rewrite
+      # extensionless URLs to their backing .html files. `vitepress preview` does
+      # the rewrite the same way Cloudflare Pages will, so we serve dist over
+      # loopback and point lychee at it. The exclude regex keeps the link check
+      # offline (any non-loopback http(s) target is dropped).
+      - name: Start VitePress preview server for link check
+        run: |
+          nohup pnpm --filter @graphorin/docs exec vitepress preview . \
+            --host 127.0.0.1 --port 8765 \
+            >/tmp/docs-preview.log 2>&1 &
+          echo $! > /tmp/docs-preview.pid
+          for _ in $(seq 1 60); do
+            curl -sf "http://127.0.0.1:8765/" >/dev/null && echo "preview is up" && exit 0
+            sleep 1
+          done
+          echo 'preview log:' >&2 && cat /tmp/docs-preview.log >&2 || true
+          exit 1
+
+      - name: Link check (lychee, loopback-only)
         uses: lycheeverse/lychee-action@v2
         with:
           args: >-
-            --offline
             --no-progress
+            --exclude-mail
             --include-fragments
-            --base ${{ github.workspace }}/documentation/.vitepress/dist
+            --exclude '^https?://(?!127\.0\.0\.1:8765)'
+            --base http://127.0.0.1:8765/
             ./documentation/.vitepress/dist/**/*.html
           fail: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Stop VitePress preview server
+        if: always()
+        run: kill "$(cat /tmp/docs-preview.pid)" 2>/dev/null || true
 
       - name: Upload built site
         uses: actions/upload-artifact@v4
