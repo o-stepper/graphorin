@@ -113,6 +113,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # wrangler-action detects `pnpm-lock.yaml` at repo root and shells out to
+      # `pnpm dlx wrangler ...`, so we need pnpm on PATH even though we never
+      # run `pnpm install` in this job.
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Download built site
         uses: actions/download-artifact@v4
         with:
