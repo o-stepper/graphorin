@@ -1,0 +1,12 @@
+{"id":"seed-001","facts":["The user's name is Alex.","Alex lives in Berlin."],"question":"What city does Alex live in?","expected":"Berlin"}
+{"id":"seed-002","facts":["The user prefers tea over coffee.","The user avoids dairy."],"question":"What drink does the user prefer?","expected":"tea"}
+{"id":"seed-003","facts":["The user works as a product engineer.","The team uses TypeScript for services."],"question":"Does the user work as a product engineer?","expected":"engineer"}
+{"id":"seed-004","facts":["The user's favorite programming language is TypeScript.","The user dislikes long meetings."],"question":"Which language is listed as the user's favorite?","expected":"TypeScript"}
+{"id":"seed-005","facts":["The user runs long-distance races.","Their personal best marathon time is under four hours."],"question":"What style of races does the user participate in?","expected":"long-distance"}
+{"id":"seed-006","facts":["The user has a cat named Pixel.","Pixel dislikes vacuum cleaners."],"question":"What is the cat's name?","expected":"Pixel"}
+{"id":"seed-007","facts":["The user is learning spoken French.","They practice for twenty minutes each morning."],"question":"Which language is the user learning?","expected":"French"}
+{"id":"seed-008","facts":["The user's budget cap for software subscriptions is fifty dollars per month.","They prefer annual billing when discounts exceed fifteen percent."],"question":"What is the monthly subscription budget cap?","expected":"fifty"}
+{"id":"seed-009","facts":["The backup window starts at two in the morning local time.","Notifications must stay off during the backup window."],"question":"When does the backup window start?","expected":"two"}
+{"id":"seed-010","facts":["The project codename is Riverstone.","Riverstone targets a winter release."],"question":"What is the project codename?","expected":"Riverstone"}
+{"id":"seed-011","facts":["The user's emergency contact is case-insensitive email help@example.test.","SMS fallback uses the same mailbox."],"question":"What email is the emergency contact?","expected":"help@example.test"}
+{"id":"seed-012","facts":["The user wants reminders only on weekdays.","Weekend reminders should be batched for Mondays."],"question":"On which days does the user want reminders?","expected":"weekdays"}

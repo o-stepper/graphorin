@@ -1,0 +1,15 @@
+[**Graphorin API reference v0.1.0**](../../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/skills](/api/@graphorin/skills/index.md) / [spec](/api/@graphorin/skills/spec/index.md) / FieldStability
+
+# Type Alias: FieldStability
+
+```ts
+type FieldStability = "stable" | "standardized" | "experimental";
+```
+
+Defined in: packages/skills/src/spec/index.ts:25
+
+Stability classification of a known upstream field.

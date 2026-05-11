@@ -1,0 +1,67 @@
+{
+  "name": "graphorin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Graphorin — TypeScript framework for building long-living personal AI assistants. Created and maintained by Oleksiy Stepurenko. MIT License.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "packageManager": "pnpm@10.28.2",
+  "workspaces": [
+    "packages/*",
+    "examples/*",
+    "benchmarks/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rimraf node_modules .turbo",
+    "check-no-network": "node ./scripts/check-no-network.mjs",
+    "check-example-docs": "node ./scripts/check-example-docs.mjs",
+    "mvp-readiness": "node ./scripts/mvp-readiness.mjs",
+    "docs:dev": "pnpm --filter @graphorin/docs dev",
+    "docs:build": "pnpm --filter @graphorin/docs build:site",
+    "docs:preview": "pnpm --filter @graphorin/docs preview",
+    "docs:clean": "pnpm --filter @graphorin/docs clean",
+    "benchmark:ci": "pnpm run check-example-docs && pnpm run build && pnpm --filter @graphorin/benchmark-locomo run benchmark:run && pnpm --filter @graphorin/benchmark-cost run benchmark:run && pnpm --filter @graphorin/benchmark-latency run benchmark:smoke && pnpm --filter @graphorin/benchmark-memory-sim run benchmark:smoke && pnpm --filter @graphorin/benchmark-dialsim run benchmark:run",
+    "check-licenses": "node ./scripts/check-licenses.mjs",
+    "check-anthropic-spec": "node ./scripts/check-anthropic-spec.mjs",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "turbo run build && changeset publish --provenance --access public"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
+    "@changesets/cli": "^2.27.10",
+    "@types/node": "^22.10.0",
+    "@vitest/coverage-v8": "^3.2.4",
+    "rimraf": "^6.0.1",
+    "tsdown": "^0.16.0",
+    "tsx": "^4.20.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "sqlite-vec"
+    ]
+  }
+}

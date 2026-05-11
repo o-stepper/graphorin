@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/audit-ignore-1.0.json",
+  "version": "1.0",
+  "description": "Known-acceptable advisories with justification + expiry. Used by `pnpm audit` in examples/github-actions/security.yml. Each entry MUST have a `justification` and an `expires` ISO date — the security workflow refuses entries past their expiry.",
+  "entries": [
+    {
+      "id": "EXAMPLE-CVE-0000",
+      "package": "example",
+      "severity": "high",
+      "justification": "Example placeholder. Remove this entry before deploying.",
+      "expires": "2099-01-01"
+    }
+  ]
+}

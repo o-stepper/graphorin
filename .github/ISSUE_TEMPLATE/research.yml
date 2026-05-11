@@ -1,0 +1,49 @@
+name: Research item
+description: Open a focused research question that should be investigated and resolved before a design or implementation decision is made.
+title: 'research: <one-line topic>'
+labels: ['research', 'needs-triage']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Research items capture *open questions* that need investigation. Each item should describe the question, the constraints, and what a satisfactory answer looks like.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Research question
+      description: A single, focused question to be answered.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why does this question matter? What design decision depends on it?
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints / non-negotiables
+      description: 'For example: must remain compatible with the local-first promise; must not introduce a phone-home channel; must work on Node 22+ across macOS/Linux/Windows.'
+    validations:
+      required: true
+
+  - type: textarea
+    id: success
+    attributes:
+      label: What does a satisfactory answer look like?
+      description: 'Concrete deliverables: a benchmark, a recommendation, a code spike, a comparison matrix, a draft API.'
+    validations:
+      required: true
+
+  - type: input
+    id: suggested_owner
+    attributes:
+      label: Suggested owner (optional)
+      description: GitHub handle of the person best positioned to investigate.
+    validations:
+      required: false

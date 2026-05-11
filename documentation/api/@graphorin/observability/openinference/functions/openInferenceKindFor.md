@@ -1,0 +1,37 @@
+[**Graphorin API reference v0.1.0**](../../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/observability](/api/@graphorin/observability/index.md) / [openinference](/api/@graphorin/observability/openinference/index.md) / openInferenceKindFor
+
+# Function: openInferenceKindFor()
+
+```ts
+function openInferenceKindFor<T>(type): 
+  | OpenInferenceSpanKind
+  | null;
+```
+
+Defined in: packages/observability/src/openinference/index.ts:104
+
+Resolve the OpenInference span kind for a Graphorin span type.
+Returns `null` for types intentionally excluded from emission.
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `T` *extends* [`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md) |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `type` | `T` |
+
+## Returns
+
+  \| [`OpenInferenceSpanKind`](/api/@graphorin/observability/openinference/type-aliases/OpenInferenceSpanKind.md)
+  \| `null`
+
+## Stable

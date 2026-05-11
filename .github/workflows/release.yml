@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The release job is gated on the `NPM_TOKEN` repository secret. Until
+# that secret is provisioned the job is a no-op and emits a warning so
+# accidental main-branch pushes never publish. Provisioning order:
+#
+#   1. Add the npm token (with `automation` scope) as `NPM_TOKEN`.
+#   2. Add a Sigstore-aware OIDC trust policy on the npm side
+#      (`registry.npmjs.org`).
+#   3. Run the workflow once via `workflow_dispatch`; from then on
+#      `changesets/action` opens the "Version Packages" PR
+#      automatically and publishes when that PR merges.
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Version & publish via Changesets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: MVP readiness gate
+        run: pnpm run mvp-readiness
+
+      - name: Skip publish — NPM_TOKEN not provisioned yet
+        if: ${{ secrets.NPM_TOKEN == '' }}
+        run: |
+          echo "::warning title=Release skipped::Repository secret NPM_TOKEN is not set; running in dry-run mode."
+          pnpm -r publish --dry-run --access public --no-git-checks
+
+      - name: Create Release PR or Publish
+        if: ${{ secrets.NPM_TOKEN != '' }}
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+          version: pnpm version
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: 'true'

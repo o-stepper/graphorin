@@ -1,0 +1,48 @@
+{
+  "name": "@graphorin/example-approval-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workflow HITL durable-resume demo for the Graphorin framework. Demonstrates @graphorin/workflow pause()/Directive(resume) lifecycle on an expense-approval pipeline that survives simulated server restart mid-pause, with all stream modes and every WorkflowEvent variant exercised end-to-end. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/approval-workflow",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/approval-workflow"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/workflow": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*"
+  },
+  "bin": {
+    "graphorin-example-approval-workflow": "./dist/main.js"
+  }
+}

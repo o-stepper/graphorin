@@ -1,0 +1,90 @@
+{
+  "name": "@graphorin/workflow",
+  "version": "0.1.0",
+  "description": "Step-graph workflow engine for the Graphorin framework: createWorkflow({...}) factory, Workflow.execute / resume / getState / listCheckpoints / fork APIs, the Graphorin-named primitives (Directive, Dispatch, pause, LatestValue, AnyValue, Reducer, ListAggregate, Stream, Barrier, Ephemeral), pluggable CheckpointStore-backed durable execution with sync / async / exit durability modes, dynamic parallelism via Dispatch, the per-channel atomic merge resolver, the HITL pause/resume lifecycle (programmatic pause + static pauseAt before/after node lists), the AbortSignal-aware hard-kill / drain cancellation contract, the per-task pending-write log for mid-step recovery, six stream modes (values / updates / messages / tasks / checkpoints / debug / custom), and per-step / per-task / per-checkpoint observability spans (workflow.run, workflow.step, workflow.task, workflow.checkpoint). Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/workflow",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/workflow"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "workflow",
+    "step-graph",
+    "durable-execution",
+    "checkpointing",
+    "hitl",
+    "pause-resume",
+    "channels",
+    "state-machine",
+    "streaming",
+    "fan-out",
+    "directive",
+    "dispatch"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./factory": {
+      "types": "./dist/factory.d.ts",
+      "import": "./dist/factory.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "import": "./dist/node.js"
+    },
+    "./checkpoint-store-memory": {
+      "types": "./dist/checkpoint-store-memory.d.ts",
+      "import": "./dist/checkpoint-store-memory.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/store-sqlite": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.9.0"
+  }
+}

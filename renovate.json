@@ -1,0 +1,60 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":dependencyDashboard",
+    ":maintainLockFilesWeekly",
+    ":prHourlyLimit2"
+  ],
+  "timezone": "UTC",
+  "schedule": ["before 6am on monday"],
+  "rangeStrategy": "bump",
+  "commitMessagePrefix": "chore(deps):",
+  "labels": ["dependencies"],
+  "rebaseWhen": "behind-base-branch",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "packageRules": [
+    {
+      "description": "Caret pinning is mandatory for stable production deps; do not let Renovate widen the range",
+      "matchUpdateTypes": ["pin"],
+      "enabled": false
+    },
+    {
+      "description": "Tilde-pinned pre-1.0 packages stay tilde (currently: sqlite-vec)",
+      "matchPackageNames": ["sqlite-vec"],
+      "rangeStrategy": "replace"
+    },
+    {
+      "description": "AI SDK v7 is on a beta line — pin exact (no Renovate auto-updates)",
+      "matchPackageNames": ["ai"],
+      "enabled": false
+    },
+    {
+      "description": "Hold pinned dev tools to one PR per week, grouped",
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "dev tools",
+      "schedule": ["before 6am on monday"],
+      "automerge": false
+    },
+    {
+      "description": "Never auto-merge production peerDependencies — always human review",
+      "matchDepTypes": ["peerDependencies", "dependencies"],
+      "automerge": false
+    },
+    {
+      "description": "Pin GitHub Actions by SHA via Renovate",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "schedule": ["at any time"]
+  },
+  "ignorePaths": ["**/node_modules/**", "**/dist/**", "**/.turbo/**"]
+}

@@ -1,0 +1,73 @@
+{
+  "name": "@graphorin/reranker-transformersjs",
+  "version": "0.1.0",
+  "description": "Cross-encoder reranker adapter for the Graphorin framework. Wraps `@huggingface/transformers@^4.1.0` to score query / passage pairs in-process via the BAAI BGE family of cross-encoder models. Automatic model selection from the agent locale: `'en'` defaults to `Xenova/bge-reranker-base` (278M); every other locale defaults to `BAAI/bge-reranker-v2-m3` (568M, multilingual). FP16 quantization default; FP32 / Q8 opt-in. Lazy-loaded with an optional idle-eviction timer to bound resident memory. Implements the `ReRanker` contract exposed by `@graphorin/memory/search`. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/reranker-transformersjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/reranker-transformersjs"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "rerank",
+    "reranker",
+    "cross-encoder",
+    "huggingface",
+    "transformersjs",
+    "bge",
+    "bge-reranker"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*"
+  },
+  "peerDependencies": {
+    "@huggingface/transformers": "^4.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@huggingface/transformers": {
+      "optional": false
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

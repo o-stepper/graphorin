@@ -1,0 +1,68 @@
+{
+  "name": "@graphorin/triggers",
+  "version": "0.1.0",
+  "description": "Background-task scheduler for the Graphorin framework. Ships durable cron / interval / idle / event triggers with the same code path in library and server modes, an in-tree 5-field cron parser, per-trigger catch-up policies (`'none'` default; `'last'` or `'all'` opt-in), and an AsyncIterable lifecycle event stream so consumers can plug into observability without monkey-patching.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/triggers",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/triggers"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "triggers",
+    "scheduler",
+    "cron",
+    "background-tasks",
+    "durable"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cron": {
+      "types": "./dist/cron.d.ts",
+      "import": "./dist/cron.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/store-sqlite": "workspace:*"
+  }
+}

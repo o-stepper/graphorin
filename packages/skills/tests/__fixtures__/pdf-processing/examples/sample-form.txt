@@ -1,0 +1,1 @@
+A placeholder example resource for the pdf-processing fixture.

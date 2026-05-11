@@ -1,0 +1,43 @@
+{
+  "name": "@graphorin/benchmark-locomo-multilingual",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Per-locale LoCoMo subset hooks for the Graphorin framework. Empty subset directories with documented contribution flow for community-contributed translations validated against multilingual-e5-base + FTS5 unicode61 + the RRF reranker. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/locomo-multilingual",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/locomo-multilingual"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "memory-evaluation"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "echo \"no dev entry for this package\" && exit 0",
+    "build": "echo \"no build needed for this package\" && exit 0",
+    "start": "echo \"no start entry\" && exit 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/embedder-transformersjs": "workspace:*"
+  }
+}

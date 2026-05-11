@@ -1,0 +1,151 @@
+{
+  "name": "@graphorin/security",
+  "version": "0.1.0",
+  "description": "Security primitives for the Graphorin framework: SecretValue runtime-safe wrapper, SecretRef URI parser, pluggable SecretsStore implementations, per-tool ACL, AsyncLocalStorage-based audit scope tracking, server token authentication (HMAC-SHA256 + pepper + scopes), tamper-evident audit log, four sandbox adapters (none / worker-threads / isolated-vm / docker), tier-based memory-modification guard, declarative input/output guardrails, process-hardening startup helpers, outbound OAuth flows (Authorization Code + PKCE / Device Authorization Grant / Dynamic Client Registration / refresh + revoke), and skills supply-chain helpers (ed25519 SKILL.md signature verification, --ignore-scripts enforcement, allow / deny policy resolver).",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/security",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/security"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "security",
+    "secrets",
+    "secret-value",
+    "secret-ref",
+    "keyring",
+    "audit-log",
+    "hash-chain",
+    "auth",
+    "hmac",
+    "scopes",
+    "sandbox",
+    "worker-threads",
+    "guardrails",
+    "memory-guard",
+    "process-hardening",
+    "oauth",
+    "oauth2",
+    "pkce",
+    "device-flow",
+    "dynamic-client-registration",
+    "skills",
+    "supply-chain",
+    "ed25519",
+    "signature-verification"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./secrets": {
+      "types": "./dist/secrets/index.d.ts",
+      "import": "./dist/secrets/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
+    "./audit": {
+      "types": "./dist/audit/index.d.ts",
+      "import": "./dist/audit/index.js"
+    },
+    "./sandbox": {
+      "types": "./dist/sandbox/index.d.ts",
+      "import": "./dist/sandbox/index.js"
+    },
+    "./guard": {
+      "types": "./dist/guard/index.d.ts",
+      "import": "./dist/guard/index.js"
+    },
+    "./guardrails": {
+      "types": "./dist/guardrails/index.d.ts",
+      "import": "./dist/guardrails/index.js"
+    },
+    "./hardening": {
+      "types": "./dist/hardening/index.d.ts",
+      "import": "./dist/hardening/index.js"
+    },
+    "./oauth": {
+      "types": "./dist/oauth/index.d.ts",
+      "import": "./dist/oauth/index.js"
+    },
+    "./supply-chain": {
+      "types": "./dist/supply-chain/index.d.ts",
+      "import": "./dist/supply-chain/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "yaml": "^2.8.0"
+  },
+  "peerDependencies": {
+    "@napi-rs/keyring": "^1.2.0",
+    "@node-rs/argon2": "^2.0.2",
+    "better-sqlite3-multiple-ciphers": "^12.9.0",
+    "dockerode": "^4.0.0",
+    "isolated-vm": "^5.0.0",
+    "openid-client": "^6.8.0"
+  },
+  "peerDependenciesMeta": {
+    "@napi-rs/keyring": {
+      "optional": true
+    },
+    "@node-rs/argon2": {
+      "optional": true
+    },
+    "better-sqlite3-multiple-ciphers": {
+      "optional": true
+    },
+    "dockerode": {
+      "optional": true
+    },
+    "isolated-vm": {
+      "optional": true
+    },
+    "openid-client": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@napi-rs/keyring": "^1.2.0",
+    "@node-rs/argon2": "^2.0.2",
+    "fast-check": "^3.23.0",
+    "openid-client": "^6.8.0"
+  }
+}

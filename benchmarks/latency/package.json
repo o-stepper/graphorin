@@ -1,0 +1,49 @@
+{
+  "name": "@graphorin/benchmark-latency",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Latency probes for the Graphorin framework. Measures p50/p95 for streaming TTFT + total response, fact extraction, and memory search; emits RESULTS.md with the budgeted thresholds (TTFT < 500 ms with cached embedder; memory search p95 < 100 ms on 10k facts). Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/latency",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/latency"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "memory-evaluation"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:run": "node ./dist/runner.js",
+    "benchmark:smoke": "node ./dist/runner.js --smoke"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-latency": "./dist/runner.js"
+  }
+}

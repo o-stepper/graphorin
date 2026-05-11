@@ -1,0 +1,138 @@
+{
+  "name": "@graphorin/observability",
+  "version": "0.1.0",
+  "description": "Observability primitives for the Graphorin framework: typed AISpan tracer over OpenTelemetry, mandatory withValidation wrapper for every exporter, sensitivity-aware RedactionValidator with built-in PII / secret patterns, GenAI Semantic Conventions conformance helpers, OpenInference span-kind emission, structured logger with span correlation, append-only JSONL exporter for replay, sanitized replay primitives, hierarchical CostTracker, and a minimal inline eval runner alongside a zero-default telemetry stub.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/observability",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/observability"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "observability",
+    "tracing",
+    "opentelemetry",
+    "otel",
+    "gen-ai",
+    "openinference",
+    "redaction",
+    "pii",
+    "cost-tracking",
+    "replay",
+    "evals",
+    "logger"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tracer": {
+      "types": "./dist/tracer/index.d.ts",
+      "import": "./dist/tracer/index.js"
+    },
+    "./redaction": {
+      "types": "./dist/redaction/index.d.ts",
+      "import": "./dist/redaction/index.js"
+    },
+    "./redaction/patterns": {
+      "types": "./dist/redaction/patterns.d.ts",
+      "import": "./dist/redaction/patterns.js"
+    },
+    "./redaction/imperative-patterns": {
+      "types": "./dist/redaction/imperative-patterns.d.ts",
+      "import": "./dist/redaction/imperative-patterns.js"
+    },
+    "./exporters": {
+      "types": "./dist/exporters/index.d.ts",
+      "import": "./dist/exporters/index.js"
+    },
+    "./gen-ai": {
+      "types": "./dist/gen-ai/index.d.ts",
+      "import": "./dist/gen-ai/index.js"
+    },
+    "./openinference": {
+      "types": "./dist/openinference/index.d.ts",
+      "import": "./dist/openinference/index.js"
+    },
+    "./cost": {
+      "types": "./dist/cost/index.d.ts",
+      "import": "./dist/cost/index.js"
+    },
+    "./replay": {
+      "types": "./dist/replay/index.d.ts",
+      "import": "./dist/replay/index.js"
+    },
+    "./eval": {
+      "types": "./dist/eval/index.d.ts",
+      "import": "./dist/eval/index.js"
+    },
+    "./logger": {
+      "types": "./dist/logger/index.d.ts",
+      "import": "./dist/logger/index.js"
+    },
+    "./telemetry": {
+      "types": "./dist/telemetry/index.d.ts",
+      "import": "./dist/telemetry/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.215.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.215.0"
+  },
+  "peerDependenciesMeta": {
+    "@opentelemetry/api": {
+      "optional": false
+    },
+    "@opentelemetry/sdk-node": {
+      "optional": true
+    },
+    "@opentelemetry/exporter-trace-otlp-http": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.215.0",
+    "@opentelemetry/sdk-node": "^0.215.0",
+    "fast-check": "^3.23.0"
+  }
+}

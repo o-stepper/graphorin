@@ -1,0 +1,175 @@
+#!/usr/bin/env node
+/**
+ * check-no-network.mjs
+ *
+ * Static guard for Graphorin's "no implicit network calls" promise
+ * (DEC-154 / ADR-041; see SECURITY.md § Privacy & telemetry). Scans
+ * `packages/*\/src/**\/*.ts` for outbound network primitives and
+ * fails the run if a forbidden call is found outside the allow-list.
+ *
+ * The allow-list covers code paths that are permitted to make network
+ * calls — every entry corresponds to an explicit user-initiated action
+ * (provider adapter, MCP transport, OAuth flow, opt-in pricing
+ * refresh, embedder model download, storage backend, OTLP exporter).
+ */
+
+import { readdir, readFile, stat } from 'node:fs/promises';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const ROOT = resolve(__dirname, '..');
+
+/**
+ * Forbidden source-level patterns. Each entry is a `[label, regex]`
+ * tuple. Regexes match the actual call site, NOT a comment or string
+ * literal — the trade-off is documented per-pattern below.
+ */
+const FORBIDDEN_PATTERNS = [
+  ['fetch', /(^|[^A-Za-z0-9_$.])fetch\s*\(/m],
+  ['http.request', /\bhttp\.request\s*\(/m],
+  ['https.request', /\bhttps\.request\s*\(/m],
+  ['http.get', /\bhttp\.get\s*\(/m],
+  ['https.get', /\bhttps\.get\s*\(/m],
+  ['net.createConnection', /\bnet\.(?:createConnection|connect)\s*\(/m],
+  ['tls.connect', /\btls\.connect\s*\(/m],
+  ['dgram.createSocket', /\bdgram\.createSocket\s*\(/m],
+  ['WebSocket', /\bnew\s+WebSocket\s*\(/m],
+  [
+    'node-fetch import',
+    /^\s*import\s+[\s\S]*?from\s+['"](?:node-fetch|undici|got|axios|ky)['"];?$/m,
+  ],
+];
+
+/**
+ * Allow-list — paths relative to the repo root. Each entry corresponds
+ * to a documented explicit-user-action code path. Add new entries with
+ * a comment explaining why (auditable in `git log`).
+ */
+const ALLOW_LIST = [
+  // OTLP HTTP exporter — fires only when the operator wires an OTLP
+  // collector URL into the tracer config (Phase 04).
+  'packages/observability/src/exporters/otlp-http.ts',
+  // Opt-in pricing refresh — never invoked automatically (Phase 04).
+  'packages/pricing/src/refresh.ts',
+  // OAuth flows — explicit user action; full surface in Phase 03d.
+  /^packages\/security\/src\/oauth\//,
+  // Skill installer — explicit user action (Phase 03d).
+  'packages/security/src/supply-chain/installer.ts',
+  // Skill signature verifier — explicit user action; resolves the
+  // publisher key over the configured well-known URL (Phase 03d).
+  'packages/security/src/supply-chain/signature.ts',
+  // Provider adapters — Phase 06 will fill the directory; preemptively
+  // allow-list to keep the guard green when Phase 06 lands.
+  /^packages\/provider\//,
+  // MCP client transports — Phase 09.
+  /^packages\/mcp\//,
+  // Embedder model downloads — Phase 05.
+  /^packages\/embedder-[A-Za-z-]+\//,
+  // Storage backends — Phase 05+.
+  /^packages\/store-[A-Za-z-]+\//,
+];
+
+const PACKAGES_DIR = join(ROOT, 'packages');
+
+async function* walkSrcFiles() {
+  const packages = await readdir(PACKAGES_DIR, { withFileTypes: true });
+  for (const pkg of packages) {
+    if (!pkg.isDirectory()) continue;
+    const srcDir = join(PACKAGES_DIR, pkg.name, 'src');
+    try {
+      await stat(srcDir);
+    } catch {
+      continue;
+    }
+    yield* walk(srcDir);
+  }
+}
+
+async function* walk(root) {
+  const entries = await readdir(root, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = join(root, entry.name);
+    if (entry.isDirectory()) {
+      yield* walk(full);
+      continue;
+    }
+    if (entry.isFile() && (full.endsWith('.ts') || full.endsWith('.mts'))) {
+      yield full;
+    }
+  }
+}
+
+function isAllowListed(relativePath) {
+  for (const entry of ALLOW_LIST) {
+    if (typeof entry === 'string' && entry === relativePath) return true;
+    if (entry instanceof RegExp && entry.test(relativePath)) return true;
+  }
+  return false;
+}
+
+function stripCommentsAndStrings(source) {
+  // Best-effort comment + string stripping. The regex passes are not a
+  // full TypeScript parser, but they are sufficient for the patterns
+  // we look for (`fetch(...)` etc.) — a real `fetch(` call site never
+  // hides inside a comment AND a single-line literal at the same time.
+  let out = source;
+  // Block comments.
+  out = out.replace(/\/\*[\s\S]*?\*\//g, ' ');
+  // Line comments.
+  out = out.replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+  // Single-quoted strings.
+  out = out.replace(/'([^'\\\n]|\\.)*'/g, "''");
+  // Double-quoted strings.
+  out = out.replace(/"([^"\\\n]|\\.)*"/g, '""');
+  // Template literals (best-effort: only single-line ones).
+  out = out.replace(/`([^`\\]|\\.)*`/g, '``');
+  return out;
+}
+
+async function scanFile(filePath) {
+  const relativePath = relative(ROOT, filePath);
+  const source = await readFile(filePath, 'utf8');
+  const cleaned = stripCommentsAndStrings(source);
+  const violations = [];
+  for (const [label, pattern] of FORBIDDEN_PATTERNS) {
+    if (pattern.test(cleaned)) {
+      violations.push(label);
+    }
+  }
+  return { relativePath, violations };
+}
+
+async function main() {
+  const offending = [];
+  for await (const file of walkSrcFiles()) {
+    const { relativePath, violations } = await scanFile(file);
+    if (violations.length === 0) continue;
+    if (isAllowListed(relativePath)) continue;
+    offending.push({ relativePath, violations });
+  }
+
+  if (offending.length === 0) {
+    console.log('check-no-network: PASS — no implicit network call sites detected.');
+    process.exit(0);
+  }
+
+  console.error('check-no-network: FAIL');
+  console.error('');
+  console.error('Implicit network call sites detected outside the allow-list:');
+  for (const entry of offending) {
+    console.error(`  - ${entry.relativePath}: ${entry.violations.join(', ')}`);
+  }
+  console.error('');
+  console.error('If the call is part of an explicit user-initiated action, add the');
+  console.error('file to ALLOW_LIST in scripts/check-no-network.mjs with a comment');
+  console.error('explaining why. See SECURITY.md § Privacy & telemetry (DEC-154 / ADR-041).');
+  process.exit(1);
+}
+
+main().catch((err) => {
+  console.error('check-no-network: ERROR');
+  console.error(err);
+  process.exit(2);
+});

@@ -1,0 +1,274 @@
+/**
+ * In-memory bookkeeping for in-flight agent / workflow runs. Exposes
+ * a tiny CRUD surface route handlers consume to honour the
+ * `GET /runs/:runId/state` and `POST /runs/:runId/abort` endpoints
+ * declared in the runtime architecture.
+ *
+ * The full durable resume / replay path lives in Phase 14b/c on top
+ * of the WebSocket layer + the consolidator daemon. Phase 14a only
+ * needs enough state to:
+ *   - mint a runId on every `POST /run` / `POST /stream`,
+ *   - track its lifecycle (`pending` → `running` → `completed` / `failed` / `aborted`),
+ *   - propagate `AbortController.signal` so handlers can cancel.
+ *
+ * @packageDocumentation
+ */
+
+/**
+ * Stable status discriminator for a run snapshot. Mirrors the values
+ * exposed on the public REST surface.
+ *
+ * @stable
+ */
+export type RunStatus = 'pending' | 'running' | 'completed' | 'failed' | 'aborted';
+
+/**
+ * Identifying tag for the underlying execution kind. Workflows run
+ * on the durable engine in `@graphorin/workflow`; agents run on the
+ * `@graphorin/agent` runtime.
+ *
+ * @stable
+ */
+export type RunKind = 'agent' | 'workflow';
+
+/**
+ * Snapshot returned by {@link RunStateTracker.snapshot}.
+ *
+ * @stable
+ */
+export interface RunStateSnapshot {
+  readonly runId: string;
+  readonly kind: RunKind;
+  readonly status: RunStatus;
+  readonly startedAt?: number;
+  readonly completedAt?: number;
+  readonly error?: { readonly message: string };
+  readonly agentId?: string;
+  readonly workflowId?: string;
+  readonly threadId?: string;
+  readonly sessionId?: string;
+  readonly userId?: string;
+}
+
+/**
+ * Bookkeeping descriptor recorded at run start. Either an agent run
+ * (with `agentId`) or a workflow run (with `workflowId` + optional
+ * `threadId`).
+ *
+ * @stable
+ */
+export type RunDescriptor =
+  | {
+      readonly kind: 'agent';
+      readonly agentId: string;
+      readonly sessionId?: string;
+      readonly userId?: string;
+    }
+  | {
+      readonly kind: 'workflow';
+      readonly workflowId: string;
+      readonly threadId?: string;
+      readonly sessionId?: string;
+      readonly userId?: string;
+    };
+
+/**
+ * In-flight handle returned by {@link RunStateTracker.start}. Handlers
+ * pass `signal` into the underlying `agent.run / workflow.execute`
+ * invocation so cancellation propagates instantly.
+ *
+ * @stable
+ */
+export interface RunHandle {
+  readonly runId: string;
+  readonly signal: AbortSignal;
+  cancel(reason?: unknown): void;
+}
+
+interface RunRecord {
+  readonly runId: string;
+  readonly kind: RunKind;
+  readonly descriptor: RunDescriptor;
+  status: RunStatus;
+  controller: AbortController;
+  startedAt?: number;
+  completedAt?: number;
+  error?: { readonly message: string };
+}
+
+/**
+ * Pluggable tracker. The default in-memory implementation is the only
+ * one shipped in Phase 14a; future phases plug in a SQLite-backed
+ * variant so durable resume survives process restarts.
+ *
+ * @stable
+ */
+export class RunStateTracker {
+  readonly #records: Map<string, RunRecord> = new Map();
+  readonly #now: () => number;
+
+  constructor(options: { readonly now?: () => number } = {}) {
+    this.#now = options.now ?? Date.now;
+  }
+
+  /** Reserve a run id without taking ownership of an AbortSignal. */
+  declare(runId: string, descriptor: RunDescriptor): void {
+    if (this.#records.has(runId)) return;
+    const controller = new AbortController();
+    this.#records.set(runId, {
+      runId,
+      kind: descriptor.kind,
+      descriptor,
+      status: 'pending',
+      controller,
+    });
+  }
+
+  /** Promote a previously-declared run to `running` (or declare it). */
+  start(runId: string, descriptor: RunDescriptor): RunHandle {
+    const existing = this.#records.get(runId);
+    const record: RunRecord = existing ?? {
+      runId,
+      kind: descriptor.kind,
+      descriptor,
+      status: 'pending',
+      controller: new AbortController(),
+    };
+    record.status = 'running';
+    record.startedAt = this.#now();
+    this.#records.set(runId, record);
+    return Object.freeze({
+      runId,
+      signal: record.controller.signal,
+      cancel: (reason?: unknown) => {
+        if (!record.controller.signal.aborted) {
+          record.controller.abort(reason);
+        }
+      },
+    });
+  }
+
+  /** Mark a run as terminal. */
+  complete(
+    runId: string,
+    status: Extract<RunStatus, 'completed' | 'failed' | 'aborted'>,
+    err?: unknown,
+  ): void {
+    const record = this.#records.get(runId);
+    if (record === undefined) return;
+    record.status = status;
+    record.completedAt = this.#now();
+    if (err !== undefined) {
+      record.error = { message: err instanceof Error ? err.message : String(err) };
+    }
+  }
+
+  /** Cancel a run via its `AbortController`. */
+  abort(runId: string, reason?: unknown): boolean {
+    const record = this.#records.get(runId);
+    if (record === undefined) return false;
+    if (!record.controller.signal.aborted) {
+      record.controller.abort(reason);
+    }
+    if (record.status === 'pending' || record.status === 'running') {
+      record.status = 'aborted';
+      record.completedAt = this.#now();
+    }
+    return true;
+  }
+
+  /** Read-only snapshot, safe to JSON.stringify. */
+  snapshot(runId: string): RunStateSnapshot | undefined {
+    const record = this.#records.get(runId);
+    if (record === undefined) return undefined;
+    const base: { -readonly [K in keyof RunStateSnapshot]?: RunStateSnapshot[K] } = {
+      runId: record.runId,
+      kind: record.kind,
+      status: record.status,
+    };
+    if (record.startedAt !== undefined) base.startedAt = record.startedAt;
+    if (record.completedAt !== undefined) base.completedAt = record.completedAt;
+    if (record.error !== undefined) base.error = record.error;
+    if (record.descriptor.kind === 'agent') {
+      base.agentId = record.descriptor.agentId;
+    } else {
+      base.workflowId = record.descriptor.workflowId;
+      if (record.descriptor.threadId !== undefined) base.threadId = record.descriptor.threadId;
+    }
+    if (record.descriptor.sessionId !== undefined) base.sessionId = record.descriptor.sessionId;
+    if (record.descriptor.userId !== undefined) base.userId = record.descriptor.userId;
+    return Object.freeze(base as RunStateSnapshot);
+  }
+
+  /**
+   * Number of runs currently in `pending` or `running`. Useful for
+   * snapshots / metrics. Note that `pending` runs hold a reservation
+   * but have not yet started any work — see {@link runningCount} for
+   * the drain-blocking subset.
+   */
+  inflightCount(): number {
+    let n = 0;
+    for (const record of this.#records.values()) {
+      if (record.status === 'pending' || record.status === 'running') n += 1;
+    }
+    return n;
+  }
+
+  /**
+   * Number of runs with active work in progress (`running`). The
+   * lifecycle drain blocks on this counter only — pending runs are a
+   * pure reservation (e.g. an awaited WS subscription) and can be
+   * aborted immediately when SIGTERM arrives.
+   */
+  runningCount(): number {
+    let n = 0;
+    for (const record of this.#records.values()) {
+      if (record.status === 'running') n += 1;
+    }
+    return n;
+  }
+
+  /**
+   * Drop every reserved-but-not-yet-started run. Called by the
+   * server lifecycle at the start of `stop()` so the drain only
+   * waits for actual work in flight.
+   */
+  abortPending(reason?: unknown): number {
+    let aborted = 0;
+    for (const record of this.#records.values()) {
+      if (record.status === 'pending') {
+        if (!record.controller.signal.aborted) record.controller.abort(reason);
+        record.status = 'aborted';
+        record.completedAt = this.#now();
+        aborted += 1;
+      }
+    }
+    return aborted;
+  }
+
+  /** Drop terminal records older than `olderThan`. */
+  prune(olderThan: number): number {
+    let removed = 0;
+    for (const [runId, record] of this.#records) {
+      if (
+        record.completedAt !== undefined &&
+        record.completedAt <= olderThan &&
+        record.status !== 'pending' &&
+        record.status !== 'running'
+      ) {
+        this.#records.delete(runId);
+        removed += 1;
+      }
+    }
+    return removed;
+  }
+
+  /** Cancel every in-flight run. Used during graceful shutdown. */
+  abortAll(reason?: unknown): number {
+    let aborted = 0;
+    for (const [runId] of this.#records) {
+      if (this.abort(runId, reason)) aborted += 1;
+    }
+    return aborted;
+  }
+}

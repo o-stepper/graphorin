@@ -1,0 +1,64 @@
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: pnpm audit + license allowlist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit (production, high+)
+        run: pnpm audit --prod --audit-level=high
+
+      - name: License allowlist
+        run: pnpm run check-licenses
+
+      - name: Verify package signatures (skip on Phase 01 — no published packages yet)
+        run: |
+          if pnpm audit signatures --help >/dev/null 2>&1; then
+            pnpm audit signatures || echo "::warning::pnpm audit signatures reported issues; review before release."
+          else
+            echo "pnpm audit signatures not available in this version; skipping."
+          fi
+
+  codeql:
+    name: CodeQL · javascript-typescript
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

@@ -1,0 +1,56 @@
+{
+  "name": "@graphorin/example-background-consolidator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Long-lived agent + cron triggers demo for the Graphorin framework. Server-mode example that wires @graphorin/triggers with the consolidator daemon to drive light + standard memory consolidation phases on a tier:cheap budget, observable via the consolidator status endpoint. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/background-consolidator",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/background-consolidator"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/server": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/embedder-transformersjs": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*",
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/provider": "workspace:*",
+    "@graphorin/triggers": "workspace:*",
+    "@graphorin/security": "workspace:*"
+  },
+  "bin": {
+    "graphorin-example-background-consolidator": "./dist/main.js"
+  }
+}

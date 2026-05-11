@@ -1,0 +1,33 @@
+name: Check no implicit network calls
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check-no-network:
+    name: Static guard for the no-phone-home promise
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies (no postinstall scripts)
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Run check-no-network
+        run: pnpm run check-no-network

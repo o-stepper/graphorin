@@ -1,0 +1,37 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [](/api/@graphorin/store-sqlite/README.md) / AuditDatabase
+
+# Interface: AuditDatabase
+
+Defined in: packages/store-sqlite/src/audit-db.ts:39
+
+Lightweight handle returned by [openAuditDatabase](/api/@graphorin/store-sqlite/functions/openAuditDatabase.md). The audit
+package (Phase 03) owns the schema; this module only opens the file
+with the cipher peer and applies WAL hardening so the consumer can
+focus on appending audit records.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-db"></a> `db` | `readonly` | [`BetterSqlite3Database`](/api/@graphorin/store-sqlite/connection/interfaces/BetterSqlite3Database.md) | packages/store-sqlite/src/audit-db.ts:41 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/store-sqlite/src/audit-db.ts:40 |
+
+## Methods
+
+### close()
+
+```ts
+close(): void;
+```
+
+Defined in: packages/store-sqlite/src/audit-db.ts:42
+
+#### Returns
+
+`void`

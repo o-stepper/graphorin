@@ -1,0 +1,178 @@
+# Graphorin Kubernetes deployment template (Phase 15).
+#
+# Apply with:
+#   kubectl create namespace graphorin
+#   kubectl apply -n graphorin -f examples/k8s/deployment.yaml
+#
+# The template assumes:
+#   - the operator built + pushed the image from `examples/docker/Dockerfile`
+#     and tagged it `ghcr.io/<org>/graphorin:0.1.0`
+#   - a Secret `graphorin-secrets` exists in the same namespace with
+#     keys `pepper`, `db-passphrase`, `audit-passphrase`
+#   - a PVC `graphorin-data` exists for the SQLite store
+#
+# `securityContext` mirrors the framework's process-hardening discipline
+# (DEC-135) and the Pod Security Standards "restricted" profile.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graphorin-config
+  labels:
+    app.kubernetes.io/name: graphorin
+    app.kubernetes.io/version: "0.1.0"
+data:
+  config.json: |
+    {
+      "server": {
+        "host": "0.0.0.0",
+        "port": 8080,
+        "trustProxy": true
+      },
+      "auth": {
+        "kind": "token",
+        "pepperRef": "file:/run/secrets/graphorin/pepper"
+      },
+      "storage": {
+        "path": "/data/graphorin/data.db",
+        "mode": "server",
+        "encryption": {
+          "enabled": true,
+          "passphraseRef": "file:/run/secrets/graphorin/db-passphrase"
+        }
+      },
+      "audit": {
+        "enabled": true,
+        "passphraseRef": "file:/run/secrets/graphorin/audit-passphrase"
+      },
+      "secrets": {
+        "source": "encrypted-file",
+        "strict": true
+      },
+      "observability": {
+        "logger": "json"
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphorin
+  labels:
+    app.kubernetes.io/name: graphorin
+    app.kubernetes.io/version: "0.1.0"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: graphorin
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: graphorin
+        app.kubernetes.io/version: "0.1.0"
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: graphorin
+          image: ghcr.io/o-stepper/graphorin:0.1.0
+          imagePullPolicy: IfNotPresent
+          args: ["start", "--config", "/etc/graphorin/config.json"]
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: GRAPHORIN_CONFIG
+              value: /etc/graphorin/config.json
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /v1/health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /etc/graphorin
+              readOnly: true
+            - name: secrets
+              mountPath: /run/secrets/graphorin
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: graphorin-data
+        - name: config
+          configMap:
+            name: graphorin-config
+            defaultMode: 0o400
+        - name: secrets
+          projected:
+            defaultMode: 0o400
+            sources:
+              - secret:
+                  name: graphorin-secrets
+                  items:
+                    - key: pepper
+                      path: pepper
+                    - key: db-passphrase
+                      path: db-passphrase
+                    - key: audit-passphrase
+                      path: audit-passphrase
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: "64Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphorin
+  labels:
+    app.kubernetes.io/name: graphorin
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: graphorin
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP

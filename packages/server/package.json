@@ -1,0 +1,156 @@
+{
+  "name": "@graphorin/server",
+  "version": "0.1.0",
+  "description": "Standalone server runtime for the Graphorin framework: createServer({...}) factory, Hono HTTP app, REST endpoints (agents / workflows / sessions / memory / skills / mcp / tokens / audit / health / health/secrets / metrics / triggers / runs/:runId/replay / sessions/:id/replay / audit/verify), per-request authentication + scope middleware (HMAC-SHA256 + pepper, server pepper required), brute-force lockout, IETF draft-07 Idempotency-Key middleware with SQLite backing + LRU read cache, deny-by-default CORS, double-submit CSRF for browser flows, sliding-window rate limit, audit middleware that streams every authenticated request through the tamper-evident hash chain, programmatic AgentRegistry / WorkflowRegistry, lifecycle hooks (beforeStart / onReady / beforeShutdown), pre-bind secrets resolution + storage migration runner that fails fast on missing pepper / unresolvable SecretRef / missing encryption peer, graceful SIGTERM drain with state preservation, durable triggers daemon (cron / interval / idle / event survive process restart per the catch-up policy contract), consolidator daemon lifecycle integration with hard stop timeout, per-subsystem health rollup (storage / embedder / secrets / encryption / consolidator / triggers / replay-buffer), Prometheus text exposition `/v1/metrics` with the canonical graphorin_* metric inventory, scope-enforced replay endpoints (sanitized by default, raw requires `traces:read:raw` admin scope, every invocation appended to the audit chain), and `POST /v1/audit/verify` chain integrity check. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/server",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/server"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "server",
+    "http",
+    "rest",
+    "hono",
+    "idempotency",
+    "auth",
+    "scopes",
+    "rate-limit",
+    "cors",
+    "csrf",
+    "audit",
+    "lifecycle",
+    "graceful-shutdown"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./config": {
+      "types": "./dist/config.d.ts",
+      "import": "./dist/config.js"
+    },
+    "./middleware": {
+      "types": "./dist/middleware/index.d.ts",
+      "import": "./dist/middleware/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.js"
+    },
+    "./ws": {
+      "types": "./dist/ws/index.d.ts",
+      "import": "./dist/ws/index.js"
+    },
+    "./sse": {
+      "types": "./dist/sse/index.d.ts",
+      "import": "./dist/sse/index.js"
+    },
+    "./commentary": {
+      "types": "./dist/commentary/index.d.ts",
+      "import": "./dist/commentary/index.js"
+    },
+    "./triggers": {
+      "types": "./dist/triggers/index.d.ts",
+      "import": "./dist/triggers/index.js"
+    },
+    "./consolidator": {
+      "types": "./dist/consolidator/index.d.ts",
+      "import": "./dist/consolidator/index.js"
+    },
+    "./health": {
+      "types": "./dist/health/index.d.ts",
+      "import": "./dist/health/index.js"
+    },
+    "./metrics": {
+      "types": "./dist/metrics/index.d.ts",
+      "import": "./dist/metrics/index.js"
+    },
+    "./replay": {
+      "types": "./dist/replay/index.d.ts",
+      "import": "./dist/replay/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/protocol": "workspace:*",
+    "@graphorin/security": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/triggers": "workspace:*",
+    "@hono/node-server": "^1.19.0",
+    "@hono/node-ws": "^1.3.0",
+    "hono": "^4.12.0",
+    "zod": "^3.25.0"
+  },
+  "peerDependencies": {
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/workflow": "workspace:*"
+  },
+  "peerDependenciesMeta": {
+    "@graphorin/agent": {
+      "optional": true
+    },
+    "@graphorin/memory": {
+      "optional": true
+    },
+    "@graphorin/sessions": {
+      "optional": true
+    },
+    "@graphorin/workflow": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/workflow": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/ws": "^8.18.1",
+    "better-sqlite3": "^12.9.0",
+    "ws": "^8.20.0"
+  }
+}

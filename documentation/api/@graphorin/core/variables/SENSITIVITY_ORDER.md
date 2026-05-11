@@ -1,0 +1,18 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / SENSITIVITY\_ORDER
+
+# Variable: SENSITIVITY\_ORDER
+
+```ts
+const SENSITIVITY_ORDER: readonly Sensitivity[];
+```
+
+Defined in: packages/core/src/types/sensitivity.ts:21
+
+Strict ordering used by sensitivity-aware filters
+(`record.sensitivity ⊆ provider.acceptsSensitivity`).
+
+## Stable

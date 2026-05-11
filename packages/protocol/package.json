@@ -1,0 +1,79 @@
+{
+  "name": "@graphorin/protocol",
+  "version": "0.1.0",
+  "description": "Wire protocol contract for the Graphorin framework: Zod schemas + TypeScript types for the WebSocket subprotocol `graphorin.protocol.v1`. Defines the `ClientMessage` and `ServerMessage` discriminated unions, the JSON-RPC-shaped control channel (`initialize` / `subscription.subscribe` / `subscription.unsubscribe` / `run.cancel` / `ping`), the typed event push frames (`{ kind: 'event', subject, type, payload, eventId }`), the asynchronous server-initiated error frames (`{ kind: 'error', code, message }`), the subprotocol negotiation helpers, and the close-code taxonomy (4001 auth.required, 4002 auth.invalid, 4003 auth.revoked, 4004 auth.scope_denied, 4005 rate.limited, 4006 flow.throttled, 4007 server.shutdown, 4008 protocol.violation). Browser-friendly: zero Node-only dependencies; the only runtime dependency is `zod`. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/protocol",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/protocol"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "protocol",
+    "websocket",
+    "subprotocol",
+    "zod",
+    "wire-format",
+    "browser-friendly"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client-message": {
+      "types": "./dist/client-message.d.ts",
+      "import": "./dist/client-message.js"
+    },
+    "./server-message": {
+      "types": "./dist/server-message.d.ts",
+      "import": "./dist/server-message.js"
+    },
+    "./subprotocol": {
+      "types": "./dist/subprotocol.d.ts",
+      "import": "./dist/subprotocol.js"
+    },
+    "./close-codes": {
+      "types": "./dist/close-codes.d.ts",
+      "import": "./dist/close-codes.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "zod": "^3.25.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

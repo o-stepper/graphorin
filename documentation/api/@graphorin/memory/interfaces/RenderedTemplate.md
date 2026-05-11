@@ -1,0 +1,22 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/memory](/api/@graphorin/memory/index.md) / [](/api/@graphorin/memory/README.md) / RenderedTemplate
+
+# Interface: RenderedTemplate
+
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:47
+
+Preamble + section-headers payload extracted from a locale pack.
+Surfaced as a separate type so test fixtures can assert against
+the resolved template independently from the locale pack.
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:48 |
+| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:49 |

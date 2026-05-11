@@ -1,0 +1,20 @@
+Graphorin
+Copyright (c) 2026 Oleksiy Stepurenko
+Licensed under the MIT License (see LICENSE).
+
+This project is an original work. All architectural decisions, naming, APIs,
+and primitive vocabulary in the @graphorin/* packages were designed for this
+project. Graphorin does not bundle, fork, or redistribute code from any
+third-party AI agent framework.
+
+Graphorin depends on third-party software components at runtime. Each such
+component is distributed under its own license and is integrated by Graphorin
+through public APIs. The complete list of runtime, optional, and build-time
+dependencies — including version pins, licenses, and the role each component
+plays inside Graphorin — is maintained in `THIRD_PARTY_NOTICES.md` at the
+root of this repository and in the per-package `package.json` files.
+
+Code of Conduct: this project adopts the Contributor Covenant 2.1
+(https://www.contributor-covenant.org/version/2/1/code_of_conduct/), which is
+licensed under CC BY 4.0. The unmodified Covenant text is reproduced in
+CODE_OF_CONDUCT.md.

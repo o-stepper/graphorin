@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/o-stepper/graphorin/main/packages/skills/anthropic-spec-snapshot.json",
+  "snapshotDate": "2026-04-19",
+  "specSource": "https://agentskills.io/specification",
+  "specCommit": null,
+  "rationale": "Bundled snapshot of the publicly published `SKILL.md` file-format specification used to determine which frontmatter fields are recognised by the upstream loader. Updated through the `pnpm run check-anthropic-spec` CI cron whenever the published specification changes.",
+  "knownFields": {
+    "name": {
+      "since": "2025-01-01",
+      "required": true,
+      "type": "string",
+      "stability": "stable"
+    },
+    "description": {
+      "since": "2025-01-01",
+      "required": true,
+      "type": "string",
+      "stability": "stable"
+    },
+    "license": {
+      "since": "2025-06-01",
+      "required": false,
+      "type": "string",
+      "stability": "standardized"
+    },
+    "compatibility": {
+      "since": "2025-06-01",
+      "required": false,
+      "type": "string",
+      "stability": "standardized"
+    },
+    "metadata": {
+      "since": "2025-09-01",
+      "required": false,
+      "type": "object",
+      "stability": "standardized"
+    },
+    "allowed-tools": {
+      "since": "2025-12-01",
+      "required": false,
+      "type": "string-or-array",
+      "stability": "experimental"
+    },
+    "disable-model-invocation": {
+      "since": "2025-09-01",
+      "required": false,
+      "type": "boolean",
+      "stability": "stable"
+    }
+  },
+  "graphorinMapping": {
+    "graphorin-allowed-tools": {
+      "anthropicEquivalent": "allowed-tools",
+      "since": "agentskills-2025-12",
+      "policy": "deprecate-graphorin-prefix",
+      "deprecateAt": "graphorin@0.5",
+      "removeAt": "graphorin@1.0"
+    },
+    "graphorin-version": {
+      "anthropicEquivalent": "metadata.version",
+      "policy": "co-exist",
+      "rationale": "graphorin-version means runtime-compat semver range; metadata.version means skill version"
+    },
+    "graphorin-runtime-compat": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only",
+      "rationale": "Successor naming for graphorin-version (clearer intent); both honoured during transition."
+    },
+    "graphorin-trust-level": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-allowed-tools-overrides": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-sandbox": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-sensitivity": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-sensitivity-defaults": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-handoff-input-filter": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-disable-model-invocation": {
+      "anthropicEquivalent": "disable-model-invocation",
+      "policy": "deprecate-graphorin-prefix",
+      "deprecateAt": "graphorin@0.5",
+      "removeAt": "graphorin@1.0"
+    },
+    "graphorin-signature": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-tools": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only"
+    },
+    "graphorin-anthropic-spec": {
+      "anthropicEquivalent": null,
+      "policy": "graphorin-only",
+      "rationale": "Author-declared snapshot date the skill was tested against."
+    }
+  }
+}

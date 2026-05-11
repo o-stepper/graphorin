@@ -1,0 +1,38 @@
+{
+  "name": "@graphorin/benchmark-dialsim",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lightweight multi-turn dialogue simulation benchmark for the Graphorin framework. Seeds alternating user/assistant turns, persists salient user facts to semantic memory, and scores recall with hybrid search. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/dialsim",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/dialsim"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:run": "node ./dist/runner.js"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-dialsim": "./dist/runner.js"
+  }
+}

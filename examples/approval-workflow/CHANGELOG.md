@@ -1,0 +1,5 @@
+# approval-workflow
+
+## 0.1.0
+
+Initial release of the workflow HITL durable-resume acceptance example. Wires `@graphorin/workflow`'s step-graph engine to a four-node expense-approval pipeline (`receive` → `auto-approve-or-pause` → `process-approved` → `notify`); fast-paths small expenses, calls `pause({ reason: 'manual-review', amount, submitter })` for high-value submissions, and demonstrates that workflow state survives a simulated server restart end-to-end by rebuilding a fresh `Workflow` instance against the same SQLite-backed `CheckpointStore` and resuming with `new Directive({ resume: { approved: true, reason: 'OK' } })`. Smoke tests run hermetically against the real `SqliteCheckpointStore` (path `:memory:`) and assert that every documented `WorkflowEvent` tag (`workflow.start`, `workflow.step.start` / `.end`, `workflow.suspended`, `workflow.resumed`, `workflow.end`, `workflow.checkpoint.written`, `workflow.task.start` / `.end`, `workflow.channel.update`) surfaces across `execute(...) + resume(...)`, that the auto-approve fast-path completes without ever pausing, and that stream modes `'values'`, `'updates'`, and `'tasks'` all complete without throwing.

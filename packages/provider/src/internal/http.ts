@@ -1,0 +1,140 @@
+/**
+ * Internal HTTP helpers shared across the local-LLM adapters.
+ *
+ * @internal
+ */
+
+import type { ProviderEvent } from '@graphorin/core';
+
+import { ProviderHttpError } from '../errors/errors.js';
+
+/**
+ * Convert a graphorin `Message` to the OpenAI-compatible chat-completion
+ * shape. The shape is the lingua-franca of the bundled local adapters
+ * (`llamaCppServerAdapter` and `openAICompatibleAdapter`); the
+ * native-Ollama path uses its own conversion.
+ *
+ * @internal
+ */
+export function toOpenAIChatMessages(
+  messages: ReadonlyArray<{
+    readonly role: 'system' | 'user' | 'assistant' | 'tool';
+    readonly content: string | ReadonlyArray<unknown>;
+    readonly toolCalls?: ReadonlyArray<{
+      readonly toolCallId: string;
+      readonly toolName: string;
+      readonly args: unknown;
+    }>;
+    readonly toolCallId?: string;
+  }>,
+): ReadonlyArray<Record<string, unknown>> {
+  return messages.map((msg) => {
+    const out: Record<string, unknown> = {
+      role: msg.role,
+      content: typeof msg.content === 'string' ? msg.content : flattenContent(msg.content),
+    };
+    if (msg.toolCalls !== undefined && msg.toolCalls.length > 0) {
+      out.tool_calls = msg.toolCalls.map((tc) => ({
+        id: tc.toolCallId,
+        type: 'function',
+        function: {
+          name: tc.toolName,
+          arguments: typeof tc.args === 'string' ? tc.args : JSON.stringify(tc.args),
+        },
+      }));
+    }
+    if (msg.role === 'tool' && msg.toolCallId !== undefined) {
+      out.tool_call_id = msg.toolCallId;
+    }
+    return out;
+  });
+}
+
+function flattenContent(parts: ReadonlyArray<unknown>): string {
+  const buffer: string[] = [];
+  for (const part of parts) {
+    if (typeof part === 'string') {
+      buffer.push(part);
+      continue;
+    }
+    if (typeof part === 'object' && part !== null) {
+      const obj = part as { type?: string; text?: string };
+      if (obj.type === 'text' && typeof obj.text === 'string') {
+        buffer.push(obj.text);
+      }
+    }
+  }
+  return buffer.join('');
+}
+
+/**
+ * Wrap a `fetch` call with HTTP error mapping. The helper does not
+ * assume any particular streaming format — callers receive the raw
+ * `Response` and dispatch on its body.
+ *
+ * @internal
+ */
+export async function callJsonHttp(args: {
+  readonly providerName: string;
+  readonly url: string;
+  readonly headers: Record<string, string>;
+  readonly body: unknown;
+  readonly signal?: AbortSignal;
+  readonly fetchImpl?: typeof fetch;
+}): Promise<Response> {
+  const fetchImpl = args.fetchImpl ?? globalThis.fetch.bind(globalThis);
+  let resp: Response;
+  try {
+    resp = await fetchImpl(args.url, {
+      method: 'POST',
+      headers: args.headers,
+      body: JSON.stringify(args.body),
+      ...(args.signal !== undefined ? { signal: args.signal } : {}),
+    });
+  } catch (cause) {
+    throw new ProviderHttpError({
+      providerName: args.providerName,
+      status: 0,
+      message: `network error reaching ${args.url}`,
+      cause,
+    });
+  }
+  if (!resp.ok) {
+    const detail = await safeReadText(resp);
+    throw new ProviderHttpError({
+      providerName: args.providerName,
+      status: resp.status,
+      message: detail.length > 0 ? detail : resp.statusText,
+    });
+  }
+  return resp;
+}
+
+async function safeReadText(resp: Response): Promise<string> {
+  try {
+    return await resp.text();
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Yield a `stream-start` `ProviderEvent` for an HTTP adapter.
+ *
+ * @internal
+ */
+export function makeStreamStartEvent(args: {
+  readonly providerName: string;
+  readonly modelId: string;
+  readonly responseId?: string;
+}): ProviderEvent {
+  return {
+    type: 'stream-start',
+    metadata: {
+      providerName: args.providerName,
+      modelId: args.modelId,
+      ...(args.responseId !== undefined ? { responseId: args.responseId } : {}),
+      createdAt: new Date().toISOString(),
+    },
+  };
+}

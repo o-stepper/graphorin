@@ -1,0 +1,74 @@
+{
+  "name": "@graphorin/provider-llamacpp-node",
+  "version": "0.1.0",
+  "description": "In-process GGUF execution adapter for the Graphorin framework. Wraps node-llama-cpp@^3.5 to load .gguf model files directly into the same Node process — no daemon, no port to manage, no GPU contention with other processes. Declares trust: 'loopback' permanently because the model lives in the same trust boundary as the host process. Ships LlamaCppNativeCounter that wraps model.tokenize() from the loaded GGUF for byte-exact token counts.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/provider-llamacpp-node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/provider-llamacpp-node"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "provider",
+    "llm",
+    "llama-cpp",
+    "node-llama-cpp",
+    "gguf",
+    "in-process",
+    "local-first",
+    "loopback"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/provider": "workspace:*"
+  },
+  "peerDependencies": {
+    "node-llama-cpp": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "node-llama-cpp": {
+      "optional": false
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {}
+}

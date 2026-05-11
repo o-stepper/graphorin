@@ -1,0 +1,62 @@
+# GitHub Actions security workflow distribution template (Phase 15).
+#
+# Mirrors the framework's supply-chain discipline (DEC-140 / ADR-034):
+# `pnpm audit` blocks the build on any High/Critical advisory not in
+# `audit-ignore.json`, and `pnpm audit signatures` verifies the npm
+# Sigstore provenance attestations on every downloaded package.
+#
+# Drop into `.github/workflows/security.yml` of a repository that
+# consumes the @graphorin/* packages.
+#
+# @stable
+
+name: Security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Daily at 02:17 UTC — catches advisories published overnight.
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: pnpm audit + provenance
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: pnpm install (frozen)
+        run: pnpm install --frozen-lockfile
+
+      - name: pnpm audit (high + critical)
+        run: pnpm audit --prod --audit-level=high
+
+      - name: pnpm audit signatures (npm Sigstore provenance)
+        run: pnpm audit signatures --prod
+
+      - name: Verify no implicit network calls (DEC-154)
+        run: pnpm run check-no-network

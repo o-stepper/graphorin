@@ -1,0 +1,19 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/sessions](/api/@graphorin/sessions/index.md) / [](/api/@graphorin/sessions/README.md) / SessionExportParsedRecord
+
+# Type Alias: SessionExportParsedRecord
+
+```ts
+type SessionExportParsedRecord = 
+  | SessionExportRecord
+  | SessionExportUnknownRecord;
+```
+
+Defined in: packages/sessions/src/export/types.ts:229
+
+Either a typed record or the unknown wrapper.
+
+## Stable

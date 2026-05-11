@@ -1,0 +1,13 @@
+# VitePress build output + cache
+.vitepress/dist/
+.vitepress/cache/
+
+# Generated, but tracked: contributing/index.md, contributing/code-of-conduct.md,
+# contributing/security.md, contributing/third-party-notices.md, and
+# reference/changelog.md are kept under version control so a fresh clone has
+# working dead-link resolution. The `predev` / `build` hook regenerates them
+# from the canonical root files on every run.
+
+# llms artefacts are generated on every build and should not be committed
+public/llms.txt
+public/llms-full.txt

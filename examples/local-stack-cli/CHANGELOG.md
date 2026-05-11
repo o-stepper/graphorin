@@ -1,0 +1,5 @@
+# local-stack-cli
+
+## 0.1.0
+
+Initial release of the fully-local-stack CLI example. Wires `createAgent({...})` to a six-tier `Memory` whose chat completions come from an Ollama-served `qwen2.5:7b-instruct-q4_K_M` (overridable via `GRAPHORIN_LLM_MODEL`), whose vectors come from an Ollama-served `nomic-embed-text` (`GRAPHORIN_EMBED_MODEL`), and whose persistence lives in `./.graphorin/local-stack-cli.db` (`GRAPHORIN_DB_PATH`). The provider is wrapped through `createProvider(adapter, { acceptsSensitivity: ['public', 'internal', 'secret'] })` because `127.0.0.1` is loopback-trusted; the only network calls leave the process for the configured Ollama daemon and `GRAPHORIN_OFFLINE=1` proves it (a missing daemon raises a typed `OllamaUnreachableError` with exit code 2). `Ctrl+C` drains the in-flight turn through `agent.abort({ drain: true, onPendingApprovals: 'hold' })` before closing the SQLite store. Ships deterministic stub provider + stub embedder so the smoke test runs offline in well under 30s.

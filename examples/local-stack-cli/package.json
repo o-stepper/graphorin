@@ -1,0 +1,54 @@
+{
+  "name": "@graphorin/example-local-stack-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fully local-stack CLI personal assistant for the Graphorin framework. Demonstrates Ollama LLM + Ollama embeddings + SQLite + sqlite-vec end-to-end, with a GRAPHORIN_OFFLINE=1 smoke check that emits zero non-localhost network packets. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/local-stack-cli",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/local-stack-cli"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/embedder-ollama": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*",
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/provider": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/tools": "workspace:*"
+  },
+  "bin": {
+    "graphorin-example-local-stack-cli": "./dist/main.js"
+  }
+}

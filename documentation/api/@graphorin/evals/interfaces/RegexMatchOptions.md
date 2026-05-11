@@ -1,0 +1,18 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / RegexMatchOptions
+
+# Interface: RegexMatchOptions
+
+Defined in: evals/src/scorers/code/regex.ts:11
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. Default `'regex-match'`. | evals/src/scorers/code/regex.ts:14 |
+| <a id="property-pattern"></a> `pattern` | `readonly` | `RegExp` | - | evals/src/scorers/code/regex.ts:12 |

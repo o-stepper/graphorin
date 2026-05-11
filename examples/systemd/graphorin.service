@@ -1,0 +1,80 @@
+; graphorin standalone server systemd unit
+;
+; Distribution template shipped with @graphorin/cli (Phase 15) and the
+; framework's process-hardening discipline (DEC-135). Copy to
+; `/etc/systemd/system/graphorin.service`, then:
+;
+;   systemctl daemon-reload
+;   systemctl enable --now graphorin.service
+;   systemctl status graphorin.service
+;   systemd-analyze security graphorin.service   # target score < 5
+;
+; The framework refuses to run as root on Linux/macOS; the unit ships
+; with `User=graphorin` so the daemon picks up the dropped-priv UID.
+;
+; @stable
+
+[Unit]
+Description=Graphorin standalone server (TypeScript framework for personal AI assistants)
+Documentation=https://github.com/o-stepper/graphorin
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=graphorin
+Group=graphorin
+
+; -- POSIX hygiene --
+UMask=0077
+
+; -- Filesystem isolation --
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ReadWritePaths=/var/lib/graphorin /run/graphorin
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+LockPersonality=true
+
+; -- Capability + privilege drop --
+NoNewPrivileges=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+; -- Memory + dump prevention --
+LimitCORE=0
+MemoryDenyWriteExecute=true
+
+; -- Runtime --
+WorkingDirectory=/var/lib/graphorin
+Environment=NODE_ENV=production
+Environment=GRAPHORIN_CONFIG=/etc/graphorin/config.json
+ExecStart=/usr/bin/graphorin start --config ${GRAPHORIN_CONFIG}
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+; -- Self-healing --
+Restart=on-failure
+RestartSec=5
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+; -- Logging --
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

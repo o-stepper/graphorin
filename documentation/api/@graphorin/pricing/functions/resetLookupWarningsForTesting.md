@@ -1,0 +1,21 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/pricing](/api/@graphorin/pricing/index.md) / [](/api/@graphorin/pricing/README.md) / \_resetLookupWarningsForTesting
+
+# Function: \_resetLookupWarningsForTesting()
+
+```ts
+function _resetLookupWarningsForTesting(): void;
+```
+
+Defined in: pricing/src/lookup.ts:30
+
+**`Internal`**
+
+— exposed for tests so the WARN-once cache can be reset.
+
+## Returns
+
+`void`

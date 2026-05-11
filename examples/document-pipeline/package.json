@@ -1,0 +1,47 @@
+{
+  "name": "@graphorin/example-document-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Workflow concurrency demo for the Graphorin framework. Document ingestion pipeline (PDF → chunks → embeddings → index → summary) that exercises every channel type (LatestValue, Reducer, Stream, Barrier, Ephemeral, AnyValue) plus Dispatch dynamic parallelism end-to-end. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/examples/document-pipeline",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "examples/document-pipeline"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "example",
+    "oleksiy-stepurenko"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/main.ts",
+    "build": "tsdown",
+    "start": "node ./dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/example-trace-helper": "workspace:*",
+    "@graphorin/workflow": "workspace:*"
+  },
+  "bin": {
+    "graphorin-example-document-pipeline": "./dist/main.js"
+  }
+}

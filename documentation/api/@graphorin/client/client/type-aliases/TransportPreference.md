@@ -1,0 +1,20 @@
+[**Graphorin API reference v0.1.0**](../../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/client](/api/@graphorin/client/index.md) / [client](/api/@graphorin/client/client/index.md) / TransportPreference
+
+# Type Alias: TransportPreference
+
+```ts
+type TransportPreference = 
+  | TransportKind
+  | "auto";
+```
+
+Defined in: packages/client/src/graphorin-client.ts:90
+
+Transport selector. `'auto'` (default) attempts a WebSocket
+handshake first and falls back to SSE on failure.
+
+## Stable

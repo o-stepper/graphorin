@@ -1,0 +1,32 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / runEvals
+
+# Function: runEvals()
+
+```ts
+function runEvals<I, O>(opts): Promise<EvalReport<I, O>>;
+```
+
+Defined in: evals/src/runner.ts:23
+
+## Type Parameters
+
+| Type Parameter |
+| ------ |
+| `I` |
+| `O` |
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`RunOptions`](/api/@graphorin/evals/interfaces/RunOptions.md)\&lt;`I`, `O`\&gt; |
+
+## Returns
+
+`Promise`\<[`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
+
+## Stable

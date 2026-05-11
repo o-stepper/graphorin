@@ -1,0 +1,20 @@
+version: 2
+
+# Renovate handles npm dependency updates (see renovate.json).
+# Dependabot is responsible *only* for GitHub Actions and security alerts.
+# We disable the npm ecosystem here so the two bots do not race.
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Etc/UTC
+    commit-message:
+      prefix: 'chore(actions)'
+    labels:
+      - dependencies
+      - github-actions
+    open-pull-requests-limit: 5

@@ -1,0 +1,119 @@
+{
+  "name": "@graphorin/memory",
+  "version": "0.1.0",
+  "description": "Six-tier memory system for the Graphorin framework: createMemory() facade with working / session / episodic / semantic / procedural / shared sub-modules, nine memory tools wired into @graphorin/tools, hybrid vector + FTS5 search composed through Reciprocal Rank Fusion (k=60 default) with a pluggable reranker hook, a multi-stage conflict resolution pipeline (exact dedup → embedding three-zone → heuristic regex → subject/predicate → defer-to-deep) with an English locale pack default + plug-in locales, an embedder migration runner with three coexistence policies (lock-on-first / multi-active / auto-migrate), per-record embedder_id enforcement, multi-agent attribution, append-only writes with soft-delete + supersede semantics, default-on bi-temporal storage, AISpan emission for every operation, and tier-aware memory-modification guard wiring.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/packages/memory",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "packages/memory"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "memory",
+    "long-term-memory",
+    "working-memory",
+    "session-memory",
+    "episodic-memory",
+    "semantic-memory",
+    "procedural-memory",
+    "shared-memory",
+    "rrf",
+    "hybrid-search",
+    "rerank",
+    "conflict-resolution",
+    "embedder-migration",
+    "bi-temporal",
+    "multi-agent"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./facade": {
+      "types": "./dist/facade.d.ts",
+      "import": "./dist/facade.js"
+    },
+    "./tiers": {
+      "types": "./dist/tiers/index.d.ts",
+      "import": "./dist/tiers/index.js"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "import": "./dist/tools/index.js"
+    },
+    "./search": {
+      "types": "./dist/search/index.d.ts",
+      "import": "./dist/search/index.js"
+    },
+    "./conflict": {
+      "types": "./dist/conflict/index.d.ts",
+      "import": "./dist/conflict/index.js"
+    },
+    "./migration": {
+      "types": "./dist/migration/index.d.ts",
+      "import": "./dist/migration/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*",
+    "@graphorin/security": "workspace:*",
+    "@graphorin/tools": "workspace:*"
+  },
+  "peerDependencies": {
+    "zod": "^3.23.0 || ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "zod": {
+      "optional": false
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@graphorin/store-sqlite": "workspace:*",
+    "@graphorin/embedder-transformersjs": "workspace:*",
+    "@graphorin/triggers": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.9.0",
+    "fast-check": "^3.23.0",
+    "zod": "^3.25.0"
+  }
+}

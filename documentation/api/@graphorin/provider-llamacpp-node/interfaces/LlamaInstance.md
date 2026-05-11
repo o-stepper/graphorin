@@ -1,0 +1,35 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / LlamaInstance
+
+# Interface: LlamaInstance
+
+Defined in: runtime.ts:14
+
+**`Internal`**
+
+`Llama` engine instance (returned by `getLlama()`).
+
+## Methods
+
+### loadModel()
+
+```ts
+loadModel(args): Promise<LlamaModelInstance>;
+```
+
+Defined in: runtime.ts:15
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `args` | \{ `gpuLayers?`: `number` \| `"auto"`; `modelPath`: `string`; \} |
+| `args.gpuLayers?` | `number` \| `"auto"` |
+| `args.modelPath` | `string` |
+
+#### Returns
+
+`Promise`\&lt;[`LlamaModelInstance`](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaModelInstance.md)\&gt;

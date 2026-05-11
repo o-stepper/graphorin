@@ -1,0 +1,44 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/memory](/api/@graphorin/memory/index.md) / [](/api/@graphorin/memory/README.md) / truncateToTokens
+
+# Function: truncateToTokens()
+
+```ts
+function truncateToTokens(
+   text, 
+   maxTokens, 
+   counter): Promise<{
+  text: string;
+  tokens: number;
+  truncated: boolean;
+}>;
+```
+
+Defined in: packages/memory/src/context-engine/token-budget.ts:110
+
+Truncate `text` to fit `maxTokens`, preserving the leading
+portion and replacing the trailing portion with the literal
+`[...truncated]` marker. The token estimate is computed via the
+supplied `counter`; truncation falls back to character-based
+trimming when the estimate is non-monotonic.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `text` | `string` |
+| `maxTokens` | `number` |
+| `counter` | [`ContextTokenCounter`](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) |
+
+## Returns
+
+`Promise`\<\{
+  `text`: `string`;
+  `tokens`: `number`;
+  `truncated`: `boolean`;
+\}\>
+
+## Stable

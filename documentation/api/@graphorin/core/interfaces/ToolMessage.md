@@ -1,0 +1,19 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ToolMessage
+
+# Interface: ToolMessage
+
+Defined in: packages/core/src/types/message.ts:170
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Defined in |
+| ------ | ------ | ------ | ------ |
+| <a id="property-content"></a> `content` | `readonly` | \| `string` \| readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | packages/core/src/types/message.ts:173 |
+| <a id="property-role"></a> `role` | `readonly` | `"tool"` | packages/core/src/types/message.ts:171 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/message.ts:172 |

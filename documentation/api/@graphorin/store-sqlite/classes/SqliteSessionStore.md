@@ -1,0 +1,504 @@
+[**Graphorin API reference v0.1.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [](/api/@graphorin/store-sqlite/README.md) / SqliteSessionStore
+
+# Class: SqliteSessionStore
+
+Defined in: packages/store-sqlite/src/session-store.ts:29
+
+Default `SessionStore` implementation. Owns:
+  - `sessions` rows.
+  - `agents_registry` rows.
+  - `session_handoffs` rows.
+  - `session_workflow_runs` mapping.
+  - `session_audit` lifecycle rows.
+
+Per `DEC-147`, the actual `session_messages` rows live in
+`@graphorin/store-sqlite`'s `MemoryStore` (single source of truth).
+
+## Stable
+
+## Implements
+
+- [`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md)
+
+## Constructors
+
+### Constructor
+
+```ts
+new SqliteSessionStore(conn): SqliteSessionStore;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:31
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `conn` | [`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md) |
+
+#### Returns
+
+`SqliteSessionStore`
+
+## Methods
+
+### appendAuditEntry()
+
+```ts
+appendAuditEntry(entry): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:203
+
+Append a session-lifecycle audit row.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `entry` | [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md) |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`appendAuditEntry`](/api/@graphorin/core/interfaces/SessionStoreExt.md#appendauditentry)
+
+***
+
+### appendHandoff()
+
+```ts
+appendHandoff(sessionId, record): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:135
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+| `record` | [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md) |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`appendHandoff`](/api/@graphorin/core/interfaces/SessionStoreExt.md#appendhandoff)
+
+***
+
+### attachWorkflowRun()
+
+```ts
+attachWorkflowRun(run): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:168
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `run` | [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md) |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`attachWorkflowRun`](/api/@graphorin/core/interfaces/SessionStoreExt.md#attachworkflowrun)
+
+***
+
+### closeSession()
+
+```ts
+closeSession(sessionId, closedAt): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:90
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+| `closedAt` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`closeSession`](/api/@graphorin/core/interfaces/SessionStoreExt.md#closesession)
+
+***
+
+### createSession()
+
+```ts
+createSession(metadata): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:35
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `metadata` | [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md) |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`createSession`](/api/@graphorin/core/interfaces/SessionStoreExt.md#createsession)
+
+***
+
+### deleteAgent()
+
+```ts
+deleteAgent(agentId): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:117
+
+Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `agentId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`deleteAgent`](/api/@graphorin/core/interfaces/SessionStoreExt.md#deleteagent)
+
+***
+
+### getSession()
+
+```ts
+getSession(sessionId): Promise<
+  | SessionMetadata
+| null>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:52
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+
+#### Returns
+
+`Promise`\<
+  \| [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)
+  \| `null`\>
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`getSession`](/api/@graphorin/core/interfaces/SessionStoreExt.md#getsession)
+
+***
+
+### listAgents()
+
+```ts
+listAgents(): Promise<readonly AgentRegistryEntry[]>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:128
+
+List all known agents (including retired ones).
+
+#### Returns
+
+`Promise`\&lt;readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`listAgents`](/api/@graphorin/core/interfaces/SessionStoreExt.md#listagents)
+
+***
+
+### listAuditEntries()
+
+```ts
+listAuditEntries(sessionId, opts?): Promise<readonly SessionAuditEntry[]>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:220
+
+List recent audit rows for a session, newest-first.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+| `opts` | \{ `limit?`: `number`; \} |
+| `opts.limit?` | `number` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`listAuditEntries`](/api/@graphorin/core/interfaces/SessionStoreExt.md#listauditentries)
+
+***
+
+### listHandoffs()
+
+```ts
+listHandoffs(sessionId): Promise<readonly HandoffRecord[]>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:160
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`listHandoffs`](/api/@graphorin/core/interfaces/SessionStoreExt.md#listhandoffs)
+
+***
+
+### listSessions()
+
+```ts
+listSessions(scope): Promise<readonly SessionMetadata[]>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:57
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | `Pick`\&lt;[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\&gt; |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`listSessions`](/api/@graphorin/core/interfaces/SessionStoreExt.md#listsessions)
+
+***
+
+### listWorkflowRuns()
+
+```ts
+listWorkflowRuns(sessionId): Promise<readonly SessionWorkflowRun[]>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:187
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`listWorkflowRuns`](/api/@graphorin/core/interfaces/SessionStoreExt.md#listworkflowruns)
+
+***
+
+### pruneAuditEntries()
+
+```ts
+pruneAuditEntries(beforeEpochMs): Promise<number>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:232
+
+Delete audit rows older than the supplied epoch ms.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `beforeEpochMs` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`pruneAuditEntries`](/api/@graphorin/core/interfaces/SessionStoreExt.md#pruneauditentries)
+
+***
+
+### registerAgent()
+
+```ts
+registerAgent(entry): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:97
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `entry` | [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md) |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`registerAgent`](/api/@graphorin/core/interfaces/SessionStoreExt.md#registeragent)
+
+***
+
+### resolveAgent()
+
+```ts
+resolveAgent(agentId): Promise<
+  | AgentRegistryEntry
+| null>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:121
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `agentId` | `string` |
+
+#### Returns
+
+`Promise`\<
+  \| [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)
+  \| `null`\>
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`resolveAgent`](/api/@graphorin/core/interfaces/SessionStoreExt.md#resolveagent)
+
+***
+
+### retireAgent()
+
+```ts
+retireAgent(agentId, retiredAt): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:110
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `agentId` | `string` |
+| `retiredAt` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`retireAgent`](/api/@graphorin/core/interfaces/SessionStoreExt.md#retireagent)
+
+***
+
+### updateSession()
+
+```ts
+updateSession(sessionId, patch): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:73
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+| `patch` | `Partial`\&lt;[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\&gt; |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`updateSession`](/api/@graphorin/core/interfaces/SessionStoreExt.md#updatesession)
+
+***
+
+### updateWorkflowRunStatus()
+
+```ts
+updateWorkflowRunStatus(
+   sessionId, 
+   workflowId, 
+   threadId, 
+status): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:175
+
+Update the status of a workflow attachment.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+| `workflowId` | `string` |
+| `threadId` | `string` |
+| `status` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`updateWorkflowRunStatus`](/api/@graphorin/core/interfaces/SessionStoreExt.md#updateworkflowrunstatus)
