@@ -132,7 +132,9 @@ function wellKnownCandidates(serverUrl: string): ReadonlyArray<string> {
 }
 
 function wellKnownUrl(serverUrl: string, suffix: string): string {
-  const base = serverUrl.replace(/\/+$/u, '');
+  let end = serverUrl.length;
+  while (end > 0 && serverUrl.charCodeAt(end - 1) === 0x2f /* '/' */) end -= 1;
+  const base = end === serverUrl.length ? serverUrl : serverUrl.slice(0, end);
   return `${base}/.well-known/${suffix}`;
 }
 

@@ -248,7 +248,11 @@ export interface RegisterEmbedderInput {
  * @stable
  */
 export function slugifyEmbedderId(id: string): string {
-  return id
+  // Cap the input before the regex passes so adversarial inputs cannot
+  // amplify any (linear) regex traversal — the final slug is never
+  // longer than 80 chars anyway.
+  const bounded = id.length > 256 ? id.slice(0, 256) : id;
+  return bounded
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '')

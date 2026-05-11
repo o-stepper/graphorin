@@ -260,7 +260,11 @@ async function defaultRun(_command: string): Promise<string> {
  * @stable
  */
 export function parseSystemdScore(output: string): number | undefined {
-  const match = /(?:Overall|exposure level)[^\n\d]*(\d+(?:\.\d+)?)/i.exec(output);
+  // `systemd-analyze security` prints at most a few hundred lines; cap
+  // the haystack before the regex so the parser is bounded even when
+  // the executor returns unexpectedly large output.
+  const haystack = output.length > 65_536 ? output.slice(0, 65_536) : output;
+  const match = /(?:Overall|exposure level)[^\n\d]*(\d+(?:\.\d+)?)/i.exec(haystack);
   if (!match) return undefined;
   const score = Number(match[1]);
   return Number.isFinite(score) ? score : undefined;

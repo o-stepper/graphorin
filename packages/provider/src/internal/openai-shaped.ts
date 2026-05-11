@@ -28,6 +28,7 @@ import {
 } from '../trust/classify-local-provider.js';
 import { callJsonHttp, makeStreamStartEvent, toOpenAIChatMessages } from './http.js';
 import { parseEventStream } from './sse.js';
+import { stripTrailingSlashes } from './url-utils.js';
 
 /**
  * Options shared by every OpenAI-compatible adapter.
@@ -130,7 +131,7 @@ export function buildOpenAIShapedProvider(opts: OpenAIShapedOptions): {
     ...opts.capabilities,
   };
   const chatPath = opts.chatPath ?? '/v1/chat/completions';
-  const url = `${opts.baseUrl.replace(/\/+$/, '')}${chatPath}`;
+  const url = `${stripTrailingSlashes(opts.baseUrl)}${chatPath}`;
 
   const provider: Provider = {
     name: opts.providerName,

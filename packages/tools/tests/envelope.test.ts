@@ -64,6 +64,25 @@ describe('toResultEnvelope', () => {
     expect(env.output).toEqual({ a: 1, b: { c: 'nested' } });
   });
 
+  it('rejects json-delta paths that target the prototype chain', () => {
+    const sentinelKey = `__pollution_sentinel_${Date.now()}`;
+    expect((Object.prototype as Record<string, unknown>)[sentinelKey]).toBeUndefined();
+
+    const env = toResultEnvelope({
+      raw: undefined,
+      chunks: [
+        { kind: 'json-delta', path: '/safe', value: 1 },
+        { kind: 'json-delta', path: `/__proto__/${sentinelKey}`, value: 'pwned' },
+        { kind: 'json-delta', path: `/constructor/prototype/${sentinelKey}`, value: 'pwned' },
+        { kind: 'json-delta', path: '/prototype/x', value: 'pwned' },
+      ],
+    });
+
+    expect(env.output).toEqual({ safe: 1 });
+    expect((Object.prototype as Record<string, unknown>)[sentinelKey]).toBeUndefined();
+    expect(({} as Record<string, unknown>)[sentinelKey]).toBeUndefined();
+  });
+
   it('appends image chunks to contentParts', () => {
     const env = toResultEnvelope({
       raw: undefined,

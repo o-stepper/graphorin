@@ -124,7 +124,7 @@ export class OllamaEmbedder implements EmbedderProvider {
 
   constructor(options: OllamaEmbedderOptions) {
     this.#model = options.model ?? DEFAULT_OLLAMA_MODEL;
-    this.#baseUrl = (options.baseUrl ?? DEFAULT_OLLAMA_BASE_URL).replace(/\/+$/, '');
+    this.#baseUrl = stripTrailingSlashesLocal(options.baseUrl ?? DEFAULT_OLLAMA_BASE_URL);
     this.#fetchImpl = options.fetchImpl ?? globalThis.fetch.bind(globalThis);
     this.#skipDigestProbe = options.skipDigestProbe ?? false;
     this.#embedPath = options.embedPath ?? '/api/embed';
@@ -338,4 +338,15 @@ function canonicalize(value: unknown): string {
     return `{${keys.map((k) => `${JSON.stringify(k)}:${canonicalize(obj[k])}`).join(',')}}`;
   }
   return 'null';
+}
+
+/**
+ * Strip every trailing `/` from a URL string in `O(n)`. Kept regex-free
+ * so CodeQL does not flag the (otherwise harmless) `/+` anchored
+ * quantifier as a polynomial-redos vector.
+ */
+function stripTrailingSlashesLocal(url: string): string {
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 0x2f) end -= 1;
+  return end === url.length ? url : url.slice(0, end);
 }

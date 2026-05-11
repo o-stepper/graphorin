@@ -141,9 +141,17 @@ function assembleFromChunks<TOutput>(chunks: ReadonlyArray<ContentChunk>): Resul
   });
 }
 
+// Path segments that target the prototype chain rather than own
+// properties. The streaming-tool inputs that reach `applyJsonPatch` can
+// originate from untrusted model output, so we refuse to traverse or
+// assign through any of these names — otherwise a path like
+// `/__proto__/polluted` would mutate `Object.prototype`.
+const FORBIDDEN_PATCH_SEGMENTS = new Set(['__proto__', 'prototype', 'constructor']);
+
 function applyJsonPatch(state: unknown, path: string, value: unknown): unknown {
   const segments = path.split('/').filter((s) => s.length > 0);
   if (segments.length === 0) return value;
+  if (segments.some((s) => FORBIDDEN_PATCH_SEGMENTS.has(s))) return state;
   const root = (state ?? {}) as Record<string, unknown>;
   let cursor: Record<string, unknown> = root;
   for (let i = 0; i < segments.length - 1; i++) {

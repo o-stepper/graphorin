@@ -62,6 +62,34 @@ describe('renderMarkdownReport', () => {
     expect(out).toContain('| `em` | 1 | 1 | 0.5000 |');
     expect(out).toContain('### `fail-1`');
   });
+
+  it('escapes pipes, backslashes and newlines in scorer reasons', () => {
+    const adversarial: EvalReport<string, string> = {
+      ...REPORT,
+      results: [
+        {
+          caseId: 'fail-escape',
+          input: 'q',
+          output: 'a',
+          durationMs: 1,
+          scores: [
+            {
+              scorer: 'em',
+              result: {
+                pass: false,
+                score: 0,
+                reason: 'col-a | col-b\\ next-line\nrow-2',
+              },
+            },
+          ],
+        },
+      ],
+    };
+    const out = renderMarkdownReport(adversarial);
+    expect(out).toContain('col-a \\| col-b\\\\ next-line row-2');
+    expect(out).not.toContain('col-a | col-b');
+    expect(out).not.toMatch(/col-b\\ next-line/);
+  });
 });
 
 describe('renderJsonReport', () => {

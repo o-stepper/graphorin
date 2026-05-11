@@ -96,9 +96,36 @@ function rewriteLinks(body) {
  *
  * Root files may start with HTML comment blocks (e.g. CODE_OF_CONDUCT.md);
  * those are kept; only the first `# ...` line after optional comments is removed.
+ *
+ * Implementation note: an obvious regex (`(?:<!--[\s\S]*?-->\s*)*`) is
+ * vulnerable to catastrophic backtracking on inputs that contain many
+ * `--><!--` boundaries with no terminating heading (CodeQL js/redos).
+ * The state machine below is linear in `body.length` regardless of
+ * input shape.
  */
 function stripFirstH1(body) {
-  return body.replace(/^(\s*(?:<!--[\s\S]*?-->\s*)*)(#\s[^\n]*\n+)/, '$1');
+  const isWhitespace = (ch) =>
+    ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r' || ch === '\f' || ch === '\v';
+  const len = body.length;
+  let i = 0;
+  for (;;) {
+    while (i < len && isWhitespace(body[i])) i++;
+    if (body.startsWith('<!--', i)) {
+      const end = body.indexOf('-->', i + 4);
+      if (end === -1) return body;
+      i = end + 3;
+      continue;
+    }
+    break;
+  }
+  if (i >= len || body[i] !== '#') return body;
+  if (i + 1 >= len || !isWhitespace(body[i + 1])) return body;
+  const lineEnd = body.indexOf('\n', i);
+  if (lineEnd === -1) return body;
+  let j = lineEnd + 1;
+  while (j < len && body[j] === '\n') j++;
+  if (j === lineEnd + 1) return body;
+  return body.slice(0, i) + body.slice(j);
 }
 
 async function syncOne({ from, to, title, description }) {

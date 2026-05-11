@@ -10,6 +10,7 @@
 
 import type { Message, TokenCounter } from '@graphorin/core';
 
+import { stripTrailingSlashes } from '../internal/url-utils.js';
 import { JsTiktokenCounter } from './js-tiktoken.js';
 
 /**
@@ -46,7 +47,7 @@ export class AnthropicAPICounter implements TokenCounter {
   constructor(options: AnthropicAPICounterOptions) {
     this.#modelId = options.modelId;
     if (options.apiKey !== undefined) this.#apiKey = options.apiKey;
-    this.#baseUrl = (options.baseUrl ?? 'https://api.anthropic.com').replace(/\/+$/, '');
+    this.#baseUrl = stripTrailingSlashes(options.baseUrl ?? 'https://api.anthropic.com');
     this.#fetchImpl = options.fetchImpl ?? globalThis.fetch.bind(globalThis);
     this.#fallback = new JsTiktokenCounter({ encoding: 'cl100k_base', modelId: options.modelId });
     this.id = options.id ?? `anthropic-native@${options.modelId}`;

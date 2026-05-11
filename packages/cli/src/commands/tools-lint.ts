@@ -363,6 +363,9 @@ function compileGlob(pattern: string): (rel: string) => boolean {
   //      text.
   //   3. Substitute the placeholders for the equivalent regex
   //      fragments (with `(?:...)` for brace expansion).
+  if (pattern.length > 4096) {
+    throw new Error(`compileGlob: pattern is too long (${pattern.length} > 4096 chars).`);
+  }
   const BRACE_OPEN = '\u0001';
   const BRACE_CLOSE = '\u0002';
   const BRACE_SEP = '\u0003';
