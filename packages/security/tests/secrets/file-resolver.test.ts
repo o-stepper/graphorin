@@ -2,6 +2,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -37,7 +38,7 @@ describe('file: resolver', () => {
     await writeFile(path, 'hello', { mode: 0o644 });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      const value = await resolveSecret(`file://${path}`);
+      const value = await resolveSecret(pathToFileURL(path).href);
       expect(value.reveal()).toBe('hello');
       expect(warn).toHaveBeenCalled();
     } finally {
@@ -51,7 +52,7 @@ describe('file: resolver', () => {
     await writeFile(path, 'hello', { mode: 0o644 });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      await resolveSecret(`file://${path}?warnOnPermissions=0`);
+      await resolveSecret(`${pathToFileURL(path).href}?warnOnPermissions=0`);
       expect(warn).not.toHaveBeenCalled();
     } finally {
       warn.mockRestore();
@@ -78,7 +79,9 @@ describe('file: resolver', () => {
   it('honours base64 encoding', async () => {
     const path = join(workDir, 'b64.txt');
     await writeFile(path, Buffer.from('hello').toString('base64'), { mode: 0o600 });
-    const value = await resolveSecret(`file://${path}?encoding=base64&warnOnPermissions=0`);
+    const value = await resolveSecret(
+      `${pathToFileURL(path).href}?encoding=base64&warnOnPermissions=0`,
+    );
     expect(value.reveal()).toBe('hello');
   });
 });

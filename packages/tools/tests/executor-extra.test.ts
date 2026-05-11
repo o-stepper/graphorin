@@ -478,7 +478,14 @@ describe('ToolExecutor — default spill writer (DoD)', () => {
       if (m) {
         const stat = await fs.stat(m[1]!);
         expect(stat.isFile()).toBe(true);
-        expect(stat.mode & 0o777 & 0o077).toBe(0); // group + others have no permission
+        // POSIX-only confidentiality check: Windows does not honour
+        // mode bits (Node returns ~0o666 by default), so the
+        // group/world-readable assertion is meaningless there. On
+        // win32 the on-disk confidentiality guarantee comes from
+        // NTFS ACLs + the os.tmpdir() location, not POSIX bits.
+        if (process.platform !== 'win32') {
+          expect(stat.mode & 0o777 & 0o077).toBe(0); // group + others have no permission
+        }
         await fs.unlink(m[1]!).catch(() => {});
       }
     }

@@ -43,21 +43,31 @@ describe('@graphorin/observability/exporters — JSONL determinism', () => {
     expect(month.sort()).toEqual(['one.jsonl', 'two.jsonl']);
   });
 
-  it('creates the trace directory with restrictive permissions', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'graphorin-jsonl-perm-'));
-    const exporter = createJSONLExporter({ path: root });
-    await exporter.export(makeRecord('a', { 'graphorin.session.id': 'sess' }));
-    await exporter.shutdown();
-    const month = (await readdir(root, { withFileTypes: true })).find((e) => e.isDirectory());
-    if (month === undefined) throw new Error('no month directory');
-    const monthInfo = await stat(join(root, month.name));
-    // 0o700 — owner read/write/execute, no group, no world
-    expect(monthInfo.mode & 0o777).toBe(0o700);
-    const file = (await readdir(join(root, month.name)))[0];
-    if (file === undefined) throw new Error('no file');
-    const fileInfo = await stat(join(root, month.name, file));
-    expect(fileInfo.mode & 0o777).toBe(0o600);
-  });
+  // POSIX-only: Windows does not honour the `mode` argument to
+  // mkdir / chmod the same way (Node returns a default ~0o666 mode
+  // regardless of what the application requested). The on-disk
+  // confidentiality guarantee on Windows comes from NTFS ACLs +
+  // userprofile location, not POSIX bits. Skip the assertion on
+  // win32 so cross-platform CI stays green; the Linux / macOS runs
+  // continue to enforce the strict 0o700 / 0o600 bits.
+  it.skipIf(process.platform === 'win32')(
+    'creates the trace directory with restrictive permissions (POSIX-only)',
+    async () => {
+      const root = await mkdtemp(join(tmpdir(), 'graphorin-jsonl-perm-'));
+      const exporter = createJSONLExporter({ path: root });
+      await exporter.export(makeRecord('a', { 'graphorin.session.id': 'sess' }));
+      await exporter.shutdown();
+      const month = (await readdir(root, { withFileTypes: true })).find((e) => e.isDirectory());
+      if (month === undefined) throw new Error('no month directory');
+      const monthInfo = await stat(join(root, month.name));
+      // 0o700 — owner read/write/execute, no group, no world
+      expect(monthInfo.mode & 0o777).toBe(0o700);
+      const file = (await readdir(join(root, month.name)))[0];
+      if (file === undefined) throw new Error('no file');
+      const fileInfo = await stat(join(root, month.name, file));
+      expect(fileInfo.mode & 0o777).toBe(0o600);
+    },
+  );
 });
 
 function makeRecord(id: string, attrs: Record<string, string>): SpanRecord {

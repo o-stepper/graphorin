@@ -1,4 +1,6 @@
 import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type {
   AuthTokenStore,
   CheckpointStore,
@@ -29,7 +31,7 @@ import {
  */
 describe('contract conformance (DoD #16)', () => {
   it('SqliteMemoryStore satisfies MemoryStore', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-mem-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-mem-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -49,7 +51,7 @@ describe('contract conformance (DoD #16)', () => {
   });
 
   it('SqliteCheckpointStore satisfies CheckpointStore', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-cp-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-cp-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -64,7 +66,7 @@ describe('contract conformance (DoD #16)', () => {
   });
 
   it('SqliteSessionStore satisfies SessionStore', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-sess-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-sess-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -92,7 +94,7 @@ describe('contract conformance (DoD #16)', () => {
   });
 
   it('SqliteTriggerStore satisfies TriggerStore', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-trig-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-trig-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -107,7 +109,7 @@ describe('contract conformance (DoD #16)', () => {
   });
 
   it('SqliteAuthTokenStore satisfies AuthTokenStore', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-tok-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-tok-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -122,7 +124,7 @@ describe('contract conformance (DoD #16)', () => {
   });
 
   it('SqliteOAuthServerStore satisfies OAuthServerStore', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-oauth-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-oauth-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
@@ -137,7 +139,7 @@ describe('contract conformance (DoD #16)', () => {
   });
 
   it('SqliteIdempotencyStore satisfies the IdempotencyStore contract', async () => {
-    const dir = await mkdtemp('/tmp/graphorin-contract-idem-');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-contract-idem-'));
     const store = await createSqliteStore({
       path: `${dir}/db.sqlite`,
       skipSqliteVec: true,
