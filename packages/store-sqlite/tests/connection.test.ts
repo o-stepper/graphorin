@@ -92,9 +92,7 @@ describe('openConnection', () => {
     // Match using the OS-specific separator so the assertion is
     // portable across POSIX (`/`) and Windows (`\`).
     const sep = process.platform === 'win32' ? '\\\\' : '/';
-    expect(conn.path).toMatch(
-      new RegExp(`deep${sep}nested${sep}dirs${sep}db\\.sqlite$`),
-    );
+    expect(conn.path).toMatch(new RegExp(`deep${sep}nested${sep}dirs${sep}db\\.sqlite$`));
     conn.close();
   });
 });
