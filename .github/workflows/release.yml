@@ -61,7 +61,7 @@ jobs:
 
       - name: Create Release PR or Publish
         if: ${{ env.NPM_TOKEN != '' }}
-        uses: changesets/action@v1.5.3
+        uses: changesets/action@v1.8.0
         with:
           publish: pnpm release
           version: pnpm version
