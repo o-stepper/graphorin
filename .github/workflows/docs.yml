@@ -79,8 +79,9 @@ jobs:
           args: >-
             --no-progress
             --include-fragments
-            --exclude '^https?://(?!127\.0\.0\.1:8765)'
-            --base http://127.0.0.1:8765/
+            --exclude '.*'
+            --include '^http://127\.0\.0\.1:8765'
+            --base-url http://127.0.0.1:8765/
             ./documentation/.vitepress/dist/**/*.html
           fail: true
         env:
