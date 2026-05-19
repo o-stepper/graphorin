@@ -152,7 +152,7 @@ jobs:
         # bails out with ERR_PNPM_ADDING_TO_ROOT. Allow it just for this step.
         env:
           NPM_CONFIG_IGNORE_WORKSPACE_ROOT_CHECK: 'true'
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
