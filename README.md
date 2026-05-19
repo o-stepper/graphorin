@@ -162,7 +162,10 @@ The framework is published as a set of focused packages on the npm registry unde
 | `@graphorin/client` | Browser-friendly client for the standalone server. |
 | `@graphorin/store-sqlite-encrypted` | Optional SQLCipher v4 encryption-at-rest. |
 | `@graphorin/secret-1password` | Optional reference adapter for the 1Password CLI. |
+| `@graphorin/reranker-transformersjs` | Optional cross-encoder reranker via `@huggingface/transformers`. |
+| `@graphorin/reranker-llm` | Optional LLM-judge reranker. |
 | `@graphorin/eslint-plugin` | ESLint rules for projects that build on Graphorin. |
+| `@graphorin/evals` | Optional evaluation primitives — scorers, datasets, reporters, regression detection. |
 
 The full per-package reference (status, role, public surface) lives at **<https://docs.graphorin.com/reference/packages>**.
 
