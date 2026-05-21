@@ -22,12 +22,6 @@
 | [OpenConnectionOptions](/api/@graphorin/store-sqlite/connection/interfaces/OpenConnectionOptions.md) | Options for [openConnection](/api/@graphorin/store-sqlite/connection/functions/openConnection.md). |
 | [SqliteConnection](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md) | The runtime contract every higher-level store interacts with. The concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/connection/functions/openConnection.md) and wraps either `better-sqlite3` (default) or `better-sqlite3-multiple-ciphers` (encryption-at-rest opt-in). |
 
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [BetterSqlite3Constructor](/api/@graphorin/store-sqlite/connection/type-aliases/BetterSqlite3Constructor.md) | Constructor signature exposed by both `better-sqlite3` and `better-sqlite3-multiple-ciphers` (the cipher peer is a drop-in replacement of the default driver). |
-
 ## Variables
 
 | Variable | Description |
@@ -42,3 +36,9 @@
 | [openConnection](/api/@graphorin/store-sqlite/connection/functions/openConnection.md) | Opens a connection. Side effects (in this order): 1. Resolve the encryption passphrase if `encryption.enabled === true`. 2. Load the cipher driver or the default `better-sqlite3` peer. 3. Create the parent directory if absent (`recursive: true`). 4. Open the database file. 5. Apply WAL hardening pragmas. 6. Apply the cipher passphrase (`PRAGMA key = ...`). 7. Load `sqlite-vec` (unless `skipSqliteVec` is set). |
 | [readPragma](/api/@graphorin/store-sqlite/connection/functions/readPragma.md) | Pragma helper that surfaces the runtime value of a single setting as a typed scalar. Used by the integration tests to verify the WAL hardening defaults landed correctly. |
 | [readWalSize](/api/@graphorin/store-sqlite/connection/functions/readWalSize.md) | Returns the byte size of the WAL file, or `0` when the file is absent / empty. Surfaced as `graphorin.storage.wal.size_bytes`. |
+
+## References
+
+### BetterSqlite3Constructor
+
+Re-exports [BetterSqlite3Constructor](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md)

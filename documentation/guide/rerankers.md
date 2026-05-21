@@ -35,9 +35,10 @@ const memory = createMemory({
 
 ### Notes & tuning
 
-- **`reranker-transformersjs`** validates `batchSize` (must be a positive
-  integer) and evicts the model after an idle window when `idleEvictionMs` is
-  set. Lower `batchSize` if large passages pressure memory.
+- **`reranker-transformersjs`** validates `batchSize` at construction (a
+  non-positive or non-integer value throws `RangeError`) and evicts the model
+  after an idle window when `idleEvictionMs` is set. Lower `batchSize` if large
+  passages pressure memory.
 - **`reranker-llm`** scores in batches (default `5`). On an unparseable model
   response it falls back to a neutral score (`fallbackScore`, default `0`)
   rather than failing the whole query — tune this for your provider. The

@@ -10,7 +10,7 @@
 function rekeyTokens(options): Promise<ReadonlyMap<string, CreatedToken>>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:234
+Defined in: packages/security/src/auth/crud.ts:235
 
 Re-issue every active token. Used after a known compromise: the
 previous tokens are revoked and replaced with fresh raw values

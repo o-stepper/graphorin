@@ -17,6 +17,6 @@ design — the import only fires when encryption-at-rest is enabled.
 
 ## Returns
 
-`Promise`\&lt;[`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/connection/type-aliases/BetterSqlite3Constructor.md)\&gt;
+`Promise`\&lt;[`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md)\&gt;
 
 ## Stable

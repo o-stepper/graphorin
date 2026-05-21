@@ -3242,16 +3242,6 @@
             ]
           },
           {
-            "text": "Type Aliases",
-            "collapsed": true,
-            "items": [
-              {
-                "text": "BetterSqlite3Constructor",
-                "link": "/api/@graphorin/store-sqlite/connection/type-aliases/BetterSqlite3Constructor.md"
-              }
-            ]
-          },
-          {
             "text": "Variables",
             "collapsed": true,
             "items": [

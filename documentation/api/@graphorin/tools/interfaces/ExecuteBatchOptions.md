@@ -6,7 +6,7 @@
 
 # Interface: ExecuteBatchOptions
 
-Defined in: packages/tools/src/executor/executor.ts:164
+Defined in: packages/tools/src/executor/executor.ts:175
 
 Per-batch options accepted by `executor.executeBatch(...)`.
 
@@ -14,7 +14,7 @@ Per-batch options accepted by `executor.executeBatch(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-calls"></a> `calls` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | - | packages/tools/src/executor/executor.ts:165 |
-| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | packages/tools/src/executor/executor.ts:166 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/tools/src/executor/executor.ts:167 |
-| <a id="property-trustlevel"></a> `trustLevel?` | `readonly` | [`SandboxTrustLevel`](/api/@graphorin/security/type-aliases/SandboxTrustLevel.md) | Trust level for the per-tool sandbox resolution. Default `'user-defined'`. | packages/tools/src/executor/executor.ts:169 |
+| <a id="property-calls"></a> `calls` | `readonly` | readonly [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md)[] | - | packages/tools/src/executor/executor.ts:176 |
+| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | packages/tools/src/executor/executor.ts:177 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/tools/src/executor/executor.ts:178 |
+| <a id="property-trustlevel"></a> `trustLevel?` | `readonly` | [`SandboxTrustLevel`](/api/@graphorin/security/type-aliases/SandboxTrustLevel.md) | Trust level for the per-tool sandbox resolution. Default `'user-defined'`. | packages/tools/src/executor/executor.ts:180 |

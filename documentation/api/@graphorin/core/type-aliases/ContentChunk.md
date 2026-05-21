@@ -24,7 +24,7 @@ type ContentChunk =
 };
 ```
 
-Defined in: packages/core/src/types/tool.ts:143
+Defined in: packages/core/src/types/tool.ts:145
 
 Single chunk of streamed tool content. Streaming-hint tools emit one
 chunk per `ctx.streamContent(...)` call; the executor concatenates

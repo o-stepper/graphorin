@@ -10,7 +10,7 @@
 function _getInflightRefreshKeysForTesting(): readonly string[];
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:60
+Defined in: packages/security/src/oauth/refresh.ts:70
 
 **`Experimental`**
 

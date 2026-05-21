@@ -13,7 +13,7 @@ function generateRawToken(opts): {
 };
 ```
 
-Defined in: packages/security/src/auth/token-format.ts:239
+Defined in: packages/security/src/auth/token-format.ts:254
 
 Generate a brand-new raw token. The result is the only place the
 plaintext value exists; callers MUST hand it to the user immediately
@@ -36,7 +36,7 @@ and persist only the HMAC hash via the `AuthTokenStore` contract.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `entropyBytes` | `Buffer` | packages/security/src/auth/token-format.ts:241 |
-| `raw` | `string` | packages/security/src/auth/token-format.ts:240 |
+| `entropyBytes` | `Buffer` | packages/security/src/auth/token-format.ts:256 |
+| `raw` | `string` | packages/security/src/auth/token-format.ts:255 |
 
 ## Stable

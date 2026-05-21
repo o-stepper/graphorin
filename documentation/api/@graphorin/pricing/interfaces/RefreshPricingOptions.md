@@ -20,6 +20,8 @@ a real network call.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | Optional fetch override — useful in tests. | pricing/src/refresh.ts:31 |
 | <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | Optional headers (auth, conditional GET, etc.). | pricing/src/refresh.ts:29 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Caller-supplied abort signal, combined with the timeout. | pricing/src/refresh.ts:45 |
 | <a id="property-snapshotdate"></a> `snapshotDate?` | `readonly` | `string` | Override the snapshot date stamped on the result. Defaults to today. | pricing/src/refresh.ts:33 |
+| <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Hard timeout for the network fetch in milliseconds. Default `30000`. Aborts the request (and throws) if the upstream is slow or unreachable so `graphorin pricing refresh` cannot hang. Pass an explicit [RefreshPricingOptions.signal](/api/@graphorin/pricing/interfaces/RefreshPricingOptions.md#property-signal) to manage cancellation yourself; the two are combined. | pricing/src/refresh.ts:43 |
 | <a id="property-url"></a> `url` | `readonly` | `string` | Snapshot URL — typically the upstream pricing JSON. | pricing/src/refresh.ts:27 |
 | <a id="property-version"></a> `version?` | `readonly` | `string` | Override the snapshot version string. Defaults to `'graphorin/0.1+refreshed'`. | pricing/src/refresh.ts:35 |

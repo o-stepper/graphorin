@@ -10,7 +10,7 @@
 function _resetDriverCacheForTesting(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:188
+Defined in: packages/store-sqlite/src/connection.ts:151
 
 **`Internal`**
 

@@ -10,7 +10,7 @@
 function createToken(options): Promise<CreatedToken>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:64
+Defined in: packages/security/src/auth/crud.ts:65
 
 Mint a new token, persist its HMAC hash through the injected store,
 and return the raw token wrapped in a `SecretValue`. The plaintext

@@ -22,7 +22,7 @@ touching the native cipher addon.
 
 | Parameter | Type |
 | ------ | ------ |
-| `ctor` | [`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/connection/type-aliases/BetterSqlite3Constructor.md) |
+| `ctor` | [`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md) |
 
 ## Returns
 

@@ -20,7 +20,7 @@ type ToolErrorKind =
   | "rate_limited";
 ```
 
-Defined in: packages/core/src/types/tool.ts:187
+Defined in: packages/core/src/types/tool.ts:180
 
 Discriminator used by `ToolError.kind`. The list is exhaustive: any new
 kind must extend the union here and every `assertNever` switch.

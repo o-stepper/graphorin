@@ -10,7 +10,7 @@
 function _resetInflightRefreshForTesting(): void;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:51
+Defined in: packages/security/src/oauth/refresh.ts:61
 
 **`Experimental`**
 

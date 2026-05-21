@@ -10,7 +10,7 @@
 function createToolExecutor(opts): ToolExecutor;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:190
+Defined in: packages/tools/src/executor/executor.ts:201
 
 Build a [ToolExecutor](/api/@graphorin/tools/interfaces/ToolExecutor.md) bound to a registry.
 

@@ -64,7 +64,7 @@ Defined in: packages/reranker-transformersjs/src/reranker.ts:124
 get invocationCount(): number;
 ```
 
-Defined in: packages/reranker-transformersjs/src/reranker.ts:145
+Defined in: packages/reranker-transformersjs/src/reranker.ts:152
 
 Number of `rerank(...)` invocations since construction. Surfaced
 for observability + the test suite.
@@ -85,7 +85,7 @@ for observability + the test suite.
 get pipelineLoaded(): boolean;
 ```
 
-Defined in: packages/reranker-transformersjs/src/reranker.ts:155
+Defined in: packages/reranker-transformersjs/src/reranker.ts:162
 
 Whether the underlying ONNX pipeline is currently loaded in
 memory. Surfaced for the idle-eviction integration test.
@@ -107,7 +107,7 @@ rerank<TInputRecord>(
 options?): Promise<readonly MemoryHit<TInputRecord>[]>;
 ```
 
-Defined in: packages/reranker-transformersjs/src/reranker.ts:174
+Defined in: packages/reranker-transformersjs/src/reranker.ts:181
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be
@@ -143,7 +143,7 @@ sorted by `score` descending.
 unload(): void;
 ```
 
-Defined in: packages/reranker-transformersjs/src/reranker.ts:165
+Defined in: packages/reranker-transformersjs/src/reranker.ts:172
 
 Drop the loaded pipeline. Equivalent to letting the idle-eviction
 timer fire. Idempotent.

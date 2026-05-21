@@ -10,7 +10,7 @@
 type TruncationStrategy = "middle" | "tail" | "spill-to-file" | "summarize";
 ```
 
-Defined in: packages/core/src/types/tool.ts:99
+Defined in: packages/core/src/types/tool.ts:101
 
 Result-envelope truncation strategy applied to a tool's assembled
 output before it reaches the conversation history.

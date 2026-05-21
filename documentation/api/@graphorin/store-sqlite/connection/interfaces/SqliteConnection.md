@@ -6,7 +6,7 @@
 
 # Interface: SqliteConnection
 
-Defined in: packages/store-sqlite/src/connection.ts:49
+Defined in: packages/store-sqlite/src/connection.ts:24
 
 The runtime contract every higher-level store interacts with. The
 concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/connection/functions/openConnection.md) and wraps either
@@ -19,9 +19,9 @@ concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/conne
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-encrypted"></a> `encrypted` | `readonly` | `boolean` | Whether the connection is encryption-enabled. | packages/store-sqlite/src/connection.ts:53 |
-| <a id="property-inmemory"></a> `inMemory` | `readonly` | `boolean` | Whether the connection wraps a `:memory:` database. | packages/store-sqlite/src/connection.ts:55 |
-| <a id="property-path"></a> `path` | `readonly` | `string` | Path to the underlying database file (`':memory:'` for in-memory). | packages/store-sqlite/src/connection.ts:51 |
+| <a id="property-encrypted"></a> `encrypted` | `readonly` | `boolean` | Whether the connection is encryption-enabled. | packages/store-sqlite/src/connection.ts:28 |
+| <a id="property-inmemory"></a> `inMemory` | `readonly` | `boolean` | Whether the connection wraps a `:memory:` database. | packages/store-sqlite/src/connection.ts:30 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | Path to the underlying database file (`':memory:'` for in-memory). | packages/store-sqlite/src/connection.ts:26 |
 
 ## Methods
 
@@ -31,7 +31,7 @@ concrete adapter is built by [openConnection](/api/@graphorin/store-sqlite/conne
 all<T>(query, params?): T[];
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:61
+Defined in: packages/store-sqlite/src/connection.ts:36
 
 #### Type Parameters
 
@@ -58,7 +58,7 @@ Defined in: packages/store-sqlite/src/connection.ts:61
 close(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:64
+Defined in: packages/store-sqlite/src/connection.ts:39
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: packages/store-sqlite/src/connection.ts:64
 exec(query): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:57
+Defined in: packages/store-sqlite/src/connection.ts:32
 
 #### Parameters
 
@@ -92,7 +92,7 @@ Defined in: packages/store-sqlite/src/connection.ts:57
 execMany(sql): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:58
+Defined in: packages/store-sqlite/src/connection.ts:33
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Defined in: packages/store-sqlite/src/connection.ts:58
 get<T>(query, params?): T | undefined;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:60
+Defined in: packages/store-sqlite/src/connection.ts:35
 
 #### Type Parameters
 
@@ -139,7 +139,7 @@ Defined in: packages/store-sqlite/src/connection.ts:60
 pragma(query, options?): unknown;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:56
+Defined in: packages/store-sqlite/src/connection.ts:31
 
 #### Parameters
 
@@ -161,7 +161,7 @@ Defined in: packages/store-sqlite/src/connection.ts:56
 prepare(query): BetterSqlite3Statement;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:62
+Defined in: packages/store-sqlite/src/connection.ts:37
 
 #### Parameters
 
@@ -181,7 +181,7 @@ Defined in: packages/store-sqlite/src/connection.ts:62
 raw(): BetterSqlite3Database;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:66
+Defined in: packages/store-sqlite/src/connection.ts:41
 
 Returns the underlying `better-sqlite3` handle. Escape hatch only.
 
@@ -199,7 +199,7 @@ run(query, params?): {
 };
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:59
+Defined in: packages/store-sqlite/src/connection.ts:34
 
 #### Parameters
 
@@ -218,7 +218,7 @@ Defined in: packages/store-sqlite/src/connection.ts:59
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `changes` | `number` | packages/store-sqlite/src/connection.ts:59 |
+| `changes` | `number` | packages/store-sqlite/src/connection.ts:34 |
 
 ***
 
@@ -228,7 +228,7 @@ Defined in: packages/store-sqlite/src/connection.ts:59
 transaction<T>(fn): T;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:63
+Defined in: packages/store-sqlite/src/connection.ts:38
 
 #### Type Parameters
 

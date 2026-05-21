@@ -10,7 +10,7 @@
 const encryptedFileResolver: SecretResolver;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:264
+Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:277
 
 Resolver for `encrypted-file:` SecretRefs.
 

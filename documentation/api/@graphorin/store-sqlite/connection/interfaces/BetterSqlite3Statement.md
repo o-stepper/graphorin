@@ -6,7 +6,7 @@
 
 # Interface: BetterSqlite3Statement
 
-Defined in: packages/store-sqlite/src/connection.ts:29
+Defined in: packages/store-sqlite/src/driver-types.ts:38
 
 **`Internal`**
 
@@ -21,7 +21,7 @@ the store.
 all<T>(...params): T[];
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:32
+Defined in: packages/store-sqlite/src/driver-types.ts:41
 
 #### Type Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/store-sqlite/src/connection.ts:32
 bind(...params): this;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:37
+Defined in: packages/store-sqlite/src/driver-types.ts:46
 
 #### Parameters
 
@@ -67,7 +67,7 @@ Defined in: packages/store-sqlite/src/connection.ts:37
 expand(toggle?): this;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:36
+Defined in: packages/store-sqlite/src/driver-types.ts:45
 
 #### Parameters
 
@@ -87,7 +87,7 @@ Defined in: packages/store-sqlite/src/connection.ts:36
 optional finalize(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:38
+Defined in: packages/store-sqlite/src/driver-types.ts:47
 
 #### Returns
 
@@ -101,7 +101,7 @@ Defined in: packages/store-sqlite/src/connection.ts:38
 get<T>(...params): T | undefined;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:31
+Defined in: packages/store-sqlite/src/driver-types.ts:40
 
 #### Type Parameters
 
@@ -127,7 +127,7 @@ Defined in: packages/store-sqlite/src/connection.ts:31
 iterate<T>(...params): IterableIterator<T>;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:33
+Defined in: packages/store-sqlite/src/driver-types.ts:42
 
 #### Type Parameters
 
@@ -153,7 +153,7 @@ Defined in: packages/store-sqlite/src/connection.ts:33
 pluck(toggle?): this;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:34
+Defined in: packages/store-sqlite/src/driver-types.ts:43
 
 #### Parameters
 
@@ -173,7 +173,7 @@ Defined in: packages/store-sqlite/src/connection.ts:34
 raw(toggle?): this;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:35
+Defined in: packages/store-sqlite/src/driver-types.ts:44
 
 #### Parameters
 
@@ -196,7 +196,7 @@ run(...params): {
 };
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:30
+Defined in: packages/store-sqlite/src/driver-types.ts:39
 
 #### Parameters
 
@@ -215,5 +215,5 @@ Defined in: packages/store-sqlite/src/connection.ts:30
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `changes` | `number` | packages/store-sqlite/src/connection.ts:30 |
-| `lastInsertRowid` | `number` \| `bigint` | packages/store-sqlite/src/connection.ts:30 |
+| `changes` | `number` | packages/store-sqlite/src/driver-types.ts:39 |
+| `lastInsertRowid` | `number` \| `bigint` | packages/store-sqlite/src/driver-types.ts:39 |

@@ -10,7 +10,7 @@
 function openConnection(options): Promise<SqliteConnection>;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:205
+Defined in: packages/store-sqlite/src/connection.ts:168
 
 Opens a connection. Side effects (in this order):
   1. Resolve the encryption passphrase if `encryption.enabled === true`.

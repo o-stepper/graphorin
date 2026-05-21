@@ -10,7 +10,7 @@
 function _setRevocationFetcherForTesting(fetcher): void;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:106
+Defined in: packages/security/src/oauth/refresh.ts:138
 
 **`Experimental`**
 

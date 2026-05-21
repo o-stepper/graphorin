@@ -6,10 +6,10 @@
 
 # Interface: ToolCall
 
-Defined in: packages/core/src/types/tool.ts:154
+Defined in: packages/core/src/types/tool-call.ts:17
 
-A single tool invocation produced by an LLM. The runtime hands these to
-the tool executor for parallel dispatch.
+A single tool invocation the model requested, normalised by the
+provider layer and handed to the tool executor for parallel dispatch.
 
 ## Stable
 
@@ -17,6 +17,6 @@ the tool executor for parallel dispatch.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | Validated input matching the tool's `inputSchema`. | packages/core/src/types/tool.ts:160 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | Stable identifier the model uses to correlate input and output. | packages/core/src/types/tool.ts:156 |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | Tool name as registered in the `ToolRegistry`. | packages/core/src/types/tool.ts:158 |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | Validated input matching the tool's `inputSchema`. | packages/core/src/types/tool-call.ts:23 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | Stable identifier the model uses to correlate input and output. | packages/core/src/types/tool-call.ts:19 |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | Tool name as registered in the `ToolRegistry`. | packages/core/src/types/tool-call.ts:21 |

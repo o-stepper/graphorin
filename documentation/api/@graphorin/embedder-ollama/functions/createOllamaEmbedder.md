@@ -10,7 +10,7 @@
 function createOllamaEmbedder(options?): OllamaEmbedder;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:103
+Defined in: packages/embedder-ollama/src/index.ts:111
 
 Build an Ollama-backed embedder. The first `embed()` call issues a
 `POST /api/show` to capture the model digest; subsequent calls hit

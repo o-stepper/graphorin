@@ -10,7 +10,7 @@
 function _resetFileResolverWarningsForTesting(): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/file.ts:104
+Defined in: packages/security/src/secrets/resolvers/file.ts:126
 
 **`Experimental`**
 
