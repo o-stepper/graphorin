@@ -4,8 +4,9 @@ name: Docs
 # regression in the docs pipeline (typedoc input, vitepress config,
 # pnpm overrides feeding vite/esbuild, …) is caught at PR time, not
 # on the next nightly schedule. The deploy job below stays gated on
-# `push` to `main`, so PR runs only execute the build + link-check
-# stages.
+# `main` — it publishes on a push/merge to `main` or a manual
+# `workflow_dispatch` re-run, so PR and scheduled runs only execute the
+# build + link-check stages.
 on:
   push:
     branches: [main]
@@ -112,7 +113,13 @@ jobs:
     name: Deploy to Cloudflare Pages
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Deploy only from `main`, on either a real push/merge OR a manual
+    # `workflow_dispatch` re-run from the Actions tab (the recovery path
+    # the header comment + the "secrets not provisioned" step point to).
+    # PR and scheduled runs still build + link-check only.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
