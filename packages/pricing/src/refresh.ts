@@ -33,6 +33,16 @@ export interface RefreshPricingOptions {
   readonly snapshotDate?: string;
   /** Override the snapshot version string. Defaults to `'graphorin/0.1+refreshed'`. */
   readonly version?: string;
+  /**
+   * Hard timeout for the network fetch in milliseconds. Default
+   * `30000`. Aborts the request (and throws) if the upstream is slow
+   * or unreachable so `graphorin pricing refresh` cannot hang. Pass an
+   * explicit {@link RefreshPricingOptions.signal} to manage
+   * cancellation yourself; the two are combined.
+   */
+  readonly timeoutMs?: number;
+  /** Caller-supplied abort signal, combined with the timeout. */
+  readonly signal?: AbortSignal;
 }
 
 /**
@@ -50,7 +60,21 @@ export async function refreshPricing(opts: RefreshPricingOptions): Promise<Prici
         'explicitly or run on a Node.js version with global fetch (>= 18).',
     );
   }
-  const res = await fetchImpl(opts.url, { headers: opts.headers ?? {} });
+  const timeoutMs = opts.timeoutMs ?? 30_000;
+  const timeoutSignal = AbortSignal.timeout(timeoutMs);
+  const signal =
+    opts.signal === undefined ? timeoutSignal : AbortSignal.any([opts.signal, timeoutSignal]);
+  let res: Awaited<ReturnType<typeof fetchImpl>>;
+  try {
+    res = await fetchImpl(opts.url, { headers: opts.headers ?? {}, signal });
+  } catch (err) {
+    if (timeoutSignal.aborted) {
+      throw new Error(`refreshPricing: timed out after ${timeoutMs} ms fetching ${opts.url}`, {
+        cause: err,
+      });
+    }
+    throw err;
+  }
   if (!res.ok) {
     throw new Error(`refreshPricing: HTTP ${res.status} ${res.statusText} from ${opts.url}`);
   }

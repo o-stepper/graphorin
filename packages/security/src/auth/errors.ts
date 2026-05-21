@@ -122,8 +122,10 @@ export class TokenLockedOutError extends GraphorinSecretsError {
 }
 
 /**
- * Raised when `rotatePepper` / `rekeyTokens` are invoked with a pepper
- * value that does not meet the minimum 32-byte entropy requirement.
+ * Raised when `createToken` / `rotatePepper` / `rekeyTokens` are
+ * invoked with a pepper value that fails the strength check — either
+ * below the 32-byte minimum, or a low-entropy / placeholder value
+ * (e.g. a long run of identical bytes). See `assessSecretStrength`.
  *
  * @stable
  */
@@ -131,10 +133,12 @@ export class WeakPepperError extends GraphorinSecretsError {
   override readonly kind: 'weak-pepper' = 'weak-pepper';
   readonly providedBytes: number;
 
-  constructor(providedBytes: number) {
+  constructor(providedBytes: number, reason?: string) {
     super(
       'weak-pepper',
-      `Refused to install pepper: ${providedBytes} bytes is below the 32-byte minimum.`,
+      reason === undefined
+        ? `Refused to install pepper: ${providedBytes} bytes is below the 32-byte minimum.`
+        : `Refused to install pepper: ${reason}.`,
       {
         hint: "Generate a fresh pepper via 'crypto.randomBytes(32)' or use the auth library's generatePepper() helper.",
       },

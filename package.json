@@ -33,6 +33,7 @@
     "clean": "turbo run clean && rimraf node_modules .turbo",
     "check-no-network": "node ./scripts/check-no-network.mjs",
     "check-example-docs": "node ./scripts/check-example-docs.mjs",
+    "smoke-examples": "node ./scripts/smoke-examples.mjs",
     "mvp-readiness": "node ./scripts/mvp-readiness.mjs",
     "docs:dev": "pnpm --filter @graphorin/docs dev",
     "docs:build": "pnpm --filter @graphorin/docs build:site",

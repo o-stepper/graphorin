@@ -1,3 +1,5 @@
+import type { ToolCall } from './tool-call.js';
+
 /**
  * Sandbox isolation level requested for a tool's `execute` method.
  *
@@ -145,20 +147,11 @@ export type ContentChunk =
   | { readonly kind: 'json-delta'; readonly path: string; readonly value: unknown }
   | { readonly kind: 'image'; readonly data: Uint8Array; readonly mediaType: string };
 
-/**
- * A single tool invocation produced by an LLM. The runtime hands these to
- * the tool executor for parallel dispatch.
- *
- * @stable
- */
-export interface ToolCall {
-  /** Stable identifier the model uses to correlate input and output. */
-  readonly toolCallId: string;
-  /** Tool name as registered in the `ToolRegistry`. */
-  readonly toolName: string;
-  /** Validated input matching the tool's `inputSchema`. */
-  readonly args: unknown;
-}
+// `ToolCall` is defined in `./tool-call.ts` to break the
+// `message.ts <-> tool.ts` import cycle; re-exported here so existing
+// `@graphorin/core` import paths keep resolving `ToolCall` from this
+// module. The local import lives at the top of the file.
+export type { ToolCall };
 
 /**
  * The successful outcome of a tool invocation, returned to the model.

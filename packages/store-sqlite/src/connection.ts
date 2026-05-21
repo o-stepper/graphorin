@@ -1,42 +1,17 @@
 import { mkdirSync } from 'node:fs';
 import { dirname, isAbsolute, resolve } from 'node:path';
+import type {
+  BetterSqlite3Constructor,
+  BetterSqlite3Database,
+  BetterSqlite3Statement,
+} from './driver-types.js';
 import { type EncryptionConfig, loadCipherDriver, resolvePassphrase } from './encryption/index.js';
 
-/**
- * Subset of the `better-sqlite3` `Database` surface used by the store.
- * Declared structurally so the package can defer the peer dependency
- * load to runtime and keep the module load free of side effects.
- *
- * @internal
- */
-export interface BetterSqlite3Database {
-  pragma(query: string, options?: { simple?: boolean }): unknown;
-  exec(query: string): void;
-  prepare(query: string): BetterSqlite3Statement;
-  transaction<T extends (...args: unknown[]) => unknown>(fn: T): T;
-  close(): void;
-  loadExtension(path: string): void;
-  readonly open: boolean;
-  readonly inTransaction: boolean;
-}
-
-/**
- * Subset of the `better-sqlite3` prepared-statement surface used by
- * the store.
- *
- * @internal
- */
-export interface BetterSqlite3Statement {
-  run(...params: ReadonlyArray<unknown>): { changes: number; lastInsertRowid: number | bigint };
-  get<T = unknown>(...params: ReadonlyArray<unknown>): T | undefined;
-  all<T = unknown>(...params: ReadonlyArray<unknown>): T[];
-  iterate<T = unknown>(...params: ReadonlyArray<unknown>): IterableIterator<T>;
-  pluck(toggle?: boolean): this;
-  raw(toggle?: boolean): this;
-  expand(toggle?: boolean): this;
-  bind(...params: ReadonlyArray<unknown>): this;
-  finalize?(): void;
-}
+// The structural driver types are defined in `./driver-types.ts` to
+// break the `connection.ts <-> encryption/index.ts` import cycle;
+// re-exported here so existing import paths keep resolving them from
+// this module.
+export type { BetterSqlite3Constructor, BetterSqlite3Database, BetterSqlite3Statement };
 
 /**
  * The runtime contract every higher-level store interacts with. The
@@ -82,18 +57,6 @@ export const WAL_HARDENING_PRAGMAS = [
   'cache_size = -64000',
   'foreign_keys = ON',
 ] as const;
-
-/**
- * Constructor signature exposed by both `better-sqlite3` and
- * `better-sqlite3-multiple-ciphers` (the cipher peer is a drop-in
- * replacement of the default driver).
- *
- * @internal
- */
-export type BetterSqlite3Constructor = new (
-  filename: string,
-  options?: { readonly?: boolean; fileMustExist?: boolean; timeout?: number },
-) => BetterSqlite3Database;
 
 /**
  * Options for {@link openConnection}.

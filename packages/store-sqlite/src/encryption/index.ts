@@ -13,7 +13,7 @@
  * @packageDocumentation
  */
 
-import type { BetterSqlite3Constructor } from '../connection.js';
+import type { BetterSqlite3Constructor } from '../driver-types.js';
 
 /**
  * Cipher selection. The default `'sqlcipher'` mirrors the most-shipped

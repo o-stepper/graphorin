@@ -482,10 +482,18 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     wssOptions.handleProtocols = (protocols) => {
       const negotiated = negotiateSubprotocol(Array.from(protocols));
       if (negotiated !== null) return negotiated;
-      // The browser ticket flow attaches the ticket as a second
-      // `Sec-WebSocket-Protocol` token. Echo back the canonical name
-      // so the upgrade succeeds; the ticket value rides along on the
-      // ticket.<value> entry the upgrade handler consumes.
+      // Browser ticket flow: the `WebSocket` constructor cannot set an
+      // `Authorization` header, so the browser client offers two
+      // subprotocol tokens — the canonical `graphorin.protocol.v1`
+      // name plus a `ticket.<value>` token (see the wire contract in
+      // `@graphorin/protocol`'s `subprotocol.ts`:
+      // `SUBPROTOCOL_NAME` / `TICKET_SUBPROTOCOL_PREFIX` /
+      // `parseTicketSubprotocol`). The server MUST echo back exactly
+      // the canonical name (never the `ticket.*` token) so the
+      // handshake's `Sec-WebSocket-Protocol` response stays valid; the
+      // ticket value is consumed separately by `createWsUpgradeEvents`
+      // via `parseTicketSubprotocol` and exchanged through the
+      // single-use `WsTicketStore`.
       for (const candidate of protocols) {
         if (candidate === SUBPROTOCOL_NAME) return SUBPROTOCOL_NAME;
       }

@@ -126,6 +126,13 @@ export class TransformersJsReRanker<TRecord extends MemoryRecord = MemoryRecord>
     this.model = options.model ?? pickRerankerModel(this.locale);
     this.dtype = options.dtype ?? 'fp16';
     this.batchSize = options.batchSize ?? 32;
+    if (!Number.isInteger(this.batchSize) || this.batchSize <= 0) {
+      throw new RangeError(
+        `[graphorin/reranker-transformersjs] batchSize must be a positive integer; got ${String(
+          options.batchSize,
+        )}.`,
+      );
+    }
     this.idleEvictionMs = options.idleEvictionMs;
     this.#revision = options.revision;
     this.#cacheDir = options.cacheDir ?? process.env.GRAPHORIN_CACHE_DIR;
