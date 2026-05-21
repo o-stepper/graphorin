@@ -5,6 +5,24 @@
  * and bridges the per-connection `WSContext` callbacks to the
  * dispatcher's RPC handler.
  *
+ * ## Subprotocol + browser ticket flow
+ *
+ * The negotiated subprotocol is always {@link SUBPROTOCOL_NAME}
+ * (`graphorin.protocol.v1`) — the canonical wire contract lives in
+ * `@graphorin/protocol`'s `subprotocol.ts`. Two auth paths exist:
+ *
+ * - **Bearer (non-browser):** the client sends `Authorization:
+ *   Bearer <token>` and a single `Sec-WebSocket-Protocol:
+ *   graphorin.protocol.v1` token.
+ * - **Ticket (browser):** the `WebSocket` constructor cannot set
+ *   headers, so the browser client offers two subprotocol tokens —
+ *   `graphorin.protocol.v1` and `ticket.<value>`. The server echoes
+ *   back only the canonical name (in `app.ts`'s `handleProtocols`),
+ *   and {@link resolveUpgradeAuth} extracts the ticket via
+ *   `parseTicketSubprotocol` and redeems it against the single-use
+ *   {@link WsTicketStore}. Tickets are short-lived and one-shot to
+ *   bound replay.
+ *
  * @packageDocumentation
  */
 
@@ -145,7 +163,7 @@ export async function createWsUpgradeEvents(
         sendRpcSuccess(ws, message.id, {
           serverInfo: {
             name: 'graphorin-server',
-            version: '0.1.0',
+            version: '0.2.0',
           },
           capabilities: {
             subscriptions: true,

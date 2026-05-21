@@ -145,4 +145,4 @@ Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

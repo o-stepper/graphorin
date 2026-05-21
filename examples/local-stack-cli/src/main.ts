@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Fully-local-stack CLI personal assistant — library mode. Wires
  * `createAgent({...})` to a six-tier `Memory` backed by SQLite +
@@ -27,7 +27,7 @@ import { createStubEmbedder } from './stub-embedder.js';
 import { createStubProvider } from './stub-provider.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 /**
  * Recipe selector. The example only ships the all-local Ollama stack

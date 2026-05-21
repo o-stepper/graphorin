@@ -131,4 +131,4 @@ By contributing to Graphorin, you agree that your contributions will be licensed
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

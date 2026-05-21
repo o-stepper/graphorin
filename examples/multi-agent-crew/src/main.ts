@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Multi-agent crew acceptance demo — library mode. Wires a supervisor +
  * two specialised worker agents (`worker-a` researcher / `worker-b`
@@ -53,7 +53,7 @@ import {
 } from './stub-provider.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 /** Recipe selector — only `'stub'` ships in v0.1 (CI hermetic). */
 export type Recipe = 'stub';

@@ -1,0 +1,94 @@
+#!/usr/bin/env node
+/**
+ * Smoke-tests the runnable `examples/*` apps against the deterministic
+ * `stub` LLM recipe so a public-API regression in any `@graphorin/*`
+ * package fails CI loudly instead of silently breaking the examples.
+ *
+ * Each example is spawned with a hard timeout. Happy-path examples must
+ * exit 0; `local-stack-cli` is exercised on its fail-fast path
+ * (`GRAPHORIN_OFFLINE=1`) and must exit 2 with an actionable message.
+ *
+ * Run locally: `node ./scripts/smoke-examples.mjs`
+ * Used by CI:  `.github/workflows/ci.yml` (job `examples-smoke`).
+ */
+
+import { spawnSync } from 'node:child_process';
+
+const TIMEOUT_MS = 90_000;
+
+/**
+ * @typedef {Object} Case
+ * @property {string} name          Workspace dir under `examples/`.
+ * @property {Record<string,string>} [env]  Extra env vars.
+ * @property {string} [stdin]       Piped stdin (for interactive CLIs).
+ * @property {number} [expectExit]  Required exit code (default 0).
+ * @property {string} [expectOutput] Substring that must appear in output.
+ */
+
+/** @type {Case[]} */
+const CASES = [
+  { name: 'approval-workflow' },
+  { name: 'document-pipeline' },
+  { name: 'background-consolidator' },
+  { name: 'multi-agent-crew' },
+  { name: 'three-agent-harness' },
+  // Interactive REPL — EOF on empty stdin ends the loop cleanly.
+  { name: 'personal-assistant-cli', stdin: 'Hello, what can you do?\n' },
+  {
+    name: 'slack-bot-integration',
+    env: {
+      GRAPHORIN_SLACK_SIGNING_SECRET: 'test-signing-secret-for-smoke',
+      GRAPHORIN_SLACK_BOT_PEPPER: 'test-pepper-32-bytes-aaaaaaaaaaaa',
+    },
+  },
+  // Fail-fast path: no Ollama daemon in CI. Force the network-backed
+  // `ollama` recipe (the `stub` recipe needs no network, so it would
+  // never trip the offline guard) and assert the actionable offline
+  // error + exit 2 rather than the (unreachable) happy path.
+  {
+    name: 'local-stack-cli',
+    env: { GRAPHORIN_LLM_RECIPE: 'ollama', GRAPHORIN_OFFLINE: '1' },
+    expectExit: 2,
+    expectOutput: 'GRAPHORIN_OFFLINE',
+  },
+];
+
+let failures = 0;
+
+for (const c of CASES) {
+  const expectExit = c.expectExit ?? 0;
+  const env = { ...process.env, GRAPHORIN_LLM_RECIPE: 'stub', ...(c.env ?? {}) };
+  const started = Date.now();
+  const result = spawnSync('pnpm', ['--filter', `./examples/${c.name}`, 'dev'], {
+    env,
+    input: c.stdin ?? '',
+    encoding: 'utf8',
+    timeout: TIMEOUT_MS,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  const ms = Date.now() - started;
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`;
+
+  const timedOut = result.error?.code === 'ETIMEDOUT';
+  const exitOk = !timedOut && result.status === expectExit;
+  const outputOk = c.expectOutput === undefined || output.includes(c.expectOutput);
+
+  if (exitOk && outputOk) {
+    console.log(`✅ ${c.name} (exit ${result.status}, ${ms} ms)`);
+  } else {
+    failures += 1;
+    const why = timedOut
+      ? `timed out after ${TIMEOUT_MS} ms`
+      : !exitOk
+        ? `exit ${result.status} (expected ${expectExit})`
+        : `output missing ${JSON.stringify(c.expectOutput)}`;
+    console.error(`❌ ${c.name} — ${why}`);
+    console.error(output.split('\n').slice(-25).join('\n'));
+  }
+}
+
+if (failures > 0) {
+  console.error(`\nsmoke-examples: FAIL — ${failures} example(s) broken.`);
+  process.exit(1);
+}
+console.log(`\nsmoke-examples: PASS — ${CASES.length} example(s) ran clean.`);

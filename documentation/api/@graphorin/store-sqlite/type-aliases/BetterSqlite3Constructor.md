@@ -1,8 +1,8 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.1.0**](../../../index.md)
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [connection](/api/@graphorin/store-sqlite/connection/index.md) / BetterSqlite3Constructor
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [](/api/@graphorin/store-sqlite/README.md) / BetterSqlite3Constructor
 
 # Type Alias: BetterSqlite3Constructor
 
@@ -10,7 +10,7 @@
 type BetterSqlite3Constructor = (filename, options?) => BetterSqlite3Database;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:93
+Defined in: packages/store-sqlite/src/driver-types.ts:57
 
 **`Internal`**
 

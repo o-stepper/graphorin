@@ -23,7 +23,7 @@ import { createMemory } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
-import { createStubProvider } from './stub-provider.js'; // see below
+import { createStubProvider } from './stub-provider.js'; // defined below
 
 const sqlite = await createSqliteStore({ path: './assistant.db' });
 await sqlite.init();
@@ -51,6 +51,58 @@ for await (const event of agent.stream('Hi!', { sessionId: 's1', userId: 'u1' })
 
 await sqlite.close();
 ```
+
+## The stub provider
+
+`createStubProvider()` is a tiny, deterministic `Provider` that echoes the last
+user message — no API keys, no network. Save it next to the snippet above as
+`stub-provider.ts`:
+
+```ts
+import type { Provider, ProviderEvent, ProviderRequest } from '@graphorin/core';
+import { zeroUsage } from '@graphorin/core';
+
+export function createStubProvider(): Provider {
+  const reply = (req: ProviderRequest): string => {
+    const last = [...req.messages].reverse().find((m) => m.role === 'user');
+    const text =
+      typeof last?.content === 'string'
+        ? last.content
+        : (last?.content ?? [])
+            .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+            .map((p) => p.text)
+            .join(' ');
+    return `stub-echo: ${text}`;
+  };
+  return {
+    name: 'stub',
+    modelId: 'stub-echo',
+    capabilities: {
+      streaming: true,
+      toolCalling: false,
+      parallelToolCalls: false,
+      multimodal: false,
+      structuredOutput: false,
+      reasoning: false,
+      contextWindow: 8_192,
+      maxOutput: 1_024,
+      reasoningContract: 'optional',
+    },
+    acceptsSensitivity: ['public', 'internal', 'secret'],
+    async *stream(req): AsyncIterable<ProviderEvent> {
+      yield { type: 'stream-start', metadata: { providerName: 'stub', modelId: 'stub-echo' } };
+      yield { type: 'text-delta', delta: reply(req) };
+      yield { type: 'finish', finishReason: 'stop', usage: zeroUsage() };
+    },
+    async generate(req) {
+      return { text: reply(req), usage: zeroUsage(), finishReason: 'stop' };
+    },
+  };
+}
+```
+
+The runnable [example apps](/guide/examples) ship a fuller version of this same
+stub.
 
 ## What's happening
 
@@ -155,4 +207,4 @@ See [Memory system](/guide/memory-system) for the full tier model and the confli
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

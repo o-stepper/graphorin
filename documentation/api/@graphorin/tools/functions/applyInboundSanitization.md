@@ -10,9 +10,33 @@
 function applyInboundSanitization(opts): SanitizationOutcome;
 ```
 
-Defined in: packages/tools/src/inbound/sanitize.ts:63
+Defined in: packages/tools/src/inbound/sanitize.ts:87
 
 Apply the per-policy inbound sanitization.
+
+## Defense posture (why `failClosed` defaults to off)
+
+`failClosed` is opt-in by design, NOT because the default is
+fail-open in the dangerous sense. The trust-class default matrix
+(`defaultInboundSanitization`) already neutralizes untrusted
+content without `failClosed`:
+
+- `mcp-derived` / `skill-untrusted` / `web-search` →
+  `'detect-and-strip-and-wrap'`: matched imperative patterns are
+  stripped AND the body is wrapped in the `<<<untrusted_content>>>`
+  envelope, so injection is defanged while legitimate content (e.g.
+  a web result that merely quotes "ignore previous instructions")
+  still flows.
+- `first-party-user-defined` / `skill-trusted` →
+  `'detect-and-flag'`: flagged for operator visibility, body
+  unchanged (the content origin is trusted).
+
+`failClosed: true` upgrades a *hit* from "sanitize and continue" to
+a hard block (`ToolError({ kind: 'inbound_sanitization_blocked' })`).
+Operators running high-assurance deployments opt in per-tool via
+`tool({ failClosed: true })`. Defaulting it to `true` globally would
+convert every web-search / MCP result that quotes imperative text
+into a tool failure — which is why it stays opt-in.
 
 ## Parameters
 

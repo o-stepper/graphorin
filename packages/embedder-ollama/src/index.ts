@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto';
 import type { EmbedderProvider, EmbedOptions } from '@graphorin/core/contracts';
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 /**
  * Default Ollama base URL. Operators that run Ollama on a non-default
@@ -67,6 +67,14 @@ export interface OllamaEmbedderOptions {
   readonly legacyEmbedPath?: string;
   /** Optional API path override (default `'/api/show'`). */
   readonly showPath?: string;
+  /**
+   * Per-request hard timeout in milliseconds. Default `30000`. Each
+   * HTTP call (`/api/show`, `/api/embed`, legacy `/api/embeddings`) is
+   * aborted if the Ollama daemon does not respond in time, so a hung
+   * daemon never stalls the caller. A per-call {@link EmbedOptions.signal}
+   * is combined with this timeout. Set to `0` to disable.
+   */
+  readonly timeoutMs?: number;
 }
 
 /**
@@ -117,6 +125,7 @@ export class OllamaEmbedder implements EmbedderProvider {
   readonly #embedPath: string;
   readonly #legacyEmbedPath: string;
   readonly #showPath: string;
+  readonly #timeoutMs: number;
   #digest: string | null;
   #resolvedDim: number | null;
   #initialized = false;
@@ -130,8 +139,24 @@ export class OllamaEmbedder implements EmbedderProvider {
     this.#embedPath = options.embedPath ?? '/api/embed';
     this.#legacyEmbedPath = options.legacyEmbedPath ?? '/api/embeddings';
     this.#showPath = options.showPath ?? '/api/show';
+    this.#timeoutMs = options.timeoutMs ?? 30_000;
     this.#digest = options.digest ?? null;
     this.#resolvedDim = options.dim ?? KNOWN_OLLAMA_MODEL_DIMS.get(this.#model) ?? null;
+  }
+
+  /**
+   * Build the `{ signal }` fetch-init fragment, combining the caller's
+   * abort signal (if any) with the per-request timeout so a hung Ollama
+   * daemon cannot stall the embed call. Returns `{}` when neither
+   * applies. Call once per fetch — each call mints a fresh timeout.
+   */
+  #signalInit(opts: EmbedOptions): { signal?: AbortSignal } {
+    const timeoutSignal = this.#timeoutMs > 0 ? AbortSignal.timeout(this.#timeoutMs) : undefined;
+    const signal =
+      opts.signal !== undefined && timeoutSignal !== undefined
+        ? AbortSignal.any([opts.signal, timeoutSignal])
+        : (opts.signal ?? timeoutSignal);
+    return signal === undefined ? {} : { signal };
   }
 
   /** The canonical embedder id — `'ollama:<model>@<dim-or-digest>'`. */
@@ -200,7 +225,7 @@ export class OllamaEmbedder implements EmbedderProvider {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ name: this.#model }),
-        ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+        ...this.#signalInit(opts),
       });
     } catch (err) {
       throw new OllamaEmbedderError(
@@ -233,7 +258,7 @@ export class OllamaEmbedder implements EmbedderProvider {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: batchBody,
-        ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+        ...this.#signalInit(opts),
       });
     } catch (err) {
       throw new OllamaEmbedderError(
@@ -291,7 +316,7 @@ export class OllamaEmbedder implements EmbedderProvider {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ model: this.#model, prompt: text }),
-        ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+        ...this.#signalInit(opts),
       });
       if (!resp.ok) {
         throw new OllamaEmbedderError(

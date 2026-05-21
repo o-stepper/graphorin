@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Minimal `SlackClient` interface plus a deterministic in-memory
  * implementation used by the smoke test. The interface surfaces the

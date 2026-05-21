@@ -13,7 +13,7 @@ function rotatePepper(options): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:194
+Defined in: packages/security/src/auth/crud.ts:195
 
 Re-HMAC every token row with a new pepper. The previous pepper is
 required to derive the per-row plaintext via re-hashing — the

@@ -10,7 +10,7 @@
 function canonicalConfigHash(config): string;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:323
+Defined in: packages/embedder-ollama/src/index.ts:348
 
 Canonical-JSON deterministic hash over an embedder configuration.
 Object keys are sorted lexicographically so the resulting hash is

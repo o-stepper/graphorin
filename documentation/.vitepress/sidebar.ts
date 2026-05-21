@@ -33,6 +33,7 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Workflow engine', link: '/guide/workflow-engine' },
       { text: 'Sessions', link: '/guide/sessions' },
       { text: 'Persistence', link: '/guide/persistence' },
+      { text: 'Storage backends', link: '/guide/storage' },
     ],
   },
   {
@@ -43,6 +44,8 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Skills', link: '/guide/skills' },
       { text: 'MCP client', link: '/guide/mcp-client' },
       { text: 'Providers', link: '/guide/providers' },
+      { text: 'Embedders', link: '/guide/embedders' },
+      { text: 'Rerankers', link: '/guide/rerankers' },
     ],
   },
   {
@@ -75,6 +78,8 @@ const referenceSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Pricing snapshot', link: '/reference/pricing' },
       { text: 'Changelog', link: '/reference/changelog' },
       { text: 'FAQ', link: '/reference/faq' },
+      { text: 'Troubleshooting', link: '/guide/troubleshooting' },
+      { text: 'Migration (pre-1.0)', link: '/guide/migration' },
     ],
   },
 ];

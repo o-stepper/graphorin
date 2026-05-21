@@ -10,7 +10,7 @@
 function ollamaAdapter(options): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/ollama.ts:78
+Defined in: packages/provider/src/adapters/ollama.ts:79
 
 Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by Ollama's native HTTP
 API. The adapter is fail-safe by default: public-cleartext URLs

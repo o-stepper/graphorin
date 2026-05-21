@@ -10,7 +10,7 @@
 type SideEffectClass = "pure" | "read-only" | "side-effecting" | "external-stateful";
 ```
 
-Defined in: packages/core/src/types/tool.ts:57
+Defined in: packages/core/src/types/tool.ts:59
 
 Side-effect classification declared by a tool author.
 

@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/three-agent-harness`. Exercises the
  * Planner / Generator / Evaluator pipeline end-to-end against the
@@ -38,8 +38,8 @@ describe('examples/three-agent-harness — smoke', () => {
     }
   });
 
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes VERSION = 0.2.0', () => {
+    expect(VERSION).toBe('0.2.0');
   });
 
   it('runHarness converges on iteration 1 with the LRU fixture', async () => {

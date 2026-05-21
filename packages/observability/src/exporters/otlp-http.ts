@@ -110,12 +110,12 @@ export function toOtlpEnvelope(record: SpanRecord, serviceName: string): unknown
         resource: {
           attributes: [
             { key: 'service.name', value: { stringValue: serviceName } },
-            { key: 'graphorin.framework.version', value: { stringValue: '0.1.0' } },
+            { key: 'graphorin.framework.version', value: { stringValue: '0.2.0' } },
           ],
         },
         scopeSpans: [
           {
-            scope: { name: '@graphorin/observability', version: '0.1.0' },
+            scope: { name: '@graphorin/observability', version: '0.2.0' },
             spans: [
               {
                 traceId: record.traceId,

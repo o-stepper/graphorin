@@ -15,7 +15,7 @@ type InboundSanitizationPolicy =
   | "detect-and-strip-and-wrap";
 ```
 
-Defined in: packages/core/src/types/tool.ts:76
+Defined in: packages/core/src/types/tool.ts:78
 
 Inbound prompt-injection sanitization policy applied to a tool's
 result body before it reaches the conversation history.

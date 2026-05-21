@@ -6,7 +6,7 @@
 
 # Interface: WsUpgradeOptions
 
-Defined in: packages/server/src/ws/upgrade.ts:40
+Defined in: packages/server/src/ws/upgrade.ts:58
 
 Public configuration accepted by [createWsUpgradeEvents](/api/@graphorin/server/functions/createWsUpgradeEvents.md).
 
@@ -16,11 +16,11 @@ Public configuration accepted by [createWsUpgradeEvents](/api/@graphorin/server/
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-dispatcher"></a> `dispatcher` | `readonly` | [`WsDispatcher`](/api/@graphorin/server/interfaces/WsDispatcher.md) | - | packages/server/src/ws/upgrade.ts:41 |
-| <a id="property-newsubscriberid"></a> `newSubscriberId?` | `readonly` | () => `string` | - | packages/server/src/ws/upgrade.ts:53 |
-| <a id="property-newsubscriptionid"></a> `newSubscriptionId?` | `readonly` | () => `string` | - | packages/server/src/ws/upgrade.ts:52 |
-| <a id="property-now"></a> `now?` | `readonly` | () => `number` | - | packages/server/src/ws/upgrade.ts:45 |
-| <a id="property-runs"></a> `runs?` | `readonly` | [`RunStateTracker`](/api/@graphorin/server/classes/RunStateTracker.md) | - | packages/server/src/ws/upgrade.ts:44 |
-| <a id="property-serversubprotocol"></a> `serverSubprotocol?` | `readonly` | `string` | Subprotocol the server advertises. Defaults to [SUBPROTOCOL\_NAME](/api/@graphorin/protocol/subprotocol/variables/SUBPROTOCOL_NAME.md); tests can override to exercise the mismatch path. | packages/server/src/ws/upgrade.ts:51 |
-| <a id="property-tickets"></a> `tickets` | `readonly` | [`WsTicketStore`](/api/@graphorin/server/interfaces/WsTicketStore.md) | - | packages/server/src/ws/upgrade.ts:42 |
-| <a id="property-verifier"></a> `verifier` | `readonly` | [`TokenVerifier`](/api/@graphorin/security/classes/TokenVerifier.md) | - | packages/server/src/ws/upgrade.ts:43 |
+| <a id="property-dispatcher"></a> `dispatcher` | `readonly` | [`WsDispatcher`](/api/@graphorin/server/interfaces/WsDispatcher.md) | - | packages/server/src/ws/upgrade.ts:59 |
+| <a id="property-newsubscriberid"></a> `newSubscriberId?` | `readonly` | () => `string` | - | packages/server/src/ws/upgrade.ts:71 |
+| <a id="property-newsubscriptionid"></a> `newSubscriptionId?` | `readonly` | () => `string` | - | packages/server/src/ws/upgrade.ts:70 |
+| <a id="property-now"></a> `now?` | `readonly` | () => `number` | - | packages/server/src/ws/upgrade.ts:63 |
+| <a id="property-runs"></a> `runs?` | `readonly` | [`RunStateTracker`](/api/@graphorin/server/classes/RunStateTracker.md) | - | packages/server/src/ws/upgrade.ts:62 |
+| <a id="property-serversubprotocol"></a> `serverSubprotocol?` | `readonly` | `string` | Subprotocol the server advertises. Defaults to [SUBPROTOCOL\_NAME](/api/@graphorin/protocol/subprotocol/variables/SUBPROTOCOL_NAME.md); tests can override to exercise the mismatch path. | packages/server/src/ws/upgrade.ts:69 |
+| <a id="property-tickets"></a> `tickets` | `readonly` | [`WsTicketStore`](/api/@graphorin/server/interfaces/WsTicketStore.md) | - | packages/server/src/ws/upgrade.ts:60 |
+| <a id="property-verifier"></a> `verifier` | `readonly` | [`TokenVerifier`](/api/@graphorin/security/classes/TokenVerifier.md) | - | packages/server/src/ws/upgrade.ts:61 |

@@ -10,7 +10,7 @@
 const DEFAULT_OLLAMA_BASE_URL: "http://127.0.0.1:11434" = 'http://127.0.0.1:11434';
 ```
 
-Defined in: packages/provider/src/adapters/ollama.ts:39
+Defined in: packages/provider/src/adapters/ollama.ts:40
 
 Default Ollama base URL.
 

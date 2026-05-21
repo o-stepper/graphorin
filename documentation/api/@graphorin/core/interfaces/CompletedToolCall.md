@@ -6,7 +6,7 @@
 
 # Interface: CompletedToolCall\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/tool.ts:245
+Defined in: packages/core/src/types/tool.ts:238
 
 A `ToolCall` paired with its outcome and execution metadata. Captured
 on `RunState.completedToolCalls` after a successful or failed run.
@@ -23,6 +23,6 @@ on `RunState.completedToolCalls` after a successful or failed run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-call"></a> `call` | `readonly` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) | packages/core/src/types/tool.ts:246 |
-| <a id="property-outcome"></a> `outcome` | `readonly` | [`ToolOutcome`](/api/@graphorin/core/type-aliases/ToolOutcome.md)\&lt;`TOutput`\&gt; | packages/core/src/types/tool.ts:247 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/tool.ts:248 |
+| <a id="property-call"></a> `call` | `readonly` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) | packages/core/src/types/tool.ts:239 |
+| <a id="property-outcome"></a> `outcome` | `readonly` | [`ToolOutcome`](/api/@graphorin/core/type-aliases/ToolOutcome.md)\&lt;`TOutput`\&gt; | packages/core/src/types/tool.ts:240 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/tool.ts:241 |

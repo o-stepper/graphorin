@@ -10,7 +10,7 @@
 function providerHasMiddleware(provider, name): boolean;
 ```
 
-Defined in: packages/provider/src/middleware/compose.ts:97
+Defined in: packages/provider/src/middleware/compose.ts:117
 
 Return `true` iff the chain rooted at `provider` contains a
 middleware whose kind matches `name`.

@@ -1,4 +1,4 @@
-import type { ToolCall } from './tool.js';
+import type { ToolCall } from './tool-call.js';
 
 /**
  * A single multimodal content part attached to a chat-style message.

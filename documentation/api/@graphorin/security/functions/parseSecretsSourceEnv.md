@@ -15,7 +15,7 @@ function parseSecretsSourceEnv(raw):
   | undefined;
 ```
 
-Defined in: packages/security/src/secrets/factory.ts:263
+Defined in: packages/security/src/secrets/factory.ts:266
 
 Parse the `GRAPHORIN_SECRETS_SOURCE` env value (per the documented
 `--secrets-source` flag policy). Accepts a single store kind

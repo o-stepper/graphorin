@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Three-agent orchestration harness — library mode. Wires three
  * `createAgent({...})` calls (Planner / Generator / Evaluator) with
@@ -46,7 +46,7 @@ import {
 } from './stub-provider.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 /** Recipe selector — `'stub'` (default, hermetic) or `'ollama'`. */
 export type Recipe = 'stub' | 'ollama';

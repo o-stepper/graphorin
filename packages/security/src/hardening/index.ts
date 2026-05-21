@@ -35,3 +35,8 @@ export {
   RefuseToRunAsRootError,
 } from './errors.js';
 export { ensureDirMode, ensureFileMode, verifyFileMode } from './file-modes.js';
+export {
+  assessSecretStrength,
+  type SecretStrength,
+  type SecretStrengthOptions,
+} from './weak-secret.js';

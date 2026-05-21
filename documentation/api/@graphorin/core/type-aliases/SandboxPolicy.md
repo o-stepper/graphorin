@@ -10,7 +10,7 @@
 type SandboxPolicy = "none" | "sandboxed" | "isolated" | "docker";
 ```
 
-Defined in: packages/core/src/types/tool.ts:10
+Defined in: packages/core/src/types/tool.ts:12
 
 Sandbox isolation level requested for a tool's `execute` method.
 

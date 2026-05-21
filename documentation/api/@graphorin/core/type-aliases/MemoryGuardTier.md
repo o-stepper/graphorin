@@ -15,7 +15,7 @@ type MemoryGuardTier =
   | "untrusted";
 ```
 
-Defined in: packages/core/src/types/tool.ts:32
+Defined in: packages/core/src/types/tool.ts:34
 
 Memory-modification guard tier requested for a tool's `execute` method.
 

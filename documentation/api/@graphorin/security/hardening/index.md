@@ -30,6 +30,12 @@ Re-exports [ApplyProcessHardeningOptions](/api/@graphorin/security/interfaces/Ap
 
 ***
 
+### assessSecretStrength
+
+Re-exports [assessSecretStrength](/api/@graphorin/security/functions/assessSecretStrength.md)
+
+***
+
 ### BOOTSTRAP\_TOKEN\_LENGTH
 
 Re-exports [BOOTSTRAP_TOKEN_LENGTH](/api/@graphorin/security/variables/BOOTSTRAP_TOKEN_LENGTH.md)
@@ -141,6 +147,18 @@ Re-exports [parseSystemdScore](/api/@graphorin/security/functions/parseSystemdSc
 ### RefuseToRunAsRootError
 
 Re-exports [RefuseToRunAsRootError](/api/@graphorin/security/classes/RefuseToRunAsRootError.md)
+
+***
+
+### SecretStrength
+
+Re-exports [SecretStrength](/api/@graphorin/security/interfaces/SecretStrength.md)
+
+***
+
+### SecretStrengthOptions
+
+Re-exports [SecretStrengthOptions](/api/@graphorin/security/interfaces/SecretStrengthOptions.md)
 
 ***
 

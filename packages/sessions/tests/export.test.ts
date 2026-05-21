@@ -20,7 +20,7 @@ function buildBody(
 ): string {
   const buffer = createBufferSink();
   const writer = createSessionExportWriter(buffer.sink, {
-    writer: '@graphorin/sessions@0.1.0',
+    writer: '@graphorin/sessions@0.2.0',
     ...(opts.hash !== undefined ? { hash: opts.hash } : {}),
   });
   return (async () => {
@@ -121,7 +121,7 @@ describe('Session export writer + reader', () => {
   it('forward-parses unknown record kinds with a WARN', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.1.0',
+      writer: '@graphorin/sessions@0.2.0',
     });
     await writer.writeRecord({
       kind: 'message',
@@ -176,7 +176,7 @@ describe('Session export writer + reader', () => {
   it('emits an embedder-mismatch warning when meta declares unknown embedder ids', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.1.0',
+      writer: '@graphorin/sessions@0.2.0',
       embedderIds: ['xenova-multilingual-e5-base@dim-768'],
     });
     await writer.close();
@@ -188,7 +188,7 @@ describe('Session export writer + reader', () => {
   it('rejects records emitted before the header is written via writeRecord("meta")', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.1.0',
+      writer: '@graphorin/sessions@0.2.0',
     });
     await expect(
       writer.writeRecord({

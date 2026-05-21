@@ -10,7 +10,7 @@
 function refreshAccessToken(args): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:36
+Defined in: packages/security/src/oauth/refresh.ts:46
 
 Refresh the access token. Identical concurrent invocations share a
 single in-flight request; subsequent callers observe the same

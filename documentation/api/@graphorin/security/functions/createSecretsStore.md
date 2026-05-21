@@ -10,7 +10,7 @@
 function createSecretsStore(opts?): Promise<SecretsStore>;
 ```
 
-Defined in: packages/security/src/secrets/factory.ts:309
+Defined in: packages/security/src/secrets/factory.ts:312
 
 Activate a `SecretsStore` for the current process. The result is
 cached; subsequent calls overwrite the previous active store and

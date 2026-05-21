@@ -10,6 +10,6 @@
 const KNOWN_OLLAMA_MODEL_DIMS: ReadonlyMap<string, number>;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:89
+Defined in: packages/embedder-ollama/src/index.ts:97
 
 Set of model -> dim hints used to seed the canonical id.

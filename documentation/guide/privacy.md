@@ -75,4 +75,4 @@ If you believe you have observed Graphorin making a network call that the runtim
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

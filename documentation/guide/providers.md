@@ -229,4 +229,4 @@ registerTokenCounter('my-vendor:my-model', (messages) => {
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

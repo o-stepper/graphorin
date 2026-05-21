@@ -20,7 +20,7 @@ describe('Tool cassette format', () => {
   it('writes a valid sentinel header + footer with body checksum on `--hash`', async () => {
     const buffer = createCassetteBufferSink();
     const writer = createToolCassetteWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.1.0',
+      writer: '@graphorin/sessions@0.2.0',
       sessionId: 'sess-1',
       runId: 'run-1',
       hash: true,
@@ -256,7 +256,7 @@ describe('Tool cassette recorder — flushToFile', () => {
   it('writes the cassette to disk and returns the summary', async () => {
     const outputPath = join(tmpDir, 'cassette.jsonl');
     const recorder = createToolCassetteRecorder({
-      writer: '@graphorin/sessions@0.1.0',
+      writer: '@graphorin/sessions@0.2.0',
       sessionId: 'sess-1',
       runId: 'run-1',
       outputPath,

@@ -10,7 +10,7 @@
 function revokeOAuthToken(args): Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:127
+Defined in: packages/security/src/oauth/refresh.ts:159
 
 Revoke an OAuth token via RFC 7009. The metadata must advertise the
 revocation endpoint; otherwise the helper resolves silently — the

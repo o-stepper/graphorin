@@ -15,7 +15,7 @@ function revokeToken(
 | undefined>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:125
+Defined in: packages/security/src/auth/crud.ts:126
 
 Soft-revoke a token. Returns the updated record or `undefined` if
 the token is unknown. The store is responsible for setting the

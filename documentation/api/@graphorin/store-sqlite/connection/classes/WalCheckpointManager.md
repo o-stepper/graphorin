@@ -6,7 +6,7 @@
 
 # Class: WalCheckpointManager
 
-Defined in: packages/store-sqlite/src/connection.ts:340
+Defined in: packages/store-sqlite/src/connection.ts:303
 
 Periodic `wal_checkpoint(RESTART)` runner. Invoked by the worker
 pool every `intervalMs` to bound WAL growth on long-running servers.
@@ -21,7 +21,7 @@ pool every `intervalMs` to bound WAL growth on long-running servers.
 new WalCheckpointManager(conn, intervalMs): WalCheckpointManager;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:345
+Defined in: packages/store-sqlite/src/connection.ts:308
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/store-sqlite/src/connection.ts:345
 start(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:350
+Defined in: packages/store-sqlite/src/connection.ts:313
 
 #### Returns
 
@@ -56,7 +56,7 @@ Defined in: packages/store-sqlite/src/connection.ts:350
 stop(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:363
+Defined in: packages/store-sqlite/src/connection.ts:326
 
 #### Returns
 

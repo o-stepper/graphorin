@@ -10,7 +10,7 @@
 function composeChain(stores): SecretsStore;
 ```
 
-Defined in: packages/security/src/secrets/factory.ts:170
+Defined in: packages/security/src/secrets/factory.ts:173
 
 Compose multiple stores into a try-in-order chain. The first non-null
 value wins; writes go to the first writable store.

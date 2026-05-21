@@ -4,8 +4,9 @@ name: Docs
 # regression in the docs pipeline (typedoc input, vitepress config,
 # pnpm overrides feeding vite/esbuild, …) is caught at PR time, not
 # on the next nightly schedule. The deploy job below stays gated on
-# `push` to `main`, so PR runs only execute the build + link-check
-# stages.
+# `main` — it publishes on a push/merge to `main` or a manual
+# `workflow_dispatch` re-run, so PR and scheduled runs only execute the
+# build + link-check stages.
 on:
   push:
     branches: [main]
@@ -41,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
@@ -49,7 +50,7 @@ jobs:
         run: corepack enable
 
       - name: Setup Node.js 22
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '22'
           cache: pnpm
@@ -84,7 +85,7 @@ jobs:
           exit 1
 
       - name: Link check (lychee, loopback-only)
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2
         with:
           args: >-
             --no-progress
@@ -101,7 +102,7 @@ jobs:
         run: kill "$(cat /tmp/docs-preview.pid)" 2>/dev/null || true
 
       - name: Upload built site
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: docs-dist
           path: documentation/.vitepress/dist
@@ -112,7 +113,13 @@ jobs:
     name: Deploy to Cloudflare Pages
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Deploy only from `main`, on either a real push/merge OR a manual
+    # `workflow_dispatch` re-run from the Actions tab (the recovery path
+    # the header comment + the "secrets not provisioned" step point to).
+    # PR and scheduled runs still build + link-check only.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -121,7 +128,7 @@ jobs:
       deployments: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       # wrangler-action detects `pnpm-lock.yaml` at repo root and shells out to
       # `pnpm dlx wrangler ...`, so we need pnpm on PATH even though we never
@@ -130,12 +137,12 @@ jobs:
         run: corepack enable
 
       - name: Setup Node.js 22
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '22'
 
       - name: Download built site
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: docs-dist
           path: documentation/.vitepress/dist
@@ -152,7 +159,7 @@ jobs:
         # bails out with ERR_PNPM_ADDING_TO_ROOT. Allow it just for this step.
         env:
           NPM_CONFIG_IGNORE_WORKSPACE_ROOT_CHECK: 'true'
-        uses: cloudflare/wrangler-action@v4
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
         with:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}

@@ -15,6 +15,7 @@ import { createHmac, randomBytes, randomUUID } from 'node:crypto';
 
 import type { AuthTokenRecord, AuthTokenStore } from '@graphorin/core/contracts';
 
+import { assessSecretStrength } from '../hardening/weak-secret.js';
 import { SecretValue } from '../secrets/secret-value.js';
 import { WeakPepperError } from './errors.js';
 import { validateScopeSet } from './scope.js';
@@ -318,8 +319,10 @@ async function hmacHexAsync(pepper: SecretValue, raw: string): Promise<string> {
 }
 
 async function assertPepperStrength(pepper: SecretValue): Promise<void> {
-  const length = await pepper.useBuffer((buf) => buf.length);
-  if (length < 32) throw new WeakPepperError(length);
+  const assessment = await pepper.useBuffer((buf) => assessSecretStrength(buf));
+  if (!assessment.ok) {
+    throw new WeakPepperError(assessment.byteLength, assessment.reason);
+  }
 }
 
 function inferEnvFromExisting(_record: AuthTokenRecord): TokenEnvironment {

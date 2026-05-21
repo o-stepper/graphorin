@@ -6,7 +6,7 @@
 
 # Interface: BetterSqlite3Database
 
-Defined in: packages/store-sqlite/src/connection.ts:12
+Defined in: packages/store-sqlite/src/driver-types.ts:21
 
 **`Internal`**
 
@@ -18,8 +18,8 @@ load to runtime and keep the module load free of side effects.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-intransaction"></a> `inTransaction` | `readonly` | `boolean` | packages/store-sqlite/src/connection.ts:20 |
-| <a id="property-open"></a> `open` | `readonly` | `boolean` | packages/store-sqlite/src/connection.ts:19 |
+| <a id="property-intransaction"></a> `inTransaction` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:29 |
+| <a id="property-open"></a> `open` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:28 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ load to runtime and keep the module load free of side effects.
 close(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:17
+Defined in: packages/store-sqlite/src/driver-types.ts:26
 
 #### Returns
 
@@ -43,7 +43,7 @@ Defined in: packages/store-sqlite/src/connection.ts:17
 exec(query): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:14
+Defined in: packages/store-sqlite/src/driver-types.ts:23
 
 #### Parameters
 
@@ -63,7 +63,7 @@ Defined in: packages/store-sqlite/src/connection.ts:14
 loadExtension(path): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:18
+Defined in: packages/store-sqlite/src/driver-types.ts:27
 
 #### Parameters
 
@@ -83,7 +83,7 @@ Defined in: packages/store-sqlite/src/connection.ts:18
 pragma(query, options?): unknown;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:13
+Defined in: packages/store-sqlite/src/driver-types.ts:22
 
 #### Parameters
 
@@ -105,7 +105,7 @@ Defined in: packages/store-sqlite/src/connection.ts:13
 prepare(query): BetterSqlite3Statement;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:15
+Defined in: packages/store-sqlite/src/driver-types.ts:24
 
 #### Parameters
 
@@ -125,7 +125,7 @@ Defined in: packages/store-sqlite/src/connection.ts:15
 transaction<T>(fn): T;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:16
+Defined in: packages/store-sqlite/src/driver-types.ts:25
 
 #### Type Parameters
 

@@ -10,7 +10,7 @@
 function parseToken(input, opts?): ParsedToken;
 ```
 
-Defined in: packages/security/src/auth/token-format.ts:261
+Defined in: packages/security/src/auth/token-format.ts:276
 
 Strict structural parser. Returns a discriminated union so callers
 can branch on `ok` without throwing on the hot path. The function

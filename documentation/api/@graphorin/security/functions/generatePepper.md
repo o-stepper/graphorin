@@ -10,7 +10,7 @@
 function generatePepper(): SecretValue;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:264
+Defined in: packages/security/src/auth/crud.ts:265
 
 Generate a fresh server pepper. The result is always exactly 32
 bytes (256 bits) so the verifier can rely on the size invariant.

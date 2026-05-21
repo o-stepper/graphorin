@@ -12,7 +12,7 @@ type ToolOutcome<TOutput> =
   | ToolError;
 ```
 
-Defined in: packages/core/src/types/tool.ts:222
+Defined in: packages/core/src/types/tool.ts:215
 
 Either a `ToolResult` or a `ToolError`. The runtime always returns one
 of the two — there is no implicit "tool fell through" outcome.

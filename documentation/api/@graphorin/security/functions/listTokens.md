@@ -10,7 +10,7 @@
 function listTokens(tokenStore, opts?): Promise<readonly TokenMetadata[]>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:108
+Defined in: packages/security/src/auth/crud.ts:109
 
 List token metadata. Never returns the raw token or the HMAC hash;
 the hash is hex on-disk only and would otherwise be a small offline

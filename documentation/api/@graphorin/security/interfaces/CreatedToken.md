@@ -6,7 +6,7 @@
 
 # Interface: CreatedToken
 
-Defined in: packages/security/src/auth/crud.ts:51
+Defined in: packages/security/src/auth/crud.ts:52
 
 Result of `createToken(...)`. The raw token is a `SecretValue` so it
 is never accidentally logged on the way back to the caller.
@@ -17,5 +17,5 @@ is never accidentally logged on the way back to the caller.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-raw"></a> `raw` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | packages/security/src/auth/crud.ts:52 |
-| <a id="property-record"></a> `record` | `readonly` | [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md) | packages/security/src/auth/crud.ts:53 |
+| <a id="property-raw"></a> `raw` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | packages/security/src/auth/crud.ts:53 |
+| <a id="property-record"></a> `record` | `readonly` | [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md) | packages/security/src/auth/crud.ts:54 |

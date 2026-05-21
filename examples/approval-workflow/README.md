@@ -20,9 +20,9 @@ pnpm --filter ./examples/approval-workflow dev
 Expected dev output:
 
 ```
-graphorin v0.1.0 approval-workflow auto — status=completed, approved=true, notifications=4.
-graphorin v0.1.0 approval-workflow manual — status=suspended, suspendedAtNode='auto-approve-or-pause'.
-graphorin v0.1.0 approval-workflow resume — status=completed, approved=true, processedAt='2026-…', notifications=4.
+graphorin v0.2.0 approval-workflow auto — status=completed, approved=true, notifications=4.
+graphorin v0.2.0 approval-workflow manual — status=suspended, suspendedAtNode='auto-approve-or-pause'.
+graphorin v0.2.0 approval-workflow resume — status=completed, approved=true, processedAt='2026-…', notifications=4.
 ```
 
 **What just happened?**
@@ -243,4 +243,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

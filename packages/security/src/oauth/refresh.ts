@@ -24,6 +24,16 @@ export interface RefreshAccessTokenArgs {
   readonly refreshToken: SecretValue;
   readonly scope?: string;
   readonly signal?: AbortSignal;
+  /**
+   * When `true` and the authorization server **rotates** the refresh
+   * token (RFC 6749 §10.4 / OAuth 2.1 — the token response carries a
+   * *different* `refresh_token`), best-effort revoke the previous
+   * refresh token via {@link revokeOAuthToken}. Defaults to `false` so
+   * existing callers are unaffected; servers that already invalidate
+   * the old token on rotation make this a defense-in-depth no-op.
+   * Revocation failures never fail the refresh.
+   */
+  readonly revokePreviousOnRotation?: boolean;
 }
 
 /**
@@ -87,7 +97,29 @@ async function doRefresh(args: RefreshAccessTokenArgs): Promise<OAuthSession> {
     }
     throw new OAuthRefreshError(serverId, error, response.body.error_description ?? error);
   }
-  return buildOAuthSession(serverId, response.body);
+  const session = buildOAuthSession(serverId, response.body);
+
+  // Refresh-token rotation (RFC 6749 §10.4 / OAuth 2.1): when the
+  // server hands back a *different* refresh token, the previous one
+  // should be retired. Opt-in + best-effort — a revocation failure
+  // must not fail the refresh the caller is awaiting.
+  if (args.revokePreviousOnRotation === true && session.refreshToken !== undefined) {
+    const rotated = session.refreshToken.reveal() !== refreshToken.reveal();
+    if (rotated) {
+      await revokeOAuthToken({
+        serverId,
+        metadata,
+        registration,
+        token: refreshToken,
+        tokenTypeHint: 'refresh_token',
+        ...(args.signal === undefined ? {} : { signal: args.signal }),
+      }).catch((err: unknown) => {
+        void err;
+      });
+    }
+  }
+
+  return session;
 }
 
 /** Strategy hook used by tests to stub the revoke request. */

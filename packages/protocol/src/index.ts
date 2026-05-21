@@ -15,7 +15,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 export * from './client-message.js';
 export * from './close-codes.js';

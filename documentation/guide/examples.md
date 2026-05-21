@@ -103,4 +103,4 @@ Three deployment templates live alongside the examples — they're not standalon
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -94,6 +94,75 @@ describe('@graphorin/security/oauth — refresh + revoke', () => {
     ).rejects.toBeInstanceOf(OAuthRefreshError);
   });
 
+  it('revokePreviousOnRotation revokes the old refresh token when the server rotates it', async () => {
+    _setTokenEndpointFetcherForTesting(async () => ({
+      ok: true,
+      status: 200,
+      body: {
+        access_token: 'new-access',
+        refresh_token: 'rotated-refresh', // server hands back a NEW refresh token
+        token_type: 'Bearer',
+        expires_in: 600,
+      },
+    }));
+    let revoked: { token: string; hint?: string } | undefined;
+    _setRevocationFetcherForTesting(async (_url, init) => {
+      const params = new URLSearchParams(init.body);
+      revoked = {
+        token: params.get('token') ?? '',
+        ...(params.get('token_type_hint') === null
+          ? {}
+          : { hint: params.get('token_type_hint') as string }),
+      };
+      return { ok: true, status: 200 };
+    });
+    const session = await refreshAccessToken({
+      serverId: 'mcp-test',
+      metadata: {
+        server: buildSyntheticServerMetadata({
+          revocationEndpoint: 'https://issuer.example.com/oauth/revoke',
+        }),
+      },
+      registration: { clientId: 'cli_test' },
+      refreshToken: SecretValue.fromString('old-refresh'),
+      revokePreviousOnRotation: true,
+    });
+    expect(session.refreshToken?.reveal()).toBe('rotated-refresh');
+    // The PREVIOUS (old) token is the one revoked, hinted as a refresh_token.
+    expect(revoked?.token).toBe('old-refresh');
+    expect(revoked?.hint).toBe('refresh_token');
+  });
+
+  it('revokePreviousOnRotation does not revoke when the refresh token is unchanged', async () => {
+    _setTokenEndpointFetcherForTesting(async () => ({
+      ok: true,
+      status: 200,
+      body: {
+        access_token: 'new-access',
+        refresh_token: 'same-refresh', // server returns the SAME token (no rotation)
+        token_type: 'Bearer',
+        expires_in: 600,
+      },
+    }));
+    let revokeCalled = false;
+    _setRevocationFetcherForTesting(async () => {
+      revokeCalled = true;
+      return { ok: true, status: 200 };
+    });
+    await refreshAccessToken({
+      serverId: 'mcp-test',
+      metadata: {
+        server: buildSyntheticServerMetadata({
+          revocationEndpoint: 'https://issuer.example.com/oauth/revoke',
+        }),
+      },
+      registration: { clientId: 'cli_test' },
+      refreshToken: SecretValue.fromString('same-refresh'),
+      revokePreviousOnRotation: true,
+    });
+    expect(revokeCalled).toBe(false);
+  });
+
   it('revokeOAuthToken posts to the discovered endpoint', async () => {
     let captured: { url: string; body: string } | undefined;
     _setRevocationFetcherForTesting(async (url, init) => {
