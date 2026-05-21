@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-dialsim",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Lightweight multi-turn dialogue simulation benchmark for the Graphorin framework. Seeds alternating user/assistant turns, persists salient user facts to semantic memory, and scores recall with hybrid search. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

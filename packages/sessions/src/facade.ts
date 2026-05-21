@@ -621,7 +621,7 @@ class SessionImpl implements Session {
   async export(opts: SessionExportOptions): Promise<SessionExportFooterRecord> {
     const meta = await this.metadata();
     const writerOpts: SessionExportWriterOptions = {
-      writer: opts.writer ?? `@graphorin/sessions@0.1.0`,
+      writer: opts.writer ?? `@graphorin/sessions@0.2.0`,
       ...(opts.schemaUrl !== undefined ? { schemaUrl: opts.schemaUrl } : {}),
       ...(opts.hash !== undefined ? { hash: opts.hash } : {}),
     };
@@ -750,7 +750,7 @@ class SessionImpl implements Session {
     const recorderOpts: ToolCassetteRecorderOptions = {
       ...opts,
       sessionId: this.id,
-      writer: opts.writer ?? `@graphorin/sessions@0.1.0`,
+      writer: opts.writer ?? `@graphorin/sessions@0.2.0`,
     };
     return createToolCassetteRecorder(recorderOpts);
   }

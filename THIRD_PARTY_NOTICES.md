@@ -12,7 +12,7 @@ licenses (SPDX identifiers), and the role each plays inside Graphorin.
 Per-package `package.json` files are the authoritative source for the
 exact versions installed in any given build; this file is a
 human-readable rollup of the runtime, peer, and optional-peer
-dependency surface as of the v0.1.0 release.
+dependency surface as of the v0.2.0 release.
 
 ---
 
@@ -29,7 +29,7 @@ Anything outside this list requires an explicit PR-level review and a
 documented exception in `DEPENDENCY_EXCEPTIONS` inside
 [`scripts/check-licenses.mjs`](./scripts/check-licenses.mjs).
 
-### Documented exceptions (v0.1.0)
+### Documented exceptions (v0.2.0)
 
 - The `@img/sharp-libvips-*` family of platform-specific binaries is
   brought in transitively by
@@ -177,4 +177,4 @@ is security-sensitive.
 
 ---
 
-**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

@@ -14,7 +14,7 @@ const rule: Rule.RuleModule = {
     type: 'suggestion',
     docs: {
       description:
-        'Disallow `console.*` calls in code that is part of a Graphorin package public API surface. (Scaffold — no-op in v0.1.0.)',
+        'Disallow `console.*` calls in code that is part of a Graphorin package public API surface. (Scaffold — no-op in v0.2.0.)',
       recommended: false,
     },
     schema: [],

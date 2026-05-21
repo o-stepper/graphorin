@@ -9,7 +9,7 @@ import { createHash } from 'node:crypto';
 import type { EmbedderProvider, EmbedOptions } from '@graphorin/core/contracts';
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 /**
  * Default Ollama base URL. Operators that run Ollama on a non-default

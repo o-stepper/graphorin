@@ -165,4 +165,4 @@ Failures are categorised by severity and emit actionable remediation steps.
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

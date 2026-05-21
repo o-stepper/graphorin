@@ -129,8 +129,8 @@ See the [Security policy](/contributing/security). **Please do not** open a publ
 
 ## What's on the roadmap?
 
-The framework is currently on the `v0.1.0` pre-release line. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for milestones; the [Changelog](/reference/changelog) has the rolled-up history.
+The framework is currently on the `v0.2.0` pre-release line. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for milestones; the [Changelog](/reference/changelog) has the rolled-up history.
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

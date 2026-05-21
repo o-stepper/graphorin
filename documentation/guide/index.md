@@ -60,8 +60,8 @@ The documentation is written for the people who will integrate Graphorin into a 
 
 ## Status
 
-Graphorin is currently on the `v0.1.0` pre-release line. The framework follows lockstep versioning across all `@graphorin/*` packages while on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the `v0.2.0` pre-release line. The framework follows lockstep versioning across all `@graphorin/*` packages while on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

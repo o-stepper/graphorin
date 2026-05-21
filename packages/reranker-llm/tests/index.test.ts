@@ -4,7 +4,7 @@ import * as pkg from '../src/index.js';
 
 describe('@graphorin/reranker-llm public surface', () => {
   it('declares the canonical version constant', () => {
-    expect(pkg.VERSION).toBe('0.1.0');
+    expect(pkg.VERSION).toBe('0.2.0');
   });
 
   it('re-exports the reranker factory + class + id', () => {

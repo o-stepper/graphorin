@@ -142,4 +142,4 @@ Every `client.callTool(...)` lands one row in the audit log with the server URL,
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko

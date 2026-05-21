@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/local-stack-cli`. Exercises the
  * deterministic stub provider + stub embedder end-to-end (so CI never
@@ -22,8 +22,8 @@ import {
 import { STUB_ECHO_PREFIX } from '../src/stub-provider.js';
 
 describe('examples/local-stack-cli — smoke', () => {
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes VERSION = 0.2.0', () => {
+    expect(VERSION).toBe('0.2.0');
   });
 
   it('runChatTurn echoes the input deterministically through the stub stack', async () => {

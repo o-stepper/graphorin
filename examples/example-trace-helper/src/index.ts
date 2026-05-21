@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Shared helper for example apps: opt-in console span export driven by
  * `GRAPHORIN_TRACE`, without pulling tracing into the default CI path.
