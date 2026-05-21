@@ -82,6 +82,6 @@
     "@graphorin/server": "workspace:*",
     "@graphorin/store-sqlite": "workspace:*",
     "@types/ws": "^8.18.1",
-    "ws": "^8.20.0"
+    "ws": "^8.20.1"
   }
 }
