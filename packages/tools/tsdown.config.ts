@@ -12,6 +12,7 @@ export default defineConfig({
     'src/built-in/index.ts',
     'src/audit/index.ts',
     'src/errors/index.ts',
+    'src/code-mode/index.ts',
   ],
   format: ['esm'],
   platform: 'node',

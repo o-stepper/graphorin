@@ -30,7 +30,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.2.0';
+export const VERSION = '0.3.0';
 
 export {
   detectRegressions,
@@ -64,9 +64,15 @@ export {
 } from './reporters/index.js';
 export { runEvals } from './runner.js';
 export {
+  type ArgumentValidityOptions,
+  argumentValidity,
+  type CorrectToolSelectedOptions,
+  correctToolSelected,
   type ExactMatchOptions,
   exactMatch,
+  type FinalStateCorrectOptions,
   factualityScorer,
+  finalStateCorrect,
   helpfulnessScorer,
   type JsonPathOptions,
   jsonPath,
@@ -75,8 +81,14 @@ export {
   type PrebuiltScorerOptions,
   type PredicateOptions,
   predicate,
+  type RecoveryAfterErrorOptions,
+  type RedundantCallDetectionOptions,
   type RegexMatchOptions,
+  recoveryAfterError,
+  redundantCallDetection,
   regexMatch,
+  type Trajectory,
+  type TrajectoryToolCall,
   toxicityScorer,
 } from './scorers/index.js';
 export type {

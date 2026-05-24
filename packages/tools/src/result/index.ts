@@ -13,6 +13,15 @@ export {
   toResultEnvelope,
 } from './envelope.js';
 export {
+  createFileResultReader,
+  type FileResultReaderOptions,
+  type ResultReader,
+  type ResultReadOutcome,
+  type ResultReadRange,
+  SPILL_HANDLE_SCHEME,
+} from './reader.js';
+export { createDefaultSpillWriter } from './spill.js';
+export {
   countTokensHeuristic,
   type TokenCounter,
   type TruncationOutcome,

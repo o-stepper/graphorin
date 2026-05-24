@@ -98,6 +98,7 @@ export type {
   ContentChunk,
   InboundSanitizationPolicy,
   MemoryGuardTier,
+  ResultHandle,
   SandboxPolicy,
   SideEffectClass,
   ToolApproval,

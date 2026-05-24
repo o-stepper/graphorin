@@ -10,7 +10,7 @@
 '@graphorin/tools': minor
 ---
 
-Audit follow-up: safe quick-wins toward v0.2.0.
+Audit follow-up: safe quick-wins toward v0.3.0.
 
 **Architecture**
 

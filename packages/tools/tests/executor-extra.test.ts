@@ -471,23 +471,29 @@ describe('ToolExecutor — default spill writer (DoD)', () => {
       runContext: makeRunContext({ runId }),
       stepNumber: 1,
     });
-    if ('output' in completed[0]!.outcome) {
-      const body = String(completed[0]!.outcome.output);
-      const m = body.match(/artifactPath="([^"]+)"/);
-      expect(m).not.toBeNull();
-      if (m) {
-        const stat = await fs.stat(m[1]!);
-        expect(stat.isFile()).toBe(true);
-        // POSIX-only confidentiality check: Windows does not honour
-        // mode bits (Node returns ~0o666 by default), so the
-        // group/world-readable assertion is meaningless there. On
-        // win32 the on-disk confidentiality guarantee comes from
-        // NTFS ACLs + the os.tmpdir() location, not POSIX bits.
-        if (process.platform !== 'win32') {
-          expect(stat.mode & 0o777 & 0o077).toBe(0); // group + others have no permission
-        }
-        await fs.unlink(m[1]!).catch(() => {});
+    const outcome = completed[0]!.outcome;
+    if ('output' in outcome) {
+      // WI-10: the spill surfaces a structured, opaque handle on the result.
+      expect(outcome.resultHandle).toBeDefined();
+      expect(outcome.resultHandle?.kind).toBe('spill-file');
+      expect(outcome.resultHandle?.uri).toMatch(/^graphorin-spill:/);
+      // Reconstruct the on-disk path from the opaque handle to verify the
+      // un-truncated body was written under os.tmpdir() with mode 0o600.
+      const os = await import('node:os');
+      const path = await import('node:path');
+      const rel = outcome.resultHandle!.uri.slice('graphorin-spill:'.length);
+      const abs = path.join(os.tmpdir(), 'graphorin-spill', ...rel.split('/'));
+      const stat = await fs.stat(abs);
+      expect(stat.isFile()).toBe(true);
+      // POSIX-only confidentiality check: Windows does not honour
+      // mode bits (Node returns ~0o666 by default), so the
+      // group/world-readable assertion is meaningless there. On
+      // win32 the on-disk confidentiality guarantee comes from
+      // NTFS ACLs + the os.tmpdir() location, not POSIX bits.
+      if (process.platform !== 'win32') {
+        expect(stat.mode & 0o777 & 0o077).toBe(0); // group + others have no permission
       }
+      await fs.unlink(abs).catch(() => {});
     }
   });
 });

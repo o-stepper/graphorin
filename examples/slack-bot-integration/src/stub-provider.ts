@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` for the Slack-bot integration example.
  * The stub never opens a socket and never calls a real LLM. It looks at

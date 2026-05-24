@@ -1,6 +1,6 @@
 ---
 title: Security
-description: Sandbox tiers, server-token auth, audit log, OAuth 2.1, supply-chain pipeline, and the lateral-leak defense layer.
+description: Sandbox tiers, server-token auth, audit log, OAuth 2.1, supply-chain pipeline, the lateral-leak defense layer, and the provenance / data-flow policy.
 ---
 
 # Security
@@ -8,30 +8,35 @@ description: Sandbox tiers, server-token auth, audit log, OAuth 2.1, supply-chai
 Security is a first-class subsystem in Graphorin, not an afterthought. `@graphorin/security` ships:
 
 - **Secrets** — `SecretValue` wrapper, `SecretRef` URI scheme, OS keychain integration, optional encrypted-file store. See [Secrets](/guide/secrets) for the full sub-page.
-- **Sandbox tiers** — `'none'`, `'isolated-vm'`, `'docker'`.
+- **Sandbox tiers** — `'none'`, `'worker-threads'`, `'isolated-vm'`, `'docker'`.
 - **Server-token authentication** — HMAC-SHA256 with a deployment-wide pepper.
 - **Audit log** — SQLite database with mandatory encryption-at-rest and a SHA-256 hash chain.
 - **OAuth 2.1 with PKCE** — outbound flows for MCP servers and skill registries.
 - **Supply-chain helpers** — Ed25519 signature verification for distributed skills.
 - **Lateral-leak defense layer** — composes orthogonally with the agent runtime's safety primitives.
+- **Provenance / data-flow policy** — opt-in, taint-based enforcement at the tool boundary that defuses the lethal trifecta (`@graphorin/security/dataflow`).
 
 ## Sandbox tiers
 
 ```mermaid
 flowchart LR
     A[Tool / skill / MCP-derived call] --> Resolver[resolveSandbox]
-    Resolver -->|trusted in-process| None[none]
-    Resolver -->|untrusted JS| Vm[isolated-vm]
-    Resolver -->|untrusted binary| Docker[docker]
+    Resolver -->|fully trusted, in-process| None[none]
+    Resolver -->|default isolation| Wt[worker-threads]
+    Resolver -->|untrusted JS, opt-in| Vm[isolated-vm]
+    Resolver -->|untrusted binary, opt-in| Docker[docker]
 ```
 
-| Tier | Backed by | Default for |
-|---|---|---|
-| `'none'` | The Node.js process. | First-party tools. |
-| `'isolated-vm'` | [`isolated-vm`](https://github.com/laverdet/isolated-vm) (peer dependency, ISC). | Untrusted JavaScript skills. |
-| `'docker'` | [`dockerode`](https://github.com/apocas/dockerode) (peer dependency, Apache-2.0). | Untrusted binaries / full subprocess isolation. |
+| Tier (resolved kind) | `sandboxPolicy` | Backed by | Used for |
+|---|---|---|---|
+| `'none'` | `'none'` | The Node.js process. | Fully-trusted first-party tools. |
+| `'worker-threads'` | `'sandboxed'` | Node.js worker threads (built-in — no peer dependency). | **The default isolation tier** — MCP-derived tools and code-mode execution. |
+| `'isolated-vm'` | `'isolated'` | [`isolated-vm`](https://github.com/laverdet/isolated-vm) (peer dependency, ISC). | Untrusted JavaScript skills. |
+| `'docker'` | `'docker'` | [`dockerode`](https://github.com/apocas/dockerode) (peer dependency, Apache-2.0). | Untrusted binaries / full subprocess isolation. |
 
-`isolated-vm` and `dockerode` are **opt-in peer dependencies** — they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code.
+A tool declares its tier through `sandboxPolicy`; the executor maps that to a resolved kind (`'sandboxed' → 'worker-threads'`, `'isolated' → 'isolated-vm'`). As of the executor wiring this field is **enforced by the agent runtime on every call** — see [Tools](/guide/tools) and [Agent runtime](/guide/agent-runtime).
+
+`isolated-vm` and `dockerode` are **opt-in peer dependencies** — they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code; `'none'` and `'worker-threads'` need nothing extra.
 
 ## Sensitivity model
 
@@ -131,6 +136,42 @@ The agent runtime's defense layer composes orthogonally with the security primit
 | Commentary-phase trace sanitisation | At the session-output boundary, before any export. |
 | Inbound sanitisation preamble | When non-trusted content is in the message list, a locale-resolved preamble is appended **after** the cache breakpoint. |
 
+## Provenance / data-flow policy
+
+The lateral-leak guards above match **patterns**; the data-flow policy (`@graphorin/security/dataflow`, opt-in, toward [CaMeL](https://arxiv.org/abs/2503.18813)) enforces **provenance**. It reuses the metadata Graphorin already attaches to every tool — trust class + source + sensitivity — to defuse the **lethal trifecta**: untrusted content + access to private data + an exfiltration/mutation sink. With all three present in one run, a prompt injection hidden in the untrusted content can drive the sink; the policy makes that flow fail closed (or, in shadow mode, merely report) unless an operator has explicitly declassified it.
+
+```mermaid
+flowchart LR
+    Out[Tool output] -->|deriveTaintLabel| Ledger[per-run TaintLedger]
+    Sink[Sink call] --> Eval[DataFlowPolicy.evaluate]
+    Ledger --> Eval
+    Eval -->|no taint| Allow[allow]
+    Eval -->|shadow| Flag[flag + audit]
+    Eval -->|declassified| Declassify[declassify + audit]
+    Eval -->|enforce| Block[block]
+```
+
+The engine is pure — no I/O, no clock, no network: `deriveTaintLabel(...)` turns a tool's registration metadata into a `TaintLabel`, a per-run `createTaintLedger()` records every output's provenance, and `createDataFlowPolicy({ mode })` returns a verdict for each candidate **sink** (a `side-effecting` / `external-stateful` tool). Untrusted output is tagged from the trust class (`mcp-derived` / `web-search` / `skill-untrusted`); secret-tier output from `sensitivity: 'secret'` only (treating the default `'internal'` tier as sensitive would trip the gate on nearly every run).
+
+A sink trips the policy on either of two signals:
+
+| Signal | Fires when | Precision |
+|---|---|---|
+| `untrusted-to-sink` | a verbatim span of untrusted content appears in the sink's arguments | precise — direct exfiltration |
+| `lethal-trifecta` | the sink fires while **both** untrusted **and** secret-tier data have entered the run, even without a provable verbatim carry | conservative — disable with `guardTrifecta: false` |
+
+Three modes (`DataFlowMode`):
+
+| Mode | Behaviour |
+|---|---|
+| `'off'` | Disabled — every flow allowed. |
+| `'shadow'` | Audit-only: a tripped flow emits a `tool:dataflow:flagged` row + counter but never blocks. **Ship this first** to surface false positives against real traffic. |
+| `'enforce'` | A tripped flow **blocks** the sink (the call yields a `dataflow_policy_blocked` error, surfaced as `tool.execute.error`) unless the sink's name is in `declassifySinks` — the explicit, audited operator escape hatch (`tool:dataflow:declassified`). |
+
+Findings are **metadata-only** — they name the flow kind and the implicated source kinds, never the raw argument or output bytes. Taint is tracked in-memory per run (not persisted across suspend/resume), and verbatim detection is best-effort (it catches verbatim / near-verbatim forwarding, not paraphrase — which is what the trifecta signal covers). The policy **composes with code-mode**: each in-script tool call runs through the same sink gate, so an injection cannot exfiltrate through a sandbox either.
+
+Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` — see the [agent runtime guide](/guide/agent-runtime#provenance-data-flow-policy-dataflowpolicy) for the full configuration and event details.
+
 ## Threat model
 
 Graphorin's design assumes a STRIDE threat model across eight trust boundaries:
@@ -165,4 +206,4 @@ Failures are categorised by severity and emit actionable remediation steps.
 
 ---
 
-**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko

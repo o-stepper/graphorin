@@ -4,7 +4,7 @@ import * as pkg from '../src/index.js';
 
 describe('@graphorin/evals public surface', () => {
   it('declares the canonical version constant', () => {
-    expect(pkg.VERSION).toBe('0.2.0');
+    expect(pkg.VERSION).toBe('0.3.0');
   });
 
   it('re-exports the parallel runner', () => {

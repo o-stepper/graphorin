@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Model Context Protocol client for the Graphorin framework: stdio + Streamable HTTP + SSE transports, typed `MCPClient` (`listTools` / `listResources` / `listPrompts` / `callTool`), `toTools()` adapter (per-server inbound prompt-injection sanitization, deferred-loading auto-default at the 10-tool threshold, structured-content + outputSchema round-trip with backward-compatible TextContent mirror, per-server result envelope overrides, collision-strategy + per-server priority, per-server preferredModel and side-effect class overrides), pluggable EventStore for resumable streaming sessions (Mcp-Session-Id + Last-Event-ID handshake), OAuth integration backed by @graphorin/security/oauth, typed errors, and library helpers consumed by the upcoming graphorin auth CLI.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

@@ -141,6 +141,18 @@ importers:
         specifier: workspace:*
         version: link:../../packages/store-sqlite
 
+  benchmarks/tool-agent:
+    dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/evals':
+        specifier: workspace:*
+        version: link:../../packages/evals
+
   documentation:
     devDependencies:
       '@braintree/sanitize-url':

@@ -14,6 +14,7 @@
  * @packageDocumentation
  */
 
+import path from 'node:path';
 import type { TruncationStrategy } from '@graphorin/core';
 
 /**
@@ -59,6 +60,15 @@ export interface TruncationOutcome {
   readonly artifactPath?: string;
   /** Bytes written to the spill artifact (only set for `'spill-to-file'`). */
   readonly artifactBytes?: number;
+  /**
+   * Opaque, run-scoped handle URI for the spill artifact — e.g.
+   * `graphorin-spill:<runId>/<toolCallId>.<ext>` (only set for
+   * `'spill-to-file'`). This is the model-facing reference embedded in the
+   * truncation annotation; unlike {@link artifactPath} it carries no raw
+   * filesystem path. Resolve it with `createFileResultReader` / the
+   * built-in `read_result` tool.
+   */
+  readonly resultHandle?: string;
   /** Model name of the summarizer (only set for `'summarize'`). */
   readonly summarizerModel?: string;
 }
@@ -214,6 +224,13 @@ async function spillToFile(
     // Spill writer / context not wired — gracefully fall back to 'middle'.
     return truncateMiddle(body, maxTokens, originalTokens, counter);
   }
+  if (options.toolSensitivityTier === 'secret') {
+    // WI-10 (P1-4) sensitivity gate: never externalise a secret-tier body
+    // to the shared spill store. Truncate in place so the data stays in the
+    // trusted conversation context and is never written to disk or surfaced
+    // behind a (less-trusted) handle.
+    return truncateMiddle(body, maxTokens, originalTokens, counter);
+  }
   const extension = looksLikeJson(body) ? 'json' : 'txt';
   const spill = await options.spill.write({
     runId: options.runId,
@@ -224,10 +241,16 @@ async function spillToFile(
       ? { sensitivityTier: options.toolSensitivityTier }
       : {}),
   });
+  // Opaque, run-scoped handle URI relative to the writer's artifact root —
+  // this, not the raw absolute path, is what the model sees in the
+  // annotation (and what `read_result` resolves back). `artifactPath` is
+  // retained on the outcome for the operator-facing spill audit row.
+  const relative = path.relative(options.spill.artifactRoot, spill.path).split(path.sep).join('/');
+  const handle = `graphorin-spill:${relative}`;
   const annotation = renderAnnotation('spill-to-file', {
     originalTokens,
     keptTokens: maxTokens,
-    artifactPath: spill.path,
+    handle,
   });
   const annotationTokens = counter.count(annotation);
   const slotTokens = Math.max(0, maxTokens - annotationTokens);
@@ -243,6 +266,7 @@ async function spillToFile(
     strategyApplied: 'spill-to-file',
     artifactPath: spill.path,
     artifactBytes: spill.bytes,
+    resultHandle: handle,
   });
 }
 

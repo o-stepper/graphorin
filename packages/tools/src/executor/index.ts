@@ -6,6 +6,10 @@
 
 export {
   createToolExecutor,
+  type DataFlowGuard,
+  type DataFlowInspectInput,
+  type DataFlowRecordInput,
+  type DataFlowVerdict,
   type ExecuteBatchOptions,
   type ExecutorOptions,
   type ToolExecutor,

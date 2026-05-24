@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-locomo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "LoCoMo memory-quality benchmark runner for the Graphorin framework. Replays multi-turn conversations against a memory-backed agent, scores the answers via deterministic exact-match + an LLM-as-judge scorer, and emits per-conversation accuracy + cost summaries. Ships a small bundled synthetic seed dataset; the public LoCoMo set can be downloaded on demand. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

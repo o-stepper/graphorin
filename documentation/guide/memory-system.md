@@ -196,4 +196,4 @@ Every memory row carries a `Sensitivity` tag — `public`, `internal`, or `secre
 
 ---
 
-**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko

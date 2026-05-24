@@ -7,14 +7,14 @@
 > entirely in-process. Implements the `ReRanker` contract from
 > `@graphorin/memory/search`.
 >
-> Project Graphorin · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.2.0 (optional sub-pack)
+- **Published:** v0.3.0 (optional sub-pack)
 - **Default model:** locale-aware (`Xenova/bge-reranker-base` for
   English, `BAAI/bge-reranker-v2-m3` for everything else).
 - **Default precision:** FP16 (`'fp16'` dtype).
@@ -120,4 +120,4 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

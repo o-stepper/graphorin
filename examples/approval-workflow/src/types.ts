@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Public types for the `approval-workflow` example. Captures the
  * expense-approval state shape, the input contract accepted by

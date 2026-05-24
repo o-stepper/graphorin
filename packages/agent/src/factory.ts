@@ -38,11 +38,31 @@ import type {
   ToolCall,
   ToolChoice,
   ToolDefinition,
+  ToolDefinitionExample,
   ToolExecutionContext,
   Usage,
 } from '@graphorin/core';
 import { isStepCount, NOOP_LOGGER, NOOP_TRACER, zeroUsage } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
+import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
+import {
+  type CodeExecuteBridge,
+  createCodeExecuteTool,
+  createCodeSearchTool,
+  type ProjectableTool,
+  projectToolApi,
+} from '@graphorin/tools/code-mode';
+import {
+  createToolExecutor,
+  type ExecutorOptions,
+  type ToolExecutor,
+} from '@graphorin/tools/executor';
+import type { ToolRegistry } from '@graphorin/tools/registry';
+import {
+  createDefaultSpillWriter,
+  createFileResultReader,
+  type ResultReader,
+} from '@graphorin/tools/result';
 import {
   AgentRuntimeError,
   InvalidAgentConfigError,
@@ -68,6 +88,15 @@ import {
   type ProgressWriteOptions,
 } from './progress/index.js';
 import { addModelUsage, createInitialRunState } from './run-state/index.js';
+import {
+  buildMemoryGuard,
+  buildSecretResolver,
+  buildToolTokenCounter,
+  createExecutorEventBridge,
+  type ExecutorEventBridge,
+} from './tooling/adapters.js';
+import { buildDataFlowGuard } from './tooling/dataflow.js';
+import { buildToolRegistry } from './tooling/registry-build.js';
 import type {
   AbortOptions,
   Agent,
@@ -85,6 +114,169 @@ const sha256Hex = (input: string): string =>
   createHash('sha256').update(input, 'utf8').digest('hex');
 
 const HANDOFF_TOOL_PREFIX = 'transfer_to_';
+
+/** The built-in deferred-discovery tool's stable name (WI-05 / P0-3). */
+const TOOL_SEARCH_NAME = 'tool_search';
+
+/**
+ * Register the built-in `tool_search` into `registry` when — and only
+ * when — the registry holds at least one deferred tool
+ * (`defer_loading: true`). `tool_search` is itself eager (so it is
+ * always advertised while a deferred pool exists) and resolvable by the
+ * executor like any other tool, so a model can both *see* it in the
+ * per-step catalogue and *call* it.
+ *
+ * No-op when nothing defers (zero overhead — the tool never appears) or
+ * when a user tool already occupies the name (the user's tool wins; we
+ * never clobber it). Because deferral is decided at registration time
+ * (`normaliseTool`), the deferred set is fixed for the life of the
+ * registry — this runs once per registry, not per step.
+ */
+function registerToolSearch(registry: ToolRegistry): void {
+  if (registry.listDeferred().length === 0) return;
+  if (registry.get(TOOL_SEARCH_NAME) !== undefined) return;
+  registry.register(createToolSearchTool({ registry }), {
+    kind: 'built-in',
+    subsystem: 'tool-discovery',
+  });
+}
+
+/** The built-in result-handle reader tool's stable name (WI-10 / P1-4). */
+const READ_RESULT_NAME = 'read_result';
+
+/**
+ * Register the built-in `read_result` into `registry` when at least one
+ * registered tool opts into the `'spill-to-file'` truncation strategy
+ * (the sole producer of spill handles today) — or when `force` is set,
+ * which the agent passes when an operator wires external result readers
+ * (e.g. an MCP `resource_link` reader; WI-13). The tool is eager, so it
+ * is advertised alongside the producing tool and the model can fetch a
+ * handle back on demand instead of inlining the full blob. No-op when
+ * nothing produces handles (zero overhead) or when a user tool already
+ * occupies the name (the user's tool wins).
+ */
+function registerReadResult(
+  registry: ToolRegistry,
+  reader: ResultReader,
+  opts?: { readonly force?: boolean },
+): void {
+  if (
+    opts?.force !== true &&
+    !registry.list().some((entry) => entry.truncationStrategy === 'spill-to-file')
+  ) {
+    return;
+  }
+  if (registry.get(READ_RESULT_NAME) !== undefined) return;
+  registry.register(createReadResultTool({ reader }), {
+    kind: 'built-in',
+    subsystem: 'result-handle',
+  });
+}
+
+/**
+ * Compose result readers into one that tries each in order, returning
+ * the first that resolves the handle (WI-13). The spill-file reader is
+ * placed first so `graphorin-spill:` handles resolve locally; operator
+ * readers (e.g. an MCP resource reader) resolve the rest. Each reader
+ * rejects handles it does not own, so resolution falls through cleanly.
+ */
+function composeResultReaders(readers: ReadonlyArray<ResultReader>): ResultReader {
+  return {
+    async read(uri, range) {
+      let lastError: unknown;
+      for (const r of readers) {
+        try {
+          return await r.read(uri, range);
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError instanceof Error
+        ? lastError
+        : new Error(`No result reader resolved handle ${JSON.stringify(uri)}.`);
+    },
+  };
+}
+
+/** The code-mode meta-tools' stable names (WI-11 / P1-2). */
+const CODE_EXECUTE_NAME = 'code_execute';
+const CODE_SEARCH_NAME = 'code_search';
+
+/**
+ * Wire code-mode (P1-2) into `registry`: register the `code_search` /
+ * `code_execute` meta-tools and return them as the tools to advertise in
+ * place of the full catalogue. The model reaches every other tool through
+ * `code_execute`, whose in-script `tools.<name>(args)` calls route back
+ * through `quietExecutor.executeOne(...)` under the calling step's
+ * `runContext` — so per-tool ACL / sanitization / truncation still apply,
+ * exactly as in direct mode. `quietExecutor` carries no `streamingSink`,
+ * so the inner calls do not interleave `tool.execute.*` events into the
+ * outer stream.
+ *
+ * Excluded from the code API (`reservedNames`): the meta-tools, the
+ * discovery / handle built-ins, handoff tools (which stay first-class
+ * provider tools), and — supplied by the caller — any approval-gated
+ * tool, since code-mode has no durable-HITL path to suspend mid-script.
+ *
+ * Returns `[]` (registering nothing) when no real tool is exposable.
+ */
+function registerCodeMode(
+  registry: ToolRegistry,
+  quietExecutor: ToolExecutor,
+  reservedNames: ReadonlySet<string>,
+): ReadonlyArray<Tool<unknown, unknown, unknown>> {
+  if (registry.get(CODE_EXECUTE_NAME) !== undefined) return []; // already wired
+  const isApprovalGated = (t: { readonly needsApproval?: unknown }): boolean =>
+    t.needsApproval === true || typeof t.needsApproval === 'function';
+  const codeTools = registry
+    .list()
+    .filter((entry) => !reservedNames.has(entry.name) && !isApprovalGated(entry));
+  if (codeTools.length === 0) return [];
+
+  const allowedTools = codeTools.map((entry) => entry.name);
+  const allowedSet = new Set(allowedTools);
+  const eagerProjectable = codeTools.filter(
+    (entry) => entry.__effectiveDeferLoading !== true,
+  ) as unknown as ReadonlyArray<ProjectableTool>;
+  const projection = projectToolApi(eagerProjectable);
+
+  const executeTool: CodeExecuteBridge = async (call, ctx) => {
+    const completed = await quietExecutor.executeOne({
+      call: { toolCallId: newId('codecall'), toolName: call.name, args: call.args },
+      runContext: ctx.runContext,
+      stepNumber: ctx.runContext.stepNumber,
+    });
+    const { outcome } = completed;
+    if ('kind' in outcome) throw new Error(`${call.name}: ${outcome.message}`);
+    return outcome.output;
+  };
+
+  const codeSearch = createCodeSearchTool({
+    projection,
+    searchDeferred: async (query, k) =>
+      (await registry.searchDeferred(query, k)).filter((match) => allowedSet.has(match.name)),
+  });
+  const codeExecute = createCodeExecuteTool({ projection, allowedTools, executeTool });
+  registry.register(codeSearch, { kind: 'built-in', subsystem: 'code-mode' });
+  registry.register(codeExecute, { kind: 'built-in', subsystem: 'code-mode' });
+  return [codeSearch, codeExecute] as ReadonlyArray<Tool<unknown, unknown, unknown>>;
+}
+
+/**
+ * Fold a completed `tool_search` result into the per-run promotion set:
+ * every matched tool name becomes advertised (and thus callable) on the
+ * next step. Tolerant of unexpected shapes (e.g. a user-shadowed
+ * `tool_search`) — only string `name`s inside a `matches` array promote.
+ */
+function recordToolSearchPromotions(output: unknown, promoted: Set<string>): void {
+  if (typeof output !== 'object' || output === null) return;
+  const matches = (output as { readonly matches?: unknown }).matches;
+  if (!Array.isArray(matches)) return;
+  for (const match of matches) {
+    const name = (match as { readonly name?: unknown } | null)?.name;
+    if (typeof name === 'string') promoted.add(name);
+  }
+}
 
 /**
  * Internal mutable view of {@link RunState}. The public type marks
@@ -176,11 +368,36 @@ function toolToDefinition(tool: Tool): ToolDefinition {
   } else if (raw && typeof raw === 'object') {
     schema = raw as Readonly<Record<string, unknown>>;
   }
+  const examples = renderToolExamples(tool);
   return {
     name: tool.name,
     description: tool.description,
     inputSchema: schema,
+    ...(examples !== undefined ? { examples } : {}),
   };
+}
+
+/**
+ * Project a tool's worked `examples` onto the provider wire contract
+ * (WI-06 / P2-3). Examples are rendered only when the tool eagerly
+ * renders them: the registry resolves the `defer_loading` auto-rule into
+ * `examplesEagerlyRendered`, so a deferred tool resolves to `false` and is
+ * skipped (its examples stay out of context even once `tool_search`
+ * promotes it). `undefined` — the "runtime decides" case for a plain
+ * eager tool — renders, since the tool is already advertised this step.
+ *
+ * Bounded to ≤5 to honour the `ToolExample` `[1,5]` contract even when a
+ * tool slipped past the registry's overflow WARN (which does not truncate).
+ */
+function renderToolExamples(tool: Tool): ReadonlyArray<ToolDefinitionExample> | undefined {
+  const examples = tool.examples;
+  if (examples === undefined || examples.length === 0) return undefined;
+  if (tool.examplesEagerlyRendered === false) return undefined;
+  return examples.slice(0, 5).map((ex) => ({
+    input: ex.input,
+    output: ex.output,
+    ...(ex.comment !== undefined ? { comment: ex.comment } : {}),
+  }));
 }
 
 const PASSTHROUGH_SCHEMA = {
@@ -379,6 +596,28 @@ function stripReasoningFromMessages(messages: Message[]): { stripped: number } {
 }
 
 /**
+ * Count the leading contiguous run of `system` messages in the initial
+ * buffer — the trusted, KV-cache-stable instruction prefix. Captured
+ * once at run start (WI-09 / P1-1): auto-compaction summarises only the
+ * messages after this prefix, so the prefix stays byte-identical across
+ * every step (the provider's cache breakpoint is real) and a long run
+ * never re-pays for the system prompt.
+ *
+ * The length is fixed for the run rather than re-derived per compaction
+ * on purpose: each compaction inserts its summary as a `system` message
+ * right after the prefix, so re-scanning the leading run would absorb
+ * that summary into the prefix and shield it from the next compaction —
+ * summaries would stack unbounded. Pinning the original length keeps
+ * each prior summary inside the compactable body, where the next pass
+ * folds it into a fresh summary-of-summary.
+ */
+function countLeadingSystemMessages(messages: ReadonlyArray<Message>): number {
+  let i = 0;
+  while (i < messages.length && messages[i]?.role === 'system') i += 1;
+  return i;
+}
+
+/**
  * Build a fresh {@link Agent} from the supplied configuration.
  *
  * @stable
@@ -446,6 +685,140 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   const progressIO: ProgressIO = createProgressIO({
     ...(config.sensitivity !== undefined ? { defaultSensitivity: config.sensitivity } : {}),
   });
+
+  // Assemble the unified tool registry at warm-up (Principle #12): one
+  // registry across first-party + skill sources, with deterministic
+  // cross-source collision resolution. Exposed read-only as
+  // `agent.registry`; the run loop and `tool_search` consume it. The
+  // registry is the tool-validation authority, so a malformed tool
+  // fails fast here at construction.
+  const toolRegistry = buildToolRegistry({
+    ...(config.tools !== undefined
+      ? { tools: config.tools as ReadonlyArray<Tool<unknown, unknown, unknown>> }
+      : {}),
+    ...(config.skills !== undefined ? { skills: config.skills } : {}),
+  }).registry;
+
+  // WI-05 (deferred loading + tool_search / P0-3): if any registered
+  // tool sets `defer_loading: true`, register the built-in `tool_search`
+  // so the model can discover those tools on demand. Tools that defer are
+  // withheld from the per-step catalogue (see the loop below) until a
+  // `tool_search` match promotes them, keeping large tool sets out of the
+  // context window. When nothing defers this is a no-op.
+  registerToolSearch(toolRegistry);
+
+  // WI-10 (result references / handles / P1-4): construct one spill
+  // writer + reader pair at warm-up. The writer is handed to the executor
+  // so a tool's `'spill-to-file'` truncation strategy externalises large
+  // bodies to disk (0600, run-scoped); the reader — over the *same*
+  // artifact root — backs the built-in `read_result` tool so the model can
+  // page through a spilled artifact on demand instead of inlining the
+  // whole blob. `read_result` is registered only when some tool spills.
+  const spillWriter = createDefaultSpillWriter();
+  const fileResultReader = createFileResultReader({ artifactRoot: spillWriter.artifactRoot });
+  // WI-13 (P2-2): compose any operator-supplied result readers (e.g. an
+  // MCP resource reader from `createMcpResourceReader`, for resolving
+  // `resource_link` handles) after the spill-file reader. `read_result`
+  // then pages both `graphorin-spill:` artifacts and external handles,
+  // and is force-registered when external readers exist (even if no tool
+  // spills) so those handles are resolvable.
+  const externalResultReaders = config.resultReaders ?? [];
+  const resultReader: ResultReader =
+    externalResultReaders.length === 0
+      ? fileResultReader
+      : composeResultReaders([fileResultReader, ...externalResultReaders]);
+  registerReadResult(toolRegistry, resultReader, { force: externalResultReaders.length > 0 });
+
+  // Construct the unified ToolExecutor once at warm-up (WI-03 / P0-1),
+  // bound to the registry above. Routing tool execution through the
+  // executor activates the documented tool fields the inline loop
+  // bypassed: per-tool `secretsAllowed` ACL, result truncation
+  // (`maxResultTokens` / `truncationStrategy`), inbound sanitization,
+  // memory-guard, idempotency keys and single-round repair.
+  //
+  // Durable HITL stays in the agent: approval is pre-screened below and
+  // suspends the run, so the executor's `ApprovalGate` only ever sees
+  // no-approval / pre-approved calls — it auto-grants and never blocks
+  // the generator (Adapter G).
+  //
+  // Sandbox note: `config.tools` are inline `tool({...})` closures that
+  // cannot be serialised to an out-of-process sandbox, and
+  // `resolveSandbox` defaults user-defined tools to `worker-threads`.
+  // Wiring a resolver that returned a real sandbox for that kind would
+  // break every inline tool, so `sandboxResolver` is intentionally left
+  // unset (the executor then runs inline — its documented fallback).
+  // The resolved policy is still surfaced on the tool-execute span /
+  // audit; real isolation applies to module-loadable (skill / MCP)
+  // tools and is wired when those land.
+  let activeExecutorBridge: ExecutorEventBridge | undefined;
+  const toolApprovalGate: NonNullable<ExecutorOptions['approvalGate']> = {
+    request: async () => ({ granted: true }),
+  };
+  const toolSecretResolver = buildSecretResolver();
+  const toolTokenCounter = buildToolTokenCounter();
+  const { memoryGuardFactory: toolMemoryGuardFactory } = buildMemoryGuard(memory);
+  // Provenance / data-flow guard (WI-12 / P1-3, opt-in). Built once and
+  // shared by every executor (direct + code-mode quiet), so the sink gate
+  // and taint recording apply uniformly. Off unless configured with a
+  // non-`'off'` mode — zero overhead on the default path.
+  const toolDataFlowGuard =
+    config.dataFlowPolicy !== undefined && config.dataFlowPolicy.mode !== 'off'
+      ? buildDataFlowGuard(config.dataFlowPolicy)
+      : undefined;
+  const toolStreamingSink: NonNullable<ExecutorOptions['streamingSink']> = (event) =>
+    activeExecutorBridge?.sink(event);
+  // `quiet` builds an executor without the streaming sink — used for
+  // code-mode's in-script tool calls (WI-11), whose `tool.execute.*`
+  // events must not interleave into the outer agent stream.
+  const makeToolExecutor = (
+    registry: ToolRegistry,
+    opts?: { readonly quiet?: boolean },
+  ): ToolExecutor =>
+    createToolExecutor({
+      registry,
+      approvalGate: toolApprovalGate,
+      secretResolver: toolSecretResolver,
+      tokenCounter: toolTokenCounter,
+      memoryGuardFactory: toolMemoryGuardFactory,
+      spill: spillWriter,
+      ...(toolDataFlowGuard !== undefined ? { dataFlowGuard: toolDataFlowGuard } : {}),
+      ...(opts?.quiet === true ? {} : { streamingSink: toolStreamingSink }),
+      ...(config.maxParallelTools !== undefined
+        ? { maxParallelTools: config.maxParallelTools }
+        : {}),
+    });
+  const toolExecutor = makeToolExecutor(toolRegistry);
+
+  // Code-mode (WI-11 / P1-2, opt-in): advertise only the `code_search` /
+  // `code_execute` meta-tools and let the model orchestrate tools inside a
+  // sandbox, so intermediate results stay out of context. A quiet executor
+  // backs the in-script tool bridge (same per-tool governance as direct
+  // mode). `read_result` is registered after the meta-tools because
+  // `code_execute` opts into `'spill-to-file'`, so a large final result can
+  // be fetched back on demand. Default `'direct'` mode leaves all of this
+  // untouched — `codeModeAdvertised` stays empty and the loop is unchanged.
+  const isCodeMode = config.toolInvocation === 'code-mode';
+  let codeModeAdvertised: ReadonlyArray<Tool<unknown, unknown, TDeps>> = [];
+  if (isCodeMode) {
+    const reserved = new Set<string>([
+      CODE_EXECUTE_NAME,
+      CODE_SEARCH_NAME,
+      TOOL_SEARCH_NAME,
+      READ_RESULT_NAME,
+      ...handoffMap.keys(),
+    ]);
+    const metas = registerCodeMode(
+      toolRegistry,
+      makeToolExecutor(toolRegistry, { quiet: true }),
+      reserved,
+    );
+    registerReadResult(toolRegistry, resultReader);
+    const readResult = toolRegistry.get(READ_RESULT_NAME);
+    codeModeAdvertised = [
+      ...metas,
+      ...(readResult !== undefined ? [readResult] : []),
+    ] as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+  }
 
   const causalityMonitor = config.causalityMonitor
     ? new CausalityMonitor(config.causalityMonitor)
@@ -562,6 +935,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       }
     }
 
+    // WI-09: pin the trusted system-prompt prefix length now, on the
+    // fully-assembled initial buffer, so auto-compaction never rewrites
+    // it and prior summaries stay re-compactable (see
+    // `countLeadingSystemMessages`).
+    const systemPrefixLength = countLeadingSystemMessages(messages);
+
     const runContextBase: RunContext<TDeps> = {
       runId: state.id,
       sessionId,
@@ -579,6 +958,199 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     const finalSnapshot: InternalRunSnapshot<TOutput> = {
       output: '' as unknown as TOutput,
     };
+
+    // WI-05: deferred tools promoted by a `tool_search` call this run.
+    // Membership grows as the model discovers tools and gates which
+    // deferred entries the per-step catalogue advertises. In-memory per
+    // run — not persisted across a suspend/resume (see changeset).
+    const promotedDeferred = new Set<string>();
+
+    /**
+     * Dispatch a batch of (non-handoff) tool calls through the
+     * {@link ToolExecutor} and surface the results as `AgentEvent`s.
+     *
+     * The agent owns the `tool.execute.start` / `.end` / `.error`
+     * lifecycle (derived deterministically from the returned
+     * {@link CompletedToolCall} outcomes) so every outcome kind —
+     * success, unknown-tool, invalid-input, sanitization-blocked,
+     * execution error — yields a consistent event and tool message,
+     * preserving the pre-WI-03 stream shape (R10). The executor's
+     * genuinely-live streaming events (`tool.execute.progress` /
+     * `.partial`, emitted only by streaming-hint tools) are bridged
+     * through Adapter E while the batch runs and are purely additive.
+     *
+     * Parallelism (WI-04): the executor runs independent calls in this
+     * batch concurrently, bounded by `maxParallelTools`. `tool.execute.start`
+     * is emitted up-front in call order and `.end` / `.error` after the
+     * batch settles, also in call order — so result mapping and tool-message
+     * history are deterministic regardless of which call finishes first,
+     * while `.progress` / `.partial` events for concurrent calls interleave
+     * (keyed by `toolCallId`). Tools declaring `executionMode: 'sequential'`
+     * are serialised by the executor and never overlap.
+     */
+    async function* dispatchBatch(
+      calls: ReadonlyArray<ToolCall>,
+      executor: ToolExecutor,
+      runContext: RunContext<TDeps>,
+      stepNum: number,
+    ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
+      if (calls.length === 0) return;
+      for (const call of calls) {
+        yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+      }
+
+      const bridge = createExecutorEventBridge();
+      activeExecutorBridge = bridge;
+      const resultsPromise = executor.executeBatch({ calls, runContext, stepNumber: stepNum });
+      // Close the bridge once the batch settles so `drain()` ends; the
+      // executor catches per-call errors, so the batch never rejects.
+      const closeOnSettle = resultsPromise.then(
+        () => bridge.close(),
+        () => bridge.close(),
+      );
+      for await (const event of bridge.drain()) {
+        if (event.type === 'tool.execute.progress' || event.type === 'tool.execute.partial') {
+          yield event as AgentEvent<TOutput>;
+        }
+      }
+      await closeOnSettle;
+      activeExecutorBridge = undefined;
+
+      const completed = await resultsPromise;
+      const byCallId = new Map(completed.map((c) => [c.outcome.toolCallId, c]));
+      const stepEntry = state.steps[state.steps.length - 1];
+      for (const call of calls) {
+        const result = byCallId.get(call.toolCallId);
+        if (result === undefined) continue;
+        if (stepEntry !== undefined) {
+          (stepEntry.toolCalls as CompletedToolCall[]).push(result);
+        }
+        const outcome = result.outcome;
+        if ('kind' in outcome) {
+          yield { type: 'tool.execute.error', toolCallId: call.toolCallId, error: outcome };
+          const text = `Error: ${outcome.message}`;
+          messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+          state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+          causalityMonitor?.recordCall(`tool.error:${call.toolName}`);
+        } else {
+          const output = outcome.output;
+          yield {
+            type: 'tool.execute.end',
+            toolCallId: call.toolCallId,
+            result: output,
+            durationMs: outcome.durationMs,
+          };
+          // WI-10 (P1-4): when the result spilled to a handle, inline only
+          // the bounded preview plus a retrieval hint so the full blob never
+          // enters the context window — the model fetches the rest on demand
+          // via `read_result`. Inlined results serialise exactly as before
+          // (preserves the happy-path message contract, R10).
+          const handle = outcome.resultHandle;
+          const text =
+            handle !== undefined
+              ? `${handle.preview}\n\n[Full result${
+                  handle.bytes !== undefined ? ` (${handle.bytes} bytes)` : ''
+                } stored behind a handle. Call read_result with handle ${JSON.stringify(
+                  handle.uri,
+                )} to retrieve it — optionally narrow with offset/length (bytes) or startLine/endLine.]`
+              : typeof output === 'string'
+                ? output
+                : JSON.stringify(output);
+          messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+          state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+          causalityMonitor?.recordCall(`tool:${call.toolName}`);
+          // WI-05: a successful `tool_search` promotes its matches so the
+          // catalogue advertises them on the next step.
+          if (call.toolName === TOOL_SEARCH_NAME) {
+            recordToolSearchPromotions(output, promotedDeferred);
+          }
+        }
+      }
+    }
+
+    /**
+     * Auto-compaction trigger (WI-09 / P1-1). Before assembling each
+     * provider request, ask the memory {@link ContextEngine} whether the
+     * in-flight buffer has crossed its per-provider threshold
+     * (`shouldCompact`); when it has, summarise the older turns
+     * (`compactNow`, `source: 'auto-trigger'`), splice the result back in
+     * — preserving the byte-stable system prefix and the most-recent
+     * turns verbatim — and emit `context.compacted`. The compaction is
+     * configured on the memory facade (`createMemory({ contextEngine })`,
+     * RB-46); there is no parallel agent-level knob.
+     *
+     * No-op when no memory is wired, when compaction is disabled or below
+     * threshold (the engine returns `false`), or for `secret`-tier runs
+     * (secret history is never shipped to the summarizer — a less-trusted
+     * external sink; per-result handle references land in WI-10). Best
+     * effort: a misconfigured engine (e.g. no summarizer) is swallowed and
+     * the run proceeds uncompacted rather than aborting mid-flight.
+     */
+    async function* maybeAutoCompact(): AsyncGenerator<AgentEvent<TOutput>, void, void> {
+      const mem = memory;
+      if (mem === undefined) return;
+      // Sensitivity gate (WI-09 step 2): drop, never re-route, secret-tier
+      // content. Auto-compaction is an LLM summarizer call, so a secret
+      // run is left un-compacted here.
+      if (config.sensitivity === 'secret') return;
+      const engine = mem.contextEngine;
+      const triggered = await engine.shouldCompact(messages).catch(() => false);
+      if (!triggered) return;
+
+      const prefix = messages.slice(0, systemPrefixLength);
+      const body = messages.slice(systemPrefixLength);
+      const startedAt = Date.now();
+      const envelope = await engine
+        .compactNow({
+          scope: { userId: state.userId ?? agentId, sessionId, agentId },
+          runId: state.id,
+          sessionId,
+          agentId,
+          source: 'auto-trigger',
+          messages: body,
+          memory: mem,
+        })
+        // No summarizer configured (or the strategy threw) — proceed with
+        // the un-compacted buffer rather than failing a live run.
+        .catch(() => undefined);
+      if (envelope === undefined) return;
+      const { result, extraContent } = envelope;
+      // Nothing was old enough to trim (body ≤ preserve-recent) — skip the
+      // splice + event so `context.compacted` only fires on real work.
+      if (result.droppedMessageIndices.length === 0) return;
+
+      // Rebuild: stable system prefix + [summary, ...recent turns]. The
+      // post-compaction hooks already fired inside `compactNow`; re-inject
+      // their text Context Essentials as a trailing system message so they
+      // survive the trim (RB-46 re-anchoring).
+      const rebuilt: Message[] = [...prefix, ...result.trimmedMessages];
+      const essentials = extraContent
+        .map((part) =>
+          typeof part === 'object' && part !== null && 'text' in part
+            ? String((part as { readonly text: unknown }).text)
+            : '',
+        )
+        .filter((text) => text.length > 0)
+        .join('\n\n');
+      if (essentials.length > 0) {
+        rebuilt.push({ role: 'system', content: essentials });
+      }
+      messages.splice(0, messages.length, ...rebuilt);
+      state.messages.splice(0, state.messages.length, ...rebuilt);
+
+      yield {
+        type: 'context.compacted',
+        runId: state.id,
+        sessionId,
+        agentId,
+        beforeTokens: result.beforeTokens,
+        afterTokens: result.afterTokens,
+        summaryTokens: result.summaryTokens,
+        durationMs: Date.now() - startedAt,
+        source: 'auto-trigger',
+        hooksFiredCount: result.hooksFiredCount,
+      };
+    }
 
     const handoffNames = Array.from(handoffMap.keys());
     let stepNumber = 0;
@@ -635,22 +1207,66 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
         yield { type: 'step.start', stepNumber };
 
+        // WI-09 (P1-1): bound context growth before the provider call.
+        // Fires `context.compacted` and rewrites the buffer in place only
+        // when the memory ContextEngine's trigger crosses threshold; a
+        // no-memory / below-threshold / secret-tier step is a no-op, so
+        // the happy-path event stream is unchanged (R10).
+        yield* maybeAutoCompact();
+
         const stepCtx: RunContext<TDeps> = { ...runContextBase, stepNumber, messages };
         const overrides = config.prepareStep ? await config.prepareStep(stepCtx) : {};
 
-        // Build the per-step tool catalogue.
+        // Resolve the registry + executor for this step. The warm-up
+        // pair is bound to config.tools + skills; a `prepareStep` tool
+        // override builds a step-scoped pair so the advertised catalogue
+        // and the executor agree on the same tool set (incl. deferred
+        // discovery for the overridden set). Code-mode does not honour a
+        // per-step `tools` override (the meta-tools + bridge are bound to
+        // the warm-up registry), so it always uses the warm-up pair.
+        const useOverrideRegistry = overrides.tools !== undefined && !isCodeMode;
+        const stepRegistry: ToolRegistry = useOverrideRegistry
+          ? buildToolRegistry({
+              tools: overrides.tools as ReadonlyArray<Tool<unknown, unknown, unknown>>,
+            }).registry
+          : toolRegistry;
+        if (useOverrideRegistry) {
+          registerToolSearch(stepRegistry);
+          registerReadResult(stepRegistry, resultReader);
+        }
+        const stepExecutor: ToolExecutor = useOverrideRegistry
+          ? makeToolExecutor(stepRegistry)
+          : toolExecutor;
+
+        // Build the per-step tool catalogue. Handoff tools are synthetic
+        // per-step entries and are always advertised.
         const handoffTools: Tool<unknown, unknown, TDeps>[] = handoffNames.map((n) => {
           const h = handoffMap.get(n);
           if (h === undefined) throw new ToolNotFoundError(n);
           return buildHandoffTool<TDeps>(h.agent);
         });
-        const baseTools = (overrides.tools ?? config.tools ?? []) as ReadonlyArray<
-          Tool<unknown, unknown, TDeps>
-        >;
-        const stepTools: ReadonlyArray<Tool<unknown, unknown, TDeps>> = [
-          ...baseTools,
-          ...handoffTools,
-        ];
+        // Code-mode (WI-11): advertise only the `code_search` /
+        // `code_execute` (+ `read_result`) meta-tools — the model reaches
+        // every real tool through `code_execute`, so the real tools stay
+        // registered (executable via the in-script bridge) but out of the
+        // model's catalogue. Otherwise (WI-05): advertise the eager tools
+        // (`tool_search` is itself eager iff a deferred tool exists) plus
+        // any deferred tools already promoted by a `tool_search` this run —
+        // never the rest of the deferred pool.
+        let stepTools: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+        if (isCodeMode) {
+          stepTools = [...codeModeAdvertised, ...handoffTools];
+        } else {
+          const eagerTools = stepRegistry.listEager() as ReadonlyArray<
+            Tool<unknown, unknown, TDeps>
+          >;
+          const promotedTools = (
+            promotedDeferred.size === 0
+              ? []
+              : stepRegistry.listDeferred().filter((entry) => promotedDeferred.has(entry.name))
+          ) as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+          stepTools = [...eagerTools, ...promotedTools, ...handoffTools];
+        }
 
         const toolPreferences = stepTools.map((t) => {
           const tt = t as Tool<unknown, unknown, TDeps> & { readonly preferredModel?: unknown };
@@ -925,10 +1541,26 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         }
 
         if (finalCalls.length > 0) {
+          // `stepRegistry` / `stepExecutor` were resolved with the
+          // catalogue above (so the advertised tools and the executor's
+          // resolvable tools agree, including any `prepareStep` override).
+          const execRunContext: RunContext<TDeps> = { ...runContextBase, stepNumber, messages };
+
+          // Walk calls in finalCalls order. Handoffs are special-cased
+          // inline (≤1 per step) and never routed through the executor.
+          // Non-handoff calls accumulate into a batch dispatched through
+          // the ToolExecutor; the batch is flushed before a handoff and
+          // before a durable-HITL suspend so execution order is kept.
+          let batch: ToolCall[] = [];
+
           for (const call of finalCalls) {
-            yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
             const handoff = handoffMap.get(call.toolName);
             if (handoff !== undefined) {
+              if (batch.length > 0) {
+                yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
+                batch = [];
+              }
+              yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
               const filter = (handoff.filter ??
                 filterLib.defaultHandoffFilter()) as DescribedFilter;
               const filtered = filter(messages);
@@ -981,34 +1613,23 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               continue;
             }
 
-            const tool = stepTools.find((t) => t.name === call.toolName);
-            if (tool === undefined) {
-              const err = new ToolNotFoundError(call.toolName);
-              yield {
-                type: 'tool.execute.error',
-                toolCallId: call.toolCallId,
-                error: {
-                  toolCallId: call.toolCallId,
-                  toolName: call.toolName,
-                  kind: 'unknown_tool',
-                  message: err.message,
-                },
-              };
-              messages.push({
-                role: 'tool',
-                toolCallId: call.toolCallId,
-                content: `Error: ${err.message}`,
-              });
-              state.messages.push({
-                role: 'tool',
-                toolCallId: call.toolCallId,
-                content: `Error: ${err.message}`,
-              });
-              continue;
-            }
-
-            const tex = await invokeNeedsApproval(tool, call.args, runContextBase, signal);
-            if (tex.needsApproval) {
+            // Approval pre-screen (Adapter G / durable HITL). Evaluate the
+            // registry-resolved `needsApproval`; an unapproved gated call
+            // suspends the run exactly as before — after flushing any
+            // queued batch so prior calls' side-effects complete first.
+            const resolvedTool = stepRegistry.get(call.toolName);
+            const needsApproval = await invokeNeedsApproval(
+              resolvedTool,
+              call.args,
+              execRunContext,
+              signal,
+            );
+            if (needsApproval) {
+              if (batch.length > 0) {
+                yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
+                batch = [];
+              }
+              yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
               const approval: ToolApproval = {
                 toolCallId: call.toolCallId,
                 toolName: call.toolName,
@@ -1040,73 +1661,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               return finalize(state, finalSnapshot);
             }
 
-            const start = Date.now();
-            try {
-              const ctx: ToolExecutionContext<TDeps> = {
-                toolCallId: call.toolCallId,
-                runContext: { ...runContextBase, stepNumber, messages },
-                signal,
-                tracer,
-                logger: NOOP_LOGGER,
-                secrets: makeNoopSecretsAccessor(),
-                reportProgress: () => {},
-                streamContent: () => {},
-              };
-              const rawResult = await tool.execute(call.args as never, ctx);
-              const duration = Date.now() - start;
-              const result = rawResult ?? null;
-              const completed: CompletedToolCall = {
-                call,
-                outcome: {
-                  toolCallId: call.toolCallId,
-                  toolName: call.toolName,
-                  output: result,
-                  durationMs: duration,
-                },
-                stepNumber,
-              };
-              const stepEntry = state.steps[state.steps.length - 1];
-              if (stepEntry !== undefined) {
-                (stepEntry.toolCalls as CompletedToolCall[]).push(completed);
-              }
-              yield {
-                type: 'tool.execute.end',
-                toolCallId: call.toolCallId,
-                result,
-                durationMs: duration,
-              };
-              const resultText = typeof result === 'string' ? result : JSON.stringify(result);
-              messages.push({ role: 'tool', toolCallId: call.toolCallId, content: resultText });
-              state.messages.push({
-                role: 'tool',
-                toolCallId: call.toolCallId,
-                content: resultText,
-              });
-              causalityMonitor?.recordCall(`tool:${call.toolName}`);
-            } catch (cause) {
-              const message = cause instanceof Error ? cause.message : String(cause);
-              yield {
-                type: 'tool.execute.error',
-                toolCallId: call.toolCallId,
-                error: {
-                  toolCallId: call.toolCallId,
-                  toolName: call.toolName,
-                  kind: 'execution_failed',
-                  message,
-                },
-              };
-              messages.push({
-                role: 'tool',
-                toolCallId: call.toolCallId,
-                content: `Error: ${message}`,
-              });
-              state.messages.push({
-                role: 'tool',
-                toolCallId: call.toolCallId,
-                content: `Error: ${message}`,
-              });
-              causalityMonitor?.recordCall(`tool.error:${call.toolName}`);
-            }
+            batch.push(call);
+          }
+
+          if (batch.length > 0) {
+            yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
           }
         }
 
@@ -1398,48 +1957,53 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     compact,
     fanOut,
     progress,
+    registry: toolRegistry,
   };
 
   return agent;
 }
 
-interface ApprovalProbe {
-  readonly needsApproval: boolean;
-}
-
-async function invokeNeedsApproval<TDeps>(
-  tool: Tool<unknown, unknown, TDeps>,
+/**
+ * Pre-execution approval screen (Adapter G / durable HITL). Evaluates a
+ * (registry-resolved) tool's `needsApproval` against the realized args.
+ * Returns `true` when the run must suspend before the tool executes.
+ *
+ * Actual execution flows through the `@graphorin/tools` executor, whose
+ * `ApprovalGate` auto-grants because only no-approval / pre-approved
+ * calls ever reach it; this probe is what keeps the suspend in the
+ * agent so the durable-HITL contract (persist `RunState`, resume via
+ * directive) is preserved.
+ */
+async function invokeNeedsApproval(
+  tool: Pick<Tool, 'needsApproval'> | undefined,
   args: unknown,
-  baseCtx: RunContext<TDeps>,
+  baseCtx: RunContext,
   signal: AbortSignal,
-): Promise<ApprovalProbe> {
-  if (tool.needsApproval === undefined || tool.needsApproval === false) {
-    return { needsApproval: false };
-  }
-  if (tool.needsApproval === true) return { needsApproval: true };
-  const probeCtx: ToolExecutionContext<TDeps> = {
+): Promise<boolean> {
+  const predicate = tool?.needsApproval;
+  if (predicate === undefined || predicate === false) return false;
+  if (predicate === true) return true;
+  const probeCtx: ToolExecutionContext = {
     toolCallId: 'probe',
     runContext: baseCtx,
     signal,
     tracer: baseCtx.tracer,
     logger: NOOP_LOGGER,
-    secrets: makeNoopSecretsAccessor(),
+    secrets: probeSecretsAccessor(),
     reportProgress: () => {},
     streamContent: () => {},
   };
-  const decision = await tool.needsApproval(args as never, probeCtx);
-  return { needsApproval: Boolean(decision) };
+  return Boolean(await predicate(args as never, probeCtx));
 }
 
-function makeNoopSecretsAccessor(): ToolExecutionContext['secrets'] {
-  function rejector(_key: string, options?: { readonly optional?: boolean }): Promise<never> {
-    void options;
-    return Promise.reject(
-      new Error(
-        'secrets.require: minimal-loop mode does not wire a secrets resolver. ' +
-          'Use the @graphorin/tools executor for full ACL support.',
-      ),
-    );
-  }
+/**
+ * Rejecting secrets accessor used only by the {@link invokeNeedsApproval}
+ * probe. Real tool execution resolves secrets through the executor's
+ * ACL-scoped accessor; an approval predicate has no legitimate need to
+ * read secret material, so every `require(...)` rejects.
+ */
+function probeSecretsAccessor(): ToolExecutionContext['secrets'] {
+  const rejector = (_key: string, _options?: { readonly optional?: boolean }): Promise<never> =>
+    Promise.reject(new Error('secrets.require is unavailable inside a needsApproval predicate'));
   return { require: rejector } as unknown as ToolExecutionContext['secrets'];
 }

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-locomo-multilingual",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Per-locale LoCoMo subset hooks for the Graphorin framework. Empty subset directories with documented contribution flow for community-contributed translations validated against multilingual-e5-base + FTS5 unicode61 + the RRF reranker. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

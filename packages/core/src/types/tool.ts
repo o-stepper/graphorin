@@ -169,6 +169,43 @@ export interface ToolResult<TOutput = unknown> {
    */
   readonly contentParts?: readonly import('./message.js').MessageContent[];
   readonly durationMs: number;
+  /**
+   * Set when the tool's output was large enough to be stored behind a
+   * handle (the `'spill-to-file'` truncation strategy, or — later — an MCP
+   * `resource_link`) instead of being inlined in full. The runtime inlines
+   * only the bounded {@link ResultHandle.preview} and lets the model fetch
+   * the rest on demand via the built-in `read_result` tool. Absent for
+   * results that were inlined directly.
+   */
+  readonly resultHandle?: ResultHandle;
+}
+
+/**
+ * An opaque, run-scoped reference to a large tool result that was stored
+ * out of the conversation buffer rather than inlined in full. The agent
+ * inlines {@link preview} (plus a retrieval hint) and registers the
+ * built-in `read_result` tool so the model can page through the full
+ * artifact behind {@link uri} on demand — keeping large results out of the
+ * context window (P1-4).
+ *
+ * @stable
+ */
+export interface ResultHandle {
+  /**
+   * Opaque, run-scoped URI — e.g. `graphorin-spill:<runId>/<toolCallId>.json`
+   * for a spill artifact. Never a raw filesystem path: the reader resolves
+   * it within the configured artifact root, so the model cannot use it to
+   * read arbitrary files.
+   */
+  readonly uri: string;
+  /** Backing store kind. `'spill-file'` today; `'resource-link'` is reserved for MCP (WI-13). */
+  readonly kind: 'spill-file' | 'resource-link';
+  /** A bounded preview of the full body (already inlined alongside the handle). */
+  readonly preview: string;
+  /** Total byte size of the full stored artifact, when known. */
+  readonly bytes?: number;
+  /** MIME type of the stored artifact, when known. */
+  readonly mediaType?: string;
 }
 
 /**
@@ -187,6 +224,7 @@ export type ToolErrorKind =
   | 'unknown_tool'
   | 'aborted'
   | 'inbound_sanitization_blocked'
+  | 'dataflow_policy_blocked'
   | 'rate_limited';
 
 /**

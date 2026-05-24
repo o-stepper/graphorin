@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/cli",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Operator CLI for the Graphorin framework. Phase 14a ships the minimal `graphorin` binary with three commands: `graphorin start` (boot the standalone server with lifecycle hooks + pre-bind validation + storage migrations + audit log), `graphorin init` (interactive prompts for cloud-upload consent, opt-in storage encryption, and one-shot bootstrap-token issuance; --non-interactive accepts every option as flags or env vars), and `graphorin migrate` (idempotent storage migrations against the configured SQLite store). Phase 15 extends the same binary with `doctor`, `token`, `secrets`, `storage`, `audit`, `memory`, `consolidator`, `triggers`, `auth`, `pricing`, `skills`, `traces`, `migrate-export`, `guard`, and `telemetry`. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

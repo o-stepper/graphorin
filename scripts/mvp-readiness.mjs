@@ -2,7 +2,7 @@
 /**
  * mvp-readiness.mjs
  *
- * Single entry point that runs the v0.2.0 release-readiness gates
+ * Single entry point that runs the v0.3.0 release-readiness gates
  * end-to-end. Used both locally (`pnpm run mvp-readiness`) and from
  * the release CI workflow before any package gets published.
  *
@@ -16,7 +16,7 @@
  *   6. check-anthropic-spec — `pnpm run check-anthropic-spec` (Skills format snapshot drift)
  *   7. check-licenses    — `pnpm run check-licenses`   (SPDX allowlist enforcement)
  *   8. workspace audit   — every published @graphorin/* package has a non-stub
- *                          version 0.2.0, license MIT, author Oleksiy Stepurenko,
+ *                          version 0.3.0, license MIT, author Oleksiy Stepurenko,
  *                          publishConfig.provenance true, and no `private: true` flag.
  *
  * Flags:
@@ -43,7 +43,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..');
 const PACKAGES_DIR = join(ROOT, 'packages');
-const REQUIRED_VERSION = '0.2.0';
+const REQUIRED_VERSION = '0.3.0';
 const REQUIRED_AUTHOR = 'Oleksiy Stepurenko';
 const REQUIRED_LICENSE = 'MIT';
 
@@ -273,7 +273,7 @@ async function main() {
     for (const line of lines) console.log(line);
     console.log('==============================');
     if (overallOk) {
-      console.log('mvp-readiness: PASS — every gate is green; v0.2.0 is release-shaped.');
+      console.log('mvp-readiness: PASS — every gate is green; v0.3.0 is release-shaped.');
     } else {
       console.error(
         `mvp-readiness: FAIL — gate '${results.find((r) => !r.ok)?.gate ?? '<unknown>'}' failed; remaining gates skipped.`,
