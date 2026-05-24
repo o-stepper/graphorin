@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -11,6 +11,24 @@ built-in adapters, the `SandboxImpl` interface, the tier resolver,
 and the typed errors used by the dispatcher.
 
 ## References
+
+### BridgedSourceOptions
+
+Re-exports [BridgedSourceOptions](/api/@graphorin/security/interfaces/BridgedSourceOptions.md)
+
+***
+
+### BridgedSourceResult
+
+Re-exports [BridgedSourceResult](/api/@graphorin/security/type-aliases/BridgedSourceResult.md)
+
+***
+
+### BridgedToolCall
+
+Re-exports [BridgedToolCall](/api/@graphorin/security/interfaces/BridgedToolCall.md)
+
+***
 
 ### createDockerSandbox
 
@@ -99,6 +117,12 @@ Re-exports [resolveSandbox](/api/@graphorin/security/functions/resolveSandbox.md
 ### ResolveSandboxInput
 
 Re-exports [ResolveSandboxInput](/api/@graphorin/security/interfaces/ResolveSandboxInput.md)
+
+***
+
+### runBridgedSource
+
+Re-exports [runBridgedSource](/api/@graphorin/security/functions/runBridgedSource.md)
 
 ***
 

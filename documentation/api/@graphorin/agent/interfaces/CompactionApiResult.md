@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CompactionApiResult
 
-Defined in: packages/agent/src/types.ts:276
+Defined in: packages/agent/src/types.ts:326
 
 Result of `agent.compact({...})`.
 
@@ -16,9 +16,9 @@ Result of `agent.compact({...})`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-aftertokens"></a> `afterTokens` | `readonly` | `number` | packages/agent/src/types.ts:278 |
-| <a id="property-beforetokens"></a> `beforeTokens` | `readonly` | `number` | packages/agent/src/types.ts:277 |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/agent/src/types.ts:280 |
-| <a id="property-hooksfiredcount"></a> `hooksFiredCount` | `readonly` | `number` | packages/agent/src/types.ts:281 |
-| <a id="property-summary"></a> `summary` | `readonly` | `string` | packages/agent/src/types.ts:282 |
-| <a id="property-summarytokens"></a> `summaryTokens` | `readonly` | `number` | packages/agent/src/types.ts:279 |
+| <a id="property-aftertokens"></a> `afterTokens` | `readonly` | `number` | packages/agent/src/types.ts:328 |
+| <a id="property-beforetokens"></a> `beforeTokens` | `readonly` | `number` | packages/agent/src/types.ts:327 |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/agent/src/types.ts:330 |
+| <a id="property-hooksfiredcount"></a> `hooksFiredCount` | `readonly` | `number` | packages/agent/src/types.ts:331 |
+| <a id="property-summary"></a> `summary` | `readonly` | `string` | packages/agent/src/types.ts:332 |
+| <a id="property-summarytokens"></a> `summaryTokens` | `readonly` | `number` | packages/agent/src/types.ts:329 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -46,6 +46,12 @@ Re-exports [CreateMCPClientOptions](/api/@graphorin/mcp/interfaces/CreateMCPClie
 
 ***
 
+### createMcpResourceReader
+
+Re-exports [createMcpResourceReader](/api/@graphorin/mcp/functions/createMcpResourceReader.md)
+
+***
+
 ### DEFAULT\_DEFER\_LOADING\_THRESHOLD
 
 Re-exports [DEFAULT_DEFER_LOADING_THRESHOLD](/api/@graphorin/mcp/variables/DEFAULT_DEFER_LOADING_THRESHOLD.md)
@@ -70,6 +76,24 @@ Re-exports [MCPContentPart](/api/@graphorin/mcp/type-aliases/MCPContentPart.md)
 
 ***
 
+### MCPElicitationHandler
+
+Re-exports [MCPElicitationHandler](/api/@graphorin/mcp/type-aliases/MCPElicitationHandler.md)
+
+***
+
+### MCPElicitationRequest
+
+Re-exports [MCPElicitationRequest](/api/@graphorin/mcp/interfaces/MCPElicitationRequest.md)
+
+***
+
+### MCPElicitationResult
+
+Re-exports [MCPElicitationResult](/api/@graphorin/mcp/type-aliases/MCPElicitationResult.md)
+
+***
+
 ### MCPPromptDefinition
 
 Re-exports [MCPPromptDefinition](/api/@graphorin/mcp/interfaces/MCPPromptDefinition.md)
@@ -91,6 +115,42 @@ Re-exports [MCPResourceContent](/api/@graphorin/mcp/interfaces/MCPResourceConten
 ### MCPResourceDefinition
 
 Re-exports [MCPResourceDefinition](/api/@graphorin/mcp/interfaces/MCPResourceDefinition.md)
+
+***
+
+### McpResourceReaderOptions
+
+Re-exports [McpResourceReaderOptions](/api/@graphorin/mcp/interfaces/McpResourceReaderOptions.md)
+
+***
+
+### MCPSamplingContent
+
+Re-exports [MCPSamplingContent](/api/@graphorin/mcp/type-aliases/MCPSamplingContent.md)
+
+***
+
+### MCPSamplingHandler
+
+Re-exports [MCPSamplingHandler](/api/@graphorin/mcp/type-aliases/MCPSamplingHandler.md)
+
+***
+
+### MCPSamplingMessage
+
+Re-exports [MCPSamplingMessage](/api/@graphorin/mcp/interfaces/MCPSamplingMessage.md)
+
+***
+
+### MCPSamplingRequest
+
+Re-exports [MCPSamplingRequest](/api/@graphorin/mcp/interfaces/MCPSamplingRequest.md)
+
+***
+
+### MCPSamplingResult
+
+Re-exports [MCPSamplingResult](/api/@graphorin/mcp/interfaces/MCPSamplingResult.md)
 
 ***
 

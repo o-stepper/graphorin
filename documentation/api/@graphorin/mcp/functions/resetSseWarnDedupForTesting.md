@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetSseWarnDedupForTesting(): void;
 ```
 
-Defined in: packages/mcp/src/client/client.ts:66
+Defined in: packages/mcp/src/client/client.ts:67
 
 **`Experimental`**
 

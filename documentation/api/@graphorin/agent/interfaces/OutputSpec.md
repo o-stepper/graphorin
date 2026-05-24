@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: OutputSpec\&lt;TOutput\&gt;
 
-Defined in: packages/agent/src/types.ts:55
+Defined in: packages/agent/src/types.ts:58
 
 Output type specification.
 
@@ -22,7 +22,7 @@ Output type specification.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description shown to the model alongside the schema. | packages/agent/src/types.ts:60 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"text"` \| `"structured"` | - | packages/agent/src/types.ts:56 |
-| <a id="property-schema"></a> `schema?` | `readonly` | \{ `parse`: `TOutput`; \} | Optional Zod schema for structured output validation. | packages/agent/src/types.ts:58 |
-| `schema.parse` | `public` | `TOutput` | - | packages/agent/src/types.ts:58 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description shown to the model alongside the schema. | packages/agent/src/types.ts:63 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"text"` \| `"structured"` | - | packages/agent/src/types.ts:59 |
+| <a id="property-schema"></a> `schema?` | `readonly` | \{ `parse`: `TOutput`; \} | Optional Zod schema for structured output validation. | packages/agent/src/types.ts:61 |
+| `schema.parse` | `public` | `TOutput` | - | packages/agent/src/types.ts:61 |

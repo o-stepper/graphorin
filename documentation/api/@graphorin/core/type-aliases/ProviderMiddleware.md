@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ProviderMiddleware = (next) => Provider;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:234
+Defined in: packages/core/src/contracts/provider.ts:256
 
 Provider middleware: a function that wraps a `Provider` and returns a
 new `Provider` with extra behaviour (retry, fallback, redaction, …).

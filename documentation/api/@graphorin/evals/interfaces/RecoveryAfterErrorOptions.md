@@ -1,0 +1,17 @@
+[**Graphorin API reference v0.3.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / RecoveryAfterErrorOptions
+
+# Interface: RecoveryAfterErrorOptions
+
+Defined in: evals/src/scorers/trajectory/recovery-after-error.ts:16
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | evals/src/scorers/trajectory/recovery-after-error.ts:18 |

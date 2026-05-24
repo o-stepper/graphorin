@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createRegisteredEvent(opts): ToolAuditEvent;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:175
+Defined in: packages/tools/src/audit/index.ts:178
 
 Convenience factory for the `tool:registered` audit row. Carries
 the resolved trust class + side-effect class + per-tool fields the

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,6 +10,6 @@
 const DEFAULT_DEFER_LOADING_THRESHOLD: 10 = 10;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:51
+Defined in: packages/mcp/src/client/defer-loading.ts:18
 
 Default auto-deferral threshold per the operator-facing convention.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,11 +10,12 @@
 function _resetMcpAdapterDedupForTesting(): void;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:80
+Defined in: packages/mcp/src/client/to-tools.ts:51
 
 **`Experimental`**
 
-Reset every process-scoped dedup set. Used by tests.
+Reset every process-scoped dedup set owned by the adapter modules.
+Used by tests.
 
 ## Returns
 

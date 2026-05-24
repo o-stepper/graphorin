@@ -1,8 +1,8 @@
-**Graphorin API reference v0.1.0**
+**Graphorin API reference v0.3.0**
 
 ***
 
-# Graphorin API reference v0.1.0
+# Graphorin API reference v0.3.0
 
 ## Packages
 

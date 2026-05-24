@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -517,6 +517,12 @@ Re-exports [ToolChoice](/api/@graphorin/core/type-aliases/ToolChoice.md)
 ### ToolDefinition
 
 Re-exports [ToolDefinition](/api/@graphorin/core/interfaces/ToolDefinition.md)
+
+***
+
+### ToolDefinitionExample
+
+Re-exports [ToolDefinitionExample](/api/@graphorin/core/interfaces/ToolDefinitionExample.md)
 
 ***
 

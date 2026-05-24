@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const countTokensHeuristic: TokenCounter;
 ```
 
-Defined in: packages/tools/src/result/truncate.ts:38
+Defined in: packages/tools/src/result/truncate.ts:39
 
 Heuristic token counter — 4 chars per token. Matches the
 fall-through behaviour the agent runtime applies when a per-

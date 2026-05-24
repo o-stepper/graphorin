@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ type AgentInput =
 | ReadonlyArray<Message>;
 ```
 
-Defined in: packages/agent/src/types.ts:48
+Defined in: packages/agent/src/types.ts:51
 
 Forward-compatible type alias for the input accepted by
 `Agent.stream / run / steer / followUp`. v0.1 ships with the

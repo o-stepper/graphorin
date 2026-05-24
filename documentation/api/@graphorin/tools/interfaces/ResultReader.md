@@ -1,0 +1,34 @@
+[**Graphorin API reference v0.3.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/tools](/api/@graphorin/tools/index.md) / [](/api/@graphorin/tools/README.md) / ResultReader
+
+# Interface: ResultReader
+
+Defined in: packages/tools/src/result/reader.ts:66
+
+Resolves result handles to (ranges of) their backing artifact.
+
+## Stable
+
+## Methods
+
+### read()
+
+```ts
+read(uri, range?): Promise<ResultReadOutcome>;
+```
+
+Defined in: packages/tools/src/result/reader.ts:67
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `uri` | `string` |
+| `range?` | [`ResultReadRange`](/api/@graphorin/tools/interfaces/ResultReadRange.md) |
+
+#### Returns
+
+`Promise`\&lt;[`ResultReadOutcome`](/api/@graphorin/tools/interfaces/ResultReadOutcome.md)\&gt;

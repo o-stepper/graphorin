@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Agent\&lt;TDeps, TOutput\&gt;
 
-Defined in: packages/agent/src/types.ts:321
+Defined in: packages/agent/src/types.ts:371
 
 Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/functions/createAgent.md).
 
@@ -23,9 +23,10 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:323 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:322 |
-| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:352 |
+| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:373 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:372 |
+| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:402 |
+| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:410 |
 
 ## Methods
 
@@ -35,7 +36,7 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 abort(options?): void;
 ```
 
-Defined in: packages/agent/src/types.ts:334
+Defined in: packages/agent/src/types.ts:384
 
 #### Parameters
 
@@ -55,7 +56,7 @@ Defined in: packages/agent/src/types.ts:334
 compact(options?): Promise<CompactionApiResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:336
+Defined in: packages/agent/src/types.ts:386
 
 #### Parameters
 
@@ -75,7 +76,7 @@ Defined in: packages/agent/src/types.ts:336
 fanOut<TFanOutOutput>(options): Promise<FanOutResult<TFanOutOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:344
+Defined in: packages/agent/src/types.ts:394
 
 Convenience wrapper around the standalone `runFanOut(...)`. The
 returned `FanOutResult` carries per-child status + the merged
@@ -107,7 +108,7 @@ strategy decides whether to propagate).
 followUp(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:333
+Defined in: packages/agent/src/types.ts:383
 
 #### Parameters
 
@@ -127,7 +128,7 @@ Defined in: packages/agent/src/types.ts:333
 run(input, options?): Promise<AgentResult<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:328
+Defined in: packages/agent/src/types.ts:378
 
 #### Parameters
 
@@ -148,7 +149,7 @@ Defined in: packages/agent/src/types.ts:328
 steer(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:332
+Defined in: packages/agent/src/types.ts:382
 
 #### Parameters
 
@@ -168,7 +169,7 @@ Defined in: packages/agent/src/types.ts:332
 stream(input, options?): AsyncIterable<AgentEvent<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:324
+Defined in: packages/agent/src/types.ts:374
 
 #### Parameters
 
@@ -191,7 +192,7 @@ toTool(options?): Tool<{
 }, TOutput, TDeps>;
 ```
 
-Defined in: packages/agent/src/types.ts:335
+Defined in: packages/agent/src/types.ts:385
 
 #### Parameters
 

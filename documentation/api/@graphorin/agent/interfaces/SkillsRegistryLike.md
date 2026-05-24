@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SkillsRegistryLike
 
-Defined in: packages/agent/src/types.ts:115
+Defined in: packages/agent/src/types.ts:118
 
 Skill-registry shape consumed by the agent loop. Implementations
 live in `@graphorin/skills`. We accept any structurally-compatible
@@ -23,7 +23,7 @@ surface.
 optional list(): readonly unknown[];
 ```
 
-Defined in: packages/agent/src/types.ts:116
+Defined in: packages/agent/src/types.ts:119
 
 #### Returns
 

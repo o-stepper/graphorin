@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -26,7 +26,7 @@ const default: {
   };
   meta: {
      name: "@graphorin/eslint-plugin";
-     version: "0.1.0";
+     version: "0.3.0";
   };
   rules: {
      no-bare-tool-exec: RuleModule;
@@ -62,9 +62,9 @@ Defined in: index.ts:87
 | `configs.recommended.rules.@graphorin/tool-description-required` | `"error"` | `'error'` | index.ts:67 |
 | `configs.recommended.rules.@graphorin/tool-examples-recommended` | `"warn"` | `'warn'` | index.ts:68 |
 | `configs.recommended.rules.@graphorin/tool-parameter-naming` | `"warn"` | `'warn'` | index.ts:69 |
-| <a id="property-meta"></a> `meta` | \{ `name`: `"@graphorin/eslint-plugin"`; `version`: `"0.1.0"`; \} | - | index.ts:87 |
+| <a id="property-meta"></a> `meta` | \{ `name`: `"@graphorin/eslint-plugin"`; `version`: `"0.3.0"`; \} | - | index.ts:87 |
 | `meta.name` | `"@graphorin/eslint-plugin"` | `'@graphorin/eslint-plugin'` | index.ts:40 |
-| `meta.version` | `"0.1.0"` | `VERSION` | index.ts:41 |
+| `meta.version` | `"0.3.0"` | `VERSION` | index.ts:41 |
 | <a id="property-rules"></a> `rules` | \{ `no-bare-tool-exec`: `RuleModule`; `no-console-in-public-api`: `RuleModule`; `no-implicit-network-call`: `RuleModule`; `no-secret-in-deps`: `RuleModule`; `no-secret-unwrap`: `RuleModule`; `no-third-party-workflow-aliases`: `RuleModule`; `provider-middleware-order`: `RuleModule`; `tool-description-required`: `RuleModule`; `tool-examples-recommended`: `RuleModule`; `tool-parameter-naming`: `RuleModule`; \} | - | index.ts:87 |
 | `rules.no-bare-tool-exec` | `RuleModule` | `noBareToolExec` | index.ts:45 |
 | `rules.no-console-in-public-api` | `RuleModule` | `noConsoleInPublicApi` | index.ts:46 |

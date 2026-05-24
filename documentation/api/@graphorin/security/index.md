@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../index.md)
+[**Graphorin API reference v0.3.0**](../../index.md)
 
 ***
 
@@ -97,7 +97,7 @@
 
 ## Status
 
-- **Version:** v0.1.0 — secrets foundations + server token auth +
+- **Version:** v0.3.0 — secrets foundations + server token auth +
   tamper-evident audit log + sandbox / memory-guard / guardrails /
   process-hardening runtime safety + outbound OAuth flows + skills
   supply-chain helpers.
@@ -338,7 +338,7 @@ line.
 
 ---
 
-**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
@@ -347,6 +347,7 @@ line.
 | [](/api/@graphorin/security/README.md) | @graphorin/security — security primitives for the Graphorin framework. Ships the `SecretValue` runtime-safe wrapper, the strict `SecretRef` URI parser, four `SecretsStore` implementations, the pluggable resolver registry, the per-tool ACL primitives, the `createSecretsStore({ kind: 'auto' })` factory, the server token- auth surface (HMAC-SHA256 + pepper, scope grammar, token CRUD, verify pipeline), and the tamper-evident audit log primitives. |
 | [audit](/api/@graphorin/security/audit/index.md) | Audit-log surface for `@graphorin/security`. Provides the tamper-evident chain primitives (`appendAudit`, `verifyAuditChain`, `pruneAudit`, `exportAudit`), the `AuditDb` lifecycle plumbing, the binding registry, and the secrets-layer bridge that turns `SecretsAuditEvent`s into chain entries. |
 | [auth](/api/@graphorin/security/auth/index.md) | Server token-auth surface for `@graphorin/security`. Combines the token format primitives, the scope grammar, the verify pipeline, and the token CRUD library functions used by `@graphorin/server` and the CLI. |
+| [dataflow](/api/@graphorin/security/dataflow/index.md) | Provenance / taint-based data-flow policy for `@graphorin/security` (P1-3, toward CaMeL). |
 | [guard](/api/@graphorin/security/guard/index.md) | Memory-modification guard subsystem of `@graphorin/security`. The guard sits between a tool and the long-lived memory store; the tier-based policy (DEC-153) trades runtime cost against attack-surface coverage. |
 | [guardrails](/api/@graphorin/security/guardrails/index.md) | Guardrails subsystem of `@graphorin/security`. Exposes the declarative `defineInputGuardrail` / `defineOutputGuardrail` builders, the `composeGuardrails(...)` runner with documented short-circuit semantics, and seven built-ins covering input length, inbound prompt-injection heuristics, PII redaction, language whitelisting, LLM moderation (input + output), and tool-usage validation. |
 | [hardening](/api/@graphorin/security/hardening/index.md) | Hardening subsystem of `@graphorin/security`. Exposes the startup helpers, the POSIX file-mode utilities, the doctor library functions, and the bootstrap-token helpers. |

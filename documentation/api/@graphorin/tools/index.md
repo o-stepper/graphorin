@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../index.md)
+[**Graphorin API reference v0.3.0**](../../index.md)
 
 ***
 
@@ -209,7 +209,7 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
@@ -219,6 +219,7 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 | [audit](/api/@graphorin/tools/audit/index.md) | Audit-event emitter + counter registry for `@graphorin/tools`. |
 | [builder](/api/@graphorin/tools/builder/index.md) | Tool builder surface for `@graphorin/tools`. |
 | [built-in](/api/@graphorin/tools/built-in/index.md) | Built-in tools shipped with `@graphorin/tools`. |
+| [code-mode](/api/@graphorin/tools/code-mode/index.md) | Code-mode / programmatic tool calling (P1-2). Public surface: |
 | [errors](/api/@graphorin/tools/errors/index.md) | Typed error classes for `@graphorin/tools`. |
 | [executor](/api/@graphorin/tools/executor/index.md) | Tool executor surface for `@graphorin/tools`. |
 | [inbound](/api/@graphorin/tools/inbound/index.md) | Inbound prompt-injection sanitization surface for `@graphorin/tools`. |

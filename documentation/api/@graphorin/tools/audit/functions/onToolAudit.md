@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function onToolAudit(listener): () => void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:124
+Defined in: packages/tools/src/audit/index.ts:127
 
 Subscribe to tool-subsystem audit events. Returns a teardown
 function that removes the listener; callers must invoke it on

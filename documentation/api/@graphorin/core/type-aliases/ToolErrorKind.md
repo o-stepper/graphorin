@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -17,10 +17,11 @@ type ToolErrorKind =
   | "unknown_tool"
   | "aborted"
   | "inbound_sanitization_blocked"
+  | "dataflow_policy_blocked"
   | "rate_limited";
 ```
 
-Defined in: packages/core/src/types/tool.ts:180
+Defined in: packages/core/src/types/tool.ts:217
 
 Discriminator used by `ToolError.kind`. The list is exhaustive: any new
 kind must extend the union here and every `assertNever` switch.

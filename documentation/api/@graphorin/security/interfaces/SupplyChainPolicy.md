@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -19,4 +19,4 @@ configuration.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-allowlist"></a> `allowlist?` | `readonly` | readonly `string`[] | - | packages/security/src/supply-chain/types.ts:123 |
 | <a id="property-denylist"></a> `denylist?` | `readonly` | readonly `string`[] | - | packages/security/src/supply-chain/types.ts:124 |
-| <a id="property-graphorindenylist"></a> `graphorinDenylist?` | `readonly` | `"auto"` \| `"off"` | `'auto'` is reserved for the post-MVP optional pull from a framework-curated denylist. The MVP only supports the operator- managed denylist; `'off'` is the only practical value. | packages/security/src/supply-chain/types.ts:130 |
+| <a id="property-graphorindenylist"></a> `graphorinDenylist?` | `readonly` | `"off"` \| `"auto"` | `'auto'` is reserved for the post-MVP optional pull from a framework-curated denylist. The MVP only supports the operator- managed denylist; `'off'` is the only practical value. | packages/security/src/supply-chain/types.ts:130 |

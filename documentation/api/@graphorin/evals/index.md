@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../index.md)
+[**Graphorin API reference v0.3.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > bounded concurrency, and regression detection that compares the
 > current run against a stored baseline.
 >
-> Project Graphorin · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.1.0 (optional sub-pack; the full orchestrator is
+- **Published:** v0.3.0 (optional sub-pack; the full orchestrator is
   decoupled from `@graphorin/observability` per RB-17 / DEC-152).
 
 ---
@@ -68,6 +68,7 @@ exitOnFailures(report);
 | `code/`     | `exactMatch`, `regexMatch`, `jsonPath`, `predicate` | Pure-code grading. No provider call.|
 | `llm/`      | `llmJudge`                                          | LLM-as-judge. Default `gpt-4o-mini`-class judge with `temperature: 0`. |
 | `prebuilt/` | `toxicityScorer`, `factualityScorer`, `helpfulnessScorer` | Wrap `llmJudge` with a project-tested rubric. |
+| `trajectory/` | `correctToolSelected`, `argumentValidity`, `redundantCallDetection`, `recoveryAfterError`, `finalStateCorrect` | Pure-code, offline scorers over a `Trajectory` (the tool calls a harness made). Measure harness reliability — tool selection, argument validity, redundant work, error recovery, goal state. |
 
 ---
 
@@ -159,7 +160,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

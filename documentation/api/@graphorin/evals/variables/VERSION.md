@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -7,7 +7,7 @@
 # Variable: VERSION
 
 ```ts
-const VERSION: "0.1.0" = '0.1.0';
+const VERSION: "0.3.0" = '0.3.0';
 ```
 
 Defined in: evals/src/index.ts:33

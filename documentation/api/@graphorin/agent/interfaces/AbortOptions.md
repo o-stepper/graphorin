@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AbortOptions
 
-Defined in: packages/agent/src/types.ts:247
+Defined in: packages/agent/src/types.ts:297
 
 Cancellation options accepted by `agent.abort({...})`.
 
@@ -16,5 +16,5 @@ Cancellation options accepted by `agent.abort({...})`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain?` | `readonly` | `boolean` | Wait for the current step to complete before stopping. | packages/agent/src/types.ts:249 |
-| <a id="property-onpendingapprovals"></a> `onPendingApprovals?` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | What to do with approvals that were already requested but not resolved at abort time. - `'deny'` (default) — auto-deny pending approvals. - `'hold'` — keep the approvals on `RunState.pendingApprovals`. - `'fail'` — reject the run with `RunError(code: 'run-aborted')`. | packages/agent/src/types.ts:258 |
+| <a id="property-drain"></a> `drain?` | `readonly` | `boolean` | Wait for the current step to complete before stopping. | packages/agent/src/types.ts:299 |
+| <a id="property-onpendingapprovals"></a> `onPendingApprovals?` | `readonly` | `"deny"` \| `"hold"` \| `"fail"` | What to do with approvals that were already requested but not resolved at abort time. - `'deny'` (default) — auto-deny pending approvals. - `'hold'` — keep the approvals on `RunState.pendingApprovals`. - `'fail'` — reject the run with `RunError(code: 'run-aborted')`. | packages/agent/src/types.ts:308 |

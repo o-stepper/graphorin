@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,13 +10,13 @@
 function adaptCallResult(args): ToolReturn<unknown>;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:318
+Defined in: packages/mcp/src/client/adapt-result.ts:33
 
 **`Internal`**
 
-Convert an MCP `CallToolResult` into a typed Graphorin
-`ToolReturn`, handling the structured-content + outputSchema
-round-trip and the backward-compatible TextContent mirror.
+Convert an MCP `CallToolResult` into a typed Graphorin `ToolReturn`,
+handling the structured-content + outputSchema round-trip and the
+backward-compatible TextContent mirror.
 
 ## Parameters
 
