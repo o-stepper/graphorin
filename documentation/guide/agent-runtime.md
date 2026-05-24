@@ -57,7 +57,7 @@ type AgentEvent<TOutput> =
   | { type: 'tool.execute.start'; toolCallId: string }
   | { type: 'tool.execute.end'; toolCallId: string }
   | { type: 'tool.approval.requested'; toolCallId: string }
-  | { type: 'context.compacted'; trimmedTokens: number }
+  | { type: 'context.compacted'; beforeTokens: number; afterTokens: number }
   | { type: 'agent.model.fellback'; previousModel: string; nextModel: string }
   | { type: 'agent.end'; output: TOutput };
 
@@ -106,6 +106,66 @@ flowchart LR
     Continue --> Step
     Continue --> Done([Done])
 ```
+
+## Tool execution in the loop
+
+At `createAgent(...)` warm-up the runtime assembles one [`ToolRegistry`](/guide/tools) from `config.tools` and `config.skills`, resolves cross-source name collisions (`'auto-prefix'` by default), and binds a [`ToolExecutor`](/guide/tools) to it. You never construct either yourself — passing `tools` / `skills` is the whole wiring. The read-only `agent.registry` exposes the assembled registry for inspection.
+
+```mermaid
+flowchart LR
+    Cfg[config.tools + config.skills] --> Reg[ToolRegistry]
+    Reg -->|listEager + tool_search| Cat[Per-step catalogue]
+    Reg -.->|listDeferred| Pool[Deferred pool]
+    Cat --> Model[Provider.stream]
+    Model -->|tool calls| Exec[executeBatch]
+    Pool -.->|tool_search promotes| Cat
+    Exec -->|tool.execute events| Out[AgentEvent stream]
+```
+
+Each step advertises only the **eager** tools (`registry.listEager()`) plus the built-in `tool_search`, sends them to the model with each tool's worked `examples` rendered into its `ToolDefinition` (see [worked examples](/guide/tools#worked-examples)), then dispatches the resulting calls through `executor.executeBatch(...)`. Handoff tools are advertised too, but routed to sub-agents rather than the executor.
+
+Because execution now flows through the executor, several tool-classification fields documented in [Tools](/guide/tools) take effect **at runtime in the agent loop**:
+
+| Field | Behaviour in the agent loop |
+|---|---|
+| `secretsAllowed` | **Enforced** — per-tool secrets ACL; a tool requesting a ref outside its ACL is denied. |
+| `inboundSanitization` | **Enforced** — untrusted tool output is flagged / stripped / wrapped before it re-enters context. |
+| `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens); `'spill-to-file'` stores the full body behind a handle (see [result handles](#result-handles-and-read_result)). |
+| `needsApproval` | **Enforced** — the run suspends for durable HITL (below) *before* the call runs. |
+| `sandboxPolicy` | Resolved and surfaced on the `tool.execute` span / audit, but inline `config.tools` run **in-process** — out-of-process isolation applies to module-loadable skill / MCP tools and is wired when those land. |
+| `memoryGuardTier` | Reserved: the guard factory is wired, but the snapshot/verify step stays inert until a scope-free memory-region reader lands (a tracked follow-up). |
+
+### Parallel dispatch
+
+Independent tool calls in one step run **concurrently**, bounded by `maxParallelTools` (default `8`; set `1` to serialise). A tool tagged `executionMode: 'sequential'` never overlaps another. The loop emits `tool.execute.start` for every call up front in call order, and `tool.execute.end` / `tool.execute.error` after each settles — also in call order — so the lifecycle is deterministic regardless of completion order. Only the live `tool.execute.progress` / `tool.execute.partial` events interleave, each keyed by `toolCallId`.
+
+### Deferred loading and `tool_search`
+
+A tool declared `defer_loading: true` is **withheld** from the per-step catalogue to keep large tool sets out of context. When the registry holds at least one deferred tool, the runtime auto-registers the built-in `tool_search` tool. The model calls `tool_search({ query })` to find deferred tools by name / description; matched tools are promoted into the catalogue on the **next** step. A deferred tool's `examples` stay out of context even once it is promoted.
+
+### Result handles and `read_result`
+
+A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint — so a large result never enters the context window **even when the tool returns a structured object** (which truncation alone leaves intact) — and auto-registers the built-in **`read_result`** tool whenever some tool spills. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root — never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. See [result handles](/guide/tools#result-handles-and-read_result) in the tools guide.
+
+The same `read_result` path resolves **external** handles too. An MCP `resource_link` tool result surfaces a handle (the resource URI) rather than inlining the body; wire `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` and the loop composes those readers after the spill reader (tried in order, each rejecting handles it does not own), so the model pages an MCP resource on demand exactly like a spilled artifact. Supplying any `resultReaders` force-registers `read_result`. See the [MCP client guide](/guide/mcp-client#large-resources-resource_link-result-handles).
+
+### Code-mode (`toolInvocation: 'code-mode'`)
+
+By default (`toolInvocation: 'direct'`) the model emits one provider tool-call per tool and each result is inlined into the conversation. Set `toolInvocation: 'code-mode'` to flip the model into **programmatic tool calling**: the agent advertises only two meta-tools — `code_execute` and `code_search` — and the model reaches every real tool by writing a script.
+
+```ts
+const agent = createAgent({
+  name: 'analyst',
+  instructions: '…',
+  provider,
+  tools: [listOrders, fetchInvoice, summarize],
+  toolInvocation: 'code-mode',
+});
+```
+
+`code_execute({ source })` runs the model-written JavaScript in a `worker-threads` sandbox; inside, `await tools.<name>(args)` calls the real tool. **Only the script's `return` value re-enters the context window** — every intermediate result stays inside the sandbox. A workflow that would otherwise inline a dozen large tool results now costs context for the final answer alone (an order-of-magnitude reduction on result-heavy tasks). `code_search({ query })` returns the exact call signatures of tools on demand (progressive disclosure), so the model writes correct calls without every schema being inlined up front.
+
+Governance is preserved: each in-script call runs through the **same executor**, so per-tool `secretsAllowed` / `inboundSanitization` / `maxResultTokens` still apply to the value handed back to the script (set a tool's `maxResultTokens` high when the script must process its full output). The sandbox blocks network and filesystem access and exposes **no** host object beyond the bound tools. Two limitations to note: **approval-gated tools** (`needsApproval`) are excluded from the code API (there is no durable-HITL suspend mid-script — call those in `'direct'` mode), and code-mode does **not** honour a per-step `prepareStep` `tools` override. The default `'direct'` path is completely unchanged. See [code-mode](/guide/tools#code-mode) in the tools guide for the building blocks.
 
 ## Durable HITL
 
@@ -185,9 +245,19 @@ const agent = createAgent({
 
 `fallbackModels: ReadonlyArray<ModelSpec>` retries the whole step against the next model on rate-limit, capacity, or context-length errors. A `ModelSpec` is either a `Provider` instance or `{ provider, model }`. The `agent.model.fellback` event fires per transition, and per-model usage attribution lands in `RunState.usage.byModel`.
 
+## Context management in the loop
+
+When `config.memory` is wired, the runtime bounds context growth automatically. Before every `provider.stream(...)` call it asks the memory `ContextEngine` whether the in-flight buffer has crossed the per-provider compaction threshold (`shouldCompact`); when it has, it summarises the older turns (`compactNow`), splices the summary back over them, keeps the most-recent turns verbatim, and emits a `context.compacted` event. Compaction is configured on the memory facade — `createMemory({ contextEngine: { compaction, providerContextWindow, summarizer } })` (RB-46) — so there is no separate agent-level knob. An agent with no memory, with compaction disabled, or below threshold simply skips the step, so the happy-path event stream is unchanged. The trigger is best-effort: a misconfigured engine (for example, no summarizer) is swallowed and the run proceeds uncompacted rather than aborting mid-flight.
+
+The `context.compacted` event carries `beforeTokens`, `afterTokens`, `summaryTokens`, `durationMs`, `hooksFiredCount`, and `source: 'auto-trigger'` (manual `agent.compact(...)` and pre-step compaction reuse the same event shape with their own `source`).
+
+**KV-cache prefix stability.** Auto-compaction never rewrites the trusted system-prompt prefix: the leading run of `system` messages established at run start is pinned, and only the conversational body after it is summarised. The prefix stays byte-identical across every step, so the provider's cache breakpoint is real and a long run never re-pays for the system prompt. Each compaction inserts its summary *after* the prefix, where the next pass folds it into a fresh summary-of-summary — so summaries never stack unbounded.
+
+**Sensitivity gate.** A run whose `sensitivity` is `'secret'` is never auto-compacted: summarisation is an LLM call, and secret-tier history is not shipped to a (potentially less-trusted) summarizer. Large individual tool outputs leave context the complementary way — via [result handles](#result-handles-and-read_result), which likewise refuse to spill a `'secret'`-tier body to the shared store.
+
 ## Post-compaction hooks
 
-When `@graphorin/memory.contextEngine` auto-compacts the buffer, the runtime fires every registered `postCompactionHooks[i]` between the trim and the next `provider.stream(...)` call. Failed hooks are isolated; the harness continues with the survivors.
+When `@graphorin/memory.contextEngine` auto-compacts the buffer, the runtime fires every registered `postCompactionHooks[i]` between the trim and the next `provider.stream(...)` call, then re-injects each hook's returned Context Essentials into the trimmed buffer as a trailing `system` message. Failed hooks are isolated; the harness continues with the survivors.
 
 ## Agent-step-level fan-out
 
@@ -248,6 +318,27 @@ Three opt-in agent-level guards configured on `createAgent({ causalityMonitor, m
 - **`protocolGuard`** — control-character escape catalogue applied at protocol boundaries.
 - **Commentary-phase trace sanitisation** runs at the session-output boundary in `@graphorin/sessions`.
 
+## Provenance / data-flow policy (`dataFlowPolicy`)
+
+Where the lateral-leak guards above match *patterns*, `dataFlowPolicy` (P1-3, opt-in) enforces *provenance* — a data-flow defence toward [CaMeL](https://arxiv.org/abs/2503.18813). It uses the metadata Graphorin already tracks (trust class + source + sensitivity) to defuse the **lethal trifecta**: untrusted content + private data + an exfiltration/mutation sink.
+
+```ts
+const agent = createAgent({
+  name: 'assistant',
+  instructions: '…',
+  provider,
+  tools: [webFetch, readSecret, sendEmail],
+  dataFlowPolicy: { mode: 'enforce' }, // or 'shadow' to audit-only first
+});
+```
+
+The executor gates every **sink** — a `side-effecting` / `external-stateful` tool — before it runs, and records the provenance of every tool output for later sink checks. A sink trips the policy when:
+
+- **`untrusted-to-sink`** — its arguments carry a verbatim span of previously-seen untrusted content (`mcp-derived` / `web-search` / `skill-untrusted` output): direct exfiltration; or
+- **`lethal-trifecta`** — it fires while *both* untrusted content **and** secret-tier (`sensitivity: 'secret'`) data have entered the run, even without a provable verbatim carry (the conservative signal; disable with `guardTrifecta: false`).
+
+Modes: **`'shadow'`** audits a tripped flow (`tool:dataflow:flagged` audit row + counter) but never blocks — ship this first to surface false positives; **`'enforce'`** blocks the sink (the call yields a `dataflow_policy_blocked` error surfaced as `tool.execute.error`) unless its name is in `declassifySinks` — the explicit, audited operator escape hatch (`tool:dataflow:declassified`). The policy **composes with `'code-mode'`**: each in-script tool call runs through the same executor gate, so an injection cannot exfiltrate through a sandbox either. Taint is tracked in-memory per run (not persisted across suspend/resume); verbatim detection is best-effort (catches verbatim/near-verbatim forwarding, not paraphrase — which is what the trifecta gate is for). Absent (the default) the loop is unchanged.
+
 ## Inbound sanitisation preamble
 
 When the assembled message list contains any non-trusted `MessageContent` part, the runtime appends the locale-resolved preamble fragment to the system prompt **after** the cache breakpoint so the trusted-only cache prefix is not invalidated.
@@ -261,4 +352,4 @@ When the assembled message list contains any non-trusted `MessageContent` part, 
 
 ---
 
-**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko

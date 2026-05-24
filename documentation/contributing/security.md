@@ -61,4 +61,4 @@ Implementation details and rationale ship with the corresponding `@graphorin/*` 
 
 ---
 
-**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

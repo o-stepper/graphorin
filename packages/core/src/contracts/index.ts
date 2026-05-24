@@ -50,6 +50,7 @@ export type {
   ResponseMetadata,
   ToolChoice,
   ToolDefinition,
+  ToolDefinitionExample,
 } from './provider.js';
 export type { ReasoningContract, ReasoningRetention } from './reasoning-retention.js';
 export type { RedactionInput, RedactionOutput, RedactionValidator } from './redaction-validator.js';

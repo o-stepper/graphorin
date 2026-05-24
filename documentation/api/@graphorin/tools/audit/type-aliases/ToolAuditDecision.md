@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ToolAuditDecision = "success" | "denied" | "error";
 ```
 
-Defined in: packages/tools/src/audit/index.ts:90
+Defined in: packages/tools/src/audit/index.ts:93
 
 Decision recorded by an audit event.
 

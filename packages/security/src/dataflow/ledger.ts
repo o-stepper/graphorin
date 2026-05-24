@@ -1,0 +1,127 @@
+/**
+ * Per-run taint ledger: records the provenance of tool outputs and
+ * answers verbatim-carry probes for sink checks.
+ *
+ * @packageDocumentation
+ */
+
+import type { ArgsTaintProbe, TaintLabel, TaintLedger } from './types.js';
+
+/** Default minimum shared-span length (normalized chars). */
+const DEFAULT_MIN_SPAN_LENGTH = 20;
+/** Default total budget for recorded untrusted text (normalized chars). */
+const DEFAULT_MAX_TRACKED_CHARS = 262_144;
+/** Floor below which a verbatim probe is considered too trivial to trust. */
+const MIN_TRUSTWORTHY_WINDOW = 8;
+
+/** Lowercase + collapse whitespace runs to a single space + trim. */
+function normalize(text: string): string {
+  return text.replace(/\s+/g, ' ').trim().toLowerCase();
+}
+
+/** All length-`window` substrings of `text` (stride 1). */
+function shingles(text: string, window: number): Set<string> {
+  const out = new Set<string>();
+  if (window <= 0 || text.length < window) return out;
+  for (let i = 0; i + window <= text.length; i++) {
+    out.add(text.slice(i, i + window));
+  }
+  return out;
+}
+
+/** `true` iff any length-`window` substring of `text` is in `grams`. */
+function sharesAnyGram(text: string, grams: ReadonlySet<string>, window: number): boolean {
+  if (window <= 0 || text.length < window) return false;
+  for (let i = 0; i + window <= text.length; i++) {
+    if (grams.has(text.slice(i, i + window))) return true;
+  }
+  return false;
+}
+
+interface TrackedSpan {
+  readonly text: string;
+  readonly sourceKind: string;
+}
+
+/**
+ * Create a run-scoped {@link TaintLedger}.
+ *
+ * Verbatim detection is a bounded shingle intersection: an output is
+ * tracked only when its normalized length is ≥ `minSpanLength`, and the
+ * total tracked text is FIFO-capped at `maxTrackedChars` (oldest spans
+ * evicted first). Detection is therefore **best-effort** — it catches
+ * verbatim / near-verbatim forwarding of untrusted content, not
+ * paraphrase, and degrades gracefully past the budget. The conservative
+ * {@link TaintLedger.untrustedSeen}/`sensitiveSeen` flags are never lossy:
+ * they are the load-bearing signal for the lethal-trifecta gate.
+ *
+ * @stable
+ */
+export function createTaintLedger(opts?: {
+  readonly minSpanLength?: number;
+  readonly maxTrackedChars?: number;
+}): TaintLedger {
+  const minSpanLength = Math.max(1, opts?.minSpanLength ?? DEFAULT_MIN_SPAN_LENGTH);
+  const maxTrackedChars = Math.max(
+    minSpanLength,
+    opts?.maxTrackedChars ?? DEFAULT_MAX_TRACKED_CHARS,
+  );
+
+  let untrustedSeen = false;
+  let sensitiveSeen = false;
+  const untrustedSourceKinds = new Set<string>();
+  const spans: TrackedSpan[] = [];
+  let trackedChars = 0;
+
+  return {
+    recordOutput(label: TaintLabel, outputText: string): void {
+      if (label.sensitive) sensitiveSeen = true;
+      if (!label.untrusted) return;
+      untrustedSeen = true;
+      untrustedSourceKinds.add(label.sourceKind);
+
+      const normalized = normalize(outputText);
+      if (normalized.length < minSpanLength) return;
+      // Cap a single oversized span to the total budget (store a prefix).
+      const text =
+        normalized.length > maxTrackedChars ? normalized.slice(0, maxTrackedChars) : normalized;
+      spans.push({ text, sourceKind: label.sourceKind });
+      trackedChars += text.length;
+      // FIFO-evict oldest spans until within budget.
+      while (trackedChars > maxTrackedChars && spans.length > 1) {
+        const evicted = spans.shift();
+        if (evicted !== undefined) trackedChars -= evicted.text.length;
+      }
+    },
+
+    inspectArgs(argsText: string): ArgsTaintProbe {
+      const argsNorm = normalize(argsText);
+      const window = Math.min(minSpanLength, argsNorm.length);
+      if (window < MIN_TRUSTWORTHY_WINDOW || spans.length === 0) {
+        return { carriesUntrustedVerbatim: false, matchedSourceKinds: [] };
+      }
+      const argGrams = shingles(argsNorm, window);
+      if (argGrams.size === 0) {
+        return { carriesUntrustedVerbatim: false, matchedSourceKinds: [] };
+      }
+      const matched = new Set<string>();
+      for (const span of spans) {
+        if (sharesAnyGram(span.text, argGrams, window)) matched.add(span.sourceKind);
+      }
+      return {
+        carriesUntrustedVerbatim: matched.size > 0,
+        matchedSourceKinds: [...matched],
+      };
+    },
+
+    get untrustedSeen(): boolean {
+      return untrustedSeen;
+    },
+    get sensitiveSeen(): boolean {
+      return sensitiveSeen;
+    },
+    get untrustedSourceKinds(): ReadonlyArray<string> {
+      return [...untrustedSourceKinds];
+    },
+  };
+}

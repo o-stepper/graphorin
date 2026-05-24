@@ -6,6 +6,10 @@
 
 export { _resetSseWarnDedupForTesting, createMCPClient } from './client.js';
 export {
+  createMcpResourceReader,
+  type McpResourceReaderOptions,
+} from './mcp-resource-reader.js';
+export {
   _resetMcpAdapterDedupForTesting,
   adaptCallResult,
   adaptMCPTools,
@@ -16,10 +20,18 @@ export type {
   MCPCallToolResult,
   MCPClient,
   MCPContentPart,
+  MCPElicitationHandler,
+  MCPElicitationRequest,
+  MCPElicitationResult,
   MCPPromptDefinition,
   MCPPromptMessage,
   MCPResourceContent,
   MCPResourceDefinition,
+  MCPSamplingContent,
+  MCPSamplingHandler,
+  MCPSamplingMessage,
+  MCPSamplingRequest,
+  MCPSamplingResult,
   MCPToolDefinition,
   MCPToToolsOptions,
 } from './types.js';

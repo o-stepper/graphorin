@@ -20,12 +20,33 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import {
   CallToolRequestSchema,
+  CreateMessageResultSchema,
+  ElicitResultSchema,
   GetPromptRequestSchema,
   ListPromptsRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+
+/**
+ * Server→client helpers handed to {@link InMemoryServerOptions.callToolHandler}
+ * so a tool call can drive elicitation / sampling mid-flight (WI-13).
+ */
+export interface CallToolServerExtra {
+  /** Send an `elicitation/create` request to the connected client. */
+  elicit(params: {
+    message: string;
+    requestedSchema: Record<string, unknown>;
+  }): Promise<{ action: string; content?: Record<string, unknown> }>;
+  /** Send a `sampling/createMessage` request to the connected client. */
+  sample(params: Record<string, unknown>): Promise<{
+    role: string;
+    content: { type: string; [k: string]: unknown };
+    model: string;
+    stopReason?: string;
+  }>;
+}
 
 export interface FixtureToolDefinition {
   readonly name: string;
@@ -61,6 +82,7 @@ export interface InMemoryServerOptions {
   readonly callToolHandler?: (
     name: string,
     args: unknown,
+    extra: CallToolServerExtra,
   ) => Promise<{
     readonly content: ReadonlyArray<Record<string, unknown>>;
     readonly structuredContent?: Record<string, unknown>;
@@ -123,10 +145,19 @@ export async function startInMemoryServer(
     })),
   }));
 
-  server.setRequestHandler(CallToolRequestSchema, async (req) => {
+  server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
     const { name, arguments: args } = req.params;
     if (opts.callToolHandler !== undefined) {
-      const result = await opts.callToolHandler(name, args);
+      const serverExtra: CallToolServerExtra = {
+        elicit: (params) =>
+          extra.sendRequest({ method: 'elicitation/create', params }, ElicitResultSchema),
+        sample: (params) =>
+          extra.sendRequest(
+            { method: 'sampling/createMessage', params },
+            CreateMessageResultSchema,
+          ),
+      };
+      const result = await opts.callToolHandler(name, args, serverExtra);
       return result;
     }
     return {

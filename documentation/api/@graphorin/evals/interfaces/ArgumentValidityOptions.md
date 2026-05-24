@@ -1,0 +1,18 @@
+[**Graphorin API reference v0.3.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / ArgumentValidityOptions
+
+# Interface: ArgumentValidityOptions
+
+Defined in: evals/src/scorers/trajectory/argument-validity.ts:19
+
+## Stable
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | evals/src/scorers/trajectory/argument-validity.ts:23 |
+| <a id="property-tools"></a> `tools` | `readonly` | readonly \{ `inputSchema`: `SchemaLike`; `name`: `string`; \}[] | The tools whose `inputSchema` is used to validate matching calls. | evals/src/scorers/trajectory/argument-validity.ts:21 |

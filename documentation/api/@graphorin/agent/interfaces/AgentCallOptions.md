@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AgentCallOptions\&lt;TDeps\&gt;
 
-Defined in: packages/agent/src/types.ts:215
+Defined in: packages/agent/src/types.ts:265
 
 Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
 
@@ -22,8 +22,8 @@ Per-call options accepted by `agent.stream(...)` / `agent.run(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-deps"></a> `deps?` | `readonly` | `TDeps` | - | packages/agent/src/types.ts:216 |
-| <a id="property-directive"></a> `directive?` | `readonly` | [`ResumeDirective`](/api/@graphorin/agent/interfaces/ResumeDirective.md) | HITL resume directive. Supplied alongside a `RunState` to resolve any approvals that were pending when the previous `agent.run(...)` call suspended. | packages/agent/src/types.ts:225 |
-| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | - | packages/agent/src/types.ts:218 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/agent/src/types.ts:217 |
-| <a id="property-userid"></a> `userId?` | `readonly` | `string` | - | packages/agent/src/types.ts:219 |
+| <a id="property-deps"></a> `deps?` | `readonly` | `TDeps` | - | packages/agent/src/types.ts:266 |
+| <a id="property-directive"></a> `directive?` | `readonly` | [`ResumeDirective`](/api/@graphorin/agent/interfaces/ResumeDirective.md) | HITL resume directive. Supplied alongside a `RunState` to resolve any approvals that were pending when the previous `agent.run(...)` call suspended. | packages/agent/src/types.ts:275 |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | - | packages/agent/src/types.ts:268 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/agent/src/types.ts:267 |
+| <a id="property-userid"></a> `userId?` | `readonly` | `string` | - | packages/agent/src/types.ts:269 |

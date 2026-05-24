@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -18,6 +18,6 @@ type GuardrailVerdict =
 };
 ```
 
-Defined in: packages/agent/src/types.ts:95
+Defined in: packages/agent/src/types.ts:98
 
 ## Stable

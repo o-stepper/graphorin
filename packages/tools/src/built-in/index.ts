@@ -3,11 +3,11 @@
  *
  * - `tool_search` — deferred-tool catalogue lookup. Always registered
  *   when at least one tool in the registry is deferred.
- * - `httpRequest` — typed HTTP wrapper with redaction-aware spans.
- * - `readFileLines` — sandbox-aware bounded file reader.
- * - `searchFile` — sandbox-aware bounded text search across a file.
+ * - `read_result` — fetch (a range of) a large tool result stored behind a
+ *   handle. Registered when at least one tool spills to file.
  *
  * @packageDocumentation
  */
 
+export { createReadResultTool, type ReadResultToolOptions } from './read-result.js';
 export { createToolSearchTool, type ToolSearchToolOptions } from './tool-search.js';

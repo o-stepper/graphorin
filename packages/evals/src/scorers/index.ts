@@ -12,3 +12,4 @@ export {
   type PrebuiltScorerOptions,
   toxicityScorer,
 } from './prebuilt/index.js';
+export * from './trajectory/index.js';

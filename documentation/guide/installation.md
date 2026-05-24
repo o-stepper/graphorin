@@ -95,4 +95,4 @@ See the [Contributing guide](/contributing/) for the full development workflow.
 
 ---
 
-**Graphorin** · v0.2.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko

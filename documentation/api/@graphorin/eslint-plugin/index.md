@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../index.md)
+[**Graphorin API reference v0.3.0**](../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > ESLint rules for projects that build on **Graphorin**.
 
-- **Status:** v0.1.0 — final Phase 16 ruleset.
+- **Status:** v0.3.0 — final Phase 16 ruleset.
 - **License:** [MIT](../../_media/LICENSE-4) — © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Peer dependency:** `eslint >= 9`.
@@ -97,7 +97,7 @@ for (const tool of tools) {
 
 ---
 
-**Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/eslint-plugin — ESLint plugin for projects that build on
 the Graphorin framework.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type OutputGuardrail<TOutput> = (output) =>
   | GuardrailVerdict;
 ```
 
-Defined in: packages/agent/src/types.ts:90
+Defined in: packages/agent/src/types.ts:93
 
 ## Type Parameters
 

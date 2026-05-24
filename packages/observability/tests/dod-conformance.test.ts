@@ -7,8 +7,8 @@ import { getTelemetryStatus } from '../src/telemetry/index.js';
 import { createTracer } from '../src/tracer/index.js';
 
 describe('@graphorin/observability — Phase 04 Definition of Done', () => {
-  it('exports the canonical 0.2.0 version', () => {
-    expect(VERSION).toBe('0.2.0');
+  it('exports the canonical 0.3.0 version', () => {
+    expect(VERSION).toBe('0.3.0');
   });
 
   it('exposes exactly 14 default-on PII / secret patterns', () => {

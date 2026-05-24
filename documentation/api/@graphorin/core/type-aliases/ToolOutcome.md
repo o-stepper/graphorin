@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type ToolOutcome<TOutput> =
   | ToolError;
 ```
 
-Defined in: packages/core/src/types/tool.ts:215
+Defined in: packages/core/src/types/tool.ts:253
 
 Either a `ToolResult` or a `ToolError`. The runtime always returns one
 of the two — there is no implicit "tool fell through" outcome.

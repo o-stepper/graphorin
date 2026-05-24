@@ -6,6 +6,7 @@ export default defineConfig({
     'src/secrets/index.ts',
     'src/auth/index.ts',
     'src/audit/index.ts',
+    'src/dataflow/index.ts',
     'src/sandbox/index.ts',
     'src/guard/index.ts',
     'src/guardrails/index.ts',

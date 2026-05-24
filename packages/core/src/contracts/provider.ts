@@ -201,6 +201,28 @@ export interface ToolDefinition {
   readonly name: string;
   readonly description?: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
+  /**
+   * Worked examples surfaced to the provider alongside the schema. The
+   * agent runtime populates this from the tool's `examples` when they
+   * are eagerly rendered (see `Tool.examplesEagerlyRendered`); it is
+   * bounded to ≤5 and absent when the tool declares none or defers them.
+   * Implementations MAY fold these into the model-facing tool description.
+   */
+  readonly examples?: ReadonlyArray<ToolDefinitionExample>;
+}
+
+/**
+ * A single worked example as projected onto the provider wire contract —
+ * a serializable, schema-agnostic view of a `ToolExample`. `input` /
+ * `output` carry the example's already-parsed values; `comment` is the
+ * optional rationale shown to the model.
+ *
+ * @stable
+ */
+export interface ToolDefinitionExample {
+  readonly input: unknown;
+  readonly output: unknown;
+  readonly comment?: string;
 }
 
 /**

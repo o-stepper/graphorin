@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/eslint-plugin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "ESLint plugin for projects that build on Graphorin. Ships scaffolds for the eventual public ruleset; full implementations land in later releases.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

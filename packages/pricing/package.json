@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/pricing",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Bundled LLM pricing snapshot for the Graphorin framework. Ships per-provider, per-model input / output / cached-read prices alongside provenance metadata, a `lookupPrice(...)` resolver, snapshot diffing utilities, an opt-in `refreshPricing(...)` hook (network gated; never automatic), and `listMissingModels(...)` for trace audits.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

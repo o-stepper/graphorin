@@ -32,6 +32,7 @@ import {
 import { deriveServerIdentity } from '../helpers/identity.js';
 import { validateMCPServerConfig } from '../helpers/validate-config.js';
 import type { ServerIdentity } from '../transport/types.js';
+import { computeClientCapabilities, registerClientRequestHandlers } from './client-handlers.js';
 import { adaptMCPTools } from './to-tools.js';
 import { buildTransport } from './transport-factory.js';
 import type {
@@ -48,7 +49,7 @@ import type {
 } from './types.js';
 
 const DEFAULT_CLIENT_NAME = 'graphorin-mcp-client';
-const DEFAULT_CLIENT_VERSION = '0.2.0';
+const DEFAULT_CLIENT_VERSION = '0.3.0';
 
 /**
  * Process-scoped dedup flag for the deprecated SSE transport WARN.
@@ -102,6 +103,8 @@ export async function createMCPClient(options: CreateMCPClientOptions): Promise<
     ...(options.logger === undefined ? {} : { logger: options.logger }),
     ...(options.clientName === undefined ? {} : { clientName: options.clientName }),
     ...(options.clientVersion === undefined ? {} : { clientVersion: options.clientVersion }),
+    ...(options.elicitation === undefined ? {} : { elicitation: options.elicitation }),
+    ...(options.sampling === undefined ? {} : { sampling: options.sampling }),
   });
 }
 
@@ -120,6 +123,8 @@ export interface CreateMCPClientFromSdkTransportOptions {
   readonly logger?: CreateMCPClientOptions['logger'];
   readonly clientName?: string;
   readonly clientVersion?: string;
+  readonly elicitation?: CreateMCPClientOptions['elicitation'];
+  readonly sampling?: CreateMCPClientOptions['sampling'];
 }
 
 /**
@@ -135,6 +140,24 @@ export async function createMCPClientFromSdkTransport(
   const sdkClient = new Client({
     name: options.clientName ?? DEFAULT_CLIENT_NAME,
     version: options.clientVersion ?? DEFAULT_CLIENT_VERSION,
+  });
+
+  // WI-13 (P2-2): advertise + register the server-initiated request
+  // handlers (elicitation / sampling) before connecting, so they are in
+  // place when the session starts. Both are gated — capabilities are
+  // advertised only when the operator supplied the matching callback.
+  const clientCapabilities = computeClientCapabilities({
+    elicitation: options.elicitation,
+    sampling: options.sampling,
+  });
+  if (clientCapabilities !== undefined) {
+    sdkClient.registerCapabilities(clientCapabilities);
+  }
+  const serverIdRef = { current: 'unknown' };
+  registerClientRequestHandlers(sdkClient, {
+    ...(options.elicitation === undefined ? {} : { elicitation: options.elicitation }),
+    ...(options.sampling === undefined ? {} : { sampling: options.sampling }),
+    serverIdRef,
   });
 
   try {
@@ -157,6 +180,9 @@ export async function createMCPClientFromSdkTransport(
     options.transportConfig,
     options.serverInfoName ?? serverInfo.name,
   );
+  // Backfill the server id so the client-side request handlers
+  // (registered before connect) label their counters with it.
+  serverIdRef.current = serverIdentity.id;
   const collisionStrategy: CollisionStrategy = options.collisionStrategy ?? 'auto-prefix';
 
   const resumable =

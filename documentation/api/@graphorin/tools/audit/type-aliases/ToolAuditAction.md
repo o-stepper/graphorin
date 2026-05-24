@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../../index.md)
 
 ***
 
@@ -23,6 +23,9 @@ type ToolAuditAction =
   | "tool:result:spill:written"
   | "tool:result:sanitization:hit"
   | "tool:result:sanitization:blocked"
+  | "tool:dataflow:flagged"
+  | "tool:dataflow:blocked"
+  | "tool:dataflow:declassified"
   | "tool:retrieval:deferred"
   | "tool:retrieval:search:executed"
   | "tool:collision:detected"

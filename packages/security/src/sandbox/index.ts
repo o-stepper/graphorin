@@ -7,6 +7,12 @@
  */
 
 export {
+  type BridgedSourceOptions,
+  type BridgedSourceResult,
+  type BridgedToolCall,
+  runBridgedSource,
+} from './bridged-source.js';
+export {
   createDockerSandbox,
   type DockerSandboxOptions,
 } from './docker.js';

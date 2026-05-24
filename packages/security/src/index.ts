@@ -17,10 +17,11 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.2.0';
+export const VERSION = '0.3.0';
 
 export * from './audit/index.js';
 export * from './auth/index.js';
+export * from './dataflow/index.js';
 export * from './guard/index.js';
 export * from './guardrails/index.js';
 export * from './hardening/index.js';

@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-latency",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Latency probes for the Graphorin framework. Measures p50/p95 for streaming TTFT + total response, fact extraction, and memory search; emits RESULTS.md with the budgeted thresholds (TTFT < 500 ms with cached embedder; memory search p95 < 100 ms on 10k facts). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -19,9 +19,51 @@ Re-exports [countTokensHeuristic](/api/@graphorin/tools/variables/countTokensHeu
 
 ***
 
+### createDefaultSpillWriter
+
+Re-exports [createDefaultSpillWriter](/api/@graphorin/tools/functions/createDefaultSpillWriter.md)
+
+***
+
+### createFileResultReader
+
+Re-exports [createFileResultReader](/api/@graphorin/tools/functions/createFileResultReader.md)
+
+***
+
+### FileResultReaderOptions
+
+Re-exports [FileResultReaderOptions](/api/@graphorin/tools/interfaces/FileResultReaderOptions.md)
+
+***
+
 ### ResultEnvelope
 
 Re-exports [ResultEnvelope](/api/@graphorin/tools/interfaces/ResultEnvelope.md)
+
+***
+
+### ResultReader
+
+Re-exports [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md)
+
+***
+
+### ResultReadOutcome
+
+Re-exports [ResultReadOutcome](/api/@graphorin/tools/interfaces/ResultReadOutcome.md)
+
+***
+
+### ResultReadRange
+
+Re-exports [ResultReadRange](/api/@graphorin/tools/interfaces/ResultReadRange.md)
+
+***
+
+### SPILL\_HANDLE\_SCHEME
+
+Re-exports [SPILL_HANDLE_SCHEME](/api/@graphorin/tools/variables/SPILL_HANDLE_SCHEME.md)
 
 ***
 

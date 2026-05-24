@@ -2249,6 +2249,10 @@
         "link": "/api/@graphorin/security/auth/"
       },
       {
+        "text": "dataflow",
+        "link": "/api/@graphorin/security/dataflow/"
+      },
+      {
         "text": "guard",
         "link": "/api/@graphorin/security/guard/"
       },
@@ -3529,6 +3533,71 @@
       {
         "text": "built-in",
         "link": "/api/@graphorin/tools/built-in/"
+      },
+      {
+        "text": "code-mode",
+        "link": "/api/@graphorin/tools/code-mode/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CodeApiProjection",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeApiProjection.md"
+              },
+              {
+                "text": "CodeExecuteLimits",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeExecuteLimits.md"
+              },
+              {
+                "text": "CodeExecuteToolOptions",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeExecuteToolOptions.md"
+              },
+              {
+                "text": "CodeSearchMatch",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeSearchMatch.md"
+              },
+              {
+                "text": "CodeSearchToolOptions",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/CodeSearchToolOptions.md"
+              },
+              {
+                "text": "ProjectableTool",
+                "link": "/api/@graphorin/tools/code-mode/interfaces/ProjectableTool.md"
+              }
+            ]
+          },
+          {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CodeExecuteBridge",
+                "link": "/api/@graphorin/tools/code-mode/type-aliases/CodeExecuteBridge.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createCodeExecuteTool",
+                "link": "/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md"
+              },
+              {
+                "text": "createCodeSearchTool",
+                "link": "/api/@graphorin/tools/code-mode/functions/createCodeSearchTool.md"
+              },
+              {
+                "text": "projectToolApi",
+                "link": "/api/@graphorin/tools/code-mode/functions/projectToolApi.md"
+              }
+            ]
+          }
+        ]
       },
       {
         "text": "errors",

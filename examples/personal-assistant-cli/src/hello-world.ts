@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Hello-world snippet embedded in the example README. Wires
  * `createAgent` + `Memory` + the deterministic stub provider with the

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -9,6 +9,30 @@
 Barrel export for every shipped scorer family.
 
 ## References
+
+### argumentValidity
+
+Re-exports [argumentValidity](/api/@graphorin/evals/functions/argumentValidity.md)
+
+***
+
+### ArgumentValidityOptions
+
+Re-exports [ArgumentValidityOptions](/api/@graphorin/evals/interfaces/ArgumentValidityOptions.md)
+
+***
+
+### correctToolSelected
+
+Re-exports [correctToolSelected](/api/@graphorin/evals/functions/correctToolSelected.md)
+
+***
+
+### CorrectToolSelectedOptions
+
+Re-exports [CorrectToolSelectedOptions](/api/@graphorin/evals/interfaces/CorrectToolSelectedOptions.md)
+
+***
 
 ### exactMatch
 
@@ -25,6 +49,18 @@ Re-exports [ExactMatchOptions](/api/@graphorin/evals/interfaces/ExactMatchOption
 ### factualityScorer
 
 Re-exports [factualityScorer](/api/@graphorin/evals/functions/factualityScorer.md)
+
+***
+
+### finalStateCorrect
+
+Re-exports [finalStateCorrect](/api/@graphorin/evals/functions/finalStateCorrect.md)
+
+***
+
+### FinalStateCorrectOptions
+
+Re-exports [FinalStateCorrectOptions](/api/@graphorin/evals/interfaces/FinalStateCorrectOptions.md)
 
 ***
 
@@ -76,6 +112,30 @@ Re-exports [PredicateOptions](/api/@graphorin/evals/interfaces/PredicateOptions.
 
 ***
 
+### recoveryAfterError
+
+Re-exports [recoveryAfterError](/api/@graphorin/evals/functions/recoveryAfterError.md)
+
+***
+
+### RecoveryAfterErrorOptions
+
+Re-exports [RecoveryAfterErrorOptions](/api/@graphorin/evals/interfaces/RecoveryAfterErrorOptions.md)
+
+***
+
+### redundantCallDetection
+
+Re-exports [redundantCallDetection](/api/@graphorin/evals/functions/redundantCallDetection.md)
+
+***
+
+### RedundantCallDetectionOptions
+
+Re-exports [RedundantCallDetectionOptions](/api/@graphorin/evals/interfaces/RedundantCallDetectionOptions.md)
+
+***
+
 ### regexMatch
 
 Re-exports [regexMatch](/api/@graphorin/evals/functions/regexMatch.md)
@@ -91,3 +151,15 @@ Re-exports [RegexMatchOptions](/api/@graphorin/evals/interfaces/RegexMatchOption
 ### toxicityScorer
 
 Re-exports [toxicityScorer](/api/@graphorin/evals/functions/toxicityScorer.md)
+
+***
+
+### Trajectory
+
+Re-exports [Trajectory](/api/@graphorin/evals/interfaces/Trajectory.md)
+
+***
+
+### TrajectoryToolCall
+
+Re-exports [TrajectoryToolCall](/api/@graphorin/evals/interfaces/TrajectoryToolCall.md)

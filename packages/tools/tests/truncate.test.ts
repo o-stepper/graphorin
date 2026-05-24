@@ -87,7 +87,12 @@ describe('truncateBody', () => {
     expect(captured!.toolCallId).toBe('call-1');
     expect(result.strategyApplied).toBe('spill-to-file');
     expect(result.artifactPath).toMatch(/^\/tmp\/graphorin\/run-1\/call-1\./);
-    expect(result.body).toContain(result.artifactPath!);
+    // WI-10: the model-facing body carries the opaque, run-scoped handle —
+    // not the raw absolute path (which is retained only on the outcome for
+    // the operator audit row).
+    expect(result.resultHandle).toBe('graphorin-spill:run-1/call-1.txt');
+    expect(result.body).toContain(result.resultHandle!);
+    expect(result.body).not.toContain(result.artifactPath!);
   });
 
   it("'summarize' invokes the supplied summarizer", async () => {

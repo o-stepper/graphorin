@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type PostCompactionHook = PostCompactionHook;
 ```
 
-Defined in: packages/agent/src/types.ts:105
+Defined in: packages/agent/src/types.ts:108
 
 Compaction post-hook factory accepted by `createAgent({...})`.
 Re-exported from `@graphorin/memory` here for ergonomic typing.

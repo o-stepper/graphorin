@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../index.md)
+[**Graphorin API reference v0.3.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > encrypt / rekey / integrity-check runners that back the `graphorin storage`
 > CLI subcommand group.
 >
-> Project Graphorin · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.1.0 (optional sub-pack)
+- **Published:** v0.3.0 (optional sub-pack)
 - **Default cipher:** `sqlcipher` (SQLCipher v4 compatible, `legacy=4`)
 - **Defaults:** encryption-at-rest is **OFF by default**. Opt in through
   `graphorin init --encrypted`.
@@ -165,7 +165,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/store-sqlite-encrypted — optional encryption-at-rest
 sub-pack for the Graphorin framework's default SQLite store.

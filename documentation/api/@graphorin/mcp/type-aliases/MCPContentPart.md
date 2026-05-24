@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -30,9 +30,95 @@ type MCPContentPart =
      uri: string;
   };
   type: "resource";
+}
+  | {
+  description?: string;
+  mimeType?: string;
+  name: string;
+  size?: number;
+  title?: string;
+  type: "resource_link";
+  uri: string;
 };
 ```
 
-Defined in: packages/mcp/src/client/types.ts:159
+Defined in: packages/mcp/src/client/types.ts:271
 
 Discriminated union over MCP content parts.
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  text: string;
+  type: "text";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  data: string;
+  mimeType: string;
+  type: "image";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  data: string;
+  mimeType: string;
+  type: "audio";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  resource: {
+     blob?: string;
+     mimeType?: string;
+     text?: string;
+     uri: string;
+  };
+  type: "resource";
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  description?: string;
+  mimeType?: string;
+  name: string;
+  size?: number;
+  title?: string;
+  type: "resource_link";
+  uri: string;
+}
+```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `description?` | `string` | - | packages/mcp/src/client/types.ts:296 |
+| `mimeType?` | `string` | - | packages/mcp/src/client/types.ts:297 |
+| `name` | `string` | - | packages/mcp/src/client/types.ts:294 |
+| `size?` | `number` | - | packages/mcp/src/client/types.ts:298 |
+| `title?` | `string` | - | packages/mcp/src/client/types.ts:295 |
+| `type` | `"resource_link"` | A link to a resource the server can serve on demand (MCP `resource_link`). Unlike an embedded `resource`, the body is **not** inlined: the adapter surfaces a preview + the `uri` as a result handle so the model fetches it via `read_result` only when needed (WI-13 / P2-2, ties to WI-10 result handles). | packages/mcp/src/client/types.ts:292 |
+| `uri` | `string` | - | packages/mcp/src/client/types.ts:293 |

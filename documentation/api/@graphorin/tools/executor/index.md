@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -19,6 +19,30 @@ Re-exports [buildToolExecutionContext](/api/@graphorin/tools/functions/buildTool
 ### createToolExecutor
 
 Re-exports [createToolExecutor](/api/@graphorin/tools/functions/createToolExecutor.md)
+
+***
+
+### DataFlowGuard
+
+Re-exports [DataFlowGuard](/api/@graphorin/tools/interfaces/DataFlowGuard.md)
+
+***
+
+### DataFlowInspectInput
+
+Re-exports [DataFlowInspectInput](/api/@graphorin/tools/interfaces/DataFlowInspectInput.md)
+
+***
+
+### DataFlowRecordInput
+
+Re-exports [DataFlowRecordInput](/api/@graphorin/tools/interfaces/DataFlowRecordInput.md)
+
+***
+
+### DataFlowVerdict
+
+Re-exports [DataFlowVerdict](/api/@graphorin/tools/type-aliases/DataFlowVerdict.md)
 
 ***
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _getToolAuditListenerCountForTesting(): number;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:145
+Defined in: packages/tools/src/audit/index.ts:148
 
 **`Experimental`**
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetToolAuditListenersForTesting(): void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:136
+Defined in: packages/tools/src/audit/index.ts:139
 
 **`Experimental`**
 

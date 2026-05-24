@@ -21,16 +21,14 @@
  * @packageDocumentation
  */
 
-import { promises as fs } from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-
 import type {
   AISpan,
   CompletedToolCall,
   ResolvedTool,
   RunContext,
   Sandbox,
+  Sensitivity,
+  SideEffectClass,
   ToolApproval,
   ToolCall,
   ToolError,
@@ -40,6 +38,8 @@ import type {
   ToolExecuteStartEvent,
   ToolOutcome,
   ToolResult,
+  ToolSource,
+  ToolTrustClass,
   ZodLikeSchema,
 } from '@graphorin/core';
 import type { ImperativePattern } from '@graphorin/observability/redaction';
@@ -56,6 +56,7 @@ import {
 import { applyInboundSanitization } from '../inbound/sanitize.js';
 import type { ToolRegistry } from '../registry/registry.js';
 import { splitTextAndContentParts, toResultEnvelope } from '../result/envelope.js';
+import { createDefaultSpillWriter } from '../result/spill.js';
 import {
   type ResultSummarizer,
   type SpillWriter,
@@ -155,7 +156,83 @@ export interface ExecutorOptions {
    * (backed by the `@graphorin/memory` tier APIs).
    */
   readonly memoryRegionReader?: MemoryRegionReader;
+  /**
+   * Optional provenance / data-flow guard (P1-3). When present, the
+   * executor consults it as a *sink gate* before running any
+   * `side-effecting` / `external-stateful` tool (so untrusted content
+   * cannot reach an exfiltration/mutation sink ungated) and *records* the
+   * provenance of every successful output for downstream sink checks. The
+   * agent runtime supplies the implementation (`@graphorin/security`'s
+   * taint engine threaded through a per-run ledger); when absent, both
+   * steps are skipped (zero overhead, feature off). Because every
+   * in-script code-mode tool call also flows through `executeOne`, the
+   * same guard composes with code-mode automatically (P1-2).
+   */
+  readonly dataFlowGuard?: DataFlowGuard;
 }
+
+/**
+ * Provenance / data-flow guard the executor consults at the tool
+ * boundary. Decisions and per-run taint state live in the
+ * implementation; the executor only enforces the {@link DataFlowVerdict}
+ * and audits it. See `@graphorin/security/dataflow`.
+ */
+export interface DataFlowGuard {
+  /**
+   * Sink gate: decide whether a `side-effecting` / `external-stateful`
+   * tool may run given what untrusted/sensitive content has entered the
+   * run. Called only for sinks. Pure w.r.t. the executor (no I/O); the
+   * executor emits the audit row and enforces a `'block'`.
+   */
+  inspect(input: DataFlowInspectInput): DataFlowVerdict;
+  /**
+   * Record one successful output's provenance so later sink gates can
+   * detect untrusted-to-sink flows. Called for every successful result.
+   */
+  record(input: DataFlowRecordInput): void;
+}
+
+/** Input to {@link DataFlowGuard.inspect}. */
+export interface DataFlowInspectInput {
+  readonly toolName: string;
+  readonly sideEffectClass: SideEffectClass;
+  readonly trustClass: ToolTrustClass;
+  readonly sensitivity?: Sensitivity;
+  readonly source?: ToolSource;
+  /** The raw tool-call arguments (stringified by the guard for probing). */
+  readonly args: unknown;
+  readonly runContext: RunContext;
+}
+
+/** Input to {@link DataFlowGuard.record}. */
+export interface DataFlowRecordInput {
+  readonly toolName: string;
+  readonly trustClass: ToolTrustClass;
+  readonly sensitivity?: Sensitivity;
+  readonly source?: ToolSource;
+  /** The (sanitized) output text the model will see. */
+  readonly outputText: string;
+  readonly runContext: RunContext;
+}
+
+/**
+ * Verdict returned by {@link DataFlowGuard.inspect}. Mirrors
+ * `@graphorin/security`'s `DataFlowDecision`; the agent maps one to the
+ * other so the executor takes no security dependency.
+ *
+ * - `'allow'`      — proceed silently.
+ * - `'flag'`       — shadow-mode detection: audit, then proceed.
+ * - `'declassify'` — operator-authorized tainted flow: audit, then proceed.
+ * - `'block'`      — enforce-mode block: surface `dataflow_policy_blocked`.
+ */
+export type DataFlowVerdict =
+  | { readonly action: 'allow' }
+  | {
+      readonly action: 'flag' | 'declassify' | 'block';
+      readonly flow: string;
+      readonly reason: string;
+      readonly sourceKinds: ReadonlyArray<string>;
+    };
 
 /** Approval gate the executor consults before executing a gated tool. */
 export interface ApprovalGate {
@@ -208,7 +285,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
   const memoryRegionReader = opts.memoryRegionReader;
   // Default spill writer — writes to `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>`
   // with `0600` permissions and tier-aware sensitivity inheritance.
-  const spillWriter = opts.spill ?? defaultSpillWriter();
+  const spillWriter = opts.spill ?? createDefaultSpillWriter();
 
   async function executeBatch(
     batch: ExecuteBatchOptions,
@@ -437,6 +514,66 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         }
       } else {
         return failWith(call, tool, 'invalid_input', parsed.error.message, runContext, stepNumber);
+      }
+    }
+
+    // Data-flow provenance gate (WI-12 / P1-3). Sinks only: untrusted
+    // content must not reach an exfiltration / mutation sink without an
+    // operator declassification. The guard decides + tracks taint; the
+    // executor audits the verdict and blocks the call when told to. Read
+    // tools are never gated (they cannot exfiltrate), so the common path
+    // pays nothing.
+    if (
+      opts.dataFlowGuard !== undefined &&
+      (tool.__sideEffectClass === 'side-effecting' ||
+        tool.__sideEffectClass === 'external-stateful')
+    ) {
+      const verdict = opts.dataFlowGuard.inspect({
+        toolName: tool.name,
+        sideEffectClass: tool.__sideEffectClass,
+        trustClass: tool.__trustClass,
+        ...(tool.sensitivity !== undefined ? { sensitivity: tool.sensitivity } : {}),
+        source: tool.__source,
+        args: call.args,
+        runContext,
+      });
+      if (verdict.action !== 'allow') {
+        const auditAction =
+          verdict.action === 'block'
+            ? 'tool:dataflow:blocked'
+            : verdict.action === 'declassify'
+              ? 'tool:dataflow:declassified'
+              : 'tool:dataflow:flagged';
+        emit({
+          action: auditAction,
+          actor: { kind: 'tool', id: tool.name },
+          target: tool.name,
+          decision: verdict.action === 'block' ? 'denied' : 'success',
+          ts: Date.now(),
+          context: { runId: runContext.runId, stepNumber, toolCallId: call.toolCallId },
+          metadata: {
+            flow: verdict.flow,
+            reason: verdict.reason,
+            sourceKinds: [...verdict.sourceKinds],
+            sideEffectClass: tool.__sideEffectClass,
+            decision: verdict.action,
+          },
+        });
+        incrementCounter('tool.dataflow.decision.total', {
+          toolName: tool.name,
+          decision: verdict.action,
+          flow: verdict.flow,
+        });
+        if (verdict.action === 'block') {
+          return failWith(
+            call,
+            tool,
+            'dataflow_policy_blocked',
+            verdict.reason,
+            runContext,
+            stepNumber,
+          );
+        }
       }
     }
 
@@ -852,7 +989,35 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         ...split.textParts.map((p) => ({ ...p, text: sanitization.body }) as typeof p),
       ],
       durationMs,
+      // WI-10 (P1-4): when the body spilled to a file, surface a structured,
+      // opaque handle + the bounded preview so the agent inlines the preview
+      // (not the full blob) and the model can fetch the rest via `read_result`.
+      ...(truncation.resultHandle !== undefined
+        ? {
+            resultHandle: {
+              uri: truncation.resultHandle,
+              kind: 'spill-file' as const,
+              preview: sanitization.body,
+              ...(truncation.artifactBytes !== undefined
+                ? { bytes: truncation.artifactBytes }
+                : {}),
+            },
+          }
+        : {}),
     };
+    // Record this output's provenance so later sink gates can detect
+    // untrusted-to-sink flows (WI-12 / P1-3). Uses the sanitized text the
+    // model will actually see — that is the only content it can forward.
+    if (opts.dataFlowGuard !== undefined) {
+      opts.dataFlowGuard.record({
+        toolName: tool.name,
+        trustClass: tool.__trustClass,
+        ...(tool.sensitivity !== undefined ? { sensitivity: tool.sensitivity } : {}),
+        source: tool.__source,
+        outputText: sanitization.body,
+        runContext,
+      });
+    }
     emit({
       action: 'tool:execute:end',
       actor: { kind: 'tool', id: tool.name },
@@ -978,28 +1143,6 @@ interface SandboxResultLike {
   readonly ok: boolean;
   readonly output?: unknown;
   readonly error?: { readonly kind: string; readonly message: string };
-}
-
-/**
- * Build the default spill writer — writes the un-truncated body to
- * `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with
- * `0600` permissions and tier-aware sensitivity inheritance.
- *
- * Marked `@internal`. Operators that need a sandbox-aware path should
- * inject their own writer via `createToolExecutor({ spill })`.
- */
-function defaultSpillWriter(): SpillWriter {
-  const root = path.join(os.tmpdir(), 'graphorin-spill');
-  return {
-    artifactRoot: root,
-    async write(opts) {
-      const dir = path.join(root, opts.runId);
-      await fs.mkdir(dir, { recursive: true });
-      const file = path.join(dir, `${opts.toolCallId}.${opts.extension}`);
-      await fs.writeFile(file, opts.body, { mode: 0o600 });
-      return { path: file, bytes: Buffer.byteLength(opts.body, 'utf8') };
-    },
-  };
 }
 
 function frozenCompleted(

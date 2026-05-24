@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.1.0**](../../../index.md)
+[**Graphorin API reference v0.3.0**](../../../index.md)
 
 ***
 
@@ -373,6 +373,12 @@ Re-exports [ReasoningContentMeta](/api/@graphorin/core/interfaces/ReasoningConte
 ### ReasoningDeltaEvent
 
 Re-exports [ReasoningDeltaEvent](/api/@graphorin/core/interfaces/ReasoningDeltaEvent.md)
+
+***
+
+### ResultHandle
+
+Re-exports [ResultHandle](/api/@graphorin/core/interfaces/ResultHandle.md)
 
 ***
 

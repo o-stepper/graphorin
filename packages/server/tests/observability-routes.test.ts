@@ -227,7 +227,7 @@ describe('Phase 14c — extended /v1/health', () => {
       };
     };
     expect(body.status).toBe('ok');
-    expect(body.version).toBe('0.2.0');
+    expect(body.version).toBe('0.3.0');
     expect(body.checks.storage?.walSizeBytes).toBeGreaterThanOrEqual(0);
     expect(body.checks.triggers?.running).toBe(true);
     expect(body.checks.consolidator?.tier).toBe('free');
@@ -260,7 +260,7 @@ describe('Phase 14c — extended /v1/health', () => {
     // the exported route factory directly.
     const { createExtendedHealthRoutes } = await import('../src/health/routes.js');
     const route = createExtendedHealthRoutes({
-      version: '0.2.0',
+      version: '0.3.0',
       startedAt: 0,
       now: () => 1_000,
       probes: async () => ({
@@ -307,7 +307,7 @@ describe('Phase 14c — /v1/metrics Prometheus exposition', () => {
     const body = await res.text();
     expect(body).toContain('# TYPE graphorin_agent_runs_total counter');
     expect(body).toContain('# TYPE graphorin_storage_wal_size_bytes gauge');
-    expect(body).toContain('graphorin_build_info{version="0.2.0"} 1');
+    expect(body).toContain('graphorin_build_info{version="0.3.0"} 1');
   });
 });
 

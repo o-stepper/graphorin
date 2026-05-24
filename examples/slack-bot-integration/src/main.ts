@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.2.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Slack bot integration acceptance demo. The module wires a small
  * adapter that converts inbound Slack `event_callback` payloads into
@@ -59,7 +59,7 @@ import {
 import { createStubProvider } from './stub-provider.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.2.0';
+export const VERSION = '0.3.0';
 
 /** Recipe selector. Only `'stub'` ships in v0.1 — production deployments swap providers. */
 export type Recipe = 'stub';
