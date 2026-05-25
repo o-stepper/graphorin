@@ -1,0 +1,53 @@
+{
+  "name": "@graphorin/benchmark-longmemeval",
+  "version": "0.3.0",
+  "private": true,
+  "description": "LongMemEval (+ real LOCOMO / DMR) memory-quality benchmark runner for the Graphorin framework. Ingests each question's haystack sessions into a fresh in-memory @graphorin/memory instance, answers from recall via the configured Provider, and scores answers with the @graphorin/evals LLM-judge ('J') plus per-ability scorers; supports per-category regression gates against a stored baseline. Real datasets download on demand via scripts/fetch-eval-datasets.mjs (dev-only); a tiny offline fixture ships for the smoke test. Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/longmemeval",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/longmemeval"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "memory-evaluation",
+    "longmemeval",
+    "locomo",
+    "dmr"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:smoke": "node ./dist/runner.js --dataset ./data/fixture.json --smoke",
+    "benchmark:longmemeval": "node ./dist/runner.js"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/evals": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-longmemeval": "./dist/runner.js"
+  }
+}

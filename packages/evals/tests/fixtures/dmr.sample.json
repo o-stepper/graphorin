@@ -1,0 +1,38 @@
+[
+  {
+    "id": "dmr-sister",
+    "question": "What is the name of the user's sister?",
+    "answer": "Anna",
+    "sessions": [
+      {
+        "id": "s1",
+        "turns": [
+          { "role": "user", "content": "My sister Anna is visiting next week." },
+          { "role": "assistant", "content": "That will be nice!" }
+        ]
+      },
+      [
+        { "speaker": "user", "text": "Anna and I are going hiking." },
+        { "speaker": "assistant", "text": "Enjoy the hike!" }
+      ],
+      {
+        "dialog": [
+          {
+            "role": "user",
+            "content": "We hiked Anna's favorite trail.",
+            "timestamp": "2023-07-01T10:00:00Z"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "question": "Where does the user work?",
+    "answer": "at a hospital",
+    "haystack_sessions": [
+      {
+        "messages": [{ "role": "user", "content": "I work as a nurse at a hospital downtown." }]
+      }
+    ]
+  }
+]

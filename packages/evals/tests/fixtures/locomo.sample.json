@@ -1,0 +1,48 @@
+[
+  {
+    "sample_id": "conv-1",
+    "conversation": {
+      "speaker_a": "Caroline",
+      "speaker_b": "Melanie",
+      "session_1_date_time": "1:56 pm on 8 May, 2023",
+      "session_1": [
+        {
+          "speaker": "Caroline",
+          "dia_id": "D1:1",
+          "text": "I started learning the violin last week."
+        },
+        { "speaker": "Melanie", "dia_id": "D1:2", "text": "That's wonderful, Caroline!" }
+      ],
+      "session_2_date_time": "10:00 am on 20 June, 2023",
+      "session_2": [
+        { "speaker": "Caroline", "dia_id": "D2:1", "text": "I performed at a recital yesterday." },
+        { "speaker": "Melanie", "dia_id": "D2:2", "text": "Congrats on the recital!" }
+      ]
+    },
+    "qa": [
+      {
+        "question": "What instrument did Caroline start learning?",
+        "answer": "the violin",
+        "evidence": ["D1:1"],
+        "category": 4
+      },
+      {
+        "question": "How long after starting the violin did Caroline perform at a recital?",
+        "answer": "about six weeks",
+        "evidence": ["D1:1", "D2:1"],
+        "category": 2
+      },
+      {
+        "question": "What is Caroline's favorite color?",
+        "category": 5,
+        "adversarial_answer": "Not mentioned in the conversation."
+      },
+      {
+        "question": "Who congratulated Caroline on her recital, and what had she started learning earlier?",
+        "answer": "Melanie congratulated her; she had started learning the violin.",
+        "evidence": ["D1:1", "D2:2"],
+        "category": 1
+      }
+    ]
+  }
+]

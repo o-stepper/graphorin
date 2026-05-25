@@ -236,11 +236,11 @@ async function ensureDatasetReadable(datasetPath: string, subset?: string): Prom
   } catch {
     if (subset !== undefined) {
       throw new Error(
-        `[benchmark-locomo] locale subset "${subset}" is not available yet (expected ${datasetPath}). ` +
+        `[benchmark-memory-smoke] locale subset "${subset}" is not available yet (expected ${datasetPath}). ` +
           `Add questions.jsonl under benchmarks/locomo-multilingual/${subset}/ or drop --subset.`,
       );
     }
-    throw new Error(`[benchmark-locomo] cannot read dataset: ${datasetPath}`);
+    throw new Error(`[benchmark-memory-smoke] cannot read dataset: ${datasetPath}`);
   }
 }
 
@@ -258,7 +258,7 @@ export async function runLocomoBenchmark(options: {
       const question = line.question;
       const expected = line.expected;
       if (!Array.isArray(facts) || typeof question !== 'string' || typeof expected !== 'string') {
-        throw new Error('[benchmark-locomo] each row needs facts[], question, expected');
+        throw new Error('[benchmark-memory-smoke] each row needs facts[], question, expected');
       }
       return {
         ...(typeof line.id === 'string' ? { id: line.id } : {}),
@@ -333,7 +333,7 @@ export async function main(): Promise<void> {
     ...(args.subset !== undefined ? { subset: args.subset } : {}),
   });
   console.log(
-    `[benchmark-locomo] cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed} avgMs=${report.summary.avgDurationMs.toFixed(2)}`,
+    `[benchmark-memory-smoke] cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed} avgMs=${report.summary.avgDurationMs.toFixed(2)}`,
   );
   await writeResults(args.results, report);
   exitOnFailures(report);
