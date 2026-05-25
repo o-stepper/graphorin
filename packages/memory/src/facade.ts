@@ -30,6 +30,7 @@ import {
   createConsolidatorPlaceholder,
   type OnBudgetExceed,
   type PhaseListener,
+  type SalienceWeights,
 } from './consolidator/index.js';
 import { createContextEngine } from './context-engine/engine.js';
 import type {
@@ -118,6 +119,10 @@ export interface CreateMemoryOptions {
     readonly lockWaitMs?: number;
     readonly decayTauDays?: number;
     readonly decayArchiveThreshold?: number;
+    /** Capacity-bounded eviction target for the light phase (X-1). Default unbounded. */
+    readonly decayCapacity?: number | null;
+    /** Weights for the multi-signal salience score (X-1). */
+    readonly salienceWeights?: SalienceWeights;
     readonly maxStandardBatchSize?: number;
     readonly maxDeepConflictsPerRun?: number;
     readonly dlqMaxRetries?: number;
@@ -440,6 +445,8 @@ function buildConsolidator(
     ...(opts.decayArchiveThreshold !== undefined
       ? { decayArchiveThreshold: opts.decayArchiveThreshold }
       : {}),
+    ...(opts.decayCapacity !== undefined ? { decayCapacity: opts.decayCapacity } : {}),
+    ...(opts.salienceWeights !== undefined ? { salienceWeights: opts.salienceWeights } : {}),
     ...(opts.maxStandardBatchSize !== undefined
       ? { maxStandardBatchSize: opts.maxStandardBatchSize }
       : {}),

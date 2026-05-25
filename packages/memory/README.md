@@ -120,6 +120,15 @@ any `EmbedderProvider`; the default is
   span. Operators inspect the rest via `graphorin memory inspect <factId>`
   (supersede chain / quarantine / conflicts / citing insights) and
   `graphorin memory activity` (consolidator / reflection activity).
+- **Multi-signal forgetting** (cost / staleness control, *not* an accuracy
+  lever). The light phase scores each fact with `salience(...)` — the Ebbinghaus
+  `retention` curve (recency + access frequency) combined with the `importance`
+  hint and a security-risk negative term (a quarantined fact is evicted first, a
+  foreign-provenance one slightly sooner). With neutral importance + an active,
+  first-party fact, `salience === retention`. Setting `decayCapacity`
+  (`createMemory({ consolidator: { decayCapacity } })`, default unbounded)
+  bounds storage: the lowest-salience facts are **soft-archived** (recoverable —
+  `archived = 1`, never deleted) until the window fits.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

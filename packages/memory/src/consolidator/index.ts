@@ -22,6 +22,7 @@
  * @packageDocumentation
  */
 
+import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import type { Consolidator } from './runtime.js';
 import type {
   ConsolidatorConfig,
@@ -44,7 +45,12 @@ export {
 export {
   DEFAULT_DECAY_ARCHIVE_THRESHOLD,
   DEFAULT_DECAY_TAU_DAYS,
+  DEFAULT_SALIENCE_WEIGHTS,
+  NEUTRAL_IMPORTANCE,
   retention,
+  type SalienceWeights,
+  salience,
+  selectForCapacityEviction,
   shouldArchive,
 } from './decay.js';
 export {
@@ -149,6 +155,8 @@ export function createConsolidatorPlaceholder(
     lockWaitMs: 30_000,
     decayTauDays: 7,
     decayArchiveThreshold: 0.05,
+    decayCapacity: null,
+    salienceWeights: DEFAULT_SALIENCE_WEIGHTS,
     maxStandardBatchSize: 50,
     maxDeepConflictsPerRun: 20,
     dlqMaxRetries: 5,

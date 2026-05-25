@@ -23,6 +23,7 @@ import type {
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 import { BudgetTracker } from './budget.js';
+import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
 import { CustomTierMisconfiguredError, ProviderNotConfiguredError } from './errors.js';
 import { tipMessageId } from './idempotency.js';
@@ -515,6 +516,8 @@ class ConsolidatorImpl implements Consolidator {
         now: this.#now,
         decayTauDays: this.#config.decayTauDays,
         decayArchiveThreshold: this.#config.decayArchiveThreshold,
+        decayCapacity: this.#config.decayCapacity,
+        salienceWeights: this.#config.salienceWeights,
         noiseFilters: this.#config.noiseFilters as ReadonlyArray<NoiseFilterPreset>,
         maxBatchSize: this.#config.maxStandardBatchSize,
         lastProcessedMessageId,
@@ -684,6 +687,8 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     lockWaitMs: opts.lockWaitMs ?? 30_000,
     decayTauDays: opts.decayTauDays ?? 7,
     decayArchiveThreshold: opts.decayArchiveThreshold ?? 0.05,
+    decayCapacity: opts.decayCapacity ?? null,
+    salienceWeights: opts.salienceWeights ?? DEFAULT_SALIENCE_WEIGHTS,
     maxStandardBatchSize: opts.maxStandardBatchSize ?? 50,
     maxDeepConflictsPerRun: opts.maxDeepConflictsPerRun ?? 20,
     dlqMaxRetries: opts.dlqMaxRetries ?? 5,

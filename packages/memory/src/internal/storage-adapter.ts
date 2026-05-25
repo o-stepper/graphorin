@@ -473,6 +473,9 @@ export interface DecayMemoryStoreExt {
    * List facts for the scope ordered by `lastAccessedAt` ASC so the
    * caller can apply Ebbinghaus retention without scanning the
    * whole table. `limit` defaults to `1000`.
+   *
+   * `importance` / `status` / `provenance` (X-1) feed the multi-signal
+   * salience score that orders capacity-bounded eviction.
    */
   listForDecay(
     scope: SessionScope,
@@ -485,6 +488,12 @@ export interface DecayMemoryStoreExt {
       readonly lastAccessedAt: number | null;
       readonly createdAt: number;
       readonly archived: boolean;
+      /** Importance hint in `[0, 1]`; `null` when unscored (X-1). */
+      readonly importance: number | null;
+      /** Retrieval-trust state (P1-4): `'active'` | `'quarantined'`. */
+      readonly status: string;
+      /** Trust-provenance tag (P1-4); `null` for first-party rows. */
+      readonly provenance: string | null;
     }>
   >;
   /**

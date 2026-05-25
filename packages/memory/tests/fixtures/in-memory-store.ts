@@ -123,6 +123,8 @@ export interface InMemoryStoreTestHooks {
     factId: string,
     signals: { strength?: number; lastAccessedAt?: number; createdAt?: number; archived?: boolean },
   ): void;
+  /** Stamp a per-fact importance hint (X-1 multi-signal salience tests). */
+  setImportance(factId: string, importance: number): void;
 }
 
 /**
@@ -832,6 +834,9 @@ export function createInMemoryStore(
           lastAccessedAt: number | null;
           createdAt: number;
           archived: boolean;
+          importance: number | null;
+          status: string;
+          provenance: string | null;
         }> = [];
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
@@ -843,6 +848,9 @@ export function createInMemoryStore(
             lastAccessedAt: sig?.lastAccessedAt ?? null,
             createdAt: sig?.createdAt ?? Date.parse(fact.createdAt),
             archived: sig?.archived ?? false,
+            importance: fact.importance ?? null,
+            status: fact.status ?? 'active',
+            provenance: fact.provenance ?? null,
           });
           if (out.length >= limit) break;
         }
@@ -928,6 +936,11 @@ export function createInMemoryStore(
     },
     registerFactEmbedder(factId, embedderId) {
       factEmbedderById.set(factId, embedderId);
+    },
+    setImportance(factId, importance) {
+      const idx = facts.findIndex((f) => f.id === factId);
+      const fact = facts[idx];
+      if (fact !== undefined) facts[idx] = { ...fact, importance };
     },
   };
 

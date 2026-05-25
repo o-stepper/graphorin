@@ -16,6 +16,7 @@ import type { ContextualRetrievalMode } from '../internal/contextualize.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
+import type { SalienceWeights } from './decay.js';
 
 /**
  * Trigger discriminator. The `'turn:N'` and `'idle:Xm'` variants are
@@ -104,6 +105,22 @@ export interface ConsolidatorConfig {
   readonly lockWaitMs: number;
   readonly decayTauDays: number;
   readonly decayArchiveThreshold: number;
+  /**
+   * Capacity-bounded eviction target for the light phase (X-1). When set,
+   * each light pass archives the lowest-salience live facts in the LRU
+   * decay window down to this many — **cost / staleness control, not an
+   * accuracy lever**. `null` (the default at every tier) leaves storage
+   * unbounded, so behaviour is identical to pre-X-1. Archiving is a soft,
+   * recoverable move; nothing is hard-deleted.
+   */
+  readonly decayCapacity: number | null;
+  /**
+   * Weights for the multi-signal salience score (X-1) that orders both
+   * threshold archiving and capacity eviction. Defaults to
+   * {@link DEFAULT_SALIENCE_WEIGHTS}; with neutral importance, active
+   * status, and first-party provenance salience equals plain retention.
+   */
+  readonly salienceWeights: SalienceWeights;
   readonly maxStandardBatchSize: number;
   readonly maxDeepConflictsPerRun: number;
   readonly dlqMaxRetries: number;
@@ -314,6 +331,10 @@ export interface CreateConsolidatorOptions {
   readonly lockWaitMs?: number;
   readonly decayTauDays?: number;
   readonly decayArchiveThreshold?: number;
+  /** Override the {@link ConsolidatorConfig.decayCapacity} default (X-1). */
+  readonly decayCapacity?: number | null;
+  /** Override the {@link ConsolidatorConfig.salienceWeights} default (X-1). */
+  readonly salienceWeights?: SalienceWeights;
   readonly maxStandardBatchSize?: number;
   readonly maxDeepConflictsPerRun?: number;
   readonly dlqMaxRetries?: number;

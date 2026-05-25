@@ -645,9 +645,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            subject, predicate, object, confidence, sensitivity, tags_json,
            embedder_id, source_message_ids_json,
            valid_from, valid_to, supersedes, superseded_by, provenance, status,
-           strength, last_accessed_at,
+           importance, strength, last_accessed_at,
            hash, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
            confidence = excluded.confidence,
@@ -659,6 +659,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            superseded_by = excluded.superseded_by,
            provenance = excluded.provenance,
            status = excluded.status,
+           importance = excluded.importance,
            updated_at = excluded.updated_at`,
         [
           fact.id,
@@ -680,6 +681,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.supersededBy ?? null,
           fact.provenance ?? null,
           fact.status ?? 'active',
+          fact.importance ?? null,
           1.0,
           null,
           null,
@@ -919,6 +921,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       readonly lastAccessedAt: number | null;
       readonly createdAt: number;
       readonly archived: boolean;
+      readonly importance: number | null;
+      readonly status: string;
+      readonly provenance: string | null;
     }>
   > {
     const rows = this.#conn.all<{
@@ -928,8 +933,12 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       last_accessed_at: number | null;
       created_at: number;
       archived: number;
+      importance: number | null;
+      status: string;
+      provenance: string | null;
     }>(
-      `SELECT id, text, strength, last_accessed_at, created_at, archived
+      `SELECT id, text, strength, last_accessed_at, created_at, archived,
+              importance, status, provenance
        FROM facts
        WHERE scope_user_id = ? AND deleted_at IS NULL
        ORDER BY COALESCE(last_accessed_at, created_at) ASC
@@ -943,6 +952,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       lastAccessedAt: row.last_accessed_at,
       createdAt: row.created_at,
       archived: row.archived === 1,
+      importance: row.importance,
+      status: row.status,
+      provenance: row.provenance,
     }));
   }
 
@@ -1305,6 +1317,7 @@ interface FactRow {
   superseded_by: string | null;
   provenance: string | null;
   status: string;
+  importance: number | null;
   strength: number;
   last_accessed_at: number | null;
   hash: string | null;
@@ -1455,6 +1468,7 @@ function rowToFact(row: FactRow): Fact {
     agentId: row.scope_agent_id ?? undefined,
     text: row.text,
     confidence: row.confidence ?? undefined,
+    importance: row.importance ?? undefined,
     sensitivity: row.sensitivity,
     tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
     validFrom: row.valid_from !== null ? new Date(row.valid_from).toISOString() : undefined,

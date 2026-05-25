@@ -114,6 +114,14 @@ export interface Fact extends MemoryRecord {
   readonly kind: 'semantic';
   readonly text: string;
   readonly confidence?: number;
+  /**
+   * Optional salience hint in `[0, 1]` for multi-signal forgetting
+   * (X-1). A *soft* signal — higher importance slows a fact's decay and
+   * delays capacity-bounded eviction, but never gates recall and never
+   * forces retention. Absent on rows written before the feature
+   * (treated as neutral, `0.5`).
+   */
+  readonly importance?: number;
   /** Bi-temporal: when the fact became true, ISO-8601. */
   readonly validFrom?: string;
   /** Bi-temporal: when the fact stopped being true, ISO-8601. */
