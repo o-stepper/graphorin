@@ -179,6 +179,20 @@ any `EmbedderProvider`; the default is
   twelfth tool, registered only when `iterativeRetrieval` is configured). Omit it
   and `searchIterative` degrades to one difficulty-gated pass with **no provider
   call**; the tool surface stays at the canonical eleven.
+- **Procedural memory extraction** (new capability, gated + opt-in). AWM-style
+  workflow induction: from a **successful** agent trajectory,
+  `ProceduralMemory.induce(scope, trajectory)` distils a reusable procedure —
+  goal + value-abstracted steps (`"search for {product}"`) + the variable names
+  + Voyager-style success criteria for self-verification on reuse
+  (`checkSuccessCriteria`). Induction fires on **success only** (a failed run
+  never calls the inducer), and the result lands **quarantined** +
+  `provenance: 'induction'` (P1-4) — procedures drive *actions*, so this is the
+  highest-poisoning-risk write and is excluded from `activate()` until validated.
+  `trajectoryFromRunState(runState)` distils the agent's already-emitted run
+  state, so capture needs **no agent change**. Wire it with
+  `createMemory({ procedureInduction: { provider } })`; omit it and `induce(...)`
+  throws `ProcedureInductionNotConfiguredError` — the procedural tier stays pure
+  offline CRUD with no provider call.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

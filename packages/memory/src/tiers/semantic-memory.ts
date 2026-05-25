@@ -398,7 +398,8 @@ export class SemanticMemory {
       // writes (user / tool / imported / unset) stay active. `status`
       // is never author-set; it is always derived here.
       const provenance = input.provenance;
-      const synthesized = provenance === 'extraction' || provenance === 'reflection';
+      const synthesized =
+        provenance === 'extraction' || provenance === 'reflection' || provenance === 'induction';
       const injection = detectMemoryInjection(text);
       const status: MemoryStatus = synthesized || injection.flagged ? 'quarantined' : 'active';
       const fact: Fact = {

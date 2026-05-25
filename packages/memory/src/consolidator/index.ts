@@ -72,6 +72,25 @@ export {
 } from './noise-filter.js';
 export { type DeepPhaseDeps, runDeepPhase } from './phases/deep.js';
 export {
+  buildInductionRequest,
+  checkSuccessCriteria,
+  createProviderWorkflowInducer,
+  DEFAULT_INDUCTION_MAX_TOKENS,
+  INDUCTION_SYSTEM_PROMPT,
+  type InducedProcedure,
+  MAX_PROCEDURE_STEPS,
+  MAX_TRAJECTORY_STEPS_SHOWN,
+  normalizeInducedProcedure,
+  parseInducedProcedure,
+  runWorkflowInduction,
+  type Trajectory,
+  type TrajectoryStep,
+  trajectoryFromRunState,
+  type VerificationResult,
+  type WorkflowInducer,
+  type WorkflowInductionOptions,
+} from './phases/induce.js';
+export {
   type LightPhaseDeps,
   runLightPhase,
 } from './phases/light.js';

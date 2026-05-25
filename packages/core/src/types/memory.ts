@@ -21,16 +21,26 @@ export type MemoryKind =
 
 /**
  * Where a memory came from — the trust-provenance tag carried by every
- * fact / episode. `user` (the human said it) and `tool` (a tool the
- * agent invoked returned it) are first-party; `extraction` (consolidator
- * distilled it from a transcript) and `reflection` (a synthesis pass
- * inferred it) are *derived* and therefore land quarantined by default;
- * `imported` is bulk-loaded from an external store. Used by P1-4 to gate
- * action-driving recall against memory-poisoning (MINJA / MemoryGraft).
+ * fact / episode / induced procedure. `user` (the human said it) and
+ * `tool` (a tool the agent invoked returned it) are first-party;
+ * `extraction` (consolidator distilled it from a transcript),
+ * `reflection` (a synthesis pass inferred it), and `induction` (an
+ * AWM-style pass distilled a reusable workflow from a successful agent
+ * trajectory, P2-2) are *derived* and therefore land quarantined by
+ * default; `imported` is bulk-loaded from an external store. Used by
+ * P1-4 to gate action-driving recall against memory-poisoning (MINJA /
+ * MemoryGraft) — induced procedures drive *actions*, so the quarantine
+ * gate matters most for them.
  *
  * @stable
  */
-export type MemoryProvenance = 'user' | 'tool' | 'extraction' | 'reflection' | 'imported';
+export type MemoryProvenance =
+  | 'user'
+  | 'tool'
+  | 'extraction'
+  | 'reflection'
+  | 'induction'
+  | 'imported';
 
 /**
  * Retrieval-trust state of a memory. `active` rows are eligible for
@@ -189,6 +199,39 @@ export interface Rule extends MemoryRecord {
   readonly text: string;
   readonly condition?: string;
   readonly priority: number;
+  /**
+   * Ordered, value-abstracted step sequence of an *induced* workflow
+   * (P2-2) — e.g. `['search for {product}', 'add {quantity} to cart',
+   * 'check out']`. Present only on procedures distilled from successful
+   * agent trajectories; author-defined rules omit it.
+   */
+  readonly steps?: ReadonlyArray<string>;
+  /**
+   * Names of the variables abstracted from the trajectory's concrete
+   * values (P2-2) — the `{product}` / `{quantity}` placeholders that
+   * appear in {@link Rule.steps}. Lets a reused procedure be re-bound to
+   * fresh arguments instead of replaying one run's literals.
+   */
+  readonly variables?: ReadonlyArray<string>;
+  /**
+   * Voyager-style verifiable success criteria stored alongside an induced
+   * procedure (P2-2) so a reuse can *self-verify* its outcome instead of
+   * trusting the procedure blindly. Author-defined rules omit it.
+   */
+  readonly successCriteria?: ReadonlyArray<string>;
+  /**
+   * Trust-provenance tag (P1-4 / P2-2). Induced procedures are
+   * `'induction'`; author-defined rules omit it (treated first-party).
+   * See {@link MemoryProvenance}.
+   */
+  readonly provenance?: MemoryProvenance;
+  /**
+   * Retrieval-trust state (P1-4 / P2-2). Induced procedures land
+   * `'quarantined'` and are excluded from activation (they must not drive
+   * actions) until validated; author-defined rules omit it (treated
+   * `'active'`). See {@link MemoryStatus}.
+   */
+  readonly status?: MemoryStatus;
 }
 
 /**

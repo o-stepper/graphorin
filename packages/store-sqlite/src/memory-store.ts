@@ -1046,8 +1046,9 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
     this.#conn.run(
       `INSERT INTO rules (
          id, scope_user_id, scope_session_id, scope_agent_id, text, condition,
-         priority, sensitivity, tags_json, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         priority, sensitivity, tags_json, created_at,
+         steps_json, variables_json, success_criteria_json, provenance, status
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         rule.id,
         rule.userId,
@@ -1059,6 +1060,11 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
         rule.sensitivity,
         rule.tags ? JSON.stringify(rule.tags) : null,
         toEpoch(rule.createdAt),
+        rule.steps ? JSON.stringify(rule.steps) : null,
+        rule.variables ? JSON.stringify(rule.variables) : null,
+        rule.successCriteria ? JSON.stringify(rule.successCriteria) : null,
+        rule.provenance ?? null,
+        rule.status ?? null,
       ],
     );
   }
@@ -1685,6 +1691,12 @@ interface RuleRow {
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
+  // P2-2: induced-procedure payload (migration 017). NULL on author rules.
+  steps_json: string | null;
+  variables_json: string | null;
+  success_criteria_json: string | null;
+  provenance: string | null;
+  status: string | null;
 }
 
 function rowToBlock(row: WorkingBlockRow): Block {
@@ -1829,6 +1841,16 @@ function rowToRule(row: RuleRow): Rule {
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
+    // P2-2: induced-procedure payload (migration 017). NULL ⇒ undefined.
+    steps: row.steps_json ? (JSON.parse(row.steps_json) as readonly string[]) : undefined,
+    variables: row.variables_json
+      ? (JSON.parse(row.variables_json) as readonly string[])
+      : undefined,
+    successCriteria: row.success_criteria_json
+      ? (JSON.parse(row.success_criteria_json) as readonly string[])
+      : undefined,
+    provenance: row.provenance !== null ? (row.provenance as MemoryProvenance) : undefined,
+    status: row.status !== null ? (row.status as MemoryStatus) : undefined,
   } as Rule;
 }
 

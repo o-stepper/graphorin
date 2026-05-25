@@ -4,7 +4,14 @@ import { z } from 'zod';
 import type { MemoryToolDeps } from './types.js';
 
 const sensitivityEnum = z.enum(['public', 'internal', 'secret']);
-const provenanceEnum = z.enum(['user', 'tool', 'extraction', 'reflection', 'imported']);
+const provenanceEnum = z.enum([
+  'user',
+  'tool',
+  'extraction',
+  'reflection',
+  'induction',
+  'imported',
+]);
 
 const factRememberInputSchema = z.object({
   text: z.string().min(1).max(8192),

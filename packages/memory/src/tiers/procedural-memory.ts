@@ -1,7 +1,27 @@
-import type { Rule, Sensitivity, SessionScope, Tracer } from '@graphorin/core';
+import type {
+  MemoryProvenance,
+  MemoryStatus,
+  Rule,
+  RunState,
+  Sensitivity,
+  SessionScope,
+  Tracer,
+} from '@graphorin/core';
+import {
+  type InducedProcedure,
+  runWorkflowInduction,
+  type Trajectory,
+  trajectoryFromRunState,
+  type WorkflowInducer,
+} from '../consolidator/phases/induce.js';
+import { ProcedureInductionNotConfiguredError } from '../errors/index.js';
 import { newMemoryId } from '../internal/id.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
+
+/** Default priority for an *induced* procedure — below the author default
+ * (50) because an induced, still-quarantined procedure is provisional. */
+const INDUCED_PRIORITY = 40;
 
 /**
  * Author-time rule payload accepted by {@link ProceduralMemory.define}.
@@ -22,6 +42,28 @@ export interface RuleInput {
   readonly sensitivity?: Sensitivity;
   readonly priority?: number;
   readonly tags?: ReadonlyArray<string>;
+  /**
+   * Optional structured workflow payload (P2-2). Usually set by
+   * {@link ProceduralMemory.induce}, but accepted here so an author can
+   * round-trip a hand-written procedure. See {@link Rule.steps}.
+   */
+  readonly steps?: ReadonlyArray<string>;
+  /** Variable names abstracted into {@link RuleInput.steps} (P2-2). */
+  readonly variables?: ReadonlyArray<string>;
+  /** Verifiable success criteria stored with the procedure (P2-2). */
+  readonly successCriteria?: ReadonlyArray<string>;
+}
+
+/**
+ * Options for {@link ProceduralMemory.induce}.
+ *
+ * @stable
+ */
+export interface InduceOptions {
+  /** Sensitivity of the stored procedure. Default `'internal'`. */
+  readonly sensitivity?: Sensitivity;
+  /** Priority of the stored procedure. Default {@link INDUCED_PRIORITY} (40). */
+  readonly priority?: number;
 }
 
 /**
@@ -40,15 +82,28 @@ export interface RuleActivationContext {
  * are deterministic so the agent runtime + ContextEngine can render
  * the active set into the system prompt every step.
  *
+ * P2-2 adds {@link ProceduralMemory.induce}: distil a reusable workflow
+ * from a successful agent trajectory and store it **quarantined** (it must
+ * not drive actions until validated). Quarantined procedures are excluded
+ * from {@link ProceduralMemory.activate} but remain visible to
+ * {@link ProceduralMemory.list}.
+ *
  * @stable
  */
 export class ProceduralMemory {
   readonly #store: MemoryStoreAdapter;
   readonly #tracer: Tracer;
+  /** Opt-in workflow inducer (P2-2). `null` ⇒ {@link induce} throws. */
+  readonly #inducer: WorkflowInducer | null;
 
-  constructor(args: { store: MemoryStoreAdapter; tracer: Tracer }) {
+  constructor(args: {
+    store: MemoryStoreAdapter;
+    tracer: Tracer;
+    inducer?: WorkflowInducer | null;
+  }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
+    this.#inducer = args.inducer ?? null;
   }
 
   /** Persist a rule. Returns the stored record. */
@@ -66,6 +121,13 @@ export class ProceduralMemory {
         ...(input.condition !== undefined ? { condition: input.condition } : {}),
         priority: input.priority ?? 50,
         ...(input.tags !== undefined ? { tags: Object.freeze([...input.tags]) } : {}),
+        ...(input.steps !== undefined ? { steps: Object.freeze([...input.steps]) } : {}),
+        ...(input.variables !== undefined
+          ? { variables: Object.freeze([...input.variables]) }
+          : {}),
+        ...(input.successCriteria !== undefined
+          ? { successCriteria: Object.freeze([...input.successCriteria]) }
+          : {}),
         createdAt: now,
         updatedAt: now,
       };
@@ -76,6 +138,79 @@ export class ProceduralMemory {
       });
       return rule;
     });
+  }
+
+  /**
+   * Induce a reusable procedure (P2-2) from a successful agent trajectory
+   * and store it **quarantined** + `provenance: 'induction'` (P1-4). Returns
+   * the stored {@link Rule}, or `null` when the trajectory was unsuccessful /
+   * empty or the inducer produced nothing inducible.
+   *
+   * Throws {@link ProcedureInductionNotConfiguredError} when no inducer was
+   * configured (`createMemory({ procedureInduction: { provider } })`).
+   */
+  async induce(
+    scope: SessionScope,
+    trajectory: Trajectory,
+    opts: InduceOptions = {},
+  ): Promise<Rule | null> {
+    const inducer = this.#inducer;
+    if (inducer === null) throw new ProcedureInductionNotConfiguredError();
+    return withMemorySpan(
+      this.#tracer,
+      'memory.write.procedural',
+      scope,
+      { 'memory.procedural.action': 'induce' },
+      async (span) => {
+        const induced = await runWorkflowInduction(trajectory, inducer, {});
+        if (induced === null) {
+          span.setAttributes({ 'memory.procedural.induced': 0 });
+          return null;
+        }
+        const now = new Date().toISOString();
+        const rule: Rule = {
+          id: newMemoryId('rule'),
+          kind: 'procedural',
+          userId: scope.userId,
+          ...(scope.sessionId !== undefined ? { sessionId: scope.sessionId } : {}),
+          ...(scope.agentId !== undefined ? { agentId: scope.agentId } : {}),
+          // Induced from a run ⇒ user-derived, so 'internal' (not the public
+          // default for author-defined rules).
+          sensitivity: opts.sensitivity ?? 'internal',
+          text: renderProcedureText(induced),
+          priority: opts.priority ?? INDUCED_PRIORITY,
+          steps: Object.freeze([...induced.steps]),
+          variables: Object.freeze([...induced.variables]),
+          successCriteria: Object.freeze([...induced.successCriteria]),
+          // Highest-poisoning-risk write in the system — procedures drive
+          // actions, so it lands quarantined + provenance-tagged (P1-4).
+          provenance: 'induction' satisfies MemoryProvenance,
+          status: 'quarantined' satisfies MemoryStatus,
+          createdAt: now,
+          updatedAt: now,
+        };
+        await this.#store.procedural.add(rule);
+        span.setAttributes({
+          'memory.procedural.induced': 1,
+          'memory.procedural.steps': induced.steps.length,
+          'memory.procedural.variables': induced.variables.length,
+        });
+        return rule;
+      },
+    );
+  }
+
+  /**
+   * Convenience over {@link induce}: distil the {@link Trajectory} from a
+   * completed {@link RunState} (the agent's already-emitted run state) and
+   * induce a procedure. The success signal is `status === 'completed'`.
+   */
+  async induceFromRun(
+    scope: SessionScope,
+    run: RunState,
+    opts: InduceOptions = {},
+  ): Promise<Rule | null> {
+    return this.induce(scope, trajectoryFromRunState(run), opts);
   }
 
   /** Soft-delete a rule. */
@@ -106,6 +241,10 @@ export class ProceduralMemory {
    * supports the literals `'always'`, `'topic=<topic>'`, and
    * `'tag=<tag>'`. Anything outside that grammar is treated as
    * always-active so callers do not silently lose rules.
+   *
+   * **Quarantined procedures are excluded** (P1-4 / P2-2): an induced
+   * procedure must not drive actions until validated, so activation — which
+   * feeds the system prompt — never surfaces it.
    */
   async activate(
     scope: SessionScope,
@@ -113,9 +252,15 @@ export class ProceduralMemory {
   ): Promise<ReadonlyArray<Rule>> {
     const rules = await this.list(scope);
     return rules
-      .filter((rule) => predicateMatches(rule, context))
+      .filter((rule) => rule.status !== 'quarantined' && predicateMatches(rule, context))
       .sort((a, b) => b.priority - a.priority);
   }
+}
+
+/** Render an induced procedure into the human-readable `Rule.text`. */
+function renderProcedureText(procedure: InducedProcedure): string {
+  const lines = [procedure.title, ...procedure.steps.map((step, i) => `${i + 1}. ${step}`)];
+  return lines.join('\n');
 }
 
 function predicateMatches(rule: Rule, context: RuleActivationContext): boolean {

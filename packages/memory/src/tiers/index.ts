@@ -19,6 +19,7 @@ export {
   type InsightSearchOptions,
 } from './insight-memory.js';
 export {
+  type InduceOptions,
   ProceduralMemory,
   type RuleActivationContext,
   type RuleInput,

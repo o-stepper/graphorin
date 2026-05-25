@@ -191,3 +191,29 @@ export class EmbedderMigrationStateError extends GraphorinMemoryError {
     });
   }
 }
+
+/**
+ * Raised when {@link ProceduralMemory.induce} (P2-2) is called but no
+ * workflow inducer was configured. Induction abstracts concrete values into
+ * variables, which needs a provider — so the capability is opt-in and the
+ * default (offline) procedural tier never silently no-ops a requested
+ * induction.
+ *
+ * @stable
+ */
+export class ProcedureInductionNotConfiguredError extends GraphorinMemoryError {
+  override readonly name = 'ProcedureInductionNotConfiguredError';
+  readonly kind = 'procedure-induction-not-configured' as const;
+
+  constructor(options?: { cause?: unknown }) {
+    super(
+      '[graphorin/memory] procedure induction requires a provider. ' +
+        'ProceduralMemory.induce(...) needs an inducer to abstract values into ' +
+        'variables; enable it with createMemory({ procedureInduction: { provider } }).',
+      {
+        ...(options?.cause !== undefined ? { cause: options.cause } : {}),
+        hint: 'Pass `procedureInduction: { provider }` to createMemory(...).',
+      },
+    );
+  }
+}

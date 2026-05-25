@@ -28,6 +28,7 @@ import {
   type ConsolidatorTriggerSpec,
   createConsolidator,
   createConsolidatorPlaceholder,
+  createProviderWorkflowInducer,
   type OnBudgetExceed,
   type PhaseListener,
   type SalienceWeights,
@@ -149,6 +150,20 @@ export interface CreateMemoryOptions {
     /** Default total-pass cap (clamped to `[1, 5]`). Default 3. */
     readonly maxIterations?: number;
     /** Output-token ceiling per grade call. Default 256. */
+    readonly maxTokens?: number;
+  };
+  /**
+   * Opt-in workflow induction (P2-2). When set, `ProceduralMemory.induce(...)`
+   * distils a reusable, value-abstracted procedure from a successful agent
+   * trajectory and stores it **quarantined** + `provenance: 'induction'`.
+   * Omitted (the default) ⇒ `induce(...)` throws
+   * {@link ProcedureInductionNotConfiguredError} and the procedural tier
+   * stays pure offline CRUD — no provider call.
+   */
+  readonly procedureInduction?: {
+    /** Provider used to abstract trajectory values into a procedure. */
+    readonly provider: Provider;
+    /** Output-token ceiling per induction call. Default 512. */
     readonly maxTokens?: number;
   };
   /**
@@ -372,7 +387,21 @@ export function createMemory(options: CreateMemoryOptions): Memory {
       ? { iterativeMaxIterations: options.iterativeRetrieval.maxIterations }
       : {}),
   });
-  const procedural = new ProceduralMemory({ store: options.store, tracer });
+  // P2-2: build the (opt-in) workflow inducer. Absent ⇒ `null` ⇒
+  // `ProceduralMemory.induce(...)` throws and the tier stays offline CRUD.
+  const inducer =
+    options.procedureInduction !== undefined
+      ? createProviderWorkflowInducer(options.procedureInduction.provider, {
+          ...(options.procedureInduction.maxTokens !== undefined
+            ? { maxTokens: options.procedureInduction.maxTokens }
+            : {}),
+        })
+      : null;
+  const procedural = new ProceduralMemory({
+    store: options.store,
+    tracer,
+    ...(inducer !== null ? { inducer } : {}),
+  });
   const shared = new SharedMemory({ store: options.store, tracer });
   const insights = new InsightMemory({ store: options.store, tracer });
 
