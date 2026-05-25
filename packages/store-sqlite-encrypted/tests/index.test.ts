@@ -4,7 +4,7 @@ import * as encrypted from '../src/index.js';
 
 describe('@graphorin/store-sqlite-encrypted public surface', () => {
   it('declares VERSION matching the package.json release', () => {
-    expect(encrypted.VERSION).toBe('0.3.0');
+    expect(encrypted.VERSION).toBe('0.4.0');
   });
 
   it('re-exports the cipher selection helpers', () => {

@@ -22,6 +22,7 @@
  * @packageDocumentation
  */
 
+import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import type { Consolidator } from './runtime.js';
 import type {
   ConsolidatorConfig,
@@ -44,7 +45,12 @@ export {
 export {
   DEFAULT_DECAY_ARCHIVE_THRESHOLD,
   DEFAULT_DECAY_TAU_DAYS,
+  DEFAULT_SALIENCE_WEIGHTS,
+  NEUTRAL_IMPORTANCE,
   retention,
+  type SalienceWeights,
+  salience,
+  selectForCapacityEviction,
   shouldArchive,
 } from './decay.js';
 export {
@@ -65,6 +71,25 @@ export {
   type NoiseFilterResult,
 } from './noise-filter.js';
 export { type DeepPhaseDeps, runDeepPhase } from './phases/deep.js';
+export {
+  buildInductionRequest,
+  checkSuccessCriteria,
+  createProviderWorkflowInducer,
+  DEFAULT_INDUCTION_MAX_TOKENS,
+  INDUCTION_SYSTEM_PROMPT,
+  type InducedProcedure,
+  MAX_PROCEDURE_STEPS,
+  MAX_TRAJECTORY_STEPS_SHOWN,
+  normalizeInducedProcedure,
+  parseInducedProcedure,
+  runWorkflowInduction,
+  type Trajectory,
+  type TrajectoryStep,
+  trajectoryFromRunState,
+  type VerificationResult,
+  type WorkflowInducer,
+  type WorkflowInductionOptions,
+} from './phases/induce.js';
 export {
   type LightPhaseDeps,
   runLightPhase,
@@ -149,11 +174,19 @@ export function createConsolidatorPlaceholder(
     lockWaitMs: 30_000,
     decayTauDays: 7,
     decayArchiveThreshold: 0.05,
+    decayCapacity: null,
+    salienceWeights: DEFAULT_SALIENCE_WEIGHTS,
     maxStandardBatchSize: 50,
     maxDeepConflictsPerRun: 20,
     dlqMaxRetries: 5,
     dlqBaseBackoffMs: 60_000,
     dlqMaxBackoffMs: 60 * 60 * 1000,
+    formEpisodes: false,
+    importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   });
 
   const status = async (): Promise<ConsolidatorStatus> =>

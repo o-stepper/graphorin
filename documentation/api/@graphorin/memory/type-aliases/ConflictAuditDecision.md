@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ConflictAuditDecision = "admit" | "dedup" | "supersede" | "pending";
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:173
+Defined in: packages/memory/src/internal/storage-adapter.ts:217
 
 Final pipeline outcome recorded against the candidate fact. Matches
 the storage adapter's `ConflictPipelineDecision` exactly.

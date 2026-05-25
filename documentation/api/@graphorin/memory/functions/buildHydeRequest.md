@@ -1,0 +1,30 @@
+[**Graphorin API reference v0.4.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/memory](/api/@graphorin/memory/index.md) / [](/api/@graphorin/memory/README.md) / buildHydeRequest
+
+# Function: buildHydeRequest()
+
+```ts
+function buildHydeRequest(query, options?): ProviderRequest;
+```
+
+Defined in: packages/memory/src/search/query-transform.ts:133
+
+Build the HyDE pseudo-document request. Pure — no I/O.
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `query` | `string` |
+| `options` | \{ `maxTokens?`: `number`; `signal?`: `AbortSignal`; \} |
+| `options.maxTokens?` | `number` |
+| `options.signal?` | `AbortSignal` |
+
+## Returns
+
+[`ProviderRequest`](/api/@graphorin/core/interfaces/ProviderRequest.md)
+
+## Stable

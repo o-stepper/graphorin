@@ -60,6 +60,77 @@ describe('@graphorin/memory/tools — fact tools', () => {
     expect(next.newId).not.toBe(first.factId);
   });
 
+  it('fact_search honours asOf (point-in-time)', async () => {
+    const memory = createMemoryWithScope();
+    const remember = findTool(memory.tools, 'fact_remember');
+    const search = findTool(memory.tools, 'fact_search');
+    const ctx = makeCtx();
+    await remember.execute(
+      {
+        text: 'residence is Berlin',
+        validFrom: '2024-01-01T00:00:00.000Z',
+        validTo: '2024-06-01T00:00:00.000Z',
+      },
+      ctx,
+    );
+    await remember.execute(
+      { text: 'residence is Munich', validFrom: '2024-06-01T00:00:00.000Z' },
+      ctx,
+    );
+    const before = (await search.execute(
+      { query: 'residence', asOf: '2024-03-01T00:00:00.000Z' },
+      ctx,
+    )) as { hits: Array<{ text: string }> };
+    expect(before.hits.map((h) => h.text)).toEqual(['residence is Berlin']);
+  });
+
+  it('fact_history returns the ordered supersede chain', async () => {
+    const memory = createMemoryWithScope();
+    const remember = findTool(memory.tools, 'fact_remember');
+    const supersede = findTool(memory.tools, 'fact_supersede');
+    const history = findTool(memory.tools, 'fact_history');
+    const ctx = makeCtx();
+    const first = (await remember.execute(
+      { text: 'residence is Moscow', validFrom: '2024-01-01T00:00:00.000Z' },
+      ctx,
+    )) as { factId: string };
+    const next = (await supersede.execute(
+      { oldId: first.factId, newText: 'residence is Tbilisi' },
+      ctx,
+    )) as { oldId: string; newId: string };
+    const out = (await history.execute({ factId: next.newId }, ctx)) as {
+      chain: Array<{ factId: string; text: string }>;
+    };
+    expect(out.chain.map((c) => c.factId)).toEqual([first.factId, next.newId]);
+    expect(out.chain.map((c) => c.text)).toEqual(['residence is Moscow', 'residence is Tbilisi']);
+  });
+
+  it('fact_validate promotes a quarantined fact into recall (and fact_search surfaces provenance)', async () => {
+    const memory = createMemoryWithScope();
+    const search = findTool(memory.tools, 'fact_search');
+    const validate = findTool(memory.tools, 'fact_validate');
+    const ctx = makeCtx();
+    // A synthesized (extraction) write lands quarantined — hidden from default recall.
+    const quarantined = await memory.semantic.remember(SCOPE, {
+      text: 'synthesized claim about the user',
+      provenance: 'extraction',
+    });
+    const before = (await search.execute({ query: 'synthesized' }, ctx)) as { hits: unknown[] };
+    expect(before.hits.length).toBe(0);
+
+    const out = (await validate.execute({ factId: quarantined.id }, ctx)) as {
+      factId: string;
+      validated: boolean;
+    };
+    expect(out.validated).toBe(true);
+
+    const after = (await search.execute({ query: 'synthesized' }, ctx)) as {
+      hits: Array<{ factId: string; provenance?: string }>;
+    };
+    expect(after.hits.map((h) => h.factId)).toEqual([quarantined.id]);
+    expect(after.hits[0]?.provenance).toBe('extraction');
+  });
+
   it('fact_forget soft-deletes the fact', async () => {
     const memory = createMemoryWithScope();
     const remember = findTool(memory.tools, 'fact_remember');
@@ -120,7 +191,9 @@ describe('@graphorin/memory/tools — guard wiring', () => {
     expect(tools.fact_remember?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_supersede?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_forget?.memoryGuardTier).toBe('memory-aware');
+    expect(tools.fact_validate?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_search?.memoryGuardTier).toBe('pure');
+    expect(tools.fact_history?.memoryGuardTier).toBe('pure');
     expect(tools.recall_episodes?.memoryGuardTier).toBe('pure');
     expect(tools.conversation_search?.memoryGuardTier).toBe('pure');
   });

@@ -49,7 +49,7 @@ import type {
 } from './types.js';
 
 const DEFAULT_CLIENT_NAME = 'graphorin-mcp-client';
-const DEFAULT_CLIENT_VERSION = '0.3.0';
+const DEFAULT_CLIENT_VERSION = '0.4.0';
 
 /**
  * Process-scoped dedup flag for the deprecated SSE transport WARN.

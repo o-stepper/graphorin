@@ -189,7 +189,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
-  it('the nine memory tools register with stable names and metadata', async () => {
+  it('the eleven memory tools register with stable names and metadata', async () => {
     const sqlite = await makeStore();
     try {
       const memory = createMemory({
@@ -197,7 +197,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
         embeddings: sqlite.embeddings,
         resolveScope: () => SCOPE,
       });
-      expect(memory.tools.length).toBe(9);
+      expect(memory.tools.length).toBe(11);
       const names = memory.tools.map((t) => t.name);
       expect(names).toEqual([
         'block_append',
@@ -209,11 +209,15 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
         'fact_forget',
         'recall_episodes',
         'conversation_search',
+        'fact_history',
+        'fact_validate',
       ]);
       // Memory-modification guard tier annotation per DEC-153.
       const byName = Object.fromEntries(memory.tools.map((t) => [t.name, t]));
       expect(byName.fact_remember?.memoryGuardTier).toBe('memory-aware');
       expect(byName.fact_search?.memoryGuardTier).toBe('pure');
+      expect(byName.fact_history?.memoryGuardTier).toBe('pure');
+      expect(byName.fact_validate?.memoryGuardTier).toBe('memory-aware');
     } finally {
       await sqlite.close();
     }

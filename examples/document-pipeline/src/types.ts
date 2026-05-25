@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Public types for the `document-pipeline` example. Captures the
  * synthetic PDF input shape, the `DocumentState` carried across every

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorCeilings
 
-Defined in: packages/memory/src/consolidator/types.ts:58
+Defined in: packages/memory/src/consolidator/types.ts:61
 
 Hard cost ceilings enforced atomically per UTC day. The default
 ceiling shape per tier is captured in
@@ -18,8 +18,8 @@ ceiling shape per tier is captured in
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cooldownms"></a> `cooldownMs` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:63 |
-| <a id="property-maxconcurrentruns"></a> `maxConcurrentRuns` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:61 |
-| <a id="property-maxcostperday"></a> `maxCostPerDay` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:60 |
-| <a id="property-maxrundurationms"></a> `maxRunDurationMs` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:62 |
-| <a id="property-maxtokensperday"></a> `maxTokensPerDay` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:59 |
+| <a id="property-cooldownms"></a> `cooldownMs` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:66 |
+| <a id="property-maxconcurrentruns"></a> `maxConcurrentRuns` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:64 |
+| <a id="property-maxcostperday"></a> `maxCostPerDay` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:63 |
+| <a id="property-maxrundurationms"></a> `maxRunDurationMs` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:65 |
+| <a id="property-maxtokensperday"></a> `maxTokensPerDay` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:62 |

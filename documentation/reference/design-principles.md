@@ -51,7 +51,7 @@ Workflows checkpoint after every step. Agent runs serialise to JSON. Pending app
 
 ### 11. Memory is a real model, not a vector DB
 
-Six tiers, multi-stage conflict resolution, bi-temporal storage, hybrid search, a budgeted background consolidator. Old facts are **superseded, never silently overwritten**.
+Six tiers (plus derived insights), multi-stage conflict resolution, bi-temporal storage with point-in-time time-travel, hybrid search over an entity graph, and a budgeted background consolidator that reflects, forgets, and learns. Old facts are **superseded, never silently overwritten**, and synthesised memory is **quarantined until validated**.
 
 ### 12. Tools, Skills, and MCP all surface the same way
 
@@ -118,4 +118,4 @@ A few feature requests have been turned down because they would contradict a pri
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,16 +6,24 @@
 
 # tools
 
-Nine memory tools registered with `@graphorin/tools` by the
-`createMemory()` facade. Each factory takes a [MemoryToolDeps](/api/@graphorin/memory/interfaces/MemoryToolDeps.md)
-bundle so consumers can scope the tool surface (per-tier ACL, scope
-resolver, etc.) without rebuilding the underlying memory facade.
+Eleven memory tools registered with `@graphorin/tools` by the
+`createMemory()` facade — plus an opt-in twelfth, `deep_recall` (P2-4),
+appended only when iterative retrieval is configured. Each factory
+takes a [MemoryToolDeps](/api/@graphorin/memory/interfaces/MemoryToolDeps.md) bundle so consumers can scope the tool
+surface (per-tier ACL, scope resolver, etc.) without rebuilding the
+underlying memory facade.
+
+## Interfaces
+
+| Interface | Description |
+| ------ | ------ |
+| [BuildMemoryToolsOptions](/api/@graphorin/memory/tools/interfaces/BuildMemoryToolsOptions.md) | Options for [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md). |
 
 ## Functions
 
 | Function | Description |
 | ------ | ------ |
-| [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical nine-memory-tool array. Order is stable — consumers can rely on the indices for snapshot tests. |
+| [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical eleven-memory-tool array. Order is stable — consumers can rely on the indices for snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are appended last so the original nine indices are unchanged. With `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is appended as a twelfth, after the stable eleven. |
 
 ## References
 
@@ -43,9 +51,21 @@ Re-exports [createConversationSearchTool](/api/@graphorin/memory/functions/creat
 
 ***
 
+### createDeepRecallTool
+
+Re-exports [createDeepRecallTool](/api/@graphorin/memory/functions/createDeepRecallTool.md)
+
+***
+
 ### createFactForgetTool
 
 Re-exports [createFactForgetTool](/api/@graphorin/memory/functions/createFactForgetTool.md)
+
+***
+
+### createFactHistoryTool
+
+Re-exports [createFactHistoryTool](/api/@graphorin/memory/functions/createFactHistoryTool.md)
 
 ***
 
@@ -64,6 +84,12 @@ Re-exports [createFactSearchTool](/api/@graphorin/memory/functions/createFactSea
 ### createFactSupersedeTool
 
 Re-exports [createFactSupersedeTool](/api/@graphorin/memory/functions/createFactSupersedeTool.md)
+
+***
+
+### createFactValidateTool
+
+Re-exports [createFactValidateTool](/api/@graphorin/memory/functions/createFactValidateTool.md)
 
 ***
 

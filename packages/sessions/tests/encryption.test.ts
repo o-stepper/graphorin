@@ -26,7 +26,7 @@ describe('Session export AES-256-GCM helpers', () => {
   it('wraps an actual JSONL export through encrypt / decrypt and re-parses correctly', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.3.0',
+      writer: '@graphorin/sessions@0.4.0',
       hash: true,
     });
     await writer.writeRecord({

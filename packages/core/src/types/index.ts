@@ -55,13 +55,18 @@ export type {
 } from './handoff.js';
 export type {
   Block,
+  EntityRole,
   Episode,
   Fact,
+  GraphEntity,
+  Insight,
   MemoryHit,
   MemoryKind,
   MemoryMetadata,
+  MemoryProvenance,
   MemoryRecord,
   MemorySearchOptions,
+  MemoryStatus,
   Rule,
 } from './memory.js';
 export type {

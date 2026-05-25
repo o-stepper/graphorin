@@ -50,7 +50,7 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 
 | Package | Status | Role |
 |---|---|---|
-| `@graphorin/memory` | stable | Six-tier memory system with the multi-stage conflict-resolution pipeline and the consolidator. |
+| `@graphorin/memory` | stable | Six-tier memory (+ derived insights): hybrid search with weighted fusion, an entity graph with one-hop expansion, bi-temporal time-travel, a provenance/quarantine safety gate, plus the multi-stage conflict pipeline and consolidator. |
 | `@graphorin/sessions` | stable | Hybrid session facade, agent registry, handoffs, JSONL export, replay reconstruction. |
 
 ## Tier 5 — Runtime
@@ -110,4 +110,4 @@ Once Graphorin reaches `1.0`, strict SemVer applies and optional packages can mo
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -1,8 +1,11 @@
 import type {
   Block,
   EmbedderProvider,
+  EntityRole,
   Episode,
   Fact,
+  GraphEntity,
+  Insight,
   MemoryHit,
   Message,
   MessageRef,
@@ -22,6 +25,14 @@ import type {
   DlqBatchRow,
   EmbeddedWriteOptions,
   EmbeddingMetaRegistryLike,
+  EntityMergeRecord,
+  EntityUpsertInput,
+  EntityWithEmbedding,
+  ExpandHopsStoreOptions,
+  GraphMemoryStoreExt,
+  InsightListOptions,
+  InsightMemoryStoreExt,
+  InsightSearchStoreOptions,
   MemoryStoreAdapter,
   PendingConflictInputLike,
   PendingConflictRowLike,
@@ -119,6 +130,8 @@ export interface InMemoryStoreTestHooks {
     factId: string,
     signals: { strength?: number; lastAccessedAt?: number; createdAt?: number; archived?: boolean },
   ): void;
+  /** Stamp a per-fact importance hint (X-1 multi-signal salience tests). */
+  setImportance(factId: string, importance: number): void;
 }
 
 /**
@@ -393,6 +406,84 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
   }
 }
 
+class InMemoryInsightStore implements InsightMemoryStoreExt {
+  readonly rows: Insight[] = [];
+
+  async insert(insight: Insight): Promise<void> {
+    const idx = this.rows.findIndex((r) => r.id === insight.id);
+    if (idx >= 0) this.rows[idx] = insight;
+    else this.rows.push(insight);
+  }
+
+  async list(scope: SessionScope, opts: InsightListOptions = {}): Promise<ReadonlyArray<Insight>> {
+    const limit = opts.limit ?? 50;
+    return this.rows
+      .filter(
+        (i) =>
+          i.userId === scope.userId &&
+          i.deletedAt === undefined &&
+          (opts.includeQuarantined === true || i.status !== 'quarantined'),
+      )
+      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      .slice(0, limit);
+  }
+
+  async search(
+    scope: SessionScope,
+    query: string,
+    opts: InsightSearchStoreOptions = {},
+  ): Promise<ReadonlyArray<MemoryHit<Insight>>> {
+    const topK = opts.topK ?? 10;
+    const q = query.toLowerCase();
+    const out: MemoryHit<Insight>[] = [];
+    for (const i of this.rows) {
+      if (i.userId !== scope.userId) continue;
+      if (i.deletedAt !== undefined) continue;
+      if (opts.includeQuarantined !== true && i.status === 'quarantined') continue;
+      if (q === '*' || i.text.toLowerCase().includes(q)) {
+        out.push({ record: i, score: 1, signals: { bm25: 1 } });
+      }
+      if (out.length >= topK) break;
+    }
+    return out;
+  }
+
+  async get(id: string): Promise<Insight | null> {
+    const i = this.rows.find((r) => r.id === id);
+    if (i === undefined || i.deletedAt !== undefined) return null;
+    return i;
+  }
+
+  async bumpSalience(id: string, delta: number): Promise<void> {
+    const idx = this.rows.findIndex((r) => r.id === id);
+    const i = idx >= 0 ? this.rows[idx] : undefined;
+    if (i !== undefined) {
+      this.rows[idx] = {
+        ...i,
+        salience: Math.max(0, i.salience + delta),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  async prune(scope: SessionScope): Promise<number> {
+    let pruned = 0;
+    for (let idx = 0; idx < this.rows.length; idx++) {
+      const i = this.rows[idx];
+      if (
+        i !== undefined &&
+        i.userId === scope.userId &&
+        i.salience <= 0 &&
+        i.deletedAt === undefined
+      ) {
+        this.rows[idx] = { ...i, deletedAt: new Date().toISOString() };
+        pruned += 1;
+      }
+    }
+    return pruned;
+  }
+}
+
 /**
  * In-memory `MemoryStoreAdapter` used by the unit tests. Implements
  * just enough surface to exercise the facade + the six tier sub-
@@ -406,11 +497,14 @@ export function createInMemoryStore(
     embedderId?: string;
     withConflictStore?: boolean;
     withConsolidatorStore?: boolean;
+    withInsightStore?: boolean;
+    withGraphStore?: boolean;
   } = {},
 ): MemoryStoreAdapter & {
   readonly __hooks: InMemoryStoreTestHooks;
   readonly __conflicts: InMemoryConflictHooks | null;
   readonly __consolidator: InMemoryConsolidatorHooks | null;
+  readonly __insights: ReadonlyArray<Insight> | null;
 } {
   const blocks = new Map<string, Block>();
   const messages: Message[] = [];
@@ -426,6 +520,8 @@ export function createInMemoryStore(
   const shared = new Map<string, Set<string>>();
   const factVectors = new Map<string, Float32Array>();
   const factEmbedderById = new Map<string, string>();
+  // P1-3: contextual index text per fact (mirrors store-sqlite's facts_fts).
+  const factIndexText = new Map<string, string>();
   const episodeVectors = new Map<string, Float32Array>();
   const decaySignals = new Map<
     string,
@@ -437,6 +533,8 @@ export function createInMemoryStore(
   const conflictStore = options.withConflictStore === true ? new InMemoryConflictStore() : null;
   const consolidatorStore =
     options.withConsolidatorStore === true ? new InMemoryConsolidatorStore() : null;
+  const insightStore = options.withInsightStore === true ? new InMemoryInsightStore() : null;
+  const graphStore = options.withGraphStore === true ? createInMemoryGraphStore(facts) : null;
 
   function blockKey(scope: SessionScope, label: string): string {
     return [scope.userId, scope.sessionId ?? '', scope.agentId ?? '', label].join('|');
@@ -581,6 +679,10 @@ export function createInMemoryStore(
         for (const episode of episodes) {
           if (episode.userId !== scope.userId) continue;
           if (episode.deletedAt !== undefined) continue;
+          if (opts.includeQuarantined !== true && episode.status === 'quarantined') continue;
+          if (opts.asOf !== undefined && Date.parse(episode.startedAt) > Date.parse(opts.asOf)) {
+            continue;
+          }
           if (q === '*' || episode.summary.toLowerCase().includes(q)) {
             out.push({ record: episode, score: 1, signals: { bm25: 1 } });
           }
@@ -588,12 +690,13 @@ export function createInMemoryStore(
         }
         return out;
       },
-      async searchVector(scope, embedding, embedderId, topK) {
+      async searchVector(scope, embedding, embedderId, topK, _asOf, includeQuarantined) {
         void embedderId;
         const out: Array<MemoryHit<Episode>> = [];
         for (const episode of episodes) {
           if (episode.userId !== scope.userId) continue;
           if (episode.deletedAt !== undefined) continue;
+          if (includeQuarantined !== true && episode.status === 'quarantined') continue;
           const vec = episodeVectors.get(episode.id);
           if (vec === undefined) continue;
           out.push({ record: episode, score: cosine(vec, embedding) });
@@ -621,6 +724,7 @@ export function createInMemoryStore(
           factVectors.set(fact.id, opts.embedding.vector);
           factEmbedderById.set(fact.id, opts.embedding.embedderId);
         }
+        if (opts.indexText !== undefined) factIndexText.set(fact.id, opts.indexText);
       },
       async get(id) {
         const fact = facts.find((f) => f.id === id);
@@ -635,18 +739,47 @@ export function createInMemoryStore(
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
-          if (q === '*' || fact.text.toLowerCase().includes(q)) {
+          if (opts.includeQuarantined !== true && fact.status === 'quarantined') continue;
+          if (opts.asOf !== undefined && !factValidAt(fact, opts.asOf)) continue;
+          // P1-3: lexical match runs against the contextual index text
+          // when present (mirrors store-sqlite's facts_fts); the canonical
+          // `fact.text` is the fallback for non-contextualized writes.
+          const haystack = (factIndexText.get(fact.id) ?? fact.text).toLowerCase();
+          if (q === '*' || haystack.includes(q)) {
             out.push({ record: fact, score: 1, signals: { bm25: 1 } });
           }
           if (out.length >= topK) break;
         }
         return out;
       },
-      async searchVector(scope, embedding, embedderId, topK) {
+      async historyOf(scope, factId) {
+        const seen = new Set<string>();
+        const queue = [factId];
+        const out: Fact[] = [];
+        while (queue.length > 0) {
+          const id = queue.shift();
+          if (id === undefined || seen.has(id)) continue;
+          seen.add(id);
+          const fact = facts.find((f) => f.id === id && f.userId === scope.userId);
+          if (fact === undefined) continue;
+          out.push(fact);
+          if (fact.supersedes !== undefined) queue.push(fact.supersedes);
+          if (fact.supersededBy !== undefined) queue.push(fact.supersededBy);
+          for (const f of facts) {
+            if (f.userId === scope.userId && (f.supersedes === id || f.supersededBy === id)) {
+              queue.push(f.id);
+            }
+          }
+        }
+        out.sort((a, b) => factOrderEpoch(a) - factOrderEpoch(b));
+        return out;
+      },
+      async searchVector(scope, embedding, embedderId, topK, _asOf, includeQuarantined) {
         const out: Array<MemoryHit<Fact>> = [];
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
+          if (includeQuarantined !== true && fact.status === 'quarantined') continue;
           const vec = factVectors.get(fact.id);
           if (vec === undefined) continue;
           // The default sqlite store gates vector reads by `embedder_id`
@@ -658,12 +791,29 @@ export function createInMemoryStore(
         out.sort((a, b) => b.score - a.score);
         return out.slice(0, topK);
       },
+      async setStatus(factId, status, _reason) {
+        const idx = facts.findIndex((f) => f.id === factId);
+        if (idx >= 0) {
+          const fact = facts[idx];
+          if (fact !== undefined) {
+            facts[idx] = { ...fact, status, updatedAt: new Date().toISOString() };
+          }
+        }
+      },
       async supersede(oldId, newFact) {
         const idx = facts.findIndex((f) => f.id === oldId);
         if (idx >= 0) {
           const old = facts[idx];
           if (old !== undefined) {
-            facts[idx] = { ...old, supersededBy: newFact.id, updatedAt: new Date().toISOString() };
+            // Mirror the sqlite adapter: close the old validity interval at
+            // the new fact's validFrom (COALESCE — never clobber an explicit
+            // close) so asOf queries exclude the superseded fact (P0-3).
+            facts[idx] = {
+              ...old,
+              supersededBy: newFact.id,
+              validTo: old.validTo ?? newFact.validFrom ?? new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
           }
         }
       },
@@ -682,6 +832,7 @@ export function createInMemoryStore(
           facts.splice(idx, 1);
           factVectors.delete(id);
           factEmbedderById.delete(id);
+          factIndexText.delete(id);
         }
       },
       async listForDecay(scope, limit = 1000) {
@@ -692,6 +843,9 @@ export function createInMemoryStore(
           lastAccessedAt: number | null;
           createdAt: number;
           archived: boolean;
+          importance: number | null;
+          status: string;
+          provenance: string | null;
         }> = [];
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
@@ -703,6 +857,9 @@ export function createInMemoryStore(
             lastAccessedAt: sig?.lastAccessedAt ?? null,
             createdAt: sig?.createdAt ?? Date.parse(fact.createdAt),
             archived: sig?.archived ?? false,
+            importance: fact.importance ?? null,
+            status: fact.status ?? 'active',
+            provenance: fact.provenance ?? null,
           });
           if (out.length >= limit) break;
         }
@@ -763,6 +920,8 @@ export function createInMemoryStore(
     },
     ...(conflictStore !== null ? { conflicts: conflictStore } : {}),
     ...(consolidatorStore !== null ? { consolidator: consolidatorStore } : {}),
+    ...(insightStore !== null ? { insights: insightStore } : {}),
+    ...(graphStore !== null ? { graph: graphStore } : {}),
   };
 
   const hooks: InMemoryStoreTestHooks = {
@@ -787,6 +946,11 @@ export function createInMemoryStore(
     },
     registerFactEmbedder(factId, embedderId) {
       factEmbedderById.set(factId, embedderId);
+    },
+    setImportance(factId, importance) {
+      const idx = facts.findIndex((f) => f.id === factId);
+      const fact = facts[idx];
+      if (fact !== undefined) facts[idx] = { ...fact, importance };
     },
   };
 
@@ -821,6 +985,9 @@ export function createInMemoryStore(
     __hooks: hooks,
     __conflicts: conflictHooks,
     __consolidator: consolidatorHooks,
+    get __insights(): ReadonlyArray<Insight> | null {
+      return insightStore === null ? null : [...insightStore.rows];
+    },
   });
 }
 
@@ -837,6 +1004,19 @@ function renderMessageText(message: Message): string {
     .join(' ');
 }
 
+/** Mirror the store's fact validity-interval check for `asOf` reads. */
+function factValidAt(fact: Fact, asOf: string): boolean {
+  const at = Date.parse(asOf);
+  const from = fact.validFrom !== undefined ? Date.parse(fact.validFrom) : null;
+  const to = fact.validTo !== undefined ? Date.parse(fact.validTo) : null;
+  return (from === null || from <= at) && (to === null || to > at);
+}
+
+/** Sort key for `historyOf` — `validFrom`, falling back to `createdAt`. */
+function factOrderEpoch(fact: Fact): number {
+  return Date.parse(fact.validFrom ?? fact.createdAt);
+}
+
 function cosine(a: Float32Array, b: Float32Array): number {
   const len = Math.min(a.length, b.length);
   let dot = 0;
@@ -851,6 +1031,179 @@ function cosine(a: Float32Array, b: Float32Array): number {
   }
   if (na === 0 || nb === 0) return 0;
   return dot / Math.sqrt(na * nb);
+}
+
+interface InMemoryEntity {
+  id: string;
+  userId: string;
+  name: string;
+  normalizedName: string;
+  vector: Float32Array | null;
+  embedderId: string | null;
+  mergedInto: string | undefined;
+  createdAt: string;
+}
+
+/**
+ * Minimal in-memory {@link GraphMemoryStoreExt} (P2-1) over the shared
+ * `facts` array — mirrors `@graphorin/store-sqlite`'s `SqliteGraphStore`
+ * (find-or-create entities, append-only reversible merges canonicalised
+ * via `mergedInto`, one-hop neighbour expansion) so the resolver +
+ * `search({ expandHops })` can be exercised offline without a SQL engine.
+ */
+function createInMemoryGraphStore(facts: Fact[]): GraphMemoryStoreExt {
+  const entities = new Map<string, InMemoryEntity>();
+  const links: Array<{ factId: string; entityId: string; role: EntityRole }> = [];
+  const merges: EntityMergeRecord[] = [];
+  let seq = 0;
+  const canonicalOf = (entityId: string): string => entities.get(entityId)?.mergedInto ?? entityId;
+  const toGraphEntity = (e: InMemoryEntity): GraphEntity => ({
+    id: e.id,
+    userId: e.userId,
+    name: e.name,
+    normalizedName: e.normalizedName,
+    ...(e.mergedInto !== undefined ? { mergedInto: e.mergedInto } : {}),
+    createdAt: e.createdAt,
+  });
+  return {
+    async upsertEntity(scope: SessionScope, input: EntityUpsertInput): Promise<string> {
+      for (const e of entities.values()) {
+        if (
+          e.userId === scope.userId &&
+          e.normalizedName === input.normalizedName &&
+          e.mergedInto === undefined
+        ) {
+          if (e.vector === null && input.vector !== undefined) {
+            e.vector = input.vector;
+            e.embedderId = input.embedderId ?? null;
+          }
+          return e.id;
+        }
+      }
+      seq += 1;
+      const id = `ent_${seq}`;
+      entities.set(id, {
+        id,
+        userId: scope.userId,
+        name: input.name,
+        normalizedName: input.normalizedName,
+        vector: input.vector ?? null,
+        embedderId: input.embedderId ?? null,
+        mergedInto: undefined,
+        createdAt: new Date().toISOString(),
+      });
+      return id;
+    },
+    async linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void> {
+      if (!links.some((l) => l.factId === factId && l.entityId === entityId && l.role === role)) {
+        links.push({ factId, entityId, role });
+      }
+    },
+    async listEntities(
+      scope: SessionScope,
+      opts: { readonly includeMerged?: boolean; readonly limit?: number } = {},
+    ): Promise<ReadonlyArray<EntityWithEmbedding>> {
+      const out: EntityWithEmbedding[] = [];
+      for (const e of entities.values()) {
+        if (e.userId !== scope.userId) continue;
+        if (opts.includeMerged !== true && e.mergedInto !== undefined) continue;
+        out.push({ ...toGraphEntity(e), vector: e.vector, embedderId: e.embedderId });
+      }
+      return out.slice(0, opts.limit ?? 1000);
+    },
+    async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
+      const e = entities.get(id);
+      return e !== undefined && e.userId === scope.userId ? toGraphEntity(e) : null;
+    },
+    async resolveCanonical(scope: SessionScope, id: string): Promise<string> {
+      let current = id;
+      for (let i = 0; i < 16; i++) {
+        const e = entities.get(current);
+        if (e === undefined || e.userId !== scope.userId || e.mergedInto === undefined) {
+          return current;
+        }
+        current = e.mergedInto;
+      }
+      return current;
+    },
+    async mergeEntities(
+      scope: SessionScope,
+      fromId: string,
+      intoId: string,
+      reason?: string,
+    ): Promise<void> {
+      const intoRoot = canonicalOf(intoId);
+      if (fromId === intoRoot) return;
+      const from = entities.get(fromId);
+      if (from !== undefined) from.mergedInto = intoRoot;
+      for (const e of entities.values()) {
+        if (e.mergedInto === fromId) e.mergedInto = intoRoot;
+      }
+      seq += 1;
+      merges.push({
+        id: `mrg_${seq}`,
+        userId: scope.userId,
+        kind: 'merge',
+        fromEntityId: fromId,
+        intoEntityId: intoRoot,
+        ...(reason !== undefined ? { reason } : {}),
+        createdAt: new Date().toISOString(),
+      });
+    },
+    async unmergeEntity(scope: SessionScope, id: string, reason?: string): Promise<void> {
+      const e = entities.get(id);
+      if (e !== undefined) e.mergedInto = undefined;
+      seq += 1;
+      merges.push({
+        id: `mrg_${seq}`,
+        userId: scope.userId,
+        kind: 'unmerge',
+        fromEntityId: id,
+        intoEntityId: null,
+        ...(reason !== undefined ? { reason } : {}),
+        createdAt: new Date().toISOString(),
+      });
+    },
+    async listMerges(
+      scope: SessionScope,
+      opts: { readonly limit?: number } = {},
+    ): Promise<ReadonlyArray<EntityMergeRecord>> {
+      return merges
+        .filter((m) => m.userId === scope.userId)
+        .slice()
+        .reverse()
+        .slice(0, opts.limit ?? 100);
+    },
+    async expandOneHop(
+      scope: SessionScope,
+      seedFactIds: ReadonlyArray<string>,
+      opts: ExpandHopsStoreOptions = {},
+    ): Promise<ReadonlyArray<Fact>> {
+      if (seedFactIds.length === 0) return [];
+      const incQ = opts.includeQuarantined === true;
+      const seedSet = new Set(seedFactIds);
+      const seedRoots = new Set<string>();
+      for (const l of links) {
+        if (seedSet.has(l.factId)) seedRoots.add(canonicalOf(l.entityId));
+      }
+      const neighbourIds = new Set<string>();
+      for (const l of links) {
+        if (!seedSet.has(l.factId) && seedRoots.has(canonicalOf(l.entityId))) {
+          neighbourIds.add(l.factId);
+        }
+      }
+      const out = facts.filter(
+        (f) =>
+          f.userId === scope.userId &&
+          neighbourIds.has(f.id) &&
+          f.deletedAt === undefined &&
+          (incQ || f.status !== 'quarantined') &&
+          (opts.asOf === undefined || factValidAt(f, opts.asOf)),
+      );
+      out.sort((a, b) => factOrderEpoch(b) - factOrderEpoch(a));
+      return out.slice(0, opts.limit ?? 60);
+    },
+  };
 }
 
 /**

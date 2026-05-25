@@ -11,7 +11,7 @@ import { nextFireAfter, type ParsedCron, parseCron } from './cron.js';
 export { CronParseError, nextFireAfter, type ParsedCron, parseCron } from './cron.js';
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 /**
  * Catch-up policy applied when a trigger missed one or more fires

@@ -45,6 +45,11 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '010': '@graphorin/memory (conflict-check)',
   '011': '@graphorin/memory (fact-conflicts audit)',
   '012': '@graphorin/memory (conflict-check conflicting ids)',
+  '013': '@graphorin/memory (provenance/quarantine)',
+  '014': '@graphorin/memory (reflection insights)',
+  '015': '@graphorin/memory (fact importance / multi-signal forgetting)',
+  '016': '@graphorin/memory (entity graph / one-hop expansion)',
+  '017': '@graphorin/memory (induced procedures / workflow induction)',
 };
 
 const dynamicMigrations: Migration[] = [];

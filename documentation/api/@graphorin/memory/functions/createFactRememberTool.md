@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ function createFactRememberTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:74
+Defined in: packages/memory/src/tools/fact-tools.ts:116
 
 `fact_remember` — persist a single semantic fact. The minimum-viable
 pipeline writes the fact straight through with MD5 deduplication;

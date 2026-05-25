@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ type ConflictAuditStage =
   | "defer-to-deep";
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:160
+Defined in: packages/memory/src/internal/storage-adapter.ts:204
 
 Stable lowercase identifier for the pipeline stage that produced a
 conflict decision. Mirrored byte-for-byte by

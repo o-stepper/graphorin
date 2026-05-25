@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -7,9 +7,9 @@
 # Variable: VERSION
 
 ```ts
-const VERSION: "0.3.0" = '0.3.0';
+const VERSION: "0.4.0" = '0.4.0';
 ```
 
-Defined in: packages/memory/src/index.ts:33
+Defined in: packages/memory/src/index.ts:34
 
 Canonical version constant. Mirrors the `package.json` version.

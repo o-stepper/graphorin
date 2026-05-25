@@ -12,8 +12,11 @@
  */
 
 import type { Provider, SessionScope, Tracer } from '@graphorin/core';
+import type { ContextualRetrievalMode } from '../internal/contextualize.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
+import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
+import type { SalienceWeights } from './decay.js';
 
 /**
  * Trigger discriminator. The `'turn:N'` and `'idle:Xm'` variants are
@@ -102,11 +105,74 @@ export interface ConsolidatorConfig {
   readonly lockWaitMs: number;
   readonly decayTauDays: number;
   readonly decayArchiveThreshold: number;
+  /**
+   * Capacity-bounded eviction target for the light phase (X-1). When set,
+   * each light pass archives the lowest-salience live facts in the LRU
+   * decay window down to this many — **cost / staleness control, not an
+   * accuracy lever**. `null` (the default at every tier) leaves storage
+   * unbounded, so behaviour is identical to pre-X-1. Archiving is a soft,
+   * recoverable move; nothing is hard-deleted.
+   */
+  readonly decayCapacity: number | null;
+  /**
+   * Weights for the multi-signal salience score (X-1) that orders both
+   * threshold archiving and capacity eviction. Defaults to
+   * {@link DEFAULT_SALIENCE_WEIGHTS}; with neutral importance, active
+   * status, and first-party provenance salience equals plain retention.
+   */
+  readonly salienceWeights: SalienceWeights;
   readonly maxStandardBatchSize: number;
   readonly maxDeepConflictsPerRun: number;
   readonly dlqMaxRetries: number;
   readonly dlqBaseBackoffMs: number;
   readonly dlqMaxBackoffMs: number;
+  /**
+   * Auto-form a quarantined episode from each processed standard-phase
+   * slice (P1-2). Defaults on at the `standard`+ tiers, off at `free` /
+   * `cheap` / `custom`. The episode summary is one budgeted LLM call;
+   * when the budget is exhausted (or no episodic tier is wired) the
+   * phase degrades to fact-only behaviour.
+   */
+  readonly formEpisodes: boolean;
+  /**
+   * Ask the episode-summarization call for an LLM importance score
+   * (1–10, normalized to `[0, 1]`) so episodic triple-signal retrieval
+   * (recency × relevance × importance) runs on all three signals
+   * (P1-2). Importance is always a *soft* signal — it never gates
+   * retention. Defaults track {@link formEpisodes}.
+   */
+  readonly importanceScoring: boolean;
+  /**
+   * Run the deep-phase reflection pass (P1-1): when accumulated episode
+   * importance crosses {@link importanceThreshold}, synthesize
+   * higher-order, cited insights over recent memories (Generative
+   * Agents). Insights land quarantined + `provenance: 'reflection'` and
+   * are ranked below the facts they cite. Defaults **on at the `full`
+   * tier only** (off at `free` / `cheap` / `standard` / `custom`) — it
+   * is the most LLM-intensive phase. A no-op without an episodic tier
+   * or an insight-capable storage adapter.
+   */
+  readonly reflection: boolean;
+  /**
+   * Sum of recent episode importance (each in `[0, 1]`) at or above
+   * which {@link reflection} fires. Below it the pass makes no LLM
+   * call. Defaults to `3`.
+   */
+  readonly importanceThreshold: number;
+  /** Upper bound on salient questions reflection asks per pass. Defaults to `3`. */
+  readonly reflectionMaxQuestions: number;
+  /**
+   * Contextual retrieval for facts written by the standard phase (P1-3).
+   * `'late-chunk'` (default at every tier) relies on the offline
+   * situating-context prefix the shared {@link SemanticMemory} computes
+   * for every write — no extra LLM call. `'llm'` is the opt-in
+   * enrichment: the standard phase spends one budgeted cheap-model call
+   * per additive write to author a 1–2 sentence situating prefix, then
+   * passes it as the write's index text. `'off'` indexes the bare text.
+   * The `'llm'` mode is **consolidator-only** by construction — the hot
+   * write path never has a provider for contextualization.
+   */
+  readonly contextualRetrieval: ContextualRetrievalMode;
 }
 
 /**
@@ -191,6 +257,10 @@ export interface PhaseOutcome {
   readonly factsCreated: number;
   readonly factsUpdated: number;
   readonly conflictsResolved: number;
+  /** Episodes auto-formed from the processed slice (P1-2). */
+  readonly episodesFormed: number;
+  /** Insights synthesized by the deep-phase reflection pass (P1-1). */
+  readonly insightsCreated: number;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
   readonly llmTokensUsed: number;
@@ -231,6 +301,13 @@ export interface CreateConsolidatorOptions {
    */
   readonly semantic: SemanticMemory;
   /**
+   * The {@link EpisodicMemory} tier instance from the parent
+   * `createMemory(...)` facade. When supplied (and `formEpisodes` is
+   * on) the standard phase auto-forms a quarantined episode per
+   * processed slice (P1-2). Omitted ⇒ episode formation is skipped.
+   */
+  readonly episodic?: EpisodicMemory;
+  /**
    * Provider used by the standard + deep phases. Required when the
    * tier enables either phase; ignored when the active phases
    * collapse to `['light']`.
@@ -254,11 +331,27 @@ export interface CreateConsolidatorOptions {
   readonly lockWaitMs?: number;
   readonly decayTauDays?: number;
   readonly decayArchiveThreshold?: number;
+  /** Override the {@link ConsolidatorConfig.decayCapacity} default (X-1). */
+  readonly decayCapacity?: number | null;
+  /** Override the {@link ConsolidatorConfig.salienceWeights} default (X-1). */
+  readonly salienceWeights?: SalienceWeights;
   readonly maxStandardBatchSize?: number;
   readonly maxDeepConflictsPerRun?: number;
   readonly dlqMaxRetries?: number;
   readonly dlqBaseBackoffMs?: number;
   readonly dlqMaxBackoffMs?: number;
+  /** Override the per-tier {@link ConsolidatorConfig.formEpisodes} default (P1-2). */
+  readonly formEpisodes?: boolean;
+  /** Override the per-tier {@link ConsolidatorConfig.importanceScoring} default (P1-2). */
+  readonly importanceScoring?: boolean;
+  /** Override the per-tier {@link ConsolidatorConfig.reflection} default (P1-1). */
+  readonly reflection?: boolean;
+  /** Override the {@link ConsolidatorConfig.importanceThreshold} default (P1-1). */
+  readonly importanceThreshold?: number;
+  /** Override the {@link ConsolidatorConfig.reflectionMaxQuestions} default (P1-1). */
+  readonly reflectionMaxQuestions?: number;
+  /** Override the per-tier {@link ConsolidatorConfig.contextualRetrieval} default (P1-3). */
+  readonly contextualRetrieval?: ContextualRetrievalMode;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }
@@ -279,6 +372,12 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly cheapModel: string | null;
       readonly deepModel: string | null;
       readonly onExceed: OnBudgetExceed;
+      readonly formEpisodes: boolean;
+      readonly importanceScoring: boolean;
+      readonly reflection: boolean;
+      readonly importanceThreshold: number;
+      readonly reflectionMaxQuestions: number;
+      readonly contextualRetrieval: ContextualRetrievalMode;
     }
   >
 > = Object.freeze({
@@ -294,6 +393,12 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    formEpisodes: false,
+    importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   cheap: {
     ceilings: {
@@ -307,6 +412,12 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    formEpisodes: false,
+    importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   standard: {
     ceilings: {
@@ -320,6 +431,12 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'log',
+    formEpisodes: true,
+    importanceScoring: true,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   full: {
     ceilings: {
@@ -333,6 +450,12 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'log',
+    formEpisodes: true,
+    importanceScoring: true,
+    reflection: true,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   custom: {
     ceilings: {
@@ -346,5 +469,11 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    formEpisodes: false,
+    importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
 });

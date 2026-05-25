@@ -42,7 +42,14 @@ import type {
 } from '../src/contracts/index.js';
 import type {
   AgentEvent,
+  EntityRole,
+  Episode,
+  Fact,
+  GraphEntity,
   MemoryKind,
+  MemoryProvenance,
+  MemorySearchOptions,
+  MemoryStatus,
   Message,
   RunContext,
   RunState,
@@ -125,6 +132,31 @@ describe('public type surface', () => {
 
   it('Sensitivity is a fixed string literal union', () => {
     expectTypeOf<Sensitivity>().toEqualTypeOf<'public' | 'internal' | 'secret'>();
+  });
+
+  it('MemoryProvenance + MemoryStatus are fixed unions (P1-4)', () => {
+    expectTypeOf<MemoryProvenance>().toEqualTypeOf<
+      'user' | 'tool' | 'extraction' | 'reflection' | 'imported'
+    >();
+    expectTypeOf<MemoryStatus>().toEqualTypeOf<'active' | 'quarantined'>();
+  });
+
+  it('Fact + Episode carry optional provenance + status; MemorySearchOptions gates quarantine (P1-4)', () => {
+    expectTypeOf<Fact['provenance']>().toEqualTypeOf<MemoryProvenance | undefined>();
+    expectTypeOf<Fact['status']>().toEqualTypeOf<MemoryStatus | undefined>();
+    expectTypeOf<Episode['provenance']>().toEqualTypeOf<MemoryProvenance | undefined>();
+    expectTypeOf<Episode['status']>().toEqualTypeOf<MemoryStatus | undefined>();
+    expectTypeOf<MemorySearchOptions['includeQuarantined']>().toEqualTypeOf<boolean | undefined>();
+  });
+
+  it('Fact carries the optional s/p/o triple + GraphEntity is the canonical entity (P2-1)', () => {
+    expectTypeOf<Fact['subject']>().toEqualTypeOf<string | undefined>();
+    expectTypeOf<Fact['predicate']>().toEqualTypeOf<string | undefined>();
+    expectTypeOf<Fact['object']>().toEqualTypeOf<string | undefined>();
+    expectTypeOf<EntityRole>().toEqualTypeOf<'subject' | 'object'>();
+    expectTypeOf<GraphEntity['id']>().toEqualTypeOf<string>();
+    expectTypeOf<GraphEntity['normalizedName']>().toEqualTypeOf<string>();
+    expectTypeOf<GraphEntity['mergedInto']>().toEqualTypeOf<string | undefined>();
   });
 
   it('MemoryKind covers exactly the six tiers', () => {

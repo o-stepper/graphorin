@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -7,13 +7,23 @@
 # Type Alias: MemoryKind
 
 ```ts
-type MemoryKind = "working" | "session" | "episodic" | "semantic" | "procedural" | "shared";
+type MemoryKind = 
+  | "working"
+  | "session"
+  | "episodic"
+  | "semantic"
+  | "procedural"
+  | "shared"
+  | "insight";
 ```
 
-Defined in: packages/core/src/types/memory.ts:10
+Defined in: packages/core/src/types/memory.ts:13
 
-The six tiers of the Graphorin memory model. Used as the discriminator
-for `MemoryStore` sub-namespaces, span types, and the `MemoryRecord`
-union.
+Kinds of memory record in the Graphorin model. The first six are the
+storage tiers the [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) contract exposes as 1:1
+sub-namespaces; `insight` is the derived, reflection-synthesized
+record kind (P1-1) — it has no base-tier namespace and is persisted
+through the optional insight surface adapters expose. Used as the
+discriminator for span types and the `MemoryRecord` union.
 
 ## Stable

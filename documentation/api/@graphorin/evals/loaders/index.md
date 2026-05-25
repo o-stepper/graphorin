@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -48,6 +48,18 @@ Re-exports [loadDatasetFromTraces](/api/@graphorin/evals/functions/loadDatasetFr
 
 ***
 
+### loadDmrDataset
+
+Re-exports [loadDmrDataset](/api/@graphorin/evals/functions/loadDmrDataset.md)
+
+***
+
+### LoadDmrOptions
+
+Re-exports [LoadDmrOptions](/api/@graphorin/evals/interfaces/LoadDmrOptions.md)
+
+***
+
 ### loadJsonlDataset
 
 Re-exports [loadJsonlDataset](/api/@graphorin/evals/functions/loadJsonlDataset.md)
@@ -60,15 +72,81 @@ Re-exports [LoadJsonlOptions](/api/@graphorin/evals/interfaces/LoadJsonlOptions.
 
 ***
 
+### loadLocomoDataset
+
+Re-exports [loadLocomoDataset](/api/@graphorin/evals/functions/loadLocomoDataset.md)
+
+***
+
+### LoadLocomoOptions
+
+Re-exports [LoadLocomoOptions](/api/@graphorin/evals/interfaces/LoadLocomoOptions.md)
+
+***
+
+### loadLongMemEvalDataset
+
+Re-exports [loadLongMemEvalDataset](/api/@graphorin/evals/functions/loadLongMemEvalDataset.md)
+
+***
+
+### LoadLongMemEvalOptions
+
+Re-exports [LoadLongMemEvalOptions](/api/@graphorin/evals/interfaces/LoadLongMemEvalOptions.md)
+
+***
+
+### MemoryEvalAbility
+
+Re-exports [MemoryEvalAbility](/api/@graphorin/evals/type-aliases/MemoryEvalAbility.md)
+
+***
+
+### MemoryEvalInput
+
+Re-exports [MemoryEvalInput](/api/@graphorin/evals/interfaces/MemoryEvalInput.md)
+
+***
+
+### MemoryEvalSession
+
+Re-exports [MemoryEvalSession](/api/@graphorin/evals/interfaces/MemoryEvalSession.md)
+
+***
+
+### MemoryEvalTurn
+
+Re-exports [MemoryEvalTurn](/api/@graphorin/evals/interfaces/MemoryEvalTurn.md)
+
+***
+
 ### parseCsv
 
 Re-exports [parseCsv](/api/@graphorin/evals/functions/parseCsv.md)
 
 ***
 
+### parseDmr
+
+Re-exports [parseDmr](/api/@graphorin/evals/functions/parseDmr.md)
+
+***
+
 ### parseJsonl
 
 Re-exports [parseJsonl](/api/@graphorin/evals/functions/parseJsonl.md)
+
+***
+
+### parseLocomo
+
+Re-exports [parseLocomo](/api/@graphorin/evals/functions/parseLocomo.md)
+
+***
+
+### parseLongMemEval
+
+Re-exports [parseLongMemEval](/api/@graphorin/evals/functions/parseLongMemEval.md)
 
 ***
 

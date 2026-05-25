@@ -1,10 +1,15 @@
 import type {
   Block,
+  EntityRole,
   Episode,
   Fact,
+  GraphEntity,
+  Insight,
   MemoryHit,
+  MemoryProvenance,
   MemoryRecord,
   MemorySearchOptions,
+  MemoryStatus,
   Message,
   Rule,
   SessionScope,
@@ -25,6 +30,29 @@ import type { SqliteConnection } from './connection.js';
 import { SqliteConsolidatorStateStore } from './consolidator-store.js';
 import type { EmbeddingMetaRepository } from './embedding-meta-repo.js';
 import { VectorTableManager } from './vector-table-mgr.js';
+
+/**
+ * Point-in-time (`asOf`) WHERE fragments. Appended only when an
+ * `asOf` epoch is supplied; absent ⇒ the query is byte-identical to
+ * the pre-feature SQL, so default reads are unaffected. Facts use the
+ * bi-temporal validity interval; episodes have no close column so they
+ * match once they have started. Each `?` is bound with the same epoch.
+ */
+const FACT_VALIDITY_CLAUSE =
+  'AND (f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)';
+const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
+
+/**
+ * Quarantine retrieval-gate fragments (P1-4). Appended to default
+ * reads so `status = 'quarantined'` rows never surface in
+ * action-driving recall; omitted only when the caller passes
+ * `includeQuarantined` (the validation / inspector path). Each is a
+ * literal predicate with no bind parameter, so it can be injected
+ * without disturbing the surrounding `?` ordering.
+ */
+const FACT_NOT_QUARANTINED = "AND f.status != 'quarantined'";
+const EPISODE_NOT_QUARANTINED = "AND e.status != 'quarantined'";
+const INSIGHT_NOT_QUARANTINED = "AND i.status != 'quarantined'";
 
 /**
  * Optional embedding payload attached to a memory write. The
@@ -48,6 +76,17 @@ export interface EmbeddingPayload {
  */
 export interface SqliteMemoryWriteOptions {
   readonly embedding?: EmbeddingPayload;
+  /**
+   * Contextual-retrieval index text (P1-3). When supplied, the FTS5 row
+   * is indexed against this (context-prepended) text instead of the
+   * canonical `fact.text`, so a terse fact stays findable by a
+   * vaguely-worded query. The persisted `facts.text` column — the value
+   * shown to the user / audit trail — is always the canonical text; only
+   * the lexical index is affected. The caller's `embedding.vector` should
+   * be computed from the same index text so the vector and FTS surfaces
+   * agree. Absent ⇒ the FTS row uses `fact.text` (pre-P1-3 behaviour).
+   */
+  readonly indexText?: string;
 }
 
 /**
@@ -68,6 +107,10 @@ export class SqliteMemoryStore implements MemoryStore {
   readonly shared: SharedMemoryStore;
   readonly conflicts: SqliteConflictStore;
   readonly consolidator: SqliteConsolidatorStateStore;
+  /** Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. */
+  readonly insights: SqliteInsightStore;
+  /** Lightweight relation-graph surface (P2-1): entities + one-hop CTE. */
+  readonly graph: SqliteGraphStore;
 
   constructor(conn: SqliteConnection, embeddings: EmbeddingMetaRepository) {
     this.#embeddings = embeddings;
@@ -80,6 +123,8 @@ export class SqliteMemoryStore implements MemoryStore {
     this.shared = new SharedMemoryStoreImpl(conn);
     this.conflicts = new SqliteConflictStore(conn);
     this.consolidator = new SqliteConsolidatorStateStore(conn);
+    this.insights = new SqliteInsightStore(conn);
+    this.graph = new SqliteGraphStore(conn);
   }
 
   async init(): Promise<void> {
@@ -410,13 +455,16 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
       this.#conn.run(
         `INSERT INTO episodes (
            id, scope_user_id, scope_session_id, scope_agent_id, summary, started_at, ended_at,
-           importance, embedder_id, source_message_ids_json, sensitivity, tags_json, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           importance, embedder_id, source_message_ids_json, sensitivity, tags_json,
+           provenance, status, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            summary = excluded.summary,
            ended_at = excluded.ended_at,
            importance = excluded.importance,
            embedder_id = excluded.embedder_id,
+           provenance = excluded.provenance,
+           status = excluded.status,
            updated_at = excluded.updated_at,
            tags_json = excluded.tags_json`,
         [
@@ -432,6 +480,8 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
           null,
           episode.sensitivity,
           episode.tags ? JSON.stringify(episode.tags) : null,
+          episode.provenance ?? null,
+          episode.status ?? 'active',
           toEpoch(episode.createdAt),
           episode.updatedAt ? toEpoch(episode.updatedAt) : null,
         ],
@@ -462,14 +512,20 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     opts: MemorySearchOptions,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const topK = opts.topK ?? 10;
+    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
+    if (asOf !== null) binds.push(asOf);
+    binds.push(topK);
     const rows = this.#conn.all<EpisodeRow & { bm25_score: number }>(
       `SELECT e.*, bm25(episodes_fts) AS bm25_score
        FROM episodes_fts
        JOIN episodes e ON e.rowid = episodes_fts.rowid
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+         ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
        ORDER BY bm25_score
        LIMIT ?`,
-      [escapeFtsQuery(opts.query), scope.userId, topK],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToEpisode(row),
@@ -498,6 +554,8 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    asOf?: string,
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -507,6 +565,14 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
       );
     }
     const tableName = this.#vectorMgr.ensureTable('episodes', meta);
+    const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    const binds: Array<Buffer | string | number> = [
+      Buffer.from(embedding.buffer),
+      topK,
+      scope.userId,
+      embedderId,
+    ];
+    if (asOfEpoch !== null) binds.push(asOfEpoch);
     const rows = this.#conn.all<EpisodeRow & { distance: number }>(
       `SELECT e.*, v.distance AS distance
        FROM ${quoteIdent(tableName)} v
@@ -517,8 +583,10 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
          AND e.embedder_id = ?
          AND e.deleted_at IS NULL
          AND e.archived = 0
+         ${includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+         ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
        ORDER BY v.distance`,
-      [Buffer.from(embedding.buffer), topK, scope.userId, embedderId],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToEpisode(row),
@@ -581,11 +649,15 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            id, scope_user_id, scope_session_id, scope_agent_id, text,
            subject, predicate, object, confidence, sensitivity, tags_json,
            embedder_id, source_message_ids_json,
-           valid_from, valid_to, supersedes, superseded_by, strength, last_accessed_at,
+           valid_from, valid_to, supersedes, superseded_by, provenance, status,
+           importance, strength, last_accessed_at,
            hash, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
+           subject = excluded.subject,
+           predicate = excluded.predicate,
+           object = excluded.object,
            confidence = excluded.confidence,
            sensitivity = excluded.sensitivity,
            tags_json = excluded.tags_json,
@@ -593,6 +665,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            valid_to = excluded.valid_to,
            supersedes = excluded.supersedes,
            superseded_by = excluded.superseded_by,
+           provenance = excluded.provenance,
+           status = excluded.status,
+           importance = excluded.importance,
            updated_at = excluded.updated_at`,
         [
           fact.id,
@@ -600,9 +675,13 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.sessionId ?? null,
           fact.agentId ?? null,
           fact.text,
-          null,
-          null,
-          null,
+          // P2-1: carry the s/p/o triple instead of dropping it. The
+          // columns + `idx_facts_subject_predicate` have existed since
+          // migration 001; this stops the write path nulling them so the
+          // relation graph (entities / one-hop expansion) has a substrate.
+          fact.subject ?? null,
+          fact.predicate ?? null,
+          fact.object ?? null,
           fact.confidence ?? null,
           fact.sensitivity,
           fact.tags ? JSON.stringify(fact.tags) : null,
@@ -612,6 +691,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.validTo ? toEpoch(fact.validTo) : null,
           fact.supersedes ?? null,
           fact.supersededBy ?? null,
+          fact.provenance ?? null,
+          fact.status ?? 'active',
+          fact.importance ?? null,
           1.0,
           null,
           null,
@@ -635,7 +717,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       }
       this.#conn.run(
         `INSERT OR REPLACE INTO facts_fts (rowid, text) VALUES ((SELECT rowid FROM facts WHERE id = ?), ?)`,
-        [fact.id, fact.text],
+        // P1-3: index the contextual text when supplied; `facts.text`
+        // (persisted above) stays canonical for display / audit.
+        [fact.id, options.indexText ?? fact.text],
       );
     });
   }
@@ -645,14 +729,20 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     opts: MemorySearchOptions,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const topK = opts.topK ?? 10;
+    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
+    if (asOf !== null) binds.push(asOf, asOf);
+    binds.push(topK);
     const rows = this.#conn.all<FactRow & { bm25_score: number }>(
       `SELECT f.*, bm25(facts_fts) AS bm25_score
        FROM facts_fts
        JOIN facts f ON f.rowid = facts_fts.rowid
        WHERE facts_fts MATCH ? AND f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         ${opts.includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
+         ${asOf !== null ? FACT_VALIDITY_CLAUSE : ''}
        ORDER BY bm25_score
        LIMIT ?`,
-      [escapeFtsQuery(opts.query), scope.userId, topK],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToFact(row),
@@ -677,6 +767,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    asOf?: string,
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -686,6 +778,14 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       );
     }
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
+    const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    const binds: Array<Buffer | string | number> = [
+      Buffer.from(embedding.buffer),
+      topK,
+      scope.userId,
+      embedderId,
+    ];
+    if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
     const rows = this.#conn.all<FactRow & { distance: number }>(
       `SELECT f.*, v.distance AS distance
        FROM ${quoteIdent(tableName)} v
@@ -696,8 +796,10 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
          AND f.embedder_id = ?
          AND f.deleted_at IS NULL
          AND f.archived = 0
+         ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
+         ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
        ORDER BY v.distance`,
-      [Buffer.from(embedding.buffer), topK, scope.userId, embedderId],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToFact(row),
@@ -707,24 +809,109 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   async supersede(oldId: string, newFact: Fact, reason?: string): Promise<void> {
+    const now = Date.now();
+    // Bi-temporal supersede (P0-3): close the old fact's validity interval
+    // so point-in-time (`asOf`) queries stop returning it once the new
+    // version takes effect — previously only `superseded_by` was set, which
+    // left the old interval open forever and broke `asOf(now)`. The interval
+    // closes at the new fact's `validFrom` (the instant the replacement takes
+    // effect) so the hand-off is seamless. `COALESCE` makes it idempotent and
+    // never clobbers an interval the caller already closed explicitly.
+    const closeAt = newFact.validFrom ? toEpoch(newFact.validFrom) : now;
     this.#conn.transaction(() => {
-      this.#conn.run('UPDATE facts SET superseded_by = ?, updated_at = ? WHERE id = ?', [
-        newFact.id,
-        Date.now(),
-        oldId,
-      ]);
+      this.#conn.run(
+        'UPDATE facts SET superseded_by = ?, valid_to = COALESCE(valid_to, ?), updated_at = ? WHERE id = ?',
+        [newFact.id, closeAt, now, oldId],
+      );
       this.#conn.run(
         `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['fact', oldId, null, newFact.text, 'SUPERSEDE', 'agent', null, Date.now()],
+        ['fact', oldId, null, newFact.text, 'SUPERSEDE', 'agent', null, now],
       );
     });
     void reason;
     await this.remember(newFact);
   }
 
+  /**
+   * Walk the supersede chain in both directions from `factId` and
+   * return every fact in it, ordered by `valid_from` ascending
+   * (oldest → newest, falling back to `created_at`). Unlike
+   * {@link search}, this deliberately surfaces superseded /
+   * soft-deleted / archived rows so callers can answer "how did this
+   * fact change over time". Traversal follows `supersedes` /
+   * `superseded_by` plus inbound edges (so a half-linked chain still
+   * resolves), is scope-guarded, and is cycle-safe. Returns `[]` for
+   * an unknown id.
+   *
+   * @stable
+   */
+  async historyOf(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>> {
+    const seen = new Set<string>();
+    const queue: string[] = [factId];
+    const rows: FactRow[] = [];
+    while (queue.length > 0) {
+      const id = queue.shift();
+      if (id === undefined || seen.has(id)) continue;
+      seen.add(id);
+      const row = this.#conn.get<FactRow>(
+        'SELECT * FROM facts WHERE id = ? AND scope_user_id = ?',
+        [id, scope.userId],
+      );
+      if (!row) continue;
+      rows.push(row);
+      if (row.supersedes !== null) queue.push(row.supersedes);
+      if (row.superseded_by !== null) queue.push(row.superseded_by);
+      const inbound = this.#conn.all<{ id: string }>(
+        'SELECT id FROM facts WHERE scope_user_id = ? AND (supersedes = ? OR superseded_by = ?)',
+        [scope.userId, id, id],
+      );
+      for (const r of inbound) queue.push(r.id);
+    }
+    rows.sort((a, b) => {
+      const av = a.valid_from ?? a.created_at;
+      const bv = b.valid_from ?? b.created_at;
+      return av !== bv ? av - bv : a.created_at - b.created_at;
+    });
+    return rows.map(rowToFact);
+  }
+
   async forget(id: string, reason?: string): Promise<void> {
     this.#conn.run('UPDATE facts SET deleted_at = ?, archived = 1 WHERE id = ?', [Date.now(), id]);
     void reason;
+  }
+
+  /**
+   * Set a fact's retrieval-trust `status` (P1-4) and write a
+   * `memory_history` audit row. Quarantine is a retrieval gate, so this
+   * touches neither the row's content nor its embedding / tombstone —
+   * it only flips eligibility for default recall. Promotion
+   * (`'active'`) is logged as a `VALIDATE` event; demotion
+   * (`'quarantined'`) as `QUARANTINE`. Surfaced through
+   * `SemanticMemoryStoreExt.setStatus`.
+   *
+   * @stable
+   */
+  async setStatus(factId: string, status: MemoryStatus, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run('UPDATE facts SET status = ?, updated_at = ? WHERE id = ?', [
+        status,
+        Date.now(),
+        factId,
+      ]);
+      this.#conn.run(
+        `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'fact',
+          factId,
+          null,
+          reason ?? status,
+          status === 'active' ? 'VALIDATE' : 'QUARANTINE',
+          'agent',
+          null,
+          Date.now(),
+        ],
+      );
+    });
   }
 
   /**
@@ -746,6 +933,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       readonly lastAccessedAt: number | null;
       readonly createdAt: number;
       readonly archived: boolean;
+      readonly importance: number | null;
+      readonly status: string;
+      readonly provenance: string | null;
     }>
   > {
     const rows = this.#conn.all<{
@@ -755,8 +945,12 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       last_accessed_at: number | null;
       created_at: number;
       archived: number;
+      importance: number | null;
+      status: string;
+      provenance: string | null;
     }>(
-      `SELECT id, text, strength, last_accessed_at, created_at, archived
+      `SELECT id, text, strength, last_accessed_at, created_at, archived,
+              importance, status, provenance
        FROM facts
        WHERE scope_user_id = ? AND deleted_at IS NULL
        ORDER BY COALESCE(last_accessed_at, created_at) ASC
@@ -770,6 +964,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       lastAccessedAt: row.last_accessed_at,
       createdAt: row.created_at,
       archived: row.archived === 1,
+      importance: row.importance,
+      status: row.status,
+      provenance: row.provenance,
     }));
   }
 
@@ -849,8 +1046,9 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
     this.#conn.run(
       `INSERT INTO rules (
          id, scope_user_id, scope_session_id, scope_agent_id, text, condition,
-         priority, sensitivity, tags_json, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         priority, sensitivity, tags_json, created_at,
+         steps_json, variables_json, success_criteria_json, provenance, status
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         rule.id,
         rule.userId,
@@ -862,6 +1060,11 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
         rule.sensitivity,
         rule.tags ? JSON.stringify(rule.tags) : null,
         toEpoch(rule.createdAt),
+        rule.steps ? JSON.stringify(rule.steps) : null,
+        rule.variables ? JSON.stringify(rule.variables) : null,
+        rule.successCriteria ? JSON.stringify(rule.successCriteria) : null,
+        rule.provenance ?? null,
+        rule.status ?? null,
       ],
     );
   }
@@ -908,6 +1111,455 @@ class SharedMemoryStoreImpl implements SharedMemoryStore {
       createdAt: new Date(row.attached_at).toISOString(),
     }));
   }
+}
+
+/**
+ * `SqliteInsightStore` — owns the `insights` + `insights_fts` tables
+ * shipped in migration 014 (P1-1). Implements the structural
+ * `InsightMemoryStoreExt` surface defined in
+ * `@graphorin/memory/internal/storage-adapter.ts`.
+ *
+ * Search is FTS5-only — insights are a soft, rank-capped inspector
+ * surface, not primary recall, so no per-embedder vec0 table is
+ * created. Pruning (the ExpeL forgetting step) is a soft-delete
+ * (`deleted_at`), never a hard purge, so pruned insights remain
+ * auditable.
+ *
+ * @stable
+ */
+export class SqliteInsightStore {
+  #conn: SqliteConnection;
+  constructor(conn: SqliteConnection) {
+    this.#conn = conn;
+  }
+
+  async insert(insight: Insight): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run(
+        `INSERT INTO insights (
+           id, scope_user_id, scope_session_id, scope_agent_id, text, cites_json, salience,
+           provenance, status, embedder_id, sensitivity, tags_json, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           text = excluded.text,
+           cites_json = excluded.cites_json,
+           salience = excluded.salience,
+           provenance = excluded.provenance,
+           status = excluded.status,
+           updated_at = excluded.updated_at,
+           tags_json = excluded.tags_json`,
+        [
+          insight.id,
+          insight.userId,
+          insight.sessionId ?? null,
+          insight.agentId ?? null,
+          insight.text,
+          JSON.stringify(insight.cites ?? []),
+          insight.salience,
+          insight.provenance ?? 'reflection',
+          insight.status ?? 'quarantined',
+          null,
+          insight.sensitivity,
+          insight.tags ? JSON.stringify(insight.tags) : null,
+          toEpoch(insight.createdAt),
+          insight.updatedAt ? toEpoch(insight.updatedAt) : null,
+        ],
+      );
+      this.#conn.run(
+        `INSERT OR REPLACE INTO insights_fts (rowid, text) VALUES ((SELECT rowid FROM insights WHERE id = ?), ?)`,
+        [insight.id, insight.text],
+      );
+    });
+  }
+
+  async list(
+    scope: SessionScope,
+    opts: { readonly limit?: number; readonly includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<Insight>> {
+    const limit = opts.limit ?? 50;
+    const rows = this.#conn.all<InsightRow>(
+      `SELECT * FROM insights
+       WHERE scope_user_id = ? AND deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : "AND status != 'quarantined'"}
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map(rowToInsight);
+  }
+
+  async search(
+    scope: SessionScope,
+    query: string,
+    opts: { readonly topK?: number; readonly includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<MemoryHit<Insight>>> {
+    const topK = opts.topK ?? 10;
+    const rows = this.#conn.all<InsightRow & { bm25_score: number }>(
+      `SELECT i.*, bm25(insights_fts) AS bm25_score
+       FROM insights_fts
+       JOIN insights i ON i.rowid = insights_fts.rowid
+       WHERE insights_fts MATCH ? AND i.scope_user_id = ? AND i.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : INSIGHT_NOT_QUARANTINED}
+       ORDER BY bm25_score
+       LIMIT ?`,
+      [escapeFtsQuery(query), scope.userId, topK],
+    );
+    return rows.map((row) => ({
+      record: rowToInsight(row),
+      score: -row.bm25_score,
+      signals: { bm25: row.bm25_score },
+    }));
+  }
+
+  async get(id: string): Promise<Insight | null> {
+    const row = this.#conn.get<InsightRow>(
+      'SELECT * FROM insights WHERE id = ? AND deleted_at IS NULL',
+      [id],
+    );
+    return row ? rowToInsight(row) : null;
+  }
+
+  /**
+   * Adjust an insight's ExpeL salience by `delta`, clamped at 0 (the
+   * floor at which `prune` removes it). Never touches content / cites —
+   * salience is the only mutable field.
+   */
+  async bumpSalience(id: string, delta: number, reason?: string): Promise<void> {
+    void reason;
+    this.#conn.run(
+      'UPDATE insights SET salience = MAX(0, salience + ?), updated_at = ? WHERE id = ? AND deleted_at IS NULL',
+      [delta, Date.now(), id],
+    );
+  }
+
+  /**
+   * Soft-delete every salience-0 insight for the scope (the ExpeL
+   * forgetting step). Returns the number pruned. Tombstone only — the
+   * row stays for audit.
+   */
+  async prune(scope: SessionScope): Promise<number> {
+    const now = Date.now();
+    const res = this.#conn.run(
+      'UPDATE insights SET deleted_at = ?, updated_at = ? WHERE scope_user_id = ? AND salience <= 0 AND deleted_at IS NULL',
+      [now, now, scope.userId],
+    );
+    return res.changes;
+  }
+}
+
+interface EntityRow {
+  id: string;
+  scope_user_id: string;
+  name: string;
+  normalized_name: string;
+  embedding: Buffer | Uint8Array | null;
+  embedder_id: string | null;
+  merged_into: string | null;
+  created_at: number;
+  updated_at: number | null;
+}
+
+interface EntityMergeRow {
+  id: string;
+  scope_user_id: string;
+  kind: string;
+  from_entity_id: string;
+  into_entity_id: string | null;
+  reason: string | null;
+  created_at: number;
+}
+
+/** Find-or-create payload for {@link SqliteGraphStore.upsertEntity}. */
+interface SqliteEntityUpsertInput {
+  readonly name: string;
+  readonly normalizedName: string;
+  readonly vector?: Float32Array;
+  readonly embedderId?: string;
+}
+
+/** A canonical entity returned with its name embedding for dedup. */
+interface SqliteEntityWithEmbedding extends GraphEntity {
+  readonly vector: Float32Array | null;
+  readonly embedderId: string | null;
+}
+
+/** One row of the append-only merge / unmerge audit ledger. */
+interface SqliteEntityMergeRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly kind: 'merge' | 'unmerge';
+  readonly fromEntityId: string;
+  readonly intoEntityId: string | null;
+  readonly reason?: string;
+  readonly createdAt: string;
+}
+
+/**
+ * Lightweight in-SQLite relation-graph store (P2-1). Owns the canonical
+ * `entities` table, the `fact_entities` mapping, and the append-only
+ * `entity_merges` ledger. Entity *resolution* (lexical + embedding dedup,
+ * optional LLM adjudication) lives in `@graphorin/memory`; this class is
+ * the pure persistence + the one-hop recursive-CTE traversal. Exposed on
+ * {@link SqliteMemoryStore.graph} and picked up structurally as the
+ * memory adapter's optional `graph` capability.
+ *
+ * @stable
+ */
+export class SqliteGraphStore {
+  #conn: SqliteConnection;
+  constructor(conn: SqliteConnection) {
+    this.#conn = conn;
+  }
+
+  /**
+   * Find-or-create the canonical (root) entity for `normalizedName` in
+   * the scope. Returns the existing root's id when one exists (back-filling
+   * its embedding if it had none), else inserts and returns a new root.
+   */
+  async upsertEntity(scope: SessionScope, input: SqliteEntityUpsertInput): Promise<string> {
+    return this.#conn.transaction(() => {
+      const existing = this.#conn.get<EntityRow>(
+        'SELECT * FROM entities WHERE scope_user_id = ? AND normalized_name = ? AND merged_into IS NULL',
+        [scope.userId, input.normalizedName],
+      );
+      const now = Date.now();
+      if (existing !== undefined) {
+        if (
+          existing.embedding === null &&
+          input.vector !== undefined &&
+          input.embedderId !== undefined
+        ) {
+          this.#conn.run(
+            'UPDATE entities SET embedding = ?, embedder_id = ?, updated_at = ? WHERE id = ?',
+            [f32ToBlob(input.vector), input.embedderId, now, existing.id],
+          );
+        }
+        return existing.id;
+      }
+      const id = generateId();
+      this.#conn.run(
+        `INSERT INTO entities (id, scope_user_id, name, normalized_name, embedding, embedder_id, merged_into, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, NULL, ?, NULL)`,
+        [
+          id,
+          scope.userId,
+          input.name,
+          input.normalizedName,
+          input.vector !== undefined ? f32ToBlob(input.vector) : null,
+          input.embedderId ?? null,
+          now,
+        ],
+      );
+      return id;
+    });
+  }
+
+  /** Link a fact's subject / object to a canonical entity (idempotent). */
+  async linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void> {
+    this.#conn.run(
+      'INSERT OR IGNORE INTO fact_entities (fact_id, entity_id, role, created_at) VALUES (?, ?, ?, ?)',
+      [factId, entityId, role, Date.now()],
+    );
+  }
+
+  /** Candidate entities for the resolver (roots only unless `includeMerged`). */
+  async listEntities(
+    scope: SessionScope,
+    opts: { readonly includeMerged?: boolean; readonly limit?: number } = {},
+  ): Promise<ReadonlyArray<SqliteEntityWithEmbedding>> {
+    const limit = opts.limit ?? 1000;
+    const rows = this.#conn.all<EntityRow>(
+      `SELECT * FROM entities
+       WHERE scope_user_id = ? ${opts.includeMerged === true ? '' : 'AND merged_into IS NULL'}
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map((r) => ({
+      ...rowToGraphEntity(r),
+      vector: blobToF32(r.embedding),
+      embedderId: r.embedder_id,
+    }));
+  }
+
+  /** Lookup one entity by id (any merge state). */
+  async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
+    const row = this.#conn.get<EntityRow>(
+      'SELECT * FROM entities WHERE id = ? AND scope_user_id = ?',
+      [id, scope.userId],
+    );
+    return row !== undefined ? rowToGraphEntity(row) : null;
+  }
+
+  /** Follow `merged_into` to the canonical root id (cycle-guarded). */
+  async resolveCanonical(scope: SessionScope, id: string): Promise<string> {
+    let current = id;
+    for (let i = 0; i < 16; i++) {
+      const row = this.#conn.get<{ merged_into: string | null }>(
+        'SELECT merged_into FROM entities WHERE id = ? AND scope_user_id = ?',
+        [current, scope.userId],
+      );
+      if (row === undefined || row.merged_into === null) return current;
+      current = row.merged_into;
+    }
+    return current;
+  }
+
+  /**
+   * Merge `fromId` into `intoId` (resolved to its root). Sets
+   * `from.merged_into` and re-points `from`'s children to keep the
+   * pointer single-level, then records a `'merge'` audit row.
+   * `fact_entities` are never rewritten — reads canonicalise via
+   * `merged_into`. A self-merge is a no-op.
+   */
+  async mergeEntities(
+    scope: SessionScope,
+    fromId: string,
+    intoId: string,
+    reason?: string,
+  ): Promise<void> {
+    this.#conn.transaction(() => {
+      const intoRow = this.#conn.get<{ merged_into: string | null }>(
+        'SELECT merged_into FROM entities WHERE id = ? AND scope_user_id = ?',
+        [intoId, scope.userId],
+      );
+      const intoRoot = intoRow?.merged_into ?? intoId;
+      if (fromId === intoRoot) return;
+      const now = Date.now();
+      this.#conn.run(
+        'UPDATE entities SET merged_into = ?, updated_at = ? WHERE id = ? AND scope_user_id = ?',
+        [intoRoot, now, fromId, scope.userId],
+      );
+      this.#conn.run(
+        'UPDATE entities SET merged_into = ?, updated_at = ? WHERE merged_into = ? AND scope_user_id = ?',
+        [intoRoot, now, fromId, scope.userId],
+      );
+      this.#conn.run(
+        `INSERT INTO entity_merges (id, scope_user_id, kind, from_entity_id, into_entity_id, reason, created_at)
+         VALUES (?, ?, 'merge', ?, ?, ?, ?)`,
+        [generateId(), scope.userId, fromId, intoRoot, reason ?? null, now],
+      );
+    });
+  }
+
+  /**
+   * Reverse a merge: clear `id.merged_into` (making it a root again) and
+   * record an `'unmerge'` audit row. Restores the entity as a root; the
+   * pre-merge child topology is not reconstructed.
+   */
+  async unmergeEntity(scope: SessionScope, id: string, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      const now = Date.now();
+      this.#conn.run(
+        'UPDATE entities SET merged_into = NULL, updated_at = ? WHERE id = ? AND scope_user_id = ?',
+        [now, id, scope.userId],
+      );
+      this.#conn.run(
+        `INSERT INTO entity_merges (id, scope_user_id, kind, from_entity_id, into_entity_id, reason, created_at)
+         VALUES (?, ?, 'unmerge', ?, NULL, ?, ?)`,
+        [generateId(), scope.userId, id, reason ?? null, now],
+      );
+    });
+  }
+
+  /** The append-only merge / unmerge audit ledger, newest first. */
+  async listMerges(
+    scope: SessionScope,
+    opts: { readonly limit?: number } = {},
+  ): Promise<ReadonlyArray<SqliteEntityMergeRecord>> {
+    const limit = opts.limit ?? 100;
+    const rows = this.#conn.all<EntityMergeRow>(
+      'SELECT * FROM entity_merges WHERE scope_user_id = ? ORDER BY created_at DESC, id DESC LIMIT ?',
+      [scope.userId, limit],
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      userId: r.scope_user_id,
+      kind: r.kind === 'unmerge' ? 'unmerge' : 'merge',
+      fromEntityId: r.from_entity_id,
+      intoEntityId: r.into_entity_id,
+      ...(r.reason !== null ? { reason: r.reason } : {}),
+      createdAt: new Date(r.created_at).toISOString(),
+    }));
+  }
+
+  /**
+   * Expand `seedFactIds` to neighbouring facts that share a canonical
+   * entity, up to `maxHops` (default 1), via a recursive CTE over
+   * `fact_entities`. Entities are canonicalised through `merged_into` in
+   * the join, so a merge transparently connects both sides. Excludes the
+   * seeds themselves and honours soft-delete / archive / quarantine /
+   * `asOf` exactly like {@link SemanticMemoryStore.search}.
+   */
+  async expandOneHop(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts: {
+      readonly maxHops?: number;
+      readonly limit?: number;
+      readonly includeQuarantined?: boolean;
+      readonly asOf?: string;
+    } = {},
+  ): Promise<ReadonlyArray<Fact>> {
+    if (seedFactIds.length === 0) return [];
+    const maxHops = opts.maxHops ?? 1;
+    const limit = opts.limit ?? 60;
+    const incQ = opts.includeQuarantined === true ? 1 : 0;
+    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    const seedsJson = JSON.stringify([...seedFactIds]);
+    const rows = this.#conn.all<FactRow>(
+      `WITH RECURSIVE
+         seed_ids(fact_id) AS (SELECT value FROM json_each(?)),
+         walk(fact_id, depth) AS (
+             SELECT fact_id, 0 FROM seed_ids
+           UNION
+             SELECT fe2.fact_id, w.depth + 1
+             FROM walk w
+             JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
+             JOIN entities e1 ON e1.id = fe1.entity_id
+             JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
+             JOIN fact_entities fe2 ON fe2.entity_id = e2.id
+             WHERE w.depth < ?
+         )
+       SELECT f.* FROM facts f
+       WHERE f.id IN (SELECT DISTINCT fact_id FROM walk WHERE depth > 0)
+         AND f.id NOT IN (SELECT fact_id FROM seed_ids)
+         AND f.scope_user_id = ?
+         AND f.deleted_at IS NULL
+         AND f.archived = 0
+         AND (? = 1 OR f.status != 'quarantined')
+         AND (? IS NULL OR ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)))
+       ORDER BY f.created_at DESC
+       LIMIT ?`,
+      [seedsJson, maxHops, scope.userId, incQ, asOf, asOf, asOf, limit],
+    );
+    return rows.map(rowToFact);
+  }
+}
+
+function f32ToBlob(vec: Float32Array): Buffer {
+  return Buffer.from(vec.buffer, vec.byteOffset, vec.byteLength);
+}
+
+function blobToF32(blob: Buffer | Uint8Array | null): Float32Array | null {
+  if (blob === null) return null;
+  // better-sqlite3 returns a Buffer whose byteOffset may not be 4-aligned
+  // for a Float32Array view, so copy into a fresh aligned buffer.
+  const copy = new Uint8Array(blob.byteLength);
+  copy.set(blob);
+  return new Float32Array(copy.buffer, 0, Math.floor(copy.byteLength / 4));
+}
+
+function rowToGraphEntity(row: EntityRow): GraphEntity {
+  return {
+    id: row.id,
+    userId: row.scope_user_id,
+    name: row.name,
+    normalizedName: row.normalized_name,
+    mergedInto: row.merged_into ?? undefined,
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
+  } as GraphEntity;
 }
 
 interface WorkingBlockRow {
@@ -970,6 +1622,8 @@ interface EpisodeRow {
   source_message_ids_json: string | null;
   sensitivity: 'public' | 'internal' | 'secret';
   tags_json: string | null;
+  provenance: string | null;
+  status: string;
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
@@ -994,6 +1648,9 @@ interface FactRow {
   valid_to: number | null;
   supersedes: string | null;
   superseded_by: string | null;
+  provenance: string | null;
+  status: string;
+  importance: number | null;
   strength: number;
   last_accessed_at: number | null;
   hash: string | null;
@@ -1001,6 +1658,24 @@ interface FactRow {
   updated_at: number | null;
   deleted_at: number | null;
   archived: number;
+}
+
+interface InsightRow {
+  id: string;
+  scope_user_id: string;
+  scope_session_id: string | null;
+  scope_agent_id: string | null;
+  text: string;
+  cites_json: string;
+  salience: number;
+  provenance: string | null;
+  status: string;
+  embedder_id: string | null;
+  sensitivity: 'public' | 'internal' | 'secret';
+  tags_json: string | null;
+  created_at: number;
+  updated_at: number | null;
+  deleted_at: number | null;
 }
 
 interface RuleRow {
@@ -1016,6 +1691,12 @@ interface RuleRow {
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
+  // P2-2: induced-procedure payload (migration 017). NULL on author rules.
+  steps_json: string | null;
+  variables_json: string | null;
+  success_criteria_json: string | null;
+  provenance: string | null;
+  status: string | null;
 }
 
 function rowToBlock(row: WorkingBlockRow): Block {
@@ -1075,12 +1756,46 @@ function rowToEpisode(row: EpisodeRow): Episode {
     startedAt: new Date(row.started_at).toISOString(),
     endedAt: new Date(row.ended_at).toISOString(),
     importance: row.importance ?? undefined,
+    provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
+    status: row.status as MemoryStatus,
     sensitivity: row.sensitivity,
     tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
   } as Episode;
+}
+
+function parseCites(json: string): ReadonlyArray<string> {
+  try {
+    const parsed: unknown = JSON.parse(json);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((x): x is string => typeof x === 'string');
+    }
+  } catch {
+    // Malformed JSON ⇒ treat as no citations (defensive).
+  }
+  return [];
+}
+
+function rowToInsight(row: InsightRow): Insight {
+  return {
+    id: row.id,
+    kind: 'insight',
+    userId: row.scope_user_id,
+    sessionId: row.scope_session_id ?? undefined,
+    agentId: row.scope_agent_id ?? undefined,
+    text: row.text,
+    cites: parseCites(row.cites_json),
+    salience: row.salience,
+    provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
+    status: row.status as MemoryStatus,
+    sensitivity: row.sensitivity,
+    tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
+    deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
+  } as Insight;
 }
 
 function rowToFact(row: FactRow): Fact {
@@ -1091,13 +1806,20 @@ function rowToFact(row: FactRow): Fact {
     sessionId: row.scope_session_id ?? undefined,
     agentId: row.scope_agent_id ?? undefined,
     text: row.text,
+    // P2-1: surface the s/p/o triple (no longer inert).
+    subject: row.subject ?? undefined,
+    predicate: row.predicate ?? undefined,
+    object: row.object ?? undefined,
     confidence: row.confidence ?? undefined,
+    importance: row.importance ?? undefined,
     sensitivity: row.sensitivity,
     tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
     validFrom: row.valid_from !== null ? new Date(row.valid_from).toISOString() : undefined,
     validTo: row.valid_to !== null ? new Date(row.valid_to).toISOString() : undefined,
     supersedes: row.supersedes ?? undefined,
     supersededBy: row.superseded_by ?? undefined,
+    provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
+    status: row.status as MemoryStatus,
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
@@ -1119,6 +1841,16 @@ function rowToRule(row: RuleRow): Rule {
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
+    // P2-2: induced-procedure payload (migration 017). NULL ⇒ undefined.
+    steps: row.steps_json ? (JSON.parse(row.steps_json) as readonly string[]) : undefined,
+    variables: row.variables_json
+      ? (JSON.parse(row.variables_json) as readonly string[])
+      : undefined,
+    successCriteria: row.success_criteria_json
+      ? (JSON.parse(row.success_criteria_json) as readonly string[])
+      : undefined,
+    provenance: row.provenance !== null ? (row.provenance as MemoryProvenance) : undefined,
+    status: row.status !== null ? (row.status as MemoryStatus) : undefined,
   } as Rule;
 }
 

@@ -21,7 +21,8 @@ metadata.
 - **Vector search** — `sqlite-vec` (`vec0`) virtual tables, one per embedder
   id, so switching embedders never mixes incompatible vectors.
 - **Keyword search** — FTS5 with the porter tokenizer and `bm25()` ranking,
-  fused with vector results via RRF (see [Rerankers](/guide/rerankers)).
+  fused with vector results via Reciprocal Rank Fusion by default, or calibrated
+  weighted fusion (see [Rerankers & fusion](/guide/rerankers)).
 - **Migrations** — applied inside transactions at startup. Test schema changes
   in staging first; a failed migration rolls back rather than half-applying.
 

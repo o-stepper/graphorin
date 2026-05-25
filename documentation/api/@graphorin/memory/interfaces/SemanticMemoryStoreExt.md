@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:62
+Defined in: packages/memory/src/internal/storage-adapter.ts:77
 
 Extension of the typed `SemanticMemoryStore` with optional
 embedding-aware helpers + lifecycle helpers that storage adapters
@@ -51,7 +51,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:72
 optional get(id): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:71
+Defined in: packages/memory/src/internal/storage-adapter.ts:96
 
 Lookup a single fact by id (returns `null` when absent or soft-deleted).
 
@@ -67,13 +67,42 @@ Lookup a single fact by id (returns `null` when absent or soft-deleted).
 
 ***
 
+### historyOf()?
+
+```ts
+optional historyOf(scope, factId): Promise<readonly Fact[]>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:121
+
+Walk the bi-temporal supersede chain that `factId` belongs to and
+return every fact in it, oldest → newest (by `validFrom`),
+including superseded / soft-deleted rows so callers can answer
+"how did this fact change over time". Scope-guarded and
+cycle-safe; returns `[]` for an unknown id. Powers
+[SemanticMemory.history](/api/@graphorin/memory/classes/SemanticMemory.md#history) (P0-2). The default
+`@graphorin/store-sqlite` adapter implements it.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `factId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
+
+***
+
 ### purge()?
 
 ```ts
 optional purge(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:77
+Defined in: packages/memory/src/internal/storage-adapter.ts:111
 
 Hard-delete a fact (GDPR path). The audit log row is preserved
 but the row itself + every per-embedder vec0 entry is removed.
@@ -122,7 +151,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:69
 optional rememberWithEmbedding(fact, options): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:63
+Defined in: packages/memory/src/internal/storage-adapter.ts:78
 
 #### Parameters
 
@@ -169,23 +198,59 @@ optional searchVector(
    scope, 
    embedding, 
    embedderId, 
-topK): Promise<readonly MemoryHit<Fact>[]>;
+   topK, 
+   asOf?, 
+includeQuarantined?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:64
+Defined in: packages/memory/src/internal/storage-adapter.ts:79
+
+#### Parameters
+
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - |
+| `embedding` | `Float32Array` | - |
+| `embedderId` | `string` | - |
+| `topK` | `number` | - |
+| `asOf?` | `string` | Point-in-time filter applied after KNN: only facts whose validity interval contains `asOf` (ISO-8601) survive. P0-2. |
+| `includeQuarantined?` | `boolean` | Include quarantined facts in the KNN result (validation / inspector path). Default reads exclude them. P1-4. |
+
+#### Returns
+
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
+
+***
+
+### setStatus()?
+
+```ts
+optional setStatus(
+   factId, 
+   status, 
+reason?): Promise<void>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:105
+
+Set a fact's retrieval-trust `status` and write a `memory_history`
+audit row (P1-4). Promotes a quarantined fact to `active` (the
+validation path) or re-quarantines an active one. Never touches
+content / embedding / tombstone — quarantine is a retrieval gate.
+Powers [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate); the default
+`@graphorin/store-sqlite` adapter implements it.
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
-| `embedding` | `Float32Array` |
-| `embedderId` | `string` |
-| `topK` | `number` |
+| `factId` | `string` |
+| `status` | [`MemoryStatus`](/api/@graphorin/core/type-aliases/MemoryStatus.md) |
+| `reason?` | `string` |
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 

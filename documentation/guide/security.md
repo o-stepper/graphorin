@@ -172,6 +172,32 @@ Findings are **metadata-only** — they name the flow kind and the implicated so
 
 Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` — see the [agent runtime guide](/guide/agent-runtime#provenance-data-flow-policy-dataflowpolicy) for the full configuration and event details.
 
+## Memory safety: provenance & quarantine
+
+The data-flow policy above governs *tool* I/O within a single run. **Long-living memory** needs its own gate: a fact written today can steer the assistant months later, so a malicious tool result or a confabulated extraction is a *persistent* attack (the memory-poisoning class — MINJA, MemoryGraft). `@graphorin/memory` defends the write path with **provenance** + **quarantine** — distinct from, and complementary to, the tool-I/O provenance above.
+
+Every memory row (fact, episode, insight, induced procedure) carries:
+
+| Field | Values | Meaning |
+|---|---|---|
+| `provenance` | `user` · `tool` · `extraction` · `reflection` · `induction` · `imported` | Where the memory came from. The middle three are *derived* (synthesised by the consolidator), so they are treated as untrusted by default. |
+| `status` | `active` · `quarantined` | Whether the row may drive recall. |
+
+A write lands `status: 'quarantined'` when either:
+
+- its provenance is **derived** (`extraction` / `reflection` / `induction`), or
+- it trips the **offline injection heuristics** — `ignore previous instructions`, role-markup smuggling (`<system>`-style tags), or secrecy / exfiltration directives — applied to first-party (`user` / `tool`) candidates.
+
+Quarantined rows are **excluded from default recall** (`fact_search`, auto-recall, and `procedural.activate()` all skip them) but are **never deleted** — quarantine is a retrieval gate, not a purge, so every row stays fully auditable. An operator (or a review UI) surfaces the queue with the `includeQuarantined` search option and promotes a vetted row with the `fact_validate` tool (`memory.semantic.validate(...)`), which is itself audited.
+
+This is the precondition for shipping **synthesised** memory safely. Three derived write-paths all flow through the gate:
+
+- **Reconciliation / extraction** (consolidator standard phase) — extracted facts land `extraction` + quarantined.
+- **Reflection / insights** (deep phase) — insights land `reflection` + quarantined, and additionally carry **mandatory citations set from the retrieved evidence** (never hallucinated) and are **rank-capped below the facts they cite**.
+- **Workflow induction** (procedural tier) — the highest-risk write, since procedures drive *actions*; induced procedures land `induction` + quarantined and are excluded from `activate()` until a human validates them.
+
+See [Memory system § Memory safety](/guide/memory-system#memory-safety-provenance-quarantine) for the API surface.
+
 ## Threat model
 
 Graphorin's design assumes a STRIDE threat model across eight trust boundaries:
@@ -206,4 +232,4 @@ Failures are categorised by severity and emit actionable remediation steps.
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

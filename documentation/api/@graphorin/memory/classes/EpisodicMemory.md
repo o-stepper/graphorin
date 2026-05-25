@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: EpisodicMemory
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:69
+Defined in: packages/memory/src/tiers/episodic-memory.ts:102
 
 `EpisodicMemory` — record + retrieve summarized stretches of past
 activity. Stored embeddings power triple-signal retrieval (recency
@@ -22,7 +22,7 @@ activity. Stored embeddings power triple-signal retrieval (recency
 new EpisodicMemory(args): EpisodicMemory;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:75
+Defined in: packages/memory/src/tiers/episodic-memory.ts:108
 
 #### Parameters
 
@@ -49,7 +49,7 @@ archive(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:184
+Defined in: packages/memory/src/tiers/episodic-memory.ts:230
 
 Soft-archive an episode. Storage adapters that implement
 `EpisodicMemoryStoreExt.archive(...)` mark the row archived in
@@ -78,7 +78,7 @@ manually).
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:134
+Defined in: packages/memory/src/tiers/episodic-memory.ts:169
 
 Lookup a single episode by id.
 
@@ -100,7 +100,7 @@ Lookup a single episode by id.
 recent(scope, opts?): Promise<readonly Episode[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:203
+Defined in: packages/memory/src/tiers/episodic-memory.ts:249
 
 List the most recent episodes (no embedding required).
 
@@ -124,7 +124,7 @@ List the most recent episodes (no embedding required).
 record(scope, input): Promise<Episode>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:88
+Defined in: packages/memory/src/tiers/episodic-memory.ts:121
 
 Persist an episode + its embedding (when an embedder is configured).
 
@@ -150,7 +150,7 @@ search(
 opts?): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:145
+Defined in: packages/memory/src/tiers/episodic-memory.ts:180
 
 Triple-signal episode retrieval (`recency × relevance ×
 importance`). The vector signal is computed on demand when an

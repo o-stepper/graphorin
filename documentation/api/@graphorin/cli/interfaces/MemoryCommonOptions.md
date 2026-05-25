@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -16,6 +16,8 @@ Defined in: packages/cli/src/commands/memory.ts:33
 
 ## Extended by
 
+- [`MemoryActivityOptions`](/api/@graphorin/cli/interfaces/MemoryActivityOptions.md)
+- [`MemoryInspectOptions`](/api/@graphorin/cli/interfaces/MemoryInspectOptions.md)
 - [`MemoryMigrateOptions`](/api/@graphorin/cli/interfaces/MemoryMigrateOptions.md)
 
 ## Properties

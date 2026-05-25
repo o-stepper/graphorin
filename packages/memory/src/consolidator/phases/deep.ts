@@ -172,6 +172,8 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
         factsCreated: 0,
         factsUpdated,
         conflictsResolved: resolved,
+        episodesFormed: 0,
+        insightsCreated: 0,
         noiseFilteredCount: 0,
         emptyExtractions: 0,
         llmTokensUsed: totalTokens,
@@ -229,7 +231,7 @@ function parseJudge(text: string | undefined): JudgeOutcome | null {
 }
 
 function stripFence(text: string): string {
-  const match = /^```(?:json)?\s*\n([\s\S]*?)\n```/u.exec(text.trim());
+  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
   return match?.[1] ?? text;
 }
 
@@ -250,6 +252,8 @@ function makeOutcome(
     factsCreated: 0,
     factsUpdated: 0,
     conflictsResolved: 0,
+    episodesFormed: 0,
+    insightsCreated: 0,
     noiseFilteredCount: 0,
     emptyExtractions: 0,
     llmTokensUsed: 0,

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../../index.md)
 
 ***
 
@@ -27,6 +27,7 @@ surfaced to operators (CLI command / docs link to fix the issue).
 - [`EmbedderMigrationLockedError`](/api/@graphorin/memory/errors/classes/EmbedderMigrationLockedError.md)
 - [`EmbedderMigrationAbortedError`](/api/@graphorin/memory/errors/classes/EmbedderMigrationAbortedError.md)
 - [`EmbedderMigrationStateError`](/api/@graphorin/memory/errors/classes/EmbedderMigrationStateError.md)
+- [`ProcedureInductionNotConfiguredError`](/api/@graphorin/memory/errors/classes/ProcedureInductionNotConfiguredError.md)
 - [`BudgetExceededError`](/api/@graphorin/memory/classes/BudgetExceededError.md)
 - [`CustomTierMisconfiguredError`](/api/@graphorin/memory/classes/CustomTierMisconfiguredError.md)
 - [`ProviderNotConfiguredError`](/api/@graphorin/memory/classes/ProviderNotConfiguredError.md)

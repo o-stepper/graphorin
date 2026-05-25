@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorTriggerReason
 
-Defined in: packages/memory/src/consolidator/types.ts:46
+Defined in: packages/memory/src/consolidator/types.ts:49
 
 Triggering reason surfaced through `Consolidator.trigger(...)`.
 
@@ -16,5 +16,5 @@ Triggering reason surfaced through `Consolidator.trigger(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"manual"` | packages/memory/src/consolidator/types.ts:47 |
-| <a id="property-value"></a> `value?` | `readonly` | `string` \| `number` | packages/memory/src/consolidator/types.ts:48 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"manual"` | packages/memory/src/consolidator/types.ts:50 |
+| <a id="property-value"></a> `value?` | `readonly` | `string` \| `number` | packages/memory/src/consolidator/types.ts:51 |

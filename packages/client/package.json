@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/client",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Reference TypeScript client for the Graphorin standalone server. Wraps the WebSocket subprotocol `graphorin.protocol.v1` (with the optional Server-Sent Events fallback for proxy-restricted environments) behind an ergonomic `GraphorinClient` class: `connect()`, `subscribe({ target, id })` returning an async-iterable subscription, `cancel(runId, opts)`, `resume(runId, directive)`, `ping()`, `disconnect()`. Handles the browser ticket flow (single-use ticket attached as a `ticket.<value>` `Sec-WebSocket-Protocol` token), exponential-backoff reconnect with `lastEventId` resume against the server replay buffer, and Zod-validated frame parsing on both directions. Browser-friendly: zero Node-only dependencies; the only runtime dependencies are `@graphorin/protocol` and `zod`. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -21,6 +21,12 @@ Re-exports [BlockDefinition](/api/@graphorin/memory/interfaces/BlockDefinition.m
 ### BlockSpec
 
 Re-exports [BlockSpec](/api/@graphorin/memory/interfaces/BlockSpec.md)
+
+***
+
+### capInsightsBelowFacts
+
+Re-exports [capInsightsBelowFacts](/api/@graphorin/memory/functions/capInsightsBelowFacts.md)
 
 ***
 
@@ -69,6 +75,54 @@ Re-exports [FactRememberOptions](/api/@graphorin/memory/interfaces/FactRememberO
 ### FactSearchOptions
 
 Re-exports [FactSearchOptions](/api/@graphorin/memory/interfaces/FactSearchOptions.md)
+
+***
+
+### FusionStrategy
+
+Re-exports [FusionStrategy](/api/@graphorin/memory/type-aliases/FusionStrategy.md)
+
+***
+
+### FusionWeights
+
+Re-exports [FusionWeights](/api/@graphorin/memory/interfaces/FusionWeights.md)
+
+***
+
+### InduceOptions
+
+Re-exports [InduceOptions](/api/@graphorin/memory/interfaces/InduceOptions.md)
+
+***
+
+### InsightListOptions
+
+Re-exports [InsightListOptions](/api/@graphorin/memory/interfaces/InsightListOptions.md)
+
+***
+
+### InsightMemory
+
+Re-exports [InsightMemory](/api/@graphorin/memory/classes/InsightMemory.md)
+
+***
+
+### InsightSearchOptions
+
+Re-exports [InsightSearchOptions](/api/@graphorin/memory/interfaces/InsightSearchOptions.md)
+
+***
+
+### IterativeRecallResult
+
+Re-exports [IterativeRecallResult](/api/@graphorin/memory/type-aliases/IterativeRecallResult.md)
+
+***
+
+### IterativeSearchOptions
+
+Re-exports [IterativeSearchOptions](/api/@graphorin/memory/interfaces/IterativeSearchOptions.md)
 
 ***
 

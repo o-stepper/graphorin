@@ -1,0 +1,83 @@
+[
+  {
+    "question_id": "lme_ie_1",
+    "question_type": "single-session-user",
+    "question": "What is the name of the user's cat?",
+    "answer": "Mochi",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s1", "s2"],
+    "haystack_dates": ["2023/05/15 (Mon) 10:00", "2023/05/20 (Sat) 14:00"],
+    "haystack_sessions": [
+      [
+        { "role": "user", "content": "I just adopted a cat named Mochi.", "has_answer": true },
+        { "role": "assistant", "content": "Congratulations on adopting Mochi!" }
+      ],
+      [
+        { "role": "user", "content": "Mochi keeps me company while I work." },
+        { "role": "assistant", "content": "That sounds lovely." }
+      ]
+    ]
+  },
+  {
+    "question_id": "lme_temp_1",
+    "question_type": "temporal-reasoning",
+    "question": "Which city did the user move to in March 2023?",
+    "answer": "Berlin",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s3"],
+    "haystack_dates": ["2023/03/10 (Fri) 08:00"],
+    "haystack_sessions": [
+      [
+        {
+          "role": "user",
+          "content": "I moved to Berlin this month for a new job.",
+          "has_answer": true
+        },
+        { "role": "assistant", "content": "Exciting — welcome to Berlin!" }
+      ]
+    ]
+  },
+  {
+    "question_id": "lme_abs_1_abs",
+    "question_type": "single-session-user",
+    "question": "What is the user's blood type?",
+    "answer": "No information is available.",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s4"],
+    "haystack_dates": ["2023/05/01 (Mon) 12:00"],
+    "haystack_sessions": [
+      [
+        { "role": "user", "content": "I had a great lunch today." },
+        { "role": "assistant", "content": "Glad to hear it!" }
+      ]
+    ]
+  },
+  {
+    "question_id": "lme_ku_1",
+    "question_type": "knowledge-update",
+    "question": "Who is the user's current employer?",
+    "answer": "Acme Corp",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s5"],
+    "haystack_dates": ["2023/04/02 (Sun) 09:00"],
+    "haystack_sessions": [
+      [
+        { "role": "user", "content": "I just started a new role at Acme Corp." },
+        { "role": "assistant", "content": "Best of luck at Acme Corp!" }
+      ]
+    ]
+  },
+  {
+    "question_id": "lme_ms_1",
+    "question_type": "multi-session",
+    "question": "What hobby did the user pick up and later perform publicly?",
+    "answer": "playing the cello",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s6", "s7"],
+    "haystack_dates": ["2023/02/01 (Wed) 09:00", "2023/05/25 (Thu) 19:00"],
+    "haystack_sessions": [
+      [{ "role": "user", "content": "I started cello lessons." }],
+      [{ "role": "user", "content": "I played the cello at a community concert." }]
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -111,6 +111,24 @@ Re-exports [LocaleSupersedeKind](/api/@graphorin/memory/type-aliases/LocaleSuper
 ### PipelineStage
 
 Re-exports [PipelineStage](/api/@graphorin/memory/interfaces/PipelineStage.md)
+
+***
+
+### ReconcileAction
+
+Re-exports [ReconcileAction](/api/@graphorin/memory/type-aliases/ReconcileAction.md)
+
+***
+
+### ReconcileDecision
+
+Re-exports [ReconcileDecision](/api/@graphorin/memory/type-aliases/ReconcileDecision.md)
+
+***
+
+### reconcileToConflictDecision
+
+Re-exports [reconcileToConflictDecision](/api/@graphorin/memory/functions/reconcileToConflictDecision.md)
 
 ***
 

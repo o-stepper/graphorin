@@ -13,6 +13,13 @@ export {
   EpisodicMemory,
 } from './episodic-memory.js';
 export {
+  capInsightsBelowFacts,
+  type InsightListOptions,
+  InsightMemory,
+  type InsightSearchOptions,
+} from './insight-memory.js';
+export {
+  type InduceOptions,
   ProceduralMemory,
   type RuleActivationContext,
   type RuleInput,
@@ -21,6 +28,10 @@ export {
   type FactInput,
   type FactRememberOptions,
   type FactSearchOptions,
+  type FusionStrategy,
+  type FusionWeights,
+  type IterativeRecallResult,
+  type IterativeSearchOptions,
   type RememberOutcome,
   SemanticMemory,
 } from './semantic-memory.js';

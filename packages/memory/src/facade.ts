@@ -28,8 +28,10 @@ import {
   type ConsolidatorTriggerSpec,
   createConsolidator,
   createConsolidatorPlaceholder,
+  createProviderWorkflowInducer,
   type OnBudgetExceed,
   type PhaseListener,
+  type SalienceWeights,
 } from './consolidator/index.js';
 import { createContextEngine } from './context-engine/engine.js';
 import type {
@@ -44,11 +46,16 @@ import { resolveLocalePack } from './context-engine/locale-packs/resolver.js';
 import { gatherMemoryMetadata, renderMetadataBlock } from './context-engine/metadata.js';
 import { partition as partitionBySensitivity } from './context-engine/privacy-filter.js';
 import { composeLayer1 } from './context-engine/templates/composer.js';
+import { type EntityResolutionConfig, EntityResolver } from './graph/entity-resolver.js';
+import type { ContextualRetrievalMode } from './internal/contextualize.js';
 import { bindEmbedder } from './internal/embedder-binding.js';
 import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/storage-adapter.js';
+import { createProviderRetrievalGrader } from './search/iterative.js';
+import { createProviderQueryTransformer } from './search/query-transform.js';
 import { RRFReranker } from './search/rrf.js';
 import type { ReRanker } from './search/types.js';
 import { EpisodicMemory } from './tiers/episodic-memory.js';
+import { InsightMemory } from './tiers/insight-memory.js';
 import { ProceduralMemory } from './tiers/procedural-memory.js';
 import { SemanticMemory } from './tiers/semantic-memory.js';
 import { SessionMemory } from './tiers/session-memory.js';
@@ -79,6 +86,87 @@ export interface CreateMemoryOptions {
   /** Override the reranker used by `SemanticMemory.search`. */
   readonly reranker?: ReRanker;
   /**
+   * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
+   * (default) prepends a deterministic, offline situating context
+   * (entities / timeframe / topics, derived from the fact's own
+   * structured fields) to the text that is embedded + FTS-indexed, so a
+   * terse fact stays findable; the canonical `text` is preserved. `'off'`
+   * indexes the bare text. The `'llm'` enrichment is **not** available on
+   * the hot path — it is a consolidator-only opt-in configured via
+   * `consolidator: { contextualRetrieval: 'llm' }`.
+   */
+  readonly contextualRetrieval?: 'off' | 'late-chunk';
+  /**
+   * Query transformation for retrieval (P2-3, opt-in). When supplied,
+   * `SemanticMemory.search(..., { multiQuery })` fans the query into
+   * reworded variants (multi-query / RAG-Fusion) and `{ hyde }` adds a
+   * hypothetical-answer embedding — both via one cheap LLM call on the
+   * given provider, fused through the existing RRF reranker. Omitted (the
+   * default) ⇒ search stays **offline + single-shot** and the
+   * `multiQuery` / `hyde` search options become silent no-ops. Reserve it
+   * for retrieval-heavy recall, not every search (it adds provider
+   * latency).
+   */
+  readonly queryTransform?: {
+    /** Cheap provider used to rewrite the query / write the HyDE passage. */
+    readonly provider: Provider;
+    /** Hard ceiling on reworded variants requested per call. Default 5. */
+    readonly maxVariants?: number;
+    /** Output-token ceiling per transform call. Default 256. */
+    readonly maxTokens?: number;
+  };
+  /**
+   * Relation-graph entity resolution (P2-1). When `entityResolution` is
+   * `true` **and** the storage adapter exposes a `graph` surface (the
+   * default `@graphorin/store-sqlite` does), `remember(...)` resolves a
+   * fact's subject / object to canonical entities and links them, so
+   * `search(..., { expandHops: 1 })` can traverse relationships. Omitted
+   * (the default) ⇒ facts still carry s/p/o but form no entity links and
+   * the write path stays offline + unchanged. Dedup is lexical +
+   * embedding (offline, via the configured embedder); LLM adjudication of
+   * ambiguous merges is a further opt-in that needs `provider`.
+   */
+  readonly graph?: EntityResolutionConfig & {
+    /** Enable entity resolution + linking on write. Default `false`. */
+    readonly entityResolution?: boolean;
+    /** Provider for opt-in LLM adjudication of ambiguous merges. */
+    readonly provider?: Provider;
+  };
+  /**
+   * Agentic / iterative retrieval (P2-4, opt-in). When supplied,
+   * `SemanticMemory.searchIterative(...)` and the gated `deep_recall`
+   * tool can grade a retrieved set on the given provider and, for queries
+   * judged hard, reformulate + retrieve again (widening to one-hop graph
+   * expansion) up to `maxIterations`, abstaining instead of confabulating
+   * when memory is insufficient. Omitted (the default) ⇒ `searchIterative`
+   * stays a single difficulty-gated pass with **no provider call**, and
+   * `deep_recall` is **not** registered (the tool surface stays at the
+   * canonical eleven). Reserve it for hard multi-hop / temporal recall —
+   * it adds provider latency per pass.
+   */
+  readonly iterativeRetrieval?: {
+    /** Cheap provider used to grade retrieved memories + reformulate. */
+    readonly provider: Provider;
+    /** Default total-pass cap (clamped to `[1, 5]`). Default 3. */
+    readonly maxIterations?: number;
+    /** Output-token ceiling per grade call. Default 256. */
+    readonly maxTokens?: number;
+  };
+  /**
+   * Opt-in workflow induction (P2-2). When set, `ProceduralMemory.induce(...)`
+   * distils a reusable, value-abstracted procedure from a successful agent
+   * trajectory and stores it **quarantined** + `provenance: 'induction'`.
+   * Omitted (the default) ⇒ `induce(...)` throws
+   * {@link ProcedureInductionNotConfiguredError} and the procedural tier
+   * stays pure offline CRUD — no provider call.
+   */
+  readonly procedureInduction?: {
+    /** Provider used to abstract trajectory values into a procedure. */
+    readonly provider: Provider;
+    /** Output-token ceiling per induction call. Default 512. */
+    readonly maxTokens?: number;
+  };
+  /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws — the
    * agent runtime overrides it in Phase 12.
@@ -105,11 +193,32 @@ export interface CreateMemoryOptions {
     readonly lockWaitMs?: number;
     readonly decayTauDays?: number;
     readonly decayArchiveThreshold?: number;
+    /** Capacity-bounded eviction target for the light phase (X-1). Default unbounded. */
+    readonly decayCapacity?: number | null;
+    /** Weights for the multi-signal salience score (X-1). */
+    readonly salienceWeights?: SalienceWeights;
     readonly maxStandardBatchSize?: number;
     readonly maxDeepConflictsPerRun?: number;
     readonly dlqMaxRetries?: number;
     readonly dlqBaseBackoffMs?: number;
     readonly dlqMaxBackoffMs?: number;
+    /** Auto-form quarantined episodes from processed slices (P1-2). Per-tier default. */
+    readonly formEpisodes?: boolean;
+    /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
+    readonly importanceScoring?: boolean;
+    /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
+    readonly reflection?: boolean;
+    /** Accumulated-importance threshold at which reflection fires (P1-1). */
+    readonly importanceThreshold?: number;
+    /** Upper bound on salient questions reflection asks per pass (P1-1). */
+    readonly reflectionMaxQuestions?: number;
+    /**
+     * Contextual retrieval for standard-phase fact writes (P1-3).
+     * `'llm'` opts into one budgeted cheap-model call per write to author
+     * a situating prefix (consolidator-only); `'late-chunk'` (default)
+     * and `'off'` defer to the write-path mode. Per-tier default.
+     */
+    readonly contextualRetrieval?: ContextualRetrievalMode;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock — used by tests. */
@@ -149,6 +258,12 @@ export interface Memory {
   readonly semantic: SemanticMemory;
   readonly procedural: ProceduralMemory;
   readonly shared: SharedMemory;
+  /**
+   * Read surface over reflection insights (P1-1). A no-op (returns
+   * empty) when the storage adapter does not expose the optional
+   * insight surface.
+   */
+  readonly insights: InsightMemory;
   readonly tools: ReadonlyArray<Tool>;
   readonly consolidator: Consolidator;
   /** The configured conflict pipeline. Surfaced for tests + CLI tooling. */
@@ -207,6 +322,54 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     embedderIdProvider,
   });
   const conflictPipeline = createConflictPipeline(options.conflictPipeline ?? {});
+  // P2-3: build the (opt-in) query transformer from the supplied provider.
+  // Absent ⇒ `null` ⇒ search stays offline + single-shot.
+  const queryTransformer =
+    options.queryTransform !== undefined
+      ? createProviderQueryTransformer(options.queryTransform.provider, {
+          ...(options.queryTransform.maxVariants !== undefined
+            ? { maxVariants: options.queryTransform.maxVariants }
+            : {}),
+          ...(options.queryTransform.maxTokens !== undefined
+            ? { maxTokens: options.queryTransform.maxTokens }
+            : {}),
+        })
+      : null;
+  // P2-1: build the (opt-in) entity resolver. Requires `graph.entityResolution`
+  // *and* a graph-capable adapter; absent ⇒ `null` ⇒ writes carry s/p/o but
+  // form no entity links and the write path stays offline + unchanged.
+  const graphStore = options.store.graph;
+  const entityResolver =
+    options.graph?.entityResolution === true && graphStore !== undefined
+      ? new EntityResolver({
+          store: graphStore,
+          embedder,
+          embedderId: embedderIdProvider,
+          ...(options.graph.provider !== undefined ? { provider: options.graph.provider } : {}),
+          config: {
+            ...(options.graph.mergeThreshold !== undefined
+              ? { mergeThreshold: options.graph.mergeThreshold }
+              : {}),
+            ...(options.graph.adjudicateThreshold !== undefined
+              ? { adjudicateThreshold: options.graph.adjudicateThreshold }
+              : {}),
+            ...(options.graph.llmAdjudication !== undefined
+              ? { llmAdjudication: options.graph.llmAdjudication }
+              : {}),
+          },
+        })
+      : null;
+  // P2-4: build the (opt-in) retrieval grader. Absent ⇒ `null` ⇒
+  // `searchIterative` runs a single difficulty-gated pass (no provider
+  // call) and the `deep_recall` tool is not registered.
+  const grader =
+    options.iterativeRetrieval !== undefined
+      ? createProviderRetrievalGrader(options.iterativeRetrieval.provider, {
+          ...(options.iterativeRetrieval.maxTokens !== undefined
+            ? { maxTokens: options.iterativeRetrieval.maxTokens }
+            : {}),
+        })
+      : null;
   const semantic = new SemanticMemory({
     store: options.store,
     tracer,
@@ -214,25 +377,55 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     embedderIdProvider,
     reranker,
     conflictPipeline,
+    ...(options.contextualRetrieval !== undefined
+      ? { contextualRetrieval: options.contextualRetrieval }
+      : {}),
+    ...(queryTransformer !== null ? { queryTransformer } : {}),
+    ...(entityResolver !== null ? { entityResolver } : {}),
+    ...(grader !== null ? { grader } : {}),
+    ...(options.iterativeRetrieval?.maxIterations !== undefined
+      ? { iterativeMaxIterations: options.iterativeRetrieval.maxIterations }
+      : {}),
   });
-  const procedural = new ProceduralMemory({ store: options.store, tracer });
+  // P2-2: build the (opt-in) workflow inducer. Absent ⇒ `null` ⇒
+  // `ProceduralMemory.induce(...)` throws and the tier stays offline CRUD.
+  const inducer =
+    options.procedureInduction !== undefined
+      ? createProviderWorkflowInducer(options.procedureInduction.provider, {
+          ...(options.procedureInduction.maxTokens !== undefined
+            ? { maxTokens: options.procedureInduction.maxTokens }
+            : {}),
+        })
+      : null;
+  const procedural = new ProceduralMemory({
+    store: options.store,
+    tracer,
+    ...(inducer !== null ? { inducer } : {}),
+  });
   const shared = new SharedMemory({ store: options.store, tracer });
+  const insights = new InsightMemory({ store: options.store, tracer });
 
-  const tools = buildMemoryTools({
-    working,
-    session,
-    episodic,
-    semantic,
-    procedural,
-    shared,
-    resolveScope,
-  });
+  const tools = buildMemoryTools(
+    {
+      working,
+      session,
+      episodic,
+      semantic,
+      procedural,
+      shared,
+      resolveScope,
+    },
+    // P2-4: the gated `deep_recall` tool is registered only when a grader
+    // is configured — the offline default stays at exactly eleven tools.
+    { includeDeepRecall: grader !== null },
+  );
 
   const consolidatorOpts = options.consolidator;
   const consolidator: Consolidator = buildConsolidator(
     consolidatorOpts,
     options.store,
     semantic,
+    episodic,
     tracer,
   );
   const contextEngineConfig = options.contextEngine ?? {};
@@ -321,6 +514,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     semantic,
     procedural,
     shared,
+    insights,
     tools,
     consolidator,
     conflictPipeline,
@@ -364,6 +558,7 @@ function buildConsolidator(
   opts: CreateMemoryOptions['consolidator'],
   store: CreateMemoryOptions['store'],
   semantic: SemanticMemory,
+  episodic: EpisodicMemory,
   tracer: Tracer,
 ): Consolidator {
   if (opts === undefined) {
@@ -379,6 +574,7 @@ function buildConsolidator(
   const consolidator = createConsolidator({
     store,
     semantic,
+    episodic,
     tracer,
     ...(opts.provider !== undefined ? { provider: opts.provider } : {}),
     ...(opts.now !== undefined ? { now: opts.now } : {}),
@@ -396,6 +592,8 @@ function buildConsolidator(
     ...(opts.decayArchiveThreshold !== undefined
       ? { decayArchiveThreshold: opts.decayArchiveThreshold }
       : {}),
+    ...(opts.decayCapacity !== undefined ? { decayCapacity: opts.decayCapacity } : {}),
+    ...(opts.salienceWeights !== undefined ? { salienceWeights: opts.salienceWeights } : {}),
     ...(opts.maxStandardBatchSize !== undefined
       ? { maxStandardBatchSize: opts.maxStandardBatchSize }
       : {}),
@@ -405,6 +603,18 @@ function buildConsolidator(
     ...(opts.dlqMaxRetries !== undefined ? { dlqMaxRetries: opts.dlqMaxRetries } : {}),
     ...(opts.dlqBaseBackoffMs !== undefined ? { dlqBaseBackoffMs: opts.dlqBaseBackoffMs } : {}),
     ...(opts.dlqMaxBackoffMs !== undefined ? { dlqMaxBackoffMs: opts.dlqMaxBackoffMs } : {}),
+    ...(opts.formEpisodes !== undefined ? { formEpisodes: opts.formEpisodes } : {}),
+    ...(opts.importanceScoring !== undefined ? { importanceScoring: opts.importanceScoring } : {}),
+    ...(opts.reflection !== undefined ? { reflection: opts.reflection } : {}),
+    ...(opts.importanceThreshold !== undefined
+      ? { importanceThreshold: opts.importanceThreshold }
+      : {}),
+    ...(opts.reflectionMaxQuestions !== undefined
+      ? { reflectionMaxQuestions: opts.reflectionMaxQuestions }
+      : {}),
+    ...(opts.contextualRetrieval !== undefined
+      ? { contextualRetrieval: opts.contextualRetrieval }
+      : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });
   if (opts.onPhaseFinished !== undefined) {

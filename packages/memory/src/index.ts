@@ -5,14 +5,15 @@
  * Phase 10a deliverables:
  *
  *  - The {@link createMemory} facade that wires every six-tier sub-
- *    module + the nine memory tools + the search reranker + the
+ *    module + the eleven memory tools + the search reranker + the
  *    context-engine + consolidator interface stubs.
  *  - Six tier sub-modules under `./tiers`: {@link WorkingMemory},
  *    {@link SessionMemory}, {@link EpisodicMemory}, {@link SemanticMemory},
  *    {@link ProceduralMemory}, {@link SharedMemory}.
- *  - Nine memory tools under `./tools`: `block_append`, `block_replace`,
+ *  - Eleven memory tools under `./tools`: `block_append`, `block_replace`,
  *    `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
- *    `fact_forget`, `recall_episodes`, `conversation_search`.
+ *    `fact_forget`, `recall_episodes`, `conversation_search`,
+ *    `fact_history` (P0-2), `fact_validate` (P1-4).
  *  - The hybrid search composition under `./search`, including the
  *    built-in {@link RRFReranker} (k=60 default) and the
  *    {@link ReRanker} contract.
@@ -30,11 +31,12 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 export * from './conflict/index.js';
 export {
   BudgetExceededError,
+  buildInductionRequest,
   CONSOLIDATOR_TIER_DEFAULTS,
   type Consolidator,
   type ConsolidatorBudgetSnapshot,
@@ -49,20 +51,36 @@ export {
   type ConsolidatorTriggerSpec,
   type CreateConsolidatorOptions,
   CustomTierMisconfiguredError,
+  checkSuccessCriteria,
   createConsolidator,
   createConsolidatorPlaceholder,
+  createProviderWorkflowInducer,
+  DEFAULT_INDUCTION_MAX_TOKENS,
+  INDUCTION_SYSTEM_PROMPT,
+  type InducedProcedure,
+  MAX_PROCEDURE_STEPS,
+  MAX_TRAJECTORY_STEPS_SHOWN,
+  normalizeInducedProcedure,
   type OnBudgetExceed,
   type ParsedTrigger,
   type PhaseListener,
   type PhaseOutcome,
   ProviderNotConfiguredError,
+  parseInducedProcedure,
   parseTriggerSpec,
   type RegisterTriggersOptions,
   type RegisterTriggersResult,
   reasonFromTrigger,
   registerConsolidatorTriggers,
+  runWorkflowInduction,
   type SchedulerLike,
+  type Trajectory,
+  type TrajectoryStep,
   type TriggerDeclarationLike,
+  trajectoryFromRunState,
+  type VerificationResult,
+  type WorkflowInducer,
+  type WorkflowInductionOptions,
 } from './consolidator/index.js';
 export {
   _getLocaleFallbackWarningsForTesting,
@@ -178,6 +196,8 @@ export {
   createMemory,
   type Memory,
 } from './facade.js';
+export * from './graph/index.js';
+export type { ContextualRetrievalMode } from './internal/contextualize.js';
 export type {
   ConflictAuditDecision,
   ConflictAuditInputLike,
@@ -194,6 +214,9 @@ export type {
   EmbeddedWriteOptions,
   EmbeddingMetaRegistryLike,
   EpisodicMemoryStoreExt,
+  InsightListOptions as InsightStoreListOptions,
+  InsightMemoryStoreExt,
+  InsightSearchStoreOptions,
   MemoryStoreAdapter,
   PendingConflictInputLike,
   PendingConflictRowLike,
@@ -205,15 +228,19 @@ export * from './migration/index.js';
 export * from './search/index.js';
 export * from './tiers/index.js';
 export {
+  type BuildMemoryToolsOptions,
   buildMemoryTools,
   createBlockAppendTool,
   createBlockReplaceTool,
   createBlockRethinkTool,
   createConversationSearchTool,
+  createDeepRecallTool,
   createFactForgetTool,
+  createFactHistoryTool,
   createFactRememberTool,
   createFactSearchTool,
   createFactSupersedeTool,
+  createFactValidateTool,
   createRecallEpisodesTool,
   type MemoryToolDeps,
   type ScopeResolver,

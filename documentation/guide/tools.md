@@ -304,8 +304,8 @@ Tools, [Skills](/guide/skills), and [MCP servers](/guide/mcp-client) all surface
 - [Skills](/guide/skills) — load skills written to the public `SKILL.md` packaging format.
 - [MCP client](/guide/mcp-client) — talk to remote tool servers over Model Context Protocol.
 - [Security](/guide/security) — sandbox and approval architecture.
-- [Memory system](/guide/memory-system) — the nine memory tools wired through `@graphorin/tools`.
+- [Memory system](/guide/memory-system) — the eleven memory tools wired through `@graphorin/tools`.
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

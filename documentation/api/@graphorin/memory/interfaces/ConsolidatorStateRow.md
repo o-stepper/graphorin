@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorStateRow
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:259
+Defined in: packages/memory/src/internal/storage-adapter.ts:303
 
 Persisted per-scope consolidator state row mirrored byte-for-byte
 by `@graphorin/store-sqlite`'s `consolidator_state` table. The lock
@@ -21,10 +21,10 @@ messages.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-activelockacquiredat"></a> `activeLockAcquiredAt` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:266 |
-| <a id="property-activelockheldby"></a> `activeLockHeldBy` | `readonly` | `string` \| `null` | packages/memory/src/internal/storage-adapter.ts:265 |
-| <a id="property-lastcompletedat"></a> `lastCompletedAt` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:263 |
-| <a id="property-lastphase"></a> `lastPhase` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | packages/memory/src/internal/storage-adapter.ts:262 |
-| <a id="property-lastprocessedmessageid"></a> `lastProcessedMessageId` | `readonly` | `string` \| `null` | packages/memory/src/internal/storage-adapter.ts:261 |
-| <a id="property-nexteligibleat"></a> `nextEligibleAt` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:264 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | packages/memory/src/internal/storage-adapter.ts:260 |
+| <a id="property-activelockacquiredat"></a> `activeLockAcquiredAt` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:310 |
+| <a id="property-activelockheldby"></a> `activeLockHeldBy` | `readonly` | `string` \| `null` | packages/memory/src/internal/storage-adapter.ts:309 |
+| <a id="property-lastcompletedat"></a> `lastCompletedAt` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:307 |
+| <a id="property-lastphase"></a> `lastPhase` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | packages/memory/src/internal/storage-adapter.ts:306 |
+| <a id="property-lastprocessedmessageid"></a> `lastProcessedMessageId` | `readonly` | `string` \| `null` | packages/memory/src/internal/storage-adapter.ts:305 |
+| <a id="property-nexteligibleat"></a> `nextEligibleAt` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:308 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | packages/memory/src/internal/storage-adapter.ts:304 |

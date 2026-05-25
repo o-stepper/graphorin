@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -20,5 +20,6 @@ can pattern-match on `kind` and `name` without parsing the message.
 | [EmbedderRegistrationError](/api/@graphorin/memory/errors/classes/EmbedderRegistrationError.md) | Raised when a memory write would reference an embedder that is not registered in the storage layer's `embedding_meta` registry. |
 | [GraphorinMemoryError](/api/@graphorin/memory/errors/classes/GraphorinMemoryError.md) | Base class for every error raised by `@graphorin/memory`. Carries a stable lowercase `kind` discriminator and an optional `hint` surfaced to operators (CLI command / docs link to fix the issue). |
 | [MemoryToolDeniedError](/api/@graphorin/memory/errors/classes/MemoryToolDeniedError.md) | Raised when a memory tool is invoked outside the per-tool ACL or the memory-modification guard tier rejects the call. |
+| [ProcedureInductionNotConfiguredError](/api/@graphorin/memory/errors/classes/ProcedureInductionNotConfiguredError.md) | Raised when ProceduralMemory.induce (P2-2) is called but no workflow inducer was configured. Induction abstracts concrete values into variables, which needs a provider — so the capability is opt-in and the default (offline) procedural tier never silently no-ops a requested induction. |
 | [WorkingBlockOverflowError](/api/@graphorin/memory/errors/classes/WorkingBlockOverflowError.md) | Raised by `WorkingMemory` when a write would exceed the declared `charLimit` and the overflow policy is `'reject'`. |
 | [WorkingBlockReplaceMismatchError](/api/@graphorin/memory/errors/classes/WorkingBlockReplaceMismatchError.md) | Raised by `WorkingMemory.replace(...)` when the supplied unique substring is not present (or appears more than once) in the block value. |

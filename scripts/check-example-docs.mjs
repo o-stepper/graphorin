@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * CI guard: ensures example READMEs keep required operator guidance strings.
  */

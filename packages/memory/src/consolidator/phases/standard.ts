@@ -13,21 +13,52 @@
  */
 
 import type { Provider, ProviderRequest, SessionScope, Tracer } from '@graphorin/core';
+import {
+  type ConflictDecision,
+  type ReconcileDecision,
+  reconcileToConflictDecision,
+} from '../../conflict/index.js';
+import {
+  type ContextualRetrievalMode,
+  contextualizeWithLlm,
+} from '../../internal/contextualize.js';
+import { newMemoryId } from '../../internal/id.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
   MemoryStoreAdapter,
   SessionMessageRecord,
 } from '../../internal/storage-adapter.js';
-import type { SemanticMemory } from '../../tiers/semantic-memory.js';
+import type { EpisodicMemory } from '../../tiers/episodic-memory.js';
+import type { FactInput, SemanticMemory } from '../../tiers/semantic-memory.js';
 import type { BudgetTracker } from '../budget.js';
 import { tipMessageId } from '../idempotency.js';
 import { applyNoiseFilters, type NoiseFilterPreset, renderText } from '../noise-filter.js';
+import { preFilterCandidate, reconcileCandidate } from '../reconcile.js';
 import type { PhaseOutcome } from '../types.js';
+
+/** Top-s nearest neighbours surfaced to the reconcile pre-filter + LLM. */
+const RECONCILE_TOP_K = 10;
 
 /** Inputs accepted by {@link runStandardPhase}. */
 export interface StandardPhaseDeps {
   readonly semantic: SemanticMemory;
+  /**
+   * Episodic tier used for auto-episode-formation (P1-2). Omitted /
+   * `null` ⇒ episode formation is skipped regardless of `formEpisodes`.
+   */
+  readonly episodic?: EpisodicMemory | null;
+  /** Auto-form a quarantined episode per processed slice (P1-2). */
+  readonly formEpisodes: boolean;
+  /** Ask the episode summary call for a `[1, 10]` importance score (P1-2). */
+  readonly importanceScoring: boolean;
+  /**
+   * Contextual-retrieval mode for additive fact writes (P1-3). `'llm'`
+   * spends one budgeted cheap-model call per `add` to author a situating
+   * prefix; `'late-chunk'` / `'off'` defer to the shared
+   * {@link SemanticMemory} instance (no extra call here).
+   */
+  readonly contextualRetrieval: ContextualRetrievalMode;
   readonly store: MemoryStoreAdapter;
   readonly consolidatorStore: ConsolidatorMemoryStoreExt | null;
   readonly provider: Provider;
@@ -60,12 +91,32 @@ interface ExtractedFact {
   readonly confidence?: number;
 }
 
+/** Parsed episode-summary payload (P1-2). */
+interface ExtractedEpisode {
+  readonly summary: string;
+  /** Raw `[1, 10]` importance as returned by the model, pre-normalization. */
+  readonly importance?: number;
+}
+
 const EXTRACTION_SYSTEM_PROMPT = [
   'You are a memory-extraction assistant for a long-running personal-assistant runtime.',
   'Read the supplied conversation slice and return the durable facts it asserts about the user, the world, or stable preferences.',
   'Skip greetings, banter, transient state, and anything the assistant produced as boilerplate.',
   'Return a single JSON object: { "facts": [{ "text": string, "subject"?: string, "predicate"?: string, "object"?: string, "confidence"?: number }] }.',
   'If the slice contains no durable facts, return { "facts": [] }.',
+].join(' ');
+
+const EPISODE_SUMMARY_SYSTEM_PROMPT = [
+  'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
+  'Read the supplied conversation slice and write one concise third-person summary of what happened — the episode.',
+  'Return a single JSON object: { "summary": string }.',
+].join(' ');
+
+const EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT = [
+  'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
+  'Read the supplied conversation slice and write one concise third-person summary of what happened — the episode.',
+  'Also rate how important / poignant this episode is for remembering the user, on an integer scale from 1 (mundane) to 10 (deeply significant).',
+  'Return a single JSON object: { "summary": string, "importance": number }.',
 ].join(' ');
 
 /**
@@ -143,24 +194,218 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
 
       const facts = parseExtraction(response.text);
       let factsCreated = 0;
-      const totalTokens =
+      let factsUpdated = 0;
+      let conflictsResolved = 0;
+      let reconcileTokens = 0;
+      let reconcileCost = 0;
+      let contextualTokens = 0;
+      let contextualCost = 0;
+      const extractionTokens =
         (usage.promptTokens ?? 0) + (usage.completionTokens ?? 0) + (usage.reasoningTokens ?? 0);
-      const snapshot = deps.budget.record({
-        phase: 'standard',
-        tokens: totalTokens,
-        costUsd: cost,
-      });
+      deps.budget.record({ phase: 'standard', tokens: extractionTokens, costUsd: cost });
 
       for (const fact of facts) {
         if (fact.text.trim().length === 0) continue;
-        const input: Parameters<SemanticMemory['remember']>[1] = { text: fact.text };
-        if (fact.subject !== undefined) Object.assign(input, { subject: fact.subject });
-        if (fact.predicate !== undefined) Object.assign(input, { predicate: fact.predicate });
-        if (fact.object !== undefined) Object.assign(input, { object: fact.object });
-        if (fact.confidence !== undefined) Object.assign(input, { confidence: fact.confidence });
-        await deps.semantic.remember(deps.scope, input);
-        factsCreated += 1;
+        const input = buildFactInput(fact);
+
+        // Neighbour-aware reconciliation (P0-3). A cheap, LLM-free pre-filter
+        // (Stage 1 exact-dedup + Stage 2 embedding zones) classifies the
+        // candidate against its nearest neighbours; only the ambiguous
+        // CONFLICT-CHECK mid-zone spends a reconcile LLM call. With no
+        // embedder configured `neighbors` is empty → every candidate is a
+        // fresh `add`, preserving the pre-reconcile behaviour.
+        const neighbors = await deps.semantic.neighbors(deps.scope, fact.text, {
+          topK: RECONCILE_TOP_K,
+        });
+        const route = await preFilterCandidate(fact.text, neighbors);
+
+        let decision: ReconcileDecision;
+        let audited: ConflictDecision;
+        if (route.route === 'reconcile' && !deps.budget.snapshot().paused) {
+          const result = await reconcileCandidate({
+            candidateText: fact.text,
+            neighbors: neighbors.map((h) => ({
+              id: h.record.id,
+              text: h.record.text,
+              ...(h.record.validFrom !== undefined ? { validFrom: h.record.validFrom } : {}),
+            })),
+            provider: deps.provider,
+            scope: deps.scope,
+          });
+          decision = result.decision;
+          audited = reconcileToConflictDecision(decision);
+          reconcileTokens += result.usage.totalTokens;
+          const callCost =
+            deps.priceUsage?.({
+              promptTokens: result.usage.promptTokens,
+              completionTokens: result.usage.completionTokens,
+            }) ?? 0;
+          reconcileCost += callCost;
+          deps.budget.record({
+            phase: 'standard',
+            tokens: result.usage.totalTokens,
+            costUsd: callCost,
+          });
+        } else if (route.route === 'reconcile') {
+          // Mid-zone but the budget is exhausted — fall back to a safe
+          // additive write rather than spending an over-budget LLM call.
+          decision = { action: 'add', reason: 'reconcile-budget-paused' };
+          audited = { kind: 'admit', stage: 'defer-to-deep', reason: 'reconcile-budget-paused' };
+        } else if (route.route === 'noop') {
+          decision = { action: 'noop', targetId: route.targetId, reason: route.reason };
+          audited = {
+            kind: 'dedup',
+            stage: route.reason === 'exact-hash-match' ? 'exact-dedup' : 'embedding-three-zone',
+            existingId: route.targetId,
+            ...(route.similarity !== undefined ? { similarity: route.similarity } : {}),
+            reason: route.reason,
+          };
+        } else {
+          decision = { action: 'add', reason: route.reason };
+          audited = { kind: 'admit', stage: 'embedding-three-zone', reason: route.reason };
+        }
+
+        // Apply the decision. Updates / conflicts route through the
+        // bi-temporal supersede (close the old interval, insert the new) —
+        // never a destructive delete (P0-3).
+        let candidateId: string;
+        switch (decision.action) {
+          case 'add': {
+            // Contextual retrieval (P1-3). In `'llm'` mode (and only when
+            // the budget is not exhausted) spend one cheap-model call to
+            // author a situating prefix and pass it as the write's index
+            // text; the helper degrades to the deterministic late-chunk
+            // prefix on any failure. `'late-chunk'` / `'off'` add nothing
+            // here — the shared SemanticMemory instance contextualizes the
+            // write. This LLM call is the only contextualization that
+            // touches a provider, keeping `'llm'` strictly consolidator-only.
+            let indexText: string | undefined;
+            if (deps.contextualRetrieval === 'llm' && !deps.budget.snapshot().paused) {
+              const ctx = await contextualizeWithLlm(
+                {
+                  text: input.text,
+                  ...(input.subject !== undefined ? { subject: input.subject } : {}),
+                  ...(input.predicate !== undefined ? { predicate: input.predicate } : {}),
+                  ...(input.object !== undefined ? { object: input.object } : {}),
+                },
+                deps.provider,
+              );
+              indexText = ctx.indexText;
+              const ctxTokens =
+                (ctx.usage.promptTokens ?? 0) +
+                (ctx.usage.completionTokens ?? 0) +
+                (ctx.usage.reasoningTokens ?? 0);
+              const ctxCost =
+                deps.priceUsage?.({
+                  promptTokens: ctx.usage.promptTokens,
+                  completionTokens: ctx.usage.completionTokens,
+                }) ?? 0;
+              contextualTokens += ctxTokens;
+              contextualCost += ctxCost;
+              deps.budget.record({ phase: 'standard', tokens: ctxTokens, costUsd: ctxCost });
+            }
+            // `pipeline: 'off'` — the standard phase has already made the
+            // conflict decision; a second inline pass would re-search +
+            // double-audit.
+            const stored = await deps.semantic.remember(deps.scope, input, {
+              pipeline: 'off',
+              ...(indexText !== undefined ? { indexText } : {}),
+            });
+            candidateId = stored.id;
+            factsCreated += 1;
+            break;
+          }
+          case 'noop': {
+            // Duplicate of `targetId` — record the dedup, write nothing.
+            candidateId = newMemoryId('fact');
+            break;
+          }
+          case 'update': {
+            const { new: stored } = await deps.semantic.supersede(
+              deps.scope,
+              decision.targetId,
+              input,
+              decision.reason,
+            );
+            candidateId = stored.id;
+            factsUpdated += 1;
+            break;
+          }
+          case 'conflict': {
+            const { new: stored } = await deps.semantic.supersede(
+              deps.scope,
+              decision.targetId,
+              input,
+              decision.reason,
+            );
+            candidateId = stored.id;
+            factsUpdated += 1;
+            conflictsResolved += 1;
+            break;
+          }
+        }
+
+        // Every decision is auditable in `fact_conflicts` (best-effort —
+        // a store without the conflict surface simply skips it).
+        await recordConflictDecision(deps.store, deps.scope, candidateId, audited);
       }
+
+      // Episode formation (P1-2). Summarize the processed slice into one
+      // quarantined episode carrying an LLM importance score, so the
+      // episodic triple-signal ranking (recency × relevance × importance)
+      // runs on all three signals. Budget-gated + provenance-tagged
+      // (P1-4): skipped when `formEpisodes` is off, no episodic tier is
+      // wired, or the budget is exhausted — the slice still advanced the
+      // cursor, so the phase degrades to fact-only behaviour.
+      let episodesFormed = 0;
+      let episodeTokens = 0;
+      let episodeCost = 0;
+      if (
+        deps.formEpisodes &&
+        deps.episodic != null &&
+        filtered.kept.length > 0 &&
+        !deps.budget.snapshot().paused
+      ) {
+        const episodeRes = await deps.provider.generate(
+          buildEpisodeRequest(deps, transcript, deps.importanceScoring),
+        );
+        const epUsage = episodeRes.usage;
+        episodeTokens =
+          (epUsage.promptTokens ?? 0) +
+          (epUsage.completionTokens ?? 0) +
+          (epUsage.reasoningTokens ?? 0);
+        episodeCost =
+          deps.priceUsage?.({
+            promptTokens: epUsage.promptTokens,
+            completionTokens: epUsage.completionTokens,
+          }) ?? 0;
+        deps.budget.record({ phase: 'standard', tokens: episodeTokens, costUsd: episodeCost });
+
+        const parsed = parseEpisode(episodeRes.text);
+        if (parsed !== null && parsed.summary.trim().length > 0) {
+          const importance = deps.importanceScoring
+            ? normalizeImportance(parsed.importance)
+            : undefined;
+          const nowFallback = new Date(
+            (typeof deps.now === 'function' ? deps.now : Date.now)(),
+          ).toISOString();
+          const startedAt = filtered.kept[0]?.createdAt ?? nowFallback;
+          const endedAt = filtered.kept[filtered.kept.length - 1]?.createdAt ?? startedAt;
+          await deps.episodic.record(deps.scope, {
+            summary: parsed.summary,
+            startedAt,
+            endedAt,
+            ...(importance !== undefined ? { importance } : {}),
+            provenance: 'extraction',
+            status: 'quarantined',
+          });
+          episodesFormed = 1;
+        }
+      }
+
+      const totalTokens = extractionTokens + reconcileTokens + episodeTokens + contextualTokens;
+      const totalCost = cost + reconcileCost + episodeCost + contextualCost;
+      const snapshot = deps.budget.snapshot();
 
       span.setAttributes({
         'consolidator.duration_ms': Math.max(
@@ -168,11 +413,17 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
           (typeof deps.now === 'function' ? deps.now : Date.now)() - startedAt,
         ),
         'consolidator.facts_extracted': factsCreated,
-        'consolidator.budget_used_usd': cost,
+        'consolidator.budget_used_usd': totalCost,
         'consolidator.standard.facts_extracted': factsCreated,
+        'consolidator.standard.facts_updated': factsUpdated,
+        'consolidator.standard.conflicts_resolved': conflictsResolved,
+        'consolidator.standard.episodes_formed': episodesFormed,
+        'consolidator.standard.reconcile_tokens': reconcileTokens,
+        'consolidator.standard.episode_tokens': episodeTokens,
+        'consolidator.standard.contextual_tokens': contextualTokens,
         'consolidator.standard.tokens.input': usage.promptTokens,
         'consolidator.standard.tokens.output': usage.completionTokens,
-        'consolidator.standard.cost.estimate.usd': cost,
+        'consolidator.standard.cost.estimate.usd': totalCost,
         'consolidator.budget.remaining.tokens': snapshot.tokensRemaining,
         'consolidator.budget.remaining.usd': snapshot.costRemaining,
         'consolidator.exceeded': snapshot.paused,
@@ -185,12 +436,14 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         phase: 'standard',
         status: 'completed',
         factsCreated,
-        factsUpdated: 0,
-        conflictsResolved: 0,
+        factsUpdated,
+        conflictsResolved,
+        episodesFormed,
+        insightsCreated: 0,
         noiseFilteredCount: filtered.droppedCount,
         emptyExtractions: facts.length === 0 ? 1 : 0,
         llmTokensUsed: totalTokens,
-        llmCostUsd: cost,
+        llmCostUsd: totalCost,
         errorMessage: null,
       };
     },
@@ -206,6 +459,37 @@ function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequ
       },
     ],
     systemMessage: EXTRACTION_SYSTEM_PROMPT,
+    temperature: 0,
+    metadata: {
+      userId: deps.scope.userId,
+      ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),
+      ...(deps.scope.agentId !== undefined ? { agentId: deps.scope.agentId } : {}),
+    },
+    outputType: { kind: 'structured' },
+  };
+}
+
+/**
+ * Build the episode-summarization request (P1-2). Uses the same
+ * transcript + structured-output seam as {@link buildRequest}; the
+ * system prompt switches on `withImportance` so a poignancy score is
+ * only requested when importance scoring is enabled.
+ */
+function buildEpisodeRequest(
+  deps: StandardPhaseDeps,
+  transcript: string,
+  withImportance: boolean,
+): ProviderRequest {
+  return {
+    messages: [
+      {
+        role: 'user',
+        content: `Conversation slice:\n${transcript}`,
+      },
+    ],
+    systemMessage: withImportance
+      ? EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT
+      : EPISODE_SUMMARY_SYSTEM_PROMPT,
     temperature: 0,
     metadata: {
       userId: deps.scope.userId,
@@ -270,8 +554,64 @@ export function parseExtraction(text: string | undefined): ReadonlyArray<Extract
   return out;
 }
 
+/**
+ * Parse the episode-summary model output into `{ summary, importance? }`
+ * (P1-2). Tolerates fenced blocks + an optional `{ episode: {...} }`
+ * wrapper; returns `null` when no usable `summary` string is present
+ * (so an extraction-shaped `{ facts: [...] }` payload is rejected, not
+ * mistaken for an episode).
+ *
+ * @internal
+ */
+export function parseEpisode(text: string | undefined): ExtractedEpisode | null {
+  if (text === undefined || text.length === 0) return null;
+  const candidate = stripFence(text).trim();
+  if (candidate.length === 0) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(candidate);
+  } catch {
+    const slice = sliceJsonObject(candidate);
+    if (slice === null) return null;
+    try {
+      parsed = JSON.parse(slice);
+    } catch {
+      return null;
+    }
+  }
+  if (parsed === null || typeof parsed !== 'object') return null;
+  const root = parsed as Record<string, unknown>;
+  const inner =
+    typeof root.summary === 'string'
+      ? root
+      : root.episode !== null && typeof root.episode === 'object'
+        ? (root.episode as Record<string, unknown>)
+        : root;
+  const summary = typeof inner.summary === 'string' ? inner.summary : null;
+  if (summary === null || summary.trim().length === 0) return null;
+  return {
+    summary,
+    ...(typeof inner.importance === 'number' ? { importance: inner.importance } : {}),
+  };
+}
+
+/**
+ * Normalize a raw `[1, 10]` poignancy score into the episodic
+ * `importance` field's `[0, 1]` range (P1-2). Out-of-range values are
+ * clamped to `[1, 10]` first (so `15 → 1.0`, `0 → 0.1`); non-finite /
+ * missing scores return `undefined` so the episode is recorded without
+ * an importance signal rather than a bogus one.
+ *
+ * @internal
+ */
+export function normalizeImportance(raw: number | undefined): number | undefined {
+  if (typeof raw !== 'number' || !Number.isFinite(raw)) return undefined;
+  const clamped = Math.min(10, Math.max(1, raw));
+  return clamped / 10;
+}
+
 function stripFence(text: string): string {
-  const match = /^```(?:json)?\s*\n([\s\S]*?)\n```/u.exec(text.trim());
+  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
   return match?.[1] ?? text;
 }
 
@@ -282,6 +622,52 @@ function sliceJsonObject(text: string): string | null {
   return text.slice(start, end + 1);
 }
 
+/**
+ * Build the {@link FactInput} for an extracted candidate. P1-4:
+ * distilled-from-transcript facts are synthesized memory — tagged
+ * `extraction` so they land quarantined (excluded from action-driving
+ * recall until validated).
+ */
+function buildFactInput(fact: ExtractedFact): FactInput {
+  return {
+    text: fact.text,
+    provenance: 'extraction',
+    ...(fact.subject !== undefined ? { subject: fact.subject } : {}),
+    ...(fact.predicate !== undefined ? { predicate: fact.predicate } : {}),
+    ...(fact.object !== undefined ? { object: fact.object } : {}),
+    ...(fact.confidence !== undefined ? { confidence: fact.confidence } : {}),
+  };
+}
+
+/**
+ * Record a reconcile / pre-filter decision into `fact_conflicts` so every
+ * write-path decision stays auditable (P0-3). Best-effort: a storage
+ * adapter without the conflict surface simply skips it.
+ */
+async function recordConflictDecision(
+  store: MemoryStoreAdapter,
+  scope: SessionScope,
+  candidateId: string,
+  decision: ConflictDecision,
+): Promise<void> {
+  const conflicts = store.conflicts;
+  if (conflicts === undefined) return;
+  await conflicts.recordDecision({
+    scope,
+    candidateId,
+    decision: decision.kind,
+    stage: decision.stage,
+    ...(decision.kind === 'dedup' || decision.kind === 'supersede'
+      ? { existingId: decision.existingId }
+      : {}),
+    ...(decision.kind === 'dedup' && decision.similarity !== undefined
+      ? { similarity: decision.similarity }
+      : {}),
+    ...(decision.reason !== undefined ? { reason: decision.reason } : {}),
+    detectedBy: 'reconcile',
+  });
+}
+
 function emptyOutcome(status: PhaseOutcome['status']): PhaseOutcome {
   return {
     phase: 'standard',
@@ -289,6 +675,8 @@ function emptyOutcome(status: PhaseOutcome['status']): PhaseOutcome {
     factsCreated: 0,
     factsUpdated: 0,
     conflictsResolved: 0,
+    episodesFormed: 0,
+    insightsCreated: 0,
     noiseFilteredCount: 0,
     emptyExtractions: 0,
     llmTokensUsed: 0,

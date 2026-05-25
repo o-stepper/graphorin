@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function registerMigration(migration): void;
 ```
 
-Defined in: packages/store-sqlite/src/migrations/registry.ts:107
+Defined in: packages/store-sqlite/src/migrations/registry.ts:112
 
 Register a runtime-supplied migration. Used by downstream packages
 that want to ship their schema alongside the bundled set without

@@ -39,6 +39,8 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Context engine.** The component that compiles the memory-aware system prompt before each agent step.
 
+**Contextual retrieval.** Prepending a short situating context to a fact before it is indexed, so a terse fact stays findable (Anthropic's *Contextual Retrieval*). The default `late-chunk` mode is deterministic + offline; an opt-in consolidator `llm` mode authors a richer prefix.
+
 ## D
 
 **`Directive`.** Workflow-engine primitive that controls the next-step decision (resume, branch, halt). Lives in `@graphorin/core/channels`.
@@ -50,6 +52,8 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 ## E
 
 **Embedder.** Component that produces dense vector representations of text. Default is `@graphorin/embedder-transformersjs`.
+
+**Entity graph.** In-SQLite `(subject, predicate, object)` graph over canonical entities, with reversible, audited merges. Backs one-hop associative search (`search(..., { expandHops: 1 })`). Opt-in via `createMemory({ graph })`.
 
 **`Ephemeral`.** Channel descriptor whose value lives only for the current step. Lives in `@graphorin/core/channels`.
 
@@ -65,11 +69,15 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Handoff.** Transfer of control between agents in the same session. Recorded as a typed `HandoffRecord`.
 
-**Hybrid search.** Search that fuses dense-vector and full-text (FTS5) results. Default fusion is Reciprocal Rank Fusion with `k=60`.
+**Hybrid search.** Search that fuses dense-vector and full-text (FTS5) results. Default fusion is Reciprocal Rank Fusion with `k=60`; an opt-in **weighted fusion** can be calibrated against labelled data.
 
 ## I
 
 **Idempotency key.** `Idempotency-Key` HTTP header that lets the standalone server deduplicate retried `POST` requests within the configured TTL.
+
+**Insight.** Derived, higher-order memory synthesised by the consolidator's reflection pass from episodes + facts. Read-only (`memory.insights`); carries mandatory citations and is quarantined until validated.
+
+**Iterative retrieval.** A gated grade-then-reformulate recall loop (CRAG / Self-RAG) for hard multi-hop questions — `searchIterative(...)` and the opt-in `deep_recall` tool. Abstains rather than confabulating.
 
 ## L
 
@@ -93,13 +101,19 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **`Provider`.** The single interface every LLM adapter implements. Lives in `@graphorin/provider`.
 
-**Procedural memory.** The "how-to" tier — workflows, recipes, learned patterns.
+**Procedural memory.** The "how-to" tier — workflows, recipes, learned patterns. Procedures can be authored (`define`) or **induced** from successful agent trajectories (AWM-style; `induce`), the latter quarantined until validated.
 
 **Progress artifact.** UTF-8 text artifact persisted via atomic-write `.tmp + rename` for cross-session continuity. Owned by `agent.progress`.
 
+**Provenance.** Two distinct senses: (1) the memory-row origin tag (`user` / `tool` / `extraction` / `reflection` / `induction` / `imported`) that gates recall trust; (2) the agent data-flow taint label used by the data-flow policy. See [Security](/guide/security).
+
+## Q
+
+**Quarantine.** A retrieval-trust state (`status: 'quarantined'`) that excludes a memory row from default recall without deleting it. Derived or injection-flagged writes land quarantined until promoted with `fact_validate`. See [Security § Memory safety](/guide/security#memory-safety-provenance-quarantine).
+
 ## R
 
-**Reciprocal Rank Fusion (RRF).** Default reranker for hybrid search; combines vector and FTS5 ranks with `k=60`.
+**Reciprocal Rank Fusion (RRF).** Default reranker for hybrid search; combines vector and FTS5 ranks with `k=60`. The `WeightedRRFReranker` generalises it with per-retriever weights (equal weights reproduce RRF exactly).
 
 **Replay.** Reconstruction of a past run from the audit log + JSONL export. Sanitised by default; opt in to live re-execution.
 
@@ -147,4 +161,4 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

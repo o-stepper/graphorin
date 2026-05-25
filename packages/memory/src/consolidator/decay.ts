@@ -73,3 +73,135 @@ export function shouldArchive(args: {
   });
   return score < args.archiveThreshold;
 }
+
+/**
+ * Neutral importance used when a fact carries no importance hint —
+ * the midpoint of the `[0, 1]` range, so an unscored fact contributes
+ * an importance factor of exactly `1.0` (`salience === retention`).
+ *
+ * @stable
+ */
+export const NEUTRAL_IMPORTANCE = 0.5;
+
+/**
+ * Tunable weights for the multi-signal {@link salience} score (X-1).
+ * Each weight is the *magnitude* of the corresponding signal's pull on
+ * the retention curve; all default to values chosen so the ordering is
+ * sensible without ever inverting it.
+ *
+ * @stable
+ */
+export interface SalienceWeights {
+  /**
+   * How strongly importance (P1-2) stretches retention. At the default
+   * `0.6`, importance `1.0` multiplies retention by `1.3` and importance
+   * `0.0` by `0.7`; neutral importance leaves it unchanged.
+   */
+  readonly importance: number;
+  /**
+   * Penalty applied to a **quarantined** fact (P1-4) — the explicit
+   * security-risk negative term. At the default `0.7`, a quarantined
+   * fact keeps only `0.3` of its retention, so it is evicted first under
+   * capacity pressure. Never a hard delete: the fact is archived,
+   * recoverable, and quarantine still gates it out of recall meanwhile.
+   */
+  readonly quarantine: number;
+  /**
+   * Mild penalty for a fact with non-first-party provenance (P1-4) —
+   * e.g. `'tool'` / `'imported'` content that did not originate with the
+   * user. At the default `0.2` such a fact keeps `0.8` of its retention.
+   */
+  readonly foreignProvenance: number;
+}
+
+/**
+ * Default {@link SalienceWeights}. Chosen so that an active,
+ * first-party, unscored fact has `salience === retention` (the X-1
+ * change is invisible until a fact carries an importance hint, is
+ * quarantined, or has foreign provenance).
+ *
+ * @stable
+ */
+export const DEFAULT_SALIENCE_WEIGHTS: SalienceWeights = Object.freeze({
+  importance: 0.6,
+  quarantine: 0.7,
+  foreignProvenance: 0.2,
+});
+
+/**
+ * Multi-signal salience for capacity-bounded forgetting (X-1). Combines
+ * the Ebbinghaus {@link retention} curve (temporal relevance + access
+ * frequency via `strength`) with the P1-2 importance hint and a P1-4
+ * security-risk negative term:
+ *
+ * ```
+ * salience = retention × importanceFactor × securityFactor
+ * ```
+ *
+ * Sold as **cost / staleness control, not accuracy**: it only orders
+ * what gets archived first when storage is bounded — it never gates
+ * recall. With neutral importance, an active fact, and first-party
+ * provenance the factors are all `1`, so `salience === retention`.
+ *
+ * @stable
+ */
+export function salience(args: {
+  readonly now: number;
+  readonly lastAccessedAt: number | null;
+  readonly createdAt: number;
+  readonly strength: number;
+  readonly tauDays: number;
+  /** Importance hint in `[0, 1]`; `null` → {@link NEUTRAL_IMPORTANCE}. */
+  readonly importance: number | null;
+  /** P1-4: a quarantined fact gets the {@link SalienceWeights.quarantine} penalty. */
+  readonly quarantined: boolean;
+  /** P1-4: a non-first-party fact gets the {@link SalienceWeights.foreignProvenance} penalty. */
+  readonly foreignProvenance: boolean;
+  /** Defaults to {@link DEFAULT_SALIENCE_WEIGHTS}. */
+  readonly weights?: SalienceWeights;
+}): number {
+  const weights = args.weights ?? DEFAULT_SALIENCE_WEIGHTS;
+  const base = retention({
+    now: args.now,
+    lastAccessedAt: args.lastAccessedAt,
+    createdAt: args.createdAt,
+    strength: args.strength,
+    tauDays: args.tauDays,
+  });
+  const importance = clamp01(args.importance ?? NEUTRAL_IMPORTANCE);
+  const importanceFactor = Math.max(0, 1 + weights.importance * (importance - NEUTRAL_IMPORTANCE));
+  const securityFactor = args.quarantined
+    ? Math.max(0, 1 - weights.quarantine)
+    : args.foreignProvenance
+      ? Math.max(0, 1 - weights.foreignProvenance)
+      : 1;
+  return Math.max(0, base * importanceFactor * securityFactor);
+}
+
+/**
+ * Capacity-bounded eviction selector (X-1). Given facts scored by
+ * {@link salience}, return the ids of the lowest-salience ones to
+ * archive so that at most `capacity` remain. Pure and deterministic:
+ * ties break by id so a given batch always evicts the same set.
+ *
+ * Returns `[]` when the batch already fits (`length <= capacity`).
+ * `capacity <= 0` evicts the whole batch.
+ *
+ * @stable
+ */
+export function selectForCapacityEviction(
+  scored: ReadonlyArray<{ readonly id: string; readonly salience: number }>,
+  capacity: number,
+): ReadonlyArray<string> {
+  const evictCount = scored.length - Math.max(0, capacity);
+  if (evictCount <= 0) return [];
+  return [...scored]
+    .sort((a, b) => a.salience - b.salience || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .slice(0, evictCount)
+    .map((row) => row.id);
+}
+
+function clamp01(value: number): number {
+  if (Number.isNaN(value)) return NEUTRAL_IMPORTANCE;
+  return Math.min(1, Math.max(0, value));
+}

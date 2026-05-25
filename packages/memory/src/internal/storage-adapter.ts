@@ -1,9 +1,13 @@
 import type {
   EmbedderProvider,
+  EntityRole,
   Episode,
   EpisodicMemoryStore,
   Fact,
+  GraphEntity,
+  Insight,
   MemoryHit,
+  MemoryStatus,
   MemoryStore,
   Message,
   MessageRef,
@@ -31,6 +35,13 @@ export interface EmbeddedWriteOptions {
     readonly embedderId: string;
     readonly vector: Float32Array;
   };
+  /**
+   * Contextual-retrieval index text (P1-3). When supplied, the adapter
+   * indexes its lexical (FTS) surface against this context-prepended
+   * text while persisting the canonical `text` unchanged. Absent ⇒ the
+   * canonical text is indexed (pre-P1-3 behaviour).
+   */
+  readonly indexText?: string;
 }
 
 /**
@@ -47,6 +58,10 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    /** Point-in-time filter (`started_at <= asOf`, ISO-8601). P0-2. */
+    asOf?: string,
+    /** Include quarantined episodes (validation/inspector path). P1-4. */
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
   /** Mark an episode archived. Soft-archive — the row stays for replay. */
   archive?(id: string, reason?: string): Promise<void>;
@@ -66,15 +81,44 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    /**
+     * Point-in-time filter applied after KNN: only facts whose
+     * validity interval contains `asOf` (ISO-8601) survive. P0-2.
+     */
+    asOf?: string,
+    /**
+     * Include quarantined facts in the KNN result (validation /
+     * inspector path). Default reads exclude them. P1-4.
+     */
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   /** Lookup a single fact by id (returns `null` when absent or soft-deleted). */
   get?(id: string): Promise<Fact | null>;
+  /**
+   * Set a fact's retrieval-trust `status` and write a `memory_history`
+   * audit row (P1-4). Promotes a quarantined fact to `active` (the
+   * validation path) or re-quarantines an active one. Never touches
+   * content / embedding / tombstone — quarantine is a retrieval gate.
+   * Powers {@link SemanticMemory.validate}; the default
+   * `@graphorin/store-sqlite` adapter implements it.
+   */
+  setStatus?(factId: string, status: MemoryStatus, reason?: string): Promise<void>;
   /**
    * Hard-delete a fact (GDPR path). The audit log row is preserved
    * but the row itself + every per-embedder vec0 entry is removed.
    * Distinct from {@link SemanticMemoryStore.forget} (soft-delete).
    */
   purge?(id: string, reason?: string): Promise<void>;
+  /**
+   * Walk the bi-temporal supersede chain that `factId` belongs to and
+   * return every fact in it, oldest → newest (by `validFrom`),
+   * including superseded / soft-deleted rows so callers can answer
+   * "how did this fact change over time". Scope-guarded and
+   * cycle-safe; returns `[]` for an unknown id. Powers
+   * {@link SemanticMemory.history} (P0-2). The default
+   * `@graphorin/store-sqlite` adapter implements it.
+   */
+  historyOf?(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>>;
 }
 
 /**
@@ -431,6 +475,9 @@ export interface DecayMemoryStoreExt {
    * List facts for the scope ordered by `lastAccessedAt` ASC so the
    * caller can apply Ebbinghaus retention without scanning the
    * whole table. `limit` defaults to `1000`.
+   *
+   * `importance` / `status` / `provenance` (X-1) feed the multi-signal
+   * salience score that orders capacity-bounded eviction.
    */
   listForDecay(
     scope: SessionScope,
@@ -443,6 +490,12 @@ export interface DecayMemoryStoreExt {
       readonly lastAccessedAt: number | null;
       readonly createdAt: number;
       readonly archived: boolean;
+      /** Importance hint in `[0, 1]`; `null` when unscored (X-1). */
+      readonly importance: number | null;
+      /** Retrieval-trust state (P1-4): `'active'` | `'quarantined'`. */
+      readonly status: string;
+      /** Trust-provenance tag (P1-4); `null` for first-party rows. */
+      readonly provenance: string | null;
     }>
   >;
   /**
@@ -450,6 +503,155 @@ export interface DecayMemoryStoreExt {
    * `memory_history` records the archive event.
    */
   archiveFact(id: string, reason?: string): Promise<void>;
+}
+
+/** Options accepted by {@link InsightMemoryStoreExt.list}. */
+export interface InsightListOptions {
+  readonly limit?: number;
+  /** Include quarantined insights (validation / inspector path). */
+  readonly includeQuarantined?: boolean;
+}
+
+/** Options accepted by {@link InsightMemoryStoreExt.search}. */
+export interface InsightSearchStoreOptions {
+  readonly topK?: number;
+  /** Include quarantined insights (validation / inspector path). */
+  readonly includeQuarantined?: boolean;
+}
+
+/**
+ * Optional storage extension for the reflection `insights` table
+ * (P1-1). The consolidator's reflection pass inserts quarantined,
+ * cited insights here; the thin `InsightMemory` read surface lists /
+ * searches them; the ExpeL salience loop bumps + prunes them. Search is
+ * FTS-only by design — insights are a soft, rank-capped inspector
+ * surface, not primary recall.
+ *
+ * Adapters that opt out leave the property undefined; reflection then
+ * degrades to a no-op (it never writes) and `InsightMemory`
+ * search/list return empty. The default `@graphorin/store-sqlite`
+ * adapter implements it.
+ *
+ * @stable
+ */
+export interface InsightMemoryStoreExt {
+  /** Persist a synthesized insight (idempotent on `id`). */
+  insert(insight: Insight): Promise<void>;
+  /** Most-recent insights for the scope (newest first). */
+  list(scope: SessionScope, opts?: InsightListOptions): Promise<ReadonlyArray<Insight>>;
+  /** FTS keyword search over insight text. */
+  search(
+    scope: SessionScope,
+    query: string,
+    opts?: InsightSearchStoreOptions,
+  ): Promise<ReadonlyArray<MemoryHit<Insight>>>;
+  /** Lookup a single insight by id (`null` when absent / pruned). */
+  get?(id: string): Promise<Insight | null>;
+  /**
+   * Adjust an insight's ExpeL salience by `delta`, clamped at 0. The
+   * floor is the value at which {@link prune} removes it.
+   */
+  bumpSalience(id: string, delta: number, reason?: string): Promise<void>;
+  /**
+   * Soft-delete every salience-0 insight for the scope (the ExpeL
+   * forgetting step). Returns the number pruned. Tombstone only —
+   * pruned insights stay auditable.
+   */
+  prune(scope: SessionScope): Promise<number>;
+}
+
+/** Find-or-create payload for {@link GraphMemoryStoreExt.upsertEntity}. */
+export interface EntityUpsertInput {
+  /** Display name as first observed. */
+  readonly name: string;
+  /** Folded key for lexical dedup + the canonical unique index. */
+  readonly normalizedName: string;
+  /** Optional name embedding (back-filled on a hit that lacked one). */
+  readonly vector?: Float32Array;
+  /** Embedder that produced {@link EntityUpsertInput.vector}. */
+  readonly embedderId?: string;
+}
+
+/**
+ * A canonical {@link GraphEntity} returned with its name embedding so the
+ * resolver can run cosine dedup in-process (entity counts are small).
+ */
+export interface EntityWithEmbedding extends GraphEntity {
+  readonly vector: Float32Array | null;
+  readonly embedderId: string | null;
+}
+
+/** One row of the append-only merge / unmerge audit ledger (P2-1). */
+export interface EntityMergeRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly kind: 'merge' | 'unmerge';
+  readonly fromEntityId: string;
+  readonly intoEntityId: string | null;
+  readonly reason?: string;
+  readonly createdAt: string;
+}
+
+/** Options for {@link GraphMemoryStoreExt.expandOneHop}. */
+export interface ExpandHopsStoreOptions {
+  /** Traversal depth (default `1`). */
+  readonly maxHops?: number;
+  /** Max neighbours to return (default `60`). */
+  readonly limit?: number;
+  /** Include quarantined neighbours (validation / inspector path). */
+  readonly includeQuarantined?: boolean;
+  /** Point-in-time filter, ISO-8601 (same semantics as fact search). */
+  readonly asOf?: string;
+}
+
+/**
+ * Optional storage extension for the lightweight in-SQLite relation
+ * graph (P2-1). Owns the canonical `entities` table, the `fact_entities`
+ * mapping, and the append-only `entity_merges` ledger. The entity
+ * *resolution policy* (lexical + embedding dedup, optional LLM
+ * adjudication) lives in `@graphorin/memory`; this surface is the pure
+ * persistence + the recursive-CTE traversal.
+ *
+ * Adapters that opt out leave the property undefined; entity resolution
+ * on write degrades to a no-op and `search({ expandHops })` skips
+ * expansion. The default `@graphorin/store-sqlite` adapter implements it.
+ *
+ * @stable
+ */
+export interface GraphMemoryStoreExt {
+  /** Find-or-create the canonical (root) entity for the normalized name. */
+  upsertEntity(scope: SessionScope, input: EntityUpsertInput): Promise<string>;
+  /** Link a fact's subject / object to a canonical entity (idempotent). */
+  linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void>;
+  /** Candidate entities for the resolver (roots only unless `includeMerged`). */
+  listEntities(
+    scope: SessionScope,
+    opts?: { readonly includeMerged?: boolean; readonly limit?: number },
+  ): Promise<ReadonlyArray<EntityWithEmbedding>>;
+  /** Lookup one entity by id (any merge state). */
+  getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null>;
+  /** Follow `mergedInto` to the canonical root id. */
+  resolveCanonical(scope: SessionScope, id: string): Promise<string>;
+  /** Merge `fromId` into `intoId`'s root; auditable + reversible. */
+  mergeEntities(
+    scope: SessionScope,
+    fromId: string,
+    intoId: string,
+    reason?: string,
+  ): Promise<void>;
+  /** Reverse a merge: make `id` a root again + record an audit row. */
+  unmergeEntity(scope: SessionScope, id: string, reason?: string): Promise<void>;
+  /** The append-only merge / unmerge ledger, newest first. */
+  listMerges(
+    scope: SessionScope,
+    opts?: { readonly limit?: number },
+  ): Promise<ReadonlyArray<EntityMergeRecord>>;
+  /** Expand seed facts to neighbours sharing a canonical entity (one-hop CTE). */
+  expandOneHop(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts?: ExpandHopsStoreOptions,
+  ): Promise<ReadonlyArray<Fact>>;
 }
 
 /**
@@ -484,6 +686,22 @@ export interface MemoryStoreAdapter extends Omit<MemoryStore, 'session' | 'episo
    * @stable
    */
   readonly consolidator?: ConsolidatorMemoryStoreExt;
+  /**
+   * Optional reflection insight surface (P1-1). Defined on the default
+   * `@graphorin/store-sqlite` adapter; omitted ⇒ reflection is a no-op
+   * and `InsightMemory` reads return empty.
+   *
+   * @stable
+   */
+  readonly insights?: InsightMemoryStoreExt;
+  /**
+   * Optional relation-graph surface (P2-1). Defined on the default
+   * `@graphorin/store-sqlite` adapter; omitted ⇒ entity resolution on
+   * write is a no-op and `search({ expandHops })` skips expansion.
+   *
+   * @stable
+   */
+  readonly graph?: GraphMemoryStoreExt;
 }
 
 /**
@@ -499,6 +717,7 @@ export type {
   Episode,
   EpisodicMemoryStore,
   Fact,
+  Insight,
   Message,
   MessageRef,
   ProceduralMemoryStore,

@@ -15,7 +15,7 @@ import type {
   MemoryStoreAdapter,
   SessionMessageRecord,
 } from '../../internal/storage-adapter.js';
-import { shouldArchive } from '../decay.js';
+import { type SalienceWeights, salience, selectForCapacityEviction } from '../decay.js';
 import { tipMessageId } from '../idempotency.js';
 import type { NoiseFilterPreset } from '../noise-filter.js';
 import { applyNoiseFilters } from '../noise-filter.js';
@@ -30,6 +30,15 @@ export interface LightPhaseDeps {
   readonly now: () => number;
   readonly decayTauDays: number;
   readonly decayArchiveThreshold: number;
+  /**
+   * Capacity-bounded eviction (X-1). When non-null, the light phase
+   * archives the lowest-salience live facts in the decay window down to
+   * this many, in addition to the threshold archiving. `null` (the
+   * default) leaves storage unbounded — behaviour identical to pre-X-1.
+   */
+  readonly decayCapacity: number | null;
+  /** Weights for the multi-signal salience score (X-1). */
+  readonly salienceWeights: SalienceWeights;
   readonly noiseFilters: ReadonlyArray<NoiseFilterPreset>;
   readonly maxBatchSize: number;
   readonly lastProcessedMessageId: string | null;
@@ -55,23 +64,58 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
       const startedAt = deps.now();
       let facts = 0;
       let archived = 0;
+      let capacityEvicted = 0;
       if (typeof deps.store.semantic.listForDecay === 'function') {
-        const rows = await deps.store.semantic.listForDecay(deps.scope, deps.maxBatchSize);
+        // When a capacity bound is set we widen the decay window past the
+        // batch size so there is always headroom to trim the overflow; the
+        // window is the LRU head (ordered by last-accessed ASC), so the
+        // bound converges over repeated passes.
+        const decayLimit =
+          deps.decayCapacity !== null
+            ? Math.max(deps.maxBatchSize, deps.decayCapacity + deps.maxBatchSize)
+            : deps.maxBatchSize;
+        const rows = await deps.store.semantic.listForDecay(deps.scope, decayLimit);
         facts = rows.length;
         const now = deps.now();
+        // Bind once so the optional method stays narrowed across `await`
+        // (and keeps its `this`); `undefined` ⇒ the store can't archive.
+        const archiveFact = deps.store.semantic.archiveFact?.bind(deps.store.semantic);
+        // Pass 1 — multi-signal threshold archiving. Salience folds the
+        // Ebbinghaus retention curve together with the P1-2 importance hint
+        // and the P1-4 security-risk negative term, so a stale, low-value,
+        // or quarantined fact crosses the threshold sooner. Neutral inputs
+        // collapse salience to plain retention (pre-X-1 behaviour).
+        const survivors: Array<{ id: string; salience: number }> = [];
         for (const row of rows) {
           if (row.archived) continue;
-          const archive = shouldArchive({
+          const score = salience({
             now,
             lastAccessedAt: row.lastAccessedAt,
             createdAt: row.createdAt,
             strength: row.strength,
             tauDays: deps.decayTauDays,
-            archiveThreshold: deps.decayArchiveThreshold,
+            importance: row.importance,
+            quarantined: row.status === 'quarantined',
+            foreignProvenance: isForeignProvenance(row.provenance),
+            weights: deps.salienceWeights,
           });
-          if (archive && typeof deps.store.semantic.archiveFact === 'function') {
-            await deps.store.semantic.archiveFact(row.id, 'low_retention');
+          if (score < deps.decayArchiveThreshold) {
+            if (archiveFact !== undefined) {
+              await archiveFact(row.id, 'low_salience');
+              archived += 1;
+            }
+            continue;
+          }
+          survivors.push({ id: row.id, salience: score });
+        }
+        // Pass 2 — capacity-bounded eviction. Archive the lowest-salience
+        // survivors (security-flagged first) until the window fits.
+        if (deps.decayCapacity !== null && archiveFact !== undefined) {
+          const evictIds = selectForCapacityEviction(survivors, deps.decayCapacity);
+          for (const id of evictIds) {
+            await archiveFact(id, 'capacity_exceeded');
             archived += 1;
+            capacityEvicted += 1;
           }
         }
       }
@@ -97,6 +141,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
         'consolidator.budget_used_usd': 0,
         'consolidator.light.facts_seen': facts,
         'consolidator.light.facts_archived': archived,
+        'consolidator.light.capacity_evicted': capacityEvicted,
         'consolidator.light.noise_filtered': noiseFilteredCount,
       });
 
@@ -106,6 +151,8 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
         factsCreated: 0,
         factsUpdated: archived,
         conflictsResolved: 0,
+        episodesFormed: 0,
+        insightsCreated: 0,
         noiseFilteredCount,
         emptyExtractions: 0,
         llmTokensUsed: 0,
@@ -114,6 +161,17 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
       };
     },
   );
+}
+
+/**
+ * `true` for provenance that did not originate first-party (P1-4) — used
+ * to apply the mild salience penalty in capacity eviction. First-party
+ * is `null` (legacy / direct write), `'user'`, and `'extraction'` (the
+ * consolidator distilling the user's own session); `'tool'`,
+ * `'imported'`, and `'reflection'` are treated as foreign.
+ */
+function isForeignProvenance(provenance: string | null): boolean {
+  return provenance !== null && provenance !== 'user' && provenance !== 'extraction';
 }
 
 /** Convenience helper used by the standard phase to advance the cursor. */

@@ -30,7 +30,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 export {
   detectRegressions,
@@ -42,6 +42,13 @@ export {
 } from './cli/index.js';
 export type {
   FromTracesOptions,
+  LoadDmrOptions,
+  LoadLocomoOptions,
+  LoadLongMemEvalOptions,
+  MemoryEvalAbility,
+  MemoryEvalInput,
+  MemoryEvalSession,
+  MemoryEvalTurn,
   TraceEvent,
 } from './loaders/index.js';
 export {
@@ -50,9 +57,15 @@ export {
   type LoadJsonlOptions,
   loadCsvDataset,
   loadDatasetFromTraces,
+  loadDmrDataset,
   loadJsonlDataset,
+  loadLocomoDataset,
+  loadLongMemEvalDataset,
   parseCsv,
+  parseDmr,
   parseJsonl,
+  parseLocomo,
+  parseLongMemEval,
 } from './loaders/index.js';
 export { detectRegressions as detectRegressionsFromReports } from './regression.js';
 export {

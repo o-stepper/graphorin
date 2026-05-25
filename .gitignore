@@ -21,6 +21,12 @@ coverage/
 # Benchmark runners write timestamped reports on each run (see packages' runner.ts)
 benchmarks/**/RESULTS.md
 
+# Eval datasets fetched on demand by scripts/fetch-eval-datasets.mjs (never committed)
+benchmarks/.datasets/
+
+# Ephemeral LongMemEval run reports (curated baselines live in baselines/)
+benchmarks/longmemeval/reports/
+
 # Local data emitted by the framework at runtime
 .graphorin/
 *.db

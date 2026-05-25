@@ -164,7 +164,7 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
   }
 
   const report: DoctorReport = Object.freeze({
-    version: '0.3.0',
+    version: '0.4.0',
     home,
     platform: process.platform,
     checks: Object.freeze(checks),

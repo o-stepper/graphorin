@@ -52,6 +52,8 @@ The CI workflow that runs the check is [`.github/workflows/check-no-network.yml`
 
 `createProvider(adapter, { acceptsSensitivity })` is the **first-run sensitivity prompt**. The default for an unfamiliar provider is **deny everything except `public`** until you opt in. Memory rows tagged `secret` are filtered before any payload reaches the adapter, regardless of the configuration.
 
+Sensitivity governs *who may see* a memory. It is orthogonal to **provenance / quarantine**, which governs *whether a memory is trusted enough to recall at all* — synthesised or injection-flagged rows are quarantined out of recall until a human validates them. See [Security § Memory safety](/guide/security#memory-safety-provenance-quarantine).
+
 ## Verifying the contract yourself
 
 Set `GRAPHORIN_OFFLINE=1` and run any of the example apps in the repository. The runtime refuses to phone home; recipes that try to reach a configured local endpoint (e.g. an Ollama daemon) emit a typed `OfflineRecipeUnreachableError` with a helpful remediation message.
@@ -75,4 +77,4 @@ If you believe you have observed Graphorin making a network call that the runtim
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -24,7 +24,7 @@ graphorin token <subcommand>    — create / list / revoke server tokens
 graphorin secrets <subcommand>  — list / get / set / delete / ref / rotate
 graphorin storage <subcommand>  — vacuum / size / migrate
 graphorin audit <subcommand>    — list / verify / export
-graphorin memory <subcommand>   — list / search / forget / migrate-embedder
+graphorin memory <subcommand>   — status / inspect / activity / migrate
 graphorin consolidator <subcommand> — run / status / clear-pending
 graphorin triggers <subcommand> — list / fire / pause / resume
 graphorin auth <subcommand>     — login / logout / status (OAuth flows)
@@ -114,12 +114,16 @@ OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free 
 
 ## `graphorin memory`
 
+Read-only operator inspection of the long-term memory store, plus the explicit embedder swap. `inspect` and `activity` query the store directly and never load an embedder.
+
 ```bash
-graphorin memory list --tier semantic --user-id alex
-graphorin memory search 'mountain hike' --tier semantic --user-id alex
-graphorin memory forget <fact-id>
-graphorin memory migrate-embedder --target Xenova/multilingual-e5-large --strategy auto-migrate
+graphorin memory status                  # counts + active embedder + migration state
+graphorin memory inspect <fact-id>       # one fact: supersede chain, quarantine, conflicts, citing insights
+graphorin memory activity --limit 20     # store-wide consolidator / reflection activity
+graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedders ./embedders.mjs
 ```
+
+`status`, `inspect`, and `activity` accept `--json` for a structured document. `memory inspect` and `memory activity` are the operator side of [recall explainability](/guide/memory-system#recall-explainability). `migrate` performs an [embedder migration](/guide/memory-system#embedder-migration) — `--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`, and `--embedders` points at a module exporting the source / target factories.
 
 ## `graphorin consolidator`
 
@@ -157,4 +161,4 @@ The CLI never phones home. The only outbound calls happen on commands that expli
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

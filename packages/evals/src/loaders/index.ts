@@ -12,6 +12,11 @@ export {
   parseCsv,
 } from './csv.js';
 export {
+  type LoadDmrOptions,
+  loadDmrDataset,
+  parseDmr,
+} from './dmr.js';
+export {
   type FromTracesOptions,
   groupAndExtract,
   loadDatasetFromTraces,
@@ -23,3 +28,19 @@ export {
   loadJsonlDataset,
   parseJsonl,
 } from './jsonl.js';
+export {
+  type LoadLocomoOptions,
+  loadLocomoDataset,
+  parseLocomo,
+} from './locomo.js';
+export {
+  type LoadLongMemEvalOptions,
+  loadLongMemEvalDataset,
+  parseLongMemEval,
+} from './longmemeval.js';
+export type {
+  MemoryEvalAbility,
+  MemoryEvalInput,
+  MemoryEvalSession,
+  MemoryEvalTurn,
+} from './memory-eval.js';

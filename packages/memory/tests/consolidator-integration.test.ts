@@ -97,8 +97,20 @@ describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integrat
       const status = await memory.consolidator.status();
       expect(status.budget.tokensUsedToday).toBe(92);
 
-      const facts = await memory.semantic.search(scope, 'Lisbon');
-      expect(facts.length).toBeGreaterThan(0);
+      // P1-4: consolidator-extracted facts are synthesized memory — they
+      // land quarantined and are EXCLUDED from default (action-driving)
+      // recall until validated. The poisoning gate, proven end-to-end.
+      const recalled = await memory.semantic.search(scope, 'Lisbon');
+      expect(recalled.length).toBe(0);
+
+      // They are persisted + auditable, surfaced only via the inspector
+      // escape hatch, and carry extraction provenance.
+      const quarantined = await memory.semantic.search(scope, 'Lisbon', {
+        includeQuarantined: true,
+      });
+      expect(quarantined.length).toBeGreaterThan(0);
+      expect(quarantined[0]?.record.status).toBe('quarantined');
+      expect(quarantined[0]?.record.provenance).toBe('extraction');
     } finally {
       await sqlite.close();
     }

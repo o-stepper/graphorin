@@ -181,7 +181,7 @@ The discriminated `AgentEvent<TOutput>` union is exhaustive and verified at comp
 
 ## Persisting facts
 
-The agent registers nine memory tools by default. Calling them is just a normal tool call:
+The agent registers eleven memory tools by default (a twelfth, `deep_recall`, when iterative retrieval is configured). Calling them is just a normal tool call:
 
 ```ts
 await memory.semantic.remember(
@@ -207,4 +207,4 @@ See [Memory system](/guide/memory-system) for the full tier model and the confli
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

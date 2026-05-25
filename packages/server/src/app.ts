@@ -375,7 +375,7 @@ export interface CreateServerOptions {
 /**
  * @stable
  */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 /**
  * Build a fully-wired Graphorin server. The returned handle is

@@ -1,0 +1,101 @@
+name: LongMemEval benchmark
+
+# Dispatch-only. The real datasets are large/gated and a meaningful run needs a
+# real Provider API key, so this never runs on push/PR — that keeps default CI
+# offline and `check-no-network`-clean. Trigger manually from the Actions tab.
+on:
+  workflow_dispatch:
+    inputs:
+      loader:
+        description: Dataset loader
+        type: choice
+        default: longmemeval
+        options:
+          - longmemeval
+          - locomo
+          - dmr
+      dataset_file:
+        description: File under benchmarks/.datasets/ to evaluate
+        type: string
+        default: longmemeval_s.json
+      variant:
+        description: LongMemEval variant (S or M)
+        type: string
+        default: S
+
+concurrency:
+  group: longmemeval-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  longmemeval:
+    name: LongMemEval (dispatch-only)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # Networked download is allowed only here: this is a dev/CI script under
+      # scripts/, never imported by packages/*/src, so `check-no-network` stays
+      # green. Gated sources are supplied via repo secrets (env overrides).
+      - name: Fetch eval datasets
+        env:
+          LOADER: ${{ inputs.loader }}
+          GRAPHORIN_LONGMEMEVAL_S_URL: ${{ secrets.GRAPHORIN_LONGMEMEVAL_S_URL }}
+          GRAPHORIN_LOCOMO_URL: ${{ secrets.GRAPHORIN_LOCOMO_URL }}
+          GRAPHORIN_DMR_URL: ${{ secrets.GRAPHORIN_DMR_URL }}
+        run: node scripts/fetch-eval-datasets.mjs --only "$LOADER"
+
+      # Per-category (ability) regression gates: each ability is compared against
+      # its committed baseline under benchmarks/longmemeval/baselines/ via
+      # detectRegressions (maxPassRateDropPct 5, maxAvgScoreDrop 0.05). Missing
+      # baselines are skipped (seed them from the emitted reports/). `--gate-on
+      # regressions` fails the job only on a baseline regression. Inputs are
+      # passed via env (never interpolated into the shell) to avoid injection.
+      #
+      # NOTE: the runner's main() falls back to a deterministic OFFLINE STUB
+      # provider — scores are plumbing-only. Wire a real Provider (and its API
+      # key secret) into the runner to produce real LongMemEval numbers.
+      - name: Run per-ability regression gates
+        env:
+          LOADER: ${{ inputs.loader }}
+          DATASET_FILE: ${{ inputs.dataset_file }}
+          VARIANT: ${{ inputs.variant }}
+        run: |
+          set -u
+          DATASET="benchmarks/.datasets/$DATASET_FILE"
+          REPORTS="benchmarks/longmemeval/reports"
+          BASELINES="benchmarks/longmemeval/baselines"
+          mkdir -p "$REPORTS"
+          status=0
+          for ability in info-extraction multi-session temporal knowledge-update abstention; do
+            echo "::group::ability=$ability"
+            node benchmarks/longmemeval/dist/runner.js \
+              --loader "$LOADER" \
+              --dataset "$DATASET" \
+              --variant "$VARIANT" \
+              --ability "$ability" \
+              --json "$REPORTS/$LOADER.$ability.json" \
+              --baseline "$BASELINES/$LOADER.$ability.json" \
+              --gate-on regressions || status=1
+            echo "::endgroup::"
+          done
+          exit $status

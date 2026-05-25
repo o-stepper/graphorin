@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Per-iteration progress snapshot yielded by [migrateEmbedder](/api/@graphorin/mem
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"fact"` \| `"message"` \| `"episode"` | `'fact'`, `'episode'`, or `'message'` — which entity is being migrated. | packages/memory/src/migration/embedder-migration.ts:32 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"fact"` \| `"episode"` \| `"message"` | `'fact'`, `'episode'`, or `'message'` — which entity is being migrated. | packages/memory/src/migration/embedder-migration.ts:32 |
 | <a id="property-migrationid"></a> `migrationId` | `readonly` | `string` | Migration row id in the persistent `migration_state` table. | packages/memory/src/migration/embedder-migration.ts:42 |
 | <a id="property-phase"></a> `phase` | `readonly` | `"aborted"` \| `"paused"` \| `"running"` \| `"planning"` \| `"committed"` | Phase discriminator. | packages/memory/src/migration/embedder-migration.ts:44 |
 | <a id="property-processed"></a> `processed` | `readonly` | `number` | Number of records processed so far. | packages/memory/src/migration/embedder-migration.ts:34 |

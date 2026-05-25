@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type SpanStatus = "ok" | "error" | "cancelled";
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:58
+Defined in: packages/core/src/contracts/tracer.ts:61
 
 Status of a finished span. Mirrors the OTel status convention with
 `'ok' | 'error'` short forms instead of the verbose tristate.

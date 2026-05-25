@@ -2,6 +2,8 @@ import type {
   EmbedderProvider,
   Episode,
   MemoryHit,
+  MemoryProvenance,
+  MemoryStatus,
   Sensitivity,
   SessionScope,
   Tracer,
@@ -26,6 +28,18 @@ export interface EpisodeInput {
   readonly importance?: number;
   readonly sensitivity?: Sensitivity;
   readonly tags?: ReadonlyArray<string>;
+  /**
+   * Trust-provenance tag (P1-4). Episodes auto-formed by the
+   * consolidator pass `'extraction'` so they land quarantined; omit
+   * (defaults to first-party `active`) for user-authored episodes.
+   */
+  readonly provenance?: MemoryProvenance;
+  /**
+   * Retrieval-trust state (P1-4). Defaults to `active`; the
+   * consolidator records auto-formed episodes as `'quarantined'` so
+   * they are excluded from action-driving recall until validated.
+   */
+  readonly status?: MemoryStatus;
 }
 
 /**
@@ -57,6 +71,25 @@ export interface EpisodeSearchOptions {
   readonly signal?: AbortSignal;
   readonly weights?: EpisodeRetrievalWeights;
   readonly dateRange?: { readonly from?: string; readonly to?: string };
+  /**
+   * Point-in-time ("as of") read. When set, only episodes that had
+   * started by this instant (`started_at <= asOf`) are returned.
+   * ISO-8601. Absent ⇒ current behaviour is unchanged. P0-2.
+   *
+   * @stable
+   */
+  readonly asOf?: string;
+  /**
+   * Include quarantined episodes in the result set (P1-4). Defaults to
+   * `false`: action-driving recall never returns quarantined rows. Set
+   * `true` only for the validation / inspector path — never for
+   * auto-recall fed back into the model. Auto-formed episodes (P1-2)
+   * land quarantined, so this is how an operator surfaces them for
+   * review.
+   *
+   * @stable
+   */
+  readonly includeQuarantined?: boolean;
 }
 
 /**
@@ -100,6 +133,8 @@ export class EpisodicMemory {
         endedAt: input.endedAt,
         ...(input.importance !== undefined ? { importance: input.importance } : {}),
         ...(input.tags !== undefined ? { tags: Object.freeze([...input.tags]) } : {}),
+        ...(input.provenance !== undefined ? { provenance: input.provenance } : {}),
+        ...(input.status !== undefined ? { status: input.status } : {}),
         createdAt: now,
         updatedAt: now,
       };
@@ -158,15 +193,26 @@ export class EpisodicMemory {
         const ftsHits = await this.#store.episodic.search(scope, {
           query,
           topK: topK * 2,
+          ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+          ...(opts.includeQuarantined !== undefined
+            ? { includeQuarantined: opts.includeQuarantined }
+            : {}),
         });
-        const vectorHits = await this.#tryVectorSearch(scope, query, topK * 2);
+        const vectorHits = await this.#tryVectorSearch(
+          scope,
+          query,
+          topK * 2,
+          opts.asOf,
+          opts.includeQuarantined,
+        );
         const merged = mergeRecency(ftsHits, vectorHits, weights);
         const finalHits = merged.slice(0, topK);
         span.setAttributes({
           'memory.search.episodic.fts_count': ftsHits.length,
           'memory.search.episodic.vector_count': vectorHits.length,
           'memory.search.episodic.final_count': finalHits.length,
+          ...(opts.asOf !== undefined ? { 'memory.search.episodic.as_of': opts.asOf } : {}),
         });
         return finalHits;
       },
@@ -217,6 +263,8 @@ export class EpisodicMemory {
     scope: SessionScope,
     query: string,
     topK: number,
+    asOf?: string,
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const embedderId = this.#embedderIdProvider();
     if (
@@ -228,7 +276,14 @@ export class EpisodicMemory {
     }
     const [vector] = await this.#embedder.embed([query]);
     if (vector === undefined) return [];
-    return this.#store.episodic.searchVector(scope, vector, embedderId, topK);
+    return this.#store.episodic.searchVector(
+      scope,
+      vector,
+      embedderId,
+      topK,
+      asOf,
+      includeQuarantined,
+    );
   }
 }
 

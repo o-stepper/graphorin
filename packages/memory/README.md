@@ -5,7 +5,7 @@
 
 `@graphorin/memory` ships the `createMemory()` facade, the six tier
 sub-modules (working, session, episodic, semantic, procedural, shared),
-the nine memory tools that the agent runtime registers with
+the eleven memory tools that the agent runtime registers with
 `@graphorin/tools`, the built-in Reciprocal Rank Fusion reranker (k=60),
 the embedder migration runner, and the interface stubs picked up later
 by the conflict-resolution pipeline, the consolidator, and the context
@@ -20,7 +20,7 @@ The package depends on:
 - `@graphorin/security` — the memory-modification guard (`MemoryGuardTier`)
   every memory tool is wired against.
 - `@graphorin/tools` — the `tool({...})` builder used to declare the
-  nine memory tools.
+  ten memory tools.
 - `zod` (peer) — schema typing for the memory tools.
 
 Storage is provided by any `MemoryStore` implementation; the default
@@ -41,11 +41,27 @@ any `EmbedderProvider`; the default is
   through the built-in `RRFReranker` (k=60 default). The
   `setReranker(custom)` hook accepts any `ReRanker` implementation
   (cross-encoder, LLM judge, custom).
-- **Nine memory tools.** `block_append`, `block_replace`,
+- **Eleven memory tools.** `block_append`, `block_replace`,
   `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
-  `fact_forget`, `recall_episodes`, `conversation_search` — every tool
-  is a typed `Tool` with `inputSchema` + `outputSchema`, the
-  appropriate `memoryGuardTier`, and the right `sideEffectClass`.
+  `fact_forget`, `recall_episodes`, `conversation_search`,
+  `fact_history`, `fact_validate` — every tool is a typed `Tool` with
+  `inputSchema` + `outputSchema`, the appropriate `memoryGuardTier`, and
+  the right `sideEffectClass`. `fact_search` accepts an `asOf` instant
+  for point-in-time reads; `fact_history` returns a fact's bi-temporal
+  supersede chain; `fact_validate` promotes a quarantined fact to active.
+- **Provenance + quarantine (memory-safety gate).** Every fact carries
+  a `provenance` tag (`user` / `tool` / `extraction` / `reflection` /
+  `imported`) and a retrieval-trust `status`. *Derived* writes
+  (consolidator extraction, future reflection) and candidates that trip
+  the offline injection heuristics (`ignore previous instructions`,
+  role-markup smuggling, secrecy / exfiltration directives) land
+  `status: 'quarantined'` and are **excluded from default recall** until
+  a human promotes them via `fact_validate`. Quarantine is a retrieval
+  gate, never a delete — quarantined rows stay fully auditable, and the
+  `includeQuarantined` search option surfaces them for the validation
+  UI. This is the precondition for safely shipping synthesized memory
+  (reflection / reconciliation / induction) against memory-poisoning
+  (MINJA, MemoryGraft).
 - **Multi-stage conflict resolution pipeline.** Every
   `SemanticMemory.remember(...)` call now flows through a five-stage
   pipeline (exact dedup → embedding three-zone → heuristic regex →
@@ -56,6 +72,127 @@ any `EmbedderProvider`; the default is
   `defineLocalePack({...})`. Operators can disable the pipeline with
   `createMemory({ conflictPipeline: { mode: 'off' } })` (a one-shot
   WARN surfaces so the regression risk is visible).
+- **Neighbour-aware write reconciliation** (consolidator standard phase).
+  Extracted facts are reconciled against their nearest neighbours via an
+  extract→reconcile loop: a cheap pre-filter (the pipeline's exact-dedup +
+  embedding zones over `SemanticMemory.neighbors(...)`) resolves clear
+  duplicates / independents with no LLM call, and only the ambiguous mid-zone
+  spends one reconcile pass choosing add / update / noop / conflict. Updates
+  and conflicts route through the bi-temporal supersede (never a delete);
+  every decision is audited in `fact_conflicts` and new facts inherit the
+  `extraction` provenance gate.
+- **Auto-importance + episode formation** (consolidator standard phase).
+  Each processed slice is summarized into one episode via a single budgeted
+  LLM call that also rates its importance `1–10` (normalized to `[0, 1]`),
+  so episodic triple-signal retrieval (recency × relevance × importance) finally
+  runs on all three signals. Auto-formed episodes carry `provenance: 'extraction'`
+  + `status: 'quarantined'` (P1-4) — surfaced for review via
+  `episodic.search(..., { includeQuarantined: true })`. Importance is a *soft*
+  signal (never a retention gate). Controlled by the per-tier `formEpisodes` /
+  `importanceScoring` flags (on at `standard` / `full`); budget-aware
+  (an exhausted budget degrades to fact-only).
+- **Reflection + insight synthesis** (consolidator deep phase). When the
+  accumulated importance of recent episodes crosses `importanceThreshold`, the
+  deep phase asks the model for the few most salient questions, retrieves
+  evidence for each, and synthesizes a higher-order **insight** (Generative
+  Agents). Insights are a distinct memory type (`memory.insights`:
+  `search` / `list`) that land `provenance: 'reflection'` +
+  `status: 'quarantined'`, carry **mandatory citations set from the retrieved
+  evidence** (never hallucinated), and are **rank-capped below the facts they
+  cite** (`capInsightsBelowFacts`). An ExpeL salience counter (start `2`,
+  pruned at `0`) manages the set. Off by default except at the `full` tier;
+  budget-aware and a no-op without an episodic tier + insight-capable store.
+- **Contextual retrieval** (write path). Before a fact is embedded + FTS-indexed
+  the framework prepends a short **situating context** (entities / timeframe /
+  topics, Anthropic's Contextual Retrieval) so a terse fact stays findable; the
+  canonical `text` is preserved. The offline default `'late-chunk'`
+  (`createMemory({ contextualRetrieval })`) derives the context deterministically
+  from the fact's own structured signals with **no extra LLM call** — a no-op for
+  plain-text writes. An opt-in, **consolidator-only** `'llm'` mode
+  (`consolidator: { contextualRetrieval: 'llm' }`) spends one budgeted cheap-model
+  call per write to author the prefix, degrading to late-chunk on any failure.
+- **Recall explainability** ("why was this recalled?"). `explainRecall(hits, {
+  query, rerankerId })` decomposes a `search(...)` result into the per-memory
+  signals that drove its score (`bm25` / `vector` / fused `rrf` / `decay`), in
+  final-rank order; `formatRecallExplanation(...)` renders it. `search` also
+  records the decay multiplier as a `decay` signal and attaches the breakdown
+  (ids + scores + signals, never the query text) to the `memory.search.semantic`
+  span. Operators inspect the rest via `graphorin memory inspect <factId>`
+  (supersede chain / quarantine / conflicts / citing insights) and
+  `graphorin memory activity` (consolidator / reflection activity).
+- **Multi-signal forgetting** (cost / staleness control, *not* an accuracy
+  lever). The light phase scores each fact with `salience(...)` — the Ebbinghaus
+  `retention` curve (recency + access frequency) combined with the `importance`
+  hint and a security-risk negative term (a quarantined fact is evicted first, a
+  foreign-provenance one slightly sooner). With neutral importance + an active,
+  first-party fact, `salience === retention`. Setting `decayCapacity`
+  (`createMemory({ consolidator: { decayCapacity } })`, default unbounded)
+  bounds storage: the lowest-salience facts are **soft-archived** (recoverable —
+  `archived = 1`, never deleted) until the window fits.
+- **Query transformation** (read path; multi-query / RAG-Fusion + opt-in HyDE).
+  `search(scope, query, { multiQuery: N })` fans the query into up to `N - 1`
+  reworded variants via one cheap LLM call, retrieves each, and fuses every list
+  through the same RRF reranker — recovering memories whose stored wording
+  differs from the question. `{ hyde: true }` additionally embeds a hypothetical
+  answer (arXiv:2212.10496) and fuses its neighbours. Both are **opt-in**, wired
+  by `createMemory({ queryTransform: { provider } })`; with no transformer (the
+  default) search stays **offline + single-shot** and these options are silent
+  no-ops. Reserve it for retrieval-heavy recall — it adds provider latency.
+- **Weighted fusion + reranker guidance** (search quality, opt-in). RRF is a
+  good zero-tuning default, but once you have labels (the `@graphorin/evals`
+  harness) a calibrated weight can do better. `search(scope, query, { fusion: {
+  strategy: 'weighted', weights: { vector: 3, fts: 1 } } })` fuses through
+  `WeightedRRFReranker`, scaling each candidate list's reciprocal-rank
+  contribution by its retriever *kind* (FTS vs vector; the HyDE list counts as
+  vector). **RRF stays the default** — omit `fusion` (or pass `{ strategy:
+  'rrf' }`) and behaviour is unchanged; equal weights reproduce RRF exactly. The
+  pure `fuseWeighted(lists, weights, k)` is exported for offline weight tuning
+  against the eval harness. For a further precision lift, install a cross-encoder
+  reranker (`@graphorin/reranker-transformersjs` / `-llm`) via
+  `createMemory({ reranker })` or `setReranker(...)` and raise `candidateTopK` —
+  reranking pays off **only on an already-high-recall candidate set**, so fix
+  recall first (contextual retrieval / multi-query) before reaching for it.
+- **Relation graph + one-hop expansion** (new capability, opt-in). Activates the
+  dormant `(subject, predicate, object)` substrate: facts now carry s/p/o, and an
+  **entity resolver** folds the subject/object strings into canonical entities
+  ("Anna", "Anna S.", "my sister" → one entity) via lexical + embedding dedup —
+  with **auditable, reversible merges** (an append-only ledger; `merged_into` is
+  single-level). At read time `search(scope, query, { expandHops: 1 })` seeds on
+  the candidates and fuses in facts sharing an entity through a recursive CTE,
+  answering "what did the person I met in Tbilisi recommend?" without leaving
+  SQLite. Enable linking with `createMemory({ graph: { entityResolution: true } })`
+  (offline; lexical + embedding). The ambiguous-similarity band mints a *new*
+  entity by default — it never auto-merges on weak evidence; opt into LLM
+  adjudication (`graph: { llmAdjudication: true, provider }`) to resolve that band.
+  Omit it all and the default path is unchanged + fully offline (`expandHops`
+  defaults to `0`).
+- **Agentic / iterative retrieval** (search quality, gated + opt-in). A
+  CRAG/Self-RAG-style grade-then-reformulate loop for hard multi-hop / temporal
+  questions one pass can't answer. A cheap **local difficulty gate**
+  (`assessQueryDifficulty`) keeps simple lookups single-shot; only a query judged
+  hard *and* with a grader configured (`createMemory({ iterativeRetrieval: {
+  provider } })`) is graded for sufficiency and, when weak, reformulated +
+  retrieved again — **widening to one-hop graph expansion** on each reformulation —
+  up to a hard-capped `maxIterations` (≤ 5), then **abstaining**
+  (`result.abstained === true`) rather than confabulating. Exposed as
+  `SemanticMemory.searchIterative(...)` and the gated **`deep_recall`** tool (a
+  twelfth tool, registered only when `iterativeRetrieval` is configured). Omit it
+  and `searchIterative` degrades to one difficulty-gated pass with **no provider
+  call**; the tool surface stays at the canonical eleven.
+- **Procedural memory extraction** (new capability, gated + opt-in). AWM-style
+  workflow induction: from a **successful** agent trajectory,
+  `ProceduralMemory.induce(scope, trajectory)` distils a reusable procedure —
+  goal + value-abstracted steps (`"search for {product}"`) + the variable names
+  + Voyager-style success criteria for self-verification on reuse
+  (`checkSuccessCriteria`). Induction fires on **success only** (a failed run
+  never calls the inducer), and the result lands **quarantined** +
+  `provenance: 'induction'` (P1-4) — procedures drive *actions*, so this is the
+  highest-poisoning-risk write and is excluded from `activate()` until validated.
+  `trajectoryFromRunState(runState)` distils the agent's already-emitted run
+  state, so capture needs **no agent change**. Wire it with
+  `createMemory({ procedureInduction: { provider } })`; omit it and `induce(...)`
+  throws `ProcedureInductionNotConfiguredError` — the procedural tier stays pure
+  offline CRUD with no provider call.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to
@@ -72,12 +209,13 @@ any `EmbedderProvider`; the default is
   recorded `'merged'` / `'per-agent'` (the rendering mode is consumed
   by the consolidator in Phase 10c).
 - **Default-on bi-temporal storage.** Fact writes set `validFrom = now`
-  and leave `validTo = null`; supersede chains are kept intact for
+  and leave `validTo = null`; a supersede closes the old fact's `validTo`
+  (so `as_of` queries reflect the change) and keeps the chain intact for
   later replay. The advanced `as_of_date` query API is opt-in
   (post-MVP).
 - **`memory.compile(scope)` + `memory.metadata(scope)`.** The
   interface used by the context engine (Phase 10d) to assemble the
-  six-layer memory-aware system prompt; `@graphorin/memory@0.3.0`
+  six-layer memory-aware system prompt; `@graphorin/memory@0.4.0`
   ships the deterministic minimum-viable rendering so the agent
   runtime in Phase 12 can already exercise the surface.
 - **Memory-modification guard wiring.** Every tool's
@@ -163,6 +301,8 @@ tool exactly once:
 | `fact_forget`        | semantic   | Soft-delete a fact (kept for replay).                  |
 | `recall_episodes`    | episodic   | Triple-signal episode retrieval.                       |
 | `conversation_search`| session    | FTS5 search over the active session messages.          |
+| `fact_history`       | semantic   | Trace a fact's bi-temporal supersede chain.            |
+| `fact_validate`      | semantic   | Promote a quarantined fact to active (audited).        |
 
 ## Embedder migration
 
@@ -258,4 +398,4 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

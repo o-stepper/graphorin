@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EpisodicMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:43
+Defined in: packages/memory/src/internal/storage-adapter.ts:54
 
 Extension of the typed `EpisodicMemoryStore` with optional
 embedding-aware helpers + lifecycle helpers that storage adapters
@@ -26,7 +26,7 @@ may expose.
 optional archive(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:52
+Defined in: packages/memory/src/internal/storage-adapter.ts:67
 
 Mark an episode archived. Soft-archive — the row stays for replay.
 
@@ -97,7 +97,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:63
 optional putWithEmbedding(episode, options): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:44
+Defined in: packages/memory/src/internal/storage-adapter.ts:55
 
 #### Parameters
 
@@ -144,19 +144,23 @@ optional searchVector(
    scope, 
    embedding, 
    embedderId, 
-topK): Promise<readonly MemoryHit<Episode>[]>;
+   topK, 
+   asOf?, 
+includeQuarantined?): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:45
+Defined in: packages/memory/src/internal/storage-adapter.ts:56
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
-| `embedding` | `Float32Array` |
-| `embedderId` | `string` |
-| `topK` | `number` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - |
+| `embedding` | `Float32Array` | - |
+| `embedderId` | `string` | - |
+| `topK` | `number` | - |
+| `asOf?` | `string` | Point-in-time filter (`started_at <= asOf`, ISO-8601). P0-2. |
+| `includeQuarantined?` | `boolean` | Include quarantined episodes (validation/inspector path). P1-4. |
 
 #### Returns
 

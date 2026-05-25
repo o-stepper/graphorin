@@ -196,3 +196,68 @@ export interface ConflictPipelineDeps {
   /** Optional cancellation signal forwarded to embedder + searchVector. */
   readonly signal?: AbortSignal;
 }
+
+/**
+ * The four actions the neighbour-aware reconcile loop (P0-3) may choose
+ * for a candidate fact once the LLM has the most-similar existing
+ * memories in view. The de-facto-standard memory write loop
+ * (Mem0 / LangMem / Letta), with Graphorin's twist: `update` and
+ * `conflict` route through a **bi-temporal supersede** (close the old
+ * interval, insert the new) rather than a destructive delete.
+ *
+ * @stable
+ */
+export type ReconcileAction = 'add' | 'update' | 'noop' | 'conflict';
+
+/**
+ * Outcome of {@link reconcileCandidate}. `add` is independent / unsure
+ * (a fresh fact); `noop` is a duplicate that adds nothing; `update` is
+ * a newer version of `targetId`; `conflict` contradicts `targetId` and
+ * closes it. The three neighbour-referencing variants carry the
+ * `targetId` of the existing fact they resolve against.
+ *
+ * @stable
+ */
+export type ReconcileDecision =
+  | { readonly action: 'add'; readonly reason?: string }
+  | { readonly action: 'update'; readonly targetId: string; readonly reason: string }
+  | { readonly action: 'noop'; readonly targetId: string; readonly reason?: string }
+  | { readonly action: 'conflict'; readonly targetId: string; readonly reason: string };
+
+/**
+ * Map a {@link ReconcileDecision} onto the existing {@link ConflictDecision}
+ * so reconcile outcomes land in `fact_conflicts` through the same audit
+ * path as the inline pipeline (no new stage / schema): `add` → `admit`,
+ * `noop` → `dedup`, `update` / `conflict` → `supersede`. All reconcile
+ * decisions are stamped with the `defer-to-deep` stage — the reconcile
+ * loop is the consolidator's replacement for the deferred deep-judge
+ * step it supersedes.
+ *
+ * @stable
+ */
+export function reconcileToConflictDecision(decision: ReconcileDecision): ConflictDecision {
+  const stage: ConflictStage = 'defer-to-deep';
+  switch (decision.action) {
+    case 'add':
+      return {
+        kind: 'admit',
+        stage,
+        ...(decision.reason !== undefined ? { reason: decision.reason } : {}),
+      };
+    case 'noop':
+      return {
+        kind: 'dedup',
+        stage,
+        existingId: decision.targetId,
+        ...(decision.reason !== undefined ? { reason: decision.reason } : {}),
+      };
+    case 'update':
+    case 'conflict':
+      return {
+        kind: 'supersede',
+        stage,
+        existingId: decision.targetId,
+        reason: decision.reason,
+      };
+  }
+}

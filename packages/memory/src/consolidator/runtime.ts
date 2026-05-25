@@ -20,8 +20,10 @@ import type {
   ConsolidatorMemoryStoreExt,
   MemoryStoreAdapter,
 } from '../internal/storage-adapter.js';
+import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 import { BudgetTracker } from './budget.js';
+import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
 import { CustomTierMisconfiguredError, ProviderNotConfiguredError } from './errors.js';
 import { tipMessageId } from './idempotency.js';
@@ -29,6 +31,7 @@ import { LockManager } from './lock.js';
 import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
 import { runLightPhase } from './phases/light.js';
+import { runReflectionPass } from './phases/reflect.js';
 import { runStandardPhase } from './phases/standard.js';
 import {
   CONSOLIDATOR_TIER_DEFAULTS,
@@ -88,6 +91,7 @@ export function createConsolidator(opts: CreateConsolidatorOptions): Consolidato
 
 class ConsolidatorImpl implements Consolidator {
   readonly #semantic: SemanticMemory;
+  readonly #episodic: EpisodicMemory | null;
   readonly #store: MemoryStoreAdapter;
   readonly #consolidatorStore: ConsolidatorMemoryStoreExt | null;
   readonly #tracer: Tracer;
@@ -113,6 +117,7 @@ class ConsolidatorImpl implements Consolidator {
 
   constructor(opts: CreateConsolidatorOptions) {
     this.#semantic = opts.semantic;
+    this.#episodic = opts.episodic ?? null;
     this.#store = opts.store;
     this.#consolidatorStore = this.#store.consolidator ?? null;
     this.#tracer = opts.tracer ?? NOOP_TRACER;
@@ -191,6 +196,12 @@ class ConsolidatorImpl implements Consolidator {
       phases: preset.phases,
       ceilings: preset.ceilings,
       onExceed: preset.onExceed,
+      formEpisodes: preset.formEpisodes,
+      importanceScoring: preset.importanceScoring,
+      reflection: preset.reflection,
+      importanceThreshold: preset.importanceThreshold,
+      reflectionMaxQuestions: preset.reflectionMaxQuestions,
+      contextualRetrieval: preset.contextualRetrieval,
     });
     this.#budget.reconfigure({
       maxTokensPerDay: preset.ceilings.maxTokensPerDay,
@@ -404,6 +415,8 @@ class ConsolidatorImpl implements Consolidator {
           factsCreated: 0,
           factsUpdated: 0,
           conflictsResolved: 0,
+          episodesFormed: 0,
+          insightsCreated: 0,
           noiseFilteredCount: 0,
           emptyExtractions: 0,
           llmTokensUsed: 0,
@@ -435,6 +448,8 @@ class ConsolidatorImpl implements Consolidator {
         factsCreated: 0,
         factsUpdated: 0,
         conflictsResolved: 0,
+        episodesFormed: 0,
+        insightsCreated: 0,
         noiseFilteredCount: 0,
         emptyExtractions: 0,
         llmTokensUsed: 0,
@@ -501,6 +516,8 @@ class ConsolidatorImpl implements Consolidator {
         now: this.#now,
         decayTauDays: this.#config.decayTauDays,
         decayArchiveThreshold: this.#config.decayArchiveThreshold,
+        decayCapacity: this.#config.decayCapacity,
+        salienceWeights: this.#config.salienceWeights,
         noiseFilters: this.#config.noiseFilters as ReadonlyArray<NoiseFilterPreset>,
         maxBatchSize: this.#config.maxStandardBatchSize,
         lastProcessedMessageId,
@@ -523,6 +540,10 @@ class ConsolidatorImpl implements Consolidator {
           : [];
       const out = await runStandardPhase({
         semantic: this.#semantic,
+        episodic: this.#episodic,
+        formEpisodes: this.#config.formEpisodes,
+        importanceScoring: this.#config.importanceScoring,
+        contextualRetrieval: this.#config.contextualRetrieval,
         store: this.#store,
         consolidatorStore: this.#consolidatorStore,
         provider: this.#provider,
@@ -548,7 +569,7 @@ class ConsolidatorImpl implements Consolidator {
     if (this.#provider === null) {
       throw new ProviderNotConfiguredError('deep');
     }
-    return runDeepPhase({
+    const deepOut = await runDeepPhase({
       store: this.#store,
       consolidatorStore: this.#consolidatorStore,
       provider: this.#provider,
@@ -563,6 +584,36 @@ class ConsolidatorImpl implements Consolidator {
           : this.#config.tier,
       now: this.#now,
     });
+    // Reflection pass (P1-1) runs after the conflict drain, reusing the
+    // deep run's lock + budget + audit window. Triple-gated: enabled by
+    // config, an episodic tier present (importance source), and an
+    // insight-capable storage adapter. The accumulated-importance
+    // threshold is enforced inside the pass.
+    const insightStore = this.#store.insights;
+    if (this.#config.reflection && this.#episodic !== null && insightStore !== undefined) {
+      const reflection = await runReflectionPass({
+        provider: this.#provider,
+        tracer: this.#tracer,
+        scope,
+        semantic: this.#semantic,
+        episodic: this.#episodic,
+        insights: insightStore,
+        budget: this.#budget,
+        importanceThreshold: this.#config.importanceThreshold,
+        maxQuestions: this.#config.reflectionMaxQuestions,
+        now: this.#now,
+      });
+      return {
+        ...deepOut,
+        insightsCreated: reflection.insightsCreated,
+        llmTokensUsed: deepOut.llmTokensUsed + reflection.tokens,
+        llmCostUsd:
+          deepOut.llmCostUsd === null && reflection.costUsd === 0
+            ? null
+            : (deepOut.llmCostUsd ?? 0) + reflection.costUsd,
+      };
+    }
+    return deepOut;
   }
 
   #emit(
@@ -591,6 +642,8 @@ function skipOutcome(
     factsCreated: 0,
     factsUpdated: 0,
     conflictsResolved: 0,
+    episodesFormed: 0,
+    insightsCreated: 0,
     noiseFilteredCount: 0,
     emptyExtractions: 0,
     llmTokensUsed: 0,
@@ -634,11 +687,19 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     lockWaitMs: opts.lockWaitMs ?? 30_000,
     decayTauDays: opts.decayTauDays ?? 7,
     decayArchiveThreshold: opts.decayArchiveThreshold ?? 0.05,
+    decayCapacity: opts.decayCapacity ?? null,
+    salienceWeights: opts.salienceWeights ?? DEFAULT_SALIENCE_WEIGHTS,
     maxStandardBatchSize: opts.maxStandardBatchSize ?? 50,
     maxDeepConflictsPerRun: opts.maxDeepConflictsPerRun ?? 20,
     dlqMaxRetries: opts.dlqMaxRetries ?? 5,
     dlqBaseBackoffMs: opts.dlqBaseBackoffMs ?? 60_000,
     dlqMaxBackoffMs: opts.dlqMaxBackoffMs ?? 60 * 60 * 1000,
+    formEpisodes: opts.formEpisodes ?? preset.formEpisodes,
+    importanceScoring: opts.importanceScoring ?? preset.importanceScoring,
+    reflection: opts.reflection ?? preset.reflection,
+    importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
+    reflectionMaxQuestions: opts.reflectionMaxQuestions ?? preset.reflectionMaxQuestions,
+    contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
   });
 }
 

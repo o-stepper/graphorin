@@ -1,0 +1,55 @@
+[
+  {
+    "question_id": "fixture_ie_1",
+    "question_type": "single-session-user",
+    "question": "What is the name of the user's cat?",
+    "answer": "Mochi",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s1", "s2"],
+    "haystack_dates": ["2023/05/15 (Mon) 10:00", "2023/05/20 (Sat) 14:00"],
+    "haystack_sessions": [
+      [
+        { "role": "user", "content": "I just adopted a cat named Mochi.", "has_answer": true },
+        { "role": "assistant", "content": "Congratulations on adopting Mochi!" }
+      ],
+      [
+        { "role": "user", "content": "Mochi keeps me company while I work from home." },
+        { "role": "assistant", "content": "That sounds lovely." }
+      ]
+    ]
+  },
+  {
+    "question_id": "fixture_temp_1",
+    "question_type": "temporal-reasoning",
+    "question": "Which city did the user move to in March 2023?",
+    "answer": "Berlin",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s3"],
+    "haystack_dates": ["2023/03/10 (Fri) 08:00"],
+    "haystack_sessions": [
+      [
+        {
+          "role": "user",
+          "content": "I moved to Berlin this month for a new job.",
+          "has_answer": true
+        },
+        { "role": "assistant", "content": "Exciting — welcome to Berlin!" }
+      ]
+    ]
+  },
+  {
+    "question_id": "fixture_abs_1_abs",
+    "question_type": "single-session-user",
+    "question": "What is the user's blood type?",
+    "answer": "No information is available.",
+    "question_date": "2023/06/01 (Thu) 09:00",
+    "haystack_session_ids": ["s4"],
+    "haystack_dates": ["2023/05/01 (Mon) 12:00"],
+    "haystack_sessions": [
+      [
+        { "role": "user", "content": "I had a great lunch today." },
+        { "role": "assistant", "content": "Glad to hear it!" }
+      ]
+    ]
+  }
+]

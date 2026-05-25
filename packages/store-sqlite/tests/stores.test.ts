@@ -98,9 +98,38 @@ describe('createSqliteStore', () => {
     const all = await store.memory.procedural.list({ userId: 'alex' });
     expect(all.length).toBe(1);
     expect(all[0]?.priority).toBe(80);
+    // Author-defined rules carry no induced-procedure payload (migration 017).
+    expect(all[0]?.steps).toBeUndefined();
+    expect(all[0]?.provenance).toBeUndefined();
+    expect(all[0]?.status).toBeUndefined();
     await store.memory.procedural.remove('r1');
     const after = await store.memory.procedural.list({ userId: 'alex' });
     expect(after.length).toBe(0);
+  });
+
+  it('procedural memory: induced-procedure fields round-trip (P2-2, migration 017)', async () => {
+    const induced = {
+      id: 'r-induced',
+      kind: 'procedural' as const,
+      userId: 'alex',
+      text: 'Reorder pet food\n1. search for {product}\n2. add {quantity}\n3. check out',
+      priority: 40,
+      sensitivity: 'internal' as const,
+      steps: Object.freeze(['search for {product}', 'add {quantity}', 'check out']),
+      variables: Object.freeze(['product', 'quantity']),
+      successCriteria: Object.freeze(['order confirmation shown']),
+      provenance: 'induction' as const,
+      status: 'quarantined' as const,
+      createdAt: new Date().toISOString(),
+    };
+    await store.memory.procedural.add(induced);
+    const all = await store.memory.procedural.list({ userId: 'alex' });
+    const got = all.find((r) => r.id === 'r-induced');
+    expect(got?.steps).toEqual(['search for {product}', 'add {quantity}', 'check out']);
+    expect(got?.variables).toEqual(['product', 'quantity']);
+    expect(got?.successCriteria).toEqual(['order confirmation shown']);
+    expect(got?.provenance).toBe('induction');
+    expect(got?.status).toBe('quarantined');
   });
 
   it('session memory: push + list + search', async () => {
