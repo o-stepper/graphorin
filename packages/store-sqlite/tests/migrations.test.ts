@@ -85,6 +85,17 @@ describe('migrations', () => {
     );
     expect(epCols.has('provenance')).toBe(true);
     expect(epCols.has('status')).toBe(true);
+    // Migration 014 added the reflection `insights` table (+ FTS) (P1-1).
+    expect(names.has('insights')).toBe(true);
+    const insCols = new Set(
+      conn
+        .all<{ name: string }>("SELECT name FROM pragma_table_info('insights')")
+        .map((c) => c.name),
+    );
+    expect(insCols.has('cites_json')).toBe(true);
+    expect(insCols.has('salience')).toBe(true);
+    expect(insCols.has('provenance')).toBe(true);
+    expect(insCols.has('status')).toBe(true);
     conn.close();
   });
 

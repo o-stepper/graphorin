@@ -57,6 +57,7 @@ export type {
   Block,
   Episode,
   Fact,
+  Insight,
   MemoryHit,
   MemoryKind,
   MemoryMetadata,

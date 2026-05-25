@@ -2,6 +2,7 @@ import type {
   Block,
   Episode,
   Fact,
+  Insight,
   MemoryHit,
   MemoryProvenance,
   MemoryRecord,
@@ -49,6 +50,7 @@ const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
  */
 const FACT_NOT_QUARANTINED = "AND f.status != 'quarantined'";
 const EPISODE_NOT_QUARANTINED = "AND e.status != 'quarantined'";
+const INSIGHT_NOT_QUARANTINED = "AND i.status != 'quarantined'";
 
 /**
  * Optional embedding payload attached to a memory write. The
@@ -92,6 +94,8 @@ export class SqliteMemoryStore implements MemoryStore {
   readonly shared: SharedMemoryStore;
   readonly conflicts: SqliteConflictStore;
   readonly consolidator: SqliteConsolidatorStateStore;
+  /** Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. */
+  readonly insights: SqliteInsightStore;
 
   constructor(conn: SqliteConnection, embeddings: EmbeddingMetaRepository) {
     this.#embeddings = embeddings;
@@ -104,6 +108,7 @@ export class SqliteMemoryStore implements MemoryStore {
     this.shared = new SharedMemoryStoreImpl(conn);
     this.conflicts = new SqliteConflictStore(conn);
     this.consolidator = new SqliteConsolidatorStateStore(conn);
+    this.insights = new SqliteInsightStore(conn);
   }
 
   async init(): Promise<void> {
@@ -1065,6 +1070,140 @@ class SharedMemoryStoreImpl implements SharedMemoryStore {
   }
 }
 
+/**
+ * `SqliteInsightStore` — owns the `insights` + `insights_fts` tables
+ * shipped in migration 014 (P1-1). Implements the structural
+ * `InsightMemoryStoreExt` surface defined in
+ * `@graphorin/memory/internal/storage-adapter.ts`.
+ *
+ * Search is FTS5-only — insights are a soft, rank-capped inspector
+ * surface, not primary recall, so no per-embedder vec0 table is
+ * created. Pruning (the ExpeL forgetting step) is a soft-delete
+ * (`deleted_at`), never a hard purge, so pruned insights remain
+ * auditable.
+ *
+ * @stable
+ */
+export class SqliteInsightStore {
+  #conn: SqliteConnection;
+  constructor(conn: SqliteConnection) {
+    this.#conn = conn;
+  }
+
+  async insert(insight: Insight): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run(
+        `INSERT INTO insights (
+           id, scope_user_id, scope_session_id, scope_agent_id, text, cites_json, salience,
+           provenance, status, embedder_id, sensitivity, tags_json, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ON CONFLICT(id) DO UPDATE SET
+           text = excluded.text,
+           cites_json = excluded.cites_json,
+           salience = excluded.salience,
+           provenance = excluded.provenance,
+           status = excluded.status,
+           updated_at = excluded.updated_at,
+           tags_json = excluded.tags_json`,
+        [
+          insight.id,
+          insight.userId,
+          insight.sessionId ?? null,
+          insight.agentId ?? null,
+          insight.text,
+          JSON.stringify(insight.cites ?? []),
+          insight.salience,
+          insight.provenance ?? 'reflection',
+          insight.status ?? 'quarantined',
+          null,
+          insight.sensitivity,
+          insight.tags ? JSON.stringify(insight.tags) : null,
+          toEpoch(insight.createdAt),
+          insight.updatedAt ? toEpoch(insight.updatedAt) : null,
+        ],
+      );
+      this.#conn.run(
+        `INSERT OR REPLACE INTO insights_fts (rowid, text) VALUES ((SELECT rowid FROM insights WHERE id = ?), ?)`,
+        [insight.id, insight.text],
+      );
+    });
+  }
+
+  async list(
+    scope: SessionScope,
+    opts: { readonly limit?: number; readonly includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<Insight>> {
+    const limit = opts.limit ?? 50;
+    const rows = this.#conn.all<InsightRow>(
+      `SELECT * FROM insights
+       WHERE scope_user_id = ? AND deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : "AND status != 'quarantined'"}
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map(rowToInsight);
+  }
+
+  async search(
+    scope: SessionScope,
+    query: string,
+    opts: { readonly topK?: number; readonly includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<MemoryHit<Insight>>> {
+    const topK = opts.topK ?? 10;
+    const rows = this.#conn.all<InsightRow & { bm25_score: number }>(
+      `SELECT i.*, bm25(insights_fts) AS bm25_score
+       FROM insights_fts
+       JOIN insights i ON i.rowid = insights_fts.rowid
+       WHERE insights_fts MATCH ? AND i.scope_user_id = ? AND i.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : INSIGHT_NOT_QUARANTINED}
+       ORDER BY bm25_score
+       LIMIT ?`,
+      [escapeFtsQuery(query), scope.userId, topK],
+    );
+    return rows.map((row) => ({
+      record: rowToInsight(row),
+      score: -row.bm25_score,
+      signals: { bm25: row.bm25_score },
+    }));
+  }
+
+  async get(id: string): Promise<Insight | null> {
+    const row = this.#conn.get<InsightRow>(
+      'SELECT * FROM insights WHERE id = ? AND deleted_at IS NULL',
+      [id],
+    );
+    return row ? rowToInsight(row) : null;
+  }
+
+  /**
+   * Adjust an insight's ExpeL salience by `delta`, clamped at 0 (the
+   * floor at which `prune` removes it). Never touches content / cites —
+   * salience is the only mutable field.
+   */
+  async bumpSalience(id: string, delta: number, reason?: string): Promise<void> {
+    void reason;
+    this.#conn.run(
+      'UPDATE insights SET salience = MAX(0, salience + ?), updated_at = ? WHERE id = ? AND deleted_at IS NULL',
+      [delta, Date.now(), id],
+    );
+  }
+
+  /**
+   * Soft-delete every salience-0 insight for the scope (the ExpeL
+   * forgetting step). Returns the number pruned. Tombstone only — the
+   * row stays for audit.
+   */
+  async prune(scope: SessionScope): Promise<number> {
+    const now = Date.now();
+    const res = this.#conn.run(
+      'UPDATE insights SET deleted_at = ?, updated_at = ? WHERE scope_user_id = ? AND salience <= 0 AND deleted_at IS NULL',
+      [now, now, scope.userId],
+    );
+    return res.changes;
+  }
+}
+
 interface WorkingBlockRow {
   id: string;
   scope_user_id: string;
@@ -1162,6 +1301,24 @@ interface FactRow {
   archived: number;
 }
 
+interface InsightRow {
+  id: string;
+  scope_user_id: string;
+  scope_session_id: string | null;
+  scope_agent_id: string | null;
+  text: string;
+  cites_json: string;
+  salience: number;
+  provenance: string | null;
+  status: string;
+  embedder_id: string | null;
+  sensitivity: 'public' | 'internal' | 'secret';
+  tags_json: string | null;
+  created_at: number;
+  updated_at: number | null;
+  deleted_at: number | null;
+}
+
 interface RuleRow {
   id: string;
   scope_user_id: string;
@@ -1242,6 +1399,38 @@ function rowToEpisode(row: EpisodeRow): Episode {
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
   } as Episode;
+}
+
+function parseCites(json: string): ReadonlyArray<string> {
+  try {
+    const parsed: unknown = JSON.parse(json);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((x): x is string => typeof x === 'string');
+    }
+  } catch {
+    // Malformed JSON ⇒ treat as no citations (defensive).
+  }
+  return [];
+}
+
+function rowToInsight(row: InsightRow): Insight {
+  return {
+    id: row.id,
+    kind: 'insight',
+    userId: row.scope_user_id,
+    sessionId: row.scope_session_id ?? undefined,
+    agentId: row.scope_agent_id ?? undefined,
+    text: row.text,
+    cites: parseCites(row.cites_json),
+    salience: row.salience,
+    provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
+    status: row.status as MemoryStatus,
+    sensitivity: row.sensitivity,
+    tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
+    deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
+  } as Insight;
 }
 
 function rowToFact(row: FactRow): Fact {

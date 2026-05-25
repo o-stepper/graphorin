@@ -49,6 +49,7 @@ import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/s
 import { RRFReranker } from './search/rrf.js';
 import type { ReRanker } from './search/types.js';
 import { EpisodicMemory } from './tiers/episodic-memory.js';
+import { InsightMemory } from './tiers/insight-memory.js';
 import { ProceduralMemory } from './tiers/procedural-memory.js';
 import { SemanticMemory } from './tiers/semantic-memory.js';
 import { SessionMemory } from './tiers/session-memory.js';
@@ -114,6 +115,12 @@ export interface CreateMemoryOptions {
     readonly formEpisodes?: boolean;
     /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
     readonly importanceScoring?: boolean;
+    /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
+    readonly reflection?: boolean;
+    /** Accumulated-importance threshold at which reflection fires (P1-1). */
+    readonly importanceThreshold?: number;
+    /** Upper bound on salient questions reflection asks per pass (P1-1). */
+    readonly reflectionMaxQuestions?: number;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock — used by tests. */
@@ -153,6 +160,12 @@ export interface Memory {
   readonly semantic: SemanticMemory;
   readonly procedural: ProceduralMemory;
   readonly shared: SharedMemory;
+  /**
+   * Read surface over reflection insights (P1-1). A no-op (returns
+   * empty) when the storage adapter does not expose the optional
+   * insight surface.
+   */
+  readonly insights: InsightMemory;
   readonly tools: ReadonlyArray<Tool>;
   readonly consolidator: Consolidator;
   /** The configured conflict pipeline. Surfaced for tests + CLI tooling. */
@@ -221,6 +234,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   });
   const procedural = new ProceduralMemory({ store: options.store, tracer });
   const shared = new SharedMemory({ store: options.store, tracer });
+  const insights = new InsightMemory({ store: options.store, tracer });
 
   const tools = buildMemoryTools({
     working,
@@ -326,6 +340,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     semantic,
     procedural,
     shared,
+    insights,
     tools,
     consolidator,
     conflictPipeline,
@@ -414,6 +429,13 @@ function buildConsolidator(
     ...(opts.dlqMaxBackoffMs !== undefined ? { dlqMaxBackoffMs: opts.dlqMaxBackoffMs } : {}),
     ...(opts.formEpisodes !== undefined ? { formEpisodes: opts.formEpisodes } : {}),
     ...(opts.importanceScoring !== undefined ? { importanceScoring: opts.importanceScoring } : {}),
+    ...(opts.reflection !== undefined ? { reflection: opts.reflection } : {}),
+    ...(opts.importanceThreshold !== undefined
+      ? { importanceThreshold: opts.importanceThreshold }
+      : {}),
+    ...(opts.reflectionMaxQuestions !== undefined
+      ? { reflectionMaxQuestions: opts.reflectionMaxQuestions }
+      : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });
   if (opts.onPhaseFinished !== undefined) {

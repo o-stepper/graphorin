@@ -91,6 +91,17 @@ any `EmbedderProvider`; the default is
   signal (never a retention gate). Controlled by the per-tier `formEpisodes` /
   `importanceScoring` flags (on at `standard` / `full`); budget-aware
   (an exhausted budget degrades to fact-only).
+- **Reflection + insight synthesis** (consolidator deep phase). When the
+  accumulated importance of recent episodes crosses `importanceThreshold`, the
+  deep phase asks the model for the few most salient questions, retrieves
+  evidence for each, and synthesizes a higher-order **insight** (Generative
+  Agents). Insights are a distinct memory type (`memory.insights`:
+  `search` / `list`) that land `provenance: 'reflection'` +
+  `status: 'quarantined'`, carry **mandatory citations set from the retrieved
+  evidence** (never hallucinated), and are **rank-capped below the facts they
+  cite** (`capInsightsBelowFacts`). An ExpeL salience counter (start `2`,
+  pruned at `0`) manages the set. Off by default except at the `full` tier;
+  budget-aware and a no-op without an episodic tier + insight-capable store.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

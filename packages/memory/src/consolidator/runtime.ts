@@ -30,6 +30,7 @@ import { LockManager } from './lock.js';
 import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
 import { runLightPhase } from './phases/light.js';
+import { runReflectionPass } from './phases/reflect.js';
 import { runStandardPhase } from './phases/standard.js';
 import {
   CONSOLIDATOR_TIER_DEFAULTS,
@@ -196,6 +197,9 @@ class ConsolidatorImpl implements Consolidator {
       onExceed: preset.onExceed,
       formEpisodes: preset.formEpisodes,
       importanceScoring: preset.importanceScoring,
+      reflection: preset.reflection,
+      importanceThreshold: preset.importanceThreshold,
+      reflectionMaxQuestions: preset.reflectionMaxQuestions,
     });
     this.#budget.reconfigure({
       maxTokensPerDay: preset.ceilings.maxTokensPerDay,
@@ -410,6 +414,7 @@ class ConsolidatorImpl implements Consolidator {
           factsUpdated: 0,
           conflictsResolved: 0,
           episodesFormed: 0,
+          insightsCreated: 0,
           noiseFilteredCount: 0,
           emptyExtractions: 0,
           llmTokensUsed: 0,
@@ -442,6 +447,7 @@ class ConsolidatorImpl implements Consolidator {
         factsUpdated: 0,
         conflictsResolved: 0,
         episodesFormed: 0,
+        insightsCreated: 0,
         noiseFilteredCount: 0,
         emptyExtractions: 0,
         llmTokensUsed: 0,
@@ -558,7 +564,7 @@ class ConsolidatorImpl implements Consolidator {
     if (this.#provider === null) {
       throw new ProviderNotConfiguredError('deep');
     }
-    return runDeepPhase({
+    const deepOut = await runDeepPhase({
       store: this.#store,
       consolidatorStore: this.#consolidatorStore,
       provider: this.#provider,
@@ -573,6 +579,36 @@ class ConsolidatorImpl implements Consolidator {
           : this.#config.tier,
       now: this.#now,
     });
+    // Reflection pass (P1-1) runs after the conflict drain, reusing the
+    // deep run's lock + budget + audit window. Triple-gated: enabled by
+    // config, an episodic tier present (importance source), and an
+    // insight-capable storage adapter. The accumulated-importance
+    // threshold is enforced inside the pass.
+    const insightStore = this.#store.insights;
+    if (this.#config.reflection && this.#episodic !== null && insightStore !== undefined) {
+      const reflection = await runReflectionPass({
+        provider: this.#provider,
+        tracer: this.#tracer,
+        scope,
+        semantic: this.#semantic,
+        episodic: this.#episodic,
+        insights: insightStore,
+        budget: this.#budget,
+        importanceThreshold: this.#config.importanceThreshold,
+        maxQuestions: this.#config.reflectionMaxQuestions,
+        now: this.#now,
+      });
+      return {
+        ...deepOut,
+        insightsCreated: reflection.insightsCreated,
+        llmTokensUsed: deepOut.llmTokensUsed + reflection.tokens,
+        llmCostUsd:
+          deepOut.llmCostUsd === null && reflection.costUsd === 0
+            ? null
+            : (deepOut.llmCostUsd ?? 0) + reflection.costUsd,
+      };
+    }
+    return deepOut;
   }
 
   #emit(
@@ -602,6 +638,7 @@ function skipOutcome(
     factsUpdated: 0,
     conflictsResolved: 0,
     episodesFormed: 0,
+    insightsCreated: 0,
     noiseFilteredCount: 0,
     emptyExtractions: 0,
     llmTokensUsed: 0,
@@ -652,6 +689,9 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     dlqMaxBackoffMs: opts.dlqMaxBackoffMs ?? 60 * 60 * 1000,
     formEpisodes: opts.formEpisodes ?? preset.formEpisodes,
     importanceScoring: opts.importanceScoring ?? preset.importanceScoring,
+    reflection: opts.reflection ?? preset.reflection,
+    importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
+    reflectionMaxQuestions: opts.reflectionMaxQuestions ?? preset.reflectionMaxQuestions,
   });
 }
 

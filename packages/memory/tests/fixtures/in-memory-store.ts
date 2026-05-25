@@ -3,6 +3,7 @@ import type {
   EmbedderProvider,
   Episode,
   Fact,
+  Insight,
   MemoryHit,
   Message,
   MessageRef,
@@ -22,6 +23,9 @@ import type {
   DlqBatchRow,
   EmbeddedWriteOptions,
   EmbeddingMetaRegistryLike,
+  InsightListOptions,
+  InsightMemoryStoreExt,
+  InsightSearchStoreOptions,
   MemoryStoreAdapter,
   PendingConflictInputLike,
   PendingConflictRowLike,
@@ -393,6 +397,84 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
   }
 }
 
+class InMemoryInsightStore implements InsightMemoryStoreExt {
+  readonly rows: Insight[] = [];
+
+  async insert(insight: Insight): Promise<void> {
+    const idx = this.rows.findIndex((r) => r.id === insight.id);
+    if (idx >= 0) this.rows[idx] = insight;
+    else this.rows.push(insight);
+  }
+
+  async list(scope: SessionScope, opts: InsightListOptions = {}): Promise<ReadonlyArray<Insight>> {
+    const limit = opts.limit ?? 50;
+    return this.rows
+      .filter(
+        (i) =>
+          i.userId === scope.userId &&
+          i.deletedAt === undefined &&
+          (opts.includeQuarantined === true || i.status !== 'quarantined'),
+      )
+      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      .slice(0, limit);
+  }
+
+  async search(
+    scope: SessionScope,
+    query: string,
+    opts: InsightSearchStoreOptions = {},
+  ): Promise<ReadonlyArray<MemoryHit<Insight>>> {
+    const topK = opts.topK ?? 10;
+    const q = query.toLowerCase();
+    const out: MemoryHit<Insight>[] = [];
+    for (const i of this.rows) {
+      if (i.userId !== scope.userId) continue;
+      if (i.deletedAt !== undefined) continue;
+      if (opts.includeQuarantined !== true && i.status === 'quarantined') continue;
+      if (q === '*' || i.text.toLowerCase().includes(q)) {
+        out.push({ record: i, score: 1, signals: { bm25: 1 } });
+      }
+      if (out.length >= topK) break;
+    }
+    return out;
+  }
+
+  async get(id: string): Promise<Insight | null> {
+    const i = this.rows.find((r) => r.id === id);
+    if (i === undefined || i.deletedAt !== undefined) return null;
+    return i;
+  }
+
+  async bumpSalience(id: string, delta: number): Promise<void> {
+    const idx = this.rows.findIndex((r) => r.id === id);
+    const i = idx >= 0 ? this.rows[idx] : undefined;
+    if (i !== undefined) {
+      this.rows[idx] = {
+        ...i,
+        salience: Math.max(0, i.salience + delta),
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  async prune(scope: SessionScope): Promise<number> {
+    let pruned = 0;
+    for (let idx = 0; idx < this.rows.length; idx++) {
+      const i = this.rows[idx];
+      if (
+        i !== undefined &&
+        i.userId === scope.userId &&
+        i.salience <= 0 &&
+        i.deletedAt === undefined
+      ) {
+        this.rows[idx] = { ...i, deletedAt: new Date().toISOString() };
+        pruned += 1;
+      }
+    }
+    return pruned;
+  }
+}
+
 /**
  * In-memory `MemoryStoreAdapter` used by the unit tests. Implements
  * just enough surface to exercise the facade + the six tier sub-
@@ -406,11 +488,13 @@ export function createInMemoryStore(
     embedderId?: string;
     withConflictStore?: boolean;
     withConsolidatorStore?: boolean;
+    withInsightStore?: boolean;
   } = {},
 ): MemoryStoreAdapter & {
   readonly __hooks: InMemoryStoreTestHooks;
   readonly __conflicts: InMemoryConflictHooks | null;
   readonly __consolidator: InMemoryConsolidatorHooks | null;
+  readonly __insights: ReadonlyArray<Insight> | null;
 } {
   const blocks = new Map<string, Block>();
   const messages: Message[] = [];
@@ -437,6 +521,7 @@ export function createInMemoryStore(
   const conflictStore = options.withConflictStore === true ? new InMemoryConflictStore() : null;
   const consolidatorStore =
     options.withConsolidatorStore === true ? new InMemoryConsolidatorStore() : null;
+  const insightStore = options.withInsightStore === true ? new InMemoryInsightStore() : null;
 
   function blockKey(scope: SessionScope, label: string): string {
     return [scope.userId, scope.sessionId ?? '', scope.agentId ?? '', label].join('|');
@@ -810,6 +895,7 @@ export function createInMemoryStore(
     },
     ...(conflictStore !== null ? { conflicts: conflictStore } : {}),
     ...(consolidatorStore !== null ? { consolidator: consolidatorStore } : {}),
+    ...(insightStore !== null ? { insights: insightStore } : {}),
   };
 
   const hooks: InMemoryStoreTestHooks = {
@@ -868,6 +954,9 @@ export function createInMemoryStore(
     __hooks: hooks,
     __conflicts: conflictHooks,
     __consolidator: consolidatorHooks,
+    get __insights(): ReadonlyArray<Insight> | null {
+      return insightStore === null ? null : [...insightStore.rows];
+    },
   });
 }
 

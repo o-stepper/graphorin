@@ -124,6 +124,25 @@ export interface ConsolidatorConfig {
    * retention. Defaults track {@link formEpisodes}.
    */
   readonly importanceScoring: boolean;
+  /**
+   * Run the deep-phase reflection pass (P1-1): when accumulated episode
+   * importance crosses {@link importanceThreshold}, synthesize
+   * higher-order, cited insights over recent memories (Generative
+   * Agents). Insights land quarantined + `provenance: 'reflection'` and
+   * are ranked below the facts they cite. Defaults **on at the `full`
+   * tier only** (off at `free` / `cheap` / `standard` / `custom`) — it
+   * is the most LLM-intensive phase. A no-op without an episodic tier
+   * or an insight-capable storage adapter.
+   */
+  readonly reflection: boolean;
+  /**
+   * Sum of recent episode importance (each in `[0, 1]`) at or above
+   * which {@link reflection} fires. Below it the pass makes no LLM
+   * call. Defaults to `3`.
+   */
+  readonly importanceThreshold: number;
+  /** Upper bound on salient questions reflection asks per pass. Defaults to `3`. */
+  readonly reflectionMaxQuestions: number;
 }
 
 /**
@@ -210,6 +229,8 @@ export interface PhaseOutcome {
   readonly conflictsResolved: number;
   /** Episodes auto-formed from the processed slice (P1-2). */
   readonly episodesFormed: number;
+  /** Insights synthesized by the deep-phase reflection pass (P1-1). */
+  readonly insightsCreated: number;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
   readonly llmTokensUsed: number;
@@ -289,6 +310,12 @@ export interface CreateConsolidatorOptions {
   readonly formEpisodes?: boolean;
   /** Override the per-tier {@link ConsolidatorConfig.importanceScoring} default (P1-2). */
   readonly importanceScoring?: boolean;
+  /** Override the per-tier {@link ConsolidatorConfig.reflection} default (P1-1). */
+  readonly reflection?: boolean;
+  /** Override the {@link ConsolidatorConfig.importanceThreshold} default (P1-1). */
+  readonly importanceThreshold?: number;
+  /** Override the {@link ConsolidatorConfig.reflectionMaxQuestions} default (P1-1). */
+  readonly reflectionMaxQuestions?: number;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }
@@ -311,6 +338,9 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly onExceed: OnBudgetExceed;
       readonly formEpisodes: boolean;
       readonly importanceScoring: boolean;
+      readonly reflection: boolean;
+      readonly importanceThreshold: number;
+      readonly reflectionMaxQuestions: number;
     }
   >
 > = Object.freeze({
@@ -328,6 +358,9 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     onExceed: 'pause',
     formEpisodes: false,
     importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
   },
   cheap: {
     ceilings: {
@@ -343,6 +376,9 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     onExceed: 'pause',
     formEpisodes: false,
     importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
   },
   standard: {
     ceilings: {
@@ -358,6 +394,9 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     onExceed: 'log',
     formEpisodes: true,
     importanceScoring: true,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
   },
   full: {
     ceilings: {
@@ -373,6 +412,9 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     onExceed: 'log',
     formEpisodes: true,
     importanceScoring: true,
+    reflection: true,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
   },
   custom: {
     ceilings: {
@@ -388,5 +430,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     onExceed: 'pause',
     formEpisodes: false,
     importanceScoring: false,
+    reflection: false,
+    importanceThreshold: 3,
+    reflectionMaxQuestions: 3,
   },
 });

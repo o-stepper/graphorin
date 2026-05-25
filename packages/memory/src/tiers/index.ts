@@ -13,6 +13,12 @@ export {
   EpisodicMemory,
 } from './episodic-memory.js';
 export {
+  capInsightsBelowFacts,
+  type InsightListOptions,
+  InsightMemory,
+  type InsightSearchOptions,
+} from './insight-memory.js';
+export {
   ProceduralMemory,
   type RuleActivationContext,
   type RuleInput,

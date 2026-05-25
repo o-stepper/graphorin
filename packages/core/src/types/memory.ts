@@ -1,13 +1,23 @@
 import type { Sensitivity } from './sensitivity.js';
 
 /**
- * The six tiers of the Graphorin memory model. Used as the discriminator
- * for `MemoryStore` sub-namespaces, span types, and the `MemoryRecord`
- * union.
+ * Kinds of memory record in the Graphorin model. The first six are the
+ * storage tiers the {@link MemoryStore} contract exposes as 1:1
+ * sub-namespaces; `insight` is the derived, reflection-synthesized
+ * record kind (P1-1) — it has no base-tier namespace and is persisted
+ * through the optional insight surface adapters expose. Used as the
+ * discriminator for span types and the `MemoryRecord` union.
  *
  * @stable
  */
-export type MemoryKind = 'working' | 'session' | 'episodic' | 'semantic' | 'procedural' | 'shared';
+export type MemoryKind =
+  | 'working'
+  | 'session'
+  | 'episodic'
+  | 'semantic'
+  | 'procedural'
+  | 'shared'
+  | 'insight';
 
 /**
  * Where a memory came from — the trust-provenance tag carried by every
@@ -155,6 +165,51 @@ export interface Rule extends MemoryRecord {
   readonly text: string;
   readonly condition?: string;
   readonly priority: number;
+}
+
+/**
+ * Insight — a higher-order observation the consolidator's reflection
+ * pass (P1-1) synthesizes over recent memories ("the user has cancelled
+ * three evening plans this month — they may be overcommitted"). No
+ * single turn states it; it is *inferred*, so it is always
+ * `provenance: 'reflection'` and lands `status: 'quarantined'` (P1-4),
+ * excluded from action-driving recall until validated.
+ *
+ * Every insight carries **mandatory citations** (`cites`) — the ids of
+ * the supporting memories it was synthesized from — so a reader can
+ * trace it back to evidence; this is the "trustworthy reflection"
+ * mitigation against confirmation-bias loops. Insights are managed with
+ * an ExpeL-style salience counter (new insights start at `2`, pruned at
+ * `≤ 0`) and are retrieval-ranked **below** the primary facts they cite.
+ *
+ * @stable
+ */
+export interface Insight extends MemoryRecord {
+  readonly kind: 'insight';
+  /** The synthesized higher-order observation. */
+  readonly text: string;
+  /**
+   * IDs of the supporting memories (facts / episodes) this insight was
+   * synthesized from. Always ≥ 1 — citations are mandatory; an insight
+   * with no traceable evidence is never persisted.
+   */
+  readonly cites: ReadonlyArray<string>;
+  /**
+   * ExpeL-style salience counter. New insights start at `2`; a
+   * maintenance pass up-/down-votes on subsequent corroboration /
+   * contradiction and prunes (soft-deletes) insights at `≤ 0`.
+   */
+  readonly salience: number;
+  /**
+   * Trust-provenance tag (P1-4). Reflection-synthesized insights are
+   * `'reflection'`. See {@link MemoryProvenance}.
+   */
+  readonly provenance?: MemoryProvenance;
+  /**
+   * Retrieval-trust state (P1-4). Insights land `'quarantined'`. See
+   * {@link MemoryStatus}.
+   */
+  readonly status?: MemoryStatus;
 }
 
 /**

@@ -3,6 +3,7 @@ import type {
   Episode,
   EpisodicMemoryStore,
   Fact,
+  Insight,
   MemoryHit,
   MemoryStatus,
   MemoryStore,
@@ -486,6 +487,61 @@ export interface DecayMemoryStoreExt {
   archiveFact(id: string, reason?: string): Promise<void>;
 }
 
+/** Options accepted by {@link InsightMemoryStoreExt.list}. */
+export interface InsightListOptions {
+  readonly limit?: number;
+  /** Include quarantined insights (validation / inspector path). */
+  readonly includeQuarantined?: boolean;
+}
+
+/** Options accepted by {@link InsightMemoryStoreExt.search}. */
+export interface InsightSearchStoreOptions {
+  readonly topK?: number;
+  /** Include quarantined insights (validation / inspector path). */
+  readonly includeQuarantined?: boolean;
+}
+
+/**
+ * Optional storage extension for the reflection `insights` table
+ * (P1-1). The consolidator's reflection pass inserts quarantined,
+ * cited insights here; the thin `InsightMemory` read surface lists /
+ * searches them; the ExpeL salience loop bumps + prunes them. Search is
+ * FTS-only by design — insights are a soft, rank-capped inspector
+ * surface, not primary recall.
+ *
+ * Adapters that opt out leave the property undefined; reflection then
+ * degrades to a no-op (it never writes) and `InsightMemory`
+ * search/list return empty. The default `@graphorin/store-sqlite`
+ * adapter implements it.
+ *
+ * @stable
+ */
+export interface InsightMemoryStoreExt {
+  /** Persist a synthesized insight (idempotent on `id`). */
+  insert(insight: Insight): Promise<void>;
+  /** Most-recent insights for the scope (newest first). */
+  list(scope: SessionScope, opts?: InsightListOptions): Promise<ReadonlyArray<Insight>>;
+  /** FTS keyword search over insight text. */
+  search(
+    scope: SessionScope,
+    query: string,
+    opts?: InsightSearchStoreOptions,
+  ): Promise<ReadonlyArray<MemoryHit<Insight>>>;
+  /** Lookup a single insight by id (`null` when absent / pruned). */
+  get?(id: string): Promise<Insight | null>;
+  /**
+   * Adjust an insight's ExpeL salience by `delta`, clamped at 0. The
+   * floor is the value at which {@link prune} removes it.
+   */
+  bumpSalience(id: string, delta: number, reason?: string): Promise<void>;
+  /**
+   * Soft-delete every salience-0 insight for the scope (the ExpeL
+   * forgetting step). Returns the number pruned. Tombstone only —
+   * pruned insights stay auditable.
+   */
+  prune(scope: SessionScope): Promise<number>;
+}
+
 /**
  * Composite shape every `@graphorin/memory` consumer must supply at
  * construction time. Mirrors the typed `MemoryStore` from
@@ -518,6 +574,14 @@ export interface MemoryStoreAdapter extends Omit<MemoryStore, 'session' | 'episo
    * @stable
    */
   readonly consolidator?: ConsolidatorMemoryStoreExt;
+  /**
+   * Optional reflection insight surface (P1-1). Defined on the default
+   * `@graphorin/store-sqlite` adapter; omitted ⇒ reflection is a no-op
+   * and `InsightMemory` reads return empty.
+   *
+   * @stable
+   */
+  readonly insights?: InsightMemoryStoreExt;
 }
 
 /**
@@ -533,6 +597,7 @@ export type {
   Episode,
   EpisodicMemoryStore,
   Fact,
+  Insight,
   Message,
   MessageRef,
   ProceduralMemoryStore,
