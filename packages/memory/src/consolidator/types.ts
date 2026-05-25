@@ -13,6 +13,7 @@
 
 import type { Provider, SessionScope, Tracer } from '@graphorin/core';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
+import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 
 /**
@@ -107,6 +108,22 @@ export interface ConsolidatorConfig {
   readonly dlqMaxRetries: number;
   readonly dlqBaseBackoffMs: number;
   readonly dlqMaxBackoffMs: number;
+  /**
+   * Auto-form a quarantined episode from each processed standard-phase
+   * slice (P1-2). Defaults on at the `standard`+ tiers, off at `free` /
+   * `cheap` / `custom`. The episode summary is one budgeted LLM call;
+   * when the budget is exhausted (or no episodic tier is wired) the
+   * phase degrades to fact-only behaviour.
+   */
+  readonly formEpisodes: boolean;
+  /**
+   * Ask the episode-summarization call for an LLM importance score
+   * (1–10, normalized to `[0, 1]`) so episodic triple-signal retrieval
+   * (recency × relevance × importance) runs on all three signals
+   * (P1-2). Importance is always a *soft* signal — it never gates
+   * retention. Defaults track {@link formEpisodes}.
+   */
+  readonly importanceScoring: boolean;
 }
 
 /**
@@ -191,6 +208,8 @@ export interface PhaseOutcome {
   readonly factsCreated: number;
   readonly factsUpdated: number;
   readonly conflictsResolved: number;
+  /** Episodes auto-formed from the processed slice (P1-2). */
+  readonly episodesFormed: number;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
   readonly llmTokensUsed: number;
@@ -231,6 +250,13 @@ export interface CreateConsolidatorOptions {
    */
   readonly semantic: SemanticMemory;
   /**
+   * The {@link EpisodicMemory} tier instance from the parent
+   * `createMemory(...)` facade. When supplied (and `formEpisodes` is
+   * on) the standard phase auto-forms a quarantined episode per
+   * processed slice (P1-2). Omitted ⇒ episode formation is skipped.
+   */
+  readonly episodic?: EpisodicMemory;
+  /**
    * Provider used by the standard + deep phases. Required when the
    * tier enables either phase; ignored when the active phases
    * collapse to `['light']`.
@@ -259,6 +285,10 @@ export interface CreateConsolidatorOptions {
   readonly dlqMaxRetries?: number;
   readonly dlqBaseBackoffMs?: number;
   readonly dlqMaxBackoffMs?: number;
+  /** Override the per-tier {@link ConsolidatorConfig.formEpisodes} default (P1-2). */
+  readonly formEpisodes?: boolean;
+  /** Override the per-tier {@link ConsolidatorConfig.importanceScoring} default (P1-2). */
+  readonly importanceScoring?: boolean;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }
@@ -279,6 +309,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly cheapModel: string | null;
       readonly deepModel: string | null;
       readonly onExceed: OnBudgetExceed;
+      readonly formEpisodes: boolean;
+      readonly importanceScoring: boolean;
     }
   >
 > = Object.freeze({
@@ -294,6 +326,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    formEpisodes: false,
+    importanceScoring: false,
   },
   cheap: {
     ceilings: {
@@ -307,6 +341,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    formEpisodes: false,
+    importanceScoring: false,
   },
   standard: {
     ceilings: {
@@ -320,6 +356,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'log',
+    formEpisodes: true,
+    importanceScoring: true,
   },
   full: {
     ceilings: {
@@ -333,6 +371,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'log',
+    formEpisodes: true,
+    importanceScoring: true,
   },
   custom: {
     ceilings: {
@@ -346,5 +386,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     cheapModel: null,
     deepModel: null,
     onExceed: 'pause',
+    formEpisodes: false,
+    importanceScoring: false,
   },
 });

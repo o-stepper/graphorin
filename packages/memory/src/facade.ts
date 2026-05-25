@@ -110,6 +110,10 @@ export interface CreateMemoryOptions {
     readonly dlqMaxRetries?: number;
     readonly dlqBaseBackoffMs?: number;
     readonly dlqMaxBackoffMs?: number;
+    /** Auto-form quarantined episodes from processed slices (P1-2). Per-tier default. */
+    readonly formEpisodes?: boolean;
+    /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
+    readonly importanceScoring?: boolean;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock — used by tests. */
@@ -233,6 +237,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     consolidatorOpts,
     options.store,
     semantic,
+    episodic,
     tracer,
   );
   const contextEngineConfig = options.contextEngine ?? {};
@@ -364,6 +369,7 @@ function buildConsolidator(
   opts: CreateMemoryOptions['consolidator'],
   store: CreateMemoryOptions['store'],
   semantic: SemanticMemory,
+  episodic: EpisodicMemory,
   tracer: Tracer,
 ): Consolidator {
   if (opts === undefined) {
@@ -379,6 +385,7 @@ function buildConsolidator(
   const consolidator = createConsolidator({
     store,
     semantic,
+    episodic,
     tracer,
     ...(opts.provider !== undefined ? { provider: opts.provider } : {}),
     ...(opts.now !== undefined ? { now: opts.now } : {}),
@@ -405,6 +412,8 @@ function buildConsolidator(
     ...(opts.dlqMaxRetries !== undefined ? { dlqMaxRetries: opts.dlqMaxRetries } : {}),
     ...(opts.dlqBaseBackoffMs !== undefined ? { dlqBaseBackoffMs: opts.dlqBaseBackoffMs } : {}),
     ...(opts.dlqMaxBackoffMs !== undefined ? { dlqMaxBackoffMs: opts.dlqMaxBackoffMs } : {}),
+    ...(opts.formEpisodes !== undefined ? { formEpisodes: opts.formEpisodes } : {}),
+    ...(opts.importanceScoring !== undefined ? { importanceScoring: opts.importanceScoring } : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });
   if (opts.onPhaseFinished !== undefined) {

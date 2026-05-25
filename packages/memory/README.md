@@ -81,6 +81,16 @@ any `EmbedderProvider`; the default is
   and conflicts route through the bi-temporal supersede (never a delete);
   every decision is audited in `fact_conflicts` and new facts inherit the
   `extraction` provenance gate.
+- **Auto-importance + episode formation** (consolidator standard phase).
+  Each processed slice is summarized into one episode via a single budgeted
+  LLM call that also rates its importance `1–10` (normalized to `[0, 1]`),
+  so episodic triple-signal retrieval (recency × relevance × importance) finally
+  runs on all three signals. Auto-formed episodes carry `provenance: 'extraction'`
+  + `status: 'quarantined'` (P1-4) — surfaced for review via
+  `episodic.search(..., { includeQuarantined: true })`. Importance is a *soft*
+  signal (never a retention gate). Controlled by the per-tier `formEpisodes` /
+  `importanceScoring` flags (on at `standard` / `full`); budget-aware
+  (an exhausted budget degrades to fact-only).
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

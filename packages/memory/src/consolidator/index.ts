@@ -154,6 +154,8 @@ export function createConsolidatorPlaceholder(
     dlqMaxRetries: 5,
     dlqBaseBackoffMs: 60_000,
     dlqMaxBackoffMs: 60 * 60 * 1000,
+    formEpisodes: false,
+    importanceScoring: false,
   });
 
   const status = async (): Promise<ConsolidatorStatus> =>

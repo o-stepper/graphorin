@@ -1,6 +1,7 @@
-import type { Fact, MemoryHit, MemoryProvenance } from '@graphorin/core';
+import type { Fact, MemoryHit, MemoryProvenance, MemoryStatus } from '@graphorin/core';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import type {
+  EpisodeInput,
   EpisodeSearchOptions,
   FactInput,
   FactSearchOptions,
@@ -234,6 +235,70 @@ describe('@graphorin/memory/tiers — EpisodicMemory', () => {
     const hits = await memory.episodic.search(SCOPE, 'bookshop');
     expect(hits.length).toBe(1);
     expect(hits[0]?.signals).toBeDefined();
+  });
+});
+
+describe('@graphorin/memory/tiers — EpisodicMemory importance + quarantine (P1-2/P1-4)', () => {
+  it('record persists provenance + status; quarantined episodes are excluded from default recall', async () => {
+    const memory = makeMemory();
+    const ep = await memory.episodic.record(SCOPE, {
+      summary: 'A synthesized episode about gardening.',
+      startedAt: new Date(0).toISOString(),
+      endedAt: new Date(1000).toISOString(),
+      provenance: 'extraction',
+      status: 'quarantined',
+    });
+    // Round-trips through get with both P1-4 fields set.
+    const got = await memory.episodic.get(ep.id);
+    expect(got?.provenance).toBe('extraction');
+    expect(got?.status).toBe('quarantined');
+    // Excluded from action-driving recall (default search)...
+    expect((await memory.episodic.search(SCOPE, 'gardening')).length).toBe(0);
+    // ...but surfaced on the inspector path.
+    const surfaced = await memory.episodic.search(SCOPE, 'gardening', {
+      includeQuarantined: true,
+    });
+    expect(surfaced.length).toBe(1);
+    expect(surfaced[0]?.record.status).toBe('quarantined');
+  });
+
+  it('triple-signal ranking orders equal recency/relevance episodes by importance', async () => {
+    // No embedder → FTS-only path: both summaries match the query
+    // (equal relevance) and share an `endedAt` (equal recency), so the
+    // only thing that can separate them is the importance signal.
+    const memory = makeMemory();
+    const startedAt = new Date('2026-05-01T09:00:00.000Z').toISOString();
+    const endedAt = new Date('2026-05-01T10:00:00.000Z').toISOString();
+    const low = await memory.episodic.record(SCOPE, {
+      summary: 'Briefly mentioned the project in passing.',
+      startedAt,
+      endedAt,
+      importance: 0.1,
+    });
+    const high = await memory.episodic.record(SCOPE, {
+      summary: 'Made a pivotal decision about the project.',
+      startedAt,
+      endedAt,
+      importance: 0.9,
+    });
+    const hits = await memory.episodic.search(SCOPE, 'project', { topK: 5 });
+    expect(hits.map((h) => h.record.id)).toEqual([high.id, low.id]);
+    // Importance is a soft signal: flipping the weight to ignore it
+    // collapses the ordering back to a tie (insertion order preserved).
+    const noImportance = await memory.episodic.search(SCOPE, 'project', {
+      topK: 5,
+      weights: { recency: 0.5, relevance: 0.5, importance: 0 },
+    });
+    const ids = noImportance.map((h) => h.record.id);
+    expect(ids).toHaveLength(2);
+    expect(ids).toContain(high.id);
+    expect(ids).toContain(low.id);
+  });
+
+  it('EpisodeInput carries optional provenance + status (P1-4)', () => {
+    expectTypeOf<EpisodeInput['provenance']>().toEqualTypeOf<MemoryProvenance | undefined>();
+    expectTypeOf<EpisodeInput['status']>().toEqualTypeOf<MemoryStatus | undefined>();
+    expectTypeOf<EpisodeSearchOptions['includeQuarantined']>().toEqualTypeOf<boolean | undefined>();
   });
 });
 

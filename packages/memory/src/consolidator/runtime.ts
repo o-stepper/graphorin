@@ -20,6 +20,7 @@ import type {
   ConsolidatorMemoryStoreExt,
   MemoryStoreAdapter,
 } from '../internal/storage-adapter.js';
+import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
 import { BudgetTracker } from './budget.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
@@ -88,6 +89,7 @@ export function createConsolidator(opts: CreateConsolidatorOptions): Consolidato
 
 class ConsolidatorImpl implements Consolidator {
   readonly #semantic: SemanticMemory;
+  readonly #episodic: EpisodicMemory | null;
   readonly #store: MemoryStoreAdapter;
   readonly #consolidatorStore: ConsolidatorMemoryStoreExt | null;
   readonly #tracer: Tracer;
@@ -113,6 +115,7 @@ class ConsolidatorImpl implements Consolidator {
 
   constructor(opts: CreateConsolidatorOptions) {
     this.#semantic = opts.semantic;
+    this.#episodic = opts.episodic ?? null;
     this.#store = opts.store;
     this.#consolidatorStore = this.#store.consolidator ?? null;
     this.#tracer = opts.tracer ?? NOOP_TRACER;
@@ -191,6 +194,8 @@ class ConsolidatorImpl implements Consolidator {
       phases: preset.phases,
       ceilings: preset.ceilings,
       onExceed: preset.onExceed,
+      formEpisodes: preset.formEpisodes,
+      importanceScoring: preset.importanceScoring,
     });
     this.#budget.reconfigure({
       maxTokensPerDay: preset.ceilings.maxTokensPerDay,
@@ -404,6 +409,7 @@ class ConsolidatorImpl implements Consolidator {
           factsCreated: 0,
           factsUpdated: 0,
           conflictsResolved: 0,
+          episodesFormed: 0,
           noiseFilteredCount: 0,
           emptyExtractions: 0,
           llmTokensUsed: 0,
@@ -435,6 +441,7 @@ class ConsolidatorImpl implements Consolidator {
         factsCreated: 0,
         factsUpdated: 0,
         conflictsResolved: 0,
+        episodesFormed: 0,
         noiseFilteredCount: 0,
         emptyExtractions: 0,
         llmTokensUsed: 0,
@@ -523,6 +530,9 @@ class ConsolidatorImpl implements Consolidator {
           : [];
       const out = await runStandardPhase({
         semantic: this.#semantic,
+        episodic: this.#episodic,
+        formEpisodes: this.#config.formEpisodes,
+        importanceScoring: this.#config.importanceScoring,
         store: this.#store,
         consolidatorStore: this.#consolidatorStore,
         provider: this.#provider,
@@ -591,6 +601,7 @@ function skipOutcome(
     factsCreated: 0,
     factsUpdated: 0,
     conflictsResolved: 0,
+    episodesFormed: 0,
     noiseFilteredCount: 0,
     emptyExtractions: 0,
     llmTokensUsed: 0,
@@ -639,6 +650,8 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     dlqMaxRetries: opts.dlqMaxRetries ?? 5,
     dlqBaseBackoffMs: opts.dlqBaseBackoffMs ?? 60_000,
     dlqMaxBackoffMs: opts.dlqMaxBackoffMs ?? 60 * 60 * 1000,
+    formEpisodes: opts.formEpisodes ?? preset.formEpisodes,
+    importanceScoring: opts.importanceScoring ?? preset.importanceScoring,
   });
 }
 

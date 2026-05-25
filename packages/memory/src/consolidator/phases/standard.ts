@@ -25,6 +25,7 @@ import type {
   MemoryStoreAdapter,
   SessionMessageRecord,
 } from '../../internal/storage-adapter.js';
+import type { EpisodicMemory } from '../../tiers/episodic-memory.js';
 import type { FactInput, SemanticMemory } from '../../tiers/semantic-memory.js';
 import type { BudgetTracker } from '../budget.js';
 import { tipMessageId } from '../idempotency.js';
@@ -38,6 +39,15 @@ const RECONCILE_TOP_K = 10;
 /** Inputs accepted by {@link runStandardPhase}. */
 export interface StandardPhaseDeps {
   readonly semantic: SemanticMemory;
+  /**
+   * Episodic tier used for auto-episode-formation (P1-2). Omitted /
+   * `null` ⇒ episode formation is skipped regardless of `formEpisodes`.
+   */
+  readonly episodic?: EpisodicMemory | null;
+  /** Auto-form a quarantined episode per processed slice (P1-2). */
+  readonly formEpisodes: boolean;
+  /** Ask the episode summary call for a `[1, 10]` importance score (P1-2). */
+  readonly importanceScoring: boolean;
   readonly store: MemoryStoreAdapter;
   readonly consolidatorStore: ConsolidatorMemoryStoreExt | null;
   readonly provider: Provider;
@@ -70,12 +80,32 @@ interface ExtractedFact {
   readonly confidence?: number;
 }
 
+/** Parsed episode-summary payload (P1-2). */
+interface ExtractedEpisode {
+  readonly summary: string;
+  /** Raw `[1, 10]` importance as returned by the model, pre-normalization. */
+  readonly importance?: number;
+}
+
 const EXTRACTION_SYSTEM_PROMPT = [
   'You are a memory-extraction assistant for a long-running personal-assistant runtime.',
   'Read the supplied conversation slice and return the durable facts it asserts about the user, the world, or stable preferences.',
   'Skip greetings, banter, transient state, and anything the assistant produced as boilerplate.',
   'Return a single JSON object: { "facts": [{ "text": string, "subject"?: string, "predicate"?: string, "object"?: string, "confidence"?: number }] }.',
   'If the slice contains no durable facts, return { "facts": [] }.',
+].join(' ');
+
+const EPISODE_SUMMARY_SYSTEM_PROMPT = [
+  'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
+  'Read the supplied conversation slice and write one concise third-person summary of what happened — the episode.',
+  'Return a single JSON object: { "summary": string }.',
+].join(' ');
+
+const EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT = [
+  'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
+  'Read the supplied conversation slice and write one concise third-person summary of what happened — the episode.',
+  'Also rate how important / poignant this episode is for remembering the user, on an integer scale from 1 (mundane) to 10 (deeply significant).',
+  'Return a single JSON object: { "summary": string, "importance": number }.',
 ].join(' ');
 
 /**
@@ -271,8 +301,61 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         await recordConflictDecision(deps.store, deps.scope, candidateId, audited);
       }
 
-      const totalTokens = extractionTokens + reconcileTokens;
-      const totalCost = cost + reconcileCost;
+      // Episode formation (P1-2). Summarize the processed slice into one
+      // quarantined episode carrying an LLM importance score, so the
+      // episodic triple-signal ranking (recency × relevance × importance)
+      // runs on all three signals. Budget-gated + provenance-tagged
+      // (P1-4): skipped when `formEpisodes` is off, no episodic tier is
+      // wired, or the budget is exhausted — the slice still advanced the
+      // cursor, so the phase degrades to fact-only behaviour.
+      let episodesFormed = 0;
+      let episodeTokens = 0;
+      let episodeCost = 0;
+      if (
+        deps.formEpisodes &&
+        deps.episodic != null &&
+        filtered.kept.length > 0 &&
+        !deps.budget.snapshot().paused
+      ) {
+        const episodeRes = await deps.provider.generate(
+          buildEpisodeRequest(deps, transcript, deps.importanceScoring),
+        );
+        const epUsage = episodeRes.usage;
+        episodeTokens =
+          (epUsage.promptTokens ?? 0) +
+          (epUsage.completionTokens ?? 0) +
+          (epUsage.reasoningTokens ?? 0);
+        episodeCost =
+          deps.priceUsage?.({
+            promptTokens: epUsage.promptTokens,
+            completionTokens: epUsage.completionTokens,
+          }) ?? 0;
+        deps.budget.record({ phase: 'standard', tokens: episodeTokens, costUsd: episodeCost });
+
+        const parsed = parseEpisode(episodeRes.text);
+        if (parsed !== null && parsed.summary.trim().length > 0) {
+          const importance = deps.importanceScoring
+            ? normalizeImportance(parsed.importance)
+            : undefined;
+          const nowFallback = new Date(
+            (typeof deps.now === 'function' ? deps.now : Date.now)(),
+          ).toISOString();
+          const startedAt = filtered.kept[0]?.createdAt ?? nowFallback;
+          const endedAt = filtered.kept[filtered.kept.length - 1]?.createdAt ?? startedAt;
+          await deps.episodic.record(deps.scope, {
+            summary: parsed.summary,
+            startedAt,
+            endedAt,
+            ...(importance !== undefined ? { importance } : {}),
+            provenance: 'extraction',
+            status: 'quarantined',
+          });
+          episodesFormed = 1;
+        }
+      }
+
+      const totalTokens = extractionTokens + reconcileTokens + episodeTokens;
+      const totalCost = cost + reconcileCost + episodeCost;
       const snapshot = deps.budget.snapshot();
 
       span.setAttributes({
@@ -285,7 +368,9 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         'consolidator.standard.facts_extracted': factsCreated,
         'consolidator.standard.facts_updated': factsUpdated,
         'consolidator.standard.conflicts_resolved': conflictsResolved,
+        'consolidator.standard.episodes_formed': episodesFormed,
         'consolidator.standard.reconcile_tokens': reconcileTokens,
+        'consolidator.standard.episode_tokens': episodeTokens,
         'consolidator.standard.tokens.input': usage.promptTokens,
         'consolidator.standard.tokens.output': usage.completionTokens,
         'consolidator.standard.cost.estimate.usd': totalCost,
@@ -303,6 +388,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         factsCreated,
         factsUpdated,
         conflictsResolved,
+        episodesFormed,
         noiseFilteredCount: filtered.droppedCount,
         emptyExtractions: facts.length === 0 ? 1 : 0,
         llmTokensUsed: totalTokens,
@@ -322,6 +408,37 @@ function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequ
       },
     ],
     systemMessage: EXTRACTION_SYSTEM_PROMPT,
+    temperature: 0,
+    metadata: {
+      userId: deps.scope.userId,
+      ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),
+      ...(deps.scope.agentId !== undefined ? { agentId: deps.scope.agentId } : {}),
+    },
+    outputType: { kind: 'structured' },
+  };
+}
+
+/**
+ * Build the episode-summarization request (P1-2). Uses the same
+ * transcript + structured-output seam as {@link buildRequest}; the
+ * system prompt switches on `withImportance` so a poignancy score is
+ * only requested when importance scoring is enabled.
+ */
+function buildEpisodeRequest(
+  deps: StandardPhaseDeps,
+  transcript: string,
+  withImportance: boolean,
+): ProviderRequest {
+  return {
+    messages: [
+      {
+        role: 'user',
+        content: `Conversation slice:\n${transcript}`,
+      },
+    ],
+    systemMessage: withImportance
+      ? EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT
+      : EPISODE_SUMMARY_SYSTEM_PROMPT,
     temperature: 0,
     metadata: {
       userId: deps.scope.userId,
@@ -384,6 +501,62 @@ export function parseExtraction(text: string | undefined): ReadonlyArray<Extract
     out.push(fact);
   }
   return out;
+}
+
+/**
+ * Parse the episode-summary model output into `{ summary, importance? }`
+ * (P1-2). Tolerates fenced blocks + an optional `{ episode: {...} }`
+ * wrapper; returns `null` when no usable `summary` string is present
+ * (so an extraction-shaped `{ facts: [...] }` payload is rejected, not
+ * mistaken for an episode).
+ *
+ * @internal
+ */
+export function parseEpisode(text: string | undefined): ExtractedEpisode | null {
+  if (text === undefined || text.length === 0) return null;
+  const candidate = stripFence(text).trim();
+  if (candidate.length === 0) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(candidate);
+  } catch {
+    const slice = sliceJsonObject(candidate);
+    if (slice === null) return null;
+    try {
+      parsed = JSON.parse(slice);
+    } catch {
+      return null;
+    }
+  }
+  if (parsed === null || typeof parsed !== 'object') return null;
+  const root = parsed as Record<string, unknown>;
+  const inner =
+    typeof root.summary === 'string'
+      ? root
+      : root.episode !== null && typeof root.episode === 'object'
+        ? (root.episode as Record<string, unknown>)
+        : root;
+  const summary = typeof inner.summary === 'string' ? inner.summary : null;
+  if (summary === null || summary.trim().length === 0) return null;
+  return {
+    summary,
+    ...(typeof inner.importance === 'number' ? { importance: inner.importance } : {}),
+  };
+}
+
+/**
+ * Normalize a raw `[1, 10]` poignancy score into the episodic
+ * `importance` field's `[0, 1]` range (P1-2). Out-of-range values are
+ * clamped to `[1, 10]` first (so `15 → 1.0`, `0 → 0.1`); non-finite /
+ * missing scores return `undefined` so the episode is recorded without
+ * an importance signal rather than a bogus one.
+ *
+ * @internal
+ */
+export function normalizeImportance(raw: number | undefined): number | undefined {
+  if (typeof raw !== 'number' || !Number.isFinite(raw)) return undefined;
+  const clamped = Math.min(10, Math.max(1, raw));
+  return clamped / 10;
 }
 
 function stripFence(text: string): string {
@@ -451,6 +624,7 @@ function emptyOutcome(status: PhaseOutcome['status']): PhaseOutcome {
     factsCreated: 0,
     factsUpdated: 0,
     conflictsResolved: 0,
+    episodesFormed: 0,
     noiseFilteredCount: 0,
     emptyExtractions: 0,
     llmTokensUsed: 0,

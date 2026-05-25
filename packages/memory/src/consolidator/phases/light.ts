@@ -106,6 +106,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
         factsCreated: 0,
         factsUpdated: archived,
         conflictsResolved: 0,
+        episodesFormed: 0,
         noiseFilteredCount,
         emptyExtractions: 0,
         llmTokensUsed: 0,
