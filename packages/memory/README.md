@@ -102,6 +102,15 @@ any `EmbedderProvider`; the default is
   cite** (`capInsightsBelowFacts`). An ExpeL salience counter (start `2`,
   pruned at `0`) manages the set. Off by default except at the `full` tier;
   budget-aware and a no-op without an episodic tier + insight-capable store.
+- **Contextual retrieval** (write path). Before a fact is embedded + FTS-indexed
+  the framework prepends a short **situating context** (entities / timeframe /
+  topics, Anthropic's Contextual Retrieval) so a terse fact stays findable; the
+  canonical `text` is preserved. The offline default `'late-chunk'`
+  (`createMemory({ contextualRetrieval })`) derives the context deterministically
+  from the fact's own structured signals with **no extra LLM call** — a no-op for
+  plain-text writes. An opt-in, **consolidator-only** `'llm'` mode
+  (`consolidator: { contextualRetrieval: 'llm' }`) spends one budgeted cheap-model
+  call per write to author the prefix, degrading to late-chunk on any failure.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

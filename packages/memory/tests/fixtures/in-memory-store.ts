@@ -510,6 +510,8 @@ export function createInMemoryStore(
   const shared = new Map<string, Set<string>>();
   const factVectors = new Map<string, Float32Array>();
   const factEmbedderById = new Map<string, string>();
+  // P1-3: contextual index text per fact (mirrors store-sqlite's facts_fts).
+  const factIndexText = new Map<string, string>();
   const episodeVectors = new Map<string, Float32Array>();
   const decaySignals = new Map<
     string,
@@ -711,6 +713,7 @@ export function createInMemoryStore(
           factVectors.set(fact.id, opts.embedding.vector);
           factEmbedderById.set(fact.id, opts.embedding.embedderId);
         }
+        if (opts.indexText !== undefined) factIndexText.set(fact.id, opts.indexText);
       },
       async get(id) {
         const fact = facts.find((f) => f.id === id);
@@ -727,7 +730,11 @@ export function createInMemoryStore(
           if (fact.deletedAt !== undefined) continue;
           if (opts.includeQuarantined !== true && fact.status === 'quarantined') continue;
           if (opts.asOf !== undefined && !factValidAt(fact, opts.asOf)) continue;
-          if (q === '*' || fact.text.toLowerCase().includes(q)) {
+          // P1-3: lexical match runs against the contextual index text
+          // when present (mirrors store-sqlite's facts_fts); the canonical
+          // `fact.text` is the fallback for non-contextualized writes.
+          const haystack = (factIndexText.get(fact.id) ?? fact.text).toLowerCase();
+          if (q === '*' || haystack.includes(q)) {
             out.push({ record: fact, score: 1, signals: { bm25: 1 } });
           }
           if (out.length >= topK) break;
@@ -814,6 +821,7 @@ export function createInMemoryStore(
           facts.splice(idx, 1);
           factVectors.delete(id);
           factEmbedderById.delete(id);
+          factIndexText.delete(id);
         }
       },
       async listForDecay(scope, limit = 1000) {

@@ -179,6 +179,7 @@ export {
   createMemory,
   type Memory,
 } from './facade.js';
+export type { ContextualRetrievalMode } from './internal/contextualize.js';
 export type {
   ConflictAuditDecision,
   ConflictAuditInputLike,

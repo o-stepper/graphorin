@@ -74,6 +74,17 @@ export interface EmbeddingPayload {
  */
 export interface SqliteMemoryWriteOptions {
   readonly embedding?: EmbeddingPayload;
+  /**
+   * Contextual-retrieval index text (P1-3). When supplied, the FTS5 row
+   * is indexed against this (context-prepended) text instead of the
+   * canonical `fact.text`, so a terse fact stays findable by a
+   * vaguely-worded query. The persisted `facts.text` column — the value
+   * shown to the user / audit trail — is always the canonical text; only
+   * the lexical index is affected. The caller's `embedding.vector` should
+   * be computed from the same index text so the vector and FTS surfaces
+   * agree. Absent ⇒ the FTS row uses `fact.text` (pre-P1-3 behaviour).
+   */
+  readonly indexText?: string;
 }
 
 /**
@@ -692,7 +703,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       }
       this.#conn.run(
         `INSERT OR REPLACE INTO facts_fts (rowid, text) VALUES ((SELECT rowid FROM facts WHERE id = ?), ?)`,
-        [fact.id, fact.text],
+        // P1-3: index the contextual text when supplied; `facts.text`
+        // (persisted above) stays canonical for display / audit.
+        [fact.id, options.indexText ?? fact.text],
       );
     });
   }

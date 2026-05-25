@@ -12,6 +12,7 @@
  */
 
 import type { Provider, SessionScope, Tracer } from '@graphorin/core';
+import type { ContextualRetrievalMode } from '../internal/contextualize.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
@@ -143,6 +144,18 @@ export interface ConsolidatorConfig {
   readonly importanceThreshold: number;
   /** Upper bound on salient questions reflection asks per pass. Defaults to `3`. */
   readonly reflectionMaxQuestions: number;
+  /**
+   * Contextual retrieval for facts written by the standard phase (P1-3).
+   * `'late-chunk'` (default at every tier) relies on the offline
+   * situating-context prefix the shared {@link SemanticMemory} computes
+   * for every write — no extra LLM call. `'llm'` is the opt-in
+   * enrichment: the standard phase spends one budgeted cheap-model call
+   * per additive write to author a 1–2 sentence situating prefix, then
+   * passes it as the write's index text. `'off'` indexes the bare text.
+   * The `'llm'` mode is **consolidator-only** by construction — the hot
+   * write path never has a provider for contextualization.
+   */
+  readonly contextualRetrieval: ContextualRetrievalMode;
 }
 
 /**
@@ -316,6 +329,8 @@ export interface CreateConsolidatorOptions {
   readonly importanceThreshold?: number;
   /** Override the {@link ConsolidatorConfig.reflectionMaxQuestions} default (P1-1). */
   readonly reflectionMaxQuestions?: number;
+  /** Override the per-tier {@link ConsolidatorConfig.contextualRetrieval} default (P1-3). */
+  readonly contextualRetrieval?: ContextualRetrievalMode;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }
@@ -341,6 +356,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly reflection: boolean;
       readonly importanceThreshold: number;
       readonly reflectionMaxQuestions: number;
+      readonly contextualRetrieval: ContextualRetrievalMode;
     }
   >
 > = Object.freeze({
@@ -361,6 +377,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   cheap: {
     ceilings: {
@@ -379,6 +396,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   standard: {
     ceilings: {
@@ -397,6 +415,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   full: {
     ceilings: {
@@ -415,6 +434,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: true,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
   custom: {
     ceilings: {
@@ -433,5 +453,6 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
+    contextualRetrieval: 'late-chunk',
   },
 });

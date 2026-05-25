@@ -33,6 +33,13 @@ export interface EmbeddedWriteOptions {
     readonly embedderId: string;
     readonly vector: Float32Array;
   };
+  /**
+   * Contextual-retrieval index text (P1-3). When supplied, the adapter
+   * indexes its lexical (FTS) surface against this context-prepended
+   * text while persisting the canonical `text` unchanged. Absent ⇒ the
+   * canonical text is indexed (pre-P1-3 behaviour).
+   */
+  readonly indexText?: string;
 }
 
 /**

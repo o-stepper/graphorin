@@ -200,6 +200,7 @@ class ConsolidatorImpl implements Consolidator {
       reflection: preset.reflection,
       importanceThreshold: preset.importanceThreshold,
       reflectionMaxQuestions: preset.reflectionMaxQuestions,
+      contextualRetrieval: preset.contextualRetrieval,
     });
     this.#budget.reconfigure({
       maxTokensPerDay: preset.ceilings.maxTokensPerDay,
@@ -539,6 +540,7 @@ class ConsolidatorImpl implements Consolidator {
         episodic: this.#episodic,
         formEpisodes: this.#config.formEpisodes,
         importanceScoring: this.#config.importanceScoring,
+        contextualRetrieval: this.#config.contextualRetrieval,
         store: this.#store,
         consolidatorStore: this.#consolidatorStore,
         provider: this.#provider,
@@ -692,6 +694,7 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     reflection: opts.reflection ?? preset.reflection,
     importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
     reflectionMaxQuestions: opts.reflectionMaxQuestions ?? preset.reflectionMaxQuestions,
+    contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
   });
 }
 

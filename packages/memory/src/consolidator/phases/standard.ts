@@ -18,6 +18,10 @@ import {
   type ReconcileDecision,
   reconcileToConflictDecision,
 } from '../../conflict/index.js';
+import {
+  type ContextualRetrievalMode,
+  contextualizeWithLlm,
+} from '../../internal/contextualize.js';
 import { newMemoryId } from '../../internal/id.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type {
@@ -48,6 +52,13 @@ export interface StandardPhaseDeps {
   readonly formEpisodes: boolean;
   /** Ask the episode summary call for a `[1, 10]` importance score (P1-2). */
   readonly importanceScoring: boolean;
+  /**
+   * Contextual-retrieval mode for additive fact writes (P1-3). `'llm'`
+   * spends one budgeted cheap-model call per `add` to author a situating
+   * prefix; `'late-chunk'` / `'off'` defer to the shared
+   * {@link SemanticMemory} instance (no extra call here).
+   */
+  readonly contextualRetrieval: ContextualRetrievalMode;
   readonly store: MemoryStoreAdapter;
   readonly consolidatorStore: ConsolidatorMemoryStoreExt | null;
   readonly provider: Provider;
@@ -187,6 +198,8 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
       let conflictsResolved = 0;
       let reconcileTokens = 0;
       let reconcileCost = 0;
+      let contextualTokens = 0;
+      let contextualCost = 0;
       const extractionTokens =
         (usage.promptTokens ?? 0) + (usage.completionTokens ?? 0) + (usage.reasoningTokens ?? 0);
       deps.budget.record({ phase: 'standard', tokens: extractionTokens, costUsd: cost });
@@ -258,10 +271,46 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         let candidateId: string;
         switch (decision.action) {
           case 'add': {
+            // Contextual retrieval (P1-3). In `'llm'` mode (and only when
+            // the budget is not exhausted) spend one cheap-model call to
+            // author a situating prefix and pass it as the write's index
+            // text; the helper degrades to the deterministic late-chunk
+            // prefix on any failure. `'late-chunk'` / `'off'` add nothing
+            // here — the shared SemanticMemory instance contextualizes the
+            // write. This LLM call is the only contextualization that
+            // touches a provider, keeping `'llm'` strictly consolidator-only.
+            let indexText: string | undefined;
+            if (deps.contextualRetrieval === 'llm' && !deps.budget.snapshot().paused) {
+              const ctx = await contextualizeWithLlm(
+                {
+                  text: input.text,
+                  ...(input.subject !== undefined ? { subject: input.subject } : {}),
+                  ...(input.predicate !== undefined ? { predicate: input.predicate } : {}),
+                  ...(input.object !== undefined ? { object: input.object } : {}),
+                },
+                deps.provider,
+              );
+              indexText = ctx.indexText;
+              const ctxTokens =
+                (ctx.usage.promptTokens ?? 0) +
+                (ctx.usage.completionTokens ?? 0) +
+                (ctx.usage.reasoningTokens ?? 0);
+              const ctxCost =
+                deps.priceUsage?.({
+                  promptTokens: ctx.usage.promptTokens,
+                  completionTokens: ctx.usage.completionTokens,
+                }) ?? 0;
+              contextualTokens += ctxTokens;
+              contextualCost += ctxCost;
+              deps.budget.record({ phase: 'standard', tokens: ctxTokens, costUsd: ctxCost });
+            }
             // `pipeline: 'off'` — the standard phase has already made the
             // conflict decision; a second inline pass would re-search +
             // double-audit.
-            const stored = await deps.semantic.remember(deps.scope, input, { pipeline: 'off' });
+            const stored = await deps.semantic.remember(deps.scope, input, {
+              pipeline: 'off',
+              ...(indexText !== undefined ? { indexText } : {}),
+            });
             candidateId = stored.id;
             factsCreated += 1;
             break;
@@ -354,8 +403,8 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         }
       }
 
-      const totalTokens = extractionTokens + reconcileTokens + episodeTokens;
-      const totalCost = cost + reconcileCost + episodeCost;
+      const totalTokens = extractionTokens + reconcileTokens + episodeTokens + contextualTokens;
+      const totalCost = cost + reconcileCost + episodeCost + contextualCost;
       const snapshot = deps.budget.snapshot();
 
       span.setAttributes({
@@ -371,6 +420,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         'consolidator.standard.episodes_formed': episodesFormed,
         'consolidator.standard.reconcile_tokens': reconcileTokens,
         'consolidator.standard.episode_tokens': episodeTokens,
+        'consolidator.standard.contextual_tokens': contextualTokens,
         'consolidator.standard.tokens.input': usage.promptTokens,
         'consolidator.standard.tokens.output': usage.completionTokens,
         'consolidator.standard.cost.estimate.usd': totalCost,

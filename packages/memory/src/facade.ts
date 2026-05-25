@@ -44,6 +44,7 @@ import { resolveLocalePack } from './context-engine/locale-packs/resolver.js';
 import { gatherMemoryMetadata, renderMetadataBlock } from './context-engine/metadata.js';
 import { partition as partitionBySensitivity } from './context-engine/privacy-filter.js';
 import { composeLayer1 } from './context-engine/templates/composer.js';
+import type { ContextualRetrievalMode } from './internal/contextualize.js';
 import { bindEmbedder } from './internal/embedder-binding.js';
 import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/storage-adapter.js';
 import { RRFReranker } from './search/rrf.js';
@@ -79,6 +80,17 @@ export interface CreateMemoryOptions {
   readonly tracer?: Tracer;
   /** Override the reranker used by `SemanticMemory.search`. */
   readonly reranker?: ReRanker;
+  /**
+   * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
+   * (default) prepends a deterministic, offline situating context
+   * (entities / timeframe / topics, derived from the fact's own
+   * structured fields) to the text that is embedded + FTS-indexed, so a
+   * terse fact stays findable; the canonical `text` is preserved. `'off'`
+   * indexes the bare text. The `'llm'` enrichment is **not** available on
+   * the hot path — it is a consolidator-only opt-in configured via
+   * `consolidator: { contextualRetrieval: 'llm' }`.
+   */
+  readonly contextualRetrieval?: 'off' | 'late-chunk';
   /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws — the
@@ -121,6 +133,13 @@ export interface CreateMemoryOptions {
     readonly importanceThreshold?: number;
     /** Upper bound on salient questions reflection asks per pass (P1-1). */
     readonly reflectionMaxQuestions?: number;
+    /**
+     * Contextual retrieval for standard-phase fact writes (P1-3).
+     * `'llm'` opts into one budgeted cheap-model call per write to author
+     * a situating prefix (consolidator-only); `'late-chunk'` (default)
+     * and `'off'` defer to the write-path mode. Per-tier default.
+     */
+    readonly contextualRetrieval?: ContextualRetrievalMode;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock — used by tests. */
@@ -231,6 +250,9 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     embedderIdProvider,
     reranker,
     conflictPipeline,
+    ...(options.contextualRetrieval !== undefined
+      ? { contextualRetrieval: options.contextualRetrieval }
+      : {}),
   });
   const procedural = new ProceduralMemory({ store: options.store, tracer });
   const shared = new SharedMemory({ store: options.store, tracer });
@@ -435,6 +457,9 @@ function buildConsolidator(
       : {}),
     ...(opts.reflectionMaxQuestions !== undefined
       ? { reflectionMaxQuestions: opts.reflectionMaxQuestions }
+      : {}),
+    ...(opts.contextualRetrieval !== undefined
+      ? { contextualRetrieval: opts.contextualRetrieval }
       : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });

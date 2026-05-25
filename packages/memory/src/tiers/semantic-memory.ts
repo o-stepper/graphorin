@@ -10,6 +10,7 @@ import type {
 } from '@graphorin/core';
 import { md5 } from '@graphorin/core';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
+import { contextualize } from '../internal/contextualize.js';
 import { newMemoryId } from '../internal/id.js';
 import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
@@ -108,6 +109,16 @@ export interface FactRememberOptions {
   readonly pipeline?: 'on' | 'off';
   /** Cancellation signal forwarded to the embedder + storage layers. */
   readonly signal?: AbortSignal;
+  /**
+   * Precomputed contextual-retrieval index text (P1-3, advanced). When
+   * supplied it overrides the instance's `'late-chunk'` computation: the
+   * embedding is computed from — and the FTS row indexed against — this
+   * text, while the canonical `text` is stored unchanged. The background
+   * consolidator passes this in its `'llm'` mode (the one place an LLM is
+   * allowed to write the situating context); first-party callers normally
+   * omit it and rely on the offline late-chunk default.
+   */
+  readonly indexText?: string;
 }
 
 /**
@@ -142,6 +153,7 @@ export class SemanticMemory {
   readonly #embedder: EmbedderProvider | null;
   readonly #embedderIdProvider: () => string | null;
   readonly #pipeline: ConflictPipeline | null;
+  readonly #contextualMode: 'off' | 'late-chunk';
   #reranker: ReRanker;
 
   constructor(args: {
@@ -151,6 +163,15 @@ export class SemanticMemory {
     embedderIdProvider: () => string | null;
     reranker: ReRanker;
     conflictPipeline?: ConflictPipeline;
+    /**
+     * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
+     * (default) prepends a deterministic situating context to the text
+     * that is embedded + FTS-indexed, leaving the canonical `text`
+     * untouched; `'off'` indexes the bare text. The hot write path never
+     * makes an LLM call — the `'llm'` enrichment is confined to the
+     * background consolidator, which supplies a precomputed `indexText`.
+     */
+    contextualRetrieval?: 'off' | 'late-chunk';
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
@@ -158,6 +179,7 @@ export class SemanticMemory {
     this.#embedderIdProvider = args.embedderIdProvider;
     this.#reranker = args.reranker;
     this.#pipeline = args.conflictPipeline ?? null;
+    this.#contextualMode = args.contextualRetrieval ?? 'late-chunk';
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -233,6 +255,13 @@ export class SemanticMemory {
       };
       const embedderId = this.#embedderIdProvider();
       const embedder = this.#embedder;
+      // P1-3: the text that is embedded + FTS-indexed. A caller-supplied
+      // `indexText` (the consolidator's `'llm'` mode) wins; otherwise the
+      // instance mode decides between the bare text (`'off'`) and the
+      // offline late-chunk prefix derived from the *author-supplied*
+      // signals on `input` (entities / timeframe / topics). The canonical
+      // `fact.text` persisted below is never altered.
+      const indexText = this.#resolveIndexText(input, fact.text, options.indexText);
       const pipelineEnabled = this.#pipeline !== null && (options.pipeline ?? 'on') === 'on';
       const decision: ConflictDecision =
         pipelineEnabled && this.#pipeline !== null
@@ -255,6 +284,7 @@ export class SemanticMemory {
         'memory.semantic.pipeline.stage': decision.stage,
         'memory.semantic.pipeline.enabled': pipelineEnabled,
         'memory.semantic.status': status,
+        'memory.semantic.contextualized': indexText !== text,
         ...(provenance !== undefined ? { 'memory.semantic.provenance': provenance } : {}),
         'memory.semantic.injection_flagged': injection.flagged,
         ...(injection.flagged
@@ -265,7 +295,7 @@ export class SemanticMemory {
       switch (decision.kind) {
         case 'admit':
         case 'pending': {
-          await this.#commitFact(fact, embedder, embedderId);
+          await this.#commitFact(fact, embedder, embedderId, indexText);
           return { fact, decision };
         }
         case 'dedup': {
@@ -273,7 +303,7 @@ export class SemanticMemory {
           return { fact: existing ?? fact, decision };
         }
         case 'supersede': {
-          await this.#commitFact(fact, embedder, embedderId);
+          await this.#commitFact(fact, embedder, embedderId, indexText);
           await this.#store.semantic.supersede(decision.existingId, fact, decision.reason);
           return { fact, decision };
         }
@@ -281,23 +311,61 @@ export class SemanticMemory {
     });
   }
 
+  /**
+   * Resolve the contextual-retrieval index text (P1-3). A caller
+   * override (the consolidator's `'llm'` mode) takes precedence; then
+   * the instance mode decides. Late-chunk derives the situating context
+   * from the *author-supplied* signals on `input` (so an extraction's
+   * subject/predicate/object survive even though the persisted `Fact`
+   * drops them) and never from framework-defaulted fields, so a plain
+   * `remember({ text })` write returns the canonical text unchanged.
+   */
+  #resolveIndexText(input: FactInput, canonicalText: string, override?: string): string {
+    if (override !== undefined) return override;
+    if (this.#contextualMode === 'off') return canonicalText;
+    return contextualize({
+      text: canonicalText,
+      ...(input.subject !== undefined ? { subject: input.subject } : {}),
+      ...(input.predicate !== undefined ? { predicate: input.predicate } : {}),
+      ...(input.object !== undefined ? { object: input.object } : {}),
+      ...(input.tags !== undefined ? { tags: input.tags } : {}),
+      ...(input.validFrom !== undefined ? { validFrom: input.validFrom } : {}),
+    });
+  }
+
   async #commitFact(
     fact: Fact,
     embedder: EmbedderProvider | null,
     embedderId: string | null,
+    indexText: string,
   ): Promise<void> {
     const adapterSupportsEmbeddedWrite =
       typeof this.#store.semantic.rememberWithEmbedding === 'function';
+    const contextualized = indexText !== fact.text;
     const hasEmbeddingPath =
       embedder !== null && embedderId !== null && adapterSupportsEmbeddedWrite;
     if (hasEmbeddingPath) {
-      const [vector] = await embedder.embed([fact.text]);
+      // Embed the *contextual* text so the vector surface agrees with the
+      // FTS index; the persisted `fact.text` stays canonical (P1-3).
+      const [vector] = await embedder.embed([indexText]);
       if (vector !== undefined && this.#store.semantic.rememberWithEmbedding !== undefined) {
         await this.#store.semantic.rememberWithEmbedding(fact, {
           embedding: { embedderId, vector },
+          ...(contextualized ? { indexText } : {}),
         });
         return;
       }
+    }
+    // No embedder, but contextualization still needs to reach the lexical
+    // index — route through the extended write when the adapter supports
+    // it. Plain (non-contextualized) writes keep the canonical fast path.
+    if (
+      contextualized &&
+      adapterSupportsEmbeddedWrite &&
+      this.#store.semantic.rememberWithEmbedding !== undefined
+    ) {
+      await this.#store.semantic.rememberWithEmbedding(fact, { indexText });
+      return;
     }
     await this.#store.semantic.remember(fact);
   }
