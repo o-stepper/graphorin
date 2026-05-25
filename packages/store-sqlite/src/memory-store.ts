@@ -27,6 +27,17 @@ import type { EmbeddingMetaRepository } from './embedding-meta-repo.js';
 import { VectorTableManager } from './vector-table-mgr.js';
 
 /**
+ * Point-in-time (`asOf`) WHERE fragments. Appended only when an
+ * `asOf` epoch is supplied; absent ⇒ the query is byte-identical to
+ * the pre-feature SQL, so default reads are unaffected. Facts use the
+ * bi-temporal validity interval; episodes have no close column so they
+ * match once they have started. Each `?` is bound with the same epoch.
+ */
+const FACT_VALIDITY_CLAUSE =
+  'AND (f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)';
+const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
+
+/**
  * Optional embedding payload attached to a memory write. The
  * `embedder_id` must already be registered in `embedding_meta`; the
  * `vector` length must match the registered `dim`.
@@ -462,14 +473,19 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     opts: MemorySearchOptions,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const topK = opts.topK ?? 10;
+    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
+    if (asOf !== null) binds.push(asOf);
+    binds.push(topK);
     const rows = this.#conn.all<EpisodeRow & { bm25_score: number }>(
       `SELECT e.*, bm25(episodes_fts) AS bm25_score
        FROM episodes_fts
        JOIN episodes e ON e.rowid = episodes_fts.rowid
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
+         ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
        ORDER BY bm25_score
        LIMIT ?`,
-      [escapeFtsQuery(opts.query), scope.userId, topK],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToEpisode(row),
@@ -498,6 +514,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    asOf?: string,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -507,6 +524,14 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
       );
     }
     const tableName = this.#vectorMgr.ensureTable('episodes', meta);
+    const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    const binds: Array<Buffer | string | number> = [
+      Buffer.from(embedding.buffer),
+      topK,
+      scope.userId,
+      embedderId,
+    ];
+    if (asOfEpoch !== null) binds.push(asOfEpoch);
     const rows = this.#conn.all<EpisodeRow & { distance: number }>(
       `SELECT e.*, v.distance AS distance
        FROM ${quoteIdent(tableName)} v
@@ -517,8 +542,9 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
          AND e.embedder_id = ?
          AND e.deleted_at IS NULL
          AND e.archived = 0
+         ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
        ORDER BY v.distance`,
-      [Buffer.from(embedding.buffer), topK, scope.userId, embedderId],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToEpisode(row),
@@ -645,14 +671,19 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     opts: MemorySearchOptions,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const topK = opts.topK ?? 10;
+    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
+    if (asOf !== null) binds.push(asOf, asOf);
+    binds.push(topK);
     const rows = this.#conn.all<FactRow & { bm25_score: number }>(
       `SELECT f.*, bm25(facts_fts) AS bm25_score
        FROM facts_fts
        JOIN facts f ON f.rowid = facts_fts.rowid
        WHERE facts_fts MATCH ? AND f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         ${asOf !== null ? FACT_VALIDITY_CLAUSE : ''}
        ORDER BY bm25_score
        LIMIT ?`,
-      [escapeFtsQuery(opts.query), scope.userId, topK],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToFact(row),
@@ -677,6 +708,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    asOf?: string,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -686,6 +718,14 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       );
     }
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
+    const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    const binds: Array<Buffer | string | number> = [
+      Buffer.from(embedding.buffer),
+      topK,
+      scope.userId,
+      embedderId,
+    ];
+    if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
     const rows = this.#conn.all<FactRow & { distance: number }>(
       `SELECT f.*, v.distance AS distance
        FROM ${quoteIdent(tableName)} v
@@ -696,8 +736,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
          AND f.embedder_id = ?
          AND f.deleted_at IS NULL
          AND f.archived = 0
+         ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
        ORDER BY v.distance`,
-      [Buffer.from(embedding.buffer), topK, scope.userId, embedderId],
+      binds,
     );
     return rows.map((row) => ({
       record: rowToFact(row),
@@ -720,6 +761,49 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     });
     void reason;
     await this.remember(newFact);
+  }
+
+  /**
+   * Walk the supersede chain in both directions from `factId` and
+   * return every fact in it, ordered by `valid_from` ascending
+   * (oldest → newest, falling back to `created_at`). Unlike
+   * {@link search}, this deliberately surfaces superseded /
+   * soft-deleted / archived rows so callers can answer "how did this
+   * fact change over time". Traversal follows `supersedes` /
+   * `superseded_by` plus inbound edges (so a half-linked chain still
+   * resolves), is scope-guarded, and is cycle-safe. Returns `[]` for
+   * an unknown id.
+   *
+   * @stable
+   */
+  async historyOf(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>> {
+    const seen = new Set<string>();
+    const queue: string[] = [factId];
+    const rows: FactRow[] = [];
+    while (queue.length > 0) {
+      const id = queue.shift();
+      if (id === undefined || seen.has(id)) continue;
+      seen.add(id);
+      const row = this.#conn.get<FactRow>(
+        'SELECT * FROM facts WHERE id = ? AND scope_user_id = ?',
+        [id, scope.userId],
+      );
+      if (!row) continue;
+      rows.push(row);
+      if (row.supersedes !== null) queue.push(row.supersedes);
+      if (row.superseded_by !== null) queue.push(row.superseded_by);
+      const inbound = this.#conn.all<{ id: string }>(
+        'SELECT id FROM facts WHERE scope_user_id = ? AND (supersedes = ? OR superseded_by = ?)',
+        [scope.userId, id, id],
+      );
+      for (const r of inbound) queue.push(r.id);
+    }
+    rows.sort((a, b) => {
+      const av = a.valid_from ?? a.created_at;
+      const bv = b.valid_from ?? b.created_at;
+      return av !== bv ? av - bv : a.created_at - b.created_at;
+    });
+    return rows.map(rowToFact);
   }
 
   async forget(id: string, reason?: string): Promise<void> {

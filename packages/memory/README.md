@@ -5,7 +5,7 @@
 
 `@graphorin/memory` ships the `createMemory()` facade, the six tier
 sub-modules (working, session, episodic, semantic, procedural, shared),
-the nine memory tools that the agent runtime registers with
+the ten memory tools that the agent runtime registers with
 `@graphorin/tools`, the built-in Reciprocal Rank Fusion reranker (k=60),
 the embedder migration runner, and the interface stubs picked up later
 by the conflict-resolution pipeline, the consolidator, and the context
@@ -20,7 +20,7 @@ The package depends on:
 - `@graphorin/security` — the memory-modification guard (`MemoryGuardTier`)
   every memory tool is wired against.
 - `@graphorin/tools` — the `tool({...})` builder used to declare the
-  nine memory tools.
+  ten memory tools.
 - `zod` (peer) — schema typing for the memory tools.
 
 Storage is provided by any `MemoryStore` implementation; the default
@@ -41,11 +41,14 @@ any `EmbedderProvider`; the default is
   through the built-in `RRFReranker` (k=60 default). The
   `setReranker(custom)` hook accepts any `ReRanker` implementation
   (cross-encoder, LLM judge, custom).
-- **Nine memory tools.** `block_append`, `block_replace`,
+- **Ten memory tools.** `block_append`, `block_replace`,
   `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
-  `fact_forget`, `recall_episodes`, `conversation_search` — every tool
-  is a typed `Tool` with `inputSchema` + `outputSchema`, the
-  appropriate `memoryGuardTier`, and the right `sideEffectClass`.
+  `fact_forget`, `recall_episodes`, `conversation_search`,
+  `fact_history` — every tool is a typed `Tool` with `inputSchema` +
+  `outputSchema`, the appropriate `memoryGuardTier`, and the right
+  `sideEffectClass`. `fact_search` accepts an `asOf` instant for
+  point-in-time reads; `fact_history` returns a fact's bi-temporal
+  supersede chain.
 - **Multi-stage conflict resolution pipeline.** Every
   `SemanticMemory.remember(...)` call now flows through a five-stage
   pipeline (exact dedup → embedding three-zone → heuristic regex →

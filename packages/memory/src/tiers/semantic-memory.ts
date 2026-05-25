@@ -46,6 +46,16 @@ export interface FactSearchOptions {
   /** Override the per-list candidate count (default `60`). */
   readonly candidateTopK?: number;
   /**
+   * Point-in-time ("as of") read. When set, only facts whose
+   * bi-temporal validity interval contains this instant are returned
+   * (`valid_from <= asOf < valid_to`, open-ended bounds allowed),
+   * applied at the store layer to both the FTS and vector candidate
+   * lists. ISO-8601. Absent ⇒ current behaviour is unchanged. P0-2.
+   *
+   * @stable
+   */
+  readonly asOf?: string;
+  /**
    * Optional decay-aware ranking. When set, the reranker output is
    * post-multiplied by the per-fact retention curve
    * `score *= exp(-elapsedDays / tauDays)` so stale facts drop in
@@ -275,9 +285,10 @@ export class SemanticMemory {
         const ftsHits = await this.#store.semantic.search(scope, {
           query,
           topK: candidateTopK,
+          ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
-        const vectorHits = await this.#tryVectorSearch(scope, query, candidateTopK);
+        const vectorHits = await this.#tryVectorSearch(scope, query, candidateTopK, opts.asOf);
         const lists: ReadonlyArray<ReadonlyArray<MemoryHit<Fact>>> =
           vectorHits.length === 0 ? [ftsHits] : [ftsHits, vectorHits];
         const fused = await this.#reranker.rerank(query, lists, {
@@ -291,6 +302,7 @@ export class SemanticMemory {
           'memory.search.semantic.final_count': ranked.length,
           'memory.search.semantic.reranker_id': this.#reranker.id,
           'memory.search.semantic.decay_applied': opts.decay !== undefined,
+          ...(opts.asOf !== undefined ? { 'memory.search.semantic.as_of': opts.asOf } : {}),
         });
         return ranked;
       },
@@ -314,6 +326,36 @@ export class SemanticMemory {
         const fact = await this.#store.semantic.get(factId);
         span.setAttributes({ 'memory.read.semantic.found': fact !== null });
         return fact;
+      },
+    );
+  }
+
+  /**
+   * Return the full bi-temporal supersede chain that `factId` belongs
+   * to, oldest → newest, including superseded / soft-deleted rows so
+   * callers can answer "how did this fact change over time". Requires
+   * a storage adapter that implements
+   * `SemanticMemoryStoreExt.historyOf(...)` — the default
+   * `@graphorin/store-sqlite` adapter wires this through. P0-2.
+   *
+   * @stable
+   */
+  async history(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>> {
+    return withMemorySpan(
+      this.#tracer,
+      'memory.read.semantic',
+      scope,
+      { 'memory.semantic.action': 'history', 'memory.semantic.fact_id': factId },
+      async (span) => {
+        if (typeof this.#store.semantic.historyOf !== 'function') {
+          throw new TypeError(
+            '[graphorin/memory] SemanticMemory.history(...) requires a storage adapter that implements `semantic.historyOf(scope, id)`. ' +
+              'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via SemanticMemoryStoreExt.',
+          );
+        }
+        const chain = await this.#store.semantic.historyOf(scope, factId);
+        span.setAttributes({ 'memory.read.semantic.history_length': chain.length });
+        return chain;
       },
     );
   }
@@ -406,6 +448,7 @@ export class SemanticMemory {
     scope: SessionScope,
     query: string,
     topK: number,
+    asOf?: string,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const embedderId = this.#embedderIdProvider();
     if (
@@ -417,7 +460,7 @@ export class SemanticMemory {
     }
     const [vector] = await this.#embedder.embed([query]);
     if (vector === undefined) return [];
-    return this.#store.semantic.searchVector(scope, vector, embedderId, topK);
+    return this.#store.semantic.searchVector(scope, vector, embedderId, topK, asOf);
   }
 
   async #applyDecay(

@@ -131,6 +131,14 @@ export interface MemorySearchOptions {
   readonly dateRange?: { readonly from?: string; readonly to?: string };
   readonly includeArchived?: boolean;
   readonly signal?: AbortSignal;
+  /**
+   * Point-in-time ("as of") read. When set, only records whose
+   * validity interval contains this instant are returned. For facts:
+   * `(valid_from IS NULL OR valid_from <= asOf) AND (valid_to IS NULL OR valid_to > asOf)`;
+   * for episodes: `started_at <= asOf`. ISO-8601. Absent ⇒ current
+   * behaviour is unchanged (every live row is eligible).
+   */
+  readonly asOf?: string;
 }
 
 /**

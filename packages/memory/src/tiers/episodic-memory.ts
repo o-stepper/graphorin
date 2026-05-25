@@ -57,6 +57,14 @@ export interface EpisodeSearchOptions {
   readonly signal?: AbortSignal;
   readonly weights?: EpisodeRetrievalWeights;
   readonly dateRange?: { readonly from?: string; readonly to?: string };
+  /**
+   * Point-in-time ("as of") read. When set, only episodes that had
+   * started by this instant (`started_at <= asOf`) are returned.
+   * ISO-8601. Absent ⇒ current behaviour is unchanged. P0-2.
+   *
+   * @stable
+   */
+  readonly asOf?: string;
 }
 
 /**
@@ -158,15 +166,17 @@ export class EpisodicMemory {
         const ftsHits = await this.#store.episodic.search(scope, {
           query,
           topK: topK * 2,
+          ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
-        const vectorHits = await this.#tryVectorSearch(scope, query, topK * 2);
+        const vectorHits = await this.#tryVectorSearch(scope, query, topK * 2, opts.asOf);
         const merged = mergeRecency(ftsHits, vectorHits, weights);
         const finalHits = merged.slice(0, topK);
         span.setAttributes({
           'memory.search.episodic.fts_count': ftsHits.length,
           'memory.search.episodic.vector_count': vectorHits.length,
           'memory.search.episodic.final_count': finalHits.length,
+          ...(opts.asOf !== undefined ? { 'memory.search.episodic.as_of': opts.asOf } : {}),
         });
         return finalHits;
       },
@@ -217,6 +227,7 @@ export class EpisodicMemory {
     scope: SessionScope,
     query: string,
     topK: number,
+    asOf?: string,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const embedderId = this.#embedderIdProvider();
     if (
@@ -228,7 +239,7 @@ export class EpisodicMemory {
     }
     const [vector] = await this.#embedder.embed([query]);
     if (vector === undefined) return [];
-    return this.#store.episodic.searchVector(scope, vector, embedderId, topK);
+    return this.#store.episodic.searchVector(scope, vector, embedderId, topK, asOf);
   }
 }
 

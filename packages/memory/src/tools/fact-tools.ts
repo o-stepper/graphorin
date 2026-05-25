@@ -24,6 +24,7 @@ const factSearchInputSchema = z.object({
   query: z.string().min(1).max(1024),
   topK: z.number().int().positive().max(50).optional(),
   tags: z.array(z.string().min(1)).max(16).optional(),
+  asOf: z.string().datetime().optional(),
 });
 const factSearchOutputSchema = z.object({
   hits: z.array(
@@ -63,6 +64,26 @@ const factForgetOutputSchema = z.object({
 
 type FactForgetInput = z.infer<typeof factForgetInputSchema>;
 type FactForgetOutput = z.infer<typeof factForgetOutputSchema>;
+
+const factHistoryInputSchema = z.object({
+  factId: z.string().min(1),
+});
+const factHistoryOutputSchema = z.object({
+  chain: z.array(
+    z.object({
+      factId: z.string(),
+      text: z.string(),
+      validFrom: z.string().optional(),
+      validTo: z.string().optional(),
+      supersedes: z.string().optional(),
+      supersededBy: z.string().optional(),
+      sensitivity: sensitivityEnum,
+    }),
+  ),
+});
+
+type FactHistoryInput = z.infer<typeof factHistoryInputSchema>;
+type FactHistoryOutput = z.infer<typeof factHistoryOutputSchema>;
 
 /**
  * `fact_remember` — persist a single semantic fact. The minimum-viable
@@ -112,7 +133,7 @@ export function createFactSearchTool(
   return tool<FactSearchInput, FactSearchOutput>({
     name: 'fact_search',
     description:
-      "Search the user's long-term factual memory by natural-language query. Returns up to `topK` matched facts with their score and sensitivity. Use this BEFORE asking the user a question they may have answered earlier.",
+      "Search the user's long-term factual memory by natural-language query. Returns up to `topK` matched facts with their score and sensitivity. Use this BEFORE asking the user a question they may have answered earlier. Pass `asOf` (ISO-8601) to read memory as it was at a past instant — point-in-time / 'what was true on date X' — instead of the current state.",
     inputSchema: factSearchInputSchema,
     outputSchema: factSearchOutputSchema,
     sideEffectClass: 'read-only',
@@ -124,6 +145,7 @@ export function createFactSearchTool(
       const scope = await deps.resolveScope(ctx);
       const hits = await deps.semantic.search(scope, input.query, {
         ...(input.topK !== undefined ? { topK: input.topK } : {}),
+        ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
         signal: ctx.signal,
       });
       return {
@@ -196,6 +218,46 @@ export function createFactForgetTool(
       const scope = await deps.resolveScope(ctx);
       await deps.semantic.forget(scope, input.factId, input.reason);
       return { factId: input.factId, forgotten: true };
+    },
+  });
+}
+
+/**
+ * `fact_history` — trace how a fact changed over time. Returns the
+ * full bi-temporal supersede chain the given fact belongs to, oldest →
+ * newest, including superseded entries, so the agent can answer "what
+ * did the user say before" / "how did this change". Read-only. P0-2.
+ *
+ * @stable
+ */
+export function createFactHistoryTool(
+  deps: MemoryToolDeps,
+): Tool<FactHistoryInput, FactHistoryOutput> {
+  return tool<FactHistoryInput, FactHistoryOutput>({
+    name: 'fact_history',
+    description:
+      "Trace how a fact changed over time. Given a factId, returns its full bi-temporal supersede chain (oldest → newest), including superseded entries, with each entry's validFrom/validTo. Use this to answer 'how did this change' or 'what was the previous value'.",
+    inputSchema: factHistoryInputSchema,
+    outputSchema: factHistoryOutputSchema,
+    sideEffectClass: 'read-only',
+    sandboxPolicy: 'none',
+    sensitivity: 'internal',
+    memoryGuardTier: 'pure',
+    tags: ['memory', 'semantic', 'temporal'],
+    async execute(input, ctx) {
+      const scope = await deps.resolveScope(ctx);
+      const chain = await deps.semantic.history(scope, input.factId);
+      return {
+        chain: chain.map((f) => ({
+          factId: f.id,
+          text: f.text,
+          ...(f.validFrom !== undefined ? { validFrom: f.validFrom } : {}),
+          ...(f.validTo !== undefined ? { validTo: f.validTo } : {}),
+          ...(f.supersedes !== undefined ? { supersedes: f.supersedes } : {}),
+          ...(f.supersededBy !== undefined ? { supersededBy: f.supersededBy } : {}),
+          sensitivity: f.sensitivity,
+        })),
+      };
     },
   });
 }

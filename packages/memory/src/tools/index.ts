@@ -1,5 +1,5 @@
 /**
- * Nine memory tools registered with `@graphorin/tools` by the
+ * Ten memory tools registered with `@graphorin/tools` by the
  * `createMemory()` facade. Each factory takes a {@link MemoryToolDeps}
  * bundle so consumers can scope the tool surface (per-tier ACL, scope
  * resolver, etc.) without rebuilding the underlying memory facade.
@@ -15,6 +15,7 @@ import {
 } from './block-tools.js';
 import {
   createFactForgetTool,
+  createFactHistoryTool,
   createFactRememberTool,
   createFactSearchTool,
   createFactSupersedeTool,
@@ -29,6 +30,7 @@ export {
 } from './block-tools.js';
 export {
   createFactForgetTool,
+  createFactHistoryTool,
   createFactRememberTool,
   createFactSearchTool,
   createFactSupersedeTool,
@@ -40,8 +42,9 @@ export {
 export type { MemoryToolDeps, ScopeResolver } from './types.js';
 
 /**
- * Build the canonical nine-memory-tool array. Order is stable —
- * consumers can rely on the indices for snapshot tests.
+ * Build the canonical ten-memory-tool array. Order is stable —
+ * consumers can rely on the indices for snapshot tests. `fact_history`
+ * (P0-2) is appended last so the original nine indices are unchanged.
  *
  * @stable
  */
@@ -56,6 +59,7 @@ export function buildMemoryTools(deps: MemoryToolDeps): ReadonlyArray<Tool> {
     createFactForgetTool(deps) as Tool,
     createRecallEpisodesTool(deps) as Tool,
     createConversationSearchTool(deps) as Tool,
+    createFactHistoryTool(deps) as Tool,
   ];
   return Object.freeze(tools);
 }

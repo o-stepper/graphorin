@@ -60,6 +60,51 @@ describe('@graphorin/memory/tools — fact tools', () => {
     expect(next.newId).not.toBe(first.factId);
   });
 
+  it('fact_search honours asOf (point-in-time)', async () => {
+    const memory = createMemoryWithScope();
+    const remember = findTool(memory.tools, 'fact_remember');
+    const search = findTool(memory.tools, 'fact_search');
+    const ctx = makeCtx();
+    await remember.execute(
+      {
+        text: 'residence is Berlin',
+        validFrom: '2024-01-01T00:00:00.000Z',
+        validTo: '2024-06-01T00:00:00.000Z',
+      },
+      ctx,
+    );
+    await remember.execute(
+      { text: 'residence is Munich', validFrom: '2024-06-01T00:00:00.000Z' },
+      ctx,
+    );
+    const before = (await search.execute(
+      { query: 'residence', asOf: '2024-03-01T00:00:00.000Z' },
+      ctx,
+    )) as { hits: Array<{ text: string }> };
+    expect(before.hits.map((h) => h.text)).toEqual(['residence is Berlin']);
+  });
+
+  it('fact_history returns the ordered supersede chain', async () => {
+    const memory = createMemoryWithScope();
+    const remember = findTool(memory.tools, 'fact_remember');
+    const supersede = findTool(memory.tools, 'fact_supersede');
+    const history = findTool(memory.tools, 'fact_history');
+    const ctx = makeCtx();
+    const first = (await remember.execute(
+      { text: 'residence is Moscow', validFrom: '2024-01-01T00:00:00.000Z' },
+      ctx,
+    )) as { factId: string };
+    const next = (await supersede.execute(
+      { oldId: first.factId, newText: 'residence is Tbilisi' },
+      ctx,
+    )) as { oldId: string; newId: string };
+    const out = (await history.execute({ factId: next.newId }, ctx)) as {
+      chain: Array<{ factId: string; text: string }>;
+    };
+    expect(out.chain.map((c) => c.factId)).toEqual([first.factId, next.newId]);
+    expect(out.chain.map((c) => c.text)).toEqual(['residence is Moscow', 'residence is Tbilisi']);
+  });
+
   it('fact_forget soft-deletes the fact', async () => {
     const memory = createMemoryWithScope();
     const remember = findTool(memory.tools, 'fact_remember');
@@ -121,6 +166,7 @@ describe('@graphorin/memory/tools — guard wiring', () => {
     expect(tools.fact_supersede?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_forget?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_search?.memoryGuardTier).toBe('pure');
+    expect(tools.fact_history?.memoryGuardTier).toBe('pure');
     expect(tools.recall_episodes?.memoryGuardTier).toBe('pure');
     expect(tools.conversation_search?.memoryGuardTier).toBe('pure');
   });

@@ -581,6 +581,9 @@ export function createInMemoryStore(
         for (const episode of episodes) {
           if (episode.userId !== scope.userId) continue;
           if (episode.deletedAt !== undefined) continue;
+          if (opts.asOf !== undefined && Date.parse(episode.startedAt) > Date.parse(opts.asOf)) {
+            continue;
+          }
           if (q === '*' || episode.summary.toLowerCase().includes(q)) {
             out.push({ record: episode, score: 1, signals: { bm25: 1 } });
           }
@@ -635,11 +638,34 @@ export function createInMemoryStore(
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
+          if (opts.asOf !== undefined && !factValidAt(fact, opts.asOf)) continue;
           if (q === '*' || fact.text.toLowerCase().includes(q)) {
             out.push({ record: fact, score: 1, signals: { bm25: 1 } });
           }
           if (out.length >= topK) break;
         }
+        return out;
+      },
+      async historyOf(scope, factId) {
+        const seen = new Set<string>();
+        const queue = [factId];
+        const out: Fact[] = [];
+        while (queue.length > 0) {
+          const id = queue.shift();
+          if (id === undefined || seen.has(id)) continue;
+          seen.add(id);
+          const fact = facts.find((f) => f.id === id && f.userId === scope.userId);
+          if (fact === undefined) continue;
+          out.push(fact);
+          if (fact.supersedes !== undefined) queue.push(fact.supersedes);
+          if (fact.supersededBy !== undefined) queue.push(fact.supersededBy);
+          for (const f of facts) {
+            if (f.userId === scope.userId && (f.supersedes === id || f.supersededBy === id)) {
+              queue.push(f.id);
+            }
+          }
+        }
+        out.sort((a, b) => factOrderEpoch(a) - factOrderEpoch(b));
         return out;
       },
       async searchVector(scope, embedding, embedderId, topK) {
@@ -835,6 +861,19 @@ function renderMessageText(message: Message): string {
       return '';
     })
     .join(' ');
+}
+
+/** Mirror the store's fact validity-interval check for `asOf` reads. */
+function factValidAt(fact: Fact, asOf: string): boolean {
+  const at = Date.parse(asOf);
+  const from = fact.validFrom !== undefined ? Date.parse(fact.validFrom) : null;
+  const to = fact.validTo !== undefined ? Date.parse(fact.validTo) : null;
+  return (from === null || from <= at) && (to === null || to > at);
+}
+
+/** Sort key for `historyOf` — `validFrom`, falling back to `createdAt`. */
+function factOrderEpoch(fact: Fact): number {
+  return Date.parse(fact.validFrom ?? fact.createdAt);
 }
 
 function cosine(a: Float32Array, b: Float32Array): number {

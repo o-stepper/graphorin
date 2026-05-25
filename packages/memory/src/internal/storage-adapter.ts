@@ -47,6 +47,8 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    /** Point-in-time filter (`started_at <= asOf`, ISO-8601). P0-2. */
+    asOf?: string,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
   /** Mark an episode archived. Soft-archive — the row stays for replay. */
   archive?(id: string, reason?: string): Promise<void>;
@@ -66,6 +68,11 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
     embedding: Float32Array,
     embedderId: string,
     topK: number,
+    /**
+     * Point-in-time filter applied after KNN: only facts whose
+     * validity interval contains `asOf` (ISO-8601) survive. P0-2.
+     */
+    asOf?: string,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   /** Lookup a single fact by id (returns `null` when absent or soft-deleted). */
   get?(id: string): Promise<Fact | null>;
@@ -75,6 +82,16 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * Distinct from {@link SemanticMemoryStore.forget} (soft-delete).
    */
   purge?(id: string, reason?: string): Promise<void>;
+  /**
+   * Walk the bi-temporal supersede chain that `factId` belongs to and
+   * return every fact in it, oldest → newest (by `validFrom`),
+   * including superseded / soft-deleted rows so callers can answer
+   * "how did this fact change over time". Scope-guarded and
+   * cycle-safe; returns `[]` for an unknown id. Powers
+   * {@link SemanticMemory.history} (P0-2). The default
+   * `@graphorin/store-sqlite` adapter implements it.
+   */
+  historyOf?(scope: SessionScope, factId: string): Promise<ReadonlyArray<Fact>>;
 }
 
 /**

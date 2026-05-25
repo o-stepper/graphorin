@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import type { MemoryStoreAdapter } from '../src/index.js';
+import { describe, expect, expectTypeOf, it } from 'vitest';
+import type { EpisodeSearchOptions, FactSearchOptions, MemoryStoreAdapter } from '../src/index.js';
 import {
   createMemory,
   defineBlock,
@@ -297,6 +297,64 @@ describe('@graphorin/memory/tiers — SemanticMemory', () => {
     await memory.semantic.remember(SCOPE, { text: 'is allergic to peanuts' });
     const hits = await memory.semantic.search(SCOPE, 'coffee');
     expect(hits.length).toBeGreaterThan(0);
+  });
+
+  it('search honours asOf (point-in-time validity interval)', async () => {
+    const memory = makeMemory();
+    await memory.semantic.remember(SCOPE, {
+      text: 'residence is Berlin',
+      validFrom: '2024-01-01T00:00:00.000Z',
+      validTo: '2024-06-01T00:00:00.000Z',
+    });
+    await memory.semantic.remember(SCOPE, {
+      text: 'residence is Munich',
+      validFrom: '2024-06-01T00:00:00.000Z',
+    });
+    const before = await memory.semantic.search(SCOPE, 'residence', {
+      asOf: '2024-03-01T00:00:00.000Z',
+    });
+    expect(before.map((h) => h.record.text)).toEqual(['residence is Berlin']);
+    const after = await memory.semantic.search(SCOPE, 'residence', {
+      asOf: '2024-09-01T00:00:00.000Z',
+    });
+    expect(after.map((h) => h.record.text)).toEqual(['residence is Munich']);
+    const live = await memory.semantic.search(SCOPE, 'residence');
+    expect(live.length).toBe(2);
+  });
+
+  it('history returns the ordered supersede chain incl. soft-deleted rows', async () => {
+    const memory = makeMemory();
+    const first = await memory.semantic.remember(SCOPE, {
+      text: 'residence is Moscow',
+      validFrom: '2024-01-01T00:00:00.000Z',
+    });
+    const { new: second } = await memory.semantic.supersede(SCOPE, first.id, {
+      text: 'residence is Tbilisi',
+      validFrom: '2024-06-01T00:00:00.000Z',
+    });
+    const chain = await memory.semantic.history(SCOPE, second.id);
+    expect(chain.map((f) => f.id)).toEqual([first.id, second.id]);
+
+    await memory.semantic.forget(SCOPE, first.id);
+    const afterForget = await memory.semantic.history(SCOPE, second.id);
+    expect(afterForget.map((f) => f.id)).toEqual([first.id, second.id]);
+  });
+
+  it('history surfaces a friendly error when the adapter has no hook', async () => {
+    const memory = createMemory({
+      store: createInMemoryStoreWithoutLifecycleExt(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+    });
+    await expect(memory.semantic.history(SCOPE, 'fact_x')).rejects.toThrow(/semantic\.history/);
+  });
+});
+
+describe('@graphorin/memory/tiers — temporal (asOf) types', () => {
+  it('FactSearchOptions and EpisodeSearchOptions expose asOf', () => {
+    expectTypeOf<FactSearchOptions>().toHaveProperty('asOf');
+    expectTypeOf<FactSearchOptions['asOf']>().toEqualTypeOf<string | undefined>();
+    expectTypeOf<EpisodeSearchOptions>().toHaveProperty('asOf');
+    expectTypeOf<EpisodeSearchOptions['asOf']>().toEqualTypeOf<string | undefined>();
   });
 });
 

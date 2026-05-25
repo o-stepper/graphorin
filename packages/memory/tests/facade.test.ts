@@ -8,7 +8,7 @@ import {
 } from './fixtures/in-memory-store.js';
 
 describe('@graphorin/memory — createMemory facade', () => {
-  it('wires every six tier sub-module + nine memory tools', () => {
+  it('wires every six tier sub-module + ten memory tools', () => {
     const memory = createMemory({
       store: createInMemoryStore(),
       embeddings: new InMemoryEmbeddingRegistry(),
@@ -20,7 +20,7 @@ describe('@graphorin/memory — createMemory facade', () => {
     expect(memory.semantic).toBeDefined();
     expect(memory.procedural).toBeDefined();
     expect(memory.shared).toBeDefined();
-    expect(memory.tools.length).toBe(9);
+    expect(memory.tools.length).toBe(10);
     const names = memory.tools.map((t) => t.name);
     expect(names).toEqual([
       'block_append',
@@ -32,6 +32,7 @@ describe('@graphorin/memory — createMemory facade', () => {
       'fact_forget',
       'recall_episodes',
       'conversation_search',
+      'fact_history',
     ]);
   });
 
