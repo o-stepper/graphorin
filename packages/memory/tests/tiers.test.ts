@@ -1,4 +1,4 @@
-import type { MemoryProvenance } from '@graphorin/core';
+import type { Fact, MemoryHit, MemoryProvenance } from '@graphorin/core';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 import type {
   EpisodeSearchOptions,
@@ -409,6 +409,62 @@ describe('@graphorin/memory/tiers — SemanticMemory provenance + quarantine (P1
       embeddings: new InMemoryEmbeddingRegistry(),
     });
     await expect(memory.semantic.validate(SCOPE, 'fact_x')).rejects.toThrow(/semantic\.setStatus/);
+  });
+});
+
+describe('@graphorin/memory/tiers — neighbors + bi-temporal supersede (P0-3)', () => {
+  it('neighbors returns raw vector hits including quarantined facts', async () => {
+    const memory = makeMemory({ embedder: createStubEmbedder() });
+    // A synthesized (extraction) write lands quarantined.
+    const fact = await memory.semantic.remember(SCOPE, {
+      text: 'the user is learning to play the cello',
+      provenance: 'extraction',
+    });
+    expect(fact.status).toBe('quarantined');
+    // Quarantined → invisible to default (action-driving) recall...
+    expect((await memory.semantic.search(SCOPE, 'cello')).length).toBe(0);
+    // ...but visible to the reconcile neighbour lookup so prior synthesized
+    // memories can still be reconciled against.
+    const ids = (await memory.semantic.neighbors(SCOPE, 'learning the cello', { topK: 10 })).map(
+      (h) => h.record.id,
+    );
+    expect(ids).toContain(fact.id);
+  });
+
+  it('neighbors returns [] when no embedder is configured (graceful degrade)', async () => {
+    const memory = makeMemory(); // no embedder
+    await memory.semantic.remember(SCOPE, { text: 'has a cat named Mochi' });
+    expect(await memory.semantic.neighbors(SCOPE, 'cat')).toEqual([]);
+  });
+
+  it('supersede closes the old validity interval so asOf excludes it', async () => {
+    const memory = makeMemory();
+    const first = await memory.semantic.remember(SCOPE, {
+      text: 'residence is Berlin',
+      validFrom: '2024-01-01T00:00:00.000Z',
+    });
+    const { new: second } = await memory.semantic.supersede(
+      SCOPE,
+      first.id,
+      { text: 'residence is Munich', validFrom: '2024-06-01T00:00:00.000Z' },
+      'moved',
+    );
+    const after = await memory.semantic.search(SCOPE, 'residence', {
+      asOf: '2024-09-01T00:00:00.000Z',
+    });
+    expect(after.map((h) => h.record.id)).toEqual([second.id]);
+    const before = await memory.semantic.search(SCOPE, 'residence', {
+      asOf: '2024-03-01T00:00:00.000Z',
+    });
+    expect(before.map((h) => h.record.id)).toEqual([first.id]);
+  });
+
+  it('SemanticMemory.neighbors has the expected type', () => {
+    const memory = makeMemory();
+    expectTypeOf(memory.semantic.neighbors).toBeFunction();
+    expectTypeOf(memory.semantic.neighbors).returns.resolves.toEqualTypeOf<
+      ReadonlyArray<MemoryHit<Fact>>
+    >();
   });
 });
 

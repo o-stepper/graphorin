@@ -72,6 +72,15 @@ any `EmbedderProvider`; the default is
   `defineLocalePack({...})`. Operators can disable the pipeline with
   `createMemory({ conflictPipeline: { mode: 'off' } })` (a one-shot
   WARN surfaces so the regression risk is visible).
+- **Neighbour-aware write reconciliation** (consolidator standard phase).
+  Extracted facts are reconciled against their nearest neighbours via an
+  extract→reconcile loop: a cheap pre-filter (the pipeline's exact-dedup +
+  embedding zones over `SemanticMemory.neighbors(...)`) resolves clear
+  duplicates / independents with no LLM call, and only the ambiguous mid-zone
+  spends one reconcile pass choosing add / update / noop / conflict. Updates
+  and conflicts route through the bi-temporal supersede (never a delete);
+  every decision is audited in `fact_conflicts` and new facts inherit the
+  `extraction` provenance gate.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to
@@ -88,7 +97,8 @@ any `EmbedderProvider`; the default is
   recorded `'merged'` / `'per-agent'` (the rendering mode is consumed
   by the consolidator in Phase 10c).
 - **Default-on bi-temporal storage.** Fact writes set `validFrom = now`
-  and leave `validTo = null`; supersede chains are kept intact for
+  and leave `validTo = null`; a supersede closes the old fact's `validTo`
+  (so `as_of` queries reflect the change) and keeps the chain intact for
   later replay. The advanced `as_of_date` query API is opt-in
   (post-MVP).
 - **`memory.compile(scope)` + `memory.metadata(scope)`.** The

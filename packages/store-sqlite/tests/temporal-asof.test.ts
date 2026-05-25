@@ -158,6 +158,78 @@ describe('semantic historyOf supersede chain', () => {
   });
 });
 
+describe('semantic supersede closes the old validity interval (P0-3)', () => {
+  it('sets valid_to on supersede so asOf excludes the superseded fact', async () => {
+    const store = await makeStore();
+    const sem = store.memory.semantic;
+    // Open-ended A: validFrom set, valid_to NULL.
+    await sem.remember({
+      id: 'oldF',
+      kind: 'semantic',
+      userId: 'alex',
+      sensitivity: 'internal',
+      text: 'Primary language is Python.',
+      validFrom: A_FROM,
+      createdAt: A_FROM,
+    });
+    // B replaces A, taking effect at B_FROM.
+    await sem.supersede(
+      'oldF',
+      {
+        id: 'newF',
+        kind: 'semantic',
+        userId: 'alex',
+        sensitivity: 'internal',
+        text: 'Primary language is Rust.',
+        validFrom: B_FROM,
+        supersedes: 'oldF',
+        createdAt: B_FROM,
+      },
+      'switched to Rust',
+    );
+
+    // The previously-open interval is now closed exactly at B's validFrom.
+    const rows = store.connection.all<{ valid_to: number | null; superseded_by: string | null }>(
+      'SELECT valid_to, superseded_by FROM facts WHERE id = ?',
+      ['oldF'],
+    );
+    expect(rows[0]?.valid_to).toBe(Date.parse(B_FROM));
+    expect(rows[0]?.superseded_by).toBe('newF');
+
+    // The supersede is recorded in the audit log.
+    const audit = store.connection.all<{ event: string }>(
+      "SELECT event FROM memory_history WHERE memory_id = ? AND event = 'SUPERSEDE'",
+      ['oldF'],
+    );
+    expect(audit).toHaveLength(1);
+
+    // asOf AFTER the switch: only the new fact is live (the old interval closed).
+    const after = await sem.search(SCOPE, { query: 'language', asOf: AFTER });
+    expect(after.map((h) => h.record.id)).toEqual(['newF']);
+
+    // asOf BEFORE the switch (inside A's now-closed interval): the old fact is live.
+    const before = await sem.search(SCOPE, { query: 'language', asOf: BEFORE });
+    expect(before.map((h) => h.record.id)).toEqual(['oldF']);
+
+    await store.close();
+  });
+
+  it('never clobbers an interval the caller already closed explicitly', async () => {
+    const store = await makeStore();
+    const sem = store.memory.semantic;
+    // A is created already closed at A_TO.
+    await sem.remember(factA());
+    await sem.supersede('fA', factB({ supersedes: 'fA' }), 'moved');
+    const rows = store.connection.all<{ valid_to: number | null }>(
+      'SELECT valid_to FROM facts WHERE id = ?',
+      ['fA'],
+    );
+    // COALESCE keeps the explicit A_TO close — supersede does not move it.
+    expect(rows[0]?.valid_to).toBe(Date.parse(A_TO));
+    await store.close();
+  });
+});
+
 function episode(id: string, startedAt: string, endedAt: string, summary: string): Episode {
   return {
     id,

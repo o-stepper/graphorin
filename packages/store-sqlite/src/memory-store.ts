@@ -777,15 +777,23 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   async supersede(oldId: string, newFact: Fact, reason?: string): Promise<void> {
+    const now = Date.now();
+    // Bi-temporal supersede (P0-3): close the old fact's validity interval
+    // so point-in-time (`asOf`) queries stop returning it once the new
+    // version takes effect — previously only `superseded_by` was set, which
+    // left the old interval open forever and broke `asOf(now)`. The interval
+    // closes at the new fact's `validFrom` (the instant the replacement takes
+    // effect) so the hand-off is seamless. `COALESCE` makes it idempotent and
+    // never clobbers an interval the caller already closed explicitly.
+    const closeAt = newFact.validFrom ? toEpoch(newFact.validFrom) : now;
     this.#conn.transaction(() => {
-      this.#conn.run('UPDATE facts SET superseded_by = ?, updated_at = ? WHERE id = ?', [
-        newFact.id,
-        Date.now(),
-        oldId,
-      ]);
+      this.#conn.run(
+        'UPDATE facts SET superseded_by = ?, valid_to = COALESCE(valid_to, ?), updated_at = ? WHERE id = ?',
+        [newFact.id, closeAt, now, oldId],
+      );
       this.#conn.run(
         `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        ['fact', oldId, null, newFact.text, 'SUPERSEDE', 'agent', null, Date.now()],
+        ['fact', oldId, null, newFact.text, 'SUPERSEDE', 'agent', null, now],
       );
     });
     void reason;

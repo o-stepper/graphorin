@@ -358,6 +358,26 @@ export class SemanticMemory {
     );
   }
 
+  /**
+   * Raw vector KNN neighbours for the consolidator's reconcile
+   * pre-filter (P0-3). Unlike {@link search} this skips FTS, reranking,
+   * and decay so the cosine scores survive intact (the conflict-pipeline
+   * zone thresholds are calibrated against them), and it **includes
+   * quarantined facts** so prior synthesized memories are visible to
+   * reconciliation. Returns `[]` when no embedder / vector adapter is
+   * configured — the consolidator then treats every candidate as a
+   * fresh `add`, degrading gracefully to the pre-reconcile behaviour.
+   *
+   * @stable
+   */
+  async neighbors(
+    scope: SessionScope,
+    text: string,
+    opts: { readonly topK?: number } = {},
+  ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    return this.#tryVectorSearch(scope, text, opts.topK ?? 10, undefined, true);
+  }
+
   /** Lookup a single fact by id. Returns `null` for soft-deleted / missing. */
   async get(scope: SessionScope, factId: string): Promise<Fact | null> {
     return withMemorySpan(

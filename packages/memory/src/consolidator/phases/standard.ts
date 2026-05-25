@@ -13,17 +13,27 @@
  */
 
 import type { Provider, ProviderRequest, SessionScope, Tracer } from '@graphorin/core';
+import {
+  type ConflictDecision,
+  type ReconcileDecision,
+  reconcileToConflictDecision,
+} from '../../conflict/index.js';
+import { newMemoryId } from '../../internal/id.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
   MemoryStoreAdapter,
   SessionMessageRecord,
 } from '../../internal/storage-adapter.js';
-import type { SemanticMemory } from '../../tiers/semantic-memory.js';
+import type { FactInput, SemanticMemory } from '../../tiers/semantic-memory.js';
 import type { BudgetTracker } from '../budget.js';
 import { tipMessageId } from '../idempotency.js';
 import { applyNoiseFilters, type NoiseFilterPreset, renderText } from '../noise-filter.js';
+import { preFilterCandidate, reconcileCandidate } from '../reconcile.js';
 import type { PhaseOutcome } from '../types.js';
+
+/** Top-s nearest neighbours surfaced to the reconcile pre-filter + LLM. */
+const RECONCILE_TOP_K = 10;
 
 /** Inputs accepted by {@link runStandardPhase}. */
 export interface StandardPhaseDeps {
@@ -143,30 +153,127 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
 
       const facts = parseExtraction(response.text);
       let factsCreated = 0;
-      const totalTokens =
+      let factsUpdated = 0;
+      let conflictsResolved = 0;
+      let reconcileTokens = 0;
+      let reconcileCost = 0;
+      const extractionTokens =
         (usage.promptTokens ?? 0) + (usage.completionTokens ?? 0) + (usage.reasoningTokens ?? 0);
-      const snapshot = deps.budget.record({
-        phase: 'standard',
-        tokens: totalTokens,
-        costUsd: cost,
-      });
+      deps.budget.record({ phase: 'standard', tokens: extractionTokens, costUsd: cost });
 
       for (const fact of facts) {
         if (fact.text.trim().length === 0) continue;
-        // P1-4: distilled-from-transcript facts are synthesized memory —
-        // tag them `extraction` so they land quarantined (excluded from
-        // action-driving recall until validated).
-        const input: Parameters<SemanticMemory['remember']>[1] = {
-          text: fact.text,
-          provenance: 'extraction',
-        };
-        if (fact.subject !== undefined) Object.assign(input, { subject: fact.subject });
-        if (fact.predicate !== undefined) Object.assign(input, { predicate: fact.predicate });
-        if (fact.object !== undefined) Object.assign(input, { object: fact.object });
-        if (fact.confidence !== undefined) Object.assign(input, { confidence: fact.confidence });
-        await deps.semantic.remember(deps.scope, input);
-        factsCreated += 1;
+        const input = buildFactInput(fact);
+
+        // Neighbour-aware reconciliation (P0-3). A cheap, LLM-free pre-filter
+        // (Stage 1 exact-dedup + Stage 2 embedding zones) classifies the
+        // candidate against its nearest neighbours; only the ambiguous
+        // CONFLICT-CHECK mid-zone spends a reconcile LLM call. With no
+        // embedder configured `neighbors` is empty → every candidate is a
+        // fresh `add`, preserving the pre-reconcile behaviour.
+        const neighbors = await deps.semantic.neighbors(deps.scope, fact.text, {
+          topK: RECONCILE_TOP_K,
+        });
+        const route = await preFilterCandidate(fact.text, neighbors);
+
+        let decision: ReconcileDecision;
+        let audited: ConflictDecision;
+        if (route.route === 'reconcile' && !deps.budget.snapshot().paused) {
+          const result = await reconcileCandidate({
+            candidateText: fact.text,
+            neighbors: neighbors.map((h) => ({
+              id: h.record.id,
+              text: h.record.text,
+              ...(h.record.validFrom !== undefined ? { validFrom: h.record.validFrom } : {}),
+            })),
+            provider: deps.provider,
+            scope: deps.scope,
+          });
+          decision = result.decision;
+          audited = reconcileToConflictDecision(decision);
+          reconcileTokens += result.usage.totalTokens;
+          const callCost =
+            deps.priceUsage?.({
+              promptTokens: result.usage.promptTokens,
+              completionTokens: result.usage.completionTokens,
+            }) ?? 0;
+          reconcileCost += callCost;
+          deps.budget.record({
+            phase: 'standard',
+            tokens: result.usage.totalTokens,
+            costUsd: callCost,
+          });
+        } else if (route.route === 'reconcile') {
+          // Mid-zone but the budget is exhausted — fall back to a safe
+          // additive write rather than spending an over-budget LLM call.
+          decision = { action: 'add', reason: 'reconcile-budget-paused' };
+          audited = { kind: 'admit', stage: 'defer-to-deep', reason: 'reconcile-budget-paused' };
+        } else if (route.route === 'noop') {
+          decision = { action: 'noop', targetId: route.targetId, reason: route.reason };
+          audited = {
+            kind: 'dedup',
+            stage: route.reason === 'exact-hash-match' ? 'exact-dedup' : 'embedding-three-zone',
+            existingId: route.targetId,
+            ...(route.similarity !== undefined ? { similarity: route.similarity } : {}),
+            reason: route.reason,
+          };
+        } else {
+          decision = { action: 'add', reason: route.reason };
+          audited = { kind: 'admit', stage: 'embedding-three-zone', reason: route.reason };
+        }
+
+        // Apply the decision. Updates / conflicts route through the
+        // bi-temporal supersede (close the old interval, insert the new) —
+        // never a destructive delete (P0-3).
+        let candidateId: string;
+        switch (decision.action) {
+          case 'add': {
+            // `pipeline: 'off'` — the standard phase has already made the
+            // conflict decision; a second inline pass would re-search +
+            // double-audit.
+            const stored = await deps.semantic.remember(deps.scope, input, { pipeline: 'off' });
+            candidateId = stored.id;
+            factsCreated += 1;
+            break;
+          }
+          case 'noop': {
+            // Duplicate of `targetId` — record the dedup, write nothing.
+            candidateId = newMemoryId('fact');
+            break;
+          }
+          case 'update': {
+            const { new: stored } = await deps.semantic.supersede(
+              deps.scope,
+              decision.targetId,
+              input,
+              decision.reason,
+            );
+            candidateId = stored.id;
+            factsUpdated += 1;
+            break;
+          }
+          case 'conflict': {
+            const { new: stored } = await deps.semantic.supersede(
+              deps.scope,
+              decision.targetId,
+              input,
+              decision.reason,
+            );
+            candidateId = stored.id;
+            factsUpdated += 1;
+            conflictsResolved += 1;
+            break;
+          }
+        }
+
+        // Every decision is auditable in `fact_conflicts` (best-effort —
+        // a store without the conflict surface simply skips it).
+        await recordConflictDecision(deps.store, deps.scope, candidateId, audited);
       }
+
+      const totalTokens = extractionTokens + reconcileTokens;
+      const totalCost = cost + reconcileCost;
+      const snapshot = deps.budget.snapshot();
 
       span.setAttributes({
         'consolidator.duration_ms': Math.max(
@@ -174,11 +281,14 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
           (typeof deps.now === 'function' ? deps.now : Date.now)() - startedAt,
         ),
         'consolidator.facts_extracted': factsCreated,
-        'consolidator.budget_used_usd': cost,
+        'consolidator.budget_used_usd': totalCost,
         'consolidator.standard.facts_extracted': factsCreated,
+        'consolidator.standard.facts_updated': factsUpdated,
+        'consolidator.standard.conflicts_resolved': conflictsResolved,
+        'consolidator.standard.reconcile_tokens': reconcileTokens,
         'consolidator.standard.tokens.input': usage.promptTokens,
         'consolidator.standard.tokens.output': usage.completionTokens,
-        'consolidator.standard.cost.estimate.usd': cost,
+        'consolidator.standard.cost.estimate.usd': totalCost,
         'consolidator.budget.remaining.tokens': snapshot.tokensRemaining,
         'consolidator.budget.remaining.usd': snapshot.costRemaining,
         'consolidator.exceeded': snapshot.paused,
@@ -191,12 +301,12 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         phase: 'standard',
         status: 'completed',
         factsCreated,
-        factsUpdated: 0,
-        conflictsResolved: 0,
+        factsUpdated,
+        conflictsResolved,
         noiseFilteredCount: filtered.droppedCount,
         emptyExtractions: facts.length === 0 ? 1 : 0,
         llmTokensUsed: totalTokens,
-        llmCostUsd: cost,
+        llmCostUsd: totalCost,
         errorMessage: null,
       };
     },
@@ -286,6 +396,52 @@ function sliceJsonObject(text: string): string | null {
   const end = text.lastIndexOf('}');
   if (start < 0 || end < start) return null;
   return text.slice(start, end + 1);
+}
+
+/**
+ * Build the {@link FactInput} for an extracted candidate. P1-4:
+ * distilled-from-transcript facts are synthesized memory — tagged
+ * `extraction` so they land quarantined (excluded from action-driving
+ * recall until validated).
+ */
+function buildFactInput(fact: ExtractedFact): FactInput {
+  return {
+    text: fact.text,
+    provenance: 'extraction',
+    ...(fact.subject !== undefined ? { subject: fact.subject } : {}),
+    ...(fact.predicate !== undefined ? { predicate: fact.predicate } : {}),
+    ...(fact.object !== undefined ? { object: fact.object } : {}),
+    ...(fact.confidence !== undefined ? { confidence: fact.confidence } : {}),
+  };
+}
+
+/**
+ * Record a reconcile / pre-filter decision into `fact_conflicts` so every
+ * write-path decision stays auditable (P0-3). Best-effort: a storage
+ * adapter without the conflict surface simply skips it.
+ */
+async function recordConflictDecision(
+  store: MemoryStoreAdapter,
+  scope: SessionScope,
+  candidateId: string,
+  decision: ConflictDecision,
+): Promise<void> {
+  const conflicts = store.conflicts;
+  if (conflicts === undefined) return;
+  await conflicts.recordDecision({
+    scope,
+    candidateId,
+    decision: decision.kind,
+    stage: decision.stage,
+    ...(decision.kind === 'dedup' || decision.kind === 'supersede'
+      ? { existingId: decision.existingId }
+      : {}),
+    ...(decision.kind === 'dedup' && decision.similarity !== undefined
+      ? { similarity: decision.similarity }
+      : {}),
+    ...(decision.reason !== undefined ? { reason: decision.reason } : {}),
+    detectedBy: 'reconcile',
+  });
 }
 
 function emptyOutcome(status: PhaseOutcome['status']): PhaseOutcome {

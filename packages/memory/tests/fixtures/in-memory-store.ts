@@ -702,7 +702,15 @@ export function createInMemoryStore(
         if (idx >= 0) {
           const old = facts[idx];
           if (old !== undefined) {
-            facts[idx] = { ...old, supersededBy: newFact.id, updatedAt: new Date().toISOString() };
+            // Mirror the sqlite adapter: close the old validity interval at
+            // the new fact's validFrom (COALESCE — never clobber an explicit
+            // close) so asOf queries exclude the superseded fact (P0-3).
+            facts[idx] = {
+              ...old,
+              supersededBy: newFact.id,
+              validTo: old.validTo ?? newFact.validFrom ?? new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
           }
         }
       },

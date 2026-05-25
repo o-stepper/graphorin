@@ -21,6 +21,9 @@ export {
   type ConflictThresholds,
   DEFAULT_CONFLICT_THRESHOLDS,
   type PipelineStage,
+  type ReconcileAction,
+  type ReconcileDecision,
+  reconcileToConflictDecision,
   type StageContext,
   type StageOutcome,
 } from './types.js';
