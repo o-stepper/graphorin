@@ -48,6 +48,7 @@ import { composeLayer1 } from './context-engine/templates/composer.js';
 import type { ContextualRetrievalMode } from './internal/contextualize.js';
 import { bindEmbedder } from './internal/embedder-binding.js';
 import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/storage-adapter.js';
+import { createProviderQueryTransformer } from './search/query-transform.js';
 import { RRFReranker } from './search/rrf.js';
 import type { ReRanker } from './search/types.js';
 import { EpisodicMemory } from './tiers/episodic-memory.js';
@@ -92,6 +93,25 @@ export interface CreateMemoryOptions {
    * `consolidator: { contextualRetrieval: 'llm' }`.
    */
   readonly contextualRetrieval?: 'off' | 'late-chunk';
+  /**
+   * Query transformation for retrieval (P2-3, opt-in). When supplied,
+   * `SemanticMemory.search(..., { multiQuery })` fans the query into
+   * reworded variants (multi-query / RAG-Fusion) and `{ hyde }` adds a
+   * hypothetical-answer embedding — both via one cheap LLM call on the
+   * given provider, fused through the existing RRF reranker. Omitted (the
+   * default) ⇒ search stays **offline + single-shot** and the
+   * `multiQuery` / `hyde` search options become silent no-ops. Reserve it
+   * for retrieval-heavy recall, not every search (it adds provider
+   * latency).
+   */
+  readonly queryTransform?: {
+    /** Cheap provider used to rewrite the query / write the HyDE passage. */
+    readonly provider: Provider;
+    /** Hard ceiling on reworded variants requested per call. Default 5. */
+    readonly maxVariants?: number;
+    /** Output-token ceiling per transform call. Default 256. */
+    readonly maxTokens?: number;
+  };
   /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws — the
@@ -248,6 +268,19 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     embedderIdProvider,
   });
   const conflictPipeline = createConflictPipeline(options.conflictPipeline ?? {});
+  // P2-3: build the (opt-in) query transformer from the supplied provider.
+  // Absent ⇒ `null` ⇒ search stays offline + single-shot.
+  const queryTransformer =
+    options.queryTransform !== undefined
+      ? createProviderQueryTransformer(options.queryTransform.provider, {
+          ...(options.queryTransform.maxVariants !== undefined
+            ? { maxVariants: options.queryTransform.maxVariants }
+            : {}),
+          ...(options.queryTransform.maxTokens !== undefined
+            ? { maxTokens: options.queryTransform.maxTokens }
+            : {}),
+        })
+      : null;
   const semantic = new SemanticMemory({
     store: options.store,
     tracer,
@@ -258,6 +291,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     ...(options.contextualRetrieval !== undefined
       ? { contextualRetrieval: options.contextualRetrieval }
       : {}),
+    ...(queryTransformer !== null ? { queryTransformer } : {}),
   });
   const procedural = new ProceduralMemory({ store: options.store, tracer });
   const shared = new SharedMemory({ store: options.store, tracer });

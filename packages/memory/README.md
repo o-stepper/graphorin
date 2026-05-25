@@ -129,6 +129,15 @@ any `EmbedderProvider`; the default is
   (`createMemory({ consolidator: { decayCapacity } })`, default unbounded)
   bounds storage: the lowest-salience facts are **soft-archived** (recoverable —
   `archived = 1`, never deleted) until the window fits.
+- **Query transformation** (read path; multi-query / RAG-Fusion + opt-in HyDE).
+  `search(scope, query, { multiQuery: N })` fans the query into up to `N - 1`
+  reworded variants via one cheap LLM call, retrieves each, and fuses every list
+  through the same RRF reranker — recovering memories whose stored wording
+  differs from the question. `{ hyde: true }` additionally embeds a hypothetical
+  answer (arXiv:2212.10496) and fuses its neighbours. Both are **opt-in**, wired
+  by `createMemory({ queryTransform: { provider } })`; with no transformer (the
+  default) search stays **offline + single-shot** and these options are silent
+  no-ops. Reserve it for retrieval-heavy recall — it adds provider latency.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

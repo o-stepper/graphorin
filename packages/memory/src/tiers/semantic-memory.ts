@@ -16,6 +16,7 @@ import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { explainRecall } from '../search/explain.js';
+import type { QueryTransformer } from '../search/query-transform.js';
 import { fuseRrf } from '../search/rrf.js';
 import type { ReRanker } from '../search/types.js';
 
@@ -95,6 +96,33 @@ export interface FactSearchOptions {
     /** Override the wall clock (test seam). */
     readonly now?: () => number;
   };
+  /**
+   * Multi-query / RAG-Fusion (P2-3). When set to `N > 1` *and* a query
+   * transformer is configured (`createMemory({ queryTransform })`), the
+   * query is fanned into up to `N - 1` reworded variants via one cheap
+   * LLM call; each variant is retrieved (FTS + vector) and **all** lists
+   * are fused through the existing RRF reranker — recovering memories
+   * whose stored wording differs from the user's phrasing. `N` bounds
+   * the *total* query strings, including the original. Offline (no
+   * transformer, or `N <= 1`) this is a **silent no-op**: search stays
+   * single-shot and makes no provider call. Opt-in + retrieval-heavy, so
+   * reserve it for deliberate recall rather than every search.
+   *
+   * @stable
+   */
+  readonly multiQuery?: number;
+  /**
+   * HyDE — Hypothetical Document Embeddings (arXiv:2212.10496), P2-3.
+   * When `true` *and* both a query transformer and an embedder are
+   * configured, generate a short hypothetical answer, embed it, and fuse
+   * its vector neighbours into the result. Helps short / ambiguous
+   * queries but adds a generate + embed round-trip and can drift — hence
+   * opt-in. With no transformer (or no embedder) this is a silent no-op
+   * and no provider call is made.
+   *
+   * @stable
+   */
+  readonly hyde?: boolean;
 }
 
 /**
@@ -155,6 +183,7 @@ export class SemanticMemory {
   readonly #embedderIdProvider: () => string | null;
   readonly #pipeline: ConflictPipeline | null;
   readonly #contextualMode: 'off' | 'late-chunk';
+  readonly #queryTransformer: QueryTransformer | null;
   #reranker: ReRanker;
 
   constructor(args: {
@@ -164,6 +193,14 @@ export class SemanticMemory {
     embedderIdProvider: () => string | null;
     reranker: ReRanker;
     conflictPipeline?: ConflictPipeline;
+    /**
+     * Query transformer for multi-query / HyDE retrieval (P2-3). When
+     * supplied, `search(..., { multiQuery })` / `{ hyde }` opt into one
+     * cheap LLM call to rewrite / hypothesize the query; omitted (the
+     * default) ⇒ those options are silent no-ops and search stays
+     * offline + single-shot.
+     */
+    queryTransformer?: QueryTransformer;
     /**
      * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
      * (default) prepends a deterministic situating context to the text
@@ -181,6 +218,7 @@ export class SemanticMemory {
     this.#reranker = args.reranker;
     this.#pipeline = args.conflictPipeline ?? null;
     this.#contextualMode = args.contextualRetrieval ?? 'late-chunk';
+    this.#queryTransformer = args.queryTransformer ?? null;
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -390,22 +428,40 @@ export class SemanticMemory {
       async (span) => {
         const candidateTopK = opts.candidateTopK ?? 60;
         const finalTopK = opts.topK ?? 10;
-        const ftsHits = await this.#store.semantic.search(scope, {
-          query,
-          topK: candidateTopK,
-          ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
-          ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
-          ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
-        });
-        const vectorHits = await this.#tryVectorSearch(
-          scope,
-          query,
-          candidateTopK,
-          opts.asOf,
-          opts.includeQuarantined,
-        );
-        const lists: ReadonlyArray<ReadonlyArray<MemoryHit<Fact>>> =
-          vectorHits.length === 0 ? [ftsHits] : [ftsHits, vectorHits];
+        // P2-3: fan the query into reworded variants when opted-in *and*
+        // a transformer is configured; otherwise this is just `[query]`
+        // (single-shot, no provider call — the offline default).
+        const queries = await this.#expandQueries(query, opts);
+        const lists: Array<ReadonlyArray<MemoryHit<Fact>>> = [];
+        let primaryFtsCount = 0;
+        let primaryVectorCount = 0;
+        let isPrimary = true;
+        for (const q of queries) {
+          const ftsHits = await this.#store.semantic.search(scope, {
+            query: q,
+            topK: candidateTopK,
+            ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+            ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+            ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+          });
+          lists.push(ftsHits);
+          const vectorHits = await this.#tryVectorSearch(
+            scope,
+            q,
+            candidateTopK,
+            opts.asOf,
+            opts.includeQuarantined,
+          );
+          if (vectorHits.length > 0) lists.push(vectorHits);
+          if (isPrimary) {
+            primaryFtsCount = ftsHits.length;
+            primaryVectorCount = vectorHits.length;
+            isPrimary = false;
+          }
+        }
+        // P2-3 HyDE: embed a hypothetical answer and fuse its neighbours.
+        const hydeHits = await this.#tryHyde(scope, query, opts, candidateTopK);
+        if (hydeHits.length > 0) lists.push(hydeHits);
         const fused = await this.#reranker.rerank(query, lists, {
           topK: finalTopK,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
@@ -416,11 +472,17 @@ export class SemanticMemory {
           rerankerId: this.#reranker.id,
         });
         span.setAttributes({
-          'memory.search.semantic.fts_count': ftsHits.length,
-          'memory.search.semantic.vector_count': vectorHits.length,
+          // `fts_count` / `vector_count` report the *original* query's
+          // candidate lists, so the single-shot default reads exactly as
+          // before; `query_count` (≥1) and `hyde_applied` cover the
+          // P2-3 fan-out.
+          'memory.search.semantic.fts_count': primaryFtsCount,
+          'memory.search.semantic.vector_count': primaryVectorCount,
           'memory.search.semantic.final_count': ranked.length,
           'memory.search.semantic.reranker_id': this.#reranker.id,
           'memory.search.semantic.decay_applied': opts.decay !== undefined,
+          'memory.search.semantic.query_count': queries.length,
+          'memory.search.semantic.hyde_applied': hydeHits.length > 0,
           // X-3: per-signal recall explanation (ids + scores + signals,
           // no query text — the query is surfaced only as `query_length`
           // above to keep traces free of recall content).
@@ -617,6 +679,69 @@ export class SemanticMemory {
     k = 60,
   ): ReadonlyArray<MemoryHit<TRecord>> {
     return fuseRrf(lists, k);
+  }
+
+  /**
+   * Multi-query expansion (P2-3). Returns the original query followed by
+   * up to `multiQuery - 1` deduped reworded variants. A no-op (`[query]`)
+   * when `multiQuery` is unset / `<= 1` or no transformer is configured —
+   * so the default path makes no provider call. A transformer failure
+   * degrades to `[query]` rather than breaking recall.
+   */
+  async #expandQueries(query: string, opts: FactSearchOptions): Promise<ReadonlyArray<string>> {
+    const n = opts.multiQuery;
+    if (n === undefined || n <= 1 || this.#queryTransformer === null) return [query];
+    try {
+      const variants = await this.#queryTransformer.expand(query, n - 1, {
+        ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+      });
+      const seen = new Set<string>([query.trim().toLowerCase()]);
+      const out: string[] = [query];
+      for (const variant of variants) {
+        const trimmed = variant.trim();
+        const key = trimmed.toLowerCase();
+        if (trimmed.length === 0 || seen.has(key)) continue;
+        seen.add(key);
+        out.push(trimmed);
+        if (out.length >= n) break;
+      }
+      return out;
+    } catch {
+      return [query];
+    }
+  }
+
+  /**
+   * HyDE retrieval (P2-3). Generates a hypothetical answer, embeds it,
+   * and returns its vector neighbours to fuse into the result. A no-op
+   * (`[]`) unless `hyde` is set, a transformer is configured, **and** an
+   * embedder + vector surface exist — the embedder guard is checked
+   * *first* so a missing embedder skips the LLM call entirely rather than
+   * generating a passage that can never be embedded.
+   */
+  async #tryHyde(
+    scope: SessionScope,
+    query: string,
+    opts: FactSearchOptions,
+    topK: number,
+  ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    if (opts.hyde !== true || this.#queryTransformer === null) return [];
+    if (
+      this.#embedder === null ||
+      this.#embedderIdProvider() === null ||
+      typeof this.#store.semantic.searchVector !== 'function'
+    ) {
+      return [];
+    }
+    try {
+      const pseudo = await this.#queryTransformer.hypothetical(query, {
+        ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+      });
+      if (pseudo === null || pseudo.trim().length === 0) return [];
+      return this.#tryVectorSearch(scope, pseudo, topK, opts.asOf, opts.includeQuarantined);
+    } catch {
+      return [];
+    }
   }
 
   async #tryVectorSearch(
