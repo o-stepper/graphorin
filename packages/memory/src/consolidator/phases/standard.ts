@@ -611,7 +611,7 @@ export function normalizeImportance(raw: number | undefined): number | undefined
 }
 
 function stripFence(text: string): string {
-  const match = /^```(?:json)?\s*\n([\s\S]*?)\n```/u.exec(text.trim());
+  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
   return match?.[1] ?? text;
 }
 

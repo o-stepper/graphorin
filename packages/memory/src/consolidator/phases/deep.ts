@@ -231,7 +231,7 @@ function parseJudge(text: string | undefined): JudgeOutcome | null {
 }
 
 function stripFence(text: string): string {
-  const match = /^```(?:json)?\s*\n([\s\S]*?)\n```/u.exec(text.trim());
+  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
   return match?.[1] ?? text;
 }
 
