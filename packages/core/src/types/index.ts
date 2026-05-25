@@ -60,8 +60,10 @@ export type {
   MemoryHit,
   MemoryKind,
   MemoryMetadata,
+  MemoryProvenance,
   MemoryRecord,
   MemorySearchOptions,
+  MemoryStatus,
   Rule,
 } from './memory.js';
 export type {

@@ -5,14 +5,15 @@
  * Phase 10a deliverables:
  *
  *  - The {@link createMemory} facade that wires every six-tier sub-
- *    module + the nine memory tools + the search reranker + the
+ *    module + the eleven memory tools + the search reranker + the
  *    context-engine + consolidator interface stubs.
  *  - Six tier sub-modules under `./tiers`: {@link WorkingMemory},
  *    {@link SessionMemory}, {@link EpisodicMemory}, {@link SemanticMemory},
  *    {@link ProceduralMemory}, {@link SharedMemory}.
- *  - Nine memory tools under `./tools`: `block_append`, `block_replace`,
+ *  - Eleven memory tools under `./tools`: `block_append`, `block_replace`,
  *    `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
- *    `fact_forget`, `recall_episodes`, `conversation_search`.
+ *    `fact_forget`, `recall_episodes`, `conversation_search`,
+ *    `fact_history` (P0-2), `fact_validate` (P1-4).
  *  - The hybrid search composition under `./search`, including the
  *    built-in {@link RRFReranker} (k=60 default) and the
  *    {@link ReRanker} contract.
@@ -211,9 +212,11 @@ export {
   createBlockRethinkTool,
   createConversationSearchTool,
   createFactForgetTool,
+  createFactHistoryTool,
   createFactRememberTool,
   createFactSearchTool,
   createFactSupersedeTool,
+  createFactValidateTool,
   createRecallEpisodesTool,
   type MemoryToolDeps,
   type ScopeResolver,

@@ -10,6 +10,29 @@ import type { Sensitivity } from './sensitivity.js';
 export type MemoryKind = 'working' | 'session' | 'episodic' | 'semantic' | 'procedural' | 'shared';
 
 /**
+ * Where a memory came from — the trust-provenance tag carried by every
+ * fact / episode. `user` (the human said it) and `tool` (a tool the
+ * agent invoked returned it) are first-party; `extraction` (consolidator
+ * distilled it from a transcript) and `reflection` (a synthesis pass
+ * inferred it) are *derived* and therefore land quarantined by default;
+ * `imported` is bulk-loaded from an external store. Used by P1-4 to gate
+ * action-driving recall against memory-poisoning (MINJA / MemoryGraft).
+ *
+ * @stable
+ */
+export type MemoryProvenance = 'user' | 'tool' | 'extraction' | 'reflection' | 'imported';
+
+/**
+ * Retrieval-trust state of a memory. `active` rows are eligible for
+ * default recall; `quarantined` rows are persisted and auditable but
+ * excluded from action-driving recall until explicitly validated (P1-4).
+ * Quarantine is a *retrieval gate*, never a delete.
+ *
+ * @stable
+ */
+export type MemoryStatus = 'active' | 'quarantined';
+
+/**
  * Snapshot of memory-tier counters surfaced to the model via the
  * memory-aware system prompt. Implementations live in `@graphorin/memory`;
  * the type sits here so the agent runtime can include it in its
@@ -89,6 +112,17 @@ export interface Fact extends MemoryRecord {
   readonly supersedes?: string;
   /** ID of the fact that supersedes this one, if any. */
   readonly supersededBy?: string;
+  /**
+   * Trust-provenance tag (P1-4). Absent on rows written before the
+   * feature; treated as first-party (`active`) when missing.
+   */
+  readonly provenance?: MemoryProvenance;
+  /**
+   * Retrieval-trust state (P1-4). Defaults to `active`; derived /
+   * injection-flagged writes land `quarantined` and are excluded from
+   * default recall.
+   */
+  readonly status?: MemoryStatus;
 }
 
 /**
@@ -105,6 +139,10 @@ export interface Episode extends MemoryRecord {
   readonly endedAt: string;
   /** Optional importance score in `[0, 1]`. */
   readonly importance?: number;
+  /** Trust-provenance tag (P1-4). See {@link MemoryProvenance}. */
+  readonly provenance?: MemoryProvenance;
+  /** Retrieval-trust state (P1-4). See {@link MemoryStatus}. */
+  readonly status?: MemoryStatus;
 }
 
 /**
@@ -130,6 +168,13 @@ export interface MemorySearchOptions {
   readonly tags?: ReadonlyArray<string>;
   readonly dateRange?: { readonly from?: string; readonly to?: string };
   readonly includeArchived?: boolean;
+  /**
+   * Include quarantined memories in the result set (P1-4). Defaults to
+   * `false`: action-driving recall never returns quarantined rows. Set
+   * `true` only for the validation / inspector path — never for
+   * auto-recall fed back into the model.
+   */
+  readonly includeQuarantined?: boolean;
   readonly signal?: AbortSignal;
   /**
    * Point-in-time ("as of") read. When set, only records whose

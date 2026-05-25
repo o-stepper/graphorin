@@ -5,7 +5,7 @@
 
 `@graphorin/memory` ships the `createMemory()` facade, the six tier
 sub-modules (working, session, episodic, semantic, procedural, shared),
-the ten memory tools that the agent runtime registers with
+the eleven memory tools that the agent runtime registers with
 `@graphorin/tools`, the built-in Reciprocal Rank Fusion reranker (k=60),
 the embedder migration runner, and the interface stubs picked up later
 by the conflict-resolution pipeline, the consolidator, and the context
@@ -41,14 +41,27 @@ any `EmbedderProvider`; the default is
   through the built-in `RRFReranker` (k=60 default). The
   `setReranker(custom)` hook accepts any `ReRanker` implementation
   (cross-encoder, LLM judge, custom).
-- **Ten memory tools.** `block_append`, `block_replace`,
+- **Eleven memory tools.** `block_append`, `block_replace`,
   `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
   `fact_forget`, `recall_episodes`, `conversation_search`,
-  `fact_history` — every tool is a typed `Tool` with `inputSchema` +
-  `outputSchema`, the appropriate `memoryGuardTier`, and the right
-  `sideEffectClass`. `fact_search` accepts an `asOf` instant for
-  point-in-time reads; `fact_history` returns a fact's bi-temporal
-  supersede chain.
+  `fact_history`, `fact_validate` — every tool is a typed `Tool` with
+  `inputSchema` + `outputSchema`, the appropriate `memoryGuardTier`, and
+  the right `sideEffectClass`. `fact_search` accepts an `asOf` instant
+  for point-in-time reads; `fact_history` returns a fact's bi-temporal
+  supersede chain; `fact_validate` promotes a quarantined fact to active.
+- **Provenance + quarantine (memory-safety gate).** Every fact carries
+  a `provenance` tag (`user` / `tool` / `extraction` / `reflection` /
+  `imported`) and a retrieval-trust `status`. *Derived* writes
+  (consolidator extraction, future reflection) and candidates that trip
+  the offline injection heuristics (`ignore previous instructions`,
+  role-markup smuggling, secrecy / exfiltration directives) land
+  `status: 'quarantined'` and are **excluded from default recall** until
+  a human promotes them via `fact_validate`. Quarantine is a retrieval
+  gate, never a delete — quarantined rows stay fully auditable, and the
+  `includeQuarantined` search option surfaces them for the validation
+  UI. This is the precondition for safely shipping synthesized memory
+  (reflection / reconciliation / induction) against memory-poisoning
+  (MINJA, MemoryGraft).
 - **Multi-stage conflict resolution pipeline.** Every
   `SemanticMemory.remember(...)` call now flows through a five-stage
   pipeline (exact dedup → embedding three-zone → heuristic regex →
@@ -166,6 +179,8 @@ tool exactly once:
 | `fact_forget`        | semantic   | Soft-delete a fact (kept for replay).                  |
 | `recall_episodes`    | episodic   | Triple-signal episode retrieval.                       |
 | `conversation_search`| session    | FTS5 search over the active session messages.          |
+| `fact_history`       | semantic   | Trace a fact's bi-temporal supersede chain.            |
+| `fact_validate`      | semantic   | Promote a quarantined fact to active (audited).        |
 
 ## Embedder migration
 

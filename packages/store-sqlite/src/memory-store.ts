@@ -3,8 +3,10 @@ import type {
   Episode,
   Fact,
   MemoryHit,
+  MemoryProvenance,
   MemoryRecord,
   MemorySearchOptions,
+  MemoryStatus,
   Message,
   Rule,
   SessionScope,
@@ -36,6 +38,17 @@ import { VectorTableManager } from './vector-table-mgr.js';
 const FACT_VALIDITY_CLAUSE =
   'AND (f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)';
 const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
+
+/**
+ * Quarantine retrieval-gate fragments (P1-4). Appended to default
+ * reads so `status = 'quarantined'` rows never surface in
+ * action-driving recall; omitted only when the caller passes
+ * `includeQuarantined` (the validation / inspector path). Each is a
+ * literal predicate with no bind parameter, so it can be injected
+ * without disturbing the surrounding `?` ordering.
+ */
+const FACT_NOT_QUARANTINED = "AND f.status != 'quarantined'";
+const EPISODE_NOT_QUARANTINED = "AND e.status != 'quarantined'";
 
 /**
  * Optional embedding payload attached to a memory write. The
@@ -421,13 +434,16 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
       this.#conn.run(
         `INSERT INTO episodes (
            id, scope_user_id, scope_session_id, scope_agent_id, summary, started_at, ended_at,
-           importance, embedder_id, source_message_ids_json, sensitivity, tags_json, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           importance, embedder_id, source_message_ids_json, sensitivity, tags_json,
+           provenance, status, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            summary = excluded.summary,
            ended_at = excluded.ended_at,
            importance = excluded.importance,
            embedder_id = excluded.embedder_id,
+           provenance = excluded.provenance,
+           status = excluded.status,
            updated_at = excluded.updated_at,
            tags_json = excluded.tags_json`,
         [
@@ -443,6 +459,8 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
           null,
           episode.sensitivity,
           episode.tags ? JSON.stringify(episode.tags) : null,
+          episode.provenance ?? null,
+          episode.status ?? 'active',
           toEpoch(episode.createdAt),
           episode.updatedAt ? toEpoch(episode.updatedAt) : null,
         ],
@@ -482,6 +500,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
        FROM episodes_fts
        JOIN episodes e ON e.rowid = episodes_fts.rowid
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
          ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
        ORDER BY bm25_score
        LIMIT ?`,
@@ -515,6 +534,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     embedderId: string,
     topK: number,
     asOf?: string,
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -542,6 +562,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
          AND e.embedder_id = ?
          AND e.deleted_at IS NULL
          AND e.archived = 0
+         ${includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
          ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
        ORDER BY v.distance`,
       binds,
@@ -607,9 +628,10 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            id, scope_user_id, scope_session_id, scope_agent_id, text,
            subject, predicate, object, confidence, sensitivity, tags_json,
            embedder_id, source_message_ids_json,
-           valid_from, valid_to, supersedes, superseded_by, strength, last_accessed_at,
+           valid_from, valid_to, supersedes, superseded_by, provenance, status,
+           strength, last_accessed_at,
            hash, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
            confidence = excluded.confidence,
@@ -619,6 +641,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            valid_to = excluded.valid_to,
            supersedes = excluded.supersedes,
            superseded_by = excluded.superseded_by,
+           provenance = excluded.provenance,
+           status = excluded.status,
            updated_at = excluded.updated_at`,
         [
           fact.id,
@@ -638,6 +662,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.validTo ? toEpoch(fact.validTo) : null,
           fact.supersedes ?? null,
           fact.supersededBy ?? null,
+          fact.provenance ?? null,
+          fact.status ?? 'active',
           1.0,
           null,
           null,
@@ -680,6 +706,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
        FROM facts_fts
        JOIN facts f ON f.rowid = facts_fts.rowid
        WHERE facts_fts MATCH ? AND f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
+         ${opts.includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
          ${asOf !== null ? FACT_VALIDITY_CLAUSE : ''}
        ORDER BY bm25_score
        LIMIT ?`,
@@ -709,6 +736,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     embedderId: string,
     topK: number,
     asOf?: string,
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -736,6 +764,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
          AND f.embedder_id = ?
          AND f.deleted_at IS NULL
          AND f.archived = 0
+         ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
          ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
        ORDER BY v.distance`,
       binds,
@@ -809,6 +838,40 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   async forget(id: string, reason?: string): Promise<void> {
     this.#conn.run('UPDATE facts SET deleted_at = ?, archived = 1 WHERE id = ?', [Date.now(), id]);
     void reason;
+  }
+
+  /**
+   * Set a fact's retrieval-trust `status` (P1-4) and write a
+   * `memory_history` audit row. Quarantine is a retrieval gate, so this
+   * touches neither the row's content nor its embedding / tombstone —
+   * it only flips eligibility for default recall. Promotion
+   * (`'active'`) is logged as a `VALIDATE` event; demotion
+   * (`'quarantined'`) as `QUARANTINE`. Surfaced through
+   * `SemanticMemoryStoreExt.setStatus`.
+   *
+   * @stable
+   */
+  async setStatus(factId: string, status: MemoryStatus, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run('UPDATE facts SET status = ?, updated_at = ? WHERE id = ?', [
+        status,
+        Date.now(),
+        factId,
+      ]);
+      this.#conn.run(
+        `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'fact',
+          factId,
+          null,
+          reason ?? status,
+          status === 'active' ? 'VALIDATE' : 'QUARANTINE',
+          'agent',
+          null,
+          Date.now(),
+        ],
+      );
+    });
   }
 
   /**
@@ -1054,6 +1117,8 @@ interface EpisodeRow {
   source_message_ids_json: string | null;
   sensitivity: 'public' | 'internal' | 'secret';
   tags_json: string | null;
+  provenance: string | null;
+  status: string;
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
@@ -1078,6 +1143,8 @@ interface FactRow {
   valid_to: number | null;
   supersedes: string | null;
   superseded_by: string | null;
+  provenance: string | null;
+  status: string;
   strength: number;
   last_accessed_at: number | null;
   hash: string | null;
@@ -1159,6 +1226,8 @@ function rowToEpisode(row: EpisodeRow): Episode {
     startedAt: new Date(row.started_at).toISOString(),
     endedAt: new Date(row.ended_at).toISOString(),
     importance: row.importance ?? undefined,
+    provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
+    status: row.status as MemoryStatus,
     sensitivity: row.sensitivity,
     tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
     createdAt: new Date(row.created_at).toISOString(),
@@ -1182,6 +1251,8 @@ function rowToFact(row: FactRow): Fact {
     validTo: row.valid_to !== null ? new Date(row.valid_to).toISOString() : undefined,
     supersedes: row.supersedes ?? undefined,
     supersededBy: row.superseded_by ?? undefined,
+    provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
+    status: row.status as MemoryStatus,
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,

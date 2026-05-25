@@ -20,6 +20,7 @@ describe('migrations', () => {
     expect(versions).toContain('010');
     expect(versions).toContain('011');
     expect(versions).toContain('012');
+    expect(versions).toContain('013');
   });
 
   it('applies every migration on a clean DB and is idempotent on re-run', async () => {
@@ -71,6 +72,19 @@ describe('migrations', () => {
     );
     const colNames = new Set(cols.map((c) => c.name));
     expect(colNames.has('conflicting_ids_json')).toBe(true);
+    // Migration 013 added provenance + status to facts and episodes.
+    const factCols = new Set(
+      conn.all<{ name: string }>("SELECT name FROM pragma_table_info('facts')").map((c) => c.name),
+    );
+    expect(factCols.has('provenance')).toBe(true);
+    expect(factCols.has('status')).toBe(true);
+    const epCols = new Set(
+      conn
+        .all<{ name: string }>("SELECT name FROM pragma_table_info('episodes')")
+        .map((c) => c.name),
+    );
+    expect(epCols.has('provenance')).toBe(true);
+    expect(epCols.has('status')).toBe(true);
     conn.close();
   });
 

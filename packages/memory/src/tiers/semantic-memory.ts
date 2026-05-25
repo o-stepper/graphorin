@@ -2,6 +2,8 @@ import type {
   EmbedderProvider,
   Fact,
   MemoryHit,
+  MemoryProvenance,
+  MemoryStatus,
   Sensitivity,
   SessionScope,
   Tracer,
@@ -9,6 +11,7 @@ import type {
 import { md5 } from '@graphorin/core';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
 import { newMemoryId } from '../internal/id.js';
+import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { fuseRrf } from '../search/rrf.js';
@@ -33,6 +36,14 @@ export interface FactInput {
   readonly validFrom?: string;
   readonly validTo?: string;
   readonly supersedes?: string;
+  /**
+   * Trust-provenance tag (P1-4). Writers that synthesize memory pass
+   * `'extraction'` / `'reflection'` so the fact lands quarantined;
+   * first-party writers pass `'user'` / `'tool'` (or omit it — absent ⇒
+   * treated as first-party `active`). The `status` is *derived* from
+   * this tag plus the injection heuristics; it is never author-set.
+   */
+  readonly provenance?: MemoryProvenance;
 }
 
 /**
@@ -55,6 +66,16 @@ export interface FactSearchOptions {
    * @stable
    */
   readonly asOf?: string;
+  /**
+   * Include quarantined facts in the result (P1-4). Defaults to
+   * `false` — action-driving recall (`fact_search`, auto-recall) never
+   * returns quarantined rows. Set `true` only for the validation /
+   * inspector path that surfaces quarantined facts to a human for
+   * promotion via {@link SemanticMemory.validate}.
+   *
+   * @stable
+   */
+  readonly includeQuarantined?: boolean;
   /**
    * Optional decay-aware ranking. When set, the reranker output is
    * post-multiplied by the per-fact retention curve
@@ -182,6 +203,16 @@ export class SemanticMemory {
     return withMemorySpan(this.#tracer, 'memory.write.semantic', scope, {}, async (span) => {
       const now = new Date().toISOString();
       const text = input.text;
+      // P1-4: derive the retrieval-trust status. Synthesized writes
+      // (consolidator extraction / reflection) and candidates that trip
+      // the offline injection heuristics land quarantined — excluded
+      // from default recall until a human validates them. First-party
+      // writes (user / tool / imported / unset) stay active. `status`
+      // is never author-set; it is always derived here.
+      const provenance = input.provenance;
+      const synthesized = provenance === 'extraction' || provenance === 'reflection';
+      const injection = detectMemoryInjection(text);
+      const status: MemoryStatus = synthesized || injection.flagged ? 'quarantined' : 'active';
       const fact: Fact = {
         id: newMemoryId('fact'),
         kind: 'semantic',
@@ -195,6 +226,8 @@ export class SemanticMemory {
         ...(input.validFrom !== undefined ? { validFrom: input.validFrom } : { validFrom: now }),
         ...(input.validTo !== undefined ? { validTo: input.validTo } : {}),
         ...(input.supersedes !== undefined ? { supersedes: input.supersedes } : {}),
+        ...(provenance !== undefined ? { provenance } : {}),
+        status,
         createdAt: now,
         updatedAt: now,
       };
@@ -221,6 +254,12 @@ export class SemanticMemory {
         'memory.semantic.pipeline.decision': decision.kind,
         'memory.semantic.pipeline.stage': decision.stage,
         'memory.semantic.pipeline.enabled': pipelineEnabled,
+        'memory.semantic.status': status,
+        ...(provenance !== undefined ? { 'memory.semantic.provenance': provenance } : {}),
+        'memory.semantic.injection_flagged': injection.flagged,
+        ...(injection.flagged
+          ? { 'memory.semantic.injection_markers': injection.markers.join(',') }
+          : {}),
       });
 
       switch (decision.kind) {
@@ -286,9 +325,16 @@ export class SemanticMemory {
           query,
           topK: candidateTopK,
           ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+          ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
-        const vectorHits = await this.#tryVectorSearch(scope, query, candidateTopK, opts.asOf);
+        const vectorHits = await this.#tryVectorSearch(
+          scope,
+          query,
+          candidateTopK,
+          opts.asOf,
+          opts.includeQuarantined,
+        );
         const lists: ReadonlyArray<ReadonlyArray<MemoryHit<Fact>>> =
           vectorHits.length === 0 ? [ftsHits] : [ftsHits, vectorHits];
         const fused = await this.#reranker.rerank(query, lists, {
@@ -303,6 +349,9 @@ export class SemanticMemory {
           'memory.search.semantic.reranker_id': this.#reranker.id,
           'memory.search.semantic.decay_applied': opts.decay !== undefined,
           ...(opts.asOf !== undefined ? { 'memory.search.semantic.as_of': opts.asOf } : {}),
+          ...(opts.includeQuarantined === true
+            ? { 'memory.search.semantic.include_quarantined': true }
+            : {}),
         });
         return ranked;
       },
@@ -356,6 +405,35 @@ export class SemanticMemory {
         const chain = await this.#store.semantic.historyOf(scope, factId);
         span.setAttributes({ 'memory.read.semantic.history_length': chain.length });
         return chain;
+      },
+    );
+  }
+
+  /**
+   * Promote a quarantined fact to `active` (P1-4). The validation path
+   * that admits a synthesized / injection-flagged memory into
+   * action-driving recall once a human (or trusted non-agent caller)
+   * has reviewed it. Writes a `memory_history` audit row. Requires a
+   * storage adapter that implements
+   * `SemanticMemoryStoreExt.setStatus(...)` — the default
+   * `@graphorin/store-sqlite` adapter wires this through.
+   *
+   * @stable
+   */
+  async validate(scope: SessionScope, factId: string, reason?: string): Promise<void> {
+    await withMemorySpan(
+      this.#tracer,
+      'memory.write.semantic',
+      scope,
+      { 'memory.semantic.action': 'validate', 'memory.semantic.fact_id': factId },
+      async () => {
+        if (typeof this.#store.semantic.setStatus !== 'function') {
+          throw new TypeError(
+            '[graphorin/memory] SemanticMemory.validate(...) requires a storage adapter that implements `semantic.setStatus(id, status)`. ' +
+              'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via SemanticMemoryStoreExt.',
+          );
+        }
+        await this.#store.semantic.setStatus(factId, 'active', reason);
       },
     );
   }
@@ -449,6 +527,7 @@ export class SemanticMemory {
     query: string,
     topK: number,
     asOf?: string,
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const embedderId = this.#embedderIdProvider();
     if (
@@ -460,7 +539,14 @@ export class SemanticMemory {
     }
     const [vector] = await this.#embedder.embed([query]);
     if (vector === undefined) return [];
-    return this.#store.semantic.searchVector(scope, vector, embedderId, topK, asOf);
+    return this.#store.semantic.searchVector(
+      scope,
+      vector,
+      embedderId,
+      topK,
+      asOf,
+      includeQuarantined,
+    );
   }
 
   async #applyDecay(

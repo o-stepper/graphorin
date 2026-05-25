@@ -153,7 +153,13 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
 
       for (const fact of facts) {
         if (fact.text.trim().length === 0) continue;
-        const input: Parameters<SemanticMemory['remember']>[1] = { text: fact.text };
+        // P1-4: distilled-from-transcript facts are synthesized memory —
+        // tag them `extraction` so they land quarantined (excluded from
+        // action-driving recall until validated).
+        const input: Parameters<SemanticMemory['remember']>[1] = {
+          text: fact.text,
+          provenance: 'extraction',
+        };
         if (fact.subject !== undefined) Object.assign(input, { subject: fact.subject });
         if (fact.predicate !== undefined) Object.assign(input, { predicate: fact.predicate });
         if (fact.object !== undefined) Object.assign(input, { object: fact.object });

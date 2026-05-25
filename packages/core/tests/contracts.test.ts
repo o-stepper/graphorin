@@ -42,7 +42,12 @@ import type {
 } from '../src/contracts/index.js';
 import type {
   AgentEvent,
+  Episode,
+  Fact,
   MemoryKind,
+  MemoryProvenance,
+  MemorySearchOptions,
+  MemoryStatus,
   Message,
   RunContext,
   RunState,
@@ -125,6 +130,21 @@ describe('public type surface', () => {
 
   it('Sensitivity is a fixed string literal union', () => {
     expectTypeOf<Sensitivity>().toEqualTypeOf<'public' | 'internal' | 'secret'>();
+  });
+
+  it('MemoryProvenance + MemoryStatus are fixed unions (P1-4)', () => {
+    expectTypeOf<MemoryProvenance>().toEqualTypeOf<
+      'user' | 'tool' | 'extraction' | 'reflection' | 'imported'
+    >();
+    expectTypeOf<MemoryStatus>().toEqualTypeOf<'active' | 'quarantined'>();
+  });
+
+  it('Fact + Episode carry optional provenance + status; MemorySearchOptions gates quarantine (P1-4)', () => {
+    expectTypeOf<Fact['provenance']>().toEqualTypeOf<MemoryProvenance | undefined>();
+    expectTypeOf<Fact['status']>().toEqualTypeOf<MemoryStatus | undefined>();
+    expectTypeOf<Episode['provenance']>().toEqualTypeOf<MemoryProvenance | undefined>();
+    expectTypeOf<Episode['status']>().toEqualTypeOf<MemoryStatus | undefined>();
+    expectTypeOf<MemorySearchOptions['includeQuarantined']>().toEqualTypeOf<boolean | undefined>();
   });
 
   it('MemoryKind covers exactly the six tiers', () => {

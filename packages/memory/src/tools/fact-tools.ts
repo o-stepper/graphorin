@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { MemoryToolDeps } from './types.js';
 
 const sensitivityEnum = z.enum(['public', 'internal', 'secret']);
+const provenanceEnum = z.enum(['user', 'tool', 'extraction', 'reflection', 'imported']);
 
 const factRememberInputSchema = z.object({
   text: z.string().min(1).max(8192),
@@ -33,6 +34,7 @@ const factSearchOutputSchema = z.object({
       text: z.string(),
       score: z.number(),
       sensitivity: sensitivityEnum,
+      provenance: provenanceEnum.optional(),
     }),
   ),
 });
@@ -84,6 +86,18 @@ const factHistoryOutputSchema = z.object({
 
 type FactHistoryInput = z.infer<typeof factHistoryInputSchema>;
 type FactHistoryOutput = z.infer<typeof factHistoryOutputSchema>;
+
+const factValidateInputSchema = z.object({
+  factId: z.string().min(1),
+  reason: z.string().max(512).optional(),
+});
+const factValidateOutputSchema = z.object({
+  factId: z.string(),
+  validated: z.boolean(),
+});
+
+type FactValidateInput = z.infer<typeof factValidateInputSchema>;
+type FactValidateOutput = z.infer<typeof factValidateOutputSchema>;
 
 /**
  * `fact_remember` — persist a single semantic fact. The minimum-viable
@@ -154,6 +168,7 @@ export function createFactSearchTool(
           text: hit.record.text,
           score: hit.score,
           sensitivity: hit.record.sensitivity,
+          ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
         })),
       };
     },
@@ -258,6 +273,40 @@ export function createFactHistoryTool(
           sensitivity: f.sensitivity,
         })),
       };
+    },
+  });
+}
+
+/**
+ * `fact_validate` — promote a quarantined fact to active (P1-4). The
+ * validation path that admits a synthesized (consolidator / reflection)
+ * or injection-flagged memory into action-driving recall once it has
+ * been reviewed; the promotion is audited in `memory_history`. This is
+ * intended as an operator / inspector action: the agent's `fact_search`
+ * cannot enumerate quarantined facts, so it cannot be socially
+ * engineered by a poisoned (and therefore hidden) memory into validating
+ * one.
+ *
+ * @stable
+ */
+export function createFactValidateTool(
+  deps: MemoryToolDeps,
+): Tool<FactValidateInput, FactValidateOutput> {
+  return tool<FactValidateInput, FactValidateOutput>({
+    name: 'fact_validate',
+    description:
+      'Promote a quarantined fact to active so it becomes eligible for normal recall. Quarantined facts are memories the system synthesized or flagged as risky; validating one is a deliberate, audited admission. Use only for explicit, reviewed promotion — not as a routine step.',
+    inputSchema: factValidateInputSchema,
+    outputSchema: factValidateOutputSchema,
+    sideEffectClass: 'side-effecting',
+    sandboxPolicy: 'none',
+    sensitivity: 'internal',
+    memoryGuardTier: 'memory-aware',
+    tags: ['memory', 'semantic', 'safety'],
+    async execute(input, ctx) {
+      const scope = await deps.resolveScope(ctx);
+      await deps.semantic.validate(scope, input.factId, input.reason);
+      return { factId: input.factId, validated: true };
     },
   });
 }

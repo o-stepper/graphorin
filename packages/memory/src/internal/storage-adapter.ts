@@ -4,6 +4,7 @@ import type {
   EpisodicMemoryStore,
   Fact,
   MemoryHit,
+  MemoryStatus,
   MemoryStore,
   Message,
   MessageRef,
@@ -49,6 +50,8 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     topK: number,
     /** Point-in-time filter (`started_at <= asOf`, ISO-8601). P0-2. */
     asOf?: string,
+    /** Include quarantined episodes (validation/inspector path). P1-4. */
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
   /** Mark an episode archived. Soft-archive — the row stays for replay. */
   archive?(id: string, reason?: string): Promise<void>;
@@ -73,9 +76,23 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
      * validity interval contains `asOf` (ISO-8601) survive. P0-2.
      */
     asOf?: string,
+    /**
+     * Include quarantined facts in the KNN result (validation /
+     * inspector path). Default reads exclude them. P1-4.
+     */
+    includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   /** Lookup a single fact by id (returns `null` when absent or soft-deleted). */
   get?(id: string): Promise<Fact | null>;
+  /**
+   * Set a fact's retrieval-trust `status` and write a `memory_history`
+   * audit row (P1-4). Promotes a quarantined fact to `active` (the
+   * validation path) or re-quarantines an active one. Never touches
+   * content / embedding / tombstone — quarantine is a retrieval gate.
+   * Powers {@link SemanticMemory.validate}; the default
+   * `@graphorin/store-sqlite` adapter implements it.
+   */
+  setStatus?(factId: string, status: MemoryStatus, reason?: string): Promise<void>;
   /**
    * Hard-delete a fact (GDPR path). The audit log row is preserved
    * but the row itself + every per-embedder vec0 entry is removed.

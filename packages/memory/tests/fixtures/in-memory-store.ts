@@ -581,6 +581,7 @@ export function createInMemoryStore(
         for (const episode of episodes) {
           if (episode.userId !== scope.userId) continue;
           if (episode.deletedAt !== undefined) continue;
+          if (opts.includeQuarantined !== true && episode.status === 'quarantined') continue;
           if (opts.asOf !== undefined && Date.parse(episode.startedAt) > Date.parse(opts.asOf)) {
             continue;
           }
@@ -591,12 +592,13 @@ export function createInMemoryStore(
         }
         return out;
       },
-      async searchVector(scope, embedding, embedderId, topK) {
+      async searchVector(scope, embedding, embedderId, topK, _asOf, includeQuarantined) {
         void embedderId;
         const out: Array<MemoryHit<Episode>> = [];
         for (const episode of episodes) {
           if (episode.userId !== scope.userId) continue;
           if (episode.deletedAt !== undefined) continue;
+          if (includeQuarantined !== true && episode.status === 'quarantined') continue;
           const vec = episodeVectors.get(episode.id);
           if (vec === undefined) continue;
           out.push({ record: episode, score: cosine(vec, embedding) });
@@ -638,6 +640,7 @@ export function createInMemoryStore(
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
+          if (opts.includeQuarantined !== true && fact.status === 'quarantined') continue;
           if (opts.asOf !== undefined && !factValidAt(fact, opts.asOf)) continue;
           if (q === '*' || fact.text.toLowerCase().includes(q)) {
             out.push({ record: fact, score: 1, signals: { bm25: 1 } });
@@ -668,11 +671,12 @@ export function createInMemoryStore(
         out.sort((a, b) => factOrderEpoch(a) - factOrderEpoch(b));
         return out;
       },
-      async searchVector(scope, embedding, embedderId, topK) {
+      async searchVector(scope, embedding, embedderId, topK, _asOf, includeQuarantined) {
         const out: Array<MemoryHit<Fact>> = [];
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           if (fact.deletedAt !== undefined) continue;
+          if (includeQuarantined !== true && fact.status === 'quarantined') continue;
           const vec = factVectors.get(fact.id);
           if (vec === undefined) continue;
           // The default sqlite store gates vector reads by `embedder_id`
@@ -683,6 +687,15 @@ export function createInMemoryStore(
         }
         out.sort((a, b) => b.score - a.score);
         return out.slice(0, topK);
+      },
+      async setStatus(factId, status, _reason) {
+        const idx = facts.findIndex((f) => f.id === factId);
+        if (idx >= 0) {
+          const fact = facts[idx];
+          if (fact !== undefined) {
+            facts[idx] = { ...fact, status, updatedAt: new Date().toISOString() };
+          }
+        }
       },
       async supersede(oldId, newFact) {
         const idx = facts.findIndex((f) => f.id === oldId);

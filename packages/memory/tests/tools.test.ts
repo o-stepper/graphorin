@@ -105,6 +105,32 @@ describe('@graphorin/memory/tools — fact tools', () => {
     expect(out.chain.map((c) => c.text)).toEqual(['residence is Moscow', 'residence is Tbilisi']);
   });
 
+  it('fact_validate promotes a quarantined fact into recall (and fact_search surfaces provenance)', async () => {
+    const memory = createMemoryWithScope();
+    const search = findTool(memory.tools, 'fact_search');
+    const validate = findTool(memory.tools, 'fact_validate');
+    const ctx = makeCtx();
+    // A synthesized (extraction) write lands quarantined — hidden from default recall.
+    const quarantined = await memory.semantic.remember(SCOPE, {
+      text: 'synthesized claim about the user',
+      provenance: 'extraction',
+    });
+    const before = (await search.execute({ query: 'synthesized' }, ctx)) as { hits: unknown[] };
+    expect(before.hits.length).toBe(0);
+
+    const out = (await validate.execute({ factId: quarantined.id }, ctx)) as {
+      factId: string;
+      validated: boolean;
+    };
+    expect(out.validated).toBe(true);
+
+    const after = (await search.execute({ query: 'synthesized' }, ctx)) as {
+      hits: Array<{ factId: string; provenance?: string }>;
+    };
+    expect(after.hits.map((h) => h.factId)).toEqual([quarantined.id]);
+    expect(after.hits[0]?.provenance).toBe('extraction');
+  });
+
   it('fact_forget soft-deletes the fact', async () => {
     const memory = createMemoryWithScope();
     const remember = findTool(memory.tools, 'fact_remember');
@@ -165,6 +191,7 @@ describe('@graphorin/memory/tools — guard wiring', () => {
     expect(tools.fact_remember?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_supersede?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_forget?.memoryGuardTier).toBe('memory-aware');
+    expect(tools.fact_validate?.memoryGuardTier).toBe('memory-aware');
     expect(tools.fact_search?.memoryGuardTier).toBe('pure');
     expect(tools.fact_history?.memoryGuardTier).toBe('pure');
     expect(tools.recall_episodes?.memoryGuardTier).toBe('pure');
