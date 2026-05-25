@@ -12,6 +12,25 @@ export {
   type RecalledMemoryExplanation,
 } from './explain.js';
 export {
+  assessQueryDifficulty,
+  buildGradeRequest,
+  createProviderRetrievalGrader,
+  DEFAULT_DIFFICULTY_THRESHOLD,
+  DEFAULT_MAX_ITERATIONS,
+  type DifficultyAssessment,
+  type DifficultyGateOptions,
+  type IterativeRetrievalDeps,
+  type IterativeRetrievalOptions,
+  type IterativeRetrievalResult,
+  MAX_ITERATIONS_CEILING,
+  parseGrade,
+  RETRIEVAL_GRADE_SYSTEM_PROMPT,
+  type RetrievalGrade,
+  type RetrievalGradeOptions,
+  type RetrievalGrader,
+  runIterativeRetrieval,
+} from './iterative.js';
+export {
   buildExpansionRequest,
   buildHydeRequest,
   createProviderQueryTransformer,

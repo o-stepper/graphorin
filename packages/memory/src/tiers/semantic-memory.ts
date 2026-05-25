@@ -17,6 +17,12 @@ import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { explainRecall } from '../search/explain.js';
+import {
+  DEFAULT_MAX_ITERATIONS,
+  type IterativeRetrievalResult,
+  type RetrievalGrader,
+  runIterativeRetrieval,
+} from '../search/iterative.js';
 import type { QueryTransformer } from '../search/query-transform.js';
 import { fuseRrf, fuseWeighted, WeightedRRFReranker } from '../search/rrf.js';
 import type { ReRanker } from '../search/types.js';
@@ -190,6 +196,39 @@ export interface FactSearchOptions {
 }
 
 /**
+ * Per-call options for {@link SemanticMemory.searchIterative} (P2-4) —
+ * the gated grade-then-reformulate loop. Extends {@link FactSearchOptions}
+ * (every base option applies to each retrieval pass); `topK` doubles as
+ * the cap on the accumulated result count.
+ *
+ * @stable
+ */
+export interface IterativeSearchOptions extends FactSearchOptions {
+  /**
+   * Total-pass cap, clamped to `[1, 5]`. Omitted ⇒ the facade-configured
+   * default (`createMemory({ iterativeRetrieval: { maxIterations } })`)
+   * or `3`.
+   */
+  readonly maxIterations?: number;
+  /**
+   * Skip the heuristic difficulty gate and force the loop (still capped
+   * and still a no-op without a grader). For deliberate "deep recall"
+   * requests and tests.
+   */
+  readonly forceHard?: boolean;
+}
+
+/**
+ * Outcome of {@link SemanticMemory.searchIterative}. Beyond the ranked
+ * `hits`, `sufficient` / `abstained` tell the caller whether the memory
+ * actually answered the query — `abstained: true` means it should say so
+ * rather than confabulate.
+ *
+ * @stable
+ */
+export type IterativeRecallResult = IterativeRetrievalResult<MemoryHit<Fact>>;
+
+/**
  * Per-call options accepted by {@link SemanticMemory.remember}. The
  * Phase 10b pipeline writes one row to `fact_conflicts` (and
  * potentially one to `conflict_check_pending`) for every invocation;
@@ -249,6 +288,8 @@ export class SemanticMemory {
   readonly #contextualMode: 'off' | 'late-chunk';
   readonly #queryTransformer: QueryTransformer | null;
   readonly #entityResolver: EntityResolver | null;
+  readonly #grader: RetrievalGrader | null;
+  readonly #iterativeMaxIterations: number;
   #reranker: ReRanker;
 
   constructor(args: {
@@ -283,6 +324,16 @@ export class SemanticMemory {
      * links, and the write path stays offline + unchanged.
      */
     entityResolver?: EntityResolver;
+    /**
+     * Retrieval grader for the gated iterative loop (P2-4). When
+     * supplied, `searchIterative(...)` can grade a retrieved set and
+     * reformulate on hard queries; omitted (the default) ⇒
+     * `searchIterative` runs a single, difficulty-gated pass and makes no
+     * provider call.
+     */
+    grader?: RetrievalGrader;
+    /** Default total-pass cap for `searchIterative`. Default 3. */
+    iterativeMaxIterations?: number;
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
@@ -293,6 +344,8 @@ export class SemanticMemory {
     this.#contextualMode = args.contextualRetrieval ?? 'late-chunk';
     this.#queryTransformer = args.queryTransformer ?? null;
     this.#entityResolver = args.entityResolver ?? null;
+    this.#grader = args.grader ?? null;
+    this.#iterativeMaxIterations = args.iterativeMaxIterations ?? DEFAULT_MAX_ITERATIONS;
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -633,6 +686,77 @@ export class SemanticMemory {
             : {}),
         });
         return ranked;
+      },
+    );
+  }
+
+  /**
+   * Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
+   * local heuristic ({@link assessQueryDifficulty}) decides whether the
+   * query is even a loop candidate; simple lookups take exactly one
+   * {@link search} pass and make no provider call. For a query judged
+   * hard *and* with a grader configured
+   * (`createMemory({ iterativeRetrieval })`), the retrieved set is graded
+   * for sufficiency and, when weak, the query is reformulated and
+   * retrieved again — **widening to one-hop graph expansion**
+   * (`expandHops: 1`) on each reformulation pass — up to `maxIterations`
+   * (hard-capped at 5). When still insufficient it returns
+   * `abstained: true` so the caller can decline to answer instead of
+   * confabulating.
+   *
+   * Without a grader (the offline default) this degrades to a single,
+   * difficulty-gated `search` and never calls a provider.
+   *
+   * @stable
+   */
+  async searchIterative(
+    scope: SessionScope,
+    query: string,
+    opts: IterativeSearchOptions = {},
+  ): Promise<IterativeRecallResult> {
+    // Reuse the `memory.search.semantic` span type (the inner per-pass
+    // searches nest under it); iterative-specific data is namespaced under
+    // the `…iterative.*` attribute prefix so no new core SpanType is
+    // needed and P2-4 stays memory-only.
+    return withMemorySpan(
+      this.#tracer,
+      'memory.search.semantic',
+      scope,
+      { 'memory.search.query_length': query.length },
+      async (span) => {
+        const result = await runIterativeRetrieval<MemoryHit<Fact>>(
+          query,
+          {
+            // `maxIterations` / `forceHard` ride along harmlessly (search
+            // ignores unknown keys); `expandHops: 1` widens recall to the
+            // P2-1 graph on reformulation passes, and the per-pass signal
+            // overrides any inherited one.
+            retrieve: (q, widen, signal) =>
+              this.search(scope, q, {
+                ...opts,
+                ...(widen ? { expandHops: 1 } : {}),
+                ...(signal !== undefined ? { signal } : {}),
+              }),
+            snippetOf: (hit) => hit.record.text,
+            idOf: (hit) => hit.record.id,
+            grader: this.#grader,
+          },
+          {
+            maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
+            maxResults: opts.topK ?? 10,
+            ...(opts.forceHard !== undefined ? { forceHard: opts.forceHard } : {}),
+            ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+          },
+        );
+        span.setAttributes({
+          'memory.search.semantic.iterative.gate_hard': result.gateHard,
+          'memory.search.semantic.iterative.iterations': result.iterations,
+          'memory.search.semantic.iterative.sufficient': result.sufficient,
+          'memory.search.semantic.iterative.abstained': result.abstained,
+          'memory.search.semantic.iterative.query_count': result.queries.length,
+          'memory.search.semantic.iterative.final_count': result.hits.length,
+        });
+        return result;
       },
     );
   }

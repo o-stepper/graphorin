@@ -211,11 +211,13 @@ export * from './migration/index.js';
 export * from './search/index.js';
 export * from './tiers/index.js';
 export {
+  type BuildMemoryToolsOptions,
   buildMemoryTools,
   createBlockAppendTool,
   createBlockReplaceTool,
   createBlockRethinkTool,
   createConversationSearchTool,
+  createDeepRecallTool,
   createFactForgetTool,
   createFactHistoryTool,
   createFactRememberTool,

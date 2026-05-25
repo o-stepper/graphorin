@@ -166,6 +166,19 @@ any `EmbedderProvider`; the default is
   adjudication (`graph: { llmAdjudication: true, provider }`) to resolve that band.
   Omit it all and the default path is unchanged + fully offline (`expandHops`
   defaults to `0`).
+- **Agentic / iterative retrieval** (search quality, gated + opt-in). A
+  CRAG/Self-RAG-style grade-then-reformulate loop for hard multi-hop / temporal
+  questions one pass can't answer. A cheap **local difficulty gate**
+  (`assessQueryDifficulty`) keeps simple lookups single-shot; only a query judged
+  hard *and* with a grader configured (`createMemory({ iterativeRetrieval: {
+  provider } })`) is graded for sufficiency and, when weak, reformulated +
+  retrieved again — **widening to one-hop graph expansion** on each reformulation —
+  up to a hard-capped `maxIterations` (≤ 5), then **abstaining**
+  (`result.abstained === true`) rather than confabulating. Exposed as
+  `SemanticMemory.searchIterative(...)` and the gated **`deep_recall`** tool (a
+  twelfth tool, registered only when `iterativeRetrieval` is configured). Omit it
+  and `searchIterative` degrades to one difficulty-gated pass with **no provider
+  call**; the tool surface stays at the canonical eleven.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

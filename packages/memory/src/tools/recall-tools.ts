@@ -44,6 +44,30 @@ const conversationSearchOutputSchema = z.object({
 type ConversationSearchInput = z.infer<typeof conversationSearchInputSchema>;
 type ConversationSearchOutput = z.infer<typeof conversationSearchOutputSchema>;
 
+const deepRecallSensitivityEnum = z.enum(['public', 'internal', 'secret']);
+const deepRecallInputSchema = z.object({
+  query: z.string().min(1).max(1024),
+  topK: z.number().int().positive().max(50).optional(),
+  maxIterations: z.number().int().min(1).max(5).optional(),
+  asOf: z.string().datetime().optional(),
+});
+const deepRecallOutputSchema = z.object({
+  hits: z.array(
+    z.object({
+      factId: z.string(),
+      text: z.string(),
+      score: z.number(),
+      sensitivity: deepRecallSensitivityEnum,
+    }),
+  ),
+  sufficient: z.boolean(),
+  abstained: z.boolean(),
+  iterations: z.number().int(),
+});
+
+type DeepRecallInput = z.infer<typeof deepRecallInputSchema>;
+type DeepRecallOutput = z.infer<typeof deepRecallOutputSchema>;
+
 /**
  * `recall_episodes` — triple-signal episode retrieval (recency ×
  * relevance × importance).
@@ -122,6 +146,57 @@ export function createConversationSearchTool(
           messageId: hit.record.id,
           score: hit.score,
         })),
+      };
+    },
+  });
+}
+
+/**
+ * `deep_recall` — gated, multi-pass ("deep") recall over the user's
+ * factual memory for HARD questions (P2-4). A local difficulty gate keeps
+ * simple lookups single-shot; only queries judged hard trigger a
+ * grade-and-reformulate loop (bounded by `maxIterations`, hard-capped at
+ * 5), widening to one-hop graph expansion on reformulation passes. The
+ * output reports `abstained: true` when memory was insufficient even
+ * after reformulating — the agent should then say it lacks the
+ * information rather than guess. Registered only when the facade is
+ * created with `iterativeRetrieval`; otherwise it degrades to a single
+ * pass, so prefer the cheaper `fact_search` for ordinary lookups.
+ *
+ * @stable
+ */
+export function createDeepRecallTool(
+  deps: MemoryToolDeps,
+): Tool<DeepRecallInput, DeepRecallOutput> {
+  return tool<DeepRecallInput, DeepRecallOutput>({
+    name: 'deep_recall',
+    description:
+      "Multi-pass ('deep') recall over the user's long-term factual memory for HARD multi-hop or temporal questions one search can't answer (e.g. 'who recommended the book the person I met in Tbilisi mentioned?'). A difficulty gate keeps simple lookups single-shot; hard questions trigger a bounded grade-and-reformulate loop. If `abstained` is true the memory was insufficient even after reformulating — tell the user you don't have enough stored to answer and DO NOT guess. Prefer the cheaper fact_search for ordinary lookups.",
+    inputSchema: deepRecallInputSchema,
+    outputSchema: deepRecallOutputSchema,
+    sideEffectClass: 'read-only',
+    sandboxPolicy: 'none',
+    sensitivity: 'internal',
+    memoryGuardTier: 'pure',
+    tags: ['memory', 'semantic'],
+    async execute(input, ctx) {
+      const scope = await deps.resolveScope(ctx);
+      const result = await deps.semantic.searchIterative(scope, input.query, {
+        ...(input.topK !== undefined ? { topK: input.topK } : {}),
+        ...(input.maxIterations !== undefined ? { maxIterations: input.maxIterations } : {}),
+        ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
+        signal: ctx.signal,
+      });
+      return {
+        hits: result.hits.map((hit) => ({
+          factId: hit.record.id,
+          text: hit.record.text,
+          score: hit.score,
+          sensitivity: hit.record.sensitivity,
+        })),
+        sufficient: result.sufficient,
+        abstained: result.abstained,
+        iterations: result.iterations,
       };
     },
   });

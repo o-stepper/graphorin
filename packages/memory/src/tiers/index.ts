@@ -29,6 +29,8 @@ export {
   type FactSearchOptions,
   type FusionStrategy,
   type FusionWeights,
+  type IterativeRecallResult,
+  type IterativeSearchOptions,
   type RememberOutcome,
   SemanticMemory,
 } from './semantic-memory.js';

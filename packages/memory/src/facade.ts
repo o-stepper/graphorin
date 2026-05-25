@@ -49,6 +49,7 @@ import { type EntityResolutionConfig, EntityResolver } from './graph/entity-reso
 import type { ContextualRetrievalMode } from './internal/contextualize.js';
 import { bindEmbedder } from './internal/embedder-binding.js';
 import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/storage-adapter.js';
+import { createProviderRetrievalGrader } from './search/iterative.js';
 import { createProviderQueryTransformer } from './search/query-transform.js';
 import { RRFReranker } from './search/rrf.js';
 import type { ReRanker } from './search/types.js';
@@ -129,6 +130,26 @@ export interface CreateMemoryOptions {
     readonly entityResolution?: boolean;
     /** Provider for opt-in LLM adjudication of ambiguous merges. */
     readonly provider?: Provider;
+  };
+  /**
+   * Agentic / iterative retrieval (P2-4, opt-in). When supplied,
+   * `SemanticMemory.searchIterative(...)` and the gated `deep_recall`
+   * tool can grade a retrieved set on the given provider and, for queries
+   * judged hard, reformulate + retrieve again (widening to one-hop graph
+   * expansion) up to `maxIterations`, abstaining instead of confabulating
+   * when memory is insufficient. Omitted (the default) ⇒ `searchIterative`
+   * stays a single difficulty-gated pass with **no provider call**, and
+   * `deep_recall` is **not** registered (the tool surface stays at the
+   * canonical eleven). Reserve it for hard multi-hop / temporal recall —
+   * it adds provider latency per pass.
+   */
+  readonly iterativeRetrieval?: {
+    /** Cheap provider used to grade retrieved memories + reformulate. */
+    readonly provider: Provider;
+    /** Default total-pass cap (clamped to `[1, 5]`). Default 3. */
+    readonly maxIterations?: number;
+    /** Output-token ceiling per grade call. Default 256. */
+    readonly maxTokens?: number;
   };
   /**
    * Resolver that produces the live {@link SessionScope} for each
@@ -323,6 +344,17 @@ export function createMemory(options: CreateMemoryOptions): Memory {
           },
         })
       : null;
+  // P2-4: build the (opt-in) retrieval grader. Absent ⇒ `null` ⇒
+  // `searchIterative` runs a single difficulty-gated pass (no provider
+  // call) and the `deep_recall` tool is not registered.
+  const grader =
+    options.iterativeRetrieval !== undefined
+      ? createProviderRetrievalGrader(options.iterativeRetrieval.provider, {
+          ...(options.iterativeRetrieval.maxTokens !== undefined
+            ? { maxTokens: options.iterativeRetrieval.maxTokens }
+            : {}),
+        })
+      : null;
   const semantic = new SemanticMemory({
     store: options.store,
     tracer,
@@ -335,20 +367,29 @@ export function createMemory(options: CreateMemoryOptions): Memory {
       : {}),
     ...(queryTransformer !== null ? { queryTransformer } : {}),
     ...(entityResolver !== null ? { entityResolver } : {}),
+    ...(grader !== null ? { grader } : {}),
+    ...(options.iterativeRetrieval?.maxIterations !== undefined
+      ? { iterativeMaxIterations: options.iterativeRetrieval.maxIterations }
+      : {}),
   });
   const procedural = new ProceduralMemory({ store: options.store, tracer });
   const shared = new SharedMemory({ store: options.store, tracer });
   const insights = new InsightMemory({ store: options.store, tracer });
 
-  const tools = buildMemoryTools({
-    working,
-    session,
-    episodic,
-    semantic,
-    procedural,
-    shared,
-    resolveScope,
-  });
+  const tools = buildMemoryTools(
+    {
+      working,
+      session,
+      episodic,
+      semantic,
+      procedural,
+      shared,
+      resolveScope,
+    },
+    // P2-4: the gated `deep_recall` tool is registered only when a grader
+    // is configured — the offline default stays at exactly eleven tools.
+    { includeDeepRecall: grader !== null },
+  );
 
   const consolidatorOpts = options.consolidator;
   const consolidator: Consolidator = buildConsolidator(
