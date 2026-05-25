@@ -111,6 +111,15 @@ any `EmbedderProvider`; the default is
   plain-text writes. An opt-in, **consolidator-only** `'llm'` mode
   (`consolidator: { contextualRetrieval: 'llm' }`) spends one budgeted cheap-model
   call per write to author the prefix, degrading to late-chunk on any failure.
+- **Recall explainability** ("why was this recalled?"). `explainRecall(hits, {
+  query, rerankerId })` decomposes a `search(...)` result into the per-memory
+  signals that drove its score (`bm25` / `vector` / fused `rrf` / `decay`), in
+  final-rank order; `formatRecallExplanation(...)` renders it. `search` also
+  records the decay multiplier as a `decay` signal and attaches the breakdown
+  (ids + scores + signals, never the query text) to the `memory.search.semantic`
+  span. Operators inspect the rest via `graphorin memory inspect <factId>`
+  (supersede chain / quarantine / conflicts / citing insights) and
+  `graphorin memory activity` (consolidator / reflection activity).
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

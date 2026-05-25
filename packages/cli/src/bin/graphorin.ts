@@ -48,6 +48,8 @@ import {
   runGuardExplain,
   runGuardStatus,
   runInit,
+  runMemoryActivity,
+  runMemoryInspect,
   runMemoryMigrate,
   runMemoryStatus,
   runMigrate,
@@ -679,6 +681,33 @@ function registerMemoryCommands(program: Command): void {
         });
       },
     );
+  memory
+    .command('inspect')
+    .description('Inspect one fact: supersede chain, quarantine, conflicts, citing insights.')
+    .argument('<factId>', 'Id of the fact to inspect.')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (factId: string, opts: { config?: string; json?: boolean }) => {
+      await runMemoryInspect({
+        factId,
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
+  memory
+    .command('activity')
+    .description('Store-wide consolidator / reflection activity: quarantine, history, conflicts.')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--limit <n>', 'Cap on recent history / conflict rows (default 20).')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (opts: { config?: string; limit?: string; json?: boolean }) => {
+      const limit = opts.limit !== undefined ? Number.parseInt(opts.limit, 10) : undefined;
+      await runMemoryActivity({
+        ...(limit !== undefined && Number.isFinite(limit) ? { limit } : {}),
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
 }
 
 function registerConsolidatorCommands(program: Command): void {

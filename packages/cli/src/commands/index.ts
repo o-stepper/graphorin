@@ -60,10 +60,22 @@ export {
 } from './guard.js';
 export { type InitCommandOptions, type InitCommandResult, runInit } from './init.js';
 export {
+  type MemoryActivityConflict,
+  type MemoryActivityEvent,
+  type MemoryActivityOptions,
+  type MemoryActivityResult,
+  type MemoryCitingInsight,
   type MemoryCommonOptions,
+  type MemoryConflictEntry,
+  type MemoryHistoryEntry,
+  type MemoryInspectFact,
+  type MemoryInspectOptions,
+  type MemoryInspectResult,
   type MemoryMigrateOptions,
   type MemoryStatusEmbedder,
   type MemoryStatusResult,
+  runMemoryActivity,
+  runMemoryInspect,
   runMemoryMigrate,
   runMemoryStatus,
 } from './memory.js';

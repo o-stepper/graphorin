@@ -15,6 +15,7 @@ import { newMemoryId } from '../internal/id.js';
 import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
+import { explainRecall } from '../search/explain.js';
 import { fuseRrf } from '../search/rrf.js';
 import type { ReRanker } from '../search/types.js';
 
@@ -410,12 +411,20 @@ export class SemanticMemory {
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
         const ranked = await this.#applyDecay(scope, fused, opts.decay);
+        const explanation = explainRecall(ranked, {
+          query,
+          rerankerId: this.#reranker.id,
+        });
         span.setAttributes({
           'memory.search.semantic.fts_count': ftsHits.length,
           'memory.search.semantic.vector_count': vectorHits.length,
           'memory.search.semantic.final_count': ranked.length,
           'memory.search.semantic.reranker_id': this.#reranker.id,
           'memory.search.semantic.decay_applied': opts.decay !== undefined,
+          // X-3: per-signal recall explanation (ids + scores + signals,
+          // no query text — the query is surfaced only as `query_length`
+          // above to keep traces free of recall content).
+          'memory.search.semantic.explain': JSON.stringify(explanation.results),
           ...(opts.asOf !== undefined ? { 'memory.search.semantic.as_of': opts.asOf } : {}),
           ...(opts.includeQuarantined === true
             ? { 'memory.search.semantic.include_quarantined': true }
@@ -664,7 +673,14 @@ export class SemanticMemory {
       const reference = sig.lastAccessedAt ?? sig.createdAt;
       const elapsed = Math.max(0, now - reference);
       const retention = Math.exp(-elapsed / (tauMs * Math.max(0.5, sig.strength)));
-      return { ...hit, score: hit.score * retention };
+      // Record the decay multiplier as a signal so recall explanations
+      // (X-3) can attribute the score drop to staleness, not just to
+      // fusion. Hits with no decay row keep their signals untouched.
+      return {
+        ...hit,
+        score: hit.score * retention,
+        signals: Object.freeze({ ...(hit.signals ?? {}), decay: retention }),
+      };
     });
     const sorted = [...out].sort((a, b) => b.score - a.score);
     return Object.freeze(sorted);

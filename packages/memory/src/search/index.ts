@@ -5,5 +5,11 @@
  * @packageDocumentation
  */
 
+export {
+  explainRecall,
+  formatRecallExplanation,
+  type RecallExplanation,
+  type RecalledMemoryExplanation,
+} from './explain.js';
 export { fuseRrf, RRF_DEFAULT_K, RRFReranker } from './rrf.js';
 export type { ReRanker, ReRankOptions } from './types.js';
