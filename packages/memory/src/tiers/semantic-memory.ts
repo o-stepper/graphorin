@@ -10,6 +10,7 @@ import type {
 } from '@graphorin/core';
 import { md5 } from '@graphorin/core';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
+import type { EntityResolver } from '../graph/entity-resolver.js';
 import { contextualize } from '../internal/contextualize.js';
 import { newMemoryId } from '../internal/id.js';
 import { detectMemoryInjection } from '../internal/injection-heuristics.js';
@@ -173,6 +174,19 @@ export interface FactSearchOptions {
    * @stable
    */
   readonly fusion?: FusionStrategy;
+  /**
+   * One-hop graph expansion (P2-1). With `1` *and* a graph-capable
+   * storage adapter (`store.graph`), the facts retrieved by the lexical /
+   * vector candidate pass are treated as seeds: facts sharing a canonical
+   * entity (subject / object) are fetched via a recursive CTE and fused
+   * in as an extra candidate list before rerank — surfacing connected
+   * facts the query never matched directly ("what did the person I met in
+   * Tbilisi recommend?"). `0` (the default) or a graph-less adapter ⇒ a
+   * silent no-op; recall is unchanged. Opt-in + retrieval-heavy.
+   *
+   * @stable
+   */
+  readonly expandHops?: 0 | 1;
 }
 
 /**
@@ -234,6 +248,7 @@ export class SemanticMemory {
   readonly #pipeline: ConflictPipeline | null;
   readonly #contextualMode: 'off' | 'late-chunk';
   readonly #queryTransformer: QueryTransformer | null;
+  readonly #entityResolver: EntityResolver | null;
   #reranker: ReRanker;
 
   constructor(args: {
@@ -260,6 +275,14 @@ export class SemanticMemory {
      * background consolidator, which supplies a precomputed `indexText`.
      */
     contextualRetrieval?: 'off' | 'late-chunk';
+    /**
+     * Entity resolver for the relation graph (P2-1). When supplied,
+     * `remember(...)` resolves a fact's subject / object to canonical
+     * entities and links them, enabling `search(..., { expandHops: 1 })`.
+     * Omitted (the default) ⇒ writes carry s/p/o but form no entity
+     * links, and the write path stays offline + unchanged.
+     */
+    entityResolver?: EntityResolver;
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
@@ -269,6 +292,7 @@ export class SemanticMemory {
     this.#pipeline = args.conflictPipeline ?? null;
     this.#contextualMode = args.contextualRetrieval ?? 'late-chunk';
     this.#queryTransformer = args.queryTransformer ?? null;
+    this.#entityResolver = args.entityResolver ?? null;
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -332,6 +356,12 @@ export class SemanticMemory {
         ...(scope.agentId !== undefined ? { agentId: scope.agentId } : {}),
         sensitivity: input.sensitivity ?? 'internal',
         text,
+        // P2-1: carry the s/p/o triple onto the persisted fact (it used to
+        // be dropped here, surviving only in the late-chunk index text).
+        // This is what activates the relation-graph substrate.
+        ...(input.subject !== undefined ? { subject: input.subject } : {}),
+        ...(input.predicate !== undefined ? { predicate: input.predicate } : {}),
+        ...(input.object !== undefined ? { object: input.object } : {}),
         ...(input.confidence !== undefined ? { confidence: input.confidence } : {}),
         ...(input.tags !== undefined ? { tags: Object.freeze([...input.tags]) } : {}),
         ...(input.validFrom !== undefined ? { validFrom: input.validFrom } : { validFrom: now }),
@@ -385,6 +415,7 @@ export class SemanticMemory {
         case 'admit':
         case 'pending': {
           await this.#commitFact(fact, embedder, embedderId, indexText);
+          await this.#linkEntities(scope, fact, options.signal);
           return { fact, decision };
         }
         case 'dedup': {
@@ -394,6 +425,7 @@ export class SemanticMemory {
         case 'supersede': {
           await this.#commitFact(fact, embedder, embedderId, indexText);
           await this.#store.semantic.supersede(decision.existingId, fact, decision.reason);
+          await this.#linkEntities(scope, fact, options.signal);
           return { fact, decision };
         }
       }
@@ -464,6 +496,25 @@ export class SemanticMemory {
     return this.#store.semantic.get(factId);
   }
 
+  /**
+   * P2-1: resolve the fact's subject / object to canonical entities and
+   * link them so one-hop expansion can traverse this fact. A no-op when
+   * no resolver is configured (the default) or the fact has no s/p/o, and
+   * resilient — a resolution failure never breaks the write that just
+   * committed.
+   */
+  async #linkEntities(scope: SessionScope, fact: Fact, signal?: AbortSignal): Promise<void> {
+    if (this.#entityResolver === null) return;
+    if (fact.subject === undefined && fact.object === undefined) return;
+    try {
+      await this.#entityResolver.linkFact(scope, fact, {
+        ...(signal !== undefined ? { signal } : {}),
+      });
+    } catch {
+      // Graph linking is a soft enrichment — never fail a committed write.
+    }
+  }
+
   /** Hybrid (vector + FTS5) search merged through the configured reranker. */
   async search(
     scope: SessionScope,
@@ -529,6 +580,15 @@ export class SemanticMemory {
           lists.push(hydeHits);
           listWeights.push(wVector);
         }
+        // P2-1: one-hop graph expansion — seed on the candidates gathered
+        // so far and fuse in facts that share a canonical entity (a third
+        // candidate kind ⇒ neutral fusion weight). A no-op without
+        // `expandHops` / a graph adapter.
+        const graphHits = await this.#tryExpandHops(scope, lists, opts, candidateTopK);
+        if (graphHits.length > 0) {
+          lists.push(graphHits);
+          listWeights.push(1);
+        }
         // X-2: weighted fusion runs through a per-call WeightedRRFReranker
         // built from the per-list weights; the default stays the
         // configured reranker so behaviour is unchanged when `fusion` is
@@ -561,6 +621,8 @@ export class SemanticMemory {
           'memory.search.semantic.decay_applied': opts.decay !== undefined,
           'memory.search.semantic.query_count': queries.length,
           'memory.search.semantic.hyde_applied': hydeHits.length > 0,
+          'memory.search.semantic.expand_hops': opts.expandHops ?? 0,
+          'memory.search.semantic.graph_count': graphHits.length,
           // X-3: per-signal recall explanation (ids + scores + signals,
           // no query text — the query is surfaced only as `query_length`
           // above to keep traces free of recall content).
@@ -831,6 +893,54 @@ export class SemanticMemory {
       });
       if (pseudo === null || pseudo.trim().length === 0) return [];
       return this.#tryVectorSearch(scope, pseudo, topK, opts.asOf, opts.includeQuarantined);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * One-hop graph expansion (P2-1). Seeds on the unique fact ids already
+   * gathered into `lists` and fuses in facts sharing a canonical entity,
+   * via the adapter's recursive-CTE `graph.expandOneHop`. A no-op (`[]`)
+   * unless `expandHops >= 1` and the adapter exposes `graph` — and
+   * resilient: a traversal error degrades to no expansion rather than
+   * breaking recall. Neighbours carry a `graph` signal so explanations
+   * (X-3) can attribute a hit to the hop.
+   */
+  async #tryExpandHops(
+    scope: SessionScope,
+    lists: ReadonlyArray<ReadonlyArray<MemoryHit<Fact>>>,
+    opts: FactSearchOptions,
+    limit: number,
+  ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    const hops = opts.expandHops ?? 0;
+    const graphStore = this.#store.graph;
+    if (hops < 1 || graphStore === undefined || typeof graphStore.expandOneHop !== 'function') {
+      return [];
+    }
+    const seedIds: string[] = [];
+    const seen = new Set<string>();
+    for (const list of lists) {
+      for (const hit of list) {
+        if (!seen.has(hit.record.id)) {
+          seen.add(hit.record.id);
+          seedIds.push(hit.record.id);
+        }
+      }
+    }
+    if (seedIds.length === 0) return [];
+    try {
+      const neighbours = await graphStore.expandOneHop(scope, seedIds, {
+        maxHops: hops,
+        limit,
+        ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+        ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+      });
+      return neighbours.map((fact) => ({
+        record: fact,
+        score: 1,
+        signals: Object.freeze({ graph: 1 }),
+      }));
     } catch {
       return [];
     }

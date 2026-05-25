@@ -152,6 +152,20 @@ any `EmbedderProvider`; the default is
   `createMemory({ reranker })` or `setReranker(...)` and raise `candidateTopK` —
   reranking pays off **only on an already-high-recall candidate set**, so fix
   recall first (contextual retrieval / multi-query) before reaching for it.
+- **Relation graph + one-hop expansion** (new capability, opt-in). Activates the
+  dormant `(subject, predicate, object)` substrate: facts now carry s/p/o, and an
+  **entity resolver** folds the subject/object strings into canonical entities
+  ("Anna", "Anna S.", "my sister" → one entity) via lexical + embedding dedup —
+  with **auditable, reversible merges** (an append-only ledger; `merged_into` is
+  single-level). At read time `search(scope, query, { expandHops: 1 })` seeds on
+  the candidates and fuses in facts sharing an entity through a recursive CTE,
+  answering "what did the person I met in Tbilisi recommend?" without leaving
+  SQLite. Enable linking with `createMemory({ graph: { entityResolution: true } })`
+  (offline; lexical + embedding). The ambiguous-similarity band mints a *new*
+  entity by default — it never auto-merges on weak evidence; opt into LLM
+  adjudication (`graph: { llmAdjudication: true, provider }`) to resolve that band.
+  Omit it all and the default path is unchanged + fully offline (`expandHops`
+  defaults to `0`).
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

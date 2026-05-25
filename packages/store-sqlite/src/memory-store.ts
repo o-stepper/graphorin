@@ -1,7 +1,9 @@
 import type {
   Block,
+  EntityRole,
   Episode,
   Fact,
+  GraphEntity,
   Insight,
   MemoryHit,
   MemoryProvenance,
@@ -107,6 +109,8 @@ export class SqliteMemoryStore implements MemoryStore {
   readonly consolidator: SqliteConsolidatorStateStore;
   /** Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. */
   readonly insights: SqliteInsightStore;
+  /** Lightweight relation-graph surface (P2-1): entities + one-hop CTE. */
+  readonly graph: SqliteGraphStore;
 
   constructor(conn: SqliteConnection, embeddings: EmbeddingMetaRepository) {
     this.#embeddings = embeddings;
@@ -120,6 +124,7 @@ export class SqliteMemoryStore implements MemoryStore {
     this.conflicts = new SqliteConflictStore(conn);
     this.consolidator = new SqliteConsolidatorStateStore(conn);
     this.insights = new SqliteInsightStore(conn);
+    this.graph = new SqliteGraphStore(conn);
   }
 
   async init(): Promise<void> {
@@ -650,6 +655,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
+           subject = excluded.subject,
+           predicate = excluded.predicate,
+           object = excluded.object,
            confidence = excluded.confidence,
            sensitivity = excluded.sensitivity,
            tags_json = excluded.tags_json,
@@ -667,9 +675,13 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.sessionId ?? null,
           fact.agentId ?? null,
           fact.text,
-          null,
-          null,
-          null,
+          // P2-1: carry the s/p/o triple instead of dropping it. The
+          // columns + `idx_facts_subject_predicate` have existed since
+          // migration 001; this stops the write path nulling them so the
+          // relation graph (entities / one-hop expansion) has a substrate.
+          fact.subject ?? null,
+          fact.predicate ?? null,
+          fact.object ?? null,
           fact.confidence ?? null,
           fact.sensitivity,
           fact.tags ? JSON.stringify(fact.tags) : null,
@@ -1229,6 +1241,321 @@ export class SqliteInsightStore {
   }
 }
 
+interface EntityRow {
+  id: string;
+  scope_user_id: string;
+  name: string;
+  normalized_name: string;
+  embedding: Buffer | Uint8Array | null;
+  embedder_id: string | null;
+  merged_into: string | null;
+  created_at: number;
+  updated_at: number | null;
+}
+
+interface EntityMergeRow {
+  id: string;
+  scope_user_id: string;
+  kind: string;
+  from_entity_id: string;
+  into_entity_id: string | null;
+  reason: string | null;
+  created_at: number;
+}
+
+/** Find-or-create payload for {@link SqliteGraphStore.upsertEntity}. */
+interface SqliteEntityUpsertInput {
+  readonly name: string;
+  readonly normalizedName: string;
+  readonly vector?: Float32Array;
+  readonly embedderId?: string;
+}
+
+/** A canonical entity returned with its name embedding for dedup. */
+interface SqliteEntityWithEmbedding extends GraphEntity {
+  readonly vector: Float32Array | null;
+  readonly embedderId: string | null;
+}
+
+/** One row of the append-only merge / unmerge audit ledger. */
+interface SqliteEntityMergeRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly kind: 'merge' | 'unmerge';
+  readonly fromEntityId: string;
+  readonly intoEntityId: string | null;
+  readonly reason?: string;
+  readonly createdAt: string;
+}
+
+/**
+ * Lightweight in-SQLite relation-graph store (P2-1). Owns the canonical
+ * `entities` table, the `fact_entities` mapping, and the append-only
+ * `entity_merges` ledger. Entity *resolution* (lexical + embedding dedup,
+ * optional LLM adjudication) lives in `@graphorin/memory`; this class is
+ * the pure persistence + the one-hop recursive-CTE traversal. Exposed on
+ * {@link SqliteMemoryStore.graph} and picked up structurally as the
+ * memory adapter's optional `graph` capability.
+ *
+ * @stable
+ */
+export class SqliteGraphStore {
+  #conn: SqliteConnection;
+  constructor(conn: SqliteConnection) {
+    this.#conn = conn;
+  }
+
+  /**
+   * Find-or-create the canonical (root) entity for `normalizedName` in
+   * the scope. Returns the existing root's id when one exists (back-filling
+   * its embedding if it had none), else inserts and returns a new root.
+   */
+  async upsertEntity(scope: SessionScope, input: SqliteEntityUpsertInput): Promise<string> {
+    return this.#conn.transaction(() => {
+      const existing = this.#conn.get<EntityRow>(
+        'SELECT * FROM entities WHERE scope_user_id = ? AND normalized_name = ? AND merged_into IS NULL',
+        [scope.userId, input.normalizedName],
+      );
+      const now = Date.now();
+      if (existing !== undefined) {
+        if (
+          existing.embedding === null &&
+          input.vector !== undefined &&
+          input.embedderId !== undefined
+        ) {
+          this.#conn.run(
+            'UPDATE entities SET embedding = ?, embedder_id = ?, updated_at = ? WHERE id = ?',
+            [f32ToBlob(input.vector), input.embedderId, now, existing.id],
+          );
+        }
+        return existing.id;
+      }
+      const id = generateId();
+      this.#conn.run(
+        `INSERT INTO entities (id, scope_user_id, name, normalized_name, embedding, embedder_id, merged_into, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, NULL, ?, NULL)`,
+        [
+          id,
+          scope.userId,
+          input.name,
+          input.normalizedName,
+          input.vector !== undefined ? f32ToBlob(input.vector) : null,
+          input.embedderId ?? null,
+          now,
+        ],
+      );
+      return id;
+    });
+  }
+
+  /** Link a fact's subject / object to a canonical entity (idempotent). */
+  async linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void> {
+    this.#conn.run(
+      'INSERT OR IGNORE INTO fact_entities (fact_id, entity_id, role, created_at) VALUES (?, ?, ?, ?)',
+      [factId, entityId, role, Date.now()],
+    );
+  }
+
+  /** Candidate entities for the resolver (roots only unless `includeMerged`). */
+  async listEntities(
+    scope: SessionScope,
+    opts: { readonly includeMerged?: boolean; readonly limit?: number } = {},
+  ): Promise<ReadonlyArray<SqliteEntityWithEmbedding>> {
+    const limit = opts.limit ?? 1000;
+    const rows = this.#conn.all<EntityRow>(
+      `SELECT * FROM entities
+       WHERE scope_user_id = ? ${opts.includeMerged === true ? '' : 'AND merged_into IS NULL'}
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map((r) => ({
+      ...rowToGraphEntity(r),
+      vector: blobToF32(r.embedding),
+      embedderId: r.embedder_id,
+    }));
+  }
+
+  /** Lookup one entity by id (any merge state). */
+  async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
+    const row = this.#conn.get<EntityRow>(
+      'SELECT * FROM entities WHERE id = ? AND scope_user_id = ?',
+      [id, scope.userId],
+    );
+    return row !== undefined ? rowToGraphEntity(row) : null;
+  }
+
+  /** Follow `merged_into` to the canonical root id (cycle-guarded). */
+  async resolveCanonical(scope: SessionScope, id: string): Promise<string> {
+    let current = id;
+    for (let i = 0; i < 16; i++) {
+      const row = this.#conn.get<{ merged_into: string | null }>(
+        'SELECT merged_into FROM entities WHERE id = ? AND scope_user_id = ?',
+        [current, scope.userId],
+      );
+      if (row === undefined || row.merged_into === null) return current;
+      current = row.merged_into;
+    }
+    return current;
+  }
+
+  /**
+   * Merge `fromId` into `intoId` (resolved to its root). Sets
+   * `from.merged_into` and re-points `from`'s children to keep the
+   * pointer single-level, then records a `'merge'` audit row.
+   * `fact_entities` are never rewritten — reads canonicalise via
+   * `merged_into`. A self-merge is a no-op.
+   */
+  async mergeEntities(
+    scope: SessionScope,
+    fromId: string,
+    intoId: string,
+    reason?: string,
+  ): Promise<void> {
+    this.#conn.transaction(() => {
+      const intoRow = this.#conn.get<{ merged_into: string | null }>(
+        'SELECT merged_into FROM entities WHERE id = ? AND scope_user_id = ?',
+        [intoId, scope.userId],
+      );
+      const intoRoot = intoRow?.merged_into ?? intoId;
+      if (fromId === intoRoot) return;
+      const now = Date.now();
+      this.#conn.run(
+        'UPDATE entities SET merged_into = ?, updated_at = ? WHERE id = ? AND scope_user_id = ?',
+        [intoRoot, now, fromId, scope.userId],
+      );
+      this.#conn.run(
+        'UPDATE entities SET merged_into = ?, updated_at = ? WHERE merged_into = ? AND scope_user_id = ?',
+        [intoRoot, now, fromId, scope.userId],
+      );
+      this.#conn.run(
+        `INSERT INTO entity_merges (id, scope_user_id, kind, from_entity_id, into_entity_id, reason, created_at)
+         VALUES (?, ?, 'merge', ?, ?, ?, ?)`,
+        [generateId(), scope.userId, fromId, intoRoot, reason ?? null, now],
+      );
+    });
+  }
+
+  /**
+   * Reverse a merge: clear `id.merged_into` (making it a root again) and
+   * record an `'unmerge'` audit row. Restores the entity as a root; the
+   * pre-merge child topology is not reconstructed.
+   */
+  async unmergeEntity(scope: SessionScope, id: string, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      const now = Date.now();
+      this.#conn.run(
+        'UPDATE entities SET merged_into = NULL, updated_at = ? WHERE id = ? AND scope_user_id = ?',
+        [now, id, scope.userId],
+      );
+      this.#conn.run(
+        `INSERT INTO entity_merges (id, scope_user_id, kind, from_entity_id, into_entity_id, reason, created_at)
+         VALUES (?, ?, 'unmerge', ?, NULL, ?, ?)`,
+        [generateId(), scope.userId, id, reason ?? null, now],
+      );
+    });
+  }
+
+  /** The append-only merge / unmerge audit ledger, newest first. */
+  async listMerges(
+    scope: SessionScope,
+    opts: { readonly limit?: number } = {},
+  ): Promise<ReadonlyArray<SqliteEntityMergeRecord>> {
+    const limit = opts.limit ?? 100;
+    const rows = this.#conn.all<EntityMergeRow>(
+      'SELECT * FROM entity_merges WHERE scope_user_id = ? ORDER BY created_at DESC, id DESC LIMIT ?',
+      [scope.userId, limit],
+    );
+    return rows.map((r) => ({
+      id: r.id,
+      userId: r.scope_user_id,
+      kind: r.kind === 'unmerge' ? 'unmerge' : 'merge',
+      fromEntityId: r.from_entity_id,
+      intoEntityId: r.into_entity_id,
+      ...(r.reason !== null ? { reason: r.reason } : {}),
+      createdAt: new Date(r.created_at).toISOString(),
+    }));
+  }
+
+  /**
+   * Expand `seedFactIds` to neighbouring facts that share a canonical
+   * entity, up to `maxHops` (default 1), via a recursive CTE over
+   * `fact_entities`. Entities are canonicalised through `merged_into` in
+   * the join, so a merge transparently connects both sides. Excludes the
+   * seeds themselves and honours soft-delete / archive / quarantine /
+   * `asOf` exactly like {@link SemanticMemoryStore.search}.
+   */
+  async expandOneHop(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts: {
+      readonly maxHops?: number;
+      readonly limit?: number;
+      readonly includeQuarantined?: boolean;
+      readonly asOf?: string;
+    } = {},
+  ): Promise<ReadonlyArray<Fact>> {
+    if (seedFactIds.length === 0) return [];
+    const maxHops = opts.maxHops ?? 1;
+    const limit = opts.limit ?? 60;
+    const incQ = opts.includeQuarantined === true ? 1 : 0;
+    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    const seedsJson = JSON.stringify([...seedFactIds]);
+    const rows = this.#conn.all<FactRow>(
+      `WITH RECURSIVE
+         seed_ids(fact_id) AS (SELECT value FROM json_each(?)),
+         walk(fact_id, depth) AS (
+             SELECT fact_id, 0 FROM seed_ids
+           UNION
+             SELECT fe2.fact_id, w.depth + 1
+             FROM walk w
+             JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
+             JOIN entities e1 ON e1.id = fe1.entity_id
+             JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
+             JOIN fact_entities fe2 ON fe2.entity_id = e2.id
+             WHERE w.depth < ?
+         )
+       SELECT f.* FROM facts f
+       WHERE f.id IN (SELECT DISTINCT fact_id FROM walk WHERE depth > 0)
+         AND f.id NOT IN (SELECT fact_id FROM seed_ids)
+         AND f.scope_user_id = ?
+         AND f.deleted_at IS NULL
+         AND f.archived = 0
+         AND (? = 1 OR f.status != 'quarantined')
+         AND (? IS NULL OR ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)))
+       ORDER BY f.created_at DESC
+       LIMIT ?`,
+      [seedsJson, maxHops, scope.userId, incQ, asOf, asOf, asOf, limit],
+    );
+    return rows.map(rowToFact);
+  }
+}
+
+function f32ToBlob(vec: Float32Array): Buffer {
+  return Buffer.from(vec.buffer, vec.byteOffset, vec.byteLength);
+}
+
+function blobToF32(blob: Buffer | Uint8Array | null): Float32Array | null {
+  if (blob === null) return null;
+  // better-sqlite3 returns a Buffer whose byteOffset may not be 4-aligned
+  // for a Float32Array view, so copy into a fresh aligned buffer.
+  const copy = new Uint8Array(blob.byteLength);
+  copy.set(blob);
+  return new Float32Array(copy.buffer, 0, Math.floor(copy.byteLength / 4));
+}
+
+function rowToGraphEntity(row: EntityRow): GraphEntity {
+  return {
+    id: row.id,
+    userId: row.scope_user_id,
+    name: row.name,
+    normalizedName: row.normalized_name,
+    mergedInto: row.merged_into ?? undefined,
+    createdAt: new Date(row.created_at).toISOString(),
+    updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
+  } as GraphEntity;
+}
+
 interface WorkingBlockRow {
   id: string;
   scope_user_id: string;
@@ -1467,6 +1794,10 @@ function rowToFact(row: FactRow): Fact {
     sessionId: row.scope_session_id ?? undefined,
     agentId: row.scope_agent_id ?? undefined,
     text: row.text,
+    // P2-1: surface the s/p/o triple (no longer inert).
+    subject: row.subject ?? undefined,
+    predicate: row.predicate ?? undefined,
+    object: row.object ?? undefined,
     confidence: row.confidence ?? undefined,
     importance: row.importance ?? undefined,
     sensitivity: row.sensitivity,

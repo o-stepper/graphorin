@@ -48,6 +48,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '013': '@graphorin/memory (provenance/quarantine)',
   '014': '@graphorin/memory (reflection insights)',
   '015': '@graphorin/memory (fact importance / multi-signal forgetting)',
+  '016': '@graphorin/memory (entity graph / one-hop expansion)',
 };
 
 const dynamicMigrations: Migration[] = [];

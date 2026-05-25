@@ -45,6 +45,7 @@ import { resolveLocalePack } from './context-engine/locale-packs/resolver.js';
 import { gatherMemoryMetadata, renderMetadataBlock } from './context-engine/metadata.js';
 import { partition as partitionBySensitivity } from './context-engine/privacy-filter.js';
 import { composeLayer1 } from './context-engine/templates/composer.js';
+import { type EntityResolutionConfig, EntityResolver } from './graph/entity-resolver.js';
 import type { ContextualRetrievalMode } from './internal/contextualize.js';
 import { bindEmbedder } from './internal/embedder-binding.js';
 import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/storage-adapter.js';
@@ -111,6 +112,23 @@ export interface CreateMemoryOptions {
     readonly maxVariants?: number;
     /** Output-token ceiling per transform call. Default 256. */
     readonly maxTokens?: number;
+  };
+  /**
+   * Relation-graph entity resolution (P2-1). When `entityResolution` is
+   * `true` **and** the storage adapter exposes a `graph` surface (the
+   * default `@graphorin/store-sqlite` does), `remember(...)` resolves a
+   * fact's subject / object to canonical entities and links them, so
+   * `search(..., { expandHops: 1 })` can traverse relationships. Omitted
+   * (the default) ⇒ facts still carry s/p/o but form no entity links and
+   * the write path stays offline + unchanged. Dedup is lexical +
+   * embedding (offline, via the configured embedder); LLM adjudication of
+   * ambiguous merges is a further opt-in that needs `provider`.
+   */
+  readonly graph?: EntityResolutionConfig & {
+    /** Enable entity resolution + linking on write. Default `false`. */
+    readonly entityResolution?: boolean;
+    /** Provider for opt-in LLM adjudication of ambiguous merges. */
+    readonly provider?: Provider;
   };
   /**
    * Resolver that produces the live {@link SessionScope} for each
@@ -281,6 +299,30 @@ export function createMemory(options: CreateMemoryOptions): Memory {
             : {}),
         })
       : null;
+  // P2-1: build the (opt-in) entity resolver. Requires `graph.entityResolution`
+  // *and* a graph-capable adapter; absent ⇒ `null` ⇒ writes carry s/p/o but
+  // form no entity links and the write path stays offline + unchanged.
+  const graphStore = options.store.graph;
+  const entityResolver =
+    options.graph?.entityResolution === true && graphStore !== undefined
+      ? new EntityResolver({
+          store: graphStore,
+          embedder,
+          embedderId: embedderIdProvider,
+          ...(options.graph.provider !== undefined ? { provider: options.graph.provider } : {}),
+          config: {
+            ...(options.graph.mergeThreshold !== undefined
+              ? { mergeThreshold: options.graph.mergeThreshold }
+              : {}),
+            ...(options.graph.adjudicateThreshold !== undefined
+              ? { adjudicateThreshold: options.graph.adjudicateThreshold }
+              : {}),
+            ...(options.graph.llmAdjudication !== undefined
+              ? { llmAdjudication: options.graph.llmAdjudication }
+              : {}),
+          },
+        })
+      : null;
   const semantic = new SemanticMemory({
     store: options.store,
     tracer,
@@ -292,6 +334,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
       ? { contextualRetrieval: options.contextualRetrieval }
       : {}),
     ...(queryTransformer !== null ? { queryTransformer } : {}),
+    ...(entityResolver !== null ? { entityResolver } : {}),
   });
   const procedural = new ProceduralMemory({ store: options.store, tracer });
   const shared = new SharedMemory({ store: options.store, tracer });

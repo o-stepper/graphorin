@@ -113,6 +113,22 @@ export interface Block extends MemoryRecord {
 export interface Fact extends MemoryRecord {
   readonly kind: 'semantic';
   readonly text: string;
+  /**
+   * Structured `(subject, predicate, object)` triple for the in-SQLite
+   * relation graph (P2-1). The consolidator's extraction prompt emits
+   * these; first-party `remember({ text })` writes usually omit them.
+   * `subject`/`object` are the graph *entities* (resolved to canonical
+   * ids in `fact_entities`); `predicate` is the relation label and is
+   * not itself an entity. Absent on rows written before the feature, and
+   * on plain free-text facts — they are a soft enrichment that powers
+   * one-hop expansion ({@link MemorySearchOptions} has no field; the
+   * memory tier's search opts in), never a recall gate.
+   */
+  readonly subject?: string;
+  /** Relation label of the {@link Fact.subject}→{@link Fact.object} triple (P2-1). */
+  readonly predicate?: string;
+  /** Object entity of the s/p/o triple (P2-1). See {@link Fact.subject}. */
+  readonly object?: string;
   readonly confidence?: number;
   /**
    * Optional salience hint in `[0, 1]` for multi-signal forgetting
@@ -218,6 +234,49 @@ export interface Insight extends MemoryRecord {
    * {@link MemoryStatus}.
    */
   readonly status?: MemoryStatus;
+}
+
+/**
+ * Role a {@link GraphEntity} plays in a {@link Fact}'s s/p/o triple
+ * (P2-1) — the `subject` or the `object`. The `predicate` is a relation
+ * label, not an entity, so it has no role here.
+ *
+ * @stable
+ */
+export type EntityRole = 'subject' | 'object';
+
+/**
+ * Canonical entity in the lightweight in-SQLite relation graph (P2-1).
+ * The entity resolver (`@graphorin/memory`) deduplicates the raw
+ * `subject`/`object` strings on facts into canonical entities — merging
+ * aliases ("Anna", "Anna S.", "my sister") via lexical + embedding
+ * similarity (with optional LLM adjudication) — so multi-hop recall can
+ * traverse relationships instead of fragmenting them.
+ *
+ * Merges are **append-only and reversible**: a merged entity is never
+ * deleted — its {@link GraphEntity.mergedInto} points at the surviving
+ * canonical entity, every merge / unmerge is recorded in an audit
+ * ledger, and `mergedInto` is single-level (it always points directly at
+ * a root), so `mergedInto ?? id` is the canonical id.
+ *
+ * @stable
+ */
+export interface GraphEntity {
+  readonly id: string;
+  readonly userId: string;
+  /** Display name as first observed (the surface form that minted it). */
+  readonly name: string;
+  /** Case/space-folded key used for lexical dedup + the canonical unique index. */
+  readonly normalizedName: string;
+  /**
+   * Canonical pointer. `undefined` ⇒ this entity is itself a root.
+   * Otherwise it is the id of the surviving entity this one was merged
+   * into; single-level by construction, so `mergedInto ?? id` resolves
+   * the canonical id without a recursive walk.
+   */
+  readonly mergedInto?: string;
+  readonly createdAt: string;
+  readonly updatedAt?: string;
 }
 
 /**

@@ -55,8 +55,10 @@ export type {
 } from './handoff.js';
 export type {
   Block,
+  EntityRole,
   Episode,
   Fact,
+  GraphEntity,
   Insight,
   MemoryHit,
   MemoryKind,

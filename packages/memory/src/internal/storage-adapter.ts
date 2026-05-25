@@ -1,8 +1,10 @@
 import type {
   EmbedderProvider,
+  EntityRole,
   Episode,
   EpisodicMemoryStore,
   Fact,
+  GraphEntity,
   Insight,
   MemoryHit,
   MemoryStatus,
@@ -558,6 +560,100 @@ export interface InsightMemoryStoreExt {
   prune(scope: SessionScope): Promise<number>;
 }
 
+/** Find-or-create payload for {@link GraphMemoryStoreExt.upsertEntity}. */
+export interface EntityUpsertInput {
+  /** Display name as first observed. */
+  readonly name: string;
+  /** Folded key for lexical dedup + the canonical unique index. */
+  readonly normalizedName: string;
+  /** Optional name embedding (back-filled on a hit that lacked one). */
+  readonly vector?: Float32Array;
+  /** Embedder that produced {@link EntityUpsertInput.vector}. */
+  readonly embedderId?: string;
+}
+
+/**
+ * A canonical {@link GraphEntity} returned with its name embedding so the
+ * resolver can run cosine dedup in-process (entity counts are small).
+ */
+export interface EntityWithEmbedding extends GraphEntity {
+  readonly vector: Float32Array | null;
+  readonly embedderId: string | null;
+}
+
+/** One row of the append-only merge / unmerge audit ledger (P2-1). */
+export interface EntityMergeRecord {
+  readonly id: string;
+  readonly userId: string;
+  readonly kind: 'merge' | 'unmerge';
+  readonly fromEntityId: string;
+  readonly intoEntityId: string | null;
+  readonly reason?: string;
+  readonly createdAt: string;
+}
+
+/** Options for {@link GraphMemoryStoreExt.expandOneHop}. */
+export interface ExpandHopsStoreOptions {
+  /** Traversal depth (default `1`). */
+  readonly maxHops?: number;
+  /** Max neighbours to return (default `60`). */
+  readonly limit?: number;
+  /** Include quarantined neighbours (validation / inspector path). */
+  readonly includeQuarantined?: boolean;
+  /** Point-in-time filter, ISO-8601 (same semantics as fact search). */
+  readonly asOf?: string;
+}
+
+/**
+ * Optional storage extension for the lightweight in-SQLite relation
+ * graph (P2-1). Owns the canonical `entities` table, the `fact_entities`
+ * mapping, and the append-only `entity_merges` ledger. The entity
+ * *resolution policy* (lexical + embedding dedup, optional LLM
+ * adjudication) lives in `@graphorin/memory`; this surface is the pure
+ * persistence + the recursive-CTE traversal.
+ *
+ * Adapters that opt out leave the property undefined; entity resolution
+ * on write degrades to a no-op and `search({ expandHops })` skips
+ * expansion. The default `@graphorin/store-sqlite` adapter implements it.
+ *
+ * @stable
+ */
+export interface GraphMemoryStoreExt {
+  /** Find-or-create the canonical (root) entity for the normalized name. */
+  upsertEntity(scope: SessionScope, input: EntityUpsertInput): Promise<string>;
+  /** Link a fact's subject / object to a canonical entity (idempotent). */
+  linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void>;
+  /** Candidate entities for the resolver (roots only unless `includeMerged`). */
+  listEntities(
+    scope: SessionScope,
+    opts?: { readonly includeMerged?: boolean; readonly limit?: number },
+  ): Promise<ReadonlyArray<EntityWithEmbedding>>;
+  /** Lookup one entity by id (any merge state). */
+  getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null>;
+  /** Follow `mergedInto` to the canonical root id. */
+  resolveCanonical(scope: SessionScope, id: string): Promise<string>;
+  /** Merge `fromId` into `intoId`'s root; auditable + reversible. */
+  mergeEntities(
+    scope: SessionScope,
+    fromId: string,
+    intoId: string,
+    reason?: string,
+  ): Promise<void>;
+  /** Reverse a merge: make `id` a root again + record an audit row. */
+  unmergeEntity(scope: SessionScope, id: string, reason?: string): Promise<void>;
+  /** The append-only merge / unmerge ledger, newest first. */
+  listMerges(
+    scope: SessionScope,
+    opts?: { readonly limit?: number },
+  ): Promise<ReadonlyArray<EntityMergeRecord>>;
+  /** Expand seed facts to neighbours sharing a canonical entity (one-hop CTE). */
+  expandOneHop(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts?: ExpandHopsStoreOptions,
+  ): Promise<ReadonlyArray<Fact>>;
+}
+
 /**
  * Composite shape every `@graphorin/memory` consumer must supply at
  * construction time. Mirrors the typed `MemoryStore` from
@@ -598,6 +694,14 @@ export interface MemoryStoreAdapter extends Omit<MemoryStore, 'session' | 'episo
    * @stable
    */
   readonly insights?: InsightMemoryStoreExt;
+  /**
+   * Optional relation-graph surface (P2-1). Defined on the default
+   * `@graphorin/store-sqlite` adapter; omitted ⇒ entity resolution on
+   * write is a no-op and `search({ expandHops })` skips expansion.
+   *
+   * @stable
+   */
+  readonly graph?: GraphMemoryStoreExt;
 }
 
 /**

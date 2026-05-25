@@ -1,8 +1,10 @@
 import type {
   Block,
   EmbedderProvider,
+  EntityRole,
   Episode,
   Fact,
+  GraphEntity,
   Insight,
   MemoryHit,
   Message,
@@ -23,6 +25,11 @@ import type {
   DlqBatchRow,
   EmbeddedWriteOptions,
   EmbeddingMetaRegistryLike,
+  EntityMergeRecord,
+  EntityUpsertInput,
+  EntityWithEmbedding,
+  ExpandHopsStoreOptions,
+  GraphMemoryStoreExt,
   InsightListOptions,
   InsightMemoryStoreExt,
   InsightSearchStoreOptions,
@@ -491,6 +498,7 @@ export function createInMemoryStore(
     withConflictStore?: boolean;
     withConsolidatorStore?: boolean;
     withInsightStore?: boolean;
+    withGraphStore?: boolean;
   } = {},
 ): MemoryStoreAdapter & {
   readonly __hooks: InMemoryStoreTestHooks;
@@ -526,6 +534,7 @@ export function createInMemoryStore(
   const consolidatorStore =
     options.withConsolidatorStore === true ? new InMemoryConsolidatorStore() : null;
   const insightStore = options.withInsightStore === true ? new InMemoryInsightStore() : null;
+  const graphStore = options.withGraphStore === true ? createInMemoryGraphStore(facts) : null;
 
   function blockKey(scope: SessionScope, label: string): string {
     return [scope.userId, scope.sessionId ?? '', scope.agentId ?? '', label].join('|');
@@ -912,6 +921,7 @@ export function createInMemoryStore(
     ...(conflictStore !== null ? { conflicts: conflictStore } : {}),
     ...(consolidatorStore !== null ? { consolidator: consolidatorStore } : {}),
     ...(insightStore !== null ? { insights: insightStore } : {}),
+    ...(graphStore !== null ? { graph: graphStore } : {}),
   };
 
   const hooks: InMemoryStoreTestHooks = {
@@ -1021,6 +1031,179 @@ function cosine(a: Float32Array, b: Float32Array): number {
   }
   if (na === 0 || nb === 0) return 0;
   return dot / Math.sqrt(na * nb);
+}
+
+interface InMemoryEntity {
+  id: string;
+  userId: string;
+  name: string;
+  normalizedName: string;
+  vector: Float32Array | null;
+  embedderId: string | null;
+  mergedInto: string | undefined;
+  createdAt: string;
+}
+
+/**
+ * Minimal in-memory {@link GraphMemoryStoreExt} (P2-1) over the shared
+ * `facts` array — mirrors `@graphorin/store-sqlite`'s `SqliteGraphStore`
+ * (find-or-create entities, append-only reversible merges canonicalised
+ * via `mergedInto`, one-hop neighbour expansion) so the resolver +
+ * `search({ expandHops })` can be exercised offline without a SQL engine.
+ */
+function createInMemoryGraphStore(facts: Fact[]): GraphMemoryStoreExt {
+  const entities = new Map<string, InMemoryEntity>();
+  const links: Array<{ factId: string; entityId: string; role: EntityRole }> = [];
+  const merges: EntityMergeRecord[] = [];
+  let seq = 0;
+  const canonicalOf = (entityId: string): string => entities.get(entityId)?.mergedInto ?? entityId;
+  const toGraphEntity = (e: InMemoryEntity): GraphEntity => ({
+    id: e.id,
+    userId: e.userId,
+    name: e.name,
+    normalizedName: e.normalizedName,
+    ...(e.mergedInto !== undefined ? { mergedInto: e.mergedInto } : {}),
+    createdAt: e.createdAt,
+  });
+  return {
+    async upsertEntity(scope: SessionScope, input: EntityUpsertInput): Promise<string> {
+      for (const e of entities.values()) {
+        if (
+          e.userId === scope.userId &&
+          e.normalizedName === input.normalizedName &&
+          e.mergedInto === undefined
+        ) {
+          if (e.vector === null && input.vector !== undefined) {
+            e.vector = input.vector;
+            e.embedderId = input.embedderId ?? null;
+          }
+          return e.id;
+        }
+      }
+      seq += 1;
+      const id = `ent_${seq}`;
+      entities.set(id, {
+        id,
+        userId: scope.userId,
+        name: input.name,
+        normalizedName: input.normalizedName,
+        vector: input.vector ?? null,
+        embedderId: input.embedderId ?? null,
+        mergedInto: undefined,
+        createdAt: new Date().toISOString(),
+      });
+      return id;
+    },
+    async linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void> {
+      if (!links.some((l) => l.factId === factId && l.entityId === entityId && l.role === role)) {
+        links.push({ factId, entityId, role });
+      }
+    },
+    async listEntities(
+      scope: SessionScope,
+      opts: { readonly includeMerged?: boolean; readonly limit?: number } = {},
+    ): Promise<ReadonlyArray<EntityWithEmbedding>> {
+      const out: EntityWithEmbedding[] = [];
+      for (const e of entities.values()) {
+        if (e.userId !== scope.userId) continue;
+        if (opts.includeMerged !== true && e.mergedInto !== undefined) continue;
+        out.push({ ...toGraphEntity(e), vector: e.vector, embedderId: e.embedderId });
+      }
+      return out.slice(0, opts.limit ?? 1000);
+    },
+    async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
+      const e = entities.get(id);
+      return e !== undefined && e.userId === scope.userId ? toGraphEntity(e) : null;
+    },
+    async resolveCanonical(scope: SessionScope, id: string): Promise<string> {
+      let current = id;
+      for (let i = 0; i < 16; i++) {
+        const e = entities.get(current);
+        if (e === undefined || e.userId !== scope.userId || e.mergedInto === undefined) {
+          return current;
+        }
+        current = e.mergedInto;
+      }
+      return current;
+    },
+    async mergeEntities(
+      scope: SessionScope,
+      fromId: string,
+      intoId: string,
+      reason?: string,
+    ): Promise<void> {
+      const intoRoot = canonicalOf(intoId);
+      if (fromId === intoRoot) return;
+      const from = entities.get(fromId);
+      if (from !== undefined) from.mergedInto = intoRoot;
+      for (const e of entities.values()) {
+        if (e.mergedInto === fromId) e.mergedInto = intoRoot;
+      }
+      seq += 1;
+      merges.push({
+        id: `mrg_${seq}`,
+        userId: scope.userId,
+        kind: 'merge',
+        fromEntityId: fromId,
+        intoEntityId: intoRoot,
+        ...(reason !== undefined ? { reason } : {}),
+        createdAt: new Date().toISOString(),
+      });
+    },
+    async unmergeEntity(scope: SessionScope, id: string, reason?: string): Promise<void> {
+      const e = entities.get(id);
+      if (e !== undefined) e.mergedInto = undefined;
+      seq += 1;
+      merges.push({
+        id: `mrg_${seq}`,
+        userId: scope.userId,
+        kind: 'unmerge',
+        fromEntityId: id,
+        intoEntityId: null,
+        ...(reason !== undefined ? { reason } : {}),
+        createdAt: new Date().toISOString(),
+      });
+    },
+    async listMerges(
+      scope: SessionScope,
+      opts: { readonly limit?: number } = {},
+    ): Promise<ReadonlyArray<EntityMergeRecord>> {
+      return merges
+        .filter((m) => m.userId === scope.userId)
+        .slice()
+        .reverse()
+        .slice(0, opts.limit ?? 100);
+    },
+    async expandOneHop(
+      scope: SessionScope,
+      seedFactIds: ReadonlyArray<string>,
+      opts: ExpandHopsStoreOptions = {},
+    ): Promise<ReadonlyArray<Fact>> {
+      if (seedFactIds.length === 0) return [];
+      const incQ = opts.includeQuarantined === true;
+      const seedSet = new Set(seedFactIds);
+      const seedRoots = new Set<string>();
+      for (const l of links) {
+        if (seedSet.has(l.factId)) seedRoots.add(canonicalOf(l.entityId));
+      }
+      const neighbourIds = new Set<string>();
+      for (const l of links) {
+        if (!seedSet.has(l.factId) && seedRoots.has(canonicalOf(l.entityId))) {
+          neighbourIds.add(l.factId);
+        }
+      }
+      const out = facts.filter(
+        (f) =>
+          f.userId === scope.userId &&
+          neighbourIds.has(f.id) &&
+          f.deletedAt === undefined &&
+          (incQ || f.status !== 'quarantined') &&
+          (opts.asOf === undefined || factValidAt(f, opts.asOf)),
+      );
+      out.sort((a, b) => factOrderEpoch(b) - factOrderEpoch(a));
+      return out.slice(0, opts.limit ?? 60);
+    },
+  };
 }
 
 /**
