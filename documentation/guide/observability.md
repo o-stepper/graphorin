@@ -137,4 +137,4 @@ The framework exposes a small set of counters for high-frequency events:
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -65,7 +65,7 @@ Sub-paths:
 
 ### Tier 4 — Memory & Sessions
 
-- **`@graphorin/memory`** — six-tier memory facade (`createMemory({...})`), the nine memory tools, the multi-stage conflict-resolution pipeline, the consolidator, and the context engine.
+- **`@graphorin/memory`** — six-tier memory facade (`createMemory({...})`), the eleven memory tools, the multi-stage conflict-resolution pipeline, the consolidator, and the context engine.
 - **`@graphorin/sessions`** — hybrid session facade, agent registry, handoff records, JSONL export schema 1.0, replay reconstruction.
 
 ### Tier 5 — Runtime
@@ -150,4 +150,4 @@ Eighteen design principles are encoded into the framework. If a feature contradi
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -46,7 +46,7 @@ await sqlite.init(); // run pending migrations
 
 Every Graphorin package owns its own SQL migrations and registers them through the **migration registry** convention. On `sqlite.init()` the registry runs pending migrations in dependency order; each migration is wrapped in a transaction and recorded in the `migration_state` table.
 
-Migrations are **forward-only** in the v0.1 line. Down-migrations are not supported until the framework reaches `1.0`.
+Migrations are **forward-only**. Down-migrations are not supported until the framework reaches `1.0`.
 
 ## Hybrid search
 
@@ -69,11 +69,23 @@ Fact rows in semantic memory are bi-temporal:
 | Column | Meaning |
 |---|---|
 | `validFrom` | When the fact became true (defaults to write time). |
-| `validTo` | When the fact ceased to be true (`NULL` = still valid). |
+| `validTo` | When the fact ceased to be true (`NULL` = still valid; closed on supersede). |
 | `recordedAt` | When the row was written (immutable). |
 | `supersededBy` | Pointer to the row that replaced it (when applicable). |
+| `importance` | Soft salience hint in `[0, 1]` used by forgetting (`NULL` = neutral). |
+| `provenance` | Origin tag — `user` / `tool` / `extraction` / `reflection` / `induction` / `imported`. |
+| `status` | Recall-trust gate — `active` or `quarantined`. |
 
-Old facts are **superseded, never silently overwritten** — every change is auditable.
+Old facts are **superseded, never silently overwritten** — every change is auditable. Because `validTo` is closed on supersede, you can read memory **as of any past instant** (`search(scope, query, { asOf })`, exposed as the `fact_search` tool's `asOf` argument) and trace a single fact's full supersede chain (`semantic.history(...)`, the `fact_history` tool).
+
+## Memory graph & derived stores
+
+Beyond the bi-temporal fact rows, the memory sub-store persists two further structures (added in migrations 013–017):
+
+- An **entity graph** — `entities`, `fact_entities`, and an append-only `entity_merges` ledger — backs one-hop associative search. Entity merges are reversible and fully audited; one-hop expansion runs as a recursive CTE entirely in SQLite.
+- **Reflection insights** — synthesised higher-order knowledge with mandatory citations, kept in their own FTS-indexed table and quarantined until validated.
+
+See [Memory system](/guide/memory-system) for how these are produced and queried.
 
 ## Optional encryption-at-rest
 
@@ -141,4 +153,4 @@ The contracts in `@graphorin/core/contracts` are deliberately small. Build a non
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -62,7 +62,7 @@ Add these as the assistant grows:
 |---|---|
 | `@graphorin/sessions` | Multi-agent attribution, JSONL export, session replay. |
 | `@graphorin/workflow` | Durable HITL workflows that survive process restarts. |
-| `@graphorin/tools` | Custom typed tools beyond the nine memory tools. |
+| `@graphorin/tools` | Custom typed tools beyond the eleven memory tools. |
 | `@graphorin/skills` | Load skills from disk, npm packages, or Git repositories. |
 | `@graphorin/mcp` | Talk to Model Context Protocol servers over stdio or Streamable HTTP. |
 | `@graphorin/security` | Secrets (`SecretValue`, `SecretRef`), audit log, sandbox, OAuth. |
@@ -95,4 +95,4 @@ See the [Contributing guide](/contributing/) for the full development workflow.
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

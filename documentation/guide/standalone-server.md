@@ -210,4 +210,4 @@ All three templates run Graphorin as a **non-root** user with the audit log on i
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko

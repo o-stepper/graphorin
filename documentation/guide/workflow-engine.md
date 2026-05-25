@@ -214,4 +214,4 @@ Pass the `tracer` from `@graphorin/observability` to record `workflow.run`, `wor
 
 ---
 
-**Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
