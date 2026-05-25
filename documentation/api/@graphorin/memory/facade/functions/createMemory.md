@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createMemory(options): Memory;
 ```
 
-Defined in: packages/memory/src/facade.ts:179
+Defined in: packages/memory/src/facade.ts:294
 
 Wire every memory subsystem in one call. Returns the typed
 `Memory` facade ready to be passed into `createAgent({...})`.

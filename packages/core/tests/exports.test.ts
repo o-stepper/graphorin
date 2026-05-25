@@ -4,7 +4,7 @@ import * as core from '../src/index.js';
 
 describe('@graphorin/core', () => {
   it('re-exports the canonical version constant', () => {
-    expect(core.VERSION).toBe('0.3.0');
+    expect(core.VERSION).toBe('0.4.0');
   });
 
   it('re-exports core utilities', () => {

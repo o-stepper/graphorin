@@ -215,7 +215,7 @@ any `EmbedderProvider`; the default is
   (post-MVP).
 - **`memory.compile(scope)` + `memory.metadata(scope)`.** The
   interface used by the context engine (Phase 10d) to assemble the
-  six-layer memory-aware system prompt; `@graphorin/memory@0.3.0`
+  six-layer memory-aware system prompt; `@graphorin/memory@0.4.0`
   ships the deterministic minimum-viable rendering so the agent
   runtime in Phase 12 can already exercise the surface.
 - **Memory-modification guard wiring.** Every tool's
@@ -398,4 +398,4 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

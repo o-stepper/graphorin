@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: PendingConflictInputLike
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:201
+Defined in: packages/memory/src/internal/storage-adapter.ts:245
 
 Pending-queue payload — Stage 5 (defer-to-deep) hands the row over
 to the deep-phase LLM judge (Phase 10c).
@@ -17,9 +17,9 @@ to the deep-phase LLM judge (Phase 10c).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-candidatetext"></a> `candidateText` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:204 |
-| <a id="property-conflictingids"></a> `conflictingIds?` | `readonly` | readonly `string`[] | Top-K conflicting existing fact ids surfaced by Stage 2. | packages/memory/src/internal/storage-adapter.ts:208 |
-| <a id="property-factid"></a> `factId` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:203 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:206 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/memory/src/internal/storage-adapter.ts:202 |
-| <a id="property-stage"></a> `stage` | `readonly` | [`ConflictAuditStage`](/api/@graphorin/memory/type-aliases/ConflictAuditStage.md) | - | packages/memory/src/internal/storage-adapter.ts:205 |
+| <a id="property-candidatetext"></a> `candidateText` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:248 |
+| <a id="property-conflictingids"></a> `conflictingIds?` | `readonly` | readonly `string`[] | Top-K conflicting existing fact ids surfaced by Stage 2. | packages/memory/src/internal/storage-adapter.ts:252 |
+| <a id="property-factid"></a> `factId` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:247 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:250 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/memory/src/internal/storage-adapter.ts:246 |
+| <a id="property-stage"></a> `stage` | `readonly` | [`ConflictAuditStage`](/api/@graphorin/memory/type-aliases/ConflictAuditStage.md) | - | packages/memory/src/internal/storage-adapter.ts:249 |

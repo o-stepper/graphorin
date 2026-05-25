@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -10,13 +10,19 @@
 const CONSOLIDATOR_TIER_DEFAULTS: Readonly<Record<ConsolidatorTier, {
   ceilings: ConsolidatorCeilings;
   cheapModel: string | null;
+  contextualRetrieval: ContextualRetrievalMode;
   deepModel: string | null;
+  formEpisodes: boolean;
+  importanceScoring: boolean;
+  importanceThreshold: number;
   onExceed: OnBudgetExceed;
   phases: ReadonlyArray<ConsolidatorPhase>;
+  reflection: boolean;
+  reflectionMaxQuestions: number;
 }>>;
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:273
+Defined in: packages/memory/src/consolidator/types.ts:366
 
 Tier preset table. The defaults follow ADR-038 §4 — `'free'`
 disables every LLM phase and pins zero ceilings, the upper tiers

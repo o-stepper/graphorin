@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SqliteMemoryWriteOptions
 
-Defined in: packages/store-sqlite/src/memory-store.ts:49
+Defined in: packages/store-sqlite/src/memory-store.ts:77
 
 Extended write surface for fact / episode / message writes. The base
 `SemanticMemoryStore.remember(...)` / `EpisodicMemoryStore.put(...)`
@@ -17,6 +17,7 @@ optional embedding through these helpers.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-embedding"></a> `embedding?` | `readonly` | [`EmbeddingPayload`](/api/@graphorin/store-sqlite/interfaces/EmbeddingPayload.md) | packages/store-sqlite/src/memory-store.ts:50 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-embedding"></a> `embedding?` | `readonly` | [`EmbeddingPayload`](/api/@graphorin/store-sqlite/interfaces/EmbeddingPayload.md) | - | packages/store-sqlite/src/memory-store.ts:78 |
+| <a id="property-indextext"></a> `indexText?` | `readonly` | `string` | Contextual-retrieval index text (P1-3). When supplied, the FTS5 row is indexed against this (context-prepended) text instead of the canonical `fact.text`, so a terse fact stays findable by a vaguely-worded query. The persisted `facts.text` column — the value shown to the user / audit trail — is always the canonical text; only the lexical index is affected. The caller's `embedding.vector` should be computed from the same index text so the vector and FTS surfaces agree. Absent ⇒ the FTS row uses `fact.text` (pre-P1-3 behaviour). | packages/store-sqlite/src/memory-store.ts:89 |

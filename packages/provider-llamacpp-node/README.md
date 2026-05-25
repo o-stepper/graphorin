@@ -78,5 +78,5 @@ discipline rather than enforcing it at runtime.
 
 ## Project metadata
 
-- **Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko
+- **Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>

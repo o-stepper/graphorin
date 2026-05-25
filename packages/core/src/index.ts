@@ -10,7 +10,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 export * from './channels/index.js';
 export * from './contracts/index.js';

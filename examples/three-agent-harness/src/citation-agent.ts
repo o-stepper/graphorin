@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Minimal `createCitationAgent({...})` post-processing helper used by
  * the research-and-decide variant. Bound to the harness example only —

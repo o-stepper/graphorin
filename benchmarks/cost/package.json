@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/benchmark-cost",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Token-cost regression suite for the Graphorin framework. Records tokens per conversation per scenario and asserts < 10 % increase between runs. Pulls model pricing from the bundled @graphorin/pricing snapshot. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",

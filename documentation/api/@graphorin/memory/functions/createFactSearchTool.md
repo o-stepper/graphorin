@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -8,12 +8,14 @@
 
 ```ts
 function createFactSearchTool(deps): Tool<{
+  asOf?: string;
   query: string;
   tags?: string[];
   topK?: number;
 }, {
   hits: {
      factId: string;
+     provenance?: "user" | "tool" | "extraction" | "reflection" | "induction" | "imported";
      score: number;
      sensitivity: "public" | "internal" | "secret";
      text: string;
@@ -21,7 +23,7 @@ function createFactSearchTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:109
+Defined in: packages/memory/src/tools/fact-tools.ts:151
 
 `fact_search` — hybrid (vector + FTS5) search over the user's
 semantic memory. Results merged through the configured reranker.
@@ -35,12 +37,14 @@ semantic memory. Results merged through the configured reranker.
 ## Returns
 
 [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
+  `asOf?`: `string`;
   `query`: `string`;
   `tags?`: `string`[];
   `topK?`: `number`;
 \}, \{
   `hits`: \{
      `factId`: `string`;
+     `provenance?`: `"user"` \| `"tool"` \| `"extraction"` \| `"reflection"` \| `"induction"` \| `"imported"`;
      `score`: `number`;
      `sensitivity`: `"public"` \| `"internal"` \| `"secret"`;
      `text`: `string`;

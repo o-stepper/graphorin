@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EpisodeSearchOptions
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:55
+Defined in: packages/memory/src/tiers/episodic-memory.ts:69
 
 Per-call options accepted by [EpisodicMemory.search](/api/@graphorin/memory/classes/EpisodicMemory.md#search).
 
@@ -14,11 +14,13 @@ Per-call options accepted by [EpisodicMemory.search](/api/@graphorin/memory/clas
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-daterange"></a> `dateRange?` | `readonly` | \{ `from?`: `string`; `to?`: `string`; \} | packages/memory/src/tiers/episodic-memory.ts:59 |
-| `dateRange.from?` | `readonly` | `string` | packages/memory/src/tiers/episodic-memory.ts:59 |
-| `dateRange.to?` | `readonly` | `string` | packages/memory/src/tiers/episodic-memory.ts:59 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | packages/memory/src/tiers/episodic-memory.ts:57 |
-| <a id="property-topk"></a> `topK?` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:56 |
-| <a id="property-weights"></a> `weights?` | `readonly` | [`EpisodeRetrievalWeights`](/api/@graphorin/memory/interfaces/EpisodeRetrievalWeights.md) | packages/memory/src/tiers/episodic-memory.ts:58 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-asof"></a> `asOf?` | `readonly` | `string` | Point-in-time ("as of") read. When set, only episodes that had started by this instant (`started_at <= asOf`) are returned. ISO-8601. Absent ⇒ current behaviour is unchanged. P0-2. **Stable** | packages/memory/src/tiers/episodic-memory.ts:81 |
+| <a id="property-daterange"></a> `dateRange?` | `readonly` | \{ `from?`: `string`; `to?`: `string`; \} | - | packages/memory/src/tiers/episodic-memory.ts:73 |
+| `dateRange.from?` | `readonly` | `string` | - | packages/memory/src/tiers/episodic-memory.ts:73 |
+| `dateRange.to?` | `readonly` | `string` | - | packages/memory/src/tiers/episodic-memory.ts:73 |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined episodes in the result set (P1-4). Defaults to `false`: action-driving recall never returns quarantined rows. Set `true` only for the validation / inspector path — never for auto-recall fed back into the model. Auto-formed episodes (P1-2) land quarantined, so this is how an operator surfaces them for review. **Stable** | packages/memory/src/tiers/episodic-memory.ts:92 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/memory/src/tiers/episodic-memory.ts:71 |
+| <a id="property-topk"></a> `topK?` | `readonly` | `number` | - | packages/memory/src/tiers/episodic-memory.ts:70 |
+| <a id="property-weights"></a> `weights?` | `readonly` | [`EpisodeRetrievalWeights`](/api/@graphorin/memory/interfaces/EpisodeRetrievalWeights.md) | - | packages/memory/src/tiers/episodic-memory.ts:72 |

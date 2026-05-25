@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConflictMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:239
+Defined in: packages/memory/src/internal/storage-adapter.ts:283
 
 Optional storage extension surfacing the audit + pending queue
 tables Phase 10b owns. Adapters that opt out leave the property
@@ -25,7 +25,7 @@ enqueuePending(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:244
+Defined in: packages/memory/src/internal/storage-adapter.ts:288
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:244
 listPending(scope, limit?): Promise<readonly PendingConflictRowLike[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:245
+Defined in: packages/memory/src/internal/storage-adapter.ts:289
 
 #### Parameters
 
@@ -68,7 +68,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:245
 markResolved(id, decision): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:246
+Defined in: packages/memory/src/internal/storage-adapter.ts:290
 
 #### Parameters
 
@@ -92,7 +92,7 @@ recordDecision(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:240
+Defined in: packages/memory/src/internal/storage-adapter.ts:284
 
 #### Parameters
 

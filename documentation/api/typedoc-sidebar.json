@@ -1121,6 +1121,10 @@
                 "link": "/api/@graphorin/memory/errors/classes/MemoryToolDeniedError.md"
               },
               {
+                "text": "ProcedureInductionNotConfiguredError",
+                "link": "/api/@graphorin/memory/errors/classes/ProcedureInductionNotConfiguredError.md"
+              },
+              {
                 "text": "WorkingBlockOverflowError",
                 "link": "/api/@graphorin/memory/errors/classes/WorkingBlockOverflowError.md"
               },
@@ -1180,6 +1184,16 @@
         "link": "/api/@graphorin/memory/tools/",
         "collapsed": true,
         "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "BuildMemoryToolsOptions",
+                "link": "/api/@graphorin/memory/tools/interfaces/BuildMemoryToolsOptions.md"
+              }
+            ]
+          },
           {
             "text": "Functions",
             "collapsed": true,

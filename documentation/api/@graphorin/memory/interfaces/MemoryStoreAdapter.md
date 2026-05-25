@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryStoreAdapter
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:467
+Defined in: packages/memory/src/internal/storage-adapter.ts:669
 
 Composite shape every `@graphorin/memory` consumer must supply at
 construction time. Mirrors the typed `MemoryStore` from
@@ -27,12 +27,14 @@ implement the minimum and leave the optional members undefined.
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-conflicts"></a> `conflicts?` | `readonly` | [`ConflictMemoryStoreExt`](/api/@graphorin/memory/interfaces/ConflictMemoryStoreExt.md) | Optional conflict audit + pending queue surface. Defined on the default `@graphorin/store-sqlite` adapter, omitted on the minimal in-memory test doubles. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:478 |
-| <a id="property-consolidator"></a> `consolidator?` | `readonly` | [`ConsolidatorMemoryStoreExt`](/api/@graphorin/memory/interfaces/ConsolidatorMemoryStoreExt.md) | Optional consolidator state + runs + DLQ surface. Defined on the default `@graphorin/store-sqlite` adapter; in-memory test doubles may opt in via the fixture. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:486 |
-| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStoreExt`](/api/@graphorin/memory/interfaces/EpisodicMemoryStoreExt.md) | - | - | packages/memory/src/internal/storage-adapter.ts:469 |
+| <a id="property-conflicts"></a> `conflicts?` | `readonly` | [`ConflictMemoryStoreExt`](/api/@graphorin/memory/interfaces/ConflictMemoryStoreExt.md) | Optional conflict audit + pending queue surface. Defined on the default `@graphorin/store-sqlite` adapter, omitted on the minimal in-memory test doubles. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:680 |
+| <a id="property-consolidator"></a> `consolidator?` | `readonly` | [`ConsolidatorMemoryStoreExt`](/api/@graphorin/memory/interfaces/ConsolidatorMemoryStoreExt.md) | Optional consolidator state + runs + DLQ surface. Defined on the default `@graphorin/store-sqlite` adapter; in-memory test doubles may opt in via the fixture. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:688 |
+| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStoreExt`](/api/@graphorin/memory/interfaces/EpisodicMemoryStoreExt.md) | - | - | packages/memory/src/internal/storage-adapter.ts:671 |
+| <a id="property-graph"></a> `graph?` | `readonly` | `GraphMemoryStoreExt` | Optional relation-graph surface (P2-1). Defined on the default `@graphorin/store-sqlite` adapter; omitted ⇒ entity resolution on write is a no-op and `search({ expandHops })` skips expansion. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:704 |
+| <a id="property-insights"></a> `insights?` | `readonly` | [`InsightMemoryStoreExt`](/api/@graphorin/memory/interfaces/InsightMemoryStoreExt.md) | Optional reflection insight surface (P1-1). Defined on the default `@graphorin/store-sqlite` adapter; omitted ⇒ reflection is a no-op and `InsightMemory` reads return empty. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:696 |
 | <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | - | `Omit.procedural` | packages/core/dist/contracts/memory-store.d.ts:23 |
-| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStoreExt`](/api/@graphorin/memory/interfaces/SemanticMemoryStoreExt.md) & `Partial`\&lt;[`DecayMemoryStoreExt`](/api/@graphorin/memory/interfaces/DecayMemoryStoreExt.md)\&gt; | - | - | packages/memory/src/internal/storage-adapter.ts:470 |
-| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStoreExt`](/api/@graphorin/memory/interfaces/SessionMemoryStoreExt.md) | - | - | packages/memory/src/internal/storage-adapter.ts:468 |
+| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStoreExt`](/api/@graphorin/memory/interfaces/SemanticMemoryStoreExt.md) & `Partial`\&lt;[`DecayMemoryStoreExt`](/api/@graphorin/memory/interfaces/DecayMemoryStoreExt.md)\&gt; | - | - | packages/memory/src/internal/storage-adapter.ts:672 |
+| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStoreExt`](/api/@graphorin/memory/interfaces/SessionMemoryStoreExt.md) | - | - | packages/memory/src/internal/storage-adapter.ts:670 |
 | <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | - | `Omit.shared` | packages/core/dist/contracts/memory-store.d.ts:24 |
 | <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | - | `Omit.working` | packages/core/dist/contracts/memory-store.d.ts:19 |
 

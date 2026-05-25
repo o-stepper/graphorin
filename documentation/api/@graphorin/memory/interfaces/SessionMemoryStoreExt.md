@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:103
+Defined in: packages/memory/src/internal/storage-adapter.ts:147
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
@@ -54,7 +54,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:122
+Defined in: packages/memory/src/internal/storage-adapter.ts:166
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -139,7 +139,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:104
+Defined in: packages/memory/src/internal/storage-adapter.ts:148
 
 #### Parameters
 
@@ -162,7 +162,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:104
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:115
+Defined in: packages/memory/src/internal/storage-adapter.ts:159
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so

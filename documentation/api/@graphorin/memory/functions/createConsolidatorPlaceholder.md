@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createConsolidatorPlaceholder(options?): Consolidator;
 ```
 
-Defined in: packages/memory/src/consolidator/index.ts:118
+Defined in: packages/memory/src/consolidator/index.ts:143
 
 Build a no-op consolidator that honours the full [Consolidator](/api/@graphorin/memory/interfaces/Consolidator.md)
 interface but performs no background work. Useful for consumers

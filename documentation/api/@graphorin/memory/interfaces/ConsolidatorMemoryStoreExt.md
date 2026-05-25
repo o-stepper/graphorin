@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:355
+Defined in: packages/memory/src/internal/storage-adapter.ts:399
 
 Optional consolidator-state surface every storage adapter exposes
 for Phase 10c. Mirrors the `consolidator_state`,
@@ -30,7 +30,7 @@ acquireLock(
 maxAgeMs): Promise<boolean>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:365
+Defined in: packages/memory/src/internal/storage-adapter.ts:409
 
 Atomically claim the per-scope lock. Returns `true` when the
 row was either unlocked, owned by `runId`, or stale (the held
@@ -62,7 +62,7 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:393
+Defined in: packages/memory/src/internal/storage-adapter.ts:437
 
 Claim every DLQ row whose `nextRetryAt` is at or before `now`,
 up to `limit`. Returns the rows in failed-at order so the
@@ -88,7 +88,7 @@ oldest backlog drains first.
 enqueueFailedBatch(input): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:387
+Defined in: packages/memory/src/internal/storage-adapter.ts:431
 
 #### Parameters
 
@@ -110,7 +110,7 @@ getState(scope): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:356
+Defined in: packages/memory/src/internal/storage-adapter.ts:400
 
 #### Parameters
 
@@ -132,7 +132,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:356
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:416
+Defined in: packages/memory/src/internal/storage-adapter.ts:460
 
 #### Parameters
 
@@ -163,7 +163,7 @@ listRecentRuns(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:370
+Defined in: packages/memory/src/internal/storage-adapter.ts:414
 
 #### Parameters
 
@@ -197,7 +197,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:415
+Defined in: packages/memory/src/internal/storage-adapter.ts:459
 
 Mark the row exhausted (`retryCount` exceeded the configured
 cap). The row stays in the DLQ for operator inspection.
@@ -227,7 +227,7 @@ exhaustion.
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:399
+Defined in: packages/memory/src/internal/storage-adapter.ts:443
 
 Mark the row succeeded — removes it from the DLQ.
 
@@ -249,7 +249,7 @@ Mark the row succeeded — removes it from the DLQ.
 recordRunFinish(finish): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:369
+Defined in: packages/memory/src/internal/storage-adapter.ts:413
 
 #### Parameters
 
@@ -269,7 +269,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:369
 recordRunStart(input): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:368
+Defined in: packages/memory/src/internal/storage-adapter.ts:412
 
 #### Parameters
 
@@ -289,7 +289,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:368
 releaseLock(scope, runId): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:366
+Defined in: packages/memory/src/internal/storage-adapter.ts:410
 
 #### Parameters
 
@@ -313,7 +313,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:405
+Defined in: packages/memory/src/internal/storage-adapter.ts:449
 
 Schedule the next retry attempt. The caller computes
 `nextRetryAt` so the backoff schedule is centralized in the
@@ -339,7 +339,7 @@ consolidator.
 upsertState(scope, patch): Promise<ConsolidatorStateRow>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:357
+Defined in: packages/memory/src/internal/storage-adapter.ts:401
 
 #### Parameters
 

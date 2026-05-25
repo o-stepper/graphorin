@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EmbeddingMetaRegistryLike
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:136
+Defined in: packages/memory/src/internal/storage-adapter.ts:180
 
 Optional extension surface for storage adapters' embedder registry.
 The interface is structural so any adapter that matches the shape
@@ -22,7 +22,7 @@ works.
 assertKnown(id): void;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:147
+Defined in: packages/memory/src/internal/storage-adapter.ts:191
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:147
 get(id): unknown;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:146
+Defined in: packages/memory/src/internal/storage-adapter.ts:190
 
 #### Parameters
 
@@ -65,7 +65,7 @@ listActive(): readonly {
 }[];
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:150
+Defined in: packages/memory/src/internal/storage-adapter.ts:194
 
 #### Returns
 
@@ -85,7 +85,7 @@ listAll(): readonly {
 }[];
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:149
+Defined in: packages/memory/src/internal/storage-adapter.ts:193
 
 #### Returns
 
@@ -104,7 +104,7 @@ registerOrReturn(input): {
 };
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:137
+Defined in: packages/memory/src/internal/storage-adapter.ts:181
 
 #### Parameters
 
@@ -129,7 +129,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:137
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `id` | `string` | packages/memory/src/internal/storage-adapter.ts:145 |
+| `id` | `string` | packages/memory/src/internal/storage-adapter.ts:189 |
 
 ***
 
@@ -139,7 +139,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:137
 retire(id, retiredAt?): void;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:148
+Defined in: packages/memory/src/internal/storage-adapter.ts:192
 
 #### Parameters
 

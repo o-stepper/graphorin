@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: SqliteMemoryStore
 
-Defined in: packages/store-sqlite/src/memory-store.ts:58
+Defined in: packages/store-sqlite/src/memory-store.ts:97
 
 Default `MemoryStore` implementation backed by SQLite + sqlite-vec.
 
@@ -24,7 +24,7 @@ Default `MemoryStore` implementation backed by SQLite + sqlite-vec.
 new SqliteMemoryStore(conn, embeddings): SqliteMemoryStore;
 ```
 
-Defined in: packages/store-sqlite/src/memory-store.ts:72
+Defined in: packages/store-sqlite/src/memory-store.ts:115
 
 #### Parameters
 
@@ -39,16 +39,18 @@ Defined in: packages/store-sqlite/src/memory-store.ts:72
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-conflicts"></a> `conflicts` | `readonly` | [`SqliteConflictStore`](/api/@graphorin/store-sqlite/classes/SqliteConflictStore.md) | packages/store-sqlite/src/memory-store.ts:69 |
-| <a id="property-consolidator"></a> `consolidator` | `readonly` | [`SqliteConsolidatorStateStore`](/api/@graphorin/store-sqlite/classes/SqliteConsolidatorStateStore.md) | packages/store-sqlite/src/memory-store.ts:70 |
-| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | packages/store-sqlite/src/memory-store.ts:65 |
-| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | packages/store-sqlite/src/memory-store.ts:67 |
-| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | packages/store-sqlite/src/memory-store.ts:66 |
-| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | packages/store-sqlite/src/memory-store.ts:64 |
-| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | packages/store-sqlite/src/memory-store.ts:68 |
-| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | packages/store-sqlite/src/memory-store.ts:63 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-conflicts"></a> `conflicts` | `readonly` | [`SqliteConflictStore`](/api/@graphorin/store-sqlite/classes/SqliteConflictStore.md) | - | packages/store-sqlite/src/memory-store.ts:108 |
+| <a id="property-consolidator"></a> `consolidator` | `readonly` | [`SqliteConsolidatorStateStore`](/api/@graphorin/store-sqlite/classes/SqliteConsolidatorStateStore.md) | - | packages/store-sqlite/src/memory-store.ts:109 |
+| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:104 |
+| <a id="property-graph"></a> `graph` | `readonly` | `SqliteGraphStore` | Lightweight relation-graph surface (P2-1): entities + one-hop CTE. | packages/store-sqlite/src/memory-store.ts:113 |
+| <a id="property-insights"></a> `insights` | `readonly` | `SqliteInsightStore` | Reflection insight surface (P1-1). FTS-only; no per-embedder vec0 table. | packages/store-sqlite/src/memory-store.ts:111 |
+| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:106 |
+| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:105 |
+| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:103 |
+| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:107 |
+| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | - | packages/store-sqlite/src/memory-store.ts:102 |
 
 ## Methods
 
@@ -58,7 +60,7 @@ Defined in: packages/store-sqlite/src/memory-store.ts:72
 close(): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/memory-store.ts:90
+Defined in: packages/store-sqlite/src/memory-store.ts:135
 
 Cleanly close any underlying handles. Idempotent.
 
@@ -78,7 +80,7 @@ Cleanly close any underlying handles. Idempotent.
 embeddingMetaRepository(): EmbeddingMetaRepository;
 ```
 
-Defined in: packages/store-sqlite/src/memory-store.ts:100
+Defined in: packages/store-sqlite/src/memory-store.ts:145
 
 Surfaced for tests and the consolidator.
 
@@ -94,7 +96,7 @@ Surfaced for tests and the consolidator.
 init(): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/memory-store.ts:85
+Defined in: packages/store-sqlite/src/memory-store.ts:130
 
 Initialize / migrate the underlying storage. Idempotent.
 
@@ -114,7 +116,7 @@ Initialize / migrate the underlying storage. Idempotent.
 vectorTableManager(): VectorTableManager;
 ```
 
-Defined in: packages/store-sqlite/src/memory-store.ts:95
+Defined in: packages/store-sqlite/src/memory-store.ts:140
 
 Surfaced for tests and the consolidator.
 

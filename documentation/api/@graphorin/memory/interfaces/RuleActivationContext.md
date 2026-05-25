@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RuleActivationContext
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:32
+Defined in: packages/memory/src/tiers/procedural-memory.ts:74
 
 Predicate context passed to [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate).
 
@@ -16,5 +16,5 @@ Predicate context passed to [ProceduralMemory.activate](/api/@graphorin/memory/c
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/memory/src/tiers/procedural-memory.ts:34 |
-| <a id="property-topic"></a> `topic?` | `readonly` | `string` | packages/memory/src/tiers/procedural-memory.ts:33 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/memory/src/tiers/procedural-memory.ts:76 |
+| <a id="property-topic"></a> `topic?` | `readonly` | `string` | packages/memory/src/tiers/procedural-memory.ts:75 |

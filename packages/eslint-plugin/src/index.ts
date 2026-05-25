@@ -34,7 +34,7 @@ import toolDescriptionRequired from './rules/tool-description-required.js';
 import toolExamplesRecommended from './rules/tool-examples-recommended.js';
 import toolParameterNaming from './rules/tool-parameter-naming.js';
 
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 export const meta = {
   name: '@graphorin/eslint-plugin',

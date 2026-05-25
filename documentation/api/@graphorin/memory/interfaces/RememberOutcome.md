@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RememberOutcome
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:90
+Defined in: packages/memory/src/tiers/semantic-memory.ts:264
 
 Returned by [SemanticMemory.remember](/api/@graphorin/memory/classes/SemanticMemory.md#remember). The `fact` is the
 stored row (which may be the *existing* fact when the pipeline
@@ -19,5 +19,5 @@ distinguish silent dedups from active inserts.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | packages/memory/src/tiers/semantic-memory.ts:92 |
-| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | packages/memory/src/tiers/semantic-memory.ts:91 |
+| <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | packages/memory/src/tiers/semantic-memory.ts:266 |
+| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | packages/memory/src/tiers/semantic-memory.ts:265 |

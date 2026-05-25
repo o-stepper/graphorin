@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DecayMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:429
+Defined in: packages/memory/src/internal/storage-adapter.ts:473
 
 Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
@@ -25,7 +25,7 @@ with an INFO log.
 archiveFact(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:452
+Defined in: packages/memory/src/internal/storage-adapter.ts:505
 
 Soft-archive a fact (sets `archived = 1`). The audit row in
 `memory_history` records the archive event.
@@ -50,17 +50,23 @@ listForDecay(scope, limit?): Promise<readonly {
   archived: boolean;
   createdAt: number;
   id: string;
+  importance: number | null;
   lastAccessedAt: number | null;
+  provenance: string | null;
+  status: string;
   strength: number;
   text: string;
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:435
+Defined in: packages/memory/src/internal/storage-adapter.ts:482
 
 List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
 whole table. `limit` defaults to `1000`.
+
+`importance` / `status` / `provenance` (X-1) feed the multi-signal
+salience score that orders capacity-bounded eviction.
 
 #### Parameters
 
@@ -75,7 +81,10 @@ whole table. `limit` defaults to `1000`.
   `archived`: `boolean`;
   `createdAt`: `number`;
   `id`: `string`;
+  `importance`: `number` \| `null`;
   `lastAccessedAt`: `number` \| `null`;
+  `provenance`: `string` \| `null`;
+  `status`: `string`;
   `strength`: `number`;
   `text`: `string`;
 \}[]\>

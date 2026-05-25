@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EpisodeRetrievalWeights
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:38
+Defined in: packages/memory/src/tiers/episodic-memory.ts:52
 
 Triple-signal episode retrieval weights. Defaults match DEC-105:
 `recency 0.3`, `relevance 0.5`, `importance 0.2`. Implementations
@@ -18,6 +18,6 @@ normalize the weighted sum back to `[0, 1]`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-importance"></a> `importance` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:41 |
-| <a id="property-recency"></a> `recency` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:39 |
-| <a id="property-relevance"></a> `relevance` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:40 |
+| <a id="property-importance"></a> `importance` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:55 |
+| <a id="property-recency"></a> `recency` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:53 |
+| <a id="property-relevance"></a> `relevance` | `readonly` | `number` | packages/memory/src/tiers/episodic-memory.ts:54 |

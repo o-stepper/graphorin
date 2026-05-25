@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * The `submit_expense` tool the Slack-bot stub agent invokes. The tool
  * is `'side-effecting'` (it would, in production, write a row to the

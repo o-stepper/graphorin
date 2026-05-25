@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ConsolidatorTier = "free" | "cheap" | "standard" | "full" | "custom";
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:39
+Defined in: packages/memory/src/consolidator/types.ts:42
 
 Tier preset that selects a consolidator behaviour bundle. The
 `'free'` preset is the default per DEC-144 / ADR-038 — no LLM call

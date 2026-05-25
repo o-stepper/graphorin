@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Consolidator
 
-Defined in: packages/memory/src/consolidator/runtime.ts:54
+Defined in: packages/memory/src/consolidator/runtime.ts:57
 
 Consolidator runtime surface returned by [createConsolidator](/api/@graphorin/memory/functions/createConsolidator.md).
 Compatible with the placeholder shape so the facade can swap the
@@ -22,7 +22,7 @@ implementation without breaking consumers.
 config(): ConsolidatorConfig;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:73
+Defined in: packages/memory/src/consolidator/runtime.ts:76
 
 Active config — frozen snapshot.
 
@@ -38,7 +38,7 @@ Active config — frozen snapshot.
 drainDlq(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:77
+Defined in: packages/memory/src/consolidator/runtime.ts:80
 
 Drain DLQ rows whose `nextRetryAt` <= now.
 
@@ -62,7 +62,7 @@ fireNow(phase, scope?): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:63
+Defined in: packages/memory/src/consolidator/runtime.ts:66
 
 Manual trigger for the requested phase. Skips phase gating + the
 idle/cron scheduler so admins can flush the queue on demand.
@@ -88,7 +88,7 @@ idle/cron scheduler so admins can flush the queue on demand.
 isFree(): boolean;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:75
+Defined in: packages/memory/src/consolidator/runtime.ts:78
 
 True when `tier === 'free'`.
 
@@ -104,7 +104,7 @@ True when `tier === 'free'`.
 onPhaseFinished(listener): () => void;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:71
+Defined in: packages/memory/src/consolidator/runtime.ts:74
 
 Subscribe to phase-finished notifications. Returns an unsubscribe.
 
@@ -126,7 +126,7 @@ Subscribe to phase-finished notifications. Returns an unsubscribe.
 pause(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:67
+Defined in: packages/memory/src/consolidator/runtime.ts:70
 
 Pause the consolidator until the next budget reset.
 
@@ -142,7 +142,7 @@ Pause the consolidator until the next budget reset.
 resume(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:69
+Defined in: packages/memory/src/consolidator/runtime.ts:72
 
 Resume after `pause()`.
 
@@ -158,7 +158,7 @@ Resume after `pause()`.
 setTier(tier): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:65
+Defined in: packages/memory/src/consolidator/runtime.ts:68
 
 Replace the active tier — recomputes ceilings + phase set.
 
@@ -180,7 +180,7 @@ Replace the active tier — recomputes ceilings + phase set.
 start(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:55
+Defined in: packages/memory/src/consolidator/runtime.ts:58
 
 #### Returns
 
@@ -194,7 +194,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:55
 status(): Promise<ConsolidatorStatus>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:58
+Defined in: packages/memory/src/consolidator/runtime.ts:61
 
 #### Returns
 
@@ -208,7 +208,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:58
 stop(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:56
+Defined in: packages/memory/src/consolidator/runtime.ts:59
 
 #### Returns
 
@@ -224,7 +224,7 @@ trigger(reason, scope): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:57
+Defined in: packages/memory/src/consolidator/runtime.ts:60
 
 #### Parameters
 

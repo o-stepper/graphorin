@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.3.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/background-consolidator`. Every test
  * runs against `:memory:` SQLite + the deterministic stub provider so
@@ -31,8 +31,8 @@ import {
 } from '../src/main.js';
 
 describe('examples/background-consolidator — smoke', () => {
-  it('exposes VERSION = 0.3.0', () => {
-    expect(VERSION).toBe('0.3.0');
+  it('exposes VERSION = 0.4.0', () => {
+    expect(VERSION).toBe('0.4.0');
   });
 
   it('runConsolidatorCycle drives turns + fires the light-tick deterministically', async () => {

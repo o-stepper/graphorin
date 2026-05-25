@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorBudgetSnapshot
 
-Defined in: packages/memory/src/consolidator/types.ts:134
+Defined in: packages/memory/src/consolidator/types.ts:200
 
 Budget snapshot block of [ConsolidatorStatus](/api/@graphorin/memory/interfaces/ConsolidatorStatus.md). Surfaces
 both the absolute usage and the remaining envelope so consumers
@@ -19,8 +19,8 @@ without doing the math themselves.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-costremaining"></a> `costRemaining` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:138 |
-| <a id="property-costusedtoday"></a> `costUsedToday` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:136 |
-| <a id="property-resetat"></a> `resetAt` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:139 |
-| <a id="property-tokensremaining"></a> `tokensRemaining` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:137 |
-| <a id="property-tokensusedtoday"></a> `tokensUsedToday` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:135 |
+| <a id="property-costremaining"></a> `costRemaining` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:204 |
+| <a id="property-costusedtoday"></a> `costUsedToday` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:202 |
+| <a id="property-resetat"></a> `resetAt` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:205 |
+| <a id="property-tokensremaining"></a> `tokensRemaining` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:203 |
+| <a id="property-tokensusedtoday"></a> `tokensUsedToday` | `readonly` | `number` | packages/memory/src/consolidator/types.ts:201 |

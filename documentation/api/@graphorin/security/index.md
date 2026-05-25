@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../index.md)
+[**Graphorin API reference v0.4.0**](../../index.md)
 
 ***
 
@@ -97,7 +97,7 @@
 
 ## Status
 
-- **Version:** v0.3.0 — secrets foundations + server token auth +
+- **Version:** v0.4.0 — secrets foundations + server token auth +
   tamper-evident audit log + sandbox / memory-guard / guardrails /
   process-hardening runtime safety + outbound OAuth flows + skills
   supply-chain helpers.
@@ -338,7 +338,7 @@ line.
 
 ---
 
-**Project Graphorin** · v0.3.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

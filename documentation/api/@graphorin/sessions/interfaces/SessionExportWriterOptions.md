@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -22,4 +22,4 @@ Options accepted by [createSessionExportWriter](/api/@graphorin/sessions/functio
 | <a id="property-minruntimeversion"></a> `minRuntimeVersion?` | `readonly` | `string` | Minimum runtime version that can read the resulting file. | packages/sessions/src/export/writer.ts:31 |
 | <a id="property-now"></a> `now?` | `readonly` | () => `number` | Override `Date.now()` for tests. | packages/sessions/src/export/writer.ts:55 |
 | <a id="property-schemaurl"></a> `schemaUrl?` | `readonly` | `string` | Optional `schemaUrl` to embed in the meta header. Conventionally a stable URL that serves the JSON Schema document for the session export format — for example a `raw.githubusercontent.com` URL pointing at the schema file in this repository. | packages/sessions/src/export/writer.ts:38 |
-| <a id="property-writer"></a> `writer` | `readonly` | `string` | Writer identifier surfaced in the meta header (e.g. `'graphorin@0.3.0'`). | packages/sessions/src/export/writer.ts:29 |
+| <a id="property-writer"></a> `writer` | `readonly` | `string` | Writer identifier surfaced in the meta header (e.g. `'graphorin@0.4.0'`). | packages/sessions/src/export/writer.ts:29 |

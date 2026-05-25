@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ type ConsolidatorTriggerSpec =
   | `budget:${number}`;
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:25
+Defined in: packages/memory/src/consolidator/types.ts:28
 
 Trigger discriminator. The `'turn:N'` and `'idle:Xm'` variants are
 the production defaults per DEC-133. `'cron:EXPR'`, `'event:NAME'`

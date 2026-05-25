@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -162,9 +162,69 @@ Re-exports [InitCommandResult](/api/@graphorin/cli/interfaces/InitCommandResult.
 
 ***
 
+### MemoryActivityConflict
+
+Re-exports [MemoryActivityConflict](/api/@graphorin/cli/interfaces/MemoryActivityConflict.md)
+
+***
+
+### MemoryActivityEvent
+
+Re-exports [MemoryActivityEvent](/api/@graphorin/cli/interfaces/MemoryActivityEvent.md)
+
+***
+
+### MemoryActivityOptions
+
+Re-exports [MemoryActivityOptions](/api/@graphorin/cli/interfaces/MemoryActivityOptions.md)
+
+***
+
+### MemoryActivityResult
+
+Re-exports [MemoryActivityResult](/api/@graphorin/cli/interfaces/MemoryActivityResult.md)
+
+***
+
+### MemoryCitingInsight
+
+Re-exports [MemoryCitingInsight](/api/@graphorin/cli/interfaces/MemoryCitingInsight.md)
+
+***
+
 ### MemoryCommonOptions
 
 Re-exports [MemoryCommonOptions](/api/@graphorin/cli/interfaces/MemoryCommonOptions.md)
+
+***
+
+### MemoryConflictEntry
+
+Re-exports [MemoryConflictEntry](/api/@graphorin/cli/interfaces/MemoryConflictEntry.md)
+
+***
+
+### MemoryHistoryEntry
+
+Re-exports [MemoryHistoryEntry](/api/@graphorin/cli/interfaces/MemoryHistoryEntry.md)
+
+***
+
+### MemoryInspectFact
+
+Re-exports [MemoryInspectFact](/api/@graphorin/cli/interfaces/MemoryInspectFact.md)
+
+***
+
+### MemoryInspectOptions
+
+Re-exports [MemoryInspectOptions](/api/@graphorin/cli/interfaces/MemoryInspectOptions.md)
+
+***
+
+### MemoryInspectResult
+
+Re-exports [MemoryInspectResult](/api/@graphorin/cli/interfaces/MemoryInspectResult.md)
 
 ***
 
@@ -351,6 +411,18 @@ Re-exports [runGuardStatus](/api/@graphorin/cli/functions/runGuardStatus.md)
 ### runInit
 
 Re-exports [runInit](/api/@graphorin/cli/functions/runInit.md)
+
+***
+
+### runMemoryActivity
+
+Re-exports [runMemoryActivity](/api/@graphorin/cli/functions/runMemoryActivity.md)
+
+***
+
+### runMemoryInspect
+
+Re-exports [runMemoryInspect](/api/@graphorin/cli/functions/runMemoryInspect.md)
 
 ***
 

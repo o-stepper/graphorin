@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EmbeddedWriteOptions
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:29
+Defined in: packages/memory/src/internal/storage-adapter.ts:33
 
 Shape of the embedding payload threaded through the optional
 embedded write helpers exposed by adapters such as
@@ -19,8 +19,9 @@ storage package directly.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-embedding"></a> `embedding?` | `readonly` | \{ `embedderId`: `string`; `vector`: `Float32Array`; \} | packages/memory/src/internal/storage-adapter.ts:30 |
-| `embedding.embedderId` | `readonly` | `string` | packages/memory/src/internal/storage-adapter.ts:31 |
-| `embedding.vector` | `readonly` | `Float32Array` | packages/memory/src/internal/storage-adapter.ts:32 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-embedding"></a> `embedding?` | `readonly` | \{ `embedderId`: `string`; `vector`: `Float32Array`; \} | - | packages/memory/src/internal/storage-adapter.ts:34 |
+| `embedding.embedderId` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:35 |
+| `embedding.vector` | `readonly` | `Float32Array` | - | packages/memory/src/internal/storage-adapter.ts:36 |
+| <a id="property-indextext"></a> `indexText?` | `readonly` | `string` | Contextual-retrieval index text (P1-3). When supplied, the adapter indexes its lexical (FTS) surface against this context-prepended text while persisting the canonical `text` unchanged. Absent ⇒ the canonical text is indexed (pre-P1-3 behaviour). | packages/memory/src/internal/storage-adapter.ts:44 |

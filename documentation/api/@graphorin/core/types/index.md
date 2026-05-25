@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../index.md)
 
 ***
 
@@ -160,6 +160,12 @@ Re-exports [Cost](/api/@graphorin/core/interfaces/Cost.md)
 
 ***
 
+### EntityRole
+
+Re-exports [EntityRole](/api/@graphorin/core/type-aliases/EntityRole.md)
+
+***
+
 ### Episode
 
 Re-exports [Episode](/api/@graphorin/core/interfaces/Episode.md)
@@ -187,6 +193,12 @@ Re-exports [FileContent](/api/@graphorin/core/interfaces/FileContent.md)
 ### flattenUsageByModel
 
 Re-exports [flattenUsageByModel](/api/@graphorin/core/functions/flattenUsageByModel.md)
+
+***
+
+### GraphEntity
+
+Re-exports [GraphEntity](/api/@graphorin/core/interfaces/GraphEntity.md)
 
 ***
 
@@ -250,6 +262,12 @@ Re-exports [InboundSanitizationPolicy](/api/@graphorin/core/type-aliases/Inbound
 
 ***
 
+### Insight
+
+Re-exports [Insight](/api/@graphorin/core/interfaces/Insight.md)
+
+***
+
 ### isStepCount
 
 Re-exports [isStepCount](/api/@graphorin/core/functions/isStepCount.md)
@@ -292,6 +310,12 @@ Re-exports [MemoryMetadata](/api/@graphorin/core/interfaces/MemoryMetadata.md)
 
 ***
 
+### MemoryProvenance
+
+Re-exports [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance.md)
+
+***
+
 ### MemoryReadEvent
 
 Re-exports [MemoryReadEvent](/api/@graphorin/core/interfaces/MemoryReadEvent.md)
@@ -307,6 +331,12 @@ Re-exports [MemoryRecord](/api/@graphorin/core/interfaces/MemoryRecord.md)
 ### MemorySearchOptions
 
 Re-exports [MemorySearchOptions](/api/@graphorin/core/interfaces/MemorySearchOptions.md)
+
+***
+
+### MemoryStatus
+
+Re-exports [MemoryStatus](/api/@graphorin/core/type-aliases/MemoryStatus.md)
 
 ***
 

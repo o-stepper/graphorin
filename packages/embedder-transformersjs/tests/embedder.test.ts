@@ -27,7 +27,7 @@ function makeStubPipelineFactory(dim: number): PipelineFactory {
 
 describe('TransformersJsEmbedder', () => {
   it('VERSION constant matches the package version', () => {
-    expect(VERSION).toBe('0.3.0');
+    expect(VERSION).toBe('0.4.0');
   });
 
   it('default id includes the canonical model + dim', () => {

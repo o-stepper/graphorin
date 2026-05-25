@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.3.0**](../../../../index.md)
+[**Graphorin API reference v0.4.0**](../../../../index.md)
 
 ***
 
@@ -7,19 +7,24 @@
 # Function: buildMemoryTools()
 
 ```ts
-function buildMemoryTools(deps): readonly Tool<unknown, unknown, unknown>[];
+function buildMemoryTools(deps, options?): readonly Tool<unknown, unknown, unknown>[];
 ```
 
-Defined in: packages/memory/src/tools/index.ts:48
+Defined in: packages/memory/src/tools/index.ts:77
 
-Build the canonical nine-memory-tool array. Order is stable —
-consumers can rely on the indices for snapshot tests.
+Build the canonical eleven-memory-tool array. Order is stable —
+consumers can rely on the indices for snapshot tests. `fact_history`
+(P0-2) and `fact_validate` (P1-4) are appended last so the original
+nine indices are unchanged. With `{ includeDeepRecall: true }` the
+gated `deep_recall` tool (P2-4) is appended as a twelfth, after the
+stable eleven.
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `deps` | [`MemoryToolDeps`](/api/@graphorin/memory/interfaces/MemoryToolDeps.md) |
+| `options` | [`BuildMemoryToolsOptions`](/api/@graphorin/memory/tools/interfaces/BuildMemoryToolsOptions.md) |
 
 ## Returns
 

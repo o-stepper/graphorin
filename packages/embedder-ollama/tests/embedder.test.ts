@@ -60,7 +60,7 @@ const FOUR_FAMILY_FIXTURES = [
 
 describe('createOllamaEmbedder', () => {
   it('exports the canonical defaults + version constant', () => {
-    expect(VERSION).toBe('0.3.0');
+    expect(VERSION).toBe('0.4.0');
     expect(DEFAULT_OLLAMA_BASE_URL).toBe('http://127.0.0.1:11434');
     expect(DEFAULT_OLLAMA_MODEL).toBe('nomic-embed-text');
     expect(KNOWN_OLLAMA_MODEL_DIMS.get('nomic-embed-text')).toBe(768);
