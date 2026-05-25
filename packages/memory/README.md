@@ -138,6 +138,20 @@ any `EmbedderProvider`; the default is
   by `createMemory({ queryTransform: { provider } })`; with no transformer (the
   default) search stays **offline + single-shot** and these options are silent
   no-ops. Reserve it for retrieval-heavy recall — it adds provider latency.
+- **Weighted fusion + reranker guidance** (search quality, opt-in). RRF is a
+  good zero-tuning default, but once you have labels (the `@graphorin/evals`
+  harness) a calibrated weight can do better. `search(scope, query, { fusion: {
+  strategy: 'weighted', weights: { vector: 3, fts: 1 } } })` fuses through
+  `WeightedRRFReranker`, scaling each candidate list's reciprocal-rank
+  contribution by its retriever *kind* (FTS vs vector; the HyDE list counts as
+  vector). **RRF stays the default** — omit `fusion` (or pass `{ strategy:
+  'rrf' }`) and behaviour is unchanged; equal weights reproduce RRF exactly. The
+  pure `fuseWeighted(lists, weights, k)` is exported for offline weight tuning
+  against the eval harness. For a further precision lift, install a cross-encoder
+  reranker (`@graphorin/reranker-transformersjs` / `-llm`) via
+  `createMemory({ reranker })` or `setReranker(...)` and raise `candidateTopK` —
+  reranking pays off **only on an already-high-recall candidate set**, so fix
+  recall first (contextual retrieval / multi-query) before reaching for it.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to

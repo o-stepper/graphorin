@@ -27,6 +27,8 @@ export {
   type FactInput,
   type FactRememberOptions,
   type FactSearchOptions,
+  type FusionStrategy,
+  type FusionWeights,
   type RememberOutcome,
   SemanticMemory,
 } from './semantic-memory.js';

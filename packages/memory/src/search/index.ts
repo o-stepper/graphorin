@@ -23,5 +23,5 @@ export {
   type QueryTransformer,
   type QueryTransformOptions,
 } from './query-transform.js';
-export { fuseRrf, RRF_DEFAULT_K, RRFReranker } from './rrf.js';
+export { fuseRrf, fuseWeighted, RRF_DEFAULT_K, RRFReranker, WeightedRRFReranker } from './rrf.js';
 export type { ReRanker, ReRankOptions } from './types.js';

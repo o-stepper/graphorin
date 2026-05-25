@@ -17,7 +17,7 @@ import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { explainRecall } from '../search/explain.js';
 import type { QueryTransformer } from '../search/query-transform.js';
-import { fuseRrf } from '../search/rrf.js';
+import { fuseRrf, fuseWeighted, WeightedRRFReranker } from '../search/rrf.js';
 import type { ReRanker } from '../search/types.js';
 
 /**
@@ -48,6 +48,44 @@ export interface FactInput {
    */
   readonly provenance?: MemoryProvenance;
 }
+
+/**
+ * Per-list weights for {@link FusionStrategy} `'weighted'` fusion (X-2),
+ * keyed by retriever *kind* rather than position so they survive the
+ * P2-3 multi-query fan-out (which appends extra FTS / vector candidate
+ * lists). Each defaults to the neutral `1` (≡ RRF). The HyDE list is a
+ * vector list and takes the `vector` weight.
+ *
+ * @stable
+ */
+export interface FusionWeights {
+  /** Weight applied to every FTS5 (lexical) candidate list. Default `1`. */
+  readonly fts?: number;
+  /** Weight applied to every vector (incl. HyDE) candidate list. Default `1`. */
+  readonly vector?: number;
+}
+
+/**
+ * Score-fusion strategy for {@link SemanticMemory.search} (X-2).
+ *
+ * - `'rrf'` (the default when `fusion` is omitted) fuses the candidate
+ *   lists through the configured reranker — the zero-tuning
+ *   {@link RRFReranker} unless one was overridden.
+ * - `'weighted'` fuses through {@link WeightedRRFReranker}, scaling each
+ *   list's reciprocal-rank contribution by its {@link FusionWeights}, for
+ *   callers who have calibrated retriever reliability against labels (the
+ *   P0-1 eval harness). At equal weights it reproduces RRF.
+ *
+ * @stable
+ */
+export type FusionStrategy =
+  | { readonly strategy: 'rrf' }
+  | {
+      readonly strategy: 'weighted';
+      readonly weights: FusionWeights;
+      /** Override the RRF constant for the weighted fuse. Default `60`. */
+      readonly k?: number;
+    };
 
 /**
  * Per-call options accepted by {@link SemanticMemory.search}.
@@ -123,6 +161,18 @@ export interface FactSearchOptions {
    * @stable
    */
   readonly hyde?: boolean;
+  /**
+   * Score-fusion strategy (X-2). Omitted (the default) ⇒ RRF via the
+   * configured reranker — behaviour is unchanged. `{ strategy:
+   * 'weighted', weights }` fuses through {@link WeightedRRFReranker},
+   * up-/down-weighting the FTS vs vector candidate lists per
+   * {@link FusionWeights}; reserve it for callers who have calibrated the
+   * weights against labels (the P0-1 eval harness). At equal weights it
+   * reproduces RRF.
+   *
+   * @stable
+   */
+  readonly fusion?: FusionStrategy;
 }
 
 /**
@@ -428,11 +478,20 @@ export class SemanticMemory {
       async (span) => {
         const candidateTopK = opts.candidateTopK ?? 60;
         const finalTopK = opts.topK ?? 10;
+        // X-2: when weighted fusion is opted-in, each candidate list is
+        // weighted by its *kind* (FTS vs vector) so the weights survive
+        // the P2-3 fan-out below; otherwise `listWeights` is unused and
+        // fusion runs through the configured reranker (RRF by default).
+        const weighted =
+          opts.fusion !== undefined && opts.fusion.strategy === 'weighted' ? opts.fusion : null;
+        const wFts = weighted?.weights.fts ?? 1;
+        const wVector = weighted?.weights.vector ?? 1;
         // P2-3: fan the query into reworded variants when opted-in *and*
         // a transformer is configured; otherwise this is just `[query]`
         // (single-shot, no provider call — the offline default).
         const queries = await this.#expandQueries(query, opts);
         const lists: Array<ReadonlyArray<MemoryHit<Fact>>> = [];
+        const listWeights: number[] = [];
         let primaryFtsCount = 0;
         let primaryVectorCount = 0;
         let isPrimary = true;
@@ -445,6 +504,7 @@ export class SemanticMemory {
             ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
           });
           lists.push(ftsHits);
+          listWeights.push(wFts);
           const vectorHits = await this.#tryVectorSearch(
             scope,
             q,
@@ -452,24 +512,42 @@ export class SemanticMemory {
             opts.asOf,
             opts.includeQuarantined,
           );
-          if (vectorHits.length > 0) lists.push(vectorHits);
+          if (vectorHits.length > 0) {
+            lists.push(vectorHits);
+            listWeights.push(wVector);
+          }
           if (isPrimary) {
             primaryFtsCount = ftsHits.length;
             primaryVectorCount = vectorHits.length;
             isPrimary = false;
           }
         }
-        // P2-3 HyDE: embed a hypothetical answer and fuse its neighbours.
+        // P2-3 HyDE: embed a hypothetical answer and fuse its neighbours
+        // (a vector list ⇒ it takes the `vector` weight).
         const hydeHits = await this.#tryHyde(scope, query, opts, candidateTopK);
-        if (hydeHits.length > 0) lists.push(hydeHits);
-        const fused = await this.#reranker.rerank(query, lists, {
+        if (hydeHits.length > 0) {
+          lists.push(hydeHits);
+          listWeights.push(wVector);
+        }
+        // X-2: weighted fusion runs through a per-call WeightedRRFReranker
+        // built from the per-list weights; the default stays the
+        // configured reranker so behaviour is unchanged when `fusion` is
+        // omitted.
+        const reranker: ReRanker =
+          weighted !== null
+            ? new WeightedRRFReranker({
+                weights: listWeights,
+                ...(weighted.k !== undefined ? { k: weighted.k } : {}),
+              })
+            : this.#reranker;
+        const fused = await reranker.rerank(query, lists, {
           topK: finalTopK,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
         const ranked = await this.#applyDecay(scope, fused, opts.decay);
         const explanation = explainRecall(ranked, {
           query,
-          rerankerId: this.#reranker.id,
+          rerankerId: reranker.id,
         });
         span.setAttributes({
           // `fts_count` / `vector_count` report the *original* query's
@@ -479,7 +557,7 @@ export class SemanticMemory {
           'memory.search.semantic.fts_count': primaryFtsCount,
           'memory.search.semantic.vector_count': primaryVectorCount,
           'memory.search.semantic.final_count': ranked.length,
-          'memory.search.semantic.reranker_id': this.#reranker.id,
+          'memory.search.semantic.reranker_id': reranker.id,
           'memory.search.semantic.decay_applied': opts.decay !== undefined,
           'memory.search.semantic.query_count': queries.length,
           'memory.search.semantic.hyde_applied': hydeHits.length > 0,
@@ -679,6 +757,20 @@ export class SemanticMemory {
     k = 60,
   ): ReadonlyArray<MemoryHit<TRecord>> {
     return fuseRrf(lists, k);
+  }
+
+  /**
+   * Pure weighted-fusion helper (X-2) — like {@link SemanticMemory.fuseRrf}
+   * but scales each list `i`'s reciprocal-rank contribution by
+   * `weights[i]`. A missing / invalid entry defaults to `1`, so equal or
+   * absent weights reproduce RRF.
+   */
+  static fuseWeighted<TRecord extends Fact>(
+    lists: ReadonlyArray<ReadonlyArray<MemoryHit<TRecord>>>,
+    weights: ReadonlyArray<number> | undefined,
+    k = 60,
+  ): ReadonlyArray<MemoryHit<TRecord>> {
+    return fuseWeighted(lists, weights, k);
   }
 
   /**
