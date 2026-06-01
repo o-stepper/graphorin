@@ -58,7 +58,7 @@
     "tsx": "^4.20.0",
     "turbo": "^2.9.14",
     "typescript": "^5.7.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
