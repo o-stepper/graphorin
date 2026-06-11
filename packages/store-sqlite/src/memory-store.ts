@@ -1894,9 +1894,18 @@ function renderMessageForFts(message: Message): string {
 }
 
 function escapeFtsQuery(query: string): string {
-  // Wrap in double quotes and escape any internal double quotes — yields
-  // a phrase query that survives operator characters in user input.
-  return `"${query.replace(/"/g, '""')}"`;
+  // Tokenise on whitespace and quote each token independently, joined with the
+  // FTS5 `OR` operator. Per-token double-quoting still neutralises operator
+  // characters and reserved keywords (user input cannot inject FTS5 syntax),
+  // but OR-ing the tokens restores lexical recall for multi-word natural-
+  // language queries: a single whole-query phrase only matches a verbatim,
+  // adjacent run of the same tokens, so reordered or non-adjacent terms scored
+  // zero. Whitespace-only input falls back to the prior (empty) phrase form.
+  const tokens = query.split(/\s+/).filter((token) => token.length > 0);
+  if (tokens.length === 0) {
+    return `"${query.replace(/"/g, '""')}"`;
+  }
+  return tokens.map((token) => `"${token.replace(/"/g, '""')}"`).join(' OR ');
 }
 
 /** Quote a SQL identifier — only `[A-Za-z0-9_]` allowed. */

@@ -103,6 +103,8 @@ These eleven are always registered. A **twelfth**, `deep_recall` (iterative grad
 
 Semantic memory composes dense-vector results with full-text (FTS5) results and fuses them through the built-in **Reciprocal Rank Fusion** reranker (`k=60` by default). The fusion is deterministic, requires no extra model, and rarely needs tuning.
 
+The FTS5 leg tokenises the query on whitespace and OR-combines the tokens — each quoted independently — so a multi-word natural-language question recalls facts that share **any** term, regardless of word order or adjacency: `where does Anna work` still finds *"Anna works at Acme"*. This matters most in the offline default, where (with no embedder configured) the FTS leg is the only retrieval signal. Per-token quoting also neutralises FTS5 operator characters, so punctuation in a query can never alter its structure or raise an error. Exact-phrase matching is not exposed as a separate mode; lean on the vector leg or [weighted fusion](/guide/rerankers) when you need phrase-level precision.
+
 ```ts
 import { RRFReranker } from '@graphorin/memory/search';
 

@@ -79,6 +79,28 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
+  it('offline FTS recall finds a fact from a multi-word natural-language question (MRET-1)', async () => {
+    const sqlite = await makeStore();
+    try {
+      // No embedder configured: the offline default, where the FTS5 leg is the
+      // only retrieval signal. A terse fact must still be reachable from a
+      // reordered, non-adjacent natural-language question.
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+      });
+      await memory.semantic.remember(SCOPE, { text: 'Anna works at Acme Corporation.' });
+
+      const hits = await memory.semantic.search(SCOPE, 'where does Anna work');
+      expect(hits.length).toBeGreaterThan(0);
+      expect(hits[0]?.record.text).toBe('Anna works at Acme Corporation.');
+      // The FTS leg contributes a non-zero fused signal (offline, no vector leg).
+      expect(hits[0]?.signals?.rrf).toBeGreaterThan(0);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('compile + metadata produce the deterministic minimum-viable rendering', async () => {
     const sqlite = await makeStore();
     try {
