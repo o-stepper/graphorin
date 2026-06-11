@@ -298,6 +298,13 @@ export interface ResolvedContextEngineConfig {
   readonly maxToolsInContext: number;
   readonly toolSearchThreshold: number;
   readonly compactionEnabled: boolean;
+  /**
+   * Whether compaction can actually fire (CE-12): `compactionEnabled` **and** a
+   * `providerContextWindow` was supplied. `compactionEnabled: true` with
+   * `compactionEffective: false` is the honest signal that compaction is
+   * configured-on but a no-op for want of a context window.
+   */
+  readonly compactionEffective: boolean;
   readonly compactionThresholdTokens: number;
   readonly providerContextWindow: number | null;
   readonly providerTrust: LocalProviderTrust;
@@ -315,6 +322,25 @@ const DEFAULT_LAYER_CAPS: Readonly<
   workingBlocks: undefined,
   autoRecall: undefined,
 };
+
+let compactionIneffectiveWarned = false;
+
+/** Emit the "compaction enabled but ineffective" warning at most once (CE-12). */
+function warnCompactionIneffective(message: string): void {
+  if (compactionIneffectiveWarned) return;
+  compactionIneffectiveWarned = true;
+  process.stderr.write(`[graphorin/memory] ${message}\n`);
+}
+
+/**
+ * Test-only — reset the one-time CE-12 compaction warning so a test can assert
+ * it fires.
+ *
+ * @internal
+ */
+export function _resetCompactionWarningForTesting(): void {
+  compactionIneffectiveWarned = false;
+}
 
 /**
  * Build a ContextEngine instance from the supplied configuration.
@@ -385,6 +411,23 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
           reservedForCompaction,
         })
       : Number.POSITIVE_INFINITY;
+  // CE-12: compaction enabled without a `providerContextWindow` leaves the
+  // threshold at Infinity, so `shouldCompact` returns false forever — a
+  // silently-dead default-on protection. Surface it: throw if the operator
+  // explicitly configured compaction, warn (once) if it is on by the default
+  // trust policy. Auto-detecting the window from the provider is not
+  // implemented.
+  const compactionEffective = compactionEnabled && providerContextWindow !== null;
+  if (compactionEnabled && providerContextWindow === null) {
+    const message =
+      'context-engine compaction is enabled but `providerContextWindow` is not set, so the ' +
+      'trigger threshold is Infinity and compaction will never fire. Pass `providerContextWindow` ' +
+      "(your model's context window, in tokens) — auto-detection from the provider is not implemented.";
+    if (compactionInput !== undefined && compactionInput !== false) {
+      throw new Error(`[graphorin/memory] ${message}`);
+    }
+    warnCompactionIneffective(message);
+  }
   const compactionStrategy: CompactionStrategy =
     compactionInput === false ||
     compactionInput === undefined ||
@@ -412,6 +455,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     maxToolsInContext,
     toolSearchThreshold,
     compactionEnabled,
+    compactionEffective,
     compactionThresholdTokens,
     providerContextWindow,
     providerTrust,

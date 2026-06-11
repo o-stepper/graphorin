@@ -1,5 +1,6 @@
 import type { Message } from '@graphorin/core';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { _resetCompactionWarningForTesting } from '../src/context-engine/engine.js';
 import {
   type CompactionSummarizer,
   countMessageTokens,
@@ -364,5 +365,43 @@ describe('context-engine — trigger evaluation perf (RB-46; Phase 10d)', () => 
     const messages = buildMessages(50, 'X'.repeat(20));
     expect(await engine.shouldCompact(messages)).toBe(false);
     expect(await countMessageTokens(messages, HEURISTIC_TOKEN_COUNTER)).toBeGreaterThan(0);
+  });
+});
+
+describe('context-engine — compaction effectiveness (CE-12)', () => {
+  it('warns once + reports compactionEffective:false when enabled without a providerContextWindow', () => {
+    _resetCompactionWarningForTesting();
+    const writes: string[] = [];
+    const spy = vi.spyOn(process.stderr, 'write').mockImplementation((chunk: unknown) => {
+      writes.push(String(chunk));
+      return true;
+    });
+    try {
+      // `public-tls` trust ⇒ compaction is default-enabled; no window supplied.
+      const engine = createContextEngine({ privacy: { providerTrust: 'public-tls' } });
+      const cfg = engine.config();
+      expect(cfg.compactionEnabled).toBe(true);
+      expect(cfg.compactionEffective).toBe(false);
+      // A second engine with the same misconfig does not re-warn (one-time).
+      createContextEngine({ privacy: { providerTrust: 'public-tls' } });
+      expect(writes.filter((w) => w.includes('providerContextWindow')).length).toBe(1);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('throws when compaction is explicitly configured without a providerContextWindow', () => {
+    _resetCompactionWarningForTesting();
+    expect(() =>
+      createContextEngine({ compaction: { trigger: { thresholdTokens: 100 } } }),
+    ).toThrow(/providerContextWindow/);
+  });
+
+  it('reports compactionEffective:true once a providerContextWindow is supplied', () => {
+    const engine = createContextEngine({
+      providerContextWindow: 200_000,
+      privacy: { providerTrust: 'public-tls' },
+    });
+    expect(engine.config().compactionEffective).toBe(true);
   });
 });
