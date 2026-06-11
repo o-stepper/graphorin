@@ -143,6 +143,17 @@ export interface ConsolidatorConfig {
    */
   readonly importanceScoring: boolean;
   /**
+   * Auto-promotion policy (MCON-2). When `true`, the standard phase admits an
+   * injection-clean **extraction** fact as `active` instead of quarantined, so
+   * routine distillation surfaces in default recall without a manual
+   * `memory review --promote`. Injection-flagged facts always stay quarantined
+   * — the security gate is preserved — and episodes / insights / induced
+   * procedures are unaffected (they remain quarantined-until-validated).
+   * Defaults **off** at every tier: it trades the fail-safe default for
+   * convenience and is an explicit operator opt-in.
+   */
+  readonly autoPromoteExtraction: boolean;
+  /**
    * Run the deep-phase reflection pass (P1-1): when accumulated episode
    * importance crosses {@link importanceThreshold}, synthesize
    * higher-order, cited insights over recent memories (Generative
@@ -344,6 +355,11 @@ export interface CreateConsolidatorOptions {
   readonly formEpisodes?: boolean;
   /** Override the per-tier {@link ConsolidatorConfig.importanceScoring} default (P1-2). */
   readonly importanceScoring?: boolean;
+  /**
+   * Opt in to auto-promotion of injection-clean extraction facts (MCON-2).
+   * Defaults `false`. See {@link ConsolidatorConfig.autoPromoteExtraction}.
+   */
+  readonly autoPromoteExtraction?: boolean;
   /** Override the per-tier {@link ConsolidatorConfig.reflection} default (P1-1). */
   readonly reflection?: boolean;
   /** Override the {@link ConsolidatorConfig.importanceThreshold} default (P1-1). */

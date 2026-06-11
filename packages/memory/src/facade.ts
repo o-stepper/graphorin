@@ -206,6 +206,8 @@ export interface CreateMemoryOptions {
     readonly formEpisodes?: boolean;
     /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
     readonly importanceScoring?: boolean;
+    /** Opt in to auto-promotion of injection-clean extraction facts (MCON-2). Default off. */
+    readonly autoPromoteExtraction?: boolean;
     /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
     readonly reflection?: boolean;
     /** Accumulated-importance threshold at which reflection fires (P1-1). */
@@ -611,6 +613,9 @@ function buildConsolidator(
     ...(opts.dlqMaxBackoffMs !== undefined ? { dlqMaxBackoffMs: opts.dlqMaxBackoffMs } : {}),
     ...(opts.formEpisodes !== undefined ? { formEpisodes: opts.formEpisodes } : {}),
     ...(opts.importanceScoring !== undefined ? { importanceScoring: opts.importanceScoring } : {}),
+    ...(opts.autoPromoteExtraction !== undefined
+      ? { autoPromoteExtraction: opts.autoPromoteExtraction }
+      : {}),
     ...(opts.reflection !== undefined ? { reflection: opts.reflection } : {}),
     ...(opts.importanceThreshold !== undefined
       ? { importanceThreshold: opts.importanceThreshold }

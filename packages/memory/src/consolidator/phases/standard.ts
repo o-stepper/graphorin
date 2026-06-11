@@ -53,6 +53,12 @@ export interface StandardPhaseDeps {
   /** Ask the episode summary call for a `[1, 10]` importance score (P1-2). */
   readonly importanceScoring: boolean;
   /**
+   * Auto-promotion policy (MCON-2). When `true`, an injection-clean extraction
+   * fact is admitted `active` instead of quarantined. Injection-flagged facts
+   * always stay quarantined. Off by default.
+   */
+  readonly autoPromoteExtraction: boolean;
+  /**
    * Contextual-retrieval mode for additive fact writes (P1-3). `'llm'`
    * spends one budgeted cheap-model call per `add` to author a situating
    * prefix; `'late-chunk'` / `'off'` defer to the shared
@@ -310,6 +316,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
             const stored = await deps.semantic.remember(deps.scope, input, {
               pipeline: 'off',
               ...(indexText !== undefined ? { indexText } : {}),
+              ...(deps.autoPromoteExtraction ? { autoPromoteSynthesized: true } : {}),
             });
             candidateId = stored.id;
             factsCreated += 1;

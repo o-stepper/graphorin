@@ -571,6 +571,7 @@ class ConsolidatorImpl implements Consolidator {
         episodic: this.#episodic,
         formEpisodes: this.#config.formEpisodes,
         importanceScoring: this.#config.importanceScoring,
+        autoPromoteExtraction: this.#config.autoPromoteExtraction,
         contextualRetrieval: this.#config.contextualRetrieval,
         store: this.#store,
         consolidatorStore: this.#consolidatorStore,
@@ -737,6 +738,8 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     dlqMaxBackoffMs: opts.dlqMaxBackoffMs ?? 60 * 60 * 1000,
     formEpisodes: opts.formEpisodes ?? preset.formEpisodes,
     importanceScoring: opts.importanceScoring ?? preset.importanceScoring,
+    // MCON-2: opt-in only — fail-safe (quarantine) stays the default at every tier.
+    autoPromoteExtraction: opts.autoPromoteExtraction ?? false,
     reflection: opts.reflection ?? preset.reflection,
     importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
     reflectionMaxQuestions: opts.reflectionMaxQuestions ?? preset.reflectionMaxQuestions,

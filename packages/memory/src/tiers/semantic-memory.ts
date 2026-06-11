@@ -252,6 +252,15 @@ export interface FactRememberOptions {
    * omit it and rely on the offline late-chunk default.
    */
   readonly indexText?: string;
+  /**
+   * Auto-promotion policy (MCON-2). When `true`, a *synthesized* write
+   * (consolidator extraction) that is **clean** by the injection heuristics is
+   * stored `active` instead of quarantined. Injection-flagged writes always
+   * stay quarantined — the security gate is preserved. Off by default; the
+   * consolidator passes it only when the operator opts in via
+   * `autoPromoteExtraction`. No effect on non-synthesized writes.
+   */
+  readonly autoPromoteSynthesized?: boolean;
 }
 
 /**
@@ -410,7 +419,14 @@ export class SemanticMemory {
       const synthesized =
         provenance === 'extraction' || provenance === 'reflection' || provenance === 'induction';
       const injection = detectMemoryInjection(text);
-      const status: MemoryStatus = synthesized || injection.flagged ? 'quarantined' : 'active';
+      // MCON-2 auto-promotion: an opted-in, injection-clean synthesized write is
+      // admitted `active`. Injection-flagged writes always stay quarantined.
+      const autoPromote = options.autoPromoteSynthesized === true;
+      const status: MemoryStatus = injection.flagged
+        ? 'quarantined'
+        : synthesized && !autoPromote
+          ? 'quarantined'
+          : 'active';
       // MRET-3: surface *why* a fresh write was quarantined so callers
       // (the fact_remember tool, harnesses) can tell an injection-flagged
       // poison candidate apart from a synthesized-but-clean consolidator
