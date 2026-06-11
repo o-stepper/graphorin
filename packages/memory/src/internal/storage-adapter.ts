@@ -76,6 +76,12 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     limit: number,
     options?: { includeQuarantined?: boolean },
   ): Promise<ReadonlyArray<Episode>>;
+  /**
+   * Set an episode's retrieval-trust `status` (MCON-2) — promote a quarantined
+   * (auto-formed) episode into default recall or re-quarantine an active one,
+   * with a `memory_history` audit row. Powers {@link EpisodicMemory.validate}.
+   */
+  setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
 }
 
 /**
@@ -567,6 +573,12 @@ export interface InsightMemoryStoreExt {
   /** Lookup a single insight by id (`null` when absent / pruned). */
   get?(id: string): Promise<Insight | null>;
   /**
+   * Set an insight's retrieval-trust `status` (MCON-2) — promote a quarantined
+   * (reflection) insight or re-quarantine an active one, with a
+   * `memory_history` audit row. Powers {@link InsightMemory.validate}.
+   */
+  setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  /**
    * Adjust an insight's ExpeL salience by `delta`, clamped at 0. The
    * floor is the value at which {@link prune} removes it.
    */
@@ -577,6 +589,21 @@ export interface InsightMemoryStoreExt {
    * pruned insights stay auditable.
    */
   prune(scope: SessionScope): Promise<number>;
+}
+
+/**
+ * Extension of the typed `ProceduralMemoryStore` with the optional
+ * promotion helper that storage adapters may expose (MCON-2).
+ *
+ * @stable
+ */
+export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
+  /**
+   * Set a rule's retrieval-trust `status` — promote a quarantined (induced)
+   * procedure into `activate()` or re-quarantine an active one, with a
+   * `memory_history` audit row. Powers {@link ProceduralMemory.validate}.
+   */
+  setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
 }
 
 /** Find-or-create payload for {@link GraphMemoryStoreExt.upsertEntity}. */
@@ -685,10 +712,12 @@ export interface GraphMemoryStoreExt {
  *
  * @stable
  */
-export interface MemoryStoreAdapter extends Omit<MemoryStore, 'session' | 'episodic' | 'semantic'> {
+export interface MemoryStoreAdapter
+  extends Omit<MemoryStore, 'session' | 'episodic' | 'semantic' | 'procedural'> {
   readonly session: SessionMemoryStoreExt;
   readonly episodic: EpisodicMemoryStoreExt;
   readonly semantic: SemanticMemoryStoreExt & Partial<DecayMemoryStoreExt>;
+  readonly procedural: ProceduralMemoryStoreExt;
   /**
    * Optional conflict audit + pending queue surface. Defined on the
    * default `@graphorin/store-sqlite` adapter, omitted on the

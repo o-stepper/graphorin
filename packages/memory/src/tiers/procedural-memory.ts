@@ -14,8 +14,12 @@ import {
   trajectoryFromRunState,
   type WorkflowInducer,
 } from '../consolidator/phases/induce.js';
-import { ProcedureInductionNotConfiguredError } from '../errors/index.js';
+import {
+  ProcedureInductionNotConfiguredError,
+  QuarantinePromotionRefusedError,
+} from '../errors/index.js';
 import { newMemoryId } from '../internal/id.js';
+import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 
@@ -254,6 +258,48 @@ export class ProceduralMemory {
     return rules
       .filter((rule) => rule.status !== 'quarantined' && predicateMatches(rule, context))
       .sort((a, b) => b.priority - a.priority);
+  }
+
+  /**
+   * Promote a quarantined (induced) procedure into `activate()` (MCON-2).
+   * Mirrors {@link SemanticMemory.validate}: re-derives the injection verdict
+   * from the stored rule text and **refuses** promotion of an injection-flagged
+   * procedure unless an operator passes `{ force: true }`. Induced procedures
+   * drive *actions*, so this gate matters most for them.
+   */
+  async validate(
+    scope: SessionScope,
+    ruleId: string,
+    reason?: string,
+    options?: { readonly force?: boolean },
+  ): Promise<void> {
+    await withMemorySpan(
+      this.#tracer,
+      'memory.write.procedural',
+      scope,
+      { 'memory.procedural.action': 'validate', 'memory.procedural.rule_id': ruleId },
+      async (span) => {
+        const store = this.#store.procedural;
+        if (typeof store.setStatus !== 'function') {
+          throw new TypeError(
+            '[graphorin/memory] ProceduralMemory.validate(...) requires a storage adapter that implements `procedural.setStatus(id, status)`. ' +
+              'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via ProceduralMemoryStoreExt.',
+          );
+        }
+        const force = options?.force === true;
+        // No store get-by-id for rules — list() already surfaces quarantined.
+        const existing = (await store.list(scope)).find((rule) => rule.id === ruleId) ?? null;
+        if (existing !== null && !force) {
+          const injection = detectMemoryInjection(existing.text);
+          if (injection.flagged) {
+            span.setAttributes({ 'memory.procedural.validate.refused': true });
+            throw new QuarantinePromotionRefusedError(ruleId, injection.markers);
+          }
+        }
+        span.setAttributes({ 'memory.procedural.validate.forced': force });
+        await store.setStatus(ruleId, 'active', reason);
+      },
+    );
   }
 }
 
