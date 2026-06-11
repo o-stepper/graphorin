@@ -45,7 +45,7 @@
     "check-anthropic-spec": "node ./scripts/check-anthropic-spec.mjs",
     "changeset": "changeset",
     "version": "changeset version",
-    "release": "turbo run build && changeset publish --provenance --access public"
+    "release": "turbo run build && changeset publish"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",
