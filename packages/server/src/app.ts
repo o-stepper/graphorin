@@ -602,11 +602,22 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
           ...(consolidatorDaemon !== undefined ? { consolidatorDaemon } : {}),
         });
 
-        if (triggersDaemon !== undefined) {
-          await triggersDaemon.start();
-        }
+        // Start the consolidator first so it is ready to handle fired
+        // triggers, bridge its cron / idle triggers onto the scheduler
+        // (MCON-4 — without this nothing pipes triggers into the
+        // consolidator and background consolidation never runs), then start
+        // the scheduler last so it only fires fully-wired triggers.
         if (consolidatorDaemon !== undefined) {
           await consolidatorDaemon.start();
+          if (
+            triggersDaemon !== undefined &&
+            consolidatorDaemon.consolidator.registerWithScheduler !== undefined
+          ) {
+            await consolidatorDaemon.consolidator.registerWithScheduler(triggersDaemon.scheduler);
+          }
+        }
+        if (triggersDaemon !== undefined) {
+          await triggersDaemon.start();
         }
 
         // Sample a couple of gauges immediately so the very first

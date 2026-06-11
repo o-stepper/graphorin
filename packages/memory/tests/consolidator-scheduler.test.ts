@@ -141,4 +141,45 @@ describe('@graphorin/memory consolidator <> @graphorin/triggers — Scheduler br
     const skippedReasons = result.skipped.map((s) => s.reason);
     expect(skippedReasons).toContain('unsupported-by-scheduler');
   });
+
+  it('registerWithScheduler registers the default idle + deep-reaching cron via the configured scope (MCON-4)', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    // No explicit triggers ⇒ the default set, which now includes a daily cron
+    // so the **deep** phase is reachable (`#planPhases` only schedules deep for
+    // cron / manual / budget reasons).
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: { tier: 'free', defaultScope: { userId: 'alex' } },
+    });
+    await memory.consolidator.start();
+    const registered: Array<{ kind: string; spec: string }> = [];
+    const scheduler: import('../src/index.js').SchedulerLike = {
+      async register(declaration): Promise<unknown> {
+        registered.push({ kind: declaration.kind, spec: declaration.spec });
+        return declaration;
+      },
+    };
+    const result = await memory.consolidator.registerWithScheduler(scheduler);
+    expect(result.registered.map((r) => r.kind).sort()).toEqual(['cron', 'idle']);
+    expect(registered.some((r) => r.kind === 'cron')).toBe(true);
+  });
+
+  it('registerWithScheduler throws when no defaultScope is configured', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: { tier: 'free' },
+    });
+    await memory.consolidator.start();
+    const scheduler: import('../src/index.js').SchedulerLike = {
+      async register(declaration): Promise<unknown> {
+        return declaration;
+      },
+    };
+    await expect(memory.consolidator.registerWithScheduler(scheduler)).rejects.toThrow(
+      /defaultScope/,
+    );
+  });
 });

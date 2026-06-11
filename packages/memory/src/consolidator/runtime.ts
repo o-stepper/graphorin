@@ -5,11 +5,14 @@
  * detail.
  *
  * The runtime is **library-mode** by default — it does not start a
- * background scheduler. Triggers are realised through manual
- * `trigger(...)` / `fireNow(...)` calls or by wiring a
- * `@graphorin/triggers` scheduler externally. Phase 14 (server)
- * starts the daemon scheduler in `beforeStart` and pipes turn / idle
- * / cron triggers into `Consolidator.trigger(...)` from there.
+ * background scheduler. Cron / idle triggers are realised by
+ * registering them with a `@graphorin/triggers` scheduler via
+ * `registerWithScheduler(...)` (the standalone server calls this in
+ * `beforeStart` whenever a consolidator + a triggers scheduler are both
+ * supplied). Turn / event triggers are consumer-emitted — the scheduler
+ * cannot fire them on its own, so the consumer must call
+ * `trigger({ kind: 'turn' | 'event' }, ...)` from its own loop. Manual
+ * `trigger(...)` / `fireNow(...)` calls work in either mode.
  *
  * @packageDocumentation
  */
@@ -33,6 +36,11 @@ import { runDeepPhase } from './phases/deep.js';
 import { runLightPhase } from './phases/light.js';
 import { runReflectionPass } from './phases/reflect.js';
 import { runStandardPhase } from './phases/standard.js';
+import {
+  type RegisterTriggersResult,
+  registerConsolidatorTriggers,
+  type SchedulerLike,
+} from './scheduler.js';
 import {
   CONSOLIDATOR_TIER_DEFAULTS,
   type ConsolidatorConfig,
@@ -74,6 +82,15 @@ export interface Consolidator {
   onPhaseFinished(listener: PhaseListener): () => void;
   /** Active config — frozen snapshot. */
   config(): ConsolidatorConfig;
+  /**
+   * Register this consolidator's cron / idle triggers with a
+   * `@graphorin/triggers` scheduler so they fire `trigger(...)`
+   * automatically (the daemon ↔ triggers bridge — MCON-4). Uses the
+   * configured `defaultScope`; throws if none was set. Turn / event
+   * triggers are skipped (consumer-emitted). The standalone server calls
+   * this in `beforeStart`.
+   */
+  registerWithScheduler(scheduler: SchedulerLike): Promise<RegisterTriggersResult>;
   /** True when `tier === 'free'`. */
   isFree(): boolean;
   /** Drain DLQ rows whose `nextRetryAt` <= now. */
@@ -167,6 +184,17 @@ class ConsolidatorImpl implements Consolidator {
 
   config(): ConsolidatorConfig {
     return this.#config;
+  }
+
+  async registerWithScheduler(scheduler: SchedulerLike): Promise<RegisterTriggersResult> {
+    if (this.#defaultScope === null) {
+      throw new Error(
+        '[graphorin/memory] Consolidator.registerWithScheduler requires a defaultScope. ' +
+          'Pass `defaultScope` to createConsolidator / createMemory, or call ' +
+          'registerConsolidatorTriggers(consolidator, scheduler, { scope }) directly.',
+      );
+    }
+    return registerConsolidatorTriggers(this, scheduler, { scope: this.#defaultScope });
   }
 
   isFree(): boolean {
@@ -717,7 +745,13 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
 }
 
 function defaultTriggers(): ConsolidatorTriggerSpec[] {
-  return ['turn:20', 'idle:5m'];
+  // `idle:5m` drives the light + standard phases between sessions; the daily
+  // cron is what makes the **deep** phase reachable (it drains the deferred
+  // conflict-check queue + runs reflection — `#planPhases` only schedules deep
+  // for cron / manual / budget reasons). A `turn:N` default was dropped: the
+  // scheduler cannot count user turns, so it was inert unless a consumer
+  // emitted `trigger({ kind: 'turn' })` itself (MCON-4).
+  return ['idle:5m', 'cron:0 4 * * *'];
 }
 
 /**

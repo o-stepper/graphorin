@@ -128,6 +128,10 @@ await scheduler.start();
 
 The triggers daemon (mounted by `@graphorin/server`) owns the schedule, persists the next-firing time across restarts, fires the registered callback, and audits every fire decision.
 
+### Background consolidation
+
+When you pass **both** a `consolidator` and a triggers scheduler to `createServer({ consolidator, triggers })`, the server bridges them in `beforeStart`: it registers the consolidator's `cron` / `idle` triggers with the scheduler so background distillation actually runs — no manual `registerConsolidatorTriggers` call. The default trigger set is `idle:5m` (drives the light + standard phases between sessions) plus a daily `cron:0 4 * * *` that makes the **deep** phase reachable — deep drains the deferred conflict-check queue and runs reflection, and only `cron` / `manual` / `budget` reasons schedule it. `turn` / `event` triggers are **consumer-emitted**: the scheduler can't fire them on its own, so your agent loop must call `consolidator.trigger({ kind: 'turn' | 'event' }, scope)` itself. The bridge uses the consolidator's `defaultScope`, so configure one; and remember the default `free` tier pins the budget to zero (set a paid tier for distillation to do anything — see [Memory system](/guide/memory-system#background-consolidator)).
+
 ## Idempotency
 
 All `POST` endpoints accept an `Idempotency-Key` header. Repeated submissions within the configured TTL return the original response (or the in-flight result for a still-running call).
