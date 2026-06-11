@@ -26,11 +26,6 @@ export interface AutoRecallTriggers {
    * top-K facts being injected into Layer 6.
    */
   readonly factTriggers: ReadonlyArray<RegExp>;
-  /**
-   * Case-insensitive regex set evaluated against the last user
-   * message for episodic recall.
-   */
-  readonly episodeTriggers: ReadonlyArray<RegExp>;
 }
 
 /**
@@ -150,9 +145,6 @@ export function defineContextLocalePack(input: PartialContextLocalePack): Partia
           autoRecallTriggers: Object.freeze({
             ...(input.autoRecallTriggers.factTriggers !== undefined
               ? { factTriggers: Object.freeze([...input.autoRecallTriggers.factTriggers]) }
-              : {}),
-            ...(input.autoRecallTriggers.episodeTriggers !== undefined
-              ? { episodeTriggers: Object.freeze([...input.autoRecallTriggers.episodeTriggers]) }
               : {}),
           }) as Partial<AutoRecallTriggers>,
         }

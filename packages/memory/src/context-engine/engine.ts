@@ -537,7 +537,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       : '';
 
     // Layer 6 — auto-recall.
-    let autoRecall: AutoRecallTriggerResult = { factsTriggered: false, episodesTriggered: false };
+    let autoRecall: AutoRecallTriggerResult = { factsTriggered: false };
     let layer6Text = '';
     if (factsAutoRecall !== false && layersEnabled.autoRecall) {
       const strategy =

@@ -25,23 +25,12 @@ describe('context-engine — auto-recall heuristic (Phase 10d)', () => {
     expect(strategy({ locale: 'en', lastUserMessage: '' }).factsTriggered).toBe(false);
   });
 
-  it('English defaults match the documented episode trigger phrases', () => {
-    const strategy = defaultLocaleHeuristicStrategy(enLocalePack);
-    expect(
-      strategy({ locale: 'en', lastUserMessage: 'recap of the meeting please' }).episodesTriggered,
-    ).toBe(true);
-    expect(
-      strategy({ locale: 'en', lastUserMessage: 'catch me up on yesterday' }).episodesTriggered,
-    ).toBe(true);
-  });
-
   it('custom locale heuristic plugs in via defineContextLocalePack', () => {
     const customPack = resolveLocalePack(
       defineContextLocalePack({
         id: 'fr-test',
         autoRecallTriggers: {
           factTriggers: [/te souviens-tu/i],
-          episodeTriggers: [/résumé de/i],
         },
       }),
       { silent: true },
@@ -51,15 +40,15 @@ describe('context-engine — auto-recall heuristic (Phase 10d)', () => {
       strategy({ locale: 'fr-test', lastUserMessage: 'Te souviens-tu de mon chien?' })
         .factsTriggered,
     ).toBe(true);
-    expect(
-      strategy({ locale: 'fr-test', lastUserMessage: 'résumé de la réunion' }).episodesTriggered,
-    ).toBe(true);
+    expect(strategy({ locale: 'fr-test', lastUserMessage: 'unrelated text' }).factsTriggered).toBe(
+      false,
+    );
   });
 
   it('defineAutoRecallStrategy returns a tagged strategy object', () => {
     const custom = defineAutoRecallStrategy({
       id: 'custom-strategy',
-      evaluate: () => ({ factsTriggered: true, episodesTriggered: false, reason: 'always-on' }),
+      evaluate: () => ({ factsTriggered: true, reason: 'always-on' }),
     });
     expect(custom.id).toBe('custom-strategy');
     const out = custom({ locale: 'en', lastUserMessage: 'anything' });
@@ -71,7 +60,7 @@ describe('context-engine — auto-recall heuristic (Phase 10d)', () => {
     expect(() =>
       defineAutoRecallStrategy({
         id: '',
-        evaluate: () => ({ factsTriggered: false, episodesTriggered: false }),
+        evaluate: () => ({ factsTriggered: false }),
       }),
     ).toThrow(/non-empty/);
     expect(() =>

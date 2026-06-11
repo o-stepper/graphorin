@@ -152,14 +152,10 @@ function mergeAutoRecallTriggers(
     return fallback.autoRecallTriggers;
   }
   const factTriggers = partial.factTriggers ?? fallback.autoRecallTriggers.factTriggers;
-  const episodeTriggers = partial.episodeTriggers ?? fallback.autoRecallTriggers.episodeTriggers;
   if (partial.factTriggers === undefined)
     emitFallbackWarning(logger, localeId, 'autoRecallTriggers.factTriggers');
-  if (partial.episodeTriggers === undefined)
-    emitFallbackWarning(logger, localeId, 'autoRecallTriggers.episodeTriggers');
   return Object.freeze({
     factTriggers: Object.freeze([...factTriggers]),
-    episodeTriggers: Object.freeze([...episodeTriggers]),
   });
 }
 
