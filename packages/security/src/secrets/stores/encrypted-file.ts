@@ -1,5 +1,5 @@
 import { createCipheriv, randomBytes } from 'node:crypto';
-import { chmod, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, readFile, rename, stat, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 
@@ -62,11 +62,35 @@ export class EncryptedFileSecretsStore implements SecretsStore {
   readonly #path: string;
   readonly #passphrase: SecretValue;
   readonly #enforcePermissions: boolean;
+  /**
+   * In-process single-writer guard (SPL-3). Serialises the
+   * read-modify-write critical section so two concurrent `set()` /
+   * `delete()` calls against the same instance cannot interleave their
+   * reads and clobber each other. Cross-process writers are out of
+   * scope (see the multi-process topology open question); the atomic
+   * temp+rename below still prevents corruption there — worst case is
+   * last-write-wins, never a truncated bundle.
+   */
+  #writeChain: Promise<unknown> = Promise.resolve();
 
   constructor(opts: EncryptedFileSecretsStoreOptions) {
     this.#path = expandTilde(opts.path);
     this.#passphrase = opts.passphrase;
     this.#enforcePermissions = opts.enforcePermissions ?? true;
+  }
+
+  /**
+   * Run a read-modify-write task after any in-flight one completes,
+   * regardless of whether the previous task resolved or rejected (a
+   * failed write must not wedge the queue).
+   */
+  #enqueueWrite<T>(task: () => Promise<T>): Promise<T> {
+    const result = this.#writeChain.then(task, task);
+    this.#writeChain = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
   }
 
   async get(key: string, _scope?: SessionScope): Promise<SecretValue | null> {
@@ -108,21 +132,25 @@ export class EncryptedFileSecretsStore implements SecretsStore {
     void opts;
     return auditStoreOperation('secret:set', STORE_SOURCE, key, async () => {
       const raw = typeof value === 'string' ? value : (value as SecretValue).reveal();
-      const plain = await this.#readOrInitPlaintext();
-      plain.values[key] = raw;
-      plain.meta.updatedAt = new Date().toISOString();
-      await this.#writePlaintext(plain);
+      await this.#enqueueWrite(async () => {
+        const plain = await this.#readOrInitPlaintext();
+        plain.values[key] = raw;
+        plain.meta.updatedAt = new Date().toISOString();
+        await this.#writePlaintext(plain);
+      });
     });
   }
 
   async delete(key: string, _scope?: SessionScope): Promise<void> {
     void _scope;
     return auditStoreOperation('secret:delete', STORE_SOURCE, key, async () => {
-      const plain = await this.#readOrInitPlaintext();
-      if (!(key in plain.values)) return;
-      delete plain.values[key];
-      plain.meta.updatedAt = new Date().toISOString();
-      await this.#writePlaintext(plain);
+      await this.#enqueueWrite(async () => {
+        const plain = await this.#readOrInitPlaintext();
+        if (!(key in plain.values)) return;
+        delete plain.values[key];
+        plain.meta.updatedAt = new Date().toISOString();
+        await this.#writePlaintext(plain);
+      });
     });
   }
 
@@ -188,9 +216,18 @@ export class EncryptedFileSecretsStore implements SecretsStore {
   async #readOrInitPlaintext(): Promise<BundlePlaintext> {
     try {
       return await this.#readPlaintext();
-    } catch {
-      const now = new Date().toISOString();
-      return { values: {}, meta: { createdAt: now, updatedAt: now } };
+    } catch (err) {
+      // SPL-3: initialise a fresh bundle ONLY when the file does not yet
+      // exist. Any other error — a decrypt / auth-tag mismatch (wrong or
+      // rotated passphrase, tampered/truncated bundle), bad magic, or
+      // invalid JSON — must propagate so the surrounding `set()` /
+      // `delete()` fails loud instead of silently overwriting (and thus
+      // destroying) every previously-stored secret.
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        const now = new Date().toISOString();
+        return { values: {}, meta: { createdAt: now, updatedAt: now } };
+      }
+      throw err;
     }
   }
 
@@ -208,10 +245,16 @@ export class EncryptedFileSecretsStore implements SecretsStore {
       magic.writeUInt32LE(ENCRYPTED_FILE_MAGIC, 0);
       const bundle = Buffer.concat([magic, salt, nonce, ciphertext, tag]);
       await mkdir(dirname(this.#path), { recursive: true });
-      await writeFile(this.#path, bundle, { mode: 0o600 });
+      // SPL-3: write to a temp sibling then atomically rename onto the
+      // target, so a crash mid-write can never truncate or corrupt an
+      // existing bundle. The reader only ever sees the old or the new
+      // file in full, never a partial one.
+      const tmpPath = `${this.#path}.tmp`;
+      await writeFile(tmpPath, bundle, { mode: 0o600 });
       if (this.#enforcePermissions && process.platform !== 'win32') {
-        await chmod(this.#path, 0o600);
+        await chmod(tmpPath, 0o600);
       }
+      await rename(tmpPath, this.#path);
     } finally {
       plaintext.fill(0);
       if (key) key.fill(0);
