@@ -5,6 +5,10 @@
  *
  * - Spawns a fresh worker per `run(...)` call (the warm pool sits
  *   above this in the dispatcher and is opt-in for v0.1).
+ * - Does **not** inherit the host `process.env`: the worker is
+ *   constructed with `env: {}` and the runtime scrubs the environment
+ *   before the handler runs, so only the explicit
+ *   `SandboxRunOptions.env` allowlist is visible (TL-9).
  * - Enforces a hard wall-clock timeout via `worker.terminate()`.
  * - Honours `AbortSignal` cancellation; on abort the worker is
  *   terminated after a configurable grace period.
@@ -146,6 +150,15 @@ if (data.noNetwork) {
   }
 }
 
+// Scrub the environment before user code runs: keep only the explicit
+// data.env allowlist. Defence in depth on top of the Worker's env: {}
+// construction; safe after register() — the loader thread captured
+// GRAPHORIN_SANDBOX_BLOCKED during the synchronous registration.
+const allowedEnv = (data && data.env) || {};
+for (const k of Object.keys(process.env)) {
+  if (!Object.prototype.hasOwnProperty.call(allowedEnv, k)) delete process.env[k];
+}
+
 (async () => {
   try {
     if (data.code.kind !== 'handler') {
@@ -278,6 +291,9 @@ async function runOnce<TInput, TOutput>(
 
   const worker = new Worker(WORKER_RUNTIME, {
     eval: true,
+    // The worker must not inherit the host process.env (TL-9); the
+    // runtime applies the `workerData.env` allowlist on top.
+    env: {},
     workerData,
     ...(resourceLimits ? { resourceLimits } : {}),
   });

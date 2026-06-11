@@ -63,6 +63,33 @@ describe('WorkerThreadsSandbox', () => {
     if (!result.ok) expect(result.error.kind).toBe('sandbox-violation');
   });
 
+  it('does not expose host environment variables to the handler (TL-9)', async () => {
+    process.env.GRAPHORIN_TL9_PROBE = 'host-secret';
+    try {
+      const sandbox = createWorkerThreadsSandbox();
+      const result = await sandbox.run(
+        { kind: 'handler', module: HANDLERS, export: 'readEnv' },
+        { input: { name: 'GRAPHORIN_TL9_PROBE' } },
+      );
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.output).toEqual({ value: null, keys: [] });
+    } finally {
+      delete process.env.GRAPHORIN_TL9_PROBE;
+    }
+  });
+
+  it('exposes only the explicitly allowlisted env entries', async () => {
+    const sandbox = createWorkerThreadsSandbox({ noFilesystem: true });
+    const result = await sandbox.run(
+      { kind: 'handler', module: HANDLERS, export: 'readEnv' },
+      { input: { name: 'GRAPHORIN_TL9_ALLOWED' }, env: { GRAPHORIN_TL9_ALLOWED: 'yes' } },
+    );
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.output).toEqual({ value: 'yes', keys: ['GRAPHORIN_TL9_ALLOWED'] });
+    }
+  });
+
   it('returns aborted when the signal aborts before dispatch', async () => {
     const sandbox = createWorkerThreadsSandbox();
     const controller = new AbortController();

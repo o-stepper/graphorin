@@ -35,6 +35,11 @@ export interface SandboxRunOptions<TInput = unknown> {
   readonly input: TInput;
   readonly timeoutMs?: number;
   readonly maxMemoryMb?: number;
+  /**
+   * Allowlist of environment variables visible inside the sandbox.
+   * Sandboxed code never inherits the host `process.env`; entries
+   * given here are the only ones defined.
+   */
   readonly env?: Readonly<Record<string, string>>;
   readonly allowNetwork?: boolean;
   readonly allowFs?: boolean;

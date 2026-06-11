@@ -30,7 +30,7 @@ flowchart LR
 | Tier (resolved kind) | `sandboxPolicy` | Backed by | Used for |
 |---|---|---|---|
 | `'none'` | `'none'` | The Node.js process. | Fully-trusted first-party tools. |
-| `'worker-threads'` | `'sandboxed'` | Node.js worker threads (built-in — no peer dependency). | **The default isolation tier** — MCP-derived tools and code-mode execution. |
+| `'worker-threads'` | `'sandboxed'` | Node.js worker threads (built-in — no peer dependency). Workers run with an empty environment (`env: {}` + a pre-run scrub) — the host `process.env` is never inherited; only the explicit `SandboxRunOptions.env` allowlist is visible. | **The default isolation tier** — MCP-derived tools and code-mode execution. |
 | `'isolated-vm'` | `'isolated'` | [`isolated-vm`](https://github.com/laverdet/isolated-vm) (peer dependency, ISC). | Untrusted JavaScript skills. |
 | `'docker'` | `'docker'` | [`dockerode`](https://github.com/apocas/dockerode) (peer dependency, Apache-2.0). | Untrusted binaries / full subprocess isolation. |
 
