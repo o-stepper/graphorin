@@ -63,6 +63,13 @@ export class BudgetTracker {
   #cost = 0;
   #paused = false;
   #pausedReason: 'tokens-exceeded' | 'cost-exceeded' | null = null;
+  /**
+   * Timestamped spend ledger for `sliding-24h` only. `#maybeReset` trims it to
+   * the trailing 24h window and recomputes `#tokens` / `#cost` from it, so the
+   * counters reflect a true rolling window instead of being zeroed on every
+   * check (MCON-3). Unused — and never appended to — under `utc` / `local`.
+   */
+  #ledger: Array<{ at: number; tokens: number; cost: number }> = [];
 
   constructor(opts: BudgetTrackerOptions) {
     this.#now = opts.now ?? Date.now;
@@ -124,8 +131,13 @@ export class BudgetTracker {
    */
   record(args: { phase: ConsolidatorPhase; tokens: number; costUsd: number }): BudgetSnapshot {
     this.#maybeReset();
-    this.#tokens += Math.max(0, args.tokens);
-    this.#cost += Math.max(0, args.costUsd);
+    const tokens = Math.max(0, args.tokens);
+    const cost = Math.max(0, args.costUsd);
+    if (this.#resetSemantics === 'sliding-24h') {
+      this.#ledger.push({ at: this.#now(), tokens, cost });
+    }
+    this.#tokens += tokens;
+    this.#cost += cost;
     if (this.#tokens > this.#maxTokensPerDay) {
       this.#handleBreach(args.phase, 'tokens', this.#tokens, this.#maxTokensPerDay);
     }
@@ -142,12 +154,18 @@ export class BudgetTracker {
    */
   snapshot(): BudgetSnapshot {
     this.#maybeReset();
+    // For the rolling window the "reset" is continuous — the boundary is when
+    // the oldest in-window spend ages out (24h after it landed).
+    const resetAt =
+      this.#resetSemantics === 'sliding-24h'
+        ? (this.#ledger[0]?.at ?? this.#now()) + DAY_MS
+        : nextBucketStart(this.#bucketStart, this.#resetSemantics);
     return Object.freeze({
       tokensUsedToday: this.#tokens,
       costUsedToday: this.#cost,
       tokensRemaining: Math.max(0, this.#maxTokensPerDay - this.#tokens),
       costRemaining: Math.max(0, this.#maxCostPerDay - this.#cost),
-      resetAt: new Date(nextBucketStart(this.#bucketStart, this.#resetSemantics)).toISOString(),
+      resetAt: new Date(resetAt).toISOString(),
       paused: this.#paused,
     });
   }
@@ -162,6 +180,7 @@ export class BudgetTracker {
     this.#cost = 0;
     this.#paused = false;
     this.#pausedReason = null;
+    this.#ledger = [];
     this.#bucketStart = bucketStart(this.#now(), this.#resetSemantics);
   }
 
@@ -182,6 +201,31 @@ export class BudgetTracker {
 
   #maybeReset(): void {
     const now = this.#now();
+    if (this.#resetSemantics === 'sliding-24h') {
+      // Rolling window: drop spends older than the trailing 24h and recompute
+      // the totals from what remains, rather than zeroing on every check.
+      const cutoff = now - DAY_MS;
+      if (
+        this.#ledger.length > 0 &&
+        this.#ledger[0] !== undefined &&
+        this.#ledger[0].at <= cutoff
+      ) {
+        this.#ledger = this.#ledger.filter((entry) => entry.at > cutoff);
+      }
+      this.#tokens = this.#ledger.reduce((sum, entry) => sum + entry.tokens, 0);
+      this.#cost = this.#ledger.reduce((sum, entry) => sum + entry.cost, 0);
+      // Auto-unpause once the window has dropped back under both ceilings.
+      if (
+        this.#paused &&
+        this.#tokens <= this.#maxTokensPerDay &&
+        this.#cost <= this.#maxCostPerDay
+      ) {
+        this.#paused = false;
+        this.#pausedReason = null;
+      }
+      return;
+    }
+    // utc / local: zero the counters when the calendar bucket rolls over.
     const currentBucket = bucketStart(now, this.#resetSemantics);
     if (currentBucket !== this.#bucketStart) {
       this.#bucketStart = currentBucket;
