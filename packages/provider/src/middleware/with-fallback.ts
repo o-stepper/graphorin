@@ -11,6 +11,7 @@
 
 import type { Provider, ProviderEvent, ProviderResponse } from '@graphorin/core';
 
+import { isAbortError } from '../internal/abort.js';
 import { defineProviderMiddleware } from './compose.js';
 
 /**
@@ -110,10 +111,18 @@ async function* fallbackStream(
 
 function defaultShouldFallback(err: unknown): boolean {
   if (err === null || typeof err !== 'object') return false;
+  // An aborted request must not trigger a fallback, even as a `status: 0`
+  // network error (PS-2). The loop also short-circuits on `req.signal?.aborted`.
+  if (isAbortError(err)) return false;
   const e = err as { kind?: string; status?: number };
   if (e.kind === 'unauthorized' || e.kind === 'invalid-request') return false;
   if (e.kind === 'transient' || e.kind === 'rate-limit' || e.kind === 'capacity') return true;
   if (typeof e.status === 'number' && e.status >= 500) return true;
+  // PS-2: the headline fallback scenario — the primary provider is down
+  // (a local server refusing connections) surfaces as `status: 0`. Treat a
+  // network failure as fallback-eligible so the chain advances to the next
+  // provider (abort already excluded above).
+  if (typeof e.status === 'number' && e.status === 0) return true;
   return false;
 }
 

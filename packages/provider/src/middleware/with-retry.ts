@@ -9,6 +9,7 @@
 
 import type { Provider, ProviderEvent, ProviderRequest, ProviderResponse } from '@graphorin/core';
 
+import { isAbortError } from '../internal/abort.js';
 import { defineProviderMiddleware } from './compose.js';
 
 /**
@@ -96,9 +97,14 @@ async function* retryingStream(
   sleep: (ms: number, signal?: AbortSignal) => Promise<void>,
 ): AsyncIterable<ProviderEvent> {
   let attempt = 0;
+  // Stream-level (not per-attempt): once *any* event has reached the
+  // consumer, a retryable failure mid-stream must NOT restart the stream —
+  // that would replay stream-start + already-delivered text/tool-call events
+  // into the same iteration (duplicate output, potential double tool execution).
+  // `withFallback` upholds the same invariant. Pre-yield failures still retry.
+  let yieldedAny = false;
   for (;;) {
     try {
-      let yieldedAny = false;
       for await (const event of next.stream(req)) {
         yieldedAny = true;
         yield event;
@@ -113,6 +119,8 @@ async function* retryingStream(
       return;
     } catch (err) {
       if (req.signal?.aborted) throw err;
+      // PS-1: never restart a stream that already emitted events.
+      if (yieldedAny) throw err;
       if (attempt >= maxRetries) throw err;
       if (!isRetryable(err)) throw err;
       const hint = readRetryAfter(err);
@@ -177,6 +185,11 @@ function readRetryAfter(err: unknown): number | null {
 
 function defaultRetryable(err: unknown): boolean {
   if (err === null || typeof err !== 'object') return false;
+  // An aborted request is never retryable, even when it surfaces as a
+  // `status: 0` network error (PS-2). The retry loop also short-circuits on
+  // `req.signal?.aborted`, but the predicate must exclude abort independently
+  // so an internally-aborted call is not retried.
+  if (isAbortError(err)) return false;
   const e = err as { kind?: string; status?: number; name?: string };
   if (
     e.kind === 'transient' ||
@@ -188,7 +201,10 @@ function defaultRetryable(err: unknown): boolean {
   }
   if (typeof e.status === 'number' && e.status === 429) return true;
   if (typeof e.status === 'number' && e.status >= 500 && e.status < 600) return true;
-  if (e.name === 'AbortError') return false;
+  // PS-2: a `ProviderHttpError{ status: 0 }` is a fetch-level network failure
+  // (ECONNREFUSED, DNS, connection reset) — exactly the transient class
+  // `withRetry` documents. Retry it (abort already excluded above).
+  if (typeof e.status === 'number' && e.status === 0) return true;
   return false;
 }
 
