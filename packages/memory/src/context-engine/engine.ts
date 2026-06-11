@@ -103,6 +103,14 @@ export type AutoRecallConfig =
   | false
   | {
       readonly topK?: number;
+      /**
+       * Minimum fused score a hit must reach to be injected. **Default `0`**
+       * (CE-4) — `topK` already bounds the volume. The scale is
+       * reranker-dependent: the default RRF reranker fuses the FTS + vector
+       * candidate lists as `1/(60 + rank)` per list, so scores top out near
+       * `2/(60 + 1) ≈ 0.033` — any positive default would silently drop every
+       * hit. Set this only when calibrating against a known reranker's scale.
+       */
       readonly threshold?: number;
       readonly strategy?: AutoRecallStrategy;
     };
@@ -530,7 +538,13 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       });
       if (autoRecall.factsTriggered) {
         const topK = factsAutoRecall.topK ?? layerCfg.autoRecall?.topK ?? 5;
-        const threshold = factsAutoRecall.threshold ?? layerCfg.autoRecall?.threshold ?? 0.7;
+        // CE-4: default 0 — rank-based `topK` already bounds the injected
+        // volume, and the threshold's scale is reranker-dependent (the default
+        // RRF reranker fuses 2 candidate lists, so scores top out near
+        // `2/(60+1) ≈ 0.033` and any positive default would silently drop
+        // everything). Operators tuning against a known reranker scale can pass
+        // an explicit `threshold`.
+        const threshold = factsAutoRecall.threshold ?? layerCfg.autoRecall?.threshold ?? 0;
         const hits = await memory.semantic
           .search(input.scope, input.lastUserMessage ?? '', { topK })
           .catch(() => []);
