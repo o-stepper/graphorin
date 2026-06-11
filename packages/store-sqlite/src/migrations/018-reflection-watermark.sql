@@ -1,0 +1,11 @@
+-- MCON-13 migration 018: reflection watermark on `consolidator_state`. The
+-- deep-phase reflection pass (@graphorin/memory) sums the importance of recent
+-- episodes to decide whether to synthesize insights. Without a watermark it
+-- re-summed the same top-N episodes every deep run and, once over threshold,
+-- re-fired the (paid) salient-questions + insight-synthesis LLM calls on every
+-- pass until those episodes aged out of the window. This column records the
+-- `ended_at` (epoch ms) of the newest episode already reflected on, so a later
+-- pass only accumulates importance from strictly-newer episodes. NULL ⇒
+-- nothing reflected yet (accumulate over all recent episodes) — unchanged
+-- behaviour for existing rows.
+ALTER TABLE consolidator_state ADD COLUMN reflection_watermark INTEGER;

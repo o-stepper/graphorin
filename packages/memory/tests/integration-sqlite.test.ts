@@ -15,12 +15,67 @@
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import type { Provider, ProviderRequest, ProviderResponse } from '@graphorin/core';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 import { createMemory, defineBlock } from '../src/index.js';
 import { createStubEmbedder } from './fixtures/in-memory-store.js';
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
+
+/**
+ * Branching stub provider for the deep-phase reflection flow — serves the
+ * salient-questions and insight-synthesis responses off their system prompts,
+ * recording which reflection prompts it saw so a test can assert no re-fire.
+ */
+function reflectionStubProvider(): Provider & { readonly reflectionCalls: string[] } {
+  const reflectionCalls: string[] = [];
+  return {
+    name: 'reflection-stub',
+    modelId: 'reflection-stub',
+    capabilities: {
+      streaming: false,
+      toolCalling: false,
+      parallelToolCalls: false,
+      multimodal: false,
+      structuredOutput: true,
+      reasoning: false,
+      contextWindow: 32_000,
+      maxOutput: 4_000,
+    },
+    acceptsSensitivity: ['public', 'internal', 'secret'],
+    async generate(req: ProviderRequest): Promise<ProviderResponse> {
+      const sys = req.systemMessage ?? '';
+      if (sys.includes('salient-questions')) {
+        reflectionCalls.push('questions');
+        return {
+          text: JSON.stringify({ questions: ['marathon'] }),
+          usage: { promptTokens: 8, completionTokens: 4 },
+          finishReason: 'stop',
+        };
+      }
+      if (sys.includes('insight-synthesis')) {
+        reflectionCalls.push('insight');
+        return {
+          text: JSON.stringify({ insight: 'The user is committed to marathon training.' }),
+          usage: { promptTokens: 10, completionTokens: 6 },
+          finishReason: 'stop',
+        };
+      }
+      return {
+        text: JSON.stringify({ decision: 'admit', reason: 'n/a' }),
+        usage: { promptTokens: 5, completionTokens: 2 },
+        finishReason: 'stop',
+      };
+    },
+    stream() {
+      throw new Error('not implemented');
+    },
+    get reflectionCalls() {
+      return reflectionCalls;
+    },
+  };
+}
 
 async function makeStore(opts: { withVec?: boolean } = {}): Promise<GraphorinSqliteStore> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-memory-integration-'));
@@ -96,6 +151,57 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       expect(hits[0]?.record.text).toBe('Anna works at Acme Corporation.');
       // The FTS leg contributes a non-zero fused signal (offline, no vector leg).
       expect(hits[0]?.signals?.rrf).toBeGreaterThan(0);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('deep-phase reflection fires on real sqlite via recency, and does not re-fire without new episodes (MCON-1, MCON-13)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const provider = reflectionStubProvider();
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+        consolidator: {
+          tier: 'full',
+          provider,
+          defaultScope: SCOPE,
+          importanceThreshold: 1.0,
+          reflectionMaxQuestions: 2,
+        },
+      });
+      await memory.consolidator.start();
+
+      const t0 = '2026-05-01T00:00:00.000Z';
+      const episodes: Array<[string, string]> = [
+        ['Long run: marathon training block, week 3.', '2026-05-01T01:00:00.000Z'],
+        ['Marathon training: tempo intervals and a recovery day.', '2026-05-01T02:00:00.000Z'],
+      ];
+      for (const [summary, endedAt] of episodes) {
+        await memory.episodic.record(SCOPE, { summary, startedAt: t0, endedAt, importance: 0.9 });
+      }
+
+      // recent() returns rows newest-first by ended_at. On the pre-fix code the
+      // `'*'` FTS probe matched zero rows and this was always empty (MCON-1).
+      const recent = await memory.episodic.recent(SCOPE, { topK: 10 });
+      expect(recent.length).toBe(2);
+      expect(recent[0]?.summary).toBe(episodes[1][0]); // the later-ended episode first
+
+      // First deep run: the reflection gate fires off recency (not the dead
+      // `'*'` probe) and synthesizes one quarantined insight.
+      const first = await memory.consolidator.fireNow('deep', SCOPE);
+      expect(first?.insightsCreated).toBe(1);
+      expect(provider.reflectionCalls.length).toBeGreaterThan(0);
+      const afterFirst = provider.reflectionCalls.length;
+      expect((await memory.insights.list(SCOPE, { includeQuarantined: true })).length).toBe(1);
+
+      // Second deep run with no new episodes: the watermark keeps the gate
+      // closed — no reflection LLM calls, no duplicate insight (MCON-13).
+      const second = await memory.consolidator.fireNow('deep', SCOPE);
+      expect(second?.insightsCreated ?? 0).toBe(0);
+      expect(provider.reflectionCalls.length).toBe(afterFirst);
+      expect((await memory.insights.list(SCOPE, { includeQuarantined: true })).length).toBe(1);
     } finally {
       await sqlite.close();
     }

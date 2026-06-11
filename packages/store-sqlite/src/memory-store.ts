@@ -543,6 +543,28 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   }
 
   /**
+   * Most-recent episodes by `ended_at` (newest first), with no FTS / vector
+   * query — recency, not relevance (MCON-1). Powers the deep-phase reflection
+   * gate and `EpisodicMemory.recent()`, both of which previously probed with a
+   * `'*'` FTS query that matches zero rows on real SQLite.
+   */
+  async listRecent(
+    scope: SessionScope,
+    limit: number,
+    opts: { includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<Episode>> {
+    const rows = this.#conn.all<EpisodeRow>(
+      `SELECT e.* FROM episodes e
+       WHERE e.scope_user_id = ? AND e.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+       ORDER BY e.ended_at DESC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map(rowToEpisode);
+  }
+
+  /**
    * KNN search against the per-embedder vec0 table for episodes.
    * Joins back to the canonical `episodes` row + applies the
    * `WHERE embedder_id = ?` guard from ADR-023 / DEC-116.

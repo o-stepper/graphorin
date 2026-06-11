@@ -591,6 +591,13 @@ class ConsolidatorImpl implements Consolidator {
     // threshold is enforced inside the pass.
     const insightStore = this.#store.insights;
     if (this.#config.reflection && this.#episodic !== null && insightStore !== undefined) {
+      // MCON-13: read the persisted reflection watermark so the gate only
+      // accumulates importance from episodes newer than the last pass, and
+      // persist the advanced value afterwards (a no-op when unchanged).
+      const priorWatermark =
+        this.#consolidatorStore !== null
+          ? ((await this.#consolidatorStore.getState(scope))?.reflectionWatermark ?? null)
+          : null;
       const reflection = await runReflectionPass({
         provider: this.#provider,
         tracer: this.#tracer,
@@ -600,9 +607,15 @@ class ConsolidatorImpl implements Consolidator {
         insights: insightStore,
         budget: this.#budget,
         importanceThreshold: this.#config.importanceThreshold,
+        reflectionWatermark: priorWatermark,
         maxQuestions: this.#config.reflectionMaxQuestions,
         now: this.#now,
       });
+      if (this.#consolidatorStore !== null && reflection.nextWatermark !== priorWatermark) {
+        await this.#consolidatorStore.upsertState(scope, {
+          reflectionWatermark: reflection.nextWatermark,
+        });
+      }
       return {
         ...deepOut,
         insightsCreated: reflection.insightsCreated,

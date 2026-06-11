@@ -28,6 +28,13 @@ export interface ConsolidatorStateRow {
   readonly nextEligibleAt: number | null;
   readonly activeLockHeldBy: string | null;
   readonly activeLockAcquiredAt: number | null;
+  /**
+   * `ended_at` (epoch ms) of the newest episode the deep-phase reflection
+   * pass has already reflected on (MCON-13). A later pass accumulates
+   * importance only from strictly-newer episodes; `null` ⇒ nothing reflected
+   * yet.
+   */
+  readonly reflectionWatermark: number | null;
 }
 
 /** @stable */
@@ -38,6 +45,7 @@ export interface ConsolidatorStatePatch {
   readonly nextEligibleAt?: number | null;
   readonly activeLockHeldBy?: string | null;
   readonly activeLockAcquiredAt?: number | null;
+  readonly reflectionWatermark?: number | null;
 }
 
 /** @stable */
@@ -101,6 +109,7 @@ interface StateRowDb {
   next_eligible_at: number | null;
   active_lock_held_by: string | null;
   active_lock_acquired_at: number | null;
+  reflection_watermark: number | null;
 }
 
 interface RunRowDb {
@@ -180,6 +189,10 @@ export class SqliteConsolidatorStateStore {
         patch.activeLockAcquiredAt !== undefined
           ? patch.activeLockAcquiredAt
           : (existing?.activeLockAcquiredAt ?? null),
+      reflectionWatermark:
+        patch.reflectionWatermark !== undefined
+          ? patch.reflectionWatermark
+          : (existing?.reflectionWatermark ?? null),
     };
     // Sentinel-empty-string keying — SQLite treats NULLs as distinct
     // in the composite primary key, so we collapse undefined session
@@ -189,15 +202,17 @@ export class SqliteConsolidatorStateStore {
       `INSERT INTO consolidator_state (
          scope_user_id, scope_session_id, scope_agent_id,
          last_processed_message_id, last_phase, last_completed_at,
-         next_eligible_at, active_lock_held_by, active_lock_acquired_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         next_eligible_at, active_lock_held_by, active_lock_acquired_at,
+         reflection_watermark
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(scope_user_id, scope_session_id, scope_agent_id) DO UPDATE SET
          last_processed_message_id = excluded.last_processed_message_id,
          last_phase = excluded.last_phase,
          last_completed_at = excluded.last_completed_at,
          next_eligible_at = excluded.next_eligible_at,
          active_lock_held_by = excluded.active_lock_held_by,
-         active_lock_acquired_at = excluded.active_lock_acquired_at`,
+         active_lock_acquired_at = excluded.active_lock_acquired_at,
+         reflection_watermark = excluded.reflection_watermark`,
       [
         merged.scope.userId,
         merged.scope.sessionId ?? '',
@@ -208,6 +223,7 @@ export class SqliteConsolidatorStateStore {
         merged.nextEligibleAt,
         merged.activeLockHeldBy,
         merged.activeLockAcquiredAt,
+        merged.reflectionWatermark,
       ],
     );
     return merged;
@@ -431,6 +447,7 @@ function rowToState(row: StateRowDb): ConsolidatorStateRow {
     nextEligibleAt: row.next_eligible_at,
     activeLockHeldBy: row.active_lock_held_by,
     activeLockAcquiredAt: row.active_lock_acquired_at,
+    reflectionWatermark: row.reflection_watermark,
   };
 }
 

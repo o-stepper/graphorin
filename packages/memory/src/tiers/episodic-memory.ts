@@ -245,18 +245,34 @@ export class EpisodicMemory {
     );
   }
 
-  /** List the most recent episodes (no embedding required). */
-  async recent(scope: SessionScope, opts: { topK?: number } = {}): Promise<ReadonlyArray<Episode>> {
+  /**
+   * Most-recent episodes by end time (newest first), with no embedding / FTS
+   * query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` — the default
+   * `@graphorin/store-sqlite` adapter implements it. Optionally includes
+   * quarantined episodes (the importance source for the reflection gate).
+   */
+  async listRecent(
+    scope: SessionScope,
+    limit: number,
+    opts: { includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<Episode>> {
     return withMemorySpan(this.#tracer, 'memory.read.episodic', scope, {}, async (span) => {
-      const topK = opts.topK ?? 10;
-      const hits = await this.#store.episodic.search(scope, {
-        query: '*',
-        topK,
-      });
-      const out = hits.map((h) => h.record);
+      const store = this.#store.episodic;
+      if (typeof store.listRecent !== 'function') {
+        throw new Error(
+          '[graphorin/memory] EpisodicMemory.listRecent requires EpisodicMemoryStoreExt.listRecent. ' +
+            'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in.',
+        );
+      }
+      const out = await store.listRecent(scope, limit, opts);
       span.setAttributes({ 'memory.read.episodic.count': out.length });
       return out;
     });
+  }
+
+  /** List the most recent episodes (no embedding required). */
+  async recent(scope: SessionScope, opts: { topK?: number } = {}): Promise<ReadonlyArray<Episode>> {
+    return this.listRecent(scope, opts.topK ?? 10, {});
   }
 
   async #tryVectorSearch(
