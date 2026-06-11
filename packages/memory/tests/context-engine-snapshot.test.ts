@@ -47,4 +47,33 @@ describe('context-engine — deterministic snapshot (Phase 10d)', () => {
     });
     expect(out.systemMessage.content).toMatchSnapshot();
   });
+
+  it('emits a KV-cache-stable Layer 1-4 prefix; only metadata moves between turns (CE-9)', async () => {
+    const memory = await buildFixtureMemory();
+    const assembleOnce = (): Promise<string> =>
+      memory.contextEngine
+        .assemble(memory, {
+          scope: FIXTURE_SCOPE,
+          runId: 'r',
+          sessionId: FIXTURE_SCOPE.sessionId,
+          agentId: FIXTURE_SCOPE.agentId,
+        })
+        .then((out) => out.systemMessage.content);
+
+    const t1 = await assembleOnce();
+    // Move only the metadata counts (factCount 0 -> 2).
+    await memory.semantic.remember(FIXTURE_SCOPE, { text: 'A fresh fact.' });
+    await memory.semantic.remember(FIXTURE_SCOPE, { text: 'Another fresh fact.' });
+    const t2 = await assembleOnce();
+
+    const prefix = (c: string): string => c.split('<memory_metadata>')[0] ?? c;
+    // The full prompt changed (the metadata counts moved)...
+    expect(t1).not.toBe(t2);
+    // ...but the Layer 1-4 prefix is byte-identical, so the KV-cache breakpoint
+    // holds across turns (CE-9).
+    expect(prefix(t1)).toBe(prefix(t2));
+    expect(prefix(t1)).toContain('Always cite sources');
+    // memoryMetadata is emitted AFTER the stable prefix, not second.
+    expect(t2.indexOf('<memory_metadata>')).toBeGreaterThan(t2.indexOf('Always cite sources'));
+  });
 });

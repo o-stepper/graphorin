@@ -351,6 +351,26 @@ export function _resetCompactionWarningForTesting(): void {
 }
 
 /**
+ * Emission order for the assembled layers — deliberately **distinct from the
+ * truncation priority ladder** (CE-9). Allocation still trims by
+ * `DEFAULT_LAYER_PRIORITY` (lowest priority first), but layers are *emitted* in
+ * this order so the volatile blocks that change every turn (`memoryMetadata`'s
+ * counts, `autoRecall`'s injected facts) sit **after** the stable Layer 1-4
+ * prefix (identity / rules / blocks / skills). That keeps the provider's — and a
+ * local llama.cpp / vLLM server's — KV-cache breakpoint real: the prefix stays
+ * byte-identical across turns even as the message count and recalled facts move.
+ */
+const LAYER_EMIT_ORDER: Readonly<Record<LayerAllocation['id'], number>> = Object.freeze({
+  identity: 0,
+  activeRules: 1,
+  workingBlocks: 2,
+  activeSkills: 3,
+  // --- KV-cache breakpoint: everything below changes per turn ---
+  memoryMetadata: 4,
+  autoRecall: 5,
+});
+
+/**
  * Build a ContextEngine instance from the supplied configuration.
  *
  * @stable
@@ -590,7 +610,12 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const preambleFired = shouldFireInboundPreamble(input.upstreamAnnotations ?? []);
     const preambleText = preambleFired ? composeInboundPreamble(localePack) : '';
 
-    const assembledLayers = allocation.layers.filter((l) => l.text.length > 0);
+    // CE-9: emit in stability order (Layer 1-4 prefix, then the cache
+    // breakpoint, then the volatile metadata / auto-recall), NOT in the
+    // truncation-priority order `allocation.layers` arrives in.
+    const assembledLayers = allocation.layers
+      .filter((l) => l.text.length > 0)
+      .sort((a, b) => LAYER_EMIT_ORDER[a.id] - LAYER_EMIT_ORDER[b.id]);
     const finalParts: string[] = assembledLayers.map((l) => l.text);
     if (preambleText.length > 0) finalParts.push(preambleText);
     const systemContent = finalParts.join('\n\n');
@@ -732,11 +757,12 @@ function buildCandidate(
 function annotationForLayer(layer: LayerAllocation): ContentAnnotation {
   switch (layer.id) {
     case 'identity':
-      // Identity merges the framework base + the user-defined
-      // agent_instructions. Tag as agent:instructions when the
-      // base is empty (e.g., the operator overrode Layer 1 to
-      // off); otherwise tag as system:framework so D3 skips
-      // re-scanning under `scanScope: 'untrusted'`.
+      // Identity merges the framework base (Layer 1) + the user-defined
+      // agent_instructions (Layer 2) into one trusted fragment, tagged
+      // `system:framework` so D3 skips re-scanning it under
+      // `scanScope: 'untrusted'`. (Both halves are first-party prompt text, so
+      // the merged layer carries a single framework trust tag — `LayerAllocation`
+      // does not surface which halves were present.)
       return annotate('system:framework', 'n/a');
     case 'memoryMetadata':
     case 'activeRules':
