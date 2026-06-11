@@ -23,6 +23,14 @@ const factRememberInputSchema = z.object({
 });
 const factRememberOutputSchema = z.object({
   factId: z.string(),
+  /**
+   * MRET-3: `true` when the write landed in quarantine (hidden from
+   * default recall until validated). A synthesized consolidator write or
+   * a candidate that tripped the injection heuristics quarantines.
+   */
+  quarantined: z.boolean(),
+  /** Why it was quarantined, when it was. */
+  quarantineReason: z.enum(['injection', 'synthesized']).optional(),
 });
 
 type FactRememberInput = z.infer<typeof factRememberInputSchema>;
@@ -129,7 +137,7 @@ export function createFactRememberTool(
     tags: ['memory', 'semantic'],
     async execute(input, ctx) {
       const scope = await deps.resolveScope(ctx);
-      const fact = await deps.semantic.remember(scope, {
+      const outcome = await deps.semantic.rememberWithDecision(scope, {
         text: input.text,
         ...(input.tags !== undefined ? { tags: input.tags } : {}),
         ...(input.confidence !== undefined ? { confidence: input.confidence } : {}),
@@ -137,7 +145,15 @@ export function createFactRememberTool(
         ...(input.validFrom !== undefined ? { validFrom: input.validFrom } : {}),
         ...(input.validTo !== undefined ? { validTo: input.validTo } : {}),
       });
-      return { factId: fact.id };
+      // MRET-3: tell the caller when the write was quarantined so a
+      // poisoned fact cannot masquerade as a normally-stored one.
+      return {
+        factId: outcome.fact.id,
+        quarantined: outcome.fact.status === 'quarantined',
+        ...(outcome.quarantineReason !== undefined
+          ? { quarantineReason: outcome.quarantineReason }
+          : {}),
+      };
     },
   });
 }
@@ -287,12 +303,23 @@ export function createFactHistoryTool(
 /**
  * `fact_validate` — promote a quarantined fact to active (P1-4). The
  * validation path that admits a synthesized (consolidator / reflection)
- * or injection-flagged memory into action-driving recall once it has
- * been reviewed; the promotion is audited in `memory_history`. This is
- * intended as an operator / inspector action: the agent's `fact_search`
- * cannot enumerate quarantined facts, so it cannot be socially
- * engineered by a poisoned (and therefore hidden) memory into validating
- * one.
+ * memory into action-driving recall once it has been reviewed; the
+ * promotion is audited in `memory_history`.
+ *
+ * MRET-3 / MST-1 — two gates close the one-turn memory-poisoning chain
+ * (`fact_remember(poison)` → `fact_validate(id)` → active recall):
+ *
+ * 1. `needsApproval: true` — the run suspends for a human decision
+ *    before this tool ever executes, so the agent cannot silently
+ *    promote any quarantined fact.
+ * 2. The underlying `SemanticMemory.validate(...)` re-checks the fact's
+ *    text against the injection heuristics and **refuses** (no `force`
+ *    is passed here) — an injection-flagged memory cannot be promoted by
+ *    the agent at all. Only an operator, via the programmatic API with
+ *    `{ force: true }`, can override after review.
+ *
+ * Synthesized-but-clean consolidator writes promote normally once
+ * approved.
  *
  * @stable
  */
@@ -302,9 +329,12 @@ export function createFactValidateTool(
   return tool<FactValidateInput, FactValidateOutput>({
     name: 'fact_validate',
     description:
-      'Promote a quarantined fact to active so it becomes eligible for normal recall. Quarantined facts are memories the system synthesized or flagged as risky; validating one is a deliberate, audited admission. Use only for explicit, reviewed promotion — not as a routine step.',
+      'Promote a quarantined fact to active so it becomes eligible for normal recall. Quarantined facts are memories the system synthesized or flagged as risky; validating one is a deliberate, human-approved admission and never a routine step. This action requires approval, and facts flagged as prompt-injection cannot be promoted here — they are an operator-only decision.',
     inputSchema: factValidateInputSchema,
     outputSchema: factValidateOutputSchema,
+    // MRET-3: the only real gate on a model-callable tool — suspend the
+    // run for a human decision before promoting anything out of quarantine.
+    needsApproval: true,
     sideEffectClass: 'side-effecting',
     sandboxPolicy: 'none',
     sensitivity: 'internal',
@@ -312,6 +342,8 @@ export function createFactValidateTool(
     tags: ['memory', 'semantic', 'safety'],
     async execute(input, ctx) {
       const scope = await deps.resolveScope(ctx);
+      // No `force`: the agent path can never promote an injection-flagged
+      // fact (validate throws QuarantinePromotionRefusedError for those).
       await deps.semantic.validate(scope, input.factId, input.reason);
       return { factId: input.factId, validated: true };
     },

@@ -188,7 +188,12 @@ A write lands `status: 'quarantined'` when either:
 - its provenance is **derived** (`extraction` / `reflection` / `induction`), or
 - it trips the **offline injection heuristics** — `ignore previous instructions`, role-markup smuggling (`<system>`-style tags), or secrecy / exfiltration directives — applied to first-party (`user` / `tool`) candidates.
 
-Quarantined rows are **excluded from default recall** (`fact_search`, auto-recall, and `procedural.activate()` all skip them) but are **never deleted** — quarantine is a retrieval gate, not a purge, so every row stays fully auditable. An operator (or a review UI) surfaces the queue with the `includeQuarantined` search option and promotes a vetted row with the `fact_validate` tool (`memory.semantic.validate(...)`), which is itself audited.
+Quarantined rows are **excluded from default recall** (`fact_search`, auto-recall, and `procedural.activate()` all skip them) but are **never deleted** — quarantine is a retrieval gate, not a purge, so every row stays fully auditable. `fact_remember` reports the quarantine in its output (`quarantined` + a `quarantineReason` of `injection` / `synthesized`), so a poisoned write cannot pass for a normal one.
+
+Promotion is hardened against the model promoting its own poison in a single turn:
+
+- The model-callable **`fact_validate` tool is approval-gated** (`needsApproval: true`) — the run suspends for a human decision before any promotion executes.
+- `memory.semantic.validate(...)` **re-checks the fact's text against the injection heuristics and refuses** an injection-flagged row with `QuarantinePromotionRefusedError`. Synthesized-but-clean rows promote once approved; an injection-flagged row is an **operator-only** decision requiring the explicit `{ force: true }` flag from a trusted (non-agent) caller after review. An operator (or review UI) surfaces the queue with the `includeQuarantined` search option; every promotion is audited.
 
 This is the precondition for shipping **synthesised** memory safely. Three derived write-paths all flow through the gate:
 

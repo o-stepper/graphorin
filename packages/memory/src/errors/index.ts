@@ -193,6 +193,38 @@ export class EmbedderMigrationStateError extends GraphorinMemoryError {
 }
 
 /**
+ * Raised by {@link SemanticMemory.validate} (P1-4 / MRET-3) when a caller
+ * tries to promote a fact whose quarantine was triggered by the offline
+ * injection heuristics. Such a fact is a memory-poisoning candidate: the
+ * agent's own `fact_validate` tool must never be able to admit it into
+ * action-driving recall, so promotion is refused unless an operator
+ * passes the explicit `force` flag through the programmatic API.
+ *
+ * @stable
+ */
+export class QuarantinePromotionRefusedError extends GraphorinMemoryError {
+  override readonly name = 'QuarantinePromotionRefusedError';
+  readonly kind = 'quarantine-promotion-refused' as const;
+  readonly factId: string;
+  /** Injection-rule labels that tripped on the fact's text. */
+  readonly markers: ReadonlyArray<string>;
+
+  constructor(factId: string, markers: ReadonlyArray<string>) {
+    super(
+      `[graphorin/memory] refusing to promote fact '${factId}' out of quarantine: ` +
+        `its text trips the injection heuristics (${markers.join(', ')}). ` +
+        'Promotion of an injection-flagged memory is an operator action — ' +
+        'pass `{ force: true }` to validate(...) from a trusted (non-agent) caller after review.',
+      {
+        hint: 'Review the quarantined fact, then promote it with validate(scope, id, reason, { force: true }) from an operator context.',
+      },
+    );
+    this.factId = factId;
+    this.markers = Object.freeze([...markers]);
+  }
+}
+
+/**
  * Raised when {@link ProceduralMemory.induce} (P2-2) is called but no
  * workflow inducer was configured. Induction abstracts concrete values into
  * variables, which needs a provider — so the capability is opt-in and the

@@ -10,6 +10,7 @@ import type {
 } from '@graphorin/core';
 import { md5 } from '@graphorin/core';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
+import { QuarantinePromotionRefusedError } from '../errors/index.js';
 import type { EntityResolver } from '../graph/entity-resolver.js';
 import { contextualize } from '../internal/contextualize.js';
 import { newMemoryId } from '../internal/id.js';
@@ -264,6 +265,14 @@ export interface FactRememberOptions {
 export interface RememberOutcome {
   readonly fact: Fact;
   readonly decision: ConflictDecision;
+  /**
+   * Why this write landed quarantined, if it did (P1-4 / MRET-3).
+   * `'injection'` — the offline injection heuristics flagged the text
+   * (a memory-poisoning candidate). `'synthesized'` — a consolidator /
+   * reflection / induction write awaiting validation. Absent when the
+   * fact is `active` or when a dedup returned a pre-existing row.
+   */
+  readonly quarantineReason?: 'injection' | 'synthesized';
 }
 
 /**
@@ -402,6 +411,13 @@ export class SemanticMemory {
         provenance === 'extraction' || provenance === 'reflection' || provenance === 'induction';
       const injection = detectMemoryInjection(text);
       const status: MemoryStatus = synthesized || injection.flagged ? 'quarantined' : 'active';
+      // MRET-3: surface *why* a fresh write was quarantined so callers
+      // (the fact_remember tool, harnesses) can tell an injection-flagged
+      // poison candidate apart from a synthesized-but-clean consolidator
+      // write. Injection takes precedence — it is the security-relevant
+      // reason and gates promotion in validate().
+      const quarantineReason: 'injection' | 'synthesized' | undefined =
+        status === 'quarantined' ? (injection.flagged ? 'injection' : 'synthesized') : undefined;
       const fact: Fact = {
         id: newMemoryId('fact'),
         kind: 'semantic',
@@ -465,22 +481,26 @@ export class SemanticMemory {
           : {}),
       });
 
+      const reasonField = quarantineReason !== undefined ? { quarantineReason } : {};
       switch (decision.kind) {
         case 'admit':
         case 'pending': {
           await this.#commitFact(fact, embedder, embedderId, indexText);
           await this.#linkEntities(scope, fact, options.signal);
-          return { fact, decision };
+          return { fact, decision, ...reasonField };
         }
         case 'dedup': {
           const existing = await this.#fetchExisting(decision.existingId);
+          // The candidate was never committed; the existing row's own
+          // status is authoritative, so do not attach the candidate's
+          // quarantine reason here.
           return { fact: existing ?? fact, decision };
         }
         case 'supersede': {
           await this.#commitFact(fact, embedder, embedderId, indexText);
           await this.#store.semantic.supersede(decision.existingId, fact, decision.reason);
           await this.#linkEntities(scope, fact, options.signal);
-          return { fact, decision };
+          return { fact, decision, ...reasonField };
         }
       }
     });
@@ -835,28 +855,58 @@ export class SemanticMemory {
 
   /**
    * Promote a quarantined fact to `active` (P1-4). The validation path
-   * that admits a synthesized / injection-flagged memory into
-   * action-driving recall once a human (or trusted non-agent caller)
-   * has reviewed it. Writes a `memory_history` audit row. Requires a
-   * storage adapter that implements
-   * `SemanticMemoryStoreExt.setStatus(...)` — the default
+   * that admits a synthesized memory into action-driving recall once a
+   * human (or trusted non-agent caller) has reviewed it. Writes a
+   * `memory_history` audit row. Requires a storage adapter that
+   * implements `SemanticMemoryStoreExt.setStatus(...)` — the default
    * `@graphorin/store-sqlite` adapter wires this through.
+   *
+   * MRET-3 / MST-1: promotion of a fact whose text still trips the
+   * offline injection heuristics is **refused** with
+   * {@link QuarantinePromotionRefusedError} — the model-facing
+   * `fact_validate` tool calls this with no `force`, so a poisoned
+   * memory can never be promoted by the agent itself (the one-turn
+   * `fact_remember(poison)` → `fact_validate(id)` chain is closed). An
+   * operator can override after review by passing `{ force: true }`
+   * from a trusted (non-agent) context. Synthesized-but-clean writes
+   * (consolidator / reflection) promote normally.
    *
    * @stable
    */
-  async validate(scope: SessionScope, factId: string, reason?: string): Promise<void> {
+  async validate(
+    scope: SessionScope,
+    factId: string,
+    reason?: string,
+    options?: { readonly force?: boolean },
+  ): Promise<void> {
     await withMemorySpan(
       this.#tracer,
       'memory.write.semantic',
       scope,
       { 'memory.semantic.action': 'validate', 'memory.semantic.fact_id': factId },
-      async () => {
+      async (span) => {
         if (typeof this.#store.semantic.setStatus !== 'function') {
           throw new TypeError(
             '[graphorin/memory] SemanticMemory.validate(...) requires a storage adapter that implements `semantic.setStatus(id, status)`. ' +
               'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via SemanticMemoryStoreExt.',
           );
         }
+        const force = options?.force === true;
+        // Re-derive the injection verdict from the stored (immutable)
+        // text. A poison candidate stays flagged forever, so this gate
+        // does not depend on persisting a quarantine reason.
+        const existing = await this.#fetchExisting(factId);
+        if (existing !== null && !force) {
+          const injection = detectMemoryInjection(existing.text);
+          if (injection.flagged) {
+            span.setAttributes({
+              'memory.semantic.validate.refused': true,
+              'memory.semantic.injection_markers': injection.markers.join(','),
+            });
+            throw new QuarantinePromotionRefusedError(factId, injection.markers);
+          }
+        }
+        span.setAttributes({ 'memory.semantic.validate.forced': force });
         await this.#store.semantic.setStatus(factId, 'active', reason);
       },
     );
