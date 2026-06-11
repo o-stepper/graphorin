@@ -445,7 +445,7 @@ class InMemoryInsightStore implements InsightMemoryStoreExt {
       if (i.userId !== scope.userId) continue;
       if (i.deletedAt !== undefined) continue;
       if (opts.includeQuarantined !== true && i.status === 'quarantined') continue;
-      if (q === '*' || i.text.toLowerCase().includes(q)) {
+      if (i.text.toLowerCase().includes(q)) {
         out.push({ record: i, score: 1, signals: { bm25: 1 } });
       }
       if (out.length >= topK) break;
@@ -637,6 +637,9 @@ export function createInMemoryStore(
         void scope;
         return filtered;
       },
+      async count(scope) {
+        return scope.sessionId === undefined ? 0 : messages.length;
+      },
       async search(scope, query, opts) {
         void opts;
         const topK = opts?.topK ?? 10;
@@ -677,6 +680,12 @@ export function createInMemoryStore(
         if (ep.deletedAt !== undefined) return null;
         return ep;
       },
+      async count(scope) {
+        return episodes.filter(
+          (e) =>
+            e.userId === scope.userId && e.deletedAt === undefined && e.status !== 'quarantined',
+        ).length;
+      },
       async search(scope, opts) {
         const topK = opts.topK ?? 10;
         const out: MemoryHit<Episode>[] = [];
@@ -688,7 +697,7 @@ export function createInMemoryStore(
           if (opts.asOf !== undefined && Date.parse(episode.startedAt) > Date.parse(opts.asOf)) {
             continue;
           }
-          if (q === '*' || episode.summary.toLowerCase().includes(q)) {
+          if (episode.summary.toLowerCase().includes(q)) {
             out.push({ record: episode, score: 1, signals: { bm25: 1 } });
           }
           if (out.length >= topK) break;
@@ -748,6 +757,12 @@ export function createInMemoryStore(
         if (fact.deletedAt !== undefined) return null;
         return fact;
       },
+      async count(scope) {
+        return facts.filter(
+          (f) =>
+            f.userId === scope.userId && f.deletedAt === undefined && f.status !== 'quarantined',
+        ).length;
+      },
       async search(scope, opts) {
         const topK = opts.topK ?? 10;
         const q = opts.query.toLowerCase();
@@ -761,7 +776,7 @@ export function createInMemoryStore(
           // when present (mirrors store-sqlite's facts_fts); the canonical
           // `fact.text` is the fallback for non-contextualized writes.
           const haystack = (factIndexText.get(fact.id) ?? fact.text).toLowerCase();
-          if (q === '*' || haystack.includes(q)) {
+          if (haystack.includes(q)) {
             out.push({ record: fact, score: 1, signals: { bm25: 1 } });
           }
           if (out.length >= topK) break;
