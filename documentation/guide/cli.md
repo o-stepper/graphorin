@@ -24,7 +24,7 @@ graphorin token <subcommand>    — create / list / revoke server tokens
 graphorin secrets <subcommand>  — list / get / set / delete / ref / rotate
 graphorin storage <subcommand>  — vacuum / size / migrate
 graphorin audit <subcommand>    — list / verify / export
-graphorin memory <subcommand>   — status / inspect / activity / migrate
+graphorin memory <subcommand>   — status / inspect / activity / review / migrate
 graphorin consolidator <subcommand> — run / status / clear-pending
 graphorin triggers <subcommand> — list / fire / pause / resume
 graphorin auth <subcommand>     — login / logout / status (OAuth flows)
@@ -114,16 +114,18 @@ OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free 
 
 ## `graphorin memory`
 
-Read-only operator inspection of the long-term memory store, plus the explicit embedder swap. `inspect` and `activity` query the store directly and never load an embedder.
+Read-only operator inspection of the long-term memory store, the quarantine review surface, plus the explicit embedder swap. `inspect`, `activity`, and `review` query the store directly and never load an embedder.
 
 ```bash
 graphorin memory status                  # counts + active embedder + migration state
 graphorin memory inspect <fact-id>       # one fact: supersede chain, quarantine, conflicts, citing insights
 graphorin memory activity --limit 20     # store-wide consolidator / reflection activity
+graphorin memory review                  # list quarantined facts / episodes / insights / procedures
+graphorin memory review --promote <id> --reason "reviewed"   # promote a reviewed item out of quarantine
 graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedders ./embedders.mjs
 ```
 
-`status`, `inspect`, and `activity` accept `--json` for a structured document. `memory inspect` and `memory activity` are the operator side of [recall explainability](/guide/memory-system#recall-explainability). `migrate` performs an [embedder migration](/guide/memory-system#embedder-migration) — `--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`, and `--embedders` points at a module exporting the source / target factories.
+`status`, `inspect`, `activity`, and `review` accept `--json` for a structured document. `memory inspect` and `memory activity` are the operator side of [recall explainability](/guide/memory-system#recall-explainability). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` performs an [embedder migration](/guide/memory-system#embedder-migration) — `--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`, and `--embedders` points at a module exporting the source / target factories.
 
 ## `graphorin consolidator`
 

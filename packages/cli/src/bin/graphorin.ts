@@ -51,6 +51,7 @@ import {
   runMemoryActivity,
   runMemoryInspect,
   runMemoryMigrate,
+  runMemoryReview,
   runMemoryStatus,
   runMigrate,
   runMigrateConfig,
@@ -708,6 +709,35 @@ function registerMemoryCommands(program: Command): void {
         ...(opts.json !== undefined ? { json: opts.json } : {}),
       });
     });
+  memory
+    .command('review')
+    .description('List quarantined memory by tier, or promote a reviewed item with --promote.')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--limit <n>', 'Cap on rows listed per type (default 20).')
+    .option('--promote <id>', 'Promote this quarantined memory id out of quarantine.')
+    .option('--reason <text>', 'Audit reason recorded with the promotion.')
+    .option('--force', 'Override the injection-refusal gate (operator action, after review).')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(
+      async (opts: {
+        config?: string;
+        limit?: string;
+        promote?: string;
+        reason?: string;
+        force?: boolean;
+        json?: boolean;
+      }) => {
+        const limit = opts.limit !== undefined ? Number.parseInt(opts.limit, 10) : undefined;
+        await runMemoryReview({
+          ...(limit !== undefined && Number.isFinite(limit) ? { limit } : {}),
+          ...(opts.promote !== undefined ? { promote: opts.promote } : {}),
+          ...(opts.reason !== undefined ? { reason: opts.reason } : {}),
+          ...(opts.force !== undefined ? { force: opts.force } : {}),
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
+        });
+      },
+    );
 }
 
 function registerConsolidatorCommands(program: Command): void {

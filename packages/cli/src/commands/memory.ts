@@ -19,6 +19,7 @@
 
 import process from 'node:process';
 
+import { createMemory } from '@graphorin/memory';
 import { EXIT_CODES } from '../internal/exit.js';
 import {
   brand,
@@ -495,6 +496,207 @@ export async function runMemoryActivity(
     return out;
   } finally {
     await ctx.close();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// `graphorin memory review` (MCON-2) — list what the consolidator left in
+// quarantine across every tier, and promote a reviewed item out of it. The
+// promote path runs through the tier's `validate(...)`, so an injection-flagged
+// memory is refused unless the operator passes `--force` after review.
+// ---------------------------------------------------------------------------
+
+/** A single quarantined memory row surfaced by `graphorin memory review`. */
+export interface MemoryReviewItem {
+  readonly id: string;
+  readonly text: string;
+  readonly provenance: string | null;
+}
+
+/** @stable */
+export interface MemoryReviewResult {
+  /** Set when `--promote <id>` succeeded. */
+  readonly promoted?: { readonly id: string; readonly type: string };
+  readonly facts: ReadonlyArray<MemoryReviewItem>;
+  readonly episodes: ReadonlyArray<MemoryReviewItem>;
+  readonly insights: ReadonlyArray<MemoryReviewItem>;
+  readonly procedures: ReadonlyArray<MemoryReviewItem>;
+}
+
+/** @stable */
+export interface MemoryReviewOptions extends MemoryCommonOptions {
+  /** Cap on the rows listed per type. Default 20. */
+  readonly limit?: number;
+  /** Promote this id out of quarantine instead of listing. */
+  readonly promote?: string;
+  /** Audit reason recorded with the promotion. */
+  readonly reason?: string;
+  /** Override the injection-refusal gate (operator action, after review). */
+  readonly force?: boolean;
+}
+
+const EMPTY_REVIEW: MemoryReviewResult = Object.freeze({
+  facts: Object.freeze([]),
+  episodes: Object.freeze([]),
+  insights: Object.freeze([]),
+  procedures: Object.freeze([]),
+});
+
+/**
+ * `graphorin memory review` — list the facts / episodes / insights / induced
+ * procedures the consolidator left in quarantine (read-only), or promote a
+ * reviewed item out of quarantine with `--promote <id>`. The promote path runs
+ * through the tier `validate(...)`, so an injection-flagged memory is refused
+ * unless `--force` is supplied after review (MCON-2).
+ *
+ * @stable
+ */
+export async function runMemoryReview(
+  options: MemoryReviewOptions = {},
+): Promise<MemoryReviewResult> {
+  const limit = Math.max(1, options.limit ?? 20);
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+  });
+  try {
+    const conn = ctx.store.connection;
+    const print = options.print ?? defaultPrintSink;
+
+    if (options.promote !== undefined) {
+      const located = locateQuarantined(conn, options.promote);
+      if (located === null) {
+        print(`${statusMarker('warn')} '${options.promote}' is not a quarantined memory.`);
+        process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
+        return EMPTY_REVIEW;
+      }
+      const memory = createMemory({ store: ctx.store.memory, embeddings: ctx.store.embeddings });
+      const scope = { userId: located.userId };
+      const validateOpts = options.force === true ? ({ force: true } as const) : undefined;
+      try {
+        await promoteByType(
+          memory,
+          located.type,
+          scope,
+          options.promote,
+          options.reason,
+          validateOpts,
+        );
+      } catch (err) {
+        if (err instanceof Error && err.name === 'QuarantinePromotionRefusedError') {
+          print(
+            `${statusMarker('warn')} refused: '${options.promote}' trips the injection heuristics.`,
+          );
+          print('  Review it, then re-run with --force from a trusted operator context.');
+          process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
+          return EMPTY_REVIEW;
+        }
+        throw err;
+      }
+      const out: MemoryReviewResult = Object.freeze({
+        ...EMPTY_REVIEW,
+        promoted: Object.freeze({ id: options.promote, type: located.type }),
+      });
+      emitReport(options, out, () => {
+        print(
+          `${statusMarker('ok')} promoted ${located.type} ${options.promote} out of quarantine.`,
+        );
+      });
+      return out;
+    }
+
+    const out: MemoryReviewResult = Object.freeze({
+      facts: listQuarantined(conn, 'facts', 'text', limit),
+      episodes: listQuarantined(conn, 'episodes', 'summary', limit),
+      insights: listQuarantined(conn, 'insights', 'text', limit),
+      procedures: listQuarantined(conn, 'rules', 'text', limit),
+    });
+    emitReport(options, out, () => {
+      print(brand('memory review — quarantined'));
+      printReviewItems(print, 'facts', out.facts);
+      printReviewItems(print, 'episodes', out.episodes);
+      printReviewItems(print, 'insights', out.insights);
+      printReviewItems(print, 'procedures', out.procedures);
+      const total =
+        out.facts.length + out.episodes.length + out.insights.length + out.procedures.length;
+      if (total === 0) {
+        print(`  ${statusMarker('ok')} nothing in quarantine.`);
+      } else {
+        print('  promote with: graphorin memory review --promote <id> [--reason <text>] [--force]');
+      }
+    });
+    return out;
+  } finally {
+    await ctx.close();
+  }
+}
+
+function printReviewItems(
+  print: (line: string) => void,
+  label: string,
+  items: ReadonlyArray<MemoryReviewItem>,
+): void {
+  print(brand(`  ${label} (${items.length}):`));
+  for (const item of items) {
+    const snippet = item.text.length > 80 ? `${item.text.slice(0, 77)}...` : item.text;
+    const prov = item.provenance !== null ? ` [${item.provenance}]` : '';
+    print(`    ${statusMarker('warn')} ${item.id}${prov} ${snippet}`);
+  }
+}
+
+function listQuarantined(
+  conn: { all<T>(q: string, p?: ReadonlyArray<unknown>): T[] },
+  table: 'facts' | 'episodes' | 'insights' | 'rules',
+  textColumn: 'text' | 'summary',
+  limit: number,
+): ReadonlyArray<MemoryReviewItem> {
+  const rows = conn.all<{ id: string; text: string; provenance: string | null }>(
+    `SELECT id, ${textColumn} AS text, provenance FROM ${table} WHERE status = 'quarantined' AND deleted_at IS NULL ORDER BY created_at DESC LIMIT ?`,
+    [limit],
+  );
+  return Object.freeze(
+    rows.map((r) => Object.freeze({ id: r.id, text: r.text, provenance: r.provenance ?? null })),
+  );
+}
+
+type QuarantineType = 'fact' | 'episode' | 'insight' | 'rule';
+
+function locateQuarantined(
+  conn: { get<T>(q: string, p?: ReadonlyArray<unknown>): T | undefined },
+  id: string,
+): { type: QuarantineType; userId: string } | null {
+  const tables: ReadonlyArray<{ table: string; type: QuarantineType }> = [
+    { table: 'facts', type: 'fact' },
+    { table: 'episodes', type: 'episode' },
+    { table: 'insights', type: 'insight' },
+    { table: 'rules', type: 'rule' },
+  ];
+  for (const { table, type } of tables) {
+    const row = conn.get<{ uid: string }>(
+      `SELECT scope_user_id AS uid FROM ${table} WHERE id = ? AND status = 'quarantined' AND deleted_at IS NULL`,
+      [id],
+    );
+    if (row !== undefined) return { type, userId: row.uid };
+  }
+  return null;
+}
+
+async function promoteByType(
+  memory: ReturnType<typeof createMemory>,
+  type: QuarantineType,
+  scope: { userId: string },
+  id: string,
+  reason: string | undefined,
+  opts: { readonly force: true } | undefined,
+): Promise<void> {
+  switch (type) {
+    case 'fact':
+      return memory.semantic.validate(scope, id, reason, opts);
+    case 'episode':
+      return memory.episodic.validate(scope, id, reason, opts);
+    case 'insight':
+      return memory.insights.validate(scope, id, reason, opts);
+    case 'rule':
+      return memory.procedural.validate(scope, id, reason, opts);
   }
 }
 
