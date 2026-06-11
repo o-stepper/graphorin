@@ -163,10 +163,6 @@ export interface ContextEngineConfig {
   readonly reservedForCompaction?: number;
   /** Pluggable token counter. Default heuristic (chars/4). */
   readonly tokenCounter?: TokenCounter | ContextTokenCounter;
-  /** RB-44 cap on the per-step tool-catalogue cardinality. Default `30`. */
-  readonly maxToolsInContext?: number;
-  /** RB-44 semantic-stage cosine threshold. Default `0.5`. */
-  readonly toolSearchThreshold?: number;
   /** Auto-compaction configuration (RB-46). */
   readonly compaction?: false | CompactionConfig;
   /** Active provider's context window; required when compaction is enabled. */
@@ -303,8 +299,6 @@ export interface ResolvedContextEngineConfig {
   readonly maxContextTokens: number;
   readonly reservedForResponse: number;
   readonly reservedForCompaction: number;
-  readonly maxToolsInContext: number;
-  readonly toolSearchThreshold: number;
   readonly compactionEnabled: boolean;
   /**
    * Whether compaction can actually fire (CE-12): `compactionEnabled` **and** a
@@ -401,8 +395,6 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
   const reservedForResponse = config.reservedForResponse ?? 4096;
   const reservedForCompaction = config.reservedForCompaction ?? 8192;
   const maxContextTokens = config.maxContextTokens ?? Number.POSITIVE_INFINITY;
-  const maxToolsInContext = config.maxToolsInContext ?? 30;
-  const toolSearchThreshold = config.toolSearchThreshold ?? 0.5;
 
   const tokenCounter: ContextTokenCounter = config.tokenCounter
     ? 'count' in config.tokenCounter
@@ -480,8 +472,6 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     maxContextTokens,
     reservedForResponse,
     reservedForCompaction,
-    maxToolsInContext,
-    toolSearchThreshold,
     compactionEnabled,
     compactionEffective,
     compactionThresholdTokens,

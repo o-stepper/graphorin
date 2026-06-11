@@ -106,7 +106,6 @@ export {
   HEURISTIC_TOKEN_COUNTER,
   renderMessageText,
 } from './token-counter.js';
-export * from './tool-budget/index.js';
 
 /**
  * Compile result. Layered into the system prompt by the agent

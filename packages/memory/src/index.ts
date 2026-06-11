@@ -97,7 +97,6 @@ export {
   type AutoRecallTriggers,
   adaptTokenCounter,
   allocateTokenBudget,
-  allocateToolCatalogue,
   annotate,
   BASE_TEMPLATE_EN_FULL,
   BASE_TEMPLATE_EN_MINIMAL,
@@ -149,7 +148,6 @@ export {
   type LayerCandidate,
   type LayerConfig,
   type LayerId,
-  type LazyLoadedToolEntry,
   type LocaleResolverLogger,
   type MemoryBaseMode,
   type MemoryContextBlocks,
@@ -182,13 +180,8 @@ export {
   SUMMARY_TEMPLATE_NAME,
   SUMMARY_TEMPLATE_VERSION,
   shouldFireInboundPreamble,
-  type ToolBudgetEntry,
-  type ToolCatalogueInput,
-  type ToolCatalogueResult,
-  type ToolRanker,
   toSpanAttributes,
   truncateToTokens,
-  updateLazyLoadedSet,
 } from './context-engine/index.js';
 export * from './errors/index.js';
 export {
