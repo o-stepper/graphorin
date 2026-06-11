@@ -106,7 +106,6 @@ Same code. Different lifetime. The standalone server is a thin shell around the 
 sequenceDiagram
     autonumber
     participant Agent as @graphorin/agent
-    participant ContextEngine as ContextEngine
     participant Memory as @graphorin/memory
     participant Provider as @graphorin/provider
     participant LLM as Provider adapter
@@ -114,21 +113,21 @@ sequenceDiagram
     participant Tracer as @graphorin/observability
 
     Agent->>Tracer: start span agent.run.step
-    Agent->>ContextEngine: assemble messages
-    ContextEngine->>Memory: compile(scope)
-    Memory-->>ContextEngine: working / session / semantic prompt
     Agent->>Provider: stream(messages, tools)
     Provider->>LLM: HTTP / in-process call
     LLM-->>Provider: token + tool-call stream
     Provider-->>Agent: AgentEvent stream
-    alt tool call requested
+    alt memory tool called
         Agent->>Tools: execute(toolCall)
+        Tools->>Memory: read / write the tier
+        Memory-->>Tools: result
         Tools-->>Agent: tool result
-        Agent->>Memory: persist if memory tool
     end
     Agent->>Tracer: end span agent.run.step
     Agent-->>Agent: next step or done
 ```
+
+> The agent builds the run's system prompt from `instructions`; it does not auto-compile a memory-aware prompt per step. The model reaches memory only through the memory tools it calls (registered via `tools: memory.tools`). The `ContextEngine` runs separately for [auto-compaction](/guide/agent-runtime#auto-compaction).
 
 ## Privacy, security, observability — built in
 

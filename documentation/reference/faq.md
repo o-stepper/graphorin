@@ -77,7 +77,7 @@ A scheduled invocation of an agent — cron, fixed interval, idle, or event. See
 
 Two complementary mechanisms:
 
-1. **Tool approvals.** Tools whose `needsApproval` predicate returns `true` raise a `tool.approval.requested` event. The run state can be persisted, the process can shut down, and another machine can resume it later via `agent.run(savedRunState, { directive: { approvals: [...] } })`.
+1. **Tool approvals.** Tools whose `needsApproval` predicate returns `true` raise a `tool.approval.requested` event. The run state can be persisted, the process can shut down, and another machine can resume it later via `agent.run(savedRunState, { directive: { approvals: [...] } })`. **Note:** on resume a granted approval is recorded but the approved tool is **not re-executed** today (the model receives a placeholder) — don't rely on it to perform a side effect like a payment or refund; gate and audit the decision, then perform the side effect in your own code. See the caveat in [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).
 2. **Workflow `pause` / `resume`.** A workflow node calls `pause(value)`; the engine yields a `workflow.suspended` event and persists the checkpoint. `workflow.resume(threadId, directive)` re-enters the paused node.
 
 See [Agent runtime](/guide/agent-runtime) and [Workflow engine](/guide/workflow-engine).

@@ -37,7 +37,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Consolidator.** Background process that distils long conversations into long-term memory in three phases — light / standard / deep. Lives in `@graphorin/memory`.
 
-**Context engine.** The component that compiles the memory-aware system prompt before each agent step.
+**Context engine.** The component that can assemble a memory-aware system prompt and drives auto-compaction. Today the agent runtime invokes it for **auto-compaction** only; the per-step prompt is built from the agent's `instructions`, and the model reaches memory through the memory tools it calls (`tools: memory.tools`).
 
 **Contextual retrieval.** Prepending a short situating context to a fact before it is indexed, so a terse fact stays findable (Anthropic's *Contextual Retrieval*). The default `late-chunk` mode is deterministic + offline; an opt-in consolidator `llm` mode authors a richer prefix.
 

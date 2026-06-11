@@ -96,8 +96,7 @@ function handle<TOutput>(event: AgentEvent<TOutput>): void {
 ```mermaid
 flowchart LR
     Start([Start]) --> Step[Run step]
-    Step --> Compile[ContextEngine.compile]
-    Compile --> Stream[Provider.stream]
+    Step --> Stream[Provider.stream]
     Stream -->|tokens| Out[text.delta]
     Stream -->|tool calls| Tools[Execute tools]
     Tools -->|needsApproval| Approval[tool.approval.requested]
@@ -169,14 +168,16 @@ Governance is preserved: each in-script call runs through the **same executor**,
 
 ## Durable HITL
 
-`runStateToJSON(runState)` / `runStateFromJSON(serialised, agent)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can pick up exactly where the first left off by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
+`runStateToJSON(runState)` / `runStateFromJSON(serialised, agent)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can resume by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
+
+> **Caveat — current behaviour.** On resume a *granted* approval is recorded, but the approved tool is **not re-executed**: the model receives a placeholder result rather than the real tool output, and a model that re-issues the call re-suspends. Do **not** rely on durable-HITL resume to actually perform a side-effecting action (payments, refunds, external writes) — use it to gate, persist, and audit the *decision*, and perform the side effect through your own code once approved. Re-executing approved calls through the executor on resume is a tracked follow-up.
 
 The `tool.approval.requested` event carries the `toolCallId` plus the tool's classification metadata. Operators that need to suspend the run combine the event with a snapshot of the current `RunState`:
 
 ```ts
 import { runStateToJSON } from '@graphorin/agent';
 
-for await (const event of agent.stream('Refund the last order if it qualifies', {
+for await (const event of agent.stream('Summarise the status of my last order', {
   sessionId: 's1',
   userId: 'u1',
 })) {

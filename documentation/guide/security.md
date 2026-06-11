@@ -30,11 +30,11 @@ flowchart LR
 | Tier (resolved kind) | `sandboxPolicy` | Backed by | Used for |
 |---|---|---|---|
 | `'none'` | `'none'` | The Node.js process. | Fully-trusted first-party tools. |
-| `'worker-threads'` | `'sandboxed'` | Node.js worker threads (built-in — no peer dependency). Workers run with an empty environment (`env: {}` + a pre-run scrub) — the host `process.env` is never inherited; only the explicit `SandboxRunOptions.env` allowlist is visible. | **The default isolation tier** — MCP-derived tools and code-mode execution. |
+| `'worker-threads'` | `'sandboxed'` | Node.js worker threads (built-in — no peer dependency). Workers run with an empty environment (`env: {}` + a pre-run scrub) — the host `process.env` is never inherited; only the explicit `SandboxRunOptions.env` allowlist is visible. | **The default isolation tier.** Today it backs **code-mode** script execution (and any tool an operator routes through a custom `sandboxResolver`). Inline `config.tools` and MCP-derived tools resolve to this policy but run **in-process** — see below. |
 | `'isolated-vm'` | `'isolated'` | [`isolated-vm`](https://github.com/laverdet/isolated-vm) (peer dependency, ISC). | Untrusted JavaScript skills. |
 | `'docker'` | `'docker'` | [`dockerode`](https://github.com/apocas/dockerode) (peer dependency, Apache-2.0). | Untrusted binaries / full subprocess isolation. |
 
-A tool declares its tier through `sandboxPolicy`; the executor maps that to a resolved kind (`'sandboxed' → 'worker-threads'`, `'isolated' → 'isolated-vm'`). As of the executor wiring this field is **enforced by the agent runtime on every call** — see [Tools](/guide/tools) and [Agent runtime](/guide/agent-runtime).
+A tool declares its tier through `sandboxPolicy`; the executor maps that to a resolved kind (`'sandboxed' → 'worker-threads'`, `'isolated' → 'isolated-vm'`). Today this policy is **advisory for inline (`config.tools`) and MCP-derived tools**: it is resolved and surfaced on the `tool.execute` span / audit row, but those tools execute **in-process** — the agent runtime intentionally ships with no `sandboxResolver` wired. Real out-of-process isolation applies only to **code-mode** scripts and to tools an operator routes through a custom `sandboxResolver`; module-loadable skill / MCP isolation is wired when those land. See the per-field runtime behaviour in [Agent runtime](/guide/agent-runtime).
 
 `isolated-vm` and `dockerode` are **opt-in peer dependencies** — they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code; `'none'` and `'worker-threads'` need nothing extra.
 
