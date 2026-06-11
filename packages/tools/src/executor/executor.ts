@@ -822,7 +822,18 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         });
       }
     }
-    const effectiveStrategy = tool.truncationStrategy ?? 'middle';
+    // TL-2: a structured (object/array) output that overflows the cap must
+    // not be inlined whole. `normalize` always resolves a concrete strategy
+    // (default `'middle'`), so when a structured output lands on that default
+    // we route it through spill-to-file instead — the model sees a bounded
+    // preview + a `read_result` handle while the full blob is preserved out of
+    // context. An explicitly pinned `'tail'` / `'summarize'` / `'spill-to-file'`
+    // is honoured. Under the cap `truncateBody` is a no-op regardless, so small
+    // objects and all string outputs pass through unchanged.
+    const baseStrategy = tool.truncationStrategy ?? 'middle';
+    const isStructuredOutput = envelope.output !== undefined && typeof envelope.output !== 'string';
+    const effectiveStrategy =
+      isStructuredOutput && baseStrategy === 'middle' ? 'spill-to-file' : baseStrategy;
     span.setAttributes({
       'graphorin.tool.result.truncation.strategy': effectiveStrategy,
       'graphorin.tool.result.truncation.source': 'tool',
@@ -1232,9 +1243,18 @@ async function raceWithCancellation<T>(
 }
 
 function wrapOutput(rawOutput: unknown, sanitizedText: string, originalText: string): unknown {
+  // When the rendered text is byte-identical to the original (nothing was
+  // truncated or sanitized), pass the typed output through unchanged — small
+  // objects keep their structure for downstream consumers (code-mode, etc).
   if (sanitizedText === originalText) return rawOutput;
-  if (typeof rawOutput === 'string' || rawOutput === undefined) return sanitizedText;
-  return rawOutput;
+  // Otherwise the body was bounded (truncated) and/or had imperative content
+  // stripped. The model must see exactly that bounded text — never the full
+  // structured object (TL-2). Previously a non-string output was returned
+  // whole here, so the cap + inbound sanitization were computed and thrown
+  // away and the agent inlined the entire blob (and any injection past the
+  // cap) verbatim. Returning the bounded text closes that bypass; the full
+  // value is preserved out of context behind the spill `resultHandle`.
+  return sanitizedText;
 }
 
 function toStartEvent(call: ToolCall): ToolExecuteStartEvent {

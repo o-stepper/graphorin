@@ -165,7 +165,7 @@ What you get out of the box:
 
 ## Response budgets and pagination
 
-Every tool result is bounded by `maxResultTokens` (default **16384**). When a result exceeds the cap, the executor applies the tool's `truncationStrategy` (`'middle'` / `'tail'` / `'spill-to-file'` / `'summarize'`). The 16k default sits deliberately below the ~25k single-result norm some providers tolerate; raise it per tool when a tool legitimately returns more, or set `maxResultTokens: 0` to disable the cap (the registry emits a WARN — uncapped results can blow the context window):
+Every tool result is bounded by `maxResultTokens` (default **16384**) — **text and structured (object/array) outputs alike**. When a result exceeds the cap, the executor applies the tool's `truncationStrategy` (`'middle'` / `'tail'` / `'spill-to-file'` / `'summarize'`); the bounded text is what reaches the model, never the full object. A structured output on the default `'middle'` strategy is routed through **spill-to-file by default**, so the full blob is preserved behind a `read_result` handle while only a bounded preview enters context. The 16k default sits deliberately below the ~25k single-result norm some providers tolerate; raise it per tool when a tool legitimately returns more, or set `maxResultTokens: 0` to disable the cap (the registry emits a WARN — uncapped results can blow the context window):
 
 ```ts
 export const bigReport = tool({
