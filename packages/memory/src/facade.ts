@@ -458,7 +458,13 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   ): Promise<MemoryContextBlocks> {
     const out: { -readonly [K in keyof MemoryContextBlocks]: MemoryContextBlocks[K] } = {};
     const blocks = await options.store.working.list(scope);
-    const rules = await options.store.procedural.list(scope);
+    // Quarantined (e.g. P2-2-induced) procedures are provisional and must not
+    // reach the system prompt — `activate()` already excludes them, and
+    // compile() (public `@stable`) must agree or a compile()-based prompt
+    // builder ingests unvalidated induction procedures (MST-3).
+    const rules = (await options.store.procedural.list(scope)).filter(
+      (rule) => rule.status !== 'quarantined',
+    );
     const shouldFilter = privacyOptedIn || compileOptions.providerAcceptsSensitivity !== undefined;
     let blocksKept: ReadonlyArray<(typeof blocks)[number]> = blocks;
     let rulesKept: ReadonlyArray<(typeof rules)[number]> = rules;
