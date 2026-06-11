@@ -33,7 +33,8 @@ export function reanchorPinnedFacts(options: {
       for (const id of ids) {
         const fact = await deps.memory.semantic.get(deps.scope, id).catch(() => null);
         if (fact === null || fact.deletedAt !== undefined) continue;
-        const tagBlob = fact.tags !== undefined ? ` tags="${(fact.tags ?? []).join(',')}"` : '';
+        const tagBlob =
+          fact.tags !== undefined ? ` tags="${escapeXml((fact.tags ?? []).join(','))}"` : '';
         const fragment = `  <fact id="${escapeXml(fact.id)}"${tagBlob}>${escapeXml(fact.text)}</fact>`;
         const fragmentTokens = await counter.countText(fragment);
         if (maxTokens > 0 && runningTokens + fragmentTokens > maxTokens) {
