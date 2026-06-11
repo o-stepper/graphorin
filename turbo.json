@@ -11,7 +11,7 @@
     "typecheck": {
       "dependsOn": ["^build"],
       "outputs": ["*.tsbuildinfo"],
-      "inputs": ["src/**", "tests/**", "tsconfig.json", "package.json"]
+      "inputs": ["src/**", "tests/**", "tsconfig.json", "tsconfig.tests.json", "package.json"]
     },
     "test": {
       "dependsOn": ["^build"],

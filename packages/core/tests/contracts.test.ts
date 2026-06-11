@@ -136,7 +136,7 @@ describe('public type surface', () => {
 
   it('MemoryProvenance + MemoryStatus are fixed unions (P1-4)', () => {
     expectTypeOf<MemoryProvenance>().toEqualTypeOf<
-      'user' | 'tool' | 'extraction' | 'reflection' | 'imported'
+      'user' | 'tool' | 'extraction' | 'reflection' | 'induction' | 'imported'
     >();
     expectTypeOf<MemoryStatus>().toEqualTypeOf<'active' | 'quarantined'>();
   });
@@ -159,9 +159,9 @@ describe('public type surface', () => {
     expectTypeOf<GraphEntity['mergedInto']>().toEqualTypeOf<string | undefined>();
   });
 
-  it('MemoryKind covers exactly the six tiers', () => {
+  it('MemoryKind covers the six tiers plus derived insights', () => {
     expectTypeOf<MemoryKind>().toEqualTypeOf<
-      'working' | 'session' | 'episodic' | 'semantic' | 'procedural' | 'shared'
+      'working' | 'session' | 'episodic' | 'semantic' | 'procedural' | 'shared' | 'insight'
     >();
   });
 
