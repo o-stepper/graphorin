@@ -1032,6 +1032,13 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           this.#conn.run(`DELETE FROM ${tableName} WHERE fact_id = ?`, [id]);
         }
       }
+      // CS-1: drop the graph links before the fact row. `fact_entities.fact_id`
+      // references `facts(id)` with no ON DELETE, and the connection runs with
+      // `foreign_keys = ON`, so deleting a linked fact would otherwise raise
+      // FOREIGN KEY constraint failed and roll back the whole purge (including
+      // the PURGE audit row). The canonical `entities` are shared data and are
+      // intentionally left intact — only this fact's links are removed.
+      this.#conn.run('DELETE FROM fact_entities WHERE fact_id = ?', [id]);
       this.#conn.run('DELETE FROM facts WHERE id = ?', [id]);
     });
   }
