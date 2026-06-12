@@ -1,5 +1,9 @@
 import type { Block, Sensitivity, SessionScope, Tracer, ZodLikeSchema } from '@graphorin/core';
-import { WorkingBlockOverflowError, WorkingBlockReplaceMismatchError } from '../errors/index.js';
+import {
+  WorkingBlockOverflowError,
+  WorkingBlockReadOnlyError,
+  WorkingBlockReplaceMismatchError,
+} from '../errors/index.js';
 import { newMemoryId } from '../internal/id.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
@@ -102,7 +106,6 @@ export class WorkingMemory {
   readonly #store: MemoryStoreAdapter;
   readonly #tracer: Tracer;
   readonly #defs: Map<string, BlockDefinition>;
-  readonly #initialised = new Set<string>();
 
   constructor(args: { store: MemoryStoreAdapter; tracer: Tracer }) {
     this.#store = args.store;
@@ -145,7 +148,12 @@ export class WorkingMemory {
       async (span) => {
         const block = await this.#store.working.get(scope, label);
         span.setAttributes({ 'memory.read.working.found': block !== null });
-        return block?.value ?? null;
+        if (block !== null) return block.value;
+        // MST-8: a defined-but-unwritten block answers with its declared
+        // defaultValue (previously advertised, copied into the
+        // definition, and then never read by anything).
+        const definition = this.#defs.get(label);
+        return definition?.defaultValue ?? null;
       },
     );
   }
@@ -283,10 +291,15 @@ export class WorkingMemory {
       async (span) => {
         const definition = this.#requireDefinition(label);
         if (definition.readOnly === true) {
-          throw new WorkingBlockReplaceMismatchError(label, 0);
+          // MRET-14: a dedicated kind — the old
+          // WorkingBlockReplaceMismatchError(label, 0) read as "substring
+          // matched 0 times" and misled replace-retry callers.
+          throw new WorkingBlockReadOnlyError(label);
         }
         const existing = await this.#store.working.get(scope, label);
-        const candidate = await nextValueFn(existing?.value);
+        // MST-8: first materialization starts from the declared default,
+        // so an append/replace on an unwritten block composes with it.
+        const candidate = await nextValueFn(existing?.value ?? definition.defaultValue);
         const enforcedValue = enforceCharLimit(candidate, definition);
         const now = new Date().toISOString();
         const id = existing?.id ?? newMemoryId('block');
@@ -307,7 +320,6 @@ export class WorkingMemory {
           updatedAt: now,
         };
         await this.#store.working.upsert(scope, block);
-        this.#initialised.add(label);
         span.setAttributes({
           'memory.write.working.action': existing === null ? 'create' : 'update',
           'memory.write.working.length': enforcedValue.length,

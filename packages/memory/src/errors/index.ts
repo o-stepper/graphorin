@@ -125,6 +125,28 @@ export class WorkingBlockReplaceMismatchError extends GraphorinMemoryError {
 }
 
 /**
+ * Thrown when any mutation targets a block defined with
+ * `readOnly: true` (MRET-14). Previously this guard threw
+ * `WorkingBlockReplaceMismatchError(label, 0)` — semantically "your
+ * unique substring matched 0 times", which misled callers that retry
+ * replace operations on mismatch.
+ *
+ * @stable
+ */
+export class WorkingBlockReadOnlyError extends GraphorinMemoryError {
+  override readonly name = 'WorkingBlockReadOnlyError';
+  readonly kind = 'working-block-read-only' as const;
+  readonly label: string;
+
+  constructor(label: string) {
+    super(`[graphorin/memory] block '${label}' is read-only — mutations are not allowed.`, {
+      hint: 'Define the block without readOnly, or write through an operator path that redefines it.',
+    });
+    this.label = label;
+  }
+}
+
+/**
  * Raised by the embedder migration runner when the operator attempts a
  * silent embedder swap under the `lock-on-first` policy.
  *
