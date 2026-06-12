@@ -115,6 +115,9 @@ class ConsolidatorImpl implements Consolidator {
   readonly #now: () => number;
   readonly #randomId: () => string;
   readonly #provider: Provider | null;
+  /** Per-phase provider overrides (MCON-7); fall back to `#provider`. */
+  readonly #cheapProvider: Provider | null;
+  readonly #deepProvider: Provider | null;
   readonly #defaultScope: SessionScope | null;
   readonly #listeners = new Set<PhaseListener>();
   readonly #lockManager: LockManager;
@@ -154,6 +157,8 @@ class ConsolidatorImpl implements Consolidator {
         return `cr_${a}${b}`;
       });
     this.#provider = opts.provider ?? null;
+    this.#cheapProvider = opts.cheapProvider ?? null;
+    this.#deepProvider = opts.deepProvider ?? null;
     this.#defaultScope = opts.defaultScope ?? null;
 
     this.#config = resolveConfig(opts);
@@ -324,6 +329,19 @@ class ConsolidatorImpl implements Consolidator {
     if (this.#manuallyPaused) return null;
     const phases = this.#planPhases(reason);
     if (phases.length === 0) return null;
+    // MCON-8: enforce the cooldown the runtime always PERSISTED but never
+    // read — back-to-back triggers used to fire with zero quiet period.
+    // Checked ONCE per trigger dispatch (phases within one dispatch chain
+    // freely); manual fireNow(...) / DLQ replays bypass it.
+    if (reason.kind !== 'manual' && this.#config.ceilings.cooldownMs > 0) {
+      const state =
+        this.#consolidatorStore !== null ? await this.#consolidatorStore.getState(scope) : null;
+      const eligibleAt = state?.nextEligibleAt ?? null;
+      const firstPhase = phases[0] ?? 'light';
+      if (eligibleAt !== null && this.#now() < eligibleAt) {
+        return this.#emit({ ...skipOutcome(firstPhase, 'cooldown'), phase: firstPhase }, scope, reason);
+      }
+    }
     let last: PhaseOutcome | null = null;
     for (const phase of phases) {
       last = await this.#runPhase(phase, scope, reason);
@@ -602,7 +620,8 @@ class ConsolidatorImpl implements Consolidator {
       return out;
     }
     if (phase === 'standard') {
-      if (this.#provider === null) {
+      const standardProvider = this.#cheapProvider ?? this.#provider;
+      if (standardProvider === null) {
         throw new ProviderNotConfiguredError('standard');
       }
       const session = this.#store.session;
@@ -624,7 +643,9 @@ class ConsolidatorImpl implements Consolidator {
         contextualRetrieval: this.#config.contextualRetrieval,
         store: this.#store,
         consolidatorStore: this.#consolidatorStore,
-        provider: this.#provider,
+        // MCON-7: the standard phase routes to the cheap-tier provider
+        // when one is configured.
+        provider: standardProvider,
         tracer: this.#tracer,
         scope,
         cheapModel: this.#config.cheapModel,
@@ -644,13 +665,14 @@ class ConsolidatorImpl implements Consolidator {
       }
       return out;
     }
-    if (this.#provider === null) {
+    const deepProvider = this.#deepProvider ?? this.#provider;
+    if (deepProvider === null) {
       throw new ProviderNotConfiguredError('deep');
     }
     const deepOut = await runDeepPhase({
       store: this.#store,
       consolidatorStore: this.#consolidatorStore,
-      provider: this.#provider,
+      provider: deepProvider,
       tracer: this.#tracer,
       scope,
       deepModel: this.#config.deepModel,
@@ -677,7 +699,8 @@ class ConsolidatorImpl implements Consolidator {
           ? ((await this.#consolidatorStore.getState(scope))?.reflectionWatermark ?? null)
           : null;
       const reflection = await runReflectionPass({
-        provider: this.#provider,
+        // MCON-7: reflection rides the deep-tier provider.
+        provider: deepProvider,
         tracer: this.#tracer,
         scope,
         semantic: this.#semantic,
@@ -725,7 +748,7 @@ class ConsolidatorImpl implements Consolidator {
 
 function skipOutcome(
   phase: ConsolidatorPhase,
-  reason: 'tokens-exceeded' | 'cost-exceeded' | 'paused',
+  reason: 'tokens-exceeded' | 'cost-exceeded' | 'paused' | 'cooldown',
 ): PhaseOutcome {
   return {
     phase,
@@ -773,7 +796,6 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     cheapModel: opts.cheapModel ?? preset.cheapModel,
     deepModel: opts.deepModel ?? preset.deepModel,
     budgetResetSemantics: opts.budgetResetSemantics ?? 'utc',
-    budgetAttribution: opts.budgetAttribution ?? 'shared',
     noiseFilters: Object.freeze([...(opts.noiseFilters ?? ['default'])]),
     lockWaitMs: opts.lockWaitMs ?? 30_000,
     decayTauDays: opts.decayTauDays ?? 7,

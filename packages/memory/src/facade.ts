@@ -202,6 +202,10 @@ export interface CreateMemoryOptions {
     readonly phases?: ReadonlyArray<ConsolidatorPhase>;
     readonly ceilings?: Partial<ConsolidatorCeilings>;
     readonly onExceed?: OnBudgetExceed;
+    /** Provider routed to the standard phase when set (MCON-7); falls back to `provider`. */
+    readonly cheapProvider?: Provider | null;
+    /** Provider routed to the deep + reflection passes when set (MCON-7). */
+    readonly deepProvider?: Provider | null;
     readonly cheapModel?: string | null;
     readonly deepModel?: string | null;
     readonly noiseFilters?: ReadonlyArray<'default' | 'minimal' | 'none'>;
@@ -612,6 +616,8 @@ function buildConsolidator(
     ...(opts.phases !== undefined ? { phases: opts.phases } : {}),
     ...(opts.ceilings !== undefined ? { ceilings: opts.ceilings } : {}),
     ...(opts.onExceed !== undefined ? { onExceed: opts.onExceed } : {}),
+    ...(opts.cheapProvider !== undefined ? { cheapProvider: opts.cheapProvider } : {}),
+    ...(opts.deepProvider !== undefined ? { deepProvider: opts.deepProvider } : {}),
     ...(opts.cheapModel !== undefined ? { cheapModel: opts.cheapModel } : {}),
     ...(opts.deepModel !== undefined ? { deepModel: opts.deepModel } : {}),
     ...(opts.noiseFilters !== undefined ? { noiseFilters: opts.noiseFilters } : {}),

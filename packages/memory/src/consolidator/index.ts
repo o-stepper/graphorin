@@ -172,7 +172,6 @@ export function createConsolidatorPlaceholder(
     cheapModel: null,
     deepModel: null,
     budgetResetSemantics: 'utc',
-    budgetAttribution: 'shared',
     noiseFilters: Object.freeze(['default' as const]),
     lockWaitMs: 30_000,
     decayTauDays: 7,
