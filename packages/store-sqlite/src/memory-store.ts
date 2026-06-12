@@ -956,6 +956,14 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     // effect) so the hand-off is seamless. `COALESCE` makes it idempotent and
     // never clobbers an interval the caller already closed explicitly.
     const closeAt = newFact.validFrom ? toEpoch(newFact.validFrom) : now;
+    // CS-12: write the successor FIRST, then close the old fact in the same
+    // call. `remember()` opens its own transaction, so it cannot be nested
+    // inside the close transaction; inverting the order makes the close
+    // depend on a durable successor instead of the reverse. A crash between
+    // the two steps leaves the old fact fully intact (open interval, no
+    // `superseded_by`) — recoverable — rather than closed in favour of, and
+    // pointing at, a row that was never written.
+    await this.remember(newFact);
     this.#conn.transaction(() => {
       this.#conn.run(
         'UPDATE facts SET superseded_by = ?, valid_to = COALESCE(valid_to, ?), updated_at = ? WHERE id = ?',
@@ -967,7 +975,6 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       );
     });
     void reason;
-    await this.remember(newFact);
   }
 
   /**
