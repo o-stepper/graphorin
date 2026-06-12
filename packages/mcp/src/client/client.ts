@@ -23,6 +23,7 @@ import type { CollisionStrategy } from '@graphorin/tools/registry';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
+import { ToolListChangedNotificationSchema } from '@modelcontextprotocol/sdk/types.js';
 import {
   MCPCallTimeoutError,
   MCPCancelledError,
@@ -30,6 +31,7 @@ import {
   MCPInvalidConfigError,
   MCPProtocolError,
   MCPToolNotFoundError,
+  MCPToolPinningError,
 } from '../errors/index.js';
 import { deriveServerIdentity } from '../helpers/identity.js';
 import { validateMCPServerConfig } from '../helpers/validate-config.js';
@@ -177,6 +179,19 @@ export async function createMCPClientFromSdkTransport(
     ...(options.elicitation === undefined ? {} : { elicitation: options.elicitation }),
     ...(options.sampling === undefined ? {} : { sampling: options.sampling }),
     serverIdRef,
+  });
+  // MC-6: surface server-side catalogue churn — at minimum an audit
+  // counter + log line; operators re-run toTools() to refresh and
+  // re-sanitize the catalogue (which also re-runs the drift diff).
+  sdkClient.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
+    incrementCounter('mcp.tools.list-changed.total', {
+      server: serverIdRef.current ?? 'unknown',
+    });
+    options.logger?.(
+      'warn',
+      'mcp.tools.list_changed received — re-run toTools() to refresh + re-sanitize the catalogue',
+      { server: serverIdRef.current },
+    );
   });
 
   try {
@@ -409,6 +424,8 @@ export async function createMCPClientFromSdkTransport(
     return Object.freeze({ messages: Object.freeze(messages) });
   }
 
+  let lastToolFingerprints: ReadonlyMap<string, string> | undefined;
+
   async function toTools(toolsOpts?: MCPToToolsOptions): Promise<ReadonlyArray<Tool>> {
     const catalogue = await listTools();
     const adapted = adaptMCPTools({
@@ -418,6 +435,50 @@ export async function createMCPClientFromSdkTransport(
       ...(toolsOpts === undefined ? {} : { options: toolsOpts }),
       ...(options.logger === undefined ? {} : { logger: options.logger }),
     });
+    // MC-6: cross-snapshot drift — a definition changing behind an
+    // already-seen name within this client's lifetime is audited.
+    if (lastToolFingerprints !== undefined) {
+      for (const [name, hash] of adapted.fingerprints) {
+        const previous = lastToolFingerprints.get(name);
+        if (previous !== undefined && previous !== hash) {
+          incrementCounter('mcp.tools.changed.total', {
+            server: serverIdentity.id,
+            tool: name,
+          });
+          options.logger?.('warn', 'mcp.tools.changed: definition drifted between snapshots', {
+            server: serverIdentity.id,
+            tool: name,
+            previous,
+            current: hash,
+          });
+        }
+      }
+    }
+    lastToolFingerprints = adapted.fingerprints;
+    // MC-6: operator pins from a previously approved snapshot — the
+    // rug-pull (approve-then-swap across restarts) posture.
+    const pins = toolsOpts?.pinnedFingerprints;
+    if (pins !== undefined) {
+      for (const [name, pinned] of Object.entries(pins)) {
+        const current = adapted.fingerprints.get(name);
+        if (current !== undefined && current !== pinned) {
+          if (toolsOpts?.onPinMismatch === 'reject') {
+            throw new MCPToolPinningError(
+              `MCP tool '${name}' no longer matches its pinned definition fingerprint — the server changed the definition behind an approved name.`,
+              { metadata: { server: serverIdentity.id, tool: name } },
+            );
+          }
+          incrementCounter('mcp.tools.pin-mismatch.total', {
+            server: serverIdentity.id,
+            tool: name,
+          });
+          options.logger?.('warn', 'mcp.tools.pin-mismatch: pinned fingerprint diverged', {
+            server: serverIdentity.id,
+            tool: name,
+          });
+        }
+      }
+    }
     return adapted.tools;
   }
 

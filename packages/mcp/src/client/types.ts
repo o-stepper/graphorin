@@ -202,6 +202,18 @@ export interface MCPToToolsOptions {
    */
   readonly callTimeoutMs?: number;
   /**
+   * Operator-pinned definition fingerprints by MCP tool name (MC-6) —
+   * the `__definitionHash` stamped on a previously approved snapshot.
+   * A mismatch means the server changed the definition behind the name.
+   */
+  readonly pinnedFingerprints?: Readonly<Record<string, string>>;
+  /**
+   * What to do on a pinned-fingerprint mismatch (MC-6). `'warn'`
+   * (default) audits `mcp.tools.pin-mismatch.total` and continues;
+   * `'reject'` throws `MCPToolPinningError`.
+   */
+  readonly onPinMismatch?: 'warn' | 'reject';
+  /**
    * Per-server `defer_loading` override. When unset and
    * `listTools()` returns more than `deferLoadingThreshold` entries
    * the auto-default flips deferral on for every tool from this

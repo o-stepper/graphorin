@@ -203,6 +203,15 @@ sequenceDiagram
 
 Two call-level knobs complete the picture: `callTool(name, args, { signal, timeoutMs })` honours the abort signal (an aborted agent run sends `notifications/cancelled` to the server — adapted tools forward their `ToolExecutionContext.signal` automatically) and maps `timeoutMs` onto the SDK request timeout, surfacing expiry as `MCPCallTimeoutError` (`kind: 'call-timeout'`). `toTools({ callTimeoutMs })` applies the same timeout to every adapted tool's calls.
 
+## Definition pinning and `list_changed`
+
+Tool definitions are a poisoning surface: a server can change a tool's description or schema behind an already-approved name (the **approve-then-swap rug-pull**). The client makes this visible (MC-6):
+
+- Every adapted tool carries a stable sha256 **`__definitionHash`** (over name + description + input/output schema + title, key-sorted). Persist it alongside your approval record.
+- Within one client's lifetime, a definition drifting between `toTools()` snapshots is audited (`mcp.tools.changed.total` + a warn log with both hashes).
+- Across restarts, pass your stored pins back: `toTools({ pinnedFingerprints: { toolName: hash }, onPinMismatch: 'reject' })` throws `MCPToolPinningError` (`kind: 'pin-mismatch'`) on divergence; the default `'warn'` audits `mcp.tools.pin-mismatch.total` and continues.
+- `notifications/tools/list_changed` is subscribed: each one bumps `mcp.tools.list-changed.total` and logs a warning — re-run `toTools()` to refresh and re-sanitize the catalogue (which also re-runs the drift diff).
+
 ## Audit + observability
 
 Every `client.callTool(...)` lands one row in the audit log with the server URL, the tool name, the call id, the duration, and the redacted (sensitivity-aware) result. The `mcp.tool.invoke` span carries the same metadata for live tracing.

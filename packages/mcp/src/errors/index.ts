@@ -23,6 +23,7 @@ export type MCPErrorKind =
   | 'auth-error'
   | 'tool-not-found'
   | 'tool-execution'
+  | 'pin-mismatch'
   | 'call-timeout'
   | 'cancelled'
   | 'invalid-config'
@@ -90,6 +91,15 @@ export class MCPAuthError extends GraphorinMCPError {
 /** Raised when {@link MCPClient.callTool} is invoked for an unknown tool. */
 export class MCPToolNotFoundError extends GraphorinMCPError {
   public readonly kind = 'tool-not-found' as const;
+}
+
+/**
+ * Raised when a pinned tool-definition fingerprint does not match the
+ * server's current definition and `onPinMismatch: 'reject'` is set
+ * (MC-6) — the approve-then-swap rug-pull posture.
+ */
+export class MCPToolPinningError extends GraphorinMCPError {
+  public readonly kind = 'pin-mismatch' as const;
 }
 
 /**

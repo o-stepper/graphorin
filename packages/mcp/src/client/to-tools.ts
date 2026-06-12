@@ -35,6 +35,7 @@ import {
   sanitizeDescription,
   warnOnPassthroughOverride,
 } from './inbound-filters.js';
+import { computeToolDefinitionHash } from './pinning.js';
 import type { MCPClient, MCPToolDefinition, MCPToToolsOptions } from './types.js';
 
 // Re-exported for backward compatibility: callers (and tests) import
@@ -56,6 +57,8 @@ export function _resetMcpAdapterDedupForTesting(): void {
 /** Result returned by {@link adaptMCPTools}. */
 export interface AdaptedToolsResult {
   readonly tools: ReadonlyArray<Tool>;
+  /** MC-6: sha256 definition fingerprint per MCP tool name. */
+  readonly fingerprints: ReadonlyMap<string, string>;
   readonly autoDeferralFired: boolean;
   readonly resolvedDeferLoading: boolean;
   readonly resolvedInboundSanitization: InboundSanitizationPolicy;
@@ -80,6 +83,7 @@ export function adaptMCPTools(args: {
   ) => void;
 }): AdaptedToolsResult {
   const opts = args.options ?? {};
+  const fingerprints = new Map<string, string>();
   const filter = opts.filter;
   const namespace = (opts.namespace ?? '').trim();
   const filtered = filter === undefined ? args.catalogue : args.catalogue.filter((t) => filter(t));
@@ -112,10 +116,13 @@ export function adaptMCPTools(args: {
       definition.outputSchema === undefined
         ? undefined
         : buildJsonSchemaValidator(definition.outputSchema as JsonSchemaLike);
+    const definitionHash = computeToolDefinitionHash(definition);
+    fingerprints.set(definition.name, definitionHash);
     tools.push(
       buildAdaptedTool({
         client: args.client,
         serverIdentity: args.serverIdentity,
+        definitionHash,
         mcpToolName: definition.name,
         graphorinToolName: namespacedName,
         description:
@@ -137,6 +144,7 @@ export function adaptMCPTools(args: {
 
   return Object.freeze({
     tools: Object.freeze(tools),
+    fingerprints,
     autoDeferralFired,
     resolvedDeferLoading,
     resolvedInboundSanitization: resolvedInbound,
@@ -160,6 +168,8 @@ interface BuildAdaptedToolArgs {
   readonly truncationStrategy?: import('@graphorin/core').TruncationStrategy;
   /** Per-call timeout forwarded to `client.callTool` (MC-3/MC-5). */
   readonly callTimeoutMs?: number;
+  /** MC-6: sha256 fingerprint of the producing MCP definition. */
+  readonly definitionHash: string;
   readonly preferredModel?:
     | import('@graphorin/core').ModelHint
     | import('@graphorin/core').ModelSpec;
@@ -213,6 +223,9 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
   // policy) instead of first-party. Zero operator boilerplate.
   return Object.assign(tool, {
     __source: { kind: 'mcp', serverIdentity: args.serverIdentity.id } as const,
+    // MC-6: operators persist this fingerprint to pin the approved
+    // definition (`toTools({ pinnedFingerprints })`).
+    __definitionHash: args.definitionHash,
   });
 }
 
