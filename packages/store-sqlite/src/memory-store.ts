@@ -775,6 +775,15 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            provenance = excluded.provenance,
            status = excluded.status,
            importance = excluded.importance,
+           -- CS-5: adopt the new embedder_id only when this write actually
+           -- carries an embedding (excluded.embedder_id IS NOT NULL). A
+           -- no-embedding re-remember (e.g. supersede()'s re-write of the new
+           -- fact) keeps the existing embedder_id so a previously-embedded
+           -- fact is not silently hidden from vector search.
+           embedder_id = CASE
+             WHEN excluded.embedder_id IS NOT NULL THEN excluded.embedder_id
+             ELSE facts.embedder_id
+           END,
            updated_at = excluded.updated_at`,
         [
           fact.id,
