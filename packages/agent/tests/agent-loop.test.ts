@@ -1,4 +1,4 @@
-import type { AgentEvent, Tool } from '@graphorin/core';
+import type { AgentEvent, Provider, Tool } from '@graphorin/core';
 import { describe, expect, it, vi } from 'vitest';
 import { createAgent } from '../src/index.js';
 import {
@@ -109,6 +109,50 @@ describe('Agent — tool execution loop', () => {
       events.push(ev);
     }
     expect(events.some((e) => e.type === 'agent.error')).toBe(true);
+  });
+
+  it('falls back when a provider THROWS a structured rate-limit error (AG-21)', async () => {
+    // A complete mock provider whose stream REJECTS with a
+    // `RateLimitExceededError`-shaped error (thrown, not emitted as a structured
+    // `{ type: 'error' }` event).
+    const primary = {
+      ...createMockProvider({ modelId: 'primary', scripts: [textOnlyScript('unused')] }),
+      stream() {
+        return {
+          [Symbol.asyncIterator]() {
+            return {
+              next: () =>
+                Promise.reject(
+                  Object.assign(new Error('rate limited'), { kind: 'rate-limit-exceeded' }),
+                ),
+            };
+          },
+        };
+      },
+    } as unknown as Provider;
+    const fallback = createMockProvider({
+      modelId: 'backup',
+      scripts: [textOnlyScript('recovered', 8)],
+    });
+    const agent = createAgent({
+      name: 'fb-throw',
+      instructions: 'go',
+      provider: primary,
+      fallbackModels: [fallback],
+    });
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream('hi')) {
+      events.push(ev);
+    }
+    const fellback = events.find((e) => e.type === 'agent.model.fellback');
+    expect(fellback).toBeDefined();
+    if (fellback?.type === 'agent.model.fellback') {
+      expect(fellback.reason).toBe('rate-limit');
+    }
+    const complete = events.find((e) => e.type === 'text.complete');
+    if (complete?.type === 'text.complete') {
+      expect(complete.text).toBe('recovered');
+    }
   });
 });
 

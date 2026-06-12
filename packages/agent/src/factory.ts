@@ -25,6 +25,7 @@ import type {
   ModelSpec,
   Provider,
   ProviderError,
+  ProviderErrorKind,
   ProviderEvent,
   ProviderRequest,
   ReasoningContent,
@@ -371,6 +372,23 @@ function lastUserText(messages: ReadonlyArray<Message>): string | undefined {
     return text.length > 0 ? text : undefined;
   }
   return undefined;
+}
+
+/**
+ * AG-21: classify a **thrown** provider error into a {@link ProviderErrorKind}
+ * so the fallback chain can act on it, instead of flattening every exception to
+ * `'unknown'` (which is always fallback-ineligible). Structural — reads the
+ * `kind` carried by `@graphorin/provider`'s `GraphorinProviderError` subclasses
+ * without importing them, keeping the agent decoupled from the provider package.
+ */
+function classifyThrownProviderErrorKind(cause: unknown): ProviderErrorKind {
+  if (typeof cause === 'object' && cause !== null && 'kind' in cause) {
+    switch ((cause as { readonly kind?: unknown }).kind) {
+      case 'rate-limit-exceeded':
+        return 'rate-limit';
+    }
+  }
+  return 'unknown';
 }
 
 function toolToDefinition(tool: Tool): ToolDefinition {
@@ -1483,7 +1501,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               break;
             }
             const message = cause instanceof Error ? cause.message : String(cause);
-            providerError = { kind: 'unknown', message, cause };
+            // AG-21: preserve the thrown error's kind (e.g. a RateLimitExceededError
+            // from `withRateLimit`) so the fallback chain treats it like the same
+            // error emitted as a structured event, instead of flattening it to
+            // an always-ineligible 'unknown'.
+            providerError = { kind: classifyThrownProviderErrorKind(cause), message, cause };
           }
           if (providerError !== undefined) {
             lastError = providerError;
