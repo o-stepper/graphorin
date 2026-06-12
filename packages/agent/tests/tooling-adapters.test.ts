@@ -296,7 +296,11 @@ describe('Adapter E — createExecutorEventBridge', () => {
 });
 
 describe('SDF-1 — memory guard snapshot/verify wired through the loop', () => {
-  it('a memoryGuardTier tool with memory wired emits memory:modification:before/after audits', async () => {
+  // Functional (not perf) test; loaded windows CI runners blow the 5s
+  // default — give the agent loop + guard audits explicit headroom.
+  it('a memoryGuardTier tool with memory wired emits memory:modification:before/after audits', {
+    timeout: 20_000,
+  }, async () => {
     const { onMemoryGuardAudit } = await import('@graphorin/security/guard');
     const { createAgent } = await import('../src/index.js');
     const { createMockProvider, toolCallScript, textOnlyScript } = await import(
