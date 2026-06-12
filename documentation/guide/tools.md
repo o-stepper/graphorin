@@ -245,7 +245,7 @@ Execution itself is `runBridgedSource(...)` from `@graphorin/security/sandbox` �
 
 ## Memory-modification guard
 
-Every tool declares a `memoryGuardTier` — one of `'pure'`, `'side-effecting-no-memory'`, `'memory-aware'`, `'unknown'`, or `'untrusted'`. When a memory-region reader is supplied, the executor snapshots the affected region before a memory-aware call, verifies it after, and audits any unexpected drift. **In the default agent build this step is inert**: the guard factory is wired, but no scope-free memory-region reader is passed yet, so the snapshot/verify cycle never runs (a tracked follow-up). The `@graphorin/memory` tools still carry the right tier, so the guard activates automatically once a reader lands.
+Every tool declares a `memoryGuardTier` — one of `'pure'`, `'side-effecting-no-memory'`, `'memory-aware'`, `'unknown'`, or `'untrusted'`. When a memory-region reader is supplied, the executor snapshots the affected region before a memory-aware call, verifies it after, and audits any unexpected drift (`memory:modification:before` / `memory:modification:after`). **With `memory` wired on the agent this step is active** (SDF-1): the runtime binds a scope-aware region reader over the working-memory tier (the scope resolves from the in-flight run), so the snapshot/verify cycle runs for every guarded tier. Without `memory`, the guard is skipped and the agent emits a one-time WARN when any tool declares a `memoryGuardTier` — the silent no-op is visible.
 
 ## Sandbox tiers
 

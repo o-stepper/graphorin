@@ -96,6 +96,7 @@ import {
   buildSecretResolver,
   buildToolTokenCounter,
   createExecutorEventBridge,
+  createMemoryRegionReader,
   type ExecutorEventBridge,
 } from './tooling/adapters.js';
 import { buildDataFlowGuard } from './tooling/dataflow.js';
@@ -830,7 +831,51 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   };
   const toolSecretResolver = buildSecretResolver();
   const toolTokenCounter = buildToolTokenCounter();
-  const { memoryGuardFactory: toolMemoryGuardFactory } = buildMemoryGuard(memory);
+  // SDF-1: when memory is wired, bind a scope-aware region reader so the
+  // executor's DEC-153 snapshot/verify cycle actually runs (the scope
+  // resolves lazily from the in-flight run — the executor only invokes
+  // the reader mid-run). Without memory the guard tiers stay skipped,
+  // and a one-time WARN below makes that silent no-op visible.
+  const memoryGuardWiring = buildMemoryGuard(
+    memory,
+    memory === undefined
+      ? {}
+      : {
+          regionReader: createMemoryRegionReader(['working'], async (region) => {
+            if (region !== 'working') return '';
+            const scope = {
+              userId: activeRunState?.userId ?? agentId,
+              ...(activeRunState?.sessionId !== undefined
+                ? { sessionId: activeRunState.sessionId }
+                : {}),
+              agentId,
+            };
+            const working = (
+              memory as unknown as {
+                working?: { compile?: (s: unknown, a?: string) => Promise<string> };
+              }
+            ).working;
+            if (working?.compile === undefined) return '';
+            try {
+              return await working.compile(scope, agentId);
+            } catch {
+              // The reader is best-effort: a failed region read must not
+              // turn the guard step into a run failure.
+              return '';
+            }
+          }),
+        },
+  );
+  const toolMemoryGuardFactory = memoryGuardWiring.memoryGuardFactory;
+  if (memory === undefined) {
+    const guarded = (config.tools ?? []).filter((t) => t.memoryGuardTier !== undefined);
+    if (guarded.length > 0) {
+      console.warn(
+        `[graphorin/agent] ${guarded.length} tool(s) declare memoryGuardTier but no memory is wired — ` +
+          'the DEC-153 snapshot/verify guard is skipped (SDF-1). Wire `memory` to activate it.',
+      );
+    }
+  }
   // Provenance / data-flow guard (WI-12 / P1-3, opt-in). Built once and
   // shared by every executor (direct + code-mode quiet), so the sink gate
   // and taint recording apply uniformly. Off unless configured with a
@@ -854,6 +899,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       secretResolver: toolSecretResolver,
       tokenCounter: toolTokenCounter,
       memoryGuardFactory: toolMemoryGuardFactory,
+      ...(memoryGuardWiring.memoryRegionReader !== undefined
+        ? { memoryRegionReader: memoryGuardWiring.memoryRegionReader }
+        : {}),
       spill: spillWriter,
       ...(toolDataFlowGuard !== undefined ? { dataFlowGuard: toolDataFlowGuard } : {}),
       ...(opts?.quiet === true ? {} : { streamingSink: toolStreamingSink }),

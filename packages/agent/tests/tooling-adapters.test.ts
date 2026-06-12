@@ -294,3 +294,56 @@ describe('Adapter E — createExecutorEventBridge', () => {
     expect(out).toEqual([]);
   });
 });
+
+describe('SDF-1 — memory guard snapshot/verify wired through the loop', () => {
+  it('a memoryGuardTier tool with memory wired emits memory:modification:before/after audits', async () => {
+    const { onMemoryGuardAudit } = await import('@graphorin/security/guard');
+    const { createAgent } = await import('../src/index.js');
+    const { createMockProvider, toolCallScript, textOnlyScript } = await import(
+      './fixtures/mock-provider.js'
+    );
+    const actions: string[] = [];
+    const stop = onMemoryGuardAudit((e) => actions.push(e.action));
+    try {
+      const memory = {
+        working: { compile: async () => 'WORKING-BLOCKS' },
+        contextEngine: {
+          shouldCompact: async () => false,
+          compactNow: async () => ({ result: { summary: '', summaryTokens: 0 } }),
+        },
+      } as never;
+      const guarded = {
+        name: 'risky_tool',
+        description: 'untrusted-tier tool',
+        memoryGuardTier: 'untrusted',
+        inputSchema: {
+          parse: (v: unknown) => v,
+          safeParse: (v: unknown) => ({ success: true as const, data: v }),
+          toJSON: () => ({ type: 'object' }),
+        },
+        async execute() {
+          return 'done';
+        },
+      } as never;
+      const agent = createAgent({
+        name: 'guarded-mem',
+        instructions: 'x',
+        provider: createMockProvider({
+          modelId: 'mock',
+          scripts: [
+            toolCallScript({ toolCallId: 't1', toolName: 'risky_tool', args: {} }),
+            textOnlyScript('ok', 4),
+          ],
+        }),
+        tools: [guarded],
+        memory,
+      });
+      const result = await agent.run('go');
+      expect(result.status).toBe('completed');
+      expect(actions).toContain('memory:modification:before');
+      expect(actions).toContain('memory:modification:after');
+    } finally {
+      stop();
+    }
+  });
+});
