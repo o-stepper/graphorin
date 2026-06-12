@@ -17,7 +17,7 @@ describe('SSE fallback', () => {
   it('streams a buffered event then closes when the request is aborted', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
-    process.env.GRAPHORIN_TEST_PEPPER_SSE = 'pepper-with-enough-entropy-SSE';
+    process.env.GRAPHORIN_TEST_PEPPER_SSE = 'pepper-with-plenty-of-entropy-aB3xK9-SSE';
     const store = await setupStore();
     const server = await createServer({
       store,

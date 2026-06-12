@@ -82,7 +82,7 @@ let port = 0;
 beforeAll(async () => {
   _resetResolversForTesting();
   installBuiltinResolvers();
-  process.env.GRAPHORIN_TEST_PEPPER_E2E = 'pepper-with-enough-entropy-E2E';
+  process.env.GRAPHORIN_TEST_PEPPER_E2E = 'pepper-with-plenty-of-entropy-aB3xK9-E2E';
   const store = await setupStore();
   server = await createServer({
     store,

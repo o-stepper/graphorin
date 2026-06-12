@@ -6,7 +6,7 @@ import type {
 } from '@graphorin/core/contracts';
 import type { SessionScope } from '@graphorin/core/types';
 
-import { enforceSecretAcl } from '../acl.js';
+import { enforceSecretAcl, secretAclAllowsRead } from '../acl.js';
 import { emitSecretsAudit } from '../audit-emitter.js';
 import { auditStoreOperation } from '../audit-helpers.js';
 import { SecretRequiredError } from '../errors.js';
@@ -60,13 +60,17 @@ export class EnvSecretsStore implements SecretsStore {
       STORE_SOURCE,
       key,
       async () => {
+        if (!secretAclAllowsRead(key)) return null; // SPL-14
         const value = this.#read(key);
         if (value === undefined) return null;
         return SecretValue.fromString(value, {
           source: { resolver: 'env', ref: `env:${this.#envKey(key)}` },
         });
       },
-      { decisionFor: (v) => (v === null ? 'not-found' : 'success') },
+      {
+        decisionFor: (v) =>
+          v === null ? (secretAclAllowsRead(key) ? 'not-found' : 'denied') : 'success',
+      },
     );
   }
 

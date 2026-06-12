@@ -1,12 +1,9 @@
+import { randomBytes } from 'node:crypto';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import {
-  _resetResolversForTesting,
-  generatePepper,
-  installBuiltinResolvers,
-} from '@graphorin/security';
+import { _resetResolversForTesting, installBuiltinResolvers } from '@graphorin/security';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -59,8 +56,7 @@ describe('token CRUD against a real SQLite store', () => {
   beforeEach(async () => {
     _resetResolversForTesting();
     installBuiltinResolvers({});
-    const pepper = await generatePepper().use((s) => Buffer.from(s).toString('hex'));
-    process.env.GRAPHORIN_TEST_PEPPER = pepper;
+    process.env.GRAPHORIN_TEST_PEPPER = randomBytes(32).toString('hex');
     cfg = await fixtureWithPepper();
   });
 

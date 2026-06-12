@@ -298,3 +298,47 @@ describe('property: parseSecretRef round-trips', () => {
     );
   });
 });
+
+// --- SPL-15 — registered resolver schemes are known schemes --------------------
+
+describe('SPL-15 — validateSecretRefs consults the live resolver registry', () => {
+  it('does not flag a scheme registered via registerResolver as unknown', async () => {
+    const { registerResolver, unregisterResolver } = await import(
+      '../../src/secrets/resolvers/index.js'
+    );
+    registerResolver({
+      scheme: 'op',
+      resolve: async () => null,
+    } as never);
+    try {
+      // Negative control: an UNregistered scheme on the same key shape is
+      // flagged — proving the matcher sees the field at all.
+      const control = validateSecretRefs({ apiKeyRef: 'nope://vault/item' });
+      expect(control.ok).toBe(false);
+      const result = validateSecretRefs({ apiKeyRef: 'op://vault/item/field' });
+      expect(result.ok).toBe(true); // documented: BUILTIN + registered schemes
+      expect(result.issues).toHaveLength(0);
+    } finally {
+      unregisterResolver('op');
+    }
+  });
+});
+
+// --- SPL-8 — naked secrets are never echoed back -------------------------------
+
+describe('SPL-8 — naked-string errors redact the input', () => {
+  it('the error message and .input carry a redacted form, not the raw secret', () => {
+    const rawSecret = 'sk-live-EXTREMELY-SECRET-VALUE-1234567890';
+    let caught: SecretRefParseError | undefined;
+    try {
+      assertNotNakedString(rawSecret);
+    } catch (err) {
+      caught = err as SecretRefParseError;
+    }
+    if (caught === undefined) throw new Error('expected a naked-string rejection');
+    expect(caught.message).not.toContain(rawSecret);
+    expect(caught.input).not.toContain(rawSecret);
+    expect(caught.message).toContain('sk-l'); // 4-char head survives for diagnosis
+    expect(caught.message).toContain(`${rawSecret.length} chars`);
+  });
+});

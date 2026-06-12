@@ -11,7 +11,7 @@ import type {
 } from '@graphorin/core/contracts';
 import type { SessionScope } from '@graphorin/core/types';
 
-import { enforceSecretAcl } from '../acl.js';
+import { enforceSecretAcl, secretAclAllowsRead } from '../acl.js';
 import { auditStoreOperation } from '../audit-helpers.js';
 import { SecretRequiredError } from '../errors.js';
 import { decryptBundle, deriveAesKey, ENCRYPTED_FILE_MAGIC } from '../resolvers/encrypted-file.js';
@@ -100,6 +100,7 @@ export class EncryptedFileSecretsStore implements SecretsStore {
       STORE_SOURCE,
       key,
       async () => {
+        if (!secretAclAllowsRead(key)) return null; // SPL-14
         const plain = await this.#readPlaintext();
         const value = plain.values[key];
         if (value === undefined) return null;
@@ -107,7 +108,10 @@ export class EncryptedFileSecretsStore implements SecretsStore {
           source: { resolver: 'encrypted-file', ref: `encrypted-file:${this.#path}#${key}` },
         });
       },
-      { decisionFor: (v) => (v === null ? 'not-found' : 'success') },
+      {
+        decisionFor: (v) =>
+          v === null ? (secretAclAllowsRead(key) ? 'not-found' : 'denied') : 'success',
+      },
     );
   }
 

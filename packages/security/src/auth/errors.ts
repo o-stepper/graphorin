@@ -122,7 +122,7 @@ export class TokenLockedOutError extends GraphorinSecretsError {
 }
 
 /**
- * Raised when `createToken` / `rotatePepper` / `rekeyTokens` are
+ * Raised when `createToken` / `rekeyTokens` are
  * invoked with a pepper value that fails the strength check — either
  * below the 32-byte minimum, or a low-entropy / placeholder value
  * (e.g. a long run of identical bytes). See `assessSecretStrength`.

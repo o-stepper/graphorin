@@ -20,7 +20,16 @@ describe('@graphorin/security/oauth — high-level client', () => {
     resetOAuthSubsystem();
     _setDiscoveryFetcherForTesting(async (url) => {
       if (url.endsWith('oauth-protected-resource')) {
-        return { ok: false, status: 404, json: async () => ({}) };
+        // SPL-7: the resource document names the AS, so the issuer in the
+        // AS metadata matches its own discovery URL (RFC 8414 §3.3).
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            resource: 'https://mcp.example.com',
+            authorization_servers: ['https://issuer.example.com'],
+          }),
+        };
       }
       return {
         ok: true,

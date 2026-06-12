@@ -160,6 +160,16 @@ export interface DataFlowPolicyConfig {
    */
   readonly guardTrifecta?: boolean;
   /**
+   * Sensitivity tiers that arm the lethal-trifecta `sensitive` leg
+   * (SDF-8). Default `['secret']` (out-of-the-box behaviour is
+   * byte-identical — only secret-tagged content counts). Set e.g.
+   * `['secret', 'internal']` so ordinary user/PII content (default
+   * `'internal'`) also counts; the agent's guard builder threads this
+   * into `deriveTaintLabel`. The verbatim `untrusted-to-sink` leg is
+   * independent of this option.
+   */
+  readonly sensitiveTiers?: ReadonlyArray<import('@graphorin/core').Sensitivity>;
+  /**
    * Sink tool names pre-authorized by the operator to receive tainted
    * data. A tainted flow into one of these is audited as `declassified`
    * and allowed even in `'enforce'` mode — the explicit, audited escape
@@ -169,7 +179,9 @@ export interface DataFlowPolicyConfig {
   /**
    * Minimum length of a shared verbatim span (in normalized characters)
    * for the ledger to treat a sink's arguments as carrying untrusted
-   * content. Lower = more sensitive (more false positives). Default `20`.
+   * content. Lower = more sensitive (more false positives), clamped up
+   * to an 8-char floor below which the probe cannot be meaningful
+   * (SDF-5). Default `20`.
    */
   readonly minSpanLength?: number;
 }

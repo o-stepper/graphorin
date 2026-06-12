@@ -60,6 +60,21 @@ export function getActiveToolSecretsContext(): ToolSecretsContext | undefined {
  *
  * @stable
  */
+/**
+ * SPL-14: ACL gate for the non-throwing `get()` path. Inside an active
+ * tool scope a denied key must read as ABSENT instead of bypassing the
+ * per-tool allowlist (any code holding the raw store could otherwise
+ * read every key). Returns `true` when the read may proceed; `true`
+ * outside any tool scope (host-level reads stay un-gated).
+ *
+ * @stable
+ */
+export function secretAclAllowsRead(key: string): boolean {
+  const ctx = toolContext.getStore();
+  if (!ctx) return true;
+  return ctx.secretsAllowed.includes(key);
+}
+
 export function enforceSecretAcl(key: string): void {
   const ctx = toolContext.getStore();
   if (!ctx) return;

@@ -106,39 +106,62 @@ export function piiDetection<TValue = unknown>(
   const stage = opts.stage ?? 'input';
   const name = opts.name ?? 'piiDetection';
 
+  /** Redact every pattern match in one string; collects matched kinds. */
+  const redactText = (input: string, matchedKinds: string[]): string => {
+    let text = input;
+    for (const pat of patterns) {
+      const re = new RegExp(
+        pat.pattern.source,
+        pat.pattern.flags.includes('g') ? pat.pattern.flags : `${pat.pattern.flags}g`,
+      );
+      let m = re.exec(text);
+      while (m !== null) {
+        if (pat.validate && !pat.validate(m[0])) {
+          m = re.exec(text);
+          continue;
+        }
+        matchedKinds.push(pat.kind);
+        const replacement = `[REDACTED:${pat.kind}]`;
+        text = text.slice(0, m.index) + replacement + text.slice(m.index + m[0].length);
+        re.lastIndex = m.index + replacement.length;
+        m = re.exec(text);
+      }
+    }
+    return text;
+  };
+
+  /**
+   * SDF-6: deep-walk string leaves so structured values are REDACTED,
+   * never reported-redacted-but-returned-verbatim. Arrays/plain objects
+   * recurse; other values pass through untouched.
+   */
+  const redactValue = (input: unknown, matchedKinds: string[]): unknown => {
+    if (typeof input === 'string') return redactText(input, matchedKinds);
+    if (Array.isArray(input)) return input.map((item) => redactValue(item, matchedKinds));
+    if (input !== null && typeof input === 'object') {
+      const out: Record<string, unknown> = {};
+      for (const [key, val] of Object.entries(input as Record<string, unknown>)) {
+        out[key] = redactValue(val, matchedKinds);
+      }
+      return out;
+    }
+    return input;
+  };
+
   const spec = {
     name,
     check: (value: TValue): GuardrailResult<TValue> => {
-      let text = textOf(value);
       const matchedKinds: string[] = [];
-      for (const pat of patterns) {
-        const re = new RegExp(
-          pat.pattern.source,
-          pat.pattern.flags.includes('g') ? pat.pattern.flags : `${pat.pattern.flags}g`,
-        );
-        let m = re.exec(text);
-        while (m !== null) {
-          if (pat.validate && !pat.validate(m[0])) {
-            m = re.exec(text);
-            continue;
-          }
-          matchedKinds.push(pat.kind);
-          if (action === 'rewrite') {
-            const replacement = `[REDACTED:${pat.kind}]`;
-            text = text.slice(0, m.index) + replacement + text.slice(m.index + m[0].length);
-            re.lastIndex = m.index + replacement.length;
-          }
-          m = re.exec(text);
-        }
-      }
+      const redacted = redactValue(value, matchedKinds);
       if (matchedKinds.length === 0) return { ok: true };
       const result: GuardrailResult<TValue> = {
         ok: false,
         action,
         message: `value contains ${matchedKinds.length} PII match(es): ${[...new Set(matchedKinds)].join(', ')}`,
-        ...(action === 'rewrite'
-          ? { rewrite: typeof value === 'string' ? (text as TValue) : value }
-          : {}),
+        // SDF-6 invariant: a rewrite is never the unredacted input —
+        // string leaves with matches were replaced above for every
+        // value shape (string, array, object).
+        ...(action === 'rewrite' ? { rewrite: redacted as TValue } : {}),
         metadata: Object.freeze({ matchedKinds }),
       };
       return result;
@@ -148,20 +171,6 @@ export function piiDetection<TValue = unknown>(
   return stage === 'input'
     ? (defineInputGuardrail<TValue>(spec) as InputGuardrail<TValue>)
     : (defineOutputGuardrail<TValue>(spec) as OutputGuardrail<TValue>);
-}
-
-function textOf(value: unknown): string {
-  if (typeof value === 'string') return value;
-  if (value === null || value === undefined) return '';
-  if (Array.isArray(value)) return value.map(textOf).join('\n');
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value);
-    } catch {
-      return String(value);
-    }
-  }
-  return String(value);
 }
 
 /**

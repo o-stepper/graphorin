@@ -17,6 +17,7 @@ import type { AuthTokenRecord, AuthTokenStore } from '@graphorin/core/contracts'
 
 import { assessSecretStrength } from '../hardening/weak-secret.js';
 import { SecretValue } from '../secrets/secret-value.js';
+import { emitAuthAudit } from './audit-emitter.js';
 import { WeakPepperError } from './errors.js';
 import { validateScopeSet } from './scope.js';
 import { DEFAULT_TOKEN_PREFIX, generateRawToken, type TokenEnvironment } from './token-format.js';
@@ -70,6 +71,9 @@ export async function createToken(options: CreateTokenOptions): Promise<CreatedT
   }
 
   const now = options.now ?? Date.now;
+  // SPL-11: a weak pepper makes stolen hashHex offline-brute-forceable —
+  // enforce strength wherever a pepper is consumed, not only in rotation.
+  await assertPepperStrength(options.pepper);
   const generated = generateRawToken({
     env: options.env,
     ...(options.prefix === undefined ? {} : { prefix: options.prefix }),
@@ -89,6 +93,14 @@ export async function createToken(options: CreateTokenOptions): Promise<CreatedT
     ...(expiresAt === undefined ? {} : { expiresAt }),
   });
   await options.tokenStore.put(record);
+
+  emitAuthAudit({
+    action: 'token:create',
+    decision: 'success',
+    ts: now(),
+    target: id,
+    metadata: { scopes: [...options.scopes], env: String(options.env) },
+  });
 
   return Object.freeze({
     raw: SecretValue.fromString(generated.raw, {
@@ -126,12 +138,22 @@ export async function listTokens(
 export async function revokeToken(
   tokenStore: AuthTokenStore,
   id: string,
-  opts: { readonly now?: () => number } = {},
+  opts: {
+    readonly now?: () => number;
+    /**
+     * SPL-9: pass the live `TokenVerifier` so revocation invalidates its
+     * LRU entry immediately — without it a revoked token keeps verifying
+     * from the cache for up to `cacheTtlMaxMs` (default 60s).
+     */
+    readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
+  } = {},
 ): Promise<TokenMetadata | undefined> {
   const now = opts.now ?? Date.now;
   const existing = await tokenStore.get(id);
   if (existing === null) return undefined;
   if (existing.revokedAt !== undefined) return toTokenMetadata(existing);
+  opts.verifier?.invalidate(existing.hashHex);
+  emitAuthAudit({ action: 'token:revoke', decision: 'success', ts: now(), target: id });
   const ts = new Date(now()).toISOString();
   await tokenStore.revoke(id, ts);
   const updated = await tokenStore.get(id);
@@ -150,6 +172,8 @@ export async function rotateToken(
     readonly id: string;
     readonly env?: TokenEnvironment | string;
     readonly scopesOverride?: ReadonlyArray<string>;
+    /** SPL-9: invalidates the rotated-out token's verifier cache entry. */
+    readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
   },
 ): Promise<{ readonly old: TokenMetadata; readonly next: CreatedToken }> {
   const existing = await options.tokenStore.get(options.id);
@@ -159,6 +183,7 @@ export async function rotateToken(
   const scopes = options.scopesOverride ?? existing.scopes;
   const env = options.env ?? inferEnvFromExisting(existing);
   await options.tokenStore.revoke(options.id, new Date((options.now ?? Date.now)()).toISOString());
+  options.verifier?.invalidate(existing.hashHex);
   const next = await createToken({
     tokenStore: options.tokenStore,
     pepper: options.pepper,
@@ -171,55 +196,17 @@ export async function rotateToken(
     ...(options.now !== undefined ? { now: options.now } : {}),
   });
   const refreshed = await options.tokenStore.get(options.id);
+  emitAuthAudit({
+    action: 'token:rotate',
+    decision: 'success',
+    ts: (options.now ?? Date.now)(),
+    target: options.id,
+    metadata: { newId: next.record.id },
+  });
   return Object.freeze({
     old: toTokenMetadata(refreshed ?? existing),
     next,
   });
-}
-
-/**
- * Re-HMAC every token row with a new pepper. The previous pepper is
- * required to derive the per-row plaintext via re-hashing — the
- * function therefore only supports the rolling-deployment use case
- * where the framework still holds the old pepper at the time of
- * rotation.
- *
- * The store update is per-row; the caller is responsible for running
- * the helper inside an outer transaction when atomicity matters.
- *
- * Returns the number of rows the helper would update; when
- * `dryRun: true` the store is not touched.
- *
- * @stable
- */
-export async function rotatePepper(options: {
-  readonly tokenStore: AuthTokenStore;
-  readonly newPepper: SecretValue;
-  readonly oldHashLookup: (id: string) => Promise<string | null>;
-  readonly recomputeHash: (id: string, oldHashHex: string) => Promise<string | null>;
-  readonly dryRun?: boolean;
-}): Promise<{ readonly updated: number; readonly skipped: number }> {
-  await assertPepperStrength(options.newPepper);
-  const records = await options.tokenStore.list();
-  let updated = 0;
-  let skipped = 0;
-  for (const record of records) {
-    const oldHashHex = await options.oldHashLookup(record.id);
-    if (oldHashHex === null) {
-      skipped += 1;
-      continue;
-    }
-    const newHashHex = await options.recomputeHash(record.id, oldHashHex);
-    if (newHashHex === null) {
-      skipped += 1;
-      continue;
-    }
-    if (!options.dryRun) {
-      await options.tokenStore.put({ ...record, hashHex: newHashHex });
-    }
-    updated += 1;
-  }
-  return Object.freeze({ updated, skipped });
 }
 
 /**
@@ -253,6 +240,13 @@ export async function rekeyTokens(options: {
     });
     out.set(record.id, next.next);
   }
+  emitAuthAudit({
+    action: 'token:rekey',
+    decision: 'success',
+    ts: (options.now ?? Date.now)(),
+    target: 'all',
+    metadata: { rekeyed: out.size },
+  });
   return out;
 }
 
@@ -318,7 +312,8 @@ async function hmacHexAsync(pepper: SecretValue, raw: string): Promise<string> {
   );
 }
 
-async function assertPepperStrength(pepper: SecretValue): Promise<void> {
+/** @internal — shared with the verifier's lazy first-use check (SPL-11). */
+export async function assertPepperStrength(pepper: SecretValue): Promise<void> {
   const assessment = await pepper.useBuffer((buf) => assessSecretStrength(buf));
   if (!assessment.ok) {
     throw new WeakPepperError(assessment.byteLength, assessment.reason);

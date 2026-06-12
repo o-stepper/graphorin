@@ -101,13 +101,23 @@ export function resolveSandbox(input: ResolveSandboxInput): ResolvedSandboxPolic
     if (operatorRequestedDifferent) reasonParts.push(`override kind=${override.kind} ignored`);
     if (operatorRelaxedNetwork) reasonParts.push('override noNetwork=false ignored');
     if (operatorRelaxedFs) reasonParts.push('override noFilesystem=false ignored');
+    // SDF-10: an untrusted (forced) tier must keep a positive wall-clock
+    // limit — `timeoutMs:0` (meaning "unbounded") is ignored and falls
+    // back to the tier default; the coercion is itself a forced action.
+    const untrustedTimeout = clampForcedTimeout(
+      override.timeoutMs,
+      DEFAULT_TIMEOUTS_MS['worker-threads'],
+    );
+    if (override.timeoutMs !== undefined && override.timeoutMs <= 0) {
+      reasonParts.push(`override timeoutMs=${override.timeoutMs} ignored (mandatory wall-clock)`);
+    }
     return Object.freeze({
       kind: 'worker-threads',
       noNetwork: true,
       noFilesystem: true,
-      timeoutMs: clampTimeout(override.timeoutMs, DEFAULT_TIMEOUTS_MS['worker-threads']),
+      timeoutMs: untrustedTimeout,
       maxMemoryMb: clampMemory(override.maxMemoryMb, 128),
-      forced,
+      forced: forced || (override.timeoutMs !== undefined && override.timeoutMs <= 0),
       reason: reasonParts.join('; '),
     });
   }
@@ -136,6 +146,16 @@ export function resolveSandbox(input: ResolveSandboxInput): ResolvedSandboxPolic
 
 function clampTimeout(value: number | undefined, fallback: number): number {
   if (value === undefined || value < 0) return fallback;
+  return value;
+}
+
+/**
+ * SDF-10: like `clampTimeout` but for forced (untrusted) tiers — a
+ * non-positive value means "no limit", which is never acceptable here:
+ * coerce it to the tier default instead.
+ */
+function clampForcedTimeout(value: number | undefined, fallback: number): number {
+  if (value === undefined || value <= 0) return fallback;
   return value;
 }
 

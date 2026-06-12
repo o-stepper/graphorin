@@ -117,3 +117,68 @@ describe('@graphorin/security/oauth — discovery', () => {
     ).rejects.toThrow(/aborted/i);
   });
 });
+
+// --- SPL-7 — https-only endpoints, issuer consistency, path-insertion ---------
+
+describe('SPL-7 — discovery hardening', () => {
+  beforeEach(() => resetOAuthSubsystem());
+  afterEach(() => resetOAuthSubsystem());
+
+  const metadataFor = (issuer: string, endpointOrigin = issuer) => ({
+    issuer,
+    authorization_endpoint: `${endpointOrigin}/oauth/authorize`,
+    token_endpoint: `${endpointOrigin}/oauth/token`,
+  });
+
+  it('rejects metadata whose endpoints are plain http on a non-localhost host', async () => {
+    _setDiscoveryFetcherForTesting(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => metadataFor('https://issuer.example.com', 'http://evil.example.com'),
+    }));
+    await expect(
+      fetchAuthorizationServerMetadata('https://issuer.example.com'),
+    ).rejects.toBeInstanceOf(OAuthDiscoveryError);
+  });
+
+  it('allows http endpoints for localhost / 127.0.0.1 (local development)', async () => {
+    _setDiscoveryFetcherForTesting(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => metadataFor('http://127.0.0.1:8080'),
+    }));
+    const metadata = await fetchAuthorizationServerMetadata('http://127.0.0.1:8080');
+    expect(metadata.tokenEndpoint).toBe('http://127.0.0.1:8080/oauth/token');
+  });
+
+  it('rejects metadata whose issuer does not match the discovery URL (RFC 8414 §3.3)', async () => {
+    _setDiscoveryFetcherForTesting(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => metadataFor('https://attacker.example.com'),
+    }));
+    await expect(
+      fetchAuthorizationServerMetadata('https://issuer.example.com'),
+    ).rejects.toBeInstanceOf(OAuthDiscoveryError);
+  });
+
+  it('builds the well-known URL via RFC 8414 path-insertion for path-bearing issuers', async () => {
+    const urls: string[] = [];
+    _setDiscoveryFetcherForTesting(async (url) => {
+      urls.push(url);
+      if (url === 'https://issuer.example.com/.well-known/oauth-authorization-server/tenant-a') {
+        return {
+          ok: true,
+          status: 200,
+          json: async () => metadataFor('https://issuer.example.com/tenant-a'),
+        };
+      }
+      return { ok: false, status: 404, json: async () => ({}) };
+    });
+    const metadata = await fetchAuthorizationServerMetadata('https://issuer.example.com/tenant-a');
+    expect(metadata.issuer).toBe('https://issuer.example.com/tenant-a');
+    expect(urls[0]).toBe(
+      'https://issuer.example.com/.well-known/oauth-authorization-server/tenant-a',
+    );
+  });
+});

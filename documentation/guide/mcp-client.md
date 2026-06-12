@@ -190,6 +190,10 @@ sequenceDiagram
 
 `createMCPClient(...)` opens the connection and performs the MCP `initialize` handshake before resolving. `client.close()` is idempotent and required for clean shutdown.
 
+## OAuth discovery hardening
+
+Discovery is a trust boundary (SPL-7): metadata names the endpoints that will receive authorization codes, refresh tokens and Basic client secrets. The client therefore **rejects non-https endpoints** (plain `http` is allowed only for loopback hosts — `localhost`, `127.0.0.1`, `[::1]` — for local development), **enforces RFC 8414 §3.3 issuer consistency** (the metadata `issuer` must equal the discovery URL it was fetched for), and builds well-known URLs via **RFC 8414 path-insertion** for path-bearing issuers (the suffix-append form is kept as a fallback for pre-RFC servers). The authorization callback also **requires the `state` parameter** (SPL-6) — a callback omitting it is rejected outright as a CSRF/code-injection attempt.
+
 ## Error mapping
 
 | MCP error code | Graphorin `ToolError.kind` |

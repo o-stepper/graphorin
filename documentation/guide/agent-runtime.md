@@ -342,6 +342,8 @@ Two opt-in agent-level guards configured on `createAgent({ causalityMonitor, mer
 
 Where the lateral-leak guards above match *patterns*, `dataFlowPolicy` (P1-3, opt-in) enforces *provenance* — a data-flow defence toward [CaMeL](https://arxiv.org/abs/2503.18813). It uses the metadata Graphorin already tracks (trust class + source + sensitivity) to defuse the **lethal trifecta**: untrusted content + private data + an exfiltration/mutation sink.
 
+**Handle-level taint inheritance (TL-6/SDF-7).** Content fetched back through `read_result` carries its *producer's* taint, not the reader's built-in trust — so a spilled untrusted body re-entering context records as untrusted, and a sink echoing it verbatim trips the gate exactly as a direct flow would. Practically, enforce mode blocks *more* than it did before handle inheritance: flows that previously laundered through spill+fetch are now gated.
+
 ```ts
 const agent = createAgent({
   name: 'assistant',

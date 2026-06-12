@@ -114,6 +114,9 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
         trustClass: input.trustClass,
         ...(input.source !== undefined ? { source: input.source } : {}),
         ...(input.sensitivity !== undefined ? { sensitivity: input.sensitivity } : {}),
+        // SDF-8: widen the trifecta `sensitive` leg to the operator's
+        // configured tiers (default secret-only ⇒ byte-identical).
+        ...(config.sensitiveTiers !== undefined ? { sensitiveTiers: config.sensitiveTiers } : {}),
       });
       ledger.recordOutput(label, input.outputText);
     },

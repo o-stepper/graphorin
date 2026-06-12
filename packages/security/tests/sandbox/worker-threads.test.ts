@@ -154,3 +154,35 @@ describe('WorkerThreadsSandbox', () => {
     expect(sandbox.capabilities.canEnforceMemoryLimit).toBe(true);
   });
 });
+
+describe('SDF-9 — process-escape hardening', () => {
+  it('blocks node:child_process even when fs/network are not restricted (always-blocked escape)', async () => {
+    const sandbox = createWorkerThreadsSandbox();
+    const result = await sandbox.run(
+      { kind: 'handler', module: HANDLERS, export: 'trySpawnEsm' },
+      { input: undefined },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message.toLowerCase()).toContain('denied');
+  });
+
+  it('blocks the CJS require() escape for an always-blocked module', async () => {
+    const sandbox = createWorkerThreadsSandbox();
+    const result = await sandbox.run(
+      { kind: 'handler', module: HANDLERS, export: 'trySpawnRequire' },
+      { input: undefined },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message.toLowerCase()).toContain('denied');
+  });
+
+  it('blocks the CJS require() escape for fs when noFilesystem is set', async () => {
+    const sandbox = createWorkerThreadsSandbox({ noFilesystem: true });
+    const result = await sandbox.run(
+      { kind: 'handler', module: HANDLERS, export: 'tryFsRequire' },
+      { input: undefined },
+    );
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message.toLowerCase()).toContain('denied');
+  });
+});

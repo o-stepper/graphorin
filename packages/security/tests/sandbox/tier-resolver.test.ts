@@ -68,3 +68,22 @@ describe('resolveSandbox', () => {
     expect(policy.reason).toContain("'trusted'");
   });
 });
+
+describe('SDF-10 — untrusted-tier wall-clock timeout floor', () => {
+  it('an override timeoutMs:0 on the untrusted tier is ignored, yielding a positive forced timeout', () => {
+    const policy = resolveSandbox({
+      trustLevel: 'untrusted',
+      override: { timeoutMs: 0 },
+    });
+    expect(policy.timeoutMs).toBeGreaterThan(0);
+    expect(policy.forced).toBe(true);
+  });
+
+  it('a positive override is still honoured (above the floor)', () => {
+    const policy = resolveSandbox({
+      trustLevel: 'untrusted',
+      override: { timeoutMs: 90_000 },
+    });
+    expect(policy.timeoutMs).toBe(90_000);
+  });
+});

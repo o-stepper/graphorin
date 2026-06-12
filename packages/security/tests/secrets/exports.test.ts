@@ -53,7 +53,8 @@ describe('@graphorin/security barrel exports', () => {
     expect(typeof security.createToken).toBe('function');
     expect(typeof security.revokeToken).toBe('function');
     expect(typeof security.rotateToken).toBe('function');
-    expect(typeof security.rotatePepper).toBe('function');
+    // SPL-10: rotatePepper removed (impossible mechanism) — rekeyTokens is the rotation.
+    expect('rotatePepper' in security).toBe(false);
     expect(typeof security.rekeyTokens).toBe('function');
     expect(typeof security.generatePepper).toBe('function');
     expect(security.DEFAULT_TOKEN_PREFIX).toBe('gph');

@@ -36,6 +36,8 @@ flowchart LR
 
 A tool declares its tier through `sandboxPolicy`; the executor maps that to a resolved kind (`'sandboxed' → 'worker-threads'`, `'isolated' → 'isolated-vm'`). Today this policy is **advisory for inline (`config.tools`) and MCP-derived tools**: it is resolved and surfaced on the `tool.execute` span / audit row, but those tools execute **in-process** — the agent runtime intentionally ships with no `sandboxResolver` wired. Real out-of-process isolation applies only to **code-mode** scripts and to tools an operator routes through a custom `sandboxResolver`; module-loadable skill / MCP isolation is wired when those land. See the per-field runtime behaviour in [Agent runtime](/guide/agent-runtime).
 
+The `'worker-threads'` tier is **best-effort** isolation, not a security boundary: the worker shares the host process and filesystem. It blocks `fs` / network module imports (ESM resolve hook + a CJS `require` interception) and always denies the process-escape modules `child_process` / `vm` / `cluster` / `inspector` / `worker_threads` (SDF-9), but a determined attacker with native addons or other escapes is not contained — load genuinely untrusted code under `'isolated-vm'` (V8 isolate) or `'docker'` (kernel) instead.
+
 `isolated-vm` and `dockerode` are **opt-in peer dependencies** — they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code; `'none'` and `'worker-threads'` need nothing extra.
 
 ## Sensitivity model
@@ -62,7 +64,7 @@ graphorin token revoke <token-id>
 
 The pepper itself is resolved at server boot through a `SecretRef` (typically stored under `keyring:graphorin_server_pepper` or the encrypted-file store). See [Secrets](/guide/secrets) for the resolution pipeline.
 
-**Pepper strength.** Installing a pepper (`rotatePepper` / `rekeyTokens`) runs a weak-secret check: peppers below 32 bytes, with low Shannon entropy, or containing a long run of identical bytes (placeholder/test values) are rejected with a `WeakPepperError` whose `reason` explains the failure. Generate peppers with `crypto.randomBytes(32)` or the auth library's `generatePepper()`. The underlying heuristic is exported as `assessSecretStrength(bytes)` from `@graphorin/security` (and `@graphorin/security/hardening`) — a pure function returning `{ ok, reason, shannonBitsPerByte, maxIdenticalRun, … }` — so you can apply the same bar to your own passphrases.
+**Pepper strength.** Consuming a pepper (`createToken`, `rekeyTokens`, the `TokenVerifier`'s first use) runs a weak-secret check: peppers below 32 bytes, with low Shannon entropy, or containing a long run of identical bytes (placeholder/test values) are rejected with a `WeakPepperError` whose `reason` explains the failure. Generate peppers with `crypto.randomBytes(32)` or the auth library's `generatePepper()`. The underlying heuristic is exported as `assessSecretStrength(bytes)` from `@graphorin/security` (and `@graphorin/security/hardening`) — a pure function returning `{ ok, reason, shannonBitsPerByte, maxIdenticalRun, … }` — so you can apply the same bar to your own passphrases.
 
 ## Audit log
 
@@ -138,7 +140,7 @@ The agent runtime's defense layer composes orthogonally with the security primit
 
 ## Provenance / data-flow policy
 
-The lateral-leak guards above match **patterns**; the data-flow policy (`@graphorin/security/dataflow`, opt-in, toward [CaMeL](https://arxiv.org/abs/2503.18813)) enforces **provenance**. It reuses the metadata Graphorin already attaches to every tool — trust class + source + sensitivity — to defuse the **lethal trifecta**: untrusted content + access to private data + an exfiltration/mutation sink. With all three present in one run, a prompt injection hidden in the untrusted content can drive the sink; the policy makes that flow fail closed (or, in shadow mode, merely report) unless an operator has explicitly declassified it.
+The lateral-leak guards above match **patterns**; the data-flow policy (`@graphorin/security/dataflow`, opt-in, toward [CaMeL](https://arxiv.org/abs/2503.18813)) enforces **provenance**. It reuses the metadata Graphorin already attaches to every tool — trust class + source + sensitivity — to defuse the **lethal trifecta**: untrusted content + access to private data + an exfiltration/mutation sink. With all three present in one run, a prompt injection hidden in the untrusted content can drive the sink; the policy makes that flow fail closed (or, in shadow mode, merely report) unless an operator has explicitly declassified it. By default only `sensitivity: 'secret'` content arms the "private data" leg (so the gate does not fire on every run); set `sensitiveTiers: ['secret', 'internal']` on the policy config to also count ordinary user/PII content (which defaults to `'internal'`). The verbatim `untrusted-to-sink` leg is independent of this knob.
 
 ```mermaid
 flowchart LR

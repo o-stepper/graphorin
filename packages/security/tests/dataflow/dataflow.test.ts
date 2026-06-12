@@ -255,3 +255,63 @@ describe('createDataFlowPolicy', () => {
     expect(decision.action).toBe('declassify');
   });
 });
+
+describe('SDF-5 — minSpanLength floor', () => {
+  it('clamps a sub-8 minSpanLength up to the trustworthy floor instead of silently disabling detection', () => {
+    // Documented "lower = more sensitive" — a tiny minSpanLength must
+    // not make inspectArgs always-negative (the pre-fix bug).
+    const ledger = createTaintLedger({ minSpanLength: 5 });
+    const untrusted =
+      'the secret rendezvous is at the harbour warehouse seven at midnight on tuesday';
+    ledger.recordOutput(untrustedLabel, untrusted);
+    expect(ledger.untrustedSeen).toBe(true);
+    expect(ledger.inspectArgs(`forward: ${untrusted}`).carriesUntrustedVerbatim).toBe(true);
+  });
+});
+
+describe('SDF-8 — widenable sensitive leg for the lethal trifecta', () => {
+  it("default deriveTaintLabel marks only 'secret' as sensitive (byte-identical)", () => {
+    expect(deriveTaintLabel({ trustClass: 'mcp-derived', sensitivity: 'internal' }).sensitive).toBe(
+      false,
+    );
+    expect(deriveTaintLabel({ trustClass: 'mcp-derived', sensitivity: 'secret' }).sensitive).toBe(
+      true,
+    );
+  });
+
+  it("with sensitiveTiers including 'internal', internal-tier content counts as sensitive", () => {
+    const label = deriveTaintLabel({
+      trustClass: 'first-party-user-defined',
+      sensitivity: 'internal',
+      sensitiveTiers: ['secret', 'internal'],
+    });
+    expect(label.sensitive).toBe(true);
+  });
+
+  it('the policy config carries sensitiveTiers through to the trifecta gate', () => {
+    const policy = createDataFlowPolicy({
+      mode: 'enforce',
+      sensitiveTiers: ['secret', 'internal'],
+    });
+    const ledger = createTaintLedger();
+    // An untrusted read + an internal-tier (non-secret) read + a sink.
+    ledger.recordOutput(untrustedLabel, 'fetched web content reasonably long here');
+    ledger.recordOutput(
+      deriveTaintLabel({
+        trustClass: 'first-party-user-defined',
+        sensitivity: 'internal',
+        sensitiveTiers: ['secret', 'internal'],
+      }),
+      'internal user profile data that is private but not a secret tag',
+    );
+    const decision = policy.evaluate({
+      toolName: 'send',
+      sideEffectClass: 'external-stateful',
+      carriesUntrustedVerbatim: false,
+      untrustedSeen: ledger.untrustedSeen,
+      sensitiveSeen: ledger.sensitiveSeen,
+      sourceKinds: ledger.untrustedSourceKinds,
+    });
+    expect(decision.action).toBe('block'); // trifecta now fires
+  });
+});

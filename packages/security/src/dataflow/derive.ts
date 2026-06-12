@@ -34,12 +34,21 @@ export function deriveTaintLabel(input: {
   readonly trustClass: ToolTrustClass;
   readonly source?: ToolSource;
   readonly sensitivity?: Sensitivity;
+  /**
+   * Sensitivity tiers that count as "sensitive" for the lethal-trifecta
+   * leg (SDF-8). Default `['secret']` — out of the box only secret-tagged
+   * content arms the trifecta, so the gate does not fire on every run.
+   * Widen to e.g. `['secret', 'internal']` to also treat ordinary
+   * user/PII content (which defaults to `'internal'`) as sensitive.
+   */
+  readonly sensitiveTiers?: ReadonlyArray<Sensitivity>;
 }): TaintLabel {
+  const sensitiveTiers = input.sensitiveTiers ?? (['secret'] as const);
   return {
     trustClass: input.trustClass,
     sourceKind: input.source?.kind ?? 'unknown',
     sensitivity: input.sensitivity ?? 'unknown',
     untrusted: UNTRUSTED_TRUST_CLASSES.has(input.trustClass),
-    sensitive: input.sensitivity === 'secret',
+    sensitive: input.sensitivity !== undefined && sensitiveTiers.includes(input.sensitivity),
   };
 }

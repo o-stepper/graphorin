@@ -27,7 +27,7 @@
   HMAC-SHA256-against-pepper verification, an LRU warm cache, per-IP
   and per-token brute-force lockouts, a concurrent-verify cap, and a
   set of CRUD helpers (`createToken`, `revokeToken`, `rotateToken`,
-  `rotatePepper`, `rekeyTokens`, `generatePepper`).
+  `rekeyTokens`, `generatePepper`).
 - **Tamper-evident audit log** — `appendAudit`, `verifyAuditChain`,
   `pruneAudit`, `exportAudit`, a canonical-JSON serialiser, an
   `AuditDb` interface, a binding registry that fail-fasts when the

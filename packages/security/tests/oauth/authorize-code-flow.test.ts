@@ -135,3 +135,27 @@ describe('@graphorin/security/oauth — Authorization Code + PKCE flow', () => {
     ).rejects.toThrow(/aborted/i);
   });
 });
+
+// --- SPL-6 — state is REQUIRED on the callback ---------------------------------
+
+describe('SPL-6 — callbacks without state are rejected', () => {
+  it('rejects a callback that simply OMITS the state parameter', async () => {
+    _setTokenEndpointFetcherForTesting(async () => {
+      throw new Error('token endpoint should not be reached');
+    });
+    _setBrowserOpenerForTesting(async (url) => {
+      const parsed = new URL(url);
+      const redirectUri = parsed.searchParams.get('redirect_uri');
+      // Drive-by request delivering an attacker-chosen code WITHOUT state.
+      await fetch(`${redirectUri}?code=attacker-code`);
+    });
+    await expect(
+      runAuthorizationCodeFlow({
+        serverId: 'mcp-test',
+        metadata: { server: buildSyntheticServerMetadata() },
+        registration: { clientId: 'cli_test' },
+        options: { scope: 'read', callbackTimeoutMs: 5_000 },
+      }),
+    ).rejects.toBeInstanceOf(OAuthCallbackError);
+  });
+});
