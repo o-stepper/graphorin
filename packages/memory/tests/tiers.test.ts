@@ -163,23 +163,27 @@ describe('@graphorin/memory/tiers — SessionMemory', () => {
     expect(await memory.session.shouldCompact(SCOPE, 100)).toBe(false);
   });
 
-  it('compact reports the count of removed/summarized', async () => {
+  it('compact never fabricates work counts — it removes nothing and says so (MRET-12)', async () => {
     const memory = makeMemory();
     for (let i = 0; i < 5; i++) {
       await memory.session.push(SCOPE, { role: 'user', content: `m${i}` });
     }
     const result = await memory.session.compact(SCOPE, { keepLastN: 2 });
-    expect(result.removed).toBe(3);
-    expect(result.summarized).toBe(3);
+    // The old stub reported total - keepLastN as "removed" while
+    // deleting nothing; the honest contract is zeros until a real
+    // splice exists at this layer.
+    expect(result.removed).toBe(0);
+    expect(result.summarized).toBe(0);
+    expect((await memory.session.list(SCOPE)).length).toBe(5);
   });
 
-  it('flushImportant returns a no-op shell in Phase 10a', async () => {
+  it('flushImportant is an honest no-op (MRET-12)', async () => {
     const memory = makeMemory();
     const result = await memory.session.flushImportant(SCOPE);
     expect(result.flushed).toBe(0);
   });
 
-  it('attributedFor returns an empty array in Phase 10a', async () => {
+  it('attributedFor is an honest empty list (MRET-12)', async () => {
     const memory = makeMemory();
     const out = await memory.session.attributedFor(SCOPE);
     expect(out.length).toBe(0);
