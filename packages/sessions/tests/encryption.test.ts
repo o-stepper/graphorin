@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { SessionExportEncryptionRequiredError } from '../src/errors/index.js';
 import {
   createBufferSink,
   createSessionExportWriter,
@@ -48,6 +49,53 @@ describe('Session export AES-256-GCM helpers', () => {
     const parsed = readSessionExport(restored);
     expect(parsed.records[0]?.kind).toBe('session');
     expect(parsed.footer.checksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+  });
+
+  it('writer.encrypt encrypts the body inline; reader restores with the key, throws without (RP-1)', async () => {
+    const salt = new TextEncoder().encode('graphorin-salt-rp1-00000000000000');
+    const key = await deriveSessionExportKey('top-secret-pass', salt);
+    const buffer = createBufferSink();
+    const writer = createSessionExportWriter(buffer.sink, {
+      writer: '@graphorin/sessions@0.4.0',
+      hash: true,
+      encrypt: { key },
+    });
+    await writer.writeRecord({
+      kind: 'session',
+      id: 'sess-secret-xyz',
+      userId: 'u-1',
+      agentId: 'main',
+      createdAt: '2026-05-08T10:00:00Z',
+    });
+    const footer = await writer.close();
+    const body = buffer.toString();
+
+    // The record's secret content must NOT survive as plaintext.
+    expect(body).not.toContain('sess-secret-xyz');
+    expect(footer.cipher).toBe('aes256gcm');
+
+    // Reader WITH the key restores the original record.
+    const parsed = readSessionExport(body, { decryptionKey: key });
+    expect(parsed.records[0]?.kind).toBe('session');
+    expect((parsed.records[0] as { id?: string }).id).toBe('sess-secret-xyz');
+
+    // Reader WITHOUT the key throws the typed error instead of mis-parsing.
+    expect(() => readSessionExport(body)).toThrow(SessionExportEncryptionRequiredError);
+  });
+
+  it('a non-encrypted export stamps no cipher on the footer (RP-1)', async () => {
+    const buffer = createBufferSink();
+    const writer = createSessionExportWriter(buffer.sink, { writer: 'w' });
+    await writer.writeRecord({
+      kind: 'session',
+      id: 's',
+      userId: 'u',
+      agentId: 'a',
+      createdAt: '2026-05-08T10:00:00Z',
+    });
+    const footer = await writer.close();
+    expect(footer.cipher).toBeUndefined();
+    expect(buffer.toString()).toContain('"id":"s"'); // plaintext, as expected
   });
 
   it('rejects ciphertext with a corrupted auth tag', async () => {

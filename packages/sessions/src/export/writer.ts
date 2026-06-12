@@ -123,10 +123,41 @@ export function createSessionExportWriter(
   let agentCount = 0;
   let recordCount = 0;
   const hashBuilder = options.hash === true ? createHash('sha256') : null;
+  // RP-1: lazily resolve the body-encryption key (the writer factory is sync,
+  // but key derivation is async). Memoised so it derives at most once.
+  let encryptionKey: Promise<Uint8Array> | null = null;
+  function resolveEncryptionKey(): Promise<Uint8Array> {
+    const enc = options.encrypt;
+    if (enc === undefined) {
+      throw new TypeError('[graphorin/sessions] internal: resolveEncryptionKey without encrypt');
+    }
+    if (enc.key !== undefined) return Promise.resolve(enc.key);
+    if (enc.passphrase !== undefined && enc.salt !== undefined) {
+      return deriveSessionExportKey(enc.passphrase, enc.salt);
+    }
+    throw new TypeError(
+      '[graphorin/sessions] encrypt requires either a pre-derived `key` or `passphrase` + `salt`.',
+    );
+  }
 
   async function writeLine(line: string): Promise<void> {
     if (hashBuilder !== null) hashBuilder.update(line, 'utf8');
     await sink.write(line);
+  }
+
+  // RP-1: when encryption is configured, the body record is AES-256-GCM
+  // encrypted and emitted as a self-identifying `{"enc":"<base64>"}` line. The
+  // meta header + footer stay plaintext so an importer can fail fast; the body
+  // checksum (if any) covers the encrypted output line, matching the reader.
+  async function writeBody(recordLine: string): Promise<void> {
+    if (options.encrypt === undefined) {
+      await writeLine(recordLine);
+      return;
+    }
+    encryptionKey ??= resolveEncryptionKey();
+    const key = await encryptionKey;
+    const ciphertext = encryptBody(new TextEncoder().encode(recordLine.replace(/\n$/, '')), key);
+    await writeLine(`${JSON.stringify({ enc: Buffer.from(ciphertext).toString('base64') })}\n`);
   }
 
   async function emitHeader(): Promise<void> {
@@ -160,7 +191,7 @@ export function createSessionExportWriter(
     else if (record.kind === 'handoff') handoffCount += 1;
     else if (record.kind === 'agent') agentCount += 1;
     recordCount += 1;
-    await writeLine(`${JSON.stringify(record)}\n`);
+    await writeBody(`${JSON.stringify(record)}\n`);
   }
 
   async function close(): Promise<SessionExportFooterRecord> {

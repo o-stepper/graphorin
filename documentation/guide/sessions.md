@@ -104,6 +104,26 @@ The `lastN(10)` default plus the filter library from `@graphorin/agent` mean the
 
 The schema is byte-stable — replays always produce the same payload byte-for-byte for the same input.
 
+### Encryption (opt-in)
+
+Pass `encrypt` to the writer to AES-256-GCM the body. Each body record is
+encrypted independently and emitted as a self-identifying `{"enc":"…"}` line;
+the meta header and footer stay plaintext so an importer can fail fast, and the
+footer stamps `cipher: "aes256gcm"`. Supply either a pre-derived 32-byte `key`
+or a `passphrase` + `salt` (derived via `deriveSessionExportKey`).
+
+```ts
+import { deriveSessionExportKey } from '@graphorin/sessions/export';
+
+const key = await deriveSessionExportKey(passphrase, salt);
+await session.export({ schema: '1.0', writer, encrypt: { key } });
+// Import: readSessionExport(body, { decryptionKey: key }).
+// Without the key, the reader throws SessionExportEncryptionRequiredError.
+```
+
+The same `salt` must be supplied to the importer to re-derive the key. A
+non-encrypted export never stamps `cipher`.
+
 ## Replay
 
 ```ts

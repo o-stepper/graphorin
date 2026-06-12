@@ -49,6 +49,9 @@ describe('Tool cassette format', () => {
     expect(parsed.toolCalls).toHaveLength(1);
     expect(parsed.footer.toolCallCount).toBe(1);
     expect(parsed.footer.checksum).toMatch(/^sha256:[a-f0-9]{64}$/);
+    // RP-1: the cassette writer has no encryption pipeline, so it must never
+    // stamp a `cipher` it can't honour.
+    expect(parsed.footer.cipher).toBeUndefined();
   });
 
   it('rejects an out-of-order tool-call cursor', async () => {
