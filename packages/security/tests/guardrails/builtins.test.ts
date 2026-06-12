@@ -259,3 +259,42 @@ describe('compose with multiple built-ins', () => {
     }
   });
 });
+
+// --- SDF-6 — piiDetection rewrite works on object/array values ----------------
+
+describe('SDF-6 — piiDetection redacts structured values instead of passing them through', () => {
+  it('rewrites PII inside object string leaves (never returns the unredacted original)', async () => {
+    const g = guardrails.piiDetection<{ user: { email: string; note: string }; tags: string[] }>();
+    const value = {
+      user: { email: 'contact hello@example.com now', note: 'ssn 123-45-6789' },
+      tags: ['call 4111 1111 1111 1111'],
+    };
+    const result = await g.check(value, ctx);
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error('expected a PII hit');
+    expect(result.action).toBe('rewrite');
+    const rewritten = result.rewrite;
+    if (rewritten === undefined) throw new Error('expected a rewrite payload');
+    // The acceptance: no path where ok:false + the UNCHANGED value flows on.
+    expect(rewritten).not.toEqual(value);
+    expect(rewritten.user.email).toContain('[REDACTED:email]');
+    expect(rewritten.user.email).not.toContain('hello@example.com');
+    expect(rewritten.tags[0]).toContain('[REDACTED:');
+    expect(rewritten.tags[0]).not.toContain('4111 1111 1111 1111');
+    // Clean fields survive untouched.
+    expect(rewritten.user.note).toContain('[REDACTED:');
+  });
+
+  it('a clean object passes ok:true', async () => {
+    const g = guardrails.piiDetection<{ msg: string }>();
+    const result = await g.check({ msg: 'nothing sensitive here' }, ctx);
+    expect(result.ok).toBe(true);
+  });
+
+  it('string rewrite behaviour is unchanged', async () => {
+    const g = guardrails.piiDetection<string>();
+    const result = await g.check('email me at hello@example.com', ctx);
+    if (result.ok) throw new Error('expected a hit');
+    expect(result.rewrite).toContain('[REDACTED:email]');
+  });
+});
