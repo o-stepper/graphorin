@@ -891,29 +891,45 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     }
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
     const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
-    const binds: Array<Buffer | string | number> = [
-      Buffer.from(embedding.buffer),
-      topK,
-      scope.userId,
-      embedderId,
-    ];
-    if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
-    const rows = this.#conn.all<FactRow & { distance: number }>(
-      `SELECT f.*, v.distance AS distance
-       FROM ${quoteIdent(tableName)} v
-       JOIN facts f ON f.id = v.fact_id
-       WHERE v.embedding MATCH ?
-         AND v.k = ?
-         AND f.scope_user_id = ?
-         AND f.embedder_id = ?
-         AND f.deleted_at IS NULL
-         AND f.archived = 0
-         ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
-         ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
-       ORDER BY v.distance`,
-      binds,
-    );
-    return rows.map((row) => ({
+    const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
+      const binds: Array<Buffer | string | number> = [
+        Buffer.from(embedding.buffer),
+        k,
+        scope.userId,
+        embedderId,
+      ];
+      if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
+      return this.#conn.all<FactRow & { distance: number }>(
+        `SELECT f.*, v.distance AS distance
+         FROM ${quoteIdent(tableName)} v
+         JOIN facts f ON f.id = v.fact_id
+         WHERE v.embedding MATCH ?
+           AND v.k = ?
+           AND f.scope_user_id = ?
+           AND f.embedder_id = ?
+           AND f.deleted_at IS NULL
+           AND f.archived = 0
+           ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
+         ORDER BY v.distance`,
+        binds,
+      );
+    };
+    // MRET-9: the vec0 k-nearest slice is GLOBAL (the table has no user
+    // partition) and every scope / validity / quarantine filter applies
+    // AFTER the cut — a minority user could be starved to zero by a
+    // dominant user's vectors. Over-fetch and widen iteratively until
+    // `topK` rows survive the filters or the table is exhausted.
+    const total =
+      this.#conn.get<{ n: number }>(`SELECT COUNT(*) AS n FROM ${quoteIdent(tableName)}`)?.n ?? 0;
+    if (total === 0) return [];
+    let k = Math.min(Math.max(topK * 4, topK + 16), total);
+    let rows = runKnn(k);
+    while (rows.length < topK && k < total) {
+      k = Math.min(k * 2, total);
+      rows = runKnn(k);
+    }
+    return rows.slice(0, topK).map((row) => ({
       record: rowToFact(row),
       score: 1 - row.distance,
       signals: { vector: 1 - row.distance },
@@ -989,6 +1005,15 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
 
   async forget(id: string, reason?: string): Promise<void> {
     this.#conn.run('UPDATE facts SET deleted_at = ?, archived = 1 WHERE id = ?', [Date.now(), id]);
+    // MRET-9: a tombstoned fact must not keep occupying k-nearest slots —
+    // dead embeddings crowd the GLOBAL vec0 slice and starve live hits.
+    // The tombstone is terminal for recall, so the vector goes with it
+    // (purge already did this; forget leaked).
+    for (const tableName of this.#vectorMgr.knownTables()) {
+      if (tableName.startsWith('facts_vec_')) {
+        this.#conn.run(`DELETE FROM ${tableName} WHERE fact_id = ?`, [id]);
+      }
+    }
     void reason;
   }
 

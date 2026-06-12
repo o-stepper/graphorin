@@ -204,3 +204,86 @@ describe('vec0 integration via sqlite-vec', () => {
     await store.close();
   });
 });
+
+describe('MRET-9 — KNN over-fetch + tombstone hygiene', () => {
+  it('a minority user gets their full topK despite a dominant user saturating the slice', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-mret9-'));
+    const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
+    await store.init();
+    const meta = store.embeddings.registerOrReturn({
+      id: 'transformersjs:m@4',
+      embedderKind: 'transformersjs',
+      model: 'm',
+      dim: 4,
+      configHash: 'cfg-mret9',
+    });
+    const semantic = store.memory.semantic as unknown as {
+      rememberWithEmbedding(
+        f: import('@graphorin/core').Fact,
+        opts: { embedding: { embedderId: string; vector: Float32Array } },
+      ): Promise<void>;
+      searchVector(
+        scope: { userId: string },
+        embedding: Float32Array,
+        embedderId: string,
+        topK: number,
+      ): Promise<ReadonlyArray<{ record: { id: string } }>>;
+      forget(id: string, reason?: string): Promise<void>;
+    };
+    const target = new Float32Array([1, 0, 0, 0]);
+    // 95 dominant-user vectors NEAR the query (they fill any small slice)…
+    for (let i = 0; i < 95; i += 1) {
+      await semantic.rememberWithEmbedding(
+        {
+          id: `dom-${i}`,
+          kind: 'semantic',
+          userId: 'dominant',
+          sensitivity: 'internal',
+          text: `dominant fact ${i}`,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          embedding: {
+            embedderId: meta.id,
+            vector: new Float32Array([1, 0.001 * i, 0, 0]),
+          },
+        },
+      );
+    }
+    // …and 5 minority-user vectors strictly FARTHER from the query.
+    for (let i = 0; i < 5; i += 1) {
+      await semantic.rememberWithEmbedding(
+        {
+          id: `min-${i}`,
+          kind: 'semantic',
+          userId: 'minority',
+          sensitivity: 'internal',
+          text: `minority fact ${i}`,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          embedding: {
+            embedderId: meta.id,
+            vector: new Float32Array([0, 1, 0.05 * i, 0]),
+          },
+        },
+      );
+    }
+    // Pre-fix: k = topK bound the GLOBAL slice to the 5 nearest rows —
+    // all dominant — and the minority scope filtered down to zero.
+    const hits = await semantic.searchVector({ userId: 'minority' }, target, meta.id, 5);
+    expect(hits.length).toBe(5);
+    expect(hits.every((h) => h.record.id.startsWith('min-'))).toBe(true);
+
+    // Tombstoned facts release their k-nearest slots (vec0 row deleted).
+    const before = store.connection.get<{ n: number }>(
+      `SELECT COUNT(*) AS n FROM ${meta.vecTableFacts}`,
+    );
+    await semantic.forget('dom-0');
+    const after = store.connection.get<{ n: number }>(
+      `SELECT COUNT(*) AS n FROM ${meta.vecTableFacts}`,
+    );
+    expect((before?.n ?? 0) - (after?.n ?? 0)).toBe(1);
+    await store.close();
+  });
+});
