@@ -23,6 +23,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { AuthTokenRecord, AuthTokenStore } from '@graphorin/core/contracts';
 
 import type { SecretValue } from '../secrets/secret-value.js';
+import { emitAuthAudit } from './audit-emitter.js';
 import { assertPepperStrength } from './crud.js';
 import { TokenVerifyOverloadError } from './errors.js';
 import { LruCache } from './lru.js';
@@ -248,6 +249,13 @@ export class TokenVerifier {
       }
 
       if (this.#tokenLockouts.has(tokenId)) {
+        emitAuthAudit({
+          action: 'auth:denied:lockout',
+          decision: 'denied',
+          ts: now,
+          target: tokenId,
+          ...(ip === undefined ? {} : { metadata: { ip } }),
+        });
         return Object.freeze({ ok: false, reason: 'token-locked-out' as const });
       }
 
@@ -285,6 +293,7 @@ export class TokenVerifier {
         /* swallow — last-used is opportunistic. */
       });
 
+      emitAuthAudit({ action: 'auth:granted', decision: 'success', ts: now, target: tokenId });
       return Object.freeze({ ok: true, token: verified });
     } finally {
       this.#inFlight = Math.max(0, this.#inFlight - 1);

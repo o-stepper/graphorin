@@ -24,6 +24,11 @@ export {
   openAuditDb,
   registerAuditDbBinding,
 } from './audit-db.js';
+export {
+  type AuthBridgeTeardown,
+  type BridgeAuthToAuditOptions,
+  bridgeAuthToAudit,
+} from './auth-bridge.js';
 export { canonicalJson } from './canonical-json.js';
 export {
   AuditChainBrokenError,

@@ -55,8 +55,10 @@ export interface OpenAuditDbOptions {
 
 /**
  * Shape of a registered binding. The factory is asynchronous so it
- * can perform the file-mode check, run the cipher self-test, and
- * write the `audit:db.opened` chain entry before returning.
+ * can perform the file-mode check and run the cipher self-test before
+ * returning. (It does NOT write an `audit:db-opened` chain entry — the
+ * database is not yet ready to record its own opening; an operator that
+ * wants one appends it after `openAuditDb(...)` resolves.)
  *
  * @stable
  */

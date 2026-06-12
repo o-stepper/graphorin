@@ -8,6 +8,17 @@
  */
 
 export {
+  _getAuthAuditListenerCountForTesting,
+  _resetAuthAuditListenersForTesting,
+  type AuthAuditAction,
+  type AuthAuditActor,
+  type AuthAuditDecision,
+  type AuthAuditEvent,
+  type AuthAuditListener,
+  emitAuthAudit,
+  onAuthAudit,
+} from './audit-emitter.js';
+export {
   type CreatedToken,
   type CreateTokenOptions,
   createToken,

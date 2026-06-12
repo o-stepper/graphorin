@@ -17,6 +17,7 @@ import type { AuthTokenRecord, AuthTokenStore } from '@graphorin/core/contracts'
 
 import { assessSecretStrength } from '../hardening/weak-secret.js';
 import { SecretValue } from '../secrets/secret-value.js';
+import { emitAuthAudit } from './audit-emitter.js';
 import { WeakPepperError } from './errors.js';
 import { validateScopeSet } from './scope.js';
 import { DEFAULT_TOKEN_PREFIX, generateRawToken, type TokenEnvironment } from './token-format.js';
@@ -93,6 +94,14 @@ export async function createToken(options: CreateTokenOptions): Promise<CreatedT
   });
   await options.tokenStore.put(record);
 
+  emitAuthAudit({
+    action: 'token:create',
+    decision: 'success',
+    ts: now(),
+    target: id,
+    metadata: { scopes: [...options.scopes], env: String(options.env) },
+  });
+
   return Object.freeze({
     raw: SecretValue.fromString(generated.raw, {
       source: { resolver: 'createToken', ref: `token:${id}` },
@@ -144,6 +153,7 @@ export async function revokeToken(
   if (existing === null) return undefined;
   if (existing.revokedAt !== undefined) return toTokenMetadata(existing);
   opts.verifier?.invalidate(existing.hashHex);
+  emitAuthAudit({ action: 'token:revoke', decision: 'success', ts: now(), target: id });
   const ts = new Date(now()).toISOString();
   await tokenStore.revoke(id, ts);
   const updated = await tokenStore.get(id);
@@ -186,6 +196,13 @@ export async function rotateToken(
     ...(options.now !== undefined ? { now: options.now } : {}),
   });
   const refreshed = await options.tokenStore.get(options.id);
+  emitAuthAudit({
+    action: 'token:rotate',
+    decision: 'success',
+    ts: (options.now ?? Date.now)(),
+    target: options.id,
+    metadata: { newId: next.record.id },
+  });
   return Object.freeze({
     old: toTokenMetadata(refreshed ?? existing),
     next,
@@ -223,6 +240,13 @@ export async function rekeyTokens(options: {
     });
     out.set(record.id, next.next);
   }
+  emitAuthAudit({
+    action: 'token:rekey',
+    decision: 'success',
+    ts: (options.now ?? Date.now)(),
+    target: 'all',
+    metadata: { rekeyed: out.size },
+  });
   return out;
 }
 
