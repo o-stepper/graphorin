@@ -463,6 +463,22 @@ describe('createMemory({ procedureInduction }) (P2-2)', () => {
     expect(provider.calls.length).toBe(1);
   });
 
+  it('induction spend lands in the consolidator budget when one is enabled (MCON-15)', async () => {
+    const provider = scriptProvider([JSON.stringify(PROC)]);
+    const memory = createMemory({
+      store: createInMemoryStore({ withConsolidatorStore: true }),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      procedureInduction: { provider },
+      consolidator: { tier: 'cheap', defaultScope: scope },
+    });
+    await memory.consolidator.start();
+    const before = (await memory.consolidator.status()).budgetRemaining;
+    await memory.procedural.induce(scope, TRAJ);
+    const after = (await memory.consolidator.status()).budgetRemaining;
+    // The induction call's tokens were recorded against the daily ceiling.
+    expect(after.tokens).toBeLessThan(before.tokens);
+  });
+
   it('leaves induction unconfigured by default — no provider call path', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),

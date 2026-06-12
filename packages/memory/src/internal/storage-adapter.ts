@@ -411,6 +411,10 @@ export interface ConsolidatorRunFinish {
   readonly conflictsResolved?: number;
   readonly noiseFilteredCount?: number;
   readonly emptyExtractions?: number;
+  /** Episodes auto-formed by the run (P1-2 / MCON-17). */
+  readonly episodesFormed?: number;
+  /** Insights synthesized by the run's reflection pass (P1-1 / MCON-17). */
+  readonly insightsCreated?: number;
   readonly errorMessage?: string | null;
   readonly retryCount?: number;
 }

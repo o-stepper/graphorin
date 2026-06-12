@@ -21,6 +21,8 @@ const recallEpisodesOutputSchema = z.object({
       score: z.number(),
       startedAt: z.string(),
       endedAt: z.string(),
+      /** Trust-provenance tag (MST-10) — synthesized episodes say so. */
+      provenance: z.string().optional(),
     }),
   ),
 });
@@ -58,6 +60,8 @@ const deepRecallOutputSchema = z.object({
       text: z.string(),
       score: z.number(),
       sensitivity: deepRecallSensitivityEnum,
+      /** Trust-provenance tag (MST-10) — synthesized facts say so. */
+      provenance: z.string().optional(),
     }),
   ),
   sufficient: z.boolean(),
@@ -109,6 +113,10 @@ export function createRecallEpisodesTool(
           score: hit.score,
           startedAt: hit.record.startedAt,
           endedAt: hit.record.endedAt,
+          // MST-10: surface origin so a consumer can tell a synthesized
+          // (consolidator-extracted) episode from a first-party record —
+          // recalled text re-enters the model as trusted tool output.
+          ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
         })),
       };
     },
@@ -193,6 +201,8 @@ export function createDeepRecallTool(
           text: hit.record.text,
           score: hit.score,
           sensitivity: hit.record.sensitivity,
+          // MST-10: origin annotation, mirroring fact_search.
+          ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
         })),
         sufficient: result.sufficient,
         abstained: result.abstained,

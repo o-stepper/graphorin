@@ -656,6 +656,9 @@ export class SemanticMemory {
         const queries = await this.#expandQueries(query, opts);
         const lists: Array<ReadonlyArray<MemoryHit<Fact>>> = [];
         const listWeights: number[] = [];
+        // MRET-13: retriever-kind labels in lockstep with `lists` so the
+        // rrf.<label> explanation signals stay stable across fan-outs.
+        const listLabels: string[] = [];
         let primaryFtsCount = 0;
         let primaryVectorCount = 0;
         let isPrimary = true;
@@ -671,6 +674,7 @@ export class SemanticMemory {
           });
           lists.push(ftsHits);
           listWeights.push(wFts);
+          listLabels.push(`fts_${queries.indexOf(q)}`);
           const vectorHits = await this.#tryVectorSearch(
             scope,
             q,
@@ -681,6 +685,7 @@ export class SemanticMemory {
           if (vectorHits.length > 0) {
             lists.push(vectorHits);
             listWeights.push(wVector);
+            listLabels.push(`vector_${queries.indexOf(q)}`);
           }
           if (isPrimary) {
             primaryFtsCount = ftsHits.length;
@@ -694,6 +699,7 @@ export class SemanticMemory {
         if (hydeHits.length > 0) {
           lists.push(hydeHits);
           listWeights.push(wVector);
+          listLabels.push('hyde');
         }
         // P2-1: one-hop graph expansion — seed on the candidates gathered
         // so far and fuse in facts that share a canonical entity (a third
@@ -703,6 +709,7 @@ export class SemanticMemory {
         if (graphHits.length > 0) {
           lists.push(graphHits);
           listWeights.push(1);
+          listLabels.push('graph');
         }
         // X-2: weighted fusion runs through a per-call WeightedRRFReranker
         // built from the per-list weights; the default stays the
@@ -728,6 +735,7 @@ export class SemanticMemory {
             : finalTopK;
         const fused = await reranker.rerank(query, lists, {
           topK: fusedTopK,
+          labels: listLabels,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
         const decayed = await this.#applyDecay(scope, fused, opts.decay);

@@ -80,6 +80,12 @@ export interface Consolidator {
   resume(): Promise<void>;
   /** Subscribe to phase-finished notifications. Returns an unsubscribe. */
   onPhaseFinished(listener: PhaseListener): () => void;
+  /**
+   * Record memory-pipeline LLM spend that happened OUTSIDE a phase run
+   * (MCON-15 — e.g. workflow induction) so the daily ceilings cover it.
+   * Counted under the deep-phase bucket.
+   */
+  recordExternalSpend(tokens: number, costUsd?: number): void;
   /** Active config — frozen snapshot. */
   config(): ConsolidatorConfig;
   /**
@@ -115,6 +121,9 @@ class ConsolidatorImpl implements Consolidator {
   readonly #now: () => number;
   readonly #randomId: () => string;
   readonly #provider: Provider | null;
+  /** Per-phase provider overrides (MCON-7); fall back to `#provider`. */
+  readonly #cheapProvider: Provider | null;
+  readonly #deepProvider: Provider | null;
   readonly #defaultScope: SessionScope | null;
   readonly #listeners = new Set<PhaseListener>();
   readonly #lockManager: LockManager;
@@ -154,6 +163,8 @@ class ConsolidatorImpl implements Consolidator {
         return `cr_${a}${b}`;
       });
     this.#provider = opts.provider ?? null;
+    this.#cheapProvider = opts.cheapProvider ?? null;
+    this.#deepProvider = opts.deepProvider ?? null;
     this.#defaultScope = opts.defaultScope ?? null;
 
     this.#config = resolveConfig(opts);
@@ -213,6 +224,11 @@ class ConsolidatorImpl implements Consolidator {
     return () => {
       this.#listeners.delete(listener);
     };
+  }
+
+  recordExternalSpend(tokens: number, costUsd?: number): void {
+    if (!Number.isFinite(tokens) || tokens <= 0) return;
+    this.#budget.record({ phase: 'deep', tokens, costUsd: costUsd ?? 0 });
   }
 
   async setTier(tier: ConsolidatorTier): Promise<void> {
@@ -324,6 +340,23 @@ class ConsolidatorImpl implements Consolidator {
     if (this.#manuallyPaused) return null;
     const phases = this.#planPhases(reason);
     if (phases.length === 0) return null;
+    // MCON-8: enforce the cooldown the runtime always PERSISTED but never
+    // read — back-to-back triggers used to fire with zero quiet period.
+    // Checked ONCE per trigger dispatch (phases within one dispatch chain
+    // freely); manual fireNow(...) / DLQ replays bypass it.
+    if (reason.kind !== 'manual' && this.#config.ceilings.cooldownMs > 0) {
+      const state =
+        this.#consolidatorStore !== null ? await this.#consolidatorStore.getState(scope) : null;
+      const eligibleAt = state?.nextEligibleAt ?? null;
+      const firstPhase = phases[0] ?? 'light';
+      if (eligibleAt !== null && this.#now() < eligibleAt) {
+        return this.#emit(
+          { ...skipOutcome(firstPhase, 'cooldown'), phase: firstPhase },
+          scope,
+          reason,
+        );
+      }
+    }
     let last: PhaseOutcome | null = null;
     for (const phase of phases) {
       last = await this.#runPhase(phase, scope, reason);
@@ -340,7 +373,12 @@ class ConsolidatorImpl implements Consolidator {
       );
     }
     if (!this.#config.phases.includes(phase) && phase !== 'light') {
-      // Allow manual flushes regardless of phase gating; warn through INFO.
+      // MCON-17: manual flushes bypass phase gating ON PURPOSE — but the
+      // operator should know they are running a phase the tier disabled
+      // (the old empty branch promised a warn and emitted nothing).
+      process.stderr.write(
+        `[graphorin/memory] consolidator.fireNow('${phase}') runs a phase not enabled for tier '${this.#config.tier}' — proceeding (manual flushes bypass phase gating).\n`,
+      );
     }
     return this.#runPhase(phase, target, { kind: 'manual', value: phase });
   }
@@ -564,6 +602,10 @@ class ConsolidatorImpl implements Consolidator {
         conflictsResolved: outcome.conflictsResolved,
         noiseFilteredCount: outcome.noiseFilteredCount,
         emptyExtractions: outcome.emptyExtractions,
+        // MCON-17: the P1-2 / P1-1 counters were computed on the outcome
+        // and then dropped — the run audit lost them.
+        episodesFormed: outcome.episodesFormed,
+        insightsCreated: outcome.insightsCreated,
         errorMessage: outcome.errorMessage,
       });
       await this.#consolidatorStore.upsertState(scope, {
@@ -602,7 +644,8 @@ class ConsolidatorImpl implements Consolidator {
       return out;
     }
     if (phase === 'standard') {
-      if (this.#provider === null) {
+      const standardProvider = this.#cheapProvider ?? this.#provider;
+      if (standardProvider === null) {
         throw new ProviderNotConfiguredError('standard');
       }
       const session = this.#store.session;
@@ -624,7 +667,9 @@ class ConsolidatorImpl implements Consolidator {
         contextualRetrieval: this.#config.contextualRetrieval,
         store: this.#store,
         consolidatorStore: this.#consolidatorStore,
-        provider: this.#provider,
+        // MCON-7: the standard phase routes to the cheap-tier provider
+        // when one is configured.
+        provider: standardProvider,
         tracer: this.#tracer,
         scope,
         cheapModel: this.#config.cheapModel,
@@ -644,13 +689,14 @@ class ConsolidatorImpl implements Consolidator {
       }
       return out;
     }
-    if (this.#provider === null) {
+    const deepProvider = this.#deepProvider ?? this.#provider;
+    if (deepProvider === null) {
       throw new ProviderNotConfiguredError('deep');
     }
     const deepOut = await runDeepPhase({
       store: this.#store,
       consolidatorStore: this.#consolidatorStore,
-      provider: this.#provider,
+      provider: deepProvider,
       tracer: this.#tracer,
       scope,
       deepModel: this.#config.deepModel,
@@ -677,7 +723,8 @@ class ConsolidatorImpl implements Consolidator {
           ? ((await this.#consolidatorStore.getState(scope))?.reflectionWatermark ?? null)
           : null;
       const reflection = await runReflectionPass({
-        provider: this.#provider,
+        // MCON-7: reflection rides the deep-tier provider.
+        provider: deepProvider,
         tracer: this.#tracer,
         scope,
         semantic: this.#semantic,
@@ -725,7 +772,7 @@ class ConsolidatorImpl implements Consolidator {
 
 function skipOutcome(
   phase: ConsolidatorPhase,
-  reason: 'tokens-exceeded' | 'cost-exceeded' | 'paused',
+  reason: 'tokens-exceeded' | 'cost-exceeded' | 'paused' | 'cooldown',
 ): PhaseOutcome {
   return {
     phase,
@@ -773,7 +820,6 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     cheapModel: opts.cheapModel ?? preset.cheapModel,
     deepModel: opts.deepModel ?? preset.deepModel,
     budgetResetSemantics: opts.budgetResetSemantics ?? 'utc',
-    budgetAttribution: opts.budgetAttribution ?? 'shared',
     noiseFilters: Object.freeze([...(opts.noiseFilters ?? ['default'])]),
     lockWaitMs: opts.lockWaitMs ?? 30_000,
     decayTauDays: opts.decayTauDays ?? 7,

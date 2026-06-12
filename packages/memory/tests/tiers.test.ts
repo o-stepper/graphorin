@@ -52,6 +52,30 @@ function createInMemoryStoreWithoutLifecycleExt(): MemoryStoreAdapter {
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
 describe('@graphorin/memory/tiers — WorkingMemory', () => {
+  it('a defined-but-unwritten block answers with its defaultValue; append composes with it (MST-8)', async () => {
+    const memory = makeMemory();
+    memory.working.define(
+      defineBlock({ label: 'persona', charLimit: 200, defaultValue: 'Neutral tone.' }),
+    );
+    // No write yet — the declared default is readable…
+    expect(await memory.working.read(SCOPE, 'persona')).toBe('Neutral tone.');
+    // …and the first mutation composes with it instead of starting empty.
+    await memory.working.append(SCOPE, 'persona', 'Loves brevity.');
+    expect(await memory.working.read(SCOPE, 'persona')).toBe('Neutral tone.\nLoves brevity.');
+  });
+
+  it('mutating a readOnly block throws the dedicated WorkingBlockReadOnlyError (MRET-14)', async () => {
+    const memory = makeMemory();
+    memory.working.define(
+      defineBlock({ label: 'policy', charLimit: 200, readOnly: true, defaultValue: 'fixed' }),
+    );
+    await expect(memory.working.write(SCOPE, 'policy', 'nope')).rejects.toMatchObject({
+      name: 'WorkingBlockReadOnlyError',
+      kind: 'working-block-read-only',
+      label: 'policy',
+    });
+  });
+
   it('write + read + list + forget round-trip', async () => {
     const memory = makeMemory();
     memory.working.define(defineBlock({ label: 'persona', charLimit: 200 }));

@@ -61,8 +61,21 @@ export interface ConsolidatorTriggerReason {
 export interface ConsolidatorCeilings {
   readonly maxTokensPerDay: number;
   readonly maxCostPerDay: number;
+  /**
+   * ADVISORY (MCON-8): the per-scope lock serializes runs, so effective
+   * concurrency is always 1 per scope regardless of this value. The
+   * field is retained for forward compatibility; it enforces nothing
+   * today.
+   */
   readonly maxConcurrentRuns: number;
   readonly maxRunDurationMs: number;
+  /**
+   * Minimum quiet period between non-manual runs per scope (MCON-8).
+   * After each run the runtime persists `nextEligibleAt = now +
+   * cooldownMs`; trigger-driven runs (`turn` / `idle` / `cron` /
+   * `event` / `budget`) inside that window defer with reason
+   * `'cooldown'`. Manual `fireNow(...)` and DLQ replays bypass it.
+   */
   readonly cooldownMs: number;
 }
 
@@ -95,12 +108,20 @@ export interface ConsolidatorConfig {
   readonly phases: ReadonlyArray<ConsolidatorPhase>;
   readonly ceilings: ConsolidatorCeilings;
   readonly onExceed: OnBudgetExceed;
-  /** Cheap-model identifier used by the standard phase. `null` disables. */
+  /**
+   * Advisory label for the standard phase's model — recorded on spans /
+   * run telemetry only (MCON-7). Routing happens via
+   * `CreateConsolidatorOptions.cheapProvider`; this string disables
+   * nothing.
+   */
   readonly cheapModel: string | null;
-  /** Deep-model identifier used by the deep phase. `null` disables. */
+  /**
+   * Advisory label for the deep phase's model — telemetry only
+   * (MCON-7). Routing happens via
+   * `CreateConsolidatorOptions.deepProvider`.
+   */
   readonly deepModel: string | null;
   readonly budgetResetSemantics: 'utc' | 'local' | 'sliding-24h';
-  readonly budgetAttribution: 'shared' | 'per-trigger';
   readonly noiseFilters: ReadonlyArray<'default' | 'minimal' | 'none'>;
   readonly lockWaitMs: number;
   readonly decayTauDays: number;
@@ -334,10 +355,20 @@ export interface CreateConsolidatorOptions {
   readonly phases?: ReadonlyArray<ConsolidatorPhase>;
   readonly ceilings?: Partial<ConsolidatorCeilings>;
   readonly onExceed?: OnBudgetExceed;
+  /**
+   * Provider routed to the standard phase (extraction / episode /
+   * reconcile / situating-context calls) when set (MCON-7). Falls back
+   * to `provider`. Pair with `cheapModel` for the telemetry label.
+   */
+  readonly cheapProvider?: Provider | null;
+  /**
+   * Provider routed to the deep phase (conflict judge) and the
+   * reflection pass when set (MCON-7). Falls back to `provider`.
+   */
+  readonly deepProvider?: Provider | null;
   readonly cheapModel?: string | null;
   readonly deepModel?: string | null;
   readonly budgetResetSemantics?: 'utc' | 'local' | 'sliding-24h';
-  readonly budgetAttribution?: 'shared' | 'per-trigger';
   readonly noiseFilters?: ReadonlyArray<'default' | 'minimal' | 'none'>;
   readonly lockWaitMs?: number;
   readonly decayTauDays?: number;

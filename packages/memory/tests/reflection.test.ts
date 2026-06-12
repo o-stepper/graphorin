@@ -209,11 +209,14 @@ async function setup(opts: {
 }
 
 /** Seed two importance-bearing quarantined episodes (P1-2 shape). */
-async function seedEpisodes(memory: ReturnType<typeof createMemory>): Promise<string[]> {
+async function seedEpisodes(
+  memory: ReturnType<typeof createMemory>,
+  endedAt: string = T1,
+): Promise<string[]> {
   const a = await memory.episodic.record(SCOPE, {
     summary: 'Long run: marathon training block, week 3.',
     startedAt: T0,
-    endedAt: T1,
+    endedAt,
     importance: 0.9,
     provenance: 'extraction',
     status: 'quarantined',
@@ -221,7 +224,7 @@ async function seedEpisodes(memory: ReturnType<typeof createMemory>): Promise<st
   const b = await memory.episodic.record(SCOPE, {
     summary: 'Marathon training: tempo intervals and recovery day.',
     startedAt: T0,
-    endedAt: T1,
+    endedAt,
     importance: 0.9,
     provenance: 'extraction',
     status: 'quarantined',
@@ -290,6 +293,53 @@ describe('consolidator deep phase — reflection (P1-1)', () => {
     // The salience-0 insight was pruned; only the freshly-synthesized one remains.
     expect(remaining.map((i) => i.id)).not.toContain('ins_dead');
     expect(remaining.length).toBe(1);
+  });
+
+  it('ExpeL loop: an unretrieved insight decays to the prune floor across passes; a retrieved one survives (MCON-16)', async () => {
+    const provider = reflectionProvider();
+    const { memory, store } = await setup({
+      provider,
+      consolidatorExtra: { importanceThreshold: 1.0 },
+    });
+    const insightStore = store.insights;
+    if (insightStore === undefined) throw new Error('expected an insight store');
+    const seed = (id: string, text: string) =>
+      insightStore.insert({
+        id,
+        kind: 'insight',
+        userId: SCOPE.userId,
+        text,
+        cites: ['ep_old'],
+        salience: 2,
+        provenance: 'reflection',
+        status: 'quarantined',
+        sensitivity: 'internal',
+        createdAt: T0,
+      });
+    await seed('ins_idle', 'Never recalled observation about stamps.');
+    await seed('ins_used', 'Frequently recalled marathon pacing insight.');
+
+    // Pass 1 (fresh episodes cross the threshold): both pre-seeded
+    // insights decay 2 → 1; the pass's own fresh insight is exempt.
+    await seedEpisodes(memory);
+    await memory.consolidator.fireNow('deep', SCOPE);
+
+    // Retrieval reinforces the used insight back up (+1 ⇒ 2).
+    const recalled = await memory.insights.search(SCOPE, 'marathon pacing', {
+      includeQuarantined: true,
+    });
+    expect(recalled.map((h) => h.record.id)).toContain('ins_used');
+
+    // Pass 2 (new episodes re-cross the threshold): idle 1 → 0 ⇒ pruned;
+    // used 2 → 1 ⇒ survives.
+    await seedEpisodes(memory, '2026-05-02T03:00:00.000Z');
+    await memory.consolidator.fireNow('deep', SCOPE);
+
+    const remaining = (await memory.insights.list(SCOPE, { includeQuarantined: true })).map(
+      (i) => i.id,
+    );
+    expect(remaining).not.toContain('ins_idle');
+    expect(remaining).toContain('ins_used');
   });
 
   it('makes no insight + no LLM call below the importance threshold', async () => {

@@ -202,6 +202,7 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
 
       const nowFn = typeof deps.now === 'function' ? deps.now : Date.now;
       let insightsCreated = 0;
+      const created: string[] = [];
       for (const question of questions) {
         if (deps.budget.snapshot().paused) break;
 
@@ -235,8 +236,9 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         seenInsights.add(normalized);
 
         const iso = new Date(nowFn()).toISOString();
+        const insightId = newMemoryId('ins');
         await deps.insights.insert({
-          id: newMemoryId('ins'),
+          id: insightId,
           kind: 'insight',
           userId: deps.scope.userId,
           ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),
@@ -251,10 +253,25 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
           createdAt: iso,
           updatedAt: iso,
         });
+        created.push(insightId);
         insightsCreated += 1;
       }
 
-      // 5. ExpeL forgetting — prune any salience-0 insights.
+      // 5. ExpeL forgetting (MCON-16): decay every existing insight by 1
+      // per reflection pass. Retrieval bumps +1 (InsightMemory.search),
+      // so an insight recalled since the last pass nets level-or-better
+      // while an unused one slides toward the prune floor — starting
+      // salience 2 ⇒ pruned after two idle passes. Fresh insights from
+      // THIS pass are exempt (they were inserted above at full salience
+      // and have had no retrieval window yet).
+      const freshIds = new Set(created);
+      for (const existing of await deps.insights.list(deps.scope, {
+        includeQuarantined: true,
+        limit: 500,
+      })) {
+        if (freshIds.has(existing.id)) continue;
+        await deps.insights.bumpSalience(existing.id, -1, 'reflection-pass-decay');
+      }
       await deps.insights.prune(deps.scope);
 
       span.setAttributes({

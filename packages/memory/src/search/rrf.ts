@@ -49,7 +49,7 @@ export class RRFReranker implements ReRanker {
     if (options.signal?.aborted === true) {
       throw new DOMException('RRFReranker aborted', 'AbortError');
     }
-    const fused = fuseRrf(lists, this.k);
+    const fused = fuseRrf(lists, this.k, options.labels);
     const topK = options.topK ?? 10;
     return fused.slice(0, Math.max(0, topK));
   }
@@ -102,7 +102,7 @@ export class WeightedRRFReranker implements ReRanker {
     if (options.signal?.aborted === true) {
       throw new DOMException('WeightedRRFReranker aborted', 'AbortError');
     }
-    const fused = fuseWeighted(lists, this.weights, this.k);
+    const fused = fuseWeighted(lists, this.weights, this.k, options.labels);
     const topK = options.topK ?? 10;
     return fused.slice(0, Math.max(0, topK));
   }
@@ -119,8 +119,9 @@ export class WeightedRRFReranker implements ReRanker {
 export function fuseRrf<TRecord extends MemoryRecord>(
   lists: ReadonlyArray<ReadonlyArray<MemoryHit<TRecord>>>,
   k: number,
+  labels?: ReadonlyArray<string>,
 ): ReadonlyArray<MemoryHit<TRecord>> {
-  return fuseWeighted(lists, undefined, k);
+  return fuseWeighted(lists, undefined, k, labels);
 }
 
 /**
@@ -148,6 +149,7 @@ export function fuseWeighted<TRecord extends MemoryRecord>(
   lists: ReadonlyArray<ReadonlyArray<MemoryHit<TRecord>>>,
   weights: ReadonlyArray<number> | undefined,
   k: number,
+  labels?: ReadonlyArray<string>,
 ): ReadonlyArray<MemoryHit<TRecord>> {
   type Aggregate = {
     record: TRecord;
@@ -160,6 +162,11 @@ export function fuseWeighted<TRecord extends MemoryRecord>(
   for (let listIdx = 0; listIdx < lists.length; listIdx++) {
     const list = lists[listIdx] ?? [];
     const weight = resolveWeight(weights, listIdx);
+    // MRET-13: explanation signals key by the caller's retriever-kind
+    // label when supplied — `rrf.list_N` is an ephemeral position that
+    // changes meaning whenever a leg (vector / HyDE / graph) is
+    // conditionally absent from the fan-out.
+    const signalKey = `rrf.${labels?.[listIdx] ?? `list_${listIdx}`}`;
     for (let i = 0; i < list.length; i++) {
       const hit = list[i];
       if (hit === undefined) continue;
@@ -171,7 +178,7 @@ export function fuseWeighted<TRecord extends MemoryRecord>(
         const signals: Record<string, number> = {
           ...(hit.signals ?? {}),
           rrf: contribution,
-          [`rrf.list_${listIdx}`]: contribution,
+          [signalKey]: contribution,
         };
         aggregates.set(id, {
           record: hit.record,
@@ -181,7 +188,7 @@ export function fuseWeighted<TRecord extends MemoryRecord>(
         });
       } else {
         existing.score += contribution;
-        existing.signals[`rrf.list_${listIdx}`] = contribution;
+        existing.signals[signalKey] = contribution;
         existing.signals.rrf = (existing.signals.rrf ?? 0) + contribution;
         for (const [key, value] of Object.entries(hit.signals ?? {})) {
           if (key in existing.signals) continue;

@@ -17,7 +17,7 @@ const WARN_REGISTRY = new Map<string, Set<string>>();
  * Reset the once-per-process WARN registry. Used by tests for
  * isolation.
  *
- * @experimental
+ * @internal
  */
 export function _resetLocaleFallbackWarningsForTesting(): void {
   WARN_REGISTRY.clear();
@@ -26,7 +26,7 @@ export function _resetLocaleFallbackWarningsForTesting(): void {
 /**
  * Inspect the once-per-process WARN registry. Used by tests.
  *
- * @experimental
+ * @internal
  */
 export function _getLocaleFallbackWarningsForTesting(): ReadonlyMap<string, ReadonlySet<string>> {
   return new Map(WARN_REGISTRY);

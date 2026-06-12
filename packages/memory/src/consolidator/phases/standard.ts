@@ -32,7 +32,6 @@ import type {
 import type { EpisodicMemory } from '../../tiers/episodic-memory.js';
 import type { FactInput, SemanticMemory } from '../../tiers/semantic-memory.js';
 import type { BudgetTracker } from '../budget.js';
-import { tipMessageId } from '../idempotency.js';
 import { applyNoiseFilters, type NoiseFilterPreset, renderText } from '../noise-filter.js';
 import { preFilterCandidate, reconcileCandidate } from '../reconcile.js';
 import type { PhaseOutcome } from '../types.js';
@@ -448,9 +447,6 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         'consolidator.budget.remaining.usd': snapshot.costRemaining,
         'consolidator.exceeded': snapshot.paused,
       });
-
-      const cursorTip = tipMessageId(rawBatch);
-      void cursorTip;
 
       return {
         phase: 'standard',

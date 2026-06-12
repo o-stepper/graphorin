@@ -225,7 +225,20 @@ export function normalizeInducedProcedure(raw: {
  */
 export function createProviderWorkflowInducer(
   provider: Provider,
-  options: { readonly maxTokens?: number } = {},
+  options: {
+    readonly maxTokens?: number;
+    /**
+     * Usage callback (MCON-15) — induction is the framework's highest
+     * poisoning-risk LLM spend and previously flowed past every budget
+     * envelope. `createMemory` wires this into the consolidator budget
+     * when one is enabled; standalone callers can record it themselves.
+     * Best-effort: a throwing callback never breaks induction.
+     */
+    readonly onUsage?: (usage: {
+      readonly promptTokens: number;
+      readonly completionTokens: number;
+    }) => void;
+  } = {},
 ): WorkflowInducer {
   return {
     async induce(trajectory, callOptions = {}): Promise<InducedProcedure | null> {
@@ -235,6 +248,14 @@ export function createProviderWorkflowInducer(
       };
       try {
         const res = await provider.generate(buildInductionRequest(trajectory, merged));
+        try {
+          options.onUsage?.({
+            promptTokens: res.usage.promptTokens,
+            completionTokens: res.usage.completionTokens,
+          });
+        } catch {
+          // Accounting is advisory; never break the induction result.
+        }
         return parseInducedProcedure(res.text);
       } catch {
         return null;

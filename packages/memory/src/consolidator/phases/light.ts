@@ -1,9 +1,10 @@
 /**
- * Light phase — no LLM. Decays every fact's retention curve, archives
- * facts whose retention has fallen below the configured threshold,
- * and runs the noise filter against any unread session messages so
- * the standard phase has a clean batch to extract from on the next
- * trigger.
+ * Light phase — no LLM. Decays every fact's retention curve and
+ * archives facts whose salience has fallen below the configured
+ * threshold (plus the X-1 capacity pass). Noise filtering happens in
+ * the standard phase where the batch is actually consumed — the old
+ * advisory re-count here read the same unconsumed messages on every
+ * pass for a counter nothing acted on (MCON-17).
  *
  * @packageDocumentation
  */
@@ -13,12 +14,9 @@ import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
   MemoryStoreAdapter,
-  SessionMessageRecord,
 } from '../../internal/storage-adapter.js';
 import { type SalienceWeights, salience, selectForCapacityEviction } from '../decay.js';
-import { tipMessageId } from '../idempotency.js';
 import type { NoiseFilterPreset } from '../noise-filter.js';
-import { applyNoiseFilters } from '../noise-filter.js';
 import type { PhaseOutcome } from '../types.js';
 
 /** Inputs accepted by {@link runLightPhase}. */
@@ -120,20 +118,10 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
         }
       }
 
-      let noiseFilteredCount = 0;
-      const session = deps.store.session;
-      if (typeof session.listMessagesSince === 'function') {
-        const batch = await session.listMessagesSince(
-          deps.scope,
-          deps.lastProcessedMessageId,
-          deps.maxBatchSize,
-        );
-        const filtered = applyNoiseFilters(
-          batch as ReadonlyArray<SessionMessageRecord>,
-          deps.noiseFilters,
-        );
-        noiseFilteredCount = filtered.droppedCount;
-      }
+      // MCON-17: the light phase no longer re-reads the unconsumed batch
+      // just to produce an advisory dropped-count — the standard phase
+      // filters where extraction actually consumes the messages.
+      const noiseFilteredCount = 0;
 
       span.setAttributes({
         'consolidator.duration_ms': Math.max(0, deps.now() - startedAt),
@@ -172,9 +160,4 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
  */
 function isForeignProvenance(provenance: string | null): boolean {
   return provenance !== null && provenance !== 'user' && provenance !== 'extraction';
-}
-
-/** Convenience helper used by the standard phase to advance the cursor. */
-export function nextCursor(batch: ReadonlyArray<SessionMessageRecord>): string | null {
-  return tipMessageId(batch);
 }

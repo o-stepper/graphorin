@@ -172,7 +172,6 @@ export function createConsolidatorPlaceholder(
     cheapModel: null,
     deepModel: null,
     budgetResetSemantics: 'utc',
-    budgetAttribution: 'shared',
     noiseFilters: Object.freeze(['default' as const]),
     lockWaitMs: 30_000,
     decayTauDays: 7,
@@ -240,6 +239,9 @@ export function createConsolidatorPlaceholder(
     },
     async resume() {
       paused = false;
+    },
+    recordExternalSpend(): void {
+      // Placeholder — no budget to record against.
     },
     onPhaseFinished(listener) {
       listeners.add(listener);

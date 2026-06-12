@@ -766,3 +766,113 @@ describe('Phase 10c DoD — Standard phase advances the cursor + replay is a no-
     expect(provider.calls.length).toBe(1);
   });
 });
+
+describe('MCON-7/MCON-8 — per-phase providers + enforced cooldown', () => {
+  function namedProvider(name: string, reply: () => string) {
+    const calls: ProviderRequest[] = [];
+    const provider: Provider & { calls: ProviderRequest[] } = {
+      name,
+      modelId: `${name}:test`,
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate(req: ProviderRequest) {
+        calls.push(req);
+        return {
+          text: reply(),
+          usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
+          finishReason: 'stop',
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+      calls,
+    };
+    return provider;
+  }
+
+  it('routes the standard phase to cheapProvider and the deep judge to deepProvider (MCON-7)', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    const base = namedProvider('base', () => '{"facts":[]}');
+    const cheap = namedProvider('cheap', () => '{"facts":[]}');
+    const deep = namedProvider('deep', () => '{"decision":"admit","reason":"ok"}');
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      conflictPipeline: { mode: 'off' },
+      consolidator: {
+        tier: 'standard',
+        provider: base,
+        cheapProvider: cheap,
+        deepProvider: deep,
+        defaultScope: scope,
+        formEpisodes: false,
+      },
+    });
+    await memory.session.push(scope, { role: 'user', content: 'extract me' });
+    const oldFact = await memory.semantic.remember(scope, { text: 'old fact' });
+    const cand = await memory.semantic.remember(scope, { text: 'candidate fact' });
+    await store.conflicts?.enqueuePending({
+      scope,
+      factId: cand.id,
+      candidateText: cand.text,
+      stage: 'defer-to-deep',
+      conflictingIds: [oldFact.id],
+    });
+    await memory.consolidator.start();
+    await memory.consolidator.fireNow('standard', scope);
+    await memory.consolidator.fireNow('deep', scope);
+    expect(cheap.calls.length).toBeGreaterThan(0); // extraction
+    expect(deep.calls.length).toBe(1); // judge
+    expect(base.calls.length).toBe(0); // fallback never used
+  });
+
+  it('a trigger inside the cooldown window defers; manual fireNow bypasses (MCON-8)', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    let clock = 1_000_000;
+    const provider = namedProvider('p', () => '{"facts":[]}');
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: {
+        tier: 'cheap', // cooldownMs: 60_000 in the preset
+        provider,
+        defaultScope: scope,
+        now: () => clock,
+      },
+    });
+    await memory.consolidator.start();
+    await memory.session.push(scope, { role: 'user', content: 'first slice' });
+
+    const first = await memory.consolidator.trigger({ kind: 'idle' }, scope);
+    expect(first?.status).not.toBe('deferred');
+
+    // 10s later — well inside the 60s cooldown: the trigger defers.
+    clock += 10_000;
+    await memory.session.push(scope, { role: 'user', content: 'second slice' });
+    const second = await memory.consolidator.trigger({ kind: 'idle' }, scope);
+    expect(second?.status).toBe('deferred');
+    expect(second?.errorMessage).toContain('cooldown');
+
+    // Manual operator intent bypasses the quiet period.
+    const manual = await memory.consolidator.fireNow('standard', scope);
+    expect(manual?.status).not.toBe('deferred');
+
+    // Past the window the trigger flows again.
+    clock += 60_000;
+    await memory.session.push(scope, { role: 'user', content: 'third slice' });
+    const third = await memory.consolidator.trigger({ kind: 'idle' }, scope);
+    expect(third?.status).not.toBe('deferred');
+  });
+});
