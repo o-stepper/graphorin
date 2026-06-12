@@ -29,7 +29,7 @@ import { SqliteConflictStore } from './conflict-store.js';
 import type { SqliteConnection } from './connection.js';
 import { SqliteConsolidatorStateStore } from './consolidator-store.js';
 import type { EmbeddingMetaRepository } from './embedding-meta-repo.js';
-import { VectorTableManager } from './vector-table-mgr.js';
+import { scoreFromDistance, VectorTableManager } from './vector-table-mgr.js';
 
 /**
  * Point-in-time (`asOf`) WHERE fragments. Appended only when an
@@ -656,8 +656,8 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     );
     return rows.map((row) => ({
       record: rowToEpisode(row),
-      score: 1 - row.distance,
-      signals: { vector: 1 - row.distance },
+      score: scoreFromDistance(meta.distanceMetric, row.distance),
+      signals: { vector: scoreFromDistance(meta.distanceMetric, row.distance) },
     }));
   }
 
@@ -932,8 +932,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     }
     return rows.slice(0, topK).map((row) => ({
       record: rowToFact(row),
-      score: 1 - row.distance,
-      signals: { vector: 1 - row.distance },
+      score: scoreFromDistance(meta.distanceMetric, row.distance),
+      signals: { vector: scoreFromDistance(meta.distanceMetric, row.distance) },
     }));
   }
 
