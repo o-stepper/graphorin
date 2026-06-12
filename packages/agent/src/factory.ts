@@ -50,6 +50,14 @@ import type { Memory } from '@graphorin/memory';
 /** Return envelope of `ContextEngine.compactNow` (shared splice paths, CE-3). */
 type CompactionEnvelope = Awaited<ReturnType<Memory['contextEngine']['compactNow']>>;
 
+/**
+ * Replacement content committed in place of assistant commentary the
+ * causality monitor blocked (AG-10). Worded to not match any built-in
+ * denial pattern, so the notice itself never re-triggers the monitor.
+ */
+const LATERAL_LEAK_BLOCKED_NOTICE =
+  '[graphorin] assistant commentary withheld by the lateral-leak defense.';
+
 import { composeGuardrails } from '@graphorin/security/guardrails';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
@@ -1001,6 +1009,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     runInFlight = true;
     pendingSteer = [];
     pendingAbort = undefined;
+    // AG-10: the causality chain is a per-run artifact — a denial
+    // recorded in one run must not poison detection in the next.
+    causalityMonitor?.reset();
     try {
       return yield* runLoopInner(input, options);
     } finally {
@@ -1951,8 +1962,20 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             (state.usage.reasoningTokens ?? 0) + stepUsage.reasoningTokens;
         }
 
+        // Lateral-leak (RB-55 / AG-10): scan the outgoing assistant
+        // content BEFORE it is appended, so a 'block' decision keeps
+        // the laundered commentary out of the durable history — and
+        // therefore out of every subsequent provider request. The
+        // deltas already streamed; what 'block' protects is the
+        // persistent buffer and the run's final output.
+        const leakCheck =
+          causalityMonitor !== undefined && textBuffer.length > 0
+            ? causalityMonitor.checkMessage(textBuffer)
+            : undefined;
+        const leakBlocked = leakCheck?.leakDetected === true && leakCheck.decision === 'block';
+
         const assistant: AssistantMessage = buildAssistantMessage(
-          textBuffer,
+          leakBlocked ? LATERAL_LEAK_BLOCKED_NOTICE : textBuffer,
           stepReasoningParts,
           finalCalls,
           agentId,
@@ -1961,30 +1984,23 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         messages.push(assistant);
         state.messages.push(assistant);
 
-        // Lateral-leak (RB-55): scan the outgoing assistant
-        // content for causality laundering / commentary-phase
-        // patterns and surface a `agent.lateral-leak.detected`
-        // event when the configured monitor flags / blocks.
-        if (causalityMonitor !== undefined && textBuffer.length > 0) {
-          const check = causalityMonitor.checkMessage(textBuffer);
-          if (check.leakDetected) {
-            const sha = sha256Hex(textBuffer);
-            yield {
-              type: 'agent.lateral-leak.detected',
-              runId: state.id,
-              sessionId,
-              agentId,
-              vector: check.vector,
-              severity: check.severity,
-              causalityChain: check.causalityChain,
-              messageContentSha256: sha,
-              ...(check.matchedPattern !== undefined
-                ? { matchedPattern: check.matchedPattern }
-                : {}),
-              decision: check.decision,
-              detectedAtIso: new Date().toISOString(),
-            };
-          }
+        if (leakCheck?.leakDetected === true) {
+          const sha = sha256Hex(textBuffer);
+          yield {
+            type: 'agent.lateral-leak.detected',
+            runId: state.id,
+            sessionId,
+            agentId,
+            vector: leakCheck.vector,
+            severity: leakCheck.severity,
+            causalityChain: leakCheck.causalityChain,
+            messageContentSha256: sha,
+            ...(leakCheck.matchedPattern !== undefined
+              ? { matchedPattern: leakCheck.matchedPattern }
+              : {}),
+            decision: leakCheck.decision,
+            detectedAtIso: new Date().toISOString(),
+          };
         }
 
         const handoffCalls = finalCalls.filter((c) => handoffMap.has(c.toolName));
@@ -2002,7 +2018,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         };
         state.steps.push(stepRecord);
 
-        if (textBuffer.length > 0) {
+        if (textBuffer.length > 0 && !leakBlocked) {
           finalSnapshot.output = textBuffer as unknown as TOutput;
           yield { type: 'text.complete', text: textBuffer };
         }

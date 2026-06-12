@@ -96,6 +96,7 @@ describe('AG-11 — one in-flight run per Agent instance', () => {
     const failing: Provider = {
       modelId: 'mock-fail',
       stream() {
+        // biome-ignore lint/correctness/useYield: a provider stream that fails before its first event
         return (async function* (): AsyncGenerator<never, void, void> {
           throw new Error('provider exploded');
         })();
