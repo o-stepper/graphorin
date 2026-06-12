@@ -96,6 +96,13 @@ export type TransportPreference = TransportKind | 'auto';
  */
 export interface GraphorinClientOptions {
   /**
+   * Session bound to the SSE fallback (IP-3): substituted into the
+   * `:sessionId` slot of `sseSessionPath`. Required to connect over
+   * SSE — the old client sent the literal template and could never
+   * receive an event.
+   */
+  readonly sessionId?: string;
+  /**
    * Server base URL. Examples: `'wss://graphorin.example.com'` or
    * `'http://localhost:8080'`. The path `/v1/ws` is appended for
    * the WebSocket transport.
@@ -162,6 +169,8 @@ interface SubscriptionInternal extends Subscription {
   __target(): SubscriptionTarget;
   __snapshotEventId(): string | undefined;
   __lastEventId(): string | undefined;
+  /** IP-7: re-point this subscription at a new server subscriptionId. */
+  __rebind(newSubscriptionId: string): void;
 }
 
 /**
@@ -171,6 +180,8 @@ export class GraphorinClient {
   readonly #options: GraphorinClientOptions;
   readonly #pending: Map<ClientMessageId, PendingRpc> = new Map();
   readonly #subscriptions: Map<string, SubscriptionInternal> = new Map();
+  /** IP-3: the synthetic single subscription an SSE connection carries. */
+  #sseSubscription: SubscriptionInternal | undefined;
   #transport: Transport | undefined;
   #idCounter = 0;
   #closed = false;
@@ -236,15 +247,40 @@ export class GraphorinClient {
    * `subscribed` frame; rejects when the server returns an
    * `error` instead.
    */
-  async subscribe(target: SubscriptionTarget): Promise<Subscription> {
+  async subscribe(
+    target: SubscriptionTarget,
+    opts?: { readonly sinceEventId?: string },
+  ): Promise<Subscription> {
     if (this.#transport === undefined) throw new ClientNotConnectedError();
     if (this.#transport.kind === 'sse') {
-      throw new TransportFailedError(
-        'subscribe() requires the WebSocket transport. The SSE fallback uses GET /v1/sessions/:id/events for live events.',
-      );
+      // IP-3: the SSE connection IS one implicit subscription to the
+      // bound session's events. Frames arrive with a server-generated
+      // subscriptionId the client cannot know upfront, so routing
+      // falls through to this synthetic subscription (see
+      // #handleFrame). Other subjects still require the WS transport.
+      const subject = subjectFor(target);
+      const boundSubject = `session:${this.#options.sessionId ?? ''}/events`;
+      if (subject !== boundSubject) {
+        throw new TransportFailedError(
+          `subscribe('${subject}') requires the WebSocket transport — the SSE fallback carries only the bound session stream ('${boundSubject}').`,
+        );
+      }
+      if (this.#sseSubscription === undefined) {
+        this.#sseSubscription = this.#createSubscription({
+          subscriptionId: '__sse__',
+          subject,
+          target,
+          snapshotEventId: undefined,
+        });
+        this.#subscriptions.set('__sse__', this.#sseSubscription);
+      }
+      return this.#sseSubscription;
     }
     const subject = subjectFor(target);
-    const lastEventId = this.#transport.lastEventId;
+    // IP-7: a resubscribe passes the SUBSCRIPTION's own cursor — the
+    // fresh transport's lastEventId is always undefined, so the old
+    // code never consulted the server replay buffer.
+    const lastEventId = opts?.sinceEventId ?? this.#transport.lastEventId;
     const params: { subject: string; lastSequenceId?: number; sinceEventId?: string } = {
       subject,
     };
@@ -303,10 +339,11 @@ export class GraphorinClient {
   /**
    * Resume a paused (HITL) run. The WebSocket protocol intentionally
    * does NOT carry a `resume` control message — resumes are durable
-   * + idempotent + body-carrying, which maps cleanly onto the REST
-   * endpoint `POST /v1/runs/:runId/resume` (Phase 14a). The client
-   * forwards the call via the supplied `fetch` implementation so
-   * subscribers continue to receive events on the same WS connection.
+   * + idempotent + body-carrying, which maps onto the REST endpoint
+   * `POST /v1/runs/:runId/resume`. NOTE (IP-14): the server endpoint
+   * currently answers **501** — server-side durable resume is not
+   * implemented yet. Library-mode callers resume directly:
+   * `agent.run(result.state, { directive })`.
    */
   async resume(
     runId: string,
@@ -429,9 +466,9 @@ export class GraphorinClient {
       {
         url,
         auth: this.#options.auth,
-        ...(this.#options.EventSource !== undefined
-          ? { EventSource: this.#options.EventSource }
-          : {}),
+        // IP-3: the fetch-streaming transport uses the client's fetch
+        // seam (the EventSource seam is gone with the rewrite).
+        ...(this.#options.fetch !== undefined ? { fetch: this.#options.fetch } : {}),
         ...(this.#options.clientId !== undefined ? { clientId: this.#options.clientId } : {}),
       },
       this.#listeners('sse'),
@@ -446,6 +483,22 @@ export class GraphorinClient {
 
   #sseUrl(): string {
     const template = this.#options.sseSessionPath ?? '/v1/sessions/:sessionId/events';
+    // IP-3: bind the session into the path — the literal template was
+    // previously sent as-is, so the SSE fallback could never connect
+    // to a real session stream.
+    if (template.includes(':sessionId')) {
+      const sessionId = this.#options.sessionId;
+      if (sessionId === undefined || sessionId.length === 0) {
+        throw new TransportFailedError(
+          "The SSE fallback needs a session binding — pass `sessionId` in the client options (it fills ':sessionId' in sseSessionPath).",
+        );
+      }
+      return joinUrl(
+        this.#options.baseUrl,
+        template.replace(':sessionId', encodeURIComponent(sessionId)),
+        { ws: false },
+      );
+    }
     return joinUrl(this.#options.baseUrl, template, { ws: false });
   }
 
@@ -499,17 +552,17 @@ export class GraphorinClient {
     }
     if (isPongFrame(frame)) return;
     if (isLifecycleFrame(frame)) {
-      const sub = this.#subscriptions.get(frame.subscriptionId);
+      const sub = this.#subscriptions.get(frame.subscriptionId) ?? this.#sseFallback();
       if (sub !== undefined) sub.__pushLifecycle(frame);
       return;
     }
     if (isReplayMarkerFrame(frame)) {
-      const sub = this.#subscriptions.get(frame.subscriptionId);
+      const sub = this.#subscriptions.get(frame.subscriptionId) ?? this.#sseFallback();
       if (sub !== undefined) sub.__pushReplayMarker(frame);
       return;
     }
     if (isEventFrame(frame)) {
-      const sub = this.#subscriptions.get(frame.subscriptionId);
+      const sub = this.#subscriptions.get(frame.subscriptionId) ?? this.#sseFallback();
       if (sub !== undefined) sub.__push(frame);
       return;
     }
@@ -527,6 +580,15 @@ export class GraphorinClient {
         if (frame.subscriptionId !== undefined) this.#subscriptions.delete(frame.subscriptionId);
       }
     }
+  }
+
+  /**
+   * IP-3: on the SSE transport every frame belongs to the single
+   * implicit session subscription regardless of the server-generated
+   * subscriptionId it carries.
+   */
+  #sseFallback(): SubscriptionInternal | undefined {
+    return this.#transport?.kind === 'sse' ? this.#sseSubscription : undefined;
   }
 
   #handleTransportError(err: Error, _kind: TransportKind): void {
@@ -592,12 +654,29 @@ export class GraphorinClient {
         for (const [oldId, sub] of [...this.#subscriptions]) {
           this.#subscriptions.delete(oldId);
           try {
-            const replaced = await this.subscribe(sub.__target());
-            // Preserve the in-flight async iterator on the new
-            // subscription so consumers don't notice the reconnect.
-            sub.__close('transport-closed');
-            const internal = replaced as SubscriptionInternal;
-            this.#subscriptions.set(internal.subscriptionId, internal);
+            // IP-7: re-establish the server-side subscription with the
+            // SUBSCRIPTION's own replay cursor, then re-point the SAME
+            // object at the new server id — the consumer's in-flight
+            // `for await` survives and the replayed events arrive in
+            // the iterator it is already reading. The old code created
+            // a NEW subscription and closed this one: the consumer's
+            // loop ended `{done: true}` while events piled up unread
+            // in an orphan.
+            const cursor = sub.__lastEventId();
+            const reply = await this.#sendRpc('subscription.subscribe', {
+              subject: sub.__subject(),
+              ...(cursor !== undefined ? { sinceEventId: cursor } : {}),
+            });
+            const result = reply as { subscriptionId?: unknown };
+            const newId =
+              typeof result.subscriptionId === 'string' && result.subscriptionId.length > 0
+                ? result.subscriptionId
+                : undefined;
+            if (newId === undefined) {
+              throw new ProtocolViolationError('Server resubscribe reply missing subscriptionId.');
+            }
+            sub.__rebind(newId);
+            this.#subscriptions.set(newId, sub);
           } catch (err) {
             sub.__close('aborted', err instanceof Error ? err : new Error(String(err)));
           }
@@ -612,7 +691,7 @@ export class GraphorinClient {
   }
 
   #createSubscription(args: {
-    readonly subscriptionId: string;
+    subscriptionId: string;
     readonly subject: string;
     readonly target: SubscriptionTarget;
     readonly snapshotEventId: string | undefined;
@@ -652,7 +731,9 @@ export class GraphorinClient {
     };
 
     const sub: SubscriptionInternal = {
-      subscriptionId: args.subscriptionId,
+      get subscriptionId(): string {
+        return args.subscriptionId;
+      },
       subject: args.subject,
       events: () => ({
         [Symbol.asyncIterator]: () => ({
@@ -718,6 +799,9 @@ export class GraphorinClient {
       __target: () => args.target,
       __snapshotEventId: () => args.snapshotEventId,
       __lastEventId: () => lastEventId,
+      __rebind: (newSubscriptionId: string) => {
+        args.subscriptionId = newSubscriptionId;
+      },
     };
     return sub;
   }

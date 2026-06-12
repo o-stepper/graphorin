@@ -344,3 +344,98 @@ describe('GraphorinClient — RPC + subscriptions', () => {
     await client.disconnect();
   });
 });
+
+describe('IP-7 — the same iterator survives a reconnect with the replay cursor', () => {
+  it('resubscribe sends the subscription cursor and rebinds the SAME object', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+      reconnect: { initialDelayMs: 1, maxDelayMs: 2, maxAttempts: 3 },
+    });
+    await connectAndAck(client);
+    const socket1 = lastSocket();
+
+    // Subscribe + receive evt-1 on sub-1.
+    const subPromise = client.subscribe({ target: 'session', id: 'rc' });
+    await Promise.resolve();
+    const subFrame = JSON.parse(socket1.sent.at(-1) ?? '{}') as { id: string };
+    socket1.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: subFrame.id,
+      result: { subscriptionId: 'sub-1' },
+    });
+    const sub = await subPromise;
+    const received: string[] = [];
+    const consumer = (async () => {
+      for await (const ev of sub.events()) {
+        received.push(ev.eventId);
+        if (received.length === 2) break;
+      }
+    })();
+    socket1.fireMessage({
+      v: '1',
+      kind: 'event',
+      eventId: 'evt-1',
+      subscriptionId: 'sub-1',
+      subject: 'session:rc/events',
+      type: 'text.delta',
+      payload: { delta: 'a' },
+    });
+
+    // Drop the transport — the client reconnects in the background
+    // (the backoff sleeps real milliseconds, so wait on a timer).
+    socket1.close(1006, 'connection reset');
+    let socket2 = socket1;
+    for (let i = 0; i < 100 && socket2 === socket1; i += 1) {
+      await new Promise((r) => setTimeout(r, 5));
+      try {
+        socket2 = lastSocket();
+      } catch {
+        // not yet
+      }
+    }
+    await ackInitialize();
+    expect(socket2).not.toBe(socket1);
+    let resub: { id: string; method?: string; params?: { sinceEventId?: string } } = { id: '' };
+    for (let i = 0; i < 100; i += 1) {
+      await new Promise((r) => setTimeout(r, 2));
+      const last = socket2.sent.at(-1);
+      if (last === undefined) continue;
+      const parsed = JSON.parse(last) as typeof resub;
+      if (parsed.method === 'subscription.subscribe') {
+        resub = parsed;
+        break;
+      }
+    }
+    expect(resub.method).toBe('subscription.subscribe');
+    // IP-7: the SUBSCRIPTION's own cursor reaches the server so the
+    // replay buffer is consulted (the old code read the fresh
+    // transport's lastEventId — always undefined).
+    expect(resub.params?.sinceEventId).toBe('evt-1');
+    socket2.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: resub.id,
+      result: { subscriptionId: 'sub-2' },
+    });
+    // Let the rebind continuation (map re-key) land before the event.
+    await new Promise((r) => setTimeout(r, 20));
+    // The replayed/missed event arrives on the NEW server id but the
+    // SAME client-side subscription — the consumer's for-await lives.
+    socket2.fireMessage({
+      v: '1',
+      kind: 'event',
+      eventId: 'evt-2',
+      subscriptionId: 'sub-2',
+      subject: 'session:rc/events',
+      type: 'text.delta',
+      payload: { delta: 'b' },
+    });
+    await consumer;
+    expect(received).toEqual(['evt-1', 'evt-2']);
+    expect(sub.subscriptionId).toBe('sub-2');
+    await client.disconnect();
+  });
+});

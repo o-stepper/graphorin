@@ -110,7 +110,7 @@ export interface TriggersFireOptions extends TriggersCommonOptions {
 /** @stable */
 export async function runTriggersFire(
   options: TriggersFireOptions,
-): Promise<{ readonly queued: true }> {
+): Promise<{ readonly fired: false; readonly unsupported: true }> {
   const ctx = await openStoreContext({
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
@@ -119,19 +119,20 @@ export async function runTriggersFire(
     if (state === null) {
       throw new Error(`[graphorin/cli] trigger '${options.id}' not found.`);
     }
-    ensureAdminTable(ctx.store.connection);
-    ctx.store.connection.run(
-      `INSERT INTO trigger_admin (trigger_id, action, queued_at) VALUES (?, 'fire', ?)
-       ON CONFLICT(trigger_id) DO UPDATE SET action = excluded.action, queued_at = excluded.queued_at`,
-      [options.id, Date.now()],
-    );
-    const result = { queued: true } as const;
+    // IP-4: the old implementation queued a row into a `trigger_admin`
+    // table NOTHING polled and reported success — the fire never
+    // happened. Until a daemon-side poll exists, the honest answer is
+    // UNSUPPORTED with the working alternative.
+    const result = { fired: false, unsupported: true } as const;
     emitReport(options, result, () => {
       const print = options.print ?? defaultPrintSink;
       print(
-        brand(`trigger '${options.id}' queued for next-tick fire (running scheduler picks it up).`),
+        brand(
+          `direct CLI fire is not wired yet — use the running server: POST /v1/triggers/${options.id}/fire (scope triggers:fire).`,
+        ),
       );
     });
+    process.exitCode = EXIT_CODES.UNSUPPORTED;
     return result;
   } finally {
     await ctx.close();
@@ -218,16 +219,6 @@ export async function runTriggersPrune(
   } finally {
     await ctx.close();
   }
-}
-
-function ensureAdminTable(conn: { exec(sql: string): void }): void {
-  conn.exec(
-    `CREATE TABLE IF NOT EXISTS trigger_admin (
-       trigger_id TEXT PRIMARY KEY,
-       action TEXT NOT NULL,
-       queued_at INTEGER NOT NULL
-     ) WITHOUT ROWID;`,
-  );
 }
 
 function parseCutoff(input: string): number {

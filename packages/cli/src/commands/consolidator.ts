@@ -68,7 +68,6 @@ export async function runConsolidatorStatus(
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
-    ensureAdminTable(ctx.store.connection);
     const conn = ctx.store.connection;
     const recent = conn.get<{ n: number }>(
       'SELECT COUNT(*) AS n FROM consolidator_runs WHERE started_at > ?',
@@ -89,11 +88,7 @@ export async function runConsolidatorStatus(
     const last = conn.get<{ started_at: number; status: string }>(
       'SELECT started_at, status FROM consolidator_runs ORDER BY started_at DESC LIMIT 1',
     );
-    const tierRow = conn.get<{ tier: string }>(
-      "SELECT value AS tier FROM consolidator_admin WHERE key = 'tier' LIMIT 1",
-    );
     const out: ConsolidatorStatusResult = Object.freeze({
-      ...(tierRow !== undefined && isTier(tierRow.tier) ? { tierHint: tierRow.tier } : {}),
       recentRuns: recent?.n ?? 0,
       successfulRuns: success?.n ?? 0,
       failedRuns: failed?.n ?? 0,
@@ -129,9 +124,11 @@ export interface ConsolidatorSetTierOptions extends ConsolidatorCommonOptions {
 }
 
 /** @stable */
-export async function runConsolidatorSetTier(
-  options: ConsolidatorSetTierOptions,
-): Promise<{ readonly tier: ConsolidatorTier }> {
+export async function runConsolidatorSetTier(options: ConsolidatorSetTierOptions): Promise<{
+  readonly tier: ConsolidatorTier;
+  readonly applied: false;
+  readonly unsupported: true;
+}> {
   if (!isTier(options.tier)) {
     throw new Error(
       `[graphorin/cli] invalid tier '${String(options.tier)}'. Allowed: ${VALID_TIERS.join(' | ')}.`,
@@ -141,18 +138,21 @@ export async function runConsolidatorSetTier(
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
-    ensureAdminTable(ctx.store.connection);
-    ctx.store.connection.run(
-      `INSERT INTO consolidator_admin (key, value, updated_at) VALUES ('tier', ?, ?)
-       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
-      [options.tier, Date.now()],
-    );
-    const result = { tier: options.tier } as const;
+    // IP-4: the old implementation upserted a `consolidator_admin` row
+    // NOTHING polls (neither the daemon nor process startup reads it —
+    // createConsolidator takes the tier from opts) and reported
+    // success. Honest answer until a daemon-side control channel
+    // exists: UNSUPPORTED with the working alternative.
+    const result = { tier: options.tier, applied: false, unsupported: true } as const;
     emitReport(options, result, () => {
       const print = options.print ?? defaultPrintSink;
-      print(brand(`consolidator tier hint persisted: ${options.tier}`));
-      print(brand(`The running daemon picks up the new tier at the next scheduled iteration.`));
+      print(
+        brand(
+          `runtime tier switching is not wired yet — set the tier in the server config (consolidator.tier: '${options.tier}') and restart, or use the server API when available.`,
+        ),
+      );
     });
+    process.exitCode = EXIT_CODES.UNSUPPORTED;
     return result;
   } finally {
     await ctx.close();
@@ -165,32 +165,36 @@ export interface ConsolidatorStopOptions extends ConsolidatorCommonOptions {}
 /** @stable */
 export async function runConsolidatorStop(
   options: ConsolidatorStopOptions = {},
-): Promise<{ readonly stopped: true }> {
+): Promise<{ readonly stopped: false; readonly unsupported: true }> {
   const ctx = await openStoreContext({
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
-    ensureAdminTable(ctx.store.connection);
-    ctx.store.connection.run(
-      `INSERT INTO consolidator_admin (key, value, updated_at) VALUES ('paused', '1', ?)
-       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
-      [Date.now()],
-    );
-    const result = { stopped: true } as const;
+    // IP-4: the old implementation persisted a pause flag NOTHING
+    // honoured and told the operator the daemon would stop — the worst
+    // possible lie when someone is trying to stop runaway LLM spend.
+    const result = { stopped: false, unsupported: true } as const;
     emitReport(options, result, () => {
       const print = options.print ?? defaultPrintSink;
-      print(brand('consolidator pause flag persisted; the daemon honours it on the next tick.'));
       print(
-        brand("Resume with 'graphorin consolidator set-tier <tier>' or by restarting the server."),
+        brand(
+          'a CLI stop channel is not wired yet — to stop consolidation NOW, stop the server process (the consolidator runs inside it).',
+        ),
+      );
+      print(
+        brand(
+          'To stay stopped across restarts set consolidator.tier to a zero-budget tier in the config.',
+        ),
       );
     });
+    process.exitCode = EXIT_CODES.UNSUPPORTED;
     return result;
   } finally {
     await ctx.close();
   }
 }
 
-function ensureAdminTable(conn: { exec(sql: string): void }): void {
+function _ensureAdminTable(conn: { exec(sql: string): void }): void {
   conn.exec(
     `CREATE TABLE IF NOT EXISTS consolidator_admin (
        key TEXT PRIMARY KEY,

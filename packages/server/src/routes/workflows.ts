@@ -28,6 +28,8 @@ export interface WorkflowRoutesDeps {
   readonly workflows: WorkflowRegistry;
   readonly runs: RunStateTracker;
   readonly newRunId?: () => string;
+  /** Streaming dispatcher (IP-2): workflow events reach the run subject. */
+  readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
 }
 
 const ExecuteBodySchema = z
@@ -99,14 +101,19 @@ export function createWorkflowRoutes(
       // Workflows are streaming-first; the REST endpoint kicks off the
       // run in the background and returns 202 + runId. The actual
       // event stream is consumed via WebSocket / SSE in Phase 14b.
-      backgroundExecute(workflow, parsed.data, tracker, deps.runs, runId);
+      const subject = `workflow:${id}/runs/${runId}/events`;
+      backgroundExecute(workflow, parsed.data, tracker, deps.runs, runId, {
+        subject,
+        ...(deps.dispatcher !== undefined ? { dispatcher: deps.dispatcher } : {}),
+      });
       return c.json(
         {
           runId,
           status: 'running',
           subscribe: {
-            websocket: `workflow:${id}/runs/${runId}/events`,
-            sse: `/v1/runs/${runId}/events`,
+            // IP-2: the previously-advertised SSE URL was never
+            // mounted; the WS subject (now in the grammar) delivers.
+            websocket: subject,
           },
         },
         202,
@@ -271,16 +278,31 @@ function backgroundExecute(
   tracker: { readonly signal: AbortSignal },
   runs: RunStateTracker,
   runId: string,
+  streaming: {
+    readonly subject: string;
+    readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
+  },
 ): void {
   const opts: { signal?: AbortSignal; threadId?: string } = { signal: tracker.signal };
   if (body.threadId !== undefined) opts.threadId = body.threadId;
   void (async () => {
     try {
-      for await (const _ of workflow.execute(body.input ?? {}, opts)) {
+      // IP-2: every workflow event reaches the dispatcher — the old
+      // loop iterated the stream and threw each event away.
+      for await (const ev of workflow.execute(body.input ?? {}, opts)) {
         if (tracker.signal.aborted) break;
+        const type =
+          typeof (ev as { type?: unknown }).type === 'string'
+            ? (ev as { type: string }).type
+            : 'workflow.event';
+        streaming.dispatcher?.emit(streaming.subject, { type, payload: ev });
       }
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'completed');
     } catch (err) {
+      streaming.dispatcher?.emit(streaming.subject, {
+        type: 'workflow.error',
+        payload: { runId, message: err instanceof Error ? err.message : String(err) },
+      });
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'failed', err);
     }
   })();

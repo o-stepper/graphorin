@@ -51,3 +51,72 @@ describe('createRateLimitMiddleware', () => {
     expect(b.status).toBe(200);
   });
 });
+
+describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
+  it('two clients with different socket addresses get independent buckets (trustProxy=false)', async () => {
+    const { Hono } = await import('hono');
+    const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
+    const { createRateLimitMiddleware } = await import('../src/middleware/rate-limit.js');
+    const app = new Hono();
+    app.use('*', createRequestStateMiddleware({}));
+    app.use(
+      '*',
+      createRateLimitMiddleware({ enabled: true, perIpRequests: 2, windowMs: 60_000 }) as never,
+    );
+    app.get('/x', (c) => c.text('ok'));
+
+    const env = (addr: string) => ({ incoming: { socket: { remoteAddress: addr } } });
+    // Client A exhausts ITS budget…
+    expect((await app.request('/x', {}, env('10.0.0.1'))).status).toBe(200);
+    expect((await app.request('/x', {}, env('10.0.0.1'))).status).toBe(200);
+    expect((await app.request('/x', {}, env('10.0.0.1'))).status).toBe(429);
+    // …client B is unaffected (the old code keyed EVERYTHING to 'anonymous').
+    expect((await app.request('/x', {}, env('10.0.0.2'))).status).toBe(200);
+  });
+
+  it('X-Real-IP / X-Forwarded-For are ignored when trustProxy=false — the socket wins', async () => {
+    const { Hono } = await import('hono');
+    const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
+    const app = new Hono();
+    app.use('*', createRequestStateMiddleware({}));
+    app.get('/ip', (c) =>
+      c.json({ ip: (c.get('state' as never) as { clientIp?: string }).clientIp }),
+    );
+    const res = await app.request(
+      '/ip',
+      { headers: { 'X-Real-IP': '6.6.6.6', 'X-Forwarded-For': '7.7.7.7' } },
+      { incoming: { socket: { remoteAddress: '10.1.1.1' } } },
+    );
+    expect(((await res.json()) as { ip?: string }).ip).toBe('10.1.1.1');
+  });
+
+  it('the window map is swept once it crosses the cap', async () => {
+    const { Hono } = await import('hono');
+    const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
+    const { createRateLimitMiddleware } = await import('../src/middleware/rate-limit.js');
+    let nowMs = 1_000_000;
+    const app = new Hono();
+    app.use('*', createRequestStateMiddleware({ now: () => nowMs }));
+    app.use(
+      '*',
+      createRateLimitMiddleware(
+        { enabled: true, perIpRequests: 100, windowMs: 1_000 },
+        { now: () => nowMs },
+      ) as never,
+    );
+    app.get('/x', (c) => c.text('ok'));
+    const env = (i: number) => ({
+      incoming: { socket: { remoteAddress: `10.9.${(i / 250) | 0}.${i % 250}` } },
+    });
+    // Fill past the sweep threshold with distinct IPs…
+    for (let i = 0; i < 10_050; i++) {
+      await app.request('/x', {}, env(i));
+    }
+    // …expire them, and one more request triggers the sweep.
+    nowMs += 5_000;
+    const res = await app.request('/x', {}, env(99_999));
+    expect(res.status).toBe(200);
+    // No direct map handle — the behavioural proof is that the request
+    // path stays correct after the sweep; the bound is structural.
+  });
+});

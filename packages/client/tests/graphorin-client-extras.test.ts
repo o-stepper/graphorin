@@ -9,11 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ClientNotConnectedError, TransportFailedError } from '../src/errors.js';
 import { GraphorinClient } from '../src/graphorin-client.js';
-import {
-  lastEventSource,
-  MockEventSource,
-  resetMockEventSource,
-} from './__fixtures__/mock-event-source.js';
+import { MockEventSource, resetMockEventSource } from './__fixtures__/mock-event-source.js';
 import { lastSocket, MockWebSocket, resetMockTransport } from './__fixtures__/mock-websocket.js';
 
 beforeEach(() => {
@@ -26,6 +22,25 @@ afterEach(() => {
 });
 
 const FAKE_WS = MockWebSocket as unknown as typeof WebSocket;
+
+/** Minimal streaming fetch stub for the rewritten fetch-based SSE transport. */
+function sseFetchStub(capture?: { headers?: Record<string, string>; url?: string }): typeof fetch {
+  return (async (input: RequestInfo | URL, init?: RequestInit) => {
+    if (capture !== undefined) {
+      capture.url = String(input);
+      capture.headers = Object.fromEntries(
+        Object.entries((init?.headers ?? {}) as Record<string, string>),
+      );
+    }
+    const body = new ReadableStream<Uint8Array>({
+      start() {
+        // stays open; the client closes it
+      },
+    });
+    return new Response(body, { status: 200, headers: { 'Content-Type': 'text/event-stream' } });
+  }) as typeof fetch;
+}
+
 const FAKE_ES = MockEventSource as unknown as typeof EventSource;
 
 async function ackInitialize(): Promise<void> {
@@ -49,19 +64,34 @@ async function ackInitialize(): Promise<void> {
 }
 
 describe('GraphorinClient — SSE / fallback / misc', () => {
-  it('rejects subscribe with TransportFailedError when the transport is SSE', async () => {
+  it('SSE subscribe serves the BOUND session and rejects other subjects (IP-3)', async () => {
     const client = new GraphorinClient({
       baseUrl: 'http://x',
       auth: { kind: 'bearer', token: 't' },
       transport: 'sse',
-      EventSource: FAKE_ES,
+      sessionId: 'a',
+      fetch: sseFetchStub(),
     });
     await client.connect();
     expect(client.transportKind).toBe('sse');
-    await expect(client.subscribe({ target: 'session', id: 'a' })).rejects.toBeInstanceOf(
+    // The bound session stream IS the (synthetic) subscription now.
+    const sub = await client.subscribe({ target: 'session', id: 'a' });
+    expect(sub.subject).toBe('session:a/events');
+    // Any OTHER subject still requires the WS transport.
+    await expect(client.subscribe({ target: 'session', id: 'other' })).rejects.toBeInstanceOf(
       TransportFailedError,
     );
     await client.disconnect();
+  });
+
+  it('SSE connect without a sessionId fails with an actionable error (IP-3)', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'http://x',
+      auth: { kind: 'bearer', token: 't' },
+      transport: 'sse',
+      fetch: sseFetchStub(),
+    });
+    await expect(client.connect()).rejects.toThrow(/sessionId/);
   });
 
   it('rejects connect with TransportFailedError when SSE is requested but auth is ticket', async () => {
@@ -128,20 +158,26 @@ describe('GraphorinClient — SSE / fallback / misc', () => {
   });
 
   it('falls back to SSE on auto-mode when the WebSocket implementation is unavailable', async () => {
+    const capture: { headers?: Record<string, string>; url?: string } = {};
     const client = new GraphorinClient({
       baseUrl: 'http://x',
       auth: { kind: 'bearer', token: 't' },
       transport: 'auto',
+      sessionId: 'sess-fb',
       // No WebSocket impl supplied → openWebSocketTransport throws,
       // and the auto-mode resolver should fall through to SSE.
-      EventSource: FAKE_ES,
+      fetch: sseFetchStub(capture),
     });
     const original = globalThis.WebSocket;
     (globalThis as { WebSocket?: unknown }).WebSocket = undefined;
     try {
       await client.connect();
       expect(client.transportKind).toBe('sse');
-      expect(lastEventSource().init.headers?.Authorization).toBe('Bearer t');
+      // fetch carries the Authorization header natively (IP-3) and the
+      // session is substituted into the path (no literal ':sessionId').
+      expect(capture.headers?.Authorization).toBe('Bearer t');
+      expect(capture.url).toContain('/v1/sessions/sess-fb/events');
+      expect(capture.url).not.toContain(':sessionId');
       await client.disconnect();
     } finally {
       (globalThis as { WebSocket?: unknown }).WebSocket = original;

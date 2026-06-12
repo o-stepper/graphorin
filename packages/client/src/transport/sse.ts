@@ -5,28 +5,26 @@
  * (subscribe / abort / resume) must go through REST endpoints
  * exposed by `@graphorin/server`.
  *
+ * IP-3: implemented on **fetch streaming**, not `EventSource`. The
+ * server writes *named* events (`event: <frame.type>`), which an
+ * `EventSource` delivers only to listeners registered per type — an
+ * unbounded catalogue the old `message`-only listener never saw.
+ * Every frame's full JSON rides in `data:`, so a direct SSE parse
+ * that ignores the event name delivers everything — and `fetch`
+ * sends the `Authorization` header natively (no polyfill seam).
+ *
  * @packageDocumentation
  */
 
-import { isEventFrame, ServerMessageSchema } from '@graphorin/protocol';
+import { ServerMessageSchema } from '@graphorin/protocol';
 
-import {
-  InvalidServerFrameError,
-  ProtocolViolationError,
-  TransportFailedError,
-} from '../errors.js';
+import { InvalidServerFrameError, TransportFailedError } from '../errors.js';
 import type { Transport, TransportListeners, TransportOptions } from './types.js';
 
 /**
- * Open an SSE transport. Resolves once the underlying `EventSource`
- * fires `open`; rejects with a typed
- * {@link TransportFailedError} on construction failure.
- *
- * The auth strategy must be `'bearer'` — SSE has no equivalent of the
- * WebSocket ticket flow because `EventSource` does not allow custom
- * headers in browsers either. SDK / server-to-server clients should
- * use the optional `EventSource` injection seam to provide a
- * polyfill that DOES allow headers (e.g. `eventsource@2.x` on Node).
+ * Open an SSE transport. Resolves once the server answers with a
+ * streaming response; rejects with a typed
+ * {@link TransportFailedError} on construction / connection failure.
  *
  * @stable
  */
@@ -39,80 +37,69 @@ export async function openSseTransport(
       `SSE transport supports only the 'bearer' auth strategy; got '${options.auth.kind}'.`,
     );
   }
-  const EventSourceImpl = options.EventSource ?? globalThis.EventSource;
-  if (typeof EventSourceImpl !== 'function') {
-    throw new TransportFailedError(
-      'No EventSource implementation found. Pass `EventSource` via the transport options or run on a runtime that ships one (modern browsers; `eventsource` polyfill on Node).',
-    );
+  const fetchImpl = options.fetch ?? globalThis.fetch;
+  if (typeof fetchImpl !== 'function') {
+    throw new TransportFailedError('No fetch implementation available for the SSE transport.');
   }
-  const url = new URL(options.url);
-  // Some `EventSource` polyfills accept an init dict with headers.
-  let source: EventSource;
+  const controller = new AbortController();
+  let resp: Response;
   try {
-    source = new EventSourceImpl(url.toString(), {
-      withCredentials: false,
-      // The `headers` field is non-standard but supported by the
-      // popular Node polyfills (e.g. `eventsource@^2.x`).
-      headers: { Authorization: `Bearer ${options.auth.token}` },
-    } as never);
+    resp = await fetchImpl(options.url, {
+      method: 'GET',
+      headers: {
+        Accept: 'text/event-stream',
+        Authorization: `Bearer ${options.auth.token}`,
+      },
+      signal: controller.signal,
+    });
   } catch (cause) {
     throw new TransportFailedError(
-      `Failed to construct EventSource for '${url.toString()}'.`,
+      `SSE connection to '${options.url}' failed.`,
       cause instanceof Error ? { cause } : {},
     );
   }
-  let openFired = false;
+  if (!resp.ok || resp.body === null) {
+    throw new TransportFailedError(
+      `SSE endpoint '${options.url}' answered ${resp.status}${resp.body === null ? ' with no body' : ''}.`,
+    );
+  }
+
   let lastEventId: string | undefined;
   let closeFired = false;
-  return await new Promise<Transport>((resolve, reject) => {
-    const fail = (err: Error): void => {
-      if (!openFired) {
-        cleanup();
-        reject(err);
-      } else {
-        listeners.onError(err);
+  const close = (reason: { code: number; reason: string; wasClean: boolean }): void => {
+    if (closeFired) return;
+    closeFired = true;
+    listeners.onClose(reason);
+  };
+
+  // Consume the stream in the background: split on newlines, parse
+  // `id:` / `data:` fields, dispatch on blank lines. The `event:`
+  // name is intentionally ignored — the full frame JSON is in `data:`.
+  void (async () => {
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let dataLines: string[] = [];
+    let pendingId: string | undefined;
+
+    const dispatch = (): void => {
+      if (dataLines.length === 0) {
+        pendingId = undefined;
+        return;
       }
-    };
-    const cleanup = (): void => {
-      source.removeEventListener('open', onOpen);
-      source.removeEventListener('message', onMessage);
-      source.removeEventListener('error', onError);
-    };
-    const onOpen = (): void => {
-      openFired = true;
-      listeners.onOpen();
-      resolve({
-        kind: 'sse',
-        url: url.toString(),
-        send(): void {
-          throw new TransportFailedError(
-            'SSE transport is read-only. Use REST for control-plane operations.',
-          );
-        },
-        close(): void {
-          if (closeFired) return;
-          closeFired = true;
-          cleanup();
-          source.close();
-          listeners.onClose({ code: 1000, reason: 'client-closed', wasClean: true });
-        },
-        get lastEventId(): string | undefined {
-          return lastEventId;
-        },
-      });
-    };
-    const onMessage = (event: MessageEvent): void => {
-      const raw = typeof event.data === 'string' ? event.data : '';
+      const raw = dataLines.join('\n');
+      dataLines = [];
+      const id = pendingId;
+      pendingId = undefined;
       let payload: unknown;
       try {
         payload = JSON.parse(raw);
       } catch {
-        fail(new ProtocolViolationError('Server sent a non-JSON SSE event.'));
+        // Keep-alive / non-JSON data is not a frame.
         return;
       }
       const parsed = ServerMessageSchema.safeParse(payload);
       if (!parsed.success) {
-        fail(
+        listeners.onError(
           new InvalidServerFrameError(
             'Server SSE frame failed schema validation.',
             parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
@@ -121,38 +108,62 @@ export async function openSseTransport(
         return;
       }
       const frame = parsed.data;
-      if (isEventFrame(frame)) {
-        lastEventId = frame.eventId;
-      } else if (typeof event.lastEventId === 'string' && event.lastEventId.length > 0) {
-        lastEventId = event.lastEventId;
-      }
+      const eventId = (frame as { eventId?: string }).eventId ?? id;
+      if (typeof eventId === 'string' && eventId.length > 0) lastEventId = eventId;
       listeners.onFrame(frame);
     };
-    const onError = (event: Event): void => {
-      const err = new TransportFailedError('SSE error event fired.', {
-        cause: event instanceof Error ? event : undefined,
-      });
-      if (!openFired) {
-        fail(err);
+
+    try {
+      for await (const chunk of resp.body as unknown as AsyncIterable<Uint8Array>) {
+        buffer += decoder.decode(chunk, { stream: true });
+        for (;;) {
+          const nl = buffer.indexOf('\n');
+          if (nl === -1) break;
+          const line = buffer.slice(0, nl).replace(/\r$/, '');
+          buffer = buffer.slice(nl + 1);
+          if (line.length === 0) {
+            dispatch();
+            continue;
+          }
+          if (line.startsWith(':')) continue; // comment / keep-alive
+          if (line.startsWith('data:')) {
+            dataLines.push(line.slice(5).replace(/^ /, ''));
+          } else if (line.startsWith('id:')) {
+            pendingId = line.slice(3).trim();
+          }
+          // `event:` / `retry:` fields are intentionally ignored.
+        }
+      }
+      close({ code: 1000, reason: 'stream ended', wasClean: true });
+    } catch (err) {
+      if (controller.signal.aborted) {
+        close({ code: 1000, reason: 'closed by client', wasClean: true });
         return;
       }
-      if (closeFired) return;
-      closeFired = true;
-      cleanup();
-      try {
-        source.close();
-      } catch {
-        // EventSource.close is idempotent on every implementation we
-        // care about; ignore double-close throws from polyfills.
-      }
-      listeners.onClose({
+      close({
         code: 1006,
-        reason: err.message,
+        reason: err instanceof Error ? err.message : String(err),
         wasClean: false,
       });
-    };
-    source.addEventListener('open', onOpen);
-    source.addEventListener('message', onMessage);
-    source.addEventListener('error', onError);
-  });
+    }
+  })();
+
+  listeners.onOpen();
+  const transport: Transport = {
+    kind: 'sse',
+    url: options.url,
+    send: () => {
+      throw new TransportFailedError(
+        'The SSE transport is read-only; control-plane calls go through REST.',
+      );
+    },
+    close: () => {
+      controller.abort();
+      close({ code: 1000, reason: 'closed by client', wasClean: true });
+    },
+    get lastEventId(): string | undefined {
+      return lastEventId;
+    },
+  };
+  return transport;
 }

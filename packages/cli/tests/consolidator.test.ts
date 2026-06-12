@@ -32,11 +32,18 @@ describe('graphorin consolidator', () => {
     expect(out.dlqSize).toBe(0);
   });
 
-  it('set-tier persists the chosen tier hint', async () => {
+  it('set-tier reports UNSUPPORTED honestly — no phantom persistence (IP-4)', async () => {
     const cfg = await fixture();
-    await runConsolidatorSetTier({ config: cfg, tier: 'cheap', print: () => undefined });
-    const after = await runConsolidatorStatus({ config: cfg, print: () => undefined });
-    expect(after.tierHint).toBe('cheap');
+    const before = process.exitCode;
+    const out = await runConsolidatorSetTier({
+      config: cfg,
+      tier: 'cheap',
+      print: () => undefined,
+    });
+    expect(out.applied).toBe(false);
+    expect(out.unsupported).toBe(true);
+    expect(process.exitCode).toBe(2);
+    process.exitCode = before;
   });
 
   it('rejects an invalid tier value', async () => {
@@ -50,9 +57,13 @@ describe('graphorin consolidator', () => {
     ).rejects.toThrow(/invalid tier/);
   });
 
-  it('stop persists the pause flag', async () => {
+  it('stop reports UNSUPPORTED honestly — never claims the daemon stopped (IP-4)', async () => {
     const cfg = await fixture();
+    const before = process.exitCode;
     const out = await runConsolidatorStop({ config: cfg, print: () => undefined });
-    expect(out.stopped).toBe(true);
+    expect(out.stopped).toBe(false);
+    expect(out.unsupported).toBe(true);
+    expect(process.exitCode).toBe(2);
+    process.exitCode = before;
   });
 });

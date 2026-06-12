@@ -136,3 +136,97 @@ describe('createIdempotencyMiddleware', () => {
     expect(counter()).toBe(2);
   });
 });
+
+describe('IP-6 — principal binding + secret-endpoint exclusion', () => {
+  function buildAuthedApp(): {
+    readonly app: Hono<{ Variables: ServerVariables }>;
+    readonly store: InMemoryIdempotencyStore;
+    readonly counter: () => number;
+  } {
+    const config = parseServerConfig({});
+    const store = new InMemoryIdempotencyStore();
+    let counter = 0;
+    const app = new Hono<{ Variables: ServerVariables }>();
+    app.use('*', createRequestStateMiddleware({}));
+    // Inject a per-request principal from the X-Test-Token header (the
+    // real auth middleware sets the same state shape).
+    app.use('*', async (c, next) => {
+      const tokenId = c.req.header('x-test-token');
+      if (tokenId !== undefined) {
+        c.set('state', {
+          ...c.get('state'),
+          auth: {
+            kind: 'token' as const,
+            token: { tokenId } as never,
+            grantedScopes: [],
+          },
+        });
+      }
+      await next();
+    });
+    app.use(
+      '*',
+      createIdempotencyMiddleware({
+        store,
+        config: config.server.idempotency,
+        excludeResponseCachePaths: ['/tokens'],
+      }),
+    );
+    app.post('/run', async (c) => {
+      counter += 1;
+      return c.json({ counter }, 201);
+    });
+    app.post('/tokens', async (c) => {
+      counter += 1;
+      return c.json({ token: `gph_live_secret_${counter}` }, 201);
+    });
+    return { app, store, counter: () => counter };
+  }
+
+  it('a replay from a DIFFERENT principal is rejected, same principal replays fine', async () => {
+    const { app, counter } = buildAuthedApp();
+    const post = (token: string) =>
+      app.request('/run', {
+        method: 'POST',
+        headers: {
+          'Idempotency-Key': 'shared-key-1',
+          'Content-Type': 'application/json',
+          'X-Test-Token': token,
+        },
+        body: JSON.stringify({ v: 1 }),
+      });
+    const first = await post('tok-alice');
+    expect(first.status).toBe(201);
+    // Same principal → cached replay.
+    const replay = await post('tok-alice');
+    expect(replay.status).toBe(201);
+    expect(replay.headers.get('Idempotency-Replayed')).toBe('true');
+    expect(counter()).toBe(1);
+    // Different principal, same key + body → rejected, NOT replayed.
+    const stolen = await post('tok-mallory');
+    expect(stolen.status).toBe(409);
+    expect(counter()).toBe(1);
+  });
+
+  it('secret-bearing endpoints are excluded: nothing cached, repeats re-execute', async () => {
+    const { app, store, counter } = buildAuthedApp();
+    const mint = () =>
+      app.request('/tokens', {
+        method: 'POST',
+        headers: {
+          'Idempotency-Key': 'mint-1',
+          'Content-Type': 'application/json',
+          'X-Test-Token': 'tok-admin',
+        },
+        body: JSON.stringify({}),
+      });
+    const a = (await (await mint()).json()) as { token: string };
+    const b = (await (await mint()).json()) as { token: string };
+    // Re-executed (no replay) — a fresh secret each time…
+    expect(a.token).not.toBe(b.token);
+    expect(counter()).toBe(2);
+    // …and the raw secret is NEVER persisted in the idempotency store.
+    const dump = JSON.stringify(await store.get('mint-1'));
+    expect(dump).not.toContain('gph_live_secret_');
+  });
+});

@@ -81,7 +81,7 @@ export async function runInit(options: InitCommandOptions = {}): Promise<InitCom
   print('');
   print('Next steps:');
   print(
-    `  1. Persist the pepper: graphorin secrets set graphorin_server_pepper=${pepperHex}  (Phase 15)`,
+    `  1. Persist the pepper: graphorin secrets set graphorin_server_pepper --value ${pepperHex}`,
   );
   print(`  2. Persist the bootstrap token securely; do NOT commit it.`);
   print(`  3. Run \`graphorin migrate --config ${target}\` to apply storage migrations.`);
@@ -176,15 +176,12 @@ export default defineConfig({
   observability: {
     logger: 'json',
   },
-  // First-run sensitivity tier per DEC-018 / DEC-126 — referenced by the
-  // memory + tools layers when deciding what context is allowed to leave
-  // the local process.
-  // @ts-expect-error — defaults block is forward-compatible for v0.1+.
-  defaults: {
-    sensitivity: {
-      cloudUploadConsent: ${JSON.stringify(input.cloudConsent)},
-    },
-  },
+  // IP-5: no top-level 'defaults' block — the strict server-config
+  // parser rejects unknown keys, so the old render made a fresh
+  // 'graphorin init' fail on the very next migrate/start. The tier you
+  // chose at init is recorded below; enforce it via the memory
+  // package (createMemory contextEngine privacy options):
+  // cloudUploadConsent: ${JSON.stringify(input.cloudConsent)}
 });
 `;
 }

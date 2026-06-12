@@ -40,6 +40,13 @@ const KEY_RE = /^[A-Za-z0-9_\-:]{8,255}$/;
  * @stable
  */
 export interface IdempotencyMiddlewareOptions {
+  /**
+   * Paths whose responses are NEVER cached or replayed (IP-6) — the
+   * middleware passes straight through. Used for secret-bearing
+   * endpoints (`POST /v1/tokens` returns a raw token; caching it would
+   * persist the secret plaintext in durable SQLite for the TTL).
+   */
+  readonly excludeResponseCachePaths?: ReadonlyArray<string>;
   readonly store: IdempotencyStore;
   readonly config: ServerConfigSpec['server']['idempotency'];
   /** Wall-clock provider; tests inject a deterministic generator. */
@@ -66,8 +73,16 @@ export function createIdempotencyMiddleware(
   const now = options.now ?? Date.now;
   const lru = new SimpleLru<string, CacheEntry>(config.lruCacheSize);
 
+  const excluded = new Set(options.excludeResponseCachePaths ?? []);
+
   return async (c, next) => {
     if (SAFE_METHODS.has(c.req.method.toUpperCase())) {
+      await next();
+      return;
+    }
+    // IP-6: secret-bearing endpoints opt out of response caching
+    // entirely — repeats re-execute and no body is ever persisted.
+    if (excluded.has(c.req.path)) {
       await next();
       return;
     }
@@ -111,7 +126,23 @@ export function createIdempotencyMiddleware(
         lru.set(key, { record, cachedAt: now() });
       }
     }
+    // IP-6: the verified principal the record is bound to. Replays are
+    // served only to the SAME principal that originally executed the
+    // request (who passed the route's scope checks at execute time) —
+    // a different token cannot fetch someone else's cached response,
+    // closing the scope-bypass the pre-router mount opened.
+    const auth = c.get('state').auth;
+    const principal = auth.kind === 'token' ? auth.token.tokenId : 'anonymous';
     if (record !== null) {
+      if (record.scope !== undefined && record.scope !== principal) {
+        return c.json(
+          {
+            error: 'idempotency-conflict',
+            message: `Idempotency-Key '${key}' is bound to a different principal.`,
+          },
+          409,
+        );
+      }
       if (config.checkBodyFingerprint && record.requestHash !== fingerprint) {
         return c.json(
           {
@@ -163,6 +194,8 @@ export function createIdempotencyMiddleware(
       statusCode: status,
       response: responseBody,
       ...(responseHeaders !== undefined ? { responseHeaders } : {}),
+      // IP-6: bind the record to the executing principal.
+      scope: principal,
       createdAt: now(),
       expiresAt: now() + config.ttlSeconds * 1000,
     };

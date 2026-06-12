@@ -905,6 +905,8 @@ function mountRoutes(
       store: ctx.store.idempotency,
       config: config.server.idempotency,
       now: ctx.now,
+      // IP-6: token minting returns a raw secret — never cache it.
+      excludeResponseCachePaths: [`${base}/tokens`],
     });
     app.use(`${base}/*`, async (c, next) => {
       if (shouldSkipAuth(c.req.path)) {
@@ -920,11 +922,23 @@ function mountRoutes(
   // continues to serve the rollup.
   app.route(`${base}/health/secrets`, createSecretsHealthRoutes());
 
-  app.route(`${base}/agents`, createAgentRoutes({ agents: ctx.agents, runs: ctx.runs }));
+  app.route(
+    `${base}/agents`,
+    createAgentRoutes({
+      agents: ctx.agents,
+      runs: ctx.runs,
+      // IP-2: the streaming dispatcher reaches the route layer.
+      ...(ctx.wsDispatcher !== undefined ? { dispatcher: ctx.wsDispatcher } : {}),
+    }),
+  );
   app.route(`${base}/runs`, createRunRoutes({ agents: ctx.agents, runs: ctx.runs }));
   app.route(
     `${base}/workflows`,
-    createWorkflowRoutes({ workflows: ctx.workflows, runs: ctx.runs }),
+    createWorkflowRoutes({
+      workflows: ctx.workflows,
+      runs: ctx.runs,
+      ...(ctx.wsDispatcher !== undefined ? { dispatcher: ctx.wsDispatcher } : {}),
+    }),
   );
   if (ctx.sessions !== undefined) {
     app.route(`${base}/sessions`, createSessionRoutes({ sessions: ctx.sessions }));
@@ -998,6 +1012,8 @@ function mountRoutes(
       createSseRoutes({
         dispatcher: ctx.wsDispatcher,
         keepAliveMs: config.server.sse.keepAliveMs,
+        // IP-9: bound the per-connection delivery queue.
+        perConnectionQueueLimit: config.server.stream.perConnectionQueueLimit,
         now: ctx.now,
       }),
     );

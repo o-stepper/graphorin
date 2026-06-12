@@ -11,7 +11,6 @@
  *   GET    /sessions/:id/messages        (scope `sessions:read`)
  *   GET    /sessions/:id/handoffs        (scope `sessions:read`)
  *   POST   /sessions/:id/export          (scope `sessions:export`)
- *   POST   /sessions/:id/replay          (scope `sessions:replay` + traces:read[:sanitized|:raw])
  *
  * @packageDocumentation
  */
@@ -86,7 +85,7 @@ const ExportBodySchema = z
   .strict()
   .default({});
 
-const ReplayBodySchema = z
+const _ReplayBodySchema = z
   .object({
     raw: z.boolean().optional(),
     fromMessageId: z.string().min(1).optional(),
@@ -210,60 +209,11 @@ export function createSessionRoutes(deps: SessionRoutesDeps): Hono<{ Variables: 
     return c.json({ sessionId: id, export: result });
   });
 
-  app.post('/:id/replay', createScopeMiddleware('sessions:replay'), async (c) => {
-    const id = c.req.param('id');
-    const parsed = ReplayBodySchema.safeParse(await safelyParseJson(c));
-    if (!parsed.success) {
-      return c.json(
-        {
-          error: 'config-invalid',
-          message: 'Invalid replay body.',
-          issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
-        },
-        400,
-      );
-    }
-    // Replay scope ladder: sanitized vs raw. The auth middleware
-    // already enforced `sessions:replay`; we additionally require
-    // the corresponding `traces:read[:sanitized|:raw]` grant per
-    // DEC-138 / ADR-032.
-    const requiredTracesScope =
-      parsed.data.raw === true ? 'traces:read:raw' : 'traces:read:sanitized';
-    const auth = c.get('state').auth;
-    const grantedScopes = auth.kind === 'token' ? auth.grantedScopes : [];
-    const grantedRaws = grantedScopes.map((scope) => scope.raw);
-    const allowed = grantedScopes.some(
-      (scope) => scope.raw === requiredTracesScope || scope.raw === 'admin:*',
-    );
-    if (!allowed) {
-      return c.json(
-        {
-          error: 'scope-denied',
-          message: `Token lacks required scope '${requiredTracesScope}'.`,
-          granted: grantedRaws,
-        },
-        403,
-      );
-    }
-    if (deps.sessions.replaySession === undefined) {
-      return c.json(
-        { error: 'session-replay-unsupported', message: 'Replay is not enabled.' },
-        400,
-      );
-    }
-    // Phase 14a returns a 202 + cursor; the actual stream is
-    // delivered through the WebSocket layer in Phase 14b.
-    return c.json(
-      {
-        sessionId: id,
-        status: 'pending',
-        subscribe: {
-          websocket: `session:${id}/replay`,
-        },
-      },
-      202,
-    );
-  });
+  // IP-14: the session-replay route lives in `replay/routes.ts` (the
+  // scope-laddered, audit-backed implementation). The Phase-14a stub
+  // that lived here SHADOWED it (mounted earlier on the same path)
+  // while advertising a `session:<id>/replay` subject the WS grammar
+  // cannot parse — deleted.
 
   return app;
 }
