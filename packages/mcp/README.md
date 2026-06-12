@@ -178,9 +178,25 @@ const issues = await createMCPClient({
   transport: {
     kind: 'streamable-http',
     url: 'https://issues.example.com/mcp',
-    headers: { Authorization: await authProvider.resolveHeader() },
   },
+  // The client installs a per-request fetch-wrapper that calls
+  // `authProvider.resolveHeader()` on every outgoing request, so the
+  // refresh-ahead window fires automatically and a long-lived session
+  // survives token expiry without re-creating the client. Do **not**
+  // resolve the token once into static `headers` — that pins a single
+  // token and defeats the refresh.
   authProvider,
+});
+```
+
+For a rare pre-shared token, pass `bearerToken` instead (mutually
+exclusive with `authProvider`; supplying both throws
+`MCPInvalidConfigError`):
+
+```ts
+const issues = await createMCPClient({
+  transport: { kind: 'streamable-http', url: 'https://issues.example.com/mcp' },
+  bearerToken: process.env.ISSUES_MCP_TOKEN!,
 });
 ```
 

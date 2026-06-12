@@ -147,20 +147,26 @@ Observability: `mcp.elicitation.requested|accepted|declined.total`, `mcp.samplin
 
 Remote MCP servers that require authorisation flow through `@graphorin/security/oauth`, which implements the **Authorization Code grant with PKCE-S256** (RFC 7636 + OAuth 2.1) plus refresh-token rotation (RFC 6749 § 6) using the optional [`openid-client`](https://github.com/panva/openid-client) peer dependency. The Device Authorization Grant is also supported for headless clients.
 
-The CLI command `graphorin auth login` walks the operator through the flow once; the resulting tokens are stored as `SecretValue`s in the configured secrets store and refreshed lazily on the next call. To use the resulting tokens with an MCP client, resolve the bearer through a `SecretRef` and pass it into the transport's `headers`:
+The CLI command `graphorin auth login` walks the operator through the flow once; the resulting tokens are stored as `SecretValue`s in the configured secrets store and refreshed lazily on the next call. To use the resulting tokens with an MCP client, pass an `authProvider` built by `createOAuthAuthorizationProvider`. The client installs a per-request fetch-wrapper that calls `authProvider.resolveHeader()` on **every** outgoing request, so the refresh-ahead window fires automatically and a long-lived agent session survives token expiry without re-creating the client:
 
 ```ts
-import { resolveSecret } from '@graphorin/security';
+import { createOAuthAuthorizationProvider, createMCPClient } from '@graphorin/mcp';
 
-const token = await resolveSecret('keyring:mcp_example_token');
+const authProvider = createOAuthAuthorizationProvider({
+  serverId: 'example-mcp',
+  storage, // the OAuthServerStore the login flow persisted to
+});
+
 const httpClient = await createMCPClient({
   transport: {
     kind: 'streamable-http',
     url: 'https://mcp.example.com/v1',
-    headers: { authorization: `Bearer ${token.reveal()}` },
   },
+  authProvider,
 });
 ```
+
+Do **not** resolve the token once into static `headers` — that pins a single token and defeats the refresh-ahead window. For a rare pre-shared token, pass `bearerToken` instead; `authProvider` and `bearerToken` are mutually exclusive and supplying both throws `MCPInvalidConfigError`.
 
 ## Lifecycle
 

@@ -55,8 +55,6 @@ export interface StreamableHttpTransportConfig {
   readonly sessionId?: string;
   /** Custom `fetch` implementation; defaults to the global `fetch`. */
   readonly fetch?: typeof fetch;
-  /** Reference to an OAuth bearer-token source for outbound calls. */
-  readonly bearerTokenRef?: string;
 }
 
 /** Options for the deprecated `'sse'` transport. */
@@ -65,7 +63,6 @@ export interface SseTransportConfig {
   readonly url: string | URL;
   readonly headers?: Readonly<Record<string, string>>;
   readonly fetch?: typeof fetch;
-  readonly bearerTokenRef?: string;
 }
 
 /**
