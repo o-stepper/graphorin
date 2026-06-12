@@ -72,6 +72,7 @@ import {
 } from '@graphorin/tools/result';
 import {
   AgentRuntimeError,
+  ConcurrentRunError,
   InvalidAgentConfigError,
   InvalidPreferredModelError,
   MultipleHandoffsInStepError,
@@ -758,6 +759,8 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   // Per-run scratch refs surfaced through the public surface for
   // event emission from `steer(...)` / `followUp(...)`.
   let activeRunState: RunState | undefined;
+  /** AG-11: guards the one-in-flight-run-per-instance invariant. */
+  let runInFlight = false;
   const externalEventQueue: AgentEvent<TOutput>[] = [];
 
   /**
@@ -977,7 +980,42 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     ? new CausalityMonitor(config.causalityMonitor)
     : undefined;
 
+  /**
+   * AG-11: one in-flight run per Agent instance. `steer` / `followUp` /
+   * `abort` / `compact` address "the run" with no run handle, so
+   * overlapping runs on one instance cannot be expressed safely — they
+   * would share the abort controller, steer queue, active-run ref and
+   * executor bridge. A second concurrent `run()` / `stream()` rejects
+   * with {@link ConcurrentRunError}; run-scoped state is reset on entry
+   * (a steer/abort queued after the previous run ended belongs to NO
+   * run) and cleared in a `finally` that also covers abandoned streams
+   * (consumer `break`) and thrown runs.
+   */
   async function* runLoop(
+    input: AgentInput | RunState,
+    options: AgentCallOptions<TDeps>,
+  ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
+    if (runInFlight) {
+      throw new ConcurrentRunError();
+    }
+    runInFlight = true;
+    pendingSteer = [];
+    pendingAbort = undefined;
+    try {
+      return yield* runLoopInner(input, options);
+    } finally {
+      runInFlight = false;
+      activeRunState = undefined;
+      // Backstop for exits that bypass `finishRun` (abandoned stream,
+      // generator teardown): settle queued manual compactions so no
+      // `agent.compact()` promise is left hanging (CE-3/AG-13).
+      while (pendingManualCompacts.length > 0) {
+        pendingManualCompacts.shift()?.resolve(noopCompactionResult('no-active-run'));
+      }
+    }
+  }
+
+  async function* runLoopInner(
     input: AgentInput | RunState,
     options: AgentCallOptions<TDeps>,
   ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
