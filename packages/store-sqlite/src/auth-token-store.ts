@@ -37,6 +37,15 @@ export class SqliteAuthTokenStore implements AuthTokenStore {
     return row ? rowToRecord(row) : null;
   }
 
+  async getByHash(hashHex: string): Promise<AuthTokenRecord | null> {
+    // SPL-19: indexed lookup so the verifier's cache-miss path is not a
+    // full-table scan with a per-row timing-safe compare in JS.
+    const row = this.#conn.get<AuthTokenRow>('SELECT * FROM auth_tokens WHERE hash_hex = ?', [
+      hashHex,
+    ]);
+    return row ? rowToRecord(row) : null;
+  }
+
   async list(): Promise<ReadonlyArray<AuthTokenRecord>> {
     const rows = this.#conn.all<AuthTokenRow>('SELECT * FROM auth_tokens ORDER BY created_at');
     return rows.map(rowToRecord);

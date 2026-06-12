@@ -306,3 +306,53 @@ describe('@graphorin/security/auth — verify pipeline', () => {
     expect(`${pepper}`).toBe('[SECRET]');
   });
 });
+
+// --- SPL-19 — scale traps -------------------------------------------------------
+
+describe('SPL-19 — verifier scale behaviour', () => {
+  it('uses getByHash on cache-miss instead of walking list()', async () => {
+    const pepper = SecretValue.fromString('vRq8sJ2mKx0aZpW4uTn7eYb5cHd9fLg1');
+    const inner = createMemoryAuthTokenStore();
+    const created = await createToken({
+      tokenStore: inner,
+      pepper,
+      env: 'live',
+      scopes: ['agents:read'],
+    });
+    let byHashCalls = 0;
+    const indexed = {
+      put: inner.put.bind(inner),
+      get: inner.get.bind(inner),
+      revoke: inner.revoke.bind(inner),
+      recordUse: inner.recordUse.bind(inner),
+      list: async () => {
+        throw new Error('full scan! the verifier must use getByHash when available');
+      },
+      getByHash: async (hashHex: string) => {
+        byHashCalls += 1;
+        const all = await inner.list();
+        return all.find((r) => r.hashHex === hashHex) ?? null;
+      },
+    };
+    const verifier = new TokenVerifier({ tokenStore: indexed, pepper });
+    const raw = await created.raw.use(async (s) => s);
+    expect((await verifier.verify(raw)).ok).toBe(true);
+    expect(byHashCalls).toBe(1);
+  });
+
+  it('caps the per-IP failure map at maxTrackedIps', async () => {
+    const pepper = SecretValue.fromString('vRq8sJ2mKx0aZpW4uTn7eYb5cHd9fLg1');
+    const verifier = new TokenVerifier({
+      tokenStore: createMemoryAuthTokenStore(),
+      pepper,
+      maxTrackedIps: 50,
+    });
+    for (let i = 0; i < 200; i++) {
+      await verifier.verify('not-a-token', { ip: `2001:db8::${i.toString(16)}` });
+    }
+    // The rotating attacker cannot inflate the maps without bound.
+    const status = verifier.status();
+    expect(status.perIpFailures).toBeGreaterThan(0); // tracking IS happening
+    expect(status.perIpFailures).toBeLessThanOrEqual(50); // ...but bounded
+  });
+});

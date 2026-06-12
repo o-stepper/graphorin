@@ -108,6 +108,12 @@ export interface VerifierOptions {
   readonly perTokenWindowMs?: number;
   /** Concurrent-verify cap. Defaults to 100. */
   readonly maxConcurrentVerify?: number;
+  /**
+   * Cap on distinct IPs tracked in the failure/lockout maps (SPL-19).
+   * Default 10 000 — overflow sweeps expired lockouts, then evicts the
+   * oldest entries.
+   */
+  readonly maxTrackedIps?: number;
   /** Wall-clock provider for testing. Defaults to `Date.now`. */
   readonly now?: () => number;
 }
@@ -131,6 +137,8 @@ export interface VerifyContext {
 export interface TokenVerifierStatus {
   readonly cacheSize: number;
   readonly inFlight: number;
+  /** Distinct IPs currently in the failure window map (SPL-19, capped). */
+  readonly perIpFailures: number;
   readonly perIpLockouts: number;
   readonly perTokenLockouts: number;
 }
@@ -154,6 +162,7 @@ export class TokenVerifier {
   readonly #perTokenWindowMs: number;
   readonly #maxConcurrent: number;
   readonly #now: () => number;
+  readonly #maxTrackedIps: number;
   readonly #ipFailures = new Map<string, RateWindow>();
   readonly #ipLockouts = new Map<string, number>();
   readonly #tokenFailures = new Map<string, RateWindow>();
@@ -172,6 +181,7 @@ export class TokenVerifier {
     this.#perTokenThreshold = options.perTokenFailureThreshold ?? 10;
     this.#perTokenWindowMs = options.perTokenWindowMs ?? 5 * 60_000;
     this.#maxConcurrent = options.maxConcurrentVerify ?? 100;
+    this.#maxTrackedIps = options.maxTrackedIps ?? 10_000;
     this.#now = options.now ?? Date.now;
   }
 
@@ -291,6 +301,7 @@ export class TokenVerifier {
     return Object.freeze({
       cacheSize: this.#cache.size,
       inFlight: this.#inFlight,
+      perIpFailures: this.#ipFailures.size,
       perIpLockouts: this.#ipLockouts.size,
       perTokenLockouts: this.#tokenLockouts.size,
     });
@@ -333,6 +344,12 @@ export class TokenVerifier {
    * pass a custom `AuthTokenStore` that supports an indexed lookup.
    */
   async #findTokenId(hashHex: string): Promise<string | undefined> {
+    // SPL-19: indexed lookup when the store supports it — the re-check
+    // keeps the timing-safe comparison on the returned row.
+    if (typeof this.#tokenStore.getByHash === 'function') {
+      const record = await this.#tokenStore.getByHash(hashHex);
+      return record !== null && timingSafeEqualHex(record.hashHex, hashHex) ? record.id : undefined;
+    }
     const records = await this.#tokenStore.list();
     for (const record of records) {
       if (timingSafeEqualHex(record.hashHex, hashHex)) return record.id;
@@ -356,6 +373,32 @@ export class TokenVerifier {
       this.#ipFailures.delete(ip);
     } else {
       this.#ipFailures.set(ip, window);
+    }
+    this.#boundIpMaps(now);
+  }
+
+  /**
+   * SPL-19: an IPv6-rotating attacker must not inflate the per-IP maps
+   * without bound — each map is capped at `maxTrackedIps` (default
+   * 10 000). On overflow, expired lockouts sweep first; then the
+   * oldest-inserted entries evict (insertion order ≈ least recently
+   * created — a bounded approximation, deliberately cheap).
+   */
+  #boundIpMaps(now: number): void {
+    if (this.#ipLockouts.size > this.#maxTrackedIps) {
+      for (const [ip, until] of this.#ipLockouts) {
+        if (until <= now) this.#ipLockouts.delete(ip);
+      }
+      while (this.#ipLockouts.size > this.#maxTrackedIps) {
+        const oldest = this.#ipLockouts.keys().next().value;
+        if (oldest === undefined) break;
+        this.#ipLockouts.delete(oldest);
+      }
+    }
+    while (this.#ipFailures.size > this.#maxTrackedIps) {
+      const oldest = this.#ipFailures.keys().next().value;
+      if (oldest === undefined) break;
+      this.#ipFailures.delete(oldest);
     }
   }
 
@@ -416,6 +459,13 @@ interface CachedAuth {
   readonly expiresAt?: number;
 }
 
+/**
+ * SPL-19 (documented semantics): a TOUCH-RESET window, not a true
+ * sliding window — the count resets only after `windowMs` of full
+ * silence; continuous traffic keeps accumulating within one logical
+ * window. Deliberately cheap (two fields per key); operators needing
+ * exact sliding semantics put a rate limiter in front of the server.
+ */
 class RateWindow {
   count = 0;
   #lastTouch = 0;
