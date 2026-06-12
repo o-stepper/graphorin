@@ -304,6 +304,8 @@ function buildQuestionsRequest(deps: ReflectionDeps, recentSummaries: string): P
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: QUESTIONS_SYSTEM_PROMPT,
     temperature: 0,
+    // MCON-14: per-call output cap — a short question list.
+    maxTokens: 512,
     metadata: scopeMetadata(deps.scope),
     outputType: { kind: 'structured' },
   };
@@ -320,6 +322,8 @@ function buildInsightRequest(
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: INSIGHT_SYSTEM_PROMPT,
     temperature: 0,
+    // MCON-14: per-call output cap — one insight object.
+    maxTokens: 512,
     metadata: scopeMetadata(deps.scope),
     outputType: { kind: 'structured' },
   };

@@ -55,6 +55,16 @@ export interface FactInput {
    * this tag plus the injection heuristics; it is never author-set.
    */
   readonly provenance?: MemoryProvenance;
+  /**
+   * Importance hint in `[0, 1]` (X-1 / MCON-12). Feeds the multi-signal
+   * salience score that orders decay archiving and capacity eviction —
+   * higher importance ⇒ evicted later. Values are clamped to `[0, 1]`;
+   * non-finite values are dropped. The consolidator's extraction pass
+   * fills this from the model's per-fact 1–10 rating
+   * (`normalizeImportance`); absent ⇒ the neutral midpoint at scoring
+   * time.
+   */
+  readonly importance?: number;
 }
 
 /**
@@ -449,6 +459,11 @@ export class SemanticMemory {
         ...(input.predicate !== undefined ? { predicate: input.predicate } : {}),
         ...(input.object !== undefined ? { object: input.object } : {}),
         ...(input.confidence !== undefined ? { confidence: input.confidence } : {}),
+        // X-1 / MCON-12: the importance hint that drives salience-ordered
+        // forgetting. Clamped to [0, 1]; non-finite ⇒ unscored.
+        ...(typeof input.importance === 'number' && Number.isFinite(input.importance)
+          ? { importance: Math.min(1, Math.max(0, input.importance)) }
+          : {}),
         ...(input.tags !== undefined ? { tags: Object.freeze([...input.tags]) } : {}),
         ...(input.validFrom !== undefined ? { validFrom: input.validFrom } : { validFrom: now }),
         ...(input.validTo !== undefined ? { validTo: input.validTo } : {}),

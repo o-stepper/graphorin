@@ -138,6 +138,8 @@ describe('contextualizeWithLlm — opt-in enrichment (P1-3)', () => {
     );
     expect(res.indexText).toBe('Anna relocated to Berlin.\nmoved there in March');
     expect(res.usage.totalTokens).toBe(10);
+    // MCON-14: the situating-context call is output-capped.
+    expect((provider.calls[0]?.maxTokens ?? 0) > 0).toBe(true);
     expect(provider.calls).toHaveLength(1);
     expect(provider.calls[0]?.systemMessage).toContain('situating-context');
     // The user prompt carries the structured hints alongside the verbatim

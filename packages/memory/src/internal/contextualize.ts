@@ -131,6 +131,8 @@ export async function contextualizeWithLlm(
     messages: [{ role: 'user', content: buildSituatingUserPrompt(input) }],
     systemMessage: SITUATING_CONTEXT_SYSTEM_PROMPT,
     temperature: 0,
+    // MCON-14: per-call output cap — a one-sentence situating prefix.
+    maxTokens: 256,
     ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
   };
   try {

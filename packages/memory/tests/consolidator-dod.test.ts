@@ -157,6 +157,8 @@ describe('Phase 10c DoD — Deep phase drains 10 fixture pending pairs', () => {
     expect(outcome?.status).toBe('completed');
     expect(outcome?.conflictsResolved).toBe(10);
     expect(provider.calls.length).toBe(10);
+    // MCON-14: every judge call is output-capped.
+    expect(provider.calls.every((r) => (r.maxTokens ?? 0) > 0)).toBe(true);
 
     const remainingPending = await store.conflicts?.listPending(scope, 50);
     expect(remainingPending?.length ?? -1).toBe(0);

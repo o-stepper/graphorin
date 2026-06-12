@@ -197,6 +197,8 @@ function buildJudgeRequest(
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: JUDGE_PROMPT,
     temperature: 0,
+    // MCON-14: per-call output cap — the verdict shape is tiny.
+    maxTokens: 256,
     metadata: {
       userId: deps.scope.userId,
       ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),
