@@ -1,6 +1,9 @@
 import type { Message } from '@graphorin/core';
 import { describe, expect, it, vi } from 'vitest';
-import { _resetCompactionWarningForTesting } from '../src/context-engine/engine.js';
+import {
+  _resetCompactionWarningForTesting,
+  _resetHeuristicCounterWarningForTesting,
+} from '../src/context-engine/engine.js';
 import {
   type CompactionSummarizer,
   countMessageTokens,
@@ -512,5 +515,42 @@ describe('context-engine — compaction effectiveness (CE-12)', () => {
       privacy: { providerTrust: 'public-tls' },
     });
     expect(engine.config().compactionEffective).toBe(true);
+  });
+});
+
+describe('CE-13 — script-aware heuristic + one-time WARN', () => {
+  it('counts dense scripts (CJK) at ~1 token/char instead of chars/4', async () => {
+    const latin = 'a'.repeat(400);
+    const cjk = '記憶圧縮試験'.repeat(40); // 240 CJK chars
+    expect(await HEURISTIC_TOKEN_COUNTER.countText(latin)).toBe(100);
+    // Pre-fix: ceil(240/4) = 60 — a ~4x undercount; now 240.
+    expect(await HEURISTIC_TOKEN_COUNTER.countText(cjk)).toBe(240);
+    // Mixed text: each script counted by its own rule.
+    expect(await HEURISTIC_TOKEN_COUNTER.countText(latin + cjk)).toBe(340);
+  });
+
+  it('warns once when the heuristic budgets a real provider window', async () => {
+    _resetHeuristicCounterWarningForTesting();
+    const writes: string[] = [];
+    const spy = vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+    try {
+      createContextEngine({
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        summarizer: STUB_SUMMARIZER,
+      });
+      createContextEngine({
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        summarizer: STUB_SUMMARIZER,
+      });
+      const warned = writes.filter((w) => w.includes('built-in heuristic'));
+      expect(warned.length).toBe(1);
+    } finally {
+      spy.mockRestore();
+    }
   });
 });

@@ -326,6 +326,7 @@ const DEFAULT_LAYER_CAPS: Readonly<
 };
 
 let compactionIneffectiveWarned = false;
+let heuristicCounterWarned = false;
 
 /** Emit the "compaction enabled but ineffective" warning at most once (CE-12). */
 function warnCompactionIneffective(message: string): void {
@@ -342,6 +343,11 @@ function warnCompactionIneffective(message: string): void {
  */
 export function _resetCompactionWarningForTesting(): void {
   compactionIneffectiveWarned = false;
+}
+
+/** @internal — test seam for the one-time heuristic-counter warning (CE-13). */
+export function _resetHeuristicCounterWarningForTesting(): void {
+  heuristicCounterWarned = false;
 }
 
 /**
@@ -401,6 +407,20 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       ? adaptTokenCounter(config.tokenCounter)
       : (config.tokenCounter as ContextTokenCounter)
     : HEURISTIC_TOKEN_COUNTER;
+  // CE-13: budgeting against a real provider window with the heuristic
+  // counter is approximate — say so once instead of failing silently
+  // late (the heuristic's failure mode is a provider context-length
+  // error before compaction fires).
+  if (
+    config.tokenCounter === undefined &&
+    typeof config.providerContextWindow === 'number' &&
+    !heuristicCounterWarned
+  ) {
+    heuristicCounterWarned = true;
+    process.stderr.write(
+      '[graphorin/memory] context-engine token counts use the built-in heuristic (chars/4 + dense-script). For production budgeting against a real provider window, pass `contextEngine.tokenCounter` (e.g. the provider package JsTiktokenCounter).\n',
+    );
+  }
 
   const privacy = config.privacy ?? {};
   const defaultSensitivity: Sensitivity = privacy.defaultSensitivity ?? 'internal';
