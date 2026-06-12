@@ -1536,12 +1536,15 @@ export async function forkThread<TState extends object>(input: {
   if (!tuple) throw new CheckpointNotFoundError(input.threadId, input.fromCheckpointId);
 
   const newThreadId = newId('thread');
+  const newCheckpointId = newId('cp');
+  // WF-17: the forked root is self-contained — its parentId must NOT
+  // dangle into the source thread (the parent only exists there).
+  const { parentId: _droppedParentId, ...rest } = tuple.checkpoint;
   const newCheckpoint: Checkpoint = {
-    ...tuple.checkpoint,
-    id: newId('cp'),
+    ...rest,
+    id: newCheckpointId,
     threadId: newThreadId,
     namespace,
-    ...(tuple.checkpoint.parentId === undefined ? {} : { parentId: tuple.checkpoint.parentId }),
   };
   await input.config.checkpointStore.put(newThreadId, namespace, newCheckpoint, {
     source: 'sync',
@@ -1549,6 +1552,32 @@ export async function forkThread<TState extends object>(input: {
     ...(tuple.metadata.nodeName !== undefined ? { nodeName: tuple.metadata.nodeName } : {}),
     ...(tuple.metadata.tags !== undefined ? { tags: [...tuple.metadata.tags] } : {}),
   });
+  // WF-17: pending writes ride along — a forked 'failed'/'aborted'
+  // checkpoint stays `retry()`-able without re-running (or losing) the
+  // tasks that already succeeded.
+  const writes = tuple.pendingWrites ?? [];
+  if (writes.length > 0) {
+    const byTask = new Map<string, Array<(typeof writes)[number]>>();
+    for (const write of writes) {
+      const bucket = byTask.get(write.taskId) ?? [];
+      bucket.push(write);
+      byTask.set(write.taskId, bucket);
+    }
+    for (const [taskId, taskWrites] of byTask) {
+      await input.config.checkpointStore.putWrites(
+        newThreadId,
+        namespace,
+        newCheckpointId,
+        taskWrites.map((w, idx) => ({
+          taskId: w.taskId,
+          index: idx,
+          channel: w.channel,
+          value: w.value,
+        })),
+        taskId,
+      );
+    }
+  }
   return { newThreadId };
 }
 
