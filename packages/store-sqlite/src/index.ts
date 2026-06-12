@@ -77,6 +77,11 @@ import {
   resolvePassphrase,
 } from './encryption/index.js';
 import {
+  checkFtsIntegrity,
+  type FtsIntegrityReport,
+  formatFtsIntegrityWarning,
+} from './fts-integrity.js';
+import {
   type IdempotencyRecord,
   type IdempotencyStore,
   SqliteIdempotencyStore,
@@ -135,6 +140,17 @@ export interface CreateSqliteStoreOptions {
   readonly loadVecExtension?: (db: unknown) => void;
   /** If `true`, skip the WAL hardening pragmas (only for `:memory:`). */
   readonly disableWalHardening?: boolean;
+  /**
+   * Sink for non-fatal startup warnings — currently the CS-10 FTS↔rowid
+   * integrity check. Defaults to `console.warn`.
+   */
+  readonly warn?: (message: string) => void;
+  /**
+   * If `true`, skip the open-time FTS integrity check (CS-10). The check is a
+   * cheap orphan-row scan; disable it only for very large stores where a
+   * per-open scan is undesirable.
+   */
+  readonly skipFtsIntegrityCheck?: boolean;
   /**
    * Optional cipher-driver loader override (test-only seam). See
    * {@link import('./connection.js').OpenConnectionOptions.cipherLoader}.
@@ -205,6 +221,14 @@ export async function createSqliteStore(
   const initOnce = async (): Promise<void> => {
     if (initialized) return;
     applied = runMigrations(conn);
+    // CS-10: surface FTS↔rowid drift loudly at open. The indexes key on the
+    // base row's implicit rowid, which a hand-run VACUUM could renumber and
+    // silently corrupt; Graphorin never VACUUMs, so this is a guard, not a
+    // hot path. Non-fatal — a warning, never a throw.
+    if (options.skipFtsIntegrityCheck !== true) {
+      const warning = formatFtsIntegrityWarning(checkFtsIntegrity(conn));
+      if (warning !== null) (options.warn ?? console.warn)(warning);
+    }
     if ((options.mode ?? 'lib') === 'server') {
       checkpointMgr.start();
     } else if (options.walCheckpointIntervalMs !== undefined) {
@@ -280,6 +304,8 @@ export {
   type ConsolidatorRunInput,
   type ConsolidatorStatePatch,
   type ConsolidatorStateRow,
+  // FTS integrity (CS-10)
+  checkFtsIntegrity,
   type DlqBatchInput,
   type DlqBatchRow,
   EmbedderLockOnFirstError,
@@ -291,6 +317,8 @@ export {
   type EmbeddingPayload,
   type EncryptionCipher,
   type EncryptionConfig,
+  type FtsIntegrityReport,
+  formatFtsIntegrityWarning,
   type IdempotencyRecord,
   type IdempotencyStore,
   listMigrations,

@@ -62,6 +62,10 @@ flowchart LR
 
 The default is **Reciprocal Rank Fusion** with `k=60`. A different reranker (e.g. cross-encoder, LLM judge) is one call away — see [Memory system](/guide/memory-system) for the swap.
 
+::: warning Never `VACUUM` the database
+FTS5 hits map back to base rows by implicit `rowid`, and `VACUUM` can renumber rowids — silently corrupting search. Use the `graphorin storage encrypt` / `rekey` maintenance path (it copies the file byte-for-byte, preserving rowids); each open also runs a cheap FTS↔rowid integrity check and warns on drift. See [Storage](/guide/storage).
+:::
+
 ## Bi-temporal storage
 
 Fact rows in semantic memory are bi-temporal:
