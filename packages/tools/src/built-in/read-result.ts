@@ -42,6 +42,8 @@ const outputSchema = z.object({
   bytes: z.number(),
   totalBytes: z.number(),
   eof: z.boolean(),
+  /** TL-6: producer trust class reported by the reader, when known. */
+  producerTrustClass: z.string().optional(),
 });
 
 type ReadResultInput = z.infer<typeof inputSchema>;

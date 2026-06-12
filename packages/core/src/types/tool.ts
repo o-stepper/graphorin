@@ -206,6 +206,13 @@ export interface ResultHandle {
   readonly bytes?: number;
   /** MIME type of the stored artifact, when known. */
   readonly mediaType?: string;
+  /**
+   * Trust class of the tool that PRODUCED the stored body (TL-6).
+   * `read_result` re-applies inbound sanitization and dataflow
+   * provenance by this class, so an untrusted spill cannot launder to
+   * trusted through the built-in reader.
+   */
+  readonly producerTrustClass?: ToolTrustClass;
 }
 
 /**

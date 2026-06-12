@@ -209,8 +209,11 @@ interface ResultHandle {
   kind: 'spill-file' | 'resource-link'; // 'resource-link' = an MCP resource_link (see below)
   preview: string; // the bounded slice already inlined in context
   bytes?: number; // size of the full artifact
+  producerTrustClass?: ToolTrustClass; // who produced the stored body (TL-6)
 }
 ```
+
+**Taint survives the round-trip (TL-6).** Spill artifacts hold the *raw* body — written before sanitization so non-model consumers keep the full data — and `read_result` is a trusted built-in. To stop an untrusted body laundering to trusted on the way back in, the executor remembers each artifact's **producer trust class** (and readers may report one — the MCP resource reader always reports `'mcp-derived'`): when a handle whose producer is untrusted is read back, the content is **re-sanitized with the producer's policy** (`detect-and-strip-and-wrap`) and the dataflow ledger records the read under the **producer's** trust class, not `read_result`'s own. The producer map is in-memory per executor; handles resumed from a prior process fall back to the reader-reported class.
 
 The agent inlines only `preview` (plus a one-line retrieval hint) — so a multi-megabyte result never enters the context window, **even when the tool returns a structured object** — and auto-registers the built-in **`read_result`** tool whenever at least one registered tool spills. The model then fetches just what it needs, by byte range or by line range:
 

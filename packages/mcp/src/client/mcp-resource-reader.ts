@@ -101,6 +101,10 @@ function sliceResource(
     const capped = Buffer.byteLength(selected, 'utf8') > cap;
     const out = capBytes(selected, cap);
     return Object.freeze({
+      // TL-6: MCP resource content is mcp-derived by definition — the
+      // executor re-applies inbound sanitization + dataflow provenance
+      // by this class when read_result relays it.
+      producerTrustClass: 'mcp-derived' as const,
       content: out,
       bytes: Buffer.byteLength(out, 'utf8'),
       totalBytes,
@@ -114,6 +118,8 @@ function sliceResource(
   const end = Math.min(rawEnd, offset + cap);
   const slice = buf.subarray(offset, end);
   return Object.freeze({
+    // TL-6: MCP resource content is mcp-derived by definition.
+    producerTrustClass: 'mcp-derived' as const,
     content: slice.toString('utf8'),
     bytes: slice.byteLength,
     totalBytes,
