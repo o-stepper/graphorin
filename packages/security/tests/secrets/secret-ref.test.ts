@@ -323,3 +323,22 @@ describe('SPL-15 — validateSecretRefs consults the live resolver registry', ()
     }
   });
 });
+
+// --- SPL-8 — naked secrets are never echoed back -------------------------------
+
+describe('SPL-8 — naked-string errors redact the input', () => {
+  it('the error message and .input carry a redacted form, not the raw secret', () => {
+    const rawSecret = 'sk-live-EXTREMELY-SECRET-VALUE-1234567890';
+    let caught: SecretRefParseError | undefined;
+    try {
+      assertNotNakedString(rawSecret);
+    } catch (err) {
+      caught = err as SecretRefParseError;
+    }
+    if (caught === undefined) throw new Error('expected a naked-string rejection');
+    expect(caught.message).not.toContain(rawSecret);
+    expect(caught.input).not.toContain(rawSecret);
+    expect(caught.message).toContain('sk-l'); // 4-char head survives for diagnosis
+    expect(caught.message).toContain(`${rawSecret.length} chars`);
+  });
+});

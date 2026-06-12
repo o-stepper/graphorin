@@ -290,7 +290,9 @@ describe('@graphorin/security/auth — verify pipeline', () => {
   });
 
   it('uses the pepper as a SecretValue without leaking it', async () => {
-    const pepper = SecretValue.fromString('a'.repeat(32));
+    // SPL-11: 'a'.repeat(32) is now refused as a placeholder — use a
+    // realistic high-entropy pepper.
+    const pepper = SecretValue.fromString('vRq8sJ2mKx0aZpW4uTn7eYb5cHd9fLg1');
     const tokenStore = createMemoryAuthTokenStore();
     const created = await createToken({
       tokenStore,

@@ -70,6 +70,9 @@ export async function createToken(options: CreateTokenOptions): Promise<CreatedT
   }
 
   const now = options.now ?? Date.now;
+  // SPL-11: a weak pepper makes stolen hashHex offline-brute-forceable —
+  // enforce strength wherever a pepper is consumed, not only in rotation.
+  await assertPepperStrength(options.pepper);
   const generated = generateRawToken({
     env: options.env,
     ...(options.prefix === undefined ? {} : { prefix: options.prefix }),
@@ -126,12 +129,21 @@ export async function listTokens(
 export async function revokeToken(
   tokenStore: AuthTokenStore,
   id: string,
-  opts: { readonly now?: () => number } = {},
+  opts: {
+    readonly now?: () => number;
+    /**
+     * SPL-9: pass the live `TokenVerifier` so revocation invalidates its
+     * LRU entry immediately — without it a revoked token keeps verifying
+     * from the cache for up to `cacheTtlMaxMs` (default 60s).
+     */
+    readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
+  } = {},
 ): Promise<TokenMetadata | undefined> {
   const now = opts.now ?? Date.now;
   const existing = await tokenStore.get(id);
   if (existing === null) return undefined;
   if (existing.revokedAt !== undefined) return toTokenMetadata(existing);
+  opts.verifier?.invalidate(existing.hashHex);
   const ts = new Date(now()).toISOString();
   await tokenStore.revoke(id, ts);
   const updated = await tokenStore.get(id);
@@ -150,6 +162,8 @@ export async function rotateToken(
     readonly id: string;
     readonly env?: TokenEnvironment | string;
     readonly scopesOverride?: ReadonlyArray<string>;
+    /** SPL-9: invalidates the rotated-out token's verifier cache entry. */
+    readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
   },
 ): Promise<{ readonly old: TokenMetadata; readonly next: CreatedToken }> {
   const existing = await options.tokenStore.get(options.id);
@@ -159,6 +173,7 @@ export async function rotateToken(
   const scopes = options.scopesOverride ?? existing.scopes;
   const env = options.env ?? inferEnvFromExisting(existing);
   await options.tokenStore.revoke(options.id, new Date((options.now ?? Date.now)()).toISOString());
+  options.verifier?.invalidate(existing.hashHex);
   const next = await createToken({
     tokenStore: options.tokenStore,
     pepper: options.pepper,
@@ -318,7 +333,8 @@ async function hmacHexAsync(pepper: SecretValue, raw: string): Promise<string> {
   );
 }
 
-async function assertPepperStrength(pepper: SecretValue): Promise<void> {
+/** @internal — shared with the verifier's lazy first-use check (SPL-11). */
+export async function assertPepperStrength(pepper: SecretValue): Promise<void> {
   const assessment = await pepper.useBuffer((buf) => assessSecretStrength(buf));
   if (!assessment.ok) {
     throw new WeakPepperError(assessment.byteLength, assessment.reason);

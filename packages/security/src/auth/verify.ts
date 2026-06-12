@@ -23,6 +23,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { AuthTokenRecord, AuthTokenStore } from '@graphorin/core/contracts';
 
 import type { SecretValue } from '../secrets/secret-value.js';
+import { assertPepperStrength } from './crud.js';
 import { TokenVerifyOverloadError } from './errors.js';
 import { LruCache } from './lru.js';
 import { type ParsedScope, parseScope, scopeMatches, tryParseScope } from './scope.js';
@@ -174,6 +175,15 @@ export class TokenVerifier {
     this.#now = options.now ?? Date.now;
   }
 
+  // SPL-11: a 1-byte pepper makes stolen hashes brute-forceable — the
+  // strength check runs once, lazily (the constructor is sync), before
+  // the first verification.
+  #pepperStrengthChecked: Promise<void> | undefined;
+  async #assertPepperOnce(): Promise<void> {
+    this.#pepperStrengthChecked ??= assertPepperStrength(this.#pepper);
+    await this.#pepperStrengthChecked;
+  }
+
   /**
    * Run the verify pipeline against a single raw token. The promise
    * always resolves; failures surface as `{ ok: false, reason }` so
@@ -182,6 +192,7 @@ export class TokenVerifier {
    * @stable
    */
   async verify(rawToken: string, ctx: VerifyContext = {}): Promise<VerifyResult> {
+    await this.#assertPepperOnce(); // SPL-11
     if (this.#inFlight >= this.#maxConcurrent) {
       throw new TokenVerifyOverloadError(this.#inFlight, this.#maxConcurrent);
     }

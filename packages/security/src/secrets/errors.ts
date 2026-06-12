@@ -54,7 +54,7 @@ export type SecretRefParseErrorKind =
  */
 export class SecretRefParseError extends GraphorinSecretsError {
   override readonly kind: SecretRefParseErrorKind;
-  /** Original input string. Safe to log — never carries a secret value. */
+  /** Original input string. Safe to log — never carries a secret value (naked-string inputs are stored REDACTED: 4-char head + length). */
   readonly input: string;
   /** Optional offset into `input` where the parser stopped. */
   readonly position?: number;

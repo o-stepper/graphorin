@@ -663,10 +663,14 @@ export function assertNotNakedString(input: string): void {
   // body (e.g. `:foo`).
   const colonIdx = input.indexOf(':');
   if (colonIdx <= 0) {
+    // SPL-8: a naked string IS the likely raw secret — never echo it
+    // whole into the message or `SecretRefParseError.input` (documented
+    // safe-to-log). Keep a 4-char head + length for diagnosis.
+    const redacted = `${input.slice(0, 4)}…(${input.length} chars)`;
     throw new SecretRefParseError(
       'naked-string',
-      `Refused naked secret string '${input}': must use a scheme prefix (e.g. 'env:', 'keyring:').`,
-      input,
+      `Refused naked secret string '${redacted}': must use a scheme prefix (e.g. 'env:', 'keyring:').`,
+      redacted,
       colonIdx,
     );
   }

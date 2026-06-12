@@ -11,6 +11,7 @@ import {
 } from '../../src/auth/crud.js';
 import { ScopeParseError, WeakPepperError } from '../../src/auth/errors.js';
 import { parseToken } from '../../src/auth/token-format.js';
+import { TokenVerifier } from '../../src/auth/verify.js';
 import { SecretValue } from '../../src/secrets/secret-value.js';
 
 import { createMemoryAuthTokenStore } from './_helpers.js';
@@ -229,5 +230,39 @@ describe('@graphorin/security/auth — token CRUD', () => {
     expect(next).toBeDefined();
     if (next === undefined) throw new Error('unreachable');
     expect(next.record.scopes).toEqual(['agents:read']);
+  });
+});
+
+// --- SPL-8/9/11 — secrets-hygiene batch ----------------------------------------
+
+describe('SPL-11 — weak peppers are rejected wherever a pepper is consumed', () => {
+  it('createToken throws WeakPepperError for a 1-byte pepper', async () => {
+    const store = createMemoryAuthTokenStore();
+    await expect(
+      createToken({
+        tokenStore: store,
+        pepper: SecretValue.fromString('x'),
+        env: 'live',
+        scopes: ['runs:read'],
+      }),
+    ).rejects.toBeInstanceOf(WeakPepperError);
+  });
+});
+
+describe('SPL-9 — revocation invalidates the verifier cache immediately', () => {
+  it('a revoked token fails verification at once when the verifier is passed', async () => {
+    const store = createMemoryAuthTokenStore();
+    const pepper = SecretValue.fromString('a-sufficiently-long-pepper-value-123456');
+    const created = await createToken({
+      tokenStore: store,
+      pepper,
+      env: 'live',
+      scopes: ['runs:read'],
+    });
+    const verifier = new TokenVerifier({ tokenStore: store, pepper });
+    const raw = await created.raw.use(async (s) => s);
+    expect((await verifier.verify(raw)).ok).toBe(true); // warm the cache
+    await revokeToken(store, created.record.id, { verifier });
+    expect((await verifier.verify(raw)).ok).toBe(false); // no 60s cache window
   });
 });
