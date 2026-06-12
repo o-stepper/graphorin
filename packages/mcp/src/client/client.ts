@@ -26,6 +26,7 @@ import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import {
   MCPCancelledError,
   MCPConnectionError,
+  MCPInvalidConfigError,
   MCPProtocolError,
   MCPToolNotFoundError,
 } from '../errors/index.js';
@@ -34,7 +35,7 @@ import { validateMCPServerConfig } from '../helpers/validate-config.js';
 import type { ServerIdentity } from '../transport/types.js';
 import { computeClientCapabilities, registerClientRequestHandlers } from './client-handlers.js';
 import { adaptMCPTools } from './to-tools.js';
-import { buildTransport } from './transport-factory.js';
+import { buildTransport, type TransportAuthSource } from './transport-factory.js';
 import type {
   CreateMCPClientOptions,
   MCPCallToolResult,
@@ -76,6 +77,23 @@ export function _resetSseWarnDedupForTesting(): void {
 export async function createMCPClient(options: CreateMCPClientOptions): Promise<MCPClient> {
   validateMCPServerConfig({ transport: options.transport });
 
+  // Mutually exclusive (documented on `CreateMCPClientOptions`): a live
+  // OAuth provider and a static pre-shared token cannot both drive the
+  // outbound `Authorization` header.
+  if (options.authProvider !== undefined && options.bearerToken !== undefined) {
+    throw new MCPInvalidConfigError(
+      '`authProvider` and `bearerToken` are mutually exclusive; supply at most one.',
+      { metadata: { transport: options.transport.kind } },
+    );
+  }
+  const auth = resolveTransportAuth(options);
+  if (auth !== undefined && options.transport.kind === 'stdio') {
+    throw new MCPInvalidConfigError(
+      'authProvider / bearerToken require an HTTP transport (streamable-http or sse); the stdio transport carries no Authorization header.',
+      { metadata: { transport: 'stdio' } },
+    );
+  }
+
   if (
     options.transport.kind === 'sse' &&
     options.suppressDeprecatedTransportWarning !== true &&
@@ -91,7 +109,7 @@ export async function createMCPClient(options: CreateMCPClientOptions): Promise<
     incrementCounter('mcp.transport.deprecated.warn.total', { transport: 'sse' });
   }
 
-  const built = buildTransport(options.transport);
+  const built = buildTransport(options.transport, auth === undefined ? undefined : { auth });
   return createMCPClientFromSdkTransport({
     transport: built.transport,
     transportConfig: options.transport,
@@ -424,6 +442,27 @@ export async function createMCPClientFromSdkTransport(
     close,
   });
   return clientApi;
+}
+
+/**
+ * Resolve the live {@link TransportAuthSource} for the outbound
+ * `Authorization` header from the mutually-exclusive `authProvider` /
+ * `bearerToken` options. `authProvider.resolveHeader()` already returns
+ * the full header value (`Bearer …`); a static `bearerToken` is wrapped
+ * into a constant `Bearer`-prefixed resolver. Returns `undefined` when
+ * neither is supplied (no header injection).
+ */
+function resolveTransportAuth(options: CreateMCPClientOptions): TransportAuthSource | undefined {
+  const provider = options.authProvider;
+  if (provider !== undefined) {
+    return { resolveHeader: () => provider.resolveHeader() };
+  }
+  if (options.bearerToken !== undefined) {
+    const token = options.bearerToken;
+    const header = /^bearer\s/i.test(token) ? token : `Bearer ${token}`;
+    return { resolveHeader: () => header };
+  }
+  return undefined;
 }
 
 function mapSdkError(cause: unknown, ctx: { readonly tool?: string }): Error {
