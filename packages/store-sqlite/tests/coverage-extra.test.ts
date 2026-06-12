@@ -226,6 +226,20 @@ describe('extra coverage', () => {
     expect(store.embeddings.listAll().length).toBe(1);
   });
 
+  it('embedder registry: rejects a non-positive dim instead of persisting float[0] (PS-11)', async () => {
+    const store = await makeStore();
+    expect(() =>
+      store.embeddings.registerOrReturn({
+        id: 'ollama:novel@0',
+        embedderKind: 'ollama',
+        model: 'novel',
+        dim: 0,
+        configHash: 'cfg0',
+      }),
+    ).toThrow(/dim/i);
+    expect(store.embeddings.listAll().length).toBe(0); // nothing persisted
+  });
+
   it('embedder registry: rejects same id with different configHash', async () => {
     const store = await makeStore();
     store.embeddings.registerOrReturn({
