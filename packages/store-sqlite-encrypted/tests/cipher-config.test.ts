@@ -15,8 +15,8 @@ describe('cipher-config', () => {
     expect(pragmaSequenceForCipher('sqlcipher')).toEqual(["cipher = 'sqlcipher'", 'legacy = 4']);
   });
 
-  it('returns the canonical PRAGMA sequence for wxsqlite3', () => {
-    expect(pragmaSequenceForCipher('wxsqlite3')).toEqual(["cipher = 'wxsqlite3'"]);
+  it('returns the canonical PRAGMA sequence for chacha20 (the peer default; wxsqlite3 is NOT a cipher — CS-13)', () => {
+    expect(pragmaSequenceForCipher('chacha20')).toEqual(["cipher = 'chacha20'"]);
   });
 
   it('returns the canonical PRAGMA sequence for aes256cbc', () => {

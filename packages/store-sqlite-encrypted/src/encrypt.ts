@@ -3,19 +3,23 @@
  * into an encrypted one. Backs `graphorin storage encrypt` per
  * ADR-030 § 8.
  *
- * Strategy: open the source DB through the cipher peer (which can read
- * unencrypted SQLite files transparently when no key is applied),
- * `ATTACH` an empty target with the desired cipher key, then call the
- * `sqlcipher_export` bundled function (available in every cipher mode
- * of `better-sqlite3-multiple-ciphers`, not just SQLCipher itself —
- * upstream rebrands the function for portability). Finally, re-open
- * the target through the cipher peer with the key applied and run
- * `PRAGMA cipher_integrity_check` to verify.
+ * Strategy (CS-7): sqlite3mc ships **no** `sqlcipher_export` function
+ * (verified against the real peer — the old ATTACH+export path threw
+ * "no such function" on every real run), so the export is a
+ * **checkpoint → file copy → in-place `PRAGMA rekey`** sequence:
+ *
+ *  1. open the plaintext source, `wal_checkpoint(TRUNCATE)`, close;
+ *  2. byte-copy the file to the target (this trivially preserves every
+ *     rowid, so FTS5 external-content mappings stay intact — CS-10);
+ *  3. open the copy through the cipher peer with NO key, apply the
+ *     cipher-selection pragmas, then `PRAGMA rekey = <key>` — sqlite3mc
+ *     encrypts a plaintext database in place;
+ *  4. re-open with the key and verify via `PRAGMA integrity_check`.
  *
  * @packageDocumentation
  */
 
-import { existsSync, renameSync, unlinkSync } from 'node:fs';
+import { copyFileSync, existsSync, renameSync, unlinkSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 
 import {
@@ -104,20 +108,36 @@ export async function encryptDatabase(
   }
 
   const Ctor = await loadCipherPeer();
-  // Open the source through the cipher peer (no key applied). The
-  // peer reads unencrypted DBs transparently in this mode.
-  const source = new Ctor(sourcePath);
   try {
-    const encodedKey = encodePassphraseForPragma(options.passphrase);
-    const escapedTarget = targetPath.replace(/'/g, "''");
-    source.exec(`ATTACH DATABASE '${escapedTarget}' AS enc KEY ${encodedKey};`);
-    for (const pragma of pragmaSequenceForCipher(cipher)) {
-      source.pragma(`enc.${pragma}`);
+    // 1. Checkpoint the plaintext source so a byte-copy captures the
+    //    full state even when the DB ran in WAL mode.
+    const source = new Ctor(sourcePath);
+    try {
+      source.pragma('wal_checkpoint(TRUNCATE)');
+    } finally {
+      if (source.open) source.close();
     }
-    source.exec("SELECT sqlcipher_export('enc');");
-    source.exec('DETACH DATABASE enc;');
+
+    // 2. Byte-copy — rowids (and therefore FTS5 mappings) are preserved.
+    copyFileSync(sourcePath, targetPath);
+
+    // 3. In-place conversion: cipher pragmas first, then `rekey` —
+    //    sqlite3mc encrypts a plaintext database in place.
+    const target = new Ctor(targetPath);
+    try {
+      for (const pragma of pragmaSequenceForCipher(cipher)) {
+        target.pragma(pragma);
+      }
+      // sqlite3mc refuses `rekey` in WAL journal mode (real-peer
+      // verified) — drop to DELETE for the conversion, restore after.
+      target.pragma('journal_mode = DELETE');
+      const encodedKey = encodePassphraseForPragma(options.passphrase);
+      target.pragma(`rekey = ${encodedKey}`);
+      target.pragma('journal_mode = WAL');
+    } finally {
+      if (target.open) target.close();
+    }
   } catch (err) {
-    if (source.open) source.close();
     if (existsSync(targetPath)) {
       try {
         unlinkSync(targetPath);
@@ -129,8 +149,6 @@ export async function encryptDatabase(
       `[graphorin/store-sqlite-encrypted] encryption failed: ${(err as Error).message}`,
       { cause: err },
     );
-  } finally {
-    if (source.open) source.close();
   }
 
   const verify = await createEncryptedConnection({
@@ -160,7 +178,7 @@ export async function encryptDatabase(
       }
     }
     throw new Error(
-      '[graphorin/store-sqlite-encrypted] cipher_integrity_check failed: ' +
+      '[graphorin/store-sqlite-encrypted] post-encrypt integrity check failed: ' +
         integrityCheck.rows.join('; '),
     );
   }

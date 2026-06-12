@@ -120,7 +120,7 @@ cipher modes shipped by the cipher peer are accepted; pass them via the
 | Cipher        | Notes                                                                       |
 |---------------|-----------------------------------------------------------------------------|
 | `'sqlcipher'` | Default. AES-256-CBC + HMAC-SHA1 + Argon2id KDF. SQLCipher v4 compatible.   |
-| `'wxsqlite3'` | Legacy mode used by older wxSQLite3 deployments.                            |
+| `'chacha20'`  | The cipher peer's own default (ChaCha20-Poly1305).                          |
 | `'aes256cbc'` | Raw AES-256-CBC without the SQLCipher HMAC envelope.                        |
 | `'aes128cbc'` | AES-128-CBC variant.                                                        |
 | `'rc4'`       | Legacy interop only. Do **not** use for new deployments.                    |

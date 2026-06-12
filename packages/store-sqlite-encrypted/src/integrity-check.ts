@@ -1,7 +1,11 @@
 /**
- * `PRAGMA cipher_integrity_check` runner. Surfaces the per-page result
- * list as a structured value so the CLI / health endpoint can report
- * the first few failures without dumping the full SQLite output.
+ * Integrity-check runner for encrypted databases. sqlite3mc ships no
+ * `PRAGMA cipher_integrity_check` (CS-7 — the old call returned an
+ * empty row-set on every real run, so `ok` was always false); the
+ * standard `PRAGMA integrity_check` works through the cipher layer
+ * once the connection is keyed, which is exactly the property the
+ * CLI / health endpoint needs ("can this DB be read with this key,
+ * and is it internally consistent").
  *
  * @packageDocumentation
  */
@@ -16,16 +20,17 @@ import type { SqliteConnection } from '@graphorin/store-sqlite/connection';
 export interface CipherIntegrityCheckResult {
   /** `true` when SQLite reported a single `'ok'` row. */
   readonly ok: boolean;
-  /** Raw rows returned by `PRAGMA cipher_integrity_check`. */
+  /** Raw rows returned by `PRAGMA integrity_check`. */
   readonly rows: ReadonlyArray<string>;
   /** Wall-clock duration of the pragma call in milliseconds. */
   readonly durationMs: number;
 }
 
 /**
- * Runs `PRAGMA cipher_integrity_check` against the provided
- * connection. The connection MUST already be open with the cipher key
- * applied (typically via {@link createEncryptedConnection}).
+ * Runs `PRAGMA integrity_check` against the provided connection. The
+ * connection MUST already be open with the cipher key applied
+ * (typically via {@link createEncryptedConnection}) — a wrong key
+ * surfaces as an open/read error before the pragma runs.
  *
  * The pragma is read-only so it is safe to run from a triggers daemon
  * cron without taking a write lock.
@@ -34,7 +39,7 @@ export interface CipherIntegrityCheckResult {
  */
 export function cipherIntegrityCheck(conn: SqliteConnection): CipherIntegrityCheckResult {
   const started = performance.now();
-  const raw = conn.pragma('cipher_integrity_check');
+  const raw = conn.pragma('integrity_check');
   const durationMs = performance.now() - started;
   const rows = normalizeRows(raw);
   const ok = rows.length === 1 && rows[0] === 'ok';

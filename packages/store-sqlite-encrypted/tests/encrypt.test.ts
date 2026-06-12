@@ -34,10 +34,15 @@ describe('encryptDatabase', () => {
     expect(result.cipher).toBe('sqlcipher');
     expect(result.integrityCheck.ok).toBe(true);
     expect(result.targetPath).toBe(tgt);
+    // CS-7 wire contract: checkpoint the source, then convert the COPY
+    // in place via cipher pragmas + rekey — never ATTACH/sqlcipher_export
+    // (sqlite3mc ships no such function).
     const sourceHistory = getStubHistory(src);
-    expect(sourceHistory?.execs.some((e) => /ATTACH DATABASE/.test(e))).toBe(true);
-    expect(sourceHistory?.execs.some((e) => /sqlcipher_export/.test(e))).toBe(true);
-    expect(sourceHistory?.execs.some((e) => /DETACH DATABASE enc/.test(e))).toBe(true);
+    expect(sourceHistory?.pragmas.some((e) => /wal_checkpoint/.test(e))).toBe(true);
+    expect(sourceHistory?.execs.some((e) => /sqlcipher_export/.test(e))).toBe(false);
+    const targetHistory = getStubHistory(tgt);
+    expect(targetHistory?.pragmas.some((p) => /^cipher = 'sqlcipher'$/.test(p))).toBe(true);
+    expect(targetHistory?.pragmas.some((p) => /^rekey = /.test(p))).toBe(true);
     // Verify the target file was written through the stub.
     expect(readFileSync(tgt, 'utf8')).toMatch(/^STUB_ENCRYPTED:/);
   });
@@ -68,8 +73,8 @@ describe('encryptDatabase', () => {
       passphrase: 'topsecret',
       cipher: 'aes256cbc',
     });
-    const sourceHistory = getStubHistory(src);
-    expect(sourceHistory?.pragmas.some((p) => /^enc\.cipher = 'aes256cbc'$/.test(p))).toBe(true);
+    const targetHistory = getStubHistory(tgt);
+    expect(targetHistory?.pragmas.some((p) => /^cipher = 'aes256cbc'$/.test(p))).toBe(true);
   });
 
   it('throws when the source DB does not exist', async () => {
@@ -135,6 +140,6 @@ describe('encryptDatabase', () => {
         targetPath: tgt,
         passphrase: 'topsecret',
       }),
-    ).rejects.toThrow(/cipher_integrity_check failed/);
+    ).rejects.toThrow(/integrity check failed/);
   });
 });

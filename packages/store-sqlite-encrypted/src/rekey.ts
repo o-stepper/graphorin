@@ -82,8 +82,12 @@ export async function rekeyDatabase(options: RekeyDatabaseOptions): Promise<Reke
     // Sanity-read forces the cipher peer to verify the old key before
     // we rewrite pages with the new one.
     conn.pragma('user_version');
+    // sqlite3mc refuses `rekey` in WAL journal mode (real-peer
+    // verified) — drop to DELETE for the rotation, restore after.
+    conn.pragma('journal_mode = DELETE');
     const newEncoded = encodePassphraseForPragma(options.newPassphrase);
     conn.pragma(`rekey = ${newEncoded}`);
+    conn.pragma('journal_mode = WAL');
   } catch (err) {
     if (conn.raw().open) conn.close();
     throw new Error(`[graphorin/store-sqlite-encrypted] rekey failed: ${(err as Error).message}`, {
