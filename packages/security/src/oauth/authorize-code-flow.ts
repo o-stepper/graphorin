@@ -99,9 +99,18 @@ export async function runAuthorizationCodeFlow(
       callback.waitForCallback(signal),
       options.callbackTimeoutMs ?? DEFAULT_CALLBACK_TIMEOUT_MS,
     );
-    if (params.state !== undefined) returnedState = params.state;
+    // SPL-6: the client ALWAYS sends `state` — a callback omitting it
+    // is rejected outright instead of skipping the CSRF/code-injection
+    // comparison (a drive-by request to the loopback callback could
+    // otherwise deliver an attacker-chosen code without knowing state).
+    if (params.state === undefined) {
+      throw new OAuthCallbackError(
+        'Authorization callback did not return the `state` parameter — rejected (CSRF defense; the request always includes one).',
+      );
+    }
+    returnedState = params.state;
     code = params.code;
-    if (returnedState !== undefined && returnedState !== state) {
+    if (returnedState !== state) {
       throw new OAuthCallbackError(
         'Authorization callback returned a `state` value that does not match the expected one.',
       );

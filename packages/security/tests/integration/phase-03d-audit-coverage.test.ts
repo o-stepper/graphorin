@@ -29,7 +29,16 @@ describe('phase 03d — audit coverage for every OAuth lifecycle action', () => 
     resetOAuthSubsystem();
     _setDiscoveryFetcherForTesting(async (url) => {
       if (url.endsWith('oauth-protected-resource')) {
-        return { ok: false, status: 404, json: async () => ({}) };
+        // SPL-7: route discovery resource -> AS so the issuer matches its
+        // own discovery URL (RFC 8414 §3.3).
+        return {
+          ok: true,
+          status: 200,
+          json: async () => ({
+            resource: 'https://mcp.example.com',
+            authorization_servers: ['https://issuer.example.com'],
+          }),
+        };
       }
       return {
         ok: true,

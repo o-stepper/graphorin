@@ -99,7 +99,9 @@ export async function fetchAuthorizationServerMetadata(
       continue;
     }
     const raw = (await response.json()) as Record<string, unknown>;
-    return parseServerMetadata(raw);
+    const metadata = parseServerMetadata(raw, serverUrl);
+    assertIssuerConsistency(serverUrl, metadata.issuer);
+    return metadata;
   }
   throw new OAuthDiscoveryError(
     serverUrl,
@@ -125,10 +127,29 @@ export async function tryProtectedResourceMetadata(
 }
 
 function wellKnownCandidates(serverUrl: string): ReadonlyArray<string> {
-  return [
+  // SPL-7: RFC 8414 §3 prescribes PATH-INSERTION — the well-known
+  // segment goes between the origin and the issuer path. The
+  // suffix-append form is kept as a fallback for servers that
+  // implemented the pre-RFC convention. For path-less issuers both
+  // forms coincide and the list is deduplicated.
+  const candidates = [
+    wellKnownPathInsertion(serverUrl, 'oauth-authorization-server'),
     wellKnownUrl(serverUrl, 'oauth-authorization-server'),
+    wellKnownPathInsertion(serverUrl, 'openid-configuration'),
     wellKnownUrl(serverUrl, 'openid-configuration'),
   ];
+  return [...new Set(candidates)];
+}
+
+/** RFC 8414 §3 path-insertion form: origin + /.well-known/<suffix> + path. */
+function wellKnownPathInsertion(serverUrl: string, suffix: string): string {
+  try {
+    const url = new URL(serverUrl);
+    const path = url.pathname.replace(/\/+$/, '');
+    return `${url.origin}/.well-known/${suffix}${path}`;
+  } catch {
+    return wellKnownUrl(serverUrl, suffix);
+  }
 }
 
 function wellKnownUrl(serverUrl: string, suffix: string): string {
@@ -138,10 +159,77 @@ function wellKnownUrl(serverUrl: string, suffix: string): string {
   return `${base}/.well-known/${suffix}`;
 }
 
-function parseServerMetadata(raw: Record<string, unknown>): OAuthServerMetadata {
+/** SPL-7: hosts where plain http is acceptable (local development). */
+function isLoopbackHost(hostname: string): boolean {
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '[::1]' ||
+    hostname === '::1' ||
+    hostname.endsWith('.localhost')
+  );
+}
+
+/**
+ * SPL-7: refuse non-https endpoints (refresh tokens and Basic client
+ * secrets get POSTed to whatever discovery names) — http is allowed
+ * only for loopback hosts. Mirrors the supply-chain key fetcher's
+ * https-only posture.
+ */
+function assertSafeEndpointUrl(serverUrl: string, field: string, value: string): void {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new OAuthDiscoveryError(serverUrl, `Metadata field '${field}' is not a valid URL.`);
+  }
+  if (url.protocol === 'https:') return;
+  if (url.protocol === 'http:' && isLoopbackHost(url.hostname)) return;
+  throw new OAuthDiscoveryError(
+    serverUrl,
+    `Metadata field '${field}' must be https (got '${value}'); plain http is allowed only for localhost.`,
+  );
+}
+
+/** Normalise an issuer-ish URL for equality: strip trailing slashes. */
+function normalizeIssuer(value: string): string {
+  return value.replace(/\/+$/, '');
+}
+
+/**
+ * SPL-7 / RFC 8414 §3.3: the metadata `issuer` MUST be identical to the
+ * issuer URL the well-known document was resolved for — otherwise a
+ * compromised document can redirect token traffic to attacker-chosen
+ * endpoints under a trusted discovery URL.
+ */
+function assertIssuerConsistency(serverUrl: string, issuer: string): void {
+  if (normalizeIssuer(issuer) !== normalizeIssuer(serverUrl)) {
+    throw new OAuthDiscoveryError(
+      serverUrl,
+      `Metadata 'issuer' (${issuer}) does not match the discovery URL (RFC 8414 §3.3).`,
+    );
+  }
+}
+
+function parseServerMetadata(raw: Record<string, unknown>, serverUrl: string): OAuthServerMetadata {
   const issuer = requireString(raw, 'issuer');
   const authorizationEndpoint = requireString(raw, 'authorization_endpoint');
   const tokenEndpoint = requireString(raw, 'token_endpoint');
+  // SPL-7: every endpoint that will carry codes/tokens/secrets is
+  // https-only (loopback exempt).
+  assertSafeEndpointUrl(serverUrl, 'issuer', issuer);
+  assertSafeEndpointUrl(serverUrl, 'authorization_endpoint', authorizationEndpoint);
+  assertSafeEndpointUrl(serverUrl, 'token_endpoint', tokenEndpoint);
+  for (const field of [
+    'registration_endpoint',
+    'revocation_endpoint',
+    'device_authorization_endpoint',
+    'userinfo_endpoint',
+    'jwks_uri',
+  ] as const) {
+    const value = raw[field];
+    if (typeof value === 'string') assertSafeEndpointUrl(serverUrl, field, value);
+  }
   const out: OAuthServerMetadata = Object.freeze({
     issuer,
     authorizationEndpoint,
