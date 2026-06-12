@@ -93,12 +93,24 @@ export class OllamaEmbedderError extends Error {
   }
 }
 
-/** Set of model -> dim hints used to seed the canonical id. */
+/**
+ * Model -> output-dimension hints used to seed the canonical id before the
+ * first `embed()` resolves the real width from a response. Only single-width
+ * families are listed; size-variant families (e.g. `qwen3-embedding`, whose
+ * dim depends on the `:0.6b` / `:4b` / `:8b` tag) are deliberately omitted so
+ * an ambiguous bind fails loudly rather than baking a wrong width (PS-11).
+ */
 export const KNOWN_OLLAMA_MODEL_DIMS: ReadonlyMap<string, number> = new Map([
   ['nomic-embed-text', 768],
   ['mxbai-embed-large', 1024],
   ['snowflake-arctic-embed', 1024],
+  ['snowflake-arctic-embed2', 1024],
   ['bge-m3', 1024],
+  ['bge-large', 1024],
+  ['embeddinggemma', 768],
+  ['all-minilm', 384],
+  ['granite-embedding', 384],
+  ['paraphrase-multilingual', 768],
 ]);
 
 /**
@@ -161,15 +173,28 @@ export class OllamaEmbedder implements EmbedderProvider {
 
   /** The canonical embedder id — `'ollama:<model>@<dim-or-digest>'`. */
   id(): string {
-    const dim = this.#resolvedDim ?? KNOWN_OLLAMA_MODEL_DIMS.get(this.#model) ?? 0;
+    const dim = this.dim();
     const digest = this.#digest !== null ? `:${this.#digest.slice(0, 12)}` : '';
     return `ollama:${this.#model}@${dim}${digest}`;
   }
 
-  /** Dim resolved at first embed (or known-default fallback). */
+  /**
+   * Output dimension — the explicit `dim` option, the resolved width from the
+   * first `embed()`, or a known-family default. PS-11: throws for an unknown
+   * model with no `dim` hint instead of returning `0` (which the store would
+   * persist and use to create a `float[0]` vec0 table, silently breaking
+   * vector search). Pass `dim` for any model not in {@link
+   * KNOWN_OLLAMA_MODEL_DIMS}, or call `embed()` once first to resolve it.
+   */
   dim(): number {
     if (this.#resolvedDim !== null) return this.#resolvedDim;
-    return KNOWN_OLLAMA_MODEL_DIMS.get(this.#model) ?? 0;
+    const known = KNOWN_OLLAMA_MODEL_DIMS.get(this.#model);
+    if (known !== undefined) return known;
+    throw new OllamaEmbedderError(
+      `[graphorin/embedder-ollama] unknown output dimension for model '${this.#model}'. ` +
+        'Pass `dim` to ollamaEmbedder({ model, dim }), or call embed() once to resolve it ' +
+        'from a response, before registering the embedder.',
+    );
   }
 
   /**

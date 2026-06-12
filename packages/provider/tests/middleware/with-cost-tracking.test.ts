@@ -6,7 +6,10 @@
 import type { ProviderRequest } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 
-import { withCostTracking } from '../../src/middleware/with-cost-tracking.js';
+import {
+  createCostAccumulator,
+  withCostTracking,
+} from '../../src/middleware/with-cost-tracking.js';
 import { bareAdapter } from '../fixtures/bare-adapter.js';
 
 const REQ: ProviderRequest = { messages: [{ role: 'user', content: 'hi' }] };
@@ -78,6 +81,29 @@ describe('withCostTracking', () => {
     await wrapped.generate(REQ);
     expect(records).toHaveLength(1);
     expect(records[0]?.totalTokens).toBe(8);
+  });
+
+  it('createCostAccumulator accumulates real totals per provider×model (PS-8)', async () => {
+    const acc = createCostAccumulator();
+    const wrapped = withCostTracking({
+      onUsage: acc.onUsage,
+      priceLookup: () => ({ inputPerMtok: 1, outputPerMtok: 2 }),
+    })(bareAdapter());
+    await wrapped.generate(REQ);
+    await wrapped.generate(REQ);
+
+    const t = acc.totalFor('bare', 'bare-model');
+    expect(t.callCount).toBe(2);
+    expect(t.promptTokens).toBe(10); // 5 × 2 calls
+    expect(t.completionTokens).toBe(6);
+    expect(t.totalTokens).toBe(16);
+    // Per call: 5·1/1e6 (input) + 3·2/1e6 (output); two calls.
+    expect(t.costUsd).toBeCloseTo(2 * (5 / 1e6 + (3 * 2) / 1e6), 10);
+    expect(acc.totals().size).toBe(1);
+
+    acc.reset();
+    expect(acc.totalFor('bare', 'bare-model').callCount).toBe(0);
+    expect(acc.totals().size).toBe(0);
   });
 
   it('uses priceLookup to populate costUsd', async () => {

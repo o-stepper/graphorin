@@ -50,6 +50,63 @@ export function toOpenAIChatMessages(
   });
 }
 
+/**
+ * Convert a graphorin `Message` to Ollama's **native** `/api/chat` shape
+ * (PS-13). Unlike the OpenAI form, Ollama's Go server expects `tool_calls`
+ * with object `arguments` (a `map[string]any`, never a JSON string) and no
+ * `id` / `type` fields — sending those breaks its unmarshaller and any
+ * multi-turn replay of assistant tool calls.
+ *
+ * @internal
+ */
+export function toOllamaChatMessages(
+  messages: ReadonlyArray<{
+    readonly role: 'system' | 'user' | 'assistant' | 'tool';
+    readonly content: string | ReadonlyArray<unknown>;
+    readonly toolCalls?: ReadonlyArray<{
+      readonly toolCallId: string;
+      readonly toolName: string;
+      readonly args: unknown;
+    }>;
+    readonly toolCallId?: string;
+  }>,
+): ReadonlyArray<Record<string, unknown>> {
+  return messages.map((msg) => {
+    const out: Record<string, unknown> = {
+      role: msg.role,
+      content: typeof msg.content === 'string' ? msg.content : flattenContent(msg.content),
+    };
+    if (msg.toolCalls !== undefined && msg.toolCalls.length > 0) {
+      out.tool_calls = msg.toolCalls.map((tc) => ({
+        function: {
+          name: tc.toolName,
+          arguments: toArgsObject(tc.args),
+        },
+      }));
+    }
+    return out;
+  });
+}
+
+/**
+ * Coerce a tool-call `args` value into the object map Ollama expects. Strings
+ * (e.g. an OpenAI-style JSON blob produced upstream) are parsed leniently;
+ * anything that isn't a JSON object becomes `{}`.
+ */
+function toArgsObject(args: unknown): Record<string, unknown> {
+  if (typeof args === 'string') {
+    try {
+      const parsed: unknown = JSON.parse(args);
+      return typeof parsed === 'object' && parsed !== null
+        ? (parsed as Record<string, unknown>)
+        : {};
+    } catch {
+      return {};
+    }
+  }
+  return typeof args === 'object' && args !== null ? (args as Record<string, unknown>) : {};
+}
+
 function flattenContent(parts: ReadonlyArray<unknown>): string {
   const buffer: string[] = [];
   for (const part of parts) {

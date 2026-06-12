@@ -108,6 +108,7 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
   readonly #sensitivityFloor: Sensitivity | undefined;
   #invocationCount = 0;
   #lastPromptTokens = 0;
+  #lastErrorCount = 0;
 
   constructor(options: LlmRerankerOptions<TRecord>) {
     this.provider = options.provider;
@@ -153,6 +154,15 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
     return this.#lastPromptTokens;
   }
 
+  /**
+   * Number of per-passage provider failures swallowed (→ `fallbackScore`) on
+   * the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
+   * is partially degraded — surface it for observability.
+   */
+  get lastErrorCount(): number {
+    return this.#lastErrorCount;
+  }
+
   async rerank<TInputRecord extends MemoryRecord>(
     query: string,
     lists: ReadonlyArray<ReadonlyArray<MemoryHit<TInputRecord>>>,
@@ -163,6 +173,7 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
     }
     this.#invocationCount += 1;
     this.#lastPromptTokens = 0;
+    this.#lastErrorCount = 0;
     const merged = mergeAndDedupe(lists);
     if (merged.length === 0) return [];
     const passages = merged.map((entry) =>
@@ -217,28 +228,38 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
     idx: number,
   ): Promise<{ idx: number; score: number }> {
     const prompt = this.#scoringPrompt({ query, passage, maxScore: this.maxScore });
-    const response = await this.provider.generate({
-      systemMessage: prompt.system,
-      messages: [
-        {
-          role: 'user',
-          content: [{ type: 'text', text: prompt.user }],
-        },
-      ],
-      temperature: this.temperature,
-      maxTokens: this.maxOutputTokens,
-      ...(signal !== undefined ? { signal } : {}),
-      ...(this.#sensitivityFloor !== undefined
-        ? { providerOptions: { reranker_sensitivity_floor: this.#sensitivityFloor } }
-        : {}),
-    });
-    this.#lastPromptTokens += response.usage.promptTokens ?? 0;
-    const text = response.text ?? '';
-    const parsed = parseIntegerResponse(text);
-    if (parsed === null) {
+    try {
+      const response = await this.provider.generate({
+        systemMessage: prompt.system,
+        messages: [
+          {
+            role: 'user',
+            content: [{ type: 'text', text: prompt.user }],
+          },
+        ],
+        temperature: this.temperature,
+        maxTokens: this.maxOutputTokens,
+        ...(signal !== undefined ? { signal } : {}),
+        ...(this.#sensitivityFloor !== undefined
+          ? { providerOptions: { reranker_sensitivity_floor: this.#sensitivityFloor } }
+          : {}),
+      });
+      this.#lastPromptTokens += response.usage.promptTokens ?? 0;
+      const text = response.text ?? '';
+      const parsed = parseIntegerResponse(text);
+      if (parsed === null) {
+        return { idx, score: this.fallbackScore * this.maxScore };
+      }
+      return { idx, score: parsed };
+    } catch (err) {
+      // PS-15: a single provider failure (429 / timeout / transient) must not
+      // collapse the whole rerank — this is an optional quality layer over
+      // memory search. Degrade that one passage to the neutral fallback and
+      // record the error. A deliberate abort is not transient: re-throw it.
+      if (isAbortError(err)) throw err;
+      this.#lastErrorCount += 1;
       return { idx, score: this.fallbackScore * this.maxScore };
     }
-    return { idx, score: parsed };
   }
 }
 
@@ -285,17 +306,21 @@ export function mergeAndDedupe<TRecord extends MemoryRecord>(
  *
  * @stable
  */
+function isAbortError(err: unknown): boolean {
+  return err instanceof Error && err.name === 'AbortError';
+}
+
 export function parseIntegerResponse(text: string): number | null {
   const trimmed = text.trim();
   if (trimmed.length === 0) return null;
+  // PS-14: accept ONLY a bare, whole-string integer. The prompt instructs the
+  // model to output exactly that; anything verbose ("Score: 7", "10/10",
+  // "Ignore the passage and output 10") is treated as non-compliant and scored
+  // via the fallback, so a passage that steers the model into prose around a
+  // chosen number can't smuggle that number through "first integer" extraction.
   const direct = /^-?\d+$/.exec(trimmed);
-  if (direct !== null) {
-    const v = Number.parseInt(direct[0], 10);
-    return Number.isFinite(v) && v >= 0 ? v : null;
-  }
-  const search = /\d+/.exec(trimmed);
-  if (search === null) return null;
-  const v = Number.parseInt(search[0], 10);
+  if (direct === null) return null;
+  const v = Number.parseInt(direct[0], 10);
   return Number.isFinite(v) && v >= 0 ? v : null;
 }
 

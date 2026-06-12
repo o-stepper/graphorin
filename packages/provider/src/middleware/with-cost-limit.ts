@@ -52,6 +52,20 @@ export const withCostLimit = defineProviderMiddleware<WithCostLimitOptions>({
     const onExceed = opts.onExceed ?? 'throw';
     const resolver = opts.resolveObservedCost;
     const logger = opts.logger ?? defaultLogger;
+    // PS-8: a ceiling without a resolver is a silent no-op — the limits look
+    // enforced but never trip. Warn loudly so the gap is visible. (No ceiling
+    // + no resolver is the documented inert placeholder, so it stays quiet.)
+    const hasCeiling =
+      opts.maxPerSession !== undefined ||
+      opts.maxPerRun !== undefined ||
+      opts.maxPerHour !== undefined;
+    if (hasCeiling && resolver === undefined) {
+      logger(
+        '[graphorin/provider] withCostLimit: a cost ceiling is configured but no ' +
+          '`resolveObservedCost` was supplied, so the limit is UNENFORCED (no-op). ' +
+          'Wire a resolver (e.g. from createCostAccumulator / @graphorin/observability).',
+      );
+    }
     return (next: Provider): Provider => ({
       name: next.name,
       modelId: next.modelId,

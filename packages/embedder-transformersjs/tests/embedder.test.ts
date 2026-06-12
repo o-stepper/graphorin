@@ -25,9 +25,59 @@ function makeStubPipelineFactory(dim: number): PipelineFactory {
   };
 }
 
+function makeCapturingPipelineFactory(dim: number, captured: string[][]): PipelineFactory {
+  return async () => {
+    const extractor: FeatureExtractor = async (texts) => {
+      const list = Array.isArray(texts) ? [...(texts as string[])] : [texts as string];
+      captured.push(list);
+      const data = new Float32Array(list.length * dim);
+      return { data, dims: [list.length, dim] };
+    };
+    return extractor;
+  };
+}
+
 describe('TransformersJsEmbedder', () => {
   it('VERSION constant matches the package version', () => {
     expect(VERSION).toBe('0.4.0');
+  });
+
+  it('prefixes E5 inputs by taskType and never prefixes non-E5 models (PS-10)', async () => {
+    const e5Texts: string[][] = [];
+    const e5 = createTransformersJsEmbedder({
+      model: 'Xenova/multilingual-e5-base',
+      pipelineFactory: makeCapturingPipelineFactory(768, e5Texts),
+    });
+    await e5.embed(['weather in Tbilisi'], { taskType: 'query' });
+    await e5.embed(['It is sunny.'], { taskType: 'passage' });
+    await e5.embed(['no task type given']); // defaults to the passage role
+    expect(e5Texts[0]).toEqual(['query: weather in Tbilisi']);
+    expect(e5Texts[1]).toEqual(['passage: It is sunny.']);
+    expect(e5Texts[2]).toEqual(['passage: no task type given']);
+
+    const bgeTexts: string[][] = [];
+    const bge = createTransformersJsEmbedder({
+      model: 'Xenova/bge-small-en-v1.5',
+      pipelineFactory: makeCapturingPipelineFactory(384, bgeTexts),
+    });
+    await bge.embed(['weather in Tbilisi'], { taskType: 'query' });
+    expect(bgeTexts[0]).toEqual(['weather in Tbilisi']); // symmetric model: untouched
+  });
+
+  it('configHash reflects the E5 task-prefix policy without touching non-E5 (PS-10)', () => {
+    const on = createTransformersJsEmbedder({ model: 'Xenova/multilingual-e5-base' });
+    const off = createTransformersJsEmbedder({
+      model: 'Xenova/multilingual-e5-base',
+      disableTaskPrefix: true,
+    });
+    expect(on.configHash()).not.toBe(off.configHash()); // flipping the policy re-keys the id
+
+    const bgeA = createTransformersJsEmbedder({ model: 'Xenova/bge-small-en-v1.5' });
+    const bgeB = createTransformersJsEmbedder({
+      model: 'Xenova/bge-small-en-v1.5',
+      disableTaskPrefix: true,
+    });
+    expect(bgeA.configHash()).toBe(bgeB.configHash()); // irrelevant flag for symmetric models
   });
 
   it('default id includes the canonical model + dim', () => {

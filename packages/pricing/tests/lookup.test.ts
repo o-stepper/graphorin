@@ -119,15 +119,38 @@ describe('@graphorin/pricing — calculateCost', () => {
     expect(cost).toBeNull();
   });
 
-  it('honours optional cached-read and reasoning tokens', () => {
+  it('bills reasoning tokens at the output rate when no explicit reasoning price (PS-19)', () => {
+    // gpt-4o-mini has an output rate of 0.6/Mtok and no reasoningUsdPerToken in
+    // the bundle, so the documented fallback bills reasoning at the output rate.
     const cost = calculateCost({
       provider: 'openai',
-      model: 'gpt-4o-2024-11-20',
+      model: 'gpt-4o-mini-2024-07-18',
       inputTokens: 0,
       outputTokens: 0,
-      cachedReadTokens: 1_000,
-      reasoningTokens: 500,
+      reasoningTokens: 1_000,
     });
-    expect(cost?.amount).toBeGreaterThanOrEqual(0);
+    expect(cost?.amount).toBeCloseTo(0.6 / 1_000, 9); // NOT $0
+  });
+
+  it('adds cached-read tokens at the cached rate without inflating input (PS-19)', () => {
+    const price = lookupPrice({ provider: 'openai', model: 'gpt-4o-2024-11-20' });
+    const cachedRate = price?.cachedReadUsdPerToken ?? 0;
+    expect(cachedRate).toBeGreaterThan(0);
+    const withCache = calculateCost({
+      provider: 'openai',
+      model: 'gpt-4o-2024-11-20',
+      inputTokens: 1_000,
+      outputTokens: 0,
+      cachedReadTokens: 1_000,
+    });
+    const noCache = calculateCost({
+      provider: 'openai',
+      model: 'gpt-4o-2024-11-20',
+      inputTokens: 1_000,
+      outputTokens: 0,
+    });
+    // inputTokens is the NON-cached prompt; cached tokens add only the cached
+    // rate — they are never also billed at the (higher) input rate.
+    expect((withCache?.amount ?? 0) - (noCache?.amount ?? 0)).toBeCloseTo(cachedRate * 1_000, 12);
   });
 });

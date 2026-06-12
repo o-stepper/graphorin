@@ -303,7 +303,9 @@ async function collectVectorCandidates(
   const adapter = deps.store.semantic;
   if (typeof adapter.searchVector !== 'function') return [];
   checkAbort(deps.signal);
-  const [vector] = await deps.embedder.embed([candidate.text]);
+  // PS-10: the candidate is compared against stored facts, which are embedded
+  // as `passage` — keep it in the same space for the asymmetric (E5) embedder.
+  const [vector] = await deps.embedder.embed([candidate.text], { taskType: 'passage' });
   if (vector === undefined) return [];
   checkAbort(deps.signal);
   const scope = {

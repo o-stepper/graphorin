@@ -199,7 +199,11 @@ async function* streamOpenAIShaped(
     resp.body,
     req.signal !== undefined ? { signal: req.signal } : {},
   )) {
-    if (req.signal?.aborted) break;
+    if (req.signal?.aborted) {
+      // PS-12: report the abort honestly instead of the default 'stop'.
+      finishReason = 'aborted';
+      break;
+    }
     let parsed: OpenAIChunk;
     try {
       parsed = JSON.parse(payload) as OpenAIChunk;
@@ -398,6 +402,10 @@ function mapFinishReason(value: string | null | undefined): FinishReason {
     case 'length':
     case 'content-filter':
       return value;
+    // PS-12: the OpenAI wire format spells it with an underscore; the dashed
+    // form alone never matched, so content-filtered completions reported 'stop'.
+    case 'content_filter':
+      return 'content-filter';
     case 'tool_calls':
     case 'function_call':
       return 'tool-calls';

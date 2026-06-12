@@ -62,6 +62,16 @@ export interface TransformersJsEmbedderOptions {
    * waiting for the first `embed()` call.
    */
   readonly dim?: number;
+  /**
+   * Disable the automatic E5 `query:` / `passage:` prefixing (PS-10). The
+   * prefixes are applied by default for E5-family models (the multilingual-e5
+   * default and any model whose id carries an `e5` token), because the E5 model
+   * card requires them and omitting them measurably degrades retrieval. Set
+   * this to `true` only if your inputs are already prefixed or you use a
+   * non-standard E5 export. Toggling it changes the canonical `configHash`
+   * (and thus the embedder id), which triggers a re-embedding migration.
+   */
+  readonly disableTaskPrefix?: boolean;
 }
 
 /**
@@ -131,6 +141,8 @@ export class TransformersJsEmbedder implements EmbedderProvider {
   readonly #dtype: string | undefined;
   readonly #device: string | undefined;
   readonly #pipelineFactory: PipelineFactory | undefined;
+  /** Whether to apply E5 `query:` / `passage:` prefixes (PS-10). */
+  readonly #taskPrefix: boolean;
   #extractor: FeatureExtractor | null = null;
   #loading: Promise<FeatureExtractor> | null = null;
   #resolvedDim: number | null;
@@ -145,6 +157,7 @@ export class TransformersJsEmbedder implements EmbedderProvider {
     this.#device = options.device;
     this.#pipelineFactory = options.pipelineFactory;
     this.#resolvedDim = options.dim ?? guessDefaultDim(this.#model);
+    this.#taskPrefix = isE5Model(this.#model) && options.disableTaskPrefix !== true;
   }
 
   id(): string {
@@ -166,6 +179,10 @@ export class TransformersJsEmbedder implements EmbedderProvider {
       revision: this.#revision ?? null,
       dtype: this.#dtype ?? null,
       device: this.#device ?? null,
+      // PS-10: the prefix policy changes the embeddings, so it must change the
+      // id. Only added when active (E5 + not disabled) so non-E5 ids — and the
+      // historical hash of an E5 model with prefixing turned off — are stable.
+      ...(this.#taskPrefix ? { taskPrefix: 'e5' as const } : {}),
     });
   }
 
@@ -175,7 +192,12 @@ export class TransformersJsEmbedder implements EmbedderProvider {
   ): Promise<ReadonlyArray<Float32Array>> {
     if (texts.length === 0) return [];
     const extractor = await this.#getExtractor();
-    const result = await extractor([...texts], {
+    // PS-10: E5 models require an asymmetric `query:` / `passage:` prefix.
+    // Default to `passage` (the indexing role) when the caller doesn't specify.
+    const inputs = this.#taskPrefix
+      ? texts.map((t) => `${opts.taskType ?? 'passage'}: ${t}`)
+      : [...texts];
+    const result = await extractor(inputs, {
       pooling: this.#pooling,
       normalize: this.#normalize,
       ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
@@ -254,6 +276,16 @@ const KNOWN_DIMS: ReadonlyMap<string, number> = new Map([
 
 function guessDefaultDim(model: string): number | null {
   return KNOWN_DIMS.get(model) ?? null;
+}
+
+/**
+ * True when a model id belongs to the E5 family, which requires asymmetric
+ * `query:` / `passage:` prefixes (PS-10). Matches an `e5` token bounded by a
+ * path / dash / underscore so it covers `multilingual-e5-base`, `e5-large`,
+ * `intfloat/e5-mistral`, etc. without false-matching unrelated names.
+ */
+export function isE5Model(model: string): boolean {
+  return /(?:^|[/_-])e5(?:[/_-]|$)/i.test(model);
 }
 
 /**

@@ -94,10 +94,18 @@ function warnOnce(args: LookupPriceArgs): void {
  * when the price is unknown. Useful when caller wants to compute cost
  * for a single LLM call without instantiating the cost tracker.
  *
+ * Token-count contract (PS-19):
+ * - `inputTokens` **excludes** `cachedReadTokens` — cached reads are billed
+ *   separately at the cheaper cached rate, so pass the non-cached prompt count
+ *   to avoid double-billing.
+ * - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
+ *   declares an explicit `reasoningUsdPerToken`.
+ *
  * @stable
  */
 export function calculateCost(
   args: LookupPriceArgs & {
+    /** Non-cached prompt tokens (excludes `cachedReadTokens`). */
     readonly inputTokens: number;
     readonly outputTokens: number;
     readonly cachedReadTokens?: number;
@@ -108,13 +116,19 @@ export function calculateCost(
   const price = lookupPrice(args, snapshot);
   if (price === null) return null;
   let amount = 0;
+  // `inputTokens` is the NON-cached prompt; cached reads are billed separately
+  // at their own (cheaper) rate, so they must be excluded from `inputTokens` to
+  // avoid double-counting (PS-19).
   amount += price.inputUsdPerToken * args.inputTokens;
   amount += price.outputUsdPerToken * args.outputTokens;
   if (args.cachedReadTokens !== undefined && price.cachedReadUsdPerToken !== undefined) {
     amount += price.cachedReadUsdPerToken * args.cachedReadTokens;
   }
-  if (args.reasoningTokens !== undefined && price.reasoningUsdPerToken !== undefined) {
-    amount += price.reasoningUsdPerToken * args.reasoningTokens;
+  if (args.reasoningTokens !== undefined) {
+    // PS-19: reasoning tokens follow completion (output) pricing unless the
+    // entry declares an explicit `reasoningUsdPerToken` — the documented
+    // contract that was previously billed at $0 for every bundled entry.
+    amount += (price.reasoningUsdPerToken ?? price.outputUsdPerToken) * args.reasoningTokens;
   }
   return { amount, currency: 'USD' };
 }

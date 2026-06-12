@@ -36,16 +36,20 @@ export default [
 ];
 ```
 
-The bundled `recommended` config wires every active rule at the
-severities documented below; consumers can extend it directly:
+The bundled config wires every active rule at the severities documented below.
+For ESLint 9+ flat config (`eslint.config.js`), spread `flat/recommended` — it
+maps the `@graphorin` namespace to the plugin object for you:
 
 ```js
 import graphorin from '@graphorin/eslint-plugin';
 
 export default [
-  graphorin.configs.recommended,
+  graphorin.configs['flat/recommended'],
 ];
 ```
+
+The legacy `.eslintrc` form is still exported as `configs.recommended`
+(`plugins: ['@graphorin']`) for ESLint 8 consumers.
 
 ## Rules
 

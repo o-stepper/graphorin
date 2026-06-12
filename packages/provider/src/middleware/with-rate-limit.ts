@@ -30,9 +30,20 @@ export interface WithRateLimitOptions {
   readonly sleepImpl?: (ms: number, signal?: AbortSignal) => Promise<void>;
 }
 
+interface Waiter {
+  resolve: () => void;
+  reject: (err: unknown) => void;
+  signal?: AbortSignal;
+  cancelled: boolean;
+}
+
 interface BucketState {
   tokens: number;
   lastRefill: number;
+  /** FIFO waiters in `'queue'` mode (PS-18). */
+  queue: Waiter[];
+  /** Whether the single drain loop for this bucket is running. */
+  draining: boolean;
 }
 
 /**
@@ -52,26 +63,87 @@ export const withRateLimit = defineProviderMiddleware<WithRateLimitOptions>({
     const buckets = new Map<string, BucketState>();
     return (next: Provider): Provider => {
       const key = `${next.name}::${next.modelId}`;
-      const acquire = async (signal?: AbortSignal): Promise<void> => {
-        const bucket = buckets.get(key) ?? { tokens: burst, lastRefill: now() };
-        const ts = now();
-        const elapsed = ts - bucket.lastRefill;
-        bucket.tokens = Math.min(burst, bucket.tokens + elapsed * refillPerMs);
-        bucket.lastRefill = ts;
-        if (bucket.tokens >= 1) {
-          bucket.tokens -= 1;
+      const bucketFor = (): BucketState => {
+        let bucket = buckets.get(key);
+        if (bucket === undefined) {
+          bucket = { tokens: burst, lastRefill: now(), queue: [], draining: false };
           buckets.set(key, bucket);
+        }
+        return bucket;
+      };
+      const refill = (bucket: BucketState): void => {
+        const ts = now();
+        bucket.tokens = Math.min(burst, bucket.tokens + (ts - bucket.lastRefill) * refillPerMs);
+        bucket.lastRefill = ts;
+      };
+      // PS-18: a single drain loop per bucket grants queued waiters ONE token at
+      // a time, sleeping until the next token actually refills. Previously every
+      // concurrent waiter computed the same wait, slept once, and then all
+      // passed — letting N requests through on ~1 token (a burst). FIFO order is
+      // preserved and grants track the real refill schedule.
+      const drain = (bucket: BucketState): void => {
+        if (bucket.draining) return;
+        bucket.draining = true;
+        void (async () => {
+          while (bucket.queue.length > 0) {
+            const head = bucket.queue[0];
+            if (head === undefined) break;
+            if (head.cancelled) {
+              bucket.queue.shift();
+              continue;
+            }
+            refill(bucket);
+            if (bucket.tokens >= 1) {
+              bucket.tokens -= 1;
+              bucket.queue.shift();
+              head.resolve();
+              continue;
+            }
+            const waitMs = Math.ceil((1 - bucket.tokens) / refillPerMs);
+            try {
+              await sleep(waitMs);
+            } catch {
+              // The shared drain sleep carries no per-waiter signal; individual
+              // aborts are handled on the waiter via its listener.
+            }
+          }
+          bucket.draining = false;
+        })();
+      };
+      const acquire = async (signal?: AbortSignal): Promise<void> => {
+        if (signal?.aborted === true) throw signal.reason ?? new Error('aborted');
+        const bucket = bucketFor();
+        refill(bucket);
+        // Fast path: a token is free AND nobody is queued ahead (preserve FIFO).
+        if (bucket.tokens >= 1 && bucket.queue.length === 0) {
+          bucket.tokens -= 1;
           return;
         }
-        const waitMs = Math.ceil((1 - bucket.tokens) / refillPerMs);
         if (mode === 'throw') {
-          buckets.set(key, bucket);
-          throw new RateLimitExceededError(waitMs);
+          throw new RateLimitExceededError(Math.ceil((1 - bucket.tokens) / refillPerMs));
         }
-        await sleep(waitMs, signal);
-        bucket.tokens = 0;
-        bucket.lastRefill = now();
-        buckets.set(key, bucket);
+        await new Promise<void>((resolve, reject) => {
+          const waiter: Waiter = {
+            resolve,
+            reject,
+            ...(signal ? { signal } : {}),
+            cancelled: false,
+          };
+          if (signal !== undefined) {
+            const onAbort = (): void => {
+              waiter.cancelled = true;
+              reject(signal.reason ?? new Error('aborted'));
+            };
+            signal.addEventListener('abort', onAbort, { once: true });
+            const settle = resolve;
+            waiter.resolve = (): void => {
+              signal.removeEventListener('abort', onAbort);
+              settle();
+            };
+          }
+          bucket.queue.push(waiter);
+          drain(bucket);
+        });
       };
       return {
         name: next.name,

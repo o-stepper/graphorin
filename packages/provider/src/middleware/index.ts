@@ -19,7 +19,9 @@ export {
 } from './production-hook.js';
 export { type WithCostLimitOptions, withCostLimit } from './with-cost-limit.js';
 export {
+  type CostAccumulator,
   type CostTrackingTotals,
+  createCostAccumulator,
   type WithCostTrackingOptions,
   withCostTracking,
 } from './with-cost-tracking.js';

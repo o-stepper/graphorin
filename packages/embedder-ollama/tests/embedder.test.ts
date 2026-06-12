@@ -66,6 +66,27 @@ describe('createOllamaEmbedder', () => {
     expect(KNOWN_OLLAMA_MODEL_DIMS.get('nomic-embed-text')).toBe(768);
   });
 
+  it('dim()/id() throw for an unknown model with no dim hint instead of baking 0 (PS-11)', () => {
+    const e = createOllamaEmbedder({ model: 'totally-unknown-embed', skipDigestProbe: true });
+    expect(() => e.dim()).toThrow(/dim/i);
+    expect(() => e.id()).toThrow(/dim/i);
+  });
+
+  it('honours an explicit dim for an unknown model (PS-11)', () => {
+    const e = createOllamaEmbedder({
+      model: 'totally-unknown-embed',
+      dim: 512,
+      skipDigestProbe: true,
+    });
+    expect(e.dim()).toBe(512);
+    expect(e.id()).toContain('@512');
+  });
+
+  it('knows the newer embedding families (PS-11)', () => {
+    expect(KNOWN_OLLAMA_MODEL_DIMS.get('embeddinggemma')).toBe(768);
+    expect(KNOWN_OLLAMA_MODEL_DIMS.get('all-minilm')).toBe(384);
+  });
+
   it('embed() roundtrips through /api/embed (batch path)', async () => {
     const dim = 8;
     const { fetch: fetchImpl, calls } = makeFakeFetch([
@@ -184,10 +205,10 @@ describe('createOllamaEmbedder', () => {
       },
     ]);
     const e = createOllamaEmbedder({ model: 'novel-model', fetchImpl });
-    expect(e.dim()).toBe(0); // unknown until first embed
+    expect(() => e.dim()).toThrow(/dim/i); // PS-11: unknown ⇒ loud, not 0
     const out = await e.embed(['hello']);
     expect(out[0]?.length).toBe(17);
-    expect(e.dim()).toBe(17);
+    expect(e.dim()).toBe(17); // resolved from the response width
   });
 
   it('concurrent embed() calls share a single /api/show probe', async () => {

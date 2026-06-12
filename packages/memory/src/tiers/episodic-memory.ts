@@ -146,7 +146,8 @@ export class EpisodicMemory {
         embedderId !== null &&
         typeof this.#store.episodic.putWithEmbedding === 'function'
       ) {
-        const [vector] = await this.#embedder.embed([input.summary]);
+        // PS-10: a stored episode summary is the `passage` role for E5.
+        const [vector] = await this.#embedder.embed([input.summary], { taskType: 'passage' });
         if (vector !== undefined) {
           await this.#store.episodic.putWithEmbedding(episode, {
             embedding: { embedderId, vector },
@@ -349,7 +350,8 @@ export class EpisodicMemory {
     ) {
       return [];
     }
-    const [vector] = await this.#embedder.embed([query]);
+    // PS-10: a search query is the `query` role for E5.
+    const [vector] = await this.#embedder.embed([query], { taskType: 'query' });
     if (vector === undefined) return [];
     return this.#store.episodic.searchVector(
       scope,

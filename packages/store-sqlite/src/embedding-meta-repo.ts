@@ -114,6 +114,16 @@ export class EmbeddingMetaRepository {
    * in effect and a different active embedder is already registered.
    */
   registerOrReturn(input: RegisterEmbedderInput): EmbeddingMetaRow {
+    // PS-11: a dim of 0 (or non-finite) would create a `float[0]` vec0 table
+    // and silently break vector search — most often an Ollama embedder bound
+    // for an unknown model before its width was resolved. Reject it loudly.
+    if (!Number.isInteger(input.dim) || input.dim <= 0) {
+      throw new EmbedderLockOnFirstError(
+        `[graphorin/store-sqlite] embedder '${input.id}' has an invalid dim (${String(input.dim)}). ` +
+          'The output dimension must be a positive integer — pass an explicit `dim` to the embedder ' +
+          '(e.g. ollamaEmbedder({ model, dim })) or resolve it from a first embed before registering.',
+      );
+    }
     const existing = this.get(input.id);
     if (existing !== null) {
       if (existing.configHash !== input.configHash) {

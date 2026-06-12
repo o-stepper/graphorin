@@ -29,6 +29,34 @@ describe('extractPairScores', () => {
     expect(extractPairScores([] as never, 2)).toEqual([0, 0]);
     expect(extractPairScores([[]] as never, 1)).toEqual([0]);
   });
+
+  it('reads the POSITIVE label score for a 2-label classifier, not the max (PS-16)', () => {
+    const raw = [
+      // An irrelevant pair: the model is confident it's the NEGATIVE class.
+      [
+        { label: 'LABEL_0', score: 0.95 },
+        { label: 'LABEL_1', score: 0.05 },
+      ],
+      // A relevant pair.
+      [
+        { label: 'LABEL_0', score: 0.2 },
+        { label: 'LABEL_1', score: 0.8 },
+      ],
+    ];
+    // The relevance score is the positive (LABEL_1) confidence, so the
+    // irrelevant pair scores low — not 0.95.
+    expect(extractPairScores(raw, 2)).toEqual([0.05, 0.8]);
+  });
+
+  it('matches positive/relevant word labels without the "irrelevant" false-match (PS-16)', () => {
+    const raw = [
+      [
+        { label: 'irrelevant', score: 0.9 },
+        { label: 'relevant', score: 0.1 },
+      ],
+    ];
+    expect(extractPairScores(raw, 1)).toEqual([0.1]); // 'relevant', not 'irrelevant'
+  });
 });
 
 describe('CrossEncoderLoadError', () => {
