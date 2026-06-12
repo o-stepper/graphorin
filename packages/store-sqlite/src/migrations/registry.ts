@@ -54,6 +54,8 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '019': '@graphorin/memory (DLQ failed-phase)',
   '020': '@graphorin/memory (rule demonstrated-success counter)',
   '021': '@graphorin/memory (run episode/insight counters)',
+  '022': '@graphorin/store-sqlite (session sequence uniqueness)',
+  '023': '@graphorin/store-sqlite (drop dead facts.hash column)',
 };
 
 const dynamicMigrations: Migration[] = [];

@@ -37,6 +37,18 @@ For multi-process deployments, front it with the standalone server rather than
 opening the same file from several processes.
 :::
 
+::: danger Never run `VACUUM`
+The FTS5 keyword indexes are keyed to each base row's implicit `rowid`.
+`VACUUM` may renumber implicit rowids, which would silently re-point every
+search hit at the wrong record. Graphorin never issues `VACUUM`, and the
+encrypted `encrypt` / `rekey` maintenance commands copy the database file
+byte-for-byte (preserving rowids) — so use those, never a hand-run `VACUUM`.
+Each open runs a cheap FTS↔rowid integrity check and warns on drift; the same
+check is exposed as `checkFtsIntegrity(connection)` (pass
+`skipFtsIntegrityCheck: true` to `createSqliteStore` to disable the open-time
+scan on very large stores).
+:::
+
 ## `@graphorin/store-sqlite-encrypted` (encryption-at-rest)
 
 A drop-in that pulls the cipher peer (`better-sqlite3-multiple-ciphers`,

@@ -200,6 +200,51 @@ describe('P2-1 EntityResolver', () => {
   });
 });
 
+describe('CS-11 resolver candidate-window safety', () => {
+  /** Wrap a graph store to count `listEntities` candidate scans. */
+  function countingGraph(inner: GraphMemoryStoreExt): {
+    graph: GraphMemoryStoreExt;
+    calls: () => number;
+  } {
+    let listCalls = 0;
+    return {
+      calls: () => listCalls,
+      graph: {
+        ...inner,
+        listEntities: (s, opts) => {
+          listCalls += 1;
+          return inner.listEntities(s, opts);
+        },
+      },
+    };
+  }
+
+  it('resolves an exact alias of an entity beyond the candidate cap (no scan, no dup)', async () => {
+    const { graph, calls } = countingGraph(graphOf(createInMemoryStore({ withGraphStore: true })));
+    const resolver = new EntityResolver({ store: graph });
+    // The oldest entity — pushed far outside any most-recent-N window.
+    const alpha = await resolver.resolve(scope, 'Alpha');
+    // Flood the store well past the 1000-row candidate cap.
+    for (let i = 0; i < 1100; i++) await resolver.resolve(scope, `filler-${i}`);
+    const before = calls();
+    // An uncapped exact lookup resolves the old alias without deserializing
+    // the candidate window — and without minting a duplicate.
+    const again = await resolver.resolve(scope, 'alpha');
+    expect(again).toBe(alpha);
+    expect(calls()).toBe(before); // no candidate scan on the exact-alias path
+  });
+
+  it('does not deserialize the candidate window when there is no query vector', async () => {
+    const { graph, calls } = countingGraph(graphOf(createInMemoryStore({ withGraphStore: true })));
+    // No embedder ⇒ no query vector ⇒ embedding dedup is impossible, so the
+    // BLOB-deserializing candidate scan must be skipped entirely.
+    const resolver = new EntityResolver({ store: graph });
+    await resolver.resolve(scope, 'Anna');
+    await resolver.resolve(scope, 'Bob');
+    expect(calls()).toBe(0);
+  });
+});
+
 describe('P2-1 search({ expandHops }) end-to-end', () => {
   // No embedder ⇒ the fixture's thresholdless vector search is off, so a
   // plain search returns only the lexical (FTS substring) match — the

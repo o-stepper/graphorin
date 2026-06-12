@@ -217,4 +217,17 @@ describe('SqliteSemanticMemoryStore.listForDecay + archiveFact', () => {
     const archived = after.find((r) => r.id === 'f1');
     expect(archived?.archived).toBe(true);
   });
+  it('CS-8: exactly one of N concurrent acquireLock calls wins (atomic)', async () => {
+    const scope = { userId: 'concurrent' };
+    const c = asConsolidator(store);
+    // Fire many acquireLock calls for distinct runIds at once. The
+    // read-then-write window used to let several win; the conditional
+    // UPSERT admits exactly one.
+    const results = await Promise.all(
+      Array.from({ length: 20 }, (_, i) => c.acquireLock(scope, `run-${i}`, 0, 60_000)),
+    );
+    expect(results.filter(Boolean)).toHaveLength(1);
+    const state = await c.getState(scope);
+    expect(state?.activeLockHeldBy).toMatch(/^run-\d+$/);
+  });
 });

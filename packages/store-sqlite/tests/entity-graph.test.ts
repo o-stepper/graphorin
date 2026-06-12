@@ -112,6 +112,33 @@ describe('P2-1 canonical entities', () => {
     ]);
   });
 
+  it('findEntityByNormalizedName: uncapped exact lookup, root-only (CS-11)', async () => {
+    const vec = new Float32Array([0.5, 0.25, -0.5, 0.125]);
+    const anna = await store.graph.upsertEntity(SCOPE, {
+      name: 'Anna',
+      normalizedName: 'anna',
+      vector: vec,
+    });
+    // Flood past the listEntities cap so the row is only reachable by the index.
+    for (let i = 0; i < 1100; i++) {
+      await store.graph.upsertEntity(SCOPE, { name: `Filler ${i}`, normalizedName: `filler-${i}` });
+    }
+    const hit = await store.graph.findEntityByNormalizedName(SCOPE, 'anna');
+    expect(hit?.id).toBe(anna);
+    expect(Array.from(hit?.vector ?? [])).toEqual([
+      expect.closeTo(0.5, 5),
+      expect.closeTo(0.25, 5),
+      expect.closeTo(-0.5, 5),
+      expect.closeTo(0.125, 5),
+    ]);
+    expect(await store.graph.findEntityByNormalizedName(SCOPE, 'nobody')).toBeNull();
+
+    // A merged (non-root) name is excluded — only canonical roots resolve.
+    const annie = await store.graph.upsertEntity(SCOPE, { name: 'Annie', normalizedName: 'annie' });
+    await store.graph.mergeEntities(SCOPE, annie, anna, 'same person');
+    expect(await store.graph.findEntityByNormalizedName(SCOPE, 'annie')).toBeNull();
+  });
+
   it('merges are auditable + reversible; distinct entities stay separate', async () => {
     const anna = await store.graph.upsertEntity(SCOPE, { name: 'Anna', normalizedName: 'anna' });
     const annie = await store.graph.upsertEntity(SCOPE, { name: 'Annie', normalizedName: 'annie' });
@@ -212,5 +239,41 @@ describe('P2-1 one-hop expansion (recursive CTE)', () => {
         (f) => f.id,
       ),
     ).toEqual(['q_f2']);
+  });
+});
+
+describe('CS-15 expandOneHop intermediate-fact visibility (multi-hop)', () => {
+  let store: SqliteMemoryStore;
+  beforeEach(async () => {
+    store = await makeStore();
+  });
+
+  // A —[X]— B —[Y]— C: B is the sole bridge from A's entity X to C's entity Y.
+  async function bridge(bOver: Partial<Fact> = {}): Promise<void> {
+    await store.semantic.remember(mkFact({ id: 'h_a', text: 'alpha', object: 'X' }));
+    await store.semantic.remember(
+      mkFact({ id: 'h_b', text: 'bravo', subject: 'X', object: 'Y', ...bOver }),
+    );
+    await store.semantic.remember(mkFact({ id: 'h_c', text: 'charlie', subject: 'Y' }));
+    const x = await store.graph.upsertEntity(SCOPE, { name: 'X', normalizedName: 'x' });
+    const y = await store.graph.upsertEntity(SCOPE, { name: 'Y', normalizedName: 'y' });
+    await store.graph.linkFactEntity('h_a', x, 'object');
+    await store.graph.linkFactEntity('h_b', x, 'subject');
+    await store.graph.linkFactEntity('h_b', y, 'object');
+    await store.graph.linkFactEntity('h_c', y, 'subject');
+  }
+
+  it('a visible intermediate fact conducts a 2-hop link', async () => {
+    await bridge();
+    const ids = (await store.graph.expandOneHop(SCOPE, ['h_a'], { maxHops: 2 })).map((f) => f.id);
+    expect(ids).toContain('h_b'); // depth 1
+    expect(ids).toContain('h_c'); // depth 2 via the visible bridge
+  });
+
+  it('a quarantined intermediate fact does not conduct the 2-hop link', async () => {
+    await bridge({ status: 'quarantined' });
+    const ids = (await store.graph.expandOneHop(SCOPE, ['h_a'], { maxHops: 2 })).map((f) => f.id);
+    expect(ids).not.toContain('h_b'); // excluded from output (quarantined)
+    expect(ids).not.toContain('h_c'); // and must not bridge A → C through itself
   });
 });

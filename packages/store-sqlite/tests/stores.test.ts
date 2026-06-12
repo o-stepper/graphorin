@@ -361,14 +361,14 @@ describe('createSqliteStore', () => {
       archive(id: string, reason?: string): Promise<void>;
     };
     await episodic.put(ep);
+    // Before archiving the episode IS searchable via FTS.
+    const before = await store.memory.episodic.search({ userId: 'alex' }, { query: 'fleeting' });
+    expect(before.some((h) => h.record.id === 'ep-x')).toBe(true);
     await episodic.archive('ep-x');
-    // Archived episodes are filtered out of `search(...)` even though
-    // their `deleted_at` tombstone is still NULL.
+    // CS-2: archive() excludes the episode from BOTH the FTS and vector
+    // legs (the TSDoc promise; the FTS leg used to leak archived rows).
     const hits = await store.memory.episodic.search({ userId: 'alex' }, { query: 'fleeting' });
-    // Note: search includes archived rows in this adapter's current
-    // implementation (the spec leaves it adapter-defined). The DoD
-    // assertion is on the archive call succeeding without error.
-    expect(Array.isArray(hits)).toBe(true);
+    expect(hits.some((h) => h.record.id === 'ep-x')).toBe(false);
   });
 
   it('session memory: totalCachedTokens (DEC-131 cache surface)', async () => {

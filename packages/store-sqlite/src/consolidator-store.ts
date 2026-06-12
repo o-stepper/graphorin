@@ -244,27 +244,29 @@ export class SqliteConsolidatorStateStore {
     now: number,
     maxAgeMs: number,
   ): Promise<boolean> {
-    const existing = await this.getState(scope);
-    if (existing === null || existing.activeLockHeldBy === null) {
-      await this.upsertState(scope, {
-        activeLockHeldBy: runId,
-        activeLockAcquiredAt: now,
-      });
-      return true;
-    }
-    if (existing.activeLockHeldBy === runId) return true;
-    if (
-      maxAgeMs > 0 &&
-      existing.activeLockAcquiredAt !== null &&
-      now - existing.activeLockAcquiredAt > maxAgeMs
-    ) {
-      await this.upsertState(scope, {
-        activeLockHeldBy: runId,
-        activeLockAcquiredAt: now,
-      });
-      return true;
-    }
-    return false;
+    // CS-8: a single conditional UPSERT — better-sqlite3 is synchronous,
+    // so the read-modify-write window that let two runners (in-process
+    // microtasks, or server + CLI on one WAL db) both win is gone. The
+    // lock is granted iff it is currently free, already ours, or stale.
+    // `changes === 1` ⇔ this caller acquired it.
+    const userId = scope.userId;
+    const sessionId = scope.sessionId ?? '';
+    const agentId = scope.agentId ?? '';
+    const staleBefore = maxAgeMs > 0 ? now - maxAgeMs : Number.NEGATIVE_INFINITY;
+    const result = this.#conn.run(
+      `INSERT INTO consolidator_state (
+         scope_user_id, scope_session_id, scope_agent_id,
+         active_lock_held_by, active_lock_acquired_at
+       ) VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(scope_user_id, scope_session_id, scope_agent_id) DO UPDATE SET
+         active_lock_held_by = excluded.active_lock_held_by,
+         active_lock_acquired_at = excluded.active_lock_acquired_at
+       WHERE consolidator_state.active_lock_held_by IS NULL
+          OR consolidator_state.active_lock_held_by = excluded.active_lock_held_by
+          OR consolidator_state.active_lock_acquired_at < ?`,
+      [userId, sessionId, agentId, runId, now, staleBefore],
+    );
+    return result.changes === 1;
   }
 
   async releaseLock(scope: SessionScope, runId: string): Promise<void> {

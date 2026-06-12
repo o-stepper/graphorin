@@ -29,7 +29,7 @@ import { SqliteConflictStore } from './conflict-store.js';
 import type { SqliteConnection } from './connection.js';
 import { SqliteConsolidatorStateStore } from './consolidator-store.js';
 import type { EmbeddingMetaRepository } from './embedding-meta-repo.js';
-import { VectorTableManager } from './vector-table-mgr.js';
+import { scoreFromDistance, VectorTableManager } from './vector-table-mgr.js';
 
 /**
  * Point-in-time (`asOf`) WHERE fragments. Appended only when an
@@ -249,39 +249,48 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     if (scope.sessionId === undefined) {
       throw new Error('[graphorin/store-sqlite] SessionMemoryStore.push requires scope.sessionId');
     }
-    const sequenceRow = this.#conn.get<{ next: number }>(
-      'SELECT COALESCE(MAX(sequence), 0) + 1 AS next FROM session_messages WHERE scope_session_id = ?',
-      [scope.sessionId],
-    );
-    const sequence = sequenceRow?.next ?? 1;
     const id = generateId();
     const createdAt = Date.now();
-    this.#conn.run(
-      `INSERT INTO session_messages (
-         id, scope_user_id, scope_session_id, scope_agent_id, agent_id, role,
-         content_json, tool_calls_json, tool_call_id, sequence, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        scope.userId,
-        scope.sessionId,
-        scope.agentId ?? null,
-        readAgentId(message),
-        message.role,
-        JSON.stringify(messageToContentJson(message)),
-        readToolCalls(message),
-        readToolCallId(message),
-        sequence,
-        createdAt,
-      ],
-    );
-    const text = renderMessageForFts(message);
-    if (text.length > 0) {
-      this.#conn.run(
-        'INSERT INTO session_messages_fts (rowid, text) VALUES ((SELECT rowid FROM session_messages WHERE id = ?), ?)',
-        [id, text],
+    // CS-9: the MAX+1 read, the message INSERT, and the FTS INSERT run in one
+    // transaction so a crash never leaves a committed message without its FTS
+    // row (silently unsearchable), and the UNIQUE(scope_session_id, sequence)
+    // constraint (migration 022) is evaluated atomically with the read — a
+    // cross-process race that recomputes the same sequence fails loudly here
+    // instead of minting a duplicate.
+    let sequence = 1;
+    this.#conn.transaction(() => {
+      const sequenceRow = this.#conn.get<{ next: number }>(
+        'SELECT COALESCE(MAX(sequence), 0) + 1 AS next FROM session_messages WHERE scope_session_id = ?',
+        [scope.sessionId],
       );
-    }
+      sequence = sequenceRow?.next ?? 1;
+      this.#conn.run(
+        `INSERT INTO session_messages (
+           id, scope_user_id, scope_session_id, scope_agent_id, agent_id, role,
+           content_json, tool_calls_json, tool_call_id, sequence, created_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          id,
+          scope.userId,
+          scope.sessionId,
+          scope.agentId ?? null,
+          readAgentId(message),
+          message.role,
+          JSON.stringify(messageToContentJson(message)),
+          readToolCalls(message),
+          readToolCallId(message),
+          sequence,
+          createdAt,
+        ],
+      );
+      const text = renderMessageForFts(message);
+      if (text.length > 0) {
+        this.#conn.run(
+          'INSERT INTO session_messages_fts (rowid, text) VALUES ((SELECT rowid FROM session_messages WHERE id = ?), ?)',
+          [id, text],
+        );
+      }
+    });
     return {
       messageId: id,
       sequence,
@@ -563,6 +572,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
        FROM episodes_fts
        JOIN episodes e ON e.rowid = episodes_fts.rowid
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
+         AND e.archived = 0
          ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
          ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
          ${episodeDateRangePredicate(from, to)}
@@ -655,8 +665,8 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     );
     return rows.map((row) => ({
       record: rowToEpisode(row),
-      score: 1 - row.distance,
-      signals: { vector: 1 - row.distance },
+      score: scoreFromDistance(meta.distanceMetric, row.distance),
+      signals: { vector: scoreFromDistance(meta.distanceMetric, row.distance) },
     }));
   }
 
@@ -757,8 +767,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            embedder_id, source_message_ids_json,
            valid_from, valid_to, supersedes, superseded_by, provenance, status,
            importance, strength, last_accessed_at,
-           hash, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
            subject = excluded.subject,
@@ -774,6 +784,15 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            provenance = excluded.provenance,
            status = excluded.status,
            importance = excluded.importance,
+           -- CS-5: adopt the new embedder_id only when this write actually
+           -- carries an embedding (excluded.embedder_id IS NOT NULL). A
+           -- no-embedding re-remember (e.g. supersede()'s re-write of the new
+           -- fact) keeps the existing embedder_id so a previously-embedded
+           -- fact is not silently hidden from vector search.
+           embedder_id = CASE
+             WHEN excluded.embedder_id IS NOT NULL THEN excluded.embedder_id
+             ELSE facts.embedder_id
+           END,
            updated_at = excluded.updated_at`,
         [
           fact.id,
@@ -801,7 +820,6 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.status ?? 'active',
           fact.importance ?? null,
           1.0,
-          null,
           null,
           toEpoch(fact.createdAt),
           fact.updatedAt ? toEpoch(fact.updatedAt) : null,
@@ -931,8 +949,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     }
     return rows.slice(0, topK).map((row) => ({
       record: rowToFact(row),
-      score: 1 - row.distance,
-      signals: { vector: 1 - row.distance },
+      score: scoreFromDistance(meta.distanceMetric, row.distance),
+      signals: { vector: scoreFromDistance(meta.distanceMetric, row.distance) },
     }));
   }
 
@@ -946,6 +964,14 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     // effect) so the hand-off is seamless. `COALESCE` makes it idempotent and
     // never clobbers an interval the caller already closed explicitly.
     const closeAt = newFact.validFrom ? toEpoch(newFact.validFrom) : now;
+    // CS-12: write the successor FIRST, then close the old fact in the same
+    // call. `remember()` opens its own transaction, so it cannot be nested
+    // inside the close transaction; inverting the order makes the close
+    // depend on a durable successor instead of the reverse. A crash between
+    // the two steps leaves the old fact fully intact (open interval, no
+    // `superseded_by`) — recoverable — rather than closed in favour of, and
+    // pointing at, a row that was never written.
+    await this.remember(newFact);
     this.#conn.transaction(() => {
       this.#conn.run(
         'UPDATE facts SET superseded_by = ?, valid_to = COALESCE(valid_to, ?), updated_at = ? WHERE id = ?',
@@ -957,7 +983,6 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       );
     });
     void reason;
-    await this.remember(newFact);
   }
 
   /**
@@ -1679,6 +1704,26 @@ export class SqliteGraphStore {
     }));
   }
 
+  /**
+   * Uncapped indexed lookup of the canonical root for an exact normalized
+   * name. Backed by the partial-unique index on `(scope_user_id,
+   * normalized_name) WHERE merged_into IS NULL`, so the resolver dedups an
+   * exact alias of an arbitrarily-old entity without paging the bounded
+   * {@link listEntities} candidate window or deserializing its BLOBs (CS-11).
+   */
+  async findEntityByNormalizedName(
+    scope: SessionScope,
+    normalizedName: string,
+  ): Promise<SqliteEntityWithEmbedding | null> {
+    const row = this.#conn.get<EntityRow>(
+      'SELECT * FROM entities WHERE scope_user_id = ? AND normalized_name = ? AND merged_into IS NULL',
+      [scope.userId, normalizedName],
+    );
+    return row !== undefined
+      ? { ...rowToGraphEntity(row), vector: blobToF32(row.embedding), embedderId: row.embedder_id }
+      : null;
+  }
+
   /** Lookup one entity by id (any merge state). */
   async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
     const row = this.#conn.get<EntityRow>(
@@ -1805,13 +1850,30 @@ export class SqliteGraphStore {
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
     const seedsJson = JSON.stringify([...seedFactIds]);
     const rows = this.#conn.all<FactRow>(
+      // CS-15: the recursive step only bridges THROUGH a fact that is itself
+      // visible to the caller (in-scope, not tombstoned/archived/quarantined,
+      // valid at `asOf`) — joining `facts fb ON fb.id = w.fact_id` with the
+      // same predicates. Without it a tombstoned/quarantined intermediate fact
+      // silently conducts a link between two otherwise-unrelated records at
+      // maxHops > 1. Seeds are also intersected with the caller scope so a
+      // foreign fact id can't be used as a traversal root.
       `WITH RECURSIVE
-         seed_ids(fact_id) AS (SELECT value FROM json_each(?)),
+         seed_ids(fact_id) AS (
+           SELECT f.id FROM facts f
+           JOIN json_each(?) j ON j.value = f.id
+           WHERE f.scope_user_id = ?
+         ),
          walk(fact_id, depth) AS (
              SELECT fact_id, 0 FROM seed_ids
            UNION
              SELECT fe2.fact_id, w.depth + 1
              FROM walk w
+             JOIN facts fb ON fb.id = w.fact_id
+               AND fb.scope_user_id = ?
+               AND fb.deleted_at IS NULL
+               AND fb.archived = 0
+               AND (? = 1 OR fb.status != 'quarantined')
+               AND (? IS NULL OR ((fb.valid_from IS NULL OR fb.valid_from <= ?) AND (fb.valid_to IS NULL OR fb.valid_to > ?)))
              JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
              JOIN entities e1 ON e1.id = fe1.entity_id
              JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
@@ -1828,7 +1890,22 @@ export class SqliteGraphStore {
          AND (? IS NULL OR ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)))
        ORDER BY f.created_at DESC
        LIMIT ?`,
-      [seedsJson, maxHops, scope.userId, incQ, asOf, asOf, asOf, limit],
+      [
+        seedsJson,
+        scope.userId,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        maxHops,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        limit,
+      ],
     );
     return rows.map(rowToFact);
   }
@@ -1950,7 +2027,6 @@ interface FactRow {
   importance: number | null;
   strength: number;
   last_accessed_at: number | null;
-  hash: string | null;
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
