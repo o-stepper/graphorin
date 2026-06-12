@@ -130,3 +130,40 @@ function uniq(arr: readonly string[]): string[] {
   }
   return out;
 }
+
+describe('MRET-13 — retriever-kind signal labels', () => {
+  const labelHit = (id: string, score: number) => ({
+    record: {
+      id,
+      kind: 'semantic' as const,
+      userId: 'u1',
+      sensitivity: 'internal' as const,
+      createdAt: new Date(0).toISOString(),
+    },
+    score,
+  });
+
+  it('keys per-list contributions by the supplied label, falling back to position', () => {
+    const fused = fuseRrf([[labelHit('a', 1)], [labelHit('a', 0.9)], [labelHit('b', 0.8)]], 60, [
+      'fts_0',
+      'vector_0',
+      // third list intentionally unlabeled → positional fallback
+    ]);
+    const a = fused.find((h) => h.record.id === 'a');
+    const b = fused.find((h) => h.record.id === 'b');
+    expect(a?.signals?.['rrf.fts_0']).toBeGreaterThan(0);
+    expect(a?.signals?.['rrf.vector_0']).toBeGreaterThan(0);
+    expect(a?.signals?.['rrf.list_0']).toBeUndefined();
+    expect(b?.signals?.['rrf.list_2']).toBeGreaterThan(0);
+  });
+
+  it('labels survive a conditionally-absent leg (the same kind keeps the same key)', () => {
+    const withVector = fuseRrf([[labelHit('a', 1)], [labelHit('a', 0.9)]], 60, [
+      'fts_0',
+      'vector_0',
+    ]);
+    const withoutVector = fuseRrf([[labelHit('a', 1)]], 60, ['fts_0']);
+    expect(withVector[0]?.signals?.['rrf.fts_0']).toBeDefined();
+    expect(withoutVector[0]?.signals?.['rrf.fts_0']).toBeDefined();
+  });
+});
