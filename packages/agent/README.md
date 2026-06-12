@@ -124,12 +124,13 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   'fallthrough-default'` once per step.
 - **Lateral-leak defense layer.** `Agent.causalityMonitor`
   (Agentic Reference Monitor pattern), `Agent.mergeGuard` (per-child
-  trust scoring + bias detection on `'judge-merge'`), the protocol
-  injection guard (control-character escape catalogue), and
+  trust scoring + bias detection on `'judge-merge'`; `detect-and-block`
+  refuses the merge with `MergeBlockedError`), the protocol
+  injection guard (`guardOutboundContent` — an exported helper for
+  the server boundary, not an `AgentConfig` knob), and
   commentary-phase trace sanitization at the session-output
   boundary compose orthogonally with the other security layers
-  (sub-agent secrets isolation, handoff input filter, outbound
-  redaction, inbound sanitization).
+  (handoff input filter, outbound redaction, inbound sanitization).
 - **Inbound sanitization preamble.** Part of the context-engine
   assemble path: with `autoAssembleContext: true` **and** memory
   wired, when the assembled message list contains any non-trusted

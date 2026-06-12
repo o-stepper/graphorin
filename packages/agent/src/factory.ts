@@ -44,8 +44,8 @@ import type {
   Usage,
 } from '@graphorin/core';
 import { isStepCount, NOOP_LOGGER, NOOP_TRACER, zeroUsage } from '@graphorin/core';
-import { composeGuardrails } from '@graphorin/security/guardrails';
 import type { Memory } from '@graphorin/memory';
+import { composeGuardrails } from '@graphorin/security/guardrails';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
   type CodeExecuteBridge,
@@ -2016,11 +2016,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // text deltas were already streamed, so the rewrite governs what
     // is persisted/returned, not the live token stream.
     const outputGuards = config.guardrails?.output;
-    if (
-      state.status === 'completed' &&
-      outputGuards !== undefined &&
-      outputGuards.length > 0
-    ) {
+    if (state.status === 'completed' && outputGuards !== undefined && outputGuards.length > 0) {
       const composed = await composeGuardrails(outputGuards, finalSnapshot.output, {
         stage: 'output',
         runId: state.id,
@@ -2284,6 +2280,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       ...(options.perBudget !== undefined ? { perBudget: options.perBudget } : {}),
       ...(options.mergeStrategy !== undefined ? { mergeStrategy: options.mergeStrategy } : {}),
       ...(options.signal !== undefined ? { signal: options.signal } : {}),
+      // AG-7: fanout lifecycle events reach the agent stream — queued
+      // on the external-event queue and drained into the active (or
+      // next consumed) run, like steer/follow-up/progress events.
+      emit: (event) => {
+        externalEventQueue.push(event as AgentEvent<TOutput>);
+      },
+      // AG-7: the configured sideways-injection merge guard finally
+      // applies to the judge-merge path.
+      ...(config.mergeGuard !== undefined ? { mergeGuard: config.mergeGuard } : {}),
       runId,
       sessionId,
       agentId,

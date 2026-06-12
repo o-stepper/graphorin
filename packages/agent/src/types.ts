@@ -31,10 +31,9 @@ import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardr
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
 import type { AgentFallbackPolicy } from './fallback/index.js';
-import type { FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
+import type { FanOutOptions, FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
 import type { CausalityMonitorConfig } from './lateral-leak/causality-monitor.js';
 import type { MergeGuardConfig } from './lateral-leak/merge-guard.js';
-import type { ProtocolGuardConfig } from './lateral-leak/protocol-guard.js';
 import type { ProgressReadOptions, ProgressWriteOptions } from './progress/index.js';
 
 /**
@@ -214,8 +213,14 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly reasoningRetention?: ReasoningRetention;
   readonly causalityMonitor?: CausalityMonitorConfig;
+  /**
+   * Sideways-injection merge guard for `agent.fanOut` `'judge-merge'`
+   * (AG-7): scores per-child source trust × contribution weight against
+   * the judge's merged output; a biased merge emits
+   * `agent.lateral-leak.detected` and `'detect-and-block'` throws
+   * `MergeBlockedError`.
+   */
   readonly mergeGuard?: MergeGuardConfig;
-  readonly protocolGuard?: ProtocolGuardConfig;
   /**
    * Provenance / taint-based data-flow policy (P1-3, opt-in). Enforces
    * data-flow rules at the tool-execution boundary using the provenance
@@ -371,10 +376,7 @@ export interface CompactionApiResult {
  * @stable
  */
 export interface AgentFanOutOptions<TOutput = unknown> {
-  readonly children: ReadonlyArray<{
-    readonly agentId: string;
-    readonly invoke: () => Promise<TOutput>;
-  }>;
+  readonly children: FanOutOptions<TOutput>['children'];
   readonly maxConcurrentChildren?: number;
   readonly perBudget?: PerChildBudget;
   readonly mergeStrategy?: MergeStrategy<TOutput>;

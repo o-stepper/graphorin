@@ -316,11 +316,11 @@ const planTool = tool({
 
 ## Lateral-leak defense layer
 
-Three opt-in agent-level guards configured on `createAgent({ causalityMonitor, mergeGuard, protocolGuard })`. They compose orthogonally with the other security layers (sub-agent secrets isolation, handoff input filter, outbound redaction, inbound sanitisation):
+Two opt-in agent-level guards configured on `createAgent({ causalityMonitor, mergeGuard })`. They compose orthogonally with the other security layers (handoff input filter, outbound redaction, inbound sanitisation):
 
 - **`causalityMonitor`** — implements an Agentic Reference Monitor pattern: every cross-agent flow is checked against the stated capability, with a configurable strictness level.
-- **`mergeGuard`** — per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy.
-- **`protocolGuard`** — control-character escape catalogue applied at protocol boundaries.
+- **`mergeGuard`** — per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy (AG-7): each child's source trust × contribution weight is scored against the judge's merged output; a biased merge emits `agent.lateral-leak.detected` (vector `sideways-injection`) and `strictness: 'detect-and-block'` throws `MergeBlockedError`.
+- **Protocol-injection guard** — the control-character escape catalogue (`guardOutboundContent`) is an exported helper for **server-boundary** wiring (SSE/session export), not an `AgentConfig` knob — the agent itself has no protocol boundary.
 - **Commentary-phase trace sanitisation** runs at the session-output boundary in `@graphorin/sessions`.
 
 ## Provenance / data-flow policy (`dataFlowPolicy`)
