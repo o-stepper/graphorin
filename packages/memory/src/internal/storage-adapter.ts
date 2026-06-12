@@ -245,10 +245,17 @@ export type ConflictAuditStage =
 /**
  * Final pipeline outcome recorded against the candidate fact. Matches
  * the storage adapter's `ConflictPipelineDecision` exactly.
+ * `'judge-unparseable'` closes a pending row whose deep-phase judge
+ * call repeatedly failed (MCON-9) so it stops being re-billed forever.
  *
  * @stable
  */
-export type ConflictAuditDecision = 'admit' | 'dedup' | 'supersede' | 'pending';
+export type ConflictAuditDecision =
+  | 'admit'
+  | 'dedup'
+  | 'supersede'
+  | 'pending'
+  | 'judge-unparseable';
 
 /**
  * Single audit row written by `runConflictPipeline(...)`. The optional
@@ -322,6 +329,13 @@ export interface ConflictMemoryStoreExt {
   enqueuePending(input: PendingConflictInputLike): Promise<{ readonly id: number }>;
   listPending(scope: SessionScope, limit?: number): Promise<ReadonlyArray<PendingConflictRowLike>>;
   markResolved(id: number, decision: ConflictAuditDecision): Promise<void>;
+  /**
+   * Stamp `attemptedAt` on a pending row whose judge call failed
+   * (MCON-9). The deep phase closes the row as `'judge-unparseable'`
+   * on the NEXT failure, so a poisoned row is billed at most twice.
+   * Optional — without it the deep phase falls back to skip-and-retry.
+   */
+  markAttempted?(id: number, attemptedAt?: number): Promise<void>;
 }
 
 /**

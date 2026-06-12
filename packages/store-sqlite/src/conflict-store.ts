@@ -36,7 +36,13 @@ export type ConflictPipelineStage =
  *
  * @stable
  */
-export type ConflictPipelineDecision = 'admit' | 'dedup' | 'supersede' | 'pending';
+export type ConflictPipelineDecision =
+  | 'admit'
+  | 'dedup'
+  | 'supersede'
+  | 'pending'
+  /** Deep-phase judge failed repeatedly; row closed un-adjudicated (MCON-9). */
+  | 'judge-unparseable';
 
 /**
  * Per-decision row written by `runConflictPipeline(...)`. One row per
@@ -235,6 +241,21 @@ export class SqliteConflictStore {
        WHERE id = ?`,
       [Date.now(), decision, id],
     );
+  }
+
+  /**
+   * Stamp `attempted_at` on a pending row whose deep-phase judge call
+   * failed (MCON-9). The deep phase closes the row as
+   * `'judge-unparseable'` on the NEXT failure, bounding how often a
+   * poisoned row can be re-billed.
+   *
+   * @stable
+   */
+  async markAttempted(id: number, attemptedAt?: number): Promise<void> {
+    this.#conn.run('UPDATE conflict_check_pending SET attempted_at = ? WHERE id = ?', [
+      attemptedAt ?? Date.now(),
+      id,
+    ]);
   }
 
   /**

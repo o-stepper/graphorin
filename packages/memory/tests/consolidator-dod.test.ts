@@ -164,6 +164,94 @@ describe('Phase 10c DoD — Deep phase drains 10 fixture pending pairs', () => {
     expect(remainingPending?.length ?? -1).toBe(0);
     consoleWarn.mockRestore();
   });
+
+  it('a garbage-judge row is billed at most twice, then closed judge-unparseable (MCON-9)', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex' };
+    // The judge always answers with unparseable garbage.
+    const provider = plannedProvider([{ text: 'NOT JSON AT ALL', tokens: 5 }]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      conflictPipeline: { mode: 'off' },
+      consolidator: { tier: 'standard', provider, defaultScope: scope },
+    });
+    const oldFact = await memory.semantic.remember(scope, { text: 'old fact' });
+    const candidate = await memory.semantic.remember(scope, { text: 'poisoned candidate' });
+    await store.conflicts?.enqueuePending({
+      scope,
+      factId: candidate.id,
+      candidateText: candidate.text,
+      stage: 'defer-to-deep',
+      conflictingIds: [oldFact.id],
+    });
+    await memory.consolidator.start();
+
+    // Run 1: bills one call, stamps attemptedAt, row stays pending.
+    await memory.consolidator.fireNow('deep', scope);
+    expect(provider.calls.length).toBe(1);
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(1);
+
+    // Run 2: bills one more call, then closes the row for good.
+    await memory.consolidator.fireNow('deep', scope);
+    expect(provider.calls.length).toBe(2);
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(0);
+    const rows = (
+      store.conflicts as unknown as {
+        pending: Array<{ input: { factId: string }; decision: string | null }>;
+      }
+    ).pending;
+    const closed = rows.find((p) => p.input.factId === candidate.id);
+    expect(closed?.decision).toBe('judge-unparseable');
+
+    // Run 3: nothing left to bill — the poisoned row never re-fires.
+    await memory.consolidator.fireNow('deep', scope);
+    expect(provider.calls.length).toBe(2);
+    consoleWarn.mockRestore();
+  });
+
+  it('a mid-run budget pause stops the judge loop instead of draining the queue (MCON-9)', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex' };
+    // Each judge call reports 9k+9k tokens; the ceiling pauses after one.
+    const provider = plannedProvider([
+      { text: '{"decision":"admit","reason":"ok"}', tokens: 9_000 },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      conflictPipeline: { mode: 'off' },
+      consolidator: {
+        tier: 'standard',
+        provider,
+        defaultScope: scope,
+        ceilings: { maxTokensPerDay: 10_000 },
+        onExceed: 'pause',
+        maxDeepConflictsPerRun: 50,
+      },
+    });
+    for (let i = 0; i < 5; i += 1) {
+      const oldFact = await memory.semantic.remember(scope, { text: `old fact ${i}` });
+      const candidate = await memory.semantic.remember(scope, { text: `candidate ${i}` });
+      await store.conflicts?.enqueuePending({
+        scope,
+        factId: candidate.id,
+        candidateText: candidate.text,
+        stage: 'defer-to-deep',
+        conflictingIds: [oldFact.id],
+      });
+    }
+    await memory.consolidator.start();
+    await memory.consolidator.fireNow('deep', scope);
+    // One billed call trips the pause; the remaining 4 rows are NOT billed.
+    expect(provider.calls.length).toBe(1);
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(4);
+    consoleWarn.mockRestore();
+  });
 });
 
 describe('Phase 10c DoD — DLQ retry succeeds after backoff; permanent-failure after max attempts', () => {
