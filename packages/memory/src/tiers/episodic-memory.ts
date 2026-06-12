@@ -440,7 +440,13 @@ function computeRecency(now: number, episode: Episode): number {
 }
 
 function normalizeRelevance(score: number): number {
-  return clamp01(1 / (1 + Math.max(0, -score)));
+  // MRET-5/MST-7: the store returns `score = -bm25(...)` — POSITIVE for
+  // every FTS match (SQLite bm25 is always negative), so the old
+  // `1 / (1 + max(0, -score))` collapsed every lexical hit to exactly
+  // 1.0 and the DEC-105 triple-signal ranking degraded to
+  // recency + importance. Saturating ratio: 0 at no signal, → 1 as the
+  // match strengthens, graduated in between (k = 1 half-point).
+  return clamp01(Math.max(0, score) / (Math.max(0, score) + 1));
 }
 
 function clamp01(value: number): number {

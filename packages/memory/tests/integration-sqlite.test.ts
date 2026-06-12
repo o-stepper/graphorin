@@ -531,6 +531,48 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
+  it('episodic FTS relevance is graduated, not a constant 1.0 (MRET-5/MST-7)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+      const startedAt = '2026-05-01T00:00:00.000Z';
+      const endedAt = '2026-05-01T01:00:00.000Z';
+      // Same recency, no importance — only lexical quality differs:
+      // one episode mentions the query terms repeatedly, the other once.
+      await sqlite.memory.episodic.put({
+        id: 'ep-strong',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Lisbon Lisbon Lisbon: booked the Lisbon trip and the Lisbon hotel.',
+        startedAt,
+        endedAt,
+        sensitivity: 'internal',
+        createdAt: endedAt,
+      });
+      await sqlite.memory.episodic.put({
+        id: 'ep-weak',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Talked through a long agenda; Lisbon came up once near the end of it.',
+        startedAt,
+        endedAt,
+        sensitivity: 'internal',
+        createdAt: endedAt,
+      });
+      const hits = await memory.episodic.search(SCOPE, 'Lisbon', {
+        weights: { recency: 0, relevance: 1, importance: 0 },
+      });
+      expect(hits.map((h) => h.record.id)).toEqual(['ep-strong', 'ep-weak']);
+      const [strong, weak] = hits;
+      // Graduated: the better lexical match scores strictly higher and
+      // neither is the degenerate constant 1.0.
+      expect(strong?.score ?? 0).toBeGreaterThan(weak?.score ?? 0);
+      expect(strong?.score ?? 1).toBeLessThan(1);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('metadata reports real per-tier counts (not a 0/1 probe), excluding quarantined rules (CE-5, MST-6)', async () => {
     const sqlite = await makeStore();
     try {
