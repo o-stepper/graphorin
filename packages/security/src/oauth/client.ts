@@ -9,7 +9,7 @@
  */
 
 import type { OAuthServerRecord, OAuthServerStore } from '@graphorin/core/contracts';
-import type { SecretValue } from '../secrets/secret-value.js';
+import { SecretValue } from '../secrets/secret-value.js';
 import { emitOAuthAudit, type OAuthAuditAction, type OAuthAuditActor } from './audit-emitter.js';
 import { runAuthorizationCodeFlow } from './authorize-code-flow.js';
 import { runDeviceAuthorizationFlow } from './authorize-device-flow.js';
@@ -43,6 +43,40 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
   const inMemoryAccess = new Map<string, SecretValue>();
   const inMemoryRefresh = new Map<string, SecretValue>();
   const inMemoryId = new Map<string, SecretValue>();
+
+  // SPL-1: the previously-phantom `keyring:oauth:*` refs become real —
+  // tokens are written to / loaded from the supplied SecretsStore under
+  // the scheme-stripped key, so refresh / revoke / the MCP bridge work
+  // across process restarts.
+  const secretKeyFor = (kind: 'access' | 'refresh' | 'id' | 'client_secret'): string =>
+    `oauth:${options.serverId}:${kind}`;
+  const memFor = (kind: 'access' | 'refresh' | 'id'): Map<string, SecretValue> =>
+    kind === 'access' ? inMemoryAccess : kind === 'refresh' ? inMemoryRefresh : inMemoryId;
+  const loadToken = async (kind: 'access' | 'refresh' | 'id'): Promise<SecretValue | undefined> => {
+    const mem = memFor(kind).get(options.serverId);
+    if (mem !== undefined) return mem;
+    if (options.secretsStore === undefined) return undefined;
+    const stored = await options.secretsStore.get(secretKeyFor(kind));
+    if (stored === null) return undefined;
+    const value = SecretValue.fromString(await stored.use((v) => v));
+    memFor(kind).set(options.serverId, value);
+    return value;
+  };
+  const persistToken = async (
+    kind: 'access' | 'refresh' | 'id',
+    value: SecretValue,
+  ): Promise<void> => {
+    if (options.secretsStore === undefined) return;
+    await options.secretsStore.set(secretKeyFor(kind), value);
+  };
+  const deletePersistedTokens = async (): Promise<void> => {
+    if (options.secretsStore === undefined) return;
+    await Promise.allSettled([
+      options.secretsStore.delete(secretKeyFor('access')),
+      options.secretsStore.delete(secretKeyFor('refresh')),
+      options.secretsStore.delete(secretKeyFor('id')),
+    ]);
+  };
 
   let cachedMetadata: DiscoveredMetadata | undefined = options.metadata;
   let cachedRegistration: OAuthRegistration | undefined = options.registration;
@@ -124,6 +158,10 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
       inMemoryRefresh.set(options.serverId, session.refreshToken);
     }
     if (session.idToken !== undefined) inMemoryId.set(options.serverId, session.idToken);
+    // SPL-1: write the actual tokens under the refs the record carries.
+    await persistToken('access', session.accessToken);
+    if (session.refreshToken !== undefined) await persistToken('refresh', session.refreshToken);
+    if (session.idToken !== undefined) await persistToken('id', session.idToken);
     const baseRecord: OAuthServerRecord = {
       id: options.serverId,
       serverUrl: options.serverUrl,
@@ -333,7 +371,7 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
     async refresh(opts) {
       const metadata = await ensureMetadata(opts?.signal);
       const registration = await ensureRegistration(opts?.signal);
-      const refreshToken = inMemoryRefresh.get(options.serverId);
+      const refreshToken = await loadToken('refresh');
       if (refreshToken === undefined) {
         recordAudit('oauth:expired', 'denied', { reason: 'no_refresh_token' });
         emitOAuthLifecycle({
@@ -355,8 +393,8 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
           refreshToken,
           ...(opts?.signal === undefined ? {} : { signal: opts.signal }),
           ...(previousScope === undefined ? {} : { scope: previousScope }),
+          ...(opts?.force === true ? { force: true } : {}),
         });
-        void opts?.force;
         await persistSession(session);
         recordAudit('oauth:refreshed', 'success', {
           ...(session.expiresAt === undefined ? {} : { expiresAt: session.expiresAt }),
@@ -395,45 +433,61 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
     async revoke(opts) {
       const metadata = await ensureMetadata(opts?.signal);
       const registration = await ensureRegistration(opts?.signal);
-      const refreshToken = inMemoryRefresh.get(options.serverId);
-      const accessToken = inMemoryAccess.get(options.serverId);
+      const refreshToken = await loadToken('refresh');
+      const accessToken = await loadToken('access');
       const tokenToRevoke = refreshToken ?? accessToken;
-      try {
-        if (tokenToRevoke !== undefined) {
-          const revokeArgs: {
-            serverId: string;
-            metadata: DiscoveredMetadata;
-            registration: OAuthRegistration;
-            token: SecretValue;
-            signal?: AbortSignal;
-            tokenTypeHint?: 'access_token' | 'refresh_token';
-          } = {
-            serverId: options.serverId,
-            metadata,
-            registration,
-            token: tokenToRevoke,
-            tokenTypeHint: refreshToken === undefined ? 'access_token' : 'refresh_token',
-          };
-          if (opts?.signal !== undefined) revokeArgs.signal = opts.signal;
-          await revokeOAuthToken(revokeArgs);
-        }
-        inMemoryAccess.delete(options.serverId);
-        inMemoryRefresh.delete(options.serverId);
-        inMemoryId.delete(options.serverId);
-        await options.storage.delete(options.serverId);
-        recordAudit('oauth:revoked', 'success', {
-          ...(opts?.reason === undefined ? {} : { reason: opts.reason }),
-        });
-        emitOAuthLifecycle({
-          type: 'oauth.revoked',
+      // SPL-1 / SPL-16: attempt the RFC 7009 revocation first and keep
+      // an honest record of whether the SERVER confirmed it. Local
+      // teardown proceeds either way (the documented contract), but the
+      // audit never claims a success that did not happen.
+      let serverRevoked = false;
+      let revokeFailure: unknown;
+      if (tokenToRevoke !== undefined) {
+        const revokeArgs: {
+          serverId: string;
+          metadata: DiscoveredMetadata;
+          registration: OAuthRegistration;
+          token: SecretValue;
+          signal?: AbortSignal;
+          tokenTypeHint?: 'access_token' | 'refresh_token';
+        } = {
           serverId: options.serverId,
-          ts: Date.now(),
+          metadata,
+          registration,
+          token: tokenToRevoke,
+          tokenTypeHint: refreshToken === undefined ? 'access_token' : 'refresh_token',
+        };
+        if (opts?.signal !== undefined) revokeArgs.signal = opts.signal;
+        try {
+          await revokeOAuthToken(revokeArgs);
+          serverRevoked = true;
+        } catch (err) {
+          revokeFailure = err;
+        }
+      }
+      inMemoryAccess.delete(options.serverId);
+      inMemoryRefresh.delete(options.serverId);
+      inMemoryId.delete(options.serverId);
+      await deletePersistedTokens();
+      await options.storage.delete(options.serverId);
+      if (revokeFailure !== undefined) {
+        recordAudit('oauth:revoked', 'error', {
+          serverRevoked: false,
+          error: String(revokeFailure),
           ...(opts?.reason === undefined ? {} : { reason: opts.reason }),
         });
-      } catch (err) {
-        recordAudit('oauth:revoked', 'error', { error: String(err) });
-        throw err;
+      } else {
+        recordAudit('oauth:revoked', 'success', {
+          serverRevoked,
+          ...(opts?.reason === undefined ? {} : { reason: opts.reason }),
+        });
       }
+      emitOAuthLifecycle({
+        type: 'oauth.revoked',
+        serverId: options.serverId,
+        ts: Date.now(),
+        ...(opts?.reason === undefined ? {} : { reason: opts.reason }),
+      });
     },
     async status() {
       const stored = await options.storage.get(options.serverId);
@@ -457,8 +511,12 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
           ? {}
           : { lastRefreshedAt: stored.lastRefreshedAt }),
         ...(stored.registeredVia === undefined ? {} : { registeredVia: stored.registeredVia }),
-        hasAccessToken: stored.accessTokenRef !== undefined,
-        hasRefreshToken: stored.refreshTokenRef !== undefined,
+        hasAccessToken:
+          stored.accessTokenRef !== undefined &&
+          (options.secretsStore === undefined || (await loadToken('access')) !== undefined),
+        hasRefreshToken:
+          stored.refreshTokenRef !== undefined &&
+          (options.secretsStore === undefined || (await loadToken('refresh')) !== undefined),
         status,
       });
     },

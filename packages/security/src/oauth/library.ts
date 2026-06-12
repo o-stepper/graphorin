@@ -27,6 +27,11 @@ import type {
  * @stable
  */
 export interface LoginInteractiveOptions {
+  /**
+   * Secrets store the session tokens are persisted into (SPL-1) so the
+   * login survives the process.
+   */
+  readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
   readonly serverId: string;
   readonly serverUrl: string;
   readonly storage: OAuthServerStore;
@@ -66,6 +71,7 @@ export async function loginInteractive(
     serverId: options.serverId,
     serverUrl: options.serverUrl,
     storage: options.storage,
+    ...(options.secretsStore === undefined ? {} : { secretsStore: options.secretsStore }),
     ...(options.metadata === undefined ? {} : { metadata: options.metadata }),
     ...(options.clientId === undefined
       ? {}
@@ -98,8 +104,14 @@ export async function loginInteractive(
  */
 export async function listOAuthSessions(
   storage: OAuthServerStore,
+  options: { readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore } = {},
 ): Promise<ReadonlyArray<OAuthSessionMetadata>> {
   const records = await storage.list();
+  const resolves = async (ref: string | undefined, key: string): Promise<boolean> => {
+    if (ref === undefined) return false;
+    if (options.secretsStore === undefined) return true;
+    return (await options.secretsStore.get(key)) !== null;
+  };
   const now = Date.now();
   const out: OAuthSessionMetadata[] = [];
   for (const record of records) {
@@ -121,8 +133,8 @@ export async function listOAuthSessions(
           ? {}
           : { lastRefreshedAt: record.lastRefreshedAt }),
         ...(record.registeredVia === undefined ? {} : { registeredVia: record.registeredVia }),
-        hasAccessToken: record.accessTokenRef !== undefined,
-        hasRefreshToken: record.refreshTokenRef !== undefined,
+        hasAccessToken: await resolves(record.accessTokenRef, `oauth:${record.id}:access`),
+        hasRefreshToken: await resolves(record.refreshTokenRef, `oauth:${record.id}:refresh`),
         status,
       }),
     );
@@ -140,7 +152,11 @@ export async function listOAuthSessions(
 export async function refreshOAuthSession(
   storage: OAuthServerStore,
   serverId: string,
-  options: { readonly signal?: AbortSignal } = {},
+  options: {
+    readonly signal?: AbortSignal;
+    /** SPL-1: resolves the persisted refresh token across processes. */
+    readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
+  } = {},
 ): Promise<OAuthSession> {
   const record = await storage.get(serverId);
   if (record === null) throw new Error(`OAuth server '${serverId}' not found.`);
@@ -151,8 +167,9 @@ export async function refreshOAuthSession(
     storage,
     registration: { clientId: record.clientId },
     ...(metadata === undefined ? {} : { metadata }),
+    ...(options.secretsStore === undefined ? {} : { secretsStore: options.secretsStore }),
   });
-  return client.refresh(options);
+  return client.refresh({ ...(options.signal === undefined ? {} : { signal: options.signal }) });
 }
 
 /**
@@ -165,7 +182,12 @@ export async function refreshOAuthSession(
 export async function revokeOAuthSession(
   storage: OAuthServerStore,
   serverId: string,
-  options: { readonly reason?: string; readonly signal?: AbortSignal } = {},
+  options: {
+    readonly reason?: string;
+    readonly signal?: AbortSignal;
+    /** SPL-1: resolves the persisted tokens so RFC 7009 actually fires. */
+    readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
+  } = {},
 ): Promise<void> {
   const record = await storage.get(serverId);
   if (record === null) return;
@@ -176,8 +198,12 @@ export async function revokeOAuthSession(
     storage,
     registration: { clientId: record.clientId },
     ...(metadata === undefined ? {} : { metadata }),
+    ...(options.secretsStore === undefined ? {} : { secretsStore: options.secretsStore }),
   });
-  await client.revoke(options);
+  await client.revoke({
+    ...(options.reason === undefined ? {} : { reason: options.reason }),
+    ...(options.signal === undefined ? {} : { signal: options.signal }),
+  });
 }
 
 function buildMetadataFromRecord(
@@ -219,8 +245,11 @@ export interface OAuthStatusSnapshot {
  *
  * @stable
  */
-export async function getOAuthStatus(storage: OAuthServerStore): Promise<OAuthStatusSnapshot> {
-  const sessions = await listOAuthSessions(storage);
+export async function getOAuthStatus(
+  storage: OAuthServerStore,
+  options: { readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore } = {},
+): Promise<OAuthStatusSnapshot> {
+  const sessions = await listOAuthSessions(storage, options);
   const strategies = listOAuthStrategies();
   const providers = strategies.map((s) => Object.freeze({ id: s.id, hasMatch: true }));
   return Object.freeze({

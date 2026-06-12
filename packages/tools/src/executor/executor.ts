@@ -152,8 +152,10 @@ export interface ExecutorOptions {
   ) => MemoryModificationGuard | null;
   /**
    * Optional memory-region reader the guard uses to hash the
-   * pre/post snapshots. The agent runtime supplies the implementation
-   * (backed by the `@graphorin/memory` tier APIs).
+   * pre/post snapshots. The agent runtime supplies one automatically
+   * when `memory` is wired (a scope-aware reader over the working
+   * tier, SDF-1); without a reader the snapshot/verify cycle is
+   * skipped.
    */
   readonly memoryRegionReader?: MemoryRegionReader;
   /**

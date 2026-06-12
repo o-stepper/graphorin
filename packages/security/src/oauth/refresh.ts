@@ -34,6 +34,12 @@ export interface RefreshAccessTokenArgs {
    * Revocation failures never fail the refresh.
    */
   readonly revokePreviousOnRotation?: boolean;
+  /**
+   * Bypass the in-flight dedupe (SPL-12): a forced refresh always
+   * issues a fresh token-endpoint request instead of joining the
+   * shared in-flight promise.
+   */
+  readonly force?: boolean;
 }
 
 /**
@@ -44,7 +50,7 @@ export interface RefreshAccessTokenArgs {
  * @stable
  */
 export function refreshAccessToken(args: RefreshAccessTokenArgs): Promise<OAuthSession> {
-  const cached = inflight.get(args.serverId);
+  const cached = args.force === true ? undefined : inflight.get(args.serverId);
   if (cached !== undefined) return cached;
   const promise = doRefresh(args).finally(() => {
     if (inflight.get(args.serverId) === promise) inflight.delete(args.serverId);
@@ -150,15 +156,22 @@ export interface RevokeOAuthTokenArgs {
 }
 
 /**
- * Revoke an OAuth token via RFC 7009. The metadata must advertise the
- * revocation endpoint; otherwise the helper resolves silently — the
- * audit log records the revocation regardless.
+ * Revoke an OAuth token via RFC 7009. Honest failure semantics
+ * (SPL-1 / SPL-16): a missing revocation endpoint, a network failure,
+ * and a non-2xx response all **throw** — the caller decides whether
+ * teardown proceeds, and the audit trail never claims a server-side
+ * revocation that was not confirmed.
  *
  * @stable
  */
 export async function revokeOAuthToken(args: RevokeOAuthTokenArgs): Promise<void> {
   const endpoint = args.metadata.server.revocationEndpoint;
-  if (endpoint === undefined || endpoint === '') return;
+  if (endpoint === undefined || endpoint === '') {
+    throw new Error(
+      `OAuth server for '${args.serverId}' advertises no revocation endpoint; ` +
+        'the token cannot be revoked server-side.',
+    );
+  }
   if (args.signal?.aborted === true) throw new OAuthFlowAbortedError('callback');
 
   const params: Record<string, string> = {
@@ -173,11 +186,14 @@ export async function revokeOAuthToken(args: RevokeOAuthTokenArgs): Promise<void
   }
   const body = encodeForm(params);
   if (activeRevocationFetcher !== null) {
-    await activeRevocationFetcher(endpoint, {
+    const result = await activeRevocationFetcher(endpoint, {
       body,
       ...(args.signal === undefined ? {} : { signal: args.signal }),
       ...(basic === undefined ? {} : { basicAuth: basic }),
     });
+    if (result !== undefined && result.ok === false) {
+      throw new Error(`RFC 7009 revocation failed with HTTP ${result.status}.`);
+    }
     return;
   }
   const headers: Record<string, string> = {
@@ -185,14 +201,15 @@ export async function revokeOAuthToken(args: RevokeOAuthTokenArgs): Promise<void
     Accept: 'application/json',
   };
   if (basic !== undefined) headers.Authorization = `Basic ${basic}`;
-  await fetch(endpoint, {
+  const resp = await fetch(endpoint, {
     method: 'POST',
     headers,
     body,
     ...(args.signal === undefined ? {} : { signal: args.signal }),
-  }).catch((err: unknown) => {
-    void err;
   });
+  if (!resp.ok) {
+    throw new Error(`RFC 7009 revocation failed with HTTP ${resp.status}.`);
+  }
 }
 
 function encodeForm(params: Readonly<Record<string, string>>): string {

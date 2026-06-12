@@ -82,7 +82,22 @@ export interface CreateOAuthClientOptions {
   readonly registration?: OAuthRegistration;
   /** Persistent storage for the registration + token-ref metadata. */
   readonly storage: import('@graphorin/core/contracts').OAuthServerStore;
-  /** Refresh-ahead window (ms before `expiresAt` triggers a refresh). */
+  /**
+   * Secrets store the actual tokens are persisted into (SPL-1). When
+   * supplied, `persistSession` writes the access / refresh / id tokens
+   * under the `oauth:<serverId>:<kind>` keys the record's refs point
+   * at, and refresh / revoke / status resolve them back — so sessions
+   * survive process restarts. Without it, tokens live only in process
+   * memory (the pre-SPL-1 behavior, documented).
+   */
+  readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
+  /**
+   * Refresh-ahead window in ms. On the client itself this only colours
+   * `status()` labels (`'expiring-soon'`); the proactive refresh that
+   * uses the window lives in the MCP bridge's authorization provider
+   * (`createOAuthAuthorizationProvider`), which refreshes when the
+   * persisted expiry is within its own `refreshAheadMs` (SPL-12).
+   */
   readonly refreshAheadMs?: number;
   /** Optional pre-discovered metadata (skip the network round-trip). */
   readonly metadata?: DiscoveredMetadata;

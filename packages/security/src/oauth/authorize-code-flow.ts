@@ -56,15 +56,18 @@ export async function runAuthorizationCodeFlow(
   const signal = options.signal;
   if (signal?.aborted === true) throw new OAuthFlowAbortedError('callback');
 
-  let callback: LocalCallbackServer | undefined;
-  let redirectUri = options.redirectUri;
-  if (redirectUri === undefined) {
-    const serverOpts: LocalCallbackServerOptions = {
-      ...(options.portRange === undefined ? {} : { portRange: options.portRange }),
-    };
-    callback = await startLocalCallbackServer(serverOpts);
-    redirectUri = callback.redirectUri;
+  // SPL-12: a caller-supplied redirectUri has no callback waiter in this
+  // flow — reject BEFORE opening a browser the user would dead-end in.
+  if (options.redirectUri !== undefined) {
+    throw new OAuthCallbackError(
+      'A redirectUri was supplied without a callback handler. Either omit redirectUri to use the built-in localhost callback or run the flow with your own waiter.',
+    );
   }
+  const serverOpts: LocalCallbackServerOptions = {
+    ...(options.portRange === undefined ? {} : { portRange: options.portRange }),
+  };
+  const callback: LocalCallbackServer = await startLocalCallbackServer(serverOpts);
+  const redirectUri = callback.redirectUri;
 
   const verifier = generatePkceVerifier();
   const challenge = computePkceChallenge(verifier);
@@ -82,33 +85,29 @@ export async function runAuthorizationCodeFlow(
   const browserOpener = options.openAuthorizationUrl ?? openInBrowser;
   const opening = Promise.resolve()
     .then(() => browserOpener(authorizationUrl, signal))
-    .catch((err) => {
-      if (callback === undefined) throw err;
+    .catch(() => {
+      // Best-effort: the local callback still works when the user opens
+      // the printed URL manually.
     });
 
   let code: string;
   let returnedState: string | undefined;
-  if (callback !== undefined) {
-    try {
-      const params = await waitWithTimeout(
-        callback.waitForCallback(signal),
-        options.callbackTimeoutMs,
-      );
-      if (params.state !== undefined) returnedState = params.state;
-      code = params.code;
-      if (returnedState !== undefined && returnedState !== state) {
-        throw new OAuthCallbackError(
-          'Authorization callback returned a `state` value that does not match the expected one.',
-        );
-      }
-    } finally {
-      await callback.close();
-    }
-  } else {
-    // Caller managed redirect; no built-in callback wait.
-    throw new OAuthCallbackError(
-      'A redirectUri was supplied without a callback handler. Either omit redirectUri to use the built-in localhost callback or supply your own waiter.',
+  try {
+    // SPL-12: the documented 5-minute default is real — an undefined
+    // callbackTimeoutMs no longer waits forever.
+    const params = await waitWithTimeout(
+      callback.waitForCallback(signal),
+      options.callbackTimeoutMs ?? DEFAULT_CALLBACK_TIMEOUT_MS,
     );
+    if (params.state !== undefined) returnedState = params.state;
+    code = params.code;
+    if (returnedState !== undefined && returnedState !== state) {
+      throw new OAuthCallbackError(
+        'Authorization callback returned a `state` value that does not match the expected one.',
+      );
+    }
+  } finally {
+    await callback.close();
   }
 
   await opening;
@@ -221,6 +220,9 @@ export function buildOAuthSession(
     issuedAt,
   });
 }
+
+/** SPL-12: the documented default for `callbackTimeoutMs`. */
+const DEFAULT_CALLBACK_TIMEOUT_MS = 5 * 60_000;
 
 async function waitWithTimeout<T>(promise: Promise<T>, timeoutMs: number | undefined): Promise<T> {
   if (timeoutMs === undefined) return promise;

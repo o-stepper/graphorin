@@ -186,19 +186,38 @@ describe('@graphorin/security/oauth — refresh + revoke', () => {
     expect(params.get('token_type_hint')).toBe('refresh_token');
   });
 
-  it('revokeOAuthToken silently skips when the endpoint is missing', async () => {
+  it('revokeOAuthToken THROWS when the endpoint is missing — no silent unconfirmed success (SPL-16)', async () => {
     let called = false;
     _setRevocationFetcherForTesting(async () => {
       called = true;
       return { ok: true, status: 200 };
     });
-    await revokeOAuthToken({
-      serverId: 'mcp-test',
-      metadata: { server: buildSyntheticServerMetadata() },
-      registration: { clientId: 'cli_test' },
-      token: SecretValue.fromString('refresh-1'),
-    });
+    await expect(
+      revokeOAuthToken({
+        serverId: 'mcp-test',
+        metadata: { server: buildSyntheticServerMetadata() },
+        registration: { clientId: 'cli_test' },
+        token: SecretValue.fromString('refresh-1'),
+      }),
+    ).rejects.toThrow(/no revocation endpoint/);
     expect(called).toBe(false);
+  });
+
+  it('revokeOAuthToken THROWS on a non-2xx revocation response (SPL-16)', async () => {
+    _setRevocationFetcherForTesting(async () => ({ ok: false, status: 503 }));
+    await expect(
+      revokeOAuthToken({
+        serverId: 'mcp-test',
+        metadata: {
+          server: {
+            ...buildSyntheticServerMetadata(),
+            revocationEndpoint: 'https://mcp.example.com/oauth/revoke',
+          },
+        },
+        registration: { clientId: 'cli_test' },
+        token: SecretValue.fromString('refresh-1'),
+      }),
+    ).rejects.toThrow(/HTTP 503/);
   });
 
   it('revokeOAuthToken sends Basic auth when a client secret is configured', async () => {
