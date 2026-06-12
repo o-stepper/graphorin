@@ -5,7 +5,6 @@ export default defineConfig({
     'src/index.ts',
     'src/client/index.ts',
     'src/transport/index.ts',
-    'src/event-store/index.ts',
     'src/oauth/index.ts',
     'src/helpers/index.ts',
     'src/errors/index.ts',
