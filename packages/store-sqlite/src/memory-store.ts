@@ -55,6 +55,29 @@ const EPISODE_NOT_QUARANTINED = "AND e.status != 'quarantined'";
 const INSIGHT_NOT_QUARANTINED = "AND i.status != 'quarantined'";
 
 /**
+ * MRET-4: any-of tags predicate against the `tags_json` array column.
+ * Rows without tags never match. The caller appends one bind per tag.
+ */
+function factTagsPredicate(tagCount: number): string {
+  const placeholders = Array.from({ length: tagCount }, () => '?').join(', ');
+  return `AND EXISTS (
+    SELECT 1 FROM json_each(COALESCE(f.tags_json, '[]'))
+    WHERE json_each.value IN (${placeholders}))`;
+}
+
+/**
+ * MRET-4: episode/date-range overlap — an episode matches when its
+ * `[started_at, ended_at]` span intersects `[from, to]` (missing bounds
+ * are open). The caller appends `from` / `to` epoch binds in order.
+ */
+function episodeDateRangePredicate(from: number | null, to: number | null): string {
+  let sql = '';
+  if (from !== null) sql += 'AND e.ended_at >= ? ';
+  if (to !== null) sql += 'AND e.started_at <= ? ';
+  return sql;
+}
+
+/**
  * Optional embedding payload attached to a memory write. The
  * `embedder_id` must already be registered in `embedding_meta`; the
  * `vector` length must match the registered `dim`.
@@ -526,8 +549,14 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const topK = opts.topK ?? 10;
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    // MRET-4: dateRange filter (declared on MemorySearchOptions,
+    // previously ignored) — overlap semantics on [started_at, ended_at].
+    const from = opts.dateRange?.from !== undefined ? toEpoch(opts.dateRange.from) : null;
+    const to = opts.dateRange?.to !== undefined ? toEpoch(opts.dateRange.to) : null;
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
     if (asOf !== null) binds.push(asOf);
+    if (from !== null) binds.push(from);
+    if (to !== null) binds.push(to);
     binds.push(topK);
     const rows = this.#conn.all<EpisodeRow & { bm25_score: number }>(
       `SELECT e.*, bm25(episodes_fts) AS bm25_score
@@ -536,6 +565,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
          ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
          ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
+         ${episodeDateRangePredicate(from, to)}
        ORDER BY bm25_score
        LIMIT ?`,
       binds,
@@ -806,8 +836,13 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const topK = opts.topK ?? 10;
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    // MRET-4: tags filter (declared on MemorySearchOptions, previously
+    // ignored). A fact matches when it carries AT LEAST ONE of the
+    // requested tags; rows without tags never match a tag filter.
+    const tags = opts.tags !== undefined && opts.tags.length > 0 ? [...opts.tags] : null;
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
     if (asOf !== null) binds.push(asOf, asOf);
+    if (tags !== null) binds.push(...tags);
     binds.push(topK);
     const rows = this.#conn.all<FactRow & { bm25_score: number }>(
       `SELECT f.*, bm25(facts_fts) AS bm25_score
@@ -816,6 +851,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
        WHERE facts_fts MATCH ? AND f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
          ${opts.includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
          ${asOf !== null ? FACT_VALIDITY_CLAUSE : ''}
+         ${tags !== null ? factTagsPredicate(tags.length) : ''}
        ORDER BY bm25_score
        LIMIT ?`,
       binds,
@@ -855,29 +891,45 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     }
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
     const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
-    const binds: Array<Buffer | string | number> = [
-      Buffer.from(embedding.buffer),
-      topK,
-      scope.userId,
-      embedderId,
-    ];
-    if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
-    const rows = this.#conn.all<FactRow & { distance: number }>(
-      `SELECT f.*, v.distance AS distance
-       FROM ${quoteIdent(tableName)} v
-       JOIN facts f ON f.id = v.fact_id
-       WHERE v.embedding MATCH ?
-         AND v.k = ?
-         AND f.scope_user_id = ?
-         AND f.embedder_id = ?
-         AND f.deleted_at IS NULL
-         AND f.archived = 0
-         ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
-         ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
-       ORDER BY v.distance`,
-      binds,
-    );
-    return rows.map((row) => ({
+    const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
+      const binds: Array<Buffer | string | number> = [
+        Buffer.from(embedding.buffer),
+        k,
+        scope.userId,
+        embedderId,
+      ];
+      if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
+      return this.#conn.all<FactRow & { distance: number }>(
+        `SELECT f.*, v.distance AS distance
+         FROM ${quoteIdent(tableName)} v
+         JOIN facts f ON f.id = v.fact_id
+         WHERE v.embedding MATCH ?
+           AND v.k = ?
+           AND f.scope_user_id = ?
+           AND f.embedder_id = ?
+           AND f.deleted_at IS NULL
+           AND f.archived = 0
+           ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
+         ORDER BY v.distance`,
+        binds,
+      );
+    };
+    // MRET-9: the vec0 k-nearest slice is GLOBAL (the table has no user
+    // partition) and every scope / validity / quarantine filter applies
+    // AFTER the cut — a minority user could be starved to zero by a
+    // dominant user's vectors. Over-fetch and widen iteratively until
+    // `topK` rows survive the filters or the table is exhausted.
+    const total =
+      this.#conn.get<{ n: number }>(`SELECT COUNT(*) AS n FROM ${quoteIdent(tableName)}`)?.n ?? 0;
+    if (total === 0) return [];
+    let k = Math.min(Math.max(topK * 4, topK + 16), total);
+    let rows = runKnn(k);
+    while (rows.length < topK && k < total) {
+      k = Math.min(k * 2, total);
+      rows = runKnn(k);
+    }
+    return rows.slice(0, topK).map((row) => ({
       record: rowToFact(row),
       score: 1 - row.distance,
       signals: { vector: 1 - row.distance },
@@ -953,6 +1005,15 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
 
   async forget(id: string, reason?: string): Promise<void> {
     this.#conn.run('UPDATE facts SET deleted_at = ?, archived = 1 WHERE id = ?', [Date.now(), id]);
+    // MRET-9: a tombstoned fact must not keep occupying k-nearest slots —
+    // dead embeddings crowd the GLOBAL vec0 slice and starve live hits.
+    // The tombstone is terminal for recall, so the vector goes with it
+    // (purge already did this; forget leaked).
+    for (const tableName of this.#vectorMgr.knownTables()) {
+      if (tableName.startsWith('facts_vec_')) {
+        this.#conn.run(`DELETE FROM ${tableName} WHERE fact_id = ?`, [id]);
+      }
+    }
     void reason;
   }
 
@@ -1015,6 +1076,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   async listForDecay(
     scope: SessionScope,
     limit = 1000,
+    opts: { readonly includeArchived?: boolean } = {},
   ): Promise<
     ReadonlyArray<{
       readonly id: string;
@@ -1028,6 +1090,12 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       readonly provenance: string | null;
     }>
   > {
+    // MCON-6: archived facts never receive access bumps, so they pin the
+    // LRU head forever and saturate the window — after ~LIMIT archived
+    // rows every light pass would see only them and live facts would stop
+    // decaying. The decay window therefore excludes archived rows by
+    // default; inspection paths opt in via `includeArchived`.
+    const archivedPredicate = opts.includeArchived === true ? '' : 'AND archived = 0';
     const rows = this.#conn.all<{
       id: string;
       text: string;
@@ -1042,7 +1110,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       `SELECT id, text, strength, last_accessed_at, created_at, archived,
               importance, status, provenance
        FROM facts
-       WHERE scope_user_id = ? AND deleted_at IS NULL
+       WHERE scope_user_id = ? AND deleted_at IS NULL ${archivedPredicate}
        ORDER BY COALESCE(last_accessed_at, created_at) ASC
        LIMIT ?`,
       [scope.userId, limit],
@@ -1057,6 +1125,60 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       importance: row.importance,
       status: row.status,
       provenance: row.provenance,
+    }));
+  }
+
+  /**
+   * Record a retrieval access for the given facts (MRET-7): stamps
+   * `last_accessed_at` and bumps `strength` by 0.1 per access, capped
+   * at 2.0 (the decay model reads `tauMs * max(0.5, strength)`, so the
+   * cap bounds how far reinforcement can stretch retention). Failures
+   * here must never break the read path — callers wrap in try/catch.
+   *
+   * @stable
+   */
+  async markAccessed(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void> {
+    if (ids.length === 0) return;
+    const at = accessedAt ?? Date.now();
+    const placeholders = ids.map(() => '?').join(', ');
+    this.#conn.run(
+      `UPDATE facts
+       SET last_accessed_at = ?, strength = MIN(2.0, strength + 0.1)
+       WHERE id IN (${placeholders})`,
+      [at, ...ids],
+    );
+  }
+
+  /**
+   * Narrow decay-column read for exactly the given fact ids (MRET-8).
+   * Replaces the per-search 1000-row LRU-window scan.
+   *
+   * @stable
+   */
+  async listDecaySignals(ids: ReadonlyArray<string>): Promise<
+    ReadonlyArray<{
+      readonly id: string;
+      readonly strength: number;
+      readonly lastAccessedAt: number | null;
+      readonly createdAt: number;
+    }>
+  > {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => '?').join(', ');
+    const rows = this.#conn.all<{
+      id: string;
+      strength: number;
+      last_accessed_at: number | null;
+      created_at: number;
+    }>(
+      `SELECT id, strength, last_accessed_at, created_at FROM facts WHERE id IN (${placeholders})`,
+      [...ids],
+    );
+    return rows.map((row) => ({
+      id: row.id,
+      strength: row.strength,
+      lastAccessedAt: row.last_accessed_at,
+      createdAt: row.created_at,
     }));
   }
 
@@ -1205,6 +1327,26 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
         ],
       );
     });
+  }
+
+  /**
+   * Record one demonstrated successful reuse of a rule (MCON-2 part 4,
+   * migration 020) and return the new counter value. Feeds
+   * promotion-by-demonstrated-success for quarantined induced
+   * procedures.
+   *
+   * @stable
+   */
+  async recordSuccess(id: string): Promise<number> {
+    this.#conn.run(
+      'UPDATE rules SET success_count = success_count + 1, updated_at = ? WHERE id = ?',
+      [Date.now(), id],
+    );
+    const row = this.#conn.get<{ success_count: number }>(
+      'SELECT success_count FROM rules WHERE id = ?',
+      [id],
+    );
+    return row?.success_count ?? 0;
   }
 }
 
@@ -1852,6 +1994,8 @@ interface RuleRow {
   success_criteria_json: string | null;
   provenance: string | null;
   status: string | null;
+  // MCON-2 part 4: demonstrated-success counter (migration 020).
+  success_count: number;
 }
 
 function rowToBlock(row: WorkingBlockRow): Block {
@@ -2006,6 +2150,8 @@ function rowToRule(row: RuleRow): Rule {
       : undefined,
     provenance: row.provenance !== null ? (row.provenance as MemoryProvenance) : undefined,
     status: row.status !== null ? (row.status as MemoryStatus) : undefined,
+    // MCON-2 part 4 (migration 020): absent on legacy snapshots ⇒ 0.
+    successCount: row.success_count ?? 0,
   } as Rule;
 }
 

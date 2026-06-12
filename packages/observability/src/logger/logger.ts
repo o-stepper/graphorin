@@ -106,8 +106,8 @@ export function createLogger(opts: LoggerOptions = {}): Logger {
       ...safeFields,
     };
     if (span !== undefined) {
-      payload['traceId'] = span.traceId;
-      payload['spanId'] = span.spanId;
+      payload.traceId = span.traceId;
+      payload.spanId = span.spanId;
     }
 
     const line = format === 'json' ? JSON.stringify(payload) : prettyRender(payload);

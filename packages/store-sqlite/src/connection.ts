@@ -346,7 +346,4 @@ export class WalCheckpointManager {
 /** @stable */
 export class SqliteVecMissingError extends Error {
   override readonly name = 'SqliteVecMissingError';
-  constructor(message: string, options?: { cause?: unknown }) {
-    super(message, options);
-  }
 }

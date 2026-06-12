@@ -228,6 +228,8 @@ function buildReconcileRequest(args: ReconcileCandidateArgs): ProviderRequest {
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: RECONCILE_SYSTEM_PROMPT,
     temperature: 0,
+    // MCON-14: per-call output cap — the decision shape is tiny.
+    maxTokens: 256,
     metadata: {
       userId: args.scope.userId,
       ...(args.scope.sessionId !== undefined ? { sessionId: args.scope.sessionId } : {}),

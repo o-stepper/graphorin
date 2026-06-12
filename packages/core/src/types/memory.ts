@@ -232,6 +232,14 @@ export interface Rule extends MemoryRecord {
    * `'active'`). See {@link MemoryStatus}.
    */
   readonly status?: MemoryStatus;
+  /**
+   * Demonstrated-success counter (MCON-2 part 4). Incremented by
+   * `ProceduralMemory.recordOutcome(...)` on each verified successful
+   * reuse; drives promotion-by-demonstrated-success for quarantined
+   * induced procedures once the configured threshold is reached.
+   * Absent ⇒ never counted (adapters without the column).
+   */
+  readonly successCount?: number;
 }
 
 /**

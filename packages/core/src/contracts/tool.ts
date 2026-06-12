@@ -157,7 +157,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
   execute(
     input: TInput,
     ctx: ToolExecutionContext<TDeps>,
-  ): Promise<TOutput | ToolReturn<TOutput> | void>;
+  ): Promise<TOutput | ToolReturn<TOutput> | undefined>;
 }
 
 /**

@@ -311,6 +311,8 @@ At the `full` tier, once the accumulated importance of recent episodes crosses a
 
 Forgetting is **cost / staleness control, not an accuracy lever**. The light phase scores each fact with `salience(...)` — the Ebbinghaus `retention` curve (recency + access frequency) combined with the fact's `importance` hint and a security-risk negative term (a quarantined or foreign-provenance fact is evicted sooner). With neutral importance on an active, first-party fact, `salience === retention`, so behaviour is unchanged until you opt in. Setting `decayCapacity` bounds storage: the lowest-salience facts are **soft-archived** (recoverable — `archived = 1`, never deleted) until the window fits.
 
+Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `lastAccessedAt` and bumps their `strength` (capped at 2.0), so recently-recalled facts genuinely decay slower (MRET-7) — the bookkeeping write is best-effort and never breaks the read path. The decay window itself excludes archived rows (MCON-6): they receive no access bumps, so without the filter they would pin the LRU head and silently stop live facts from decaying once enough of them accumulated; inspection paths pass `listForDecay(scope, limit, { includeArchived: true })`.
+
 ```ts
 createMemory({ /* … */ consolidator: { tier: 'standard', enabled: true, provider, decayCapacity: 50_000 } });
 ```

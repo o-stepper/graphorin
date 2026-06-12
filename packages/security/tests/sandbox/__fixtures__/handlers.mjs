@@ -36,7 +36,7 @@ export async function alwaysThrow() {
 }
 
 export async function readEnv(input) {
-  const name = input && input.name;
+  const name = input?.name;
   return {
     value: (name && process.env[name]) ?? null,
     keys: Object.keys(process.env),

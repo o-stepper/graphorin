@@ -168,6 +168,48 @@ describe('consolidator standard phase — episode formation (P1-2)', () => {
     expect(Date.parse(ep?.startedAt ?? '')).toBeLessThanOrEqual(Date.parse(ep?.endedAt ?? ''));
   });
 
+  it('extraction fills per-fact importance, normalized 1-10 → [0.1, 1] (MCON-12)', async () => {
+    const provider = episodeProvider({
+      facts: [
+        { text: 'The user is training for a marathon', importance: 8 },
+        { text: 'The user mentioned the weather', importance: 1 },
+        { text: 'The user works as a designer' }, // unscored ⇒ no signal
+      ],
+    });
+    const memory = await setup({ provider, consolidatorExtra: { formEpisodes: false } });
+    await memory.session.push(SCOPE, {
+      role: 'user',
+      content: 'I am training for a marathon this fall. I work as a designer.',
+    });
+    await memory.consolidator.fireNow('standard', SCOPE);
+
+    const rows = (await memory.semantic.search(SCOPE, 'user', { includeQuarantined: true })).map(
+      (h) => h.record,
+    );
+    const byText = (needle: string) => rows.find((r) => (r.text ?? '').includes(needle));
+    expect(byText('marathon')?.importance).toBeCloseTo(0.8, 10);
+    expect(byText('weather')?.importance).toBeCloseTo(0.1, 10);
+    expect(byText('designer')?.importance).toBeUndefined();
+  });
+
+  it('every consolidator LLM request carries a per-call maxTokens cap (MCON-14)', async () => {
+    const provider = episodeProvider({
+      facts: [{ text: 'The user is training for a marathon' }],
+      episode: { summary: 'Marathon plans.', importance: 5 },
+    });
+    const memory = await setup({ provider });
+    await memory.session.push(SCOPE, { role: 'user', content: 'Training for a marathon.' });
+    await memory.consolidator.fireNow('standard', SCOPE);
+    // Extraction + episode summary: both must be output-capped so a
+    // degenerate response cannot blow through the daily ceiling in one
+    // call (budget.record only runs AFTER generate returns).
+    expect(provider.calls.length).toBe(2);
+    for (const req of provider.calls) {
+      expect(typeof req.maxTokens).toBe('number');
+      expect(req.maxTokens ?? 0).toBeGreaterThan(0);
+    }
+  });
+
   it('forms no episode and makes no extra LLM call when formEpisodes is off', async () => {
     const provider = episodeProvider({
       facts: [{ text: 'The user likes green tea' }],

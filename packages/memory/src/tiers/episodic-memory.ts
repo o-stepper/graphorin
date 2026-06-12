@@ -196,6 +196,9 @@ export class EpisodicMemory {
           query,
           topK: topK * 2,
           ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+          // MRET-4: forward the date filter — it was accepted by the
+          // recall_episodes tool and silently dropped right here.
+          ...(opts.dateRange !== undefined ? { dateRange: opts.dateRange } : {}),
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
           ...(opts.includeQuarantined !== undefined
             ? { includeQuarantined: opts.includeQuarantined }
@@ -208,7 +211,20 @@ export class EpisodicMemory {
           opts.asOf,
           opts.includeQuarantined,
         );
-        const merged = mergeRecency(ftsHits, vectorHits, weights);
+        // MRET-4: the vector leg's store signature is positional (no
+        // dateRange parameter) — apply the same overlap semantics to its
+        // hits so both legs agree before the merge.
+        const from = opts.dateRange?.from !== undefined ? Date.parse(opts.dateRange.from) : null;
+        const to = opts.dateRange?.to !== undefined ? Date.parse(opts.dateRange.to) : null;
+        const rangedVectorHits =
+          from !== null || to !== null
+            ? vectorHits.filter((h) => {
+                if (from !== null && Date.parse(h.record.endedAt) < from) return false;
+                if (to !== null && Date.parse(h.record.startedAt) > to) return false;
+                return true;
+              })
+            : vectorHits;
+        const merged = mergeRecency(ftsHits, rangedVectorHits, weights);
         const finalHits = merged.slice(0, topK);
         span.setAttributes({
           'memory.search.episodic.fts_count': ftsHits.length,
@@ -424,7 +440,13 @@ function computeRecency(now: number, episode: Episode): number {
 }
 
 function normalizeRelevance(score: number): number {
-  return clamp01(1 / (1 + Math.max(0, -score)));
+  // MRET-5/MST-7: the store returns `score = -bm25(...)` — POSITIVE for
+  // every FTS match (SQLite bm25 is always negative), so the old
+  // `1 / (1 + max(0, -score))` collapsed every lexical hit to exactly
+  // 1.0 and the DEC-105 triple-signal ranking degraded to
+  // recency + importance. Saturating ratio: 0 at no signal, → 1 as the
+  // match strengthens, graduated in between (k = 1 half-point).
+  return clamp01(Math.max(0, score) / (Math.max(0, score) + 1));
 }
 
 function clamp01(value: number): number {

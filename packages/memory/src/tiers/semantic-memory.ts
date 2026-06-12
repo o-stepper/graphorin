@@ -55,6 +55,16 @@ export interface FactInput {
    * this tag plus the injection heuristics; it is never author-set.
    */
   readonly provenance?: MemoryProvenance;
+  /**
+   * Importance hint in `[0, 1]` (X-1 / MCON-12). Feeds the multi-signal
+   * salience score that orders decay archiving and capacity eviction —
+   * higher importance ⇒ evicted later. Values are clamped to `[0, 1]`;
+   * non-finite values are dropped. The consolidator's extraction pass
+   * fills this from the model's per-fact 1–10 rating
+   * (`normalizeImportance`); absent ⇒ the neutral midpoint at scoring
+   * time.
+   */
+  readonly importance?: number;
 }
 
 /**
@@ -105,6 +115,14 @@ export interface FactSearchOptions {
   readonly signal?: AbortSignal;
   /** Override the per-list candidate count (default `60`). */
   readonly candidateTopK?: number;
+  /**
+   * Any-of tags filter (MRET-4). A fact matches when it carries at
+   * least one of the requested tags; untagged facts never match.
+   * Applied in-store on the FTS leg and as a record-level filter on
+   * the fused result so every candidate leg (vector / HyDE / graph)
+   * obeys it.
+   */
+  readonly tags?: ReadonlyArray<string>;
   /**
    * Point-in-time ("as of") read. When set, only facts whose
    * bi-temporal validity interval contains this instant are returned
@@ -449,6 +467,11 @@ export class SemanticMemory {
         ...(input.predicate !== undefined ? { predicate: input.predicate } : {}),
         ...(input.object !== undefined ? { object: input.object } : {}),
         ...(input.confidence !== undefined ? { confidence: input.confidence } : {}),
+        // X-1 / MCON-12: the importance hint that drives salience-ordered
+        // forgetting. Clamped to [0, 1]; non-finite ⇒ unscored.
+        ...(typeof input.importance === 'number' && Number.isFinite(input.importance)
+          ? { importance: Math.min(1, Math.max(0, input.importance)) }
+          : {}),
         ...(input.tags !== undefined ? { tags: Object.freeze([...input.tags]) } : {}),
         ...(input.validFrom !== undefined ? { validFrom: input.validFrom } : { validFrom: now }),
         ...(input.validTo !== undefined ? { validTo: input.validTo } : {}),
@@ -641,6 +664,8 @@ export class SemanticMemory {
             query: q,
             topK: candidateTopK,
             ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+            // MRET-4: in-store any-of tags predicate on the FTS leg.
+            ...(opts.tags !== undefined && opts.tags.length > 0 ? { tags: opts.tags } : {}),
             ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
             ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
           });
@@ -690,11 +715,45 @@ export class SemanticMemory {
                 ...(weighted.k !== undefined ? { k: weighted.k } : {}),
               })
             : this.#reranker;
+        // MRET-8: when decay re-ranking is requested, fuse the FULL
+        // candidate pool (not just finalTopK) so a fresh fact sitting at
+        // position topK+1 pre-decay can still enter the final page; the
+        // finalTopK cut moves to AFTER decay + filters.
+        const fusedTopK =
+          opts.decay !== undefined
+            ? Math.max(
+                finalTopK,
+                lists.reduce((n, l) => n + l.length, 0),
+              )
+            : finalTopK;
         const fused = await reranker.rerank(query, lists, {
-          topK: finalTopK,
+          topK: fusedTopK,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
-        const ranked = await this.#applyDecay(scope, fused, opts.decay);
+        const decayed = await this.#applyDecay(scope, fused, opts.decay);
+        // MRET-4: the vector / HyDE / graph legs have no store-level tags
+        // predicate — enforce the any-of filter on the fused records so
+        // every leg obeys it.
+        const filtered =
+          opts.tags !== undefined && opts.tags.length > 0
+            ? decayed.filter((h) => {
+                const recordTags = h.record.tags;
+                if (recordTags === undefined || recordTags.length === 0) return false;
+                return opts.tags?.some((t) => recordTags.includes(t)) === true;
+              })
+            : decayed;
+        const ranked = filtered.slice(0, finalTopK);
+        // MRET-7: recall reinforces the recalled facts — stamp
+        // last-accessed + bump strength so "recently accessed facts decay
+        // slower" actually holds. Bookkeeping only: a failure here must
+        // never break the read path.
+        if (ranked.length > 0 && typeof this.#store.semantic.markAccessed === 'function') {
+          try {
+            await this.#store.semantic.markAccessed(ranked.map((h) => h.record.id));
+          } catch {
+            // Best-effort: decay reinforcement is advisory.
+          }
+        }
         const explanation = explainRecall(ranked, {
           query,
           rerankerId: reranker.id,
@@ -777,6 +836,10 @@ export class SemanticMemory {
             snippetOf: (hit) => hit.record.text,
             idOf: (hit) => hit.record.id,
             grader: this.#grader,
+            // MRET-2: re-fuse the per-pass lists with RRF before the
+            // final topK cut so a reformulation-pass find can outrank
+            // pass-1 noise (discovery order silently dropped it).
+            fuse: (lists) => fuseRrf(lists, 60),
           },
           {
             maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
@@ -1170,8 +1233,24 @@ export class SemanticMemory {
     decay: FactSearchOptions['decay'],
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     if (decay === undefined || hits.length === 0) return hits;
-    if (typeof this.#store.semantic.listForDecay !== 'function') return hits;
-    const rows = await this.#store.semantic.listForDecay(scope, 1000);
+    // MRET-8: read decay columns ONLY for the hit ids (narrow IN-list)
+    // instead of re-reading the scope's 1000 oldest rows per search —
+    // the old window was O(scope) per query AND, being the LRU head,
+    // could even miss the hits entirely.
+    const semantic = this.#store.semantic;
+    let rows: ReadonlyArray<{
+      readonly id: string;
+      readonly strength: number;
+      readonly lastAccessedAt: number | null;
+      readonly createdAt: number;
+    }>;
+    if (typeof semantic.listDecaySignals === 'function') {
+      rows = await semantic.listDecaySignals(hits.map((h) => h.record.id));
+    } else if (typeof semantic.listForDecay === 'function') {
+      rows = await semantic.listForDecay(scope, 1000);
+    } else {
+      return hits;
+    }
     if (rows.length === 0) return hits;
     const signals = new Map(
       rows.map((row) => [

@@ -295,6 +295,7 @@ class InMemoryConsolidatorStore implements ConsolidatorMemoryStoreExt {
       failedAt: input.failedAt,
       nextRetryAt: input.nextRetryAt,
       retryCount: input.retryCount,
+      phase: input.phase ?? null,
     });
   }
 
@@ -352,6 +353,7 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
   readonly pending: Array<{
     readonly id: number;
     readonly input: PendingConflictInputLike;
+    attemptedAt: number | null;
     resolvedAt: number | null;
     decision: ConflictAuditDecision | null;
   }> = [];
@@ -368,7 +370,7 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
   async enqueuePending(input: PendingConflictInputLike): Promise<{ readonly id: number }> {
     this.#seq += 1;
     const id = this.#seq;
-    this.pending.push({ id, input, resolvedAt: null, decision: null });
+    this.pending.push({ id, input, attemptedAt: null, resolvedAt: null, decision: null });
     return { id };
   }
 
@@ -388,7 +390,7 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
           stage: p.input.stage,
           reason: p.input.reason ?? null,
           enqueuedAt: now,
-          attemptedAt: null,
+          attemptedAt: p.attemptedAt,
           resolvedAt: p.resolvedAt,
           decision: p.decision,
           conflictingIds: p.input.conflictingIds ?? [],
@@ -403,6 +405,11 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
       entry.resolvedAt = Date.now();
       entry.decision = decision;
     }
+  }
+
+  async markAttempted(id: number, attemptedAt?: number): Promise<void> {
+    const entry = this.pending.find((p) => p.id === id);
+    if (entry !== undefined) entry.attemptedAt = attemptedAt ?? Date.now();
   }
 
   /** Test helper — exposes the raw pending input list for assertions. */
@@ -866,7 +873,7 @@ export function createInMemoryStore(
           factIndexText.delete(id);
         }
       },
-      async listForDecay(scope, limit = 1000) {
+      async listForDecay(scope, limit = 1000, opts: { includeArchived?: boolean } = {}) {
         const out: Array<{
           id: string;
           text: string;
@@ -881,18 +888,58 @@ export function createInMemoryStore(
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           const sig = decaySignals.get(fact.id);
+          const archived = sig?.archived ?? false;
+          // MCON-6 (real-store parity): archived rows are excluded from
+          // the decay window by default — inspection opts in.
+          if (archived && opts.includeArchived !== true) continue;
           out.push({
             id: fact.id,
             text: fact.text,
             strength: sig?.strength ?? 1,
             lastAccessedAt: sig?.lastAccessedAt ?? null,
             createdAt: sig?.createdAt ?? Date.parse(fact.createdAt),
-            archived: sig?.archived ?? false,
+            archived,
             importance: fact.importance ?? null,
             status: fact.status ?? 'active',
             provenance: fact.provenance ?? null,
           });
           if (out.length >= limit) break;
+        }
+        return out;
+      },
+      async markAccessed(ids: ReadonlyArray<string>, accessedAt?: number) {
+        const at = accessedAt ?? Date.now();
+        for (const id of ids) {
+          const sig = decaySignals.get(id) ?? {
+            strength: 1,
+            lastAccessedAt: null,
+            createdAt: Date.now(),
+            archived: false,
+          };
+          decaySignals.set(id, {
+            ...sig,
+            lastAccessedAt: at,
+            strength: Math.min(2, sig.strength + 0.1),
+          });
+        }
+      },
+      async listDecaySignals(ids: ReadonlyArray<string>) {
+        const out: Array<{
+          id: string;
+          strength: number;
+          lastAccessedAt: number | null;
+          createdAt: number;
+        }> = [];
+        for (const id of ids) {
+          const fact = facts.find((f) => f.id === id);
+          if (fact === undefined) continue;
+          const sig = decaySignals.get(id);
+          out.push({
+            id,
+            strength: sig?.strength ?? 1,
+            lastAccessedAt: sig?.lastAccessedAt ?? null,
+            createdAt: sig?.createdAt ?? Date.parse(fact.createdAt),
+          });
         }
         return out;
       },
@@ -928,6 +975,19 @@ export function createInMemoryStore(
             rules[idx] = { ...rule, deletedAt: new Date().toISOString() };
           }
         }
+      },
+      async setStatus(id: string, status: 'active' | 'quarantined') {
+        const idx = rules.findIndex((r) => r.id === id);
+        const rule = rules[idx];
+        if (idx >= 0 && rule !== undefined) rules[idx] = { ...rule, status };
+      },
+      async recordSuccess(id: string) {
+        const idx = rules.findIndex((r) => r.id === id);
+        const rule = rules[idx];
+        if (idx < 0 || rule === undefined) return 0;
+        const next = (rule.successCount ?? 0) + 1;
+        rules[idx] = { ...rule, successCount: next };
+        return next;
       },
     },
     shared: {

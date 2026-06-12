@@ -78,7 +78,7 @@ describe('TransformersJsEmbedder', () => {
   });
 
   it('honours GRAPHORIN_CACHE_DIR for the cache_dir option', async () => {
-    process.env['GRAPHORIN_CACHE_DIR'] = '/tmp/graphorin-cache';
+    process.env.GRAPHORIN_CACHE_DIR = '/tmp/graphorin-cache';
     let captured: { cache_dir?: string } = {};
     const e = createTransformersJsEmbedder({
       pipelineFactory: async (_, __, opts) => {
@@ -93,7 +93,7 @@ describe('TransformersJsEmbedder', () => {
     });
     await e.embed(['x']);
     expect(captured.cache_dir).toBe('/tmp/graphorin-cache');
-    delete process.env['GRAPHORIN_CACHE_DIR'];
+    delete process.env.GRAPHORIN_CACHE_DIR;
   });
 
   it('embed surfaces EmbedderModelLoadError when the pipeline factory fails', async () => {

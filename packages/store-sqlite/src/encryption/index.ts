@@ -93,9 +93,6 @@ export type PassphraseResolver = () => Promise<string | Buffer>;
  */
 export class CipherPeerMissingError extends Error {
   override readonly name = 'CipherPeerMissingError';
-  constructor(message: string, options?: { cause?: unknown }) {
-    super(message, options);
-  }
 }
 
 /**

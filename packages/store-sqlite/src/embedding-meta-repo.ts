@@ -37,9 +37,6 @@ export interface EmbeddingMetaRow {
  */
 export class EmbedderLockOnFirstError extends Error {
   override readonly name = 'EmbedderLockOnFirstError';
-  constructor(message: string) {
-    super(message);
-  }
 }
 
 /**

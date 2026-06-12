@@ -157,9 +157,99 @@ describe('Phase 10c DoD — Deep phase drains 10 fixture pending pairs', () => {
     expect(outcome?.status).toBe('completed');
     expect(outcome?.conflictsResolved).toBe(10);
     expect(provider.calls.length).toBe(10);
+    // MCON-14: every judge call is output-capped.
+    expect(provider.calls.every((r) => (r.maxTokens ?? 0) > 0)).toBe(true);
 
     const remainingPending = await store.conflicts?.listPending(scope, 50);
     expect(remainingPending?.length ?? -1).toBe(0);
+    consoleWarn.mockRestore();
+  });
+
+  it('a garbage-judge row is billed at most twice, then closed judge-unparseable (MCON-9)', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex' };
+    // The judge always answers with unparseable garbage.
+    const provider = plannedProvider([{ text: 'NOT JSON AT ALL', tokens: 5 }]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      conflictPipeline: { mode: 'off' },
+      consolidator: { tier: 'standard', provider, defaultScope: scope },
+    });
+    const oldFact = await memory.semantic.remember(scope, { text: 'old fact' });
+    const candidate = await memory.semantic.remember(scope, { text: 'poisoned candidate' });
+    await store.conflicts?.enqueuePending({
+      scope,
+      factId: candidate.id,
+      candidateText: candidate.text,
+      stage: 'defer-to-deep',
+      conflictingIds: [oldFact.id],
+    });
+    await memory.consolidator.start();
+
+    // Run 1: bills one call, stamps attemptedAt, row stays pending.
+    await memory.consolidator.fireNow('deep', scope);
+    expect(provider.calls.length).toBe(1);
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(1);
+
+    // Run 2: bills one more call, then closes the row for good.
+    await memory.consolidator.fireNow('deep', scope);
+    expect(provider.calls.length).toBe(2);
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(0);
+    const rows = (
+      store.conflicts as unknown as {
+        pending: Array<{ input: { factId: string }; decision: string | null }>;
+      }
+    ).pending;
+    const closed = rows.find((p) => p.input.factId === candidate.id);
+    expect(closed?.decision).toBe('judge-unparseable');
+
+    // Run 3: nothing left to bill — the poisoned row never re-fires.
+    await memory.consolidator.fireNow('deep', scope);
+    expect(provider.calls.length).toBe(2);
+    consoleWarn.mockRestore();
+  });
+
+  it('a mid-run budget pause stops the judge loop instead of draining the queue (MCON-9)', async () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    const scope: SessionScope = { userId: 'alex' };
+    // Each judge call reports 9k+9k tokens; the ceiling pauses after one.
+    const provider = plannedProvider([
+      { text: '{"decision":"admit","reason":"ok"}', tokens: 9_000 },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      conflictPipeline: { mode: 'off' },
+      consolidator: {
+        tier: 'standard',
+        provider,
+        defaultScope: scope,
+        ceilings: { maxTokensPerDay: 10_000 },
+        onExceed: 'pause',
+        maxDeepConflictsPerRun: 50,
+      },
+    });
+    for (let i = 0; i < 5; i += 1) {
+      const oldFact = await memory.semantic.remember(scope, { text: `old fact ${i}` });
+      const candidate = await memory.semantic.remember(scope, { text: `candidate ${i}` });
+      await store.conflicts?.enqueuePending({
+        scope,
+        factId: candidate.id,
+        candidateText: candidate.text,
+        stage: 'defer-to-deep',
+        conflictingIds: [oldFact.id],
+      });
+    }
+    await memory.consolidator.start();
+    await memory.consolidator.fireNow('deep', scope);
+    // One billed call trips the pause; the remaining 4 rows are NOT billed.
+    expect(provider.calls.length).toBe(1);
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(4);
     consoleWarn.mockRestore();
   });
 });
@@ -225,6 +315,149 @@ describe('Phase 10c DoD — DLQ retry succeeds after backoff; permanent-failure 
       expect(row.nextRetryAt).toBeNull();
       expect(row.retryCount).toBeGreaterThanOrEqual(3);
     }
+  });
+});
+
+describe('MCON-10 — DLQ rows carry phase + slice; drainDlq replays under the run envelope', () => {
+  it('records the failed phase + messageIds at enqueue, and the replay is a real consolidator run', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    let clock = 0;
+    let failNext = true;
+    const provider = ((): Provider => ({
+      name: 'flaky',
+      modelId: 'flaky:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        if (failNext) {
+          failNext = false;
+          throw new Error('429 rate limit — provider down');
+        }
+        return {
+          text: '{"facts":[]}',
+          usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
+          finishReason: 'stop',
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    }))();
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: scope,
+        now: () => clock,
+        dlqBaseBackoffMs: 1_000,
+        dlqMaxBackoffMs: 5_000,
+      },
+    });
+    await memory.session.push(scope, { role: 'user', content: 'slice that fails to extract' });
+    await memory.consolidator.start();
+    const failed = await memory.consolidator.fireNow('standard', scope);
+    expect(failed?.status).toBe('failed');
+
+    // The DLQ row persists the failed phase and the REAL failed slice.
+    const dlq = store.__consolidator?.dlq ?? [];
+    expect(dlq.length).toBe(1);
+    expect(dlq[0]?.phase).toBe('standard');
+    expect(dlq[0]?.messageIds.length).toBe(1);
+
+    // The replay runs through #runPhase: lock + precheck + run records.
+    const runsBefore = store.__consolidator?.runs.length ?? 0;
+    clock += 60_000;
+    const drained = await memory.consolidator.drainDlq(scope);
+    expect(drained).toBe(1);
+    expect(store.__consolidator?.dlq.length ?? 0).toBe(0);
+    const runs = store.__consolidator?.runs ?? [];
+    expect(runs.length).toBe(runsBefore + 1);
+    const replay = runs.at(-1);
+    expect(replay?.phase).toBe('standard');
+    expect(replay?.triggerKind).toBe('manual');
+  });
+
+  it('replays the PERSISTED phase — a failed deep run is retried as deep, not extraction', async () => {
+    const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
+    let clock = 0;
+    const judged: string[] = [];
+    const provider: Provider = {
+      name: 'judge-only',
+      modelId: 'judge:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate(req) {
+        judged.push(req.systemMessage ?? '');
+        return {
+          text: '{"decision":"admit","reason":"ok"}',
+          usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
+          finishReason: 'stop',
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    };
+    const scope: SessionScope = { userId: 'alex' };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      conflictPipeline: { mode: 'off' },
+      consolidator: { tier: 'standard', provider, defaultScope: scope, now: () => clock },
+    });
+    // A pending conflict gives the deep replay real work to do.
+    const oldFact = await memory.semantic.remember(scope, { text: 'old fact' });
+    const candidate = await memory.semantic.remember(scope, { text: 'candidate fact' });
+    await store.conflicts?.enqueuePending({
+      scope,
+      factId: candidate.id,
+      candidateText: candidate.text,
+      stage: 'defer-to-deep',
+      conflictingIds: [oldFact.id],
+    });
+    // Synthesize the DLQ row a failed DEEP run would have left behind.
+    await store.consolidator?.enqueueFailedBatch({
+      id: 'dlq-deep-1',
+      consolidatorRunId: null,
+      scope,
+      messageIds: [],
+      errorKind: 'provider-5xx',
+      errorMessage: 'judge died mid-run',
+      failedAt: 0,
+      nextRetryAt: 0,
+      retryCount: 0,
+      phase: 'deep',
+    });
+    await memory.consolidator.start();
+    clock += 60_000;
+    const drained = await memory.consolidator.drainDlq(scope);
+    expect(drained).toBe(1);
+    // The replay ran the deep judge (not extraction) and resolved the row.
+    expect(judged.length).toBe(1);
+    expect(judged[0]).toContain('conflict-resolution judge');
+    expect((await store.conflicts?.listPending(scope, 10))?.length).toBe(0);
+    const replay = (store.__consolidator?.runs ?? []).at(-1);
+    expect(replay?.phase).toBe('deep');
   });
 });
 

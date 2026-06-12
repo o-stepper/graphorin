@@ -167,18 +167,33 @@ export interface CreateMemoryOptions {
     readonly maxTokens?: number;
   };
   /**
+   * Promotion-by-demonstrated-success for quarantined induced
+   * procedures (MCON-2 part 4). Fully offline — orthogonal to
+   * `procedureInduction` (no provider needed). When configured,
+   * `procedural.recordOutcome(scope, id, true)` increments the rule's
+   * persistent success counter and promotes it into `activate()` once
+   * `afterSuccesses` verified reuses accumulate; the injection gate
+   * still refuses flagged texts. Omitted ⇒ outcomes are counted but
+   * nothing auto-promotes.
+   */
+  readonly procedurePromotion?: {
+    /** Successful demonstrated reuses required before promotion (≥ 1). */
+    readonly afterSuccesses: number;
+  };
+  /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws — the
    * agent runtime overrides it in Phase 12.
    */
   readonly resolveScope?: ScopeResolver;
   /**
-   * Consolidator configuration. When omitted (or `enabled: false`)
-   * the facade installs the Phase 10a no-op placeholder so consumers
-   * can still type their interactions without paying the runtime
-   * cost. Pass `enabled: true` (or any non-`tier: 'free'` settings)
-   * to construct the production runtime from
-   * `@graphorin/memory/consolidator`.
+   * Consolidator configuration. When omitted, empty, or
+   * `enabled: false`, the facade installs the Phase 10a no-op
+   * placeholder so consumers can still type their interactions without
+   * paying the runtime cost. ANY other setting — including offline
+   * knobs like `decayCapacity` or `contextualRetrieval` — implicitly
+   * enables the production runtime (MST-4); `enabled: false` together
+   * with other settings warns once and keeps the placeholder.
    */
   readonly consolidator?: {
     readonly enabled?: boolean;
@@ -403,6 +418,10 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     store: options.store,
     tracer,
     ...(inducer !== null ? { inducer } : {}),
+    // MCON-2 part 4: opt-in promotion-by-demonstrated-success.
+    ...(options.procedurePromotion?.afterSuccesses !== undefined
+      ? { promoteAfterSuccesses: options.procedurePromotion.afterSuccesses }
+      : {}),
   });
   const shared = new SharedMemory({ store: options.store, tracer });
   const insights = new InsightMemory({ store: options.store, tracer });
@@ -635,18 +654,30 @@ function buildConsolidator(
   return consolidator;
 }
 
+let consolidatorConfigIgnoredWarned = false;
+
+/** @internal — test seam for the one-time disabled-config warning. */
+export function _resetConsolidatorConfigWarningForTesting(): void {
+  consolidatorConfigIgnoredWarned = false;
+}
+
 function shouldEnableConsolidator(opts: NonNullable<CreateMemoryOptions['consolidator']>): boolean {
-  if (opts.enabled === false) return false;
-  if (opts.enabled === true) return true;
-  // Implicit enable: any non-default option that signals real use.
-  return (
-    opts.tier !== undefined ||
-    opts.phases !== undefined ||
-    opts.ceilings !== undefined ||
-    opts.cheapModel !== undefined ||
-    opts.deepModel !== undefined ||
-    opts.provider !== undefined ||
-    opts.onPhaseFinished !== undefined ||
-    opts.defaultScope !== undefined
+  // MST-4: ANY non-empty consolidator config implicitly enables — the old
+  // allow-list silently ignored offline knobs (`decayCapacity`,
+  // `formEpisodes`, `reflection`, `contextualRetrieval`, …): the caller
+  // got a no-op placeholder while believing the feature was on.
+  const keys = Object.keys(opts).filter(
+    (k) => k !== 'enabled' && (opts as Record<string, unknown>)[k] !== undefined,
   );
+  if (opts.enabled === false) {
+    if (keys.length > 0 && !consolidatorConfigIgnoredWarned) {
+      consolidatorConfigIgnoredWarned = true;
+      process.stderr.write(
+        `[graphorin/memory] consolidator config (${keys.join(', ')}) was supplied together with enabled: false — the settings are ignored until the consolidator is enabled.\n`,
+      );
+    }
+    return false;
+  }
+  if (opts.enabled === true) return true;
+  return keys.length > 0;
 }

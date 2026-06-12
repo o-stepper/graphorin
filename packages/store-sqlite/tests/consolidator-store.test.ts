@@ -103,10 +103,13 @@ describe('SqliteConsolidatorStateStore', () => {
       failedAt: 100,
       nextRetryAt: 200,
       retryCount: 0,
+      phase: 'deep',
     });
     const ready = await asConsolidator(store).claimReadyBatches(scope, 250);
     expect(ready.length).toBe(1);
     expect(ready[0]?.messageIds).toEqual(['msg_1', 'msg_2']);
+    // MCON-10 / migration 019: the failed phase round-trips.
+    expect(ready[0]?.phase).toBe('deep');
 
     await asConsolidator(store).rescheduleBatch('b1', 1, 999);
     const stillReady = await asConsolidator(store).claimReadyBatches(scope, 100);
@@ -199,6 +202,7 @@ describe('SqliteSemanticMemoryStore.listForDecay + archiveFact', () => {
       listForDecay(
         scope: { userId: string },
         limit?: number,
+        opts?: { includeArchived?: boolean },
       ): Promise<ReadonlyArray<{ id: string; archived: boolean }>>;
       archiveFact(id: string, reason?: string): Promise<void>;
     };
@@ -206,7 +210,10 @@ describe('SqliteSemanticMemoryStore.listForDecay + archiveFact', () => {
     expect(before.length).toBe(2);
     expect(before.every((row) => !row.archived)).toBe(true);
     await semantic.archiveFact('f1', 'low_retention');
-    const after = await semantic.listForDecay(scope);
+    // MCON-6: the decay window drops archived rows; inspection opts in.
+    const window = await semantic.listForDecay(scope);
+    expect(window.map((r) => r.id)).toEqual(['f2']);
+    const after = await semantic.listForDecay(scope, undefined, { includeArchived: true });
     const archived = after.find((r) => r.id === 'f1');
     expect(archived?.archived).toBe(true);
   });

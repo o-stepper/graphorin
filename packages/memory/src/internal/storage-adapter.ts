@@ -245,10 +245,17 @@ export type ConflictAuditStage =
 /**
  * Final pipeline outcome recorded against the candidate fact. Matches
  * the storage adapter's `ConflictPipelineDecision` exactly.
+ * `'judge-unparseable'` closes a pending row whose deep-phase judge
+ * call repeatedly failed (MCON-9) so it stops being re-billed forever.
  *
  * @stable
  */
-export type ConflictAuditDecision = 'admit' | 'dedup' | 'supersede' | 'pending';
+export type ConflictAuditDecision =
+  | 'admit'
+  | 'dedup'
+  | 'supersede'
+  | 'pending'
+  | 'judge-unparseable';
 
 /**
  * Single audit row written by `runConflictPipeline(...)`. The optional
@@ -322,6 +329,13 @@ export interface ConflictMemoryStoreExt {
   enqueuePending(input: PendingConflictInputLike): Promise<{ readonly id: number }>;
   listPending(scope: SessionScope, limit?: number): Promise<ReadonlyArray<PendingConflictRowLike>>;
   markResolved(id: number, decision: ConflictAuditDecision): Promise<void>;
+  /**
+   * Stamp `attemptedAt` on a pending row whose judge call failed
+   * (MCON-9). The deep phase closes the row as `'judge-unparseable'`
+   * on the NEXT failure, so a poisoned row is billed at most twice.
+   * Optional — without it the deep phase falls back to skip-and-retry.
+   */
+  markAttempted?(id: number, attemptedAt?: number): Promise<void>;
 }
 
 /**
@@ -412,6 +426,12 @@ export interface DlqBatchInput {
   readonly failedAt: number;
   readonly nextRetryAt: number;
   readonly retryCount: number;
+  /**
+   * Phase that failed (MCON-10) so `drainDlq` replays the SAME phase
+   * instead of inferring (the old inference hard-coded `'standard'`).
+   * Absent / `null` ⇒ legacy row, replayed as `'standard'`.
+   */
+  readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
 /** @stable */
@@ -425,6 +445,8 @@ export interface DlqBatchRow {
   readonly failedAt: number;
   readonly nextRetryAt: number | null;
   readonly retryCount: number;
+  /** Phase that failed (MCON-10); `null`/absent ⇒ legacy row. */
+  readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
 /**
@@ -518,12 +540,19 @@ export interface DecayMemoryStoreExt {
    * caller can apply Ebbinghaus retention without scanning the
    * whole table. `limit` defaults to `1000`.
    *
+   * Archived rows are EXCLUDED by default (MCON-6) — they never receive
+   * access bumps, so they would pin the LRU head and saturate the decay
+   * window, structurally stopping threshold-archiving and capacity
+   * eviction for live facts. Inspection paths pass
+   * `{ includeArchived: true }`.
+   *
    * `importance` / `status` / `provenance` (X-1) feed the multi-signal
    * salience score that orders capacity-bounded eviction.
    */
   listForDecay(
     scope: SessionScope,
     limit?: number,
+    opts?: { readonly includeArchived?: boolean },
   ): Promise<
     ReadonlyArray<{
       readonly id: string;
@@ -545,6 +574,28 @@ export interface DecayMemoryStoreExt {
    * `memory_history` records the archive event.
    */
   archiveFact(id: string, reason?: string): Promise<void>;
+  /**
+   * Record a retrieval access for the given facts (MRET-7): stamp
+   * `lastAccessedAt` and reinforce `strength` (implementation-capped).
+   * Optional — adapters without decay columns may omit it; callers
+   * MUST treat failures as non-fatal (the read path never breaks on a
+   * bookkeeping write).
+   */
+  markAccessed?(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void>;
+  /**
+   * Narrow decay-column read for exactly the given fact ids (MRET-8) —
+   * powers per-search decay re-ranking without the old O(scope)
+   * 1000-row window read. Optional; absent ⇒ the tier falls back to
+   * `listForDecay`.
+   */
+  listDecaySignals?(ids: ReadonlyArray<string>): Promise<
+    ReadonlyArray<{
+      readonly id: string;
+      readonly strength: number;
+      readonly lastAccessedAt: number | null;
+      readonly createdAt: number;
+    }>
+  >;
 }
 
 /** Options accepted by {@link InsightMemoryStoreExt.list}. */
@@ -621,6 +672,14 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
    * `memory_history` audit row. Powers {@link ProceduralMemory.validate}.
    */
   setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  /**
+   * Record one demonstrated successful reuse of a rule and return the
+   * new counter value (MCON-2 part 4). Powers
+   * promotion-by-demonstrated-success via
+   * {@link ProceduralMemory.recordOutcome}. Optional — adapters without
+   * the counter simply never auto-promote.
+   */
+  recordSuccess?(id: string): Promise<number>;
 }
 
 /** Find-or-create payload for {@link GraphMemoryStoreExt.upsertEntity}. */

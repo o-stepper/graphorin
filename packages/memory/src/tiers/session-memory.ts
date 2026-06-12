@@ -126,10 +126,10 @@ export class SessionMemory {
   }
 
   /**
-   * Surface high-importance items as a silent turn for the model.
-   * Phase 10a ships a no-op shell; Phase 10c (Consolidator) populates
-   * the actual flush behaviour. The method exists in 10a so callers
-   * can wire the contract today without conditional checks.
+   * NOT IMPLEMENTED (MRET-12) — always resolves `{ flushed: 0 }` and
+   * performs no work. The consolidator pipeline (extraction → facts /
+   * episodes) superseded the planned "silent flush turn"; this method
+   * remains only for contract stability. Do not branch on its counter.
    */
   async flushImportant(
     scope: SessionScope,
@@ -140,35 +140,38 @@ export class SessionMemory {
       this.#tracer,
       'memory.write.session',
       scope,
-      { 'memory.session.action': 'flush-important' },
+      { 'memory.session.action': 'flush-important', 'memory.session.implemented': false },
       async () => ({ flushed: 0 }),
     );
   }
 
   /**
-   * Phase 10a ships the deterministic minimum-viable compaction:
-   * summarises the request as a counter-only shape. Phase 10c
-   * replaces the inner body with the LLM-summarized cutoff.
+   * NOT IMPLEMENTED (MRET-12) — always resolves
+   * `{ removed: 0, summarized: 0 }` and deletes / summarizes nothing.
+   * Session-context compaction is owned by the context engine
+   * (`memory.contextEngine.compactNow`, driven by the agent runtime);
+   * this tier-level method previously FABRICATED counts (it reported
+   * `total - keepLastN` as "removed" while removing nothing — with the
+   * default `keepLastN: 0` it claimed to have compacted the whole
+   * session). It now reports the truth until a real message splice
+   * exists at this layer.
    */
   async compact(
     scope: SessionScope,
     opts: { keepLastN?: number } = {},
   ): Promise<SessionCompactionResult> {
+    void opts;
     return withMemorySpan(
       this.#tracer,
       'memory.write.session',
       scope,
-      { 'memory.session.action': 'compact' },
+      { 'memory.session.action': 'compact', 'memory.session.implemented': false },
       async (span) => {
-        const messages = await this.#store.session.list(scope, {});
-        const keep = Math.max(0, opts.keepLastN ?? 0);
-        const total = messages.length;
-        const removed = Math.max(0, total - keep);
         span.setAttributes({
-          'memory.session.compact.removed': removed,
-          'memory.session.compact.summarized': removed,
+          'memory.session.compact.removed': 0,
+          'memory.session.compact.summarized': 0,
         });
-        return { removed, summarized: removed };
+        return { removed: 0, summarized: 0 };
       },
     );
   }
@@ -215,19 +218,14 @@ export class SessionMemory {
   }
 
   /**
-   * Returns the registered agents that participated in the supplied
-   * scope. The default sqlite adapter exposes `agents_registry` rows
-   * via the sessions store; this convenience accessor resolves them
-   * without requiring callers to import the sessions package.
-   *
-   * The method is best-effort — adapters that do not maintain an
-   * agent registry simply return an empty list.
+   * NOT IMPLEMENTED (MRET-12) — always resolves `[]`. The agent
+   * registry lives in `@graphorin/sessions` and has never been
+   * threaded into this tier; the previous JSDoc claimed the default
+   * sqlite adapter "resolves" registry rows here, which was false. Use
+   * the sessions facade for participant attribution.
    */
   async attributedFor(scope: SessionScope): Promise<ReadonlyArray<AgentRegistryEntry>> {
     void scope;
-    // Phase 10a ships an empty shell; Phase 11 wires the registry
-    // through the sessions facade. Returning [] at this layer keeps
-    // the contract stable without leaking adapter internals.
     return [];
   }
 }

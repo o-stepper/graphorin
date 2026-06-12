@@ -126,7 +126,7 @@ export function readSessionExport(
     } catch {
       throw new SessionExportFormatInvalidError(`malformed JSONL on line ${i + 1}`);
     }
-    const kind = parsed['kind'];
+    const kind = parsed.kind;
     if (kind === 'footer') {
       footer = parsed as unknown as SessionExportFooterRecord;
       continue;
@@ -185,19 +185,19 @@ function parseHeader(line: string): SessionExportMetaRecord {
   } catch {
     throw new SessionExportFormatInvalidError('meta header is not valid JSON');
   }
-  if (parsed['kind'] !== 'meta') {
+  if (parsed.kind !== 'meta') {
     throw new SessionExportFormatInvalidError(
-      `expected line 1 to be { kind: 'meta', ... } (got kind=${String(parsed['kind'])})`,
+      `expected line 1 to be { kind: 'meta', ... } (got kind=${String(parsed.kind)})`,
     );
   }
-  if (parsed['format'] !== SESSION_EXPORT_FORMAT) {
+  if (parsed.format !== SESSION_EXPORT_FORMAT) {
     throw new SessionExportFormatInvalidError(
-      `expected format='${SESSION_EXPORT_FORMAT}' (got format='${String(parsed['format'])}')`,
+      `expected format='${SESSION_EXPORT_FORMAT}' (got format='${String(parsed.format)}')`,
     );
   }
-  if (typeof parsed['version'] !== 'string' || !/^\d+\.\d+$/.test(parsed['version'])) {
+  if (typeof parsed.version !== 'string' || !/^\d+\.\d+$/.test(parsed.version)) {
     throw new SessionExportFormatInvalidError(
-      `expected version to be 'MAJOR.MINOR' (got '${String(parsed['version'])}')`,
+      `expected version to be 'MAJOR.MINOR' (got '${String(parsed.version)}')`,
     );
   }
   return parsed as unknown as SessionExportMetaRecord;
@@ -228,7 +228,7 @@ function parseBodyRecord(
   parsed: Readonly<Record<string, unknown>>,
   warnings: SessionExportWarning[],
 ): SessionExportParsedRecord {
-  const kind = parsed['kind'];
+  const kind = parsed.kind;
   if (typeof kind !== 'string') {
     throw new SessionExportFormatInvalidError('body record missing string `kind`');
   }

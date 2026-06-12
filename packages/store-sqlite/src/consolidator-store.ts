@@ -84,6 +84,8 @@ export interface DlqBatchInput {
   readonly failedAt: number;
   readonly nextRetryAt: number;
   readonly retryCount: number;
+  /** Phase that failed (MCON-10); `null`/absent ⇒ legacy 'standard' replay. */
+  readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
 /** @stable */
@@ -97,6 +99,8 @@ export interface DlqBatchRow {
   readonly failedAt: number;
   readonly nextRetryAt: number | null;
   readonly retryCount: number;
+  /** Phase that failed (MCON-10); `null` ⇒ legacy row. */
+  readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
 interface StateRowDb {
@@ -134,6 +138,7 @@ interface DlqRowDb {
   failed_at: number;
   next_retry_at: number | null;
   retry_count: number;
+  phase: string | null;
 }
 
 /**
@@ -354,8 +359,8 @@ export class SqliteConsolidatorStateStore {
       `INSERT INTO consolidator_failed_batches (
          id, consolidator_run_id, scope_user_id,
          message_ids_json, error_kind, error_message,
-         failed_at, next_retry_at, retry_count
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         failed_at, next_retry_at, retry_count, phase
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         input.id,
         input.consolidatorRunId,
@@ -366,6 +371,7 @@ export class SqliteConsolidatorStateStore {
         input.failedAt,
         input.nextRetryAt,
         input.retryCount,
+        input.phase ?? null,
       ],
     );
   }
@@ -472,5 +478,7 @@ function rowToDlq(row: DlqRowDb, scope: SessionScope): DlqBatchRow {
     failedAt: row.failed_at,
     nextRetryAt: row.next_retry_at,
     retryCount: row.retry_count,
+    phase:
+      row.phase === 'light' || row.phase === 'standard' || row.phase === 'deep' ? row.phase : null,
   };
 }

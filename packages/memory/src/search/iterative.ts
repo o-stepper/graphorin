@@ -185,6 +185,14 @@ export interface RetrievalGrade {
 export interface RetrievalGradeOptions {
   /** Cancellation signal forwarded to the underlying provider call. */
   readonly signal?: AbortSignal;
+  /**
+   * Reformulations already attempted (MRET-11). Surfaced to the grader
+   * as context so it can propose something genuinely new — the grade
+   * itself is ALWAYS judged against the original question, never a
+   * reformulation (a narrowed sub-query must not be declared
+   * "sufficient" while the original multi-hop question is not).
+   */
+  readonly triedQueries?: ReadonlyArray<string>;
 }
 
 /**
@@ -232,12 +240,20 @@ export const RETRIEVAL_GRADE_SYSTEM_PROMPT =
 export function buildGradeRequest(
   query: string,
   snippets: ReadonlyArray<string>,
-  options: { readonly maxTokens?: number; readonly signal?: AbortSignal } = {},
+  options: {
+    readonly maxTokens?: number;
+    readonly signal?: AbortSignal;
+    readonly triedQueries?: ReadonlyArray<string>;
+  } = {},
 ): ProviderRequest {
   const body =
     snippets.length === 0 ? '(none)' : snippets.map((s, i) => `[${i + 1}] ${s}`).join('\n');
+  const tried =
+    options.triedQueries !== undefined && options.triedQueries.length > 0
+      ? `\n\nQueries already tried (do not repeat them): ${options.triedQueries.join(' | ')}`
+      : '';
   const content =
-    `Question: ${query}\n\nRetrieved memories:\n${body}\n\n` +
+    `Question: ${query}\n\nRetrieved memories:\n${body}${tried}\n\n` +
     'Grade whether these memories are sufficient to answer the question. If not, ' +
     'propose a single better search query.';
   return {
@@ -302,6 +318,7 @@ export function createProviderRetrievalGrader(
         const request = buildGradeRequest(query, snippets, {
           maxTokens,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+          ...(opts.triedQueries !== undefined ? { triedQueries: opts.triedQueries } : {}),
         });
         const response = await provider.generate(request);
         return parseGrade(response.text);
@@ -359,6 +376,14 @@ export interface IterativeRetrievalDeps<H> {
   idOf(hit: H): string;
   /** Grader; `null` ⇒ single-shot (no grading, no provider call). */
   grader: RetrievalGrader | null;
+  /**
+   * Re-fuse the per-pass hit lists into one ranked list (MRET-2).
+   * Receives one list per pass in pass order; the result feeds the
+   * final `maxResults` cut so a pass-2 find can outrank pass-1 noise.
+   * Absent ⇒ the loop falls back to round-robin interleaving (still
+   * strictly better than the old discovery-order cut).
+   */
+  fuse?(lists: ReadonlyArray<ReadonlyArray<H>>): ReadonlyArray<H>;
 }
 
 /**
@@ -403,15 +428,14 @@ export async function runIterativeRetrieval<H>(
   const maxSnippets = Math.max(1, options.maxGradeSnippets ?? DEFAULT_MAX_GRADE_SNIPPETS);
   const signal = options.signal;
 
-  const seen = new Set<string>();
-  const accumulated: H[] = [];
+  // MRET-2: hits are tracked PER PASS — RAW, including cross-pass
+  // repeats, so rank fusion can reward consensus between passes. The
+  // grade window and the final list dedup by id at read time. The old
+  // flat append meant pass 1 saturated the first `maxSnippets` forever
+  // and the final cut ran in discovery order.
+  const passLists: Array<ReadonlyArray<H>> = [];
   const accumulate = (hits: ReadonlyArray<H>): void => {
-    for (const hit of hits) {
-      const id = deps.idOf(hit);
-      if (seen.has(id)) continue;
-      seen.add(id);
-      accumulated.push(hit);
-    }
+    passLists.push([...hits]);
   };
   const queries: string[] = [query];
   const tried = new Set<string>([query.trim().toLowerCase()]);
@@ -424,19 +448,22 @@ export async function runIterativeRetrieval<H>(
   // make no abstention claim.
   const grader = deps.grader;
   if (!gate.hard || grader === null) {
-    return finalize(accumulated, 1, gate.hard, true, false, queries, options.maxResults);
+    return finalize(deps, passLists, 1, gate.hard, true, false, queries, options.maxResults);
   }
 
   let passes = 1;
-  let current = query;
   for (;;) {
-    const grade = await grader.grade(
-      current,
-      accumulated.slice(0, maxSnippets).map(deps.snippetOf),
-      signal !== undefined ? { signal } : {},
-    );
+    // MRET-2: the grade window interleaves the TOP hits of every pass
+    // (latest pass included) instead of replaying pass 1's head.
+    // MRET-11: sufficiency is always judged against the ORIGINAL
+    // question; reformulations ride along as already-tried context.
+    const window = interleave(passLists, maxSnippets, deps.idOf).map(deps.snippetOf);
+    const grade = await grader.grade(query, window, {
+      ...(signal !== undefined ? { signal } : {}),
+      ...(queries.length > 1 ? { triedQueries: queries.slice(1) } : {}),
+    });
     if (grade.sufficient) {
-      return finalize(accumulated, passes, true, true, false, queries, options.maxResults);
+      return finalize(deps, passLists, passes, true, true, false, queries, options.maxResults);
     }
     if (passes >= cap) break;
     const next = normalizeReformulation(grade.reformulation, tried);
@@ -445,14 +472,41 @@ export async function runIterativeRetrieval<H>(
     queries.push(next);
     tried.add(next.toLowerCase());
     accumulate(await deps.retrieve(next, true, signal));
-    current = next;
   }
   // Cap reached or no further reformulation while still insufficient ⇒ abstain.
-  return finalize(accumulated, passes, true, false, true, queries, options.maxResults);
+  return finalize(deps, passLists, passes, true, false, true, queries, options.maxResults);
+}
+
+/**
+ * Round-robin interleave of per-pass lists, deduped by id: hit 1 of
+ * every pass, then hit 2 of every pass, … — guarantees the latest
+ * pass's top hits enter a window of any size.
+ */
+function interleave<H>(
+  lists: ReadonlyArray<ReadonlyArray<H>>,
+  limit: number,
+  idOf: (hit: H) => string,
+): H[] {
+  const out: H[] = [];
+  const seen = new Set<string>();
+  const longest = lists.reduce((max, l) => Math.max(max, l.length), 0);
+  for (let rank = 0; rank < longest && out.length < limit; rank += 1) {
+    for (const list of lists) {
+      const hit = list[rank];
+      if (hit === undefined) continue;
+      const id = idOf(hit);
+      if (seen.has(id)) continue;
+      seen.add(id);
+      out.push(hit);
+      if (out.length >= limit) break;
+    }
+  }
+  return out;
 }
 
 function finalize<H>(
-  hits: ReadonlyArray<H>,
+  deps: IterativeRetrievalDeps<H>,
+  passLists: ReadonlyArray<ReadonlyArray<H>>,
   iterations: number,
   gateHard: boolean,
   sufficient: boolean,
@@ -460,9 +514,27 @@ function finalize<H>(
   queries: ReadonlyArray<string>,
   maxResults: number | undefined,
 ): IterativeRetrievalResult<H> {
+  // MRET-2: re-rank ACROSS passes before the cut — discovery order let
+  // pass-1 noise crowd out the pass-2 hit that actually answers.
+  const ranked =
+    typeof deps.fuse === 'function'
+      ? dedupBy(deps.fuse(passLists), deps.idOf)
+      : interleave(passLists, Number.POSITIVE_INFINITY, deps.idOf);
   const capped =
-    maxResults !== undefined && maxResults >= 0 ? hits.slice(0, maxResults) : hits.slice();
+    maxResults !== undefined && maxResults >= 0 ? ranked.slice(0, maxResults) : ranked.slice();
   return { hits: capped, iterations, gateHard, sufficient, abstained, queries: [...queries] };
+}
+
+function dedupBy<H>(hits: ReadonlyArray<H>, idOf: (hit: H) => string): H[] {
+  const seen = new Set<string>();
+  const out: H[] = [];
+  for (const hit of hits) {
+    const id = idOf(hit);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push(hit);
+  }
+  return out;
 }
 
 function clampIterations(value: number | undefined): number {

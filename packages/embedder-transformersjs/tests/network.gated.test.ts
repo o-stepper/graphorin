@@ -15,12 +15,12 @@ import { createTransformersJsEmbedder } from '../src/index.js';
  *   2. A second `embed(...)` against a fresh embedder (same cache dir)
  *      hits the cache instead of re-downloading.
  */
-const enabled = process.env['RUN_NETWORK_TESTS'] === '1';
+const enabled = process.env.RUN_NETWORK_TESTS === '1';
 
 describe.skipIf(!enabled)('transformersjs embedder — network-gated', () => {
   it('downloads the default model on first use and reuses the cache on second use', async () => {
     const cacheDir = await mkdtemp(join(tmpdir(), 'graphorin-tjs-network-'));
-    process.env['GRAPHORIN_CACHE_DIR'] = cacheDir;
+    process.env.GRAPHORIN_CACHE_DIR = cacheDir;
     try {
       const first = createTransformersJsEmbedder({
         model: 'Xenova/multilingual-e5-small',
@@ -43,7 +43,7 @@ describe.skipIf(!enabled)('transformersjs embedder — network-gated', () => {
       // plenty of headroom for slow CI hardware.
       expect(elapsedSecond * 3).toBeLessThan(elapsedFirst);
     } finally {
-      delete process.env['GRAPHORIN_CACHE_DIR'];
+      delete process.env.GRAPHORIN_CACHE_DIR;
     }
   }, 120_000);
 });

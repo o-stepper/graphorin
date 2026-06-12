@@ -22,7 +22,8 @@ import {
   type SqliteMemoryStore,
 } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
-import { createMemory, defineBlock } from '../src/index.js';
+import { retention } from '../src/consolidator/index.js';
+import { createMemory, defineBlock, enLocalePack } from '../src/index.js';
 import { createStubEmbedder } from './fixtures/in-memory-store.js';
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
@@ -354,6 +355,277 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
+  it('the decay window is not saturated by archived rows — live facts keep decaying (MCON-6)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+        consolidator: { tier: 'free', defaultScope: SCOPE },
+      });
+      await memory.consolidator.start();
+
+      const now = Date.now();
+      const conn = sqlite.connection;
+      // 55 archived rows, older than everything else: pre-fix they pin
+      // the LRU head (window LIMIT 50) and the live stale fact below is
+      // never even seen by the light pass.
+      for (let i = 0; i < 55; i += 1) {
+        const id = `arch-${i}`;
+        await sqlite.memory.semantic.remember({
+          id,
+          kind: 'semantic',
+          userId: SCOPE.userId,
+          sensitivity: 'internal',
+          text: `archived filler ${i}`,
+          createdAt: new Date(now - 90 * 24 * 60 * 60_000).toISOString(),
+        });
+        conn.run('UPDATE facts SET archived = 1, created_at = ? WHERE id = ?', [
+          now - 90 * 24 * 60 * 60_000,
+          id,
+        ]);
+      }
+      // One live fact, 40 days stale — retention e^(-40/7) ≈ 0.003 < 0.05.
+      await sqlite.memory.semantic.remember({
+        id: 'live-stale',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'stale but live fact',
+        createdAt: new Date(now - 40 * 24 * 60 * 60_000).toISOString(),
+      });
+      conn.run('UPDATE facts SET created_at = ? WHERE id = ?', [
+        now - 40 * 24 * 60 * 60_000,
+        'live-stale',
+      ]);
+
+      const outcome = await memory.consolidator.fireNow('light', SCOPE);
+      expect(outcome?.factsUpdated ?? 0).toBeGreaterThanOrEqual(1);
+      const row = conn.get<{ archived: number }>('SELECT archived FROM facts WHERE id = ?', [
+        'live-stale',
+      ]);
+      expect(row?.archived).toBe(1);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('recall marks access and reinforced facts retain better than untouched peers (MRET-7)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+      });
+      const now = Date.now();
+      const createdAt = new Date(now - 6 * 24 * 60 * 60_000).toISOString();
+      await sqlite.memory.semantic.remember({
+        id: 'f-accessed',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'enjoys alpine climbing in Georgia',
+        createdAt,
+      });
+      await sqlite.memory.semantic.remember({
+        id: 'f-untouched',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'prefers green tea over coffee',
+        createdAt,
+      });
+      const conn = sqlite.connection;
+      conn.run('UPDATE facts SET created_at = ? WHERE id IN (?, ?)', [
+        now - 6 * 24 * 60 * 60_000,
+        'f-accessed',
+        'f-untouched',
+      ]);
+
+      // Recall only the climbing fact — search() must stamp its access.
+      const hits = await memory.semantic.search(SCOPE, 'alpine climbing');
+      expect(hits.map((h) => h.record.id)).toContain('f-accessed');
+
+      const decay = sqlite.memory.semantic as unknown as {
+        listForDecay(
+          scope: typeof SCOPE,
+          limit?: number,
+        ): Promise<
+          ReadonlyArray<{
+            id: string;
+            lastAccessedAt: number | null;
+            createdAt: number;
+            strength: number;
+          }>
+        >;
+      };
+      const decayRows = await decay.listForDecay(SCOPE, 10);
+      const accessed = decayRows.find((r) => r.id === 'f-accessed');
+      const untouched = decayRows.find((r) => r.id === 'f-untouched');
+      expect(accessed?.lastAccessedAt).not.toBeNull();
+      expect(accessed?.strength ?? 1).toBeGreaterThan(1);
+      expect(untouched?.lastAccessedAt).toBeNull();
+
+      // The reinforced fact now retains strictly better than its peer.
+      const at = Date.now();
+      const ret = (r: { lastAccessedAt: number | null; createdAt: number; strength: number }) =>
+        retention({
+          now: at,
+          lastAccessedAt: r.lastAccessedAt,
+          createdAt: r.createdAt,
+          strength: r.strength,
+          tauDays: 7,
+        });
+      expect(accessed && untouched ? ret(accessed) > ret(untouched) : false).toBe(true);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('recall_episodes dateRange and fact_search tags filter end-to-end (MRET-4)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+
+      // Episodes: one in March, one in May.
+      await sqlite.memory.episodic.put({
+        id: 'ep-mar',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Discussed the Lisbon conference travel plan.',
+        startedAt: '2026-03-10T10:00:00.000Z',
+        endedAt: '2026-03-10T12:00:00.000Z',
+        sensitivity: 'internal',
+        createdAt: '2026-03-10T12:00:00.000Z',
+      });
+      await sqlite.memory.episodic.put({
+        id: 'ep-may',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Discussed the Lisbon apartment search.',
+        startedAt: '2026-05-20T10:00:00.000Z',
+        endedAt: '2026-05-20T12:00:00.000Z',
+        sensitivity: 'internal',
+        createdAt: '2026-05-20T12:00:00.000Z',
+      });
+      const all = await memory.episodic.search(SCOPE, 'Lisbon');
+      expect(all.map((h) => h.record.id).sort()).toEqual(['ep-mar', 'ep-may']);
+      const march = await memory.episodic.search(SCOPE, 'Lisbon', {
+        dateRange: { from: '2026-03-01T00:00:00.000Z', to: '2026-03-31T23:59:59.000Z' },
+      });
+      expect(march.map((h) => h.record.id)).toEqual(['ep-mar']);
+
+      // Facts: one tagged, one not.
+      await memory.semantic.remember(SCOPE, {
+        text: 'Prefers aisle seats on long flights',
+        tags: ['travel'],
+      });
+      await memory.semantic.remember(SCOPE, { text: 'Prefers green tea over coffee' });
+      const tagged = await memory.semantic.search(SCOPE, 'prefers', { tags: ['travel'] });
+      expect(tagged.length).toBe(1);
+      expect(tagged[0]?.record.text).toContain('aisle');
+      const untagged = await memory.semantic.search(SCOPE, 'prefers');
+      expect(untagged.length).toBe(2);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('decay re-ranks the full fused pool — a fresh fact beyond topK enters the page (MRET-8)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+      const now = Date.now();
+      const stale = new Date(now - 60 * 24 * 60 * 60_000).toISOString();
+      // 10 stale facts that all lexically match; 1 fresh fact that
+      // matches WEAKER (single mention + longer text ⇒ worse bm25), so
+      // pre-decay it ranks at position 11 and the old post-slice decay
+      // could never surface it.
+      for (let i = 0; i < 10; i += 1) {
+        await sqlite.memory.semantic.remember({
+          id: `stale-${i}`,
+          kind: 'semantic',
+          userId: SCOPE.userId,
+          sensitivity: 'internal',
+          text: 'kayaking kayaking kayaking trip notes',
+          createdAt: stale,
+        });
+      }
+      await sqlite.memory.semantic.remember({
+        id: 'fresh-11',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'started a brand new hobby this week and it involves kayaking on the river',
+        createdAt: new Date(now).toISOString(),
+      });
+      const conn = sqlite.connection;
+      conn.run(`UPDATE facts SET created_at = ? WHERE id LIKE 'stale-%'`, [
+        now - 60 * 24 * 60 * 60_000,
+      ]);
+      conn.run('UPDATE facts SET created_at = ? WHERE id = ?', [now, 'fresh-11']);
+
+      // NOTE: decay first — MRET-7 marks every RETURNED fact as accessed,
+      // which would refresh the stale ones for a later decay pass.
+      const decayed = await memory.semantic.search(SCOPE, 'kayaking', {
+        topK: 10,
+        decay: { tauDays: 7 },
+      });
+      expect(decayed.map((h) => h.record.id)).toContain('fresh-11');
+      expect(decayed.length).toBe(10);
+
+      // Без decay срез идёт по чистой лексике — fresh-11 за бортом.
+      // (After the decayed search the returned ids got access-bumped,
+      // but plain fusion ignores decay columns so the order holds.)
+      const noDecay = await memory.semantic.search(SCOPE, 'kayaking', { topK: 10 });
+      expect(noDecay.map((h) => h.record.id)).not.toContain('fresh-11');
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('episodic FTS relevance is graduated, not a constant 1.0 (MRET-5/MST-7)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+      const startedAt = '2026-05-01T00:00:00.000Z';
+      const endedAt = '2026-05-01T01:00:00.000Z';
+      // Same recency, no importance — only lexical quality differs:
+      // one episode mentions the query terms repeatedly, the other once.
+      await sqlite.memory.episodic.put({
+        id: 'ep-strong',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Lisbon Lisbon Lisbon: booked the Lisbon trip and the Lisbon hotel.',
+        startedAt,
+        endedAt,
+        sensitivity: 'internal',
+        createdAt: endedAt,
+      });
+      await sqlite.memory.episodic.put({
+        id: 'ep-weak',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Talked through a long agenda; Lisbon came up once near the end of it.',
+        startedAt,
+        endedAt,
+        sensitivity: 'internal',
+        createdAt: endedAt,
+      });
+      const hits = await memory.episodic.search(SCOPE, 'Lisbon', {
+        weights: { recency: 0, relevance: 1, importance: 0 },
+      });
+      expect(hits.map((h) => h.record.id)).toEqual(['ep-strong', 'ep-weak']);
+      const [strong, weak] = hits;
+      // Graduated: the better lexical match scores strictly higher and
+      // neither is the degenerate constant 1.0.
+      expect(strong?.score ?? 0).toBeGreaterThan(weak?.score ?? 0);
+      expect(strong?.score ?? 1).toBeLessThan(1);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('metadata reports real per-tier counts (not a 0/1 probe), excluding quarantined rules (CE-5, MST-6)', async () => {
     const sqlite = await makeStore();
     try {
@@ -510,6 +782,45 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
           ].includes(row.stage),
         ),
       ).toBe(true);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('locale-pack tool signatures match the registered tool schemas (MST-5)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+        resolveScope: () => SCOPE,
+      });
+      const byName = new Map(memory.tools.map((t) => [t.name, t]));
+      // Every `tool_name(arg, arg?)` mention in the system-prompt base
+      // template must reference only parameters the registered schema
+      // actually accepts — the model "filters" with phantom params
+      // otherwise (non-strict zod strips unknown keys silently).
+      const text = enLocalePack.baseTemplate.full;
+      const mentions = [...text.matchAll(/\b([a-z][a-z0-9_]*)\(([^)]*)\)/g)];
+      let checked = 0;
+      for (const m of mentions) {
+        const name = m[1] ?? '';
+        const tool = byName.get(name);
+        if (tool === undefined) continue;
+        checked += 1;
+        const shape =
+          (tool.inputSchema as unknown as { shape?: Record<string, unknown> }).shape ?? {};
+        for (const raw of (m[2] ?? '').split(',')) {
+          const param = raw.trim().replace(/\?$/, '');
+          if (param.length === 0) continue;
+          expect(
+            Object.keys(shape),
+            `locale pack advertises ${name}(${param}) but the schema has no such key`,
+          ).toContain(param);
+        }
+      }
+      // The retrieval guidance block mentions at least the three search tools.
+      expect(checked).toBeGreaterThanOrEqual(3);
     } finally {
       await sqlite.close();
     }

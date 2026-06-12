@@ -319,8 +319,11 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
   function assertNoDuplicates(
     strategy?: CollisionStrategy,
     ctx?: CollisionContext,
-  ): void | ReadonlyArray<CollisionResolution> {
-    if (strategy === undefined) return assertNoDuplicatesPure();
+  ): undefined | ReadonlyArray<CollisionResolution> {
+    if (strategy === undefined) {
+      assertNoDuplicatesPure();
+      return undefined;
+    }
     if (ctx === undefined) {
       throw new TypeError(
         "ToolRegistry.assertNoDuplicates(strategy, ctx): the 'ctx' argument is required when a strategy is supplied.",

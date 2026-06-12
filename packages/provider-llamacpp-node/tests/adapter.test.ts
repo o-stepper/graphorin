@@ -239,7 +239,6 @@ describe('llamaCppNodeAdapter — real default sessionFactory (PS-3)', () => {
 
 describe('llamaCppNodeAdapter — mid-stream error honesty (PS-4)', () => {
   const failingSession = async (): Promise<LlamaSessionInstance> => ({
-    // biome-ignore lint/correctness/useYield: the fixture throws after one chunk
     async *promptStreamingResponse(): AsyncIterable<string> {
       yield 'partial ';
       throw new Error('cuda device lost');

@@ -245,7 +245,7 @@ describe('redactionValidatorOnGenAiAttributes', () => {
     });
     await tracer.shutdown();
     const events = records[0]?.events ?? [];
-    const content = String(events[0]?.attributes['content'] ?? '');
+    const content = String(events[0]?.attributes.content ?? '');
     expect(content).not.toContain('sk-ABCDE1234567890ABCDEFGHIJ');
     expect(content).toContain('[REDACTED openai-key]');
     expect(tracer.getMetrics().matchesByPattern['openai-key']).toBeGreaterThan(0);
@@ -322,7 +322,7 @@ describe('genAiPerformanceBudget', () => {
     // GitHub-hosted Ubuntu / Windows runner does not. The measured
     // values are still emitted so a future regression is visible in
     // the test output.
-    if (process.env['CI'] === 'true') {
+    if (process.env.CI === 'true') {
       // Surface the numbers so they show up in CI logs.
       console.log(
         `[genAiPerformanceBudget] CI mean provider=${meanProviderUs.toFixed(1)} µs, tool=${meanToolUs.toFixed(1)} µs (strict assertion skipped; see pnpm run benchmark:ci)`,

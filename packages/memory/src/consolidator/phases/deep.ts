@@ -96,7 +96,23 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
       let totalTokens = 0;
       let totalCost = 0;
 
+      // MCON-9: a judge call that throws or returns garbage must not be
+      // re-billed forever. First failure stamps `attemptedAt`; a failure
+      // on an already-attempted row closes it (`'judge-unparseable'`),
+      // so a poisoned row costs at most two calls across all runs.
+      const recordJudgeFailure = async (r: (typeof pending)[number]): Promise<void> => {
+        if (r.attemptedAt !== null) {
+          await conflicts.markResolved(r.id, 'judge-unparseable');
+        } else if (typeof conflicts.markAttempted === 'function') {
+          await conflicts.markAttempted(r.id);
+        }
+      };
+
       for (const row of pending) {
+        // MCON-9: mirror the standard/reflect phases — once the budget
+        // pauses mid-run, stop spending instead of draining up to
+        // maxConflictsPerRun calls past the ceiling.
+        if (deps.budget.snapshot().paused) break;
         const candidateText = row.candidateText;
         const conflictingId = row.conflictingIds[0] ?? null;
         let existingText: string | null = null;
@@ -110,6 +126,7 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
           response = await deps.provider.generate(request);
         } catch (err) {
           span.recordException(err);
+          await recordJudgeFailure(row);
           continue;
         }
         const usage = response.usage;
@@ -125,7 +142,10 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
         deps.budget.record({ phase: 'deep', tokens, costUsd: cost });
 
         const judge = parseJudge(response.text);
-        if (judge === null) continue;
+        if (judge === null) {
+          await recordJudgeFailure(row);
+          continue;
+        }
 
         if (judge.decision === 'supersede' && conflictingId !== null) {
           if (typeof semantic.get === 'function') {
@@ -197,6 +217,8 @@ function buildJudgeRequest(
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: JUDGE_PROMPT,
     temperature: 0,
+    // MCON-14: per-call output cap — the verdict shape is tiny.
+    maxTokens: 256,
     metadata: {
       userId: deps.scope.userId,
       ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),

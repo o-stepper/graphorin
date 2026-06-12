@@ -95,6 +95,8 @@ interface ExtractedFact {
   readonly predicate?: string;
   readonly object?: string;
   readonly confidence?: number;
+  /** Raw `[1, 10]` importance as returned by the model, pre-normalization (MCON-12). */
+  readonly importance?: number;
 }
 
 /** Parsed episode-summary payload (P1-2). */
@@ -108,9 +110,20 @@ const EXTRACTION_SYSTEM_PROMPT = [
   'You are a memory-extraction assistant for a long-running personal-assistant runtime.',
   'Read the supplied conversation slice and return the durable facts it asserts about the user, the world, or stable preferences.',
   'Skip greetings, banter, transient state, and anything the assistant produced as boilerplate.',
-  'Return a single JSON object: { "facts": [{ "text": string, "subject"?: string, "predicate"?: string, "object"?: string, "confidence"?: number }] }.',
+  'For each fact also rate how important it is for remembering the user, on an integer scale from 1 (incidental detail) to 10 (identity-defining).',
+  'Return a single JSON object: { "facts": [{ "text": string, "subject"?: string, "predicate"?: string, "object"?: string, "confidence"?: number, "importance"?: number }] }.',
   'If the slice contains no durable facts, return { "facts": [] }.',
 ].join(' ');
+
+/**
+ * Per-call output-token ceilings (MCON-14). `BudgetTracker.record()`
+ * only runs AFTER `provider.generate` returns, so without a request cap
+ * a degenerate model response could blow through the daily ceiling in a
+ * single call before `pause` can take effect. All consolidator output
+ * shapes are small and well-defined; the caps are deliberately roomy.
+ */
+const EXTRACTION_MAX_TOKENS = 1024;
+const EPISODE_MAX_TOKENS = 512;
 
 const EPISODE_SUMMARY_SYSTEM_PROMPT = [
   'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
@@ -467,6 +480,7 @@ function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequ
     ],
     systemMessage: EXTRACTION_SYSTEM_PROMPT,
     temperature: 0,
+    maxTokens: EXTRACTION_MAX_TOKENS,
     metadata: {
       userId: deps.scope.userId,
       ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),
@@ -498,6 +512,7 @@ function buildEpisodeRequest(
       ? EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT
       : EPISODE_SUMMARY_SYSTEM_PROMPT,
     temperature: 0,
+    maxTokens: EPISODE_MAX_TOKENS,
     metadata: {
       userId: deps.scope.userId,
       ...(deps.scope.sessionId !== undefined ? { sessionId: deps.scope.sessionId } : {}),
@@ -555,6 +570,7 @@ export function parseExtraction(text: string | undefined): ReadonlyArray<Extract
       ...(typeof obj.predicate === 'string' ? { predicate: obj.predicate } : {}),
       ...(typeof obj.object === 'string' ? { object: obj.object } : {}),
       ...(typeof obj.confidence === 'number' ? { confidence: obj.confidence } : {}),
+      ...(typeof obj.importance === 'number' ? { importance: obj.importance } : {}),
     };
     out.push(fact);
   }
@@ -636,6 +652,10 @@ function sliceJsonObject(text: string): string | null {
  * recall until validated).
  */
 function buildFactInput(fact: ExtractedFact): FactInput {
+  // MCON-12: normalize the model's raw [1, 10] importance into the
+  // [0.1, 1.0] store scale (same contract as episodes); non-finite raw
+  // scores drop the signal rather than fabricating one.
+  const importance = normalizeImportance(fact.importance);
   return {
     text: fact.text,
     provenance: 'extraction',
@@ -643,6 +663,7 @@ function buildFactInput(fact: ExtractedFact): FactInput {
     ...(fact.predicate !== undefined ? { predicate: fact.predicate } : {}),
     ...(fact.object !== undefined ? { object: fact.object } : {}),
     ...(fact.confidence !== undefined ? { confidence: fact.confidence } : {}),
+    ...(importance !== undefined ? { importance } : {}),
   };
 }
 

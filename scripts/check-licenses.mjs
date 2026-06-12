@@ -412,9 +412,7 @@ async function main() {
     }
   }
   console.error('');
-  console.error(
-    'Allowed SPDX identifiers (dependency pass): ' + [...ALLOWED].sort().join(', ') + '.',
-  );
+  console.error(`Allowed SPDX identifiers (dependency pass): ${[...ALLOWED].sort().join(', ')}.`);
   console.error(
     'If a dependency must ship under a non-allowlisted license, add it to DEPENDENCY_EXCEPTIONS in scripts/check-licenses.mjs with a one-line justification (the entry is auditable in `git log`).',
   );

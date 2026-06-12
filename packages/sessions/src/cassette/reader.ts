@@ -84,7 +84,7 @@ export function readToolCassette(body: string): ToolCassetteReadResult {
     } catch {
       throw new CassetteFormatInvalidError(`malformed JSONL on line ${i + 1}`);
     }
-    if (parsed['kind'] === 'footer') {
+    if (parsed.kind === 'footer') {
       footer = parsed as unknown as ToolCassetteFooterRecord;
       continue;
     }
@@ -140,19 +140,19 @@ function parseHeader(line: string): ToolCassetteMetaRecord {
   } catch {
     throw new CassetteFormatInvalidError('meta header is not valid JSON');
   }
-  if (parsed['kind'] !== 'meta') {
+  if (parsed.kind !== 'meta') {
     throw new CassetteFormatInvalidError(
-      `expected line 1 to be { kind: 'meta', ... } (got kind=${String(parsed['kind'])})`,
+      `expected line 1 to be { kind: 'meta', ... } (got kind=${String(parsed.kind)})`,
     );
   }
-  if (parsed['format'] !== TOOL_CASSETTE_FORMAT) {
+  if (parsed.format !== TOOL_CASSETTE_FORMAT) {
     throw new CassetteFormatInvalidError(
-      `expected format='${TOOL_CASSETTE_FORMAT}' (got format='${String(parsed['format'])}')`,
+      `expected format='${TOOL_CASSETTE_FORMAT}' (got format='${String(parsed.format)}')`,
     );
   }
-  if (typeof parsed['version'] !== 'string' || !/^\d+\.\d+$/.test(parsed['version'])) {
+  if (typeof parsed.version !== 'string' || !/^\d+\.\d+$/.test(parsed.version)) {
     throw new CassetteFormatInvalidError(
-      `expected version to be 'MAJOR.MINOR' (got '${String(parsed['version'])}')`,
+      `expected version to be 'MAJOR.MINOR' (got '${String(parsed.version)}')`,
     );
   }
   return parsed as unknown as ToolCassetteMetaRecord;
@@ -184,7 +184,7 @@ function parseBodyRecord(
   parsed: Readonly<Record<string, unknown>>,
   warnings: { kind: 'unknown-record' | 'schema-future-minor'; message: string }[],
 ): ToolCassetteParsedRecord {
-  const kind = parsed['kind'];
+  const kind = parsed.kind;
   if (typeof kind !== 'string') {
     throw new CassetteFormatInvalidError('body record missing string `kind`');
   }

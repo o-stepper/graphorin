@@ -309,16 +309,80 @@ describe('runIterativeRetrieval (P2-4)', () => {
     expect(retrieveCalls).toHaveLength(1);
   });
 
-  it('accumulates + dedups hits across passes in discovery order', async () => {
+  it('accumulates + dedups hits across passes (interleaved when no fuse is supplied)', async () => {
     const grader = scriptGrader([insufficient('r1'), SUFFICIENT]);
     const { deps } = makeDeps({ q: ['a', 'b'], r1: ['b', 'c'] }, grader);
     const all = await runIterativeRetrieval('q', deps, { forceHard: true });
     expect(all.hits.map((h) => h.id)).toEqual(['a', 'b', 'c']);
+  });
 
-    const grader2 = scriptGrader([insufficient('r1'), SUFFICIENT]);
-    const { deps: deps2 } = makeDeps({ q: ['a', 'b'], r1: ['b', 'c'] }, grader2);
-    const capped = await runIterativeRetrieval('q', deps2, { forceHard: true, maxResults: 2 });
-    expect(capped.hits.map((h) => h.id)).toEqual(['a', 'b']);
+  it('a pass-2 find reaches both the grade window and the final cut when pass 1 saturates (MRET-2)', async () => {
+    // Pass 1 fills the whole default grade window (8) AND the final cut
+    // with noise; the answer only arrives on the reformulation pass.
+    const noise = Array.from({ length: 10 }, (_, i) => `n${i}`);
+    const windows: string[][] = [];
+    let calls = 0;
+    const grader: RetrievalGrader = {
+      async grade(_q, snippets) {
+        windows.push([...snippets]);
+        calls += 1;
+        return calls === 1 ? insufficient('better query') : SUFFICIENT;
+      },
+    };
+    const { deps } = makeDeps({ q: noise, 'better query': ['answer', 'n0'] }, grader);
+    const r = await runIterativeRetrieval('q', deps, { forceHard: true, maxResults: 5 });
+    expect(r.sufficient).toBe(true);
+    // The re-grade window is NOT byte-identical to grade 1's — the
+    // pass-2 answer snippet is in it (the old flat slice replayed
+    // pass 1's head forever and the loop span to the cap).
+    expect(windows[1]).toContain('text:answer');
+    // And the answer survives the maxResults cut instead of being
+    // dropped behind 10 discovery-ordered noise hits.
+    expect(r.hits.map((h) => h.id)).toContain('answer');
+  });
+
+  it('always grades against the ORIGINAL question; reformulations ride as tried-context (MRET-11)', async () => {
+    const graded: Array<{ query: string; tried: ReadonlyArray<string> | undefined }> = [];
+    let calls = 0;
+    const grader: RetrievalGrader = {
+      async grade(q, _snippets, opts) {
+        graded.push({ query: q, tried: opts?.triedQueries });
+        calls += 1;
+        return calls === 1 ? insufficient('narrow sub-question') : SUFFICIENT;
+      },
+    };
+    const { deps } = makeDeps({ q: ['a'], 'narrow sub-question': ['b'] }, grader);
+    await runIterativeRetrieval('q', deps, { forceHard: true });
+    expect(graded[0]?.query).toBe('q');
+    // The re-grade is judged against the ORIGINAL question — never the
+    // narrowed reformulation (premature sufficient=true otherwise).
+    expect(graded[1]?.query).toBe('q');
+    expect(graded[1]?.tried).toEqual(['narrow sub-question']);
+  });
+
+  it('re-fuses per-pass lists through the injected fuse before the cut (MRET-2)', async () => {
+    const grader = scriptGrader([insufficient('r1'), SUFFICIENT]);
+    const { deps } = makeDeps({ q: ['a', 'b'], r1: ['c', 'a'] }, grader);
+    // A fuse that ranks by cross-pass frequency then by name puts the
+    // consensus hit first — the cut keeps it even at maxResults 1.
+    const fused = await runIterativeRetrieval(
+      'q',
+      {
+        ...deps,
+        fuse: (lists) => {
+          const score = new Map<string, number>();
+          for (const list of lists) {
+            for (const hit of list) score.set(hit.id, (score.get(hit.id) ?? 0) + 1);
+          }
+          const byId = new Map(lists.flat().map((h) => [h.id, h]));
+          return [...byId.values()].sort(
+            (x, y) => (score.get(y.id) ?? 0) - (score.get(x.id) ?? 0) || x.id.localeCompare(y.id),
+          );
+        },
+      },
+      { forceHard: true, maxResults: 1 },
+    );
+    expect(fused.hits.map((h) => h.id)).toEqual(['a']); // seen by BOTH passes
   });
 });
 
