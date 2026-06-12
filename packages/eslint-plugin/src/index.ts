@@ -54,22 +54,51 @@ export const rules = {
   'tool-parameter-naming': toolParameterNaming,
 } as const;
 
-export const configs = {
-  recommended: {
-    plugins: ['@graphorin'],
-    rules: {
-      '@graphorin/no-bare-tool-exec': 'warn',
-      '@graphorin/no-implicit-network-call': 'error',
-      '@graphorin/no-secret-in-deps': 'error',
-      '@graphorin/no-secret-unwrap': 'error',
-      '@graphorin/no-third-party-workflow-aliases': 'error',
-      '@graphorin/provider-middleware-order': 'error',
-      '@graphorin/tool-description-required': 'error',
-      '@graphorin/tool-examples-recommended': 'warn',
-      '@graphorin/tool-parameter-naming': 'warn',
-    },
-  },
+/** Shared severity map for both the legacy and flat recommended presets. */
+const RECOMMENDED_RULES = {
+  '@graphorin/no-bare-tool-exec': 'warn',
+  '@graphorin/no-implicit-network-call': 'error',
+  '@graphorin/no-secret-in-deps': 'error',
+  '@graphorin/no-secret-unwrap': 'error',
+  '@graphorin/no-third-party-workflow-aliases': 'error',
+  '@graphorin/provider-middleware-order': 'error',
+  '@graphorin/tool-description-required': 'error',
+  '@graphorin/tool-examples-recommended': 'warn',
+  '@graphorin/tool-parameter-naming': 'warn',
 } as const;
+
+/**
+ * PS-17: ship BOTH config shapes. `recommended` is the legacy `.eslintrc` form
+ * (`plugins: ['@graphorin']`); `flat/recommended` is the ESLint 9+ flat-config
+ * form that maps the namespace to the plugin object, so flat-config consumers
+ * can `...plugin.configs['flat/recommended']` instead of hand-wiring ten rules.
+ */
+const plugin: {
+  readonly meta: typeof meta;
+  readonly rules: typeof rules;
+  readonly configs: {
+    readonly recommended: {
+      readonly plugins: readonly string[];
+      readonly rules: typeof RECOMMENDED_RULES;
+    };
+    readonly 'flat/recommended': {
+      plugins: Record<string, unknown>;
+      readonly rules: typeof RECOMMENDED_RULES;
+    };
+  };
+} = {
+  meta,
+  rules,
+  configs: {
+    recommended: { plugins: ['@graphorin'], rules: RECOMMENDED_RULES },
+    // `plugins` is filled in below — the flat form maps the namespace to the
+    // plugin object itself, which must exist first.
+    'flat/recommended': { plugins: {}, rules: RECOMMENDED_RULES },
+  },
+};
+plugin.configs['flat/recommended'].plugins = { '@graphorin': plugin };
+
+export const configs = plugin.configs;
 
 export {
   AMBIGUOUS_PARAMETER_NAMES,
@@ -83,7 +112,5 @@ export {
   runToolRules,
   type ToolGraderScore,
 } from './tool-discovery.js';
-
-const plugin = { meta, rules, configs };
 
 export default plugin;

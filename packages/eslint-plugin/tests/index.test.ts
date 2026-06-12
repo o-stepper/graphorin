@@ -1,3 +1,6 @@
+import { dirname } from 'node:path';
+
+import { Linter } from 'eslint';
 import { describe, expect, it } from 'vitest';
 
 import plugin, { meta, rules, VERSION } from '../src/index.js';
@@ -59,5 +62,31 @@ describe('@graphorin/eslint-plugin', () => {
       '@graphorin/no-third-party-workflow-aliases': 'error',
       '@graphorin/no-bare-tool-exec': 'warn',
     });
+  });
+
+  it('ships a flat-config recommended preset for ESLint 9+ (PS-17)', () => {
+    const flat = plugin.configs['flat/recommended'];
+    expect(flat).toBeDefined();
+    // Flat config maps the namespace to the plugin OBJECT, not the `['@graphorin']`
+    // string the legacy `.eslintrc` form uses.
+    expect(flat.plugins['@graphorin']).toBe(plugin);
+    expect(flat.rules).toEqual(plugin.configs.recommended.rules);
+    // The legacy form is retained for ESLint <9.
+    expect(plugin.configs.recommended.plugins).toEqual(['@graphorin']);
+
+    // Smoke: a flat-config array spreading the preset lints a fixture and the
+    // rules fire (the whole point — flat-config consumers couldn't use the
+    // string-array `recommended`). `cwd` must prefix the `files` glob match.
+    const filename = '/repo/packages/example/src/example.js';
+    const linter = new Linter({ cwd: dirname(filename) });
+    const messages = linter.verify(
+      `await fetch('https://example.com');`,
+      [
+        { files: ['**/*.js'], languageOptions: { ecmaVersion: 2023, sourceType: 'module' } },
+        flat as Linter.Config,
+      ],
+      filename,
+    );
+    expect(messages.some((m) => m.ruleId === '@graphorin/no-implicit-network-call')).toBe(true);
   });
 });
