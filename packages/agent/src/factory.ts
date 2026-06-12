@@ -573,15 +573,35 @@ function handleProviderEvent(
     }
     case 'tool-call-end': {
       const acc = state.calls.get(ev.toolCallId);
-      const toolName = acc?.toolName ?? '';
-      state.finalCalls.push({ toolCallId: ev.toolCallId, toolName, args: ev.finalArgs });
+      if (acc === undefined) {
+        // AG-26: an end without a matching start has no tool name — the
+        // old path dispatched it as the unknown tool ''. Drop it loudly.
+        process.stderr.write(
+          `[graphorin/agent] dropped tool-call-end '${ev.toolCallId}' with no matching tool-call-start.\n`,
+        );
+        return {};
+      }
+      state.finalCalls.push({
+        toolCallId: ev.toolCallId,
+        toolName: acc.toolName,
+        args: ev.finalArgs,
+      });
       return {
         emit: { type: 'tool.call.end', toolCallId: ev.toolCallId, finalArgs: ev.finalArgs },
       };
     }
+    // AG-26: provider-generated files / citations are consumer-observable
+    // events instead of silently vanishing.
     case 'file':
+      return { emit: { type: 'file.generated', mimeType: ev.mimeType, data: ev.data } };
     case 'source':
-      return {};
+      return {
+        emit: {
+          type: 'source.cited',
+          uri: ev.uri,
+          ...(ev.title !== undefined ? { title: ev.title } : {}),
+        },
+      };
     case 'finish':
       return { usage: ev.usage, finished: true };
     case 'error':
@@ -2251,7 +2271,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     }
 
     if (state.status === 'running') {
-      state.status = 'completed';
+      // AG-24: the loop exited via the stop condition (default
+      // isStepCount(50)) with work still pending — that is a CUT run,
+      // not a completion. Surface it as a typed failure so consumers
+      // can tell it apart from a clean finish.
+      const message = `run stopped by stop condition: ${stopWhen.description}`;
+      state.status = 'failed';
+      state.error = { message, code: 'stop-condition' };
+      yield { type: 'agent.error', error: { message, code: 'stop-condition' } };
     }
     // AG-3: structured output is parsed + validated on the completed
     // path — a failure is a typed run failure (`output-validation-failed`),

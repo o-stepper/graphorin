@@ -46,6 +46,8 @@ export type AgentEvent<TOutput = string> =
   | AgentProgressWrittenEvent
   | AgentProgressReadEvent
   | AgentLateralLeakDetectedEvent
+  | FileGeneratedEvent
+  | SourceCitedEvent
   | StepEndEvent
   | GuardrailTrippedEvent
   | AgentEndEvent<TOutput>
@@ -206,6 +208,30 @@ export interface HandoffEvent {
   readonly fromAgentId: string;
   readonly toAgentId: string;
   readonly reason?: string;
+}
+
+/**
+ * A provider-generated file surfaced from the model stream (AG-26) —
+ * previously these `'file'` provider events were silently dropped.
+ *
+ * @stable
+ */
+export interface FileGeneratedEvent {
+  readonly type: 'file.generated';
+  readonly mimeType: string;
+  readonly data: Uint8Array;
+}
+
+/**
+ * A provider citation surfaced from the model stream (AG-26) —
+ * previously these `'source'` provider events were silently dropped.
+ *
+ * @stable
+ */
+export interface SourceCitedEvent {
+  readonly type: 'source.cited';
+  readonly uri: string;
+  readonly title?: string;
 }
 
 /** @stable */
