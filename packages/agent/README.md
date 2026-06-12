@@ -78,10 +78,12 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   returns a serializable `HandoffInputFilterDescriptor` so the
   JSONL session export can replay it byte-equal.
 - **Cancellation.** `agent.abort({ drain, onPendingApprovals })` —
-  hard-kill default with 50 ms grace; `drain: true` waits for the
-  current step to complete; pending approvals can be auto-denied
-  (`'deny'` default), held (`'hold'`), or raised as an error
-  (`'fail'`).
+  the default hard-kills the in-flight provider stream mid-event;
+  `drain: true` lets the current step's stream finish (reach its step
+  boundary) before stopping. A mid-stream abort ends the run as
+  `'aborted'` (a cancellation), never a failed run. Pending approvals
+  can be auto-denied (`'deny'` default), held (`'hold'`), or raised as
+  an error (`'fail'`).
 - **Reasoning preservation.** Anthropic Claude tool-use loops
   round-trip `reasoning` content parts (with opaque `meta` such as
   `signature` / `data`) into the next provider call when the

@@ -314,7 +314,12 @@ export interface AgentToToolOptions {
  * @stable
  */
 export interface AbortOptions {
-  /** Wait for the current step to complete before stopping. */
+  /**
+   * When `true`, let the in-flight provider stream finish (the current step
+   * reaches its boundary) instead of interrupting it mid-event, then stop at the
+   * next step. Default `false` hard-kills the in-flight stream immediately. (The
+   * step's tool calls still observe the cancellation once the signal is set.)
+   */
   readonly drain?: boolean;
   /**
    * What to do with approvals that were already requested but not
