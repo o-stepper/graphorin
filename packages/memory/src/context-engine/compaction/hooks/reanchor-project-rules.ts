@@ -33,7 +33,7 @@ export function reanchorProjectRules(
       const lines = ['<memory_rules anchor="post-compaction">'];
       for (const rule of filtered) {
         lines.push(
-          `  <rule priority="${rule.priority}" tags="${(rule.tags ?? []).join(',')}">${escapeXml(rule.text)}</rule>`,
+          `  <rule priority="${rule.priority}" tags="${escapeXml((rule.tags ?? []).join(','))}">${escapeXml(rule.text)}</rule>`,
         );
       }
       lines.push('</memory_rules>');

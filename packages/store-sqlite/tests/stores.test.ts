@@ -183,6 +183,49 @@ describe('createSqliteStore', () => {
     expect(await semantic.get('fact-x')).toBeNull();
   });
 
+  it('semantic memory: purge() of a graph-linked fact removes the fact + its entity links, keeps the entity (CS-1)', async () => {
+    const scope = { userId: 'alex', sessionId: 's1' };
+    const fact = {
+      id: 'fact-graph',
+      kind: 'semantic' as const,
+      userId: 'alex',
+      sensitivity: 'internal' as const,
+      text: 'Alex lives in Tbilisi',
+      subject: 'Alex',
+      predicate: 'lives_in',
+      object: 'Tbilisi',
+      createdAt: new Date().toISOString(),
+    };
+    const semantic = store.memory.semantic as unknown as {
+      get(id: string): Promise<typeof fact | null>;
+      purge(id: string, reason?: string): Promise<void>;
+      remember(f: typeof fact): Promise<void>;
+    };
+    await semantic.remember(fact);
+    // Link the fact to a canonical entity, exactly as on-write resolution does
+    // when graph.entityResolution is enabled. This is what makes purge() trip
+    // the fact_entities → facts(id) foreign key with no ON DELETE clause.
+    const entityId = await store.memory.graph.upsertEntity(scope, {
+      name: 'Tbilisi',
+      normalizedName: 'tbilisi',
+    });
+    await store.memory.graph.linkFactEntity('fact-graph', entityId, 'object');
+    expect(
+      store.connection.all('SELECT 1 FROM fact_entities WHERE fact_id = ?', ['fact-graph']).length,
+    ).toBe(1);
+
+    // Pre-fix: DELETE FROM facts throws FOREIGN KEY constraint failed and the
+    // whole purge transaction (incl. the PURGE audit row) rolls back.
+    await semantic.purge('fact-graph', 'gdpr-request');
+
+    expect(await semantic.get('fact-graph')).toBeNull();
+    expect(
+      store.connection.all('SELECT 1 FROM fact_entities WHERE fact_id = ?', ['fact-graph']).length,
+    ).toBe(0);
+    // The canonical entity is shared data, not the purged subject — it stays.
+    expect(await store.memory.graph.getEntity(scope, entityId)).not.toBeNull();
+  });
+
   it('episodic memory: archive extension method', async () => {
     const ep = {
       id: 'ep-x',

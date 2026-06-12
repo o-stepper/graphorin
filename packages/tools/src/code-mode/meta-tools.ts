@@ -146,7 +146,7 @@ function buildExecuteDescription(projection: CodeApiProjection): string {
   return [
     'Run a JavaScript snippet that orchestrates several tool calls in a sandbox and returns only the final result. Prefer this over calling tools one at a time when a task needs multiple tool calls whose intermediate outputs you do not need to read: the intermediates stay inside the sandbox and never enter the conversation, so large or numerous results do not consume your context.',
     '',
-    'Write the body of an async function. Call a tool with `await tools.NAME(args)` (use `await tools["NAME"](args)` for names containing dots). `return` your final answer — any JSON-serialisable value; only the returned value comes back. Tool arguments and results must be JSON-serialisable. There is no network or filesystem access inside the sandbox.',
+    'Write the body of an async function. Call a tool with `await tools.NAME(args)` (use `await tools["NAME"](args)` for names containing dots). `return` your final answer — any JSON-serialisable value; only the returned value comes back. Tool arguments and results must be JSON-serialisable. The script runs in an isolated worker thread: network and filesystem access are blocked (best-effort) and host environment variables are not available — `process.env` is empty. The only way to reach the outside world is through the `tools` object.',
     '',
     'Example source:',
     '  const orders = await tools.list_orders({ customerId: "c1" });',

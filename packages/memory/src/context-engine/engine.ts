@@ -727,7 +727,8 @@ function renderAutoRecalledFacts(facts: ReadonlyArray<Fact>): string {
   if (facts.length === 0) return '';
   const lines = ['<auto_recalled_facts>'];
   for (const fact of facts) {
-    const tagsAttr = fact.tags !== undefined ? ` tags="${(fact.tags ?? []).join(',')}"` : '';
+    const tagsAttr =
+      fact.tags !== undefined ? ` tags="${escapeXmlAttr((fact.tags ?? []).join(','))}"` : '';
     lines.push(
       `  <fact id="${escapeXmlAttr(fact.id)}"${tagsAttr}>${escapeXmlText(fact.text)}</fact>`,
     );

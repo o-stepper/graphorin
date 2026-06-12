@@ -43,7 +43,7 @@ The audit log is encrypted-at-rest and SHA-256 hash-chained. Tampering breaks th
 
 ### 9. The runtime is durable
 
-Workflows checkpoint after every step. Agent runs serialise to JSON. Pending approvals can survive a process restart on a different machine.
+Workflows checkpoint after every step. Agent runs serialise to JSON. Pending approvals can survive a process restart on a different machine. (One current limit: a granted approval resumed on another machine is recorded but the approved tool is not re-executed yet — see the caveat in [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).)
 
 ### 10. Human-in-the-loop is a primitive
 

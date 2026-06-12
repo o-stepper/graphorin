@@ -2,7 +2,7 @@
 /**
  * mvp-readiness.mjs
  *
- * Single entry point that runs the v0.4.0 release-readiness gates
+ * Single entry point that runs the release-readiness gates
  * end-to-end. Used both locally (`pnpm run mvp-readiness`) and from
  * the release CI workflow before any package gets published.
  *
@@ -16,8 +16,9 @@
  *   6. check-anthropic-spec — `pnpm run check-anthropic-spec` (Skills format snapshot drift)
  *   7. check-licenses    — `pnpm run check-licenses`   (SPDX allowlist enforcement)
  *   8. workspace audit   — every published @graphorin/* package has a non-stub
- *                          version 0.4.0, license MIT, author Oleksiy Stepurenko,
- *                          publishConfig.provenance true, and no `private: true` flag.
+ *                          version matching the root manifest (lockstep), license
+ *                          MIT, author Oleksiy Stepurenko, publishConfig.provenance
+ *                          true, and no `private: true` flag.
  *
  * Flags:
  *   --skip-build     skip gates 3 + 4 (build + test). Useful for a fast
@@ -33,6 +34,7 @@
  */
 
 import { spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import process from 'node:process';
@@ -43,7 +45,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..');
 const PACKAGES_DIR = join(ROOT, 'packages');
-const REQUIRED_VERSION = '0.4.0';
+// CI-4: the reference version is the root manifest's version, not a hardcoded
+// literal. Every published package must match the root (lockstep), so when a
+// version PR bumps the root the gate moves with it — otherwise the gate would
+// reject the very release it produced (e.g. after 0.4.0 → 0.4.1 every package
+// would read `version !== '0.4.0'` and fail before the publish step).
+const REQUIRED_VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 const REQUIRED_AUTHOR = 'Oleksiy Stepurenko';
 const REQUIRED_LICENSE = 'MIT';
 
@@ -273,7 +280,9 @@ async function main() {
     for (const line of lines) console.log(line);
     console.log('==============================');
     if (overallOk) {
-      console.log('mvp-readiness: PASS — every gate is green; v0.4.0 is release-shaped.');
+      console.log(
+        `mvp-readiness: PASS — every gate is green; v${REQUIRED_VERSION} is release-shaped.`,
+      );
     } else {
       console.error(
         `mvp-readiness: FAIL — gate '${results.find((r) => !r.ok)?.gate ?? '<unknown>'}' failed; remaining gates skipped.`,

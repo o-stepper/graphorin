@@ -211,7 +211,7 @@ async function* streamFromVercel(
   } catch (cause) {
     throw new ProviderHttpError({
       providerName,
-      status: 0,
+      status: statusFromCause(cause),
       message: 'streamText() failed before yielding any chunks',
       cause,
     });
@@ -330,7 +330,7 @@ async function generateFromVercel(
   } catch (cause) {
     throw new ProviderHttpError({
       providerName,
-      status: 0,
+      status: statusFromCause(cause),
       message: 'generateText() rejected',
       cause,
     });
@@ -383,6 +383,24 @@ function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
 
 function pickString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
+}
+
+/**
+ * Lift a real HTTP status from a rejected AI SDK call (PS-2). The SDK's
+ * `APICallError` carries a numeric `statusCode`; surfacing it lets
+ * `withRetry` / `withFallback` see a genuine 429 / 5xx instead of the
+ * `status: 0` network-error placeholder. Returns `0` when no status is
+ * present (a true transport-level failure or an abort) — `0` is itself
+ * retryable / fallback-eligible by default, while an abort is excluded by
+ * the predicates via the wrapped `cause`.
+ */
+function statusFromCause(cause: unknown): number {
+  if (cause !== null && typeof cause === 'object') {
+    const c = cause as { statusCode?: unknown; status?: unknown };
+    if (typeof c.statusCode === 'number' && Number.isFinite(c.statusCode)) return c.statusCode;
+    if (typeof c.status === 'number' && Number.isFinite(c.status)) return c.status;
+  }
+  return 0;
 }
 
 function mapFinishReason(value: string | undefined): FinishReason {

@@ -132,6 +132,12 @@ When the OS keychain is not available (servers, containers, headless CI), `Encry
 
 The store is selected through the `--secrets-source encrypted-file` flag, the matching `secrets.source` config field, or the `createSecretsStore({ kind: 'encrypted-file', ... })` factory. The master passphrase resolves through a `SecretRef` (typically `env:GRAPHORIN_MASTER_PASSPHRASE` or `file:///path/to/passphrase`) so it is never embedded in plain config.
 
+**Durability and recovery.** The store treats the bundle as precious data:
+
+- **Fail-loud on a wrong passphrase or corruption.** A read that fails because the passphrase is wrong (or rotated), or because the bundle is tampered, truncated, or malformed, **throws** — it never silently re-initialises an empty bundle. A fresh empty bundle is created only when the file genuinely does not exist yet (`ENOENT`). This means a mistyped/rotated `GRAPHORIN_MASTER_PASSPHRASE` surfaces as an error on the next `get`/`set`/`delete` rather than wiping every stored secret. **Recovery:** restore the correct passphrase — the on-disk bundle is left untouched by a failed write.
+- **Atomic writes.** Every write goes to a temp sibling (`<path>.tmp`, mode `0o600`) and is then `rename`d onto the target, so a crash mid-write can never truncate or corrupt the existing bundle; a reader only ever sees the old or the new file in full.
+- **In-process single-writer guard.** Concurrent `set`/`delete` calls on one store instance are serialised so their read-modify-write cycles cannot interleave and clobber each other. Cross-process concurrent writers are out of scope (the atomic rename still rules out corruption — worst case is last-write-wins).
+
 ## Optional 1Password adapter
 
 The `@graphorin/secret-1password` package is an optional reference adapter that delegates to the system [1Password CLI (`op`)](https://developer.1password.com/docs/cli/get-started/). It does **not** bundle the CLI — install the binary yourself. The adapter exposes a `SecretResolver` for the canonical `op://` URI scheme defined by 1Password:

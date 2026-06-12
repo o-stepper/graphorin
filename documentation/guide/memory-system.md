@@ -88,12 +88,12 @@ Everything above runs **fully offline** with no provider. The richer capabilitie
 | `block_append` | working | Append text to a working memory block. |
 | `block_replace` | working | Replace a unique substring inside a block. |
 | `block_rethink` | working | Replace a block's value entirely. |
-| `fact_remember` | semantic | Persist a new fact through the multi-stage conflict pipeline. |
+| `fact_remember` | semantic | Persist a new fact through the multi-stage conflict pipeline. Its output reports `quarantined` (and a `quarantineReason` of `injection` / `synthesized`) so a poisoned write cannot pass for a normally-stored one. |
 | `fact_search` | semantic | Hybrid (vector + FTS5 + RRF) search over facts. Accepts an `asOf` instant for point-in-time reads. |
 | `fact_supersede` | semantic | Mark an old fact superseded by a new one. |
 | `fact_forget` | semantic | Soft-delete a fact (kept for replay). |
 | `fact_history` | semantic | Trace a fact's bi-temporal supersede chain. |
-| `fact_validate` | semantic | Promote a quarantined fact to active (audited). |
+| `fact_validate` | semantic | Promote a quarantined fact to active (audited). **Approval-gated**, and it cannot promote an injection-flagged fact — see [quarantine](#memory-safety-provenance-quarantine). |
 | `recall_episodes` | episodic | Triple-signal episode retrieval. |
 | `conversation_search` | session | FTS5 search over the active session messages. |
 
@@ -232,10 +232,17 @@ Every fact (and episode, insight, induced procedure) carries:
 - a **`provenance`** tag — `user`, `tool`, `extraction`, `reflection`, `induction`, or `imported`; and
 - a retrieval-trust **`status`** — `active` or `quarantined`.
 
-*Derived* writes (consolidator extraction, reflection, workflow induction) and any candidate that trips the offline **injection heuristics** (`ignore previous instructions`, role-markup smuggling, secrecy / exfiltration directives) land `status: 'quarantined'` and are **excluded from default recall** until a human promotes them with `fact_validate`:
+*Derived* writes (consolidator extraction, reflection, workflow induction) and any candidate that trips the offline **injection heuristics** (`ignore previous instructions`, role-markup smuggling, secrecy / exfiltration directives) land `status: 'quarantined'` and are **excluded from default recall** until promoted. `fact_remember` reports the quarantine in its output (`quarantined: true` with a `quarantineReason` of `injection` or `synthesized`), so a poisoned write cannot masquerade as a normal one.
+
+Promotion is two-gated so the model cannot poison its own memory in one turn (`fact_remember(poison)` → `fact_validate(id)`):
+
+- The model-callable **`fact_validate` tool is approval-gated** (`needsApproval: true`): the run suspends for a human decision before any promotion runs.
+- `validate(...)` **re-checks the text against the injection heuristics and refuses** an injection-flagged fact with `QuarantinePromotionRefusedError`. Synthesized-but-clean writes promote normally; an injection-flagged fact is an **operator-only** decision and needs the explicit `force` flag from a trusted (non-agent) caller:
 
 ```ts
-await memory.semantic.validate(scope, factId); // quarantined → active, audited
+await memory.semantic.validate(scope, factId); // synthesized → active, audited
+// Injection-flagged facts are refused unless an operator forces, after review:
+await memory.semantic.validate(scope, factId, 'reviewed by operator', { force: true });
 
 // Review queue: surface quarantined rows explicitly.
 const pending = await memory.semantic.search(scope, '', { includeQuarantined: true });

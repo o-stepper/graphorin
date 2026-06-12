@@ -7,7 +7,7 @@
  */
 
 import { type OAuthAuditEvent, onOAuthAudit } from '../oauth/audit-emitter.js';
-import { appendAudit } from './append.js';
+import { appendAudit, reportDroppedAuditWrite } from './append.js';
 import type { AuditDb } from './audit-db.js';
 import type { AuditAction, AuditActor, AuditDecision, AuditEntryInput } from './types.js';
 
@@ -43,7 +43,8 @@ export function bridgeOAuthToAudit(opts: BridgeOAuthToAuditOptions): OAuthBridge
     tail = tail
       .then(() => appendAudit(opts.db, input))
       .catch((error) => {
-        opts.onWriteError?.(event, error);
+        if (opts.onWriteError !== undefined) opts.onWriteError(event, error);
+        else reportDroppedAuditWrite('oauth', error);
       });
   });
   const teardown = (): void => unsubscribe();

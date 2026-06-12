@@ -63,8 +63,8 @@ jobs:
         if: ${{ env.NPM_TOKEN != '' }}
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
-          publish: pnpm release
-          version: pnpm version
+          publish: pnpm run release
+          version: pnpm run version
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
         env:

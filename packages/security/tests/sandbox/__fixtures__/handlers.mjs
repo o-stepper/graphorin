@@ -34,3 +34,11 @@ export async function tryHttp() {
 export async function alwaysThrow() {
   throw new Error('fixture intentionally throws');
 }
+
+export async function readEnv(input) {
+  const name = input && input.name;
+  return {
+    value: (name && process.env[name]) ?? null,
+    keys: Object.keys(process.env),
+  };
+}

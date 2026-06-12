@@ -1,6 +1,6 @@
 ---
 title: Tools
-description: The typed tool({...}) builder, ToolRegistry, and ToolExecutor — parallel dispatch, approvals, sandbox enforcement, inbound sanitisation, and the memory-modification guard.
+description: The typed tool({...}) builder, ToolRegistry, and ToolExecutor — parallel dispatch, approvals, sandbox-policy resolution, inbound sanitisation, and the memory-modification guard.
 ---
 
 # Tools
@@ -9,7 +9,7 @@ description: The typed tool({...}) builder, ToolRegistry, and ToolExecutor — p
 
 - **`tool({...})`** — typed factory for declaring a Zod-validated tool. Inference flows from `inputSchema` / `outputSchema` into the `execute(input, ctx)` callback so you never repeat the input shape.
 - **`createToolRegistry(...)`** — strategy-aware registry that hosts every registered tool, with cross-source collision policies.
-- **`createToolExecutor(...)`** — runs `Tool[]` invocations with parallel-by-default dispatch, approval flow, sandbox enforcement, and a memory-modification guard.
+- **`createToolExecutor(...)`** — runs `Tool[]` invocations with parallel-by-default dispatch, approval flow, sandbox-policy resolution, and a memory-modification guard.
 
 ## Declaring a tool
 
@@ -50,7 +50,7 @@ Every tool declares two safety attributes plus an explicit approval predicate:
 | `sensitivity` | `'public'` / `'internal'` / `'secret'` | Whether the result may flow into traces and exports unredacted, and which providers may see it. |
 | `sideEffectClass` | `'pure'` / `'read-only'` / `'side-effecting'` / `'external-stateful'` | Idempotency-key requirements, audit emphasis, sandbox-tier defaults. |
 | `needsApproval` | `boolean` or `(input, ctx) => boolean \| Promise<boolean>` | Whether the runtime suspends the run with a `tool.approval.requested` event before executing the tool. |
-| `memoryGuardTier` | `MemoryGuardTier` (DEC-153) | The pre/post snapshot tier the executor enforces around the tool. |
+| `memoryGuardTier` | `MemoryGuardTier` (DEC-153) | Classification for the pre/post memory-snapshot guard. The snapshot/verify step is wired but **inert in the default agent build** until a scope-free memory-region reader lands. |
 | `preferredModel` | `'fast'` / `'balanced'` / `'smart'` or a `ModelSpec` | Per-tool model-tier hint. Resolved against the agent's tier map. |
 
 Approval is **driven by `needsApproval`**, not by `sideEffectClass`. The latter is a classification used for idempotency checks, sandbox defaults, and audit emphasis; whether a specific call gates on a human is the operator's decision.
@@ -165,7 +165,7 @@ What you get out of the box:
 
 ## Response budgets and pagination
 
-Every tool result is bounded by `maxResultTokens` (default **16384**). When a result exceeds the cap, the executor applies the tool's `truncationStrategy` (`'middle'` / `'tail'` / `'spill-to-file'` / `'summarize'`). The 16k default sits deliberately below the ~25k single-result norm some providers tolerate; raise it per tool when a tool legitimately returns more, or set `maxResultTokens: 0` to disable the cap (the registry emits a WARN — uncapped results can blow the context window):
+Every tool result is bounded by `maxResultTokens` (default **16384**) — **text and structured (object/array) outputs alike**. When a result exceeds the cap, the executor applies the tool's `truncationStrategy` (`'middle'` / `'tail'` / `'spill-to-file'` / `'summarize'`); the bounded text is what reaches the model, never the full object. A structured output on the default `'middle'` strategy is routed through **spill-to-file by default**, so the full blob is preserved behind a `read_result` handle while only a bounded preview enters context. The 16k default sits deliberately below the ~25k single-result norm some providers tolerate; raise it per tool when a tool legitimately returns more, or set `maxResultTokens: 0` to disable the cap (the registry emits a WARN — uncapped results can blow the context window):
 
 ```ts
 export const bigReport = tool({
@@ -241,11 +241,11 @@ projection.signatureFor('list_orders'); // `tools.list_orders = (input: {…}) =
 
 `createCodeExecuteTool({ projection, allowedTools, executeTool })` builds the `code_execute` tool. Its `executeTool` bridge is invoked for each `tools.<name>(args)` call the script makes; the agent wires it to `executor.executeOne(...)`, so a code-mode call is governed exactly like a direct one. `createCodeSearchTool({ projection, searchDeferred })` builds `code_search`, which returns matching signatures on demand.
 
-Execution itself is `runBridgedSource(...)` from `@graphorin/security/sandbox` — a `worker-threads`-tier primitive that evaluates the source as the body of an `async (tools) => { … }` function, exposes `tools` as RPC stubs that round-trip to the host `dispatch`, blocks network/filesystem, enforces a wall-clock timeout + memory ceiling + a tool-call budget, and returns **only** the script's final value. The worker can reach the host through nothing but the tool-call channel, and that channel serves only the `allowedTools` names — there is no path to the registry, the executor, or any other host object. As with the `worker-threads` sandbox tier, this is best-effort defence in depth, not a guarantee against process-level mischief by hostile code; layer `isolated-vm` / `docker` underneath when you need V8-grade isolation.
+Execution itself is `runBridgedSource(...)` from `@graphorin/security/sandbox` — a `worker-threads`-tier primitive that evaluates the source as the body of an `async (tools) => { … }` function, exposes `tools` as RPC stubs that round-trip to the host `dispatch`, blocks network/filesystem, enforces a wall-clock timeout + memory ceiling + a tool-call budget, and returns **only** the script's final value. The worker runs with an **empty environment**: it is constructed with `env: {}` and the runtime scrubs `process.env` before the script runs, so host environment variables (API keys, credentials) are never visible to model-written code. The worker can reach the host through nothing but the tool-call channel, and that channel serves only the `allowedTools` names — there is no path to the registry, the executor, or any other host object. As with the `worker-threads` sandbox tier, this is best-effort defence in depth, not a guarantee against process-level mischief by hostile code; layer `isolated-vm` / `docker` underneath when you need V8-grade isolation.
 
 ## Memory-modification guard
 
-Every tool declares a `memoryGuardTier`. The executor takes a snapshot of the affected memory region before the call, verifies after, and audits any unexpected drift. The default ships with read-only / append / replace / supersede / delete tiers; the `@graphorin/memory` tools wire themselves to the right tier automatically.
+Every tool declares a `memoryGuardTier` — one of `'pure'`, `'side-effecting-no-memory'`, `'memory-aware'`, `'unknown'`, or `'untrusted'`. When a memory-region reader is supplied, the executor snapshots the affected region before a memory-aware call, verifies it after, and audits any unexpected drift. **In the default agent build this step is inert**: the guard factory is wired, but no scope-free memory-region reader is passed yet, so the snapshot/verify cycle never runs (a tracked follow-up). The `@graphorin/memory` tools still carry the right tier, so the guard activates automatically once a reader lands.
 
 ## Sandbox tiers
 

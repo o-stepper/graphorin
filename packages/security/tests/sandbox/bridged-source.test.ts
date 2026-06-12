@@ -132,6 +132,23 @@ describe('runBridgedSource', () => {
     if (!result.ok) expect(result.error.kind).toBe('timeout');
   });
 
+  it('does not expose host environment variables to the script (TL-9)', async () => {
+    process.env.GRAPHORIN_TL9_PROBE = 'host-secret';
+    try {
+      const { dispatch } = recordingDispatch({});
+      const result = await runBridgedSource({
+        source:
+          'return { probe: process.env.GRAPHORIN_TL9_PROBE ?? null, keys: Object.keys(process.env) };',
+        allowedTools: [],
+        dispatch,
+      });
+      expect(result.ok).toBe(true);
+      if (result.ok) expect(result.output).toEqual({ probe: null, keys: [] });
+    } finally {
+      delete process.env.GRAPHORIN_TL9_PROBE;
+    }
+  });
+
   it('aborts when the signal fires before dispatch', async () => {
     const { dispatch } = recordingDispatch({});
     const controller = new AbortController();

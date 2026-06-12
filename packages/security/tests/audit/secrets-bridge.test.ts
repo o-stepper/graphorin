@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bridgeSecretsToAudit } from '../../src/audit/secrets-bridge.js';
 import { verifyAuditChain } from '../../src/audit/verify-chain.js';
@@ -77,6 +77,32 @@ describe('@graphorin/security/audit — secrets-bridge', () => {
     });
     await new Promise((resolve) => setImmediate(resolve));
     expect(errors.length).toBe(1);
+  });
+
+  it('logs a visible warning when a write fails and no onWriteError is configured (SPL-4)', async () => {
+    const failingDb = {
+      ...createMemoryAuditDb(),
+      async insert(): Promise<never> {
+        throw new Error('disk full');
+      },
+    };
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      // No onWriteError — the failure must not be swallowed silently.
+      bridgeSecretsToAudit({ db: failingDb });
+      emitSecretsAudit({
+        action: 'secret:get',
+        decision: 'success',
+        ts: 1,
+        source: 'memory',
+        target: 'X',
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(String(warn.mock.calls[0]?.[0])).toMatch(/audit secrets write failed; entry dropped/);
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it('tearing down stops further writes', async () => {

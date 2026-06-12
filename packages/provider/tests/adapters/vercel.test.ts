@@ -212,6 +212,25 @@ describe('vercelAdapter', () => {
     await expect(adapter.generate(REQ)).rejects.toBeInstanceOf(ProviderHttpError);
   });
 
+  it('generate() lifts the real statusCode from the SDK error (PS-2)', async () => {
+    // AI SDK APICallError carries a numeric `statusCode`; the adapter must
+    // surface it so withRetry / withFallback see a real 429/5xx instead of
+    // the status-0 "network error" placeholder.
+    const apiError = Object.assign(new Error('rate limited'), { statusCode: 429 });
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: makeOverrides({ generateError: apiError }),
+    });
+    await expect(adapter.generate(REQ)).rejects.toMatchObject({ status: 429 });
+  });
+
+  it('stream() lifts the real statusCode from a pre-yield SDK error (PS-2)', async () => {
+    const apiError = Object.assign(new Error('service unavailable'), { statusCode: 503 });
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: makeOverrides({ streamError: apiError }),
+    });
+    await expect(collect(adapter.stream(REQ))).rejects.toMatchObject({ status: 503 });
+  });
+
   it('uses default name "<provider>-<modelId>" when name option omitted', () => {
     const adapter = vercelAdapter(MODEL, { runtimeOverrides: makeOverrides({}) });
     expect(adapter.name).toBe('fixture-fixture-model');

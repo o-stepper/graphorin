@@ -22,10 +22,13 @@
  * return value crosses back; intermediate values never leave the worker.
  *
  * Isolation is the `worker-threads` tier's: a fresh V8 isolate per run,
- * best-effort `node:fs` / `node:net` import blocking and a `fetch`
- * refusal (reused from {@link createWorkerThreadsSandbox}), a hard
- * wall-clock timeout via `worker.terminate()`, an optional memory
- * ceiling, and `AbortSignal` cancellation. The **only** channel from the
+ * an empty environment (the worker is constructed with `env: {}` and the
+ * runtime scrubs `process.env` before user code runs, so host secrets
+ * are not visible — TL-9), best-effort `node:fs` / `node:net` import
+ * blocking and a `fetch` refusal (reused from
+ * {@link createWorkerThreadsSandbox}), a hard wall-clock timeout via
+ * `worker.terminate()`, an optional memory ceiling, and `AbortSignal`
+ * cancellation. The **only** channel from the
  * worker to the host is the tool-call RPC, and it serves none but the
  * `allowedTools` names — there is no way to obtain a reference to the
  * executor, the registry, or any other host object (functions do not
@@ -160,6 +163,15 @@ if (data.noNetwork) {
   }
 }
 
+// Scrub the environment before user code runs: keep only the explicit
+// data.env allowlist. Defence in depth on top of the Worker's env: {}
+// construction; safe after register() — the loader thread captured
+// GRAPHORIN_SANDBOX_BLOCKED during the synchronous registration.
+const allowedEnv = (data && data.env) || {};
+for (const k of Object.keys(process.env)) {
+  if (!Object.prototype.hasOwnProperty.call(allowedEnv, k)) delete process.env[k];
+}
+
 let __seq = 0;
 let __toolCalls = 0;
 const __pending = new Map();
@@ -256,6 +268,10 @@ export async function runBridgedSource(opts: BridgedSourceOptions): Promise<Brid
 
   const worker = new Worker(BRIDGED_RUNTIME, {
     eval: true,
+    // The worker must not inherit the host process.env — the source is
+    // model-written, and `return process.env` would exfiltrate host
+    // secrets into the conversation (TL-9).
+    env: {},
     workerData: {
       source: opts.source,
       allowedTools: opts.allowedTools,

@@ -43,6 +43,7 @@ const agent = createAgent({
   instructions: 'Be brief and helpful.',
   provider,
   memory,
+  tools: memory.tools, // expose the eleven memory tools to the model
 });
 
 for await (const event of agent.stream('Hi!', { sessionId: 's1', userId: 'u1' })) {
@@ -117,18 +118,18 @@ sequenceDiagram
     participant Store as SQLite + sqlite-vec
 
     App->>Agent: agent.stream("Hi!")
-    Agent->>Memory: compile(scope)
-    Memory->>Store: read working / session / semantic
-    Store-->>Memory: rows
-    Memory-->>Agent: memory-aware system prompt
     Agent->>Provider: stream(messages, tools)
     Provider->>LLM: HTTP / in-process call
     LLM-->>Provider: token stream
     Provider-->>Agent: AgentEvent stream
+    Agent->>Memory: memory tool call (e.g. fact_search / fact_remember)
+    Memory->>Store: read / append rows
+    Store-->>Memory: rows
+    Memory-->>Agent: tool result
     Agent-->>App: event.type === "text.delta"
-    Agent->>Memory: persist new facts
-    Memory->>Store: append rows
 ```
+
+> The model reaches memory only through the **memory tools** it calls — the agent does not auto-compile a memory-aware prompt or auto-persist facts. Pass `tools: memory.tools` (below) to make those tools available; the only automatic memory integration today is [auto-compaction](/guide/agent-runtime#auto-compaction).
 
 ## Try it with a real local LLM
 
@@ -181,7 +182,7 @@ The discriminated `AgentEvent<TOutput>` union is exhaustive and verified at comp
 
 ## Persisting facts
 
-The agent registers eleven memory tools by default (a twelfth, `deep_recall`, when iterative retrieval is configured). Calling them is just a normal tool call:
+Passing `tools: memory.tools` (as in the agent above) exposes the eleven memory tools to the model (a twelfth, `deep_recall`, when iterative retrieval is configured) — without it the model has no memory tools to call. You can also drive the same tiers directly from your own code, no agent required:
 
 ```ts
 await memory.semantic.remember(

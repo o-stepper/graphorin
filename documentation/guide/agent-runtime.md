@@ -96,8 +96,7 @@ function handle<TOutput>(event: AgentEvent<TOutput>): void {
 ```mermaid
 flowchart LR
     Start([Start]) --> Step[Run step]
-    Step --> Compile[ContextEngine.compile]
-    Compile --> Stream[Provider.stream]
+    Step --> Stream[Provider.stream]
     Stream -->|tokens| Out[text.delta]
     Stream -->|tool calls| Tools[Execute tools]
     Tools -->|needsApproval| Approval[tool.approval.requested]
@@ -130,7 +129,7 @@ Because execution now flows through the executor, several tool-classification fi
 |---|---|
 | `secretsAllowed` | **Enforced** — per-tool secrets ACL; a tool requesting a ref outside its ACL is denied. |
 | `inboundSanitization` | **Enforced** — untrusted tool output is flagged / stripped / wrapped before it re-enters context. |
-| `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens); `'spill-to-file'` stores the full body behind a handle (see [result handles](#result-handles-and-read_result)). |
+| `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens), **text and structured object outputs alike**; the model sees the bounded text, never the full object. An over-cap structured output spills by default, storing the full body behind a handle (see [result handles](#result-handles-and-read_result)). |
 | `needsApproval` | **Enforced** — the run suspends for durable HITL (below) *before* the call runs. |
 | `sandboxPolicy` | Resolved and surfaced on the `tool.execute` span / audit, but inline `config.tools` run **in-process** — out-of-process isolation applies to module-loadable skill / MCP tools and is wired when those land. |
 | `memoryGuardTier` | Reserved: the guard factory is wired, but the snapshot/verify step stays inert until a scope-free memory-region reader lands (a tracked follow-up). |
@@ -145,7 +144,7 @@ A tool declared `defer_loading: true` is **withheld** from the per-step catalogu
 
 ### Result handles and `read_result`
 
-A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint — so a large result never enters the context window **even when the tool returns a structured object** (which truncation alone leaves intact) — and auto-registers the built-in **`read_result`** tool whenever some tool spills. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root — never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. See [result handles](/guide/tools#result-handles-and-read_result) in the tools guide.
+A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint — so a large result never enters the context window **even when the tool returns a structured object** (which the executor now bounds and, on the default strategy, spills by default rather than inlining whole) — and auto-registers the built-in **`read_result`** tool whenever some tool spills. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root — never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. See [result handles](/guide/tools#result-handles-and-read_result) in the tools guide.
 
 The same `read_result` path resolves **external** handles too. An MCP `resource_link` tool result surfaces a handle (the resource URI) rather than inlining the body; wire `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` and the loop composes those readers after the spill reader (tried in order, each rejecting handles it does not own), so the model pages an MCP resource on demand exactly like a spilled artifact. Supplying any `resultReaders` force-registers `read_result`. See the [MCP client guide](/guide/mcp-client#large-resources-resource_link-result-handles).
 
@@ -169,14 +168,16 @@ Governance is preserved: each in-script call runs through the **same executor**,
 
 ## Durable HITL
 
-`runStateToJSON(runState)` / `runStateFromJSON(serialised, agent)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can pick up exactly where the first left off by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
+`runStateToJSON(runState)` / `runStateFromJSON(serialised, agent)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can resume by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
+
+> **Caveat — current behaviour.** On resume a *granted* approval is recorded, but the approved tool is **not re-executed**: the model receives a placeholder result rather than the real tool output, and a model that re-issues the call re-suspends. Do **not** rely on durable-HITL resume to actually perform a side-effecting action (payments, refunds, external writes) — use it to gate, persist, and audit the *decision*, and perform the side effect through your own code once approved. Re-executing approved calls through the executor on resume is a tracked follow-up.
 
 The `tool.approval.requested` event carries the `toolCallId` plus the tool's classification metadata. Operators that need to suspend the run combine the event with a snapshot of the current `RunState`:
 
 ```ts
 import { runStateToJSON } from '@graphorin/agent';
 
-for await (const event of agent.stream('Refund the last order if it qualifies', {
+for await (const event of agent.stream('Summarise the status of my last order', {
   sessionId: 's1',
   userId: 'u1',
 })) {

@@ -12,7 +12,7 @@
  */
 
 import { onSecretsAudit, type SecretsAuditEvent } from '../secrets/audit-emitter.js';
-import { appendAudit } from './append.js';
+import { appendAudit, reportDroppedAuditWrite } from './append.js';
 import type { AuditDb } from './audit-db.js';
 import type { AuditAction, AuditActor, AuditDecision, AuditEntryInput } from './types.js';
 
@@ -51,10 +51,13 @@ export interface SecretsBridgeTeardown {
  * Subscribe the audit-log subsystem to the secrets-layer audit
  * emitter. Returns a teardown function.
  *
- * Writes are serialised through a per-bridge queue so concurrent
- * secrets events never race on `db.latest()` and produce duplicate
- * `seq` values. Failures are isolated from the secret access path
- * via the `onWriteError` callback.
+ * Writes are serialised through a per-bridge queue (and, since SPL-4,
+ * also at the source inside `appendAudit`, which serialises every
+ * caller of one `AuditDb`) so concurrent secrets events never race on
+ * `db.latest()` and produce duplicate `seq` values. A failed write is
+ * isolated from the secret access path via the `onWriteError` callback;
+ * when none is supplied it is logged (never swallowed) so a dropped
+ * audit entry stays visible.
  *
  * @stable
  */
@@ -65,7 +68,8 @@ export function bridgeSecretsToAudit(options: BridgeSecretsToAuditOptions): Secr
     tail = tail
       .then(() => appendAudit(options.db, input))
       .catch((error) => {
-        options.onWriteError?.(event, error);
+        if (options.onWriteError !== undefined) options.onWriteError(event, error);
+        else reportDroppedAuditWrite('secrets', error);
       });
   });
   const teardown = (): void => unsubscribe();
