@@ -1851,13 +1851,30 @@ export class SqliteGraphStore {
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
     const seedsJson = JSON.stringify([...seedFactIds]);
     const rows = this.#conn.all<FactRow>(
+      // CS-15: the recursive step only bridges THROUGH a fact that is itself
+      // visible to the caller (in-scope, not tombstoned/archived/quarantined,
+      // valid at `asOf`) — joining `facts fb ON fb.id = w.fact_id` with the
+      // same predicates. Without it a tombstoned/quarantined intermediate fact
+      // silently conducts a link between two otherwise-unrelated records at
+      // maxHops > 1. Seeds are also intersected with the caller scope so a
+      // foreign fact id can't be used as a traversal root.
       `WITH RECURSIVE
-         seed_ids(fact_id) AS (SELECT value FROM json_each(?)),
+         seed_ids(fact_id) AS (
+           SELECT f.id FROM facts f
+           JOIN json_each(?) j ON j.value = f.id
+           WHERE f.scope_user_id = ?
+         ),
          walk(fact_id, depth) AS (
              SELECT fact_id, 0 FROM seed_ids
            UNION
              SELECT fe2.fact_id, w.depth + 1
              FROM walk w
+             JOIN facts fb ON fb.id = w.fact_id
+               AND fb.scope_user_id = ?
+               AND fb.deleted_at IS NULL
+               AND fb.archived = 0
+               AND (? = 1 OR fb.status != 'quarantined')
+               AND (? IS NULL OR ((fb.valid_from IS NULL OR fb.valid_from <= ?) AND (fb.valid_to IS NULL OR fb.valid_to > ?)))
              JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
              JOIN entities e1 ON e1.id = fe1.entity_id
              JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
@@ -1874,7 +1891,22 @@ export class SqliteGraphStore {
          AND (? IS NULL OR ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)))
        ORDER BY f.created_at DESC
        LIMIT ?`,
-      [seedsJson, maxHops, scope.userId, incQ, asOf, asOf, asOf, limit],
+      [
+        seedsJson,
+        scope.userId,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        maxHops,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        limit,
+      ],
     );
     return rows.map(rowToFact);
   }
