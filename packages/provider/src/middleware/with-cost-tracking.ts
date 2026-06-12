@@ -1,10 +1,10 @@
 /**
- * `withCostTracking` — accumulates `tokensUsed` + `cost` per
- * `provider × model` from the `finish` event of every stream / one-
- * shot generation. The shipped middleware is intentionally simple: it
- * surfaces a process-local accumulator. Consumers that want to wire
- * the framework's `CostTracker` from `@graphorin/observability` pass
- * a delegate via `onUsage`.
+ * `withCostTracking` — reports `tokensUsed` + `cost` per `provider × model`
+ * from the `finish` event of every stream / one-shot generation via the
+ * `onUsage` hook. For a ready-made process-local accumulator, wire
+ * {@link createCostAccumulator}'s `onUsage` and read its `.totals()`; consumers
+ * that prefer the framework's `CostTracker` from `@graphorin/observability`
+ * pass their own delegate.
  *
  * @packageDocumentation
  */
@@ -14,8 +14,8 @@ import type { Provider, ProviderEvent, ProviderResponse } from '@graphorin/core'
 import { defineProviderMiddleware } from './compose.js';
 
 /**
- * Aggregated totals exposed via {@link withCostTracking}'s
- * `accumulator()` callback.
+ * Aggregated totals for one `provider × model`, returned by
+ * {@link CostAccumulator.totalFor} / {@link CostAccumulator.totals}.
  *
  * @stable
  */
@@ -25,6 +25,60 @@ export interface CostTrackingTotals {
   readonly completionTokens: number;
   readonly totalTokens: number;
   readonly costUsd: number;
+}
+
+/**
+ * A process-local cost accumulator (PS-8). Wire {@link CostAccumulator.onUsage}
+ * into {@link withCostTracking} and read the running totals — keyed by
+ * `provider × model` — back via {@link CostAccumulator.totals} /
+ * {@link CostAccumulator.totalFor}.
+ *
+ * @stable
+ */
+export interface CostAccumulator {
+  /** Pass this to {@link withCostTracking}'s `onUsage`. */
+  readonly onUsage: NonNullable<WithCostTrackingOptions['onUsage']>;
+  /** Snapshot of every tracked `provider::model` → totals. */
+  totals(): ReadonlyMap<string, CostTrackingTotals>;
+  /** Running totals for one `provider × model` (zeros when unseen). */
+  totalFor(providerName: string, modelId: string): CostTrackingTotals;
+  /** Clear all accumulated totals. */
+  reset(): void;
+}
+
+const ZERO_TOTALS: CostTrackingTotals = Object.freeze({
+  callCount: 0,
+  promptTokens: 0,
+  completionTokens: 0,
+  totalTokens: 0,
+  costUsd: 0,
+});
+
+/**
+ * Create a {@link CostAccumulator} — the process-local accumulator described on
+ * {@link withCostTracking}. Keys totals by `'<providerName>::<modelId>'`.
+ *
+ * @stable
+ */
+export function createCostAccumulator(): CostAccumulator {
+  const map = new Map<string, CostTrackingTotals>();
+  const keyOf = (providerName: string, modelId: string): string => `${providerName}::${modelId}`;
+  return {
+    onUsage: (info) => {
+      const key = keyOf(info.providerName, info.modelId);
+      const prev = map.get(key) ?? ZERO_TOTALS;
+      map.set(key, {
+        callCount: prev.callCount + 1,
+        promptTokens: prev.promptTokens + info.promptTokens,
+        completionTokens: prev.completionTokens + info.completionTokens,
+        totalTokens: prev.totalTokens + info.totalTokens,
+        costUsd: prev.costUsd + info.costUsd,
+      });
+    },
+    totals: () => new Map(map),
+    totalFor: (providerName, modelId) => map.get(keyOf(providerName, modelId)) ?? ZERO_TOTALS,
+    reset: () => map.clear(),
+  };
 }
 
 /**

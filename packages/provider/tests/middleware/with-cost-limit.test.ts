@@ -106,4 +106,21 @@ describe('withCostLimit', () => {
       expect(e.observed).toBe(1.25);
     }
   });
+
+  it('warns once when ceilings are configured without a resolver (PS-8)', () => {
+    const warnings: string[] = [];
+    const logger = (m: string): void => {
+      warnings.push(m);
+    };
+    // Ceilings set but no resolver ⇒ silently unenforced; must be loud.
+    withCostLimit({ maxPerSession: 10, logger });
+    expect(warnings.some((w) => /resolveObservedCost|unenforced|no-op/i.test(w))).toBe(true);
+    expect(warnings).toHaveLength(1);
+  });
+
+  it('does not warn when no ceilings are configured (intentional placeholder)', () => {
+    const warnings: string[] = [];
+    withCostLimit({ logger: (m: string) => warnings.push(m) });
+    expect(warnings).toHaveLength(0);
+  });
 });
