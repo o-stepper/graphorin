@@ -390,11 +390,43 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   const startedAt = now();
   const version = options.version ?? VERSION;
 
+  // IP-1: when encryption is configured, resolve the passphrase ref
+  // BEFORE constructing the store and thread the encryption config
+  // through — `graphorin init --encrypted` produced a config nothing
+  // honoured, and a database encrypted via `storage encrypt` could not
+  // be opened by the server at all.
+  let storeEncryption:
+    | { enabled: true; cipher?: never; passphraseResolver: () => Promise<string> }
+    | undefined;
+  if (options.store === undefined && config.storage.encryption.enabled) {
+    if (config.storage.encryption.passphraseRef === undefined) {
+      throw new Error(
+        '[graphorin/server] storage.encryption.enabled is true but no passphraseRef is configured.',
+      );
+    }
+    const { resolveSecret } = await import('@graphorin/security/secrets');
+    const passphrase = await resolveSecret(config.storage.encryption.passphraseRef);
+    storeEncryption = {
+      enabled: true,
+      passphraseResolver: async () => passphrase.use((v) => v),
+    } as never;
+  }
   const store =
     options.store ??
     (await createSqliteStore({
       path: config.storage.path,
       mode: config.storage.mode,
+      ...(storeEncryption !== undefined
+        ? {
+            encryption: {
+              enabled: true,
+              ...(config.storage.encryption.cipher !== undefined
+                ? { cipher: config.storage.encryption.cipher as never }
+                : {}),
+              passphraseResolver: storeEncryption.passphraseResolver,
+            },
+          }
+        : {}),
     }));
 
   const runs = options.runs ?? new RunStateTracker({ now });
@@ -1126,6 +1158,9 @@ function buildDefaultHealthProbes(
     store,
     walWarnThresholdBytes: config.health.walWarnThresholdBytes,
     encryptionEnabled: config.storage.encryption.enabled,
+    // IP-1: when this process built the encrypted store itself, the
+    // keyed open at boot proved the cipher peer — report the fact.
+    ...(config.storage.encryption.enabled ? { cipherPeerInstalled: true } : {}),
   };
   if (triggersDaemon !== undefined) out.triggers = triggersDaemon;
   if (consolidatorDaemon !== undefined) out.consolidator = consolidatorDaemon;

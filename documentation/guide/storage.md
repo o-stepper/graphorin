@@ -42,11 +42,18 @@ opening the same file from several processes.
 A drop-in that pulls the cipher peer (`better-sqlite3-multiple-ciphers`,
 SQLCipher v4 compatible) and adds:
 
-- `createEncryptedConnection` — open an encrypted DB.
+- `createEncryptedConnection` — open an encrypted DB (the cipher-selection
+  pragmas are applied **before** `PRAGMA key`, so SQLCipher-v4 databases open
+  correctly against the chacha20-defaulting peer).
 - `encryptDatabase` / `rekeyDatabase` — back `graphorin storage encrypt` and
-  `graphorin storage rekey`.
-- `cipherIntegrityCheck` — backs the daily verification cron and
-  `/v1/health/storage`.
+  `graphorin storage rekey`. The export is a **checkpoint → byte-copy →
+  in-place `PRAGMA rekey`** sequence (CS-7): sqlite3mc ships no
+  `sqlcipher_export`, and the byte-copy trivially preserves rowids so FTS5
+  mappings stay intact. Rekey drops to `journal_mode = DELETE` for the
+  rotation (sqlite3mc refuses to rekey in WAL) and restores WAL after.
+- `cipherIntegrityCheck` — runs the standard `PRAGMA integrity_check`
+  through the keyed connection (sqlite3mc has no `cipher_integrity_check`);
+  backs the daily verification cron and `/v1/health/storage`.
 
 Defaults (ADR-030): cipher `sqlcipher` (`legacy=4`), **off by default** —
 enable with `graphorin init --encrypted`. The audit DB is **always** encrypted

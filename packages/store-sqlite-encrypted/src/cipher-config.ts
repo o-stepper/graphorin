@@ -28,7 +28,7 @@ export const DEFAULT_CIPHER: EncryptionCipher = 'sqlcipher';
  */
 const CIPHER_PRAGMAS: Readonly<Record<EncryptionCipher, ReadonlyArray<string>>> = Object.freeze({
   sqlcipher: Object.freeze(["cipher = 'sqlcipher'", 'legacy = 4']),
-  wxsqlite3: Object.freeze(["cipher = 'wxsqlite3'"]),
+  chacha20: Object.freeze(["cipher = 'chacha20'"]),
   aes256cbc: Object.freeze(["cipher = 'aes256cbc'"]),
   aes128cbc: Object.freeze(["cipher = 'aes128cbc'"]),
   rc4: Object.freeze(["cipher = 'rc4'"]),

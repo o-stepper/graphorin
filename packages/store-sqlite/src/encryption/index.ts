@@ -16,14 +16,42 @@
 import type { BetterSqlite3Constructor } from '../driver-types.js';
 
 /**
- * Cipher selection. The default `'sqlcipher'` mirrors the most-shipped
- * variant of `better-sqlite3-multiple-ciphers`. Other variants
- * (`'wxsqlite3'`, `'rc4'`, …) are accepted by the cipher peer; we
- * validate the string only at the resolver boundary.
+ * Cipher selection, validated against the real sqlite3mc vocabulary
+ * (CS-13 — `'wxsqlite3'` is the library's name, not a cipher; the peer
+ * rejects it with "Cipher 'wxsqlite3' unknown"). `'sqlcipher'` is the
+ * Graphorin default (SQLCipher v4 compatible); `'chacha20'` is the
+ * peer's own default cipher.
  *
  * @stable
  */
-export type EncryptionCipher = 'sqlcipher' | 'wxsqlite3' | 'aes256cbc' | 'aes128cbc' | 'rc4';
+export type EncryptionCipher = 'sqlcipher' | 'chacha20' | 'aes256cbc' | 'aes128cbc' | 'rc4';
+
+/**
+ * The cipher-selection PRAGMAs that must run **before** `PRAGMA key`
+ * on a freshly opened connection (CS-7). sqlite3mc defaults to
+ * `chacha20`, so opening a SQLCipher-v4 database with `key` alone
+ * reads garbage — every keyed open must pin the cipher first.
+ *
+ * @stable
+ */
+export function cipherSelectionPragmas(cipher: EncryptionCipher): ReadonlyArray<string> {
+  switch (cipher) {
+    case 'sqlcipher':
+      return Object.freeze(["cipher = 'sqlcipher'", 'legacy = 4']);
+    case 'chacha20':
+      return Object.freeze(["cipher = 'chacha20'"]);
+    case 'aes256cbc':
+      return Object.freeze(["cipher = 'aes256cbc'"]);
+    case 'aes128cbc':
+      return Object.freeze(["cipher = 'aes128cbc'"]);
+    case 'rc4':
+      return Object.freeze(["cipher = 'rc4'"]);
+    default: {
+      const exhaustive: never = cipher;
+      throw new Error(`unknown cipher: ${String(exhaustive)}`);
+    }
+  }
+}
 
 /**
  * Encryption-at-rest configuration. Default `{ enabled: false }`.

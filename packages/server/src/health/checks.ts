@@ -176,7 +176,14 @@ export async function collectHealth(options: HealthCheckOptions): Promise<Health
   }
 
   if (options.encryptionEnabled !== undefined) {
-    const peerDepInstalled = options.cipherPeerInstalled ?? !options.encryptionEnabled;
+    // IP-1: a server that is serving this health endpoint with
+    // encryption enabled has already opened the store WITH its key at
+    // boot (createServer threads the resolved passphrase into
+    // createSqliteStore and fails fast otherwise) — that successful
+    // keyed open is the factual basis of this check. 'fail' is
+    // reserved for an explicit negative cipher-peer probe; the old
+    // default blamed a missing peer dep on every encrypted boot.
+    const peerDepInstalled = options.cipherPeerInstalled ?? true;
     checks.encryption = {
       status: options.encryptionEnabled && peerDepInstalled === false ? 'fail' : 'ok',
       enabled: options.encryptionEnabled,

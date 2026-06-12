@@ -5,7 +5,12 @@ import type {
   BetterSqlite3Database,
   BetterSqlite3Statement,
 } from './driver-types.js';
-import { type EncryptionConfig, loadCipherDriver, resolvePassphrase } from './encryption/index.js';
+import {
+  cipherSelectionPragmas,
+  type EncryptionConfig,
+  loadCipherDriver,
+  resolvePassphrase,
+} from './encryption/index.js';
 
 // The structural driver types are defined in `./driver-types.ts` to
 // break the `connection.ts <-> encryption/index.ts` import cycle;
@@ -202,6 +207,13 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
   const db = new Ctor(absolutePath);
 
   if (resolvedEncryption.enabled && cipherPassphrase !== undefined) {
+    // CS-7: pin the cipher BEFORE `PRAGMA key` — sqlite3mc defaults to
+    // chacha20, so a SQLCipher-v4 database opened with `key` alone
+    // reads garbage. The selection pragmas are a no-op on the stub
+    // driver and on databases already using the peer default.
+    for (const pragma of cipherSelectionPragmas(resolvedEncryption.cipher ?? 'sqlcipher')) {
+      db.pragma(pragma);
+    }
     // The cipher peer reads the passphrase via `PRAGMA key`. The
     // pragma must run before any other statement. The passphrase is
     // already SQL-literal encoded by `resolvePassphrase`.

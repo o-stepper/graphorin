@@ -108,12 +108,20 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
         if (trimmed === 'page_size') return 4096;
         if (trimmed === 'wal_checkpoint(PASSIVE)') return [{ busy: 0, log: 0, checkpointed: 0 }];
         if (trimmed === 'cipher_integrity_check') {
-          if (opts.failIntegrity === true) return [{ cipher_integrity_check: 'page 4: bad hmac' }];
+          // Real-peer faithful: sqlite3mc has no such pragma — it
+          // returns an empty row-set (CS-7).
+          return [];
+        }
+        if (trimmed === 'integrity_check') {
+          if (opts.failIntegrity === true) return [{ integrity_check: 'page 4: bad hmac' }];
           const persisted = readStubFile(this.path);
           if (persisted !== null && persisted.integrity === 'failed') {
-            return [{ cipher_integrity_check: 'persisted failure' }];
+            return [{ integrity_check: 'persisted failure' }];
           }
-          return [{ cipher_integrity_check: 'ok' }];
+          return [{ integrity_check: 'ok' }];
+        }
+        if (trimmed.startsWith('wal_checkpoint')) {
+          return [{ busy: 0, log: 0, checkpointed: 0 }];
         }
         if (trimmed === 'user_version') return 0;
         const keyMatch = /^key\s*=\s*(.+)$/.exec(trimmed);
@@ -122,10 +130,11 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
           return null;
         }
         const rekeyMatch = /^rekey\s*=\s*(.+)$/.exec(trimmed);
-        if (rekeyMatch && this.#key !== null) {
+        if (rekeyMatch) {
+          // Real-peer faithful: `PRAGMA rekey` re-keys a keyed DB AND
+          // encrypts a plaintext DB in place (no prior key needed) —
+          // the CS-7 copy+rekey export path relies on the latter.
           this.#key = rekeyMatch[1] ?? null;
-          // Persist the new key to disk so the verification re-open
-          // sees it.
           writeStubFile(this.path, {
             version: 1,
             key: this.#key ?? '',
@@ -166,17 +175,9 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
           });
           return;
         }
-        if (/SELECT sqlcipher_export\('enc'\)/i.test(query)) {
-          if (this.#attachedPath !== null && this.#attachedKey !== null) {
-            writeStubFile(this.#attachedPath, {
-              version: 1,
-              key: this.#attachedKey,
-              cipher: this.#attachedCipher ?? 'sqlcipher',
-              attachedFromUnencrypted: true,
-              integrity: 'ok',
-            });
-          }
-          return;
+        if (/sqlcipher_export/i.test(query)) {
+          // Real-peer faithful: sqlite3mc ships no sqlcipher_export.
+          throw new Error('no such function: sqlcipher_export');
         }
         if (/DETACH DATABASE enc/i.test(query)) {
           this.#attachedPath = null;

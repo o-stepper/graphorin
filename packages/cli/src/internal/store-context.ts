@@ -73,6 +73,25 @@ export async function openStoreContext(
     path: config.storage.path,
     mode: config.storage.mode,
   };
+  // IP-1: the CLI honours the same encryption config as the server, so
+  // `graphorin` commands can open a database produced by
+  // `graphorin storage encrypt`.
+  if (config.storage.encryption.enabled) {
+    if (config.storage.encryption.passphraseRef === undefined) {
+      throw new Error(
+        '[graphorin/cli] storage.encryption.enabled is true but no passphraseRef is configured.',
+      );
+    }
+    const { resolveSecret } = await import('@graphorin/security/secrets');
+    const passphrase = await resolveSecret(config.storage.encryption.passphraseRef);
+    (storeOpts as { encryption?: unknown }).encryption = {
+      enabled: true,
+      ...(config.storage.encryption.cipher !== undefined
+        ? { cipher: config.storage.encryption.cipher }
+        : {}),
+      passphraseResolver: async () => passphrase.use((v: string) => v),
+    };
+  }
   const store = await factory(storeOpts);
   if (options.skipInit !== true) {
     await store.init();
