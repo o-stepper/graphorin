@@ -61,3 +61,32 @@ describe('graphorin triggers', () => {
     expect(out.removed).toEqual([]);
   });
 });
+
+describe('IP-4 — fire reports UNSUPPORTED honestly', () => {
+  it('an existing trigger is NOT silently "queued" — unsupported + exit code 2', async () => {
+    const cfg = await fixture();
+    const { runTriggersStatus: _s } = await import('../src/commands/triggers.js');
+    // register a trigger row via the store context the commands share
+    const { openStoreContext } = await import('../src/internal/store-context.js');
+    const ctx = await openStoreContext({ config: cfg });
+    await ctx.store.triggers.upsert({
+      id: 'fireable',
+      kind: 'interval',
+      spec: '60000',
+      callbackRef: 'fireable',
+      missedFires: 0,
+      disabled: false,
+      catchupPolicy: 'none',
+      maxCatchupRuns: 1,
+      catchupWindowMs: 1000,
+      createdAt: new Date().toISOString(),
+    });
+    await ctx.close();
+    const before = process.exitCode;
+    const out = await runTriggersFire({ config: cfg, id: 'fireable', print: () => undefined });
+    expect(out.fired).toBe(false);
+    expect(out.unsupported).toBe(true);
+    expect(process.exitCode).toBe(2);
+    process.exitCode = before;
+  });
+});

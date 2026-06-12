@@ -137,6 +137,8 @@ graphorin consolidator run --phase light
 graphorin consolidator clear-pending --older-than 30d
 ```
 
+> `consolidator set-tier` / `consolidator stop` exit with code `2` (UNSUPPORTED) — there is no runtime control channel into the daemon yet, and the CLI refuses to pretend otherwise (IP-4). To change the tier, edit `consolidator.tier` in the config and restart; to stop consolidation now, stop the server process. `triggers fire` likewise points at the working server route (`POST /v1/triggers/:id/fire`).
+
 ## `graphorin migrate-export`
 
 ```bash

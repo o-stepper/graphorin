@@ -110,7 +110,10 @@ describe('IP-5 — init output parses through the strict server schema', () => {
     // The generated config (a TS module: defineConfig({...})) must
     // satisfy the STRICT parser — extract the object literal and
     // evaluate it (the file itself is TS, not directly importable).
-    const objSource = raw.slice(raw.indexOf('defineConfig(') + 'defineConfig('.length, raw.lastIndexOf(')'));
+    const objSource = raw.slice(
+      raw.indexOf('defineConfig(') + 'defineConfig('.length,
+      raw.lastIndexOf(')'),
+    );
     // biome-ignore lint/security/noGlobalEval: test-only evaluation of our own generated literal
     const cfg = (0, eval)(`(${objSource})`);
     const { parseServerConfig } = await import('@graphorin/server');
