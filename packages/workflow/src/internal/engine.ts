@@ -591,8 +591,17 @@ async function* driveRun<TState extends object>(
       },
     });
 
+    // WF-15: task/custom events are pumped LIVE while the parallel
+    // tasks run — pushes wake the pump below instead of waiting for
+    // the whole step to settle.
     const stepEvents: WorkflowEvent<TState>[] = [];
     const customEvents: WorkflowEvent<TState>[] = [];
+    let notifyEventPump: (() => void) | undefined;
+    const wakeEventPump = (): void => {
+      const notify = notifyEventPump;
+      notifyEventPump = undefined;
+      notify?.();
+    };
 
     const taskController = new AbortController();
     const onSignalAbort = (): void => taskController.abort();
@@ -622,6 +631,7 @@ async function* driveRun<TState extends object>(
           taskId: task.taskId,
           nodeName: task.nodeName,
         });
+        wakeEventPump();
       }
       const start = Date.now();
       // WF-11: every executed task gets its advertised `workflow.task`
@@ -641,6 +651,7 @@ async function* driveRun<TState extends object>(
           name,
           payload,
         });
+        wakeEventPump();
       };
 
       const ctx: WorkflowContext<TState> = Object.freeze({
@@ -723,20 +734,54 @@ async function* driveRun<TState extends object>(
           status: status === 'paused' ? 'paused' : status === 'failed' ? 'failed' : 'completed',
           durationMs,
         });
+        wakeEventPump();
       }
     });
 
     let graceExpired = false;
     try {
-      graceExpired =
-        (await waitForTasksOrTimeout(taskPromises, taskController.signal, cancelGraceMs)) ===
-        'grace-expired';
+      // WF-15: yield queued task/custom events as they arrive. The pump
+      // sleeps on `notifyEventPump` and is woken by every push and by
+      // step settle; the executor re-check closes the flip-between-
+      // check-and-sleep race.
+      let stepSettled = false;
+      const settledPromise = waitForTasksOrTimeout(
+        taskPromises,
+        taskController.signal,
+        cancelGraceMs,
+      ).then((outcome) => {
+        stepSettled = true;
+        wakeEventPump();
+        return outcome;
+      });
+      while (true) {
+        while (stepEvents.length > 0) {
+          const ev = stepEvents.shift();
+          if (ev !== undefined) yield ev;
+        }
+        while (customEvents.length > 0) {
+          const ev = customEvents.shift();
+          if (ev !== undefined && includeCustomEvents) yield ev;
+        }
+        if (stepSettled) break;
+        await new Promise<void>((resolve) => {
+          notifyEventPump = resolve;
+          if (stepSettled || stepEvents.length > 0 || customEvents.length > 0) {
+            notifyEventPump = undefined;
+            resolve();
+          }
+        });
+      }
+      graceExpired = (await settledPromise) === 'grace-expired';
     } finally {
       signal?.removeEventListener('abort', onSignalAbort);
     }
 
-    for (const ev of stepEvents) yield ev;
-    if (includeCustomEvents) for (const ev of customEvents) yield ev;
+    // Tail drain: events enqueued between the last pump pass and settle.
+    for (const ev of stepEvents.splice(0)) yield ev;
+    for (const ev of customEvents.splice(0)) {
+      if (includeCustomEvents) yield ev;
+    }
 
     if (signal?.aborted && !nodeFailure) {
       // WF-11: a cancellation whose grace window expired with tasks
