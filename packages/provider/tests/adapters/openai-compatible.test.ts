@@ -98,6 +98,25 @@ describe('openAICompatibleAdapter', () => {
     });
   });
 
+  it("maps the wire 'content_filter' finish reason to 'content-filter' (PS-12)", async () => {
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({
+        body: makeSseStream([
+          { choices: [{ delta: { content: 'partial' } }] },
+          { choices: [{ finish_reason: 'content_filter' }] },
+          '[DONE]',
+        ]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.finishReason).toBe('content-filter'); // not the default 'stop'
+  });
+
   it('forwards Authorization: Bearer header from apiKey', async () => {
     const capture: { url?: string; init?: RequestInit } = {};
     const provider = openAICompatibleAdapter({

@@ -151,7 +151,10 @@ async function* streamOllama(
     resp.body,
     req.signal !== undefined ? { signal: req.signal } : {},
   )) {
-    if (req.signal?.aborted) break;
+    if (req.signal?.aborted) {
+      finishReason = 'aborted'; // PS-12: honest abort reason, not 'stop'
+      break;
+    }
     let chunk: OllamaChatChunk;
     try {
       chunk = JSON.parse(line) as OllamaChatChunk;
