@@ -48,6 +48,10 @@ Every operation returns `AsyncIterable<AgentEvent<TOutput>>`. `agent.run(...)` i
 // A simplified shape that mirrors the @graphorin/core
 // `AgentEvent<TOutput>` discriminated union. Hover any
 // identifier below to see the inferred type.
+type AgentResult<TOutput> = {
+  output: TOutput;
+  status: 'completed' | 'failed' | 'aborted' | 'awaiting_approval';
+};
 type AgentEvent<TOutput> =
   | { type: 'agent.start'; runId: string }
   | { type: 'step.start'; stepNumber: number }
