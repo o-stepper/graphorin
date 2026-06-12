@@ -194,7 +194,7 @@ export async function runConsolidatorStop(
   }
 }
 
-function ensureAdminTable(conn: { exec(sql: string): void }): void {
+function _ensureAdminTable(conn: { exec(sql: string): void }): void {
   conn.exec(
     `CREATE TABLE IF NOT EXISTS consolidator_admin (
        key TEXT PRIMARY KEY,

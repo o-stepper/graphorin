@@ -85,7 +85,7 @@ const ExportBodySchema = z
   .strict()
   .default({});
 
-const ReplayBodySchema = z
+const _ReplayBodySchema = z
   .object({
     raw: z.boolean().optional(),
     fromMessageId: z.string().min(1).optional(),

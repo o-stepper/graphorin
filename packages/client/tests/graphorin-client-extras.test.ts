@@ -9,11 +9,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ClientNotConnectedError, TransportFailedError } from '../src/errors.js';
 import { GraphorinClient } from '../src/graphorin-client.js';
-import {
-  lastEventSource,
-  MockEventSource,
-  resetMockEventSource,
-} from './__fixtures__/mock-event-source.js';
+import { MockEventSource, resetMockEventSource } from './__fixtures__/mock-event-source.js';
 import { lastSocket, MockWebSocket, resetMockTransport } from './__fixtures__/mock-websocket.js';
 
 beforeEach(() => {
