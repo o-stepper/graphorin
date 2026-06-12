@@ -114,5 +114,7 @@ export function defaultOpenAiEncoding(model: string | undefined): 'o200k_base' |
   const id = model.toLowerCase();
   const sep = Math.max(id.lastIndexOf('/'), id.lastIndexOf(':'));
   const bare = sep === -1 ? id : id.slice(sep + 1);
-  return /^(?:gpt-4o|gpt-4\.1|gpt-[5-9]|gpt-\d{2}|o[1-9])/.test(bare) ? 'o200k_base' : 'cl100k_base';
+  return /^(?:gpt-4o|gpt-4\.1|gpt-[5-9]|gpt-\d{2}|o[1-9])/.test(bare)
+    ? 'o200k_base'
+    : 'cl100k_base';
 }

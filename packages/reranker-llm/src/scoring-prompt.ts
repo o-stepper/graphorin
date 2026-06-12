@@ -55,11 +55,7 @@ const PASSAGE_CLOSE = 'PASSAGE>>>';
  * forged score line after it (PS-14).
  */
 function neutraliseDelimiters(passage: string): string {
-  return passage
-    .split(PASSAGE_CLOSE)
-    .join('PASSAGE> >>')
-    .split(PASSAGE_OPEN)
-    .join('<<< PASSAGE');
+  return passage.split(PASSAGE_CLOSE).join('PASSAGE> >>').split(PASSAGE_OPEN).join('<<< PASSAGE');
 }
 
 /**
