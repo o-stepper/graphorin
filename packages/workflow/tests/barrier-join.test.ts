@@ -23,19 +23,28 @@ interface JoinState {
   out?: string;
 }
 
+/**
+ * A barrier WRITE is the writer's single value; the channel merges it
+ * under the writer's node name into the Record the readers see. The
+ * state type carries the merged read shape, so write sites cast.
+ */
+function barrierWrite(value: string): Record<string, string> {
+  return value as unknown as Record<string, string>;
+}
+
 describe('WF-5 — Barrier joins wait for every writer', () => {
   it('an ASYMMETRIC fan-in runs the join node exactly once, only after a AND c wrote', async () => {
     const joinRuns: Array<Record<string, string>> = [];
     const wf = createWorkflow<JoinState>({
       name: 'barrier-asym',
       channels: {
-        joined: barrier<string>(['a', 'c']) as never,
+        joined: barrier<Record<string, string>>(['a', 'c']),
         out: latestValue<string>(),
       },
       nodes: {
-        a: createNode<JoinState>({ name: 'a', run: () => ({ joined: 'a-val' }) }),
+        a: createNode<JoinState>({ name: 'a', run: () => ({ joined: barrierWrite('a-val') }) }),
         b: createNode<JoinState>({ name: 'b', run: () => ({}) }),
-        c: createNode<JoinState>({ name: 'c', run: () => ({ joined: 'c-val' }) }),
+        c: createNode<JoinState>({ name: 'c', run: () => ({ joined: barrierWrite('c-val') }) }),
         join: createNode<JoinState>({
           name: 'join',
           run: (state) => {
@@ -70,12 +79,12 @@ describe('WF-5 — Barrier joins wait for every writer', () => {
     const wf = createWorkflow<JoinState>({
       name: 'barrier-sym',
       channels: {
-        joined: barrier<string>(['a', 'c']) as never,
+        joined: barrier<Record<string, string>>(['a', 'c']),
         out: latestValue<string>(),
       },
       nodes: {
-        a: createNode<JoinState>({ name: 'a', run: () => ({ joined: 'a-val' }) }),
-        c: createNode<JoinState>({ name: 'c', run: () => ({ joined: 'c-val' }) }),
+        a: createNode<JoinState>({ name: 'a', run: () => ({ joined: barrierWrite('a-val') }) }),
+        c: createNode<JoinState>({ name: 'c', run: () => ({ joined: barrierWrite('c-val') }) }),
         join: createNode<JoinState>({
           name: 'join',
           run: (state) => {
@@ -105,14 +114,17 @@ describe('WF-5 — Barrier joins wait for every writer', () => {
     const wf = createWorkflow<JoinState>({
       name: 'barrier-starved',
       channels: {
-        joined: barrier<string>(['a', 'ghost']) as never,
+        joined: barrier<Record<string, string>>(['a', 'ghost']),
         out: latestValue<string>(),
       },
       nodes: {
-        a: createNode<JoinState>({ name: 'a', run: () => ({ joined: 'a-val' }) }),
+        a: createNode<JoinState>({ name: 'a', run: () => ({ joined: barrierWrite('a-val') }) }),
         // `ghost` is a declared barrier writer that exists but is never
         // scheduled — the join must not fire with the partial map.
-        ghost: createNode<JoinState>({ name: 'ghost', run: () => ({ joined: 'ghost-val' }) }),
+        ghost: createNode<JoinState>({
+          name: 'ghost',
+          run: () => ({ joined: barrierWrite('ghost-val') }),
+        }),
         join: createNode<JoinState>({
           name: 'join',
           run: () => {

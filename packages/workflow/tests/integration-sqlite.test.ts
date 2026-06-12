@@ -106,7 +106,7 @@ describe('@graphorin/workflow <> @graphorin/store-sqlite', () => {
       await collect(wf.execute({ value: 5 }, { threadId: 'fork-source' }));
       const checkpoints = await wf.listCheckpoints('fork-source');
       const middle = checkpoints[Math.floor(checkpoints.length / 2)];
-      expect(middle).toBeDefined();
+      if (!middle) throw new Error('expected a middle checkpoint');
       const { newThreadId } = await wf.fork('fork-source', middle.id);
       const cloned = await wf.getState(newThreadId);
       expect(cloned.threadId).toBe(newThreadId);

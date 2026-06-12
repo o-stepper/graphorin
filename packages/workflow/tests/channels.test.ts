@@ -1,3 +1,4 @@
+import type { Channel } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import {
   anyValue,
@@ -23,6 +24,9 @@ interface TestState {
   scratch: string;
 }
 
+// The internal applyWrites/buildInitialState signatures take the erased
+// `Record<string, Channel<unknown>>` view (the engine casts the same way) —
+// per-key channel generics are intentionally dropped at this boundary.
 const channels = {
   status: latestValue<string>({ default: 'pending' }),
   notes: listAggregate<string>({ default: [] }),
@@ -31,7 +35,7 @@ const channels = {
   events: stream<string>({ unique: true, default: [] }),
   joined: barrier<Record<string, string>>(['a', 'b']),
   scratch: ephemeral<string>(),
-};
+} as unknown as Readonly<Record<string, Channel<unknown>>>;
 
 function write(
   nodeName: string,
@@ -121,7 +125,7 @@ describe('applyWrites — channel merge strategies', () => {
       applyWrites<{ total: number }>({
         state: { total: 0 },
         versions: {},
-        channels: failing,
+        channels: failing as unknown as Readonly<Record<string, Channel<unknown>>>,
         writes: [{ nodeName: 'n', taskId: 't', index: 0, channel: 'total', value: 1 }],
       }),
     ).toThrow(ReducerError);
