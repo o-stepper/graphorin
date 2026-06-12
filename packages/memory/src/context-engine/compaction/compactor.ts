@@ -151,7 +151,10 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   // deserialize and reason about a compaction event.
   const metadata: CompactionMetadataPayload = {
     compactedAtIso: new Date(startTs).toISOString(),
-    compactedFromMessageIds: Object.freeze(olderMessages.map((_, idx) => `msg_${idx}`)),
+    // CE-14: positional labels, prefixed with the compaction instant so
+    // they no longer collide across compaction events (core Message has
+    // no id — these are indices into THIS compaction's dropped slice).
+    compactedFromMessageIds: Object.freeze(olderMessages.map((_, idx) => `c${startTs}_msg_${idx}`)),
     compactedFromMessageIndices: Object.freeze(olderMessages.map((_, idx) => idx)),
     compactedFromTokens: await countMessageTokens(olderMessages, counter),
     summaryTokens: summarized.usageTokens ?? (await counter.countText(summarized.text)),

@@ -28,7 +28,7 @@ import { renderMessageText } from '../../token-counter.js';
  *
  * @stable
  */
-export const SUMMARY_TEMPLATE_VERSION = '1.0';
+export const SUMMARY_TEMPLATE_VERSION = '1.1';
 
 /**
  * Stable identifier of the bundled template.
@@ -127,8 +127,15 @@ export function renderFinalSummary(input: {
   const { template, summaryFromLlm, preservedMessages, metadata } = input;
   const recentTurnsHeader = template.sections[7];
   const metadataHeader = template.sections[8];
+  // CE-7: one-line digests, NOT verbatim — the preserved turns also live
+  // on as real messages after the splice, so verbatim rendering doubled
+  // them in the post-compaction buffer (and in afterTokens).
   const recentTurns = preservedMessages
-    .map((message, idx) => `[${idx}] ${message.role}: ${renderMessageText(message).trim()}`)
+    .map((message, idx) => {
+      const text = renderMessageText(message).trim().replace(/\s+/g, ' ');
+      const digest = text.length > 120 ? `${text.slice(0, 120)}…` : text;
+      return `[${idx}] ${message.role}: ${digest}`;
+    })
     .join('\n');
   const metadataBlock = JSON.stringify(metadata, null, 2);
   return [

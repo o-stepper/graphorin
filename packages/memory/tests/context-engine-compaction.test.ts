@@ -329,6 +329,115 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
   });
 });
 
+describe('CE-6/CE-7 — real hook context, dedup\'d preserved turns, anti-thrash', () => {
+  it('a custom function-form hook observes the GENUINE result + source (CE-6)', async () => {
+    const observed: Array<{ summary: string; source: string; runId: string }> = [];
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: {
+          trigger: { thresholdTokens: 100 },
+          postCompactionHooks: [
+            async (ctx) => {
+              observed.push({
+                summary: ctx.result.summary,
+                source: ctx.source,
+                runId: ctx.runId,
+              });
+              return [];
+            },
+          ],
+        },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    await memory.contextEngine.compactNow({
+      scope,
+      runId: 'run-real',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'auto-trigger',
+      messages: buildMessages(30, 'Y'.repeat(400)),
+      memory,
+    });
+    expect(observed.length).toBe(1);
+    expect(observed[0]?.source).toBe('auto-trigger');
+    expect(observed[0]?.runId).toBe('run-real');
+    // The old wrapper fabricated summary: '' — the real one is non-empty.
+    expect((observed[0]?.summary ?? '').length).toBeGreaterThan(0);
+  });
+
+  it('preserved turns appear exactly once in the post-compaction buffer (CE-7)', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 100 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    const sentinel = `UNIQUE_SENTINEL_${'Q'.repeat(160)}_END`;
+    const messages = [...buildMessages(30, 'Z'.repeat(400)), { role: 'user' as const, content: sentinel }];
+    const out = await memory.contextEngine.compactNow({
+      scope,
+      runId: 'run-dedup',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'manual',
+      messages,
+      memory,
+    });
+    // The sentinel lives on as a live preserved message…
+    const liveCount = out.result.trimmedMessages.filter((m) =>
+      JSON.stringify(m.content).includes(sentinel),
+    ).length;
+    expect(liveCount).toBe(1);
+    // …and the in-buffer summary does NOT carry it verbatim a second
+    // time (section 8 renders one-line digests, truncated at 120 chars).
+    const summaryMessage = out.result.trimmedMessages[0];
+    const summaryText = JSON.stringify(summaryMessage?.content ?? '');
+    expect(summaryText.includes(sentinel)).toBe(false);
+  });
+
+  it('an immediate re-trigger after compaction is suppressed until the buffer grows (CE-7 anti-thrash)', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 60 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    const messages = buildMessages(30, 'W'.repeat(400));
+    expect(await memory.contextEngine.shouldCompact(messages)).toBe(true);
+    const out = await memory.contextEngine.compactNow({
+      scope,
+      runId: 'run-thrash',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'auto-trigger',
+      messages,
+      memory,
+    });
+    // The post-compaction buffer may still sit near/above the tiny
+    // threshold — but the guard requires growth before re-firing.
+    expect(await memory.contextEngine.shouldCompact(out.result.trimmedMessages)).toBe(false);
+    // New conversation volume past the last outcome re-arms the trigger.
+    const grown = [...out.result.trimmedMessages, ...buildMessages(30, 'V'.repeat(800))];
+    expect(await memory.contextEngine.shouldCompact(grown)).toBe(true);
+  });
+});
+
 describe('context-engine — trigger evaluation perf (RB-46; Phase 10d)', () => {
   it('shouldCompact completes in < 2ms p95 with the DEC-131 cache amortization path', async () => {
     const engine = createContextEngine({
