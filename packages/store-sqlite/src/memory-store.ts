@@ -563,6 +563,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
        FROM episodes_fts
        JOIN episodes e ON e.rowid = episodes_fts.rowid
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
+         AND e.archived = 0
          ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
          ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
          ${episodeDateRangePredicate(from, to)}
