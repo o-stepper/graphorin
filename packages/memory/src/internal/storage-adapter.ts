@@ -582,6 +582,20 @@ export interface DecayMemoryStoreExt {
    * bookkeeping write).
    */
   markAccessed?(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void>;
+  /**
+   * Narrow decay-column read for exactly the given fact ids (MRET-8) —
+   * powers per-search decay re-ranking without the old O(scope)
+   * 1000-row window read. Optional; absent ⇒ the tier falls back to
+   * `listForDecay`.
+   */
+  listDecaySignals?(ids: ReadonlyArray<string>): Promise<
+    ReadonlyArray<{
+      readonly id: string;
+      readonly strength: number;
+      readonly lastAccessedAt: number | null;
+      readonly createdAt: number;
+    }>
+  >;
 }
 
 /** Options accepted by {@link InsightMemoryStoreExt.list}. */

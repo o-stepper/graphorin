@@ -531,6 +531,60 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
+  it('decay re-ranks the full fused pool — a fresh fact beyond topK enters the page (MRET-8)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+      const now = Date.now();
+      const stale = new Date(now - 60 * 24 * 60 * 60_000).toISOString();
+      // 10 stale facts that all lexically match; 1 fresh fact that
+      // matches WEAKER (single mention + longer text ⇒ worse bm25), so
+      // pre-decay it ranks at position 11 and the old post-slice decay
+      // could never surface it.
+      for (let i = 0; i < 10; i += 1) {
+        await sqlite.memory.semantic.remember({
+          id: `stale-${i}`,
+          kind: 'semantic',
+          userId: SCOPE.userId,
+          sensitivity: 'internal',
+          text: 'kayaking kayaking kayaking trip notes',
+          createdAt: stale,
+        });
+      }
+      await sqlite.memory.semantic.remember({
+        id: 'fresh-11',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'started a brand new hobby this week and it involves kayaking on the river',
+        createdAt: new Date(now).toISOString(),
+      });
+      const conn = sqlite.connection;
+      conn.run(
+        `UPDATE facts SET created_at = ? WHERE id LIKE 'stale-%'`,
+        [now - 60 * 24 * 60 * 60_000],
+      );
+      conn.run('UPDATE facts SET created_at = ? WHERE id = ?', [now, 'fresh-11']);
+
+      // NOTE: decay first — MRET-7 marks every RETURNED fact as accessed,
+      // which would refresh the stale ones for a later decay pass.
+      const decayed = await memory.semantic.search(SCOPE, 'kayaking', {
+        topK: 10,
+        decay: { tauDays: 7 },
+      });
+      expect(decayed.map((h) => h.record.id)).toContain('fresh-11');
+      expect(decayed.length).toBe(10);
+
+      // Без decay срез идёт по чистой лексике — fresh-11 за бортом.
+      // (After the decayed search the returned ids got access-bumped,
+      // but plain fusion ignores decay columns so the order holds.)
+      const noDecay = await memory.semantic.search(SCOPE, 'kayaking', { topK: 10 });
+      expect(noDecay.map((h) => h.record.id)).not.toContain('fresh-11');
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('episodic FTS relevance is graduated, not a constant 1.0 (MRET-5/MST-7)', async () => {
     const sqlite = await makeStore();
     try {

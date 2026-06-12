@@ -1125,6 +1125,39 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
+   * Narrow decay-column read for exactly the given fact ids (MRET-8).
+   * Replaces the per-search 1000-row LRU-window scan.
+   *
+   * @stable
+   */
+  async listDecaySignals(ids: ReadonlyArray<string>): Promise<
+    ReadonlyArray<{
+      readonly id: string;
+      readonly strength: number;
+      readonly lastAccessedAt: number | null;
+      readonly createdAt: number;
+    }>
+  > {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => '?').join(', ');
+    const rows = this.#conn.all<{
+      id: string;
+      strength: number;
+      last_accessed_at: number | null;
+      created_at: number;
+    }>(
+      `SELECT id, strength, last_accessed_at, created_at FROM facts WHERE id IN (${placeholders})`,
+      [...ids],
+    );
+    return rows.map((row) => ({
+      id: row.id,
+      strength: row.strength,
+      lastAccessedAt: row.last_accessed_at,
+      createdAt: row.created_at,
+    }));
+  }
+
+  /**
    * Soft-archive a fact — sets `archived = 1` and writes a
    * `memory_history` audit row. Distinct from {@link forget}: this
    * does not set `deleted_at`, so search results can still surface

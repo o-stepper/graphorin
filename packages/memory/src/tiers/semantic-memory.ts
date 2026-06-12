@@ -715,15 +715,26 @@ export class SemanticMemory {
                 ...(weighted.k !== undefined ? { k: weighted.k } : {}),
               })
             : this.#reranker;
+        // MRET-8: when decay re-ranking is requested, fuse the FULL
+        // candidate pool (not just finalTopK) so a fresh fact sitting at
+        // position topK+1 pre-decay can still enter the final page; the
+        // finalTopK cut moves to AFTER decay + filters.
+        const fusedTopK =
+          opts.decay !== undefined
+            ? Math.max(
+                finalTopK,
+                lists.reduce((n, l) => n + l.length, 0),
+              )
+            : finalTopK;
         const fused = await reranker.rerank(query, lists, {
-          topK: finalTopK,
+          topK: fusedTopK,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
         const decayed = await this.#applyDecay(scope, fused, opts.decay);
         // MRET-4: the vector / HyDE / graph legs have no store-level tags
         // predicate — enforce the any-of filter on the fused records so
         // every leg obeys it.
-        const ranked =
+        const filtered =
           opts.tags !== undefined && opts.tags.length > 0
             ? decayed.filter((h) => {
                 const recordTags = h.record.tags;
@@ -731,6 +742,7 @@ export class SemanticMemory {
                 return opts.tags?.some((t) => recordTags.includes(t)) === true;
               })
             : decayed;
+        const ranked = filtered.slice(0, finalTopK);
         // MRET-7: recall reinforces the recalled facts — stamp
         // last-accessed + bump strength so "recently accessed facts decay
         // slower" actually holds. Bookkeeping only: a failure here must
@@ -1221,8 +1233,24 @@ export class SemanticMemory {
     decay: FactSearchOptions['decay'],
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     if (decay === undefined || hits.length === 0) return hits;
-    if (typeof this.#store.semantic.listForDecay !== 'function') return hits;
-    const rows = await this.#store.semantic.listForDecay(scope, 1000);
+    // MRET-8: read decay columns ONLY for the hit ids (narrow IN-list)
+    // instead of re-reading the scope's 1000 oldest rows per search —
+    // the old window was O(scope) per query AND, being the LRU head,
+    // could even miss the hits entirely.
+    const semantic = this.#store.semantic;
+    let rows: ReadonlyArray<{
+      readonly id: string;
+      readonly strength: number;
+      readonly lastAccessedAt: number | null;
+      readonly createdAt: number;
+    }>;
+    if (typeof semantic.listDecaySignals === 'function') {
+      rows = await semantic.listDecaySignals(hits.map((h) => h.record.id));
+    } else if (typeof semantic.listForDecay === 'function') {
+      rows = await semantic.listForDecay(scope, 1000);
+    } else {
+      return hits;
+    }
     if (rows.length === 0) return hits;
     const signals = new Map(
       rows.map((row) => [

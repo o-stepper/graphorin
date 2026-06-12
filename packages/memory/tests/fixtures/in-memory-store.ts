@@ -923,6 +923,26 @@ export function createInMemoryStore(
           });
         }
       },
+      async listDecaySignals(ids: ReadonlyArray<string>) {
+        const out: Array<{
+          id: string;
+          strength: number;
+          lastAccessedAt: number | null;
+          createdAt: number;
+        }> = [];
+        for (const id of ids) {
+          const fact = facts.find((f) => f.id === id);
+          if (fact === undefined) continue;
+          const sig = decaySignals.get(id);
+          out.push({
+            id,
+            strength: sig?.strength ?? 1,
+            lastAccessedAt: sig?.lastAccessedAt ?? null,
+            createdAt: sig?.createdAt ?? Date.parse(fact.createdAt),
+          });
+        }
+        return out;
+      },
       async archiveFact(id, _reason) {
         const sig = decaySignals.get(id) ?? {
           strength: 1,
