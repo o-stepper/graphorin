@@ -78,7 +78,21 @@ describe('Agent.stream — hello world', () => {
       events.push(ev);
     }
     const types = events.map((e) => e.type);
-    expect(types).toEqual(['agent.start', 'step.start', 'text.delta', 'text.complete', 'step.end']);
+    expect(types).toEqual([
+      'agent.start',
+      'step.start',
+      'text.delta',
+      'text.complete',
+      'step.end',
+      'agent.end',
+    ]);
+    const endEv = events.at(-1);
+    expect(endEv?.type).toBe('agent.end');
+    if (endEv?.type === 'agent.end') {
+      expect(endEv.result.status).toBe('completed');
+      expect(endEv.result.output).toBe('hello world');
+      expect(endEv.runId).toMatch(/^run_/);
+    }
     const startEv = events[0];
     if (startEv?.type === 'agent.start') {
       expect(startEv.runId).toMatch(/^run_/);

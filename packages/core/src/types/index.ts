@@ -26,8 +26,6 @@ export type {
   GuardrailTrippedEvent,
   HandoffEvent,
   LateralLeakVector,
-  MemoryReadEvent,
-  MemoryWriteEvent,
   ProgressArtifactRef,
   ReasoningDeltaEvent,
   StepEndEvent,

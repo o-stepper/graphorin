@@ -88,3 +88,41 @@ describe('createProgressIO', () => {
     );
   });
 });
+
+describe('agent.progress events (AG-20)', () => {
+  it('progress.write/read queue agent.progress.written/read events, delivered on the run stream', async () => {
+    const { createAgent } = await import('../src/index.js');
+    const { createMockProvider, textOnlyScript } = await import('./fixtures/mock-provider.js');
+    const agent = createAgent({
+      name: 'progressor',
+      instructions: 'noop',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('ok', 4)] }),
+    });
+    const ref = await agent.progress.write('Phase 1 done', { role: 'planner' });
+    expect(ref.sha256).toMatch(/^[0-9a-f]{64}$/);
+    // No runId supplied: out-of-run write/read share the agent's stable
+    // fallback id, so the read finds what the write just persisted.
+    const refs = await agent.progress.read({ role: 'planner' });
+    expect(refs.length).toBe(1);
+
+    // The events queue on the external-event queue and drain into the
+    // next consumed stream.
+    const events: import('@graphorin/core').AgentEvent[] = [];
+    for await (const ev of agent.stream('hi')) {
+      events.push(ev);
+    }
+    const written = events.find((e) => e.type === 'agent.progress.written');
+    expect(written).toBeDefined();
+    if (written?.type === 'agent.progress.written') {
+      expect(written.ref.sha256).toBe(ref.sha256);
+      expect(written.agentId).toBe(agent.id);
+    }
+    const read = events.find((e) => e.type === 'agent.progress.read');
+    expect(read).toBeDefined();
+    if (read?.type === 'agent.progress.read' && written?.type === 'agent.progress.written') {
+      expect(read.refs.length).toBe(1);
+      expect(read.queriedRunId).toBe(written.runId);
+      expect(read.queriedRole).toBe('planner');
+    }
+  });
+});

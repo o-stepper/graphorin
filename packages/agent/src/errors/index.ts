@@ -46,8 +46,8 @@ export class AgentRuntimeError extends Error {
 
 /**
  * Thrown by `createAgent({...})` when the supplied options fail
- * structural validation (missing `provider`, empty `name`, both
- * `outputType: 'text'` and `outputSchema` declared, ...).
+ * structural validation (missing `provider`, empty `name`, an
+ * `outputType` of kind `'text'` carrying a `schema`, ...).
  *
  * @stable
  */

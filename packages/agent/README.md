@@ -66,11 +66,13 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
 - **Durable HITL.** `RunState.toJSON()` /
   `RunState.fromJSON(serialized, agent)` round-trip the full run
   state through any storage the caller picks (file, SQLite, KV, S3).
-- **Multi-agent.** `Agent.toTool({ exposeTurns,
-  secretsInheritance, inheritSecrets, inputFilter })` wraps an
-  agent as a tool the parent agent can call. The default
-  `secretsInheritance: 'inherit-allowlist'` with empty
-  `inheritedSecrets` enforces the principle of least authority.
+- **Multi-agent.** `Agent.toTool({ exposeTurns, inputFilter })`
+  wraps an agent as a tool the parent agent can call. The parent's
+  abort signal, deps, and sessionId propagate into the sub-run;
+  without an `inputFilter` the sub-agent sees only the input string
+  (no parent conversation crosses the boundary), and there is no
+  secret-inheritance mechanism at this boundary at all — least
+  authority by construction.
 - **Filter library.** `filters.lastN(n)`, `filters.lastUser`,
   `filters.summary({...})`, `filters.bySensitivity({...})`,
   `filters.stripReasoning()`, `filters.stripSensitiveOutputs()`,
@@ -124,17 +126,22 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   'fallthrough-default'` once per step.
 - **Lateral-leak defense layer.** `Agent.causalityMonitor`
   (Agentic Reference Monitor pattern), `Agent.mergeGuard` (per-child
-  trust scoring + bias detection on `'judge-merge'`), the protocol
-  injection guard (control-character escape catalogue), and
+  trust scoring + bias detection on `'judge-merge'`; `detect-and-block`
+  refuses the merge with `MergeBlockedError`), the protocol
+  injection guard (`guardOutboundContent` — an exported helper for
+  the server boundary, not an `AgentConfig` knob), and
   commentary-phase trace sanitization at the session-output
   boundary compose orthogonally with the other security layers
-  (sub-agent secrets isolation, handoff input filter, outbound
-  redaction, inbound sanitization).
-- **Inbound sanitization preamble.** When the assembled message
-  list contains any non-trusted `MessageContent` part, the runtime
-  appends the locale-resolved preamble fragment to the system
-  prompt **after** the cache breakpoint so the trusted-only cache
-  prefix is not invalidated.
+  (handoff input filter, outbound redaction, inbound sanitization).
+- **Inbound sanitization preamble.** Part of the context-engine
+  assemble path: with `autoAssembleContext: true` **and** memory
+  wired, when the assembled message list contains any non-trusted
+  `MessageContent` part the engine appends the locale-resolved
+  preamble fragment to the system prompt **after** the cache
+  breakpoint so the trusted-only cache prefix is not invalidated.
+  Without that opt-in the preamble (like the rest of `assemble()`)
+  does not run; the context engine is configured on the memory
+  facade (`createMemory({ contextEngine })`), not on `AgentConfig`.
 
 ## Documentation
 

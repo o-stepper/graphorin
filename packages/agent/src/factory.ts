@@ -40,11 +40,13 @@ import type {
   ToolChoice,
   ToolDefinition,
   ToolDefinitionExample,
+  ToolError,
   ToolExecutionContext,
   Usage,
 } from '@graphorin/core';
 import { isStepCount, NOOP_LOGGER, NOOP_TRACER, zeroUsage } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
+import { composeGuardrails } from '@graphorin/security/guardrails';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
   type CodeExecuteBridge,
@@ -359,6 +361,39 @@ function asMessages(input: AgentInput | RunState): {
   throw new InvalidAgentConfigError(`unrecognized AgentInput shape`);
 }
 
+/**
+ * Strip a single Markdown code fence around a JSON payload (AG-3).
+ * Models often wrap structured output in ```json fences even when told
+ * not to. ReDoS-safe: the info string is matched with `[^\n]*`.
+ */
+function stripJsonFence(text: string): string {
+  const trimmed = text.trim();
+  const match = /^```[^\n]*\n([\s\S]*?)\n?```$/.exec(trimmed);
+  return match?.[1] ?? trimmed;
+}
+
+/**
+ * The AG-3 fallback instruction: one trailing system message that
+ * pins JSON-only output and embeds the wire schema / description.
+ * This is the documented structured-output contract for adapters that
+ * do not yet consume `ProviderRequest.outputType` natively (PS-24).
+ */
+function buildStructuredInstruction(spec: {
+  readonly description?: string;
+  readonly jsonSchema?: Readonly<Record<string, unknown>>;
+}): string {
+  const parts = [
+    'Respond with a single valid JSON value only — no prose, no Markdown code fences.',
+  ];
+  if (spec.description !== undefined && spec.description.length > 0) {
+    parts.push(spec.description);
+  }
+  if (spec.jsonSchema !== undefined) {
+    parts.push(`The JSON MUST conform to this JSON Schema:\n${JSON.stringify(spec.jsonSchema)}`);
+  }
+  return parts.join('\n');
+}
+
 /** Most-recent user-role text in `messages` (for context-engine auto-recall). */
 function lastUserText(messages: ReadonlyArray<Message>): string | undefined {
   for (let i = messages.length - 1; i >= 0; i--) {
@@ -564,7 +599,6 @@ function effectiveReasoningRetention(
       return 'pass-through-all';
     case 'hidden':
       return 'strip';
-    case undefined:
     default:
       return 'strip';
   }
@@ -663,6 +697,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   }
   if (config.provider === undefined || config.provider === null) {
     throw new InvalidAgentConfigError("missing 'provider'");
+  }
+  // AG-3: a schema on a text-kind output spec is a config mistake (the
+  // schema would never run) — reject instead of silently ignoring.
+  if (config.outputType?.kind === 'text' && config.outputType.schema !== undefined) {
+    throw new InvalidAgentConfigError(
+      "outputType.kind 'text' with a schema — did you mean kind: 'structured'?",
+    );
   }
   validatePreferredModel(config.preferredModel);
   if (config.modelTierMap !== undefined) {
@@ -960,7 +1001,58 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       for (const m of messages) state.messages.push(m);
     }
 
+    const finalSnapshot: InternalRunSnapshot<TOutput> = {
+      output: '' as unknown as TOutput,
+    };
+
     yield { type: 'agent.start', runId: state.id, agentId };
+
+    // AG-2 / SDF-4: input guardrails screen each fresh-run seed user
+    // message (string content) BEFORE the first provider call, using the
+    // canonical `@graphorin/security` composer. 'block' fails the run
+    // without reaching the model; 'rewrite' replaces the content in both
+    // the working buffer and the persisted RunState; 'warn' logs and
+    // continues. Resumed runs skip the pass — their seed was screened
+    // when first submitted.
+    const inputGuards = config.guardrails?.input;
+    if (!resumed && inputGuards !== undefined && inputGuards.length > 0) {
+      for (let i = 0; i < messages.length; i++) {
+        const msg = messages[i];
+        if (msg === undefined || msg.role !== 'user' || typeof msg.content !== 'string') continue;
+        const composed = await composeGuardrails(inputGuards, msg.content, {
+          stage: 'input',
+          runId: state.id,
+          sessionId,
+          agentId,
+        });
+        if (!composed.ok) {
+          yield {
+            type: 'guardrail.tripped',
+            guardrailName: composed.name,
+            phase: 'input',
+            reason: composed.message,
+          };
+          const message = `input guardrail '${composed.name}' blocked the run: ${composed.message}`;
+          yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
+          state.status = 'failed';
+          state.error = { message, code: 'guardrail-blocked' };
+          return yield* finishRun(state, finalSnapshot);
+        }
+        if (composed.value !== msg.content) {
+          const rewritten: Message = { ...msg, content: composed.value };
+          const stateIdx = state.messages.indexOf(msg);
+          messages[i] = rewritten;
+          if (stateIdx !== -1) state.messages[stateIdx] = rewritten;
+        }
+      }
+    }
+
+    // AG-3: one per-run JSON instruction for structured output, appended
+    // to each provider request (never the shared buffer / RunState).
+    const structuredInstruction =
+      config.outputType?.kind === 'structured'
+        ? buildStructuredInstruction(config.outputType)
+        : undefined;
 
     // AG-1: approved gated calls collected from a resume directive, executed
     // for real once every approval is resolved (see the dispatch below).
@@ -1047,16 +1139,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state,
     };
 
-    const finalSnapshot: InternalRunSnapshot<TOutput> = {
-      output: '' as unknown as TOutput,
-    };
-
     // AG-14: a resumed run that is still suspended (`awaiting_approval` with
     // approvals the directive did not resolve) or already terminal-failed must
     // not re-enter the provider loop — that would re-issue a dangling tool_use
     // real providers reject, or silently complete a failed run. Return it as-is.
     if (resumed && (state.status === 'awaiting_approval' || state.status === 'failed')) {
-      return finalize(state, finalSnapshot);
+      return yield* finishRun(state, finalSnapshot);
     }
 
     // AG-1: every approval is now resolved (status is 'running'), so execute the
@@ -1327,7 +1415,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           if (ev !== undefined) yield ev;
         }
         if (signal.aborted) {
-          if (yield* emitCancellation()) return finalize(state, finalSnapshot);
+          if (yield* emitCancellation()) return yield* finishRun(state, finalSnapshot);
           break;
         }
         stepNumber += 1;
@@ -1455,7 +1543,28 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         );
 
         const baseRequest: ProviderRequest = {
-          messages,
+          // AG-3 fallback contract: for structured output the request
+          // carries ONE trailing system instruction (JSON-only + schema)
+          // in the request copy — never in the shared buffer or the
+          // persisted RunState. Adapters with native structured output
+          // additionally receive `outputType` below (PS-24 consumes it).
+          messages:
+            structuredInstruction === undefined
+              ? messages
+              : [...messages, { role: 'system' as const, content: structuredInstruction }],
+          ...(config.outputType !== undefined
+            ? {
+                outputType: {
+                  kind: config.outputType.kind,
+                  ...(config.outputType.description !== undefined
+                    ? { description: config.outputType.description }
+                    : {}),
+                  ...(config.outputType.jsonSchema !== undefined
+                    ? { jsonSchema: config.outputType.jsonSchema }
+                    : {}),
+                },
+              }
+            : {}),
           tools: toolDefs,
           ...(overrides.toolChoice !== undefined
             ? { toolChoice: overrides.toolChoice }
@@ -1582,7 +1691,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               };
               state.status = 'failed';
               state.error = { message: providerError.message, code: providerError.kind };
-              return finalize(state, finalSnapshot);
+              return yield* finishRun(state, finalSnapshot);
             }
             continue;
           }
@@ -1622,7 +1731,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         // tool calls run and the graceful stop happens at the loop top.
         if (signal.aborted && !modelSucceeded) {
           yield* emitCancellation();
-          return finalize(state, finalSnapshot);
+          return yield* finishRun(state, finalSnapshot);
         }
 
         if (!modelSucceeded) {
@@ -1635,7 +1744,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           };
           state.status = 'failed';
           state.error = { message: 'no provider completed', code: 'no-provider-completed' };
-          return finalize(state, finalSnapshot);
+          return yield* finishRun(state, finalSnapshot);
         }
 
         usageAcc.add(lastModelId, stepUsage);
@@ -1729,6 +1838,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 filterLib.defaultHandoffFilter()) as DescribedFilter;
               const filtered = filter(messages);
               const targetId = handoff.agent.id;
+              // The secrets fields record the structural reality: no
+              // inheritance mechanism exists at this boundary, so the
+              // target receives nothing — an empty allowlist is the
+              // factually-true provenance (AG-17).
               const handoffRec: HandoffRecord = {
                 fromAgentId: agentId,
                 toAgentId: targetId,
@@ -1742,10 +1855,53 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               yield { type: 'handoff', fromAgentId: agentId, toAgentId: targetId };
               state.currentAgentId = targetId;
               const subAgent = handoff.agent;
+              // AG-22: the sub-agent inherits the parent's abort signal,
+              // deps, and sessionId; its terminal `agent.end` is observed
+              // so a failed/aborted sub-run surfaces as a TOOL ERROR —
+              // never an empty-string success with durationMs 0.
+              const subStart = Date.now();
               const subOutputs: string[] = [];
-              const subStream = subAgent.stream(filtered as Message[]);
+              let subResult: AgentResult<unknown> | undefined;
+              const subStream = subAgent.stream(filtered as Message[], {
+                signal,
+                ...(options.deps !== undefined || config.deps !== undefined
+                  ? { deps: (options.deps ?? config.deps) as TDeps }
+                  : {}),
+                sessionId,
+              });
               for await (const subEv of subStream) {
                 if (subEv.type === 'text.complete') subOutputs.push(subEv.text);
+                else if (subEv.type === 'agent.end') {
+                  subResult = subEv.result as AgentResult<unknown>;
+                }
+              }
+              const subDurationMs = Date.now() - subStart;
+              const stepEntry = state.steps[state.steps.length - 1];
+              if (subResult !== undefined && subResult.status !== 'completed') {
+                const toolError: ToolError = {
+                  toolCallId: call.toolCallId,
+                  toolName: call.toolName,
+                  kind: subResult.status === 'aborted' ? 'aborted' : 'execution_failed',
+                  message: `handoff to '${targetId}' ${subResult.status}${
+                    subResult.error !== undefined ? `: ${subResult.error.message}` : ''
+                  }`,
+                };
+                if (stepEntry !== undefined) {
+                  (stepEntry.toolCalls as CompletedToolCall[]).push({
+                    call,
+                    outcome: toolError,
+                    stepNumber,
+                  });
+                }
+                yield {
+                  type: 'tool.execute.error',
+                  toolCallId: call.toolCallId,
+                  error: toolError,
+                };
+                const text = `Error: ${toolError.message}`;
+                messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+                state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+                continue;
               }
               const result = subOutputs.join('');
               const completed: CompletedToolCall = {
@@ -1754,11 +1910,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                   toolCallId: call.toolCallId,
                   toolName: call.toolName,
                   output: result,
-                  durationMs: 0,
+                  durationMs: subDurationMs,
                 },
                 stepNumber,
               };
-              const stepEntry = state.steps[state.steps.length - 1];
               if (stepEntry !== undefined) {
                 (stepEntry.toolCalls as CompletedToolCall[]).push(completed);
               }
@@ -1766,7 +1921,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 type: 'tool.execute.end',
                 toolCallId: call.toolCallId,
                 result,
-                durationMs: 0,
+                durationMs: subDurationMs,
               };
               messages.push({ role: 'tool', toolCallId: call.toolCallId, content: result });
               state.messages.push({
@@ -1828,7 +1983,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                   { source: 'sync', status: 'suspended', nodeName: 'agent.run' },
                 );
               }
-              return finalize(state, finalSnapshot);
+              return yield* finishRun(state, finalSnapshot);
             }
 
             batch.push(call);
@@ -1852,7 +2007,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       yield { type: 'agent.error', error: { message, code } };
       state.status = 'failed';
       state.error = { message, code };
-      return finalize(state, finalSnapshot);
+      return yield* finishRun(state, finalSnapshot);
     } finally {
       // AG-5: drop the parent-signal listener so it does not accumulate across
       // runs that share one long-lived `options.signal`. Runs after this point
@@ -1879,8 +2034,58 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       delete (state as { finishedAt?: string }).finishedAt;
       yield* runFollowUpLoop(messages, state, stepNumber, signal, sessionId, userId);
     }
+
+    // AG-3: structured output is parsed + validated on the completed
+    // path — a failure is a typed run failure (`output-validation-failed`),
+    // never a silent text-cast. Runs BEFORE output guardrails so they
+    // screen the PARSED value.
+    if (state.status === 'completed' && config.outputType?.kind === 'structured') {
+      const raw = String(finalSnapshot.output ?? '');
+      try {
+        const parsed: unknown = JSON.parse(stripJsonFence(raw));
+        finalSnapshot.output = (
+          config.outputType.schema !== undefined ? config.outputType.schema.parse(parsed) : parsed
+        ) as TOutput;
+      } catch (cause) {
+        const message = `structured output validation failed: ${
+          cause instanceof Error ? cause.message : String(cause)
+        }`;
+        yield { type: 'agent.error', error: { message, code: 'output-validation-failed' } };
+        state.status = 'failed';
+        state.error = { message, code: 'output-validation-failed' };
+      }
+    }
+
+    // AG-2 / SDF-4: output guardrails screen the final output on the
+    // completed path before `agent.end`. 'block' fails the run;
+    // 'rewrite' replaces the durable result (`result.output`) — the
+    // text deltas were already streamed, so the rewrite governs what
+    // is persisted/returned, not the live token stream.
+    const outputGuards = config.guardrails?.output;
+    if (state.status === 'completed' && outputGuards !== undefined && outputGuards.length > 0) {
+      const composed = await composeGuardrails(outputGuards, finalSnapshot.output, {
+        stage: 'output',
+        runId: state.id,
+        sessionId,
+        agentId,
+      });
+      if (!composed.ok) {
+        yield {
+          type: 'guardrail.tripped',
+          guardrailName: composed.name,
+          phase: 'output',
+          reason: composed.message,
+        };
+        const message = `output guardrail '${composed.name}' blocked the run: ${composed.message}`;
+        yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
+        state.status = 'failed';
+        state.error = { message, code: 'guardrail-blocked' };
+      } else if (composed.value !== finalSnapshot.output) {
+        finalSnapshot.output = composed.value;
+      }
+    }
     activeRunState = undefined;
-    return finalize(state, finalSnapshot);
+    return yield* finishRun(state, finalSnapshot);
   }
 
   /**
@@ -1906,14 +2111,34 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     yield* (async function* (): AsyncGenerator<AgentEvent<TOutput>, void, void> {})();
   }
 
+  /**
+   * Terminal wrapper around {@link finalize}: every exit path of the run
+   * loop — completed, failed, aborted, suspended — ends the stream with
+   * an `agent.end` event carrying the final {@link AgentResult} (AG-20).
+   */
+  async function* finishRun(
+    state: MutableRunState,
+    snapshot: InternalRunSnapshot<TOutput>,
+  ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
+    const result = finalize(state, snapshot);
+    yield { type: 'agent.end', runId: result.state.id, result };
+    return result;
+  }
+
   function finalize(
     state: MutableRunState,
     snapshot: InternalRunSnapshot<TOutput>,
   ): AgentResult<TOutput> {
     state.finishedAt = state.finishedAt ?? new Date().toISOString();
+    // AG-9: the result carries the terminal status, the failure (when
+    // any), and the final RunState — a suspended run is resumable from
+    // the result alone, no checkpointStore required.
     return {
       output: snapshot.output,
       usage: state.usage,
+      status: state.status,
+      ...(state.error !== undefined ? { error: state.error } : {}),
+      state: state as unknown as RunState,
     };
   }
 
@@ -1948,16 +2173,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   ): Promise<AgentResult<TOutput>> => {
     const opts = options ?? {};
     const gen = runLoop(input, opts);
-    let result: AgentResult<TOutput> = {
-      output: '' as unknown as TOutput,
-      usage: zeroUsage(),
-    };
     let next = await gen.next();
     while (next.done !== true) {
       next = await gen.next();
     }
-    if (next.value !== undefined) {
-      result = next.value;
+    // Every terminal path of the run loop returns `finalize(...)`; an
+    // undefined return value would mean the generator was torn down
+    // externally — an invariant violation, not a run outcome (AG-9).
+    const result = next.value;
+    if (result === undefined) {
+      throw new Error('unreachable: agent run loop ended without a result');
     }
     return result;
   };
@@ -2016,19 +2241,57 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         TDeps
       >['inputSchema'],
       sideEffectClass: 'side-effecting',
-      async execute(input) {
+      async execute(input, ctx) {
+        // AG-17: the parent ToolExecutionContext propagates — the
+        // parent's abort stops the sub-agent, deps/sessionId flow
+        // through, and the optional `inputFilter` shapes a seed from
+        // the parent history. Least authority by default: without a
+        // filter the sub-agent sees ONLY the input string, never the
+        // parent conversation.
+        const callOpts: AgentCallOptions<TDeps> = {
+          ...(ctx?.signal !== undefined ? { signal: ctx.signal } : {}),
+          ...(ctx?.runContext.deps !== undefined ? { deps: ctx.runContext.deps as TDeps } : {}),
+          ...(ctx?.runContext.sessionId !== undefined
+            ? { sessionId: ctx.runContext.sessionId }
+            : {}),
+        };
+        const seed: AgentInput =
+          options.inputFilter !== undefined && ctx !== undefined
+            ? ([
+                ...options.inputFilter(ctx.runContext.messages),
+                { role: 'user' as const, content: input.input },
+              ] as Message[])
+            : input.input;
         if (exposeTurns === 'all') {
           // Replay the streamed text completions as the result so
           // the parent agent sees every turn the sub-agent
           // produced. `exposeTurns: 'final'` (default) and
           // `'none'` skip the per-turn assembly.
           const turns: string[] = [];
-          for await (const ev of stream(input.input, {})) {
+          let endResult: AgentResult<TOutput> | undefined;
+          for await (const ev of stream(seed, callOpts)) {
             if (ev.type === 'text.complete') turns.push(ev.text);
+            else if (ev.type === 'agent.end') endResult = ev.result;
+          }
+          if (endResult !== undefined && endResult.status !== 'completed') {
+            throw new Error(
+              `sub-agent '${config.name}' ${endResult.status}${
+                endResult.error !== undefined ? `: ${endResult.error.message}` : ''
+              }`,
+            );
           }
           return turns.join('\n\n') as unknown as TOutput;
         }
-        const result = await run(input.input, {});
+        const result = await run(seed, callOpts);
+        // AG-17/AG-22 class: a non-completed sub-run is a TOOL ERROR,
+        // never an empty-string success.
+        if (result.status !== 'completed') {
+          throw new Error(
+            `sub-agent '${config.name}' ${result.status}${
+              result.error !== undefined ? `: ${result.error.message}` : ''
+            }`,
+          );
+        }
         if (exposeTurns === 'none') return '' as unknown as TOutput;
         return result.output;
       },
@@ -2101,6 +2364,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       ...(options.perBudget !== undefined ? { perBudget: options.perBudget } : {}),
       ...(options.mergeStrategy !== undefined ? { mergeStrategy: options.mergeStrategy } : {}),
       ...(options.signal !== undefined ? { signal: options.signal } : {}),
+      // AG-7: fanout lifecycle events reach the agent stream — queued
+      // on the external-event queue and drained into the active (or
+      // next consumed) run, like steer/follow-up/progress events.
+      emit: (event) => {
+        externalEventQueue.push(event as AgentEvent<TOutput>);
+      },
+      // AG-7: the configured sideways-injection merge guard finally
+      // applies to the judge-merge path.
+      ...(config.mergeGuard !== undefined ? { mergeGuard: config.mergeGuard } : {}),
       runId,
       sessionId,
       agentId,
@@ -2108,14 +2380,38 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     return runFanOut<TFanOutOutput>(fanOutOptions);
   };
 
+  // Stable fallback id so out-of-run `progress.write` → `progress.read`
+  // pairs resolve to the same artifact directory (a fresh id per call
+  // could never find what it just wrote).
+  const progressFallbackRunId = `run_${newId()}`;
   const progress: AgentProgressIO = {
-    write: (content: string, opts?: ProgressWriteOptions) => {
-      const runId = activeRunState?.id ?? `run_${newId()}`;
-      return progressIO.write(runId, content, opts);
+    write: async (content: string, opts?: ProgressWriteOptions) => {
+      const runId = activeRunState?.id ?? progressFallbackRunId;
+      const ref = await progressIO.write(runId, content, opts);
+      // AG-20: surface the documented `agent.progress.written` event —
+      // queued here and drained into the active (or next consumed) stream.
+      externalEventQueue.push({
+        type: 'agent.progress.written',
+        runId,
+        sessionId: activeRunState?.sessionId ?? '',
+        agentId,
+        ref,
+      } as AgentEvent<TOutput>);
+      return ref;
     },
-    read: (opts?: ProgressReadOptions) => {
-      const runId = activeRunState?.id ?? `run_${newId()}`;
-      return progressIO.read(runId, opts);
+    read: async (opts?: ProgressReadOptions) => {
+      const queriedRunId = opts?.runId ?? activeRunState?.id ?? progressFallbackRunId;
+      const refs = await progressIO.read(queriedRunId, opts);
+      externalEventQueue.push({
+        type: 'agent.progress.read',
+        runId: activeRunState?.id ?? queriedRunId,
+        sessionId: activeRunState?.sessionId ?? '',
+        agentId,
+        refs,
+        queriedRunId,
+        queriedRole: opts?.role,
+      } as AgentEvent<TOutput>);
+      return refs;
     },
   };
 

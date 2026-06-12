@@ -48,6 +48,10 @@ Every operation returns `AsyncIterable<AgentEvent<TOutput>>`. `agent.run(...)` i
 // A simplified shape that mirrors the @graphorin/core
 // `AgentEvent<TOutput>` discriminated union. Hover any
 // identifier below to see the inferred type.
+type AgentResult<TOutput> = {
+  output: TOutput;
+  status: 'completed' | 'failed' | 'aborted' | 'awaiting_approval';
+};
 type AgentEvent<TOutput> =
   | { type: 'agent.start'; runId: string }
   | { type: 'step.start'; stepNumber: number }
@@ -59,7 +63,7 @@ type AgentEvent<TOutput> =
   | { type: 'tool.approval.requested'; toolCallId: string }
   | { type: 'context.compacted'; beforeTokens: number; afterTokens: number }
   | { type: 'agent.model.fellback'; previousModel: string; nextModel: string }
-  | { type: 'agent.end'; output: TOutput };
+  | { type: 'agent.end'; runId: string; result: AgentResult<TOutput> };
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled event: ${JSON.stringify(value)}`);
@@ -191,13 +195,9 @@ for await (const event of agent.stream('Summarise the status of my last order', 
 
 ## Multi-agent
 
-`agent.toTool({ name, description, exposeTurns, secretsInheritance, inheritSecrets, inputFilter })` wraps an agent as a typed tool the parent agent can call. The default `secretsInheritance: 'inherit-allowlist'` with an empty `inheritSecrets` array enforces the **principle of least authority** — sub-agents inherit nothing unless explicitly granted.
+`agent.toTool({ name, description, exposeTurns, inputFilter })` wraps an agent as a typed tool the parent agent can call (AG-17). The parent's abort signal, `deps`, and `sessionId` propagate into the sub-run; a non-completed sub-run (failed/aborted) surfaces as a **tool error**, never an empty-string success.
 
-| `secretsInheritance` | Behaviour |
-|---|---|
-| `'inherit-allowlist'` (default) | Sub-agent inherits only the secret refs explicitly listed in `inheritSecrets`. |
-| `'forward-explicit'` | Sub-agent receives only the secret refs forwarded for this specific call. |
-| `'isolated'` | Sub-agent receives no inherited secrets at all. |
+Isolation at this boundary is **structural least authority**: without an `inputFilter` the sub-agent sees only the input string — no parent conversation crosses the boundary — and there is no secret-inheritance mechanism here at all (the sub-agent runs with its own configuration). With `inputFilter` supplied, the sub-agent is seeded with `[...inputFilter(parentMessages), { role: 'user', content: input }]`, mirroring the handoff filter discipline.
 
 ## Filter library
 
@@ -316,11 +316,11 @@ const planTool = tool({
 
 ## Lateral-leak defense layer
 
-Three opt-in agent-level guards configured on `createAgent({ causalityMonitor, mergeGuard, protocolGuard })`. They compose orthogonally with the other security layers (sub-agent secrets isolation, handoff input filter, outbound redaction, inbound sanitisation):
+Two opt-in agent-level guards configured on `createAgent({ causalityMonitor, mergeGuard })`. They compose orthogonally with the other security layers (handoff input filter, outbound redaction, inbound sanitisation):
 
 - **`causalityMonitor`** — implements an Agentic Reference Monitor pattern: every cross-agent flow is checked against the stated capability, with a configurable strictness level.
-- **`mergeGuard`** — per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy.
-- **`protocolGuard`** — control-character escape catalogue applied at protocol boundaries.
+- **`mergeGuard`** — per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy (AG-7): each child's source trust × contribution weight is scored against the judge's merged output; a biased merge emits `agent.lateral-leak.detected` (vector `sideways-injection`) and `strictness: 'detect-and-block'` throws `MergeBlockedError`.
+- **Protocol-injection guard** — the control-character escape catalogue (`guardOutboundContent`) is an exported helper for **server-boundary** wiring (SSE/session export), not an `AgentConfig` knob — the agent itself has no protocol boundary.
 - **Commentary-phase trace sanitisation** runs at the session-output boundary in `@graphorin/sessions`.
 
 ## Provenance / data-flow policy (`dataFlowPolicy`)

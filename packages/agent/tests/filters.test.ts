@@ -119,7 +119,9 @@ describe('filters.stripToolCalls', () => {
     const filtered = stripToolCalls()(sample);
     expect(filtered.some((m) => m.role === 'tool')).toBe(false);
     const assistantWithCalls = filtered.find(
-      (m) => m.role === 'assistant' && (m as { toolCalls?: unknown[] }).toolCalls !== undefined,
+      (m) =>
+        m.role === 'assistant' &&
+        (m as unknown as { toolCalls?: unknown[] }).toolCalls !== undefined,
     );
     expect(assistantWithCalls).toBeUndefined();
   });

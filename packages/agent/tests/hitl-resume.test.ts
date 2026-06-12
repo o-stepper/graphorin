@@ -3,30 +3,27 @@ import { describe, expect, it } from 'vitest';
 import { createAgent, runStateFromJSON, runStateToJSON } from '../src/index.js';
 import { createMockProvider, textOnlyScript, toolCallScript } from './fixtures/mock-provider.js';
 
-const buildSendEmailTool = (): Tool<
-  { readonly to: string; readonly body: string },
-  string,
-  unknown
-> => ({
-  name: 'send_email',
-  description: 'Send an email (requires approval).',
-  inputSchema: {
-    parse: (v: unknown) => v as { readonly to: string; readonly body: string },
-    safeParse: (v: unknown) => ({
-      success: true as const,
-      data: v as { readonly to: string; readonly body: string },
-    }),
-    toJSON: (): Record<string, unknown> => ({
-      type: 'object',
-      properties: { to: { type: 'string' }, body: { type: 'string' } },
-    }),
-  } as Tool<{ readonly to: string; readonly body: string }, string, unknown>['inputSchema'],
-  needsApproval: true,
-  sideEffectClass: 'external-stateful',
-  async execute(input) {
-    return `sent:${input.to}`;
-  },
-});
+const buildSendEmailTool = (): Tool<unknown, unknown, unknown> =>
+  ({
+    name: 'send_email',
+    description: 'Send an email (requires approval).',
+    inputSchema: {
+      parse: (v: unknown) => v as { readonly to: string; readonly body: string },
+      safeParse: (v: unknown) => ({
+        success: true as const,
+        data: v as { readonly to: string; readonly body: string },
+      }),
+      toJSON: (): Record<string, unknown> => ({
+        type: 'object',
+        properties: { to: { type: 'string' }, body: { type: 'string' } },
+      }),
+    } as Tool<{ readonly to: string; readonly body: string }, string, unknown>['inputSchema'],
+    needsApproval: true,
+    sideEffectClass: 'external-stateful',
+    async execute(input: { readonly to: string; readonly body: string }) {
+      return `sent:${input.to}`;
+    },
+  }) as unknown as Tool<unknown, unknown, unknown>;
 
 describe('Agent — HITL approval flow', () => {
   it('suspends on a needsApproval tool call, persists RunState, and resumes via directive', async () => {
@@ -55,13 +52,21 @@ describe('Agent — HITL approval flow', () => {
     for await (const ev of agent.stream('email Alice')) {
       events1.push(ev);
       if (ev.type === 'tool.approval.requested') {
-        // The current public surface returns the run via
-        // `agent.run(...)`; for the test we walk the stream and
-        // synthesize the state from the emitted events.
+        // `agent.run(...)` now returns the suspended RunState directly
+        // (`result.state`, AG-9 — covered in agent-result.test.ts); this
+        // test keeps the synthetic-state path to pin the serialized
+        // wire format a durable store would rehydrate from.
       }
     }
-    // The first run must NOT have hit `agent.end`.
-    expect(events1.some((e) => e.type === 'agent.end')).toBe(false);
+    // The suspended run still ends with a terminal `agent.end` (AG-20) —
+    // its result carries status 'awaiting_approval', which is how stream
+    // consumers (e.g. an SSE bridge) learn the stream is over but resumable.
+    const end1 = events1.find((e) => e.type === 'agent.end');
+    expect(end1).toBeDefined();
+    if (end1?.type === 'agent.end') {
+      expect(end1.result.status).toBe('awaiting_approval');
+      expect(end1.result.state.pendingApprovals.length).toBeGreaterThan(0);
+    }
     expect(events1.some((e) => e.type === 'tool.approval.requested')).toBe(true);
 
     // Build a synthetic RunState representing the suspended run

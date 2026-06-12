@@ -37,7 +37,7 @@ function fakeSandbox(id: string): SandboxImpl {
       canEnforceTimeout: true,
       canEnforceMemoryLimit: true,
     },
-    run: async () => ({ ok: true as const, output: undefined, durationMs: 0 }),
+    run: async () => ({ ok: true as const, output: undefined as never, durationMs: 0 }),
   };
 }
 

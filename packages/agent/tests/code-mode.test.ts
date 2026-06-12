@@ -188,7 +188,7 @@ describe('WI-11 — only the final result re-enters context', () => {
     expect(codeResult).toBeDefined();
     // The two 100 KB intermediates were combined to a tiny final result…
     expect(codeResult).toContain('200000');
-    expect(codeResult!.length).toBeLessThan(200);
+    expect(codeResult?.length).toBeLessThan(200);
     // …and the 200 KB of intermediate data never entered the conversation.
     expect(toolMessages.some((c) => c.includes('X'.repeat(2000)))).toBe(false);
     for (const m of toolMessages) trackSpill(m);

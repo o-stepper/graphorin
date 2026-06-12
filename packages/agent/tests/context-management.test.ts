@@ -178,6 +178,7 @@ describe('WI-09 — auto-compaction trigger', () => {
       'text.delta',
       'text.complete',
       'step.end',
+      'agent.end',
     ]);
   });
 

@@ -25,19 +25,15 @@ import type {
   ToolChoice,
   Tracer,
 } from '@graphorin/core';
-import type {
-  ContextEngineConfig,
-  Memory,
-  PostCompactionHook as MemoryPostCompactionHook,
-} from '@graphorin/memory';
+import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@graphorin/memory';
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
+import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardrails';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
 import type { AgentFallbackPolicy } from './fallback/index.js';
-import type { FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
+import type { FanOutOptions, FanOutResult, MergeStrategy, PerChildBudget } from './fanout/index.js';
 import type { CausalityMonitorConfig } from './lateral-leak/causality-monitor.js';
 import type { MergeGuardConfig } from './lateral-leak/merge-guard.js';
-import type { ProtocolGuardConfig } from './lateral-leak/protocol-guard.js';
 import type { ProgressReadOptions, ProgressWriteOptions } from './progress/index.js';
 
 /**
@@ -57,10 +53,22 @@ export type AgentInput = string | Message | ReadonlyArray<Message>;
  */
 export interface OutputSpec<TOutput> {
   readonly kind: 'text' | 'structured';
-  /** Optional Zod schema for structured output validation. */
+  /**
+   * Local validator (Zod-compatible `{ parse }`) applied to the final
+   * model output on the completed path (AG-3). A parse failure fails
+   * the run with `output-validation-failed` — never a silent cast.
+   */
   readonly schema?: { parse(value: unknown): TOutput };
   /** Optional description shown to the model alongside the schema. */
   readonly description?: string;
+  /**
+   * Wire-format JSON Schema advertised to the model: forwarded on
+   * `ProviderRequest.outputType` for adapters with native structured
+   * output, and embedded in the fallback JSON instruction appended as
+   * a trailing system message (the documented contract until adapters
+   * consume `outputType` natively — PS-24).
+   */
+  readonly jsonSchema?: Readonly<Record<string, unknown>>;
 }
 
 /**
@@ -81,23 +89,6 @@ export interface PrepareStepOverrides<TDeps = unknown> {
   readonly temperature?: number;
   readonly maxTokens?: number;
 }
-
-/**
- * Input guardrail predicate.
- *
- * @stable
- */
-export type InputGuardrail = (input: AgentInput) => Promise<GuardrailVerdict> | GuardrailVerdict;
-
-/** @stable */
-export type OutputGuardrail<TOutput = unknown> = (
-  output: TOutput,
-) => Promise<GuardrailVerdict> | GuardrailVerdict;
-
-/** @stable */
-export type GuardrailVerdict =
-  | { readonly trip: false }
-  | { readonly trip: true; readonly reason?: string; readonly name?: string };
 
 /**
  * Compaction post-hook factory accepted by `createAgent({...})`.
@@ -126,10 +117,16 @@ export interface SkillsRegistryLike {
  *
  * @stable
  */
+// `TOutput` is existential here: handoff targets legitimately vary in
+// output type, and `Agent` is invariant in `TOutput` (the result is
+// covariant, `guardrails.output` is contravariant) — `unknown` would
+// reject every concretely-typed agent.
 export type HandoffEntry<TDeps = unknown> =
-  | Agent<TDeps, unknown>
+  // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
+  | Agent<TDeps, any>
   | {
-      readonly target: Agent<TDeps, unknown>;
+      // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
+      readonly target: Agent<TDeps, any>;
       readonly inputFilter?: HandoffFilter;
     };
 
@@ -166,14 +163,30 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly autoAssembleContext?: boolean;
   readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
   readonly outputType?: OutputSpec<TOutput>;
+  /**
+   * Deterministic checks run by the loop (AG-2; canonical contract is
+   * `@graphorin/security`'s `GuardrailDefinition` — SDF-4).
+   *
+   * - `input` guardrails run over each **fresh-run seed user message**
+   *   (string content) before the first provider call. `'block'` fails
+   *   the run (`guardrail-blocked`) without reaching the model;
+   *   `'rewrite'` replaces the message content (mirrored into the
+   *   persisted `RunState`); `'warn'` logs and continues.
+   * - `output` guardrails run over the **final output** on the
+   *   completed path before `agent.end`. `'block'` fails the run;
+   *   `'rewrite'` replaces `result.output` (text deltas were already
+   *   streamed — the rewrite governs the durable result, not the
+   *   live token stream).
+   *
+   * Every trip emits a `guardrail.tripped` event.
+   */
   readonly guardrails?: {
-    readonly input?: ReadonlyArray<InputGuardrail>;
+    readonly input?: ReadonlyArray<InputGuardrail<string>>;
     readonly output?: ReadonlyArray<OutputGuardrail<TOutput>>;
   };
   readonly stopWhen?: StopCondition;
   readonly toolChoice?: ToolChoice;
   readonly prepareStep?: PrepareStepHook<TDeps>;
-  readonly contextEngine?: ContextEngineConfig;
   readonly maxParallelTools?: number;
   /**
    * How the model invokes tools (P1-2).
@@ -196,7 +209,6 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly fallbackPolicy?: AgentFallbackPolicy;
   readonly preferredModel?: ModelHint | ModelSpec;
   readonly modelTierMap?: Partial<Record<ModelHint, ModelSpec>>;
-  readonly modelTierAutoClassification?: boolean;
   /**
    * Per-agent override of the per-provider auto-detected
    * {@link ReasoningRetention} default. Wins over the provider-
@@ -207,8 +219,14 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly reasoningRetention?: ReasoningRetention;
   readonly causalityMonitor?: CausalityMonitorConfig;
+  /**
+   * Sideways-injection merge guard for `agent.fanOut` `'judge-merge'`
+   * (AG-7): scores per-child source trust × contribution weight against
+   * the judge's merged output; a biased merge emits
+   * `agent.lateral-leak.detected` and `'detect-and-block'` throws
+   * `MergeBlockedError`.
+   */
   readonly mergeGuard?: MergeGuardConfig;
-  readonly protocolGuard?: ProtocolGuardConfig;
   /**
    * Provenance / taint-based data-flow policy (P1-3, opt-in). Enforces
    * data-flow rules at the tool-execution boundary using the provenance
@@ -303,8 +321,15 @@ export interface AgentToToolOptions {
   readonly name?: string;
   readonly description?: string;
   readonly exposeTurns?: 'final' | 'all' | 'none';
-  readonly secretsInheritance?: 'inherit-allowlist' | 'isolated' | 'forward-explicit';
-  readonly inheritSecrets?: ReadonlyArray<string>;
+  /**
+   * Shapes the sub-agent seed from the parent history (AG-17): when
+   * supplied, the sub-agent is seeded with
+   * `[...inputFilter(parentMessages), { role: 'user', content: input }]`.
+   * Without a filter the sub-agent sees ONLY the input string — no
+   * parent conversation crosses the boundary (least authority by
+   * construction; there is no secret-inheritance mechanism at this
+   * boundary at all).
+   */
   readonly inputFilter?: HandoffFilter;
 }
 
@@ -364,10 +389,7 @@ export interface CompactionApiResult {
  * @stable
  */
 export interface AgentFanOutOptions<TOutput = unknown> {
-  readonly children: ReadonlyArray<{
-    readonly agentId: string;
-    readonly invoke: () => Promise<TOutput>;
-  }>;
+  readonly children: FanOutOptions<TOutput>['children'];
   readonly maxConcurrentChildren?: number;
   readonly perBudget?: PerChildBudget;
   readonly mergeStrategy?: MergeStrategy<TOutput>;

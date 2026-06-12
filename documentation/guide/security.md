@@ -131,8 +131,8 @@ The agent runtime's defense layer composes orthogonally with the security primit
 | Layer | Purpose |
 |---|---|
 | `causalityMonitor` (`createAgent({ causalityMonitor })`) | Implements an Agentic Reference Monitor pattern. Every cross-agent flow is checked against the stated capability. |
-| `mergeGuard` (`createAgent({ mergeGuard })`) | Per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy. |
-| `protocolGuard` (`createAgent({ protocolGuard })`) | Control-character escape catalogue applied at protocol boundaries. |
+| `mergeGuard` (`createAgent({ mergeGuard })`) | Per-child trust scoring + bias detection on the `'judge-merge'` fan-out strategy; `detect-and-block` refuses the merge (`MergeBlockedError`). |
+| Protocol-injection guard (`guardOutboundContent` helper) | Control-character escape catalogue for server-boundary wiring (SSE / session export) — not an `AgentConfig` knob. |
 | Commentary-phase trace sanitisation | At the session-output boundary, before any export. |
 | Inbound sanitisation preamble | When non-trusted content is in the message list, a locale-resolved preamble is appended **after** the cache breakpoint. |
 

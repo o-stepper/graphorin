@@ -138,9 +138,9 @@ export function lastUser(): DescribedFilter {
 }
 
 /**
- * The full unfiltered history. Emits a deprecation warning per call
- * — security-conscious callers should pick {@link lastN} or
- * {@link bySensitivity} instead.
+ * The full unfiltered history. Discouraged — security-conscious
+ * callers should pick {@link lastN} or {@link bySensitivity} instead
+ * (a sub-agent rarely needs the parent's entire conversation).
  *
  * @stable
  */

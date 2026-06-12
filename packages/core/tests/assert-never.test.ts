@@ -60,10 +60,6 @@ function describeAgentEvent(e: AgentEvent): string {
       return e.toolCallId;
     case 'tool.approval.denied':
       return e.toolCallId;
-    case 'memory.read':
-      return e.query;
-    case 'memory.write':
-      return e.recordId;
     case 'context.compacted':
       return e.runId;
     case 'handoff':

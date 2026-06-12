@@ -19,9 +19,9 @@
       "!**/coverage",
       "!**/node_modules",
       "!**/*.tsbuildinfo",
-      "!documentation/api/**",
-      "!documentation/.vitepress/dist/**",
-      "!documentation/.vitepress/cache/**"
+      "!documentation/api",
+      "!documentation/.vitepress/dist",
+      "!documentation/.vitepress/cache"
     ]
   },
   "formatter": {
