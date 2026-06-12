@@ -78,7 +78,7 @@ describe('maxSteps safeguard', () => {
     const error = events.find((e) => e.type === 'workflow.error');
     expect(error).toBeDefined();
     if (error?.type === 'workflow.error') {
-      expect(error.error.code).toBe('invalid-config');
+      expect(error.error.code).toBe('max-steps-exceeded');
       expect(error.error.message).toMatch(/maxSteps/);
     }
   });

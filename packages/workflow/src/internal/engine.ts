@@ -465,7 +465,7 @@ async function* driveRun<TState extends object>(
     }
     if (internal.stepNumber >= maxSteps) {
       throw new WorkflowError(
-        'invalid-config',
+        'max-steps-exceeded',
         `workflow "${config.name}" exceeded the maxSteps cap (${maxSteps}); aborting to prevent runaway execution`,
         { hint: 'increase maxSteps on createWorkflow({...}) or check for an infinite edge cycle' },
       );
@@ -604,6 +604,17 @@ async function* driveRun<TState extends object>(
         });
       }
       const start = Date.now();
+      // WF-11: every executed task gets its advertised `workflow.task`
+      // span — ok/error mirrors the task outcome.
+      const taskSpan = tracer?.startSpan({
+        type: 'workflow.task',
+        attrs: {
+          'graphorin.workflow.name': config.name,
+          'graphorin.workflow.step_number': internal.stepNumber,
+          'graphorin.workflow.node': task.nodeName,
+          'graphorin.workflow.task_id': task.taskId,
+        },
+      });
       const ctxEmit = (name: string, payload?: unknown): void => {
         customEvents.push({
           type: 'workflow.custom',
@@ -671,6 +682,8 @@ async function* driveRun<TState extends object>(
         }
       }
 
+      taskSpan?.setStatus(status === 'failed' ? 'error' : 'ok');
+      taskSpan?.end();
       const durationMs = Date.now() - start;
       taskOutcomes.push({
         task,
@@ -693,8 +706,11 @@ async function* driveRun<TState extends object>(
       }
     });
 
+    let graceExpired = false;
     try {
-      await waitForTasksOrTimeout(taskPromises, taskController.signal, cancelGraceMs);
+      graceExpired =
+        (await waitForTasksOrTimeout(taskPromises, taskController.signal, cancelGraceMs)) ===
+        'grace-expired';
     } finally {
       signal?.removeEventListener('abort', onSignalAbort);
     }
@@ -703,9 +719,20 @@ async function* driveRun<TState extends object>(
     if (includeCustomEvents) for (const ev of customEvents) yield ev;
 
     if (signal?.aborted && !nodeFailure) {
+      // WF-11: a cancellation whose grace window expired with tasks
+      // still unsettled is its own advertised failure mode — distinct
+      // from a clean boundary abort.
       nodeFailure = {
         nodeName: tasks[0]?.nodeName ?? '<unknown>',
-        cause: new WorkflowAbortedError(threadId, signalAbortReason(signal)),
+        cause: graceExpired
+          ? new WorkflowError(
+              'workflow-cancel-timeout',
+              `cancellation grace (${cancelGraceMs}ms) expired with unsettled task(s) still running in workflow "${config.name}"`,
+              {
+                hint: 'tasks that ignore ctx.signal keep running in the background; raise cancelGraceMs or honour the signal in the node',
+              },
+            )
+          : new WorkflowAbortedError(threadId, signalAbortReason(signal)),
       };
     }
 
@@ -1197,6 +1224,20 @@ async function persistCheckpoint<TState extends object>(
 
   const stateForPersist = serializeState(internal.state);
 
+  // WF-11: persisted checkpoints get their advertised
+  // `workflow.checkpoint` span; skipped ('exit'-mode running) puts
+  // record nothing.
+  const checkpointSpan = skipPut
+    ? undefined
+    : config.tracer?.startSpan({
+        type: 'workflow.checkpoint',
+        attrs: {
+          'graphorin.workflow.thread_id': threadId,
+          'graphorin.workflow.step_number': internal.stepNumber,
+          'graphorin.workflow.checkpoint_status': status,
+        },
+      });
+
   const checkpoint: Checkpoint = {
     id: checkpointId,
     threadId,
@@ -1214,26 +1255,34 @@ async function persistCheckpoint<TState extends object>(
     ...(tags !== undefined ? { tags } : {}),
   };
 
-  if (!skipPut) {
-    await config.checkpointStore.put(threadId, namespace, checkpoint, metadata);
-  }
-
-  if (args.pendingWritesByTask) {
-    for (const [taskId, writes] of args.pendingWritesByTask) {
-      await config.checkpointStore.putWrites(
-        threadId,
-        namespace,
-        checkpointId,
-        writes.map((w, idx) => ({
-          taskId: w.taskId,
-          index: idx,
-          channel: w.channel,
-          value: w.value,
-        })),
-        taskId,
-      );
+  try {
+    if (!skipPut) {
+      await config.checkpointStore.put(threadId, namespace, checkpoint, metadata);
     }
+
+    if (args.pendingWritesByTask) {
+      for (const [taskId, writes] of args.pendingWritesByTask) {
+        await config.checkpointStore.putWrites(
+          threadId,
+          namespace,
+          checkpointId,
+          writes.map((w, idx) => ({
+            taskId: w.taskId,
+            index: idx,
+            channel: w.channel,
+            value: w.value,
+          })),
+          taskId,
+        );
+      }
+    }
+  } catch (err) {
+    checkpointSpan?.setStatus('error');
+    checkpointSpan?.end();
+    throw err;
   }
+  checkpointSpan?.setStatus('ok');
+  checkpointSpan?.end();
 
   return skipPut ? null : checkpointId;
 }
@@ -1540,15 +1589,15 @@ function waitForTasksOrTimeout(
   tasks: ReadonlyArray<Promise<unknown>>,
   signal: AbortSignal,
   cancelGraceMs: number,
-): Promise<void> {
-  const settled = Promise.allSettled(tasks).then(() => undefined);
+): Promise<'settled' | 'grace-expired'> {
+  const settled = Promise.allSettled(tasks).then(() => 'settled' as const);
   if (signal.aborted) {
-    return Promise.race([settled, deadline(cancelGraceMs)]);
+    return Promise.race([settled, deadline(cancelGraceMs).then(() => 'grace-expired' as const)]);
   }
   let timeoutId: NodeJS.Timeout | undefined;
-  const onAbortDeadline = new Promise<void>((resolve) => {
+  const onAbortDeadline = new Promise<'grace-expired'>((resolve) => {
     const trigger = (): void => {
-      timeoutId = setTimeout(() => resolve(), cancelGraceMs);
+      timeoutId = setTimeout(() => resolve('grace-expired'), cancelGraceMs);
     };
     signal.addEventListener('abort', trigger, { once: true });
   });
