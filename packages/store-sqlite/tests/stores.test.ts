@@ -177,6 +177,30 @@ describe('createSqliteStore', () => {
     expect(got?.status).toBe('quarantined');
   });
 
+  it('procedural memory: recordSuccess increments + round-trips the counter (MCON-2, migration 020)', async () => {
+    const rule = {
+      id: 'r-count',
+      kind: 'procedural' as const,
+      userId: 'alex',
+      text: 'Induced procedure under trial',
+      priority: 40,
+      sensitivity: 'internal' as const,
+      provenance: 'induction' as const,
+      status: 'quarantined' as const,
+      createdAt: new Date().toISOString(),
+    };
+    await store.memory.procedural.add(rule);
+    const procedural = store.memory.procedural as unknown as {
+      recordSuccess(id: string): Promise<number>;
+    };
+    expect(await procedural.recordSuccess('r-count')).toBe(1);
+    expect(await procedural.recordSuccess('r-count')).toBe(2);
+    const got = (await store.memory.procedural.list({ userId: 'alex' })).find(
+      (r) => r.id === 'r-count',
+    );
+    expect(got?.successCount).toBe(2);
+  });
+
   it('session memory: push + list + search', async () => {
     const scope = { userId: 'alex', sessionId: 's1' };
     const r1 = await store.memory.session.push(scope, {

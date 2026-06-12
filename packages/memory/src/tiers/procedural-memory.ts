@@ -99,15 +99,89 @@ export class ProceduralMemory {
   readonly #tracer: Tracer;
   /** Opt-in workflow inducer (P2-2). `null` ⇒ {@link induce} throws. */
   readonly #inducer: WorkflowInducer | null;
+  /**
+   * Promotion-by-demonstrated-success threshold (MCON-2 part 4).
+   * `null` ⇒ outcomes are counted but never auto-promote.
+   */
+  readonly #promoteAfterSuccesses: number | null;
 
   constructor(args: {
     store: MemoryStoreAdapter;
     tracer: Tracer;
     inducer?: WorkflowInducer | null;
+    promoteAfterSuccesses?: number | null;
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
     this.#inducer = args.inducer ?? null;
+    const k = args.promoteAfterSuccesses;
+    this.#promoteAfterSuccesses =
+      typeof k === 'number' && Number.isFinite(k) && k >= 1 ? Math.floor(k) : null;
+  }
+
+  /**
+   * Record the outcome of one demonstrated reuse of a procedure
+   * (MCON-2 part 4). A success increments the rule's persistent
+   * `successCount`; when `procedurePromotion.afterSuccesses` is
+   * configured and a QUARANTINED procedure reaches the threshold it is
+   * promoted through {@link validate} — the injection gate still
+   * applies, so a flagged text refuses promotion (surfaced as
+   * `refused: true`) no matter how many successes accumulate.
+   * Failures are observed but not persisted (no negative counter yet).
+   *
+   * Callers decide what "success" means — typically
+   * `checkSuccessCriteria(...)` over the procedure's stored
+   * `successCriteria`, or an operator's judgement.
+   *
+   * @stable
+   */
+  async recordOutcome(
+    scope: SessionScope,
+    ruleId: string,
+    succeeded: boolean,
+  ): Promise<{
+    readonly successCount: number;
+    readonly promoted: boolean;
+    readonly refused: boolean;
+  }> {
+    return withMemorySpan(
+      this.#tracer,
+      'memory.write.procedural',
+      scope,
+      { 'memory.procedural.action': 'record-outcome', 'memory.procedural.rule_id': ruleId },
+      async (span) => {
+        const store = this.#store.procedural;
+        if (!succeeded || typeof store.recordSuccess !== 'function') {
+          span.setAttributes({ 'memory.procedural.outcome.counted': false });
+          return { successCount: 0, promoted: false, refused: false };
+        }
+        const successCount = await store.recordSuccess(ruleId);
+        span.setAttributes({ 'memory.procedural.outcome.success_count': successCount });
+        const threshold = this.#promoteAfterSuccesses;
+        if (threshold === null || successCount < threshold) {
+          return { successCount, promoted: false, refused: false };
+        }
+        const existing = (await store.list(scope)).find((rule) => rule.id === ruleId) ?? null;
+        if (existing === null || existing.status !== 'quarantined') {
+          return { successCount, promoted: false, refused: false };
+        }
+        try {
+          await this.validate(
+            scope,
+            ruleId,
+            `demonstrated-success: ${successCount} >= ${threshold}`,
+          );
+          span.setAttributes({ 'memory.procedural.outcome.promoted': true });
+          return { successCount, promoted: true, refused: false };
+        } catch (err) {
+          if (err instanceof QuarantinePromotionRefusedError) {
+            span.setAttributes({ 'memory.procedural.outcome.refused': true });
+            return { successCount, promoted: false, refused: true };
+          }
+          throw err;
+        }
+      },
+    );
   }
 
   /** Persist a rule. Returns the stored record. */

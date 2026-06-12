@@ -52,6 +52,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '017': '@graphorin/memory (induced procedures / workflow induction)',
   '018': '@graphorin/memory (reflection watermark)',
   '019': '@graphorin/memory (DLQ failed-phase)',
+  '020': '@graphorin/memory (rule demonstrated-success counter)',
 };
 
 const dynamicMigrations: Migration[] = [];

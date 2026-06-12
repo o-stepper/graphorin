@@ -956,6 +956,19 @@ export function createInMemoryStore(
           }
         }
       },
+      async setStatus(id: string, status: 'active' | 'quarantined') {
+        const idx = rules.findIndex((r) => r.id === id);
+        const rule = rules[idx];
+        if (idx >= 0 && rule !== undefined) rules[idx] = { ...rule, status };
+      },
+      async recordSuccess(id: string) {
+        const idx = rules.findIndex((r) => r.id === id);
+        const rule = rules[idx];
+        if (idx < 0 || rule === undefined) return 0;
+        const next = (rule.successCount ?? 0) + 1;
+        rules[idx] = { ...rule, successCount: next };
+        return next;
+      },
     },
     shared: {
       async attach(recordId, agentId) {

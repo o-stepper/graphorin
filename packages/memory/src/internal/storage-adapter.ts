@@ -658,6 +658,14 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
    * `memory_history` audit row. Powers {@link ProceduralMemory.validate}.
    */
   setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  /**
+   * Record one demonstrated successful reuse of a rule and return the
+   * new counter value (MCON-2 part 4). Powers
+   * promotion-by-demonstrated-success via
+   * {@link ProceduralMemory.recordOutcome}. Optional — adapters without
+   * the counter simply never auto-promote.
+   */
+  recordSuccess?(id: string): Promise<number>;
 }
 
 /** Find-or-create payload for {@link GraphMemoryStoreExt.upsertEntity}. */

@@ -167,6 +167,20 @@ export interface CreateMemoryOptions {
     readonly maxTokens?: number;
   };
   /**
+   * Promotion-by-demonstrated-success for quarantined induced
+   * procedures (MCON-2 part 4). Fully offline — orthogonal to
+   * `procedureInduction` (no provider needed). When configured,
+   * `procedural.recordOutcome(scope, id, true)` increments the rule's
+   * persistent success counter and promotes it into `activate()` once
+   * `afterSuccesses` verified reuses accumulate; the injection gate
+   * still refuses flagged texts. Omitted ⇒ outcomes are counted but
+   * nothing auto-promotes.
+   */
+  readonly procedurePromotion?: {
+    /** Successful demonstrated reuses required before promotion (≥ 1). */
+    readonly afterSuccesses: number;
+  };
+  /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws — the
    * agent runtime overrides it in Phase 12.
@@ -404,6 +418,10 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     store: options.store,
     tracer,
     ...(inducer !== null ? { inducer } : {}),
+    // MCON-2 part 4: opt-in promotion-by-demonstrated-success.
+    ...(options.procedurePromotion?.afterSuccesses !== undefined
+      ? { promoteAfterSuccesses: options.procedurePromotion.afterSuccesses }
+      : {}),
   });
   const shared = new SharedMemory({ store: options.store, tracer });
   const insights = new InsightMemory({ store: options.store, tracer });

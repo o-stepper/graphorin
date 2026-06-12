@@ -1270,6 +1270,26 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
       );
     });
   }
+
+  /**
+   * Record one demonstrated successful reuse of a rule (MCON-2 part 4,
+   * migration 020) and return the new counter value. Feeds
+   * promotion-by-demonstrated-success for quarantined induced
+   * procedures.
+   *
+   * @stable
+   */
+  async recordSuccess(id: string): Promise<number> {
+    this.#conn.run(
+      'UPDATE rules SET success_count = success_count + 1, updated_at = ? WHERE id = ?',
+      [Date.now(), id],
+    );
+    const row = this.#conn.get<{ success_count: number }>(
+      'SELECT success_count FROM rules WHERE id = ?',
+      [id],
+    );
+    return row?.success_count ?? 0;
+  }
 }
 
 class SharedMemoryStoreImpl implements SharedMemoryStore {
@@ -1916,6 +1936,8 @@ interface RuleRow {
   success_criteria_json: string | null;
   provenance: string | null;
   status: string | null;
+  // MCON-2 part 4: demonstrated-success counter (migration 020).
+  success_count: number;
 }
 
 function rowToBlock(row: WorkingBlockRow): Block {
@@ -2070,6 +2092,8 @@ function rowToRule(row: RuleRow): Rule {
       : undefined,
     provenance: row.provenance !== null ? (row.provenance as MemoryProvenance) : undefined,
     status: row.status !== null ? (row.status as MemoryStatus) : undefined,
+    // MCON-2 part 4 (migration 020): absent on legacy snapshots ⇒ 0.
+    successCount: row.success_count ?? 0,
   } as Rule;
 }
 
