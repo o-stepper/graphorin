@@ -36,10 +36,7 @@ describe('CS-14 — dead facts.hash column + index are removed', () => {
       text: 'espresso machine maintenance',
       createdAt: new Date().toISOString(),
     });
-    const hits = await store.memory.semantic.search(
-      { userId: 'alex' },
-      { query: 'espresso' },
-    );
+    const hits = await store.memory.semantic.search({ userId: 'alex' }, { query: 'espresso' });
     expect(hits.map((h) => h.record.id)).toContain('f1');
 
     await store.close();

@@ -26,7 +26,11 @@ type SemanticVec = {
   ): Promise<ReadonlyArray<{ record: { id: string }; score: number }>>;
 };
 
-async function setup(): Promise<{ semantic: SemanticVec; embedderId: string; close: () => Promise<void> }> {
+async function setup(): Promise<{
+  semantic: SemanticVec;
+  embedderId: string;
+  close: () => Promise<void>;
+}> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-cs5-'));
   const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
   await store.init();
