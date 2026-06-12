@@ -589,3 +589,61 @@ describe('CE-3/AG-13 — manual agent.compact() splices through the loop', () =>
     expect(compactNowCalls()).toBe(0);
   });
 });
+
+// --- TL-10 — spill artifacts cleared on terminal runs --------------------------
+
+describe('TL-10 — run-scoped spill artifacts are cleared when the run ends', () => {
+  it('a completed run removes its spill directory; awaiting_approval keeps it', async () => {
+    const { promises: fsp } = await import('node:fs');
+    const os = await import('node:os');
+    const path = await import('node:path');
+    const spillRoot = path.join(os.tmpdir(), 'graphorin-spill');
+    const bigTool: Tool<unknown, unknown, unknown> = {
+      name: 'big',
+      description: 'big output',
+      inputSchema: passthroughSchema,
+      sideEffectClass: 'pure',
+      maxResultTokens: 50,
+      truncationStrategy: 'spill-to-file',
+      execute: async () => `head\n${'filler '.repeat(800)}`,
+    } as Tool<unknown, unknown, unknown>;
+
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [
+        toolCallScript({ toolCallId: 'tc-1', toolName: 'big', args: {} }),
+        textOnlyScript('done', 4),
+      ],
+    });
+    const agent = createAgent({ name: 'spiller', instructions: 'I', provider, tools: [bigTool] });
+    const result = await agent.run('go');
+    expect(result.status).toBe('completed');
+    const runDir = path.join(spillRoot, result.state.id);
+    await expect(fsp.stat(runDir)).rejects.toThrow(); // cleared
+
+    // Suspended (awaiting_approval) runs keep their artifacts.
+    const approvalTool: Tool<unknown, unknown, unknown> = {
+      ...bigTool,
+      name: 'big-gated',
+      needsApproval: true,
+    } as Tool<unknown, unknown, unknown>;
+    const provider2 = createMockProvider({
+      modelId: 'mock',
+      scripts: [
+        toolCallScript({ toolCallId: 'tc-a', toolName: 'big', args: {} }),
+        toolCallScript({ toolCallId: 'tc-b', toolName: 'big-gated', args: {} }),
+      ],
+    });
+    const agent2 = createAgent({
+      name: 'suspender',
+      instructions: 'I',
+      provider: provider2,
+      tools: [bigTool, approvalTool],
+    });
+    const result2 = await agent2.run('go');
+    expect(result2.status).toBe('awaiting_approval');
+    const runDir2 = path.join(spillRoot, result2.state.id);
+    await expect(fsp.stat(runDir2)).resolves.toBeDefined(); // kept for resume
+    await fsp.rm(runDir2, { recursive: true, force: true }).catch(() => {});
+  });
+});

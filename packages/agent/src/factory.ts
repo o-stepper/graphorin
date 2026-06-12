@@ -2348,6 +2348,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       pendingManualCompacts.shift()?.resolve(noopCompactionResult('no-active-run'));
     }
     const result = finalize(state, snapshot);
+    // TL-10: spill artifacts are run-scoped scratch — drop them once the
+    // run is terminal. `awaiting_approval` and `aborted` runs keep
+    // theirs (handles must survive resume); orphans fall to the writer's
+    // startup TTL sweep.
+    if (result.status === 'completed' || result.status === 'failed') {
+      await spillWriter.clear?.(result.state.id).catch(() => {});
+    }
     yield { type: 'agent.end', runId: result.state.id, result };
     return result;
   }

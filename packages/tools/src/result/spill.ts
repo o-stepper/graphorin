@@ -15,18 +15,68 @@ import os from 'node:os';
 import path from 'node:path';
 import type { SpillWriter } from './truncate.js';
 
+/** Options for {@link createDefaultSpillWriter}. */
+export interface DefaultSpillWriterOptions {
+  /** Artifact root. Default `<os.tmpdir()>/graphorin-spill`. */
+  readonly root?: string;
+  /**
+   * TTL for the best-effort startup sweep of orphaned run directories
+   * (TL-10). Default 7 days; pass `false` to disable the startup sweep.
+   */
+  readonly startupSweepTtlMs?: number | false;
+}
+
+/** Default TTL for the startup sweep of orphaned spill runs (7 days). */
+export const DEFAULT_SPILL_SWEEP_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 /**
  * Build the default spill writer — writes the un-truncated body to
  * `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
  * permissions and tier-aware sensitivity inheritance.
+ *
+ * Lifecycle (TL-10): `clear(runId)` removes one run's artifacts (the
+ * agent calls it on terminal completed/failed runs); `sweep(ttlMs)`
+ * removes run directories older than the TTL, and one best-effort
+ * 7-day sweep fires at construction to collect orphans from crashed
+ * processes.
  *
  * Operators that need a sandbox-aware path inject their own writer via
  * `createToolExecutor({ spill })` (and a matching reader for `read_result`).
  *
  * @stable
  */
-export function createDefaultSpillWriter(): SpillWriter {
-  const root = path.join(os.tmpdir(), 'graphorin-spill');
+export function createDefaultSpillWriter(options: DefaultSpillWriterOptions = {}): SpillWriter {
+  const root = options.root ?? path.join(os.tmpdir(), 'graphorin-spill');
+
+  async function sweep(ttlMs: number): Promise<number> {
+    const cutoff = Date.now() - Math.max(0, ttlMs);
+    let removed = 0;
+    let entries: string[];
+    try {
+      entries = await fs.readdir(root);
+    } catch {
+      return 0; // root does not exist yet — nothing to sweep
+    }
+    for (const entry of entries) {
+      const dir = path.join(root, entry);
+      try {
+        const stat = await fs.stat(dir);
+        if (!stat.isDirectory()) continue;
+        if (stat.mtimeMs < cutoff) {
+          await fs.rm(dir, { recursive: true, force: true });
+          removed += 1;
+        }
+      } catch {
+        // raced with another sweep / permission issue — best effort
+      }
+    }
+    return removed;
+  }
+
+  if (options.startupSweepTtlMs !== false) {
+    void sweep(options.startupSweepTtlMs ?? DEFAULT_SPILL_SWEEP_TTL_MS).catch(() => {});
+  }
+
   return {
     artifactRoot: root,
     async write(opts) {
@@ -36,5 +86,13 @@ export function createDefaultSpillWriter(): SpillWriter {
       await fs.writeFile(file, opts.body, { mode: 0o600 });
       return { path: file, bytes: Buffer.byteLength(opts.body, 'utf8') };
     },
+    async clear(runId) {
+      // The run id comes from the framework, but never let a crafted id
+      // escape the artifact root.
+      const dir = path.resolve(root, runId);
+      if (!dir.startsWith(path.resolve(root) + path.sep)) return;
+      await fs.rm(dir, { recursive: true, force: true });
+    },
+    sweep,
   };
 }
