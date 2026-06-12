@@ -105,11 +105,50 @@ export interface AllocationResult {
 }
 
 /**
+ * Tags opened-but-not-closed in `text`, innermost-first. A heuristic
+ * scanner sized for the engine's own XML-ish layer markup
+ * (`<memory_blocks>`, `<memory_rules>`, ...) — self-closing tags are
+ * skipped and an unmatched closer is ignored.
+ */
+function unclosedTags(text: string): string[] {
+  const stack: string[] = [];
+  const re = /<(\/?)([A-Za-z_][\w.-]*)(?:\s[^<>]*)?(\/?)>/g;
+  let match = re.exec(text);
+  while (match !== null) {
+    const [, closing, name, selfClosing] = match;
+    if (selfClosing !== '/' && name !== undefined) {
+      if (closing === '/') {
+        const idx = stack.lastIndexOf(name);
+        if (idx !== -1) stack.splice(idx, 1);
+      } else {
+        stack.push(name);
+      }
+    }
+    match = re.exec(text);
+  }
+  return stack.reverse();
+}
+
+/**
+ * Snap a prefix cut to a structure-safe point (CE-16e): never end
+ * inside a partially-emitted tag (`...<memory_blo`).
+ */
+function snapCut(kept: string): string {
+  const lastOpen = kept.lastIndexOf('<');
+  return lastOpen > kept.lastIndexOf('>') ? kept.slice(0, lastOpen) : kept;
+}
+
+/**
  * Truncate `text` to fit `maxTokens`, preserving the leading
  * portion and replacing the trailing portion with the literal
  * `[...truncated]` marker. The token estimate is computed via the
  * supplied `counter`; truncation falls back to character-based
  * trimming when the estimate is non-monotonic.
+ *
+ * Structure-aware (CE-16e): the cut never splits a tag, and block
+ * tags the cut leaves open are re-closed after the marker, so a
+ * capped layer of XML-ish markup (e.g. `<memory_blocks>`) stays
+ * well-formed in the assembled prompt. Plain strings are unaffected.
  *
  * @stable
  */
@@ -142,8 +181,24 @@ export async function truncateToTokens(
       hi = mid - 1;
     }
   }
-  const truncated = `${text.slice(0, bestCut)}${marker}`;
-  const tokens = await counter.countText(truncated);
+  let kept = snapCut(text.slice(0, bestCut));
+  let closers = unclosedTags(kept)
+    .map((t) => `</${t}>`)
+    .join('');
+  let truncated = `${kept}${marker}${closers.length > 0 ? `\n${closers}` : ''}`;
+  let tokens = await counter.countText(truncated);
+  // Re-closing may push past the cap — shave the kept body until the
+  // whole thing (body + marker + closers) fits. Terminates: `kept`
+  // shrinks by ≥1 char per pass, and the empty body fits by the
+  // `targetTokens > 0` guard above.
+  while (tokens > maxTokens && kept.length > 0) {
+    kept = snapCut(kept.slice(0, kept.length - Math.ceil(kept.length * 0.1)));
+    closers = unclosedTags(kept)
+      .map((t) => `</${t}>`)
+      .join('');
+    truncated = `${kept}${marker}${closers.length > 0 ? `\n${closers}` : ''}`;
+    tokens = await counter.countText(truncated);
+  }
   return { text: truncated, tokens, truncated: true };
 }
 
