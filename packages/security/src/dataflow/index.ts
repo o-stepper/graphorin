@@ -26,4 +26,5 @@ export type {
   TaintFlowKind,
   TaintLabel,
   TaintLedger,
+  TaintLedgerSnapshot,
 } from './types.js';

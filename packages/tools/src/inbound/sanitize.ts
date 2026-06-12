@@ -110,15 +110,18 @@ export function applyInboundSanitization(opts: {
   }
 
   const patterns = opts.patterns ?? BUILT_IN_IMPERATIVE_PATTERNS;
-  // Default scan budget. 5 ms is the long-term production target but
-  // is empirically too tight on cold V8 (the very first scan after a
-  // fresh worker / serverless cold-start measures 6-12 ms on hosted
-  // CI runners; subsequent scans run in <1 ms). A 50 ms ceiling is
-  // still well below any user-perceptible latency and avoids
-  // silently skipping the strip pass on every freshly-warmed
-  // process. Callers that need a stricter budget (e.g. a hot-path
-  // benchmark) still pass `budgetMs` explicitly.
-  const scan = scanImperativePatterns(opts.body, patterns, opts.budgetMs ?? 50);
+  // Default scan budget. 5 ms is the long-term production target but is
+  // empirically too tight on cold V8 — the very first scan after a fresh
+  // worker / serverless cold-start measures 6-12 ms on hosted CI runners, and a
+  // *loaded* shared runner (e.g. windows-latest under a full matrix) has been
+  // observed past 50 ms. On a timeout the strip pass is SKIPPED and the body is
+  // returned unredacted (fail-open by design — see below), so an over-tight
+  // budget silently lets injection through under load. A 250 ms ceiling is
+  // still well below any user-perceptible (registration-time, one-shot)
+  // latency and keeps the strip pass running on slow/loaded machines. Callers
+  // that need a stricter budget (e.g. a hot-path benchmark) still pass
+  // `budgetMs` explicitly.
+  const scan = scanImperativePatterns(opts.body, patterns, opts.budgetMs ?? 250);
   const scanTimedOut = scan === null;
   const hits = scan?.hits ?? [];
   const patternsHit = Object.freeze(hits.map((h) => h.pattern));

@@ -894,6 +894,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     const state = baseState as RunState as unknown as MutableRunState & RunState;
     activeRunState = state;
 
+    // AG-19: rehydrate the run-scoped security state BEFORE any tool runs this
+    // resume. Seeding the data-flow ledger with the persisted coarse taint
+    // summary keeps an enforce-mode sink gated across the suspend/resume
+    // boundary (the promoted-tool set is restored below, once it exists).
+    if (resumed && state.taintSummary !== undefined) {
+      toolDataFlowGuard?.seedLedger(state.id, state.taintSummary);
+    }
+
     const messages: Message[] = resumed ? [...state.messages] : [];
     if (!resumed) {
       // Inject the agent's system prompt at the top of the buffer
@@ -1079,6 +1087,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // deferred entries the per-step catalogue advertises. In-memory per
     // run — not persisted across a suspend/resume (see changeset).
     const promotedDeferred = new Set<string>();
+    // AG-19: restore deferred tools promoted by `tool_search` before the suspend
+    // so they remain in the per-step catalogue after a resume.
+    if (resumed && state.promotedTools !== undefined) {
+      for (const name of state.promotedTools) promotedDeferred.add(name);
+    }
 
     /**
      * Dispatch a batch of (non-handoff) tool calls through the
@@ -1789,6 +1802,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               };
               state.pendingApprovals.push(approval);
               state.status = 'awaiting_approval';
+              // AG-19: persist the coarse taint summary + promoted-tool set into
+              // the suspended state so a resume rehydrates the sink gate and the
+              // discovered-tool catalogue instead of starting empty.
+              const taintSnap = toolDataFlowGuard?.snapshotLedger(state.id);
+              if (taintSnap !== undefined) state.taintSummary = taintSnap;
+              if (promotedDeferred.size > 0) state.promotedTools = [...promotedDeferred];
               yield {
                 type: 'tool.approval.requested',
                 toolCallId: call.toolCallId,

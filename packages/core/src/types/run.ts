@@ -76,9 +76,36 @@ export interface RunState {
    * the primary model.
    */
   usageByModel?: RunStateUsageByModel;
+  /**
+   * AG-19: coarse data-flow taint summary, carried across suspend/resume so a
+   * resumed run does not start with an empty ledger that silently un-gates
+   * sinks exposed before the suspend. Structurally matches
+   * `@graphorin/security`'s `TaintLedgerSnapshot` (core takes no security
+   * dependency); only the load-bearing flags are persisted — never the tracked
+   * untrusted text spans.
+   */
+  taintSummary?: RunTaintSummary;
+  /**
+   * AG-19: names of deferred tools promoted by `tool_search` this run, carried
+   * across suspend/resume so discovered tools remain in the per-step catalogue.
+   */
+  promotedTools?: ReadonlyArray<string>;
   readonly startedAt: string;
   finishedAt?: string;
   error?: RunError;
+}
+
+/**
+ * Coarse, serializable data-flow taint summary persisted in {@link RunState}
+ * across suspend/resume (AG-19). Structurally identical to
+ * `@graphorin/security`'s `TaintLedgerSnapshot`; carries no untrusted text.
+ *
+ * @stable
+ */
+export interface RunTaintSummary {
+  readonly untrustedSeen: boolean;
+  readonly sensitiveSeen: boolean;
+  readonly untrustedSourceKinds: ReadonlyArray<string>;
 }
 
 /**

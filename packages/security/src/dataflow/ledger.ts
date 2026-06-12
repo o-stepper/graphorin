@@ -5,7 +5,7 @@
  * @packageDocumentation
  */
 
-import type { ArgsTaintProbe, TaintLabel, TaintLedger } from './types.js';
+import type { ArgsTaintProbe, TaintLabel, TaintLedger, TaintLedgerSnapshot } from './types.js';
 
 /** Default minimum shared-span length (normalized chars). */
 const DEFAULT_MIN_SPAN_LENGTH = 20;
@@ -60,6 +60,14 @@ interface TrackedSpan {
 export function createTaintLedger(opts?: {
   readonly minSpanLength?: number;
   readonly maxTrackedChars?: number;
+  /**
+   * AG-19: rehydrate the coarse trifecta-gate flags from a prior
+   * {@link TaintLedger.snapshot}, so a resumed run does not start with an empty
+   * ledger that silently un-gates sinks exposed before the suspend. Spans are
+   * not restored (they are untrusted text and are not persisted), so the
+   * verbatim-carry probe restarts while the load-bearing gate is preserved.
+   */
+  readonly initial?: TaintLedgerSnapshot;
 }): TaintLedger {
   const minSpanLength = Math.max(1, opts?.minSpanLength ?? DEFAULT_MIN_SPAN_LENGTH);
   const maxTrackedChars = Math.max(
@@ -67,9 +75,9 @@ export function createTaintLedger(opts?: {
     opts?.maxTrackedChars ?? DEFAULT_MAX_TRACKED_CHARS,
   );
 
-  let untrustedSeen = false;
-  let sensitiveSeen = false;
-  const untrustedSourceKinds = new Set<string>();
+  let untrustedSeen = opts?.initial?.untrustedSeen ?? false;
+  let sensitiveSeen = opts?.initial?.sensitiveSeen ?? false;
+  const untrustedSourceKinds = new Set<string>(opts?.initial?.untrustedSourceKinds ?? []);
   const spans: TrackedSpan[] = [];
   let trackedChars = 0;
 
@@ -122,6 +130,15 @@ export function createTaintLedger(opts?: {
     },
     get untrustedSourceKinds(): ReadonlyArray<string> {
       return [...untrustedSourceKinds];
+    },
+
+    snapshot(): TaintLedgerSnapshot {
+      // Coarse flags only — never the tracked spans (untrusted text).
+      return {
+        untrustedSeen,
+        sensitiveSeen,
+        untrustedSourceKinds: [...untrustedSourceKinds],
+      };
     },
   };
 }
