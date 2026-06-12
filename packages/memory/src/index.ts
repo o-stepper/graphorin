@@ -185,6 +185,7 @@ export {
 } from './context-engine/index.js';
 export * from './errors/index.js';
 export {
+  _resetConsolidatorConfigWarningForTesting,
   type CreateMemoryOptions,
   createMemory,
   type Memory,

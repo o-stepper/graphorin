@@ -1,5 +1,5 @@
 import type { SessionScope } from '@graphorin/core';
-import { describe, expect, expectTypeOf, it } from 'vitest';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import {
   type ConsolidatorConfig,
   type CreateConsolidatorOptions,
@@ -10,7 +10,7 @@ import {
   salience,
   selectForCapacityEviction,
 } from '../src/consolidator/index.js';
-import { createMemory } from '../src/index.js';
+import { _resetConsolidatorConfigWarningForTesting, createMemory } from '../src/index.js';
 import {
   createInMemoryStore,
   createStubEmbedder,
@@ -125,6 +125,65 @@ describe('consolidator/decay — selectForCapacityEviction (X-1)', () => {
 
   it('evicts the whole batch at capacity 0', () => {
     expect(selectForCapacityEviction(scored, 0)).toHaveLength(4);
+  });
+});
+
+describe('MST-4 — any non-empty consolidator config implicitly enables', () => {
+  it('decayCapacity alone constructs the real consolidator and the capacity applies', async () => {
+    const store = createInMemoryStore({ withConsolidatorStore: true });
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      // No tier / provider / enabled — the old allow-list silently
+      // installed a no-op placeholder for this exact shape.
+      consolidator: { decayCapacity: 1, defaultScope: { userId: 'alex' } },
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    const a = await memory.semantic.remember(scope, { text: 'first fact' });
+    const b = await memory.semantic.remember(scope, { text: 'second fact' });
+    for (const id of [a.id, b.id]) {
+      store.__hooks.setDecaySignals(id, {
+        lastAccessedAt: Date.now() - DAY,
+        createdAt: Date.now() - DAY,
+        strength: 1,
+      });
+    }
+    await memory.consolidator.start();
+    const outcome = await memory.consolidator.fireNow('light', scope);
+    // The placeholder returns null; the real runtime evicts down to 1.
+    expect(outcome).not.toBeNull();
+    expect(outcome?.factsUpdated).toBe(1);
+  });
+
+  it('enabled:false + real settings keeps the placeholder and warns once', async () => {
+    _resetConsolidatorConfigWarningForTesting();
+    const writes: string[] = [];
+    const spy = vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      writes.push(String(chunk));
+      return true;
+    });
+    try {
+      const store = createInMemoryStore({ withConsolidatorStore: true });
+      const memory = createMemory({
+        store,
+        embeddings: new InMemoryEmbeddingRegistry(),
+        consolidator: { enabled: false, decayCapacity: 5000 },
+      });
+      const again = createMemory({
+        store,
+        embeddings: new InMemoryEmbeddingRegistry(),
+        consolidator: { enabled: false, decayCapacity: 5000 },
+      });
+      expect(again).toBeDefined();
+      const outcome = await memory.consolidator.fireNow('light', { userId: 'alex' });
+      expect(outcome).toBeNull(); // placeholder
+      const warned = writes.filter((w) => w.includes('enabled: false'));
+      expect(warned.length).toBe(1); // once, not per createMemory
+      expect(warned[0]).toContain('decayCapacity');
+    } finally {
+      spy.mockRestore();
+    }
   });
 });
 
