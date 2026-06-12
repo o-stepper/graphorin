@@ -78,6 +78,17 @@ export class InsightMemory {
             ? { includeQuarantined: opts.includeQuarantined }
             : {}),
         });
+        // MCON-16: retrieval reinforces (ExpeL) — a recalled insight gains
+        // +1 salience, offsetting the per-reflection-pass −1 decay, so
+        // used insights persist while unused ones slide to the prune
+        // floor. Best-effort bookkeeping: never break the read path.
+        for (const hit of hits) {
+          try {
+            await store.bumpSalience(hit.record.id, 1, 'retrieval');
+          } catch {
+            // Advisory only.
+          }
+        }
         span.setAttributes({ 'memory.search.insight.count': hits.length });
         return hits;
       },
