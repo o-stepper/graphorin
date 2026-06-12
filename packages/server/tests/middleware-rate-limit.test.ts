@@ -105,7 +105,9 @@ describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
       ) as never,
     );
     app.get('/x', (c) => c.text('ok'));
-    const env = (i: number) => ({ incoming: { socket: { remoteAddress: `10.9.${(i / 250) | 0}.${i % 250}` } } });
+    const env = (i: number) => ({
+      incoming: { socket: { remoteAddress: `10.9.${(i / 250) | 0}.${i % 250}` } },
+    });
     // Fill past the sweep threshold with distinct IPs…
     for (let i = 0; i < 10_050; i++) {
       await app.request('/x', {}, env(i));

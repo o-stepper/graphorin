@@ -42,7 +42,6 @@ function extractBearer(c: Context): string | undefined {
   return trimmed.slice(BEARER_PREFIX.length).trim();
 }
 
-
 function reasonToStatus(reason: string): {
   status: number;
   body: { error: string; message: string; hint?: string };

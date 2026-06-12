@@ -146,6 +146,17 @@ async function bootServer(extraScopes?: ReadonlyArray<string>): Promise<{
     skipHardening: true,
     skipListen: true,
     sessions: buildSessionStub(),
+    // IP-14: the REAL replay route (replay/routes.ts) must serve even
+    // with the sessions API configured — the old in-sessions stub
+    // shadowed it.
+    replay: {
+      async loadRunReplay(input: { runId: string; mode: string }) {
+        return { events: [{ runId: input.runId, mode: input.mode }] };
+      },
+      async loadSessionReplay(input: { sessionId: string; mode: string }) {
+        return { events: [{ sessionId: input.sessionId, mode: input.mode }] };
+      },
+    } as never,
     memory: buildMemoryStub(),
     skills: buildSkillsStub(),
     mcp: buildMcpStub(),
@@ -351,7 +362,7 @@ describe('REST integration — happy + error paths', () => {
     expect(ok.status).toBe(200);
   });
 
-  it('POST /v1/runs/:runId/resume returns the current snapshot for a tracked run', async () => {
+  it('POST /v1/runs/:runId/resume answers 501 honestly until durable resume lands (IP-14)', async () => {
     if (server === undefined || bearer === undefined) throw new Error('not booted');
     server.runs.declare('resume-1', { kind: 'agent', agentId: 'echo' });
     const res = await server.app.request('/v1/runs/resume-1/resume', {
@@ -359,7 +370,12 @@ describe('REST integration — happy + error paths', () => {
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     });
-    expect(res.status).toBe(202);
+    // IP-14: server-side durable resume is not implemented — the old
+    // 202 persisted nothing while the client SDK documented it as the
+    // durable HITL path. 501 + the library-side pointer is the truth.
+    expect(res.status).toBe(501);
+    const body = (await res.json()) as { error?: string };
+    expect(body.error).toBe('resume-not-implemented');
     const missing = await server.app.request('/v1/runs/missing/resume', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
@@ -515,28 +531,30 @@ describe('REST integration — happy + error paths', () => {
     expect(res.status).toBe(200);
   });
 
-  it('POST /v1/sessions/:id/replay enforces traces:read[:sanitized|:raw] per DEC-138', async () => {
+  it('POST /v1/sessions/:id/replay reaches the REAL handler with both APIs configured (IP-14, DEC-138 ladder intact)', async () => {
     await server?.app.request('/v1/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 'u1', agentId: 'echo', sessionId: 's3' }),
     });
 
-    // Sanitized replay — token has traces:read:sanitized → 202.
+    // IP-14: the REAL replay handler serves (the in-sessions stub that
+    // shadowed it is gone) — 200 with the loaded events, ladder intact.
     const sanitized = await server?.app.request('/v1/sessions/s3/replay', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     });
-    expect(sanitized.status).toBe(202);
+    expect(sanitized.status).toBe(200);
+    const sanitizedBody = (await sanitized.json()) as { events?: unknown[] };
+    expect(Array.isArray(sanitizedBody.events)).toBe(true);
 
-    // Raw replay — token has traces:read:raw → 202.
     const raw = await server?.app.request('/v1/sessions/s3/replay', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ raw: true }),
     });
-    expect(raw.status).toBe(202);
+    expect(raw.status).toBe(200);
   });
 
   it('POST /v1/memory/search + POST /v1/memory/facts work + accept body', async () => {

@@ -196,13 +196,22 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
     if (state === undefined) {
       return c.json({ error: 'run-not-found', message: `Run '${runId}' is not registered.` }, 404);
     }
-    // Phase 14a stub: full HITL resume wiring lives in Phase 14b/c.
-    // The endpoint accepts the directive payload, persists nothing,
-    // and returns the current snapshot so clients can verify the
-    // contract surface today.
+    // IP-14: a 202 that persists nothing and resumes nothing is a lie
+    // the client SDK was built on. Until the server can rehydrate the
+    // RunState and re-enter the agent loop (the persisted-approvals
+    // work — Wave 3), the honest answer is 501 with the working
+    // library-side path: `agent.run(result.state, { directive })`
+    // executes approved tools for real (AG-1/AG-9).
     return c.json(
-      { runId, status: state.status, message: 'Resume accepted; awaiting HITL implementation.' },
-      202,
+      {
+        error: 'resume-not-implemented',
+        runId,
+        status: state.status,
+        message:
+          'Server-side HITL resume is not implemented yet. Resume library-side: ' +
+          'agent.run(result.state, { directive }) — the suspended RunState is on the AgentResult.',
+      },
+      501,
     );
   });
 

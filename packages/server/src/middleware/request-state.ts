@@ -61,9 +61,7 @@ export function createRequestStateMiddleware(
     // limits and lockouts actually key per client instead of dumping
     // every request into one shared 'anonymous' bucket.
     const socketAddress = (
-      c.env as
-        | { incoming?: { socket?: { remoteAddress?: string } } }
-        | undefined
+      c.env as { incoming?: { socket?: { remoteAddress?: string } } } | undefined
     )?.incoming?.socket?.remoteAddress;
     const ip = clientIp(headerLookup, trustProxy) ?? socketAddress;
     const state: ServerRequestState = {

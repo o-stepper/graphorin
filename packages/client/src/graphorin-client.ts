@@ -303,10 +303,11 @@ export class GraphorinClient {
   /**
    * Resume a paused (HITL) run. The WebSocket protocol intentionally
    * does NOT carry a `resume` control message — resumes are durable
-   * + idempotent + body-carrying, which maps cleanly onto the REST
-   * endpoint `POST /v1/runs/:runId/resume` (Phase 14a). The client
-   * forwards the call via the supplied `fetch` implementation so
-   * subscribers continue to receive events on the same WS connection.
+   * + idempotent + body-carrying, which maps onto the REST endpoint
+   * `POST /v1/runs/:runId/resume`. NOTE (IP-14): the server endpoint
+   * currently answers **501** — server-side durable resume is not
+   * implemented yet. Library-mode callers resume directly:
+   * `agent.run(result.state, { directive })`.
    */
   async resume(
     runId: string,
