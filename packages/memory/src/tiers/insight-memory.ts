@@ -14,6 +14,8 @@
  */
 
 import type { Fact, Insight, MemoryHit, SessionScope, Tracer } from '@graphorin/core';
+import { QuarantinePromotionRefusedError } from '../errors/index.js';
+import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 
@@ -106,6 +108,46 @@ export class InsightMemory {
     const store = this.#store.insights;
     if (store === undefined || typeof store.get !== 'function') return null;
     return store.get(id);
+  }
+
+  /**
+   * Promote a quarantined insight out of quarantine (MCON-2). Mirrors
+   * {@link SemanticMemory.validate}: re-derives the injection verdict from the
+   * stored text and **refuses** promotion of an injection-flagged insight
+   * unless an operator passes `{ force: true }` from a trusted context.
+   */
+  async validate(
+    scope: SessionScope,
+    insightId: string,
+    reason?: string,
+    options?: { readonly force?: boolean },
+  ): Promise<void> {
+    await withMemorySpan(
+      this.#tracer,
+      'memory.write.insight',
+      scope,
+      { 'memory.insight.action': 'validate', 'memory.insight.insight_id': insightId },
+      async (span) => {
+        const store = this.#store.insights;
+        if (store === undefined || typeof store.setStatus !== 'function') {
+          throw new TypeError(
+            '[graphorin/memory] InsightMemory.validate(...) requires a storage adapter that implements `insights.setStatus(id, status)`. ' +
+              'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via InsightMemoryStoreExt.',
+          );
+        }
+        const force = options?.force === true;
+        const existing = typeof store.get === 'function' ? await store.get(insightId) : null;
+        if (existing !== null && !force) {
+          const injection = detectMemoryInjection(existing.text);
+          if (injection.flagged) {
+            span.setAttributes({ 'memory.insight.validate.refused': true });
+            throw new QuarantinePromotionRefusedError(insightId, injection.markers);
+          }
+        }
+        span.setAttributes({ 'memory.insight.validate.forced': force });
+        await store.setStatus(insightId, 'active', reason);
+      },
+    );
   }
 }
 

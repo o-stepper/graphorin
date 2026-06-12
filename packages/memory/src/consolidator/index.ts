@@ -150,7 +150,10 @@ export function createConsolidatorPlaceholder(
   let paused = false;
   let tier: ConsolidatorTier = options.tier ?? 'free';
   const triggers = Object.freeze([
-    ...(options.triggers ?? (['turn:20', 'idle:5m'] as ConsolidatorTriggerSpec[])),
+    // Matches the real runtime default (MCON-4): idle drives light/standard,
+    // the daily cron makes the deep phase reachable; turn:N is consumer-emitted
+    // so it is not a scheduler default.
+    ...(options.triggers ?? (['idle:5m', 'cron:0 4 * * *'] as ConsolidatorTriggerSpec[])),
   ]) as ReadonlyArray<ConsolidatorTriggerSpec>;
   const listeners = new Set<PhaseListener>();
 
@@ -183,6 +186,7 @@ export function createConsolidatorPlaceholder(
     dlqMaxBackoffMs: 60 * 60 * 1000,
     formEpisodes: false,
     importanceScoring: false,
+    autoPromoteExtraction: false,
     reflection: false,
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
@@ -243,6 +247,10 @@ export function createConsolidatorPlaceholder(
     },
     config() {
       return config;
+    },
+    async registerWithScheduler() {
+      // No-op consolidator: nothing to schedule.
+      return Object.freeze({ registered: Object.freeze([]), skipped: Object.freeze([]) });
     },
     isFree() {
       return tier === 'free';

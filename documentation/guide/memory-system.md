@@ -250,6 +250,10 @@ await memory.semantic.validate(scope, factId, 'reviewed by operator', { force: t
 const pending = await memory.semantic.search(scope, '', { includeQuarantined: true });
 ```
 
+The same `validate(...)` exists on **every derived tier** — `memory.episodic.validate`, `memory.insights.validate`, and `memory.procedural.validate` (so an induced procedure can finally reach `activate()`) — each with the identical injection-refusal gate. Operators review and promote the whole queue from the CLI: **`graphorin memory review`** lists what is quarantined across all four tiers, and `--promote <id>` promotes a reviewed item (refused for injection-flagged rows unless `--force`).
+
+Quarantine is **fail-safe by default** — paid distillation stays invisible until validated. Where that trade-off is wrong for a deployment, the consolidator's opt-in `autoPromoteExtraction` flag (`createMemory({ consolidator: { autoPromoteExtraction: true } })`, **off by default**) admits **injection-clean extraction facts** as `active` directly. Injection-flagged facts always stay quarantined, and episodes / insights / induced procedures are unaffected — they remain quarantined-until-validated.
+
 Quarantine is a **retrieval gate, never a delete** — quarantined rows stay fully auditable. This is the precondition for safely shipping synthesised memory (reflection / reconciliation / induction) against memory-poisoning attacks. See [Security](/guide/security#memory-safety-provenance-quarantine) for the threat model.
 
 ## Procedural memory & induction

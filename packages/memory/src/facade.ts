@@ -206,6 +206,8 @@ export interface CreateMemoryOptions {
     readonly formEpisodes?: boolean;
     /** Score episode importance via the consolidator LLM (P1-2). Per-tier default. */
     readonly importanceScoring?: boolean;
+    /** Opt in to auto-promotion of injection-clean extraction facts (MCON-2). Default off. */
+    readonly autoPromoteExtraction?: boolean;
     /** Run the deep-phase reflection pass synthesizing cited insights (P1-1). Per-tier default. */
     readonly reflection?: boolean;
     /** Accumulated-importance threshold at which reflection fires (P1-1). */
@@ -458,7 +460,13 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   ): Promise<MemoryContextBlocks> {
     const out: { -readonly [K in keyof MemoryContextBlocks]: MemoryContextBlocks[K] } = {};
     const blocks = await options.store.working.list(scope);
-    const rules = await options.store.procedural.list(scope);
+    // Quarantined (e.g. P2-2-induced) procedures are provisional and must not
+    // reach the system prompt — `activate()` already excludes them, and
+    // compile() (public `@stable`) must agree or a compile()-based prompt
+    // builder ingests unvalidated induction procedures (MST-3).
+    const rules = (await options.store.procedural.list(scope)).filter(
+      (rule) => rule.status !== 'quarantined',
+    );
     const shouldFilter = privacyOptedIn || compileOptions.providerAcceptsSensitivity !== undefined;
     let blocksKept: ReadonlyArray<(typeof blocks)[number]> = blocks;
     let rulesKept: ReadonlyArray<(typeof rules)[number]> = rules;
@@ -605,6 +613,9 @@ function buildConsolidator(
     ...(opts.dlqMaxBackoffMs !== undefined ? { dlqMaxBackoffMs: opts.dlqMaxBackoffMs } : {}),
     ...(opts.formEpisodes !== undefined ? { formEpisodes: opts.formEpisodes } : {}),
     ...(opts.importanceScoring !== undefined ? { importanceScoring: opts.importanceScoring } : {}),
+    ...(opts.autoPromoteExtraction !== undefined
+      ? { autoPromoteExtraction: opts.autoPromoteExtraction }
+      : {}),
     ...(opts.reflection !== undefined ? { reflection: opts.reflection } : {}),
     ...(opts.importanceThreshold !== undefined
       ? { importanceThreshold: opts.importanceThreshold }

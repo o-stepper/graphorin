@@ -363,7 +363,7 @@ describe('Phase 10c DoD — consolidator.status() shape', () => {
 
     const status = await memory.consolidator.status();
     expect(status.tier).toBe('free');
-    expect(status.triggers).toEqual(['turn:20', 'idle:5m']);
+    expect(status.triggers).toEqual(['idle:5m', 'cron:0 4 * * *']);
     expect(status.queueDepth).toBeGreaterThanOrEqual(0);
     expect(status.queueDepth).toBe(status.pendingConflicts);
     expect(status.dlqSize).toBe(0);

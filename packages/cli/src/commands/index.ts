@@ -72,11 +72,15 @@ export {
   type MemoryInspectOptions,
   type MemoryInspectResult,
   type MemoryMigrateOptions,
+  type MemoryReviewItem,
+  type MemoryReviewOptions,
+  type MemoryReviewResult,
   type MemoryStatusEmbedder,
   type MemoryStatusResult,
   runMemoryActivity,
   runMemoryInspect,
   runMemoryMigrate,
+  runMemoryReview,
   runMemoryStatus,
 } from './memory.js';
 export { type MigrateCommandOptions, type MigrateCommandResult, runMigrate } from './migrate.js';

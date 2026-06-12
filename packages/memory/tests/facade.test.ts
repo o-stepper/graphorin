@@ -58,7 +58,7 @@ describe('@graphorin/memory — createMemory facade', () => {
     });
     const status = await memory.consolidator.status();
     expect(status.tier).toBe('free');
-    expect(status.triggers).toEqual(['turn:20', 'idle:5m']);
+    expect(status.triggers).toEqual(['idle:5m', 'cron:0 4 * * *']);
     await memory.consolidator.start();
     const after = await memory.consolidator.status();
     expect(after.running).toBe(true);

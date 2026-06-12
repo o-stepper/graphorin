@@ -633,6 +633,35 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
       id,
     ]);
   }
+
+  /**
+   * Promote / demote an episode's retrieval-trust `status` (MCON-2) and write a
+   * `memory_history` audit row. Mirrors `setStatus` on facts — a retrieval gate
+   * only. Powers {@link EpisodicMemory.validate} so a quarantined (auto-formed)
+   * episode can be promoted into default recall.
+   */
+  async setStatus(id: string, status: MemoryStatus, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run('UPDATE episodes SET status = ?, updated_at = ? WHERE id = ?', [
+        status,
+        Date.now(),
+        id,
+      ]);
+      this.#conn.run(
+        `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'episode',
+          id,
+          null,
+          reason ?? status,
+          status === 'active' ? 'VALIDATE' : 'QUARANTINE',
+          'agent',
+          null,
+          Date.now(),
+        ],
+      );
+    });
+  }
 }
 
 class SemanticMemoryStoreImpl implements SemanticMemoryStore {
@@ -1108,6 +1137,36 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
     this.#conn.run('UPDATE rules SET deleted_at = ? WHERE id = ?', [Date.now(), id]);
     void reason;
   }
+
+  /**
+   * Promote / demote a procedural rule's retrieval-trust `status` (MCON-2) and
+   * write a `memory_history` audit row. Mirrors `setStatus` on facts — a
+   * retrieval gate only, never touching content. Powers
+   * {@link ProceduralMemory.validate} so an induced (quarantined) procedure can
+   * be promoted into `activate()`.
+   */
+  async setStatus(id: string, status: MemoryStatus, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run('UPDATE rules SET status = ?, updated_at = ? WHERE id = ?', [
+        status,
+        Date.now(),
+        id,
+      ]);
+      this.#conn.run(
+        `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'rule',
+          id,
+          null,
+          reason ?? status,
+          status === 'active' ? 'VALIDATE' : 'QUARANTINE',
+          'agent',
+          null,
+          Date.now(),
+        ],
+      );
+    });
+  }
 }
 
 class SharedMemoryStoreImpl implements SharedMemoryStore {
@@ -1246,6 +1305,34 @@ export class SqliteInsightStore {
       [id],
     );
     return row ? rowToInsight(row) : null;
+  }
+
+  /**
+   * Promote / demote an insight's retrieval-trust `status` (MCON-2) and write a
+   * `memory_history` audit row. Mirrors `setStatus` on facts — a retrieval gate
+   * only. Powers {@link InsightMemory.validate} so a quarantined (reflection)
+   * insight can be promoted out of quarantine.
+   */
+  async setStatus(id: string, status: MemoryStatus, reason?: string): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#conn.run(
+        'UPDATE insights SET status = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL',
+        [status, Date.now(), id],
+      );
+      this.#conn.run(
+        `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          'insight',
+          id,
+          null,
+          reason ?? status,
+          status === 'active' ? 'VALIDATE' : 'QUARANTINE',
+          'agent',
+          null,
+          Date.now(),
+        ],
+      );
+    });
   }
 
   /**

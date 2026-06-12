@@ -1,8 +1,10 @@
 import { _resetResolversForTesting, installBuiltinResolvers } from '@graphorin/security/secrets';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+import { createScheduler } from '@graphorin/triggers';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { createServer, type GraphorinServer } from '../src/app.js';
+import type { ConsolidatorLike, ConsolidatorStatusLike } from '../src/consolidator/daemon.js';
 import {
   LifecycleDoubleStartError,
   LifecycleNotStartedError,
@@ -257,5 +259,65 @@ describe('Real listener boot', () => {
     expect(body.status).toBe('ok');
     await server.stop();
     delete process.env.GRAPHORIN_REAL_PEPPER;
+  });
+});
+
+describe('Consolidator trigger bridge (MCON-4)', () => {
+  function spyConsolidator(): { consolidator: ConsolidatorLike; registeredWith: () => unknown } {
+    let registeredWith: unknown = null;
+    const status = async (): Promise<ConsolidatorStatusLike> => ({
+      tier: 'free',
+      running: false,
+      paused: false,
+      queueDepth: 0,
+      dlqSize: 0,
+      deferredRuns: 0,
+      emptyExtractions: 0,
+      budget: {
+        tokensUsedToday: 0,
+        costUsedToday: 0,
+        tokensRemaining: 0,
+        costRemaining: 0,
+        resetAt: new Date(0).toISOString(),
+      },
+    });
+    return {
+      consolidator: {
+        async start() {},
+        async stop() {},
+        status,
+        async registerWithScheduler(scheduler) {
+          registeredWith = scheduler;
+          return { registered: [], skipped: [] };
+        },
+      },
+      registeredWith: () => registeredWith,
+    };
+  }
+
+  it('start() registers the consolidator on the triggers scheduler — no manual wiring (MCON-4)', async () => {
+    _resetResolversForTesting();
+    installBuiltinResolvers();
+    process.env.GRAPHORIN_HOOKS_PEPPER = 'hooks-pepper-bytes-9XaQ7uvPyR';
+    store = await buildStore();
+    const scheduler = createScheduler({ store: store.triggers, mode: 'server' });
+    const spy = spyConsolidator();
+    server = await createServer({
+      store,
+      skipHardening: true,
+      skipListen: true,
+      triggers: { scheduler },
+      consolidator: spy.consolidator,
+      config: {
+        auth: { kind: 'token', pepperRef: 'env:GRAPHORIN_HOOKS_PEPPER' },
+        storage: { path: ':memory:', mode: 'lib' },
+      },
+    });
+    await server.start();
+    // The server bridged the consolidator onto the scheduler in beforeStart.
+    // Without it, nothing pipes triggers into the consolidator and background
+    // consolidation never fires in server mode (the pre-fix bug).
+    expect(spy.registeredWith()).toBe(scheduler);
+    delete process.env.GRAPHORIN_HOOKS_PEPPER;
   });
 });

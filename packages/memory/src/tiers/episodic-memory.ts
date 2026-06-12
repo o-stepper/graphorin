@@ -8,7 +8,9 @@ import type {
   SessionScope,
   Tracer,
 } from '@graphorin/core';
+import { QuarantinePromotionRefusedError } from '../errors/index.js';
 import { newMemoryId } from '../internal/id.js';
+import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 
@@ -273,6 +275,47 @@ export class EpisodicMemory {
   /** List the most recent episodes (no embedding required). */
   async recent(scope: SessionScope, opts: { topK?: number } = {}): Promise<ReadonlyArray<Episode>> {
     return this.listRecent(scope, opts.topK ?? 10, {});
+  }
+
+  /**
+   * Promote a quarantined episode into default recall (MCON-2). Mirrors
+   * {@link SemanticMemory.validate}: re-derives the injection verdict from the
+   * stored summary and **refuses** promotion of an injection-flagged episode
+   * (`QuarantinePromotionRefusedError`) unless an operator passes
+   * `{ force: true }` from a trusted, non-agent context.
+   */
+  async validate(
+    scope: SessionScope,
+    episodeId: string,
+    reason?: string,
+    options?: { readonly force?: boolean },
+  ): Promise<void> {
+    await withMemorySpan(
+      this.#tracer,
+      'memory.write.episodic',
+      scope,
+      { 'memory.episodic.action': 'validate', 'memory.episodic.episode_id': episodeId },
+      async (span) => {
+        const store = this.#store.episodic;
+        if (typeof store.setStatus !== 'function') {
+          throw new TypeError(
+            '[graphorin/memory] EpisodicMemory.validate(...) requires a storage adapter that implements `episodic.setStatus(id, status)`. ' +
+              'The default `@graphorin/store-sqlite` adapter implements it; custom adapters can opt in via EpisodicMemoryStoreExt.',
+          );
+        }
+        const force = options?.force === true;
+        const existing = await store.get(episodeId);
+        if (existing !== null && !force) {
+          const injection = detectMemoryInjection(existing.summary);
+          if (injection.flagged) {
+            span.setAttributes({ 'memory.episodic.validate.refused': true });
+            throw new QuarantinePromotionRefusedError(episodeId, injection.markers);
+          }
+        }
+        span.setAttributes({ 'memory.episodic.validate.forced': force });
+        await store.setStatus(episodeId, 'active', reason);
+      },
+    );
   }
 
   async #tryVectorSearch(

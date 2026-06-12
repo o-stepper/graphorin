@@ -40,6 +40,7 @@ export type SpanType =
   | 'memory.consolidate.reflect'
   | 'memory.search.insight'
   | 'memory.read.insight'
+  | 'memory.write.insight'
   | 'memory.conflict'
   | 'memory.embed'
   | 'workflow.run'
