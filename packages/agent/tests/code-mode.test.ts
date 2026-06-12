@@ -135,7 +135,7 @@ describe('WI-11 — code-mode registration', () => {
     expect(advertised).not.toContain('code_execute');
   });
 
-  it('excludes approval-gated tools from the code API', () => {
+  it('excludes approval-gated tools from the code API (but lists them with the marker, TL-8)', () => {
     const provider = recordingProvider([textOnlyScript('hi')]);
     const agent = createAgent({
       name: 'cm-approval',
@@ -146,7 +146,11 @@ describe('WI-11 — code-mode registration', () => {
     });
     const description = agent.registry?.get('code_execute')?.description ?? '';
     expect(description).toContain('fetch_big'); // a normal tool is offered
-    expect(description).not.toContain('danger'); // the approval-gated tool is not
+    // TL-8: the gated tool is NOT a callable signature — but it is named
+    // in the call-directly section instead of being silently absent.
+    expect(description).not.toContain('tools.danger(');
+    const gatedSection = description.slice(description.indexOf('NOT callable'));
+    expect(gatedSection).toContain('danger');
   });
 });
 
@@ -201,3 +205,52 @@ function trackSpill(content: string): void {
   const runId = m?.[1]?.split('/')[0];
   if (runId !== undefined) spillDirsToClean.push(path.join(os.tmpdir(), 'graphorin-spill', runId));
 }
+
+// --- TL-8 — approval-gated tools are VISIBLE, with a call-directly marker -----
+
+describe('TL-8 — gated tools are visible in code-mode instead of silently absent', () => {
+  it('the code_execute catalogue names gated tools with the approval marker', async () => {
+    const provider = recordingProvider([textOnlyScript('hi')]);
+    const agent = createAgent({
+      name: 'cm-gated',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      tools: [fetchBig, dangerTool],
+      toolInvocation: 'code-mode',
+    });
+    const codeExecute = agent.registry?.get('code_execute');
+    expect(codeExecute).toBeDefined();
+    const description = codeExecute?.description ?? '';
+    expect(description).toContain('danger');
+    expect(description.toLowerCase()).toContain('requires approval');
+  });
+
+  it('a bridged call to a gated tool fails with the call-it-directly hint', async () => {
+    const provider = recordingProvider([
+      toolCallScript({
+        toolCallId: 'tc-script',
+        toolName: 'code_execute',
+        args: { source: 'return await tools.danger({});' },
+      }),
+      textOnlyScript('done'),
+    ]);
+    const agent = createAgent({
+      name: 'cm-bridge-guard',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      tools: [fetchBig, dangerTool],
+      toolInvocation: 'code-mode',
+    });
+    let surfaced = '';
+    for await (const ev of agent.stream('go')) {
+      if (ev.type === 'tool.execute.end' && ev.toolCallId === 'tc-script') {
+        surfaced = String(ev.result ?? '');
+      }
+      if (ev.type === 'tool.execute.error' && ev.toolCallId === 'tc-script') {
+        surfaced = ev.error.message;
+      }
+    }
+    expect(surfaced.toLowerCase()).toContain('approval');
+    expect(surfaced).toContain('directly');
+  });
+});

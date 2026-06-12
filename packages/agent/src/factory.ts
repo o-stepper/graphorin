@@ -250,14 +250,29 @@ function registerCodeMode(
     .filter((entry) => !reservedNames.has(entry.name) && !isApprovalGated(entry));
   if (codeTools.length === 0) return [];
 
-  const allowedTools = codeTools.map((entry) => entry.name);
-  const allowedSet = new Set(allowedTools);
+  // TL-8: gated tools cannot suspend for HITL mid-script, so they are
+  // excluded from the code API — but VISIBLY: they appear in the
+  // catalogue/search with a call-directly marker, and a bridged call
+  // fails with the same hint instead of an opaque unknown-tool error.
+  const approvalGatedTools = registry
+    .list()
+    .filter((entry) => !reservedNames.has(entry.name) && isApprovalGated(entry))
+    .map((entry) => entry.name);
+  const approvalGatedSet = new Set(approvalGatedTools);
+
+  const allowedTools = [...codeTools.map((entry) => entry.name), ...approvalGatedTools];
+  const allowedSet = new Set(codeTools.map((entry) => entry.name));
   const eagerProjectable = codeTools.filter(
     (entry) => entry.__effectiveDeferLoading !== true,
   ) as unknown as ReadonlyArray<ProjectableTool>;
   const projection = projectToolApi(eagerProjectable);
 
   const executeTool: CodeExecuteBridge = async (call, ctx) => {
+    if (approvalGatedSet.has(call.name)) {
+      throw new Error(
+        `${call.name} requires human approval and cannot run inside code_execute — call it directly as a standalone tool call so the run can suspend for the approval.`,
+      );
+    }
     const completed = await quietExecutor.executeOne({
       call: { toolCallId: newId('codecall'), toolName: call.name, args: call.args },
       runContext: ctx.runContext,
@@ -270,10 +285,16 @@ function registerCodeMode(
 
   const codeSearch = createCodeSearchTool({
     projection,
+    approvalGatedTools,
     searchDeferred: async (query, k) =>
       (await registry.searchDeferred(query, k)).filter((match) => allowedSet.has(match.name)),
   });
-  const codeExecute = createCodeExecuteTool({ projection, allowedTools, executeTool });
+  const codeExecute = createCodeExecuteTool({
+    projection,
+    allowedTools,
+    executeTool,
+    approvalGatedTools,
+  });
   registry.register(codeSearch, { kind: 'built-in', subsystem: 'code-mode' });
   registry.register(codeExecute, { kind: 'built-in', subsystem: 'code-mode' });
   return [codeSearch, codeExecute] as ReadonlyArray<Tool<unknown, unknown, unknown>>;

@@ -48,6 +48,12 @@ export interface CodeSearchToolOptions {
   /** Projection over the eager (advertised) tool set. */
   readonly projection: CodeApiProjection;
   /**
+   * Approval-gated tool names (TL-8) — excluded from the code API but
+   * surfaced in matches with a call-directly marker so the model is
+   * never silently missing a capability.
+   */
+  readonly approvalGatedTools?: ReadonlyArray<string>;
+  /**
    * Search the deferred pool for `query`, returning up to `k` matches.
    * Typically `registry.searchDeferred`. Omitted ⇒ eager-only search.
    */
@@ -94,7 +100,15 @@ export function createCodeSearchTool(opts: CodeSearchToolOptions): Tool<CodeSear
         }
       }
       incrementCounter('tool.code_mode.search.executed.total', undefined);
-      const blocks = [eager, deferred].filter((s) => s.length > 0).join('\n\n');
+      // TL-8: gated tools are findable too — with the marker, never silent.
+      const gatedMatches = (opts.approvalGatedTools ?? [])
+        .filter((name) => name.toLowerCase().includes(input.query.toLowerCase()))
+        .map(
+          (name) =>
+            `${name} — requires approval; call it directly as a normal tool call, not from code_execute`,
+        )
+        .join('\n');
+      const blocks = [eager, deferred, gatedMatches].filter((s) => s.length > 0).join('\n\n');
       return blocks.length > 0
         ? blocks
         : `No tool matches "${input.query}". Tools available in code-mode:\n${opts.projection.catalogue}`;
@@ -135,6 +149,11 @@ export interface CodeExecuteToolOptions {
   readonly limits?: CodeExecuteLimits;
   /** Override the runner (tests inject a fake). Default {@link runBridgedSource}. */
   readonly run?: (o: BridgedSourceOptions) => ReturnType<typeof runBridgedSource>;
+  /**
+   * Approval-gated tool names (TL-8) — listed in the catalogue with a
+   * call-directly marker (they cannot suspend for HITL mid-script).
+   */
+  readonly approvalGatedTools?: ReadonlyArray<string>;
 }
 
 const executeInput = z.object({
@@ -142,7 +161,18 @@ const executeInput = z.object({
 });
 type CodeExecuteInput = z.infer<typeof executeInput>;
 
-function buildExecuteDescription(projection: CodeApiProjection): string {
+function buildExecuteDescription(
+  projection: CodeApiProjection,
+  approvalGatedTools: ReadonlyArray<string> = [],
+): string {
+  const gatedSection =
+    approvalGatedTools.length === 0
+      ? []
+      : [
+          '',
+          'NOT callable from code_execute (each requires approval — call it directly as a normal tool call so the run can pause for a human decision):',
+          approvalGatedTools.map((name) => `  ${name}`).join('\n'),
+        ];
   return [
     'Run a JavaScript snippet that orchestrates several tool calls in a sandbox and returns only the final result. Prefer this over calling tools one at a time when a task needs multiple tool calls whose intermediate outputs you do not need to read: the intermediates stay inside the sandbox and never enter the conversation, so large or numerous results do not consume your context.',
     '',
@@ -155,6 +185,7 @@ function buildExecuteDescription(projection: CodeApiProjection): string {
     '',
     'Available tools (call code_search for a tool’s exact parameters):',
     projection.catalogue,
+    ...gatedSection,
   ].join('\n');
 }
 
@@ -172,7 +203,7 @@ export function createCodeExecuteTool(
   const limits = opts.limits ?? {};
   return tool<CodeExecuteInput, string>({
     name: 'code_execute',
-    description: buildExecuteDescription(opts.projection),
+    description: buildExecuteDescription(opts.projection, opts.approvalGatedTools ?? []),
     inputSchema: executeInput,
     outputSchema: z.string(),
     // Conservative: a script can call side-effecting tools.
