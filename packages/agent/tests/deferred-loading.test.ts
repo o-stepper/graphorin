@@ -265,3 +265,55 @@ describe('deferred loading + tool_search (WI-05)', () => {
     expect(step1).not.toContain('tool_search');
   });
 });
+
+// --- TL-7 — promotions persist on RunState across suspend/resume --------------
+
+describe('TL-7 — tool_search promotions survive suspend/resume', () => {
+  it('persists promoted names on RunState and keeps them in the resumed catalogue', async () => {
+    const sharedTools = (): Tool<unknown, unknown, unknown>[] => [
+      makeTool('echo', noop),
+      makeTool('weather_lookup', noop, {
+        defer_loading: true,
+        description: 'Get the weather forecast for a city',
+      }),
+      makeTool('send_email', noop, { needsApproval: true }),
+    ];
+
+    // Run 1: tool_search promotes weather_lookup, then a gated call suspends.
+    const { provider } = createRecordingProvider([
+      multiToolCallScript([
+        { toolCallId: 'tc-search', toolName: 'tool_search', args: { query: 'weather' } },
+      ]),
+      multiToolCallScript([{ toolCallId: 'tc-mail', toolName: 'send_email', args: {} }]),
+    ]);
+    const agent = createAgent({
+      name: 'promoter',
+      instructions: 'noop',
+      provider,
+      tools: sharedTools(),
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('awaiting_approval');
+    // The discovery is part of the trajectory — it must be ON the state.
+    expect(result.state.promotedTools).toContain('weather_lookup');
+
+    // Resume on a FRESH instance (process restart): the promoted tool is
+    // advertised WITHOUT the model having to re-search.
+    const { provider: provider2, toolNamesPerStep } = createRecordingProvider([
+      textOnlyScript('done', 4),
+    ]);
+    const resumeAgent = createAgent({
+      name: 'promoter',
+      instructions: 'noop',
+      provider: provider2,
+      tools: sharedTools(),
+    });
+    const rehydrated = JSON.parse(JSON.stringify(result.state));
+    const resumed = await resumeAgent.run(rehydrated, {
+      directive: { approvals: [{ toolCallId: 'tc-mail', granted: true }] },
+    });
+    expect(resumed.status).toBe('completed');
+    const firstResumedStep = toolNamesPerStep[0] ?? [];
+    expect(firstResumedStep).toContain('weather_lookup');
+  });
+});

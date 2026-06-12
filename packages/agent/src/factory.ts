@@ -1329,8 +1329,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     // WI-05: deferred tools promoted by a `tool_search` call this run.
     // Membership grows as the model discovers tools and gates which
-    // deferred entries the per-step catalogue advertises. In-memory per
-    // run — not persisted across a suspend/resume (see changeset).
+    // deferred entries the per-step catalogue advertises. TL-7/AG-19:
+    // persisted onto `RunState.promotedTools` at suspend and rehydrated
+    // below, so a resumed run keeps its discoveries.
     const promotedDeferred = new Set<string>();
     // AG-19: restore deferred tools promoted by `tool_search` before the suspend
     // so they remain in the per-step catalogue after a resume.
