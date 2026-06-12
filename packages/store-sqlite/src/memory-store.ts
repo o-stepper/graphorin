@@ -767,8 +767,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            embedder_id, source_message_ids_json,
            valid_from, valid_to, supersedes, superseded_by, provenance, status,
            importance, strength, last_accessed_at,
-           hash, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
            subject = excluded.subject,
@@ -820,7 +820,6 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.status ?? 'active',
           fact.importance ?? null,
           1.0,
-          null,
           null,
           toEpoch(fact.createdAt),
           fact.updatedAt ? toEpoch(fact.updatedAt) : null,
@@ -2028,7 +2027,6 @@ interface FactRow {
   importance: number | null;
   strength: number;
   last_accessed_at: number | null;
-  hash: string | null;
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
