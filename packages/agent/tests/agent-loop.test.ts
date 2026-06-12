@@ -45,7 +45,7 @@ describe('Agent — tool execution loop', () => {
       name: 'echo-agent',
       instructions: 'noop',
       provider,
-      tools: [echoTool],
+      tools: [echoTool as unknown as Tool<unknown, unknown, unknown>],
     });
     const events: AgentEvent[] = [];
     for await (const ev of agent.stream('please echo')) {

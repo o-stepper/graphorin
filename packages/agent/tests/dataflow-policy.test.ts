@@ -85,7 +85,7 @@ function mockProvider(scripts: ReadonlyArray<MockProviderScript>): Provider {
   };
 }
 
-async function drain(agent: ReturnType<typeof createAgent>): Promise<string[]> {
+async function drain(agent: import('../src/index.js').Agent<unknown, string>): Promise<string[]> {
   const types: string[] = [];
   for await (const ev of agent.stream('go')) types.push(ev.type);
   return types;

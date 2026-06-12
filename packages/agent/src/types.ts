@@ -117,10 +117,16 @@ export interface SkillsRegistryLike {
  *
  * @stable
  */
+// `TOutput` is existential here: handoff targets legitimately vary in
+// output type, and `Agent` is invariant in `TOutput` (the result is
+// covariant, `guardrails.output` is contravariant) — `unknown` would
+// reject every concretely-typed agent.
 export type HandoffEntry<TDeps = unknown> =
-  | Agent<TDeps, unknown>
+  // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
+  | Agent<TDeps, any>
   | {
-      readonly target: Agent<TDeps, unknown>;
+      // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
+      readonly target: Agent<TDeps, any>;
       readonly inputFilter?: HandoffFilter;
     };
 

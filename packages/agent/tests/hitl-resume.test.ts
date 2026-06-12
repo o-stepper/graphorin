@@ -3,30 +3,27 @@ import { describe, expect, it } from 'vitest';
 import { createAgent, runStateFromJSON, runStateToJSON } from '../src/index.js';
 import { createMockProvider, textOnlyScript, toolCallScript } from './fixtures/mock-provider.js';
 
-const buildSendEmailTool = (): Tool<
-  { readonly to: string; readonly body: string },
-  string,
-  unknown
-> => ({
-  name: 'send_email',
-  description: 'Send an email (requires approval).',
-  inputSchema: {
-    parse: (v: unknown) => v as { readonly to: string; readonly body: string },
-    safeParse: (v: unknown) => ({
-      success: true as const,
-      data: v as { readonly to: string; readonly body: string },
-    }),
-    toJSON: (): Record<string, unknown> => ({
-      type: 'object',
-      properties: { to: { type: 'string' }, body: { type: 'string' } },
-    }),
-  } as Tool<{ readonly to: string; readonly body: string }, string, unknown>['inputSchema'],
-  needsApproval: true,
-  sideEffectClass: 'external-stateful',
-  async execute(input) {
-    return `sent:${input.to}`;
-  },
-});
+const buildSendEmailTool = (): Tool<unknown, unknown, unknown> =>
+  ({
+    name: 'send_email',
+    description: 'Send an email (requires approval).',
+    inputSchema: {
+      parse: (v: unknown) => v as { readonly to: string; readonly body: string },
+      safeParse: (v: unknown) => ({
+        success: true as const,
+        data: v as { readonly to: string; readonly body: string },
+      }),
+      toJSON: (): Record<string, unknown> => ({
+        type: 'object',
+        properties: { to: { type: 'string' }, body: { type: 'string' } },
+      }),
+    } as Tool<{ readonly to: string; readonly body: string }, string, unknown>['inputSchema'],
+    needsApproval: true,
+    sideEffectClass: 'external-stateful',
+    async execute(input: { readonly to: string; readonly body: string }) {
+      return `sent:${input.to}`;
+    },
+  }) as unknown as Tool<unknown, unknown, unknown>;
 
 describe('Agent — HITL approval flow', () => {
   it('suspends on a needsApproval tool call, persists RunState, and resumes via directive', async () => {
