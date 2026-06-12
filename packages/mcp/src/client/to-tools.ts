@@ -129,6 +129,7 @@ export function adaptMCPTools(args: {
         ...(opts.truncationStrategy === undefined
           ? {}
           : { truncationStrategy: opts.truncationStrategy }),
+        ...(opts.callTimeoutMs === undefined ? {} : { callTimeoutMs: opts.callTimeoutMs }),
         ...(preferredModel === undefined ? {} : { preferredModel }),
       }),
     );
@@ -157,6 +158,8 @@ interface BuildAdaptedToolArgs {
   readonly sideEffectClass: import('@graphorin/core').SideEffectClass;
   readonly maxResultTokens?: number;
   readonly truncationStrategy?: import('@graphorin/core').TruncationStrategy;
+  /** Per-call timeout forwarded to `client.callTool` (MC-3/MC-5). */
+  readonly callTimeoutMs?: number;
   readonly preferredModel?:
     | import('@graphorin/core').ModelHint
     | import('@graphorin/core').ModelSpec;
@@ -184,8 +187,18 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
       ? {}
       : { truncationStrategy: args.truncationStrategy }),
     ...(args.preferredModel === undefined ? {} : { preferredModel: args.preferredModel }),
-    async execute(input: unknown): Promise<ToolReturn<unknown>> {
-      const result = await args.client.callTool(args.mcpToolName, input);
+    async execute(
+      input: unknown,
+      ctx?: import('@graphorin/core').ToolExecutionContext<unknown>,
+    ): Promise<ToolReturn<unknown>> {
+      // MC-5: the agent's per-call AbortSignal reaches the wire — an
+      // aborted run sends `notifications/cancelled` instead of orphaning
+      // the JSON-RPC request on the server. MC-3: the per-server call
+      // timeout rides along.
+      const result = await args.client.callTool(args.mcpToolName, input, {
+        ...(ctx?.signal !== undefined ? { signal: ctx.signal } : {}),
+        ...(args.callTimeoutMs !== undefined ? { timeoutMs: args.callTimeoutMs } : {}),
+      });
       return adaptCallResult({
         result,
         outputSchema: args.outputSchema,

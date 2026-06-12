@@ -12,6 +12,7 @@
 
 import type { MessageContent, ToolReturn, ZodLikeSchema } from '@graphorin/core';
 import { incrementCounter } from '@graphorin/tools/audit';
+import { MCPToolExecutionError } from '../errors/index.js';
 import type { ServerIdentity } from '../transport/types.js';
 import type { MCPCallToolResult, MCPContentPart } from './types.js';
 
@@ -32,6 +33,24 @@ export interface AdaptCallResultArgs {
  */
 export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> {
   const { result, outputSchema, serverIdentity, toolName } = args;
+  // MC-4: the SDK deliberately does NOT throw on isError results — the
+  // failure marker must not launder into a successful ToolReturn. Throw
+  // the typed error so the executor records a real failure; the server's
+  // text rides in the message for model self-correction.
+  if (result.isError === true) {
+    const errorText = (result.content ?? [])
+      .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+      .map((p) => p.text)
+      .join('\n');
+    incrementCounter('mcp.call.tool-error.total', {
+      server: serverIdentity.id,
+      tool: toolName,
+    });
+    throw new MCPToolExecutionError(
+      errorText.length > 0 ? errorText : `MCP tool '${toolName}' reported an error result.`,
+      { metadata: { tool: toolName } },
+    );
+  }
   const contentParts: MessageContent[] = [];
   // `resource_link` parts are NOT inlined: each contributes a compact
   // preview (carrying the `uri` as a result handle) so the model fetches

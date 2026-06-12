@@ -22,6 +22,7 @@ export type MCPErrorKind =
   | 'protocol-error'
   | 'auth-error'
   | 'tool-not-found'
+  | 'tool-execution'
   | 'call-timeout'
   | 'cancelled'
   | 'invalid-config'
@@ -89,6 +90,17 @@ export class MCPAuthError extends GraphorinMCPError {
 /** Raised when {@link MCPClient.callTool} is invoked for an unknown tool. */
 export class MCPToolNotFoundError extends GraphorinMCPError {
   public readonly kind = 'tool-not-found' as const;
+}
+
+/**
+ * Raised when the MCP server reports a tool-level failure
+ * (`CallToolResult.isError === true`, MC-4). The server's content text
+ * rides in the message so the model keeps its self-correction signal —
+ * while the executor records a real tool FAILURE (audit, retry and
+ * error policies all engage) instead of a fake success.
+ */
+export class MCPToolExecutionError extends GraphorinMCPError {
+  public readonly kind = 'tool-execution' as const;
 }
 
 /** Raised when a tool call exceeds its configured timeout / aborts. */

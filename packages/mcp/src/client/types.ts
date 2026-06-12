@@ -197,6 +197,11 @@ export interface MCPToToolsOptions {
    */
   readonly inboundSanitization?: InboundSanitizationPolicy;
   /**
+   * Per-call timeout (ms) applied to every adapted tool's
+   * `client.callTool` invocation (MC-3/MC-5). Default: the SDK default.
+   */
+  readonly callTimeoutMs?: number;
+  /**
    * Per-server `defer_loading` override. When unset and
    * `listTools()` returns more than `deferLoadingThreshold` entries
    * the auto-default flips deferral on for every tool from this

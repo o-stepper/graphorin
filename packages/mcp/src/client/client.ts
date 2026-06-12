@@ -24,6 +24,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 import {
+  MCPCallTimeoutError,
   MCPCancelledError,
   MCPConnectionError,
   MCPInvalidConfigError,
@@ -324,7 +325,15 @@ export async function createMCPClientFromSdkTransport(
     args: unknown,
     opts?: { signal?: AbortSignal; timeoutMs?: number },
   ): Promise<MCPCallToolResult> {
-    const requestOptions = opts?.signal === undefined ? {} : { signal: opts.signal };
+    // MC-3: `timeoutMs` maps onto the SDK's RequestOptions — both the
+    // per-attempt and the total ceiling, so progress notifications
+    // cannot extend past the caller's budget.
+    const requestOptions = {
+      ...(opts?.signal === undefined ? {} : { signal: opts.signal }),
+      ...(opts?.timeoutMs === undefined
+        ? {}
+        : { timeout: opts.timeoutMs, maxTotalTimeout: opts.timeoutMs }),
+    };
     incrementCounter('mcp.call.invoked.total', { server: serverIdentity.id, tool: name });
     let result: Awaited<ReturnType<typeof sdkClient.callTool>>;
     try {
@@ -472,6 +481,17 @@ function mapSdkError(cause: unknown, ctx: { readonly tool?: string }): Error {
     const message = cause.message ?? '';
     if (name === 'AbortError' || /aborted|cancell/i.test(message)) {
       return new MCPCancelledError('MCP request was cancelled.', { metadata, cause });
+    }
+    // MC-3: the SDK reports request-timeout as a plain McpError — map it
+    // onto the advertised typed class instead of MCPProtocolError.
+    if (/request timed out|timed out/i.test(message)) {
+      return new MCPCallTimeoutError(
+        `MCP request timed out${ctx.tool ? ` (tool: ${ctx.tool})` : ''}.`,
+        {
+          metadata,
+          cause,
+        },
+      );
     }
     if (/unknown\s+tool|tool\s+not\s+found|method\s+not\s+found/i.test(message)) {
       return new MCPToolNotFoundError(`MCP tool not found${ctx.tool ? `: ${ctx.tool}` : ''}.`, {

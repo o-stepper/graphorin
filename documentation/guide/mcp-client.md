@@ -199,6 +199,9 @@ sequenceDiagram
 | `InternalError` | `'internal-error'` |
 | `RequestCanceled` | `'aborted'` |
 | `Timeout` | `'timed-out'` |
+| `CallToolResult.isError: true` | tool **failure** — `MCPToolExecutionError` (`kind: 'tool-execution'`) with the server's content text in the message, so the executor records a real failure (audit, retry and error policies engage) while the model keeps the self-correction signal |
+
+Two call-level knobs complete the picture: `callTool(name, args, { signal, timeoutMs })` honours the abort signal (an aborted agent run sends `notifications/cancelled` to the server — adapted tools forward their `ToolExecutionContext.signal` automatically) and maps `timeoutMs` onto the SDK request timeout, surfacing expiry as `MCPCallTimeoutError` (`kind: 'call-timeout'`). `toTools({ callTimeoutMs })` applies the same timeout to every adapted tool's calls.
 
 ## Audit + observability
 
