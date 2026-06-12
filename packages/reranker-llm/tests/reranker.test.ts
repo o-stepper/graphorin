@@ -94,6 +94,34 @@ describe('createLlmReranker', () => {
     expect(result[0]?.score).toBeCloseTo(0.25);
   });
 
+  it('falls back when a single provider call fails (e.g. 429) instead of collapsing the rerank (PS-15)', async () => {
+    const { provider } = buildStubProvider((req) => {
+      const text = firstText(req.messages[0]?.content);
+      if (text.includes('banana bread')) throw new Error('429 Too Many Requests');
+      return '9';
+    });
+    const reranker = createLlmReranker({ provider, fallbackScore: 0.1 });
+    const result = await reranker.rerank('q', [
+      [hit('r1', 'apple pie', 0.6), hit('r2', 'banana bread', 0.5)],
+    ]);
+    expect(result).toHaveLength(2);
+    const banana = result.find((h) => h.record.id === 'r2');
+    const apple = result.find((h) => h.record.id === 'r1');
+    expect(apple?.score).toBeCloseTo(0.9); // the healthy pair still scores
+    expect(banana?.signals?.llm_score_norm).toBeCloseTo(0.1); // failed pair → fallback
+    expect(reranker.lastErrorCount).toBe(1);
+  });
+
+  it('still propagates an AbortError thrown mid-scoring (PS-15)', async () => {
+    const { provider } = buildStubProvider(() => {
+      throw new DOMException('aborted', 'AbortError');
+    });
+    const reranker = createLlmReranker({ provider });
+    await expect(reranker.rerank('q', [[hit('r1', 'apple', 0.5)]])).rejects.toMatchObject({
+      name: 'AbortError',
+    });
+  });
+
   it('honours an aborted AbortSignal before the first batch', async () => {
     const controller = new AbortController();
     controller.abort();
