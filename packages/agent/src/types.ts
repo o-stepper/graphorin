@@ -25,11 +25,7 @@ import type {
   ToolChoice,
   Tracer,
 } from '@graphorin/core';
-import type {
-  ContextEngineConfig,
-  Memory,
-  PostCompactionHook as MemoryPostCompactionHook,
-} from '@graphorin/memory';
+import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@graphorin/memory';
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
@@ -173,7 +169,6 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly stopWhen?: StopCondition;
   readonly toolChoice?: ToolChoice;
   readonly prepareStep?: PrepareStepHook<TDeps>;
-  readonly contextEngine?: ContextEngineConfig;
   readonly maxParallelTools?: number;
   /**
    * How the model invokes tools (P1-2).

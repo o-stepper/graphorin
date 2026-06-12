@@ -445,7 +445,8 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   // The facade's `compile(...)` is the static-fragment surface
   // consumed by callers that do not know the active provider yet
   // (the agent runtime calls `memory.contextEngine.assemble(...)`
-  // with full provider context). The privacy filter only fires
+  // with full provider context when `autoAssembleContext` is
+  // enabled). The privacy filter only fires
   // when the caller explicitly passes `providerAcceptsSensitivity`
   // OR the operator opted into the engine's `privacy` block.
   const privacyOptedIn =

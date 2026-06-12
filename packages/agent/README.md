@@ -130,11 +130,15 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   boundary compose orthogonally with the other security layers
   (sub-agent secrets isolation, handoff input filter, outbound
   redaction, inbound sanitization).
-- **Inbound sanitization preamble.** When the assembled message
-  list contains any non-trusted `MessageContent` part, the runtime
-  appends the locale-resolved preamble fragment to the system
-  prompt **after** the cache breakpoint so the trusted-only cache
-  prefix is not invalidated.
+- **Inbound sanitization preamble.** Part of the context-engine
+  assemble path: with `autoAssembleContext: true` **and** memory
+  wired, when the assembled message list contains any non-trusted
+  `MessageContent` part the engine appends the locale-resolved
+  preamble fragment to the system prompt **after** the cache
+  breakpoint so the trusted-only cache prefix is not invalidated.
+  Without that opt-in the preamble (like the rest of `assemble()`)
+  does not run; the context engine is configured on the memory
+  facade (`createMemory({ contextEngine })`), not on `AgentConfig`.
 
 ## Documentation
 
