@@ -1,7 +1,22 @@
 import type { ProviderRequest } from '@graphorin/core';
+import type { Memory } from '@graphorin/memory';
 import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
 import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
+
+/** Stub Memory whose `contextEngine.assemble` returns a fixed system prompt. */
+function fakeAssemblingMemory(content: string, onAssemble?: () => void): Memory {
+  const engine = {
+    async assemble() {
+      onAssemble?.();
+      return { systemMessage: { role: 'system' as const, content } };
+    },
+    async shouldCompact() {
+      return false;
+    },
+  };
+  return { contextEngine: engine } as unknown as Memory;
+}
 
 describe('Agent — system prompt assembly from `instructions`', () => {
   it('injects the agent.instructions string as the first system message before the user input', async () => {
@@ -54,5 +69,57 @@ describe('Agent — system prompt assembly from `instructions`', () => {
     await agent.run('hi');
     const first = capturedRequest?.messages[0];
     expect(first?.role).toBe('user');
+  });
+
+  it('builds the system prompt via memory.contextEngine.assemble when autoAssembleContext is on (CE-1)', async () => {
+    let capturedRequest: ProviderRequest | undefined;
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 8)] });
+    const wrapped = {
+      ...provider,
+      stream(req: ProviderRequest) {
+        capturedRequest = req;
+        return provider.stream(req);
+      },
+    };
+    const agent = createAgent({
+      name: 'assembler',
+      instructions: 'BASE INSTRUCTIONS',
+      provider: wrapped,
+      memory: fakeAssemblingMemory('<graphorin_memory_base>ASSEMBLED</graphorin_memory_base>'),
+      autoAssembleContext: true,
+    });
+    await agent.run('hi');
+    const first = capturedRequest?.messages[0];
+    expect(first?.role).toBe('system');
+    if (first?.role === 'system') {
+      expect(first.content).toBe('<graphorin_memory_base>ASSEMBLED</graphorin_memory_base>');
+    }
+  });
+
+  it('keeps plain instructions and does NOT call assemble when autoAssembleContext is off (CE-1 default)', async () => {
+    let capturedRequest: ProviderRequest | undefined;
+    let assembleCalls = 0;
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 8)] });
+    const wrapped = {
+      ...provider,
+      stream(req: ProviderRequest) {
+        capturedRequest = req;
+        return provider.stream(req);
+      },
+    };
+    const agent = createAgent({
+      name: 'plain',
+      instructions: 'BASE INSTRUCTIONS',
+      provider: wrapped,
+      memory: fakeAssemblingMemory('SHOULD-NOT-APPEAR', () => {
+        assembleCalls += 1;
+      }),
+      // autoAssembleContext omitted ⇒ default false
+    });
+    await agent.run('hi');
+    const first = capturedRequest?.messages[0];
+    expect(first?.role).toBe('system');
+    if (first?.role === 'system') expect(first.content).toBe('BASE INSTRUCTIONS');
+    expect(assembleCalls).toBe(0);
   });
 });

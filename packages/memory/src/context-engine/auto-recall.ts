@@ -1,7 +1,8 @@
 /**
  * Auto-recall heuristic — opt-in regex-based pre-call that injects
- * the top-K facts (and/or episodes) into Layer 6 when the last user
- * message matches one of the configured trigger phrases.
+ * the top-K facts into Layer 6 when the last user message matches one
+ * of the configured trigger phrases. (Episode auto-recall is not
+ * implemented; episodes are reachable via the `recall_episodes` tool.)
  *
  * The framework ships English defaults; per-locale trigger
  * phrases extend the default via {@link defineContextLocalePack}.
@@ -30,7 +31,6 @@ export interface AutoRecallStrategyContext {
  */
 export interface AutoRecallTriggerResult {
   readonly factsTriggered: boolean;
-  readonly episodesTriggered: boolean;
   /** Optional reason surfaced in spans / metadata. */
   readonly reason?: string;
 }
@@ -50,22 +50,16 @@ export type AutoRecallStrategy = (ctx: AutoRecallStrategyContext) => AutoRecallT
  */
 export function defaultLocaleHeuristicStrategy(pack: ContextLocalePack): AutoRecallStrategy {
   const factTriggers = pack.autoRecallTriggers.factTriggers;
-  const episodeTriggers = pack.autoRecallTriggers.episodeTriggers;
   return (ctx) => {
     const text = ctx.lastUserMessage ?? '';
     if (text.length === 0) {
-      return { factsTriggered: false, episodesTriggered: false };
+      return { factsTriggered: false };
     }
     const factsTriggered = factTriggers.some((re) => re.test(text));
-    const episodesTriggered = episodeTriggers.some((re) => re.test(text));
-    if (factsTriggered || episodesTriggered) {
-      return {
-        factsTriggered,
-        episodesTriggered,
-        reason: 'locale-heuristic-trigger-matched',
-      };
+    if (factsTriggered) {
+      return { factsTriggered, reason: 'locale-heuristic-trigger-matched' };
     }
-    return { factsTriggered: false, episodesTriggered: false };
+    return { factsTriggered: false };
   };
 }
 

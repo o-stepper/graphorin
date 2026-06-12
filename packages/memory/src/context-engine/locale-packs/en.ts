@@ -81,11 +81,6 @@ export const enLocalePack: ContextLocalePack = Object.freeze({
       /\byou (mentioned|told|said)\b/i,
       /\bmy preference\b/i,
     ]),
-    episodeTriggers: Object.freeze([
-      /\bwhat did we (work on|do) (last|earlier)\b/i,
-      /\bsummari[sz]e .*(meeting|session|previous)\b/i,
-      /\b(recap|catch me up)\b/i,
-    ]),
   }),
   inboundSanitizationPreamble: Object.freeze({
     text: INBOUND_PREAMBLE_TEXT,

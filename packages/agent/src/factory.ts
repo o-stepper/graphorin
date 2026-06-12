@@ -358,6 +358,21 @@ function asMessages(input: AgentInput | RunState): {
   throw new InvalidAgentConfigError(`unrecognized AgentInput shape`);
 }
 
+/** Most-recent user-role text in `messages` (for context-engine auto-recall). */
+function lastUserText(messages: ReadonlyArray<Message>): string | undefined {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (m?.role !== 'user') continue;
+    if (typeof m.content === 'string') return m.content;
+    const text = m.content
+      .filter((p): p is { readonly type: 'text'; readonly text: string } => p.type === 'text')
+      .map((p) => p.text)
+      .join(' ');
+    return text.length > 0 ? text : undefined;
+  }
+  return undefined;
+}
+
 function toolToDefinition(tool: Tool): ToolDefinition {
   const ts = tool as Tool & { readonly inputSchema?: { readonly toJSON?: () => unknown } };
   let schema: Readonly<Record<string, unknown>> = {};
@@ -858,8 +873,28 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       // Inject the agent's system prompt at the top of the buffer
       // exactly once per run, before any seed messages.
       const instructionsRaw = config.instructions;
-      if (typeof instructionsRaw === 'string' && instructionsRaw.length > 0) {
-        messages.push({ role: 'system', content: instructionsRaw });
+      const instructionsText = typeof instructionsRaw === 'string' ? instructionsRaw : '';
+      let systemPrompt = instructionsText;
+      if (config.autoAssembleContext === true && memory !== undefined) {
+        // CE-1 (opt-in): build the memory-aware 6-layer system prompt via the
+        // context engine. The instructions become Layer 2; the engine prepends
+        // the memory base and appends working blocks, procedural rules, skill
+        // cards, the metadata counts, and (when `factsAutoRecall` is configured)
+        // auto-recalled facts. Default-off keeps the explicit memory-tools
+        // pattern, so the system prompt is `instructions` alone.
+        const lastUser = lastUserText(seed);
+        const assembled = await memory.contextEngine.assemble(memory, {
+          scope: { userId: userId ?? agentId, sessionId, agentId },
+          agentId,
+          sessionId,
+          runId: state.id,
+          ...(instructionsText.length > 0 ? { agentInstructions: instructionsText } : {}),
+          ...(lastUser !== undefined ? { lastUserMessage: lastUser } : {}),
+        });
+        systemPrompt = assembled.systemMessage.content;
+      }
+      if (systemPrompt.length > 0) {
+        messages.push({ role: 'system', content: systemPrompt });
       }
       messages.push(...seed);
       // Mirror the assembled messages into RunState so the JSONL

@@ -3,8 +3,8 @@
  *
  * The tool is auto-registered by the agent runtime when the tool
  * registry contains at least one deferred tool (`__effectiveDeferLoading
- * === true`). It is exempt from the per-step `maxToolsInContext` cap
- * (always present so the model can discover deferred tools mid-step).
+ * === true`). It is always present (never itself deferred) so the model
+ * can discover deferred tools mid-step.
  *
  * The schema is declared inline using Zod — `@graphorin/tools`
  * declares Zod as a (required) peer dependency and consumes it as a

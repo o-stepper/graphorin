@@ -145,6 +145,18 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly tools?: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
   readonly skills?: SkillsRegistryLike;
   readonly memory?: Memory;
+  /**
+   * Opt in to building the per-run system prompt from the memory
+   * {@link ContextEngine} (CE-1). When `true` **and** `memory` is wired, the
+   * runtime calls `memory.contextEngine.assemble(...)` once at run start: the
+   * agent's `instructions` become Layer 2 and the engine prepends the memory
+   * base and appends working blocks, procedural rules, skill cards, the
+   * metadata counts, and — when `factsAutoRecall` is configured — auto-recalled
+   * facts. Defaults `false`: the prompt is built from `instructions` alone and
+   * the model reaches memory only through the memory tools it calls (the
+   * documented explicit pattern). Has no effect without `memory`.
+   */
+  readonly autoAssembleContext?: boolean;
   readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
   readonly outputType?: OutputSpec<TOutput>;
   readonly guardrails?: {
