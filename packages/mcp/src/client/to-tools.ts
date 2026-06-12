@@ -207,7 +207,13 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
       });
     },
   } satisfies Tool<unknown, unknown, unknown>;
-  return tool;
+  // MC-7: pre-stamp the provenance so the agent's inferToolSource —
+  // which honours an existing stamp — classifies tools passed via
+  // `config.tools` as 'mcp-derived' (untrusted for the WI-12 dataflow
+  // policy) instead of first-party. Zero operator boilerplate.
+  return Object.assign(tool, {
+    __source: { kind: 'mcp', serverIdentity: args.serverIdentity.id } as const,
+  });
 }
 
 /** Unused export kept for ergonomic test access. */

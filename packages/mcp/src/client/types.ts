@@ -214,10 +214,6 @@ export interface MCPToToolsOptions {
   readonly maxResultTokens?: number;
   /** Per-server truncation strategy override applied at registration. */
   readonly truncationStrategy?: TruncationStrategy;
-  /** Per-call collision-strategy override. */
-  readonly collisionStrategy?: CollisionStrategy;
-  /** Per-call priority value used by the `'priority'` strategy. */
-  readonly priority?: number;
   /** Tool-name -> per-tool side-effect class override map. */
   readonly sideEffectClassByTool?: Readonly<Record<string, SideEffectClass>>;
   /** Tool-name -> per-tool preferred-model override map. */
