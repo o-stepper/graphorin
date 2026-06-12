@@ -191,7 +191,6 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly fallbackPolicy?: AgentFallbackPolicy;
   readonly preferredModel?: ModelHint | ModelSpec;
   readonly modelTierMap?: Partial<Record<ModelHint, ModelSpec>>;
-  readonly modelTierAutoClassification?: boolean;
   /**
    * Per-agent override of the per-provider auto-detected
    * {@link ReasoningRetention} default. Wins over the provider-

@@ -109,6 +109,7 @@ describe('ToolExecutor loop wiring — golden-trace parity', () => {
       'text.delta',
       'text.complete',
       'step.end',
+      'agent.end',
     ]);
     expect(endResult).toBe('echo:hi');
   });

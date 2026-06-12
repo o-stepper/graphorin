@@ -1,4 +1,3 @@
-import type { MemoryKind } from './memory.js';
 import type { RunError, RunState, RunStatus } from './run.js';
 import type { ContentChunk, ToolError } from './tool.js';
 import type { Usage } from './usage.js';
@@ -34,8 +33,6 @@ export type AgentEvent<TOutput = string> =
   | ToolApprovalRequestedEvent
   | ToolApprovalGrantedEvent
   | ToolApprovalDeniedEvent
-  | MemoryReadEvent
-  | MemoryWriteEvent
   | ContextCompactedEvent
   | HandoffEvent
   | AgentSteeredEvent
@@ -182,21 +179,6 @@ export interface ToolApprovalDeniedEvent {
   readonly type: 'tool.approval.denied';
   readonly toolCallId: string;
   readonly reason?: string;
-}
-
-/** @stable */
-export interface MemoryReadEvent {
-  readonly type: 'memory.read';
-  readonly query: string;
-  readonly resultsCount: number;
-  readonly kind?: MemoryKind;
-}
-
-/** @stable */
-export interface MemoryWriteEvent {
-  readonly type: 'memory.write';
-  readonly kind: MemoryKind;
-  readonly recordId: string;
 }
 
 /**

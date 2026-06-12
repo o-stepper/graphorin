@@ -61,8 +61,15 @@ describe('Agent — HITL approval flow', () => {
         // wire format a durable store would rehydrate from.
       }
     }
-    // The first run must NOT have hit `agent.end`.
-    expect(events1.some((e) => e.type === 'agent.end')).toBe(false);
+    // The suspended run still ends with a terminal `agent.end` (AG-20) —
+    // its result carries status 'awaiting_approval', which is how stream
+    // consumers (e.g. an SSE bridge) learn the stream is over but resumable.
+    const end1 = events1.find((e) => e.type === 'agent.end');
+    expect(end1).toBeDefined();
+    if (end1?.type === 'agent.end') {
+      expect(end1.result.status).toBe('awaiting_approval');
+      expect(end1.result.state.pendingApprovals.length).toBeGreaterThan(0);
+    }
     expect(events1.some((e) => e.type === 'tool.approval.requested')).toBe(true);
 
     // Build a synthetic RunState representing the suspended run

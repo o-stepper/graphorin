@@ -59,7 +59,7 @@ type AgentEvent<TOutput> =
   | { type: 'tool.approval.requested'; toolCallId: string }
   | { type: 'context.compacted'; beforeTokens: number; afterTokens: number }
   | { type: 'agent.model.fellback'; previousModel: string; nextModel: string }
-  | { type: 'agent.end'; output: TOutput };
+  | { type: 'agent.end'; runId: string; result: AgentResult<TOutput> };
 
 function assertNever(value: never): never {
   throw new Error(`Unhandled event: ${JSON.stringify(value)}`);

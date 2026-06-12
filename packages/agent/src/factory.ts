@@ -1056,7 +1056,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // not re-enter the provider loop — that would re-issue a dangling tool_use
     // real providers reject, or silently complete a failed run. Return it as-is.
     if (resumed && (state.status === 'awaiting_approval' || state.status === 'failed')) {
-      return finalize(state, finalSnapshot);
+      return yield* finishRun(state, finalSnapshot);
     }
 
     // AG-1: every approval is now resolved (status is 'running'), so execute the
@@ -1327,7 +1327,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           if (ev !== undefined) yield ev;
         }
         if (signal.aborted) {
-          if (yield* emitCancellation()) return finalize(state, finalSnapshot);
+          if (yield* emitCancellation()) return yield* finishRun(state, finalSnapshot);
           break;
         }
         stepNumber += 1;
@@ -1582,7 +1582,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               };
               state.status = 'failed';
               state.error = { message: providerError.message, code: providerError.kind };
-              return finalize(state, finalSnapshot);
+              return yield* finishRun(state, finalSnapshot);
             }
             continue;
           }
@@ -1622,7 +1622,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         // tool calls run and the graceful stop happens at the loop top.
         if (signal.aborted && !modelSucceeded) {
           yield* emitCancellation();
-          return finalize(state, finalSnapshot);
+          return yield* finishRun(state, finalSnapshot);
         }
 
         if (!modelSucceeded) {
@@ -1635,7 +1635,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           };
           state.status = 'failed';
           state.error = { message: 'no provider completed', code: 'no-provider-completed' };
-          return finalize(state, finalSnapshot);
+          return yield* finishRun(state, finalSnapshot);
         }
 
         usageAcc.add(lastModelId, stepUsage);
@@ -1828,7 +1828,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                   { source: 'sync', status: 'suspended', nodeName: 'agent.run' },
                 );
               }
-              return finalize(state, finalSnapshot);
+              return yield* finishRun(state, finalSnapshot);
             }
 
             batch.push(call);
@@ -1852,7 +1852,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       yield { type: 'agent.error', error: { message, code } };
       state.status = 'failed';
       state.error = { message, code };
-      return finalize(state, finalSnapshot);
+      return yield* finishRun(state, finalSnapshot);
     } finally {
       // AG-5: drop the parent-signal listener so it does not accumulate across
       // runs that share one long-lived `options.signal`. Runs after this point
@@ -1880,7 +1880,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       yield* runFollowUpLoop(messages, state, stepNumber, signal, sessionId, userId);
     }
     activeRunState = undefined;
-    return finalize(state, finalSnapshot);
+    return yield* finishRun(state, finalSnapshot);
   }
 
   /**
@@ -1904,6 +1904,20 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // generator here so we can extend it later without breaking
     // the public surface.
     yield* (async function* (): AsyncGenerator<AgentEvent<TOutput>, void, void> {})();
+  }
+
+  /**
+   * Terminal wrapper around {@link finalize}: every exit path of the run
+   * loop — completed, failed, aborted, suspended — ends the stream with
+   * an `agent.end` event carrying the final {@link AgentResult} (AG-20).
+   */
+  async function* finishRun(
+    state: MutableRunState,
+    snapshot: InternalRunSnapshot<TOutput>,
+  ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
+    const result = finalize(state, snapshot);
+    yield { type: 'agent.end', runId: result.state.id, result };
+    return result;
   }
 
   function finalize(
@@ -2114,14 +2128,38 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     return runFanOut<TFanOutOutput>(fanOutOptions);
   };
 
+  // Stable fallback id so out-of-run `progress.write` → `progress.read`
+  // pairs resolve to the same artifact directory (a fresh id per call
+  // could never find what it just wrote).
+  const progressFallbackRunId = `run_${newId()}`;
   const progress: AgentProgressIO = {
-    write: (content: string, opts?: ProgressWriteOptions) => {
-      const runId = activeRunState?.id ?? `run_${newId()}`;
-      return progressIO.write(runId, content, opts);
+    write: async (content: string, opts?: ProgressWriteOptions) => {
+      const runId = activeRunState?.id ?? progressFallbackRunId;
+      const ref = await progressIO.write(runId, content, opts);
+      // AG-20: surface the documented `agent.progress.written` event —
+      // queued here and drained into the active (or next consumed) stream.
+      externalEventQueue.push({
+        type: 'agent.progress.written',
+        runId,
+        sessionId: activeRunState?.sessionId ?? '',
+        agentId,
+        ref,
+      } as AgentEvent<TOutput>);
+      return ref;
     },
-    read: (opts?: ProgressReadOptions) => {
-      const runId = activeRunState?.id ?? `run_${newId()}`;
-      return progressIO.read(runId, opts);
+    read: async (opts?: ProgressReadOptions) => {
+      const queriedRunId = opts?.runId ?? activeRunState?.id ?? progressFallbackRunId;
+      const refs = await progressIO.read(queriedRunId, opts);
+      externalEventQueue.push({
+        type: 'agent.progress.read',
+        runId: activeRunState?.id ?? queriedRunId,
+        sessionId: activeRunState?.sessionId ?? '',
+        agentId,
+        refs,
+        queriedRunId,
+        queriedRole: opts?.role,
+      } as AgentEvent<TOutput>);
+      return refs;
     },
   };
 

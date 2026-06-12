@@ -168,7 +168,6 @@ A few of the most common event types:
 | `tool.call.start` / `tool.call.delta` / `tool.call.end` | Streaming model emission of a tool call. |
 | `tool.execute.start` / `tool.execute.end` / `tool.execute.error` | Execution lifecycle of the tool. |
 | `tool.approval.requested` / `tool.approval.granted` / `tool.approval.denied` | A privileged tool needs human approval and the eventual decision. |
-| `memory.read` / `memory.write` | A memory operation crossed the boundary. |
 | `context.compacted` | The context engine auto-compacted the buffer. |
 | `handoff` | The agent handed off to another agent. |
 | `agent.model.fellback` | The agent retried against a fallback model. |
