@@ -38,8 +38,8 @@ export interface TelemetryStatus {
  * @stable
  */
 export function getTelemetryStatus(env: NodeJS.ProcessEnv = process.env): TelemetryStatus {
-  const telemetry = env['GRAPHORIN_TELEMETRY'];
-  const noPhoneHome = env['GRAPHORIN_NO_PHONE_HOME'];
+  const telemetry = env.GRAPHORIN_TELEMETRY;
+  const noPhoneHome = env.GRAPHORIN_NO_PHONE_HOME;
   return {
     enabled: false,
     reason: 'telemetry not yet implemented (v0.1 ships zero default telemetry)',
@@ -77,15 +77,15 @@ export function announceTelemetryPosture(
   const env = opts.env ?? process.env;
   const sink = opts.sink ?? ((line: string) => console.info(line));
   const lines: string[] = [];
-  if (env['GRAPHORIN_TELEMETRY'] !== undefined) {
+  if (env.GRAPHORIN_TELEMETRY !== undefined) {
     lines.push(
-      `[graphorin/observability] info: GRAPHORIN_TELEMETRY=${env['GRAPHORIN_TELEMETRY']} ` +
+      `[graphorin/observability] info: GRAPHORIN_TELEMETRY=${env.GRAPHORIN_TELEMETRY} ` +
         '— acknowledged. Telemetry is hardcoded `disabled` in v0.1.',
     );
   }
-  if (env['GRAPHORIN_NO_PHONE_HOME'] !== undefined) {
+  if (env.GRAPHORIN_NO_PHONE_HOME !== undefined) {
     lines.push(
-      `[graphorin/observability] info: GRAPHORIN_NO_PHONE_HOME=${env['GRAPHORIN_NO_PHONE_HOME']} ` +
+      `[graphorin/observability] info: GRAPHORIN_NO_PHONE_HOME=${env.GRAPHORIN_NO_PHONE_HOME} ` +
         '— acknowledged. Graphorin already makes zero outbound calls without explicit user action.',
     );
   }

@@ -140,7 +140,7 @@ export class TransformersJsEmbedder implements EmbedderProvider {
     this.#pooling = options.pooling ?? 'mean';
     this.#normalize = options.normalize ?? true;
     this.#revision = options.revision;
-    this.#cacheDir = options.cacheDir ?? process.env['GRAPHORIN_CACHE_DIR'];
+    this.#cacheDir = options.cacheDir ?? process.env.GRAPHORIN_CACHE_DIR;
     this.#dtype = options.dtype;
     this.#device = options.device;
     this.#pipelineFactory = options.pipelineFactory;

@@ -48,7 +48,6 @@ describe('Agent — HITL approval flow', () => {
 
     // First run — capture the suspended RunState by walking the stream.
     const events1: AgentEvent[] = [];
-    let suspendedState: unknown;
     for await (const ev of agent.stream('email Alice')) {
       events1.push(ev);
       if (ev.type === 'tool.approval.requested') {
@@ -71,7 +70,7 @@ describe('Agent — HITL approval flow', () => {
 
     // Build a synthetic RunState representing the suspended run
     // (the tool was approval-gated; pendingApprovals has one entry).
-    suspendedState = {
+    const suspendedState: unknown = {
       version: 'graphorin-run-state/1.0',
       id: 'run-fixture',
       agentId: agent.id,

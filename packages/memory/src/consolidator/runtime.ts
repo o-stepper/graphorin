@@ -805,4 +805,3 @@ function defaultTriggers(): ConsolidatorTriggerSpec[] {
   // emitted `trigger({ kind: 'turn' })` itself (MCON-4).
   return ['idle:5m', 'cron:0 4 * * *'];
 }
-

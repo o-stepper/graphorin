@@ -25,7 +25,7 @@ describe('@graphorin/observability/eval — runEval', () => {
     expect(report.summary.total).toBe(2);
     expect(report.summary.passed).toBe(1);
     expect(report.summary.failed).toBe(1);
-    expect(report.summary.byScorer['length']?.passed).toBe(1);
+    expect(report.summary.byScorer.length?.passed).toBe(1);
   });
 
   it('catches scorer exceptions and reports them as failures', async () => {

@@ -29,7 +29,7 @@ describe('@graphorin/observability/redaction — validator', () => {
     expect(result).not.toBeNull();
     expect(result?.value).toContain('[REDACTED email]');
     expect(result?.value).not.toContain('alice@example.com');
-    expect(v.counters().matchesByPattern['email']).toBeGreaterThan(0);
+    expect(v.counters().matchesByPattern.email).toBeGreaterThan(0);
   });
 
   it('throws when failOnUnredactedSensitive is true and a tier exceeds the floor', () => {

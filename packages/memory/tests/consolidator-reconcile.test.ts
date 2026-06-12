@@ -78,7 +78,7 @@ function reconcileProvider(opts: {
       if (sys.includes('reconcile')) {
         reconcileCalls += 1;
         // MCON-14: every reconcile call must be output-capped.
-        if ((req.maxTokens ?? 0) <= 0) throw new Error("reconcile request missing maxTokens");
+        if ((req.maxTokens ?? 0) <= 0) throw new Error('reconcile request missing maxTokens');
         const content = String(req.messages[0]?.content ?? '');
         const decision = opts.reconcile?.(content) ?? { action: 'add', reason: 'test-default' };
         return {

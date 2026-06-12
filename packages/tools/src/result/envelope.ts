@@ -33,7 +33,7 @@ export interface ResultEnvelope<TOutput = unknown> {
  * @stable
  */
 export function toResultEnvelope<TOutput>(opts: {
-  readonly raw: TOutput | ToolReturn<TOutput> | void;
+  readonly raw: TOutput | ToolReturn<TOutput> | undefined;
   readonly chunks?: ReadonlyArray<ContentChunk>;
 }): ResultEnvelope<TOutput> {
   const { raw, chunks } = opts;

@@ -14,7 +14,7 @@ describe('truncateBody', () => {
   });
 
   it("'middle' truncation preserves head and tail with annotation in the middle", async () => {
-    const body = 'A'.repeat(2000) + 'MIDDLE' + 'B'.repeat(2000);
+    const body = `${'A'.repeat(2000)}MIDDLE${'B'.repeat(2000)}`;
     const result = await truncateBody({
       body,
       maxTokens: 100,
@@ -28,7 +28,7 @@ describe('truncateBody', () => {
   });
 
   it("'tail' truncation preserves the tail and inserts annotation at the head", async () => {
-    const body = 'A'.repeat(2000) + 'TAIL_MARKER';
+    const body = `${'A'.repeat(2000)}TAIL_MARKER`;
     const result = await truncateBody({
       body,
       maxTokens: 50,

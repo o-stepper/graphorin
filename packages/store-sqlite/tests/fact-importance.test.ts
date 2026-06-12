@@ -92,9 +92,9 @@ describe('fact importance + decay row (X-1, migration 015)', () => {
     await decayExt(store).archiveFact('f4', 'capacity_exceeded');
 
     // MCON-6: archived rows leave the default decay window — inspect via opt-in.
-    const row = (
-      await decayExt(store).listForDecay(SCOPE, 10, { includeArchived: true })
-    ).find((r) => r.id === 'f4');
+    const row = (await decayExt(store).listForDecay(SCOPE, 10, { includeArchived: true })).find(
+      (r) => r.id === 'f4',
+    );
     expect(row?.archived).toBe(true);
     // Soft archive, not a purge: the row survives and is still fetchable.
     expect(await decayExt(store).get('f4')).not.toBeNull();

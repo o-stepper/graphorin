@@ -26,7 +26,7 @@ import { buildSyntheticServerMetadata, resetOAuthSubsystem } from './_helpers.js
  * would still trip the assertion since it would never tear down at
  * all. Local runs continue to enforce the 100 ms budget.
  */
-const TEARDOWN_BUDGET_MS = process.env['CI'] === 'true' ? 500 : 100;
+const TEARDOWN_BUDGET_MS = process.env.CI === 'true' ? 500 : 100;
 
 describe('@graphorin/security/oauth — cancellation latency', () => {
   beforeEach(() => {

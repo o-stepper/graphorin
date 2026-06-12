@@ -27,7 +27,7 @@ const HANDLER_SLEEP_MS = 5_000;
  * tight bound locally so a real cancellation regression still trips it,
  * widen on shared CI so transient runner load does not.
  */
-const CANCEL_BUDGET_MS = process.env['CI'] === 'true' ? 1_500 : 200;
+const CANCEL_BUDGET_MS = process.env.CI === 'true' ? 1_500 : 200;
 
 describe('MCPClient — AbortSignal cancellation discipline', () => {
   let client: MCPClient | undefined;

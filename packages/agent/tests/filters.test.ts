@@ -150,7 +150,9 @@ describe('filters.custom', () => {
   it('wraps a bare HandoffFilter into a DescribedFilter with kind=custom', () => {
     const f = custom((h) => h.slice(0, 1));
     expect(f.descriptor.kind).toBe('custom');
-    expect(f([sample[0]!, sample[1]!]).length).toBe(1);
+    const [first, second] = sample;
+    if (first === undefined || second === undefined) throw new Error('fixture too short');
+    expect(f([first, second]).length).toBe(1);
   });
 });
 

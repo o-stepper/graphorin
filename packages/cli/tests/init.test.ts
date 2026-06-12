@@ -115,6 +115,7 @@ describe('IP-5 — init output parses through the strict server schema', () => {
       raw.lastIndexOf(')'),
     );
     // biome-ignore lint/security/noGlobalEval: test-only evaluation of our own generated literal
+    // biome-ignore lint/complexity/noCommaOperator: indirect eval is the point — evaluate in global scope
     const cfg = (0, eval)(`(${objSource})`);
     const { parseServerConfig } = await import('@graphorin/server');
     expect(() => parseServerConfig(cfg)).not.toThrow();

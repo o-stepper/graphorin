@@ -479,8 +479,6 @@ function rowToDlq(row: DlqRowDb, scope: SessionScope): DlqBatchRow {
     nextRetryAt: row.next_retry_at,
     retryCount: row.retry_count,
     phase:
-      row.phase === 'light' || row.phase === 'standard' || row.phase === 'deep'
-        ? row.phase
-        : null,
+      row.phase === 'light' || row.phase === 'standard' || row.phase === 'deep' ? row.phase : null,
   };
 }

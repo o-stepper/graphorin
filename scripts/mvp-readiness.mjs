@@ -179,7 +179,7 @@ async function workspaceAudit() {
 function summarise(label, ok, elapsedMs, extras = '') {
   const status = ok ? 'PASS' : 'FAIL';
   const seconds = (elapsedMs / 1000).toFixed(1);
-  return `[${status}] ${label.padEnd(24)} (${seconds.padStart(5)}s)${extras ? '  ' + extras : ''}`;
+  return `[${status}] ${label.padEnd(24)} (${seconds.padStart(5)}s)${extras ? `  ${extras}` : ''}`;
 }
 
 async function main() {

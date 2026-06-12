@@ -96,7 +96,7 @@ describe('@graphorin/observability/tracer — createTracer', () => {
       gs?.setAttribute('user.email', 'alice@example.com', { sensitivity: 'public' });
     });
     await tracer.shutdown();
-    expect(tracer.getMetrics().matchesByPattern['email']).toBeGreaterThan(0);
+    expect(tracer.getMetrics().matchesByPattern.email).toBeGreaterThan(0);
   });
 
   it('auto-wraps the OTLP exporter when supplied raw', () => {

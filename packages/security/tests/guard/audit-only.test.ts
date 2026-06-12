@@ -123,7 +123,7 @@ describe('createAuditOnlyGuard', () => {
     // not flake the suite; the gate still catches gross (10-100x)
     // regressions. The strict perf gate lives in `pnpm run
     // benchmark:ci` on a quiescent fixture.
-    const P95_BUDGET_US = process.env['CI'] === 'true' ? 5000 : 200;
+    const P95_BUDGET_US = process.env.CI === 'true' ? 5000 : 200;
     expect(p95SnapshotUs).toBeLessThan(P95_BUDGET_US);
     expect(p95VerifyUs).toBeLessThan(P95_BUDGET_US);
     expect(lastSnap?.digest[0]?.region).toBe('a');

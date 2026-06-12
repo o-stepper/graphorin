@@ -30,7 +30,7 @@ export type ToolSpec<TInput = unknown, TOutput = unknown, TDeps = unknown> = Omi
   readonly execute: (
     input: TInput,
     ctx: ToolExecutionContext<TDeps>,
-  ) => Promise<TOutput | ToolReturn<TOutput> | void>;
+  ) => Promise<TOutput | ToolReturn<TOutput> | undefined>;
 };
 
 /**
