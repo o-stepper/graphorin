@@ -14,11 +14,11 @@
  *
  * The consolidator runs **inside** the server process, so the CLI
  * cannot direct-control a live in-memory instance from a different
- * process. Instead, the CLI reads the SQLite tables that the running
- * consolidator writes to (`consolidator_state`, `consolidator_runs`,
- * `consolidator_failed_batches`) and persists the tier override into a
- * lightweight `consolidator_admin` table the running daemon polls at
- * its next scheduled iteration.
+ * process. `status` reads the SQLite tables the running consolidator
+ * writes to (`consolidator_state`, `consolidator_runs`,
+ * `consolidator_failed_batches`, `conflict_check_pending`); `set-tier`
+ * and `stop` honestly report UNSUPPORTED until a daemon-side control
+ * channel exists (IP-4) — nothing polls an admin table.
  *
  * @packageDocumentation
  */
@@ -73,17 +73,22 @@ export async function runConsolidatorStatus(
       'SELECT COUNT(*) AS n FROM consolidator_runs WHERE started_at > ?',
       [Date.now() - 24 * 60 * 60_000],
     );
+    // MCON-5: the store writes 'running' | 'completed' | 'failed' |
+    // 'partial' | 'deferred' (consolidator-store.ts) — the old queries
+    // asked for 'success'/'error'/'pending' and always returned 0.
     const success = conn.get<{ n: number }>(
-      "SELECT COUNT(*) AS n FROM consolidator_runs WHERE status = 'success' AND started_at > ?",
+      "SELECT COUNT(*) AS n FROM consolidator_runs WHERE status = 'completed' AND started_at > ?",
       [Date.now() - 24 * 60 * 60_000],
     );
     const failed = conn.get<{ n: number }>(
-      "SELECT COUNT(*) AS n FROM consolidator_runs WHERE status = 'error' AND started_at > ?",
+      "SELECT COUNT(*) AS n FROM consolidator_runs WHERE status = 'failed' AND started_at > ?",
       [Date.now() - 24 * 60 * 60_000],
     );
     const dlq = conn.get<{ n: number }>('SELECT COUNT(*) AS n FROM consolidator_failed_batches');
+    // Pending conflict work lives in conflict_check_pending, not in
+    // consolidator_runs ('pending' was never a run status).
     const pending = conn.get<{ n: number }>(
-      "SELECT COUNT(*) AS n FROM consolidator_runs WHERE status = 'pending'",
+      'SELECT COUNT(*) AS n FROM conflict_check_pending WHERE resolved_at IS NULL',
     );
     const last = conn.get<{ started_at: number; status: string }>(
       'SELECT started_at, status FROM consolidator_runs ORDER BY started_at DESC LIMIT 1',
@@ -192,16 +197,6 @@ export async function runConsolidatorStop(
   } finally {
     await ctx.close();
   }
-}
-
-function _ensureAdminTable(conn: { exec(sql: string): void }): void {
-  conn.exec(
-    `CREATE TABLE IF NOT EXISTS consolidator_admin (
-       key TEXT PRIMARY KEY,
-       value TEXT NOT NULL,
-       updated_at INTEGER NOT NULL
-     ) WITHOUT ROWID;`,
-  );
 }
 
 function isTier(value: unknown): value is ConsolidatorTier {
