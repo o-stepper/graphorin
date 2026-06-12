@@ -881,7 +881,30 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       // Inject the agent's system prompt at the top of the buffer
       // exactly once per run, before any seed messages.
       const instructionsRaw = config.instructions;
-      const instructionsText = typeof instructionsRaw === 'string' ? instructionsRaw : '';
+      // AG-8: resolve the function form of `instructions` (sync or async). It is
+      // resolved ONCE per run (the per-run contract documented on `AgentConfig`),
+      // against a RunContext snapshot at step 0; the result is pinned as the
+      // run's system-prompt prefix. A function that previously returned nothing
+      // observable now actually seeds the system message.
+      let instructionsText: string;
+      if (typeof instructionsRaw === 'string') {
+        instructionsText = instructionsRaw;
+      } else {
+        const instructionsCtx: RunContext<TDeps> = {
+          runId: state.id,
+          sessionId,
+          ...(userId !== undefined ? { userId } : {}),
+          agentId,
+          deps: (options.deps ?? config.deps) as TDeps,
+          tracer,
+          signal,
+          usage: usageAcc,
+          stepNumber: 0,
+          messages,
+          state,
+        };
+        instructionsText = await instructionsRaw(instructionsCtx);
+      }
       let systemPrompt = instructionsText;
       if (config.autoAssembleContext === true && memory !== undefined) {
         // CE-1 (opt-in): build the memory-aware 6-layer system prompt via the
