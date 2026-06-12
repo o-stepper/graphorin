@@ -51,6 +51,16 @@ export const DEFAULT_PRESERVE_RECENT_TURNS = 6;
 /** Opening marker of the inbound-untrusted envelope (tools sanitize layer). */
 const UNTRUSTED_MARKER = '<<<untrusted_content';
 
+/**
+ * Wall-clock budget for the CE-15 injection scan of the summarizer
+ * output. The scanner's 5ms default exists for the per-tool-result
+ * hot path; here a compaction already paid for an LLM call, and on a
+ * contended host (slow CI runners included) scheduler noise can cross
+ * 5ms between pattern iterations — making the scanner return `null`
+ * (verdict unknown) and the security check silently fail open.
+ */
+const COMPACTION_SCAN_BUDGET_MS = 50;
+
 /** CE-15: does the compacted window carry inbound-untrusted envelopes? */
 function windowContainsUntrusted(messages: ReadonlyArray<Message>): boolean {
   return messages.some((message) => renderMessageText(message).includes(UNTRUSTED_MARKER));
@@ -194,7 +204,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   // summarizer output itself — the LLM-authored body is committed
   // inside a derived-trust envelope (sticky across re-compactions:
   // the envelope re-triggers this detection next time around).
-  const summaryScan = scanImperativePatterns(summarized.text);
+  const summaryScan = scanImperativePatterns(summarized.text, undefined, COMPACTION_SCAN_BUDGET_MS);
   const summaryTrust: 'trusted' | 'untrusted-derived' =
     windowContainsUntrusted(olderMessages) || (summaryScan !== null && summaryScan.hits.length > 0)
       ? 'untrusted-derived'
