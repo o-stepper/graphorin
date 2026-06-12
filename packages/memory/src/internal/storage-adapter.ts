@@ -82,6 +82,11 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
    * with a `memory_history` audit row. Powers {@link EpisodicMemory.validate}.
    */
   setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  /**
+   * Count the recall-eligible episodes for the scope (CE-5) — a `COUNT(*)`,
+   * never materialising rows. Powers honest `metadata()` counts.
+   */
+  count?(scope: SessionScope): Promise<number>;
 }
 
 /**
@@ -120,6 +125,12 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * `@graphorin/store-sqlite` adapter implements it.
    */
   setStatus?(factId: string, status: MemoryStatus, reason?: string): Promise<void>;
+  /**
+   * Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
+   * the default recall filters (live, non-archived, non-quarantined), never
+   * materialising rows. Powers honest `metadata()` counts.
+   */
+  count?(scope: SessionScope): Promise<number>;
   /**
    * Hard-delete a fact (GDPR path). The audit log row is preserved
    * but the row itself + every per-embedder vec0 entry is removed.
@@ -185,6 +196,12 @@ export interface SessionMemoryStoreExt extends SessionMemoryStore {
     lastMessageId: string | null,
     limit: number,
   ): Promise<ReadonlyArray<SessionMessageRecord>>;
+  /**
+   * Count the live messages in the scoped session (CE-5) — a `COUNT(*)`, never
+   * materialising rows; `0` for a user-only scope. Powers honest `metadata()`
+   * counts instead of `list(...)`-materialising up to 1000 rows.
+   */
+  count?(scope: SessionScope): Promise<number>;
 }
 
 /**

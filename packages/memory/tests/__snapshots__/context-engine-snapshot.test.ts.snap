@@ -37,15 +37,6 @@ You have access to a multi-tier memory system that persists between conversation
 Help the user write tests.
 </agent_instructions>
 
-<memory_metadata>
-  Working blocks: 2
-  Active rules: 1
-  Indexed messages: 0
-  Episodes: 0
-  Facts: 0
-  Tags: locale:en
-</memory_metadata>
-
 <memory_rules>
   <rule priority="80">Always cite sources for non-obvious claims.</rule>
 </memory_rules>
@@ -61,5 +52,14 @@ Help the user write tests.
 
 <skills_available>
   <skill name="pdf-processing" description="Extract text from PDFs" />
-</skills_available>"
+</skills_available>
+
+<memory_metadata>
+  Working blocks: 2
+  Active rules: 1
+  Indexed messages: 0
+  Episodes: 0
+  Facts: 0
+  Tags: locale:en
+</memory_metadata>"
 `;

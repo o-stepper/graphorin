@@ -103,6 +103,14 @@ export type AutoRecallConfig =
   | false
   | {
       readonly topK?: number;
+      /**
+       * Minimum fused score a hit must reach to be injected. **Default `0`**
+       * (CE-4) — `topK` already bounds the volume. The scale is
+       * reranker-dependent: the default RRF reranker fuses the FTS + vector
+       * candidate lists as `1/(60 + rank)` per list, so scores top out near
+       * `2/(60 + 1) ≈ 0.033` — any positive default would silently drop every
+       * hit. Set this only when calibrating against a known reranker's scale.
+       */
       readonly threshold?: number;
       readonly strategy?: AutoRecallStrategy;
     };
@@ -298,6 +306,13 @@ export interface ResolvedContextEngineConfig {
   readonly maxToolsInContext: number;
   readonly toolSearchThreshold: number;
   readonly compactionEnabled: boolean;
+  /**
+   * Whether compaction can actually fire (CE-12): `compactionEnabled` **and** a
+   * `providerContextWindow` was supplied. `compactionEnabled: true` with
+   * `compactionEffective: false` is the honest signal that compaction is
+   * configured-on but a no-op for want of a context window.
+   */
+  readonly compactionEffective: boolean;
   readonly compactionThresholdTokens: number;
   readonly providerContextWindow: number | null;
   readonly providerTrust: LocalProviderTrust;
@@ -315,6 +330,45 @@ const DEFAULT_LAYER_CAPS: Readonly<
   workingBlocks: undefined,
   autoRecall: undefined,
 };
+
+let compactionIneffectiveWarned = false;
+
+/** Emit the "compaction enabled but ineffective" warning at most once (CE-12). */
+function warnCompactionIneffective(message: string): void {
+  if (compactionIneffectiveWarned) return;
+  compactionIneffectiveWarned = true;
+  process.stderr.write(`[graphorin/memory] ${message}\n`);
+}
+
+/**
+ * Test-only — reset the one-time CE-12 compaction warning so a test can assert
+ * it fires.
+ *
+ * @internal
+ */
+export function _resetCompactionWarningForTesting(): void {
+  compactionIneffectiveWarned = false;
+}
+
+/**
+ * Emission order for the assembled layers — deliberately **distinct from the
+ * truncation priority ladder** (CE-9). Allocation still trims by
+ * `DEFAULT_LAYER_PRIORITY` (lowest priority first), but layers are *emitted* in
+ * this order so the volatile blocks that change every turn (`memoryMetadata`'s
+ * counts, `autoRecall`'s injected facts) sit **after** the stable Layer 1-4
+ * prefix (identity / rules / blocks / skills). That keeps the provider's — and a
+ * local llama.cpp / vLLM server's — KV-cache breakpoint real: the prefix stays
+ * byte-identical across turns even as the message count and recalled facts move.
+ */
+const LAYER_EMIT_ORDER: Readonly<Record<LayerAllocation['id'], number>> = Object.freeze({
+  identity: 0,
+  activeRules: 1,
+  workingBlocks: 2,
+  activeSkills: 3,
+  // --- KV-cache breakpoint: everything below changes per turn ---
+  memoryMetadata: 4,
+  autoRecall: 5,
+});
 
 /**
  * Build a ContextEngine instance from the supplied configuration.
@@ -385,6 +439,23 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
           reservedForCompaction,
         })
       : Number.POSITIVE_INFINITY;
+  // CE-12: compaction enabled without a `providerContextWindow` leaves the
+  // threshold at Infinity, so `shouldCompact` returns false forever — a
+  // silently-dead default-on protection. Surface it: throw if the operator
+  // explicitly configured compaction, warn (once) if it is on by the default
+  // trust policy. Auto-detecting the window from the provider is not
+  // implemented.
+  const compactionEffective = compactionEnabled && providerContextWindow !== null;
+  if (compactionEnabled && providerContextWindow === null) {
+    const message =
+      'context-engine compaction is enabled but `providerContextWindow` is not set, so the ' +
+      'trigger threshold is Infinity and compaction will never fire. Pass `providerContextWindow` ' +
+      "(your model's context window, in tokens) — auto-detection from the provider is not implemented.";
+    if (compactionInput !== undefined && compactionInput !== false) {
+      throw new Error(`[graphorin/memory] ${message}`);
+    }
+    warnCompactionIneffective(message);
+  }
   const compactionStrategy: CompactionStrategy =
     compactionInput === false ||
     compactionInput === undefined ||
@@ -412,6 +483,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     maxToolsInContext,
     toolSearchThreshold,
     compactionEnabled,
+    compactionEffective,
     compactionThresholdTokens,
     providerContextWindow,
     providerTrust,
@@ -486,7 +558,13 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       });
       if (autoRecall.factsTriggered) {
         const topK = factsAutoRecall.topK ?? layerCfg.autoRecall?.topK ?? 5;
-        const threshold = factsAutoRecall.threshold ?? layerCfg.autoRecall?.threshold ?? 0.7;
+        // CE-4: default 0 — rank-based `topK` already bounds the injected
+        // volume, and the threshold's scale is reranker-dependent (the default
+        // RRF reranker fuses 2 candidate lists, so scores top out near
+        // `2/(60+1) ≈ 0.033` and any positive default would silently drop
+        // everything). Operators tuning against a known reranker scale can pass
+        // an explicit `threshold`.
+        const threshold = factsAutoRecall.threshold ?? layerCfg.autoRecall?.threshold ?? 0;
         const hits = await memory.semantic
           .search(input.scope, input.lastUserMessage ?? '', { topK })
           .catch(() => []);
@@ -532,7 +610,12 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const preambleFired = shouldFireInboundPreamble(input.upstreamAnnotations ?? []);
     const preambleText = preambleFired ? composeInboundPreamble(localePack) : '';
 
-    const assembledLayers = allocation.layers.filter((l) => l.text.length > 0);
+    // CE-9: emit in stability order (Layer 1-4 prefix, then the cache
+    // breakpoint, then the volatile metadata / auto-recall), NOT in the
+    // truncation-priority order `allocation.layers` arrives in.
+    const assembledLayers = allocation.layers
+      .filter((l) => l.text.length > 0)
+      .sort((a, b) => LAYER_EMIT_ORDER[a.id] - LAYER_EMIT_ORDER[b.id]);
     const finalParts: string[] = assembledLayers.map((l) => l.text);
     if (preambleText.length > 0) finalParts.push(preambleText);
     const systemContent = finalParts.join('\n\n');
@@ -674,11 +757,12 @@ function buildCandidate(
 function annotationForLayer(layer: LayerAllocation): ContentAnnotation {
   switch (layer.id) {
     case 'identity':
-      // Identity merges the framework base + the user-defined
-      // agent_instructions. Tag as agent:instructions when the
-      // base is empty (e.g., the operator overrode Layer 1 to
-      // off); otherwise tag as system:framework so D3 skips
-      // re-scanning under `scanScope: 'untrusted'`.
+      // Identity merges the framework base (Layer 1) + the user-defined
+      // agent_instructions (Layer 2) into one trusted fragment, tagged
+      // `system:framework` so D3 skips re-scanning it under
+      // `scanScope: 'untrusted'`. (Both halves are first-party prompt text, so
+      // the merged layer carries a single framework trust tag — `LayerAllocation`
+      // does not surface which halves were present.)
       return annotate('system:framework', 'n/a');
     case 'memoryMetadata':
     case 'activeRules':

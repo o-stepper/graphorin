@@ -292,6 +292,19 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     return rows.reverse().map(rowToMessage);
   }
 
+  /**
+   * Count the live messages in the scoped session (CE-5) — a `COUNT(*)`, never
+   * materialising rows. Returns `0` for a user-only scope (no session to count).
+   */
+  async count(scope: SessionScope): Promise<number> {
+    if (scope.sessionId === undefined) return 0;
+    const row = this.#conn.get<{ n: number }>(
+      'SELECT COUNT(*) AS n FROM session_messages WHERE scope_session_id = ? AND deleted_at IS NULL',
+      [scope.sessionId],
+    );
+    return row?.n ?? 0;
+  }
+
   async search(
     scope: SessionScope,
     query: string,
@@ -662,6 +675,18 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
       );
     });
   }
+
+  /**
+   * Count the recall-eligible episodes for the scope (CE-5) — a `COUNT(*)`
+   * with the same default filters as the FTS search (live, non-quarantined).
+   */
+  async count(scope: SessionScope): Promise<number> {
+    const row = this.#conn.get<{ n: number }>(
+      "SELECT COUNT(*) AS n FROM episodes WHERE scope_user_id = ? AND deleted_at IS NULL AND status != 'quarantined'",
+      [scope.userId],
+    );
+    return row?.n ?? 0;
+  }
 }
 
 class SemanticMemoryStoreImpl implements SemanticMemoryStore {
@@ -963,6 +988,20 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
         ],
       );
     });
+  }
+
+  /**
+   * Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
+   * the same default filters as the FTS search (live, non-archived,
+   * non-quarantined). Replaces the old `search({ query: '*', topK: 1 })` probe
+   * that returned at most 1 and was deterministically 0 on real SQLite.
+   */
+  async count(scope: SessionScope): Promise<number> {
+    const row = this.#conn.get<{ n: number }>(
+      "SELECT COUNT(*) AS n FROM facts WHERE scope_user_id = ? AND deleted_at IS NULL AND archived = 0 AND status != 'quarantined'",
+      [scope.userId],
+    );
+    return row?.n ?? 0;
   }
 
   /**

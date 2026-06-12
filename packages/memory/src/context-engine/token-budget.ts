@@ -1,10 +1,16 @@
 /**
- * Priority-ordered token-budget allocator. The allocator runs over
- * the six layers the {@link ContextEngine} renders into the system
- * prompt and trims the lowest-priority layers first when the
- * combined cost exceeds the configured budget.
+ * Priority-ordered token-budget allocator. The allocator runs over the six
+ * layers of the {@link ContextEngine}'s system prompt and trims the
+ * lowest-priority layers first when the combined cost exceeds the configured
+ * budget.
  *
- * Priority (configurable):
+ * This **truncation priority** is deliberately separate from the **emission
+ * order** (CE-9): the engine emits the surviving layers in a stable order
+ * (identity → rules → blocks → skills → [KV-cache breakpoint] → metadata →
+ * auto-recall) regardless of which were trimmed, so the cacheable prefix stays
+ * byte-stable across turns. This ladder governs only *what gets dropped first*.
+ *
+ * Priority (configurable), highest preserved → first truncated:
  *
  * 1. **identity** — Layer 1 (`graphorin_memory_base` + agent
  *    instructions). Always preserved; truncated last.

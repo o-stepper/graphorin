@@ -38,12 +38,17 @@ export async function gatherMemoryMetadata(
   scope: SessionScope,
   deps: MemoryMetadataDeps,
 ): Promise<MemoryMetadata> {
-  const [blocks, rules, episodes, messages, facts, status] = await Promise.all([
+  // CE-5 / MST-6: real `COUNT(*)` surfaces per tier — the old
+  // `search({ query: '*', topK: 1 })` probe was capped at 1 and matched zero
+  // rows on real SQLite (`escapeFtsQuery('*')` tokenises to nothing), so a
+  // production deploy told the model "Facts: 0" regardless of content. Counts
+  // never materialise rows; `messageCount` no longer lists up to 1000 messages.
+  const [blocks, rules, episodeCount, messageCount, factCount, status] = await Promise.all([
     deps.store.working.list(scope),
     deps.store.procedural.list(scope),
-    deps.store.episodic.search(scope, { query: '*', topK: 1 }).catch(() => []),
-    deps.store.session.list(scope, {}).catch(() => []),
-    deps.store.semantic.search(scope, { query: '*', topK: 1 }).catch(() => []),
+    countOrZero(deps.store.episodic, scope),
+    countOrZero(deps.store.session, scope),
+    countOrZero(deps.store.semantic, scope),
     deps.consolidator.status(),
   ]);
   // The metadata block surfaces the embedder id + active locale so
@@ -55,15 +60,32 @@ export async function gatherMemoryMetadata(
   if (embedderId !== null) tags.push(`embedder:${embedderId}`);
 
   const meta: MemoryMetadata = {
-    factCount: facts.length,
-    episodeCount: episodes.length,
-    messageCount: messages.length,
-    activeRuleCount: rules.length,
+    factCount,
+    episodeCount,
+    messageCount,
+    // MST-6: "Active rules" excludes still-quarantined (e.g. induced) rules.
+    activeRuleCount: rules.filter((rule) => rule.status !== 'quarantined').length,
     workingBlockCount: blocks.length,
     ...(status.lastRunAt !== undefined ? { lastConsolidatedAt: status.lastRunAt } : {}),
     tags: Object.freeze(tags),
   };
   return Object.freeze(meta);
+}
+
+/**
+ * Read a tier's `count(scope)` when the adapter exposes it (CE-5), degrading to
+ * `0` for adapters that do not — honest, and never the old 0/1 probe.
+ */
+async function countOrZero(
+  store: { count?(scope: SessionScope): Promise<number> },
+  scope: SessionScope,
+): Promise<number> {
+  if (typeof store.count !== 'function') return 0;
+  try {
+    return await store.count(scope);
+  } catch {
+    return 0;
+  }
 }
 
 /**

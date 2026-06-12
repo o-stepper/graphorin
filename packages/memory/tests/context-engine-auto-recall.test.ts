@@ -110,6 +110,32 @@ describe('context-engine — auto-recall heuristic (Phase 10d)', () => {
     expect(out.systemMessage.content).toContain('Tbilisi');
   });
 
+  it('factsAutoRecall injects facts at the DEFAULT threshold (CE-4)', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        // No explicit `threshold` ⇒ the default. RRF-fused scores top out near
+        // 0.033, so the old 0.7 default silently dropped every hit; the default
+        // must let the topK list through (rank-based topK bounds the volume).
+        factsAutoRecall: { topK: 3 },
+        privacy: { providerTrust: 'loopback' },
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    await memory.semantic.remember(scope, { text: 'do you remember user lives in Tbilisi' });
+    const out = await memory.contextEngine.assemble(memory, {
+      scope,
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      lastUserMessage: 'do you remember',
+    });
+    expect(out.autoRecall.factsTriggered).toBe(true);
+    expect(out.systemMessage.content).toContain('<auto_recalled_facts>');
+    expect(out.systemMessage.content).toContain('Tbilisi');
+  });
+
   it('does NOT inject auto-recall when the trigger phrase is absent', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),

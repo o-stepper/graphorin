@@ -350,6 +350,54 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
+  it('metadata reports real per-tier counts (not a 0/1 probe), excluding quarantined rules (CE-5, MST-6)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+      for (const text of [
+        'Lives in Lisbon.',
+        'Works as a botanist.',
+        'Drinks oat-milk lattes.',
+        'Plays the cello.',
+        'Allergic to walnuts.',
+      ]) {
+        await memory.semantic.remember(SCOPE, { text });
+      }
+      await memory.session.push(SCOPE, { role: 'user', content: 'hi' });
+      await memory.session.push(SCOPE, { role: 'assistant', content: 'hello' });
+      for (let i = 0; i < 3; i++) {
+        await memory.episodic.record(SCOPE, {
+          summary: `Episode ${i}`,
+          startedAt: new Date(i * 1000).toISOString(),
+          endedAt: new Date(i * 1000 + 500).toISOString(),
+          importance: 0.5,
+        });
+      }
+      await memory.procedural.define(SCOPE, { text: 'Greet the user by name.' }); // active
+      await sqlite.memory.procedural.add({
+        id: 'rule-q',
+        kind: 'procedural',
+        userId: SCOPE.userId,
+        sessionId: SCOPE.sessionId,
+        text: 'a still-quarantined induced rule',
+        priority: 40,
+        sensitivity: 'internal',
+        status: 'quarantined',
+        provenance: 'induction',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      const meta = await memory.metadata(SCOPE);
+      expect(meta.factCount).toBe(5);
+      expect(meta.episodeCount).toBe(3);
+      expect(meta.messageCount).toBe(2);
+      expect(meta.activeRuleCount).toBe(1); // the quarantined rule is excluded
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('compile + metadata produce the deterministic minimum-viable rendering', async () => {
     const sqlite = await makeStore();
     try {
