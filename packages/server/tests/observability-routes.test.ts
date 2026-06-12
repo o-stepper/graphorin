@@ -386,7 +386,7 @@ describe('Phase 14c — triggers REST routes', () => {
     expect(missing.status).toBe(404);
   });
 
-  it('POST /v1/triggers/:id/disable unregisters the trigger (admin scope)', async () => {
+  it('POST /v1/triggers/:id/disable flips the flag; DELETE unregisters (IP-17)', async () => {
     const { server, scheduler, bearer, anonBearer } = await bootServer();
     await scheduler.register(interval('to-disable', 5_000, async () => {}));
 
@@ -402,8 +402,24 @@ describe('Phase 14c — triggers REST routes', () => {
     });
     expect(ok.status).toBe(200);
 
+    // IP-17: disable is a NON-destructive flag flip — the trigger
+    // survives, paused; enable restores it; DELETE removes it.
     const all = await scheduler.list();
-    expect(all.find((t) => t.id === 'to-disable')).toBeUndefined();
+    expect(all.find((t) => t.id === 'to-disable')?.disabled).toBe(true);
+
+    const enable = await server.app.request('/v1/triggers/to-disable/enable', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(enable.status).toBe(200);
+    expect((await scheduler.list()).find((t) => t.id === 'to-disable')?.disabled).toBe(false);
+
+    const del = await server.app.request('/v1/triggers/to-disable', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(del.status).toBe(200);
+    expect((await scheduler.list()).find((t) => t.id === 'to-disable')).toBeUndefined();
 
     const missing = await server.app.request('/v1/triggers/missing/disable', {
       method: 'POST',
