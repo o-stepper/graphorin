@@ -90,7 +90,9 @@ describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
     expect(((await res.json()) as { ip?: string }).ip).toBe('10.1.1.1');
   });
 
-  it('the window map is swept once it crosses the cap', async () => {
+  // Inserts >10k window entries through real requests; loaded windows CI
+  // runners blow the 5s default — functional assertion, explicit headroom.
+  it('the window map is swept once it crosses the cap', { timeout: 20_000 }, async () => {
     const { Hono } = await import('hono');
     const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
     const { createRateLimitMiddleware } = await import('../src/middleware/rate-limit.js');

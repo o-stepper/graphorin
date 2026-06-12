@@ -90,7 +90,7 @@ import {
   type ProgressReadOptions,
   type ProgressWriteOptions,
 } from './progress/index.js';
-import { addModelUsage, createInitialRunState } from './run-state/index.js';
+import { addModelUsage, createInitialRunState, serializeRunState } from './run-state/index.js';
 import {
   buildMemoryGuard,
   buildSecretResolver,
@@ -2023,7 +2023,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                     id: state.id,
                     threadId: state.id,
                     namespace: 'agent',
-                    state,
+                    // AG-23: persist a detached, secret-redacted snapshot —
+                    // never the live MutableRunState reference.
+                    state: serializeRunState(state, { stripTracingApiKey: true }),
                     channelVersions: {},
                     stepNumber,
                     createdAt: new Date().toISOString(),
