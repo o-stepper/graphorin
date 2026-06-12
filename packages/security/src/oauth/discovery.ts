@@ -141,11 +141,22 @@ function wellKnownCandidates(serverUrl: string): ReadonlyArray<string> {
   return [...new Set(candidates)];
 }
 
+/**
+ * Strip trailing '/' characters without a regex — `/\/+$/` is a
+ * polynomial-backtracking ReDoS hazard on attacker-influenced metadata
+ * URLs (CodeQL js/redos). Linear scan instead.
+ */
+function stripTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 0x2f /* '/' */) end -= 1;
+  return end === value.length ? value : value.slice(0, end);
+}
+
 /** RFC 8414 §3 path-insertion form: origin + /.well-known/<suffix> + path. */
 function wellKnownPathInsertion(serverUrl: string, suffix: string): string {
   try {
     const url = new URL(serverUrl);
-    const path = url.pathname.replace(/\/+$/, '');
+    const path = stripTrailingSlashes(url.pathname);
     return `${url.origin}/.well-known/${suffix}${path}`;
   } catch {
     return wellKnownUrl(serverUrl, suffix);
@@ -193,7 +204,7 @@ function assertSafeEndpointUrl(serverUrl: string, field: string, value: string):
 
 /** Normalise an issuer-ish URL for equality: strip trailing slashes. */
 function normalizeIssuer(value: string): string {
-  return value.replace(/\/+$/, '');
+  return stripTrailingSlashes(value);
 }
 
 /**
