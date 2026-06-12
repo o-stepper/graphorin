@@ -138,7 +138,7 @@ When you pass **both** a `consolidator` and a triggers scheduler to `createServe
 
 ## Idempotency
 
-All `POST` endpoints accept an `Idempotency-Key` header. Repeated submissions within the configured TTL return the original response (or the in-flight result for a still-running call).
+Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** — the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute.
 
 ## Disconnect policy
 

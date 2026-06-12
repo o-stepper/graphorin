@@ -873,6 +873,8 @@ function mountRoutes(
       store: ctx.store.idempotency,
       config: config.server.idempotency,
       now: ctx.now,
+      // IP-6: token minting returns a raw secret — never cache it.
+      excludeResponseCachePaths: [`${base}/tokens`],
     });
     app.use(`${base}/*`, async (c, next) => {
       if (shouldSkipAuth(c.req.path)) {
