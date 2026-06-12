@@ -262,6 +262,8 @@ The `context.compacted` event carries `beforeTokens`, `afterTokens`, `summaryTok
 
 **Sensitivity gate.** A run whose `sensitivity` is `'secret'` is never auto-compacted: summarisation is an LLM call, and secret-tier history is not shipped to a (potentially less-trusted) summarizer. Large individual tool outputs leave context the complementary way — via [result handles](#result-handles-and-read_result), which likewise refuse to spill a `'secret'`-tier body to the shared store.
 
+**Summary trust (CE-15).** The spliced summary is a `system`-role message, but it is **not unconditionally trusted**: when the compacted window contained `<<<untrusted_content>>>`-wrapped tool results — or the injection heuristics flag the summarizer's own output — the compactor commits the LLM-authored body inside a `<<<untrusted_content trust="derived" tool="compaction-summarizer">>>` envelope (marker sequences in the body are neutralized so injected text cannot break out, and the envelope stays sticky across repeated compactions). The classification is surfaced as `CompactionResult.summaryTrust`. See [Security § Compaction summary trust](/guide/security#compaction-summary-trust).
+
 ## Post-compaction hooks
 
 When `@graphorin/memory.contextEngine` auto-compacts the buffer, the runtime fires every registered `postCompactionHooks[i]` between the trim and the next `provider.stream(...)` call, then re-injects each hook's returned Context Essentials into the trimmed buffer as a trailing `system` message. Failed hooks are isolated; the harness continues with the survivors.

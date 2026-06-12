@@ -5,9 +5,13 @@
  *
  * The summarizer's preamble explicitly instructs it to treat
  * `<<<untrusted_content>>>`-wrapped tool results as data, not
- * instructions (cross-cut RB-43); the produced summary is
- * system-authored and carries `inbound:trust = 'trusted'` per the
- * RB-43 annotation axis.
+ * instructions (cross-cut RB-43). The produced summary is NOT
+ * unconditionally trusted (CE-15): when the compacted window carried
+ * untrusted envelopes — or the injection heuristics flag the
+ * summarizer output — the compactor wraps the LLM-authored body in a
+ * `trust="derived"` envelope (see `CompactionResult.summaryTrust`),
+ * so taint survives compaction instead of laundering into an
+ * authoritative system message.
  *
  * Section 8 ("Recent turns preserved verbatim") is filled by the
  * harness, NOT by the summarizer — the preservation contract is

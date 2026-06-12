@@ -203,6 +203,19 @@ This is the precondition for shipping **synthesised** memory safely. Three deriv
 
 See [Memory system § Memory safety](/guide/memory-system#memory-safety-provenance-quarantine) for the API surface.
 
+## Compaction summary trust
+
+Context compaction is a trust boundary in its own right: the summarizer LLM reads the older portion of the conversation — including tool results wrapped in `<<<untrusted_content>>>` envelopes — and its output is spliced into the live buffer as a `system`-role message the main model treats as authoritative. Without a backstop, that is a classic **injection-laundering** path: text that entered the run untrusted re-enters it as trusted summary prose.
+
+The compactor closes this structurally (CE-15), not just with summarizer prompt wording:
+
+- **Window detection.** If any message in the compacted window carries an `<<<untrusted_content>>>` envelope, the LLM-authored summary body is committed **inside a `trust="derived"` envelope** (`<<<untrusted_content trust="derived" tool="compaction-summarizer">>>`), so the model's standing rule for untrusted blocks — data, not instructions — keeps applying to the summary.
+- **Output scan.** Independently of the window, the summarizer's output is run through the offline injection heuristics (the same `ignore previous instructions`-family patterns used by the tool-result sanitizer); a hit degrades the summary to the derived envelope too.
+- **No break-out.** Envelope marker sequences inside the summary body are neutralized before wrapping, so summarizer output influenced by injected text cannot close the envelope early and smuggle "system text" after it.
+- **Sticky across re-compaction.** A derived summary still carries the envelope when it is itself compacted later, which re-triggers the window detection — taint does not wash out with repeated summarization, consistent with the [data-flow policy](#provenance-data-flow-policy)'s no-laundering rule.
+
+The classification is surfaced as `CompactionResult.summaryTrust` (`'trusted' | 'untrusted-derived'`) for observability. A clean window with a clean summary is committed byte-identically to the pre-CE-15 behaviour.
+
 ## Threat model
 
 Graphorin's design assumes a STRIDE threat model across eight trust boundaries:

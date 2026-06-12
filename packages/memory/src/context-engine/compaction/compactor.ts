@@ -17,11 +17,13 @@
  */
 
 import type { Message, ModelSpec, SystemMessage } from '@graphorin/core';
+import { scanImperativePatterns } from '@graphorin/observability/redaction';
 import type { ContextLocalePack } from '../locale-packs/index.js';
 import {
   type ContextTokenCounter,
   countMessageTokens,
   HEURISTIC_TOKEN_COUNTER,
+  renderMessageText,
 } from '../token-counter.js';
 import {
   buildSummarizerPrompt,
@@ -45,6 +47,27 @@ import type {
  * @stable
  */
 export const DEFAULT_PRESERVE_RECENT_TURNS = 6;
+
+/** Opening marker of the inbound-untrusted envelope (tools sanitize layer). */
+const UNTRUSTED_MARKER = '<<<untrusted_content';
+
+/** CE-15: does the compacted window carry inbound-untrusted envelopes? */
+function windowContainsUntrusted(messages: ReadonlyArray<Message>): boolean {
+  return messages.some((message) => renderMessageText(message).includes(UNTRUSTED_MARKER));
+}
+
+/**
+ * CE-15: wrap the LLM-authored summary body in a derived-trust
+ * envelope. Envelope marker sequences inside the body are neutralized
+ * first so summarizer output influenced by injected text cannot break
+ * out of the envelope and masquerade as authoritative system text.
+ */
+function wrapSummaryAsDerived(body: string): string {
+  const neutralized = body
+    .replaceAll('<<</untrusted_content>>>', '[[/untrusted_content]]')
+    .replaceAll(UNTRUSTED_MARKER, '[[untrusted_content');
+  return `<<<untrusted_content trust="derived" tool="compaction-summarizer">>>\n${neutralized}\n<<</untrusted_content>>>`;
+}
 
 /**
  * Trim the in-flight buffer using the
@@ -127,6 +150,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
       source: input.source,
       durationMs: now() - startTs,
       hooksFiredCount: 0,
+      summaryTrust: 'trusted',
     });
   }
 
@@ -164,9 +188,23 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
     preserveRecentTurns,
   };
 
+  // CE-15: the summary must not launder untrusted content into a
+  // trusted system message. When the compacted window carried
+  // untrusted envelopes — or the injection heuristics flag the
+  // summarizer output itself — the LLM-authored body is committed
+  // inside a derived-trust envelope (sticky across re-compactions:
+  // the envelope re-triggers this detection next time around).
+  const summaryScan = scanImperativePatterns(summarized.text);
+  const summaryTrust: 'trusted' | 'untrusted-derived' =
+    windowContainsUntrusted(olderMessages) || (summaryScan !== null && summaryScan.hits.length > 0)
+      ? 'untrusted-derived'
+      : 'trusted';
   const finalSummary = renderFinalSummary({
     template,
-    summaryFromLlm: summarized.text,
+    summaryFromLlm:
+      summaryTrust === 'untrusted-derived'
+        ? wrapSummaryAsDerived(summarized.text)
+        : summarized.text,
     preservedMessages,
     metadata,
   });
@@ -195,6 +233,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
     source: input.source,
     durationMs,
     hooksFiredCount: 0,
+    summaryTrust,
   });
 }
 
