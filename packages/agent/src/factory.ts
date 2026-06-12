@@ -1239,6 +1239,41 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     const handoffNames = Array.from(handoffMap.keys());
     let stepNumber = 0;
 
+    // AG-6: shared cancellation path for both the loop-top abort check and a
+    // mid-stream provider abort. Yields `agent.cancelling`, applies the
+    // `onPendingApprovals` policy, and returns `true` when the run was finalized
+    // as 'failed' (the 'fail' policy — the caller must `return finalize(...)`);
+    // otherwise it sets `state.status = 'aborted'` and returns `false`.
+    async function* emitCancellation(): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
+      yield {
+        type: 'agent.cancelling',
+        runId: state.id,
+        drain: pendingAbort?.drain ?? false,
+        onPendingApprovals: pendingAbort?.onPendingApprovals ?? 'deny',
+      };
+      const policy = pendingAbort?.onPendingApprovals ?? 'deny';
+      if (policy === 'deny') {
+        const drained = state.pendingApprovals.splice(0, state.pendingApprovals.length);
+        for (const approval of drained) {
+          yield {
+            type: 'tool.approval.denied',
+            toolCallId: approval.toolCallId,
+            reason: 'auto-denied: agent.abort()',
+          };
+        }
+      } else if (policy === 'fail') {
+        state.status = 'failed';
+        state.error = { message: 'aborted with pending approvals', code: 'run-aborted' };
+        yield {
+          type: 'agent.error',
+          error: { message: 'aborted with pending approvals', code: 'run-aborted' },
+        };
+        return true;
+      }
+      state.status = 'aborted';
+      return false;
+    }
+
     try {
       while (!stopWhen.check(state)) {
         // Drain any externally-queued lifecycle events
@@ -1248,33 +1283,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           if (ev !== undefined) yield ev;
         }
         if (signal.aborted) {
-          yield {
-            type: 'agent.cancelling',
-            runId: state.id,
-            drain: pendingAbort?.drain ?? false,
-            onPendingApprovals: pendingAbort?.onPendingApprovals ?? 'deny',
-          };
-          // Resolve pending approvals per the operator's policy.
-          const policy = pendingAbort?.onPendingApprovals ?? 'deny';
-          if (policy === 'deny') {
-            const drained = state.pendingApprovals.splice(0, state.pendingApprovals.length);
-            for (const approval of drained) {
-              yield {
-                type: 'tool.approval.denied',
-                toolCallId: approval.toolCallId,
-                reason: 'auto-denied: agent.abort()',
-              };
-            }
-          } else if (policy === 'fail') {
-            state.status = 'failed';
-            state.error = { message: 'aborted with pending approvals', code: 'run-aborted' };
-            yield {
-              type: 'agent.error',
-              error: { message: 'aborted with pending approvals', code: 'run-aborted' },
-            };
-            return finalize(state, finalSnapshot);
-          }
-          state.status = 'aborted';
+          if (yield* emitCancellation()) return finalize(state, finalSnapshot);
           break;
         }
         stepNumber += 1;
@@ -1468,7 +1477,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           try {
             const stream = providerForStep.stream(baseRequest);
             for await (const ev of stream) {
-              if (signal.aborted) {
+              // AG-6 `drain`: the default hard-kills the in-flight provider
+              // stream mid-event; `abort({ drain: true })` instead lets the
+              // current step finish (the documented "wait for the current step
+              // to complete") and stops gracefully at the next loop-top check.
+              if (signal.aborted && pendingAbort?.drain !== true) {
                 throw new AgentRuntimeError('run-aborted', 'aborted');
               }
               const out = handleProviderEvent(ev, evState);
@@ -1496,8 +1509,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               if (out.finished === true) providerCallCompleted = true;
             }
           } catch (cause) {
-            if (cause instanceof AgentRuntimeError && cause.code === 'run-aborted') {
-              providerError = { kind: 'unknown', message: 'aborted', cause };
+            // AG-6: a mid-stream abort (our run-aborted sentinel, or any error
+            // once the signal is aborted — e.g. a native AbortError from the
+            // provider) is NOT a provider failure. Break out of the fallback
+            // chain WITHOUT a providerError; the post-stream abort check below
+            // ends the run as 'aborted', never 'no-provider-completed'. Don't
+            // continue the fallback chain against an already-aborted signal.
+            if (
+              signal.aborted ||
+              (cause instanceof AgentRuntimeError && cause.code === 'run-aborted')
+            ) {
               break;
             }
             const message = cause instanceof Error ? cause.message : String(cause);
@@ -1547,6 +1568,17 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             }
             break;
           }
+        }
+
+        // AG-6: a mid-stream abort that interrupted the stream (no completed
+        // model) ends the run as a cancellation ('aborted', or 'failed' under
+        // the `onPendingApprovals: 'fail'` policy) rather than falling through
+        // to a 'no-provider-completed' failure. When the model DID complete
+        // (e.g. `drain: true` let the step finish), fall through so the step's
+        // tool calls run and the graceful stop happens at the loop top.
+        if (signal.aborted && !modelSucceeded) {
+          yield* emitCancellation();
+          return finalize(state, finalSnapshot);
         }
 
         if (!modelSucceeded) {
