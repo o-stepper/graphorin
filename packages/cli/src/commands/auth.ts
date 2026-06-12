@@ -24,7 +24,7 @@ import {
   refreshOAuthSession,
   revokeOAuthSession,
 } from '@graphorin/security';
-
+import { createSecretsStore, getActiveSecretsStore } from '@graphorin/security/secrets';
 import { EXIT_CODES } from '../internal/exit.js';
 import { checkOfflineModeBlocked } from '../internal/offline.js';
 import {
@@ -35,6 +35,23 @@ import {
   statusMarker,
 } from '../internal/output.js';
 import { openStoreContext } from '../internal/store-context.js';
+
+/**
+ * Resolve the CLI's secrets store for OAuth token persistence (SPL-1):
+ * the already-active store when one exists, else the default auto
+ * chain (keyring → encrypted-file → env). Best-effort — a store
+ * failure degrades to the in-memory-only pre-SPL-1 behavior instead of
+ * blocking the auth command.
+ */
+async function resolveAuthSecretsStore(): Promise<
+  import('@graphorin/core/contracts').SecretsStore | undefined
+> {
+  try {
+    return getActiveSecretsStore() ?? (await createSecretsStore({}));
+  } catch {
+    return undefined;
+  }
+}
 
 /** @stable */
 export interface AuthCommonOptions extends CommonOutputOptions {
@@ -68,10 +85,12 @@ export async function runAuthLogin(options: AuthLoginOptions): Promise<LoginInte
   });
   try {
     const serverId = options.serverId ?? deriveServerId(options.serverUrl);
+    const secretsStore = await resolveAuthSecretsStore();
     const result = await loginInteractive({
       serverId,
       serverUrl: options.serverUrl,
       storage: ctx.store.oauthServers,
+      ...(secretsStore === undefined ? {} : { secretsStore }),
       ...(options.deviceFlow !== undefined ? { deviceFlow: options.deviceFlow } : {}),
       ...(options.scope !== undefined ? { scope: options.scope } : {}),
       ...(options.clientId !== undefined ? { clientId: options.clientId } : {}),
@@ -97,7 +116,10 @@ export async function runAuthList(options: AuthListOptions = {}) {
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
-    const list = await listOAuthSessions(ctx.store.oauthServers);
+    const secretsStore = await resolveAuthSecretsStore();
+    const list = await listOAuthSessions(ctx.store.oauthServers, {
+      ...(secretsStore === undefined ? {} : { secretsStore }),
+    });
     emitReport(options, list, () => {
       const print = options.print ?? defaultPrintSink;
       if (list.length === 0) {
@@ -134,7 +156,10 @@ export async function runAuthRefresh(options: AuthRefreshOptions) {
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
-    const session = await refreshOAuthSession(ctx.store.oauthServers, options.id);
+    const secretsStore = await resolveAuthSecretsStore();
+    const session = await refreshOAuthSession(ctx.store.oauthServers, options.id, {
+      ...(secretsStore === undefined ? {} : { secretsStore }),
+    });
     emitReport(options, { ok: true, id: options.id }, () => {
       const print = options.print ?? defaultPrintSink;
       print(
@@ -161,7 +186,9 @@ export async function runAuthRevoke(options: AuthRevokeOptions): Promise<{ reado
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
+    const secretsStore = await resolveAuthSecretsStore();
     await revokeOAuthSession(ctx.store.oauthServers, options.id, {
+      ...(secretsStore === undefined ? {} : { secretsStore }),
       ...(options.reason !== undefined ? { reason: options.reason } : {}),
     });
     emitReport(options, { ok: true } as const, () => {
@@ -180,7 +207,10 @@ export async function runAuthStatus(options: AuthCommonOptions = {}) {
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
-    const status = await getOAuthStatus(ctx.store.oauthServers);
+    const secretsStore = await resolveAuthSecretsStore();
+    const status = await getOAuthStatus(ctx.store.oauthServers, {
+      ...(secretsStore === undefined ? {} : { secretsStore }),
+    });
     emitReport(options, status, () => {
       const print = options.print ?? defaultPrintSink;
       print(

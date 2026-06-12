@@ -23,6 +23,11 @@ import { MCPAuthError } from '../errors/index.js';
 
 /** Options accepted by {@link createOAuthAuthorizationProvider}. */
 export interface OAuthAuthorizationProviderOptions {
+  /**
+   * Secrets store the persisted tokens resolve from (SPL-1) — with it,
+   * the bridge issues Authorization headers across process restarts.
+   */
+  readonly secretsStore?: import('@graphorin/core/contracts').SecretsStore;
   /** Stable identifier of the persisted OAuth server (`serverId`). */
   readonly serverId: string;
   /** Persistent storage. */
@@ -89,11 +94,10 @@ export function createOAuthAuthorizationProvider(
       (expiresAt !== undefined && expiresAt - now < refreshAheadMs);
     if (!stale && activeSession !== undefined) return activeSession;
     try {
-      const session = await refreshOAuthSession(
-        options.storage,
-        options.serverId,
-        options.signal === undefined ? {} : { signal: options.signal },
-      );
+      const session = await refreshOAuthSession(options.storage, options.serverId, {
+        ...(options.signal === undefined ? {} : { signal: options.signal }),
+        ...(options.secretsStore === undefined ? {} : { secretsStore: options.secretsStore }),
+      });
       activeSession = session;
       return session;
     } catch (cause) {

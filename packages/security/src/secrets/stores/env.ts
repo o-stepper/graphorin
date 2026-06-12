@@ -7,6 +7,7 @@ import type {
 import type { SessionScope } from '@graphorin/core/types';
 
 import { enforceSecretAcl } from '../acl.js';
+import { emitSecretsAudit } from '../audit-emitter.js';
 import { auditStoreOperation } from '../audit-helpers.js';
 import { SecretRequiredError } from '../errors.js';
 import { SecretValue } from '../secret-value.js';
@@ -87,17 +88,27 @@ export class EnvSecretsStore implements SecretsStore {
     _opts?: SecretsSetOptions,
   ): Promise<void> {
     void _opts;
+    // SPL-16: a refused write must not audit as a success — the no-op
+    // is recorded as 'denied' so the trail reflects reality.
+    if (!this.#allowMutation) {
+      console.warn(
+        `[graphorin/security] EnvSecretsStore.set('${key}') is a no-op (read-only by default; pass { allowMutation: true } to enable test-only writes).`,
+      );
+      emitSecretsAudit({
+        action: 'secret:set',
+        decision: 'denied',
+        ts: Date.now(),
+        source: STORE_SOURCE,
+        target: key,
+        metadata: { mutationAllowed: false, reason: 'read-only-store' },
+      });
+      return;
+    }
     return auditStoreOperation(
       'secret:set',
       STORE_SOURCE,
       key,
       async () => {
-        if (!this.#allowMutation) {
-          console.warn(
-            `[graphorin/security] EnvSecretsStore.set('${key}') is a no-op (read-only by default; pass { allowMutation: true } to enable test-only writes).`,
-          );
-          return;
-        }
         const raw = typeof value === 'string' ? value : (value as SecretValue).reveal();
         process.env[this.#envKey(key)] = raw;
         REGISTERED_KEYS.get(this)?.add(key);
@@ -110,17 +121,26 @@ export class EnvSecretsStore implements SecretsStore {
 
   async delete(key: string, _scope?: SessionScope): Promise<void> {
     void _scope;
+    // SPL-16: same honesty as set() — the refused delete audits 'denied'.
+    if (!this.#allowMutation) {
+      console.warn(
+        `[graphorin/security] EnvSecretsStore.delete('${key}') is a no-op (read-only by default; pass { allowMutation: true } to enable test-only writes).`,
+      );
+      emitSecretsAudit({
+        action: 'secret:delete',
+        decision: 'denied',
+        ts: Date.now(),
+        source: STORE_SOURCE,
+        target: key,
+        metadata: { mutationAllowed: false, reason: 'read-only-store' },
+      });
+      return;
+    }
     return auditStoreOperation(
       'secret:delete',
       STORE_SOURCE,
       key,
       async () => {
-        if (!this.#allowMutation) {
-          console.warn(
-            `[graphorin/security] EnvSecretsStore.delete('${key}') is a no-op (read-only by default; pass { allowMutation: true } to enable test-only writes).`,
-          );
-          return;
-        }
         delete process.env[this.#envKey(key)];
         REGISTERED_KEYS.get(this)?.delete(key);
       },

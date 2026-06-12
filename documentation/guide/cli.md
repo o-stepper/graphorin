@@ -106,8 +106,10 @@ graphorin skills migrate-frontmatter <path>  # idempotent dry-run by default
 
 ```bash
 graphorin auth login mcp.example.com
+graphorin auth refresh <server-id>   # real across restarts — the refresh token persists in the secrets store (SPL-1)
+graphorin auth revoke <server-id>    # RFC-7009 server-side revoke; the audit records 'error' when unconfirmed
 graphorin auth logout mcp.example.com
-graphorin auth status
+graphorin auth status                # hasRefreshToken reflects what actually resolves
 ```
 
 OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free port; tokens land in the configured secrets store. See [Security § OAuth 2.1 with PKCE](/guide/security#oauth-2-1-with-pkce).

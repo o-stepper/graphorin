@@ -171,6 +171,18 @@ const apiKey = await resolveSecret('op://Production/Stripe API/credential');
 
 Errors from the CLI surface as typed `OpResolverError` codes (`'binary-missing'`, `'unauthenticated'`, `'item-not-found'`, …) so your code can react cleanly.
 
+## Where OAuth tokens live (SPL-1)
+
+`graphorin auth login` persists the OAuth **access / refresh / id tokens** into
+the active `SecretsStore` (the same `keyring → encrypted-file → env` chain as
+every other secret) under `oauth:<serverId>:<kind>` keys; the
+`OAuthServerStore` record carries only the **refs**, never token material. A
+fresh process resolves the refresh token back from the store, so
+`graphorin auth refresh` / `auth revoke` and the MCP bridge's
+`Authorization` header all work across restarts. `auth status` reports
+`hasRefreshToken` only when the ref actually resolves. Without a usable
+secrets store the tokens live in process memory only (the command warns).
+
 ## Telemetry redaction for `SecretValue`s
 
 Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory. The validator substitutes a redacted placeholder for any attribute whose serialised form matches a known `SecretValue` shape. Operators that pass `validation: 'off'` must wrap exporters explicitly — the tracer refuses to register a raw exporter in that mode and throws `UnvalidatedExporterError` at startup.
