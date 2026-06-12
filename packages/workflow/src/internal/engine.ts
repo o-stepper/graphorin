@@ -40,6 +40,7 @@ import {
   DeadEndError,
   NodeExecutionError,
   ResumeWithoutSuspensionError,
+  StateNotSerializableError,
   ThreadNotFoundError,
   WorkflowAbortedError,
   WorkflowError,
@@ -957,6 +958,11 @@ function planTasks<TState extends object>(
 
   for (const nodeName of reachable) {
     if (planned.some((t) => t.nodeName === nodeName)) continue;
+    // WF-5: a node fed by 2+ writers of one Barrier channel is a join —
+    // defer it until EVERY writer in the barrier's `from` has written.
+    // The last writer's completion re-fires its edge, so the join runs
+    // exactly once, with the complete map.
+    if (barrierDefersNode(config, internal.state, nodeName)) continue;
     planned.push({
       taskId: newId('task'),
       nodeName,
@@ -989,6 +995,36 @@ function planTasks<TState extends object>(
   }
 
   return { tasks: planned };
+}
+
+/**
+ * WF-5 join gate. A node is barrier-gated when at least two of its
+ * in-edge sources are writers of the same Barrier channel — the
+ * declared fan-in join shape. Single-writer edges never defer, so a
+ * barrier writer's unrelated out-edges keep firing normally.
+ */
+function barrierDefersNode<TState extends object>(
+  config: WorkflowConfig<TState>,
+  state: TState,
+  nodeName: string,
+): boolean {
+  for (const [channelName, descriptor] of Object.entries(
+    config.channels as Readonly<Record<string, Channel<unknown>>>,
+  )) {
+    if (descriptor.kind !== 'barrier') continue;
+    const from = descriptor.from;
+    const joinSources = new Set(
+      config.edges.filter((e) => e.to === nodeName && from.includes(e.from)).map((e) => e.from),
+    );
+    if (joinSources.size < 2) continue;
+    const raw = (state as Record<string, unknown>)[channelName];
+    const map: Record<string, unknown> =
+      typeof raw === 'object' && raw !== null && !Array.isArray(raw)
+        ? (raw as Record<string, unknown>)
+        : {};
+    if (!from.every((writer) => writer in map)) return true;
+  }
+  return false;
 }
 
 function reachableEnd<TState extends object>(
@@ -1416,10 +1452,67 @@ interface PersistedStateEnvelope {
 }
 
 function serializeState<TState extends object>(state: TState): PersistedStateEnvelope {
+  // WF-10: checkpoint state must be JSON-safe on EVERY store. The
+  // in-memory store would happily structuredClone a Map/Set/Date that
+  // the production SQLite store JSON.stringify-es into junk — fail
+  // fast and identically instead of corrupting silently later.
+  for (const [channel, value] of Object.entries(state as Record<string, unknown>)) {
+    const offender = findNonJsonSafe(value, channel);
+    if (offender !== null) {
+      throw new StateNotSerializableError(channel, offender.path, offender.kind);
+    }
+  }
   return {
     schema: CHECKPOINT_SCHEMA_VERSION,
     state: structuredClone(state),
   };
+}
+
+/**
+ * Depth-first JSON-safety walk. Returns the path + kind of the first
+ * value that `JSON.stringify` would degrade without an error, or
+ * `null` when the value round-trips faithfully. `undefined` is
+ * tolerated (a dropped key restores as an absent optional property).
+ */
+function findNonJsonSafe(
+  value: unknown,
+  path: string,
+  seen = new WeakSet<object>(),
+): { path: string; kind: string } | null {
+  if (value === null || value === undefined) return null;
+  const t = typeof value;
+  if (t === 'string' || t === 'boolean') return null;
+  if (t === 'number') {
+    return Number.isFinite(value as number) ? null : { path, kind: 'non-finite number' };
+  }
+  if (t === 'bigint' || t === 'function' || t === 'symbol') return { path, kind: t };
+  if (t !== 'object') return { path, kind: t };
+  const obj = value as object;
+  if (seen.has(obj)) return { path, kind: 'circular reference' };
+  seen.add(obj);
+  if (Array.isArray(obj)) {
+    for (let i = 0; i < obj.length; i++) {
+      const inner = findNonJsonSafe(obj[i], `${path}[${i}]`, seen);
+      if (inner !== null) return inner;
+    }
+    return null;
+  }
+  if (obj instanceof Map) return { path, kind: 'Map' };
+  if (obj instanceof Set) return { path, kind: 'Set' };
+  if (obj instanceof Date) return { path, kind: 'Date' };
+  if (obj instanceof RegExp) return { path, kind: 'RegExp' };
+  if (ArrayBuffer.isView(obj) || obj instanceof ArrayBuffer) {
+    return { path, kind: 'binary buffer' };
+  }
+  const proto = Object.getPrototypeOf(obj);
+  if (proto !== Object.prototype && proto !== null) {
+    return { path, kind: `class instance (${obj.constructor?.name ?? 'unknown'})` };
+  }
+  for (const [key, inner] of Object.entries(obj)) {
+    const found = findNonJsonSafe(inner, `${path}.${key}`, seen);
+    if (found !== null) return found;
+  }
+  return null;
 }
 
 export function unwrapPersistedState(raw: unknown): unknown {

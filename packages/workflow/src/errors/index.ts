@@ -29,7 +29,8 @@ export type WorkflowErrorCode =
   | 'node-execution-failed'
   | 'reducer-failed'
   | 'state-validation-failed'
-  | 'dead-end';
+  | 'dead-end'
+  | 'state-not-serializable';
 
 /**
  * Base error class for all `@graphorin/workflow` failures.
@@ -232,6 +233,29 @@ export class DeadEndError extends WorkflowError {
     this.name = 'DeadEndError';
     this.workflowName = workflowName;
     this.stalledNodes = stalledNodes;
+  }
+}
+
+/**
+ * Thrown at checkpoint time when a channel value would not survive a
+ * JSON round-trip (WF-10) — Map/Set/Date/class instances silently
+ * degrade with the SQLite store, so every store rejects them eagerly.
+ */
+export class StateNotSerializableError extends WorkflowError {
+  readonly channel: string;
+  readonly path: string;
+
+  constructor(channel: string, path: string, kind: string) {
+    super(
+      'state-not-serializable',
+      `channel "${channel}" holds a non-JSON-safe value (${kind} at ${path}) — checkpoint state must survive a JSON round-trip`,
+      {
+        hint: 'store plain objects/arrays/primitives in workflow state; convert Map/Set/Date to JSON-safe shapes before writing the channel',
+      },
+    );
+    this.name = 'StateNotSerializableError';
+    this.channel = channel;
+    this.path = path;
   }
 }
 
