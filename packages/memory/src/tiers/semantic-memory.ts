@@ -824,6 +824,10 @@ export class SemanticMemory {
             snippetOf: (hit) => hit.record.text,
             idOf: (hit) => hit.record.id,
             grader: this.#grader,
+            // MRET-2: re-fuse the per-pass lists with RRF before the
+            // final topK cut so a reformulation-pass find can outrank
+            // pass-1 noise (discovery order silently dropped it).
+            fuse: (lists) => fuseRrf(lists, 60),
           },
           {
             maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
