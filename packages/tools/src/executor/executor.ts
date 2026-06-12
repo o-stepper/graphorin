@@ -466,11 +466,23 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     // Approval flow.
     if (tool.needsApproval !== undefined) {
-      const ctxForPredicate = await prepareContext(call, tool, runContext, stepNumber, trustLevel);
-      const needsApproval =
-        typeof tool.needsApproval === 'function'
-          ? await tool.needsApproval(ctxForPredicate.input, ctxForPredicate.ctx)
-          : tool.needsApproval;
+      // TL-11: a static `needsApproval: true` needs no context at all;
+      // the function form gets one that is DISPOSED right after the
+      // predicate — previously both forms eagerly built a full per-call
+      // context (sandbox resolve + streaming channel + abort listener)
+      // that was thrown away while its run-signal listener lived on.
+      let needsApproval: boolean;
+      if (typeof tool.needsApproval === 'function') {
+        const predicateCtx = await prepareContext(call, tool, runContext, stepNumber, trustLevel);
+        try {
+          needsApproval = await tool.needsApproval(predicateCtx.input, predicateCtx.ctx);
+        } finally {
+          predicateCtx.channel.abort('finished');
+          predicateCtx.linkedAbort.release();
+        }
+      } else {
+        needsApproval = tool.needsApproval;
+      }
       if (needsApproval) {
         const approval: ToolApproval = {
           toolCallId: call.toolCallId,
@@ -781,6 +793,10 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       executeError = caught;
     } finally {
       channel.abort('finished');
+      // TL-11: detach the per-call linked signal — without this every
+      // settled call left one listener on the run signal for the rest
+      // of the run (MaxListeners warnings on long gated runs).
+      linkedAbort.release();
     }
 
     const aggregator = channel.snapshot();
@@ -1343,15 +1359,19 @@ function mapSandboxPolicy(
 function linkSignal(parent: AbortSignal): {
   readonly signal: AbortSignal;
   readonly abort: () => void;
+  /** TL-11: detach from the parent — settled calls must not accumulate listeners. */
+  readonly release: () => void;
 } {
   const ac = new AbortController();
+  let release: () => void = () => {};
   if (parent.aborted) {
     ac.abort();
   } else {
     const onAbort = (): void => ac.abort();
     parent.addEventListener('abort', onAbort, { once: true });
+    release = () => parent.removeEventListener('abort', onAbort);
   }
-  return { signal: ac.signal, abort: () => ac.abort() };
+  return { signal: ac.signal, abort: () => ac.abort(), release };
 }
 
 async function raceWithCancellation<T>(
