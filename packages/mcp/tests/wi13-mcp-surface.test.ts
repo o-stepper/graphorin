@@ -232,7 +232,10 @@ describe('WI-13 — sampling', () => {
           });
           return {
             content: [
-              { type: 'text', text: `model:${r.model}|${(r.content as { text: string }).text}` },
+              {
+                type: 'text',
+                text: `model:${r.model}|${(r.content as unknown as { text: string }).text}`,
+              },
             ],
           };
         },

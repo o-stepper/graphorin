@@ -81,13 +81,13 @@ function reconcileProvider(opts: {
         const decision = opts.reconcile?.(content) ?? { action: 'add', reason: 'test-default' };
         return {
           text: JSON.stringify(decision),
-          usage: { promptTokens: 5, completionTokens: 2 },
+          usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
           finishReason: 'stop',
         };
       }
       return {
         text: JSON.stringify({ facts: opts.facts }),
-        usage: { promptTokens: 10, completionTokens: 5 },
+        usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 },
         finishReason: 'stop',
       };
     },

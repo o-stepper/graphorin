@@ -25,12 +25,13 @@ describe('openWebSocketTransport', () => {
   it('throws when no WebSocket implementation is available', async () => {
     await expect(
       openWebSocketTransport(
+        // Exercise the runtime guard: an explicit undefined WebSocket is
+        // illegal under exactOptionalPropertyTypes, hence the cast.
         {
           url: 'ws://x',
           auth: { kind: 'bearer', token: 't' },
-          // @ts-expect-error — exercising the runtime guard
           WebSocket: undefined,
-        },
+        } as unknown as Parameters<typeof openWebSocketTransport>[0],
         {
           onOpen: () => {},
           onFrame: () => {},

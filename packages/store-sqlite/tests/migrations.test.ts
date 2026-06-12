@@ -220,9 +220,10 @@ describe('migrations', () => {
       'fact-500',
       'mig-1',
     ]);
-    row = conn2.get<{ processed: number }>('SELECT processed FROM migration_state WHERE id = ?', [
-      'mig-1',
-    ]);
+    row = conn2.get<{ status: string; processed: number; last_record_id: string }>(
+      'SELECT status, processed, last_record_id FROM migration_state WHERE id = ?',
+      ['mig-1'],
+    );
     expect(row?.processed).toBe(500);
 
     // Final commit.

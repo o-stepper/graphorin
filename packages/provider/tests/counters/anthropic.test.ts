@@ -48,7 +48,7 @@ describe('AnthropicAPICounter', () => {
   });
 
   it('returns input_tokens from a 200 response when an apiKey is set', async () => {
-    let capturedHeaders: HeadersInit | undefined;
+    let capturedHeaders: RequestInit['headers'] | undefined;
     const fetchImpl = (async (_url: string, init?: RequestInit) => {
       capturedHeaders = init?.headers;
       return makeJsonResponse({ input_tokens: 42 });

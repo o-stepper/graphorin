@@ -118,22 +118,26 @@ describe('Phase 14c — daemon survival under load', () => {
     const runPromises: Promise<unknown>[] = [];
     for (let i = 0; i < concurrentRuns; i++) {
       runPromises.push(
-        server.app.request('/v1/agents/work/run', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ input: i }),
-        }),
+        Promise.resolve(
+          server.app.request('/v1/agents/work/run', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input: i }),
+          }),
+        ),
       );
     }
 
     const replayPromises: Promise<unknown>[] = [];
     for (let i = 0; i < 5; i++) {
       replayPromises.push(
-        server.app.request(`/v1/runs/replay-${i}/replay`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        }),
+        Promise.resolve(
+          server.app.request(`/v1/runs/replay-${i}/replay`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({}),
+          }),
+        ),
       );
     }
 

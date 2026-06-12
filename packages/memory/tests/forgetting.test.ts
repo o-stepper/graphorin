@@ -147,7 +147,12 @@ describe('consolidator light phase — capacity-bounded eviction (X-1)', () => {
     });
     const scope: SessionScope = { userId: 'alex' };
 
-    const ids: Record<string, string> = {};
+    const ids: Record<'top' | 'high' | 'low' | 'bottom', string> = {
+      top: '',
+      high: '',
+      low: '',
+      bottom: '',
+    };
     for (const [label, importance] of [
       ['top', 0.9],
       ['high', 0.7],
@@ -166,7 +171,7 @@ describe('consolidator light phase — capacity-bounded eviction (X-1)', () => {
     expect(outcome?.factsUpdated).toBe(2); // two evicted to fit capacity 2
 
     const archived = new Map(
-      (await store.semantic.listForDecay(scope, 100)).map((r) => [r.id, r.archived]),
+      ((await store.semantic.listForDecay?.(scope, 100)) ?? []).map((r) => [r.id, r.archived]),
     );
     expect(archived.get(ids.top)).toBe(false);
     expect(archived.get(ids.high)).toBe(false);
@@ -195,7 +200,7 @@ describe('consolidator light phase — capacity-bounded eviction (X-1)', () => {
 
     expect(outcome?.factsUpdated).toBe(1);
     const archived = new Map(
-      (await store.semantic.listForDecay(scope, 100)).map((r) => [r.id, r.archived]),
+      ((await store.semantic.listForDecay?.(scope, 100)) ?? []).map((r) => [r.id, r.archived]),
     );
     expect(archived.get(q.id)).toBe(true);
     expect(archived.get(a.id)).toBe(false);

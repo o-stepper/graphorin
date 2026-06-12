@@ -96,9 +96,10 @@ describe('GraphorinClient.resume', () => {
     const client = new GraphorinClient({
       baseUrl: 'http://x',
       auth: { kind: 'bearer', token: 't' },
-      // @ts-expect-error — exercise the runtime guard
+      // Exercise the runtime guard: an explicit undefined fetch is
+      // illegal under exactOptionalPropertyTypes, hence the cast.
       fetch: undefined,
-    });
+    } as unknown as ConstructorParameters<typeof GraphorinClient>[0]);
     const original = globalThis.fetch;
     // Temporarily delete globalThis.fetch so the guard fires.
     (globalThis as { fetch?: unknown }).fetch = undefined;

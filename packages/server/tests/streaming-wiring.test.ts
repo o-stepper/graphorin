@@ -5,6 +5,7 @@
  * grammatical) `workflow:<id>/runs/<runId>/events` subject.
  */
 
+import type { ServerMessage } from '@graphorin/protocol';
 import { parseScope } from '@graphorin/security/auth';
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
@@ -13,7 +14,7 @@ import { AgentRegistry, WorkflowRegistry } from '../src/registry/index.js';
 import { createAgentRoutes } from '../src/routes/agents.js';
 import { createWorkflowRoutes } from '../src/routes/workflows.js';
 import { RunStateTracker } from '../src/runtime/run-state.js';
-import { createWsDispatcher, type ServerMessage } from '../src/ws/dispatcher.js';
+import { createWsDispatcher } from '../src/ws/dispatcher.js';
 import { tryParseSubject } from '../src/ws/subjects.js';
 
 function makeSubscriber(scopes: string[]): {

@@ -16,7 +16,8 @@ async function makeExport(dir: string): Promise<string> {
     id: 's-1',
     title: 'Test session',
     createdAt: new Date().toISOString(),
-    user: { id: 'u-1' },
+    userId: 'u-1',
+    agentId: 'main',
   });
   await writer.close();
   await writeFile(path, buffer.toString(), 'utf8');

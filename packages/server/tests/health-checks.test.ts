@@ -1,7 +1,12 @@
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { collectHealth, rollup } from '../src/health/checks.js';
+import {
+  type ConsolidatorCheck,
+  collectHealth,
+  rollup,
+  type StorageCheck,
+} from '../src/health/checks.js';
 
 let store: GraphorinSqliteStore;
 
@@ -21,13 +26,14 @@ afterEach(async () => {
 
 describe('health/checks', () => {
   it('rollup() promotes the worst per-check status', () => {
+    // rollup() only reads `.status` — the slim literals stand in for full checks.
     expect(rollup({})).toBe('ok');
-    expect(rollup({ storage: { status: 'ok' } })).toBe('ok');
-    expect(rollup({ storage: { status: 'warn' } })).toBe('degraded');
+    expect(rollup({ storage: { status: 'ok' } as StorageCheck })).toBe('ok');
+    expect(rollup({ storage: { status: 'warn' } as StorageCheck })).toBe('degraded');
     expect(
       rollup({
-        storage: { status: 'warn' },
-        consolidator: { status: 'fail' },
+        storage: { status: 'warn' } as StorageCheck,
+        consolidator: { status: 'fail' } as ConsolidatorCheck,
       }),
     ).toBe('failing');
   });

@@ -6,7 +6,7 @@ describe('NoneSandbox', () => {
   it('runs a registered handler and returns the typed output', async () => {
     const handler = vi.fn(async (input: { n: number }) => ({ doubled: input.n * 2 }));
     const sandbox = createNoneSandbox({
-      resolveHandler: () => handler,
+      resolveHandler: () => handler as never,
     });
     const result = await sandbox.run<{ n: number }, { doubled: number }>(
       { kind: 'handler', module: '__fixture__', export: 'double' },

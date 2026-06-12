@@ -43,7 +43,7 @@ function mkInsight(over: Partial<Insight> = {}): Insight {
     createdAt: now,
     updatedAt: now,
     ...over,
-  };
+  } as Insight;
 }
 
 describe('SqliteInsightStore (P1-1)', () => {

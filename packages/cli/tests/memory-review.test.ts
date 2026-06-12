@@ -2,7 +2,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createSqliteStore, type SqliteMemoryStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 
 import { type MemoryReviewResult, runMemoryReview } from '../src/commands/memory.js';
@@ -44,7 +44,7 @@ async function seededReviewConfig(): Promise<string> {
     provenance: 'extraction',
     createdAt: ISO,
   });
-  await store.memory.insights.insert({
+  await (store.memory as SqliteMemoryStore).insights.insert({
     id: 'iQ',
     kind: 'insight',
     userId: 'u1',

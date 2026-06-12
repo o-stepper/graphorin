@@ -1,11 +1,4 @@
-import type {
-  AISpan,
-  EmbedderProvider,
-  Fact,
-  MemoryHit,
-  SessionScope,
-  Tracer,
-} from '@graphorin/core';
+import type { EmbedderProvider, Fact, MemoryHit, SessionScope, Tracer } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -506,14 +499,15 @@ describe('runConflictPipeline — span emission', () => {
           type: opts.type,
           id: 'span',
           traceId: 'trace',
-          setAttributes(a) {
+          setAttributes(a: Record<string, unknown>) {
             Object.assign(attrs, a);
           },
           addEvent() {},
           recordException() {},
           setStatus() {},
           end() {},
-        } as AISpan;
+          // The recorder is type-erased; per-call generic narrowing is irrelevant.
+        } as never;
       },
       async span(opts, fn) {
         const span = this.startSpan(opts);

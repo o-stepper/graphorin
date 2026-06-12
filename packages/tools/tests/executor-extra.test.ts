@@ -76,7 +76,7 @@ describe('ToolExecutor — secrets ACL enforcement (DoD)', () => {
     const executor = createToolExecutor({
       registry,
       secretResolver: {
-        async resolve(key) {
+        async resolve(key: string) {
           resolverCalls++;
           if (key === 'ALLOWED_KEY') {
             return {
@@ -560,7 +560,8 @@ function makeRecordingTracer(
         },
         end() {},
       };
-      return span;
+      // The recorder is type-erased; the per-call generic narrowing is irrelevant here.
+      return span as never;
     },
     async span(opts, fn) {
       const span = this.startSpan(opts);

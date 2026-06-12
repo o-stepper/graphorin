@@ -88,7 +88,7 @@ describe('runStart — error paths', () => {
     }) as never);
     const writes: string[] = [];
     const writeSpy = vi.spyOn(process.stderr, 'write').mockImplementation((data) => {
-      writes.push(typeof data === 'string' ? data : data.toString('utf8'));
+      writes.push(typeof data === 'string' ? data : Buffer.from(data).toString('utf8'));
       return true;
     });
     try {
@@ -122,7 +122,7 @@ describe('runStart — error paths', () => {
     }) as never);
     const writes: string[] = [];
     const writeSpy = vi.spyOn(process.stderr, 'write').mockImplementation((data) => {
-      writes.push(typeof data === 'string' ? data : data.toString('utf8'));
+      writes.push(typeof data === 'string' ? data : Buffer.from(data).toString('utf8'));
       return true;
     });
     try {

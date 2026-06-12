@@ -38,13 +38,13 @@ export interface CallToolServerExtra {
   elicit(params: {
     message: string;
     requestedSchema: Record<string, unknown>;
-  }): Promise<{ action: string; content?: Record<string, unknown> }>;
+  }): Promise<{ action: string; content?: Record<string, unknown> | undefined }>;
   /** Send a `sampling/createMessage` request to the connected client. */
   sample(params: Record<string, unknown>): Promise<{
     role: string;
     content: { type: string; [k: string]: unknown };
     model: string;
-    stopReason?: string;
+    stopReason?: string | undefined;
   }>;
 }
 

@@ -94,13 +94,13 @@ function episodeProvider(opts: {
         const body = opts.episode ?? { summary: 'The user discussed their plans.', importance: 6 };
         return {
           text: JSON.stringify(body),
-          usage: { promptTokens: 8, completionTokens: 4 },
+          usage: { promptTokens: 8, completionTokens: 4, totalTokens: 12 },
           finishReason: 'stop',
         };
       }
       return {
         text: JSON.stringify({ facts: opts.facts }),
-        usage: { promptTokens: 10, completionTokens: 5 },
+        usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 },
         finishReason: 'stop',
       };
     },

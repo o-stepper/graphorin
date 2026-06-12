@@ -143,7 +143,7 @@ describe('createCodeExecuteTool', () => {
     );
     expect(out).toBe(JSON.stringify({ len: 50_000 }, null, 2));
     expect(out).not.toContain('ZZZ'); // the 50 KB intermediate never surfaces
-    expect(out.length).toBeLessThan(50);
+    expect(String(out).length).toBeLessThan(50);
   });
 
   it('returns a plain string result verbatim', async () => {

@@ -16,7 +16,11 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Provider, ProviderRequest, ProviderResponse } from '@graphorin/core';
-import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+import {
+  createSqliteStore,
+  type GraphorinSqliteStore,
+  type SqliteMemoryStore,
+} from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 import { createMemory, defineBlock } from '../src/index.js';
 import { createStubEmbedder } from './fixtures/in-memory-store.js';
@@ -50,7 +54,7 @@ function reflectionStubProvider(): Provider & { readonly reflectionCalls: string
         reflectionCalls.push('questions');
         return {
           text: JSON.stringify({ questions: ['marathon'] }),
-          usage: { promptTokens: 8, completionTokens: 4 },
+          usage: { promptTokens: 8, completionTokens: 4, totalTokens: 12 },
           finishReason: 'stop',
         };
       }
@@ -58,13 +62,13 @@ function reflectionStubProvider(): Provider & { readonly reflectionCalls: string
         reflectionCalls.push('insight');
         return {
           text: JSON.stringify({ insight: 'The user is committed to marathon training.' }),
-          usage: { promptTokens: 10, completionTokens: 6 },
+          usage: { promptTokens: 10, completionTokens: 6, totalTokens: 16 },
           finishReason: 'stop',
         };
       }
       return {
         text: JSON.stringify({ decision: 'admit', reason: 'n/a' }),
-        usage: { promptTokens: 5, completionTokens: 2 },
+        usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
         finishReason: 'stop',
       };
     },
@@ -186,7 +190,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       // `'*'` FTS probe matched zero rows and this was always empty (MCON-1).
       const recent = await memory.episodic.recent(SCOPE, { topK: 10 });
       expect(recent.length).toBe(2);
-      expect(recent[0]?.summary).toBe(episodes[1][0]); // the later-ended episode first
+      expect(recent[0]?.summary).toBe(episodes[1]?.[0]); // the later-ended episode first
 
       // First deep run: the reflection gate fires off recency (not the dead
       // `'*'` probe) and synthesizes one quarantined insight.
@@ -226,7 +230,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       expect((await memory.episodic.recent(SCOPE)).some((e) => e.id === ep.id)).toBe(true);
 
       // Insight: quarantined ⇒ excluded from default search; validate ⇒ found.
-      await sqlite.memory.insights.insert({
+      await (sqlite.memory as SqliteMemoryStore).insights.insert({
         id: 'ins-1',
         kind: 'insight',
         userId: SCOPE.userId,
@@ -489,7 +493,10 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       });
       expect(b.decision.kind === 'supersede' || b.decision.kind === 'pending').toBe(true);
       // The store-side conflict surface persisted both decisions.
-      const recent = await sqlite.memory.conflicts.listRecentDecisions(SCOPE, 10);
+      const recent = await (sqlite.memory as SqliteMemoryStore).conflicts.listRecentDecisions(
+        SCOPE,
+        10,
+      );
       expect(recent.length).toBeGreaterThanOrEqual(2);
       // Every recorded row carries the canonical pipeline stage labels.
       expect(

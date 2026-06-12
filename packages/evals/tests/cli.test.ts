@@ -33,7 +33,7 @@ const REPORT: EvalReport<string, string> = {
   },
 };
 
-let originalExitCode: number | undefined;
+let originalExitCode: typeof process.exitCode;
 
 beforeEach(() => {
   originalExitCode = process.exitCode;

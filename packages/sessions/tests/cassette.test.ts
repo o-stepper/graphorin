@@ -3,7 +3,6 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
-  CassetteIdempotencyMismatchError,
   type CassetteReplayDecision,
   createCassetteBufferSink,
   createToolCassetteRecorder,
@@ -14,7 +13,11 @@ import {
   TOOL_CASSETTE_FORMAT,
   type ToolCallRecord,
 } from '../src/cassette/index.js';
-import { CassetteCursorViolationError, CassetteFormatInvalidError } from '../src/errors/index.js';
+import {
+  CassetteCursorViolationError,
+  CassetteFormatInvalidError,
+  CassetteIdempotencyMismatchError,
+} from '../src/errors/index.js';
 
 describe('Tool cassette format', () => {
   it('writes a valid sentinel header + footer with body checksum on `--hash`', async () => {

@@ -27,10 +27,10 @@ describe('applyHardeningEarly', () => {
       // Skip — Windows does not honour POSIX UIDs.
       return;
     }
-    vi.spyOn(process, 'geteuid').mockReturnValue(0);
+    vi.spyOn(process as unknown as { geteuid(): number }, 'geteuid').mockReturnValue(0);
     const writes: string[] = [];
     vi.spyOn(process.stderr, 'write').mockImplementation((data) => {
-      writes.push(typeof data === 'string' ? data : data.toString('utf8'));
+      writes.push(typeof data === 'string' ? data : Buffer.from(data).toString('utf8'));
       return true;
     });
     const exit = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
@@ -45,7 +45,7 @@ describe('applyHardeningEarly', () => {
 
   it('applies umask(0o077) on POSIX hosts when not running as root', () => {
     if (process.platform === 'win32') return;
-    vi.spyOn(process, 'geteuid').mockReturnValue(1000);
+    vi.spyOn(process as unknown as { geteuid(): number }, 'geteuid').mockReturnValue(1000);
     const before = process.umask();
     try {
       applyHardeningEarly();
@@ -59,7 +59,7 @@ describe('applyHardeningEarly', () => {
 
   it('rethrows non-RefuseToRunAsRootError errors unchanged', () => {
     if (process.platform === 'win32') return;
-    vi.spyOn(process, 'geteuid').mockReturnValue(0);
+    vi.spyOn(process as unknown as { geteuid(): number }, 'geteuid').mockReturnValue(0);
     const exit = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
       throw new Error('exit-called');
     }) as never);

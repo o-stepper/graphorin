@@ -17,9 +17,12 @@ import type {
 import { NOOP_TRACER, zeroUsage } from '@graphorin/core';
 
 const noopUsage: UsageAccumulator = {
-  add(_partial: Partial<Usage>): void {},
-  current(): UsageSnapshot {
-    return Object.freeze({ ...zeroUsage(), modelId: 'fixture' });
+  total: zeroUsage(),
+  byModel: new Map(),
+  add(_modelId: string, _usage: Usage): void {},
+  reset(): void {},
+  snapshot(): UsageSnapshot {
+    return Object.freeze({ total: zeroUsage(), byModel: [] });
   },
 };
 

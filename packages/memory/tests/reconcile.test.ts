@@ -57,7 +57,7 @@ function fixedProvider(
       calls.push(req);
       return {
         text,
-        usage: { promptTokens: 7, completionTokens: 3 },
+        usage: { promptTokens: 7, completionTokens: 3, totalTokens: 10 },
         finishReason: 'stop',
       };
     },

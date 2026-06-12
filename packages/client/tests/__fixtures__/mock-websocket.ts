@@ -123,13 +123,13 @@ export class MockWebSocket {
   }
 
   fireError(): void {
-    this.dispatch('error', { type: 'error' });
+    this.dispatch('error', { type: 'error' } as Event);
   }
 
   fireOpen(): void {
     if (this.readyState !== MockWebSocket.CONNECTING) return;
     this.readyState = MockWebSocket.OPEN;
-    this.dispatch('open', { type: 'open' });
+    this.dispatch('open', { type: 'open' } as Event);
   }
 
   private dispatch(type: string, event: Event | MessageEvent | CloseEvent): void {

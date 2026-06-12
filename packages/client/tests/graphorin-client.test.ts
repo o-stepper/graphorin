@@ -6,7 +6,7 @@ import {
   GraphorinClientError,
   SubprotocolMismatchError,
 } from '../src/errors.js';
-import { GraphorinClient } from '../src/graphorin-client.js';
+import { GraphorinClient, type SubscriptionTarget } from '../src/graphorin-client.js';
 import {
   configureNextSocket,
   lastSocket,
@@ -326,7 +326,7 @@ describe('GraphorinClient — RPC + subscriptions', () => {
     });
     await connectAndAck(client);
     const socket = lastSocket();
-    const cases = [
+    const cases: ReadonlyArray<readonly [SubscriptionTarget, string]> = [
       [{ target: 'session', id: 'abc' } as const, 'session:abc/events'],
       [{ target: 'agent', id: 'a', runId: 'r' } as const, 'agent:a/runs/r/events'],
       [{ target: 'workflow', id: 'w' } as const, 'workflow:w/events'],
@@ -351,7 +351,7 @@ describe('IP-7 — the same iterator survives a reconnect with the replay cursor
       baseUrl: 'ws://localhost',
       auth: { kind: 'bearer', token: 't' },
       WebSocket: FAKE_WS,
-      reconnect: { initialDelayMs: 1, maxDelayMs: 2, maxAttempts: 3 },
+      reconnect: { baseMs: 1, maxMs: 2, maxAttempts: 3 },
     });
     await connectAndAck(client);
     const socket1 = lastSocket();

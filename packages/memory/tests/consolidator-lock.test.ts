@@ -30,6 +30,7 @@ class FakeStore implements ConsolidatorMemoryStoreExt {
       nextEligibleAt: null,
       activeLockHeldBy: null,
       activeLockAcquiredAt: null,
+      reflectionWatermark: null,
     };
     const next: ConsolidatorStateRow = {
       ...current,
@@ -53,6 +54,7 @@ class FakeStore implements ConsolidatorMemoryStoreExt {
         lastPhase: current?.lastPhase ?? null,
         lastCompletedAt: current?.lastCompletedAt ?? null,
         nextEligibleAt: current?.nextEligibleAt ?? null,
+        reflectionWatermark: current?.reflectionWatermark ?? null,
         activeLockHeldBy: runId,
         activeLockAcquiredAt: now,
       });

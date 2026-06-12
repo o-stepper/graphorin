@@ -28,7 +28,6 @@ describe('createServer', () => {
     installBuiltinResolvers();
     const store = await setupStore();
     const server = await createServer({
-      validatedConfig: undefined,
       store,
       skipHardening: true,
       skipListen: true,

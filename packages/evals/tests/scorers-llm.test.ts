@@ -86,7 +86,9 @@ describe('llmJudge', () => {
     const scorer = llmJudge({
       provider: buildProvider((req) => {
         const m = req.messages[0]?.content[0];
-        if (m !== undefined && 'text' in m) captured = (m as { text: string }).text;
+        if (typeof m === 'object' && m !== null && 'text' in m) {
+          captured = (m as { text: string }).text;
+        }
         return '9';
       }),
     });
