@@ -31,10 +31,21 @@ export function createRateLimitMiddleware(
   }
   const windows = new Map<string, Window>();
   const now = options.now ?? Date.now;
+  // IP-10: bound the window map — expired entries are swept once the
+  // map crosses the cap so an attacker rotating spoofed XFF values
+  // (trustProxy=true deployments) cannot grow it without bound.
+  const SWEEP_THRESHOLD = 10_000;
+  const sweep = (ts: number): void => {
+    if (windows.size < SWEEP_THRESHOLD) return;
+    for (const [key, win] of windows) {
+      if (ts - win.start >= config.windowMs) windows.delete(key);
+    }
+  };
 
   return async (c, next) => {
     const ip = c.get('state').clientIp ?? 'anonymous';
     const ts = now();
+    sweep(ts);
     const window = windows.get(ip) ?? { count: 0, start: ts };
     if (ts - window.start >= config.windowMs) {
       window.start = ts;

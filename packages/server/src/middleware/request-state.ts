@@ -56,7 +56,16 @@ export function createRequestStateMiddleware(
   return async (c, next) => {
     const headerLookup = (name: string): string | undefined => c.req.header(name);
     const requestId = headerLookup('x-request-id')?.trim() || idFactory();
-    const ip = clientIp(headerLookup, trustProxy);
+    // IP-10: with the default trustProxy=false the proxy headers are
+    // ignored — the client IP comes from the SOCKET, so per-IP rate
+    // limits and lockouts actually key per client instead of dumping
+    // every request into one shared 'anonymous' bucket.
+    const socketAddress = (
+      c.env as
+        | { incoming?: { socket?: { remoteAddress?: string } } }
+        | undefined
+    )?.incoming?.socket?.remoteAddress;
+    const ip = clientIp(headerLookup, trustProxy) ?? socketAddress;
     const state: ServerRequestState = {
       requestId,
       receivedAt: now(),

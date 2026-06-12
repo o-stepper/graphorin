@@ -42,18 +42,6 @@ function extractBearer(c: Context): string | undefined {
   return trimmed.slice(BEARER_PREFIX.length).trim();
 }
 
-function clientIp(c: Context, trustProxy: boolean): string | undefined {
-  if (trustProxy) {
-    const xff = c.req.header('x-forwarded-for');
-    if (xff !== undefined && xff.length > 0) {
-      const [first] = xff.split(',');
-      if (first !== undefined) return first.trim();
-    }
-  }
-  const direct = c.req.header('x-real-ip');
-  if (direct !== undefined && direct.length > 0) return direct.trim();
-  return undefined;
-}
 
 function reasonToStatus(reason: string): {
   status: number;
@@ -111,11 +99,13 @@ export function createAuthMiddleware(
   const allowAnonymous = options.allowAnonymous ?? false;
   return async (c, next: Next) => {
     const token = extractBearer(c);
-    const ipFromState = c.get('state').clientIp;
-    // The request-state middleware has already resolved the trusted
-    // client IP per the configured `trustProxy` flag. Auth never
-    // re-derives it; we simply forward what the upstream layer set.
-    const ip = ipFromState ?? clientIp(c, false);
+    // IP-11: the request-state middleware is the ONLY IP authority —
+    // it resolves the client IP per the configured trustProxy policy
+    // (proxy headers when trusted, else the socket address). The old
+    // fallback read attacker-controlled X-Real-IP unconditionally,
+    // letting header rotation evade per-IP lockout and a spoofed
+    // victim IP trigger a lockout against them.
+    const ip = c.get('state').clientIp;
     if (token === undefined) {
       if (allowAnonymous) {
         c.set('state', { ...c.get('state'), auth: { kind: 'unauthenticated' as const } });
