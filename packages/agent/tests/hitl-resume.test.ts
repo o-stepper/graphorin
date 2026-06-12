@@ -123,6 +123,51 @@ describe('Agent — HITL approval flow', () => {
     }
   });
 
+  it('executes the approved tool on resume — real side effect, exactly once (AG-1)', async () => {
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 4)] });
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'noop',
+      provider,
+      tools: [buildSendEmailTool()],
+    });
+    const suspended = {
+      version: 'graphorin-run-state/1.0',
+      id: 'run-ag1',
+      agentId: agent.id,
+      currentAgentId: agent.id,
+      sessionId: 's',
+      status: 'awaiting_approval',
+      steps: [],
+      messages: [{ role: 'user', content: 'email Alice' }],
+      pendingApprovals: [
+        {
+          toolCallId: 'tc-email',
+          toolName: 'send_email',
+          args: { to: 'a@b.c', body: 'hi' },
+          requestedAt: new Date().toISOString(),
+        },
+      ],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: new Date().toISOString(),
+    } as const;
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream(runStateFromJSON(JSON.stringify(suspended)), {
+      directive: { approvals: [{ toolCallId: 'tc-email', granted: true }] },
+    })) {
+      events.push(ev);
+    }
+    // The approved tool actually ran — exactly once — and its real result (not a
+    // placeholder) reached the message buffer.
+    const execEnds = events.filter((e) => e.type === 'tool.execute.end');
+    expect(execEnds).toHaveLength(1);
+    const end = execEnds[0];
+    if (end?.type === 'tool.execute.end') {
+      expect(end.result).toBe('sent:a@b.c');
+    }
+  });
+
   it('records a denied approval and resumes with the rejection in the message buffer', async () => {
     const provider = createMockProvider({
       modelId: 'mock',

@@ -954,6 +954,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     yield { type: 'agent.start', runId: state.id, agentId };
 
+    // AG-1: approved gated calls collected from a resume directive, executed
+    // for real once every approval is resolved (see the dispatch below).
+    const resumedApprovedCalls: ToolCall[] = [];
+
     // Process resume directive — apply approval decisions to any
     // pending approvals captured in the previous suspend.
     if (
@@ -974,18 +978,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             type: 'tool.approval.granted',
             toolCallId: approval.toolCallId,
           };
-          // Pretend the tool call has not yet executed; we record
-          // its outcome as a tool message so the model sees the
-          // approved result on the next step.
-          messages.push({
-            role: 'tool',
+          // AG-1: queue the approved call for REAL execution once every
+          // approval is resolved (dispatched below). It runs through the same
+          // ToolExecutor as any other tool call — taint / audit / result
+          // recording — instead of pushing a "[not actually executed]"
+          // placeholder that left the gated side effect unreachable.
+          resumedApprovedCalls.push({
             toolCallId: approval.toolCallId,
-            content: '[approval granted; tool not actually executed in resume]',
-          });
-          state.messages.push({
-            role: 'tool',
-            toolCallId: approval.toolCallId,
-            content: '[approval granted; tool not actually executed in resume]',
+            toolName: approval.toolName,
+            args: approval.args,
           });
         } else {
           yield {
@@ -1048,6 +1049,29 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // real providers reject, or silently complete a failed run. Return it as-is.
     if (resumed && (state.status === 'awaiting_approval' || state.status === 'failed')) {
       return finalize(state, finalSnapshot);
+    }
+
+    // AG-1: every approval is now resolved (status is 'running'), so execute the
+    // approved gated calls for REAL before the provider loop — the model sees
+    // their genuine results on the first step. They run through the shared
+    // ToolExecutor (taint / audit) and record CompletedToolCalls in a resume
+    // step. Dispatching here (outside the loop's approval pre-screen) also means
+    // the gated call never re-suspends, so there is no livelock.
+    if (resumed && resumedApprovedCalls.length > 0) {
+      state.steps.push({
+        stepNumber: 0,
+        startedAt: new Date().toISOString(),
+        endedAt: new Date().toISOString(),
+        usage: zeroUsage(),
+        toolCalls: [],
+        agentId: state.currentAgentId,
+      });
+      yield* dispatchBatch(
+        resumedApprovedCalls,
+        toolExecutor,
+        { ...runContextBase, stepNumber: 0, messages },
+        0,
+      );
     }
 
     // WI-05: deferred tools promoted by a `tool_search` call this run.
