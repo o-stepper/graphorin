@@ -23,7 +23,7 @@ import {
 } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 import { retention } from '../src/consolidator/index.js';
-import { createMemory, defineBlock } from '../src/index.js';
+import { createMemory, defineBlock, enLocalePack } from '../src/index.js';
 import { createStubEmbedder } from './fixtures/in-memory-store.js';
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
@@ -482,6 +482,55 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
+  it('recall_episodes dateRange and fact_search tags filter end-to-end (MRET-4)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
+
+      // Episodes: one in March, one in May.
+      await sqlite.memory.episodic.put({
+        id: 'ep-mar',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Discussed the Lisbon conference travel plan.',
+        startedAt: '2026-03-10T10:00:00.000Z',
+        endedAt: '2026-03-10T12:00:00.000Z',
+        sensitivity: 'internal',
+        createdAt: '2026-03-10T12:00:00.000Z',
+      });
+      await sqlite.memory.episodic.put({
+        id: 'ep-may',
+        kind: 'episodic',
+        userId: SCOPE.userId,
+        summary: 'Discussed the Lisbon apartment search.',
+        startedAt: '2026-05-20T10:00:00.000Z',
+        endedAt: '2026-05-20T12:00:00.000Z',
+        sensitivity: 'internal',
+        createdAt: '2026-05-20T12:00:00.000Z',
+      });
+      const all = await memory.episodic.search(SCOPE, 'Lisbon');
+      expect(all.map((h) => h.record.id).sort()).toEqual(['ep-mar', 'ep-may']);
+      const march = await memory.episodic.search(SCOPE, 'Lisbon', {
+        dateRange: { from: '2026-03-01T00:00:00.000Z', to: '2026-03-31T23:59:59.000Z' },
+      });
+      expect(march.map((h) => h.record.id)).toEqual(['ep-mar']);
+
+      // Facts: one tagged, one not.
+      await memory.semantic.remember(SCOPE, {
+        text: 'Prefers aisle seats on long flights',
+        tags: ['travel'],
+      });
+      await memory.semantic.remember(SCOPE, { text: 'Prefers green tea over coffee' });
+      const tagged = await memory.semantic.search(SCOPE, 'prefers', { tags: ['travel'] });
+      expect(tagged.length).toBe(1);
+      expect(tagged[0]?.record.text).toContain('aisle');
+      const untagged = await memory.semantic.search(SCOPE, 'prefers');
+      expect(untagged.length).toBe(2);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('metadata reports real per-tier counts (not a 0/1 probe), excluding quarantined rules (CE-5, MST-6)', async () => {
     const sqlite = await makeStore();
     try {
@@ -638,6 +687,45 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
           ].includes(row.stage),
         ),
       ).toBe(true);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('locale-pack tool signatures match the registered tool schemas (MST-5)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+        resolveScope: () => SCOPE,
+      });
+      const byName = new Map(memory.tools.map((t) => [t.name, t]));
+      // Every `tool_name(arg, arg?)` mention in the system-prompt base
+      // template must reference only parameters the registered schema
+      // actually accepts — the model "filters" with phantom params
+      // otherwise (non-strict zod strips unknown keys silently).
+      const text = enLocalePack.baseTemplate.full;
+      const mentions = [...text.matchAll(/\b([a-z][a-z0-9_]*)\(([^)]*)\)/g)];
+      let checked = 0;
+      for (const m of mentions) {
+        const name = m[1] ?? '';
+        const tool = byName.get(name);
+        if (tool === undefined) continue;
+        checked += 1;
+        const shape =
+          (tool.inputSchema as unknown as { shape?: Record<string, unknown> }).shape ?? {};
+        for (const raw of (m[2] ?? '').split(',')) {
+          const param = raw.trim().replace(/\?$/, '');
+          if (param.length === 0) continue;
+          expect(
+            Object.keys(shape),
+            `locale pack advertises ${name}(${param}) but the schema has no such key`,
+          ).toContain(param);
+        }
+      }
+      // The retrieval guidance block mentions at least the three search tools.
+      expect(checked).toBeGreaterThanOrEqual(3);
     } finally {
       await sqlite.close();
     }

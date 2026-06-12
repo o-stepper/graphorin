@@ -116,6 +116,14 @@ export interface FactSearchOptions {
   /** Override the per-list candidate count (default `60`). */
   readonly candidateTopK?: number;
   /**
+   * Any-of tags filter (MRET-4). A fact matches when it carries at
+   * least one of the requested tags; untagged facts never match.
+   * Applied in-store on the FTS leg and as a record-level filter on
+   * the fused result so every candidate leg (vector / HyDE / graph)
+   * obeys it.
+   */
+  readonly tags?: ReadonlyArray<string>;
+  /**
    * Point-in-time ("as of") read. When set, only facts whose
    * bi-temporal validity interval contains this instant are returned
    * (`valid_from <= asOf < valid_to`, open-ended bounds allowed),
@@ -656,6 +664,8 @@ export class SemanticMemory {
             query: q,
             topK: candidateTopK,
             ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+            // MRET-4: in-store any-of tags predicate on the FTS leg.
+            ...(opts.tags !== undefined && opts.tags.length > 0 ? { tags: opts.tags } : {}),
             ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
             ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
           });
@@ -709,7 +719,18 @@ export class SemanticMemory {
           topK: finalTopK,
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
-        const ranked = await this.#applyDecay(scope, fused, opts.decay);
+        const decayed = await this.#applyDecay(scope, fused, opts.decay);
+        // MRET-4: the vector / HyDE / graph legs have no store-level tags
+        // predicate — enforce the any-of filter on the fused records so
+        // every leg obeys it.
+        const ranked =
+          opts.tags !== undefined && opts.tags.length > 0
+            ? decayed.filter((h) => {
+                const recordTags = h.record.tags;
+                if (recordTags === undefined || recordTags.length === 0) return false;
+                return opts.tags?.some((t) => recordTags.includes(t)) === true;
+              })
+            : decayed;
         // MRET-7: recall reinforces the recalled facts — stamp
         // last-accessed + bump strength so "recently accessed facts decay
         // slower" actually holds. Bookkeeping only: a failure here must

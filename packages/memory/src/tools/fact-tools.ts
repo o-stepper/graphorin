@@ -182,6 +182,9 @@ export function createFactSearchTool(
       const scope = await deps.resolveScope(ctx);
       const hits = await deps.semantic.search(scope, input.query, {
         ...(input.topK !== undefined ? { topK: input.topK } : {}),
+        // MRET-4: forward the tags filter — it was accepted by the
+        // schema and silently dropped here.
+        ...(input.tags !== undefined && input.tags.length > 0 ? { tags: input.tags } : {}),
         ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
         signal: ctx.signal,
       });

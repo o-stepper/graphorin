@@ -55,6 +55,29 @@ const EPISODE_NOT_QUARANTINED = "AND e.status != 'quarantined'";
 const INSIGHT_NOT_QUARANTINED = "AND i.status != 'quarantined'";
 
 /**
+ * MRET-4: any-of tags predicate against the `tags_json` array column.
+ * Rows without tags never match. The caller appends one bind per tag.
+ */
+function factTagsPredicate(tagCount: number): string {
+  const placeholders = Array.from({ length: tagCount }, () => '?').join(', ');
+  return `AND EXISTS (
+    SELECT 1 FROM json_each(COALESCE(f.tags_json, '[]'))
+    WHERE json_each.value IN (${placeholders}))`;
+}
+
+/**
+ * MRET-4: episode/date-range overlap — an episode matches when its
+ * `[started_at, ended_at]` span intersects `[from, to]` (missing bounds
+ * are open). The caller appends `from` / `to` epoch binds in order.
+ */
+function episodeDateRangePredicate(from: number | null, to: number | null): string {
+  let sql = '';
+  if (from !== null) sql += 'AND e.ended_at >= ? ';
+  if (to !== null) sql += 'AND e.started_at <= ? ';
+  return sql;
+}
+
+/**
  * Optional embedding payload attached to a memory write. The
  * `embedder_id` must already be registered in `embedding_meta`; the
  * `vector` length must match the registered `dim`.
@@ -526,8 +549,14 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   ): Promise<ReadonlyArray<MemoryHit<Episode>>> {
     const topK = opts.topK ?? 10;
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    // MRET-4: dateRange filter (declared on MemorySearchOptions,
+    // previously ignored) — overlap semantics on [started_at, ended_at].
+    const from = opts.dateRange?.from !== undefined ? toEpoch(opts.dateRange.from) : null;
+    const to = opts.dateRange?.to !== undefined ? toEpoch(opts.dateRange.to) : null;
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
     if (asOf !== null) binds.push(asOf);
+    if (from !== null) binds.push(from);
+    if (to !== null) binds.push(to);
     binds.push(topK);
     const rows = this.#conn.all<EpisodeRow & { bm25_score: number }>(
       `SELECT e.*, bm25(episodes_fts) AS bm25_score
@@ -536,6 +565,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
        WHERE episodes_fts MATCH ? AND e.scope_user_id = ? AND e.deleted_at IS NULL
          ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
          ${asOf !== null ? EPISODE_VALIDITY_CLAUSE : ''}
+         ${episodeDateRangePredicate(from, to)}
        ORDER BY bm25_score
        LIMIT ?`,
       binds,
@@ -806,8 +836,13 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const topK = opts.topK ?? 10;
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    // MRET-4: tags filter (declared on MemorySearchOptions, previously
+    // ignored). A fact matches when it carries AT LEAST ONE of the
+    // requested tags; rows without tags never match a tag filter.
+    const tags = opts.tags !== undefined && opts.tags.length > 0 ? [...opts.tags] : null;
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
     if (asOf !== null) binds.push(asOf, asOf);
+    if (tags !== null) binds.push(...tags);
     binds.push(topK);
     const rows = this.#conn.all<FactRow & { bm25_score: number }>(
       `SELECT f.*, bm25(facts_fts) AS bm25_score
@@ -816,6 +851,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
        WHERE facts_fts MATCH ? AND f.scope_user_id = ? AND f.deleted_at IS NULL AND f.archived = 0
          ${opts.includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
          ${asOf !== null ? FACT_VALIDITY_CLAUSE : ''}
+         ${tags !== null ? factTagsPredicate(tags.length) : ''}
        ORDER BY bm25_score
        LIMIT ?`,
       binds,
