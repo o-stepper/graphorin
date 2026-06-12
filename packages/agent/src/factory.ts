@@ -1011,13 +1011,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       if (stillPending.length === 0) {
         state.status = 'running';
       }
-    } else if (resumed) {
-      // Caller passed a RunState but no directive — bring the
-      // status back to `running` if the previous run completed.
-      if (state.status === 'completed' || state.status === 'failed') {
-        state.status = 'completed';
-      }
     }
+    // AG-14: the resumed status is left untouched here. A 'failed' run is NOT
+    // silently rewritten to 'completed' (the terminal/suspended guard below
+    // returns it as-is); a 'completed' run keeps its status and re-enters the
+    // loop for a follow-up; an unresolved 'awaiting_approval' run is caught by
+    // that same guard.
 
     // WI-09: pin the trusted system-prompt prefix length now, on the
     // fully-assembled initial buffer, so auto-compaction never rewrites
@@ -1042,6 +1041,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     const finalSnapshot: InternalRunSnapshot<TOutput> = {
       output: '' as unknown as TOutput,
     };
+
+    // AG-14: a resumed run that is still suspended (`awaiting_approval` with
+    // approvals the directive did not resolve) or already terminal-failed must
+    // not re-enter the provider loop — that would re-issue a dangling tool_use
+    // real providers reject, or silently complete a failed run. Return it as-is.
+    if (resumed && (state.status === 'awaiting_approval' || state.status === 'failed')) {
+      return finalize(state, finalSnapshot);
+    }
 
     // WI-05: deferred tools promoted by a `tool_search` call this run.
     // Membership grows as the model discovers tools and gates which
