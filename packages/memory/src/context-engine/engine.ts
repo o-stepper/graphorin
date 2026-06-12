@@ -277,6 +277,10 @@ export interface ContextEngine {
     readonly messages: ReadonlyArray<Message>;
     readonly memory: Memory;
     readonly summarizer?: CompactionSummarizer;
+    /** Per-call override of the strategy's preserve-recent count (CE-3). */
+    readonly preserveRecentTurns?: number;
+    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
+    readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
     readonly signal?: AbortSignal;
   }): Promise<{
     readonly result: CompactionResult;
@@ -669,8 +673,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
   ): Promise<boolean> {
     if (!compactionEnabled) return false;
     if (compactionThresholdTokens === Number.POSITIVE_INFINITY) return false;
-    const total =
-      options.precomputedTokens ?? (await countMessageTokens(messages, tokenCounter));
+    const total = options.precomputedTokens ?? (await countMessageTokens(messages, tokenCounter));
     if (total < compactionThresholdTokens) return false;
     if (
       lastCompactionAfterTokens !== null &&
@@ -690,6 +693,10 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     readonly messages: ReadonlyArray<Message>;
     readonly memory: Memory;
     readonly summarizer?: CompactionSummarizer;
+    /** Per-call override of the strategy's preserve-recent count (CE-3). */
+    readonly preserveRecentTurns?: number;
+    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
+    readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
     readonly signal?: AbortSignal;
   }): Promise<{
     readonly result: CompactionResult;
@@ -706,7 +713,11 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const compactionInputCall: ExecuteCompactionInput = {
       messages: callInput.messages,
       source: callInput.source,
-      strategy: compactionStrategy,
+      strategy:
+        callInput.preserveRecentTurns !== undefined &&
+        compactionStrategy.kind === 'summarize-old-preserve-recent'
+          ? { ...compactionStrategy, preserveRecentTurns: callInput.preserveRecentTurns }
+          : compactionStrategy,
       localePack,
       summarizer: activeSummarizer,
       tokenCounter,
@@ -740,6 +751,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
           {
             memory: callInput.memory,
             scope: callInput.scope,
+            ...(callInput.procedural !== undefined ? { procedural: callInput.procedural } : {}),
           },
           ctx,
         );
@@ -897,7 +909,7 @@ function resolveDefaultHooks(
         const id = `customHook_${idx}`;
         return {
           id,
-          async resolveContent(deps, ctx) {
+          async resolveContent(_deps, ctx) {
             // CE-6: the operator's hook sees the genuine compaction
             // context. `ctx` is always supplied by compactNow; the
             // throw guards a direct caller that forgot it rather than

@@ -379,6 +379,14 @@ export interface CompactionApiResult {
   readonly durationMs: number;
   readonly hooksFiredCount: number;
   readonly summary: string;
+  /**
+   * `true` when the compaction trimmed + spliced the live run buffer
+   * (CE-3/AG-13). `false` results carry an explicit
+   * {@link skippedReason} instead of silently reporting zeros.
+   */
+  readonly applied: boolean;
+  /** Why nothing was spliced, when {@link applied} is `false`. */
+  readonly skippedReason?: 'no-memory' | 'no-active-run' | 'nothing-to-trim' | 'sensitivity-gated';
 }
 
 /**

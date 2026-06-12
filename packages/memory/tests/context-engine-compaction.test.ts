@@ -332,7 +332,7 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
   });
 });
 
-describe('CE-6/CE-7 — real hook context, dedup\'d preserved turns, anti-thrash', () => {
+describe("CE-6/CE-7 — real hook context, dedup'd preserved turns, anti-thrash", () => {
   it('a custom function-form hook observes the GENUINE result + source (CE-6)', async () => {
     const observed: Array<{ summary: string; source: string; runId: string }> = [];
     const memory = createMemory({
@@ -387,7 +387,10 @@ describe('CE-6/CE-7 — real hook context, dedup\'d preserved turns, anti-thrash
     });
     const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
     const sentinel = `UNIQUE_SENTINEL_${'Q'.repeat(160)}_END`;
-    const messages = [...buildMessages(30, 'Z'.repeat(400)), { role: 'user' as const, content: sentinel }];
+    const messages = [
+      ...buildMessages(30, 'Z'.repeat(400)),
+      { role: 'user' as const, content: sentinel },
+    ];
     const out = await memory.contextEngine.compactNow({
       scope,
       runId: 'run-dedup',
@@ -552,5 +555,71 @@ describe('CE-13 — script-aware heuristic + one-time WARN', () => {
     } finally {
       spy.mockRestore();
     }
+  });
+});
+
+// --- CE-3/CE-6 — compactNow per-call overrides --------------------------------
+
+describe('CE-3/CE-6 — compactNow per-call overrides', () => {
+  const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+
+  function makeCompactableMemory() {
+    return createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 100 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+  }
+
+  function baseCall(memory: ReturnType<typeof makeCompactableMemory>) {
+    return {
+      scope,
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'manual' as const,
+      messages: buildMessages(40, 'X'.repeat(800)),
+      memory,
+    };
+  }
+
+  it('forwards preserveRecentTurns as a per-call strategy override (CE-3)', async () => {
+    const memory = makeCompactableMemory();
+    const overridden = await memory.contextEngine.compactNow({
+      ...baseCall(memory),
+      preserveRecentTurns: 2,
+    });
+    expect(overridden.result.preservedMessages.length).toBe(2);
+    // Without the override the configured strategy default (6) still applies.
+    const plain = await memory.contextEngine.compactNow(baseCall(memory));
+    expect(plain.result.preservedMessages.length).toBe(6);
+  });
+
+  it('supplies HookDeps.procedural to the built-in hooks (CE-6 item 3)', async () => {
+    const memory = makeCompactableMemory();
+    await memory.procedural.define(scope, { text: 'always cite sources' });
+    await memory.procedural.define(scope, {
+      text: 'use blue-green deploys',
+      condition: 'topic=deploys',
+    });
+    const joinTexts = (out: {
+      readonly extraContent: ReadonlyArray<{ readonly type: string; readonly text?: string }>;
+    }): string => out.extraContent.map((p) => (p.type === 'text' ? (p.text ?? '') : '')).join('\n');
+
+    const without = await memory.contextEngine.compactNow(baseCall(memory));
+    expect(joinTexts(without)).toContain('always cite sources');
+    expect(joinTexts(without)).not.toContain('blue-green');
+
+    const withTopic = await memory.contextEngine.compactNow({
+      ...baseCall(memory),
+      procedural: { topic: 'deploys' },
+    });
+    expect(joinTexts(withTopic)).toContain('blue-green');
+    expect(joinTexts(withTopic)).toContain('always cite sources');
   });
 });
