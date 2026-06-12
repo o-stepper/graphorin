@@ -358,7 +358,12 @@ class ConsolidatorImpl implements Consolidator {
       );
     }
     if (!this.#config.phases.includes(phase) && phase !== 'light') {
-      // Allow manual flushes regardless of phase gating; warn through INFO.
+      // MCON-17: manual flushes bypass phase gating ON PURPOSE — but the
+      // operator should know they are running a phase the tier disabled
+      // (the old empty branch promised a warn and emitted nothing).
+      process.stderr.write(
+        `[graphorin/memory] consolidator.fireNow('${phase}') runs a phase not enabled for tier '${this.#config.tier}' — proceeding (manual flushes bypass phase gating).\n`,
+      );
     }
     return this.#runPhase(phase, target, { kind: 'manual', value: phase });
   }
@@ -582,6 +587,10 @@ class ConsolidatorImpl implements Consolidator {
         conflictsResolved: outcome.conflictsResolved,
         noiseFilteredCount: outcome.noiseFilteredCount,
         emptyExtractions: outcome.emptyExtractions,
+        // MCON-17: the P1-2 / P1-1 counters were computed on the outcome
+        // and then dropped — the run audit lost them.
+        episodesFormed: outcome.episodesFormed,
+        insightsCreated: outcome.insightsCreated,
         errorMessage: outcome.errorMessage,
       });
       await this.#consolidatorStore.upsertState(scope, {

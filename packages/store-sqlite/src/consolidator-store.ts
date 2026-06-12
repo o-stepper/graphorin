@@ -69,6 +69,10 @@ export interface ConsolidatorRunFinish {
   readonly conflictsResolved?: number;
   readonly noiseFilteredCount?: number;
   readonly emptyExtractions?: number;
+  /** Episodes auto-formed by the run (P1-2 / MCON-17). */
+  readonly episodesFormed?: number;
+  /** Insights synthesized by the run's reflection pass (P1-1 / MCON-17). */
+  readonly insightsCreated?: number;
   readonly errorMessage?: string | null;
   readonly retryCount?: number;
 }
@@ -297,6 +301,7 @@ export class SqliteConsolidatorStateStore {
            llm_tokens_used = ?, llm_cost_usd = ?,
            facts_created = ?, facts_updated = ?, conflicts_resolved = ?,
            noise_filtered_count = ?, empty_extractions = ?,
+           episodes_formed = ?, insights_created = ?,
            error_message = ?, retry_count = ?
        WHERE id = ?`,
       [
@@ -309,6 +314,8 @@ export class SqliteConsolidatorStateStore {
         finish.conflictsResolved ?? 0,
         finish.noiseFilteredCount ?? 0,
         finish.emptyExtractions ?? 0,
+        finish.episodesFormed ?? 0,
+        finish.insightsCreated ?? 0,
         finish.errorMessage ?? null,
         finish.retryCount ?? 0,
         finish.id,

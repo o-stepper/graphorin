@@ -449,8 +449,6 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         'consolidator.exceeded': snapshot.paused,
       });
 
-      const cursorTip = tipMessageId(rawBatch);
-      void cursorTip;
 
       return {
         phase: 'standard',
