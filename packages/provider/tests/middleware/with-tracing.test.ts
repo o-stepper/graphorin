@@ -106,6 +106,19 @@ describe('withTracing — counting tracer', () => {
     expect(calls.recordException).toBe(0);
   });
 
+  it('ends the span when the consumer breaks early (PS-7)', async () => {
+    const { tracer, calls } = countingTracer();
+    const wrapped = withTracing({ tracer })(bareAdapter());
+    for await (const _ of wrapped.stream(REQ)) {
+      void _;
+      break; // abort after the first event — the normal streaming-UI abort path
+    }
+    expect(calls.startSpan).toBe(1);
+    expect(calls.end).toBe(1); // span closed despite skipping the success path
+    expect(calls.recordException).toBe(0); // a break is not an error
+    expect(calls.setStatus).not.toContainEqual({ status: 'ok' }); // never completed
+  });
+
   it('records exception + sets error status when the inner stream throws', async () => {
     const { tracer, calls } = countingTracer();
     const broken = bareAdapter();

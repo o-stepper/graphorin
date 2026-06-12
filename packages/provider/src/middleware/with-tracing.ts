@@ -78,11 +78,15 @@ async function* tracedStream(
       yield event;
     }
     span.setStatus('ok');
-    span.end();
   } catch (err) {
     span.recordException(err);
     span.setStatus('error', (err as Error).message);
-    span.end();
     throw err;
+  } finally {
+    // PS-7: a consumer `break`/early-return injects a generator `return` at the
+    // `yield`, skipping both the success and catch paths. Ending the span in
+    // `finally` guarantees it is closed exactly once on every exit — normal
+    // completion, error, or early abort (which leaves the status unset).
+    span.end();
   }
 }
