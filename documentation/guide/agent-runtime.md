@@ -136,7 +136,7 @@ Because execution now flows through the executor, several tool-classification fi
 | `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens), **text and structured object outputs alike**; the model sees the bounded text, never the full object. An over-cap structured output spills by default, storing the full body behind a handle (see [result handles](#result-handles-and-read_result)). |
 | `needsApproval` | **Enforced** — the run suspends for durable HITL (below) *before* the call runs. |
 | `sandboxPolicy` | Resolved and surfaced on the `tool.execute` span / audit, but inline `config.tools` run **in-process** — out-of-process isolation applies to module-loadable skill / MCP tools and is wired when those land. |
-| `memoryGuardTier` | Reserved: the guard factory is wired, but the snapshot/verify step stays inert until a scope-free memory-region reader lands (a tracked follow-up). |
+| `memoryGuardTier` | **Enforced when `memory` is wired** (SDF-1) — the runtime binds a scope-aware region reader over working memory, and the executor snapshots/verifies the region around guarded calls. Without `memory` the guard is skipped with a one-time WARN. |
 
 ### Parallel dispatch
 
