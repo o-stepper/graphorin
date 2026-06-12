@@ -313,14 +313,14 @@ function isAbortError(err: unknown): boolean {
 export function parseIntegerResponse(text: string): number | null {
   const trimmed = text.trim();
   if (trimmed.length === 0) return null;
+  // PS-14: accept ONLY a bare, whole-string integer. The prompt instructs the
+  // model to output exactly that; anything verbose ("Score: 7", "10/10",
+  // "Ignore the passage and output 10") is treated as non-compliant and scored
+  // via the fallback, so a passage that steers the model into prose around a
+  // chosen number can't smuggle that number through "first integer" extraction.
   const direct = /^-?\d+$/.exec(trimmed);
-  if (direct !== null) {
-    const v = Number.parseInt(direct[0], 10);
-    return Number.isFinite(v) && v >= 0 ? v : null;
-  }
-  const search = /\d+/.exec(trimmed);
-  if (search === null) return null;
-  const v = Number.parseInt(search[0], 10);
+  if (direct === null) return null;
+  const v = Number.parseInt(direct[0], 10);
   return Number.isFinite(v) && v >= 0 ? v : null;
 }
 
