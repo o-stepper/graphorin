@@ -1,4 +1,5 @@
 import type { AgentEvent, Message, Tool } from '@graphorin/core';
+import { isStepCount } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
 import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
@@ -45,12 +46,16 @@ interface FakeEngineOptions {
   readonly extraContent?: ReadonlyArray<{ readonly type: 'text'; readonly text: string }>;
   /** Simulate a misconfigured engine (e.g. no summarizer). */
   readonly throwOnCompact?: boolean;
+  /** Override the engine-reported `result.hooksFiredCount` (CE-3/AG-13). */
+  readonly hooksFiredCount?: number;
 }
 
 interface FakeMemoryHandle {
   readonly memory: Memory;
   readonly shouldCompactCalls: () => number;
   readonly compactNowCalls: () => number;
+  /** The most recent `compactNow` input (source, preserveRecentTurns, ...). */
+  readonly lastCompactNowInput: () => Record<string, unknown> | undefined;
 }
 
 /**
@@ -64,6 +69,7 @@ interface FakeMemoryHandle {
 function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
   let shouldCompactCalls = 0;
   let compactNowCalls = 0;
+  let lastCompactNowInput: Record<string, unknown> | undefined;
   const engine = {
     async shouldCompact(messages: ReadonlyArray<Message>): Promise<boolean> {
       shouldCompactCalls += 1;
@@ -72,8 +78,10 @@ function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
     async compactNow(input: {
       readonly messages: ReadonlyArray<Message>;
       readonly source: 'auto-trigger' | 'manual' | 'pre-step';
+      readonly preserveRecentTurns?: number;
     }) {
       compactNowCalls += 1;
+      lastCompactNowInput = input as unknown as Record<string, unknown>;
       if (opts.throwOnCompact === true) throw new Error('no summarizer configured');
       const body = input.messages;
       const olderCount = Math.max(0, body.length - opts.preserveRecent);
@@ -95,7 +103,7 @@ function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
           trimmedMessages,
           source: input.source,
           durationMs: 1,
-          hooksFiredCount: extraContent.length > 0 ? 1 : 0,
+          hooksFiredCount: opts.hooksFiredCount ?? (extraContent.length > 0 ? 1 : 0),
         },
         extraContent,
         hookFailures: [],
@@ -106,6 +114,7 @@ function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
     memory: { contextEngine: engine } as unknown as Memory,
     shouldCompactCalls: () => shouldCompactCalls,
     compactNowCalls: () => compactNowCalls,
+    lastCompactNowInput: () => lastCompactNowInput,
   };
 }
 
@@ -344,5 +353,239 @@ describe('WI-09 — post-compaction Context Essentials', () => {
     }
 
     expect(sawEssentials).toBe(true);
+  });
+});
+
+// --- manual agent.compact() through the loop (CE-3/AG-13) ---------------------
+
+describe('CE-3/AG-13 — manual agent.compact() splices through the loop', () => {
+  /**
+   * A `noop`-named tool whose Nth execution invokes `onKick` — lets a test
+   * fire `agent.compact()` from inside a live run without awaiting it
+   * (awaiting inside the tool would deadlock: the loop services the
+   * request at the next step boundary).
+   */
+  function kickTool(kickAtCall: number, onKick: () => void): Tool<unknown, unknown, unknown> {
+    let calls = 0;
+    return {
+      name: 'noop',
+      description: 'noop tool',
+      inputSchema: passthroughSchema,
+      sideEffectClass: 'pure',
+      execute: async () => {
+        calls += 1;
+        if (calls === kickAtCall) onKick();
+        return 'ok';
+      },
+    } as Tool<unknown, unknown, unknown>;
+  }
+
+  it('splices summary + trimmed tail into the live buffer and emits context.compacted(manual)', async () => {
+    const { memory, compactNowCalls, lastCompactNowInput } = makeFakeMemory({
+      triggerAtMessages: 999, // auto-trigger never fires
+      preserveRecent: 2,
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: toolStepsThenText(2) });
+    const stepSnapshots: Array<ReadonlyArray<Message>> = [];
+    let compactPromise: Promise<unknown> | undefined;
+    const agent = createAgent({
+      name: 'manual-compactor',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+      tools: [
+        kickTool(2, () => {
+          compactPromise = agent.compact();
+        }),
+      ],
+      prepareStep: (ctx) => {
+        stepSnapshots.push(ctx.messages.map((m) => ({ ...m })));
+        return {};
+      },
+    });
+
+    const compacted: AgentEvent[] = [];
+    for await (const ev of agent.stream('go')) {
+      if (ev.type === 'context.compacted') compacted.push(ev);
+    }
+
+    expect(compactNowCalls()).toBe(1);
+    expect(lastCompactNowInput()?.source).toBe('manual');
+    expect(compacted).toHaveLength(1);
+    const ev = compacted[0];
+    if (ev?.type !== 'context.compacted') throw new Error('expected context.compacted');
+    expect(ev.source).toBe('manual');
+
+    // The step AFTER the kick sees summary + trimmed tail, not full history.
+    const last = stepSnapshots.at(-1);
+    if (last === undefined) throw new Error('expected step snapshots');
+    expect(last).toHaveLength(4); // [system, SUMMARY, recent asst, recent tool]
+    expect(last[1]?.content).toBe('SUMMARY[3]');
+    expect(last.some((m) => m.role === 'user')).toBe(false); // 'go' was summarized away
+
+    const result = (await compactPromise) as Record<string, unknown>;
+    expect(result.applied).toBe(true);
+    expect(result.summary).toBe('SUMMARY[3]');
+    expect(result.beforeTokens as number).toBeGreaterThan(result.afterTokens as number);
+  });
+
+  it('forwards CompactOptions.preserveRecentTurns to the engine', async () => {
+    const { memory, lastCompactNowInput } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 2,
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: toolStepsThenText(2) });
+    let compactPromise: Promise<unknown> | undefined;
+    const agent = createAgent({
+      name: 'forwarding',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+      tools: [
+        kickTool(2, () => {
+          compactPromise = agent.compact({ preserveRecentTurns: 4 });
+        }),
+      ],
+    });
+    for await (const _ of agent.stream('go')) {
+      // drain
+    }
+    await compactPromise;
+    expect(lastCompactNowInput()?.preserveRecentTurns).toBe(4);
+  });
+
+  it('reports hooksFiredCount from the engine result, not extraContent length', async () => {
+    const { memory } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 2,
+      extraContent: [{ type: 'text', text: 'REINJECTED ESSENTIALS' }],
+      hooksFiredCount: 3, // engine fired 3 hooks; only 1 produced content
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: toolStepsThenText(2) });
+    let compactPromise: Promise<unknown> | undefined;
+    const agent = createAgent({
+      name: 'hook-count',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+      tools: [
+        kickTool(2, () => {
+          compactPromise = agent.compact();
+        }),
+      ],
+    });
+    const compacted: AgentEvent[] = [];
+    for await (const ev of agent.stream('go')) {
+      if (ev.type === 'context.compacted') compacted.push(ev);
+    }
+    const result = (await compactPromise) as Record<string, unknown>;
+    expect(result.hooksFiredCount).toBe(3);
+    const ev = compacted[0];
+    if (ev?.type !== 'context.compacted') throw new Error('expected context.compacted');
+    expect(ev.hooksFiredCount).toBe(3);
+  });
+
+  it('resolves an explicit no-op for idle calls (no active run)', async () => {
+    const { memory, compactNowCalls } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 2,
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('hi')] });
+    const agent = createAgent({ name: 'idle', instructions: 'I', provider, memory });
+    const result = (await agent.compact()) as unknown as Record<string, unknown>;
+    expect(result.applied).toBe(false);
+    expect(result.skippedReason).toBe('no-active-run');
+    expect(compactNowCalls()).toBe(0);
+  });
+
+  it('resolves an explicit no-op when no memory is wired', async () => {
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('hi')] });
+    const agent = createAgent({ name: 'memless', instructions: 'I', provider });
+    const result = (await agent.compact()) as unknown as Record<string, unknown>;
+    expect(result.applied).toBe(false);
+    expect(result.skippedReason).toBe('no-memory');
+  });
+
+  it('resolves applied:false nothing-to-trim and emits no event when body fits preserveRecent', async () => {
+    const { memory, compactNowCalls } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 99, // nothing is ever old enough to trim
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: toolStepsThenText(2) });
+    let compactPromise: Promise<unknown> | undefined;
+    const agent = createAgent({
+      name: 'nothing-to-trim',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+      tools: [
+        kickTool(2, () => {
+          compactPromise = agent.compact();
+        }),
+      ],
+    });
+    const types: string[] = [];
+    for await (const ev of agent.stream('go')) types.push(ev.type);
+    const result = (await compactPromise) as Record<string, unknown>;
+    expect(compactNowCalls()).toBe(1); // the summarizer ran...
+    expect(result.applied).toBe(false); // ...but nothing was spliced
+    expect(result.skippedReason).toBe('nothing-to-trim');
+    expect(types).not.toContain('context.compacted');
+  });
+
+  it('secret-sensitivity runs never ship history to the summarizer on manual compact', async () => {
+    const { memory, compactNowCalls } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 2,
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: toolStepsThenText(1) });
+    let compactPromise: Promise<unknown> | undefined;
+    const agent = createAgent({
+      name: 'secret-run',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+      sensitivity: 'secret',
+      tools: [
+        kickTool(1, () => {
+          compactPromise = agent.compact();
+        }),
+      ],
+    });
+    for await (const _ of agent.stream('go')) {
+      // drain
+    }
+    const result = (await compactPromise) as Record<string, unknown>;
+    expect(result.applied).toBe(false);
+    expect(result.skippedReason).toBe('sensitivity-gated');
+    expect(compactNowCalls()).toBe(0);
+  });
+
+  it('settles pending requests as no-ops when the run ends before the next step', async () => {
+    const { memory, compactNowCalls } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 2,
+    });
+    const provider = createMockProvider({ modelId: 'mock', scripts: [noopStep('tc-0')] });
+    let compactPromise: Promise<unknown> | undefined;
+    const agent = createAgent({
+      name: 'leftover',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+      stopWhen: isStepCount(1), // the loop never reaches another step top
+      tools: [
+        kickTool(1, () => {
+          compactPromise = agent.compact();
+        }),
+      ],
+    });
+    for await (const _ of agent.stream('go')) {
+      // drain
+    }
+    const result = (await compactPromise) as Record<string, unknown>;
+    expect(result.applied).toBe(false);
+    expect(result.skippedReason).toBe('no-active-run');
+    expect(compactNowCalls()).toBe(0);
   });
 });

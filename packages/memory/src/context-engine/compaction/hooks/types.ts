@@ -43,5 +43,14 @@ export interface HookDeps {
  */
 export interface NamedPostCompactionHook {
   readonly id: string;
-  resolveContent(deps: HookDeps): Promise<ReadonlyArray<MessageContent>>;
+  /**
+   * `ctx` carries the REAL compaction outcome (CE-6) — result, scope,
+   * runId, sessionId, agentId, source — built by `compactNow` after the
+   * pipeline finishes. Record-form built-ins may ignore it; the
+   * function-form wrapper forwards it to the operator's hook verbatim.
+   */
+  resolveContent(
+    deps: HookDeps,
+    ctx?: import('../types.js').PostCompactionHookContext,
+  ): Promise<ReadonlyArray<MessageContent>>;
 }

@@ -53,6 +53,17 @@ export interface CompactionResult {
   readonly source: CompactionSource;
   readonly durationMs: number;
   readonly hooksFiredCount: number;
+  /**
+   * Trust classification of the produced summary (CE-15).
+   * `'untrusted-derived'` when the compacted window contained
+   * `<<<untrusted_content>>>` envelopes or the injection heuristics
+   * flagged the summarizer output — the LLM-authored summary body is
+   * then wrapped in a `trust="derived"` envelope so taint survives
+   * compaction instead of laundering into an authoritative system
+   * message. `'trusted'` (or absent, for custom strategies that
+   * predate the field) otherwise.
+   */
+  readonly summaryTrust?: 'trusted' | 'untrusted-derived';
 }
 
 /**

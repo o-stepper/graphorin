@@ -46,6 +46,10 @@ import type {
 } from '@graphorin/core';
 import { isStepCount, NOOP_LOGGER, NOOP_TRACER, zeroUsage } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
+
+/** Return envelope of `ContextEngine.compactNow` (shared splice paths, CE-3). */
+type CompactionEnvelope = Awaited<ReturnType<Memory['contextEngine']['compactNow']>>;
+
 import { composeGuardrails } from '@graphorin/security/guardrails';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
@@ -756,6 +760,33 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   let activeRunState: RunState | undefined;
   const externalEventQueue: AgentEvent<TOutput>[] = [];
 
+  /**
+   * Manual-compaction requests enqueued by `agent.compact()` (CE-3 /
+   * AG-13). The run loop owns the live message buffer, so the splice
+   * must happen inside the loop: `maybeAutoCompact` services the queue
+   * at the next step boundary, and `finishRun` settles leftovers as
+   * explicit no-ops.
+   */
+  interface PendingManualCompact {
+    readonly options: CompactOptions | undefined;
+    readonly resolve: (result: CompactionApiResult) => void;
+    readonly reject: (cause: unknown) => void;
+  }
+  const pendingManualCompacts: PendingManualCompact[] = [];
+
+  const noopCompactionResult = (
+    skippedReason: NonNullable<CompactionApiResult['skippedReason']>,
+  ): CompactionApiResult => ({
+    beforeTokens: 0,
+    afterTokens: 0,
+    summaryTokens: 0,
+    durationMs: 0,
+    hooksFiredCount: 0,
+    summary: '',
+    applied: false,
+    skippedReason,
+  });
+
   const memory: Memory | undefined = config.memory;
   const progressIO: ProgressIO = createProgressIO({
     ...(config.sensitivity !== undefined ? { defaultSensitivity: config.sensitivity } : {}),
@@ -1349,8 +1380,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
      * external sink; per-result handle references land in WI-10). Best
      * effort: a misconfigured engine (e.g. no summarizer) is swallowed and
      * the run proceeds uncompacted rather than aborting mid-flight.
+     *
+     * Operator-requested compactions (`agent.compact()`, CE-3/AG-13) are
+     * serviced here too, FIRST — the queue carries the `compact()` promise
+     * resolvers, and manual requests bypass the trigger evaluation.
      */
     async function* maybeAutoCompact(): AsyncGenerator<AgentEvent<TOutput>, void, void> {
+      while (pendingManualCompacts.length > 0) {
+        const pending = pendingManualCompacts.shift();
+        if (pending !== undefined) yield* serviceManualCompact(pending);
+      }
       const mem = memory;
       if (mem === undefined) return;
       // Sensitivity gate (WI-09 step 2): drop, never re-route, secret-tier
@@ -1361,8 +1400,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       const triggered = await engine.shouldCompact(messages).catch(() => false);
       if (!triggered) return;
 
-      const prefix = messages.slice(0, systemPrefixLength);
-      const body = messages.slice(systemPrefixLength);
       const startedAt = Date.now();
       const envelope = await engine
         .compactNow({
@@ -1371,24 +1408,43 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           sessionId,
           agentId,
           source: 'auto-trigger',
-          messages: body,
+          messages: messages.slice(systemPrefixLength),
           memory: mem,
         })
         // No summarizer configured (or the strategy threw) — proceed with
         // the un-compacted buffer rather than failing a live run.
         .catch(() => undefined);
       if (envelope === undefined) return;
-      const { result, extraContent } = envelope;
       // Nothing was old enough to trim (body ≤ preserve-recent) — skip the
       // splice + event so `context.compacted` only fires on real work.
-      if (result.droppedMessageIndices.length === 0) return;
+      if (envelope.result.droppedMessageIndices.length === 0) return;
 
-      // Rebuild: stable system prefix + [summary, ...recent turns]. The
-      // post-compaction hooks already fired inside `compactNow`; re-inject
-      // their text Context Essentials as a trailing system message so they
-      // survive the trim (RB-46 re-anchoring).
-      const rebuilt: Message[] = [...prefix, ...result.trimmedMessages];
-      const essentials = extraContent
+      spliceCompacted(envelope);
+      yield {
+        type: 'context.compacted',
+        runId: state.id,
+        sessionId,
+        agentId,
+        beforeTokens: envelope.result.beforeTokens,
+        afterTokens: envelope.result.afterTokens,
+        summaryTokens: envelope.result.summaryTokens,
+        durationMs: Date.now() - startedAt,
+        source: 'auto-trigger',
+        hooksFiredCount: envelope.result.hooksFiredCount,
+      };
+    }
+
+    /**
+     * Prefix-pinned splice shared by the auto + manual compaction paths
+     * (CE-3): stable system prefix + [summary, ...recent turns], with the
+     * post-compaction hooks' text Context Essentials re-anchored as a
+     * trailing system message so they survive the trim (RB-46). Mutates
+     * BOTH the live loop buffer and `state.messages`.
+     */
+    function spliceCompacted(envelope: CompactionEnvelope): void {
+      const prefix = messages.slice(0, systemPrefixLength);
+      const rebuilt: Message[] = [...prefix, ...envelope.result.trimmedMessages];
+      const essentials = envelope.extraContent
         .map((part) =>
           typeof part === 'object' && part !== null && 'text' in part
             ? String((part as { readonly text: unknown }).text)
@@ -1401,19 +1457,71 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       }
       messages.splice(0, messages.length, ...rebuilt);
       state.messages.splice(0, state.messages.length, ...rebuilt);
+    }
 
-      yield {
-        type: 'context.compacted',
-        runId: state.id,
-        sessionId,
-        agentId,
+    /**
+     * Service one `agent.compact()` request inside the loop (CE-3/AG-13):
+     * same prefix-pinned splice as the auto path, `source: 'manual'` (or
+     * the caller's `'pre-step'`), `preserveRecentTurns` forwarded as a
+     * per-call strategy override. An engine failure rejects the caller's
+     * promise but never aborts the live run; a summarize that trims
+     * nothing resolves `applied: false` without an event.
+     */
+    async function* serviceManualCompact(
+      pending: PendingManualCompact,
+    ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
+      const mem = memory;
+      if (mem === undefined) {
+        pending.resolve(noopCompactionResult('no-memory'));
+        return;
+      }
+      const source = pending.options?.source ?? 'manual';
+      const startedAt = Date.now();
+      let envelope: CompactionEnvelope;
+      try {
+        envelope = await mem.contextEngine.compactNow({
+          scope: { userId: state.userId ?? agentId, sessionId, agentId },
+          runId: state.id,
+          sessionId,
+          agentId,
+          source,
+          messages: messages.slice(systemPrefixLength),
+          memory: mem,
+          ...(pending.options?.preserveRecentTurns !== undefined
+            ? { preserveRecentTurns: pending.options.preserveRecentTurns }
+            : {}),
+        });
+      } catch (cause) {
+        pending.reject(cause);
+        return;
+      }
+      const { result } = envelope;
+      const applied = result.droppedMessageIndices.length > 0;
+      if (applied) {
+        spliceCompacted(envelope);
+        yield {
+          type: 'context.compacted',
+          runId: state.id,
+          sessionId,
+          agentId,
+          beforeTokens: result.beforeTokens,
+          afterTokens: result.afterTokens,
+          summaryTokens: result.summaryTokens,
+          durationMs: Date.now() - startedAt,
+          source,
+          hooksFiredCount: result.hooksFiredCount,
+        };
+      }
+      pending.resolve({
         beforeTokens: result.beforeTokens,
         afterTokens: result.afterTokens,
         summaryTokens: result.summaryTokens,
         durationMs: Date.now() - startedAt,
-        source: 'auto-trigger',
         hooksFiredCount: result.hooksFiredCount,
-      };
+        summary: result.summary ?? '',
+        applied,
+        ...(applied ? {} : { skippedReason: 'nothing-to-trim' as const }),
+      });
     }
 
     const handoffNames = Array.from(handoffMap.keys());
@@ -2170,6 +2278,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     state: MutableRunState,
     snapshot: InternalRunSnapshot<TOutput>,
   ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
+    // CE-3/AG-13: settle manual-compact requests the loop never serviced —
+    // the run is over, there is no live buffer left to splice.
+    while (pendingManualCompacts.length > 0) {
+      pendingManualCompacts.shift()?.resolve(noopCompactionResult('no-active-run'));
+    }
     const result = finalize(state, snapshot);
     yield { type: 'agent.end', runId: result.state.id, result };
     return result;
@@ -2350,55 +2463,25 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   };
 
   const compact = async (options?: CompactOptions): Promise<CompactionApiResult> => {
-    if (memory === undefined) {
-      // No memory wired — emit a noop result. Operators can still
-      // see this on the trace; the helper is intentionally
-      // forgiving so example apps that don't wire memory don't
-      // crash on `agent.compact()`.
-      return {
-        beforeTokens: 0,
-        afterTokens: 0,
-        summaryTokens: 0,
-        durationMs: 0,
-        hooksFiredCount: 0,
-        summary: '',
-      };
-    }
-    if (activeRunState === undefined) {
-      return {
-        beforeTokens: 0,
-        afterTokens: 0,
-        summaryTokens: 0,
-        durationMs: 0,
-        hooksFiredCount: 0,
-        summary: '',
-      };
-    }
-    const sessionId = activeRunState.sessionId;
-    // `SessionScope.userId` is required on the contract; fall
-    // through to `agentId` as the scope's "logical user" when the
-    // run state has no explicit `userId`. Single-user-per-process
-    // is the v0.1 default per DEC-005, so the substitution is
-    // idempotent across calls.
-    const scopeUserId = activeRunState.userId ?? agentId;
-    const start = Date.now();
-    const result = await memory.contextEngine.compactNow({
-      scope: { userId: scopeUserId, sessionId, agentId },
-      runId: activeRunState.id,
-      sessionId,
-      agentId,
-      source: options?.source ?? 'manual',
-      messages: activeRunState.messages,
-      memory,
+    // No memory wired — an explicit no-op (AG-13), intentionally
+    // forgiving so example apps that don't wire memory don't crash
+    // on `agent.compact()`.
+    if (memory === undefined) return noopCompactionResult('no-memory');
+    // Sensitivity gate (WI-09 step 2) applies to MANUAL compaction
+    // too: secret-tier history never ships to the summarizer.
+    if (config.sensitivity === 'secret') return noopCompactionResult('sensitivity-gated');
+    // Idle — there is no live buffer to splice (AG-13's explicit
+    // no-op marker, where the old surface silently reported zeros).
+    if (activeRunState === undefined) return noopCompactionResult('no-active-run');
+    // CE-3/AG-13: the run loop owns the live buffer, so the splice
+    // happens there — enqueue and let `maybeAutoCompact` service the
+    // request at the next step boundary with the same prefix-pinned
+    // splice as auto-compaction. Don't await this from inside a tool
+    // handler: the loop can't reach the next step until the tool
+    // returns.
+    return await new Promise<CompactionApiResult>((resolve, reject) => {
+      pendingManualCompacts.push({ options, resolve, reject });
     });
-    return {
-      beforeTokens: result.result.beforeTokens,
-      afterTokens: result.result.afterTokens,
-      summaryTokens: result.result.summaryTokens,
-      durationMs: Date.now() - start,
-      hooksFiredCount: result.extraContent.length,
-      summary: result.result.summary ?? '',
-    };
   };
 
   const fanOut = async <TFanOutOutput = unknown>(

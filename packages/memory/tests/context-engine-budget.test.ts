@@ -89,3 +89,38 @@ describe('context-engine — token budget allocator (Phase 10d)', () => {
     expect(out.truncated).toBe(false);
   });
 });
+
+// --- CE-16(e) — structure-aware truncation -------------------------------------
+
+describe('CE-16(e) — structure-aware truncateToTokens', () => {
+  it('never cuts mid-tag: angle brackets stay balanced across the cut', async () => {
+    const body = Array.from({ length: 300 }, (_, i) => `<t${i}>v</t${i}>`).join('');
+    const out = await truncateToTokens(body, 25, HEURISTIC_TOKEN_COUNTER);
+    expect(out.truncated).toBe(true);
+    expect(out.tokens).toBeLessThanOrEqual(25);
+    expect((out.text.match(/</g) ?? []).length).toBe((out.text.match(/>/g) ?? []).length);
+  });
+
+  it('re-closes an open block tag after the marker so layer XML stays well-formed', async () => {
+    const body = `<memory_blocks>\n${'fact '.repeat(400)}\n</memory_blocks>`;
+    const out = await truncateToTokens(body, 30, HEURISTIC_TOKEN_COUNTER);
+    expect(out.truncated).toBe(true);
+    expect(out.tokens).toBeLessThanOrEqual(30);
+    expect(out.text).toContain('[...truncated]');
+    expect(out.text.trimEnd().endsWith('</memory_blocks>')).toBe(true);
+  });
+
+  it('re-closes nested tags innermost-first', async () => {
+    const body = `<outer><inner>${'x'.repeat(2000)}</inner></outer>`;
+    const out = await truncateToTokens(body, 20, HEURISTIC_TOKEN_COUNTER);
+    expect(out.truncated).toBe(true);
+    expect(out.text).toMatch(/<\/inner><\/outer>\s*$/);
+  });
+
+  it('leaves plain-string truncation behaviour unchanged', async () => {
+    const out = await truncateToTokens('A'.repeat(1000), 5, HEURISTIC_TOKEN_COUNTER);
+    expect(out.text.endsWith('[...truncated]')).toBe(true);
+    expect(out.tokens).toBeLessThanOrEqual(5);
+    expect(out.text).not.toContain('<');
+  });
+});

@@ -30,16 +30,34 @@ export interface ContextTokenCounter {
 }
 
 /**
- * Built-in heuristic counter — `Math.ceil(text.length / 4)`. Stable
+ * Script-aware heuristic (CE-13). The flat chars/4 rule undercounts
+ * non-Latin scripts ~4x — real tokenizers emit roughly one token per
+ * CJK character (and per kana / hangul syllable), so a 200k-window
+ * threshold expressed in "heuristic tokens" let CJK conversations blow
+ * past the provider limit before compaction ever fired. Characters
+ * outside the Latin-ish range count at one token each; Latin text keeps
+ * the classic chars/4. Still a heuristic — wire a real `TokenCounter`
+ * (e.g. the provider package's JsTiktokenCounter) for production
+ * accuracy.
+ */
+const DENSE_SCRIPT_RE =
+  // CJK unified + extensions, kana, hangul, CJK punctuation, full-width forms.
+  /[ᄀ-ᇿ⺀-〿぀-ヿ㄰-㆏ㇰ-䶿一-鿿ꥠ-꥿가-퟿豈-﫿＀-￯]/g;
+
+/**
+ * Built-in heuristic counter — chars/4 for Latin-ish text plus one
+ * token per dense-script (CJK/kana/hangul) character (CE-13). Stable
  * default when the operator does not pass a real {@link TokenCounter}.
  *
  * @stable
  */
 export const HEURISTIC_TOKEN_COUNTER: ContextTokenCounter = Object.freeze({
-  id: 'graphorin/heuristic@chars-per-4',
+  id: 'graphorin/heuristic@chars-per-4+dense-script',
   async countText(text: string): Promise<number> {
     if (typeof text !== 'string' || text.length === 0) return 0;
-    return Math.ceil(text.length / 4);
+    const dense = text.match(DENSE_SCRIPT_RE)?.length ?? 0;
+    const latin = text.length - dense;
+    return Math.ceil(latin / 4) + dense;
   },
 });
 

@@ -277,6 +277,10 @@ export interface ContextEngine {
     readonly messages: ReadonlyArray<Message>;
     readonly memory: Memory;
     readonly summarizer?: CompactionSummarizer;
+    /** Per-call override of the strategy's preserve-recent count (CE-3). */
+    readonly preserveRecentTurns?: number;
+    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
+    readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
     readonly signal?: AbortSignal;
   }): Promise<{
     readonly result: CompactionResult;
@@ -326,6 +330,7 @@ const DEFAULT_LAYER_CAPS: Readonly<
 };
 
 let compactionIneffectiveWarned = false;
+let heuristicCounterWarned = false;
 
 /** Emit the "compaction enabled but ineffective" warning at most once (CE-12). */
 function warnCompactionIneffective(message: string): void {
@@ -342,6 +347,11 @@ function warnCompactionIneffective(message: string): void {
  */
 export function _resetCompactionWarningForTesting(): void {
   compactionIneffectiveWarned = false;
+}
+
+/** @internal — test seam for the one-time heuristic-counter warning (CE-13). */
+export function _resetHeuristicCounterWarningForTesting(): void {
+  heuristicCounterWarned = false;
 }
 
 /**
@@ -401,6 +411,20 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       ? adaptTokenCounter(config.tokenCounter)
       : (config.tokenCounter as ContextTokenCounter)
     : HEURISTIC_TOKEN_COUNTER;
+  // CE-13: budgeting against a real provider window with the heuristic
+  // counter is approximate — say so once instead of failing silently
+  // late (the heuristic's failure mode is a provider context-length
+  // error before compaction fires).
+  if (
+    config.tokenCounter === undefined &&
+    typeof config.providerContextWindow === 'number' &&
+    !heuristicCounterWarned
+  ) {
+    heuristicCounterWarned = true;
+    process.stderr.write(
+      '[graphorin/memory] context-engine token counts use the built-in heuristic (chars/4 + dense-script). For production budgeting against a real provider window, pass `contextEngine.tokenCounter` (e.g. the provider package JsTiktokenCounter).\n',
+    );
+  }
 
   const privacy = config.privacy ?? {};
   const defaultSensitivity: Sensitivity = privacy.defaultSensitivity ?? 'internal';
@@ -635,17 +659,29 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     });
   }
 
+  // CE-7 anti-thrash: after a compaction whose afterTokens still sits at
+  // or above the trigger threshold (e.g. huge tool results among the
+  // preserved turns), an immediate re-trigger would summarize the
+  // previous summary — spend with no reclaim. Track the last outcome and
+  // require the buffer to have GROWN past it before firing again.
+  let lastCompactionAfterTokens: number | null = null;
+  const REARM_GROWTH_TOKENS = 256;
+
   async function shouldCompact(
     messages: ReadonlyArray<Message>,
     options: { readonly precomputedTokens?: number } = {},
   ): Promise<boolean> {
     if (!compactionEnabled) return false;
     if (compactionThresholdTokens === Number.POSITIVE_INFINITY) return false;
-    if (options.precomputedTokens !== undefined) {
-      return options.precomputedTokens >= compactionThresholdTokens;
+    const total = options.precomputedTokens ?? (await countMessageTokens(messages, tokenCounter));
+    if (total < compactionThresholdTokens) return false;
+    if (
+      lastCompactionAfterTokens !== null &&
+      total <= lastCompactionAfterTokens + REARM_GROWTH_TOKENS
+    ) {
+      return false;
     }
-    const total = await countMessageTokens(messages, tokenCounter);
-    return total >= compactionThresholdTokens;
+    return true;
   }
 
   async function compactNow(callInput: {
@@ -657,6 +693,10 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     readonly messages: ReadonlyArray<Message>;
     readonly memory: Memory;
     readonly summarizer?: CompactionSummarizer;
+    /** Per-call override of the strategy's preserve-recent count (CE-3). */
+    readonly preserveRecentTurns?: number;
+    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
+    readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
     readonly signal?: AbortSignal;
   }): Promise<{
     readonly result: CompactionResult;
@@ -673,7 +713,11 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const compactionInputCall: ExecuteCompactionInput = {
       messages: callInput.messages,
       source: callInput.source,
-      strategy: compactionStrategy,
+      strategy:
+        callInput.preserveRecentTurns !== undefined &&
+        compactionStrategy.kind === 'summarize-old-preserve-recent'
+          ? { ...compactionStrategy, preserveRecentTurns: callInput.preserveRecentTurns }
+          : compactionStrategy,
       localePack,
       summarizer: activeSummarizer,
       tokenCounter,
@@ -700,10 +744,17 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     let hooksFired = 0;
     for (const hook of compactionHooks) {
       try {
-        const parts = await hook.resolveContent({
-          memory: callInput.memory,
-          scope: callInput.scope,
-        });
+        // CE-6: hooks receive the REAL compaction context — the old code
+        // built `ctx` and then `void ctx;`-discarded it while the
+        // function-form wrapper fabricated a zeroed result.
+        const parts = await hook.resolveContent(
+          {
+            memory: callInput.memory,
+            scope: callInput.scope,
+            ...(callInput.procedural !== undefined ? { procedural: callInput.procedural } : {}),
+          },
+          ctx,
+        );
         extraContent.push(...parts);
         hooksFired += 1;
       } catch (err) {
@@ -713,11 +764,21 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
         });
       }
     }
-    void ctx;
     const enrichedResult: CompactionResult = Object.freeze({
       ...result,
       hooksFiredCount: hooksFired,
     });
+    // CE-7: arm the anti-thrash guard and surface the failure mode where
+    // compaction could not get under the trigger threshold.
+    lastCompactionAfterTokens = enrichedResult.afterTokens;
+    if (
+      compactionThresholdTokens !== Number.POSITIVE_INFINITY &&
+      enrichedResult.afterTokens >= compactionThresholdTokens
+    ) {
+      process.stderr.write(
+        `[graphorin/memory] compaction finished at ${enrichedResult.afterTokens} tokens — still at/above the ${compactionThresholdTokens}-token trigger (oversized preserved turns?). The immediate re-trigger is suppressed until the buffer grows.\n`,
+      );
+    }
     return Object.freeze({
       result: enrichedResult,
       extraContent: Object.freeze(extraContent),
@@ -848,27 +909,17 @@ function resolveDefaultHooks(
         const id = `customHook_${idx}`;
         return {
           id,
-          async resolveContent(deps) {
-            const result = await hook({
-              result: {
-                summary: '',
-                summaryTokens: 0,
-                beforeTokens: 0,
-                afterTokens: 0,
-                droppedMessageIds: [],
-                droppedMessageIndices: [],
-                preservedMessages: [],
-                trimmedMessages: [],
-                source: 'manual',
-                durationMs: 0,
-                hooksFiredCount: 0,
-              },
-              scope: deps.scope,
-              runId: '',
-              sessionId: '',
-              agentId: '',
-              source: 'manual',
-            });
+          async resolveContent(_deps, ctx) {
+            // CE-6: the operator's hook sees the genuine compaction
+            // context. `ctx` is always supplied by compactNow; the
+            // throw guards a direct caller that forgot it rather than
+            // silently fabricating zeros (the old behaviour).
+            if (ctx === undefined) {
+              throw new TypeError(
+                '[graphorin/memory] post-compaction hooks require the compaction context — call through ContextEngine.compactNow(...).',
+              );
+            }
+            const result = await hook(ctx);
             return result;
           },
         };
