@@ -15,7 +15,6 @@ export {
   listTokens,
   rekeyTokens,
   revokeToken,
-  rotatePepper,
   rotateToken,
   type TokenMetadata,
 } from './crud.js';

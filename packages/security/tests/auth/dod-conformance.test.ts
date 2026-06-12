@@ -12,8 +12,8 @@ import {
   createToken,
   generatePepper,
   listTokens,
+  rekeyTokens,
   revokeToken,
-  rotatePepper,
   type TokenMetadata,
 } from '../../src/auth/crud.js';
 import { TokenVerifyOverloadError } from '../../src/auth/errors.js';
@@ -239,28 +239,13 @@ describe('Phase 03b — DoD conformance', () => {
     });
   });
 
-  describe('rotatePepper dry-run', () => {
-    it('returns the row count without mutating the store', async () => {
+  describe('pepper rotation (SPL-10)', () => {
+    it('rekeyTokens is the supported rotation; rotatePepper is gone', async () => {
       const tokenStore = createMemoryAuthTokenStore();
       const pepper = generatePepper();
-      const created = await createToken({
-        tokenStore,
-        pepper,
-        env: 'live',
-        scopes: ['agents:read'],
-      });
-      const before = await tokenStore.list();
-      const result = await rotatePepper({
-        tokenStore,
-        newPepper: generatePepper(),
-        oldHashLookup: async () => created.record.hashHex,
-        recomputeHash: async () => 'replacement-hash',
-        dryRun: true,
-      });
-      expect(result.updated).toBe(1);
-      expect(result.skipped).toBe(0);
-      const after = await tokenStore.list();
-      expect(after).toEqual(before);
+      await createToken({ tokenStore, pepper, env: 'live', scopes: ['agents:read'] });
+      const rotated = await rekeyTokens({ tokenStore, pepper: generatePepper(), env: 'live' });
+      expect(rotated.size).toBe(1);
     });
   });
 

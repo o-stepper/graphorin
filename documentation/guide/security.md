@@ -62,7 +62,7 @@ graphorin token revoke <token-id>
 
 The pepper itself is resolved at server boot through a `SecretRef` (typically stored under `keyring:graphorin_server_pepper` or the encrypted-file store). See [Secrets](/guide/secrets) for the resolution pipeline.
 
-**Pepper strength.** Installing a pepper (`rotatePepper` / `rekeyTokens`) runs a weak-secret check: peppers below 32 bytes, with low Shannon entropy, or containing a long run of identical bytes (placeholder/test values) are rejected with a `WeakPepperError` whose `reason` explains the failure. Generate peppers with `crypto.randomBytes(32)` or the auth library's `generatePepper()`. The underlying heuristic is exported as `assessSecretStrength(bytes)` from `@graphorin/security` (and `@graphorin/security/hardening`) — a pure function returning `{ ok, reason, shannonBitsPerByte, maxIdenticalRun, … }` — so you can apply the same bar to your own passphrases.
+**Pepper strength.** Consuming a pepper (`createToken`, `rekeyTokens`, the `TokenVerifier`'s first use) runs a weak-secret check: peppers below 32 bytes, with low Shannon entropy, or containing a long run of identical bytes (placeholder/test values) are rejected with a `WeakPepperError` whose `reason` explains the failure. Generate peppers with `crypto.randomBytes(32)` or the auth library's `generatePepper()`. The underlying heuristic is exported as `assessSecretStrength(bytes)` from `@graphorin/security` (and `@graphorin/security/hardening`) — a pure function returning `{ ok, reason, shannonBitsPerByte, maxIdenticalRun, … }` — so you can apply the same bar to your own passphrases.
 
 ## Audit log
 

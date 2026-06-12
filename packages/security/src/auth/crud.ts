@@ -193,51 +193,6 @@ export async function rotateToken(
 }
 
 /**
- * Re-HMAC every token row with a new pepper. The previous pepper is
- * required to derive the per-row plaintext via re-hashing — the
- * function therefore only supports the rolling-deployment use case
- * where the framework still holds the old pepper at the time of
- * rotation.
- *
- * The store update is per-row; the caller is responsible for running
- * the helper inside an outer transaction when atomicity matters.
- *
- * Returns the number of rows the helper would update; when
- * `dryRun: true` the store is not touched.
- *
- * @stable
- */
-export async function rotatePepper(options: {
-  readonly tokenStore: AuthTokenStore;
-  readonly newPepper: SecretValue;
-  readonly oldHashLookup: (id: string) => Promise<string | null>;
-  readonly recomputeHash: (id: string, oldHashHex: string) => Promise<string | null>;
-  readonly dryRun?: boolean;
-}): Promise<{ readonly updated: number; readonly skipped: number }> {
-  await assertPepperStrength(options.newPepper);
-  const records = await options.tokenStore.list();
-  let updated = 0;
-  let skipped = 0;
-  for (const record of records) {
-    const oldHashHex = await options.oldHashLookup(record.id);
-    if (oldHashHex === null) {
-      skipped += 1;
-      continue;
-    }
-    const newHashHex = await options.recomputeHash(record.id, oldHashHex);
-    if (newHashHex === null) {
-      skipped += 1;
-      continue;
-    }
-    if (!options.dryRun) {
-      await options.tokenStore.put({ ...record, hashHex: newHashHex });
-    }
-    updated += 1;
-  }
-  return Object.freeze({ updated, skipped });
-}
-
-/**
  * Re-issue every active token. Used after a known compromise: the
  * previous tokens are revoked and replaced with fresh raw values
  * using the same scopes / labels.

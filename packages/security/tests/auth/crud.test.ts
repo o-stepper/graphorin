@@ -6,7 +6,6 @@ import {
   listTokens,
   rekeyTokens,
   revokeToken,
-  rotatePepper,
   rotateToken,
 } from '../../src/auth/crud.js';
 import { ScopeParseError, WeakPepperError } from '../../src/auth/errors.js';
@@ -142,80 +141,24 @@ describe('@graphorin/security/auth — token CRUD', () => {
     );
   });
 
-  it('rotatePepper updates the hashHex of every row in dryRun=false', async () => {
-    const tokenStore = createMemoryAuthTokenStore();
-    const oldPepper = generatePepper();
-    const created = await createToken({
-      tokenStore,
-      pepper: oldPepper,
-      env: 'live',
-      scopes: ['agents:read'],
-    });
-    const newPepper = generatePepper();
-    const result = await rotatePepper({
-      tokenStore,
-      newPepper,
-      oldHashLookup: async (id) => (id === created.record.id ? created.record.hashHex : null),
-      recomputeHash: async (_id, oldHashHex) => `${oldHashHex}-rotated`,
-    });
-    expect(result.updated).toBe(1);
-    expect(result.skipped).toBe(0);
-    const updated = await tokenStore.get(created.record.id);
-    expect(updated?.hashHex).toBe(`${created.record.hashHex}-rotated`);
+  it('rotatePepper is gone — rekeyTokens is the supported rotation (SPL-10)', () => {
+    // The old helper documented an impossible mechanism (re-deriving
+    // HMACs to a new pepper without the raw tokens) and delegated all
+    // real work to caller-supplied callbacks while never using
+    // `newPepper`. Re-issuing via `rekeyTokens` is the only sound path.
+    expect(rekeyTokens).toBeTypeOf('function');
   });
 
-  it('rotatePepper(dryRun=true) leaves the store unchanged', async () => {
+  it('createToken rejects a sub-32-byte pepper (SPL-11 superseded the rotatePepper check)', async () => {
     const tokenStore = createMemoryAuthTokenStore();
-    const oldPepper = generatePepper();
-    const created = await createToken({
-      tokenStore,
-      pepper: oldPepper,
-      env: 'live',
-      scopes: ['agents:read'],
-    });
-    const newPepper = generatePepper();
-    const result = await rotatePepper({
-      tokenStore,
-      newPepper,
-      oldHashLookup: async () => created.record.hashHex,
-      recomputeHash: async () => 'whatever',
-      dryRun: true,
-    });
-    expect(result.updated).toBe(1);
-    const refreshed = await tokenStore.get(created.record.id);
-    expect(refreshed?.hashHex).toBe(created.record.hashHex);
-  });
-
-  it('rotatePepper rejects a sub-32-byte pepper', async () => {
-    const tokenStore = createMemoryAuthTokenStore();
-    const weak = SecretValue.fromString('short');
     await expect(
-      rotatePepper({
+      createToken({
         tokenStore,
-        newPepper: weak,
-        oldHashLookup: async () => null,
-        recomputeHash: async () => null,
+        pepper: SecretValue.fromString('short'),
+        env: 'live',
+        scopes: ['agents:read'],
       }),
     ).rejects.toBeInstanceOf(WeakPepperError);
-  });
-
-  it('rotatePepper skips rows for which the lookup returns null', async () => {
-    const tokenStore = createMemoryAuthTokenStore();
-    const pepper = generatePepper();
-    await createToken({
-      tokenStore,
-      pepper,
-      env: 'live',
-      scopes: ['agents:read'],
-    });
-    const result = await rotatePepper({
-      tokenStore,
-      newPepper: pepper,
-      oldHashLookup: async () => null,
-      recomputeHash: async () => 'never',
-    });
-    expect(result.updated).toBe(0);
-    expect(result.skipped).toBe(1);
   });
 
   it('rekeyTokens revokes every active token and issues fresh raws', async () => {
