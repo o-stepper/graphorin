@@ -560,10 +560,9 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
         createdAt: new Date(now).toISOString(),
       });
       const conn = sqlite.connection;
-      conn.run(
-        `UPDATE facts SET created_at = ? WHERE id LIKE 'stale-%'`,
-        [now - 60 * 24 * 60 * 60_000],
-      );
+      conn.run(`UPDATE facts SET created_at = ? WHERE id LIKE 'stale-%'`, [
+        now - 60 * 24 * 60 * 60_000,
+      ]);
       conn.run('UPDATE facts SET created_at = ? WHERE id = ?', [now, 'fresh-11']);
 
       // NOTE: decay first — MRET-7 marks every RETURNED fact as accessed,
