@@ -33,7 +33,7 @@ export function buildOrderProcessingWorkflow(
     name: 'order-processing',
     channels: {
       status: latestValue<OrderState['status']>({ default: 'pending' }),
-      notes: listAggregate<string>({ default: [] }),
+      notes: listAggregate<string>({ default: [] }) as never,
       decision: latestValue<OrderState['decision']>(),
       amount: latestValue<number>(),
     },
@@ -59,11 +59,11 @@ export function buildOrderProcessingWorkflow(
           };
         },
       }),
-      autoApprove: createNode({
+      autoApprove: createNode<OrderState & { amount?: number }>({
         name: 'autoApprove',
         run: async () => ({ status: 'approved', notes: ['auto-approved'] }),
       }),
-      ship: createNode({
+      ship: createNode<OrderState & { amount?: number }>({
         name: 'ship',
         run: async () => ({ status: 'shipped', notes: ['shipped'] }),
       }),

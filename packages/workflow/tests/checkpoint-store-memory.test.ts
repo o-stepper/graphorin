@@ -112,7 +112,7 @@ describe('InMemoryCheckpointStore', () => {
     );
     const tuple = await store.getTuple('t1', 'ns');
     expect(tuple?.pendingWrites).toHaveLength(1);
-    expect(tuple?.pendingWrites?.[0].value).toBe('replaced');
+    expect(tuple?.pendingWrites?.[0]?.value).toBe('replaced');
   });
 
   it('skips putWrites when the writes array is empty', async () => {

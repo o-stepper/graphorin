@@ -52,6 +52,9 @@ export function createWorkflow<
 
   const nodeNames = Object.freeze(Object.keys(config.nodes));
   const namespace = namespaceFor(config);
+  // Per-instance re-entrancy guard for resume/retry; cross-instance and
+  // cross-process races are handled by the store-level checkpoint CAS.
+  const resumeLock = new Set<string>();
 
   const workflow: Workflow<TState, TInput> = Object.freeze({
     name: config.name,
@@ -80,6 +83,18 @@ export function createWorkflow<
         ...(directive !== undefined ? { directive } : {}),
         streamMode,
         ...(opts?.signal !== undefined ? { signal: opts.signal } : {}),
+        resumeLock,
+      });
+    },
+    retry(threadId: string, opts?: WorkflowResumeOptions): AsyncIterable<WorkflowEvent<TState>> {
+      const streamMode = opts?.stream ?? DEFAULT_STREAM_MODE;
+      return resumeEngine<TState>({
+        config,
+        threadId,
+        streamMode,
+        ...(opts?.signal !== undefined ? { signal: opts.signal } : {}),
+        resumeLock,
+        mode: 'retry',
       });
     },
     async getState(threadId: string): Promise<WorkflowState<TState>> {
@@ -89,7 +104,8 @@ export function createWorkflow<
         tuple.metadata.status === 'running' ||
         tuple.metadata.status === 'suspended' ||
         tuple.metadata.status === 'completed' ||
-        tuple.metadata.status === 'failed'
+        tuple.metadata.status === 'failed' ||
+        tuple.metadata.status === 'aborted'
           ? tuple.metadata.status
           : 'running';
       const unwrapped = unwrapPersistedStateForRead(tuple.checkpoint.state);

@@ -146,7 +146,7 @@ interface CheckpointRow {
   channel_versions_json: string;
   step_number: number;
   source: 'sync' | 'async' | 'exit';
-  status: 'running' | 'suspended' | 'completed' | 'failed';
+  status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   node_name: string | null;
   tags_json: string | null;
   created_at: number;

@@ -38,8 +38,8 @@ describe('createWorkflow — execute() reference flow', () => {
     expect(types).toContain('workflow.step.end');
 
     const final = events[events.length - 1];
-    expect(final.type).toBe('workflow.end');
-    if (final.type === 'workflow.end') {
+    expect(final?.type).toBe('workflow.end');
+    if (final?.type === 'workflow.end') {
       expect(final.state.status).toBe('shipped');
       expect(final.state.notes).toEqual(
         expect.arrayContaining(['validated amount=25', 'auto-approved', 'shipped']),
@@ -123,7 +123,7 @@ describe('Workflow.fork', () => {
     await collect(wf.execute({ amount: 25 }, { threadId: 'thread-original' }));
     const checkpoints = await wf.listCheckpoints('thread-original');
     const middle = checkpoints[Math.floor(checkpoints.length / 2)];
-    expect(middle).toBeDefined();
+    if (!middle) throw new Error('expected a middle checkpoint');
     const { newThreadId } = await wf.fork('thread-original', middle.id);
     expect(newThreadId).not.toBe('thread-original');
     const cloned = await wf.getState(newThreadId);
@@ -151,7 +151,7 @@ describe('Dispatch — dynamic parallelism', () => {
     const wf = createWorkflow<DState, Partial<DState>>({
       name: 'dispatch-test',
       channels: {
-        result: listAggregate<string>({ default: [] }),
+        result: listAggregate<string>({ default: [] }) as never,
       },
       nodes: {
         fanOut: createNode<DState>({
@@ -180,7 +180,7 @@ describe('Dispatch — dynamic parallelism', () => {
     const final = events[events.length - 1];
     expect(final?.type).toBe('workflow.end');
     if (final?.type === 'workflow.end') {
-      expect((final.state as DState).result.sort()).toEqual([
+      expect([...(final.state as DState).result].sort()).toEqual([
         'processed-a',
         'processed-b',
         'processed-c',
@@ -341,7 +341,7 @@ describe('Stream channel + concurrency', () => {
     const checkpointStore = new InMemoryCheckpointStore();
     const wf = createWorkflow<SState>({
       name: 'stream-merge',
-      channels: { events: stream<string>({ default: [] }) },
+      channels: { events: stream<string>({ default: [] }) as never },
       nodes: {
         seed: createNode<SState>({
           name: 'seed',
@@ -370,7 +370,7 @@ describe('Stream channel + concurrency', () => {
     const final = events[events.length - 1];
     if (final?.type === 'workflow.end') {
       const stateEvents = (final.state as SState).events;
-      expect(stateEvents.sort()).toEqual(['A', 'B']);
+      expect([...stateEvents].sort()).toEqual(['A', 'B']);
     }
   });
 });

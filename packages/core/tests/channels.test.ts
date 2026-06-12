@@ -105,20 +105,41 @@ describe('pause', () => {
   });
 
   it('returns the resume value when invoked inside runWithPauseResume', async () => {
-    const result = await runWithPauseResume('approved', () => {
+    const result = await runWithPauseResume(['approved'], () => {
       const value = pause<{ kind: 'approval' }, string>({ kind: 'approval' });
       return value;
     });
     expect(result).toBe('approved');
   });
 
+  it('replays successive values in order to successive pause() calls (WF-2)', async () => {
+    const result = await runWithPauseResume(['first', 'second'], () => {
+      const a = pause<{ kind: 'approval' }, string>({ kind: 'approval' });
+      const b = pause<{ kind: 'approval-2' }, string>({ kind: 'approval-2' });
+      return [a, b];
+    });
+    expect(result).toEqual(['first', 'second']);
+  });
+
   it('falls back to throwing when the runWithPauseResume scope has been consumed', async () => {
     let threw: unknown;
-    await runWithPauseResume('first', () => {
+    await runWithPauseResume(['first'], () => {
       const value = pause<{ kind: 'approval' }, string>({ kind: 'approval' });
       expect(value).toBe('first');
       try {
         pause({ kind: 'approval-2' });
+      } catch (err) {
+        threw = err;
+      }
+    });
+    expect(isPauseSignal(threw)).toBe(true);
+  });
+
+  it('an EMPTY values array behaves like no scope — every pause() suspends', async () => {
+    let threw: unknown;
+    await runWithPauseResume([], () => {
+      try {
+        pause({ kind: 'approval' });
       } catch (err) {
         threw = err;
       }

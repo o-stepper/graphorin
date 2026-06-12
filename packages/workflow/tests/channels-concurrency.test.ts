@@ -8,6 +8,7 @@
  * Ephemeral) must respect their documented contract.
  */
 
+import type { Channel } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import {
   anyValue,
@@ -44,7 +45,7 @@ const baseChannels = {
   notes: listAggregate<string>({ default: [] }),
   events: stream<string>({ default: [] }),
   joined: barrier<Record<string, number>>(['a', 'b', 'c']),
-};
+} as unknown as Readonly<Record<string, Channel<unknown>>>;
 
 interface BaseState {
   total: number;
@@ -102,7 +103,9 @@ describe('channels — concurrency invariants', () => {
   });
 
   it('Stream uniqueness deduplicates regardless of write order', () => {
-    const channels = { events: stream<string>({ unique: true, default: [] }) };
+    const channels = {
+      events: stream<string>({ unique: true, default: [] }),
+    } as unknown as Readonly<Record<string, Channel<unknown>>>;
     const writes: ChannelWrite[] = ['a', 'b', 'a', 'c', 'b', 'a'].map((v, i) =>
       makeWrite(`w${i}`, 'events', v),
     );

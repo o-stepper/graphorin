@@ -271,7 +271,7 @@ export interface WorkflowConfig<TState extends object = Record<string, unknown>>
 export interface WorkflowState<TState extends object = Record<string, unknown>> {
   readonly threadId: string;
   readonly stepNumber: number;
-  readonly status: 'running' | 'suspended' | 'completed' | 'failed';
+  readonly status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   readonly state: TState;
   readonly checkpointId: CheckpointId;
   /** Carries the value passed to `pause(value)` when status is `suspended`. */
@@ -293,6 +293,13 @@ export interface PendingPauseRecord {
   readonly staticBefore?: boolean;
   /** When `true` the engine paused after the task completed, via `pauseAt.after`. */
   readonly staticAfter?: boolean;
+  /**
+   * Ordered resume values ALREADY delivered to this node's earlier
+   * `pause()` calls (WF-2). On resume the body re-executes from the
+   * top: these replay by index, and the new directive value lands at
+   * the next cursor.
+   */
+  readonly satisfied?: ReadonlyArray<unknown>;
 }
 
 /**
@@ -312,6 +319,12 @@ export interface Workflow<
     directive?: Directive,
     opts?: WorkflowResumeOptions,
   ): AsyncIterable<WorkflowEvent<TState>>;
+  /**
+   * Restart a `'failed'` thread from its last failure checkpoint
+   * (WF-3/WF-6): successful sibling tasks of the failed step replay
+   * from their persisted pending writes; only the failed work re-runs.
+   */
+  retry(threadId: string, opts?: WorkflowResumeOptions): AsyncIterable<WorkflowEvent<TState>>;
   getState(threadId: string): Promise<WorkflowState<TState>>;
   listCheckpoints(threadId: string): Promise<ReadonlyArray<import('@graphorin/core').Checkpoint>>;
   fork(threadId: string, fromCheckpointId: CheckpointId): Promise<{ readonly newThreadId: string }>;

@@ -28,7 +28,9 @@ export type WorkflowErrorCode =
   | 'workflow-cancel-timeout'
   | 'node-execution-failed'
   | 'reducer-failed'
-  | 'state-validation-failed';
+  | 'state-validation-failed'
+  | 'dead-end'
+  | 'state-not-serializable';
 
 /**
  * Base error class for all `@graphorin/workflow` failures.
@@ -187,6 +189,73 @@ export class NodeExecutionError extends WorkflowError {
     super('node-execution-failed', `node "${nodeName}" failed during execution`, { cause });
     this.name = 'NodeExecutionError';
     this.nodeName = nodeName;
+  }
+}
+
+/**
+ * Thrown when a checkpoint write detects that another writer advanced
+ * the thread concurrently (WF-12) — the loser must not fork the
+ * timeline.
+ */
+export class CheckpointVersionConflictError extends WorkflowError {
+  readonly threadId: string;
+  readonly expectedParentId: string;
+  readonly actualLatestId: string;
+
+  constructor(threadId: string, expectedParentId: string, actualLatestId: string) {
+    super(
+      'checkpoint-version-conflict',
+      `thread "${threadId}" advanced concurrently — expected latest checkpoint "${expectedParentId}" but found "${actualLatestId}"`,
+      { hint: 'another resume/run of this thread won the race; re-read state before retrying' },
+    );
+    this.name = 'CheckpointVersionConflictError';
+    this.threadId = threadId;
+    this.expectedParentId = expectedParentId;
+    this.actualLatestId = actualLatestId;
+  }
+}
+
+/**
+ * Thrown when planning stalls with no runnable tasks and no satisfied
+ * END edge (WF-14) — an all-false conditional fan is an error, not a
+ * silent completion.
+ */
+export class DeadEndError extends WorkflowError {
+  readonly workflowName: string;
+  readonly stalledNodes: ReadonlyArray<string>;
+
+  constructor(workflowName: string, stalledNodes: ReadonlyArray<string>) {
+    super(
+      'dead-end',
+      `workflow "${workflowName}" dead-ended: node(s) ${stalledNodes.map((n) => `"${n}"`).join(', ')} completed but no outgoing edge fired and no __end__ edge is satisfied`,
+      { hint: 'add an unconditional fallback edge or an edge to __end__ covering this state' },
+    );
+    this.name = 'DeadEndError';
+    this.workflowName = workflowName;
+    this.stalledNodes = stalledNodes;
+  }
+}
+
+/**
+ * Thrown at checkpoint time when a channel value would not survive a
+ * JSON round-trip (WF-10) — Map/Set/Date/class instances silently
+ * degrade with the SQLite store, so every store rejects them eagerly.
+ */
+export class StateNotSerializableError extends WorkflowError {
+  readonly channel: string;
+  readonly path: string;
+
+  constructor(channel: string, path: string, kind: string) {
+    super(
+      'state-not-serializable',
+      `channel "${channel}" holds a non-JSON-safe value (${kind} at ${path}) — checkpoint state must survive a JSON round-trip`,
+      {
+        hint: 'store plain objects/arrays/primitives in workflow state; convert Map/Set/Date to JSON-safe shapes before writing the channel',
+      },
+    );
+    this.name = 'StateNotSerializableError';
+    this.channel = channel;
+    this.path = path;
   }
 }
 
