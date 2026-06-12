@@ -133,6 +133,12 @@ Some providers expose internal reasoning content (extended thinking, scratch pad
 
 Handoffs always strip reasoning — `filters.stripReasoning()` is unconditional at the boundary.
 
+## Request timeouts & structured output
+
+The HTTP adapters (Ollama, OpenAI-compatible, `llama.cpp` server) apply a **default time-to-response timeout of 120 s** per request (PS-24): a hung server that never answers surfaces as a retryable `ProviderHttpError` ("request timed out…") instead of stalling `generate()` forever. The timer is scoped to the response headers — once the server starts answering, a long streaming body is never killed. Override per adapter with `timeoutMs` (`0` disables); the caller's `signal` always composes.
+
+The same adapters now consume `ProviderRequest.outputType` (set by the agent's `outputType` config and the memory pipelines): a structured request maps to OpenAI-shaped `response_format` (`json_schema` when `outputType.jsonSchema` is supplied, `json_object` otherwise) and to Ollama's native `format` field. The mapping is gated on the adapter's `capabilities.structuredOutput` — override it to `false` for servers that reject `response_format`.
+
 ## Adapters at a glance
 
 ### Vercel AI SDK

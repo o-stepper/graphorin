@@ -16,12 +16,14 @@ import type {
   Sensitivity,
   Usage,
 } from '@graphorin/core';
+import { ProviderHttpError } from '@graphorin/provider/errors';
 import { applyReasoningPolicy, resolveReasoningRetention } from '@graphorin/provider/reasoning';
-
 import {
+  type LlamaChatSessionPeer,
   type LlamaCppNodeRuntimeOverrides,
   type LlamaModelInstance,
   type LlamaSessionInstance,
+  loadLlamaChatSessionCtor,
   loadLlamaModule,
 } from './runtime.js';
 
@@ -67,8 +69,12 @@ export interface LlamaCppNodeAdapterOptions {
    */
   readonly modelOverride?: LlamaModelInstance;
   /**
-   * Optional session factory override. When unset, the adapter calls
-   * the runtime's `createSession(...)`.
+   * Optional session factory override. When unset, the adapter builds a
+   * real session from the peer (PS-3): `model.createContext()` →
+   * `new LlamaChatSession({ contextSequence })`, streaming through
+   * `prompt(text, { onTextChunk })`. Overrides
+   * (`runtimeOverrides.createSession` or this option) keep the test
+   * seam.
    */
   readonly sessionFactory?: (
     model: LlamaModelInstance,
@@ -116,7 +122,9 @@ export function llamaCppNodeAdapter(options: LlamaCppNodeAdapterOptions): Provid
     return resolving;
   };
   const sessionFactory =
-    options.sessionFactory ?? options.runtimeOverrides?.createSession ?? defaultSessionFactory;
+    options.sessionFactory ??
+    options.runtimeOverrides?.createSession ??
+    ((model: LlamaModelInstance, system?: string) => defaultSessionFactory(model, system, options));
   return {
     name: providerName,
     modelId: options.modelPath,
@@ -142,12 +150,24 @@ export function llamaCppNodeAdapter(options: LlamaCppNodeAdapterOptions): Provid
       const collected: string[] = [];
       let usage: Usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
       let finishReason: ProviderResponse['finishReason'] = 'stop';
+      let streamError: { message: string } | undefined;
       for await (const event of events) {
         if (event.type === 'text-delta') collected.push(event.delta);
+        if (event.type === 'error') streamError = event.error;
         if (event.type === 'finish') {
           usage = event.usage;
           finishReason = event.finishReason;
         }
+      }
+      // PS-4: a swallowed mid-stream error returned truncated text
+      // indistinguishable from success — and a never-throwing
+      // generate() bypasses withRetry / withFallback entirely.
+      if (streamError !== undefined) {
+        throw new ProviderHttpError({
+          providerName,
+          status: 0,
+          message: streamError.message,
+        });
       }
       return {
         text: collected.join(''),
@@ -197,6 +217,7 @@ async function* streamLlamaCppNode(
     },
   };
   let completionTokens = 0;
+  let errored = false;
   try {
     const streamOptions: { signal?: AbortSignal; maxTokens?: number; temperature?: number } = {};
     if (req.signal !== undefined) streamOptions.signal = req.signal;
@@ -209,11 +230,14 @@ async function* streamLlamaCppNode(
       if (req.signal?.aborted) break;
     }
   } catch (err) {
+    errored = true;
     yield { type: 'error', error: { kind: 'unknown', message: (err as Error).message } };
   }
   yield {
     type: 'finish',
-    finishReason: 'stop',
+    // PS-4: a mid-stream failure must not masquerade as a clean stop —
+    // partial text would be indistinguishable from success.
+    finishReason: errored ? 'error' : 'stop',
     usage: {
       promptTokens,
       completionTokens,
@@ -230,13 +254,100 @@ async function resolveModel(options: LlamaCppNodeAdapterOptions): Promise<LlamaM
   });
 }
 
-function defaultSessionFactory(_model: LlamaModelInstance): Promise<LlamaSessionInstance> {
-  return Promise.reject(
-    new Error(
-      '[graphorin/provider-llamacpp-node] no sessionFactory configured. ' +
-        'Pass one explicitly or supply runtimeOverrides.createSession.',
-    ),
+/**
+ * The REAL default session factory (PS-3): `model.createContext()` →
+ * `context.getSequence()` → `new LlamaChatSession({ contextSequence })`
+ * from the lazily-loaded peer, adapting its callback-streaming
+ * `prompt(text, { onTextChunk })` to the adapter's
+ * `promptStreamingResponse` AsyncIterable contract.
+ */
+async function defaultSessionFactory(
+  model: LlamaModelInstance,
+  system: string | undefined,
+  options: LlamaCppNodeAdapterOptions,
+): Promise<LlamaSessionInstance> {
+  const ChatSession = await loadLlamaChatSessionCtor(options.runtimeOverrides);
+  const context = await model.createContext(
+    options.contextSize !== undefined ? { contextSize: options.contextSize } : undefined,
   );
+  const sequence = context.getSequence();
+  const session = new ChatSession({
+    contextSequence: sequence,
+    ...(system !== undefined ? { systemPrompt: system } : {}),
+  });
+  return {
+    promptStreamingResponse(prompt, streamOptions) {
+      return promptToIterable(session, prompt, streamOptions);
+    },
+  };
+}
+
+/**
+ * Bridge the peer's callback-streaming `prompt(...)` into the
+ * AsyncIterable the adapter consumes. A rejection from `prompt`
+ * rejects the pending/next iteration so the stream's error path
+ * (PS-4) observes it.
+ */
+function promptToIterable(
+  session: LlamaChatSessionPeer,
+  prompt: string,
+  streamOptions?: {
+    readonly signal?: AbortSignal;
+    readonly maxTokens?: number;
+    readonly temperature?: number;
+  },
+): AsyncIterable<string> {
+  const queue: string[] = [];
+  let done = false;
+  let failure: unknown;
+  let wake: (() => void) | null = null;
+  const notify = (): void => {
+    if (wake !== null) {
+      const w = wake;
+      wake = null;
+      w();
+    }
+  };
+  void session
+    .prompt(prompt, {
+      ...(streamOptions?.signal !== undefined ? { signal: streamOptions.signal } : {}),
+      ...(streamOptions?.maxTokens !== undefined ? { maxTokens: streamOptions.maxTokens } : {}),
+      ...(streamOptions?.temperature !== undefined
+        ? { temperature: streamOptions.temperature }
+        : {}),
+      onTextChunk: (chunk: string) => {
+        if (typeof chunk === 'string' && chunk.length > 0) queue.push(chunk);
+        notify();
+      },
+    })
+    .then(
+      () => {
+        done = true;
+        notify();
+      },
+      (err: unknown) => {
+        failure = err instanceof Error ? err : new Error(String(err));
+        done = true;
+        notify();
+      },
+    );
+  return {
+    [Symbol.asyncIterator](): AsyncIterator<string> {
+      return {
+        async next(): Promise<IteratorResult<string>> {
+          for (;;) {
+            const head = queue.shift();
+            if (head !== undefined) return { done: false, value: head };
+            if (failure !== undefined) throw failure;
+            if (done) return { done: true, value: undefined };
+            await new Promise<void>((resolve) => {
+              wake = resolve;
+            });
+          }
+        },
+      };
+    },
+  };
 }
 
 function renderPrompt(req: ProviderRequest): string {

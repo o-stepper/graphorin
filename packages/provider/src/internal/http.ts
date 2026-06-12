@@ -74,6 +74,17 @@ function flattenContent(parts: ReadonlyArray<unknown>): string {
  *
  * @internal
  */
+/**
+ * Default per-request timeout for the baseUrl adapters (PS-24). Scoped
+ * to time-to-response (headers): the timer is cleared the moment the
+ * server answers, so long streaming bodies are never killed — only a
+ * hung server that never responds. Generous because a cold local
+ * llama-server can take tens of seconds to load a model.
+ *
+ * @stable
+ */
+export const DEFAULT_REQUEST_TIMEOUT_MS = 120_000;
+
 export async function callJsonHttp(args: {
   readonly providerName: string;
   readonly url: string;
@@ -81,23 +92,46 @@ export async function callJsonHttp(args: {
   readonly body: unknown;
   readonly signal?: AbortSignal;
   readonly fetchImpl?: typeof fetch;
+  /**
+   * Time-to-response budget (PS-24). Default
+   * {@link DEFAULT_REQUEST_TIMEOUT_MS}; `0` disables.
+   */
+  readonly timeoutMs?: number;
 }): Promise<Response> {
   const fetchImpl = args.fetchImpl ?? globalThis.fetch.bind(globalThis);
+  const timeoutMs = args.timeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS;
+  const timeoutCtl = timeoutMs > 0 ? new AbortController() : undefined;
+  const timer =
+    timeoutCtl !== undefined ? setTimeout(() => timeoutCtl.abort(), timeoutMs) : undefined;
+  const signal =
+    args.signal !== undefined && timeoutCtl !== undefined
+      ? AbortSignal.any([args.signal, timeoutCtl.signal])
+      : (args.signal ?? timeoutCtl?.signal);
   let resp: Response;
   try {
     resp = await fetchImpl(args.url, {
       method: 'POST',
       headers: args.headers,
       body: JSON.stringify(args.body),
-      ...(args.signal !== undefined ? { signal: args.signal } : {}),
+      ...(signal !== undefined ? { signal } : {}),
     });
   } catch (cause) {
+    if (timeoutCtl?.signal.aborted === true && args.signal?.aborted !== true) {
+      throw new ProviderHttpError({
+        providerName: args.providerName,
+        status: 0,
+        message: `request timed out after ${timeoutMs}ms reaching ${args.url}`,
+        cause,
+      });
+    }
     throw new ProviderHttpError({
       providerName: args.providerName,
       status: 0,
       message: `network error reaching ${args.url}`,
       cause,
     });
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
   }
   if (!resp.ok) {
     const detail = await safeReadText(resp);
