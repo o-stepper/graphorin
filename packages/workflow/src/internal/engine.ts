@@ -104,6 +104,26 @@ export function namespaceFor(config: { readonly name: string }): string {
   return `workflow/${config.name}`;
 }
 
+let warnedLegacyAsyncDurability = false;
+
+/**
+ * WF-7: `'async'` was removed from {@link DurabilityMode} — it was
+ * byte-identical to `'sync'`. Legacy JS callers that still pass it get
+ * `'sync'` behaviour and a one-time warning instead of a crash.
+ */
+function normalizeDurability(mode: DurabilityMode | undefined): DurabilityMode {
+  if ((mode as string) === 'async') {
+    if (!warnedLegacyAsyncDurability) {
+      warnedLegacyAsyncDurability = true;
+      process.stderr.write(
+        "[graphorin/workflow] durability 'async' was removed (it was identical to 'sync'); running with 'sync'. Update the config.\n",
+      );
+    }
+    return 'sync';
+  }
+  return mode ?? 'sync';
+}
+
 const DEFAULT_MAX_STEPS = 200;
 const DEFAULT_CANCEL_GRACE_MS = 100;
 
@@ -151,7 +171,7 @@ export async function* runEngine<TState extends object, TInput extends Partial<T
   const tracer = config.tracer;
   const channels = config.channels as Readonly<Record<string, Channel<unknown>>>;
   const namespace = namespaceFor(config);
-  const durability = opts.durability ?? config.durability ?? 'sync';
+  const durability = normalizeDurability(opts.durability ?? config.durability);
 
   const initialState = buildInitialState<TState>({
     channels,
@@ -217,7 +237,7 @@ export async function* resumeEngine<TState extends object>(
   const tracer = config.tracer;
   const channels = config.channels as Readonly<Record<string, Channel<unknown>>>;
   const namespace = namespaceFor(config);
-  const durability = opts.durability ?? config.durability ?? 'sync';
+  const durability = normalizeDurability(opts.durability ?? config.durability);
   const mode = opts.mode ?? 'resume';
   const lock = opts.resumeLock;
 

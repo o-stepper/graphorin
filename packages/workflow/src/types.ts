@@ -45,9 +45,16 @@ export const TASKS_CHANNEL = '__graphorin_tasks__' as const;
 /**
  * Allowed durability modes for the checkpoint writer.
  *
+ * WF-7: the advertised `'async'` mode was byte-identical to `'sync'`
+ * (both awaited the same put), so it was removed rather than shipped
+ * as a fake third behaviour — a fire-and-forget writer would conflict
+ * with the WF-12 compare-and-set guard and the WF-8 only-report-real-
+ * writes contract. The runtime still coerces a legacy `'async'` input
+ * to `'sync'` with a one-time warning.
+ *
  * @stable
  */
-export type DurabilityMode = 'sync' | 'async' | 'exit';
+export type DurabilityMode = 'sync' | 'exit';
 
 /**
  * Stream emission modes accepted by `workflow.execute(input, { stream })`.
@@ -119,7 +126,7 @@ export interface WorkflowExecuteOptions {
   readonly signal?: AbortSignal;
   /**
    * Override the durability mode declared at workflow construction time.
-   * Useful for one-off `async` runs in tests.
+   * Useful for one-off `'exit'` runs in tests.
    */
   readonly durability?: DurabilityMode;
 }

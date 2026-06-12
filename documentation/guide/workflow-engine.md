@@ -138,7 +138,7 @@ Checkpoint state must survive a JSON round-trip and this is enforced identically
 
 ### Durability modes
 
-`durability: 'sync' | 'async'` persist every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) — under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked.
+`durability: 'sync'` persists every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) — under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked. (The former `'async'` mode was removed: it was byte-identical to `'sync'`; a legacy `'async'` input is coerced to `'sync'` with a one-time warning.)
 
 ## Synchronous-step semantics
 
