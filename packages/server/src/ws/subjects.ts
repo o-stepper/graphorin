@@ -35,6 +35,11 @@ export type ParsedSubject =
       readonly runId: string;
     }
   | { readonly kind: 'workflow-events'; readonly workflowId: string }
+  | {
+      readonly kind: 'workflow-run-events';
+      readonly workflowId: string;
+      readonly runId: string;
+    }
   | { readonly kind: 'memory-conflicts' }
   | { readonly kind: 'audit-events' };
 
@@ -54,6 +59,7 @@ const SESSION_EVENTS = /^session:([A-Za-z0-9_-]+)\/events$/;
 const SESSION_RUN_EVENTS = /^session:([A-Za-z0-9_-]+)\/runs\/([A-Za-z0-9_-]+)\/events$/;
 const AGENT_RUN_EVENTS = /^agent:([A-Za-z0-9_-]+)\/runs\/([A-Za-z0-9_-]+)\/events$/;
 const WORKFLOW_EVENTS = /^workflow:([A-Za-z0-9_-]+)\/events$/;
+const WORKFLOW_RUN_EVENTS = /^workflow:([A-Za-z0-9_-]+)\/runs\/([A-Za-z0-9_-]+)\/events$/;
 
 /**
  * Parse a subject string into the {@link ParsedSubject} discriminator.
@@ -91,6 +97,13 @@ export function tryParseSubject(raw: string): ParseSubjectResult {
   if (m !== null) {
     return { ok: true, subject: { kind: 'session-events', sessionId: m[1] ?? '' } };
   }
+  m = raw.match(WORKFLOW_RUN_EVENTS);
+  if (m !== null) {
+    return {
+      ok: true,
+      subject: { kind: 'workflow-run-events', workflowId: m[1] ?? '', runId: m[2] ?? '' },
+    };
+  }
   m = raw.match(WORKFLOW_EVENTS);
   if (m !== null) {
     return { ok: true, subject: { kind: 'workflow-events', workflowId: m[1] ?? '' } };
@@ -115,6 +128,8 @@ export function requiredScopeFor(subject: ParsedSubject): ParsedScope {
     case 'agent-run-events':
       return parseScope(`agents:read:${subject.agentId}`);
     case 'workflow-events':
+      return parseScope(`workflows:read:${subject.workflowId}`);
+    case 'workflow-run-events':
       return parseScope(`workflows:read:${subject.workflowId}`);
     case 'memory-conflicts':
       return parseScope('memory:read');

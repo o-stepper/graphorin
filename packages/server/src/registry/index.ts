@@ -28,6 +28,20 @@ export interface ServerAgentLike {
       readonly userId?: string;
     },
   ): Promise<unknown>;
+  /**
+   * Streaming surface (IP-2). `@graphorin/agent` agents satisfy this
+   * structurally; `POST /agents/:id/stream` consumes it and emits
+   * every event onto the run's WS subject. Optional so plain
+   * run-only fixtures keep working (they emit a single terminal frame).
+   */
+  stream?(
+    input: unknown,
+    options?: {
+      readonly signal?: AbortSignal;
+      readonly sessionId?: string;
+      readonly userId?: string;
+    },
+  ): AsyncIterable<unknown>;
 }
 
 /**

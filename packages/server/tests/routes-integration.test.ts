@@ -312,11 +312,18 @@ describe('REST integration — happy + error paths', () => {
     const body = (await res.json()) as {
       runId: string;
       status: string;
-      subscribe: { websocket: string; sse: string };
+      subscribe: { websocket: string; sse?: string };
     };
-    expect(body.status).toBe('pending');
+    // IP-2: the run actually starts now ('running', not a forever-
+    // 'pending' declaration) and the 202 no longer advertises the
+    // never-mounted SSE URL.
+    expect(body.status).toBe('running');
     expect(body.subscribe.websocket).toContain('agent:echo/runs/');
-    expect(body.subscribe.sse).toContain('/v1/runs/');
+    expect(body.subscribe.sse).toBeUndefined();
+    // The background run completes (run-only registry entry).
+    await new Promise((r) => setTimeout(r, 20));
+    const snap = server?.runs.snapshot(body.runId);
+    expect(snap?.status).toBe('completed');
   });
 
   it('GET /v1/runs/:runId/state returns a terminal snapshot for a completed run', async () => {

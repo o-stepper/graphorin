@@ -41,6 +41,12 @@ import type { WsDispatcher } from '../ws/dispatcher.js';
  * @stable
  */
 export interface SseRoutesDeps {
+  /**
+   * Cap on the per-connection SSE delivery queue (IP-9). A consumer
+   * that stops reading past this many buffered frames is closed
+   * instead of growing the queue without bound. Default 1000.
+   */
+  readonly perConnectionQueueLimit?: number;
   readonly dispatcher: WsDispatcher;
   readonly commentary?: DeliveryCommentaryConfig;
   /**
@@ -71,7 +77,7 @@ export function createSseRoutes(deps: SseRoutesDeps): Hono<{ Variables: ServerVa
   app.get(
     '/:id/events',
     createScopeMiddleware('sessions:read'),
-    sseHandler(deps.dispatcher, sanitizer, keepAliveMs),
+    sseHandler(deps.dispatcher, sanitizer, keepAliveMs, deps.perConnectionQueueLimit ?? 1000),
   );
   return app;
 }
@@ -80,6 +86,7 @@ function sseHandler(
   dispatcher: WsDispatcher,
   sanitizer: DeliveryCommentarySanitizer,
   keepAliveMs: number,
+  perConnectionQueueLimit: number,
 ): MiddlewareHandler<{ Variables: ServerVariables }> {
   return async (c: Context<{ Variables: ServerVariables }>) => {
     const sessionId = c.req.param('id');
@@ -118,6 +125,8 @@ function sseHandler(
       const grantedScopes = authState.kind === 'token' ? authState.grantedScopes : [];
       const tokenId = authState.kind === 'token' ? authState.token.tokenId : 'sse-anon';
       let queue: ServerMessage[] = [];
+      let closedByBackpressure = false;
+      const queueLimit = perConnectionQueueLimit;
       let resumeNotify: (() => void) | undefined;
       const notify = (): void => {
         if (resumeNotify !== undefined) {
@@ -136,6 +145,14 @@ function sseHandler(
         // the `agents:invoke:<sessionId>` grant.
         grantedScopes,
         send: (frame: ServerMessage) => {
+          // IP-9: bound the queue — a stalled consumer is closed, not
+          // buffered into the heap forever.
+          if (queue.length >= queueLimit) {
+            closedByBackpressure = true;
+            queue = [];
+            notify();
+            return;
+          }
           queue.push(frame);
           notify();
         },
@@ -178,6 +195,24 @@ function sseHandler(
       c.req.raw.signal.addEventListener('abort', onAbort, { once: true });
       try {
         while (!aborted) {
+          if (closedByBackpressure) {
+            // IP-9: the consumer stalled past the queue cap — close the
+            // stream with a terminal lifecycle frame instead of
+            // buffering unboundedly.
+            await writer.write(
+              encodeSse({
+                event: 'lifecycle',
+                data: JSON.stringify({
+                  kind: 'lifecycle',
+                  subscriptionId,
+                  status: 'failed',
+                  reason: 'flow.throttled',
+                }),
+              }),
+            );
+            aborted = true;
+            continue;
+          }
           if (queue.length > 0) {
             const next = queue.shift();
             if (next === undefined) continue;

@@ -118,6 +118,13 @@ export async function createWsUpgradeEvents(
         close: (code: number, reason: string) => {
           ws.close(code, reason);
         },
+        // IP-9: surface the socket's real backlog so the dispatcher's
+        // backpressure threshold measures something — the synchronous
+        // outstanding-events counter never accumulates.
+        bufferedAmount: () => {
+          const raw = (ws as { raw?: { bufferedAmount?: number } }).raw;
+          return raw?.bufferedAmount ?? 0;
+        },
       };
       const reg = options.dispatcher.registerSubscriber(handle);
       unregister = reg.unregister;

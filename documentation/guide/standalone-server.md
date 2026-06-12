@@ -44,7 +44,7 @@ Built on [`hono`](https://github.com/honojs/hono) (MIT) and [`@hono/node-server`
 | `GET` | `/v1/agents` | List registered agents. |
 | `GET` | `/v1/agents/:id` | Describe a single agent. |
 | `POST` | `/v1/agents/:id/run` | Run an agent synchronously and return the final output. |
-| `POST` | `/v1/agents/:id/stream` | Start a streaming run; returns `runId` plus subscription metadata for the SSE / WebSocket channel. |
+| `POST` | `/v1/agents/:id/stream` | **Starts the run** and returns `202` with `runId` + the WS subject (`agent:<id>/runs/<runId>/events`) the events are emitted on (IP-2). Subscribe over WebSocket; workflow runs use `workflow:<id>/runs/<runId>/events`. |
 | `GET` | `/v1/runs/:runId/state` | Read the current `RunState`. |
 | `POST` | `/v1/runs/:runId/abort` | Abort a run. |
 | `POST` | `/v1/runs/:runId/resume` | Resume a paused run with a directive (Phase 14a stub today). |
