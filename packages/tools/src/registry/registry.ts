@@ -168,6 +168,26 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
           }
           break;
         }
+        case 'sandbox:advisory-inline': {
+          const key = `sandbox-advisory:${warning.toolName}`;
+          if (!emittedWarnings.has(key)) {
+            emittedWarnings.add(key);
+            incrementCounter('tool.sandbox.advisory.total', { toolName: warning.toolName });
+            emit({
+              action: 'tool:classification:warn',
+              actor: { kind: 'system', id: 'tool-registry' },
+              target: warning.toolName,
+              decision: 'success',
+              ts: Date.now(),
+              metadata: {
+                kind: 'sandbox-policy-advisory-inline',
+                policy: warning.policy,
+                hint: 'inline tools run in-process; real isolation applies to module-loadable (skill/MCP) tools and code-mode',
+              },
+            });
+          }
+          break;
+        }
         case 'classification:idempotency-key-missing': {
           const key = `idem-missing:${warning.toolName}:${warning.sideEffectClass}`;
           if (!emittedWarnings.has(key)) {

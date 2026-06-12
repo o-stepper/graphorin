@@ -12,9 +12,6 @@
  *   `close`) plus the strategy-aware {@link MCPClient.toTools}
  *   adapter that bridges MCP tool descriptors into Graphorin
  *   {@link Tool} records.
- * - The {@link EventStore} contract + the default
- *   {@link InMemoryEventStore} implementation used by the resumable
- *   streaming-session helpers on the Streamable HTTP transport.
  * - The OAuth bridge that resolves bearer headers from the
  *   {@link OAuthAuthorizationProvider} backed by
  *   `@graphorin/security/oauth`.
@@ -31,7 +28,6 @@
  *
  * ```ts
  * import { createMCPClient } from '@graphorin/mcp/client';
- * import { InMemoryEventStore } from '@graphorin/mcp/event-store';
  * import { createOAuthAuthorizationProvider } from '@graphorin/mcp/oauth';
  * import { formatMCPServerName, validateMCPServerConfig } from '@graphorin/mcp/helpers';
  * import { MCPConnectionError } from '@graphorin/mcp/errors';
@@ -46,7 +42,6 @@ export const VERSION = '0.4.0';
 
 export * from './client/index.js';
 export * from './errors/index.js';
-export * from './event-store/index.js';
 export * from './helpers/index.js';
 export * from './oauth/index.js';
 export * from './transport/index.js';

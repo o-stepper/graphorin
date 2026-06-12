@@ -15,7 +15,6 @@ import type {
 } from '@graphorin/core';
 import type { CollisionStrategy } from '@graphorin/tools/registry';
 
-import type { EventStore } from '../event-store/index.js';
 import type { OAuthAuthorizationProvider } from '../oauth/bridge.js';
 import type { MCPTransportConfig, ServerIdentity } from '../transport/types.js';
 
@@ -42,12 +41,6 @@ export interface CreateMCPClientOptions {
   readonly collisionStrategy?: CollisionStrategy;
   /** Per-client priority value used by the `'priority'` strategy. */
   readonly priority?: number;
-  /**
-   * Pluggable {@link EventStore} for resumable Streamable HTTP
-   * sessions. The default is the in-memory store with capacity
-   * `1024`.
-   */
-  readonly eventStore?: EventStore;
   /** Operator-supplied server identity overrides. */
   readonly serverInfoName?: string;
   /** Operator-supplied logger. */
@@ -139,7 +132,12 @@ export type MCPSamplingContent =
 /** A message in a sampling conversation. */
 export interface MCPSamplingMessage {
   readonly role: 'user' | 'assistant';
-  readonly content: MCPSamplingContent;
+  /**
+   * Every content block of the SDK message (MC-13) — previously only
+   * the FIRST block survived, silently dropping e.g. the image in a
+   * text+image message before it reached the operator's handler.
+   */
+  readonly content: ReadonlyArray<MCPSamplingContent>;
 }
 
 /**
@@ -197,6 +195,23 @@ export interface MCPToToolsOptions {
    */
   readonly inboundSanitization?: InboundSanitizationPolicy;
   /**
+   * Per-call timeout (ms) applied to every adapted tool's
+   * `client.callTool` invocation (MC-3/MC-5). Default: the SDK default.
+   */
+  readonly callTimeoutMs?: number;
+  /**
+   * Operator-pinned definition fingerprints by MCP tool name (MC-6) —
+   * the `__definitionHash` stamped on a previously approved snapshot.
+   * A mismatch means the server changed the definition behind the name.
+   */
+  readonly pinnedFingerprints?: Readonly<Record<string, string>>;
+  /**
+   * What to do on a pinned-fingerprint mismatch (MC-6). `'warn'`
+   * (default) audits `mcp.tools.pin-mismatch.total` and continues;
+   * `'reject'` throws `MCPToolPinningError`.
+   */
+  readonly onPinMismatch?: 'warn' | 'reject';
+  /**
    * Per-server `defer_loading` override. When unset and
    * `listTools()` returns more than `deferLoadingThreshold` entries
    * the auto-default flips deferral on for every tool from this
@@ -209,10 +224,6 @@ export interface MCPToToolsOptions {
   readonly maxResultTokens?: number;
   /** Per-server truncation strategy override applied at registration. */
   readonly truncationStrategy?: TruncationStrategy;
-  /** Per-call collision-strategy override. */
-  readonly collisionStrategy?: CollisionStrategy;
-  /** Per-call priority value used by the `'priority'` strategy. */
-  readonly priority?: number;
   /** Tool-name -> per-tool side-effect class override map. */
   readonly sideEffectClassByTool?: Readonly<Record<string, SideEffectClass>>;
   /** Tool-name -> per-tool preferred-model override map. */
@@ -315,9 +326,15 @@ export interface MCPClient {
   /** Per-client priority value used by the `'priority'` strategy. */
   readonly priority?: number;
   /**
-   * Whether the connected server advertises Streamable HTTP session
-   * support (resolved at `initialize` time).
+   * Whether the Streamable HTTP server assigned an `Mcp-Session-Id`
+   * at `initialize` time (MC-9). A session id means stateful routing —
+   * it is NOT a replay guarantee: per the Streamable HTTP spec,
+   * event replay is the SERVER's responsibility, and the SDK
+   * transport already auto-reconnects with `Last-Event-ID` when the
+   * server supports it.
    */
+  readonly sessionIdPresent: boolean;
+  /** @deprecated Alias of {@link sessionIdPresent} — same value, misleading name. */
   readonly resumable: boolean;
 
   listTools(opts?: { signal?: AbortSignal }): Promise<ReadonlyArray<MCPToolDefinition>>;

@@ -209,8 +209,13 @@ interface ResultHandle {
   kind: 'spill-file' | 'resource-link'; // 'resource-link' = an MCP resource_link (see below)
   preview: string; // the bounded slice already inlined in context
   bytes?: number; // size of the full artifact
+  producerTrustClass?: ToolTrustClass; // who produced the stored body (TL-6)
 }
 ```
+
+**Lifecycle (TL-10).** Spill artifacts are run-scoped scratch: the agent deletes a run's directory when the run ends `completed` or `failed`; `awaiting_approval` and `aborted` runs **keep** theirs, so handles survive resume. The default writer also fires one best-effort sweep at construction removing run directories older than 7 days (orphans from crashed processes), and exposes `clear(runId)` / `sweep(ttlMs)` for custom schedules. Custom `SpillWriter`s may omit both and rely on external rotation.
+
+**Taint survives the round-trip (TL-6).** Spill artifacts hold the *raw* body — written before sanitization so non-model consumers keep the full data — and `read_result` is a trusted built-in. To stop an untrusted body laundering to trusted on the way back in, the executor remembers each artifact's **producer trust class** (and readers may report one — the MCP resource reader always reports `'mcp-derived'`): when a handle whose producer is untrusted is read back, the content is **re-sanitized with the producer's policy** (`detect-and-strip-and-wrap`) and the dataflow ledger records the read under the **producer's** trust class, not `read_result`'s own. The producer map is in-memory per executor; handles resumed from a prior process fall back to the reader-reported class.
 
 The agent inlines only `preview` (plus a one-line retrieval hint) — so a multi-megabyte result never enters the context window, **even when the tool returns a structured object** — and auto-registers the built-in **`read_result`** tool whenever at least one registered tool spills. The model then fetches just what it needs, by byte range or by line range:
 
@@ -242,6 +247,10 @@ projection.signatureFor('list_orders'); // `tools.list_orders = (input: {…}) =
 `createCodeExecuteTool({ projection, allowedTools, executeTool })` builds the `code_execute` tool. Its `executeTool` bridge is invoked for each `tools.<name>(args)` call the script makes; the agent wires it to `executor.executeOne(...)`, so a code-mode call is governed exactly like a direct one. `createCodeSearchTool({ projection, searchDeferred })` builds `code_search`, which returns matching signatures on demand.
 
 Execution itself is `runBridgedSource(...)` from `@graphorin/security/sandbox` — a `worker-threads`-tier primitive that evaluates the source as the body of an `async (tools) => { … }` function, exposes `tools` as RPC stubs that round-trip to the host `dispatch`, blocks network/filesystem, enforces a wall-clock timeout + memory ceiling + a tool-call budget, and returns **only** the script's final value. The worker runs with an **empty environment**: it is constructed with `env: {}` and the runtime scrubs `process.env` before the script runs, so host environment variables (API keys, credentials) are never visible to model-written code. The worker can reach the host through nothing but the tool-call channel, and that channel serves only the `allowedTools` names — there is no path to the registry, the executor, or any other host object. As with the `worker-threads` sandbox tier, this is best-effort defence in depth, not a guarantee against process-level mischief by hostile code; layer `isolated-vm` / `docker` underneath when you need V8-grade isolation.
+
+## Execution limits
+
+Inline tools (the `tool({...})` closures the agent runs in-process) are bounded by an **enforced wall-clock timeout** (TL-4): the tier-resolved per-tool `timeoutMs` when set, else `createToolExecutor({ inlineToolTimeoutMs })` (default 60 s; an explicit executor option wins over tier defaults). Expiry fails the call with `ToolError({ kind: 'timeout' })` — the first real producer of that kind — and the run continues; a tool that hangs and ignores `ctx.signal` can no longer block a run indefinitely. Sandbox tiers keep their own per-tier timeouts.
 
 ## Memory-modification guard
 

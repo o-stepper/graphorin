@@ -53,6 +53,7 @@ import {
   observeHistogram,
   type ToolAuditEvent,
 } from '../audit/index.js';
+import { defaultInboundSanitization } from '../builder/trust-class.js';
 import { applyInboundSanitization } from '../inbound/sanitize.js';
 import type { ToolRegistry } from '../registry/registry.js';
 import { splitTextAndContentParts, toResultEnvelope } from '../result/envelope.js';
@@ -171,6 +172,13 @@ export interface ExecutorOptions {
    * same guard composes with code-mode automatically (P1-2).
    */
   readonly dataFlowGuard?: DataFlowGuard;
+  /**
+   * Wall-clock limit applied to INLINE tool execution (TL-4) — the
+   * per-tool sandbox-tier `timeoutMs` wins when resolved > 0. Expiry
+   * fails the call with `ToolError({ kind: 'timeout' })`; the run
+   * continues. Default {@link DEFAULT_INLINE_TOOL_TIMEOUT_MS} (60s).
+   */
+  readonly inlineToolTimeoutMs?: number;
 }
 
 /**
@@ -277,6 +285,29 @@ export interface ToolExecutor {
  *
  * @stable
  */
+/**
+ * Default wall-clock limit for INLINE tool execution (TL-4). Sandbox
+ * tiers carry their own per-tier defaults; inline closures previously
+ * had none — a hanging tool that ignored `ctx.signal` blocked the run
+ * indefinitely.
+ *
+ * @stable
+ */
+export const DEFAULT_INLINE_TOOL_TIMEOUT_MS = 60_000;
+
+/** TL-4: sentinel for the inline wall-clock expiry (maps to kind 'timeout'). */
+class InlineToolTimeoutError extends Error {
+  constructor(readonly limitMs: number) {
+    super(`Tool execution exceeded the ${limitMs}ms wall-clock timeout.`);
+    this.name = 'InlineToolTimeoutError';
+  }
+}
+
+/** TL-6: trust classes whose content must not launder through handle reads. */
+function isUntrustedProducerClass(trustClass: ToolTrustClass): boolean {
+  return defaultInboundSanitization(trustClass) === 'detect-and-strip-and-wrap';
+}
+
 export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
   const maxParallelTools = opts.maxParallelTools ?? 8;
   const emit = opts.emitAudit ?? emitToolAudit;
@@ -288,6 +319,20 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
   // Default spill writer — writes to `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>`
   // with `0600` permissions and tier-aware sensitivity inheritance.
   const spillWriter = opts.spill ?? createDefaultSpillWriter();
+  // TL-6: trust class of the tool that PRODUCED each spill artifact,
+  // keyed by handle URI. Handle reads (read_result) re-apply inbound
+  // sanitization + dataflow provenance by the PRODUCER's class so an
+  // untrusted body cannot launder to trusted through the built-in
+  // reader. In-memory per executor — handles from a resumed prior
+  // process fall back to the reader-reported class (or none).
+  const handleProducerTaint = new Map<
+    string,
+    {
+      readonly trustClass: ToolTrustClass;
+      readonly source: ToolSource;
+      readonly sensitivity?: Sensitivity;
+    }
+  >();
 
   async function executeBatch(
     batch: ExecuteBatchOptions,
@@ -421,11 +466,23 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     // Approval flow.
     if (tool.needsApproval !== undefined) {
-      const ctxForPredicate = await prepareContext(call, tool, runContext, stepNumber, trustLevel);
-      const needsApproval =
-        typeof tool.needsApproval === 'function'
-          ? await tool.needsApproval(ctxForPredicate.input, ctxForPredicate.ctx)
-          : tool.needsApproval;
+      // TL-11: a static `needsApproval: true` needs no context at all;
+      // the function form gets one that is DISPOSED right after the
+      // predicate — previously both forms eagerly built a full per-call
+      // context (sandbox resolve + streaming channel + abort listener)
+      // that was thrown away while its run-signal listener lived on.
+      let needsApproval: boolean;
+      if (typeof tool.needsApproval === 'function') {
+        const predicateCtx = await prepareContext(call, tool, runContext, stepNumber, trustLevel);
+        try {
+          needsApproval = await tool.needsApproval(predicateCtx.input, predicateCtx.ctx);
+        } finally {
+          predicateCtx.channel.abort('finished');
+          predicateCtx.linkedAbort.release();
+        }
+      } else {
+        needsApproval = tool.needsApproval;
+      }
       if (needsApproval) {
         const approval: ToolApproval = {
           toolCallId: call.toolCallId,
@@ -653,6 +710,12 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     // still surfaced on the span and audit row for operator visibility.
     const execStart = performance.now();
     const sandbox = prepared.sandbox.kind !== 'none' ? sandboxResolver(prepared.sandbox) : null;
+    // TL-3: operators alert on declared-but-not-enforced isolation. For
+    // kind 'none', in-process IS the policy (enforced by definition);
+    // for any other kind, enforcement means a real sandbox dispatcher.
+    span.setAttributes({
+      'graphorin.tool.sandbox.enforced': prepared.sandbox.kind === 'none' || sandbox !== null,
+    });
     let rawResult: unknown;
     let executeError: unknown;
     try {
@@ -691,21 +754,49 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           executeError = new Error(`[sandbox:${sandbox.id}] ${errInfo.kind}: ${errInfo.message}`);
         }
       } else {
-        rawResult = await withSecretsScope({
-          tool,
-          runContext,
-          fn: () =>
-            raceWithCancellation(
-              () => tool.execute(validatedInput as never, ctx),
-              linkedAbort.signal,
-              cancellationGraceMs,
-            ),
-        });
+        // TL-4: inline closures get an enforced wall-clock limit — the
+        // tier-resolved per-tool timeout when set, else the executor
+        // default. A tool that hangs and ignores `ctx.signal` fails with
+        // kind 'timeout' instead of blocking the run forever.
+        const inlineLimitMs =
+          opts.inlineToolTimeoutMs !== undefined
+            ? opts.inlineToolTimeoutMs
+            : prepared.sandbox.timeoutMs > 0
+              ? prepared.sandbox.timeoutMs
+              : DEFAULT_INLINE_TOOL_TIMEOUT_MS;
+        span.setAttributes({ 'graphorin.tool.inline_timeout_ms': inlineLimitMs });
+        let inlineTimer: NodeJS.Timeout | undefined;
+        try {
+          rawResult = await Promise.race([
+            withSecretsScope({
+              tool,
+              runContext,
+              fn: () =>
+                raceWithCancellation(
+                  () => tool.execute(validatedInput as never, ctx),
+                  linkedAbort.signal,
+                  cancellationGraceMs,
+                ),
+            }),
+            new Promise<never>((_, reject) => {
+              inlineTimer = setTimeout(
+                () => reject(new InlineToolTimeoutError(inlineLimitMs)),
+                inlineLimitMs,
+              );
+            }),
+          ]);
+        } finally {
+          if (inlineTimer !== undefined) clearTimeout(inlineTimer);
+        }
       }
     } catch (caught) {
       executeError = caught;
     } finally {
       channel.abort('finished');
+      // TL-11: detach the per-call linked signal — without this every
+      // settled call left one listener on the run signal for the rest
+      // of the run (MaxListeners warnings on long gated runs).
+      linkedAbort.release();
     }
 
     const aggregator = channel.snapshot();
@@ -756,7 +847,11 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     if (executeError !== undefined) {
       const cancelled = linkedAbort.signal.aborted;
-      const kind: ToolErrorKind = cancelled ? 'aborted' : 'execution_failed';
+      const kind: ToolErrorKind = cancelled
+        ? 'aborted'
+        : executeError instanceof InlineToolTimeoutError
+          ? 'timeout'
+          : 'execution_failed';
       const partialOutput =
         aggregator.chunks.length > 0
           ? toResultEnvelope({ raw: undefined, chunks: aggregator.chunks }).output
@@ -919,11 +1014,64 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       });
     }
 
+    // TL-6: a handle read returns content PRODUCED by an earlier tool —
+    // sanitize and record provenance by the PRODUCER's trust class, not
+    // the reader's own (read_result is a trusted built-in; without this
+    // an untrusted spill laundered to trusted on the way back in).
+    const readHandle =
+      typeof (call.args as { readonly handle?: unknown } | null | undefined)?.handle === 'string'
+        ? (call.args as { readonly handle: string }).handle
+        : undefined;
+    const mappedTaint = readHandle !== undefined ? handleProducerTaint.get(readHandle) : undefined;
+    const readerReportedClass =
+      typeof (envelope.output as { readonly producerTrustClass?: unknown } | null | undefined)
+        ?.producerTrustClass === 'string'
+        ? ((envelope.output as { readonly producerTrustClass: string })
+            .producerTrustClass as ToolTrustClass)
+        : undefined;
+    const producerTaint =
+      mappedTaint !== undefined && isUntrustedProducerClass(mappedTaint.trustClass)
+        ? mappedTaint
+        : readerReportedClass !== undefined && isUntrustedProducerClass(readerReportedClass)
+          ? { trustClass: readerReportedClass, source: tool.__source }
+          : undefined;
+    const effectiveTrustClass = producerTaint?.trustClass ?? tool.__trustClass;
+    const effectiveSource = producerTaint?.source ?? tool.__source;
+    const effectiveSensitivity = producerTaint?.sensitivity ?? tool.sensitivity;
+
+    // TL-6: object outputs bypass `wrapOutput` untouched (WI-10), so for
+    // a tainted handle read the `content` string field is defanged
+    // in place — that is the channel the model actually reads.
+    let effectiveOutput = envelope.output;
+    if (
+      producerTaint !== undefined &&
+      typeof effectiveOutput === 'object' &&
+      effectiveOutput !== null &&
+      typeof (effectiveOutput as { readonly content?: unknown }).content === 'string'
+    ) {
+      const contentSanitization = applyInboundSanitization({
+        body: (effectiveOutput as { readonly content: string }).content,
+        policy: defaultInboundSanitization(effectiveTrustClass),
+        trustClass: effectiveTrustClass,
+        toolName: tool.name,
+        ...(opts.imperativePatterns !== undefined ? { patterns: opts.imperativePatterns } : {}),
+        ...(opts.imperativeBudgetMs !== undefined ? { budgetMs: opts.imperativeBudgetMs } : {}),
+      });
+      effectiveOutput = { ...(effectiveOutput as object), content: contentSanitization.body };
+    }
+
     // Inbound sanitization.
     const sanitization = applyInboundSanitization({
       body: truncation.body,
-      policy: tool.inboundSanitization ?? 'pass-through',
-      trustClass: tool.__trustClass,
+      // When producer taint fired, the producer-class default (always
+      // 'detect-and-strip-and-wrap' — taint only fires for untrusted
+      // classes) overrides the reader's own baked policy: the reader was
+      // classified for ITS provenance, not for the content it relays.
+      policy:
+        producerTaint !== undefined
+          ? defaultInboundSanitization(effectiveTrustClass)
+          : (tool.inboundSanitization ?? 'pass-through'),
+      trustClass: effectiveTrustClass,
       toolName: tool.name,
       ...(tool.failClosed === true ? { failClosed: true } : {}),
       ...(opts.imperativePatterns !== undefined ? { patterns: opts.imperativePatterns } : {}),
@@ -992,7 +1140,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       'graphorin.tool.inbound.sanitization.patterns_hit_count': sanitization.patternsHit.length,
     });
 
-    const sanitizedOutput = wrapOutput(envelope.output, sanitization.body, split.text);
+    const sanitizedOutput = wrapOutput(effectiveOutput, sanitization.body, split.text);
     const result: ToolResult = {
       toolCallId: call.toolCallId,
       toolName: tool.name,
@@ -1011,6 +1159,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
               uri: truncation.resultHandle,
               kind: 'spill-file' as const,
               preview: sanitization.body,
+              producerTrustClass: effectiveTrustClass,
               ...(truncation.artifactBytes !== undefined
                 ? { bytes: truncation.artifactBytes }
                 : {}),
@@ -1018,15 +1167,25 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           }
         : {}),
     };
+    if (truncation.resultHandle !== undefined) {
+      // TL-6: remember who produced this artifact so a later read
+      // re-applies the producer's taint (effective values chain taint
+      // across re-spills of handle reads too).
+      handleProducerTaint.set(truncation.resultHandle, {
+        trustClass: effectiveTrustClass,
+        source: effectiveSource,
+        ...(effectiveSensitivity !== undefined ? { sensitivity: effectiveSensitivity } : {}),
+      });
+    }
     // Record this output's provenance so later sink gates can detect
     // untrusted-to-sink flows (WI-12 / P1-3). Uses the sanitized text the
     // model will actually see — that is the only content it can forward.
     if (opts.dataFlowGuard !== undefined) {
       opts.dataFlowGuard.record({
         toolName: tool.name,
-        trustClass: tool.__trustClass,
-        ...(tool.sensitivity !== undefined ? { sensitivity: tool.sensitivity } : {}),
-        source: tool.__source,
+        trustClass: effectiveTrustClass,
+        ...(effectiveSensitivity !== undefined ? { sensitivity: effectiveSensitivity } : {}),
+        source: effectiveSource,
         outputText: sanitization.body,
         runContext,
       });
@@ -1200,15 +1359,19 @@ function mapSandboxPolicy(
 function linkSignal(parent: AbortSignal): {
   readonly signal: AbortSignal;
   readonly abort: () => void;
+  /** TL-11: detach from the parent — settled calls must not accumulate listeners. */
+  readonly release: () => void;
 } {
   const ac = new AbortController();
+  let release: () => void = () => {};
   if (parent.aborted) {
     ac.abort();
   } else {
     const onAbort = (): void => ac.abort();
     parent.addEventListener('abort', onAbort, { once: true });
+    release = () => parent.removeEventListener('abort', onAbort);
   }
-  return { signal: ac.signal, abort: () => ac.abort() };
+  return { signal: ac.signal, abort: () => ac.abort(), release };
 }
 
 async function raceWithCancellation<T>(

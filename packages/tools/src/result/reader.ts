@@ -56,6 +56,13 @@ export interface ResultReadOutcome {
   readonly totalBytes: number;
   /** `true` when {@link content} reaches the end of the artifact (no more to read). */
   readonly eof: boolean;
+  /**
+   * Trust class of the producer of the resolved artifact, when the
+   * reader knows it (TL-6) — e.g. the MCP resource reader always
+   * reports `'mcp-derived'`. The executor re-applies inbound
+   * sanitization + dataflow provenance by this class.
+   */
+  readonly producerTrustClass?: import('@graphorin/core').ToolTrustClass;
 }
 
 /**

@@ -71,11 +71,16 @@ export function createMcpResourceReader(opts: McpResourceReaderOptions): ResultR
   };
 }
 
-/** Prefer the text body; fall back to the (base64) blob payload. */
-function resourceBody(content: MCPResourceContent): string {
-  if (content.text !== undefined) return content.text;
-  if (content.blob !== undefined) return content.blob;
-  return '';
+/**
+ * Raw resource bytes (MC-10): text resources as UTF-8, blob resources
+ * DECODED from base64 — slicing/totalBytes operate on real payload
+ * bytes, never on the ~33%-inflated base64 string (whose arbitrary
+ * cuts also break base64 quads).
+ */
+function resourceBytes(content: MCPResourceContent): Buffer {
+  if (content.text !== undefined) return Buffer.from(content.text, 'utf8');
+  if (content.blob !== undefined) return Buffer.from(content.blob, 'base64');
+  return Buffer.alloc(0);
 }
 
 /**
@@ -88,8 +93,8 @@ function sliceResource(
   range: ResultReadRange | undefined,
   defaultMaxBytes: number,
 ): ResultReadOutcome {
-  const full = resourceBody(content);
-  const buf = Buffer.from(full, 'utf8');
+  const buf = resourceBytes(content);
+  const full = buf.toString('utf8');
   const totalBytes = buf.byteLength;
   const cap = Math.max(0, range?.maxBytes ?? defaultMaxBytes);
 
@@ -101,6 +106,10 @@ function sliceResource(
     const capped = Buffer.byteLength(selected, 'utf8') > cap;
     const out = capBytes(selected, cap);
     return Object.freeze({
+      // TL-6: MCP resource content is mcp-derived by definition — the
+      // executor re-applies inbound sanitization + dataflow provenance
+      // by this class when read_result relays it.
+      producerTrustClass: 'mcp-derived' as const,
       content: out,
       bytes: Buffer.byteLength(out, 'utf8'),
       totalBytes,
@@ -114,6 +123,8 @@ function sliceResource(
   const end = Math.min(rawEnd, offset + cap);
   const slice = buf.subarray(offset, end);
   return Object.freeze({
+    // TL-6: MCP resource content is mcp-derived by definition.
+    producerTrustClass: 'mcp-derived' as const,
     content: slice.toString('utf8'),
     bytes: slice.byteLength,
     totalBytes,

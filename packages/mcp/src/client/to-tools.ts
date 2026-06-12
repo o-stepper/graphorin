@@ -35,6 +35,7 @@ import {
   sanitizeDescription,
   warnOnPassthroughOverride,
 } from './inbound-filters.js';
+import { computeToolDefinitionHash } from './pinning.js';
 import type { MCPClient, MCPToolDefinition, MCPToToolsOptions } from './types.js';
 
 // Re-exported for backward compatibility: callers (and tests) import
@@ -56,6 +57,8 @@ export function _resetMcpAdapterDedupForTesting(): void {
 /** Result returned by {@link adaptMCPTools}. */
 export interface AdaptedToolsResult {
   readonly tools: ReadonlyArray<Tool>;
+  /** MC-6: sha256 definition fingerprint per MCP tool name. */
+  readonly fingerprints: ReadonlyMap<string, string>;
   readonly autoDeferralFired: boolean;
   readonly resolvedDeferLoading: boolean;
   readonly resolvedInboundSanitization: InboundSanitizationPolicy;
@@ -80,6 +83,7 @@ export function adaptMCPTools(args: {
   ) => void;
 }): AdaptedToolsResult {
   const opts = args.options ?? {};
+  const fingerprints = new Map<string, string>();
   const filter = opts.filter;
   const namespace = (opts.namespace ?? '').trim();
   const filtered = filter === undefined ? args.catalogue : args.catalogue.filter((t) => filter(t));
@@ -112,10 +116,14 @@ export function adaptMCPTools(args: {
       definition.outputSchema === undefined
         ? undefined
         : buildJsonSchemaValidator(definition.outputSchema as JsonSchemaLike);
+    const definitionHash = computeToolDefinitionHash(definition);
+    fingerprints.set(definition.name, definitionHash);
     tools.push(
       buildAdaptedTool({
         client: args.client,
         serverIdentity: args.serverIdentity,
+        definitionHash,
+        ...(args.logger !== undefined ? { logger: args.logger } : {}),
         mcpToolName: definition.name,
         graphorinToolName: namespacedName,
         description:
@@ -129,6 +137,7 @@ export function adaptMCPTools(args: {
         ...(opts.truncationStrategy === undefined
           ? {}
           : { truncationStrategy: opts.truncationStrategy }),
+        ...(opts.callTimeoutMs === undefined ? {} : { callTimeoutMs: opts.callTimeoutMs }),
         ...(preferredModel === undefined ? {} : { preferredModel }),
       }),
     );
@@ -136,6 +145,7 @@ export function adaptMCPTools(args: {
 
   return Object.freeze({
     tools: Object.freeze(tools),
+    fingerprints,
     autoDeferralFired,
     resolvedDeferLoading,
     resolvedInboundSanitization: resolvedInbound,
@@ -157,6 +167,15 @@ interface BuildAdaptedToolArgs {
   readonly sideEffectClass: import('@graphorin/core').SideEffectClass;
   readonly maxResultTokens?: number;
   readonly truncationStrategy?: import('@graphorin/core').TruncationStrategy;
+  /** Per-call timeout forwarded to `client.callTool` (MC-3/MC-5). */
+  readonly callTimeoutMs?: number;
+  /** MC-6: sha256 fingerprint of the producing MCP definition. */
+  readonly definitionHash: string;
+  readonly logger?: (
+    level: 'debug' | 'info' | 'warn' | 'error',
+    message: string,
+    fields?: Record<string, unknown>,
+  ) => void;
   readonly preferredModel?:
     | import('@graphorin/core').ModelHint
     | import('@graphorin/core').ModelSpec;
@@ -184,17 +203,37 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
       ? {}
       : { truncationStrategy: args.truncationStrategy }),
     ...(args.preferredModel === undefined ? {} : { preferredModel: args.preferredModel }),
-    async execute(input: unknown): Promise<ToolReturn<unknown>> {
-      const result = await args.client.callTool(args.mcpToolName, input);
+    async execute(
+      input: unknown,
+      ctx?: import('@graphorin/core').ToolExecutionContext<unknown>,
+    ): Promise<ToolReturn<unknown>> {
+      // MC-5: the agent's per-call AbortSignal reaches the wire — an
+      // aborted run sends `notifications/cancelled` instead of orphaning
+      // the JSON-RPC request on the server. MC-3: the per-server call
+      // timeout rides along.
+      const result = await args.client.callTool(args.mcpToolName, input, {
+        ...(ctx?.signal !== undefined ? { signal: ctx.signal } : {}),
+        ...(args.callTimeoutMs !== undefined ? { timeoutMs: args.callTimeoutMs } : {}),
+      });
       return adaptCallResult({
         result,
         outputSchema: args.outputSchema,
         serverIdentity: args.serverIdentity,
         toolName: args.graphorinToolName,
+        ...(args.logger !== undefined ? { logger: args.logger } : {}),
       });
     },
   } satisfies Tool<unknown, unknown, unknown>;
-  return tool;
+  // MC-7: pre-stamp the provenance so the agent's inferToolSource —
+  // which honours an existing stamp — classifies tools passed via
+  // `config.tools` as 'mcp-derived' (untrusted for the WI-12 dataflow
+  // policy) instead of first-party. Zero operator boilerplate.
+  return Object.assign(tool, {
+    __source: { kind: 'mcp', serverIdentity: args.serverIdentity.id } as const,
+    // MC-6: operators persist this fingerprint to pin the approved
+    // definition (`toTools({ pinnedFingerprints })`).
+    __definitionHash: args.definitionHash,
+  });
 }
 
 /** Unused export kept for ergonomic test access. */

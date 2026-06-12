@@ -256,7 +256,8 @@ describe('WI-13 — sampling', () => {
     const result = await client.callTool('summarize', {});
     expect(seen?.maxTokens).toBe(128);
     expect(seen?.systemPrompt).toBe('You are concise.');
-    expect(seen?.messages[0]?.content).toEqual({ type: 'text', text: 'Summarize: hello world' });
+    // MC-13: content is now the FULL block array (no silent truncation).
+    expect(seen?.messages[0]?.content).toEqual([{ type: 'text', text: 'Summarize: hello world' }]);
     const text = (result.content[0] as { type: 'text'; text: string }).text;
     expect(text).toContain('model:stub-model-1');
     expect(text).toContain('a terse summary');

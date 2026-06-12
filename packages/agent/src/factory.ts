@@ -250,14 +250,29 @@ function registerCodeMode(
     .filter((entry) => !reservedNames.has(entry.name) && !isApprovalGated(entry));
   if (codeTools.length === 0) return [];
 
-  const allowedTools = codeTools.map((entry) => entry.name);
-  const allowedSet = new Set(allowedTools);
+  // TL-8: gated tools cannot suspend for HITL mid-script, so they are
+  // excluded from the code API — but VISIBLY: they appear in the
+  // catalogue/search with a call-directly marker, and a bridged call
+  // fails with the same hint instead of an opaque unknown-tool error.
+  const approvalGatedTools = registry
+    .list()
+    .filter((entry) => !reservedNames.has(entry.name) && isApprovalGated(entry))
+    .map((entry) => entry.name);
+  const approvalGatedSet = new Set(approvalGatedTools);
+
+  const allowedTools = [...codeTools.map((entry) => entry.name), ...approvalGatedTools];
+  const allowedSet = new Set(codeTools.map((entry) => entry.name));
   const eagerProjectable = codeTools.filter(
     (entry) => entry.__effectiveDeferLoading !== true,
   ) as unknown as ReadonlyArray<ProjectableTool>;
   const projection = projectToolApi(eagerProjectable);
 
   const executeTool: CodeExecuteBridge = async (call, ctx) => {
+    if (approvalGatedSet.has(call.name)) {
+      throw new Error(
+        `${call.name} requires human approval and cannot run inside code_execute — call it directly as a standalone tool call so the run can suspend for the approval.`,
+      );
+    }
     const completed = await quietExecutor.executeOne({
       call: { toolCallId: newId('codecall'), toolName: call.name, args: call.args },
       runContext: ctx.runContext,
@@ -270,10 +285,16 @@ function registerCodeMode(
 
   const codeSearch = createCodeSearchTool({
     projection,
+    approvalGatedTools,
     searchDeferred: async (query, k) =>
       (await registry.searchDeferred(query, k)).filter((match) => allowedSet.has(match.name)),
   });
-  const codeExecute = createCodeExecuteTool({ projection, allowedTools, executeTool });
+  const codeExecute = createCodeExecuteTool({
+    projection,
+    allowedTools,
+    executeTool,
+    approvalGatedTools,
+  });
   registry.register(codeSearch, { kind: 'built-in', subsystem: 'code-mode' });
   registry.register(codeExecute, { kind: 'built-in', subsystem: 'code-mode' });
   return [codeSearch, codeExecute] as ReadonlyArray<Tool<unknown, unknown, unknown>>;
@@ -1329,8 +1350,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     // WI-05: deferred tools promoted by a `tool_search` call this run.
     // Membership grows as the model discovers tools and gates which
-    // deferred entries the per-step catalogue advertises. In-memory per
-    // run — not persisted across a suspend/resume (see changeset).
+    // deferred entries the per-step catalogue advertises. TL-7/AG-19:
+    // persisted onto `RunState.promotedTools` at suspend and rehydrated
+    // below, so a resumed run keeps its discoveries.
     const promotedDeferred = new Set<string>();
     // AG-19: restore deferred tools promoted by `tool_search` before the suspend
     // so they remain in the per-step catalogue after a resume.
@@ -2348,6 +2370,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       pendingManualCompacts.shift()?.resolve(noopCompactionResult('no-active-run'));
     }
     const result = finalize(state, snapshot);
+    // TL-10: spill artifacts are run-scoped scratch — drop them once the
+    // run is terminal. `awaiting_approval` and `aborted` runs keep
+    // theirs (handles must survive resume); orphans fall to the writer's
+    // startup TTL sweep.
+    if (result.status === 'completed' || result.status === 'failed') {
+      await spillWriter.clear?.(result.state.id).catch(() => {});
+    }
     yield { type: 'agent.end', runId: result.state.id, result };
     return result;
   }

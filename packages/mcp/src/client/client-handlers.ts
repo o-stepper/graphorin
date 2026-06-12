@@ -106,7 +106,9 @@ export function registerClientRequestHandlers(
       const samplingRequest: MCPSamplingRequest = {
         messages: p.messages.map((m) => ({
           role: m.role,
-          content: toGraphorinContent(firstContentBlock(m.content)),
+          // MC-13: keep EVERY block — a text+image message must reach the
+          // operator's handler whole, not truncated to its first block.
+          content: contentBlocks(m.content).map((block) => toGraphorinContent(block)),
         })),
         maxTokens: p.maxTokens,
         ...(p.systemPrompt === undefined ? {} : { systemPrompt: p.systemPrompt }),
@@ -140,13 +142,16 @@ export function registerClientRequestHandlers(
   }
 }
 
-/** Narrow an SDK message content (block | block[]) to a single block. */
-function firstContentBlock(content: unknown): { readonly type?: unknown; [k: string]: unknown } {
-  const block = Array.isArray(content) ? content[0] : content;
-  if (block !== null && typeof block === 'object') {
-    return block as { readonly type?: unknown; [k: string]: unknown };
-  }
-  return { type: 'text', text: '' };
+/** Normalise SDK message content (block | block[]) to a block array (MC-13). */
+function contentBlocks(
+  content: unknown,
+): ReadonlyArray<{ readonly type?: unknown; [k: string]: unknown }> {
+  const raw = Array.isArray(content) ? content : [content];
+  const blocks = raw.filter(
+    (b): b is { readonly type?: unknown; [k: string]: unknown } =>
+      b !== null && typeof b === 'object',
+  );
+  return blocks.length > 0 ? blocks : [{ type: 'text', text: '' }];
 }
 
 /** Map an SDK content block to the Graphorin sampling-content union. */

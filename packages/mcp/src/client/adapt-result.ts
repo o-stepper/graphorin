@@ -12,6 +12,7 @@
 
 import type { MessageContent, ToolReturn, ZodLikeSchema } from '@graphorin/core';
 import { incrementCounter } from '@graphorin/tools/audit';
+import { MCPToolExecutionError } from '../errors/index.js';
 import type { ServerIdentity } from '../transport/types.js';
 import type { MCPCallToolResult, MCPContentPart } from './types.js';
 
@@ -21,6 +22,11 @@ export interface AdaptCallResultArgs {
   readonly outputSchema?: ZodLikeSchema<unknown> | undefined;
   readonly serverIdentity: ServerIdentity;
   readonly toolName: string;
+  readonly logger?: (
+    level: 'debug' | 'info' | 'warn' | 'error',
+    message: string,
+    fields?: Record<string, unknown>,
+  ) => void;
 }
 
 /**
@@ -32,6 +38,24 @@ export interface AdaptCallResultArgs {
  */
 export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> {
   const { result, outputSchema, serverIdentity, toolName } = args;
+  // MC-4: the SDK deliberately does NOT throw on isError results — the
+  // failure marker must not launder into a successful ToolReturn. Throw
+  // the typed error so the executor records a real failure; the server's
+  // text rides in the message for model self-correction.
+  if (result.isError === true) {
+    const errorText = (result.content ?? [])
+      .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+      .map((p) => p.text)
+      .join('\n');
+    incrementCounter('mcp.call.tool-error.total', {
+      server: serverIdentity.id,
+      tool: toolName,
+    });
+    throw new MCPToolExecutionError(
+      errorText.length > 0 ? errorText : `MCP tool '${toolName}' reported an error result.`,
+      { metadata: { tool: toolName } },
+    );
+  }
   const contentParts: MessageContent[] = [];
   // `resource_link` parts are NOT inlined: each contributes a compact
   // preview (carrying the `uri` as a result handle) so the model fetches
@@ -51,7 +75,38 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
   const textParts = (result.content ?? []).filter(
     (p): p is { type: 'text'; text: string } => p.type === 'text',
   );
-  const concatenatedText = [...textParts.map((t) => t.text), ...resourceLinkPreviews].join('\n');
+  // MC-8: the typed `output` is the ONLY channel the agent loop
+  // serialises into the tool message — non-text parts must leave a
+  // text trace there (the full payloads stay in `contentParts`), and
+  // embedded resource TEXT joins the concatenation outright.
+  const outputSegments: string[] = [];
+  for (const part of result.content ?? []) {
+    switch (part.type) {
+      case 'text':
+        outputSegments.push(part.text);
+        break;
+      case 'image':
+      case 'audio':
+        outputSegments.push(describeBinaryPart(part.type, part.mimeType, part.data));
+        break;
+      case 'resource': {
+        if (part.resource.text !== undefined) {
+          outputSegments.push(part.resource.text);
+        } else if (part.resource.blob !== undefined) {
+          outputSegments.push(
+            `[resource ${part.resource.uri} ${part.resource.mimeType ?? 'application/octet-stream'}, ~${approxDecodedSize(part.resource.blob)} — full payload in contentParts]`,
+          );
+        } else {
+          outputSegments.push(`Resource ${part.resource.uri}`);
+        }
+        break;
+      }
+      case 'resource_link':
+        // Joined below via the read_result preview.
+        break;
+    }
+  }
+  const concatenatedText = [...outputSegments, ...resourceLinkPreviews].join('\n');
 
   if (result.structuredContent !== undefined) {
     if (outputSchema !== undefined) {
@@ -74,7 +129,23 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
         server: serverIdentity.id,
         tool: toolName,
       });
-      // Fall through to the text mirror path on schema failure.
+      // MC-11: a schema mismatch must not silently drop the payload —
+      // log and mirror the structured content as JSON text, exactly
+      // like the no-schema branch does.
+      args.logger?.(
+        'warn',
+        'mcp.structured-content.validation.failed: payload mirrored as JSON text',
+        { server: serverIdentity.id, tool: toolName },
+      );
+      const fallbackParts = [...contentParts];
+      if (textParts.length === 0) {
+        fallbackParts.push({ type: 'text', text: JSON.stringify(result.structuredContent) });
+      }
+      return Object.freeze({
+        output:
+          concatenatedText.length > 0 ? concatenatedText : JSON.stringify(result.structuredContent),
+        contentParts: Object.freeze(fallbackParts),
+      });
     } else {
       incrementCounter('mcp.structured-content.emitted.total', {
         server: serverIdentity.id,
@@ -150,6 +221,17 @@ function formatResourceLinkPreview(
   const desc =
     part.description === undefined || part.description.length === 0 ? '' : ` — ${part.description}`;
   return `[resource_link] ${label}${metaStr}${desc}\nFetch the full contents on demand with read_result, handle: ${part.uri}`;
+}
+
+/** Human-readable size of a base64 payload's decoded bytes (MC-8). */
+function approxDecodedSize(base64: string): string {
+  const bytes = Math.floor((base64.length * 3) / 4);
+  return bytes >= 1024 ? `${Math.round(bytes / 1024)}kB` : `${bytes}B`;
+}
+
+/** Text descriptor for a non-text content part (MC-8). */
+function describeBinaryPart(kind: 'image' | 'audio', mimeType: string, data: string): string {
+  return `[${kind} ${mimeType}, ~${approxDecodedSize(data)} — full payload in contentParts]`;
 }
 
 function decodeBase64(value: string): Uint8Array {

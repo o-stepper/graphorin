@@ -105,6 +105,19 @@ export interface SpillWriter {
     readonly body: string;
     readonly sensitivityTier?: string;
   }): Promise<{ readonly path: string; readonly bytes: number }>;
+  /**
+   * Remove every artifact of one run (TL-10). The agent calls this when
+   * a run ends `completed`/`failed`; `awaiting_approval` and `aborted`
+   * runs keep theirs (handles must survive resume). Optional — custom
+   * writers without it rely on the TTL sweep / external rotation.
+   */
+  clear?(runId: string): Promise<void>;
+  /**
+   * Remove run directories older than `ttlMs` (TL-10). Returns the
+   * number of run directories removed. The default writer fires one
+   * best-effort sweep at construction (7-day TTL) to collect orphans.
+   */
+  sweep?(ttlMs: number): Promise<number>;
 }
 
 /**

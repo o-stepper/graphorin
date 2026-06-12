@@ -23,12 +23,15 @@ import type { CollisionStrategy } from '@graphorin/tools/registry';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import type { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
+import { ToolListChangedNotificationSchema } from '@modelcontextprotocol/sdk/types.js';
 import {
+  MCPCallTimeoutError,
   MCPCancelledError,
   MCPConnectionError,
   MCPInvalidConfigError,
   MCPProtocolError,
   MCPToolNotFoundError,
+  MCPToolPinningError,
 } from '../errors/index.js';
 import { deriveServerIdentity } from '../helpers/identity.js';
 import { validateMCPServerConfig } from '../helpers/validate-config.js';
@@ -177,6 +180,19 @@ export async function createMCPClientFromSdkTransport(
     ...(options.sampling === undefined ? {} : { sampling: options.sampling }),
     serverIdRef,
   });
+  // MC-6: surface server-side catalogue churn — at minimum an audit
+  // counter + log line; operators re-run toTools() to refresh and
+  // re-sanitize the catalogue (which also re-runs the drift diff).
+  sdkClient.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
+    incrementCounter('mcp.tools.list-changed.total', {
+      server: serverIdRef.current ?? 'unknown',
+    });
+    options.logger?.(
+      'warn',
+      'mcp.tools.list_changed received — re-run toTools() to refresh + re-sanitize the catalogue',
+      { server: serverIdRef.current },
+    );
+  });
 
   try {
     await sdkClient.connect(options.transport);
@@ -203,14 +219,27 @@ export async function createMCPClientFromSdkTransport(
   serverIdRef.current = serverIdentity.id;
   const collisionStrategy: CollisionStrategy = options.collisionStrategy ?? 'auto-prefix';
 
-  const resumable =
+  // MC-1: the client-side eventStore option was removed — per the
+  // Streamable HTTP spec event replay is the SERVER's responsibility,
+  // and the SDK transport auto-reconnects with Last-Event-ID on its
+  // own. Warn legacy callers instead of silently ignoring the option.
+  if ((options as { readonly eventStore?: unknown }).eventStore !== undefined) {
+    options.logger?.(
+      'warn',
+      "the client 'eventStore' option was removed (MC-1): event replay is a server responsibility; the SDK transport auto-reconnects with Last-Event-ID. Remove the option.",
+      { server: serverIdentity.id },
+    );
+  }
+  // MC-9: a session id means stateful routing, NOT a replay guarantee.
+  const sessionIdPresent =
     isStreamableHttp(options.transport) &&
     (options.transport as StreamableHTTPClientTransport).sessionId !== undefined;
+  const resumable = sessionIdPresent;
   if (options.logger !== undefined) {
-    options.logger('info', 'mcp.session.resumable.resolved', {
+    options.logger('info', 'mcp.session.session-id.resolved', {
       server: serverIdentity.id,
-      value: resumable,
-      source: resumable ? 'server-advertises' : 'transport-default',
+      value: sessionIdPresent,
+      source: sessionIdPresent ? 'session-id-present' : 'transport-default',
     });
   }
   let structuredContentSeenLogged = false;
@@ -324,7 +353,15 @@ export async function createMCPClientFromSdkTransport(
     args: unknown,
     opts?: { signal?: AbortSignal; timeoutMs?: number },
   ): Promise<MCPCallToolResult> {
-    const requestOptions = opts?.signal === undefined ? {} : { signal: opts.signal };
+    // MC-3: `timeoutMs` maps onto the SDK's RequestOptions — both the
+    // per-attempt and the total ceiling, so progress notifications
+    // cannot extend past the caller's budget.
+    const requestOptions = {
+      ...(opts?.signal === undefined ? {} : { signal: opts.signal }),
+      ...(opts?.timeoutMs === undefined
+        ? {}
+        : { timeout: opts.timeoutMs, maxTotalTimeout: opts.timeoutMs }),
+    };
     incrementCounter('mcp.call.invoked.total', { server: serverIdentity.id, tool: name });
     let result: Awaited<ReturnType<typeof sdkClient.callTool>>;
     try {
@@ -400,6 +437,8 @@ export async function createMCPClientFromSdkTransport(
     return Object.freeze({ messages: Object.freeze(messages) });
   }
 
+  let lastToolFingerprints: ReadonlyMap<string, string> | undefined;
+
   async function toTools(toolsOpts?: MCPToToolsOptions): Promise<ReadonlyArray<Tool>> {
     const catalogue = await listTools();
     const adapted = adaptMCPTools({
@@ -409,6 +448,50 @@ export async function createMCPClientFromSdkTransport(
       ...(toolsOpts === undefined ? {} : { options: toolsOpts }),
       ...(options.logger === undefined ? {} : { logger: options.logger }),
     });
+    // MC-6: cross-snapshot drift — a definition changing behind an
+    // already-seen name within this client's lifetime is audited.
+    if (lastToolFingerprints !== undefined) {
+      for (const [name, hash] of adapted.fingerprints) {
+        const previous = lastToolFingerprints.get(name);
+        if (previous !== undefined && previous !== hash) {
+          incrementCounter('mcp.tools.changed.total', {
+            server: serverIdentity.id,
+            tool: name,
+          });
+          options.logger?.('warn', 'mcp.tools.changed: definition drifted between snapshots', {
+            server: serverIdentity.id,
+            tool: name,
+            previous,
+            current: hash,
+          });
+        }
+      }
+    }
+    lastToolFingerprints = adapted.fingerprints;
+    // MC-6: operator pins from a previously approved snapshot — the
+    // rug-pull (approve-then-swap across restarts) posture.
+    const pins = toolsOpts?.pinnedFingerprints;
+    if (pins !== undefined) {
+      for (const [name, pinned] of Object.entries(pins)) {
+        const current = adapted.fingerprints.get(name);
+        if (current !== undefined && current !== pinned) {
+          if (toolsOpts?.onPinMismatch === 'reject') {
+            throw new MCPToolPinningError(
+              `MCP tool '${name}' no longer matches its pinned definition fingerprint — the server changed the definition behind an approved name.`,
+              { metadata: { server: serverIdentity.id, tool: name } },
+            );
+          }
+          incrementCounter('mcp.tools.pin-mismatch.total', {
+            server: serverIdentity.id,
+            tool: name,
+          });
+          options.logger?.('warn', 'mcp.tools.pin-mismatch: pinned fingerprint diverged', {
+            server: serverIdentity.id,
+            tool: name,
+          });
+        }
+      }
+    }
     return adapted.tools;
   }
 
@@ -431,6 +514,7 @@ export async function createMCPClientFromSdkTransport(
     serverIdentity,
     collisionStrategy,
     ...(options.priority === undefined ? {} : { priority: options.priority }),
+    sessionIdPresent,
     resumable,
     listTools,
     listResources,
@@ -472,6 +556,17 @@ function mapSdkError(cause: unknown, ctx: { readonly tool?: string }): Error {
     const message = cause.message ?? '';
     if (name === 'AbortError' || /aborted|cancell/i.test(message)) {
       return new MCPCancelledError('MCP request was cancelled.', { metadata, cause });
+    }
+    // MC-3: the SDK reports request-timeout as a plain McpError — map it
+    // onto the advertised typed class instead of MCPProtocolError.
+    if (/request timed out|timed out/i.test(message)) {
+      return new MCPCallTimeoutError(
+        `MCP request timed out${ctx.tool ? ` (tool: ${ctx.tool})` : ''}.`,
+        {
+          metadata,
+          cause,
+        },
+      );
     }
     if (/unknown\s+tool|tool\s+not\s+found|method\s+not\s+found/i.test(message)) {
       return new MCPToolNotFoundError(`MCP tool not found${ctx.tool ? `: ${ctx.tool}` : ''}.`, {

@@ -81,7 +81,12 @@ export type NormaliseWarning =
       readonly toolName: string;
       readonly count: number;
     }
-  | { readonly kind: 'result:cap-disabled'; readonly toolName: string };
+  | { readonly kind: 'result:cap-disabled'; readonly toolName: string }
+  | {
+      readonly kind: 'sandbox:advisory-inline';
+      readonly toolName: string;
+      readonly policy: string;
+    };
 
 /**
  * Default value cap used for tool result tokens.
@@ -145,6 +150,21 @@ export function normaliseTool<TInput, TOutput, TDeps>(
     throw new InvalidSideEffectClassError({ toolName: tool.name, value: tool.sideEffectClass });
   } else {
     sideEffectClass = tool.sideEffectClass;
+  }
+
+  // TL-3: a non-'none' sandboxPolicy on an inline (first-party) tool is
+  // ADVISORY — the agent runs inline closures in-process. Warn once so a
+  // declared-but-not-enforced policy never reads as protection.
+  if (
+    source.kind === 'first-party' &&
+    tool.sandboxPolicy !== undefined &&
+    tool.sandboxPolicy !== 'none'
+  ) {
+    warnings.push({
+      kind: 'sandbox:advisory-inline',
+      toolName: tool.name,
+      policy: tool.sandboxPolicy,
+    });
   }
 
   const hasIdempotencyKey = typeof tool.idempotencyKey === 'function';
