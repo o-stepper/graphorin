@@ -40,13 +40,24 @@ class FakeClock {
 
   async advance(ms: number): Promise<void> {
     const target = this.#now + ms;
-    while (this.#pending.length > 0 && this.#pending[0]!.fireAt <= target) {
-      const next = this.#pending.shift()!;
+    for (;;) {
+      // Drain microtask chains (async fire() bodies are several awaits
+      // deep over the sync-sqlite store) so timers they arm participate
+      // in this same advance — otherwise a re-arm lands after the scan
+      // and periodic triggers appear dead.
+      await this.#settle();
+      const next = this.#pending[0];
+      if (next === undefined || next.fireAt > target) break;
+      this.#pending.shift();
       this.#now = next.fireAt;
       next.cb();
-      await Promise.resolve();
     }
     this.#now = target;
+    await this.#settle();
+  }
+
+  async #settle(): Promise<void> {
+    for (let i = 0; i < 25; i++) await Promise.resolve();
   }
 
   pending(): readonly FakeTimer[] {
@@ -268,7 +279,7 @@ describe('Scheduler', () => {
     expect(() => event('zero', '', () => undefined)).toThrow();
   });
 
-  it("catchup-policy='all' fires up to maxCatchupRuns missed runs on resume", async () => {
+  it("catchup-policy='all' fires min(missed, maxCatchupRuns) REAL missed runs on resume (RP-12)", async () => {
     const triggerStore = await makeStore();
     const s1 = createScheduler({
       store: triggerStore,
@@ -287,6 +298,10 @@ describe('Scheduler', () => {
     await s1.fire('cron-all');
     expect(initialFires).toBe(1);
     await s1.stop();
+
+    // Five 09:00 boundaries pass while the scheduler is offline
+    // (epoch t=0 → boundaries at 9h/33h/57h/81h/105h ≤ 106h).
+    await clock.advance(4 * 24 * 60 * 60 * 1000 + 10 * 60 * 60 * 1000);
 
     let resumedFires = 0;
     const s2 = createScheduler({
@@ -311,11 +326,14 @@ describe('Scheduler', () => {
       ),
     );
     await s2.start();
+    // 5 real misses, capped at maxCatchupRuns=3; the excess lands in missedFires.
     expect(resumedFires).toBe(3);
+    const st = await triggerStore.get('cron-all');
+    expect(st?.missedFires).toBe(2);
     await s2.stop();
   });
 
-  it("catchup-policy='last' fires exactly once on resume", async () => {
+  it("catchup-policy='last' fires exactly once on resume IFF a boundary was crossed (RP-12)", async () => {
     const triggerStore = await makeStore();
     const s1 = createScheduler({
       store: triggerStore,
@@ -328,6 +346,9 @@ describe('Scheduler', () => {
     await s1.start();
     await s1.fire('cron-last');
     await s1.stop();
+
+    // One 09:00 boundary passes offline (inside the default 24h window).
+    await clock.advance(10 * 60 * 60 * 1000);
 
     let resumedFires = 0;
     const s2 = createScheduler({
@@ -349,6 +370,88 @@ describe('Scheduler', () => {
     );
     await s2.start();
     expect(resumedFires).toBe(1);
+    await s2.stop();
+  });
+
+  it('restart with ZERO missed fires applies zero catch-up (RP-12)', async () => {
+    const triggerStore = await makeStore();
+    const s1 = createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s1.register(cron('cron-none-missed', '0 9 * * *', () => undefined));
+    await s1.start();
+    await s1.fire('cron-none-missed');
+    await s1.stop();
+
+    // Restart five minutes later — no 09:00 boundary crossed.
+    await clock.advance(5 * 60 * 1000);
+
+    let resumedFires = 0;
+    const s2 = createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s2.register(
+      cron(
+        'cron-none-missed',
+        '0 9 * * *',
+        () => {
+          resumedFires++;
+        },
+        { catchupPolicy: 'last' },
+      ),
+    );
+    await s2.start();
+    expect(resumedFires).toBe(0);
+    await s2.stop();
+  });
+
+  it('interval triggers participate in catch-up (RP-12)', async () => {
+    const triggerStore = await makeStore();
+    const s1 = createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s1.register(interval('hourly', 60 * 60 * 1000, () => undefined));
+    await s1.start();
+    await s1.fire('hourly');
+    await s1.stop();
+
+    // 3 intervals pass offline.
+    await clock.advance(3 * 60 * 60 * 1000 + 60_000);
+
+    let resumedFires = 0;
+    const s2 = createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    await s2.register(
+      interval(
+        'hourly',
+        60 * 60 * 1000,
+        () => {
+          resumedFires++;
+        },
+        { catchupPolicy: 'all', maxCatchupRuns: 2, catchupWindowMs: 24 * 60 * 60 * 1000 },
+      ),
+    );
+    await s2.start();
+    expect(resumedFires).toBe(2);
+    const st = await triggerStore.get('hourly');
+    expect(st?.missedFires).toBe(1);
     await s2.stop();
   });
 
@@ -426,5 +529,145 @@ describe('Scheduler', () => {
     await clock.advance(1_500);
     await new Promise((r) => setTimeout(r, 20));
     expect(errors).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('scheduler correctness — RP-13/14/15', () => {
+  let clock: FakeClock;
+  let triggerStore: import('@graphorin/core/contracts').TriggerStore;
+  let scheduler: Scheduler;
+
+  beforeEach(async () => {
+    _resetLibModeWarningForTesting();
+    clock = new FakeClock();
+    triggerStore = await makeStore();
+    scheduler = createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+  });
+
+  afterEach(async () => {
+    await scheduler.stop();
+  });
+
+  it('RP-13: an interval trigger fires exactly once per period across 3 periods', async () => {
+    let count = 0;
+    await scheduler.register(
+      interval('beat', 1_000, () => {
+        count++;
+      }),
+    );
+    await scheduler.start();
+    await clock.advance(1_000);
+    expect(count).toBe(1);
+    await clock.advance(1_000);
+    expect(count).toBe(2);
+    await clock.advance(1_000);
+    expect(count).toBe(3);
+  });
+
+  it('RP-14: a throwing callback does not kill the trigger — it fires again next period', async () => {
+    let calls = 0;
+    await scheduler.register(
+      interval('flaky', 1_000, () => {
+        calls++;
+        if (calls === 1) throw new Error('transient network failure');
+      }),
+    );
+    await scheduler.start();
+    await clock.advance(1_000);
+    expect(calls).toBe(1);
+    // The error must not consume the trigger: state carries a FUTURE
+    // nextFireAt and the timer is re-armed.
+    const st = await triggerStore.get('flaky');
+    expect(st?.nextFireAt).toBeDefined();
+    expect(Date.parse(st?.nextFireAt ?? '')).toBeGreaterThan(clock.now());
+    await clock.advance(1_000);
+    expect(calls).toBe(2);
+  });
+
+  it('RP-14: the failed fire does NOT advance lastFiredAt', async () => {
+    let calls = 0;
+    await scheduler.register(
+      interval('flaky2', 1_000, () => {
+        calls++;
+        throw new Error('always fails');
+      }),
+    );
+    await scheduler.start();
+    await clock.advance(1_000);
+    const st = await triggerStore.get('flaky2');
+    // No successful fire was recorded.
+    expect(st?.lastFiredAt).toBeUndefined();
+    expect(calls).toBe(1);
+  });
+
+  it('RP-15: a delay beyond 2^31-1 ms arms a chunked wake-up, never a clamped timer', async () => {
+    const MAX_TIMEOUT = 2 ** 31 - 1;
+    const FORTY_DAYS = 40 * 24 * 60 * 60 * 1000;
+    let count = 0;
+    await scheduler.register(
+      interval('quarterly-ish', FORTY_DAYS, () => {
+        count++;
+      }),
+    );
+    await scheduler.start();
+    // The scheduler must never hand the platform a delay that Node
+    // would clamp to 1 ms (the hot-loop bug).
+    for (const t of clock.pending()) {
+      expect(t.fireAt - clock.now()).toBeLessThanOrEqual(MAX_TIMEOUT);
+    }
+    // The intermediate wake-up re-arms without firing.
+    await clock.advance(MAX_TIMEOUT);
+    expect(count).toBe(0);
+    for (const t of clock.pending()) {
+      expect(t.fireAt - clock.now()).toBeLessThanOrEqual(MAX_TIMEOUT);
+    }
+    // The real boundary fires exactly once.
+    await clock.advance(FORTY_DAYS - MAX_TIMEOUT);
+    expect(count).toBe(1);
+  });
+});
+
+describe('setDisabled — flag flip, not removal (IP-17)', () => {
+  it('disable stops firing but keeps the trigger; enable re-arms from now', async () => {
+    _resetLibModeWarningForTesting();
+    const clock = new FakeClock();
+    const triggerStore = await makeStore();
+    const scheduler = createScheduler({
+      store: triggerStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    let count = 0;
+    await scheduler.register(
+      interval('toggler', 1_000, () => {
+        count++;
+      }),
+    );
+    await scheduler.start();
+    await clock.advance(1_000);
+    expect(count).toBe(1);
+
+    const disabled = await scheduler.setDisabled('toggler', true);
+    expect(disabled.disabled).toBe(true);
+    await clock.advance(5_000);
+    expect(count).toBe(1); // silent while disabled
+    // Still registered + persisted (NOT unregistered).
+    expect((await scheduler.list()).some((t) => t.id === 'toggler')).toBe(true);
+
+    const enabled = await scheduler.setDisabled('toggler', false);
+    expect(enabled.disabled).toBe(false);
+    // Re-armed from now — no immediate stale-nextFireAt fire.
+    expect(count).toBe(1);
+    await clock.advance(1_000);
+    expect(count).toBe(2);
+    await scheduler.stop();
   });
 });

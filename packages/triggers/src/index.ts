@@ -32,6 +32,13 @@ export type TriggerKind = 'cron' | 'interval' | 'idle' | 'event';
 export interface TriggerOptions {
   readonly catchupPolicy?: CatchupPolicy;
   readonly maxCatchupRuns?: number;
+  /**
+   * How far back (from the last successful fire) misses are honored.
+   * Catch-up counts REAL missed fires (RP-12), so the window must
+   * exceed the trigger period — a 24h window can never catch up a
+   * daily cron whose boundary is itself 24h after the last fire.
+   * Default 24h.
+   */
   readonly catchupWindowMs?: number;
   readonly tags?: ReadonlyArray<string>;
   /**
@@ -202,6 +209,13 @@ export interface Scheduler {
   emit(eventName: string, payload?: unknown): Promise<void>;
   /** Manually fire `id` (used by `graphorin triggers fire`, Phase 15). */
   fire(id: string, payload?: unknown): Promise<void>;
+  /**
+   * Flip the persistent `disabled` flag (IP-17). Disabling cancels the
+   * armed timer but keeps the trigger registered + persisted; enabling
+   * recomputes the next fire from now and re-arms. The destructive
+   * removal is `unregister(...)`.
+   */
+  setDisabled(id: string, disabled: boolean): Promise<TriggerState>;
   /** AsyncIterable lifecycle event stream. */
   events(): AsyncIterable<SchedulerEvent>;
   /** Notify the scheduler that the user / runtime is no longer idle. */
@@ -227,6 +241,13 @@ export function _resetLibModeWarningForTesting(): void {
 }
 
 const DEFAULT_CATCHUP_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Node clamps `setTimeout` delays beyond `2^31 - 1` ms to 1 ms — a
+ * quarterly cron would fire immediately in a hot loop (RP-15). Delays
+ * above this arm an intermediate wake-up that re-schedules instead.
+ */
+const MAX_TIMEOUT_MS = 2 ** 31 - 1;
 
 class SchedulerImpl implements Scheduler {
   readonly #store: TriggerStore;
@@ -295,7 +316,7 @@ class SchedulerImpl implements Scheduler {
 
     this.#publish({ type: 'registered', id: declaration.id, kind: declaration.kind });
 
-    if (existing !== null && declaration.kind === 'cron') {
+    if (existing !== null && (declaration.kind === 'cron' || declaration.kind === 'interval')) {
       await this.#applyCatchup(state, existing, now);
     }
 
@@ -358,20 +379,90 @@ class SchedulerImpl implements Scheduler {
       const durationMs = this.#now() - start;
       this.#publish({ type: 'fire-end', id, durationMs });
       const state = await this.#store.get(id);
-      const nextFireMs = state !== null ? this.#computeNextFire(decl, state, this.#now()) : null;
+      // RP-13: compute the next fire from THIS fire's timestamp — the
+      // persisted state still carries the PREVIOUS lastFiredAt, which
+      // for interval triggers yields `prev + interval ≈ now` and an
+      // immediate duplicate via the clamped-to-0 delay. Idle triggers
+      // never self-reschedule: their next window starts only when
+      // `recordActivity()` observes new activity (a fire-driven re-arm
+      // would compute a stale `lastActivity + idleMs`, clamp to 0 and
+      // refire in a loop).
+      const nextFireMs =
+        state !== null && decl.kind !== 'idle'
+          ? this.#computeNextFire(
+              decl,
+              { ...state, lastFiredAt: new Date(firedAt).toISOString() },
+              this.#now(),
+            )
+          : null;
       await this.#store.recordFire(
         id,
         new Date(firedAt).toISOString(),
         nextFireMs !== null ? new Date(nextFireMs).toISOString() : undefined,
       );
-      if (this.#started) {
+      if (this.#started && decl.kind !== 'idle') {
         const refreshed = await this.#store.get(id);
         if (refreshed !== null) this.#schedule(id, refreshed);
       }
     } catch (err) {
       const durationMs = this.#now() - start;
       this.#publish({ type: 'fire-error', id, error: err, durationMs });
+      // RP-14: the one-shot timer is consumed by this fire — recompute
+      // and persist the next fire WITHOUT recording a successful fire
+      // (lastFiredAt stays put), and re-arm, so a single callback
+      // failure cannot permanently silence a daily cron.
+      try {
+        const state = await this.#store.get(id);
+        if (state !== null && decl.kind !== 'idle') {
+          const nextFireMs = this.#computeNextFire(
+            decl,
+            { ...state, lastFiredAt: new Date(firedAt).toISOString() },
+            this.#now(),
+          );
+          const updated: TriggerState = {
+            ...state,
+            ...(nextFireMs !== null ? { nextFireAt: new Date(nextFireMs).toISOString() } : {}),
+            updatedAt: new Date(this.#now()).toISOString(),
+          };
+          await this.#store.upsert(updated);
+          if (this.#started) this.#schedule(id, updated);
+        }
+      } catch {
+        // Best-effort re-arm — a store failure here must not become an
+        // unhandled rejection out of the timer callback.
+      }
     }
+  }
+
+  async setDisabled(id: string, disabled: boolean): Promise<TriggerState> {
+    const state = await this.#store.get(id);
+    if (state === null) {
+      throw new Error(`[graphorin/triggers] no trigger registered with id '${id}'`);
+    }
+    const nowIso = new Date(this.#now()).toISOString();
+    if (disabled) {
+      this.#cancelHandle(id);
+      const updated: TriggerState = { ...state, disabled: true, updatedAt: nowIso };
+      await this.#store.upsert(updated);
+      return updated;
+    }
+    // Re-enable: recompute the next fire from NOW (a stale persisted
+    // nextFireAt from before the disable would otherwise clamp to 0 and
+    // fire immediately), then re-arm.
+    const decl = this.#declarations.get(id);
+    const nextMs =
+      decl !== undefined
+        ? this.#computeNextFire(decl, { ...state, lastFiredAt: nowIso }, this.#now())
+        : null;
+    const updated: TriggerState = {
+      ...state,
+      disabled: false,
+      ...(nextMs !== null ? { nextFireAt: new Date(nextMs).toISOString() } : {}),
+      updatedAt: nowIso,
+    };
+    await this.#store.upsert(updated);
+    if (this.#started) this.#schedule(id, updated);
+    return updated;
   }
 
   recordActivity(): void {
@@ -451,22 +542,44 @@ class SchedulerImpl implements Scheduler {
 
   async #applyCatchup(state: TriggerState, existing: TriggerState, now: number): Promise<void> {
     if (state.catchupPolicy === 'none') return;
+    const decl = this.#declarations.get(state.id);
+    if (decl === undefined || (decl.kind !== 'cron' && decl.kind !== 'interval')) return;
     const lastFired = existing.lastFiredAt !== undefined ? Date.parse(existing.lastFiredAt) : null;
     if (lastFired === null) return;
-    const window = state.catchupWindowMs;
-    const cutoff = now - window;
-    if (lastFired < cutoff) return;
-    const max = state.maxCatchupRuns;
+    if (lastFired < now - state.catchupWindowMs) return;
+
+    // RP-12: count the REAL missed fires by walking the schedule from
+    // the last successful fire to now — a restart with zero crossed
+    // boundaries must apply zero catch-up (the old code fired `1` /
+    // `maxCatchupRuns` times unconditionally).
+    const SCAN_CAP = 1000;
     let missed = 0;
-    if (state.catchupPolicy === 'last') {
-      missed = 1;
-    } else if (state.catchupPolicy === 'all') {
-      // Best-effort estimate — for cron we don't enumerate every
-      // missed fire, we cap at `max`.
-      missed = max;
+    if (decl.kind === 'cron') {
+      const parsed = this.#parsedCron.get(decl.id) ?? parseCron(decl.spec);
+      let cursor = lastFired;
+      while (missed < SCAN_CAP) {
+        const next = nextFireAfter(parsed, new Date(cursor));
+        if (next === null || next.getTime() > now) break;
+        cursor = next.getTime();
+        missed += 1;
+      }
+    } else {
+      const intervalMs = Number.parseInt(decl.spec, 10);
+      missed = Math.floor((now - lastFired) / intervalMs);
     }
-    for (let i = 0; i < missed; i++) {
+    if (missed <= 0) return;
+
+    const toFire = state.catchupPolicy === 'last' ? 1 : Math.min(missed, state.maxCatchupRuns);
+    for (let i = 0; i < toFire; i++) {
       await this.fire(state.id);
+    }
+    // The overflow beyond what we re-ran is recorded for health/CLI.
+    const excess = missed - toFire;
+    if (excess > 0) {
+      const refreshed = await this.#store.get(state.id);
+      if (refreshed !== null) {
+        await this.#store.upsert({ ...refreshed, missedFires: excess });
+      }
     }
     this.#publish({ type: 'catchup-applied', id: state.id, missed });
   }
@@ -487,6 +600,21 @@ class SchedulerImpl implements Scheduler {
     }
     if (delay === null) return;
     if (delay < 0) delay = 0;
+
+    if (delay > MAX_TIMEOUT_MS) {
+      // RP-15: chunk the wait — the intermediate wake-up re-reads the
+      // freshest state and re-schedules (it never fires the callback).
+      const handle = this.#setTimeout(() => {
+        void this.#store
+          .get(id)
+          .then((s) => {
+            if (s !== null) this.#schedule(id, s);
+          })
+          .catch(() => {});
+      }, MAX_TIMEOUT_MS);
+      this.#handles.set(id, handle);
+      return;
+    }
 
     const handle = this.#setTimeout(() => {
       void this.fire(id);
