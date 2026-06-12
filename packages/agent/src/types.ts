@@ -27,6 +27,7 @@ import type {
 } from '@graphorin/core';
 import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@graphorin/memory';
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
+import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardrails';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
 import type { AgentFallbackPolicy } from './fallback/index.js';
@@ -77,23 +78,6 @@ export interface PrepareStepOverrides<TDeps = unknown> {
   readonly temperature?: number;
   readonly maxTokens?: number;
 }
-
-/**
- * Input guardrail predicate.
- *
- * @stable
- */
-export type InputGuardrail = (input: AgentInput) => Promise<GuardrailVerdict> | GuardrailVerdict;
-
-/** @stable */
-export type OutputGuardrail<TOutput = unknown> = (
-  output: TOutput,
-) => Promise<GuardrailVerdict> | GuardrailVerdict;
-
-/** @stable */
-export type GuardrailVerdict =
-  | { readonly trip: false }
-  | { readonly trip: true; readonly reason?: string; readonly name?: string };
 
 /**
  * Compaction post-hook factory accepted by `createAgent({...})`.
@@ -162,8 +146,25 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly autoAssembleContext?: boolean;
   readonly handoffs?: ReadonlyArray<HandoffEntry<TDeps>>;
   readonly outputType?: OutputSpec<TOutput>;
+  /**
+   * Deterministic checks run by the loop (AG-2; canonical contract is
+   * `@graphorin/security`'s `GuardrailDefinition` — SDF-4).
+   *
+   * - `input` guardrails run over each **fresh-run seed user message**
+   *   (string content) before the first provider call. `'block'` fails
+   *   the run (`guardrail-blocked`) without reaching the model;
+   *   `'rewrite'` replaces the message content (mirrored into the
+   *   persisted `RunState`); `'warn'` logs and continues.
+   * - `output` guardrails run over the **final output** on the
+   *   completed path before `agent.end`. `'block'` fails the run;
+   *   `'rewrite'` replaces `result.output` (text deltas were already
+   *   streamed — the rewrite governs the durable result, not the
+   *   live token stream).
+   *
+   * Every trip emits a `guardrail.tripped` event.
+   */
   readonly guardrails?: {
-    readonly input?: ReadonlyArray<InputGuardrail>;
+    readonly input?: ReadonlyArray<InputGuardrail<string>>;
     readonly output?: ReadonlyArray<OutputGuardrail<TOutput>>;
   };
   readonly stopWhen?: StopCondition;

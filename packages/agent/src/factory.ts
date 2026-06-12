@@ -44,6 +44,7 @@ import type {
   Usage,
 } from '@graphorin/core';
 import { isStepCount, NOOP_LOGGER, NOOP_TRACER, zeroUsage } from '@graphorin/core';
+import { composeGuardrails } from '@graphorin/security/guardrails';
 import type { Memory } from '@graphorin/memory';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
@@ -960,7 +961,51 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       for (const m of messages) state.messages.push(m);
     }
 
+    const finalSnapshot: InternalRunSnapshot<TOutput> = {
+      output: '' as unknown as TOutput,
+    };
+
     yield { type: 'agent.start', runId: state.id, agentId };
+
+    // AG-2 / SDF-4: input guardrails screen each fresh-run seed user
+    // message (string content) BEFORE the first provider call, using the
+    // canonical `@graphorin/security` composer. 'block' fails the run
+    // without reaching the model; 'rewrite' replaces the content in both
+    // the working buffer and the persisted RunState; 'warn' logs and
+    // continues. Resumed runs skip the pass — their seed was screened
+    // when first submitted.
+    const inputGuards = config.guardrails?.input;
+    if (!resumed && inputGuards !== undefined && inputGuards.length > 0) {
+      for (let i = 0; i < messages.length; i++) {
+        const msg = messages[i];
+        if (msg === undefined || msg.role !== 'user' || typeof msg.content !== 'string') continue;
+        const composed = await composeGuardrails(inputGuards, msg.content, {
+          stage: 'input',
+          runId: state.id,
+          sessionId,
+          agentId,
+        });
+        if (!composed.ok) {
+          yield {
+            type: 'guardrail.tripped',
+            guardrailName: composed.name,
+            phase: 'input',
+            reason: composed.message,
+          };
+          const message = `input guardrail '${composed.name}' blocked the run: ${composed.message}`;
+          yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
+          state.status = 'failed';
+          state.error = { message, code: 'guardrail-blocked' };
+          return yield* finishRun(state, finalSnapshot);
+        }
+        if (composed.value !== msg.content) {
+          const rewritten: Message = { ...msg, content: composed.value };
+          const stateIdx = state.messages.indexOf(msg);
+          messages[i] = rewritten;
+          if (stateIdx !== -1) state.messages[stateIdx] = rewritten;
+        }
+      }
+    }
 
     // AG-1: approved gated calls collected from a resume directive, executed
     // for real once every approval is resolved (see the dispatch below).
@@ -1045,10 +1090,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       stepNumber: 0,
       messages,
       state,
-    };
-
-    const finalSnapshot: InternalRunSnapshot<TOutput> = {
-      output: '' as unknown as TOutput,
     };
 
     // AG-14: a resumed run that is still suspended (`awaiting_approval` with
@@ -1878,6 +1919,39 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state.status = 'running';
       delete (state as { finishedAt?: string }).finishedAt;
       yield* runFollowUpLoop(messages, state, stepNumber, signal, sessionId, userId);
+    }
+
+    // AG-2 / SDF-4: output guardrails screen the final output on the
+    // completed path before `agent.end`. 'block' fails the run;
+    // 'rewrite' replaces the durable result (`result.output`) — the
+    // text deltas were already streamed, so the rewrite governs what
+    // is persisted/returned, not the live token stream.
+    const outputGuards = config.guardrails?.output;
+    if (
+      state.status === 'completed' &&
+      outputGuards !== undefined &&
+      outputGuards.length > 0
+    ) {
+      const composed = await composeGuardrails(outputGuards, finalSnapshot.output, {
+        stage: 'output',
+        runId: state.id,
+        sessionId,
+        agentId,
+      });
+      if (!composed.ok) {
+        yield {
+          type: 'guardrail.tripped',
+          guardrailName: composed.name,
+          phase: 'output',
+          reason: composed.message,
+        };
+        const message = `output guardrail '${composed.name}' blocked the run: ${composed.message}`;
+        yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
+        state.status = 'failed';
+        state.error = { message, code: 'guardrail-blocked' };
+      } else if (composed.value !== finalSnapshot.output) {
+        finalSnapshot.output = composed.value;
+      }
     }
     activeRunState = undefined;
     return yield* finishRun(state, finalSnapshot);

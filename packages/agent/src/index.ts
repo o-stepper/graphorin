@@ -145,9 +145,6 @@ export type {
   AgentToToolOptions,
   CompactionApiResult,
   CompactOptions,
-  GuardrailVerdict,
-  InputGuardrail,
-  OutputGuardrail,
   OutputSpec,
   PostCompactionHook,
   PrepareStepHook,
@@ -155,3 +152,13 @@ export type {
   ResumeDirective,
   SkillsRegistryLike,
 } from './types.js';
+
+// AG-2 / SDF-4: the canonical guardrail contract lives in
+// `@graphorin/security`; re-exported here for config ergonomics.
+export type {
+  GuardrailContext,
+  GuardrailDefinition,
+  GuardrailResult,
+  InputGuardrail,
+  OutputGuardrail,
+} from '@graphorin/security/guardrails';
