@@ -411,12 +411,19 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   });
   // P2-2: build the (opt-in) workflow inducer. Absent ⇒ `null` ⇒
   // `ProceduralMemory.induce(...)` throws and the tier stays offline CRUD.
+  // MCON-15: induction spend is recorded into the consolidator budget —
+  // the consolidator is constructed AFTER the inducer, so the callback
+  // routes through a slot filled below (placeholder ⇒ no-op).
+  let consolidatorForSpend: Consolidator | null = null;
   const inducer =
     options.procedureInduction !== undefined
       ? createProviderWorkflowInducer(options.procedureInduction.provider, {
           ...(options.procedureInduction.maxTokens !== undefined
             ? { maxTokens: options.procedureInduction.maxTokens }
             : {}),
+          onUsage: (usage) => {
+            consolidatorForSpend?.recordExternalSpend(usage.promptTokens + usage.completionTokens);
+          },
         })
       : null;
   const procedural = new ProceduralMemory({
@@ -454,6 +461,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     episodic,
     tracer,
   );
+  consolidatorForSpend = consolidator;
   const contextEngineConfig = options.contextEngine ?? {};
   const contextEngine: ContextEngine = createContextEngine(contextEngineConfig);
   const resolved = contextEngine.config();

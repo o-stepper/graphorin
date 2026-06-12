@@ -14,12 +14,9 @@ import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
   MemoryStoreAdapter,
-  SessionMessageRecord,
 } from '../../internal/storage-adapter.js';
 import { type SalienceWeights, salience, selectForCapacityEviction } from '../decay.js';
-import { tipMessageId } from '../idempotency.js';
 import type { NoiseFilterPreset } from '../noise-filter.js';
-import { applyNoiseFilters } from '../noise-filter.js';
 import type { PhaseOutcome } from '../types.js';
 
 /** Inputs accepted by {@link runLightPhase}. */
@@ -164,5 +161,3 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
 function isForeignProvenance(provenance: string | null): boolean {
   return provenance !== null && provenance !== 'user' && provenance !== 'extraction';
 }
-
-

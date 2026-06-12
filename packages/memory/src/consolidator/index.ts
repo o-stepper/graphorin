@@ -240,6 +240,9 @@ export function createConsolidatorPlaceholder(
     async resume() {
       paused = false;
     },
+    recordExternalSpend(): void {
+      // Placeholder — no budget to record against.
+    },
     onPhaseFinished(listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);

@@ -80,6 +80,12 @@ export interface Consolidator {
   resume(): Promise<void>;
   /** Subscribe to phase-finished notifications. Returns an unsubscribe. */
   onPhaseFinished(listener: PhaseListener): () => void;
+  /**
+   * Record memory-pipeline LLM spend that happened OUTSIDE a phase run
+   * (MCON-15 — e.g. workflow induction) so the daily ceilings cover it.
+   * Counted under the deep-phase bucket.
+   */
+  recordExternalSpend(tokens: number, costUsd?: number): void;
   /** Active config — frozen snapshot. */
   config(): ConsolidatorConfig;
   /**
@@ -220,6 +226,11 @@ class ConsolidatorImpl implements Consolidator {
     };
   }
 
+  recordExternalSpend(tokens: number, costUsd?: number): void {
+    if (!Number.isFinite(tokens) || tokens <= 0) return;
+    this.#budget.record({ phase: 'deep', tokens, costUsd: costUsd ?? 0 });
+  }
+
   async setTier(tier: ConsolidatorTier): Promise<void> {
     const preset = CONSOLIDATOR_TIER_DEFAULTS[tier];
     if (preset === undefined) {
@@ -339,7 +350,11 @@ class ConsolidatorImpl implements Consolidator {
       const eligibleAt = state?.nextEligibleAt ?? null;
       const firstPhase = phases[0] ?? 'light';
       if (eligibleAt !== null && this.#now() < eligibleAt) {
-        return this.#emit({ ...skipOutcome(firstPhase, 'cooldown'), phase: firstPhase }, scope, reason);
+        return this.#emit(
+          { ...skipOutcome(firstPhase, 'cooldown'), phase: firstPhase },
+          scope,
+          reason,
+        );
       }
     }
     let last: PhaseOutcome | null = null;
