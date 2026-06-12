@@ -211,11 +211,12 @@ function validateConfig<TState extends object>(config: WorkflowConfig<TState>): 
   if (
     config.durability !== undefined &&
     config.durability !== 'sync' &&
-    config.durability !== 'async' &&
-    config.durability !== 'exit'
+    config.durability !== 'exit' &&
+    // WF-7: legacy value — the engine coerces it to 'sync' with a warn.
+    (config.durability as string) !== 'async'
   ) {
     throw new InvalidWorkflowConfigError(
-      `durability mode "${config.durability}" is invalid — accepted values are "sync" | "async" | "exit"`,
+      `durability mode "${config.durability}" is invalid — accepted values are "sync" | "exit"`,
     );
   }
   if (

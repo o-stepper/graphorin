@@ -50,6 +50,14 @@ import type { Memory } from '@graphorin/memory';
 /** Return envelope of `ContextEngine.compactNow` (shared splice paths, CE-3). */
 type CompactionEnvelope = Awaited<ReturnType<Memory['contextEngine']['compactNow']>>;
 
+/**
+ * Replacement content committed in place of assistant commentary the
+ * causality monitor blocked (AG-10). Worded to not match any built-in
+ * denial pattern, so the notice itself never re-triggers the monitor.
+ */
+const LATERAL_LEAK_BLOCKED_NOTICE =
+  '[graphorin] assistant commentary withheld by the lateral-leak defense.';
+
 import { composeGuardrails } from '@graphorin/security/guardrails';
 import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
 import {
@@ -72,6 +80,7 @@ import {
 } from '@graphorin/tools/result';
 import {
   AgentRuntimeError,
+  ConcurrentRunError,
   InvalidAgentConfigError,
   InvalidPreferredModelError,
   MultipleHandoffsInStepError,
@@ -564,15 +573,35 @@ function handleProviderEvent(
     }
     case 'tool-call-end': {
       const acc = state.calls.get(ev.toolCallId);
-      const toolName = acc?.toolName ?? '';
-      state.finalCalls.push({ toolCallId: ev.toolCallId, toolName, args: ev.finalArgs });
+      if (acc === undefined) {
+        // AG-26: an end without a matching start has no tool name — the
+        // old path dispatched it as the unknown tool ''. Drop it loudly.
+        process.stderr.write(
+          `[graphorin/agent] dropped tool-call-end '${ev.toolCallId}' with no matching tool-call-start.\n`,
+        );
+        return {};
+      }
+      state.finalCalls.push({
+        toolCallId: ev.toolCallId,
+        toolName: acc.toolName,
+        args: ev.finalArgs,
+      });
       return {
         emit: { type: 'tool.call.end', toolCallId: ev.toolCallId, finalArgs: ev.finalArgs },
       };
     }
+    // AG-26: provider-generated files / citations are consumer-observable
+    // events instead of silently vanishing.
     case 'file':
+      return { emit: { type: 'file.generated', mimeType: ev.mimeType, data: ev.data } };
     case 'source':
-      return {};
+      return {
+        emit: {
+          type: 'source.cited',
+          uri: ev.uri,
+          ...(ev.title !== undefined ? { title: ev.title } : {}),
+        },
+      };
     case 'finish':
       return { usage: ev.usage, finished: true };
     case 'error':
@@ -758,6 +787,8 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   // Per-run scratch refs surfaced through the public surface for
   // event emission from `steer(...)` / `followUp(...)`.
   let activeRunState: RunState | undefined;
+  /** AG-11: guards the one-in-flight-run-per-instance invariant. */
+  let runInFlight = false;
   const externalEventQueue: AgentEvent<TOutput>[] = [];
 
   /**
@@ -977,11 +1008,58 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     ? new CausalityMonitor(config.causalityMonitor)
     : undefined;
 
+  /**
+   * AG-11: one in-flight run per Agent instance. `steer` / `followUp` /
+   * `abort` / `compact` address "the run" with no run handle, so
+   * overlapping runs on one instance cannot be expressed safely — they
+   * would share the abort controller, steer queue, active-run ref and
+   * executor bridge. A second concurrent `run()` / `stream()` rejects
+   * with {@link ConcurrentRunError}; run-scoped state is reset on entry
+   * (a steer/abort queued after the previous run ended belongs to NO
+   * run) and cleared in a `finally` that also covers abandoned streams
+   * (consumer `break`) and thrown runs.
+   */
   async function* runLoop(
     input: AgentInput | RunState,
     options: AgentCallOptions<TDeps>,
   ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
-    const { seed, resumed } = asMessages(input);
+    if (runInFlight) {
+      throw new ConcurrentRunError();
+    }
+    runInFlight = true;
+    pendingSteer = [];
+    pendingAbort = undefined;
+    // AG-10: the causality chain is a per-run artifact — a denial
+    // recorded in one run must not poison detection in the next.
+    causalityMonitor?.reset();
+    try {
+      return yield* runLoopInner(input, options);
+    } finally {
+      runInFlight = false;
+      activeRunState = undefined;
+      // Backstop for exits that bypass `finishRun` (abandoned stream,
+      // generator teardown): settle queued manual compactions so no
+      // `agent.compact()` promise is left hanging (CE-3/AG-13).
+      while (pendingManualCompacts.length > 0) {
+        pendingManualCompacts.shift()?.resolve(noopCompactionResult('no-active-run'));
+      }
+    }
+  }
+
+  async function* runLoopInner(
+    input: AgentInput | RunState,
+    options: AgentCallOptions<TDeps>,
+  ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
+    const { seed: rawSeed, resumed } = asMessages(input);
+    // AG-12: queued follow-ups are next-turn metadata — they ride into
+    // the next FRESH run as leading user turns. The old path mutated a
+    // finished run back to 'running' and appended the message to a loop
+    // that never processed it, leaving a non-terminal persisted RunState
+    // with a dangling user turn. Resumed runs keep the queue intact.
+    const seed =
+      resumed === undefined && pendingFollowUp.length > 0
+        ? [...pendingFollowUp.splice(0, pendingFollowUp.length), ...rawSeed]
+        : rawSeed;
     const sessionId = options.sessionId ?? config.sessionId ?? `session_${newId()}`;
     const userId = options.userId ?? config.userId;
     const localCtl = new AbortController();
@@ -1526,6 +1604,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     const handoffNames = Array.from(handoffMap.keys());
     let stepNumber = 0;
+    // AG-15: tools the model actually called on the PREVIOUS step — the
+    // per-tool preferred-model ladder consults these, never the full
+    // advertised catalogue.
+    let lastStepCalledToolNames: ReadonlyArray<string> = [];
 
     // AG-6: shared cancellation path for both the loop-top abort check and a
     // mid-stream provider abort. Yields `agent.cancelling`, applies the
@@ -1649,12 +1731,19 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           stepTools = [...eagerTools, ...promotedTools, ...handoffTools];
         }
 
-        const toolPreferences = stepTools.map((t) => {
-          const tt = t as Tool<unknown, unknown, TDeps> & { readonly preferredModel?: unknown };
-          return tt.preferredModel as Parameters<
-            typeof resolvePreferredModel
-          >[0]['toolPreferredModels'][number];
-        });
+        // AG-15: consult the hints of the tools the model CALLED on the
+        // previous step — a smart-hinted but never-called tool must not
+        // pin the whole conversation to the top cost tier. Steps with no
+        // prior calls fall through to the agent-preferred default.
+        const calledLastStep = new Set(lastStepCalledToolNames);
+        const toolPreferences = stepTools
+          .filter((t) => calledLastStep.has(t.name))
+          .map((t) => {
+            const tt = t as Tool<unknown, unknown, TDeps> & { readonly preferredModel?: unknown };
+            return tt.preferredModel as Parameters<
+              typeof resolvePreferredModel
+            >[0]['toolPreferredModels'][number];
+          });
 
         const primary: PreferredModelResolution = resolvePreferredModel({
           ...(overrides.provider !== undefined ? { prepareStepProvider: overrides.provider } : {}),
@@ -1913,8 +2002,20 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             (state.usage.reasoningTokens ?? 0) + stepUsage.reasoningTokens;
         }
 
+        // Lateral-leak (RB-55 / AG-10): scan the outgoing assistant
+        // content BEFORE it is appended, so a 'block' decision keeps
+        // the laundered commentary out of the durable history — and
+        // therefore out of every subsequent provider request. The
+        // deltas already streamed; what 'block' protects is the
+        // persistent buffer and the run's final output.
+        const leakCheck =
+          causalityMonitor !== undefined && textBuffer.length > 0
+            ? causalityMonitor.checkMessage(textBuffer)
+            : undefined;
+        const leakBlocked = leakCheck?.leakDetected === true && leakCheck.decision === 'block';
+
         const assistant: AssistantMessage = buildAssistantMessage(
-          textBuffer,
+          leakBlocked ? LATERAL_LEAK_BLOCKED_NOTICE : textBuffer,
           stepReasoningParts,
           finalCalls,
           agentId,
@@ -1923,30 +2024,23 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         messages.push(assistant);
         state.messages.push(assistant);
 
-        // Lateral-leak (RB-55): scan the outgoing assistant
-        // content for causality laundering / commentary-phase
-        // patterns and surface a `agent.lateral-leak.detected`
-        // event when the configured monitor flags / blocks.
-        if (causalityMonitor !== undefined && textBuffer.length > 0) {
-          const check = causalityMonitor.checkMessage(textBuffer);
-          if (check.leakDetected) {
-            const sha = sha256Hex(textBuffer);
-            yield {
-              type: 'agent.lateral-leak.detected',
-              runId: state.id,
-              sessionId,
-              agentId,
-              vector: check.vector,
-              severity: check.severity,
-              causalityChain: check.causalityChain,
-              messageContentSha256: sha,
-              ...(check.matchedPattern !== undefined
-                ? { matchedPattern: check.matchedPattern }
-                : {}),
-              decision: check.decision,
-              detectedAtIso: new Date().toISOString(),
-            };
-          }
+        if (leakCheck?.leakDetected === true) {
+          const sha = sha256Hex(textBuffer);
+          yield {
+            type: 'agent.lateral-leak.detected',
+            runId: state.id,
+            sessionId,
+            agentId,
+            vector: leakCheck.vector,
+            severity: leakCheck.severity,
+            causalityChain: leakCheck.causalityChain,
+            messageContentSha256: sha,
+            ...(leakCheck.matchedPattern !== undefined
+              ? { matchedPattern: leakCheck.matchedPattern }
+              : {}),
+            decision: leakCheck.decision,
+            detectedAtIso: new Date().toISOString(),
+          };
         }
 
         const handoffCalls = finalCalls.filter((c) => handoffMap.has(c.toolName));
@@ -1963,8 +2057,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           agentId: state.currentAgentId,
         };
         state.steps.push(stepRecord);
+        lastStepCalledToolNames = finalCalls.map((c) => c.toolName);
 
-        if (textBuffer.length > 0) {
+        if (textBuffer.length > 0 && !leakBlocked) {
           finalSnapshot.output = textBuffer as unknown as TOutput;
           yield { type: 'text.complete', text: textBuffer };
         }
@@ -2176,23 +2271,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     }
 
     if (state.status === 'running') {
-      state.status = 'completed';
+      // AG-24: the loop exited via the stop condition (default
+      // isStepCount(50)) with work still pending — that is a CUT run,
+      // not a completion. Surface it as a typed failure so consumers
+      // can tell it apart from a clean finish.
+      const message = `run stopped by stop condition: ${stopWhen.description}`;
+      state.status = 'failed';
+      state.error = { message, code: 'stop-condition' };
+      yield { type: 'agent.error', error: { message, code: 'stop-condition' } };
     }
-    // Drain any queued follow-ups into a new turn while the run
-    // is still active. Each follow-up message is appended to the
-    // buffer + state, and the loop is restarted from the top so
-    // the model produces the next assistant message.
-    if (pendingFollowUp.length > 0 && state.status === 'completed' && !signal.aborted) {
-      const turn = pendingFollowUp.splice(0, pendingFollowUp.length);
-      for (const m of turn) {
-        messages.push(m);
-        state.messages.push(m);
-      }
-      state.status = 'running';
-      delete (state as { finishedAt?: string }).finishedAt;
-      yield* runFollowUpLoop(messages, state, stepNumber, signal, sessionId, userId);
-    }
-
     // AG-3: structured output is parsed + validated on the completed
     // path — a failure is a typed run failure (`output-validation-failed`),
     // never a silent text-cast. Runs BEFORE output guardrails so they
@@ -2244,29 +2331,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     }
     activeRunState = undefined;
     return yield* finishRun(state, finalSnapshot);
-  }
-
-  /**
-   * Re-enter the loop with the supplied buffer + accumulated
-   * step counter when a queued follow-up turn fires.
-   */
-  async function* runFollowUpLoop(
-    _messages: Message[],
-    _state: RunState,
-    _stepNumber: number,
-    _signal: AbortSignal,
-    _sessionId: string,
-    _userId: string | undefined,
-  ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-    // Intentional minimal-loop placeholder: the v0.1 follow-up
-    // semantics document the queueing path but do NOT auto-spawn
-    // a new provider call inside the same generator. Operators
-    // who want a follow-up turn invoke `agent.run(...)` again
-    // with the queued message; the queue is documented as
-    // "next-turn metadata", not "auto-spawn-a-turn". Keeping the
-    // generator here so we can extend it later without breaking
-    // the public surface.
-    yield* (async function* (): AsyncGenerator<AgentEvent<TOutput>, void, void> {})();
   }
 
   /**
@@ -2548,7 +2612,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     },
   };
 
-  void pendingFollowUp;
   void config.sensitivity as Sensitivity | undefined;
 
   const agent: Agent<TDeps, TOutput> = {

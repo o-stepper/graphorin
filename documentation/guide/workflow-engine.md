@@ -138,7 +138,7 @@ Checkpoint state must survive a JSON round-trip and this is enforced identically
 
 ### Durability modes
 
-`durability: 'sync' | 'async'` persist every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) — under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked.
+`durability: 'sync'` persists every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) — under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked. (The former `'async'` mode was removed: it was byte-identical to `'sync'`; a legacy `'async'` input is coerced to `'sync'` with a one-time warning.)
 
 ## Synchronous-step semantics
 
@@ -235,7 +235,7 @@ Use `agent.fanOut(...)` when:
 
 `WorkflowError` is the base class with a stable `code` discriminator. The full `WorkflowErrorCode` union covers:
 
-`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `cycle-detected`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `workflow-aborted`, `workflow-cancel-timeout`, `node-execution-failed`, `reducer-failed`, `state-validation-failed`, `dead-end`, `state-not-serializable`.
+`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired), `node-execution-failed`, `reducer-failed`, `state-validation-failed`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine — runaway loops are bounded by `maxSteps`.)
 
 Two of these are planning-honesty guarantees: a conditional fan where **no** edge fires and no `__end__` edge is satisfied raises `dead-end` instead of silently completing, and non-JSON-safe channel values raise `state-not-serializable` at the first checkpoint on every store.
 

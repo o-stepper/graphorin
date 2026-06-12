@@ -7,9 +7,11 @@
  *
  *   1. `prepareStep({ provider })` — the operator's explicit per-step
  *      override always wins.
- *   2. `Tool.preferredModel`        — the tool author's per-tool hint;
- *      multi-tool ties resolve to the highest cost tier
- *      (`'smart' > 'balanced' > 'fast'`; explicit `ModelSpec` is
+ *   2. `Tool.preferredModel`        — the tool author's per-tool hint.
+ *      Only the tools the model actually CALLED on the previous step
+ *      are consulted (AG-15) — an advertised-but-uncalled hint never
+ *      escalates the run. Multi-tool ties resolve to the highest cost
+ *      tier (`'smart' > 'balanced' > 'fast'`; explicit `ModelSpec` is
  *      treated as the highest tier).
  *   3. `Agent.preferredModel?`      — the per-agent default.
  *   4. `Agent` default `provider`   — the v0.1-alpha behaviour.

@@ -45,7 +45,14 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
   readonly needsApproval?:
     | boolean
     | ((input: TInput, ctx: ToolExecutionContext<TDeps>) => boolean | Promise<boolean>);
-  /** Sandbox isolation level. Defaults are picked by `@graphorin/security`. */
+  /**
+   * Sandbox isolation level. Defaults are picked by
+   * `@graphorin/security`. ADVISORY in the default agent build (AG-18):
+   * inline `config.tools` closures cannot be serialised out-of-process,
+   * so the resolved policy is surfaced on the `tool.execute` span /
+   * audit but the tool runs in-process. Real isolation applies to
+   * module-loadable (skill / MCP) tools.
+   */
   readonly sandboxPolicy?: SandboxPolicy;
   /** Free-form labels surfaced to operators and to the model. */
   readonly tags?: ReadonlyArray<string>;
@@ -69,7 +76,13 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
    * given sink (provider / exporter).
    */
   readonly sensitivity?: import('../types/sensitivity.js').Sensitivity;
-  /** Memory-modification guard tier (DEC-153). */
+  /**
+   * Memory-modification guard tier (DEC-153). ACTIVE when the agent is
+   * created with `memory` wired (SDF-1): the runtime binds a scope-aware
+   * region reader over working memory and the executor snapshots/verifies
+   * the region around guarded calls. Without `memory` the guard is
+   * skipped and the agent emits a one-time WARN.
+   */
   readonly memoryGuardTier?: MemoryGuardTier;
   /** Inbound prompt-injection sanitization policy. */
   readonly inboundSanitization?: InboundSanitizationPolicy;

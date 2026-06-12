@@ -104,6 +104,26 @@ export function namespaceFor(config: { readonly name: string }): string {
   return `workflow/${config.name}`;
 }
 
+let warnedLegacyAsyncDurability = false;
+
+/**
+ * WF-7: `'async'` was removed from {@link DurabilityMode} — it was
+ * byte-identical to `'sync'`. Legacy JS callers that still pass it get
+ * `'sync'` behaviour and a one-time warning instead of a crash.
+ */
+function normalizeDurability(mode: DurabilityMode | undefined): DurabilityMode {
+  if ((mode as string) === 'async') {
+    if (!warnedLegacyAsyncDurability) {
+      warnedLegacyAsyncDurability = true;
+      process.stderr.write(
+        "[graphorin/workflow] durability 'async' was removed (it was identical to 'sync'); running with 'sync'. Update the config.\n",
+      );
+    }
+    return 'sync';
+  }
+  return mode ?? 'sync';
+}
+
 const DEFAULT_MAX_STEPS = 200;
 const DEFAULT_CANCEL_GRACE_MS = 100;
 
@@ -151,7 +171,7 @@ export async function* runEngine<TState extends object, TInput extends Partial<T
   const tracer = config.tracer;
   const channels = config.channels as Readonly<Record<string, Channel<unknown>>>;
   const namespace = namespaceFor(config);
-  const durability = opts.durability ?? config.durability ?? 'sync';
+  const durability = normalizeDurability(opts.durability ?? config.durability);
 
   const initialState = buildInitialState<TState>({
     channels,
@@ -217,7 +237,7 @@ export async function* resumeEngine<TState extends object>(
   const tracer = config.tracer;
   const channels = config.channels as Readonly<Record<string, Channel<unknown>>>;
   const namespace = namespaceFor(config);
-  const durability = opts.durability ?? config.durability ?? 'sync';
+  const durability = normalizeDurability(opts.durability ?? config.durability);
   const mode = opts.mode ?? 'resume';
   const lock = opts.resumeLock;
 
@@ -465,7 +485,7 @@ async function* driveRun<TState extends object>(
     }
     if (internal.stepNumber >= maxSteps) {
       throw new WorkflowError(
-        'invalid-config',
+        'max-steps-exceeded',
         `workflow "${config.name}" exceeded the maxSteps cap (${maxSteps}); aborting to prevent runaway execution`,
         { hint: 'increase maxSteps on createWorkflow({...}) or check for an infinite edge cycle' },
       );
@@ -571,8 +591,17 @@ async function* driveRun<TState extends object>(
       },
     });
 
+    // WF-15: task/custom events are pumped LIVE while the parallel
+    // tasks run — pushes wake the pump below instead of waiting for
+    // the whole step to settle.
     const stepEvents: WorkflowEvent<TState>[] = [];
     const customEvents: WorkflowEvent<TState>[] = [];
+    let notifyEventPump: (() => void) | undefined;
+    const wakeEventPump = (): void => {
+      const notify = notifyEventPump;
+      notifyEventPump = undefined;
+      notify?.();
+    };
 
     const taskController = new AbortController();
     const onSignalAbort = (): void => taskController.abort();
@@ -602,14 +631,27 @@ async function* driveRun<TState extends object>(
           taskId: task.taskId,
           nodeName: task.nodeName,
         });
+        wakeEventPump();
       }
       const start = Date.now();
+      // WF-11: every executed task gets its advertised `workflow.task`
+      // span — ok/error mirrors the task outcome.
+      const taskSpan = tracer?.startSpan({
+        type: 'workflow.task',
+        attrs: {
+          'graphorin.workflow.name': config.name,
+          'graphorin.workflow.step_number': internal.stepNumber,
+          'graphorin.workflow.node': task.nodeName,
+          'graphorin.workflow.task_id': task.taskId,
+        },
+      });
       const ctxEmit = (name: string, payload?: unknown): void => {
         customEvents.push({
           type: 'workflow.custom',
           name,
           payload,
         });
+        wakeEventPump();
       };
 
       const ctx: WorkflowContext<TState> = Object.freeze({
@@ -671,6 +713,8 @@ async function* driveRun<TState extends object>(
         }
       }
 
+      taskSpan?.setStatus(status === 'failed' ? 'error' : 'ok');
+      taskSpan?.end();
       const durationMs = Date.now() - start;
       taskOutcomes.push({
         task,
@@ -690,22 +734,70 @@ async function* driveRun<TState extends object>(
           status: status === 'paused' ? 'paused' : status === 'failed' ? 'failed' : 'completed',
           durationMs,
         });
+        wakeEventPump();
       }
     });
 
+    let graceExpired = false;
     try {
-      await waitForTasksOrTimeout(taskPromises, taskController.signal, cancelGraceMs);
+      // WF-15: yield queued task/custom events as they arrive. The pump
+      // sleeps on `notifyEventPump` and is woken by every push and by
+      // step settle; the executor re-check closes the flip-between-
+      // check-and-sleep race.
+      let stepSettled = false;
+      const settledPromise = waitForTasksOrTimeout(
+        taskPromises,
+        taskController.signal,
+        cancelGraceMs,
+      ).then((outcome) => {
+        stepSettled = true;
+        wakeEventPump();
+        return outcome;
+      });
+      while (true) {
+        while (stepEvents.length > 0) {
+          const ev = stepEvents.shift();
+          if (ev !== undefined) yield ev;
+        }
+        while (customEvents.length > 0) {
+          const ev = customEvents.shift();
+          if (ev !== undefined && includeCustomEvents) yield ev;
+        }
+        if (stepSettled) break;
+        await new Promise<void>((resolve) => {
+          notifyEventPump = resolve;
+          if (stepSettled || stepEvents.length > 0 || customEvents.length > 0) {
+            notifyEventPump = undefined;
+            resolve();
+          }
+        });
+      }
+      graceExpired = (await settledPromise) === 'grace-expired';
     } finally {
       signal?.removeEventListener('abort', onSignalAbort);
     }
 
-    for (const ev of stepEvents) yield ev;
-    if (includeCustomEvents) for (const ev of customEvents) yield ev;
+    // Tail drain: events enqueued between the last pump pass and settle.
+    for (const ev of stepEvents.splice(0)) yield ev;
+    for (const ev of customEvents.splice(0)) {
+      if (includeCustomEvents) yield ev;
+    }
 
     if (signal?.aborted && !nodeFailure) {
+      // WF-11: a cancellation whose grace window expired with tasks
+      // still unsettled is its own advertised failure mode — distinct
+      // from a clean boundary abort.
       nodeFailure = {
         nodeName: tasks[0]?.nodeName ?? '<unknown>',
-        cause: new WorkflowAbortedError(threadId, signalAbortReason(signal)),
+        cause: graceExpired
+          ? new WorkflowError(
+              'workflow-cancel-timeout',
+              `cancellation grace (${cancelGraceMs}ms) expired with unsettled task(s) still running in workflow "${config.name}"`,
+              {
+                hint: 'tasks that ignore ctx.signal keep running in the background; raise cancelGraceMs or honour the signal in the node',
+              },
+            )
+          : new WorkflowAbortedError(threadId, signalAbortReason(signal)),
       };
     }
 
@@ -1197,6 +1289,20 @@ async function persistCheckpoint<TState extends object>(
 
   const stateForPersist = serializeState(internal.state);
 
+  // WF-11: persisted checkpoints get their advertised
+  // `workflow.checkpoint` span; skipped ('exit'-mode running) puts
+  // record nothing.
+  const checkpointSpan = skipPut
+    ? undefined
+    : config.tracer?.startSpan({
+        type: 'workflow.checkpoint',
+        attrs: {
+          'graphorin.workflow.thread_id': threadId,
+          'graphorin.workflow.step_number': internal.stepNumber,
+          'graphorin.workflow.checkpoint_status': status,
+        },
+      });
+
   const checkpoint: Checkpoint = {
     id: checkpointId,
     threadId,
@@ -1214,26 +1320,34 @@ async function persistCheckpoint<TState extends object>(
     ...(tags !== undefined ? { tags } : {}),
   };
 
-  if (!skipPut) {
-    await config.checkpointStore.put(threadId, namespace, checkpoint, metadata);
-  }
-
-  if (args.pendingWritesByTask) {
-    for (const [taskId, writes] of args.pendingWritesByTask) {
-      await config.checkpointStore.putWrites(
-        threadId,
-        namespace,
-        checkpointId,
-        writes.map((w, idx) => ({
-          taskId: w.taskId,
-          index: idx,
-          channel: w.channel,
-          value: w.value,
-        })),
-        taskId,
-      );
+  try {
+    if (!skipPut) {
+      await config.checkpointStore.put(threadId, namespace, checkpoint, metadata);
     }
+
+    if (args.pendingWritesByTask) {
+      for (const [taskId, writes] of args.pendingWritesByTask) {
+        await config.checkpointStore.putWrites(
+          threadId,
+          namespace,
+          checkpointId,
+          writes.map((w, idx) => ({
+            taskId: w.taskId,
+            index: idx,
+            channel: w.channel,
+            value: w.value,
+          })),
+          taskId,
+        );
+      }
+    }
+  } catch (err) {
+    checkpointSpan?.setStatus('error');
+    checkpointSpan?.end();
+    throw err;
   }
+  checkpointSpan?.setStatus('ok');
+  checkpointSpan?.end();
 
   return skipPut ? null : checkpointId;
 }
@@ -1422,12 +1536,15 @@ export async function forkThread<TState extends object>(input: {
   if (!tuple) throw new CheckpointNotFoundError(input.threadId, input.fromCheckpointId);
 
   const newThreadId = newId('thread');
+  const newCheckpointId = newId('cp');
+  // WF-17: the forked root is self-contained — its parentId must NOT
+  // dangle into the source thread (the parent only exists there).
+  const { parentId: _droppedParentId, ...rest } = tuple.checkpoint;
   const newCheckpoint: Checkpoint = {
-    ...tuple.checkpoint,
-    id: newId('cp'),
+    ...rest,
+    id: newCheckpointId,
     threadId: newThreadId,
     namespace,
-    ...(tuple.checkpoint.parentId === undefined ? {} : { parentId: tuple.checkpoint.parentId }),
   };
   await input.config.checkpointStore.put(newThreadId, namespace, newCheckpoint, {
     source: 'sync',
@@ -1435,6 +1552,32 @@ export async function forkThread<TState extends object>(input: {
     ...(tuple.metadata.nodeName !== undefined ? { nodeName: tuple.metadata.nodeName } : {}),
     ...(tuple.metadata.tags !== undefined ? { tags: [...tuple.metadata.tags] } : {}),
   });
+  // WF-17: pending writes ride along — a forked 'failed'/'aborted'
+  // checkpoint stays `retry()`-able without re-running (or losing) the
+  // tasks that already succeeded.
+  const writes = tuple.pendingWrites ?? [];
+  if (writes.length > 0) {
+    const byTask = new Map<string, Array<(typeof writes)[number]>>();
+    for (const write of writes) {
+      const bucket = byTask.get(write.taskId) ?? [];
+      bucket.push(write);
+      byTask.set(write.taskId, bucket);
+    }
+    for (const [taskId, taskWrites] of byTask) {
+      await input.config.checkpointStore.putWrites(
+        newThreadId,
+        namespace,
+        newCheckpointId,
+        taskWrites.map((w, idx) => ({
+          taskId: w.taskId,
+          index: idx,
+          channel: w.channel,
+          value: w.value,
+        })),
+        taskId,
+      );
+    }
+  }
   return { newThreadId };
 }
 
@@ -1540,15 +1683,15 @@ function waitForTasksOrTimeout(
   tasks: ReadonlyArray<Promise<unknown>>,
   signal: AbortSignal,
   cancelGraceMs: number,
-): Promise<void> {
-  const settled = Promise.allSettled(tasks).then(() => undefined);
+): Promise<'settled' | 'grace-expired'> {
+  const settled = Promise.allSettled(tasks).then(() => 'settled' as const);
   if (signal.aborted) {
-    return Promise.race([settled, deadline(cancelGraceMs)]);
+    return Promise.race([settled, deadline(cancelGraceMs).then(() => 'grace-expired' as const)]);
   }
   let timeoutId: NodeJS.Timeout | undefined;
-  const onAbortDeadline = new Promise<void>((resolve) => {
+  const onAbortDeadline = new Promise<'grace-expired'>((resolve) => {
     const trigger = (): void => {
-      timeoutId = setTimeout(() => resolve(), cancelGraceMs);
+      timeoutId = setTimeout(() => resolve('grace-expired'), cancelGraceMs);
     };
     signal.addEventListener('abort', trigger, { once: true });
   });

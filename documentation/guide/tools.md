@@ -50,7 +50,7 @@ Every tool declares two safety attributes plus an explicit approval predicate:
 | `sensitivity` | `'public'` / `'internal'` / `'secret'` | Whether the result may flow into traces and exports unredacted, and which providers may see it. |
 | `sideEffectClass` | `'pure'` / `'read-only'` / `'side-effecting'` / `'external-stateful'` | Idempotency-key requirements, audit emphasis, sandbox-tier defaults. |
 | `needsApproval` | `boolean` or `(input, ctx) => boolean \| Promise<boolean>` | Whether the runtime suspends the run with a `tool.approval.requested` event before executing the tool. |
-| `memoryGuardTier` | `MemoryGuardTier` (DEC-153) | Classification for the pre/post memory-snapshot guard. The snapshot/verify step is wired but **inert in the default agent build** until a scope-free memory-region reader lands. |
+| `memoryGuardTier` | `MemoryGuardTier` (DEC-153) | Classification for the pre/post memory-snapshot guard. **Active when the agent has `memory` wired** (SDF-1); skipped with a one-time WARN otherwise — see [Memory-modification guard](#memory-modification-guard). |
 | `preferredModel` | `'fast'` / `'balanced'` / `'smart'` or a `ModelSpec` | Per-tool model-tier hint. Resolved against the agent's tier map. |
 
 Approval is **driven by `needsApproval`**, not by `sideEffectClass`. The latter is a classification used for idempotency checks, sandbox defaults, and audit emphasis; whether a specific call gates on a human is the operator's decision.

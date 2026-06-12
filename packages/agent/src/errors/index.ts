@@ -28,7 +28,8 @@ export type AgentRuntimeErrorCode =
   | 'merge-blocked'
   | 'protocol-injection-rejected'
   | 'run-state-version-unsupported'
-  | 'run-state-malformed';
+  | 'run-state-malformed'
+  | 'concurrent-run';
 
 /**
  * Base class for every error thrown from `@graphorin/agent`.
@@ -142,6 +143,26 @@ export class ToolNotFoundError extends AgentRuntimeError {
  *
  * @stable
  */
+/**
+ * Thrown when a second `run()` / `stream()` starts while another run is
+ * in flight on the same `Agent` instance (AG-11). The public surface
+ * (`steer` / `followUp` / `abort` / `compact`) addresses "the run"
+ * without a run handle, so overlapping runs would share the abort
+ * controller, steer queue, and executor bridge — start the second run
+ * on its own `createAgent(...)` instance instead.
+ *
+ * @stable
+ */
+export class ConcurrentRunError extends AgentRuntimeError {
+  constructor() {
+    super(
+      'concurrent-run',
+      'This Agent instance already has a run in flight. One run per instance: await the active run (or abort it), or create a separate agent instance for parallel work.',
+      'ConcurrentRunError',
+    );
+  }
+}
+
 export class MultipleHandoffsInStepError extends AgentRuntimeError {
   readonly handoffNames: ReadonlyArray<string>;
   constructor(handoffNames: ReadonlyArray<string>) {

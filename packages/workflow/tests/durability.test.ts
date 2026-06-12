@@ -30,7 +30,7 @@ describe('durability modes', () => {
     expect(store.size()).toBeGreaterThan(0);
   });
 
-  it('persists every step in `async` mode (best-effort fast path)', async () => {
+  it('coerces the removed `async` mode to `sync` with a one-time warning (WF-7)', async () => {
     const store = new InMemoryCheckpointStore();
     const wf = createWorkflow<{ value: number }>({
       name: 'async-mode',
@@ -51,10 +51,23 @@ describe('durability modes', () => {
         { from: 'b', to: '__end__' },
       ],
       checkpointStore: store,
-      durability: 'async',
+      // Legacy mode removed by WF-7 — runtime coerces it to 'sync'.
+      durability: 'async' as unknown as import('../src/types.js').DurabilityMode,
     });
-    await collect(wf.execute({}, { threadId: 'async-1' }));
-    expect(store.size()).toBeGreaterThan(0);
+    const warnings: string[] = [];
+    const original = process.stderr.write.bind(process.stderr);
+    process.stderr.write = ((chunk: string | Uint8Array): boolean => {
+      warnings.push(String(chunk));
+      return true;
+    }) as typeof process.stderr.write;
+    try {
+      await collect(wf.execute({}, { threadId: 'async-1' }));
+    } finally {
+      process.stderr.write = original;
+    }
+    // Coerced to 'sync': every step checkpoint persisted, with a warn.
+    expect(store.size()).toBeGreaterThan(1);
+    expect(warnings.join('')).toContain("'async'");
   });
 
   it('only writes a terminal checkpoint in `exit` mode', async () => {

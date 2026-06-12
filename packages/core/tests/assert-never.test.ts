@@ -86,6 +86,10 @@ function describeAgentEvent(e: AgentEvent): string {
       return e.queriedRunId;
     case 'agent.lateral-leak.detected':
       return e.vector;
+    case 'file.generated':
+      return e.mimeType;
+    case 'source.cited':
+      return e.uri;
     case 'step.end':
       return String(e.stepNumber);
     case 'guardrail.tripped':
