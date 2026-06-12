@@ -255,3 +255,16 @@ describe('createDataFlowPolicy', () => {
     expect(decision.action).toBe('declassify');
   });
 });
+
+describe('SDF-5 — minSpanLength floor', () => {
+  it('clamps a sub-8 minSpanLength up to the trustworthy floor instead of silently disabling detection', () => {
+    // Documented "lower = more sensitive" — a tiny minSpanLength must
+    // not make inspectArgs always-negative (the pre-fix bug).
+    const ledger = createTaintLedger({ minSpanLength: 5 });
+    const untrusted =
+      'the secret rendezvous is at the harbour warehouse seven at midnight on tuesday';
+    ledger.recordOutput(untrustedLabel, untrusted);
+    expect(ledger.untrustedSeen).toBe(true);
+    expect(ledger.inspectArgs(`forward: ${untrusted}`).carriesUntrustedVerbatim).toBe(true);
+  });
+});

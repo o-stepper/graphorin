@@ -169,7 +169,9 @@ export interface DataFlowPolicyConfig {
   /**
    * Minimum length of a shared verbatim span (in normalized characters)
    * for the ledger to treat a sink's arguments as carrying untrusted
-   * content. Lower = more sensitive (more false positives). Default `20`.
+   * content. Lower = more sensitive (more false positives), clamped up
+   * to an 8-char floor below which the probe cannot be meaningful
+   * (SDF-5). Default `20`.
    */
   readonly minSpanLength?: number;
 }

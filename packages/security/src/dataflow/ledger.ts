@@ -69,7 +69,13 @@ export function createTaintLedger(opts?: {
    */
   readonly initial?: TaintLedgerSnapshot;
 }): TaintLedger {
-  const minSpanLength = Math.max(1, opts?.minSpanLength ?? DEFAULT_MIN_SPAN_LENGTH);
+  // SDF-5: the verbatim probe needs a window of at least
+  // MIN_TRUSTWORTHY_WINDOW chars to be meaningful — a sub-floor
+  // minSpanLength used to silently make `inspectArgs` always-negative
+  // (the opposite of the documented "lower = more sensitive"). Clamp
+  // UP to the floor so detection stays on.
+  const requestedMinSpan = Math.max(1, opts?.minSpanLength ?? DEFAULT_MIN_SPAN_LENGTH);
+  const minSpanLength = Math.max(requestedMinSpan, MIN_TRUSTWORTHY_WINDOW);
   const maxTrackedChars = Math.max(
     minSpanLength,
     opts?.maxTrackedChars ?? DEFAULT_MAX_TRACKED_CHARS,
