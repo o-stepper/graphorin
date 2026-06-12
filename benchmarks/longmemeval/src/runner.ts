@@ -124,6 +124,11 @@ async function recall(
     }
   };
   collect(await memory.semantic.search(scope, question, { topK }));
+  // Per-keyword fan-out. As of MRET-1 the store tokenises FTS queries itself
+  // (each whitespace token is OR-quoted), so the natural-language search above
+  // already recalls on individual terms; this loop is now a redundant recall
+  // booster retained pending the EB-1 benchmark rework. It no longer
+  // compensates for a library gap.
   const perToken = Math.max(4, Math.floor(topK / 2));
   for (const token of keywordTokens(question)) {
     collect(await memory.semantic.search(scope, token, { topK: perToken }));

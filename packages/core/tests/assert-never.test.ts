@@ -159,6 +159,7 @@ function describeMemoryKind(k: MemoryKind): string {
     case 'semantic':
     case 'procedural':
     case 'shared':
+    case 'insight':
       return k;
     default:
       return assertNever(k);
@@ -177,6 +178,7 @@ function describeToolErrorKind(k: ToolErrorKind): string {
     case 'aborted':
     case 'inbound_sanitization_blocked':
     case 'rate_limited':
+    case 'dataflow_policy_blocked':
       return k;
     default:
       return assertNever(k);

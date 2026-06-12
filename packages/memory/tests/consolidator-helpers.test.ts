@@ -249,6 +249,43 @@ describe('consolidator/budget', () => {
     expect(typeof b).toBe('number');
     expect(nextBucketStart(b, 'local')).toBe(b + 24 * 60 * 60 * 1000);
   });
+
+  it('sliding-24h accumulates within the window, keeps pause, and ages spend out only past 24h (MCON-3)', () => {
+    const HOUR = 60 * 60 * 1000;
+    let now = Date.parse('2026-04-21T00:00:00Z');
+    const tracker = new BudgetTracker({
+      maxTokensPerDay: 100,
+      maxCostPerDay: 1000,
+      onExceed: 'pause',
+      resetSemantics: 'sliding-24h',
+      now: () => now,
+    });
+
+    tracker.record({ phase: 'standard', tokens: 60, costUsd: 0 });
+    expect(tracker.snapshot().tokensUsedToday).toBe(60);
+
+    // < 24h later the spend is preserved — not zeroed on every check.
+    now += HOUR;
+    expect(tracker.snapshot().tokensUsedToday).toBe(60);
+
+    // Cross the ceiling → pause; the pause survives the next check.
+    tracker.record({ phase: 'standard', tokens: 60, costUsd: 0 });
+    expect(tracker.snapshot().tokensUsedToday).toBe(120);
+    expect(tracker.snapshot().paused).toBe(true);
+    expect(tracker.precheck('standard').allowed).toBe(false);
+
+    now += HOUR;
+    expect(tracker.snapshot().paused).toBe(true);
+    expect(tracker.snapshot().tokensUsedToday).toBe(120);
+
+    // Past 24h from both spends: they age out of the trailing window, the
+    // total drops to 0, and the tracker auto-unpauses.
+    now += 25 * HOUR;
+    const snap = tracker.snapshot();
+    expect(snap.tokensUsedToday).toBe(0);
+    expect(snap.paused).toBe(false);
+    expect(tracker.precheck('standard').allowed).toBe(true);
+  });
 });
 
 describe('consolidator/triggers', () => {

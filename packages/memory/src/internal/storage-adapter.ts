@@ -65,6 +65,17 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
   /** Mark an episode archived. Soft-archive — the row stays for replay. */
   archive?(id: string, reason?: string): Promise<void>;
+  /**
+   * Most-recent episodes by end time (newest first), with no FTS / vector
+   * query — recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
+   * and the deep-phase reflection gate. The default `@graphorin/store-sqlite`
+   * adapter implements it.
+   */
+  listRecent?(
+    scope: SessionScope,
+    limit: number,
+    options?: { includeQuarantined?: boolean },
+  ): Promise<ReadonlyArray<Episode>>;
 }
 
 /**
@@ -308,6 +319,13 @@ export interface ConsolidatorStateRow {
   readonly nextEligibleAt: number | null;
   readonly activeLockHeldBy: string | null;
   readonly activeLockAcquiredAt: number | null;
+  /**
+   * `ended_at` (epoch ms) of the newest episode the deep-phase reflection
+   * pass has already reflected on (MCON-13). A later pass accumulates
+   * importance only from strictly-newer episodes; `null` ⇒ nothing reflected
+   * yet.
+   */
+  readonly reflectionWatermark: number | null;
 }
 
 /**
@@ -326,6 +344,7 @@ export interface ConsolidatorStatePatch {
   readonly nextEligibleAt?: number | null;
   readonly activeLockHeldBy?: string | null;
   readonly activeLockAcquiredAt?: number | null;
+  readonly reflectionWatermark?: number | null;
 }
 
 /**

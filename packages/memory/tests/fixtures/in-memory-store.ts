@@ -181,6 +181,7 @@ class InMemoryConsolidatorStore implements ConsolidatorMemoryStoreExt {
       nextEligibleAt: null,
       activeLockHeldBy: null,
       activeLockAcquiredAt: null,
+      reflectionWatermark: null,
     };
     const next: ConsolidatorStateRow = {
       ...current,
@@ -194,6 +195,9 @@ class InMemoryConsolidatorStore implements ConsolidatorMemoryStoreExt {
       ...(patch.activeLockHeldBy !== undefined ? { activeLockHeldBy: patch.activeLockHeldBy } : {}),
       ...(patch.activeLockAcquiredAt !== undefined
         ? { activeLockAcquiredAt: patch.activeLockAcquiredAt }
+        : {}),
+      ...(patch.reflectionWatermark !== undefined
+        ? { reflectionWatermark: patch.reflectionWatermark }
         : {}),
     };
     this.state.set(key, next);
@@ -216,6 +220,7 @@ class InMemoryConsolidatorStore implements ConsolidatorMemoryStoreExt {
           lastPhase: null,
           lastCompletedAt: null,
           nextEligibleAt: null,
+          reflectionWatermark: null,
         }),
         scope,
         activeLockHeldBy: runId,
@@ -712,6 +717,17 @@ export function createInMemoryStore(
             episodes[idx] = { ...ep, deletedAt: new Date().toISOString() };
           }
         }
+      },
+      async listRecent(scope, limit, opts) {
+        return episodes
+          .filter(
+            (episode) =>
+              episode.userId === scope.userId &&
+              episode.deletedAt === undefined &&
+              (opts?.includeQuarantined === true || episode.status !== 'quarantined'),
+          )
+          .sort((a, b) => Date.parse(b.endedAt) - Date.parse(a.endedAt))
+          .slice(0, limit);
       },
     },
     semantic: {

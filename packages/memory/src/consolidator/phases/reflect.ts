@@ -45,6 +45,13 @@ export interface ReflectionDeps {
   readonly budget: BudgetTracker;
   /** Reflection fires only when accumulated episode importance ≥ this. */
   readonly importanceThreshold: number;
+  /**
+   * `ended_at` (epoch ms) of the newest episode a prior pass already reflected
+   * on (MCON-13). The gate accumulates importance only from strictly-newer
+   * episodes, so a deep run with no new episodes never re-fires. `null` /
+   * absent ⇒ nothing reflected yet (accumulate over all recent episodes).
+   */
+  readonly reflectionWatermark?: number | null;
   /** Upper bound on salient questions asked per pass. */
   readonly maxQuestions: number;
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
@@ -61,6 +68,13 @@ export interface ReflectionOutcome {
   readonly insightsCreated: number;
   readonly tokens: number;
   readonly costUsd: number;
+  /**
+   * Watermark to persist for the next pass (MCON-13): the `ended_at` (epoch
+   * ms) of the newest episode this pass reflected on, or the incoming
+   * watermark unchanged when the pass did not fire. The runtime persists it
+   * to `consolidator_state`.
+   */
+  readonly nextWatermark: number | null;
 }
 
 const QUESTIONS_SYSTEM_PROMPT = [
@@ -102,6 +116,7 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         insightsCreated: 0,
         tokens: 0,
         costUsd: 0,
+        nextWatermark: deps.reflectionWatermark ?? null,
         ...over,
       });
 
@@ -114,13 +129,21 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         return empty();
       }
 
-      // 1. Accumulated-importance gate. Auto-formed episodes (P1-2) land
-      //    quarantined, so importance accrues there — include them.
-      const recent = await deps.episodic.search(deps.scope, '*', {
-        topK: 50,
+      // 1. Accumulated-importance gate. Recency, not relevance: list the most
+      //    recent episodes (MCON-1 — the old `'*'` FTS probe matched zero rows
+      //    on real SQLite). Auto-formed episodes (P1-2) land
+      //    quarantined, so importance accrues there — include them. Only count
+      //    episodes newer than the watermark so a pass with no new episodes
+      //    never re-fires the paid synthesis (MCON-13).
+      const recentEpisodes = await deps.episodic.listRecent(deps.scope, 50, {
         includeQuarantined: true,
       });
-      const accumulated = recent.reduce((sum, hit) => sum + (hit.record.importance ?? 0), 0);
+      const watermark = deps.reflectionWatermark ?? null;
+      const fresh =
+        watermark === null
+          ? recentEpisodes
+          : recentEpisodes.filter((e) => Date.parse(e.endedAt) > watermark);
+      const accumulated = fresh.reduce((sum, episode) => sum + (episode.importance ?? 0), 0);
       span.setAttributes({
         'consolidator.reflect.accumulated_importance': accumulated,
         'consolidator.reflect.threshold': deps.importanceThreshold,
@@ -129,6 +152,12 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         span.setAttributes({ 'consolidator.reflect.triggered': 0 });
         return empty({ accumulatedImportance: accumulated });
       }
+      // The newest episode this pass will reflect on — persisted as the next
+      // watermark so subsequent passes skip everything up to here.
+      const advancedWatermark = fresh.reduce(
+        (max, episode) => Math.max(max, Date.parse(episode.endedAt)),
+        watermark ?? Number.NEGATIVE_INFINITY,
+      );
 
       let tokens = 0;
       let costUsd = 0;
@@ -149,10 +178,10 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         deps.budget.record({ phase: 'deep', tokens: t, costUsd: c });
       };
 
-      // 2. Salient questions over recent memories.
-      const recentSummaries = recent
+      // 2. Salient questions over the new (post-watermark) memories.
+      const recentSummaries = fresh
         .slice(0, RECENT_CONTEXT_LIMIT)
-        .map((hit) => `- ${hit.record.summary}`)
+        .map((episode) => `- ${episode.summary}`)
         .join('\n');
       const questionsRes = await deps.provider.generate(
         buildQuestionsRequest(deps, recentSummaries),
@@ -160,6 +189,16 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
       record(questionsRes.usage);
       const questions = parseQuestions(questionsRes.text).slice(0, Math.max(0, deps.maxQuestions));
       span.setAttributes({ 'consolidator.reflect.questions': questions.length });
+
+      // Pre-filter new insights against already-stored ones so a re-fire over
+      // overlapping evidence does not write near-duplicates (MCON-13). Offline
+      // and embedding-free: normalised exact match, the insight analogue of
+      // the conflict pipeline's stage-1 dedup.
+      const seenInsights = new Set(
+        (await deps.insights.list(deps.scope, { includeQuarantined: true, limit: 200 })).map((i) =>
+          normalizeInsightText(i.text),
+        ),
+      );
 
       const nowFn = typeof deps.now === 'function' ? deps.now : Date.now;
       let insightsCreated = 0;
@@ -188,6 +227,12 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         record(insightRes.usage);
         const text = parseInsight(insightRes.text);
         if (text === null) continue;
+
+        // Skip near-duplicates of an already-stored insight (and of one just
+        // written this pass).
+        const normalized = normalizeInsightText(text);
+        if (seenInsights.has(normalized)) continue;
+        seenInsights.add(normalized);
 
         const iso = new Date(nowFn()).toISOString();
         await deps.insights.insert({
@@ -225,9 +270,27 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         insightsCreated,
         tokens,
         costUsd,
+        // Advance past everything reflected on this pass. `advancedWatermark`
+        // is finite here (the gate fired ⇒ `fresh` is non-empty).
+        nextWatermark: Number.isFinite(advancedWatermark) ? advancedWatermark : watermark,
       };
     },
   );
+}
+
+/**
+ * Normalise an insight for exact-dedup comparison — lowercased, punctuation
+ * stripped, whitespace collapsed. Two insights that differ only in casing or
+ * trailing punctuation collapse to the same key.
+ *
+ * @internal
+ */
+export function normalizeInsightText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
 }
 
 function buildQuestionsRequest(deps: ReflectionDeps, recentSummaries: string): ProviderRequest {

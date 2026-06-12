@@ -50,6 +50,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '015': '@graphorin/memory (fact importance / multi-signal forgetting)',
   '016': '@graphorin/memory (entity graph / one-hop expansion)',
   '017': '@graphorin/memory (induced procedures / workflow induction)',
+  '018': '@graphorin/memory (reflection watermark)',
 };
 
 const dynamicMigrations: Migration[] = [];

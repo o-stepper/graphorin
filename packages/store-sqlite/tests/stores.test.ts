@@ -66,6 +66,47 @@ describe('createSqliteStore', () => {
     expect(hits[0]?.signals?.bm25).toBeTypeOf('number');
   });
 
+  it('semantic memory: multi-word natural-language query matches non-adjacent terms (MRET-1/CS-6)', async () => {
+    await store.memory.semantic.remember({
+      id: 'f-anna',
+      kind: 'semantic' as const,
+      userId: 'alex',
+      sensitivity: 'internal' as const,
+      text: 'Anna works at Acme Corporation.',
+      createdAt: new Date().toISOString(),
+    });
+    // A natural-language question whose terms are reordered and non-adjacent
+    // relative to the stored fact. Whole-query phrase escaping returns zero
+    // lexical hits here; tokenised escaping recalls on the shared term.
+    const hits = await store.memory.semantic.search(
+      { userId: 'alex' },
+      { query: 'where does Anna work' },
+    );
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits[0]?.record.id).toBe('f-anna');
+    expect(hits[0]?.signals?.bm25).toBeTypeOf('number');
+  });
+
+  it('semantic memory: FTS5 operator characters in a query are neutralised, not interpreted (MRET-1/CS-6)', async () => {
+    await store.memory.semantic.remember({
+      id: 'f-special',
+      kind: 'semantic' as const,
+      userId: 'alex',
+      sensitivity: 'internal' as const,
+      text: 'Loves mountain hiking and fresh espresso.',
+      createdAt: new Date().toISOString(),
+    });
+    // FTS5 syntax characters (`*`, `(`, `)`, `"`, boolean keywords, `NEAR/`)
+    // must be quoted away per token — the query must not raise a SqliteError
+    // and must still recall on the legitimate tokens it contains.
+    const hits = await store.memory.semantic.search(
+      { userId: 'alex' },
+      { query: 'espresso* AND "fresh" OR (mountain) NEAR/2 hiking' },
+    );
+    expect(hits.length).toBeGreaterThan(0);
+    expect(hits[0]?.record.id).toBe('f-special');
+  });
+
   it('episodic memory: put + get + search', async () => {
     const ep = {
       id: 'e1',

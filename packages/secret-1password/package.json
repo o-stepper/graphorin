@@ -47,7 +47,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.tests.json",
     "test": "vitest run",
     "lint": "biome check .",
     "clean": "rimraf dist .turbo *.tsbuildinfo"

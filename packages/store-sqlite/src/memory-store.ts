@@ -543,6 +543,28 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   }
 
   /**
+   * Most-recent episodes by `ended_at` (newest first), with no FTS / vector
+   * query — recency, not relevance (MCON-1). Powers the deep-phase reflection
+   * gate and `EpisodicMemory.recent()`, both of which previously probed with a
+   * `'*'` FTS query that matches zero rows on real SQLite.
+   */
+  async listRecent(
+    scope: SessionScope,
+    limit: number,
+    opts: { includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<Episode>> {
+    const rows = this.#conn.all<EpisodeRow>(
+      `SELECT e.* FROM episodes e
+       WHERE e.scope_user_id = ? AND e.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+       ORDER BY e.ended_at DESC
+       LIMIT ?`,
+      [scope.userId, limit],
+    );
+    return rows.map(rowToEpisode);
+  }
+
+  /**
    * KNN search against the per-embedder vec0 table for episodes.
    * Joins back to the canonical `episodes` row + applies the
    * `WHERE embedder_id = ?` guard from ADR-023 / DEC-116.
@@ -1894,9 +1916,18 @@ function renderMessageForFts(message: Message): string {
 }
 
 function escapeFtsQuery(query: string): string {
-  // Wrap in double quotes and escape any internal double quotes — yields
-  // a phrase query that survives operator characters in user input.
-  return `"${query.replace(/"/g, '""')}"`;
+  // Tokenise on whitespace and quote each token independently, joined with the
+  // FTS5 `OR` operator. Per-token double-quoting still neutralises operator
+  // characters and reserved keywords (user input cannot inject FTS5 syntax),
+  // but OR-ing the tokens restores lexical recall for multi-word natural-
+  // language queries: a single whole-query phrase only matches a verbatim,
+  // adjacent run of the same tokens, so reordered or non-adjacent terms scored
+  // zero. Whitespace-only input falls back to the prior (empty) phrase form.
+  const tokens = query.split(/\s+/).filter((token) => token.length > 0);
+  if (tokens.length === 0) {
+    return `"${query.replace(/"/g, '""')}"`;
+  }
+  return tokens.map((token) => `"${token.replace(/"/g, '""')}"`).join(' OR ');
 }
 
 /** Quote a SQL identifier — only `[A-Za-z0-9_]` allowed. */
