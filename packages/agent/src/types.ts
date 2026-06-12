@@ -54,10 +54,22 @@ export type AgentInput = string | Message | ReadonlyArray<Message>;
  */
 export interface OutputSpec<TOutput> {
   readonly kind: 'text' | 'structured';
-  /** Optional Zod schema for structured output validation. */
+  /**
+   * Local validator (Zod-compatible `{ parse }`) applied to the final
+   * model output on the completed path (AG-3). A parse failure fails
+   * the run with `output-validation-failed` — never a silent cast.
+   */
   readonly schema?: { parse(value: unknown): TOutput };
   /** Optional description shown to the model alongside the schema. */
   readonly description?: string;
+  /**
+   * Wire-format JSON Schema advertised to the model: forwarded on
+   * `ProviderRequest.outputType` for adapters with native structured
+   * output, and embedded in the fallback JSON instruction appended as
+   * a trailing system message (the documented contract until adapters
+   * consume `outputType` natively — PS-24).
+   */
+  readonly jsonSchema?: Readonly<Record<string, unknown>>;
 }
 
 /**

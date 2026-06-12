@@ -360,6 +360,39 @@ function asMessages(input: AgentInput | RunState): {
   throw new InvalidAgentConfigError(`unrecognized AgentInput shape`);
 }
 
+/**
+ * Strip a single Markdown code fence around a JSON payload (AG-3).
+ * Models often wrap structured output in ```json fences even when told
+ * not to. ReDoS-safe: the info string is matched with `[^\n]*`.
+ */
+function stripJsonFence(text: string): string {
+  const trimmed = text.trim();
+  const match = /^```[^\n]*\n([\s\S]*?)\n?```$/.exec(trimmed);
+  return match?.[1] ?? trimmed;
+}
+
+/**
+ * The AG-3 fallback instruction: one trailing system message that
+ * pins JSON-only output and embeds the wire schema / description.
+ * This is the documented structured-output contract for adapters that
+ * do not yet consume `ProviderRequest.outputType` natively (PS-24).
+ */
+function buildStructuredInstruction(spec: {
+  readonly description?: string;
+  readonly jsonSchema?: Readonly<Record<string, unknown>>;
+}): string {
+  const parts = [
+    'Respond with a single valid JSON value only — no prose, no Markdown code fences.',
+  ];
+  if (spec.description !== undefined && spec.description.length > 0) {
+    parts.push(spec.description);
+  }
+  if (spec.jsonSchema !== undefined) {
+    parts.push(`The JSON MUST conform to this JSON Schema:\n${JSON.stringify(spec.jsonSchema)}`);
+  }
+  return parts.join('\n');
+}
+
 /** Most-recent user-role text in `messages` (for context-engine auto-recall). */
 function lastUserText(messages: ReadonlyArray<Message>): string | undefined {
   for (let i = messages.length - 1; i >= 0; i--) {
@@ -664,6 +697,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   }
   if (config.provider === undefined || config.provider === null) {
     throw new InvalidAgentConfigError("missing 'provider'");
+  }
+  // AG-3: a schema on a text-kind output spec is a config mistake (the
+  // schema would never run) — reject instead of silently ignoring.
+  if (config.outputType?.kind === 'text' && config.outputType.schema !== undefined) {
+    throw new InvalidAgentConfigError(
+      "outputType.kind 'text' with a schema — did you mean kind: 'structured'?",
+    );
   }
   validatePreferredModel(config.preferredModel);
   if (config.modelTierMap !== undefined) {
@@ -1006,6 +1046,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         }
       }
     }
+
+    // AG-3: one per-run JSON instruction for structured output, appended
+    // to each provider request (never the shared buffer / RunState).
+    const structuredInstruction =
+      config.outputType?.kind === 'structured'
+        ? buildStructuredInstruction(config.outputType)
+        : undefined;
 
     // AG-1: approved gated calls collected from a resume directive, executed
     // for real once every approval is resolved (see the dispatch below).
@@ -1496,7 +1543,28 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         );
 
         const baseRequest: ProviderRequest = {
-          messages,
+          // AG-3 fallback contract: for structured output the request
+          // carries ONE trailing system instruction (JSON-only + schema)
+          // in the request copy — never in the shared buffer or the
+          // persisted RunState. Adapters with native structured output
+          // additionally receive `outputType` below (PS-24 consumes it).
+          messages:
+            structuredInstruction === undefined
+              ? messages
+              : [...messages, { role: 'system' as const, content: structuredInstruction }],
+          ...(config.outputType !== undefined
+            ? {
+                outputType: {
+                  kind: config.outputType.kind,
+                  ...(config.outputType.description !== undefined
+                    ? { description: config.outputType.description }
+                    : {}),
+                  ...(config.outputType.jsonSchema !== undefined
+                    ? { jsonSchema: config.outputType.jsonSchema }
+                    : {}),
+                },
+              }
+            : {}),
           tools: toolDefs,
           ...(overrides.toolChoice !== undefined
             ? { toolChoice: overrides.toolChoice }
@@ -1919,6 +1987,27 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state.status = 'running';
       delete (state as { finishedAt?: string }).finishedAt;
       yield* runFollowUpLoop(messages, state, stepNumber, signal, sessionId, userId);
+    }
+
+    // AG-3: structured output is parsed + validated on the completed
+    // path — a failure is a typed run failure (`output-validation-failed`),
+    // never a silent text-cast. Runs BEFORE output guardrails so they
+    // screen the PARSED value.
+    if (state.status === 'completed' && config.outputType?.kind === 'structured') {
+      const raw = String(finalSnapshot.output ?? '');
+      try {
+        const parsed: unknown = JSON.parse(stripJsonFence(raw));
+        finalSnapshot.output = (
+          config.outputType.schema !== undefined ? config.outputType.schema.parse(parsed) : parsed
+        ) as TOutput;
+      } catch (cause) {
+        const message = `structured output validation failed: ${
+          cause instanceof Error ? cause.message : String(cause)
+        }`;
+        yield { type: 'agent.error', error: { message, code: 'output-validation-failed' } };
+        state.status = 'failed';
+        state.error = { message, code: 'output-validation-failed' };
+      }
     }
 
     // AG-2 / SDF-4: output guardrails screen the final output on the
