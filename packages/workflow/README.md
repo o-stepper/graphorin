@@ -101,8 +101,20 @@ for await (const event of stream) {
 
 - **Durable execution.** Every execution step ends with a checkpoint
   written through the pluggable `CheckpointStore` from
-  `@graphorin/core`. A new process can pick up exactly where the
-  previous one left off via `workflow.resume(threadId, directive)`.
+  `@graphorin/core`, carrying the full resumable frontier (pending
+  pauses, `Dispatch` tasks, completed-but-unwalked nodes). A new
+  process can pick up exactly where the previous one left off via
+  `workflow.resume(threadId, directive)` — including crashed threads
+  whose latest checkpoint is `running` — and `retry(threadId)`
+  restarts a `failed` thread re-running only the failed work
+  (successful siblings replay from persisted writes). Checkpoint
+  writes are CAS-guarded: a racing resume loses with
+  `checkpoint-version-conflict` instead of forking the timeline.
+  Resume re-executes the paused node body from the top (snapshot
+  resume, not deterministic replay) — side effects before a
+  `pause()` must be idempotent. Checkpoint state must be JSON-safe;
+  `Map`/`Set`/`Date` fail fast with `state-not-serializable` on every
+  store.
 - **Synchronous-step semantics.** Tasks planned for an execution step
   run in parallel; their writes merge atomically per channel; the
   merged state is persisted; the next step plans against the new
@@ -112,7 +124,9 @@ for await (const event of stream) {
   (overwrite, error on collision), `AnyValue` (last-writer-wins),
   `Reducer((prev, next) => merged)`, `ListAggregate` (append),
   `Stream` (append-only queue, optional uniqueness), `Barrier(['a',
-  'b'])` (wait for all named writers), `Ephemeral` (per-step value).
+  'b'])` (keyed join — a node fed by 2+ of the barrier's writers waits
+  for every writer and runs exactly once), `Ephemeral` (per-step
+  value).
 - **HITL via `pause(value)`.** A node calls `pause(...)`; the engine
   catches the signal, persists state, and yields a
   `workflow.suspended` event. `workflow.resume(threadId, new
@@ -145,7 +159,8 @@ for await (const event of stream) {
   `unknown-node`, `thread-not-found`, `checkpoint-not-found`,
   `concurrent-resume-rejected`, `resume-without-suspension`,
   `workflow-aborted`, `node-execution-failed`, `reducer-failed`,
-  `state-validation-failed`.
+  `state-validation-failed`, `checkpoint-version-conflict`,
+  `dead-end`, `state-not-serializable`.
 
 ## Composition with `@graphorin/agent`
 

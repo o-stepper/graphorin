@@ -106,6 +106,40 @@ flowchart LR
 
 Every execution step ends with a checkpoint written through the pluggable `CheckpointStore`. A new process — even on a different machine — can pick up exactly where the previous one left off via `workflow.resume(threadId, directive)`. HITL is a primitive, not a bolt-on.
 
+### What the checkpoint carries
+
+Each checkpoint persists the merged state, the per-channel versions, **and the resumable frontier**: every pending pause (parallel pausers included), every `Dispatch` task that has not run yet, and every node that completed but whose outgoing edges have not been walked. Nothing in flight is lost at a suspend/crash boundary — a sibling that completed while another node paused still fires its edges after resume.
+
+### Recovery matrix
+
+| Latest checkpoint status | How to continue | What happens |
+|---|---|---|
+| `suspended` | `resume(threadId, directive)` | The paused node re-runs with the directive value; parallel pausers re-suspend with their own values intact. |
+| `running` | `resume(threadId)` | Crash recovery — the process died mid-run; execution continues from the last completed step. Completed steps are never re-run. |
+| `aborted` | `resume(threadId)` or `retry(threadId)` | A clean `AbortSignal` boundary stop. Completed tasks of the aborted step replay from their persisted writes. |
+| `failed` | `retry(threadId)` | Successful sibling tasks of the failed step replay from their persisted pending writes — **only the failed work re-runs**. |
+| `completed` | — | `resume` reports `resume-without-suspension`. |
+
+### Concurrency control
+
+Every checkpoint write is guarded by a compare-and-set against the latest stored checkpoint. Two racing resumes (even from different processes over one SQLite file) cannot both advance a thread: exactly one wins, the loser surfaces `checkpoint-version-conflict`. A second `execute()` on a thread whose latest checkpoint is still `running`/`suspended` is refused the same way; re-executing a terminal (`completed`/`failed`/`aborted`) thread is allowed. Within one `Workflow` instance, a concurrent second `resume` fails fast with `concurrent-resume-rejected`.
+
+### The re-execution contract
+
+Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Temporal-style event-sourced re-execution — that would handcuff all user code to determinism). The consequences you must design for:
+
+- On resume, the paused node's body re-executes **from the top**. Earlier `pause()` calls inside the same body replay their already-delivered values in order; only the first unsatisfied `pause()` suspends again.
+- **Side effects before a `pause()` run again on every resume of that node.** Make them idempotent, or move them into a separate upstream node (whose completed step is never re-run).
+- A `pauseAt.before` static gate re-runs the gated node with *no* replayed values — operator approval of the node is not an answer to any programmatic `pause()` inside it.
+
+### State must be JSON-safe
+
+Checkpoint state must survive a JSON round-trip and this is enforced identically on every store: a `Map`/`Set`/`Date`/class instance in a channel fails the checkpoint immediately with the typed `state-not-serializable` error naming the channel and path — instead of round-tripping in dev (in-memory `structuredClone`) and silently degrading to `{}`/strings under the SQLite store.
+
+### Durability modes
+
+`durability: 'sync' | 'async'` persist every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) — under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked.
+
 ## Synchronous-step semantics
 
 Tasks planned for an execution step run in parallel; their writes merge atomically per channel; the merged state is persisted; the next step plans against the new state. The semantics are documented for predictability under concurrent writes.
@@ -119,7 +153,7 @@ Tasks planned for an execution step run in parallel; their writes merge atomical
 | `Reducer((prev, next) => merged)` | Custom merge function. |
 | `ListAggregate` | Append. |
 | `Stream` | Append-only queue, optional uniqueness. |
-| `Barrier(['a', 'b'])` | Wait for all named writers. |
+| `Barrier(['a', 'b'])` | Keyed map of writer → value; **joins**: a node fed by 2+ of the barrier's writers is deferred until every writer in `from` has written, then runs exactly once with the complete map. |
 | `Ephemeral` | Per-step value; not persisted. |
 
 These names are part of the public API of `@graphorin/core/channels` and are not aliases for terms from any other workflow library.
@@ -127,6 +161,8 @@ These names are part of the public API of `@graphorin/core/channels` and are not
 ## HITL via `pause(value)`
 
 A node calls `pause(value)`; the engine catches the signal, persists state, and yields a `workflow.suspended` event with the supplied value attached. Calling `workflow.resume(threadId, new Directive({ resume }))` re-enters the paused node with the resumed value.
+
+A node body may pause **several times**: each resume satisfies the next `pause()` in order (earlier ones replay their already-delivered values — see the re-execution contract above). Parallel nodes that pause in the same step each keep their own pending pause; resuming answers the first, and the others re-suspend untouched.
 
 ## Static `pauseAt`
 
@@ -199,7 +235,9 @@ Use `agent.fanOut(...)` when:
 
 `WorkflowError` is the base class with a stable `code` discriminator. The full `WorkflowErrorCode` union covers:
 
-`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `cycle-detected`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `workflow-aborted`, `workflow-cancel-timeout`, `node-execution-failed`, `reducer-failed`, `state-validation-failed`.
+`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `cycle-detected`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `workflow-aborted`, `workflow-cancel-timeout`, `node-execution-failed`, `reducer-failed`, `state-validation-failed`, `dead-end`, `state-not-serializable`.
+
+Two of these are planning-honesty guarantees: a conditional fan where **no** edge fires and no `__end__` edge is satisfied raises `dead-end` instead of silently completing, and non-JSON-safe channel values raise `state-not-serializable` at the first checkpoint on every store.
 
 ## Pluggable observability
 
