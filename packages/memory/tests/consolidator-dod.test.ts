@@ -52,7 +52,7 @@ function plannedProvider(plan: ReadonlyArray<ProviderPlan | (() => never)>): Pro
       const tokens = next?.tokens ?? 10;
       return {
         text: next?.text ?? '{"facts":[]}',
-        usage: { promptTokens: tokens, completionTokens: tokens },
+        usage: { promptTokens: tokens, completionTokens: tokens, totalTokens: tokens * 2 },
         finishReason: 'stop',
       };
     },
@@ -254,7 +254,7 @@ describe('Phase 10c DoD — UTC reset across simulated date change', () => {
         extractCalls += 1;
         return {
           text: '{"facts":[]}',
-          usage: { promptTokens: 9_000, completionTokens: 9_000 },
+          usage: { promptTokens: 9_000, completionTokens: 9_000, totalTokens: 18000 },
           finishReason: 'stop',
         };
       },

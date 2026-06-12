@@ -54,13 +54,13 @@ export class MockEventSource {
   }
 
   fireError(): void {
-    this.#dispatch('error', { type: 'error' });
+    this.#dispatch('error', { type: 'error' } as Event);
   }
 
   fireOpen(): void {
     if (this.readyState !== MockEventSource.CONNECTING) return;
     this.readyState = MockEventSource.OPEN;
-    this.#dispatch('open', { type: 'open' });
+    this.#dispatch('open', { type: 'open' } as Event);
   }
 
   #dispatch(type: string, event: Event | MessageEvent): void {

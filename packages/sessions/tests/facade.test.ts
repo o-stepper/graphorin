@@ -168,7 +168,7 @@ describe('Session facade', () => {
     await session.close();
     const rows = await session.audit({ limit: 10 });
     expect(rows.length).toBeGreaterThanOrEqual(2);
-    expect(rows[0]?.at >= (rows[1]?.at ?? '')).toBe(true);
+    expect((rows[0]?.at ?? '') >= (rows[1]?.at ?? '')).toBe(true);
   });
 
   it('pruneAudit() removes rows older than the threshold', async () => {

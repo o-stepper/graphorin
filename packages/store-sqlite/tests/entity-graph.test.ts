@@ -40,7 +40,7 @@ function mkFact(over: Partial<Fact> = {}): Fact {
     createdAt: now,
     updatedAt: now,
     ...over,
-  };
+  } as Fact;
 }
 
 describe('P2-1 s/p/o write-path round-trip', () => {

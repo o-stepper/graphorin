@@ -50,7 +50,7 @@ function fakeProvider(plan: ProviderResponse[]): Provider {
       if (next === undefined) {
         return {
           text: '{"facts":[]}',
-          usage: { promptTokens: 0, completionTokens: 0 },
+          usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
           finishReason: 'stop' as const,
         };
       }
@@ -69,7 +69,7 @@ describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integrat
       const provider = fakeProvider([
         {
           text: '{"facts":[{"text":"User lives in Lisbon and works remotely","subject":"user","predicate":"livesIn","object":"Lisbon"}]}',
-          usage: { promptTokens: 80, completionTokens: 12 },
+          usage: { promptTokens: 80, completionTokens: 12, totalTokens: 92 },
           finishReason: 'stop',
         },
       ]);
@@ -143,7 +143,7 @@ describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integrat
           }
           return {
             text: '{"facts":[]}',
-            usage: { promptTokens: 5, completionTokens: 1 },
+            usage: { promptTokens: 5, completionTokens: 1, totalTokens: 6 },
             finishReason: 'stop',
           };
         },
@@ -186,7 +186,7 @@ describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integrat
       const provider = fakeProvider([
         {
           text: '{"facts":[]}',
-          usage: { promptTokens: 5, completionTokens: 1 },
+          usage: { promptTokens: 5, completionTokens: 1, totalTokens: 6 },
           finishReason: 'stop',
         },
       ]);

@@ -246,7 +246,8 @@ function bagOfWordsEmbedder(dim = 64): EmbedderProvider {
         h ^= tok.charCodeAt(i);
         h = Math.imul(h, 16777619);
       }
-      out[(h >>> 0) % dim] += 1;
+      const idx = (h >>> 0) % dim;
+      out[idx] = (out[idx] ?? 0) + 1;
     }
     let norm = 0;
     for (let i = 0; i < dim; i++) norm += (out[i] ?? 0) ** 2;

@@ -58,6 +58,19 @@ function writeStubFile(path: string, state: StubFileState): void {
   writeFileSync(path, `STUB_ENCRYPTED:${JSON.stringify(state)}`);
 }
 
+export interface StubDriverInstance {
+  open: boolean;
+  inTransaction: boolean;
+  readonly path: string;
+  readonly history: StubDriverHistory;
+  pragma(stmt: string, options?: { simple?: boolean }): unknown;
+  exec(query: string): void;
+  prepare(): never;
+  transaction<T extends (...args: unknown[]) => unknown>(fn: T): T;
+  close(): void;
+  loadExtension(): void;
+}
+
 /**
  * Builds a fresh stub-driver constructor. Each constructor maintains
  * its own history bucket so multi-DB tests do not cross-contaminate.

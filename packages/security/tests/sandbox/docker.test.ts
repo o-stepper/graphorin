@@ -41,11 +41,7 @@ describe('DockerSandbox', () => {
       }),
     });
     // The 'kind: file' arm is not implemented; expect a sandbox-violation.
-    const result = await noop.run(
-      // @ts-expect-error — exercising the unsupported branch on purpose.
-      { kind: 'file', path: '/tmp/x.js' },
-      { input: undefined },
-    );
+    const result = await noop.run({ kind: 'file', path: '/tmp/x.js' }, { input: undefined });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.kind).toBe('sandbox-violation');
   });

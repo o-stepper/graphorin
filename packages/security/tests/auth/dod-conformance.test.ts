@@ -361,7 +361,7 @@ describe('Phase 03b — DoD conformance', () => {
       });
       const listed = await listTokens(tokenStore);
       expectTypeOf(listed).toMatchTypeOf<ReadonlyArray<TokenMetadata>>();
-      expect((listed[0] as Record<string, unknown>).hashHex).toBeUndefined();
+      expect((listed[0] as unknown as Record<string, unknown>).hashHex).toBeUndefined();
     });
   });
 });

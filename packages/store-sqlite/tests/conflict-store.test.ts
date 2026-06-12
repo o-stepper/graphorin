@@ -2,16 +2,24 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createSqliteStore, SqliteConflictStore } from '../src/index.js';
+import { createSqliteStore, SqliteConflictStore, type SqliteMemoryStore } from '../src/index.js';
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
+/** The concrete store handle — tests reach past the `MemoryStore` contract. */
+type ConcreteStore = Omit<Awaited<ReturnType<typeof createSqliteStore>>, 'memory'> & {
+  memory: SqliteMemoryStore;
+};
+
 async function open(): Promise<{
-  store: Awaited<ReturnType<typeof createSqliteStore>>;
+  store: ConcreteStore;
   close: () => Promise<void>;
 }> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-conflict-store-'));
-  const store = await createSqliteStore({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
+  const store = (await createSqliteStore({
+    path: `${dir}/db.sqlite`,
+    skipSqliteVec: true,
+  })) as unknown as ConcreteStore;
   await store.init();
   return {
     store,

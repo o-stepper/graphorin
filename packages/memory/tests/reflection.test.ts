@@ -153,7 +153,7 @@ function reflectionProvider(
       if (sys.includes('salient-questions')) {
         return {
           text: JSON.stringify({ questions: over.questions ?? ['marathon'] }),
-          usage: { promptTokens: 8, completionTokens: 4 },
+          usage: { promptTokens: 8, completionTokens: 4, totalTokens: 12 },
           finishReason: 'stop',
         };
       }
@@ -162,14 +162,14 @@ function reflectionProvider(
           text: JSON.stringify({
             insight: over.insight ?? 'The user is deeply committed to marathon training.',
           }),
-          usage: { promptTokens: 10, completionTokens: 6 },
+          usage: { promptTokens: 10, completionTokens: 6, totalTokens: 16 },
           finishReason: 'stop',
         };
       }
       // Deep-phase conflict judge (unused here — no pending conflicts).
       return {
         text: JSON.stringify({ decision: 'admit', reason: 'n/a' }),
-        usage: { promptTokens: 5, completionTokens: 2 },
+        usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
         finishReason: 'stop',
       };
     },

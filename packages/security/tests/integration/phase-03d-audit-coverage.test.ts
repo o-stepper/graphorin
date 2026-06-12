@@ -121,7 +121,7 @@ describe('phase 03d — audit coverage for every OAuth lifecycle action', () => 
         serverUrl: 'https://mcp.example.com',
         storage,
         registration: { clientId: stillStored?.clientId ?? '' },
-        metadata: result.client.metadata,
+        ...(result.client.metadata !== undefined ? { metadata: result.client.metadata } : {}),
       });
       // Seed the client with a fresh session so it has a token to
       // revoke (the previous client's in-memory map is gone with

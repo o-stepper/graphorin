@@ -19,13 +19,21 @@ import { runMigrations } from '../src/migrations/runner.js';
 
 const SCOPE: SessionScope = { userId: 'alex', sessionId: 's1' };
 
-async function makeStore(): Promise<SqliteMemoryStore> {
+/** The concrete semantic sub-store surface the tests reach past the contract for. */
+type ConcreteStore = Omit<SqliteMemoryStore, 'semantic'> & {
+  semantic: SqliteMemoryStore['semantic'] & {
+    rememberWithEmbedding(fact: Fact, options?: { indexText?: string }): Promise<void>;
+    get(id: string): Promise<Fact | null>;
+  };
+};
+
+async function makeStore(): Promise<ConcreteStore> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-ctxidx-'));
   const conn = await openConnection({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
   runMigrations(conn);
   const store = new SqliteMemoryStore(conn, new EmbeddingMetaRepository(conn, 'multi-active'));
   await store.init();
-  return store;
+  return store as unknown as ConcreteStore;
 }
 
 let counter = 0;
@@ -44,11 +52,11 @@ function mkFact(over: Partial<Fact> = {}): Fact {
     createdAt: now,
     updatedAt: now,
     ...over,
-  };
+  } as Fact;
 }
 
 describe('contextual retrieval — storage layer (P1-3)', () => {
-  let store: SqliteMemoryStore;
+  let store: ConcreteStore;
   beforeEach(async () => {
     store = await makeStore();
   });

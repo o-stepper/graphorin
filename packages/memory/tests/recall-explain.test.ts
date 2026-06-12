@@ -57,7 +57,7 @@ describe('@graphorin/memory — recall explanation (X-3)', () => {
     it('decomposes per-signal scores in final-rank order', () => {
       const hits: ReadonlyArray<MemoryHit> = [
         { record: record('f1'), score: 0.04, signals: { bm25: 1, vector: 0.9, rrf: 0.033 } },
-        { record: record('f2', 'episode'), score: 0.016, signals: { rrf: 0.016 } },
+        { record: record('f2', 'episodic'), score: 0.016, signals: { rrf: 0.016 } },
       ];
       const ex = explainRecall(hits, { query: 'tbilisi', rerankerId: 'rrf' });
 
@@ -67,7 +67,7 @@ describe('@graphorin/memory — recall explanation (X-3)', () => {
       expect(ex.results.map((r) => r.id)).toEqual(['f1', 'f2']);
       expect(ex.results.map((r) => r.rank)).toEqual([1, 2]);
       expect(ex.results[0]?.kind).toBe('semantic');
-      expect(ex.results[1]?.kind).toBe('episode');
+      expect(ex.results[1]?.kind).toBe('episodic');
       expect(ex.results[0]?.score).toBe(0.04);
       expect(ex.results[0]?.signals).toEqual({ bm25: 1, vector: 0.9, rrf: 0.033 });
     });

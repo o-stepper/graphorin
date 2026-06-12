@@ -5,6 +5,7 @@
  */
 
 export {
+  type ApprovalGate,
   createToolExecutor,
   type DataFlowGuard,
   type DataFlowInspectInput,

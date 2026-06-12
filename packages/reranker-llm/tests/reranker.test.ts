@@ -4,6 +4,14 @@ import { createLlmReranker, mergeAndDedupe, RERANKER_ID } from '../src/reranker.
 
 import { buildStubProvider, hit } from './_fixtures.js';
 
+/** Extracts the first text block from a string-or-blocks message content. */
+function firstText(content: unknown): string {
+  const m = Array.isArray(content) ? (content[0] as unknown) : undefined;
+  return typeof m === 'object' && m !== null && 'text' in m
+    ? String((m as { text: unknown }).text)
+    : '';
+}
+
 describe('mergeAndDedupe', () => {
   it('keeps the highest score per record id and preserves first-seen order', () => {
     const a = hit('r1', 'apple', 0.5);
@@ -47,10 +55,7 @@ describe('createLlmReranker', () => {
       'cherry cobbler': '7',
     };
     const { provider, calls } = buildStubProvider((req) => {
-      const text =
-        req.messages[0]?.content[0] !== undefined && 'text' in req.messages[0].content[0]
-          ? (req.messages[0].content[0] as { text: string }).text
-          : '';
+      const text = firstText(req.messages[0]?.content);
       const passage = Object.keys(scores).find((p) => text.includes(p));
       return passage !== undefined ? (scores[passage] as string) : '0';
     });
@@ -138,11 +143,7 @@ describe('createLlmReranker', () => {
     });
     await reranker.rerank('lisbon', [[hit('r1', 'a passage', 0.5)]]);
     expect(calls[0]?.request.systemMessage).toBe('CUSTOM SYSTEM 10');
-    const userText =
-      calls[0]?.request.messages[0]?.content[0] !== undefined &&
-      'text' in calls[0].request.messages[0].content[0]
-        ? (calls[0].request.messages[0].content[0] as { text: string }).text
-        : '';
+    const userText = firstText(calls[0]?.request.messages[0]?.content);
     expect(userText).toBe('Q=lisbon P=a passage');
   });
 
@@ -153,11 +154,7 @@ describe('createLlmReranker', () => {
       passageExtractor: (record) => `EXTRACTED:${(record as { text?: string }).text ?? ''}`,
     });
     await reranker.rerank('q', [[hit('r1', 'apple', 0.5)]]);
-    const text =
-      calls[0]?.request.messages[0]?.content[0] !== undefined &&
-      'text' in calls[0].request.messages[0].content[0]
-        ? (calls[0].request.messages[0].content[0] as { text: string }).text
-        : '';
+    const text = firstText(calls[0]?.request.messages[0]?.content);
     expect(text).toContain('EXTRACTED:apple');
   });
 

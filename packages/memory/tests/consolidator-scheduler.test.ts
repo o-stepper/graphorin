@@ -47,10 +47,6 @@ function inMemoryTriggerStore(): TriggerStore {
         });
       }
     },
-    async setDisabled(id, disabled) {
-      const row = rows.get(id);
-      if (row !== undefined) rows.set(id, { state: { ...row.state, disabled } });
-    },
   };
 }
 

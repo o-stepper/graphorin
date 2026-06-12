@@ -127,6 +127,12 @@ let server: GraphorinServer | undefined;
 let bearer: string | undefined;
 let adminBearer: string | undefined;
 
+/** The booted server — every test runs after bootServer() in beforeEach. */
+function srv(): GraphorinServer {
+  if (server === undefined) throw new Error('server not booted');
+  return server;
+}
+
 async function bootServer(extraScopes?: ReadonlyArray<string>): Promise<{
   server: GraphorinServer;
   bearer: string;
@@ -234,7 +240,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/health is anonymous-reachable and returns the version', async () => {
-    const res = await server?.app.request('/v1/health');
+    const res = await srv().app.request('/v1/health');
     expect(res.status).toBe(200);
     const body = (await res.json()) as { status: string; version: string };
     expect(body.status).toBe('ok');
@@ -242,7 +248,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/agents returns the registry contents', async () => {
-    server?.agents.register({
+    srv().agents.register({
       id: 'echo',
       description: 'echo agent',
       agent: {
@@ -252,7 +258,7 @@ describe('REST integration — happy + error paths', () => {
         },
       },
     });
-    const res = await server?.app.request('/v1/agents', {
+    const res = await srv().app.request('/v1/agents', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(res.status).toBe(200);
@@ -261,7 +267,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/agents/:id/run returns the agent result on success', async () => {
-    server?.agents.register({
+    srv().agents.register({
       id: 'echo',
       agent: {
         id: 'echo',
@@ -270,7 +276,7 @@ describe('REST integration — happy + error paths', () => {
         },
       },
     });
-    const res = await server?.app.request('/v1/agents/echo/run', {
+    const res = await srv().app.request('/v1/agents/echo/run', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ input: 'hello world' }),
@@ -283,7 +289,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/agents/:id/run returns 404 for an unknown agent', async () => {
-    const res = await server?.app.request('/v1/agents/missing/run', {
+    const res = await srv().app.request('/v1/agents/missing/run', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -294,7 +300,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/agents/:id/stream returns 202 + a runId envelope', async () => {
-    server?.agents.register({
+    srv().agents.register({
       id: 'echo',
       agent: {
         id: 'echo',
@@ -303,7 +309,7 @@ describe('REST integration — happy + error paths', () => {
         },
       },
     });
-    const res = await server?.app.request('/v1/agents/echo/stream', {
+    const res = await srv().app.request('/v1/agents/echo/stream', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ input: 'hi' }),
@@ -322,7 +328,7 @@ describe('REST integration — happy + error paths', () => {
     expect(body.subscribe.sse).toBeUndefined();
     // The background run completes (run-only registry entry).
     await new Promise((r) => setTimeout(r, 20));
-    const snap = server?.runs.snapshot(body.runId);
+    const snap = srv().runs.snapshot(body.runId);
     expect(snap?.status).toBe('completed');
   });
 
@@ -400,7 +406,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/workflows/:id/execute returns 202 with a runId envelope', async () => {
-    server?.workflows.register({
+    srv().workflows.register({
       id: 'pipeline',
       workflow: {
         name: 'pipeline',
@@ -412,7 +418,7 @@ describe('REST integration — happy + error paths', () => {
         },
       },
     });
-    const res = await server?.app.request('/v1/workflows/pipeline/execute', {
+    const res = await srv().app.request('/v1/workflows/pipeline/execute', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ input: { x: 1 } }),
@@ -423,7 +429,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/workflows/:id/execute returns 404 for unknown workflow', async () => {
-    const res = await server?.app.request('/v1/workflows/missing/execute', {
+    const res = await srv().app.request('/v1/workflows/missing/execute', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -432,7 +438,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/workflows/:id/state requires threadId; returns the workflow state', async () => {
-    server?.workflows.register({
+    srv().workflows.register({
       id: 'pipeline',
       workflow: {
         name: 'pipeline',
@@ -444,12 +450,12 @@ describe('REST integration — happy + error paths', () => {
         },
       },
     });
-    const noThread = await server?.app.request('/v1/workflows/pipeline/state', {
+    const noThread = await srv().app.request('/v1/workflows/pipeline/state', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(noThread.status).toBe(400);
 
-    const ok = await server?.app.request('/v1/workflows/pipeline/state?threadId=t-1', {
+    const ok = await srv().app.request('/v1/workflows/pipeline/state?threadId=t-1', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(ok.status).toBe(200);
@@ -458,7 +464,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/workflows/:id/checkpoints returns the list', async () => {
-    server?.workflows.register({
+    srv().workflows.register({
       id: 'pipeline',
       workflow: {
         name: 'pipeline',
@@ -470,20 +476,20 @@ describe('REST integration — happy + error paths', () => {
         },
       },
     });
-    const res = await server?.app.request('/v1/workflows/pipeline/checkpoints?threadId=t-1', {
+    const res = await srv().app.request('/v1/workflows/pipeline/checkpoints?threadId=t-1', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(res.status).toBe(200);
   });
 
   it('POST /v1/sessions creates + GET /v1/sessions lists sessions', async () => {
-    const created = await server?.app.request('/v1/sessions', {
+    const created = await srv().app.request('/v1/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 'u1', agentId: 'echo' }),
     });
     expect(created.status).toBe(201);
-    const list = await server?.app.request('/v1/sessions?userId=u1', {
+    const list = await srv().app.request('/v1/sessions?userId=u1', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(list.status).toBe(200);
@@ -492,14 +498,14 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/sessions/:id returns 404 for unknown session', async () => {
-    const res = await server?.app.request('/v1/sessions/unknown', {
+    const res = await srv().app.request('/v1/sessions/unknown', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(res.status).toBe(404);
   });
 
   it('POST /v1/sessions rejects malformed body with 400', async () => {
-    const res = await server?.app.request('/v1/sessions', {
+    const res = await srv().app.request('/v1/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -508,29 +514,29 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/sessions/:id/messages + handoffs return arrays', async () => {
-    const created = await server?.app.request('/v1/sessions', {
+    const created = await srv().app.request('/v1/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 'u1', agentId: 'echo', sessionId: 's1' }),
     });
     expect(created.status).toBe(201);
-    const messages = await server?.app.request('/v1/sessions/s1/messages?limit=10', {
+    const messages = await srv().app.request('/v1/sessions/s1/messages?limit=10', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(messages.status).toBe(200);
-    const handoffs = await server?.app.request('/v1/sessions/s1/handoffs', {
+    const handoffs = await srv().app.request('/v1/sessions/s1/handoffs', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(handoffs.status).toBe(200);
   });
 
   it('POST /v1/sessions/:id/export returns the export payload', async () => {
-    await server?.app.request('/v1/sessions', {
+    await srv().app.request('/v1/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 'u1', agentId: 'echo', sessionId: 's2' }),
     });
-    const res = await server?.app.request('/v1/sessions/s2/export', {
+    const res = await srv().app.request('/v1/sessions/s2/export', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ includeAuditEntries: true }),
@@ -539,7 +545,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/sessions/:id/replay reaches the REAL handler with both APIs configured (IP-14, DEC-138 ladder intact)', async () => {
-    await server?.app.request('/v1/sessions', {
+    await srv().app.request('/v1/sessions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId: 'u1', agentId: 'echo', sessionId: 's3' }),
@@ -547,7 +553,7 @@ describe('REST integration — happy + error paths', () => {
 
     // IP-14: the REAL replay handler serves (the in-sessions stub that
     // shadowed it is gone) — 200 with the loaded events, ladder intact.
-    const sanitized = await server?.app.request('/v1/sessions/s3/replay', {
+    const sanitized = await srv().app.request('/v1/sessions/s3/replay', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -556,7 +562,7 @@ describe('REST integration — happy + error paths', () => {
     const sanitizedBody = (await sanitized.json()) as { events?: unknown[] };
     expect(Array.isArray(sanitizedBody.events)).toBe(true);
 
-    const raw = await server?.app.request('/v1/sessions/s3/replay', {
+    const raw = await srv().app.request('/v1/sessions/s3/replay', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ raw: true }),
@@ -565,14 +571,14 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/memory/search + POST /v1/memory/facts work + accept body', async () => {
-    const search = await server?.app.request('/v1/memory/search', {
+    const search = await srv().app.request('/v1/memory/search', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ scope: { userId: 'u1' }, query: 'hello' }),
     });
     expect(search.status).toBe(200);
 
-    const remember = await server?.app.request('/v1/memory/facts', {
+    const remember = await srv().app.request('/v1/memory/facts', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ scope: { userId: 'u1' }, text: 'fact' }),
@@ -580,7 +586,7 @@ describe('REST integration — happy + error paths', () => {
     expect(remember.status).toBe(201);
     const body = (await remember.json()) as { fact: { factId: string } };
 
-    const forget = await server?.app.request(`/v1/memory/facts/${body.fact.factId}?userId=u1`, {
+    const forget = await srv().app.request(`/v1/memory/facts/${body.fact.factId}?userId=u1`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${bearer}` },
     });
@@ -588,7 +594,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('memory routes reject malformed bodies with 400', async () => {
-    const res = await server?.app.request('/v1/memory/search', {
+    const res = await srv().app.request('/v1/memory/search', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -597,13 +603,13 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/memory/blocks creates + DELETE /v1/memory/blocks/:label removes', async () => {
-    const created = await server?.app.request('/v1/memory/blocks', {
+    const created = await srv().app.request('/v1/memory/blocks', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ scope: { userId: 'u1' }, label: 'persona', body: 'You are…' }),
     });
     expect(created.status).toBe(201);
-    const removed = await server?.app.request('/v1/memory/blocks/persona?userId=u1', {
+    const removed = await srv().app.request('/v1/memory/blocks/persona?userId=u1', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${bearer}` },
     });
@@ -611,43 +617,43 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/skills + POST /v1/skills/install round-trip', async () => {
-    const list = await server?.app.request('/v1/skills', {
+    const list = await srv().app.request('/v1/skills', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(list.status).toBe(200);
-    const install = await server?.app.request('/v1/skills/install', {
+    const install = await srv().app.request('/v1/skills/install', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ source: 'pdf-extractor' }),
     });
     expect(install.status).toBe(201);
-    const get = await server?.app.request('/v1/skills/pdf-extractor', {
+    const get = await srv().app.request('/v1/skills/pdf-extractor', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(get.status).toBe(200);
-    const missing = await server?.app.request('/v1/skills/nope', {
+    const missing = await srv().app.request('/v1/skills/nope', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(missing.status).toBe(404);
   });
 
   it('GET/POST/DELETE /v1/mcp/servers round-trip', async () => {
-    const empty = await server?.app.request('/v1/mcp/servers', {
+    const empty = await srv().app.request('/v1/mcp/servers', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(empty.status).toBe(200);
-    const created = await server?.app.request('/v1/mcp/servers', {
+    const created = await srv().app.request('/v1/mcp/servers', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: 'mcp-1', transport: 'stdio' }),
     });
     expect(created.status).toBe(201);
-    const removed = await server?.app.request('/v1/mcp/servers/mcp-1', {
+    const removed = await srv().app.request('/v1/mcp/servers/mcp-1', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(removed.status).toBe(204);
-    const notFound = await server?.app.request('/v1/mcp/servers/missing', {
+    const notFound = await srv().app.request('/v1/mcp/servers/missing', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${bearer}` },
     });
@@ -655,11 +661,11 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('GET /v1/audit returns entries + POST /v1/audit/export returns a payload', async () => {
-    const list = await server?.app.request('/v1/audit?limit=5', {
+    const list = await srv().app.request('/v1/audit?limit=5', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(list.status).toBe(200);
-    const exp = await server?.app.request('/v1/audit/export', {
+    const exp = await srv().app.request('/v1/audit/export', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
@@ -668,7 +674,7 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('POST /v1/tokens mints a fresh token + GET /v1/tokens lists + DELETE revokes', async () => {
-    const created = await server?.app.request('/v1/tokens', {
+    const created = await srv().app.request('/v1/tokens', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ scopes: ['agents:read'], label: 'ci-bot' }),
@@ -677,14 +683,14 @@ describe('REST integration — happy + error paths', () => {
     const body = (await created.json()) as { token: { id: string }; raw: string };
     expect(body.raw).toMatch(/^gph_live_v1_/);
 
-    const list = await server?.app.request('/v1/tokens', {
+    const list = await srv().app.request('/v1/tokens', {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(list.status).toBe(200);
     const listBody = (await list.json()) as { tokens: ReadonlyArray<unknown> };
     expect(listBody.tokens.length).toBeGreaterThanOrEqual(2);
 
-    const revoked = await server?.app.request(`/v1/tokens/${body.token.id}`, {
+    const revoked = await srv().app.request(`/v1/tokens/${body.token.id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${bearer}` },
     });
@@ -692,27 +698,28 @@ describe('REST integration — happy + error paths', () => {
   });
 
   it('admin scope grants access to every protected route', async () => {
-    const res = await server?.app.request('/v1/agents', {
+    const res = await srv().app.request('/v1/agents', {
       headers: { Authorization: `Bearer ${adminBearer}` },
     });
     expect(res.status).toBe(200);
   });
 
   it('returns 401 when no bearer token is supplied', async () => {
-    const res = await server?.app.request('/v1/agents');
+    const res = await srv().app.request('/v1/agents');
     expect(res.status).toBe(401);
   });
 
   it('returns 403 when the granted scopes do not match', async () => {
     const pepper = await resolveSecret(`env:${PEPPER_ENV}`);
+    if (store === undefined) throw new Error('store not booted');
     const restricted = await createToken({
-      tokenStore: store?.authTokens,
+      tokenStore: store.authTokens,
       pepper,
       env: 'live',
       scopes: ['memory:read'],
     });
     const raw = await restricted.raw.use((v) => v);
-    const res = await server?.app.request('/v1/agents', {
+    const res = await srv().app.request('/v1/agents', {
       headers: { Authorization: `Bearer ${raw}` },
     });
     expect(res.status).toBe(403);

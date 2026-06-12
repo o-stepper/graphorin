@@ -2,7 +2,11 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createSqliteStore, type GraphorinSqliteStore } from '../src/index.js';
+import {
+  createSqliteStore,
+  type GraphorinSqliteStore,
+  type SqliteMemoryStore,
+} from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
   const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-stores-'));
@@ -246,11 +250,12 @@ describe('createSqliteStore', () => {
     // Link the fact to a canonical entity, exactly as on-write resolution does
     // when graph.entityResolution is enabled. This is what makes purge() trip
     // the fact_entities → facts(id) foreign key with no ON DELETE clause.
-    const entityId = await store.memory.graph.upsertEntity(scope, {
+    const graph = (store.memory as SqliteMemoryStore).graph;
+    const entityId = await graph.upsertEntity(scope, {
       name: 'Tbilisi',
       normalizedName: 'tbilisi',
     });
-    await store.memory.graph.linkFactEntity('fact-graph', entityId, 'object');
+    await graph.linkFactEntity('fact-graph', entityId, 'object');
     expect(
       store.connection.all('SELECT 1 FROM fact_entities WHERE fact_id = ?', ['fact-graph']).length,
     ).toBe(1);
@@ -264,7 +269,7 @@ describe('createSqliteStore', () => {
       store.connection.all('SELECT 1 FROM fact_entities WHERE fact_id = ?', ['fact-graph']).length,
     ).toBe(0);
     // The canonical entity is shared data, not the purged subject — it stays.
-    expect(await store.memory.graph.getEntity(scope, entityId)).not.toBeNull();
+    expect(await graph.getEntity(scope, entityId)).not.toBeNull();
   });
 
   it('episodic memory: archive extension method', async () => {

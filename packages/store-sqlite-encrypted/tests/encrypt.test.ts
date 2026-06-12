@@ -60,7 +60,7 @@ describe('encryptDatabase', () => {
     expect(result.targetPath).toBe(src);
     expect(result.swap?.originalRenamedTo).toMatch(/data\.db\.bak\.\d+$/);
     expect(readFileSync(src, 'utf8')).toMatch(/^STUB_ENCRYPTED:/);
-    expect(readFileSync(result.swap?.originalRenamedTo, 'utf8')).toBe('unencrypted-bytes');
+    expect(readFileSync(result.swap?.originalRenamedTo ?? '', 'utf8')).toBe('unencrypted-bytes');
   });
 
   it('respects a non-default cipher selection', async () => {

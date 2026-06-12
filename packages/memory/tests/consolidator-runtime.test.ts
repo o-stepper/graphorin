@@ -46,7 +46,7 @@ function fakeProvider(plan: ProviderResponse[]): Provider & {
       if (next === undefined) {
         return {
           text: '{"facts":[]}',
-          usage: { promptTokens: 0, completionTokens: 0 },
+          usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
           finishReason: 'stop' as const,
         };
       }
@@ -115,7 +115,7 @@ describe('consolidator/runtime — standard phase', () => {
     const provider = fakeProvider([
       {
         text: '{"facts":[{"text":"User lives in Tbilisi","subject":"user","predicate":"livesIn","object":"Tbilisi"}]}',
-        usage: { promptTokens: 50, completionTokens: 10 },
+        usage: { promptTokens: 50, completionTokens: 10, totalTokens: 60 },
         finishReason: 'stop',
       },
     ]);
@@ -194,7 +194,7 @@ describe('consolidator/runtime — deep phase — dedup decision', () => {
     const provider = fakeProvider([
       {
         text: '{"decision":"dedup","reason":"identical content"}',
-        usage: { promptTokens: 25, completionTokens: 5 },
+        usage: { promptTokens: 25, completionTokens: 5, totalTokens: 30 },
         finishReason: 'stop',
       },
     ]);
@@ -237,7 +237,7 @@ describe('consolidator/runtime — deep phase — dedup decision', () => {
     const provider = fakeProvider([
       {
         text: 'not json at all just chatter',
-        usage: { promptTokens: 10, completionTokens: 5 },
+        usage: { promptTokens: 10, completionTokens: 5, totalTokens: 15 },
         finishReason: 'stop',
       },
     ]);
@@ -280,7 +280,7 @@ describe('consolidator/runtime — deep phase', () => {
     const provider = fakeProvider([
       {
         text: '{"decision":"supersede","reason":"candidate replaces older fact"}',
-        usage: { promptTokens: 30, completionTokens: 5 },
+        usage: { promptTokens: 30, completionTokens: 5, totalTokens: 35 },
         finishReason: 'stop',
       },
     ]);
@@ -377,7 +377,7 @@ describe('consolidator/runtime — wiring', () => {
     const provider = fakeProvider([
       {
         text: '{"facts":[]}',
-        usage: { promptTokens: 9999, completionTokens: 1 },
+        usage: { promptTokens: 9999, completionTokens: 1, totalTokens: 10000 },
         finishReason: 'stop',
       },
     ]);
@@ -467,7 +467,7 @@ describe('consolidator/runtime — wiring', () => {
     const provider = fakeProvider([
       {
         text: '{"facts":[]}',
-        usage: { promptTokens: 5, completionTokens: 5 },
+        usage: { promptTokens: 5, completionTokens: 5, totalTokens: 10 },
         finishReason: 'stop',
       },
     ]);
@@ -512,7 +512,7 @@ describe('consolidator/runtime — wiring', () => {
     const provider = fakeProvider([
       {
         text: '{"facts":[]}',
-        usage: { promptTokens: 10, completionTokens: 1 },
+        usage: { promptTokens: 10, completionTokens: 1, totalTokens: 11 },
         finishReason: 'stop',
       },
     ]);
