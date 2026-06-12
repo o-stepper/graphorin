@@ -698,6 +698,12 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     // still surfaced on the span and audit row for operator visibility.
     const execStart = performance.now();
     const sandbox = prepared.sandbox.kind !== 'none' ? sandboxResolver(prepared.sandbox) : null;
+    // TL-3: operators alert on declared-but-not-enforced isolation. For
+    // kind 'none', in-process IS the policy (enforced by definition);
+    // for any other kind, enforcement means a real sandbox dispatcher.
+    span.setAttributes({
+      'graphorin.tool.sandbox.enforced': prepared.sandbox.kind === 'none' || sandbox !== null,
+    });
     let rawResult: unknown;
     let executeError: unknown;
     try {
