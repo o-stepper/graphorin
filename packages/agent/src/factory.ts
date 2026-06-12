@@ -1584,6 +1584,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     const handoffNames = Array.from(handoffMap.keys());
     let stepNumber = 0;
+    // AG-15: tools the model actually called on the PREVIOUS step — the
+    // per-tool preferred-model ladder consults these, never the full
+    // advertised catalogue.
+    let lastStepCalledToolNames: ReadonlyArray<string> = [];
 
     // AG-6: shared cancellation path for both the loop-top abort check and a
     // mid-stream provider abort. Yields `agent.cancelling`, applies the
@@ -1707,12 +1711,19 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           stepTools = [...eagerTools, ...promotedTools, ...handoffTools];
         }
 
-        const toolPreferences = stepTools.map((t) => {
-          const tt = t as Tool<unknown, unknown, TDeps> & { readonly preferredModel?: unknown };
-          return tt.preferredModel as Parameters<
-            typeof resolvePreferredModel
-          >[0]['toolPreferredModels'][number];
-        });
+        // AG-15: consult the hints of the tools the model CALLED on the
+        // previous step — a smart-hinted but never-called tool must not
+        // pin the whole conversation to the top cost tier. Steps with no
+        // prior calls fall through to the agent-preferred default.
+        const calledLastStep = new Set(lastStepCalledToolNames);
+        const toolPreferences = stepTools
+          .filter((t) => calledLastStep.has(t.name))
+          .map((t) => {
+            const tt = t as Tool<unknown, unknown, TDeps> & { readonly preferredModel?: unknown };
+            return tt.preferredModel as Parameters<
+              typeof resolvePreferredModel
+            >[0]['toolPreferredModels'][number];
+          });
 
         const primary: PreferredModelResolution = resolvePreferredModel({
           ...(overrides.provider !== undefined ? { prepareStepProvider: overrides.provider } : {}),
@@ -2026,6 +2037,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           agentId: state.currentAgentId,
         };
         state.steps.push(stepRecord);
+        lastStepCalledToolNames = finalCalls.map((c) => c.toolName);
 
         if (textBuffer.length > 0 && !leakBlocked) {
           finalSnapshot.output = textBuffer as unknown as TOutput;
