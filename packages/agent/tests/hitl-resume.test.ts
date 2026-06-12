@@ -55,9 +55,10 @@ describe('Agent — HITL approval flow', () => {
     for await (const ev of agent.stream('email Alice')) {
       events1.push(ev);
       if (ev.type === 'tool.approval.requested') {
-        // The current public surface returns the run via
-        // `agent.run(...)`; for the test we walk the stream and
-        // synthesize the state from the emitted events.
+        // `agent.run(...)` now returns the suspended RunState directly
+        // (`result.state`, AG-9 — covered in agent-result.test.ts); this
+        // test keeps the synthetic-state path to pin the serialized
+        // wire format a durable store would rehydrate from.
       }
     }
     // The first run must NOT have hit `agent.end`.

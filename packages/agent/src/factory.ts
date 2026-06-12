@@ -1911,9 +1911,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     snapshot: InternalRunSnapshot<TOutput>,
   ): AgentResult<TOutput> {
     state.finishedAt = state.finishedAt ?? new Date().toISOString();
+    // AG-9: the result carries the terminal status, the failure (when
+    // any), and the final RunState — a suspended run is resumable from
+    // the result alone, no checkpointStore required.
     return {
       output: snapshot.output,
       usage: state.usage,
+      status: state.status,
+      ...(state.error !== undefined ? { error: state.error } : {}),
+      state: state as unknown as RunState,
     };
   }
 
@@ -1948,16 +1954,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   ): Promise<AgentResult<TOutput>> => {
     const opts = options ?? {};
     const gen = runLoop(input, opts);
-    let result: AgentResult<TOutput> = {
-      output: '' as unknown as TOutput,
-      usage: zeroUsage(),
-    };
     let next = await gen.next();
     while (next.done !== true) {
       next = await gen.next();
     }
-    if (next.value !== undefined) {
-      result = next.value;
+    // Every terminal path of the run loop returns `finalize(...)`; an
+    // undefined return value would mean the generator was torn down
+    // externally — an invariant violation, not a run outcome (AG-9).
+    const result = next.value;
+    if (result === undefined) {
+      throw new Error('unreachable: agent run loop ended without a result');
     }
     return result;
   };

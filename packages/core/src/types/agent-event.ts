@@ -1,4 +1,5 @@
 import type { MemoryKind } from './memory.js';
+import type { RunError, RunState, RunStatus } from './run.js';
 import type { ContentChunk, ToolError } from './tool.js';
 import type { Usage } from './usage.js';
 
@@ -482,11 +483,29 @@ export interface AgentLateralLeakDetectedEvent {
 }
 
 /**
- * Final result of an agent run, carried by the `agent.end` event.
+ * Final result of an agent run-loop invocation, returned by
+ * `agent.run(...)` and carried by the `agent.end` event.
+ *
+ * A failed run **resolves** with `status: 'failed'` and the error in
+ * `error` — `agent.run(...)` does not reject on run failure (only on
+ * configuration/usage errors thrown before the loop starts). A suspended
+ * run resolves with `status: 'awaiting_approval'` and a resumable
+ * `state` (AG-9).
  *
  * @stable
  */
 export interface AgentResult<TOutput = string> {
   readonly output: TOutput;
   readonly usage: Usage;
+  /** Terminal status of this run-loop invocation. */
+  readonly status: RunStatus;
+  /** Populated when the run failed; mirrors `RunState.error`. */
+  readonly error?: RunError;
+  /**
+   * The run's final state. Resumable when `status === 'awaiting_approval'`
+   * — pass it back to `agent.run(...)` / `agent.stream(...)` (optionally
+   * round-tripped through `runStateToJSON`/`runStateFromJSON` for
+   * durability). Treat as an immutable snapshot.
+   */
+  readonly state: RunState;
 }
