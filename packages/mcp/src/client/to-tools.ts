@@ -123,6 +123,7 @@ export function adaptMCPTools(args: {
         client: args.client,
         serverIdentity: args.serverIdentity,
         definitionHash,
+        ...(args.logger !== undefined ? { logger: args.logger } : {}),
         mcpToolName: definition.name,
         graphorinToolName: namespacedName,
         description:
@@ -170,6 +171,11 @@ interface BuildAdaptedToolArgs {
   readonly callTimeoutMs?: number;
   /** MC-6: sha256 fingerprint of the producing MCP definition. */
   readonly definitionHash: string;
+  readonly logger?: (
+    level: 'debug' | 'info' | 'warn' | 'error',
+    message: string,
+    fields?: Record<string, unknown>,
+  ) => void;
   readonly preferredModel?:
     | import('@graphorin/core').ModelHint
     | import('@graphorin/core').ModelSpec;
@@ -214,6 +220,7 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
         outputSchema: args.outputSchema,
         serverIdentity: args.serverIdentity,
         toolName: args.graphorinToolName,
+        ...(args.logger !== undefined ? { logger: args.logger } : {}),
       });
     },
   } satisfies Tool<unknown, unknown, unknown>;
