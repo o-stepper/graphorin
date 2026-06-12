@@ -113,10 +113,18 @@ if (data && data.env) {
   for (const k of Object.keys(data.env)) process.env[k] = data.env[k];
 }
 
-const blocked = [];
+// SDF-9: process-level escapes are ALWAYS blocked — child_process, vm,
+// worker_threads (nested), cluster, inspector all defeat the untrusted
+// tier regardless of the fs/network flags. Defence in depth; the real
+// isolation guarantee still needs isolated-vm / docker.
+const ESCAPE_MODULES = ['node:child_process', 'child_process',
+  'node:vm', 'vm', 'node:worker_threads', 'worker_threads',
+  'node:cluster', 'cluster', 'node:inspector', 'inspector'];
+const blocked = [...ESCAPE_MODULES];
 if (data.noFilesystem) blocked.push('node:fs', 'fs', 'node:fs/promises', 'fs/promises');
 if (data.noNetwork) blocked.push('node:http', 'http', 'node:https', 'https',
   'node:net', 'net', 'node:dgram', 'dgram', 'node:tls', 'tls');
+
 
 if (blocked.length) {
   const { register } = require('node:module');
@@ -127,8 +135,10 @@ if (blocked.length) {
     "export async function resolve(spec, ctx, next) {" +
     "  if (blocked.has(spec)) {" +
     "    const isFs = spec === 'node:fs' || spec === 'fs' || spec === 'node:fs/promises' || spec === 'fs/promises';" +
-    "    const err = new Error((isFs ? 'filesystem' : 'network') + ' access denied by sandbox policy: ' + spec);" +
-    "    err.name = isFs ? 'SandboxFsAccessDenied' : 'SandboxNetworkAccessDenied';" +
+    "    const isNet = spec.indexOf('http') >= 0 || spec.indexOf('net') >= 0 || spec.indexOf('tls') >= 0 || spec.indexOf('dgram') >= 0;" +
+    "    const kind = isFs ? 'filesystem' : isNet ? 'network' : 'module';" +
+    "    const err = new Error(kind + ' access denied by sandbox policy: ' + spec);" +
+    "    err.name = isFs ? 'SandboxFsAccessDenied' : isNet ? 'SandboxNetworkAccessDenied' : 'SandboxModuleAccessDenied';" +
     "    throw err;" +
     "  }" +
     "  return next(spec, ctx);" +
@@ -157,6 +167,27 @@ if (data.noNetwork) {
 const allowedEnv = (data && data.env) || {};
 for (const k of Object.keys(process.env)) {
   if (!Object.prototype.hasOwnProperty.call(allowedEnv, k)) delete process.env[k];
+}
+
+// SDF-9: the ESM resolve hook does not see CJS require() — patch
+// Module._load (after the runtime's own setup requires) so a
+// createRequire()-based require('node:child_process') / require('fs')
+// is denied too.
+{
+  const Module = require('node:module');
+  const blockedSet = new Set(blocked);
+  const originalLoad = Module._load;
+  Module._load = function (request, parent, isMain) {
+    if (blockedSet.has(request)) {
+      const isFs = request === 'node:fs' || request === 'fs'
+        || request === 'node:fs/promises' || request === 'fs/promises';
+      const err = new Error(
+        (isFs ? 'filesystem' : 'module') + ' access denied by sandbox policy: ' + request);
+      err.name = isFs ? 'SandboxFsAccessDenied' : 'SandboxModuleAccessDenied';
+      throw err;
+    }
+    return originalLoad.call(this, request, parent, isMain);
+  };
 }
 
 (async () => {

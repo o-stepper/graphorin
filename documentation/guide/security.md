@@ -36,6 +36,8 @@ flowchart LR
 
 A tool declares its tier through `sandboxPolicy`; the executor maps that to a resolved kind (`'sandboxed' → 'worker-threads'`, `'isolated' → 'isolated-vm'`). Today this policy is **advisory for inline (`config.tools`) and MCP-derived tools**: it is resolved and surfaced on the `tool.execute` span / audit row, but those tools execute **in-process** — the agent runtime intentionally ships with no `sandboxResolver` wired. Real out-of-process isolation applies only to **code-mode** scripts and to tools an operator routes through a custom `sandboxResolver`; module-loadable skill / MCP isolation is wired when those land. See the per-field runtime behaviour in [Agent runtime](/guide/agent-runtime).
 
+The `'worker-threads'` tier is **best-effort** isolation, not a security boundary: the worker shares the host process and filesystem. It blocks `fs` / network module imports (ESM resolve hook + a CJS `require` interception) and always denies the process-escape modules `child_process` / `vm` / `cluster` / `inspector` / `worker_threads` (SDF-9), but a determined attacker with native addons or other escapes is not contained — load genuinely untrusted code under `'isolated-vm'` (V8 isolate) or `'docker'` (kernel) instead.
+
 `isolated-vm` and `dockerode` are **opt-in peer dependencies** — they are not installed by default, so a base install pulls in zero native sandbox code. Add them only if you load untrusted code; `'none'` and `'worker-threads'` need nothing extra.
 
 ## Sensitivity model

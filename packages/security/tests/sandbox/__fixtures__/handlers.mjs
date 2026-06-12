@@ -42,3 +42,23 @@ export async function readEnv(input) {
     keys: Object.keys(process.env),
   };
 }
+
+export async function trySpawnEsm() {
+  const cp = await import('node:child_process');
+  return typeof cp.spawn;
+}
+
+export async function trySpawnRequire() {
+  // The CJS require() escape — the ESM resolve hook does not see this.
+  const { createRequire } = await import('node:module');
+  const require = createRequire(import.meta.url);
+  const cp = require('node:child_process');
+  return typeof cp.spawn;
+}
+
+export async function tryFsRequire() {
+  const { createRequire } = await import('node:module');
+  const require = createRequire(import.meta.url);
+  const fs = require('node:fs');
+  return typeof fs.readFileSync;
+}
