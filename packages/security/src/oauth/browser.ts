@@ -85,10 +85,45 @@ interface LauncherSpec {
   readonly args: ReadonlyArray<string>;
 }
 
-function resolveLauncher(url: string): LauncherSpec {
-  const plat = platform();
+/**
+ * SPL-18: the launcher URL ultimately derives from fetched OAuth
+ * discovery metadata. Reject anything that is not a plain http(s) URL,
+ * and refuse shell/cmd metacharacters outright — defence in depth on
+ * top of SPL-7's discovery validation.
+ */
+function assertSafeLaunchUrl(url: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error(`Refusing to launch a browser for a malformed URL: ${url}`);
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error(`Refusing to launch a browser for non-http(s) URL: ${parsed.protocol}`);
+  }
+  // Belt-and-braces: a valid http(s) URL cannot contain bare shell
+  // metacharacters, but reject them explicitly so a parser quirk never
+  // reaches a launcher.
+  if (/[&|^<>"`\r\n]/.test(url)) {
+    throw new Error('Refusing to launch a browser for a URL containing shell metacharacters.');
+  }
+}
+
+function resolveLauncher(url: string, plat: NodeJS.Platform = platform()): LauncherSpec {
+  assertSafeLaunchUrl(url);
   if (plat === 'darwin') return { command: 'open', args: [url] };
-  if (plat === 'win32') return { command: 'cmd', args: ['/c', 'start', '""', url] };
+  // SPL-18: NOT `cmd /c start` — cmd.exe re-parses its command line and
+  // `start` re-parses again, so metacharacters in a hostile URL could
+  // break out of the argument. `rundll32 url.dll,FileProtocolHandler`
+  // hands the URL to the shell's URL handler without a cmd re-parse.
+  if (plat === 'win32') {
+    return { command: 'rundll32', args: ['url.dll,FileProtocolHandler', url] };
+  }
   // POSIX fallthrough — Linux + BSD + WSL.
   return { command: 'xdg-open', args: [url] };
+}
+
+/** @experimental — test seam for the platform-specific launcher (SPL-18). */
+export function _resolveLauncherForTesting(url: string, plat: NodeJS.Platform): LauncherSpec {
+  return resolveLauncher(url, plat);
 }
