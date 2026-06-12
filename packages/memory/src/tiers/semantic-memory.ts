@@ -580,8 +580,9 @@ export class SemanticMemory {
       embedder !== null && embedderId !== null && adapterSupportsEmbeddedWrite;
     if (hasEmbeddingPath) {
       // Embed the *contextual* text so the vector surface agrees with the
-      // FTS index; the persisted `fact.text` stays canonical (P1-3).
-      const [vector] = await embedder.embed([indexText]);
+      // FTS index; the persisted `fact.text` stays canonical (P1-3). PS-10:
+      // stored content is the `passage` role for asymmetric (E5) embedders.
+      const [vector] = await embedder.embed([indexText], { taskType: 'passage' });
       if (vector !== undefined && this.#store.semantic.rememberWithEmbedding !== undefined) {
         await this.#store.semantic.rememberWithEmbedding(fact, {
           embedding: { embedderId, vector },
@@ -1223,7 +1224,8 @@ export class SemanticMemory {
     ) {
       return [];
     }
-    const [vector] = await this.#embedder.embed([query]);
+    // PS-10: a search query is the `query` role for asymmetric (E5) embedders.
+    const [vector] = await this.#embedder.embed([query], { taskType: 'query' });
     if (vector === undefined) return [];
     return this.#store.semantic.searchVector(
       scope,
