@@ -50,6 +50,11 @@ export interface OllamaAdapterOptions {
   readonly chatPath?: string;
   readonly headers?: Readonly<Record<string, string>>;
   readonly fetchImpl?: typeof fetch;
+  /**
+   * Time-to-response budget per request (PS-24). Default
+   * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
+   */
+  readonly timeoutMs?: number;
   readonly allowInsecureTransport?: boolean;
   readonly acceptsSensitivity?: ReadonlyArray<Sensitivity>;
   readonly capabilities?: Partial<ProviderCapabilities>;
@@ -128,7 +133,7 @@ async function* streamOllama(
   url: string,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  const body = buildBody(options.model, req, true);
+  const body = buildBody(options.model, req, true, options.capabilities?.structuredOutput ?? true);
   const resp = await callJsonHttp({
     providerName,
     url,
@@ -136,6 +141,7 @@ async function* streamOllama(
     body,
     ...(req.signal !== undefined ? { signal: req.signal } : {}),
     ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+    ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
   });
   yield makeStreamStartEvent({ providerName, modelId: options.model });
   let usage: Usage = { promptTokens: 0, completionTokens: 0, totalTokens: 0 };
@@ -186,7 +192,7 @@ async function generateOllama(
   url: string,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const body = buildBody(options.model, req, false);
+  const body = buildBody(options.model, req, false, options.capabilities?.structuredOutput ?? true);
   const resp = await callJsonHttp({
     providerName,
     url,
@@ -194,6 +200,7 @@ async function generateOllama(
     body,
     ...(req.signal !== undefined ? { signal: req.signal } : {}),
     ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+    ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
   });
   let json: OllamaChatChunk;
   try {
@@ -219,7 +226,12 @@ async function generateOllama(
   };
 }
 
-function buildBody(model: string, req: ProviderRequest, stream: boolean): Record<string, unknown> {
+function buildBody(
+  model: string,
+  req: ProviderRequest,
+  stream: boolean,
+  structuredOutput: boolean,
+): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
       ? [{ role: 'system' as const, content: req.systemMessage }, ...req.messages]
@@ -244,6 +256,11 @@ function buildBody(model: string, req: ProviderRequest, stream: boolean): Record
         parameters: t.inputSchema,
       },
     }));
+  }
+  // PS-24: Ollama's native structured output — `format` takes a JSON
+  // schema object (or 'json' for schema-less JSON mode).
+  if (structuredOutput && req.outputType?.kind === 'structured') {
+    body.format = req.outputType.jsonSchema ?? 'json';
   }
   if (req.providerOptions !== undefined) {
     Object.assign(body, req.providerOptions);

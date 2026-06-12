@@ -46,6 +46,11 @@ export interface OpenAIShapedOptions {
   readonly allowInsecureTransport?: boolean;
   readonly capabilities?: Partial<ProviderCapabilities>;
   /**
+   * Time-to-response budget per request (PS-24). Default
+   * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
+   */
+  readonly timeoutMs?: number;
+  /**
    * Overrides the default `acceptsSensitivity` value derived from the
    * trust classifier. Loud users can opt out of the conservative
    * default, but the framework still emits one WARN per process so
@@ -170,7 +175,7 @@ async function* streamOpenAIShaped(
   url: string,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  const body = buildBody(opts.model, req, true);
+  const body = buildBody(opts.model, req, true, opts.capabilities?.structuredOutput ?? true);
   const resp = await callJsonHttp({
     providerName: opts.providerName,
     url,
@@ -178,6 +183,7 @@ async function* streamOpenAIShaped(
     body,
     ...(req.signal !== undefined ? { signal: req.signal } : {}),
     ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+    ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
   });
 
   yield makeStreamStartEvent({ providerName: opts.providerName, modelId: opts.model });
@@ -273,7 +279,7 @@ async function generateOpenAIShaped(
   url: string,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const body = buildBody(opts.model, req, false);
+  const body = buildBody(opts.model, req, false, opts.capabilities?.structuredOutput ?? true);
   const resp = await callJsonHttp({
     providerName: opts.providerName,
     url,
@@ -281,6 +287,7 @@ async function generateOpenAIShaped(
     body,
     ...(req.signal !== undefined ? { signal: req.signal } : {}),
     ...(opts.fetchImpl !== undefined ? { fetchImpl: opts.fetchImpl } : {}),
+    ...(opts.timeoutMs !== undefined ? { timeoutMs: opts.timeoutMs } : {}),
   });
   let json: OpenAIChunk;
   try {
@@ -317,7 +324,12 @@ async function generateOpenAIShaped(
   };
 }
 
-function buildBody(model: string, req: ProviderRequest, stream: boolean): Record<string, unknown> {
+function buildBody(
+  model: string,
+  req: ProviderRequest,
+  stream: boolean,
+  structuredOutput: boolean,
+): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
       ? [{ role: 'system' as const, content: req.systemMessage }, ...req.messages]
@@ -341,6 +353,18 @@ function buildBody(model: string, req: ProviderRequest, stream: boolean): Record
   }
   if (req.toolChoice !== undefined) {
     body.tool_choice = mapToolChoice(req.toolChoice);
+  }
+  // PS-24: structured output finally reaches the wire — gated on the
+  // declared capability so a structuredOutput:false override keeps the
+  // request clean for servers that reject response_format.
+  if (structuredOutput && req.outputType?.kind === 'structured') {
+    body.response_format =
+      req.outputType.jsonSchema !== undefined
+        ? {
+            type: 'json_schema',
+            json_schema: { name: 'output', schema: req.outputType.jsonSchema, strict: true },
+          }
+        : { type: 'json_object' };
   }
   if (req.providerOptions !== undefined) {
     Object.assign(body, req.providerOptions);

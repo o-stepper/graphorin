@@ -40,6 +40,13 @@ export interface LlamaCppServerAdapterOptions {
   /** Custom `fetch` implementation; useful for tests. */
   readonly fetchImpl?: typeof fetch;
   /**
+   * Time-to-response budget per request (PS-24). Default
+   * `DEFAULT_REQUEST_TIMEOUT_MS` (120s); `0` disables.
+   */
+  readonly timeoutMs?: number;
+  /** Capability overrides merged on top of the adapter defaults. */
+  readonly capabilities?: Partial<import('@graphorin/core').ProviderCapabilities>;
+  /**
    * Acknowledge the risk of running over plaintext HTTP against a
    * public host. Without this flag the adapter throws
    * {@link import('../errors/errors.js').LocalProviderInsecureTransportError}.
@@ -88,7 +95,8 @@ export function llamaCppServerAdapter(options: LlamaCppServerAdapterOptions): Pr
       ? { acceptsSensitivity: options.acceptsSensitivity }
       : {}),
     ...(options.logger !== undefined ? { logger: options.logger } : {}),
-    capabilities: { multimodal: false, parallelToolCalls: false },
+    ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
+    capabilities: { multimodal: false, parallelToolCalls: false, ...options.capabilities },
   });
   return built.provider;
 }
