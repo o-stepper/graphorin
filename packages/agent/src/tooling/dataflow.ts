@@ -25,6 +25,7 @@ import {
   type DataFlowPolicyConfig,
   deriveTaintLabel,
   type TaintLedger,
+  type TaintLedgerSnapshot,
 } from '@graphorin/security/dataflow';
 import type {
   DataFlowGuard,
@@ -53,7 +54,18 @@ function stringifyArgs(value: unknown): string {
  *
  * @internal
  */
-export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuard {
+/**
+ * The executor's {@link DataFlowGuard} plus AG-19 ledger-persistence hooks the
+ * agent uses to carry the coarse taint summary across a suspend/resume.
+ */
+export interface DataFlowGuardWithLedgers extends DataFlowGuard {
+  /** Read a run's coarse taint summary to persist on suspend (or `undefined`). */
+  snapshotLedger(runId: string): TaintLedgerSnapshot | undefined;
+  /** Pre-seed a run's ledger from a persisted summary on resume. */
+  seedLedger(runId: string, summary: TaintLedgerSnapshot): void;
+}
+
+export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardWithLedgers {
   const policy = createDataFlowPolicy(config);
   const ledgerOpts =
     config.minSpanLength !== undefined ? { minSpanLength: config.minSpanLength } : {};
@@ -104,6 +116,16 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuard 
         ...(input.sensitivity !== undefined ? { sensitivity: input.sensitivity } : {}),
       });
       ledger.recordOutput(label, input.outputText);
+    },
+
+    // AG-19: snapshot/rehydrate the run's coarse taint summary across a
+    // suspend/resume so the sink gate is not silently un-gated on the HITL
+    // boundary. Only the load-bearing flags cross the boundary — never spans.
+    snapshotLedger(runId: string): TaintLedgerSnapshot | undefined {
+      return ledgers.get(runId)?.snapshot();
+    },
+    seedLedger(runId: string, summary: TaintLedgerSnapshot): void {
+      ledgers.set(runId, createTaintLedger({ ...ledgerOpts, initial: summary }));
     },
   };
 }

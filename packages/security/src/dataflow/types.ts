@@ -120,6 +120,27 @@ export interface TaintLedger {
   readonly sensitiveSeen: boolean;
   /** Distinct untrusted source kinds observed so far. */
   readonly untrustedSourceKinds: ReadonlyArray<string>;
+  /**
+   * Coarse, serializable summary of the load-bearing trifecta-gate signal —
+   * the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked
+   * verbatim spans (those are untrusted text and must not be persisted). Used
+   * to rehydrate the ledger across a suspend/resume so the sink gate is not
+   * silently weakened on the HITL boundary (AG-19).
+   */
+  snapshot(): TaintLedgerSnapshot;
+}
+
+/**
+ * Serializable coarse summary of a {@link TaintLedger} — the trifecta-gate
+ * flags only. Round-trips through `createTaintLedger({ initial })`. Carries no
+ * untrusted text content, so it is safe to persist in a `RunState`.
+ *
+ * @stable
+ */
+export interface TaintLedgerSnapshot {
+  readonly untrustedSeen: boolean;
+  readonly sensitiveSeen: boolean;
+  readonly untrustedSourceKinds: ReadonlyArray<string>;
 }
 
 /**

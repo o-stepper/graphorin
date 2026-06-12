@@ -18,6 +18,7 @@ import type {
   RunStateUsageByModel,
   RunStatus,
   RunStep,
+  RunTaintSummary,
   ToolApproval,
   Usage,
 } from '@graphorin/core';
@@ -29,7 +30,7 @@ import { RunStateMalformedError, RunStateVersionUnsupportedError } from '../erro
  *
  * @stable
  */
-export const RUN_STATE_SCHEMA_VERSION = 'graphorin-run-state/1.0' as const;
+export const RUN_STATE_SCHEMA_VERSION = 'graphorin-run-state/1.1' as const;
 
 /**
  * Reader-supported schema id range. Major version 1 only for v0.1.
@@ -58,6 +59,10 @@ export interface SerializedRunState {
   readonly handoffs: ReadonlyArray<HandoffRecord>;
   readonly usage: Usage;
   readonly usageByModel?: RunStateUsageByModel;
+  /** AG-19: coarse data-flow taint summary (no untrusted text). */
+  readonly taintSummary?: RunTaintSummary;
+  /** AG-19: deferred tools promoted by `tool_search` this run. */
+  readonly promotedTools?: ReadonlyArray<string>;
   readonly startedAt: string;
   readonly finishedAt?: string;
   readonly error?: { readonly message: string; readonly code: string; readonly details?: unknown };
@@ -103,6 +108,8 @@ export function serializeRunState(
     handoffs: state.handoffs,
     usage: state.usage,
     ...(state.usageByModel !== undefined ? { usageByModel: state.usageByModel } : {}),
+    ...(state.taintSummary !== undefined ? { taintSummary: state.taintSummary } : {}),
+    ...(state.promotedTools !== undefined ? { promotedTools: state.promotedTools } : {}),
     startedAt: state.startedAt,
     ...(state.finishedAt !== undefined ? { finishedAt: state.finishedAt } : {}),
     ...(state.error !== undefined ? { error: state.error } : {}),
@@ -259,6 +266,23 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     );
   }
 
+  // AG-19: rehydrate the coarse taint summary + promoted-tool set (additive;
+  // absent on older v1.0 payloads).
+  let taintSummary: RunTaintSummary | undefined;
+  if (isRecord(payload.taintSummary)) {
+    const ts = payload.taintSummary;
+    taintSummary = {
+      untrustedSeen: ts.untrustedSeen === true,
+      sensitiveSeen: ts.sensitiveSeen === true,
+      untrustedSourceKinds: Array.isArray(ts.untrustedSourceKinds)
+        ? ts.untrustedSourceKinds.filter((k): k is string => typeof k === 'string')
+        : [],
+    };
+  }
+  const promotedTools = Array.isArray(payload.promotedTools)
+    ? payload.promotedTools.filter((t): t is string => typeof t === 'string')
+    : undefined;
+
   const out: RunState = {
     id,
     agentId,
@@ -272,6 +296,8 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     handoffs,
     usage,
     ...(usageByModel !== undefined ? { usageByModel } : {}),
+    ...(taintSummary !== undefined ? { taintSummary } : {}),
+    ...(promotedTools !== undefined ? { promotedTools } : {}),
     startedAt,
     ...(typeof finishedAtRaw === 'string' ? { finishedAt: finishedAtRaw } : {}),
     ...(error !== undefined ? { error } : {}),

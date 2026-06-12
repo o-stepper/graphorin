@@ -1,7 +1,7 @@
 import type { Provider, ProviderEvent, ProviderRequest, Tool } from '@graphorin/core';
 import { onToolAudit, type ToolAuditEvent } from '@graphorin/tools/audit';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { createAgent } from '../src/index.js';
+import { createAgent, runStateFromJSON } from '../src/index.js';
 import {
   type MockProviderScript,
   textOnlyScript,
@@ -135,6 +135,50 @@ describe('WI-12 — provenance data-flow policy', () => {
     const types = await drain(agent);
     expect(state.sent).toBe(false); // the sink never ran
     expect(types).toContain('tool.execute.error'); // surfaced to the stream
+    expect(auditActions()).toContain('tool:dataflow:blocked');
+  });
+
+  it('rehydrates the taint ledger on resume so an enforce-mode sink stays gated (AG-19)', async () => {
+    const state = { sent: false };
+    const agent = createAgent({
+      name: 'df-resume',
+      instructions: 'INSTRUCTIONS',
+      provider: mockProvider([
+        toolCallScript({ toolCallId: 's1', toolName: 'send_email', args: {} }),
+        textOnlyScript('done'),
+      ]),
+      tools: [makeSink(state)],
+      dataFlowPolicy: { mode: 'enforce' },
+    });
+    // A run that ALREADY saw untrusted + secret data before the suspend: the
+    // trifecta is latent in the persisted coarse taint summary, with an empty
+    // in-memory ledger (the new-process resume scenario).
+    const resumed = {
+      version: 'graphorin-run-state/1.1',
+      id: 'run-taint',
+      agentId: agent.id,
+      currentAgentId: agent.id,
+      sessionId: 's',
+      status: 'running',
+      steps: [],
+      messages: [{ role: 'user', content: 'go' }],
+      pendingApprovals: [],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      taintSummary: {
+        untrustedSeen: true,
+        sensitiveSeen: true,
+        untrustedSourceKinds: ['web-search'],
+      },
+      startedAt: new Date().toISOString(),
+    } as const;
+    const types: string[] = [];
+    for await (const ev of agent.stream(runStateFromJSON(JSON.stringify(resumed)))) {
+      types.push(ev.type);
+    }
+    // The rehydrated trifecta state gated the sink — it never ran.
+    expect(state.sent).toBe(false);
+    expect(types).toContain('tool.execute.error');
     expect(auditActions()).toContain('tool:dataflow:blocked');
   });
 

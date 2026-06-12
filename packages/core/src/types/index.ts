@@ -92,6 +92,7 @@ export {
   type RunStateUsageByModel,
   type RunStatus,
   type RunStep,
+  type RunTaintSummary,
 } from './run.js';
 export type { Sensitivity } from './sensitivity.js';
 export { acceptsSensitivity, SENSITIVITY_ORDER } from './sensitivity.js';
