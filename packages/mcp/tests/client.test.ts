@@ -176,7 +176,7 @@ describe('MCPClient — integration against the in-memory MCP server', () => {
     expect(client.resumable).toBe(false);
   });
 
-  it('the operator-supplied logger receives the resumable INFO line', async () => {
+  it('the operator-supplied logger receives the session-id INFO line', async () => {
     const fixture = await startInMemoryServer();
     dispose = fixture.close;
     const lines: { level: string; message: string }[] = [];
@@ -187,7 +187,7 @@ describe('MCPClient — integration against the in-memory MCP server', () => {
         lines.push({ level, message });
       },
     });
-    expect(lines.some((l) => l.message === 'mcp.session.resumable.resolved')).toBe(true);
+    expect(lines.some((l) => l.message === 'mcp.session.session-id.resolved')).toBe(true);
   });
 
   it('close() is idempotent under double invocation', async () => {

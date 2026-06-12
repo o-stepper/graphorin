@@ -15,7 +15,6 @@ import type {
 } from '@graphorin/core';
 import type { CollisionStrategy } from '@graphorin/tools/registry';
 
-import type { EventStore } from '../event-store/index.js';
 import type { OAuthAuthorizationProvider } from '../oauth/bridge.js';
 import type { MCPTransportConfig, ServerIdentity } from '../transport/types.js';
 
@@ -42,12 +41,6 @@ export interface CreateMCPClientOptions {
   readonly collisionStrategy?: CollisionStrategy;
   /** Per-client priority value used by the `'priority'` strategy. */
   readonly priority?: number;
-  /**
-   * Pluggable {@link EventStore} for resumable Streamable HTTP
-   * sessions. The default is the in-memory store with capacity
-   * `1024`.
-   */
-  readonly eventStore?: EventStore;
   /** Operator-supplied server identity overrides. */
   readonly serverInfoName?: string;
   /** Operator-supplied logger. */
@@ -328,9 +321,15 @@ export interface MCPClient {
   /** Per-client priority value used by the `'priority'` strategy. */
   readonly priority?: number;
   /**
-   * Whether the connected server advertises Streamable HTTP session
-   * support (resolved at `initialize` time).
+   * Whether the Streamable HTTP server assigned an `Mcp-Session-Id`
+   * at `initialize` time (MC-9). A session id means stateful routing —
+   * it is NOT a replay guarantee: per the Streamable HTTP spec,
+   * event replay is the SERVER's responsibility, and the SDK
+   * transport already auto-reconnects with `Last-Event-ID` when the
+   * server supports it.
    */
+  readonly sessionIdPresent: boolean;
+  /** @deprecated Alias of {@link sessionIdPresent} — same value, misleading name. */
   readonly resumable: boolean;
 
   listTools(opts?: { signal?: AbortSignal }): Promise<ReadonlyArray<MCPToolDefinition>>;

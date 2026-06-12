@@ -219,14 +219,27 @@ export async function createMCPClientFromSdkTransport(
   serverIdRef.current = serverIdentity.id;
   const collisionStrategy: CollisionStrategy = options.collisionStrategy ?? 'auto-prefix';
 
-  const resumable =
+  // MC-1: the client-side eventStore option was removed — per the
+  // Streamable HTTP spec event replay is the SERVER's responsibility,
+  // and the SDK transport auto-reconnects with Last-Event-ID on its
+  // own. Warn legacy callers instead of silently ignoring the option.
+  if ((options as { readonly eventStore?: unknown }).eventStore !== undefined) {
+    options.logger?.(
+      'warn',
+      "the client 'eventStore' option was removed (MC-1): event replay is a server responsibility; the SDK transport auto-reconnects with Last-Event-ID. Remove the option.",
+      { server: serverIdentity.id },
+    );
+  }
+  // MC-9: a session id means stateful routing, NOT a replay guarantee.
+  const sessionIdPresent =
     isStreamableHttp(options.transport) &&
     (options.transport as StreamableHTTPClientTransport).sessionId !== undefined;
+  const resumable = sessionIdPresent;
   if (options.logger !== undefined) {
-    options.logger('info', 'mcp.session.resumable.resolved', {
+    options.logger('info', 'mcp.session.session-id.resolved', {
       server: serverIdentity.id,
-      value: resumable,
-      source: resumable ? 'server-advertises' : 'transport-default',
+      value: sessionIdPresent,
+      source: sessionIdPresent ? 'session-id-present' : 'transport-default',
     });
   }
   let structuredContentSeenLogged = false;
@@ -501,6 +514,7 @@ export async function createMCPClientFromSdkTransport(
     serverIdentity,
     collisionStrategy,
     ...(options.priority === undefined ? {} : { priority: options.priority }),
+    sessionIdPresent,
     resumable,
     listTools,
     listResources,
