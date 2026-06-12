@@ -135,6 +135,7 @@ Because execution now flows through the executor, several tool-classification fi
 | `inboundSanitization` | **Enforced** — untrusted tool output is flagged / stripped / wrapped before it re-enters context. |
 | `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens), **text and structured object outputs alike**; the model sees the bounded text, never the full object. An over-cap structured output spills by default, storing the full body behind a handle (see [result handles](#result-handles-and-read_result)). |
 | `needsApproval` | **Enforced** — the run suspends for durable HITL (below) *before* the call runs. |
+| inline wall-clock timeout | **Enforced** (TL-4) — inline tools are bounded by the tier-resolved per-tool `timeoutMs` (or the executor default, 60s); a hanging tool that ignores `ctx.signal` fails with `ToolError({ kind: 'timeout' })` and the run continues. |
 | `sandboxPolicy` | Resolved and surfaced on the `tool.execute` span / audit, but inline `config.tools` run **in-process** — out-of-process isolation applies to module-loadable skill / MCP tools and is wired when those land. |
 | `memoryGuardTier` | **Enforced when `memory` is wired** (SDF-1) — the runtime binds a scope-aware region reader over working memory, and the executor snapshots/verifies the region around guarded calls. Without `memory` the guard is skipped with a one-time WARN. |
 

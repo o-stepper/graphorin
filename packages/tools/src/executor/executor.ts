@@ -172,6 +172,13 @@ export interface ExecutorOptions {
    * same guard composes with code-mode automatically (P1-2).
    */
   readonly dataFlowGuard?: DataFlowGuard;
+  /**
+   * Wall-clock limit applied to INLINE tool execution (TL-4) — the
+   * per-tool sandbox-tier `timeoutMs` wins when resolved > 0. Expiry
+   * fails the call with `ToolError({ kind: 'timeout' })`; the run
+   * continues. Default {@link DEFAULT_INLINE_TOOL_TIMEOUT_MS} (60s).
+   */
+  readonly inlineToolTimeoutMs?: number;
 }
 
 /**
@@ -278,6 +285,24 @@ export interface ToolExecutor {
  *
  * @stable
  */
+/**
+ * Default wall-clock limit for INLINE tool execution (TL-4). Sandbox
+ * tiers carry their own per-tier defaults; inline closures previously
+ * had none — a hanging tool that ignored `ctx.signal` blocked the run
+ * indefinitely.
+ *
+ * @stable
+ */
+export const DEFAULT_INLINE_TOOL_TIMEOUT_MS = 60_000;
+
+/** TL-4: sentinel for the inline wall-clock expiry (maps to kind 'timeout'). */
+class InlineToolTimeoutError extends Error {
+  constructor(readonly limitMs: number) {
+    super(`Tool execution exceeded the ${limitMs}ms wall-clock timeout.`);
+    this.name = 'InlineToolTimeoutError';
+  }
+}
+
 /** TL-6: trust classes whose content must not launder through handle reads. */
 function isUntrustedProducerClass(trustClass: ToolTrustClass): boolean {
   return defaultInboundSanitization(trustClass) === 'detect-and-strip-and-wrap';
@@ -711,16 +736,40 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           executeError = new Error(`[sandbox:${sandbox.id}] ${errInfo.kind}: ${errInfo.message}`);
         }
       } else {
-        rawResult = await withSecretsScope({
-          tool,
-          runContext,
-          fn: () =>
-            raceWithCancellation(
-              () => tool.execute(validatedInput as never, ctx),
-              linkedAbort.signal,
-              cancellationGraceMs,
-            ),
-        });
+        // TL-4: inline closures get an enforced wall-clock limit — the
+        // tier-resolved per-tool timeout when set, else the executor
+        // default. A tool that hangs and ignores `ctx.signal` fails with
+        // kind 'timeout' instead of blocking the run forever.
+        const inlineLimitMs =
+          opts.inlineToolTimeoutMs !== undefined
+            ? opts.inlineToolTimeoutMs
+            : prepared.sandbox.timeoutMs > 0
+              ? prepared.sandbox.timeoutMs
+              : DEFAULT_INLINE_TOOL_TIMEOUT_MS;
+        span.setAttributes({ 'graphorin.tool.inline_timeout_ms': inlineLimitMs });
+        let inlineTimer: NodeJS.Timeout | undefined;
+        try {
+          rawResult = await Promise.race([
+            withSecretsScope({
+              tool,
+              runContext,
+              fn: () =>
+                raceWithCancellation(
+                  () => tool.execute(validatedInput as never, ctx),
+                  linkedAbort.signal,
+                  cancellationGraceMs,
+                ),
+            }),
+            new Promise<never>((_, reject) => {
+              inlineTimer = setTimeout(
+                () => reject(new InlineToolTimeoutError(inlineLimitMs)),
+                inlineLimitMs,
+              );
+            }),
+          ]);
+        } finally {
+          if (inlineTimer !== undefined) clearTimeout(inlineTimer);
+        }
       }
     } catch (caught) {
       executeError = caught;
@@ -776,7 +825,11 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     if (executeError !== undefined) {
       const cancelled = linkedAbort.signal.aborted;
-      const kind: ToolErrorKind = cancelled ? 'aborted' : 'execution_failed';
+      const kind: ToolErrorKind = cancelled
+        ? 'aborted'
+        : executeError instanceof InlineToolTimeoutError
+          ? 'timeout'
+          : 'execution_failed';
       const partialOutput =
         aggregator.chunks.length > 0
           ? toResultEnvelope({ raw: undefined, chunks: aggregator.chunks }).output
