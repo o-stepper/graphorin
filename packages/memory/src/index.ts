@@ -1,19 +1,23 @@
 /**
- * `@graphorin/memory` — six-tier memory system for the Graphorin
- * framework.
+ * `@graphorin/memory` — seven-tier memory system for the Graphorin
+ * framework (MST-13: working / session / episodic / semantic /
+ * procedural / shared + the read-only insight tier from P1-1).
  *
- * Phase 10a deliverables:
+ * Surface overview:
  *
- *  - The {@link createMemory} facade that wires every six-tier sub-
- *    module + the eleven memory tools + the search reranker + the
- *    context-engine + consolidator interface stubs.
- *  - Six tier sub-modules under `./tiers`: {@link WorkingMemory},
+ *  - The {@link createMemory} facade that wires every tier sub-module
+ *    + the memory tools + the search reranker + the context-engine +
+ *    the consolidator.
+ *  - Tier sub-modules under `./tiers`: {@link WorkingMemory},
  *    {@link SessionMemory}, {@link EpisodicMemory}, {@link SemanticMemory},
- *    {@link ProceduralMemory}, {@link SharedMemory}.
- *  - Eleven memory tools under `./tools`: `block_append`, `block_replace`,
- *    `block_rethink`, `fact_remember`, `fact_search`, `fact_supersede`,
- *    `fact_forget`, `recall_episodes`, `conversation_search`,
- *    `fact_history` (P0-2), `fact_validate` (P1-4).
+ *    {@link ProceduralMemory}, {@link SharedMemory}, plus the read-only
+ *    {@link InsightMemory}.
+ *  - Eleven memory tools under `./tools` (plus the gated twelfth,
+ *    `deep_recall`, registered only when iterative retrieval is
+ *    configured): `block_append`, `block_replace`, `block_rethink`,
+ *    `fact_remember`, `fact_search`, `fact_supersede`, `fact_forget`,
+ *    `recall_episodes`, `conversation_search`, `fact_history` (P0-2),
+ *    `fact_validate` (P1-4).
  *  - The hybrid search composition under `./search`, including the
  *    built-in {@link RRFReranker} (k=60 default) and the
  *    {@link ReRanker} contract.

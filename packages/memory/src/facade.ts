@@ -1,6 +1,7 @@
 /**
- * `createMemory()` — the facade that wires every six-tier sub-module +
- * the nine memory tools + the search reranker + the context engine
+ * `createMemory()` — the facade that wires every tier sub-module (the
+ * seven-tier system) + the eleven (+1 gated) memory tools + the search
+ * reranker + the context engine
  * stubs + the consolidator placeholder.
  *
  * @packageDocumentation
