@@ -1,5 +1,5 @@
 import type { AgentEvent, Tool } from '@graphorin/core';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createAgent } from '../src/index.js';
 import {
   createMockProvider,
@@ -207,5 +207,74 @@ describe('Agent — abort', () => {
     }
     // Either the run completed normally (mock is fast) or we saw the cancel signal.
     expect(events.length).toBeGreaterThan(0);
+  });
+
+  const makeNoopTool = (): Tool<unknown, string, unknown> => ({
+    name: 'noop',
+    description: 'noop',
+    inputSchema: {
+      parse: (v: unknown) => v,
+      safeParse: (v: unknown) => ({ success: true as const, data: v }),
+      toJSON: (): Record<string, unknown> => ({ type: 'object' }),
+    } as Tool<unknown, string, unknown>['inputSchema'],
+    sideEffectClass: 'pure',
+    async execute() {
+      return 'ok';
+    },
+  });
+
+  it('agent.abort() stops the run + applies abort options even when the caller passed options.signal (AG-5)', async () => {
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [
+        toolCallScript({ toolCallId: 'tc-1', toolName: 'noop', args: {} }),
+        toolCallScript({ toolCallId: 'tc-2', toolName: 'noop', args: {} }),
+        toolCallScript({ toolCallId: 'tc-3', toolName: 'noop', args: {} }),
+        textOnlyScript('done'),
+      ],
+    });
+    const agent = createAgent({
+      name: 'abortable',
+      instructions: 'go',
+      provider,
+      tools: [makeNoopTool()],
+    });
+    const parent = new AbortController();
+    const events: AgentEvent[] = [];
+    let aborted = false;
+    for await (const ev of agent.stream('go', { signal: parent.signal })) {
+      events.push(ev);
+      if (!aborted && ev.type === 'tool.execute.end') {
+        aborted = true;
+        agent.abort({ onPendingApprovals: 'deny' });
+      }
+    }
+    const cancelling = events.find((e) => e.type === 'agent.cancelling');
+    expect(cancelling).toBeDefined();
+    if (cancelling?.type === 'agent.cancelling') {
+      expect(cancelling.onPendingApprovals).toBe('deny');
+    }
+    // The run stopped early — it did NOT execute all three tool steps.
+    expect(events.filter((e) => e.type === 'tool.execute.end').length).toBeLessThan(3);
+  });
+
+  it('removes the parent-signal abort listener when the run ends (no accumulation; AG-5)', async () => {
+    const parent = new AbortController();
+    const addSpy = vi.spyOn(parent.signal, 'addEventListener');
+    const removeSpy = vi.spyOn(parent.signal, 'removeEventListener');
+    for (let i = 0; i < 3; i++) {
+      const agent = createAgent({
+        name: 'leaky',
+        instructions: 'go',
+        provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done')] }),
+      });
+      for await (const _ev of agent.stream('go', { signal: parent.signal })) {
+        // drain the stream to completion
+      }
+    }
+    const adds = addSpy.mock.calls.filter((c) => c[0] === 'abort').length;
+    const removes = removeSpy.mock.calls.filter((c) => c[0] === 'abort').length;
+    expect(adds).toBe(3);
+    expect(removes).toBe(3);
   });
 });

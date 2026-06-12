@@ -66,6 +66,26 @@ describe('durable HITL resume', () => {
     }
   });
 
+  it('advances the step counter across resume so post-resume checkpoints do not tie (WF-4)', async () => {
+    const store = new InMemoryCheckpointStore();
+    const writer = buildWorkflow(store);
+    await collect(writer.execute({}, { threadId: 'wf4' }));
+    const namespace = 'workflow/durable-resume';
+    const suspended = await store.getTuple('wf4', namespace);
+    const suspendedStep = suspended?.checkpoint.stepNumber ?? -1;
+    expect(suspendedStep).toBeGreaterThanOrEqual(0);
+
+    const reader = buildWorkflow(store);
+    await collect(reader.resume('wf4', new Directive({ resume: 'yes' })));
+
+    // No post-resume checkpoint may reuse the suspended stepNumber — otherwise a
+    // crash-recovery / second pause would tie and `getTuple` could return the
+    // stale suspended checkpoint, re-running the pause node.
+    const all = await collect(store.list('wf4', namespace));
+    const atSuspendedStep = all.filter((t) => t.checkpoint.stepNumber === suspendedStep);
+    expect(atSuspendedStep).toHaveLength(1);
+  });
+
   it('rejects concurrent resumes for the same thread', async () => {
     const store = new InMemoryCheckpointStore();
     const wf = buildWorkflow(store);

@@ -140,6 +140,13 @@ export type HandoffEntry<TDeps = unknown> =
  */
 export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly name: string;
+  /**
+   * The agent's system prompt. A string is used verbatim; a function is
+   * resolved **once per run** (sync or async, awaited) against a
+   * {@link RunContext} snapshot at step 0, and its result is pinned as the
+   * run's system-prompt prefix for the whole run (it is not re-evaluated
+   * per step). An empty string injects no system message.
+   */
   readonly instructions: string | ((ctx: RunContext<TDeps>) => string | Promise<string>);
   readonly provider: Provider;
   readonly tools?: ReadonlyArray<Tool<unknown, unknown, TDeps>>;

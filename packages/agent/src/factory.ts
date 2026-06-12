@@ -848,10 +848,18 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     const userId = options.userId ?? config.userId;
     const localCtl = new AbortController();
     abortController = localCtl;
-    const signal = options.signal ?? localCtl.signal;
-    if (options.signal) {
-      const onParent = (): void => localCtl.abort();
-      options.signal.addEventListener('abort', onParent);
+    // AG-5: the loop + every provider request must observe the LOCAL
+    // controller, so `agent.abort()` (which aborts `localCtl`) is honoured even
+    // when the caller supplied their own `options.signal`. The caller's signal
+    // is propagated INTO `localCtl` by the listener below; the listener is torn
+    // down in the run's `finally` so it does not accumulate across runs that
+    // share one long-lived parent signal.
+    const signal = localCtl.signal;
+    const parentSignal = options.signal;
+    const onParentAbort = (): void => localCtl.abort();
+    if (parentSignal !== undefined) {
+      if (parentSignal.aborted) localCtl.abort();
+      else parentSignal.addEventListener('abort', onParentAbort);
     }
 
     const usageAcc = new InMemoryUsageAccumulator();
@@ -873,7 +881,30 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       // Inject the agent's system prompt at the top of the buffer
       // exactly once per run, before any seed messages.
       const instructionsRaw = config.instructions;
-      const instructionsText = typeof instructionsRaw === 'string' ? instructionsRaw : '';
+      // AG-8: resolve the function form of `instructions` (sync or async). It is
+      // resolved ONCE per run (the per-run contract documented on `AgentConfig`),
+      // against a RunContext snapshot at step 0; the result is pinned as the
+      // run's system-prompt prefix. A function that previously returned nothing
+      // observable now actually seeds the system message.
+      let instructionsText: string;
+      if (typeof instructionsRaw === 'string') {
+        instructionsText = instructionsRaw;
+      } else {
+        const instructionsCtx: RunContext<TDeps> = {
+          runId: state.id,
+          sessionId,
+          ...(userId !== undefined ? { userId } : {}),
+          agentId,
+          deps: (options.deps ?? config.deps) as TDeps,
+          tracer,
+          signal,
+          usage: usageAcc,
+          stepNumber: 0,
+          messages,
+          state,
+        };
+        instructionsText = await instructionsRaw(instructionsCtx);
+      }
       let systemPrompt = instructionsText;
       if (config.autoAssembleContext === true && memory !== undefined) {
         // CE-1 (opt-in): build the memory-aware 6-layer system prompt via the
@@ -1718,6 +1749,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state.status = 'failed';
       state.error = { message, code };
       return finalize(state, finalSnapshot);
+    } finally {
+      // AG-5: drop the parent-signal listener so it does not accumulate across
+      // runs that share one long-lived `options.signal`. Runs after this point
+      // (the follow-up loop) keep working via `agent.abort()` on `localCtl`.
+      if (parentSignal !== undefined) {
+        parentSignal.removeEventListener('abort', onParentAbort);
+      }
     }
 
     if (state.status === 'running') {

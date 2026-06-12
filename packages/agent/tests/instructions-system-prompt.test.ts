@@ -48,6 +48,52 @@ describe('Agent — system prompt assembly from `instructions`', () => {
     expect(second?.role).toBe('user');
   });
 
+  it('resolves a sync function-form instructions into the system message (AG-8)', async () => {
+    let capturedRequest: ProviderRequest | undefined;
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 8)] });
+    const wrapped = {
+      ...provider,
+      stream(req: ProviderRequest) {
+        capturedRequest = req;
+        return provider.stream(req);
+      },
+    };
+    const agent = createAgent({
+      name: 'fn-sync',
+      instructions: (ctx) => `You are agent ${ctx.agentId}.`,
+      provider: wrapped,
+    });
+    await agent.run('hi');
+    const first = capturedRequest?.messages[0];
+    expect(first?.role).toBe('system');
+    if (first?.role === 'system') {
+      expect(first.content).toContain('You are agent ');
+    }
+  });
+
+  it('awaits an async function-form instructions (AG-8)', async () => {
+    let capturedRequest: ProviderRequest | undefined;
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 8)] });
+    const wrapped = {
+      ...provider,
+      stream(req: ProviderRequest) {
+        capturedRequest = req;
+        return provider.stream(req);
+      },
+    };
+    const agent = createAgent({
+      name: 'fn-async',
+      instructions: async () => 'ASYNC SYSTEM PROMPT',
+      provider: wrapped,
+    });
+    await agent.run('hi');
+    const first = capturedRequest?.messages[0];
+    expect(first?.role).toBe('system');
+    if (first?.role === 'system') {
+      expect(first.content).toBe('ASYNC SYSTEM PROMPT');
+    }
+  });
+
   it('omits the system message when instructions is the empty string', async () => {
     let capturedRequest: ProviderRequest | undefined;
     const provider = createMockProvider({

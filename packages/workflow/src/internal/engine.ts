@@ -218,7 +218,12 @@ export async function* resumeEngine<TState extends object>(
       visitedNodes: new Set<string>(),
       pendingDynamicTasks: [],
       lastCompletedNodes: [],
-      stepNumber: tuple.checkpoint.stepNumber,
+      // WF-4: advance the step counter on resume so the first post-resume
+      // checkpoint is strictly newer than the suspended one. Without this they
+      // tie, and `getTuple` (max stepNumber) returns the STALE suspended
+      // checkpoint — re-running the pause node after a crash, and livelocking a
+      // node that pauses twice in a row.
+      stepNumber: tuple.checkpoint.stepNumber + 1,
       parentCheckpointId: tuple.checkpoint.id,
       pendingPause: pendingPause,
       status: 'running',
