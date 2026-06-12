@@ -1,3 +1,4 @@
+import type { ToolReturn } from '@graphorin/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { adaptCallResult } from '../src/client/adapt-result.js';
@@ -42,7 +43,7 @@ describe('MC-8/MC-11 — non-text content and structured payloads are never sile
         content: [{ type: 'image', data: PNG_BYTES, mimeType: 'image/png' }],
       }),
     });
-    const result = await tool.execute({}, undefined as never);
+    const result = (await tool.execute({}, undefined as never)) as ToolReturn<unknown>;
     const output = String(result.output);
     expect(output.length).toBeGreaterThan(0);
     expect(output).toContain('[image image/png');
@@ -61,7 +62,7 @@ describe('MC-8/MC-11 — non-text content and structured payloads are never sile
         ],
       }),
     });
-    const result = await tool.execute({}, undefined as never);
+    const result = (await tool.execute({}, undefined as never)) as ToolReturn<unknown>;
     expect(String(result.output)).toContain('EMBEDDED BODY TEXT');
   });
 

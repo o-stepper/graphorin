@@ -71,11 +71,16 @@ export function createMcpResourceReader(opts: McpResourceReaderOptions): ResultR
   };
 }
 
-/** Prefer the text body; fall back to the (base64) blob payload. */
-function resourceBody(content: MCPResourceContent): string {
-  if (content.text !== undefined) return content.text;
-  if (content.blob !== undefined) return content.blob;
-  return '';
+/**
+ * Raw resource bytes (MC-10): text resources as UTF-8, blob resources
+ * DECODED from base64 — slicing/totalBytes operate on real payload
+ * bytes, never on the ~33%-inflated base64 string (whose arbitrary
+ * cuts also break base64 quads).
+ */
+function resourceBytes(content: MCPResourceContent): Buffer {
+  if (content.text !== undefined) return Buffer.from(content.text, 'utf8');
+  if (content.blob !== undefined) return Buffer.from(content.blob, 'base64');
+  return Buffer.alloc(0);
 }
 
 /**
@@ -88,8 +93,8 @@ function sliceResource(
   range: ResultReadRange | undefined,
   defaultMaxBytes: number,
 ): ResultReadOutcome {
-  const full = resourceBody(content);
-  const buf = Buffer.from(full, 'utf8');
+  const buf = resourceBytes(content);
+  const full = buf.toString('utf8');
   const totalBytes = buf.byteLength;
   const cap = Math.max(0, range?.maxBytes ?? defaultMaxBytes);
 

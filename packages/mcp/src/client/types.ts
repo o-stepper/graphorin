@@ -132,7 +132,12 @@ export type MCPSamplingContent =
 /** A message in a sampling conversation. */
 export interface MCPSamplingMessage {
   readonly role: 'user' | 'assistant';
-  readonly content: MCPSamplingContent;
+  /**
+   * Every content block of the SDK message (MC-13) — previously only
+   * the FIRST block survived, silently dropping e.g. the image in a
+   * text+image message before it reached the operator's handler.
+   */
+  readonly content: ReadonlyArray<MCPSamplingContent>;
 }
 
 /**
