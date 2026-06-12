@@ -27,7 +27,7 @@ async function setupStore() {
 beforeAll(async () => {
   _resetResolversForTesting();
   installBuiltinResolvers();
-  process.env.GRAPHORIN_TEST_PEPPER_SSE_LEI = 'pepper-with-enough-entropy-LEI';
+  process.env.GRAPHORIN_TEST_PEPPER_SSE_LEI = 'pepper-with-plenty-of-entropy-aB3xK9-LEI';
   const store = await setupStore();
   server = await createServer({
     store,

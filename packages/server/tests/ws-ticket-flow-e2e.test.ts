@@ -21,7 +21,7 @@ let rawToken = '';
 beforeAll(async () => {
   _resetResolversForTesting();
   installBuiltinResolvers();
-  process.env.GRAPHORIN_TEST_PEPPER_TICKET_E2E = 'pepper-with-enough-entropy-TKT';
+  process.env.GRAPHORIN_TEST_PEPPER_TICKET_E2E = 'pepper-with-plenty-of-entropy-aB3xK9-TKT';
   const store = await createSqliteStore({
     path: ':memory:',
     mode: 'lib',

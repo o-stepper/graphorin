@@ -17,7 +17,7 @@ describe('POST /v1/session/ws-ticket', () => {
   it('issues a single-use ticket for an authenticated bearer call', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
-    process.env.GRAPHORIN_TEST_PEPPER_WS = 'pepper-with-enough-entropy-XX1';
+    process.env.GRAPHORIN_TEST_PEPPER_WS = 'pepper-with-plenty-of-entropy-aB3xK9-XX1';
     const store = await setupStore();
     const server = await createServer({
       store,
@@ -73,7 +73,7 @@ describe('POST /v1/session/ws-ticket', () => {
   it('rejects unauthenticated calls with 401', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
-    process.env.GRAPHORIN_TEST_PEPPER_WS2 = 'pepper-with-enough-entropy-XX2';
+    process.env.GRAPHORIN_TEST_PEPPER_WS2 = 'pepper-with-plenty-of-entropy-aB3xK9-XX2';
     const store = await setupStore();
     const server = await createServer({
       store,
@@ -100,7 +100,7 @@ describe('POST /v1/session/ws-ticket', () => {
   it('rejects an authenticated token without the agents:invoke scope', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
-    process.env.GRAPHORIN_TEST_PEPPER_WS3 = 'pepper-with-enough-entropy-XX3';
+    process.env.GRAPHORIN_TEST_PEPPER_WS3 = 'pepper-with-plenty-of-entropy-aB3xK9-XX3';
     const store = await setupStore();
     const server = await createServer({
       store,
