@@ -91,6 +91,57 @@ describe('Tool cassette format', () => {
     expect(() => readToolCassette(buffer.toString())).toThrow(CassetteCursorViolationError);
   });
 
+  it('accepts parallel tool-calls with non-monotonic ids in one step (RP-4)', async () => {
+    const buffer = createCassetteBufferSink();
+    const writer = createToolCassetteWriter(buffer.sink, {
+      writer: 'fake',
+      sessionId: 'sess-1',
+      runId: 'run-1',
+    });
+    const base = {
+      kind: 'tool-call' as const,
+      toolName: 'a',
+      sideEffectClass: 'pure' as const,
+      args: {},
+      output: {},
+      status: 'completed' as const,
+      durationMs: 1,
+      agentId: 'main',
+      timestampIso: '2026-05-08T10:00:00Z',
+    };
+    // Provider ids carry no lexicographic guarantee; two parallel calls in one
+    // step can arrive "decreasing".
+    await writer.writeRecord({ ...base, stepNumber: 1, toolCallId: 'toolu_zzz' });
+    await writer.writeRecord({ ...base, stepNumber: 1, toolCallId: 'toolu_aaa' });
+    await writer.close();
+    const parsed = readToolCassette(buffer.toString());
+    expect(parsed.toolCalls.map((t) => t.toolCallId)).toEqual(['toolu_zzz', 'toolu_aaa']);
+  });
+
+  it('still rejects an exact duplicate tool-call id in the same step (RP-4)', async () => {
+    const buffer = createCassetteBufferSink();
+    const writer = createToolCassetteWriter(buffer.sink, {
+      writer: 'fake',
+      sessionId: 'sess-1',
+      runId: 'run-1',
+    });
+    const base = {
+      kind: 'tool-call' as const,
+      toolName: 'a',
+      sideEffectClass: 'pure' as const,
+      args: {},
+      output: {},
+      status: 'completed' as const,
+      durationMs: 1,
+      agentId: 'main',
+      timestampIso: '2026-05-08T10:00:00Z',
+    };
+    await writer.writeRecord({ ...base, stepNumber: 1, toolCallId: 'dup' });
+    await writer.writeRecord({ ...base, stepNumber: 1, toolCallId: 'dup' });
+    await writer.close();
+    expect(() => readToolCassette(buffer.toString())).toThrow(CassetteCursorViolationError);
+  });
+
   it('rejects bodies that do not start with a meta sentinel', () => {
     expect(() => readToolCassette('not a cassette')).toThrow(CassetteFormatInvalidError);
   });
