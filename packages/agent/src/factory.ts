@@ -1030,7 +1030,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     input: AgentInput | RunState,
     options: AgentCallOptions<TDeps>,
   ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
-    const { seed, resumed } = asMessages(input);
+    const { seed: rawSeed, resumed } = asMessages(input);
+    // AG-12: queued follow-ups are next-turn metadata — they ride into
+    // the next FRESH run as leading user turns. The old path mutated a
+    // finished run back to 'running' and appended the message to a loop
+    // that never processed it, leaving a non-terminal persisted RunState
+    // with a dangling user turn. Resumed runs keep the queue intact.
+    const seed =
+      resumed === undefined && pendingFollowUp.length > 0
+        ? [...pendingFollowUp.splice(0, pendingFollowUp.length), ...rawSeed]
+        : rawSeed;
     const sessionId = options.sessionId ?? config.sessionId ?? `session_${newId()}`;
     const userId = options.userId ?? config.userId;
     const localCtl = new AbortController();
@@ -2232,21 +2241,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     if (state.status === 'running') {
       state.status = 'completed';
     }
-    // Drain any queued follow-ups into a new turn while the run
-    // is still active. Each follow-up message is appended to the
-    // buffer + state, and the loop is restarted from the top so
-    // the model produces the next assistant message.
-    if (pendingFollowUp.length > 0 && state.status === 'completed' && !signal.aborted) {
-      const turn = pendingFollowUp.splice(0, pendingFollowUp.length);
-      for (const m of turn) {
-        messages.push(m);
-        state.messages.push(m);
-      }
-      state.status = 'running';
-      delete (state as { finishedAt?: string }).finishedAt;
-      yield* runFollowUpLoop(messages, state, stepNumber, signal, sessionId, userId);
-    }
-
     // AG-3: structured output is parsed + validated on the completed
     // path — a failure is a typed run failure (`output-validation-failed`),
     // never a silent text-cast. Runs BEFORE output guardrails so they
@@ -2298,29 +2292,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     }
     activeRunState = undefined;
     return yield* finishRun(state, finalSnapshot);
-  }
-
-  /**
-   * Re-enter the loop with the supplied buffer + accumulated
-   * step counter when a queued follow-up turn fires.
-   */
-  async function* runFollowUpLoop(
-    _messages: Message[],
-    _state: RunState,
-    _stepNumber: number,
-    _signal: AbortSignal,
-    _sessionId: string,
-    _userId: string | undefined,
-  ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-    // Intentional minimal-loop placeholder: the v0.1 follow-up
-    // semantics document the queueing path but do NOT auto-spawn
-    // a new provider call inside the same generator. Operators
-    // who want a follow-up turn invoke `agent.run(...)` again
-    // with the queued message; the queue is documented as
-    // "next-turn metadata", not "auto-spawn-a-turn". Keeping the
-    // generator here so we can extend it later without breaking
-    // the public surface.
-    yield* (async function* (): AsyncGenerator<AgentEvent<TOutput>, void, void> {})();
   }
 
   /**
@@ -2602,7 +2573,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     },
   };
 
-  void pendingFollowUp;
   void config.sensitivity as Sensitivity | undefined;
 
   const agent: Agent<TDeps, TOutput> = {
