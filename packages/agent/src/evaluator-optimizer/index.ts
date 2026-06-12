@@ -130,7 +130,7 @@ export async function evaluatorOptimizer<TOutput>(
   let terminationReason: EvaluatorOptimizerOutcome<TOutput>['terminationReason'] = 'maxIterations';
 
   for (let i = 1; i <= options.maxIterations; i++) {
-    if (options.signal !== undefined && options.signal.aborted) {
+    if (options.signal?.aborted) {
       terminationReason = 'cancelled';
       break;
     }

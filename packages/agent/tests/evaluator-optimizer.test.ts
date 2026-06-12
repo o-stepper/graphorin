@@ -21,7 +21,7 @@ describe('evaluatorOptimizer', () => {
     const events: AgentEvent[] = [];
     const r = await evaluatorOptimizer<string>('x', {
       generator: async (_input, critique, iter) => `iter-${iter}-${critique ?? 'none'}`,
-      evaluator: async (_i, candidate, _r, iter) => ({
+      evaluator: async (_i, _candidate, _r, iter) => ({
         score: 60 + iter * 10,
         pass: iter >= 2,
         critique: `feedback-${iter}`,

@@ -40,6 +40,7 @@ import type {
   ToolChoice,
   ToolDefinition,
   ToolDefinitionExample,
+  ToolError,
   ToolExecutionContext,
   Usage,
 } from '@graphorin/core';
@@ -598,7 +599,6 @@ function effectiveReasoningRetention(
       return 'pass-through-all';
     case 'hidden':
       return 'strip';
-    case undefined:
     default:
       return 'strip';
   }
@@ -1838,6 +1838,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 filterLib.defaultHandoffFilter()) as DescribedFilter;
               const filtered = filter(messages);
               const targetId = handoff.agent.id;
+              // The secrets fields record the structural reality: no
+              // inheritance mechanism exists at this boundary, so the
+              // target receives nothing — an empty allowlist is the
+              // factually-true provenance (AG-17).
               const handoffRec: HandoffRecord = {
                 fromAgentId: agentId,
                 toAgentId: targetId,
@@ -1851,10 +1855,53 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               yield { type: 'handoff', fromAgentId: agentId, toAgentId: targetId };
               state.currentAgentId = targetId;
               const subAgent = handoff.agent;
+              // AG-22: the sub-agent inherits the parent's abort signal,
+              // deps, and sessionId; its terminal `agent.end` is observed
+              // so a failed/aborted sub-run surfaces as a TOOL ERROR —
+              // never an empty-string success with durationMs 0.
+              const subStart = Date.now();
               const subOutputs: string[] = [];
-              const subStream = subAgent.stream(filtered as Message[]);
+              let subResult: AgentResult<unknown> | undefined;
+              const subStream = subAgent.stream(filtered as Message[], {
+                signal,
+                ...(options.deps !== undefined || config.deps !== undefined
+                  ? { deps: (options.deps ?? config.deps) as TDeps }
+                  : {}),
+                sessionId,
+              });
               for await (const subEv of subStream) {
                 if (subEv.type === 'text.complete') subOutputs.push(subEv.text);
+                else if (subEv.type === 'agent.end') {
+                  subResult = subEv.result as AgentResult<unknown>;
+                }
+              }
+              const subDurationMs = Date.now() - subStart;
+              const stepEntry = state.steps[state.steps.length - 1];
+              if (subResult !== undefined && subResult.status !== 'completed') {
+                const toolError: ToolError = {
+                  toolCallId: call.toolCallId,
+                  toolName: call.toolName,
+                  kind: subResult.status === 'aborted' ? 'aborted' : 'execution_failed',
+                  message: `handoff to '${targetId}' ${subResult.status}${
+                    subResult.error !== undefined ? `: ${subResult.error.message}` : ''
+                  }`,
+                };
+                if (stepEntry !== undefined) {
+                  (stepEntry.toolCalls as CompletedToolCall[]).push({
+                    call,
+                    outcome: toolError,
+                    stepNumber,
+                  });
+                }
+                yield {
+                  type: 'tool.execute.error',
+                  toolCallId: call.toolCallId,
+                  error: toolError,
+                };
+                const text = `Error: ${toolError.message}`;
+                messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+                state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+                continue;
               }
               const result = subOutputs.join('');
               const completed: CompletedToolCall = {
@@ -1863,11 +1910,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                   toolCallId: call.toolCallId,
                   toolName: call.toolName,
                   output: result,
-                  durationMs: 0,
+                  durationMs: subDurationMs,
                 },
                 stepNumber,
               };
-              const stepEntry = state.steps[state.steps.length - 1];
               if (stepEntry !== undefined) {
                 (stepEntry.toolCalls as CompletedToolCall[]).push(completed);
               }
@@ -1875,7 +1921,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 type: 'tool.execute.end',
                 toolCallId: call.toolCallId,
                 result,
-                durationMs: 0,
+                durationMs: subDurationMs,
               };
               messages.push({ role: 'tool', toolCallId: call.toolCallId, content: result });
               state.messages.push({
@@ -2195,19 +2241,57 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         TDeps
       >['inputSchema'],
       sideEffectClass: 'side-effecting',
-      async execute(input) {
+      async execute(input, ctx) {
+        // AG-17: the parent ToolExecutionContext propagates — the
+        // parent's abort stops the sub-agent, deps/sessionId flow
+        // through, and the optional `inputFilter` shapes a seed from
+        // the parent history. Least authority by default: without a
+        // filter the sub-agent sees ONLY the input string, never the
+        // parent conversation.
+        const callOpts: AgentCallOptions<TDeps> = {
+          ...(ctx?.signal !== undefined ? { signal: ctx.signal } : {}),
+          ...(ctx?.runContext.deps !== undefined ? { deps: ctx.runContext.deps as TDeps } : {}),
+          ...(ctx?.runContext.sessionId !== undefined
+            ? { sessionId: ctx.runContext.sessionId }
+            : {}),
+        };
+        const seed: AgentInput =
+          options.inputFilter !== undefined && ctx !== undefined
+            ? ([
+                ...options.inputFilter(ctx.runContext.messages),
+                { role: 'user' as const, content: input.input },
+              ] as Message[])
+            : input.input;
         if (exposeTurns === 'all') {
           // Replay the streamed text completions as the result so
           // the parent agent sees every turn the sub-agent
           // produced. `exposeTurns: 'final'` (default) and
           // `'none'` skip the per-turn assembly.
           const turns: string[] = [];
-          for await (const ev of stream(input.input, {})) {
+          let endResult: AgentResult<TOutput> | undefined;
+          for await (const ev of stream(seed, callOpts)) {
             if (ev.type === 'text.complete') turns.push(ev.text);
+            else if (ev.type === 'agent.end') endResult = ev.result;
+          }
+          if (endResult !== undefined && endResult.status !== 'completed') {
+            throw new Error(
+              `sub-agent '${config.name}' ${endResult.status}${
+                endResult.error !== undefined ? `: ${endResult.error.message}` : ''
+              }`,
+            );
           }
           return turns.join('\n\n') as unknown as TOutput;
         }
-        const result = await run(input.input, {});
+        const result = await run(seed, callOpts);
+        // AG-17/AG-22 class: a non-completed sub-run is a TOOL ERROR,
+        // never an empty-string success.
+        if (result.status !== 'completed') {
+          throw new Error(
+            `sub-agent '${config.name}' ${result.status}${
+              result.error !== undefined ? `: ${result.error.message}` : ''
+            }`,
+          );
+        }
         if (exposeTurns === 'none') return '' as unknown as TOutput;
         return result.output;
       },

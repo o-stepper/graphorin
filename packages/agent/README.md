@@ -66,11 +66,13 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
 - **Durable HITL.** `RunState.toJSON()` /
   `RunState.fromJSON(serialized, agent)` round-trip the full run
   state through any storage the caller picks (file, SQLite, KV, S3).
-- **Multi-agent.** `Agent.toTool({ exposeTurns,
-  secretsInheritance, inheritSecrets, inputFilter })` wraps an
-  agent as a tool the parent agent can call. The default
-  `secretsInheritance: 'inherit-allowlist'` with empty
-  `inheritedSecrets` enforces the principle of least authority.
+- **Multi-agent.** `Agent.toTool({ exposeTurns, inputFilter })`
+  wraps an agent as a tool the parent agent can call. The parent's
+  abort signal, deps, and sessionId propagate into the sub-run;
+  without an `inputFilter` the sub-agent sees only the input string
+  (no parent conversation crosses the boundary), and there is no
+  secret-inheritance mechanism at this boundary at all — least
+  authority by construction.
 - **Filter library.** `filters.lastN(n)`, `filters.lastUser`,
   `filters.summary({...})`, `filters.bySensitivity({...})`,
   `filters.stripReasoning()`, `filters.stripSensitiveOutputs()`,

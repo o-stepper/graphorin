@@ -220,7 +220,7 @@ async function runWithSemaphore<TOutput>(
     if (child === undefined) return Promise.resolve();
     const start = Date.now();
     const exec = async (): Promise<ChildResult<TOutput>> => {
-      if (signal !== undefined && signal.aborted) {
+      if (signal?.aborted) {
         return {
           agentId: child.agentId,
           status: 'cancelled',
@@ -279,7 +279,7 @@ async function runWithSemaphore<TOutput>(
         };
       } catch (cause) {
         const message = cause instanceof Error ? cause.message : String(cause);
-        const aborted = signal !== undefined && signal.aborted;
+        const aborted = signal?.aborted;
         const status: ChildResult<TOutput>['status'] = message.startsWith('budget-exceeded')
           ? 'budget-exceeded'
           : aborted

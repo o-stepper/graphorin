@@ -133,7 +133,7 @@ describe('WI-10 — large results stay out of context', () => {
     trackSpillCleanup(handleMsg!);
     // The full 6000-char blob never reaches the conversation buffer…
     expect(handleMsg!).not.toContain(body);
-    expect(handleMsg!.length).toBeLessThan(1000);
+    expect(handleMsg?.length).toBeLessThan(1000);
     // …and the model is told how to fetch the rest.
     expect(handleMsg!).toContain('read_result');
     expect(handleMsg!).toMatch(/handle "graphorin-spill:[^"]+"/);

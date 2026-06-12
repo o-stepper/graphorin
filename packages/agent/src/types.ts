@@ -315,8 +315,15 @@ export interface AgentToToolOptions {
   readonly name?: string;
   readonly description?: string;
   readonly exposeTurns?: 'final' | 'all' | 'none';
-  readonly secretsInheritance?: 'inherit-allowlist' | 'isolated' | 'forward-explicit';
-  readonly inheritSecrets?: ReadonlyArray<string>;
+  /**
+   * Shapes the sub-agent seed from the parent history (AG-17): when
+   * supplied, the sub-agent is seeded with
+   * `[...inputFilter(parentMessages), { role: 'user', content: input }]`.
+   * Without a filter the sub-agent sees ONLY the input string — no
+   * parent conversation crosses the boundary (least authority by
+   * construction; there is no secret-inheritance mechanism at this
+   * boundary at all).
+   */
   readonly inputFilter?: HandoffFilter;
 }
 

@@ -191,13 +191,9 @@ for await (const event of agent.stream('Summarise the status of my last order', 
 
 ## Multi-agent
 
-`agent.toTool({ name, description, exposeTurns, secretsInheritance, inheritSecrets, inputFilter })` wraps an agent as a typed tool the parent agent can call. The default `secretsInheritance: 'inherit-allowlist'` with an empty `inheritSecrets` array enforces the **principle of least authority** — sub-agents inherit nothing unless explicitly granted.
+`agent.toTool({ name, description, exposeTurns, inputFilter })` wraps an agent as a typed tool the parent agent can call (AG-17). The parent's abort signal, `deps`, and `sessionId` propagate into the sub-run; a non-completed sub-run (failed/aborted) surfaces as a **tool error**, never an empty-string success.
 
-| `secretsInheritance` | Behaviour |
-|---|---|
-| `'inherit-allowlist'` (default) | Sub-agent inherits only the secret refs explicitly listed in `inheritSecrets`. |
-| `'forward-explicit'` | Sub-agent receives only the secret refs forwarded for this specific call. |
-| `'isolated'` | Sub-agent receives no inherited secrets at all. |
+Isolation at this boundary is **structural least authority**: without an `inputFilter` the sub-agent sees only the input string — no parent conversation crosses the boundary — and there is no secret-inheritance mechanism here at all (the sub-agent runs with its own configuration). With `inputFilter` supplied, the sub-agent is seeded with `[...inputFilter(parentMessages), { role: 'user', content: input }]`, mirroring the handoff filter discipline.
 
 ## Filter library
 
