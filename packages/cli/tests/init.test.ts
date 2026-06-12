@@ -89,3 +89,31 @@ describe('runInit', () => {
     await expect(readFile(result.configPath, 'utf8')).rejects.toThrow();
   });
 });
+
+describe('IP-5 — init output parses through the strict server schema', () => {
+  it('renderConfig round-trips parseServerConfig with zero unrecognized keys', async () => {
+    const { mkdtemp } = await import('node:fs/promises');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const { readFile } = await import('node:fs/promises');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-init-rt-'));
+    const { runInit } = await import('../src/commands/init.js');
+    const result = await runInit({
+      cwd: dir,
+      nonInteractive: true,
+      cloudConsent: 'public-only',
+      encrypted: false,
+      print: () => {},
+    } as never);
+    const raw = await readFile(result.configPath, 'utf8');
+    expect(raw).not.toContain('defaults:');
+    // The generated config (a TS module: defineConfig({...})) must
+    // satisfy the STRICT parser — extract the object literal and
+    // evaluate it (the file itself is TS, not directly importable).
+    const objSource = raw.slice(raw.indexOf('defineConfig(') + 'defineConfig('.length, raw.lastIndexOf(')'));
+    // biome-ignore lint/security/noGlobalEval: test-only evaluation of our own generated literal
+    const cfg = (0, eval)(`(${objSource})`);
+    const { parseServerConfig } = await import('@graphorin/server');
+    expect(() => parseServerConfig(cfg)).not.toThrow();
+  });
+});
