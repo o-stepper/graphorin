@@ -181,18 +181,91 @@ describe('llamaCppNodeAdapter — generate()', () => {
   });
 });
 
-describe('llamaCppNodeAdapter — default sessionFactory error', () => {
-  it('throws an actionable error when no sessionFactory or runtime override is configured', async () => {
+describe('llamaCppNodeAdapter — real default sessionFactory (PS-3)', () => {
+  it('streams through the default factory: createContext + LlamaChatSession from the (stubbed) peer', async () => {
+    const ctorArgs: Array<{ contextSequence: unknown; systemPrompt?: string }> = [];
+    class StubChatSession {
+      constructor(args: { contextSequence: unknown; systemPrompt?: string }) {
+        ctorArgs.push(args);
+      }
+      async prompt(
+        _text: string,
+        options?: { onTextChunk?: (chunk: string) => void },
+      ): Promise<string> {
+        options?.onTextChunk?.('hel');
+        options?.onTextChunk?.('lo');
+        return 'hello';
+      }
+    }
     const provider = llamaCppNodeAdapter({
       modelPath: '/tmp/fixture.gguf',
       modelOverride: fixtureModel(),
+      runtimeOverrides: { LlamaChatSession: StubChatSession },
     });
-    const events: ProviderEvent[] = [];
-    await expect(
-      (async () => {
-        for await (const ev of provider.stream(REQ)) events.push(ev);
-      })(),
-    ).rejects.toMatchObject({ message: expect.stringContaining('sessionFactory') });
+    const events = await consume(provider.stream({ ...REQ, systemMessage: 'be brief' }));
+    const text = events
+      .filter((e) => e.type === 'text-delta')
+      .map((e) => (e.type === 'text-delta' ? e.delta : ''))
+      .join('');
+    expect(text).toBe('hello');
+    const finish = events.at(-1);
+    expect(finish?.type).toBe('finish');
+    if (finish?.type === 'finish') expect(finish.finishReason).toBe('stop');
+    // The session was built from the model's context sequence with the
+    // system prompt threaded through.
+    expect(ctorArgs).toHaveLength(1);
+    expect(ctorArgs[0]?.systemPrompt).toBe('be brief');
+  });
+
+  it('a rejecting prompt() surfaces through the default factory as an error event', async () => {
+    class FailingChatSession {
+      async prompt(): Promise<string> {
+        throw new Error('native inference crashed');
+      }
+    }
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      runtimeOverrides: { LlamaChatSession: FailingChatSession as never },
+    });
+    const events = await consume(provider.stream(REQ));
+    const err = events.find((e) => e.type === 'error');
+    expect(err).toBeDefined();
+    if (err?.type === 'error') expect(err.error.message).toContain('native inference crashed');
+    const finish = events.at(-1);
+    if (finish?.type === 'finish') expect(finish.finishReason).toBe('error');
+  });
+});
+
+describe('llamaCppNodeAdapter — mid-stream error honesty (PS-4)', () => {
+  const failingSession = async (): Promise<LlamaSessionInstance> => ({
+    // biome-ignore lint/correctness/useYield: the fixture throws after one chunk
+    async *promptStreamingResponse(): AsyncIterable<string> {
+      yield 'partial ';
+      throw new Error('cuda device lost');
+    },
+  });
+
+  it("a mid-stream error finishes with finishReason 'error', not 'stop'", async () => {
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: failingSession,
+    });
+    const events = await consume(provider.stream(REQ));
+    expect(events.some((e) => e.type === 'error')).toBe(true);
+    const finish = events.at(-1);
+    expect(finish?.type).toBe('finish');
+    if (finish?.type === 'finish') expect(finish.finishReason).toBe('error');
+  });
+
+  it('generate() THROWS on a mid-stream error instead of returning partial text', async () => {
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: failingSession,
+    });
+    await expect(provider.generate(REQ)).rejects.toThrow(/cuda device lost/);
   });
 });
 
