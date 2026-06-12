@@ -295,6 +295,7 @@ class InMemoryConsolidatorStore implements ConsolidatorMemoryStoreExt {
       failedAt: input.failedAt,
       nextRetryAt: input.nextRetryAt,
       retryCount: input.retryCount,
+      phase: input.phase ?? null,
     });
   }
 

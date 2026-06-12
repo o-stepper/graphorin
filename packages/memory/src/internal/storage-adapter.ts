@@ -426,6 +426,12 @@ export interface DlqBatchInput {
   readonly failedAt: number;
   readonly nextRetryAt: number;
   readonly retryCount: number;
+  /**
+   * Phase that failed (MCON-10) so `drainDlq` replays the SAME phase
+   * instead of inferring (the old inference hard-coded `'standard'`).
+   * Absent / `null` ⇒ legacy row, replayed as `'standard'`.
+   */
+  readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
 /** @stable */
@@ -439,6 +445,8 @@ export interface DlqBatchRow {
   readonly failedAt: number;
   readonly nextRetryAt: number | null;
   readonly retryCount: number;
+  /** Phase that failed (MCON-10); `null`/absent ⇒ legacy row. */
+  readonly phase?: 'light' | 'standard' | 'deep' | null;
 }
 
 /**

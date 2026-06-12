@@ -103,10 +103,13 @@ describe('SqliteConsolidatorStateStore', () => {
       failedAt: 100,
       nextRetryAt: 200,
       retryCount: 0,
+      phase: 'deep',
     });
     const ready = await asConsolidator(store).claimReadyBatches(scope, 250);
     expect(ready.length).toBe(1);
     expect(ready[0]?.messageIds).toEqual(['msg_1', 'msg_2']);
+    // MCON-10 / migration 019: the failed phase round-trips.
+    expect(ready[0]?.phase).toBe('deep');
 
     await asConsolidator(store).rescheduleBatch('b1', 1, 999);
     const stillReady = await asConsolidator(store).claimReadyBatches(scope, 100);

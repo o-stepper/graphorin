@@ -124,6 +124,13 @@ class ConsolidatorImpl implements Consolidator {
   #manuallyPaused = false;
   #deferredRuns = 0;
   /**
+   * Message ids of the batch the most recent `#dispatch` operated on
+   * (MCON-10). Captured so a thrown phase can enqueue its DLQ row with
+   * the REAL failed slice instead of `[]` — replays must target the
+   * window that failed, not whatever the cursor points at later.
+   */
+  #lastDispatchMessageIds: ReadonlyArray<string> = [];
+  /**
    * Bumped when the runtime cannot persist a deferred run to the
    * audit log (e.g., adapter omits the consolidator surface). The
    * `status()` reader merges this with the persisted count so
@@ -344,14 +351,28 @@ class ConsolidatorImpl implements Consolidator {
     const ready = await store.claimReadyBatches(scope, this.#now(), 50);
     let drained = 0;
     for (const row of ready) {
-      const replayPhase = inferReplayPhase(row.errorKind);
+      // MCON-10: replay the phase that actually failed (persisted at
+      // enqueue); legacy rows without one fall back to 'standard',
+      // matching the old behaviour.
+      const replayPhase: ConsolidatorPhase = row.phase ?? 'standard';
       let succeeded = false;
+      let deferred = false;
       let lastError: unknown = null;
       try {
-        const outcome = await this.#dispatch(replayPhase, scope);
-        if (outcome.status === 'completed' || outcome.status === 'partial') {
+        // MCON-10: replays run through the FULL phase envelope — budget
+        // precheck, scope lock, and recordRunStart/Finish — so they are
+        // visible in `consolidator_runs` and cannot race a live run or
+        // spend past a pause.
+        const outcome = await this.#runPhase(replayPhase, scope, {
+          kind: 'manual',
+          value: `dlq-replay:${replayPhase}`,
+        });
+        if (outcome?.status === 'completed' || outcome?.status === 'partial') {
           succeeded = true;
-        } else if (outcome.errorMessage !== null) {
+        } else if (outcome?.status === 'deferred') {
+          deferred = true;
+          lastError = new Error(outcome.errorMessage ?? 'replay deferred');
+        } else if (outcome?.errorMessage != null) {
           lastError = new Error(outcome.errorMessage);
         }
       } catch (err) {
@@ -360,6 +381,17 @@ class ConsolidatorImpl implements Consolidator {
       if (succeeded) {
         await store.markBatchSucceeded(row.id);
         drained += 1;
+        continue;
+      }
+      if (deferred) {
+        // Lock contention / budget pause is transient — reschedule at the
+        // SAME retry count so contention cannot exhaust the row.
+        const delayMs = nextBackoffMs({
+          retryCount: row.retryCount + 1,
+          baseMs: this.#config.dlqBaseBackoffMs,
+          maxMs: this.#config.dlqMaxBackoffMs,
+        });
+        await store.rescheduleBatch(row.id, row.retryCount, this.#now() + delayMs);
         continue;
       }
       const nextRetryCount = row.retryCount + 1;
@@ -484,12 +516,22 @@ class ConsolidatorImpl implements Consolidator {
         llmCostUsd: null,
         errorMessage: describeError(err),
       };
-      if (this.#consolidatorStore !== null) {
+      // MCON-10: a failed DLQ *replay* must not enqueue a fresh DLQ row —
+      // the original row already tracks the failure (drainDlq reschedules
+      // or exhausts it); double-tracking multiplies rows per drain.
+      const isDlqReplay =
+        reason.kind === 'manual' &&
+        typeof reason.value === 'string' &&
+        reason.value.startsWith('dlq-replay:');
+      if (this.#consolidatorStore !== null && !isDlqReplay) {
         await this.#consolidatorStore.enqueueFailedBatch({
           id: this.#randomId(),
           consolidatorRunId: runId,
           scope,
-          messageIds: [],
+          // MCON-10: capture the slice that actually failed so replays
+          // can be audited against it; the cursor may move past this
+          // window before the replay fires.
+          messageIds: this.#lastDispatchMessageIds,
           errorKind: classifyError(err),
           errorMessage: describeError(err),
           failedAt: this.#now(),
@@ -501,6 +543,9 @@ class ConsolidatorImpl implements Consolidator {
               maxMs: this.#config.dlqMaxBackoffMs,
             }),
           retryCount: 0,
+          // MCON-10: persist the failed phase — replays must re-run the
+          // SAME phase, not an inferred 'standard'.
+          phase,
         });
       }
     }
@@ -532,6 +577,9 @@ class ConsolidatorImpl implements Consolidator {
   }
 
   async #dispatch(phase: ConsolidatorPhase, scope: SessionScope): Promise<PhaseOutcome> {
+    // MCON-10: reset the failed-slice capture per dispatch; the standard
+    // branch refills it from the batch it actually processes.
+    this.#lastDispatchMessageIds = [];
     const state =
       this.#consolidatorStore !== null ? await this.#consolidatorStore.getState(scope) : null;
     const lastProcessedMessageId = state?.lastProcessedMessageId ?? null;
@@ -566,6 +614,7 @@ class ConsolidatorImpl implements Consolidator {
               this.#config.maxStandardBatchSize,
             )
           : [];
+      this.#lastDispatchMessageIds = rawBatch.map((r) => r.id);
       const out = await runStandardPhase({
         semantic: this.#semantic,
         episodic: this.#episodic,
@@ -757,17 +806,3 @@ function defaultTriggers(): ConsolidatorTriggerSpec[] {
   return ['idle:5m', 'cron:0 4 * * *'];
 }
 
-/**
- * Infer which phase to replay when a DLQ row is claimed. Standard
- * phase is the default — the rate-limit / 5xx / timeout / parse
- * errors all originate in standard-phase LLM calls. The deep-phase
- * judge can also fail, but those errors land in the DLQ with a
- * different `error_kind` only when the runtime tags them
- * explicitly; for now the heuristic is good enough.
- *
- * @internal
- */
-function inferReplayPhase(errorKind: string): ConsolidatorPhase {
-  void errorKind;
-  return 'standard';
-}
