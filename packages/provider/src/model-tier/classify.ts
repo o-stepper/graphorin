@@ -37,19 +37,30 @@ export interface ClassifierRule {
  * @stable
  */
 export const CLASSIFIER_RULES: readonly ClassifierRule[] = Object.freeze([
-  // Anthropic — direct.
-  { tier: 'fast', family: 'anthropic-haiku', pattern: /^claude(?:-\d)?-?haiku/ },
-  { tier: 'balanced', family: 'anthropic-sonnet', pattern: /^claude(?:-\d)?-?sonnet/ },
-  { tier: 'smart', family: 'anthropic-opus', pattern: /^claude(?:-\d)?-?opus/ },
+  // Anthropic — direct. PS-20: the version segment between `claude` and the
+  // family word can be multi-part (`claude-3-5-haiku`, `claude-3-7-sonnet`) or
+  // absent (`claude-haiku-4-5`), so allow zero-or-more `-<digits/dots>` groups.
+  { tier: 'fast', family: 'anthropic-haiku', pattern: /^claude(?:-[\d.]+)*-?haiku/ },
+  { tier: 'balanced', family: 'anthropic-sonnet', pattern: /^claude(?:-[\d.]+)*-?sonnet/ },
+  { tier: 'smart', family: 'anthropic-opus', pattern: /^claude(?:-[\d.]+)*-?opus/ },
+  { tier: 'smart', family: 'anthropic-fable', pattern: /^claude.*fable/ },
   { tier: 'smart', family: 'anthropic-mythos', pattern: /^claude.*mythos/ },
   // Anthropic — via Bedrock.
-  { tier: 'fast', family: 'bedrock-claude-haiku', pattern: /^anthropic\.claude(?:-\d)?-?haiku/ },
+  {
+    tier: 'fast',
+    family: 'bedrock-claude-haiku',
+    pattern: /^anthropic\.claude(?:-[\d.]+)*-?haiku/,
+  },
   {
     tier: 'balanced',
     family: 'bedrock-claude-sonnet',
-    pattern: /^anthropic\.claude(?:-\d)?-?sonnet/,
+    pattern: /^anthropic\.claude(?:-[\d.]+)*-?sonnet/,
   },
-  { tier: 'smart', family: 'bedrock-claude-opus', pattern: /^anthropic\.claude(?:-\d)?-?opus/ },
+  {
+    tier: 'smart',
+    family: 'bedrock-claude-opus',
+    pattern: /^anthropic\.claude(?:-[\d.]+)*-?opus/,
+  },
   // OpenAI.
   { tier: 'fast', family: 'openai-mini', pattern: /^gpt-(\d|\d+\.\d+)-?mini/ },
   { tier: 'fast', family: 'openai-nano', pattern: /^gpt-(\d|\d+\.\d+)-?nano/ },

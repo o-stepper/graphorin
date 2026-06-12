@@ -81,4 +81,22 @@ describe('createDefaultCounter', () => {
     expect(createDefaultCounter({ model: 'ollama-llama3.1' })).toBeInstanceOf(HeuristicCounter);
     expect(createDefaultCounter({ model: 'mystery' })).toBeInstanceOf(HeuristicCounter);
   });
+
+  // PS-20: the OpenAI fallback encoding must track the model family — gpt-4o /
+  // gpt-4.1 / gpt-5+ / o-series use o200k_base; legacy gpt-4 / gpt-3.5 stay on
+  // cl100k_base. The counter's `version` carries the resolved encoding.
+  it.each([
+    ['gpt-4o', 'o200k_base'],
+    ['gpt-4o-mini', 'o200k_base'],
+    ['gpt-4.1', 'o200k_base'],
+    ['gpt-5.5', 'o200k_base'],
+    ['o3-pro', 'o200k_base'],
+    ['gpt-4', 'cl100k_base'],
+    ['gpt-4-turbo', 'cl100k_base'],
+    ['gpt-3.5-turbo', 'cl100k_base'],
+  ] as const)('selects %s → %s', (model, encoding) => {
+    const c = createDefaultCounter({ model });
+    expect(c).toBeInstanceOf(JsTiktokenCounter);
+    expect(c.version).toContain(encoding);
+  });
 });

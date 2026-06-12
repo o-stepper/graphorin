@@ -40,6 +40,12 @@ describe('classifyModelTier — per-family fixtures', () => {
     ['claude-haiku-4-5', 'fast'],
     ['anthropic/claude-sonnet-4-5', 'balanced'],
     ['claude-opus-4-7', 'smart'],
+    // PS-20: real dated Anthropic ids carry multi-segment versions
+    // (`3-5`, `3-7`) before the family word; the regex must match them.
+    ['claude-3-5-haiku-20241022', 'fast'],
+    ['claude-3-7-sonnet-20250219', 'balanced'],
+    ['claude-fable-5', 'smart'],
+    ['anthropic.claude-3-5-haiku-20241022', 'fast'],
     ['anthropic.claude-haiku-4', 'fast'],
     ['anthropic.claude-sonnet-4', 'balanced'],
     ['anthropic.claude-opus-4', 'smart'],
@@ -103,6 +109,8 @@ describe('CLASSIFIER_RULES', () => {
     expect(families.has('anthropic-haiku')).toBe(true);
     expect(families.has('anthropic-sonnet')).toBe(true);
     expect(families.has('anthropic-opus')).toBe(true);
+    expect(families.has('anthropic-fable')).toBe(true); // PS-20
+    expect(families.has('anthropic-mythos')).toBe(true);
     expect(families.has('openai-gpt')).toBe(true);
     expect(families.has('openai-reasoning')).toBe(true);
     expect(families.has('gemini-flash')).toBe(true);

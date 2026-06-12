@@ -93,8 +93,26 @@ export function createDefaultCounter(options: CreateDefaultCounterOptions): Toke
       return new GoogleAPICounter({ modelId: options.model });
     case 'openai':
     case 'openai-compatible':
-      return new JsTiktokenCounter({ encoding: 'cl100k_base', modelId: options.model });
+      return new JsTiktokenCounter({
+        encoding: defaultOpenAiEncoding(options.model),
+        modelId: options.model,
+      });
     default:
       return new HeuristicCounter({ modelId: options.model });
   }
+}
+
+/**
+ * PS-20: pick the fallback tiktoken encoding by model family. `js-tiktoken`'s
+ * `encodingForModel` handles ids it recognises; this is the explicit fallback
+ * for ids it does not (the 2025/2026 families). gpt-4o / gpt-4.1 / gpt-5+ and
+ * the o-series reasoning models use `o200k_base`; legacy gpt-4 / gpt-3.5 stay
+ * on `cl100k_base`.
+ */
+export function defaultOpenAiEncoding(model: string | undefined): 'o200k_base' | 'cl100k_base' {
+  if (model === undefined) return 'cl100k_base';
+  const id = model.toLowerCase();
+  const sep = Math.max(id.lastIndexOf('/'), id.lastIndexOf(':'));
+  const bare = sep === -1 ? id : id.slice(sep + 1);
+  return /^(?:gpt-4o|gpt-4\.1|gpt-[5-9]|gpt-\d{2}|o[1-9])/.test(bare) ? 'o200k_base' : 'cl100k_base';
 }
