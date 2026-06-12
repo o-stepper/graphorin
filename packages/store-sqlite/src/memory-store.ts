@@ -249,39 +249,48 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     if (scope.sessionId === undefined) {
       throw new Error('[graphorin/store-sqlite] SessionMemoryStore.push requires scope.sessionId');
     }
-    const sequenceRow = this.#conn.get<{ next: number }>(
-      'SELECT COALESCE(MAX(sequence), 0) + 1 AS next FROM session_messages WHERE scope_session_id = ?',
-      [scope.sessionId],
-    );
-    const sequence = sequenceRow?.next ?? 1;
     const id = generateId();
     const createdAt = Date.now();
-    this.#conn.run(
-      `INSERT INTO session_messages (
-         id, scope_user_id, scope_session_id, scope_agent_id, agent_id, role,
-         content_json, tool_calls_json, tool_call_id, sequence, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        id,
-        scope.userId,
-        scope.sessionId,
-        scope.agentId ?? null,
-        readAgentId(message),
-        message.role,
-        JSON.stringify(messageToContentJson(message)),
-        readToolCalls(message),
-        readToolCallId(message),
-        sequence,
-        createdAt,
-      ],
-    );
-    const text = renderMessageForFts(message);
-    if (text.length > 0) {
-      this.#conn.run(
-        'INSERT INTO session_messages_fts (rowid, text) VALUES ((SELECT rowid FROM session_messages WHERE id = ?), ?)',
-        [id, text],
+    // CS-9: the MAX+1 read, the message INSERT, and the FTS INSERT run in one
+    // transaction so a crash never leaves a committed message without its FTS
+    // row (silently unsearchable), and the UNIQUE(scope_session_id, sequence)
+    // constraint (migration 022) is evaluated atomically with the read — a
+    // cross-process race that recomputes the same sequence fails loudly here
+    // instead of minting a duplicate.
+    let sequence = 1;
+    this.#conn.transaction(() => {
+      const sequenceRow = this.#conn.get<{ next: number }>(
+        'SELECT COALESCE(MAX(sequence), 0) + 1 AS next FROM session_messages WHERE scope_session_id = ?',
+        [scope.sessionId],
       );
-    }
+      sequence = sequenceRow?.next ?? 1;
+      this.#conn.run(
+        `INSERT INTO session_messages (
+           id, scope_user_id, scope_session_id, scope_agent_id, agent_id, role,
+           content_json, tool_calls_json, tool_call_id, sequence, created_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          id,
+          scope.userId,
+          scope.sessionId,
+          scope.agentId ?? null,
+          readAgentId(message),
+          message.role,
+          JSON.stringify(messageToContentJson(message)),
+          readToolCalls(message),
+          readToolCallId(message),
+          sequence,
+          createdAt,
+        ],
+      );
+      const text = renderMessageForFts(message);
+      if (text.length > 0) {
+        this.#conn.run(
+          'INSERT INTO session_messages_fts (rowid, text) VALUES ((SELECT rowid FROM session_messages WHERE id = ?), ?)',
+          [id, text],
+        );
+      }
+    });
     return {
       messageId: id,
       sequence,
