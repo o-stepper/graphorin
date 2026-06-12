@@ -94,10 +94,26 @@ export function _resetPipelineFactoryCacheForTesting(): void {
 }
 
 /**
- * Normalises the raw pipeline output to a flat `score[]` aligned with
- * the input pair order. Cross-encoder classifiers return either a
- * single-best `{label, score}` per pair or an array of `topk` entries
- * — we collapse on the highest-scoring positive label.
+ * True when a classifier label names the *positive* (relevant) class. Matches
+ * the conventional binary forms — `LABEL_1`, `positive`, `relevant`,
+ * `entailment`, `true`, `yes` — using exact words so it does not mis-fire on a
+ * negative label that merely contains one (`irrelevant` ⊃ `relevant`).
+ */
+function isPositiveLabel(label: string): boolean {
+  const l = label.toLowerCase().trim();
+  if (l === '1' || /(?:^|[_-])1$/.test(l)) return true; // '1', 'label_1', 'class-1'
+  return /^(?:positive|relevant|entailment|true|yes|pos)$/.test(l);
+}
+
+/**
+ * Normalises the raw pipeline output to a flat `score[]` aligned with the input
+ * pair order. Cross-encoder classifiers return either a single-best
+ * `{label, score}` per pair (the default single-logit bge exports) or an array
+ * of `topk` entries. For the array shape we read the POSITIVE label's
+ * confidence — NOT the max of any label (PS-16): an irrelevant pair's most
+ * confident class is the *negative* one, so taking the max would invert the
+ * ranking for any 2-label classifier. When no label looks positive (single-logit
+ * or unrecognised labels) we fall back to the top score.
  *
  * @internal
  */
@@ -111,11 +127,18 @@ export function extractPairScores(
     if (cell === undefined) continue;
     if (Array.isArray(cell)) {
       let best = Number.NEGATIVE_INFINITY;
+      let positive = Number.NEGATIVE_INFINITY;
+      let sawPositive = false;
       for (const entry of cell) {
         if (entry === undefined) continue;
         if (entry.score > best) best = entry.score;
+        if (isPositiveLabel(entry.label)) {
+          sawPositive = true;
+          if (entry.score > positive) positive = entry.score;
+        }
       }
-      out[i] = Number.isFinite(best) ? best : 0;
+      const chosen = sawPositive ? positive : best;
+      out[i] = Number.isFinite(chosen) ? chosen : 0;
     } else {
       const single = cell as ClassifierResult;
       out[i] = single.score;
