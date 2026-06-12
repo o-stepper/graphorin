@@ -22,6 +22,7 @@ import {
   type SqliteMemoryStore,
 } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
+import { retention } from '../src/consolidator/index.js';
 import { createMemory, defineBlock } from '../src/index.js';
 import { createStubEmbedder } from './fixtures/in-memory-store.js';
 
@@ -349,6 +350,133 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
         consolidator: { tier: 'standard', defaultScope: SCOPE, autoPromoteExtraction: true },
       });
       expect(on.consolidator.config().autoPromoteExtraction).toBe(true);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('the decay window is not saturated by archived rows — live facts keep decaying (MCON-6)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+        consolidator: { tier: 'free', defaultScope: SCOPE },
+      });
+      await memory.consolidator.start();
+
+      const now = Date.now();
+      const conn = sqlite.connection;
+      // 55 archived rows, older than everything else: pre-fix they pin
+      // the LRU head (window LIMIT 50) and the live stale fact below is
+      // never even seen by the light pass.
+      for (let i = 0; i < 55; i += 1) {
+        const id = `arch-${i}`;
+        await sqlite.memory.semantic.remember({
+          id,
+          kind: 'semantic',
+          userId: SCOPE.userId,
+          sensitivity: 'internal',
+          text: `archived filler ${i}`,
+          createdAt: new Date(now - 90 * 24 * 60 * 60_000).toISOString(),
+        });
+        conn.run('UPDATE facts SET archived = 1, created_at = ? WHERE id = ?', [
+          now - 90 * 24 * 60 * 60_000,
+          id,
+        ]);
+      }
+      // One live fact, 40 days stale — retention e^(-40/7) ≈ 0.003 < 0.05.
+      await sqlite.memory.semantic.remember({
+        id: 'live-stale',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'stale but live fact',
+        createdAt: new Date(now - 40 * 24 * 60 * 60_000).toISOString(),
+      });
+      conn.run('UPDATE facts SET created_at = ? WHERE id = ?', [
+        now - 40 * 24 * 60 * 60_000,
+        'live-stale',
+      ]);
+
+      const outcome = await memory.consolidator.fireNow('light', SCOPE);
+      expect(outcome?.factsUpdated ?? 0).toBeGreaterThanOrEqual(1);
+      const row = conn.get<{ archived: number }>('SELECT archived FROM facts WHERE id = ?', [
+        'live-stale',
+      ]);
+      expect(row?.archived).toBe(1);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
+  it('recall marks access and reinforced facts retain better than untouched peers (MRET-7)', async () => {
+    const sqlite = await makeStore();
+    try {
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+      });
+      const now = Date.now();
+      const createdAt = new Date(now - 6 * 24 * 60 * 60_000).toISOString();
+      await sqlite.memory.semantic.remember({
+        id: 'f-accessed',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'enjoys alpine climbing in Georgia',
+        createdAt,
+      });
+      await sqlite.memory.semantic.remember({
+        id: 'f-untouched',
+        kind: 'semantic',
+        userId: SCOPE.userId,
+        sensitivity: 'internal',
+        text: 'prefers green tea over coffee',
+        createdAt,
+      });
+      const conn = sqlite.connection;
+      conn.run('UPDATE facts SET created_at = ? WHERE id IN (?, ?)', [
+        now - 6 * 24 * 60 * 60_000,
+        'f-accessed',
+        'f-untouched',
+      ]);
+
+      // Recall only the climbing fact — search() must stamp its access.
+      const hits = await memory.semantic.search(SCOPE, 'alpine climbing');
+      expect(hits.map((h) => h.record.id)).toContain('f-accessed');
+
+      const decay = sqlite.memory.semantic as unknown as {
+        listForDecay(
+          scope: typeof SCOPE,
+          limit?: number,
+        ): Promise<
+          ReadonlyArray<{
+            id: string;
+            lastAccessedAt: number | null;
+            createdAt: number;
+            strength: number;
+          }>
+        >;
+      };
+      const decayRows = await decay.listForDecay(SCOPE, 10);
+      const accessed = decayRows.find((r) => r.id === 'f-accessed');
+      const untouched = decayRows.find((r) => r.id === 'f-untouched');
+      expect(accessed?.lastAccessedAt).not.toBeNull();
+      expect(accessed?.strength ?? 1).toBeGreaterThan(1);
+      expect(untouched?.lastAccessedAt).toBeNull();
+
+      // The reinforced fact now retains strictly better than its peer.
+      const at = Date.now();
+      const ret = (r: { lastAccessedAt: number | null; createdAt: number; strength: number }) =>
+        retention({
+          now: at,
+          lastAccessedAt: r.lastAccessedAt,
+          createdAt: r.createdAt,
+          strength: r.strength,
+          tauDays: 7,
+        });
+      expect(accessed && untouched ? ret(accessed) > ret(untouched) : false).toBe(true);
     } finally {
       await sqlite.close();
     }

@@ -207,6 +207,55 @@ describe('createSqliteStore', () => {
     expect((await store.memory.shared.listFor('agent-A')).length).toBe(1);
   });
 
+  it('semantic memory: listForDecay excludes archived rows by default; markAccessed bumps recency + strength (MCON-6/MRET-7)', async () => {
+    const scope = { userId: 'alex' };
+    const semantic = store.memory.semantic as unknown as {
+      remember(f: Record<string, unknown>): Promise<void>;
+      archiveFact(id: string, reason?: string): Promise<void>;
+      markAccessed(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void>;
+      listForDecay(
+        scope: { userId: string },
+        limit?: number,
+        opts?: { includeArchived?: boolean },
+      ): Promise<
+        ReadonlyArray<{
+          id: string;
+          archived: boolean;
+          lastAccessedAt: number | null;
+          strength: number;
+        }>
+      >;
+    };
+    const mk = (id: string) => ({
+      id,
+      kind: 'semantic' as const,
+      userId: 'alex',
+      sensitivity: 'internal' as const,
+      text: `decay fixture ${id}`,
+      createdAt: new Date().toISOString(),
+    });
+    await semantic.remember(mk('d-live'));
+    await semantic.remember(mk('d-old'));
+    await semantic.archiveFact('d-old', 'low_salience');
+
+    // MCON-6: the decay window must not be saturated by archived rows.
+    const window = await semantic.listForDecay(scope, 10);
+    expect(window.map((r) => r.id)).toEqual(['d-live']);
+    // The inspection path still reaches archived rows on request.
+    const all = await semantic.listForDecay(scope, 10, { includeArchived: true });
+    expect(all.map((r) => r.id).sort()).toEqual(['d-live', 'd-old']);
+
+    // MRET-7: recall marks access — recency set, strength bumped with a cap.
+    const accessedAt = Date.now();
+    await semantic.markAccessed(['d-live'], accessedAt);
+    const after = (await semantic.listForDecay(scope, 10)).find((r) => r.id === 'd-live');
+    expect(after?.lastAccessedAt).toBe(accessedAt);
+    expect(after?.strength).toBeGreaterThan(1);
+    for (let i = 0; i < 30; i += 1) await semantic.markAccessed(['d-live'], accessedAt + i);
+    const capped = (await semantic.listForDecay(scope, 10)).find((r) => r.id === 'd-live');
+    expect(capped?.strength).toBeLessThanOrEqual(2);
+  });
+
   it('semantic memory: get + purge extension methods (consumed by @graphorin/memory)', async () => {
     const fact = {
       id: 'fact-x',

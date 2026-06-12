@@ -866,7 +866,7 @@ export function createInMemoryStore(
           factIndexText.delete(id);
         }
       },
-      async listForDecay(scope, limit = 1000) {
+      async listForDecay(scope, limit = 1000, opts: { includeArchived?: boolean } = {}) {
         const out: Array<{
           id: string;
           text: string;
@@ -881,13 +881,17 @@ export function createInMemoryStore(
         for (const fact of facts) {
           if (fact.userId !== scope.userId) continue;
           const sig = decaySignals.get(fact.id);
+          const archived = sig?.archived ?? false;
+          // MCON-6 (real-store parity): archived rows are excluded from
+          // the decay window by default — inspection opts in.
+          if (archived && opts.includeArchived !== true) continue;
           out.push({
             id: fact.id,
             text: fact.text,
             strength: sig?.strength ?? 1,
             lastAccessedAt: sig?.lastAccessedAt ?? null,
             createdAt: sig?.createdAt ?? Date.parse(fact.createdAt),
-            archived: sig?.archived ?? false,
+            archived,
             importance: fact.importance ?? null,
             status: fact.status ?? 'active',
             provenance: fact.provenance ?? null,
@@ -895,6 +899,22 @@ export function createInMemoryStore(
           if (out.length >= limit) break;
         }
         return out;
+      },
+      async markAccessed(ids: ReadonlyArray<string>, accessedAt?: number) {
+        const at = accessedAt ?? Date.now();
+        for (const id of ids) {
+          const sig = decaySignals.get(id) ?? {
+            strength: 1,
+            lastAccessedAt: null,
+            createdAt: Date.now(),
+            archived: false,
+          };
+          decaySignals.set(id, {
+            ...sig,
+            lastAccessedAt: at,
+            strength: Math.min(2, sig.strength + 0.1),
+          });
+        }
       },
       async archiveFact(id, _reason) {
         const sig = decaySignals.get(id) ?? {

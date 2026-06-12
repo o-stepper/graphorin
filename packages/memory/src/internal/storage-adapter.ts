@@ -518,12 +518,19 @@ export interface DecayMemoryStoreExt {
    * caller can apply Ebbinghaus retention without scanning the
    * whole table. `limit` defaults to `1000`.
    *
+   * Archived rows are EXCLUDED by default (MCON-6) — they never receive
+   * access bumps, so they would pin the LRU head and saturate the decay
+   * window, structurally stopping threshold-archiving and capacity
+   * eviction for live facts. Inspection paths pass
+   * `{ includeArchived: true }`.
+   *
    * `importance` / `status` / `provenance` (X-1) feed the multi-signal
    * salience score that orders capacity-bounded eviction.
    */
   listForDecay(
     scope: SessionScope,
     limit?: number,
+    opts?: { readonly includeArchived?: boolean },
   ): Promise<
     ReadonlyArray<{
       readonly id: string;
@@ -545,6 +552,14 @@ export interface DecayMemoryStoreExt {
    * `memory_history` records the archive event.
    */
   archiveFact(id: string, reason?: string): Promise<void>;
+  /**
+   * Record a retrieval access for the given facts (MRET-7): stamp
+   * `lastAccessedAt` and reinforce `strength` (implementation-capped).
+   * Optional — adapters without decay columns may omit it; callers
+   * MUST treat failures as non-fatal (the read path never breaks on a
+   * bookkeeping write).
+   */
+  markAccessed?(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void>;
 }
 
 /** Options accepted by {@link InsightMemoryStoreExt.list}. */

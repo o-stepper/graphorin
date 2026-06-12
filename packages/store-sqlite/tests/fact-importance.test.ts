@@ -31,6 +31,7 @@ interface DecayExt {
   listForDecay(
     scope: SessionScope,
     limit?: number,
+    opts?: { includeArchived?: boolean },
   ): Promise<
     ReadonlyArray<{
       readonly id: string;
@@ -90,7 +91,10 @@ describe('fact importance + decay row (X-1, migration 015)', () => {
     await store.memory.semantic.remember(fact('f4', 'soon archived'));
     await decayExt(store).archiveFact('f4', 'capacity_exceeded');
 
-    const row = (await decayExt(store).listForDecay(SCOPE, 10)).find((r) => r.id === 'f4');
+    // MCON-6: archived rows leave the default decay window — inspect via opt-in.
+    const row = (
+      await decayExt(store).listForDecay(SCOPE, 10, { includeArchived: true })
+    ).find((r) => r.id === 'f4');
     expect(row?.archived).toBe(true);
     // Soft archive, not a purge: the row survives and is still fetchable.
     expect(await decayExt(store).get('f4')).not.toBeNull();

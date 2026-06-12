@@ -1015,6 +1015,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   async listForDecay(
     scope: SessionScope,
     limit = 1000,
+    opts: { readonly includeArchived?: boolean } = {},
   ): Promise<
     ReadonlyArray<{
       readonly id: string;
@@ -1028,6 +1029,12 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       readonly provenance: string | null;
     }>
   > {
+    // MCON-6: archived facts never receive access bumps, so they pin the
+    // LRU head forever and saturate the window — after ~LIMIT archived
+    // rows every light pass would see only them and live facts would stop
+    // decaying. The decay window therefore excludes archived rows by
+    // default; inspection paths opt in via `includeArchived`.
+    const archivedPredicate = opts.includeArchived === true ? '' : 'AND archived = 0';
     const rows = this.#conn.all<{
       id: string;
       text: string;
@@ -1042,7 +1049,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       `SELECT id, text, strength, last_accessed_at, created_at, archived,
               importance, status, provenance
        FROM facts
-       WHERE scope_user_id = ? AND deleted_at IS NULL
+       WHERE scope_user_id = ? AND deleted_at IS NULL ${archivedPredicate}
        ORDER BY COALESCE(last_accessed_at, created_at) ASC
        LIMIT ?`,
       [scope.userId, limit],
@@ -1058,6 +1065,27 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       status: row.status,
       provenance: row.provenance,
     }));
+  }
+
+  /**
+   * Record a retrieval access for the given facts (MRET-7): stamps
+   * `last_accessed_at` and bumps `strength` by 0.1 per access, capped
+   * at 2.0 (the decay model reads `tauMs * max(0.5, strength)`, so the
+   * cap bounds how far reinforcement can stretch retention). Failures
+   * here must never break the read path — callers wrap in try/catch.
+   *
+   * @stable
+   */
+  async markAccessed(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void> {
+    if (ids.length === 0) return;
+    const at = accessedAt ?? Date.now();
+    const placeholders = ids.map(() => '?').join(', ');
+    this.#conn.run(
+      `UPDATE facts
+       SET last_accessed_at = ?, strength = MIN(2.0, strength + 0.1)
+       WHERE id IN (${placeholders})`,
+      [at, ...ids],
+    );
   }
 
   /**

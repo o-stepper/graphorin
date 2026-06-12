@@ -199,6 +199,7 @@ describe('SqliteSemanticMemoryStore.listForDecay + archiveFact', () => {
       listForDecay(
         scope: { userId: string },
         limit?: number,
+        opts?: { includeArchived?: boolean },
       ): Promise<ReadonlyArray<{ id: string; archived: boolean }>>;
       archiveFact(id: string, reason?: string): Promise<void>;
     };
@@ -206,7 +207,10 @@ describe('SqliteSemanticMemoryStore.listForDecay + archiveFact', () => {
     expect(before.length).toBe(2);
     expect(before.every((row) => !row.archived)).toBe(true);
     await semantic.archiveFact('f1', 'low_retention');
-    const after = await semantic.listForDecay(scope);
+    // MCON-6: the decay window drops archived rows; inspection opts in.
+    const window = await semantic.listForDecay(scope);
+    expect(window.map((r) => r.id)).toEqual(['f2']);
+    const after = await semantic.listForDecay(scope, undefined, { includeArchived: true });
     const archived = after.find((r) => r.id === 'f1');
     expect(archived?.archived).toBe(true);
   });

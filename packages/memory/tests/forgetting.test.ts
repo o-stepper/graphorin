@@ -171,7 +171,9 @@ describe('consolidator light phase — capacity-bounded eviction (X-1)', () => {
     expect(outcome?.factsUpdated).toBe(2); // two evicted to fit capacity 2
 
     const archived = new Map(
-      ((await store.semantic.listForDecay?.(scope, 100)) ?? []).map((r) => [r.id, r.archived]),
+      ((await store.semantic.listForDecay?.(scope, 100, { includeArchived: true })) ?? []).map(
+        (r) => [r.id, r.archived],
+      ),
     );
     expect(archived.get(ids.top)).toBe(false);
     expect(archived.get(ids.high)).toBe(false);
@@ -200,7 +202,9 @@ describe('consolidator light phase — capacity-bounded eviction (X-1)', () => {
 
     expect(outcome?.factsUpdated).toBe(1);
     const archived = new Map(
-      ((await store.semantic.listForDecay?.(scope, 100)) ?? []).map((r) => [r.id, r.archived]),
+      ((await store.semantic.listForDecay?.(scope, 100, { includeArchived: true })) ?? []).map(
+        (r) => [r.id, r.archived],
+      ),
     );
     expect(archived.get(q.id)).toBe(true);
     expect(archived.get(a.id)).toBe(false);

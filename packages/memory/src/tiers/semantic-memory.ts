@@ -695,6 +695,17 @@ export class SemanticMemory {
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
         });
         const ranked = await this.#applyDecay(scope, fused, opts.decay);
+        // MRET-7: recall reinforces the recalled facts — stamp
+        // last-accessed + bump strength so "recently accessed facts decay
+        // slower" actually holds. Bookkeeping only: a failure here must
+        // never break the read path.
+        if (ranked.length > 0 && typeof this.#store.semantic.markAccessed === 'function') {
+          try {
+            await this.#store.semantic.markAccessed(ranked.map((h) => h.record.id));
+          } catch {
+            // Best-effort: decay reinforcement is advisory.
+          }
+        }
         const explanation = explainRecall(ranked, {
           query,
           rerankerId: reranker.id,
