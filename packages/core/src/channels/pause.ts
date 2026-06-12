@@ -44,15 +44,22 @@ export class PauseSignal<TValue = unknown> extends Error {
  * @internal
  */
 export interface PauseResumeScope {
-  readonly value: unknown;
-  consumed: boolean;
+  /** Ordered resume values replayed to successive `pause()` calls (WF-2). */
+  readonly values: ReadonlyArray<unknown>;
+  cursor: number;
 }
 
 const pauseResumeStorage = new AsyncLocalStorage<PauseResumeScope>();
 
 /**
- * Run `fn` inside a scope where the next `pause(...)` call returns the
- * supplied `value` instead of throwing a fresh {@link PauseSignal}.
+ * Run `fn` inside a scope where successive `pause(...)` calls return the
+ * supplied `values` in order instead of throwing a fresh
+ * {@link PauseSignal} (WF-2: a node body re-executes from the top on
+ * every resume, so earlier pauses must replay their already-delivered
+ * values and only the FIRST unsatisfied `pause()` suspends again). An
+ * empty `values` array behaves exactly like no scope — every `pause()`
+ * suspends — which is what a static-gate resume needs so a programmatic
+ * `pause()` inside the node is never silently satisfied.
  *
  * This helper is the contract between the runtime and `pause(...)`.
  * Consumers of `pause(...)` never call it directly — only the workflow
@@ -60,8 +67,11 @@ const pauseResumeStorage = new AsyncLocalStorage<PauseResumeScope>();
  *
  * @internal
  */
-export function runWithPauseResume<R>(value: unknown, fn: () => R | Promise<R>): Promise<R> {
-  const scope: PauseResumeScope = { value, consumed: false };
+export function runWithPauseResume<R>(
+  values: ReadonlyArray<unknown>,
+  fn: () => R | Promise<R>,
+): Promise<R> {
+  const scope: PauseResumeScope = { values, cursor: 0 };
   return pauseResumeStorage.run(scope, async () => fn());
 }
 
@@ -82,9 +92,10 @@ export function runWithPauseResume<R>(value: unknown, fn: () => R | Promise<R>):
  */
 export function pause<TValue, TResume = unknown>(value: TValue): TResume {
   const scope = pauseResumeStorage.getStore();
-  if (scope !== undefined && !scope.consumed) {
-    scope.consumed = true;
-    return scope.value as TResume;
+  if (scope !== undefined && scope.cursor < scope.values.length) {
+    const next = scope.values[scope.cursor];
+    scope.cursor += 1;
+    return next as TResume;
   }
   throw new PauseSignal<TValue>(value);
 }

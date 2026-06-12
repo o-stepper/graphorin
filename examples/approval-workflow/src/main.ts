@@ -181,7 +181,7 @@ export interface RunApprovalDemoOptions {
 export interface RunApprovalDemoResult {
   readonly events: ReadonlyArray<WorkflowEvent<ExpenseState>>;
   readonly finalState: ExpenseState;
-  readonly status: 'completed' | 'suspended' | 'running' | 'failed';
+  readonly status: 'completed' | 'suspended' | 'running' | 'failed' | 'aborted';
   readonly suspendedAtNode?: string;
   readonly threadId: string;
 }
@@ -233,7 +233,7 @@ export interface SimulateServerRestartOptions {
 export interface SimulateServerRestartResult {
   readonly events: ReadonlyArray<WorkflowEvent<ExpenseState>>;
   readonly finalState: ExpenseState;
-  readonly status: 'completed' | 'suspended' | 'running' | 'failed';
+  readonly status: 'completed' | 'suspended' | 'running' | 'failed' | 'aborted';
   readonly threadId: string;
 }
 

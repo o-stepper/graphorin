@@ -34,7 +34,7 @@ export interface Checkpoint {
  */
 export interface CheckpointMetadata {
   readonly source: 'sync' | 'async' | 'exit';
-  readonly status: 'running' | 'suspended' | 'completed' | 'failed';
+  readonly status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   readonly nodeName?: string;
   readonly tags?: ReadonlyArray<string>;
 }

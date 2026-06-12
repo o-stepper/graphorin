@@ -228,7 +228,7 @@ export interface RunDocumentPipelineDemoResult {
   readonly events: ReadonlyArray<WorkflowEvent<DocumentState>>;
   readonly finalState: DocumentState;
   readonly channelEvents: Readonly<Record<string, number>>;
-  readonly status: 'completed' | 'suspended' | 'running' | 'failed';
+  readonly status: 'completed' | 'suspended' | 'running' | 'failed' | 'aborted';
 }
 
 /**
