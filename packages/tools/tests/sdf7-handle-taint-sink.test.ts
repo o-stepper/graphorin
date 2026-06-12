@@ -3,9 +3,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-
-import { createReadResultTool } from '../src/built-in/index.js';
 import { tool } from '../src/builder/index.js';
+import { createReadResultTool } from '../src/built-in/index.js';
 import type { DataFlowGuard } from '../src/executor/executor.js';
 import { createToolExecutor } from '../src/executor/index.js';
 import { createToolRegistry } from '../src/registry/index.js';
