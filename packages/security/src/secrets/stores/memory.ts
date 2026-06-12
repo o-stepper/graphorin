@@ -6,7 +6,7 @@ import type {
 } from '@graphorin/core/contracts';
 import type { SessionScope } from '@graphorin/core/types';
 
-import { enforceSecretAcl } from '../acl.js';
+import { enforceSecretAcl, secretAclAllowsRead } from '../acl.js';
 import { auditStoreOperation } from '../audit-helpers.js';
 import { MemoryStoreInProductionError, SecretRequiredError } from '../errors.js';
 import { SecretValue } from '../secret-value.js';
@@ -40,9 +40,12 @@ export class MemorySecretsStore implements SecretsStore {
       'secret:get',
       STORE_SOURCE,
       key,
-      () => this.#read(key, scope, false),
+      // SPL-14: a denied key reads as absent (with a 'denied' audit row)
+      // instead of bypassing the per-tool allowlist on the get() path.
+      async () => (secretAclAllowsRead(key) ? this.#read(key, scope, false) : null),
       {
-        decisionFor: (value) => (value === null ? 'not-found' : 'success'),
+        decisionFor: (value) =>
+          value === null ? (secretAclAllowsRead(key) ? 'not-found' : 'denied') : 'success',
       },
     );
   }

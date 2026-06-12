@@ -1,6 +1,7 @@
 import type { SecretRef as SecretRefContract } from '@graphorin/core/contracts';
 
 import { SecretRefParseError, type SecretRefParseErrorKind } from './errors.js';
+import { listResolverSchemes } from './resolvers/registry.js';
 
 /**
  * Set of scheme names the parser knows about by default. Every entry
@@ -584,7 +585,14 @@ export function validateSecretRefs(
   }> = [];
 
   const matcher = opts.fieldNameMatcher ?? DEFAULT_REF_FIELD_MATCHER;
-  const knownSchemes = new Set((opts.knownSchemes ?? BUILTIN_SCHEMES).map((s) => s.toLowerCase()));
+  // SPL-15: as documented — BUILTIN_SCHEMES plus every scheme registered
+  // through registerResolver, consulted at CALL time (op:// etc. no
+  // longer flags unknown once its resolver is installed).
+  const knownSchemes = new Set(
+    (opts.knownSchemes ?? [...BUILTIN_SCHEMES, ...listResolverSchemes()]).map((s) =>
+      s.toLowerCase(),
+    ),
+  );
   const allowLiteral = opts.allowLiteral ?? false;
   const seen = new WeakSet<object>();
 

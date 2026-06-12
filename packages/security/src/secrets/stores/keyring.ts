@@ -6,7 +6,7 @@ import type {
 } from '@graphorin/core/contracts';
 import type { SessionScope } from '@graphorin/core/types';
 
-import { enforceSecretAcl } from '../acl.js';
+import { enforceSecretAcl, secretAclAllowsRead } from '../acl.js';
 import { auditStoreOperation } from '../audit-helpers.js';
 import { SecretRequiredError } from '../errors.js';
 import { _getKeyringEntryCtor, KEYRING_DEFAULT_SERVICE } from '../resolvers/keyring.js';
@@ -48,6 +48,7 @@ export class KeyringSecretsStore implements SecretsStore {
       `keyring:${this.#service}`,
       key,
       async () => {
+        if (!secretAclAllowsRead(key)) return null; // SPL-14
         const Entry = await _getKeyringEntryCtor();
         const raw = new Entry(this.#service, key).getPassword();
         if (raw === null || raw === undefined) return null;
@@ -56,7 +57,10 @@ export class KeyringSecretsStore implements SecretsStore {
           source: { resolver: 'keyring', ref: `keyring:${key}?service=${this.#service}` },
         });
       },
-      { decisionFor: (v) => (v === null ? 'not-found' : 'success') },
+      {
+        decisionFor: (v) =>
+          v === null ? (secretAclAllowsRead(key) ? 'not-found' : 'denied') : 'success',
+      },
     );
   }
 

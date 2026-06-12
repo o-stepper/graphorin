@@ -8,7 +8,7 @@ import type {
 } from '@graphorin/core/contracts';
 import type { SessionScope } from '@graphorin/core/types';
 
-import { enforceSecretAcl } from './acl.js';
+import { enforceSecretAcl, secretAclAllowsRead } from './acl.js';
 import { emitSecretsAudit } from './audit-emitter.js';
 import { auditStoreOperation } from './audit-helpers.js';
 import {
@@ -446,13 +446,17 @@ class ChainSecretsStore implements SecretsStore {
       'chain',
       key,
       async () => {
+        if (!secretAclAllowsRead(key)) return null; // SPL-14
         for (const store of this.#stores) {
           const value = (await store.get(key, scope)) as SecretValue | null;
           if (value !== null) return value;
         }
         return null;
       },
-      { decisionFor: (v) => (v === null ? 'not-found' : 'success') },
+      {
+        decisionFor: (v) =>
+          v === null ? (secretAclAllowsRead(key) ? 'not-found' : 'denied') : 'success',
+      },
     );
   }
 
