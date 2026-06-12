@@ -10,6 +10,7 @@
  * @packageDocumentation
  */
 
+import { randomUUID } from 'node:crypto';
 import type {
   FinishReason,
   Provider,
@@ -22,7 +23,7 @@ import type {
 } from '@graphorin/core';
 
 import { LocalProviderInsecureTransportError, ProviderStreamParseError } from '../errors/errors.js';
-import { callJsonHttp, makeStreamStartEvent, toOpenAIChatMessages } from '../internal/http.js';
+import { callJsonHttp, makeStreamStartEvent, toOllamaChatMessages } from '../internal/http.js';
 import { parseNdJsonStream } from '../internal/sse.js';
 import { stripTrailingSlashes } from '../internal/url-utils.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
@@ -166,7 +167,7 @@ async function* streamOllama(
     }
     if (Array.isArray(chunk.message?.tool_calls)) {
       for (const tc of chunk.message.tool_calls) {
-        const toolCallId = tc.id ?? `call_${Math.random().toString(36).slice(2)}`;
+        const toolCallId = tc.id ?? `call_${randomUUID()}`;
         const toolName = tc.function?.name ?? '';
         if (toolName.length === 0) continue;
         yield { type: 'tool-call-start', toolCallId, toolName };
@@ -217,7 +218,7 @@ async function generateOllama(
     ...(Array.isArray(json.message?.tool_calls) && json.message.tool_calls.length > 0
       ? {
           toolCalls: json.message.tool_calls.map((tc) => ({
-            toolCallId: tc.id ?? `call_${Math.random().toString(36).slice(2)}`,
+            toolCallId: tc.id ?? `call_${randomUUID()}`,
             toolName: tc.function?.name ?? '',
             args: tc.function?.arguments ?? {},
           })),
@@ -238,7 +239,7 @@ function buildBody(
       : req.messages;
   const body: Record<string, unknown> = {
     model,
-    messages: toOpenAIChatMessages(messages),
+    messages: toOllamaChatMessages(messages),
     stream,
   };
   if (req.temperature !== undefined || req.maxTokens !== undefined) {
