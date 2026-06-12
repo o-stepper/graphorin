@@ -123,6 +123,51 @@ describe('Agent — HITL approval flow', () => {
     }
   });
 
+  it('executes the approved tool on resume — real side effect, exactly once (AG-1)', async () => {
+    const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 4)] });
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'noop',
+      provider,
+      tools: [buildSendEmailTool()],
+    });
+    const suspended = {
+      version: 'graphorin-run-state/1.0',
+      id: 'run-ag1',
+      agentId: agent.id,
+      currentAgentId: agent.id,
+      sessionId: 's',
+      status: 'awaiting_approval',
+      steps: [],
+      messages: [{ role: 'user', content: 'email Alice' }],
+      pendingApprovals: [
+        {
+          toolCallId: 'tc-email',
+          toolName: 'send_email',
+          args: { to: 'a@b.c', body: 'hi' },
+          requestedAt: new Date().toISOString(),
+        },
+      ],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: new Date().toISOString(),
+    } as const;
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream(runStateFromJSON(JSON.stringify(suspended)), {
+      directive: { approvals: [{ toolCallId: 'tc-email', granted: true }] },
+    })) {
+      events.push(ev);
+    }
+    // The approved tool actually ran — exactly once — and its real result (not a
+    // placeholder) reached the message buffer.
+    const execEnds = events.filter((e) => e.type === 'tool.execute.end');
+    expect(execEnds).toHaveLength(1);
+    const end = execEnds[0];
+    if (end?.type === 'tool.execute.end') {
+      expect(end.result).toBe('sent:a@b.c');
+    }
+  });
+
   it('records a denied approval and resumes with the rejection in the message buffer', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -165,6 +210,77 @@ describe('Agent — HITL approval flow', () => {
       events.push(ev);
     }
     expect(events.some((e) => e.type === 'tool.approval.denied')).toBe(true);
+  });
+
+  it('resuming an awaiting-approval run WITHOUT a directive stays suspended — no provider call (AG-14)', async () => {
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [textOnlyScript('should not run', 4)],
+    });
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'noop',
+      provider,
+      tools: [buildSendEmailTool()],
+    });
+    const suspended = {
+      version: 'graphorin-run-state/1.0',
+      id: 'run-aw',
+      agentId: agent.id,
+      currentAgentId: agent.id,
+      sessionId: 's',
+      status: 'awaiting_approval',
+      steps: [],
+      messages: [{ role: 'user', content: 'email' }],
+      pendingApprovals: [
+        {
+          toolCallId: 'tc-1',
+          toolName: 'send_email',
+          args: { to: 'a@b.c', body: 'x' },
+          requestedAt: new Date().toISOString(),
+        },
+      ],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: new Date().toISOString(),
+    } as const;
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream(runStateFromJSON(JSON.stringify(suspended)))) {
+      events.push(ev);
+    }
+    // Still suspended — the loop never re-issued the dangling tool_use.
+    expect(events.some((e) => e.type === 'step.start')).toBe(false);
+    expect(events.some((e) => e.type === 'text.complete')).toBe(false);
+  });
+
+  it('does not re-run / silently complete a resumed failed run (AG-14)', async () => {
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [textOnlyScript('should not run', 4)],
+    });
+    const agent = createAgent({ name: 'r', instructions: 'noop', provider });
+    const failed = {
+      version: 'graphorin-run-state/1.0',
+      id: 'run-f',
+      agentId: agent.id,
+      currentAgentId: agent.id,
+      sessionId: 's',
+      status: 'failed',
+      steps: [],
+      messages: [{ role: 'user', content: 'x' }],
+      pendingApprovals: [],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: new Date().toISOString(),
+      error: { message: 'boom', code: 'unknown' },
+    } as const;
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream(runStateFromJSON(JSON.stringify(failed)))) {
+      events.push(ev);
+    }
+    // The failed run was NOT silently re-entered + completed.
+    expect(events.some((e) => e.type === 'step.start')).toBe(false);
+    expect(events.some((e) => e.type === 'text.complete')).toBe(false);
   });
 
   it('runStateToJSON / runStateFromJSON round-trip the full state shape', () => {
