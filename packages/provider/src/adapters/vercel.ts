@@ -247,8 +247,12 @@ async function* streamFromVercel(
         }
         break;
       }
-      case 'tool-call-streaming-start': {
-        const toolCallId = pickString(chunk.toolCallId);
+      // PS-6 dual-shape: AI SDK v4 streams `tool-call-streaming-start` /
+      // `tool-call-delta` keyed by `toolCallId`/`argsTextDelta`; v7 streams
+      // `tool-input-start` / `tool-input-delta` keyed by `id`/`delta`.
+      case 'tool-call-streaming-start':
+      case 'tool-input-start': {
+        const toolCallId = pickString(chunk.toolCallId) ?? pickString(chunk.id);
         const toolName = pickString(chunk.toolName);
         if (toolCallId !== undefined && toolName !== undefined) {
           yield {
@@ -259,9 +263,13 @@ async function* streamFromVercel(
         }
         break;
       }
-      case 'tool-call-delta': {
-        const toolCallId = pickString(chunk.toolCallId);
-        const argsDelta = pickString(chunk.argsTextDelta);
+      case 'tool-call-delta':
+      case 'tool-input-delta': {
+        const toolCallId = pickString(chunk.toolCallId) ?? pickString(chunk.id);
+        const argsDelta =
+          pickString(chunk.argsTextDelta) ??
+          pickString(chunk.delta) ??
+          pickString(chunk.inputTextDelta);
         if (toolCallId !== undefined && argsDelta !== undefined && argsDelta.length > 0) {
           yield {
             type: 'tool-call-input-delta',
@@ -272,19 +280,22 @@ async function* streamFromVercel(
         break;
       }
       case 'tool-call': {
-        const toolCallId = pickString(chunk.toolCallId);
+        const toolCallId = pickString(chunk.toolCallId) ?? pickString(chunk.id);
         if (toolCallId !== undefined) {
           yield {
             type: 'tool-call-end',
             toolCallId,
-            finalArgs: chunk.args,
+            // v4 carries `args`; v7 carries `input`.
+            finalArgs: chunk.args ?? chunk.input,
           };
         }
         break;
       }
       case 'finish': {
         finishReason = mapFinishReason(pickString(chunk.finishReason));
-        finalUsage = mapUsage(chunk.usage);
+        // v4 carries `usage`; v7 carries `totalUsage` (zeroing the v4
+        // read nulled cost tracking on streaming).
+        finalUsage = mapUsage(chunk.totalUsage ?? chunk.usage);
         break;
       }
       case 'error': {
@@ -345,7 +356,9 @@ async function generateFromVercel(
     usage,
     finishReason,
     ...(result.text !== undefined ? { text: result.text } : {}),
-    ...(result.toolCalls !== undefined ? { toolCalls: [...result.toolCalls] } : {}),
+    ...(result.toolCalls !== undefined
+      ? { toolCalls: result.toolCalls.map(normalizeToolCall) }
+      : {}),
     ...(result.providerMetadata !== undefined ? { providerMetadata: result.providerMetadata } : {}),
   };
   return response;
@@ -375,7 +388,11 @@ function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
     ...(req.tools !== undefined ? { tools: req.tools } : {}),
     ...(req.toolChoice !== undefined ? { toolChoice: req.toolChoice } : {}),
     ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
-    ...(req.maxTokens !== undefined ? { maxTokens: req.maxTokens } : {}),
+    // v4 reads `maxTokens`; v7 renamed it `maxOutputTokens` — send both
+    // so the cap is honoured against either peer (PS-6).
+    ...(req.maxTokens !== undefined
+      ? { maxTokens: req.maxTokens, maxOutputTokens: req.maxTokens }
+      : {}),
     ...(req.signal !== undefined ? { abortSignal: req.signal } : {}),
     ...(req.providerOptions !== undefined ? { providerOptions: req.providerOptions } : {}),
   } as const;
@@ -383,6 +400,25 @@ function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
 
 function pickString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
+}
+
+/**
+ * Normalize a generate() tool call across peers: AI SDK v4 carries
+ * `args`, v7 carries `input` (PS-6). The framework shape is `args`.
+ */
+function normalizeToolCall(tc: unknown): { toolCallId: string; toolName: string; args: unknown } {
+  const t = tc as {
+    toolCallId?: unknown;
+    id?: unknown;
+    toolName?: unknown;
+    args?: unknown;
+    input?: unknown;
+  };
+  return {
+    toolCallId: pickString(t.toolCallId) ?? pickString(t.id) ?? '',
+    toolName: pickString(t.toolName) ?? '',
+    args: t.args ?? t.input,
+  };
 }
 
 /**

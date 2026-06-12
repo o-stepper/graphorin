@@ -289,3 +289,79 @@ describe('vercelAdapter', () => {
 // downstream test harnesses.
 const _typeWitness: AssistantMessage = { role: 'assistant', content: '' };
 void _typeWitness;
+
+describe('vercelAdapter — AI SDK v7 shapes (PS-6)', () => {
+  const V7_MODEL: LanguageModelLike = {
+    provider: 'fixture',
+    modelId: 'fixture-model-v7',
+    specificationVersion: 'v2',
+  };
+
+  it('streams v7 tool-input-start/tool-input-delta/tool-call (id + input fields)', async () => {
+    const provider = vercelAdapter(V7_MODEL, {
+      runtimeOverrides: makeOverrides({
+        streamChunks: [
+          { type: 'tool-input-start', id: 'c7', toolName: 'search' },
+          { type: 'tool-input-delta', id: 'c7', delta: '{"q":' },
+          { type: 'tool-input-delta', id: 'c7', delta: '"x"}' },
+          { type: 'tool-call', toolCallId: 'c7', toolName: 'search', input: { q: 'x' } },
+          {
+            type: 'finish',
+            finishReason: 'tool-calls',
+            totalUsage: { inputTokens: 7, outputTokens: 3, totalTokens: 10 },
+          },
+        ],
+      }),
+    });
+    const events = await collect(provider.stream(REQ));
+    const types = events.map((e) => e.type);
+    expect(types).toContain('tool-call-start');
+    expect(types).toContain('tool-call-input-delta');
+    expect(types).toContain('tool-call-end');
+    const start = events.find((e) => e.type === 'tool-call-start');
+    if (start?.type === 'tool-call-start') {
+      expect(start.toolCallId).toBe('c7');
+      expect(start.toolName).toBe('search');
+    }
+    const deltas = events.filter((e) => e.type === 'tool-call-input-delta');
+    expect(
+      deltas.map((d) => (d.type === 'tool-call-input-delta' ? d.argsDelta : '')).join(''),
+    ).toBe('{"q":"x"}');
+    const end = events.find((e) => e.type === 'tool-call-end');
+    if (end?.type === 'tool-call-end') {
+      expect(end.finalArgs).toEqual({ q: 'x' });
+    }
+    // v7 finish carries totalUsage — must not zero out cost tracking.
+    const finish = events.find((e) => e.type === 'finish');
+    if (finish?.type === 'finish') {
+      expect(finish.usage.totalTokens).toBe(10);
+      expect(finish.usage.promptTokens).toBe(7);
+    }
+  });
+
+  it('generate() normalizes v7 toolCalls (input field) to args', async () => {
+    const provider = vercelAdapter(V7_MODEL, {
+      runtimeOverrides: makeOverrides({
+        generateResult: {
+          text: '',
+          toolCalls: [{ toolCallId: 'g1', toolName: 'lookup', input: { id: 42 } }],
+          usage: { inputTokens: 5, outputTokens: 2, totalTokens: 7 },
+        } as never,
+      }),
+    });
+    const res = await provider.generate(REQ);
+    expect(res.toolCalls?.[0]?.toolName).toBe('lookup');
+    expect((res.toolCalls?.[0] as { args?: unknown })?.args).toEqual({ id: 42 });
+    expect(res.usage.totalTokens).toBe(7);
+  });
+
+  it('sends maxOutputTokens (v7 name) alongside legacy maxTokens', async () => {
+    const capture: { lastArgs?: Record<string, unknown> } = {};
+    const provider = vercelAdapter(V7_MODEL, {
+      runtimeOverrides: makeOverrides({ streamChunks: [], capture }),
+    });
+    await collect(provider.stream({ ...REQ, maxTokens: 128 }));
+    expect(capture.lastArgs?.maxOutputTokens).toBe(128);
+    expect(capture.lastArgs?.maxTokens).toBe(128);
+  });
+});
