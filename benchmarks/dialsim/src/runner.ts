@@ -68,7 +68,7 @@ export async function main(): Promise<void> {
       '',
       '| Metric | Value |',
       '| --- | --- |',
-      '| Accuracy | ' + String(accuracy) + ' |',
+      `| Accuracy | ${String(accuracy)} |`,
       '',
     ].join('\n'),
     'utf8',

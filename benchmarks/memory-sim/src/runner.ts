@@ -89,8 +89,8 @@ export async function main(): Promise<void> {
     '',
     '| Metric | Value |',
     '| --- | --- |',
-    '| Rounds | ' + String(rounds) + ' |',
-    '| Top-1 hit rate | ' + hitRate.toFixed(4) + ' |',
+    `| Rounds | ${String(rounds)} |`,
+    `| Top-1 hit rate | ${hitRate.toFixed(4)} |`,
     '',
   ];
   await writeFile(join(pkgRoot(), 'RESULTS.md'), lines.join('\n'), 'utf8');
