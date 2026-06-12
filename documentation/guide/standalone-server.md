@@ -75,6 +75,10 @@ Built on [`hono`](https://github.com/honojs/hono) (MIT) and [`@hono/node-server`
 | `POST` | `/v1/tokens` | Issue a token. |
 | `DELETE` | `/v1/tokens/:id` | Revoke a token. |
 | `GET` | `/v1/triggers` | List configured triggers. |
+| `POST` | `/v1/triggers/:id/fire` | Fire a trigger immediately. |
+| `POST` | `/v1/triggers/:id/disable` | **Flag flip** — pause the trigger; it stays registered and persisted. |
+| `POST` | `/v1/triggers/:id/enable` | Re-enable a paused trigger (the next fire is recomputed from now). |
+| `DELETE` | `/v1/triggers/:id` | **Destructive** — unregister and remove the trigger. |
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/auth/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 

@@ -168,21 +168,24 @@ describe('Triggers durability — simulated daemon restart', () => {
     const ctx1 = await bootDaemon({
       clock: clock1,
       catchupPolicy: 'last',
-      catchupWindowMs: 24 * 60 * 60 * 1000,
+      catchupWindowMs: 48 * 60 * 60 * 1000,
       fires,
     });
     await clock1.advance(2 * 60 * 60 * 1000);
     expect(fires).toHaveLength(1);
     await ctx1.daemon.stop();
 
-    // Offline for 12h — well inside the 24h catch-up window so the
-    // 'last' policy must fire exactly once on restart.
-    const clock2 = new FakeClock(clock1.now() + 12 * 60 * 60 * 1000);
+    // Offline for 36h — one 08:00 boundary (May 10) was genuinely
+    // missed, and the last fire (08:00 May 9, 37h ago) is still inside
+    // the 48h window. NOTE (RP-12): the window must exceed the cron
+    // period for catch-up to be possible — with real-miss counting a
+    // 24h window can never catch up a daily cron.
+    const clock2 = new FakeClock(clock1.now() + 36 * 60 * 60 * 1000);
     const before = fires.length;
     const ctx2 = await bootDaemon({
       clock: clock2,
       catchupPolicy: 'last',
-      catchupWindowMs: 24 * 60 * 60 * 1000,
+      catchupWindowMs: 48 * 60 * 60 * 1000,
       fires,
     });
     await clock2.advance(0);

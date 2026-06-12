@@ -5,8 +5,9 @@
  *   GET    /triggers                    (scope `triggers:read`)
  *   GET    /triggers/:id                (scope `triggers:read`)
  *   POST   /triggers/:id/fire           (scope `triggers:fire`)
- *   POST   /triggers/:id/disable        (scope `triggers:disable`)
- *   POST   /triggers/:id/enable         (scope `triggers:disable`)
+ *   POST   /triggers/:id/disable        (scope `triggers:disable`) — flag flip
+ *   POST   /triggers/:id/enable         (scope `triggers:disable`) — flag flip
+ *   DELETE /triggers/:id                (scope `triggers:disable`) — unregister
  *   POST   /triggers/prune              (scope `triggers:disable`)
  *
  * Response shapes mirror the persisted `TriggerState` rows so CLI +
@@ -70,18 +71,37 @@ export function createTriggersRoutes(
     return c.json({ ok: true, fired: id });
   });
 
+  // IP-17: disable/enable are non-destructive flag flips on the
+  // persistent TriggerState (in agreement with the CLI); the
+  // destructive removal is DELETE /:id.
   app.post('/:id/disable', createScopeMiddleware('triggers:disable'), async (c) => {
     const id = c.req.param('id');
-    const all = await scheduler.list();
-    const existing = all.find((t) => t.id === id);
-    if (existing === undefined) {
+    try {
+      const updated = await scheduler.setDisabled(id, true);
+      return c.json({ ok: true, trigger: serializeTrigger(updated) });
+    } catch {
       return c.json({ error: 'not-found', message: `Trigger '${id}' not found.` }, 404);
     }
-    if (existing.disabled) {
-      return c.json({ ok: true, trigger: serializeTrigger(existing) });
+  });
+
+  app.post('/:id/enable', createScopeMiddleware('triggers:disable'), async (c) => {
+    const id = c.req.param('id');
+    try {
+      const updated = await scheduler.setDisabled(id, false);
+      return c.json({ ok: true, trigger: serializeTrigger(updated) });
+    } catch {
+      return c.json({ error: 'not-found', message: `Trigger '${id}' not found.` }, 404);
+    }
+  });
+
+  app.delete('/:id', createScopeMiddleware('triggers:disable'), async (c) => {
+    const id = c.req.param('id');
+    const all = await scheduler.list();
+    if (!all.some((t) => t.id === id)) {
+      return c.json({ error: 'not-found', message: `Trigger '${id}' not found.` }, 404);
     }
     await scheduler.unregister(id);
-    return c.json({ ok: true, disabled: id });
+    return c.json({ ok: true, removed: id });
   });
 
   app.post('/prune', createScopeMiddleware('triggers:disable'), async (c) => {
