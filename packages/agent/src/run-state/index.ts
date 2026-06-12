@@ -75,10 +75,14 @@ export interface SerializedRunState {
  */
 export interface SerializeRunStateOptions {
   /**
-   * Drop tracing API keys and other secrets that callers store in
-   * `RunContext.deps`. Defaults to `false` for the round-trip
-   * canonical helper; the agent runtime always passes `true` when
-   * persisting through the checkpoint store.
+   * Deep-redact secret-named keys (`apiKey`, `authorization`,
+   * `bearerToken` / `accessToken` / `refreshToken`, `password`,
+   * `secret`, …) anywhere in the snapshot — tool results and messages
+   * included — replacing their values with `'[redacted]'`. Defaults to
+   * `false` for the round-trip canonical helper; the agent runtime
+   * passes `true` when persisting through the checkpoint store
+   * (AG-23). Redaction is best-effort by key name: secrets stored
+   * under unrelated keys are not detected.
    */
   readonly stripTracingApiKey?: boolean;
 }
@@ -93,7 +97,6 @@ export function serializeRunState(
   state: RunState,
   options: SerializeRunStateOptions = {},
 ): SerializedRunState {
-  void options;
   const out: SerializedRunState = {
     version: RUN_STATE_SCHEMA_VERSION,
     id: state.id,
@@ -114,7 +117,57 @@ export function serializeRunState(
     ...(state.finishedAt !== undefined ? { finishedAt: state.finishedAt } : {}),
     ...(state.error !== undefined ? { error: state.error } : {}),
   };
-  return out;
+  // AG-23: the snapshot must be DETACHED from the live MutableRunState —
+  // a post-suspend mutation must never reach an already-persisted
+  // checkpoint. The JSON round-trip doubles as the plain-JSON guarantee
+  // this function documents (no Map/Set/Date survive it).
+  const detached = JSON.parse(JSON.stringify(out)) as SerializedRunState;
+  if (options.stripTracingApiKey === true) {
+    redactSecretKeysInPlace(detached);
+  }
+  return detached;
+}
+
+/**
+ * Key names whose values are redacted by
+ * `serializeRunState(state, { stripTracingApiKey: true })`.
+ */
+const SECRET_KEY_PATTERN =
+  /^(api[-_]?key|tracing[-_]?api[-_]?key|x-api-key|authorization|bearer[-_]?token|access[-_]?token|refresh[-_]?token|secret|password|passphrase)$/i;
+
+const REDACTED = '[redacted]';
+
+function redactSecretKeysInPlace(value: unknown): void {
+  if (typeof value !== 'object' || value === null) return;
+  if (Array.isArray(value)) {
+    for (const item of value) redactSecretKeysInPlace(item);
+    return;
+  }
+  const record = value as Record<string, unknown>;
+  // Tool messages embed the tool output as a JSON STRING in `content` —
+  // parse, redact, and re-stringify so a secret inside the string form
+  // is caught too.
+  if (record.role === 'tool' && typeof record.content === 'string') {
+    record.content = redactJsonString(record.content);
+  }
+  for (const [key, inner] of Object.entries(record)) {
+    if (SECRET_KEY_PATTERN.test(key)) {
+      record[key] = REDACTED;
+      continue;
+    }
+    redactSecretKeysInPlace(inner);
+  }
+}
+
+function redactJsonString(content: string): string {
+  try {
+    const parsed = JSON.parse(content) as unknown;
+    if (typeof parsed !== 'object' || parsed === null) return content;
+    redactSecretKeysInPlace(parsed);
+    return JSON.stringify(parsed);
+  } catch {
+    return content;
+  }
 }
 
 /**

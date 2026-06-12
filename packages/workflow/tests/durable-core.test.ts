@@ -397,6 +397,46 @@ describe('WF-12 — double-resume of one suspended thread', () => {
   });
 });
 
+describe('WF-12 — concurrent execute() on one threadId', () => {
+  it('exactly one of two racing executes completes; the loser gets checkpoint-version-conflict', async () => {
+    const store = new InMemoryCheckpointStore();
+    const build = () =>
+      createWorkflow<S>({
+        name: 'dup-exec',
+        channels: { a: latestValue<string>() },
+        nodes: {
+          slow: createNode<S>({
+            name: 'slow',
+            run: async () => {
+              await new Promise((r) => setTimeout(r, 30));
+              return { a: 'done' };
+            },
+          }),
+        },
+        edges: [
+          { from: '__start__', to: 'slow' },
+          { from: 'slow', to: '__end__' },
+        ],
+        checkpointStore: store,
+      });
+
+    const [r1, r2] = await Promise.all([
+      collect(build().execute({}, { threadId: 'dup-1' })),
+      collect(build().execute({}, { threadId: 'dup-1' })),
+    ]);
+    const ended = [r1, r2].filter((evs) => evs.at(-1)?.type === 'workflow.end').length;
+    const conflicted = [r1, r2].filter((evs) =>
+      evs.some(
+        (e) =>
+          e.type === 'workflow.error' &&
+          (e as { error?: { code?: string } }).error?.code === 'checkpoint-version-conflict',
+      ),
+    ).length;
+    expect(ended).toBe(1);
+    expect(conflicted).toBe(1);
+  });
+});
+
 describe('WF-9 — ctx.state is a real frozen snapshot', () => {
   it('a node mutating ctx.state cannot corrupt siblings or the checkpoint', async () => {
     const store = new InMemoryCheckpointStore();
