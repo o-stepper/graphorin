@@ -754,6 +754,17 @@ export interface GraphMemoryStoreExt {
     scope: SessionScope,
     opts?: { readonly includeMerged?: boolean; readonly limit?: number },
   ): Promise<ReadonlyArray<EntityWithEmbedding>>;
+  /**
+   * Uncapped indexed lookup of the canonical root for an exact normalized
+   * name. Lets the resolver dedup an exact alias of an arbitrarily-old
+   * entity without scanning (and deserializing) the bounded
+   * {@link listEntities} candidate window (CS-11). Optional: stores without
+   * it fall back to the capped lexical scan inside `resolveEntityDecision`.
+   */
+  findEntityByNormalizedName?(
+    scope: SessionScope,
+    normalizedName: string,
+  ): Promise<EntityWithEmbedding | null>;
   /** Lookup one entity by id (any merge state). */
   getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null>;
   /** Follow `mergedInto` to the canonical root id. */

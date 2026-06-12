@@ -112,6 +112,33 @@ describe('P2-1 canonical entities', () => {
     ]);
   });
 
+  it('findEntityByNormalizedName: uncapped exact lookup, root-only (CS-11)', async () => {
+    const vec = new Float32Array([0.5, 0.25, -0.5, 0.125]);
+    const anna = await store.graph.upsertEntity(SCOPE, {
+      name: 'Anna',
+      normalizedName: 'anna',
+      vector: vec,
+    });
+    // Flood past the listEntities cap so the row is only reachable by the index.
+    for (let i = 0; i < 1100; i++) {
+      await store.graph.upsertEntity(SCOPE, { name: `Filler ${i}`, normalizedName: `filler-${i}` });
+    }
+    const hit = await store.graph.findEntityByNormalizedName(SCOPE, 'anna');
+    expect(hit?.id).toBe(anna);
+    expect(Array.from(hit?.vector ?? [])).toEqual([
+      expect.closeTo(0.5, 5),
+      expect.closeTo(0.25, 5),
+      expect.closeTo(-0.5, 5),
+      expect.closeTo(0.125, 5),
+    ]);
+    expect(await store.graph.findEntityByNormalizedName(SCOPE, 'nobody')).toBeNull();
+
+    // A merged (non-root) name is excluded — only canonical roots resolve.
+    const annie = await store.graph.upsertEntity(SCOPE, { name: 'Annie', normalizedName: 'annie' });
+    await store.graph.mergeEntities(SCOPE, annie, anna, 'same person');
+    expect(await store.graph.findEntityByNormalizedName(SCOPE, 'annie')).toBeNull();
+  });
+
   it('merges are auditable + reversible; distinct entities stay separate', async () => {
     const anna = await store.graph.upsertEntity(SCOPE, { name: 'Anna', normalizedName: 'anna' });
     const annie = await store.graph.upsertEntity(SCOPE, { name: 'Annie', normalizedName: 'annie' });

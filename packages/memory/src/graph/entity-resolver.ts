@@ -235,8 +235,20 @@ export class EntityResolver {
   ): Promise<string | null> {
     const normalizedName = normalizeEntityName(rawName);
     if (normalizedName.length === 0) return null;
-    const candidates = await this.#store.listEntities(scope);
+    // 1. Exact lexical match — the cheapest, strongest signal. Resolve it via
+    //    an uncapped indexed lookup so an alias of an arbitrarily-old entity
+    //    dedups without scanning (and deserializing) the bounded candidate
+    //    window, and short-circuits before any embedding call (CS-11). Stores
+    //    that don't implement it fall through to the capped lexical scan below.
+    const exact = await this.#store.findEntityByNormalizedName?.(scope, normalizedName);
+    if (exact != null) return exact.id;
     const vector = await this.#embed(rawName, opts.signal);
+    // 2. Without a query vector, embedding dedup is impossible — skip the
+    //    BLOB-deserializing candidate scan entirely and mint a new entity.
+    if (vector === null || vector.length === 0) {
+      return this.#create(scope, rawName, normalizedName, vector);
+    }
+    const candidates = await this.#store.listEntities(scope);
     const decision = resolveEntityDecision({
       normalizedName,
       vector,

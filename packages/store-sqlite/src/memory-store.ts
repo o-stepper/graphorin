@@ -1680,6 +1680,26 @@ export class SqliteGraphStore {
     }));
   }
 
+  /**
+   * Uncapped indexed lookup of the canonical root for an exact normalized
+   * name. Backed by the partial-unique index on `(scope_user_id,
+   * normalized_name) WHERE merged_into IS NULL`, so the resolver dedups an
+   * exact alias of an arbitrarily-old entity without paging the bounded
+   * {@link listEntities} candidate window or deserializing its BLOBs (CS-11).
+   */
+  async findEntityByNormalizedName(
+    scope: SessionScope,
+    normalizedName: string,
+  ): Promise<SqliteEntityWithEmbedding | null> {
+    const row = this.#conn.get<EntityRow>(
+      'SELECT * FROM entities WHERE scope_user_id = ? AND normalized_name = ? AND merged_into IS NULL',
+      [scope.userId, normalizedName],
+    );
+    return row !== undefined
+      ? { ...rowToGraphEntity(row), vector: blobToF32(row.embedding), embedderId: row.embedder_id }
+      : null;
+  }
+
   /** Lookup one entity by id (any merge state). */
   async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
     const row = this.#conn.get<EntityRow>(

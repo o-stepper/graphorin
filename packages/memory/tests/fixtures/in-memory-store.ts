@@ -1133,6 +1133,8 @@ interface InMemoryEntity {
   embedderId: string | null;
   mergedInto: string | undefined;
   createdAt: string;
+  /** Monotonic insertion order — mirrors the store's `created_at DESC`. */
+  seq: number;
 }
 
 /**
@@ -1182,8 +1184,24 @@ function createInMemoryGraphStore(facts: Fact[]): GraphMemoryStoreExt {
         embedderId: input.embedderId ?? null,
         mergedInto: undefined,
         createdAt: new Date().toISOString(),
+        seq,
       });
       return id;
+    },
+    async findEntityByNormalizedName(
+      scope: SessionScope,
+      normalizedName: string,
+    ): Promise<EntityWithEmbedding | null> {
+      for (const e of entities.values()) {
+        if (
+          e.userId === scope.userId &&
+          e.normalizedName === normalizedName &&
+          e.mergedInto === undefined
+        ) {
+          return { ...toGraphEntity(e), vector: e.vector, embedderId: e.embedderId };
+        }
+      }
+      return null;
     },
     async linkFactEntity(factId: string, entityId: string, role: EntityRole): Promise<void> {
       if (!links.some((l) => l.factId === factId && l.entityId === entityId && l.role === role)) {
@@ -1194,13 +1212,18 @@ function createInMemoryGraphStore(facts: Fact[]): GraphMemoryStoreExt {
       scope: SessionScope,
       opts: { readonly includeMerged?: boolean; readonly limit?: number } = {},
     ): Promise<ReadonlyArray<EntityWithEmbedding>> {
-      const out: EntityWithEmbedding[] = [];
+      const out: InMemoryEntity[] = [];
       for (const e of entities.values()) {
         if (e.userId !== scope.userId) continue;
         if (opts.includeMerged !== true && e.mergedInto !== undefined) continue;
-        out.push({ ...toGraphEntity(e), vector: e.vector, embedderId: e.embedderId });
+        out.push(e);
       }
-      return out.slice(0, opts.limit ?? 1000);
+      // Mirror the store's `ORDER BY created_at DESC LIMIT ?` — newest first,
+      // so a flooded store pushes the oldest rows past the candidate cap.
+      out.sort((a, b) => b.seq - a.seq);
+      return out
+        .slice(0, opts.limit ?? 1000)
+        .map((e) => ({ ...toGraphEntity(e), vector: e.vector, embedderId: e.embedderId }));
     },
     async getEntity(scope: SessionScope, id: string): Promise<GraphEntity | null> {
       const e = entities.get(id);
