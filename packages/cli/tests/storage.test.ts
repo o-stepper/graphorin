@@ -1,6 +1,6 @@
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
@@ -41,6 +41,24 @@ describe('graphorin storage status', () => {
     expect(out.encryption.enabled).toBe(false);
     expect(typeof out.cipherPeer.installed).toBe('boolean');
     expect(lines.some((l) => l.includes('storage status'))).toBe(true);
+  });
+
+  it('resolves a relative storage.path against the CWD, not the config-file dir (IP-20)', async () => {
+    // The config lives in a temp dir that is NOT process.cwd(); a relative
+    // storage.path must resolve against the CWD — the same rule the server
+    // (createServer → createSqliteStore) and openStoreContext use — so every
+    // command + the server inspect ONE database from any working directory.
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-ip20-'));
+    const cfg = join(dir, 'graphorin.config.json');
+    await writeFile(
+      cfg,
+      JSON.stringify({ storage: { path: 'data.db', mode: 'lib' }, auth: { kind: 'none' } }),
+      'utf8',
+    );
+    const out = await runStorageStatus({ config: cfg, print: () => {} });
+    expect(out.path).toBe(resolve(process.cwd(), 'data.db'));
+    // Must NOT resolve against the config-file directory (the old behaviour).
+    expect(out.path).not.toBe(resolve(dir, 'data.db'));
   });
 });
 

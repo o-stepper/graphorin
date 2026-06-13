@@ -67,19 +67,16 @@ export async function runStorageStatus(
   const loaded = await loadConfig(options.config);
   const config = parseServerConfig(loaded.config);
   const cipherPeer = await probeCipherPeer();
-  const mainDb = await statSafely(absoluteFromConfig(loaded.path, config.storage.path));
-  const walFile = await statSafely(`${absoluteFromConfig(loaded.path, config.storage.path)}-wal`);
+  const mainDb = await statSafely(resolveStoragePath(config.storage.path));
+  const walFile = await statSafely(`${resolveStoragePath(config.storage.path)}-wal`);
   let auditPath: string | undefined;
   let auditExists: boolean | undefined;
   if (config.audit.enabled) {
-    auditPath = absoluteFromConfig(
-      loaded.path,
-      config.audit.path ?? deriveAuditPath(config.storage.path),
-    );
+    auditPath = resolveStoragePath(config.audit.path ?? deriveAuditPath(config.storage.path));
     auditExists = (await statSafely(auditPath)).exists;
   }
   const out: StorageStatusResult = Object.freeze({
-    path: absoluteFromConfig(loaded.path, config.storage.path),
+    path: resolveStoragePath(config.storage.path),
     mode: config.storage.mode,
     encryption: Object.freeze({
       enabled: config.storage.encryption.enabled,
@@ -176,7 +173,7 @@ export async function runStorageEncrypt(
   }
   const loaded = await loadConfig(options.config);
   const config = parseServerConfig(loaded.config);
-  const sourcePath = absoluteFromConfig(loaded.path, config.storage.path);
+  const sourcePath = resolveStoragePath(config.storage.path);
   const targetPath = options.targetPath ?? `${sourcePath}.encrypted`;
   const passphrase = await resolvePassphraseRef(options.passphraseFrom);
   try {
@@ -235,7 +232,7 @@ export async function runStorageRekey(options: StorageRekeyOptions): Promise<Sto
   }
   const loaded = await loadConfig(options.config);
   const config = parseServerConfig(loaded.config);
-  const path = absoluteFromConfig(loaded.path, config.storage.path);
+  const path = resolveStoragePath(config.storage.path);
   const oldPassphrase = await resolvePassphraseRef(options.oldPassphraseFrom);
   const newPassphrase = await resolvePassphraseRef(options.newPassphraseFrom);
   try {
@@ -293,7 +290,7 @@ export async function runStorageCleanupBackups(
 ): Promise<StorageCleanupBackupsResult> {
   const loaded = await loadConfig(options.config);
   const config = parseServerConfig(loaded.config);
-  const dbPath = absoluteFromConfig(loaded.path, config.storage.path);
+  const dbPath = resolveStoragePath(config.storage.path);
   const dir = dirname(dbPath);
   const basename = dbPath.split('/').pop() ?? '';
   let entries: string[];
@@ -434,9 +431,14 @@ async function statSafely(
   }
 }
 
-function absoluteFromConfig(configPath: string, target: string): string {
-  if (isAbsolute(target)) return target;
-  return resolve(dirname(configPath), target);
+// IP-20: resolve a relative storage path against the CWD — the SAME rule the
+// server (`createServer` → `createSqliteStore`) and `openStoreContext` use — so
+// `graphorin storage status / encrypt` from any directory reports the same
+// database the server and the other CLI commands (`memory`, …) open. Resolving
+// against the config-file dir made `storage status` the lone outlier: from a
+// foreign CWD it inspected a different `data.db` than everything else.
+function resolveStoragePath(target: string): string {
+  return isAbsolute(target) ? target : resolve(target);
 }
 
 function deriveAuditPath(storagePath: string): string {
