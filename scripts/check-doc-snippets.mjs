@@ -44,6 +44,8 @@ const CHECKED = [
   'documentation/guide/persistence.md',
   // Many illustrative fragments; check just the embedder-migration snippet.
   { file: 'documentation/guide/memory-system.md', includes: 'migrateEmbedder(' },
+  // Check the token-counter snippet (the rest reference external context).
+  { file: 'documentation/guide/providers.md', includes: 'setGlobalTokenCounter' },
 ];
 
 const COMPILER_OPTIONS = {
