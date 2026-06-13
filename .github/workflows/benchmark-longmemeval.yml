@@ -1,8 +1,19 @@
 name: LongMemEval benchmark
 
-# Dispatch-only. The real datasets are large/gated and a meaningful run needs a
-# real Provider API key, so this never runs on push/PR — that keeps default CI
-# offline and `check-no-network`-clean. Trigger manually from the Actions tab.
+# Tier 2 of the three-tier eval cadence (B1):
+#   1. PR-smoke  — deterministic, offline, every PR (root `benchmark:ci`; runs the
+#                  stub fixtures, fails hard, no LLM-judge, no real cost).
+#   2. weekly real-provider — THIS workflow: LLM-judged real-provider run against
+#                  the gated datasets, per-ability regression gates. Dispatch-only
+#                  by default (a meaningful run needs a real Provider key + the
+#                  large datasets, which would bust offline/`check-no-network` and
+#                  cost money); a maintainer enables a weekly `schedule:` trigger
+#                  here once the provider secrets are wired.
+#   3. release-full — full sweep + baseline comparison at release (added with the
+#                  first npm publication; out of scope until the release contour
+#                  goes live).
+# Trigger manually from the Actions tab; pick a real `provider` to get real numbers
+# (default `stub` is plumbing-only).
 on:
   workflow_dispatch:
     inputs:
