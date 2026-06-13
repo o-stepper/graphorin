@@ -122,8 +122,16 @@ function sseHandler(
       const subscriberId = `sse-${Math.random().toString(36).slice(2, 10)}`;
       const subscriptionId = `${subscriberId}-sub`;
       const authState = c.get('state').auth;
-      const grantedScopes = authState.kind === 'token' ? authState.grantedScopes : [];
-      const tokenId = authState.kind === 'token' ? authState.token.tokenId : 'sse-anon';
+      // IP-13: the anonymous (auth.kind='none') principal carries `admin:*` in
+      // grantedScopes, so the dispatcher's per-subject scope check still passes.
+      const grantedScopes =
+        authState.kind === 'token' || authState.kind === 'anonymous' ? authState.grantedScopes : [];
+      const tokenId =
+        authState.kind === 'token'
+          ? authState.token.tokenId
+          : authState.kind === 'anonymous'
+            ? 'anonymous'
+            : 'sse-anon';
       let queue: ServerMessage[] = [];
       let closedByBackpressure = false;
       const queueLimit = perConnectionQueueLimit;

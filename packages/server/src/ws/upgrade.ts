@@ -59,7 +59,19 @@ import type { WsTicket, WsTicketStore } from './ticket.js';
 export interface WsUpgradeOptions {
   readonly dispatcher: WsDispatcher;
   readonly tickets: WsTicketStore;
-  readonly verifier: TokenVerifier;
+  /**
+   * Token verifier for bearer / ticket upgrades. Optional only in the
+   * IP-13 no-auth loopback mode (`anonymous: true`), where there is no
+   * verifier to construct and every upgrade is accepted.
+   */
+  readonly verifier?: TokenVerifier;
+  /**
+   * IP-13: authentication is disabled server-wide (`auth.kind='none'`).
+   * Accept the upgrade unconditionally with a full (`admin:*`) scope grant
+   * instead of silently refusing to mount the WS route. Trusted-loopback
+   * / single-operator mode only.
+   */
+  readonly anonymous?: boolean;
   readonly runs?: RunStateTracker;
   readonly now?: () => number;
   /**
@@ -366,6 +378,12 @@ async function resolveUpgradeAuth(
       grantedScopes: state.auth.grantedScopes,
     };
   }
+  // IP-13: no-auth loopback mode — accept the upgrade with a full scope grant
+  // instead of silently failing to mount. Checked before ticket/bearer so the
+  // verifier may legitimately be absent.
+  if (options.anonymous === true) {
+    return { kind: 'ok', tokenId: 'anonymous', grantedScopes: ANONYMOUS_WS_SCOPES };
+  }
   const ticketValue = parseTicketSubprotocol(c.req.header('sec-websocket-protocol') ?? '');
   if (ticketValue !== undefined) {
     const consumed = options.tickets.consume(ticketValue);
@@ -376,6 +394,7 @@ async function resolveUpgradeAuth(
   }
   const header = c.req.header('authorization') ?? c.req.header('Authorization');
   if (header?.toLowerCase().startsWith('bearer ') === true) {
+    if (options.verifier === undefined) return { kind: 'denied', reason: 'auth.required' };
     const token = header.slice(7).trim();
     const verified = await options.verifier.verify(token);
     if (!verified.ok) return { kind: 'denied', reason: 'auth.invalid' };
@@ -394,6 +413,13 @@ async function resolveUpgradeAuth(
  * enforces. `scopeMatches` honours wildcards (`agents:*`, `admin:*`).
  */
 const INVOKE_SCOPE: ParsedScope = parseScope('agents:invoke');
+
+/**
+ * IP-13: full scope grant handed to a no-auth (`auth.kind='none'`) upgrade.
+ * `admin:*` matches every required scope, including the {@link INVOKE_SCOPE}
+ * gate on run cancellation.
+ */
+const ANONYMOUS_WS_SCOPES: ReadonlyArray<ParsedScope> = [parseScope('admin:*')];
 
 function grantsInvokeScope(granted: ReadonlyArray<ParsedScope>): boolean {
   for (const scope of granted) {

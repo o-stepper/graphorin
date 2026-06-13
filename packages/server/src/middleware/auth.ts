@@ -7,10 +7,45 @@
  * @packageDocumentation
  */
 
-import { type ParsedScope, type TokenVerifier, tryParseScope } from '@graphorin/security/auth';
+import {
+  type ParsedScope,
+  parseScope,
+  type TokenVerifier,
+  tryParseScope,
+} from '@graphorin/security/auth';
 import type { Context, MiddlewareHandler, Next } from 'hono';
 
 import type { ServerVariables } from '../internal/context.js';
+
+/**
+ * IP-13: the scope set granted to every request when `auth.kind = 'none'`.
+ * `admin:*` matches every required scope (see `@graphorin/security/auth`
+ * `scopeMatches`), so the trusted-loopback operator is uniformly authorized
+ * without special-casing each route.
+ */
+const ANONYMOUS_GRANTED_SCOPES: ReadonlyArray<ParsedScope> = Object.freeze([parseScope('admin:*')]);
+
+/**
+ * Build the no-auth middleware mounted when `auth.kind = 'none'`. It stamps
+ * `state.auth = { kind: 'anonymous', grantedScopes: [admin:*] }` so the
+ * scope middleware, SSE handler and replay routes all treat the request as a
+ * fully-authorized principal. This is the documented trusted-loopback /
+ * single-operator mode — never mount it on a non-loopback deployment without
+ * understanding that every endpoint becomes open.
+ *
+ * @stable
+ */
+export function createAnonymousAuthMiddleware(): MiddlewareHandler<{
+  Variables: ServerVariables;
+}> {
+  return async (c, next: Next) => {
+    c.set('state', {
+      ...c.get('state'),
+      auth: { kind: 'anonymous' as const, grantedScopes: ANONYMOUS_GRANTED_SCOPES },
+    });
+    await next();
+  };
+}
 
 /**
  * Options accepted by {@link createAuthMiddleware}. Tests inject a

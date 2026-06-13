@@ -19,7 +19,11 @@ export {
   createAuditMiddleware,
   HTTP_REQUEST_AUDIT_ACTION,
 } from './audit.js';
-export { type AuthMiddlewareOptions, createAuthMiddleware } from './auth.js';
+export {
+  type AuthMiddlewareOptions,
+  createAnonymousAuthMiddleware,
+  createAuthMiddleware,
+} from './auth.js';
 export { createCorsMiddleware } from './cors.js';
 export { createCsrfMiddleware } from './csrf.js';
 export {
