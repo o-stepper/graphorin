@@ -500,6 +500,118 @@ export async function runMemoryActivity(
 }
 
 // ---------------------------------------------------------------------------
+// `graphorin memory why` (RP-17 / X-3) — "why was this recalled?" Decodes the
+// `memory.search.semantic.explain` attribute the memory search records on each
+// `memory.search.semantic` span (now durable via the RP-17 `spans` table) into
+// the per-fact ranking signals (FTS bm25, vector similarity, fused RRF, decay).
+// ---------------------------------------------------------------------------
+
+/** A single decoded recall explanation surfaced by `graphorin memory why`. */
+export interface MemoryWhyRecall {
+  readonly spanId: string;
+  /** Span start time (unix nanos) of the recall. */
+  readonly at: number;
+  readonly results: ReadonlyArray<{
+    readonly id: string;
+    readonly rank: number;
+    readonly score: number;
+    readonly signals: Readonly<Record<string, number>>;
+  }>;
+}
+
+/** @stable */
+export interface MemoryWhyResult {
+  readonly recalls: ReadonlyArray<MemoryWhyRecall>;
+}
+
+/** @stable */
+export interface MemoryWhyOptions extends MemoryCommonOptions {
+  /** Restrict to one session's recall spans. */
+  readonly sessionId?: string;
+  /** Cap on the most-recent recall spans returned. Default 5. */
+  readonly limit?: number;
+}
+
+interface SpanExplainRow {
+  readonly span_id: string;
+  readonly start_unix_nano: number;
+  readonly attributes_json: string;
+}
+
+/**
+ * `graphorin memory why` — explain why facts were recalled, by decoding the
+ * `memory.search.semantic.explain` attribute off the persisted recall spans.
+ * Pure read-only inspection; requires the SQLite span exporter to have recorded
+ * spans (RP-17). Empty when nothing was recorded.
+ *
+ * @stable
+ */
+export async function runMemoryWhy(options: MemoryWhyOptions): Promise<MemoryWhyResult> {
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+  });
+  try {
+    const conn = ctx.store.connection;
+    const limit = options.limit ?? 5;
+    const rows =
+      options.sessionId !== undefined
+        ? conn.all<SpanExplainRow>(
+            `SELECT span_id, start_unix_nano, attributes_json FROM spans
+             WHERE type = 'memory.search.semantic' AND session_id = ?
+             ORDER BY start_unix_nano DESC LIMIT ?`,
+            [options.sessionId, limit],
+          )
+        : conn.all<SpanExplainRow>(
+            `SELECT span_id, start_unix_nano, attributes_json FROM spans
+             WHERE type = 'memory.search.semantic'
+             ORDER BY start_unix_nano DESC LIMIT ?`,
+            [limit],
+          );
+    const recalls = rows.map((r): MemoryWhyRecall => {
+      let results: MemoryWhyRecall['results'] = [];
+      try {
+        const attrs = JSON.parse(r.attributes_json) as Record<string, unknown>;
+        const raw = attrs['memory.search.semantic.explain'];
+        const parsed: unknown = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (Array.isArray(parsed)) {
+          results = Object.freeze(parsed) as MemoryWhyRecall['results'];
+        }
+      } catch {
+        // Malformed attribute payload — surface an empty recall, not a throw.
+      }
+      return Object.freeze({ spanId: r.span_id, at: r.start_unix_nano, results });
+    });
+    const out: MemoryWhyResult = Object.freeze({ recalls: Object.freeze(recalls) });
+    emitReport(options, out, () => {
+      const print = options.print ?? defaultPrintSink;
+      print(brand('memory why'));
+      if (recalls.length === 0) {
+        print(
+          `  ${statusMarker('info')} no recorded memory.search.semantic spans ` +
+            `(wire createSqliteSpanExporter into the tracer to record recall explanations)`,
+        );
+        return;
+      }
+      for (const rc of recalls) {
+        print(brand(`  recall @ ${rc.at} (span ${rc.spanId}):`));
+        for (const item of rc.results) {
+          const signals = Object.entries(item.signals)
+            .map(([k, v]) => `${k}=${v.toFixed(3)}`)
+            .join(', ');
+          print(
+            `    ${statusMarker('info')} #${item.rank} ${item.id} ` +
+              `score=${item.score.toFixed(3)} [${signals}]`,
+          );
+        }
+      }
+    });
+    return out;
+  } finally {
+    await ctx.close();
+  }
+}
+
+// ---------------------------------------------------------------------------
 // `graphorin memory review` (MCON-2) — list what the consolidator left in
 // quarantine across every tier, and promote a reviewed item out of it. The
 // promote path runs through the tier's `validate(...)`, so an injection-flagged
