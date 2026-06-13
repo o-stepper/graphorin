@@ -120,6 +120,20 @@ export type CompactionStrategy =
       /** Tool names whose results are never cleared. */
       readonly excludeTools?: ReadonlyArray<string>;
       /**
+       * A6 / SOTA-2 — recoverable clearing. Wire to a spill / `read_result`
+       * registry: cleared content is saved behind a handle and the placeholder
+       * references it so the model can re-fetch via `read_result`. Omitted ⇒ bare
+       * placeholders (irrecoverable). Only fires for clears that commit.
+       */
+      readonly externalize?: (
+        content: string,
+        info: {
+          readonly toolCallId: string;
+          readonly toolName?: string;
+          readonly clearedTokens: number;
+        },
+      ) => Promise<{ readonly handleId: string; readonly preview?: string }>;
+      /**
        * What to do when clearing leaves the buffer over the threshold. Defaults
        * to summarizing the already-cleared buffer (so the LLM sees the reduced
        * window); set `false` for a pure zero-LLM tier that stops after clearing.
