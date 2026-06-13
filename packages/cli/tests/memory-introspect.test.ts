@@ -155,6 +155,56 @@ describe('graphorin memory inspect', () => {
     expect(out.chain).toHaveLength(0);
   });
 
+  it('IP-22: surfaces importance (015) and linked canonical entities (016)', async () => {
+    const cfg = await seededConfig((conn) => {
+      conn.run(
+        'INSERT INTO facts (id, scope_user_id, text, sensitivity, status, provenance, valid_from, valid_to, supersedes, superseded_by, created_at, importance) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+        [
+          'fX',
+          'u1',
+          'Alice lives in Berlin',
+          'internal',
+          'active',
+          'extraction',
+          T0,
+          null,
+          null,
+          null,
+          T0,
+          0.8,
+        ],
+      );
+      const insertEntity = (id: string, name: string, mergedInto: string | null): void => {
+        conn.run(
+          'INSERT INTO entities (id, scope_user_id, name, normalized_name, merged_into, created_at) VALUES (?,?,?,?,?,?)',
+          [id, 'u1', name, name.toLowerCase(), mergedInto, T0],
+        );
+      };
+      insertEntity('berlin', 'Berlin', null);
+      insertEntity('berlin-old', 'Berlin DE', 'berlin'); // merged into 'berlin'
+      insertEntity('alice', 'Alice', null);
+      const link = (entityId: string, role: string): void => {
+        conn.run(
+          'INSERT INTO fact_entities (fact_id, entity_id, role, created_at) VALUES (?,?,?,?)',
+          ['fX', entityId, role, T0],
+        );
+      };
+      link('alice', 'subject');
+      link('berlin-old', 'object'); // links a merged entity → must resolve to canonical
+    });
+    const out = await runMemoryInspect({ config: cfg, factId: 'fX', print: () => undefined });
+
+    expect(out.fact?.importance).toBe(0.8);
+    expect(out.linkedEntities).toHaveLength(2);
+    const obj = out.linkedEntities.find((e) => e.role === 'object');
+    expect(obj?.name).toBe('Berlin'); // canonical, not 'Berlin DE'
+    expect(obj?.entityId).toBe('berlin');
+    expect(obj?.mergedFrom).toBe('berlin-old');
+    const subj = out.linkedEntities.find((e) => e.role === 'subject');
+    expect(subj?.name).toBe('Alice');
+    expect(subj?.mergedFrom).toBeNull();
+  });
+
   it('emits a JSON document under --json', async () => {
     const cfg = await seededConfig(seedGraph);
     let payload: unknown;

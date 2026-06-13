@@ -68,6 +68,7 @@ export {
   type MemoryCommonOptions,
   type MemoryConflictEntry,
   type MemoryHistoryEntry,
+  type MemoryInspectEntity,
   type MemoryInspectFact,
   type MemoryInspectOptions,
   type MemoryInspectResult,
