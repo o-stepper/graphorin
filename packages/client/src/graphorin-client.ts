@@ -43,6 +43,7 @@ import {
   ClientAbortedError,
   ClientNotConnectedError,
   GraphorinClientError,
+  kindForRpcCode,
   ProtocolViolationError,
   TransportFailedError,
 } from './errors.js';
@@ -128,6 +129,14 @@ export interface GraphorinClientOptions {
   readonly fetch?: typeof fetch;
   /** Optional client identifier surfaced on diagnostics. */
   readonly clientId?: string;
+  /**
+   * IP-19: per-RPC reply timeout in milliseconds. When set (and > 0), an RPC
+   * that receives no matching reply within this window rejects with a
+   * {@link TransportFailedError} instead of hanging forever on a
+   * non-responsive server. Default: unset — no timeout, so a legitimately
+   * slow server reply is never aborted (opt-in).
+   */
+  readonly rpcTimeoutMs?: number;
 }
 
 /**
@@ -529,9 +538,12 @@ export class GraphorinClient {
       const pending = this.#pending.get(frame.id);
       if (pending !== undefined) {
         this.#pending.delete(frame.id);
+        // IP-19: surface the server's error class (rate-limited, scope-denied,
+        // auth-failed, …) instead of collapsing every RPC failure to
+        // 'protocol-violation'.
         pending.reject(
           new GraphorinClientError(
-            'protocol-violation',
+            kindForRpcCode(frame.error.code),
             `Server returned an error for RPC '${frame.id}': ${frame.error.message} (code=${frame.error.code}).`,
           ),
         );
@@ -699,7 +711,10 @@ export class GraphorinClient {
     const queue: ServerEventFrame[] = [];
     const lifecycle: ServerLifecycleFrame[] = [];
     const replayMarkers: ServerReplayMarkerFrame[] = [];
-    const waiters: Array<(value: IteratorResult<ServerEventFrame>) => void> = [];
+    const waiters: Array<{
+      resolve: (value: IteratorResult<ServerEventFrame>) => void;
+      reject: (err: Error) => void;
+    }> = [];
     let closed = false;
     let closeError: Error | undefined;
     let lastEventId: string | undefined = args.snapshotEventId;
@@ -708,7 +723,7 @@ export class GraphorinClient {
       lastEventId = frame.eventId;
       const waiter = waiters.shift();
       if (waiter !== undefined) {
-        waiter({ value: frame, done: false });
+        waiter.resolve({ value: frame, done: false });
         return;
       }
       queue.push(frame);
@@ -722,10 +737,14 @@ export class GraphorinClient {
       while (waiters.length > 0) {
         const waiter = waiters.shift();
         if (waiter === undefined) continue;
+        // IP-19(c): a waiter blocked in next() must observe the SAME outcome a
+        // fresh next() would after close — reject with closeError when the
+        // stream tore down abnormally, rather than silently resolving done:true
+        // and swallowing the transport/abort failure.
         if (closeError !== undefined) {
-          waiter({ value: undefined as unknown as ServerEventFrame, done: true });
+          waiter.reject(closeError);
         } else {
-          waiter({ value: undefined as unknown as ServerEventFrame, done: true });
+          waiter.resolve({ value: undefined as unknown as ServerEventFrame, done: true });
         }
       }
     };
@@ -749,8 +768,8 @@ export class GraphorinClient {
                 done: true,
               });
             }
-            return new Promise<IteratorResult<ServerEventFrame>>((resolve) => {
-              waiters.push(resolve);
+            return new Promise<IteratorResult<ServerEventFrame>>((resolve, reject) => {
+              waiters.push({ resolve, reject });
             });
           },
           return: (): Promise<IteratorResult<ServerEventFrame>> => {
@@ -810,12 +829,47 @@ export class GraphorinClient {
     if (this.#transport === undefined) throw new ClientNotConnectedError();
     const id = this.#nextId();
     const frame = buildRpcFrame(method, id, params);
+    const timeoutMs = this.#options.rpcTimeoutMs;
     return new Promise((resolve, reject) => {
-      this.#pending.set(id, { resolve, reject });
+      // IP-19: arm an optional reply timer. Wrapping resolve/reject so that
+      // EVERY settle path (matching reply, disconnect, transport error) clears
+      // the timer — otherwise a stray timer could reject an already-settled id.
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const clear = (): void => {
+        if (timer !== undefined) {
+          clearTimeout(timer);
+          timer = undefined;
+        }
+      };
+      const pending: PendingRpc = {
+        resolve: (value) => {
+          clear();
+          resolve(value);
+        },
+        reject: (reason) => {
+          clear();
+          reject(reason);
+        },
+      };
+      this.#pending.set(id, pending);
+      if (timeoutMs !== undefined && timeoutMs > 0) {
+        timer = setTimeout(() => {
+          // Fire only if this exact request is still outstanding.
+          if (this.#pending.get(id) === pending) {
+            this.#pending.delete(id);
+            reject(
+              new TransportFailedError(
+                `RPC '${method}' (id=${id}) timed out after ${timeoutMs}ms with no server reply.`,
+              ),
+            );
+          }
+        }, timeoutMs);
+      }
       try {
         // Asserting non-null because we just verified above.
         (this.#transport as Transport).send(frame);
       } catch (err) {
+        clear();
         this.#pending.delete(id);
         reject(err);
       }
