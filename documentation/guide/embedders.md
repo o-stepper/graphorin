@@ -1,3 +1,8 @@
+---
+title: Embedders
+description: Embedders turn text into dense vectors for semantic memory search via the EmbedderProvider contract — local Transformers.js / Ollama backends, dimension locking, and migration.
+---
+
 # Embedders
 
 An **embedder** turns text into a dense vector so memory can do semantic

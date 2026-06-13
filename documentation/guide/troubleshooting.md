@@ -1,3 +1,8 @@
+---
+title: Troubleshooting
+description: Common Graphorin issues and how to resolve them — install & runtime, storage, providers, memory, and the standalone server.
+---
+
 # Troubleshooting
 
 Common issues and how to resolve them. If something here is missing, check the

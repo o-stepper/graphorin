@@ -1,3 +1,8 @@
+---
+title: Migration (pre-1.0)
+description: How Graphorin versions move before 1.0 — the versioning policy, storage migrations, and what to expect when upgrading.
+---
+
 # Migration (pre-1.0)
 
 Graphorin is pre-1.0. This page tracks how versions move and what to expect

@@ -1,3 +1,8 @@
+---
+title: Rerankers
+description: After memory retrieves candidates, a reranker reorders them by relevance before they enter the context window — a pluggable stage behind the ReRanker contract.
+---
+
 # Rerankers
 
 After memory retrieves candidates, a **reranker** reorders them by relevance
