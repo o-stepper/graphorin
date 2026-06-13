@@ -11,7 +11,7 @@
  *   chain, the per-step compaction lifecycle, the per-tool
  *   preferred-model resolution, the structured progress-artifact
  *   APIs, and the lateral-leak defense layer.
- * - `RunState.toJSON / fromJSON` helpers for caller-managed
+ * - `runStateToJSON / runStateFromJSON` helpers for caller-managed
  *   durable HITL.
  * - The handoff filter library.
  * - The agent-step-level fan-out helpers (`runFanOut`,

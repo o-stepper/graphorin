@@ -47,7 +47,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **`Dispatch`.** Workflow-engine primitive that schedules dynamic parallel tasks in the next execution step. Lives in `@graphorin/core/channels`.
 
-**Durable HITL.** Human-in-the-loop that survives a process restart. Powered by `RunState.toJSON()` / `RunState.fromJSON(...)` in the agent runtime and `pause` / `resume` in the workflow engine.
+**Durable HITL.** Human-in-the-loop that survives a process restart. Powered by `runStateToJSON()` / `runStateFromJSON()` in the agent runtime and `pause` / `resume` in the workflow engine.
 
 ## E
 
@@ -121,7 +121,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **`RunContext`.** The context object passed into tool `execute(input, ctx)` calls. Carries `signal`, `tracer`, `fetch`, scope-bound secrets, run identifiers.
 
-**`RunState`.** Serialisable snapshot of an agent run. `RunState.toJSON()` / `RunState.fromJSON(serialised, agent)` round-trip the full state.
+**`RunState`.** Serialisable snapshot of an agent run. `runStateToJSON(state)` / `runStateFromJSON(serialised)` round-trip the full state.
 
 ## S
 
