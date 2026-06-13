@@ -817,6 +817,12 @@ interface MountRoutesContext {
   readonly consolidatorDaemon?: ConsolidatorDaemon;
 }
 
+/** IP-23: is `host` a loopback interface (so an open /metrics is not exposed)? */
+function isLoopbackHost(host: string): boolean {
+  const h = host.trim().toLowerCase();
+  return h === '127.0.0.1' || h === '::1' || h === '[::1]' || h === 'localhost';
+}
+
 function mountRoutes(
   app: Hono<{ Variables: ServerVariables }>,
   config: ServerConfigSpec,
@@ -842,6 +848,17 @@ function mountRoutes(
   app.route(`${base}/health`, health);
 
   if (config.metrics.enabled) {
+    // IP-23: an unauthenticated /metrics endpoint leaks operational intel
+    // (trigger ids in labels, consolidator budgets). It is fine on a loopback
+    // host, but binding a non-loopback host with auth off silently exposes it.
+    if (!config.metrics.requireAuth && !isLoopbackHost(config.server.host)) {
+      console.warn(
+        `[graphorin/server] WARN: /metrics is unauthenticated (metrics.requireAuth=false) and ` +
+          `the server binds the non-loopback host '${config.server.host}'. The exposition leaks ` +
+          `operational detail to anyone who can reach it — set metrics.requireAuth=true or bind a ` +
+          `loopback host.`,
+      );
+    }
     const metricsRoute = createMetricsRoutes({
       registry: ctx.metricRegistry,
       requireAuth: config.metrics.requireAuth,
