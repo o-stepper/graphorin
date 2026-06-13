@@ -4,7 +4,6 @@
  *
  * Phase 16 final ruleset:
  *
- *   - `no-console-in-public-api`         — scaffold (no-op).
  *   - `no-secret-unwrap`                  — DEC-020 / ADR-026. Active.
  *   - `no-secret-in-deps`                 — DEC-137. Active.
  *   - `provider-middleware-order`         — DEC-145 / ADR-039. Active.
@@ -15,16 +14,14 @@
  *   - `tool-examples-recommended`         — Active.
  *   - `tool-parameter-naming`             — Active.
  *
- * `no-console-in-public-api` is intentionally a no-op for v0.1 — the
- * full implementation is a stylistic refinement that depends on the
- * post-v0.1 public-API surface freeze and does not affect the
- * security guarantees this plugin enforces.
+ * (The former `no-console-in-public-api` scaffold — a permanent no-op
+ * since Phase 01 — was removed in the v0.4 hygiene pass (PS-21) rather
+ * than shipped inert.)
  *
  * @packageDocumentation
  */
 
 import noBareToolExec from './rules/no-bare-tool-exec.js';
-import noConsoleInPublicApi from './rules/no-console-in-public-api.js';
 import noImplicitNetworkCall from './rules/no-implicit-network-call.js';
 import noSecretInDeps from './rules/no-secret-in-deps.js';
 import noSecretUnwrap from './rules/no-secret-unwrap.js';
@@ -43,7 +40,6 @@ export const meta = {
 
 export const rules = {
   'no-bare-tool-exec': noBareToolExec,
-  'no-console-in-public-api': noConsoleInPublicApi,
   'no-implicit-network-call': noImplicitNetworkCall,
   'no-secret-in-deps': noSecretInDeps,
   'no-secret-unwrap': noSecretUnwrap,

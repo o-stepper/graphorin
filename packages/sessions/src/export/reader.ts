@@ -58,7 +58,8 @@ export interface SessionExportWarning {
     | 'unknown-record'
     | 'schema-future-minor'
     | 'embedder-mismatch-dropped'
-    | 'reasoning-meta-extension';
+    | 'reasoning-meta-extension'
+    | 'footer-count-mismatch';
   readonly message: string;
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
@@ -165,6 +166,47 @@ export function readSessionExport(
     if (expected !== actual) {
       throw new SessionExportChecksumMismatchError(expected, actual);
     }
+  }
+
+  // RP-7: cross-check the footer's declared counts against what we actually
+  // parsed. Without this a truncated body (dropped records) reads clean when
+  // no `--hash` checksum is present. The writer counts the same way (every
+  // body record bumps `recordCount`; per-kind counters track the rest).
+  const parsedMessageCount = records.filter((r) => r.kind === 'message').length;
+  const parsedHandoffCount = records.filter((r) => r.kind === 'handoff').length;
+  const parsedAgentCount = records.filter((r) => r.kind === 'agent').length;
+  const countMismatches: string[] = [];
+  if (footer.recordCount !== records.length) {
+    countMismatches.push(`recordCount ${footer.recordCount} ≠ ${records.length}`);
+  }
+  if (footer.messageCount !== parsedMessageCount) {
+    countMismatches.push(`messageCount ${footer.messageCount} ≠ ${parsedMessageCount}`);
+  }
+  if (footer.handoffCount !== parsedHandoffCount) {
+    countMismatches.push(`handoffCount ${footer.handoffCount} ≠ ${parsedHandoffCount}`);
+  }
+  if (footer.agentCount !== parsedAgentCount) {
+    countMismatches.push(`agentCount ${footer.agentCount} ≠ ${parsedAgentCount}`);
+  }
+  if (countMismatches.length > 0) {
+    warnings.push({
+      kind: 'footer-count-mismatch',
+      message: `Footer counts do not match the parsed records (possible truncation): ${countMismatches.join('; ')}.`,
+      metadata: {
+        footer: {
+          recordCount: footer.recordCount,
+          messageCount: footer.messageCount,
+          handoffCount: footer.handoffCount,
+          agentCount: footer.agentCount,
+        },
+        actual: {
+          recordCount: records.length,
+          messageCount: parsedMessageCount,
+          handoffCount: parsedHandoffCount,
+          agentCount: parsedAgentCount,
+        },
+      },
+    });
   }
 
   // Embedder-mismatch warnings — single warning per mismatch encountered.
