@@ -40,7 +40,7 @@ Sub-paths:
 - `@graphorin/core/types` — `Message`, `AgentEvent`, `WorkflowEvent`, `RunContext`, `RunState`, `Usage`, …
 - `@graphorin/core/contracts` — `Provider`, `MemoryStore`, `Tracer`, `Sandbox`, …
 - `@graphorin/core/utils` — tiny dependency-free helpers (`collect`, `mapStream`, `merge`, `withSignal`, `md5`, `xxhash`).
-- `@graphorin/core/channels` — the Graphorin-named workflow primitive set: `LatestValue`, `Reducer`, `Stream`, `Barrier`, `Ephemeral`, `AnyValue`.
+- `@graphorin/core/channels` — the Graphorin-named workflow primitive set: `LatestValue`, `Reducer`, `Stream`, `Barrier`, `Ephemeral`, `AnyValue`, `ListAggregate`.
 
 ### Tier 1 — Cross-cutting infrastructure
 
@@ -71,7 +71,7 @@ Sub-paths:
 ### Tier 5 — Runtime
 
 - **`@graphorin/agent`** — agent runtime: typed `model -> tool calls -> model` loop, streaming events, durable HITL approvals, multi-agent handoffs, model fallback, fan-out, evaluator-optimizer loops, lateral-leak defenses.
-- **`@graphorin/workflow`** — durable step-graph runtime with checkpoints, the `pause(value)` / `resume(directive)` lifecycle, `Dispatch(...)` for dynamic parallelism, four channel kinds.
+- **`@graphorin/workflow`** — durable step-graph runtime with checkpoints, the `pause(value)` / `resume(directive)` lifecycle, `Dispatch(...)` for dynamic parallelism, seven channel kinds.
 
 ### Tier 6 — Standalone server + DX
 

@@ -1,3 +1,8 @@
+---
+title: Storage backends
+description: The store contracts behind Graphorin persistence — memory, sessions, workflow checkpoints, triggers, auth — with a default SQLite implementation and opt-in encryption-at-rest.
+---
+
 # Storage backends
 
 Graphorin persists everything — memory tiers, sessions, workflow checkpoints,

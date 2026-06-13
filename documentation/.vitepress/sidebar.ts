@@ -58,6 +58,8 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Standalone server', link: '/guide/standalone-server' },
       { text: 'CLI', link: '/guide/cli' },
       { text: 'Deployment', link: '/guide/deployment' },
+      { text: 'Troubleshooting', link: '/guide/troubleshooting' },
+      { text: 'Migration (pre-1.0)', link: '/guide/migration' },
     ],
   },
   {
