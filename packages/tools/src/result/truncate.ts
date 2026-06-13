@@ -344,6 +344,26 @@ function sliceByTokens(
   return end === 'head' ? body.slice(0, lo) : body.slice(-lo);
 }
 
+/**
+ * A8: an actionable next step for the model, not just "this was truncated".
+ * An opaque annotation makes the model retry blindly or give up; a concrete
+ * recovery path (narrow the request, or fetch the spilled handle) keeps the
+ * self-correction loop productive.
+ */
+function truncationHint(strategy: TruncationStrategy): string {
+  switch (strategy) {
+    case 'middle':
+    case 'tail':
+      return ' re-run narrower (date range/filter/limit) for the omitted part';
+    case 'spill-to-file':
+      return ' full result via read_result(handle)';
+    case 'summarize':
+      return ' re-run narrower for verbatim detail';
+    default:
+      return '';
+  }
+}
+
 function renderAnnotation(
   strategy: TruncationStrategy,
   meta: Readonly<Record<string, unknown>>,
@@ -352,7 +372,7 @@ function renderAnnotation(
     .filter(([, v]) => v !== undefined)
     .map(([k, v]) => `${k}=${formatValue(v)}`)
     .join(' ');
-  return `${ANNOTATION_PREFIX} strategy=${strategy} ${fields} ${ANNOTATION_SUFFIX}`;
+  return `${ANNOTATION_PREFIX} strategy=${strategy} ${fields}${truncationHint(strategy)} ${ANNOTATION_SUFFIX}`;
 }
 
 function formatValue(value: unknown): string {
