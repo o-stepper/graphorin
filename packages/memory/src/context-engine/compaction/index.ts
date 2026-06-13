@@ -5,6 +5,13 @@
  */
 
 export {
+  CLEARED_TOOL_RESULT_MARKER,
+  type ClearToolResultsOptions,
+  type ClearToolResultsOutcome,
+  clearOldToolResults,
+  DEFAULT_KEEP_TOOL_USES,
+} from './clear-tool-results.js';
+export {
   DEFAULT_PRESERVE_RECENT_TURNS,
   type ExecuteCompactionInput,
   executeCompaction,
