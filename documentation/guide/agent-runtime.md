@@ -12,7 +12,7 @@ description: The typed model -> tool calls -> model loop, streaming events, dura
 Every primitive that is useful from a script ships from the npm package without the optional standalone server:
 
 - `createAgent({...})`
-- `RunState.toJSON()` / `RunState.fromJSON(serialized, agent)`
+- `runStateToJSON(state)` / `runStateFromJSON(serialized)`
 - The filter library
 - `evaluatorOptimizer({...})`
 - `agent.fanOut({...})`
@@ -173,7 +173,7 @@ Governance is preserved: each in-script call runs through the **same executor**,
 
 ## Durable HITL
 
-`runStateToJSON(runState)` / `runStateFromJSON(serialised, agent)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can resume by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
+`runStateToJSON(runState)` / `runStateFromJSON(serialised)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can resume by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
 
 > **Caveat — current behaviour.** On resume a *granted* approval is recorded, but the approved tool is **not re-executed**: the model receives a placeholder result rather than the real tool output, and a model that re-issues the call re-suspends. Do **not** rely on durable-HITL resume to actually perform a side-effecting action (payments, refunds, external writes) — use it to gate, persist, and audit the *decision*, and perform the side effect through your own code once approved. Re-executing approved calls through the executor on resume is a tracked follow-up.
 

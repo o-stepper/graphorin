@@ -100,7 +100,7 @@ export class EvaluatorOptimizerConfigError extends AgentRuntimeError {
 }
 
 /**
- * Thrown by `RunState.fromJSON(...)` when the agent name in the
+ * Thrown by `runStateFromJSON(...)` when the agent name in the
  * serialized state cannot be resolved against the supplied agent
  * graph (renamed agent / removed handoff).
  *
@@ -111,7 +111,7 @@ export class AgentResolutionError extends AgentRuntimeError {
   constructor(agentId: string) {
     super(
       'agent-resolution-failed',
-      `RunState.fromJSON: agent '${agentId}' is not registered in the supplied graph.`,
+      `runStateFromJSON: agent '${agentId}' is not registered in the supplied graph.`,
       'AgentResolutionError',
     );
     this.agentId = agentId;
@@ -176,7 +176,7 @@ export class MultipleHandoffsInStepError extends AgentRuntimeError {
 }
 
 /**
- * Thrown by `RunState.fromJSON(...)` when the version field in the
+ * Thrown by `runStateFromJSON(...)` when the version field in the
  * serialized state is from a future major version of the framework.
  *
  * @stable
@@ -197,7 +197,7 @@ export class RunStateVersionUnsupportedError extends AgentRuntimeError {
 }
 
 /**
- * Thrown by `RunState.fromJSON(...)` when the supplied JSON does not
+ * Thrown by `runStateFromJSON(...)` when the supplied JSON does not
  * shape-match the documented {@link SerializedRunState}.
  *
  * @stable

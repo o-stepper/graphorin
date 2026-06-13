@@ -53,7 +53,7 @@ runtime) is combined with the timeout.
 ### Transformers.js
 
 ```ts
-createTransformersEmbedder({
+createTransformersJsEmbedder({
   model: 'Xenova/multilingual-e5-base',
   cacheDir: process.env.GRAPHORIN_CACHE_DIR, // honoured automatically
 });
@@ -65,7 +65,7 @@ networked machine, copy the cache, run offline thereafter).
 
 ## Embedder identity & migrations
 
-Each embedder reports a stable canonical id (`embedderId()`) derived from its
+Each embedder reports a stable canonical id (`id()`) derived from its
 model + config (for Ollama, including the resolved model digest). Memory keys
 vector rows by that id, so swapping models or upgrading the underlying model
 triggers the configured migration policy rather than silently mixing
