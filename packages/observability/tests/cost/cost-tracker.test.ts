@@ -25,8 +25,33 @@ describe('@graphorin/observability/cost — createCostTracker', () => {
     expect(usage.totalTokens).toBe(250);
     expect(usage.callCount).toBe(2);
     expect(usage.cost?.amount).toBeCloseTo(0.75);
+    expect(usage.mixedCurrency).toBe(false); // single currency
     expect(usage.byModel).toHaveLength(1);
     expect(usage.byModel[0]?.model).toBe('gpt-4o');
+  });
+
+  it('RP-22: flags mixed-currency aggregation instead of silently overwriting the currency', () => {
+    const tracker = createCostTracker();
+    tracker.record({
+      spanId: 's1',
+      model: 'm',
+      promptTokens: 1,
+      completionTokens: 1,
+      cost: { amount: 1, currency: 'USD' },
+      sessionId: 'mix',
+    });
+    tracker.record({
+      spanId: 's2',
+      model: 'm',
+      promptTokens: 1,
+      completionTokens: 1,
+      cost: { amount: 1, currency: 'EUR' },
+      sessionId: 'mix',
+    });
+    const usage = tracker.usage('session', 'mix');
+    expect(usage.mixedCurrency).toBe(true); // pre-RP-22 this silently summed
+    expect(usage.cost?.currency).toBe('USD'); // first currency kept, not overwritten by EUR
+    expect(usage.byModel[0]?.mixedCurrency).toBe(true);
   });
 
   it('rolls up across nested parent-child spans', () => {

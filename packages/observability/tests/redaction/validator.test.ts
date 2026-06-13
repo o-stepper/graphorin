@@ -32,6 +32,17 @@ describe('@graphorin/observability/redaction — validator', () => {
     expect(v.counters().matchesByPattern.email).toBeGreaterThan(0);
   });
 
+  it('RP-21: redacts a Luhn-valid PAN but leaves a 13-digit epoch timestamp alone', () => {
+    const v = createRedactionValidator({ minTier: 'public' });
+    // A real Visa test number (Luhn-valid) is redacted.
+    const pan = v.validate({ value: 'card 4111 1111 1111 1111', tier: 'public' });
+    expect(pan?.value).toContain('[REDACTED creditcard]');
+    // A 13-digit millisecond epoch is not a valid PAN (Luhn fails) — pre-RP-21
+    // the regex masked it, corrupting the payload.
+    const ts = v.validate({ value: 'ts=1718000000000', tier: 'public' });
+    expect(ts?.value).toBe('ts=1718000000000');
+  });
+
   it('throws when failOnUnredactedSensitive is true and a tier exceeds the floor', () => {
     const v = createRedactionValidator({ minTier: 'public', failOnUnredactedSensitive: true });
     expect(() => v.validate({ value: 'x', tier: 'secret' })).toThrow(RedactionValidationError);

@@ -49,6 +49,12 @@ export interface CostSnapshot {
   readonly reasoningTokens: number;
   readonly callCount: number;
   readonly cost: Cost | null;
+  /**
+   * RP-22: `true` when records carrying differing currencies were aggregated
+   * into this snapshot. `cost.amount` is then a sum across currencies and must
+   * not be treated as a single clean figure.
+   */
+  readonly mixedCurrency: boolean;
   readonly byModel: ReadonlyArray<{
     readonly model: string;
     readonly promptTokens: number;
@@ -56,6 +62,7 @@ export interface CostSnapshot {
     readonly reasoningTokens: number;
     readonly callCount: number;
     readonly cost: Cost | null;
+    readonly mixedCurrency: boolean;
   }>;
 }
 

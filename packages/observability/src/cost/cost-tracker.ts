@@ -45,6 +45,8 @@ interface AggregateBucket {
   callCount: number;
   costAmount: number;
   costCurrency: string | null;
+  /** RP-22: set when records carrying differing currencies are aggregated. */
+  mixedCurrency: boolean;
   byModel: Map<string, AggregateBucket>;
   exceeded: boolean;
 }
@@ -57,9 +59,23 @@ function freshBucket(): AggregateBucket {
     callCount: 0,
     costAmount: 0,
     costCurrency: null,
+    mixedCurrency: false,
     byModel: new Map(),
     exceeded: false,
   };
+}
+
+// RP-22: accumulate a cost without silently overwriting the currency. The
+// first currency seen is kept; a record in a different currency flags the
+// bucket as `mixedCurrency` so a USD + EUR total is never reported as one
+// clean figure.
+function addCost(bucket: AggregateBucket, cost: Cost): void {
+  if (bucket.costCurrency !== null && bucket.costCurrency !== cost.currency) {
+    bucket.mixedCurrency = true;
+  } else if (bucket.costCurrency === null) {
+    bucket.costCurrency = cost.currency;
+  }
+  bucket.costAmount += cost.amount;
 }
 
 function combine(target: AggregateBucket, input: CostRecordInput): void {
@@ -67,19 +83,13 @@ function combine(target: AggregateBucket, input: CostRecordInput): void {
   target.completionTokens += input.completionTokens;
   target.reasoningTokens += input.reasoningTokens ?? 0;
   target.callCount += 1;
-  if (input.cost !== undefined) {
-    target.costAmount += input.cost.amount;
-    target.costCurrency = input.cost.currency;
-  }
+  if (input.cost !== undefined) addCost(target, input.cost);
   const modelBucket = target.byModel.get(input.model) ?? freshBucket();
   modelBucket.promptTokens += input.promptTokens;
   modelBucket.completionTokens += input.completionTokens;
   modelBucket.reasoningTokens += input.reasoningTokens ?? 0;
   modelBucket.callCount += 1;
-  if (input.cost !== undefined) {
-    modelBucket.costAmount += input.cost.amount;
-    modelBucket.costCurrency = input.cost.currency;
-  }
+  if (input.cost !== undefined) addCost(modelBucket, input.cost);
   target.byModel.set(input.model, modelBucket);
 }
 
@@ -95,6 +105,7 @@ function snapshotOf(bucket: AggregateBucket): CostSnapshot {
     totalTokens: bucket.promptTokens + bucket.completionTokens + bucket.reasoningTokens,
     callCount: bucket.callCount,
     cost,
+    mixedCurrency: bucket.mixedCurrency,
     byModel: [...bucket.byModel.entries()].map(([model, b]) => ({
       model,
       promptTokens: b.promptTokens,
@@ -102,6 +113,7 @@ function snapshotOf(bucket: AggregateBucket): CostSnapshot {
       reasoningTokens: b.reasoningTokens,
       callCount: b.callCount,
       cost: b.costCurrency === null ? null : { amount: b.costAmount, currency: b.costCurrency },
+      mixedCurrency: b.mixedCurrency,
     })),
   };
 }
@@ -113,6 +125,7 @@ const ZERO: CostSnapshot = Object.freeze({
   totalTokens: 0,
   callCount: 0,
   cost: null,
+  mixedCurrency: false,
   byModel: [],
 });
 
