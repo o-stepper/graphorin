@@ -58,17 +58,23 @@ const mcpTools = await stdioClient.toTools({
   namespace: 'fs',
   // Optional `defer_loading` override; defaults to auto when there
   // are more than 10 tools.
-  deferLoading: false,
+  defer_loading: false,
   // Per-tool side-effect classification override (DEC-153).
   sideEffectClassByTool: {
     'fs/write': 'side-effecting',
   },
 });
 
-const registry = createToolRegistry({
-  tools: [...mcpTools, ...firstPartyTools],
-  collisionStrategy: 'auto-prefix',
-});
+// `createToolRegistry()` takes no tool list. Register each tool with its
+// source — the strategy-aware registry uses the `serverIdentity` to
+// auto-prefix names that collide across servers.
+const registry = createToolRegistry();
+for (const tool of mcpTools) {
+  registry.register(tool, { kind: 'mcp', serverIdentity: 'filesystem' });
+}
+for (const tool of firstPartyTools) {
+  registry.register(tool, { kind: 'first-party' });
+}
 ```
 
 The adapter:
