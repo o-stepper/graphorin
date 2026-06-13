@@ -1245,6 +1245,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // AG-1: approved gated calls collected from a resume directive, executed
     // for real once every approval is resolved (see the dispatch below).
     const resumedApprovedCalls: ToolCall[] = [];
+    // Step-journal: tool calls already completed on a prior resume are recorded
+    // in the journal (`state.steps`); a re-resume must not run their side effects
+    // again. Collect their ids so an approved call already journaled is replayed,
+    // not re-executed (exactly-once; AG-1).
+    const journaledCallIds = new Set<string>();
+    for (const step of state.steps) {
+      for (const completed of step.toolCalls) journaledCallIds.add(completed.call.toolCallId);
+    }
 
     // Process resume directive — apply approval decisions to any
     // pending approvals captured in the previous suspend.
@@ -1266,6 +1274,18 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             type: 'tool.approval.granted',
             toolCallId: approval.toolCallId,
           };
+          // Step-journal: if this approved call already ran on a prior resume —
+          // journaled in `state.steps` with its result still in the message
+          // buffer — replay it instead of running the side effect again
+          // (exactly-once across re-resumes). If the journal entry exists but its
+          // result message was lost, fall through to a single re-execution (the
+          // documented "at most one re-execution" bound).
+          if (
+            journaledCallIds.has(approval.toolCallId) &&
+            messages.some((m) => m.role === 'tool' && m.toolCallId === approval.toolCallId)
+          ) {
+            continue;
+          }
           // AG-1: queue the approved call for REAL execution once every
           // approval is resolved (dispatched below). It runs through the same
           // ToolExecutor as any other tool call — taint / audit / result
