@@ -87,10 +87,10 @@ The loader supports four source kinds:
 
 | Source | Shape | Trust posture |
 |---|---|---|
-| `inline` | `{ kind: 'inline', skill }` | Programmatic, fully trusted. |
-| `folder` | `{ kind: 'folder', path }` | Trusted by default; passes through the same validator pipeline. |
-| `npm-package` | `{ kind: 'npm-package', packageName, version? }` | Untrusted; install delegated to `@graphorin/security/supply-chain` with `--ignore-scripts` enforced and an Ed25519 signature requirement. |
-| `git-repo` | `{ kind: 'git-repo', url, ref? }` | Untrusted; shallow-clone via the supply-chain helper, pinned to a ref, signature-verified. |
+| `inline` | `{ kind: 'inline', skill }` | Programmatic, fully trusted (the host process supplies the code). |
+| `folder` | `{ kind: 'folder', path, trustLevel? }` | A directory on disk **cannot self-promote**: its frontmatter `graphorin-trust-level: trusted` / `trusted-with-scripts` is capped at `unknown` (sandbox forced, outputs taint-marked) unless the operator passes an explicit `trustLevel`. Trust is granted by the integrator, never the artifact. |
+| `npm-package` | `{ kind: 'npm-package', packageName, version?, trustLevel? }` | Untrusted by default; install delegated to `@graphorin/security/supply-chain` with `--ignore-scripts` enforced and an Ed25519 signature requirement. An operator `trustLevel` overrides the default. |
+| `git-repo` | `{ kind: 'git-repo', url, ref?, trustLevel? }` | Untrusted by default; shallow-clone via the supply-chain helper, pinned to a ref, signature-verified. An operator `trustLevel` overrides the default. |
 
 ## Field-resolution precedence
 

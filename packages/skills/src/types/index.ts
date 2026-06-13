@@ -70,7 +70,18 @@ export type SkillTrustLevelValue = SkillsTrustLevel;
  * @stable
  */
 export type SkillSource =
-  | { readonly kind: 'folder'; readonly path: string }
+  | {
+      readonly kind: 'folder';
+      readonly path: string;
+      /**
+       * Operator-supplied trust level. When present it overrides the
+       * skill's self-declared `graphorin-trust-level`. Without it, a
+       * folder's self-declared `trusted` / `trusted-with-scripts` is
+       * capped at `'unknown'` — a downloaded directory cannot promote
+       * itself; trust is granted by the integrator, never the artifact.
+       */
+      readonly trustLevel?: SkillTrustLevel;
+    }
   | {
       readonly kind: 'npm-package';
       readonly packageName: string;

@@ -286,7 +286,27 @@ async function loadFromFolder(
       cause: err,
     });
   }
-  const { metadata, diagnostics, body } = parseAndValidate(skillMd, options);
+  const parsed = parseAndValidate(skillMd, options);
+  const { diagnostics, body } = parsed;
+  // RP-9: trust is granted by the integrator, never the artifact. An operator
+  // override on the source wins; absent one, a folder's self-declared
+  // 'trusted'/'trusted-with-scripts' is capped at 'unknown' so a downloaded
+  // directory cannot promote itself out of the sandbox + taint-marking. The
+  // resolved level is written back onto the metadata so every downstream
+  // consumer (tool stamping, sandbox tier, inbound sanitization) sees it.
+  const operatorTrust = extractTrustLevel(source);
+  const effectiveTrust: SkillsTrustLevel =
+    operatorTrust ??
+    (source.kind === 'folder'
+      ? capSelfDeclaredTrust(parsed.metadata.graphorinTrustLevel)
+      : parsed.metadata.graphorinTrustLevel);
+  const metadata: SkillMetadata =
+    effectiveTrust === parsed.metadata.graphorinTrustLevel
+      ? parsed.metadata
+      : (Object.freeze({
+          ...parsed.metadata,
+          graphorinTrustLevel: effectiveTrust,
+        }) as SkillMetadata);
 
   let signature: SkillSignatureVerificationResult | undefined = precomputedSignature;
   if (signature === undefined && metadata.graphorinSignaturePresent) {
@@ -320,7 +340,7 @@ async function loadFromFolder(
             ? { kind: 'git-repo', url: source.url }
             : { kind: 'git-repo', url: source.url, ref: source.ref }
           : { kind: 'folder', path: absolutePath },
-    coerceForSupplyChain(extractTrustLevel(source) ?? metadata.graphorinTrustLevel),
+    coerceForSupplyChain(metadata.graphorinTrustLevel),
   );
 
   return buildSkill({
@@ -631,8 +651,21 @@ function describeSource(source: SkillSource): string {
 }
 
 function extractTrustLevel(source: SkillSource): SkillsTrustLevel | undefined {
-  if (source.kind === 'npm-package' || source.kind === 'git-repo') return source.trustLevel;
+  if (source.kind === 'npm-package' || source.kind === 'git-repo' || source.kind === 'folder')
+    return source.trustLevel;
   return undefined;
+}
+
+/**
+ * Cap a folder skill's self-declared trust level. A directory on disk —
+ * possibly downloaded from the internet — cannot self-promote to a trusted
+ * tier without an operator override (RP-9): `trusted` /
+ * `trusted-with-scripts` collapse to `'unknown'` (sandbox forced, signature
+ * optional, outputs taint-marked), while `untrusted` / `unknown` pass
+ * through unchanged.
+ */
+function capSelfDeclaredTrust(level: SkillsTrustLevel): SkillsTrustLevel {
+  return level === 'trusted' || level === 'trusted-with-scripts' ? 'unknown' : level;
 }
 
 /**

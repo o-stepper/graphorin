@@ -3,8 +3,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 import { loadSkillFromSource, loadSkills } from '../src/loader/index.js';
+import { stampSkillToolFromMetadata } from '../src/registry/bridge.js';
 
 let tmpRoot: string;
 
@@ -107,6 +109,76 @@ describe('loadSkillFromSource — folder', () => {
     expect(skill.metadata.graphorinTrustLevel).toBe('untrusted');
     expect(skill.metadata.graphorinHandoffInputFilter).toEqual({ kind: 'lastUser' });
     expect(skill.toolDeclarations()).toEqual([{ name: 'read_file' }, { name: 'write_file' }]);
+  });
+
+  it('RP-9: a folder skill cannot self-promote to trusted without an operator override', async () => {
+    const dir = await makeSkillDir(
+      'self-trusted',
+      [
+        '---',
+        'name: self-trusted',
+        'description: A downloaded folder that self-declares a trusted level.',
+        'graphorin-trust-level: trusted',
+        '---',
+        'BODY',
+      ].join('\n'),
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
+    // Artifact self-declaration is capped at 'unknown' — trust is granted by
+    // the integrator, never the downloaded folder.
+    expect(skill.metadata.graphorinTrustLevel).toBe('unknown');
+    const stamped = stampSkillToolFromMetadata(
+      {
+        name: 'risky',
+        description: 'tool',
+        inputSchema: z.object({}),
+        sandboxPolicy: 'none',
+        async execute() {
+          return {};
+        },
+      },
+      skill.metadata,
+    );
+    expect(stamped.source).toEqual({
+      kind: 'skill',
+      skillName: 'self-trusted',
+      trustLevel: 'untrusted',
+    });
+    expect(stamped.tool.inboundSanitization).toBe('detect-and-strip-and-wrap');
+    expect(stamped.resolvedSandbox.kind).toBe('worker-threads');
+  });
+
+  it('RP-9: an explicit operator trustLevel override on a folder source wins', async () => {
+    const dir = await makeSkillDir(
+      'operator-trusted',
+      [
+        '---',
+        'name: operator-trusted',
+        'description: A folder the operator explicitly elects to trust.',
+        'graphorin-trust-level: unknown',
+        '---',
+        'BODY',
+      ].join('\n'),
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir, trustLevel: 'trusted' });
+    expect(skill.metadata.graphorinTrustLevel).toBe('trusted');
+    const stamped = stampSkillToolFromMetadata(
+      {
+        name: 'safe',
+        description: 'tool',
+        inputSchema: z.object({}),
+        sandboxPolicy: 'none',
+        async execute() {
+          return {};
+        },
+      },
+      skill.metadata,
+    );
+    expect(stamped.source).toEqual({
+      kind: 'skill',
+      skillName: 'operator-trusted',
+      trustLevel: 'trusted',
+    });
   });
 
   it('untrusted + missing handoff filter triggers a warn diagnostic', async () => {
