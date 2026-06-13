@@ -163,10 +163,12 @@ export async function createWsUpgradeEvents(
         return;
       }
       if (!initialized && !isInitializeRequest(message) && !isPingRequest(message)) {
+        // IP-21: a frame before `initialize` is a protocol-sequencing error,
+        // not an auth failure — the connection is already authenticated.
         sendRpcError(
           ws,
           message.id,
-          RPC_ERROR_CODES.AUTH_REQUIRED,
+          RPC_ERROR_CODES.PROTOCOL_VIOLATION,
           'Send `initialize` before any other RPC.',
         );
         return;
