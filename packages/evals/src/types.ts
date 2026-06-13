@@ -54,6 +54,13 @@ export interface RunOptions<I, O> {
   readonly concurrency?: number;
   readonly signal?: AbortSignal;
   /**
+   * How to handle `signal` abort. Default (`false`): stop dispatching and
+   * resolve with a **partial** {@link EvalReport} (`aborted: true`) covering
+   * the cases that finished — a long judged run shouldn't lose all completed
+   * work to a Ctrl+C. Set `true` to throw the abort reason instead.
+   */
+  readonly throwOnAbort?: boolean;
+  /**
    * Optional progress hook invoked after every case. Useful for
    * terminal reporters that want a per-case heartbeat.
    */

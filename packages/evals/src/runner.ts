@@ -43,7 +43,9 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
 
   async function worker(): Promise<void> {
     while (true) {
-      throwIfAborted(signal);
+      // EB-14: stop dispatching new work on abort, but don't throw — whatever
+      // already completed must survive into a partial report.
+      if (isAborted(signal)) return;
       const myIndex = nextWorkIndex++;
       if (myIndex >= queue.length) return;
       const item = queue[myIndex];
@@ -61,6 +63,9 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
           signal !== undefined ? { signal } : undefined,
         );
       } catch (err) {
+        // An abort-induced agent failure is not a real scorer failure — drop it
+        // so it doesn't pollute the partial report with spurious fails (EB-14).
+        if (isAborted(signal)) return;
         const durationMs = Date.now() - startedAt;
         const failResult: EvalCaseResult<I, O> = {
           caseId,
@@ -90,7 +95,8 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
       const scores: EvalCaseResult<I, O>['scores'][number][] = [];
       let allPassed = true;
       for (const scorer of opts.scorers) {
-        throwIfAborted(signal);
+        // No mid-case abort check: once agent.run completes, finish scoring so
+        // the case lands intact in the partial report rather than half-done.
         const result = await safeScore(scorer, item.sample, output, durationMs);
         scores.push({ scorer: scorer.name, result });
         if (!result.pass) allPassed = false;
@@ -116,6 +122,15 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
   const workerCount = Math.min(concurrency, queue.length);
   await Promise.all(Array.from({ length: workerCount }, () => worker()));
 
+  // EB-14: an aborted run resolves with a PARTIAL report (only the cases that
+  // finished) marked `aborted: true`, instead of discarding everything — a
+  // long judged run shouldn't lose all completed work to a Ctrl+C. Callers who
+  // prefer the old throw-on-abort opt in with `throwOnAbort`.
+  if (isAborted(signal)) {
+    if (opts.throwOnAbort === true) throwIfAborted(signal);
+    const done = results.filter((r): r is EvalCaseResult<I, O> => r !== undefined);
+    return { ...summarize(done, opts.scorers), aborted: true };
+  }
   return summarize(results, opts.scorers);
 }
 
@@ -190,6 +205,13 @@ function summarize<I, O>(
       byScorer: Object.freeze(summaryByScorer),
     },
   };
+}
+
+// A plain function call so TypeScript re-reads `signal.aborted` each time —
+// the flag flips during an `await` (external mutation) and inline
+// `signal?.aborted === true` checks would otherwise be narrowed away.
+function isAborted(signal: AbortSignal | undefined): boolean {
+  return signal?.aborted === true;
 }
 
 function throwIfAborted(signal: AbortSignal | undefined): void {

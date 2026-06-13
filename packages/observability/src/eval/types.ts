@@ -87,6 +87,12 @@ export interface EvalReport<I, O> {
       >
     >;
   };
+  /**
+   * `true` when the run was cut short by an aborted signal — `results` and
+   * `summary` then cover only the cases that finished before the abort (a
+   * partial report). Absent on a normal full run. See `runEvals`.
+   */
+  readonly aborted?: boolean;
 }
 
 /**
