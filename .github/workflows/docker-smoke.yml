@@ -1,0 +1,76 @@
+name: Docker image smoke
+
+# CI-11: the distribution Dockerfile (examples/docker/Dockerfile) was never
+# built in CI, so a regression in it broke users rather than a badge. This job
+# builds the image from a clean checkout and proves the server boots and
+# answers /v1/health. It runs on demand and weekly — NOT on every PR — because
+# a full multi-package image build is slow and the Dockerfile changes rarely.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays 06:00 UTC.
+    - cron: '0 6 * * 1'
+
+concurrency:
+  group: docker-smoke-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-health:
+    name: docker build + /v1/health
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Build the distribution image
+        run: docker build -f examples/docker/Dockerfile -t graphorin:smoke .
+
+      - name: CLI smoke (entrypoint + symlinked binary)
+        run: docker run --rm graphorin:smoke --version
+
+      - name: Boot the server and probe /v1/health
+        run: |
+          set -euo pipefail
+          # Minimal smoke config. `auth.kind: 'none'` avoids needing a pepper
+          # secret just to reach the unauthenticated /v1/health route; the
+          # server warns about it on a non-loopback bind but still boots
+          # (IP-13). Storage is the image's writable /data mount.
+          mkdir -p "${RUNNER_TEMP}/gconf"
+          cat > "${RUNNER_TEMP}/gconf/config.json" <<'JSON'
+          {
+            "server": { "host": "0.0.0.0", "port": 8080 },
+            "auth": { "kind": "none" },
+            "storage": { "path": "/data/data.db", "mode": "server", "encryption": { "enabled": false } },
+            "audit": { "enabled": false },
+            "secrets": { "source": "auto", "strict": false },
+            "observability": { "logger": "json" }
+          }
+          JSON
+          docker run -d --name graphorin-smoke \
+            -v "${RUNNER_TEMP}/gconf:/etc/graphorin:ro" \
+            -e GRAPHORIN_CONFIG=/etc/graphorin/config.json \
+            -p 8080:8080 \
+            graphorin:smoke
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/v1/health >/dev/null 2>&1; then
+              echo "health OK after ${i}s:"
+              curl -fsS http://127.0.0.1:8080/v1/health
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::/v1/health did not become ready within 30s"
+          exit 1
+
+      - name: Container logs (on failure)
+        if: failure()
+        run: docker logs graphorin-smoke || true
+
+      - name: Teardown
+        if: always()
+        run: docker rm -f graphorin-smoke || true

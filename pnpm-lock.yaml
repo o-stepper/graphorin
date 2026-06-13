@@ -443,30 +443,12 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@graphorin/embedder-transformersjs':
-        specifier: workspace:*
-        version: link:../../packages/embedder-transformersjs
       '@graphorin/example-trace-helper':
         specifier: workspace:*
         version: link:../example-trace-helper
-      '@graphorin/memory':
-        specifier: workspace:*
-        version: link:../../packages/memory
-      '@graphorin/observability':
-        specifier: workspace:*
-        version: link:../../packages/observability
       '@graphorin/provider':
         specifier: workspace:*
         version: link:../../packages/provider
-      '@graphorin/sessions':
-        specifier: workspace:*
-        version: link:../../packages/sessions
-      '@graphorin/store-sqlite':
-        specifier: workspace:*
-        version: link:../../packages/store-sqlite
-      '@graphorin/tools':
-        specifier: workspace:*
-        version: link:../../packages/tools
 
   packages/agent:
     dependencies:
