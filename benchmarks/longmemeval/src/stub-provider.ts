@@ -44,15 +44,15 @@ export function createStubProvider(respond: (req: ProviderRequest) => string): P
 /**
  * The default offline stub. It plays two roles depending on the prompt:
  *
- *  - **judge** (system prompt mentions "evaluator") → returns a passing
- *    integer so the `llmJudge` "J" scorer yields a value;
+ *  - **judge** (system prompt mentions "evaluator"/"grader") → returns a
+ *    passing `SCORE: <n>` line in the marker format `llmJudge` parses (EB-7);
  *  - **agent** (everything else) → echoes the most salient line of the
  *    supplied MEMORY context, or an explicit "no information" answer when
  *    the context is empty (so abstention cases behave sensibly offline).
  */
 export function createDefaultStubProvider(): Provider {
   return createStubProvider((req) => {
-    if (/evaluator|integer score/i.test(req.systemMessage ?? '')) return '8';
+    if (/evaluator|grader/i.test(req.systemMessage ?? '')) return 'SCORE: 8';
     const memory = extractMemoryBlock(lastUserText(req));
     return memory.length > 0 ? memory : 'I do not have that information in memory.';
   });

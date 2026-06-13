@@ -4,4 +4,10 @@
  * @packageDocumentation
  */
 
-export { type LlmJudgeOptions, llmJudge } from './judge.js';
+export {
+  fenceForJudge,
+  type LlmJudgeOptions,
+  llmJudge,
+  parseScore,
+  scoreContract,
+} from './judge.js';

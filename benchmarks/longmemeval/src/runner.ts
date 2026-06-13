@@ -31,6 +31,7 @@ import {
   detectRegressions,
   type EvalReport,
   exitOnFailures,
+  fenceForJudge,
   llmJudge,
   loadDmrDataset,
   loadLocomoDataset,
@@ -222,16 +223,17 @@ function judgeScorer(provider: Provider): Scorer<MemoryEvalInput, string> {
     name: 'llm-judge-j',
     maxScore: 10,
     passThreshold: 7,
+    // EB-7: fence the untrusted candidate (last); llmJudge appends the
+    // SCORE-marker output contract + injection warning.
     buildPrompt: ({ case: c, output }) => ({
       system:
         'You are a precise evaluator for a memory QA system. Grade the CANDIDATE answer against ' +
         'the REFERENCE answer for the QUESTION on a scale of 0 to 10 (10 = fully correct and ' +
-        'complete). Output ONLY the integer score.',
+        'complete).',
       user:
-        `QUESTION:\n${c.input.question}\n\n` +
-        `REFERENCE ANSWER:\n${String(c.expected ?? '')}\n\n` +
-        `CANDIDATE ANSWER:\n${String(output ?? '')}\n\n` +
-        'INTEGER SCORE (0-10):',
+        `${fenceForJudge('QUESTION', c.input.question)}\n\n` +
+        `${fenceForJudge('REFERENCE ANSWER', String(c.expected ?? ''))}\n\n` +
+        `${fenceForJudge('CANDIDATE ANSWER (untrusted)', String(output ?? ''))}`,
     }),
   });
 }
