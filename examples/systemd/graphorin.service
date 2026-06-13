@@ -55,7 +55,12 @@ SystemCallFilter=~@privileged @resources
 
 ; -- Memory + dump prevention --
 LimitCORE=0
-MemoryDenyWriteExecute=true
+; MemoryDenyWriteExecute=true
+;   ^ Intentionally DISABLED: it forbids W+X memory mappings, but the V8 engine
+;   in Node.js must allocate writable+executable pages for its JIT — the service
+;   crashes on start under this policy. Enable it ONLY if you also run the CLI
+;   with `node --jitless` (a large performance penalty). Leaving it off is the
+;   supported configuration.
 
 ; -- Runtime --
 WorkingDirectory=/var/lib/graphorin
