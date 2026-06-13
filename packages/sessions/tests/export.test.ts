@@ -12,6 +12,7 @@ import {
   SESSION_EXPORT_FORMAT,
   SESSION_EXPORT_SCHEMA_CURRENT,
   type SessionExportRecord,
+  type SessionExportWarning,
 } from '../src/export/index.js';
 
 function buildBody(
@@ -97,6 +98,35 @@ describe('Session export writer + reader', () => {
     expect(parsed.footer.messageCount).toBe(1);
     expect(parsed.footer.handoffCount).toBe(1);
     expect(parsed.footer.agentCount).toBe(1);
+  });
+
+  it('warns when the footer counts overstate the parsed records (RP-7 truncation)', async () => {
+    const records: SessionExportRecord[] = [
+      {
+        kind: 'message',
+        sessionId: 's',
+        messageId: 'm-1',
+        sequence: 1,
+        createdAt: '2026-05-08T10:00:01Z',
+        message: { role: 'user', content: 'one' },
+      },
+      {
+        kind: 'message',
+        sessionId: 's',
+        messageId: 'm-2',
+        sequence: 2,
+        createdAt: '2026-05-08T10:00:02Z',
+        message: { role: 'user', content: 'two' },
+      },
+    ];
+    const body = await buildBody(records); // footer declares 2 messages / 2 records
+    // Drop the second message line (simulate truncation) — footer is untouched.
+    const lines = body.split('\n').filter((l) => l.length > 0);
+    const truncated = `${[lines[0], lines[1], lines[lines.length - 1]].join('\n')}\n`;
+    const warns: SessionExportWarning[] = [];
+    const parsed = readSessionExport(truncated, { onWarn: (w) => warns.push(w) });
+    expect(parsed.records).toHaveLength(1);
+    expect(warns.some((w) => w.kind === 'footer-count-mismatch')).toBe(true);
   });
 
   it('verifies the body checksum when `--hash` is used', async () => {

@@ -17,12 +17,8 @@ describe('@graphorin/eslint-plugin', () => {
     expect(meta.version).toBe(VERSION);
   });
 
-  it('registers the no-console-in-public-api rule (no-op scaffold)', () => {
-    expect(rules).toHaveProperty('no-console-in-public-api');
-    const rule = rules['no-console-in-public-api'];
-    expect(rule.meta?.type).toBe('suggestion');
-    const listener = rule.create({} as never);
-    expect(Object.keys(listener)).toHaveLength(0);
+  it('no longer registers the removed no-console-in-public-api scaffold (PS-21)', () => {
+    expect(rules).not.toHaveProperty('no-console-in-public-api');
   });
 
   it('registers the no-secret-unwrap rule as an active CallExpression visitor', () => {
