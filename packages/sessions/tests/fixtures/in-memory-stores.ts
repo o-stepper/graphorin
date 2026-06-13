@@ -121,6 +121,30 @@ export class InMemorySessionStore implements SessionStoreExt {
     this.auditEntries.push(...remaining);
     return before - this.auditEntries.length;
   }
+  async deleteSession(sessionId: string): Promise<void> {
+    this.#deleteSessionCascade(sessionId);
+  }
+  async pruneSessions(opts: {
+    readonly beforeEpochMs?: number;
+    readonly closedOnly?: boolean;
+  }): Promise<number> {
+    const ids = [...this.sessions.values()]
+      .filter((s) => (opts.closedOnly === true ? s.closedAt !== undefined : true))
+      .filter((s) =>
+        opts.beforeEpochMs !== undefined ? Date.parse(s.createdAt) < opts.beforeEpochMs : true,
+      )
+      .map((s) => s.id);
+    for (const id of ids) this.#deleteSessionCascade(id);
+    return ids.length;
+  }
+  #deleteSessionCascade(sessionId: string): void {
+    this.sessions.delete(sessionId);
+    this.handoffs.delete(sessionId);
+    this.workflowRuns.delete(sessionId);
+    const remaining = this.auditEntries.filter((e) => e.sessionId !== sessionId);
+    this.auditEntries.length = 0;
+    this.auditEntries.push(...remaining);
+  }
 }
 
 interface StoredMessage {

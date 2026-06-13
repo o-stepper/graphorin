@@ -133,4 +133,21 @@ export interface SessionStoreExt extends SessionStore {
   ): Promise<ReadonlyArray<SessionAuditEntry>>;
   /** Delete audit rows older than the supplied epoch ms. */
   pruneAuditEntries(beforeEpochMs: number): Promise<number>;
+  /**
+   * Hard-delete a session and cascade its session-owned rows — handoffs,
+   * workflow-run attachments, and audit entries (RP-6). Message rows live in
+   * the `SessionMemoryStore` and are purged separately. A no-op for an unknown
+   * id.
+   */
+  deleteSession(sessionId: string): Promise<void>;
+  /**
+   * Retention sweep (RP-6): hard-delete (cascade) every session matching the
+   * policy. `beforeEpochMs` limits to sessions created before that instant;
+   * `closedOnly` limits to closed sessions. With neither, deletes all sessions.
+   * Returns the number of sessions deleted.
+   */
+  pruneSessions(opts: {
+    readonly beforeEpochMs?: number;
+    readonly closedOnly?: boolean;
+  }): Promise<number>;
 }

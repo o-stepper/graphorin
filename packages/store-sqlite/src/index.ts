@@ -21,7 +21,7 @@ import type {
   CheckpointStore,
   MemoryStore,
   OAuthServerStore,
-  SessionStore,
+  SessionStoreExt,
   TriggerStore,
 } from '@graphorin/core/contracts';
 import {
@@ -168,7 +168,7 @@ export interface CreateSqliteStoreOptions {
 export interface GraphorinSqliteStore {
   readonly memory: MemoryStore;
   readonly checkpoints: CheckpointStore;
-  readonly sessions: SessionStore;
+  readonly sessions: SessionStoreExt;
   readonly triggers: TriggerStore;
   readonly authTokens: AuthTokenStore;
   readonly oauthServers: OAuthServerStore;

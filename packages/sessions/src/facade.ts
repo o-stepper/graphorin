@@ -43,7 +43,7 @@ import {
   type CommentarySanitizer,
   createCommentarySanitizer,
 } from './commentary/index.js';
-import { SessionNotFoundError } from './errors/index.js';
+import { SessionClosedError, SessionNotFoundError } from './errors/index.js';
 import {
   readSessionExport,
   type SessionExportReadOptions,
@@ -304,6 +304,19 @@ export interface SessionManager {
   listSessions(
     scope: Pick<SessionScope, 'userId' | 'agentId'>,
   ): Promise<ReadonlyArray<SessionMetadata>>;
+  /**
+   * Hard-delete a session and cascade its handoffs / workflow runs / audit rows
+   * (RP-6). Message rows are owned by the memory store; purge them separately.
+   */
+  deleteSession(sessionId: string): Promise<void>;
+  /**
+   * Retention sweep (RP-6): delete every session matching the policy. Returns
+   * the count deleted. See {@link SessionStoreExt.pruneSessions}.
+   */
+  pruneSessions(opts: {
+    readonly beforeEpochMs?: number;
+    readonly closedOnly?: boolean;
+  }): Promise<number>;
   /** Import a JSONL stream into a fresh session. */
   importFromString(
     body: string,
@@ -401,6 +414,12 @@ export function createSessionManager(opts: CreateSessionManagerOptions): Session
     },
     async listSessions(scope) {
       return store.listSessions(scope);
+    },
+    async deleteSession(sessionId) {
+      await store.deleteSession(sessionId);
+    },
+    async pruneSessions(pruneOpts) {
+      return store.pruneSessions(pruneOpts);
     },
     async importFromString(body, importOpts) {
       const read = readSessionExport(body, importOpts ?? {});
@@ -522,12 +541,15 @@ class SessionImpl implements Session {
   readonly scope: SessionScope;
   readonly commentaryPolicy: CommentaryPolicy;
   readonly #args: SessionImplArgs;
+  /** RP-6: best-effort closed-state guard for this instance. */
+  #closed: boolean;
 
   constructor(args: SessionImplArgs) {
     this.#args = args;
     this.id = args.meta.id;
     this.scope = args.scope;
     this.commentaryPolicy = args.commentary.policy;
+    this.#closed = args.meta.closedAt !== undefined;
   }
 
   async metadata(): Promise<SessionMetadata> {
@@ -537,6 +559,11 @@ class SessionImpl implements Session {
   }
 
   async push(message: Message): Promise<MessageRef> {
+    // RP-6: close() is a real lifecycle boundary — pushing to a closed session
+    // is rejected rather than silently accepted. (Multi-writer last-write-wins:
+    // this guards the common same-instance case; a session closed by another
+    // writer is caught on the next reload.)
+    if (this.#closed) throw new SessionClosedError(this.id);
     const sanitized = this.#sanitize(message, 'session-push');
     return this.#args.memory.push(this.scope, sanitized);
   }
@@ -621,6 +648,7 @@ class SessionImpl implements Session {
   async close(): Promise<void> {
     const closedAt = new Date(this.#args.now()).toISOString();
     await this.#args.store.closeSession(this.id, closedAt);
+    this.#closed = true;
     await this.#audit('session.closed', { closedAt });
   }
 

@@ -162,6 +162,53 @@ describe('extra coverage', () => {
     expect(list.length).toBe(1);
   });
 
+  it('sessions: deleteSession cascades + pruneSessions(closedOnly) (RP-6)', async () => {
+    const store = await makeStore();
+    const t = new Date().toISOString();
+    await store.sessions.createSession({ id: 'del-1', userId: 'u1', agentId: 'a', createdAt: t });
+    await store.sessions.appendHandoff('del-1', {
+      fromAgentId: 'a',
+      toAgentId: 'b',
+      stepNumber: 1,
+      at: t,
+    });
+    await store.sessions.attachWorkflowRun({
+      sessionId: 'del-1',
+      workflowId: 'wf',
+      threadId: 'th',
+      status: 'running',
+      attachedAt: t,
+    });
+    await store.sessions.appendAuditEntry({
+      id: 'au-1',
+      sessionId: 'del-1',
+      action: 'session.created',
+      actor: { kind: 'system', id: 'sys' },
+      at: t,
+    });
+    expect((await store.sessions.listHandoffs('del-1')).length).toBe(1);
+
+    await store.sessions.deleteSession('del-1');
+    expect(await store.sessions.getSession('del-1')).toBeNull();
+    expect((await store.sessions.listHandoffs('del-1')).length).toBe(0);
+    expect((await store.sessions.listWorkflowRuns('del-1')).length).toBe(0);
+    expect((await store.sessions.listAuditEntries('del-1')).length).toBe(0);
+
+    // Retention sweep: closed session swept, open one kept.
+    await store.sessions.createSession({ id: 'open-1', userId: 'u1', agentId: 'a', createdAt: t });
+    await store.sessions.createSession({
+      id: 'closed-1',
+      userId: 'u1',
+      agentId: 'a',
+      createdAt: t,
+    });
+    await store.sessions.closeSession('closed-1', new Date().toISOString());
+    const deleted = await store.sessions.pruneSessions({ closedOnly: true });
+    expect(deleted).toBe(1);
+    expect(await store.sessions.getSession('open-1')).not.toBeNull();
+    expect(await store.sessions.getSession('closed-1')).toBeNull();
+  });
+
   it('sessions: retireAgent and attach/list workflow runs', async () => {
     const store = await makeStore();
     const t = new Date().toISOString();
