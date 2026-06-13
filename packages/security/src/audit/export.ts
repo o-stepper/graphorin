@@ -4,6 +4,13 @@
  * The function never loads the entire chain into memory; it writes
  * one canonical-JSON line per entry into the supplied writer.
  *
+ * The exported `hash`/`prevHash` of an entry are only stable until the
+ * next `pruneAudit(...)`: pruning reroots the surviving suffix and
+ * recomputes every surviving entry's hash, so hashes archived from an
+ * export taken before a prune will no longer match the live chain.
+ * Anchor exports to an external timestamp/signature if you need them to
+ * stay verifiable across a prune.
+ *
  * @packageDocumentation
  */
 

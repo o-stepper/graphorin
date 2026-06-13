@@ -39,6 +39,24 @@ describe('@graphorin/security/supply-chain — policy resolver', () => {
     expect(decision.outcome).toBe('allow');
   });
 
+  it('deny-wins precedence lets an explicit denylist entry override a broad allowlist (SPL-20)', () => {
+    const decision = evaluateSupplyChainPolicy('@my-org/skill', {
+      allowlist: ['@my-org/*'],
+      denylist: ['@my-org/skill'],
+      precedence: 'deny-wins',
+    });
+    expect(decision.outcome).toBe('deny');
+    expect(decision.outcome === 'deny' && decision.source).toBe('denylist');
+  });
+
+  it('default precedence keeps allow-wins so a scope can be denied with specific exceptions', () => {
+    const decision = evaluateSupplyChainPolicy('@my-org/skill', {
+      allowlist: ['@my-org/skill'],
+      denylist: ['@my-org/*'],
+    });
+    expect(decision.outcome).toBe('allow');
+  });
+
   it('honours the framework denylist when graphorinDenylist is auto', () => {
     _setFrameworkDenylistForTesting(['@known-bad/*']);
     const decision = evaluateSupplyChainPolicy('@known-bad/abc', {

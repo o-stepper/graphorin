@@ -196,9 +196,13 @@ export class TokenVerifier {
   }
 
   /**
-   * Run the verify pipeline against a single raw token. The promise
-   * always resolves; failures surface as `{ ok: false, reason }` so
-   * callers can map them straight to HTTP responses.
+   * Run the verify pipeline against a single raw token. Resolves with a
+   * `{ ok: false, reason }` result for every authentication failure —
+   * including IP/token lockout — so callers can map them straight to HTTP
+   * responses; it does NOT reject for a failed verification. The single
+   * exception is backpressure: when more than `maxConcurrent` verifications
+   * are already in flight it throws {@link TokenVerifyOverloadError} so the
+   * caller sheds load instead of queueing unboundedly.
    *
    * @stable
    */

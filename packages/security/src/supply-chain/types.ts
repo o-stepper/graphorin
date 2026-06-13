@@ -128,6 +128,17 @@ export interface SupplyChainPolicy {
    * managed denylist; `'off'` is the only practical value.
    */
   readonly graphorinDenylist?: 'auto' | 'off';
+  /**
+   * Conflict resolution when a package matches BOTH the allowlist and a
+   * deny list. `'allow-wins'` (the default) lets the allowlist short-circuit,
+   * so an operator can deny a whole scope yet allow specific exceptions
+   * inside it. `'deny-wins'` evaluates the deny lists first, so an explicit
+   * denylist entry is never overridden by a broad allowlist glob — the safer
+   * posture when the denylist is the security-critical list.
+   *
+   * SPL-20: defaults to `'allow-wins'` (byte-identical to prior behaviour).
+   */
+  readonly precedence?: 'allow-wins' | 'deny-wins';
 }
 
 /**
