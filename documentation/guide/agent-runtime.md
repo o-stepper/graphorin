@@ -145,7 +145,7 @@ Independent tool calls in one step run **concurrently**, bounded by `maxParallel
 
 ### Deferred loading and `tool_search`
 
-A tool declared `defer_loading: true` is **withheld** from the per-step catalogue to keep large tool sets out of context. When the registry holds at least one deferred tool, the runtime auto-registers the built-in `tool_search` tool. The model calls `tool_search({ query })` to find deferred tools by name / description; matched tools are promoted into the catalogue on the **next** step. A deferred tool's `examples` stay out of context even once it is promoted.
+A tool declared `defer_loading: true` is **withheld** from the per-step catalogue to keep large tool sets out of context. When the registry holds at least one deferred tool, the runtime auto-registers the built-in `tool_search` tool. The model calls `tool_search({ query })` to find deferred tools by name / description; matched tools are promoted into the catalogue on the **next** step. Promotions are **append-only** — a newly promoted tool joins the *end* of the catalogue (in promotion order), so the eager prefix and any earlier promotions keep their byte position and the provider's prompt-cache breakpoint survives across steps. A deferred tool's `examples` stay out of context even once it is promoted.
 
 ### Result handles and `read_result`
 

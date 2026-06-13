@@ -112,6 +112,7 @@ import {
   createMemoryRegionReader,
   type ExecutorEventBridge,
 } from './tooling/adapters.js';
+import { orderPromotedTools } from './tooling/catalogue.js';
 import { buildDataFlowGuard } from './tooling/dataflow.js';
 import { buildToolRegistry } from './tooling/registry-build.js';
 import type {
@@ -1745,10 +1746,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           const eagerTools = stepRegistry.listEager() as ReadonlyArray<
             Tool<unknown, unknown, TDeps>
           >;
+          // A7: emit promoted deferred tools in PROMOTION order (append-only) so
+          // a later promotion joins the END and the prompt-cache prefix (eager
+          // tools + earlier promotions) stays byte-stable across steps.
           const promotedTools = (
             promotedDeferred.size === 0
               ? []
-              : stepRegistry.listDeferred().filter((entry) => promotedDeferred.has(entry.name))
+              : orderPromotedTools(promotedDeferred, stepRegistry.listDeferred())
           ) as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
           stepTools = [...eagerTools, ...promotedTools, ...handoffTools];
         }
