@@ -42,8 +42,10 @@ import {
 
 import {
   InputFilterRequiredError,
+  SkillFrontmatterConflictError,
   SkillLoadError,
   SkillRequiredFieldMissingError,
+  SkillRuntimeCompatError,
 } from '../errors/index.js';
 import {
   parseAllowedToolsValue,
@@ -183,10 +185,10 @@ export async function loadSkillFromSource(
 }
 
 /**
- * Load multiple skills concurrently. Emits a warning diagnostic on
- * the first encountered source error when
- * `throwOnSourceError === false`; otherwise the first error
- * propagates out unchanged.
+ * Load multiple skills concurrently. The sources are loaded in parallel and
+ * the returned array preserves input order. When `throwOnSourceError === false`
+ * (default) a failing source is logged and skipped; otherwise the first
+ * rejection propagates out unchanged.
  *
  * @stable
  */
@@ -195,23 +197,24 @@ export async function loadSkills(
   options: LoadSkillsOptions = {},
 ): Promise<ReadonlyArray<Skill>> {
   const { throwOnSourceError = false, ...inner } = options;
-  const out: Skill[] = [];
-  for (const source of sources) {
-    try {
-      const skill = await loadSkillFromSource(source, inner);
-      out.push(skill);
-    } catch (err) {
-      if (throwOnSourceError) throw err;
-      // We cannot create a Skill from a failed source, but we want to
-      // preserve a structured diagnostic so callers can audit which
-      // sources failed without re-running the loader.
-      // eslint-disable-next-line no-console
-      console.warn(
-        `[graphorin/skills] Failed to load source ${describeSource(source)}: ${(err as Error).message}`,
-      );
-    }
-  }
-  return Object.freeze(out);
+  const loaded = await Promise.all(
+    sources.map(async (source): Promise<Skill | null> => {
+      try {
+        return await loadSkillFromSource(source, inner);
+      } catch (err) {
+        if (throwOnSourceError) throw err;
+        // We cannot create a Skill from a failed source, but we want to
+        // preserve a structured diagnostic so callers can audit which
+        // sources failed without re-running the loader.
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[graphorin/skills] Failed to load source ${describeSource(source)}: ${(err as Error).message}`,
+        );
+        return null;
+      }
+    }),
+  );
+  return Object.freeze(loaded.filter((skill): skill is Skill => skill !== null));
 }
 
 async function loadFromInline(
@@ -286,7 +289,27 @@ async function loadFromFolder(
       cause: err,
     });
   }
-  const { metadata, diagnostics, body } = parseAndValidate(skillMd, options);
+  const parsed = parseAndValidate(skillMd, options);
+  const { diagnostics, body } = parsed;
+  // RP-9: trust is granted by the integrator, never the artifact. An operator
+  // override on the source wins; absent one, a folder's self-declared
+  // 'trusted'/'trusted-with-scripts' is capped at 'unknown' so a downloaded
+  // directory cannot promote itself out of the sandbox + taint-marking. The
+  // resolved level is written back onto the metadata so every downstream
+  // consumer (tool stamping, sandbox tier, inbound sanitization) sees it.
+  const operatorTrust = extractTrustLevel(source);
+  const effectiveTrust: SkillsTrustLevel =
+    operatorTrust ??
+    (source.kind === 'folder'
+      ? capSelfDeclaredTrust(parsed.metadata.graphorinTrustLevel)
+      : parsed.metadata.graphorinTrustLevel);
+  const metadata: SkillMetadata =
+    effectiveTrust === parsed.metadata.graphorinTrustLevel
+      ? parsed.metadata
+      : (Object.freeze({
+          ...parsed.metadata,
+          graphorinTrustLevel: effectiveTrust,
+        }) as SkillMetadata);
 
   let signature: SkillSignatureVerificationResult | undefined = precomputedSignature;
   if (signature === undefined && metadata.graphorinSignaturePresent) {
@@ -320,7 +343,7 @@ async function loadFromFolder(
             ? { kind: 'git-repo', url: source.url }
             : { kind: 'git-repo', url: source.url, ref: source.ref }
           : { kind: 'folder', path: absolutePath },
-    coerceForSupplyChain(extractTrustLevel(source) ?? metadata.graphorinTrustLevel),
+    coerceForSupplyChain(metadata.graphorinTrustLevel),
   );
 
   return buildSkill({
@@ -392,6 +415,16 @@ async function locateSkillRoot(installPath: string, sourceLabel: string): Promis
   } catch {
     // continue
   }
+  // RP-10: npm packages land under `node_modules/<packageName>`. The label is
+  // the package name for npm sources; for git it is a URL and this probe
+  // simply misses, falling through to the one-level-deep scan below.
+  const nodeModulesRoot = join(installPath, 'node_modules', sourceLabel);
+  try {
+    await stat(join(nodeModulesRoot, SKILL_MANIFEST_FILENAME));
+    return nodeModulesRoot;
+  } catch {
+    // continue
+  }
   const entries = await readdir(installPath, { withFileTypes: true });
   for (const entry of entries) {
     if (entry.isDirectory()) {
@@ -438,11 +471,83 @@ function parseAndValidate(skillMd: string, options: LoadSkillOptions): ParsedAnd
   const metadata = buildMetadata(validated, frontmatter);
   const diagnostics: FrontmatterDiagnostic[] = [...validated.diagnostics];
   appendUntrustedHandoffDiagnostic(metadata, diagnostics, options.conflictPolicy);
+  appendInvalidFieldTypeDiagnostics(frontmatter, validated, diagnostics);
+  enforceErrorPolicy(metadata, validated, diagnostics, options);
   return Object.freeze({
     metadata,
     diagnostics: Object.freeze(diagnostics),
     body: split.body,
   });
+}
+
+/**
+ * RP-11(d): a frontmatter field that is present but unparseable must not be
+ * silently dropped (`?? []`). Surface an `invalid-field-type` diagnostic so
+ * callers can audit the rejected value, as the parser contracts mandate.
+ */
+function appendInvalidFieldTypeDiagnostics(
+  raw: Record<string, unknown>,
+  validated: ValidatedFrontmatter,
+  diagnostics: FrontmatterDiagnostic[],
+): void {
+  const handoffRaw = validated.resolved.handoffInputFilter.value;
+  if (handoffRaw !== undefined && parseHandoffInputFilter(handoffRaw) === null) {
+    diagnostics.push(
+      Object.freeze({
+        kind: 'invalid-field-type',
+        field: 'handoff-input-filter',
+        severity: 'warn',
+        message: "'handoff-input-filter' has an unsupported shape; the declaration was ignored.",
+        hint: "Use 'lastUser', 'lastN: <n>', 'none', or 'full'.",
+      }),
+    );
+  }
+  const toolsRaw = raw['graphorin-tools'];
+  if (toolsRaw !== undefined && parseToolsField(toolsRaw) === null) {
+    diagnostics.push(
+      Object.freeze({
+        kind: 'invalid-field-type',
+        field: 'graphorin-tools',
+        severity: 'warn',
+        message: "'graphorin-tools' must be a list of tool declarations; the value was ignored.",
+        hint: 'Provide a YAML list, e.g. `graphorin-tools:` with `- name: read_file` entries.',
+      }),
+    );
+  }
+}
+
+/**
+ * RP-11(b): under `conflictPolicy: 'error'`, an error-severity diagnostic
+ * fails the load through the matching typed exception instead of being
+ * silently surfaced. Default (`'warn'`) keeps these as diagnostics.
+ */
+function enforceErrorPolicy(
+  metadata: SkillMetadata,
+  validated: ValidatedFrontmatter,
+  diagnostics: ReadonlyArray<FrontmatterDiagnostic>,
+  options: LoadSkillOptions,
+): void {
+  if (options.conflictPolicy !== 'error') return;
+  for (const diag of diagnostics) {
+    if (diag.severity !== 'error') continue;
+    if (diag.kind === 'invalid-runtime-compat') {
+      const declared = validated.resolved.runtimeCompat.value;
+      throw new SkillRuntimeCompatError(
+        metadata.name,
+        typeof declared === 'string' ? declared : String(declared),
+        options.runtimeVersion ?? '<unknown>',
+        diag.hint === undefined ? undefined : { hint: diag.hint },
+      );
+    }
+    if (diag.kind === 'conflict') {
+      throw new SkillFrontmatterConflictError(
+        metadata.name,
+        diag.field,
+        [diag.field],
+        diag.hint === undefined ? undefined : { hint: diag.hint },
+      );
+    }
+  }
 }
 
 function buildMetadata(
@@ -631,8 +736,21 @@ function describeSource(source: SkillSource): string {
 }
 
 function extractTrustLevel(source: SkillSource): SkillsTrustLevel | undefined {
-  if (source.kind === 'npm-package' || source.kind === 'git-repo') return source.trustLevel;
+  if (source.kind === 'npm-package' || source.kind === 'git-repo' || source.kind === 'folder')
+    return source.trustLevel;
   return undefined;
+}
+
+/**
+ * Cap a folder skill's self-declared trust level. A directory on disk —
+ * possibly downloaded from the internet — cannot self-promote to a trusted
+ * tier without an operator override (RP-9): `trusted` /
+ * `trusted-with-scripts` collapse to `'unknown'` (sandbox forced, signature
+ * optional, outputs taint-marked), while `untrusted` / `unknown` pass
+ * through unchanged.
+ */
+function capSelfDeclaredTrust(level: SkillsTrustLevel): SkillsTrustLevel {
+  return level === 'trusted' || level === 'trusted-with-scripts' ? 'unknown' : level;
 }
 
 /**

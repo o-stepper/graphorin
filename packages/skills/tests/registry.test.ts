@@ -1,3 +1,4 @@
+import type { ResolvedTool } from '@graphorin/core';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import { SkillNameCollisionError } from '../src/errors/index.js';
@@ -7,6 +8,7 @@ import {
   parseActivationTrigger,
   stampSkillToolFromMetadata,
 } from '../src/registry/index.js';
+import type { InlineSkillTool } from '../src/types/index.js';
 
 async function inlineSkill(
   name: string,
@@ -40,6 +42,78 @@ describe('createSkillRegistry', () => {
     const skill = await inlineSkill('a');
     registry.register(skill);
     expect(() => registry.register(skill)).toThrowError(SkillNameCollisionError);
+  });
+
+  it('RP-11(e): replace() upgrades a registered skill in place and upserts a new one', async () => {
+    const registry = createSkillRegistry();
+    const v1 = await inlineSkill('dup', ['license: MIT']);
+    registry.register(v1);
+    const v2 = await inlineSkill('dup', ['license: Apache-2.0']);
+    registry.replace(v2);
+    expect(registry.size()).toBe(1);
+    expect(registry.getSkill('dup')?.metadata.license).toBe('Apache-2.0');
+    // replace() on an unknown name adds it (upsert), unlike register().
+    const fresh = await inlineSkill('brand-new');
+    registry.replace(fresh);
+    expect(registry.has('brand-new')).toBe(true);
+  });
+
+  it('RP-11(a): activate() surfaces stamped tools when a stampTool fn is configured', async () => {
+    const tool: InlineSkillTool = {
+      name: 'echo',
+      description: 'echoes',
+      inputSchema: z.object({}),
+      async execute() {
+        return {};
+      },
+    };
+    const skill = await loadSkillFromSource({
+      kind: 'inline',
+      skill: {
+        skillMd: ['---', 'name: with-tools', 'description: has a tool', '---', 'BODY'].join('\n'),
+        tools: [tool],
+      },
+    });
+    const stampTool = vi.fn(
+      (t: InlineSkillTool): ResolvedTool =>
+        ({
+          ...t,
+          __trustClass: 'untrusted',
+          __source: { kind: 'skill', skillName: 'with-tools', trustLevel: 'untrusted' },
+          __effectiveDeferLoading: false,
+          __sideEffectClass: 'pure',
+          __hasIdempotencyKey: false,
+          __streamingHint: false,
+          __exampleCount: 0,
+        }) as unknown as ResolvedTool,
+    );
+    const registry = createSkillRegistry({ activationStrategy: 'eager', stampTool });
+    registry.register(skill);
+    const [activated] = await registry.activate(['with-tools']);
+    expect(stampTool).toHaveBeenCalledTimes(1);
+    expect(activated?.tools.map((t) => t.name)).toEqual(['echo']);
+  });
+
+  it('RP-11(a): activate() returns no tools when no stampTool fn is configured', async () => {
+    const tool: InlineSkillTool = {
+      name: 'echo',
+      description: 'echoes',
+      inputSchema: z.object({}),
+      async execute() {
+        return {};
+      },
+    };
+    const skill = await loadSkillFromSource({
+      kind: 'inline',
+      skill: {
+        skillMd: ['---', 'name: no-stamper', 'description: has a tool', '---', 'BODY'].join('\n'),
+        tools: [tool],
+      },
+    });
+    const registry = createSkillRegistry({ activationStrategy: 'eager' });
+    registry.register(skill);
+    const [activated] = await registry.activate(['no-stamper']);
+    expect(activated?.tools).toEqual([]);
   });
 
   it('getAutoActivationMetadata excludes disable-model-invocation skills', async () => {

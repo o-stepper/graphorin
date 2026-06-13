@@ -19,6 +19,7 @@
  * @packageDocumentation
  */
 
+import type { ResolvedTool } from '@graphorin/core';
 import { parseSlashCommand } from '../activation/index.js';
 import { SkillNameCollisionError, SlashCommandParseError } from '../errors/index.js';
 
@@ -34,6 +35,15 @@ import type {
   SkillToolDeclaration,
 } from '../types/index.js';
 
+/**
+ * Stamping seam injected by the agent runtime (Phase 12). It turns a skill's
+ * pre-built `Tool` into a fully resolved `ResolvedTool` (trust class + sandbox
+ * tier + source). The skills package keeps no hard dependency on
+ * `@graphorin/tools`; when no stamper is configured, `activate()` surfaces no
+ * tools (the runtime resolves them itself).
+ */
+export type SkillToolStamper = (tool: InlineSkillTool, metadata: SkillMetadata) => ResolvedTool;
+
 /** Options accepted by {@link createSkillRegistry}. */
 export interface SkillRegistryOptions {
   /**
@@ -45,11 +55,24 @@ export interface SkillRegistryOptions {
    * suitable for tests.
    */
   readonly activationStrategy?: 'metadata-only' | 'eager';
+  /**
+   * Optional stamping function (RP-11). When supplied, `activate()` runs each
+   * skill's pre-built `Tool[]` through it and surfaces the results on
+   * {@link ActivatedSkill.tools}. Without it, `activate()` surfaces no tools —
+   * the agent runtime resolves and stamps them itself.
+   */
+  readonly stampTool?: SkillToolStamper;
 }
 
 /** Public registry surface. */
 export interface SkillRegistry {
   register(skill: Skill): void;
+  /**
+   * Upsert a skill by name (RP-11). Unlike {@link SkillRegistry.register},
+   * `replace` overwrites an existing registration instead of throwing on a
+   * name collision — the upgrade path for hot-reloading a re-loaded skill.
+   */
+  replace(skill: Skill): void;
   unregister(name: string): boolean;
   getSkill(name: string): Skill | undefined;
   has(name: string): boolean;
@@ -133,6 +156,10 @@ export function createSkillRegistry(options: SkillRegistryOptions = {}): SkillRe
     if (skillsByName.has(skill.metadata.name)) {
       throw new SkillNameCollisionError(skill.metadata.name);
     }
+    skillsByName.set(skill.metadata.name, skill);
+  }
+
+  function replace(skill: Skill): void {
     skillsByName.set(skill.metadata.name, skill);
   }
 
@@ -262,15 +289,20 @@ export function createSkillRegistry(options: SkillRegistryOptions = {}): SkillRe
       const body = strategy === 'eager' ? await request.skill.body(signal) : '';
       const resources: ReadonlyArray<SkillResource> =
         strategy === 'eager' ? await request.skill.resources(signal) : Object.freeze([]);
-      // Pre-built tools (inline source) are surfaced via
-      // `Skill.tools()`; the agent runtime stamps them into the
-      // `@graphorin/tools` registry through `stampSkillTool(...)`.
-      // For Phase 08's narrow surface we expose the raw `Tool[]`
-      // without the stamping step — Phase 12 owns that responsibility
-      // because the stamping requires a tools registry instance the
-      // skills package does not depend on.
-      const stampedTools = Object.freeze([]);
-      void request.skill.tools();
+      // Pre-built tools (inline source) are surfaced via `Skill.tools()`.
+      // When the caller wired a `stampTool` function (the agent runtime does),
+      // each tool is stamped into a `ResolvedTool` and surfaced here; without
+      // it the registry exposes no tools (the runtime resolves them itself).
+      const stampedTools: ReadonlyArray<ResolvedTool> =
+        options.stampTool !== undefined
+          ? Object.freeze(
+              request.skill
+                .tools()
+                .map((tool) =>
+                  (options.stampTool as SkillToolStamper)(tool, request.skill.metadata),
+                ),
+            )
+          : Object.freeze([]);
       out.push(
         Object.freeze({
           skill: request.skill,
@@ -311,6 +343,7 @@ export function createSkillRegistry(options: SkillRegistryOptions = {}): SkillRe
 
   return Object.freeze({
     register,
+    replace,
     unregister,
     getSkill,
     has,

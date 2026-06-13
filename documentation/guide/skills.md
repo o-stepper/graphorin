@@ -87,10 +87,10 @@ The loader supports four source kinds:
 
 | Source | Shape | Trust posture |
 |---|---|---|
-| `inline` | `{ kind: 'inline', skill }` | Programmatic, fully trusted. |
-| `folder` | `{ kind: 'folder', path }` | Trusted by default; passes through the same validator pipeline. |
-| `npm-package` | `{ kind: 'npm-package', packageName, version? }` | Untrusted; install delegated to `@graphorin/security/supply-chain` with `--ignore-scripts` enforced and an Ed25519 signature requirement. |
-| `git-repo` | `{ kind: 'git-repo', url, ref? }` | Untrusted; shallow-clone via the supply-chain helper, pinned to a ref, signature-verified. |
+| `inline` | `{ kind: 'inline', skill }` | Programmatic, fully trusted (the host process supplies the code). |
+| `folder` | `{ kind: 'folder', path, trustLevel? }` | A directory on disk **cannot self-promote**: its frontmatter `graphorin-trust-level: trusted` / `trusted-with-scripts` is capped at `unknown` (sandbox forced, outputs taint-marked) unless the operator passes an explicit `trustLevel`. Trust is granted by the integrator, never the artifact. |
+| `npm-package` | `{ kind: 'npm-package', packageName, version?, trustLevel? }` | Untrusted by default; install delegated to `@graphorin/security/supply-chain` with `--ignore-scripts` enforced and an Ed25519 signature requirement. An operator `trustLevel` overrides the default. |
+| `git-repo` | `{ kind: 'git-repo', url, ref?, trustLevel? }` | Untrusted by default; shallow-clone via the supply-chain helper, pinned to a ref, signature-verified. An operator `trustLevel` overrides the default. |
 
 ## Field-resolution precedence
 
@@ -121,19 +121,19 @@ Skills register their declared tool calls into the same `ToolRegistry` your appl
 
 ## Supply chain
 
-Untrusted skills (`npm-package`, `git-repo`) flow through `@graphorin/security/supply-chain`:
+Untrusted skills (`npm-package`, `git-repo`) flow through `@graphorin/security/supply-chain`. The installer is **install-then-verify**: the package is fetched into a quarantine directory first, then its `SKILL.md` signature is checked from the install path. A rejected (unsigned or tampered) package never reaches the loader and its quarantine directory is removed.
 
 ```mermaid
 flowchart LR
-    Source[npm-package or git-repo] --> Fetch[Fetch with --ignore-scripts]
-    Fetch --> Signature[Ed25519 signature check]
+    Source[npm-package or git-repo] --> Fetch[Fetch into quarantine with --ignore-scripts]
+    Fetch --> Signature[Read SKILL.md + Ed25519 signature check]
     Signature -->|valid| Load[Load skill]
-    Signature -->|invalid| Reject[Reject + audit row]
+    Signature -->|invalid / missing| Reject[Remove quarantine + audit row]
     Load --> Sandbox[Sandbox tier from frontmatter]
     Sandbox --> Registry[Register tools]
 ```
 
-The skill installer never runs `npm postinstall` scripts on untrusted packages. The signature verifier resolves the publisher key over the configured well-known URL.
+The skill installer never runs `npm postinstall` scripts on untrusted packages. The signature verifier resolves the publisher key over the configured well-known URL (or an inline key in the manifest). Verification reads `SKILL.md` from the install path, so a default `loadSkills([{ kind: 'npm-package', … }])` works without a pre-fetched manifest; callers that need offline verification can still pass `skillMd` to the installer directly.
 
 ## Next steps
 

@@ -1,4 +1,5 @@
 import { sign as cryptoSign, generateKeyPairSync } from 'node:crypto';
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -167,6 +168,72 @@ describe('supply-chain integration — signature verification + --ignore-scripts
     const env = observed[0]?.env;
     expect(env?.npm_config_ignore_scripts).toBe('true');
     expect(observed[0]?.args).toContain('--ignore-scripts');
+  });
+
+  it('RP-10: default npm load installs-then-verifies a signed skill without a pre-fetched skillMd', async () => {
+    const { publicKey, privateKey } = generateKeyPairSync('ed25519');
+    const publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' }).toString();
+    const base = [
+      '---',
+      'name: signed-npm-skill',
+      'description: A signed skill resolved from the install path.',
+      'graphorin-signature:',
+      '  algorithm: ed25519-sha256',
+      '  publisher: vendor.example.com',
+      '  publishedAt: 2026-04-19T12:00:00Z',
+      '  signature: PLACEHOLDER',
+      '  publicKeyRef:',
+      '    kind: inline',
+      '    publicKeyPem: |',
+      ...publicKeyPem.split('\n').map((l) => `      ${l}`),
+      '---',
+    ].join('\n');
+    const { bytes } = canonicalizeForSignature(base);
+    const sig = cryptoSign(null, bytes, privateKey).toString('base64url');
+    const signed = base.replace('signature: PLACEHOLDER', `signature: ${sig}`);
+
+    _setPackageManagerForTesting(() => 'pnpm');
+    _setPackageManagerRunnerForTesting(async ({ cwd }) => {
+      // Simulate a real install: the package lands under node_modules/<pkg>.
+      const pkgDir = join(cwd ?? tmpdir(), 'node_modules', '@vendor/signed-npm-skill');
+      await mkdir(pkgDir, { recursive: true });
+      await writeFile(join(pkgDir, 'SKILL.md'), signed, 'utf8');
+      return { exitCode: 0, stdout: '', stderr: '' };
+    });
+
+    // Default (untrusted) trust level — no manual skillMd. Pre-fix this threw
+    // SkillSignatureMissingError BEFORE the install ever ran.
+    const skill = await loadSkillFromSource({
+      kind: 'npm-package',
+      packageName: '@vendor/signed-npm-skill',
+    });
+    expect(skill.metadata.name).toBe('signed-npm-skill');
+    expect(skill.signature?.valid).toBe(true);
+  });
+
+  it('RP-10: an unsigned npm skill fails AFTER install with the quarantine cleaned up', async () => {
+    let installDir: string | undefined;
+    _setPackageManagerForTesting(() => 'pnpm');
+    _setPackageManagerRunnerForTesting(async ({ cwd }) => {
+      installDir = cwd;
+      const pkgDir = join(cwd ?? tmpdir(), 'node_modules', '@vendor/unsigned-skill');
+      await mkdir(pkgDir, { recursive: true });
+      await writeFile(
+        join(pkgDir, 'SKILL.md'),
+        ['---', 'name: unsigned-skill', 'description: No signature block.', '---', 'BODY'].join(
+          '\n',
+        ),
+        'utf8',
+      );
+      return { exitCode: 0, stdout: '', stderr: '' };
+    });
+
+    await expect(
+      loadSkillFromSource({ kind: 'npm-package', packageName: '@vendor/unsigned-skill' }),
+    ).rejects.toThrow();
+    expect(installDir).toBeDefined();
+    // Quarantine directory removed on verification failure.
+    expect(installDir !== undefined && existsSync(installDir)).toBe(false);
   });
 
   it('allowlist short-circuits the policy resolver', () => {
