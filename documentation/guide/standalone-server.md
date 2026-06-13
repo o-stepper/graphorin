@@ -82,6 +82,17 @@ Built on [`hono`](https://github.com/honojs/hono) (MIT) and [`@hono/node-server`
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/auth/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 
+## Authentication modes
+
+`auth.kind` selects how the server authenticates requests:
+
+| `auth.kind` | Behaviour |
+| --- | --- |
+| `'token'` (default) | Every endpoint except `/v1/health` (and, when `metrics.requireAuth = false`, `/v1/metrics`) requires a bearer token signed with HMAC-SHA256 against the deployment pepper. Scopes are enforced per route; the WebSocket upgrade authenticates by bearer header or a single-use ticket. |
+| `'none'` | **Authentication is disabled.** Every endpoint — REST, the WebSocket upgrade, SSE and replay — is served to an anonymous, fully-authorized (`admin:*`) principal with no token. Intended only for **trusted loopback / single-operator** deployments. |
+
+The `'none'` contract is explicit and total: there is no half-open state. Either you run with tokens, or every route (including run invocation and the live stream) is open to anyone who can reach the socket. `ws.enabled: true` is honoured under `'none'` — the upgrade mounts and accepts clients that present only the `graphorin.protocol.v1` subprotocol (no ticket needed). Because this removes all access control, the server prints a startup **warning** when `auth.kind='none'` is combined with a non-loopback `server.host` (e.g. `0.0.0.0`); bind a loopback host or switch to `auth.kind='token'` for any exposed deployment.
+
 ## WebSocket protocol
 
 `@graphorin/protocol` ships the `graphorin.protocol.v1` contract — a typed message envelope for live event streaming over WebSocket. Built on [`@hono/node-ws`](https://github.com/honojs/middleware) (MIT).

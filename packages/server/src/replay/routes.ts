@@ -166,7 +166,9 @@ interface ScopeRefusal {
 }
 
 function enforceReplayScope(auth: AuthState, mode: ReplayMode): ScopeRefusal | undefined {
-  if (auth.kind !== 'token') {
+  // IP-13: both a verified token and the no-auth anonymous principal carry a
+  // `grantedScopes` set; only a genuinely unauthenticated request is refused.
+  if (auth.kind === 'unauthenticated') {
     return {
       code: 'auth-required',
       status: 401,
@@ -203,7 +205,8 @@ function auditActor(auth: AuthState): {
       ...(auth.token.label !== undefined ? { label: auth.token.label } : {}),
     };
   }
-  return { kind: 'system', id: 'unauthenticated' };
+  // IP-13: attribute no-auth replays to the synthetic 'anonymous' principal.
+  return { kind: 'system', id: auth.kind === 'anonymous' ? 'anonymous' : 'unauthenticated' };
 }
 
 async function maybeAppendAudit(

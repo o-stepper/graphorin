@@ -41,7 +41,17 @@ export function createAuthRoutes(deps: AuthRoutesDeps): Hono<{ Variables: Server
 
   app.post('/session/ws-ticket', createScopeMiddleware('agents:invoke'), (c) => {
     const auth = c.get('state').auth;
-    if (auth.kind !== 'token') {
+    // IP-13: in the no-auth loopback mode (`auth.kind='none'`) there is no
+    // bearer token, but the anonymous principal is fully authorized — mint a
+    // ticket bound to a synthetic `anonymous` id so a browser client written
+    // for token mode still completes the round-trip.
+    const principal =
+      auth.kind === 'token'
+        ? { tokenId: auth.token.tokenId, scopes: auth.grantedScopes }
+        : auth.kind === 'anonymous'
+          ? { tokenId: 'anonymous', scopes: auth.grantedScopes }
+          : undefined;
+    if (principal === undefined) {
       return c.json(
         {
           error: 'auth-required',
@@ -50,10 +60,7 @@ export function createAuthRoutes(deps: AuthRoutesDeps): Hono<{ Variables: Server
         401,
       );
     }
-    const ticket = deps.tickets.issue({
-      tokenId: auth.token.tokenId,
-      scopes: auth.grantedScopes,
-    });
+    const ticket = deps.tickets.issue(principal);
     return c.json(
       {
         ticket: ticket.value,

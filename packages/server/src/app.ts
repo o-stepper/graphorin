@@ -47,6 +47,7 @@ import { type LifecycleHooks, type OnErrorContext, runPreBind } from './lifecycl
 import { createServerMetricRegistry, SERVER_METRIC_NAMES } from './metrics/catalog.js';
 import type { MetricRegistry } from './metrics/registry.js';
 import {
+  createAnonymousAuthMiddleware,
   createAuditMiddleware,
   createAuthMiddleware,
   createCorsMiddleware,
@@ -847,6 +848,19 @@ function mountRoutes(
   });
   app.route(`${base}/health`, health);
 
+  // IP-13: `auth.kind='none'` disables authentication on every route. It is the
+  // documented trusted-loopback / single-operator mode, but binding a
+  // non-loopback host with auth off exposes full admin access (including the WS
+  // stream) to anyone who can reach it — warn loudly rather than silently.
+  if (config.auth.kind === 'none' && !isLoopbackHost(config.server.host)) {
+    console.warn(
+      `[graphorin/server] WARN: auth.kind='none' disables authentication on every endpoint, ` +
+        `but the server binds the non-loopback host '${config.server.host}'. Anyone who can reach ` +
+        `it has full admin access — use auth.kind='token' for non-loopback deployments or bind a ` +
+        `loopback host.`,
+    );
+  }
+
   if (config.metrics.enabled) {
     // IP-23: an unauthenticated /metrics endpoint leaks operational intel
     // (trigger ids in labels, consolidator budgets). It is fine on a loopback
@@ -901,9 +915,16 @@ function mountRoutes(
     }
     return false;
   }
-  if (ctx.verifier !== undefined) {
-    const verifier = ctx.verifier;
-    const authMw = createAuthMiddleware({ verifier });
+  // IP-13: in the no-auth loopback mode (`auth.kind='none'`) there is no
+  // verifier, but the authenticated subtree must still be reachable — install
+  // an anonymous middleware that stamps a fully-authorized principal so the
+  // domain routes serve instead of every one of them returning 401.
+  const anonymousAuth = ctx.verifier === undefined && config.auth.kind === 'none';
+  if (ctx.verifier !== undefined || anonymousAuth) {
+    const authMw =
+      ctx.verifier !== undefined
+        ? createAuthMiddleware({ verifier: ctx.verifier })
+        : createAnonymousAuthMiddleware();
     app.use(`${base}/*`, async (c, next) => {
       if (shouldSkipAuth(c.req.path)) {
         await next();
@@ -1008,11 +1029,15 @@ function mountRoutes(
   if (ctx.wsTickets !== undefined) {
     app.route(`${base}`, createAuthRoutes({ tickets: ctx.wsTickets }));
   }
+  // IP-13: mount the WS upgrade when a verifier is wired OR auth is disabled
+  // (`auth.kind='none'`). The old condition required a verifier, so
+  // `ws.enabled: true` under no-auth was silently ignored — the route never
+  // mounted and clients got a bare 404 with no explanation.
   if (
     ctx.wsDispatcher !== undefined &&
     ctx.wsTickets !== undefined &&
     ctx.wsAdapter !== undefined &&
-    ctx.verifier !== undefined &&
+    (ctx.verifier !== undefined || anonymousAuth) &&
     config.server.ws.enabled
   ) {
     const dispatcher = ctx.wsDispatcher;
@@ -1025,7 +1050,8 @@ function mountRoutes(
         createWsUpgradeEvents(c, {
           dispatcher,
           tickets,
-          verifier,
+          ...(verifier !== undefined ? { verifier } : {}),
+          anonymous: anonymousAuth,
           runs,
           now: ctx.now,
         }),
