@@ -8,6 +8,35 @@
  * @packageDocumentation
  */
 
+import { RPC_ERROR_CODES } from '@graphorin/protocol';
+
+/**
+ * IP-19: map a JSON-RPC error code from a server `RpcFailure` frame to the
+ * client's discriminated {@link GraphorinClientErrorKind}, so a rate-limited
+ * or scope-denied RPC is distinguishable from a genuine protocol violation.
+ */
+export function kindForRpcCode(code: number): GraphorinClientErrorKind {
+  switch (code) {
+    case RPC_ERROR_CODES.RATE_LIMITED:
+      return 'rate-limited';
+    case RPC_ERROR_CODES.SCOPE_DENIED:
+      return 'scope-denied';
+    case RPC_ERROR_CODES.AUTH_REQUIRED:
+    case RPC_ERROR_CODES.AUTH_INVALID:
+      return 'auth-failed';
+    case RPC_ERROR_CODES.RUN_NOT_FOUND:
+      return 'run-not-found';
+    case RPC_ERROR_CODES.SUBSCRIPTION_NOT_FOUND:
+      return 'subscription-not-found';
+    case RPC_ERROR_CODES.INTERNAL_ERROR:
+      return 'server-error';
+    default:
+      // INVALID_REQUEST / INVALID_PARAMS / METHOD_NOT_FOUND / PROTOCOL_VIOLATION
+      // and any unknown code stay a protocol violation.
+      return 'protocol-violation';
+  }
+}
+
 /**
  * Discriminator union of every error kind raised by the client.
  *
@@ -20,6 +49,12 @@ export type GraphorinClientErrorKind =
   | 'auth-failed'
   | 'protocol-violation'
   | 'subscription-not-found'
+  // IP-19: discriminated RPC-failure kinds so callers can branch on the
+  // server's error class instead of pattern-matching the message string.
+  | 'rate-limited'
+  | 'scope-denied'
+  | 'run-not-found'
+  | 'server-error'
   | 'aborted'
   | 'invalid-server-frame';
 

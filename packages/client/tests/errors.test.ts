@@ -1,3 +1,4 @@
+import { RPC_ERROR_CODES } from '@graphorin/protocol';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -6,6 +7,7 @@ import {
   ClientNotConnectedError,
   GraphorinClientError,
   InvalidServerFrameError,
+  kindForRpcCode,
   ProtocolViolationError,
   SubprotocolMismatchError,
   SubscriptionNotFoundError,
@@ -42,5 +44,26 @@ describe('GraphorinClientError hierarchy', () => {
     const err = new SubscriptionNotFoundError('sub-1');
     expect(err.subscriptionId).toBe('sub-1');
     expect(err.message).toContain('sub-1');
+  });
+});
+
+describe('kindForRpcCode (IP-19) — RPC error code → discriminated kind', () => {
+  it('maps each meaningful JSON-RPC error code to its own kind', () => {
+    expect(kindForRpcCode(RPC_ERROR_CODES.RATE_LIMITED)).toBe('rate-limited');
+    expect(kindForRpcCode(RPC_ERROR_CODES.SCOPE_DENIED)).toBe('scope-denied');
+    expect(kindForRpcCode(RPC_ERROR_CODES.AUTH_REQUIRED)).toBe('auth-failed');
+    expect(kindForRpcCode(RPC_ERROR_CODES.AUTH_INVALID)).toBe('auth-failed');
+    expect(kindForRpcCode(RPC_ERROR_CODES.RUN_NOT_FOUND)).toBe('run-not-found');
+    expect(kindForRpcCode(RPC_ERROR_CODES.SUBSCRIPTION_NOT_FOUND)).toBe('subscription-not-found');
+    expect(kindForRpcCode(RPC_ERROR_CODES.INTERNAL_ERROR)).toBe('server-error');
+  });
+
+  it('collapses the generic JSON-RPC violations and unknown codes to protocol-violation', () => {
+    expect(kindForRpcCode(RPC_ERROR_CODES.INVALID_REQUEST)).toBe('protocol-violation');
+    expect(kindForRpcCode(RPC_ERROR_CODES.INVALID_PARAMS)).toBe('protocol-violation');
+    expect(kindForRpcCode(RPC_ERROR_CODES.METHOD_NOT_FOUND)).toBe('protocol-violation');
+    expect(kindForRpcCode(RPC_ERROR_CODES.PROTOCOL_VIOLATION)).toBe('protocol-violation');
+    // An unrecognised code is treated conservatively as a protocol violation.
+    expect(kindForRpcCode(-31000)).toBe('protocol-violation');
   });
 });

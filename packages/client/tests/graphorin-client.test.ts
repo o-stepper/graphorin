@@ -2,9 +2,11 @@ import type { ServerMessage } from '@graphorin/protocol';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
+  ClientAbortedError,
   ClientNotConnectedError,
   GraphorinClientError,
   SubprotocolMismatchError,
+  TransportFailedError,
 } from '../src/errors.js';
 import { GraphorinClient, type SubscriptionTarget } from '../src/graphorin-client.js';
 import {
@@ -188,6 +190,81 @@ describe('GraphorinClient — RPC + subscriptions', () => {
     });
     await expect(sub).rejects.toBeInstanceOf(GraphorinClientError);
     await client.disconnect();
+  });
+
+  it('discriminates the RPC error kind from the JSON-RPC error code (IP-19)', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+    });
+    await connectAndAck(client);
+    const socket = lastSocket();
+    const sub = client.subscribe({ target: 'session', id: 'busy' });
+    await Promise.resolve();
+    const sent = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sent.id,
+      // -32004 === RPC_ERROR_CODES.RATE_LIMITED — must surface as its own kind,
+      // not the generic 'protocol-violation'.
+      error: { code: -32004, message: 'rate limited' },
+    });
+    const err = await sub.catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(GraphorinClientError);
+    expect((err as GraphorinClientError).kind).toBe('rate-limited');
+    await client.disconnect();
+  });
+
+  it('rejects an RPC that gets no reply within rpcTimeoutMs (IP-19b)', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+      // initialize is acked within microtasks, well under this window; the
+      // un-answered ping below is what trips the timer.
+      rpcTimeoutMs: 40,
+    });
+    await connectAndAck(client);
+    const pinged = client.ping();
+    const err = await pinged.catch((e: unknown) => e);
+    expect(err).toBeInstanceOf(TransportFailedError);
+    expect((err as TransportFailedError).message).toContain('timed out after 40ms');
+    await client.disconnect();
+  });
+
+  it('rejects a blocked event waiter when the client disconnects (IP-19c)', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+    });
+    await connectAndAck(client);
+    const socket = lastSocket();
+    const subPromise = client.subscribe({ target: 'session', id: 'live' });
+    await Promise.resolve();
+    const sent = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sent.id,
+      result: { subscriptionId: 'sub-live' },
+    });
+    const sub = await subPromise;
+
+    // No events are queued, so next() parks a waiter rather than resolving.
+    const iter = sub.events()[Symbol.asyncIterator]();
+    const pending = iter.next();
+    await Promise.resolve();
+    // Attach the rejection assertion BEFORE teardown so the rejection is never
+    // momentarily unhandled.
+    const rejection = expect(pending).rejects.toBeInstanceOf(ClientAbortedError);
+
+    // Abnormal teardown must propagate to the parked waiter as a rejection —
+    // not a silent { done: true } that swallows the disconnect.
+    await client.disconnect();
+    await rejection;
   });
 
   it('rejects subscribe when not connected', async () => {
