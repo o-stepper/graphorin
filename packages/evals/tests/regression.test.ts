@@ -70,7 +70,7 @@ describe('detectRegressions', () => {
     expect(r.findings.find((f) => f.kind === 'avg-score-drop')).toBeDefined();
   });
 
-  it('flags duration regressions', () => {
+  it('flags duration regressions when an explicit ms budget is set (opt-in)', () => {
     const baseline = makeReport({
       total: 5,
       passed: 5,
@@ -83,8 +83,30 @@ describe('detectRegressions', () => {
       avgDurationMs: 1500,
       byScorer: { em: { passed: 5, failed: 0, avgScore: 1 } },
     });
-    const r = detectRegressions(current, baseline);
+    const r = detectRegressions(current, baseline, { maxAvgDurationIncreaseMs: 250 });
     expect(r.findings.find((f) => f.kind === 'avg-duration-increase')).toBeDefined();
+  });
+
+  it('does NOT flag duration regressions by default — the gate is opt-in (EB-4)', () => {
+    // avgDuration jumps 100ms -> 5000ms with pass-rate/scores unchanged. The
+    // absolute duration gate is environment-sensitive (workstation baseline vs
+    // slow CI runner, or real LLM latency jitter), so it must be off unless a
+    // caller opts in with an explicit ms budget.
+    const baseline = makeReport({
+      total: 5,
+      passed: 5,
+      avgDurationMs: 100,
+      byScorer: { em: { passed: 5, failed: 0, avgScore: 1 } },
+    });
+    const current = makeReport({
+      total: 5,
+      passed: 5,
+      avgDurationMs: 5000,
+      byScorer: { em: { passed: 5, failed: 0, avgScore: 1 } },
+    });
+    const r = detectRegressions(current, baseline);
+    expect(r.findings.find((f) => f.kind === 'avg-duration-increase')).toBeUndefined();
+    expect(r.hasRegressions).toBe(false);
   });
 
   it('flags scorers that disappeared from the current run', () => {

@@ -79,7 +79,13 @@ export interface RegressionOptions {
   readonly maxPassRateDropPct?: number;
   /** Minimum drop in average score per scorer that counts as a regression. */
   readonly maxAvgScoreDrop?: number;
-  /** Maximum allowed increase in `avgDurationMs`. */
+  /**
+   * Maximum allowed increase in `avgDurationMs` before it counts as a
+   * regression. **Opt-in: defaults to `Infinity` (gate off)** because absolute
+   * wall-clock budgets are environment-sensitive (workstation baseline vs CI
+   * runner, real LLM-latency jitter). Pass a finite ms budget to enable an
+   * absolute duration gate; leave unset to ignore duration entirely.
+   */
   readonly maxAvgDurationIncreaseMs?: number;
 }
 
