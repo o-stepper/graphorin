@@ -144,6 +144,12 @@ export interface MemorySystemAgentOptions {
   readonly topK?: number;
   /** Run the consolidator's standard phase after ingest (needs an extraction-capable provider). */
   readonly consolidate?: boolean;
+  /**
+   * EB-11 hook: fired once per ACTUAL conversation ingest (a cache miss), NOT
+   * per QA case — lets a caller/test confirm a sample's N questions ingest the
+   * haystack only once.
+   */
+  readonly onIngest?: () => void;
 }
 
 /**
@@ -160,58 +166,75 @@ export function createMemorySystemAgent(
     agentId: 'longmemeval-agent',
   };
   const topK = options.topK ?? DEFAULT_TOP_K;
+  // EB-11: the LOCOMO loader pushes the SAME `haystackSessions` array into
+  // every QA case of one conversation, so a fresh per-case ingest re-loads the
+  // whole (~300-turn) conversation — and, with --consolidate, re-runs the LLM
+  // consolidation pass — once per QUESTION. Key the ingested memory by that
+  // shared array reference: each conversation is ingested once and its store is
+  // reused (read-only) by its other questions; a different conversation is a
+  // different array, so it gets a separate store and sample isolation holds.
+  // The :memory: stores stay open for the run's lifetime (a short-lived
+  // benchmark process) — not closed per case, since later questions of the same
+  // sample still read them.
+  const ingestCache = new WeakMap<object, Memory>();
+
+  async function ingestConversation(input: MemoryEvalInput): Promise<Memory> {
+    const cached = ingestCache.get(input.haystackSessions);
+    if (cached !== undefined) return cached;
+    const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
+    await store.init();
+    const memory = createMemory({
+      store: store.memory as never,
+      embeddings: store.embeddings,
+      resolveScope: () => scope,
+      conflictPipeline: { mode: 'off' },
+      consolidator:
+        options.consolidate === true
+          ? { enabled: true, provider: options.provider, tier: 'standard', defaultScope: scope }
+          : { enabled: false },
+    });
+    for (const session of input.haystackSessions) {
+      for (const turn of session.turns) {
+        const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
+        await memory.semantic.remember(scope, {
+          text: normalizeForFts(`${turn.role}${stamp}: ${turn.content}`),
+          sensitivity: 'internal',
+        });
+      }
+    }
+    if (options.consolidate === true) {
+      await memory.consolidator.fireNow('standard', scope);
+    }
+    ingestCache.set(input.haystackSessions, memory);
+    options.onIngest?.();
+    return memory;
+  }
+
   return {
     async run(input: MemoryEvalInput): Promise<string> {
-      const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
-      await store.init();
-      const memory = createMemory({
-        store: store.memory as never,
-        embeddings: store.embeddings,
-        resolveScope: () => scope,
-        conflictPipeline: { mode: 'off' },
-        consolidator:
-          options.consolidate === true
-            ? { enabled: true, provider: options.provider, tier: 'standard', defaultScope: scope }
-            : { enabled: false },
+      const memory = await ingestConversation(input);
+      const context = await recall(memory, scope, input.question, topK);
+      const askedAt = input.askedAt !== undefined ? `\nCURRENT DATE: ${input.askedAt}` : '';
+      const response = await options.provider.generate({
+        systemMessage:
+          "You are a personal assistant answering from the user's long-term memory. Use ONLY " +
+          'the MEMORY context. If the answer is not present, reply that you do not have that ' +
+          'information.',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `MEMORY:\n${context}${askedAt}\n\nQUESTION: ${input.question}\n\nANSWER:`,
+              },
+            ],
+          },
+        ],
+        temperature: 0,
+        maxTokens: 256,
       });
-      try {
-        for (const session of input.haystackSessions) {
-          for (const turn of session.turns) {
-            const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
-            await memory.semantic.remember(scope, {
-              text: normalizeForFts(`${turn.role}${stamp}: ${turn.content}`),
-              sensitivity: 'internal',
-            });
-          }
-        }
-        if (options.consolidate === true) {
-          await memory.consolidator.fireNow('standard', scope);
-        }
-        const context = await recall(memory, scope, input.question, topK);
-        const askedAt = input.askedAt !== undefined ? `\nCURRENT DATE: ${input.askedAt}` : '';
-        const response = await options.provider.generate({
-          systemMessage:
-            "You are a personal assistant answering from the user's long-term memory. Use ONLY " +
-            'the MEMORY context. If the answer is not present, reply that you do not have that ' +
-            'information.',
-          messages: [
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: `MEMORY:\n${context}${askedAt}\n\nQUESTION: ${input.question}\n\nANSWER:`,
-                },
-              ],
-            },
-          ],
-          temperature: 0,
-          maxTokens: 256,
-        });
-        return response.text ?? '';
-      } finally {
-        await store.close();
-      }
+      return response.text ?? '';
     },
   };
 }
