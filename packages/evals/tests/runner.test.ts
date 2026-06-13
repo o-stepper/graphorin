@@ -92,7 +92,7 @@ describe('runEvals', () => {
     expect(events.find((e) => e.passed === false)).toBeDefined();
   });
 
-  it('honours an aborted signal before the next case', async () => {
+  it('throws on an aborted signal when throwOnAbort is set (opt-in)', async () => {
     const controller = new AbortController();
     const dataset = fromIterable([
       { input: 'a', expected: 'a' },
@@ -111,8 +111,38 @@ describe('runEvals', () => {
         dataset,
         scorers: [exactMatch()],
         signal: controller.signal,
+        throwOnAbort: true,
       }),
     ).rejects.toThrow(/aborted/);
+  });
+
+  it('returns a partial report with aborted:true instead of discarding completed work (EB-14)', async () => {
+    const controller = new AbortController();
+    const dataset = fromIterable([
+      { input: 'a', expected: 'a' },
+      { input: 'b', expected: 'b' },
+      { input: 'c', expected: 'c' },
+    ]);
+    let calls = 0;
+    const report = await runEvals({
+      agent: {
+        async run(input) {
+          calls += 1;
+          // Abort after the 2nd case finishes; the 3rd is never dispatched.
+          if (calls === 2) controller.abort();
+          return input;
+        },
+      },
+      dataset,
+      scorers: [exactMatch()],
+      signal: controller.signal,
+    });
+    expect(report.aborted).toBe(true);
+    // The two completed cases survive — Ctrl+C on a long judged run no longer
+    // throws away everything that already finished.
+    expect(report.results).toHaveLength(2);
+    expect(report.summary.total).toBe(2);
+    expect(report.results.map((r) => r.caseId)).toEqual(['case-0', 'case-1']);
   });
 
   it('returns an empty summary when the dataset is empty', async () => {
