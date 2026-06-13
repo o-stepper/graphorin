@@ -25,7 +25,7 @@ flowchart LR
     Adapter --> Triggers[Triggers state]
 ```
 
-A single SQLite database file holds every Graphorin table. The adapter exposes typed sub-stores for `memory`, `sessions`, `embeddings`, `workflow`, `audit`, and `triggers`. Each sub-store is the implementation of a contract declared in `@graphorin/core/contracts` — your application can swap in a different adapter without touching the rest of the framework.
+A single SQLite database file holds every Graphorin table. The adapter exposes typed sub-stores for `memory`, `checkpoints`, `sessions`, `triggers`, `embeddings`, `authTokens`, `oauthServers`, and `idempotency`. (The audit log is **not** a sub-store — it lives in its own, always-encrypted database; see below.) Each sub-store is the implementation of a contract declared in `@graphorin/core/contracts` — your application can swap in a different adapter without touching the rest of the framework.
 
 ## Wiring the default
 
@@ -34,13 +34,12 @@ import { createSqliteStore } from '@graphorin/store-sqlite';
 
 const sqlite = await createSqliteStore({
   path: './assistant.db',
-  pragmas: { /* defaults are sane; override only when you need to */ },
 });
 
 await sqlite.init(); // run pending migrations
 ```
 
-`createSqliteStore({...})` returns a typed object with `memory`, `sessions`, `embeddings`, `workflow`, `audit`, and `triggers` sub-stores plus a top-level `close()` method.
+`createSqliteStore({...})` returns a typed object with `memory`, `checkpoints`, `sessions`, `triggers`, `embeddings`, `authTokens`, `oauthServers`, and `idempotency` sub-stores, the raw `connection`, plus top-level `init()` / `close()` methods.
 
 ## Migrations
 
@@ -123,7 +122,7 @@ Embeddings produced by `@graphorin/embedder-transformersjs` are tagged with the 
 ## File layout
 
 ```text
-./assistant.db           — main database (memory, sessions, workflow, triggers, embeddings)
+./assistant.db           — main database (memory, sessions, checkpoints, triggers, embeddings)
 ./assistant.db-wal       — write-ahead log
 ./assistant.db-shm       — shared-memory file
 ./.graphorin/audit.db    — encrypted audit log

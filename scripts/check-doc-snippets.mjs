@@ -38,7 +38,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
  * guide's snippets are made compilable (DOC-7..11); this is the enforced floor,
  * not the ceiling.
  */
-const CHECKED = ['documentation/guide/embedders.md'];
+const CHECKED = ['documentation/guide/embedders.md', 'documentation/guide/persistence.md'];
 
 const COMPILER_OPTIONS = {
   module: ts.ModuleKind.ESNext,
