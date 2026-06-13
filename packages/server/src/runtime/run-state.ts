@@ -32,6 +32,32 @@ export type RunStatus = 'pending' | 'running' | 'completed' | 'failed' | 'aborte
 export type RunKind = 'agent' | 'workflow';
 
 /**
+ * Terminal status a run can settle into (never `pending` / `running`).
+ *
+ * @stable
+ */
+export type TerminalRunStatus = Extract<RunStatus, 'completed' | 'failed' | 'aborted'>;
+
+/**
+ * IP-15: payload handed to the {@link RunStateTracker} `onTerminal` callback
+ * the first time a run reaches a terminal state. The server turns this into
+ * the `graphorin_agent_runs_total` counter + `graphorin_agent_run_duration_seconds`
+ * summary. `durationMs` is omitted for a run that was aborted before it ever
+ * started (no meaningful wall-clock).
+ *
+ * @stable
+ */
+export interface TerminalRunInfo {
+  readonly status: TerminalRunStatus;
+  readonly kind: RunKind;
+  readonly durationMs?: number;
+}
+
+function isTerminalStatus(status: RunStatus): status is TerminalRunStatus {
+  return status === 'completed' || status === 'failed' || status === 'aborted';
+}
+
+/**
  * Snapshot returned by {@link RunStateTracker.snapshot}.
  *
  * @stable
@@ -106,9 +132,35 @@ interface RunRecord {
 export class RunStateTracker {
   readonly #records: Map<string, RunRecord> = new Map();
   readonly #now: () => number;
+  readonly #onTerminal: ((info: TerminalRunInfo) => void) | undefined;
 
-  constructor(options: { readonly now?: () => number } = {}) {
+  constructor(
+    options: {
+      readonly now?: () => number;
+      /**
+       * IP-15: invoked exactly once per run, the first time it settles into a
+       * terminal state. Used to drive the run-count + duration metrics. Never
+       * throws into the tracker — wrap your handler if it might.
+       */
+      readonly onTerminal?: (info: TerminalRunInfo) => void;
+    } = {},
+  ) {
     this.#now = options.now ?? Date.now;
+    this.#onTerminal = options.onTerminal;
+  }
+
+  #emitTerminal(record: RunRecord): void {
+    if (this.#onTerminal === undefined) return;
+    if (!isTerminalStatus(record.status)) return;
+    const durationMs =
+      record.startedAt !== undefined && record.completedAt !== undefined
+        ? record.completedAt - record.startedAt
+        : undefined;
+    this.#onTerminal({
+      status: record.status,
+      kind: record.kind,
+      ...(durationMs !== undefined ? { durationMs } : {}),
+    });
   }
 
   /** Reserve a run id without taking ownership of an AbortSignal. */
@@ -156,11 +208,15 @@ export class RunStateTracker {
   ): void {
     const record = this.#records.get(runId);
     if (record === undefined) return;
+    // IP-15: only the FIRST terminal transition counts toward the metrics —
+    // a run aborted then re-completed must not double-increment.
+    const wasTerminal = isTerminalStatus(record.status);
     record.status = status;
     record.completedAt = this.#now();
     if (err !== undefined) {
       record.error = { message: err instanceof Error ? err.message : String(err) };
     }
+    if (!wasTerminal) this.#emitTerminal(record);
   }
 
   /** Cancel a run via its `AbortController`. */
@@ -173,6 +229,7 @@ export class RunStateTracker {
     if (record.status === 'pending' || record.status === 'running') {
       record.status = 'aborted';
       record.completedAt = this.#now();
+      this.#emitTerminal(record);
     }
     return true;
   }
@@ -240,6 +297,7 @@ export class RunStateTracker {
         if (!record.controller.signal.aborted) record.controller.abort(reason);
         record.status = 'aborted';
         record.completedAt = this.#now();
+        this.#emitTerminal(record);
         aborted += 1;
       }
     }

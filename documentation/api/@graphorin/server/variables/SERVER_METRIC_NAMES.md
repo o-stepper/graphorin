@@ -17,14 +17,9 @@ const SERVER_METRIC_NAMES: Readonly<{
   consolidatorQueueDepth: "graphorin_consolidator_queue_depth";
   idempotencyCacheHitRatio: "graphorin_idempotency_cache_hit_ratio";
   inflightRuns: "graphorin_inflight_runs";
-  oauthTokensFreshness: "graphorin_oauth_tokens_freshness_seconds";
-  providerCostUsdTotal: "graphorin_provider_cost_usd_total";
-  providerTokensTotal: "graphorin_provider_tokens_total";
-  redactionDropsTotal: "graphorin_redaction_drops_total";
   replayBufferEvents: "graphorin_replay_buffer_events";
   serverUptime: "graphorin_server_uptime_seconds";
   storageWalSize: "graphorin_storage_wal_size_bytes";
-  toolCallsTotal: "graphorin_tool_calls_total";
   triggersFiresTotal: "graphorin_triggers_fires_total";
 }>;
 ```

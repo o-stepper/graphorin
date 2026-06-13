@@ -430,7 +430,23 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
         : {}),
     }));
 
-  const runs = options.runs ?? new RunStateTracker({ now });
+  const metricRegistry = options.metricRegistry ?? createServerMetricRegistry();
+  metricRegistry.set(SERVER_METRIC_NAMES.buildInfo, 1, { version });
+
+  // IP-15: agent / workflow run completions move graphorin_agent_runs_total +
+  // graphorin_agent_run_duration_seconds. The tracker stays metric-agnostic —
+  // it fires a terminal callback the server turns into samples.
+  const runs =
+    options.runs ??
+    new RunStateTracker({
+      now,
+      onTerminal: (info) => {
+        metricRegistry.inc(SERVER_METRIC_NAMES.agentRunsTotal, { status: info.status });
+        if (info.durationMs !== undefined) {
+          metricRegistry.observe(SERVER_METRIC_NAMES.agentRunDuration, info.durationMs / 1000);
+        }
+      },
+    });
   const agents = options.agents ?? new AgentRegistry();
   const workflows = options.workflows ?? new WorkflowRegistry();
 
@@ -460,9 +476,6 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   let preBind: Awaited<ReturnType<typeof runPreBind>> | undefined;
   let verifier: TokenVerifier | undefined;
   let pepperHandle: import('@graphorin/security').SecretValue | undefined;
-
-  const metricRegistry = options.metricRegistry ?? createServerMetricRegistry();
-  metricRegistry.set(SERVER_METRIC_NAMES.buildInfo, 1, { version });
 
   let triggersDaemon: TriggersDaemon | undefined;
   if (options.triggers !== undefined) {
@@ -954,6 +967,8 @@ function mountRoutes(
       now: ctx.now,
       // IP-6: token minting returns a raw secret — never cache it.
       excludeResponseCachePaths: [`${base}/tokens`],
+      // IP-15: publish the live cache hit ratio gauge.
+      metricRegistry: ctx.metricRegistry,
     });
     app.use(`${base}/*`, async (c, next) => {
       if (shouldSkipAuth(c.req.path)) {
