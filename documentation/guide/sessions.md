@@ -132,6 +132,8 @@ const replayed = await session.replay({
 });
 ```
 
+`session.replay()` reads its spans from the `traceSource` you pass, or — when you construct the manager with `replayTraceSource: (id) => traceSourceForSession(store.connection, id)` (the durable span sink from `@graphorin/store-sqlite`, migration 024) — from the persisted spans for that session. With no source wired, replay falls back to the empty source and emits only `replay.start` / `replay.end`. See [Observability § Replay](/guide/observability#replay).
+
 By default, replays are **sanitised** — sensitive content is redacted, and external side-effects (real provider calls, real tool executions with side-effects) are stubbed against recorded "tool cassettes" (`graphorin-tool-cassette/1.0`). The `toolReplayMode` knob honours per-tool `sideEffectClass` so `'pure'` and `'read-only'` tools may be re-executed live while `'side-effecting'` and `'external-stateful'` tools default to the recorded cassette.
 
 Every replay writes one audit row.
