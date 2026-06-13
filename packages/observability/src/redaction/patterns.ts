@@ -63,6 +63,14 @@ export interface RedactionPattern {
   /** Replacement string used when `mode === 'mask'`. */
   readonly mask?: string;
   /**
+   * Optional per-match predicate (RP-21). When present, a regex hit is only
+   * treated as a real match — and masked — when this returns `true` for the
+   * matched substring. Used by the `creditcard` pattern to require a valid
+   * Luhn checksum so look-alike digit runs (epoch-ms timestamps, order ids)
+   * are not corrupted.
+   */
+  readonly verify?: (match: string) => boolean;
+  /**
    * Optional opt-in flag. When `true` the pattern is **not** active by
    * default; operators must add it to `enabledPatterns` explicitly. Used
    * by the IPv4 / IPv6 patterns because raw IPs frequently appear in
@@ -154,9 +162,12 @@ const PATTERNS: readonly RedactionPattern[] = [
   {
     name: 'creditcard',
     category: 'pii',
-    description: 'Credit card number (13–19 digits, optional spaces / dashes).',
+    description: 'Credit card number (13–19 digits, optional spaces / dashes; Luhn-checked).',
     regex: /\b(?:\d[\s-]*?){13,19}\b/g,
     mask: '[REDACTED creditcard]',
+    // RP-21: require a valid Luhn checksum so a 13–19 digit run that is not a
+    // real PAN (millisecond epoch timestamps, order numbers, …) is left alone.
+    verify: isLuhnValid,
   },
   {
     name: 'us-ssn',
@@ -224,3 +235,25 @@ export const OPT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS.filter(
  * @stable
  */
 export const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
+
+/**
+ * Luhn (mod-10) checksum validator used by the `creditcard` pattern (RP-21).
+ * Strips spaces / dashes, bounds the length to 13–19 digits, and verifies the
+ * checksum so a digit run that merely *looks* like a PAN is not redacted.
+ */
+function isLuhnValid(value: string): boolean {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length < 13 || digits.length > 19) return false;
+  let sum = 0;
+  let double = false;
+  for (let i = digits.length - 1; i >= 0; i -= 1) {
+    let d = digits.charCodeAt(i) - 48; // '0'
+    if (double) {
+      d *= 2;
+      if (d > 9) d -= 9;
+    }
+    sum += d;
+    double = !double;
+  }
+  return sum % 10 === 0;
+}

@@ -117,12 +117,27 @@ function applyPatterns(
 ): string {
   let out = s;
   for (const p of patterns) {
+    const mask = p.mask ?? `[REDACTED ${p.name}]`;
     p.regex.lastIndex = 0;
-    if (p.regex.test(out)) {
-      matched.add(p.name);
-      p.regex.lastIndex = 0;
-      out = out.replace(p.regex, p.mask ?? `[REDACTED ${p.name}]`);
+    if (p.verify === undefined) {
+      if (p.regex.test(out)) {
+        matched.add(p.name);
+        p.regex.lastIndex = 0;
+        out = out.replace(p.regex, mask);
+      }
+      continue;
     }
+    // RP-21: per-match predicate — only mask hits the verifier accepts (e.g.
+    // Luhn-valid PANs), and only count the pattern as matched when one did.
+    const verify = p.verify;
+    p.regex.lastIndex = 0;
+    out = out.replace(p.regex, (m) => {
+      if (verify(m)) {
+        matched.add(p.name);
+        return mask;
+      }
+      return m;
+    });
   }
   return out;
 }
