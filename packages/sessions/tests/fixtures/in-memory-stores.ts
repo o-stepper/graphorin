@@ -15,7 +15,7 @@ import type {
   SessionStoreExt,
   SessionWorkflowRun,
 } from '@graphorin/core/contracts';
-import type { SessionMemoryFacade } from '../../src/facade.js';
+import type { SessionMemoryFacade, SessionMessageWithMetadata } from '../../src/facade.js';
 
 export class InMemorySessionStore implements SessionStoreExt {
   readonly sessions = new Map<string, SessionMetadata>();
@@ -176,6 +176,21 @@ export class InMemoryMemorySessionFacade implements SessionMemoryFacade {
       rows = rows.slice(-opts.lastN);
     }
     return rows.map((r) => r.message);
+  }
+  async listWithMetadata(
+    scope: SessionScope,
+    opts: SessionListOptions = {},
+  ): Promise<ReadonlyArray<SessionMessageWithMetadata>> {
+    const messages = await this.list(scope, opts);
+    return messages.map((message) => {
+      const row = this.messages.find((m) => m.message === message);
+      return {
+        message,
+        messageId: row?.id ?? '',
+        sequence: row?.sequence ?? 0,
+        createdAt: row?.createdAt ?? '',
+      };
+    });
   }
   async search(): Promise<ReadonlyArray<MemoryHit>> {
     return [];

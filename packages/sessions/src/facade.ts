@@ -82,6 +82,16 @@ import {
 export interface SessionMemoryFacade {
   push(scope: SessionScope, message: Message): Promise<MessageRef>;
   list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
+  /**
+   * List messages with their persisted identity (RP-5): the stored message id,
+   * sequence, and `createdAt`. Optional — when absent, export falls back to
+   * fabricating those fields (the legacy behaviour). Implemented by
+   * `@graphorin/memory.session` over the store's real rows.
+   */
+  listWithMetadata?(
+    scope: SessionScope,
+    opts?: SessionListOptions,
+  ): Promise<ReadonlyArray<SessionMessageWithMetadata>>;
   search(
     scope: SessionScope,
     query: string,
@@ -92,6 +102,19 @@ export interface SessionMemoryFacade {
     scope: SessionScope,
     opts?: { keepLastN?: number },
   ): Promise<{ removed: number; summarized: number; summary?: string }>;
+}
+
+/**
+ * A stored message paired with its persisted identity (RP-5). The core
+ * {@link Message} type carries no id / timestamp; these come from the store row.
+ *
+ * @stable
+ */
+export interface SessionMessageWithMetadata {
+  readonly message: Message;
+  readonly messageId: string;
+  readonly sequence: number;
+  readonly createdAt: string;
 }
 
 /**
@@ -645,29 +668,51 @@ class SessionImpl implements Session {
     };
     await writer.writeRecord(sessionRecord);
 
-    const allAgents = await this.#args.store.listAgents();
-    for (const agent of allAgents) {
-      const agentRecord: SessionExportAgentRecord = agentToRecord(agent);
-      await writer.writeRecord(agentRecord);
+    // RP-5: gather messages (with their persisted identity when the memory
+    // facade exposes it) + handoffs FIRST, so agents can be filtered to those
+    // actually referenced by this session instead of dumping the whole catalog.
+    const withMeta: ReadonlyArray<SessionMessageWithMetadata> =
+      this.#args.memory.listWithMetadata !== undefined
+        ? await this.#args.memory.listWithMetadata(this.scope, {})
+        : (await this.#args.memory.list(this.scope, {})).map((message, i) => ({
+            message,
+            messageId: this.#args.idFactory('msg'),
+            sequence: i + 1,
+            createdAt: new Date(this.#args.now()).toISOString(),
+          }));
+    const handoffs = await this.#args.store.listHandoffs(this.id);
+
+    // Referenced agents: the session's primary agent + any agent that authored
+    // a message or took part in a handoff.
+    const referencedAgents = new Set<string>([meta.agentId]);
+    for (const { message } of withMeta) {
+      if (message.role === 'assistant' && message.agentId !== undefined) {
+        referencedAgents.add(message.agentId);
+      }
+    }
+    for (const h of handoffs) {
+      referencedAgents.add(h.fromAgentId);
+      referencedAgents.add(h.toAgentId);
     }
 
-    const messages = await this.#args.memory.list(this.scope, {});
-    let sequence = 0;
-    for (const message of messages) {
-      sequence += 1;
+    const allAgents = await this.#args.store.listAgents();
+    for (const agent of allAgents) {
+      if (!referencedAgents.has(agent.id)) continue;
+      await writer.writeRecord(agentToRecord(agent));
+    }
+
+    for (const { message, messageId, sequence, createdAt } of withMeta) {
       const sanitized = this.#sanitize(message, 'session-export');
       const messageRecord: SessionExportMessageRecord = {
         kind: 'message',
         sessionId: this.id,
-        messageId: this.#args.idFactory('msg'),
+        messageId,
         sequence,
-        createdAt: new Date(this.#args.now()).toISOString(),
+        createdAt,
         message: sanitized,
       };
       await writer.writeRecord(messageRecord);
     }
-
-    const handoffs = await this.#args.store.listHandoffs(this.id);
     for (const handoff of handoffs) {
       const handoffRecord: SessionExportHandoffRecord = {
         kind: 'handoff',

@@ -220,6 +220,14 @@ describe('createSqliteStore', () => {
     expect(list[1]?.role).toBe('assistant');
     const hits = await store.memory.session.search(scope, 'containers');
     expect(hits.length).toBeGreaterThanOrEqual(1);
+
+    // RP-5: listWithMetadata surfaces the stored id / sequence / createdAt.
+    const withMeta = await store.memory.session.listWithMetadata?.(scope);
+    expect(withMeta).toBeDefined();
+    expect(withMeta?.map((m) => m.messageId)).toEqual([r1.messageId, r2.messageId]);
+    expect(withMeta?.map((m) => m.sequence)).toEqual([1, 2]);
+    expect(withMeta?.[0]?.createdAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(withMeta?.[0]?.message.role).toBe('user');
   });
 
   it('shared memory: attach / listFor / detach', async () => {

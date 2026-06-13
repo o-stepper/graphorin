@@ -28,6 +28,7 @@ export type {
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
+  SessionMessageWithMetadata,
   SharedMemoryStore,
   WorkingMemoryStore,
 } from './memory-store.js';

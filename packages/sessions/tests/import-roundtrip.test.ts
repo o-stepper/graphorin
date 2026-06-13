@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBufferSink, createSessionManager } from '../src/index.js';
+import { createBufferSink, createSessionManager, readSessionExport } from '../src/index.js';
 import { InMemoryMemorySessionFacade, InMemorySessionStore } from './fixtures/in-memory-stores.js';
 
 const fixedNow = (): number => Date.parse('2026-05-08T10:00:00Z');
@@ -59,6 +59,43 @@ describe('Session export / import round-trip', () => {
       const agents = await sourceB.manager.agents.list();
       expect(agents.some((a) => a.id === 'worker')).toBe(true);
     }
+  });
+
+  it('preserves stored message id/createdAt and excludes unreferenced agents (RP-5)', async () => {
+    let clock = Date.parse('2026-05-08T10:00:00Z');
+    const now = (): number => clock;
+    const store = new InMemorySessionStore();
+    const memory = new InMemoryMemorySessionFacade(now);
+    let seq = 0;
+    const idf = (p: string): string => {
+      seq += 1;
+      return `${p}-${String(seq).padStart(4, '0')}`;
+    };
+    const manager = createSessionManager({ store, memory, now, newId: idf });
+    const session = await manager.create({ userId: 'u-1', agentId: 'main' });
+    await session.push({ role: 'user', content: 'hello' });
+    await session.push({ role: 'assistant', content: 'hi', agentId: 'main' });
+    // An agent registered but never referenced by a message or handoff.
+    await manager.agents.register('ghost', { displayName: 'Ghost' });
+    // Export happens LATER than the messages were stored.
+    clock = Date.parse('2026-06-01T00:00:00.000Z');
+
+    const buffer = createBufferSink();
+    await session.export({ sink: buffer.sink });
+    const parsed = readSessionExport(buffer.toString());
+
+    const msgs = parsed.records.filter(
+      (r): r is typeof r & { messageId: string; createdAt: string } => r.kind === 'message',
+    );
+    // Stored ids/timestamps survive — not fresh ids or the export wall-clock.
+    expect(msgs.map((m) => m.messageId)).toEqual(['msg-1', 'msg-2']);
+    expect(msgs[0]?.createdAt).toBe('2026-05-08T10:00:00.000Z');
+
+    const agentIds = parsed.records
+      .filter((r): r is typeof r & { id: string } => r.kind === 'agent')
+      .map((a) => a.id);
+    expect(agentIds).toContain('main'); // referenced by the assistant message
+    expect(agentIds).not.toContain('ghost'); // unrelated to this session
   });
 
   it('preserves causalityChain on MessageContent through export / import', async () => {

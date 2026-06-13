@@ -22,6 +22,7 @@ import type {
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
+  SessionMessageWithMetadata,
   SharedMemoryStore,
   WorkingMemoryStore,
 } from '@graphorin/core/contracts';
@@ -322,6 +323,47 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
       [...params, limit],
     );
     return rows.reverse().map(rowToMessage);
+  }
+
+  /**
+   * RP-5: like {@link list}, but each message carries its persisted identity
+   * (stored id, sequence, `createdAt`) so an exporter preserves message identity
+   * + chronology rather than fabricating fresh ids / the export wall-clock.
+   */
+  async listWithMetadata(
+    scope: SessionScope,
+    opts: SessionListOptions = {},
+  ): Promise<ReadonlyArray<SessionMessageWithMetadata>> {
+    if (scope.sessionId === undefined) {
+      throw new Error(
+        '[graphorin/store-sqlite] SessionMemoryStore.listWithMetadata requires scope.sessionId',
+      );
+    }
+    const conditions = ['scope_session_id = ?', 'deleted_at IS NULL'];
+    const params: unknown[] = [scope.sessionId];
+    if (opts.agentId !== undefined) {
+      conditions.push('agent_id = ?');
+      params.push(opts.agentId);
+    }
+    if (opts.role !== undefined) {
+      conditions.push('role = ?');
+      params.push(opts.role);
+    }
+    if (opts.sinceMessageId !== undefined) {
+      conditions.push('sequence > (SELECT sequence FROM session_messages WHERE id = ?)');
+      params.push(opts.sinceMessageId);
+    }
+    const limit = opts.lastN ?? 1000;
+    const rows = this.#conn.all<SessionMessageRow>(
+      `SELECT * FROM session_messages WHERE ${conditions.join(' AND ')} ORDER BY sequence DESC LIMIT ?`,
+      [...params, limit],
+    );
+    return rows.reverse().map((row) => ({
+      message: rowToMessage(row),
+      messageId: row.id,
+      sequence: row.sequence,
+      createdAt: new Date(row.created_at).toISOString(),
+    }));
   }
 
   /**
