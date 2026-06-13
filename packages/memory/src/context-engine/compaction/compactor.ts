@@ -271,6 +271,7 @@ async function executeClearStrategy(
       ...(strategy.keepToolUses !== undefined ? { keepToolUses: strategy.keepToolUses } : {}),
       ...(strategy.clearAtLeast !== undefined ? { clearAtLeast: strategy.clearAtLeast } : {}),
       ...(strategy.excludeTools !== undefined ? { excludeTools: strategy.excludeTools } : {}),
+      ...(strategy.externalize !== undefined ? { externalize: strategy.externalize } : {}),
     },
     counter,
   );

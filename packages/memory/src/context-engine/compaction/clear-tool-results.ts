@@ -12,7 +12,11 @@
  */
 
 import type { Message, ToolMessage } from '@graphorin/core';
-import { type ContextTokenCounter, countMessageTokens } from '../token-counter.js';
+import {
+  type ContextTokenCounter,
+  countMessageTokens,
+  renderMessageText,
+} from '../token-counter.js';
 
 /** Placeholder prefix on a cleared tool result — makes clearing idempotent. */
 export const CLEARED_TOOL_RESULT_MARKER = '[cleared tool result';
@@ -34,6 +38,23 @@ export interface ClearToolResultsOptions {
     readonly toolName?: string;
     readonly clearedTokens: number;
   }) => string;
+  /**
+   * A6 / SOTA-2 — recoverable clearing. When provided, the original tool-result
+   * text of each cleared message is handed to this callback (wire it to a spill
+   * store / the `read_result` handle registry) and the placeholder references the
+   * returned handle id + preview, so the model can re-fetch the full result via
+   * `read_result` rather than losing it. Invoked only for clears that actually
+   * commit (after the `clearAtLeast` floor), so a rejected clearing never spills.
+   * Omitted ⇒ the bare `placeholder` (irrecoverable, byte-identical default).
+   */
+  readonly externalize?: (
+    content: string,
+    info: {
+      readonly toolCallId: string;
+      readonly toolName?: string;
+      readonly clearedTokens: number;
+    },
+  ) => Promise<{ readonly handleId: string; readonly preview?: string }>;
 }
 
 /** Result of a clearing pass. `clearedIndices` empty ⇒ nothing changed. */
@@ -45,6 +66,17 @@ export interface ClearToolResultsOutcome {
 
 function defaultPlaceholder(info: { toolName?: string; clearedTokens: number }): string {
   return `${CLEARED_TOOL_RESULT_MARKER} · ${info.toolName ?? 'tool'} · ${info.clearedTokens} tokens elided · re-run the tool if needed]`;
+}
+
+/** A6: a placeholder that points at the externalized handle (recoverable via read_result). */
+function handlePlaceholder(info: {
+  toolName?: string;
+  clearedTokens: number;
+  handleId: string;
+  preview?: string;
+}): string {
+  const preview = info.preview !== undefined && info.preview.length > 0 ? ` · ${info.preview}` : '';
+  return `${CLEARED_TOOL_RESULT_MARKER} · ${info.toolName ?? 'tool'} · ${info.clearedTokens} tokens · full result via read_result handle: ${info.handleId}${preview}]`;
 }
 
 function isAlreadyCleared(content: Message['content']): boolean {
@@ -84,6 +116,7 @@ export async function clearOldToolResults(
   // Keep the most-recent `keep`; older ones are candidates unless excluded.
   const keptCutoff = toolIdx.length - Math.max(0, keep);
   const replacements = new Map<number, ToolMessage>();
+  const clearedTokensByIdx = new Map<number, number>();
   let reclaimable = 0;
   for (let j = 0; j < toolIdx.length && j < keptCutoff; j++) {
     const idx = toolIdx[j];
@@ -104,11 +137,40 @@ export async function clearOldToolResults(
     const placeholderTokens = await countMessageTokens([replaced], counter);
     reclaimable += Math.max(0, originalTokens - placeholderTokens);
     replacements.set(idx, replaced);
+    clearedTokensByIdx.set(idx, originalTokens);
   }
 
   const clearAtLeast = options.clearAtLeast ?? 0;
   if (replacements.size === 0 || reclaimable < clearAtLeast) {
     return { messages, clearedIndices: [], reclaimedTokens: 0 };
+  }
+
+  // A6: only now that the clearing commits, externalize each cleared result to a
+  // recoverable handle and rewrite its placeholder to reference it. Skipped
+  // clears (above) never reach here, so the spill never fires for nothing.
+  const externalize = options.externalize;
+  if (externalize !== undefined) {
+    for (const idx of replacements.keys()) {
+      const tm = messages[idx] as ToolMessage;
+      const name = toolNameById.get(tm.toolCallId);
+      const clearedTokens = clearedTokensByIdx.get(idx) ?? 0;
+      const content = typeof tm.content === 'string' ? tm.content : renderMessageText(tm);
+      const handle = await externalize(content, {
+        toolCallId: tm.toolCallId,
+        ...(name !== undefined ? { toolName: name } : {}),
+        clearedTokens,
+      });
+      replacements.set(idx, {
+        role: 'tool',
+        toolCallId: tm.toolCallId,
+        content: handlePlaceholder({
+          ...(name !== undefined ? { toolName: name } : {}),
+          clearedTokens,
+          handleId: handle.handleId,
+          ...(handle.preview !== undefined ? { preview: handle.preview } : {}),
+        }),
+      });
+    }
   }
 
   const out = messages.map((m, i) => replacements.get(i) ?? m);
