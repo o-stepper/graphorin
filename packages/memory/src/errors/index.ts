@@ -173,9 +173,9 @@ export class EmbedderMigrationLockedError extends GraphorinMemoryError {
 
 /**
  * Raised by `migrateEmbedder(...)` when the runner is interrupted via
- * `AbortSignal`. The surrounding `for-await` loop receives this error
- * so the operator can resume from the persisted cursor on the next
- * invocation.
+ * `AbortSignal`. The surrounding `for-await` loop receives this error so
+ * the operator can re-run the migration. MST-12: there is no persisted
+ * cursor today, so a re-run restarts from the beginning.
  *
  * @stable
  */
@@ -187,9 +187,9 @@ export class EmbedderMigrationAbortedError extends GraphorinMemoryError {
   constructor(migrationId: string) {
     super(
       `[graphorin/memory] embedder migration '${migrationId}' aborted before completion. ` +
-        'The migration cursor is persisted in `migration_state`; resume by re-running `migrateEmbedder(...)`.',
+        'Re-run `migrateEmbedder(...)` to restart (there is no persisted cursor yet, so it begins again).',
       {
-        hint: 'Re-invoke migrateEmbedder(...) to resume from the persisted cursor.',
+        hint: 'Re-invoke migrateEmbedder(...) to restart the migration.',
       },
     );
     this.migrationId = migrationId;
@@ -197,9 +197,9 @@ export class EmbedderMigrationAbortedError extends GraphorinMemoryError {
 }
 
 /**
- * Raised by the migration runner when the persisted `migration_state`
- * row references embedders that are no longer registered (e.g. the
- * operator removed the underlying tables manually).
+ * Raised by the migration runner when the migration references embedders
+ * that are no longer registered (e.g. the operator removed the underlying
+ * tables manually).
  *
  * @stable
  */
@@ -209,7 +209,7 @@ export class EmbedderMigrationStateError extends GraphorinMemoryError {
 
   constructor(message: string) {
     super(`[graphorin/memory] ${message}`, {
-      hint: 'Inspect the migration_state table; abort the broken row before retrying.',
+      hint: 'Re-register the source/target embedders (or re-run with the current ones) before retrying.',
     });
   }
 }

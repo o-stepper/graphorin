@@ -59,12 +59,22 @@ export interface ResolutionCandidate {
   readonly id: string;
   readonly normalizedName: string;
   readonly vector: Float32Array | null;
+  /**
+   * MST-11: the embedder that produced `vector`. When both this and the
+   * query's `vectorEmbedderId` are known and differ, the candidate is skipped
+   * for embedding comparison — vectors from different models live in different
+   * spaces, so their cosine is meaningless. Absent on either side ⇒ compared
+   * (byte-identical to the prior behaviour).
+   */
+  readonly embedderId?: string | null;
 }
 
 /** Inputs to {@link resolveEntityDecision} (all provided by the caller). */
 export interface ResolveDecisionInput {
   readonly normalizedName: string;
   readonly vector?: Float32Array | null;
+  /** MST-11: the embedder that produced `vector` (gates cross-embedder cosine). */
+  readonly vectorEmbedderId?: string | null;
   readonly candidates: ReadonlyArray<ResolutionCandidate>;
   readonly mergeThreshold: number;
   readonly adjudicateThreshold: number;
@@ -130,6 +140,16 @@ export function resolveEntityDecision(input: ResolveDecisionInput): EntityResolv
   let bestSim = Number.NEGATIVE_INFINITY;
   for (const c of input.candidates) {
     if (c.vector === null || c.vector.length === 0) continue;
+    // MST-11: never compare vectors across embedders — different models live
+    // in different vector spaces, so their cosine is meaningless. Skip only
+    // when both embedder ids are known and differ.
+    if (
+      input.vectorEmbedderId != null &&
+      c.embedderId != null &&
+      c.embedderId !== input.vectorEmbedderId
+    ) {
+      continue;
+    }
     const sim = cosineSimilarity(v, c.vector);
     if (sim > bestSim) {
       bestSim = sim;
@@ -252,6 +272,7 @@ export class EntityResolver {
     const decision = resolveEntityDecision({
       normalizedName,
       vector,
+      vectorEmbedderId: this.#embedderId(),
       candidates,
       mergeThreshold: this.#mergeThreshold,
       adjudicateThreshold: this.#adjudicateThreshold,

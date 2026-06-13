@@ -146,9 +146,10 @@ describe('@graphorin/memory — DoD: auto-migrate resumes after process kill', (
       configHash: sourceEmbedder.configHash(),
     });
 
-    // Stateful queue mirrors the storage adapter's persistent
-    // `migration_state` cursor — it survives across the two
-    // `migrateEmbedder(...)` invocations.
+    // MST-12: resumption is caller-driven. This stateful queue IS the cursor —
+    // the caller's `nextBatch` owns it and it survives across the two
+    // `migrateEmbedder(...)` invocations. There is no persisted
+    // `migration_state` cursor in the storage adapter today.
     const queue: Array<{ id: string; text: string }> = [
       { id: 'f1', text: 'one' },
       { id: 'f2', text: 'two' },

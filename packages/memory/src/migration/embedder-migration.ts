@@ -38,7 +38,11 @@ export interface MigrationProgress {
   readonly source: string;
   /** Identifier of the target embedder. */
   readonly target: string;
-  /** Migration row id in the persistent `migration_state` table. */
+  /**
+   * Identifier for this migration run. MST-12: this is an in-memory id for
+   * the current run — there is no persisted `migration_state` cursor today, so
+   * a migration does not resume across processes.
+   */
   readonly migrationId: string;
   /** Phase discriminator. */
   readonly phase: 'planning' | 'running' | 'paused' | 'committed' | 'aborted';
@@ -67,9 +71,10 @@ export interface MigrateEmbedderOptions {
   /** Optional cap on the number of rows to migrate per kind. */
   readonly maxRecordsPerKind?: number;
   /**
-   * Hook that returns the next batch of rows to re-embed for a given
-   * kind. The default sqlite adapter wires the consolidator to this
-   * hook through `@graphorin/store-sqlite`'s migration helpers.
+   * Hook that returns the next batch of rows to re-embed for a given kind.
+   * MST-12: this is **caller-supplied** — there is no store-side helper that
+   * auto-wires it today, and `auto-migrate` throws without it. Pass a paging
+   * function over your source rows to drive the migration.
    */
   readonly nextBatch?: NextBatchHook;
   /** Optional abort signal — aborting yields one final progress event. */
