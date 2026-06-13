@@ -101,6 +101,8 @@ for await (const event of client.runAgent('planner', { prompt: 'Plan a hike.' })
 
 The browser-friendly client is published as `@graphorin/client` and depends only on `@graphorin/protocol`. SSE is the documented fallback for environments that cannot upgrade to WebSocket.
 
+Cancelling a run over the socket — the `run.cancel` request and the `notifications/cancelled` notification — requires the same **`agents:invoke`** scope as the REST `POST /v1/runs/:runId/abort` route. A `run.cancel` from a token without it is rejected with `SCOPE_DENIED` (`-32003`); a `notifications/cancelled` without it (or before `initialize`) is silently ignored, since a notification carries no id to reply on.
+
 ## Triggers
 
 `@graphorin/triggers` is the durable scheduling layer. Four trigger kinds:

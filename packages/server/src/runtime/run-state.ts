@@ -272,3 +272,31 @@ export class RunStateTracker {
     return aborted;
   }
 }
+
+/** Default cadence for the terminal-record prune sweep (IP-16). */
+export const DEFAULT_RUN_PRUNE_INTERVAL_MS = 60_000;
+/** Default retention for terminal run records before they are dropped. */
+export const DEFAULT_RUN_RETENTION_MS = 5 * 60_000;
+
+/**
+ * IP-16: schedule a periodic prune of terminal run records. Without this the
+ * tracker's `prune()` was never called, so every run / stream / workflow left
+ * a `RunRecord` (each holding an `AbortController`) in memory forever — an
+ * unbounded leak on a long-living server. Returns a stop function that clears
+ * the timer; the timer is `unref`-ed so it never keeps the process alive.
+ */
+export function scheduleRunPruning(
+  runs: RunStateTracker,
+  now: () => number,
+  opts: { readonly intervalMs?: number; readonly retentionMs?: number } = {},
+): () => void {
+  const intervalMs = opts.intervalMs ?? DEFAULT_RUN_PRUNE_INTERVAL_MS;
+  const retentionMs = opts.retentionMs ?? DEFAULT_RUN_RETENTION_MS;
+  const timer = setInterval(() => {
+    runs.prune(now() - retentionMs);
+  }, intervalMs);
+  if (typeof (timer as { unref?: () => void }).unref === 'function') {
+    (timer as { unref: () => void }).unref();
+  }
+  return () => clearInterval(timer);
+}

@@ -74,7 +74,7 @@ import {
   type SessionApi,
   type SkillsApi,
 } from './routes/index.js';
-import { RunStateTracker } from './runtime/run-state.js';
+import { RunStateTracker, scheduleRunPruning } from './runtime/run-state.js';
 import { createSseRoutes } from './sse/index.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import { createTriggersDaemon } from './triggers/daemon.js';
@@ -453,6 +453,8 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   let listening: { readonly host: string; readonly port: number } | undefined;
   let started = false;
   let stopped = false;
+  // IP-16: stops the periodic terminal-run prune sweep on shutdown.
+  let stopRunPruning: (() => void) | undefined;
   let auditDb: AuditDb | undefined;
   let preBind: Awaited<ReturnType<typeof runPreBind>> | undefined;
   let verifier: TokenVerifier | undefined;
@@ -667,6 +669,10 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
         metricRegistry.set(SERVER_METRIC_NAMES.inflightRuns, runs.runningCount());
         metricRegistry.set(SERVER_METRIC_NAMES.replayBufferEvents, 0);
 
+        // IP-16: terminal run records (each holding an AbortController) would
+        // otherwise accumulate forever; sweep them on a periodic timer.
+        stopRunPruning = scheduleRunPruning(runs, now);
+
         if (options.skipListen !== true) {
           serverInstance = serve({
             fetch: app.fetch.bind(app),
@@ -713,6 +719,9 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
       if (!started) throw new LifecycleNotStartedError();
       if (stopped) return;
       stopped = true;
+      // IP-16: halt the prune sweep before draining.
+      stopRunPruning?.();
+      stopRunPruning = undefined;
       const drainTimeoutMs = force === true ? 0 : config.server.shutdown.drainTimeoutMs;
       try {
         if (options.hooks?.beforeShutdown !== undefined) {

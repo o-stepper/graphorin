@@ -42,6 +42,7 @@ import {
   SUBPROTOCOL_NAME,
 } from '@graphorin/protocol';
 import type { ParsedScope, TokenVerifier } from '@graphorin/security/auth';
+import { parseScope, scopeMatches } from '@graphorin/security/auth';
 import type { Context } from 'hono';
 import type { WSContext, WSEvents } from 'hono/ws';
 
@@ -152,8 +153,13 @@ export async function createWsUpgradeEvents(
       }
       const message = parsed.data;
       if (isCancelledNotification(message)) {
-        const runId = message.params.requestId;
-        options.runs?.abort(runId, 'mcp-cancel');
+        // IP-8: only an initialized connection holding `agents:invoke` may
+        // cancel a run. A notification carries no id, so an unauthorised one
+        // is silently ignored (there is no error channel) rather than aborting
+        // an arbitrary run.
+        if (initialized && grantsInvokeScope(auth.grantedScopes)) {
+          options.runs?.abort(message.params.requestId, 'mcp-cancel');
+        }
         return;
       }
       if (!initialized && !isInitializeRequest(message) && !isPingRequest(message)) {
@@ -255,6 +261,17 @@ export async function createWsUpgradeEvents(
         return;
       }
       if (isRunCancelRequest(message)) {
+        // IP-8: mirror the REST `POST /runs/:runId/abort` scope gate so a
+        // bearer token cannot abort an arbitrary run without `agents:invoke`.
+        if (!grantsInvokeScope(auth.grantedScopes)) {
+          sendRpcError(
+            ws,
+            message.id,
+            RPC_ERROR_CODES.SCOPE_DENIED,
+            "Token lacks required scope 'agents:invoke'.",
+          );
+          return;
+        }
         const runId = message.params.runId;
         const aborted = options.runs?.abort(runId, message.params.reason ?? 'rpc-cancel') === true;
         if (!aborted) {
@@ -367,6 +384,20 @@ async function resolveUpgradeAuth(
     };
   }
   return { kind: 'denied', reason: 'auth.required' };
+}
+
+/**
+ * IP-8: the `agents:invoke` scope required to cancel a run over the WS
+ * transport — the same requirement the REST `POST /runs/:runId/abort` route
+ * enforces. `scopeMatches` honours wildcards (`agents:*`, `admin:*`).
+ */
+const INVOKE_SCOPE: ParsedScope = parseScope('agents:invoke');
+
+function grantsInvokeScope(granted: ReadonlyArray<ParsedScope>): boolean {
+  for (const scope of granted) {
+    if (scopeMatches(scope, INVOKE_SCOPE)) return true;
+  }
+  return false;
 }
 
 function acceptTicket(ticket: WsTicket): ResolvedUpgradeAuth {
