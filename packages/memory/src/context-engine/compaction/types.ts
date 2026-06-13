@@ -76,14 +76,25 @@ export interface CompactionResult {
 export interface CompactionTriggerConfig {
   readonly thresholdTokens?: number;
   readonly thresholdRatio?: number;
+  /**
+   * SOTA-4 reclaim-floor: defer a compaction whose predicted reclaim — the
+   * older, compactable portion of the buffer (everything but the preserved
+   * recent turns) — is below this many tokens. Prevents compact-thrash at the
+   * threshold (paying a summarizer call to reclaim a handful of tokens). Opt-in;
+   * unset / `0` ⇒ no floor (current behaviour).
+   */
+  readonly minReclaimTokens?: number;
 }
 
 /**
  * Strategy discriminator. The default
  * `'summarize-old-preserve-recent'` strategy invokes the
  * configured summarizer and replaces the older portion with a
- * structured 9-section summary; the `'custom'` variant accepts an
- * arbitrary callable.
+ * structured 9-section summary; `'clear-old-tool-results'` (SOTA-1) is
+ * a zero-LLM tier that replaces the oldest tool results with compact
+ * placeholders BEFORE any summarizer call, falling back to summarize
+ * only if clearing did not reclaim enough; the `'custom'` variant
+ * accepts an arbitrary callable.
  *
  * @stable
  */
@@ -95,6 +106,32 @@ export type CompactionStrategy =
       readonly summarizerTimeoutMs?: number;
       readonly templateName?: string;
       readonly preStep?: boolean;
+    }
+  | {
+      /**
+       * SOTA-1 zero-LLM clearing tier (Anthropic `clear_tool_uses`): replace the
+       * oldest tool results with placeholders before paying for a summarizer.
+       */
+      readonly kind: 'clear-old-tool-results';
+      /** Most-recent tool results kept verbatim (default 3). */
+      readonly keepToolUses?: number;
+      /** Only clear if at least this many tokens are reclaimable (default 0). */
+      readonly clearAtLeast?: number;
+      /** Tool names whose results are never cleared. */
+      readonly excludeTools?: ReadonlyArray<string>;
+      /**
+       * What to do when clearing leaves the buffer over the threshold. Defaults
+       * to summarizing the already-cleared buffer (so the LLM sees the reduced
+       * window); set `false` for a pure zero-LLM tier that stops after clearing.
+       */
+      readonly summarizeFallback?:
+        | false
+        | {
+            readonly preserveRecentTurns?: number;
+            readonly summarizerModel?: ModelSpec | string;
+            readonly summarizerTimeoutMs?: number;
+            readonly templateName?: string;
+          };
     }
   | {
       readonly kind: 'custom';

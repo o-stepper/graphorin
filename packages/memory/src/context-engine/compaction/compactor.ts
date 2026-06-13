@@ -25,6 +25,7 @@ import {
   HEURISTIC_TOKEN_COUNTER,
   renderMessageText,
 } from '../token-counter.js';
+import { clearOldToolResults } from './clear-tool-results.js';
 import {
   buildSummarizerPrompt,
   type CompactionMetadataPayload,
@@ -136,6 +137,10 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
     return result;
   }
 
+  if (input.strategy.kind === 'clear-old-tool-results') {
+    return executeClearStrategy(input, input.strategy, counter, now, startTs, beforeTokens);
+  }
+
   const preserveRecentTurns = input.strategy.preserveRecentTurns ?? DEFAULT_PRESERVE_RECENT_TURNS;
   const summarizerModelInput = input.strategy.summarizerModel;
   const summarizerTimeoutMs = input.strategy.summarizerTimeoutMs;
@@ -244,6 +249,69 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
     durationMs,
     hooksFiredCount: 0,
     summaryTrust,
+  });
+}
+
+/**
+ * SOTA-1: clear the oldest tool results (zero-LLM), then summarize only if the
+ * cleared buffer is still over the threshold. The summarizer runs on the
+ * already-reduced window, so a few-tool-result buffer compacts for free.
+ */
+async function executeClearStrategy(
+  input: ExecuteCompactionInput,
+  strategy: Extract<CompactionStrategy, { kind: 'clear-old-tool-results' }>,
+  counter: ContextTokenCounter,
+  now: () => number,
+  startTs: number,
+  beforeTokens: number,
+): Promise<CompactionResult> {
+  const outcome = await clearOldToolResults(
+    input.messages,
+    {
+      ...(strategy.keepToolUses !== undefined ? { keepToolUses: strategy.keepToolUses } : {}),
+      ...(strategy.clearAtLeast !== undefined ? { clearAtLeast: strategy.clearAtLeast } : {}),
+      ...(strategy.excludeTools !== undefined ? { excludeTools: strategy.excludeTools } : {}),
+    },
+    counter,
+  );
+  const afterClearTokens = await countMessageTokens(outcome.messages, counter);
+
+  const fallback = strategy.summarizeFallback;
+  if (fallback !== false && afterClearTokens > input.thresholdTokens) {
+    // Clearing did not reclaim enough — summarize the ALREADY-cleared buffer.
+    const summarized = await executeCompaction({
+      ...input,
+      messages: outcome.messages,
+      strategy: { kind: 'summarize-old-preserve-recent', ...(fallback ?? {}) },
+    });
+    return Object.freeze({
+      ...summarized,
+      // Report against the original buffer + carry the cleared indices.
+      beforeTokens,
+      droppedMessageIndices: Object.freeze([
+        ...outcome.clearedIndices,
+        ...summarized.droppedMessageIndices.filter((i) => !outcome.clearedIndices.includes(i)),
+      ]),
+      durationMs: now() - startTs,
+    });
+  }
+
+  // Zero-LLM clear-only outcome: content replaced in place, nothing summarized.
+  const clearedSet = new Set(outcome.clearedIndices);
+  const preservedMessages = outcome.messages.filter((_, i) => !clearedSet.has(i));
+  return Object.freeze({
+    summary: '',
+    summaryTokens: 0,
+    beforeTokens,
+    afterTokens: afterClearTokens,
+    droppedMessageIds: Object.freeze(outcome.clearedIndices.map((i) => `c${startTs}_cleared_${i}`)),
+    droppedMessageIndices: Object.freeze([...outcome.clearedIndices]),
+    preservedMessages: Object.freeze(preservedMessages),
+    trimmedMessages: Object.freeze([...outcome.messages]),
+    source: input.source,
+    durationMs: now() - startTs,
+    hooksFiredCount: 0,
+    summaryTrust: 'trusted',
   });
 }
 
