@@ -492,9 +492,6 @@ importers:
       '@graphorin/security':
         specifier: workspace:*
         version: link:../security
-      '@graphorin/sessions':
-        specifier: workspace:*
-        version: link:../sessions
       '@graphorin/skills':
         specifier: workspace:*
         version: link:../skills
