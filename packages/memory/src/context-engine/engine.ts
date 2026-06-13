@@ -37,7 +37,11 @@ import {
   type AutoRecallTriggerResult,
   defaultLocaleHeuristicStrategy,
 } from './auto-recall.js';
-import { type ExecuteCompactionInput, executeCompaction } from './compaction/compactor.js';
+import {
+  DEFAULT_PRESERVE_RECENT_TURNS,
+  type ExecuteCompactionInput,
+  executeCompaction,
+} from './compaction/compactor.js';
 import type { NamedPostCompactionHook } from './compaction/hooks/types.js';
 import {
   reanchorPersonaBlock,
@@ -482,6 +486,22 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
           templateName: 'summary-9-section',
         }
       : compactionInput.strategy;
+  // SOTA-4 reclaim-floor: defer a compaction whose older (compactable) portion
+  // is below this floor (read from the trigger config; 0 = off, byte-identical).
+  const compactionMinReclaimTokens =
+    triggerSpec !== undefined && triggerSpec !== 'never'
+      ? Math.max(0, triggerSpec.minReclaimTokens ?? 0)
+      : 0;
+  // How many recent turns the active strategy preserves (the reclaimable portion
+  // is everything before them).
+  const reclaimPreserveTurns =
+    compactionStrategy.kind === 'summarize-old-preserve-recent'
+      ? (compactionStrategy.preserveRecentTurns ?? DEFAULT_PRESERVE_RECENT_TURNS)
+      : compactionStrategy.kind === 'clear-old-tool-results' &&
+          typeof compactionStrategy.summarizeFallback === 'object'
+        ? (compactionStrategy.summarizeFallback.preserveRecentTurns ??
+          DEFAULT_PRESERVE_RECENT_TURNS)
+        : DEFAULT_PRESERVE_RECENT_TURNS;
   const compactionHooks: ReadonlyArray<NamedPostCompactionHook> = resolveDefaultHooks(
     compactionInput === false || compactionInput === undefined
       ? undefined
@@ -680,6 +700,15 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       total <= lastCompactionAfterTokens + REARM_GROWTH_TOKENS
     ) {
       return false;
+    }
+    // SOTA-4 reclaim-floor: skip when the older (compactable) portion is too
+    // small to be worth a summarizer call — avoids compact-thrash at the
+    // threshold. Counts only the older slice; cheap relative to the avoided call.
+    if (compactionMinReclaimTokens > 0) {
+      const olderCount = Math.max(0, messages.length - reclaimPreserveTurns);
+      if (olderCount === 0) return false;
+      const olderTokens = await countMessageTokens(messages.slice(0, olderCount), tokenCounter);
+      if (olderTokens < compactionMinReclaimTokens) return false;
     }
     return true;
   }

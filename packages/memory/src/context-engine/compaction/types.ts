@@ -76,6 +76,14 @@ export interface CompactionResult {
 export interface CompactionTriggerConfig {
   readonly thresholdTokens?: number;
   readonly thresholdRatio?: number;
+  /**
+   * SOTA-4 reclaim-floor: defer a compaction whose predicted reclaim — the
+   * older, compactable portion of the buffer (everything but the preserved
+   * recent turns) — is below this many tokens. Prevents compact-thrash at the
+   * threshold (paying a summarizer call to reclaim a handful of tokens). Opt-in;
+   * unset / `0` ⇒ no floor (current behaviour).
+   */
+  readonly minReclaimTokens?: number;
 }
 
 /**
