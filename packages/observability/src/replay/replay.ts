@@ -115,7 +115,11 @@ export function createReplay(opts: ReplayOptions = {}): Replay {
           }
 
           const sanitized = sanitizeRecord(record, validator);
-          if (sanitized === null || sanitized.droppedReason !== undefined) {
+          // RP-18: sanitization is attribute-granular and never drops the whole
+          // span. A record arrives pre-flagged with `droppedReason` only if an
+          // upstream stage marked it; honour that, otherwise replay the
+          // stripped span.
+          if (sanitized.droppedReason !== undefined) {
             skipped += 1;
             yield {
               type: 'replay.skipped',

@@ -32,6 +32,22 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     expect(records[0]?.status).toBe('ok');
   });
 
+  it('RP-18: a framework span with an untagged attribute reaches the exporter (stripped, not dropped)', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((record) => records.push(record));
+    // Default validation floor is 'public'. The untagged `memory.scope.user_id`
+    // attribute defaults to the 'internal' tier — before RP-18 this made the
+    // whole span vanish from every exporter (operators saw empty traces).
+    const tracer = createTracer({ exporters: [exporter], warnSink: () => {} });
+    await tracer.span(
+      { type: 'agent.run', attrs: { 'memory.scope.user_id': 'u-1' } },
+      async () => undefined,
+    );
+    await tracer.shutdown();
+    expect(records).toHaveLength(1); // span survives end-to-end
+    expect(records[0]?.attributes['memory.scope.user_id']).toBeUndefined(); // untagged → stripped
+  });
+
   it('records exceptions and sets the error status', async () => {
     const records: SpanRecord[] = [];
     const exporter = mockExporter((record) => records.push(record));
@@ -131,7 +147,7 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     expect(seen).toHaveLength(1);
   });
 
-  it('createSampler honours always-on and rate-limit decision makers', () => {
+  it('createSampler honours always-on and probabilistic decision makers', () => {
     const always = createSampler({ rate: 0, decisionMaker: 'always-on' });
     expect(always.shouldSample('agent.run')).toBe(true);
 
@@ -139,6 +155,61 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     expect(seeded.shouldSample('agent.run')).toBe(true);
     const seededLow = createSampler({ rate: 0.5, random: () => 0.99 });
     expect(seededLow.shouldSample('agent.run')).toBe(false);
+  });
+
+  it('RP-19: the rate-limit decision maker caps sampled spans per second', () => {
+    let t = 1_000_000;
+    const limiter = createSampler({
+      decisionMaker: 'rate-limit',
+      maxPerSecond: 2,
+      now: () => t,
+    });
+    expect(limiter.shouldSample('agent.run')).toBe(true); // 1
+    expect(limiter.shouldSample('agent.run')).toBe(true); // 2
+    expect(limiter.shouldSample('agent.run')).toBe(false); // over the cap
+    t += 1_000; // next window resets the count
+    expect(limiter.shouldSample('agent.run')).toBe(true);
+  });
+
+  it('RP-19: a child of an unsampled parent is not recorded (true parent-based)', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((r) => records.push(r));
+    // The root `memory.embed` span is sampled out (rate 0); under real
+    // parent-based sampling its child must NOT be recorded as an orphan.
+    const tracer = createTracer({
+      exporters: [exporter],
+      sampling: {
+        decisionMaker: 'parent-based',
+        rate: 1,
+        rules: [{ type: 'memory.embed', rate: 0 }],
+      },
+      warnSink: () => {},
+    });
+    await tracer.span({ type: 'memory.embed' }, async (parent) => {
+      await tracer.span({ type: 'tool.execute', parent }, async () => undefined);
+    });
+    await tracer.shutdown();
+    expect(records).toHaveLength(0); // neither the sampled-out root nor its child
+  });
+
+  it('RP-19: defaultAttributeSensitivity tags untagged initial attrs so they survive a matching floor', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((r) => records.push(r));
+    // With the default sensitivity set to 'public' against the default
+    // 'public' floor, an untagged initial attribute survives instead of being
+    // stripped — proving the knob is effective.
+    const tracer = createTracer({
+      exporters: [exporter],
+      defaultAttributeSensitivity: 'public',
+      warnSink: () => {},
+    });
+    await tracer.span(
+      { type: 'agent.run', attrs: { 'memory.scope.user_id': 'u-1' } },
+      async () => undefined,
+    );
+    await tracer.shutdown();
+    expect(records).toHaveLength(1);
+    expect(records[0]?.attributes['memory.scope.user_id']).toBe('u-1');
   });
 
   it('unsampled spans never reach the validator (only sampled spans are validated)', async () => {

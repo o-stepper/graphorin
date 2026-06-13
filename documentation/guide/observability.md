@@ -49,14 +49,17 @@ The validation layer enforces:
 
 ```mermaid
 flowchart LR
-    Span[Span emitted] --> SR[Sensitivity router]
+    Span[Span emitted] --> SR[Per-attribute router]
     SR -->|public| Pass[Pass through]
     SR -->|internal + opted in| RPI[PII redactor]
-    SR -->|internal + not opted in| Drop[Drop attribute]
-    SR -->|secret| Block[Block span entirely]
+    SR -->|internal + not opted in| Strip[Strip attribute]
+    SR -->|secret| Strip
     RPI --> Out[Exporter]
     Pass --> Out
+    Strip --> Out
 ```
+
+Redaction is **attribute-granular**: an attribute that exceeds the configured floor (or matches a secret / PII pattern) is stripped and counted, and the rest of the span still reaches the exporter. A single untagged or over-tier attribute never makes the whole span vanish — before this fix (RP-18) framework spans, which carry untagged attributes by default, disappeared from every exporter and operators saw empty traces.
 
 You **cannot** disable the validation wrapper. You can:
 

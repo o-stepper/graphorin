@@ -7,8 +7,8 @@ describe('@graphorin/observability/replay — DEFAULT_REPLAY_LOG_CONFIG', () => 
     expect(DEFAULT_REPLAY_LOG_CONFIG.retentionDays).toBe(30);
   });
 
-  it('enables auto-prune by default with a daily 4am UTC cron', () => {
-    expect(DEFAULT_REPLAY_LOG_CONFIG.autoPrune.enabled).toBe(true);
+  it('leaves auto-prune disabled by default (no built-in scheduler consumes it — RP-19)', () => {
+    expect(DEFAULT_REPLAY_LOG_CONFIG.autoPrune.enabled).toBe(false);
     expect(DEFAULT_REPLAY_LOG_CONFIG.autoPrune.schedule).toBe('0 4 * * *');
   });
 

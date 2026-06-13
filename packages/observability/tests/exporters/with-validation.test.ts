@@ -21,17 +21,42 @@ describe('@graphorin/observability/exporters — withValidation', () => {
     expect(isValidatedExporter(exporter)).toBe(false);
   });
 
-  it('drops sensitive attribute values when their declared tier exceeds the floor', async () => {
+  it('strips sensitive attribute values whose declared tier exceeds the floor, keeping the span (RP-18)', async () => {
     const lines: string[] = [];
     const wrapped = withValidation(createConsoleExporter({ sink: (line) => lines.push(line) }), {
       minTier: 'public',
     });
     const record = sampleRecord({
       attributes: { 'graphorin.session.id': 'session-1', 'tool.input': 'top secret' },
-      sensitivityByAttribute: { 'tool.input': 'secret' },
+      sensitivityByAttribute: { 'graphorin.session.id': 'public', 'tool.input': 'secret' },
     });
     await wrapped.export(record);
-    expect(lines).toHaveLength(0);
+    // RP-18: attribute-granular strip, not a whole-record drop — the span
+    // still reaches the exporter with the offending attribute removed.
+    expect(lines).toHaveLength(1);
+    const parsed = JSON.parse(lines[0] ?? '{}');
+    expect(parsed.attributes['graphorin.session.id']).toBe('session-1'); // public → kept
+    expect(parsed.attributes['tool.input']).toBeUndefined(); // secret > public floor → stripped
+  });
+
+  it('RP-18: an untagged framework attribute is stripped but the span still exports', async () => {
+    const lines: string[] = [];
+    const wrapped = withValidation(createConsoleExporter({ sink: (line) => lines.push(line) }), {
+      minTier: 'public',
+    });
+    // A framework span: one public-tagged attr + one UNTAGGED attr (defaults
+    // to 'internal', exceeding the 'public' floor). Before RP-18 the entire
+    // record vanished from every exporter, so operators saw empty traces.
+    const record = sampleRecord({
+      attributes: { 'tool.name': 'lookup', 'memory.scope.user_id': 'u-1' },
+      sensitivityByAttribute: { 'tool.name': 'public' },
+    });
+    await wrapped.export(record);
+    expect(lines).toHaveLength(1);
+    const parsed = JSON.parse(lines[0] ?? '{}');
+    expect(parsed.attributes['tool.name']).toBe('lookup'); // public → kept
+    expect(parsed.attributes['memory.scope.user_id']).toBeUndefined(); // untagged → stripped
+    expect(parsed.droppedReason).toBeUndefined();
   });
 
   it('forwards records when nothing exceeds the floor', async () => {
