@@ -137,7 +137,9 @@ describe('P2-1 canonical entities', () => {
     const annie = await store.graph.upsertEntity(SCOPE, { name: 'Annie', normalizedName: 'annie' });
     await store.graph.mergeEntities(SCOPE, annie, anna, 'same person');
     expect(await store.graph.findEntityByNormalizedName(SCOPE, 'annie')).toBeNull();
-  });
+    // 1100 sequential awaited inserts above blow the default 5 s vitest timeout
+    // on a loaded CI runner (observed ~7 s on windows CI) — give it headroom.
+  }, 20_000);
 
   it('merges are auditable + reversible; distinct entities stay separate', async () => {
     const anna = await store.graph.upsertEntity(SCOPE, { name: 'Anna', normalizedName: 'anna' });
