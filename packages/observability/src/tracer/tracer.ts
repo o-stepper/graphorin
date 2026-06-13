@@ -180,7 +180,13 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     const traceId = spec.parent?.traceId ?? newTraceId();
     const id = newSpanId();
     const parentId = spec.parent?.id;
-    const sampled = sampler.shouldSample(spec.type, parentId !== undefined);
+    // RP-19: a real parent-sampled flag for `'parent-based'` sampling. An
+    // unsampled parent is a noop span (no `setAttribute`), so `asGraphorinSpan`
+    // returns null — `parentId !== undefined` used to treat that as
+    // parent-sampled and record the child as an orphan.
+    const parentSampled =
+      spec.parent === undefined ? undefined : asGraphorinSpan(spec.parent) !== null;
+    const sampled = sampler.shouldSample(spec.type, parentSampled);
     if (!sampled) {
       return noopSpan<T>(spec.type, traceId, id, parentId);
     }
@@ -245,7 +251,13 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     attrs: undefined | Readonly<Record<string, SpanAttributeValue>>,
   ): Readonly<Record<string, Sensitivity>> | undefined {
     if (attrs === undefined) return undefined;
-    return undefined; // Initial attrs do not carry per-key sensitivity overrides; use setAttribute() for that.
+    // RP-19: initial attrs that omit an explicit `setAttribute(_, _, {
+    // sensitivity })` default to `defaultAttributeSensitivity`. Threading it
+    // here makes the knob effective — untagged framework attributes carry the
+    // configured tier instead of the validator's hardcoded fallback.
+    const out: Record<string, Sensitivity> = {};
+    for (const key of Object.keys(attrs)) out[key] = defaultAttrSensitivity;
+    return Object.freeze(out);
   }
 
   function noopSpan<T extends SpanType>(
@@ -254,7 +266,6 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     id: string,
     parentId?: string,
   ): AISpan<T> {
-    void defaultAttrSensitivity;
     const stub: AISpan<T> = {
       type,
       id,

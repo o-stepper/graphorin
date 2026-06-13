@@ -35,6 +35,19 @@ export interface SamplingOptions {
   /** Decision maker. Defaults to `'parent-based'`. */
   readonly decisionMaker?: SamplingDecisionMaker;
   /**
+   * Cap for the `'rate-limit'` decision maker: at most this many root spans
+   * are sampled per rolling 1-second window (RP-19). `undefined` ⇒ no cap
+   * (samples everything); `0` ⇒ sample nothing. Ignored by the other
+   * decision makers.
+   */
+  readonly maxPerSecond?: number;
+  /**
+   * Clock for the `'rate-limit'` window. Defaults to `Date.now`.
+   *
+   * @internal
+   */
+  readonly now?: () => number;
+  /**
    * Optional override for streaming-event sampling.
    * @see RB-52 — streaming event family `tool.execute.{progress,partial}`.
    */
@@ -79,11 +92,38 @@ export function createSampler(opts: SamplingOptions = {}): Sampler {
   const streamingRate = clampRate(opts.streaming?.eventSamplingRate ?? 1.0);
   const includeChunks = opts.streaming?.includeChunkContent ?? 'none';
   const random = opts.random ?? Math.random;
+  const maxPerSecond = opts.maxPerSecond;
+  const now = opts.now ?? Date.now;
+  let windowStart: number | undefined;
+  let windowCount = 0;
 
   return {
     shouldSample(type, parentSampled): boolean {
       if (decisionMaker === 'always-on') return true;
-      if (decisionMaker === 'parent-based' && parentSampled === true) return true;
+      if (decisionMaker === 'parent-based') {
+        // RP-19: true parent-based — follow the parent's real sampling
+        // decision. A child of an unsampled parent is NOT recorded (it would
+        // otherwise be an orphan); a root span (no parent) falls through to
+        // the rate.
+        if (parentSampled === true) return true;
+        if (parentSampled === false) return false;
+      }
+      if (decisionMaker === 'rate-limit') {
+        // RP-19: a real token-window limiter, distinct from the probabilistic
+        // path. Caps sampled spans to `maxPerSecond` per rolling second.
+        if (maxPerSecond === undefined) return true;
+        if (maxPerSecond <= 0) return false;
+        const t = now();
+        if (windowStart === undefined || t - windowStart >= 1000) {
+          windowStart = t;
+          windowCount = 0;
+        }
+        if (windowCount < maxPerSecond) {
+          windowCount += 1;
+          return true;
+        }
+        return false;
+      }
       const rate = ruleByType.get(type) ?? baseRate;
       if (rate >= 1) return true;
       if (rate <= 0) return false;

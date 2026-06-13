@@ -12,9 +12,9 @@ import { join, resolve } from 'node:path';
 import type { SpanRecord } from '../exporters/types.js';
 
 /**
- * Read every span record from a JSONL trace log. Lines that fail to
- * parse are emitted as `null` events; callers can `filter(Boolean)` to
- * skip them.
+ * Read every span record from a JSONL trace log. Lines that fail to parse are
+ * skipped (the iterator keeps going); the generator only ever yields parsed
+ * {@link SpanRecord} values, never `null`.
  *
  * @stable
  */

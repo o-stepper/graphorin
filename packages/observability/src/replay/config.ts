@@ -24,13 +24,13 @@ export interface ReplayLogConfig {
    */
   readonly retentionDays?: number;
   /**
-   * Auto-prune toggle. When enabled, the framework runs a daily
-   * background job that deletes files older than `retentionDays`.
-   * The job is wired through `@graphorin/triggers` (Phase 05) /
-   * `@graphorin/server` (Phase 14); in library mode the consumer
-   * must run `pruneTraces(...)` manually.
+   * Auto-prune hint. `enabled` + `schedule` describe a daily prune of files
+   * older than `retentionDays`, but **no built-in scheduler consumes this
+   * yet** (RP-19) — it is a declarative intent. Until a host wires it to a
+   * trigger, callers must run `pruneTraces(...)` themselves; the default is
+   * therefore `enabled: false` so the option is not an inert default-on.
    *
-   * @default { enabled: true, schedule: '0 4 * * *' }
+   * @default { enabled: false, schedule: '0 4 * * *' }
    */
   readonly autoPrune?: {
     readonly enabled: boolean;
@@ -53,6 +53,6 @@ export interface ReplayLogConfig {
  */
 export const DEFAULT_REPLAY_LOG_CONFIG: Omit<Required<ReplayLogConfig>, 'path'> = Object.freeze({
   retentionDays: 30,
-  autoPrune: Object.freeze({ enabled: true, schedule: '0 4 * * *' }),
+  autoPrune: Object.freeze({ enabled: false, schedule: '0 4 * * *' }),
   encryption: 'off' as const,
 });
