@@ -1,18 +1,34 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  */
 
 import { describe, expect, it } from 'vitest';
-import { runCostRegression, VERSION } from '../src/runner.js';
+import { measureAllScenarios, runCostRegression, SCENARIO_IDS, VERSION } from '../src/runner.js';
 
 describe('benchmarks/cost', () => {
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes VERSION', () => {
+    expect(VERSION).toBe('0.2.0');
   });
 
-  it('pinned transcript matches regression baseline tokens', async () => {
-    const r = await runCostRegression();
-    expect(r.tokens).toBe(r.baseline);
-    expect(r.ratio).toBe(0);
+  it('measures prompt assembly — tool schemas and a richer system prompt grow the count (EB-12)', async () => {
+    const tokens = await measureAllScenarios();
+    const bare = tokens.bare ?? Number.NaN;
+    const withTools = tokens['with-tools'] ?? Number.NaN;
+    const rich = tokens['rich-instructions'] ?? Number.NaN;
+    expect(bare).toBeGreaterThan(0);
+    // Advertising tool schemas grows the assembled prompt — a regression that
+    // inflates tool descriptions would be caught here, unlike the old harness.
+    expect(withTools).toBeGreaterThan(bare);
+    // A longer system prompt grows it too.
+    expect(rich).toBeGreaterThan(bare);
+  });
+
+  it('every scenario is within tolerance of the stored baseline', async () => {
+    const report = await runCostRegression();
+    expect(report.results.map((r) => r.id).sort()).toEqual([...SCENARIO_IDS].sort());
+    expect(report.worstRatio).toBeLessThanOrEqual(0.1);
+    for (const r of report.results) {
+      expect(r.ratio).toBe(0);
+    }
   });
 });

@@ -54,6 +54,9 @@ importers:
 
   benchmarks/cost:
     dependencies:
+      '@graphorin/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
       '@graphorin/core':
         specifier: workspace:*
         version: link:../../packages/core
