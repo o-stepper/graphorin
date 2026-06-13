@@ -173,13 +173,15 @@ export async function runMemoryMigrate(options: MemoryMigrateOptions): Promise<n
 // ---------------------------------------------------------------------------
 
 const FACT_INSPECT_COLUMNS =
-  'id, text, status, provenance, valid_from, valid_to, supersedes, superseded_by, created_at';
+  'id, text, status, provenance, importance, valid_from, valid_to, supersedes, superseded_by, created_at';
 
 interface FactInspectRow {
   readonly id: string;
   readonly text: string;
   readonly status: string | null;
   readonly provenance: string | null;
+  /** X-1 / migration 015: per-fact salience hint. */
+  readonly importance: number | null;
   readonly valid_from: number | null;
   readonly valid_to: number | null;
   readonly supersedes: string | null;
@@ -193,11 +195,27 @@ export interface MemoryInspectFact {
   readonly text: string;
   readonly status: string;
   readonly provenance: string | null;
+  /** X-1 / migration 015: per-fact importance (salience hint), if set. */
+  readonly importance: number | null;
   readonly validFrom: string | null;
   readonly validTo: string | null;
   readonly supersedes: string | null;
   readonly supersededBy: string | null;
   readonly createdAt: string;
+}
+
+/**
+ * A canonical entity a fact links to (P2-1 / migration 016). `name` follows
+ * `merged_into` to the surviving entity, so a merged link shows its canonical.
+ *
+ * @stable
+ */
+export interface MemoryInspectEntity {
+  readonly entityId: string;
+  readonly name: string;
+  readonly role: string;
+  /** Set when the linked entity was merged into `entityId`/`name`. */
+  readonly mergedFrom: string | null;
 }
 
 /** @stable */
@@ -233,6 +251,8 @@ export interface MemoryInspectResult {
   readonly history: ReadonlyArray<MemoryHistoryEntry>;
   readonly conflicts: ReadonlyArray<MemoryConflictEntry>;
   readonly citingInsights: ReadonlyArray<MemoryCitingInsight>;
+  /** Canonical entities this fact links to (P2-1 / migration 016). */
+  readonly linkedEntities: ReadonlyArray<MemoryInspectEntity>;
 }
 
 /** @stable */
@@ -309,6 +329,33 @@ export async function runMemoryInspect(
           Object.freeze({ id: r.id, text: r.text, status: r.status, salience: r.salience }),
       );
 
+    // IP-22: a fact's canonical-entity links (migration 016). Each link is
+    // followed through `entities.merged_into` so a link to a merged entity
+    // shows its surviving canonical.
+    const linkedEntities =
+      fact === null
+        ? []
+        : conn
+            .all<{ entity_id: string; name: string; role: string; merged_from: string | null }>(
+              `SELECT canon.id AS entity_id, canon.name AS name, fe.role AS role,
+                      CASE WHEN e.merged_into IS NULL THEN NULL ELSE e.id END AS merged_from
+               FROM fact_entities fe
+               JOIN entities e ON e.id = fe.entity_id
+               JOIN entities canon ON canon.id = COALESCE(e.merged_into, e.id)
+               WHERE fe.fact_id = ?
+               ORDER BY fe.role, canon.name`,
+              [options.factId],
+            )
+            .map(
+              (r): MemoryInspectEntity =>
+                Object.freeze({
+                  entityId: r.entity_id,
+                  name: r.name,
+                  role: r.role,
+                  mergedFrom: r.merged_from,
+                }),
+            );
+
     const out: MemoryInspectResult = Object.freeze({
       found: fact !== null,
       fact,
@@ -316,6 +363,7 @@ export async function runMemoryInspect(
       history: Object.freeze(history),
       conflicts: Object.freeze(conflicts),
       citingInsights: Object.freeze(citingInsights),
+      linkedEntities: Object.freeze(linkedEntities),
     });
 
     emitReport(options, out, () => {
@@ -330,7 +378,17 @@ export async function runMemoryInspect(
         `  ${statusMarker(f.status === 'quarantined' ? 'warn' : 'ok')} status=${f.status} provenance=${f.provenance ?? 'user (first-party)'}`,
       );
       print(`  text: ${f.text}`);
+      print(
+        `  importance: ${f.importance !== null ? f.importance.toFixed(2) : '(unset — neutral salience)'}`,
+      );
       print(`  valid: ${f.validFrom ?? 'open'} .. ${f.validTo ?? 'open'}`);
+      if (out.linkedEntities.length > 0) {
+        print(brand(`  linked entities (${out.linkedEntities.length}):`));
+        for (const e of out.linkedEntities) {
+          const merged = e.mergedFrom !== null ? ` (merged from ${e.mergedFrom})` : '';
+          print(`    ${statusMarker('info')} ${e.role}: ${e.name} [${e.entityId}]${merged}`);
+        }
+      }
       if (out.chain.length > 1) {
         print(brand(`  supersede chain (${out.chain.length}, oldest -> newest):`));
         for (const c of out.chain) {
@@ -851,6 +909,7 @@ function toInspectFact(row: FactInspectRow): MemoryInspectFact {
     text: row.text,
     status: row.status ?? 'active',
     provenance: row.provenance,
+    importance: row.importance,
     validFrom: epochToIso(row.valid_from),
     validTo: epochToIso(row.valid_to),
     supersedes: row.supersedes,
