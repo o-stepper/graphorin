@@ -218,6 +218,19 @@ The compactor closes this structurally (CE-15), not just with summarizer prompt 
 
 The classification is surfaced as `CompactionResult.summaryTrust` (`'trusted' | 'untrusted-derived'`) for observability. A clean window with a clean summary is committed byte-identically to the pre-CE-15 behaviour.
 
+## Known limitations
+
+These are deliberate, documented gaps — the honest boundary of what the current
+release enforces. Each is a design-class change (an operator trust root, a signed
+external anchor, a persisted registry) rather than a one-line fix, and is tracked
+rather than shipped speculatively.
+
+- **Skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key — but for an `inline` key that key comes from the (attacker-authored) frontmatter itself, and for a `well-known` key the pin fingerprint is frontmatter-supplied too. Without an operator-pinned `publicKeySource`, a *self-signed* skill verifies as `signatureVerified: true`. Treat signature verification as integrity-in-transit, not publisher authenticity, until you configure an operator trust root. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
+- **The audit chain is tamper-*evident*, not tamper-*resistant*.** It is an unkeyed SHA-256 hash chain with no signing key or external anchor. An actor with write access to the audit database — or a compromised process holding the at-rest passphrase — can delete or rewrite entries and re-root the chain so `verifyAuditChain` still reports clean (`pruneAudit` does exactly this re-rooting by design). It defends only against actors *without* DB write access. Anchor the chain head externally if you need resistance against privileged actors. A prune also rewrites surviving entries' hashes, so hashes archived from an earlier `exportAudit` no longer match the live chain.
+- **The installed-skills registry is process-memory only.** `auditInstalledSkills()` reflects only installations performed in the current process; it is not persisted across restarts. Relatedly, the `trusted-with-scripts` trust level is currently unreachable in practice (no folder installer constructs a `{ kind: 'folder' }` source), so skill `postinstall` lifecycles never run.
+
+Smaller residuals tracked alongside these: 1Password Connect / service-account tokens are held as long-lived plain strings (not `SecretValue`); the entity-resolution candidate window is a fixed 1000 most-recent rows; and the verbatim-carry taint probe (not the load-bearing trifecta gate) restarts empty after a durable-HITL suspend.
+
 ## Threat model
 
 Graphorin's design assumes a STRIDE threat model across eight trust boundaries:
