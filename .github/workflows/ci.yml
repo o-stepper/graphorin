@@ -58,6 +58,11 @@ jobs:
       - name: Build
         run: pnpm build
 
+      # DOC-13: type-check the documentation's `ts` snippets against the just-built
+      # `dist/*.d.ts` — a doc that names a non-existent export/option fails here.
+      - name: Doc snippets type-check
+        run: pnpm run check-doc-snippets
+
       - name: Benchmark smoke + cost regression + doc guards
         run: pnpm run benchmark:ci
 

@@ -27,6 +27,7 @@
     "typecheck": "turbo run typecheck",
     "clean": "turbo run clean && rimraf node_modules .turbo",
     "check-no-network": "node ./scripts/check-no-network.mjs",
+    "check-doc-snippets": "node ./scripts/check-doc-snippets.mjs",
     "check-example-docs": "node ./scripts/check-example-docs.mjs",
     "smoke-examples": "node ./scripts/smoke-examples.mjs",
     "mvp-readiness": "node ./scripts/mvp-readiness.mjs",
