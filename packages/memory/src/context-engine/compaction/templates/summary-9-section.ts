@@ -13,10 +13,11 @@
  * so taint survives compaction instead of laundering into an
  * authoritative system message.
  *
- * Section 8 ("Recent turns preserved verbatim") is filled by the
- * harness, NOT by the summarizer — the preservation contract is
- * mechanical and auditable. The other 8 sections are produced by
- * the LLM call.
+ * The last two sections ("Recent turns preserved verbatim" and
+ * "Compaction metadata") are filled by the harness, NOT by the
+ * summarizer — those contracts are mechanical and auditable. The
+ * other nine sections (incl. the SOTA-6 "Errors encountered and
+ * resolutions" and "Next steps") are produced by the LLM call.
  *
  * @packageDocumentation
  */
@@ -32,7 +33,7 @@ import { renderMessageText } from '../../token-counter.js';
  *
  * @stable
  */
-export const SUMMARY_TEMPLATE_VERSION = '1.1';
+export const SUMMARY_TEMPLATE_VERSION = '1.2';
 
 /**
  * Stable identifier of the bundled template.
@@ -63,9 +64,9 @@ export interface RenderedTemplate {
  *  3. A delimited dump of the older messages the harness is about
  *     to drop.
  *
- * The summarizer must produce sections 1-7 + 9. Section 8 is
- * stitched in by the harness before the result is committed to
- * the in-flight buffer.
+ * The summarizer produces every section except the last two; those
+ * (recent turns + metadata) are stitched in by the harness before the
+ * result is committed to the in-flight buffer.
  *
  * @stable
  */
@@ -74,10 +75,13 @@ export function buildSummarizerPrompt(input: {
   readonly olderMessages: ReadonlyArray<Message>;
 }): string {
   const { template, olderMessages } = input;
+  // The last two sections (recent turns + metadata) are always harness-filled,
+  // regardless of how many LLM-produced sections precede them (SOTA-6 added two).
+  const harnessFrom = template.sections.length - 2;
   const sectionList = template.sections
     .map(
       (header, idx) =>
-        `  ${idx + 1}. ${header}${idx === 7 ? ' (filled by harness; do NOT generate)' : ''}`,
+        `  ${idx + 1}. ${header}${idx >= harnessFrom ? ' (filled by harness; do NOT generate)' : ''}`,
     )
     .join('\n');
   const messageDump = olderMessages
@@ -115,10 +119,10 @@ export interface CompactionMetadataPayload {
 }
 
 /**
- * Render the produced summary into the final 9-section text the
- * harness commits to the in-flight buffer. Sections 1-7 + 9 are
- * stitched in from `summaryFromLlm` + `metadata`; section 8 is the
- * verbatim render of the preserved recent turns (mechanical).
+ * Render the produced summary into the final text the harness commits
+ * to the in-flight buffer. The LLM-produced sections come from
+ * `summaryFromLlm`; the last two are stitched in mechanically — the
+ * preserved recent turns and the `metadata` block.
  *
  * @stable
  */
@@ -129,8 +133,9 @@ export function renderFinalSummary(input: {
   readonly metadata: CompactionMetadataPayload;
 }): string {
   const { template, summaryFromLlm, preservedMessages, metadata } = input;
-  const recentTurnsHeader = template.sections[7];
-  const metadataHeader = template.sections[8];
+  // The two harness-filled sections are always the last two (SOTA-6).
+  const recentTurnsHeader = template.sections[template.sections.length - 2];
+  const metadataHeader = template.sections[template.sections.length - 1];
   // CE-7: one-line digests, NOT verbatim — the preserved turns also live
   // on as real messages after the splice, so verbatim rendering doubled
   // them in the post-compaction buffer (and in afterTokens).

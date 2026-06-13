@@ -67,7 +67,7 @@ export interface InboundSanitizationPreamble {
 export interface CompactionSummaryTemplate {
   /** Preamble injected at the top of the summarizer prompt. */
   readonly preamble: string;
-  /** 9 section headers. */
+  /** 11 section headers. The last two are filled by the harness. */
   readonly sections: readonly [
     string, // 1: Session goal and current task
     string, // 2: Decisions made and rationale
@@ -76,8 +76,10 @@ export interface CompactionSummaryTemplate {
     string, // 5: Tools used and their outcomes
     string, // 6: Files / artifacts referenced
     string, // 7: Persona / preferences / project rules surfaced
-    string, // 8: Recent turns preserved verbatim
-    string, // 9: Compaction metadata
+    string, // 8: Errors encountered and resolutions (SOTA-6)
+    string, // 9: Next steps (SOTA-6)
+    string, // 10: Recent turns preserved verbatim (harness-filled)
+    string, // 11: Compaction metadata (harness-filled)
   ];
 }
 
