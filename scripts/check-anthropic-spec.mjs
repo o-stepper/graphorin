@@ -14,15 +14,19 @@
  * `graphorin-*` namespace prefix on the frontmatter so they remain
  * forward-compatible.
  *
- * This helper is invoked manually or by a CI cron. It compares the
- * bundled `packages/skills/anthropic-spec-snapshot.json` against an
- * upstream snapshot file (provided via `--upstream <path>` or the
- * `GRAPHORIN_UPSTREAM_SPEC_PATH` environment variable). When no
- * upstream snapshot is supplied, the helper exits 0 with a
- * "no upstream supplied" notice so it can run in CI without network
- * access — the maintainer is expected to run it locally with the
- * latest snapshot fetched manually from
+ * This helper is invoked manually, or by the `mvp-readiness` gate
+ * (gate 6) which runs it in no-upstream skip mode. There is NO
+ * scheduled CI job that supplies an upstream snapshot — so in every
+ * automated context today the diff is skipped and the gate only
+ * confirms the bundled snapshot parses. Real drift detection requires
+ * the maintainer to pass `--upstream <path>` (or set
+ * `GRAPHORIN_UPSTREAM_SPEC_PATH`) with a snapshot fetched manually from
  * `https://agentskills.io/specification`.
+ *
+ * It compares the bundled `packages/skills/anthropic-spec-snapshot.json`
+ * against that upstream snapshot. When none is supplied the helper exits
+ * 0 with a "no upstream supplied" notice (a skip, not a verification) so
+ * it can run offline.
  *
  * Usage:
  *
@@ -32,7 +36,8 @@
  *     pnpm run check-anthropic-spec
  *
  * Exit codes:
- *   0 — bundled snapshot covers every upstream field; no drift.
+ *   0 — no drift (bundled covers every upstream field), OR no upstream
+ *       snapshot was supplied so the diff was skipped.
  *   1 — upstream snapshot adds or removes a field; review required.
  *   2 — invocation error (file missing, JSON parse failure, etc.).
  */
