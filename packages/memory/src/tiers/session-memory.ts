@@ -4,9 +4,11 @@ import type {
   Message,
   MessageRef,
   SessionListOptions,
+  SessionMessageWithMetadata,
   SessionScope,
   Tracer,
 } from '@graphorin/core';
+import { newMemoryId } from '../internal/id.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 
@@ -100,6 +102,30 @@ export class SessionMemory {
         return out;
       },
     );
+  }
+
+  /**
+   * RP-5: list messages with their persisted identity (stored id / sequence /
+   * `createdAt`) so an exporter preserves message identity + chronology.
+   * Delegates to the store when it supports the richer read.
+   */
+  async listWithMetadata(
+    scope: SessionScope,
+    opts: SessionListOptions = {},
+  ): Promise<ReadonlyArray<SessionMessageWithMetadata>> {
+    const store = this.#store.session;
+    if (store.listWithMetadata !== undefined) {
+      return store.listWithMetadata(scope, opts);
+    }
+    // A store without the richer read: fabricate a unique id + the current time
+    // (the pre-RP-5 behaviour, just centralised here).
+    const messages = await store.list(scope, opts);
+    return messages.map((message, i) => ({
+      message,
+      messageId: newMemoryId('msg'),
+      sequence: i + 1,
+      createdAt: new Date().toISOString(),
+    }));
   }
 
   /** Hybrid (FTS5) search over the session messages. */

@@ -55,10 +55,32 @@ export interface MessageRef {
   readonly persistedAt: string;
 }
 
+/**
+ * A stored message paired with its persisted identity (RP-5). The {@link Message}
+ * type itself carries no id / timestamp; these come from the store row, so an
+ * exporter can preserve message identity + chronology across a round-trip.
+ *
+ * @stable
+ */
+export interface SessionMessageWithMetadata {
+  readonly message: Message;
+  readonly messageId: string;
+  readonly sequence: number;
+  readonly createdAt: string;
+}
+
 /** @stable */
 export interface SessionMemoryStore {
   push(scope: SessionScope, message: Message): Promise<MessageRef>;
   list(scope: SessionScope, opts?: SessionListOptions): Promise<ReadonlyArray<Message>>;
+  /**
+   * List messages with their persisted identity (RP-5). Optional: stores that
+   * don't implement it fall back to `list` + fabricated ids on the export path.
+   */
+  listWithMetadata?(
+    scope: SessionScope,
+    opts?: SessionListOptions,
+  ): Promise<ReadonlyArray<SessionMessageWithMetadata>>;
   search(
     scope: SessionScope,
     query: string,
