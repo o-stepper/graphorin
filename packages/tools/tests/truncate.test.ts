@@ -147,3 +147,25 @@ describe('truncateBody', () => {
     expect(countTokensHeuristic.count('')).toBe(0);
   });
 });
+
+describe('A8: actionable truncation annotations', () => {
+  it("'middle' truncation tells the model how to retrieve the omitted portion", async () => {
+    const result = await truncateBody({
+      body: 'A'.repeat(4000),
+      maxTokens: 100,
+      strategy: 'middle',
+    });
+    expect(result.truncated).toBe(true);
+    // Not just "truncated" — an actionable next step the model can take.
+    expect(result.body).toMatch(/re-run|narrower|date range|filter/i);
+  });
+
+  it("'tail' truncation carries the same actionable guidance", async () => {
+    const result = await truncateBody({
+      body: 'A'.repeat(4000),
+      maxTokens: 100,
+      strategy: 'tail',
+    });
+    expect(result.body).toMatch(/re-run|narrower|date range|filter/i);
+  });
+});
