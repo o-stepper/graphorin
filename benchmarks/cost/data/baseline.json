@@ -1,7 +1,10 @@
 {
-  "scenarioId": "graphorin-cost-regression-v1",
-  "pinnedMessageTokens": 54,
+  "scenarios": {
+    "bare": 35,
+    "with-tools": 115,
+    "rich-instructions": 72
+  },
   "toleranceRatio": 0.1,
   "encoding": "cl100k_base",
-  "frameworkVersion": "0.1.0"
+  "frameworkVersion": "0.4.0"
 }
