@@ -92,6 +92,50 @@ describe('regexMatch', () => {
     });
     expect(r.pass).toBe(true);
   });
+
+  it('is not stateful across cases when the pattern carries /g (EB-5)', async () => {
+    // A `/g` RegExp advances lastIndex on .test(); reusing the scorer must not
+    // make a later identical case spuriously fail.
+    const scorer = regexMatch({ pattern: /foo/g });
+    const first = await scorer.score({
+      case: noopCase('q') as never,
+      output: 'foo' as never,
+      durationMs: 0,
+    });
+    const second = await scorer.score({
+      case: noopCase('q') as never,
+      output: 'foo' as never,
+      durationMs: 0,
+    });
+    expect(first.pass).toBe(true);
+    expect(second.pass).toBe(true);
+  });
+
+  it('is not stateful across cases when the pattern carries /y (EB-5)', async () => {
+    const scorer = regexMatch({ pattern: /^bar/y });
+    const first = await scorer.score({
+      case: noopCase('q') as never,
+      output: 'bar' as never,
+      durationMs: 0,
+    });
+    const second = await scorer.score({
+      case: noopCase('q') as never,
+      output: 'bar' as never,
+      durationMs: 0,
+    });
+    expect(first.pass).toBe(true);
+    expect(second.pass).toBe(true);
+  });
+
+  it('preserves non-stateful flags like /i', async () => {
+    const scorer = regexMatch({ pattern: /lisbon/gi });
+    const r = await scorer.score({
+      case: noopCase('q') as never,
+      output: 'LISBON' as never,
+      durationMs: 0,
+    });
+    expect(r.pass).toBe(true);
+  });
 });
 
 describe('jsonPath', () => {
