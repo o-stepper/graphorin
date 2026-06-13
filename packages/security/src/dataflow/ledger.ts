@@ -68,6 +68,14 @@ export function createTaintLedger(opts?: {
    * verbatim-carry probe restarts while the load-bearing gate is preserved.
    */
   readonly initial?: TaintLedgerSnapshot;
+  /**
+   * SDF-8 / FIDES-lattice: optional predicate run over each tool output. When it
+   * returns `true`, the read counts toward `sensitiveSeen` even if the tool's
+   * declared `sensitivity` is not `'secret'` — so PII/user-content exfiltration
+   * trips the lethal-trifecta leg. Wire `containsPii` here to opt in; omit for
+   * byte-identical behaviour.
+   */
+  readonly piiSensitivity?: (text: string) => boolean;
 }): TaintLedger {
   // SDF-5: the verbatim probe needs a window of at least
   // MIN_TRUSTWORTHY_WINDOW chars to be meaningful — a sub-floor
@@ -84,12 +92,20 @@ export function createTaintLedger(opts?: {
   let untrustedSeen = opts?.initial?.untrustedSeen ?? false;
   let sensitiveSeen = opts?.initial?.sensitiveSeen ?? false;
   const untrustedSourceKinds = new Set<string>(opts?.initial?.untrustedSourceKinds ?? []);
+  const piiSensitivity = opts?.piiSensitivity;
   const spans: TrackedSpan[] = [];
   let trackedChars = 0;
 
   return {
     recordOutput(label: TaintLabel, outputText: string): void {
-      if (label.sensitive) sensitiveSeen = true;
+      if (label.sensitive) {
+        sensitiveSeen = true;
+      } else if (!sensitiveSeen && piiSensitivity !== undefined && piiSensitivity(outputText)) {
+        // FIDES-lattice (SDF-8): PII in the output is a sensitive read even
+        // without a 'secret' tag. `sensitiveSeen` latches, so scan only while
+        // it is still false.
+        sensitiveSeen = true;
+      }
       if (!label.untrusted) return;
       untrustedSeen = true;
       untrustedSourceKinds.add(label.sourceKind);

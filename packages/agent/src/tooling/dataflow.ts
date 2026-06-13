@@ -27,6 +27,7 @@ import {
   type TaintLedger,
   type TaintLedgerSnapshot,
 } from '@graphorin/security/dataflow';
+import { containsPii } from '@graphorin/security/guardrails';
 import type {
   DataFlowGuard,
   DataFlowInspectInput,
@@ -67,8 +68,12 @@ export interface DataFlowGuardWithLedgers extends DataFlowGuard {
 
 export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardWithLedgers {
   const policy = createDataFlowPolicy(config);
-  const ledgerOpts =
-    config.minSpanLength !== undefined ? { minSpanLength: config.minSpanLength } : {};
+  // FIDES-lattice (SDF-8): when treatPiiAsSensitive is on, feed the PII catalogue
+  // into the ledger so PII reads arm the trifecta `sensitive` leg. Default off.
+  const ledgerOpts = {
+    ...(config.minSpanLength !== undefined ? { minSpanLength: config.minSpanLength } : {}),
+    ...(config.treatPiiAsSensitive === true ? { piiSensitivity: containsPii } : {}),
+  };
   const ledgers = new Map<string, TaintLedger>();
 
   function ledgerFor(runId: string): TaintLedger {

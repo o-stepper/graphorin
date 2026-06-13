@@ -91,6 +91,35 @@ export interface PiiDetectionOptions {
 }
 
 /**
+ * SDF-8 / FIDES-lattice: does `text` contain any catalogued PII (email, SSN,
+ * phone, Luhn-valid card, …)? A pure, allocation-light predicate that returns on
+ * the first valid match and honours per-pattern `validate` (e.g. Luhn). Used to
+ * feed user/PII content into the dataflow taint ledger's `sensitiveSeen` leg so
+ * PII exfiltration trips the lethal-trifecta gate even without a `'secret'` tag.
+ *
+ * @stable
+ */
+export function containsPii(
+  text: string,
+  patterns: ReadonlyArray<PiiPattern> = DEFAULT_PII_PATTERNS,
+): boolean {
+  for (const pat of patterns) {
+    const re = new RegExp(
+      pat.pattern.source,
+      pat.pattern.flags.includes('g') ? pat.pattern.flags : `${pat.pattern.flags}g`,
+    );
+    let m = re.exec(text);
+    while (m !== null) {
+      if (pat.validate === undefined || pat.validate(m[0])) return true;
+      // Validator rejected this match (e.g. Luhn fail); the global regex has
+      // already advanced lastIndex, so continue scanning for the next hit.
+      m = re.exec(text);
+    }
+  }
+  return false;
+}
+
+/**
  * Construct the PII detection guardrail.
  *
  * @stable
