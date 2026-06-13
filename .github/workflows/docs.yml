@@ -21,7 +21,7 @@ on:
 # The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and
 # `CLOUDFLARE_ACCOUNT_ID` repository secrets. Until those secrets are
 # provisioned the deploy is a no-op and emits a warning, mirroring the
-# existing `release.yml` `NPM_TOKEN` pattern. Provisioning order:
+# `release.yml` `RELEASE_ENABLED` gating pattern. Provisioning order:
 #
 #   1. Create a Cloudflare Pages project named `graphorin-docs`.
 #   2. Add the custom domain `docs.graphorin.com` on the Cloudflare side.
