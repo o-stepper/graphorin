@@ -8,7 +8,7 @@ the framework never depends on a specific backend.
 Embedders are **opt-in**. With no embedder configured, vector search is
 disabled and memory falls back to keyword search only.
 
-```ts
+```ts no-check
 import { createMemory } from '@graphorin/memory';
 import { createOllamaEmbedder } from '@graphorin/embedder-ollama';
 
@@ -38,6 +38,8 @@ download. See [Privacy & no-phone-home](/guide/privacy).
 ### Ollama
 
 ```ts
+import { createOllamaEmbedder } from '@graphorin/embedder-ollama';
+
 createOllamaEmbedder({
   model: 'nomic-embed-text',
   baseUrl: 'http://127.0.0.1:11434', // default
@@ -53,6 +55,8 @@ runtime) is combined with the timeout.
 ### Transformers.js
 
 ```ts
+import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+
 createTransformersJsEmbedder({
   model: 'Xenova/multilingual-e5-base',
   cacheDir: process.env.GRAPHORIN_CACHE_DIR, // honoured automatically
