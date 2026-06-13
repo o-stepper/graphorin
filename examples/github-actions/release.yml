@@ -32,21 +32,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      # Actions are pinned to a commit SHA (with a `# vX` comment) — the
+      # practice this template's README recommends and the framework's own
+      # workflows follow. Bump deliberately; re-pin the SHA when you do.
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
+      # pnpm comes from the `packageManager` field via Corepack — no separate
+      # (and harder-to-pin) `pnpm/action-setup` action needed.
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version-file: ".nvmrc"
           registry-url: "https://registry.npmjs.org"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+          cache: pnpm
 
       - name: pnpm install (frozen)
         run: pnpm install --frozen-lockfile
@@ -63,7 +67,7 @@ jobs:
         run: pnpm run check-no-network
 
       - name: Create Release Pull Request or publish
-        uses: changesets/action@v1
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           publish: pnpm run release
           version: pnpm run version

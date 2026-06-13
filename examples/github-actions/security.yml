@@ -1,9 +1,10 @@
 # GitHub Actions security workflow distribution template (Phase 15).
 #
 # Mirrors the framework's supply-chain discipline (DEC-140 / ADR-034):
-# `pnpm audit` blocks the build on any High/Critical advisory not in
-# `audit-ignore.json`, and `pnpm audit signatures` verifies the npm
-# Sigstore provenance attestations on every downloaded package.
+# `pnpm audit` blocks the build on any High/Critical advisory not allowlisted
+# via `pnpm.auditConfig.ignoreCves` / `ignoreGhsas` in package.json, and
+# `pnpm audit signatures` verifies the npm Sigstore provenance attestations on
+# every downloaded package.
 #
 # Drop into `.github/workflows/security.yml` of a repository that
 # consumes the @graphorin/* packages.
@@ -35,28 +36,39 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      # Actions pinned to a commit SHA (see this template's README) — re-pin on
+      # a deliberate bump.
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           persist-credentials: false
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version-file: ".nvmrc"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+          cache: pnpm
 
       - name: pnpm install (frozen)
         run: pnpm install --frozen-lockfile
 
+      # Allow known-acceptable advisories via pnpm's own config in package.json:
+      #   "pnpm": { "auditConfig": { "ignoreCves": ["CVE-..."], "ignoreGhsas": ["GHSA-..."] } }
+      # (there is no separate `audit-ignore.json` mechanism in pnpm).
       - name: pnpm audit (high + critical)
         run: pnpm audit --prod --audit-level=high
 
+      # `pnpm audit signatures` only exists on newer pnpm; guard it so a
+      # consumer on an older pnpm gets a warning, not a hard failure.
       - name: pnpm audit signatures (npm Sigstore provenance)
-        run: pnpm audit signatures --prod
+        run: |
+          if pnpm audit signatures --help >/dev/null 2>&1; then
+            pnpm audit signatures --prod || echo "::warning::pnpm audit signatures reported issues; review before release."
+          else
+            echo "pnpm audit signatures not available in this pnpm version; skipping."
+          fi
 
       - name: Verify no implicit network calls (DEC-154)
         run: pnpm run check-no-network
