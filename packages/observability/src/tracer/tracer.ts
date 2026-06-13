@@ -162,9 +162,14 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     exporters = [fallback];
   }
 
+  // RP-20: sink() exports are fire-and-forget; hold each promise so flush()
+  // can await it. Without this a span emitted moments before shutdown is lost
+  // when the exporter's closed-guard trips before its export() resolves.
+  const inFlight = new Set<Promise<void>>();
+
   function sink(record: SpanRecord): void {
     for (const exporter of exporters) {
-      Promise.resolve()
+      const p = Promise.resolve()
         .then(() => exporter.export(record))
         .catch((err: unknown) => {
           warnSink(
@@ -173,6 +178,10 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
             }`,
           );
         });
+      inFlight.add(p);
+      void p.finally(() => {
+        inFlight.delete(p);
+      });
     }
   }
 
@@ -224,6 +233,10 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
   }
 
   async function flush(): Promise<void> {
+    // RP-20: drain in-flight fire-and-forget exports first, then flush.
+    while (inFlight.size > 0) {
+      await Promise.all([...inFlight]);
+    }
     await Promise.all(exporters.map((e) => e.flush()));
   }
 

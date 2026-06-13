@@ -47,6 +47,23 @@ export interface JSONLExporterOptions {
    * @internal
    */
   readonly now?: DateProvider;
+  /**
+   * Upper bound on simultaneously-open file handles (RP-20). The pool keys
+   * by `(session, UTC-month)`, so a long-living server would otherwise hold
+   * one fd per pair forever; the least-recently-used handle is closed once
+   * the cap is reached. Defaults to `64`.
+   */
+  readonly maxOpenHandles?: number;
+}
+
+/**
+ * A JSONL exporter, plus an introspection seam for the bounded handle pool.
+ *
+ * @stable
+ */
+export interface JSONLExporter extends TraceExporter {
+  /** Number of file handles currently open in the pool (RP-20). */
+  openHandleCount(): number;
 }
 
 /**
@@ -55,15 +72,17 @@ export interface JSONLExporterOptions {
  *
  * @stable
  */
-export function createJSONLExporter(opts: JSONLExporterOptions): TraceExporter {
+export function createJSONLExporter(opts: JSONLExporterOptions): JSONLExporter {
   const id = opts.id ?? 'jsonl';
   const root = opts.path;
   const now = opts.now ?? (() => new Date());
   const resolveFilePath = opts.resolveFilePath ?? defaultPathResolver(now);
+  const maxOpenHandles = Math.max(1, opts.maxOpenHandles ?? 64);
 
   // Pool of file handles, keyed by absolute path. Each handle is opened
-  // in append mode the first time we touch the path; subsequent
-  // exports re-use the existing handle.
+  // in append mode the first time we touch the path; subsequent exports
+  // re-use the existing handle. The pool is LRU-bounded (RP-20) — the Map's
+  // insertion order is the recency order, so the first entry is the LRU.
   const handles = new Map<string, FileHandleEntry>();
   let closed = false;
 
@@ -72,7 +91,7 @@ export function createJSONLExporter(opts: JSONLExporterOptions): TraceExporter {
     async export(record: SpanRecord): Promise<void> {
       if (closed) return;
       const filePath = resolveFilePath(record, root);
-      const entry = await openOrReuse(handles, filePath);
+      const entry = await openOrReuse(handles, filePath, maxOpenHandles);
       const line = `${JSON.stringify(serializableRecord(record))}\n`;
       await entry.handle.write(line, null, 'utf8');
     },
@@ -88,6 +107,9 @@ export function createJSONLExporter(opts: JSONLExporterOptions): TraceExporter {
       }
       handles.clear();
     },
+    openHandleCount(): number {
+      return handles.size;
+    },
   };
 }
 
@@ -98,9 +120,32 @@ interface FileHandleEntry {
 async function openOrReuse(
   pool: Map<string, FileHandleEntry>,
   filePath: string,
+  maxOpenHandles: number,
 ): Promise<FileHandleEntry> {
   const cached = pool.get(filePath);
-  if (cached !== undefined) return cached;
+  if (cached !== undefined) {
+    // Mark most-recently-used by re-inserting at the tail of the Map.
+    pool.delete(filePath);
+    pool.set(filePath, cached);
+    return cached;
+  }
+
+  // RP-20: evict least-recently-used handles before exceeding the cap so the
+  // open-fd count stays bounded. An evicted path simply re-opens (append mode)
+  // on its next export — no data is lost.
+  while (pool.size >= maxOpenHandles) {
+    const lruKey = pool.keys().next().value;
+    if (lruKey === undefined) break;
+    const lru = pool.get(lruKey);
+    pool.delete(lruKey);
+    if (lru !== undefined) {
+      try {
+        await lru.handle.close();
+      } catch {
+        // Best-effort — a failed close must not block the new open.
+      }
+    }
+  }
 
   await mkdir(dirname(filePath), { recursive: true, mode: 0o700 });
   const handle = await open(filePath, 'a', 0o600);
