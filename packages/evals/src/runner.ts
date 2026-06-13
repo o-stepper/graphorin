@@ -48,9 +48,11 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
       if (myIndex >= queue.length) return;
       const item = queue[myIndex];
       if (item === undefined) return;
-      const caseId =
-        item.sample.id ??
-        (iterations === 1 ? `case-${item.idx}` : `case-${item.idx}-iter-${item.iter}`);
+      // EB-6: a caller-provided id must still be disambiguated per iteration —
+      // otherwise iterations>1 emits multiple results under one caseId and
+      // JUnit/HTML reporters render indistinguishable testcases.
+      const baseId = item.sample.id ?? `case-${item.idx}`;
+      const caseId = iterations === 1 ? baseId : `${baseId}-iter-${item.iter}`;
       const startedAt = Date.now();
       let output: O;
       try {
