@@ -41,3 +41,19 @@ multi-session | temporal | knowledge-update | abstention`.
 
 `reports/` holds ephemeral run output and is git-ignored; only the curated
 baselines in this directory are committed.
+
+## Full-context baseline (SOTA-1)
+
+The memory pipeline is only meaningful next to the dumb baseline that inlines the
+**whole** haystack. Run the same ability with `--mode full-context` against the
+same real provider and compare accuracy *and* the `Tokens/query` line stamped in
+each RESULTS header — on a small corpus full-context often wins on accuracy at a
+much higher token cost, and that trade-off is the number to report:
+
+```bash
+node benchmarks/longmemeval/dist/runner.js \
+  --provider ollama --model llama3.1 --mode full-context \
+  --loader longmemeval --dataset benchmarks/.datasets/longmemeval_s.json \
+  --variant S --ability temporal \
+  --json benchmarks/longmemeval/reports/full-context.temporal.json
+```
