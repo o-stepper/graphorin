@@ -40,7 +40,6 @@ export interface ToolCassetteWriterOptions {
   readonly minRuntimeVersion?: string;
   readonly schemaUrl?: string;
   readonly hash?: boolean;
-  readonly cipher?: 'aes256gcm' | 'chacha20-poly1305';
   readonly now?: () => number;
 }
 
@@ -121,7 +120,9 @@ export function createToolCassetteWriter(
       toolCallCount,
       writtenAtIso: new Date(now()).toISOString(),
       ...(hashBuilder !== null ? { checksum: `sha256:${hashBuilder.digest('hex')}` } : {}),
-      ...(options.cipher !== undefined ? { cipher: options.cipher } : {}),
+      // RP-1: the cassette writer never had a key / encryption pipeline, so it
+      // must not stamp a `cipher` it can't honour. The footer type keeps the
+      // field readable for forward compatibility; the writer never emits it.
     };
     await sink.write(`${JSON.stringify(footer)}\n`);
     return footer;

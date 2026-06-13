@@ -18,6 +18,7 @@
 import { createDecipheriv, createHash } from 'node:crypto';
 import {
   SessionExportChecksumMismatchError,
+  SessionExportEncryptionRequiredError,
   SessionExportFormatInvalidError,
   SessionExportSchemaTooNewError,
   SessionExportSchemaUnsupportedError,
@@ -131,8 +132,28 @@ export function readSessionExport(
       footer = parsed as unknown as SessionExportFooterRecord;
       continue;
     }
+    // The body checksum covers the on-disk (possibly encrypted) line, matching
+    // what the writer hashed.
     bodyHash.update(`${line}\n`, 'utf8');
-    const record = parseBodyRecord(parsed, warnings);
+    let recordSource = parsed;
+    // RP-1: a `{"enc":"<base64>"}` line is an AES-256-GCM-encrypted body record.
+    if (typeof parsed.enc === 'string') {
+      if (options.decryptionKey === undefined) {
+        throw new SessionExportEncryptionRequiredError();
+      }
+      const plaintext = decryptBody(
+        new Uint8Array(Buffer.from(parsed.enc, 'base64')),
+        options.decryptionKey,
+      );
+      try {
+        recordSource = JSON.parse(Buffer.from(plaintext).toString('utf8')) as Readonly<
+          Record<string, unknown>
+        >;
+      } catch {
+        throw new SessionExportFormatInvalidError(`malformed decrypted record on line ${i + 1}`);
+      }
+    }
+    const record = parseBodyRecord(recordSource, warnings);
     records.push(record);
   }
   if (footer === undefined) {

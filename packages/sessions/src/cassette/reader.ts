@@ -74,7 +74,11 @@ export function readToolCassette(body: string): ToolCassetteReadResult {
   let footer: ToolCassetteFooterRecord | undefined;
   const bodyHash = createHash('sha256');
   let lastStepNumber: number | undefined;
-  let lastToolCallId: string | undefined;
+  // RP-4: track the tool-call ids seen in the CURRENT step. Parallel tool-calls
+  // share a step and their provider ids carry no lexicographic order, so the
+  // cursor only rejects a step regression or an exact (same step + same id)
+  // duplicate — not a "decreasing" id within the step.
+  let stepToolCallIds = new Set<string>();
   for (let i = 1; i < lines.length; i += 1) {
     const line = lines[i];
     if (line === undefined || line.length === 0) continue;
@@ -93,18 +97,23 @@ export function readToolCassette(body: string): ToolCassetteReadResult {
     records.push(record);
     if (record.kind === 'tool-call') {
       const tcRecord = record;
-      if (
-        lastStepNumber !== undefined &&
-        (tcRecord.stepNumber < lastStepNumber ||
-          (tcRecord.stepNumber === lastStepNumber && (lastToolCallId ?? '') >= tcRecord.toolCallId))
-      ) {
+      if (lastStepNumber !== undefined && tcRecord.stepNumber < lastStepNumber) {
         throw new CassetteCursorViolationError(
-          `tool-call cursor must advance: previous { stepNumber=${lastStepNumber}, toolCallId='${lastToolCallId}' } ` +
-            `>= incoming { stepNumber=${tcRecord.stepNumber}, toolCallId='${tcRecord.toolCallId}' }`,
+          `tool-call cursor must not regress: previous stepNumber=${lastStepNumber} ` +
+            `> incoming stepNumber=${tcRecord.stepNumber} (toolCallId='${tcRecord.toolCallId}')`,
         );
       }
-      lastStepNumber = tcRecord.stepNumber;
-      lastToolCallId = tcRecord.toolCallId;
+      if (tcRecord.stepNumber !== lastStepNumber) {
+        // A new step — reset the per-step id set.
+        stepToolCallIds = new Set<string>();
+        lastStepNumber = tcRecord.stepNumber;
+      }
+      if (stepToolCallIds.has(tcRecord.toolCallId)) {
+        throw new CassetteCursorViolationError(
+          `duplicate tool-call id '${tcRecord.toolCallId}' within step ${tcRecord.stepNumber}`,
+        );
+      }
+      stepToolCallIds.add(tcRecord.toolCallId);
       toolCalls.push(tcRecord);
     }
   }
