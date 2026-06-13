@@ -39,12 +39,19 @@ import {
   type MemoryEvalAbility,
   type MemoryEvalInput,
   predicate,
+  type RegressionOptions,
   type RegressionReport,
   renderMarkdownReport,
   runEvals,
   type Scorer,
 } from '@graphorin/evals';
 import { createMemory, type Memory } from '@graphorin/memory';
+import {
+  createProvider,
+  llamaCppServerAdapter,
+  ollamaAdapter,
+  openAICompatibleAdapter,
+} from '@graphorin/provider';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
 import { createDefaultStubProvider } from './stub-provider.js';
@@ -52,6 +59,108 @@ import { createDefaultStubProvider } from './stub-provider.js';
 export const VERSION = '0.1.0';
 
 const DEFAULT_TOP_K = 12;
+
+/**
+ * The regression-gate tolerances the dispatch CI job gates on. Quality-only:
+ * `maxAvgDurationIncreaseMs` stays `Infinity` because real LLM latency swings by
+ * whole seconds run to run (EB-4). Exported so the B2 negative-control test
+ * exercises the EXACT values the gate uses — proving it fails on a real
+ * regression rather than being theater.
+ */
+export const REGRESSION_TOLERANCES: RegressionOptions = {
+  maxPassRateDropPct: 5,
+  maxAvgScoreDrop: 0.05,
+  maxAvgDurationIncreaseMs: Number.POSITIVE_INFINITY,
+};
+
+/** The real HTTP-adapter providers the CLI can resolve, besides the offline stub. */
+const REAL_PROVIDER_NAMES = ['ollama', 'llamacpp', 'openai-compatible'] as const;
+type RealProviderName = (typeof REAL_PROVIDER_NAMES)[number];
+
+/** A provider request from CLI flags / env, before resolution (EB-1). */
+export interface BenchProviderSpec {
+  /** `stub` (default) or one of {@link REAL_PROVIDER_NAMES}. */
+  readonly name?: string;
+  /** Model id — required for every real provider. */
+  readonly model?: string;
+  /** Base URL — required for `openai-compatible`; loopback default for `ollama`/`llamacpp`. */
+  readonly baseUrl?: string;
+  /** Bearer key for `openai-compatible` (env-only; never a CLI flag). */
+  readonly apiKey?: string;
+}
+
+/** A resolved {@link Provider} plus the provenance label stamped into RESULTS. */
+export interface ResolvedBenchProvider {
+  readonly provider: Provider;
+  readonly label: string;
+}
+
+/**
+ * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default — and any
+ * `stub` name — is the deterministic offline stub, labelled
+ * `stub (plumbing-only)` so a plumbing run can never be mistaken for a real
+ * result. A real `--provider` constructs the matching HTTP adapter; the network
+ * is only touched later at `generate()` time, so this stays offline-safe (and
+ * `check-no-network` ignores `benchmarks/`).
+ *
+ * Cloud models (Anthropic/OpenAI) are reached via `openai-compatible` pointed at
+ * their OpenAI-compatible endpoint with `GRAPHORIN_BENCH_API_KEY`, or via the
+ * programmatic {@link runLongMemEvalBenchmark} path for the Vercel AI SDK route.
+ */
+export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenchProvider {
+  const name = spec.name === undefined || spec.name === '' ? 'stub' : spec.name;
+  if (name === 'stub') {
+    return { provider: createDefaultStubProvider(), label: 'stub (plumbing-only)' };
+  }
+  if (!(REAL_PROVIDER_NAMES as readonly string[]).includes(name)) {
+    throw new Error(
+      `[benchmark-longmemeval] unknown --provider '${name}'. Valid: stub, ${REAL_PROVIDER_NAMES.join(', ')}.`,
+    );
+  }
+  const model = spec.model;
+  if (model === undefined || model === '') {
+    throw new Error(
+      `[benchmark-longmemeval] --provider ${name} requires --model (or GRAPHORIN_BENCH_MODEL).`,
+    );
+  }
+  const opts = { acceptsSensitivity: ['public', 'internal'] as const };
+  const baseUrl = spec.baseUrl !== undefined && spec.baseUrl !== '' ? spec.baseUrl : undefined;
+  switch (name as RealProviderName) {
+    case 'ollama':
+      return {
+        provider: createProvider(ollamaAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }), opts),
+        label: `ollama:${model}`,
+      };
+    case 'llamacpp':
+      return {
+        provider: createProvider(
+          llamaCppServerAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }),
+          opts,
+        ),
+        label: `llamacpp:${model}`,
+      };
+    default: {
+      // openai-compatible — no loopback default; a base URL is mandatory.
+      if (baseUrl === undefined) {
+        throw new Error(
+          '[benchmark-longmemeval] --provider openai-compatible requires --base-url ' +
+            '(or GRAPHORIN_BENCH_BASE_URL).',
+        );
+      }
+      return {
+        provider: createProvider(
+          openAICompatibleAdapter({
+            model,
+            baseUrl,
+            ...(spec.apiKey ? { apiKey: spec.apiKey } : {}),
+          }),
+          opts,
+        ),
+        label: `openai-compatible:${model}`,
+      };
+    }
+  }
+}
 
 type LoaderName = 'longmemeval' | 'locomo' | 'dmr';
 
@@ -137,6 +246,91 @@ async function recall(
   return texts.join('\n');
 }
 
+/** Which system-under-test the runner evaluates (SOTA-1). */
+export type BenchMode = 'memory' | 'full-context';
+
+/** Accumulates provider usage across a run so RESULTS can report tokens/query (SOTA-1). */
+export interface BenchMeter {
+  queries: number;
+  totalTokens: number;
+}
+
+/** A fresh, zeroed {@link BenchMeter}. */
+export function createBenchMeter(): BenchMeter {
+  return { queries: 0, totalTokens: 0 };
+}
+
+/**
+ * Shared answer path: build the QA prompt from the supplied context, answer via
+ * the provider, and meter usage. The memory agent feeds *recalled* context; the
+ * full-context baseline feeds the *entire* haystack — only the context differs.
+ */
+async function answerFromContext(
+  provider: Provider,
+  input: MemoryEvalInput,
+  context: string,
+  meter: BenchMeter | undefined,
+): Promise<string> {
+  const askedAt = input.askedAt !== undefined ? `\nCURRENT DATE: ${input.askedAt}` : '';
+  const response = await provider.generate({
+    systemMessage:
+      "You are a personal assistant answering from the user's long-term memory. Use ONLY " +
+      'the MEMORY context. If the answer is not present, reply that you do not have that ' +
+      'information.',
+    messages: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: `MEMORY:\n${context}${askedAt}\n\nQUESTION: ${input.question}\n\nANSWER:`,
+          },
+        ],
+      },
+    ],
+    temperature: 0,
+    maxTokens: 256,
+  });
+  if (meter !== undefined) {
+    meter.queries += 1;
+    meter.totalTokens += response.usage?.totalTokens ?? 0;
+  }
+  return response.text ?? '';
+}
+
+/** Options for {@link createFullContextAgent}. */
+export interface FullContextAgentOptions {
+  readonly provider: Provider;
+  /** Optional token/latency meter shared with the runner (SOTA-1). */
+  readonly meter?: BenchMeter;
+}
+
+/**
+ * SOTA-1 baseline: inline the ENTIRE haystack into the prompt — no store, no
+ * retrieval window. Every memory-pipeline score is reported against this; on a
+ * small corpus the honest result often favours full-context (ConvoMem: full
+ * context beats memory systems below ~150 conversations) at a much higher token
+ * cost, which the {@link BenchMeter} surfaces. It is the prerequisite for any
+ * corpus-size-aware threshold (SOTA-2) — without it, thresholds are picked blind.
+ */
+export function createFullContextAgent(
+  options: FullContextAgentOptions,
+): AgentLike<MemoryEvalInput, string> {
+  return {
+    async run(input: MemoryEvalInput): Promise<string> {
+      const context = input.haystackSessions
+        .flatMap((session) =>
+          session.turns.map((turn) => {
+            const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
+            return `${turn.role}${stamp}: ${turn.content}`;
+          }),
+        )
+        .join('\n');
+      return answerFromContext(options.provider, input, context, options.meter);
+    },
+  };
+}
+
 /** Options for {@link createMemorySystemAgent}. */
 export interface MemorySystemAgentOptions {
   readonly provider: Provider;
@@ -144,6 +338,8 @@ export interface MemorySystemAgentOptions {
   readonly topK?: number;
   /** Run the consolidator's standard phase after ingest (needs an extraction-capable provider). */
   readonly consolidate?: boolean;
+  /** Optional token/latency meter shared with the runner (SOTA-1). */
+  readonly meter?: BenchMeter;
   /**
    * EB-11 hook: fired once per ACTUAL conversation ingest (a cache miss), NOT
    * per QA case — lets a caller/test confirm a sample's N questions ingest the
@@ -214,27 +410,7 @@ export function createMemorySystemAgent(
     async run(input: MemoryEvalInput): Promise<string> {
       const memory = await ingestConversation(input);
       const context = await recall(memory, scope, input.question, topK);
-      const askedAt = input.askedAt !== undefined ? `\nCURRENT DATE: ${input.askedAt}` : '';
-      const response = await options.provider.generate({
-        systemMessage:
-          "You are a personal assistant answering from the user's long-term memory. Use ONLY " +
-          'the MEMORY context. If the answer is not present, reply that you do not have that ' +
-          'information.',
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `MEMORY:\n${context}${askedAt}\n\nQUESTION: ${input.question}\n\nANSWER:`,
-              },
-            ],
-          },
-        ],
-        temperature: 0,
-        maxTokens: 256,
-      });
-      return response.text ?? '';
+      return answerFromContext(options.provider, input, context, options.meter);
     },
   };
 }
@@ -294,6 +470,10 @@ export interface RunLongMemEvalOptions {
   readonly topK?: number;
   readonly consolidate?: boolean;
   readonly concurrency?: number;
+  /** System-under-test: `memory` (default) or the `full-context` baseline (SOTA-1). */
+  readonly mode?: BenchMode;
+  /** Optional usage meter; populated with tokens/query across the run (SOTA-1). */
+  readonly meter?: BenchMeter;
 }
 
 /** Run the benchmark and return the eval report (does not write RESULTS). */
@@ -308,11 +488,18 @@ export async function runLongMemEvalBenchmark(
   if (options.smoke === true) {
     cases = cases.slice(0, 3);
   }
-  const agent = createMemorySystemAgent({
-    provider: options.provider,
-    ...(options.topK !== undefined ? { topK: options.topK } : {}),
-    ...(options.consolidate !== undefined ? { consolidate: options.consolidate } : {}),
-  });
+  const agent =
+    options.mode === 'full-context'
+      ? createFullContextAgent({
+          provider: options.provider,
+          ...(options.meter !== undefined ? { meter: options.meter } : {}),
+        })
+      : createMemorySystemAgent({
+          provider: options.provider,
+          ...(options.topK !== undefined ? { topK: options.topK } : {}),
+          ...(options.consolidate !== undefined ? { consolidate: options.consolidate } : {}),
+          ...(options.meter !== undefined ? { meter: options.meter } : {}),
+        });
   return runEvals<MemoryEvalInput, string>({
     agent,
     dataset: { cases },
@@ -345,6 +532,12 @@ interface CliArgs {
   topK?: number;
   consolidate: boolean;
   gateOn: 'all' | 'regressions';
+  /** EB-1 real-provider path (default: offline stub). */
+  providerName?: string;
+  model?: string;
+  baseUrl?: string;
+  /** SOTA-1 system-under-test (default: memory). */
+  mode?: BenchMode;
 }
 
 function pkgRoot(): string {
@@ -390,6 +583,18 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     } else if (a === '--gate-on' && next !== undefined) {
       args.gateOn = next === 'regressions' ? 'regressions' : 'all';
       i++;
+    } else if (a === '--provider' && next !== undefined) {
+      args.providerName = next;
+      i++;
+    } else if (a === '--model' && next !== undefined) {
+      args.model = next;
+      i++;
+    } else if (a === '--base-url' && next !== undefined) {
+      args.baseUrl = next;
+      i++;
+    } else if (a === '--mode' && next !== undefined) {
+      args.mode = next === 'full-context' ? 'full-context' : 'memory';
+      i++;
     } else if (a === '--smoke') {
       args.smoke = true;
     } else if (a === '--consolidate') {
@@ -399,30 +604,75 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
   return args;
 }
 
-async function writeResults(
-  resultsPath: string,
-  report: EvalReport<MemoryEvalInput, string>,
-): Promise<void> {
-  const header = [
+/** Run metadata stamped into the RESULTS header beside the provider (SOTA-1). */
+export interface ResultsMeta {
+  /** Which system-under-test ran. */
+  readonly mode?: BenchMode;
+  /** Mean provider tokens per QA query (the honest cost axis next to accuracy). */
+  readonly tokensPerQuery?: number;
+  readonly generatedAt?: string;
+}
+
+/**
+ * The RESULTS.md header, stamped with the provider provenance (EB-1) and — when
+ * available — the run mode and tokens/query cost axis (SOTA-1). A stub run is
+ * labelled `stub (plumbing-only)` so it can never read as a real result.
+ */
+export function buildResultsHeader(providerLabel: string, meta: ResultsMeta = {}): string {
+  const lines = [
     '# LongMemEval — memory-quality benchmark results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',
-    `_Generated: ${new Date().toISOString()}_`,
-    '',
-  ].join('\n');
+    `**Provider:** ${providerLabel}`,
+  ];
+  if (meta.mode !== undefined) lines.push(`**Mode:** ${meta.mode}`);
+  if (meta.tokensPerQuery !== undefined) {
+    lines.push(`**Tokens/query:** ${meta.tokensPerQuery.toFixed(0)}`);
+  }
+  lines.push('', `_Generated: ${meta.generatedAt ?? new Date().toISOString()}_`, '');
+  return lines.join('\n');
+}
+
+async function writeResults(
+  resultsPath: string,
+  report: EvalReport<MemoryEvalInput, string>,
+  providerLabel: string,
+  meta: ResultsMeta,
+): Promise<void> {
   await mkdir(dirname(resultsPath), { recursive: true });
-  await writeFile(resultsPath, `${header}${renderMarkdownReport(report)}`, 'utf8');
+  await writeFile(
+    resultsPath,
+    `${buildResultsHeader(providerLabel, meta)}${renderMarkdownReport(report)}`,
+    'utf8',
+  );
 }
 
 export async function main(): Promise<void> {
   const args = parseArgs(process.argv);
-  console.warn(
-    '[benchmark-longmemeval] no Provider injected; using the deterministic offline stub — ' +
-      'scores are plumbing-only. Call runLongMemEvalBenchmark({ provider }) with a real ' +
-      'Provider for meaningful numbers.',
-  );
-  const provider = createDefaultStubProvider();
+  // CLI flags win; env (GRAPHORIN_BENCH_*) fills the gaps. The API key is
+  // env-only — never put a secret on the command line.
+  const providerName = args.providerName ?? process.env.GRAPHORIN_BENCH_PROVIDER;
+  const model = args.model ?? process.env.GRAPHORIN_BENCH_MODEL;
+  const baseUrl = args.baseUrl ?? process.env.GRAPHORIN_BENCH_BASE_URL;
+  const apiKey = process.env.GRAPHORIN_BENCH_API_KEY;
+  const { provider, label } = resolveBenchProvider({
+    ...(providerName !== undefined ? { name: providerName } : {}),
+    ...(model !== undefined ? { model } : {}),
+    ...(baseUrl !== undefined ? { baseUrl } : {}),
+    ...(apiKey !== undefined ? { apiKey } : {}),
+  });
+  if (label.startsWith('stub')) {
+    console.warn(
+      '[benchmark-longmemeval] no real Provider selected; using the deterministic offline stub — ' +
+        'scores are plumbing-only. Pass --provider ollama|llamacpp|openai-compatible (with --model, ' +
+        'or the GRAPHORIN_BENCH_* env vars) for meaningful numbers.',
+    );
+  } else {
+    console.log(`[benchmark-longmemeval] provider=${label}`);
+  }
+  const mode: BenchMode = args.mode ?? 'memory';
+  const meter = createBenchMeter();
   const report = await runLongMemEvalBenchmark({
     datasetPath: args.dataset,
     loader: args.loader,
@@ -431,14 +681,17 @@ export async function main(): Promise<void> {
     smoke: args.smoke,
     ...(args.topK !== undefined ? { topK: args.topK } : {}),
     consolidate: args.consolidate,
+    mode,
+    meter,
     provider,
   });
+  const tokensPerQuery = meter.queries > 0 ? meter.totalTokens / meter.queries : 0;
   console.log(
-    `[benchmark-longmemeval] loader=${args.loader}${args.ability !== undefined ? ` ability=${args.ability}` : ''} ` +
+    `[benchmark-longmemeval] loader=${args.loader} mode=${mode}${args.ability !== undefined ? ` ability=${args.ability}` : ''} ` +
       `cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed} ` +
-      `avgMs=${report.summary.avgDurationMs.toFixed(2)}`,
+      `avgMs=${report.summary.avgDurationMs.toFixed(2)} tokens/query=${tokensPerQuery.toFixed(0)}`,
   );
-  await writeResults(args.results, report);
+  await writeResults(args.results, report, label, { mode, tokensPerQuery });
   if (args.json !== undefined) {
     await writeFile(args.json, JSON.stringify(report, null, 2), 'utf8');
     console.log(`[benchmark-longmemeval] wrote JSON report to ${args.json}`);
@@ -457,14 +710,7 @@ export async function main(): Promise<void> {
     }
     if (baselineText !== undefined) {
       const baseline = JSON.parse(baselineText) as EvalReport<MemoryEvalInput, string>;
-      regression = detectRegressions(report, baseline, {
-        maxPassRateDropPct: 5,
-        maxAvgScoreDrop: 0.05,
-        // Quality-only gate: real LLM latency swings by whole seconds run to
-        // run, so an absolute avg-duration budget would only produce flaky
-        // failures here. Explicit even though Infinity is now the default (EB-4).
-        maxAvgDurationIncreaseMs: Number.POSITIVE_INFINITY,
-      });
+      regression = detectRegressions(report, baseline, REGRESSION_TOLERANCES);
       if (regression.hasRegressions) {
         console.error('[benchmark-longmemeval] REGRESSIONS DETECTED:');
         for (const f of regression.findings) console.error(`  - ${f.message}`);
