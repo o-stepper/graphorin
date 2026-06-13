@@ -163,6 +163,8 @@ describe('vercelAdapter', () => {
     const textDeltas = events.filter((e) => e.type === 'text-delta');
     expect(textDeltas).toHaveLength(0);
     expect(events.at(-1)?.type).toBe('finish');
+    // PS-12: an aborted stream reports 'aborted', not the initial 'stop'.
+    expect((events.at(-1) as { finishReason?: string }).finishReason).toBe('aborted');
   });
 
   it('default capabilities are populated and overridable', () => {
