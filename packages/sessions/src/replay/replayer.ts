@@ -14,6 +14,7 @@
  * @packageDocumentation
  */
 
+import { stat } from 'node:fs/promises';
 import type { Sensitivity } from '@graphorin/core';
 import type { SpanRecord } from '@graphorin/observability/exporters';
 import {
@@ -28,7 +29,7 @@ import {
 import { readToolCassette } from '../cassette/reader.js';
 import { type CassetteReplayDecision, decideToolReplay } from '../cassette/replay.js';
 import type { ToolCallRecord, ToolCassetteSource, ToolReplayMode } from '../cassette/types.js';
-import { ReplayAccessDeniedError } from '../errors/index.js';
+import { CassetteArtifactMissingError, ReplayAccessDeniedError } from '../errors/index.js';
 import type { SessionReplayEvent, SessionReplayOptions } from './types.js';
 
 /**
@@ -141,7 +142,29 @@ export function createSessionReplayer(opts: CreateSessionReplayerOptions = {}): 
       if (input.cassette !== undefined) {
         const replayMode: ToolReplayMode = input.toolReplayMode ?? 'auto';
         const records = await collectCassetteRecords(input.cassette);
+        const onMissingArtifact = input.onMissingArtifact ?? 'abort';
         for (const record of records) {
+          // RP-3: when the record's content parts are referenced on disk (not
+          // inlined), the artifacts must exist before we substitute the
+          // recorded output. A moved / deleted artifact is honoured per
+          // `onMissingArtifact`: 'abort' throws, 'fallback-live' surfaces a
+          // decision so the caller re-runs the tool live.
+          const missingArtifact =
+            record.contentParts === undefined ? await firstMissingArtifact(record) : null;
+          if (missingArtifact !== null) {
+            if (onMissingArtifact === 'abort') {
+              throw new CassetteArtifactMissingError(record.toolName, missingArtifact);
+            }
+            yield {
+              type: 'tool.cassette.replay.artifact-missing',
+              toolName: record.toolName,
+              toolCallId: record.toolCallId,
+              stepNumber: record.stepNumber,
+              missingArtifactPath: missingArtifact,
+              decision: 'fallback-live',
+            };
+            continue;
+          }
           const live = (await (input.liveInvocation?.(record) ??
             Promise.resolve({ args: record.args }))) as {
             readonly args: unknown;
@@ -181,6 +204,23 @@ const emptySource: AsyncIterable<SpanRecord> = {
     // empty
   },
 };
+
+/**
+ * RP-3: stat each referenced artifact for a tool-call record; return the first
+ * path that cannot be opened, or `null` when every reference resolves (or the
+ * record references none).
+ */
+async function firstMissingArtifact(record: ToolCallRecord): Promise<string | null> {
+  if (record.contentPartsRefs === undefined) return null;
+  for (const ref of record.contentPartsRefs) {
+    try {
+      await stat(ref.path);
+    } catch {
+      return ref.path;
+    }
+  }
+  return null;
+}
 
 async function collectCassetteRecords(
   source: ToolCassetteSource,

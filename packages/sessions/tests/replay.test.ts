@@ -1,7 +1,7 @@
 import type { SpanRecord } from '@graphorin/observability/exporters';
 import { describe, expect, it } from 'vitest';
 import type { ToolCallRecord } from '../src/cassette/types.js';
-import { ReplayAccessDeniedError } from '../src/errors/index.js';
+import { CassetteArtifactMissingError, ReplayAccessDeniedError } from '../src/errors/index.js';
 import { createSessionManager } from '../src/index.js';
 import { createSessionReplayer } from '../src/replay/index.js';
 import { InMemoryMemorySessionFacade, InMemorySessionStore } from './fixtures/in-memory-stores.js';
@@ -118,5 +118,60 @@ describe('Session replayer', () => {
     const replayEndIdx = types.indexOf('replay.end');
     const cassetteIdx = types.indexOf('tool.cassette.replay.substituted');
     expect(cassetteIdx).toBeGreaterThan(replayEndIdx);
+  });
+
+  function recordWithMissingArtifact(): ToolCallRecord {
+    return {
+      kind: 'tool-call',
+      stepNumber: 1,
+      toolCallId: 'tc-art',
+      toolName: 'reads-file',
+      sideEffectClass: 'pure',
+      args: {},
+      output: { ok: true },
+      status: 'completed',
+      durationMs: 1,
+      agentId: 'main',
+      timestampIso: '2026-05-08T10:00:00Z',
+      // Referenced (not inlined) artifact that no longer exists on disk.
+      contentPartsRefs: [
+        { kind: 'image', path: '/graphorin/does-not-exist/moved-artifact.png', sizeBytes: 42 },
+      ],
+    };
+  }
+
+  it('aborts replay when a referenced artifact is missing (RP-3, default)', async () => {
+    const replayer = createSessionReplayer();
+    const iter = replayer.run({
+      target: 'session:s-1',
+      traceSource: [],
+      cassette: { kind: 'inline', records: [recordWithMissingArtifact()] },
+      toolReplayMode: 'recorded',
+    });
+    await expect(
+      (async () => {
+        for await (const _e of iter) void _e;
+      })(),
+    ).rejects.toBeInstanceOf(CassetteArtifactMissingError);
+  });
+
+  it('surfaces an artifact-missing fallback-live decision when configured (RP-3)', async () => {
+    const replayer = createSessionReplayer();
+    const events: Array<{ type: string; decision?: string; missingArtifactPath?: string }> = [];
+    for await (const event of replayer.run({
+      target: 'session:s-1',
+      traceSource: [],
+      cassette: { kind: 'inline', records: [recordWithMissingArtifact()] },
+      toolReplayMode: 'recorded',
+      onMissingArtifact: 'fallback-live',
+    })) {
+      events.push(event as { type: string; decision?: string; missingArtifactPath?: string });
+    }
+    const missing = events.find((e) => e.type === 'tool.cassette.replay.artifact-missing');
+    expect(missing).toBeDefined();
+    expect(missing?.decision).toBe('fallback-live');
+    expect(missing?.missingArtifactPath).toBe('/graphorin/does-not-exist/moved-artifact.png');
+    // It does NOT also emit a substitution for that record.
+    expect(events.some((e) => e.type === 'tool.cassette.replay.substituted')).toBe(false);
   });
 });
