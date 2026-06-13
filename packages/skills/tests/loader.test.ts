@@ -213,13 +213,13 @@ describe('loadSkillFromSource — folder', () => {
     await expect(
       loadSkillFromSource(
         { kind: 'folder', path: dir },
-        { runtimeVersion: '0.4.0', conflictPolicy: 'error' },
+        { runtimeVersion: '0.5.0', conflictPolicy: 'error' },
       ),
     ).rejects.toBeInstanceOf(SkillRuntimeCompatError);
     // Default (warn) policy keeps it a diagnostic — the load still succeeds.
     const skill = await loadSkillFromSource(
       { kind: 'folder', path: dir },
-      { runtimeVersion: '0.4.0' },
+      { runtimeVersion: '0.5.0' },
     );
     expect(skill.diagnostics().some((d) => d.kind === 'invalid-runtime-compat')).toBe(true);
   });

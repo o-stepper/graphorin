@@ -320,4 +320,4 @@ Tools, [Skills](/guide/skills), and [MCP servers](/guide/mcp-client) all surface
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko

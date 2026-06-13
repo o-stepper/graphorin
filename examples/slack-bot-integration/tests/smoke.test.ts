@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/slack-bot-integration`. Every test runs
  * against an in-memory SQLite store and stubs the Slack `WebClient`
@@ -73,8 +73,8 @@ async function buildApp(overrides: CreateSlackBotAppOptions = {}): Promise<{
 }
 
 describe('examples/slack-bot-integration — smoke', () => {
-  it('exposes VERSION = 0.4.0', () => {
-    expect(VERSION).toBe('0.4.0');
+  it('exposes VERSION = 0.5.0', () => {
+    expect(VERSION).toBe('0.5.0');
   });
 
   it('processSlackEvent forwards a small Slack message and posts the reply back', async () => {

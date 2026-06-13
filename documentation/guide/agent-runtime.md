@@ -376,4 +376,4 @@ When the assembled message list contains any non-trusted `MessageContent` part, 
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -104,7 +104,7 @@ import { SqliteTriggerStore } from './trigger-store.js';
 import { VectorTableManager } from './vector-table-mgr.js';
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.4.0';
+export const VERSION = '0.5.0';
 
 /**
  * Library mode — single in-process connection. Server mode — opt-in

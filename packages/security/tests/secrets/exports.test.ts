@@ -4,7 +4,7 @@ import * as security from '../../src/index.js';
 
 describe('@graphorin/security barrel exports', () => {
   it('re-exports the canonical version constant', () => {
-    expect(security.VERSION).toBe('0.4.0');
+    expect(security.VERSION).toBe('0.5.0');
   });
 
   it('re-exports the SecretValue wrapper class', () => {

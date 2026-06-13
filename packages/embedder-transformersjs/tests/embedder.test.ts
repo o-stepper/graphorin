@@ -39,7 +39,7 @@ function makeCapturingPipelineFactory(dim: number, captured: string[][]): Pipeli
 
 describe('TransformersJsEmbedder', () => {
   it('VERSION constant matches the package version', () => {
-    expect(VERSION).toBe('0.4.0');
+    expect(VERSION).toBe('0.5.0');
   });
 
   it('prefixes E5 inputs by taskType and never prefixes non-E5 models (PS-10)', async () => {

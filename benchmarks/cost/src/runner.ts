@@ -234,7 +234,7 @@ async function updateBaseline(): Promise<void> {
     scenarios,
     toleranceRatio: prior?.toleranceRatio ?? 0.1,
     encoding: prior?.encoding ?? 'cl100k_base',
-    frameworkVersion: '0.4.0',
+    frameworkVersion: '0.5.0',
   };
   await writeFile(baselinePath(), `${JSON.stringify(next, null, 2)}\n`, 'utf8');
   console.log(`[benchmark-cost] baseline updated: ${JSON.stringify(scenarios)}`);

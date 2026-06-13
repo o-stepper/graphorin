@@ -118,4 +118,4 @@ A few feature requests have been turned down because they would contradict a pri
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko

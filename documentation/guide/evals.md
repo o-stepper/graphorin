@@ -75,4 +75,4 @@ The `benchmarks/*` workspaces wrap the harness for specific suites — `benchmar
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko

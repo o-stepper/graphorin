@@ -110,9 +110,9 @@ The **body** explains the *why*, not the *what*. One logical change per commit; 
 
 Graphorin follows [SemVer](https://semver.org). Pre-1.0, minor bumps cover breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). Once Graphorin reaches 1.0, strict SemVer applies. All `@graphorin/*` packages are released **lockstep** at the same version while on the 0.x line.
 
-Versions are managed by [Changesets](https://github.com/changesets/changesets) and are the **single source of version bumps** going forward: open a PR with a changeset, and the release pipeline opens a "Version Packages" PR that applies the bump + CHANGELOG. Do **not** bump versions by hand — let `pnpm run version` (which runs `changeset version`) do it.
+Versions are tracked with [Changesets](https://github.com/changesets/changesets): open a PR with a changeset describing your change. All `@graphorin/*` packages release **lockstep** at the same version while on the 0.x line.
 
-> Historical note: the `0.2.0`–`0.4.0` bumps were applied manually while the release pipeline was being brought up, and their changesets were deliberately retained. Those already-shipped changesets have since been drained from `.changeset/`, so the next version PR reflects only unreleased work. From `0.4.0` onward, changesets are the only path that bumps a version — never edit a package `version` field by hand.
+> Release mechanics: the version bump + root `CHANGELOG.md` are currently applied by the maintainer as a **manual pass** — the automated `changeset version` changelog step (`@changesets/changelog-github`) is not yet reliable in this repo — and the consumed changesets for already-released work are then drained from `.changeset/`. The `0.2.0`–`0.5.0` bumps were all applied this way. The intent is to move to changeset-driven bumps once the changelog generator is fixed; until then, do not hand-bump versions in a feature PR — author a changeset and let the release pass apply it.
 
 ## Privacy & no-phone-home
 
@@ -133,4 +133,4 @@ By contributing to Graphorin, you agree that your contributions will be licensed
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

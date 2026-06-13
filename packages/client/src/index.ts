@@ -19,7 +19,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.4.0';
+export const VERSION = '0.5.0';
 
 export * from './errors.js';
 export {

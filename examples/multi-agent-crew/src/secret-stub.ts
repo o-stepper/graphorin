@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Minimal in-tree implementation of the {@link SecretValue} contract from
  * `@graphorin/core`. The wrapper redacts every standard JavaScript

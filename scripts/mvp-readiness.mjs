@@ -49,7 +49,7 @@ const PACKAGES_DIR = join(ROOT, 'packages');
 // literal. Every published package must match the root (lockstep), so when a
 // version PR bumps the root the gate moves with it — otherwise the gate would
 // reject the very release it produced (e.g. after 0.4.0 → 0.4.1 every package
-// would read `version !== '0.4.0'` and fail before the publish step).
+// would read `version !== '0.5.0'` and fail before the publish step).
 const REQUIRED_VERSION = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).version;
 const REQUIRED_AUTHOR = 'Oleksiy Stepurenko';
 const REQUIRED_LICENSE = 'MIT';

@@ -4,5 +4,5 @@
   "passAt1": 1.0,
   "passAtK": 1.0,
   "taskCount": 3,
-  "frameworkVersion": "0.4.0"
+  "frameworkVersion": "0.5.0"
 }
