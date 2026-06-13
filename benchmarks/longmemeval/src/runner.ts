@@ -39,6 +39,7 @@ import {
   type MemoryEvalAbility,
   type MemoryEvalInput,
   predicate,
+  type RegressionOptions,
   type RegressionReport,
   renderMarkdownReport,
   runEvals,
@@ -58,6 +59,19 @@ import { createDefaultStubProvider } from './stub-provider.js';
 export const VERSION = '0.1.0';
 
 const DEFAULT_TOP_K = 12;
+
+/**
+ * The regression-gate tolerances the dispatch CI job gates on. Quality-only:
+ * `maxAvgDurationIncreaseMs` stays `Infinity` because real LLM latency swings by
+ * whole seconds run to run (EB-4). Exported so the B2 negative-control test
+ * exercises the EXACT values the gate uses — proving it fails on a real
+ * regression rather than being theater.
+ */
+export const REGRESSION_TOLERANCES: RegressionOptions = {
+  maxPassRateDropPct: 5,
+  maxAvgScoreDrop: 0.05,
+  maxAvgDurationIncreaseMs: Number.POSITIVE_INFINITY,
+};
 
 /** The real HTTP-adapter providers the CLI can resolve, besides the offline stub. */
 const REAL_PROVIDER_NAMES = ['ollama', 'llamacpp', 'openai-compatible'] as const;
@@ -696,14 +710,7 @@ export async function main(): Promise<void> {
     }
     if (baselineText !== undefined) {
       const baseline = JSON.parse(baselineText) as EvalReport<MemoryEvalInput, string>;
-      regression = detectRegressions(report, baseline, {
-        maxPassRateDropPct: 5,
-        maxAvgScoreDrop: 0.05,
-        // Quality-only gate: real LLM latency swings by whole seconds run to
-        // run, so an absolute avg-duration budget would only produce flaky
-        // failures here. Explicit even though Infinity is now the default (EB-4).
-        maxAvgDurationIncreaseMs: Number.POSITIVE_INFINITY,
-      });
+      regression = detectRegressions(report, baseline, REGRESSION_TOLERANCES);
       if (regression.hasRegressions) {
         console.error('[benchmark-longmemeval] REGRESSIONS DETECTED:');
         for (const f of regression.findings) console.error(`  - ${f.message}`);
