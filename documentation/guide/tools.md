@@ -72,7 +72,7 @@ export const refundOrder = tool({
 
 ## Worked examples
 
-A tool may ship up to **five** worked `examples` — `{ input, output, comment? }` triples validated against the tool's `inputSchema` / `outputSchema` at registration. The agent renders them into the `ToolDefinition` it sends the provider, so the model sees concrete input→output pairs next to the schema:
+A tool may ship up to **five** worked `examples` — `{ input, output, comment? }` triples validated against the tool's `inputSchema` / `outputSchema` at registration. The agent projects them onto the `ToolDefinition` it sends the provider, and the provider layer (`createProvider`) folds them into the tool's model-facing **description**, so the model sees concrete input→output pairs next to the schema (Anthropic reports complex-parameter accuracy rising 72% → 90% with worked examples):
 
 ```ts
 export const weather = tool({

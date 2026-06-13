@@ -25,6 +25,7 @@ import type {
 } from '@graphorin/core';
 
 import { resolveReasoningRetention } from './reasoning/retention.js';
+import { foldToolExamples } from './tool-examples.js';
 
 /**
  * Options accepted by {@link createProvider}.
@@ -98,13 +99,23 @@ function applyDefaults(
   options: CreateProviderOptions,
   capabilities: ProviderCapabilities,
 ): ProviderRequest {
+  let next = req;
+  // A1: fold worked tool examples into the model-facing description so the model
+  // actually sees them (the wire contract carries them; adapters never rendered
+  // them). Deterministic ⇒ the tool spec stays prompt-cache-stable.
+  if (next.tools !== undefined) {
+    const foldedTools = foldToolExamples(next.tools);
+    if (foldedTools !== next.tools) next = { ...next, tools: foldedTools };
+  }
   const effectiveRetention = resolveReasoningRetention({
-    ...(req.reasoningRetention !== undefined ? { requested: req.reasoningRetention } : {}),
+    ...(next.reasoningRetention !== undefined ? { requested: next.reasoningRetention } : {}),
     ...(options.reasoningRetention !== undefined ? { overridden: options.reasoningRetention } : {}),
     ...(capabilities.reasoningContract !== undefined
       ? { contract: capabilities.reasoningContract }
       : {}),
   });
-  if (effectiveRetention === req.reasoningRetention) return req;
-  return { ...req, reasoningRetention: effectiveRetention };
+  if (effectiveRetention !== next.reasoningRetention) {
+    next = { ...next, reasoningRetention: effectiveRetention };
+  }
+  return next;
 }

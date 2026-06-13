@@ -36,4 +36,5 @@ export * from './middleware/index.js';
 export * from './model-tier/index.js';
 export * from './provider.js';
 export * from './reasoning/index.js';
+export { foldToolExamples } from './tool-examples.js';
 export * from './trust/index.js';
