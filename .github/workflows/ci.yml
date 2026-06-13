@@ -63,6 +63,11 @@ jobs:
       - name: Doc snippets type-check
         run: pnpm run check-doc-snippets
 
+      # DOC-6: diff the CLI guide against the real commander tree — a documented
+      # command/subcommand that does not exist (e.g. `consolidator run`) fails here.
+      - name: CLI docs command diff
+        run: pnpm run check-cli-docs
+
       - name: Benchmark smoke + cost regression + doc guards
         run: pnpm run benchmark:ci
 
