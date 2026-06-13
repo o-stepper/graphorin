@@ -107,6 +107,25 @@ export type OpCliErrorKind =
  * @stable
  */
 export function createDefaultOpCli(): OpCli {
+  return createOpCli();
+}
+
+/**
+ * Grace period after SIGTERM before escalating to SIGKILL (SPL-22). A
+ * well-behaved `op` exits on SIGTERM well within this window; a wedged one
+ * (ignoring SIGTERM in an uninterruptible read) is force-killed so the hard
+ * timeout actually settles the promise.
+ */
+const SIGKILL_GRACE_MS = 1_000;
+
+/**
+ * {@link OpCli} factory with an injectable `spawn` (for tests). Production
+ * code uses {@link createDefaultOpCli}.
+ *
+ * @stable
+ */
+export function createOpCli(deps: { readonly spawn?: typeof spawn } = {}): OpCli {
+  const spawnFn = deps.spawn ?? spawn;
   return {
     async read(uri: string, options: OpCliReadOptions = {}): Promise<OpCliReadResult> {
       const binary = options.binary ?? 'op';
@@ -136,7 +155,7 @@ export function createDefaultOpCli(): OpCli {
         let killedByTimeout = false;
         let proc: ReturnType<typeof spawn>;
         try {
-          proc = spawn(binary, args, { env, stdio: ['ignore', 'pipe', 'pipe'] });
+          proc = spawnFn(binary, args, { env, stdio: ['ignore', 'pipe', 'pipe'] });
         } catch (err) {
           reject(
             new OpCliError(
@@ -147,6 +166,7 @@ export function createDefaultOpCli(): OpCli {
           );
           return;
         }
+        let graceTimer: ReturnType<typeof setTimeout> | undefined;
         const timer = setTimeout(() => {
           killedByTimeout = true;
           try {
@@ -154,6 +174,24 @@ export function createDefaultOpCli(): OpCli {
           } catch {
             // best-effort
           }
+          // SPL-22: SIGTERM alone can hang forever if `op` ignores it. Escalate
+          // to SIGKILL after a short grace AND reject from the timer, so the
+          // promise settles even when `close` never fires.
+          graceTimer = setTimeout(() => {
+            try {
+              proc.kill('SIGKILL');
+            } catch {
+              // best-effort
+            }
+            reject(
+              new OpCliError(
+                'timeout',
+                `op CLI timed out after ${timeoutMs} ms while resolving '${uri}' and did not exit on SIGTERM.`,
+                { stderr, hint: 'increase --op-timeout-ms or check 1Password connectivity' },
+              ),
+            );
+          }, SIGKILL_GRACE_MS);
+          graceTimer.unref?.();
         }, timeoutMs);
         timer.unref?.();
         proc.stdout?.on('data', (chunk: Buffer) => {
@@ -164,6 +202,7 @@ export function createDefaultOpCli(): OpCli {
         });
         proc.on('error', (err) => {
           clearTimeout(timer);
+          if (graceTimer !== undefined) clearTimeout(graceTimer);
           if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
             reject(
               new OpCliError(
@@ -182,6 +221,7 @@ export function createDefaultOpCli(): OpCli {
         });
         proc.on('close', (code) => {
           clearTimeout(timer);
+          if (graceTimer !== undefined) clearTimeout(graceTimer);
           const durationMs = performance.now() - started;
           if (killedByTimeout) {
             reject(

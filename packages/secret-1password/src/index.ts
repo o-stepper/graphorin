@@ -29,6 +29,7 @@ export const VERSION = '0.4.0';
 
 export {
   createDefaultOpCli,
+  createOpCli,
   type OpCli,
   OpCliError,
   type OpCliErrorKind,
