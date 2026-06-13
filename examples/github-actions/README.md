@@ -9,7 +9,10 @@ examples smoke test.
 | `release.yml` | Changesets-based version & publish pipeline, gated on `NPM_TOKEN`, with npm provenance. |
 | `security.yml` | `pnpm audit`, license allowlist, and CodeQL scanning on push/PR + a weekly schedule. |
 | `renovate.json` | Renovate config for npm dependency updates. |
-| `audit-ignore.json` | Allowlist of reviewed/accepted `pnpm audit` advisories. |
+
+To allowlist a reviewed advisory, use pnpm's own config in your `package.json`
+(`"pnpm": { "auditConfig": { "ignoreCves": ["CVE-…"], "ignoreGhsas": ["GHSA-…"] } }`)
+— pnpm has no separate `audit-ignore.json` mechanism.
 
 ## Use
 
