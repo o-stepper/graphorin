@@ -27,6 +27,11 @@ import {
 import { type ServerType, serve } from '@hono/node-server';
 import { createNodeWebSocket } from '@hono/node-ws';
 import { Hono } from 'hono';
+import {
+  bridgeCommentaryToAudit,
+  createLateBoundCommentarySink,
+  type LateBoundCommentarySink,
+} from './commentary/index.js';
 import { parseServerConfig, type ServerConfigInput, type ServerConfigSpec } from './config.js';
 import type { ConsolidatorDaemon, ConsolidatorLike } from './consolidator/daemon.js';
 import { createConsolidatorDaemon } from './consolidator/daemon.js';
@@ -493,11 +498,18 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   let dispatcher: WsDispatcher | undefined;
   let tickets: WsTicketStore | undefined;
   let wsAdapter: ReturnType<typeof createNodeWebSocket> | undefined;
+  // IP-21: the dispatcher is built here, before the audit DB opens in start().
+  // Hand it a late-bound commentary sink now and install the audit-writing
+  // target once the DB exists — otherwise the sanitizer's documented decisions
+  // (wrapped/stripped frames with before/after digests) are dropped.
+  let commentaryAuditSink: LateBoundCommentarySink | undefined;
   if (config.server.ws.enabled) {
+    commentaryAuditSink = createLateBoundCommentarySink();
     dispatcher = createWsDispatcher({
       commentary: {
         policy: config.server.ws.commentarySanitization.policy,
         applyToEvents: config.server.ws.commentarySanitization.applyToEvents,
+        sink: commentaryAuditSink,
       },
       replayBuffer: {
         maxEvents: config.server.stream.replayBuffer.maxEvents,
@@ -604,6 +616,9 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
             passphrase: preBind.auditPassphrase,
             ...(config.audit.cipher !== undefined ? { cipher: config.audit.cipher } : {}),
           });
+          // IP-21: now that the audit chain is open, route the WS dispatcher's
+          // commentary-sanitizer decisions into it.
+          commentaryAuditSink?.bind(bridgeCommentaryToAudit(auditDb));
         }
 
         if (config.auth.kind === 'token') {

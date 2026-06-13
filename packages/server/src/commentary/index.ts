@@ -6,6 +6,14 @@
  */
 
 export {
+  bridgeCommentaryToAudit,
+  COMMENTARY_AUDIT_ACTION,
+  type CommentaryAuditSink,
+  commentaryDecisionToAuditInput,
+  createLateBoundCommentarySink,
+  type LateBoundCommentarySink,
+} from './audit-bridge.js';
+export {
   DEFAULT_APPLY_TO_EVENTS,
   DEFAULT_DELIVERY_COMMENTARY_PATTERNS,
 } from './built-in-patterns.js';
