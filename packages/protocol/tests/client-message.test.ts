@@ -76,6 +76,18 @@ describe('ClientMessageSchema (positive paths)', () => {
 });
 
 describe('ClientMessageSchema (negative paths)', () => {
+  it('IP-21: rejects subscription.subscribe carrying the removed lastSequenceId field', () => {
+    const result = ClientMessageSchema.safeParse({
+      v: '1',
+      jsonrpc: '2.0',
+      id: 's',
+      method: 'subscription.subscribe',
+      params: { subject: 'session:abc/events', lastSequenceId: 3 },
+    });
+    // The dead field was removed; the strict params object now rejects it.
+    expect(result.success).toBe(false);
+  });
+
   it('rejects an unknown method', () => {
     const result = ClientMessageSchema.safeParse({
       v: '1',

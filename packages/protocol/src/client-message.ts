@@ -32,8 +32,9 @@ const InitializeParams = z
 const SubscribeParams = z
   .object({
     subject: z.string().min(1),
+    // IP-21: `sinceEventId` is the resumption cursor. `lastSequenceId` was a
+    // dead wire field — the client never set it and the server never read it.
     sinceEventId: z.string().min(1).optional(),
-    lastSequenceId: z.number().int().nonnegative().optional(),
   })
   .strict();
 

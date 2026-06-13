@@ -281,7 +281,7 @@ export class GraphorinClient {
     // fresh transport's lastEventId is always undefined, so the old
     // code never consulted the server replay buffer.
     const lastEventId = opts?.sinceEventId ?? this.#transport.lastEventId;
-    const params: { subject: string; lastSequenceId?: number; sinceEventId?: string } = {
+    const params: { subject: string; sinceEventId?: string } = {
       subject,
     };
     if (lastEventId !== undefined) params.sinceEventId = lastEventId;
