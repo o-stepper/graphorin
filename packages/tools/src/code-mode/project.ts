@@ -32,6 +32,8 @@ export interface ProjectableTool {
   readonly name: string;
   readonly description?: string;
   readonly inputSchema?: unknown;
+  /** A5: the tool's output schema; renders the signature's return type. */
+  readonly outputSchema?: unknown;
   /** Present on `ResolvedTool`; absent tools group under "tools". */
   readonly __source?: ToolSource;
 }
@@ -155,6 +157,13 @@ function inputType(tool: ProjectableTool): string {
   return jsonSchemaToTs(json);
 }
 
+/** A5: render the resolved-value type from a tool's `outputSchema` (or `unknown`). */
+function outputType(tool: ProjectableTool): string {
+  const json = schemaToJson(tool.outputSchema);
+  if (json === undefined) return 'unknown';
+  return jsonSchemaToTs(json);
+}
+
 /** Render one tool's signature block (JSDoc + declaration). */
 function signatureBlock(tool: ProjectableTool): string {
   const desc = (tool.description ?? '(no description)').replace(/\s+/g, ' ').trim();
@@ -162,7 +171,7 @@ function signatureBlock(tool: ProjectableTool): string {
   const callable = /^[A-Za-z_$][\w$]*$/.test(tool.name)
     ? `tools.${tool.name}`
     : `tools[${JSON.stringify(tool.name)}]`;
-  return `/** ${desc} */\n${callable} = (input: ${inputType(tool)}): Promise<unknown>`;
+  return `/** ${desc} */\n${callable} = (input: ${inputType(tool)}): Promise<${outputType(tool)}>`;
 }
 
 /**

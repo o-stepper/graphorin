@@ -87,6 +87,8 @@ export interface ToolSearchMatch {
   readonly name: string;
   readonly description: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
+  /** A5: the matched tool's output schema, when declared (renders a return type). */
+  readonly outputSchema?: Readonly<Record<string, unknown>>;
   readonly score: number;
   readonly source: 'semantic' | 'bm25' | 'regex-name';
 }

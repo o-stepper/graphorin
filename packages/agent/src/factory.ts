@@ -462,21 +462,30 @@ function classifyThrownProviderErrorKind(cause: unknown): ProviderErrorKind {
   return 'unknown';
 }
 
+/** Resolve a Zod-like schema to a JSON-Schema record (via `toJSON`), else pass an object through. */
+function projectSchema(raw: unknown): Readonly<Record<string, unknown>> | undefined {
+  if (raw === null || raw === undefined) return undefined;
+  const toJson = (raw as { toJSON?: () => unknown }).toJSON;
+  if (typeof toJson === 'function') return toJson.call(raw) as Readonly<Record<string, unknown>>;
+  if (typeof raw === 'object') return raw as Readonly<Record<string, unknown>>;
+  return undefined;
+}
+
 function toolToDefinition(tool: Tool): ToolDefinition {
-  const ts = tool as Tool & { readonly inputSchema?: { readonly toJSON?: () => unknown } };
-  let schema: Readonly<Record<string, unknown>> = {};
-  const raw = ts.inputSchema as unknown;
-  const tj = (raw as { toJSON?: () => unknown }).toJSON;
-  if (typeof tj === 'function') {
-    schema = tj.call(raw) as Readonly<Record<string, unknown>>;
-  } else if (raw && typeof raw === 'object') {
-    schema = raw as Readonly<Record<string, unknown>>;
-  }
+  const ts = tool as Tool & {
+    readonly inputSchema?: unknown;
+    readonly outputSchema?: unknown;
+  };
+  const inputSchema = projectSchema(ts.inputSchema) ?? {};
+  // A5: project the output schema so structured-output providers + typed
+  // code-mode see the tool's result shape.
+  const outputSchema = projectSchema(ts.outputSchema);
   const examples = renderToolExamples(tool);
   return {
     name: tool.name,
     description: tool.description,
-    inputSchema: schema,
+    inputSchema,
+    ...(outputSchema !== undefined ? { outputSchema } : {}),
     ...(examples !== undefined ? { examples } : {}),
   };
 }

@@ -47,6 +47,17 @@ describe('A1: foldToolExamples', () => {
     expect(foldToolExamples(input)).toBe(input);
   });
 
+  it('preserves outputSchema while folding examples (A1 × A5)', () => {
+    const folded = foldToolExamples([
+      { ...withExamples, outputSchema: { type: 'object', properties: { id: { type: 'string' } } } },
+    ]);
+    expect(folded[0]?.outputSchema).toEqual({
+      type: 'object',
+      properties: { id: { type: 'string' } },
+    });
+    expect(folded[0]?.examples).toBeUndefined();
+  });
+
   it('only rewrites tools that have examples; leaves the rest untouched', () => {
     const folded = foldToolExamples([noExamples, withExamples]);
     expect(folded[0]).toBe(noExamples); // unchanged reference

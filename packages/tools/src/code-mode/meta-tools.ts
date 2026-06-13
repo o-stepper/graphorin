@@ -41,6 +41,8 @@ export interface CodeSearchMatch {
   readonly name: string;
   readonly description: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
+  /** A5: the matched tool's output schema, when declared (renders a return type). */
+  readonly outputSchema?: Readonly<Record<string, unknown>>;
 }
 
 /** Configuration for {@link createCodeSearchTool}. */

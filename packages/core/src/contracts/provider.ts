@@ -202,6 +202,13 @@ export interface ToolDefinition {
   readonly description?: string;
   readonly inputSchema: Readonly<Record<string, unknown>>;
   /**
+   * A5: the tool's output schema (JSON Schema), when declared. The agent runtime
+   * populates it from `Tool.outputSchema`; structured-output providers and typed
+   * code-mode use it to validate / type the tool's result. Absent when the tool
+   * declares no output schema.
+   */
+  readonly outputSchema?: Readonly<Record<string, unknown>>;
+  /**
    * Worked examples surfaced to the provider alongside the schema. The
    * agent runtime populates this from the tool's `examples` when they
    * are eagerly rendered (see `Tool.examplesEagerlyRendered`); it is
