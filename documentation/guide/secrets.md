@@ -169,6 +169,8 @@ registerResolver(
 const apiKey = await resolveSecret('op://Production/Stripe API/credential');
 ```
 
+Beyond `serviceAccountToken`, the resolver options also support 1Password **Connect** mode (`connect: { host, token }`, wired through `OP_CONNECT_HOST` / `OP_CONNECT_TOKEN`) and an `account` override for machines signed in to multiple 1Password accounts. The `op` invocation has a hard wall-clock timeout that escalates `SIGTERM` → `SIGKILL`, so a wedged CLI can never hang the resolver.
+
 Errors from the CLI surface as typed `OpResolverError` codes (`'binary-missing'`, `'unauthenticated'`, `'item-not-found'`, …) so your code can react cleanly.
 
 ## Where OAuth tokens live (SPL-1)

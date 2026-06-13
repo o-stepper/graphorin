@@ -126,6 +126,8 @@ Loading from `npm-package` or `git-repo` always:
 
 Local `folder` installations are trusted-by-default but flow through the same validator pipeline.
 
+An operator allow/deny policy gates which package names may be installed. By default a matching allowlist entry wins (so you can deny a whole scope yet allow specific exceptions inside it); set `precedence: 'deny-wins'` to consult the deny lists first, so an explicit denylist entry can never be overridden by a broad allowlist glob.
+
 ## Lateral-leak defense layer
 
 The agent runtime's defense layer composes orthogonally with the security primitives above:
