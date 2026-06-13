@@ -20,7 +20,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/multi-agent-crew dev
 Expected dev output:
 
 ```
-graphorin v0.4.0 multi-agent-crew — recipe='stub', handoffs=2, messages=4, agents=3, output='Crew synthesis — researcher said: "[researched] Key findings about 'Summarise the design considerations…'.
+graphorin v0.5.0 multi-agent-crew — recipe='stub', handoffs=2, messages=4, agents=3, output='Crew synthesis — researcher said: "[researched] Key findings about 'Summarise the design considerations…'.
 ```
 
 **What just happened?**
@@ -246,4 +246,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

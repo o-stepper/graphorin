@@ -14,6 +14,31 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.5.0 — 2026-06-14
+
+A framework-wide **audit-remediation** release — waves 0-4 of a 301-finding
+security + correctness audit — plus SOTA adopts across memory, tools, and the
+agent runtime. This is the **first release published to the npm registry**.
+
+### Security & correctness
+
+- Closed actively-exploitable holes: code-mode `process.env` exfiltration, the model-driven memory-quarantine bypass, object tool-outputs bypassing truncation + inbound sanitization, the encrypted-secrets-store silent data-loss path, the concurrent-`appendAudit` race, the GDPR `purge()` FK failure, idempotency-replay scope bypass, and per-IP rate-limit spoofing.
+- Fail-loud over silent corruption: secrets/audit write paths, provider retry + fallback on network errors, and four trigger-scheduler bugs (spurious catch-up, interval double-fire, error-death, long-horizon `setTimeout` overflow).
+
+### Completed core mechanisms
+
+- Durable HITL resume now executes an approved tool exactly once; workflow crash-recovery + frontier persistence; `ContextEngine.assemble()`, guardrails, structured `outputType`, and the previously-inert `AgentConfig` fields are wired or removed.
+- Memory: tokenized FTS recall, honest metadata counts, server-wired background consolidation, real sliding-window cost budgets, and a quarantine promotion path.
+- Streaming server end-to-end (SSE / WebSocket), config-driven storage encryption, provider request timeouts + JSON-mode, and the Vercel AI SDK v7 chunk shapes.
+
+### SOTA adopts (eval-gated)
+
+- Compaction clearing-tier with recoverable `read_result` handles + reclaim-floor and Errors/Next-steps summary sections; the FIDES data-flow lattice; prompt-cache-aware tool catalogue with worked tool-use examples and end-to-end structured output; step-journal exactly-once resume; OpenTelemetry GenAI span mapping.
+
+### Hardening & honesty (wave 4)
+
+- Obfuscation-resistant taint detection, opt-in deny-wins supply-chain precedence, audit-prune + 1Password-CLI-timeout fixes, all-occurrence / cross-delta redaction, a cross-embedder entity-resolution guard, revived no-network guard coverage, and a documented security **Known limitations** section.
+
 ## 0.4.0 — 2026-05-26
 
 The **memory program** (P0-1 … P2-2) — a research-grade rebuild of

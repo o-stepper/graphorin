@@ -111,12 +111,12 @@ WantedBy=multi-user.target
 The `examples/docker/` template ships a multi-stage build that produces a slim image with only the runtime dependencies. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
-docker build -t graphorin:0.4.0 -f examples/docker/Dockerfile .
+docker build -t graphorin:0.5.0 -f examples/docker/Dockerfile .
 docker run -d --name graphorin \
   -v graphorin-data:/var/lib/graphorin \
   -p 127.0.0.1:8787:8787 \
   -e OTLP_URL=https://otel.example.com/v1/traces \
-  graphorin:0.4.0
+  graphorin:0.5.0
 ```
 
 Mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation.
@@ -147,4 +147,4 @@ Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko

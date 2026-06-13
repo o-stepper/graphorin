@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Single-agent local CLI personal assistant — library mode. The
  * module wires `createAgent({...})` to a six-tier `Memory` backed by
@@ -23,7 +23,7 @@ import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-s
 import { createStubProvider } from './stub-provider.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.4.0';
+export const VERSION = '0.5.0';
 
 /** LLM recipes exposed by `GRAPHORIN_LLM_RECIPE`. */
 export type Recipe = 'ollama' | 'llamacpp-server' | 'llamacpp-node' | 'stub';

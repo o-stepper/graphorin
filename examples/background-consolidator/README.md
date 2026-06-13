@@ -28,7 +28,7 @@ pnpm --filter ./examples/background-consolidator dev
 Expected output:
 
 ```
-graphorin v0.4.0 background-consolidator — recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=4, standardPhases=4, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
+graphorin v0.5.0 background-consolidator — recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=4, standardPhases=4, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
 ```
 
 The dev script boots the app against `:memory:` SQLite, drives one cycle through `runConsolidatorCycle({ ... })`, prints the consolidator status, and exits cleanly.
@@ -308,7 +308,7 @@ The example exports a small, typed surface other packages can build on:
 - `runConsolidatorCycle({ app, turns?, durationMs?, fireTriggerIds? })` — drives a deterministic cycle (synthetic turns + `scheduler.fire(...)`) and returns `{ snapshot, status, eventCounts, turnsDriven, outcomes }`.
 - `BACKGROUND_TICK_TRIGGER_ID`, `IDLE_PROBE_TRIGGER_ID`, `DEFAULT_TRIGGERS` — stable ids and the default consolidator trigger list.
 
-All public files start with the canonical `Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko` header and use only the public types from `@graphorin/agent`, `@graphorin/core`, `@graphorin/memory`, `@graphorin/sessions`, `@graphorin/triggers`, `@graphorin/server`, `@graphorin/store-sqlite`.
+All public files start with the canonical `Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko` header and use only the public types from `@graphorin/agent`, `@graphorin/core`, `@graphorin/memory`, `@graphorin/sessions`, `@graphorin/triggers`, `@graphorin/server`, `@graphorin/store-sqlite`.
 
 ---
 
@@ -318,4 +318,4 @@ Set **`GRAPHORIN_TRACE=console`** for terminal span export via `@graphorin/examp
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

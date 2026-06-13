@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.4.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Workflow concurrency acceptance demo — library mode. Wires
  * `@graphorin/workflow`'s step-graph engine to an eight-node document
@@ -50,7 +50,7 @@ import {
 } from './types.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.4.0';
+export const VERSION = '0.5.0';
 
 /** Default stream mode used by the demo helper unless explicitly overridden. */
 const DEFAULT_STREAM_MODE: StreamMode = 'debug';

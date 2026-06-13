@@ -13,7 +13,7 @@ describe('@graphorin/eslint-plugin', () => {
   });
 
   it('exports the canonical version constant', () => {
-    expect(VERSION).toBe('0.4.0');
+    expect(VERSION).toBe('0.5.0');
     expect(meta.version).toBe(VERSION);
   });
 

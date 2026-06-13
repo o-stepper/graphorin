@@ -170,7 +170,7 @@ Long-running streams (agent runs, workflows) survive client disconnects through 
 ```json
 {
   "status": "ok",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "checks": {
     "storage": "ok",
     "audit-log": "ok",
@@ -231,4 +231,4 @@ All three templates run Graphorin as a **non-root** user with the audit log on i
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
