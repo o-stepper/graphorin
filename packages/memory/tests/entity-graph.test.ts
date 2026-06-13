@@ -104,6 +104,44 @@ describe('P2-1 pure resolution policy', () => {
     expect(resolveEntityDecision({ ...base, vector: null })).toEqual({ kind: 'new' });
   });
 
+  it('decision: never matches a candidate from a different embedder (MST-11)', () => {
+    const identical = new Float32Array([1, 0, 0]);
+    // A candidate whose vector is identical but came from a DIFFERENT embedder
+    // must be skipped — its cosine is meaningless across vector spaces.
+    const crossEmbedder = resolveEntityDecision({
+      normalizedName: 'anna s',
+      vector: identical,
+      vectorEmbedderId: 'embedder-A',
+      candidates: [
+        { id: 'e1', normalizedName: 'anna smith', vector: identical, embedderId: 'embedder-B' },
+      ],
+      mergeThreshold: 0.92,
+      adjudicateThreshold: 0.82,
+    });
+    expect(crossEmbedder.kind).toBe('new');
+    // Same embedder ⇒ still matches.
+    const sameEmbedder = resolveEntityDecision({
+      normalizedName: 'anna s',
+      vector: identical,
+      vectorEmbedderId: 'embedder-A',
+      candidates: [
+        { id: 'e1', normalizedName: 'anna smith', vector: identical, embedderId: 'embedder-A' },
+      ],
+      mergeThreshold: 0.92,
+      adjudicateThreshold: 0.82,
+    });
+    expect(sameEmbedder).toMatchObject({ kind: 'match', entityId: 'e1', via: 'embedding' });
+    // Absent embedder ids ⇒ compared (byte-identical default).
+    const noIds = resolveEntityDecision({
+      normalizedName: 'anna s',
+      vector: identical,
+      candidates: [{ id: 'e1', normalizedName: 'anna smith', vector: identical }],
+      mergeThreshold: 0.92,
+      adjudicateThreshold: 0.82,
+    });
+    expect(noIds.kind).toBe('match');
+  });
+
   it('parseAdjudication accepts only a clear yes', () => {
     expect(parseAdjudication('yes')).toBe(true);
     expect(parseAdjudication('Yes, same person.')).toBe(true);
