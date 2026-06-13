@@ -121,19 +121,19 @@ Skills register their declared tool calls into the same `ToolRegistry` your appl
 
 ## Supply chain
 
-Untrusted skills (`npm-package`, `git-repo`) flow through `@graphorin/security/supply-chain`:
+Untrusted skills (`npm-package`, `git-repo`) flow through `@graphorin/security/supply-chain`. The installer is **install-then-verify**: the package is fetched into a quarantine directory first, then its `SKILL.md` signature is checked from the install path. A rejected (unsigned or tampered) package never reaches the loader and its quarantine directory is removed.
 
 ```mermaid
 flowchart LR
-    Source[npm-package or git-repo] --> Fetch[Fetch with --ignore-scripts]
-    Fetch --> Signature[Ed25519 signature check]
+    Source[npm-package or git-repo] --> Fetch[Fetch into quarantine with --ignore-scripts]
+    Fetch --> Signature[Read SKILL.md + Ed25519 signature check]
     Signature -->|valid| Load[Load skill]
-    Signature -->|invalid| Reject[Reject + audit row]
+    Signature -->|invalid / missing| Reject[Remove quarantine + audit row]
     Load --> Sandbox[Sandbox tier from frontmatter]
     Sandbox --> Registry[Register tools]
 ```
 
-The skill installer never runs `npm postinstall` scripts on untrusted packages. The signature verifier resolves the publisher key over the configured well-known URL.
+The skill installer never runs `npm postinstall` scripts on untrusted packages. The signature verifier resolves the publisher key over the configured well-known URL (or an inline key in the manifest). Verification reads `SKILL.md` from the install path, so a default `loadSkills([{ kind: 'npm-package', … }])` works without a pre-fetched manifest; callers that need offline verification can still pass `skillMd` to the installer directly.
 
 ## Next steps
 

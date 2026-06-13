@@ -15,7 +15,7 @@
  */
 
 import { spawn } from 'node:child_process';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { recordInstallation } from './audit.js';
@@ -78,11 +78,17 @@ export async function installSkillFromNpm(
       : { kind: 'npm-package', packageName: options.packageName, version: options.version };
   assertPolicyAllows(options.packageName, options.policy ?? {});
   const trust = resolveTrustPolicy(source, options.trustLevel);
+  // RP-10: the install path is a quarantine directory we own when the caller
+  // did not pin a `cwd`. On a verification failure we remove it so a rejected
+  // (unsigned / tampered) package leaves nothing on disk.
+  const createdCwd = options.cwd === undefined;
   const cwd = options.cwd ?? mkdtempSync(join(tmpdir(), 'graphorin-skills-'));
   const skillId = `skill:${options.packageName}@${options.version ?? 'latest'}`;
 
-  const signature = await maybeVerifySignature(skillId, trust, options.skillMd);
-
+  // RP-10: install FIRST, then verify the signature against the SKILL.md that
+  // landed in the install path. The pre-install verification used to throw
+  // `SkillSignatureMissingError` before anything was downloaded, so the
+  // default (untrusted) load was impossible without a pre-fetched `skillMd`.
   if (options.dryRun !== true) {
     const manager = detectPackageManager(options.env);
     const spec =
@@ -112,6 +118,7 @@ export async function installSkillFromNpm(
     if (options.signal !== undefined) runArgs.signal = options.signal;
     const result = await runPackageManager(runArgs);
     if (result.exitCode !== 0) {
+      if (createdCwd) safeRemoveDir(cwd);
       emitSupplyChainAudit({
         action: 'skill:installed',
         decision: 'error',
@@ -132,6 +139,32 @@ export async function installSkillFromNpm(
       });
     }
   }
+
+  const signature = await verifyAfterInstall({
+    skillId,
+    trust,
+    resolveSkillMd: () =>
+      resolveInstalledSkillMd(options.skillMd, options.dryRun === true, cwd, source, {
+        packageName: options.packageName,
+      }),
+    onReject: () => {
+      if (createdCwd) safeRemoveDir(cwd);
+      emitSupplyChainAudit({
+        action: 'skill:installed',
+        decision: 'error',
+        ts: Date.now(),
+        source: 'skills-supply-chain',
+        target: skillId,
+        ...(options.actor === undefined ? {} : { actor: options.actor }),
+        metadata: {
+          source: 'npm',
+          trustLevel: trust.level,
+          ignoreScripts: trust.ignoreScripts,
+          signatureRejected: true,
+        },
+      });
+    },
+  });
 
   const status: SkillInstallationStatus = Object.freeze({
     id: skillId,
@@ -193,16 +226,19 @@ export async function installSkillFromGit(
       : { kind: 'git-repo', url: options.repoUrl, ref: options.ref };
   assertPolicyAllows(options.repoUrl, options.policy ?? {});
   const trust = resolveTrustPolicy(source, options.trustLevel);
+  // RP-10: the shallow clone always lands in a quarantine directory we own,
+  // so a rejected (unsigned / tampered) repo is removed on failure.
   const dest = mkdtempSync(join(tmpdir(), 'graphorin-skills-git-'));
   const skillId = `skill:${options.repoUrl}@${options.ref ?? 'HEAD'}`;
-  const signature = await maybeVerifySignature(skillId, trust, options.skillMd);
 
+  // RP-10: clone FIRST, then verify against the cloned SKILL.md.
   if (options.dryRun !== true) {
     const args = ['clone', '--depth=1'];
     if (options.ref !== undefined) args.push('--branch', options.ref);
     args.push(options.repoUrl, dest);
     const result = await spawnGit(args, options.signal);
     if (result.exitCode !== 0) {
+      safeRemoveDir(dest);
       emitSupplyChainAudit({
         action: 'skill:installed',
         decision: 'error',
@@ -223,6 +259,30 @@ export async function installSkillFromGit(
       });
     }
   }
+
+  const signature = await verifyAfterInstall({
+    skillId,
+    trust,
+    resolveSkillMd: () =>
+      resolveInstalledSkillMd(options.skillMd, options.dryRun === true, dest, source, {}),
+    onReject: () => {
+      safeRemoveDir(dest);
+      emitSupplyChainAudit({
+        action: 'skill:installed',
+        decision: 'error',
+        ts: Date.now(),
+        source: 'skills-supply-chain',
+        target: skillId,
+        ...(options.actor === undefined ? {} : { actor: options.actor }),
+        metadata: {
+          source: 'git',
+          trustLevel: trust.level,
+          ignoreScripts: trust.ignoreScripts,
+          signatureRejected: true,
+        },
+      });
+    },
+  });
 
   const status: SkillInstallationStatus = Object.freeze({
     id: skillId,
@@ -248,19 +308,42 @@ export async function installSkillFromGit(
   return status;
 }
 
-async function maybeVerifySignature(
-  skillId: string,
-  trust: ReturnType<typeof resolveTrustPolicy>,
-  skillMd: string | undefined,
-): Promise<SkillSignatureVerificationResult | undefined> {
+/**
+ * Verify the signature of an already-installed skill (RP-10: install-then-
+ * verify). The `resolveSkillMd` thunk is only invoked when the trust policy
+ * requires a signature, so a softer policy never touches the install path.
+ * On a rejection (missing / tampered signature under a strict policy) the
+ * `onReject` hook fires — used to remove the quarantine directory + emit an
+ * error audit — before the typed exception propagates to the caller.
+ */
+async function verifyAfterInstall(args: {
+  skillId: string;
+  trust: ReturnType<typeof resolveTrustPolicy>;
+  resolveSkillMd: () => string | undefined;
+  onReject: () => void;
+}): Promise<SkillSignatureVerificationResult | undefined> {
+  const { skillId, trust, resolveSkillMd, onReject } = args;
   if (!trust.signature.required) return undefined;
+  const skillMd = resolveSkillMd();
   if (skillMd === undefined) {
     if (trust.signature.rejectIfMissing) {
+      onReject();
       throw new SkillSignatureMissingError(skillId);
     }
     return undefined;
   }
-  const result = await verifySkillSignature({ skillMd });
+  // `verifySkillSignature` throws (e.g. `SkillSignatureMissingError` for a
+  // manifest with no `graphorin-signature` block) rather than always
+  // returning a `valid: false` shape, so the cleanup hook must fire on a
+  // throw too — otherwise a rejected package would leave the quarantine dir
+  // behind.
+  let result: SkillSignatureVerificationResult;
+  try {
+    result = await verifySkillSignature({ skillMd });
+  } catch (err) {
+    onReject();
+    throw err;
+  }
   // When the operator-resolved trust policy mandates rejection on a
   // failed signature, surface the rejection through the typed
   // exception so callers can branch on `instanceof
@@ -269,6 +352,7 @@ async function maybeVerifySignature(
   // level that does not require signature verification (none in v0.1
   // — kept here for forward-compatibility).
   if (!result.valid && trust.signature.rejectIfMissing) {
+    onReject();
     throw new SkillSignatureInvalidError(
       skillId,
       result.reason ?? 'ed25519 verification failed',
@@ -276,6 +360,73 @@ async function maybeVerifySignature(
     );
   }
   return result;
+}
+
+const SKILL_MANIFEST_FILENAME = 'SKILL.md';
+
+/**
+ * Resolve the SKILL.md used for signature verification (RP-10). A caller-
+ * supplied `provided` value (offline / pre-fetch) wins; otherwise — and only
+ * for a real install — the manifest is read from the install path. In
+ * `dryRun` mode nothing was installed, so there is nothing to read.
+ */
+function resolveInstalledSkillMd(
+  provided: string | undefined,
+  dryRun: boolean,
+  installPath: string,
+  source: SkillSource,
+  ctx: { packageName?: string },
+): string | undefined {
+  if (provided !== undefined) return provided;
+  if (dryRun) return undefined;
+  return readInstalledManifest(installPath, source, ctx.packageName);
+}
+
+/**
+ * Best-effort search for SKILL.md inside a freshly installed package. Probes
+ * the install root, the npm `node_modules/<packageName>` layout, and one
+ * directory deep (covering git clones with a nested skill folder).
+ */
+function readInstalledManifest(
+  installPath: string,
+  source: SkillSource,
+  packageName: string | undefined,
+): string | undefined {
+  const candidates: string[] = [join(installPath, SKILL_MANIFEST_FILENAME)];
+  if (source.kind === 'npm-package' && packageName !== undefined) {
+    candidates.push(join(installPath, 'node_modules', packageName, SKILL_MANIFEST_FILENAME));
+  }
+  for (const candidate of candidates) {
+    const content = tryReadFile(candidate);
+    if (content !== undefined) return content;
+  }
+  try {
+    for (const entry of readdirSync(installPath, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        const content = tryReadFile(join(installPath, entry.name, SKILL_MANIFEST_FILENAME));
+        if (content !== undefined) return content;
+      }
+    }
+  } catch {
+    // Install path unreadable — treat as no manifest.
+  }
+  return undefined;
+}
+
+function tryReadFile(path: string): string | undefined {
+  try {
+    return readFileSync(path, 'utf8');
+  } catch {
+    return undefined;
+  }
+}
+
+function safeRemoveDir(path: string): void {
+  try {
+    rmSync(path, { recursive: true, force: true });
+  } catch {
+    // Best-effort cleanup — a leftover quarantine dir is not worth failing on.
+  }
 }
 
 function buildAuditMetadata(status: SkillInstallationStatus): Record<string, unknown> {
@@ -321,5 +472,3 @@ async function spawnGit(args: ReadonlyArray<string>, signal?: AbortSignal): Prom
     });
   });
 }
-
-void readFileSync;

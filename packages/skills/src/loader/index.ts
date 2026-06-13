@@ -412,6 +412,16 @@ async function locateSkillRoot(installPath: string, sourceLabel: string): Promis
   } catch {
     // continue
   }
+  // RP-10: npm packages land under `node_modules/<packageName>`. The label is
+  // the package name for npm sources; for git it is a URL and this probe
+  // simply misses, falling through to the one-level-deep scan below.
+  const nodeModulesRoot = join(installPath, 'node_modules', sourceLabel);
+  try {
+    await stat(join(nodeModulesRoot, SKILL_MANIFEST_FILENAME));
+    return nodeModulesRoot;
+  } catch {
+    // continue
+  }
   const entries = await readdir(installPath, { withFileTypes: true });
   for (const entry of entries) {
     if (entry.isDirectory()) {
