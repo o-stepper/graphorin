@@ -229,7 +229,12 @@ async function* streamFromVercel(
   let finishReason: FinishReason = 'stop';
 
   for await (const chunk of stream) {
-    if (req.signal?.aborted) break;
+    if (req.signal?.aborted) {
+      // PS-12: an aborted stream must report 'aborted', not the initial 'stop'
+      // — mirrors the openai-shaped and ollama adapters.
+      finishReason = 'aborted';
+      break;
+    }
     switch (chunk.type) {
       case 'text-delta': {
         const delta = pickString(chunk.textDelta) ?? pickString(chunk.text) ?? '';

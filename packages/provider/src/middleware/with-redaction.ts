@@ -152,8 +152,9 @@ function effectivePolicy(
   const tierDefaults = trustClass !== undefined ? TRUST_CLASS_DEFAULTS[trustClass] : {};
   const explicitOverride = trustClass !== undefined ? (raw.byTrustClass?.[trustClass] ?? {}) : {};
   const merged: RequiredPolicy = {
-    patterns:
+    patterns: ensureGlobalPatterns(
       raw.patterns ?? explicitOverride.patterns ?? tierDefaults.patterns ?? BUILT_IN_PATTERNS,
+    ),
     action: raw.action ?? explicitOverride.action ?? tierDefaults.action ?? 'redact',
     failClosed: pick(raw.failClosed, explicitOverride.failClosed, tierDefaults.failClosed, false),
     scanScope: raw.scanScope ?? explicitOverride.scanScope ?? tierDefaults.scanScope ?? 'all',
@@ -175,6 +176,25 @@ function effectivePolicy(
     merged.action = 'throw';
   }
   return merged;
+}
+
+/**
+ * PS-22: callers can supply a pattern without the global flag. `.replace` /
+ * `.match` then stop after the FIRST occurrence, so a second secret on the same
+ * line is neither redacted nor counted. Re-compile every non-global pattern
+ * with the `g` flag so all occurrences are covered. The 14 built-ins already
+ * carry `/g`; this only rescues user-supplied patterns (identity otherwise).
+ */
+function ensureGlobalPatterns(
+  patterns: ReadonlyArray<RedactionPattern>,
+): ReadonlyArray<RedactionPattern> {
+  let changed = false;
+  const out = patterns.map((p) => {
+    if (p.regex.global) return p;
+    changed = true;
+    return { ...p, regex: new RegExp(p.regex.source, `${p.regex.flags}g`) };
+  });
+  return changed ? out : patterns;
 }
 
 function pick<T>(...values: ReadonlyArray<T | undefined>): T {
@@ -593,29 +613,49 @@ async function* scanStreamingResponse(
   policy: RequiredPolicy,
   logger: (message: string, meta?: object) => void,
 ): AsyncIterable<ProviderEvent> {
+  // PS-22: secrets can straddle text-delta boundaries. Keep a bounded tail of
+  // recently-streamed text and scan `tail + delta`, reporting only matches that
+  // reach into the freshly-arrived delta so a prior window's matches are not
+  // double-counted. The tail is capped (no unbounded accumulation); a single
+  // match longer than the cap can still slip a boundary (best-effort).
+  const TAIL_WINDOW = 512;
+  let tail = '';
   for await (const event of source) {
     if (event.type === 'text-delta' && policy.scanScope === 'all') {
-      // Observability-only — match patterns and emit synthetic
-      // violation rows; do NOT mutate the stream content (mid-stream
-      // mutation would break structured-output / tool-call parsing).
+      // Observability-only — match patterns and emit synthetic violation rows;
+      // do NOT mutate the stream content (mid-stream mutation would break
+      // structured-output / tool-call parsing).
+      const haystack = tail + event.delta;
       for (const pattern of policy.patterns) {
         pattern.regex.lastIndex = 0;
-        if (pattern.regex.test(event.delta)) {
-          const matches = event.delta.match(pattern.regex) ?? [];
-          const matchLength = matches.reduce((sum, m) => sum + m.length, 0);
+        let newMatchLength = 0;
+        let match = pattern.regex.exec(haystack);
+        while (match !== null) {
+          const endIndex = match.index + match[0].length;
+          // A match wholly inside `tail` was reported on the prior delta.
+          if (match[0].length > 0 && endIndex > tail.length) {
+            newMatchLength += match[0].length;
+          }
+          if (!pattern.regex.global) break;
+          if (match[0].length === 0) pattern.regex.lastIndex += 1;
+          match = pattern.regex.exec(haystack);
+        }
+        if (newMatchLength > 0) {
           reportViolation(
             policy,
             {
               patternName: pattern.name,
               fieldPath: 'response.text-delta',
               role: 'assistant',
-              matchLength,
+              matchLength: newMatchLength,
               action: 'redact',
             },
             logger,
           );
         }
       }
+      tail =
+        haystack.length > TAIL_WINDOW ? haystack.slice(haystack.length - TAIL_WINDOW) : haystack;
     }
     yield event;
   }

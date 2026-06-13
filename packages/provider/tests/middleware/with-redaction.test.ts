@@ -198,6 +198,58 @@ describe('withRedaction — default action: redact', () => {
   });
 });
 
+describe('withRedaction — PS-22 all-occurrence + cross-delta', () => {
+  it('redacts every occurrence of a non-global user pattern, not just the first', async () => {
+    const adapter = capturingAdapter();
+    const wrapped = withRedaction({
+      logger: () => undefined,
+      trustClassOverride: 'public-tls',
+      // No /g flag — pre-fix, .replace() only masks the first occurrence.
+      patterns: [
+        {
+          name: 'ticket',
+          category: 'secret',
+          description: 'support ticket id',
+          regex: /TICKET-\d+/,
+          mask: '[REDACTED ticket]',
+        },
+      ],
+    })(adapter.provider);
+    await wrapped.generate(
+      buildReq([{ role: 'user', content: 'see TICKET-111 and TICKET-222 now' }]),
+    );
+    const content = (adapter.seen[0]?.messages[0] as UserMessage).content as string;
+    expect(content).not.toContain('TICKET-111');
+    expect(content).not.toContain('TICKET-222');
+  });
+
+  it('detects a secret split across two text-delta boundaries', async () => {
+    const violations: PromptRedactionViolation[] = [];
+    const events: ReadonlyArray<ProviderEvent> = [
+      { type: 'text-delta', delta: 'my key is sk-AAAAAAAAAA' },
+      { type: 'text-delta', delta: 'AAAAAAAAAAAAAAAAAAAA done' },
+      {
+        type: 'finish',
+        finishReason: 'stop',
+        usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      },
+    ];
+    const adapter = capturingAdapter(events);
+    const wrapped = withRedaction({
+      logger: () => undefined,
+      trustClassOverride: 'public-tls',
+      scanScope: 'all',
+      onViolation: (v) => violations.push(v),
+    })(adapter.provider);
+    await consume(wrapped.stream(buildReq([{ role: 'user', content: 'hi' }])));
+    expect(
+      violations.some(
+        (v) => v.patternName === 'openai-key' && v.fieldPath === 'response.text-delta',
+      ),
+    ).toBe(true);
+  });
+});
+
 describe('withRedaction — failClosed', () => {
   it('throws PromptRedactionError on the first hit when failClosed: true', async () => {
     const adapter = capturingAdapter();
