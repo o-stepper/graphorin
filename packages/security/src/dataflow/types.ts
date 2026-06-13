@@ -170,6 +170,14 @@ export interface DataFlowPolicyConfig {
    */
   readonly sensitiveTiers?: ReadonlyArray<import('@graphorin/core').Sensitivity>;
   /**
+   * FIDES-lattice (SDF-8): when `true`, a tool output that the PII catalogue
+   * flags (email, SSN, card, …) arms the lethal-trifecta `sensitive` leg even
+   * without a `'secret'` tag — so exfiltrating user/PII content trips the gate.
+   * The agent's guard builder wires `containsPii` into the ledger. Default
+   * `false` ⇒ byte-identical. Composes with {@link sensitiveTiers}.
+   */
+  readonly treatPiiAsSensitive?: boolean;
+  /**
    * Sink tool names pre-authorized by the operator to receive tainted
    * data. A tainted flow into one of these is audited as `declassified`
    * and allowed even in `'enforce'` mode — the explicit, audited escape

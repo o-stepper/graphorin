@@ -21,6 +21,7 @@ export {
 } from './llm-moderation.js';
 export { type MaxLengthOptions, maxLength } from './max-length.js';
 export {
+  containsPii,
   DEFAULT_PII_PATTERNS,
   luhn,
   type PiiDetectionOptions,
