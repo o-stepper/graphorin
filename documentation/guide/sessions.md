@@ -124,6 +124,15 @@ await session.export({ schema: '1.0', writer, encrypt: { key } });
 The same `salt` must be supplied to the importer to re-derive the key. A
 non-encrypted export never stamps `cipher`.
 
+### Integrity
+
+Independently of encryption, the footer records `recordCount` / `messageCount` /
+`handoffCount` / `agentCount`, and the reader cross-checks them against the
+records it actually parsed — a truncated or tampered body surfaces a
+`footer-count-mismatch` warning. Pass `hash: true` to additionally stamp a
+SHA-256 `checksum` of the body on the footer; the importer then verifies it and
+throws `SessionExportChecksumMismatchError` on any mismatch.
+
 ## Replay
 
 ```ts

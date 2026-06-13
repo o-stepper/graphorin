@@ -155,7 +155,7 @@ What you get out of the box:
 - **Parallel-by-default dispatch.** Bounded concurrency via `maxParallelTools` (default `8`). Opt a single tool out with `executionMode: 'sequential'`.
 - **Approval flow.** A tool's `needsApproval` predicate triggers a blocking gate; the runtime emits `tool.approval.requested` so a human can resolve it durably (granted / denied surface as `tool.approval.granted` / `tool.approval.denied`).
 - **Per-tool secrets ACL scoping** via `@graphorin/security/secrets`'s `withChildToolSecretsContext`.
-- **Sandbox-policy resolution** via `@graphorin/security/sandbox`. Three sandbox tiers — `'none'`, `'isolated-vm'`, `'docker'` — chosen per tool / per call.
+- **Sandbox-policy resolution** via `@graphorin/security/sandbox`. Four sandbox tiers — `'none'`, `'worker-threads'` (the default isolation tier), `'isolated-vm'`, `'docker'` — chosen per tool / per call.
 - **Memory-modification guard hook.** Snapshot-before, verify-after; mismatches emit an audit row and a `tool.executor.memory_guard.mismatch.total{toolName,tier}` counter increment.
 - **Hard-kill cancellation** with a configurable grace window (50 ms default). Cancellation surfaces `ToolError({ kind: 'aborted' })` and `setStatus('cancelled')` on the span.
 - **Single-round tool repair** via the operator-supplied repair hook.
@@ -271,6 +271,7 @@ flowchart LR
 | Tier | Backed by | When chosen |
 |---|---|---|
 | `'none'` | The Node.js process. | Trusted, in-process tools. Default for first-party tools. |
+| `'worker-threads'` | Node.js worker threads (built-in — no peer dependency). | The default isolation tier; backs code-mode execution and any tool routed through a `sandboxResolver`. Runs with an empty `env` + a `process.env` scrub. |
 | `'isolated-vm'` | [`isolated-vm`](https://github.com/laverdet/isolated-vm) (peer dependency). | Untrusted JavaScript tools (e.g. skills loaded from disk). |
 | `'docker'` | [`dockerode`](https://github.com/apocas/dockerode) (peer dependency). | Untrusted binaries or full subprocess isolation. |
 

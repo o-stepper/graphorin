@@ -42,7 +42,7 @@ A `MiddlewareOrderingError` is thrown the moment the array argument violates the
 | `withCostLimit` | Refuses requests that would breach the configured budget. |
 | `withCostTracking` | Records per-call cost for auditing. |
 | `withFallback` | Composes a chain of fallback providers. |
-| `withRedaction` | Innermost: strips secrets / PII immediately before the adapter call. |
+| `withRedaction` | Innermost: strips secrets / PII immediately before the adapter call. User-supplied patterns match **every** occurrence (the `/g` flag is forced), and the streaming scan keeps a bounded tail buffer so a secret split across two `text-delta` chunks is still caught. |
 
 Token counting, model-tier classification, and reasoning-retention policy are **separate APIs** (`createDefaultCounter(...)`, `classifyModelTier(...)`, `resolveReasoningRetention(...)`) — not middleware. They run as part of the agent runtime's per-step planning, not inside the middleware chain.
 
@@ -76,7 +76,7 @@ Every adapter normalises its native stream into the same `ProviderEvent` discrim
 | `reasoning-delta` | A token of an extended-reasoning channel (e.g. `<thinking>`). |
 | `tool-call-start` / `tool-call-input-delta` / `tool-call-end` | Streaming tool calls. |
 | `file` / `source` | A generated file part, or a source citation. |
-| `finish` | Terminal event — carries the `finishReason` **and** the `usage` (input / output / total tokens). |
+| `finish` | Terminal event — carries the `finishReason` **and** the `usage` (input / output / total tokens). An aborted stream reports `finishReason: 'aborted'` (not `'stop'`), and abort is excluded from `withRetry` / `withFallback`. |
 | `error` | A normalised, typed error. |
 
 The agent runtime consumes this stream and emits its own `AgentEvent`s on top.

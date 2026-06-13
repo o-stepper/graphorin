@@ -5,29 +5,30 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# Publishing uses npm **Trusted Publishing (OIDC)** — no long-lived NPM_TOKEN
-# (decision C1). GitHub Actions mints a short-lived OIDC token (`id-token: write`
-# below) that npm exchanges for publish rights, and Sigstore provenance is
-# attached automatically (`.npmrc provenance=true` + per-package
-# `publishConfig.provenance`). There is no publish credential to rotate or leak.
+# Publishing authenticates with a long-lived **NPM_TOKEN** (decision C1): an npm
+# automation / granular-access token with publish rights to the `@graphorin`
+# scope, injected as `NODE_AUTH_TOKEN` on the publish step only (CI-10) so the
+# workspace build/test steps never see it. Sigstore provenance is still attached
+# via OIDC (`id-token: write` below + `.npmrc` provenance=true + per-package
+# `publishConfig.provenance`) — provenance uses OIDC regardless of the publish
+# auth method.
 #
 # The publish step is gated on the `RELEASE_ENABLED` **repository variable** so
 # an accidental main-branch push never publishes before the registry side is
 # configured. Maintainer provisioning order:
 #
-#   1. On npmjs.com, add a Trusted Publisher to each `@graphorin/*` package (and
-#      `graphorin`): GitHub repo `o-stepper/graphorin`, workflow `release.yml`.
-#      (For a brand-new package name, reserve + configure it first, or do one
-#      manual `npm publish` then switch it to trusted publishing.)
-#   2. Rehearse against a local registry (verdaccio) or a `workflow_dispatch`
-#      run to confirm the publish client performs the OIDC exchange.
+#   1. Create an npm automation token with publish rights to `@graphorin/*`
+#      (and `graphorin`); add it as the repo secret `NPM_TOKEN`. Ensure the
+#      `@graphorin` scope exists and the token can publish each (still-
+#      unpublished) package name.
+#   2. Rehearse with a `workflow_dispatch` run (the dry-run step below fires
+#      whenever RELEASE_ENABLED is not yet 'true') to confirm auth + the set.
 #   3. Set the repository variable `RELEASE_ENABLED=true`. From then on
-#      `changesets/action` opens the "Version Packages" PR automatically and
-#      publishes via OIDC when that PR merges.
+#      `changesets/action` publishes via NPM_TOKEN on a push to main.
 permissions:
   contents: write
   pull-requests: write
-  id-token: write # OIDC trusted publishing + Sigstore provenance.
+  id-token: write # Sigstore provenance attestation (works alongside NPM_TOKEN auth).
 
 concurrency:
   group: release-${{ github.ref }}
@@ -54,15 +55,15 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      # No `registry-url:` — under OIDC there is no NODE_AUTH_TOKEN to inject
-      # (CI-5). The repo `.npmrc` (provenance=true) + each package's
-      # `publishConfig` point at the default npm registry; auth is the OIDC
-      # exchange, not a static token.
       - name: Setup Node.js 22
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '22'
           cache: pnpm
+          # CI-5: registry-url makes setup-node write the project `.npmrc` line
+          # that reads `NODE_AUTH_TOKEN`, so the publish step authenticates with
+          # NPM_TOKEN against the default npm registry.
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -73,7 +74,7 @@ jobs:
       - name: Dry-run publish — releases not enabled yet
         if: ${{ vars.RELEASE_ENABLED != 'true' }}
         run: |
-          echo "::warning title=Release skipped::Repository variable RELEASE_ENABLED is not 'true'; running in dry-run mode (configure npm Trusted Publishing first)."
+          echo "::warning title=Release skipped::Repository variable RELEASE_ENABLED is not 'true'; running in dry-run mode (configure NPM_TOKEN + the @graphorin scope first)."
           pnpm -r publish --dry-run --no-git-checks
 
       - name: Create Release PR or Publish
@@ -86,5 +87,7 @@ jobs:
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # No NPM_TOKEN (CI-10): OIDC mints a short-lived token per run.
+          # CI-10: the npm publish token is scoped to THIS step only, not the
+          # whole job, so workspace build/test steps never see it.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
