@@ -15,7 +15,12 @@ import type {
 
 const DEFAULT_PASS_RATE_DROP_PCT = 5;
 const DEFAULT_AVG_SCORE_DROP = 0.05;
-const DEFAULT_AVG_DURATION_INCREASE_MS = 250;
+// EB-4: the avg-duration gate is OPT-IN (default off). Absolute wall-clock
+// budgets are environment-sensitive — a baseline recorded on a fast
+// workstation vs a loaded CI runner, or real LLM-latency jitter of whole
+// seconds, would flag spurious "regressions". Callers that genuinely want a
+// duration budget pass an explicit finite `maxAvgDurationIncreaseMs`.
+const DEFAULT_AVG_DURATION_INCREASE_MS = Number.POSITIVE_INFINITY;
 
 /**
  * Detect regressions between `current` and `baseline` reports.

@@ -437,6 +437,10 @@ export async function main(): Promise<void> {
       regression = detectRegressions(report, baseline, {
         maxPassRateDropPct: 5,
         maxAvgScoreDrop: 0.05,
+        // Quality-only gate: real LLM latency swings by whole seconds run to
+        // run, so an absolute avg-duration budget would only produce flaky
+        // failures here. Explicit even though Infinity is now the default (EB-4).
+        maxAvgDurationIncreaseMs: Number.POSITIVE_INFINITY,
       });
       if (regression.hasRegressions) {
         console.error('[benchmark-longmemeval] REGRESSIONS DETECTED:');
