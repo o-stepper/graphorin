@@ -31,5 +31,18 @@ Mount secrets (pepper, DB passphrases) read-only rather than baking them into
 the image. See [Standalone server](../../documentation/guide/standalone-server.md)
 and [Security](../../documentation/guide/security.md).
 
+## Supported platforms
+
+The image is built and health-checked for **`linux/amd64`** by the weekly
+`Docker image smoke` workflow (`.github/workflows/docker-smoke.yml`, also
+runnable on demand via `workflow_dispatch`). `linux/arm64` is best-effort.
+
+The native modules `better-sqlite3` and `sqlite-vec` are installed from
+**prebuilt binaries** — `node:22-slim` ships no C toolchain (`python3` /
+`make` / `g++`). If a prebuilt binary is unavailable for the target
+platform (e.g. an uncommon arch, or GitHub Releases being unreachable at
+build time), the build fails at `pnpm install`; add the toolchain to the
+builder stage if you need to compile from source.
+
 Related templates: [`../k8s`](../k8s), [`../systemd`](../systemd),
 [`../github-actions`](../github-actions).
