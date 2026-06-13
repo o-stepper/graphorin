@@ -148,6 +148,17 @@ export interface CreateSessionManagerOptions {
   readonly commentaryPolicy?: CommentaryPolicy;
   /** Replay engine configuration. */
   readonly replay?: CreateSessionReplayerOptions;
+  /**
+   * RP-17: default `traceSource` factory for `Session.replay()`. When a
+   * session is replayed without an explicit `traceSource`, this is invoked
+   * with the session id to resolve the persisted spans (e.g.
+   * `(id) => traceSourceForSession(store.connection, id)` from
+   * `@graphorin/store-sqlite`). Without it, replay falls back to the empty
+   * source and emits only `replay.start` / `replay.end`.
+   */
+  readonly replayTraceSource?: (
+    sessionId: string,
+  ) => Parameters<SessionReplayer['run']>[0]['traceSource'];
   /** Counter sink (no-op by default). */
   readonly counters?: SessionCounters;
   /** Test seam: override `Date.now()`. */
@@ -366,6 +377,9 @@ export function createSessionManager(opts: CreateSessionManagerOptions): Session
       idFactory,
       agents,
       replayer,
+      ...(opts.replayTraceSource !== undefined
+        ? { replayTraceSource: opts.replayTraceSource }
+        : {}),
       manager: () => manager,
     });
   }
@@ -533,6 +547,9 @@ interface SessionImplArgs {
   readonly idFactory: (prefix: string) => string;
   readonly agents: AgentRegistry;
   readonly replayer: SessionReplayer;
+  readonly replayTraceSource?: (
+    sessionId: string,
+  ) => Parameters<SessionReplayer['run']>[0]['traceSource'];
   readonly manager: () => SessionManager;
 }
 
@@ -797,6 +814,10 @@ class SessionImpl implements Session {
       ...(opts.cassette !== undefined ? { cassetteKind: opts.cassette.kind } : {}),
     });
     let count = 0;
+    // RP-17: default the trace source to the manager-supplied persisted-span
+    // factory (e.g. the SQLite `spans` table) so `replay()` with no arguments
+    // reproduces a real run instead of emitting only replay.start / replay.end.
+    const traceSource = opts.traceSource ?? this.#args.replayTraceSource?.(this.id);
     const runArgs: Parameters<SessionReplayer['run']>[0] = {
       target,
       ...(opts.raw !== undefined ? { raw: opts.raw } : {}),
@@ -815,7 +836,7 @@ class SessionImpl implements Session {
       ...(opts.onMissingArtifact !== undefined
         ? { onMissingArtifact: opts.onMissingArtifact }
         : {}),
-      ...(opts.traceSource !== undefined ? { traceSource: opts.traceSource } : {}),
+      ...(traceSource !== undefined ? { traceSource } : {}),
       ...(opts.liveInvocation !== undefined ? { liveInvocation: opts.liveInvocation } : {}),
     };
     for await (const event of this.#args.replayer.run(runArgs)) {

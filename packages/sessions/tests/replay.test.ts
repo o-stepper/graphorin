@@ -72,6 +72,33 @@ describe('Session replayer', () => {
     expect(replayAudit.some((e) => e.action === 'session.replay.completed')).toBe(true);
   });
 
+  it('RP-17: Session.replay() with no args defaults to the manager-supplied trace source', async () => {
+    let __id = 0;
+    const idFactory = (prefix: string): string => {
+      __id += 1;
+      return `${prefix}-${String(__id).padStart(4, '0')}`;
+    };
+    const fixedNow = (): number => Date.parse('2026-05-08T10:00:00Z');
+    const store = new InMemorySessionStore();
+    const memory = new InMemoryMemorySessionFacade(fixedNow);
+    const manager = createSessionManager({
+      store,
+      memory,
+      now: fixedNow,
+      newId: idFactory,
+      // Stands in for `(id) => traceSourceForSession(store.connection, id)`.
+      replayTraceSource: () => [makeSpan('span-1'), makeSpan('span-2')],
+    });
+    const session = await manager.create({ userId: 'u-1', agentId: 'main' });
+    const types: string[] = [];
+    for await (const event of session.replay()) {
+      types.push(event.type);
+    }
+    // Without RP-17 wiring `replay()` would default to the empty source and
+    // emit only replay.start / replay.end — now the persisted spans replay.
+    expect(types.filter((t) => t === 'replay.event')).toHaveLength(2);
+  });
+
   it('drops secret-tagged content under sanitized replay', async () => {
     const replayer = createSessionReplayer();
     const events: { type: string }[] = [];

@@ -99,14 +99,24 @@ const tracer = createTracer({
 
 ## Replay
 
-Every persisted span has enough metadata to reconstruct the agent run that produced it. The standalone server's `/v1/replays/:runId` endpoint returns:
+Spans persist so a run can be reconstructed later. `@graphorin/store-sqlite` ships a durable span sink (migration 024 + the `spans` table):
 
-- the canonical `RunState` snapshot at every step;
-- the input / output payloads (sanitised by default);
-- the tool call lifecycle;
-- the memory writes and conflict-pipeline decisions.
+```ts
+import { createTracer, withValidation } from '@graphorin/observability';
+import { createSqliteSpanExporter, traceSourceForSession } from '@graphorin/store-sqlite';
 
-Replays are sanitised by default and bound by the configured retention window. See [Standalone server](/guide/standalone-server) for the REST surface.
+// Persist every span, keyed by the `graphorin.session.id` attribute.
+const tracer = createTracer({ exporters: [withValidation(createSqliteSpanExporter(store.connection))] });
+
+// Read a session's spans back as the `traceSource` Session.replay() consumes.
+const manager = createSessionManager({
+  store: store.sessions,
+  memory,
+  replayTraceSource: (id) => traceSourceForSession(store.connection, id),
+});
+```
+
+With that wiring, `session.replay()` (no arguments) reproduces the real run instead of emitting only `replay.start` / `replay.end`. Without it, replay falls back to the empty source. Replays are sanitised by default and bound by the configured retention window; the same `spans` table backs the `graphorin memory why` introspection. See [Standalone server](/guide/standalone-server) for the REST surface.
 
 ## GenAI Semantic Convention attributes
 

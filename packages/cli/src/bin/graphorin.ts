@@ -53,6 +53,7 @@ import {
   runMemoryMigrate,
   runMemoryReview,
   runMemoryStatus,
+  runMemoryWhy,
   runMigrate,
   runMigrateConfig,
   runMigrateExport,
@@ -704,6 +705,24 @@ function registerMemoryCommands(program: Command): void {
     .action(async (opts: { config?: string; limit?: string; json?: boolean }) => {
       const limit = opts.limit !== undefined ? Number.parseInt(opts.limit, 10) : undefined;
       await runMemoryActivity({
+        ...(limit !== undefined && Number.isFinite(limit) ? { limit } : {}),
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
+  memory
+    .command('why')
+    .description(
+      'Explain why facts were recalled (ranking signals) from the persisted recall spans.',
+    )
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--session <id>', "Restrict to one session's recall spans.")
+    .option('--limit <n>', 'Cap on the most-recent recall spans (default 5).')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (opts: { config?: string; session?: string; limit?: string; json?: boolean }) => {
+      const limit = opts.limit !== undefined ? Number.parseInt(opts.limit, 10) : undefined;
+      await runMemoryWhy({
+        ...(opts.session !== undefined ? { sessionId: opts.session } : {}),
         ...(limit !== undefined && Number.isFinite(limit) ? { limit } : {}),
         ...(opts.config !== undefined ? { config: opts.config } : {}),
         ...(opts.json !== undefined ? { json: opts.json } : {}),

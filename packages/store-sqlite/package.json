@@ -71,7 +71,8 @@
     "clean": "rimraf dist .turbo *.tsbuildinfo"
   },
   "dependencies": {
-    "@graphorin/core": "workspace:*"
+    "@graphorin/core": "workspace:*",
+    "@graphorin/observability": "workspace:*"
   },
   "peerDependencies": {
     "better-sqlite3": "^12.9.0",

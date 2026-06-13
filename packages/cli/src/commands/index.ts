@@ -77,11 +77,15 @@ export {
   type MemoryReviewResult,
   type MemoryStatusEmbedder,
   type MemoryStatusResult,
+  type MemoryWhyOptions,
+  type MemoryWhyRecall,
+  type MemoryWhyResult,
   runMemoryActivity,
   runMemoryInspect,
   runMemoryMigrate,
   runMemoryReview,
   runMemoryStatus,
+  runMemoryWhy,
 } from './memory.js';
 export { type MigrateCommandOptions, type MigrateCommandResult, runMigrate } from './migrate.js';
 export {

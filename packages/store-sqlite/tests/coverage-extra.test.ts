@@ -1,12 +1,15 @@
 import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import type { SpanRecord } from '@graphorin/observability';
 import { describe, expect, it } from 'vitest';
 import {
   CipherPeerMissingError,
+  createSqliteSpanExporter,
   createSqliteStore,
   type GraphorinSqliteStore,
   openAuditDatabase,
+  traceSourceForSession,
 } from '../src/index.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
@@ -323,5 +326,36 @@ describe('extra coverage', () => {
   it('idempotency: prune returns 0 when nothing matches', async () => {
     const store = await makeStore();
     expect(await store.idempotency.prune(0)).toBe(0);
+  });
+
+  it('spans: exporter persists + traceSourceForSession reads back ordered + session-filtered (RP-17)', async () => {
+    const store = await makeStore();
+    const exporter = createSqliteSpanExporter(store.connection);
+    const span = (id: string, start: number, sessionId: string): SpanRecord => ({
+      type: 'agent.run',
+      id,
+      traceId: 'tr-1',
+      name: 'agent.run',
+      startUnixNano: start,
+      endUnixNano: start + 1,
+      status: 'ok',
+      attributes: { 'graphorin.session.id': sessionId, foo: 'bar' },
+      events: [],
+    });
+    // Inserted out of order, across two sessions.
+    await exporter.export(span('s2', 200, 'sess-A'));
+    await exporter.export(span('s1', 100, 'sess-A'));
+    await exporter.export(span('s3', 150, 'sess-B'));
+    await exporter.flush();
+
+    const collected: SpanRecord[] = [];
+    for await (const rec of traceSourceForSession(store.connection, 'sess-A')) {
+      collected.push(rec);
+    }
+    // Ordered by start time, filtered to sess-A (s3 belongs to sess-B).
+    expect(collected.map((r) => r.id)).toEqual(['s1', 's2']);
+    expect(collected[0]?.type).toBe('agent.run');
+    expect(collected[0]?.attributes.foo).toBe('bar'); // attributes round-trip
+    await exporter.shutdown();
   });
 });
