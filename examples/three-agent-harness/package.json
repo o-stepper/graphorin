@@ -39,14 +39,8 @@
   "dependencies": {
     "@graphorin/core": "workspace:*",
     "@graphorin/agent": "workspace:*",
-    "@graphorin/memory": "workspace:*",
-    "@graphorin/store-sqlite": "workspace:*",
-    "@graphorin/embedder-transformersjs": "workspace:*",
     "@graphorin/example-trace-helper": "workspace:*",
-    "@graphorin/observability": "workspace:*",
-    "@graphorin/provider": "workspace:*",
-    "@graphorin/sessions": "workspace:*",
-    "@graphorin/tools": "workspace:*"
+    "@graphorin/provider": "workspace:*"
   },
   "bin": {
     "graphorin-example-three-agent-harness": "./dist/main.js"
