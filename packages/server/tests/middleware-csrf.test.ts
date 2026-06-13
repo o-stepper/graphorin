@@ -24,6 +24,17 @@ describe('createCsrfMiddleware', () => {
     expect(res.headers.get('Set-Cookie')).toContain('graphorin_csrf=');
   });
 
+  it('IP-12: the CSRF cookie carries no HttpOnly attribute so an SPA can echo it', async () => {
+    const app = buildApp();
+    const res = await app.request('/echo');
+    const cookie = res.headers.get('Set-Cookie') ?? '';
+    expect(cookie).toContain('graphorin_csrf=');
+    // RFC 6265: the mere presence of HttpOnly (even `HttpOnly=false`) enables
+    // it, so document.cookie can't read the token for the double-submit echo.
+    expect(cookie.toLowerCase()).not.toContain('httponly');
+    expect(cookie).toContain('SameSite=Strict');
+  });
+
   it('passes bearer-authenticated requests through', async () => {
     const app = buildApp();
     const res = await app.request('/echo', {

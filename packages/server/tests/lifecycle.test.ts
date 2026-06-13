@@ -1,7 +1,7 @@
 import { _resetResolversForTesting, installBuiltinResolvers } from '@graphorin/security/secrets';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { createScheduler } from '@graphorin/triggers';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createServer, type GraphorinServer } from '../src/app.js';
 import type { ConsolidatorLike, ConsolidatorStatusLike } from '../src/consolidator/daemon.js';
@@ -319,5 +319,48 @@ describe('Consolidator trigger bridge (MCON-4)', () => {
     // consolidation never fires in server mode (the pre-fix bug).
     expect(spy.registeredWith()).toBe(scheduler);
     delete process.env.GRAPHORIN_HOOKS_PEPPER;
+  });
+});
+
+describe('IP-23: open /metrics on a non-loopback host', () => {
+  async function startWith(host: string, pepperEnv: string): Promise<string[]> {
+    _resetResolversForTesting();
+    installBuiltinResolvers();
+    process.env[pepperEnv] = 'ip23-pepper-bytes-9XaQ7uvPyR1234';
+    const warns: string[] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((m?: unknown) => {
+      warns.push(String(m));
+    });
+    try {
+      store = await buildStore();
+      server = await createServer({
+        store,
+        skipHardening: true,
+        skipListen: true,
+        config: {
+          auth: { kind: 'token', pepperRef: `env:${pepperEnv}` },
+          storage: { path: ':memory:', mode: 'lib' },
+          server: { host },
+          metrics: { enabled: true, requireAuth: false },
+        },
+      });
+      await server.start();
+    } finally {
+      spy.mockRestore();
+      delete process.env[pepperEnv];
+    }
+    return warns;
+  }
+
+  it('warns at start when /metrics is unauthenticated and the host is not loopback', async () => {
+    const warns = await startWith('0.0.0.0', 'GRAPHORIN_IP23_PEPPER');
+    expect(
+      warns.some((w) => w.includes('/metrics is unauthenticated') && w.includes('0.0.0.0')),
+    ).toBe(true);
+  });
+
+  it('does not warn on a loopback host', async () => {
+    const warns = await startWith('127.0.0.1', 'GRAPHORIN_IP23B_PEPPER');
+    expect(warns.some((w) => w.includes('/metrics is unauthenticated'))).toBe(false);
   });
 });

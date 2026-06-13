@@ -44,10 +44,10 @@ export function createCsrfMiddleware(
       // bearer-only callers — they don't need it.
       if (!isBearer && cookieValue === undefined) {
         const token = randomBytes(24).toString('base64url');
-        c.header(
-          'Set-Cookie',
-          `${config.cookieName}=${token}; Path=/; SameSite=Strict; HttpOnly=false; Secure`,
-        );
+        // IP-12: the CSRF token must be readable by the SPA for the
+        // double-submit echo, so the cookie carries NO HttpOnly attribute —
+        // RFC 6265 enables HttpOnly on its mere presence, even `HttpOnly=false`.
+        c.header('Set-Cookie', `${config.cookieName}=${token}; Path=/; SameSite=Strict; Secure`);
       }
       await next();
       return;
