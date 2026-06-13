@@ -200,7 +200,7 @@ workflow.execute(input, { stream: 'updates' });
 |---|---|
 | `values` (default) | Final state at every step. |
 | `updates` | Per-channel deltas. |
-| `messages` | Message-shaped event projection (assistant turns + tool calls). |
+| `messages` | Reserved for a future message-shaped projection (assistant turns + tool calls); **currently behaves as `updates`**. |
 | `tasks` | Task lifecycle events. |
 | `checkpoints` | Checkpoint metadata. |
 | `debug` | Everything, verbose. |

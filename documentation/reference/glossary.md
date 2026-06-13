@@ -125,7 +125,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 ## S
 
-**Sandbox tier.** `'none'` / `'isolated-vm'` / `'docker'`. Resolved per tool call by `resolveSandbox(...)` in `@graphorin/security`.
+**Sandbox tier.** `'none'` / `'worker-threads'` (the default) / `'isolated-vm'` / `'docker'`. Resolved per tool call by `resolveSandbox(...)` in `@graphorin/security`.
 
 **`SecretRef`.** A `<scheme>:<scheme-specific-part>` URI that names where a secret lives (e.g. `env:OPENAI_API_KEY`, `keyring:my_key`, `file:///abs/path`, `op://vault/item/field`). Resolved through a pluggable resolver registry in `@graphorin/security`.
 
