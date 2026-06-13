@@ -105,7 +105,6 @@
     "@graphorin/observability": "workspace:*",
     "@graphorin/provider": "workspace:*",
     "@graphorin/security": "workspace:*",
-    "@graphorin/sessions": "workspace:*",
     "@graphorin/skills": "workspace:*",
     "@graphorin/tools": "workspace:*"
   },

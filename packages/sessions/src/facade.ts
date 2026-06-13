@@ -160,7 +160,11 @@ export interface Session {
     readonly summarized: number;
     readonly summary?: string;
   }>;
-  /** Append a handoff record. Auto-fires from `Agent.toTool()` in `@graphorin/agent`. */
+  /**
+   * Append a handoff record. RP-2: this does **not** auto-fire from
+   * `Agent.toTool()` — the agent accumulates `HandoffRecord`s in its own
+   * `RunState`; the operator forwards them here (see `examples/multi-agent-crew`).
+   */
   appendHandoff(record: Omit<HandoffRecord, 'at'> & { at?: string }): Promise<HandoffRecord>;
   /** Every handoff in this session, oldest-first. */
   listHandoffs(): Promise<ReadonlyArray<HandoffRecord>>;
@@ -207,9 +211,11 @@ export interface Session {
     },
   ): AsyncIterable<SessionReplayEvent>;
   /**
-   * Begin recording a tool cassette. The recorder is wired into the
-   * agent runtime (`@graphorin/agent`) so each `tool.execute.end /
-   * .error` event flows through.
+   * Begin recording a tool cassette. RP-2: the recorder is **not** wired into
+   * the agent runtime automatically — the operator subscribes to the agent's
+   * `RunContext` events and forwards `tool.execute.end / .error` into
+   * `recorder.recordToolCall(...)`. See `examples/multi-agent-crew` for the
+   * canonical wiring.
    */
   recordToolCassette(opts: SessionRecordCassetteOptions): ToolCassetteRecorder;
   /** Recent audit rows for this session, newest-first. */
