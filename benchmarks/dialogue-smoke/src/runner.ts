@@ -1,10 +1,11 @@
 /**
  * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Multi-turn dialogue simulation: user lines carry structured facts;
- * assistant lines echo acknowledgement. After the dialogue, a question
- * should be answered from semantic memory via hybrid search (FTS-only
- * when no embedder is configured).
+ * Dialogue smoke test: a few fixed turns carry one structured fact;
+ * assistant lines echo acknowledgement. After the turns, the fact should
+ * be recoverable from semantic memory via hybrid search (FTS-only when no
+ * embedder is configured). This is a wiring smoke check — NOT the published
+ * DialSim benchmark (arXiv:2406.13144).
  */
 
 import { writeFile } from 'node:fs/promises';
@@ -21,7 +22,7 @@ function pkgRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..');
 }
 
-export async function runDialSim(): Promise<{ pass: boolean; accuracy: number }> {
+export async function runDialogueSmoke(): Promise<{ pass: boolean; accuracy: number }> {
   const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
   await store.init();
   const scope: SessionScope = { userId: 'dial-user', sessionId: 'dial-sess' };
@@ -56,11 +57,11 @@ export async function runDialSim(): Promise<{ pass: boolean; accuracy: number }>
 }
 
 export async function main(): Promise<void> {
-  const { pass, accuracy } = await runDialSim();
+  const { pass, accuracy } = await runDialogueSmoke();
   await writeFile(
     join(pkgRoot(), 'RESULTS.md'),
     [
-      '# Dialogue simulation — results',
+      '# Dialogue smoke test — results',
       '',
       `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
       '',
@@ -73,7 +74,7 @@ export async function main(): Promise<void> {
     ].join('\n'),
     'utf8',
   );
-  console.log(`[benchmark-dialsim] pass=${pass} accuracy=${accuracy}`);
+  console.log(`[benchmark-dialogue-smoke] pass=${pass} accuracy=${accuracy}`);
   if (!pass) process.exitCode = 1;
 }
 

@@ -67,7 +67,7 @@ importers:
         specifier: ^1.0.21
         version: 1.0.21
 
-  benchmarks/dialsim:
+  benchmarks/dialogue-smoke:
     dependencies:
       '@graphorin/core':
         specifier: workspace:*

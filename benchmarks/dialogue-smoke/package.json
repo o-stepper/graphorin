@@ -1,15 +1,15 @@
 {
-  "name": "@graphorin/benchmark-dialsim",
+  "name": "@graphorin/benchmark-dialogue-smoke",
   "version": "0.4.0",
   "private": true,
-  "description": "Lightweight multi-turn dialogue simulation benchmark for the Graphorin framework. Seeds alternating user/assistant turns, persists salient user facts to semantic memory, and scores recall with hybrid search. Created and maintained by Oleksiy Stepurenko.",
+  "description": "Lightweight dialogue smoke test for the Graphorin framework. Seeds a few fixed user/assistant turns, persists a salient fact to semantic memory, and asserts hybrid search (FTS-only without an embedder) recovers it. This is a wiring smoke check, NOT the published DialSim benchmark (arXiv:2406.13144). Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
-  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/dialsim",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/dialogue-smoke",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/o-stepper/graphorin.git",
-    "directory": "benchmarks/dialsim"
+    "directory": "benchmarks/dialogue-smoke"
   },
   "bugs": {
     "url": "https://github.com/o-stepper/graphorin/issues"
@@ -33,6 +33,6 @@
     "@graphorin/store-sqlite": "workspace:*"
   },
   "bin": {
-    "graphorin-benchmark-dialsim": "./dist/runner.js"
+    "graphorin-benchmark-dialogue-smoke": "./dist/runner.js"
   }
 }

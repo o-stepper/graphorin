@@ -185,10 +185,10 @@ Distribution templates: `docker/`, `k8s/`, `systemd/`, `github-actions/`.
   + cost summary.
 - `benchmarks/locomo-multilingual` — community-contribution hooks for
   per-locale subsets.
-- `benchmarks/dialsim` — DialSim runner.
+- `benchmarks/dialogue-smoke` — dialogue smoke test (wiring check; not
+  the published DialSim benchmark).
 - `benchmarks/memory-sim` — synthetic-dialogue memory simulator.
-- `benchmarks/latency` — p50 / p95 latency probes for streaming
-  response, fact extraction, and memory search.
+- `benchmarks/latency` — p50 / p95 FTS memory-search latency probe.
 - `benchmarks/cost` — per-conversation token-cost regression suite
   (CI budget assertion, must not increase > 10 % between runs).
 

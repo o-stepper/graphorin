@@ -1,10 +1,10 @@
 /**
  * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Latency probes for semantic memory search (FTS path without embedder).
- * Emits p50/p95 on a synthetic fact corpus. Full-stream TTFT requires a
- * cached embedder plus a live provider; this harness documents budgets in
- * RESULTS.md and keeps CI hermetic on SQLite + FTS only.
+ * FTS memory-search latency probe (no embedder). Emits p50/p95/p99 on a
+ * synthetic fact corpus. Streaming TTFT and fact-extraction latency are NOT
+ * measured here — they need a cached embedder plus a live provider; this
+ * harness keeps CI hermetic on SQLite + FTS only.
  */
 
 import { writeFile } from 'node:fs/promises';
@@ -71,8 +71,11 @@ export async function main(): Promise<void> {
   const samples = smoke ? 24 : 80;
   const { p50ms, p95ms, p99ms } = await measureMemorySearchLatency({ factCount, samples });
 
-  const budgetSearchP95Ms = 100;
-  const pass = p95ms < budgetSearchP95Ms || smoke;
+  // Regression tripwire applied at THIS probe's corpus size (factCount),
+  // not the 10k-fact MVP design target — see the "MVP design target" note
+  // emitted below. Keeps the budget line honest about what was measured.
+  const regressionGateP95Ms = 100;
+  const pass = p95ms < regressionGateP95Ms || smoke;
 
   const lines = [
     '# Latency probes — results',
@@ -90,12 +93,16 @@ export async function main(): Promise<void> {
     `| p50 | ${p50ms.toFixed(3)} |`,
     `| p95 | ${p95ms.toFixed(3)} |`,
     `| p99 | ${p99ms.toFixed(3)} |`,
-    `| Budget p95 (10k-facts target doc) | ${String(budgetSearchP95Ms)} ms |`,
+    `| Regression gate p95 (${String(factCount)} facts) | ${String(regressionGateP95Ms)} ms |`,
     `| CI pass (smoke relaxes hard gate) | ${pass ? 'yes' : 'no'} |`,
     '',
-    '## Streaming TTFT',
+    '## MVP design target',
     '',
-    'Hermetic CI does not download embedding weights. Measure time-to-first-token with a local cached embedder and your chosen `Provider` in a workstation profile; budgets are listed in the Graphorin MVP specification.',
+    `This probe runs at **${String(factCount)} facts** as a fast regression tripwire. The Graphorin MVP target of p95 < ${String(regressionGateP95Ms)} ms is specified at **10k facts** and is validated on a workstation profile, not in hermetic CI — do not read the measured number above as a 10k-scale result.`,
+    '',
+    '## Streaming TTFT & fact extraction',
+    '',
+    'Not measured here. Time-to-first-token and fact-extraction latency need a cached embedder and a live `Provider`; measure them on a workstation profile. Hermetic CI keeps to SQLite + FTS only.',
     '',
   ];
 
