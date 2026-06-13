@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
+import { SkillRuntimeCompatError } from '../src/errors/index.js';
 import { loadSkillFromSource, loadSkills } from '../src/loader/index.js';
 import { stampSkillToolFromMetadata } from '../src/registry/bridge.js';
 
@@ -197,6 +198,52 @@ describe('loadSkillFromSource — folder', () => {
     expect(diag?.severity).toBe('warn');
   });
 
+  it('RP-11(b): conflictPolicy:error throws SkillRuntimeCompatError on an incompatible runtime-compat', async () => {
+    const dir = await makeSkillDir(
+      'rc-incompatible',
+      [
+        '---',
+        'name: rc-incompatible',
+        'description: declares a runtime range the installed version cannot satisfy.',
+        'graphorin-runtime-compat: ">=9.0.0"',
+        '---',
+        'BODY',
+      ].join('\n'),
+    );
+    await expect(
+      loadSkillFromSource(
+        { kind: 'folder', path: dir },
+        { runtimeVersion: '0.4.0', conflictPolicy: 'error' },
+      ),
+    ).rejects.toBeInstanceOf(SkillRuntimeCompatError);
+    // Default (warn) policy keeps it a diagnostic — the load still succeeds.
+    const skill = await loadSkillFromSource(
+      { kind: 'folder', path: dir },
+      { runtimeVersion: '0.4.0' },
+    );
+    expect(skill.diagnostics().some((d) => d.kind === 'invalid-runtime-compat')).toBe(true);
+  });
+
+  it('RP-11(d): a malformed graphorin-tools value surfaces an invalid-field-type diagnostic', async () => {
+    const dir = await makeSkillDir(
+      'bad-tools',
+      [
+        '---',
+        'name: bad-tools',
+        'description: graphorin-tools is a scalar, not a list.',
+        'graphorin-tools: 42',
+        '---',
+        'BODY',
+      ].join('\n'),
+    );
+    const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
+    expect(
+      skill
+        .diagnostics()
+        .some((d) => d.kind === 'invalid-field-type' && d.field === 'graphorin-tools'),
+    ).toBe(true);
+  });
+
   it('throws when SKILL.md is missing', async () => {
     const dir = join(tmpRoot, 'missing-skill');
     await mkdir(dir, { recursive: true });
@@ -259,5 +306,15 @@ describe('loadSkills', () => {
         throwOnSourceError: true,
       }),
     ).rejects.toThrowError();
+  });
+
+  it('RP-11(c): loads multiple sources and preserves input order', async () => {
+    const a = await makeSkillDir('c-a', ['---', 'name: c-a', 'description: a', '---'].join('\n'));
+    const b = await makeSkillDir('c-b', ['---', 'name: c-b', 'description: b', '---'].join('\n'));
+    const skills = await loadSkills([
+      { kind: 'folder', path: a },
+      { kind: 'folder', path: b },
+    ]);
+    expect(skills.map((s) => s.metadata.name)).toEqual(['c-a', 'c-b']);
   });
 });
