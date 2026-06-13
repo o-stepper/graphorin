@@ -909,6 +909,9 @@ importers:
       '@graphorin/core':
         specifier: workspace:*
         version: link:../core
+      '@graphorin/observability':
+        specifier: workspace:*
+        version: link:../observability
       better-sqlite3-multiple-ciphers:
         specifier: ^12.9.0
         version: 12.9.0

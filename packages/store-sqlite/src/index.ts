@@ -95,6 +95,11 @@ import { listMigrations, type Migration, registerMigration } from './migrations/
 import { type AppliedMigration, runMigrations } from './migrations/runner.js';
 import { SqliteOAuthServerStore } from './oauth-server-store.js';
 import { SqliteSessionStore } from './session-store.js';
+import {
+  createSqliteSpanExporter,
+  SPAN_SESSION_ATTRIBUTE,
+  traceSourceForSession,
+} from './span-store.js';
 import { SqliteTriggerStore } from './trigger-store.js';
 import { VectorTableManager } from './vector-table-mgr.js';
 
@@ -306,6 +311,8 @@ export {
   type ConsolidatorStateRow,
   // FTS integrity (CS-10)
   checkFtsIntegrity,
+  // span persistence (RP-17)
+  createSqliteSpanExporter,
   type DlqBatchInput,
   type DlqBatchRow,
   EmbedderLockOnFirstError,
@@ -337,6 +344,7 @@ export {
   registerMigration,
   resolvePassphrase,
   runMigrations,
+  SPAN_SESSION_ATTRIBUTE,
   SqliteAuthTokenStore,
   SqliteCheckpointStore,
   SqliteConflictStore,
@@ -349,6 +357,7 @@ export {
   SqliteSessionStore,
   SqliteTriggerStore,
   slugifyEmbedderId,
+  traceSourceForSession,
   UnknownEmbedderIdError,
   VectorTableManager,
   WAL_HARDENING_PRAGMAS,
