@@ -28,7 +28,7 @@ Before promoting a Graphorin deployment to production:
 1. **Storage**
    - Pick a backend (local SQLite, encrypted SQLite, or a custom adapter).
    - Schedule a snapshot / replication job. The default SQLite write-ahead log makes online backups via `BACKUP TO …` straightforward.
-   - Run `graphorin storage vacuum` periodically on long-lived deployments.
+   - Run `graphorin storage cleanup-backups` periodically to prune stale encryption backups on long-lived deployments.
 
 2. **Encryption-at-rest**
    - The audit log is **always** encrypted (mandatory).
@@ -36,8 +36,8 @@ Before promoting a Graphorin deployment to production:
    - The passphrase resolves through `SecretRef` — keep it in the OS keychain or a managed vault, never in plain config files.
 
 3. **Tokens**
-   - Issue tokens with `graphorin token issue --role <role> --ttl <duration>`.
-   - Set a TTL appropriate for the role. Admin tokens should be short-lived.
+   - Issue tokens with `graphorin token create --scopes <list> --expires-in <duration>`.
+   - Set an expiry appropriate for the scopes. Admin (`admin:*`) tokens should be short-lived.
    - Rotate the deployment-wide pepper on a schedule.
    - Document who holds which token in your incident-response runbook.
 

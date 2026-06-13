@@ -113,7 +113,7 @@ const sqlite = await createSqliteStore({
 await sqlite.init();
 ```
 
-Installing `@graphorin/store-sqlite-encrypted` registers the cipher peer driver. The package also exposes `encryptDatabase(...)`, `rekeyDatabase(...)`, and `cipherIntegrityCheck(...)` — the runners that back `graphorin storage encrypt` / `rekey` / `integrity-check`. The passphrase is resolved through the same `SecretRef` pipeline as every other secret. See [Secrets](/guide/secrets).
+Installing `@graphorin/store-sqlite-encrypted` registers the cipher peer driver. The package also exposes `encryptDatabase(...)`, `rekeyDatabase(...)`, and `cipherIntegrityCheck(...)` — the runners that back `graphorin storage encrypt` / `rekey` (the integrity check also runs automatically on every open). The passphrase is resolved through the same `SecretRef` pipeline as every other secret. See [Secrets](/guide/secrets).
 
 ## Embedder model storage
 
