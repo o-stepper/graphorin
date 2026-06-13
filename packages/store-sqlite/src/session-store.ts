@@ -233,6 +233,43 @@ export class SqliteSessionStore implements SessionStoreExt {
     const result = this.#conn.run('DELETE FROM session_audit WHERE at < ?', [beforeEpochMs]);
     return result.changes ?? 0;
   }
+
+  /** RP-6: hard-delete a session + its handoffs / workflow runs / audit rows. */
+  async deleteSession(sessionId: string): Promise<void> {
+    this.#conn.transaction(() => {
+      this.#deleteSessionCascade(sessionId);
+    });
+  }
+
+  /** RP-6: retention sweep — delete every session matching the policy. */
+  async pruneSessions(opts: {
+    readonly beforeEpochMs?: number;
+    readonly closedOnly?: boolean;
+  }): Promise<number> {
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    if (opts.closedOnly === true) conditions.push('closed_at IS NOT NULL');
+    if (opts.beforeEpochMs !== undefined) {
+      conditions.push('created_at < ?');
+      params.push(opts.beforeEpochMs);
+    }
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const ids = this.#conn
+      .all<{ id: string }>(`SELECT id FROM sessions ${where}`, params)
+      .map((r) => r.id);
+    this.#conn.transaction(() => {
+      for (const id of ids) this.#deleteSessionCascade(id);
+    });
+    return ids.length;
+  }
+
+  /** Cascade-delete one session's rows. Caller owns the transaction. */
+  #deleteSessionCascade(sessionId: string): void {
+    this.#conn.run('DELETE FROM session_handoffs WHERE session_id = ?', [sessionId]);
+    this.#conn.run('DELETE FROM session_workflow_runs WHERE session_id = ?', [sessionId]);
+    this.#conn.run('DELETE FROM session_audit WHERE session_id = ?', [sessionId]);
+    this.#conn.run('DELETE FROM sessions WHERE id = ?', [sessionId]);
+  }
 }
 
 interface SessionRow {

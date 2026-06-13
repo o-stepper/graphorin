@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SessionNotFoundError } from '../src/errors/index.js';
+import { SessionClosedError, SessionNotFoundError } from '../src/errors/index.js';
 import { createSessionManager } from '../src/index.js';
 import { InMemoryMemorySessionFacade, InMemorySessionStore } from './fixtures/in-memory-stores.js';
 
@@ -39,6 +39,45 @@ describe('Session facade', () => {
     expect(ref.messageId).toMatch(/^msg-/);
     expect(memory.messages).toHaveLength(1);
     expect(memory.messages[0]?.message).toEqual({ role: 'user', content: 'Hello' });
+  });
+
+  it('rejects push() to a closed session (RP-6)', async () => {
+    const { manager } = setup();
+    const session = await manager.create({ userId: 'u-1', agentId: 'main' });
+    await session.push({ role: 'user', content: 'before close' });
+    await session.close();
+    await expect(session.push({ role: 'user', content: 'after close' })).rejects.toBeInstanceOf(
+      SessionClosedError,
+    );
+  });
+
+  it('deleteSession cascades handoffs / workflow runs / audit (RP-6)', async () => {
+    const { manager, store } = setup();
+    const session = await manager.create({ userId: 'u-1', agentId: 'main' });
+    await session.appendHandoff({ fromAgentId: 'main', toAgentId: 'worker', stepNumber: 1 });
+    expect(store.sessions.has(session.id)).toBe(true);
+    expect((store.handoffs.get(session.id) ?? []).length).toBeGreaterThan(0);
+
+    await manager.deleteSession(session.id);
+    expect(store.sessions.has(session.id)).toBe(false);
+    expect(store.handoffs.has(session.id)).toBe(false);
+    await expect(manager.get(session.id)).rejects.toBeInstanceOf(SessionNotFoundError);
+  });
+
+  it('pruneSessions(closedOnly) deletes closed sessions, keeps open ones (RP-6)', async () => {
+    const { manager, store } = setup();
+    const open = await manager.create({ userId: 'u-1', agentId: 'main' });
+    const closed = await manager.create({
+      userId: 'u-1',
+      agentId: 'main',
+      sessionId: 'closed-1',
+    });
+    await closed.close();
+
+    const deleted = await manager.pruneSessions({ closedOnly: true });
+    expect(deleted).toBe(1);
+    expect(store.sessions.has(open.id)).toBe(true);
+    expect(store.sessions.has('closed-1')).toBe(false);
   });
 
   it('list() delegates to memory and applies session-list sanitization', async () => {

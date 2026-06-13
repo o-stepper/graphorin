@@ -26,6 +26,7 @@ export type SessionErrorCode =
   | 'session-export-checksum-mismatch'
   | 'session-export-encryption-required'
   | 'session-not-found'
+  | 'session-closed'
   | 'agent-not-found'
   | 'invalid-commentary-policy';
 
@@ -260,6 +261,25 @@ export class SessionNotFoundError extends SessionError {
   readonly sessionId: string;
   constructor(sessionId: string) {
     super('session-not-found', `Session ${sessionId} does not exist.`, 'SessionNotFoundError');
+    this.sessionId = sessionId;
+  }
+}
+
+/**
+ * Thrown by `Session.push(...)` when the session has been closed (RP-6).
+ * `close()` is a real lifecycle boundary, not advisory — reopen the session
+ * (a fresh `create`) or write to a different one.
+ *
+ * @stable
+ */
+export class SessionClosedError extends SessionError {
+  readonly sessionId: string;
+  constructor(sessionId: string) {
+    super(
+      'session-closed',
+      `Session ${sessionId} is closed; cannot push new messages.`,
+      'SessionClosedError',
+    );
     this.sessionId = sessionId;
   }
 }
