@@ -22,11 +22,11 @@ const __dirname = dirname(__filename);
 const ROOT = resolve(__dirname, '..');
 
 /**
- * Forbidden source-level patterns. Each entry is a `[label, regex]`
- * tuple. Regexes match the actual call site, NOT a comment or string
- * literal — the trade-off is documented per-pattern below.
+ * Forbidden CALL-SITE patterns. Tested against comment- AND string-
+ * stripped source so a `fetch(` inside a string literal is not a false
+ * positive.
  */
-const FORBIDDEN_PATTERNS = [
+const CALL_PATTERNS = [
   ['fetch', /(^|[^A-Za-z0-9_$.])fetch\s*\(/m],
   ['http.request', /\bhttp\.request\s*\(/m],
   ['https.request', /\bhttps\.request\s*\(/m],
@@ -36,9 +36,37 @@ const FORBIDDEN_PATTERNS = [
   ['tls.connect', /\btls\.connect\s*\(/m],
   ['dgram.createSocket', /\bdgram\.createSocket\s*\(/m],
   ['WebSocket', /\bnew\s+WebSocket\s*\(/m],
+  // EB-10: browser-style network primitives a polyfill/bundler can expose.
+  ['XMLHttpRequest', /\bnew\s+XMLHttpRequest\s*\(/m],
+  ['EventSource', /\bnew\s+EventSource\s*\(/m],
+  // EB-10: namespace-bound HTTP-client calls, e.g. `undici.request(...)`.
+  ['undici/got call', /\b(?:undici|got)\.(?:request|stream|fetch|get|post)\s*\(/m],
+];
+
+/**
+ * Forbidden IMPORT patterns. Import specifiers ARE string literals, so
+ * these run against COMMENT-stripped but string-PRESERVING source —
+ * stripping strings (as the call-site pass does) blanks the specifier,
+ * which is exactly why the prior single import pattern was inert (EB-10).
+ * Covers static `import`, dynamic `import(...)`, and `require(...)`. The
+ * trade-off: a string literal that itself contains an import-of-a-client
+ * is a (rare, easily-resolved) false positive — over-flagging is the
+ * safe direction for a no-network guard.
+ */
+const HTTP_CLIENT_SPECIFIERS = '(?:node-fetch|undici|got|axios|ky|ws)';
+const IMPORT_PATTERNS = [
+  // Line-anchored to keep a mid-string `import` from matching.
   [
-    'node-fetch import',
-    /^\s*import\s+[\s\S]*?from\s+['"](?:node-fetch|undici|got|axios|ky)['"];?$/m,
+    'http-client import',
+    new RegExp(`^\\s*import\\s+[\\s\\S]*?from\\s+['"]${HTTP_CLIENT_SPECIFIERS}['"]`, 'm'),
+  ],
+  [
+    'http-client dynamic import',
+    new RegExp(`\\bimport\\s*\\(\\s*['"]${HTTP_CLIENT_SPECIFIERS}['"]\\s*\\)`, 'm'),
+  ],
+  [
+    'http-client require',
+    new RegExp(`\\brequire\\s*\\(\\s*['"]${HTTP_CLIENT_SPECIFIERS}['"]\\s*\\)`, 'm'),
   ],
 ];
 
@@ -109,16 +137,21 @@ function isAllowListed(relativePath) {
   return false;
 }
 
-function stripCommentsAndStrings(source) {
-  // Best-effort comment + string stripping. The regex passes are not a
-  // full TypeScript parser, but they are sufficient for the patterns
-  // we look for (`fetch(...)` etc.) — a real `fetch(` call site never
-  // hides inside a comment AND a single-line literal at the same time.
+function stripComments(source) {
   let out = source;
   // Block comments.
   out = out.replace(/\/\*[\s\S]*?\*\//g, ' ');
   // Line comments.
   out = out.replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+  return out;
+}
+
+function stripCommentsAndStrings(source) {
+  // Best-effort comment + string stripping. The regex passes are not a
+  // full TypeScript parser, but they are sufficient for the patterns
+  // we look for (`fetch(...)` etc.) — a real `fetch(` call site never
+  // hides inside a comment AND a single-line literal at the same time.
+  let out = stripComments(source);
   // Single-quoted strings.
   out = out.replace(/'([^'\\\n]|\\.)*'/g, "''");
   // Double-quoted strings.
@@ -128,17 +161,28 @@ function stripCommentsAndStrings(source) {
   return out;
 }
 
+/**
+ * Detect forbidden network primitives in a single source string. Call-site
+ * patterns run against comment+string-stripped source; import patterns run
+ * against comment-stripped (string-preserving) source. Exported for testing.
+ */
+export function detectViolations(source) {
+  const callSource = stripCommentsAndStrings(source);
+  const importSource = stripComments(source);
+  const violations = [];
+  for (const [label, pattern] of CALL_PATTERNS) {
+    if (pattern.test(callSource)) violations.push(label);
+  }
+  for (const [label, pattern] of IMPORT_PATTERNS) {
+    if (pattern.test(importSource)) violations.push(label);
+  }
+  return violations;
+}
+
 async function scanFile(filePath) {
   const relativePath = relative(ROOT, filePath);
   const source = await readFile(filePath, 'utf8');
-  const cleaned = stripCommentsAndStrings(source);
-  const violations = [];
-  for (const [label, pattern] of FORBIDDEN_PATTERNS) {
-    if (pattern.test(cleaned)) {
-      violations.push(label);
-    }
-  }
-  return { relativePath, violations };
+  return { relativePath, violations: detectViolations(source) };
 }
 
 async function main() {
@@ -168,8 +212,12 @@ async function main() {
   process.exit(1);
 }
 
-main().catch((err) => {
-  console.error('check-no-network: ERROR');
-  console.error(err);
-  process.exit(2);
-});
+// Only run the repo scan when executed directly — importing this module
+// (e.g. for testing `detectViolations`) must not trigger a full scan.
+if (process.argv[1] === __filename) {
+  main().catch((err) => {
+    console.error('check-no-network: ERROR');
+    console.error(err);
+    process.exit(2);
+  });
+}
