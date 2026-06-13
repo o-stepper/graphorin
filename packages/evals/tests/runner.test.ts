@@ -21,7 +21,7 @@ describe('runEvals', () => {
     expect(report.summary.byScorer['exact-match']?.passed).toBe(2);
   });
 
-  it('runs N iterations per case and uses caseId-iter-N naming', async () => {
+  it('disambiguates an explicit caseId per iteration so report ids are unique (EB-6)', async () => {
     const dataset = fromIterable([{ id: 'sample', input: 'a', expected: 'a' }]);
     const report = await runEvals({
       agent: { run: async (input) => input },
@@ -30,7 +30,10 @@ describe('runEvals', () => {
       iterations: 3,
     });
     expect(report.summary.total).toBe(3);
-    expect(report.results.every((r) => r.caseId.startsWith('sample'))).toBe(true);
+    const ids = report.results.map((r) => r.caseId).sort();
+    expect(ids).toEqual(['sample-iter-0', 'sample-iter-1', 'sample-iter-2']);
+    // Every caseId is unique — JUnit/HTML reporters can key on them.
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('runs in parallel when concurrency > 1', async () => {

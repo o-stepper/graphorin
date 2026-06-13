@@ -32,8 +32,10 @@ export async function runEval<I, O>(opts: RunEvalOptions<I, O>): Promise<EvalRep
       throwIfAborted(signal);
       const sampleCase = opts.dataset.cases[idx];
       if (sampleCase === undefined) continue;
-      const caseId =
-        sampleCase.id ?? (iterations === 1 ? `case-${idx}` : `case-${idx}-iter-${iter}`);
+      // EB-6: disambiguate a caller-provided id per iteration too, not just the
+      // synthetic fallback — otherwise iterations>1 emits duplicate caseIds.
+      const baseId = sampleCase.id ?? `case-${idx}`;
+      const caseId = iterations === 1 ? baseId : `${baseId}-iter-${iter}`;
 
       const startedAt = Date.now();
       const output = await opts.agent.run(sampleCase.input);

@@ -45,7 +45,7 @@ describe('@graphorin/observability/eval — runEval', () => {
     expect(report.results[0]?.scores[0]?.result.reason).toContain('broken');
   });
 
-  it('honours iterations', async () => {
+  it('honours iterations and gives every result a unique caseId (EB-6)', async () => {
     let runs = 0;
     const report = await runEval({
       agent: {
@@ -54,7 +54,8 @@ describe('@graphorin/observability/eval — runEval', () => {
           return 1;
         },
       },
-      dataset: { cases: [{ input: 1, expected: 1 }] },
+      // Explicit id: it must still be disambiguated per iteration.
+      dataset: { cases: [{ id: 'sample', input: 1, expected: 1 }] },
       scorers: [
         {
           name: 'noop',
@@ -67,6 +68,9 @@ describe('@graphorin/observability/eval — runEval', () => {
     });
     expect(runs).toBe(3);
     expect(report.results).toHaveLength(3);
+    const ids = report.results.map((r) => r.caseId).sort();
+    expect(ids).toEqual(['sample-iter-0', 'sample-iter-1', 'sample-iter-2']);
+    expect(new Set(ids).size).toBe(3);
   });
 
   it('aborts when the supplied AbortSignal fires', async () => {
