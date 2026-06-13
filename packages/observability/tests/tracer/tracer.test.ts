@@ -32,6 +32,22 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     expect(records[0]?.status).toBe('ok');
   });
 
+  it('RP-18: a framework span with an untagged attribute reaches the exporter (stripped, not dropped)', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((record) => records.push(record));
+    // Default validation floor is 'public'. The untagged `memory.scope.user_id`
+    // attribute defaults to the 'internal' tier — before RP-18 this made the
+    // whole span vanish from every exporter (operators saw empty traces).
+    const tracer = createTracer({ exporters: [exporter], warnSink: () => {} });
+    await tracer.span(
+      { type: 'agent.run', attrs: { 'memory.scope.user_id': 'u-1' } },
+      async () => undefined,
+    );
+    await tracer.shutdown();
+    expect(records).toHaveLength(1); // span survives end-to-end
+    expect(records[0]?.attributes['memory.scope.user_id']).toBeUndefined(); // untagged → stripped
+  });
+
   it('records exceptions and sets the error status', async () => {
     const records: SpanRecord[] = [];
     const exporter = mockExporter((record) => records.push(record));

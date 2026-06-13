@@ -49,11 +49,11 @@ export function withValidation<E extends TraceExporter>(
     id: `${exporter.id}+validated`,
     [VALIDATED_EXPORTER_BRAND]: true,
     async export(record: SpanRecord): Promise<void> {
-      const sanitized = sanitizeRecord(record, validator);
-      // Drop the record entirely when the validator could not sanitize
-      // it (tier exceeded the floor on at least one attribute).
-      if (sanitized === null || sanitized.droppedReason !== undefined) return;
-      await exporter.export(sanitized);
+      // RP-18: the validator strips offending attributes (counting each drop)
+      // and always returns an exportable record — a single untagged or
+      // over-tier attribute no longer makes the whole span vanish from every
+      // exporter.
+      await exporter.export(sanitizeRecord(record, validator));
     },
     flush: () => exporter.flush(),
     shutdown: () => exporter.shutdown(),
@@ -67,22 +67,17 @@ export function withValidation<E extends TraceExporter>(
 export function sanitizeRecord(
   record: SpanRecord,
   validator: RedactionValidatorInstance,
-): SpanRecord | null {
+): SpanRecord {
   const sensitivities = record.sensitivityByAttribute ?? {};
-
+  // RP-18: attribute-granular sanitization. Offending attributes are stripped
+  // (and counted by the validator); the span itself always survives so
+  // framework spans carrying untagged attributes still reach every exporter.
   const sanitizedAttrs = sanitizeAttributes(
     record.attributes,
     sensitivities,
     validator,
     record.type,
   );
-  if (sanitizedAttrs === null) {
-    return {
-      ...record,
-      droppedReason: 'sensitivity-tier-exceeded',
-    };
-  }
-
   const sanitizedEvents = sanitizeEvents(record.events, validator, record.type);
   return {
     ...record,
@@ -99,7 +94,7 @@ export function sanitizeAttributes(
   sensitivities: Readonly<Record<string, SpanAttributeValue>>,
   validator: RedactionValidatorInstance,
   spanType?: string,
-): SpanAttributes | null {
+): SpanAttributes {
   const out: Record<string, SpanAttributeValue> = {};
   for (const [key, value] of Object.entries(attrs)) {
     const tier = readTier(sensitivities[key]);
@@ -109,9 +104,10 @@ export function sanitizeAttributes(
       context: spanType === undefined ? { attribute: key } : { attribute: key, spanType },
     });
     if (result === null) {
-      // Tier exceeded the floor on this single attribute — drop the
-      // whole record per the default-deny posture.
-      return null;
+      // RP-18: this single attribute exceeded the floor (or matched a secret
+      // pattern). Strip it — the validator has already counted the drop — and
+      // keep the rest of the span rather than discarding the whole record.
+      continue;
     }
     out[key] = result.value as SpanAttributeValue;
   }
@@ -129,7 +125,6 @@ export function sanitizeEvents(
   const out: SpanRecord['events'][number][] = [];
   for (const event of events) {
     const sanitizedAttrs = sanitizeAttributes(event.attributes, {}, validator, spanType);
-    if (sanitizedAttrs === null) continue;
     out.push({ name: event.name, timeUnixNano: event.timeUnixNano, attributes: sanitizedAttrs });
   }
   return out;

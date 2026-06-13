@@ -32,7 +32,7 @@ describe('@graphorin/observability/redaction — performance budget', () => {
     const start = process.hrtime.bigint();
     for (let i = 0; i < iterations; i++) {
       const out = sanitizeRecord(record, validator);
-      if (out === null) throw new Error('unexpected null sanitized record');
+      if (out.events === undefined) throw new Error('unexpected sanitized record shape');
     }
     const elapsedNs = Number(process.hrtime.bigint() - start);
     const meanUs = elapsedNs / iterations / 1000;
