@@ -170,7 +170,7 @@ Long-running streams (agent runs, workflows) survive client disconnects through 
 ```json
 {
   "status": "ok",
-  "version": "0.1.0",
+  "version": "0.4.0",
   "checks": {
     "storage": "ok",
     "audit-log": "ok",
