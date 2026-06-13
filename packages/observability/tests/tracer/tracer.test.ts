@@ -48,6 +48,33 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     expect(records[0]?.attributes['memory.scope.user_id']).toBeUndefined(); // untagged → stripped
   });
 
+  it('RP-20: flush()/shutdown() awaits in-flight exports so a span is not lost', async () => {
+    let release: () => void = () => {};
+    const gate = new Promise<void>((r) => {
+      release = r;
+    });
+    const captured: SpanRecord[] = [];
+    let closed = false;
+    const slow = withValidation({
+      id: 'slow',
+      async export(r: SpanRecord) {
+        await gate;
+        if (closed) return; // the exporter's closed-guard (as in the JSONL exporter)
+        captured.push(r);
+      },
+      async flush() {},
+      async shutdown() {
+        closed = true;
+      },
+    });
+    const tracer = createTracer({ exporters: [slow], warnSink: () => {} });
+    await tracer.span({ type: 'agent.run' }, async () => undefined); // sink fires export (pending on gate)
+    const shutdownP = tracer.shutdown(); // flush() drains in-flight before closing
+    release(); // let the slow export resolve
+    await shutdownP;
+    expect(captured).toHaveLength(1); // pre-RP-20 the closed-guard would drop it
+  });
+
   it('records exceptions and sets the error status', async () => {
     const records: SpanRecord[] = [];
     const exporter = mockExporter((record) => records.push(record));
