@@ -71,11 +71,12 @@ Every adapter normalises its native stream into the same `ProviderEvent` discrim
 
 | Event type | Meaning |
 |---|---|
-| `text.delta` | A token of the assistant message. |
-| `tool.call.delta` / `tool.call.end` | Streaming tool calls. |
-| `reasoning.delta` | A token of an extended-reasoning channel (e.g. `<thinking>`). |
-| `usage` | A usage update — input / output / total tokens. |
-| `finish` | The stream has completed; carries the `finishReason`. |
+| `stream-start` | The stream opened — carries response metadata. |
+| `text-delta` | A token of the assistant message. |
+| `reasoning-delta` | A token of an extended-reasoning channel (e.g. `<thinking>`). |
+| `tool-call-start` / `tool-call-input-delta` / `tool-call-end` | Streaming tool calls. |
+| `file` / `source` | A generated file part, or a source citation. |
+| `finish` | Terminal event — carries the `finishReason` **and** the `usage` (input / output / total tokens). |
 | `error` | A normalised, typed error. |
 
 The agent runtime consumes this stream and emits its own `AgentEvent`s on top.
@@ -207,19 +208,17 @@ const provider = createProvider(
 );
 ```
 
-Trade-off: in-process loses durable mid-stream resume because the model context lives in the Node.js process — see the durable-resume table in [Quickstart](/guide/quickstart).
+Trade-off: in-process loses durable mid-stream resume because the model context lives in the Node.js process — durable resume across a restart needs the [Standalone server](/guide/standalone-server).
 
 ## Token counting
 
-`@graphorin/provider/counters` ships a dispatcher with built-in counters for Anthropic and OpenAI / `tiktoken`-style models. Plug in a custom counter for any other backend:
+`@graphorin/provider` ships a dispatcher with built-in counters for Anthropic and OpenAI / `tiktoken`-style models. Install one tuned to your model — or your own implementation of the `TokenCounter` contract (`{ id, version, count, countText }`) — as the process-global counter:
 
 ```ts
-import { registerTokenCounter } from '@graphorin/provider';
+import { createDefaultCounter, setGlobalTokenCounter } from '@graphorin/provider';
 
-registerTokenCounter('my-vendor:my-model', (messages) => {
-  // Implementation using your vendor's tokeniser.
-  return computeTokenCount(messages);
-});
+// Built-in counter tuned to a specific model:
+setGlobalTokenCounter(createDefaultCounter({ model: 'gpt-4o' }));
 ```
 
 ## Pricing
