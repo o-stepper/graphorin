@@ -16,7 +16,6 @@
  * @packageDocumentation
  */
 
-import { Buffer } from 'node:buffer';
 import { SecretValue } from '../secrets/secret-value.js';
 import { openInBrowser } from './browser.js';
 import {
@@ -249,5 +248,3 @@ async function waitWithTimeout<T>(promise: Promise<T>, timeoutMs: number | undef
     if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
   }
 }
-
-void Buffer; // Imported for parity with the other modules; not used directly.

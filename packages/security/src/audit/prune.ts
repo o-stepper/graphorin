@@ -7,9 +7,20 @@
  * everything older than `before` provided that the surviving prefix
  * keeps at least `retain` entries.
  *
+ * Only the longest *contiguous* run of fully-expired entries at the
+ * front of the chain is removed. Because the chain is a hash chain it
+ * can only be trimmed at the front, so an expired entry that sits (by
+ * `seq`) behind a not-yet-expired one — e.g. when timestamps are not
+ * monotonic in `seq` order — is retained rather than punching a hole in
+ * the chain. Deleting fewer entries than the wall-clock cutoff implies
+ * is the safe behaviour here, never a silent gap.
+ *
  * After deletion the first surviving entry's `prevHash` is rewritten
  * to the genesis value so `verifyAuditChain(...)` keeps returning
- * `{ ok: true }` on the surviving suffix.
+ * `{ ok: true }` on the surviving suffix. This recomputes every
+ * surviving entry's `hash`, so any entry hashes previously archived via
+ * `exportAudit(...)` will no longer match the post-prune chain — treat a
+ * prune as invalidating the hashes of earlier exports.
  *
  * @packageDocumentation
  */

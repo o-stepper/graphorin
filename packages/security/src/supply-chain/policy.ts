@@ -6,15 +6,19 @@
  * - `@vendor/specific-skill` is an exact match.
  * - `*` is a wildcard within a single segment.
  *
- * The resolver resolves three layers in order:
+ * The resolver consults three layers — operator allowlist, operator
+ * denylist, and the framework-curated denylist (post-MVP optional pull,
+ * active only when `graphorinDenylist === 'auto'` AND a matching pattern
+ * is registered via {@link _setFrameworkDenylistForTesting}).
  *
- * 1. Operator allowlist — short-circuits to `'allow'` regardless of
- *    the deny lists.
- * 2. Operator denylist — short-circuits to `'deny'`.
- * 3. Framework-curated denylist (post-MVP optional pull) — emits a
- *    `'deny'` decision when `graphorinDenylist === 'auto'` AND a
- *    matching pattern is registered via
- *    {@link _setFrameworkDenylistForTesting}.
+ * The order of the allow vs deny layers is governed by `policy.precedence`
+ * (SPL-20):
+ *
+ * - `'allow-wins'` (default) — the allowlist short-circuits to `'allow'`
+ *   before the deny lists are consulted, so an operator can deny a whole
+ *   scope yet allow specific exceptions inside it.
+ * - `'deny-wins'` — the deny lists are consulted first, so an explicit
+ *   denylist entry is never overridden by a broad allowlist glob.
  *
  * @packageDocumentation
  */
@@ -50,11 +54,34 @@ export function evaluateSupplyChainPolicy(
   packageName: string,
   policy: SupplyChainPolicy = {},
 ): SupplyChainDecision {
-  if (policy.allowlist !== undefined) {
-    for (const pattern of policy.allowlist) {
-      if (matchesGlob(packageName, pattern)) return Object.freeze({ outcome: 'allow' as const });
-    }
+  const denyWins = policy.precedence === 'deny-wins';
+  const first = denyWins ? matchDeny(packageName, policy) : matchAllow(packageName, policy);
+  if (first !== undefined) return first;
+  const second = denyWins ? matchAllow(packageName, policy) : matchDeny(packageName, policy);
+  if (second !== undefined) return second;
+  return Object.freeze({ outcome: 'allow' as const });
+}
+
+/** First matching allowlist pattern → `'allow'`, else `undefined`. */
+function matchAllow(
+  packageName: string,
+  policy: SupplyChainPolicy,
+): SupplyChainDecision | undefined {
+  if (policy.allowlist === undefined) return undefined;
+  for (const pattern of policy.allowlist) {
+    if (matchesGlob(packageName, pattern)) return Object.freeze({ outcome: 'allow' as const });
   }
+  return undefined;
+}
+
+/**
+ * First matching operator-denylist (then framework-denylist when
+ * `graphorinDenylist === 'auto'`) pattern → `'deny'`, else `undefined`.
+ */
+function matchDeny(
+  packageName: string,
+  policy: SupplyChainPolicy,
+): SupplyChainDecision | undefined {
   if (policy.denylist !== undefined) {
     for (const pattern of policy.denylist) {
       if (matchesGlob(packageName, pattern)) {
@@ -77,7 +104,7 @@ export function evaluateSupplyChainPolicy(
       }
     }
   }
-  return Object.freeze({ outcome: 'allow' as const });
+  return undefined;
 }
 
 /**

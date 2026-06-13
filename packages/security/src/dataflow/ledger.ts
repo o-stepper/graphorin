@@ -14,9 +14,25 @@ const DEFAULT_MAX_TRACKED_CHARS = 262_144;
 /** Floor below which a verbatim probe is considered too trivial to trust. */
 const MIN_TRUSTWORTHY_WINDOW = 8;
 
-/** Lowercase + collapse whitespace runs to a single space + trim. */
+/**
+ * Fold text to an obfuscation-resistant comparison form: Unicode NFKC
+ * (collapses fullwidth / compatibility homoglyphs to their canonical form),
+ * keep only letters and numbers, lowercase. Dropping everything else folds
+ * away case, whitespace, punctuation (whether inserted mid-word or swapped in
+ * for the spaces), and control / zero-width characters in a single pass.
+ *
+ * SDF-11: the previous lowercase + collapse-whitespace fold was defeated by
+ * trivial obfuscation — a single inserted punctuation or zero-width character
+ * every `<window` chars broke every shingle. This fold is still best-effort
+ * verbatim detection: it does NOT defeat aggressive paraphrase or cross-script
+ * confusables (e.g. a Cyrillic «а» is a distinct code point NFKC leaves apart),
+ * and it fails toward flagging.
+ */
 function normalize(text: string): string {
-  return text.replace(/\s+/g, ' ').trim().toLowerCase();
+  return text
+    .normalize('NFKC')
+    .replace(/[^\p{L}\p{N}]/gu, '')
+    .toLowerCase();
 }
 
 /** All length-`window` substrings of `text` (stride 1). */
@@ -49,9 +65,12 @@ interface TrackedSpan {
  * Verbatim detection is a bounded shingle intersection: an output is
  * tracked only when its normalized length is ≥ `minSpanLength`, and the
  * total tracked text is FIFO-capped at `maxTrackedChars` (oldest spans
- * evicted first). Detection is therefore **best-effort** — it catches
- * verbatim / near-verbatim forwarding of untrusted content, not
- * paraphrase, and degrades gracefully past the budget. The conservative
+ * evicted first). Comparison runs over an NFKC + alphanumeric-only fold
+ * (SDF-11), so case, whitespace, inserted punctuation, zero-width and
+ * fullwidth-homoglyph obfuscation do not defeat it. Detection is therefore
+ * **best-effort** — it catches verbatim / near-verbatim forwarding of
+ * untrusted content, not aggressive paraphrase or cross-script confusables,
+ * and degrades gracefully past the budget. The conservative
  * {@link TaintLedger.untrustedSeen}/`sensitiveSeen` flags are never lossy:
  * they are the load-bearing signal for the lethal-trifecta gate.
  *

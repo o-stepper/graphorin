@@ -10,7 +10,6 @@
  * @packageDocumentation
  */
 
-import { Buffer } from 'node:buffer';
 import { createHmac, randomBytes, randomUUID } from 'node:crypto';
 
 import type { AuthTokenRecord, AuthTokenStore } from '@graphorin/core/contracts';
@@ -20,7 +19,7 @@ import { SecretValue } from '../secrets/secret-value.js';
 import { emitAuthAudit } from './audit-emitter.js';
 import { WeakPepperError } from './errors.js';
 import { validateScopeSet } from './scope.js';
-import { DEFAULT_TOKEN_PREFIX, generateRawToken, type TokenEnvironment } from './token-format.js';
+import { generateRawToken, type TokenEnvironment } from './token-format.js';
 
 /**
  * Options for `createToken(...)`.
@@ -327,6 +326,3 @@ function inferEnvFromExisting(_record: AuthTokenRecord): TokenEnvironment {
   // Phase 05 may extend the schema to persist the env label.
   return 'live';
 }
-
-void DEFAULT_TOKEN_PREFIX;
-void Buffer;
