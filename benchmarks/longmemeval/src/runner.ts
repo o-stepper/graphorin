@@ -45,6 +45,12 @@ import {
   type Scorer,
 } from '@graphorin/evals';
 import { createMemory, type Memory } from '@graphorin/memory';
+import {
+  createProvider,
+  llamaCppServerAdapter,
+  ollamaAdapter,
+  openAICompatibleAdapter,
+} from '@graphorin/provider';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
 import { createDefaultStubProvider } from './stub-provider.js';
@@ -52,6 +58,95 @@ import { createDefaultStubProvider } from './stub-provider.js';
 export const VERSION = '0.1.0';
 
 const DEFAULT_TOP_K = 12;
+
+/** The real HTTP-adapter providers the CLI can resolve, besides the offline stub. */
+const REAL_PROVIDER_NAMES = ['ollama', 'llamacpp', 'openai-compatible'] as const;
+type RealProviderName = (typeof REAL_PROVIDER_NAMES)[number];
+
+/** A provider request from CLI flags / env, before resolution (EB-1). */
+export interface BenchProviderSpec {
+  /** `stub` (default) or one of {@link REAL_PROVIDER_NAMES}. */
+  readonly name?: string;
+  /** Model id — required for every real provider. */
+  readonly model?: string;
+  /** Base URL — required for `openai-compatible`; loopback default for `ollama`/`llamacpp`. */
+  readonly baseUrl?: string;
+  /** Bearer key for `openai-compatible` (env-only; never a CLI flag). */
+  readonly apiKey?: string;
+}
+
+/** A resolved {@link Provider} plus the provenance label stamped into RESULTS. */
+export interface ResolvedBenchProvider {
+  readonly provider: Provider;
+  readonly label: string;
+}
+
+/**
+ * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default — and any
+ * `stub` name — is the deterministic offline stub, labelled
+ * `stub (plumbing-only)` so a plumbing run can never be mistaken for a real
+ * result. A real `--provider` constructs the matching HTTP adapter; the network
+ * is only touched later at `generate()` time, so this stays offline-safe (and
+ * `check-no-network` ignores `benchmarks/`).
+ *
+ * Cloud models (Anthropic/OpenAI) are reached via `openai-compatible` pointed at
+ * their OpenAI-compatible endpoint with `GRAPHORIN_BENCH_API_KEY`, or via the
+ * programmatic {@link runLongMemEvalBenchmark} path for the Vercel AI SDK route.
+ */
+export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenchProvider {
+  const name = spec.name === undefined || spec.name === '' ? 'stub' : spec.name;
+  if (name === 'stub') {
+    return { provider: createDefaultStubProvider(), label: 'stub (plumbing-only)' };
+  }
+  if (!(REAL_PROVIDER_NAMES as readonly string[]).includes(name)) {
+    throw new Error(
+      `[benchmark-longmemeval] unknown --provider '${name}'. Valid: stub, ${REAL_PROVIDER_NAMES.join(', ')}.`,
+    );
+  }
+  const model = spec.model;
+  if (model === undefined || model === '') {
+    throw new Error(
+      `[benchmark-longmemeval] --provider ${name} requires --model (or GRAPHORIN_BENCH_MODEL).`,
+    );
+  }
+  const opts = { acceptsSensitivity: ['public', 'internal'] as const };
+  const baseUrl = spec.baseUrl !== undefined && spec.baseUrl !== '' ? spec.baseUrl : undefined;
+  switch (name as RealProviderName) {
+    case 'ollama':
+      return {
+        provider: createProvider(ollamaAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }), opts),
+        label: `ollama:${model}`,
+      };
+    case 'llamacpp':
+      return {
+        provider: createProvider(
+          llamaCppServerAdapter({ model, ...(baseUrl ? { baseUrl } : {}) }),
+          opts,
+        ),
+        label: `llamacpp:${model}`,
+      };
+    default: {
+      // openai-compatible — no loopback default; a base URL is mandatory.
+      if (baseUrl === undefined) {
+        throw new Error(
+          '[benchmark-longmemeval] --provider openai-compatible requires --base-url ' +
+            '(or GRAPHORIN_BENCH_BASE_URL).',
+        );
+      }
+      return {
+        provider: createProvider(
+          openAICompatibleAdapter({
+            model,
+            baseUrl,
+            ...(spec.apiKey ? { apiKey: spec.apiKey } : {}),
+          }),
+          opts,
+        ),
+        label: `openai-compatible:${model}`,
+      };
+    }
+  }
+}
 
 type LoaderName = 'longmemeval' | 'locomo' | 'dmr';
 
@@ -345,6 +440,10 @@ interface CliArgs {
   topK?: number;
   consolidate: boolean;
   gateOn: 'all' | 'regressions';
+  /** EB-1 real-provider path (default: offline stub). */
+  providerName?: string;
+  model?: string;
+  baseUrl?: string;
 }
 
 function pkgRoot(): string {
@@ -390,6 +489,15 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     } else if (a === '--gate-on' && next !== undefined) {
       args.gateOn = next === 'regressions' ? 'regressions' : 'all';
       i++;
+    } else if (a === '--provider' && next !== undefined) {
+      args.providerName = next;
+      i++;
+    } else if (a === '--model' && next !== undefined) {
+      args.model = next;
+      i++;
+    } else if (a === '--base-url' && next !== undefined) {
+      args.baseUrl = next;
+      i++;
     } else if (a === '--smoke') {
       args.smoke = true;
     } else if (a === '--consolidate') {
@@ -399,30 +507,62 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
   return args;
 }
 
-async function writeResults(
-  resultsPath: string,
-  report: EvalReport<MemoryEvalInput, string>,
-): Promise<void> {
-  const header = [
+/**
+ * The RESULTS.md header, stamped with the provider provenance (EB-1) — a stub
+ * run is labelled `stub (plumbing-only)` so it can never read as a real result.
+ */
+export function buildResultsHeader(
+  providerLabel: string,
+  generatedAt: string = new Date().toISOString(),
+): string {
+  return [
     '# LongMemEval — memory-quality benchmark results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',
-    `_Generated: ${new Date().toISOString()}_`,
+    `**Provider:** ${providerLabel}`,
+    '',
+    `_Generated: ${generatedAt}_`,
     '',
   ].join('\n');
+}
+
+async function writeResults(
+  resultsPath: string,
+  report: EvalReport<MemoryEvalInput, string>,
+  providerLabel: string,
+): Promise<void> {
   await mkdir(dirname(resultsPath), { recursive: true });
-  await writeFile(resultsPath, `${header}${renderMarkdownReport(report)}`, 'utf8');
+  await writeFile(
+    resultsPath,
+    `${buildResultsHeader(providerLabel)}${renderMarkdownReport(report)}`,
+    'utf8',
+  );
 }
 
 export async function main(): Promise<void> {
   const args = parseArgs(process.argv);
-  console.warn(
-    '[benchmark-longmemeval] no Provider injected; using the deterministic offline stub — ' +
-      'scores are plumbing-only. Call runLongMemEvalBenchmark({ provider }) with a real ' +
-      'Provider for meaningful numbers.',
-  );
-  const provider = createDefaultStubProvider();
+  // CLI flags win; env (GRAPHORIN_BENCH_*) fills the gaps. The API key is
+  // env-only — never put a secret on the command line.
+  const providerName = args.providerName ?? process.env.GRAPHORIN_BENCH_PROVIDER;
+  const model = args.model ?? process.env.GRAPHORIN_BENCH_MODEL;
+  const baseUrl = args.baseUrl ?? process.env.GRAPHORIN_BENCH_BASE_URL;
+  const apiKey = process.env.GRAPHORIN_BENCH_API_KEY;
+  const { provider, label } = resolveBenchProvider({
+    ...(providerName !== undefined ? { name: providerName } : {}),
+    ...(model !== undefined ? { model } : {}),
+    ...(baseUrl !== undefined ? { baseUrl } : {}),
+    ...(apiKey !== undefined ? { apiKey } : {}),
+  });
+  if (label.startsWith('stub')) {
+    console.warn(
+      '[benchmark-longmemeval] no real Provider selected; using the deterministic offline stub — ' +
+        'scores are plumbing-only. Pass --provider ollama|llamacpp|openai-compatible (with --model, ' +
+        'or the GRAPHORIN_BENCH_* env vars) for meaningful numbers.',
+    );
+  } else {
+    console.log(`[benchmark-longmemeval] provider=${label}`);
+  }
   const report = await runLongMemEvalBenchmark({
     datasetPath: args.dataset,
     loader: args.loader,
@@ -438,7 +578,7 @@ export async function main(): Promise<void> {
       `cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed} ` +
       `avgMs=${report.summary.avgDurationMs.toFixed(2)}`,
   );
-  await writeResults(args.results, report);
+  await writeResults(args.results, report, label);
   if (args.json !== undefined) {
     await writeFile(args.json, JSON.stringify(report, null, 2), 'utf8');
     console.log(`[benchmark-longmemeval] wrote JSON report to ${args.json}`);

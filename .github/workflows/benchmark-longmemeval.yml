@@ -22,6 +22,19 @@ on:
         description: LongMemEval variant (S or M)
         type: string
         default: S
+      provider:
+        description: Provider to evaluate (stub = plumbing-only, no real numbers)
+        type: choice
+        default: stub
+        options:
+          - stub
+          - ollama
+          - llamacpp
+          - openai-compatible
+      model:
+        description: Model id for a real provider (ignored for stub)
+        type: string
+        default: ''
 
 concurrency:
   group: longmemeval-${{ github.ref }}
@@ -71,14 +84,21 @@ jobs:
       # regressions` fails the job only on a baseline regression. Inputs are
       # passed via env (never interpolated into the shell) to avoid injection.
       #
-      # NOTE: the runner's main() falls back to a deterministic OFFLINE STUB
-      # provider — scores are plumbing-only. Wire a real Provider (and its API
-      # key secret) into the runner to produce real LongMemEval numbers.
+      # The runner resolves its Provider from --provider (default `stub` =
+      # plumbing-only, no real numbers). Select a real provider in the dispatch
+      # form and supply its endpoint/key as repo secrets to produce real
+      # LongMemEval numbers; the emitted RESULTS header records which provider
+      # ran. PROVIDER/MODEL/base-url/key all flow via env (never interpolated
+      # into the shell) to avoid injection.
       - name: Run per-ability regression gates
         env:
           LOADER: ${{ inputs.loader }}
           DATASET_FILE: ${{ inputs.dataset_file }}
           VARIANT: ${{ inputs.variant }}
+          PROVIDER: ${{ inputs.provider }}
+          GRAPHORIN_BENCH_MODEL: ${{ inputs.model }}
+          GRAPHORIN_BENCH_BASE_URL: ${{ secrets.GRAPHORIN_BENCH_BASE_URL }}
+          GRAPHORIN_BENCH_API_KEY: ${{ secrets.GRAPHORIN_BENCH_API_KEY }}
         run: |
           set -u
           DATASET="benchmarks/.datasets/$DATASET_FILE"
@@ -89,6 +109,7 @@ jobs:
           for ability in info-extraction multi-session temporal knowledge-update abstention; do
             echo "::group::ability=$ability"
             node benchmarks/longmemeval/dist/runner.js \
+              --provider "$PROVIDER" \
               --loader "$LOADER" \
               --dataset "$DATASET" \
               --variant "$VARIANT" \
