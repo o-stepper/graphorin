@@ -57,7 +57,7 @@ The default for an unfamiliar provider is **deny everything except `public`** un
 The standalone server (`@graphorin/server`) requires every authenticated REST / WebSocket / SSE connection to present a bearer token signed with HMAC-SHA256 against a deployment-wide pepper. The unauthenticated `/v1/health` probe is exempt so liveness checks work before token verification is wired. Tokens are generated and rotated through `graphorin token`:
 
 ```bash
-graphorin token create --scope agents:invoke --ttl 30d
+graphorin token create --scopes agents:invoke --expires-in 30d
 graphorin token list
 graphorin token revoke <token-id>
 ```
@@ -79,7 +79,7 @@ Every privileged operation writes one row to the audit log:
 
 The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain.
 
-The CLI commands `graphorin audit list` / `graphorin audit verify` walk the chain and report any breaks.
+The CLI command `graphorin audit verify` walks the chain and reports any breaks (`graphorin audit export` / `prune` round out the group).
 
 ## OAuth 2.1 with PKCE
 

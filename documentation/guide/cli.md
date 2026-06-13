@@ -20,21 +20,21 @@ graphorin migrate               — run pending storage migrations
 graphorin migrate-config <path> — migrate an older graphorin.config.* file
 
 graphorin doctor                — audit POSIX modes + sanity checks
-graphorin token <subcommand>    — create / list / revoke server tokens
+graphorin token <subcommand>    — create / list / revoke / rotate / rekey / verify
 graphorin secrets <subcommand>  — list / get / set / delete / ref / rotate
-graphorin storage <subcommand>  — vacuum / size / migrate
-graphorin audit <subcommand>    — list / verify / export
-graphorin memory <subcommand>   — status / inspect / activity / review / migrate
-graphorin consolidator <subcommand> — run / status / clear-pending
-graphorin triggers <subcommand> — list / fire / pause / resume
-graphorin auth <subcommand>     — login / logout / status (OAuth flows)
-graphorin pricing <subcommand>  — show / refresh / diff / missing
+graphorin storage <subcommand>  — status / encrypt / rekey / cleanup-backups
+graphorin audit <subcommand>    — verify / prune / export
+graphorin memory <subcommand>   — status / inspect / activity / why / review / migrate
+graphorin consolidator <subcommand> — status / set-tier / stop
+graphorin triggers <subcommand> — list / status / fire / disable / prune
+graphorin auth <subcommand>     — login / list / refresh / revoke / status (OAuth flows)
+graphorin pricing <subcommand>  — status / refresh / diff / lookup / missing
 graphorin skills <subcommand>   — install / inspect / audit / migrate-frontmatter
-graphorin traces <subcommand>   — list / show
+graphorin traces <subcommand>   — status / prune
 graphorin migrate-export <path> — export a JSONL session from the local DB
-graphorin guard <subcommand>    — preview / explain memory-modification policies
-graphorin telemetry <subcommand> — show effective tracing configuration
-graphorin tools-lint <path>     — lint workspace tools against the @graphorin/eslint-plugin rules
+graphorin guard <subcommand>    — status / explain memory-modification policies
+graphorin telemetry <subcommand> — status / enable / disable / inspect
+graphorin tools lint <path>     — lint workspace tools against the @graphorin/eslint-plugin rules
 ```
 
 ## `graphorin start`
@@ -61,7 +61,7 @@ Failures are categorised by severity (`error`, `warning`, `info`) and emit actio
 ## `graphorin token`
 
 ```bash
-graphorin token create --scope agents:invoke --ttl 30d
+graphorin token create --scopes agents:invoke --expires-in 30d
 graphorin token list
 graphorin token revoke <token-id>
 ```
@@ -86,9 +86,11 @@ Use `--secrets-source <auto|keyring|encrypted-file|env>` and `--strict-secrets` 
 ## `graphorin pricing`
 
 ```bash
-graphorin pricing show
+graphorin pricing status
 graphorin pricing refresh                     # fetches a fresh snapshot on demand
 graphorin pricing diff
+graphorin pricing lookup <model>              # resolve one model's entry
+graphorin pricing missing                     # models with no pricing data
 ```
 
 The bundled snapshot is **never refreshed automatically** — only an explicit invocation of `graphorin pricing refresh` reaches the network. See [Pricing](/reference/pricing).
@@ -106,9 +108,9 @@ graphorin skills migrate-frontmatter <path>  # idempotent dry-run by default
 
 ```bash
 graphorin auth login mcp.example.com
+graphorin auth list                  # configured servers + whether a refresh token resolves
 graphorin auth refresh <server-id>   # real across restarts — the refresh token persists in the secrets store (SPL-1)
 graphorin auth revoke <server-id>    # RFC-7009 server-side revoke; the audit records 'error' when unconfirmed
-graphorin auth logout mcp.example.com
 graphorin auth status                # hasRefreshToken reflects what actually resolves
 ```
 
@@ -116,25 +118,26 @@ OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free 
 
 ## `graphorin memory`
 
-Read-only operator inspection of the long-term memory store, the quarantine review surface, plus the explicit embedder swap. `inspect`, `activity`, and `review` query the store directly and never load an embedder.
+Read-only operator inspection of the long-term memory store, the quarantine review surface, plus the explicit embedder swap. `inspect`, `activity`, `why`, and `review` query the store directly and never load an embedder.
 
 ```bash
 graphorin memory status                  # counts + active embedder + migration state
 graphorin memory inspect <fact-id>       # one fact: supersede chain, quarantine, conflicts, citing insights
 graphorin memory activity --limit 20     # store-wide consolidator / reflection activity
+graphorin memory why --session s1 --limit 5   # explain why facts were recalled (ranking signals) from persisted spans
 graphorin memory review                  # list quarantined facts / episodes / insights / procedures
 graphorin memory review --promote <id> --reason "reviewed"   # promote a reviewed item out of quarantine
 graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedders ./embedders.mjs
 ```
 
-`status`, `inspect`, `activity`, and `review` accept `--json` for a structured document. `memory inspect` and `memory activity` are the operator side of [recall explainability](/guide/memory-system#recall-explainability). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` performs an [embedder migration](/guide/memory-system#embedder-migration) — `--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`, and `--embedders` points at a module exporting the source / target factories.
+`status`, `inspect`, `activity`, `why`, and `review` accept `--json` for a structured document. `memory inspect`, `memory activity`, and `memory why` are the operator side of [recall explainability](/guide/memory-system#recall-explainability) — `why` decodes the per-fact ranking signals from the persisted recall spans (RP-17). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` performs an [embedder migration](/guide/memory-system#embedder-migration) — `--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`, and `--embedders` points at a module exporting the source / target factories.
 
 ## `graphorin consolidator`
 
 ```bash
 graphorin consolidator status
-graphorin consolidator run --phase light
-graphorin consolidator clear-pending --older-than 30d
+graphorin consolidator set-tier standard
+graphorin consolidator stop
 ```
 
 > `consolidator set-tier` / `consolidator stop` exit with code `2` (UNSUPPORTED) — there is no runtime control channel into the daemon yet, and the CLI refuses to pretend otherwise (IP-4). To change the tier, edit `consolidator.tier` in the config and restart; to stop consolidation now, stop the server process. `triggers fire` likewise points at the working server route (`POST /v1/triggers/:id/fire`).
@@ -150,10 +153,11 @@ Produces a deterministic JSONL export — see [Sessions § JSONL export schema 1
 ## `graphorin telemetry`
 
 ```bash
-graphorin telemetry show
+graphorin telemetry status
+graphorin telemetry inspect           # dump the resolved exporter + redaction config
 ```
 
-Prints the effective tracing configuration: exporters, redaction patterns, sensitivity allowlists, and the resolved `gen_ai.system` mappings. Honours the same `withValidation(...)` requirement as runtime — there is no way to disable redaction from the CLI.
+`status` prints the effective tracing configuration: exporters, redaction patterns, sensitivity allowlists, and the resolved `gen_ai.system` mappings. Honours the same `withValidation(...)` requirement as runtime — there is no way to disable redaction from the CLI.
 
 ## Privacy
 
