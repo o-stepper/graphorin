@@ -196,6 +196,8 @@ interface SubscriberRecord {
 
 interface SubscriptionRecord {
   readonly subscriberId: string;
+  /** IP-18: the authenticating principal's token id (not the connection id). */
+  readonly tokenId: string;
   readonly subscriptionId: string;
   readonly subject: string;
   readonly parsed: ParsedSubject;
@@ -351,6 +353,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     }
     const record: SubscriptionRecord = {
       subscriberId: input.subscriberId,
+      tokenId: subscriber.handle.tokenId,
       subscriptionId: input.subscriptionId,
       subject: input.subject,
       parsed: parseResult.subject,
@@ -513,7 +516,7 @@ function snapshotForRecord(record: SubscriptionRecord): WsSubscriptionSnapshot {
     subject: record.subject,
     subjectKind: record.parsed.kind,
     subscriberId: record.subscriberId,
-    tokenId: record.subscriberId,
+    tokenId: record.tokenId,
     createdAt: record.createdAt,
     lastEventId: record.lastEventId,
   });

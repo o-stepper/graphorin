@@ -38,6 +38,21 @@ describe('createWsDispatcher', () => {
     if (!result.ok) expect(result.reason).toBe('scope-denied');
   });
 
+  it('IP-18: a subscription snapshot reports the principal token id, not the connection id', () => {
+    const dispatcher = createWsDispatcher();
+    const sub = makeSubscriber(['agents:invoke:*']); // handle.id='sub-1', tokenId='tok-1'
+    dispatcher.registerSubscriber(sub.handle);
+    dispatcher.subscribe({
+      subscriberId: sub.handle.id,
+      subject: 'session:abc/events',
+      subscriptionId: 'sub-x',
+    });
+    const snaps = dispatcher.listForSubscriber(sub.handle.id);
+    expect(snaps).toHaveLength(1);
+    expect(snaps[0]?.subscriberId).toBe('sub-1');
+    expect(snaps[0]?.tokenId).toBe('tok-1'); // pre-IP-18 this was the subscriber id
+  });
+
   it('subscribes + receives a freshly emitted event with sanitization', () => {
     const dispatcher = createWsDispatcher({
       commentary: { policy: 'wrap' },
