@@ -115,7 +115,7 @@ describe('MetricRegistry', () => {
   it('produces output that conforms to Prometheus text format constraints', () => {
     const registry = createServerMetricRegistry();
     registry.set(SERVER_METRIC_NAMES.buildInfo, 1, { version: '0.4.0' });
-    registry.inc(SERVER_METRIC_NAMES.toolCallsTotal, { tool: 'fetch', status: 'ok' });
+    registry.inc(SERVER_METRIC_NAMES.triggersFiresTotal, { trigger_id: 'cron-1', status: 'ok' });
     const output = registry.render();
     // Every block must have HELP + TYPE preceding the first sample line.
     const lines = output.split('\n').filter((l) => l.length > 0);

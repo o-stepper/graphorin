@@ -26,6 +26,8 @@ import type { Context, MiddlewareHandler } from 'hono';
 import type { ServerConfigSpec } from '../config.js';
 import type { ServerVariables } from '../internal/context.js';
 import { fingerprintRequest } from '../internal/json.js';
+import { SERVER_METRIC_NAMES } from '../metrics/catalog.js';
+import type { MetricRegistry } from '../metrics/registry.js';
 
 const HEADER_NAME = 'idempotency-key';
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE']);
@@ -51,6 +53,12 @@ export interface IdempotencyMiddlewareOptions {
   readonly config: ServerConfigSpec['server']['idempotency'];
   /** Wall-clock provider; tests inject a deterministic generator. */
   readonly now?: () => number;
+  /**
+   * IP-15: when supplied, the middleware publishes a live
+   * `graphorin_idempotency_cache_hit_ratio` gauge (replays / replays+executes)
+   * instead of leaving the registered metric a permanently-empty series.
+   */
+  readonly metricRegistry?: MetricRegistry;
 }
 
 interface CacheEntry {
@@ -74,6 +82,19 @@ export function createIdempotencyMiddleware(
   const lru = new SimpleLru<string, CacheEntry>(config.lruCacheSize);
 
   const excluded = new Set(options.excludeResponseCachePaths ?? []);
+
+  // IP-15: publish the cache hit ratio as a live gauge. A "hit" is a replay
+  // served from a stored record; a "miss" is a keyed request that executed
+  // fresh. Conflicts (409) are abnormal and excluded from the ratio.
+  const registry = options.metricRegistry;
+  let hits = 0;
+  let lookups = 0;
+  const recordCacheOutcome = (hit: boolean): void => {
+    if (registry === undefined) return;
+    lookups += 1;
+    if (hit) hits += 1;
+    registry.set(SERVER_METRIC_NAMES.idempotencyCacheHitRatio, hits / lookups);
+  };
 
   return async (c, next) => {
     if (SAFE_METHODS.has(c.req.method.toUpperCase())) {
@@ -159,6 +180,7 @@ export function createIdempotencyMiddleware(
           c.header(name, value);
         }
         c.header('Idempotency-Replayed', 'true');
+        recordCacheOutcome(true);
         return new Response(JSON.stringify(record.response), {
           status: record.statusCode,
           headers: {
@@ -173,6 +195,8 @@ export function createIdempotencyMiddleware(
       await store.delete(key);
     }
 
+    // A keyed request that reaches execution is a cache miss.
+    recordCacheOutcome(false);
     await next();
 
     const status = c.res.status;

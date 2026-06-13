@@ -15,21 +15,25 @@ import { MetricRegistry } from './registry.js';
 /**
  * @stable
  */
+// IP-15: the catalog lists only metrics the server actually moves. Five
+// previously-registered series — `graphorin_tool_calls_total`,
+// `graphorin_provider_tokens_total`, `graphorin_provider_cost_usd_total`,
+// `graphorin_redaction_drops_total` and `graphorin_oauth_tokens_freshness_seconds`
+// — had no producer anywhere in the monorepo (per-tool and provider usage live
+// in the agent runtime, not the server; redaction drops in the observability
+// layer; OAuth freshness needs an MCP token store the server does not own). A
+// permanently-empty series is worse than an absent one for dashboards, so they
+// are dropped until a real producer exists rather than advertised inert.
 export const SERVER_METRIC_NAMES = Object.freeze({
   agentRunsTotal: 'graphorin_agent_runs_total',
   agentRunDuration: 'graphorin_agent_run_duration_seconds',
-  toolCallsTotal: 'graphorin_tool_calls_total',
-  providerTokensTotal: 'graphorin_provider_tokens_total',
-  providerCostUsdTotal: 'graphorin_provider_cost_usd_total',
   storageWalSize: 'graphorin_storage_wal_size_bytes',
   idempotencyCacheHitRatio: 'graphorin_idempotency_cache_hit_ratio',
   triggersFiresTotal: 'graphorin_triggers_fires_total',
-  redactionDropsTotal: 'graphorin_redaction_drops_total',
   consolidatorQueueDepth: 'graphorin_consolidator_queue_depth',
   consolidatorDlqSize: 'graphorin_consolidator_dlq_size',
   consolidatorBudgetRemainingUsd: 'graphorin_consolidator_budget_remaining_usd',
   consolidatorBudgetRemainingTokens: 'graphorin_consolidator_budget_remaining_tokens',
-  oauthTokensFreshness: 'graphorin_oauth_tokens_freshness_seconds',
   replayBufferEvents: 'graphorin_replay_buffer_events',
   inflightRuns: 'graphorin_inflight_runs',
   serverUptime: 'graphorin_server_uptime_seconds',
@@ -57,21 +61,6 @@ export function createServerMetricRegistry(): MetricRegistry {
     'Agent run duration in seconds.',
     [],
   );
-  registry.registerCounter(
-    SERVER_METRIC_NAMES.toolCallsTotal,
-    'Total tool invocations by tool id and terminal status.',
-    ['tool', 'status'],
-  );
-  registry.registerCounter(
-    SERVER_METRIC_NAMES.providerTokensTotal,
-    'Total provider tokens by direction (input/output).',
-    ['provider', 'model', 'direction'],
-  );
-  registry.registerCounter(
-    SERVER_METRIC_NAMES.providerCostUsdTotal,
-    'Total provider cost in USD.',
-    ['provider', 'model'],
-  );
   registry.registerGauge(SERVER_METRIC_NAMES.storageWalSize, 'Current SQLite WAL size in bytes.');
   registry.registerGauge(
     SERVER_METRIC_NAMES.idempotencyCacheHitRatio,
@@ -81,11 +70,6 @@ export function createServerMetricRegistry(): MetricRegistry {
     SERVER_METRIC_NAMES.triggersFiresTotal,
     'Total trigger fires by trigger id and outcome.',
     ['trigger_id', 'status'],
-  );
-  registry.registerCounter(
-    SERVER_METRIC_NAMES.redactionDropsTotal,
-    'Total redaction drops by reason and pattern bucket.',
-    ['reason', 'pattern'],
   );
   registry.registerGauge(
     SERVER_METRIC_NAMES.consolidatorQueueDepth,
@@ -103,11 +87,6 @@ export function createServerMetricRegistry(): MetricRegistry {
   registry.registerGauge(
     SERVER_METRIC_NAMES.consolidatorBudgetRemainingTokens,
     'Consolidator token budget remaining for the current period.',
-  );
-  registry.registerGauge(
-    SERVER_METRIC_NAMES.oauthTokensFreshness,
-    'Seconds since the most recent OAuth refresh per server.',
-    ['server_id'],
   );
   registry.registerGauge(
     SERVER_METRIC_NAMES.replayBufferEvents,
