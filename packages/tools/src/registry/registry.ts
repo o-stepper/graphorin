@@ -715,10 +715,13 @@ function toMatch(
 ): ToolSearchMatch {
   const bounded = Math.max(0, Math.min(1, score));
   const inputSchema = (entry.inputSchema as { _input?: unknown } | undefined) ?? {};
+  // A5: carry the output schema so code-mode can render the signature's return type.
+  const outputSchema = entry.outputSchema as Readonly<Record<string, unknown>> | undefined;
   return Object.freeze({
     name: entry.name,
     description: entry.description,
     inputSchema: inputSchema as Readonly<Record<string, unknown>>,
+    ...(outputSchema !== undefined ? { outputSchema } : {}),
     score: bounded,
     source,
   });

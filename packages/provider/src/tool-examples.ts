@@ -41,8 +41,14 @@ export function foldToolExamples(
       tool.description !== undefined && tool.description.length > 0
         ? `${tool.description}\n\n${section}`
         : section;
-    // Rebuild without `examples` — it now lives in the description text.
-    return { name: tool.name, inputSchema: tool.inputSchema, description };
+    // Rebuild without `examples` (now in the description text), preserving every
+    // other field — notably `outputSchema` (A5).
+    return {
+      name: tool.name,
+      inputSchema: tool.inputSchema,
+      description,
+      ...(tool.outputSchema !== undefined ? { outputSchema: tool.outputSchema } : {}),
+    };
   });
   return changed ? out : tools;
 }

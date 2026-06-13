@@ -241,8 +241,10 @@ import { runBridgedSource } from '@graphorin/security/sandbox';
 // Project the resolved tools as a typed code API the model can read:
 const projection = projectToolApi(registry.list());
 projection.catalogue;            // name + one-line description, grouped by source
-projection.signatureFor('list_orders'); // `tools.list_orders = (input: {…}) => Promise<unknown>`
+projection.signatureFor('list_orders'); // `tools.list_orders = (input: {…}): Promise<{…}>`
 ```
+
+A tool's `outputSchema` is rendered into the signature's return type (`Promise<…>` instead of `Promise<unknown>`), so a model writing a `code_execute` script knows what each call returns and can chain them. The same `outputSchema` is projected onto the `ToolDefinition` sent to the provider for structured-output validation.
 
 `createCodeExecuteTool({ projection, allowedTools, executeTool })` builds the `code_execute` tool. Its `executeTool` bridge is invoked for each `tools.<name>(args)` call the script makes; the agent wires it to `executor.executeOne(...)`, so a code-mode call is governed exactly like a direct one. `createCodeSearchTool({ projection, searchDeferred })` builds `code_search`, which returns matching signatures on demand.
 
