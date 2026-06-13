@@ -67,7 +67,10 @@ describe('Session export / import round-trip', () => {
     const store = new InMemorySessionStore();
     const memory = new InMemoryMemorySessionFacade(now);
     let seq = 0;
-    const idf = (p: string): string => `${p}-${String((seq += 1)).padStart(4, '0')}`;
+    const idf = (p: string): string => {
+      seq += 1;
+      return `${p}-${String(seq).padStart(4, '0')}`;
+    };
     const manager = createSessionManager({ store, memory, now, newId: idf });
     const session = await manager.create({ userId: 'u-1', agentId: 'main' });
     await session.push({ role: 'user', content: 'hello' });
