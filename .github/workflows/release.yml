@@ -5,20 +5,29 @@ on:
     branches: [main]
   workflow_dispatch:
 
-# The release job is gated on the `NPM_TOKEN` repository secret. Until
-# that secret is provisioned the job is a no-op and emits a warning so
-# accidental main-branch pushes never publish. Provisioning order:
+# Publishing uses npm **Trusted Publishing (OIDC)** — no long-lived NPM_TOKEN
+# (decision C1). GitHub Actions mints a short-lived OIDC token (`id-token: write`
+# below) that npm exchanges for publish rights, and Sigstore provenance is
+# attached automatically (`.npmrc provenance=true` + per-package
+# `publishConfig.provenance`). There is no publish credential to rotate or leak.
 #
-#   1. Add the npm token (with `automation` scope) as `NPM_TOKEN`.
-#   2. Add a Sigstore-aware OIDC trust policy on the npm side
-#      (`registry.npmjs.org`).
-#   3. Run the workflow once via `workflow_dispatch`; from then on
-#      `changesets/action` opens the "Version Packages" PR
-#      automatically and publishes when that PR merges.
+# The publish step is gated on the `RELEASE_ENABLED` **repository variable** so
+# an accidental main-branch push never publishes before the registry side is
+# configured. Maintainer provisioning order:
+#
+#   1. On npmjs.com, add a Trusted Publisher to each `@graphorin/*` package (and
+#      `graphorin`): GitHub repo `o-stepper/graphorin`, workflow `release.yml`.
+#      (For a brand-new package name, reserve + configure it first, or do one
+#      manual `npm publish` then switch it to trusted publishing.)
+#   2. Rehearse against a local registry (verdaccio) or a `workflow_dispatch`
+#      run to confirm the publish client performs the OIDC exchange.
+#   3. Set the repository variable `RELEASE_ENABLED=true`. From then on
+#      `changesets/action` opens the "Version Packages" PR automatically and
+#      publishes via OIDC when that PR merges.
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
+  id-token: write # OIDC trusted publishing + Sigstore provenance.
 
 concurrency:
   group: release-${{ github.ref }}
@@ -28,24 +37,27 @@ jobs:
   release:
     name: Version & publish via Changesets
     runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
-          persist-credentials: false
+          # changesets/action pushes the "Version Packages" branch + tags, so it
+          # needs the checkout to retain the GITHUB_TOKEN git credentials (CI-6).
+          persist-credentials: true
 
       - name: Enable Corepack
         run: corepack enable
 
+      # No `registry-url:` — under OIDC there is no NODE_AUTH_TOKEN to inject
+      # (CI-5). The repo `.npmrc` (provenance=true) + each package's
+      # `publishConfig` point at the default npm registry; auth is the OIDC
+      # exchange, not a static token.
       - name: Setup Node.js 22
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '22'
           cache: pnpm
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -53,14 +65,14 @@ jobs:
       - name: MVP readiness gate
         run: pnpm run mvp-readiness
 
-      - name: Skip publish — NPM_TOKEN not provisioned yet
-        if: ${{ env.NPM_TOKEN == '' }}
+      - name: Dry-run publish — releases not enabled yet
+        if: ${{ vars.RELEASE_ENABLED != 'true' }}
         run: |
-          echo "::warning title=Release skipped::Repository secret NPM_TOKEN is not set; running in dry-run mode."
-          pnpm -r publish --dry-run --access public --no-git-checks
+          echo "::warning title=Release skipped::Repository variable RELEASE_ENABLED is not 'true'; running in dry-run mode (configure npm Trusted Publishing first)."
+          pnpm -r publish --dry-run --no-git-checks
 
       - name: Create Release PR or Publish
-        if: ${{ env.NPM_TOKEN != '' }}
+        if: ${{ vars.RELEASE_ENABLED == 'true' }}
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           publish: pnpm run release
@@ -69,5 +81,5 @@ jobs:
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+          # No NPM_TOKEN (CI-10): OIDC mints a short-lived token per run.
           NPM_CONFIG_PROVENANCE: 'true'
