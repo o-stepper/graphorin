@@ -34,11 +34,17 @@ import ts from 'typescript';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 /**
- * Pages whose `ts` snippets must type-check. Coverage grows as each priority
- * guide's snippets are made compilable (DOC-7..11); this is the enforced floor,
- * not the ceiling.
+ * Pages whose `ts` snippets must type-check. An entry is a path (check every
+ * `ts` block) or `{ file, includes }` (check only blocks containing `includes`).
+ * Coverage grows as each priority guide's snippets are made compilable
+ * (DOC-7..11); this is the enforced floor, not the ceiling.
  */
-const CHECKED = ['documentation/guide/embedders.md', 'documentation/guide/persistence.md'];
+const CHECKED = [
+  'documentation/guide/embedders.md',
+  'documentation/guide/persistence.md',
+  // Many illustrative fragments; check just the embedder-migration snippet.
+  { file: 'documentation/guide/memory-system.md', includes: 'migrateEmbedder(' },
+];
 
 const COMPILER_OPTIONS = {
   module: ts.ModuleKind.ESNext,
@@ -59,6 +65,9 @@ const COMPILER_OPTIONS = {
   // snippet first imports one.
   baseUrl: ROOT,
   paths: {
+    // Subpath exports need their own entry (the `@graphorin/*` glob below maps
+    // the package name only). Add one per subpath a checked snippet imports.
+    '@graphorin/memory/migration': ['packages/memory/dist/migration'],
     '@graphorin/*': ['packages/*/dist'],
   },
 };
@@ -104,7 +113,12 @@ function checkSnippet(code) {
 let checked = 0;
 let failed = 0;
 
-for (const relFile of CHECKED) {
+for (const entry of CHECKED) {
+  // An entry is either a path (check every `ts` block) or `{ file, includes }`
+  // to check only the blocks whose code contains `includes` — for heavy pages
+  // where just one snippet is API-bearing and the rest are illustrative.
+  const relFile = typeof entry === 'string' ? entry : entry.file;
+  const includes = typeof entry === 'string' ? undefined : entry.includes;
   let markdown;
   try {
     markdown = readFileSync(resolve(ROOT, relFile), 'utf8');
@@ -113,6 +127,7 @@ for (const relFile of CHECKED) {
     process.exit(2);
   }
   for (const block of extractTsBlocks(markdown)) {
+    if (includes !== undefined && !block.code.includes(includes)) continue;
     checked += 1;
     const diagnostics = checkSnippet(block.code);
     if (diagnostics.length > 0) {

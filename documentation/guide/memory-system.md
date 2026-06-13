@@ -328,16 +328,21 @@ Operators inspect the rest from the CLI — `graphorin memory inspect <factId>` 
 Switching embedders silently is a footgun — old vectors are not comparable to new ones. The runner in `@graphorin/memory/migration` makes the change explicit:
 
 ```ts
-import { migrateEmbedder } from '@graphorin/memory/migration';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import { createOllamaEmbedder } from '@graphorin/embedder-ollama';
 import { createTransformersJsEmbedder } from '@graphorin/embedder-transformersjs';
+import { migrateEmbedder } from '@graphorin/memory/migration';
 
+const sqlite = await createSqliteStore({ path: './assistant.db' });
+const source = createOllamaEmbedder(); // the embedder that produced the existing vectors
 const target = createTransformersJsEmbedder({ model: 'Xenova/multilingual-e5-large' });
 
+// The default sqlite adapter wires the `nextBatch` hook for you via
+// `@graphorin/store-sqlite`; supply your own when using a custom store.
 for await (const progress of migrateEmbedder({
-  store: sqlite,
-  embeddings: sqlite.embeddings,
-  source: memory.embedder,
+  source,
   target,
+  embeddings: sqlite.embeddings,
   strategy: 'auto-migrate',
 })) {
   console.log(`${progress.processed}/${progress.total} (${progress.kind})`);
