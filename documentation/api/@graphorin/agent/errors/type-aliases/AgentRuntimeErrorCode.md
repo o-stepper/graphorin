@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -22,7 +22,8 @@ type AgentRuntimeErrorCode =
   | "merge-blocked"
   | "protocol-injection-rejected"
   | "run-state-version-unsupported"
-  | "run-state-malformed";
+  | "run-state-malformed"
+  | "concurrent-run";
 ```
 
 Defined in: packages/agent/src/errors/index.ts:16

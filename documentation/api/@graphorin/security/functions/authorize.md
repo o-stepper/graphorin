@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ function authorize(result, required):
 };
 ```
 
-Defined in: packages/security/src/auth/verify.ts:387
+Defined in: packages/security/src/auth/verify.ts:454
 
 Helper that authorises a parsed verify result against a required
 scope. Keeps the scope plumbing close to the rest of the auth

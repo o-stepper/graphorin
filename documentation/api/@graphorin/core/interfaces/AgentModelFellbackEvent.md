@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AgentModelFellbackEvent
 
-Defined in: packages/core/src/types/agent-event.ts:304
+Defined in: packages/core/src/types/agent-event.ts:313
 
 Emitted exactly once per agent-level model-fallback transition.
 Identifies the failed primary, the next model in
@@ -23,12 +23,12 @@ subsequent events flow.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:308 |
-| <a id="property-attempt"></a> `attempt` | `readonly` | `number` | packages/core/src/types/agent-event.ts:313 |
-| <a id="property-from"></a> `from` | `readonly` | `string` | packages/core/src/types/agent-event.ts:309 |
-| <a id="property-reason"></a> `reason` | `readonly` | `"rate-limit"` \| `"capacity"` \| `"context-length"` \| `"transient"` | packages/core/src/types/agent-event.ts:311 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:306 |
-| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:307 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:312 |
-| <a id="property-to"></a> `to` | `readonly` | `string` | packages/core/src/types/agent-event.ts:310 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.model.fellback"` | packages/core/src/types/agent-event.ts:305 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:317 |
+| <a id="property-attempt"></a> `attempt` | `readonly` | `number` | packages/core/src/types/agent-event.ts:322 |
+| <a id="property-from"></a> `from` | `readonly` | `string` | packages/core/src/types/agent-event.ts:318 |
+| <a id="property-reason"></a> `reason` | `readonly` | `"rate-limit"` \| `"capacity"` \| `"context-length"` \| `"transient"` | packages/core/src/types/agent-event.ts:320 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:315 |
+| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:316 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:321 |
+| <a id="property-to"></a> `to` | `readonly` | `string` | packages/core/src/types/agent-event.ts:319 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.model.fellback"` | packages/core/src/types/agent-event.ts:314 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type TriggerCallback = (payload?) => void | Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:52
+Defined in: packages/triggers/src/index.ts:59
 
 Trigger callback. Receives an optional `payload` for `event`
 triggers; for cron / interval / idle triggers `payload` is

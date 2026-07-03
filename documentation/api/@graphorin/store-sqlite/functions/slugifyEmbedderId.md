@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function slugifyEmbedderId(id): string;
 ```
 
-Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:250
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:257
 
 Translates an `embedder_id` like `'transformersjs:Xenova/multilingual-e5-base@768'`
 into a SQL-safe slug used in vec0 table names. Letters / digits stay,

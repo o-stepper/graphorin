@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:60
 new EncryptedFileSecretsStore(opts): EncryptedFileSecretsStore;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:66
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:76
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:66
 delete(key, _scope?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:118
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:148
 
 #### Parameters
 
@@ -75,7 +75,7 @@ Defined in: packages/security/src/secrets/stores/encrypted-file.ts:118
 get(key, _scope?): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:72
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:96
 
 Returns the secret if it exists, `null` otherwise.
 
@@ -102,7 +102,7 @@ Returns the secret if it exists, `null` otherwise.
 list(_scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:129
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:161
 
 Returns metadata about every key — never the values themselves.
 
@@ -128,7 +128,7 @@ Returns metadata about every key — never the values themselves.
 require(key, _scope?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:90
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:118
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -160,7 +160,7 @@ set(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/encrypted-file.ts:103
+Defined in: packages/security/src/secrets/stores/encrypted-file.ts:131
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

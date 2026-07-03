@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RememberOutcome
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:264
+Defined in: packages/memory/src/tiers/semantic-memory.ts:292
 
 Returned by [SemanticMemory.remember](/api/@graphorin/memory/classes/SemanticMemory.md#remember). The `fact` is the
 stored row (which may be the *existing* fact when the pipeline
@@ -17,7 +17,8 @@ distinguish silent dedups from active inserts.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | packages/memory/src/tiers/semantic-memory.ts:266 |
-| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | packages/memory/src/tiers/semantic-memory.ts:265 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | - | packages/memory/src/tiers/semantic-memory.ts:294 |
+| <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | - | packages/memory/src/tiers/semantic-memory.ts:293 |
+| <a id="property-quarantinereason"></a> `quarantineReason?` | `readonly` | `"injection"` \| `"synthesized"` | Why this write landed quarantined, if it did (P1-4 / MRET-3). `'injection'` — the offline injection heuristics flagged the text (a memory-poisoning candidate). `'synthesized'` — a consolidator / reflection / induction write awaiting validation. Absent when the fact is `active` or when a dedup returned a pre-existing row. | packages/memory/src/tiers/semantic-memory.ts:302 |

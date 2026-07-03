@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AnnotatedPart
 
-Defined in: packages/memory/src/context-engine/engine.ts:205
+Defined in: packages/memory/src/context-engine/engine.ts:213
 
 Single annotated `MessageContent` part assembled by the engine.
 
@@ -16,5 +16,5 @@ Single annotated `MessageContent` part assembled by the engine.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-annotation"></a> `annotation` | `readonly` | [`ContentAnnotation`](/api/@graphorin/memory/interfaces/ContentAnnotation.md) | packages/memory/src/context-engine/engine.ts:207 |
-| <a id="property-content"></a> `content` | `readonly` | [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md) | packages/memory/src/context-engine/engine.ts:206 |
+| <a id="property-annotation"></a> `annotation` | `readonly` | [`ContentAnnotation`](/api/@graphorin/memory/interfaces/ContentAnnotation.md) | packages/memory/src/context-engine/engine.ts:215 |
+| <a id="property-content"></a> `content` | `readonly` | [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md) | packages/memory/src/context-engine/engine.ts:214 |

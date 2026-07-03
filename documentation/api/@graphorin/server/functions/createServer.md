@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createServer(options?): Promise<GraphorinServer>;
 ```
 
-Defined in: packages/server/src/app.ts:386
+Defined in: packages/server/src/app.ts:392
 
 Build a fully-wired Graphorin server. The returned handle is
 inert until `start()` is awaited.

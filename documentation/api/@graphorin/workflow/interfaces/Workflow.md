@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Workflow\&lt;TState, TInput\&gt;
 
-Defined in: packages/workflow/src/types.ts:303
+Defined in: packages/workflow/src/types.ts:317
 
 Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/functions/createWorkflow.md).
 
@@ -23,8 +23,8 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:307 |
-| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:308 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:321 |
+| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:322 |
 
 ## Methods
 
@@ -34,7 +34,7 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 execute(input, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:309
+Defined in: packages/workflow/src/types.ts:323
 
 #### Parameters
 
@@ -57,7 +57,7 @@ fork(threadId, fromCheckpointId): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:317
+Defined in: packages/workflow/src/types.ts:337
 
 #### Parameters
 
@@ -80,7 +80,7 @@ Defined in: packages/workflow/src/types.ts:317
 getState(threadId): Promise<WorkflowState<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:315
+Defined in: packages/workflow/src/types.ts:335
 
 #### Parameters
 
@@ -100,7 +100,7 @@ Defined in: packages/workflow/src/types.ts:315
 listCheckpoints(threadId): Promise<readonly Checkpoint[]>;
 ```
 
-Defined in: packages/workflow/src/types.ts:316
+Defined in: packages/workflow/src/types.ts:336
 
 #### Parameters
 
@@ -123,7 +123,7 @@ resume(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:310
+Defined in: packages/workflow/src/types.ts:324
 
 #### Parameters
 
@@ -131,6 +131,31 @@ Defined in: packages/workflow/src/types.ts:310
 | ------ | ------ |
 | `threadId` | `string` |
 | `directive?` | [`Directive`](/api/@graphorin/workflow/classes/Directive.md)\<`Record`\&lt;`string`, `unknown`\&gt;, `unknown`\> |
+| `opts?` | [`WorkflowResumeOptions`](/api/@graphorin/workflow/interfaces/WorkflowResumeOptions.md) |
+
+#### Returns
+
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+
+***
+
+### retry()
+
+```ts
+retry(threadId, opts?): AsyncIterable<WorkflowEvent<TState>>;
+```
+
+Defined in: packages/workflow/src/types.ts:334
+
+Restart a `'failed'` thread from its last failure checkpoint
+(WF-3/WF-6): successful sibling tasks of the failed step replay
+from their persisted pending writes; only the failed work re-runs.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
 | `opts?` | [`WorkflowResumeOptions`](/api/@graphorin/workflow/interfaces/WorkflowResumeOptions.md) |
 
 #### Returns

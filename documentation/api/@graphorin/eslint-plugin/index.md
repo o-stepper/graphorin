@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > ESLint rules for projects that build on **Graphorin**.
 
-- **Status:** v0.4.0 — final Phase 16 ruleset.
+- **Status:** v0.5.0 — final Phase 16 ruleset.
 - **License:** [MIT](../../_media/LICENSE-4) — © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Peer dependency:** `eslint >= 9`.
@@ -42,16 +42,20 @@ export default [
 ];
 ```
 
-The bundled `recommended` config wires every active rule at the
-severities documented below; consumers can extend it directly:
+The bundled config wires every active rule at the severities documented below.
+For ESLint 9+ flat config (`eslint.config.js`), spread `flat/recommended` — it
+maps the `@graphorin` namespace to the plugin object for you:
 
 ```js
 import graphorin from '@graphorin/eslint-plugin';
 
 export default [
-  graphorin.configs.recommended,
+  graphorin.configs['flat/recommended'],
 ];
 ```
+
+The legacy `.eslintrc` form is still exported as `configs.recommended`
+(`plugins: ['@graphorin']`) for ESLint 8 consumers.
 
 ## Rules
 
@@ -97,14 +101,13 @@ for (const tool of tools) {
 
 ---
 
-**Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/eslint-plugin — ESLint plugin for projects that build on
 the Graphorin framework.
 
 Phase 16 final ruleset:
 
-  - `no-console-in-public-api`         — scaffold (no-op).
   - `no-secret-unwrap`                  — DEC-020 / ADR-026. Active.
   - `no-secret-in-deps`                 — DEC-137. Active.
   - `provider-middleware-order`         — DEC-145 / ADR-039. Active.
@@ -115,10 +118,9 @@ Phase 16 final ruleset:
   - `tool-examples-recommended`         — Active.
   - `tool-parameter-naming`             — Active.
 
-`no-console-in-public-api` is intentionally a no-op for v0.1 — the
-full implementation is a stylistic refinement that depends on the
-post-v0.1 public-API surface freeze and does not affect the
-security guarantees this plugin enforces.
+(The former `no-console-in-public-api` scaffold — a permanent no-op
+since Phase 01 — was removed in the v0.4 hygiene pass (PS-21) rather
+than shipped inert.)
 
 ## Interfaces
 
@@ -140,7 +142,7 @@ security guarantees this plugin enforces.
 | ------ | ------ |
 | [AMBIGUOUS\_PARAMETER\_NAMES](/api/@graphorin/eslint-plugin/variables/AMBIGUOUS_PARAMETER_NAMES.md) | Generic identifiers the parameter-naming rule flags as ambiguous. Tools whose `inputSchema` references only specific identifiers (e.g. `userId`, `recipientEmail`, `apiKey`) get full credit on the naming axis. |
 | [configs](/api/@graphorin/eslint-plugin/variables/configs.md) | - |
-| [default](/api/@graphorin/eslint-plugin/variables/default.md) | - |
+| [default](/api/@graphorin/eslint-plugin/variables/default.md) | PS-17: ship BOTH config shapes. `recommended` is the legacy `.eslintrc` form (`plugins: ['@graphorin']`); `flat/recommended` is the ESLint 9+ flat-config form that maps the namespace to the plugin object, so flat-config consumers can `...plugin.configs['flat/recommended']` instead of hand-wiring ten rules. |
 | [meta](/api/@graphorin/eslint-plugin/variables/meta.md) | - |
 | [PARAMETER\_NAMING\_OPT\_OUT\_TAGS](/api/@graphorin/eslint-plugin/variables/PARAMETER_NAMING_OPT_OUT_TAGS.md) | Tag values that, when present in a tool's `tags: [...]` literal, suppress the parameter-naming rule for that tool. The opt-out exists so operators can defer the rename for a long tail of pre-RB-49 tools while the framework migrates without breaking calling code. |
 | [PLACEHOLDER\_DESCRIPTIONS](/api/@graphorin/eslint-plugin/variables/PLACEHOLDER_DESCRIPTIONS.md) | Placeholder values the description-required rule treats as non-descriptions. |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ContextEngine
 
-Defined in: packages/memory/src/context-engine/engine.ts:245
+Defined in: packages/memory/src/context-engine/engine.ts:253
 
 Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextEngine.md) instance returned by
 [createContextEngine](/api/@graphorin/memory/functions/createContextEngine.md).
@@ -21,7 +21,7 @@ Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextE
 assemble(memory, input): Promise<AssembledPrompt>;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:247
+Defined in: packages/memory/src/context-engine/engine.ts:255
 
 Assemble the layered system prompt for a single step.
 
@@ -51,7 +51,7 @@ compactNow(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:267
+Defined in: packages/memory/src/context-engine/engine.ts:275
 
 Run a compaction call. Phase 12 calls this when the trigger
 fires (`source: 'auto-trigger'`) or the operator invokes
@@ -59,18 +59,22 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | \{ `agentId`: `string`; `memory`: [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md); `messages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `runId`: `string`; `scope`: [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md); `sessionId`: `string`; `signal?`: `AbortSignal`; `source`: [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md); `summarizer?`: [`CompactionSummarizer`](/api/@graphorin/memory/interfaces/CompactionSummarizer.md); \} |
-| `input.agentId` | `string` |
-| `input.memory` | [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md) |
-| `input.messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] |
-| `input.runId` | `string` |
-| `input.scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
-| `input.sessionId` | `string` |
-| `input.signal?` | `AbortSignal` |
-| `input.source` | [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md) |
-| `input.summarizer?` | [`CompactionSummarizer`](/api/@graphorin/memory/interfaces/CompactionSummarizer.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | \{ `agentId`: `string`; `memory`: [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md); `messages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `preserveRecentTurns?`: `number`; `procedural?`: \{ `tags?`: readonly `string`[]; `topic?`: `string`; \}; `runId`: `string`; `scope`: [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md); `sessionId`: `string`; `signal?`: `AbortSignal`; `source`: [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md); `summarizer?`: [`CompactionSummarizer`](/api/@graphorin/memory/interfaces/CompactionSummarizer.md); \} | - |
+| `input.agentId` | `string` | - |
+| `input.memory` | [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md) | - |
+| `input.messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
+| `input.preserveRecentTurns?` | `number` | Per-call override of the strategy's preserve-recent count (CE-3). |
+| `input.procedural?` | \{ `tags?`: readonly `string`[]; `topic?`: `string`; \} | Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). |
+| `input.procedural.tags?` | readonly `string`[] | - |
+| `input.procedural.topic?` | `string` | - |
+| `input.runId` | `string` | - |
+| `input.scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - |
+| `input.sessionId` | `string` | - |
+| `input.signal?` | `AbortSignal` | - |
+| `input.source` | [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md) | - |
+| `input.summarizer?` | [`CompactionSummarizer`](/api/@graphorin/memory/interfaces/CompactionSummarizer.md) | - |
 
 #### Returns
 
@@ -91,7 +95,7 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 config(): ResolvedContextEngineConfig;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:283
+Defined in: packages/memory/src/context-engine/engine.ts:295
 
 Resolved configuration snapshot.
 
@@ -107,7 +111,7 @@ Resolved configuration snapshot.
 shouldCompact(messages, options?): Promise<boolean>;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:258
+Defined in: packages/memory/src/context-engine/engine.ts:266
 
 Trigger evaluation primitive used by Phase 12 (agent runtime)
 at the top of every step. Returns `true` when the in-flight

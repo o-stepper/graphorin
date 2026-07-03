@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -12,6 +12,8 @@ type MCPErrorKind =
   | "protocol-error"
   | "auth-error"
   | "tool-not-found"
+  | "tool-execution"
+  | "pin-mismatch"
   | "call-timeout"
   | "cancelled"
   | "invalid-config"

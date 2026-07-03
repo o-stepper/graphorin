@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryCitingInsight
 
-Defined in: packages/cli/src/commands/memory.ts:220
+Defined in: packages/cli/src/commands/memory.ts:239
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/memory.ts:220
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/cli/src/commands/memory.ts:221 |
-| <a id="property-salience"></a> `salience` | `readonly` | `number` | packages/cli/src/commands/memory.ts:224 |
-| <a id="property-status"></a> `status` | `readonly` | `string` | packages/cli/src/commands/memory.ts:223 |
-| <a id="property-text"></a> `text` | `readonly` | `string` | packages/cli/src/commands/memory.ts:222 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/cli/src/commands/memory.ts:240 |
+| <a id="property-salience"></a> `salience` | `readonly` | `number` | packages/cli/src/commands/memory.ts:243 |
+| <a id="property-status"></a> `status` | `readonly` | `string` | packages/cli/src/commands/memory.ts:242 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/cli/src/commands/memory.ts:241 |

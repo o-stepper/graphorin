@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function parseActivationTrigger(raw): ParsedActivationTrigger;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:356
+Defined in: packages/skills/src/registry/index.ts:389
 
 Parse a single activation trigger. Slash-command bodies
 (`/skill:<name>`) are routed through the slash parser; bare names

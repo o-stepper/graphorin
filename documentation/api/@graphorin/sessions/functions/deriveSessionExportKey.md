@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function deriveSessionExportKey(passphrase, salt): Promise<Uint8Array<ArrayBufferLike>>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:222
+Defined in: packages/sessions/src/export/writer.ts:253
 
 Derive a 32-byte AES key from a passphrase + salt. Exposed for
 symmetry with the importer, which must supply the same salt to

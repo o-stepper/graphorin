@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionApi
 
-Defined in: packages/server/src/routes/sessions.ts:33
+Defined in: packages/server/src/routes/sessions.ts:32
 
 Minimal contract route handlers consume. Real deployments wire
 `@graphorin/sessions.SessionManager` in directly; tests pass a
@@ -22,7 +22,7 @@ lighter stub.
 create(input): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:39
+Defined in: packages/server/src/routes/sessions.ts:38
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/server/src/routes/sessions.ts:39
 optional exportSession(sessionId, opts): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:52
+Defined in: packages/server/src/routes/sessions.ts:51
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: packages/server/src/routes/sessions.ts:52
 get(sessionId): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:38
+Defined in: packages/server/src/routes/sessions.ts:37
 
 #### Parameters
 
@@ -90,7 +90,7 @@ Defined in: packages/server/src/routes/sessions.ts:38
 list(opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:34
+Defined in: packages/server/src/routes/sessions.ts:33
 
 #### Parameters
 
@@ -112,7 +112,7 @@ Defined in: packages/server/src/routes/sessions.ts:34
 listHandoffs(sessionId): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:51
+Defined in: packages/server/src/routes/sessions.ts:50
 
 #### Parameters
 
@@ -132,7 +132,7 @@ Defined in: packages/server/src/routes/sessions.ts:51
 listMessages(sessionId, opts): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:47
+Defined in: packages/server/src/routes/sessions.ts:46
 
 #### Parameters
 
@@ -154,7 +154,7 @@ Defined in: packages/server/src/routes/sessions.ts:47
 remove(sessionId): Promise<boolean>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:46
+Defined in: packages/server/src/routes/sessions.ts:45
 
 #### Parameters
 
@@ -174,7 +174,7 @@ Defined in: packages/server/src/routes/sessions.ts:46
 optional replaySession(sessionId, opts): AsyncIterable<unknown>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:59
+Defined in: packages/server/src/routes/sessions.ts:58
 
 #### Parameters
 

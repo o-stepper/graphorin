@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function encryptDatabase(options): Promise<EncryptDatabaseResult>;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:80
+Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:84
 
 Encrypts an unencrypted SQLite database. Returns once the target
 file has been written and verified. Throws if the source is missing,

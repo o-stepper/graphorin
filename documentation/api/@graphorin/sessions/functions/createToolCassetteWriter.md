@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createToolCassetteWriter(sink, options): ToolCassetteWriter;
 ```
 
-Defined in: packages/sessions/src/cassette/writer.ts:64
+Defined in: packages/sessions/src/cassette/writer.ts:63
 
 Build a streaming writer.
 

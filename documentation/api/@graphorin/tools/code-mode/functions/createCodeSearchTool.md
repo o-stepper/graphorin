@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function createCodeSearchTool(opts): Tool<{
 }, string>;
 ```
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:73
+Defined in: packages/tools/src/code-mode/meta-tools.ts:81
 
 Build the `code_search` meta-tool. Returns matching `tools.<name>(…)`
 signatures as text (eager substring match + the deferred pool).

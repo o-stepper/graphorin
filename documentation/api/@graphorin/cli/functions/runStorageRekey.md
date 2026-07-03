@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runStorageRekey(options): Promise<StorageRekeyResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:227
+Defined in: packages/cli/src/commands/storage.ts:224
 
 ## Parameters
 

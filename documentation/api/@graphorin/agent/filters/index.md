@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -42,7 +42,7 @@ documented in the agent-loop reference.
 | [compose](/api/@graphorin/agent/filters/functions/compose.md) | Compose multiple filters left-to-right. The composer **always** appends `stripReasoning()` at the end so reasoning content never crosses a handoff boundary regardless of caller intent. |
 | [custom](/api/@graphorin/agent/filters/functions/custom.md) | Wrap a caller-supplied function as a [DescribedFilter](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) with the canonical `'custom'` descriptor. |
 | [defaultHandoffFilter](/api/@graphorin/agent/filters/functions/defaultHandoffFilter.md) | The canonical default applied by the agent runtime to every `Agent.toTool(...)` and `handoff(...)` invocation when the caller does not supply an explicit filter. |
-| [full](/api/@graphorin/agent/filters/functions/full.md) | The full unfiltered history. Emits a deprecation warning per call — security-conscious callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead. |
+| [full](/api/@graphorin/agent/filters/functions/full.md) | The full unfiltered history. Discouraged — security-conscious callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead (a sub-agent rarely needs the parent's entire conversation). |
 | [lastN](/api/@graphorin/agent/filters/functions/lastN.md) | Keep the parent's system prompt and the last `n` non-system messages. Default `n = 10` per DEC-146 / RB-40 security-first compose. |
 | [lastUser](/api/@graphorin/agent/filters/functions/lastUser.md) | Keep only the parent's system prompt and the most recent user message. Useful for simple sub-agents that only need the question. |
 | [stripReasoning](/api/@graphorin/agent/filters/functions/stripReasoning.md) | Strip every `ReasoningContent` part from each message. Always applied at the handoff boundary (the `compose(...)` helper appends this filter automatically). |

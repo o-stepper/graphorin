@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function readWalSize(conn): number;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:286
+Defined in: packages/store-sqlite/src/connection.ts:298
 
 Returns the byte size of the WAL file, or `0` when the file is
 absent / empty. Surfaced as `graphorin.storage.wal.size_bytes`.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ type ToolChoice =
 };
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:233
+Defined in: packages/core/src/contracts/provider.ts:240
 
 Tool selection strategy.
 

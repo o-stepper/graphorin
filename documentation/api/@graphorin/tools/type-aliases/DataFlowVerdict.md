@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ type DataFlowVerdict =
 };
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:228
+Defined in: packages/tools/src/executor/executor.ts:238
 
 Verdict returned by [DataFlowGuard.inspect](/api/@graphorin/tools/interfaces/DataFlowGuard.md#inspect). Mirrors
 `@graphorin/security`'s `DataFlowDecision`; the agent maps one to the

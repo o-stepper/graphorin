@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -25,7 +25,7 @@ type BridgedSourceResult =
 };
 ```
 
-Defined in: packages/security/src/sandbox/bridged-source.ts:87
+Defined in: packages/security/src/sandbox/bridged-source.ts:90
 
 Outcome of a [runBridgedSource](/api/@graphorin/security/functions/runBridgedSource.md) run.
 
@@ -44,10 +44,10 @@ Outcome of a [runBridgedSource](/api/@graphorin/security/functions/runBridgedSou
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `durationMs` | `number` | - | packages/security/src/sandbox/bridged-source.ts:94 |
-| `ok` | `true` | - | packages/security/src/sandbox/bridged-source.ts:89 |
-| `output` | `unknown` | The script's final return value (structured-clone safe). | packages/security/src/sandbox/bridged-source.ts:91 |
-| `toolCalls` | `number` | Number of bridged tool calls the script made. | packages/security/src/sandbox/bridged-source.ts:93 |
+| `durationMs` | `number` | - | packages/security/src/sandbox/bridged-source.ts:97 |
+| `ok` | `true` | - | packages/security/src/sandbox/bridged-source.ts:92 |
+| `output` | `unknown` | The script's final return value (structured-clone safe). | packages/security/src/sandbox/bridged-source.ts:94 |
+| `toolCalls` | `number` | Number of bridged tool calls the script made. | packages/security/src/sandbox/bridged-source.ts:96 |
 
 ***
 

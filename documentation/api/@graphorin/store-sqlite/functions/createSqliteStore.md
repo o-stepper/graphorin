@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createSqliteStore(options): Promise<GraphorinSqliteStore>;
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:175
+Defined in: packages/store-sqlite/src/index.ts:196
 
 Open a SQLite-backed Graphorin store. The returned object exposes
 every contract implementation; call `init()` once before first use.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DynamicClientRegistrationResult
 
-Defined in: packages/security/src/oauth/types.ts:119
+Defined in: packages/security/src/oauth/types.ts:134
 
 Result of the Dynamic Client Registration round-trip.
 
@@ -16,8 +16,8 @@ Result of the Dynamic Client Registration round-trip.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-clientid"></a> `clientId` | `readonly` | `string` | packages/security/src/oauth/types.ts:120 |
-| <a id="property-clientidissuedat"></a> `clientIdIssuedAt?` | `readonly` | `number` | packages/security/src/oauth/types.ts:122 |
-| <a id="property-clientsecret"></a> `clientSecret?` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | packages/security/src/oauth/types.ts:121 |
-| <a id="property-clientsecretexpiresat"></a> `clientSecretExpiresAt?` | `readonly` | `number` | packages/security/src/oauth/types.ts:123 |
-| <a id="property-raw"></a> `raw?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/security/src/oauth/types.ts:124 |
+| <a id="property-clientid"></a> `clientId` | `readonly` | `string` | packages/security/src/oauth/types.ts:135 |
+| <a id="property-clientidissuedat"></a> `clientIdIssuedAt?` | `readonly` | `number` | packages/security/src/oauth/types.ts:137 |
+| <a id="property-clientsecret"></a> `clientSecret?` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | packages/security/src/oauth/types.ts:136 |
+| <a id="property-clientsecretexpiresat"></a> `clientSecretExpiresAt?` | `readonly` | `number` | packages/security/src/oauth/types.ts:138 |
+| <a id="property-raw"></a> `raw?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/security/src/oauth/types.ts:139 |

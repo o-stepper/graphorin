@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:77
+Defined in: packages/memory/src/internal/storage-adapter.ts:99
 
 Extension of the typed `SemanticMemoryStore` with optional
 embedding-aware helpers + lifecycle helpers that storage adapters
@@ -20,13 +20,37 @@ may expose.
 
 ## Methods
 
+### count()?
+
+```ts
+optional count(scope): Promise<number>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:133
+
+Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
+the default recall filters (live, non-archived, non-quarantined), never
+materialising rows. Powers honest `metadata()` counts.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+***
+
 ### forget()
 
 ```ts
 forget(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:72
+Defined in: packages/core/dist/contracts/memory-store.d.ts:90
 
 #### Parameters
 
@@ -51,7 +75,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:72
 optional get(id): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:96
+Defined in: packages/memory/src/internal/storage-adapter.ts:118
 
 Lookup a single fact by id (returns `null` when absent or soft-deleted).
 
@@ -73,7 +97,7 @@ Lookup a single fact by id (returns `null` when absent or soft-deleted).
 optional historyOf(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:121
+Defined in: packages/memory/src/internal/storage-adapter.ts:149
 
 Walk the bi-temporal supersede chain that `factId` belongs to and
 return every fact in it, oldest → newest (by `validFrom`),
@@ -102,7 +126,7 @@ cycle-safe; returns `[]` for an unknown id. Powers
 optional purge(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:111
+Defined in: packages/memory/src/internal/storage-adapter.ts:139
 
 Hard-delete a fact (GDPR path). The audit log row is preserved
 but the row itself + every per-embedder vec0 entry is removed.
@@ -127,7 +151,7 @@ Distinct from [SemanticMemoryStore.forget](/api/@graphorin/memory/interfaces/Sem
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:69
+Defined in: packages/core/dist/contracts/memory-store.d.ts:87
 
 #### Parameters
 
@@ -151,7 +175,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:69
 optional rememberWithEmbedding(fact, options): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:78
+Defined in: packages/memory/src/internal/storage-adapter.ts:100
 
 #### Parameters
 
@@ -172,7 +196,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:78
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:70
+Defined in: packages/core/dist/contracts/memory-store.d.ts:88
 
 #### Parameters
 
@@ -203,7 +227,7 @@ optional searchVector(
 includeQuarantined?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:79
+Defined in: packages/memory/src/internal/storage-adapter.ts:101
 
 #### Parameters
 
@@ -231,7 +255,7 @@ optional setStatus(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:105
+Defined in: packages/memory/src/internal/storage-adapter.ts:127
 
 Set a fact's retrieval-trust `status` and write a `memory_history`
 audit row (P1-4). Promotes a quarantined fact to `active` (the
@@ -263,7 +287,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:71
+Defined in: packages/core/dist/contracts/memory-store.d.ts:89
 
 #### Parameters
 

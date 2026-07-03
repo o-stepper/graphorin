@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function mergeAndDedupe<TRecord>(lists): readonly MergedEntry<TRecord>[];
 ```
 
-Defined in: reranker.ts:256
+Defined in: reranker.ts:277
 
 Merge per-source lists, keeping the highest initial score per record
 id. Pure function; exported for the unit fixture.

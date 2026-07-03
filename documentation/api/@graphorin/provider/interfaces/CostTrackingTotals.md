@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -8,8 +8,8 @@
 
 Defined in: packages/provider/src/middleware/with-cost-tracking.ts:22
 
-Aggregated totals exposed via [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md)'s
-`accumulator()` callback.
+Aggregated totals for one `provider × model`, returned by
+[CostAccumulator.totalFor](/api/@graphorin/provider/interfaces/CostAccumulator.md#totalfor) / [CostAccumulator.totals](/api/@graphorin/provider/interfaces/CostAccumulator.md#totals).
 
 ## Stable
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AutoRecallStrategyContext
 
-Defined in: packages/memory/src/context-engine/auto-recall.ts:21
+Defined in: packages/memory/src/context-engine/auto-recall.ts:22
 
 Per-call scope passed to a custom strategy.
 
@@ -16,5 +16,5 @@ Per-call scope passed to a custom strategy.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-lastusermessage"></a> `lastUserMessage` | `readonly` | `string` | packages/memory/src/context-engine/auto-recall.ts:23 |
-| <a id="property-locale"></a> `locale` | `readonly` | `string` | packages/memory/src/context-engine/auto-recall.ts:22 |
+| <a id="property-lastusermessage"></a> `lastUserMessage` | `readonly` | `string` | packages/memory/src/context-engine/auto-recall.ts:24 |
+| <a id="property-locale"></a> `locale` | `readonly` | `string` | packages/memory/src/context-engine/auto-recall.ts:23 |

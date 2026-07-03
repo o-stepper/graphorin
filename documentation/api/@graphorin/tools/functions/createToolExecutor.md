@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,9 +10,7 @@
 function createToolExecutor(opts): ToolExecutor;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:278
-
-Build a [ToolExecutor](/api/@graphorin/tools/interfaces/ToolExecutor.md) bound to a registry.
+Defined in: packages/tools/src/executor/executor.ts:311
 
 ## Parameters
 
@@ -23,5 +21,3 @@ Build a [ToolExecutor](/api/@graphorin/tools/interfaces/ToolExecutor.md) bound t
 ## Returns
 
 [`ToolExecutor`](/api/@graphorin/tools/interfaces/ToolExecutor.md)
-
-## Stable

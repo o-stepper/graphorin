@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: TokenVerifierStatus
 
-Defined in: packages/security/src/auth/verify.ts:130
+Defined in: packages/security/src/auth/verify.ts:138
 
 Diagnostic snapshot for the rate limiter and concurrent-verify cap.
 Used by health endpoints / `graphorin doctor` once those ship.
@@ -15,9 +15,10 @@ Used by health endpoints / `graphorin doctor` once those ship.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-cachesize"></a> `cacheSize` | `readonly` | `number` | packages/security/src/auth/verify.ts:131 |
-| <a id="property-inflight"></a> `inFlight` | `readonly` | `number` | packages/security/src/auth/verify.ts:132 |
-| <a id="property-periplockouts"></a> `perIpLockouts` | `readonly` | `number` | packages/security/src/auth/verify.ts:133 |
-| <a id="property-pertokenlockouts"></a> `perTokenLockouts` | `readonly` | `number` | packages/security/src/auth/verify.ts:134 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-cachesize"></a> `cacheSize` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:139 |
+| <a id="property-inflight"></a> `inFlight` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:140 |
+| <a id="property-peripfailures"></a> `perIpFailures` | `readonly` | `number` | Distinct IPs currently in the failure window map (SPL-19, capped). | packages/security/src/auth/verify.ts:142 |
+| <a id="property-periplockouts"></a> `perIpLockouts` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:143 |
+| <a id="property-pertokenlockouts"></a> `perTokenLockouts` | `readonly` | `number` | - | packages/security/src/auth/verify.ts:144 |

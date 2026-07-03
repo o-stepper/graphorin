@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runFanOut<TOutput>(opts): Promise<FanOutResult<TOutput>>;
 ```
 
-Defined in: packages/agent/src/fanout/index.ts:210
+Defined in: packages/agent/src/fanout/index.ts:330
 
 Run a fan-out and produce the aggregate [FanOutResult](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md).
 Pure with respect to side effects — the runtime emits events /

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createAgent<TDeps, TOutput>(config): Agent<TDeps, TOutput>;
 ```
 
-Defined in: packages/agent/src/factory.ts:625
+Defined in: packages/agent/src/factory.ts:757
 
 Build a fresh [Agent](/api/@graphorin/agent/interfaces/Agent.md) from the supplied configuration.
 

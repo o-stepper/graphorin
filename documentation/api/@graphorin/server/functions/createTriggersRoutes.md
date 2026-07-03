@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createTriggersRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/triggers/routes.ts:36
+Defined in: packages/server/src/triggers/routes.ts:37
 
 ## Parameters
 

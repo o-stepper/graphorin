@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetAuditDbBindingsForTesting(): void;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:175
+Defined in: packages/security/src/audit/audit-db.ts:177
 
 **`Experimental`**
 

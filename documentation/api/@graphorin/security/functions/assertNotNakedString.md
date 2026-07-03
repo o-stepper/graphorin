@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function assertNotNakedString(input): void;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:653
+Defined in: packages/security/src/secrets/secret-ref.ts:661
 
 Reject naked strings (no scheme) at validation time. Used by the
 resolver dispatcher so a typo in `*Ref` config does not silently fall

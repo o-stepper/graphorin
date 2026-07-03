@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,14 +10,18 @@
 function extractPairScores(raw, pairCount): number[];
 ```
 
-Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:104
+Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:120
 
 **`Internal`**
 
-Normalises the raw pipeline output to a flat `score[]` aligned with
-the input pair order. Cross-encoder classifiers return either a
-single-best `{label, score}` per pair or an array of `topk` entries
-— we collapse on the highest-scoring positive label.
+Normalises the raw pipeline output to a flat `score[]` aligned with the input
+pair order. Cross-encoder classifiers return either a single-best
+`{label, score}` per pair (the default single-logit bge exports) or an array
+of `topk` entries. For the array shape we read the POSITIVE label's
+confidence — NOT the max of any label (PS-16): an irrelevant pair's most
+confident class is the *negative* one, so taking the max would invert the
+ranking for any 2-label classifier. When no label looks positive (single-logit
+or unrecognised labels) we fall back to the top score.
 
 ## Parameters
 

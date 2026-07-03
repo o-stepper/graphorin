@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function matchesGlob(packageName, pattern): boolean;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:173
+Defined in: packages/security/src/supply-chain/policy.ts:200
 
 Glob match for npm package patterns. Implements:
 

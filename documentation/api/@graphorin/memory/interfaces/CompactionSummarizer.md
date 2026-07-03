@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CompactionSummarizer
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:140
+Defined in: packages/memory/src/context-engine/compaction/types.ts:202
 
 Summarizer adapter — accepts a prompt and returns the produced
 summary. The Phase 06 `Provider` adapters implement this
@@ -20,7 +20,7 @@ does not take the heavier `Provider` dependency directly.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:152 |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:214 |
 
 ## Methods
 
@@ -33,7 +33,7 @@ summarize(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:146
+Defined in: packages/memory/src/context-engine/compaction/types.ts:208
 
 Produce a summary text for the supplied prompt. The prompt is
 built by the compactor using the configured 9-section template;

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryCommonOptions
 
-Defined in: packages/cli/src/commands/memory.ts:33
+Defined in: packages/cli/src/commands/memory.ts:34
 
 ## Stable
 
@@ -19,12 +19,14 @@ Defined in: packages/cli/src/commands/memory.ts:33
 - [`MemoryActivityOptions`](/api/@graphorin/cli/interfaces/MemoryActivityOptions.md)
 - [`MemoryInspectOptions`](/api/@graphorin/cli/interfaces/MemoryInspectOptions.md)
 - [`MemoryMigrateOptions`](/api/@graphorin/cli/interfaces/MemoryMigrateOptions.md)
+- [`MemoryReviewOptions`](/api/@graphorin/cli/interfaces/MemoryReviewOptions.md)
+- [`MemoryWhyOptions`](/api/@graphorin/cli/interfaces/MemoryWhyOptions.md)
 
 ## Properties
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | packages/cli/src/commands/memory.ts:34 |
+| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | packages/cli/src/commands/memory.ts:35 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | `CommonOutputOptions.json` | packages/cli/src/internal/output.ts:71 |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam — capture JSON documents instead of writing to stdout. | `CommonOutputOptions.jsonPrint` | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | `CommonOutputOptions.nonInteractive` | packages/cli/src/internal/output.ts:73 |

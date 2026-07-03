@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: WorkflowEdge\&lt;TState\&gt;
 
-Defined in: packages/workflow/src/types.ts:205
+Defined in: packages/workflow/src/types.ts:212
 
 Edge between two nodes. Edges with a `when` predicate fire only
 when the predicate evaluates to truthy; unconditional edges always
@@ -24,6 +24,6 @@ fire when the source node completes.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-from"></a> `from` | `readonly` | `string` | packages/workflow/src/types.ts:206 |
-| <a id="property-to"></a> `to` | `readonly` | `string` | packages/workflow/src/types.ts:207 |
-| <a id="property-when"></a> `when?` | `readonly` | [`EdgePredicate`](/api/@graphorin/workflow/type-aliases/EdgePredicate.md)\&lt;`TState`\&gt; | packages/workflow/src/types.ts:208 |
+| <a id="property-from"></a> `from` | `readonly` | `string` | packages/workflow/src/types.ts:213 |
+| <a id="property-to"></a> `to` | `readonly` | `string` | packages/workflow/src/types.ts:214 |
+| <a id="property-when"></a> `when?` | `readonly` | [`EdgePredicate`](/api/@graphorin/workflow/type-aliases/EdgePredicate.md)\&lt;`TState`\&gt; | packages/workflow/src/types.ts:215 |

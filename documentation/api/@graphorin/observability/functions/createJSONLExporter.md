@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,10 +7,10 @@
 # Function: createJSONLExporter()
 
 ```ts
-function createJSONLExporter(opts): TraceExporter;
+function createJSONLExporter(opts): JSONLExporter;
 ```
 
-Defined in: packages/observability/src/exporters/jsonl.ts:58
+Defined in: packages/observability/src/exporters/jsonl.ts:75
 
 Build a JSONL trace exporter. Call `withValidation(exporter)` before
 passing the result to `createTracer({ exporters })`.
@@ -23,6 +23,6 @@ passing the result to `createTracer({ exporters })`.
 
 ## Returns
 
-[`TraceExporter`](/api/@graphorin/observability/interfaces/TraceExporter.md)
+`JSONLExporter`
 
 ## Stable

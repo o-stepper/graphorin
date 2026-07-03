@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -31,7 +31,7 @@ type ServerIdentity =
 };
 ```
 
-Defined in: packages/mcp/src/transport/types.ts:81
+Defined in: packages/mcp/src/transport/types.ts:78
 
 Server identity descriptor attached to every MCP-derived `Tool`.
 Mirrors the shape consumed by the tool-registry collision

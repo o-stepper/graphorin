@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function pickTopTierAcrossTools(hints):
   | undefined;
 ```
 
-Defined in: packages/agent/src/preferred-model/index.ts:82
+Defined in: packages/agent/src/preferred-model/index.ts:84
 
 Pick the highest-cost tier across the supplied per-tool hints.
 Explicit `ModelSpec` entries are treated as the highest tier

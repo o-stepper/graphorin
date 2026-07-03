@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: SessionError
 
-Defined in: packages/sessions/src/errors/index.ts:37
+Defined in: packages/sessions/src/errors/index.ts:38
 
 Base class for every error thrown from `@graphorin/sessions`.
 
@@ -30,6 +30,7 @@ Base class for every error thrown from `@graphorin/sessions`.
 - [`SessionExportChecksumMismatchError`](/api/@graphorin/sessions/errors/classes/SessionExportChecksumMismatchError.md)
 - [`SessionExportEncryptionRequiredError`](/api/@graphorin/sessions/errors/classes/SessionExportEncryptionRequiredError.md)
 - [`SessionNotFoundError`](/api/@graphorin/sessions/errors/classes/SessionNotFoundError.md)
+- [`SessionClosedError`](/api/@graphorin/sessions/errors/classes/SessionClosedError.md)
 - [`AgentNotFoundError`](/api/@graphorin/sessions/errors/classes/AgentNotFoundError.md)
 
 ## Constructors
@@ -43,7 +44,7 @@ new SessionError(
    name?): SessionError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:39
+Defined in: packages/sessions/src/errors/index.ts:40
 
 #### Parameters
 
@@ -68,7 +69,7 @@ Error.constructor
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | `Error.cause` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-code"></a> `code` | `readonly` | [`SessionErrorCode`](/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md) | - | - | packages/sessions/src/errors/index.ts:38 |
+| <a id="property-code"></a> `code` | `readonly` | [`SessionErrorCode`](/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md) | - | - | packages/sessions/src/errors/index.ts:39 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | `Error.message` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | `Error.name` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | `Error.stack` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -27,7 +27,7 @@ type HandoffInputFilterStep =
 };
 ```
 
-Defined in: packages/skills/src/types/index.ts:211
+Defined in: packages/skills/src/types/index.ts:222
 
 Composable step recognised inside `graphorin-handoff-input-filter:
 { compose: [...] }`. The runtime resolves named steps into actual

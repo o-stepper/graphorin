@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function countMessageTokens(messages, counter): Promise<number>;
 ```
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:72
+Defined in: packages/memory/src/context-engine/token-counter.ts:90
 
 Count tokens across a message list using a [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md)
 (or the heuristic fallback). Used by the trigger-evaluation hot

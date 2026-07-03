@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RunError
 
-Defined in: packages/core/src/types/run.ts:119
+Defined in: packages/core/src/types/run.ts:146
 
 Failure carried by `RunState.error`. The shape mirrors the wire format
 used by `agent.error` events.
@@ -17,6 +17,6 @@ used by `agent.error` events.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-code"></a> `code` | `readonly` | `string` | packages/core/src/types/run.ts:121 |
-| <a id="property-details"></a> `details?` | `readonly` | `unknown` | packages/core/src/types/run.ts:122 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/types/run.ts:120 |
+| <a id="property-code"></a> `code` | `readonly` | `string` | packages/core/src/types/run.ts:148 |
+| <a id="property-details"></a> `details?` | `readonly` | `unknown` | packages/core/src/types/run.ts:149 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/types/run.ts:147 |

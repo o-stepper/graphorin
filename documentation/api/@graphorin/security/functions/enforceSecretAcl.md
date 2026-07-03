@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,10 +10,7 @@
 function enforceSecretAcl(key): void;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:63
-
-Throw `SecretAccessDeniedError` if a tool context is active and the
-key is not in its allowlist. No-op when no tool context is active.
+Defined in: packages/security/src/secrets/acl.ts:78
 
 ## Parameters
 
@@ -24,5 +21,3 @@ key is not in its allowlist. No-op when no tool context is active.
 ## Returns
 
 `void`
-
-## Stable

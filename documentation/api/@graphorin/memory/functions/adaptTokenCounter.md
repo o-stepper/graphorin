@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function adaptTokenCounter(counter): ContextTokenCounter;
 ```
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:54
+Defined in: packages/memory/src/context-engine/token-counter.ts:72
 
 Wrap a real [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) into the narrower
 [ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface. Calls `countText(text)`

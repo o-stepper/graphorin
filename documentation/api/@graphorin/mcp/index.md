@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -18,8 +18,8 @@ MCP-derived tools, the structured-content + outputSchema
 round-trip with backward-compatible TextContent mirror, the
 deferred-loading auto-default at the 10-tool threshold, the
 collision-strategy + per-server priority handoff to the tool
-registry, an `EventStore` contract for resumable Streamable HTTP
-sessions, and the OAuth bridge that resolves bearer headers from
+registry, honest Streamable HTTP session semantics, and the OAuth
+bridge that resolves bearer headers from
 the existing outbound OAuth subsystem in `@graphorin/security`.
 
 ## Highlights
@@ -68,18 +68,17 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
   request, debounces concurrent refreshes via the OAuth
   subsystem's in-flight de-duplication, and emits the
   `mcp.auth.expired` lifecycle event when a refresh fails.
-- **Resumable streaming sessions.** The `EventStore` interface and
-  the default `InMemoryEventStore` (capacity `1024`) implement the
-  Streamable HTTP `Mcp-Session-Id` + `Last-Event-ID` resume
-  handshake. Pluggable adapters (a SQLite-backed store from
-  `@graphorin/store-sqlite` for cross-restart durability) follow
-  the same interface.
+- **Streamable HTTP sessions.** The client persists the assigned
+  `Mcp-Session-Id` and the SDK transport auto-reconnects with
+  `Last-Event-ID` after a transient disconnect. Event replay is the
+  SERVER's responsibility per the Streamable HTTP spec — the client
+  surfaces `sessionIdPresent` (stateful routing detected; not a
+  replay guarantee).
 
 ## Stable sub-paths
 
 ```ts
 import { createMCPClient } from '@graphorin/mcp/client';
-import { InMemoryEventStore } from '@graphorin/mcp/event-store';
 import { createOAuthAuthorizationProvider } from '@graphorin/mcp/oauth';
 import {
   formatMCPServerName,
@@ -184,35 +183,40 @@ const issues = await createMCPClient({
   transport: {
     kind: 'streamable-http',
     url: 'https://issues.example.com/mcp',
-    headers: { Authorization: await authProvider.resolveHeader() },
   },
+  // The client installs a per-request fetch-wrapper that calls
+  // `authProvider.resolveHeader()` on every outgoing request, so the
+  // refresh-ahead window fires automatically and a long-lived session
+  // survives token expiry without re-creating the client. Do **not**
+  // resolve the token once into static `headers` — that pins a single
+  // token and defeats the refresh.
   authProvider,
 });
 ```
 
-## Resumable streaming sessions
-
-When the MCP server advertises Streamable HTTP session support on
-`initialize`, the client persists the assigned `Mcp-Session-Id`
-header and replays missed events from the configured
-`EventStore` after a transient disconnect (per the Streamable HTTP
-resume handshake the spec defines). The default
-`InMemoryEventStore` keeps a per-session ring buffer of `1024`
-events; the buffer is fixed-size so the runtime degrades
-gracefully under sustained pressure. For cross-restart
-durability, point the client at a SQLite-backed `EventStore` from
-`@graphorin/store-sqlite`.
+For a rare pre-shared token, pass `bearerToken` instead (mutually
+exclusive with `authProvider`; supplying both throws
+`MCPInvalidConfigError`):
 
 ```ts
-import { InMemoryEventStore, createMCPClient } from '@graphorin/mcp';
-
-const eventStore = new InMemoryEventStore({ capacity: 4096 });
-
 const issues = await createMCPClient({
   transport: { kind: 'streamable-http', url: 'https://issues.example.com/mcp' },
-  eventStore,
+  bearerToken: process.env.ISSUES_MCP_TOKEN!,
 });
 ```
+
+## Streamable HTTP sessions
+
+When the MCP server assigns an `Mcp-Session-Id` on `initialize`, the
+client persists it for stateful routing and exposes
+`client.sessionIdPresent` (`client.resumable` is its deprecated
+alias). A session id is **not** a replay guarantee: per the
+Streamable HTTP spec, event replay is the **server's**
+responsibility, and the SDK transport already auto-reconnects with
+the `Last-Event-ID` header after a transient disconnect — no client
+configuration needed. (The former client-side `eventStore` option
+was removed: a client-held store cannot drive replay; passing the
+legacy option logs a warning.)
 
 ### Reverse-proxy operational note
 
@@ -295,7 +299,7 @@ MIT — © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
@@ -304,7 +308,6 @@ MIT — © 2026 Oleksiy Stepurenko.
 | [](/api/@graphorin/mcp/README.md) | `@graphorin/mcp` — Model Context Protocol client for the Graphorin framework. |
 | [client](/api/@graphorin/mcp/client/index.md) | Public surface for the MCP client. |
 | [errors](/api/@graphorin/mcp/errors/index.md) | Typed error union for the `@graphorin/mcp` package. |
-| [event-store](/api/@graphorin/mcp/event-store/index.md) | Pluggable event-store surface for `@graphorin/mcp`. |
 | [helpers](/api/@graphorin/mcp/helpers/index.md) | Helper utilities exposed by `@graphorin/mcp`. |
 | [oauth](/api/@graphorin/mcp/oauth/index.md) | OAuth integration surface for `@graphorin/mcp`. |
 | [transport](/api/@graphorin/mcp/transport/index.md) | Transport descriptors + identity helpers for `@graphorin/mcp`. |

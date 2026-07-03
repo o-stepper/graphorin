@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: GraphorinClient
 
-Defined in: packages/client/src/graphorin-client.ts:170
+Defined in: packages/client/src/graphorin-client.ts:188
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/client/src/graphorin-client.ts:170
 new GraphorinClient(options): GraphorinClient;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:180
+Defined in: packages/client/src/graphorin-client.ts:200
 
 #### Parameters
 
@@ -42,7 +42,7 @@ get transportKind():
   | undefined;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:399
+Defined in: packages/client/src/graphorin-client.ts:445
 
 Return the active transport kind (or `undefined` if not connected).
 
@@ -59,7 +59,7 @@ Return the active transport kind (or `undefined` if not connected).
 cancel(runId, opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:278
+Defined in: packages/client/src/graphorin-client.ts:323
 
 Cancel a server-side run. Sends the `run.cancel` RPC and
 resolves with the server's `result` payload (typically
@@ -87,7 +87,7 @@ resolves with the server's `result` payload (typically
 cancelNotify(requestId): void;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:357
+Defined in: packages/client/src/graphorin-client.ts:403
 
 Send an MCP-compatible cancellation notification. Does not wait
 for a server reply (notifications have no `id`).
@@ -110,7 +110,7 @@ for a server reply (notifications have no `id`).
 connect(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:195
+Defined in: packages/client/src/graphorin-client.ts:215
 
 Open the underlying transport. Resolves once the server has
 accepted the handshake (`'open'`); rejects with a typed
@@ -131,7 +131,7 @@ it during another `connect()` returns the same promise.
 disconnect(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:375
+Defined in: packages/client/src/graphorin-client.ts:421
 
 Disconnect the underlying transport and abort every pending RPC
 + subscription. Idempotent.
@@ -148,7 +148,7 @@ Disconnect the underlying transport and abort every pending RPC
 ping(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:229
+Defined in: packages/client/src/graphorin-client.ts:249
 
 Send a `ping` RPC and resolve when the server replies with `pong`.
 
@@ -167,14 +167,15 @@ resume(
 opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:311
+Defined in: packages/client/src/graphorin-client.ts:357
 
 Resume a paused (HITL) run. The WebSocket protocol intentionally
 does NOT carry a `resume` control message — resumes are durable
-+ idempotent + body-carrying, which maps cleanly onto the REST
-endpoint `POST /v1/runs/:runId/resume` (Phase 14a). The client
-forwards the call via the supplied `fetch` implementation so
-subscribers continue to receive events on the same WS connection.
++ idempotent + body-carrying, which maps onto the REST endpoint
+`POST /v1/runs/:runId/resume`. NOTE (IP-14): the server endpoint
+currently answers **501** — server-side durable resume is not
+implemented yet. Library-mode callers resume directly:
+`agent.run(result.state, { directive })`.
 
 #### Parameters
 
@@ -194,10 +195,10 @@ subscribers continue to receive events on the same WS connection.
 ### subscribe()
 
 ```ts
-subscribe(target): Promise<Subscription>;
+subscribe(target, opts?): Promise<Subscription>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:239
+Defined in: packages/client/src/graphorin-client.ts:259
 
 Subscribe to a server-side event stream. Resolves with a
 [Subscription](/api/@graphorin/client/client/interfaces/Subscription.md) once the server confirms with the matching
@@ -209,6 +210,8 @@ Subscribe to a server-side event stream. Resolves with a
 | Parameter | Type |
 | ------ | ------ |
 | `target` | [`SubscriptionTarget`](/api/@graphorin/client/client/type-aliases/SubscriptionTarget.md) |
+| `opts?` | \{ `sinceEventId?`: `string`; \} |
+| `opts.sinceEventId?` | `string` |
 
 #### Returns
 

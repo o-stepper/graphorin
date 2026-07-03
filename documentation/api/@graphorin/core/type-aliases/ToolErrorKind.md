@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -21,7 +21,7 @@ type ToolErrorKind =
   | "rate_limited";
 ```
 
-Defined in: packages/core/src/types/tool.ts:217
+Defined in: packages/core/src/types/tool.ts:224
 
 Discriminator used by `ToolError.kind`. The list is exhaustive: any new
 kind must extend the union here and every `assertNever` switch.

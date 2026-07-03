@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -19,5 +19,5 @@ sidecar table for efficient listing.
 | ------ | ------ | ------ | ------ |
 | <a id="property-nodename"></a> `nodeName?` | `readonly` | `string` | packages/core/src/contracts/checkpoint-store.ts:38 |
 | <a id="property-source"></a> `source` | `readonly` | `"sync"` \| `"async"` \| `"exit"` | packages/core/src/contracts/checkpoint-store.ts:36 |
-| <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` | packages/core/src/contracts/checkpoint-store.ts:37 |
+| <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | packages/core/src/contracts/checkpoint-store.ts:37 |
 | <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/core/src/contracts/checkpoint-store.ts:39 |

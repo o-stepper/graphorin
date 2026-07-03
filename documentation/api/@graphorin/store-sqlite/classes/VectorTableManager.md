@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -69,7 +69,7 @@ concrete table name (which the caller uses in their `INSERT INTO`
 knownTables(): readonly string[];
 ```
 
-Defined in: packages/store-sqlite/src/vector-table-mgr.ts:47
+Defined in: packages/store-sqlite/src/vector-table-mgr.ts:51
 
 **`Internal`**
 

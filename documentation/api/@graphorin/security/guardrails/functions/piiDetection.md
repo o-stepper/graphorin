@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function piiDetection<TValue>(opts?): GuardrailDefinition<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:98
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:127
 
 Construct the PII detection guardrail.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function buildSummarizerPrompt(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:68
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:73
 
 Build the prompt the summarizer LLM receives. The prompt
 contains:
@@ -21,9 +21,9 @@ contains:
  3. A delimited dump of the older messages the harness is about
     to drop.
 
-The summarizer must produce sections 1-7 + 9. Section 8 is
-stitched in by the harness before the result is committed to
-the in-flight buffer.
+The summarizer produces every section except the last two; those
+(recent turns + metadata) are stitched in by the harness before the
+result is committed to the in-flight buffer.
 
 ## Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,10 +7,10 @@
 # Function: getOAuthStatus()
 
 ```ts
-function getOAuthStatus(storage): Promise<OAuthStatusSnapshot>;
+function getOAuthStatus(storage, options?): Promise<OAuthStatusSnapshot>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:222
+Defined in: packages/security/src/oauth/library.ts:248
 
 Build the snapshot returned by `graphorin auth status` (Phase 15).
 
@@ -19,6 +19,8 @@ Build the snapshot returned by `graphorin auth status` (Phase 15).
 | Parameter | Type |
 | ------ | ------ |
 | `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) |
+| `options` | \{ `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); \} |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) |
 
 ## Returns
 

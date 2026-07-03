@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,9 @@
 
 ```ts
 function runConsolidatorSetTier(options): Promise<{
+  applied: false;
   tier: ConsolidatorTier;
+  unsupported: true;
 }>;
 ```
 
@@ -23,7 +25,9 @@ Defined in: packages/cli/src/commands/consolidator.ts:132
 ## Returns
 
 `Promise`\<\{
+  `applied`: `false`;
   `tier`: [`ConsolidatorTier`](/api/@graphorin/memory/type-aliases/ConsolidatorTier.md);
+  `unsupported`: `true`;
 \}\>
 
 ## Stable

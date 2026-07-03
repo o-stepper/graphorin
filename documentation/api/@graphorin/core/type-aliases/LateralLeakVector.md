@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ type LateralLeakVector =
   | "protocol-header";
 ```
 
-Defined in: packages/core/src/types/agent-event.ts:458
+Defined in: packages/core/src/types/agent-event.ts:467
 
 Lateral-leak vector classification surfaced on
 [AgentLateralLeakDetectedEvent.vector](/api/@graphorin/core/interfaces/AgentLateralLeakDetectedEvent.md#property-vector).

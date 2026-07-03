@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: LoginInteractiveResult
 
-Defined in: packages/security/src/oauth/library.ts:49
+Defined in: packages/security/src/oauth/library.ts:54
 
 Result returned by [loginInteractive](/api/@graphorin/security/functions/loginInteractive.md).
 
@@ -16,6 +16,6 @@ Result returned by [loginInteractive](/api/@graphorin/security/functions/loginIn
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-client"></a> `client` | `readonly` | [`OAuthClient`](/api/@graphorin/security/interfaces/OAuthClient.md) | packages/security/src/oauth/library.ts:52 |
-| <a id="property-session"></a> `session` | `readonly` | [`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md) | packages/security/src/oauth/library.ts:50 |
-| <a id="property-status"></a> `status` | `readonly` | [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md) | packages/security/src/oauth/library.ts:51 |
+| <a id="property-client"></a> `client` | `readonly` | [`OAuthClient`](/api/@graphorin/security/interfaces/OAuthClient.md) | packages/security/src/oauth/library.ts:57 |
+| <a id="property-session"></a> `session` | `readonly` | [`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md) | packages/security/src/oauth/library.ts:55 |
+| <a id="property-status"></a> `status` | `readonly` | [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md) | packages/security/src/oauth/library.ts:56 |

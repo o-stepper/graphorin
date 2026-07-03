@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -24,6 +24,6 @@ type MCPSamplingContent =
 };
 ```
 
-Defined in: packages/mcp/src/client/types.ts:134
+Defined in: packages/mcp/src/client/types.ts:127
 
 A single content block carried by a sampling message or result.

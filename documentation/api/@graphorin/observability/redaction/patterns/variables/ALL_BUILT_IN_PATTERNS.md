@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:226
+Defined in: packages/observability/src/redaction/patterns.ts:237
 
 Full registry — for tooling that wants to introspect every pattern
 the framework knows about (e.g. CLI `graphorin redaction list`).

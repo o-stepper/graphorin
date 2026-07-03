@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -9,15 +9,15 @@
 ```ts
 const meta: {
   name: "@graphorin/eslint-plugin";
-  version: "0.4.0";
+  version: "0.5.0";
 };
 ```
 
-Defined in: index.ts:39
+Defined in: index.ts:36
 
 ## Type Declaration
 
 | Name | Type | Default value | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `"@graphorin/eslint-plugin"` | `'@graphorin/eslint-plugin'` | index.ts:40 |
-| <a id="property-version"></a> `version` | `"0.4.0"` | `VERSION` | index.ts:41 |
+| <a id="property-name"></a> `name` | `"@graphorin/eslint-plugin"` | `'@graphorin/eslint-plugin'` | index.ts:37 |
+| <a id="property-version"></a> `version` | `"0.5.0"` | `VERSION` | index.ts:38 |

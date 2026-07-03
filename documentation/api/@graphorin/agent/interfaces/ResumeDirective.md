@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ResumeDirective
 
-Defined in: packages/agent/src/types.ts:256
+Defined in: packages/agent/src/types.ts:293
 
 Resume directive accepted by `agent.run(input | RunState, { directive })`.
 
@@ -22,4 +22,4 @@ approvals: [...] } })` to resume.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:257 |
+| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:294 |

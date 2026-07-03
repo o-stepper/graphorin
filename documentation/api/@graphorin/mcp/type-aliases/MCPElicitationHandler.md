@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type MCPElicitationHandler = (request, opts) =>
 | Promise<MCPElicitationResult>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:128
+Defined in: packages/mcp/src/client/types.ts:121
 
 Handler for server-initiated elicitation requests.
 

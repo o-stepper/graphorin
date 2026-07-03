@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: AgentRegistry
 
-Defined in: packages/server/src/registry/index.ts:129
+Defined in: packages/server/src/registry/index.ts:143
 
 Read/write registry for agents the server should expose. Every
 mutation is synchronous and the lookup is `O(1)`.
@@ -39,7 +39,7 @@ describe(id):
   | undefined;
 ```
 
-Defined in: packages/server/src/registry/index.ts:165
+Defined in: packages/server/src/registry/index.ts:179
 
 #### Parameters
 
@@ -62,7 +62,7 @@ get(id):
   | undefined;
 ```
 
-Defined in: packages/server/src/registry/index.ts:145
+Defined in: packages/server/src/registry/index.ts:159
 
 #### Parameters
 
@@ -83,7 +83,7 @@ Defined in: packages/server/src/registry/index.ts:145
 has(id): boolean;
 ```
 
-Defined in: packages/server/src/registry/index.ts:149
+Defined in: packages/server/src/registry/index.ts:163
 
 #### Parameters
 
@@ -103,7 +103,7 @@ Defined in: packages/server/src/registry/index.ts:149
 list(): readonly AgentSummary[];
 ```
 
-Defined in: packages/server/src/registry/index.ts:153
+Defined in: packages/server/src/registry/index.ts:167
 
 #### Returns
 
@@ -117,7 +117,7 @@ readonly [`AgentSummary`](/api/@graphorin/server/registry/interfaces/AgentSummar
 register(entry): void;
 ```
 
-Defined in: packages/server/src/registry/index.ts:132
+Defined in: packages/server/src/registry/index.ts:146
 
 #### Parameters
 
@@ -137,7 +137,7 @@ Defined in: packages/server/src/registry/index.ts:132
 size(): number;
 ```
 
-Defined in: packages/server/src/registry/index.ts:175
+Defined in: packages/server/src/registry/index.ts:189
 
 #### Returns
 
@@ -151,7 +151,7 @@ Defined in: packages/server/src/registry/index.ts:175
 unregister(id): boolean;
 ```
 
-Defined in: packages/server/src/registry/index.ts:141
+Defined in: packages/server/src/registry/index.ts:155
 
 #### Parameters
 

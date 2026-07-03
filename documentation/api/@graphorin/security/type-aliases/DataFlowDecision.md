@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ type DataFlowDecision =
 } & DataFlowFinding;
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:206
+Defined in: packages/security/src/dataflow/types.ts:247
 
 The verdict [DataFlowPolicy.evaluate](/api/@graphorin/security/interfaces/DataFlowPolicy.md#evaluate) returns for a sink call.
 

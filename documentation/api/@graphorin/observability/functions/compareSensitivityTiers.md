@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function compareSensitivityTiers(a, b): number;
 ```
 
-Defined in: packages/observability/src/redaction/validator.ts:285
+Defined in: packages/observability/src/redaction/validator.ts:300
 
 Quickly compute the relative ordering of two sensitivity tiers.
 Exposed because the tracer + replay layers need it without taking a

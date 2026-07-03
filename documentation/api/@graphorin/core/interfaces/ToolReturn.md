@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ToolReturn\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/contracts/tool.ts:203
+Defined in: packages/core/src/contracts/tool.ts:216
 
 Optional return envelope: pairs a typed `output` (passed to the model)
 with extra `contentParts` that are appended verbatim to the
@@ -24,5 +24,5 @@ conversation (images, files, audio, …).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-contentparts"></a> `contentParts?` | `readonly` | readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | packages/core/src/contracts/tool.ts:205 |
-| <a id="property-output"></a> `output` | `readonly` | `TOutput` | packages/core/src/contracts/tool.ts:204 |
+| <a id="property-contentparts"></a> `contentParts?` | `readonly` | readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | packages/core/src/contracts/tool.ts:218 |
+| <a id="property-output"></a> `output` | `readonly` | `TOutput` | packages/core/src/contracts/tool.ts:217 |

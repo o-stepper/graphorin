@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CompactionConfig
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:125
+Defined in: packages/memory/src/context-engine/compaction/types.ts:187
 
 Full compaction config. Either `false` (explicitly disabled),
 `'auto'` (resolved per-provider at warm-up) or a fully-specified
@@ -18,6 +18,6 @@ record.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-postcompactionhooks"></a> `postCompactionHooks?` | `readonly` | readonly [`PostCompactionHook`](/api/@graphorin/memory/type-aliases/PostCompactionHook.md)[] | packages/memory/src/context-engine/compaction/types.ts:128 |
-| <a id="property-strategy"></a> `strategy?` | `readonly` | [`CompactionStrategy`](/api/@graphorin/memory/type-aliases/CompactionStrategy.md) | packages/memory/src/context-engine/compaction/types.ts:127 |
-| <a id="property-trigger"></a> `trigger?` | `readonly` | \| [`CompactionTriggerConfig`](/api/@graphorin/memory/interfaces/CompactionTriggerConfig.md) \| `"never"` | packages/memory/src/context-engine/compaction/types.ts:126 |
+| <a id="property-postcompactionhooks"></a> `postCompactionHooks?` | `readonly` | readonly [`PostCompactionHook`](/api/@graphorin/memory/type-aliases/PostCompactionHook.md)[] | packages/memory/src/context-engine/compaction/types.ts:190 |
+| <a id="property-strategy"></a> `strategy?` | `readonly` | [`CompactionStrategy`](/api/@graphorin/memory/type-aliases/CompactionStrategy.md) | packages/memory/src/context-engine/compaction/types.ts:189 |
+| <a id="property-trigger"></a> `trigger?` | `readonly` | \| [`CompactionTriggerConfig`](/api/@graphorin/memory/interfaces/CompactionTriggerConfig.md) \| `"never"` | packages/memory/src/context-engine/compaction/types.ts:188 |

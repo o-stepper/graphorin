@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const RUN_STATE_SCHEMA_MAJOR_SUPPORTED: 1 = 1;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:39
+Defined in: packages/agent/src/run-state/index.ts:40
 
 Reader-supported schema id range. Major version 1 only for v0.1.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,8 +6,9 @@
 
 # facade
 
-`createMemory()` — the facade that wires every six-tier sub-module +
-the nine memory tools + the search reranker + the context engine
+`createMemory()` — the facade that wires every tier sub-module (the
+seven-tier system) + the eleven (+1 gated) memory tools + the search
+reranker + the context engine
 stubs + the consolidator placeholder.
 
 ## Interfaces
@@ -21,4 +22,5 @@ stubs + the consolidator placeholder.
 
 | Function | Description |
 | ------ | ------ |
+| [\_resetConsolidatorConfigWarningForTesting](/api/@graphorin/memory/facade/functions/resetConsolidatorConfigWarningForTesting.md) | — test seam for the one-time disabled-config warning. |
 | [createMemory](/api/@graphorin/memory/facade/functions/createMemory.md) | Wire every memory subsystem in one call. Returns the typed `Memory` facade ready to be passed into `createAgent({...})`. |

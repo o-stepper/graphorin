@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function resolvePreferredModel(input): PreferredModelResolution;
 ```
 
-Defined in: packages/agent/src/preferred-model/index.ts:118
+Defined in: packages/agent/src/preferred-model/index.ts:120
 
 Walk the precedence ladder and return the resolved provider for a
 single agent step. Pure function — no side effects.

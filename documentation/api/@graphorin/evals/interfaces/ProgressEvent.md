@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ProgressEvent
 
-Defined in: evals/src/types.ts:64
+Defined in: evals/src/types.ts:71
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: evals/src/types.ts:64
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-caseid"></a> `caseId` | `readonly` | `string` | evals/src/types.ts:67 |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | evals/src/types.ts:68 |
-| <a id="property-index"></a> `index` | `readonly` | `number` | evals/src/types.ts:65 |
-| <a id="property-passed"></a> `passed` | `readonly` | `boolean` | evals/src/types.ts:69 |
-| <a id="property-total"></a> `total` | `readonly` | `number` | evals/src/types.ts:66 |
+| <a id="property-caseid"></a> `caseId` | `readonly` | `string` | evals/src/types.ts:74 |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | evals/src/types.ts:75 |
+| <a id="property-index"></a> `index` | `readonly` | `number` | evals/src/types.ts:72 |
+| <a id="property-passed"></a> `passed` | `readonly` | `boolean` | evals/src/types.ts:76 |
+| <a id="property-total"></a> `total` | `readonly` | `number` | evals/src/types.ts:73 |

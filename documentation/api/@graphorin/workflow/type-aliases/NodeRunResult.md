@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ type NodeRunResult<TState> =
 | Partial<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:176
+Defined in: packages/workflow/src/types.ts:183
 
 Permissible return shapes from a node's `run(...)` callback.
 

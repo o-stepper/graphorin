@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ToolCassetteWriter
 
-Defined in: packages/sessions/src/cassette/writer.ts:54
+Defined in: packages/sessions/src/cassette/writer.ts:53
 
 Writer surface returned by [createToolCassetteWriter](/api/@graphorin/sessions/functions/createToolCassetteWriter.md). Call
 `writeRecord(...)` per body record (any order, but `meta` and
@@ -22,7 +22,7 @@ Writer surface returned by [createToolCassetteWriter](/api/@graphorin/sessions/f
 close(): Promise<ToolCassetteFooterRecord>;
 ```
 
-Defined in: packages/sessions/src/cassette/writer.ts:56
+Defined in: packages/sessions/src/cassette/writer.ts:55
 
 #### Returns
 
@@ -36,7 +36,7 @@ Defined in: packages/sessions/src/cassette/writer.ts:56
 writeRecord(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/writer.ts:55
+Defined in: packages/sessions/src/cassette/writer.ts:54
 
 #### Parameters
 

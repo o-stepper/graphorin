@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ type VerifyResult =
 };
 ```
 
-Defined in: packages/security/src/auth/verify.ts:58
+Defined in: packages/security/src/auth/verify.ts:60
 
 Discriminated result of a verify call. The pipeline never throws
 on the unhappy path so callers can map `reason` directly to an

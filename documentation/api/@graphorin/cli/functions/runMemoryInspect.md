@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runMemoryInspect(options): Promise<MemoryInspectResult>;
 ```
 
-Defined in: packages/cli/src/commands/memory.ts:251
+Defined in: packages/cli/src/commands/memory.ts:272
 
 `graphorin memory inspect <factId>` — surface everything the store
 knows about one fact: its retrieval-trust status + provenance, the

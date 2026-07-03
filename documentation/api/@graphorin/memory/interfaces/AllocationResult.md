@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AllocationResult
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:94
+Defined in: packages/memory/src/context-engine/token-budget.ts:100
 
 Result of an allocator run.
 
@@ -16,7 +16,7 @@ Result of an allocator run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-budgettokens"></a> `budgetTokens` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:97 |
-| <a id="property-layers"></a> `layers` | `readonly` | readonly [`LayerAllocation`](/api/@graphorin/memory/interfaces/LayerAllocation.md)[] | packages/memory/src/context-engine/token-budget.ts:95 |
-| <a id="property-overflowdropped"></a> `overflowDropped` | `readonly` | readonly [`LayerId`](/api/@graphorin/memory/type-aliases/LayerId.md)[] | packages/memory/src/context-engine/token-budget.ts:98 |
-| <a id="property-totaltokens"></a> `totalTokens` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:96 |
+| <a id="property-budgettokens"></a> `budgetTokens` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:103 |
+| <a id="property-layers"></a> `layers` | `readonly` | readonly [`LayerAllocation`](/api/@graphorin/memory/interfaces/LayerAllocation.md)[] | packages/memory/src/context-engine/token-budget.ts:101 |
+| <a id="property-overflowdropped"></a> `overflowDropped` | `readonly` | readonly [`LayerId`](/api/@graphorin/memory/type-aliases/LayerId.md)[] | packages/memory/src/context-engine/token-budget.ts:104 |
+| <a id="property-totaltokens"></a> `totalTokens` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:102 |

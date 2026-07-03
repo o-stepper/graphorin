@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,9 +12,9 @@ function getTraceLog(filePath): AsyncIterable<SpanRecord<SpanType>>;
 
 Defined in: packages/observability/src/replay/log.ts:21
 
-Read every span record from a JSONL trace log. Lines that fail to
-parse are emitted as `null` events; callers can `filter(Boolean)` to
-skip them.
+Read every span record from a JSONL trace log. Lines that fail to parse are
+skipped (the iterator keeps going); the generator only ever yields parsed
+[SpanRecord](/api/@graphorin/observability/interfaces/SpanRecord.md) values, never `null`.
 
 ## Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: WorkingMemory
 
-Defined in: packages/memory/src/tiers/working-memory.ts:101
+Defined in: packages/memory/src/tiers/working-memory.ts:105
 
 `WorkingMemory` — labeled, character-bounded blocks rendered into
 every system prompt. Operations:
@@ -34,7 +34,7 @@ every system prompt. Operations:
 new WorkingMemory(args): WorkingMemory;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:107
+Defined in: packages/memory/src/tiers/working-memory.ts:110
 
 #### Parameters
 
@@ -59,7 +59,7 @@ append(
 content): Promise<Block>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:159
+Defined in: packages/memory/src/tiers/working-memory.ts:167
 
 Append `content` to a block (with a newline separator).
 
@@ -86,7 +86,7 @@ attach(
 agentId): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:214
+Defined in: packages/memory/src/tiers/working-memory.ts:222
 
 Attach a working block to an additional agent. Backed by the
 adapter's `shared.attach(...)` join table so multi-agent crews
@@ -112,7 +112,7 @@ can share the same block without duplicating storage.
 compile(scope, agentId?): Promise<string>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:257
+Defined in: packages/memory/src/tiers/working-memory.ts:265
 
 Render a deterministic `<memory_blocks>` XML fragment for the
 supplied scope. The full layered system prompt (six layers) is
@@ -142,7 +142,7 @@ accepted but ignored — the rendering is scope-wide.
 define(definition): BlockDefinition;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:114
+Defined in: packages/memory/src/tiers/working-memory.ts:117
 
 Register a block definition. Returns the same definition object.
 
@@ -166,7 +166,7 @@ definitionFor(label):
   | undefined;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:125
+Defined in: packages/memory/src/tiers/working-memory.ts:128
 
 Lookup a definition by label.
 
@@ -189,7 +189,7 @@ Lookup a definition by label.
 definitions(): readonly BlockDefinition[];
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:120
+Defined in: packages/memory/src/tiers/working-memory.ts:123
 
 Snapshot of every registered definition.
 
@@ -208,7 +208,7 @@ detach(
 agentId): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:231
+Defined in: packages/memory/src/tiers/working-memory.ts:239
 
 Detach a working block from an agent.
 
@@ -235,7 +235,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:197
+Defined in: packages/memory/src/tiers/working-memory.ts:205
 
 Soft-delete a block.
 
@@ -259,7 +259,7 @@ Soft-delete a block.
 list(scope): Promise<readonly Block[]>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:130
+Defined in: packages/memory/src/tiers/working-memory.ts:133
 
 List active (non-deleted) blocks for the supplied scope.
 
@@ -281,7 +281,7 @@ List active (non-deleted) blocks for the supplied scope.
 read(scope, label): Promise<string | null>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:139
+Defined in: packages/memory/src/tiers/working-memory.ts:142
 
 Read a single block's value (or `null` when absent).
 
@@ -308,7 +308,7 @@ replace(
 newText): Promise<Block>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:171
+Defined in: packages/memory/src/tiers/working-memory.ts:179
 
 Replace the unique substring `oldUnique` inside the block's value
 with `newText`. Throws `WorkingBlockReplaceMismatchError` when
@@ -338,7 +338,7 @@ rethink(
 mutator): Promise<Block>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:188
+Defined in: packages/memory/src/tiers/working-memory.ts:196
 
 Run `mutator(current) => next` and persist the result.
 
@@ -365,7 +365,7 @@ write(
 value): Promise<Block>;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:154
+Defined in: packages/memory/src/tiers/working-memory.ts:162
 
 Replace a block's value entirely. Honours overflow policy.
 

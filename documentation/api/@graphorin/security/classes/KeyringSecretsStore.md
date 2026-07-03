@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: packages/security/src/secrets/stores/keyring.ts:39
 delete(key, _scope?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:91
+Defined in: packages/security/src/secrets/stores/keyring.ts:95
 
 #### Parameters
 
@@ -102,7 +102,7 @@ Returns the secret if it exists, `null` otherwise.
 list(_scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:100
+Defined in: packages/security/src/secrets/stores/keyring.ts:104
 
 Returns metadata about every key — never the values themselves.
 
@@ -128,7 +128,7 @@ Returns metadata about every key — never the values themselves.
 require(key, _scope?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:63
+Defined in: packages/security/src/secrets/stores/keyring.ts:67
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -160,7 +160,7 @@ set(
 _opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:77
+Defined in: packages/security/src/secrets/stores/keyring.ts:81
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

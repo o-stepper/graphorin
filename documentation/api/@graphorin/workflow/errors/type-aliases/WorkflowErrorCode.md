@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,6 @@ type WorkflowErrorCode =
   | "invalid-channel-write"
   | "multi-write-into-latest-value"
   | "unknown-node"
-  | "cycle-detected"
   | "thread-not-found"
   | "checkpoint-not-found"
   | "checkpoint-version-conflict"
@@ -20,9 +19,12 @@ type WorkflowErrorCode =
   | "concurrent-resume-rejected"
   | "workflow-aborted"
   | "workflow-cancel-timeout"
+  | "max-steps-exceeded"
   | "node-execution-failed"
   | "reducer-failed"
-  | "state-validation-failed";
+  | "state-validation-failed"
+  | "dead-end"
+  | "state-not-serializable";
 ```
 
 Defined in: packages/workflow/src/errors/index.ts:16

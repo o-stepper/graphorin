@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryActivityConflict
 
-Defined in: packages/cli/src/commands/memory.ts:376
+Defined in: packages/cli/src/commands/memory.ts:435
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: packages/cli/src/commands/memory.ts:376
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-candidateid"></a> `candidateId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:377 |
-| <a id="property-decision"></a> `decision` | `readonly` | `string` | packages/cli/src/commands/memory.ts:379 |
-| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:381 |
-| <a id="property-existingid"></a> `existingId` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:378 |
-| <a id="property-stage"></a> `stage` | `readonly` | `string` | packages/cli/src/commands/memory.ts:380 |
+| <a id="property-candidateid"></a> `candidateId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:436 |
+| <a id="property-decision"></a> `decision` | `readonly` | `string` | packages/cli/src/commands/memory.ts:438 |
+| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:440 |
+| <a id="property-existingid"></a> `existingId` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:437 |
+| <a id="property-stage"></a> `stage` | `readonly` | `string` | packages/cli/src/commands/memory.ts:439 |

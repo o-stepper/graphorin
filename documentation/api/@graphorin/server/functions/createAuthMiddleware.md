@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createAuthMiddleware(options): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/auth.ts:108
+Defined in: packages/server/src/middleware/auth.ts:130
 
 Build the bearer-token middleware. The middleware always sets
 `c.var.state.auth`, even on the unauthenticated branch, so

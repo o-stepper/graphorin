@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function assertPolicyAllows(packageName, policy): void;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:90
+Defined in: packages/security/src/supply-chain/policy.ts:117
 
 Throw [SkillInstallDeniedError](/api/@graphorin/security/classes/SkillInstallDeniedError.md) when the policy resolves to
 `'deny'`. Returns silently otherwise so callers can chain it

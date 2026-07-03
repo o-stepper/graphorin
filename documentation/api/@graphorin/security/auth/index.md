@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,6 +12,48 @@ and the token CRUD library functions used by `@graphorin/server`
 and the CLI.
 
 ## References
+
+### \_getAuthAuditListenerCountForTesting
+
+Re-exports [_getAuthAuditListenerCountForTesting](/api/@graphorin/security/functions/getAuthAuditListenerCountForTesting.md)
+
+***
+
+### \_resetAuthAuditListenersForTesting
+
+Re-exports [_resetAuthAuditListenersForTesting](/api/@graphorin/security/functions/resetAuthAuditListenersForTesting.md)
+
+***
+
+### AuthAuditAction
+
+Re-exports [AuthAuditAction](/api/@graphorin/security/type-aliases/AuthAuditAction.md)
+
+***
+
+### AuthAuditActor
+
+Re-exports [AuthAuditActor](/api/@graphorin/security/interfaces/AuthAuditActor.md)
+
+***
+
+### AuthAuditDecision
+
+Re-exports [AuthAuditDecision](/api/@graphorin/security/type-aliases/AuthAuditDecision.md)
+
+***
+
+### AuthAuditEvent
+
+Re-exports [AuthAuditEvent](/api/@graphorin/security/interfaces/AuthAuditEvent.md)
+
+***
+
+### AuthAuditListener
+
+Re-exports [AuthAuditListener](/api/@graphorin/security/type-aliases/AuthAuditListener.md)
+
+***
 
 ### authorize
 
@@ -49,6 +91,12 @@ Re-exports [DEFAULT_TOKEN_PREFIX](/api/@graphorin/security/variables/DEFAULT_TOK
 
 ***
 
+### emitAuthAudit
+
+Re-exports [emitAuthAudit](/api/@graphorin/security/functions/emitAuthAudit.md)
+
+***
+
 ### encodeBase62Bytes
 
 Re-exports [encodeBase62Bytes](/api/@graphorin/security/functions/encodeBase62Bytes.md)
@@ -82,6 +130,12 @@ Re-exports [GenerateRawTokenOptions](/api/@graphorin/security/interfaces/Generat
 ### listTokens
 
 Re-exports [listTokens](/api/@graphorin/security/functions/listTokens.md)
+
+***
+
+### onAuthAudit
+
+Re-exports [onAuthAudit](/api/@graphorin/security/functions/onAuthAudit.md)
 
 ***
 
@@ -124,12 +178,6 @@ Re-exports [rekeyTokens](/api/@graphorin/security/functions/rekeyTokens.md)
 ### revokeToken
 
 Re-exports [revokeToken](/api/@graphorin/security/functions/revokeToken.md)
-
-***
-
-### rotatePepper
-
-Re-exports [rotatePepper](/api/@graphorin/security/functions/rotatePepper.md)
 
 ***
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runMemoryActivity(options?): Promise<MemoryActivityResult>;
 ```
 
-Defined in: packages/cli/src/commands/memory.ts:410
+Defined in: packages/cli/src/commands/memory.ts:469
 
 `graphorin memory activity` — a store-wide view of what the
 consolidator and reflection passes have been doing: how many facts /

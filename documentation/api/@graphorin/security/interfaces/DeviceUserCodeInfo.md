@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DeviceUserCodeInfo
 
-Defined in: packages/security/src/oauth/types.ts:219
+Defined in: packages/security/src/oauth/types.ts:234
 
 Information surfaced via [AuthorizeDeviceOptions.onUserCode](/api/@graphorin/security/interfaces/AuthorizeDeviceOptions.md#property-onusercode).
 
@@ -16,8 +16,8 @@ Information surfaced via [AuthorizeDeviceOptions.onUserCode](/api/@graphorin/sec
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-expiresat"></a> `expiresAt` | `readonly` | `number` | packages/security/src/oauth/types.ts:223 |
-| <a id="property-intervalms"></a> `intervalMs` | `readonly` | `number` | packages/security/src/oauth/types.ts:224 |
-| <a id="property-usercode"></a> `userCode` | `readonly` | `string` | packages/security/src/oauth/types.ts:220 |
-| <a id="property-verificationuri"></a> `verificationUri` | `readonly` | `string` | packages/security/src/oauth/types.ts:221 |
-| <a id="property-verificationuricomplete"></a> `verificationUriComplete?` | `readonly` | `string` | packages/security/src/oauth/types.ts:222 |
+| <a id="property-expiresat"></a> `expiresAt` | `readonly` | `number` | packages/security/src/oauth/types.ts:238 |
+| <a id="property-intervalms"></a> `intervalMs` | `readonly` | `number` | packages/security/src/oauth/types.ts:239 |
+| <a id="property-usercode"></a> `userCode` | `readonly` | `string` | packages/security/src/oauth/types.ts:235 |
+| <a id="property-verificationuri"></a> `verificationUri` | `readonly` | `string` | packages/security/src/oauth/types.ts:236 |
+| <a id="property-verificationuricomplete"></a> `verificationUriComplete?` | `readonly` | `string` | packages/security/src/oauth/types.ts:237 |

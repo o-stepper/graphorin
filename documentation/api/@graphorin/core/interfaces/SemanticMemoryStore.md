@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:88
+Defined in: packages/core/src/contracts/memory-store.ts:110
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:88
 forget(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:92
+Defined in: packages/core/src/contracts/memory-store.ts:114
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:92
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:89
+Defined in: packages/core/src/contracts/memory-store.ts:111
 
 #### Parameters
 
@@ -63,7 +63,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:89
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:90
+Defined in: packages/core/src/contracts/memory-store.ts:112
 
 #### Parameters
 
@@ -87,7 +87,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:91
+Defined in: packages/core/src/contracts/memory-store.ts:113
 
 #### Parameters
 

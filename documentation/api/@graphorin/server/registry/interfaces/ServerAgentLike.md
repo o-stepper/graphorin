@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -43,3 +43,32 @@ Defined in: packages/server/src/registry/index.ts:23
 #### Returns
 
 `Promise`\&lt;`unknown`\&gt;
+
+***
+
+### stream()?
+
+```ts
+optional stream(input, options?): AsyncIterable<unknown>;
+```
+
+Defined in: packages/server/src/registry/index.ts:37
+
+Streaming surface (IP-2). `@graphorin/agent` agents satisfy this
+structurally; `POST /agents/:id/stream` consumes it and emits
+every event onto the run's WS subject. Optional so plain
+run-only fixtures keep working (they emit a single terminal frame).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `input` | `unknown` |
+| `options?` | \{ `sessionId?`: `string`; `signal?`: `AbortSignal`; `userId?`: `string`; \} |
+| `options.sessionId?` | `string` |
+| `options.signal?` | `AbortSignal` |
+| `options.userId?` | `string` |
+
+#### Returns
+
+`AsyncIterable`\&lt;`unknown`\&gt;

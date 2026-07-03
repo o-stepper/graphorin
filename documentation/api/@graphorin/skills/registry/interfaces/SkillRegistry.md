@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SkillRegistry
 
-Defined in: packages/skills/src/registry/index.ts:51
+Defined in: packages/skills/src/registry/index.ts:68
 
 Public registry surface.
 
@@ -18,7 +18,7 @@ Public registry surface.
 activate(triggers, signal?): Promise<readonly ActivatedSkill[]>;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:78
+Defined in: packages/skills/src/registry/index.ts:101
 
 #### Parameters
 
@@ -39,7 +39,7 @@ Defined in: packages/skills/src/registry/index.ts:78
 clear(): void;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:99
+Defined in: packages/skills/src/registry/index.ts:122
 
 #### Returns
 
@@ -53,7 +53,7 @@ Defined in: packages/skills/src/registry/index.ts:99
 getAutoActivationMetadata(): readonly SkillMetadata[];
 ```
 
-Defined in: packages/skills/src/registry/index.ts:62
+Defined in: packages/skills/src/registry/index.ts:85
 
 Skills surfaced into the system prompt for auto-activation.
 Skills with `disable-model-invocation: true` are excluded.
@@ -70,7 +70,7 @@ readonly [`SkillMetadata`](/api/@graphorin/skills/interfaces/SkillMetadata.md)[]
 getMetadata(): readonly SkillMetadata[];
 ```
 
-Defined in: packages/skills/src/registry/index.ts:57
+Defined in: packages/skills/src/registry/index.ts:80
 
 #### Returns
 
@@ -84,7 +84,7 @@ readonly [`SkillMetadata`](/api/@graphorin/skills/interfaces/SkillMetadata.md)[]
 getMetadataBlock(): string;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:69
+Defined in: packages/skills/src/registry/index.ts:92
 
 Render the auto-activation metadata as a string suitable for the
 system prompt. The format is bytes-stable and consumed verbatim
@@ -103,7 +103,7 @@ by the ContextEngine layered template (Phase 10d). Skills with
 getSkill(name): Skill | undefined;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:54
+Defined in: packages/skills/src/registry/index.ts:77
 
 #### Parameters
 
@@ -123,7 +123,7 @@ Defined in: packages/skills/src/registry/index.ts:54
 has(name): boolean;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:55
+Defined in: packages/skills/src/registry/index.ts:78
 
 #### Parameters
 
@@ -143,7 +143,7 @@ Defined in: packages/skills/src/registry/index.ts:55
 list(): readonly Skill[];
 ```
 
-Defined in: packages/skills/src/registry/index.ts:56
+Defined in: packages/skills/src/registry/index.ts:79
 
 #### Returns
 
@@ -157,7 +157,31 @@ readonly [`Skill`](/api/@graphorin/skills/interfaces/Skill.md)[]
 register(skill): void;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:52
+Defined in: packages/skills/src/registry/index.ts:69
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `skill` | [`Skill`](/api/@graphorin/skills/interfaces/Skill.md) |
+
+#### Returns
+
+`void`
+
+***
+
+### replace()
+
+```ts
+replace(skill): void;
+```
+
+Defined in: packages/skills/src/registry/index.ts:75
+
+Upsert a skill by name (RP-11). Unlike [SkillRegistry.register](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#register),
+`replace` overwrites an existing registration instead of throwing on a
+name collision — the upgrade path for hot-reloading a re-loaded skill.
 
 #### Parameters
 
@@ -179,7 +203,7 @@ resolveTrigger(trigger):
   | null;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:77
+Defined in: packages/skills/src/registry/index.ts:100
 
 Resolve a single trigger (model-emitted skill name OR the raw
 `/skill:<name>` slash-command body) into an [ActivationRequest](/api/@graphorin/skills/registry/interfaces/ActivationRequest.md).
@@ -206,7 +230,7 @@ slash command — callers that want a strict mode should call
 search(triggers): readonly Skill[];
 ```
 
-Defined in: packages/skills/src/registry/index.ts:88
+Defined in: packages/skills/src/registry/index.ts:111
 
 Best-effort match: returns every skill whose name OR description
 contains all of the supplied trigger tokens (case-insensitive).
@@ -231,7 +255,7 @@ readonly [`Skill`](/api/@graphorin/skills/interfaces/Skill.md)[]
 size(): number;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:98
+Defined in: packages/skills/src/registry/index.ts:121
 
 #### Returns
 
@@ -245,7 +269,7 @@ Defined in: packages/skills/src/registry/index.ts:98
 toolDeclarations(): readonly RegisteredToolDeclaration[];
 ```
 
-Defined in: packages/skills/src/registry/index.ts:97
+Defined in: packages/skills/src/registry/index.ts:120
 
 #### Returns
 
@@ -259,7 +283,7 @@ readonly [`RegisteredToolDeclaration`](/api/@graphorin/skills/registry/interface
 tools(): readonly InlineSkillTool[];
 ```
 
-Defined in: packages/skills/src/registry/index.ts:96
+Defined in: packages/skills/src/registry/index.ts:119
 
 Flat, deduplicated list of every pre-built tool shipped by the
 registered skills. The first registration wins on a `tool.name`
@@ -279,7 +303,7 @@ readonly [`InlineSkillTool`](/api/@graphorin/skills/type-aliases/InlineSkillTool
 unregister(name): boolean;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:53
+Defined in: packages/skills/src/registry/index.ts:76
 
 #### Parameters
 

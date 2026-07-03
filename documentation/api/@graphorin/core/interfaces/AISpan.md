@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AISpan\&lt;T\&gt;
 
-Defined in: packages/core/src/contracts/tracer.ts:86
+Defined in: packages/core/src/contracts/tracer.ts:87
 
 Typed span. Generic over `SpanType` so consumers can specialize a
 function on a particular span kind without losing the discriminator.
@@ -27,10 +27,10 @@ function on a particular span kind without losing the discriminator.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:88 |
-| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:90 |
-| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:89 |
-| <a id="property-type"></a> `type` | `readonly` | `T` | packages/core/src/contracts/tracer.ts:87 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:89 |
+| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:91 |
+| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:90 |
+| <a id="property-type"></a> `type` | `readonly` | `T` | packages/core/src/contracts/tracer.ts:88 |
 
 ## Methods
 
@@ -40,7 +40,7 @@ function on a particular span kind without losing the discriminator.
 addEvent(name, attrs?): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:94
+Defined in: packages/core/src/contracts/tracer.ts:95
 
 Append a span event (attribute-bearing time-stamped marker).
 
@@ -63,7 +63,7 @@ Append a span event (attribute-bearing time-stamped marker).
 end(): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:100
+Defined in: packages/core/src/contracts/tracer.ts:101
 
 End the span. Idempotent.
 
@@ -79,7 +79,7 @@ End the span. Idempotent.
 recordException(err): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:96
+Defined in: packages/core/src/contracts/tracer.ts:97
 
 Record an exception. Multiple calls are kept in the span event log.
 
@@ -101,7 +101,7 @@ Record an exception. Multiple calls are kept in the span event log.
 setAttributes(attrs): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:92
+Defined in: packages/core/src/contracts/tracer.ts:93
 
 Add or replace attributes. Repeated calls are merged (last write wins).
 
@@ -123,7 +123,7 @@ Add or replace attributes. Repeated calls are merged (last write wins).
 setStatus(status, message?): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:98
+Defined in: packages/core/src/contracts/tracer.ts:99
 
 Set the terminal status.
 

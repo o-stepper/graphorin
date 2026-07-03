@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: TokenRotationEvent
 
-Defined in: packages/security/src/oauth/types.ts:299
+Defined in: packages/security/src/oauth/types.ts:314
 
 Snapshot passed to [OAuthStrategy.onTokenRotation](/api/@graphorin/security/interfaces/OAuthStrategy.md#property-ontokenrotation).
 
@@ -16,8 +16,8 @@ Snapshot passed to [OAuthStrategy.onTokenRotation](/api/@graphorin/security/inte
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-issuedat"></a> `issuedAt` | `readonly` | `number` | packages/security/src/oauth/types.ts:304 |
-| <a id="property-nextscope"></a> `nextScope?` | `readonly` | `string` | packages/security/src/oauth/types.ts:303 |
-| <a id="property-previousscope"></a> `previousScope?` | `readonly` | `string` | packages/security/src/oauth/types.ts:302 |
-| <a id="property-serverid"></a> `serverId` | `readonly` | `string` | packages/security/src/oauth/types.ts:300 |
-| <a id="property-serverurl"></a> `serverUrl` | `readonly` | `string` | packages/security/src/oauth/types.ts:301 |
+| <a id="property-issuedat"></a> `issuedAt` | `readonly` | `number` | packages/security/src/oauth/types.ts:319 |
+| <a id="property-nextscope"></a> `nextScope?` | `readonly` | `string` | packages/security/src/oauth/types.ts:318 |
+| <a id="property-previousscope"></a> `previousScope?` | `readonly` | `string` | packages/security/src/oauth/types.ts:317 |
+| <a id="property-serverid"></a> `serverId` | `readonly` | `string` | packages/security/src/oauth/types.ts:315 |
+| <a id="property-serverurl"></a> `serverUrl` | `readonly` | `string` | packages/security/src/oauth/types.ts:316 |

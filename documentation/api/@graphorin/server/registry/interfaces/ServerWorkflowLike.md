@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ServerWorkflowLike
 
-Defined in: packages/server/src/registry/index.ts:39
+Defined in: packages/server/src/registry/index.ts:53
 
 Minimal shape the server needs from a `Workflow`. Mirrors the
 `Workflow` surface from `@graphorin/workflow`.
@@ -17,7 +17,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/server/src/registry/index.ts:40 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/server/src/registry/index.ts:54 |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 execute(input, options?): AsyncIterable<unknown>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:41
+Defined in: packages/server/src/registry/index.ts:55
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: packages/server/src/registry/index.ts:41
 optional getState(threadId): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:46
+Defined in: packages/server/src/registry/index.ts:60
 
 #### Parameters
 
@@ -70,7 +70,7 @@ Defined in: packages/server/src/registry/index.ts:46
 optional listCheckpoints(threadId): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:47
+Defined in: packages/server/src/registry/index.ts:61
 
 #### Parameters
 
@@ -90,7 +90,7 @@ Defined in: packages/server/src/registry/index.ts:47
 optional resume(threadId, directive?): AsyncIterable<unknown>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:45
+Defined in: packages/server/src/registry/index.ts:59
 
 #### Parameters
 

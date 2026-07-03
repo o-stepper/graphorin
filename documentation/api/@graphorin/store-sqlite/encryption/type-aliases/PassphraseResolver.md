@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type PassphraseResolver = () => Promise<string | Buffer>;
 ```
 
-Defined in: packages/store-sqlite/src/encryption/index.ts:56
+Defined in: packages/store-sqlite/src/encryption/index.ts:84
 
 Passphrase resolver shape. Implementations live in
 `@graphorin/security` (`'env:GRAPHORIN_DB_PASSPHRASE'`,

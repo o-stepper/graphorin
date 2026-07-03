@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function rekeyTokens(options): Promise<ReadonlyMap<string, CreatedToken>>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:235
+Defined in: packages/security/src/auth/crud.ts:221
 
 Re-issue every active token. Used after a known compromise: the
 previous tokens are revoked and replaced with fresh raw values

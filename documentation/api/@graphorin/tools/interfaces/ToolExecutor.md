@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ToolExecutor
 
-Defined in: packages/tools/src/executor/executor.ts:261
+Defined in: packages/tools/src/executor/executor.ts:271
 
 Public executor surface.
 
@@ -18,7 +18,7 @@ Public executor surface.
 executeBatch(opts): Promise<readonly CompletedToolCall<unknown>[]>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:263
+Defined in: packages/tools/src/executor/executor.ts:273
 
 Run a batch of tool calls.
 
@@ -40,7 +40,7 @@ Run a batch of tool calls.
 executeOne(opts): Promise<CompletedToolCall<unknown>>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:265
+Defined in: packages/tools/src/executor/executor.ts:275
 
 Run a single tool call.
 

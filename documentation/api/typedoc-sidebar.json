@@ -22,6 +22,10 @@
                 "link": "/api/@graphorin/agent/errors/classes/AgentRuntimeError.md"
               },
               {
+                "text": "ConcurrentRunError",
+                "link": "/api/@graphorin/agent/errors/classes/ConcurrentRunError.md"
+              },
+              {
                 "text": "EvaluatorOptimizerConfigError",
                 "link": "/api/@graphorin/agent/errors/classes/EvaluatorOptimizerConfigError.md"
               },
@@ -594,6 +598,16 @@
                 "link": "/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md"
               }
             ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "kindForRpcCode",
+                "link": "/api/@graphorin/client/errors/functions/kindForRpcCode.md"
+              }
+            ]
           }
         ]
       },
@@ -796,6 +810,10 @@
           {
             "text": "createTransformersJsEmbedder",
             "link": "/api/@graphorin/embedder-transformersjs/functions/createTransformersJsEmbedder.md"
+          },
+          {
+            "text": "isE5Model",
+            "link": "/api/@graphorin/embedder-transformersjs/functions/isE5Model.md"
           }
         ]
       }
@@ -1016,8 +1034,16 @@
                 "link": "/api/@graphorin/mcp/errors/classes/MCPProtocolError.md"
               },
               {
+                "text": "MCPToolExecutionError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPToolExecutionError.md"
+              },
+              {
                 "text": "MCPToolNotFoundError",
                 "link": "/api/@graphorin/mcp/errors/classes/MCPToolNotFoundError.md"
+              },
+              {
+                "text": "MCPToolPinningError",
+                "link": "/api/@graphorin/mcp/errors/classes/MCPToolPinningError.md"
               },
               {
                 "text": "MCPTransportNotSupportedError",
@@ -1046,10 +1072,6 @@
             ]
           }
         ]
-      },
-      {
-        "text": "event-store",
-        "link": "/api/@graphorin/mcp/event-store/"
       },
       {
         "text": "helpers",
@@ -1125,8 +1147,16 @@
                 "link": "/api/@graphorin/memory/errors/classes/ProcedureInductionNotConfiguredError.md"
               },
               {
+                "text": "QuarantinePromotionRefusedError",
+                "link": "/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md"
+              },
+              {
                 "text": "WorkingBlockOverflowError",
                 "link": "/api/@graphorin/memory/errors/classes/WorkingBlockOverflowError.md"
+              },
+              {
+                "text": "WorkingBlockReadOnlyError",
+                "link": "/api/@graphorin/memory/errors/classes/WorkingBlockReadOnlyError.md"
               },
               {
                 "text": "WorkingBlockReplaceMismatchError",
@@ -1159,6 +1189,10 @@
             "text": "Functions",
             "collapsed": true,
             "items": [
+              {
+                "text": "_resetConsolidatorConfigWarningForTesting",
+                "link": "/api/@graphorin/memory/facade/functions/resetConsolidatorConfigWarningForTesting.md"
+              },
               {
                 "text": "createMemory",
                 "link": "/api/@graphorin/memory/facade/functions/createMemory.md"
@@ -2242,6 +2276,10 @@
             "link": "/api/@graphorin/secret-1password/functions/createOnePasswordResolver.md"
           },
           {
+            "text": "createOpCli",
+            "link": "/api/@graphorin/secret-1password/functions/createOpCli.md"
+          },
+          {
             "text": "normalizeOpUri",
             "link": "/api/@graphorin/secret-1password/functions/normalizeOpUri.md"
           }
@@ -2350,7 +2388,52 @@
     "items": [
       {
         "text": "commentary",
-        "link": "/api/@graphorin/server/commentary/"
+        "link": "/api/@graphorin/server/commentary/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Interfaces",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "CommentaryAuditSink",
+                "link": "/api/@graphorin/server/commentary/interfaces/CommentaryAuditSink.md"
+              },
+              {
+                "text": "LateBoundCommentarySink",
+                "link": "/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md"
+              }
+            ]
+          },
+          {
+            "text": "Variables",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "COMMENTARY_AUDIT_ACTION",
+                "link": "/api/@graphorin/server/commentary/variables/COMMENTARY_AUDIT_ACTION.md"
+              }
+            ]
+          },
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "bridgeCommentaryToAudit",
+                "link": "/api/@graphorin/server/commentary/functions/bridgeCommentaryToAudit.md"
+              },
+              {
+                "text": "commentaryDecisionToAuditInput",
+                "link": "/api/@graphorin/server/commentary/functions/commentaryDecisionToAuditInput.md"
+              },
+              {
+                "text": "createLateBoundCommentarySink",
+                "link": "/api/@graphorin/server/commentary/functions/createLateBoundCommentarySink.md"
+              }
+            ]
+          }
+        ]
       },
       {
         "text": "config",
@@ -2516,7 +2599,20 @@
       },
       {
         "text": "middleware",
-        "link": "/api/@graphorin/server/middleware/"
+        "link": "/api/@graphorin/server/middleware/",
+        "collapsed": true,
+        "items": [
+          {
+            "text": "Functions",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "createAnonymousAuthMiddleware",
+                "link": "/api/@graphorin/server/middleware/functions/createAnonymousAuthMiddleware.md"
+              }
+            ]
+          }
+        ]
       },
       {
         "text": "registry",
@@ -2706,6 +2802,10 @@
                 "link": "/api/@graphorin/sessions/errors/classes/ReplayAccessDeniedError.md"
               },
               {
+                "text": "SessionClosedError",
+                "link": "/api/@graphorin/sessions/errors/classes/SessionClosedError.md"
+              },
+              {
                 "text": "SessionError",
                 "link": "/api/@graphorin/sessions/errors/classes/SessionError.md"
               },
@@ -2787,6 +2887,10 @@
               {
                 "text": "SessionMemoryFacade",
                 "link": "/api/@graphorin/sessions/facade/interfaces/SessionMemoryFacade.md"
+              },
+              {
+                "text": "SessionMessageWithMetadata",
+                "link": "/api/@graphorin/sessions/facade/interfaces/SessionMessageWithMetadata.md"
               },
               {
                 "text": "SessionRecordCassetteOptions",
@@ -3131,6 +3235,16 @@
             ]
           },
           {
+            "text": "Type Aliases",
+            "collapsed": true,
+            "items": [
+              {
+                "text": "SkillToolStamper",
+                "link": "/api/@graphorin/skills/registry/type-aliases/SkillToolStamper.md"
+              }
+            ]
+          },
+          {
             "text": "Functions",
             "collapsed": true,
             "items": [
@@ -3330,6 +3444,10 @@
             "text": "Functions",
             "collapsed": true,
             "items": [
+              {
+                "text": "cipherSelectionPragmas",
+                "link": "/api/@graphorin/store-sqlite/encryption/functions/cipherSelectionPragmas.md"
+              },
               {
                 "text": "loadCipherDriver",
                 "link": "/api/@graphorin/store-sqlite/encryption/functions/loadCipherDriver.md"
@@ -3760,8 +3878,16 @@
                 "link": "/api/@graphorin/workflow/errors/classes/CheckpointNotFoundError.md"
               },
               {
+                "text": "CheckpointVersionConflictError",
+                "link": "/api/@graphorin/workflow/errors/classes/CheckpointVersionConflictError.md"
+              },
+              {
                 "text": "ConcurrentResumeError",
                 "link": "/api/@graphorin/workflow/errors/classes/ConcurrentResumeError.md"
+              },
+              {
+                "text": "DeadEndError",
+                "link": "/api/@graphorin/workflow/errors/classes/DeadEndError.md"
               },
               {
                 "text": "InvalidChannelWriteError",
@@ -3786,6 +3912,10 @@
               {
                 "text": "ResumeWithoutSuspensionError",
                 "link": "/api/@graphorin/workflow/errors/classes/ResumeWithoutSuspensionError.md"
+              },
+              {
+                "text": "StateNotSerializableError",
+                "link": "/api/@graphorin/workflow/errors/classes/StateNotSerializableError.md"
               },
               {
                 "text": "ThreadNotFoundError",

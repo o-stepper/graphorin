@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -210,6 +210,12 @@ Re-exports [MemoryHistoryEntry](/api/@graphorin/cli/interfaces/MemoryHistoryEntr
 
 ***
 
+### MemoryInspectEntity
+
+Re-exports [MemoryInspectEntity](/api/@graphorin/cli/interfaces/MemoryInspectEntity.md)
+
+***
+
 ### MemoryInspectFact
 
 Re-exports [MemoryInspectFact](/api/@graphorin/cli/interfaces/MemoryInspectFact.md)
@@ -234,6 +240,24 @@ Re-exports [MemoryMigrateOptions](/api/@graphorin/cli/interfaces/MemoryMigrateOp
 
 ***
 
+### MemoryReviewItem
+
+Re-exports [MemoryReviewItem](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)
+
+***
+
+### MemoryReviewOptions
+
+Re-exports [MemoryReviewOptions](/api/@graphorin/cli/interfaces/MemoryReviewOptions.md)
+
+***
+
+### MemoryReviewResult
+
+Re-exports [MemoryReviewResult](/api/@graphorin/cli/interfaces/MemoryReviewResult.md)
+
+***
+
 ### MemoryStatusEmbedder
 
 Re-exports [MemoryStatusEmbedder](/api/@graphorin/cli/interfaces/MemoryStatusEmbedder.md)
@@ -243,6 +267,24 @@ Re-exports [MemoryStatusEmbedder](/api/@graphorin/cli/interfaces/MemoryStatusEmb
 ### MemoryStatusResult
 
 Re-exports [MemoryStatusResult](/api/@graphorin/cli/interfaces/MemoryStatusResult.md)
+
+***
+
+### MemoryWhyOptions
+
+Re-exports [MemoryWhyOptions](/api/@graphorin/cli/interfaces/MemoryWhyOptions.md)
+
+***
+
+### MemoryWhyRecall
+
+Re-exports [MemoryWhyRecall](/api/@graphorin/cli/interfaces/MemoryWhyRecall.md)
+
+***
+
+### MemoryWhyResult
+
+Re-exports [MemoryWhyResult](/api/@graphorin/cli/interfaces/MemoryWhyResult.md)
 
 ***
 
@@ -432,9 +474,21 @@ Re-exports [runMemoryMigrate](/api/@graphorin/cli/functions/runMemoryMigrate.md)
 
 ***
 
+### runMemoryReview
+
+Re-exports [runMemoryReview](/api/@graphorin/cli/functions/runMemoryReview.md)
+
+***
+
 ### runMemoryStatus
 
 Re-exports [runMemoryStatus](/api/@graphorin/cli/functions/runMemoryStatus.md)
+
+***
+
+### runMemoryWhy
+
+Re-exports [runMemoryWhy](/api/@graphorin/cli/functions/runMemoryWhy.md)
 
 ***
 

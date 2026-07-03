@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: EpisodicMemory
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:102
+Defined in: packages/memory/src/tiers/episodic-memory.ts:104
 
 `EpisodicMemory` — record + retrieve summarized stretches of past
 activity. Stored embeddings power triple-signal retrieval (recency
@@ -22,7 +22,7 @@ activity. Stored embeddings power triple-signal retrieval (recency
 new EpisodicMemory(args): EpisodicMemory;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:108
+Defined in: packages/memory/src/tiers/episodic-memory.ts:110
 
 #### Parameters
 
@@ -49,7 +49,7 @@ archive(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:230
+Defined in: packages/memory/src/tiers/episodic-memory.ts:249
 
 Soft-archive an episode. Storage adapters that implement
 `EpisodicMemoryStoreExt.archive(...)` mark the row archived in
@@ -78,7 +78,7 @@ manually).
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:169
+Defined in: packages/memory/src/tiers/episodic-memory.ts:172
 
 Lookup a single episode by id.
 
@@ -94,13 +94,44 @@ Lookup a single episode by id.
 
 ***
 
+### listRecent()
+
+```ts
+listRecent(
+   scope, 
+   limit, 
+opts?): Promise<readonly Episode[]>;
+```
+
+Defined in: packages/memory/src/tiers/episodic-memory.ts:273
+
+Most-recent episodes by end time (newest first), with no embedding / FTS
+query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` — the default
+`@graphorin/store-sqlite` adapter implements it. Optionally includes
+quarantined episodes (the importance source for the reflection gate).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `limit` | `number` |
+| `opts` | \{ `includeQuarantined?`: `boolean`; \} |
+| `opts.includeQuarantined?` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\&gt;
+
+***
+
 ### recent()
 
 ```ts
 recent(scope, opts?): Promise<readonly Episode[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:249
+Defined in: packages/memory/src/tiers/episodic-memory.ts:293
 
 List the most recent episodes (no embedding required).
 
@@ -124,7 +155,7 @@ List the most recent episodes (no embedding required).
 record(scope, input): Promise<Episode>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:121
+Defined in: packages/memory/src/tiers/episodic-memory.ts:123
 
 Persist an episode + its embedding (when an embedder is configured).
 
@@ -150,7 +181,7 @@ search(
 opts?): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/episodic-memory.ts:180
+Defined in: packages/memory/src/tiers/episodic-memory.ts:183
 
 Triple-signal episode retrieval (`recency × relevance ×
 importance`). The vector signal is computed on demand when an
@@ -169,3 +200,37 @@ relevance term as a normalized fallback.
 #### Returns
 
 `Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
+
+***
+
+### validate()
+
+```ts
+validate(
+   scope, 
+   episodeId, 
+   reason?, 
+options?): Promise<void>;
+```
+
+Defined in: packages/memory/src/tiers/episodic-memory.ts:304
+
+Promote a quarantined episode into default recall (MCON-2). Mirrors
+[SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict from the
+stored summary and **refuses** promotion of an injection-flagged episode
+(`QuarantinePromotionRefusedError`) unless an operator passes
+`{ force: true }` from a trusted, non-agent context.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `episodeId` | `string` |
+| `reason?` | `string` |
+| `options?` | \{ `force?`: `boolean`; \} |
+| `options.force?` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function installSkillFromGit(options): Promise<SkillInstallationStatus>;
 ```
 
-Defined in: packages/security/src/supply-chain/installer.ts:187
+Defined in: packages/security/src/supply-chain/installer.ts:220
 
 Install a skill from a git repository (shallow clone). The
 resulting clone lives in the OS temp directory; consumers are

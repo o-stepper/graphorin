@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > encrypt / rekey / integrity-check runners that back the `graphorin storage`
 > CLI subcommand group.
 >
-> Project Graphorin · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.4.0 (optional sub-pack)
+- **Published:** v0.5.0 (optional sub-pack)
 - **Default cipher:** `sqlcipher` (SQLCipher v4 compatible, `legacy=4`)
 - **Defaults:** encryption-at-rest is **OFF by default**. Opt in through
   `graphorin init --encrypted`.
@@ -126,7 +126,7 @@ cipher modes shipped by the cipher peer are accepted; pass them via the
 | Cipher        | Notes                                                                       |
 |---------------|-----------------------------------------------------------------------------|
 | `'sqlcipher'` | Default. AES-256-CBC + HMAC-SHA1 + Argon2id KDF. SQLCipher v4 compatible.   |
-| `'wxsqlite3'` | Legacy mode used by older wxSQLite3 deployments.                            |
+| `'chacha20'`  | The cipher peer's own default (ChaCha20-Poly1305).                          |
 | `'aes256cbc'` | Raw AES-256-CBC without the SQLCipher HMAC envelope.                        |
 | `'aes128cbc'` | AES-128-CBC variant.                                                        |
 | `'rc4'`       | Legacy interop only. Do **not** use for new deployments.                    |
@@ -165,7 +165,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/store-sqlite-encrypted — optional encryption-at-rest
 sub-pack for the Graphorin framework's default SQLite store.
@@ -221,7 +221,7 @@ Defaults follow ADR-030 / DEC-129:
 
 | Type Alias | Description |
 | ------ | ------ |
-| [EncryptionCipher](/api/@graphorin/store-sqlite-encrypted/type-aliases/EncryptionCipher.md) | Cipher selection. The default `'sqlcipher'` mirrors the most-shipped variant of `better-sqlite3-multiple-ciphers`. Other variants (`'wxsqlite3'`, `'rc4'`, …) are accepted by the cipher peer; we validate the string only at the resolver boundary. |
+| [EncryptionCipher](/api/@graphorin/store-sqlite-encrypted/type-aliases/EncryptionCipher.md) | Cipher selection, validated against the real sqlite3mc vocabulary (CS-13 — `'wxsqlite3'` is the library's name, not a cipher; the peer rejects it with "Cipher 'wxsqlite3' unknown"). `'sqlcipher'` is the Graphorin default (SQLCipher v4 compatible); `'chacha20'` is the peer's own default cipher. |
 
 ## Variables
 
@@ -236,7 +236,7 @@ Defaults follow ADR-030 / DEC-129:
 | ------ | ------ |
 | [\_resetCipherPeerCacheForTesting](/api/@graphorin/store-sqlite-encrypted/functions/resetCipherPeerCacheForTesting.md) | Test-only escape hatch. Drops the cached constructor so the next [loadCipherPeer](/api/@graphorin/store-sqlite-encrypted/functions/loadCipherPeer.md) call re-imports the peer. |
 | [\_setCipherPeerForTesting](/api/@graphorin/store-sqlite-encrypted/functions/setCipherPeerForTesting.md) | Test-only escape hatch. Pre-populates the cache with a stub driver so unit tests can exercise the encrypt / rekey runners without touching the native cipher addon. |
-| [cipherIntegrityCheck](/api/@graphorin/store-sqlite-encrypted/functions/cipherIntegrityCheck.md) | Runs `PRAGMA cipher_integrity_check` against the provided connection. The connection MUST already be open with the cipher key applied (typically via [createEncryptedConnection](/api/@graphorin/store-sqlite-encrypted/functions/createEncryptedConnection.md)). |
+| [cipherIntegrityCheck](/api/@graphorin/store-sqlite-encrypted/functions/cipherIntegrityCheck.md) | Runs `PRAGMA integrity_check` against the provided connection. The connection MUST already be open with the cipher key applied (typically via [createEncryptedConnection](/api/@graphorin/store-sqlite-encrypted/functions/createEncryptedConnection.md)) — a wrong key surfaces as an open/read error before the pragma runs. |
 | [createEncryptedConnection](/api/@graphorin/store-sqlite-encrypted/functions/createEncryptedConnection.md) | Opens an encrypted SQLite connection. Differs from `openConnection` only in that the cipher peer driver is preloaded — callers that supply an `encryption.passphraseResolver` get the same behaviour as `openConnection({ encryption })` plus an explicit fail-fast on a missing cipher peer. |
 | [encodePassphraseForPragma](/api/@graphorin/store-sqlite-encrypted/functions/encodePassphraseForPragma.md) | SQL-literal-encodes a passphrase for use as the right-hand side of `PRAGMA key = ...`. |
 | [encryptDatabase](/api/@graphorin/store-sqlite-encrypted/functions/encryptDatabase.md) | Encrypts an unencrypted SQLite database. Returns once the target file has been written and verified. Throws if the source is missing, the target already exists (and `overwriteTarget` is unset), the cipher peer is missing, or the integrity check fails. |

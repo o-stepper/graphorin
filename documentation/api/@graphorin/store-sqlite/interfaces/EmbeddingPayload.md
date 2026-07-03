@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EmbeddingPayload
 
-Defined in: packages/store-sqlite/src/memory-store.ts:64
+Defined in: packages/store-sqlite/src/memory-store.ts:88
 
 Optional embedding payload attached to a memory write. The
 `embedder_id` must already be registered in `embedding_meta`; the
@@ -18,5 +18,5 @@ Optional embedding payload attached to a memory write. The
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-embedderid"></a> `embedderId` | `readonly` | `string` | packages/store-sqlite/src/memory-store.ts:65 |
-| <a id="property-vector"></a> `vector` | `readonly` | `Float32Array` | packages/store-sqlite/src/memory-store.ts:66 |
+| <a id="property-embedderid"></a> `embedderId` | `readonly` | `string` | packages/store-sqlite/src/memory-store.ts:89 |
+| <a id="property-vector"></a> `vector` | `readonly` | `Float32Array` | packages/store-sqlite/src/memory-store.ts:90 |

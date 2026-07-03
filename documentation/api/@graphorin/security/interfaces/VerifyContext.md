@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: VerifyContext
 
-Defined in: packages/security/src/auth/verify.ts:119
+Defined in: packages/security/src/auth/verify.ts:127
 
 Optional context surfaced to the verify pipeline.
 
@@ -16,4 +16,4 @@ Optional context surfaced to the verify pipeline.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-ip"></a> `ip?` | `readonly` | `string` | Caller IP address (or pseudonymous hash). Used by the per-IP rate limit. | packages/security/src/auth/verify.ts:121 |
+| <a id="property-ip"></a> `ip?` | `readonly` | `string` | Caller IP address (or pseudonymous hash). Used by the per-IP rate limit. | packages/security/src/auth/verify.ts:129 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -66,15 +66,12 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
   jsonrpc: ZodLiteral<"2.0">;
   method: ZodLiteral<"subscription.subscribe">;
   params: ZodObject<{
-     lastSequenceId: ZodOptional<ZodNumber>;
      sinceEventId: ZodOptional<ZodString>;
      subject: ZodString;
    }, "strict", ZodTypeAny, {
-     lastSequenceId?: number;
      sinceEventId?: string;
      subject: string;
    }, {
-     lastSequenceId?: number;
      sinceEventId?: string;
      subject: string;
   }>;
@@ -84,7 +81,6 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
   jsonrpc: "2.0";
   method: "subscription.subscribe";
   params: {
-     lastSequenceId?: number;
      sinceEventId?: string;
      subject: string;
   };
@@ -94,7 +90,6 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
   jsonrpc: "2.0";
   method: "subscription.subscribe";
   params: {
-     lastSequenceId?: number;
      sinceEventId?: string;
      subject: string;
   };
@@ -130,7 +125,7 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
 }>]>;
 ```
 
-Defined in: client-message.ts:129
+Defined in: client-message.ts:130
 
 Zod schema for every legal client → server frame. Use
 [ClientMessageSchema](/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md).safeParse() inside the server upgrade

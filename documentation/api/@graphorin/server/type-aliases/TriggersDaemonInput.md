@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ type TriggersDaemonInput =
 };
 ```
 
-Defined in: packages/server/src/app.ts:304
+Defined in: packages/server/src/app.ts:310
 
 Discriminated union accepted by `CreateServerOptions.triggers`. A
 caller may either supply a fully-built daemon (e.g. constructed

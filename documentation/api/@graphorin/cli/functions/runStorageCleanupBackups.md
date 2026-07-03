@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runStorageCleanupBackups(options?): Promise<StorageCleanupBackupsResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:291
+Defined in: packages/cli/src/commands/storage.ts:288
 
 Drop stale `.bak`, `.bak.<ts>`, and `.tmp.<ts>` siblings of the
 configured storage path. Useful after `encrypt` / `rekey` runs that

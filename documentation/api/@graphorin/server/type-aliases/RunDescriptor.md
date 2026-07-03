@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ type RunDescriptor =
 };
 ```
 
-Defined in: packages/server/src/runtime/run-state.ts:60
+Defined in: packages/server/src/runtime/run-state.ts:86
 
 Bookkeeping descriptor recorded at run start. Either an agent run
 (with `agentId`) or a workflow run (with `workflowId` + optional

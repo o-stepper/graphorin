@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: LayerCandidate
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:59
+Defined in: packages/memory/src/context-engine/token-budget.ts:65
 
 Single layer candidate fed to [allocate](/api/@graphorin/memory/functions/allocateTokenBudget.md). The `text` field
 carries the rendered fragment; `cap` is the optional per-layer
@@ -19,7 +19,7 @@ for advanced use cases.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:62 |
-| <a id="property-id"></a> `id` | `readonly` | [`LayerId`](/api/@graphorin/memory/type-aliases/LayerId.md) | packages/memory/src/context-engine/token-budget.ts:60 |
-| <a id="property-priority"></a> `priority?` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:63 |
-| <a id="property-text"></a> `text` | `readonly` | `string` | packages/memory/src/context-engine/token-budget.ts:61 |
+| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:68 |
+| <a id="property-id"></a> `id` | `readonly` | [`LayerId`](/api/@graphorin/memory/type-aliases/LayerId.md) | packages/memory/src/context-engine/token-budget.ts:66 |
+| <a id="property-priority"></a> `priority?` | `readonly` | `number` | packages/memory/src/context-engine/token-budget.ts:69 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | packages/memory/src/context-engine/token-budget.ts:67 |

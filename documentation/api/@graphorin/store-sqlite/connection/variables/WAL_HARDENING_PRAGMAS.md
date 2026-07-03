@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const WAL_HARDENING_PRAGMAS: readonly ["journal_mode = WAL", "synchronous = NORMAL", "busy_timeout = 5000", "mmap_size = 134217728", "temp_store = MEMORY", "cache_size = -64000", "foreign_keys = ON"];
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:51
+Defined in: packages/store-sqlite/src/connection.ts:56
 
 Mandatory WAL hardening pragmas applied at connection open. Any
 deviation must be documented in the calling site's TSDoc per the

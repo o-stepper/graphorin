@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -43,13 +43,36 @@ Mark an episode archived. Soft-archive — the row stays for replay.
 
 ***
 
+### count()?
+
+```ts
+optional count(scope): Promise<number>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:89
+
+Count the recall-eligible episodes for the scope (CE-5) — a `COUNT(*)`,
+never materialising rows. Powers honest `metadata()` counts.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+***
+
 ### get()
 
 ```ts
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:65
+Defined in: packages/core/dist/contracts/memory-store.d.ts:83
 
 #### Parameters
 
@@ -67,13 +90,44 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:65
 
 ***
 
+### listRecent()?
+
+```ts
+optional listRecent(
+   scope, 
+   limit, 
+options?): Promise<readonly Episode[]>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:74
+
+Most-recent episodes by end time (newest first), with no FTS / vector
+query — recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
+and the deep-phase reflection gate. The default `@graphorin/store-sqlite`
+adapter implements it.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `limit` | `number` |
+| `options?` | \{ `includeQuarantined?`: `boolean`; \} |
+| `options.includeQuarantined?` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\&gt;
+
+***
+
 ### put()
 
 ```ts
 put(episode): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:63
+Defined in: packages/core/dist/contracts/memory-store.d.ts:81
 
 #### Parameters
 
@@ -118,7 +172,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:55
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:64
+Defined in: packages/core/dist/contracts/memory-store.d.ts:82
 
 #### Parameters
 
@@ -165,3 +219,32 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:56
 #### Returns
 
 `Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
+
+***
+
+### setStatus()?
+
+```ts
+optional setStatus(
+   id, 
+   status, 
+reason?): Promise<void>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:84
+
+Set an episode's retrieval-trust `status` (MCON-2) — promote a quarantined
+(auto-formed) episode into default recall or re-quarantine an active one,
+with a `memory_history` audit row. Powers [EpisodicMemory.validate](/api/@graphorin/memory/classes/EpisodicMemory.md#validate).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` |
+| `status` | [`MemoryStatus`](/api/@graphorin/core/type-aliases/MemoryStatus.md) |
+| `reason?` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;

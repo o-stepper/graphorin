@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const AUTHORITY_OPTIONAL_SCHEMES: ReadonlySet<string>;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:42
+Defined in: packages/security/src/secrets/secret-ref.ts:43
 
 Schemes whose authority component is optional. `file:` and
 `encrypted-file:` accept either `file:///abs/path` (authority empty)

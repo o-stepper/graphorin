@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AgentErrorEvent
 
-Defined in: packages/core/src/types/agent-event.ts:251
+Defined in: packages/core/src/types/agent-event.ts:260
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:251
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/core/src/types/agent-event.ts:253 |
-| `error.code` | `readonly` | `string` | packages/core/src/types/agent-event.ts:253 |
-| `error.message` | `readonly` | `string` | packages/core/src/types/agent-event.ts:253 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.error"` | packages/core/src/types/agent-event.ts:252 |
+| <a id="property-error"></a> `error` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/core/src/types/agent-event.ts:262 |
+| `error.code` | `readonly` | `string` | packages/core/src/types/agent-event.ts:262 |
+| `error.message` | `readonly` | `string` | packages/core/src/types/agent-event.ts:262 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.error"` | packages/core/src/types/agent-event.ts:261 |

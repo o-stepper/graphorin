@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function loginInteractive(options): Promise<LoginInteractiveResult>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:62
+Defined in: packages/security/src/oauth/library.ts:67
 
 Drive an interactive login flow against the supplied server. The
 function chooses Authorization Code by default and falls back to

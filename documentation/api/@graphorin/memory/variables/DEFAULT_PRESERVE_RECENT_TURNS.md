@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const DEFAULT_PRESERVE_RECENT_TURNS: 6 = 6;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/compactor.ts:47
+Defined in: packages/memory/src/context-engine/compaction/compactor.ts:50
 
 Default count of recent turns preserved verbatim by the
 `summarize-old-preserve-recent` strategy.

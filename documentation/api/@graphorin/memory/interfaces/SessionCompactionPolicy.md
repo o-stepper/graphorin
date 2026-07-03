@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionCompactionPolicy
 
-Defined in: packages/memory/src/tiers/session-memory.ts:20
+Defined in: packages/memory/src/tiers/session-memory.ts:22
 
 Per-session compaction policy. The default `0.9` matches DEC-104:
 compaction kicks in once cached message tokens exceed
@@ -18,5 +18,5 @@ compaction kicks in once cached message tokens exceed
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-compactatratio"></a> `compactAtRatio?` | `readonly` | `number` | Default `0.9`. | packages/memory/src/tiers/session-memory.ts:22 |
-| <a id="property-contextwindowtokens"></a> `contextWindowTokens?` | `readonly` | `number` | Default `8192`. | packages/memory/src/tiers/session-memory.ts:24 |
+| <a id="property-compactatratio"></a> `compactAtRatio?` | `readonly` | `number` | Default `0.9`. | packages/memory/src/tiers/session-memory.ts:24 |
+| <a id="property-contextwindowtokens"></a> `contextWindowTokens?` | `readonly` | `number` | Default `8192`. | packages/memory/src/tiers/session-memory.ts:26 |

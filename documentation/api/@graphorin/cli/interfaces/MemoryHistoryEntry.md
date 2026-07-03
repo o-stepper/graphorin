@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryHistoryEntry
 
-Defined in: packages/cli/src/commands/memory.ts:203
+Defined in: packages/cli/src/commands/memory.ts:222
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/cli/src/commands/memory.ts:203
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:206 |
-| <a id="property-event"></a> `event` | `readonly` | `string` | packages/cli/src/commands/memory.ts:204 |
-| <a id="property-source"></a> `source` | `readonly` | `string` | packages/cli/src/commands/memory.ts:205 |
+| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:225 |
+| <a id="property-event"></a> `event` | `readonly` | `string` | packages/cli/src/commands/memory.ts:223 |
+| <a id="property-source"></a> `source` | `readonly` | `string` | packages/cli/src/commands/memory.ts:224 |

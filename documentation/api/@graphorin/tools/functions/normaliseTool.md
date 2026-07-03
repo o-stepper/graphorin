@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function normaliseTool<TInput, TOutput, TDeps>(tool, source): NormaliseOutcome<TInput, TOutput, TDeps>;
 ```
 
-Defined in: packages/tools/src/registry/normalize.ts:99
+Defined in: packages/tools/src/registry/normalize.ts:104
 
 Normalise a tool registration. Throws on programming errors
 (invalid examples, invalid `preferredModel`, invalid

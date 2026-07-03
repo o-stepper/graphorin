@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function revokeOAuthSession(
 options?): Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:165
+Defined in: packages/security/src/oauth/library.ts:182
 
 Revoke the OAuth session for `serverId`. The function always tears
 the persisted record down even when the revocation endpoint
@@ -21,13 +21,14 @@ returns an error.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) |
-| `serverId` | `string` |
-| `options` | \{ `reason?`: `string`; `signal?`: `AbortSignal`; \} |
-| `options.reason?` | `string` |
-| `options.signal?` | `AbortSignal` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | - |
+| `serverId` | `string` | - |
+| `options` | \{ `reason?`: `string`; `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); `signal?`: `AbortSignal`; \} | - |
+| `options.reason?` | `string` | - |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | SPL-1: resolves the persisted tokens so RFC 7009 actually fires. |
+| `options.signal?` | `AbortSignal` | - |
 
 ## Returns
 

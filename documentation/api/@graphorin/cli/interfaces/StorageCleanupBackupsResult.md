@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: StorageCleanupBackupsResult
 
-Defined in: packages/cli/src/commands/storage.ts:278
+Defined in: packages/cli/src/commands/storage.ts:275
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/cli/src/commands/storage.ts:278
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/storage.ts:279 |
-| <a id="property-dryrun"></a> `dryRun` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:281 |
-| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/storage.ts:280 |
+| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/storage.ts:276 |
+| <a id="property-dryrun"></a> `dryRun` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:278 |
+| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/storage.ts:277 |

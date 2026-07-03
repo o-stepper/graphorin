@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function readSessionExport(body, options?): SessionExportReadResult;
 ```
 
-Defined in: packages/sessions/src/export/reader.ts:98
+Defined in: packages/sessions/src/export/reader.ts:100
 
 Parse a string body. The body must be a single block of JSONL with
 a `kind: 'meta'` first line and a `kind: 'footer'` last line.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,7 +7,7 @@
 # Variable: VERSION
 
 ```ts
-const VERSION: "0.4.0" = '0.4.0';
+const VERSION: "0.5.0" = '0.5.0';
 ```
 
 Defined in: packages/secret-1password/src/index.ts:28

@@ -1,0 +1,22 @@
+[**Graphorin API reference v0.5.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/provider](/api/@graphorin/provider/index.md) / [](/api/@graphorin/provider/README.md) / createCostAccumulator
+
+# Function: createCostAccumulator()
+
+```ts
+function createCostAccumulator(): CostAccumulator;
+```
+
+Defined in: packages/provider/src/middleware/with-cost-tracking.ts:63
+
+Create a [CostAccumulator](/api/@graphorin/provider/interfaces/CostAccumulator.md) — the process-local accumulator described on
+[withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md). Keys totals by `'<providerName>::<modelId>'`.
+
+## Returns
+
+[`CostAccumulator`](/api/@graphorin/provider/interfaces/CostAccumulator.md)
+
+## Stable

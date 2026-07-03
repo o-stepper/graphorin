@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MCPResourceDefinition
 
-Defined in: packages/mcp/src/client/types.ts:237
+Defined in: packages/mcp/src/client/types.ts:248
 
 Resource descriptor returned by `listResources()`.
 
@@ -14,7 +14,7 @@ Resource descriptor returned by `listResources()`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/mcp/src/client/types.ts:240 |
-| <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | packages/mcp/src/client/types.ts:241 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | packages/mcp/src/client/types.ts:239 |
-| <a id="property-uri"></a> `uri` | `readonly` | `string` | packages/mcp/src/client/types.ts:238 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/mcp/src/client/types.ts:251 |
+| <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | packages/mcp/src/client/types.ts:252 |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | packages/mcp/src/client/types.ts:250 |
+| <a id="property-uri"></a> `uri` | `readonly` | `string` | packages/mcp/src/client/types.ts:249 |

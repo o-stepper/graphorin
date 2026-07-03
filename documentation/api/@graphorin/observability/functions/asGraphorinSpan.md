@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function asGraphorinSpan<T>(span):
   | null;
 ```
 
-Defined in: packages/observability/src/tracer/tracer.ts:280
+Defined in: packages/observability/src/tracer/tracer.ts:304
 
 Returns the underlying [GraphorinSpan](/api/@graphorin/observability/interfaces/GraphorinSpan.md) when `span` is a Graphorin
 span. Useful when callers want to reach the per-attribute sensitivity

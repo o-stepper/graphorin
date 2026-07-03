@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function describeParseErrorKind(kind): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:684
+Defined in: packages/security/src/secrets/secret-ref.ts:696
 
 Map `SecretRefParseErrorKind` to a human-friendly string. Useful for
 diagnostic messages in `graphorin doctor --check-secrets`.

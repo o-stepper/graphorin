@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: WorkflowSummary
 
-Defined in: packages/server/src/registry/index.ts:66
+Defined in: packages/server/src/registry/index.ts:80
 
 Snapshot record returned by [WorkflowRegistry.list](/api/@graphorin/server/registry/classes/WorkflowRegistry.md#list).
 
@@ -16,6 +16,6 @@ Snapshot record returned by [WorkflowRegistry.list](/api/@graphorin/server/regis
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/server/src/registry/index.ts:68 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:67 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/server/src/registry/index.ts:69 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/server/src/registry/index.ts:82 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:81 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/server/src/registry/index.ts:83 |

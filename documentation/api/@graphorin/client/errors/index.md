@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -31,3 +31,9 @@ boundaries when the package is dual-loaded).
 | Type Alias | Description |
 | ------ | ------ |
 | [GraphorinClientErrorKind](/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md) | Discriminator union of every error kind raised by the client. |
+
+## Functions
+
+| Function | Description |
+| ------ | ------ |
+| [kindForRpcCode](/api/@graphorin/client/errors/functions/kindForRpcCode.md) | IP-19: map a JSON-RPC error code from a server `RpcFailure` frame to the client's discriminated [GraphorinClientErrorKind](/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md), so a rate-limited or scope-denied RPC is distinguishable from a genuine protocol violation. |

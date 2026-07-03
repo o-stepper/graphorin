@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ function allocateTokenBudget(
 options?): Promise<AllocationResult>;
 ```
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:153
+Defined in: packages/memory/src/context-engine/token-budget.ts:214
 
 Run the allocator. Layers are sorted by priority ascending (the
 first layer is the highest priority); when the running total

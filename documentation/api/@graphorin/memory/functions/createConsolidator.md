@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createConsolidator(opts): Consolidator;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:88
+Defined in: packages/memory/src/consolidator/runtime.ts:111
 
 Build the runtime consolidator.
 

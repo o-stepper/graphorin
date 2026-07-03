@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createSessionReplayer(opts?): SessionReplayer;
 ```
 
-Defined in: packages/sessions/src/replay/replayer.ts:91
+Defined in: packages/sessions/src/replay/replayer.ts:92
 
 Build a session-level replayer.
 

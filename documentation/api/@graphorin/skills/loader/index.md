@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -42,5 +42,5 @@ The loader supports four sources:
 | Function | Description |
 | ------ | ------ |
 | [loadSkillFromSource](/api/@graphorin/skills/loader/functions/loadSkillFromSource.md) | Load a single skill from any supported source. The loader runs the full frontmatter validator and resolves the supply-chain trust policy so the returned [Skill](/api/@graphorin/skills/interfaces/Skill.md) is ready to be inserted into a `SkillRegistry`. |
-| [loadSkills](/api/@graphorin/skills/loader/functions/loadSkills.md) | Load multiple skills concurrently. Emits a warning diagnostic on the first encountered source error when `throwOnSourceError === false`; otherwise the first error propagates out unchanged. |
+| [loadSkills](/api/@graphorin/skills/loader/functions/loadSkills.md) | Load multiple skills concurrently. The sources are loaded in parallel and the returned array preserves input order. When `throwOnSourceError === false` (default) a failing source is logged and skipped; otherwise the first rejection propagates out unchanged. |
 | [requireHandoffInputFilter](/api/@graphorin/skills/loader/functions/requireHandoffInputFilter.md) | Required handoff-filter declaration helper. Returns the typed declaration the loader parsed from frontmatter; throws [InputFilterRequiredError](/api/@graphorin/skills/errors/classes/InputFilterRequiredError.md) when the skill is untrusted and the field is missing. Used by the agent runtime in Phase 12 right before instantiating an untrusted skill's sub-agent. |

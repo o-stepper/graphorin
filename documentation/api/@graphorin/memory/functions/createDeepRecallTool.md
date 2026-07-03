@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,6 +16,7 @@ function createDeepRecallTool(deps): Tool<{
   abstained: boolean;
   hits: {
      factId: string;
+     provenance?: string;
      score: number;
      sensitivity: "public" | "internal" | "secret";
      text: string;
@@ -25,7 +26,7 @@ function createDeepRecallTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:168
+Defined in: packages/memory/src/tools/recall-tools.ts:176
 
 `deep_recall` — gated, multi-pass ("deep") recall over the user's
 factual memory for HARD questions (P2-4). A local difficulty gate keeps
@@ -55,6 +56,7 @@ pass, so prefer the cheaper `fact_search` for ordinary lookups.
   `abstained`: `boolean`;
   `hits`: \{
      `factId`: `string`;
+     `provenance?`: `string`;
      `score`: `number`;
      `sensitivity`: `"public"` \| `"internal"` \| `"secret"`;
      `text`: `string`;

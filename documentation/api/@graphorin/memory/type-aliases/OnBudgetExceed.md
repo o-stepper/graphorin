@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type OnBudgetExceed = "pause" | "log" | "throw";
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:78
+Defined in: packages/memory/src/consolidator/types.ts:91
 
 Behaviour applied by the budget enforcer when a ceiling is hit
 mid-run. `'pause'` is the conservative default — the consolidator

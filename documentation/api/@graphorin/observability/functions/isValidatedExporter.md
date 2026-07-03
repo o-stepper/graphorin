@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function isValidatedExporter(exporter): boolean;
 ```
 
-Defined in: packages/observability/src/exporters/with-validation.ts:150
+Defined in: packages/observability/src/exporters/with-validation.ts:145
 
 Quickly check whether an exporter is the result of a previous
 [withValidation](/api/@graphorin/observability/functions/withValidation.md) call. The tracer uses this to fail fast at

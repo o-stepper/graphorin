@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: SessionMemory
 
-Defined in: packages/memory/src/tiers/session-memory.ts:48
+Defined in: packages/memory/src/tiers/session-memory.ts:50
 
 `SessionMemory` — append-only message log per session. Owns the
 `session_messages` storage by single-source-of-truth (DEC-147); the
@@ -22,7 +22,7 @@ Defined in: packages/memory/src/tiers/session-memory.ts:48
 new SessionMemory(args): SessionMemory;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:53
+Defined in: packages/memory/src/tiers/session-memory.ts:55
 
 #### Parameters
 
@@ -45,15 +45,13 @@ Defined in: packages/memory/src/tiers/session-memory.ts:53
 attributedFor(scope): Promise<readonly AgentRegistryEntry[]>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:226
+Defined in: packages/memory/src/tiers/session-memory.ts:253
 
-Returns the registered agents that participated in the supplied
-scope. The default sqlite adapter exposes `agents_registry` rows
-via the sessions store; this convenience accessor resolves them
-without requiring callers to import the sessions package.
-
-The method is best-effort — adapters that do not maintain an
-agent registry simply return an empty list.
+NOT IMPLEMENTED (MRET-12) — always resolves `[]`. The agent
+registry lives in `@graphorin/sessions` and has never been
+threaded into this tier; the previous JSDoc claimed the default
+sqlite adapter "resolves" registry rows here, which was false. Use
+the sessions facade for participant attribution.
 
 #### Parameters
 
@@ -73,11 +71,17 @@ agent registry simply return an empty list.
 compact(scope, opts?): Promise<SessionCompactionResult>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:153
+Defined in: packages/memory/src/tiers/session-memory.ts:185
 
-Phase 10a ships the deterministic minimum-viable compaction:
-summarises the request as a counter-only shape. Phase 10c
-replaces the inner body with the LLM-summarized cutoff.
+NOT IMPLEMENTED (MRET-12) — always resolves
+`{ removed: 0, summarized: 0 }` and deletes / summarizes nothing.
+Session-context compaction is owned by the context engine
+(`memory.contextEngine.compactNow`, driven by the agent runtime);
+this tier-level method previously FABRICATED counts (it reported
+`total - keepLastN` as "removed" while removing nothing — with the
+default `keepLastN: 0` it claimed to have compacted the whole
+session). It now reports the truth until a real message splice
+exists at this layer.
 
 #### Parameters
 
@@ -101,12 +105,12 @@ flushImportant(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:134
+Defined in: packages/memory/src/tiers/session-memory.ts:160
 
-Surface high-importance items as a silent turn for the model.
-Phase 10a ships a no-op shell; Phase 10c (Consolidator) populates
-the actual flush behaviour. The method exists in 10a so callers
-can wire the contract today without conditional checks.
+NOT IMPLEMENTED (MRET-12) — always resolves `{ flushed: 0 }` and
+performs no work. The consolidator pipeline (extraction → facts /
+episodes) superseded the planned "silent flush turn"; this method
+remains only for contract stability. Do not branch on its counter.
 
 #### Parameters
 
@@ -130,7 +134,7 @@ can wire the contract today without conditional checks.
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:87
+Defined in: packages/memory/src/tiers/session-memory.ts:89
 
 List messages for the supplied scope.
 
@@ -147,13 +151,38 @@ List messages for the supplied scope.
 
 ***
 
+### listWithMetadata()
+
+```ts
+listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
+```
+
+Defined in: packages/memory/src/tiers/session-memory.ts:112
+
+RP-5: list messages with their persisted identity (stored id / sequence /
+`createdAt`) so an exporter preserves message identity + chronology.
+Delegates to the store when it supports the richer read.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `opts` | [`SessionListOptions`](/api/@graphorin/core/interfaces/SessionListOptions.md) |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\&gt;
+
+***
+
 ### push()
 
 ```ts
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:64
+Defined in: packages/memory/src/tiers/session-memory.ts:66
 
 Persist a message. Returns the storage reference.
 
@@ -179,7 +208,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:106
+Defined in: packages/memory/src/tiers/session-memory.ts:132
 
 Hybrid (FTS5) search over the session messages.
 
@@ -205,7 +234,7 @@ Hybrid (FTS5) search over the session messages.
 shouldCompact(scope, contextWindowOrOptions?): Promise<boolean>;
 ```
 
-Defined in: packages/memory/src/tiers/session-memory.ts:192
+Defined in: packages/memory/src/tiers/session-memory.ts:221
 
 Returns `true` when the cached message tokens exceed
 `compactAtRatio * contextWindow` (default `0.9` per DEC-104). The

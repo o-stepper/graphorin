@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: PerChildBudget
 
-Defined in: packages/agent/src/fanout/index.ts:24
+Defined in: packages/agent/src/fanout/index.ts:33
 
 Per-child budget. Defaults derived from the canonical 2026
 scaling-rule table for agent fan-out workloads.
@@ -15,8 +15,8 @@ scaling-rule table for agent fan-out workloads.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-durationms"></a> `durationMs?` | `readonly` | `number` | packages/agent/src/fanout/index.ts:27 |
-| <a id="property-tokens"></a> `tokens?` | `readonly` | `number` | packages/agent/src/fanout/index.ts:25 |
-| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | `number` | packages/agent/src/fanout/index.ts:26 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-durationms"></a> `durationMs?` | `readonly` | `number` | Wall-clock cap, enforced for every child via a race timer. | packages/agent/src/fanout/index.ts:47 |
+| <a id="property-tokens"></a> `tokens?` | `readonly` | `number` | Max `usage.totalTokens` per child. Enforced **post-hoc** and only for usage-reporting children (an `invoke` that resolves to a full `AgentResult` — e.g. `() => child.run(input)`); a child returning a plain value reports `tokensUsed: 0` and this cap cannot fire. | packages/agent/src/fanout/index.ts:40 |
+| <a id="property-toolcalls"></a> `toolCalls?` | `readonly` | `number` | Max tool calls per child. Same usage-reporting contract as [PerChildBudget.tokens](/api/@graphorin/agent/fanout/interfaces/PerChildBudget.md#property-tokens) (counted from `state.steps`). | packages/agent/src/fanout/index.ts:45 |

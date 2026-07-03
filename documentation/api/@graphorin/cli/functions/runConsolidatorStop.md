@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -8,11 +8,12 @@
 
 ```ts
 function runConsolidatorStop(options?): Promise<{
-  stopped: true;
+  stopped: false;
+  unsupported: true;
 }>;
 ```
 
-Defined in: packages/cli/src/commands/consolidator.ts:166
+Defined in: packages/cli/src/commands/consolidator.ts:171
 
 ## Parameters
 
@@ -23,7 +24,8 @@ Defined in: packages/cli/src/commands/consolidator.ts:166
 ## Returns
 
 `Promise`\<\{
-  `stopped`: `true`;
+  `stopped`: `false`;
+  `unsupported`: `true`;
 \}\>
 
 ## Stable

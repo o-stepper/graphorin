@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Scheduler
 
-Defined in: packages/triggers/src/index.ts:195
+Defined in: packages/triggers/src/index.ts:202
 
 Public Scheduler surface.
 
@@ -20,7 +20,7 @@ Public Scheduler surface.
 emit(eventName, payload?): Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:202
+Defined in: packages/triggers/src/index.ts:209
 
 Emit `eventName` to every registered `event` trigger.
 
@@ -43,7 +43,7 @@ Emit `eventName` to every registered `event` trigger.
 events(): AsyncIterable<SchedulerEvent>;
 ```
 
-Defined in: packages/triggers/src/index.ts:206
+Defined in: packages/triggers/src/index.ts:220
 
 AsyncIterable lifecycle event stream.
 
@@ -59,7 +59,7 @@ AsyncIterable lifecycle event stream.
 fire(id, payload?): Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:204
+Defined in: packages/triggers/src/index.ts:211
 
 Manually fire `id` (used by `graphorin triggers fire`, Phase 15).
 
@@ -82,7 +82,7 @@ Manually fire `id` (used by `graphorin triggers fire`, Phase 15).
 list(): Promise<readonly TriggerState[]>;
 ```
 
-Defined in: packages/triggers/src/index.ts:198
+Defined in: packages/triggers/src/index.ts:205
 
 #### Returns
 
@@ -96,7 +96,7 @@ Defined in: packages/triggers/src/index.ts:198
 recordActivity(): void;
 ```
 
-Defined in: packages/triggers/src/index.ts:208
+Defined in: packages/triggers/src/index.ts:222
 
 Notify the scheduler that the user / runtime is no longer idle.
 
@@ -112,7 +112,7 @@ Notify the scheduler that the user / runtime is no longer idle.
 register(declaration): Promise<TriggerState>;
 ```
 
-Defined in: packages/triggers/src/index.ts:196
+Defined in: packages/triggers/src/index.ts:203
 
 #### Parameters
 
@@ -126,13 +126,39 @@ Defined in: packages/triggers/src/index.ts:196
 
 ***
 
+### setDisabled()
+
+```ts
+setDisabled(id, disabled): Promise<TriggerState>;
+```
+
+Defined in: packages/triggers/src/index.ts:218
+
+Flip the persistent `disabled` flag (IP-17). Disabling cancels the
+armed timer but keeps the trigger registered + persisted; enabling
+recomputes the next fire from now and re-arms. The destructive
+removal is `unregister(...)`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `string` |
+| `disabled` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;[`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)\&gt;
+
+***
+
 ### start()
 
 ```ts
 start(): Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:199
+Defined in: packages/triggers/src/index.ts:206
 
 #### Returns
 
@@ -146,7 +172,7 @@ Defined in: packages/triggers/src/index.ts:199
 stop(): Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:200
+Defined in: packages/triggers/src/index.ts:207
 
 #### Returns
 
@@ -160,7 +186,7 @@ Defined in: packages/triggers/src/index.ts:200
 unregister(id): Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:197
+Defined in: packages/triggers/src/index.ts:204
 
 #### Parameters
 

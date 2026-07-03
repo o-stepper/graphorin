@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createSessionRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/sessions.ts:107
+Defined in: packages/server/src/routes/sessions.ts:106
 
 ## Parameters
 

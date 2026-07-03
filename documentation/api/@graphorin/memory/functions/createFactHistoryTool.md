@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -22,7 +22,7 @@ function createFactHistoryTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:255
+Defined in: packages/memory/src/tools/fact-tools.ts:274
 
 `fact_history` — trace how a fact changed over time. Returns the
 full bi-temporal supersede chain the given fact belongs to, oldest →

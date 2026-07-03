@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: SqliteConsolidatorStateStore
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:137
+Defined in: packages/store-sqlite/src/consolidator-store.ts:155
 
 SQLite-backed consolidator state store. Constructed by
 [SqliteMemoryStore](/api/@graphorin/store-sqlite/classes/SqliteMemoryStore.md); never instantiated directly by
@@ -22,7 +22,7 @@ application code.
 new SqliteConsolidatorStateStore(conn): SqliteConsolidatorStateStore;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:140
+Defined in: packages/store-sqlite/src/consolidator-store.ts:158
 
 #### Parameters
 
@@ -46,7 +46,7 @@ acquireLock(
 maxAgeMs): Promise<boolean>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:216
+Defined in: packages/store-sqlite/src/consolidator-store.ts:241
 
 #### Parameters
 
@@ -72,7 +72,7 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:357
+Defined in: packages/store-sqlite/src/consolidator-store.ts:388
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:357
 enqueueFailedBatch(input): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:336
+Defined in: packages/store-sqlite/src/consolidator-store.ts:366
 
 #### Parameters
 
@@ -116,7 +116,7 @@ getState(scope): Promise<
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:144
+Defined in: packages/store-sqlite/src/consolidator-store.ts:162
 
 #### Parameters
 
@@ -138,7 +138,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:144
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:405
+Defined in: packages/store-sqlite/src/consolidator-store.ts:436
 
 #### Parameters
 
@@ -169,7 +169,7 @@ listRecentRuns(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:298
+Defined in: packages/store-sqlite/src/consolidator-store.ts:328
 
 #### Parameters
 
@@ -203,7 +203,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:387
+Defined in: packages/store-sqlite/src/consolidator-store.ts:418
 
 #### Parameters
 
@@ -225,7 +225,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:387
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:374
+Defined in: packages/store-sqlite/src/consolidator-store.ts:405
 
 #### Parameters
 
@@ -245,7 +245,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:374
 recordRunFinish(finish): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:272
+Defined in: packages/store-sqlite/src/consolidator-store.ts:299
 
 #### Parameters
 
@@ -265,7 +265,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:272
 recordRunStart(input): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:255
+Defined in: packages/store-sqlite/src/consolidator-store.ts:282
 
 #### Parameters
 
@@ -285,7 +285,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:255
 releaseLock(scope, runId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:245
+Defined in: packages/store-sqlite/src/consolidator-store.ts:272
 
 #### Parameters
 
@@ -309,7 +309,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:378
+Defined in: packages/store-sqlite/src/consolidator-store.ts:409
 
 #### Parameters
 
@@ -331,7 +331,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:378
 upsertState(scope, patch): Promise<ConsolidatorStateRow>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:155
+Defined in: packages/store-sqlite/src/consolidator-store.ts:173
 
 #### Parameters
 

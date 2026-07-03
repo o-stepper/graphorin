@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -29,9 +29,21 @@ Re-exports [composeProviderMiddleware](/api/@graphorin/provider/functions/compos
 
 ***
 
+### CostAccumulator
+
+Re-exports [CostAccumulator](/api/@graphorin/provider/interfaces/CostAccumulator.md)
+
+***
+
 ### CostTrackingTotals
 
 Re-exports [CostTrackingTotals](/api/@graphorin/provider/interfaces/CostTrackingTotals.md)
+
+***
+
+### createCostAccumulator
+
+Re-exports [createCostAccumulator](/api/@graphorin/provider/functions/createCostAccumulator.md)
 
 ***
 

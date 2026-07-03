@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -15,11 +15,18 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: pricing/src/lookup.ts:99
+Defined in: pricing/src/lookup.ts:106
 
 Multiply a per-token price by an integer token count. Returns `null`
 when the price is unknown. Useful when caller wants to compute cost
 for a single LLM call without instantiating the cost tracker.
+
+Token-count contract (PS-19):
+- `inputTokens` **excludes** `cachedReadTokens` — cached reads are billed
+  separately at the cheaper cached rate, so pass the non-cached prompt count
+  to avoid double-billing.
+- `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
+  declares an explicit `reasoningUsdPerToken`.
 
 ## Parameters
 

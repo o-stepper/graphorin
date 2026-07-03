@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryActivityResult
 
-Defined in: packages/cli/src/commands/memory.ts:385
+Defined in: packages/cli/src/commands/memory.ts:444
 
 ## Stable
 
@@ -14,9 +14,9 @@ Defined in: packages/cli/src/commands/memory.ts:385
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-quarantine"></a> `quarantine` | `readonly` | \{ `episodes`: `number`; `facts`: `number`; `insights`: `number`; \} | packages/cli/src/commands/memory.ts:386 |
-| `quarantine.episodes` | `readonly` | `number` | packages/cli/src/commands/memory.ts:388 |
-| `quarantine.facts` | `readonly` | `number` | packages/cli/src/commands/memory.ts:387 |
-| `quarantine.insights` | `readonly` | `number` | packages/cli/src/commands/memory.ts:389 |
-| <a id="property-recentconflicts"></a> `recentConflicts` | `readonly` | readonly [`MemoryActivityConflict`](/api/@graphorin/cli/interfaces/MemoryActivityConflict.md)[] | packages/cli/src/commands/memory.ts:392 |
-| <a id="property-recenthistory"></a> `recentHistory` | `readonly` | readonly [`MemoryActivityEvent`](/api/@graphorin/cli/interfaces/MemoryActivityEvent.md)[] | packages/cli/src/commands/memory.ts:391 |
+| <a id="property-quarantine"></a> `quarantine` | `readonly` | \{ `episodes`: `number`; `facts`: `number`; `insights`: `number`; \} | packages/cli/src/commands/memory.ts:445 |
+| `quarantine.episodes` | `readonly` | `number` | packages/cli/src/commands/memory.ts:447 |
+| `quarantine.facts` | `readonly` | `number` | packages/cli/src/commands/memory.ts:446 |
+| `quarantine.insights` | `readonly` | `number` | packages/cli/src/commands/memory.ts:448 |
+| <a id="property-recentconflicts"></a> `recentConflicts` | `readonly` | readonly [`MemoryActivityConflict`](/api/@graphorin/cli/interfaces/MemoryActivityConflict.md)[] | packages/cli/src/commands/memory.ts:451 |
+| <a id="property-recenthistory"></a> `recentHistory` | `readonly` | readonly [`MemoryActivityEvent`](/api/@graphorin/cli/interfaces/MemoryActivityEvent.md)[] | packages/cli/src/commands/memory.ts:450 |

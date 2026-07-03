@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createAgentRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/agents.ts:49
+Defined in: packages/server/src/routes/agents.ts:55
 
 ## Parameters
 

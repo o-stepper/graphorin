@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorRunInput
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:44
+Defined in: packages/store-sqlite/src/consolidator-store.ts:52
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:44
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/store-sqlite/src/consolidator-store.ts:45 |
-| <a id="property-phase"></a> `phase` | `readonly` | `"light"` \| `"standard"` \| `"deep"` | packages/store-sqlite/src/consolidator-store.ts:48 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | packages/store-sqlite/src/consolidator-store.ts:46 |
-| <a id="property-startedat"></a> `startedAt` | `readonly` | `number` | packages/store-sqlite/src/consolidator-store.ts:49 |
-| <a id="property-triggerkind"></a> `triggerKind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"manual"` | packages/store-sqlite/src/consolidator-store.ts:47 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/store-sqlite/src/consolidator-store.ts:53 |
+| <a id="property-phase"></a> `phase` | `readonly` | `"light"` \| `"standard"` \| `"deep"` | packages/store-sqlite/src/consolidator-store.ts:56 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | packages/store-sqlite/src/consolidator-store.ts:54 |
+| <a id="property-startedat"></a> `startedAt` | `readonly` | `number` | packages/store-sqlite/src/consolidator-store.ts:57 |
+| <a id="property-triggerkind"></a> `triggerKind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"manual"` | packages/store-sqlite/src/consolidator-store.ts:55 |

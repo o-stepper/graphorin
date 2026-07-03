@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: WorkflowState\&lt;TState\&gt;
 
-Defined in: packages/workflow/src/types.ts:271
+Defined in: packages/workflow/src/types.ts:278
 
 Snapshot returned by [Workflow.getState](/api/@graphorin/workflow/interfaces/Workflow.md#getstate). Combines the most
 recent checkpoint state with the high-level run status / pending
@@ -24,9 +24,9 @@ pause payload.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-checkpointid"></a> `checkpointId` | `readonly` | `string` | - | packages/workflow/src/types.ts:276 |
-| <a id="property-pendingpause"></a> `pendingPause?` | `readonly` | [`PendingPauseRecord`](/api/@graphorin/workflow/interfaces/PendingPauseRecord.md) | Carries the value passed to `pause(value)` when status is `suspended`. | packages/workflow/src/types.ts:278 |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | - | packages/workflow/src/types.ts:275 |
-| <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` | - | packages/workflow/src/types.ts:274 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/workflow/src/types.ts:273 |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | - | packages/workflow/src/types.ts:272 |
+| <a id="property-checkpointid"></a> `checkpointId` | `readonly` | `string` | - | packages/workflow/src/types.ts:283 |
+| <a id="property-pendingpause"></a> `pendingPause?` | `readonly` | [`PendingPauseRecord`](/api/@graphorin/workflow/interfaces/PendingPauseRecord.md) | Carries the value passed to `pause(value)` when status is `suspended`. | packages/workflow/src/types.ts:285 |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | - | packages/workflow/src/types.ts:282 |
+| <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | - | packages/workflow/src/types.ts:281 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/workflow/src/types.ts:280 |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | - | packages/workflow/src/types.ts:279 |

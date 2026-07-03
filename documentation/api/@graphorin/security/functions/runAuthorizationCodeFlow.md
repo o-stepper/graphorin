@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runAuthorizationCodeFlow(args): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/authorize-code-flow.ts:51
+Defined in: packages/security/src/oauth/authorize-code-flow.ts:50
 
 Drive the Authorization Code + PKCE flow. The function is exposed
 for tests and for higher-level orchestration in `client.ts`.

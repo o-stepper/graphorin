@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: ProceduralMemory
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:93
+Defined in: packages/memory/src/tiers/procedural-memory.ts:97
 
 `ProceduralMemory` — standing orders activated when the agent's
 current context matches the rule's predicate. The activation rules
@@ -29,14 +29,15 @@ from [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory
 new ProceduralMemory(args): ProceduralMemory;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:99
+Defined in: packages/memory/src/tiers/procedural-memory.ts:108
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `args` | \{ `inducer?`: \| [`WorkflowInducer`](/api/@graphorin/memory/interfaces/WorkflowInducer.md) \| `null`; `store`: [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md); `tracer`: [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md); \} |
+| `args` | \{ `inducer?`: \| [`WorkflowInducer`](/api/@graphorin/memory/interfaces/WorkflowInducer.md) \| `null`; `promoteAfterSuccesses?`: `number` \| `null`; `store`: [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md); `tracer`: [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md); \} |
 | `args.inducer?` | \| [`WorkflowInducer`](/api/@graphorin/memory/interfaces/WorkflowInducer.md) \| `null` |
+| `args.promoteAfterSuccesses?` | `number` \| `null` |
 | `args.store` | [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md) |
 | `args.tracer` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) |
 
@@ -52,7 +53,7 @@ Defined in: packages/memory/src/tiers/procedural-memory.ts:99
 activate(scope, context?): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:249
+Defined in: packages/memory/src/tiers/procedural-memory.ts:327
 
 Return the rules active under `context`. Rules without a
 `condition` are always active; the bundled predicate vocabulary
@@ -83,7 +84,7 @@ feeds the system prompt — never surfaces it.
 define(scope, input): Promise<Rule>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:110
+Defined in: packages/memory/src/tiers/procedural-memory.ts:188
 
 Persist a rule. Returns the stored record.
 
@@ -109,7 +110,7 @@ induce(
 opts?): Promise<Rule | null>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:152
+Defined in: packages/memory/src/tiers/procedural-memory.ts:230
 
 Induce a reusable procedure (P2-2) from a successful agent trajectory
 and store it **quarantined** + `provenance: 'induction'` (P1-4). Returns
@@ -142,7 +143,7 @@ induceFromRun(
 opts?): Promise<Rule | null>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:208
+Defined in: packages/memory/src/tiers/procedural-memory.ts:286
 
 Convenience over [induce](/api/@graphorin/memory/classes/ProceduralMemory.md#induce): distil the [Trajectory](/api/@graphorin/memory/interfaces/Trajectory.md) from a
 completed [RunState](/api/@graphorin/core/interfaces/RunState.md) (the agent's already-emitted run state) and
@@ -168,7 +169,7 @@ induce a procedure. The success signal is `status === 'completed'`.
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:230
+Defined in: packages/memory/src/tiers/procedural-memory.ts:308
 
 List every active (non-deleted) rule for the supplied scope.
 
@@ -184,6 +185,54 @@ List every active (non-deleted) rule for the supplied scope.
 
 ***
 
+### recordOutcome()
+
+```ts
+recordOutcome(
+   scope, 
+   ruleId, 
+   succeeded): Promise<{
+  promoted: boolean;
+  refused: boolean;
+  successCount: number;
+}>;
+```
+
+Defined in: packages/memory/src/tiers/procedural-memory.ts:138
+
+Record the outcome of one demonstrated reuse of a procedure
+(MCON-2 part 4). A success increments the rule's persistent
+`successCount`; when `procedurePromotion.afterSuccesses` is
+configured and a QUARANTINED procedure reaches the threshold it is
+promoted through [validate](/api/@graphorin/memory/classes/ProceduralMemory.md#validate) — the injection gate still
+applies, so a flagged text refuses promotion (surfaced as
+`refused: true`) no matter how many successes accumulate.
+Failures are observed but not persisted (no negative counter yet).
+
+Callers decide what "success" means — typically
+`checkSuccessCriteria(...)` over the procedure's stored
+`successCriteria`, or an operator's judgement.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `ruleId` | `string` |
+| `succeeded` | `boolean` |
+
+#### Returns
+
+`Promise`\<\{
+  `promoted`: `boolean`;
+  `refused`: `boolean`;
+  `successCount`: `number`;
+\}\>
+
+#### Stable
+
+***
+
 ### remove()
 
 ```ts
@@ -193,7 +242,7 @@ remove(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:217
+Defined in: packages/memory/src/tiers/procedural-memory.ts:295
 
 Soft-delete a rule.
 
@@ -204,6 +253,40 @@ Soft-delete a rule.
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `ruleId` | `string` |
 | `reason?` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
+### validate()
+
+```ts
+validate(
+   scope, 
+   ruleId, 
+   reason?, 
+options?): Promise<void>;
+```
+
+Defined in: packages/memory/src/tiers/procedural-memory.ts:344
+
+Promote a quarantined (induced) procedure into `activate()` (MCON-2).
+Mirrors [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict
+from the stored rule text and **refuses** promotion of an injection-flagged
+procedure unless an operator passes `{ force: true }`. Induced procedures
+drive *actions*, so this gate matters most for them.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `ruleId` | `string` |
+| `reason?` | `string` |
+| `options?` | \{ `force?`: `boolean`; \} |
+| `options.force?` | `boolean` |
 
 #### Returns
 

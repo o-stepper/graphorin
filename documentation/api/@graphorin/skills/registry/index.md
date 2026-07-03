@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -32,6 +32,12 @@ standalone server (Phase 14) consume. It exposes:
 | [RegisteredToolDeclaration](/api/@graphorin/skills/registry/interfaces/RegisteredToolDeclaration.md) | Tool-declaration record exposed by [SkillRegistry.toolDeclarations](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#tooldeclarations). Adds the owning skill's name and trust level so downstream registrations into `@graphorin/tools` can stamp the source. |
 | [SkillRegistry](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md) | Public registry surface. |
 | [SkillRegistryOptions](/api/@graphorin/skills/registry/interfaces/SkillRegistryOptions.md) | Options accepted by [createSkillRegistry](/api/@graphorin/skills/registry/functions/createSkillRegistry.md). |
+
+## Type Aliases
+
+| Type Alias | Description |
+| ------ | ------ |
+| [SkillToolStamper](/api/@graphorin/skills/registry/type-aliases/SkillToolStamper.md) | Stamping seam injected by the agent runtime (Phase 12). It turns a skill's pre-built `Tool` into a fully resolved `ResolvedTool` (trust class + sandbox tier + source). The skills package keeps no hard dependency on `@graphorin/tools`; when no stamper is configured, `activate()` surfaces no tools (the runtime resolves them itself). |
 
 ## Functions
 

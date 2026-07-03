@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:59
+Defined in: packages/core/src/contracts/memory-store.ts:73
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:59
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:61
+Defined in: packages/core/src/contracts/memory-store.ts:75
 
 #### Parameters
 
@@ -37,13 +37,37 @@ Defined in: packages/core/src/contracts/memory-store.ts:61
 
 ***
 
+### listWithMetadata()?
+
+```ts
+optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
+```
+
+Defined in: packages/core/src/contracts/memory-store.ts:80
+
+List messages with their persisted identity (RP-5). Optional: stores that
+don't implement it fall back to `list` + fabricated ids on the export path.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `opts?` | [`SessionListOptions`](/api/@graphorin/core/interfaces/SessionListOptions.md) |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\&gt;
+
+***
+
 ### push()
 
 ```ts
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:60
+Defined in: packages/core/src/contracts/memory-store.ts:74
 
 #### Parameters
 
@@ -67,7 +91,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:62
+Defined in: packages/core/src/contracts/memory-store.ts:84
 
 #### Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function flattenUsageByModel(byModel): readonly ModelUsage[];
 ```
 
-Defined in: packages/core/src/types/run.ts:93
+Defined in: packages/core/src/types/run.ts:120
 
 Snapshot helper used by `@graphorin/observability` aggregators to
 convert the on-disk `usageByModel` shape into the canonical

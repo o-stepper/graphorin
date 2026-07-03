@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: InboundSanitizationPreamble
 
-Defined in: packages/memory/src/context-engine/locale-packs/types.ts:56
+Defined in: packages/memory/src/context-engine/locale-packs/types.ts:51
 
 D4 inbound-sanitization preamble fragment. Injected after the
 cache breakpoint (Layer 5/6 territory) on steps containing
@@ -18,4 +18,4 @@ untrusted tool output.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-text"></a> `text` | `readonly` | `string` | Verbatim text appended to the system message when fired. | packages/memory/src/context-engine/locale-packs/types.ts:58 |
+| <a id="property-text"></a> `text` | `readonly` | `string` | Verbatim text appended to the system message when fired. | packages/memory/src/context-engine/locale-packs/types.ts:53 |

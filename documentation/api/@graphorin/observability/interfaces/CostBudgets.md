@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CostBudgets
 
-Defined in: packages/observability/src/cost/types.ts:67
+Defined in: packages/observability/src/cost/types.ts:74
 
 Budget configuration shape consumed by [createCostTracker](/api/@graphorin/observability/functions/createCostTracker.md).
 
@@ -16,8 +16,8 @@ Budget configuration shape consumed by [createCostTracker](/api/@graphorin/obser
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-currency"></a> `currency?` | `readonly` | `string` | Currency. Defaults to `'USD'`. | packages/observability/src/cost/types.ts:77 |
-| <a id="property-peragent"></a> `perAgent?` | `readonly` | `number` | Per-agent budget. | packages/observability/src/cost/types.ts:73 |
-| <a id="property-perrun"></a> `perRun?` | `readonly` | `number` | Per-run budget. | packages/observability/src/cost/types.ts:75 |
-| <a id="property-persession"></a> `perSession?` | `readonly` | `number` | Per-session budget in the configured currency. | packages/observability/src/cost/types.ts:69 |
-| <a id="property-peruser"></a> `perUser?` | `readonly` | `number` | Per-user budget. | packages/observability/src/cost/types.ts:71 |
+| <a id="property-currency"></a> `currency?` | `readonly` | `string` | Currency. Defaults to `'USD'`. | packages/observability/src/cost/types.ts:84 |
+| <a id="property-peragent"></a> `perAgent?` | `readonly` | `number` | Per-agent budget. | packages/observability/src/cost/types.ts:80 |
+| <a id="property-perrun"></a> `perRun?` | `readonly` | `number` | Per-run budget. | packages/observability/src/cost/types.ts:82 |
+| <a id="property-persession"></a> `perSession?` | `readonly` | `number` | Per-session budget in the configured currency. | packages/observability/src/cost/types.ts:76 |
+| <a id="property-peruser"></a> `perUser?` | `readonly` | `number` | Per-user budget. | packages/observability/src/cost/types.ts:78 |

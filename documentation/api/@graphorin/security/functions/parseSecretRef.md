@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function parseSecretRef(uri): ParsedSecretRef;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:368
+Defined in: packages/security/src/secrets/secret-ref.ts:369
 
 Strict RFC 3986-subset parser for `SecretRef` URIs. Rejects every
 input that does not conform to the grammar declared in the

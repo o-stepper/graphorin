@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: TransformersJsEmbedder
 
-Defined in: packages/embedder-transformersjs/src/index.ts:125
+Defined in: packages/embedder-transformersjs/src/index.ts:135
 
 `EmbedderProvider` implementation backed by `@huggingface/transformers`.
 
@@ -24,7 +24,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:125
 new TransformersJsEmbedder(options): TransformersJsEmbedder;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:138
+Defined in: packages/embedder-transformersjs/src/index.ts:150
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:138
 configHash(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:160
+Defined in: packages/embedder-transformersjs/src/index.ts:173
 
 Stable hash of the embedder's configuration (model + revision + opts).
 
@@ -64,7 +64,7 @@ Stable hash of the embedder's configuration (model + revision + opts).
 dim(): number;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:155
+Defined in: packages/embedder-transformersjs/src/index.ts:168
 
 Output dimensionality of the embedding vectors.
 
@@ -84,7 +84,7 @@ Output dimensionality of the embedding vectors.
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:172
+Defined in: packages/embedder-transformersjs/src/index.ts:189
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 
@@ -111,7 +111,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 id(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:150
+Defined in: packages/embedder-transformersjs/src/index.ts:163
 
 Stable identifier (e.g. `'transformersjs:Xenova/multilingual-e5-base'`).
 

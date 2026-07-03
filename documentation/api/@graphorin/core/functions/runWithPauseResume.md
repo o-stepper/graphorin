@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,15 +7,21 @@
 # Function: runWithPauseResume()
 
 ```ts
-function runWithPauseResume<R>(value, fn): Promise<R>;
+function runWithPauseResume<R>(values, fn): Promise<R>;
 ```
 
-Defined in: packages/core/src/channels/pause.ts:63
+Defined in: packages/core/src/channels/pause.ts:70
 
 **`Internal`**
 
-Run `fn` inside a scope where the next `pause(...)` call returns the
-supplied `value` instead of throwing a fresh [PauseSignal](/api/@graphorin/core/classes/PauseSignal.md).
+Run `fn` inside a scope where successive `pause(...)` calls return the
+supplied `values` in order instead of throwing a fresh
+[PauseSignal](/api/@graphorin/core/classes/PauseSignal.md) (WF-2: a node body re-executes from the top on
+every resume, so earlier pauses must replay their already-delivered
+values and only the FIRST unsatisfied `pause()` suspends again). An
+empty `values` array behaves exactly like no scope — every `pause()`
+suspends — which is what a static-gate resume needs so a programmatic
+`pause()` inside the node is never silently satisfied.
 
 This helper is the contract between the runtime and `pause(...)`.
 Consumers of `pause(...)` never call it directly — only the workflow
@@ -31,7 +37,7 @@ engine wires it up around the resumed node body.
 
 | Parameter | Type |
 | ------ | ------ |
-| `value` | `unknown` |
+| `values` | readonly `unknown`[] |
 | `fn` | () => `R` \| `Promise`\&lt;`R`\&gt; |
 
 ## Returns

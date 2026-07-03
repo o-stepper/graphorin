@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Subscription
 
-Defined in: packages/client/src/graphorin-client.ts:145
+Defined in: packages/client/src/graphorin-client.ts:161
 
 Public surface returned by [GraphorinClient.subscribe](/api/@graphorin/client/client/classes/GraphorinClient.md#subscribe).
 
@@ -16,8 +16,8 @@ Public surface returned by [GraphorinClient.subscribe](/api/@graphorin/client/cl
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-subject"></a> `subject` | `readonly` | `string` | packages/client/src/graphorin-client.ts:147 |
-| <a id="property-subscriptionid"></a> `subscriptionId` | `readonly` | `string` | packages/client/src/graphorin-client.ts:146 |
+| <a id="property-subject"></a> `subject` | `readonly` | `string` | packages/client/src/graphorin-client.ts:163 |
+| <a id="property-subscriptionid"></a> `subscriptionId` | `readonly` | `string` | packages/client/src/graphorin-client.ts:162 |
 
 ## Methods
 
@@ -35,7 +35,7 @@ events(): AsyncIterable<{
 }>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:148
+Defined in: packages/client/src/graphorin-client.ts:164
 
 #### Returns
 
@@ -57,7 +57,7 @@ Defined in: packages/client/src/graphorin-client.ts:148
 metadata(): SubscriptionMetadata;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:153
+Defined in: packages/client/src/graphorin-client.ts:169
 
 #### Returns
 
@@ -71,7 +71,7 @@ Defined in: packages/client/src/graphorin-client.ts:153
 unsubscribe(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:152
+Defined in: packages/client/src/graphorin-client.ts:168
 
 Close the subscription on the server. Idempotent.
 

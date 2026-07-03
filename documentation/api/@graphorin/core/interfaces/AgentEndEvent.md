@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AgentEndEvent\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/agent-event.ts:244
+Defined in: packages/core/src/types/agent-event.ts:253
 
 ## Stable
 
@@ -20,6 +20,6 @@ Defined in: packages/core/src/types/agent-event.ts:244
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | packages/core/src/types/agent-event.ts:247 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:246 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | packages/core/src/types/agent-event.ts:245 |
+| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | packages/core/src/types/agent-event.ts:256 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:255 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | packages/core/src/types/agent-event.ts:254 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: PrivacyConfig
 
-Defined in: packages/memory/src/context-engine/engine.ts:115
+Defined in: packages/memory/src/context-engine/engine.ts:127
 
 Privacy block of the engine config.
 
@@ -16,7 +16,7 @@ Privacy block of the engine config.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-clouduploadconsent"></a> `cloudUploadConsent?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:116 |
-| <a id="property-defaultsensitivity"></a> `defaultSensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | packages/memory/src/context-engine/engine.ts:117 |
-| <a id="property-provideracceptssensitivity"></a> `providerAcceptsSensitivity?` | `readonly` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | packages/memory/src/context-engine/engine.ts:118 |
-| <a id="property-providertrust"></a> `providerTrust?` | `readonly` | [`LocalProviderTrust`](/api/@graphorin/core/type-aliases/LocalProviderTrust.md) | packages/memory/src/context-engine/engine.ts:119 |
+| <a id="property-clouduploadconsent"></a> `cloudUploadConsent?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:128 |
+| <a id="property-defaultsensitivity"></a> `defaultSensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | packages/memory/src/context-engine/engine.ts:129 |
+| <a id="property-provideracceptssensitivity"></a> `providerAcceptsSensitivity?` | `readonly` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | packages/memory/src/context-engine/engine.ts:130 |
+| <a id="property-providertrust"></a> `providerTrust?` | `readonly` | [`LocalProviderTrust`](/api/@graphorin/core/type-aliases/LocalProviderTrust.md) | packages/memory/src/context-engine/engine.ts:131 |

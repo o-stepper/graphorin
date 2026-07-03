@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function getQueryParamAll(ref, key): readonly string[];
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:547
+Defined in: packages/security/src/secrets/secret-ref.ts:548
 
 Read every value associated with `key` in the original query string
 (multi-value support). Returns an empty array if the parameter is

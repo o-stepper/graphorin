@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -25,16 +25,22 @@ counter family.
 ### resolveContent()
 
 ```ts
-resolveContent(deps): Promise<readonly MessageContent[]>;
+resolveContent(deps, ctx?): Promise<readonly MessageContent[]>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:46
+Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:52
+
+`ctx` carries the REAL compaction outcome (CE-6) — result, scope,
+runId, sessionId, agentId, source — built by `compactNow` after the
+pipeline finishes. Record-form built-ins may ignore it; the
+function-form wrapper forwards it to the operator's hook verbatim.
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `deps` | `HookDeps` |
+| `ctx?` | [`PostCompactionHookContext`](/api/@graphorin/memory/interfaces/PostCompactionHookContext.md) |
 
 #### Returns
 

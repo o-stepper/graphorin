@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: OAuthAuthorizationProvider
 
-Defined in: packages/mcp/src/oauth/bridge.ts:46
+Defined in: packages/mcp/src/oauth/bridge.ts:51
 
 Live authorization-header provider returned by
 [createOAuthAuthorizationProvider](/api/@graphorin/mcp/functions/createOAuthAuthorizationProvider.md).
@@ -17,7 +17,7 @@ Live authorization-header provider returned by
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-serverid"></a> `serverId` | `readonly` | `string` | Persist the most recently observed expiry timestamp. | packages/mcp/src/oauth/bridge.ts:52 |
+| <a id="property-serverid"></a> `serverId` | `readonly` | `string` | Persist the most recently observed expiry timestamp. | packages/mcp/src/oauth/bridge.ts:57 |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Live authorization-header provider returned by
 refresh(): Promise<OAuthSession>;
 ```
 
-Defined in: packages/mcp/src/oauth/bridge.ts:50
+Defined in: packages/mcp/src/oauth/bridge.ts:55
 
 Force a refresh, regardless of expiry.
 
@@ -43,7 +43,7 @@ Force a refresh, regardless of expiry.
 resolveHeader(): Promise<string>;
 ```
 
-Defined in: packages/mcp/src/oauth/bridge.ts:48
+Defined in: packages/mcp/src/oauth/bridge.ts:53
 
 Resolve an `Authorization: Bearer ...` header.
 

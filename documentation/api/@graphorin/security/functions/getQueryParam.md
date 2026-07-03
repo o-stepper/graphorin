@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function getQueryParam(ref, key): string | undefined;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:518
+Defined in: packages/security/src/secrets/secret-ref.ts:519
 
 Read a single query parameter from a parsed ref. Returns `undefined`
 if the parameter is not present.

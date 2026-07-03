@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -27,7 +27,7 @@ type HandoffInputFilterDeclaration =
 };
 ```
 
-Defined in: packages/skills/src/types/index.ts:194
+Defined in: packages/skills/src/types/index.ts:205
 
 `graphorin-handoff-input-filter` declaration recognised by the
 loader. The runtime resolves the declaration into the actual filter

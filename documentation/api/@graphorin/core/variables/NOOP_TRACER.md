@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const NOOP_TRACER: Tracer;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:141
+Defined in: packages/core/src/contracts/tracer.ts:142
 
 Minimal no-op tracer. Useful as a typed default when downstream code
 needs a non-null `Tracer` without taking the observability dependency.

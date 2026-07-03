@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,10 +16,12 @@ function createFactRememberTool(deps): Tool<{
   validTo?: string;
 }, {
   factId: string;
+  quarantined: boolean;
+  quarantineReason?: "injection" | "synthesized";
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:116
+Defined in: packages/memory/src/tools/fact-tools.ts:124
 
 `fact_remember` — persist a single semantic fact. The minimum-viable
 pipeline writes the fact straight through with MD5 deduplication;
@@ -42,6 +44,8 @@ Phase 10b extends the body with the multi-stage conflict resolution.
   `validTo?`: `string`;
 \}, \{
   `factId`: `string`;
+  `quarantined`: `boolean`;
+  `quarantineReason?`: `"injection"` \| `"synthesized"`;
 \}\>
 
 ## Stable

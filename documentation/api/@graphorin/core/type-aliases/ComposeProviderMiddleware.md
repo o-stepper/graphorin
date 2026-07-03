@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ComposeProviderMiddleware = (middlewares) => ProviderMiddleware;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:269
+Defined in: packages/core/src/contracts/provider.ts:276
 
 Type signature for the canonical middleware composer (the runtime
 implementation lives in `@graphorin/provider`).

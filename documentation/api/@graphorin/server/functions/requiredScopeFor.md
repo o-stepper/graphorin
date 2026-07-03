@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function requiredScopeFor(subject): ParsedScope;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:109
+Defined in: packages/server/src/ws/subjects.ts:122
 
 Required scope literal for every subject kind, expressed as a
 `ParsedScope`. The matcher `scopeMatches(granted, required)` uses

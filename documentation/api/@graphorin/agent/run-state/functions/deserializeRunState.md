@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function deserializeRunState(payload, options?): RunState;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:155
+Defined in: packages/agent/src/run-state/index.ts:215
 
 Rehydrate a [RunState](/api/@graphorin/core/interfaces/RunState.md) from the on-disk payload. Throws
 [RunStateVersionUnsupportedError](/api/@graphorin/agent/errors/classes/RunStateVersionUnsupportedError.md) when the payload version

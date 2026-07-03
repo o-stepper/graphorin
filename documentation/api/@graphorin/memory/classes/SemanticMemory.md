@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: SemanticMemory
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:282
+Defined in: packages/memory/src/tiers/semantic-memory.ts:318
 
 `SemanticMemory` — long-term factual store. Hybrid (vector + FTS5)
 search merges the two ranked lists through the configured
@@ -28,7 +28,7 @@ instance (`createMemory({ conflictPipeline: { mode: 'off' } })`).
 new SemanticMemory(args): SemanticMemory;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:295
+Defined in: packages/memory/src/tiers/semantic-memory.ts:331
 
 #### Parameters
 
@@ -62,7 +62,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:895
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1033
 
 Soft-delete a fact (kept for replay; never hard-deleted).
 
@@ -89,7 +89,7 @@ fuse(
 options?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:933
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1071
 
 Fuse multiple ranked lists outside of a `search()` call.
 
@@ -115,7 +115,7 @@ Fuse multiple ranked lists outside of a `search()` call.
 get(scope, factId): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:786
+Defined in: packages/memory/src/tiers/semantic-memory.ts:894
 
 Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
@@ -138,7 +138,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 history(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:816
+Defined in: packages/memory/src/tiers/semantic-memory.ts:924
 
 Return the full bi-temporal supersede chain that `factId` belongs
 to, oldest → newest, including superseded / soft-deleted rows so
@@ -171,7 +171,7 @@ neighbors(
 opts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:777
+Defined in: packages/memory/src/tiers/semantic-memory.ts:885
 
 Raw vector KNN neighbours for the consolidator's reconcile
 pre-filter (P0-3). Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
@@ -208,7 +208,7 @@ purge(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:914
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1052
 
 Hard-delete a fact (GDPR path). Distinct from [forget](/api/@graphorin/memory/classes/SemanticMemory.md#forget): the
 record is removed from storage entirely instead of soft-archived.
@@ -239,7 +239,7 @@ remember(
 options?): Promise<Fact>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:370
+Defined in: packages/memory/src/tiers/semantic-memory.ts:406
 
 Persist a fact. Returns the stored record. Phase 10b routes every
 call through the multi-stage conflict resolution pipeline; the
@@ -270,7 +270,7 @@ rememberWithDecision(
 options?): Promise<RememberOutcome>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:386
+Defined in: packages/memory/src/tiers/semantic-memory.ts:422
 
 Like [remember](/api/@graphorin/memory/classes/SemanticMemory.md#remember) but returns the pipeline `decision` alongside
 the stored fact. Useful for callers that need to distinguish
@@ -298,7 +298,7 @@ silent dedups (`decision.kind === 'dedup'`) from fresh inserts.
 reranker(): ReRanker;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:359
+Defined in: packages/memory/src/tiers/semantic-memory.ts:395
 
 Currently active reranker.
 
@@ -317,7 +317,7 @@ search(
 opts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:573
+Defined in: packages/memory/src/tiers/semantic-memory.ts:633
 
 Hybrid (vector + FTS5) search merged through the configured reranker.
 
@@ -344,7 +344,7 @@ searchIterative(
 opts?): Promise<IterativeRecallResult>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:713
+Defined in: packages/memory/src/tiers/semantic-memory.ts:817
 
 Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
 local heuristic ([assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md)) decides whether the
@@ -384,7 +384,7 @@ difficulty-gated `search` and never calls a provider.
 setReranker(reranker): ReRanker;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:352
+Defined in: packages/memory/src/tiers/semantic-memory.ts:388
 
 Replace the active reranker. Returns the previous instance.
 
@@ -413,7 +413,7 @@ supersede(
 }>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:866
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1004
 
 Mark `oldId` superseded by a new fact. Returns the new record.
 
@@ -441,18 +441,28 @@ Mark `oldId` superseded by a new fact. Returns the new record.
 validate(
    scope, 
    factId, 
-reason?): Promise<void>;
+   reason?, 
+options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:847
+Defined in: packages/memory/src/tiers/semantic-memory.ts:964
 
 Promote a quarantined fact to `active` (P1-4). The validation path
-that admits a synthesized / injection-flagged memory into
-action-driving recall once a human (or trusted non-agent caller)
-has reviewed it. Writes a `memory_history` audit row. Requires a
-storage adapter that implements
-`SemanticMemoryStoreExt.setStatus(...)` — the default
+that admits a synthesized memory into action-driving recall once a
+human (or trusted non-agent caller) has reviewed it. Writes a
+`memory_history` audit row. Requires a storage adapter that
+implements `SemanticMemoryStoreExt.setStatus(...)` — the default
 `@graphorin/store-sqlite` adapter wires this through.
+
+MRET-3 / MST-1: promotion of a fact whose text still trips the
+offline injection heuristics is **refused** with
+[QuarantinePromotionRefusedError](/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md) — the model-facing
+`fact_validate` tool calls this with no `force`, so a poisoned
+memory can never be promoted by the agent itself (the one-turn
+`fact_remember(poison)` → `fact_validate(id)` chain is closed). An
+operator can override after review by passing `{ force: true }`
+from a trusted (non-agent) context. Synthesized-but-clean writes
+(consolidator / reflection) promote normally.
 
 #### Parameters
 
@@ -461,6 +471,8 @@ storage adapter that implements
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `factId` | `string` |
 | `reason?` | `string` |
+| `options?` | \{ `force?`: `boolean`; \} |
+| `options.force?` | `boolean` |
 
 #### Returns
 
@@ -476,7 +488,7 @@ storage adapter that implements
 static fuseRrf<TRecord>(lists, k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:942
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1080
 
 Pure-fusion helper — exposed for callers that already collected results.
 
@@ -508,7 +520,7 @@ static fuseWeighted<TRecord>(
    k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:955
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1093
 
 Pure weighted-fusion helper (X-2) — like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by

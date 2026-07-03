@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MCPPromptMessage
 
-Defined in: packages/mcp/src/client/types.ts:342
+Defined in: packages/mcp/src/client/types.ts:359
 
 Single prompt message returned by `getPrompt(...)`.
 
@@ -14,5 +14,5 @@ Single prompt message returned by `getPrompt(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md) | packages/mcp/src/client/types.ts:344 |
-| <a id="property-role"></a> `role` | `readonly` | `"user"` \| `"assistant"` | packages/mcp/src/client/types.ts:343 |
+| <a id="property-content"></a> `content` | `readonly` | [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md) | packages/mcp/src/client/types.ts:361 |
+| <a id="property-role"></a> `role` | `readonly` | `"user"` \| `"assistant"` | packages/mcp/src/client/types.ts:360 |

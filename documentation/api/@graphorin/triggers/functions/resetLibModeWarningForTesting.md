@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetLibModeWarningForTesting(): void;
 ```
 
-Defined in: packages/triggers/src/index.ts:225
+Defined in: packages/triggers/src/index.ts:239
 
 **`Internal`**
 

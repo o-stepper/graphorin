@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -52,6 +52,12 @@ Re-exports [factualityScorer](/api/@graphorin/evals/functions/factualityScorer.m
 
 ***
 
+### fenceForJudge
+
+Re-exports [fenceForJudge](/api/@graphorin/evals/functions/fenceForJudge.md)
+
+***
+
 ### finalStateCorrect
 
 Re-exports [finalStateCorrect](/api/@graphorin/evals/functions/finalStateCorrect.md)
@@ -91,6 +97,12 @@ Re-exports [llmJudge](/api/@graphorin/evals/functions/llmJudge.md)
 ### LlmJudgeOptions
 
 Re-exports [LlmJudgeOptions](/api/@graphorin/evals/interfaces/LlmJudgeOptions.md)
+
+***
+
+### parseScore
+
+Re-exports [parseScore](/api/@graphorin/evals/functions/parseScore.md)
 
 ***
 
@@ -145,6 +157,12 @@ Re-exports [regexMatch](/api/@graphorin/evals/functions/regexMatch.md)
 ### RegexMatchOptions
 
 Re-exports [RegexMatchOptions](/api/@graphorin/evals/interfaces/RegexMatchOptions.md)
+
+***
+
+### scoreContract
+
+Re-exports [scoreContract](/api/@graphorin/evals/functions/scoreContract.md)
 
 ***
 

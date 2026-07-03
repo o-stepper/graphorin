@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorStopOptions
 
-Defined in: packages/cli/src/commands/consolidator.ts:163
+Defined in: packages/cli/src/commands/consolidator.ts:168
 
 ## Stable
 

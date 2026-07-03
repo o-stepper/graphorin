@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function _getLocaleFallbackWarningsForTesting(): ReadonlyMap<string, ReadonlySet
 
 Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:31
 
-**`Experimental`**
+**`Internal`**
 
 Inspect the once-per-process WARN registry. Used by tests.
 

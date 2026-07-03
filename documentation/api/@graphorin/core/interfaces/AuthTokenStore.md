@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -31,6 +31,34 @@ Defined in: packages/core/src/contracts/auth-token-store.ts:32
 | Parameter | Type |
 | ------ | ------ |
 | `id` | `string` |
+
+#### Returns
+
+`Promise`\<
+  \| [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md)
+  \| `null`\>
+
+***
+
+### getByHash()?
+
+```ts
+optional getByHash(hashHex): Promise<
+  | AuthTokenRecord
+| null>;
+```
+
+Defined in: packages/core/src/contracts/auth-token-store.ts:41
+
+Indexed lookup by HMAC hash (SPL-19). When present, the verifier
+uses it on cache-miss instead of walking `list()` — O(1) instead of
+an O(n) full-table scan per verification.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `hashHex` | `string` |
 
 #### Returns
 

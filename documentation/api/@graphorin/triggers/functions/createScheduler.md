@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createScheduler(options): Scheduler;
 ```
 
-Defined in: packages/triggers/src/index.ts:212
+Defined in: packages/triggers/src/index.ts:226
 
 ## Parameters
 

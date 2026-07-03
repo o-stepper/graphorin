@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const withFallback: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-fallback.ts:33
+Defined in: packages/provider/src/middleware/with-fallback.ts:34
 
 ## Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -21,7 +21,7 @@ fast with [CipherPeerMissingError](/api/@graphorin/store-sqlite/encryption/class
 | <a id="property-cipherloader"></a> `cipherLoader?` | `readonly` | () => `Promise`\&lt;[`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md)\&gt; | **`Internal`** Optional cipher-driver loader override. When unset the function defers to the canonical [loadCipherDriver](/api/@graphorin/store-sqlite/encryption/functions/loadCipherDriver.md). Used by the test suite to simulate a missing cipher peer without uninstalling the package from the workspace. | packages/store-sqlite/src/audit-db.ts:28 |
 | <a id="property-driver"></a> `driver?` | `readonly` | [`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md) | Optional driver override for tests. | packages/store-sqlite/src/audit-db.ts:19 |
 | <a id="property-encryption"></a> `encryption` | `readonly` | \{ `cipher?`: [`EncryptionCipher`](/api/@graphorin/store-sqlite/encryption/type-aliases/EncryptionCipher.md); `enabled`: `true`; `passphraseResolver`: [`PassphraseResolver`](/api/@graphorin/store-sqlite/encryption/type-aliases/PassphraseResolver.md); \} | Cipher / passphrase resolver — required because audit.db is encrypted. | packages/store-sqlite/src/audit-db.ts:17 |
-| `encryption.cipher?` | `readonly` | [`EncryptionCipher`](/api/@graphorin/store-sqlite/encryption/type-aliases/EncryptionCipher.md) | - | packages/store-sqlite/src/encryption/index.ts:37 |
-| `encryption.enabled` | `readonly` | `true` | - | packages/store-sqlite/src/encryption/index.ts:36 |
-| `encryption.passphraseResolver` | `readonly` | [`PassphraseResolver`](/api/@graphorin/store-sqlite/encryption/type-aliases/PassphraseResolver.md) | Resolves the passphrase at startup. Returns the raw passphrase string (the caller is responsible for clearing it from memory after the connection is open). Inputs typically come from a `SecretValue` resolver in `@graphorin/security` or from an operator-supplied env var. | packages/store-sqlite/src/encryption/index.ts:45 |
+| `encryption.cipher?` | `readonly` | [`EncryptionCipher`](/api/@graphorin/store-sqlite/encryption/type-aliases/EncryptionCipher.md) | - | packages/store-sqlite/src/encryption/index.ts:65 |
+| `encryption.enabled` | `readonly` | `true` | - | packages/store-sqlite/src/encryption/index.ts:64 |
+| `encryption.passphraseResolver` | `readonly` | [`PassphraseResolver`](/api/@graphorin/store-sqlite/encryption/type-aliases/PassphraseResolver.md) | Resolves the passphrase at startup. Returns the raw passphrase string (the caller is responsible for clearing it from memory after the connection is open). Inputs typically come from a `SecretValue` resolver in `@graphorin/security` or from an operator-supplied env var. | packages/store-sqlite/src/encryption/index.ts:73 |
 | <a id="property-path"></a> `path` | `readonly` | `string` | - | packages/store-sqlite/src/audit-db.ts:15 |

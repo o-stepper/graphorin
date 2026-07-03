@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createProgressIO(config?): ProgressIO;
 ```
 
-Defined in: packages/agent/src/progress/index.ts:105
+Defined in: packages/agent/src/progress/index.ts:106
 
 Build a [ProgressIO](/api/@graphorin/agent/progress/interfaces/ProgressIO.md) bound to a particular artifact root.
 

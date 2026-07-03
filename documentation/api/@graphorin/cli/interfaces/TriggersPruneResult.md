@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: TriggersPruneResult
 
-Defined in: packages/cli/src/commands/triggers.ts:184
+Defined in: packages/cli/src/commands/triggers.ts:185
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/cli/src/commands/triggers.ts:184
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/triggers.ts:185 |
+| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/triggers.ts:186 |

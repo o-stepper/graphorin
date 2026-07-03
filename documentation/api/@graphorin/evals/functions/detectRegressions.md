@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function detectRegressions<I, O>(
 options?): RegressionReport<I, O>;
 ```
 
-Defined in: evals/src/regression.ts:25
+Defined in: evals/src/regression.ts:30
 
 Detect regressions between `current` and `baseline` reports.
 

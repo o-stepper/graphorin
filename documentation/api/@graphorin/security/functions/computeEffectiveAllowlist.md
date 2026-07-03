@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function computeEffectiveAllowlist(parent, declared): readonly string[];
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:80
+Defined in: packages/security/src/secrets/acl.ts:95
 
 Compute the **effective** allowlist for a child scope: intersection
 of the parent's allowlist and the child's declared list. The

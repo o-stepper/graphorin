@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,23 +6,25 @@
 
 # Interface: ConsolidatorRunFinish
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:347
+Defined in: packages/memory/src/internal/storage-adapter.ts:403
 
 ## Stable
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-conflictsresolved"></a> `conflictsResolved?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:355 |
-| <a id="property-emptyextractions"></a> `emptyExtractions?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:357 |
-| <a id="property-errormessage"></a> `errorMessage?` | `readonly` | `string` \| `null` | packages/memory/src/internal/storage-adapter.ts:358 |
-| <a id="property-factscreated"></a> `factsCreated?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:353 |
-| <a id="property-factsupdated"></a> `factsUpdated?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:354 |
-| <a id="property-finishedat"></a> `finishedAt` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:349 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/internal/storage-adapter.ts:348 |
-| <a id="property-llmcostusd"></a> `llmCostUsd?` | `readonly` | `number` \| `null` | packages/memory/src/internal/storage-adapter.ts:352 |
-| <a id="property-llmtokensused"></a> `llmTokensUsed?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:351 |
-| <a id="property-noisefilteredcount"></a> `noiseFilteredCount?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:356 |
-| <a id="property-retrycount"></a> `retryCount?` | `readonly` | `number` | packages/memory/src/internal/storage-adapter.ts:359 |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"deferred"` \| `"partial"` | packages/memory/src/internal/storage-adapter.ts:350 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-conflictsresolved"></a> `conflictsResolved?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:411 |
+| <a id="property-emptyextractions"></a> `emptyExtractions?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:413 |
+| <a id="property-episodesformed"></a> `episodesFormed?` | `readonly` | `number` | Episodes auto-formed by the run (P1-2 / MCON-17). | packages/memory/src/internal/storage-adapter.ts:415 |
+| <a id="property-errormessage"></a> `errorMessage?` | `readonly` | `string` \| `null` | - | packages/memory/src/internal/storage-adapter.ts:418 |
+| <a id="property-factscreated"></a> `factsCreated?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:409 |
+| <a id="property-factsupdated"></a> `factsUpdated?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:410 |
+| <a id="property-finishedat"></a> `finishedAt` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:405 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/memory/src/internal/storage-adapter.ts:404 |
+| <a id="property-insightscreated"></a> `insightsCreated?` | `readonly` | `number` | Insights synthesized by the run's reflection pass (P1-1 / MCON-17). | packages/memory/src/internal/storage-adapter.ts:417 |
+| <a id="property-llmcostusd"></a> `llmCostUsd?` | `readonly` | `number` \| `null` | - | packages/memory/src/internal/storage-adapter.ts:408 |
+| <a id="property-llmtokensused"></a> `llmTokensUsed?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:407 |
+| <a id="property-noisefilteredcount"></a> `noiseFilteredCount?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:412 |
+| <a id="property-retrycount"></a> `retryCount?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:419 |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"deferred"` \| `"partial"` | - | packages/memory/src/internal/storage-adapter.ts:406 |

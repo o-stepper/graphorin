@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const withCostTracking: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:63
+Defined in: packages/provider/src/middleware/with-cost-tracking.ts:117
 
 ## Parameters
 

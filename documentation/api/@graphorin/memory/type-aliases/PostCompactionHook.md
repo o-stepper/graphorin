@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type PostCompactionHook = (ctx) => Promise<ReadonlyArray<MessageContent>>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:114
+Defined in: packages/memory/src/context-engine/compaction/types.ts:176
 
 Post-compaction hook signature. Each hook returns the
 `MessageContent[]` parts the harness should append to the

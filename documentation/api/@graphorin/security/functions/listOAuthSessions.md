@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,10 +7,10 @@
 # Function: listOAuthSessions()
 
 ```ts
-function listOAuthSessions(storage): Promise<readonly OAuthSessionMetadata[]>;
+function listOAuthSessions(storage, options?): Promise<readonly OAuthSessionMetadata[]>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:99
+Defined in: packages/security/src/oauth/library.ts:105
 
 List the audit-safe metadata of every persisted OAuth session.
 
@@ -19,6 +19,8 @@ List the audit-safe metadata of every persisted OAuth session.
 | Parameter | Type |
 | ------ | ------ |
 | `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) |
+| `options` | \{ `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); \} |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) |
 
 ## Returns
 

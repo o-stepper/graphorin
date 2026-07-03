@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function defineAutoRecallStrategy(opts): AutoRecallStrategy & {
 };
 ```
 
-Defined in: packages/memory/src/context-engine/auto-recall.ts:79
+Defined in: packages/memory/src/context-engine/auto-recall.ts:73
 
 Builder for application-supplied custom strategies. Accepts a
 raw function and returns a tagged version so the engine can

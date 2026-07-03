@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -46,6 +46,21 @@ const [vec] = await embedder.embed(['Loves espresso.']);
 console.log(embedder.id(), embedder.dim(), vec.length);
 ```
 
+## E5 asymmetric prefixes
+
+E5-family models (the default, and any model id carrying an `e5` token) require
+asymmetric `query:` / `passage:` prefixes — omitting them measurably degrades
+retrieval. The embedder applies them automatically: pass `taskType: 'query'`
+when embedding a search query and `taskType: 'passage'` (the default) for stored
+content. The Graphorin memory tiers thread this for you (`query` on search,
+`passage` on `remember`).
+
+> **Migration:** enabling the prefixes (the new default for E5) changes the
+> embedder's `configHash`, and therefore its `id`. Under the default
+> `lock-on-first` policy an existing index built before this change reports an
+> embedder mismatch — run `graphorin memory migrate` to re-embed it, or pass
+> `disableTaskPrefix: true` to keep the old (unprefixed) behaviour and id.
+
 ## Cache directory
 
 The Hugging Face model cache lives under `os.homedir()/.cache/...` by
@@ -72,7 +87,7 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/embedder-transformersjs — default in-process embedder.
 
@@ -115,3 +130,4 @@ ADR-025).
 | [\_resetPipelineFactoryCacheForTesting](/api/@graphorin/embedder-transformersjs/functions/resetPipelineFactoryCacheForTesting.md) | Test-only cache reset. |
 | [canonicalConfigHash](/api/@graphorin/embedder-transformersjs/functions/canonicalConfigHash.md) | Canonical-JSON deterministic hash of an embedder configuration. Object keys are sorted lexicographically; primitives flow through as `JSON.stringify` would render them. Used by the multi-table per- embedder vec0 layout to tell drift apart from a true model swap. |
 | [createTransformersJsEmbedder](/api/@graphorin/embedder-transformersjs/functions/createTransformersJsEmbedder.md) | Build a `TransformersJsEmbedder` instance. Lazy: the underlying pipeline is constructed on the first `embed()` call so packaging the embedder does not pay the model-load cost. |
+| [isE5Model](/api/@graphorin/embedder-transformersjs/functions/isE5Model.md) | True when a model id belongs to the E5 family, which requires asymmetric `query:` / `passage:` prefixes (PS-10). Matches an `e5` token bounded by a path / dash / underscore so it covers `multilingual-e5-base`, `e5-large`, `intfloat/e5-mistral`, etc. without false-matching unrelated names. |

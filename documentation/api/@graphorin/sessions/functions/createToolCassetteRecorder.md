@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createToolCassetteRecorder(options): ToolCassetteRecorder;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:91
+Defined in: packages/sessions/src/cassette/recorder.ts:92
 
 Build a recorder that buffers every record into memory and flushes
 to disk on `flushToFile()`. The recorder is intentionally

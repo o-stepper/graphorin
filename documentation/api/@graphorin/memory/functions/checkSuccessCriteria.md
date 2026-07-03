@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function checkSuccessCriteria(procedure, observed): VerificationResult;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:301
+Defined in: packages/memory/src/consolidator/phases/induce.ts:322
 
 Self-verify a reuse against an induced procedure's success criteria. A
 criterion is met when any observed signal contains it (case-insensitive

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: WorkflowExecuteOptions
 
-Defined in: packages/workflow/src/types.ts:114
+Defined in: packages/workflow/src/types.ts:121
 
 Optional context passed to [Workflow.execute](/api/@graphorin/workflow/interfaces/Workflow.md#execute). `threadId` is
 the stable resume key — supply it explicitly when the caller wants
@@ -19,7 +19,7 @@ fresh ULID-style identifier.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-durability"></a> `durability?` | `readonly` | [`DurabilityMode`](/api/@graphorin/workflow/type-aliases/DurabilityMode.md) | Override the durability mode declared at workflow construction time. Useful for one-off `async` runs in tests. | packages/workflow/src/types.ts:124 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Cancellation signal. Honored at every step boundary. | packages/workflow/src/types.ts:119 |
-| <a id="property-stream"></a> `stream?` | `readonly` | [`StreamMode`](/api/@graphorin/workflow/type-aliases/StreamMode.md) | Stream emission mode. Default: `values`. | packages/workflow/src/types.ts:117 |
-| <a id="property-threadid"></a> `threadId?` | `readonly` | `string` | - | packages/workflow/src/types.ts:115 |
+| <a id="property-durability"></a> `durability?` | `readonly` | [`DurabilityMode`](/api/@graphorin/workflow/type-aliases/DurabilityMode.md) | Override the durability mode declared at workflow construction time. Useful for one-off `'exit'` runs in tests. | packages/workflow/src/types.ts:131 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Cancellation signal. Honored at every step boundary. | packages/workflow/src/types.ts:126 |
+| <a id="property-stream"></a> `stream?` | `readonly` | [`StreamMode`](/api/@graphorin/workflow/type-aliases/StreamMode.md) | Stream emission mode. Default: `values`. | packages/workflow/src/types.ts:124 |
+| <a id="property-threadid"></a> `threadId?` | `readonly` | `string` | - | packages/workflow/src/types.ts:122 |

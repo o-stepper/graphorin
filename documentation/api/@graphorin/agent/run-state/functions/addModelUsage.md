@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function addModelUsage(
    delta): void;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:333
+Defined in: packages/agent/src/run-state/index.ts:412
 
 Append a per-model usage entry to [RunState.usageByModel](/api/@graphorin/core/interfaces/RunState.md#property-usagebymodel).
 Mutates the supplied state in place — used by the agent runtime's

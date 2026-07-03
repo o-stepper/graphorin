@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function projectToolApi(tools): CodeApiProjection;
 ```
 
-Defined in: packages/tools/src/code-mode/project.ts:174
+Defined in: packages/tools/src/code-mode/project.ts:183
 
 Project a set of resolved tools as a typed code API. See the module
 docstring.

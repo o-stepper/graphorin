@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function tryParseSubject(raw): ParseSubjectResult;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:63
+Defined in: packages/server/src/ws/subjects.ts:69
 
 Parse a subject string into the [ParsedSubject](/api/@graphorin/server/type-aliases/ParsedSubject.md) discriminator.
 

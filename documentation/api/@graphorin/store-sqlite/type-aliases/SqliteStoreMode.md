@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type SqliteStoreMode = "lib" | "server";
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:106
+Defined in: packages/store-sqlite/src/index.ts:116
 
 Library mode — single in-process connection. Server mode — opt-in
 `WorkerPool` (1 writer + N readers); WAL hardening and the periodic

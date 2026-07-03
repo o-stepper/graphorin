@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function llmJudge<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/llm/judge.ts:37
+Defined in: evals/src/scorers/llm/judge.ts:49
 
 ## Type Parameters
 

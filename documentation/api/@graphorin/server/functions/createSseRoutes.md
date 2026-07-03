@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createSseRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/sse/events.ts:63
+Defined in: packages/server/src/sse/events.ts:69
 
 Build the SSE event-stream router. Mounts
 `GET /sessions/:id/events` (the canonical path documented in the

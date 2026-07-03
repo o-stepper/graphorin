@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const DEFAULT_LAYER_PRIORITY: ReadonlyArray<LayerId>;
 ```
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:42
+Defined in: packages/memory/src/context-engine/token-budget.ts:48
 
 Default priority ladder. Higher priority means the layer is
 preserved longer when the budget is tight.

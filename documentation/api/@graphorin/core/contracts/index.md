@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -433,6 +433,12 @@ Re-exports [SessionListOptions](/api/@graphorin/core/interfaces/SessionListOptio
 ### SessionMemoryStore
 
 Re-exports [SessionMemoryStore](/api/@graphorin/core/interfaces/SessionMemoryStore.md)
+
+***
+
+### SessionMessageWithMetadata
+
+Re-exports [SessionMessageWithMetadata](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)
 
 ***
 

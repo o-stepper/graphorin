@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const withRateLimit: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-rate-limit.ts:41
+Defined in: packages/provider/src/middleware/with-rate-limit.ts:52
 
 ## Parameters
 

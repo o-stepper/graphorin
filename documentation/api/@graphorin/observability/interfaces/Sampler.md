@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Sampler
 
-Defined in: packages/observability/src/tracer/sampling.ts:56
+Defined in: packages/observability/src/tracer/sampling.ts:69
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/observability/src/tracer/sampling.ts:56
 shouldIncludeChunkContent(): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:62
+Defined in: packages/observability/src/tracer/sampling.ts:75
 
 Returns whether chunk *content* should travel through the exporter.
 
@@ -34,7 +34,7 @@ Returns whether chunk *content* should travel through the exporter.
 shouldRecordEvent(name): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:60
+Defined in: packages/observability/src/tracer/sampling.ts:73
 
 Decide whether a span event of the given name should be recorded.
 
@@ -56,7 +56,7 @@ Decide whether a span event of the given name should be recorded.
 shouldSample(type, parentSampled?): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:58
+Defined in: packages/observability/src/tracer/sampling.ts:71
 
 Decide whether a span of the given type should be recorded.
 

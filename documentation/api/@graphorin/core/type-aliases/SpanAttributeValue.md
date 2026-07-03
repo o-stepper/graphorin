@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -17,6 +17,6 @@ type SpanAttributeValue =
 | ReadonlyArray<boolean>;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:71
+Defined in: packages/core/src/contracts/tracer.ts:72
 
 ## Stable

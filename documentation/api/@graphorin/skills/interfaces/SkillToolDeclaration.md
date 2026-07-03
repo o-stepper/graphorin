@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SkillToolDeclaration
 
-Defined in: packages/skills/src/types/index.ts:229
+Defined in: packages/skills/src/types/index.ts:240
 
 Tool declaration found inside `graphorin-tools:`. The loader only
 captures the declarations; the actual `Tool[]` is produced by the
@@ -23,7 +23,7 @@ skill author's `tools/*.ts` modules and bridged into the
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/skills/src/types/index.ts:232 |
-| <a id="property-module"></a> `module?` | `readonly` | `string` | packages/skills/src/types/index.ts:231 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/skills/src/types/index.ts:230 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/skills/src/types/index.ts:233 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/skills/src/types/index.ts:243 |
+| <a id="property-module"></a> `module?` | `readonly` | `string` | packages/skills/src/types/index.ts:242 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/skills/src/types/index.ts:241 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/skills/src/types/index.ts:244 |

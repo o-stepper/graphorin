@@ -1,0 +1,35 @@
+[**Graphorin API reference v0.5.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/tools](/api/@graphorin/tools/index.md) / [](/api/@graphorin/tools/README.md) / ApprovalGate
+
+# Interface: ApprovalGate
+
+Defined in: packages/tools/src/executor/executor.ts:248
+
+Approval gate the executor consults before executing a gated tool.
+
+## Methods
+
+### request()
+
+```ts
+request(call, approval): Promise<ApprovalDecision>;
+```
+
+Defined in: packages/tools/src/executor/executor.ts:253
+
+Request approval for the tool call. Returns `{ granted: true }` to
+proceed, `{ granted: false, reason? }` to deny.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `call` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) |
+| `approval` | [`ToolApproval`](/api/@graphorin/core/interfaces/ToolApproval.md) |
+
+#### Returns
+
+`Promise`\&lt;`ApprovalDecision`\&gt;

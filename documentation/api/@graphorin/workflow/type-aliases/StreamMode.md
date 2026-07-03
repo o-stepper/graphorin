@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ type StreamMode =
   | "custom";
 ```
 
-Defined in: packages/workflow/src/types.ts:60
+Defined in: packages/workflow/src/types.ts:67
 
 Stream emission modes accepted by `workflow.execute(input, { stream })`.
 The default is `values`. The `messages` mode is reserved for future

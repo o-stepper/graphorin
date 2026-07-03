@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -18,11 +18,12 @@ function createReadResultTool(opts): Tool<{
   bytes: number;
   content: string;
   eof: boolean;
+  producerTrustClass?: string;
   totalBytes: number;
 }>;
 ```
 
-Defined in: packages/tools/src/built-in/read-result.ts:55
+Defined in: packages/tools/src/built-in/read-result.ts:57
 
 Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md).
 
@@ -45,6 +46,7 @@ Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/to
   `bytes`: `number`;
   `content`: `string`;
   `eof`: `boolean`;
+  `producerTrustClass?`: `string`;
   `totalBytes`: `number`;
 \}\>
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function generatePepper(): SecretValue;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:265
+Defined in: packages/security/src/auth/crud.ts:258
 
 Generate a fresh server pepper. The result is always exactly 32
 bytes (256 bits) so the verifier can rely on the size invariant.

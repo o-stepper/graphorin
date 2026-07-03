@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -33,7 +33,7 @@
   HMAC-SHA256-against-pepper verification, an LRU warm cache, per-IP
   and per-token brute-force lockouts, a concurrent-verify cap, and a
   set of CRUD helpers (`createToken`, `revokeToken`, `rotateToken`,
-  `rotatePepper`, `rekeyTokens`, `generatePepper`).
+  `rekeyTokens`, `generatePepper`).
 - **Tamper-evident audit log** — `appendAudit`, `verifyAuditChain`,
   `pruneAudit`, `exportAudit`, a canonical-JSON serialiser, an
   `AuditDb` interface, a binding registry that fail-fasts when the
@@ -97,7 +97,7 @@
 
 ## Status
 
-- **Version:** v0.4.0 — secrets foundations + server token auth +
+- **Version:** v0.5.0 — secrets foundations + server token auth +
   tamper-evident audit log + sandbox / memory-guard / guardrails /
   process-hardening runtime safety + outbound OAuth flows + skills
   supply-chain helpers.
@@ -338,7 +338,7 @@ line.
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 

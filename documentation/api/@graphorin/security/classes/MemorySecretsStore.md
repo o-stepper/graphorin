@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -70,7 +70,7 @@ Whether this store has any keys at all.
 delete(key, scope?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/memory.ts:82
+Defined in: packages/security/src/secrets/stores/memory.ts:85
 
 #### Parameters
 
@@ -122,7 +122,7 @@ Returns the secret if it exists, `null` otherwise.
 list(scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/security/src/secrets/stores/memory.ts:88
+Defined in: packages/security/src/secrets/stores/memory.ts:91
 
 Returns metadata about every key — never the values themselves.
 
@@ -148,7 +148,7 @@ Returns metadata about every key — never the values themselves.
 require(key, scope?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/stores/memory.ts:50
+Defined in: packages/security/src/secrets/stores/memory.ts:53
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -180,7 +180,7 @@ set(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/memory.ts:58
+Defined in: packages/security/src/secrets/stores/memory.ts:61
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

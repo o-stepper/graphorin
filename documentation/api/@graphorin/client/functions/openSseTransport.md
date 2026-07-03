@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,17 +10,11 @@
 function openSseTransport(options, listeners): Promise<Transport>;
 ```
 
-Defined in: packages/client/src/transport/sse.ts:33
+Defined in: packages/client/src/transport/sse.ts:31
 
-Open an SSE transport. Resolves once the underlying `EventSource`
-fires `open`; rejects with a typed
-[TransportFailedError](/api/@graphorin/client/errors/classes/TransportFailedError.md) on construction failure.
-
-The auth strategy must be `'bearer'` — SSE has no equivalent of the
-WebSocket ticket flow because `EventSource` does not allow custom
-headers in browsers either. SDK / server-to-server clients should
-use the optional `EventSource` injection seam to provide a
-polyfill that DOES allow headers (e.g. `eventsource@2.x` on Node).
+Open an SSE transport. Resolves once the server answers with a
+streaming response; rejects with a typed
+[TransportFailedError](/api/@graphorin/client/errors/classes/TransportFailedError.md) on construction / connection failure.
 
 ## Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetWithSecretListenersForTesting(): void;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:150
+Defined in: packages/security/src/secrets/acl.ts:165
 
 **`Experimental`**
 

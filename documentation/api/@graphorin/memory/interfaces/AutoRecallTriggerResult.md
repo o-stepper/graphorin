@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AutoRecallTriggerResult
 
-Defined in: packages/memory/src/context-engine/auto-recall.ts:31
+Defined in: packages/memory/src/context-engine/auto-recall.ts:32
 
 Outcome of a strategy invocation.
 
@@ -16,6 +16,5 @@ Outcome of a strategy invocation.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-episodestriggered"></a> `episodesTriggered` | `readonly` | `boolean` | - | packages/memory/src/context-engine/auto-recall.ts:33 |
-| <a id="property-factstriggered"></a> `factsTriggered` | `readonly` | `boolean` | - | packages/memory/src/context-engine/auto-recall.ts:32 |
+| <a id="property-factstriggered"></a> `factsTriggered` | `readonly` | `boolean` | - | packages/memory/src/context-engine/auto-recall.ts:33 |
 | <a id="property-reason"></a> `reason?` | `readonly` | `string` | Optional reason surfaced in spans / metadata. | packages/memory/src/context-engine/auto-recall.ts:35 |

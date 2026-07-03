@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const SUMMARY_TEMPLATE_NAME: "summary-9-section" = 'summary-9-section';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:38
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:43
 
 Stable identifier of the bundled template.
 

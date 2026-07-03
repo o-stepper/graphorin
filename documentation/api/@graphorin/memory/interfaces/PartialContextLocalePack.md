@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: PartialContextLocalePack
 
-Defined in: packages/memory/src/context-engine/locale-packs/types.ts:123
+Defined in: packages/memory/src/context-engine/locale-packs/types.ts:120
 
 Builder used by application code that wants to ship a custom
 locale pack. The builder freezes every input so the pack can be
@@ -24,8 +24,8 @@ an operator installs a partial locale pack).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-autorecalltriggers"></a> `autoRecallTriggers?` | `readonly` | `Partial`\&lt;[`AutoRecallTriggers`](/api/@graphorin/memory/interfaces/AutoRecallTriggers.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:126 |
-| <a id="property-basetemplate"></a> `baseTemplate?` | `readonly` | `Partial`\&lt;[`BaseTemplateFragments`](/api/@graphorin/memory/interfaces/BaseTemplateFragments.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:125 |
-| <a id="property-compactionsummarytemplate"></a> `compactionSummaryTemplate?` | `readonly` | `Partial`\&lt;[`CompactionSummaryTemplate`](/api/@graphorin/memory/interfaces/CompactionSummaryTemplate.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:128 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/locale-packs/types.ts:124 |
-| <a id="property-inboundsanitizationpreamble"></a> `inboundSanitizationPreamble?` | `readonly` | `Partial`\&lt;[`InboundSanitizationPreamble`](/api/@graphorin/memory/interfaces/InboundSanitizationPreamble.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:127 |
+| <a id="property-autorecalltriggers"></a> `autoRecallTriggers?` | `readonly` | `Partial`\&lt;[`AutoRecallTriggers`](/api/@graphorin/memory/interfaces/AutoRecallTriggers.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:123 |
+| <a id="property-basetemplate"></a> `baseTemplate?` | `readonly` | `Partial`\&lt;[`BaseTemplateFragments`](/api/@graphorin/memory/interfaces/BaseTemplateFragments.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:122 |
+| <a id="property-compactionsummarytemplate"></a> `compactionSummaryTemplate?` | `readonly` | `Partial`\&lt;[`CompactionSummaryTemplate`](/api/@graphorin/memory/interfaces/CompactionSummaryTemplate.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:125 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/locale-packs/types.ts:121 |
+| <a id="property-inboundsanitizationpreamble"></a> `inboundSanitizationPreamble?` | `readonly` | `Partial`\&lt;[`InboundSanitizationPreamble`](/api/@graphorin/memory/interfaces/InboundSanitizationPreamble.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:124 |
