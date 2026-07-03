@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function renderMessageText(message): string;
 ```
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:94
+Defined in: packages/memory/src/context-engine/token-counter.ts:112
 
 Render a `Message` into a single textual approximation suitable
 for token counting. Multimodal parts other than `'text'` /

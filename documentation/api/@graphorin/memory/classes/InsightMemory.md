@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: InsightMemory
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:47
+Defined in: packages/memory/src/tiers/insight-memory.ts:49
 
 `InsightMemory` — list / search reflection insights. A no-op (returns
 empty) when the storage adapter does not expose the optional
@@ -22,7 +22,7 @@ empty) when the storage adapter does not expose the optional
 new InsightMemory(args): InsightMemory;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:51
+Defined in: packages/memory/src/tiers/insight-memory.ts:53
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/memory/src/tiers/insight-memory.ts:51
 get(id): Promise<Insight | null>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:105
+Defined in: packages/memory/src/tiers/insight-memory.ts:118
 
 Lookup a single insight by id.
 
@@ -66,7 +66,7 @@ Lookup a single insight by id.
 list(scope, opts?): Promise<readonly Insight[]>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:86
+Defined in: packages/memory/src/tiers/insight-memory.ts:99
 
 Most-recent insights for the scope (newest first).
 
@@ -92,7 +92,7 @@ search(
 opts?): Promise<readonly MemoryHit<Insight>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:57
+Defined in: packages/memory/src/tiers/insight-memory.ts:59
 
 FTS keyword search over insight text.
 
@@ -107,3 +107,36 @@ FTS keyword search over insight text.
 #### Returns
 
 `Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\>
+
+***
+
+### validate()
+
+```ts
+validate(
+   scope, 
+   insightId, 
+   reason?, 
+options?): Promise<void>;
+```
+
+Defined in: packages/memory/src/tiers/insight-memory.ts:130
+
+Promote a quarantined insight out of quarantine (MCON-2). Mirrors
+[SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict from the
+stored text and **refuses** promotion of an injection-flagged insight
+unless an operator passes `{ force: true }` from a trusted context.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `insightId` | `string` |
+| `reason?` | `string` |
+| `options?` | \{ `force?`: `boolean`; \} |
+| `options.force?` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;

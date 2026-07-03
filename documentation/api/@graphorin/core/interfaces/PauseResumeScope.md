@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -22,7 +22,7 @@ to be re-architected as a state machine.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-consumed"></a> `consumed` | `public` | `boolean` | packages/core/src/channels/pause.ts:48 |
-| <a id="property-value"></a> `value` | `readonly` | `unknown` | packages/core/src/channels/pause.ts:47 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-cursor"></a> `cursor` | `public` | `number` | - | packages/core/src/channels/pause.ts:49 |
+| <a id="property-values"></a> `values` | `readonly` | readonly `unknown`[] | Ordered resume values replayed to successive `pause()` calls (WF-2). | packages/core/src/channels/pause.ts:48 |

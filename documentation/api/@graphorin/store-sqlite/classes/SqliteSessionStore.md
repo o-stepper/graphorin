@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -196,6 +196,32 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 
 ***
 
+### deleteSession()
+
+```ts
+deleteSession(sessionId): Promise<void>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:238
+
+RP-6: hard-delete a session + its handoffs / workflow runs / audit rows.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`deleteSession`](/api/@graphorin/core/interfaces/SessionStoreExt.md#deletesession)
+
+***
+
 ### getSession()
 
 ```ts
@@ -367,6 +393,34 @@ Delete audit rows older than the supplied epoch ms.
 #### Implementation of
 
 [`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`pruneAuditEntries`](/api/@graphorin/core/interfaces/SessionStoreExt.md#pruneauditentries)
+
+***
+
+### pruneSessions()
+
+```ts
+pruneSessions(opts): Promise<number>;
+```
+
+Defined in: packages/store-sqlite/src/session-store.ts:245
+
+RP-6: retention sweep — delete every session matching the policy.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | \{ `beforeEpochMs?`: `number`; `closedOnly?`: `boolean`; \} |
+| `opts.beforeEpochMs?` | `number` |
+| `opts.closedOnly?` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Implementation of
+
+[`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md).[`pruneSessions`](/api/@graphorin/core/interfaces/SessionStoreExt.md#prunesessions)
 
 ***
 

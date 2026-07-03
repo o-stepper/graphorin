@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runStateFromJSON(serialized, options?): RunState;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:284
+Defined in: packages/agent/src/run-state/index.ts:363
 
 Convenience JSON-string parser pairing with [runStateToJSON](/api/@graphorin/agent/run-state/functions/runStateToJSON.md).
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RetrievalGrader
 
-Defined in: packages/memory/src/search/iterative.ts:201
+Defined in: packages/memory/src/search/iterative.ts:209
 
 Pluggable retrieval-grader seam consumed by the iterative loop. The
 built-in provider-backed implementation lives in
@@ -29,7 +29,7 @@ grade(
 options?): Promise<RetrievalGrade>;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:202
+Defined in: packages/memory/src/search/iterative.ts:210
 
 #### Parameters
 

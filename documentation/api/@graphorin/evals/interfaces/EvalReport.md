@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -21,12 +21,13 @@ Final report shape.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-results"></a> `results` | `readonly` | readonly [`EvalCaseResult`](/api/@graphorin/evals/interfaces/EvalCaseResult.md)\&lt;`I`, `O`\&gt;[] | observability/dist/eval/types.d.ts:75 |
-| <a id="property-summary"></a> `summary` | `readonly` | \{ `avgDurationMs`: `number`; `byScorer`: `Readonly`\<`Record`\&lt;`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\&gt;\>; `failed`: `number`; `passed`: `number`; `total`: `number`; \} | observability/dist/eval/types.d.ts:76 |
-| `summary.avgDurationMs` | `readonly` | `number` | observability/dist/eval/types.d.ts:80 |
-| `summary.byScorer` | `readonly` | `Readonly`\<`Record`\&lt;`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\&gt;\> | observability/dist/eval/types.d.ts:81 |
-| `summary.failed` | `readonly` | `number` | observability/dist/eval/types.d.ts:79 |
-| `summary.passed` | `readonly` | `number` | observability/dist/eval/types.d.ts:78 |
-| `summary.total` | `readonly` | `number` | observability/dist/eval/types.d.ts:77 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-aborted"></a> `aborted?` | `readonly` | `boolean` | `true` when the run was cut short by an aborted signal — `results` and `summary` then cover only the cases that finished before the abort (a partial report). Absent on a normal full run. See `runEvals`. | observability/dist/eval/types.d.ts:92 |
+| <a id="property-results"></a> `results` | `readonly` | readonly [`EvalCaseResult`](/api/@graphorin/evals/interfaces/EvalCaseResult.md)\&lt;`I`, `O`\&gt;[] | - | observability/dist/eval/types.d.ts:75 |
+| <a id="property-summary"></a> `summary` | `readonly` | \{ `avgDurationMs`: `number`; `byScorer`: `Readonly`\<`Record`\&lt;`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\&gt;\>; `failed`: `number`; `passed`: `number`; `total`: `number`; \} | - | observability/dist/eval/types.d.ts:76 |
+| `summary.avgDurationMs` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:80 |
+| `summary.byScorer` | `readonly` | `Readonly`\<`Record`\&lt;`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\&gt;\> | - | observability/dist/eval/types.d.ts:81 |
+| `summary.failed` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:79 |
+| `summary.passed` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:78 |
+| `summary.total` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:77 |

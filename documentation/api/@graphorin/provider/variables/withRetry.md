@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const withRetry: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-retry.ts:33
+Defined in: packages/provider/src/middleware/with-retry.ts:34
 
 ## Parameters
 

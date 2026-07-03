@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type EntityRole = "subject" | "object";
 ```
 
-Defined in: packages/core/src/types/memory.ts:289
+Defined in: packages/core/src/types/memory.ts:297
 
 Role a [GraphEntity](/api/@graphorin/core/interfaces/GraphEntity.md) plays in a [Fact](/api/@graphorin/core/interfaces/Fact.md)'s s/p/o triple
 (P2-1) — the `subject` or the `object`. The `predicate` is a relation

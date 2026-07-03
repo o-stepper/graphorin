@@ -7,10 +7,10 @@ on:
 
 # Publishing authenticates with a long-lived **NPM_TOKEN** (decision C1): an npm
 # automation / granular-access token with publish rights to the `@graphorin`
-# scope, injected as `NODE_AUTH_TOKEN` on the publish step only (CI-10) so the
+# scope, injected as `NPM_TOKEN` on the publish step only (CI-10) so the
 # workspace build/test steps never see it. Sigstore provenance is still attached
 # via OIDC (`id-token: write` below + `.npmrc` provenance=true + per-package
-# `publishConfig.provenance`) — provenance uses OIDC regardless of the publish
+# `publishConfig.provenance`); provenance uses OIDC regardless of the publish
 # auth method.
 #
 # The publish step is gated on the `RELEASE_ENABLED` **repository variable** so
@@ -60,7 +60,7 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
-          # No `registry-url:` — `changesets/action` writes its own publish
+          # No `registry-url:`; `changesets/action` writes its own publish
           # `.npmrc` from the `NPM_TOKEN` env below; a setup-node registry-url
           # would add a second, empty-token `.npmrc` that shadows it.
 
@@ -70,13 +70,14 @@ jobs:
       - name: MVP readiness gate
         run: pnpm run mvp-readiness
 
-      - name: Dry-run publish — releases not enabled yet
+      - name: Dry-run publish (releases not enabled yet)
         if: ${{ vars.RELEASE_ENABLED != 'true' }}
         run: |
           echo "::warning title=Release skipped::Repository variable RELEASE_ENABLED is not 'true'; running in dry-run mode (configure NPM_TOKEN + the @graphorin scope first)."
           pnpm -r publish --dry-run --no-git-checks
 
       - name: Create Release PR or Publish
+        id: changesets
         if: ${{ vars.RELEASE_ENABLED == 'true' }}
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
@@ -92,3 +93,32 @@ jobs:
           # NODE_AUTH_TOKEN makes the action miss it and fall back to OIDC.)
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
+
+      # C4 / Wave-4 acceptance gate: after a real publish, verify the release
+      # actually carries valid Sigstore provenance + npm registry signatures.
+      # Runs in a throwaway project (NOT the workspace, where `@graphorin/*` are
+      # symlinked and would bypass registry verification) against the base leaf
+      # package `@graphorin/core` (zero internal deps), so it installs
+      # cleanly even when a release is partial/interrupted, and lockstep
+      # versioning means it is always part of the published set. `npm audit
+      # signatures` exits non-zero if any signature or attestation fails to
+      # verify, so a bad provenance chain fails the run. No NPM_TOKEN here:
+      # signature verification is a public-registry read, so the publish token
+      # stays scoped to the step above (CI-10).
+      - name: Post-publish provenance smoke (C4)
+        if: ${{ vars.RELEASE_ENABLED == 'true' && steps.changesets.outputs.published == 'true' }}
+        run: |
+          version="$(node -p "require('./packages/core/package.json').version")"
+          echo "Verifying provenance + registry signatures for @graphorin/core@${version}"
+          workdir="$(mktemp -d)"
+          cd "$workdir"
+          npm init -y >/dev/null 2>&1
+          # Absorb brief registry propagation lag right after publish.
+          for attempt in 1 2 3; do
+            if npm install "@graphorin/core@${version}" --no-audit --no-fund; then
+              break
+            fi
+            echo "::warning::install attempt ${attempt} failed (registry propagation?); retrying in 15s"
+            sleep 15
+          done
+          npm audit signatures

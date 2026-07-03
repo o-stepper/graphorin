@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function capInsightsBelowFacts(factHits, insightHits): readonly MemoryHit<Insight>[];
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:130
+Defined in: packages/memory/src/tiers/insight-memory.ts:183
 
 Enforce the P1-1 rank ceiling: an insight may never outrank a primary
 fact **it cites**. For each insight hit, if any fact it cites is

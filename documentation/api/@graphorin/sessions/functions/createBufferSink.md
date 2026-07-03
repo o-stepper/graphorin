@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ function createBufferSink(): {
 };
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:196
+Defined in: packages/sessions/src/export/writer.ts:227
 
 Convenience: a sink that buffers every line into a `string[]`. Used
 by tests + the simple in-memory export path.
@@ -31,8 +31,8 @@ by tests + the simple in-memory export path.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `lines` | `string`[] | packages/sessions/src/export/writer.ts:198 |
-| `sink` | [`SessionExportSink`](/api/@graphorin/sessions/interfaces/SessionExportSink.md) | packages/sessions/src/export/writer.ts:197 |
-| `toString()` | () => `string` | packages/sessions/src/export/writer.ts:199 |
+| `lines` | `string`[] | packages/sessions/src/export/writer.ts:229 |
+| `sink` | [`SessionExportSink`](/api/@graphorin/sessions/interfaces/SessionExportSink.md) | packages/sessions/src/export/writer.ts:228 |
+| `toString()` | () => `string` | packages/sessions/src/export/writer.ts:230 |
 
 ## Stable

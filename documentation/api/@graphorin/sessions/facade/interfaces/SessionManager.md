@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionManager
 
-Defined in: packages/sessions/src/facade.ts:250
+Defined in: packages/sessions/src/facade.ts:290
 
 Surface returned by [createSessionManager](/api/@graphorin/sessions/facade/functions/createSessionManager.md).
 
@@ -16,8 +16,8 @@ Surface returned by [createSessionManager](/api/@graphorin/sessions/facade/funct
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-agents"></a> `agents` | `readonly` | [`AgentRegistry`](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md) | The underlying agent registry. | packages/sessions/src/facade.ts:252 |
-| <a id="property-commentary"></a> `commentary` | `readonly` | [`CommentarySanitizer`](/api/@graphorin/sessions/interfaces/CommentarySanitizer.md) | Default sanitizer instance (test seam). | packages/sessions/src/facade.ts:254 |
+| <a id="property-agents"></a> `agents` | `readonly` | [`AgentRegistry`](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md) | The underlying agent registry. | packages/sessions/src/facade.ts:292 |
+| <a id="property-commentary"></a> `commentary` | `readonly` | [`CommentarySanitizer`](/api/@graphorin/sessions/interfaces/CommentarySanitizer.md) | Default sanitizer instance (test seam). | packages/sessions/src/facade.ts:294 |
 
 ## Methods
 
@@ -27,7 +27,7 @@ Surface returned by [createSessionManager](/api/@graphorin/sessions/facade/funct
 create(args): Promise<Session>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:262
+Defined in: packages/sessions/src/facade.ts:302
 
 Create a fresh session. The optional `commentaryPolicy` overrides
 the manager-level default just for this session — useful for
@@ -53,6 +53,29 @@ uses the `'wrap'` default).
 
 ***
 
+### deleteSession()
+
+```ts
+deleteSession(sessionId): Promise<void>;
+```
+
+Defined in: packages/sessions/src/facade.ts:322
+
+Hard-delete a session and cascade its handoffs / workflow runs / audit rows
+(RP-6). Message rows are owned by the memory store; purge them separately.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### find()
 
 ```ts
@@ -61,7 +84,7 @@ find(sessionId): Promise<
 | null>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:273
+Defined in: packages/sessions/src/facade.ts:313
 
 Best-effort lookup. Returns `null` when the id is unknown.
 
@@ -85,7 +108,7 @@ Best-effort lookup. Returns `null` when the id is unknown.
 get(sessionId): Promise<Session>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:271
+Defined in: packages/sessions/src/facade.ts:311
 
 Hydrate an existing session by id.
 
@@ -111,7 +134,7 @@ importFromString(body, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:279
+Defined in: packages/sessions/src/facade.ts:332
 
 Import a JSONL stream into a fresh session.
 
@@ -138,7 +161,7 @@ Import a JSONL stream into a fresh session.
 listSessions(scope): Promise<readonly SessionMetadata[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:275
+Defined in: packages/sessions/src/facade.ts:315
 
 List sessions for a scope (newest-first by `createdAt`).
 
@@ -160,7 +183,7 @@ List sessions for a scope (newest-first by `createdAt`).
 pruneAudit(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:286
+Defined in: packages/sessions/src/facade.ts:339
 
 Prune audit rows older than the supplied epoch ms.
 
@@ -176,13 +199,38 @@ Prune audit rows older than the supplied epoch ms.
 
 ***
 
+### pruneSessions()
+
+```ts
+pruneSessions(opts): Promise<number>;
+```
+
+Defined in: packages/sessions/src/facade.ts:327
+
+Retention sweep (RP-6): delete every session matching the policy. Returns
+the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/interfaces/SessionStoreExt.md#prunesessions).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | \{ `beforeEpochMs?`: `number`; `closedOnly?`: `boolean`; \} |
+| `opts.beforeEpochMs?` | `number` |
+| `opts.closedOnly?` | `boolean` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+***
+
 ### replayer()
 
 ```ts
 replayer(): SessionReplayer;
 ```
 
-Defined in: packages/sessions/src/facade.ts:284
+Defined in: packages/sessions/src/facade.ts:337
 
 Build the underlying replay engine for advanced consumers.
 

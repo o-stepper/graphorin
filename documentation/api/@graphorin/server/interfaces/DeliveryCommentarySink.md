@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,6 +14,11 @@ audit telemetry can skip the sink and the sanitizer becomes a
 pure transform.
 
 ## Stable
+
+## Extended by
+
+- [`CommentaryAuditSink`](/api/@graphorin/server/commentary/interfaces/CommentaryAuditSink.md)
+- [`LateBoundCommentarySink`](/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md)
 
 ## Methods
 

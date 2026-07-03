@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function resolveTrustPolicy(source, trustLevel): ResolvedSkillTrustPolicy;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:105
+Defined in: packages/security/src/supply-chain/policy.ts:132
 
 Resolve the trust policy for a (source, trust-level) tuple. The
 resolver enforces the project-wide rule that npm/git installs

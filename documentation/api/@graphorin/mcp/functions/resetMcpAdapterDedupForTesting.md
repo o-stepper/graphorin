@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetMcpAdapterDedupForTesting(): void;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:51
+Defined in: packages/mcp/src/client/to-tools.ts:52
 
 **`Experimental`**
 

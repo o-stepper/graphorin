@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -25,4 +25,5 @@ context window (P1-4).
 | <a id="property-kind"></a> `kind` | `readonly` | `"spill-file"` \| `"resource-link"` | Backing store kind. `'spill-file'` today; `'resource-link'` is reserved for MCP (WI-13). | packages/core/src/types/tool.ts:202 |
 | <a id="property-mediatype"></a> `mediaType?` | `readonly` | `string` | MIME type of the stored artifact, when known. | packages/core/src/types/tool.ts:208 |
 | <a id="property-preview"></a> `preview` | `readonly` | `string` | A bounded preview of the full body (already inlined alongside the handle). | packages/core/src/types/tool.ts:204 |
+| <a id="property-producertrustclass"></a> `producerTrustClass?` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | Trust class of the tool that PRODUCED the stored body (TL-6). `read_result` re-applies inbound sanitization and dataflow provenance by this class, so an untrusted spill cannot launder to trusted through the built-in reader. | packages/core/src/types/tool.ts:215 |
 | <a id="property-uri"></a> `uri` | `readonly` | `string` | Opaque, run-scoped URI — e.g. `graphorin-spill:<runId>/<toolCallId>.json` for a spill artifact. Never a raw filesystem path: the reader resolves it within the configured artifact root, so the model cannot use it to read arbitrary files. | packages/core/src/types/tool.ts:200 |

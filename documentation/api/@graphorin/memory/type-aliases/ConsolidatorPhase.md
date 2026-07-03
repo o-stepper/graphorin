@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ConsolidatorPhase = "light" | "standard" | "deep";
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:85
+Defined in: packages/memory/src/consolidator/types.ts:98
 
 Phase identifier used by the runtime + audit rows.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ function cron(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:75
+Defined in: packages/triggers/src/index.ts:82
 
 Build a cron trigger declaration. The expression is validated
 eagerly — a malformed cron expression throws at registration time,

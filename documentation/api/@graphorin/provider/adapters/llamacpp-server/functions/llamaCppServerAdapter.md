@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function llamaCppServerAdapter(options): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/llamacpp-server.ts:74
+Defined in: packages/provider/src/adapters/llamacpp-server.ts:81
 
 Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by the upstream
 `llama-server` binary. The factory does not start the binary —

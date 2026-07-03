@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ClientMessageId = z.infer<typeof RpcId>;
 ```
 
-Defined in: client-message.ts:153
+Defined in: client-message.ts:154
 
 Convenience type for the JSON-RPC `id` slot. Matches the Graphorin
 subset (string + integer; no `null`, no float).

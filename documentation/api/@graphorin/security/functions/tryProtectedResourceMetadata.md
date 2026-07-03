@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function tryProtectedResourceMetadata(resourceUrl, signal?): Promise<
 | undefined>;
 ```
 
-Defined in: packages/security/src/oauth/discovery.ts:116
+Defined in: packages/security/src/oauth/discovery.ts:118
 
 Try to resolve protected-resource metadata (RFC 9728). Returns
 `undefined` when the resource does not advertise the document.

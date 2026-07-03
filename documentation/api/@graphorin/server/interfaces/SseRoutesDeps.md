@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,8 @@ Stable shape consumed by [createSseRoutes](/api/@graphorin/server/functions/crea
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-commentary"></a> `commentary?` | `readonly` | [`DeliveryCommentaryConfig`](/api/@graphorin/server/interfaces/DeliveryCommentaryConfig.md) | - | packages/server/src/sse/events.ts:45 |
-| <a id="property-dispatcher"></a> `dispatcher` | `readonly` | [`WsDispatcher`](/api/@graphorin/server/interfaces/WsDispatcher.md) | - | packages/server/src/sse/events.ts:44 |
-| <a id="property-keepalivems"></a> `keepAliveMs?` | `readonly` | `number` | How long the SSE responder waits between heartbeat comments to keep proxies / load balancers from closing the idle connection. Default `15_000` ms. | packages/server/src/sse/events.ts:51 |
-| <a id="property-now"></a> `now?` | `readonly` | () => `number` | - | packages/server/src/sse/events.ts:52 |
+| <a id="property-commentary"></a> `commentary?` | `readonly` | [`DeliveryCommentaryConfig`](/api/@graphorin/server/interfaces/DeliveryCommentaryConfig.md) | - | packages/server/src/sse/events.ts:51 |
+| <a id="property-dispatcher"></a> `dispatcher` | `readonly` | [`WsDispatcher`](/api/@graphorin/server/interfaces/WsDispatcher.md) | - | packages/server/src/sse/events.ts:50 |
+| <a id="property-keepalivems"></a> `keepAliveMs?` | `readonly` | `number` | How long the SSE responder waits between heartbeat comments to keep proxies / load balancers from closing the idle connection. Default `15_000` ms. | packages/server/src/sse/events.ts:57 |
+| <a id="property-now"></a> `now?` | `readonly` | () => `number` | - | packages/server/src/sse/events.ts:58 |
+| <a id="property-perconnectionqueuelimit"></a> `perConnectionQueueLimit?` | `readonly` | `number` | Cap on the per-connection SSE delivery queue (IP-9). A consumer that stops reading past this many buffered frames is closed instead of growing the queue without bound. Default 1000. | packages/server/src/sse/events.ts:49 |

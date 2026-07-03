@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ParsedActivationTrigger
 
-Defined in: packages/skills/src/registry/index.ts:339
+Defined in: packages/skills/src/registry/index.ts:372
 
 Parsed activation trigger. The registry uses this to discriminate
 slash-command activations (which override
@@ -19,6 +19,6 @@ activations (which honour it).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-activationkind"></a> `activationKind` | `readonly` | `"auto"` \| `"slash-command"` \| `"explicit"` | packages/skills/src/registry/index.ts:341 |
-| <a id="property-args"></a> `args?` | `readonly` | `string` | packages/skills/src/registry/index.ts:342 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/skills/src/registry/index.ts:340 |
+| <a id="property-activationkind"></a> `activationKind` | `readonly` | `"auto"` \| `"slash-command"` \| `"explicit"` | packages/skills/src/registry/index.ts:374 |
+| <a id="property-args"></a> `args?` | `readonly` | `string` | packages/skills/src/registry/index.ts:375 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/skills/src/registry/index.ts:373 |

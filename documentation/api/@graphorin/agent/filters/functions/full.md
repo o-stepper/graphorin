@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -12,9 +12,9 @@ function full(): DescribedFilter;
 
 Defined in: packages/agent/src/filters/index.ts:147
 
-The full unfiltered history. Emits a deprecation warning per call
-— security-conscious callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or
-[bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead.
+The full unfiltered history. Discouraged — security-conscious
+callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead
+(a sub-agent rarely needs the parent's entire conversation).
 
 ## Returns
 

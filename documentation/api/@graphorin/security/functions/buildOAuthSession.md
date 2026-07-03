@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function buildOAuthSession(
    override?): OAuthSession;
 ```
 
-Defined in: packages/security/src/oauth/authorize-code-flow.ts:180
+Defined in: packages/security/src/oauth/authorize-code-flow.ts:187
 
 Construct an [OAuthSession](/api/@graphorin/security/interfaces/OAuthSession.md) from a successful token-endpoint
 payload. Exported for the device + refresh flows so they share a

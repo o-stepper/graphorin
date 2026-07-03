@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runStorageEncrypt(options): Promise<StorageEncryptResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:166
+Defined in: packages/cli/src/commands/storage.ts:163
 
 `graphorin storage encrypt --passphrase-from <ref>` — encrypt a
 previously unencrypted SQLite store. Delegates to the optional Phase

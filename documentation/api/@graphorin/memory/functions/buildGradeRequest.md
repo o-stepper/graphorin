@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function buildGradeRequest(
    options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:232
+Defined in: packages/memory/src/search/iterative.ts:240
 
 Build the grade request. Pure — no I/O. Temperature 0 so the verdict
 is as stable as the model allows.
@@ -24,9 +24,10 @@ is as stable as the model allows.
 | ------ | ------ |
 | `query` | `string` |
 | `snippets` | readonly `string`[] |
-| `options` | \{ `maxTokens?`: `number`; `signal?`: `AbortSignal`; \} |
+| `options` | \{ `maxTokens?`: `number`; `signal?`: `AbortSignal`; `triedQueries?`: readonly `string`[]; \} |
 | `options.maxTokens?` | `number` |
 | `options.signal?` | `AbortSignal` |
+| `options.triedQueries?` | readonly `string`[] |
 
 ## Returns
 

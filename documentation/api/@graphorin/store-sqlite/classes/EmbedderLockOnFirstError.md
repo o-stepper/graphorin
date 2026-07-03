@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -23,22 +23,47 @@ already-locked database fails fast with this error pointing at
 ### Constructor
 
 ```ts
-new EmbedderLockOnFirstError(message): EmbedderLockOnFirstError;
+new EmbedderLockOnFirstError(message?): EmbedderLockOnFirstError;
 ```
 
-Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:40
+Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1082
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `message` | `string` |
+| `message?` | `string` |
 
 #### Returns
 
 `EmbedderLockOnFirstError`
 
-#### Overrides
+#### Inherited from
+
+```ts
+Error.constructor
+```
+
+### Constructor
+
+```ts
+new EmbedderLockOnFirstError(message?, options?): EmbedderLockOnFirstError;
+```
+
+Defined in: node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1082
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `message?` | `string` |
+| `options?` | `ErrorOptions` |
+
+#### Returns
+
+`EmbedderLockOnFirstError`
+
+#### Inherited from
 
 ```ts
 Error.constructor

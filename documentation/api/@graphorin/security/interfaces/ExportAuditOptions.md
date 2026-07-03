@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ExportAuditOptions
 
-Defined in: packages/security/src/audit/export.ts:30
+Defined in: packages/security/src/audit/export.ts:37
 
 Options for `exportAudit(...)`.
 
@@ -16,7 +16,7 @@ Options for `exportAudit(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-fromseq"></a> `fromSeq?` | `readonly` | `number` | - | packages/security/src/audit/export.ts:31 |
-| <a id="property-include"></a> `include?` | `readonly` | (`entry`) => `boolean` | Predicate to filter individual entries. | packages/security/src/audit/export.ts:35 |
-| <a id="property-toseq"></a> `toSeq?` | `readonly` | `number` | - | packages/security/src/audit/export.ts:32 |
-| <a id="property-writer"></a> `writer` | `readonly` | [`AuditExportWriter`](/api/@graphorin/security/interfaces/AuditExportWriter.md) | - | packages/security/src/audit/export.ts:33 |
+| <a id="property-fromseq"></a> `fromSeq?` | `readonly` | `number` | - | packages/security/src/audit/export.ts:38 |
+| <a id="property-include"></a> `include?` | `readonly` | (`entry`) => `boolean` | Predicate to filter individual entries. | packages/security/src/audit/export.ts:42 |
+| <a id="property-toseq"></a> `toSeq?` | `readonly` | `number` | - | packages/security/src/audit/export.ts:39 |
+| <a id="property-writer"></a> `writer` | `readonly` | [`AuditExportWriter`](/api/@graphorin/security/interfaces/AuditExportWriter.md) | - | packages/security/src/audit/export.ts:40 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -25,4 +25,4 @@ Defined in: packages/cli/src/commands/migrate-export.ts:41
 | <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam — capture human lines instead of writing to stderr. | `CommonOutputOptions.print` | packages/cli/src/internal/output.ts:75 |
 | <a id="property-to"></a> `to` | `readonly` | `string` | - | - | packages/cli/src/commands/migrate-export.ts:43 |
 | <a id="property-toschema"></a> `toSchema?` | `readonly` | `string` | Defaults to the writer's current schema (e.g. `'1.0'`). | - | packages/cli/src/commands/migrate-export.ts:45 |
-| <a id="property-writer"></a> `writer?` | `readonly` | `string` | Surfaced on the meta header. Defaults to `'graphorin-cli@0.4.0'`. | - | packages/cli/src/commands/migrate-export.ts:47 |
+| <a id="property-writer"></a> `writer?` | `readonly` | `string` | Surfaced on the meta header. Defaults to `'graphorin-cli@0.5.0'`. | - | packages/cli/src/commands/migrate-export.ts:47 |

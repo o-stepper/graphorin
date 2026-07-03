@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function validateSecretRefs(config, opts?): SecretRefValidationResult;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:576
+Defined in: packages/security/src/secrets/secret-ref.ts:577
 
 Walks an arbitrary configuration object and validates every `*Ref`
 field. Returns a structured result rather than throwing, so callers

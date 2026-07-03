@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function exportAudit(db, options): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/audit/export.ts:46
+Defined in: packages/security/src/audit/export.ts:53
 
 Stream every entry in `[fromSeq, toSeq]` (inclusive) into `writer`
 as JSONL. Each line is canonical JSON terminated by `\n`.

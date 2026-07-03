@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,7 +7,7 @@
 # Type Alias: ConflictPipelineDecision
 
 ```ts
-type ConflictPipelineDecision = "admit" | "dedup" | "supersede" | "pending";
+type ConflictPipelineDecision = "admit" | "dedup" | "supersede" | "pending" | "judge-unparseable";
 ```
 
 Defined in: packages/store-sqlite/src/conflict-store.ts:39

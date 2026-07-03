@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const BUILTIN_SCHEMES: ReadonlyArray<string>;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:11
+Defined in: packages/security/src/secrets/secret-ref.ts:12
 
 Set of scheme names the parser knows about by default. Every entry
 corresponds to a built-in resolver shipped from `./resolvers/`.

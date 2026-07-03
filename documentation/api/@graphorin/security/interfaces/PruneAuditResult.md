@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: PruneAuditResult
 
-Defined in: packages/security/src/audit/prune.ts:65
+Defined in: packages/security/src/audit/prune.ts:76
 
 Result of `pruneAudit(...)`.
 
@@ -16,5 +16,5 @@ Result of `pruneAudit(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | packages/security/src/audit/prune.ts:66 |
-| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | Sequence number of the first surviving entry, or `undefined` if empty. | packages/security/src/audit/prune.ts:68 |
+| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | packages/security/src/audit/prune.ts:77 |
+| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | Sequence number of the first surviving entry, or `undefined` if empty. | packages/security/src/audit/prune.ts:79 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const OPT_IN_PATTERNS: readonly RedactionPattern[];
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:216
+Defined in: packages/observability/src/redaction/patterns.ts:227
 
 Patterns that are recognised by the validator but are NOT enabled by
 default. Use them via `patterns: [...BUILT_IN_PATTERNS, ...OPT_IN_PATTERNS]`.

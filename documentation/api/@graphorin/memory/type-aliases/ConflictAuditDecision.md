@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,12 +7,14 @@
 # Type Alias: ConflictAuditDecision
 
 ```ts
-type ConflictAuditDecision = "admit" | "dedup" | "supersede" | "pending";
+type ConflictAuditDecision = "admit" | "dedup" | "supersede" | "pending" | "judge-unparseable";
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:217
+Defined in: packages/memory/src/internal/storage-adapter.ts:253
 
 Final pipeline outcome recorded against the candidate fact. Matches
 the storage adapter's `ConflictPipelineDecision` exactly.
+`'judge-unparseable'` closes a pending row whose deep-phase judge
+call repeatedly failed (MCON-9) so it stops being re-billed forever.
 
 ## Stable

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function refreshOAuthSession(
 options?): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:140
+Defined in: packages/security/src/oauth/library.ts:152
 
 Refresh the OAuth session for `serverId`. Throws when the session
 has no refresh token or when the authorization server rejects the
@@ -21,12 +21,13 @@ refresh.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) |
-| `serverId` | `string` |
-| `options` | \{ `signal?`: `AbortSignal`; \} |
-| `options.signal?` | `AbortSignal` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `storage` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | - |
+| `serverId` | `string` | - |
+| `options` | \{ `secretsStore?`: [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md); `signal?`: `AbortSignal`; \} | - |
+| `options.secretsStore?` | [`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md) | SPL-1: resolves the persisted refresh token across processes. |
+| `options.signal?` | `AbortSignal` | - |
 
 ## Returns
 

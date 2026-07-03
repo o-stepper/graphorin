@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > `Promise.all()`. Implements the `ReRanker` contract from
 > `@graphorin/memory/search`.
 >
-> Project Graphorin · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.4.0 (optional sub-pack)
+- **Published:** v0.5.0 (optional sub-pack)
 - **Default temperature:** `0` (deterministic).
 - **Default batch size:** `5` parallel provider calls.
 - **Default max score:** `10` (operator-tunable; finer scales improve
@@ -136,7 +136,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/reranker-llm — LLM-as-reranker adapter for the Graphorin
 framework.
@@ -188,7 +188,7 @@ locale-privileging).
 
 | Variable | Description |
 | ------ | ------ |
-| [defaultScoringPrompt](/api/@graphorin/reranker-llm/variables/defaultScoringPrompt.md) | Default English scoring prompt. Asks the model to emit a single integer in `[0, maxScore]` and to omit any other text. |
+| [defaultScoringPrompt](/api/@graphorin/reranker-llm/variables/defaultScoringPrompt.md) | Default English scoring prompt. Asks the model to emit a single integer in `[0, maxScore]` and to omit any other text. The passage is wrapped in explicit delimiters and framed as untrusted DATA — never instructions — so a poisoned memory can't steer its own relevance score (PS-14). |
 | [RERANKER\_ID](/api/@graphorin/reranker-llm/variables/RERANKER_ID.md) | - |
 | [VERSION](/api/@graphorin/reranker-llm/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
 
@@ -200,4 +200,4 @@ locale-privileging).
 | [defaultPassageExtractor](/api/@graphorin/reranker-llm/functions/defaultPassageExtractor.md) | Walks `text → summary → value → label → id` to find the best passage representation of a memory record. |
 | [mergeAndDedupe](/api/@graphorin/reranker-llm/functions/mergeAndDedupe.md) | Merge per-source lists, keeping the highest initial score per record id. Pure function; exported for the unit fixture. |
 | [normalizeScore](/api/@graphorin/reranker-llm/functions/normalizeScore.md) | Normalise a raw integer score into `[0, 1]`. Rejects out-of-range inputs by clamping; returns the configured fallback when the input is `null` (parse failed upstream). |
-| [parseIntegerResponse](/api/@graphorin/reranker-llm/functions/parseIntegerResponse.md) | Parse the model's reply into a non-negative integer. Accepts: |
+| [parseIntegerResponse](/api/@graphorin/reranker-llm/functions/parseIntegerResponse.md) | - |

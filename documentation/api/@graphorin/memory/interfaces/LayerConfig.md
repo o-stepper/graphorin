@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: LayerConfig
 
-Defined in: packages/memory/src/context-engine/engine.ts:91
+Defined in: packages/memory/src/context-engine/engine.ts:95
 
 Per-layer cap configuration. Mirrors the documented
 `ContextEngineConfig.layers.*` fields.
@@ -17,5 +17,5 @@ Per-layer cap configuration. Mirrors the documented
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/engine.ts:93 |
-| <a id="property-enabled"></a> `enabled?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:92 |
+| <a id="property-cap"></a> `cap?` | `readonly` | `number` | packages/memory/src/context-engine/engine.ts:97 |
+| <a id="property-enabled"></a> `enabled?` | `readonly` | `boolean` | packages/memory/src/context-engine/engine.ts:96 |

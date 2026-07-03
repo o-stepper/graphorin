@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const CONSOLIDATOR_INVALID_TIER_EXIT: 1 = EXIT_CODES.RECOVERABLE_FAILURE;
 ```
 
-Defined in: packages/cli/src/commands/consolidator.ts:213
+Defined in: packages/cli/src/commands/consolidator.ts:212
 
 Exit code emitted when a tier value fails validation. Re-exported
 so the binary can surface the same code to downstream callers.

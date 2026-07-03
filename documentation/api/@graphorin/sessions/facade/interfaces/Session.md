@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: Session
 
-Defined in: packages/sessions/src/facade.ts:142
+Defined in: packages/sessions/src/facade.ts:176
 
 Per-session ergonomic facade returned by
 [SessionManager.create](/api/@graphorin/sessions/facade/interfaces/SessionManager.md#create) / [SessionManager.get](/api/@graphorin/sessions/facade/interfaces/SessionManager.md#get).
@@ -17,9 +17,9 @@ Per-session ergonomic facade returned by
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-commentarypolicy"></a> `commentaryPolicy` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | Effective commentary policy for this session. | packages/sessions/src/facade.ts:146 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/sessions/src/facade.ts:143 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/sessions/src/facade.ts:144 |
+| <a id="property-commentarypolicy"></a> `commentaryPolicy` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | Effective commentary policy for this session. | packages/sessions/src/facade.ts:180 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/sessions/src/facade.ts:177 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/sessions/src/facade.ts:178 |
 
 ## Methods
 
@@ -29,9 +29,11 @@ Per-session ergonomic facade returned by
 appendHandoff(record): Promise<HandoffRecord>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:164
+Defined in: packages/sessions/src/facade.ts:202
 
-Append a handoff record. Auto-fires from `Agent.toTool()` in `@graphorin/agent`.
+Append a handoff record. RP-2: this does **not** auto-fire from
+`Agent.toTool()` — the agent accumulates `HandoffRecord`s in its own
+`RunState`; the operator forwards them here (see `examples/multi-agent-crew`).
 
 #### Parameters
 
@@ -51,7 +53,7 @@ Append a handoff record. Auto-fires from `Agent.toTool()` in `@graphorin/agent`.
 attachWorkflowRun(run): Promise<SessionWorkflowRun>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:173
+Defined in: packages/sessions/src/facade.ts:211
 
 Attach a workflow run to this session.
 
@@ -73,7 +75,7 @@ Attach a workflow run to this session.
 audit(opts?): Promise<readonly SessionAuditEntry[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:216
+Defined in: packages/sessions/src/facade.ts:256
 
 Recent audit rows for this session, newest-first.
 
@@ -96,7 +98,7 @@ Recent audit rows for this session, newest-first.
 close(): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:187
+Defined in: packages/sessions/src/facade.ts:225
 
 Mark the session closed. Idempotent.
 
@@ -116,7 +118,7 @@ compact(opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:158
+Defined in: packages/sessions/src/facade.ts:192
 
 Manual compaction — wraps `memory.session.compact(...)`.
 
@@ -143,7 +145,7 @@ Manual compaction — wraps `memory.session.compact(...)`.
 export(opts): Promise<SessionExportFooterRecord>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:201
+Defined in: packages/sessions/src/facade.ts:239
 
 Stream the session as a JSONL session-export 1.0 document.
 
@@ -165,7 +167,7 @@ Stream the session as a JSONL session-export 1.0 document.
 fork(opts?): Promise<Session>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:199
+Defined in: packages/sessions/src/facade.ts:237
 
 Fork the session at a given point. Returns a fresh `Session`
 with copied session-level metadata; the new session id is
@@ -196,7 +198,7 @@ forks remain post-v0.1.
 handoffsByAgent(agentId, direction?): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:168
+Defined in: packages/sessions/src/facade.ts:206
 
 Filter handoffs by agent + direction.
 
@@ -219,7 +221,7 @@ Filter handoffs by agent + direction.
 list(opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:151
+Defined in: packages/sessions/src/facade.ts:185
 
 List messages — wraps `memory.session.list(scope, ...)`.
 
@@ -241,7 +243,7 @@ List messages — wraps `memory.session.list(scope, ...)`.
 listHandoffs(): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:166
+Defined in: packages/sessions/src/facade.ts:204
 
 Every handoff in this session, oldest-first.
 
@@ -257,7 +259,7 @@ Every handoff in this session, oldest-first.
 metadata(): Promise<SessionMetadata>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:147
+Defined in: packages/sessions/src/facade.ts:181
 
 #### Returns
 
@@ -271,7 +273,7 @@ Defined in: packages/sessions/src/facade.ts:147
 push(message): Promise<MessageRef>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:149
+Defined in: packages/sessions/src/facade.ts:183
 
 Persist a new message — wraps `memory.session.push(scope, ...)`.
 
@@ -293,11 +295,13 @@ Persist a new message — wraps `memory.session.push(scope, ...)`.
 recordToolCassette(opts): ToolCassetteRecorder;
 ```
 
-Defined in: packages/sessions/src/facade.ts:214
+Defined in: packages/sessions/src/facade.ts:254
 
-Begin recording a tool cassette. The recorder is wired into the
-agent runtime (`@graphorin/agent`) so each `tool.execute.end /
-.error` event flows through.
+Begin recording a tool cassette. RP-2: the recorder is **not** wired into
+the agent runtime automatically — the operator subscribes to the agent's
+`RunContext` events and forwards `tool.execute.end / .error` into
+`recorder.recordToolCall(...)`. See `examples/multi-agent-crew` for the
+canonical wiring.
 
 #### Parameters
 
@@ -317,7 +321,7 @@ agent runtime (`@graphorin/agent`) so each `tool.execute.end /
 replay(opts?): AsyncIterable<SessionReplayEvent>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:203
+Defined in: packages/sessions/src/facade.ts:241
 
 Sanitized-by-default replay.
 
@@ -339,7 +343,7 @@ Sanitized-by-default replay.
 search(query, opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:153
+Defined in: packages/sessions/src/facade.ts:187
 
 Hybrid (FTS5) search over messages — wraps `memory.session.search(...)`.
 
@@ -367,7 +371,7 @@ updateWorkflowRunStatus(
 status): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:181
+Defined in: packages/sessions/src/facade.ts:219
 
 Update a workflow run's status.
 
@@ -391,7 +395,7 @@ Update a workflow run's status.
 workflowRuns(): Promise<readonly SessionWorkflowRun[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:179
+Defined in: packages/sessions/src/facade.ts:217
 
 List workflow runs attached to this session.
 

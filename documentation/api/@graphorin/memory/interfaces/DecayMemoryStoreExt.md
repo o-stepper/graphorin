@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DecayMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:473
+Defined in: packages/memory/src/internal/storage-adapter.ts:541
 
 Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
@@ -25,7 +25,7 @@ with an INFO log.
 archiveFact(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:505
+Defined in: packages/memory/src/internal/storage-adapter.ts:580
 
 Soft-archive a fact (sets `archived = 1`). The audit row in
 `memory_history` records the archive event.
@@ -43,10 +43,48 @@ Soft-archive a fact (sets `archived = 1`). The audit row in
 
 ***
 
+### listDecaySignals()?
+
+```ts
+optional listDecaySignals(ids): Promise<readonly {
+  createdAt: number;
+  id: string;
+  lastAccessedAt: number | null;
+  strength: number;
+}[]>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:595
+
+Narrow decay-column read for exactly the given fact ids (MRET-8) —
+powers per-search decay re-ranking without the old O(scope)
+1000-row window read. Optional; absent ⇒ the tier falls back to
+`listForDecay`.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ids` | readonly `string`[] |
+
+#### Returns
+
+`Promise`\<readonly \{
+  `createdAt`: `number`;
+  `id`: `string`;
+  `lastAccessedAt`: `number` \| `null`;
+  `strength`: `number`;
+\}[]\>
+
+***
+
 ### listForDecay()
 
 ```ts
-listForDecay(scope, limit?): Promise<readonly {
+listForDecay(
+   scope, 
+   limit?, 
+   opts?): Promise<readonly {
   archived: boolean;
   createdAt: number;
   id: string;
@@ -59,11 +97,17 @@ listForDecay(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:482
+Defined in: packages/memory/src/internal/storage-adapter.ts:556
 
 List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
 whole table. `limit` defaults to `1000`.
+
+Archived rows are EXCLUDED by default (MCON-6) — they never receive
+access bumps, so they would pin the LRU head and saturate the decay
+window, structurally stopping threshold-archiving and capacity
+eviction for live facts. Inspection paths pass
+`{ includeArchived: true }`.
 
 `importance` / `status` / `provenance` (X-1) feed the multi-signal
 salience score that orders capacity-bounded eviction.
@@ -74,6 +118,8 @@ salience score that orders capacity-bounded eviction.
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `limit?` | `number` |
+| `opts?` | \{ `includeArchived?`: `boolean`; \} |
+| `opts.includeArchived?` | `boolean` |
 
 #### Returns
 
@@ -88,3 +134,30 @@ salience score that orders capacity-bounded eviction.
   `strength`: `number`;
   `text`: `string`;
 \}[]\>
+
+***
+
+### markAccessed()?
+
+```ts
+optional markAccessed(ids, accessedAt?): Promise<void>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:588
+
+Record a retrieval access for the given facts (MRET-7): stamp
+`lastAccessedAt` and reinforce `strength` (implementation-capped).
+Optional — adapters without decay columns may omit it; callers
+MUST treat failures as non-fatal (the read path never breaks on a
+bookkeeping write).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `ids` | readonly `string`[] |
+| `accessedAt?` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;

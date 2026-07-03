@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function decryptBody(body, key): Uint8Array;
 ```
 
-Defined in: packages/sessions/src/export/reader.ts:252
+Defined in: packages/sessions/src/export/reader.ts:315
 
 Decrypt a body that was written with `encryptBody(...)`. The layout
 is `[iv (12)][ciphertext][tag (16)]`.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type PhaseListener = (outcome) => void;
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:277
+Defined in: packages/memory/src/consolidator/types.ts:309
 
 Listener callback subscribed via
 [Consolidator.onPhaseFinished](/api/@graphorin/memory/interfaces/Consolidator.md#onphasefinished). Useful for tests + observers.

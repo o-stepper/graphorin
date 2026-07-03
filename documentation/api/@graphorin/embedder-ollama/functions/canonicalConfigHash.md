@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function canonicalConfigHash(config): string;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:348
+Defined in: packages/embedder-ollama/src/index.ts:373
 
 Canonical-JSON deterministic hash over an embedder configuration.
 Object keys are sorted lexicographically so the resulting hash is

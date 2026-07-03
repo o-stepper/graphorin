@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createCodeExecuteTool(opts): Tool<{
 }, string>;
 ```
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:168
+Defined in: packages/tools/src/code-mode/meta-tools.ts:201
 
 Build the `code_execute` meta-tool. Its output is the script's final
 value rendered as a string, so the executor's `maxResultTokens` /

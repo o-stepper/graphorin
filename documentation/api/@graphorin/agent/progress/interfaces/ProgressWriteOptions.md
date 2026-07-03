@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ProgressWriteOptions
 
-Defined in: packages/agent/src/progress/index.ts:50
+Defined in: packages/agent/src/progress/index.ts:51
 
 Per-call options for [ProgressIO.write](/api/@graphorin/agent/progress/interfaces/ProgressIO.md#write).
 
@@ -16,7 +16,7 @@ Per-call options for [ProgressIO.write](/api/@graphorin/agent/progress/interface
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-role"></a> `role?` | `readonly` | `string` | - | packages/agent/src/progress/index.ts:51 |
-| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/agent/src/progress/index.ts:54 |
-| <a id="property-seq"></a> `seq?` | `readonly` | `number` | Explicit sequence number; default auto-increments per `(runId, role)`. | packages/agent/src/progress/index.ts:53 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | packages/agent/src/progress/index.ts:55 |
+| <a id="property-role"></a> `role?` | `readonly` | `string` | - | packages/agent/src/progress/index.ts:52 |
+| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/agent/src/progress/index.ts:55 |
+| <a id="property-seq"></a> `seq?` | `readonly` | `number` | Explicit sequence number; default auto-increments per `(runId, role)`. | packages/agent/src/progress/index.ts:54 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | packages/agent/src/progress/index.ts:56 |

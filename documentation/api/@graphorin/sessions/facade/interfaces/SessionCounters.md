@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionCounters
 
-Defined in: packages/sessions/src/facade.ts:104
+Defined in: packages/sessions/src/facade.ts:127
 
 Counter receiver used by the commentary sanitizer + the cassette
 audit emissions. Defaults to a no-op. Hook your `@graphorin/observability`
@@ -25,7 +25,7 @@ inc(
    labels?): void;
 ```
 
-Defined in: packages/sessions/src/facade.ts:105
+Defined in: packages/sessions/src/facade.ts:128
 
 #### Parameters
 

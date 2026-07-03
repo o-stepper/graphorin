@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -17,11 +17,12 @@ degrades to `null` (no procedure) — induction never breaks the write path.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `provider` | [`Provider`](/api/@graphorin/core/interfaces/Provider.md) |
-| `options` | \{ `maxTokens?`: `number`; \} |
-| `options.maxTokens?` | `number` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `provider` | [`Provider`](/api/@graphorin/core/interfaces/Provider.md) | - |
+| `options` | \{ `maxTokens?`: `number`; `onUsage?`: (`usage`) => `void`; \} | - |
+| `options.maxTokens?` | `number` | - |
+| `options.onUsage?` | (`usage`) => `void` | Usage callback (MCON-15) — induction is the framework's highest poisoning-risk LLM spend and previously flowed past every budget envelope. `createMemory` wires this into the consolidator budget when one is enabled; standalone callers can record it themselves. Best-effort: a throwing callback never breaks induction. |
 
 ## Returns
 

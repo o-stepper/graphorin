@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ChildResult\&lt;TOutput\&gt;
 
-Defined in: packages/agent/src/fanout/index.ts:55
+Defined in: packages/agent/src/fanout/index.ts:75
 
 Per-child outcome surfaced on
 [FanOutResult.children](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md#property-children). Failed-child isolation: a child
@@ -25,12 +25,12 @@ never an exception thrown from the fan-out call itself.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/agent/src/fanout/index.ts:56 |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/agent/src/fanout/index.ts:62 |
-| <a id="property-error"></a> `error?` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/agent/src/fanout/index.ts:59 |
-| `error.code` | `readonly` | `string` | packages/agent/src/fanout/index.ts:59 |
-| `error.message` | `readonly` | `string` | packages/agent/src/fanout/index.ts:59 |
-| <a id="property-output"></a> `output?` | `readonly` | `TOutput` | packages/agent/src/fanout/index.ts:58 |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"budget-exceeded"` \| `"cancelled"` | packages/agent/src/fanout/index.ts:57 |
-| <a id="property-tokensused"></a> `tokensUsed` | `readonly` | `number` | packages/agent/src/fanout/index.ts:60 |
-| <a id="property-toolcallcount"></a> `toolCallCount` | `readonly` | `number` | packages/agent/src/fanout/index.ts:61 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/agent/src/fanout/index.ts:76 |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/agent/src/fanout/index.ts:82 |
+| <a id="property-error"></a> `error?` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/agent/src/fanout/index.ts:79 |
+| `error.code` | `readonly` | `string` | packages/agent/src/fanout/index.ts:79 |
+| `error.message` | `readonly` | `string` | packages/agent/src/fanout/index.ts:79 |
+| <a id="property-output"></a> `output?` | `readonly` | `TOutput` | packages/agent/src/fanout/index.ts:78 |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"failed"` \| `"budget-exceeded"` \| `"cancelled"` | packages/agent/src/fanout/index.ts:77 |
+| <a id="property-tokensused"></a> `tokensUsed` | `readonly` | `number` | packages/agent/src/fanout/index.ts:80 |
+| <a id="property-toolcallcount"></a> `toolCallCount` | `readonly` | `number` | packages/agent/src/fanout/index.ts:81 |

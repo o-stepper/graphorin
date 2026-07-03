@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function __resetVercelRuntimeCache(): void;
 ```
 
-Defined in: packages/provider/src/adapters/vercel.ts:463
+Defined in: packages/provider/src/adapters/vercel.ts:522
 
 **`Internal`**
 

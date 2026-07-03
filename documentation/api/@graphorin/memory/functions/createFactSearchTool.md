@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ function createFactSearchTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:151
+Defined in: packages/memory/src/tools/fact-tools.ts:167
 
 `fact_search` — hybrid (vector + FTS5) search over the user's
 semantic memory. Results merged through the configured reranker.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: EpisodicMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:78
+Defined in: packages/core/src/contracts/memory-store.ts:100
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:78
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:84
+Defined in: packages/core/src/contracts/memory-store.ts:106
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:84
 put(episode): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:79
+Defined in: packages/core/src/contracts/memory-store.ts:101
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:79
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:80
+Defined in: packages/core/src/contracts/memory-store.ts:102
 
 #### Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -43,6 +43,12 @@ Re-exports [ComposedGuardrailResult](/api/@graphorin/security/type-aliases/Compo
 ### composeGuardrails
 
 Re-exports [composeGuardrails](/api/@graphorin/security/functions/composeGuardrails.md)
+
+***
+
+### containsPii
+
+Re-exports [containsPii](/api/@graphorin/security/functions/containsPii.md)
 
 ***
 

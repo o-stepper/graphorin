@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ToolCassetteRecorder
 
-Defined in: packages/sessions/src/cassette/recorder.ts:52
+Defined in: packages/sessions/src/cassette/recorder.ts:53
 
 Surface returned by [createToolCassetteRecorder](/api/@graphorin/sessions/functions/createToolCassetteRecorder.md). The
 recorder is async-only — every event the runtime drains is a
@@ -22,7 +22,7 @@ Promise so backpressure does not block the agent loop.
 close(): Promise<ToolCassetteFooterRecord>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:68
+Defined in: packages/sessions/src/cassette/recorder.ts:69
 
 Close the cassette + return the footer. Idempotent.
 
@@ -42,7 +42,7 @@ flushToFile(): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:73
+Defined in: packages/sessions/src/cassette/recorder.ts:74
 
 Flush the cassette to the configured `outputPath`. Returns the
 `{ path, recordCount, sha256 }` summary surfaced to the caller.
@@ -63,7 +63,7 @@ Flush the cassette to the configured `outputPath`. Returns the
 recordAuditSegment(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:66
+Defined in: packages/sessions/src/cassette/recorder.ts:67
 
 Record an `audit` chain segment.
 
@@ -85,7 +85,7 @@ Record an `audit` chain segment.
 recordCompaction(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:62
+Defined in: packages/sessions/src/cassette/recorder.ts:63
 
 Record a `compaction` event.
 
@@ -107,7 +107,7 @@ Record a `compaction` event.
 recordModelFallback(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:60
+Defined in: packages/sessions/src/cassette/recorder.ts:61
 
 Record a `model-fallback` chain advance.
 
@@ -129,7 +129,7 @@ Record a `model-fallback` chain advance.
 recordProgressArtifactRef(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:64
+Defined in: packages/sessions/src/cassette/recorder.ts:65
 
 Record a `progress-artifact-ref` spilled-artifact event.
 
@@ -151,7 +151,7 @@ Record a `progress-artifact-ref` spilled-artifact event.
 recordToolCall(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:54
+Defined in: packages/sessions/src/cassette/recorder.ts:55
 
 Record a `tool-call` event. Computes hashes lazily.
 
@@ -173,7 +173,7 @@ Record a `tool-call` event. Computes hashes lazily.
 recordToolSearchResolved(record): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:58
+Defined in: packages/sessions/src/cassette/recorder.ts:59
 
 Record a `tool-search-resolved` lazy-load event.
 
@@ -195,7 +195,7 @@ Record a `tool-search-resolved` lazy-load event.
 toString(): string;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:79
+Defined in: packages/sessions/src/cassette/recorder.ts:80
 
 Snapshot the buffered cassette body as a single string.
 

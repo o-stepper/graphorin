@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -28,7 +28,7 @@ type SubscriptionTarget =
 };
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:70
+Defined in: packages/client/src/graphorin-client.ts:71
 
 Discriminator for the subscription target. Mirrors the strict
 subject grammar enforced by the server:

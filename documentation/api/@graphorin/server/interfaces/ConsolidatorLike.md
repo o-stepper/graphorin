@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -42,6 +42,32 @@ Defined in: packages/server/src/consolidator/daemon.ts:26
 #### Returns
 
 `Promise`\&lt;`void`\&gt;
+
+***
+
+### registerWithScheduler()?
+
+```ts
+optional registerWithScheduler(scheduler): Promise<unknown>;
+```
+
+Defined in: packages/server/src/consolidator/daemon.ts:36
+
+Register the consolidator's cron / idle triggers with the server's
+triggers scheduler so background consolidation actually fires (MCON-4).
+Called from `beforeStart` when both a consolidator and a triggers daemon
+are configured. Optional so a consolidator without a `defaultScope` (or a
+custom surface) simply opts out.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scheduler` | [`Scheduler`](/api/@graphorin/triggers/interfaces/Scheduler.md) |
+
+#### Returns
+
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 

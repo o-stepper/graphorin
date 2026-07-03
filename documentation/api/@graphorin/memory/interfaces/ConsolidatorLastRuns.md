@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorLastRuns
 
-Defined in: packages/memory/src/consolidator/types.ts:186
+Defined in: packages/memory/src/consolidator/types.ts:218
 
 Per-phase last-run snapshot surfaced inside
 [ConsolidatorStatus.lastRuns](/api/@graphorin/memory/interfaces/ConsolidatorStatus.md#property-lastruns). Each entry carries the
@@ -19,6 +19,6 @@ phase (`undefined` when the phase has never run).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-deep"></a> `deep?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:189 |
-| <a id="property-light"></a> `light?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:187 |
-| <a id="property-standard"></a> `standard?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:188 |
+| <a id="property-deep"></a> `deep?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:221 |
+| <a id="property-light"></a> `light?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:219 |
+| <a id="property-standard"></a> `standard?` | `readonly` | `string` | packages/memory/src/consolidator/types.ts:220 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DispatchLike
 
-Defined in: packages/workflow/src/types.ts:188
+Defined in: packages/workflow/src/types.ts:195
 
 **`Internal`**
 
@@ -17,5 +17,5 @@ pulling the concrete class into this module's import graph.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | packages/workflow/src/types.ts:190 |
-| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | packages/workflow/src/types.ts:189 |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | packages/workflow/src/types.ts:197 |
+| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | packages/workflow/src/types.ts:196 |

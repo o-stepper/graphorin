@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,11 +10,13 @@
 function revokeOAuthToken(args): Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:159
+Defined in: packages/security/src/oauth/refresh.ts:167
 
-Revoke an OAuth token via RFC 7009. The metadata must advertise the
-revocation endpoint; otherwise the helper resolves silently — the
-audit log records the revocation regardless.
+Revoke an OAuth token via RFC 7009. Honest failure semantics
+(SPL-1 / SPL-16): a missing revocation endpoint, a network failure,
+and a non-2xx response all **throw** — the caller decides whether
+teardown proceeds, and the audit trail never claims a server-side
+revocation that was not confirmed.
 
 ## Parameters
 

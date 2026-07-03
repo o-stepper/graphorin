@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SkillResource
 
-Defined in: packages/skills/src/types/index.ts:242
+Defined in: packages/skills/src/types/index.ts:253
 
 Lazy resource accessor returned by [Skill.resources](/api/@graphorin/skills/interfaces/Skill.md#resources). The
 loader does not read the file off disk until `.read()` is invoked.
@@ -17,9 +17,9 @@ loader does not read the file off disk until `.read()` is invoked.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-mediatype"></a> `mediaType?` | `readonly` | `string` | packages/skills/src/types/index.ts:245 |
-| <a id="property-path"></a> `path` | `readonly` | `string` | packages/skills/src/types/index.ts:243 |
-| <a id="property-relativepath"></a> `relativePath` | `readonly` | `string` | packages/skills/src/types/index.ts:244 |
+| <a id="property-mediatype"></a> `mediaType?` | `readonly` | `string` | packages/skills/src/types/index.ts:256 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/skills/src/types/index.ts:254 |
+| <a id="property-relativepath"></a> `relativePath` | `readonly` | `string` | packages/skills/src/types/index.ts:255 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ loader does not read the file off disk until `.read()` is invoked.
 read(signal?): Promise<Uint8Array<ArrayBufferLike>>;
 ```
 
-Defined in: packages/skills/src/types/index.ts:246
+Defined in: packages/skills/src/types/index.ts:257
 
 #### Parameters
 
@@ -49,7 +49,7 @@ Defined in: packages/skills/src/types/index.ts:246
 readText(signal?): Promise<string>;
 ```
 
-Defined in: packages/skills/src/types/index.ts:247
+Defined in: packages/skills/src/types/index.ts:258
 
 #### Parameters
 

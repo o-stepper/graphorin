@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: AuthMiddlewareOptions
 
-Defined in: packages/server/src/middleware/auth.ts:22
+Defined in: packages/server/src/middleware/auth.ts:57
 
 Options accepted by [createAuthMiddleware](/api/@graphorin/server/functions/createAuthMiddleware.md). Tests inject a
 stub verifier; production wiring uses the verifier built during the
@@ -18,5 +18,5 @@ server's pre-bind step.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-allowanonymous"></a> `allowAnonymous?` | `readonly` | `boolean` | Whether to allow unauthenticated requests through. Used by `health` and (when explicitly opted-in) by the public read endpoints. When `false` (the default), missing / malformed / invalid tokens short-circuit the request with `401`. | packages/server/src/middleware/auth.ts:30 |
-| <a id="property-verifier"></a> `verifier` | `readonly` | [`TokenVerifier`](/api/@graphorin/security/classes/TokenVerifier.md) | - | packages/server/src/middleware/auth.ts:23 |
+| <a id="property-allowanonymous"></a> `allowAnonymous?` | `readonly` | `boolean` | Whether to allow unauthenticated requests through. Used by `health` and (when explicitly opted-in) by the public read endpoints. When `false` (the default), missing / malformed / invalid tokens short-circuit the request with `401`. | packages/server/src/middleware/auth.ts:65 |
+| <a id="property-verifier"></a> `verifier` | `readonly` | [`TokenVerifier`](/api/@graphorin/security/classes/TokenVerifier.md) | - | packages/server/src/middleware/auth.ts:58 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function openAuditDb(options): Promise<AuditDb>;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:187
+Defined in: packages/security/src/audit/audit-db.ts:189
 
 Open an audit database. The function fails fast with
 `AuditDbCipherUnavailableError` when no binding is registered, or

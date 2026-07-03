@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runMemoryStatus(options?): Promise<MemoryStatusResult>;
 ```
 
-Defined in: packages/cli/src/commands/memory.ts:61
+Defined in: packages/cli/src/commands/memory.ts:62
 
 ## Parameters
 

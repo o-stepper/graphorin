@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -7,10 +7,10 @@
 # Variable: RUN\_STATE\_SCHEMA\_VERSION
 
 ```ts
-const RUN_STATE_SCHEMA_VERSION: "graphorin-run-state/1.0";
+const RUN_STATE_SCHEMA_VERSION: "graphorin-run-state/1.1";
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:32
+Defined in: packages/agent/src/run-state/index.ts:33
 
 Canonical schema id for serialized [RunState](/api/@graphorin/core/interfaces/RunState.md) payloads.
 

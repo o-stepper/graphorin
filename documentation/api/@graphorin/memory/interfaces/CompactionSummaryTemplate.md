@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CompactionSummaryTemplate
 
-Defined in: packages/memory/src/context-engine/locale-packs/types.ts:72
+Defined in: packages/memory/src/context-engine/locale-packs/types.ts:67
 
 Structured 9-section summary template fragments used by the
 auto-compaction summarizer (RB-46). Section order is fixed; only
@@ -22,5 +22,5 @@ section. Section indices are 1-based to match the documented
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | Preamble injected at the top of the summarizer prompt. | packages/memory/src/context-engine/locale-packs/types.ts:74 |
-| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | 9 section headers. | packages/memory/src/context-engine/locale-packs/types.ts:76 |
+| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | Preamble injected at the top of the summarizer prompt. | packages/memory/src/context-engine/locale-packs/types.ts:69 |
+| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | 11 section headers. The last two are filled by the harness. | packages/memory/src/context-engine/locale-packs/types.ts:71 |

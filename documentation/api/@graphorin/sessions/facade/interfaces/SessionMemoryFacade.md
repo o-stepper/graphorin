@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -26,7 +26,7 @@ optional compact(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:91
+Defined in: packages/sessions/src/facade.ts:101
 
 #### Parameters
 
@@ -54,7 +54,7 @@ optional flushImportant(scope, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:90
+Defined in: packages/sessions/src/facade.ts:100
 
 #### Parameters
 
@@ -93,6 +93,32 @@ Defined in: packages/sessions/src/facade.ts:84
 
 ***
 
+### listWithMetadata()?
+
+```ts
+optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
+```
+
+Defined in: packages/sessions/src/facade.ts:91
+
+List messages with their persisted identity (RP-5): the stored message id,
+sequence, and `createdAt`. Optional — when absent, export falls back to
+fabricating those fields (the legacy behaviour). Implemented by
+`@graphorin/memory.session` over the store's real rows.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `opts?` | [`SessionListOptions`](/api/@graphorin/core/interfaces/SessionListOptions.md) |
+
+#### Returns
+
+`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/sessions/facade/interfaces/SessionMessageWithMetadata.md)[]\&gt;
+
+***
+
 ### push()
 
 ```ts
@@ -123,7 +149,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:85
+Defined in: packages/sessions/src/facade.ts:95
 
 #### Parameters
 

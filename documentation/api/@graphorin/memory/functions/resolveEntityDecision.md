@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function resolveEntityDecision(input): EntityResolveDecision;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:119
+Defined in: packages/memory/src/graph/entity-resolver.ts:129
 
 Pure resolution policy: lexical exact match → embedding cosine →
 ambiguous band → new. No I/O; deterministic. The caller decides what

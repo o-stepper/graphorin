@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -221,7 +221,7 @@ any `EmbedderProvider`; the default is
   (post-MVP).
 - **`memory.compile(scope)` + `memory.metadata(scope)`.** The
   interface used by the context engine (Phase 10d) to assemble the
-  six-layer memory-aware system prompt; `@graphorin/memory@0.4.0`
+  six-layer memory-aware system prompt; `@graphorin/memory@0.5.0`
   ships the deterministic minimum-viable rendering so the agent
   runtime in Phase 12 can already exercise the surface.
 - **Memory-modification guard wiring.** Every tool's
@@ -404,16 +404,16 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/memory/README.md) | `@graphorin/memory` — six-tier memory system for the Graphorin framework. |
+| [](/api/@graphorin/memory/README.md) | `@graphorin/memory` — seven-tier memory system for the Graphorin framework (MST-13: working / session / episodic / semantic / procedural / shared + the read-only insight tier from P1-1). |
 | [conflict](/api/@graphorin/memory/conflict/index.md) | Public surface of the multi-stage conflict resolution pipeline shipped in `@graphorin/memory` Phase 10b (DEC-117 / ADR-018 ext / RB-02). |
 | [errors](/api/@graphorin/memory/errors/index.md) | Typed error classes raised by `@graphorin/memory`. Every memory subsystem throws one of these instead of plain `Error` so consumers can pattern-match on `kind` and `name` without parsing the message. |
-| [facade](/api/@graphorin/memory/facade/index.md) | `createMemory()` — the facade that wires every six-tier sub-module + the nine memory tools + the search reranker + the context engine stubs + the consolidator placeholder. |
+| [facade](/api/@graphorin/memory/facade/index.md) | `createMemory()` — the facade that wires every tier sub-module (the seven-tier system) + the eleven (+1 gated) memory tools + the search reranker + the context engine stubs + the consolidator placeholder. |
 | [migration](/api/@graphorin/memory/migration/index.md) | Embedder migration runner — one of the three deliverables that turns `@graphorin/memory` into a long-running, embedder-aware system. |
 | [search](/api/@graphorin/memory/search/index.md) | Hybrid search composition for `@graphorin/memory`. Owns the `ReRanker` contract and the built-in `RRFReranker` (k=60 default). |
 | [tiers](/api/@graphorin/memory/tiers/index.md) | Six tier sub-modules for `@graphorin/memory`. Imported by the `createMemory()` facade; consumers can also instantiate a tier directly when wiring the package against a custom `MemoryStore`. |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createRedactionValidator(opts?): RedactionValidatorInstance;
 ```
 
-Defined in: packages/observability/src/redaction/validator.ts:156
+Defined in: packages/observability/src/redaction/validator.ts:171
 
 Create a [RedactionValidator](/api/@graphorin/observability/interfaces/RedactionValidator.md) configured against the supplied
 options. The result implements both the `RedactionValidator`

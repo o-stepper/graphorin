@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createCostTracker(opts?): CostTracker;
 ```
 
-Defined in: packages/observability/src/cost/cost-tracker.ts:124
+Defined in: packages/observability/src/cost/cost-tracker.ts:137
 
 Build a [CostTracker](/api/@graphorin/observability/interfaces/CostTracker.md) configured with the supplied budgets.
 

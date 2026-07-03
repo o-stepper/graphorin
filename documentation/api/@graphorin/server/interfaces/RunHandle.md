@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RunHandle
 
-Defined in: packages/server/src/runtime/run-state.ts:82
+Defined in: packages/server/src/runtime/run-state.ts:108
 
 In-flight handle returned by [RunStateTracker.start](/api/@graphorin/server/classes/RunStateTracker.md#start). Handlers
 pass `signal` into the underlying `agent.run / workflow.execute`
@@ -18,8 +18,8 @@ invocation so cancellation propagates instantly.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:83 |
-| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | packages/server/src/runtime/run-state.ts:84 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/server/src/runtime/run-state.ts:109 |
+| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | packages/server/src/runtime/run-state.ts:110 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ invocation so cancellation propagates instantly.
 cancel(reason?): void;
 ```
 
-Defined in: packages/server/src/runtime/run-state.ts:85
+Defined in: packages/server/src/runtime/run-state.ts:111
 
 #### Parameters
 

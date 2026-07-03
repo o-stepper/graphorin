@@ -1,0 +1,18 @@
+[**Graphorin API reference v0.5.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite](/api/@graphorin/store-sqlite/index.md) / [](/api/@graphorin/store-sqlite/README.md) / FtsIntegrityReport
+
+# Interface: FtsIntegrityReport
+
+Defined in: packages/store-sqlite/src/fts-integrity.ts:34
+
+One FTS table's integrity finding.
+
+## Properties
+
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-orphanrows"></a> `orphanRows` | `readonly` | `number` | FTS rows whose `rowid` matches no row in the base table. | packages/store-sqlite/src/fts-integrity.ts:38 |
+| <a id="property-table"></a> `table` | `readonly` | `string` | The FTS table inspected. | packages/store-sqlite/src/fts-integrity.ts:36 |

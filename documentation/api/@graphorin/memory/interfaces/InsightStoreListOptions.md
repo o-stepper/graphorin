@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: InsightStoreListOptions
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:509
+Defined in: packages/memory/src/internal/storage-adapter.ts:606
 
 Options accepted by [InsightMemoryStoreExt.list](/api/@graphorin/memory/interfaces/InsightMemoryStoreExt.md#list).
 
@@ -14,5 +14,5 @@ Options accepted by [InsightMemoryStoreExt.list](/api/@graphorin/memory/interfac
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/internal/storage-adapter.ts:512 |
-| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:510 |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/internal/storage-adapter.ts:609 |
+| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:607 |

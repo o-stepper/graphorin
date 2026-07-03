@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ProceduralMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:96
+Defined in: packages/core/src/contracts/memory-store.ts:118
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:96
 add(rule): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:97
+Defined in: packages/core/src/contracts/memory-store.ts:119
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:97
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:98
+Defined in: packages/core/src/contracts/memory-store.ts:120
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:98
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:99
+Defined in: packages/core/src/contracts/memory-store.ts:121
 
 #### Parameters
 

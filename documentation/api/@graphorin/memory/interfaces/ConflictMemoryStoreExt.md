@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConflictMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:283
+Defined in: packages/memory/src/internal/storage-adapter.ts:324
 
 Optional storage extension surfacing the audit + pending queue
 tables Phase 10b owns. Adapters that opt out leave the property
@@ -25,7 +25,7 @@ enqueuePending(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:288
+Defined in: packages/memory/src/internal/storage-adapter.ts:329
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:288
 listPending(scope, limit?): Promise<readonly PendingConflictRowLike[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:289
+Defined in: packages/memory/src/internal/storage-adapter.ts:330
 
 #### Parameters
 
@@ -62,13 +62,39 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:289
 
 ***
 
+### markAttempted()?
+
+```ts
+optional markAttempted(id, attemptedAt?): Promise<void>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:338
+
+Stamp `attemptedAt` on a pending row whose judge call failed
+(MCON-9). The deep phase closes the row as `'judge-unparseable'`
+on the NEXT failure, so a poisoned row is billed at most twice.
+Optional — without it the deep phase falls back to skip-and-retry.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `id` | `number` |
+| `attemptedAt?` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### markResolved()
 
 ```ts
 markResolved(id, decision): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:290
+Defined in: packages/memory/src/internal/storage-adapter.ts:331
 
 #### Parameters
 
@@ -92,7 +118,7 @@ recordDecision(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:284
+Defined in: packages/memory/src/internal/storage-adapter.ts:325
 
 #### Parameters
 

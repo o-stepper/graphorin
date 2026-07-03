@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: IterativeRetrievalDeps\&lt;H\&gt;
 
-Defined in: packages/memory/src/search/iterative.ts:349
+Defined in: packages/memory/src/search/iterative.ts:366
 
 Dependencies injected into [runIterativeRetrieval](/api/@graphorin/memory/functions/runIterativeRetrieval.md). The loop does
 no I/O of its own — `retrieve` and `grader` own all side effects.
@@ -23,9 +23,35 @@ no I/O of its own — `retrieve` and `grader` own all side effects.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-grader"></a> `grader` | \| [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md) \| `null` | Grader; `null` ⇒ single-shot (no grading, no provider call). | packages/memory/src/search/iterative.ts:361 |
+| <a id="property-grader"></a> `grader` | \| [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md) \| `null` | Grader; `null` ⇒ single-shot (no grading, no provider call). | packages/memory/src/search/iterative.ts:378 |
 
 ## Methods
+
+### fuse()?
+
+```ts
+optional fuse(lists): readonly H[];
+```
+
+Defined in: packages/memory/src/search/iterative.ts:386
+
+Re-fuse the per-pass hit lists into one ranked list (MRET-2).
+Receives one list per pass in pass order; the result feeds the
+final `maxResults` cut so a pass-2 find can outrank pass-1 noise.
+Absent ⇒ the loop falls back to round-robin interleaving (still
+strictly better than the old discovery-order cut).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `lists` | readonly readonly `H`[][] |
+
+#### Returns
+
+readonly `H`[]
+
+***
 
 ### idOf()
 
@@ -33,7 +59,7 @@ no I/O of its own — `retrieve` and `grader` own all side effects.
 idOf(hit): string;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:359
+Defined in: packages/memory/src/search/iterative.ts:376
 
 Stable id used to dedup hits across passes.
 
@@ -58,7 +84,7 @@ retrieve(
 signal?): Promise<readonly H[]>;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:355
+Defined in: packages/memory/src/search/iterative.ts:372
 
 Run one retrieval pass for `query`. `widen` is `true` on
 reformulation passes so the caller can broaden recall (e.g. enable
@@ -84,7 +110,7 @@ P2-1 one-hop graph expansion).
 snippetOf(hit): string;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:357
+Defined in: packages/memory/src/search/iterative.ts:374
 
 Snippet shown to the grader for a hit.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -31,7 +31,7 @@ Defined in: reranker.ts:97
 new LlmReRanker<TRecord>(options): LlmReRanker<TRecord>;
 ```
 
-Defined in: reranker.ts:112
+Defined in: reranker.ts:113
 
 #### Parameters
 
@@ -65,12 +65,32 @@ Defined in: reranker.ts:112
 get invocationCount(): number;
 ```
 
-Defined in: reranker.ts:141
+Defined in: reranker.ts:142
 
 Number of `rerank(...)` invocations since construction. Surfaced
 for observability + the test suite.
 
 ##### Stable
+
+##### Returns
+
+`number`
+
+***
+
+### lastErrorCount
+
+#### Get Signature
+
+```ts
+get lastErrorCount(): number;
+```
+
+Defined in: reranker.ts:162
+
+Number of per-passage provider failures swallowed (→ `fallbackScore`) on
+the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
+is partially degraded — surface it for observability.
 
 ##### Returns
 
@@ -86,7 +106,7 @@ for observability + the test suite.
 get lastPromptTokens(): number;
 ```
 
-Defined in: reranker.ts:152
+Defined in: reranker.ts:153
 
 Rough total prompt-tokens spent on the most-recent rerank call.
 Returned by the provider on each `generate(...)`; we expose the
@@ -109,7 +129,7 @@ rerank<TInputRecord>(
 options?): Promise<readonly MemoryHit<TInputRecord>[]>;
 ```
 
-Defined in: reranker.ts:156
+Defined in: reranker.ts:166
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be

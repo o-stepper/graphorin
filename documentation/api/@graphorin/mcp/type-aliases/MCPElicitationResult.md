@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -20,7 +20,7 @@ type MCPElicitationResult =
 };
 ```
 
-Defined in: packages/mcp/src/client/types.ts:117
+Defined in: packages/mcp/src/client/types.ts:110
 
 Operator response to an [MCPElicitationRequest](/api/@graphorin/mcp/interfaces/MCPElicitationRequest.md). `accept` returns
 the collected flat values; `decline`/`cancel` carry no content.

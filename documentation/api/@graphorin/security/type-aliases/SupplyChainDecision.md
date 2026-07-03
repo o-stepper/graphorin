@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ type SupplyChainDecision =
 };
 ```
 
-Defined in: packages/security/src/supply-chain/types.ts:138
+Defined in: packages/security/src/supply-chain/types.ts:149
 
 Decision returned by [evaluateSupplyChainPolicy](/api/@graphorin/security/functions/evaluateSupplyChainPolicy.md).
 

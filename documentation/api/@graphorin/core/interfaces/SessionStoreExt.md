@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -166,6 +166,31 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 
 ***
 
+### deleteSession()
+
+```ts
+deleteSession(sessionId): Promise<void>;
+```
+
+Defined in: packages/core/src/contracts/session-store.ts:142
+
+Hard-delete a session and cascade its session-owned rows — handoffs,
+workflow-run attachments, and audit entries (RP-6). Message rows live in
+the `SessionMemoryStore` and are purged separately. A no-op for an unknown
+id.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `sessionId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### getSession()
 
 ```ts
@@ -321,6 +346,33 @@ Delete audit rows older than the supplied epoch ms.
 | Parameter | Type |
 | ------ | ------ |
 | `beforeEpochMs` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+***
+
+### pruneSessions()
+
+```ts
+pruneSessions(opts): Promise<number>;
+```
+
+Defined in: packages/core/src/contracts/session-store.ts:149
+
+Retention sweep (RP-6): hard-delete (cascade) every session matching the
+policy. `beforeEpochMs` limits to sessions created before that instant;
+`closedOnly` limits to closed sessions. With neither, deletes all sessions.
+Returns the number of sessions deleted.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | \{ `beforeEpochMs?`: `number`; `closedOnly?`: `boolean`; \} |
+| `opts.beforeEpochMs?` | `number` |
+| `opts.closedOnly?` | `boolean` |
 
 #### Returns
 

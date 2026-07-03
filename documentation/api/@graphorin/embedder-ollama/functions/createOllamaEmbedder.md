@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createOllamaEmbedder(options?): OllamaEmbedder;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:111
+Defined in: packages/embedder-ollama/src/index.ts:123
 
 Build an Ollama-backed embedder. The first `embed()` call issues a
 `POST /api/show` to capture the model digest; subsequent calls hit

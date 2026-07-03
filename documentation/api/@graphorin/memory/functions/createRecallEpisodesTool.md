@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -18,6 +18,7 @@ function createRecallEpisodesTool(deps): Tool<{
   episodes: {
      endedAt: string;
      episodeId: string;
+     provenance?: string;
      score: number;
      startedAt: string;
      summary: string;
@@ -25,7 +26,7 @@ function createRecallEpisodesTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:77
+Defined in: packages/memory/src/tools/recall-tools.ts:81
 
 `recall_episodes` — triple-signal episode retrieval (recency ×
 relevance × importance).
@@ -49,6 +50,7 @@ relevance × importance).
   `episodes`: \{
      `endedAt`: `string`;
      `episodeId`: `string`;
+     `provenance?`: `string`;
      `score`: `number`;
      `startedAt`: `string`;
      `summary`: `string`;

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runTriggersDisable(options): Promise<
 | null>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:147
+Defined in: packages/cli/src/commands/triggers.ts:148
 
 ## Parameters
 

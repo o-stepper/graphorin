@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -24,9 +24,11 @@ surfaced to operators (CLI command / docs link to fix the issue).
 - [`MemoryToolDeniedError`](/api/@graphorin/memory/errors/classes/MemoryToolDeniedError.md)
 - [`WorkingBlockOverflowError`](/api/@graphorin/memory/errors/classes/WorkingBlockOverflowError.md)
 - [`WorkingBlockReplaceMismatchError`](/api/@graphorin/memory/errors/classes/WorkingBlockReplaceMismatchError.md)
+- [`WorkingBlockReadOnlyError`](/api/@graphorin/memory/errors/classes/WorkingBlockReadOnlyError.md)
 - [`EmbedderMigrationLockedError`](/api/@graphorin/memory/errors/classes/EmbedderMigrationLockedError.md)
 - [`EmbedderMigrationAbortedError`](/api/@graphorin/memory/errors/classes/EmbedderMigrationAbortedError.md)
 - [`EmbedderMigrationStateError`](/api/@graphorin/memory/errors/classes/EmbedderMigrationStateError.md)
+- [`QuarantinePromotionRefusedError`](/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md)
 - [`ProcedureInductionNotConfiguredError`](/api/@graphorin/memory/errors/classes/ProcedureInductionNotConfiguredError.md)
 - [`BudgetExceededError`](/api/@graphorin/memory/classes/BudgetExceededError.md)
 - [`CustomTierMisconfiguredError`](/api/@graphorin/memory/classes/CustomTierMisconfiguredError.md)

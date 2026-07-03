@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -46,7 +46,7 @@ type SchedulerEvent =
 };
 ```
 
-Defined in: packages/triggers/src/index.ts:148
+Defined in: packages/triggers/src/index.ts:155
 
 Lifecycle event emitted by [Scheduler.events](/api/@graphorin/triggers/interfaces/Scheduler.md#events). Useful for
 tests and for piping into observability without monkey-patching.

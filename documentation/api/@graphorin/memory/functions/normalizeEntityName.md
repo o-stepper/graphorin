@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function normalizeEntityName(name): string;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:81
+Defined in: packages/memory/src/graph/entity-resolver.ts:91
 
 Fold an entity surface form into a canonical lexical key: Unicode
 NFKC, lowercased, internal whitespace collapsed, surrounding

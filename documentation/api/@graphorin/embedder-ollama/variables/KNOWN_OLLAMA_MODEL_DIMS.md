@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,6 +10,10 @@
 const KNOWN_OLLAMA_MODEL_DIMS: ReadonlyMap<string, number>;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:97
+Defined in: packages/embedder-ollama/src/index.ts:103
 
-Set of model -> dim hints used to seed the canonical id.
+Model -> output-dimension hints used to seed the canonical id before the
+first `embed()` resolves the real width from a response. Only single-width
+families are listed; size-variant families (e.g. `qwen3-embedding`, whose
+dim depends on the `:0.6b` / `:4b` / `:8b` tag) are deliberately omitted so
+an ambiguous bind fails loudly rather than baking a wrong width (PS-11).

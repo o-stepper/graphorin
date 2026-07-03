@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -316,12 +316,6 @@ Re-exports [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance
 
 ***
 
-### MemoryReadEvent
-
-Re-exports [MemoryReadEvent](/api/@graphorin/core/interfaces/MemoryReadEvent.md)
-
-***
-
 ### MemoryRecord
 
 Re-exports [MemoryRecord](/api/@graphorin/core/interfaces/MemoryRecord.md)
@@ -337,12 +331,6 @@ Re-exports [MemorySearchOptions](/api/@graphorin/core/interfaces/MemorySearchOpt
 ### MemoryStatus
 
 Re-exports [MemoryStatus](/api/@graphorin/core/type-aliases/MemoryStatus.md)
-
-***
-
-### MemoryWriteEvent
-
-Re-exports [MemoryWriteEvent](/api/@graphorin/core/interfaces/MemoryWriteEvent.md)
 
 ***
 
@@ -451,6 +439,12 @@ Re-exports [RunStatus](/api/@graphorin/core/type-aliases/RunStatus.md)
 ### RunStep
 
 Re-exports [RunStep](/api/@graphorin/core/interfaces/RunStep.md)
+
+***
+
+### RunTaintSummary
+
+Re-exports [RunTaintSummary](/api/@graphorin/core/interfaces/RunTaintSummary.md)
 
 ***
 

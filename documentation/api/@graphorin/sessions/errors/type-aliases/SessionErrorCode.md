@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -20,6 +20,7 @@ type SessionErrorCode =
   | "session-export-checksum-mismatch"
   | "session-export-encryption-required"
   | "session-not-found"
+  | "session-closed"
   | "agent-not-found"
   | "invalid-commentary-policy";
 ```

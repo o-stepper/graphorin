@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function getQueryParamRequired(ref, key): string;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:528
+Defined in: packages/security/src/secrets/secret-ref.ts:529
 
 Read a query parameter and throw if it is missing. Useful for
 resolver implementations that require a configuration value.

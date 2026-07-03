@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function parseAdjudication(text): boolean;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:193
+Defined in: packages/memory/src/graph/entity-resolver.ts:213
 
 Parse a yes/no adjudication reply. Conservative: only a clear yes is `true`.
 

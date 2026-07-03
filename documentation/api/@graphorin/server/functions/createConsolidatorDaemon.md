@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createConsolidatorDaemon(options): ConsolidatorDaemon;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:78
+Defined in: packages/server/src/consolidator/daemon.ts:86
 
 ## Parameters
 

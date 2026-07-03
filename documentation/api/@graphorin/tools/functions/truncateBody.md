@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function truncateBody(opts): Promise<TruncationOutcome>;
 ```
 
-Defined in: packages/tools/src/result/truncate.ts:133
+Defined in: packages/tools/src/result/truncate.ts:146
 
 Apply the per-strategy truncation pipeline.
 

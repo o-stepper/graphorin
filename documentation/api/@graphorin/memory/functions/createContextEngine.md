@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createContextEngine(config?): ContextEngine;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:324
+Defined in: packages/memory/src/context-engine/engine.ts:386
 
 Build a ContextEngine instance from the supplied configuration.
 

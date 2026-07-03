@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -14,11 +14,15 @@ type GraphorinClientErrorKind =
   | "auth-failed"
   | "protocol-violation"
   | "subscription-not-found"
+  | "rate-limited"
+  | "scope-denied"
+  | "run-not-found"
+  | "server-error"
   | "aborted"
   | "invalid-server-frame";
 ```
 
-Defined in: packages/client/src/errors.ts:16
+Defined in: packages/client/src/errors.ts:45
 
 Discriminator union of every error kind raised by the client.
 

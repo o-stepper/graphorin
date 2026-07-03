@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ type LayerId =
   | "autoRecall";
 ```
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:28
+Defined in: packages/memory/src/context-engine/token-budget.ts:34
 
 Layer-id discriminator. Mirrors the documented Layer 1-6
 structure of the layered system prompt.

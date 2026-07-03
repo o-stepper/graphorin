@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ActivationRequest
 
-Defined in: packages/skills/src/registry/index.ts:103
+Defined in: packages/skills/src/registry/index.ts:126
 
 Activation request produced by [SkillRegistry.resolveTrigger](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#resolvetrigger).
 
@@ -14,6 +14,6 @@ Activation request produced by [SkillRegistry.resolveTrigger](/api/@graphorin/sk
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-activationkind"></a> `activationKind` | `readonly` | `"auto"` \| `"slash-command"` \| `"explicit"` | packages/skills/src/registry/index.ts:105 |
-| <a id="property-args"></a> `args?` | `readonly` | `string` | packages/skills/src/registry/index.ts:106 |
-| <a id="property-skill"></a> `skill` | `readonly` | [`Skill`](/api/@graphorin/skills/interfaces/Skill.md) | packages/skills/src/registry/index.ts:104 |
+| <a id="property-activationkind"></a> `activationKind` | `readonly` | `"auto"` \| `"slash-command"` \| `"explicit"` | packages/skills/src/registry/index.ts:128 |
+| <a id="property-args"></a> `args?` | `readonly` | `string` | packages/skills/src/registry/index.ts:129 |
+| <a id="property-skill"></a> `skill` | `readonly` | [`Skill`](/api/@graphorin/skills/interfaces/Skill.md) | packages/skills/src/registry/index.ts:127 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SecretRefValidationResult
 
-Defined in: packages/security/src/secrets/secret-ref.ts:71
+Defined in: packages/security/src/secrets/secret-ref.ts:72
 
 Result of `validateSecretRefs(...)`. Lists every problem found during
 a recursive walk over a config object.
@@ -17,5 +17,5 @@ a recursive walk over a config object.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-issues"></a> `issues` | `readonly` | readonly \{ `error`: [`SecretRefParseError`](/api/@graphorin/security/classes/SecretRefParseError.md); `path`: readonly (`string` \| `number`)[]; `raw`: `unknown`; \}[] | packages/security/src/secrets/secret-ref.ts:73 |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/security/src/secrets/secret-ref.ts:72 |
+| <a id="property-issues"></a> `issues` | `readonly` | readonly \{ `error`: [`SecretRefParseError`](/api/@graphorin/security/classes/SecretRefParseError.md); `path`: readonly (`string` \| `number`)[]; `raw`: `unknown`; \}[] | packages/security/src/secrets/secret-ref.ts:74 |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/security/src/secrets/secret-ref.ts:73 |

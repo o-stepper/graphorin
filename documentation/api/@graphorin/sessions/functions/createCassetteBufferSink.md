@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ function createCassetteBufferSink(): {
 };
 ```
 
-Defined in: packages/sessions/src/cassette/writer.ts:138
+Defined in: packages/sessions/src/cassette/writer.ts:139
 
 Convenience: a sink that buffers every line into a `string[]`.
 
@@ -30,8 +30,8 @@ Convenience: a sink that buffers every line into a `string[]`.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `lines` | `string`[] | packages/sessions/src/cassette/writer.ts:140 |
-| `sink` | [`ToolCassetteSink`](/api/@graphorin/sessions/interfaces/ToolCassetteSink.md) | packages/sessions/src/cassette/writer.ts:139 |
-| `toString()` | () => `string` | packages/sessions/src/cassette/writer.ts:141 |
+| `lines` | `string`[] | packages/sessions/src/cassette/writer.ts:141 |
+| `sink` | [`ToolCassetteSink`](/api/@graphorin/sessions/interfaces/ToolCassetteSink.md) | packages/sessions/src/cassette/writer.ts:140 |
+| `toString()` | () => `string` | packages/sessions/src/cassette/writer.ts:142 |
 
 ## Stable

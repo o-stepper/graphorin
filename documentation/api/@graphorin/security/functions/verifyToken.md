@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function verifyToken(
 ctx?): Promise<VerifyResult>;
 ```
 
-Defined in: packages/security/src/auth/verify.ts:371
+Defined in: packages/security/src/auth/verify.ts:438
 
 Functional convenience wrapper around `TokenVerifier#verify`. The
 stateless variant constructs a one-shot verifier per call and is

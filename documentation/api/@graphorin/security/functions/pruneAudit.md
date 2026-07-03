@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function pruneAudit(db, options): Promise<PruneAuditResult>;
 ```
 
-Defined in: packages/security/src/audit/prune.ts:78
+Defined in: packages/security/src/audit/prune.ts:89
 
 Drop entries older than `before`, leaving at least `retain`
 entries. Maintains the chain integrity by rewriting the first

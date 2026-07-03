@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function classifyModelTier(provider):
   | undefined;
 ```
 
-Defined in: packages/provider/src/model-tier/classify.ts:72
+Defined in: packages/provider/src/model-tier/classify.ts:83
 
 Classify a `Provider`'s `modelId` into one of `'fast' | 'balanced' |
 'smart'`. Returns `undefined` when the model id matches none of the

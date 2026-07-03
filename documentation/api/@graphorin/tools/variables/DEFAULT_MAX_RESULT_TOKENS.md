@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,6 +10,6 @@
 const DEFAULT_MAX_RESULT_TOKENS: 16384 = 16384;
 ```
 
-Defined in: packages/tools/src/registry/normalize.ts:89
+Defined in: packages/tools/src/registry/normalize.ts:94
 
 Default value cap used for tool result tokens.

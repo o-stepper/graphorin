@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ function parseAuthority(authority):
   | undefined;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:443
+Defined in: packages/security/src/secrets/secret-ref.ts:444
 
 Split an authority string of the form `[userinfo@]host[:port]` into
 its components. `host` is lowercased per RFC 3986; userinfo and port

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -18,5 +18,4 @@ replace them via [defineContextLocalePack](/api/@graphorin/memory/functions/defi
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-episodetriggers"></a> `episodeTriggers` | `readonly` | readonly `RegExp`[] | Case-insensitive regex set evaluated against the last user message for episodic recall. | packages/memory/src/context-engine/locale-packs/types.ts:33 |
 | <a id="property-facttriggers"></a> `factTriggers` | `readonly` | readonly `RegExp`[] | Case-insensitive regex set evaluated against the last user message. A match indicates the model would benefit from the top-K facts being injected into Layer 6. | packages/memory/src/context-engine/locale-packs/types.ts:28 |

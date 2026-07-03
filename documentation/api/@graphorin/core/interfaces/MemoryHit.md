@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryHit\&lt;TRecord\&gt;
 
-Defined in: packages/core/src/types/memory.ts:359
+Defined in: packages/core/src/types/memory.ts:367
 
 A single retrieval hit with similarity / relevance metadata.
 
@@ -22,6 +22,6 @@ A single retrieval hit with similarity / relevance metadata.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-record"></a> `record` | `readonly` | `TRecord` | - | packages/core/src/types/memory.ts:360 |
-| <a id="property-score"></a> `score` | `readonly` | `number` | - | packages/core/src/types/memory.ts:361 |
-| <a id="property-signals"></a> `signals?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Optional source signals contributing to `score` (BM25, vec, RRF, …). | packages/core/src/types/memory.ts:363 |
+| <a id="property-record"></a> `record` | `readonly` | `TRecord` | - | packages/core/src/types/memory.ts:368 |
+| <a id="property-score"></a> `score` | `readonly` | `number` | - | packages/core/src/types/memory.ts:369 |
+| <a id="property-signals"></a> `signals?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Optional source signals contributing to `score` (BM25, vec, RRF, …). | packages/core/src/types/memory.ts:371 |

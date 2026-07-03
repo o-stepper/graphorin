@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionCompactionResult
 
-Defined in: packages/memory/src/tiers/session-memory.ts:35
+Defined in: packages/memory/src/tiers/session-memory.ts:37
 
 Snapshot returned by [SessionMemory.compact](/api/@graphorin/memory/classes/SessionMemory.md#compact). The
 minimum-viable rendering simply reports counts; the full
@@ -19,6 +19,6 @@ implementation later.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-removed"></a> `removed` | `readonly` | `number` | packages/memory/src/tiers/session-memory.ts:36 |
-| <a id="property-summarized"></a> `summarized` | `readonly` | `number` | packages/memory/src/tiers/session-memory.ts:37 |
-| <a id="property-summary"></a> `summary?` | `readonly` | `string` | packages/memory/src/tiers/session-memory.ts:38 |
+| <a id="property-removed"></a> `removed` | `readonly` | `number` | packages/memory/src/tiers/session-memory.ts:38 |
+| <a id="property-summarized"></a> `summarized` | `readonly` | `number` | packages/memory/src/tiers/session-memory.ts:39 |
+| <a id="property-summary"></a> `summary?` | `readonly` | `string` | packages/memory/src/tiers/session-memory.ts:40 |

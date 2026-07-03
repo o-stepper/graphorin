@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: BaseTemplateFragments
 
-Defined in: packages/memory/src/context-engine/locale-packs/types.ts:42
+Defined in: packages/memory/src/context-engine/locale-packs/types.ts:37
 
 Layer 1 template fragments. The composeTemplate function
 picks the right fragment based on `memoryBaseMode`.
@@ -17,5 +17,5 @@ picks the right fragment based on `memoryBaseMode`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-full"></a> `full` | `readonly` | `string` | Full educational template (~250-350 tokens). | packages/memory/src/context-engine/locale-packs/types.ts:44 |
-| <a id="property-minimal"></a> `minimal` | `readonly` | `string` | Minimal template for high-end models (~80-120 tokens). | packages/memory/src/context-engine/locale-packs/types.ts:46 |
+| <a id="property-full"></a> `full` | `readonly` | `string` | Full educational template (~250-350 tokens). | packages/memory/src/context-engine/locale-packs/types.ts:39 |
+| <a id="property-minimal"></a> `minimal` | `readonly` | `string` | Minimal template for high-end models (~80-120 tokens). | packages/memory/src/context-engine/locale-packs/types.ts:41 |

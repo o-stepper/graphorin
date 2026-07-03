@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MemoryActivityEvent
 
-Defined in: packages/cli/src/commands/memory.ts:367
+Defined in: packages/cli/src/commands/memory.ts:426
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: packages/cli/src/commands/memory.ts:367
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:372 |
-| <a id="property-event"></a> `event` | `readonly` | `string` | packages/cli/src/commands/memory.ts:370 |
-| <a id="property-memoryid"></a> `memoryId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:369 |
-| <a id="property-memorykind"></a> `memoryKind` | `readonly` | `string` | packages/cli/src/commands/memory.ts:368 |
-| <a id="property-source"></a> `source` | `readonly` | `string` | packages/cli/src/commands/memory.ts:371 |
+| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:431 |
+| <a id="property-event"></a> `event` | `readonly` | `string` | packages/cli/src/commands/memory.ts:429 |
+| <a id="property-memoryid"></a> `memoryId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:428 |
+| <a id="property-memorykind"></a> `memoryKind` | `readonly` | `string` | packages/cli/src/commands/memory.ts:427 |
+| <a id="property-source"></a> `source` | `readonly` | `string` | packages/cli/src/commands/memory.ts:430 |

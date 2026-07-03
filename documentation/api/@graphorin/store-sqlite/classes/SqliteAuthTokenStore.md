@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -68,13 +68,45 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:35
 
 ***
 
+### getByHash()
+
+```ts
+getByHash(hashHex): Promise<
+  | AuthTokenRecord
+| null>;
+```
+
+Defined in: packages/store-sqlite/src/auth-token-store.ts:40
+
+Indexed lookup by HMAC hash (SPL-19). When present, the verifier
+uses it on cache-miss instead of walking `list()` — O(1) instead of
+an O(n) full-table scan per verification.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `hashHex` | `string` |
+
+#### Returns
+
+`Promise`\<
+  \| [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md)
+  \| `null`\>
+
+#### Implementation of
+
+[`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md).[`getByHash`](/api/@graphorin/core/interfaces/AuthTokenStore.md#getbyhash)
+
+***
+
 ### list()
 
 ```ts
 list(): Promise<readonly AuthTokenRecord[]>;
 ```
 
-Defined in: packages/store-sqlite/src/auth-token-store.ts:40
+Defined in: packages/store-sqlite/src/auth-token-store.ts:49
 
 #### Returns
 
@@ -116,7 +148,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:17
 recordUse(id, usedAt): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/auth-token-store.ts:52
+Defined in: packages/store-sqlite/src/auth-token-store.ts:61
 
 #### Parameters
 
@@ -141,7 +173,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:52
 revoke(id, revokedAt): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/auth-token-store.ts:45
+Defined in: packages/store-sqlite/src/auth-token-store.ts:54
 
 #### Parameters
 

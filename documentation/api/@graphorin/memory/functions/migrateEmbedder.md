@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function migrateEmbedder(options): AsyncGenerator<MigrationProgress, void, unknown>;
 ```
 
-Defined in: packages/memory/src/migration/embedder-migration.ts:122
+Defined in: packages/memory/src/migration/embedder-migration.ts:127
 
 Stream embedder migrations as `AsyncIterable<MigrationProgress>`.
 

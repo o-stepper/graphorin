@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -24,8 +24,6 @@ type AgentEvent<TOutput> =
   | ToolApprovalRequestedEvent
   | ToolApprovalGrantedEvent
   | ToolApprovalDeniedEvent
-  | MemoryReadEvent
-  | MemoryWriteEvent
   | ContextCompactedEvent
   | HandoffEvent
   | AgentSteeredEvent
@@ -39,6 +37,8 @@ type AgentEvent<TOutput> =
   | AgentProgressWrittenEvent
   | AgentProgressReadEvent
   | AgentLateralLeakDetectedEvent
+  | FileGeneratedEvent
+  | SourceCitedEvent
   | StepEndEvent
   | GuardrailTrippedEvent
   | AgentEndEvent<TOutput>

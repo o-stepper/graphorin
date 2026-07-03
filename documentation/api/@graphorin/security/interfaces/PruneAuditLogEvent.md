@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: PruneAuditLogEvent
 
-Defined in: packages/security/src/audit/prune.ts:51
+Defined in: packages/security/src/audit/prune.ts:62
 
 Structured shape of the single log event emitted per prune run.
 
@@ -16,9 +16,9 @@ Structured shape of the single log event emitted per prune run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-before"></a> `before` | `readonly` | `number` | packages/security/src/audit/prune.ts:57 |
-| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | packages/security/src/audit/prune.ts:54 |
-| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | packages/security/src/audit/prune.ts:55 |
-| <a id="property-level"></a> `level` | `readonly` | `"info"` | packages/security/src/audit/prune.ts:52 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/security/src/audit/prune.ts:53 |
-| <a id="property-retain"></a> `retain` | `readonly` | `number` | packages/security/src/audit/prune.ts:56 |
+| <a id="property-before"></a> `before` | `readonly` | `number` | packages/security/src/audit/prune.ts:68 |
+| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | packages/security/src/audit/prune.ts:65 |
+| <a id="property-firstsurvivingseq"></a> `firstSurvivingSeq?` | `readonly` | `number` | packages/security/src/audit/prune.ts:66 |
+| <a id="property-level"></a> `level` | `readonly` | `"info"` | packages/security/src/audit/prune.ts:63 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/security/src/audit/prune.ts:64 |
+| <a id="property-retain"></a> `retain` | `readonly` | `number` | packages/security/src/audit/prune.ts:67 |

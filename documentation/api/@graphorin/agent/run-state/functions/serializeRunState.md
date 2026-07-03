@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function serializeRunState(state, options?): SerializedRunState;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:87
+Defined in: packages/agent/src/run-state/index.ts:96
 
 Render a JSON-stable snapshot of the supplied [RunState](/api/@graphorin/core/interfaces/RunState.md).
 The returned value is plain JSON (no `Map`, `Set`, `Date`, ...).

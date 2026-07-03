@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SharedMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:103
+Defined in: packages/core/src/contracts/memory-store.ts:125
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:103
 attach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:104
+Defined in: packages/core/src/contracts/memory-store.ts:126
 
 #### Parameters
 
@@ -39,7 +39,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:104
 detach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:105
+Defined in: packages/core/src/contracts/memory-store.ts:127
 
 #### Parameters
 
@@ -60,7 +60,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:105
 listFor(agentId): Promise<readonly MemoryRecord[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:106
+Defined in: packages/core/src/contracts/memory-store.ts:128
 
 #### Parameters
 

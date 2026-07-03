@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionReplayer
 
-Defined in: packages/sessions/src/replay/replayer.ts:61
+Defined in: packages/sessions/src/replay/replayer.ts:62
 
 Convenience surface returned by [createSessionReplayer](/api/@graphorin/sessions/functions/createSessionReplayer.md). The
 replayer is async-iterable; the agent runtime drives it under
@@ -22,7 +22,7 @@ replayer is async-iterable; the agent runtime drives it under
 run(options): AsyncIterable<SessionReplayEvent>;
 ```
 
-Defined in: packages/sessions/src/replay/replayer.ts:73
+Defined in: packages/sessions/src/replay/replayer.ts:74
 
 Run the replay engine. The caller threads in:
  - `traceSource`: an iterable of `SpanRecord`s (from the

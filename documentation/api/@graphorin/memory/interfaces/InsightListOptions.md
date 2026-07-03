@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: InsightListOptions
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:34
+Defined in: packages/memory/src/tiers/insight-memory.ts:36
 
 Per-call options accepted by [InsightMemory.list](/api/@graphorin/memory/classes/InsightMemory.md#list).
 
@@ -14,5 +14,5 @@ Per-call options accepted by [InsightMemory.list](/api/@graphorin/memory/classes
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/tiers/insight-memory.ts:37 |
-| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | packages/memory/src/tiers/insight-memory.ts:35 |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/tiers/insight-memory.ts:39 |
+| <a id="property-limit"></a> `limit?` | `readonly` | `number` | - | packages/memory/src/tiers/insight-memory.ts:37 |

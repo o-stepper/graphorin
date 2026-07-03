@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const OPAQUE_ONLY_SCHEMES: ReadonlySet<string>;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:26
+Defined in: packages/security/src/secrets/secret-ref.ts:27
 
 Schemes that **forbid** an authority component (no `//` allowed).
 

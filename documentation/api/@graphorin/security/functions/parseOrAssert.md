@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function parseOrAssert(input): ParsedSecretRef;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:673
+Defined in: packages/security/src/secrets/secret-ref.ts:685
 
 Convenience: parse if the input looks like a URI, otherwise throw a
 `naked-string` parse error. Used by `resolveSecret(...)`.

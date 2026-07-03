@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: TriggersRoutesDeps
 
-Defined in: packages/server/src/triggers/routes.ts:29
+Defined in: packages/server/src/triggers/routes.ts:30
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/triggers/routes.ts:29
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-daemon"></a> `daemon` | `readonly` | [`TriggersDaemon`](/api/@graphorin/server/interfaces/TriggersDaemon.md) | packages/server/src/triggers/routes.ts:30 |
+| <a id="property-daemon"></a> `daemon` | `readonly` | [`TriggersDaemon`](/api/@graphorin/server/interfaces/TriggersDaemon.md) | packages/server/src/triggers/routes.ts:31 |

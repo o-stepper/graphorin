@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type ClientMessage = z.infer<typeof ClientMessageSchema>;
 ```
 
-Defined in: client-message.ts:145
+Defined in: client-message.ts:146
 
 Inferred TypeScript union for the `ClientMessage` discriminator. A
 value satisfying this type round-trips through

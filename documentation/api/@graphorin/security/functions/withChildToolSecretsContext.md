@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function withChildToolSecretsContext<T>(child, fn): T;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:99
+Defined in: packages/security/src/secrets/acl.ts:114
 
 Convenience: run `fn` inside a child scope rooted at the current
 active context. Used by `@graphorin/agent` to wire sub-agent calls.

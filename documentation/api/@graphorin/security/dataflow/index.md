@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -93,3 +93,9 @@ Re-exports [TaintLabel](/api/@graphorin/security/interfaces/TaintLabel.md)
 ### TaintLedger
 
 Re-exports [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md)
+
+***
+
+### TaintLedgerSnapshot
+
+Re-exports [TaintLedgerSnapshot](/api/@graphorin/security/interfaces/TaintLedgerSnapshot.md)

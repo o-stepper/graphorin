@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function runIterativeRetrieval<H>(
 options?): Promise<IterativeRetrievalResult<H>>;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:393
+Defined in: packages/memory/src/search/iterative.ts:418
 
 Run the gated grade-then-reformulate loop.
 

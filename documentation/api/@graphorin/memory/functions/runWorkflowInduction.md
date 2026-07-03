@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function runWorkflowInduction(
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:253
+Defined in: packages/memory/src/consolidator/phases/induce.ts:274
 
 Pure orchestrator: induce a procedure from a trajectory.
 

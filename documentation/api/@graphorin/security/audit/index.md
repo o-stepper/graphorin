@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -107,6 +107,24 @@ Re-exports [AuditExportWriter](/api/@graphorin/security/interfaces/AuditExportWr
 ### AuditPayloadSerializationError
 
 Re-exports [AuditPayloadSerializationError](/api/@graphorin/security/classes/AuditPayloadSerializationError.md)
+
+***
+
+### AuthBridgeTeardown
+
+Re-exports [AuthBridgeTeardown](/api/@graphorin/security/interfaces/AuthBridgeTeardown.md)
+
+***
+
+### bridgeAuthToAudit
+
+Re-exports [bridgeAuthToAudit](/api/@graphorin/security/functions/bridgeAuthToAudit.md)
+
+***
+
+### BridgeAuthToAuditOptions
+
+Re-exports [BridgeAuthToAuditOptions](/api/@graphorin/security/interfaces/BridgeAuthToAuditOptions.md)
 
 ***
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createWsDispatcher(options?): WsDispatcher;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:211
+Defined in: packages/server/src/ws/dispatcher.ts:213
 
 Build a fresh dispatcher.
 

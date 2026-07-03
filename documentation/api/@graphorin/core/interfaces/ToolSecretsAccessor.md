@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ToolSecretsAccessor
 
-Defined in: packages/core/src/contracts/tool.ts:254
+Defined in: packages/core/src/contracts/tool.ts:267
 
 Per-call secrets accessor surface. Implemented by the executor; the
 tool author calls `require(...)` to obtain a `SecretValue` wrapper.
@@ -27,7 +27,7 @@ unwraps a secret outside the tool's permitted set.
 require(key, options?): Promise<SecretValue>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:261
+Defined in: packages/core/src/contracts/tool.ts:274
 
 Resolve a secret by key. Throws `SecretAccessDeniedError` if the
 key is not in the tool's `secretsAllowed` allowlist; throws
@@ -52,7 +52,7 @@ if the key resolves to no value.
 require(key, options): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:265
+Defined in: packages/core/src/contracts/tool.ts:278
 
 ##### Parameters
 

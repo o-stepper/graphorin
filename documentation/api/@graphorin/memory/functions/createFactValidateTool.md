@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,16 +16,27 @@ function createFactValidateTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:299
+Defined in: packages/memory/src/tools/fact-tools.ts:329
 
 `fact_validate` — promote a quarantined fact to active (P1-4). The
 validation path that admits a synthesized (consolidator / reflection)
-or injection-flagged memory into action-driving recall once it has
-been reviewed; the promotion is audited in `memory_history`. This is
-intended as an operator / inspector action: the agent's `fact_search`
-cannot enumerate quarantined facts, so it cannot be socially
-engineered by a poisoned (and therefore hidden) memory into validating
-one.
+memory into action-driving recall once it has been reviewed; the
+promotion is audited in `memory_history`.
+
+MRET-3 / MST-1 — two gates close the one-turn memory-poisoning chain
+(`fact_remember(poison)` → `fact_validate(id)` → active recall):
+
+1. `needsApproval: true` — the run suspends for a human decision
+   before this tool ever executes, so the agent cannot silently
+   promote any quarantined fact.
+2. The underlying `SemanticMemory.validate(...)` re-checks the fact's
+   text against the injection heuristics and **refuses** (no `force`
+   is passed here) — an injection-flagged memory cannot be promoted by
+   the agent at all. Only an operator, via the programmatic API with
+   `{ force: true }`, can override after review.
+
+Synthesized-but-clean consolidator writes promote normally once
+approved.
 
 ## Parameters
 

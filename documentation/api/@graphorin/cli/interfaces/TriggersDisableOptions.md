@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: TriggersDisableOptions
 
-Defined in: packages/cli/src/commands/triggers.ts:142
+Defined in: packages/cli/src/commands/triggers.ts:143
 
 ## Stable
 
@@ -19,7 +19,7 @@ Defined in: packages/cli/src/commands/triggers.ts:142
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-config"></a> `config?` | `readonly` | `string` | - | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`config`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-config) | packages/cli/src/commands/triggers.ts:37 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | - | packages/cli/src/commands/triggers.ts:143 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | - | packages/cli/src/commands/triggers.ts:144 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-json) | packages/cli/src/internal/output.ts:71 |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam — capture JSON documents instead of writing to stdout. | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`TriggersCommonOptions`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/TriggersCommonOptions.md#property-noninteractive) | packages/cli/src/internal/output.ts:73 |

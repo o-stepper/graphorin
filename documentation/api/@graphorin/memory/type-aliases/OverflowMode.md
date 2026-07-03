@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type OverflowMode = "truncate" | "drop";
 ```
 
-Defined in: packages/memory/src/context-engine/token-budget.ts:73
+Defined in: packages/memory/src/context-engine/token-budget.ts:79
 
 Per-layer truncation mode used when the layer overflows its cap
 or the global budget. `truncate` is the default; `drop` removes

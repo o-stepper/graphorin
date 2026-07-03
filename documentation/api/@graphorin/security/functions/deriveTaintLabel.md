@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -24,12 +24,13 @@ trust class, source, and declared sensitivity.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | \{ `sensitivity?`: [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md); `source?`: [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md); `trustClass`: [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md); \} |
-| `input.sensitivity?` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) |
-| `input.source?` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) |
-| `input.trustClass` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | \{ `sensitiveTiers?`: readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[]; `sensitivity?`: [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md); `source?`: [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md); `trustClass`: [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md); \} | - |
+| `input.sensitiveTiers?` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | Sensitivity tiers that count as "sensitive" for the lethal-trifecta leg (SDF-8). Default `['secret']` — out of the box only secret-tagged content arms the trifecta, so the gate does not fire on every run. Widen to e.g. `['secret', 'internal']` to also treat ordinary user/PII content (which defaults to `'internal'`) as sensitive. |
+| `input.sensitivity?` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - |
+| `input.source?` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - |
+| `input.trustClass` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - |
 
 ## Returns
 

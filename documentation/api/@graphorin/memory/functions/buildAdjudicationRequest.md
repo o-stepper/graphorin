@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function buildAdjudicationRequest(
    options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:178
+Defined in: packages/memory/src/graph/entity-resolver.ts:198
 
 Build the (pure) adjudication request. Exposed for testing.
 

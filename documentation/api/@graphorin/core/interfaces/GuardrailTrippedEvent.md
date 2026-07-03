@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: GuardrailTrippedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:236
+Defined in: packages/core/src/types/agent-event.ts:245
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:236
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-guardrailname"></a> `guardrailName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:238 |
-| <a id="property-phase"></a> `phase` | `readonly` | `"input"` \| `"output"` | packages/core/src/types/agent-event.ts:239 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:240 |
-| <a id="property-type"></a> `type` | `readonly` | `"guardrail.tripped"` | packages/core/src/types/agent-event.ts:237 |
+| <a id="property-guardrailname"></a> `guardrailName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:247 |
+| <a id="property-phase"></a> `phase` | `readonly` | `"input"` \| `"output"` | packages/core/src/types/agent-event.ts:248 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:249 |
+| <a id="property-type"></a> `type` | `readonly` | `"guardrail.tripped"` | packages/core/src/types/agent-event.ts:246 |

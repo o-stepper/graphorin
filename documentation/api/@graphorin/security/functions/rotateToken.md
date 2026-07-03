@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function rotateToken(options): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:148
+Defined in: packages/security/src/auth/crud.ts:169
 
 Revoke a token and immediately mint a fresh one with the same
 scopes. Useful for grace-period rotations.
@@ -22,7 +22,7 @@ scopes. Useful for grace-period rotations.
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | `Omit`\&lt;[`CreateTokenOptions`](/api/@graphorin/security/interfaces/CreateTokenOptions.md), `"env"` \| `"scopes"` \| `"idOverride"`\&gt; & \{ `env?`: `string`; `id`: `string`; `scopesOverride?`: readonly `string`[]; \} |
+| `options` | `Omit`\&lt;[`CreateTokenOptions`](/api/@graphorin/security/interfaces/CreateTokenOptions.md), `"env"` \| `"scopes"` \| `"idOverride"`\&gt; & \{ `env?`: `string`; `id`: `string`; `scopesOverride?`: readonly `string`[]; `verifier?`: \{ `invalidate`: `void`; \}; \} |
 
 ## Returns
 

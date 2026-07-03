@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionExportWarning
 
-Defined in: packages/sessions/src/export/reader.ts:55
+Defined in: packages/sessions/src/export/reader.ts:56
 
 Lifecycle event surfaced by the reader. Every `'unknown-record'`
 + every `'schema-future-minor'` triggers exactly one warning.
@@ -17,6 +17,6 @@ Lifecycle event surfaced by the reader. Every `'unknown-record'`
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | \| `"unknown-record"` \| `"schema-future-minor"` \| `"embedder-mismatch-dropped"` \| `"reasoning-meta-extension"` | packages/sessions/src/export/reader.ts:56 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/sessions/src/export/reader.ts:61 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/export/reader.ts:62 |
+| <a id="property-kind"></a> `kind` | `readonly` | \| `"unknown-record"` \| `"schema-future-minor"` \| `"embedder-mismatch-dropped"` \| `"reasoning-meta-extension"` \| `"footer-count-mismatch"` | packages/sessions/src/export/reader.ts:57 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/sessions/src/export/reader.ts:63 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/export/reader.ts:64 |

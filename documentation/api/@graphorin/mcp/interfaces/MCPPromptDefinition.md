@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MCPPromptDefinition
 
-Defined in: packages/mcp/src/client/types.ts:245
+Defined in: packages/mcp/src/client/types.ts:256
 
 Prompt descriptor returned by `listPrompts()`.
 
@@ -14,6 +14,6 @@ Prompt descriptor returned by `listPrompts()`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-arguments"></a> `arguments?` | `readonly` | readonly \{ `description?`: `string`; `name`: `string`; `required?`: `boolean`; \}[] | packages/mcp/src/client/types.ts:248 |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/mcp/src/client/types.ts:247 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/mcp/src/client/types.ts:246 |
+| <a id="property-arguments"></a> `arguments?` | `readonly` | readonly \{ `description?`: `string`; `name`: `string`; `required?`: `boolean`; \}[] | packages/mcp/src/client/types.ts:259 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/mcp/src/client/types.ts:258 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/mcp/src/client/types.ts:257 |

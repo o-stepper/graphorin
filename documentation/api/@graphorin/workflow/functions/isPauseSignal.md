@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function isPauseSignal(err): err is PauseSignal<unknown>;
 ```
 
-Defined in: packages/core/dist/channels/pause.d.ts:74
+Defined in: packages/core/dist/channels/pause.d.ts:81
 
 Cross-realm safe type guard for `PauseSignal`.
 

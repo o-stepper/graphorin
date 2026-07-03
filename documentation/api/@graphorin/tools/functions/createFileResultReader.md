@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createFileResultReader(opts): ResultReader;
 ```
 
-Defined in: packages/tools/src/result/reader.ts:83
+Defined in: packages/tools/src/result/reader.ts:90
 
 Build a filesystem-backed [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md) confined to `artifactRoot`.
 

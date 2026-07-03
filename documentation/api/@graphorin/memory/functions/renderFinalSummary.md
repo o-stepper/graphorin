@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,12 +10,12 @@
 function renderFinalSummary(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:121
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:129
 
-Render the produced summary into the final 9-section text the
-harness commits to the in-flight buffer. Sections 1-7 + 9 are
-stitched in from `summaryFromLlm` + `metadata`; section 8 is the
-verbatim render of the preserved recent turns (mechanical).
+Render the produced summary into the final text the harness commits
+to the in-flight buffer. The LLM-produced sections come from
+`summaryFromLlm`; the last two are stitched in mechanically — the
+preserved recent turns and the `metadata` block.
 
 ## Parameters
 

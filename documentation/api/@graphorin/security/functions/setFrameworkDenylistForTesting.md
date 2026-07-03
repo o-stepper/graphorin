@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _setFrameworkDenylistForTesting(patterns): void;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:40
+Defined in: packages/security/src/supply-chain/policy.ts:44
 
 **`Experimental`**
 

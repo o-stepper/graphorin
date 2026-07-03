@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function requireHandoffInputFilter(metadata): HandoffInputFilterDeclaration;
 ```
 
-Defined in: packages/skills/src/loader/index.ts:669
+Defined in: packages/skills/src/loader/index.ts:787
 
 Required handoff-filter declaration helper. Returns the typed
 declaration the loader parsed from frontmatter; throws

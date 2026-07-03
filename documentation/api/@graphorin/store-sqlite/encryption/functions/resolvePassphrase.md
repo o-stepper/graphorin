@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function resolvePassphrase(config): Promise<string>;
 ```
 
-Defined in: packages/store-sqlite/src/encryption/index.ts:102
+Defined in: packages/store-sqlite/src/encryption/index.ts:127
 
 Resolves the configured passphrase to a SQL-literal-ready value
 suitable for `PRAGMA key = <literal>`. UTF-8 passphrases are returned

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConflictAuditRow
 
-Defined in: packages/store-sqlite/src/conflict-store.ts:68
+Defined in: packages/store-sqlite/src/conflict-store.ts:74
 
 Row shape returned from `recordDecision(...)`.
 
@@ -16,5 +16,5 @@ Row shape returned from `recordDecision(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `number` | packages/store-sqlite/src/conflict-store.ts:70 |
-| <a id="property-id"></a> `id` | `readonly` | `number` | packages/store-sqlite/src/conflict-store.ts:69 |
+| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `number` | packages/store-sqlite/src/conflict-store.ts:76 |
+| <a id="property-id"></a> `id` | `readonly` | `number` | packages/store-sqlite/src/conflict-store.ts:75 |

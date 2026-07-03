@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runBridgedSource(opts): Promise<BridgedSourceResult>;
 ```
 
-Defined in: packages/security/src/sandbox/bridged-source.ts:237
+Defined in: packages/security/src/sandbox/bridged-source.ts:249
 
 Run model-written source in a worker, bridging `tools.<name>(args)`
 calls back to the host. See the module docstring for the isolation

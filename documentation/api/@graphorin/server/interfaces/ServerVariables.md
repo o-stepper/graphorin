@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ServerVariables
 
-Defined in: packages/server/src/internal/context.ts:66
+Defined in: packages/server/src/internal/context.ts:74
 
 Hono variable map. Exported so consumers can type their own
 middleware against the same surface.
@@ -27,5 +27,5 @@ middleware against the same surface.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | [`ServerRequestState`](/api/@graphorin/server/interfaces/ServerRequestState.md) | packages/server/src/internal/context.ts:67 |
-| <a id="property-token"></a> `token?` | `readonly` | [`RequestToken`](/api/@graphorin/server/interfaces/RequestToken.md) | packages/server/src/internal/context.ts:68 |
+| <a id="property-state"></a> `state` | `readonly` | [`ServerRequestState`](/api/@graphorin/server/interfaces/ServerRequestState.md) | packages/server/src/internal/context.ts:75 |
+| <a id="property-token"></a> `token?` | `readonly` | [`RequestToken`](/api/@graphorin/server/interfaces/RequestToken.md) | packages/server/src/internal/context.ts:76 |

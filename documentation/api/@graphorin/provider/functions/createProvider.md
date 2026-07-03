@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createProvider(adapter, options?): Provider;
 ```
 
-Defined in: packages/provider/src/provider.ts:73
+Defined in: packages/provider/src/provider.ts:74
 
 Wrap an adapter in the canonical `Provider` shape. Adapters returned
 by the bundled factories already implement `Provider`; passing them

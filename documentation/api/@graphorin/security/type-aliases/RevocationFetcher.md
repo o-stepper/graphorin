@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ type RevocationFetcher = (url, init) => Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:126
+Defined in: packages/security/src/oauth/refresh.ts:132
 
 Strategy hook used by tests to stub the revoke request.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -24,6 +24,11 @@ type NormaliseWarning =
 }
   | {
   kind: "result:cap-disabled";
+  toolName: string;
+}
+  | {
+  kind: "sandbox:advisory-inline";
+  policy: string;
   toolName: string;
 };
 ```

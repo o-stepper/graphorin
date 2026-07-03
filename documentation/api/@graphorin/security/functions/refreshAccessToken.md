@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function refreshAccessToken(args): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:46
+Defined in: packages/security/src/oauth/refresh.ts:52
 
 Refresh the access token. Identical concurrent invocations share a
 single in-flight request; subsequent callers observe the same

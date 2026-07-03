@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: SessionRoutesDeps
 
-Defined in: packages/server/src/routes/sessions.ts:100
+Defined in: packages/server/src/routes/sessions.ts:99
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/routes/sessions.ts:100
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionApi`](/api/@graphorin/server/interfaces/SessionApi.md) | packages/server/src/routes/sessions.ts:101 |
+| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionApi`](/api/@graphorin/server/interfaces/SessionApi.md) | packages/server/src/routes/sessions.ts:100 |

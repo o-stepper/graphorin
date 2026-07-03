@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: WorkflowNode\&lt;TState\&gt;
 
-Defined in: packages/workflow/src/types.ts:149
+Defined in: packages/workflow/src/types.ts:156
 
 Pure node contract. The runtime invokes `run(state, ctx)` exactly
 once per scheduled task; the return value is converted into channel
@@ -27,5 +27,5 @@ schedules new tasks instead of writing to channels.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:150 |
-| <a id="property-run"></a> `run` | `readonly` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt; | packages/workflow/src/types.ts:151 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:157 |
+| <a id="property-run"></a> `run` | `readonly` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt; | packages/workflow/src/types.ts:158 |

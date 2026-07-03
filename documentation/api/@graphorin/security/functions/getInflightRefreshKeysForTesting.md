@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _getInflightRefreshKeysForTesting(): readonly string[];
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:70
+Defined in: packages/security/src/oauth/refresh.ts:76
 
 **`Experimental`**
 

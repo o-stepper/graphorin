@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const DEFAULT_OLLAMA_BASE_URL: "http://127.0.0.1:11434" = 'http://127.0.0.1:11434';
 ```
 
-Defined in: packages/provider/src/adapters/ollama.ts:40
+Defined in: packages/provider/src/adapters/ollama.ts:41
 
 Default Ollama base URL.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runAuthRevoke(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/auth.ts:159
+Defined in: packages/cli/src/commands/auth.ts:184
 
 ## Parameters
 

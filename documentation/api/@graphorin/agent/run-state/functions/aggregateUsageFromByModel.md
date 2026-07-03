@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function aggregateUsageFromByModel(byModel): Usage;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:363
+Defined in: packages/agent/src/run-state/index.ts:442
 
 Recompute the aggregate usage from `usageByModel`. Returns the
 sum that callers can compare against `state.usage` to verify the

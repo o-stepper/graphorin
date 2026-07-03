@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createOAuthAuthorizationProvider(options): OAuthAuthorizationProvider;
 ```
 
-Defined in: packages/mcp/src/oauth/bridge.ts:70
+Defined in: packages/mcp/src/oauth/bridge.ts:75
 
 Build a provider that resolves the `Authorization` header value the
 Streamable HTTP / SSE MCP transports send on every request.

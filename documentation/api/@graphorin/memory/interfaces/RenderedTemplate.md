@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: RenderedTemplate
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:47
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:52
 
 Preamble + section-headers payload extracted from a locale pack.
 Surfaced as a separate type so test fixtures can assert against
@@ -18,5 +18,5 @@ the resolved template independently from the locale pack.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:48 |
-| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:49 |
+| <a id="property-preamble"></a> `preamble` | `readonly` | `string` | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:53 |
+| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:54 |

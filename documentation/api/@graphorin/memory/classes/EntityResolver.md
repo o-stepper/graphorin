@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: EntityResolver
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:207
+Defined in: packages/memory/src/graph/entity-resolver.ts:227
 
 Resolves a fact's subject / object strings to canonical entity ids and
 links them, applying [resolveEntityDecision](/api/@graphorin/memory/functions/resolveEntityDecision.md) backed by an
@@ -25,7 +25,7 @@ write path skips it and behaviour is unchanged + offline.
 new EntityResolver(deps): EntityResolver;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:216
+Defined in: packages/memory/src/graph/entity-resolver.ts:236
 
 #### Parameters
 
@@ -48,7 +48,7 @@ linkFact(
 opts?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:262
+Defined in: packages/memory/src/graph/entity-resolver.ts:295
 
 Resolve + link a fact's subject and object (the predicate is a
 relation label, never an entity). Idempotent on re-link.
@@ -77,7 +77,7 @@ resolve(
 opts?): Promise<string | null>;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:231
+Defined in: packages/memory/src/graph/entity-resolver.ts:251
 
 Resolve a single name to a canonical entity id (find-or-create),
 deduping via lexical + embedding similarity. Returns `null` for a

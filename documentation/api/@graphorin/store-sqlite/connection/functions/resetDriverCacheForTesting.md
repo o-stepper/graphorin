@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _resetDriverCacheForTesting(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:151
+Defined in: packages/store-sqlite/src/connection.ts:156
 
 **`Internal`**
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,20 +6,21 @@
 
 # Interface: DlqBatchInput
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:69
+Defined in: packages/store-sqlite/src/consolidator-store.ts:81
 
 ## Stable
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-consolidatorrunid"></a> `consolidatorRunId` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:71 |
-| <a id="property-errorkind"></a> `errorKind` | `readonly` | `string` | packages/store-sqlite/src/consolidator-store.ts:74 |
-| <a id="property-errormessage"></a> `errorMessage` | `readonly` | `string` | packages/store-sqlite/src/consolidator-store.ts:75 |
-| <a id="property-failedat"></a> `failedAt` | `readonly` | `number` | packages/store-sqlite/src/consolidator-store.ts:76 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/store-sqlite/src/consolidator-store.ts:70 |
-| <a id="property-messageids"></a> `messageIds` | `readonly` | readonly `string`[] | packages/store-sqlite/src/consolidator-store.ts:73 |
-| <a id="property-nextretryat"></a> `nextRetryAt` | `readonly` | `number` | packages/store-sqlite/src/consolidator-store.ts:77 |
-| <a id="property-retrycount"></a> `retryCount` | `readonly` | `number` | packages/store-sqlite/src/consolidator-store.ts:78 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | packages/store-sqlite/src/consolidator-store.ts:72 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-consolidatorrunid"></a> `consolidatorRunId` | `readonly` | `string` \| `null` | - | packages/store-sqlite/src/consolidator-store.ts:83 |
+| <a id="property-errorkind"></a> `errorKind` | `readonly` | `string` | - | packages/store-sqlite/src/consolidator-store.ts:86 |
+| <a id="property-errormessage"></a> `errorMessage` | `readonly` | `string` | - | packages/store-sqlite/src/consolidator-store.ts:87 |
+| <a id="property-failedat"></a> `failedAt` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:88 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/store-sqlite/src/consolidator-store.ts:82 |
+| <a id="property-messageids"></a> `messageIds` | `readonly` | readonly `string`[] | - | packages/store-sqlite/src/consolidator-store.ts:85 |
+| <a id="property-nextretryat"></a> `nextRetryAt` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:89 |
+| <a id="property-phase"></a> `phase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | Phase that failed (MCON-10); `null`/absent ⇒ legacy 'standard' replay. | packages/store-sqlite/src/consolidator-store.ts:92 |
+| <a id="property-retrycount"></a> `retryCount` | `readonly` | `number` | - | packages/store-sqlite/src/consolidator-store.ts:90 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/store-sqlite/src/consolidator-store.ts:84 |

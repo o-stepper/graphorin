@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type CompileScope = SessionScope;
 ```
 
-Defined in: packages/memory/src/context-engine/index.ts:150
+Defined in: packages/memory/src/context-engine/index.ts:149
 
 Author-time scope passed through to the context engine.
 

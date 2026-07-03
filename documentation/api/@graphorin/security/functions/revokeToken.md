@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function revokeToken(
 | undefined>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:126
+Defined in: packages/security/src/auth/crud.ts:137
 
 Soft-revoke a token. Returns the updated record or `undefined` if
 the token is unknown. The store is responsible for setting the
@@ -23,12 +23,14 @@ the token is unknown. The store is responsible for setting the
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `tokenStore` | [`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md) |
-| `id` | `string` |
-| `opts` | \{ `now?`: () => `number`; \} |
-| `opts.now?` | () => `number` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `tokenStore` | [`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md) | - |
+| `id` | `string` | - |
+| `opts` | \{ `now?`: () => `number`; `verifier?`: \{ `invalidate`: `void`; \}; \} | - |
+| `opts.now?` | () => `number` | - |
+| `opts.verifier?` | \{ `invalidate`: `void`; \} | SPL-9: pass the live `TokenVerifier` so revocation invalidates its LRU entry immediately — without it a revoked token keeps verifying from the cache for up to `cacheTtlMaxMs` (default 60s). |
+| `opts.verifier.invalidate` | - |
 
 ## Returns
 

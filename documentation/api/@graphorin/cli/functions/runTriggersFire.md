@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,8 @@
 
 ```ts
 function runTriggersFire(options): Promise<{
-  queued: true;
+  fired: false;
+  unsupported: true;
 }>;
 ```
 
@@ -23,7 +24,8 @@ Defined in: packages/cli/src/commands/triggers.ts:111
 ## Returns
 
 `Promise`\<\{
-  `queued`: `true`;
+  `fired`: `false`;
+  `unsupported`: `true`;
 \}\>
 
 ## Stable

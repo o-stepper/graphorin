@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function renderMetadataBlock(meta): string;
 ```
 
-Defined in: packages/memory/src/context-engine/metadata.ts:75
+Defined in: packages/memory/src/context-engine/metadata.ts:97
 
 Render the [MemoryMetadata](/api/@graphorin/core/interfaces/MemoryMetadata.md) block as the `<memory_metadata>`
 XML fragment used inside Layer 5 of the layered system prompt.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -9,6 +9,12 @@
 Tool executor surface for `@graphorin/tools`.
 
 ## References
+
+### ApprovalGate
+
+Re-exports [ApprovalGate](/api/@graphorin/tools/interfaces/ApprovalGate.md)
+
+***
 
 ### buildToolExecutionContext
 

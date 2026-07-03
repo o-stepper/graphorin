@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorStatePatch
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:34
+Defined in: packages/store-sqlite/src/consolidator-store.ts:41
 
 ## Stable
 
@@ -14,9 +14,10 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:34
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-activelockacquiredat"></a> `activeLockAcquiredAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:40 |
-| <a id="property-activelockheldby"></a> `activeLockHeldBy?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:39 |
-| <a id="property-lastcompletedat"></a> `lastCompletedAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:37 |
-| <a id="property-lastphase"></a> `lastPhase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | packages/store-sqlite/src/consolidator-store.ts:36 |
-| <a id="property-lastprocessedmessageid"></a> `lastProcessedMessageId?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:35 |
-| <a id="property-nexteligibleat"></a> `nextEligibleAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:38 |
+| <a id="property-activelockacquiredat"></a> `activeLockAcquiredAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:47 |
+| <a id="property-activelockheldby"></a> `activeLockHeldBy?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:46 |
+| <a id="property-lastcompletedat"></a> `lastCompletedAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:44 |
+| <a id="property-lastphase"></a> `lastPhase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | packages/store-sqlite/src/consolidator-store.ts:43 |
+| <a id="property-lastprocessedmessageid"></a> `lastProcessedMessageId?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:42 |
+| <a id="property-nexteligibleat"></a> `nextEligibleAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:45 |
+| <a id="property-reflectionwatermark"></a> `reflectionWatermark?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:48 |

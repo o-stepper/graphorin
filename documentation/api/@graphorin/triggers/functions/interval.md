@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ function interval(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:86
+Defined in: packages/triggers/src/index.ts:93
 
 ## Parameters
 

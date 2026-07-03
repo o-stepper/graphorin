@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type MCPSamplingHandler = (request, opts) =>
 | Promise<MCPSamplingResult>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:179
+Defined in: packages/mcp/src/client/types.ts:177
 
 Handler for server-initiated sampling requests.
 

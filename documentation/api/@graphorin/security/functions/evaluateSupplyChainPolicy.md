@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function evaluateSupplyChainPolicy(packageName, policy?): SupplyChainDecision;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:49
+Defined in: packages/security/src/supply-chain/policy.ts:53
 
 Evaluate the supply-chain policy for the supplied package name.
 

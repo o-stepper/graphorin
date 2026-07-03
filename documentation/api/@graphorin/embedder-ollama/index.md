@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -69,7 +69,7 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/embedder-ollama — first-class opt-in alternative embedder
 for the Graphorin framework. Wraps the local Ollama HTTP API.
@@ -93,7 +93,7 @@ for the Graphorin framework. Wraps the local Ollama HTTP API.
 | ------ | ------ |
 | [DEFAULT\_OLLAMA\_BASE\_URL](/api/@graphorin/embedder-ollama/variables/DEFAULT_OLLAMA_BASE_URL.md) | Default Ollama base URL. Operators that run Ollama on a non-default port pass an explicit `baseUrl`. |
 | [DEFAULT\_OLLAMA\_MODEL](/api/@graphorin/embedder-ollama/variables/DEFAULT_OLLAMA_MODEL.md) | Default Ollama model. Matches the de-facto choice in the Ollama community for general-purpose multilingual embeddings. |
-| [KNOWN\_OLLAMA\_MODEL\_DIMS](/api/@graphorin/embedder-ollama/variables/KNOWN_OLLAMA_MODEL_DIMS.md) | Set of model -> dim hints used to seed the canonical id. |
+| [KNOWN\_OLLAMA\_MODEL\_DIMS](/api/@graphorin/embedder-ollama/variables/KNOWN_OLLAMA_MODEL_DIMS.md) | Model -> output-dimension hints used to seed the canonical id before the first `embed()` resolves the real width from a response. Only single-width families are listed; size-variant families (e.g. `qwen3-embedding`, whose dim depends on the `:0.6b` / `:4b` / `:8b` tag) are deliberately omitted so an ambiguous bind fails loudly rather than baking a wrong width (PS-11). |
 | [VERSION](/api/@graphorin/embedder-ollama/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
 
 ## Functions

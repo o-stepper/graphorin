@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function defineBlock(spec): BlockDefinition;
 ```
 
-Defined in: packages/memory/src/tiers/working-memory.ts:60
+Defined in: packages/memory/src/tiers/working-memory.ts:64
 
 Build a frozen [BlockDefinition](/api/@graphorin/memory/interfaces/BlockDefinition.md). Surfaced as `blocks.define(...)`
 for ergonomic call-sites; the underlying object is the same shape

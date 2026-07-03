@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function ensureStoreAuditBinding(): void;
 ```
 
-Defined in: packages/server/src/app.ts:102
+Defined in: packages/server/src/app.ts:108
 
 ## Returns
 

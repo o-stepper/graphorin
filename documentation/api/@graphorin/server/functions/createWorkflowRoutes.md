@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createWorkflowRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/workflows.ts:60
+Defined in: packages/server/src/routes/workflows.ts:62
 
 ## Parameters
 

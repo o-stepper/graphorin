@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: OutputSpec
 
-Defined in: packages/core/src/contracts/provider.ts:241
+Defined in: packages/core/src/contracts/provider.ts:248
 
 Output type specification for structured / typed responses. Concrete
 Zod-based variants live in the runtime packages.
@@ -17,6 +17,6 @@ Zod-based variants live in the runtime packages.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:243 |
-| <a id="property-jsonschema"></a> `jsonSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/provider.ts:244 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"text"` \| `"structured"` | packages/core/src/contracts/provider.ts:242 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:250 |
+| <a id="property-jsonschema"></a> `jsonSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/provider.ts:251 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"text"` \| `"structured"` | packages/core/src/contracts/provider.ts:249 |

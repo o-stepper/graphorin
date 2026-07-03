@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type CodeExecuteBridge = (call, ctx) => Promise<unknown>;
 ```
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:111
+Defined in: packages/tools/src/code-mode/meta-tools.ts:127
 
 Host bridge: run one bridged tool call and return its output. Receives
 the `code_execute` call's own [ToolExecutionContext](/api/@graphorin/core/interfaces/ToolExecutionContext.md), so the agent

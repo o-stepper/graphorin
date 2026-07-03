@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MCPClient
 
-Defined in: packages/mcp/src/client/types.ts:306
+Defined in: packages/mcp/src/client/types.ts:317
 
 Public surface of an active MCP client.
 
@@ -16,14 +16,15 @@ Public surface of an active MCP client.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-collisionstrategy"></a> `collisionStrategy` | `readonly` | [`CollisionStrategy`](/api/@graphorin/tools/type-aliases/CollisionStrategy.md) | Per-client default collision strategy. | packages/mcp/src/client/types.ts:314 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable identifier — derived from the transport. | packages/mcp/src/client/types.ts:308 |
-| <a id="property-priority"></a> `priority?` | `readonly` | `number` | Per-client priority value used by the `'priority'` strategy. | packages/mcp/src/client/types.ts:316 |
-| <a id="property-resumable"></a> `resumable` | `readonly` | `boolean` | Whether the connected server advertises Streamable HTTP session support (resolved at `initialize` time). | packages/mcp/src/client/types.ts:321 |
-| <a id="property-serveridentity"></a> `serverIdentity` | `readonly` | [`ServerIdentity`](/api/@graphorin/mcp/type-aliases/ServerIdentity.md) | Server identity descriptor consumed by the tool-registry resolver. | packages/mcp/src/client/types.ts:312 |
-| <a id="property-serverinfo"></a> `serverInfo` | `readonly` | \{ `name`: `string`; `version`: `string`; \} | Server-advertised information from the `initialize` handshake. | packages/mcp/src/client/types.ts:310 |
-| `serverInfo.name` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:310 |
-| `serverInfo.version` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:310 |
+| <a id="property-collisionstrategy"></a> `collisionStrategy` | `readonly` | [`CollisionStrategy`](/api/@graphorin/tools/type-aliases/CollisionStrategy.md) | Per-client default collision strategy. | packages/mcp/src/client/types.ts:325 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable identifier — derived from the transport. | packages/mcp/src/client/types.ts:319 |
+| <a id="property-priority"></a> `priority?` | `readonly` | `number` | Per-client priority value used by the `'priority'` strategy. | packages/mcp/src/client/types.ts:327 |
+| <a id="property-resumable"></a> ~~`resumable`~~ | `readonly` | `boolean` | **Deprecated** Alias of [sessionIdPresent](/api/@graphorin/mcp/interfaces/MCPClient.md#property-sessionidpresent) — same value, misleading name. | packages/mcp/src/client/types.ts:338 |
+| <a id="property-serveridentity"></a> `serverIdentity` | `readonly` | [`ServerIdentity`](/api/@graphorin/mcp/type-aliases/ServerIdentity.md) | Server identity descriptor consumed by the tool-registry resolver. | packages/mcp/src/client/types.ts:323 |
+| <a id="property-serverinfo"></a> `serverInfo` | `readonly` | \{ `name`: `string`; `version`: `string`; \} | Server-advertised information from the `initialize` handshake. | packages/mcp/src/client/types.ts:321 |
+| `serverInfo.name` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:321 |
+| `serverInfo.version` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:321 |
+| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time (MC-9). A session id means stateful routing — it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | packages/mcp/src/client/types.ts:336 |
 
 ## Methods
 
@@ -36,7 +37,7 @@ callTool(
 opts?): Promise<MCPCallToolResult>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:326
+Defined in: packages/mcp/src/client/types.ts:343
 
 #### Parameters
 
@@ -60,7 +61,7 @@ Defined in: packages/mcp/src/client/types.ts:326
 close(): Promise<void>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:338
+Defined in: packages/mcp/src/client/types.ts:355
 
 #### Returns
 
@@ -79,7 +80,7 @@ getPrompt(
 }>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:332
+Defined in: packages/mcp/src/client/types.ts:349
 
 #### Parameters
 
@@ -104,7 +105,7 @@ Defined in: packages/mcp/src/client/types.ts:332
 listPrompts(opts?): Promise<readonly MCPPromptDefinition[]>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:325
+Defined in: packages/mcp/src/client/types.ts:342
 
 #### Parameters
 
@@ -125,7 +126,7 @@ Defined in: packages/mcp/src/client/types.ts:325
 listResources(opts?): Promise<readonly MCPResourceDefinition[]>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:324
+Defined in: packages/mcp/src/client/types.ts:341
 
 #### Parameters
 
@@ -146,7 +147,7 @@ Defined in: packages/mcp/src/client/types.ts:324
 listTools(opts?): Promise<readonly MCPToolDefinition[]>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:323
+Defined in: packages/mcp/src/client/types.ts:340
 
 #### Parameters
 
@@ -167,7 +168,7 @@ Defined in: packages/mcp/src/client/types.ts:323
 readResource(uri, opts?): Promise<MCPResourceContent>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:331
+Defined in: packages/mcp/src/client/types.ts:348
 
 #### Parameters
 
@@ -189,7 +190,7 @@ Defined in: packages/mcp/src/client/types.ts:331
 toTools(opts?): Promise<readonly Tool<unknown, unknown, unknown>[]>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:337
+Defined in: packages/mcp/src/client/types.ts:354
 
 #### Parameters
 

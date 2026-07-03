@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createSkillRegistry(options?): SkillRegistry;
 ```
 
-Defined in: packages/skills/src/registry/index.ts:128
+Defined in: packages/skills/src/registry/index.ts:151
 
 Build a fresh, empty registry. Multiple registries can co-exist
 within a single process; the framework defaults to a single shared

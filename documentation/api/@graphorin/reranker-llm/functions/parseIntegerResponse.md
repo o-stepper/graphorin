@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,16 +10,7 @@
 function parseIntegerResponse(text): number | null;
 ```
 
-Defined in: reranker.ts:288
-
-Parse the model's reply into a non-negative integer. Accepts:
-
- - `'7'` — bare integer.
- - `'7\n'` / `' 7 '` — surrounding whitespace stripped.
- - `'Score: 7'` / `'7/10'` — first integer in the string is taken.
-
-Returns `null` when no integer can be extracted; the reranker
-substitutes the fallback score.
+Defined in: reranker.ts:313
 
 ## Parameters
 
@@ -30,5 +21,3 @@ substitutes the fallback score.
 ## Returns
 
 `number` \| `null`
-
-## Stable

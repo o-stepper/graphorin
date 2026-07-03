@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runAuthList(options?): Promise<readonly OAuthSessionMetadata[]>;
 ```
 
-Defined in: packages/cli/src/commands/auth.ts:95
+Defined in: packages/cli/src/commands/auth.ts:114
 
 ## Parameters
 

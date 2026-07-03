@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CostTrackerOptions
 
-Defined in: packages/observability/src/cost/types.ts:100
+Defined in: packages/observability/src/cost/types.ts:107
 
 Configuration shape for [createCostTracker](/api/@graphorin/observability/functions/createCostTracker.md).
 
@@ -16,5 +16,5 @@ Configuration shape for [createCostTracker](/api/@graphorin/observability/functi
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-budgets"></a> `budgets?` | `readonly` | [`CostBudgets`](/api/@graphorin/observability/interfaces/CostBudgets.md) | packages/observability/src/cost/types.ts:101 |
-| <a id="property-onexceed"></a> `onExceed?` | `readonly` | [`CostBudgetExceededCallback`](/api/@graphorin/observability/type-aliases/CostBudgetExceededCallback.md) | packages/observability/src/cost/types.ts:102 |
+| <a id="property-budgets"></a> `budgets?` | `readonly` | [`CostBudgets`](/api/@graphorin/observability/interfaces/CostBudgets.md) | packages/observability/src/cost/types.ts:108 |
+| <a id="property-onexceed"></a> `onExceed?` | `readonly` | [`CostBudgetExceededCallback`](/api/@graphorin/observability/type-aliases/CostBudgetExceededCallback.md) | packages/observability/src/cost/types.ts:109 |

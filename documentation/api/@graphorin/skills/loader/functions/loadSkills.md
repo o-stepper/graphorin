@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,12 +10,12 @@
 function loadSkills(sources, options?): Promise<readonly Skill[]>;
 ```
 
-Defined in: packages/skills/src/loader/index.ts:193
+Defined in: packages/skills/src/loader/index.ts:195
 
-Load multiple skills concurrently. Emits a warning diagnostic on
-the first encountered source error when
-`throwOnSourceError === false`; otherwise the first error
-propagates out unchanged.
+Load multiple skills concurrently. The sources are loaded in parallel and
+the returned array preserves input order. When `throwOnSourceError === false`
+(default) a failing source is logged and skipped; otherwise the first
+rejection propagates out unchanged.
 
 ## Parameters
 

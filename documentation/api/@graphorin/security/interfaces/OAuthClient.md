@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: OAuthClient
 
-Defined in: packages/security/src/oauth/types.ts:233
+Defined in: packages/security/src/oauth/types.ts:248
 
 Public surface of the [createOAuthClient](/api/@graphorin/security/functions/createOAuthClient.md) factory. Each method
 accepts an `AbortSignal` so callers can cancel mid-flow.
@@ -17,10 +17,10 @@ accepts an `AbortSignal` so callers can cancel mid-flow.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-metadata"></a> `metadata` | `readonly` | \| [`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md) \| `undefined` | Cached metadata; the field reflects the latest known state. | packages/security/src/oauth/types.ts:239 |
-| <a id="property-registration"></a> `registration` | `readonly` | \| [`OAuthRegistration`](/api/@graphorin/security/interfaces/OAuthRegistration.md) \| `undefined` | Cached registration; the field reflects the latest known state. | packages/security/src/oauth/types.ts:237 |
-| <a id="property-serverid"></a> `serverId` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:234 |
-| <a id="property-serverurl"></a> `serverUrl` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:235 |
+| <a id="property-metadata"></a> `metadata` | `readonly` | \| [`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md) \| `undefined` | Cached metadata; the field reflects the latest known state. | packages/security/src/oauth/types.ts:254 |
+| <a id="property-registration"></a> `registration` | `readonly` | \| [`OAuthRegistration`](/api/@graphorin/security/interfaces/OAuthRegistration.md) \| `undefined` | Cached registration; the field reflects the latest known state. | packages/security/src/oauth/types.ts:252 |
+| <a id="property-serverid"></a> `serverId` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:249 |
+| <a id="property-serverurl"></a> `serverUrl` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:250 |
 
 ## Methods
 
@@ -30,7 +30,7 @@ accepts an `AbortSignal` so callers can cancel mid-flow.
 authorizeCode(opts?): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:256
+Defined in: packages/security/src/oauth/types.ts:271
 
 Run the Authorization Code + PKCE flow.
 
@@ -52,7 +52,7 @@ Run the Authorization Code + PKCE flow.
 authorizeDevice(opts?): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:258
+Defined in: packages/security/src/oauth/types.ts:273
 
 Run the Device Authorization Grant.
 
@@ -74,7 +74,7 @@ Run the Device Authorization Grant.
 discover(opts?): Promise<DiscoveredMetadata>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:242
+Defined in: packages/security/src/oauth/types.ts:257
 
 Run discovery. Returns the cached value when available.
 
@@ -98,7 +98,7 @@ Run discovery. Returns the cached value when available.
 refresh(opts?): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:265
+Defined in: packages/security/src/oauth/types.ts:280
 
 Refresh the access token. Reuses the in-flight refresh promise
 when one is already running, so concurrent callers all observe
@@ -124,7 +124,7 @@ the same network round-trip.
 registerClient(opts?): Promise<DynamicClientRegistrationResult>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:248
+Defined in: packages/security/src/oauth/types.ts:263
 
 Run Dynamic Client Registration. The metadata's
 `registration_endpoint` must be set; the call rejects with
@@ -152,7 +152,7 @@ Run Dynamic Client Registration. The metadata's
 revoke(opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:267
+Defined in: packages/security/src/oauth/types.ts:282
 
 Revoke the current session against the discovered revocation endpoint.
 
@@ -178,7 +178,7 @@ status(): Promise<
 | null>;
 ```
 
-Defined in: packages/security/src/oauth/types.ts:269
+Defined in: packages/security/src/oauth/types.ts:284
 
 Audit-safe metadata view. Returns `null` when no session is stored.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function _resetLocaleFallbackWarningsForTesting(): void;
 
 Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:22
 
-**`Experimental`**
+**`Internal`**
 
 Reset the once-per-process WARN registry. Used by tests for
 isolation.

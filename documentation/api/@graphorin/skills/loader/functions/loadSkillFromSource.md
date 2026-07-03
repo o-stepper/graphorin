@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function loadSkillFromSource(source, options?): Promise<Skill>;
 ```
 
-Defined in: packages/skills/src/loader/index.ts:123
+Defined in: packages/skills/src/loader/index.ts:125
 
 Load a single skill from any supported source. The loader runs the
 full frontmatter validator and resolves the supply-chain trust

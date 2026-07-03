@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ type FeatureExtractor = (texts, options?) => Promise<{
 }>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:74
+Defined in: packages/embedder-transformersjs/src/index.ts:84
 
 **`Internal`**
 

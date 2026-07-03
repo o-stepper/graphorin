@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function rollup(checks): HealthRollup;
 ```
 
-Defined in: packages/server/src/health/checks.ts:259
+Defined in: packages/server/src/health/checks.ts:266
 
 Promote the worst per-check status to the rollup label.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ToolExample\&lt;TInput, TOutput\&gt;
 
-Defined in: packages/core/src/contracts/tool.ts:170
+Defined in: packages/core/src/contracts/tool.ts:183
 
 Worked example for a `Tool`. Type-parameterized on the same generics
 as `Tool`, so a `ToolExample` for `Tool<{ q: string }, { hits: T[] }>`
@@ -25,6 +25,6 @@ cannot specify an `input` shape that does not match.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-comment"></a> `comment?` | `readonly` | `string` | packages/core/src/contracts/tool.ts:173 |
-| <a id="property-input"></a> `input` | `readonly` | `TInput` | packages/core/src/contracts/tool.ts:171 |
-| <a id="property-output"></a> `output` | `readonly` | \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; | packages/core/src/contracts/tool.ts:172 |
+| <a id="property-comment"></a> `comment?` | `readonly` | `string` | packages/core/src/contracts/tool.ts:186 |
+| <a id="property-input"></a> `input` | `readonly` | `TInput` | packages/core/src/contracts/tool.ts:184 |
+| <a id="property-output"></a> `output` | `readonly` | \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; | packages/core/src/contracts/tool.ts:185 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -41,6 +41,7 @@ type SpanType =
   | "memory.consolidate.reflect"
   | "memory.search.insight"
   | "memory.read.insight"
+  | "memory.write.insight"
   | "memory.conflict"
   | "memory.embed"
   | "workflow.run"

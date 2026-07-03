@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ type VerifyFailureReason =
   | "token-locked-out";
 ```
 
-Defined in: packages/security/src/auth/verify.ts:68
+Defined in: packages/security/src/auth/verify.ts:70
 
 Reasons a verify call can fail. Each value is a stable lowercase
 discriminator suitable for direct logging.

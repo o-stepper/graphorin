@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: WorkflowResumeOptions
 
-Defined in: packages/workflow/src/types.ts:134
+Defined in: packages/workflow/src/types.ts:141
 
 Optional context passed to [Workflow.resume](/api/@graphorin/workflow/interfaces/Workflow.md#resume). The `directive`
 argument is the typed value supplied to the paused node + optional
@@ -18,5 +18,5 @@ channel writes.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | packages/workflow/src/types.ts:136 |
-| <a id="property-stream"></a> `stream?` | `readonly` | [`StreamMode`](/api/@graphorin/workflow/type-aliases/StreamMode.md) | packages/workflow/src/types.ts:135 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | packages/workflow/src/types.ts:143 |
+| <a id="property-stream"></a> `stream?` | `readonly` | [`StreamMode`](/api/@graphorin/workflow/type-aliases/StreamMode.md) | packages/workflow/src/types.ts:142 |

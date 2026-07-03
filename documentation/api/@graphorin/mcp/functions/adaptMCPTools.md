@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function adaptMCPTools(args): AdaptedToolsResult;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:71
+Defined in: packages/mcp/src/client/to-tools.ts:74
 
 Build the [Tool](/api/@graphorin/core/interfaces/Tool.md) array for the supplied MCP tool catalogue.
 

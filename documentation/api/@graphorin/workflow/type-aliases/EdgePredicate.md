@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type EdgePredicate<TState> = (state) => boolean;
 ```
 
-Defined in: packages/workflow/src/types.ts:194
+Defined in: packages/workflow/src/types.ts:201
 
 Predicate evaluated by the engine when deciding which edges to fire.
 

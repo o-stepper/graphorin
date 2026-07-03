@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function isSubjectAllowed(granted, subject): boolean;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:132
+Defined in: packages/server/src/ws/subjects.ts:147
 
 Compatibility shim — re-exports `scopeMatches` so consumers don't
 have to learn the security package's surface.

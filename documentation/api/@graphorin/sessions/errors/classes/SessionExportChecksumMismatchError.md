@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: SessionExportChecksumMismatchError
 
-Defined in: packages/sessions/src/errors/index.ts:223
+Defined in: packages/sessions/src/errors/index.ts:224
 
 Thrown when a `--hash` footer's checksum does not match the
 recomputed body checksum on import.
@@ -25,7 +25,7 @@ recomputed body checksum on import.
 new SessionExportChecksumMismatchError(expected, actual): SessionExportChecksumMismatchError;
 ```
 
-Defined in: packages/sessions/src/errors/index.ts:226
+Defined in: packages/sessions/src/errors/index.ts:227
 
 #### Parameters
 
@@ -46,10 +46,10 @@ Defined in: packages/sessions/src/errors/index.ts:226
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-actual"></a> `actual` | `readonly` | `string` | - | - | packages/sessions/src/errors/index.ts:225 |
+| <a id="property-actual"></a> `actual` | `readonly` | `string` | - | - | packages/sessions/src/errors/index.ts:226 |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`cause`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-code"></a> `code` | `readonly` | [`SessionErrorCode`](/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md) | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`code`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-code) | packages/sessions/src/errors/index.ts:38 |
-| <a id="property-expected"></a> `expected` | `readonly` | `string` | - | - | packages/sessions/src/errors/index.ts:224 |
+| <a id="property-code"></a> `code` | `readonly` | [`SessionErrorCode`](/api/@graphorin/sessions/errors/type-aliases/SessionErrorCode.md) | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`code`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-code) | packages/sessions/src/errors/index.ts:39 |
+| <a id="property-expected"></a> `expected` | `readonly` | `string` | - | - | packages/sessions/src/errors/index.ts:225 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`message`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`name`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-name) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`SessionError`](/api/@graphorin/sessions/errors/classes/SessionError.md).[`stack`](/api/@graphorin/sessions/errors/classes/SessionError.md#property-stack) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

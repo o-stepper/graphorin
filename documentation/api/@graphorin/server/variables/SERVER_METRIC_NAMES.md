@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -24,6 +24,6 @@ const SERVER_METRIC_NAMES: Readonly<{
 }>;
 ```
 
-Defined in: packages/server/src/metrics/catalog.ts:18
+Defined in: packages/server/src/metrics/catalog.ts:27
 
 ## Stable

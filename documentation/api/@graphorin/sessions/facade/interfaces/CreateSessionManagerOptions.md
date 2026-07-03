@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: CreateSessionManagerOptions
 
-Defined in: packages/sessions/src/facade.ts:119
+Defined in: packages/sessions/src/facade.ts:142
 
 Per-session-manager configuration.
 
@@ -16,10 +16,11 @@ Per-session-manager configuration.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-commentarypolicy"></a> `commentaryPolicy?` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | Default commentary policy. Defaults to `'wrap'`. | packages/sessions/src/facade.ts:125 |
-| <a id="property-counters"></a> `counters?` | `readonly` | [`SessionCounters`](/api/@graphorin/sessions/facade/interfaces/SessionCounters.md) | Counter sink (no-op by default). | packages/sessions/src/facade.ts:129 |
-| <a id="property-memory"></a> `memory` | `readonly` | [`SessionMemoryFacade`](/api/@graphorin/sessions/facade/interfaces/SessionMemoryFacade.md) | Memory facade — `@graphorin/memory.session` delegate target. | packages/sessions/src/facade.ts:123 |
-| <a id="property-newid"></a> `newId?` | `readonly` | (`prefix`) => `string` | Test seam: override the id generator. | packages/sessions/src/facade.ts:133 |
-| <a id="property-now"></a> `now?` | `readonly` | () => `number` | Test seam: override `Date.now()`. | packages/sessions/src/facade.ts:131 |
-| <a id="property-replay"></a> `replay?` | `readonly` | [`CreateSessionReplayerOptions`](/api/@graphorin/sessions/interfaces/CreateSessionReplayerOptions.md) | Replay engine configuration. | packages/sessions/src/facade.ts:127 |
-| <a id="property-store"></a> `store` | `readonly` | [`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md) | Storage adapter — `@graphorin/store-sqlite` is the default. | packages/sessions/src/facade.ts:121 |
+| <a id="property-commentarypolicy"></a> `commentaryPolicy?` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | Default commentary policy. Defaults to `'wrap'`. | packages/sessions/src/facade.ts:148 |
+| <a id="property-counters"></a> `counters?` | `readonly` | [`SessionCounters`](/api/@graphorin/sessions/facade/interfaces/SessionCounters.md) | Counter sink (no-op by default). | packages/sessions/src/facade.ts:163 |
+| <a id="property-memory"></a> `memory` | `readonly` | [`SessionMemoryFacade`](/api/@graphorin/sessions/facade/interfaces/SessionMemoryFacade.md) | Memory facade — `@graphorin/memory.session` delegate target. | packages/sessions/src/facade.ts:146 |
+| <a id="property-newid"></a> `newId?` | `readonly` | (`prefix`) => `string` | Test seam: override the id generator. | packages/sessions/src/facade.ts:167 |
+| <a id="property-now"></a> `now?` | `readonly` | () => `number` | Test seam: override `Date.now()`. | packages/sessions/src/facade.ts:165 |
+| <a id="property-replay"></a> `replay?` | `readonly` | [`CreateSessionReplayerOptions`](/api/@graphorin/sessions/interfaces/CreateSessionReplayerOptions.md) | Replay engine configuration. | packages/sessions/src/facade.ts:150 |
+| <a id="property-replaytracesource"></a> `replayTraceSource?` | `readonly` | (`sessionId`) => \| `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> \| `Iterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> \| `undefined` | RP-17: default `traceSource` factory for `Session.replay()`. When a session is replayed without an explicit `traceSource`, this is invoked with the session id to resolve the persisted spans (e.g. `(id) => traceSourceForSession(store.connection, id)` from `@graphorin/store-sqlite`). Without it, replay falls back to the empty source and emits only `replay.start` / `replay.end`. | packages/sessions/src/facade.ts:159 |
+| <a id="property-store"></a> `store` | `readonly` | [`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md) | Storage adapter — `@graphorin/store-sqlite` is the default. | packages/sessions/src/facade.ts:144 |

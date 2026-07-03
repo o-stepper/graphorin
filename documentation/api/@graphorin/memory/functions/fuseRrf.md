@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,7 +7,10 @@
 # Function: fuseRrf()
 
 ```ts
-function fuseRrf<TRecord>(lists, k): readonly MemoryHit<TRecord>[];
+function fuseRrf<TRecord>(
+   lists, 
+   k, 
+   labels?): readonly MemoryHit<TRecord>[];
 ```
 
 Defined in: packages/memory/src/search/rrf.ts:119
@@ -29,6 +32,7 @@ wrapping of the public surface.
 | ------ | ------ |
 | `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] |
 | `k` | `number` |
+| `labels?` | readonly `string`[] |
 
 ## Returns
 

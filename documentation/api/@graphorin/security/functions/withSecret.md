@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function withSecret<T>(
 opts?): Promise<T>;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:180
+Defined in: packages/security/src/secrets/acl.ts:195
 
 Run `fn` with the unwrapped value. Auto-wraps raw strings into a
 `SecretValue` so callers migrating from raw-string APIs do not have

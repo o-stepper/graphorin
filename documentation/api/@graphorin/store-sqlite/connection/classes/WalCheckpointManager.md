@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: WalCheckpointManager
 
-Defined in: packages/store-sqlite/src/connection.ts:303
+Defined in: packages/store-sqlite/src/connection.ts:315
 
 Periodic `wal_checkpoint(RESTART)` runner. Invoked by the worker
 pool every `intervalMs` to bound WAL growth on long-running servers.
@@ -21,7 +21,7 @@ pool every `intervalMs` to bound WAL growth on long-running servers.
 new WalCheckpointManager(conn, intervalMs): WalCheckpointManager;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:308
+Defined in: packages/store-sqlite/src/connection.ts:320
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/store-sqlite/src/connection.ts:308
 start(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:313
+Defined in: packages/store-sqlite/src/connection.ts:325
 
 #### Returns
 
@@ -56,7 +56,7 @@ Defined in: packages/store-sqlite/src/connection.ts:313
 stop(): void;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:326
+Defined in: packages/store-sqlite/src/connection.ts:338
 
 #### Returns
 

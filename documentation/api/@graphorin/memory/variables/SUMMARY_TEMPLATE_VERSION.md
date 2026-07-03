@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -7,10 +7,10 @@
 # Variable: SUMMARY\_TEMPLATE\_VERSION
 
 ```ts
-const SUMMARY_TEMPLATE_VERSION: "1.0" = '1.0';
+const SUMMARY_TEMPLATE_VERSION: "1.2" = '1.2';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:31
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:36
 
 Template version surfaced into the summary's section 9 metadata.
 Bumped when the section structure / preamble wording changes in

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -11,6 +11,7 @@ type SkillSource =
   | {
   kind: "folder";
   path: string;
+  trustLevel?: SkillTrustLevel;
 }
   | {
   kind: "npm-package";
@@ -40,5 +41,60 @@ Source descriptor for a [loadSkills](/api/@graphorin/skills/loader/functions/loa
   load.
 - `'inline'`      — the caller supplies a parsed skill structure;
   useful for tests and embedded fixtures.
+
+## Union Members
+
+### Type Literal
+
+```ts
+{
+  kind: "folder";
+  path: string;
+  trustLevel?: SkillTrustLevel;
+}
+```
+
+| Name | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ |
+| `kind` | `"folder"` | - | packages/skills/src/types/index.ts:74 |
+| `path` | `string` | - | packages/skills/src/types/index.ts:75 |
+| `trustLevel?` | [`SkillTrustLevel`](/api/@graphorin/skills/type-aliases/SkillTrustLevel.md) | Operator-supplied trust level. When present it overrides the skill's self-declared `graphorin-trust-level`. Without it, a folder's self-declared `trusted` / `trusted-with-scripts` is capped at `'unknown'` — a downloaded directory cannot promote itself; trust is granted by the integrator, never the artifact. | packages/skills/src/types/index.ts:83 |
+
+***
+
+### Type Literal
+
+```ts
+{
+  kind: "npm-package";
+  packageName: string;
+  trustLevel?: SkillTrustLevel;
+  version?: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  kind: "git-repo";
+  ref?: string;
+  trustLevel?: SkillTrustLevel;
+  url: string;
+}
+```
+
+***
+
+### Type Literal
+
+```ts
+{
+  kind: "inline";
+  skill: InlineSkill;
+}
+```
 
 ## Stable

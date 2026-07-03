@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MCPSamplingResult
 
-Defined in: packages/mcp/src/client/types.ts:171
+Defined in: packages/mcp/src/client/types.ts:169
 
 Operator response to an [MCPSamplingRequest](/api/@graphorin/mcp/interfaces/MCPSamplingRequest.md).
 
@@ -16,7 +16,7 @@ Operator response to an [MCPSamplingRequest](/api/@graphorin/mcp/interfaces/MCPS
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | [`MCPSamplingContent`](/api/@graphorin/mcp/type-aliases/MCPSamplingContent.md) | packages/mcp/src/client/types.ts:173 |
-| <a id="property-model"></a> `model` | `readonly` | `string` | packages/mcp/src/client/types.ts:174 |
-| <a id="property-role"></a> `role` | `readonly` | `"assistant"` | packages/mcp/src/client/types.ts:172 |
-| <a id="property-stopreason"></a> `stopReason?` | `readonly` | `string` | packages/mcp/src/client/types.ts:175 |
+| <a id="property-content"></a> `content` | `readonly` | [`MCPSamplingContent`](/api/@graphorin/mcp/type-aliases/MCPSamplingContent.md) | packages/mcp/src/client/types.ts:171 |
+| <a id="property-model"></a> `model` | `readonly` | `string` | packages/mcp/src/client/types.ts:172 |
+| <a id="property-role"></a> `role` | `readonly` | `"assistant"` | packages/mcp/src/client/types.ts:170 |
+| <a id="property-stopreason"></a> `stopReason?` | `readonly` | `string` | packages/mcp/src/client/types.ts:173 |

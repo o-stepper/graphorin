@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createProviderRetrievalGrader(provider, options?): RetrievalGrader;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:294
+Defined in: packages/memory/src/search/iterative.ts:310
 
 Wrap a [Provider](/api/@graphorin/core/interfaces/Provider.md) as a [RetrievalGrader](/api/@graphorin/memory/interfaces/RetrievalGrader.md). **Resilient**: a
 provider error or unparseable response degrades to the

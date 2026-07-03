@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: GraphorinSqliteStore
 
-Defined in: packages/store-sqlite/src/index.ts:152
+Defined in: packages/store-sqlite/src/index.ts:173
 
 Composite handle returned by [createSqliteStore](/api/@graphorin/store-sqlite/functions/createSqliteStore.md).
 
@@ -16,16 +16,16 @@ Composite handle returned by [createSqliteStore](/api/@graphorin/store-sqlite/fu
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-appliedmigrations"></a> `appliedMigrations` | `readonly` | readonly [`AppliedMigration`](/api/@graphorin/store-sqlite/interfaces/AppliedMigration.md)[] | packages/store-sqlite/src/index.ts:162 |
-| <a id="property-authtokens"></a> `authTokens` | `readonly` | [`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md) | packages/store-sqlite/src/index.ts:157 |
-| <a id="property-checkpoints"></a> `checkpoints` | `readonly` | [`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md) | packages/store-sqlite/src/index.ts:154 |
-| <a id="property-connection"></a> `connection` | `readonly` | [`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md) | packages/store-sqlite/src/index.ts:161 |
-| <a id="property-embeddings"></a> `embeddings` | `readonly` | [`EmbeddingMetaRepository`](/api/@graphorin/store-sqlite/classes/EmbeddingMetaRepository.md) | packages/store-sqlite/src/index.ts:160 |
-| <a id="property-idempotency"></a> `idempotency` | `readonly` | [`IdempotencyStore`](/api/@graphorin/store-sqlite/interfaces/IdempotencyStore.md) | packages/store-sqlite/src/index.ts:159 |
-| <a id="property-memory"></a> `memory` | `readonly` | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md) | packages/store-sqlite/src/index.ts:153 |
-| <a id="property-oauthservers"></a> `oauthServers` | `readonly` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | packages/store-sqlite/src/index.ts:158 |
-| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionStore`](/api/@graphorin/core/interfaces/SessionStore.md) | packages/store-sqlite/src/index.ts:155 |
-| <a id="property-triggers"></a> `triggers` | `readonly` | [`TriggerStore`](/api/@graphorin/core/interfaces/TriggerStore.md) | packages/store-sqlite/src/index.ts:156 |
+| <a id="property-appliedmigrations"></a> `appliedMigrations` | `readonly` | readonly [`AppliedMigration`](/api/@graphorin/store-sqlite/interfaces/AppliedMigration.md)[] | packages/store-sqlite/src/index.ts:183 |
+| <a id="property-authtokens"></a> `authTokens` | `readonly` | [`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md) | packages/store-sqlite/src/index.ts:178 |
+| <a id="property-checkpoints"></a> `checkpoints` | `readonly` | [`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md) | packages/store-sqlite/src/index.ts:175 |
+| <a id="property-connection"></a> `connection` | `readonly` | [`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md) | packages/store-sqlite/src/index.ts:182 |
+| <a id="property-embeddings"></a> `embeddings` | `readonly` | [`EmbeddingMetaRepository`](/api/@graphorin/store-sqlite/classes/EmbeddingMetaRepository.md) | packages/store-sqlite/src/index.ts:181 |
+| <a id="property-idempotency"></a> `idempotency` | `readonly` | [`IdempotencyStore`](/api/@graphorin/store-sqlite/interfaces/IdempotencyStore.md) | packages/store-sqlite/src/index.ts:180 |
+| <a id="property-memory"></a> `memory` | `readonly` | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md) | packages/store-sqlite/src/index.ts:174 |
+| <a id="property-oauthservers"></a> `oauthServers` | `readonly` | [`OAuthServerStore`](/api/@graphorin/core/interfaces/OAuthServerStore.md) | packages/store-sqlite/src/index.ts:179 |
+| <a id="property-sessions"></a> `sessions` | `readonly` | [`SessionStoreExt`](/api/@graphorin/core/interfaces/SessionStoreExt.md) | packages/store-sqlite/src/index.ts:176 |
+| <a id="property-triggers"></a> `triggers` | `readonly` | [`TriggerStore`](/api/@graphorin/core/interfaces/TriggerStore.md) | packages/store-sqlite/src/index.ts:177 |
 
 ## Methods
 
@@ -35,7 +35,7 @@ Composite handle returned by [createSqliteStore](/api/@graphorin/store-sqlite/fu
 close(): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:166
+Defined in: packages/store-sqlite/src/index.ts:187
 
 Close the connection + stop the checkpoint manager. Idempotent.
 
@@ -51,7 +51,7 @@ Close the connection + stop the checkpoint manager. Idempotent.
 init(): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:164
+Defined in: packages/store-sqlite/src/index.ts:185
 
 Initialize the store: run migrations + start checkpoint manager.
 

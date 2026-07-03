@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function luhn(value): boolean;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:172
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:210
 
 Luhn checksum for credit-card validation.
 

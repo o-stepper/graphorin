@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createSessionManager(opts): SessionManager;
 ```
 
-Defined in: packages/sessions/src/facade.ts:295
+Defined in: packages/sessions/src/facade.ts:348
 
 Build a session manager. The manager is the public entry point;
 sessions are obtained via `manager.create(...)` / `manager.get(...)`.

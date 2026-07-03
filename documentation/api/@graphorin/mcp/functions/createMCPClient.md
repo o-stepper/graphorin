@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createMCPClient(options): Promise<MCPClient>;
 ```
 
-Defined in: packages/mcp/src/client/client.ts:76
+Defined in: packages/mcp/src/client/client.ts:80
 
 Open a typed MCP client connection.
 

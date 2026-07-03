@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function adaptCallResult(args): ToolReturn<unknown>;
 ```
 
-Defined in: packages/mcp/src/client/adapt-result.ts:33
+Defined in: packages/mcp/src/client/adapt-result.ts:39
 
 **`Internal`**
 

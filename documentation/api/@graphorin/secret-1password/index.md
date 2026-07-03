@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../index.md)
+[**Graphorin API reference v0.5.0**](../../index.md)
 
 ***
 
@@ -12,14 +12,14 @@
 > pluggable `SecretResolver` registry by shelling out to the official
 > 1Password CLI (`op read 'op://<vault>/<item>/<field>'`).
 >
-> Project Graphorin · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.4.0 (optional sub-pack)
+- **Published:** v0.5.0 (optional sub-pack)
 - Reference adapter — community packages should follow this template
   when wiring HashiCorp Vault, AWS Secrets Manager, GCP Secret
   Manager, Azure Key Vault, Bitwarden, or Unix `pass`.
@@ -173,7 +173,7 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.4.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 @graphorin/secret-1password — reference 1Password secret-resolver
 adapter for the Graphorin framework.
@@ -231,4 +231,5 @@ additional `SecretResolver` implementations.
 | ------ | ------ |
 | [createDefaultOpCli](/api/@graphorin/secret-1password/functions/createDefaultOpCli.md) | Default [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) implementation. Spawns `op read --no-color --reveal '<uri>'` with the configured timeout and inherits the parent environment. |
 | [createOnePasswordResolver](/api/@graphorin/secret-1password/functions/createOnePasswordResolver.md) | Build a `SecretResolver` that honours the `op://` scheme. Register with `registerResolver(...)` from `@graphorin/security` at app bootstrap. |
+| [createOpCli](/api/@graphorin/secret-1password/functions/createOpCli.md) | [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) factory with an injectable `spawn` (for tests). Production code uses [createDefaultOpCli](/api/@graphorin/secret-1password/functions/createDefaultOpCli.md). |
 | [normalizeOpUri](/api/@graphorin/secret-1password/functions/normalizeOpUri.md) | Lowercase the authority + path segments of an `op://` URI so two configs that differ only in case resolve to the same value (matching 1Password's case-insensitive behaviour). |

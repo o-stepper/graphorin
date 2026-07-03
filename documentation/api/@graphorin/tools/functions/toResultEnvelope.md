@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -26,9 +26,9 @@ use the `chunks` parameter to materialise the assembled body.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \{ `chunks?`: readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[]; `raw`: \| `void` \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt;; \} |
+| `opts` | \{ `chunks?`: readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[]; `raw`: \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined`; \} |
 | `opts.chunks?` | readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[] |
-| `opts.raw` | \| `void` \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; |
+| `opts.raw` | \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined` |
 
 ## Returns
 

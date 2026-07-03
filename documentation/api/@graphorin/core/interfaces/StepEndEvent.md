@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: StepEndEvent
 
-Defined in: packages/core/src/types/agent-event.ts:229
+Defined in: packages/core/src/types/agent-event.ts:238
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:229
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:231 |
-| <a id="property-type"></a> `type` | `readonly` | `"step.end"` | packages/core/src/types/agent-event.ts:230 |
-| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | packages/core/src/types/agent-event.ts:232 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:240 |
+| <a id="property-type"></a> `type` | `readonly` | `"step.end"` | packages/core/src/types/agent-event.ts:239 |
+| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | packages/core/src/types/agent-event.ts:241 |

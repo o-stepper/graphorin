@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function registerAuditDbBinding(binding, opts?): () => void;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:124
+Defined in: packages/security/src/audit/audit-db.ts:126
 
 Register a concrete binding. The framework default
 (`better-sqlite3-multiple-ciphers`) is registered by

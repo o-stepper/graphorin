@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type IterativeRecallResult = IterativeRetrievalResult<MemoryHit<Fact>>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:229
+Defined in: packages/memory/src/tiers/semantic-memory.ts:248
 
 Outcome of [SemanticMemory.searchIterative](/api/@graphorin/memory/classes/SemanticMemory.md#searchiterative). Beyond the ranked
 `hits`, `sufficient` / `abstained` tell the caller whether the memory

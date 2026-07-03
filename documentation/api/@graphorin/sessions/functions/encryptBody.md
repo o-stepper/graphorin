@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function encryptBody(body, key): Uint8Array;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:239
+Defined in: packages/sessions/src/export/writer.ts:270
 
 Convenience: AES-256-GCM encrypt a body buffer. The IV is generated
 fresh and prepended; the auth tag is appended. Output layout:

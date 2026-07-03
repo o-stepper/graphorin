@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function parseGrade(text): RetrievalGrade;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:266
+Defined in: packages/memory/src/search/iterative.ts:282
 
 Parse a grader model output into a [RetrievalGrade](/api/@graphorin/memory/interfaces/RetrievalGrade.md). Tolerates a
 bare JSON object, a fenced block, and chatty text around the object.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -19,6 +19,7 @@ Configuration accepted by [createTransformersJsEmbedder](/api/@graphorin/embedde
 | <a id="property-cachedir"></a> `cacheDir?` | `readonly` | `string` | Optional cache directory. When unset, the embedder honours `process.env.GRAPHORIN_CACHE_DIR`, otherwise falls back to the Hugging Face default (`os.homedir()/.cache/huggingface/hub`). | packages/embedder-transformersjs/src/index.ts:45 |
 | <a id="property-device"></a> `device?` | `readonly` | `string` | Override device (`'cpu'`, `'webgpu'`, …). Default `'cpu'`. | packages/embedder-transformersjs/src/index.ts:52 |
 | <a id="property-dim"></a> `dim?` | `readonly` | `number` | Optional dimensionality hint. When the caller knows the output dimension up-front, it is included in the canonical id without waiting for the first `embed()` call. | packages/embedder-transformersjs/src/index.ts:64 |
+| <a id="property-disabletaskprefix"></a> `disableTaskPrefix?` | `readonly` | `boolean` | Disable the automatic E5 `query:` / `passage:` prefixing (PS-10). The prefixes are applied by default for E5-family models (the multilingual-e5 default and any model whose id carries an `e5` token), because the E5 model card requires them and omitting them measurably degrades retrieval. Set this to `true` only if your inputs are already prefixed or you use a non-standard E5 export. Toggling it changes the canonical `configHash` (and thus the embedder id), which triggers a re-embedding migration. | packages/embedder-transformersjs/src/index.ts:74 |
 | <a id="property-dtype"></a> `dtype?` | `readonly` | `string` | Optional dtype hint (`'fp32' | 'fp16' | 'q8' | 'q4'`). When unset, the runtime picks the model's recommended default. | packages/embedder-transformersjs/src/index.ts:50 |
 | <a id="property-model"></a> `model?` | `readonly` | `string` | Default `'Xenova/multilingual-e5-base'` (768-dim). | packages/embedder-transformersjs/src/index.ts:33 |
 | <a id="property-normalize"></a> `normalize?` | `readonly` | `boolean` | Default `true`. | packages/embedder-transformersjs/src/index.ts:37 |

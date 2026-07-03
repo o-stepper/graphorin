@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 const CHECKPOINT_SCHEMA_VERSION: "graphorin-workflow-checkpoint/1.0";
 ```
 
-Defined in: packages/workflow/src/internal/engine.ts:1094
+Defined in: packages/workflow/src/internal/engine.ts:1590
 
 Schema version embedded in every persisted checkpoint envelope.
 Bumping the major part requires a documented migration path; the

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -14,12 +14,13 @@ Snapshot returned by [CostTracker.usage](/api/@graphorin/observability/interface
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-bymodel"></a> `byModel` | `readonly` | readonly \{ `callCount`: `number`; `completionTokens`: `number`; `cost`: [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null`; `model`: `string`; `promptTokens`: `number`; `reasoningTokens`: `number`; \}[] | packages/observability/src/cost/types.ts:52 |
-| <a id="property-callcount"></a> `callCount` | `readonly` | `number` | packages/observability/src/cost/types.ts:50 |
-| <a id="property-completiontokens"></a> `completionTokens` | `readonly` | `number` | packages/observability/src/cost/types.ts:48 |
-| <a id="property-cost"></a> `cost` | `readonly` | [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null` | packages/observability/src/cost/types.ts:51 |
-| <a id="property-prompttokens"></a> `promptTokens` | `readonly` | `number` | packages/observability/src/cost/types.ts:47 |
-| <a id="property-reasoningtokens"></a> `reasoningTokens` | `readonly` | `number` | packages/observability/src/cost/types.ts:49 |
-| <a id="property-totaltokens"></a> `totalTokens` | `readonly` | `number` | packages/observability/src/cost/types.ts:46 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-bymodel"></a> `byModel` | `readonly` | readonly \{ `callCount`: `number`; `completionTokens`: `number`; `cost`: [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null`; `mixedCurrency`: `boolean`; `model`: `string`; `promptTokens`: `number`; `reasoningTokens`: `number`; \}[] | - | packages/observability/src/cost/types.ts:58 |
+| <a id="property-callcount"></a> `callCount` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:50 |
+| <a id="property-completiontokens"></a> `completionTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:48 |
+| <a id="property-cost"></a> `cost` | `readonly` | [`Cost`](/api/@graphorin/core/interfaces/Cost.md) \| `null` | - | packages/observability/src/cost/types.ts:51 |
+| <a id="property-mixedcurrency"></a> `mixedCurrency` | `readonly` | `boolean` | RP-22: `true` when records carrying differing currencies were aggregated into this snapshot. `cost.amount` is then a sum across currencies and must not be treated as a single clean figure. | packages/observability/src/cost/types.ts:57 |
+| <a id="property-prompttokens"></a> `promptTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:47 |
+| <a id="property-reasoningtokens"></a> `reasoningTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:49 |
+| <a id="property-totaltokens"></a> `totalTokens` | `readonly` | `number` | - | packages/observability/src/cost/types.ts:46 |

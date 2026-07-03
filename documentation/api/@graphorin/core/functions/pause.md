@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function pause<TValue, TResume>(value): TResume;
 ```
 
-Defined in: packages/core/src/channels/pause.ts:83
+Defined in: packages/core/src/channels/pause.ts:93
 
 Programmatically suspend the current workflow node. The `value` is
 surfaced to callers via the `WorkflowSuspendedEvent.value` field; the

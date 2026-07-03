@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function readPragma(conn, name): unknown;
 ```
 
-Defined in: packages/store-sqlite/src/connection.ts:276
+Defined in: packages/store-sqlite/src/connection.ts:288
 
 Pragma helper that surfaces the runtime value of a single setting as
 a typed scalar. Used by the integration tests to verify the WAL

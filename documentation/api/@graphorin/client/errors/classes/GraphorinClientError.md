@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.4.0**](../../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Class: GraphorinClientError
 
-Defined in: packages/client/src/errors.ts:33
+Defined in: packages/client/src/errors.ts:68
 
 Base class for every error raised by `@graphorin/client`. Carries a
 stable [GraphorinClientErrorKind](/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md) discriminator and an
@@ -40,7 +40,7 @@ new GraphorinClientError(
    options?): GraphorinClientError;
 ```
 
-Defined in: packages/client/src/errors.ts:36
+Defined in: packages/client/src/errors.ts:71
 
 #### Parameters
 
@@ -65,7 +65,7 @@ Error.constructor
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `Error.cause` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-kind"></a> `kind` | `readonly` | [`GraphorinClientErrorKind`](/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md) | - | packages/client/src/errors.ts:34 |
+| <a id="property-kind"></a> `kind` | `readonly` | [`GraphorinClientErrorKind`](/api/@graphorin/client/errors/type-aliases/GraphorinClientErrorKind.md) | - | packages/client/src/errors.ts:69 |
 | <a id="property-message"></a> `message` | `public` | `string` | `Error.message` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | `Error.name` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | `Error.stack` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

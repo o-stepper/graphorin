@@ -1,34 +1,31 @@
-[**Graphorin API reference v0.4.0**](../../../index.md)
+[**Graphorin API reference v0.5.0**](../../../index.md)
 
 ***
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [](/api/@graphorin/agent/README.md) / OutputGuardrail
 
-# Type Alias: OutputGuardrail\&lt;TOutput\&gt;
+# Type Alias: OutputGuardrail\&lt;TValue\&gt;
 
 ```ts
-type OutputGuardrail<TOutput> = (output) => 
-  | Promise<GuardrailVerdict>
-  | GuardrailVerdict;
+type OutputGuardrail<TValue> = GuardrailDefinition<TValue> & {
+  kind: "output";
+};
 ```
 
-Defined in: packages/agent/src/types.ts:93
+Defined in: packages/security/dist/guardrails/types.d.ts:93
+
+Output guardrail discriminator.
+
+## Type Declaration
+
+| Name | Type | Defined in |
+| ------ | ------ | ------ |
+| `kind` | `"output"` | packages/security/dist/guardrails/types.d.ts:94 |
 
 ## Type Parameters
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TOutput` | `unknown` |
-
-## Parameters
-
-| Parameter | Type |
-| ------ | ------ |
-| `output` | `TOutput` |
-
-## Returns
-
-  \| `Promise`\&lt;[`GuardrailVerdict`](/api/@graphorin/agent/type-aliases/GuardrailVerdict.md)\&gt;
-  \| [`GuardrailVerdict`](/api/@graphorin/agent/type-aliases/GuardrailVerdict.md)
+| `TValue` | `unknown` |
 
 ## Stable
