@@ -60,10 +60,9 @@ jobs:
         with:
           node-version: '22'
           cache: pnpm
-          # CI-5: registry-url makes setup-node write the project `.npmrc` line
-          # that reads `NODE_AUTH_TOKEN`, so the publish step authenticates with
-          # NPM_TOKEN against the default npm registry.
-          registry-url: 'https://registry.npmjs.org'
+          # No `registry-url:` — `changesets/action` writes its own publish
+          # `.npmrc` from the `NPM_TOKEN` env below; a setup-node registry-url
+          # would add a second, empty-token `.npmrc` that shadows it.
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -87,7 +86,9 @@ jobs:
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # CI-10: the npm publish token is scoped to THIS step only, not the
-          # whole job, so workspace build/test steps never see it.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # `changesets/action` reads the env var named exactly `NPM_TOKEN` to
+          # write its publish `.npmrc`; scoped to THIS step only (CI-10) so the
+          # workspace build/test steps never see it. (Passing it as
+          # NODE_AUTH_TOKEN makes the action miss it and fall back to OIDC.)
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: 'true'
