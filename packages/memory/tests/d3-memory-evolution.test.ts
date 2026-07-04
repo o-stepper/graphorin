@@ -94,8 +94,18 @@ describe('learned-context pure helpers (D3)', () => {
 function learnedContextProvider(): Provider & { readonly calls: ProviderRequest[] } {
   const calls: ProviderRequest[] = [];
   return {
-    id: () => 'fixture-learned-context',
-    capabilities: () => ({ streaming: false, tools: false }),
+    name: 'fake',
+    modelId: 'fixture-learned-context',
+    capabilities: {
+      streaming: false,
+      toolCalling: false,
+      parallelToolCalls: false,
+      multimodal: false,
+      structuredOutput: true,
+      reasoning: false,
+      contextWindow: 32_000,
+      maxOutput: 4_000,
+    },
     async generate(req: ProviderRequest): Promise<ProviderResponse> {
       calls.push(req);
       const sys = req.systemMessage ?? '';

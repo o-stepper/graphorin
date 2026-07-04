@@ -73,7 +73,12 @@ describe('types', () => {
       | { readonly strategy: 'rrf' }
       | {
           readonly strategy: 'weighted';
-          readonly weights: { readonly fts?: number; readonly vector?: number };
+          readonly weights: {
+            readonly fts?: number;
+            readonly vector?: number;
+            readonly graph?: number;
+            readonly entity?: number;
+          };
           readonly k?: number;
         }
       | undefined

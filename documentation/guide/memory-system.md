@@ -162,6 +162,16 @@ The ambiguous-similarity band **mints a new entity by default** — it never aut
 
 The resolver also refuses to compare embeddings **across different embedders**: if a candidate entity was embedded by a different model than the current one, the cosine step is skipped (different models occupy different vector spaces), so a half-migrated graph cannot produce garbage merges from incomparable vectors.
 
+### PPR-lite, graph fusion weight, and exact entity-match (D5)
+
+Three opt-in refinements to the graph leg:
+
+- **PPR-lite spreading activation** — `search(scope, q, { expandHops: 2, graphScoring: 'ppr' })` widens to two-hop expansion and scores neighbours by damped spreading activation (`damping^hopDepth`, HippoRAG-style) instead of a flat `1`, so a fact two hops from a strong seed ranks below a direct neighbour. Seeding from query-matched entities (rather than the retrieved candidates) is the eval-gated extension.
+- **Graph as a tunable fusion weight** — the graph leg was hardcoded neutral; `fusion: { strategy: 'weighted', weights: { graph, entity } }` now weights it like the FTS / vector legs once its reliability is calibrated against labels.
+- **Exact entity-match retriever** — `search(scope, q, { entityMatch: true })` adds a precise "facts about `<entity>`" candidate leg: the query terms are normalized to entity names and facts linked to a matching canonical entity are fused in (with the `entity` weight), distinct from the fuzzy FTS / vector legs.
+
+The `longmemeval` harness exposes `--retrieval ppr` and `--retrieval entity` alongside `graph` for A/B measurement. Bitemporal event-time, Matryoshka embedding truncation, and cascade LLM reranking remain **eval-gated** (built only once the numbers justify), per the roadmap.
+
 ## Agentic / iterative retrieval
 
 For hard multi-hop or temporal questions one pass can't answer, `searchIterative` runs a **grade-then-reformulate loop** (CRAG / Self-RAG). A cheap **local difficulty gate** keeps simple lookups single-shot; only a query judged *hard* — and only when a grader is configured — is graded for sufficiency and, when weak, reformulated and retrieved again (widening to one-hop graph expansion each round), up to a hard-capped `maxIterations` (≤ 5). If it still can't satisfy the question it **abstains** rather than confabulating:

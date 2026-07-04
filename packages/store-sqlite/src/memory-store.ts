@@ -2126,6 +2126,126 @@ export class SqliteGraphStore {
     );
     return rows.map(rowToFact);
   }
+
+  /**
+   * PPR-lite graded expansion (D5): the same recursive entity-graph walk
+   * as {@link expandOneHop}, but returns each reachable fact with its
+   * MINIMUM hop distance from the seed set, so callers can weight
+   * neighbours by damped spreading activation instead of a flat score.
+   */
+  async expandActivation(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts: {
+      readonly maxHops?: number;
+      readonly limit?: number;
+      readonly includeQuarantined?: boolean;
+      readonly asOf?: string;
+      readonly includeSuperseded?: boolean;
+    } = {},
+  ): Promise<ReadonlyArray<{ readonly fact: Fact; readonly depth: number }>> {
+    if (seedFactIds.length === 0) return [];
+    const maxHops = opts.maxHops ?? 2;
+    const limit = opts.limit ?? 60;
+    const incQ = opts.includeQuarantined === true ? 1 : 0;
+    const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
+    const seedsJson = JSON.stringify([...seedFactIds]);
+    const rows = this.#conn.all<FactRow & { depth: number }>(
+      `WITH RECURSIVE
+         seed_ids(fact_id) AS (
+           SELECT f.id FROM facts f
+           JOIN json_each(?) j ON j.value = f.id
+           WHERE f.scope_user_id = ?
+         ),
+         walk(fact_id, depth) AS (
+             SELECT fact_id, 0 FROM seed_ids
+           UNION
+             SELECT fe2.fact_id, w.depth + 1
+             FROM walk w
+             JOIN facts fb ON fb.id = w.fact_id
+               AND fb.scope_user_id = ?
+               AND fb.deleted_at IS NULL
+               AND fb.archived = 0
+               AND (? = 1 OR fb.status != 'quarantined')
+               AND (? IS NULL OR ((fb.valid_from IS NULL OR fb.valid_from <= ?) AND (fb.valid_to IS NULL OR fb.valid_to > ?)))
+             JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
+             JOIN entities e1 ON e1.id = fe1.entity_id
+             JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
+             JOIN fact_entities fe2 ON fe2.entity_id = e2.id
+             WHERE w.depth < ?
+         )
+       SELECT f.*, MIN(reached.depth) AS depth FROM facts f
+       JOIN (SELECT fact_id, MIN(depth) AS depth FROM walk WHERE depth > 0 GROUP BY fact_id) reached
+         ON reached.fact_id = f.id
+       WHERE f.id NOT IN (SELECT fact_id FROM seed_ids)
+         AND f.scope_user_id = ?
+         AND f.deleted_at IS NULL
+         AND f.archived = 0
+         AND (? = 1 OR f.status != 'quarantined')
+         AND (? IS NULL OR ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)))
+       GROUP BY f.id
+       ORDER BY depth ASC, f.created_at DESC
+       LIMIT ?`,
+      [
+        seedsJson,
+        scope.userId,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        maxHops,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        limit,
+      ],
+    );
+    return rows.map((row) => ({ fact: rowToFact(row), depth: row.depth }));
+  }
+
+  /**
+   * Exact entity-match retriever (D5): facts linked to the entity whose
+   * normalized name equals `normalizedName` (canonicalising merges).
+   * Powers a precise "facts about <entity>" candidate leg distinct from
+   * the fuzzy vector/FTS legs.
+   */
+  async factsForEntityName(
+    scope: SessionScope,
+    normalizedName: string,
+    opts: {
+      readonly limit?: number;
+      readonly includeQuarantined?: boolean;
+      readonly asOf?: string;
+      readonly includeSuperseded?: boolean;
+    } = {},
+  ): Promise<ReadonlyArray<Fact>> {
+    const limit = opts.limit ?? 30;
+    const incQ = opts.includeQuarantined === true ? 1 : 0;
+    const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
+    const binds: Array<string | number> = [scope.userId, normalizedName, scope.userId];
+    if (asOf !== null) binds.push(asOf, asOf);
+    binds.push(limit);
+    const rows = this.#conn.all<FactRow>(
+      `SELECT DISTINCT f.* FROM facts f
+       JOIN fact_entities fe ON fe.fact_id = f.id
+       JOIN entities e ON e.id = fe.entity_id
+       JOIN entities canon ON COALESCE(canon.merged_into, canon.id) = COALESCE(e.merged_into, e.id)
+       WHERE canon.scope_user_id = ?
+         AND canon.normalized_name = ?
+         AND f.scope_user_id = ?
+         AND f.deleted_at IS NULL
+         AND f.archived = 0
+         ${incQ === 1 ? '' : "AND f.status != 'quarantined'"}
+         ${asOf !== null ? 'AND ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?))' : ''}
+       ORDER BY f.created_at DESC
+       LIMIT ?`,
+      binds,
+    );
+    return rows.map(rowToFact);
+  }
 }
 
 function f32ToBlob(vec: Float32Array): Buffer {

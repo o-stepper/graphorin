@@ -825,6 +825,27 @@ export interface GraphMemoryStoreExt {
     seedFactIds: ReadonlyArray<string>,
     opts?: ExpandHopsStoreOptions,
   ): Promise<ReadonlyArray<Fact>>;
+  /**
+   * PPR-lite graded expansion (D5): like {@link expandOneHop} but returns
+   * each neighbour with its minimum hop `depth` from the seeds, so the
+   * tier can weight it by damped spreading activation. Optional — stores
+   * without it fall back to flat one-hop expansion.
+   */
+  expandActivation?(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts?: ExpandHopsStoreOptions,
+  ): Promise<ReadonlyArray<{ readonly fact: Fact; readonly depth: number }>>;
+  /**
+   * Exact entity-match retriever (D5): facts linked to the canonical
+   * entity for `normalizedName`. Optional. Powers a precise
+   * "facts about <entity>" candidate leg.
+   */
+  factsForEntityName?(
+    scope: SessionScope,
+    normalizedName: string,
+    opts?: ExpandHopsStoreOptions,
+  ): Promise<ReadonlyArray<Fact>>;
 }
 
 /**

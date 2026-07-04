@@ -13,13 +13,14 @@ import { md5 } from '@graphorin/core';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
 import { DEFAULT_SALIENCE_WEIGHTS, type SalienceWeights } from '../consolidator/decay.js';
 import { QuarantinePromotionRefusedError } from '../errors/index.js';
-import type { EntityResolver } from '../graph/entity-resolver.js';
+import { type EntityResolver, normalizeEntityName } from '../graph/entity-resolver.js';
 import { contextualize } from '../internal/contextualize.js';
 import { newMemoryId } from '../internal/id.js';
 import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import { explainRecall } from '../search/explain.js';
+import { pprActivation } from '../search/graph-ppr.js';
 import {
   DEFAULT_MAX_ITERATIONS,
   type IterativeRetrievalResult,
@@ -91,6 +92,15 @@ export interface FusionWeights {
   readonly fts?: number;
   /** Weight applied to every vector (incl. HyDE) candidate list. Default `1`. */
   readonly vector?: number;
+  /**
+   * Weight applied to the graph-expansion candidate list (D5). Default
+   * `1` (the previous neutral behaviour). Tune it once the graph leg's
+   * reliability is calibrated against labels — the roadmap's "graph as a
+   * first-class tunable fusion weight" (was hardcoded neutral).
+   */
+  readonly graph?: number;
+  /** Weight applied to the exact entity-match candidate list (D5). Default `1`. */
+  readonly entity?: number;
 }
 
 /**
@@ -240,11 +250,33 @@ export interface FactSearchOptions {
    * in as an extra candidate list before rerank — surfacing connected
    * facts the query never matched directly ("what did the person I met in
    * Tbilisi recommend?"). `0` (the default) or a graph-less adapter ⇒ a
-   * silent no-op; recall is unchanged. Opt-in + retrieval-heavy.
+   * silent no-op; recall is unchanged. Opt-in + retrieval-heavy. `2`
+   * (D5) widens to two-hop expansion — pair with `graphScoring: 'ppr'`
+   * so distant neighbours decay instead of tying with direct ones.
    *
    * @stable
    */
-  readonly expandHops?: 0 | 1;
+  readonly expandHops?: 0 | 1 | 2;
+  /**
+   * Graph-expansion scoring (D5). `'flat'` (the default) scores every
+   * graph neighbour `1` (the pre-D5 behaviour). `'ppr'` uses PPR-lite
+   * damped spreading activation (`damping^hopDepth`) via the store's
+   * `expandActivation`, so a two-hop neighbour ranks below a direct one;
+   * a no-op without `expandHops >= 1` or a graph-capable adapter.
+   *
+   * @stable
+   */
+  readonly graphScoring?: 'flat' | 'ppr';
+  /**
+   * Exact entity-match retriever (D5). When set, the query terms are
+   * normalized to entity names and facts linked to a matching canonical
+   * entity are fused in as a precise candidate leg (`entity` fusion
+   * weight), distinct from the fuzzy FTS / vector legs. A no-op without
+   * a graph-capable adapter. Opt-in.
+   *
+   * @stable
+   */
+  readonly entityMatch?: boolean;
   /**
    * Retrieval-time principal filter (D3). When set, only facts whose
    * `owner` is in the requested set are returned — `'user'` for
@@ -707,6 +739,8 @@ export class SemanticMemory {
           opts.fusion !== undefined && opts.fusion.strategy === 'weighted' ? opts.fusion : null;
         const wFts = weighted?.weights.fts ?? 1;
         const wVector = weighted?.weights.vector ?? 1;
+        const wGraph = weighted?.weights.graph ?? 1;
+        const wEntity = weighted?.weights.entity ?? 1;
         // P2-3: fan the query into reworded variants when opted-in *and*
         // a transformer is configured; otherwise this is just `[query]`
         // (single-shot, no provider call — the offline default).
@@ -770,8 +804,16 @@ export class SemanticMemory {
         const graphHits = await this.#tryExpandHops(scope, lists, opts, candidateTopK);
         if (graphHits.length > 0) {
           lists.push(graphHits);
-          listWeights.push(1);
+          listWeights.push(wGraph);
           listLabels.push('graph');
+        }
+        // D5: exact entity-match leg — a precise "facts about <entity>"
+        // candidate list, fused with its own weight.
+        const entityHits = await this.#tryEntityMatch(scope, query, opts, candidateTopK);
+        if (entityHits.length > 0) {
+          lists.push(entityHits);
+          listWeights.push(wEntity);
+          listLabels.push('entity');
         }
         // X-2: weighted fusion runs through a per-call WeightedRRFReranker
         // built from the per-list weights; the default stays the
@@ -794,7 +836,11 @@ export class SemanticMemory {
         // otherwise untagged candidates occupy fused ranks, get
         // filtered, and the search silently returns fewer than topK.
         const fusedTopK =
-          opts.decay !== undefined || (opts.tags?.length ?? 0) > 0 || opts.owner !== undefined
+          opts.decay !== undefined ||
+          (opts.tags?.length ?? 0) > 0 ||
+          opts.owner !== undefined ||
+          (opts.expandHops ?? 0) > 0 ||
+          opts.entityMatch === true
             ? Math.max(
                 finalTopK,
                 lists.reduce((n, l) => n + l.length, 0),
@@ -1277,14 +1323,26 @@ export class SemanticMemory {
       }
     }
     if (seedIds.length === 0) return [];
+    const expandOpts = {
+      maxHops: hops,
+      limit,
+      ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+      ...(opts.includeSuperseded === true ? { includeSuperseded: true } : {}),
+      ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+    };
     try {
-      const neighbours = await graphStore.expandOneHop(scope, seedIds, {
-        maxHops: hops,
-        limit,
-        ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
-        ...(opts.includeSuperseded === true ? { includeSuperseded: true } : {}),
-        ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
-      });
+      // D5: PPR-lite damped spreading activation when opted in AND the
+      // store exposes the graded expansion; otherwise the flat one-hop.
+      if (opts.graphScoring === 'ppr' && typeof graphStore.expandActivation === 'function') {
+        const graded = await graphStore.expandActivation(scope, seedIds, expandOpts);
+        const scores = pprActivation(graded);
+        return graded.map((entry, i) => ({
+          record: entry.fact,
+          score: scores[i] ?? 0,
+          signals: Object.freeze({ graph: scores[i] ?? 0 }),
+        }));
+      }
+      const neighbours = await graphStore.expandOneHop(scope, seedIds, expandOpts);
       return neighbours.map((fact) => ({
         record: fact,
         score: 1,
@@ -1293,6 +1351,53 @@ export class SemanticMemory {
     } catch {
       return [];
     }
+  }
+
+  /**
+   * D5 exact entity-match leg. Normalizes the query into candidate
+   * entity names and fetches facts linked to a matching canonical
+   * entity. A no-op without `entityMatch`, a graph adapter, or the
+   * `factsForEntityName` store method.
+   */
+  async #tryEntityMatch(
+    scope: SessionScope,
+    query: string,
+    opts: FactSearchOptions,
+    limit: number,
+  ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    if (opts.entityMatch !== true) return [];
+    const graphStore = this.#store.graph;
+    if (graphStore === undefined || typeof graphStore.factsForEntityName !== 'function') {
+      return [];
+    }
+    // Candidate entity names: the whole normalized query plus its
+    // longer word n-grams (cheap, offline). The store's canonical index
+    // makes each lookup O(1); most miss, the hit is precise.
+    const normalized = normalizeEntityName(query);
+    if (normalized.length === 0) return [];
+    const candidates = new Set<string>([normalized]);
+    const words = normalized.split(' ').filter((w) => w.length > 2);
+    for (const w of words) candidates.add(w);
+    const out: MemoryHit<Fact>[] = [];
+    const seen = new Set<string>();
+    try {
+      for (const name of candidates) {
+        const facts = await graphStore.factsForEntityName(scope, name, {
+          limit,
+          ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+          ...(opts.includeSuperseded === true ? { includeSuperseded: true } : {}),
+          ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
+        });
+        for (const fact of facts) {
+          if (seen.has(fact.id)) continue;
+          seen.add(fact.id);
+          out.push({ record: fact, score: 1, signals: Object.freeze({ entity: 1 }) });
+        }
+      }
+    } catch {
+      return [];
+    }
+    return out;
   }
 
   async #tryVectorSearch(
