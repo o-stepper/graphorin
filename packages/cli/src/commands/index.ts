@@ -144,10 +144,13 @@ export {
 } from './skills.js';
 export { runStart, type SecretsSourceFlag, type StartCommandOptions } from './start.js';
 export {
+  runStorageBackup,
   runStorageCleanupBackups,
   runStorageEncrypt,
   runStorageRekey,
   runStorageStatus,
+  type StorageBackupOptions,
+  type StorageBackupResult,
   type StorageCleanupBackupsOptions,
   type StorageCleanupBackupsResult,
   type StorageCommonOptions,

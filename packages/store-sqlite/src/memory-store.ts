@@ -63,6 +63,29 @@ function resolveFactValidityEpoch(
 }
 
 /**
+ * MRET-9 / store-03: the vec0 k-nearest slice is GLOBAL (no user
+ * partition) and every scope / validity / quarantine filter applies
+ * AFTER the cut — a minority user could be starved to zero by a
+ * dominant user's vectors. Over-fetch and widen iteratively until
+ * `topK` rows survive the filters or the table is exhausted. Shared by
+ * the fact and episode KNN paths.
+ */
+function widenKnn<Row>(
+  runKnn: (k: number) => ReadonlyArray<Row>,
+  topK: number,
+  total: number,
+): ReadonlyArray<Row> {
+  if (total === 0) return [];
+  let k = Math.min(Math.max(topK * 4, topK + 16), total);
+  let rows = runKnn(k);
+  while (rows.length < topK && k < total) {
+    k = Math.min(k * 2, total);
+    rows = runKnn(k);
+  }
+  return rows.slice(0, topK);
+}
+
+/**
  * Quarantine retrieval-gate fragments (P1-4). Appended to default
  * reads so `status = 'quarantined'` rows never surface in
  * action-driving recall; omitted only when the caller passes
@@ -138,6 +161,7 @@ export interface SqliteMemoryWriteOptions {
  * @stable
  */
 export class SqliteMemoryStore implements MemoryStore {
+  #conn: SqliteConnection;
   #embeddings: EmbeddingMetaRepository;
   #vectorMgr: VectorTableManager;
   #initialized = false;
@@ -156,6 +180,7 @@ export class SqliteMemoryStore implements MemoryStore {
   readonly graph: SqliteGraphStore;
 
   constructor(conn: SqliteConnection, embeddings: EmbeddingMetaRepository) {
+    this.#conn = conn;
     this.#embeddings = embeddings;
     this.#vectorMgr = new VectorTableManager(conn);
     this.working = new WorkingMemoryStoreImpl(conn);
@@ -187,6 +212,21 @@ export class SqliteMemoryStore implements MemoryStore {
   /** Surfaced for tests and the consolidator. */
   embeddingMetaRepository(): EmbeddingMetaRepository {
     return this.#embeddings;
+  }
+
+  /**
+   * store-04: retention prune for the `memory_history` audit trail —
+   * without one the table grows unboundedly (every supersede /
+   * quarantine transition appends). Deletes rows older than
+   * `olderThanMs`; returns the number pruned. Operators call this from
+   * their own maintenance schedule; nothing prunes automatically.
+   *
+   * @stable
+   */
+  async pruneHistory(olderThanMs: number): Promise<number> {
+    const cutoff = Date.now() - Math.max(0, olderThanMs);
+    // Inclusive boundary: a row aged exactly `olderThanMs` is pruned.
+    return this.#conn.run('DELETE FROM memory_history WHERE created_at <= ?', [cutoff]).changes;
   }
 }
 
@@ -702,28 +742,37 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     }
     const tableName = this.#vectorMgr.ensureTable('episodes', meta);
     const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
-    const binds: Array<Buffer | string | number> = [
-      Buffer.from(embedding.buffer),
-      topK,
-      scope.userId,
-      embedderId,
-    ];
-    if (asOfEpoch !== null) binds.push(asOfEpoch);
-    const rows = this.#conn.all<EpisodeRow & { distance: number }>(
-      `SELECT e.*, v.distance AS distance
-       FROM ${quoteIdent(tableName)} v
-       JOIN episodes e ON e.id = v.episode_id
-       WHERE v.embedding MATCH ?
-         AND v.k = ?
-         AND e.scope_user_id = ?
-         AND e.embedder_id = ?
-         AND e.deleted_at IS NULL
-         AND e.archived = 0
-         ${includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
-         ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
-       ORDER BY v.distance`,
-      binds,
-    );
+    const runKnn = (k: number): ReadonlyArray<EpisodeRow & { distance: number }> => {
+      const binds: Array<Buffer | string | number> = [
+        Buffer.from(embedding.buffer),
+        k,
+        scope.userId,
+        embedderId,
+      ];
+      if (asOfEpoch !== null) binds.push(asOfEpoch);
+      return this.#conn.all<EpisodeRow & { distance: number }>(
+        `SELECT e.*, v.distance AS distance
+         FROM ${quoteIdent(tableName)} v
+         JOIN episodes e ON e.id = v.episode_id
+         WHERE v.embedding MATCH ?
+           AND v.k = ?
+           AND e.scope_user_id = ?
+           AND e.embedder_id = ?
+           AND e.deleted_at IS NULL
+           AND e.archived = 0
+           ${includeQuarantined === true ? '' : EPISODE_NOT_QUARANTINED}
+           ${asOfEpoch !== null ? EPISODE_VALIDITY_CLAUSE : ''}
+         ORDER BY v.distance`,
+        binds,
+      );
+    };
+    // store-03: the MRET-9 over-fetch loop, ported from the fact side —
+    // the vec0 k-nearest slice is GLOBAL, so a minority user on a
+    // multi-user (or heavily archived) store could be starved to zero
+    // by the post-KNN filters. Widen until `topK` rows survive.
+    const total =
+      this.#conn.get<{ n: number }>(`SELECT COUNT(*) AS n FROM ${quoteIdent(tableName)}`)?.n ?? 0;
+    const rows = widenKnn(runKnn, topK, total);
     return rows.map((row) => ({
       record: rowToEpisode(row),
       score: scoreFromDistance(meta.distanceMetric, row.distance),
@@ -998,21 +1047,11 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
         binds,
       );
     };
-    // MRET-9: the vec0 k-nearest slice is GLOBAL (the table has no user
-    // partition) and every scope / validity / quarantine filter applies
-    // AFTER the cut — a minority user could be starved to zero by a
-    // dominant user's vectors. Over-fetch and widen iteratively until
-    // `topK` rows survive the filters or the table is exhausted.
+    // MRET-9: over-fetch + widen via the shared helper (see widenKnn).
     const total =
       this.#conn.get<{ n: number }>(`SELECT COUNT(*) AS n FROM ${quoteIdent(tableName)}`)?.n ?? 0;
-    if (total === 0) return [];
-    let k = Math.min(Math.max(topK * 4, topK + 16), total);
-    let rows = runKnn(k);
-    while (rows.length < topK && k < total) {
-      k = Math.min(k * 2, total);
-      rows = runKnn(k);
-    }
-    return rows.slice(0, topK).map((row) => ({
+    const rows = widenKnn(runKnn, topK, total);
+    return rows.map((row) => ({
       record: rowToFact(row),
       score: scoreFromDistance(meta.distanceMetric, row.distance),
       signals: { vector: scoreFromDistance(meta.distanceMetric, row.distance) },
@@ -1318,10 +1357,34 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    */
   async purge(id: string, reason?: string): Promise<void> {
     this.#conn.transaction(() => {
-      const row = this.#conn.get<{ rowid: number }>(
-        'SELECT rowid AS rowid FROM facts WHERE id = ?',
+      const row = this.#conn.get<{ rowid: number; text: string }>(
+        'SELECT rowid AS rowid, text FROM facts WHERE id = ?',
         [id],
       );
+      // store-04: hard-deleted fact CONTENT must not survive in the
+      // audit trail — history rows are scrubbed to the event skeleton
+      // inside the same transaction. Two sweeps: (a) every row keyed
+      // to this id, and (b) every row VALUE-matching this fact's text
+      // (a SUPERSEDE row carries the new fact's text on the OLD
+      // fact's id). The PURGE row below is written after the scrub so
+      // its reason survives.
+      this.#conn.run(
+        `UPDATE memory_history SET prev_value = NULL, new_value = NULL
+         WHERE memory_kind = 'fact' AND memory_id = ?`,
+        [id],
+      );
+      if (row !== undefined) {
+        this.#conn.run(
+          `UPDATE memory_history SET prev_value = NULL
+           WHERE memory_kind = 'fact' AND prev_value = ?`,
+          [row.text],
+        );
+        this.#conn.run(
+          `UPDATE memory_history SET new_value = NULL
+           WHERE memory_kind = 'fact' AND new_value = ?`,
+          [row.text],
+        );
+      }
       this.#conn.run(
         `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, message_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         ['fact', id, null, reason ?? null, 'PURGE', 'agent', null, Date.now()],

@@ -19,7 +19,7 @@
  * @packageDocumentation
  */
 
-import { copyFileSync, existsSync, renameSync, unlinkSync } from 'node:fs';
+import { existsSync, renameSync, unlinkSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 
 import {
@@ -109,17 +109,18 @@ export async function encryptDatabase(
 
   const Ctor = await loadCipherPeer();
   try {
-    // 1. Checkpoint the plaintext source so a byte-copy captures the
-    //    full state even when the DB ran in WAL mode.
-    const source = new Ctor(sourcePath);
+    // 1+2. Online page-level copy via the driver's backup API
+    //    (store-05). The old checkpoint-close-then-copyFileSync left a
+    //    window in which a concurrent writer (a running daemon) could
+    //    commit WAL frames the byte-copy silently missed; `backup()`
+    //    is consistent under live writers, preserves rowids (FTS5
+    //    mappings survive), and includes WAL content.
+    const source = new Ctor(sourcePath, { readonly: true });
     try {
-      source.pragma('wal_checkpoint(TRUNCATE)');
+      await source.backup(targetPath);
     } finally {
       if (source.open) source.close();
     }
-
-    // 2. Byte-copy — rowids (and therefore FTS5 mappings) are preserved.
-    copyFileSync(sourcePath, targetPath);
 
     // 3. In-place conversion: cipher pragmas first, then `rekey` —
     //    sqlite3mc encrypts a plaintext database in place.

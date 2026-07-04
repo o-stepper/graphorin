@@ -264,8 +264,16 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
       return db.prepare(query);
     },
     transaction<T>(fn: () => T): T {
-      const wrapped = db.transaction(fn as (...args: unknown[]) => unknown) as () => T;
-      return wrapped();
+      // store-06: write transactions BEGIN IMMEDIATE. Every
+      // `.transaction(...)` caller in this package bundles writes
+      // (several read-then-write — session push, supersede, graph
+      // upsert), and under WAL a DEFERRED transaction that reads first
+      // and then upgrades fails with SQLITE_BUSY_SNAPSHOT when another
+      // process (server + CLI on one db) commits in between —
+      // `busy_timeout` does not retry that case. IMMEDIATE takes the
+      // write lock up front, so the busy handler waits instead.
+      const wrapped = db.transaction(fn as (...args: unknown[]) => unknown);
+      return wrapped.immediate() as T;
     },
     close() {
       if (db.open) db.close();

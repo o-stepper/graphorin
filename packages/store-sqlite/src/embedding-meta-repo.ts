@@ -146,13 +146,25 @@ export class EmbeddingMetaRepository {
       }
     }
 
+    // store F13: vec0 tables are only ever created with cosine or
+    // euclidean — a 'dot' request was silently rewritten to cosine at
+    // table-create while the meta kept advertising 'dot'. Persist what
+    // the table actually computes, and say so.
+    if (input.distanceMetric === 'dot') {
+      process.stderr.write(
+        `[graphorin/store-sqlite] embedder '${input.id}' requested distanceMetric 'dot', which ` +
+          `sqlite-vec tables do not compute — registering as 'cosine' (identical ranking for ` +
+          `L2-normalized embeddings; NOT for unnormalized ones).\n`,
+      );
+    }
     const slug = slugifyEmbedderId(input.id);
     const row: EmbeddingMetaRow = {
       id: input.id,
       embedderKind: input.embedderKind,
       model: input.model,
       dim: input.dim,
-      distanceMetric: input.distanceMetric ?? 'cosine',
+      distanceMetric:
+        input.distanceMetric === 'dot' ? 'cosine' : (input.distanceMetric ?? 'cosine'),
       configHash: input.configHash,
       vecTableFacts: `facts_vec_${slug}`,
       vecTableEpisodes: `episodes_vec_${slug}`,

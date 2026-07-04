@@ -56,6 +56,8 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '021': '@graphorin/memory (run episode/insight counters)',
   '022': '@graphorin/store-sqlite (session sequence uniqueness)',
   '023': '@graphorin/store-sqlite (drop dead facts.hash column)',
+  '024': '@graphorin/store-sqlite (durable span persistence)',
+  '025': '@graphorin/store-sqlite (fact supersede-chain indexes)',
 };
 
 const dynamicMigrations: Migration[] = [];
