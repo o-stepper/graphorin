@@ -190,14 +190,25 @@ function defaultRetryable(err: unknown): boolean {
   // `req.signal?.aborted`, but the predicate must exclude abort independently
   // so an internally-aborted call is not retried.
   if (isAbortError(err)) return false;
-  const e = err as { kind?: string; status?: number; name?: string };
+  const e = err as { kind?: string; errorKind?: string; status?: number; name?: string };
+  // `ProviderHttpError.kind` is always 'provider-http'; the canonical
+  // mapped kind rides on `errorKind` — consult both.
+  const kinds = [e.kind, e.errorKind];
   if (
-    e.kind === 'transient' ||
-    e.kind === 'rate-limit' ||
-    e.kind === 'rate-limit-exceeded' ||
-    e.kind === 'capacity'
+    kinds.includes('transient') ||
+    kinds.includes('rate-limit') ||
+    kinds.includes('rate-limit-exceeded') ||
+    kinds.includes('capacity')
   ) {
     return true;
+  }
+  if (
+    kinds.includes('unauthorized') ||
+    kinds.includes('invalid-request') ||
+    kinds.includes('context-length') ||
+    kinds.includes('content-filter')
+  ) {
+    return false;
   }
   if (typeof e.status === 'number' && e.status === 429) return true;
   if (typeof e.status === 'number' && e.status >= 500 && e.status < 600) return true;

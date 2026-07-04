@@ -1,8 +1,9 @@
 /**
- * `vercelAdapter` multimodal pass-through coverage. Image / audio /
- * file content parts in `Message.content` arrays must be forwarded to
- * the AI SDK byte-equal — the adapter is a thin translator and the
- * underlying SDK is responsible for the wire-shape.
+ * `vercelAdapter` multimodal conversion coverage. Image parts keep the
+ * SDK's `image` part shape (with `mediaType` added); audio and file
+ * parts ride as AI SDK `file` parts carrying `data` + `mediaType`
+ * (the SDK has no dedicated audio user part). Payload bytes must be
+ * forwarded by reference, never copied or re-encoded.
  */
 import type { Message, UserMessage } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
@@ -64,7 +65,7 @@ describe('vercelAdapter — multimodal content pass-through', () => {
     expect(parts[1]?.mimeType).toBe('image/jpeg');
   });
 
-  it('forwards audio content parts unchanged', async () => {
+  it('converts audio content parts to AI SDK file parts (bytes by reference)', async () => {
     const capture: { lastArgs?: Record<string, unknown> } = {};
     const adapter = vercelAdapter(MODEL, { runtimeOverrides: makeOverrides(capture) });
     const audioBytes = new Uint8Array([0x52, 0x49, 0x46, 0x46]);
@@ -76,15 +77,19 @@ describe('vercelAdapter — multimodal content pass-through', () => {
     const forwarded = capture.lastArgs?.messages as ReadonlyArray<Message> | undefined;
     const parts = (forwarded?.[0] as UserMessage).content as ReadonlyArray<{
       type: string;
-      audio?: Uint8Array;
+      data?: Uint8Array;
+      mediaType?: string;
       mimeType?: string;
     }>;
-    expect(parts[0]?.type).toBe('audio');
-    expect(parts[0]?.audio).toBe(audioBytes);
+    // The AI SDK has no dedicated audio user part — audio rides as a
+    // `file` part with `data` + `mediaType` (+ v4's `mimeType`).
+    expect(parts[0]?.type).toBe('file');
+    expect(parts[0]?.data).toBe(audioBytes);
+    expect(parts[0]?.mediaType).toBe('audio/wav');
     expect(parts[0]?.mimeType).toBe('audio/wav');
   });
 
-  it('forwards file content parts (e.g. PDF) unchanged', async () => {
+  it('converts file content parts (e.g. PDF) to AI SDK file parts', async () => {
     const capture: { lastArgs?: Record<string, unknown> } = {};
     const adapter = vercelAdapter(MODEL, { runtimeOverrides: makeOverrides(capture) });
     const fileBytes = new Uint8Array([0x25, 0x50, 0x44, 0x46]);
@@ -103,12 +108,15 @@ describe('vercelAdapter — multimodal content pass-through', () => {
     const forwarded = capture.lastArgs?.messages as ReadonlyArray<Message> | undefined;
     const parts = (forwarded?.[0] as UserMessage).content as ReadonlyArray<{
       type: string;
-      file?: Uint8Array;
+      data?: Uint8Array;
+      mediaType?: string;
       mimeType?: string;
       filename?: string;
     }>;
     expect(parts[0]?.type).toBe('file');
-    expect(parts[0]?.file).toBe(fileBytes);
+    // The SDK's file part carries the payload under `data`.
+    expect(parts[0]?.data).toBe(fileBytes);
+    expect(parts[0]?.mediaType).toBe('application/pdf');
     expect(parts[0]?.mimeType).toBe('application/pdf');
     expect(parts[0]?.filename).toBe('doc.pdf');
   });

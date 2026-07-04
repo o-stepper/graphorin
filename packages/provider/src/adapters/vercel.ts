@@ -5,6 +5,13 @@
  * maps the resulting events onto the canonical
  * {@link import('@graphorin/core').ProviderEvent} discriminated union.
  *
+ * Outbound, the adapter converts Graphorin messages / tools onto the
+ * AI SDK call contract (see `vercel-messages.ts`): tool definitions
+ * become a name-keyed record with `jsonSchema()`-shaped input schemas,
+ * assistant `toolCalls` become `tool-call` content parts, and
+ * `ToolMessage`s become `tool-result` messages — the SDK zod-validates
+ * all of these and rejects the raw Graphorin shapes.
+ *
  * The AI SDK is an **optional peer dependency** of `@graphorin/provider`.
  * Production callers leave `runtimeOverrides` unset and the adapter
  * dynamically imports the package on first use; test fixtures pass a
@@ -18,7 +25,6 @@
 
 import type {
   FinishReason,
-  Message,
   Provider,
   ProviderCapabilities,
   ProviderEvent,
@@ -31,6 +37,7 @@ import { ProviderHttpError, ProviderStreamParseError } from '../errors/errors.js
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { inferReasoningContract } from '../reasoning/classify-contract.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
+import { toAiSdkPrompt, toAiSdkToolChoice, toAiSdkTools } from './vercel-messages.js';
 
 /**
  * Structural shape the adapter expects from the AI SDK language model
@@ -76,7 +83,8 @@ export interface AISDKChunk {
 export interface VercelRuntimeOverrides {
   readonly streamText: (args: {
     model: LanguageModelLike;
-    messages: ReadonlyArray<Message>;
+    /** AI SDK `ModelMessage`-shaped values (converted, NOT Graphorin `Message`s). */
+    messages: ReadonlyArray<Readonly<Record<string, unknown>>>;
     system?: string;
     tools?: unknown;
     toolChoice?: unknown;
@@ -89,7 +97,8 @@ export interface VercelRuntimeOverrides {
   };
   readonly generateText: (args: {
     model: LanguageModelLike;
-    messages: ReadonlyArray<Message>;
+    /** AI SDK `ModelMessage`-shaped values (converted, NOT Graphorin `Message`s). */
+    messages: ReadonlyArray<Readonly<Record<string, unknown>>>;
     system?: string;
     tools?: unknown;
     toolChoice?: unknown;
@@ -152,10 +161,10 @@ const DEFAULT_CAPABILITIES: Omit<ProviderCapabilities, 'reasoningContract'> = {
 
 /**
  * Wrap a Vercel AI SDK language-model value in a Graphorin
- * {@link Provider}. The adapter passes Graphorin `Message`s through
- * directly — both formats use the same role + content discriminated
- * shape — and translates the streaming chunks emitted by the AI SDK
- * onto Graphorin `ProviderEvent`s.
+ * {@link Provider}. Outbound requests are converted onto the AI SDK
+ * call contract (name-keyed tools, `tool-call` / `tool-result` content
+ * parts — see `vercel-messages.ts`); the streaming chunks emitted by
+ * the AI SDK are translated back onto Graphorin `ProviderEvent`s.
  *
  * The adapter auto-detects the model's
  * {@link import('@graphorin/core').ReasoningContract} from its
@@ -209,11 +218,13 @@ async function* streamFromVercel(
     const result = sdk.streamText(callArgs);
     stream = result.fullStream;
   } catch (cause) {
+    const headers = headersFromCause(cause);
     throw new ProviderHttpError({
       providerName,
       status: statusFromCause(cause),
       message: 'streamText() failed before yielding any chunks',
       cause,
+      ...(headers !== undefined ? { headers } : {}),
     });
   }
 
@@ -344,11 +355,13 @@ async function generateFromVercel(
   try {
     result = await sdk.generateText(callArgs);
   } catch (cause) {
+    const headers = headersFromCause(cause);
     throw new ProviderHttpError({
       providerName,
       status: statusFromCause(cause),
       message: 'generateText() rejected',
       cause,
+      ...(headers !== undefined ? { headers } : {}),
     });
   }
   const usage = mapUsage(result.usage) ?? {
@@ -386,12 +399,18 @@ function applyRequestPreflight(
 }
 
 function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
+  const prompt = toAiSdkPrompt(req.messages);
+  // System-role transcript messages are hoisted here — the SDK rejects
+  // them inside `messages`. The request-level systemMessage leads.
+  const system = [req.systemMessage, prompt.system]
+    .filter((s): s is string => s !== undefined && s.length > 0)
+    .join('\n\n');
   return {
     model,
-    messages: req.messages,
-    ...(req.systemMessage !== undefined ? { system: req.systemMessage } : {}),
-    ...(req.tools !== undefined ? { tools: req.tools } : {}),
-    ...(req.toolChoice !== undefined ? { toolChoice: req.toolChoice } : {}),
+    messages: prompt.messages,
+    ...(system.length > 0 ? { system } : {}),
+    ...(req.tools !== undefined && req.tools.length > 0 ? { tools: toAiSdkTools(req.tools) } : {}),
+    ...(req.toolChoice !== undefined ? { toolChoice: toAiSdkToolChoice(req.toolChoice) } : {}),
     ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
     // v4 reads `maxTokens`; v7 renamed it `maxOutputTokens` — send both
     // so the cap is honoured against either peer (PS-6).
@@ -442,6 +461,29 @@ function statusFromCause(cause: unknown): number {
     if (typeof c.status === 'number' && Number.isFinite(c.status)) return c.status;
   }
   return 0;
+}
+
+/**
+ * Lift backoff-relevant response headers from a rejected AI SDK call.
+ * `APICallError` carries `responseHeaders: Record<string, string>`;
+ * forwarding `retry-after` / `x-ratelimit-*` lets `withRetry` honour
+ * server-provided delays on 429s.
+ */
+function headersFromCause(cause: unknown): Readonly<Record<string, string>> | undefined {
+  if (cause === null || typeof cause !== 'object') return undefined;
+  const raw = (cause as { responseHeaders?: unknown }).responseHeaders;
+  if (raw === null || typeof raw !== 'object') return undefined;
+  const picked: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
+    const lower = key.toLowerCase();
+    if (
+      (lower === 'retry-after' || lower.startsWith('x-ratelimit-')) &&
+      typeof value === 'string'
+    ) {
+      picked[lower] = value;
+    }
+  }
+  return Object.keys(picked).length > 0 ? picked : undefined;
 }
 
 function mapFinishReason(value: string | undefined): FinishReason {

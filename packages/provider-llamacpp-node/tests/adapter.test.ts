@@ -131,7 +131,27 @@ describe('llamaCppNodeAdapter — stream()', () => {
     expect(capturedSystem).toBe('sys');
   });
 
-  it('halts the stream when AbortSignal is aborted mid-stream', async () => {
+  it('does NOT render the system prompt into the prompt text (core-provider-08)', async () => {
+    // The session already carries `systemPrompt` via its chat template;
+    // rendering it again showed the model the system prompt twice.
+    let capturedPrompt: string | undefined;
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: async () => ({
+        async *promptStreamingResponse(prompt: string): AsyncIterable<string> {
+          capturedPrompt = prompt;
+          yield 'ok';
+        },
+      }),
+    });
+    await consume(provider.stream({ ...REQ, systemMessage: 'SECRET-SYSTEM-LINE' }));
+    expect(capturedPrompt).toBeDefined();
+    expect(capturedPrompt).not.toContain('SECRET-SYSTEM-LINE');
+    expect(capturedPrompt).toContain('[user] hi');
+  });
+
+  it("halts the stream when AbortSignal is aborted mid-stream and reports 'aborted' (PS-12)", async () => {
     const ac = new AbortController();
     const provider = llamaCppNodeAdapter({
       modelPath: '/tmp/fixture.gguf',
@@ -147,7 +167,46 @@ describe('llamaCppNodeAdapter — stream()', () => {
     const events = await consume(provider.stream({ ...REQ, signal: ac.signal }));
     const deltas = events.filter((e) => e.type === 'text-delta');
     expect(deltas.length).toBeLessThanOrEqual(2);
-    expect(events.at(-1)?.type).toBe('finish');
+    const finish = events.at(-1);
+    expect(finish?.type).toBe('finish');
+    // core-provider-08: an aborted stream must not masquerade as a clean
+    // 'stop' — middleware and cost accounting key on the honest reason.
+    if (finish?.type === 'finish') expect(finish.finishReason).toBe('aborted');
+  });
+
+  it('disposes the session (context + sequence) after every stream (core-provider-08)', async () => {
+    let disposed = 0;
+    const provider = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: async () => ({
+        async *promptStreamingResponse(): AsyncIterable<string> {
+          yield 'hi';
+        },
+        dispose() {
+          disposed++;
+        },
+      }),
+    });
+    await consume(provider.stream(REQ));
+    expect(disposed).toBe(1);
+    // The error path must release the context too.
+    let disposedOnError = 0;
+    const failing = llamaCppNodeAdapter({
+      modelPath: '/tmp/fixture.gguf',
+      modelOverride: fixtureModel(),
+      sessionFactory: async () => ({
+        // biome-ignore lint/correctness/useYield: deliberate error-path fixture; the throw runs before any yield.
+        async *promptStreamingResponse(): AsyncIterable<string> {
+          throw new Error('boom');
+        },
+        dispose() {
+          disposedOnError++;
+        },
+      }),
+    });
+    await consume(failing.stream(REQ));
+    expect(disposedOnError).toBe(1);
   });
 
   it('emits an error event when the session throws', async () => {

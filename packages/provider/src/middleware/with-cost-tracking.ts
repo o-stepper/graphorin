@@ -167,10 +167,14 @@ function emitUsage(
   if (opts.onUsage === undefined) return;
   const usage = result.usage;
   const price = opts.priceLookup?.({ providerName: next.name, modelId: next.modelId }) ?? null;
+  // Reasoning tokens are billed at the output rate (the PS-19 contract
+  // in @graphorin/pricing) — providers that report them separately from
+  // completionTokens must not get them for free.
   const costUsd =
     price !== null
       ? (usage.promptTokens * (price.inputPerMtok ?? 0)) / 1_000_000 +
-        (usage.completionTokens * (price.outputPerMtok ?? 0)) / 1_000_000
+        ((usage.completionTokens + (usage.reasoningTokens ?? 0)) * (price.outputPerMtok ?? 0)) /
+          1_000_000
       : (usage.cost?.amount ?? 0);
   opts.onUsage({
     providerName: next.name,

@@ -114,9 +114,30 @@ function defaultShouldFallback(err: unknown): boolean {
   // An aborted request must not trigger a fallback, even as a `status: 0`
   // network error (PS-2). The loop also short-circuits on `req.signal?.aborted`.
   if (isAbortError(err)) return false;
-  const e = err as { kind?: string; status?: number };
-  if (e.kind === 'unauthorized' || e.kind === 'invalid-request') return false;
-  if (e.kind === 'transient' || e.kind === 'rate-limit' || e.kind === 'capacity') return true;
+  const e = err as { kind?: string; errorKind?: string; status?: number };
+  // `ProviderHttpError.kind` is always 'provider-http' (stable discriminant);
+  // the mapped canonical kind rides on `errorKind`. Consult both so a 429
+  // fails over as a rate limit and a 400/context overflow never does.
+  const kinds = [e.kind, e.errorKind];
+  if (
+    kinds.includes('unauthorized') ||
+    kinds.includes('invalid-request') ||
+    kinds.includes('context-length') ||
+    kinds.includes('content-filter')
+  ) {
+    return false;
+  }
+  if (
+    kinds.includes('transient') ||
+    kinds.includes('rate-limit') ||
+    kinds.includes('rate-limit-exceeded') ||
+    kinds.includes('capacity')
+  ) {
+    return true;
+  }
+  // A 429 on the primary is exactly the case a same-model fallback chain
+  // exists for — the alternate deployment has its own rate budget.
+  if (typeof e.status === 'number' && e.status === 429) return true;
   if (typeof e.status === 'number' && e.status >= 500) return true;
   // PS-2: the headline fallback scenario — the primary provider is down
   // (a local server refusing connections) surfaces as `status: 0`. Treat a

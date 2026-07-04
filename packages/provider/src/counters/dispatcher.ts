@@ -42,17 +42,24 @@ export function detectProviderFamily(args: {
   readonly provider?: string;
 }): 'anthropic' | 'openai' | 'google' | 'bedrock' | 'ollama' | 'openai-compatible' | 'unknown' {
   const provider = args.provider?.toLowerCase();
-  const modelLower = args.model.toLowerCase();
+  // Strip the Bedrock cross-region inference-profile prefix
+  // (`us.anthropic.claude-…`) so region-qualified ids classify like
+  // their bare form (core-provider-11).
+  const modelLower = args.model.toLowerCase().replace(/^(?:us|eu|apac|jp|au|us-gov)\./, '');
+  // The AI SDK reports dotted provider ids ('anthropic.messages',
+  // 'amazon-bedrock.messages'), so match by prefix / substring.
+  const providerIsAnthropic = provider !== undefined && provider.startsWith('anthropic');
+  const providerIsBedrock = provider !== undefined && provider.includes('bedrock');
   if (
-    provider === 'anthropic' ||
+    providerIsAnthropic ||
     modelLower.startsWith('claude') ||
     modelLower.startsWith('anthropic.claude')
   ) {
-    if (provider === 'bedrock' || modelLower.startsWith('anthropic.claude')) return 'bedrock';
+    if (providerIsBedrock || modelLower.startsWith('anthropic.claude')) return 'bedrock';
     return 'anthropic';
   }
   if (provider === 'google' || modelLower.startsWith('gemini')) return 'google';
-  if (provider === 'bedrock') return 'bedrock';
+  if (providerIsBedrock) return 'bedrock';
   if (provider === 'openai' || provider === 'azure-openai' || /^(gpt-|o1|o3|o4)/.test(modelLower)) {
     return 'openai';
   }

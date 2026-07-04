@@ -698,10 +698,10 @@ importers:
       '@graphorin/observability':
         specifier: workspace:*
         version: link:../observability
-      ai:
-        specifier: ^7.0.0-beta.76
-        version: 7.0.0-canary.124(zod@3.25.76)
     devDependencies:
+      ai:
+        specifier: ^7.0.15
+        version: 7.0.15(zod@3.25.76)
       fast-check:
         specifier: ^3.23.0
         version: 3.23.2
@@ -978,21 +978,21 @@ importers:
 
 packages:
 
-  '@ai-sdk/gateway@4.0.0-canary.71':
-    resolution: {integrity: sha512-hfTEVfA1Mo31buFuxD0XH92qlzt9D/qidf/KBMKWHw/60o0ryQt1YRIuO7Qbjc9UhbSuGhDkpbl4UYfN3KMvIA==}
-    engines: {node: '>=18'}
+  '@ai-sdk/gateway@4.0.12':
+    resolution: {integrity: sha512-Y7Fy8xJwPz7ZC0DhSQG3HIVk+drup42hrIj6yqKlib3CxwiR0F7nYyUI8+kPrEtbZEoyKoRstvT4/o0HEyFBHA==}
+    engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@5.0.0-canary.33':
-    resolution: {integrity: sha512-HItKA4aktSxVg+AhMYmS/ZDwE2N4Leu9x9suaWhi024dkdBS5hER9ltWWtHpVjKvxBGD51R86dYtf/gJJLBsrw==}
-    engines: {node: '>=18'}
+  '@ai-sdk/provider-utils@5.0.5':
+    resolution: {integrity: sha512-oI0t3dvCoqWNV1I8o1Rybi2DXDvHES5r/TrwtJW90tuFLVepgJlftPxrcjh8vaSvjqC2diTuA2vXyjKAyHJm4A==}
+    engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider@4.0.0-canary.16':
-    resolution: {integrity: sha512-IJKj5cOfRNbc1+rBIdyqFbsd4tjWY3wrM3y2D2YdZCHLi6qpS2yLN0P+ajEPCEnto6iZFWQHk28iRMwgvFSJRg==}
-    engines: {node: '>=18'}
+  '@ai-sdk/provider@4.0.2':
+    resolution: {integrity: sha512-pfPoy9J1B1xV7cqJ8MYHOsDYrMv5tR3+EMNfI249OhkD2uRakvav3Fo7XpD2luuN/YNCBY7KfEQc7vEV7KEtyw==}
+    engines: {node: '>=22'}
 
   '@algolia/abtesting@1.18.1':
     resolution: {integrity: sha512-aehCadlWOGvrT91KUIZpC0MbB8KBW9yUuvTJFd2xesR7le/IsT4nJUnjCCZ4ZqZCeTcPHPV5mo//fZ5oxcSVYw==}
@@ -3272,9 +3272,9 @@ packages:
     resolution: {integrity: sha512-+Ut8d9LLqwEvHHJl1+PIHqoyDxFgVN847JTVM3Izi3xHDWPE4UtzzXysMZQs64DMcrJfBeS/uoEP4AD3HQHnQQ==}
     engines: {node: '>=12.0'}
 
-  ai@7.0.0-canary.124:
-    resolution: {integrity: sha512-yocnPrewEjLeZqFZQUfqplDuSxNOEFY9cEwt74qizhN8sGNAmfRJ2RgfJvqd3OiS19IsubUqKKqvFDpAF0V7QQ==}
-    engines: {node: '>=18'}
+  ai@7.0.15:
+    resolution: {integrity: sha512-7406MUy9O5sIhwOgxEWuoj+td3XUGgG96SBt6pmBU4t4sQ2fpnDx5UnHaXT2HUTXl5GorbWz/MfCrSPRz0QJqw==}
+    engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
@@ -5872,22 +5872,22 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/gateway@4.0.0-canary.71(zod@3.25.76)':
+  '@ai-sdk/gateway@4.0.12(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider': 4.0.0-canary.16
-      '@ai-sdk/provider-utils': 5.0.0-canary.33(zod@3.25.76)
+      '@ai-sdk/provider': 4.0.2
+      '@ai-sdk/provider-utils': 5.0.5(zod@3.25.76)
       '@vercel/oidc': 3.2.0
       zod: 3.25.76
 
-  '@ai-sdk/provider-utils@5.0.0-canary.33(zod@3.25.76)':
+  '@ai-sdk/provider-utils@5.0.5(zod@3.25.76)':
     dependencies:
-      '@ai-sdk/provider': 4.0.0-canary.16
+      '@ai-sdk/provider': 4.0.2
       '@standard-schema/spec': 1.1.0
       '@workflow/serde': 4.1.0
       eventsource-parser: 3.0.8
       zod: 3.25.76
 
-  '@ai-sdk/provider@4.0.0-canary.16':
+  '@ai-sdk/provider@4.0.2':
     dependencies:
       json-schema: 0.4.0
 
@@ -8029,11 +8029,11 @@ snapshots:
 
   adm-zip@0.5.17: {}
 
-  ai@7.0.0-canary.124(zod@3.25.76):
+  ai@7.0.15(zod@3.25.76):
     dependencies:
-      '@ai-sdk/gateway': 4.0.0-canary.71(zod@3.25.76)
-      '@ai-sdk/provider': 4.0.0-canary.16
-      '@ai-sdk/provider-utils': 5.0.0-canary.33(zod@3.25.76)
+      '@ai-sdk/gateway': 4.0.12(zod@3.25.76)
+      '@ai-sdk/provider': 4.0.2
+      '@ai-sdk/provider-utils': 5.0.5(zod@3.25.76)
       zod: 3.25.76
 
   ajv-formats@3.0.1(ajv@8.20.0):

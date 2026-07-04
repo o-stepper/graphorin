@@ -52,6 +52,22 @@ describe('detectProviderFamily', () => {
   it('returns unknown for the residual', () => {
     expect(detectProviderFamily({ model: 'mystery-model' })).toBe('unknown');
   });
+
+  it('detects bedrock from cross-region inference-profile ids (core-provider-11)', () => {
+    expect(detectProviderFamily({ model: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0' })).toBe(
+      'bedrock',
+    );
+    expect(detectProviderFamily({ model: 'eu.anthropic.claude-haiku-4-5-v1:0' })).toBe('bedrock');
+  });
+
+  it("detects anthropic / bedrock from the AI SDK's dotted provider ids (core-provider-11)", () => {
+    expect(detectProviderFamily({ model: 'alias', provider: 'anthropic.messages' })).toBe(
+      'anthropic',
+    );
+    expect(detectProviderFamily({ model: 'alias', provider: 'amazon-bedrock.messages' })).toBe(
+      'bedrock',
+    );
+  });
 });
 
 describe('createDefaultCounter', () => {

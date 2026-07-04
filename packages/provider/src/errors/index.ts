@@ -6,6 +6,7 @@
 
 export {
   CostBudgetExceededError,
+  classifyHttpStatus,
   GraphorinProviderError,
   InvalidProviderError,
   LocalProviderInsecureTransportError,

@@ -189,4 +189,102 @@ describe('openAICompatibleAdapter', () => {
     expect(result.toolCalls?.[0]?.args).toBe('not-json');
     expect(result.finishReason).toBe('stop');
   });
+
+  // core-provider-09: without stream_options.include_usage, vanilla
+  // OpenAI-shaped servers (vLLM, Together, OpenAI proper) never emit the
+  // final usage chunk and streamed cost tracking silently zeroes.
+  it('streaming requests send stream_options.include_usage by default', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({ body: makeSseStream(['[DONE]']), capture }),
+      logger: () => {},
+    });
+    await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const body = JSON.parse(String(capture.init?.body)) as Record<string, unknown>;
+    expect(body.stream).toBe(true);
+    expect(body.stream_options).toEqual({ include_usage: true });
+  });
+
+  it('generate() (non-streaming) does NOT send stream_options', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({
+        jsonOnce: { choices: [{ message: { content: 'x' }, finish_reason: 'stop' }] },
+        capture,
+      }),
+      logger: () => {},
+    });
+    await provider.generate({ messages: [{ role: 'user', content: 'hi' }] });
+    const body = JSON.parse(String(capture.init?.body)) as Record<string, unknown>;
+    expect(body.stream).toBe(false);
+    expect('stream_options' in body).toBe(false);
+  });
+
+  it('providerOptions can override stream_options for servers that reject the field', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({ body: makeSseStream(['[DONE]']), capture }),
+      logger: () => {},
+    });
+    await collect(
+      provider.stream({
+        messages: [{ role: 'user', content: 'hi' }],
+        providerOptions: { stream_options: undefined },
+      }),
+    );
+    const body = JSON.parse(String(capture.init?.body)) as Record<string, unknown>;
+    // JSON.stringify drops the undefined override — the field is gone.
+    expect('stream_options' in body).toBe(false);
+  });
+
+  // core-provider-10: the generic adapter previously pinned users to the
+  // 8k/4k defaults with no way to widen them or disable response_format.
+  it('forwards capability overrides (contextWindow, structuredOutput)', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'vllm-model',
+      baseUrl: 'http://127.0.0.1:8000',
+      capabilities: { contextWindow: 131_072, structuredOutput: false },
+      fetchImpl: makeFetchImpl({
+        jsonOnce: { choices: [{ message: { content: 'x' }, finish_reason: 'stop' }] },
+        capture,
+      }),
+      logger: () => {},
+    });
+    expect(provider.capabilities.contextWindow).toBe(131_072);
+    expect(provider.capabilities.structuredOutput).toBe(false);
+    // structuredOutput: false keeps response_format off the wire even
+    // for a structured outputType (the documented override).
+    await provider.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      outputType: { kind: 'structured', jsonSchema: { type: 'object' } },
+    });
+    const body = JSON.parse(String(capture.init?.body)) as Record<string, unknown>;
+    expect('response_format' in body).toBe(false);
+  });
+
+  it('forwards timeoutMs (a hung server rejects after the budget)', async () => {
+    const hangingFetch = ((_input: unknown, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () =>
+          reject(Object.assign(new Error('aborted'), { name: 'AbortError' })),
+        );
+      })) as unknown as typeof fetch;
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      timeoutMs: 25,
+      fetchImpl: hangingFetch,
+      logger: () => {},
+    });
+    await expect(
+      provider.generate({ messages: [{ role: 'user', content: 'hi' }] }),
+    ).rejects.toThrow(/timed out after 25ms/);
+  });
 });

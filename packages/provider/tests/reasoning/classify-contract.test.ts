@@ -45,6 +45,26 @@ describe('inferReasoningContract', () => {
     );
   });
 
+  it("recognises the AI SDK's dotted provider ids (core-provider-11)", () => {
+    // The AI SDK reports `model.provider` as 'anthropic.messages' /
+    // 'amazon-bedrock.messages', not the bare vendor name.
+    expect(
+      inferReasoningContract({ modelId: 'legacy-alias', provider: 'anthropic.messages' }),
+    ).toBe('round-trip-required');
+    expect(
+      inferReasoningContract({ modelId: 'legacy-alias', provider: 'amazon-bedrock.messages' }),
+    ).toBe('round-trip-required');
+  });
+
+  it('classifies Bedrock cross-region inference-profile ids (core-provider-11)', () => {
+    expect(
+      inferReasoningContract({ modelId: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0' }),
+    ).toBe('round-trip-required');
+    expect(inferReasoningContract({ modelId: 'eu.anthropic.claude-haiku-4-5-v1:0' })).toBe(
+      'round-trip-required',
+    );
+  });
+
   it('returns optional for empty / non-string modelId', () => {
     expect(inferReasoningContract({ modelId: '' })).toBe('optional');
     expect(inferReasoningContract({ modelId: undefined as unknown as string })).toBe('optional');

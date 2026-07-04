@@ -13,7 +13,7 @@
  * @packageDocumentation
  */
 
-import type { Provider, Sensitivity } from '@graphorin/core';
+import type { Provider, ProviderCapabilities, Sensitivity } from '@graphorin/core';
 
 import { buildOpenAIShapedProvider } from '../internal/openai-shaped.js';
 
@@ -43,6 +43,19 @@ export interface OpenAICompatibleAdapterOptions {
    * public host.
    */
   readonly allowInsecureTransport?: boolean;
+  /**
+   * Capability overrides merged on top of the adapter defaults
+   * (core-provider-10). Use them to widen `contextWindow` /
+   * `maxOutput` for large-context servers or to set
+   * `structuredOutput: false` for servers that reject
+   * `response_format`.
+   */
+  readonly capabilities?: Partial<ProviderCapabilities>;
+  /**
+   * Time-to-response budget per request (PS-24). Default 120s; `0`
+   * disables.
+   */
+  readonly timeoutMs?: number;
   /** Override for the default `acceptsSensitivity` value. */
   readonly acceptsSensitivity?: ReadonlyArray<Sensitivity>;
   /** Provider name attached to spans / log lines. */
@@ -71,6 +84,8 @@ export function openAICompatibleAdapter(options: OpenAICompatibleAdapterOptions)
     ...(options.allowInsecureTransport !== undefined
       ? { allowInsecureTransport: options.allowInsecureTransport }
       : {}),
+    ...(options.capabilities !== undefined ? { capabilities: options.capabilities } : {}),
+    ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
     ...(options.acceptsSensitivity !== undefined
       ? { acceptsSensitivity: options.acceptsSensitivity }
       : {}),

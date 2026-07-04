@@ -6,6 +6,8 @@
  * @packageDocumentation
  */
 
+import type { ProviderErrorKind } from '@graphorin/core';
+
 /**
  * Base class for every error thrown by `@graphorin/provider`. Consumers
  * narrow on the discriminant `kind` rather than `instanceof` — both
@@ -199,6 +201,44 @@ export const OllamaInsecureTransportError = LocalProviderInsecureTransportError;
 export type OllamaInsecureTransportError = LocalProviderInsecureTransportError;
 
 /**
+ * Body phrasings used by the major providers when the request blew the
+ * model's context window. Sniffed by {@link classifyHttpStatus} so a
+ * 400 that is really a context overflow surfaces as `'context-length'`
+ * (the kind the compaction / emergency tiers key on), not a generic
+ * `'invalid-request'`.
+ */
+const CONTEXT_LENGTH_BODY_RE =
+  /context[_ -]?length|context window|prompt is too long|maximum context|too many tokens|exceeds? the (?:model'?s? )?max/i;
+
+/**
+ * Map an HTTP status (plus optional error-body text) onto the
+ * canonical {@link import('@graphorin/core').ProviderErrorKind}. One
+ * shared table so `withRetry` / `withFallback` and consumers switching
+ * on the documented kinds see consistent values from every HTTP
+ * adapter:
+ *
+ * - `429` → `'rate-limit'`
+ * - `401` / `403` → `'unauthorized'`
+ * - `400` / `404` / `422` → `'invalid-request'` (or
+ *   `'context-length'` when the body says so)
+ * - `503` / `529` → `'capacity'` (529 is Anthropic's overloaded code)
+ * - other `5xx` and `0` (network failure) → `'transient'`
+ *
+ * @stable
+ */
+export function classifyHttpStatus(status: number, bodyText?: string): ProviderErrorKind {
+  if (status === 429) return 'rate-limit';
+  if (status === 401 || status === 403) return 'unauthorized';
+  if (status === 400 || status === 404 || status === 422) {
+    if (bodyText !== undefined && CONTEXT_LENGTH_BODY_RE.test(bodyText)) return 'context-length';
+    return 'invalid-request';
+  }
+  if (status === 503 || status === 529) return 'capacity';
+  if (status >= 500 || status === 0) return 'transient';
+  return 'unknown';
+}
+
+/**
  * Wrapped HTTP error returned by an adapter. Carries the original
  * status code so middleware (`withRetry`, `withFallback`) can decide
  * whether the error is retryable.
@@ -209,13 +249,35 @@ export class ProviderHttpError extends GraphorinProviderError {
   override readonly name = 'ProviderHttpError';
   readonly status: number;
   readonly providerName: string;
+  /**
+   * The canonical `ProviderErrorKind` mapped from the HTTP status via
+   * {@link classifyHttpStatus} (the `kind` field keeps its stable
+   * `'provider-http'` discriminant). Middleware predicates consult
+   * this so a 429 fails over / retries as a rate limit.
+   */
+  readonly errorKind: ProviderErrorKind;
+  /**
+   * Backoff-relevant response headers captured from the failed
+   * response (`retry-after`, `x-ratelimit-*`), lowercased.
+   * `withRetry`'s Retry-After hint reader consumes them.
+   */
+  readonly headers?: Readonly<Record<string, string>>;
 
-  constructor(args: { providerName: string; status: number; message: string; cause?: unknown }) {
+  constructor(args: {
+    providerName: string;
+    status: number;
+    message: string;
+    cause?: unknown;
+    errorKind?: ProviderErrorKind;
+    headers?: Readonly<Record<string, string>>;
+  }) {
     super('provider-http', `[${args.providerName}] HTTP ${args.status}: ${args.message}`, {
       ...(args.cause !== undefined ? { cause: args.cause } : {}),
     });
     this.providerName = args.providerName;
     this.status = args.status;
+    this.errorKind = args.errorKind ?? classifyHttpStatus(args.status, args.message);
+    if (args.headers !== undefined) this.headers = args.headers;
   }
 }
 
