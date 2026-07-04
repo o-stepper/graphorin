@@ -59,6 +59,19 @@ interface TrackedSpan {
   readonly sourceKind: string;
 }
 
+/** Cap on persisted span-tile hashes (C6). */
+const MAX_PERSISTED_TILE_HASHES = 8192;
+
+/** FNV-1a 32-bit over a string, hex-encoded — one-way, cheap, stable. */
+function fnv1a32(text: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
 /**
  * Create a run-scoped {@link TaintLedger}.
  *
@@ -111,6 +124,9 @@ export function createTaintLedger(opts?: {
   let untrustedSeen = opts?.initial?.untrustedSeen ?? false;
   let sensitiveSeen = opts?.initial?.sensitiveSeen ?? false;
   const untrustedSourceKinds = new Set<string>(opts?.initial?.untrustedSourceKinds ?? []);
+  // C6: hashed span tiles from a prior run leg — re-arms the verbatim
+  // probe for pre-suspend content without ever persisting untrusted text.
+  const rehydratedTiles = new Set<string>(opts?.initial?.spanTileHashes ?? []);
   const piiSensitivity = opts?.piiSensitivity;
   const spans: TrackedSpan[] = [];
   let trackedChars = 0;
@@ -143,10 +159,26 @@ export function createTaintLedger(opts?: {
       }
     },
 
+    recordAssistantOutput(text: string): void {
+      // C6: only meaningful once the run is tainted — an untainted run's
+      // model output derives from trusted context only.
+      if (!untrustedSeen) return;
+      const normalized = normalize(text);
+      if (normalized.length < minSpanLength) return;
+      const bounded =
+        normalized.length > maxTrackedChars ? normalized.slice(0, maxTrackedChars) : normalized;
+      spans.push({ text: bounded, sourceKind: 'llm-derived' });
+      trackedChars += bounded.length;
+      while (trackedChars > maxTrackedChars && spans.length > 1) {
+        const evicted = spans.shift();
+        if (evicted !== undefined) trackedChars -= evicted.text.length;
+      }
+    },
+
     inspectArgs(argsText: string): ArgsTaintProbe {
       const argsNorm = normalize(argsText);
       const window = Math.min(minSpanLength, argsNorm.length);
-      if (window < MIN_TRUSTWORTHY_WINDOW || spans.length === 0) {
+      if (window < MIN_TRUSTWORTHY_WINDOW || (spans.length === 0 && rehydratedTiles.size === 0)) {
         return { carriesUntrustedVerbatim: false, matchedSourceKinds: [] };
       }
       const argGrams = shingles(argsNorm, window);
@@ -156,6 +188,16 @@ export function createTaintLedger(opts?: {
       const matched = new Set<string>();
       for (const span of spans) {
         if (sharesAnyGram(span.text, argGrams, window)) matched.add(span.sourceKind);
+      }
+      // C6: probe the rehydrated (hashed) tiles from before a resume. Only
+      // valid at the canonical window (tiles were cut at minSpanLength).
+      if (matched.size === 0 && rehydratedTiles.size > 0 && window === minSpanLength) {
+        for (const gram of argGrams) {
+          if (rehydratedTiles.has(fnv1a32(gram))) {
+            matched.add('resumed-untrusted');
+            break;
+          }
+        }
       }
       return {
         carriesUntrustedVerbatim: matched.size > 0,
@@ -174,11 +216,26 @@ export function createTaintLedger(opts?: {
     },
 
     snapshot(): TaintLedgerSnapshot {
-      // Coarse flags only — never the tracked spans (untrusted text).
+      // Coarse flags plus ONE-WAY tile hashes — never the tracked spans
+      // themselves (untrusted text is not persisted; hashes cannot be
+      // inverted and carry no content).
+      const tiles: string[] = [];
+      outer: for (const span of spans) {
+        for (let i = 0; i + minSpanLength <= span.text.length; i += minSpanLength) {
+          tiles.push(fnv1a32(span.text.slice(i, i + minSpanLength)));
+          if (tiles.length >= MAX_PERSISTED_TILE_HASHES) break outer;
+        }
+      }
+      // Carry forward tiles rehydrated from an earlier leg too.
+      for (const tile of rehydratedTiles) {
+        if (tiles.length >= MAX_PERSISTED_TILE_HASHES) break;
+        tiles.push(tile);
+      }
       return {
         untrustedSeen,
         sensitiveSeen,
         untrustedSourceKinds: [...untrustedSourceKinds],
+        ...(tiles.length > 0 ? { spanTileHashes: tiles } : {}),
       };
     },
   };

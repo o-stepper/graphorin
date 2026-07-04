@@ -336,12 +336,16 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
   let taintSummary: RunTaintSummary | undefined;
   if (isRecord(payload.taintSummary)) {
     const ts = payload.taintSummary;
+    const tileHashes = Array.isArray(ts.spanTileHashes)
+      ? ts.spanTileHashes.filter((h): h is string => typeof h === 'string')
+      : undefined;
     taintSummary = {
       untrustedSeen: ts.untrustedSeen === true,
       sensitiveSeen: ts.sensitiveSeen === true,
       untrustedSourceKinds: Array.isArray(ts.untrustedSourceKinds)
         ? ts.untrustedSourceKinds.filter((k): k is string => typeof k === 'string')
         : [],
+      ...(tileHashes !== undefined && tileHashes.length > 0 ? { spanTileHashes: tileHashes } : {}),
     };
   }
   const promotedTools = Array.isArray(payload.promotedTools)

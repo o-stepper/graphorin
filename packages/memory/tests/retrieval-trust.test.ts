@@ -168,3 +168,18 @@ describe('C5 — extraction decontextualization contract', () => {
     expect(extraction).toContain('resolve pronouns');
   });
 });
+
+describe('C6 — recallTaint override on recall tools', () => {
+  it('marks the result untrusted when any hit is quarantined or foreign', async () => {
+    const { recallTaint } = await import('../src/tools/taint.js');
+    expect(recallTaint([{ provenance: 'user', status: 'active' }])).toBeUndefined();
+    expect(recallTaint([{ provenance: 'imported', status: 'active' }])).toEqual({
+      untrusted: true,
+      sourceKind: 'memory-recall',
+    });
+    expect(recallTaint([{ provenance: 'user', status: 'quarantined' }])).toEqual({
+      untrusted: true,
+      sourceKind: 'memory-recall',
+    });
+  });
+});

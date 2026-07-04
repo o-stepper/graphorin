@@ -128,6 +128,13 @@ export interface RunTaintSummary {
   readonly untrustedSeen: boolean;
   readonly sensitiveSeen: boolean;
   readonly untrustedSourceKinds: ReadonlyArray<string>;
+  /**
+   * C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms
+   * the verbatim-carry probe after a resume at tile granularity. Hashes
+   * only — no untrusted text is ever persisted (the invariant above
+   * holds).
+   */
+  readonly spanTileHashes?: ReadonlyArray<string>;
 }
 
 /**

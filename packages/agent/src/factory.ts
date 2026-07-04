@@ -2388,6 +2388,17 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         messages.push(assistant);
         state.messages.push(assistant);
 
+        // C6: once the run is tainted, the model's own TEXT output is
+        // derived from untrusted context — record it so a later sink call
+        // copying the model's phrasing still trips the verbatim probe
+        // (no-op on untainted runs). Tool-call args are deliberately NOT
+        // recorded: the sink gate inspects those same args next, and
+        // recording them first would self-match every post-taint call,
+        // collapsing the precise verbatim signal into the coarse one.
+        if (toolDataFlowGuard !== undefined && textBuffer.length > 0 && !leakBlocked) {
+          toolDataFlowGuard.recordAssistant(state.id, textBuffer);
+        }
+
         if (leakCheck?.leakDetected === true) {
           const sha = sha256Hex(textBuffer);
           yield {

@@ -1,6 +1,7 @@
 import type { Tool } from '@graphorin/core';
 import { tool } from '@graphorin/tools';
 import { z } from 'zod';
+import { recallTaint } from './taint.js';
 import type { MemoryToolDeps } from './types.js';
 
 const recallEpisodesInputSchema = z.object({
@@ -116,7 +117,7 @@ export function createRecallEpisodesTool(
         ...(dateRange !== undefined ? { dateRange } : {}),
         signal: ctx.signal,
       });
-      return {
+      const output = {
         episodes: hits.map((hit) => ({
           episodeId: hit.record.id,
           summary: hit.record.summary,
@@ -129,6 +130,10 @@ export function createRecallEpisodesTool(
           ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
         })),
       };
+      // C6: recalled foreign-provenance / quarantined episodes re-arm the
+      // taint ledger (the cross-session poisoning leg).
+      const taint = recallTaint(hits.map((h) => h.record));
+      return taint === undefined ? output : { output, taint };
     },
   });
 }
@@ -211,7 +216,7 @@ export function createDeepRecallTool(
         forceHard: true,
         signal: ctx.signal,
       });
-      return {
+      const output = {
         hits: result.hits.map((hit) => ({
           factId: hit.record.id,
           text: hit.record.text,
@@ -229,6 +234,9 @@ export function createDeepRecallTool(
         graded: result.graded,
         iterations: result.iterations,
       };
+      // C6: mirror fact_search — recalled poisoned content re-arms the ledger.
+      const taint = recallTaint(result.hits.map((h) => h.record));
+      return taint === undefined ? output : { output, taint };
     },
   });
 }

@@ -157,11 +157,12 @@ flowchart LR
 
 The engine is pure — no I/O, no clock, no network: `deriveTaintLabel(...)` turns a tool's registration metadata into a `TaintLabel`, a per-run `createTaintLedger()` records every output's provenance, and `createDataFlowPolicy({ mode })` returns a verdict for each candidate **sink** (a `side-effecting` / `external-stateful` tool). Untrusted output is tagged from the trust class (`mcp-derived` / `web-search` / `skill-untrusted`); secret-tier output from `sensitivity: 'secret'` only (treating the default `'internal'` tier as sensitive would trip the gate on nearly every run).
 
-A sink trips the policy on either of two signals:
+A sink trips the policy on any of three signals:
 
 | Signal | Fires when | Precision |
 |---|---|---|
 | `untrusted-to-sink` | a verbatim span of untrusted content appears in the sink's arguments | precise — direct exfiltration |
+| `derived-untrusted-to-sink` | (`derivedTaint: 'strict'`, opt-in) ANY sink fires after untrusted content entered the run — CaMeL-style control-flow integrity, paraphrase-robust by construction | deliberately coarse — size it in shadow mode first |
 | `lethal-trifecta` | the sink fires while **both** untrusted **and** secret-tier data have entered the run, even without a provable verbatim carry | conservative — disable with `guardTrifecta: false` |
 
 Three modes (`DataFlowMode`):
@@ -172,7 +173,15 @@ Three modes (`DataFlowMode`):
 | `'shadow'` | Audit-only: a tripped flow emits a `tool:dataflow:flagged` row + counter but never blocks. **Ship this first** to surface false positives against real traffic. |
 | `'enforce'` | A tripped flow **blocks** the sink (the call yields a `dataflow_policy_blocked` error, surfaced as `tool.execute.error`) unless the sink's name is in `declassifySinks` — the explicit, audited operator escape hatch (`tool:dataflow:declassified`). |
 
-Findings are **metadata-only** — they name the flow kind and the implicated source kinds, never the raw argument or output bytes. Taint is tracked in-memory per run (not persisted across suspend/resume), and verbatim detection is best-effort (it catches verbatim / near-verbatim forwarding, not paraphrase — which is what the trifecta signal covers). The policy **composes with code-mode**: each in-script tool call runs through the same sink gate, so an injection cannot exfiltrate through a sandbox either.
+Findings are **metadata-only** — they name the flow kind and the implicated source kinds, never the raw argument or output bytes. Verbatim detection is best-effort (it catches verbatim / near-verbatim forwarding; paraphrase is what `derivedTaint: 'strict'` and the trifecta signal cover). The policy **composes with code-mode**: each in-script tool call runs through the same sink gate, so an injection cannot exfiltrate through a sandbox either.
+
+Three additional propagation legs close gaps the run-local shingle probe cannot see:
+
+- **Model output** — once a run is tainted, the agent records each step's assistant text as derived-untrusted (`llm-derived`), so a later sink call copying the model's own phrasing still trips the verbatim probe.
+- **Memory recall** — the recall tools (`fact_search`, `deep_recall`, `recall_episodes`) attach a taint override when any returned item is quarantined or foreign-provenance, so poisoned memory written in an earlier session re-arms the ledger at recall (the cross-session MINJA leg). Overrides only ever WIDEN a label; nothing can launder an untrusted tool's output.
+- **Suspend/resume** — the persisted `RunState.taintSummary` now carries one-way FNV-1a hashes of the tracked spans' tiles alongside the coarse flags, so a resumed run re-detects verbatim copies of pre-suspend untrusted content (at tile granularity) without any untrusted text ever being persisted.
+
+**Pattern catalogues are signal, not gates.** The injection/PII regex catalogues (guardrails, the memory quarantine heuristics, the imperative-pattern strip) now share a Unicode pre-pass (`normalizeForMatching`: NFKC + zero-width strip) so cheap character-injection — zero-width splits, fullwidth homoglyphs — no longer slips past them. They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate — memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
 
 Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` — see the [agent runtime guide](/guide/agent-runtime#provenance-data-flow-policy-dataflowpolicy) for the full configuration and event details.
 

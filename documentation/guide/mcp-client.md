@@ -220,6 +220,9 @@ Two call-level knobs complete the picture: `callTool(name, args, { signal, timeo
 
 ## Definition pinning and `list_changed`
 
+**Durable trust-on-first-use (`pinStore`).** Pass `toTools({ pinStore })` — any `{ get(serverId), set(serverId, fingerprints) }` store (a JSON file, a SQLite table) — and the client records each server's definition fingerprints on first sight (`mcp.tools.pins-recorded.total`) and compares on every later call. With a store present, a mismatch **rejects by default** (`MCPToolPinningError` — a persisted first approval is an explicit trust decision; pass `onPinMismatch: 'warn'` to downgrade). Explicit `pinnedFingerprints` win over the store. Tool descriptions additionally run through the injection heuristics at registration; hits are stripped AND counted (`mcp.tool-description.injection-flagged.total`) so a poisoning server is visible, not silently laundered.
+
+
 Tool definitions are a poisoning surface: a server can change a tool's description or schema behind an already-approved name (the **approve-then-swap rug-pull**). The client makes this visible (MC-6):
 
 - Every adapted tool carries a stable sha256 **`__definitionHash`** (over name + description + input/output schema + title, key-sorted). Persist it alongside your approval record.

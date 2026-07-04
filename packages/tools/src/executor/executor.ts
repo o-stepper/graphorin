@@ -237,6 +237,16 @@ export interface DataFlowInspectInput {
 export interface DataFlowRecordInput {
   readonly toolName: string;
   readonly trustClass: ToolTrustClass;
+  /**
+   * C6: per-result taint override from the tool's ToolReturn envelope.
+   * Flags only ever WIDEN the derived label (guards must never let an
+   * override downgrade an untrusted tool's output).
+   */
+  readonly taintOverride?: {
+    readonly untrusted?: boolean;
+    readonly sensitive?: boolean;
+    readonly sourceKind?: string;
+  };
   readonly sensitivity?: Sensitivity;
   readonly source?: ToolSource;
   /** The (sanitized) output text the model will see. */
@@ -1419,6 +1429,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         ...(effectiveSensitivity !== undefined ? { sensitivity: effectiveSensitivity } : {}),
         source: effectiveSource,
         outputText: sanitization.body,
+        ...(envelope.taint !== undefined ? { taintOverride: envelope.taint } : {}),
         runContext,
       });
     }

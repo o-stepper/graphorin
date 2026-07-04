@@ -23,6 +23,12 @@ export interface ResultEnvelope<TOutput = unknown> {
   readonly textBody: string;
   /** Multipart wire payload (text + non-text parts). */
   readonly contentParts: ReadonlyArray<MessageContent>;
+  /** C6: per-result taint override carried from the ToolReturn envelope. */
+  readonly taint?: {
+    readonly untrusted?: boolean;
+    readonly sensitive?: boolean;
+    readonly sourceKind?: string;
+  };
 }
 
 /**
@@ -48,6 +54,7 @@ export function toResultEnvelope<TOutput>(opts: {
       output: raw.output,
       textBody,
       contentParts: Object.freeze([...(raw.contentParts ?? [])]),
+      ...(raw.taint !== undefined ? { taint: raw.taint } : {}),
     });
   }
   // Raw output.

@@ -99,5 +99,14 @@ export function sanitizeDescription(args: {
     contentOrigin: `mcp:tool-description:${args.serverIdentity.id}`,
     failClosed: false,
   });
+  // C6: tool-description poisoning is a registration-time SIGNAL, not
+  // just a silent strip — count it so operators see which server ships
+  // imperative-laden descriptions (Invariant Labs tool-poisoning class).
+  if (outcome.patternsHit.length > 0) {
+    incrementCounter('mcp.tool-description.injection-flagged.total', {
+      server: args.serverIdentity.id,
+      tool: args.toolName,
+    });
+  }
   return outcome.body;
 }
