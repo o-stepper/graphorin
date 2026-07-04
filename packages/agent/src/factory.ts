@@ -1155,6 +1155,38 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       toolDataFlowGuard?.seedLedger(state.id, state.taintSummary);
     }
 
+    // WI-05: deferred tools promoted by a `tool_search` call this run.
+    // Membership grows as the model discovers tools and gates which
+    // deferred entries the per-step catalogue advertises. TL-7/AG-19:
+    // persisted onto `RunState.promotedTools` at every exit and
+    // rehydrated here, so a resumed run keeps its discoveries.
+    const promotedDeferred = new Set<string>();
+    // AG-19: restore deferred tools promoted by `tool_search` before the suspend
+    // so they remain in the per-step catalogue after a resume.
+    if (resumed && state.promotedTools !== undefined) {
+      for (const name of state.promotedTools) promotedDeferred.add(name);
+    }
+
+    // agent-08 (F4): capture the run-scoped security state on EVERY exit
+    // through finishRun — not just the approval suspend. An 'aborted' run
+    // is resumable (the AG-14 guard blocks only awaiting_approval/failed)
+    // and a 'completed' run re-enters as a follow-up; both must rehydrate
+    // the enforce-mode sink gate and the discovered-tool catalogue.
+    // Shadows the factory-scope finishRunBase for every call in this run.
+    async function* finishRun(
+      s: MutableRunState & RunState,
+      snapshot: InternalRunSnapshot<TOutput>,
+    ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
+      const taintSnap = toolDataFlowGuard?.snapshotLedger(s.id);
+      if (taintSnap !== undefined) {
+        (s as { taintSummary?: typeof taintSnap }).taintSummary = taintSnap;
+      }
+      if (promotedDeferred.size > 0) {
+        (s as { promotedTools?: readonly string[] }).promotedTools = [...promotedDeferred];
+      }
+      return yield* finishRunBase(s, snapshot);
+    }
+
     const messages: Message[] = resumed ? [...state.messages] : [];
     if (!resumed) {
       // Inject the agent's system prompt at the top of the buffer
@@ -1479,18 +1511,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // state carrying its results.
     if (resumed && state.status === 'awaiting_approval') {
       return yield* finishRun(state, finalSnapshot);
-    }
-
-    // WI-05: deferred tools promoted by a `tool_search` call this run.
-    // Membership grows as the model discovers tools and gates which
-    // deferred entries the per-step catalogue advertises. TL-7/AG-19:
-    // persisted onto `RunState.promotedTools` at suspend and rehydrated
-    // below, so a resumed run keeps its discoveries.
-    const promotedDeferred = new Set<string>();
-    // AG-19: restore deferred tools promoted by `tool_search` before the suspend
-    // so they remain in the per-step catalogue after a resume.
-    if (resumed && state.promotedTools !== undefined) {
-      for (const name of state.promotedTools) promotedDeferred.add(name);
     }
 
     /**
@@ -2573,7 +2593,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
    * loop — completed, failed, aborted, suspended — ends the stream with
    * an `agent.end` event carrying the final {@link AgentResult} (AG-20).
    */
-  async function* finishRun(
+  async function* finishRunBase(
     state: MutableRunState,
     snapshot: InternalRunSnapshot<TOutput>,
   ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {

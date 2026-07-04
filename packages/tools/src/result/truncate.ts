@@ -104,6 +104,20 @@ export interface SpillWriter {
     readonly extension: string;
     readonly body: string;
     readonly sensitivityTier?: string;
+    /**
+     * Trust class of the tool that produced this body (TL-6 /
+     * tools-03). Writers persist it (the default writer stores a
+     * `<file>.meta.json` sidecar) so a reader in ANOTHER executor or a
+     * resumed process can re-taint the content — without it, an
+     * untrusted spill read back through the trusted `read_result`
+     * built-in launders to trusted.
+     */
+    readonly producerTrustClass?: string;
+    /**
+     * Source of the producing tool (a JSON-serializable `ToolSource`
+     * value), persisted alongside the trust class.
+     */
+    readonly producerSource?: unknown;
   }): Promise<{ readonly path: string; readonly bytes: number }>;
   /**
    * Remove every artifact of one run (TL-10). The agent calls this when
@@ -132,6 +146,17 @@ export interface TruncateOptions {
   readonly runId?: string;
   readonly toolCallId?: string;
   readonly toolSensitivityTier?: string;
+  /**
+   * Effective trust class of the content's producer, forwarded to
+   * {@link SpillWriter.write} so the artifact's taint survives process
+   * / executor boundaries (tools-03).
+   */
+  readonly producerTrustClass?: string;
+  /**
+   * Effective source of the content's producer (a JSON-serializable
+   * `ToolSource` value; see {@link producerTrustClass}).
+   */
+  readonly producerSource?: unknown;
   readonly signal?: AbortSignal;
 }
 
@@ -253,6 +278,10 @@ async function spillToFile(
     ...(options.toolSensitivityTier !== undefined
       ? { sensitivityTier: options.toolSensitivityTier }
       : {}),
+    ...(options.producerTrustClass !== undefined
+      ? { producerTrustClass: options.producerTrustClass }
+      : {}),
+    ...(options.producerSource !== undefined ? { producerSource: options.producerSource } : {}),
   });
   // Opaque, run-scoped handle URI relative to the writer's artifact root —
   // this, not the raw absolute path, is what the model sees in the

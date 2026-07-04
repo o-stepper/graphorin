@@ -12,8 +12,11 @@
  *
  * Because the agent builds one executor that serves the whole run (and the
  * code-mode quiet executor too), the guard keeps a per-run ledger map.
- * Taint state is in-memory and run-scoped; like `tool_search` promotion it
- * is **not** persisted across a suspend/resume. The map is bounded by
+ * The live ledger (with its verbatim-probe spans) is in-memory and
+ * run-scoped, but its COARSE summary survives suspend/resume: the agent
+ * persists `snapshotLedger()` onto `RunState.taintSummary` on every exit
+ * and re-seeds via `seedLedger()` on resume (AG-19 / agent-08) — only the
+ * span-level verbatim probe restarts. The map is bounded by
  * insertion-order eviction so a long-lived agent never leaks ledgers.
  *
  * @packageDocumentation
