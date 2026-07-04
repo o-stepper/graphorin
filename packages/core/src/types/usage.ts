@@ -8,9 +8,31 @@
  * @stable
  */
 export interface Usage {
+  /**
+   * Total input tokens for the call, INCLUDING any prompt-cache reads and
+   * writes (`cachedReadTokens` / `cacheWriteTokens` are informational
+   * subsets, not additions). This matches the context size the model saw.
+   */
   promptTokens: number;
   completionTokens: number;
+  /**
+   * Reasoning tokens billed IN ADDITION to `completionTokens` (exclusive;
+   * adapters that receive an inclusive total split it so the sum stays
+   * exact). Cost formulas may add this to the output leg without
+   * double-counting.
+   */
   reasoningTokens?: number;
+  /**
+   * Prompt tokens served from the provider's prompt cache (a subset of
+   * `promptTokens`), billed at the discounted cache-read rate.
+   */
+  cachedReadTokens?: number;
+  /**
+   * Prompt tokens written to the provider's prompt cache this call (a
+   * subset of `promptTokens`), billed at the cache-write premium where the
+   * provider charges one (Anthropic does; OpenAI does not report writes).
+   */
+  cacheWriteTokens?: number;
   totalTokens: number;
   cost?: Cost;
 }
@@ -39,6 +61,8 @@ export interface ModelUsage {
   promptTokens: number;
   completionTokens: number;
   reasoningTokens?: number;
+  cachedReadTokens?: number;
+  cacheWriteTokens?: number;
   totalTokens: number;
   cost?: Cost;
   callCount: number;

@@ -53,6 +53,21 @@ export function lookupPrice(
 
   if (exact !== undefined) return entryToResult(exact, snapshot);
 
+  // Date-suffix fallback (core-provider-03): dated ids like
+  // `claude-haiku-4-5-20251001` resolve to their dateless alias entry
+  // (`claude-haiku-4-5`) so the snapshot does not need one row per
+  // dated release.
+  const dateless = args.model.replace(/-\d{8}$/, '');
+  if (dateless !== args.model) {
+    const alias = snapshot.entries.find(
+      (entry) =>
+        entry.provider === args.provider &&
+        entry.model === dateless &&
+        (args.region === undefined || entry.region === undefined || entry.region === args.region),
+    );
+    if (alias !== undefined) return entryToResult(alias, snapshot);
+  }
+
   // Wildcard fallback — used by local providers (`provider: 'ollama', model: '*'`).
   const wildcard = snapshot.entries.find(
     (entry) => entry.provider === args.provider && entry.model === '*',
@@ -70,6 +85,9 @@ function entryToResult(entry: ModelPrice, snapshot: PricingSnapshot): LookupPric
     ...(entry.cachedReadUsdPerToken === undefined
       ? {}
       : { cachedReadUsdPerToken: entry.cachedReadUsdPerToken }),
+    ...(entry.cacheWriteUsdPerToken === undefined
+      ? {}
+      : { cacheWriteUsdPerToken: entry.cacheWriteUsdPerToken }),
     ...(entry.reasoningUsdPerToken === undefined
       ? {}
       : { reasoningUsdPerToken: entry.reasoningUsdPerToken }),
@@ -95,20 +113,24 @@ function warnOnce(args: LookupPriceArgs): void {
  * for a single LLM call without instantiating the cost tracker.
  *
  * Token-count contract (PS-19):
- * - `inputTokens` **excludes** `cachedReadTokens` — cached reads are billed
- *   separately at the cheaper cached rate, so pass the non-cached prompt count
- *   to avoid double-billing.
+ * - `inputTokens` **excludes** `cachedReadTokens` and `cacheWriteTokens` —
+ *   the cache legs are billed separately at their own rates, so pass the
+ *   non-cached prompt count to avoid double-billing.
  * - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
  *   declares an explicit `reasoningUsdPerToken`.
+ * - `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
+ *   declares one, else at the full input rate (a cache write is at minimum a
+ *   normal input token — the fallback never under-bills relative to no cache).
  *
  * @stable
  */
 export function calculateCost(
   args: LookupPriceArgs & {
-    /** Non-cached prompt tokens (excludes `cachedReadTokens`). */
+    /** Non-cached prompt tokens (excludes cache reads AND cache writes). */
     readonly inputTokens: number;
     readonly outputTokens: number;
     readonly cachedReadTokens?: number;
+    readonly cacheWriteTokens?: number;
     readonly reasoningTokens?: number;
   },
   snapshot: PricingSnapshot = BUNDLED_SNAPSHOT,
@@ -123,6 +145,9 @@ export function calculateCost(
   amount += price.outputUsdPerToken * args.outputTokens;
   if (args.cachedReadTokens !== undefined && price.cachedReadUsdPerToken !== undefined) {
     amount += price.cachedReadUsdPerToken * args.cachedReadTokens;
+  }
+  if (args.cacheWriteTokens !== undefined) {
+    amount += (price.cacheWriteUsdPerToken ?? price.inputUsdPerToken) * args.cacheWriteTokens;
   }
   if (args.reasoningTokens !== undefined) {
     // PS-19: reasoning tokens follow completion (output) pricing unless the

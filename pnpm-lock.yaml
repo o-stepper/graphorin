@@ -699,6 +699,9 @@ importers:
         specifier: workspace:*
         version: link:../observability
     devDependencies:
+      '@graphorin/pricing':
+        specifier: workspace:*
+        version: link:../pricing
       ai:
         specifier: ^7.0.15
         version: 7.0.15(zod@3.25.76)

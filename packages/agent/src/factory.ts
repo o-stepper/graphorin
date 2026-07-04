@@ -151,13 +151,16 @@ const TOOL_SEARCH_NAME = 'tool_search';
  * (`normaliseTool`), the deferred set is fixed for the life of the
  * registry — this runs once per registry, not per step.
  */
-function registerToolSearch(registry: ToolRegistry): void {
+function registerToolSearch(registry: ToolRegistry, availability?: 'next-step' | 'next-run'): void {
   if (registry.listDeferred().length === 0) return;
   if (registry.get(TOOL_SEARCH_NAME) !== undefined) return;
-  registry.register(createToolSearchTool({ registry }), {
-    kind: 'built-in',
-    subsystem: 'tool-discovery',
-  });
+  registry.register(
+    createToolSearchTool({ registry, ...(availability !== undefined ? { availability } : {}) }),
+    {
+      kind: 'built-in',
+      subsystem: 'tool-discovery',
+    },
+  );
 }
 
 /** The built-in result-handle reader tool's stable name (WI-10 / P1-4). */
@@ -811,6 +814,43 @@ function countLeadingSystemMessages(messages: ReadonlyArray<Message>): number {
 }
 
 /**
+ * Immutable usage sum. Optional token fields (reasoning + prompt-cache
+ * legs, core-provider-02) appear in the result only when at least one
+ * side carries them, so pre-cache serialized shapes stay byte-identical.
+ */
+function addUsage(a: Usage, b: Usage): Usage {
+  const optional = (x: number | undefined, y: number | undefined): number | undefined =>
+    x === undefined && y === undefined ? undefined : (x ?? 0) + (y ?? 0);
+  const reasoningTokens = optional(a.reasoningTokens, b.reasoningTokens);
+  const cachedReadTokens = optional(a.cachedReadTokens, b.cachedReadTokens);
+  const cacheWriteTokens = optional(a.cacheWriteTokens, b.cacheWriteTokens);
+  return {
+    promptTokens: a.promptTokens + b.promptTokens,
+    completionTokens: a.completionTokens + b.completionTokens,
+    totalTokens: a.totalTokens + b.totalTokens,
+    ...(reasoningTokens !== undefined ? { reasoningTokens } : {}),
+    ...(cachedReadTokens !== undefined ? { cachedReadTokens } : {}),
+    ...(cacheWriteTokens !== undefined ? { cacheWriteTokens } : {}),
+  };
+}
+
+/** In-place variant of {@link addUsage} for mutable accumulators. */
+function accumulateUsage(target: Usage, delta: Usage): void {
+  target.promptTokens += delta.promptTokens;
+  target.completionTokens += delta.completionTokens;
+  target.totalTokens += delta.totalTokens;
+  if (delta.reasoningTokens !== undefined) {
+    target.reasoningTokens = (target.reasoningTokens ?? 0) + delta.reasoningTokens;
+  }
+  if (delta.cachedReadTokens !== undefined) {
+    target.cachedReadTokens = (target.cachedReadTokens ?? 0) + delta.cachedReadTokens;
+  }
+  if (delta.cacheWriteTokens !== undefined) {
+    target.cacheWriteTokens = (target.cacheWriteTokens ?? 0) + delta.cacheWriteTokens;
+  }
+}
+
+/**
  * Build a fresh {@link Agent} from the supplied configuration.
  *
  * @stable
@@ -934,7 +974,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   // withheld from the per-step catalogue (see the loop below) until a
   // `tool_search` match promotes them, keeping large tool sets out of the
   // context window. When nothing defers this is a no-op.
-  registerToolSearch(toolRegistry);
+  registerToolSearch(
+    toolRegistry,
+    config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
+  );
 
   // WI-10 (result references / handles / P1-4): construct one spill
   // writer + reader pair at warm-up. The writer is handed to the executor
@@ -1203,6 +1246,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     if (resumed && state.promotedTools !== undefined) {
       for (const name of state.promotedTools) promotedDeferred.add(name);
     }
+    // C1: under `toolPromotion: 'run-boundary'` the advertised catalogue is
+    // frozen to the promotions known at run start (incl. those restored
+    // above), keeping the provider prompt cache byte-stable for the whole
+    // run. New promotions still land in `promotedDeferred` (and persist),
+    // taking effect on the next run / resume.
+    const runStartPromotions =
+      config.toolPromotion === 'run-boundary' ? new Set(promotedDeferred) : undefined;
 
     // agent-08 (F4): capture the run-scoped security state on EVERY exit
     // through finishRun — not just the approval suspend. An 'aborted' run
@@ -1970,7 +2020,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             }).registry
           : toolRegistry;
         if (useOverrideRegistry) {
-          registerToolSearch(stepRegistry);
+          registerToolSearch(
+            stepRegistry,
+            config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
+          );
           registerReadResult(stepRegistry, resultReader);
         }
         const stepExecutor: ToolExecutor = useOverrideRegistry
@@ -2000,14 +2053,19 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             Tool<unknown, unknown, TDeps>
           >;
           // A7: emit promoted deferred tools in PROMOTION order (append-only) so
-          // a later promotion joins the END and the prompt-cache prefix (eager
-          // tools + earlier promotions) stays byte-stable across steps.
+          // a later promotion joins the END and the prompt-cache prefix stays
+          // byte-stable across steps. C1 (agent-11): handoff tools serialize
+          // BEFORE the growing promoted section — handoffs are fixed per run,
+          // so the stable prefix is now eager + handoffs + earlier promotions
+          // and a new promotion shifts nothing that came before it.
+          // 'run-boundary' promotion advertises only the run-start snapshot.
+          const advertisedPromotions = runStartPromotions ?? promotedDeferred;
           const promotedTools = (
-            promotedDeferred.size === 0
+            advertisedPromotions.size === 0
               ? []
-              : orderPromotedTools(promotedDeferred, stepRegistry.listDeferred())
+              : orderPromotedTools(advertisedPromotions, stepRegistry.listDeferred())
           ) as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
-          stepTools = [...eagerTools, ...promotedTools, ...handoffTools];
+          stepTools = [...eagerTools, ...handoffTools, ...promotedTools];
         }
 
         // AG-15: consult the hints of the tools the model CALLED on the
@@ -2105,6 +2163,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           signal,
           ...(overrides.temperature !== undefined ? { temperature: overrides.temperature } : {}),
           ...(overrides.maxTokens !== undefined ? { maxTokens: overrides.maxTokens } : {}),
+          ...(config.cachePolicy !== undefined ? { cachePolicy: config.cachePolicy } : {}),
           reasoningRetention: reasoningPolicy,
         };
 
@@ -2174,19 +2233,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 providerError = out.providerError;
               }
               if (out.usage !== undefined) {
-                providerStepUsage = {
-                  promptTokens: providerStepUsage.promptTokens + out.usage.promptTokens,
-                  completionTokens: providerStepUsage.completionTokens + out.usage.completionTokens,
-                  totalTokens: providerStepUsage.totalTokens + out.usage.totalTokens,
-                  ...(out.usage.reasoningTokens !== undefined ||
-                  providerStepUsage.reasoningTokens !== undefined
-                    ? {
-                        reasoningTokens:
-                          (providerStepUsage.reasoningTokens ?? 0) +
-                          (out.usage.reasoningTokens ?? 0),
-                      }
-                    : {}),
-                };
+                providerStepUsage = addUsage(providerStepUsage, out.usage);
               }
               if (out.finished === true) providerCallCompleted = true;
             }
@@ -2260,13 +2307,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 },
               ];
             }
-            stepUsage.promptTokens += providerStepUsage.promptTokens;
-            stepUsage.completionTokens += providerStepUsage.completionTokens;
-            stepUsage.totalTokens += providerStepUsage.totalTokens;
-            if (providerStepUsage.reasoningTokens !== undefined) {
-              stepUsage.reasoningTokens =
-                (stepUsage.reasoningTokens ?? 0) + providerStepUsage.reasoningTokens;
-            }
+            accumulateUsage(stepUsage, providerStepUsage);
             break;
           }
         }
@@ -2297,13 +2338,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
         usageAcc.add(lastModelId, stepUsage);
         addModelUsage(state, lastModelId, stepUsage);
-        state.usage.promptTokens += stepUsage.promptTokens;
-        state.usage.completionTokens += stepUsage.completionTokens;
-        state.usage.totalTokens += stepUsage.totalTokens;
-        if (stepUsage.reasoningTokens !== undefined) {
-          state.usage.reasoningTokens =
-            (state.usage.reasoningTokens ?? 0) + stepUsage.reasoningTokens;
-        }
+        accumulateUsage(state.usage, stepUsage);
 
         // Lateral-leak (RB-55 / AG-10): scan the outgoing assistant
         // content BEFORE it is appended, so a 'block' decision keeps

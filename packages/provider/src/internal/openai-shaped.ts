@@ -433,15 +433,22 @@ function mapOpenAIUsage(input: unknown): Usage | undefined {
     completion_tokens?: number;
     total_tokens?: number;
     reasoning_tokens?: number;
+    // OpenAI reports cache reads as a SUBSET of prompt_tokens
+    // (core-provider-02); there is no cache-write leg on this wire.
+    prompt_tokens_details?: { cached_tokens?: number };
   };
   const promptTokens = u.prompt_tokens ?? 0;
   const completionTokens = u.completion_tokens ?? 0;
   const totalTokens = u.total_tokens ?? promptTokens + completionTokens;
+  const cachedTokens = u.prompt_tokens_details?.cached_tokens;
   const usage: Usage = {
     promptTokens,
     completionTokens,
     totalTokens,
     ...(u.reasoning_tokens !== undefined ? { reasoningTokens: u.reasoning_tokens } : {}),
+    ...(typeof cachedTokens === 'number' && Number.isFinite(cachedTokens) && cachedTokens > 0
+      ? { cachedReadTokens: cachedTokens }
+      : {}),
   };
   return usage;
 }
@@ -500,5 +507,6 @@ interface OpenAIChunk {
     readonly completion_tokens?: number;
     readonly total_tokens?: number;
     readonly reasoning_tokens?: number;
+    readonly prompt_tokens_details?: { readonly cached_tokens?: number };
   };
 }

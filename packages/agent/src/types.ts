@@ -16,6 +16,7 @@ import type {
   ModelSpec,
   ProgressArtifactRef,
   Provider,
+  ProviderCachePolicy,
   ReasoningRetention,
   RunContext,
   RunState,
@@ -257,6 +258,32 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * any reader force-registers `read_result` even when no tool spills.
    */
   readonly resultReaders?: ReadonlyArray<ResultReader>;
+  /**
+   * Opt-in prompt-cache breakpoint policy (core-provider-02), forwarded
+   * verbatim on every `ProviderRequest` the loop issues. With
+   * `{ breakpoints: 'auto' }` the Anthropic path (vercel adapter) anchors
+   * `cache_control` markers on the first and last conversation messages,
+   * so the stable prefix (tools + system + early turns) is written to the
+   * provider cache once and read at the discounted rate on every later
+   * step. Providers with automatic caching ignore it. Pair with the
+   * append-only transcript the loop already maintains — cache hit rate is
+   * the #1 production cost lever for multi-step agents.
+   */
+  readonly cachePolicy?: ProviderCachePolicy;
+  /**
+   * When deferred-tool promotions (via `tool_search`) take effect (C1):
+   *
+   * - `'immediate'` (default) — a promoted tool joins the catalogue on the
+   *   NEXT step. Costs one provider-cache invalidation per promotion
+   *   (the tools block changes), which is the standard trade for tool
+   *   discovery.
+   * - `'run-boundary'` — the catalogue advertised to the model is frozen
+   *   for the whole run; promotions are still recorded (and persisted on
+   *   `RunState.promotedTools`) but only join the catalogue on the next
+   *   run / resume. Keeps the provider prompt cache byte-stable across
+   *   every step of a run.
+   */
+  readonly toolPromotion?: 'immediate' | 'run-boundary';
   readonly tracer?: Tracer;
   readonly checkpointStore?: CheckpointStore;
   readonly sensitivity?: Sensitivity;

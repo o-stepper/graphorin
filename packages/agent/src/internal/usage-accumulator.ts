@@ -31,6 +31,12 @@ export class InMemoryUsageAccumulator implements UsageAccumulator {
         totalTokens: usage.totalTokens,
         callCount: 1,
         ...(usage.reasoningTokens !== undefined ? { reasoningTokens: usage.reasoningTokens } : {}),
+        ...(usage.cachedReadTokens !== undefined
+          ? { cachedReadTokens: usage.cachedReadTokens }
+          : {}),
+        ...(usage.cacheWriteTokens !== undefined
+          ? { cacheWriteTokens: usage.cacheWriteTokens }
+          : {}),
         ...(usage.cost !== undefined ? { cost: usage.cost } : {}),
       });
     } else {
@@ -40,11 +46,9 @@ export class InMemoryUsageAccumulator implements UsageAccumulator {
         completionTokens: prev.completionTokens + usage.completionTokens,
         totalTokens: prev.totalTokens + usage.totalTokens,
         callCount: prev.callCount + 1,
-        ...(usage.reasoningTokens !== undefined || prev.reasoningTokens !== undefined
-          ? {
-              reasoningTokens: (prev.reasoningTokens ?? 0) + (usage.reasoningTokens ?? 0),
-            }
-          : {}),
+        ...sumOptional('reasoningTokens', prev.reasoningTokens, usage.reasoningTokens),
+        ...sumOptional('cachedReadTokens', prev.cachedReadTokens, usage.cachedReadTokens),
+        ...sumOptional('cacheWriteTokens', prev.cacheWriteTokens, usage.cacheWriteTokens),
       };
       this.#byModel.set(modelId, merged);
     }
@@ -52,11 +56,9 @@ export class InMemoryUsageAccumulator implements UsageAccumulator {
       promptTokens: this.#aggregate.promptTokens + usage.promptTokens,
       completionTokens: this.#aggregate.completionTokens + usage.completionTokens,
       totalTokens: this.#aggregate.totalTokens + usage.totalTokens,
-      ...(usage.reasoningTokens !== undefined || this.#aggregate.reasoningTokens !== undefined
-        ? {
-            reasoningTokens: (this.#aggregate.reasoningTokens ?? 0) + (usage.reasoningTokens ?? 0),
-          }
-        : {}),
+      ...sumOptional('reasoningTokens', this.#aggregate.reasoningTokens, usage.reasoningTokens),
+      ...sumOptional('cachedReadTokens', this.#aggregate.cachedReadTokens, usage.cachedReadTokens),
+      ...sumOptional('cacheWriteTokens', this.#aggregate.cacheWriteTokens, usage.cacheWriteTokens),
     };
   }
 
@@ -71,4 +73,18 @@ export class InMemoryUsageAccumulator implements UsageAccumulator {
       byModel: Array.from(this.#byModel.values()).map((m) => ({ ...m })),
     };
   }
+}
+
+/**
+ * Sum an optional token field: present in the output only when at least
+ * one side carries it (so a run that never saw the field keeps the same
+ * serialized shape as before the field existed).
+ */
+function sumOptional<K extends string>(
+  key: K,
+  a: number | undefined,
+  b: number | undefined,
+): Partial<Record<K, number>> {
+  if (a === undefined && b === undefined) return {};
+  return { [key]: (a ?? 0) + (b ?? 0) } as Partial<Record<K, number>>;
 }

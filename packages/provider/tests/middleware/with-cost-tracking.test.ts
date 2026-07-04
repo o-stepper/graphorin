@@ -225,3 +225,82 @@ describe('withCostTracking', () => {
     expect(records[0]).toBeCloseTo(25);
   });
 });
+
+describe('prompt-cache cost legs (core-provider-02)', () => {
+  const cacheUsageProvider = (usage: {
+    promptTokens: number;
+    completionTokens: number;
+    totalTokens: number;
+    cachedReadTokens?: number;
+    cacheWriteTokens?: number;
+  }) => {
+    const base = bareAdapter();
+    return {
+      ...base,
+      async generate() {
+        return { text: 'hi', usage, finishReason: 'stop' as const };
+      },
+    };
+  };
+
+  it('bills cache reads/writes at their own rates and the remainder at the input rate', async () => {
+    const seen: Array<{
+      costUsd: number;
+      cachedReadTokens?: number;
+      cacheWriteTokens?: number;
+    }> = [];
+    const wrapped = withCostTracking({
+      onUsage: (info) => {
+        seen.push({
+          costUsd: info.costUsd,
+          ...(info.cachedReadTokens !== undefined
+            ? { cachedReadTokens: info.cachedReadTokens }
+            : {}),
+          ...(info.cacheWriteTokens !== undefined
+            ? { cacheWriteTokens: info.cacheWriteTokens }
+            : {}),
+        });
+      },
+      priceLookup: () => ({
+        inputPerMtok: 3,
+        outputPerMtok: 15,
+        cachedReadPerMtok: 0.3,
+        cacheWritePerMtok: 3.75,
+      }),
+    })(
+      cacheUsageProvider({
+        promptTokens: 1_000_000, // includes both cache legs
+        completionTokens: 0,
+        totalTokens: 1_000_000,
+        cachedReadTokens: 800_000,
+        cacheWriteTokens: 100_000,
+      }),
+    );
+    await wrapped.generate(REQ);
+    expect(seen).toHaveLength(1);
+    // 100k base @ $3 + 800k reads @ $0.30 + 100k writes @ $3.75 (per Mtok)
+    expect(seen[0]?.costUsd).toBeCloseTo(0.1 * 3 + 0.8 * 0.3 + 0.1 * 3.75, 10);
+    expect(seen[0]?.cachedReadTokens).toBe(800_000);
+    expect(seen[0]?.cacheWriteTokens).toBe(100_000);
+  });
+
+  it('falls back to the full input rate for cache legs when cache rates are absent', async () => {
+    const seen: number[] = [];
+    const wrapped = withCostTracking({
+      onUsage: (info) => {
+        seen.push(info.costUsd);
+      },
+      priceLookup: () => ({ inputPerMtok: 2, outputPerMtok: 10 }),
+    })(
+      cacheUsageProvider({
+        promptTokens: 1_000_000,
+        completionTokens: 0,
+        totalTokens: 1_000_000,
+        cachedReadTokens: 500_000,
+      }),
+    );
+    await wrapped.generate(REQ);
+    // No cache rates -> identical to billing the whole prompt at input rate.
+    expect(seen[0]).toBeCloseTo(2, 10);
+  });
+});
