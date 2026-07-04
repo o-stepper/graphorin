@@ -1,8 +1,8 @@
 {
   "scenarios": {
-    "bare": 35,
-    "with-tools": 115,
-    "rich-instructions": 72
+    "bare": 31,
+    "with-tools": 111,
+    "rich-instructions": 68
   },
   "toleranceRatio": 0.1,
   "encoding": "cl100k_base",
