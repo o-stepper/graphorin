@@ -79,6 +79,13 @@ export interface InMemoryServerOptions {
   readonly tools?: ReadonlyArray<FixtureToolDefinition>;
   readonly resources?: ReadonlyArray<FixtureResourceDefinition>;
   readonly prompts?: ReadonlyArray<FixturePromptDefinition>;
+  /**
+   * When set, `tools/list` / `resources/list` / `prompts/list` serve at
+   * most this many items per page and return a `nextCursor` until the
+   * catalogue is drained (mcp-skills-02: exercises the client's
+   * cursor-pagination loop).
+   */
+  readonly pageSize?: number;
   readonly callToolHandler?: (
     name: string,
     args: unknown,
@@ -130,20 +137,36 @@ export async function startInMemoryServer(
     },
   );
 
-  server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: (opts.tools ?? []).map((t) => ({
-      name: t.name,
-      description: t.description ?? '',
-      // The MCP spec mandates `inputSchema.type === 'object'` for tool
-      // input shapes; the fixture promotes a bare schema upward when
-      // the test author leaves it implicit.
-      inputSchema:
-        t.inputSchema.type === 'object'
-          ? t.inputSchema
-          : { type: 'object', properties: {}, ...t.inputSchema },
-      ...(t.outputSchema === undefined ? {} : { outputSchema: t.outputSchema }),
-    })),
-  }));
+  /** Cursor-paginate `items` when `opts.pageSize` is set (mcp-skills-02). */
+  function paginate<T>(
+    items: ReadonlyArray<T>,
+    cursor: string | undefined,
+  ): { readonly page: ReadonlyArray<T>; readonly nextCursor?: string } {
+    if (opts.pageSize === undefined) return { page: items };
+    const start = cursor === undefined ? 0 : Number.parseInt(cursor, 10) || 0;
+    const end = start + opts.pageSize;
+    const page = items.slice(start, end);
+    return end < items.length ? { page, nextCursor: String(end) } : { page };
+  }
+
+  server.setRequestHandler(ListToolsRequestSchema, async (req) => {
+    const { page, nextCursor } = paginate(opts.tools ?? [], req.params?.cursor);
+    return {
+      tools: page.map((t) => ({
+        name: t.name,
+        description: t.description ?? '',
+        // The MCP spec mandates `inputSchema.type === 'object'` for tool
+        // input shapes; the fixture promotes a bare schema upward when
+        // the test author leaves it implicit.
+        inputSchema:
+          t.inputSchema.type === 'object'
+            ? t.inputSchema
+            : { type: 'object', properties: {}, ...t.inputSchema },
+        ...(t.outputSchema === undefined ? {} : { outputSchema: t.outputSchema }),
+      })),
+      ...(nextCursor === undefined ? {} : { nextCursor }),
+    };
+  });
 
   server.setRequestHandler(CallToolRequestSchema, async (req, extra) => {
     const { name, arguments: args } = req.params;
@@ -165,14 +188,18 @@ export async function startInMemoryServer(
     };
   });
 
-  server.setRequestHandler(ListResourcesRequestSchema, async () => ({
-    resources: (opts.resources ?? []).map((r) => ({
-      uri: r.uri,
-      ...(r.name === undefined ? {} : { name: r.name }),
-      ...(r.description === undefined ? {} : { description: r.description }),
-      ...(r.mimeType === undefined ? {} : { mimeType: r.mimeType }),
-    })),
-  }));
+  server.setRequestHandler(ListResourcesRequestSchema, async (req) => {
+    const { page, nextCursor } = paginate(opts.resources ?? [], req.params?.cursor);
+    return {
+      resources: page.map((r) => ({
+        uri: r.uri,
+        ...(r.name === undefined ? {} : { name: r.name }),
+        ...(r.description === undefined ? {} : { description: r.description }),
+        ...(r.mimeType === undefined ? {} : { mimeType: r.mimeType }),
+      })),
+      ...(nextCursor === undefined ? {} : { nextCursor }),
+    };
+  });
 
   server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
     const uri = req.params.uri;
@@ -192,13 +219,17 @@ export async function startInMemoryServer(
     };
   });
 
-  server.setRequestHandler(ListPromptsRequestSchema, async () => ({
-    prompts: (opts.prompts ?? []).map((p) => ({
-      name: p.name,
-      ...(p.description === undefined ? {} : { description: p.description }),
-      ...(p.arguments === undefined ? {} : { arguments: [...p.arguments] }),
-    })),
-  }));
+  server.setRequestHandler(ListPromptsRequestSchema, async (req) => {
+    const { page, nextCursor } = paginate(opts.prompts ?? [], req.params?.cursor);
+    return {
+      prompts: page.map((p) => ({
+        name: p.name,
+        ...(p.description === undefined ? {} : { description: p.description }),
+        ...(p.arguments === undefined ? {} : { arguments: [...p.arguments] }),
+      })),
+      ...(nextCursor === undefined ? {} : { nextCursor }),
+    };
+  });
 
   server.setRequestHandler(GetPromptRequestSchema, async (req) => {
     const name = req.params.name;
