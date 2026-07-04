@@ -822,3 +822,114 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
     expect(out.result.preservedMessages[0]?.role).toBe('assistant');
   });
 });
+
+describe('context-engine-02 — post-compaction hooks honour the D2 privacy filter', () => {
+  it('a secret persona block and secret rule never reach the essentials on a cloud tier', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      workingBlocks: [
+        defineBlock({ label: 'persona', charLimit: 200, sensitivity: 'secret' }),
+        defineBlock({ label: 'style', charLimit: 200, sensitivity: 'public' }),
+      ],
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 100 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    await memory.working.write(scope, 'persona', 'TOP-SECRET persona directives');
+    await memory.working.write(scope, 'style', 'be concise');
+    await memory.procedural.define(scope, {
+      text: 'SECRET internal compliance rule',
+      sensitivity: 'secret',
+    });
+    await memory.procedural.define(scope, { text: 'always cite sources' });
+
+    const out = await memory.contextEngine.compactNow({
+      scope,
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'auto-trigger',
+      messages: buildMessages(40, 'X'.repeat(800)),
+      memory,
+    });
+    const essentials = out.extraContent.map((p) => (p.type === 'text' ? p.text : '')).join('\n');
+    // assemble() withholds secret content from the provider on public-tls;
+    // the post-compaction splice ships to the SAME provider, so the hooks
+    // must withhold it too (pre-fix: the default hooks re-injected it raw).
+    expect(essentials).not.toContain('TOP-SECRET persona directives');
+    expect(essentials).not.toContain('SECRET internal compliance rule');
+    // Non-secret content still re-anchors.
+    expect(essentials).toContain('always cite sources');
+  });
+});
+
+describe('context-engine-04 — guard and floor share the full-buffer basis', () => {
+  it('arms the anti-thrash guard against prefix + body + essentials, suppressing an immediate re-trigger', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 100 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    const engine = memory.contextEngine;
+    // A realistic pinned prefix, far above the 256-token re-arm window.
+    const prefixMessages: Message[] = [
+      { role: 'system', content: 'P'.repeat(4000) },
+      { role: 'system', content: 'Q'.repeat(4000) },
+    ];
+    const body = buildMessages(40, 'X'.repeat(800));
+
+    const out = await engine.compactNow({
+      scope,
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'auto-trigger',
+      messages: body,
+      prefixMessages,
+      memory,
+    });
+    // The post-splice full buffer the agent will measure next step:
+    // prefix + trimmed body (+ essentials, empty here — no blocks/rules).
+    const fullAfterSplice: Message[] = [...prefixMessages, ...out.result.trimmedMessages];
+    // Pre-fix the guard was armed with the BODY-only afterTokens, so the
+    // full-buffer total always exceeded baseline + 256 and the trigger
+    // re-fired a summarizer call at the top of EVERY subsequent step.
+    expect(
+      await engine.shouldCompact(fullAfterSplice, { compactableFromIndex: prefixMessages.length }),
+    ).toBe(false);
+  });
+
+  it('reclaim floor ignores the pinned prefix when compactableFromIndex is given', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 100, minReclaimTokens: 2000 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+    const engine = memory.contextEngine;
+    // Huge prefix, tiny compactable body: without the index the prefix is
+    // counted as reclaimable and the floor lets a pointless summarizer
+    // call through; with it, the trigger correctly defers.
+    const prefix: Message[] = [{ role: 'system', content: 'P'.repeat(40_000) }];
+    const tinyBody = buildMessages(8, 'x'.repeat(40));
+    const full = [...prefix, ...tinyBody];
+    expect(await engine.shouldCompact(full, { compactableFromIndex: prefix.length })).toBe(false);
+    // Same buffer WITHOUT the index (the pre-fix agent call shape) fires.
+    expect(await engine.shouldCompact(full)).toBe(true);
+  });
+});

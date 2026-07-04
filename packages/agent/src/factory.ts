@@ -1638,7 +1638,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       // run is left un-compacted here.
       if (config.sensitivity === 'secret') return;
       const engine = mem.contextEngine;
-      const triggered = await engine.shouldCompact(messages).catch(() => false);
+      // context-engine-04: trigger, reclaim floor, and anti-thrash guard
+      // share one basis — the engine sees the full buffer for the trigger
+      // total, learns where the pinned (uncompactable) prefix ends, and
+      // receives the prefix messages so the guard arms against the FULL
+      // post-splice context instead of the sliced body.
+      const triggered = await engine
+        .shouldCompact(messages, { compactableFromIndex: systemPrefixLength })
+        .catch(() => false);
       if (!triggered) return;
 
       const startedAt = Date.now();
@@ -1650,6 +1657,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           agentId,
           source: 'auto-trigger',
           messages: messages.slice(systemPrefixLength),
+          prefixMessages: messages.slice(0, systemPrefixLength),
           memory: mem,
         })
         // No summarizer configured (or the strategy threw) — proceed with
@@ -1727,6 +1735,8 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           agentId,
           source,
           messages: messages.slice(systemPrefixLength),
+          // context-engine-04: same accounting basis as the auto path.
+          prefixMessages: messages.slice(0, systemPrefixLength),
           memory: mem,
           ...(pending.options?.preserveRecentTurns !== undefined
             ? { preserveRecentTurns: pending.options.preserveRecentTurns }

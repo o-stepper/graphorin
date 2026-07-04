@@ -25,10 +25,16 @@ export function reanchorProjectRules(
     async resolveContent(deps: HookDeps): Promise<ReadonlyArray<MessageContent>> {
       const procedural = deps.procedural ?? {};
       const rules = await deps.memory.procedural.activate(deps.scope, procedural);
+      // context-engine-02: apply the same D2 privacy decision `assemble()`
+      // applies to active rules — the hook's output ships to the provider.
+      const visible =
+        deps.allowSensitivity === undefined
+          ? rules
+          : rules.filter((rule) => deps.allowSensitivity?.(rule.sensitivity) === true);
       const filtered =
         allowlist === null
-          ? rules
-          : rules.filter((rule) => (rule.tags ?? []).some((tag) => allowlist.has(tag)));
+          ? visible
+          : visible.filter((rule) => (rule.tags ?? []).some((tag) => allowlist.has(tag)));
       if (filtered.length === 0) return [];
       const lines = ['<memory_rules anchor="post-compaction">'];
       for (const rule of filtered) {

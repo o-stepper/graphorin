@@ -17,7 +17,7 @@
  * @packageDocumentation
  */
 
-import type { MessageContent, SessionScope } from '@graphorin/core';
+import type { MessageContent, Sensitivity, SessionScope } from '@graphorin/core';
 import type { Memory } from '../../../facade.js';
 
 /**
@@ -32,6 +32,18 @@ export interface HookDeps {
   readonly scope: SessionScope;
   /** Optional context tags surfaced to the procedural-rules query. */
   readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
+  /**
+   * D2 privacy evaluator threaded from the engine's resolved privacy
+   * config (context-engine-02). `true` = the provider may see content of
+   * this sensitivity. Built-in hooks MUST consult it before re-injecting
+   * tier content: `assemble()` filters what ships to the provider, and
+   * the post-compaction splice ships to the SAME provider — without the
+   * check, a `secret`-tier persona block / rule / pinned fact that the
+   * assembly correctly withheld leaks on the first compaction. Absent
+   * (operator-built HookDeps) means no filtering; the engine always
+   * supplies one.
+   */
+  readonly allowSensitivity?: (sensitivity: Sensitivity | undefined) => boolean;
 }
 
 /**

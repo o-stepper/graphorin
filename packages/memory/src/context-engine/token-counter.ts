@@ -63,15 +63,22 @@ export const HEURISTIC_TOKEN_COUNTER: ContextTokenCounter = Object.freeze({
 
 /**
  * Wrap a real {@link TokenCounter} into the narrower
- * {@link ContextTokenCounter} surface. Calls `countText(text)`
- * directly for max precision; falls back to the synthetic
- * single-message bridge when only `count(messages)` is supported.
+ * {@link ContextTokenCounter} surface — PRESERVING the native
+ * message-level `count(messages)` (context-engine-03). The adapter
+ * used to keep only `countText`, which forced
+ * {@link countMessageTokens} onto the per-message render path for
+ * every real counter; combined with `renderMessageText` ignoring
+ * tool calls, tool-call arguments contributed zero to every trigger /
+ * before / after count while the provider billed for them.
  *
  * @stable
  */
-export function adaptTokenCounter(counter: TokenCounter): ContextTokenCounter {
+export function adaptTokenCounter(
+  counter: TokenCounter,
+): ContextTokenCounter & Pick<TokenCounter, 'count'> {
   return Object.freeze({
     id: counter.id,
+    count: (messages: ReadonlyArray<Message>): Promise<number> => counter.count(messages),
     async countText(text: string): Promise<number> {
       if (typeof text !== 'string' || text.length === 0) return 0;
       return counter.countText(text);
@@ -105,23 +112,46 @@ export async function countMessageTokens(
  * Render a `Message` into a single textual approximation suitable
  * for token counting. Multimodal parts other than `'text'` /
  * `'reasoning'` contribute a constant approximation so the counter
- * does not silently under-count.
+ * does not silently under-count. Assistant tool calls render their
+ * name + serialized args (context-engine-03) — file writes and
+ * `code_execute` scripts are frequently the dominant tokens of an
+ * agentic step, and the provider serializes + counts them, so the
+ * engine's arithmetic must too (mirrors the provider-side
+ * `serialiseMessageForCount`).
  *
  * @stable
  */
 export function renderMessageText(message: Message): string {
   if (message.role === 'system') return message.content;
   const content = message.content;
-  if (typeof content === 'string') return content;
   let out = '';
-  for (const part of content) {
-    if (part.type === 'text' || part.type === 'reasoning') {
-      out += `${part.text}\n`;
-    } else {
-      // Approximate non-text parts (image / audio / file) as a small
-      // fixed cost so the counter does not silently under-count.
-      out += '[non-text-part]\n';
+  if (typeof content === 'string') {
+    out = content;
+  } else {
+    for (const part of content) {
+      if (part.type === 'text' || part.type === 'reasoning') {
+        out += `${part.text}\n`;
+      } else {
+        // Approximate non-text parts (image / audio / file) as a small
+        // fixed cost so the counter does not silently under-count.
+        out += '[non-text-part]\n';
+      }
+    }
+  }
+  if (message.role === 'assistant' && message.toolCalls !== undefined) {
+    for (const call of message.toolCalls) {
+      const args = typeof call.args === 'string' ? call.args : safeStringifyArgs(call.args);
+      out += `\n[tool-call:${call.toolName}] ${args}`;
     }
   }
   return out;
+}
+
+/** JSON-stringify tool args without ever throwing (circular → constant). */
+function safeStringifyArgs(args: unknown): string {
+  try {
+    return JSON.stringify(args) ?? '';
+  } catch {
+    return '[unserializable-args]';
+  }
 }
