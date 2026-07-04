@@ -120,6 +120,44 @@ describe('runBridgedSource', () => {
     if (!result.ok) expect(result.error.kind).toBe('sandbox-violation');
   });
 
+  it('blocks the child_process escape via import (D4 / tools-05)', async () => {
+    const { dispatch } = recordingDispatch({});
+    const result = await runBridgedSource({
+      source: "const cp = await import('node:child_process'); cp.execSync('id'); return 'escaped';",
+      allowedTools: [],
+      dispatch,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.kind).toBe('sandbox-violation');
+  });
+
+  it('blocks the child_process escape via CJS require (D4 / tools-05)', async () => {
+    const { dispatch } = recordingDispatch({});
+    const result = await runBridgedSource({
+      source:
+        "const { createRequire } = await import('node:module');" +
+        "const req = createRequire(process.cwd() + '/x.js');" +
+        "req('child_process').execSync('id'); return 'escaped';",
+      allowedTools: [],
+      dispatch,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.kind).toBe('sandbox-violation');
+  });
+
+  it('blocks vm and worker_threads nested escapes (D4 / tools-05)', async () => {
+    const { dispatch } = recordingDispatch({});
+    for (const mod of ['node:vm', 'node:worker_threads']) {
+      const result = await runBridgedSource({
+        source: `await import('${mod}'); return 'escaped';`,
+        allowedTools: [],
+        dispatch,
+      });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error.kind).toBe('sandbox-violation');
+    }
+  });
+
   it('enforces a wall-clock timeout on a non-terminating script', async () => {
     const { dispatch } = recordingDispatch({});
     const result = await runBridgedSource({

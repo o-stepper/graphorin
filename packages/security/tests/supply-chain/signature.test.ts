@@ -164,4 +164,54 @@ describe('@graphorin/security/supply-chain — signature verifier', () => {
       SkillSignatureInvalidError,
     );
   });
+
+  describe('operator trust root (D4 / security-01)', () => {
+    it('rejects a valid signature from a key absent from the trust root', async () => {
+      const { skillMd, publicKeyPem } = buildSignedSkill({
+        name: 'pdf-processing',
+        publisher: 'evil.example.com',
+        publicKeyRef: { url: 'https://evil.example.com/.well-known/graphorin-skill-pubkey.pem' },
+      });
+      _setPublicKeyFetcherForTesting(async () => publicKeyPem);
+      const result = await verifySkillSignature({
+        skillMd,
+        trustRoot: { publishers: ['trusted.example.com'] },
+      });
+      expect(result.valid).toBe(false);
+      expect(result.reason).toContain('untrusted-key');
+    });
+
+    it('accepts a valid signature whose publisher is in the trust root', async () => {
+      const { skillMd, publicKeyPem } = buildSignedSkill({
+        name: 'pdf-processing',
+        publisher: 'trusted.example.com',
+        publicKeyRef: { url: 'https://trusted.example.com/.well-known/graphorin-skill-pubkey.pem' },
+      });
+      _setPublicKeyFetcherForTesting(async () => publicKeyPem);
+      const result = await verifySkillSignature({
+        skillMd,
+        trustRoot: { publishers: ['trusted.example.com'] },
+      });
+      expect(result.valid).toBe(true);
+    });
+
+    it('accepts a valid signature whose key fingerprint is pinned in the trust root', async () => {
+      const { skillMd, publicKeyPem } = buildSignedSkill({
+        name: 'pdf-processing',
+        publisher: 'vendor.example.com',
+        publicKeyRef: { url: 'https://vendor.example.com/.well-known/graphorin-skill-pubkey.pem' },
+      });
+      _setPublicKeyFetcherForTesting(async () => publicKeyPem);
+      // First resolve the fingerprint the verifier computes.
+      const probe = await verifySkillSignature({ skillMd });
+      expect(probe.valid).toBe(true);
+      const fingerprint = probe.fingerprint;
+      expect(fingerprint).toBeDefined();
+      const result = await verifySkillSignature({
+        skillMd,
+        trustRoot: { fingerprints: [fingerprint as string] },
+      });
+      expect(result.valid).toBe(true);
+    });
+  });
 });

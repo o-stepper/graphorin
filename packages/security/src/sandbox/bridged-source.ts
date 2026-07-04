@@ -126,7 +126,15 @@ if (data && data.env) {
   for (const k of Object.keys(data.env)) process.env[k] = data.env[k];
 }
 
-const blocked = [];
+// D4 / tools-05 (SDF-9 parity with worker-threads.ts): process-level
+// escapes are ALWAYS blocked — child_process, vm, worker_threads
+// (nested), cluster, inspector each trivially defeat the no-fs /
+// no-network flags. Defence in depth; worker threads remain a fault
+// boundary, not a security boundary.
+const ESCAPE_MODULES = ['node:child_process', 'child_process',
+  'node:vm', 'vm', 'node:worker_threads', 'worker_threads',
+  'node:cluster', 'cluster', 'node:inspector', 'inspector'];
+const blocked = [...ESCAPE_MODULES];
 if (data.noFilesystem) blocked.push('node:fs', 'fs', 'node:fs/promises', 'fs/promises');
 if (data.noNetwork) blocked.push('node:http', 'http', 'node:https', 'https',
   'node:net', 'net', 'node:dgram', 'dgram', 'node:tls', 'tls');
@@ -140,8 +148,10 @@ if (blocked.length) {
     "export async function resolve(spec, ctx, next) {" +
     "  if (blocked.has(spec)) {" +
     "    const isFs = spec === 'node:fs' || spec === 'fs' || spec === 'node:fs/promises' || spec === 'fs/promises';" +
-    "    const err = new Error((isFs ? 'filesystem' : 'network') + ' access denied by sandbox policy: ' + spec);" +
-    "    err.name = isFs ? 'SandboxFsAccessDenied' : 'SandboxNetworkAccessDenied';" +
+    "    const isNet = spec.indexOf('http') >= 0 || spec.indexOf('net') >= 0 || spec.indexOf('tls') >= 0 || spec.indexOf('dgram') >= 0;" +
+    "    const kind = isFs ? 'filesystem' : isNet ? 'network' : 'module';" +
+    "    const err = new Error(kind + ' access denied by sandbox policy: ' + spec);" +
+    "    err.name = isFs ? 'SandboxFsAccessDenied' : isNet ? 'SandboxNetworkAccessDenied' : 'SandboxModuleAccessDenied';" +
     "    throw err;" +
     "  }" +
     "  return next(spec, ctx);" +
@@ -170,6 +180,26 @@ if (data.noNetwork) {
 const allowedEnv = (data && data.env) || {};
 for (const k of Object.keys(process.env)) {
   if (!Object.prototype.hasOwnProperty.call(allowedEnv, k)) delete process.env[k];
+}
+
+// D4 / tools-05: the ESM resolve hook does not see CJS require() — patch
+// Module._load so a createRequire()-based require('child_process') /
+// require('vm') inside bridged code is denied too.
+{
+  const Module = require('node:module');
+  const blockedSet = new Set(blocked);
+  const originalLoad = Module._load;
+  Module._load = function (request, parent, isMain) {
+    if (blockedSet.has(request)) {
+      const isFs = request === 'node:fs' || request === 'fs'
+        || request === 'node:fs/promises' || request === 'fs/promises';
+      const err = new Error(
+        (isFs ? 'filesystem' : 'module') + ' access denied by sandbox policy: ' + request);
+      err.name = isFs ? 'SandboxFsAccessDenied' : 'SandboxModuleAccessDenied';
+      throw err;
+    }
+    return originalLoad.call(this, request, parent, isMain);
+  };
 }
 
 let __seq = 0;
@@ -216,7 +246,8 @@ Object.freeze(tools);
     parentPort.postMessage({ type: 'done', ok: true, output: output, toolCalls: __toolCalls });
   } catch (err) {
     const nm = err && err.name;
-    const kind = (nm === 'SandboxFsAccessDenied' || nm === 'SandboxNetworkAccessDenied')
+    const kind = (nm === 'SandboxFsAccessDenied' || nm === 'SandboxNetworkAccessDenied'
+      || nm === 'SandboxModuleAccessDenied')
       ? 'sandbox-violation' : 'execution-failed';
     parentPort.postMessage({
       type: 'done', ok: false, toolCalls: __toolCalls,

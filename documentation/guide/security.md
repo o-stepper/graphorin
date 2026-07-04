@@ -81,6 +81,30 @@ The audit log lives in a dedicated SQLite database with **mandatory encryption-a
 
 The CLI command `graphorin audit verify` walks the chain and reports any breaks (`graphorin audit export` / `prune` round out the group).
 
+### Merkle transparency + signed checkpoints (D4)
+
+The linear hash chain is tamper-*evident* but not tamper-*resistant*: a writer who can rewrite the whole database can re-root the chain (exactly what `pruneAudit` does by design). `@graphorin/security/audit` adds an RFC-6962 Merkle layer over the same rows so the log can be **anchored** and made tamper-resistant against that adversary:
+
+```ts
+import {
+  signAuditCheckpoint,
+  verifyAuditAgainstCheckpoint,
+  generateAuditSigningKeyPair,
+} from '@graphorin/security/audit';
+
+const { publicKeyPem, privateKeyPem } = generateAuditSigningKeyPair(); // Ed25519
+// Periodically sign the current tree head and store it OUT OF BAND
+// (a different host, an object store, a ticket):
+const checkpoint = await signAuditCheckpoint(auditDb, { privateKeyPem, writerId: 'ci' });
+
+// Later — the signature is valid AND the live log is an append-only
+// extension of the checkpointed head (any rewrite of the covered prefix
+// fails the RFC-6962 consistency proof):
+const result = await verifyAuditAgainstCheckpoint(auditDb, checkpoint, { publicKeyPem });
+```
+
+Also available: `computeAuditTreeHead`, `proveAuditInclusion` / `verifyAuditInclusion` ("entry N is in the log with head H"), and `proveAuditConsistency` / `verifyAuditConsistency`. As long as one signed checkpoint survives outside the writer's reach, a rewrite, reorder, or truncate-and-re-root is detectable.
+
 ## OAuth 2.1 with PKCE
 
 ```mermaid
@@ -127,6 +151,21 @@ Loading from `npm-package` or `git-repo` always:
 Local `folder` installations are trusted-by-default but flow through the same validator pipeline.
 
 An operator allow/deny policy gates which package names may be installed. By default a matching allowlist entry wins (so you can deny a whole scope yet allow specific exceptions inside it); set `precedence: 'deny-wins'` to consult the deny lists first, so an explicit denylist entry can never be overridden by a broad allowlist glob.
+
+**Operator trust root (D4).** A valid signature is not authenticity if the signer is anyone — a self-signed skill whose inline key is not pinned would otherwise verify green under the signature-required policy. Pass a `trustRoot` (through `installSkillFromNpm` / `installSkillFromGit` or directly to `verifySkillSignature`) and the resolved signing key must be in it, or verification returns `valid: false` with `reason: 'untrusted-key'`:
+
+```ts
+await installSkillFromNpm({
+  packageName: '@vendor/skill',
+  trustRoot: {
+    publishers: ['vendor.example.com'],           // trusted publisher ids
+    fingerprints: ['sha256:...'],                  // and/or pinned key fingerprints
+    allowSigstore: true,                           // sigstore-resolved keys exempt (default)
+  },
+});
+```
+
+The root check runs after the ed25519 signature itself is valid, so the result distinguishes a forged signature from an untrusted signer.
 
 ## Lateral-leak defense layer
 
@@ -184,6 +223,40 @@ Three additional propagation legs close gaps the run-local shingle probe cannot 
 **Pattern catalogues are signal, not gates.** The injection/PII regex catalogues (guardrails, the memory quarantine heuristics, the imperative-pattern strip) now share a Unicode pre-pass (`normalizeForMatching`: NFKC + zero-width strip) so cheap character-injection — zero-width splits, fullwidth homoglyphs — no longer slips past them. They remain best-effort telemetry: adaptive attacks bypass published pattern/classifier defenses at >90% ASR ("The Attacker Moves Second"), so never rely on a catalogue verdict as the sole gate — memory quarantine is reversible by design (`fact_validate`), and the deterministic dataflow policy above is the load-bearing control.
 
 Wire it end-to-end with `createAgent({ dataFlowPolicy: { mode: 'shadow' } })` — see the [agent runtime guide](/guide/agent-runtime#provenance-data-flow-policy-dataflowpolicy) for the full configuration and event details.
+
+## Tool-argument policies & Rule-of-Two (D4)
+
+The data-flow policy above is *detective* (it flags/blocks at the sink after taint is observed). Two *preventive* layers deny disallowed calls before they run, and compose with it:
+
+**Progent-style tool-argument policies** (`AgentConfig.toolPolicy`) are forbid-before-allow rules over the tool name and its validated arguments, evaluated by the executor on every call. A `forbid` verdict blocks the call with a `capability_blocked` outcome (recovery hint `report_to_user`):
+
+```ts
+createAgent({
+  // ...
+  toolPolicy: {
+    rules: [
+      { effect: 'forbid', tool: 'delete_*', reason: 'destructive ops disabled' },
+      { effect: 'forbid', tool: 'transfer', when: (f) => (f.args as any).amount > 1000 },
+    ],
+    defaultDenySensitive: true, // secret-tier tools need an explicit allow
+  },
+});
+```
+
+A matching `forbid` always beats an `allow`, so narrowing composes safely and a later broad allow can never re-open a denied call.
+
+**Rule-of-Two capability profiles** (`AgentConfig.ruleOfTwo`) declare which of the three lethal-trifecta legs an agent may hold this session: `{ untrustedInput, sensitiveData, externalSideEffects }`. Holding all three is the dangerous configuration; a well-formed profile drops one. Denying `externalSideEffects` forces a read-only capability floor (writer tools are neither advertised nor executable, D2's single-writer gate); denying `sensitiveData` default-denies secret-tier tools. This turns the coarse lethal-trifecta trigger from detective into **preventive** — the third leg is deterministically blocked, not merely flagged.
+
+```ts
+createAgent({
+  // ...
+  // A browsing worker that reads untrusted web content and secrets, but
+  // cannot act on the world:
+  ruleOfTwo: { untrustedInput: true, sensitiveData: true, externalSideEffects: false },
+});
+```
+
+The pure decision engines live in `@graphorin/security/policy` (`evaluateToolArgumentPolicy`, `buildRuleOfTwoPolicy`).
 
 ## Memory safety: provenance & quarantine
 

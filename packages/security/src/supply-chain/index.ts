@@ -69,6 +69,7 @@ export {
   _setSigstoreVerifierForTesting,
   type PublicKeyFetcher,
   type SigstoreVerifier,
+  type SkillTrustRoot,
   type VerifySkillSignatureOptions,
   verifySkillSignature,
 } from './signature.js';

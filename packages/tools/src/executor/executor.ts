@@ -99,6 +99,15 @@ export interface ExecutorOptions {
   readonly emitAudit?: (event: ToolAuditEvent) => void;
   /** Approval gate — invoked when a tool's `needsApproval` resolves to `true`. */
   readonly approvalGate?: ApprovalGate;
+  /**
+   * Declarative tool-argument policy guard (D4 / Progent). Consulted
+   * AFTER schema validation + approval, BEFORE the data-flow sink gate,
+   * on every tool call. A `forbid` verdict blocks the call with a
+   * `capability_blocked` outcome. The pure decision engine lives in
+   * `@graphorin/security/policy` (`evaluateToolArgumentPolicy`); the
+   * agent runtime injects this adapter. Absent ⇒ no policy (legacy).
+   */
+  readonly argumentPolicy?: ToolArgumentPolicyGuard;
   /** Tool repair hook (single-round). */
   readonly repair?: ToolRepairHook;
   /** Per-provider token counter used by the truncation pipeline. */
@@ -309,6 +318,23 @@ export interface ExecuteBatchOptions {
    * agent-side advertise filter. Absent ⇒ all capabilities (legacy).
    */
   readonly capability?: 'read-only';
+}
+
+/**
+ * Structural adapter for the D4 tool-argument policy (Progent). The
+ * agent runtime wires `evaluateToolArgumentPolicy` from
+ * `@graphorin/security/policy`; `@graphorin/tools` stays dependency-free
+ * on security.
+ *
+ * @stable
+ */
+export interface ToolArgumentPolicyGuard {
+  evaluate(input: {
+    readonly toolName: string;
+    readonly sideEffectClass: SideEffectClass;
+    readonly sensitive: boolean;
+    readonly args: unknown;
+  }): { readonly effect: 'allow' } | { readonly effect: 'forbid'; readonly reason: string };
 }
 
 /** Public executor surface. */
@@ -801,6 +827,31 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           ts: Date.now(),
           context: { runId: runContext.runId, stepNumber, toolCallId: call.toolCallId },
         });
+      }
+    }
+
+    // D4 Progent tool-argument policy: forbid-before-allow rules over the
+    // validated args, evaluated after approval and before the sink gate.
+    // A forbid verdict is a deterministic pre-execution block — the
+    // preventive complement to the (detective) data-flow gate below.
+    if (opts.argumentPolicy !== undefined) {
+      const decision = opts.argumentPolicy.evaluate({
+        toolName: tool.name,
+        sideEffectClass: tool.__sideEffectClass,
+        sensitive: tool.sensitivity === 'secret',
+        args: validatedInput,
+      });
+      if (decision.effect === 'forbid') {
+        const error: ToolError = {
+          toolCallId: call.toolCallId,
+          toolName: tool.name,
+          kind: 'capability_blocked',
+          message: `Blocked by tool-argument policy: ${decision.reason}`,
+          hint: decision.reason,
+        };
+        incrementCounter('tool.executor.policy-blocked.total', { toolName: tool.name });
+        emitErrorAudit(error, runContext, stepNumber);
+        return frozenCompleted(call, error, stepNumber);
       }
     }
 

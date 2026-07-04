@@ -29,6 +29,7 @@ import type {
 import type { Memory, PostCompactionHook as MemoryPostCompactionHook } from '@graphorin/memory';
 import type { DataFlowPolicyConfig } from '@graphorin/security/dataflow';
 import type { InputGuardrail, OutputGuardrail } from '@graphorin/security/guardrails';
+import type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/policy';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import type { ResultReader } from '@graphorin/tools/result';
 import type { AgentFallbackPolicy } from './fallback/index.js';
@@ -329,6 +330,23 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * {@link AgentCallOptions.capability}. See {@link AgentCapability}.
    */
   readonly capability?: AgentCapability;
+  /**
+   * Declarative tool-argument policy (D4 / Progent). Forbid-before-allow
+   * rules over tool name + validated args, evaluated by the executor on
+   * every call; default-deny sensitive tools with `defaultDenySensitive`.
+   * A forbid verdict blocks the call (`capability_blocked`). Composes on
+   * top of {@link ruleOfTwo}. See `@graphorin/security/policy`.
+   */
+  readonly toolPolicy?: ToolArgumentPolicy;
+  /**
+   * Rule-of-Two capability profile (D4). Declares which of {untrusted
+   * input, sensitive data, external side effects} this agent may hold;
+   * denying external side effects forces a read-only capability floor
+   * and blocks writer tools, denying sensitive data default-denies
+   * sensitive tools. Holding all three is the dangerous configuration
+   * the preset is designed to prevent. See `@graphorin/security/policy`.
+   */
+  readonly ruleOfTwo?: RuleOfTwoProfile;
   readonly sessionId?: string;
   readonly userId?: string;
   readonly deps?: TDeps;

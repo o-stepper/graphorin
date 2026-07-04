@@ -116,6 +116,7 @@ import {
 } from './tooling/adapters.js';
 import { orderPromotedTools } from './tooling/catalogue.js';
 import { buildDataFlowGuard } from './tooling/dataflow.js';
+import { buildToolArgumentPolicy } from './tooling/policy.js';
 import { buildToolRegistry } from './tooling/registry-build.js';
 import type {
   AbortOptions,
@@ -1106,6 +1107,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     config.dataFlowPolicy !== undefined && config.dataFlowPolicy.mode !== 'off'
       ? buildDataFlowGuard(config.dataFlowPolicy)
       : undefined;
+  // D4 Progent tool-argument policy + Rule-of-Two floor. `ruleOfTwo`
+  // compiles to a policy (+ a read-only capability floor when it denies
+  // external side effects); an explicit `toolPolicy` composes on top
+  // (its rules are appended, so an explicit forbid still wins). Built
+  // once, shared by every executor.
+  const { guard: toolArgumentPolicyGuard, capabilityFloor: ruleOfTwoCapabilityFloor } =
+    buildToolArgumentPolicy(config.toolPolicy, config.ruleOfTwo);
   const toolStreamingSink: NonNullable<ExecutorOptions['streamingSink']> = (event) =>
     activeExecutorBridge?.sink(event);
   // `quiet` builds an executor without the streaming sink — used for
@@ -1126,6 +1134,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         : {}),
       spill: spillWriter,
       ...(toolDataFlowGuard !== undefined ? { dataFlowGuard: toolDataFlowGuard } : {}),
+      ...(toolArgumentPolicyGuard !== undefined ? { argumentPolicy: toolArgumentPolicyGuard } : {}),
       ...(opts?.quiet === true ? {} : { streamingSink: toolStreamingSink }),
       ...(config.maxParallelTools !== undefined
         ? { maxParallelTools: config.maxParallelTools }
@@ -1191,9 +1200,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     runInFlight = true;
     pendingSteer = [];
     pendingAbort = undefined;
-    // D2: per-run capability — the call-level override wins over the
-    // agent default; absent ⇒ all capabilities (legacy behaviour).
-    activeRunCapability = options.capability ?? config.capability;
+    // D2 + D4: per-run capability — the call-level override wins, then
+    // the agent default, then the Rule-of-Two floor (a profile denying
+    // external side effects forces read-only even without an explicit
+    // capability). Absent ⇒ all capabilities (legacy behaviour).
+    activeRunCapability = options.capability ?? config.capability ?? ruleOfTwoCapabilityFloor;
     // AG-10: the causality chain is a per-run artifact — a denial
     // recorded in one run must not poison detection in the next.
     causalityMonitor?.reset();
