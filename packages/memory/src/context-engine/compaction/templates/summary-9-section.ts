@@ -1,5 +1,9 @@
 /**
- * Built-in 9-section structured summary template (RB-46 § 5.2).
+ * Built-in structured summary template (RB-46 § 5.2). Historically named
+ * "9-section" (the file name is retained for import stability); the
+ * template has since grown to 12 sections — the stable id below says
+ * `summary-sections` so metadata no longer misstates the shape
+ * (context-engine-14).
  * The template ships in English by default; locale-extensible via
  * `defineContextLocalePack({ compactionSummaryTemplate: { ... } })`.
  *
@@ -16,8 +20,9 @@
  * The last two sections ("Recent turns preserved verbatim" and
  * "Compaction metadata") are filled by the harness, NOT by the
  * summarizer — those contracts are mechanical and auditable. The
- * other nine sections (incl. the SOTA-6 "Errors encountered and
- * resolutions" and "Next steps") are produced by the LLM call.
+ * other sections (incl. the SOTA-6 "Errors encountered and
+ * resolutions" / "Next steps" and the C4 "Constraints and
+ * non-negotiables") are produced by the LLM call.
  *
  * @packageDocumentation
  */
@@ -33,14 +38,14 @@ import { renderMessageText } from '../../token-counter.js';
  *
  * @stable
  */
-export const SUMMARY_TEMPLATE_VERSION = '1.2';
+export const SUMMARY_TEMPLATE_VERSION = '1.3';
 
 /**
  * Stable identifier of the bundled template.
  *
  * @stable
  */
-export const SUMMARY_TEMPLATE_NAME = 'summary-9-section';
+export const SUMMARY_TEMPLATE_NAME = 'summary-sections';
 
 /**
  * Preamble + section-headers payload extracted from a locale pack.

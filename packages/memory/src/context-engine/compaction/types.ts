@@ -90,7 +90,7 @@ export interface CompactionTriggerConfig {
  * Strategy discriminator. The default
  * `'summarize-old-preserve-recent'` strategy invokes the
  * configured summarizer and replaces the older portion with a
- * structured 9-section summary; `'clear-old-tool-results'` (SOTA-1) is
+ * structured section summary; `'clear-old-tool-results'` (SOTA-1) is
  * a zero-LLM tier that replaces the oldest tool results with compact
  * placeholders BEFORE any summarizer call, falling back to summarize
  * only if clearing did not reclaim enough; the `'custom'` variant
@@ -118,6 +118,14 @@ export type CompactionStrategy =
        * tokens); lower it for small summarizer models; `0` disables.
        */
       readonly summarizerInputCharBudget?: number;
+      /**
+       * C4: keep the most recent N USER messages from the summarized
+       * window verbatim (re-inserted between the summary and the
+       * preserved tail) — only assistant/tool content is summarized
+       * away. User words are the task statement; paraphrase loses
+       * constraints. Default `2`; `0` disables.
+       */
+      readonly preserveUserMessages?: number;
     }
   | {
       /**
@@ -131,6 +139,19 @@ export type CompactionStrategy =
       readonly clearAtLeast?: number;
       /** Tool names whose results are never cleared. */
       readonly excludeTools?: ReadonlyArray<string>;
+      /**
+       * C4 (clear_tool_uses_20250919 parity): additionally blank the
+       * PAIRED assistant tool-call arguments when a result is cleared,
+       * reclaiming the input side of verbose calls too. Default `false`.
+       */
+      readonly clearToolInputs?: boolean;
+      /**
+       * C4 (context-engine-11): the retrieval tool the externalized-handle
+       * placeholder advertises. Pass `null` when the runtime does not
+       * register `read_result` so the placeholder never promises a tool
+       * the model cannot call. Default `'read_result'`.
+       */
+      readonly readResultToolName?: string | null;
       /**
        * A6 / SOTA-2 — recoverable clearing. Wire to a spill / `read_result`
        * registry: cleared content is saved behind a handle and the placeholder
@@ -176,6 +197,13 @@ export interface PostCompactionHookContext {
   readonly sessionId: string;
   readonly agentId: string;
   readonly source: CompactionSource;
+  /**
+   * C4: the messages this compaction dropped (summarized away /
+   * cleared), in original order. Lets re-anchoring hooks recover
+   * references — e.g. `reanchorRecentResults` re-lists the result
+   * handles that just left the window.
+   */
+  readonly droppedMessages?: ReadonlyArray<Message>;
 }
 
 /**
@@ -214,7 +242,7 @@ export interface CompactionConfig {
 export interface CompactionSummarizer {
   /**
    * Produce a summary text for the supplied prompt. The prompt is
-   * built by the compactor using the configured 9-section template;
+   * built by the compactor using the configured section template;
    * the adapter is responsible for invoking the underlying LLM.
    */
   summarize(input: {

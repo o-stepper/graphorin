@@ -19,6 +19,10 @@ export {
 export { reanchorPersonaBlock } from './hooks/reanchor-persona-block.js';
 export { reanchorPinnedFacts } from './hooks/reanchor-pinned-facts.js';
 export { reanchorProjectRules } from './hooks/reanchor-project-rules.js';
+export {
+  type ReanchorRecentResultsOptions,
+  reanchorRecentResults,
+} from './hooks/reanchor-recent-results.js';
 export type { HookDeps, NamedPostCompactionHook } from './hooks/types.js';
 export {
   buildSummarizerPrompt,

@@ -170,7 +170,9 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
       memory,
     });
     expect(out.result.beforeTokens).toBeGreaterThan(out.result.afterTokens);
-    expect(out.result.preservedMessages.length).toBe(6); // default preserveRecentTurns
+    // Default preserveRecentTurns (6) + the 2 most recent user messages
+    // carried verbatim from the summarized window (C4).
+    expect(out.result.preservedMessages.length).toBe(8);
     expect(out.result.summary).toContain(SUMMARY_TEMPLATE_NAME);
     expect(out.result.summary).toContain(SUMMARY_TEMPLATE_VERSION);
     expect(out.hookFailures).toEqual([]);
@@ -235,7 +237,7 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
       sessionId: 's1',
       agentId: 'a1',
       source: 'auto-trigger',
-      messages: buildMessages(20),
+      messages: buildMessages(20, 'X'.repeat(800)),
       memory,
     });
     expect(out.hookFailures).toEqual([{ hookName: 'buggyHook', reason: 'Error' }]);
@@ -323,7 +325,7 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
       sessionId: 's1',
       agentId: 'a1',
       source: 'auto-trigger',
-      messages: buildMessages(20),
+      messages: buildMessages(20, 'X'.repeat(800)),
       memory,
     });
     const after = await memory.consolidator.status();
@@ -595,10 +597,11 @@ describe('CE-3/CE-6 — compactNow per-call overrides', () => {
       ...baseCall(memory),
       preserveRecentTurns: 2,
     });
-    expect(overridden.result.preservedMessages.length).toBe(2);
+    // 2 positional turns + 2 user messages carried verbatim (C4).
+    expect(overridden.result.preservedMessages.length).toBe(4);
     // Without the override the configured strategy default (6) still applies.
     const plain = await memory.contextEngine.compactNow(baseCall(memory));
-    expect(plain.result.preservedMessages.length).toBe(6);
+    expect(plain.result.preservedMessages.length).toBe(8);
   });
 
   it('supplies HookDeps.procedural to the built-in hooks (CE-6 item 3)', async () => {
@@ -746,7 +749,12 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
       contextEngine: {
         providerContextWindow: 200_000,
         privacy: { providerTrust: 'public-tls' },
-        compaction: { trigger: { thresholdTokens: 100 } },
+        compaction: {
+          trigger: { thresholdTokens: 100 },
+          // These tests pin the POSITIONAL boundary snap; the C4
+          // carry-users-verbatim default would shift every index.
+          strategy: { kind: 'summarize-old-preserve-recent', preserveUserMessages: 0 },
+        },
         summarizer: STUB_SUMMARIZER,
       },
     });
@@ -781,7 +789,7 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
       runId: 'r',
       sessionId: 's1',
       agentId: 'a1',
-      source: 'auto-trigger',
+      source: 'manual',
       messages,
       memory,
     });
@@ -815,7 +823,7 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
       runId: 'r',
       sessionId: 's1',
       agentId: 'a1',
-      source: 'auto-trigger',
+      source: 'manual',
       messages,
       memory,
     });
@@ -854,7 +862,7 @@ describe('context-engine-02 — post-compaction hooks honour the D2 privacy filt
       runId: 'r',
       sessionId: 's1',
       agentId: 'a1',
-      source: 'auto-trigger',
+      source: 'manual',
       messages: buildMessages(40, 'X'.repeat(800)),
       memory,
     });
@@ -895,7 +903,7 @@ describe('context-engine-04 — guard and floor share the full-buffer basis', ()
       runId: 'r',
       sessionId: 's1',
       agentId: 'a1',
-      source: 'auto-trigger',
+      source: 'manual',
       messages: body,
       prefixMessages,
       memory,

@@ -54,32 +54,33 @@ export interface InboundSanitizationPreamble {
 }
 
 /**
- * Structured 9-section summary template fragments used by the
- * auto-compaction summarizer (RB-46). Section order is fixed; only
- * the per-section header / preamble text is locale-extensible.
+ * Structured section-template fragments used by the auto-compaction
+ * summarizer (RB-46). Section order is fixed; only the per-section
+ * header / preamble text is locale-extensible.
  *
  * Each entry is the human-readable header for the corresponding
  * section. Section indices are 1-based to match the documented
- * 9-section layout in the architecture doc.
+ * layout in the architecture doc.
  *
  * @stable
  */
 export interface CompactionSummaryTemplate {
   /** Preamble injected at the top of the summarizer prompt. */
   readonly preamble: string;
-  /** 11 section headers. The last two are filled by the harness. */
+  /** 12 section headers. The last two are filled by the harness. */
   readonly sections: readonly [
     string, // 1: Session goal and current task
     string, // 2: Decisions made and rationale
-    string, // 3: Key facts established
-    string, // 4: Open questions and ambiguities
-    string, // 5: Tools used and their outcomes
-    string, // 6: Files / artifacts referenced
-    string, // 7: Persona / preferences / project rules surfaced
-    string, // 8: Errors encountered and resolutions (SOTA-6)
-    string, // 9: Next steps (SOTA-6)
-    string, // 10: Recent turns preserved verbatim (harness-filled)
-    string, // 11: Compaction metadata (harness-filled)
+    string, // 3: Constraints and non-negotiables (C4)
+    string, // 4: Key facts established
+    string, // 5: Open questions and ambiguities
+    string, // 6: Tools used and their outcomes
+    string, // 7: Files / artifacts referenced
+    string, // 8: Persona / preferences / project rules surfaced
+    string, // 9: Errors encountered and resolutions (SOTA-6)
+    string, // 10: Next steps (SOTA-6)
+    string, // 11: Recent turns preserved verbatim (harness-filled)
+    string, // 12: Compaction metadata (harness-filled)
   ];
 }
 
@@ -100,7 +101,7 @@ export interface ContextLocalePack {
   readonly autoRecallTriggers: AutoRecallTriggers;
   /** Inbound-sanitization preamble (D4 — RB-43). */
   readonly inboundSanitizationPreamble: InboundSanitizationPreamble;
-  /** 9-section compaction summary template (RB-46). */
+  /** Structured compaction summary template (RB-46). */
   readonly compactionSummaryTemplate: CompactionSummaryTemplate;
 }
 
