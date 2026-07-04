@@ -13,14 +13,20 @@ docker build -t graphorin:latest -f examples/docker/Dockerfile .
 
 ## Run
 
+The container needs a **JSON config mounted at `/etc/graphorin/config.json`**
+(the image `CMD` passes it via `--config`; the loader reads `.json`/`.js`/`.mjs`,
+not TOML). Start from
+[`../systemd/config.example.json`](../systemd/config.example.json) and point
+any `file:` secret refs under `/run/secrets/graphorin/`:
+
 ```bash
 docker run --rm \
   --read-only --tmpfs /tmp \
   --security-opt no-new-privileges \
   --cap-drop=ALL \
   -v graphorin-data:/data \
-  -v /run/secrets/graphorin:/secrets:ro \
-  -e GRAPHORIN_CONFIG=/etc/graphorin/config.json \
+  -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
+  -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
   -p 8080:8080 \
   graphorin:latest
 ```
@@ -28,7 +34,9 @@ docker run --rm \
 The flags mirror the framework's process-hardening discipline (refuse-to-run-as-root,
 `umask 0o077`, dropped capabilities, read-only root FS, no new privileges).
 Mount secrets (pepper, DB passphrases) read-only rather than baking them into
-the image. See [Standalone server](../../documentation/guide/standalone-server.md)
+the image. Without the config mount the CLI exits immediately with
+"config file not found". See
+[Standalone server](../../documentation/guide/standalone-server.md)
 and [Security](../../documentation/guide/security.md).
 
 ## Supported platforms

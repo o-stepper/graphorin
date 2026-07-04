@@ -49,6 +49,9 @@ data:
         "source": "encrypted-file",
         "strict": true
       },
+      "metrics": {
+        "requireAuth": true
+      },
       "observability": {
         "logger": "json"
       }
@@ -62,6 +65,9 @@ metadata:
     app.kubernetes.io/name: graphorin
     app.kubernetes.io/version: "0.5.0"
 spec:
+  # SQLite is single-writer: do NOT raise replicas above 1. `Recreate`
+  # (not RollingUpdate) guarantees the old pod releases the RWO volume
+  # and the DB file before the new one starts.
   replicas: 1
   strategy:
     type: Recreate
@@ -86,12 +92,16 @@ spec:
         - name: graphorin
           image: ghcr.io/o-stepper/graphorin:0.5.0
           imagePullPolicy: IfNotPresent
+          # `--config` is the only way the CLI selects a config file; there is
+          # no GRAPHORIN_CONFIG env var. Note the standalone daemon serves the
+          # health / metrics / tokens / agents / runs / workflows / ws / sse
+          # surface; the memory / sessions / skills / mcp / audit REST routes
+          # mount only when the server is embedded with the matching domain
+          # adapters (see the standalone-server guide).
           args: ["start", "--config", "/etc/graphorin/config.json"]
           env:
             - name: NODE_ENV
               value: production
-            - name: GRAPHORIN_CONFIG
-              value: /etc/graphorin/config.json
           ports:
             - name: http
               containerPort: 8080
@@ -110,6 +120,15 @@ spec:
             limits:
               cpu: "1000m"
               memory: "1Gi"
+          # startupProbe gives slow first boots (schema migrations on a large
+          # DB) up to 5 minutes before liveness takes over and could kill the
+          # pod mid-migration.
+          startupProbe:
+            httpGet:
+              path: /v1/health
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
           livenessProbe:
             httpGet:
               path: /v1/health
@@ -139,13 +158,17 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: graphorin-data
+        # 0440 (not 0400, and not YAML-1.2 `0o` octal, which kubectl's
+        # YAML-1.1 parser reads as a string): the files are root-owned with
+        # fsGroup 10001, so the group-read bit is what lets the non-root
+        # process (uid 10001) read its config and secret material.
         - name: config
           configMap:
             name: graphorin-config
-            defaultMode: 0o400
+            defaultMode: 0440
         - name: secrets
           projected:
-            defaultMode: 0o400
+            defaultMode: 0440
             sources:
               - secret:
                   name: graphorin-secrets

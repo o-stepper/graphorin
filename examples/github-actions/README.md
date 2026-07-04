@@ -6,8 +6,8 @@ examples smoke test.
 
 | File | Purpose |
 |---|---|
-| `release.yml` | Changesets-based version & publish pipeline, gated on `NPM_TOKEN`, with npm provenance. |
-| `security.yml` | `pnpm audit`, license allowlist, and CodeQL scanning on push/PR + a weekly schedule. |
+| `release.yml` | Changesets-based version & publish pipeline, gated on `NPM_TOKEN`, with npm provenance. Requires the changesets scripts in your `package.json` (`"version": "changeset version"`, `"release": "<build> && changeset publish"`). |
+| `security.yml` | `pnpm audit` (high+critical) and Sigstore signature verification on push/PR + a daily schedule. (No CodeQL or license-allowlist steps - add your own if you need them; Graphorin's monorepo `security.yml` shows a CodeQL job to crib from.) |
 | `renovate.json` | Renovate config for npm dependency updates. |
 
 To allowlist a reviewed advisory, use pnpm's own config in your `package.json`

@@ -33,7 +33,11 @@ ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
 PrivateDevices=true
-ReadWritePaths=/var/lib/graphorin /run/graphorin
+; StateDirectory has systemd create /var/lib/graphorin owned by the service
+; user; ProtectSystem=strict leaves it writable without a ReadWritePaths
+; carve-out for anything else.
+StateDirectory=graphorin
+ReadWritePaths=/var/lib/graphorin
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
@@ -63,11 +67,15 @@ LimitCORE=0
 ;   supported configuration.
 
 ; -- Runtime --
+; The config file must be JSON (or .js/.mjs) - the loader does not read TOML.
+; A starter lives next to this unit: examples/systemd/config.example.json ->
+; /etc/graphorin/config.json.
 WorkingDirectory=/var/lib/graphorin
 Environment=NODE_ENV=production
 Environment=GRAPHORIN_CONFIG=/etc/graphorin/config.json
 ExecStart=/usr/bin/graphorin start --config ${GRAPHORIN_CONFIG}
-ExecReload=/bin/kill -HUP $MAINPID
+; No ExecReload: the daemon handles SIGTERM/SIGINT only, so SIGHUP would
+; simply kill it (config is re-read on restart, not reload).
 KillSignal=SIGTERM
 TimeoutStopSec=30
 

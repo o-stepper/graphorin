@@ -7,14 +7,16 @@
 # Build:
 #   docker build -t graphorin:latest -f examples/docker/Dockerfile .
 #
-# Run:
+# Run (a JSON config mounted at /etc/graphorin/config.json is REQUIRED -
+# the CMD below passes it via --config; see
+# examples/systemd/config.example.json for a starter):
 #   docker run --rm \
 #     --read-only --tmpfs /tmp \
 #     --security-opt no-new-privileges \
 #     --cap-drop=ALL \
 #     -v graphorin-data:/data \
-#     -v /run/secrets/graphorin:/secrets:ro \
-#     -e GRAPHORIN_CONFIG=/etc/graphorin/config.json \
+#     -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
+#     -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
 #     -p 8080:8080 \
 #     graphorin:latest
 #
@@ -57,14 +59,17 @@ RUN corepack enable && corepack prepare pnpm@10.28.2 --activate \
 RUN ln -s /app/packages/cli/dist/bin/graphorin.js /usr/local/bin/graphorin \
  && chmod 0755 /usr/local/bin/graphorin
 
-# Mount points the container expects.
-RUN mkdir -p /data /secrets /etc/graphorin \
- && chown graphorin:graphorin /data /secrets /etc/graphorin \
- && chmod 0700 /data /secrets
+# Mount points the container expects. Secrets mount at
+# /run/secrets/graphorin so `file:/run/secrets/graphorin/<name>` refs in the
+# config resolve (mirrors the k8s template).
+RUN mkdir -p /data /run/secrets/graphorin /etc/graphorin \
+ && chown graphorin:graphorin /data /run/secrets/graphorin /etc/graphorin \
+ && chmod 0700 /data /run/secrets/graphorin
 
+# The CLI selects its config via the --config flag in CMD below; there is no
+# GRAPHORIN_CONFIG env var.
 USER graphorin
-ENV NODE_ENV=production \
-    GRAPHORIN_CONFIG=/etc/graphorin/config.json
+ENV NODE_ENV=production
 
 EXPOSE 8080
 
