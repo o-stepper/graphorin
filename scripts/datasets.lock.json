@@ -1,0 +1,32 @@
+{
+  "$comment": "SHA-256 pins for the eval datasets fetched by scripts/fetch-eval-datasets.mjs (audit 2026-07-04, E5). Benchmark baselines and any future release-full gate depend on these files, so a changed or substituted upstream file must fail the fetch loudly instead of silently shifting scores. Source URLs are pinned to immutable revisions (an HF revision sha / a GitHub commit sha), and the sha256 is verified after every download AND for already-present files. Refresh a pin deliberately with `node scripts/fetch-eval-datasets.mjs --force --update-lock`.",
+  "datasets": {
+    "longmemeval": {
+      "file": "longmemeval_s.json",
+      "sha256": "08d8dad4be43ee2049a22ff5674eb86725d0ce5ff434cde2627e5e8e7e117894",
+      "bytes": 278025796,
+      "source": "https://huggingface.co/datasets/xiaowu0162/longmemeval/resolve/2ec2a557f339b6c0369619b1ed5793734cc87533/longmemeval_s",
+      "upstreamRevision": "2ec2a557f339b6c0369619b1ed5793734cc87533",
+      "pinnedAt": "2026-07-04",
+      "note": "LongMemEval_S (arXiv:2410.10813). The sha256 is the file's authoritative HF LFS oid at the pinned revision. Upstream has deprecated this dataset in favour of xiaowu0162/longmemeval-cleaned (longmemeval_s_cleaned.json, which removes noisy history sessions); switching variants changes benchmark numbers and is an eval-baseline decision, not a fetch-script one - keep the paper-canonical file pinned here until an eval pass decides otherwise."
+    },
+    "locomo": {
+      "file": "locomo10.json",
+      "sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+      "bytes": 2805274,
+      "source": "https://raw.githubusercontent.com/snap-research/locomo/cbfbc1dba6bc53d00625212a0f22d55ffee7c1fc/data/locomo10.json",
+      "upstreamRevision": "cbfbc1dba6bc53d00625212a0f22d55ffee7c1fc",
+      "pinnedAt": "2026-07-04",
+      "note": "Real LOCOMO conversations (arXiv:2402.17753); commit-pinned raw.githubusercontent.com URL, hash computed from a verified download."
+    },
+    "dmr": {
+      "file": "dmr.json",
+      "sha256": null,
+      "bytes": null,
+      "source": null,
+      "upstreamRevision": null,
+      "pinnedAt": null,
+      "note": "DMR (MemGPT/Letta, arXiv:2310.08560) has no stable public direct URL; supply GRAPHORIN_DMR_URL with your copy. UNPINNED until a maintainer records a hash with --update-lock - the fetch script warns loudly about this."
+    }
+  }
+}

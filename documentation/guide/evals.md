@@ -51,7 +51,7 @@ Loaders return a uniform case list:
 - **`loadLongMemEvalDataset`** — the real [LongMemEval](https://arxiv.org/abs/2410.10813) long-term-memory benchmark (ICLR 2025).
 - **`loadLocomoDataset`** — the real [LOCOMO](https://arxiv.org/abs/2402.17753) multi-session conversational-memory benchmark.
 
-The LongMemEval / LOCOMO datasets are not bundled; fetch them with `scripts/fetch-eval-datasets.mjs` (an explicit, user-initiated download), then point the loader at the local path.
+The LongMemEval / LOCOMO datasets are not bundled; fetch them with `scripts/fetch-eval-datasets.mjs` (an explicit, user-initiated download), then point the loader at the local path. Downloads are integrity-checked: every dataset is pinned in `scripts/datasets.lock.json` (SHA-256 + immutable-revision source URL), already-present files are re-verified rather than trusted, and a `GRAPHORIN_*_URL` env override changes the source but not the required hash. A hash mismatch fails loudly; re-pin deliberately with `--force --update-lock`.
 
 ## Reporters
 
