@@ -121,7 +121,11 @@ The **body** explains the *why*, not the *what*. One logical change per commit; 
 
 Graphorin follows [SemVer](https://semver.org). Pre-1.0, minor bumps cover breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). Once Graphorin reaches 1.0, strict SemVer applies. All `@graphorin/*` packages are released **lockstep** at the same version while on the 0.x line.
 
-Versions are managed by [Changesets](https://github.com/changesets/changesets). Do **not** bump versions by hand — let `pnpm changeset version` do it.
+Versions are tracked with [Changesets](https://github.com/changesets/changesets): open a PR with a changeset describing your change. All `@graphorin/*` packages release **lockstep** at the same version while on the 0.x line.
+
+> Release mechanics: the version bump + root `CHANGELOG.md` are currently applied by the maintainer as a **manual pass** (the automated `changeset version` changelog step, `@changesets/changelog-github`, is not yet reliable in this repo), and the consumed changesets for already-released work are then drained from `.changeset/`. The `0.2.0` through `0.5.0` bumps were all applied this way. The intent is to move to changeset-driven bumps once the changelog generator is fixed; until then, do not hand-bump versions in a feature PR: author a changeset and let the release pass apply it.
+
+> Git tags & provenance: the tag history starts at `0.5.0`, the first version published to the npm registry (each published package carries a `@graphorin/<pkg>@0.5.0` tag created by the release pipeline). The earlier `0.2.0`, `0.3.0`, and `0.4.0` bumps were internal-only and were never published, so no retro tags were backfilled for them: audit item CI-7 keeps the changelog backfill and these CONTRIBUTING notes, but retro-tagging never-published versions is a deliberate skip. Every real publish is provenance-checked in CI by the post-publish `npm audit signatures` smoke in `.github/workflows/release.yml`.
 
 ## Privacy & no-phone-home
 
