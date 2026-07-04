@@ -357,13 +357,36 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     const indexByCallId = new Map(calls.map((c, i) => [c.toolCallId, i]));
 
     // Run sequential tools first (deterministic ordering).
-    for (const call of sequentialCalls) {
-      const completed = await executeOne({
+    // TL-12 (tools-07): `executeOne` is designed not to throw, but a
+    // user-supplied hook that does (e.g. a throwing `tracer.span`) must
+    // never SHRINK the batch — a missing slot means the agent pushes no
+    // `tool` message for that id, leaving a dangling `tool_use` the next
+    // provider request is rejected for. Synthesize an `execution_failed`
+    // outcome instead of dropping the slot.
+    const synthesizeFailure = (call: ToolCall, cause: unknown): CompletedToolCall =>
+      frozenCompleted(
         call,
-        runContext: batch.runContext,
-        stepNumber: batch.stepNumber,
-        trustLevel,
-      });
+        {
+          toolCallId: call.toolCallId,
+          toolName: call.toolName,
+          kind: 'execution_failed',
+          message: `tool execution rejected outside the executor pipeline: ${describe(cause)}`,
+        },
+        batch.stepNumber,
+      );
+
+    for (const call of sequentialCalls) {
+      let completed: CompletedToolCall;
+      try {
+        completed = await executeOne({
+          call,
+          runContext: batch.runContext,
+          stepNumber: batch.stepNumber,
+          trustLevel,
+        });
+      } catch (cause) {
+        completed = synthesizeFailure(call, cause);
+      }
       const idx = indexByCallId.get(call.toolCallId);
       if (idx !== undefined) results[idx] = completed;
     }
@@ -383,12 +406,10 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
             stepNumber: batch.stepNumber,
             trustLevel,
           })
+            .catch((cause: unknown) => synthesizeFailure(call, cause))
             .then((completed) => {
               const idx = indexByCallId.get(call.toolCallId);
               if (idx !== undefined) results[idx] = completed;
-            })
-            .catch(() => {
-              /* completed handler already records error outcomes */
             })
             .finally(() => {
               inFlight = Math.max(0, inFlight - 1);

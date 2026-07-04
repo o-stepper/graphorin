@@ -2151,8 +2151,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           // inline (≤1 per step) and never routed through the executor.
           // Non-handoff calls accumulate into a batch dispatched through
           // the ToolExecutor; the batch is flushed before a handoff and
-          // before a durable-HITL suspend so execution order is kept.
+          // before each approval-gated call so execution order is kept.
+          // Gated calls are COLLECTED (all of them, agent-01) and the run
+          // suspends once after the walk, so every non-gated toolCallId
+          // has a tool message before the suspend snapshot — a dropped
+          // call would persist a dangling `tool_use` that real providers
+          // reject on resume.
           let batch: ToolCall[] = [];
+          let stepApprovalsRequested = 0;
 
           for (const call of finalCalls) {
             const handoff = handoffMap.get(call.toolName);
@@ -2261,9 +2267,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             }
 
             // Approval pre-screen (Adapter G / durable HITL). Evaluate the
-            // registry-resolved `needsApproval`; an unapproved gated call
-            // suspends the run exactly as before — after flushing any
-            // queued batch so prior calls' side-effects complete first.
+            // registry-resolved `needsApproval`; a gated call flushes the
+            // queued batch (prior calls' side-effects complete first) and
+            // is recorded as a pending approval. The walk CONTINUES: later
+            // gated calls are collected too, and later non-gated calls
+            // still execute before the suspend (agent-01 — previously
+            // everything after the first gated call was silently dropped,
+            // never executed and never approvable, leaving dangling
+            // `tool_use` ids in the persisted transcript).
             const resolvedTool = stepRegistry.get(call.toolName);
             const needsApproval = await invokeNeedsApproval(
               resolvedTool,
@@ -2284,36 +2295,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                 requestedAt: new Date().toISOString(),
               };
               state.pendingApprovals.push(approval);
-              state.status = 'awaiting_approval';
-              // AG-19: persist the coarse taint summary + promoted-tool set into
-              // the suspended state so a resume rehydrates the sink gate and the
-              // discovered-tool catalogue instead of starting empty.
-              const taintSnap = toolDataFlowGuard?.snapshotLedger(state.id);
-              if (taintSnap !== undefined) state.taintSummary = taintSnap;
-              if (promotedDeferred.size > 0) state.promotedTools = [...promotedDeferred];
+              stepApprovalsRequested += 1;
               yield {
                 type: 'tool.approval.requested',
                 toolCallId: call.toolCallId,
               };
-              if (config.checkpointStore !== undefined) {
-                await config.checkpointStore.put(
-                  state.id,
-                  'agent',
-                  {
-                    id: state.id,
-                    threadId: state.id,
-                    namespace: 'agent',
-                    // AG-23: persist a detached, secret-redacted snapshot —
-                    // never the live MutableRunState reference.
-                    state: serializeRunState(state, { stripTracingApiKey: true }),
-                    channelVersions: {},
-                    stepNumber,
-                    createdAt: new Date().toISOString(),
-                  },
-                  { source: 'sync', status: 'suspended', nodeName: 'agent.run' },
-                );
-              }
-              return yield* finishRun(state, finalSnapshot);
+              continue;
             }
 
             batch.push(call);
@@ -2321,6 +2308,39 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
           if (batch.length > 0) {
             yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
+          }
+
+          // Durable-HITL suspend: once per step, carrying EVERY gated call
+          // the model batched. Runs after the final batch flush so the
+          // suspend snapshot already contains tool messages for the whole
+          // non-gated remainder of the step.
+          if (stepApprovalsRequested > 0) {
+            state.status = 'awaiting_approval';
+            // AG-19: persist the coarse taint summary + promoted-tool set into
+            // the suspended state so a resume rehydrates the sink gate and the
+            // discovered-tool catalogue instead of starting empty.
+            const taintSnap = toolDataFlowGuard?.snapshotLedger(state.id);
+            if (taintSnap !== undefined) state.taintSummary = taintSnap;
+            if (promotedDeferred.size > 0) state.promotedTools = [...promotedDeferred];
+            if (config.checkpointStore !== undefined) {
+              await config.checkpointStore.put(
+                state.id,
+                'agent',
+                {
+                  id: state.id,
+                  threadId: state.id,
+                  namespace: 'agent',
+                  // AG-23: persist a detached, secret-redacted snapshot —
+                  // never the live MutableRunState reference.
+                  state: serializeRunState(state, { stripTracingApiKey: true }),
+                  channelVersions: {},
+                  stepNumber,
+                  createdAt: new Date().toISOString(),
+                },
+                { source: 'sync', status: 'suspended', nodeName: 'agent.run' },
+              );
+            }
+            return yield* finishRun(state, finalSnapshot);
           }
         }
 

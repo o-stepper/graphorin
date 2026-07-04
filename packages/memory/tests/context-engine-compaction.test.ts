@@ -736,3 +736,89 @@ describe('CE-15 — compaction summary trust (no laundering)', () => {
     expect(out.result.summary).toContain('[[/untrusted_content]]');
   });
 });
+
+describe('context-engine-01 — summarize boundary never splits an assistant/tool pair', () => {
+  function makeMemory() {
+    return createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      contextEngine: {
+        providerContextWindow: 200_000,
+        privacy: { providerTrust: 'public-tls' },
+        compaction: { trigger: { thresholdTokens: 100 } },
+        summarizer: STUB_SUMMARIZER,
+      },
+    });
+  }
+
+  /** [user, (assistant(toolCalls)+tool)*5, user] — a realistic tool loop. */
+  function buildToolLoop(): Message[] {
+    const out: Message[] = [{ role: 'user', content: 'start '.repeat(60) }];
+    for (let i = 1; i <= 5; i++) {
+      out.push({
+        role: 'assistant',
+        content: `calling tool ${i} `.repeat(20),
+        toolCalls: [{ toolCallId: `t${i}`, toolName: 'search', args: { q: `q${i}` } }],
+      });
+      out.push({ role: 'tool', toolCallId: `t${i}`, content: `result ${i} `.repeat(40) });
+    }
+    out.push({ role: 'user', content: 'and now? '.repeat(30) });
+    return out;
+  }
+
+  it('snaps the boundary backward when the positional cut lands on a tool message', async () => {
+    const memory = makeMemory();
+    const messages = buildToolLoop();
+    // 12 messages, default preserveRecentTurns 6 ⇒ positional boundary at
+    // index 6, which is tool(t3) — its assistant partner would be
+    // summarized away, producing an orphan the next provider call 400s on.
+    expect(messages).toHaveLength(12);
+    expect(messages[6]?.role).toBe('tool');
+
+    const out = await memory.contextEngine.compactNow({
+      scope: { userId: 'u1', sessionId: 's1', agentId: 'a1' },
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'auto-trigger',
+      messages,
+      memory,
+    });
+
+    const preserved = out.result.preservedMessages;
+    // The preserved window starts on the assistant that owns t3 — one more
+    // message than requested, never an orphan tool message.
+    expect(preserved[0]?.role).toBe('assistant');
+    expect(preserved).toHaveLength(7);
+
+    // Structural invariant: every preserved tool message has its
+    // announcing assistant partner inside the preserved window.
+    const announced = new Set<string>();
+    for (const m of preserved) {
+      if (m.role === 'assistant' && m.toolCalls !== undefined) {
+        for (const c of m.toolCalls) announced.add(c.toolCallId);
+      } else if (m.role === 'tool') {
+        expect(announced.has(m.toolCallId)).toBe(true);
+      }
+    }
+    // And the dropped slice shrank accordingly (5 messages, not 6).
+    expect(out.result.droppedMessageIndices).toHaveLength(5);
+  });
+
+  it('leaves an already-clean boundary untouched', async () => {
+    const memory = makeMemory();
+    const messages = buildToolLoop().slice(0, 11); // boundary at index 5 = assistant(t3)
+    expect(messages[5]?.role).toBe('assistant');
+    const out = await memory.contextEngine.compactNow({
+      scope: { userId: 'u1', sessionId: 's1', agentId: 'a1' },
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      source: 'auto-trigger',
+      messages,
+      memory,
+    });
+    expect(out.result.preservedMessages).toHaveLength(6);
+    expect(out.result.preservedMessages[0]?.role).toBe('assistant');
+  });
+});
