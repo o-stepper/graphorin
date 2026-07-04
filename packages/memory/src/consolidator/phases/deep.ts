@@ -120,6 +120,16 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
           const fact = await semantic.get(conflictingId);
           existingText = fact?.text ?? null;
         }
+        // memory-consolidation-01: the conflicting fact vanished between
+        // enqueue and drain (forgotten / purged / superseded) — there is
+        // nothing to judge against. Admit the candidate WITHOUT a
+        // provider call: a 'dedup' verdict against "(unknown)" would
+        // delete the only surviving copy.
+        if (conflictingId !== null && existingText === null) {
+          await conflicts.markResolved(row.id, 'admit');
+          resolved += 1;
+          continue;
+        }
         const request = buildJudgeRequest(deps, candidateText, existingText);
         let response: Awaited<ReturnType<Provider['generate']>>;
         try {
@@ -157,9 +167,11 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
           }
           await conflicts.markResolved(row.id, 'supersede');
         } else if (judge.decision === 'dedup' && conflictingId !== null) {
-          if (typeof semantic.purge === 'function') {
-            await semantic.purge(row.factId, judge.reason);
-          } else if (typeof semantic.forget === 'function') {
+          // memory-consolidation-01: dedup on an LLM verdict must be a
+          // SOFT forget (replayable tombstone), never the GDPR
+          // hard-delete `purge` — "never a destructive delete" (P0-3)
+          // applies doubly to a background path acting on model output.
+          if (typeof semantic.forget === 'function') {
             await semantic.forget(row.factId, judge.reason);
           }
           factsUpdated += 1;

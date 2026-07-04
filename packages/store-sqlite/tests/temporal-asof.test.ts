@@ -65,14 +65,63 @@ describe('semantic as_of point-in-time queries (FTS)', () => {
     await store.close();
   });
 
-  it('is a no-op when asOf is absent (regression-safe)', async () => {
+  it('a default read behaves as asOf=now: closed intervals are excluded (memory-retrieval-01)', async () => {
     const store = await makeStore();
     await store.memory.semantic.remember(factA());
     await store.memory.semantic.remember(factB());
 
-    const all = await store.memory.semantic.search(SCOPE, { query: 'Residence' });
+    // fA's interval closed in 2024 — it must not surface as current.
+    const current = await store.memory.semantic.search(SCOPE, { query: 'Residence' });
+    expect(current.map((h) => h.record.id)).toEqual(['fB']);
+
+    await store.close();
+  });
+
+  it('includeSuperseded restores the full history for inspector paths', async () => {
+    const store = await makeStore();
+    await store.memory.semantic.remember(factA());
+    await store.memory.semantic.remember(factB());
+
+    const all = await store.memory.semantic.search(SCOPE, {
+      query: 'Residence',
+      includeSuperseded: true,
+    });
     expect(new Set(all.map((h) => h.record.id))).toEqual(new Set(['fA', 'fB']));
     expect(all.length).toBe(2);
+
+    await store.close();
+  });
+
+  it('supersede() removes the old fact from default recall (the fact_supersede promise)', async () => {
+    const store = await makeStore();
+    const oldFact: Fact = {
+      id: 'f-old',
+      kind: 'semantic',
+      userId: 'alex',
+      sensitivity: 'internal',
+      text: 'Residence is Berlin.',
+      createdAt: new Date().toISOString(),
+    };
+    await store.memory.semantic.remember(oldFact);
+    const newFact: Fact = {
+      id: 'f-new',
+      kind: 'semantic',
+      userId: 'alex',
+      sensitivity: 'internal',
+      text: 'Residence is Paris.',
+      createdAt: new Date().toISOString(),
+    };
+    await store.memory.semantic.supersede('f-old', newFact, 'moved');
+
+    const current = await store.memory.semantic.search(SCOPE, { query: 'Residence' });
+    expect(current.map((h) => h.record.id)).toEqual(['f-new']);
+
+    // The old fact stays reachable for audit / history.
+    const history = await store.memory.semantic.search(SCOPE, {
+      query: 'Residence',
+      includeSuperseded: true,
+    });
+    expect(new Set(history.map((h) => h.record.id))).toEqual(new Set(['f-old', 'f-new']));
 
     await store.close();
   });

@@ -144,6 +144,17 @@ export interface FactSearchOptions {
    */
   readonly includeQuarantined?: boolean;
   /**
+   * Include superseded / validity-expired facts (memory-retrieval-01).
+   * Defaults to `false`: a default read behaves as `asOf = now`, so a
+   * fact whose validity interval was closed (e.g. by `supersede`)
+   * never surfaces as current — what the `fact_supersede` tool
+   * promises. Set `true` only for inspector / audit paths. Ignored
+   * when an explicit {@link asOf} is supplied.
+   *
+   * @stable
+   */
+  readonly includeSuperseded?: boolean;
+  /**
    * Optional decay-aware ranking. When set, the reranker output is
    * post-multiplied by the per-fact retention curve
    * `score *= exp(-elapsedDays / tauDays)` so stale facts drop in
@@ -671,6 +682,7 @@ export class SemanticMemory {
             // MRET-4: in-store any-of tags predicate on the FTS leg.
             ...(opts.tags !== undefined && opts.tags.length > 0 ? { tags: opts.tags } : {}),
             ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+            ...(opts.includeSuperseded === true ? { includeSuperseded: true } : {}),
             ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
           });
           lists.push(ftsHits);
@@ -682,6 +694,7 @@ export class SemanticMemory {
             candidateTopK,
             opts.asOf,
             opts.includeQuarantined,
+            opts.includeSuperseded,
           );
           if (vectorHits.length > 0) {
             lists.push(vectorHits);
@@ -727,8 +740,13 @@ export class SemanticMemory {
         // candidate pool (not just finalTopK) so a fresh fact sitting at
         // position topK+1 pre-decay can still enter the final page; the
         // finalTopK cut moves to AFTER decay + filters.
+        // memory-retrieval-03: the tags filter also runs AFTER fusion
+        // (the vector / HyDE / graph legs have no store-level tags
+        // predicate), so a tagged search must widen the same way —
+        // otherwise untagged candidates occupy fused ranks, get
+        // filtered, and the search silently returns fewer than topK.
         const fusedTopK =
-          opts.decay !== undefined
+          opts.decay !== undefined || (opts.tags?.length ?? 0) > 0
             ? Math.max(
                 finalTopK,
                 lists.reduce((n, l) => n + l.length, 0),
@@ -1197,6 +1215,7 @@ export class SemanticMemory {
         maxHops: hops,
         limit,
         ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+        ...(opts.includeSuperseded === true ? { includeSuperseded: true } : {}),
         ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
       });
       return neighbours.map((fact) => ({
@@ -1215,6 +1234,7 @@ export class SemanticMemory {
     topK: number,
     asOf?: string,
     includeQuarantined?: boolean,
+    includeSuperseded?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const embedderId = this.#embedderIdProvider();
     if (
@@ -1234,6 +1254,7 @@ export class SemanticMemory {
       topK,
       asOf,
       includeQuarantined,
+      includeSuperseded,
     );
   }
 

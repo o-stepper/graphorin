@@ -62,10 +62,20 @@ const deepRecallOutputSchema = z.object({
       sensitivity: deepRecallSensitivityEnum,
       /** Trust-provenance tag (MST-10) — synthesized facts say so. */
       provenance: z.string().optional(),
+      /** Closed validity end (only surfaces on `asOf` reads). */
+      validTo: z.string().optional(),
+      /** Id of the fact that superseded this one, when any. */
+      supersededBy: z.string().optional(),
     }),
   ),
   sufficient: z.boolean(),
   abstained: z.boolean(),
+  /**
+   * Whether the grader actually judged sufficiency
+   * (memory-retrieval-02). When `false`, `sufficient: true` is a
+   * default, not a verdict.
+   */
+  graded: z.boolean(),
   iterations: z.number().int(),
 });
 
@@ -193,6 +203,12 @@ export function createDeepRecallTool(
         ...(input.topK !== undefined ? { topK: input.topK } : {}),
         ...(input.maxIterations !== undefined ? { maxIterations: input.maxIterations } : {}),
         ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
+        // memory-retrieval-02: the model choosing deep_recall over
+        // fact_search IS the hardness signal — the local heuristic gate
+        // rejected the tool's own documented multi-hop examples
+        // (W_MULTI_HOP 0.4 < threshold 0.5) and is English-only. The
+        // cap + grader stop conditions still bound cost.
+        forceHard: true,
         signal: ctx.signal,
       });
       return {
@@ -203,9 +219,14 @@ export function createDeepRecallTool(
           sensitivity: hit.record.sensitivity,
           // MST-10: origin annotation, mirroring fact_search.
           ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
+          ...(hit.record.validTo !== undefined ? { validTo: hit.record.validTo } : {}),
+          ...(hit.record.supersededBy !== undefined
+            ? { supersededBy: hit.record.supersededBy }
+            : {}),
         })),
         sufficient: result.sufficient,
         abstained: result.abstained,
+        graded: result.graded,
         iterations: result.iterations,
       };
     },

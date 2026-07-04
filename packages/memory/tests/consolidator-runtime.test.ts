@@ -186,11 +186,24 @@ describe('consolidator/runtime — standard phase', () => {
 });
 
 describe('consolidator/runtime — deep phase — dedup decision', () => {
-  it('marks the candidate purged when judge picks dedup', async () => {
+  it('soft-forgets (NEVER purges) the candidate when the judge picks dedup', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
       withConsolidatorStore: true,
     });
+    // memory-consolidation-01: a background LLM verdict must never
+    // trigger the GDPR hard-delete — spy on purge to prove it stays cold.
+    const semanticStore = store.semantic as {
+      purge?: (id: string, reason?: string) => Promise<void>;
+    };
+    let purgeCalled = false;
+    const origPurge = semanticStore.purge?.bind(store.semantic);
+    if (origPurge !== undefined) {
+      semanticStore.purge = async (id, reason) => {
+        purgeCalled = true;
+        await origPurge(id, reason);
+      };
+    }
     const provider = fakeProvider([
       {
         text: '{"decision":"dedup","reason":"identical content"}',
@@ -224,9 +237,59 @@ describe('consolidator/runtime — deep phase — dedup decision', () => {
     const outcome = await memory.consolidator.fireNow('deep', scope);
     expect(outcome?.conflictsResolved).toBe(1);
     expect(outcome?.factsUpdated).toBe(1);
-    // The candidate has been purged — `get` returns null.
+    // The candidate is gone from recall — but via the SOFT, replayable
+    // tombstone, never the destructive purge.
     const remaining = await memory.semantic.get(scope, candidate.id);
     expect(remaining).toBeNull();
+    expect(purgeCalled).toBe(false);
+  });
+
+  it('admits WITHOUT a provider call when the conflicting fact vanished before the drain', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    // memory-consolidation-01: a 'dedup' verdict against "(unknown)"
+    // would delete the ONLY surviving copy. The judge must not rule on
+    // a vanished counterpart at all.
+    const provider = fakeProvider([
+      {
+        text: '{"decision":"dedup","reason":"should never be asked"}',
+        usage: { promptTokens: 25, completionTokens: 5, totalTokens: 30 },
+        finishReason: 'stop',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'standard',
+        provider,
+        defaultScope: { userId: 'alex' },
+      },
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    const oldFact = await memory.semantic.remember(scope, { text: 'I love mountain biking' });
+    const candidate = await memory.semantic.remember(scope, { text: 'I love mountain biking too' });
+    if (store.conflicts !== undefined) {
+      await store.conflicts.enqueuePending({
+        scope,
+        factId: candidate.id,
+        candidateText: candidate.text,
+        stage: 'defer-to-deep',
+        conflictingIds: [oldFact.id],
+      });
+    }
+    // The conflicting fact disappears between enqueue and drain.
+    await memory.semantic.forget(scope, oldFact.id, 'user asked');
+    await memory.consolidator.start();
+    const outcome = await memory.consolidator.fireNow('deep', scope);
+    expect(outcome?.conflictsResolved).toBe(1);
+    // No judge call was spent, and the candidate SURVIVES as the only copy.
+    expect(provider.calls).toHaveLength(0);
+    const survivor = await memory.semantic.get(scope, candidate.id);
+    expect(survivor).not.toBeNull();
   });
 
   it('falls through to admit when the judge response is unparseable', async () => {

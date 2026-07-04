@@ -33,15 +33,34 @@ import type { EmbeddingMetaRepository } from './embedding-meta-repo.js';
 import { scoreFromDistance, VectorTableManager } from './vector-table-mgr.js';
 
 /**
- * Point-in-time (`asOf`) WHERE fragments. Appended only when an
- * `asOf` epoch is supplied; absent ⇒ the query is byte-identical to
- * the pre-feature SQL, so default reads are unaffected. Facts use the
- * bi-temporal validity interval; episodes have no close column so they
- * match once they have started. Each `?` is bound with the same epoch.
+ * Point-in-time (`asOf`) WHERE fragments. Facts use the bi-temporal
+ * validity interval; episodes have no close column so they match once
+ * they have started. Each `?` is bound with the same epoch.
+ *
+ * memory-retrieval-01: default fact reads (no explicit `asOf`) behave
+ * as `asOf = now`, so superseded / validity-expired facts no longer
+ * surface as current — exactly what the `fact_supersede` tool
+ * promises. Callers opt back into the full history with
+ * `includeSuperseded: true` (the inspector / audit path). An explicit
+ * `asOf` always wins.
  */
 const FACT_VALIDITY_CLAUSE =
   'AND (f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)';
 const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
+
+/**
+ * Resolve the validity epoch for a fact read (memory-retrieval-01):
+ * explicit `asOf` wins; otherwise default reads evaluate the validity
+ * interval at NOW unless the caller asked for superseded rows. Returns
+ * `null` when no validity filtering should apply.
+ */
+function resolveFactValidityEpoch(
+  asOf: string | undefined,
+  includeSuperseded: boolean | undefined,
+): number | null {
+  if (asOf !== undefined) return toEpoch(asOf);
+  return includeSuperseded === true ? null : Date.now();
+}
 
 /**
  * Quarantine retrieval-gate fragments (P1-4). Appended to default
@@ -895,7 +914,9 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     opts: MemorySearchOptions,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const topK = opts.topK ?? 10;
-    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    // memory-retrieval-01: default reads evaluate validity at NOW so
+    // superseded / expired facts stop surfacing as current.
+    const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
     // MRET-4: tags filter (declared on MemorySearchOptions, previously
     // ignored). A fact matches when it carries AT LEAST ONE of the
     // requested tags; rows without tags never match a tag filter.
@@ -941,6 +962,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     topK: number,
     asOf?: string,
     includeQuarantined?: boolean,
+    includeSuperseded?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -950,7 +972,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       );
     }
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
-    const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
+    // memory-retrieval-01: default reads evaluate validity at NOW.
+    const asOfEpoch = resolveFactValidityEpoch(asOf, includeSuperseded);
     const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
         Buffer.from(embedding.buffer),
@@ -1883,13 +1906,15 @@ export class SqliteGraphStore {
       readonly limit?: number;
       readonly includeQuarantined?: boolean;
       readonly asOf?: string;
+      readonly includeSuperseded?: boolean;
     } = {},
   ): Promise<ReadonlyArray<Fact>> {
     if (seedFactIds.length === 0) return [];
     const maxHops = opts.maxHops ?? 1;
     const limit = opts.limit ?? 60;
     const incQ = opts.includeQuarantined === true ? 1 : 0;
-    const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
+    // memory-retrieval-01: default reads evaluate validity at NOW.
+    const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
     const seedsJson = JSON.stringify([...seedFactIds]);
     const rows = this.#conn.all<FactRow>(
       // CS-15: the recursive step only bridges THROUGH a fact that is itself

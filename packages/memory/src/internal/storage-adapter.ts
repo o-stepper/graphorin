@@ -113,6 +113,11 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
      * inspector path). Default reads exclude them. P1-4.
      */
     includeQuarantined?: boolean,
+    /**
+     * Include superseded / validity-expired facts. Default reads
+     * evaluate validity at NOW (memory-retrieval-01).
+     */
+    includeSuperseded?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   /** Lookup a single fact by id (returns `null` when absent or soft-deleted). */
   get?(id: string): Promise<Fact | null>;
@@ -728,6 +733,11 @@ export interface ExpandHopsStoreOptions {
   readonly includeQuarantined?: boolean;
   /** Point-in-time filter, ISO-8601 (same semantics as fact search). */
   readonly asOf?: string;
+  /**
+   * Include superseded / validity-expired neighbours. Default reads
+   * evaluate validity at NOW (memory-retrieval-01).
+   */
+  readonly includeSuperseded?: boolean;
 }
 
 /**

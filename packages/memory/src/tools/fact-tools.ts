@@ -50,6 +50,14 @@ const factSearchOutputSchema = z.object({
       score: z.number(),
       sensitivity: sensitivityEnum,
       provenance: provenanceEnum.optional(),
+      /**
+       * Set when the fact's validity interval was closed (superseded /
+       * expired). Only present on `asOf` reads — default reads exclude
+       * such facts entirely (memory-retrieval-01).
+       */
+      validTo: z.string().optional(),
+      /** Id of the fact that superseded this one, when any. */
+      supersededBy: z.string().optional(),
     }),
   ),
 });
@@ -195,6 +203,12 @@ export function createFactSearchTool(
           score: hit.score,
           sensitivity: hit.record.sensitivity,
           ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
+          // memory-retrieval-01: surface validity metadata so the model
+          // can tell a historical (asOf) hit from a current one.
+          ...(hit.record.validTo !== undefined ? { validTo: hit.record.validTo } : {}),
+          ...(hit.record.supersededBy !== undefined
+            ? { supersededBy: hit.record.supersededBy }
+            : {}),
         })),
       };
     },
@@ -203,8 +217,9 @@ export function createFactSearchTool(
 
 /**
  * `fact_supersede` — soft-supersede an old fact by storing a new one
- * that replaces it. The old fact is kept for replay but ranked below
- * the new one.
+ * that replaces it. The old fact is kept for replay but no longer
+ * surfaced by default reads (they evaluate validity at NOW); it stays
+ * reachable via `asOf` / inspector paths.
  *
  * @stable
  */
