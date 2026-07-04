@@ -326,9 +326,13 @@ export class SqliteSessionStore implements SessionStoreExt {
 
   /** Discover per-embedder vec0 tables by prefix, identifier-validated. */
   #contentVecTables(prefix: 'session_messages_vec_' | 'episodes_vec_'): string[] {
+    // The prefixes are compile-time literals — spell out their LIKE
+    // patterns (underscores escaped) instead of sanitizing at runtime.
+    const pattern =
+      prefix === 'session_messages_vec_' ? 'session\\_messages\\_vec\\_%' : 'episodes\\_vec\\_%';
     const rows = this.#conn.all<{ name: string }>(
       "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE ? ESCAPE '\\'",
-      [`${prefix.replace(/_/g, '\\_')}%`],
+      [pattern],
     );
     return rows.map((r) => r.name).filter((name) => /^[A-Za-z0-9_]+$/.test(name));
   }
