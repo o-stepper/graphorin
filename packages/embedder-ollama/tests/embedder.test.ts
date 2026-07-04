@@ -324,7 +324,9 @@ describe('lock-on-first integration with @graphorin/store-sqlite', () => {
     await store.close();
   });
 
-  it('lock-on-first rejects a second incompatible Ollama embedder', { timeout: 20_000 }, async () => {
+  it('lock-on-first rejects a second incompatible Ollama embedder', {
+    timeout: 20_000,
+  }, async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-ollama-lock2-'));
     const { createSqliteStore } = await import('@graphorin/store-sqlite');
     const store = await createSqliteStore({
