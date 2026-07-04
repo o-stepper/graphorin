@@ -17,6 +17,7 @@ import { createHash } from 'node:crypto';
 import type {
   AgentEvent,
   AgentResult,
+  AISpan,
   AssistantMessage,
   CompletedToolCall,
   HandoffRecord,
@@ -1354,6 +1355,22 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       output: '' as unknown as TOutput,
     };
 
+    // C7: one agent.run span per run; step/tool/provider spans parent
+    // under it so the whole run is a single trace tree. Attributes follow
+    // the OTel GenAI semantic conventions (gen_ai.*).
+    const runSpan = tracer.startSpan({
+      type: 'agent.run',
+      attrs: {
+        'gen_ai.operation.name': 'invoke_agent',
+        'gen_ai.agent.id': agentId,
+        'gen_ai.agent.name': config.name,
+        'graphorin.run.id': state.id,
+        'graphorin.session.id': sessionId,
+        'graphorin.run.resumed': resumed !== undefined,
+      },
+    });
+    let currentStepSpan: AISpan<'agent.step'> | undefined;
+
     yield { type: 'agent.start', runId: state.id, agentId };
 
     // AG-2 / SDF-4: input guardrails screen each fresh-run seed user
@@ -2021,6 +2038,18 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         }
 
         yield { type: 'step.start', stepNumber };
+        // C7: defensive end for a span left open by a mid-step exit path.
+        currentStepSpan?.end();
+        currentStepSpan = tracer.startSpan({
+          type: 'agent.step',
+          parent: runSpan,
+          attrs: {
+            'gen_ai.operation.name': 'invoke_agent',
+            'gen_ai.agent.id': agentId,
+            'graphorin.run.id': state.id,
+            'graphorin.step.number': stepNumber,
+          },
+        });
 
         // WI-09 (P1-1): bound context growth before the provider call.
         // Fires `context.compacted` and rewrites the buffer in place only
@@ -2029,7 +2058,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         // the happy-path event stream is unchanged (R10).
         yield* maybeAutoCompact();
 
-        const stepCtx: RunContext<TDeps> = { ...runContextBase, stepNumber, messages };
+        const stepCtx: RunContext<TDeps> = {
+          ...runContextBase,
+          stepNumber,
+          messages,
+          ...(currentStepSpan !== undefined ? { span: currentStepSpan } : {}),
+        };
         const overrides = config.prepareStep ? await config.prepareStep(stepCtx) : {};
 
         // Resolve the registry + executor for this step. The warm-up
@@ -2190,6 +2224,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           ...(overrides.temperature !== undefined ? { temperature: overrides.temperature } : {}),
           ...(overrides.maxTokens !== undefined ? { maxTokens: overrides.maxTokens } : {}),
           ...(config.cachePolicy !== undefined ? { cachePolicy: config.cachePolicy } : {}),
+          ...(currentStepSpan !== undefined ? { parentSpan: currentStepSpan } : {}),
           reasoningRetention: reasoningPolicy,
         };
 
@@ -2454,7 +2489,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           // `stepRegistry` / `stepExecutor` were resolved with the
           // catalogue above (so the advertised tools and the executor's
           // resolvable tools agree, including any `prepareStep` override).
-          const execRunContext: RunContext<TDeps> = { ...runContextBase, stepNumber, messages };
+          const execRunContext: RunContext<TDeps> = {
+            ...runContextBase,
+            stepNumber,
+            messages,
+            ...(currentStepSpan !== undefined ? { span: currentStepSpan } : {}),
+          };
 
           // Walk calls in finalCalls order. Handoffs are special-cased
           // inline (≤1 per step) and never routed through the executor.
@@ -2692,6 +2732,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           }
         }
 
+        currentStepSpan?.setAttributes({
+          'gen_ai.usage.input_tokens': stepUsage.promptTokens,
+          'gen_ai.usage.output_tokens': stepUsage.completionTokens,
+        });
+        currentStepSpan?.end();
+        currentStepSpan = undefined;
         yield { type: 'step.end', stepNumber, usage: stepUsage };
 
         if (finalCalls.length === 0) {
@@ -2748,6 +2794,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state.error = { message, code };
       return yield* finishRun(state, finalSnapshot);
     } finally {
+      // C7: close the trace tree on every exit path.
+      currentStepSpan?.end();
+      currentStepSpan = undefined;
+      runSpan.setAttributes({
+        'gen_ai.usage.input_tokens': state.usage.promptTokens,
+        'gen_ai.usage.output_tokens': state.usage.completionTokens,
+        'graphorin.run.status': state.status,
+      });
+      runSpan.setStatus(state.status === 'failed' ? 'error' : 'ok');
+      runSpan.end();
       // AG-5: drop the parent-signal listener so it does not accumulate across
       // runs that share one long-lived `options.signal`. Runs after this point
       // (the follow-up loop) keep working via `agent.abort()` on `localCtl`.

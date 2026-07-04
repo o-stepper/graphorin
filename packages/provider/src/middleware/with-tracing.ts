@@ -51,9 +51,22 @@ export const withTracing = defineProviderMiddleware<WithTracingOptions>({
             attrs: {
               'graphorin.provider.id': next.name,
               'graphorin.provider.model': next.modelId,
+              // C7: OTel GenAI semantic conventions.
+              'gen_ai.operation.name': 'chat',
+              'gen_ai.provider.name': next.name,
+              'gen_ai.request.model': next.modelId,
             },
+            // C7: parent under the agent step span when the loop supplies one.
+            ...(req.parentSpan !== undefined ? { parent: req.parentSpan } : {}),
           },
-          async () => next.generate(req),
+          async (span) => {
+            const response = await next.generate(req);
+            span.setAttributes({
+              'gen_ai.usage.input_tokens': response.usage.promptTokens,
+              'gen_ai.usage.output_tokens': response.usage.completionTokens,
+            });
+            return response;
+          },
         );
       },
       ...(next.countTokens ? { countTokens: next.countTokens.bind(next) } : {}),
@@ -71,10 +84,22 @@ async function* tracedStream(
     attrs: {
       'graphorin.provider.id': next.name,
       'graphorin.provider.model': next.modelId,
+      // C7: OTel GenAI semantic conventions.
+      'gen_ai.operation.name': 'chat',
+      'gen_ai.provider.name': next.name,
+      'gen_ai.request.model': next.modelId,
     },
+    // C7: parent under the agent step span when the loop supplies one.
+    ...(req.parentSpan !== undefined ? { parent: req.parentSpan } : {}),
   });
   try {
     for await (const event of next.stream(req)) {
+      if (event.type === 'finish') {
+        span.setAttributes({
+          'gen_ai.usage.input_tokens': event.usage.promptTokens,
+          'gen_ai.usage.output_tokens': event.usage.completionTokens,
+        });
+      }
       yield event;
     }
     span.setStatus('ok');

@@ -199,4 +199,10 @@ export interface RunContext<TDeps = unknown> {
   readonly stepNumber: number;
   readonly messages: ReadonlyArray<Message>;
   readonly state: RunState;
+  /**
+   * C7: the current `agent.step` span (when the runtime traces). Spans
+   * created inside tool execution parent under it so a run's traces
+   * form one tree.
+   */
+  readonly span?: import('../contracts/tracer.js').AISpan;
 }

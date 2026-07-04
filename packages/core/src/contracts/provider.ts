@@ -99,6 +99,13 @@ export interface ProviderRequest {
   readonly signal?: AbortSignal;
   readonly providerOptions?: Readonly<Record<string, unknown>>;
   readonly cachePolicy?: ProviderCachePolicy;
+  /**
+   * C7: live parent span for the provider call. Like `signal`, this is a
+   * runtime handle (never serialized): `withTracing` parents its
+   * provider.generate/stream span under it so a run's traces form one
+   * tree instead of disconnected fragments.
+   */
+  readonly parentSpan?: import('./tracer.js').AISpan;
   readonly metadata?: ProviderRequestMetadata;
   /**
    * Per-request override of the provider's auto-detected

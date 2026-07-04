@@ -15,6 +15,8 @@ import { classifyHttpStatus, ProviderHttpError } from '../../src/errors/errors.j
 import { callJsonHttp } from '../../src/internal/http.js';
 import { withFallback } from '../../src/middleware/with-fallback.js';
 import { withRetry } from '../../src/middleware/with-retry.js';
+import { withTracing } from '../../src/middleware/with-tracing.js';
+import { bareAdapter } from '../fixtures/bare-adapter.js';
 
 describe('classifyHttpStatus', () => {
   it('maps the canonical statuses', () => {
@@ -194,5 +196,75 @@ describe('withRetry honours captured Retry-After headers', () => {
     const result = await retried.generate({ messages: [] });
     expect(result.text).toBe('ok');
     expect(delays).toEqual([2000]);
+  });
+});
+
+describe('C7 — withTracing parenting + gen_ai attributes', () => {
+  function recordingTracer() {
+    const spans: Array<{
+      type: string;
+      parentId?: string;
+      attrs: Record<string, unknown>;
+    }> = [];
+    interface SpanOpts {
+      type: string;
+      attrs?: Record<string, unknown>;
+      parent?: { id: string; traceId: string };
+    }
+    function startSpan(opts: SpanOpts) {
+      const record = {
+        type: opts.type,
+        ...(opts.parent !== undefined ? { parentId: opts.parent.id } : {}),
+        attrs: { ...(opts.attrs ?? {}) },
+      };
+      spans.push(record);
+      return {
+        type: opts.type,
+        id: `s-${spans.length}`,
+        traceId: opts.parent?.traceId ?? 't-1',
+        setAttributes(attrs: Record<string, unknown>) {
+          Object.assign(record.attrs, attrs);
+        },
+        addEvent() {},
+        recordException() {},
+        setStatus() {},
+        end() {},
+      };
+    }
+    const tracer = {
+      startSpan,
+      async span(opts: SpanOpts, fn: (s: ReturnType<typeof startSpan>) => unknown) {
+        const s = startSpan(opts);
+        return await fn(s);
+      },
+      async shutdown() {},
+    };
+    return { tracer, spans };
+  }
+
+  it('parents provider.stream under req.parentSpan and stamps gen_ai usage', async () => {
+    const { tracer, spans } = recordingTracer();
+    const parent = {
+      type: 'agent.step',
+      id: 'step-1',
+      traceId: 'trace-1',
+      setAttributes() {},
+      addEvent() {},
+      recordException() {},
+      setStatus() {},
+      end() {},
+    };
+    const wrapped = withTracing({ tracer: tracer as never })(bareAdapter());
+    for await (const _ of wrapped.stream({
+      messages: [{ role: 'user', content: 'hi' }],
+      parentSpan: parent as never,
+    }))
+      void _;
+    const span = spans.find((s) => s.type === 'provider.stream');
+    expect(span?.parentId).toBe('step-1');
+    expect(span?.attrs['gen_ai.operation.name']).toBe('chat');
+    expect(span?.attrs['gen_ai.request.model']).toBe('bare-model');
+    expect(span?.attrs['gen_ai.usage.input_tokens']).toBe(5);
+    expect(span?.attrs['gen_ai.usage.output_tokens']).toBe(3);
   });
 });

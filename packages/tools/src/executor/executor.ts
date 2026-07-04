@@ -554,9 +554,15 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       runContext.tracer.span<'tool.execute', CompletedToolCall>(
         {
           type: 'tool.execute',
+          // C7: parent under the current agent.step span when present, so
+          // tool spans join the run's trace tree instead of starting one.
+          ...(runContext.span !== undefined ? { parent: runContext.span } : {}),
           attrs: {
             'graphorin.tool.name': tool.name,
             'graphorin.tool.call_id': call.toolCallId,
+            'gen_ai.operation.name': 'execute_tool',
+            'gen_ai.tool.name': tool.name,
+            'gen_ai.tool.call.id': call.toolCallId,
             'graphorin.tool.side_effect_class': tool.__sideEffectClass,
             'graphorin.tool.streaming_hint': tool.__streamingHint,
             'graphorin.tool.trust_class': tool.__trustClass,
