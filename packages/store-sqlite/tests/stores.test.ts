@@ -309,6 +309,68 @@ describe('createSqliteStore', () => {
     expect(await semantic.get('fact-x')).toBeNull();
   });
 
+  it('purge() scrubs fact text out of memory_history; pruneHistory retires old rows (store-04)', async () => {
+    const now = new Date().toISOString();
+    const semantic = store.memory.semantic as unknown as {
+      remember(f: import('@graphorin/core').Fact): Promise<void>;
+      supersede(
+        oldId: string,
+        next: import('@graphorin/core').Fact,
+        reason?: string,
+      ): Promise<void>;
+      purge(id: string, reason?: string): Promise<void>;
+    };
+    const oldFact: import('@graphorin/core').Fact = {
+      id: 'hist-old',
+      kind: 'semantic',
+      userId: 'alex',
+      sensitivity: 'internal',
+      text: 'SECRET-OLD lives in Berlin',
+      createdAt: now,
+    };
+    const newFact: import('@graphorin/core').Fact = {
+      id: 'hist-new',
+      kind: 'semantic',
+      userId: 'alex',
+      sensitivity: 'internal',
+      text: 'SECRET-NEW lives in Paris',
+      createdAt: now,
+    };
+    await semantic.remember(oldFact);
+    await semantic.supersede('hist-old', newFact, 'moved');
+    // The SUPERSEDE audit row carries the NEW fact's text.
+    const preScrub = store.connection.all<{ new_value: string | null }>(
+      "SELECT new_value FROM memory_history WHERE memory_kind = 'fact' AND event = 'SUPERSEDE'",
+    );
+    expect(preScrub.some((r) => r.new_value === 'SECRET-NEW lives in Paris')).toBe(true);
+
+    // GDPR purge of the NEW fact: its text must vanish from the audit
+    // trail too — including the SUPERSEDE row keyed to the OLD id.
+    await semantic.purge('hist-new', 'gdpr-request');
+    const postScrub = store.connection.all<{ prev_value: string | null; new_value: string | null }>(
+      "SELECT prev_value, new_value FROM memory_history WHERE memory_kind = 'fact'",
+    );
+    const dump = JSON.stringify(postScrub);
+    expect(dump).not.toContain('SECRET-NEW');
+    // The event skeleton survives (rows are scrubbed, not deleted).
+    const events = store.connection.all<{ event: string }>(
+      "SELECT event FROM memory_history WHERE memory_kind = 'fact'",
+    );
+    expect(events.some((r) => r.event === 'SUPERSEDE')).toBe(true);
+    expect(events.some((r) => r.event === 'PURGE')).toBe(true);
+
+    // Retention prune: rows older than the cutoff are deleted.
+    const memStore = store.memory as unknown as {
+      pruneHistory(olderThanMs: number): Promise<number>;
+    };
+    const pruned = await memStore.pruneHistory(0);
+    expect(pruned).toBeGreaterThan(0);
+    const left = store.connection.get<{ n: number }>(
+      "SELECT COUNT(*) AS n FROM memory_history WHERE memory_kind = 'fact'",
+    );
+    expect(left?.n).toBe(0);
+  });
+
   it('semantic memory: purge() of a graph-linked fact removes the fact + its entity links, keeps the entity (CS-1)', async () => {
     const scope = { userId: 'alex', sessionId: 's1' };
     const fact = {

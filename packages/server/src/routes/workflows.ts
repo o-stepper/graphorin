@@ -152,19 +152,28 @@ export function createWorkflowRoutes(
         );
       }
       const runId = newRunId();
-      deps.runs.declare(runId, {
+      // periphery-01: the old handler declared the run and returned 202
+      // WITHOUT ever calling `workflow.resume(...)` — the run sat
+      // `pending` forever and the advertised SSE URL was never mounted.
+      // Resume now mirrors execute: background-iterate + emit on the WS
+      // subject; the tracker completes the run.
+      const tracker = deps.runs.start(runId, {
         kind: 'workflow',
         workflowId: id,
         threadId: parsed.data.threadId,
+      });
+      const subject = `workflow:${id}/runs/${runId}/events`;
+      backgroundResume(workflow, parsed.data, tracker, deps.runs, runId, {
+        subject,
+        ...(deps.dispatcher !== undefined ? { dispatcher: deps.dispatcher } : {}),
       });
       return c.json(
         {
           runId,
           threadId: parsed.data.threadId,
-          status: 'pending',
+          status: 'running',
           subscribe: {
-            websocket: `workflow:${id}/runs/${runId}/events`,
-            sse: `/v1/runs/${runId}/events`,
+            websocket: subject,
           },
         },
         202,
@@ -255,16 +264,20 @@ export function createWorkflowRoutes(
           400,
         );
       }
-      // Fork delegates to the workflow's own primitives in Phase 14b/c.
-      // Phase 14a returns a structured 202 with the fork descriptor so
-      // the API contract is reachable today.
+      // periphery-01: the old handler returned a 202 that forked
+      // nothing — the same class of lie IP-14 removed from the agent
+      // resume route. Honest 501 until the workflow fork primitive is
+      // threaded through the registry.
       return c.json(
         {
+          error: 'workflow-fork-not-implemented',
+          message:
+            'Workflow fork is not implemented on the server surface yet. ' +
+            'Fork the thread programmatically via the workflow API.',
           workflowId: id,
-          status: 'pending',
           fork: parsed.data,
         },
-        202,
+        501,
       );
     },
   );
@@ -290,6 +303,49 @@ function backgroundExecute(
       // IP-2: every workflow event reaches the dispatcher — the old
       // loop iterated the stream and threw each event away.
       for await (const ev of workflow.execute(body.input ?? {}, opts)) {
+        if (tracker.signal.aborted) break;
+        const type =
+          typeof (ev as { type?: unknown }).type === 'string'
+            ? (ev as { type: string }).type
+            : 'workflow.event';
+        streaming.dispatcher?.emit(streaming.subject, { type, payload: ev });
+      }
+      runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'completed');
+    } catch (err) {
+      streaming.dispatcher?.emit(streaming.subject, {
+        type: 'workflow.error',
+        payload: { runId, message: err instanceof Error ? err.message : String(err) },
+      });
+      runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'failed', err);
+    }
+  })();
+}
+
+/**
+ * periphery-01: mirror of {@link backgroundExecute} for the resume
+ * path — iterate `workflow.resume(threadId, {resume})`, emit every
+ * event on the run subject, and complete the tracked run.
+ */
+function backgroundResume(
+  workflow: NonNullable<ReturnType<WorkflowRegistry['get']>>,
+  body: z.infer<typeof ResumeBodySchema>,
+  tracker: { readonly signal: AbortSignal },
+  runs: RunStateTracker,
+  runId: string,
+  streaming: {
+    readonly subject: string;
+    readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
+  },
+): void {
+  const resume = workflow.resume;
+  if (resume === undefined) return;
+  void (async () => {
+    try {
+      for await (const ev of resume.call(
+        workflow,
+        body.threadId,
+        body.resume !== undefined ? { resume: body.resume } : {},
+      )) {
         if (tracker.signal.aborted) break;
         const type =
           typeof (ev as { type?: unknown }).type === 'string'

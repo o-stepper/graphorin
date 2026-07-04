@@ -97,17 +97,29 @@ export function classifyModelTier(provider: ProviderLike): ModelHint | undefined
   return undefined;
 }
 
+/**
+ * Bedrock cross-region inference-profile prefix (`us.anthropic.claude-…`).
+ * Stripped so region-qualified ids hit the `^anthropic\.claude` rules
+ * (core-provider-11).
+ */
+const BEDROCK_REGION_PREFIX = /^(?:us|eu|apac|jp|au|us-gov)\./;
+
 function stripFamilyPrefix(model: string): string {
   // Common prefixes used by adapters: `anthropic/...`, `openai/...`,
   // `google/...`, `provider:model`, etc. Strip them so the rule
   // patterns can stay anchored at `^`.
   const slash = model.indexOf('/');
-  if (slash !== -1) return model.slice(slash + 1);
-  const colon = model.indexOf(':');
-  if (colon !== -1 && !model.startsWith('http')) {
+  if (slash !== -1) return model.slice(slash + 1).replace(BEDROCK_REGION_PREFIX, '');
+  const deRegioned = model.replace(BEDROCK_REGION_PREFIX, '');
+  // Bedrock ids end in ':<version>' (`anthropic.claude-...-v1:0`) — the
+  // colon there is a version separator, not a provider/model split, and
+  // the rule patterns are prefix-anchored so the suffix is harmless.
+  if (deRegioned.startsWith('anthropic.')) return deRegioned;
+  const colon = deRegioned.indexOf(':');
+  if (colon !== -1 && !deRegioned.startsWith('http')) {
     // Skip URL-like values (`http://localhost:8080`) — `:` there is a
     // port separator, not a provider/model split.
-    return model.slice(colon + 1);
+    return deRegioned.slice(colon + 1);
   }
-  return model;
+  return deRegioned;
 }

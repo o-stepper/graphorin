@@ -81,6 +81,10 @@ export function createIdempotencyMiddleware(
   const now = options.now ?? Date.now;
   const lru = new SimpleLru<string, CacheEntry>(config.lruCacheSize);
 
+  // periphery-08: keys whose execution is currently in flight — a
+  // concurrent duplicate is rejected (409) instead of double-executing.
+  const inFlight = new Set<string>();
+
   const excluded = new Set(options.excludeResponseCachePaths ?? []);
 
   // IP-15: publish the cache hit ratio as a live gauge. A "hit" is a replay
@@ -195,40 +199,64 @@ export function createIdempotencyMiddleware(
       await store.delete(key);
     }
 
-    // A keyed request that reaches execution is a cache miss.
-    recordCacheOutcome(false);
-    await next();
-
-    const status = c.res.status;
-    if (NON_CACHEABLE_STATUS.has(status)) {
-      // Retry-eligible — leave nothing in the cache.
-      return;
+    // periphery-08: the record is only written AFTER next(), so two
+    // concurrent requests with the same key would both miss the cache
+    // and both execute (a double agent run). Track in-flight keyed
+    // executions in-process (the server is single-process by design)
+    // and reject concurrent duplicates per
+    // draft-ietf-httpapi-idempotency-key-header: 409 + Retry-After.
+    // The key stays in-flight until the record is CACHED (or found
+    // uncacheable), so a duplicate never slips in between execution
+    // and the write.
+    if (inFlight.has(key)) {
+      c.header('Retry-After', '1');
+      return c.json(
+        {
+          error: 'idempotency-in-flight',
+          message: `A request with Idempotency-Key '${key}' is currently being processed.`,
+        },
+        409,
+      );
     }
-    const responseBody = await captureJsonResponse(c);
-    if (responseBody === null) {
-      // Non-JSON or empty body — skip caching to keep the schema
-      // simple; clients that need response replay can use bodied
-      // POSTs.
-      return;
-    }
-    const responseHeaders = collectResponseHeaders(c);
-    const record_: IdempotencyRecord = {
-      key,
-      requestHash: fingerprint,
-      statusCode: status,
-      response: responseBody,
-      ...(responseHeaders !== undefined ? { responseHeaders } : {}),
-      // IP-6: bind the record to the executing principal.
-      scope: principal,
-      createdAt: now(),
-      expiresAt: now() + config.ttlSeconds * 1000,
-    };
+    inFlight.add(key);
     try {
-      await store.put(record_);
-      lru.set(key, { record: record_, cachedAt: now() });
-    } catch {
-      // Best-effort cache. Persistence failures must not break the
-      // hot path — operators see them via the audit log + logger.
+      // A keyed request that reaches execution is a cache miss.
+      recordCacheOutcome(false);
+      await next();
+
+      const status = c.res.status;
+      if (NON_CACHEABLE_STATUS.has(status)) {
+        // Retry-eligible — leave nothing in the cache.
+        return;
+      }
+      const responseBody = await captureJsonResponse(c);
+      if (responseBody === null) {
+        // Non-JSON or empty body — skip caching to keep the schema
+        // simple; clients that need response replay can use bodied
+        // POSTs.
+        return;
+      }
+      const responseHeaders = collectResponseHeaders(c);
+      const record_: IdempotencyRecord = {
+        key,
+        requestHash: fingerprint,
+        statusCode: status,
+        response: responseBody,
+        ...(responseHeaders !== undefined ? { responseHeaders } : {}),
+        // IP-6: bind the record to the executing principal.
+        scope: principal,
+        createdAt: now(),
+        expiresAt: now() + config.ttlSeconds * 1000,
+      };
+      try {
+        await store.put(record_);
+        lru.set(key, { record: record_, cachedAt: now() });
+      } catch {
+        // Best-effort cache. Persistence failures must not break the
+        // hot path — operators see them via the audit log + logger.
+      }
+    } finally {
+      inFlight.delete(key);
     }
   };
 }

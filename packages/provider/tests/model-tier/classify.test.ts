@@ -102,6 +102,16 @@ describe('classifyModelTier — error paths', () => {
   });
 });
 
+describe('classifyModelTier — Bedrock cross-region ids (core-provider-11)', () => {
+  it.each([
+    ['us.anthropic.claude-haiku-4-5-v1:0', 'fast'],
+    ['eu.anthropic.claude-sonnet-4-5-20250929-v1:0', 'balanced'],
+    ['apac.anthropic.claude-opus-4-8-v1:0', 'smart'],
+  ])('%s → %s', (modelId, tier) => {
+    expect(classifyModelTier(provider(modelId))).toBe(tier);
+  });
+});
+
 describe('CLASSIFIER_RULES', () => {
   it('is a frozen array with at least one entry per major family', () => {
     expect(Object.isFrozen(CLASSIFIER_RULES)).toBe(true);

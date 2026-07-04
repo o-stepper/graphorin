@@ -13,6 +13,10 @@
  *    an already-encrypted DB.
  *  - `graphorin storage cleanup-backups` — drop stale `.bak` /
  *    `.bak.<ts>` files left by previous encrypt / rekey runs.
+ *  - `graphorin storage backup <dest>` — online, consistent copy via
+ *    the driver's page-level backup API (store-02). Safe under a live
+ *    writer, preserves rowids (FTS5 mappings survive). Never use
+ *    `VACUUM INTO` — rowid renumbering corrupts FTS mappings.
  *
  * `encrypt`, `rekey`, and `cleanup-backups` need the cipher peer
  * (`better-sqlite3-multiple-ciphers`) which ships in the optional
@@ -121,6 +125,69 @@ export async function runStorageStatus(
     if (out.auditDb.enabled) {
       print(`  ${marker(out.auditDb.exists === true)} audit.db: ${out.auditDb.path}`);
     }
+  });
+  return out;
+}
+
+/** @stable */
+export interface StorageBackupOptions extends StorageCommonOptions {
+  /** Destination file path for the backup copy. */
+  readonly dest: string;
+  /** Replace an existing destination file. Default: refuse. */
+  readonly overwrite?: boolean;
+}
+
+/** @stable */
+export interface StorageBackupResult {
+  readonly source: string;
+  readonly dest: string;
+  readonly sizeBytes?: number;
+}
+
+/**
+ * store-02: online backup via the driver's page-level `backup()` API —
+ * consistent under a live writer (the daemon can keep running),
+ * preserves rowids so FTS5 external-content mappings survive, and for
+ * an encrypted store produces an equally-encrypted copy (same key).
+ * This is the ONLY supported SQL-level backup: `VACUUM INTO`
+ * renumbers rowids and corrupts the FTS mapping on restore.
+ *
+ * @stable
+ */
+export async function runStorageBackup(
+  options: StorageBackupOptions,
+): Promise<StorageBackupResult> {
+  const { openStoreContext } = await import('../internal/store-context.js');
+  const dest = isAbsolute(options.dest) ? options.dest : resolve(process.cwd(), options.dest);
+  const destStat = await statSafely(dest);
+  if (destStat.exists && options.overwrite !== true) {
+    throw new Error(
+      `[graphorin/cli] backup destination already exists: ${dest}. Pass --overwrite to replace it.`,
+    );
+  }
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+  });
+  let source: string;
+  try {
+    source = ctx.store.connection.path;
+    if (source === dest) {
+      throw new Error('[graphorin/cli] backup destination must differ from the store path.');
+    }
+    await ctx.store.connection.raw().backup(dest);
+  } finally {
+    await ctx.close();
+  }
+  const written = await statSafely(dest);
+  const out: StorageBackupResult = Object.freeze({
+    source,
+    dest,
+    ...(written.size !== undefined ? { sizeBytes: written.size } : {}),
+  });
+  emitReport(options, out, () => {
+    const print = options.print ?? defaultPrintSink;
+    print(brand('storage backup'));
+    print(`  ${statusMarker('ok')} ${out.source} -> ${out.dest} (${formatSize(out.sizeBytes)})`);
   });
   return out;
 }

@@ -119,3 +119,44 @@ describe('buildJsonSchemaValidator', () => {
     expect(no.toJSON?.()).toEqual({ not: {} });
   });
 });
+
+describe('mcp-skills-07 — server-supplied pattern hardening (ReDoS)', () => {
+  it('a catastrophic-backtracking pattern is guarded out (degrades to permissive) within a time budget', () => {
+    const validator = buildJsonSchemaValidator({
+      type: 'object',
+      properties: {
+        s: { type: 'string', pattern: '(a+)+$' },
+      },
+    });
+    const hostile = `${'a'.repeat(64)}b`;
+    const started = Date.now();
+    // Pre-fix this stalled the event loop with catastrophic
+    // backtracking; the nested-quantifier heuristic now skips the
+    // pattern entirely (permissive, like a malformed pattern).
+    const result = validator.safeParse({ s: hostile });
+    expect(Date.now() - started).toBeLessThan(1_000);
+    expect(result.success).toBe(true);
+  });
+
+  it('an oversized test string skips pattern evaluation instead of scanning it', () => {
+    const validator = buildJsonSchemaValidator({
+      type: 'object',
+      properties: { s: { type: 'string', pattern: '^x' } },
+    });
+    const big = 'y'.repeat(20_000);
+    const result = validator.safeParse({ s: big });
+    // Over the cap: pattern not evaluated (permissive) — the mismatch
+    // is deliberately NOT reported rather than scanning 20k chars of
+    // attacker-controlled input per property.
+    expect(result.success).toBe(true);
+  });
+
+  it('ordinary patterns still validate', () => {
+    const validator = buildJsonSchemaValidator({
+      type: 'object',
+      properties: { s: { type: 'string', pattern: '^ab+c$' } },
+    });
+    expect(validator.safeParse({ s: 'abbbc' }).success).toBe(true);
+    expect(validator.safeParse({ s: 'zzz' }).success).toBe(false);
+  });
+});

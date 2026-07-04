@@ -182,6 +182,54 @@ describe('WI-12 — provenance data-flow policy', () => {
     expect(auditActions()).toContain('tool:dataflow:blocked');
   });
 
+  it('agent-08: a COMPLETED run persists the coarse taint summary on its final state', async () => {
+    // Pre-fix the snapshot only happened on the approval suspend, so a
+    // completed run re-entering as a follow-up lost the trifecta flags
+    // and an enforce-mode sink was silently un-gated.
+    const agent = createAgent({
+      name: 'df-complete-snapshot',
+      instructions: 'INSTRUCTIONS',
+      provider: mockProvider([
+        toolCallScript({ toolCallId: 't1', toolName: 'web_fetch', args: {} }),
+        textOnlyScript('done'),
+      ]),
+      tools: [makeWebFetch(INJECTION)],
+      dataFlowPolicy: { mode: 'shadow' },
+    });
+    let result: { state: { taintSummary?: { untrustedSeen?: boolean } } } | undefined;
+    for await (const ev of agent.stream('go')) {
+      if (ev.type === 'agent.end') {
+        result = ev.result as unknown as typeof result;
+      }
+    }
+    expect(result?.state.taintSummary?.untrustedSeen).toBe(true);
+  });
+
+  it('agent-08: an ABORTED run persists the coarse taint summary (aborted runs are resumable)', async () => {
+    const agent = createAgent({
+      name: 'df-abort-snapshot',
+      instructions: 'INSTRUCTIONS',
+      provider: mockProvider([
+        toolCallScript({ toolCallId: 't1', toolName: 'web_fetch', args: {} }),
+        toolCallScript({ toolCallId: 't2', toolName: 'web_fetch', args: {} }),
+        textOnlyScript('done'),
+      ]),
+      tools: [makeWebFetch(INJECTION)],
+      dataFlowPolicy: { mode: 'shadow' },
+    });
+    let result:
+      | { status: string; state: { taintSummary?: { untrustedSeen?: boolean } } }
+      | undefined;
+    for await (const ev of agent.stream('go')) {
+      if (ev.type === 'tool.execute.end') agent.abort();
+      if (ev.type === 'agent.end') {
+        result = ev.result as unknown as typeof result;
+      }
+    }
+    expect(result?.status).toBe('aborted');
+    expect(result?.state.taintSummary?.untrustedSeen).toBe(true);
+  });
+
   it('flags but does not block in shadow mode', async () => {
     const state = { sent: false };
     const agent = createAgent({

@@ -44,6 +44,10 @@ const outputSchema = z.object({
   eof: z.boolean(),
   /** TL-6: producer trust class reported by the reader, when known. */
   producerTrustClass: z.string().optional(),
+  /** tools-03: producer source (a `ToolSource` value) from the taint sidecar, when known. */
+  producerSource: z.object({ kind: z.string() }).passthrough().optional(),
+  /** tools-03: producer sensitivity recovered from the taint sidecar, when known. */
+  producerSensitivity: z.string().optional(),
 });
 
 type ReadResultInput = z.infer<typeof inputSchema>;

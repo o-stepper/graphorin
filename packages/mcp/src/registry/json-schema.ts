@@ -253,15 +253,44 @@ function validateString(
     issues.push({ path, message: `expected at most ${schema.maxLength} characters` });
   }
   if (typeof schema.pattern === 'string') {
-    try {
-      const re = new RegExp(schema.pattern);
-      if (!re.test(value))
-        issues.push({ path, message: `did not match pattern ${schema.pattern}` });
-    } catch {
-      // Treat malformed patterns as permissive (mirrors Ajv default).
+    // mcp-skills-07: the pattern comes VERBATIM from the (untrusted)
+    // MCP server and runs on every validated input — a
+    // catastrophic-backtracking pattern (`(a+)+$`) plus a long
+    // model-generated string stalls the agent's event loop. Guards:
+    // cap the pattern and the tested-string length, and reject the
+    // classic nested-quantifier shapes heuristically. A guarded-out
+    // pattern degrades to permissive (same as a malformed one).
+    if (
+      schema.pattern.length <= MAX_PATTERN_LENGTH &&
+      value.length <= MAX_PATTERN_TEST_LENGTH &&
+      !looksCatastrophic(schema.pattern)
+    ) {
+      try {
+        const re = new RegExp(schema.pattern);
+        if (!re.test(value))
+          issues.push({ path, message: `did not match pattern ${schema.pattern}` });
+      } catch {
+        // Treat malformed patterns as permissive (mirrors Ajv default).
+      }
     }
   }
   return issues;
+}
+
+/** mcp-skills-07: hard caps on server-supplied `pattern` evaluation. */
+const MAX_PATTERN_LENGTH = 1_000;
+const MAX_PATTERN_TEST_LENGTH = 10_000;
+
+/**
+ * Cheap heuristic for the classic catastrophic-backtracking shape: a
+ * group whose inner expression ends with a quantifier and which is
+ * itself quantified (`(a+)+`, `(a*)*`, `(a+){2,}`, `(?:x+)*`). A
+ * linear-time engine (re2) would make this exact; the heuristic errs
+ * on the safe side for untrusted input, and a rejected pattern simply
+ * degrades to permissive.
+ */
+function looksCatastrophic(pattern: string): boolean {
+  return /\)[*+]|\)\{\d+,(?:\d+)?\}/.test(pattern) && /[*+}]\s*\)/.test(pattern);
 }
 
 function validateNumber(

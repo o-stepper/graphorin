@@ -44,6 +44,13 @@ export interface LlamaSessionInstance {
       readonly temperature?: number;
     },
   ): AsyncIterable<string>;
+  /**
+   * Release the per-request context / sequence backing this session.
+   * node-llama-cpp contexts hold KV-cache memory (hundreds of MB at
+   * large context sizes); the adapter calls this in a `finally` after
+   * every stream so long-running agents do not leak until OOM.
+   */
+  dispose?(): void;
 }
 
 /**

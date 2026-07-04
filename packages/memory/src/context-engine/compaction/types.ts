@@ -106,6 +106,18 @@ export type CompactionStrategy =
       readonly summarizerTimeoutMs?: number;
       readonly templateName?: string;
       readonly preStep?: boolean;
+      /**
+       * Character budget for the older-messages dump embedded in the
+       * summarizer prompt (context-engine-07). Without a cap the
+       * single-shot prompt carries the ENTIRE older window (~85% of the
+       * main model's window at default thresholds) and overflows any
+       * smaller `summarizerModel` — the failure is swallowed, so the
+       * run silently never compacts. When the dump exceeds the budget
+       * the OLDEST messages are elided (a marker notes how many) and
+       * the newest are kept verbatim. Default 96_000 chars (~24k
+       * tokens); lower it for small summarizer models; `0` disables.
+       */
+      readonly summarizerInputCharBudget?: number;
     }
   | {
       /**

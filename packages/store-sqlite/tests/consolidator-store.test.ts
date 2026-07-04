@@ -56,6 +56,29 @@ describe('SqliteConsolidatorStateStore', () => {
     expect(s2?.lastProcessedMessageId).toBe('b');
   });
 
+  it('upsertState never clobbers a concurrently acquired lock (store-07)', async () => {
+    const scope = { userId: 'alex' };
+    // Process A reads (lock free)… process B acquires… A patches an
+    // UNRELATED field. Pre-fix A's read-merge-write wrote EVERY column
+    // back, silently reverting B's lock to NULL — two consolidator
+    // runs then raced.
+    await asConsolidator(store).getState(scope);
+    expect(await asConsolidator(store).acquireLock(scope, 'runner-b', 1_000, 60_000)).toBe(true);
+    await asConsolidator(store).upsertState(scope, { lastCompletedAt: 5_000 });
+    const after = await asConsolidator(store).getState(scope);
+    expect(after?.lastCompletedAt).toBe(5_000);
+    expect(after?.activeLockHeldBy).toBe('runner-b');
+  });
+
+  it('releaseLock is a no-op for a non-holder (store-07)', async () => {
+    const scope = { userId: 'alex' };
+    expect(await asConsolidator(store).acquireLock(scope, 'holder', 0, 60_000)).toBe(true);
+    await asConsolidator(store).releaseLock(scope, 'someone-else');
+    expect((await asConsolidator(store).getState(scope))?.activeLockHeldBy).toBe('holder');
+    await asConsolidator(store).releaseLock(scope, 'holder');
+    expect((await asConsolidator(store).getState(scope))?.activeLockHeldBy).toBeNull();
+  });
+
   it('acquires + releases the lock idempotently', async () => {
     const scope = { userId: 'alex' };
     expect(await asConsolidator(store).acquireLock(scope, 'r1', 0, 60_000)).toBe(true);

@@ -353,10 +353,20 @@ export interface MemorySearchOptions {
    * Point-in-time ("as of") read. When set, only records whose
    * validity interval contains this instant are returned. For facts:
    * `(valid_from IS NULL OR valid_from <= asOf) AND (valid_to IS NULL OR valid_to > asOf)`;
-   * for episodes: `started_at <= asOf`. ISO-8601. Absent ⇒ current
-   * behaviour is unchanged (every live row is eligible).
+   * for episodes: `started_at <= asOf`. ISO-8601. Absent ⇒ fact reads
+   * evaluate validity at NOW (see {@link includeSuperseded}).
    */
   readonly asOf?: string;
+  /**
+   * Include superseded / validity-expired facts in the result set
+   * (memory-retrieval-01). Defaults to `false`: a default read behaves
+   * as `asOf = now`, so a fact whose `validTo` was closed (e.g. by
+   * `supersede`) never surfaces as current — exactly what the
+   * `fact_supersede` tool promises. Set `true` only for inspector /
+   * audit paths that need the full history. Ignored when an explicit
+   * {@link asOf} is supplied.
+   */
+  readonly includeSuperseded?: boolean;
 }
 
 /**

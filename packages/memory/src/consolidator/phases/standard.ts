@@ -235,7 +235,20 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         const neighbors = await deps.semantic.neighbors(deps.scope, fact.text, {
           topK: RECONCILE_TOP_K,
         });
-        const route = await preFilterCandidate(fact.text, neighbors);
+        let route = await preFilterCandidate(fact.text, neighbors);
+        // memory-consolidation-07: without an embedder `neighbors` is
+        // always empty, so dedup never fires and a DLQ replay (or plain
+        // re-run) of a partially-committed slice re-writes every
+        // already-committed fact verbatim. Guard with an
+        // embedder-independent exact-text lookup: FTS top hits +
+        // string equality. Skipped in the mainline (embedder) config,
+        // where the KNN stages already catch exact duplicates.
+        if (route.route !== 'noop' && neighbors.length === 0) {
+          const exactId = await findExactTextDuplicate(deps.semantic, deps.scope, fact.text);
+          if (exactId !== null) {
+            route = { route: 'noop', targetId: exactId, reason: 'exact-text-fts' };
+          }
+        }
 
         let decision: ReconcileDecision;
         let audited: ConflictDecision;
@@ -273,7 +286,10 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
           decision = { action: 'noop', targetId: route.targetId, reason: route.reason };
           audited = {
             kind: 'dedup',
-            stage: route.reason === 'exact-hash-match' ? 'exact-dedup' : 'embedding-three-zone',
+            stage:
+              route.reason === 'exact-hash-match' || route.reason === 'exact-text-fts'
+                ? 'exact-dedup'
+                : 'embedding-three-zone',
             existingId: route.targetId,
             ...(route.similarity !== undefined ? { similarity: route.similarity } : {}),
             reason: route.reason,
@@ -467,6 +483,10 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
 }
 
 function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequest {
+  // memory-consolidation-08: temporal anchoring — state today's date and
+  // instruct the model to resolve relative time into absolute dates, so
+  // "I'm interviewing next Friday" becomes a dated, durable fact.
+  const today = new Date(deps.now?.() ?? Date.now()).toISOString().slice(0, 10);
   return {
     messages: [
       {
@@ -474,7 +494,10 @@ function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequ
         content: `Conversation slice:\n${transcript}`,
       },
     ],
-    systemMessage: EXTRACTION_SYSTEM_PROMPT,
+    systemMessage:
+      `${EXTRACTION_SYSTEM_PROMPT} Today is ${today}. Each transcript line carries its ` +
+      'timestamp in parentheses; resolve relative dates ("next Friday", "last month") ' +
+      'into absolute ISO dates in the extracted fact text.',
     temperature: 0,
     maxTokens: EXTRACTION_MAX_TOKENS,
     metadata: {
@@ -523,7 +546,13 @@ function renderTranscript(messages: ReadonlyArray<SessionMessageRecord>): string
     .map((m) => {
       const role = m.message.role;
       const text = renderText(m.message);
-      return `[${m.sequence}] ${role}: ${text}`;
+      // memory-consolidation-08: per-message timestamps anchor the
+      // extraction — without them relative time ("next Friday", "last
+      // month") distils into facts with no resolvable timeframe.
+      const stamp = typeof m.createdAt === 'string' && m.createdAt.length > 0 ? m.createdAt : '';
+      return stamp.length > 0
+        ? `[${m.sequence}] (${stamp}) ${role}: ${text}`
+        : `[${m.sequence}] ${role}: ${text}`;
     })
     .join('\n');
 }
@@ -647,6 +676,28 @@ function sliceJsonObject(text: string): string | null {
  * `extraction` so they land quarantined (excluded from action-driving
  * recall until validated).
  */
+/**
+ * Embedder-independent exact-duplicate lookup
+ * (memory-consolidation-07): FTS top hits + strict string equality.
+ * Returns the existing fact's id or `null`. Failures are swallowed —
+ * the guard is an optimization, never a reason to fail the slice.
+ */
+async function findExactTextDuplicate(
+  semantic: SemanticMemory,
+  scope: SessionScope,
+  text: string,
+): Promise<string | null> {
+  try {
+    // Extraction output lands quarantined (P1-4) — the committed copy a
+    // replay would duplicate is exactly a quarantined row, so the guard
+    // must look past the retrieval gate.
+    const hits = await semantic.search(scope, text, { topK: 5, includeQuarantined: true });
+    return hits.find((h) => h.record.text === text)?.record.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 function buildFactInput(fact: ExtractedFact): FactInput {
   // MCON-12: normalize the model's raw [1, 10] importance into the
   // [0.1, 1.0] store scale (same contract as episodes); non-finite raw

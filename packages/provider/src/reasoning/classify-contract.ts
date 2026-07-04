@@ -79,8 +79,14 @@ export function inferReasoningContract(input: InferReasoningContractInput): Reas
   const provider = input.provider?.toLowerCase();
   // Provider-explicit short-circuits — let cloud-LLM consumers tag
   // their model with `provider: 'anthropic'` even when the modelId is
-  // a non-canonical alias (e.g. `legacy-thinking-router`).
-  if (provider === 'anthropic' || provider === 'bedrock') {
+  // a non-canonical alias (e.g. `legacy-thinking-router`). Prefix /
+  // substring matching because the AI SDK reports dotted provider ids
+  // (`'anthropic.messages'`, `'amazon-bedrock.messages'`), not the
+  // bare vendor name (core-provider-11).
+  if (
+    provider !== undefined &&
+    (provider.startsWith('anthropic') || provider.includes('bedrock'))
+  ) {
     return 'round-trip-required';
   }
   const normalised = stripPrefix(input.modelId.toLowerCase());
@@ -90,12 +96,25 @@ export function inferReasoningContract(input: InferReasoningContractInput): Reas
   return 'optional';
 }
 
+/**
+ * Bedrock cross-region inference-profile prefix (`us.anthropic.claude-…`,
+ * the standard way to invoke Claude on Bedrock since 2025). Stripped
+ * before pattern matching so the `^anthropic\.claude` rules still fire
+ * (core-provider-11).
+ */
+const BEDROCK_REGION_PREFIX = /^(?:us|eu|apac|jp|au|us-gov)\./;
+
 function stripPrefix(model: string): string {
   const slash = model.indexOf('/');
-  if (slash !== -1) return model.slice(slash + 1);
-  const colon = model.indexOf(':');
-  if (colon !== -1 && !model.startsWith('http')) {
-    return model.slice(colon + 1);
+  if (slash !== -1) return model.slice(slash + 1).replace(BEDROCK_REGION_PREFIX, '');
+  const deRegioned = model.replace(BEDROCK_REGION_PREFIX, '');
+  // Bedrock ids end in ':<version>' (`anthropic.claude-...-v1:0`) — the
+  // colon there is a version separator, not a provider/model split, and
+  // the rule patterns are prefix-anchored so the suffix is harmless.
+  if (deRegioned.startsWith('anthropic.')) return deRegioned;
+  const colon = deRegioned.indexOf(':');
+  if (colon !== -1 && !deRegioned.startsWith('http')) {
+    return deRegioned.slice(colon + 1);
   }
-  return model;
+  return deRegioned;
 }

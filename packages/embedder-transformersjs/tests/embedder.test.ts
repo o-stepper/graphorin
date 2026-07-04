@@ -175,10 +175,31 @@ describe('TransformersJsEmbedder', () => {
       model: 'unknown-model',
       pipelineFactory: makeStubPipelineFactory(123),
     });
-    expect(e.dim()).toBe(768); // default fallback
+    // periphery-05 (PS-11 port): an unknown model with no `dim` hint
+    // throws instead of silently assuming 768 — the assumed width baked
+    // a wrong-width id + vec0 table, and the id then CHANGED after the
+    // first embed (which lock-on-first reads as an embedder swap).
+    expect(() => e.dim()).toThrow(/Unknown embedding width/);
+    expect(() => e.id()).toThrow(/Unknown embedding width/);
     await e.embed(['hello']);
     expect(e.dim()).toBe(123);
     expect(e.id()).toBe('transformersjs:unknown-model@123');
+  });
+
+  it('an explicit dim hint binds the width and drift throws (periphery-05)', async () => {
+    const e = createTransformersJsEmbedder({
+      model: 'unknown-model',
+      dim: 123,
+      pipelineFactory: makeStubPipelineFactory(123),
+    });
+    expect(e.dim()).toBe(123);
+    await expect(e.embed(['hello'])).resolves.toHaveLength(1);
+    const wrong = createTransformersJsEmbedder({
+      model: 'unknown-model',
+      dim: 999,
+      pipelineFactory: makeStubPipelineFactory(123),
+    });
+    await expect(wrong.embed(['hello'])).rejects.toThrow(/bound to 999/);
   });
 
   it('pipeline factory is called once across multiple embed() invocations (cache hit on second call)', async () => {

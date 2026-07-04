@@ -7,7 +7,8 @@ import { bootLiveServer, type LiveServerHandle } from './__fixtures__/live-serve
 let live: LiveServerHandle | undefined;
 
 beforeAll(async () => {
-  live = await bootLiveServer(['agents:invoke:*']);
+  // periphery-10: session streams gate on the sessions:read family.
+  live = await bootLiveServer(['sessions:read:*']);
 });
 
 afterAll(async () => {

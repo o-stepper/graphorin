@@ -186,7 +186,13 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
     preamble: input.localePack.compactionSummaryTemplate.preamble,
     sections: input.localePack.compactionSummaryTemplate.sections,
   };
-  const prompt = buildSummarizerPrompt({ template, olderMessages });
+  const prompt = buildSummarizerPrompt({
+    template,
+    olderMessages,
+    ...(input.strategy.summarizerInputCharBudget !== undefined
+      ? { maxDumpChars: input.strategy.summarizerInputCharBudget }
+      : {}),
+  });
 
   const summarizerInput: {
     prompt: string;

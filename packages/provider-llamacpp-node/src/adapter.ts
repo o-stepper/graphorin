@@ -218,26 +218,42 @@ async function* streamLlamaCppNode(
   };
   let completionTokens = 0;
   let errored = false;
+  let aborted = false;
   try {
     const streamOptions: { signal?: AbortSignal; maxTokens?: number; temperature?: number } = {};
     if (req.signal !== undefined) streamOptions.signal = req.signal;
     if (req.maxTokens !== undefined) streamOptions.maxTokens = req.maxTokens;
     if (req.temperature !== undefined) streamOptions.temperature = req.temperature;
     for await (const piece of session.promptStreamingResponse(prompt, streamOptions)) {
+      if (req.signal?.aborted) {
+        aborted = true;
+        break;
+      }
       if (typeof piece !== 'string' || piece.length === 0) continue;
       completionTokens += lengthOf(model.tokenize(piece));
       yield { type: 'text-delta', delta: piece };
-      if (req.signal?.aborted) break;
+      if (req.signal?.aborted) {
+        aborted = true;
+        break;
+      }
     }
   } catch (err) {
     errored = true;
     yield { type: 'error', error: { kind: 'unknown', message: (err as Error).message } };
+  } finally {
+    // Release the per-request context / KV cache (core-provider-08).
+    try {
+      session.dispose?.();
+    } catch {
+      // Disposal failures must never mask the stream outcome.
+    }
   }
   yield {
     type: 'finish',
     // PS-4: a mid-stream failure must not masquerade as a clean stop —
-    // partial text would be indistinguishable from success.
-    finishReason: errored ? 'error' : 'stop',
+    // partial text would be indistinguishable from success. PS-12: an
+    // aborted stream reports 'aborted', mirroring the HTTP adapters.
+    finishReason: errored ? 'error' : aborted ? 'aborted' : 'stop',
     usage: {
       promptTokens,
       completionTokens,
@@ -278,6 +294,15 @@ async function defaultSessionFactory(
   return {
     promptStreamingResponse(prompt, streamOptions) {
       return promptToIterable(session, prompt, streamOptions);
+    },
+    dispose() {
+      // Sequence first, then its owning context (core-provider-08).
+      try {
+        sequence.dispose?.();
+      } catch {
+        // fall through to the context
+      }
+      context.dispose?.();
     },
   };
 }
@@ -352,7 +377,10 @@ function promptToIterable(
 
 function renderPrompt(req: ProviderRequest): string {
   const parts: string[] = [];
-  if (req.systemMessage !== undefined) parts.push(`[system] ${req.systemMessage}`);
+  // `req.systemMessage` is deliberately NOT rendered here: the session
+  // factory already sets it as the chat-template `systemPrompt`, and
+  // rendering it again would show the model the system prompt twice
+  // (core-provider-08).
   for (const msg of req.messages) {
     const text =
       typeof msg.content === 'string'

@@ -248,6 +248,37 @@ describe('runIterativeRetrieval (P2-4)', () => {
     expect(retrieveCalls).toHaveLength(1);
   });
 
+  it('graded=false on single-shot paths; graded=true once the grader actually ran (memory-retrieval-02)', async () => {
+    // Single-shot (gate not hard): sufficient defaults true, but graded says so.
+    const ungraded = await runIterativeRetrieval(
+      'where do I live',
+      makeDeps({ 'where do I live': ['a'] }, scriptGrader([SUFFICIENT])).deps,
+    );
+    expect(ungraded.graded).toBe(false);
+    expect(ungraded.sufficient).toBe(true);
+    // Single-shot (no grader): same default, same honesty flag.
+    const noGrader = await runIterativeRetrieval('q', makeDeps({ q: ['a'] }, null).deps, {
+      forceHard: true,
+    });
+    expect(noGrader.graded).toBe(false);
+    // A graded pass — sufficient is now a real verdict.
+    const graded = await runIterativeRetrieval(
+      'q',
+      makeDeps({ q: ['a'] }, scriptGrader([SUFFICIENT])).deps,
+      { forceHard: true },
+    );
+    expect(graded.graded).toBe(true);
+    expect(graded.sufficient).toBe(true);
+    // An abstention is graded too.
+    const abstained = await runIterativeRetrieval(
+      'q',
+      makeDeps({ q: ['a'] }, scriptGrader([insufficient(null)])).deps,
+      { forceHard: true },
+    );
+    expect(abstained.graded).toBe(true);
+    expect(abstained.abstained).toBe(true);
+  });
+
   it('reformulates once then stops when sufficient (widening on pass 2)', async () => {
     const grader = scriptGrader([insufficient('better'), SUFFICIENT]);
     const { deps, retrieveCalls } = makeDeps({ q: ['a'], better: ['b'] }, grader);
@@ -466,10 +497,41 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
     const out = (await tool?.execute(
       { query: 'who did the person I met before recommend, and which book?', maxIterations: 2 },
       makeCtx(),
-    )) as { abstained: boolean; sufficient: boolean; iterations: number };
+    )) as { abstained: boolean; sufficient: boolean; graded: boolean; iterations: number };
     expect(out.abstained).toBe(true);
     expect(out.sufficient).toBe(false);
+    expect(out.graded).toBe(true);
     expect(out.iterations).toBe(2);
+  });
+
+  it('deep_recall forces the loop: even a simple query gets GRADED (memory-retrieval-02)', async () => {
+    // Pre-fix the local difficulty gate (W_MULTI_HOP 0.4 < threshold
+    // 0.5, English-only regexes) rejected the tool's own documented
+    // examples, so deep_recall returned single-shot `sufficient: true`
+    // without any grading. The model choosing deep_recall IS the
+    // hardness signal — the tool now passes forceHard.
+    const provider = scriptProvider([
+      '{"sufficient": true, "confidence": 0.9, "reformulation": null}',
+    ]);
+    const scope = { userId: 'alex' };
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      iterativeRetrieval: { provider },
+      resolveScope: () => scope,
+    });
+    await memory.semantic.remember(scope, { text: 'tbilisi trip notes' });
+    const tool = memory.tools.find((t) => t.name === 'deep_recall');
+    const out = (await tool?.execute({ query: 'tbilisi' }, makeCtx())) as {
+      sufficient: boolean;
+      graded: boolean;
+      iterations: number;
+    };
+    // The grader RAN (one provider call) — a simple query is no longer
+    // waved through ungraded.
+    expect(provider.calls).toHaveLength(1);
+    expect(out.graded).toBe(true);
+    expect(out.sufficient).toBe(true);
   });
 });
 

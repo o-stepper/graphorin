@@ -644,6 +644,29 @@ describe('@graphorin/memory/tiers — SharedMemory', () => {
   });
 });
 
+describe('SemanticMemory.search — tags widen the fusion pool (memory-retrieval-03)', () => {
+  it('a tagged search returns topK tagged hits even when untagged candidates crowd the cut', async () => {
+    const memory = makeMemory();
+    const scope = { userId: 'tags-user' };
+    // 20 untagged facts FIRST: they occupy the early fused ranks (the
+    // fixture FTS scores are constant, so order is insertion order).
+    for (let i = 0; i < 20; i += 1) {
+      await memory.semantic.remember(scope, { text: `alpha plain item ${i}` });
+    }
+    // 10 tagged facts after them.
+    for (let i = 0; i < 10; i += 1) {
+      await memory.semantic.remember(scope, { text: `alpha work item ${i}`, tags: ['work'] });
+    }
+    // Pre-fix: the fused pool was cut to topK BEFORE the record-level
+    // tags filter, so the 10 untagged front-runners were kept, then
+    // filtered — the search silently returned zero hits although 10
+    // tagged matches exist. The widened pool returns all 10.
+    const hits = await memory.semantic.search(scope, 'alpha', { topK: 10, tags: ['work'] });
+    expect(hits).toHaveLength(10);
+    expect(hits.every((h) => h.record.tags?.includes('work') === true)).toBe(true);
+  });
+});
+
 function makeMemory(
   opts: { embedder?: ReturnType<typeof createStubEmbedder> } = {},
 ): ReturnType<typeof createMemory> {

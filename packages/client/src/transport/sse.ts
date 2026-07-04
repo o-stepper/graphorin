@@ -49,6 +49,11 @@ export async function openSseTransport(
       headers: {
         Accept: 'text/event-stream',
         Authorization: `Bearer ${options.auth.token}`,
+        // periphery-03: resume from the replay buffer instead of
+        // re-receiving the entire buffered history on every reconnect.
+        ...(options.lastEventId !== undefined && options.lastEventId.length > 0
+          ? { 'Last-Event-ID': options.lastEventId }
+          : {}),
       },
       signal: controller.signal,
     });

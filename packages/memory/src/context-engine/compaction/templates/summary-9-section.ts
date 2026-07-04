@@ -73,6 +73,13 @@ export interface RenderedTemplate {
 export function buildSummarizerPrompt(input: {
   readonly template: RenderedTemplate;
   readonly olderMessages: ReadonlyArray<Message>;
+  /**
+   * Character budget for the message dump (context-engine-07). When the
+   * rendered dump exceeds it, the OLDEST lines are elided (newest kept)
+   * and a marker notes how many were dropped. `undefined` ⇒ default
+   * {@link DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET}; `0` disables the cap.
+   */
+  readonly maxDumpChars?: number;
 }): string {
   const { template, olderMessages } = input;
   // The last two sections (recent turns + metadata) are always harness-filled,
@@ -84,9 +91,16 @@ export function buildSummarizerPrompt(input: {
         `  ${idx + 1}. ${header}${idx >= harnessFrom ? ' (filled by harness; do NOT generate)' : ''}`,
     )
     .join('\n');
-  const messageDump = olderMessages
-    .map((message, idx) => `[${idx}] ${message.role}: ${renderMessageText(message).trim()}`)
-    .join('\n');
+  // context-engine-09: the dump rides inside a data-only envelope — a
+  // tool result carrying the closing marker would break out of it and
+  // inject instructions straight into the summarizer. Neutralize the
+  // marker sequences the same way `wrapSummaryAsDerived` does.
+  const lines = olderMessages.map(
+    (message, idx) =>
+      `[${idx}] ${message.role}: ${neutralizeDumpMarkers(renderMessageText(message).trim())}`,
+  );
+  const budget = input.maxDumpChars ?? DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET;
+  const messageDump = budget > 0 ? capDumpLines(lines, budget) : lines.join('\n');
   return [
     template.preamble,
     '',
@@ -98,6 +112,48 @@ export function buildSummarizerPrompt(input: {
     messageDump,
     '<<</older_messages>>>',
   ].join('\n');
+}
+
+/**
+ * Default character budget for the summarizer's older-messages dump
+ * (~24k tokens at 4 chars/token) — bounded so pointing
+ * `summarizerModel` at a smaller model does not overflow its window
+ * (context-engine-07).
+ *
+ * @stable
+ */
+export const DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET = 96_000;
+
+/** Neutralize the dump's own envelope markers inside message text (context-engine-09). */
+function neutralizeDumpMarkers(text: string): string {
+  return text
+    .replaceAll('<<</older_messages>>>', '[[/older_messages]]')
+    .replaceAll('<<<older_messages>>>', '[[older_messages]]');
+}
+
+/**
+ * Cap the dump to `budget` characters by dropping the OLDEST lines
+ * first — the newest older-window messages carry the state the summary
+ * must preserve for continuity. A leading marker records the elision.
+ */
+function capDumpLines(lines: ReadonlyArray<string>, budget: number): string {
+  let total = 0;
+  const kept: string[] = [];
+  for (let i = lines.length - 1; i >= 0; i -= 1) {
+    const line = lines[i] ?? '';
+    // +1 for the joining newline.
+    if (total + line.length + 1 > budget && kept.length > 0) break;
+    kept.unshift(line);
+    total += line.length + 1;
+    // A single line larger than the whole budget: keep it truncated.
+    if (total > budget) {
+      kept[0] = `${(kept[0] ?? '').slice(0, Math.max(0, budget))}…`;
+      break;
+    }
+  }
+  const dropped = lines.length - kept.length;
+  if (dropped <= 0) return kept.join('\n');
+  return [`[... ${dropped} earlier message(s) omitted from summarization ...]`, ...kept].join('\n');
 }
 
 /**

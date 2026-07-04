@@ -40,7 +40,7 @@ describe('createWsDispatcher', () => {
 
   it('IP-18: a subscription snapshot reports the principal token id, not the connection id', () => {
     const dispatcher = createWsDispatcher();
-    const sub = makeSubscriber(['agents:invoke:*']); // handle.id='sub-1', tokenId='tok-1'
+    const sub = makeSubscriber(['sessions:read:*']); // handle.id='sub-1', tokenId='tok-1'
     dispatcher.registerSubscriber(sub.handle);
     dispatcher.subscribe({
       subscriberId: sub.handle.id,
@@ -57,7 +57,7 @@ describe('createWsDispatcher', () => {
     const dispatcher = createWsDispatcher({
       commentary: { policy: 'wrap' },
     });
-    const sub = makeSubscriber(['agents:invoke:*']);
+    const sub = makeSubscriber(['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
     const subscribed = dispatcher.subscribe({
       subscriberId: sub.handle.id,
@@ -86,7 +86,7 @@ describe('createWsDispatcher', () => {
     const dispatcher = createWsDispatcher({
       commentary: { policy: 'pass-through' },
     });
-    const sub = makeSubscriber(['agents:invoke:*']);
+    const sub = makeSubscriber(['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
     dispatcher.subscribe({
       subscriberId: sub.handle.id,
@@ -105,7 +105,7 @@ describe('createWsDispatcher', () => {
 
   it('replays buffered events on subscribe with sinceEventId', () => {
     const dispatcher = createWsDispatcher();
-    const sub = makeSubscriber(['agents:invoke:*']);
+    const sub = makeSubscriber(['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
 
     // Emit before any subscriber so events go into the buffer.
@@ -124,7 +124,7 @@ describe('createWsDispatcher', () => {
 
   it('cleans up subscriptions on unregister', () => {
     const dispatcher = createWsDispatcher();
-    const sub = makeSubscriber(['agents:invoke:*']);
+    const sub = makeSubscriber(['sessions:read:*']);
     const reg = dispatcher.registerSubscriber(sub.handle);
     dispatcher.subscribe({
       subscriberId: sub.handle.id,
@@ -139,7 +139,7 @@ describe('createWsDispatcher', () => {
 
   it('emits lifecycle frames to a single subscription', () => {
     const dispatcher = createWsDispatcher();
-    const sub = makeSubscriber(['agents:invoke:*']);
+    const sub = makeSubscriber(['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
     dispatcher.subscribe({
       subscriberId: sub.handle.id,

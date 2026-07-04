@@ -73,6 +73,7 @@ import {
   runSkillsInstall,
   runSkillsMigrateFrontmatter,
   runStart,
+  runStorageBackup,
   runStorageCleanupBackups,
   runStorageEncrypt,
   runStorageRekey,
@@ -565,6 +566,25 @@ function registerStorageCommands(program: Command): void {
           oldPassphraseFrom: opts.oldPassphraseFrom,
           newPassphraseFrom: opts.newPassphraseFrom,
           ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
+        });
+      },
+    );
+  storage
+    .command('backup')
+    .description(
+      'Online, consistent copy of the store via the page-level backup API (safe under a live writer; never use VACUUM INTO).',
+    )
+    .argument('<dest>', 'Destination file path for the backup copy.')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--overwrite', 'Replace an existing destination file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(
+      async (dest: string, opts: { config?: string; overwrite?: boolean; json?: boolean }) => {
+        await runStorageBackup({
+          dest,
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.overwrite === true ? { overwrite: true } : {}),
           ...(opts.json !== undefined ? { json: opts.json } : {}),
         });
       },

@@ -343,6 +343,15 @@ function buildBody(
     messages: toOpenAIChatMessages(messages),
     stream,
   };
+  if (stream) {
+    // core-provider-09: vanilla OpenAI-shaped servers (vLLM, Together,
+    // OpenAI proper) only emit the final usage chunk when asked;
+    // without it streamed calls finish with {0,0,0} usage and cost
+    // tracking silently zeroes. llama.cpp accepts the flag too.
+    // `providerOptions` is merged last, so callers can override it for
+    // servers that reject the field.
+    body.stream_options = { include_usage: true };
+  }
   if (req.temperature !== undefined) body.temperature = req.temperature;
   if (req.maxTokens !== undefined) body.max_tokens = req.maxTokens;
   if (req.tools !== undefined && req.tools.length > 0) {

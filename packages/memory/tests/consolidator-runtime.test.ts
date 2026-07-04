@@ -186,11 +186,24 @@ describe('consolidator/runtime — standard phase', () => {
 });
 
 describe('consolidator/runtime — deep phase — dedup decision', () => {
-  it('marks the candidate purged when judge picks dedup', async () => {
+  it('soft-forgets (NEVER purges) the candidate when the judge picks dedup', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
       withConsolidatorStore: true,
     });
+    // memory-consolidation-01: a background LLM verdict must never
+    // trigger the GDPR hard-delete — spy on purge to prove it stays cold.
+    const semanticStore = store.semantic as {
+      purge?: (id: string, reason?: string) => Promise<void>;
+    };
+    let purgeCalled = false;
+    const origPurge = semanticStore.purge?.bind(store.semantic);
+    if (origPurge !== undefined) {
+      semanticStore.purge = async (id, reason) => {
+        purgeCalled = true;
+        await origPurge(id, reason);
+      };
+    }
     const provider = fakeProvider([
       {
         text: '{"decision":"dedup","reason":"identical content"}',
@@ -224,9 +237,59 @@ describe('consolidator/runtime — deep phase — dedup decision', () => {
     const outcome = await memory.consolidator.fireNow('deep', scope);
     expect(outcome?.conflictsResolved).toBe(1);
     expect(outcome?.factsUpdated).toBe(1);
-    // The candidate has been purged — `get` returns null.
+    // The candidate is gone from recall — but via the SOFT, replayable
+    // tombstone, never the destructive purge.
     const remaining = await memory.semantic.get(scope, candidate.id);
     expect(remaining).toBeNull();
+    expect(purgeCalled).toBe(false);
+  });
+
+  it('admits WITHOUT a provider call when the conflicting fact vanished before the drain', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    // memory-consolidation-01: a 'dedup' verdict against "(unknown)"
+    // would delete the ONLY surviving copy. The judge must not rule on
+    // a vanished counterpart at all.
+    const provider = fakeProvider([
+      {
+        text: '{"decision":"dedup","reason":"should never be asked"}',
+        usage: { promptTokens: 25, completionTokens: 5, totalTokens: 30 },
+        finishReason: 'stop',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'standard',
+        provider,
+        defaultScope: { userId: 'alex' },
+      },
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    const oldFact = await memory.semantic.remember(scope, { text: 'I love mountain biking' });
+    const candidate = await memory.semantic.remember(scope, { text: 'I love mountain biking too' });
+    if (store.conflicts !== undefined) {
+      await store.conflicts.enqueuePending({
+        scope,
+        factId: candidate.id,
+        candidateText: candidate.text,
+        stage: 'defer-to-deep',
+        conflictingIds: [oldFact.id],
+      });
+    }
+    // The conflicting fact disappears between enqueue and drain.
+    await memory.semantic.forget(scope, oldFact.id, 'user asked');
+    await memory.consolidator.start();
+    const outcome = await memory.consolidator.fireNow('deep', scope);
+    expect(outcome?.conflictsResolved).toBe(1);
+    // No judge call was spent, and the candidate SURVIVES as the only copy.
+    expect(provider.calls).toHaveLength(0);
+    const survivor = await memory.semantic.get(scope, candidate.id);
+    expect(survivor).not.toBeNull();
   });
 
   it('falls through to admit when the judge response is unparseable', async () => {
@@ -564,5 +627,199 @@ describe('consolidator/runtime — wiring', () => {
     const ph = createConsolidatorPlaceholder();
     const out = await ph.fireNow('light', { userId: 'alex' });
     expect(out).toBeNull();
+  });
+});
+
+describe('consolidator/runtime — Wave B operational fixes', () => {
+  it('expires stale CONFLICT-CHECK rows as admit at tiers without a deep phase (memory-consolidation-04)', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const provider = fakeProvider([]);
+    const scope: SessionScope = { userId: 'alex' };
+    // Clock injected 8 days ahead of the (real-now) enqueue stamp, so the
+    // 7-day TTL sees the row as stale.
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: scope,
+        now: () => Date.now() + 8 * 24 * 60 * 60 * 1000,
+      },
+    });
+    const fact = await memory.semantic.remember(scope, { text: 'stale conflict candidate' });
+    if (store.conflicts === undefined) throw new Error('fixture without conflict store');
+    await store.conflicts.enqueuePending({
+      scope,
+      factId: fact.id,
+      candidateText: fact.text,
+      stage: 'defer-to-deep',
+      conflictingIds: [],
+    });
+    await memory.consolidator.start();
+    await memory.consolidator.trigger({ kind: 'turn' }, scope);
+    // The 'cheap' tier has no deep phase: without the TTL sweep this row
+    // would sit unresolved forever. It is resolved as ADMIT (the safe
+    // direction — the candidate fact stays live).
+    const left = await store.conflicts.listPending(scope);
+    expect(left).toHaveLength(0);
+    const survivor = await memory.semantic.get(scope, fact.id);
+    expect(survivor).not.toBeNull();
+  });
+
+  it('keeps fresh pending rows (and every row at deep-phase tiers)', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const scope: SessionScope = { userId: 'alex' };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: { tier: 'cheap', provider: fakeProvider([]), defaultScope: scope },
+    });
+    const fact = await memory.semantic.remember(scope, { text: 'fresh conflict candidate' });
+    if (store.conflicts === undefined) throw new Error('fixture without conflict store');
+    await store.conflicts.enqueuePending({
+      scope,
+      factId: fact.id,
+      candidateText: fact.text,
+      stage: 'defer-to-deep',
+      conflictingIds: [],
+    });
+    await memory.consolidator.start();
+    await memory.consolidator.trigger({ kind: 'turn' }, scope);
+    // Fresh row (enqueued "now", TTL 7 days): untouched.
+    const left = await store.conflicts.listPending(scope);
+    expect(left).toHaveLength(1);
+  });
+
+  it('extraction is temporally anchored: today-date in the prompt, timestamps per line (memory-consolidation-08)', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    const provider = fakeProvider([
+      {
+        text: '{"facts":[]}',
+        usage: { promptTokens: 10, completionTokens: 2, totalTokens: 12 },
+        finishReason: 'stop',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: { tier: 'cheap', provider, defaultScope: scope },
+    });
+    await memory.session.push(scope, {
+      role: 'user',
+      content: 'I am interviewing next Friday.',
+    });
+    await memory.consolidator.start();
+    await memory.consolidator.fireNow('standard', scope);
+    const req = provider.calls[0];
+    if (req === undefined) throw new Error('extraction call never made');
+    expect(req.systemMessage).toContain('Today is');
+    expect(req.systemMessage).toContain('resolve relative dates');
+    const transcript = String(req.messages[0]?.content ?? '');
+    // Each line carries its ISO timestamp in parentheses.
+    expect(transcript).toMatch(/\(\d{4}-\d{2}-\d{2}T[0-9:.]+Z\)/);
+  });
+
+  it('threads priceUsage into the phases so the USD ceiling accumulates (memory-consolidation-02)', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    const provider = fakeProvider([
+      {
+        text: '{"facts":[]}',
+        usage: { promptTokens: 100, completionTokens: 20, totalTokens: 120 },
+        finishReason: 'stop',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: scope,
+        priceUsage: ({ promptTokens, completionTokens }) =>
+          (promptTokens * 3 + completionTokens * 15) / 1_000_000,
+      },
+    });
+    await memory.session.push(scope, { role: 'user', content: 'note something' });
+    await memory.consolidator.start();
+    await memory.consolidator.fireNow('standard', scope);
+    const status = await memory.consolidator.status();
+    // Pre-fix priceUsage was unreachable from CreateConsolidatorOptions
+    // and every phase priced its calls at $0.
+    expect(status.budget.costUsedToday).toBeGreaterThan(0);
+  });
+});
+
+describe('consolidator/runtime — trigger() drains the DLQ (memory-consolidation-03)', () => {
+  it('a later trigger replays a failed batch without any explicit drainDlq call', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    let clock = Date.parse('2026-04-21T00:00:00Z');
+    let attempt = 0;
+    const flaky: Provider = {
+      name: 'flaky',
+      modelId: 'flaky:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        attempt += 1;
+        if (attempt === 1) throw new Error('transient upstream blip');
+        return {
+          text: '{"facts":[]}',
+          usage: { promptTokens: 5, completionTokens: 1, totalTokens: 6 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: { tier: 'cheap', provider: flaky, defaultScope: scope, now: () => clock },
+    });
+    await memory.session.push(scope, { role: 'user', content: 'hello there' });
+    await memory.consolidator.start();
+    const failed = await memory.consolidator.fireNow('standard', scope);
+    expect(failed?.status).toBe('failed');
+    expect((await memory.consolidator.status()).dlqSize).toBeGreaterThan(0);
+
+    // Advance past backoff + cooldown; an ordinary trigger — the loop's
+    // normal heartbeat — now replays the batch. Pre-fix drainDlq had NO
+    // production caller and failed batches accumulated forever.
+    clock += 2 * 60 * 60 * 1000;
+    await memory.consolidator.trigger({ kind: 'turn' }, scope);
+    expect((await memory.consolidator.status()).dlqSize).toBe(0);
   });
 });

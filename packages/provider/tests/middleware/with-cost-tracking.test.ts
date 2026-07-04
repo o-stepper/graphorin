@@ -202,4 +202,26 @@ describe('withCostTracking', () => {
     await wrapped.generate({ ...REQ, metadata: { sessionId: 's1' } });
     expect(capturedMetadata).toMatchObject({ sessionId: 's1' });
   });
+
+  it('bills separately-reported reasoningTokens at the output rate (PS-19)', async () => {
+    const base = bareAdapter();
+    const reasoningProvider = {
+      ...base,
+      generate: async () => ({
+        text: 'ok',
+        usage: { promptTokens: 5, completionTokens: 3, reasoningTokens: 7, totalTokens: 15 },
+        finishReason: 'stop' as const,
+      }),
+    };
+    const records: number[] = [];
+    const wrapped = withCostTracking({
+      onUsage: ({ costUsd }) => {
+        records.push(costUsd);
+      },
+      priceLookup: () => ({ inputPerMtok: 1_000_000, outputPerMtok: 2_000_000 }),
+    })(reasoningProvider);
+    await wrapped.generate(REQ);
+    // 5 input * 1.00 + (3 completion + 7 reasoning) * 2.00 = 25.00 USD
+    expect(records[0]).toBeCloseTo(25);
+  });
 });

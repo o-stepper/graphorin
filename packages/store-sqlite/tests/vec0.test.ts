@@ -287,3 +287,65 @@ describe('MRET-9 — KNN over-fetch + tombstone hygiene', () => {
     await store.close();
   });
 });
+
+describe('store-03 — episode KNN over-fetch (MRET-9 ported)', () => {
+  it('a minority user gets their full topK of EPISODES despite a dominant user saturating the slice', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-store03-'));
+    const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
+    await store.init();
+    const meta = store.embeddings.registerOrReturn({
+      id: 'transformersjs:m@4',
+      embedderKind: 'transformersjs',
+      model: 'm',
+      dim: 4,
+      configHash: 'cfg-store03',
+    });
+    const episodic = store.memory.episodic as unknown as {
+      putWithEmbedding(
+        e: import('@graphorin/core').Episode,
+        opts: { embedding: { embedderId: string; vector: Float32Array } },
+      ): Promise<void>;
+      searchVector(
+        scope: { userId: string },
+        embedding: Float32Array,
+        embedderId: string,
+        topK: number,
+      ): Promise<ReadonlyArray<{ record: { id: string } }>>;
+    };
+    const now = new Date().toISOString();
+    const makeEpisode = (id: string, userId: string): import('@graphorin/core').Episode => ({
+      id,
+      kind: 'episodic',
+      userId,
+      sensitivity: 'internal',
+      summary: `episode ${id}`,
+      startedAt: now,
+      endedAt: now,
+      createdAt: now,
+    });
+    // 95 dominant-user vectors NEAR the query fill any small k slice…
+    for (let i = 0; i < 95; i += 1) {
+      await episodic.putWithEmbedding(makeEpisode(`dom-${i}`, 'dominant'), {
+        embedding: { embedderId: meta.id, vector: new Float32Array([1, 0.001 * i, 0, 0]) },
+      });
+    }
+    // …and 5 minority-user vectors strictly FARTHER from it.
+    for (let i = 0; i < 5; i += 1) {
+      await episodic.putWithEmbedding(makeEpisode(`min-${i}`, 'minority'), {
+        embedding: { embedderId: meta.id, vector: new Float32Array([0, 1, 0.001 * i, 0]) },
+      });
+    }
+    // Pre-fix: `topK` bound directly as the GLOBAL vec0 k — the
+    // dominant user's 95 near vectors filled the k=5 slice and the
+    // minority scope filter starved the result to zero.
+    const hits = await episodic.searchVector(
+      { userId: 'minority' },
+      new Float32Array([1, 0, 0, 0]),
+      meta.id,
+      5,
+    );
+    expect(hits).toHaveLength(5);
+    expect(hits.every((h) => h.record.id.startsWith('min-'))).toBe(true);
+    await store.close();
+  });
+});

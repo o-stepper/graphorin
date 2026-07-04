@@ -174,68 +174,62 @@ export class SqliteConsolidatorStateStore {
     scope: SessionScope,
     patch: ConsolidatorStatePatch,
   ): Promise<ConsolidatorStateRow> {
-    const existing = await this.getState(scope);
-    const merged: ConsolidatorStateRow = {
-      scope,
-      lastProcessedMessageId:
-        patch.lastProcessedMessageId !== undefined
-          ? patch.lastProcessedMessageId
-          : (existing?.lastProcessedMessageId ?? null),
-      lastPhase: patch.lastPhase !== undefined ? patch.lastPhase : (existing?.lastPhase ?? null),
-      lastCompletedAt:
-        patch.lastCompletedAt !== undefined
-          ? patch.lastCompletedAt
-          : (existing?.lastCompletedAt ?? null),
-      nextEligibleAt:
-        patch.nextEligibleAt !== undefined
-          ? patch.nextEligibleAt
-          : (existing?.nextEligibleAt ?? null),
-      activeLockHeldBy:
-        patch.activeLockHeldBy !== undefined
-          ? patch.activeLockHeldBy
-          : (existing?.activeLockHeldBy ?? null),
-      activeLockAcquiredAt:
-        patch.activeLockAcquiredAt !== undefined
-          ? patch.activeLockAcquiredAt
-          : (existing?.activeLockAcquiredAt ?? null),
-      reflectionWatermark:
-        patch.reflectionWatermark !== undefined
-          ? patch.reflectionWatermark
-          : (existing?.reflectionWatermark ?? null),
-    };
+    // store-07: build the UPDATE from the SUPPLIED patch keys only,
+    // inside one (IMMEDIATE) transaction. The old read-merge-write
+    // wrote EVERY column back, so a concurrent `acquireLock` landing
+    // between the read and the write was silently reverted to NULL —
+    // partially defeating CS-8's atomic lock and letting two
+    // consolidator runs race.
+    //
     // Sentinel-empty-string keying — SQLite treats NULLs as distinct
     // in the composite primary key, so we collapse undefined session
     // / agent ids to '' before insert. The reverse mapping in
     // `rowToState` converts '' back to `undefined`.
-    this.#conn.run(
-      `INSERT INTO consolidator_state (
-         scope_user_id, scope_session_id, scope_agent_id,
-         last_processed_message_id, last_phase, last_completed_at,
-         next_eligible_at, active_lock_held_by, active_lock_acquired_at,
-         reflection_watermark
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-       ON CONFLICT(scope_user_id, scope_session_id, scope_agent_id) DO UPDATE SET
-         last_processed_message_id = excluded.last_processed_message_id,
-         last_phase = excluded.last_phase,
-         last_completed_at = excluded.last_completed_at,
-         next_eligible_at = excluded.next_eligible_at,
-         active_lock_held_by = excluded.active_lock_held_by,
-         active_lock_acquired_at = excluded.active_lock_acquired_at,
-         reflection_watermark = excluded.reflection_watermark`,
-      [
-        merged.scope.userId,
-        merged.scope.sessionId ?? '',
-        merged.scope.agentId ?? '',
-        merged.lastProcessedMessageId,
-        merged.lastPhase,
-        merged.lastCompletedAt,
-        merged.nextEligibleAt,
-        merged.activeLockHeldBy,
-        merged.activeLockAcquiredAt,
-        merged.reflectionWatermark,
-      ],
-    );
-    return merged;
+    const userId = scope.userId;
+    const sessionId = scope.sessionId ?? '';
+    const agentId = scope.agentId ?? '';
+    const columnByKey = [
+      ['lastProcessedMessageId', 'last_processed_message_id'],
+      ['lastPhase', 'last_phase'],
+      ['lastCompletedAt', 'last_completed_at'],
+      ['nextEligibleAt', 'next_eligible_at'],
+      ['activeLockHeldBy', 'active_lock_held_by'],
+      ['activeLockAcquiredAt', 'active_lock_acquired_at'],
+      ['reflectionWatermark', 'reflection_watermark'],
+    ] as const;
+    const row = this.#conn.transaction(() => {
+      this.#conn.run(
+        `INSERT INTO consolidator_state (scope_user_id, scope_session_id, scope_agent_id)
+         VALUES (?, ?, ?)
+         ON CONFLICT(scope_user_id, scope_session_id, scope_agent_id) DO NOTHING`,
+        [userId, sessionId, agentId],
+      );
+      const sets: string[] = [];
+      const binds: unknown[] = [];
+      for (const [key, column] of columnByKey) {
+        const value = patch[key];
+        if (value !== undefined) {
+          sets.push(`${column} = ?`);
+          binds.push(value);
+        }
+      }
+      if (sets.length > 0) {
+        this.#conn.run(
+          `UPDATE consolidator_state SET ${sets.join(', ')}
+           WHERE scope_user_id = ? AND scope_session_id = ? AND scope_agent_id = ?`,
+          [...binds, userId, sessionId, agentId],
+        );
+      }
+      return this.#conn.get<StateRowDb>(
+        `SELECT * FROM consolidator_state
+         WHERE scope_user_id = ? AND scope_session_id = ? AND scope_agent_id = ?`,
+        [userId, sessionId, agentId],
+      );
+    });
+    if (row === undefined) {
+      throw new Error('[graphorin/store-sqlite] consolidator_state row vanished mid-upsert');
+    }
+    return rowToState(row);
   }
 
   async acquireLock(
@@ -270,13 +264,15 @@ export class SqliteConsolidatorStateStore {
   }
 
   async releaseLock(scope: SessionScope, runId: string): Promise<void> {
-    const existing = await this.getState(scope);
-    if (existing !== null && existing.activeLockHeldBy === runId) {
-      await this.upsertState(scope, {
-        activeLockHeldBy: null,
-        activeLockAcquiredAt: null,
-      });
-    }
+    // store-07: one atomic conditional UPDATE — the old read-then-write
+    // could clear a lock a DIFFERENT runner acquired in between.
+    this.#conn.run(
+      `UPDATE consolidator_state
+       SET active_lock_held_by = NULL, active_lock_acquired_at = NULL
+       WHERE scope_user_id = ? AND scope_session_id = ? AND scope_agent_id = ?
+         AND active_lock_held_by = ?`,
+      [scope.userId, scope.sessionId ?? '', scope.agentId ?? '', runId],
+    );
   }
 
   async recordRunStart(input: ConsolidatorRunInput): Promise<void> {

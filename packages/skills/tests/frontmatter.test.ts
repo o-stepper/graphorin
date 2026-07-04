@@ -61,6 +61,29 @@ describe('resolveSkillField (ADR-043 algorithm)', () => {
     expect(r.conflictingSources).toContain('graphorin-allowed-tools');
   });
 
+  it('the NESTED metadata.graphorin object form resolves (mcp-skills-09 / F-10)', () => {
+    // skills.md documents this as the preferred authoring form; the
+    // old resolver only read the flat dotted key and silently dropped
+    // nested values (sensitivity / sandbox written per the docs).
+    const fm = {
+      metadata: { graphorin: { sensitivity: 'internal', sandbox: 'isolated-vm' } },
+    };
+    const sensitivity = resolveSkillField<string>(fm, 'sensitivity');
+    expect(sensitivity.value).toBe('internal');
+    expect(sensitivity.source).toBe('metadata-graphorin');
+    const sandbox = resolveSkillField<string>(fm, 'sandbox');
+    expect(sandbox.value).toBe('isolated-vm');
+    // The flat form still wins when both are present (it was the only
+    // working form pre-fix, so existing skills keep their behaviour).
+    const both = {
+      metadata: {
+        'graphorin.sensitivity': 'secret',
+        graphorin: { sensitivity: 'public' },
+      },
+    };
+    expect(resolveSkillField<string>(both, 'sensitivity').value).toBe('secret');
+  });
+
   it('metadata.graphorin.* wins over graphorin-* legacy when Anthropic-base is missing', () => {
     const fm = {
       metadata: { 'graphorin.allowed-tools': ['b'] },

@@ -36,6 +36,10 @@ For a CLI script or a desktop app, embed the library packages directly. See [Arc
 
 Built on [`hono`](https://github.com/honojs/hono) (MIT) and [`@hono/node-server`](https://github.com/honojs/node-server) (MIT). The default `basePath` is `/v1`. Every authenticated endpoint requires a bearer token signed with HMAC-SHA256 against the deployment-wide pepper. The unauthenticated `/v1/health` route is exempt.
 
+::: warning Adapter-gated routes - what `graphorin start` actually serves
+Most domain routes below mount **only when the corresponding adapter is passed to `createServer({...})` programmatically**: sessions, memory, skills, MCP, audit, triggers, and replay routes need their adapter; `/v1/agents/*` and `/v1/workflows/*` need agents / workflows registered in the registries. The `graphorin start` daemon currently composes **none of these** - it serves health, metrics, tokens, auth tickets, and the WS/SSE endpoints only. To get the full surface, embed the server: build your adapter bag and call `createServer({ agents, workflows, sessions, memory, ... })` from your own entrypoint. A config-driven compose hook for `graphorin start` is tracked as future work.
+:::
+
 | Method | Path | Purpose |
 |---|---|---|
 | `GET` | `/v1/health` | Liveness + readiness summary (probes for storage, audit log, secrets, triggers, encryption). |
@@ -80,7 +84,7 @@ Built on [`hono`](https://github.com/honojs/hono) (MIT) and [`@hono/node-server`
 | `POST` | `/v1/triggers/:id/enable` | Re-enable a paused trigger (the next fire is recomputed from now). |
 | `DELETE` | `/v1/triggers/:id` | **Destructive** — unregister and remove the trigger. |
 | `GET` | `/v1/workflows` | List configured workflows. |
-| `POST` | `/v1/auth/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
+| `POST` | `/v1/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 
 ## Authentication modes
 
@@ -153,15 +157,9 @@ When you pass **both** a `consolidator` and a triggers scheduler to `createServe
 
 Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** — the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute.
 
-## Disconnect policy
+## Disconnects and reconnection
 
-Long-running streams (agent runs, workflows) survive client disconnects through the configurable `disconnect.policy`:
-
-| Policy | Behaviour on client disconnect |
-|---|---|
-| `'continue'` (default) | Run continues; client reconnects via `GET /v1/agents/:id/runs/:runId/follow`. |
-| `'pause'` | Run is paused; resumed when the client reconnects with the same `runId`. |
-| `'abort'` | Run aborts with `client-disconnected`. |
+Runs are **not** tied to the client connection: a background run started via `POST /v1/agents/:id/stream` (or a workflow execute/resume) keeps running when the subscriber drops. To catch up, reconnect over WebSocket and resubscribe to the run subject (`agent:<id>/runs/<runId>/events`) passing your last seen `eventId` - the server replays missed events from its bounded replay buffer. The SSE endpoint honours the standard `Last-Event-ID` header the same way. There is no per-run pause/abort-on-disconnect policy.
 
 ## Health checks
 

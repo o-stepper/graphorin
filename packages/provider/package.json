@@ -122,6 +122,7 @@
     "provenance": true
   },
   "devDependencies": {
+    "ai": "^7.0.15",
     "fast-check": "^3.23.0",
     "js-tiktoken": "^1.0.21"
   }

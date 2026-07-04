@@ -192,13 +192,31 @@ export async function callJsonHttp(args: {
   }
   if (!resp.ok) {
     const detail = await safeReadText(resp);
+    const headers = pickBackoffHeaders(resp.headers);
     throw new ProviderHttpError({
       providerName: args.providerName,
       status: resp.status,
       message: detail.length > 0 ? detail : resp.statusText,
+      ...(headers !== undefined ? { headers } : {}),
     });
   }
   return resp;
+}
+
+/**
+ * Capture the backoff-relevant response headers (`retry-after`,
+ * `x-ratelimit-*`) so `withRetry`'s Retry-After hint reader can honour
+ * server-provided delays. Returns `undefined` when none are present.
+ */
+function pickBackoffHeaders(headers: Headers): Readonly<Record<string, string>> | undefined {
+  const picked: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    const lower = key.toLowerCase();
+    if (lower === 'retry-after' || lower.startsWith('x-ratelimit-')) {
+      picked[lower] = value;
+    }
+  });
+  return Object.keys(picked).length > 0 ? picked : undefined;
 }
 
 async function safeReadText(resp: Response): Promise<string> {

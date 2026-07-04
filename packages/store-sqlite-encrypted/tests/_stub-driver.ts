@@ -209,6 +209,20 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
         return fn;
       }
 
+      /**
+       * store-05: the encrypt runner copies via the driver's online
+       * backup API. The stub mirrors better-sqlite3's semantics with a
+       * plain byte copy (page-consistency is the REAL driver's
+       * concern; real-peer.test.ts covers it).
+       */
+      async backup(destinationPath: string): Promise<void> {
+        if (existsSync(this.path)) {
+          writeFileSync(destinationPath, readFileSync(this.path));
+        } else {
+          writeFileSync(destinationPath, '');
+        }
+      }
+
       close(): void {
         this.open = false;
       }

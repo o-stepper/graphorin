@@ -22,6 +22,8 @@ import {
   type ClientCapabilities,
   CreateMessageRequestSchema,
   ElicitRequestSchema,
+  ErrorCode,
+  McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import type {
   MCPElicitationHandler,
@@ -75,6 +77,21 @@ export function registerClientRequestHandlers(
     sdkClient.setRequestHandler(ElicitRequestSchema, async (request, extra) => {
       incrementCounter('mcp.elicitation.requested.total', { server: serverIdRef.current });
       const params = request.params;
+      // mcp-skills-05 (SEP-1036): URL-mode elicitation carries a URL,
+      // not a form schema. The old handler surfaced it as an
+      // empty-schema FORM with the URL invisible — decline it honestly
+      // until URL elicitation is supported. (We advertise the `form`
+      // sub-capability only, so a conforming server never sends this.)
+      if ((params as { readonly mode?: unknown }).mode === 'url') {
+        incrementCounter('mcp.elicitation.declined.total', {
+          server: serverIdRef.current,
+          action: 'decline',
+        });
+        throw new McpError(
+          ErrorCode.InvalidRequest,
+          "URL-mode elicitation is not supported by this client (only 'form' is advertised).",
+        );
+      }
       const requestedSchema =
         'requestedSchema' in params && params.requestedSchema !== undefined
           ? (params.requestedSchema as Readonly<Record<string, unknown>>)
@@ -102,6 +119,18 @@ export function registerClientRequestHandlers(
     sdkClient.setRequestHandler(CreateMessageRequestSchema, async (request, extra) => {
       incrementCounter('mcp.sampling.requested.total', { server: serverIdRef.current });
       const p = request.params;
+      // mcp-skills-05: protocol 2025-11-25 — "The client MUST return an
+      // error if this field is provided but
+      // ClientCapabilities.sampling.tools is not declared". We do not
+      // declare it; pre-fix a tools-carrying request was silently
+      // answered as a plain completion.
+      const withTools = p as { readonly tools?: unknown; readonly toolChoice?: unknown };
+      if (withTools.tools !== undefined || withTools.toolChoice !== undefined) {
+        throw new McpError(
+          ErrorCode.InvalidRequest,
+          'sampling with tools is not supported by this client (ClientCapabilities.sampling.tools is not declared).',
+        );
+      }
       const mp = p.modelPreferences;
       const samplingRequest: MCPSamplingRequest = {
         messages: p.messages.map((m) => ({

@@ -43,6 +43,13 @@ export interface BudgetTrackerOptions {
   readonly onExceed: OnBudgetExceed;
   readonly resetSemantics: 'utc' | 'local' | 'sliding-24h';
   readonly now?: () => number;
+  /**
+   * Sink for the `onExceed: 'log'` WARN (memory-consolidation-02).
+   * Defaults to `process.stderr`. One WARN per resource per budget
+   * window — the shipped standard/full presets use `'log'`, so without
+   * it a breached ceiling was completely silent.
+   */
+  readonly logger?: (message: string) => void;
 }
 
 /**
@@ -56,6 +63,7 @@ export class BudgetTracker {
   readonly #now: () => number;
   readonly #resetSemantics: 'utc' | 'local' | 'sliding-24h';
   readonly #onExceed: OnBudgetExceed;
+  readonly #logger: (message: string) => void;
   #maxTokensPerDay: number;
   #maxCostPerDay: number;
   #bucketStart: number;
@@ -63,6 +71,8 @@ export class BudgetTracker {
   #cost = 0;
   #paused = false;
   #pausedReason: 'tokens-exceeded' | 'cost-exceeded' | null = null;
+  /** Resources already WARNed this window under `onExceed: 'log'` (memory-consolidation-02). */
+  #warnedThisWindow = new Set<'tokens' | 'cost'>();
   /**
    * Timestamped spend ledger for `sliding-24h` only. `#maybeReset` trims it to
    * the trailing 24h window and recomputes `#tokens` / `#cost` from it, so the
@@ -75,6 +85,11 @@ export class BudgetTracker {
     this.#now = opts.now ?? Date.now;
     this.#resetSemantics = opts.resetSemantics;
     this.#onExceed = opts.onExceed;
+    this.#logger =
+      opts.logger ??
+      ((message: string): void => {
+        process.stderr.write(`${message}\n`);
+      });
     this.#maxTokensPerDay = opts.maxTokensPerDay;
     this.#maxCostPerDay = opts.maxCostPerDay;
     this.#bucketStart = bucketStart(this.#now(), this.#resetSemantics);
@@ -181,6 +196,7 @@ export class BudgetTracker {
     this.#paused = false;
     this.#pausedReason = null;
     this.#ledger = [];
+    this.#warnedThisWindow.clear();
     this.#bucketStart = bucketStart(this.#now(), this.#resetSemantics);
   }
 
@@ -196,6 +212,18 @@ export class BudgetTracker {
     if (this.#onExceed === 'pause') {
       this.#paused = true;
       this.#pausedReason = resource === 'tokens' ? 'tokens-exceeded' : 'cost-exceeded';
+    }
+    if (this.#onExceed === 'log' && !this.#warnedThisWindow.has(resource)) {
+      // memory-consolidation-02: the type doc always promised "'log'
+      // keeps running with a WARN" — the WARN finally exists. Once per
+      // resource per budget window, so a breached daily ceiling is
+      // visible without flooding.
+      this.#warnedThisWindow.add(resource);
+      this.#logger(
+        `[graphorin/memory] consolidator ${resource} budget exceeded in phase '${phase}': ` +
+          `${resource === 'cost' ? `$${actual.toFixed(4)} > $${budget.toFixed(4)}` : `${actual} > ${budget}`} ` +
+          `(onExceed: 'log' — continuing; switch to 'pause'/'throw' to enforce).`,
+      );
     }
   }
 
@@ -223,6 +251,9 @@ export class BudgetTracker {
         this.#paused = false;
         this.#pausedReason = null;
       }
+      if (this.#tokens <= this.#maxTokensPerDay && this.#cost <= this.#maxCostPerDay) {
+        this.#warnedThisWindow.clear();
+      }
       return;
     }
     // utc / local: zero the counters when the calendar bucket rolls over.
@@ -233,6 +264,7 @@ export class BudgetTracker {
       this.#cost = 0;
       this.#paused = false;
       this.#pausedReason = null;
+      this.#warnedThisWindow.clear();
     }
   }
 }

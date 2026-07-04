@@ -34,11 +34,14 @@ describe('encryptDatabase', () => {
     expect(result.cipher).toBe('sqlcipher');
     expect(result.integrityCheck.ok).toBe(true);
     expect(result.targetPath).toBe(tgt);
-    // CS-7 wire contract: checkpoint the source, then convert the COPY
-    // in place via cipher pragmas + rekey — never ATTACH/sqlcipher_export
-    // (sqlite3mc ships no such function).
+    // CS-7 / store-05 wire contract: copy via the driver's ONLINE
+    // backup API (consistent under a live writer — the old
+    // checkpoint-close-then-copyFileSync silently dropped frames
+    // committed in between), then convert the COPY in place via cipher
+    // pragmas + rekey — never ATTACH/sqlcipher_export (sqlite3mc ships
+    // no such function).
     const sourceHistory = getStubHistory(src);
-    expect(sourceHistory?.pragmas.some((e) => /wal_checkpoint/.test(e))).toBe(true);
+    expect(sourceHistory?.pragmas.some((e) => /wal_checkpoint/.test(e))).toBe(false);
     expect(sourceHistory?.execs.some((e) => /sqlcipher_export/.test(e))).toBe(false);
     const targetHistory = getStubHistory(tgt);
     expect(targetHistory?.pragmas.some((p) => /^cipher = 'sqlcipher'$/.test(p))).toBe(true);

@@ -353,6 +353,13 @@ export interface IterativeRetrievalResult<H> {
    * than answer from `hits`.
    */
   readonly abstained: boolean;
+  /**
+   * `true` when the grader actually judged the result at least once
+   * (memory-retrieval-02). `false` on the single-shot path (gate not
+   * hard, or no grader configured) — there `sufficient: true` is a
+   * DEFAULT, not a verdict, and consumers must not read it as one.
+   */
+  readonly graded: boolean;
   /** The sequence of queries tried (original first). */
   readonly queries: ReadonlyArray<string>;
 }
@@ -448,7 +455,10 @@ export async function runIterativeRetrieval<H>(
   // make no abstention claim.
   const grader = deps.grader;
   if (!gate.hard || grader === null) {
-    return finalize(deps, passLists, 1, gate.hard, true, false, queries, options.maxResults);
+    // Single-shot: nothing was graded, so `sufficient: true` is a
+    // default — `graded: false` tells consumers not to trust it as a
+    // verdict (memory-retrieval-02).
+    return finalize(deps, passLists, 1, gate.hard, true, false, false, queries, options.maxResults);
   }
 
   let passes = 1;
@@ -463,7 +473,17 @@ export async function runIterativeRetrieval<H>(
       ...(queries.length > 1 ? { triedQueries: queries.slice(1) } : {}),
     });
     if (grade.sufficient) {
-      return finalize(deps, passLists, passes, true, true, false, queries, options.maxResults);
+      return finalize(
+        deps,
+        passLists,
+        passes,
+        true,
+        true,
+        false,
+        true,
+        queries,
+        options.maxResults,
+      );
     }
     if (passes >= cap) break;
     const next = normalizeReformulation(grade.reformulation, tried);
@@ -474,7 +494,7 @@ export async function runIterativeRetrieval<H>(
     accumulate(await deps.retrieve(next, true, signal));
   }
   // Cap reached or no further reformulation while still insufficient ⇒ abstain.
-  return finalize(deps, passLists, passes, true, false, true, queries, options.maxResults);
+  return finalize(deps, passLists, passes, true, false, true, true, queries, options.maxResults);
 }
 
 /**
@@ -511,6 +531,7 @@ function finalize<H>(
   gateHard: boolean,
   sufficient: boolean,
   abstained: boolean,
+  graded: boolean,
   queries: ReadonlyArray<string>,
   maxResults: number | undefined,
 ): IterativeRetrievalResult<H> {
@@ -522,7 +543,15 @@ function finalize<H>(
       : interleave(passLists, Number.POSITIVE_INFINITY, deps.idOf);
   const capped =
     maxResults !== undefined && maxResults >= 0 ? ranked.slice(0, maxResults) : ranked.slice();
-  return { hits: capped, iterations, gateHard, sufficient, abstained, queries: [...queries] };
+  return {
+    hits: capped,
+    iterations,
+    gateHard,
+    sufficient,
+    abstained,
+    graded,
+    queries: [...queries],
+  };
 }
 
 function dedupBy<H>(hits: ReadonlyArray<H>, idOf: (hit: H) => string): H[] {

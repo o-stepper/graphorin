@@ -27,7 +27,7 @@ Before promoting a Graphorin deployment to production:
 
 1. **Storage**
    - Pick a backend (local SQLite, encrypted SQLite, or a custom adapter).
-   - Schedule a snapshot / replication job. The default SQLite write-ahead log makes online backups via `BACKUP TO …` straightforward.
+   - Schedule a snapshot / replication job around `graphorin storage backup <dest>` - an online, consistent page-level copy that is safe under a live writer and preserves rowids. **Never use `VACUUM` or `VACUUM INTO` for backups**: rowid renumbering corrupts the FTS5 external-content mappings on restore.
    - Run `graphorin storage cleanup-backups` periodically to prune stale encryption backups on long-lived deployments.
 
 2. **Encryption-at-rest**

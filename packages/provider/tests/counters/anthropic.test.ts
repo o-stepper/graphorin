@@ -152,3 +152,104 @@ describe('AnthropicAPICounter', () => {
     expect(named.id).toBe('custom');
   });
 });
+
+/**
+ * core-provider-04: the counter must POST Anthropic wire-shaped bodies.
+ * Pre-fix it posted raw Graphorin messages; any transcript with a
+ * system / tool message or assistant `toolCalls` 400'd and silently
+ * fell back to cl100k tiktoken (~15-20% undercount) after a wasted
+ * HTTP round trip.
+ */
+describe('AnthropicAPICounter wire shape', () => {
+  const AGENT_TRANSCRIPT: ReadonlyArray<Message> = [
+    { role: 'system', content: 'be terse' },
+    { role: 'user', content: 'weather?' },
+    {
+      role: 'assistant',
+      content: 'checking',
+      toolCalls: [{ toolCallId: 'call-1', toolName: 'weather', args: { city: 'kyiv' } }],
+    },
+    { role: 'tool', toolCallId: 'call-1', content: 'sunny' },
+    { role: 'user', content: 'thanks' },
+  ];
+
+  async function captureBody(messages: ReadonlyArray<Message>): Promise<Record<string, unknown>> {
+    let body: Record<string, unknown> | undefined;
+    const fetchImpl = (async (_url: string, init?: RequestInit) => {
+      body = JSON.parse(String(init?.body)) as Record<string, unknown>;
+      return makeJsonResponse({ input_tokens: 7 });
+    }) as unknown as typeof fetch;
+    const counter = new AnthropicAPICounter({
+      modelId: 'claude-haiku-4-5',
+      apiKey: 'sk-ant-x',
+      fetchImpl,
+    });
+    const total = await counter.count(messages);
+    expect(total).toBe(7);
+    if (body === undefined) throw new Error('fetch never called');
+    return body;
+  }
+
+  it('hoists system messages, maps toolCalls to tool_use and tool results to user-turn tool_result', async () => {
+    const body = await captureBody(AGENT_TRANSCRIPT);
+    expect(body.system).toBe('be terse');
+    const messages = body.messages as ReadonlyArray<{
+      role: string;
+      content: ReadonlyArray<Record<string, unknown>>;
+    }>;
+    // Only user/assistant roles ever reach the wire.
+    expect(messages.every((m) => m.role === 'user' || m.role === 'assistant')).toBe(true);
+    expect(messages.map((m) => m.role)).toEqual(['user', 'assistant', 'user']);
+    const assistant = messages[1];
+    expect(assistant?.content.some((b) => b.type === 'text')).toBe(true);
+    const toolUse = assistant?.content.find((b) => b.type === 'tool_use');
+    expect(toolUse?.id).toBe('call-1');
+    expect(toolUse?.name).toBe('weather');
+    expect(toolUse?.input).toEqual({ city: 'kyiv' });
+    // The tool result merged into the FOLLOWING user turn together with
+    // the next user text (consecutive same-role turns are merged).
+    const lastUser = messages[2];
+    const toolResult = lastUser?.content.find((b) => b.type === 'tool_result');
+    expect(toolResult?.tool_use_id).toBe('call-1');
+    expect(lastUser?.content.some((b) => b.type === 'text')).toBe(true);
+  });
+
+  it('forces the transcript to start with a user turn', async () => {
+    const body = await captureBody([{ role: 'assistant', content: 'hello there' }]);
+    const messages = body.messages as ReadonlyArray<{ role: string }>;
+    expect(messages[0]?.role).toBe('user');
+    expect(messages[1]?.role).toBe('assistant');
+  });
+
+  it('warns once (not per call) when the native path degrades', async () => {
+    const warnings: string[] = [];
+    const fetchImpl = (async () =>
+      makeJsonResponse({}, { status: 400 })) as unknown as typeof fetch;
+    const counter = new AnthropicAPICounter({
+      modelId: 'claude-haiku-4-5',
+      apiKey: 'sk-ant-x',
+      fetchImpl,
+      logger: (message) => warnings.push(message),
+    });
+    await counter.count(MESSAGES);
+    await counter.count(MESSAGES);
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('falling back');
+  });
+
+  it('skips the HTTP call entirely when nothing countable remains', async () => {
+    let fetched = false;
+    const fetchImpl = (async () => {
+      fetched = true;
+      return makeJsonResponse({ input_tokens: 1 });
+    }) as unknown as typeof fetch;
+    const counter = new AnthropicAPICounter({
+      modelId: 'claude-haiku-4-5',
+      apiKey: 'sk-ant-x',
+      fetchImpl,
+    });
+    const total = await counter.count([]);
+    expect(fetched).toBe(false);
+    expect(typeof total).toBe('number');
+  });
+});

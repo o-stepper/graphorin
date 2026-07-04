@@ -332,8 +332,10 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
   // keyed by handle URI. Handle reads (read_result) re-apply inbound
   // sanitization + dataflow provenance by the PRODUCER's class so an
   // untrusted body cannot launder to trusted through the built-in
-  // reader. In-memory per executor — handles from a resumed prior
-  // process fall back to the reader-reported class (or none).
+  // reader. In-memory per executor — handles from another executor or
+  // a resumed prior process fall back to the reader-reported class,
+  // which the default file reader recovers from the artifact's taint
+  // sidecar (tools-03), so the taint survives both boundaries.
   const handleProducerTaint = new Map<
     string,
     {
@@ -982,6 +984,52 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     // context. An explicitly pinned `'tail'` / `'summarize'` / `'spill-to-file'`
     // is honoured. Under the cap `truncateBody` is a no-op regardless, so small
     // objects and all string outputs pass through unchanged.
+    // TL-6 / tools-03: resolve the PRODUCER's taint before truncation —
+    // a handle read returns content produced by an earlier tool, and a
+    // re-spill of that content must persist the producer's class (not
+    // read_result's own) into the new artifact's sidecar. Resolution
+    // order: this executor's in-memory map, then the class the reader
+    // reported (the file reader recovers it from the sidecar, covering
+    // the second-executor / resumed-process cases).
+    const readHandle =
+      typeof (call.args as { readonly handle?: unknown } | null | undefined)?.handle === 'string'
+        ? (call.args as { readonly handle: string }).handle
+        : undefined;
+    const mappedTaint = readHandle !== undefined ? handleProducerTaint.get(readHandle) : undefined;
+    const readerReported = envelope.output as
+      | {
+          readonly producerTrustClass?: unknown;
+          readonly producerSource?: unknown;
+          readonly producerSensitivity?: unknown;
+        }
+      | null
+      | undefined;
+    const readerReportedClass =
+      typeof readerReported?.producerTrustClass === 'string'
+        ? (readerReported.producerTrustClass as ToolTrustClass)
+        : undefined;
+    const readerReportedSource =
+      typeof readerReported?.producerSource === 'object' &&
+      readerReported.producerSource !== null &&
+      typeof (readerReported.producerSource as { readonly kind?: unknown }).kind === 'string'
+        ? (readerReported.producerSource as ToolSource)
+        : undefined;
+    const producerTaint =
+      mappedTaint !== undefined && isUntrustedProducerClass(mappedTaint.trustClass)
+        ? mappedTaint
+        : readerReportedClass !== undefined && isUntrustedProducerClass(readerReportedClass)
+          ? {
+              trustClass: readerReportedClass,
+              source: readerReportedSource ?? tool.__source,
+              ...(typeof readerReported?.producerSensitivity === 'string'
+                ? { sensitivity: readerReported.producerSensitivity as Sensitivity }
+                : {}),
+            }
+          : undefined;
+    const effectiveTrustClass = producerTaint?.trustClass ?? tool.__trustClass;
+    const effectiveSource = producerTaint?.source ?? tool.__source;
+    const effectiveSensitivity = producerTaint?.sensitivity ?? tool.sensitivity;
+
     const baseStrategy = tool.truncationStrategy ?? 'middle';
     const isStructuredOutput = envelope.output !== undefined && typeof envelope.output !== 'string';
     const effectiveStrategy =
@@ -1001,7 +1049,14 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         spill: spillWriter,
         runId: runContext.runId,
         toolCallId: call.toolCallId,
-        ...(tool.sensitivity !== undefined ? { toolSensitivityTier: tool.sensitivity } : {}),
+        // Effective (producer-aware) sensitivity: a secret-produced body
+        // stays secret through a handle-read re-spill, so the WI-10
+        // secret gate keeps it off disk (tools-03).
+        ...(effectiveSensitivity !== undefined
+          ? { toolSensitivityTier: effectiveSensitivity }
+          : {}),
+        producerTrustClass: effectiveTrustClass,
+        producerSource: effectiveSource,
         signal: runContext.signal,
       },
     });
@@ -1070,30 +1125,10 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     }
 
     // TL-6: a handle read returns content PRODUCED by an earlier tool —
-    // sanitize and record provenance by the PRODUCER's trust class, not
-    // the reader's own (read_result is a trusted built-in; without this
-    // an untrusted spill laundered to trusted on the way back in).
-    const readHandle =
-      typeof (call.args as { readonly handle?: unknown } | null | undefined)?.handle === 'string'
-        ? (call.args as { readonly handle: string }).handle
-        : undefined;
-    const mappedTaint = readHandle !== undefined ? handleProducerTaint.get(readHandle) : undefined;
-    const readerReportedClass =
-      typeof (envelope.output as { readonly producerTrustClass?: unknown } | null | undefined)
-        ?.producerTrustClass === 'string'
-        ? ((envelope.output as { readonly producerTrustClass: string })
-            .producerTrustClass as ToolTrustClass)
-        : undefined;
-    const producerTaint =
-      mappedTaint !== undefined && isUntrustedProducerClass(mappedTaint.trustClass)
-        ? mappedTaint
-        : readerReportedClass !== undefined && isUntrustedProducerClass(readerReportedClass)
-          ? { trustClass: readerReportedClass, source: tool.__source }
-          : undefined;
-    const effectiveTrustClass = producerTaint?.trustClass ?? tool.__trustClass;
-    const effectiveSource = producerTaint?.source ?? tool.__source;
-    const effectiveSensitivity = producerTaint?.sensitivity ?? tool.sensitivity;
-
+    // sanitize and record provenance by the PRODUCER's trust class
+    // (resolved above, before truncation), not the reader's own
+    // (read_result is a trusted built-in; without this an untrusted
+    // spill laundered to trusted on the way back in).
     // TL-6: object outputs bypass `wrapOutput` untouched (WI-10), so for
     // a tainted handle read the `content` string field is defanged
     // in place — that is the channel the model actually reads.

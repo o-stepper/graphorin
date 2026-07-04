@@ -53,7 +53,7 @@ graphorin-tags:
   - planning
 metadata:
   graphorin:
-    sandboxTier: isolated-vm
+    sandbox: isolated-vm
     sensitivity: internal
 ---
 
@@ -102,14 +102,13 @@ The validator walks this ladder for every recognised field. Direct collisions tr
 
 ## Slash-command activation
 
-`/skill:trip-planner` parses into:
+`/skill:trip-planner plan a weekend in Rome` parses into:
 
 ```ts
 {
-  kind: 'skill-activation',
-  source: 'slash-command',
   name: 'trip-planner',
-  args: { /* … */ },
+  args: 'plan a weekend in Rome', // the raw argument string after the name
+  raw: '/skill:trip-planner plan a weekend in Rome',
 }
 ```
 

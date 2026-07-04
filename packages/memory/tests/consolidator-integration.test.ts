@@ -180,6 +180,79 @@ describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integrat
     }
   });
 
+  it('replay of a partially-committed slice does not duplicate facts without an embedder (memory-consolidation-07)', async () => {
+    const sqlite = await makeStore();
+    try {
+      // Call plan (standard tier = extraction + episode per run):
+      //   run 1: extraction OK → fact COMMITS; episode call THROWS →
+      //          the slice fails, DLQ row, cursor NOT advanced.
+      //   run 2: extraction OK (same facts); episode OK.
+      // Pre-fix, run 2 re-wrote the already-committed fact verbatim:
+      // with no embedder `neighbors` is empty, so nothing deduped.
+      let call = 0;
+      const provider: Provider = {
+        name: 'two-phase',
+        modelId: 'two-phase:test',
+        capabilities: {
+          streaming: false,
+          toolCalling: false,
+          parallelToolCalls: false,
+          multimodal: false,
+          structuredOutput: true,
+          reasoning: false,
+          contextWindow: 32_000,
+          maxOutput: 4_000,
+        },
+        async generate(req: ProviderRequest) {
+          call += 1;
+          const isEpisode = req.systemMessage?.includes('episode-summarization') === true;
+          if (isEpisode && call <= 2) throw new Error('episode model down');
+          if (isEpisode) {
+            return {
+              text: '{"summary":"chat about moving to Lisbon","importance":5}',
+              usage: { promptTokens: 20, completionTokens: 10, totalTokens: 30 },
+              finishReason: 'stop' as const,
+            };
+          }
+          return {
+            text: '{"facts":[{"text":"User lives in Lisbon"}]}',
+            usage: { promptTokens: 40, completionTokens: 10, totalTokens: 50 },
+            finishReason: 'stop' as const,
+          };
+        },
+        stream: () => {
+          throw new Error('not implemented');
+        },
+      };
+      const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+      const memory = createMemory({
+        store: sqlite.memory,
+        embeddings: sqlite.embeddings,
+        consolidator: { tier: 'standard', provider, defaultScope: scope },
+      });
+      await memory.session.push(scope, {
+        role: 'user',
+        content: 'I just moved from Madrid to Lisbon.',
+      });
+      await memory.consolidator.start();
+
+      const first = await memory.consolidator.fireNow('standard', scope);
+      expect(first?.status).toBe('failed');
+
+      const second = await memory.consolidator.fireNow('standard', scope);
+      expect(second?.status).toBe('completed');
+
+      // Exactly ONE copy of the fact survives the replay.
+      const copies = await memory.semantic.search(scope, 'Lisbon', {
+        includeQuarantined: true,
+        topK: 20,
+      });
+      expect(copies.filter((h) => h.record.text === 'User lives in Lisbon')).toHaveLength(1);
+    } finally {
+      await sqlite.close();
+    }
+  });
+
   it('survives process-restart: cursor persists across createConsolidator instances', async () => {
     const sqlite = await makeStore();
     try {

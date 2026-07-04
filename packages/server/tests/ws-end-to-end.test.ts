@@ -108,7 +108,7 @@ beforeAll(async () => {
     tokenStore: store.authTokens,
     pepper,
     env: 'live',
-    scopes: ['agents:invoke:*'],
+    scopes: ['sessions:read:*'],
   });
   rawToken = await minted.raw.use((value) => value);
 });

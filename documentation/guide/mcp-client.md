@@ -61,7 +61,8 @@ const mcpTools = await stdioClient.toTools({
   defer_loading: false,
   // Per-tool side-effect classification override (DEC-153).
   sideEffectClassByTool: {
-    'fs/write': 'side-effecting',
+    // Namespaced with '.', matching the adapted tool names.
+    'fs.write': 'side-effecting',
   },
 });
 
@@ -83,7 +84,7 @@ The adapter:
 - maps the MCP tool's input/output schemas into the `Tool` contract;
 - defaults each generated tool to `sideEffectClass: 'external-stateful'` (operators downgrade per-tool through `sideEffectClassByTool`);
 - routes execution back through the client's `callTool(name, input)`;
-- emits one `mcp.call.invoked.total` counter per call and a `mcp.tool.invoke` span via `@graphorin/observability`.
+- emits `mcp.call.invoked.total` / `mcp.call.failed.total` / `mcp.call.cancelled.total` counters per call (there is no MCP-specific span today; adapted tools still get the executor's regular `tool.execute` span).
 
 ## Large resources: `resource_link` → result handles
 
@@ -202,13 +203,13 @@ Discovery is a trust boundary (SPL-7): metadata names the endpoints that will re
 
 ## Error mapping
 
-| MCP error code | Graphorin `ToolError.kind` |
+The client throws typed `@graphorin/mcp` errors; the tool **executor** then maps whatever an adapted tool throws onto `ToolError.kind`:
+
+| Client-side error | Executor `ToolError.kind` |
 |---|---|
-| `MethodNotFound` | `'not-found'` |
-| `InvalidParams` | `'invalid-input'` |
-| `InternalError` | `'internal-error'` |
-| `RequestCanceled` | `'aborted'` |
-| `Timeout` | `'timed-out'` |
+| `MCPProtocolError` (transport / RPC failures) | `'execution_failed'` |
+| `MCPCallTimeoutError` (`timeoutMs` expiry, `kind: 'call-timeout'`) | `'execution_failed'` |
+| Abort via the run signal | `'aborted'` |
 | `CallToolResult.isError: true` | tool **failure** — `MCPToolExecutionError` (`kind: 'tool-execution'`) with the server's content text in the message, so the executor records a real failure (audit, retry and error policies engage) while the model keeps the self-correction signal |
 
 Two call-level knobs complete the picture: `callTool(name, args, { signal, timeoutMs })` honours the abort signal (an aborted agent run sends `notifications/cancelled` to the server — adapted tools forward their `ToolExecutionContext.signal` automatically) and maps `timeoutMs` onto the SDK request timeout, surfacing expiry as `MCPCallTimeoutError` (`kind: 'call-timeout'`). `toTools({ callTimeoutMs })` applies the same timeout to every adapted tool's calls.
@@ -224,7 +225,7 @@ Tool definitions are a poisoning surface: a server can change a tool's descripti
 
 ## Audit + observability
 
-Every `client.callTool(...)` lands one row in the audit log with the server URL, the tool name, the call id, the duration, and the redacted (sensitivity-aware) result. The `mcp.tool.invoke` span carries the same metadata for live tracing.
+The client itself emits **counters**, not audit rows or spans: `mcp.call.invoked|failed|cancelled.total`, `mcp.structured-content.*`, `mcp.resource-link.*`, `mcp.tools.changed|list-changed|pin-mismatch.total`, `mcp.elicitation.*`, `mcp.sampling.*`, and `mcp.transport.closed|error.total`. Tool calls that run through the agent's executor additionally land the executor's generic `tool:execute:*` audit rows (which do not carry the server URL). Server-initiated **sampling and tasks with tool-use, and icons, are known-unsupported** (a sampling request carrying `tools` is rejected with an `McpError`, per the 2025-11-25 MUST).
 
 ## Next steps
 

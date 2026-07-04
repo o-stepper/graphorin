@@ -56,6 +56,13 @@ import {
 } from './types.js';
 
 /**
+ * Age after which an unresolved CONFLICT-CHECK row is expired as
+ * `'admit'` at tiers with no deep phase (memory-consolidation-04) —
+ * the judge that would resolve it never runs there.
+ */
+const PENDING_CONFLICT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
  * Consolidator runtime surface returned by {@link createConsolidator}.
  * Compatible with the placeholder shape so the facade can swap the
  * implementation without breaking consumers.
@@ -124,6 +131,14 @@ class ConsolidatorImpl implements Consolidator {
   /** Per-phase provider overrides (MCON-7); fall back to `#provider`. */
   readonly #cheapProvider: Provider | null;
   readonly #deepProvider: Provider | null;
+  /**
+   * USD pricer for phase LLM usage (memory-consolidation-02). Without
+   * it every phase's `priceUsage?.(...) ?? 0` evaluates to zero and the
+   * `maxCostPerDay` ceiling can never trip.
+   */
+  readonly #priceUsage:
+    | ((usage: { promptTokens: number; completionTokens: number }) => number)
+    | null;
   readonly #defaultScope: SessionScope | null;
   readonly #listeners = new Set<PhaseListener>();
   readonly #lockManager: LockManager;
@@ -165,6 +180,7 @@ class ConsolidatorImpl implements Consolidator {
     this.#provider = opts.provider ?? null;
     this.#cheapProvider = opts.cheapProvider ?? null;
     this.#deepProvider = opts.deepProvider ?? null;
+    this.#priceUsage = opts.priceUsage ?? null;
     this.#defaultScope = opts.defaultScope ?? null;
 
     this.#config = resolveConfig(opts);
@@ -338,6 +354,15 @@ class ConsolidatorImpl implements Consolidator {
   ): Promise<PhaseOutcome | null> {
     if (!this.#running) return null;
     if (this.#manuallyPaused) return null;
+    // memory-consolidation-03: `drainDlq` finally has a production
+    // caller — failed batches whose backoff has elapsed replay here
+    // instead of accumulating forever. Cheap when the queue is empty
+    // (one SELECT); replays are backoff-gated by the store.
+    await this.drainDlq(scope).catch(() => 0);
+    // memory-consolidation-04: tiers without a deep phase never drain
+    // the pending CONFLICT-CHECK queue — expire stale rows as 'admit'
+    // so it cannot grow monotonically at the free/cheap defaults.
+    await this.#expireStalePendingConflicts(scope).catch(() => {});
     const phases = this.#planPhases(reason);
     if (phases.length === 0) return null;
     // MCON-8: enforce the cooldown the runtime always PERSISTED but never
@@ -381,6 +406,25 @@ class ConsolidatorImpl implements Consolidator {
       );
     }
     return this.#runPhase(phase, target, { kind: 'manual', value: phase });
+  }
+
+  /**
+   * memory-consolidation-04: at tiers with no deep phase the pending
+   * CONFLICT-CHECK queue has no drain. Resolve rows older than 7 days
+   * as `'admit'` (the safe direction — the candidate fact stays live;
+   * only the never-coming judge call is skipped), bounded per sweep.
+   */
+  async #expireStalePendingConflicts(scope: SessionScope): Promise<void> {
+    if (this.#config.phases.includes('deep')) return;
+    const conflicts = this.#store.conflicts;
+    if (conflicts === undefined) return;
+    const cutoff = this.#now() - PENDING_CONFLICT_TTL_MS;
+    const pending = await conflicts.listPending(scope, 200);
+    for (const row of pending) {
+      if (row.enqueuedAt <= cutoff) {
+        await conflicts.markResolved(row.id, 'admit');
+      }
+    }
   }
 
   async drainDlq(scope: SessionScope): Promise<number> {
@@ -680,6 +724,7 @@ class ConsolidatorImpl implements Consolidator {
         tier: this.#config.tier === 'free' ? 'cheap' : this.#config.tier,
         now: this.#now,
         batch: rawBatch,
+        ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
       });
       const cursor = tipMessageId(rawBatch);
       if (cursor !== null && this.#consolidatorStore !== null) {
@@ -707,6 +752,7 @@ class ConsolidatorImpl implements Consolidator {
           ? 'standard'
           : this.#config.tier,
       now: this.#now,
+      ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
     });
     // Reflection pass (P1-1) runs after the conflict drain, reusing the
     // deep run's lock + budget + audit window. Triple-gated: enabled by
@@ -735,6 +781,7 @@ class ConsolidatorImpl implements Consolidator {
         reflectionWatermark: priorWatermark,
         maxQuestions: this.#config.reflectionMaxQuestions,
         now: this.#now,
+        ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
       });
       if (this.#consolidatorStore !== null && reflection.nextWatermark !== priorWatermark) {
         await this.#consolidatorStore.upsertState(scope, {

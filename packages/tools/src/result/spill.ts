@@ -29,6 +29,19 @@ export interface DefaultSpillWriterOptions {
 /** Default TTL for the startup sweep of orphaned spill runs (7 days). */
 export const DEFAULT_SPILL_SWEEP_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** Suffix of the taint sidecar written next to each spill artifact (tools-03). */
+export const SPILL_SIDECAR_SUFFIX = '.meta.json';
+
+/**
+ * Path of the taint sidecar for a spill artifact (tools-03). Shared by
+ * the default writer and {@link createFileResultReader}.
+ *
+ * @internal
+ */
+export function sidecarPathFor(artifactPath: string): string {
+  return `${artifactPath}${SPILL_SIDECAR_SUFFIX}`;
+}
+
 /**
  * Build the default spill writer — writes the un-truncated body to
  * `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
@@ -84,6 +97,21 @@ export function createDefaultSpillWriter(options: DefaultSpillWriterOptions = {}
       await fs.mkdir(dir, { recursive: true });
       const file = path.join(dir, `${opts.toolCallId}.${opts.extension}`);
       await fs.writeFile(file, opts.body, { mode: 0o600 });
+      // tools-03: persist the producer's taint next to the artifact so a
+      // reader in another executor / a resumed process re-applies it —
+      // the executor's in-memory taint map does not survive either
+      // boundary, and without the sidecar an untrusted spill read back
+      // through the trusted `read_result` built-in laundered to trusted.
+      if (opts.producerTrustClass !== undefined || opts.sensitivityTier !== undefined) {
+        const meta = {
+          ...(opts.producerTrustClass !== undefined
+            ? { producerTrustClass: opts.producerTrustClass }
+            : {}),
+          ...(opts.producerSource !== undefined ? { source: opts.producerSource } : {}),
+          ...(opts.sensitivityTier !== undefined ? { sensitivity: opts.sensitivityTier } : {}),
+        };
+        await fs.writeFile(sidecarPathFor(file), JSON.stringify(meta), { mode: 0o600 });
+      }
       return { path: file, bytes: Buffer.byteLength(opts.body, 'utf8') };
     },
     async clear(runId) {
