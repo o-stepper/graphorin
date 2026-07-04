@@ -25,9 +25,13 @@ metadata.
   …). Deviations must be documented at the call site.
 - **Vector search** — `sqlite-vec` (`vec0`) virtual tables, one per embedder
   id, so switching embedders never mixes incompatible vectors.
-- **Keyword search** — FTS5 with the porter tokenizer and `bm25()` ranking,
-  fused with vector results via Reciprocal Rank Fusion by default, or calibrated
-  weighted fusion (see [Rerankers & fusion](/guide/rerankers)).
+- **Keyword search** — FTS5 with the `unicode61` tokenizer
+  (`remove_diacritics 2`, tokenchars `-_.@/`) and `bm25()` ranking, fused with
+  vector results via Reciprocal Rank Fusion by default, or calibrated weighted
+  fusion (see [Rerankers & fusion](/guide/rerankers)). `unicode61` is
+  multilingual-first: no English stemming (searches match word forms
+  literally), but identifiers, emails, and paths tokenize as single terms and
+  non-Latin scripts work out of the box.
 - **Migrations** — applied inside transactions at startup. Test schema changes
   in staging first; a failed migration rolls back rather than half-applying.
 

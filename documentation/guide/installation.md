@@ -8,7 +8,7 @@ description: Install the @graphorin/* packages from the npm registry. Node.js 22
 Graphorin is published as a set of focused packages on the npm registry under the `@graphorin/*` scope. Packages are released **lockstep** at the same version while the framework is on the `0.x` line.
 
 ::: tip Status
-The published `@graphorin/*` packages land on the npm registry as each implementation phase completes. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for availability.
+The `@graphorin/*` packages are published on the npm registry since `v0.5.0`. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for new versions.
 :::
 
 ## Prerequisites
