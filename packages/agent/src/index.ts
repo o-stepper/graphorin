@@ -151,6 +151,7 @@ export type {
   AbortOptions,
   Agent,
   AgentCallOptions,
+  AgentCapability,
   AgentConfig,
   AgentInput,
   AgentToToolOptions,

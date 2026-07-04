@@ -34,6 +34,7 @@ async function runOne(args: {
   readonly toolArgs?: unknown;
   readonly executorOptions?: Partial<Parameters<typeof createToolExecutor>[0]>;
   readonly signal?: AbortSignal;
+  readonly capability?: 'read-only';
 }): Promise<ToolError> {
   const executor = createToolExecutor({
     registry: args.registry,
@@ -43,6 +44,7 @@ async function runOne(args: {
     calls: [{ toolCallId: 'call-1', toolName: args.toolName, args: args.toolArgs ?? {} }],
     runContext: makeRunContext(args.signal !== undefined ? { signal: args.signal } : {}),
     stepNumber: 1,
+    ...(args.capability !== undefined ? { capability: args.capability } : {}),
   });
   // SEP-1303: the batch NEVER shrinks and never throws — the failure is a
   // returned outcome.
@@ -59,6 +61,22 @@ describe('SEP-1303 — every producible ToolErrorKind returns as a model-visible
     const registry = createToolRegistry();
     const error = await runOne({ registry, toolName: 'nope' });
     expect(error.kind).toBe('unknown_tool' satisfies ToolErrorKind);
+  });
+
+  it("capability_blocked: a writer call under read-only capability returns 'capability_blocked'", async () => {
+    const registry = createToolRegistry();
+    registry.register(
+      tool({
+        name: 'writer',
+        description: 'side-effecting tool',
+        inputSchema: z.object({}),
+        sideEffectClass: 'side-effecting',
+        execute: async () => 'wrote',
+      }),
+    );
+    const error = await runOne({ registry, toolName: 'writer', capability: 'read-only' });
+    expect(error.kind).toBe('capability_blocked' satisfies ToolErrorKind);
+    expect(error.recoveryHint).toBe('report_to_user');
   });
 
   it("invalid_input: schema rejection returns 'invalid_input'", async () => {

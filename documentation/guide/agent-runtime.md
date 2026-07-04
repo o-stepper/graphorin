@@ -253,6 +253,27 @@ for await (const event of agent.stream('Summarise the status of my last order', 
 
 Isolation at this boundary is **structural least authority**: without an `inputFilter` the sub-agent sees only the input string — no parent conversation crosses the boundary — and there is no secret-inheritance mechanism here at all (the sub-agent runs with its own configuration). With `inputFilter` supplied, the sub-agent is seeded with `[...inputFilter(parentMessages), { role: 'user', content: input }]`, mirroring the handoff filter discipline.
 
+### Read-only capability (single-writer constraint)
+
+`createAgent({ capability: 'read-only' })` — or per invocation, `agent.run(input, { capability: 'read-only' })` — makes a run side-effect-free **by construction** (D2): writer tools (`side-effecting` / `external-stateful`) and handoff tools are never advertised to the model, and the tool executor deterministically blocks any writer call the model fabricates anyway with a `capability_blocked` outcome (`recoveryHint: 'report_to_user'`). This is the single-writer constraint from multi-agent practice: run N parallel research workers read-only while exactly one agent in the topology holds the write pen. In code-mode a read-only run advertises `code_search` only — `code_execute` is itself side-effecting. The capability is per-invocation state, not persisted in `RunState`: re-supply it when resuming.
+
+### Context folding and taint propagation across the sub-agent boundary
+
+Two `toTool` options complete the orchestrator-worker recipe (D2):
+
+- `contextFold: true | { maxChars }` — instead of the child's raw output, the parent's tool result is a compact distilled outcome: status, step / tool-call counts, the tools used, and the final text clamped to `maxChars` (default 2000). Tool-heavy child runs stop flooding the parent window.
+- `propagateTaint` (default `true`) — when the child run saw untrusted or sensitive content, the tool result carries a widen-only taint override (`sourceKind: 'sub-agent'`) that re-arms the **parent's** data-flow ledger, so provenance survives the fold. A no-op when the parent has no `dataFlowPolicy`.
+
+```ts
+const worker = createAgent({ name: 'researcher', provider, tools: readOnlyTools });
+const orchestrator = createAgent({
+  name: 'lead',
+  provider,
+  dataFlowPolicy: { mode: 'enforce' },
+  tools: [worker.toTool({ capability: 'read-only', contextFold: true })],
+});
+```
+
 ## Filter library
 
 Handoffs use a built-in filter library to shape the payload that crosses the boundary. Every filter returns a serializable `HandoffInputFilterDescriptor` so a JSONL session export can replay the same boundary byte-equal.

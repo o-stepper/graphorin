@@ -321,6 +321,14 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly tracer?: Tracer;
   readonly checkpointStore?: CheckpointStore;
   readonly sensitivity?: Sensitivity;
+  /**
+   * Agent-default capability restriction (D2). `'read-only'` builds a
+   * side-effect-free agent: writer tools and handoffs are never
+   * advertised and the executor blocks writer calls deterministically
+   * (`capability_blocked`). Per-call override:
+   * {@link AgentCallOptions.capability}. See {@link AgentCapability}.
+   */
+  readonly capability?: AgentCapability;
   readonly sessionId?: string;
   readonly userId?: string;
   readonly deps?: TDeps;
@@ -401,7 +409,28 @@ export interface AgentCallOptions<TDeps> {
    * `agent.run(...)` call suspended.
    */
   readonly directive?: ResumeDirective;
+  /**
+   * Per-run capability restriction (D2) — overrides
+   * {@link AgentConfig.capability} for this invocation. See that field
+   * for semantics. Not persisted in `RunState`: re-supply it when
+   * resuming a suspended run.
+   */
+  readonly capability?: AgentCapability;
 }
+
+/**
+ * Run-level capability restriction (D2 — the single-writer constraint
+ * from multi-agent practice). `'read-only'` makes the run
+ * side-effect-free by construction: writer tools (`side-effecting` /
+ * `external-stateful`) and handoffs are never advertised to the model,
+ * and the tool executor deterministically blocks any writer call the
+ * model fabricates anyway (`capability_blocked`). Use it to run
+ * parallel research / explorer sub-agents while exactly one agent in
+ * the topology keeps write capability.
+ *
+ * @stable
+ */
+export type AgentCapability = 'read-only';
 
 /**
  * `agent.toTool({...})` options.
@@ -422,6 +451,30 @@ export interface AgentToToolOptions {
    * boundary at all).
    */
   readonly inputFilter?: HandoffFilter;
+  /**
+   * Run the sub-agent under a restricted capability (D2): a
+   * `'read-only'` worker cannot execute or advertise writer tools. The
+   * orchestrator-worker recipe is `parent (full capability) + workers
+   * via toTool({ capability: 'read-only', contextFold: true })`.
+   */
+  readonly capability?: AgentCapability;
+  /**
+   * Context folding at the sub-agent boundary (D2): instead of the raw
+   * final output, the parent receives a compact distilled outcome —
+   * status, step/tool-call counts, tools used, and the final text
+   * clamped to `maxChars` (default 2000). Keeps tool-heavy child runs
+   * from flooding the parent window. Default off (raw output).
+   */
+  readonly contextFold?: boolean | { readonly maxChars?: number };
+  /**
+   * Propagate the child run's coarse taint flags across the fold (D2,
+   * default `true`): when the child saw untrusted / sensitive content,
+   * the tool result carries a widen-only `taint` override
+   * (`sourceKind: 'sub-agent'`) that re-arms the PARENT's data-flow
+   * ledger. A no-op when the parent has no `dataFlowPolicy`. Set
+   * `false` only for children whose inputs are fully trusted.
+   */
+  readonly propagateTaint?: boolean;
 }
 
 /**

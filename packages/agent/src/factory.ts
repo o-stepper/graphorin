@@ -252,6 +252,7 @@ function registerCodeMode(
   registry: ToolRegistry,
   quietExecutor: ToolExecutor,
   reservedNames: ReadonlySet<string>,
+  getRunCapability?: () => 'read-only' | undefined,
 ): ReadonlyArray<Tool<unknown, unknown, unknown>> {
   if (registry.get(CODE_EXECUTE_NAME) !== undefined) return []; // already wired
   const codeTools = registry
@@ -282,10 +283,13 @@ function registerCodeMode(
         `${call.name} requires human approval and cannot run inside code_execute — call it directly as a standalone tool call so the run can suspend for the approval.`,
       );
     }
+    const runCapability = getRunCapability?.();
     const completed = await quietExecutor.executeOne({
       call: { toolCallId: newId('codecall'), toolName: call.name, args: call.args },
       runContext: ctx.runContext,
       stepNumber: ctx.runContext.stepNumber,
+      // D2: in-script calls inherit the active run's capability.
+      ...(runCapability !== undefined ? { capability: runCapability } : {}),
     });
     const { outcome } = completed;
     if ('kind' in outcome) throw new Error(`${call.name}: ${outcome.message}`);
@@ -937,6 +941,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   // Per-run scratch refs surfaced through the public surface for
   // event emission from `steer(...)` / `followUp(...)`.
   let activeRunState: RunState | undefined;
+  // D2: capability of the ACTIVE run — read by the code-mode bridge so
+  // in-script tool calls inherit the run's single-writer restriction.
+  let activeRunCapability: 'read-only' | undefined;
   /** AG-11: guards the one-in-flight-run-per-instance invariant. */
   let runInFlight = false;
   const externalEventQueue: AgentEvent<TOutput>[] = [];
@@ -1149,6 +1156,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       toolRegistry,
       makeToolExecutor(toolRegistry, { quiet: true }),
       reserved,
+      () => activeRunCapability,
     );
     registerReadResult(toolRegistry, resultReader);
     const readResult = toolRegistry.get(READ_RESULT_NAME);
@@ -1183,6 +1191,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     runInFlight = true;
     pendingSteer = [];
     pendingAbort = undefined;
+    // D2: per-run capability — the call-level override wins over the
+    // agent default; absent ⇒ all capabilities (legacy behaviour).
+    activeRunCapability = options.capability ?? config.capability;
     // AG-10: the causality chain is a per-run artifact — a denial
     // recorded in one run must not poison detection in the next.
     causalityMonitor?.reset();
@@ -1191,6 +1202,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     } finally {
       runInFlight = false;
       activeRunState = undefined;
+      activeRunCapability = undefined;
       // Backstop for exits that bypass `finishRun` (abandoned stream,
       // generator teardown): settle queued manual compactions so no
       // `agent.compact()` promise is left hanging (CE-3/AG-13).
@@ -1679,6 +1691,8 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         ...(dispatchOpts.disableRepair !== undefined
           ? { disableRepair: dispatchOpts.disableRepair }
           : {}),
+        // D2: the run's capability restriction rides every batch.
+        ...(activeRunCapability !== undefined ? { capability: activeRunCapability } : {}),
       });
       // Close the bridge once the batch settles so `drain()` ends; the
       // executor catches per-call errors, so the batch never rejects.
@@ -2105,9 +2119,21 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         // (`tool_search` is itself eager iff a deferred tool exists) plus
         // any deferred tools already promoted by a `tool_search` this run —
         // never the rest of the deferred pool.
+        // D2 single-writer constraint: a read-only run never ADVERTISES
+        // writer tools (side-effecting / external-stateful) nor handoffs
+        // (a transfer hands the writer pen to another agent). The
+        // executor-level capability gate backs this up for calls the
+        // model fabricates anyway.
+        const readOnlyRun = activeRunCapability === 'read-only';
+        const keepReadOnly = (t: Tool<unknown, unknown, TDeps>): boolean => {
+          const cls = (t as { __sideEffectClass?: string }).__sideEffectClass ?? t.sideEffectClass;
+          return cls === 'pure' || cls === 'read-only';
+        };
         let stepTools: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
         if (isCodeMode) {
-          stepTools = [...codeModeAdvertised, ...handoffTools];
+          stepTools = readOnlyRun
+            ? [...codeModeAdvertised.filter(keepReadOnly)]
+            : [...codeModeAdvertised, ...handoffTools];
         } else {
           const eagerTools = stepRegistry.listEager() as ReadonlyArray<
             Tool<unknown, unknown, TDeps>
@@ -2125,7 +2151,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               ? []
               : orderPromotedTools(advertisedPromotions, stepRegistry.listDeferred())
           ) as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
-          stepTools = [...eagerTools, ...handoffTools, ...promotedTools];
+          stepTools = readOnlyRun
+            ? [...eagerTools.filter(keepReadOnly), ...promotedTools.filter(keepReadOnly)]
+            : [...eagerTools, ...handoffTools, ...promotedTools];
         }
 
         // AG-15: consult the hints of the tools the model CALLED on the
@@ -2990,10 +3018,53 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     abortController?.abort();
   };
 
+  // D2: distil a completed child run into a compact, bounded outcome the
+  // parent folds into its context instead of the raw transcript/output.
+  const foldRunOutcome = (result: AgentResult<TOutput>, maxChars: number): string => {
+    const steps = result.state.steps;
+    const toolNames = [
+      ...new Set(steps.flatMap((step) => step.toolCalls.map((c) => c.call.toolName))),
+    ];
+    const header =
+      `[sub-agent '${config.name}' outcome] status=${result.status}; ` +
+      `steps=${steps.length}; toolCalls=${steps.reduce((n, st) => n + st.toolCalls.length, 0)}` +
+      (toolNames.length > 0 ? `; tools=${toolNames.join(', ')}` : '');
+    const text = typeof result.output === 'string' ? result.output : JSON.stringify(result.output);
+    const body =
+      text.length > maxChars
+        ? `${text.slice(0, maxChars)}\n[... ${text.length - maxChars} chars truncated by contextFold]`
+        : text;
+    return `${header}\n${body}`;
+  };
+
+  // D2: carry the child's coarse taint flags across the fold so the
+  // parent's data-flow ledger re-arms (widen-only; a no-op when the
+  // parent has no dataFlowPolicy).
+  const taintFromChildState = (
+    state: RunState,
+  ): { untrusted?: boolean; sensitive?: boolean; sourceKind?: string } | undefined => {
+    const summary = state.taintSummary;
+    if (summary === undefined || (!summary.untrustedSeen && !summary.sensitiveSeen)) {
+      return undefined;
+    }
+    return {
+      ...(summary.untrustedSeen ? { untrusted: true } : {}),
+      ...(summary.sensitiveSeen ? { sensitive: true } : {}),
+      sourceKind: 'sub-agent',
+    };
+  };
+
   const toTool = (
     options: AgentToToolOptions = {},
   ): Tool<{ readonly input: string }, TOutput, TDeps> => {
     const exposeTurns = options.exposeTurns ?? 'final';
+    const foldMaxChars =
+      options.contextFold === undefined || options.contextFold === false
+        ? null
+        : typeof options.contextFold === 'object'
+          ? (options.contextFold.maxChars ?? 2000)
+          : 2000;
+    const propagateTaint = options.propagateTaint !== false;
     const toolName = options.name ?? `subagent_${config.name}`;
     const description = options.description ?? `Invoke sub-agent '${config.name}'.`;
     const schema = {
@@ -3030,6 +3101,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           ...(ctx?.runContext.sessionId !== undefined
             ? { sessionId: ctx.runContext.sessionId }
             : {}),
+          // D2: run the child under a restricted capability (read-only
+          // workers in an orchestrator-worker fan-out).
+          ...(options.capability !== undefined ? { capability: options.capability } : {}),
         };
         const seed: AgentInput =
           options.inputFilter !== undefined && ctx !== undefined
@@ -3056,7 +3130,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               }`,
             );
           }
-          return turns.join('\n\n') as unknown as TOutput;
+          const allOutput = (foldMaxChars !== null && endResult !== undefined
+            ? foldRunOutcome(endResult, foldMaxChars)
+            : turns.join('\n\n')) as unknown as TOutput;
+          const allTaint =
+            propagateTaint && endResult !== undefined
+              ? taintFromChildState(endResult.state)
+              : undefined;
+          return (allTaint !== undefined
+            ? { output: allOutput, taint: allTaint }
+            : allOutput) as unknown as TOutput;
         }
         const result = await run(seed, callOpts);
         // AG-17/AG-22 class: a non-completed sub-run is a TOOL ERROR,
@@ -3068,8 +3151,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             }`,
           );
         }
-        if (exposeTurns === 'none') return '' as unknown as TOutput;
-        return result.output;
+        const taint = propagateTaint ? taintFromChildState(result.state) : undefined;
+        const output = (exposeTurns === 'none'
+          ? ''
+          : foldMaxChars !== null
+            ? foldRunOutcome(result, foldMaxChars)
+            : result.output) as unknown as TOutput;
+        return (taint !== undefined ? { output, taint } : output) as unknown as TOutput;
       },
     };
     return tool;

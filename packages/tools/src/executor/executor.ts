@@ -301,6 +301,14 @@ export interface ExecuteBatchOptions {
    * `invalid_input` rather than execute a payload nobody saw.
    */
   readonly disableRepair?: boolean;
+  /**
+   * Run-level capability restriction (D2 — single-writer constraint).
+   * `'read-only'` deterministically blocks every `side-effecting` /
+   * `external-stateful` tool with a `capability_blocked` outcome, no
+   * matter what the model asked for — the enforcement half of the
+   * agent-side advertise filter. Absent ⇒ all capabilities (legacy).
+   */
+  readonly capability?: 'read-only';
 }
 
 /** Public executor surface. */
@@ -315,6 +323,8 @@ export interface ToolExecutor {
     readonly trustLevel?: SandboxTrustLevel;
     /** See {@link ExecuteBatchOptions.disableRepair}. */
     readonly disableRepair?: boolean;
+    /** See {@link ExecuteBatchOptions.capability}. */
+    readonly capability?: 'read-only';
   }): Promise<CompletedToolCall>;
 }
 
@@ -479,6 +489,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           stepNumber: batch.stepNumber,
           trustLevel,
           ...(batch.disableRepair !== undefined ? { disableRepair: batch.disableRepair } : {}),
+          ...(batch.capability !== undefined ? { capability: batch.capability } : {}),
         });
       } catch (cause) {
         completed = synthesizeFailure(call, cause);
@@ -502,6 +513,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
             stepNumber: batch.stepNumber,
             trustLevel,
             ...(batch.disableRepair !== undefined ? { disableRepair: batch.disableRepair } : {}),
+            ...(batch.capability !== undefined ? { capability: batch.capability } : {}),
           })
             .catch((cause: unknown) => synthesizeFailure(call, cause))
             .then((completed) => {
@@ -528,6 +540,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     readonly stepNumber: number;
     readonly trustLevel?: SandboxTrustLevel;
     readonly disableRepair?: boolean;
+    readonly capability?: 'read-only';
   }): Promise<CompletedToolCall> {
     const { call, runContext, stepNumber } = opts2;
     const trustLevel = opts2.trustLevel ?? 'user-defined';
@@ -541,6 +554,26 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         kind: 'unknown_tool',
         message: `Unknown tool: ${call.toolName}`,
       };
+      emitErrorAudit(error, runContext, stepNumber);
+      return frozenCompleted(call, error, stepNumber);
+    }
+
+    // D2 single-writer constraint: a read-only run deterministically
+    // blocks writer tools BEFORE validation/approval — the enforcement
+    // half behind the agent's advertise filter, so a model (or injected
+    // instruction) calling an unadvertised writer still cannot execute.
+    if (
+      opts2.capability === 'read-only' &&
+      (tool.__sideEffectClass === 'side-effecting' ||
+        tool.__sideEffectClass === 'external-stateful')
+    ) {
+      const error: ToolError = {
+        toolCallId: call.toolCallId,
+        toolName: call.toolName,
+        kind: 'capability_blocked',
+        message: `Tool '${call.toolName}' is ${tool.__sideEffectClass}, but this run holds read-only capability (single-writer constraint).`,
+      };
+      incrementCounter('tool.executor.capability-blocked.total', { toolName: call.toolName });
       emitErrorAudit(error, runContext, stepNumber);
       return frozenCompleted(call, error, stepNumber);
     }
@@ -1589,6 +1622,7 @@ function recoveryForKind(kind: ToolErrorKind): {
     case 'sandbox_violation':
     case 'inbound_sanitization_blocked':
     case 'dataflow_policy_blocked':
+    case 'capability_blocked':
       return { recoverable: false, recoveryHint: 'report_to_user' };
     default:
       return { recoverable: false };
