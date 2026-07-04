@@ -32,6 +32,9 @@ function buildApp(
   app.post('/run', async (c) => {
     const body = await c.req.json();
     counter += 1;
+    // Yield one macrotask so concurrent-duplicate tests overlap
+    // deterministically with the in-flight window.
+    await new Promise((resolve) => setTimeout(resolve, 5));
     return c.json({ counter, echoed: body }, 201);
   });
   return { app, store, counter: () => counter, advance: (ms: number) => (now += ms) };
@@ -54,6 +57,34 @@ describe('createIdempotencyMiddleware', () => {
     expect(second.headers.get('Idempotency-Replayed')).toBe('true');
     const json = (await second.json()) as { counter: number };
     expect(json.counter).toBe(1);
+  });
+
+  it('a CONCURRENT duplicate is rejected 409 in-flight instead of double-executing (periphery-08)', async () => {
+    const { app, counter } = buildApp();
+    const headers = {
+      'Content-Type': 'application/json',
+      'Idempotency-Key': 'concurrent-key-0001',
+    };
+    const body = JSON.stringify({ foo: 'bar' });
+    // Fire both requests without awaiting the first — pre-fix the
+    // record landed only after next(), so both missed the cache and
+    // both executed (a double agent run).
+    const [first, second] = await Promise.all([
+      app.request('/run', { method: 'POST', headers, body }),
+      app.request('/run', { method: 'POST', headers, body }),
+    ]);
+    const statuses = [first.status, second.status].sort((a, b) => a - b);
+    expect(statuses).toEqual([201, 409]);
+    expect(counter()).toBe(1);
+    const rejected = first.status === 409 ? first : second;
+    const rejectedBody = (await rejected.json()) as { error: string };
+    expect(rejectedBody.error).toBe('idempotency-in-flight');
+    expect(rejected.headers.get('Retry-After')).toBe('1');
+    // Once the winner finished, a retry replays its cached response.
+    const third = await app.request('/run', { method: 'POST', headers, body });
+    expect(third.status).toBe(201);
+    expect(third.headers.get('Idempotency-Replayed')).toBe('true');
+    expect(counter()).toBe(1);
   });
 
   it('rejects with 409 when the body fingerprint mismatches', async () => {

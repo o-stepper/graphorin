@@ -23,7 +23,7 @@ function makeSubscriber(id: string, scopes: string[]) {
 describe('WsDispatcher replay resume on reconnect', () => {
   it('replays buffered events to a brand-new subscription with no cursor', () => {
     const dispatcher = createWsDispatcher();
-    const sub = makeSubscriber('s1', ['agents:invoke:*']);
+    const sub = makeSubscriber('s1', ['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
 
     // Emit events before any subscription exists.
@@ -49,7 +49,7 @@ describe('WsDispatcher replay resume on reconnect', () => {
 
   it('resumes from a sinceEventId cursor and only replays events after the cursor', () => {
     const dispatcher = createWsDispatcher();
-    const sub = makeSubscriber('s1', ['agents:invoke:*']);
+    const sub = makeSubscriber('s1', ['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
 
     // Pre-emit + capture the eventId of the third frame.
@@ -85,7 +85,7 @@ describe('WsDispatcher replay resume on reconnect', () => {
     const dispatcher = createWsDispatcher({
       replayBuffer: { maxEvents: 2 },
     });
-    const sub = makeSubscriber('s1', ['agents:invoke:*']);
+    const sub = makeSubscriber('s1', ['sessions:read:*']);
     dispatcher.registerSubscriber(sub.handle);
 
     // Push 5 events; the buffer drops the first 3.

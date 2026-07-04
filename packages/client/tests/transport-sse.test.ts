@@ -110,6 +110,28 @@ describe('openSseTransport — server wire-format parity (IP-3)', () => {
     expect(closes.length).toBeGreaterThan(0); // stream end closes cleanly
   });
 
+  it('sends Last-Event-ID on connect when a resume cursor is supplied (periphery-03)', async () => {
+    const captured: { headers?: Record<string, string> } = {};
+    const fetchImpl = (async (_url: unknown, init?: RequestInit) => {
+      captured.headers = Object.fromEntries(
+        Object.entries((init?.headers ?? {}) as Record<string, string>),
+      );
+      return streamResponse([eventFrame('text.delta', 'evt-9', { delta: 'x' })]);
+    }) as typeof fetch;
+    await openSseTransport(
+      {
+        url: 'http://local.test/v1/sessions/sess-1/events',
+        auth: { kind: 'bearer', token: 'tok-123' },
+        fetch: fetchImpl,
+        lastEventId: 'evt-42',
+      },
+      { onOpen: () => {}, onFrame: () => {}, onError: () => {}, onClose: () => {} },
+    );
+    // Pre-fix the header was never sent, so every reconnect replayed
+    // the ENTIRE server buffer into the consumer.
+    expect(captured.headers?.['Last-Event-ID']).toBe('evt-42');
+  });
+
   it('multi-line data frames reassemble before parsing', async () => {
     const pretty = JSON.stringify(
       {

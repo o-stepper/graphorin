@@ -45,8 +45,14 @@ describe('tryParseSubject', () => {
 
 describe('requiredScopeFor + isSubjectAllowed', () => {
   it('binds the right scope per subject kind', () => {
+    // periphery-10: session streams are read-only, so they gate on the
+    // sessions:read family (the resource slot is a sessionId), not on
+    // agents:invoke whose slot is an agentId everywhere else.
     expect(requiredScopeFor({ kind: 'session-events', sessionId: 'abc' }).raw).toBe(
-      'agents:invoke:abc',
+      'sessions:read:abc',
+    );
+    expect(requiredScopeFor({ kind: 'session-run-events', sessionId: 'abc', runId: 'r' }).raw).toBe(
+      'sessions:read:abc',
     );
     expect(requiredScopeFor({ kind: 'agent-run-events', agentId: 'a', runId: 'r' }).raw).toBe(
       'agents:read:a',
@@ -55,7 +61,13 @@ describe('requiredScopeFor + isSubjectAllowed', () => {
 
   it('honours wildcard grants', () => {
     expect(
-      isSubjectAllowed([parseScope('agents:invoke:*')], {
+      isSubjectAllowed([parseScope('sessions:read:*')], {
+        kind: 'session-events',
+        sessionId: 'abc',
+      }),
+    ).toBe(true);
+    expect(
+      isSubjectAllowed([parseScope('sessions:*')], {
         kind: 'session-events',
         sessionId: 'abc',
       }),

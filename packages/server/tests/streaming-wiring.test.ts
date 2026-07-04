@@ -76,6 +76,11 @@ function buildApp(): {
         yield { type: 'workflow.step.completed', stepNumber: 1 };
         yield { type: 'workflow.completed' };
       },
+      async *resume(threadId: string, directive?: { readonly resume?: unknown }) {
+        await new Promise((r) => setTimeout(r, 25));
+        yield { type: 'workflow.resumed', threadId, resume: directive?.resume };
+        yield { type: 'workflow.completed' };
+      },
     } as never,
   });
 
@@ -92,6 +97,7 @@ function buildApp(): {
           parseScope('agents:invoke:streamy'),
           parseScope('agents:read:streamy'),
           parseScope('workflows:execute:flowy'),
+          parseScope('workflows:resume:flowy'),
           parseScope('workflows:read:flowy'),
         ],
       },
@@ -166,6 +172,42 @@ describe('IP-2 — the streaming endpoints actually stream', () => {
 
     await new Promise((r) => setTimeout(r, 120));
     expect(JSON.stringify(sub.sent)).toContain('workflow.step.completed');
+    expect(runs.snapshot(body.runId)?.status).toBe('completed');
+  });
+
+  it('periphery-01: POST /workflows/:id/resume actually resumes and emits on the subject', async () => {
+    const { app, dispatcher, runs } = buildApp();
+    const res = await app.request('/workflows/flowy/resume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ threadId: 't-99', resume: { approved: true } }),
+    });
+    // Pre-fix: 202 'pending' that never called workflow.resume() and
+    // advertised an unmounted SSE path.
+    expect(res.status).toBe(202);
+    const body = (await res.json()) as {
+      runId: string;
+      status: string;
+      subscribe: { websocket: string; sse?: string };
+    };
+    expect(body.status).toBe('running');
+    expect(body.subscribe.sse).toBeUndefined();
+    const parsed = tryParseSubject(body.subscribe.websocket);
+    expect(parsed.ok).toBe(true);
+
+    const sub = makeSubscriber(['workflows:read:flowy']);
+    dispatcher.registerSubscriber(sub.handle);
+    const result = dispatcher.subscribe({
+      subscriberId: sub.handle.id,
+      subject: body.subscribe.websocket,
+      subscriptionId: 'sub-r',
+    });
+    expect(result.ok).toBe(true);
+
+    await new Promise((r) => setTimeout(r, 120));
+    const wire = JSON.stringify(sub.sent);
+    expect(wire).toContain('workflow.resumed');
+    expect(wire).toContain('t-99');
     expect(runs.snapshot(body.runId)?.status).toBe('completed');
   });
 });

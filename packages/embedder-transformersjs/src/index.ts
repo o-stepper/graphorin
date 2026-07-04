@@ -161,13 +161,26 @@ export class TransformersJsEmbedder implements EmbedderProvider {
   }
 
   id(): string {
-    const dim = this.#resolvedDim ?? DEFAULT_DIM;
-    return `transformersjs:${this.#model}@${dim}`;
+    return `transformersjs:${this.#model}@${this.dim()}`;
   }
 
+  /**
+   * Output dimension — the explicit `dim` option, a known-model
+   * default, or the width resolved from the first `embed()`.
+   * periphery-05 (the PS-11 fix ported from the Ollama embedder):
+   * throws for an unknown model with no `dim` hint instead of silently
+   * assuming 768 — a wrong assumed width bakes a wrong-width id AND a
+   * wrong-width vec0 table, and the id then CHANGES after the first
+   * `embed()` resolves the truth, which `lock-on-first` reads as an
+   * embedder swap.
+   */
   dim(): number {
     if (this.#resolvedDim !== null) return this.#resolvedDim;
-    return DEFAULT_DIM;
+    throw new Error(
+      `[graphorin/embedder-transformersjs] Unknown embedding width for model '${this.#model}'. ` +
+        `Pass { dim: <width> } to createTransformersJsEmbedder(...) (or call embed() once before ` +
+        `registration so the width is resolved from the model output).`,
+    );
   }
 
   configHash(): string {
@@ -203,6 +216,15 @@ export class TransformersJsEmbedder implements EmbedderProvider {
       ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
     });
     const lastDim = result.dims[result.dims.length - 1] ?? this.#resolvedDim ?? DEFAULT_DIM;
+    // periphery-05: a width already published (via `dim` option or a
+    // prior embed) must not silently drift — the vec0 table and the
+    // canonical id were derived from it.
+    if (this.#resolvedDim !== null && lastDim !== this.#resolvedDim) {
+      throw new Error(
+        `[graphorin/embedder-transformersjs] Model '${this.#model}' produced ${lastDim}-dim ` +
+          `vectors but the embedder is bound to ${this.#resolvedDim} — check the 'dim' option.`,
+      );
+    }
     if (this.#resolvedDim === null) {
       this.#resolvedDim = lastDim;
     }

@@ -407,7 +407,6 @@ describe('GraphorinClient — RPC + subscriptions', () => {
       [{ target: 'session', id: 'abc' } as const, 'session:abc/events'],
       [{ target: 'agent', id: 'a', runId: 'r' } as const, 'agent:a/runs/r/events'],
       [{ target: 'workflow', id: 'w' } as const, 'workflow:w/events'],
-      [{ target: 'run', runId: 'r' } as const, 'run:r/events'],
       [{ target: 'run', runId: 'r', sessionId: 's' } as const, 'session:s/runs/r/events'],
     ];
     for (const [target, expected] of cases) {
@@ -418,6 +417,12 @@ describe('GraphorinClient — RPC + subscriptions', () => {
       };
       expect(sent.params.subject).toBe(expected);
     }
+    // periphery-09: the server grammar has NO bare `run:` form — the
+    // old `run:<id>/events` fallback always failed server-side with an
+    // opaque unknown-subject error. Fail fast client-side instead.
+    await expect(client.subscribe({ target: 'run', runId: 'r' })).rejects.toThrow(
+      /requires `sessionId`/,
+    );
     await client.disconnect();
   });
 });

@@ -103,7 +103,7 @@ describe('IP-21 — commentary audit bridge', () => {
     dispatcher.registerSubscriber({
       id: 'rec-1',
       tokenId: 'tok-1',
-      grantedScopes: [parseScope('agents:invoke:*')],
+      grantedScopes: [parseScope('sessions:read:*')],
       send: (frame) => {
         received.push(frame);
       },

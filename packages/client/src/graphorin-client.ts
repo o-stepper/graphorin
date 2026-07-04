@@ -274,7 +274,10 @@ export class GraphorinClient {
           `subscribe('${subject}') requires the WebSocket transport — the SSE fallback carries only the bound session stream ('${boundSubject}').`,
         );
       }
-      if (this.#sseSubscription === undefined) {
+      // periphery-03: a CLOSED bound subscription (a prior terminal
+      // reconnect failure) must not be handed back — recreate it so a
+      // recovered client delivers events again.
+      if (this.#sseSubscription === undefined || this.#sseSubscription.metadata().closed) {
         this.#sseSubscription = this.#createSubscription({
           subscriptionId: '__sse__',
           subject,
@@ -471,6 +474,10 @@ export class GraphorinClient {
       );
     }
     const url = this.#sseUrl();
+    // periphery-03: resume from where the bound session subscription
+    // left off — without the cursor every reconnect replays the whole
+    // server buffer into the consumer.
+    const resumeCursor = this.#sseSubscription?.__lastEventId();
     const transport = await openSseTransport(
       {
         url,
@@ -479,6 +486,7 @@ export class GraphorinClient {
         // seam (the EventSource seam is gone with the rewrite).
         ...(this.#options.fetch !== undefined ? { fetch: this.#options.fetch } : {}),
         ...(this.#options.clientId !== undefined ? { clientId: this.#options.clientId } : {}),
+        ...(resumeCursor !== undefined ? { lastEventId: resumeCursor } : {}),
       },
       this.#listeners('sse'),
     );
@@ -663,6 +671,15 @@ export class GraphorinClient {
         // the server replays missed events from the buffer.
         const transport = this.#transport;
         if (transport === undefined) continue;
+        // periphery-03: on the SSE fallback the connection IS the
+        // subscription — the reconnect already carried the resume
+        // cursor as `Last-Event-ID`, and frames keep flowing into the
+        // same bound subscription object. The RPC resubscribe below
+        // would call `transport.send(...)`, which the read-only SSE
+        // transport rejects; pre-fix that error CLOSED the
+        // subscription and the client silently stopped delivering
+        // events for the life of the object.
+        if (transport.kind === 'sse') return;
         for (const [oldId, sub] of [...this.#subscriptions]) {
           this.#subscriptions.delete(oldId);
           try {
@@ -903,7 +920,14 @@ function subjectFor(target: SubscriptionTarget): string {
         assertNonEmpty(target.sessionId, 'run.sessionId');
         return `session:${target.sessionId}/runs/${target.runId}/events`;
       }
-      return `run:${target.runId}/events`;
+      // periphery-09: the server subject grammar has NO bare `run:`
+      // form — the old `run:<id>/events` fallback always failed
+      // server-side with an opaque unknown-subject error. Fail fast
+      // with an actionable message instead.
+      throw new TypeError(
+        "subscribe({ target: 'run' }) requires `sessionId` — the server subject grammar has no bare run form. " +
+          "Pass { kind: 'run', runId, sessionId } or use the 'agent' target with the agent id.",
+      );
     case 'workflow':
       assertNonEmpty(target.id, 'workflow.id');
       return `workflow:${target.id}/events`;

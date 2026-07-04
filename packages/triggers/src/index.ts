@@ -467,6 +467,11 @@ class SchedulerImpl implements Scheduler {
 
   recordActivity(): void {
     this.#lastActivity = this.#now();
+    // periphery (P-14): never (re)arm idle timers on a scheduler that
+    // is not started — a stopped scheduler firing callbacks is a
+    // lifecycle violation. The activity timestamp is still recorded so
+    // a later start() computes the idle window correctly.
+    if (!this.#started) return;
     // Reschedule idle triggers so they treat "now" as the start of
     // their idle window.
     for (const decl of this.#declarations.values()) {
@@ -529,7 +534,19 @@ class SchedulerImpl implements Scheduler {
       case 'interval': {
         const intervalMs = Number.parseInt(decl.spec, 10);
         const last = state?.lastFiredAt !== undefined ? Date.parse(state.lastFiredAt) : now;
-        return last + intervalMs;
+        const next = last + intervalMs;
+        // periphery-11: after downtime `last + interval` is in the past;
+        // the schedule clamp turned that into an IMMEDIATE fire even
+        // under `catchupPolicy: 'none'` ("drop missed fires"). Advance
+        // to the next FUTURE boundary on the original cadence — missed
+        // boundaries are the catch-up machinery's business, not the
+        // base schedule's. (Cron already behaves this way:
+        // `nextFireAfter(now)` is always future.)
+        if (next <= now && Number.isFinite(intervalMs) && intervalMs > 0) {
+          const missedBoundaries = Math.floor((now - last) / intervalMs) + 1;
+          return last + missedBoundaries * intervalMs;
+        }
+        return next;
       }
       case 'idle': {
         const idleMs = Number.parseInt(decl.spec, 10);

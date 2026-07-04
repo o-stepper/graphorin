@@ -37,7 +37,7 @@ describe('WsDispatcher backpressure', () => {
       perConnectionQueueLimit: 4,
       onWarn: () => {},
     });
-    const sub = makeSubscriber('s1', ['agents:invoke:*']);
+    const sub = makeSubscriber('s1', ['sessions:read:*']);
     sub.bufferedAmount = () => 1024 * 5; // > limit * 1024
     dispatcher.registerSubscriber(sub);
     dispatcher.subscribe({
@@ -58,7 +58,7 @@ describe('WsDispatcher backpressure', () => {
       perConnectionQueueLimit: 100,
       onWarn: () => {},
     });
-    const sub = makeSubscriber('s1', ['agents:invoke:*']);
+    const sub = makeSubscriber('s1', ['sessions:read:*']);
     sub.send = () => {
       throw new Error('socket-write-failed');
     };

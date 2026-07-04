@@ -396,7 +396,12 @@ async function resolveUpgradeAuth(
   if (header?.toLowerCase().startsWith('bearer ') === true) {
     if (options.verifier === undefined) return { kind: 'denied', reason: 'auth.required' };
     const token = header.slice(7).trim();
-    const verified = await options.verifier.verify(token);
+    // P-05: pass the client IP like the HTTP auth middleware does, so
+    // the verifier's per-IP failure threshold / lockout engages for
+    // upgrade attempts too — without it `GET /v1/ws` was a
+    // lockout-free brute-force surface.
+    const ip = c.get('state')?.clientIp;
+    const verified = await options.verifier.verify(token, ip !== undefined ? { ip } : {});
     if (!verified.ok) return { kind: 'denied', reason: 'auth.invalid' };
     return {
       kind: 'ok',

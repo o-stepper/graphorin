@@ -56,7 +56,7 @@ function emitLeak(dispatcherConfig: { commentary?: DeliveryCommentaryConfig } = 
       sink: { onDecision: (d) => decisions.push(d) },
     } as DeliveryCommentaryConfig,
   });
-  const rec = makeRecorder(['agents:invoke:*']);
+  const rec = makeRecorder(['sessions:read:*']);
   dispatcher.registerSubscriber(rec.handle);
   dispatcher.subscribe({
     subscriberId: rec.handle.id,

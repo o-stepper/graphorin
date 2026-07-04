@@ -244,6 +244,91 @@ describe('Scheduler', () => {
     await fresh.stop();
   });
 
+  it("interval + catchupPolicy 'none' does NOT fire immediately after a restart (periphery-11)", async () => {
+    // First process: register, fire once (records lastFiredAt), stop.
+    const sharedStore = await makeStore();
+    const first = createScheduler({
+      store: sharedStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    let count1 = 0;
+    await first.register(
+      interval('beat', 1_000, () => {
+        count1++;
+      }),
+    );
+    await first.start();
+    await clock.advance(1_000);
+    expect(count1).toBe(1);
+    await first.stop();
+
+    // Downtime: several boundaries pass.
+    await clock.advance(10_500);
+
+    // Second process re-registers over the SAME persisted state with
+    // 'none' ("drop missed fires"). Pre-fix `last + interval` was in
+    // the past and the schedule clamp fired IMMEDIATELY on startup.
+    const second = createScheduler({
+      store: sharedStore,
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    let count2 = 0;
+    await second.register(
+      interval(
+        'beat',
+        1_000,
+        () => {
+          count2++;
+        },
+        { catchupPolicy: 'none' },
+      ),
+    );
+    await second.start();
+    // No immediate fire...
+    await clock.advance(0);
+    expect(count2).toBe(0);
+    // ...the next FUTURE boundary on the original cadence fires.
+    await clock.advance(1_000);
+    expect(count2).toBe(1);
+    await second.stop();
+  });
+
+  it('recordActivity on a stopped scheduler never arms idle timers (P-14)', async () => {
+    let fired = 0;
+    const libScheduler2 = createScheduler({
+      store: await makeStore(),
+      mode: 'server',
+      now: clock.now,
+      setTimeout: clock.setTimeout,
+      clearTimeout: clock.clearTimeout,
+    });
+    const { idle } = await import('../src/index.js');
+    await libScheduler2.register(
+      idle('idle-1', 1_000, () => {
+        fired++;
+      }),
+    );
+    // NOT started: activity must not arm a timer.
+    libScheduler2.recordActivity();
+    await clock.advance(5_000);
+    expect(fired).toBe(0);
+    await libScheduler2.start();
+    libScheduler2.recordActivity();
+    await clock.advance(1_000);
+    expect(fired).toBe(1);
+    await libScheduler2.stop();
+    // Stopped again: re-arming is refused.
+    libScheduler2.recordActivity();
+    await clock.advance(5_000);
+    expect(fired).toBe(1);
+  });
+
   it('unregister removes the timer', async () => {
     let count = 0;
     const t = interval('poll', 1_000, () => {

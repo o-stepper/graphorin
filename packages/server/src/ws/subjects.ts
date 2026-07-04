@@ -121,10 +121,16 @@ export function tryParseSubject(raw: string): ParseSubjectResult {
  */
 export function requiredScopeFor(subject: ParsedSubject): ParsedScope {
   switch (subject.kind) {
+    // periphery-10: session streams are READ-ONLY, so they gate on
+    // `sessions:read:<sessionId>` — consistent with the SSE route's
+    // `sessions:read` requirement (which the old `agents:invoke:<x>`
+    // requirement silently stacked on top of), and the resource slot
+    // is a sessionId under the sessions family instead of overloading
+    // `agents:invoke` (whose slot is an agentId everywhere else).
     case 'session-events':
-      return parseScope(`agents:invoke:${subject.sessionId}`);
+      return parseScope(`sessions:read:${subject.sessionId}`);
     case 'session-run-events':
-      return parseScope(`agents:invoke:${subject.sessionId}`);
+      return parseScope(`sessions:read:${subject.sessionId}`);
     case 'agent-run-events':
       return parseScope(`agents:read:${subject.agentId}`);
     case 'workflow-events':
