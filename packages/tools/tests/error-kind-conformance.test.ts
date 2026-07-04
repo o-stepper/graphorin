@@ -18,7 +18,7 @@ import { makeRunContext } from './fixtures.js';
 function failingSandbox(kind: 'sandbox-violation' | 'memory-exceeded' | 'timeout'): Sandbox {
   return {
     id: 'conformance-sandbox',
-    async run<TInput, TOutput>() {
+    async run<_TInput, _TOutput>() {
       return {
         ok: false as const,
         error: { kind, message: `sandbox reported ${kind}` },

@@ -94,6 +94,8 @@ function describeAgentEvent(e: AgentEvent): string {
       return String(e.stepNumber);
     case 'guardrail.tripped':
       return e.guardrailName;
+    case 'verifier.result':
+      return e.verifierId;
     case 'agent.end':
       return e.runId;
     case 'agent.error':

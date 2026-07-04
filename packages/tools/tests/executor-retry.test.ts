@@ -18,7 +18,7 @@ function flaky(
   failures: number,
   extra: object = {},
 ): {
-  readonly t: ReturnType<typeof tool>;
+  readonly t: Parameters<ReturnType<typeof createToolRegistry>['register']>[0];
   readonly attempts: () => number;
 } {
   let attempts = 0;
@@ -36,7 +36,10 @@ function flaky(
       return `ok after ${attempts}`;
     },
   });
-  return { t, attempts: () => attempts };
+  return {
+    t: t as Parameters<ReturnType<typeof createToolRegistry>['register']>[0],
+    attempts: () => attempts,
+  };
 }
 
 describe('C3 — executor transparent retry', () => {

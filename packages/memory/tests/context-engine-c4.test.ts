@@ -58,7 +58,7 @@ function makeEngineMemory(summarizer: ReturnType<typeof makeSummarizer>) {
 function longMessages(count: number): Message[] {
   const out: Message[] = [];
   for (let i = 0; i < count; i++) {
-    out.push({ role: i % 2 === 0 ? 'user' : 'assistant', content: `turn ${i} ` + 'X'.repeat(800) });
+    out.push({ role: i % 2 === 0 ? 'user' : 'assistant', content: `turn ${i} ${'X'.repeat(800)}` });
   }
   return out;
 }

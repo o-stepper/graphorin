@@ -98,9 +98,7 @@ describe('C6 — hashed span tiles across snapshot/rehydrate', () => {
     ledger.recordOutput(UNTRUSTED_LABEL, secretish);
 
     const snapshot = ledger.snapshot();
-    expect(snapshot.spanTileHashes !== undefined && snapshot.spanTileHashes.length).toBeGreaterThan(
-      0,
-    );
+    expect(snapshot.spanTileHashes?.length).toBeGreaterThan(0);
     // One-way: no persisted field contains any normalized fragment.
     const serialized = JSON.stringify(snapshot);
     expect(serialized).not.toContain('pastebin');

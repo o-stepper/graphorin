@@ -5,7 +5,7 @@
  * - the verifier seam feeds deterministic feedback back before completion
  * - provider responses journal onto RunState and replay deterministically
  */
-import type { AgentEvent, Message, Provider, Tool } from '@graphorin/core';
+import type { AgentEvent, Message, Tool } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import { createAgent, createReplayProvider } from '../src/index.js';
 import { createMockProvider, textOnlyScript, toolCallScript } from './fixtures/mock-provider.js';
