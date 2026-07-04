@@ -10,6 +10,14 @@
  * @stable
  */
 export class Dispatch<TArgs = unknown> {
+  /**
+   * Cross-realm brand (workflow-13): the engine's structural fallback
+   * requires this marker so a plain state object that happens to carry
+   * `nodeName` + `args` keys is treated as channel WRITES, never
+   * silently swallowed as a dispatch. A plain own property (not a
+   * symbol) so it survives `structuredClone` across worker boundaries.
+   */
+  readonly __graphorinDispatch: true = true;
   readonly nodeName: string;
   readonly args: TArgs;
 

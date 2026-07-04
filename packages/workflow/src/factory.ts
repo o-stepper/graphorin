@@ -14,10 +14,12 @@ import {
   InvalidWorkflowConfigError,
   ThreadNotFoundError,
   UnknownNodeError,
+  WorkflowError,
 } from './errors/index.js';
 import {
   forkThread,
   namespaceFor,
+  readFrontier,
   resumeEngine,
   runEngine,
   unwrapPersistedState as unwrapPersistedStateForRead,
@@ -83,6 +85,10 @@ export function createWorkflow<
         ...(directive !== undefined ? { directive } : {}),
         streamMode,
         ...(opts?.signal !== undefined ? { signal: opts.signal } : {}),
+        ...(opts?.durability !== undefined ? { durability: opts.durability } : {}),
+        ...(opts?.allowVersionMismatch !== undefined
+          ? { allowVersionMismatch: opts.allowVersionMismatch }
+          : {}),
         resumeLock,
       });
     },
@@ -93,9 +99,94 @@ export function createWorkflow<
         threadId,
         streamMode,
         ...(opts?.signal !== undefined ? { signal: opts.signal } : {}),
+        ...(opts?.durability !== undefined ? { durability: opts.durability } : {}),
+        ...(opts?.allowVersionMismatch !== undefined
+          ? { allowVersionMismatch: opts.allowVersionMismatch }
+          : {}),
         resumeLock,
         mode: 'retry',
       });
+    },
+    async tick(
+      threadId: string,
+      opts?: { readonly now?: number },
+    ): Promise<{ readonly fired: boolean; readonly nextWakeAt: number | null }> {
+      const tuple = await config.checkpointStore.getTuple(threadId, namespace);
+      if (!tuple) throw new ThreadNotFoundError(threadId);
+      const now = opts?.now ?? Date.now();
+      const timers = readFrontier(tuple.metadata).pauses.filter(
+        (p): p is typeof p & { wakeAt: number } => typeof p.wakeAt === 'number',
+      );
+      const due = timers.filter((p) => p.wakeAt <= now);
+      const pendingAfter = timers.filter((p) => p.wakeAt > now).map((p) => p.wakeAt);
+      if (due.length === 0 || tuple.metadata.status !== 'suspended') {
+        return {
+          fired: false,
+          nextWakeAt: pendingAfter.length > 0 ? Math.min(...pendingAfter) : null,
+        };
+      }
+      // Resume targeting the earliest due timer; drain the resulting
+      // events internally, surfacing the first workflow.error as a throw.
+      const earliest = due.reduce((min, p) => (p.wakeAt < min.wakeAt ? p : min));
+      const events = resumeEngine<TState>({
+        config,
+        threadId,
+        streamMode: 'values',
+        resumeLock,
+        selectPause: (p) => p.wakeAt === earliest.wakeAt && p.nodeName === earliest.nodeName,
+        selectPauseLabel: `timer@${earliest.wakeAt}`,
+      });
+      for await (const event of events) {
+        if (event.type === 'workflow.error') {
+          throw new WorkflowError(
+            event.error.code as ConstructorParameters<typeof WorkflowError>[0],
+            event.error.message,
+          );
+        }
+      }
+      const after = await config.checkpointStore.getTuple(threadId, namespace);
+      const remaining =
+        after === null
+          ? []
+          : readFrontier(after.metadata)
+              .pauses.filter(
+                (p): p is typeof p & { wakeAt: number } => typeof p.wakeAt === 'number',
+              )
+              .map((p) => p.wakeAt);
+      return {
+        fired: true,
+        nextWakeAt: remaining.length > 0 ? Math.min(...remaining) : null,
+      };
+    },
+    resolveAwakeable(
+      threadId: string,
+      name: string,
+      value?: unknown,
+      opts?: WorkflowResumeOptions,
+    ): AsyncIterable<WorkflowEvent<TState>> {
+      const streamMode = opts?.stream ?? DEFAULT_STREAM_MODE;
+      return resumeEngine<TState>({
+        config,
+        threadId,
+        directive: { resume: value },
+        streamMode,
+        ...(opts?.signal !== undefined ? { signal: opts.signal } : {}),
+        ...(opts?.durability !== undefined ? { durability: opts.durability } : {}),
+        ...(opts?.allowVersionMismatch !== undefined
+          ? { allowVersionMismatch: opts.allowVersionMismatch }
+          : {}),
+        resumeLock,
+        selectPause: (p) => p.name === name,
+        selectPauseLabel: name,
+      });
+    },
+    approve(
+      threadId: string,
+      name: string,
+      decision: unknown,
+      opts?: WorkflowResumeOptions,
+    ): AsyncIterable<WorkflowEvent<TState>> {
+      return workflow.resolveAwakeable(threadId, name, decision, opts);
     },
     async getState(threadId: string): Promise<WorkflowState<TState>> {
       const tuple = await config.checkpointStore.getTuple(threadId, namespace);
@@ -111,6 +202,7 @@ export function createWorkflow<
       const unwrapped = unwrapPersistedStateForRead(tuple.checkpoint.state);
       const stateRecord = (unwrapped as TState) ?? ({} as TState);
       const pendingPause = readPauseTag(tuple.metadata.tags);
+      const frontierPauses = readFrontier(tuple.metadata).pauses;
       return {
         threadId,
         stepNumber: tuple.checkpoint.stepNumber,
@@ -118,6 +210,9 @@ export function createWorkflow<
         state: { ...(stateRecord as object) } as TState,
         checkpointId: tuple.checkpoint.id,
         ...(pendingPause !== undefined ? { pendingPause } : {}),
+        // D1: the FULL pause set — timers (wakeAt), awakeables /
+        // approvals (name), parallel pausers.
+        ...(frontierPauses.length > 0 ? { pendingPauses: frontierPauses } : {}),
       };
     },
     async listCheckpoints(threadId: string): Promise<ReadonlyArray<Checkpoint>> {

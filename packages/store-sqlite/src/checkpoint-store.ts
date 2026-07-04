@@ -2,11 +2,13 @@ import type {
   Checkpoint,
   CheckpointId,
   CheckpointMetadata,
+  CheckpointPutOptions,
   CheckpointStore,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
 } from '@graphorin/core/contracts';
+import { CheckpointConflictError } from '@graphorin/core/contracts';
 import type { SqliteConnection } from './connection.js';
 
 /**
@@ -26,7 +28,36 @@ export class SqliteCheckpointStore implements CheckpointStore {
     namespace: string,
     checkpoint: Checkpoint,
     metadata: CheckpointMetadata,
+    opts?: CheckpointPutOptions,
   ): Promise<CheckpointId> {
+    // D1 / workflow-01: the compare-and-set runs inside one synchronous
+    // better-sqlite3 transaction, so the latest-checkpoint read and the
+    // insert are atomic in-process AND serialized cross-process by
+    // SQLite's writer lock.
+    if (opts?.expectedLatestId !== undefined) {
+      this.#conn.transaction(() => {
+        const latest = this.#conn.get<{ id: string }>(
+          'SELECT id FROM workflow_checkpoints WHERE thread_id = ? AND namespace = ? ORDER BY step_number DESC LIMIT 1',
+          [threadId, namespace],
+        );
+        const latestId = latest?.id ?? null;
+        if (latestId !== opts.expectedLatestId) {
+          throw new CheckpointConflictError(threadId, opts.expectedLatestId ?? null, latestId);
+        }
+        this.#insertCheckpoint(threadId, namespace, checkpoint, metadata);
+      });
+      return checkpoint.id;
+    }
+    this.#insertCheckpoint(threadId, namespace, checkpoint, metadata);
+    return checkpoint.id;
+  }
+
+  #insertCheckpoint(
+    threadId: string,
+    namespace: string,
+    checkpoint: Checkpoint,
+    metadata: CheckpointMetadata,
+  ): void {
     this.#conn.run(
       `INSERT OR REPLACE INTO workflow_checkpoints (
          id, thread_id, namespace, parent_id, state_json, channel_versions_json,
@@ -47,7 +78,6 @@ export class SqliteCheckpointStore implements CheckpointStore {
         Date.parse(checkpoint.createdAt),
       ],
     );
-    return checkpoint.id;
   }
 
   async putWrites(
@@ -145,6 +175,8 @@ interface CheckpointRow {
   state_json: string;
   channel_versions_json: string;
   step_number: number;
+  // Legacy persisted rows may still carry 'async' (removed from the
+  // contract union, workflow-14); reads normalize it to 'sync'.
   source: 'sync' | 'async' | 'exit';
   status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   node_name: string | null;
@@ -171,7 +203,7 @@ function rowToTuple(row: CheckpointRow): CheckpointTuple {
     createdAt: new Date(row.created_at).toISOString(),
   };
   const metadata: CheckpointMetadata = {
-    source: row.source,
+    source: row.source === 'async' ? 'sync' : row.source,
     status: row.status,
     ...(row.node_name !== null ? { nodeName: row.node_name } : {}),
     ...(row.tags_json !== null ? { tags: JSON.parse(row.tags_json) } : {}),

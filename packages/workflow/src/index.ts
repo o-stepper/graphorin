@@ -16,7 +16,7 @@
  * - Static `pauseAt.before` / `pauseAt.after` HITL declarations.
  * - The `AbortSignal`-aware hard-kill / cancellation contract with a
  *   configurable grace window.
- * - Six stream emission modes (`values`, `updates`, `messages`,
+ * - Seven stream emission modes (`values`, `updates`, `messages`,
  *   `tasks`, `checkpoints`, `debug`, `custom`) and the
  *   `workflow.run / workflow.step / workflow.task /
  *   workflow.checkpoint` observability spans.
@@ -32,6 +32,8 @@ export const VERSION = '0.5.0';
 
 export type {
   AnyValue,
+  ApprovalPauseValue,
+  AwakeablePauseValue,
   Barrier,
   Channel,
   ChannelKind,
@@ -48,6 +50,7 @@ export type {
   PendingWrite,
   Reducer,
   Stream,
+  TimerPauseValue,
   WorkflowChannelUpdateEvent,
   WorkflowCheckpointWrittenEvent,
   WorkflowCustomEvent,
@@ -64,18 +67,25 @@ export type {
 } from '@graphorin/core';
 export {
   anyValue,
+  awaitExternal,
   barrier,
   Directive,
   Dispatch,
   dispatch,
   ephemeral,
+  isApprovalPauseValue,
+  isAwakeablePauseValue,
   isPauseSignal,
+  isTimerPauseValue,
   latestValue,
   listAggregate,
   PAUSE_SIGNAL_BRAND,
   PauseSignal,
   pause,
   reducer,
+  requestApproval,
+  sleepFor,
+  sleepUntil,
   stream,
 } from '@graphorin/core';
 export { InMemoryCheckpointStore } from './checkpoint-store-memory.js';
@@ -86,13 +96,17 @@ export {
   InvalidWorkflowConfigError,
   MultiWriteError,
   NodeExecutionError,
+  NodeTimeoutError,
+  PauseNotFoundError,
   ReducerError,
   ResumeWithoutSuspensionError,
   ThreadNotFoundError,
   UnknownNodeError,
   WorkflowAbortedError,
+  WorkflowDivergenceError,
   WorkflowError,
   type WorkflowErrorCode,
+  WorkflowVersionMismatchError,
 } from './errors/index.js';
 export { createWorkflow } from './factory.js';
 export { CHECKPOINT_SCHEMA_VERSION } from './internal/engine.js';
@@ -110,6 +124,7 @@ export type {
   WorkflowEdge,
   WorkflowExecuteOptions,
   WorkflowNode,
+  WorkflowNodeRetryPolicy,
   WorkflowNodeRun,
   WorkflowPauseAt,
   WorkflowResumeOptions,

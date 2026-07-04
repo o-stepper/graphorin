@@ -66,6 +66,13 @@ export interface WorkflowChannelUpdateEvent<TState = unknown> {
   readonly stepNumber: number;
   readonly channel: keyof TState & string;
   readonly version: number;
+  /**
+   * The merged value, carried ONLY for `ephemeral` channels
+   * (workflow-07): their values are wiped from state before the next
+   * planning round, so this event is the one place a consumer can
+   * observe them. Persistent channels omit it — read the state instead.
+   */
+  readonly value?: unknown;
 }
 
 /** @stable */

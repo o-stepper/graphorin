@@ -32,6 +32,14 @@ export interface ApplyResult<TState extends object> {
   readonly state: TState;
   readonly versions: Readonly<Record<string, number>>;
   readonly changedChannels: ReadonlyArray<string>;
+  /**
+   * Merged values of the `ephemeral` channels touched this step
+   * (workflow-07). Ephemeral values are wiped from `state` before this
+   * function returns, so the engine surfaces them on the
+   * `workflow.channel.update` event instead — the only place a consumer
+   * can ever observe them.
+   */
+  readonly ephemeralValues: Readonly<Record<string, unknown>>;
 }
 
 /**
@@ -68,7 +76,9 @@ export function applyWrites<TState extends object>(input: {
     if (descriptor.kind === 'ephemeral') ephemeralKeys.add(channelName);
   }
 
+  const ephemeralValues: Record<string, unknown> = {};
   for (const key of ephemeralKeys) {
+    ephemeralValues[key] = next[key];
     delete next[key];
   }
 
@@ -76,6 +86,7 @@ export function applyWrites<TState extends object>(input: {
     state: next as TState,
     versions: Object.freeze({ ...versions }),
     changedChannels: Object.freeze([...changed]),
+    ephemeralValues: Object.freeze(ephemeralValues),
   };
 }
 

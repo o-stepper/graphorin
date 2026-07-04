@@ -31,8 +31,24 @@ export {
 
 export type { DirectiveOptions } from './directive.js';
 export { Directive } from './directive.js';
-
 export { Dispatch, dispatch } from './dispatch.js';
+export type {
+  ApprovalPauseValue,
+  AwakeablePauseValue,
+  TimerPauseValue,
+} from './durable.js';
+export {
+  APPROVAL_PAUSE_KIND,
+  AWAKEABLE_PAUSE_KIND,
+  awaitExternal,
+  isApprovalPauseValue,
+  isAwakeablePauseValue,
+  isTimerPauseValue,
+  requestApproval,
+  sleepFor,
+  sleepUntil,
+  TIMER_PAUSE_KIND,
+} from './durable.js';
 export type { PauseResumeScope } from './pause.js';
 export {
   isPauseSignal,

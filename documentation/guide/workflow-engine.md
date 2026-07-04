@@ -122,7 +122,9 @@ Each checkpoint persists the merged state, the per-channel versions, **and the r
 
 ### Concurrency control
 
-Every checkpoint write is guarded by a compare-and-set against the latest stored checkpoint. Two racing resumes (even from different processes over one SQLite file) cannot both advance a thread: exactly one wins, the loser surfaces `checkpoint-version-conflict`. A second `execute()` on a thread whose latest checkpoint is still `running`/`suspended` is refused the same way; re-executing a terminal (`completed`/`failed`/`aborted`) thread is allowed. Within one `Workflow` instance, a concurrent second `resume` fails fast with `concurrent-resume-rejected`.
+Every checkpoint write is guarded by a compare-and-set against the latest stored checkpoint. Since D1 the CAS is **atomic at the store layer**: `CheckpointStore.put(..., { expectedLatestId })` performs the comparison and the insert in one transaction (the bundled in-memory and SQLite stores both implement it; a custom store that ignores the option falls back to the engine's best-effort pre-check). Two racing resumes (even from different processes over one SQLite file) cannot both advance a thread: exactly one wins, the loser surfaces `checkpoint-version-conflict`. A second `execute()` on a thread whose latest checkpoint is still `running`/`suspended` is refused the same way; re-executing a terminal (`completed`/`failed`/`aborted`) thread is allowed. Within one `Workflow` instance, a concurrent second `resume` fails fast with `concurrent-resume-rejected`.
+
+Within one step, `maxConcurrentTasks` bounds how many planned tasks (including `Dispatch` fan-outs) execute simultaneously; tasks past the cap queue and start as slots free up. Absent, parallelism is unbounded.
 
 ### The re-execution contract
 
@@ -164,6 +166,47 @@ A node calls `pause(value)`; the engine catches the signal, persists state, and 
 
 A node body may pause **several times**: each resume satisfies the next `pause()` in order (earlier ones replay their already-delivered values — see the re-execution contract above). Parallel nodes that pause in the same step each keep their own pending pause; resuming answers the first, and the others re-suspend untouched.
 
+### Durable timers, awakeables, and approvals
+
+Three durable primitives ride the same pause substrate (so they survive restarts inside the checkpointed frontier):
+
+```ts
+import { awaitExternal, requestApproval, sleepFor, sleepUntil } from '@graphorin/workflow';
+
+// Durable timer: suspends with a persisted wake-at timestamp.
+sleepUntil('2026-08-01T09:00:00Z'); // or sleepFor(ms)
+// Fire due timers from any scheduler:
+const { fired, nextWakeAt } = await workflow.tick(threadId);
+
+// Durable promise (awakeable): suspends under a name until an external
+// system resolves it.
+const payload = awaitExternal<WebhookPayload>('payment-confirmed');
+// ...elsewhere: workflow.resolveAwakeable(threadId, 'payment-confirmed', payload)
+
+// Persisted approval: an awakeable specialized for human sign-off.
+const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' });
+// ...elsewhere: workflow.approve(threadId, 'deploy-prod', { ok: true })
+```
+
+`getState(threadId).pendingPauses` surfaces the full pending set — timers carry `wakeAt`, awakeables/approvals carry `name` — so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
+
+### Per-node timeout and retry
+
+```ts
+createNode({ name: 'fetch', run, timeoutMs: 30_000, retry: { maxAttempts: 3, backoffMs: 250 } });
+// or workflow-wide: createWorkflow({ ..., nodeDefaults: { timeoutMs, retry } })
+```
+
+`timeoutMs` is a hard per-task wall-clock budget: on expiry the task's `ctx.signal` aborts (a well-behaved body stops; one that ignores the signal keeps running in the background, same contract as cancellation) and the task fails with `node-timeout`. `retry` re-invokes the body on thrown failures only — `pause(...)` suspensions, aborts, and timeouts never retry — with exponential backoff.
+
+### Version pinning and divergence detection
+
+`createWorkflow({ ..., version: '2.1.0' })` stamps the definition version into every persisted frontier. A resume whose stored version differs fails loudly with `workflow-version-mismatch` (override per call with `{ allowVersionMismatch: true }` after verifying compatibility). Independently, a resume whose frontier references nodes absent from the current definition fails with `workflow-divergence` — persisted state never silently replays through changed code.
+
+### Step journaling (opt-in)
+
+`createWorkflow({ ..., journalSteps: true })` closes the crash-between-execute-and-persist window: before each step the engine journals a step-intent record against the parent checkpoint, and each completed task journals its channel writes as it finishes. Crash recovery from a `running` checkpoint then replays the journaled writes of completed tasks and re-runs **only** the unfinished ones — completed side effects do not repeat. Costs one extra store write per completed task; the first step of a run has no parent checkpoint to journal against and re-runs whole on a crash.
+
 ## Static `pauseAt`
 
 Declare suspension points without hand-rolling `pause(...)` inside the node body:
@@ -177,7 +220,7 @@ createWorkflow({
 
 ## Dynamic parallelism via `Dispatch(node, args)`
 
-A node returns one or more `Dispatch('processOrder', { orderId })` directives; the engine schedules each as a parallel task in the next execution step.
+A node returns one or more `Dispatch('processOrder', { orderId })` directives; the engine schedules each as a parallel task in the next execution step. Construct them via `dispatch(...)` / `new Dispatch(...)` — a bare `{ nodeName, args }` object is treated as channel writes (workflow-13), so a state shape that happens to use those keys is never silently swallowed as a task. `Directive.goto` remains a destructive operator escape hatch: it discards the restored frontier (pending pauses included) in favour of the single goto task.
 
 ## Cancellation
 

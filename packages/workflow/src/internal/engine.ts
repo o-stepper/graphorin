@@ -31,7 +31,15 @@ import type {
   Tracer,
   WorkflowEvent,
 } from '@graphorin/core';
-import { Dispatch, isPauseSignal, runWithPauseResume } from '@graphorin/core';
+import {
+  CheckpointConflictError,
+  Dispatch,
+  isApprovalPauseValue,
+  isAwakeablePauseValue,
+  isPauseSignal,
+  isTimerPauseValue,
+  runWithPauseResume,
+} from '@graphorin/core';
 
 import {
   CheckpointNotFoundError,
@@ -39,11 +47,15 @@ import {
   ConcurrentResumeError,
   DeadEndError,
   NodeExecutionError,
+  NodeTimeoutError,
+  PauseNotFoundError,
   ResumeWithoutSuspensionError,
   StateNotSerializableError,
   ThreadNotFoundError,
   WorkflowAbortedError,
+  WorkflowDivergenceError,
   WorkflowError,
+  WorkflowVersionMismatchError,
 } from '../errors/index.js';
 import {
   type DispatchLike,
@@ -55,6 +67,7 @@ import {
   type WorkflowConfig,
   type WorkflowContext,
   type WorkflowNode,
+  type WorkflowNodeRetryPolicy,
 } from '../types.js';
 import { applyWrites, buildInitialState, type ChannelWrite } from './channels.js';
 import { newId } from './ids.js';
@@ -93,6 +106,17 @@ export interface EngineResumeOptions<TState extends object> {
    * one by replaying the persisted writes of its successful tasks.
    */
   readonly mode?: 'resume' | 'retry';
+  /**
+   * D1: pick WHICH pending pause receives the resume value. Used by
+   * `resolveAwakeable` / `approve` (match by `name`) and `tick` (match
+   * by due `wakeAt`). Absent ⇒ the first pause (legacy behaviour). A
+   * selector that matches nothing fails with `pause-not-found`.
+   */
+  readonly selectPause?: (pause: PendingPauseRecord) => boolean;
+  /** Human-readable target for the pause-not-found error message. */
+  readonly selectPauseLabel?: string;
+  /** Skip the workflow-version pin check (D1). */
+  readonly allowVersionMismatch?: boolean;
 }
 
 /**
@@ -145,8 +169,6 @@ interface PlannedTask {
 interface RunInternalState<TState extends object> {
   state: TState;
   versions: Record<string, number>;
-  /** Sentinel: nodes whose edges have already been evaluated. */
-  readonly visitedNodes: Set<string>;
   /** Fresh tasks scheduled for the next step via {@link Dispatch}. */
   pendingDynamicTasks: PlannedTask[];
   /** Names of nodes that completed during the previous step. */
@@ -182,7 +204,6 @@ export async function* runEngine<TState extends object, TInput extends Partial<T
   const internal: RunInternalState<TState> = {
     state: initialState,
     versions: {},
-    visitedNodes: new Set<string>(),
     pendingDynamicTasks: [],
     lastCompletedNodes: [START_NODE],
     stepNumber: 0,
@@ -267,10 +288,41 @@ export async function* resumeEngine<TState extends object>(
     const restored = restoreState<TState>(tuple.checkpoint, channels);
     const frontier = readFrontier(tuple.metadata);
 
+    // D1 / workflow-14: fail loudly when the stored frontier was written
+    // by a different pinned workflow version — replaying state through
+    // changed code silently diverges from the journal.
+    if (
+      opts.allowVersionMismatch !== true &&
+      frontier.version !== undefined &&
+      config.version !== undefined &&
+      frontier.version !== config.version
+    ) {
+      yield emitError<TState>(
+        threadId,
+        new WorkflowVersionMismatchError(threadId, frontier.version, config.version),
+      );
+      return;
+    }
+    // D1: journal-divergence detection — the frontier must only reference
+    // nodes the current definition still declares.
+    const missingNodes = [
+      ...new Set(
+        [
+          ...frontier.pauses.map((p) => p.nodeName),
+          ...frontier.dynamic.map((d) => d.nodeName),
+          ...frontier.completed,
+          ...(frontier.stepTasks ?? []).map((t) => t.nodeName),
+        ].filter((n) => n !== START_NODE && !(n in config.nodes)),
+      ),
+    ];
+    if (missingNodes.length > 0) {
+      yield emitError<TState>(threadId, new WorkflowDivergenceError(threadId, missingNodes));
+      return;
+    }
+
     const internal: RunInternalState<TState> = {
       state: restored.state,
       versions: { ...restored.versions },
-      visitedNodes: new Set<string>(),
       pendingDynamicTasks: [],
       lastCompletedNodes: [],
       // WF-4: advance the step counter on resume so the first post-resume
@@ -312,14 +364,32 @@ export async function* resumeEngine<TState extends object>(
         internal.versions = { ...applied.versions };
       }
       internal.lastCompletedNodes = completed.map((t) => t.nodeName);
+      // workflow-08: a task that PAUSED in the failed step re-runs with
+      // its already-delivered pause answers replayed — the failure
+      // frontier now persists the pause records, so satisfied values are
+      // no longer dropped on sibling failure.
+      const pauseByNode = new Map(frontier.pauses.map((p) => [p.nodeName, p] as const));
       internal.pendingDynamicTasks = stepTasks
         .filter((t) => t.status !== 'completed')
-        .map((t) => ({
-          taskId: newId('task'),
-          nodeName: t.nodeName,
-          source: 'dispatch' as const,
-          ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
-        }));
+        .map((t) => {
+          const pauseRecord = t.status === 'paused' ? pauseByNode.get(t.nodeName) : undefined;
+          if (pauseRecord !== undefined) {
+            return {
+              taskId: newId('task'),
+              nodeName: t.nodeName,
+              source: 'resume' as const,
+              ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
+              resumeValues: pauseRecord.staticBefore ? [] : [...(pauseRecord.satisfied ?? [])],
+              ...(pauseRecord.staticBefore ? { staticBefore: true } : {}),
+            };
+          }
+          return {
+            taskId: newId('task'),
+            nodeName: t.nodeName,
+            source: 'dispatch' as const,
+            ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
+          };
+        });
     } else {
       // Suspended or crash ('running') resume: restore the persisted
       // frontier — completed-but-unwalked nodes and surviving dynamic
@@ -332,7 +402,40 @@ export async function* resumeEngine<TState extends object>(
         ...(d.dispatchArgs !== undefined ? { dispatchArgs: d.dispatchArgs } : {}),
       }));
 
-      if (directive?.goto) {
+      // D1 / workflow-04 (opt-in journalSteps): crash recovery from a
+      // 'running' checkpoint consumes the step journal when present —
+      // completed tasks of the interrupted step replay from their
+      // journaled writes; only unfinished work re-runs. The journal
+      // supersedes the frontier fan-out (the intent's task list already
+      // captured it at planning time).
+      let journalRecovered = false;
+      if (status === 'running' && config.journalSteps === true) {
+        const journal = readStepJournal(tuple, internal.stepNumber);
+        if (journal !== null) {
+          if (journal.replayWrites.length > 0) {
+            const applied = applyWrites<TState>({
+              state: internal.state,
+              versions: internal.versions,
+              channels,
+              writes: journal.replayWrites,
+            });
+            internal.state = applied.state;
+            internal.versions = { ...applied.versions };
+          }
+          internal.lastCompletedNodes = journal.completedNodes;
+          internal.pendingDynamicTasks = journal.rerunTasks;
+          journalRecovered = true;
+        }
+      }
+
+      if (journalRecovered) {
+        // Frontier fan-out skipped: the journal's intent captured the
+        // interrupted step's full task list at planning time.
+      } else if (directive?.goto) {
+        // workflow-09: goto is DESTRUCTIVE by contract — the restored
+        // frontier (dynamic tasks, unwalked nodes, pending pause records
+        // with their delivered answers) is discarded in favour of the
+        // single goto task. Documented on Directive.goto.
         internal.pendingDynamicTasks = [
           {
             taskId: newId('task'),
@@ -342,7 +445,24 @@ export async function* resumeEngine<TState extends object>(
         ];
         internal.lastCompletedNodes = [];
       } else {
-        const [primary, ...others] = frontier.pauses;
+        // D1: awakeables / timers pick their target pause explicitly;
+        // the default stays "first pause" for plain resumes.
+        let orderedPauses = frontier.pauses;
+        if (opts.selectPause !== undefined) {
+          const target = frontier.pauses.find((pauseRecord) => opts.selectPause?.(pauseRecord));
+          if (target === undefined) {
+            yield emitError<TState>(
+              threadId,
+              new PauseNotFoundError(threadId, opts.selectPauseLabel ?? '<selector>'),
+            );
+            return;
+          }
+          orderedPauses = [
+            target,
+            ...frontier.pauses.filter((pauseRecord) => pauseRecord !== target),
+          ];
+        }
+        const [primary, ...others] = orderedPauses;
         if (primary) {
           if (primary.staticAfter) {
             // The paused node already completed; resume by walking its
@@ -481,9 +601,32 @@ async function* driveRun<TState extends object>(
 
   while (!internal.closed) {
     if (signal?.aborted) {
+      // workflow-12: persist a terminal 'aborted' checkpoint before
+      // throwing so the thread never reports 'running' forever.
+      internal.status = 'aborted';
+      await persistCheckpoint({
+        config,
+        namespace,
+        threadId,
+        internal,
+        durability,
+        status: 'aborted',
+        frontier: frontierFromInternal(internal, config),
+      });
       throw new WorkflowAbortedError(threadId, signalAbortReason(signal));
     }
     if (internal.stepNumber >= maxSteps) {
+      // workflow-12: same terminal-status contract for the step cap.
+      internal.status = 'failed';
+      await persistCheckpoint({
+        config,
+        namespace,
+        threadId,
+        internal,
+        durability,
+        status: 'failed',
+        frontier: frontierFromInternal(internal, config),
+      });
       throw new WorkflowError(
         'max-steps-exceeded',
         `workflow "${config.name}" exceeded the maxSteps cap (${maxSteps}); aborting to prevent runaway execution`,
@@ -536,7 +679,7 @@ async function* driveRun<TState extends object>(
         durability,
         status: 'suspended',
         nodeName: suspendBefore.nodeName,
-        frontier: frontierFromInternal(internal),
+        frontier: frontierFromInternal(internal, config),
       });
       if (includeCheckpointEvents && checkpointId !== null) {
         yield checkpointEvent<TState>(checkpointId, internal.stepNumber);
@@ -623,7 +766,57 @@ async function* driveRun<TState extends object>(
     // or the persisted state.
     const stateView = deepFreeze(structuredClone(internal.state)) as TState;
 
+    // D1 / workflow-04 (opt-in): journal a step-intent record against the
+    // parent checkpoint BEFORE execution so crash recovery knows exactly
+    // which tasks were in flight; each completed task then journals its
+    // writes as it finishes. First step has no parent to attach to —
+    // a crash there re-runs the whole step (documented).
+    const journalCheckpointId =
+      config.journalSteps === true && internal.parentCheckpointId !== undefined
+        ? internal.parentCheckpointId
+        : null;
+    if (journalCheckpointId !== null) {
+      await config.checkpointStore.putWrites(
+        threadId,
+        namespace,
+        journalCheckpointId,
+        [
+          {
+            taskId: STEP_INTENT_TASK_ID,
+            index: 0,
+            channel: STEP_INTENT_CHANNEL,
+            value: {
+              v: 1,
+              stepNumber: internal.stepNumber,
+              tasks: tasks.map((t) => ({
+                taskId: t.taskId,
+                nodeName: t.nodeName,
+                source: t.source,
+                ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
+                ...(t.resumeValues !== undefined ? { resumeValues: [...t.resumeValues] } : {}),
+                ...(t.staticBefore === true ? { staticBefore: true } : {}),
+              })),
+            },
+          },
+        ],
+        STEP_INTENT_TASK_ID,
+      );
+    }
+
+    // D1 / workflow-10: bounded per-step concurrency. Tasks past the cap
+    // queue and start as slots free up; absent ⇒ unbounded (legacy).
+    const semaphore = createSemaphore(config.maxConcurrentTasks);
+
     const taskPromises = tasks.map(async (task) => {
+      await semaphore.acquire();
+      try {
+        await executeOneTask(task);
+      } finally {
+        semaphore.release();
+      }
+    });
+
+    async function executeOneTask(task: PlannedTask): Promise<void> {
       if (includeTaskEvents) {
         stepEvents.push({
           type: 'workflow.task.start',
@@ -654,11 +847,18 @@ async function* driveRun<TState extends object>(
         wakeEventPump();
       };
 
+      // D1: per-task controller so a node timeout can abort ITS body
+      // without touching siblings; outer aborts chain through.
+      const perTaskController = new AbortController();
+      const chainAbort = (): void => perTaskController.abort(taskController.signal.reason);
+      if (taskController.signal.aborted) chainAbort();
+      else taskController.signal.addEventListener('abort', chainAbort, { once: true });
+
       const ctx: WorkflowContext<TState> = Object.freeze({
         threadId,
         stepNumber: internal.stepNumber,
         taskId: task.taskId,
-        signal: taskController.signal,
+        signal: perTaskController.signal,
         emit: ctxEmit,
         state: stateView,
         ...(task.dispatchArgs !== undefined ? { dispatchArgs: task.dispatchArgs } : {}),
@@ -669,16 +869,21 @@ async function* driveRun<TState extends object>(
       let paused: { value: unknown } | undefined;
       let status: 'completed' | 'paused' | 'failed' = 'completed';
       try {
-        let nodeOutput: unknown;
         const node = config.nodes[task.nodeName];
         if (!node) {
           throw new NodeExecutionError(task.nodeName, new Error('node not registered'));
         }
-        if (task.source === 'resume') {
-          nodeOutput = await runResumedNode(node, ctx, task.resumeValues ?? []);
-        } else {
-          nodeOutput = await Promise.resolve(node.run(ctx.state, ctx));
-        }
+        // D1 / workflow-03: per-node timeout + bounded retry (node-level
+        // fields override config.nodeDefaults; absent ⇒ legacy behaviour).
+        const nodeOutput = await runNodeWithPolicy({
+          node,
+          ctx,
+          task,
+          timeoutMs: node.timeoutMs ?? config.nodeDefaults?.timeoutMs,
+          retry: node.retry ?? config.nodeDefaults?.retry,
+          stepController: taskController,
+          taskController: perTaskController,
+        });
 
         const harvested = harvestNodeOutput<TState>({
           nodeName: task.nodeName,
@@ -736,7 +941,39 @@ async function* driveRun<TState extends object>(
         });
         wakeEventPump();
       }
-    });
+
+      // Avoid leaking the chained listener when the step controller
+      // outlives this task.
+      taskController.signal.removeEventListener('abort', chainAbort);
+
+      // D1 / workflow-04: journal this completed task's writes (plus a
+      // done marker so zero-write completions are recoverable) against
+      // the parent checkpoint, as soon as it finishes. Best-effort by
+      // contract? No — a journal write failure must surface: silent loss
+      // here would defeat the exactly-once recovery the flag promises.
+      if (journalCheckpointId !== null && status === 'completed') {
+        await config.checkpointStore.putWrites(
+          threadId,
+          namespace,
+          journalCheckpointId,
+          [
+            ...writes.map((w, idx) => ({
+              taskId: task.taskId,
+              index: idx,
+              channel: w.channel,
+              value: w.value,
+            })),
+            {
+              taskId: task.taskId,
+              index: writes.length,
+              channel: TASK_DONE_CHANNEL,
+              value: true,
+            },
+          ],
+          task.taskId,
+        );
+      }
+    }
 
     let graceExpired = false;
     try {
@@ -801,9 +1038,43 @@ async function* driveRun<TState extends object>(
       };
     }
 
+    // workflow-02: apply channel writes in PLANNED task order, not
+    // completion order — non-commutative merges (any-value, reducers,
+    // list/stream appends) become deterministic under parallel async
+    // nodes. `taskOutcomes` is completion-ordered; re-key by task id.
+    const outcomeByTaskId = new Map(taskOutcomes.map((o) => [o.task.taskId, o] as const));
+    const orderedOutcomes = tasks
+      .map((t) => outcomeByTaskId.get(t.taskId))
+      .filter((o): o is NonNullable<typeof o> => o !== undefined);
+
+    // WF-1/WF-2 + workflow-08: collect EVERY pause raised this step
+    // BEFORE the failure branch, so a sibling failure no longer drops
+    // already-delivered pause answers — the failure frontier persists
+    // them and `retry` replays them. Durable suspensions (timers /
+    // awakeables / approvals, D1) stamp their wakeAt / name here.
+    const pauseRecords: PendingPauseRecord[] = [];
+    for (const outcome of orderedOutcomes) {
+      if (outcome.paused === undefined) continue;
+      const pauseValue = outcome.paused.value;
+      pauseRecords.push({
+        nodeName: outcome.task.nodeName,
+        value: pauseValue,
+        ...(outcome.task.dispatchArgs !== undefined
+          ? { dispatchArgs: outcome.task.dispatchArgs }
+          : {}),
+        ...(outcome.task.resumeValues !== undefined && outcome.task.resumeValues.length > 0
+          ? { satisfied: outcome.task.resumeValues }
+          : {}),
+        ...(isTimerPauseValue(pauseValue) ? { wakeAt: pauseValue.wakeAt } : {}),
+        ...(isAwakeablePauseValue(pauseValue) || isApprovalPauseValue(pauseValue)
+          ? { name: pauseValue.name }
+          : {}),
+      });
+    }
+
     if (nodeFailure) {
       const successWrites: ChannelWrite[] = [];
-      for (const outcome of taskOutcomes) {
+      for (const outcome of orderedOutcomes) {
         if (outcome.status === 'completed') {
           for (const w of outcome.writes) successWrites.push(w);
         }
@@ -825,9 +1096,12 @@ async function* driveRun<TState extends object>(
         nodeName: nodeFailure.nodeName,
         frontier: {
           v: 1,
-          pauses: [],
+          // workflow-08: paused tasks' records (incl. satisfied answers)
+          // survive a sibling failure so retry can replay them.
+          pauses: pauseRecords,
           dynamic: [],
           completed: [],
+          ...(config.version !== undefined ? { version: config.version } : {}),
           // The full task list of the failed step — `retry` replays the
           // completed ones from `pendingWrites` and re-runs the rest.
           stepTasks: tasks.map((t) => ({
@@ -849,37 +1123,46 @@ async function* driveRun<TState extends object>(
       throw wrapNodeFailure(nodeFailure.nodeName, nodeFailure.cause);
     }
 
-    // WF-1/WF-2: collect EVERY pause raised this step — parallel pausers
-    // beyond the first re-suspend on resume instead of getting lost.
-    const pauseRecords: PendingPauseRecord[] = [];
-    for (const outcome of taskOutcomes) {
-      if (outcome.paused === undefined) continue;
-      pauseRecords.push({
-        nodeName: outcome.task.nodeName,
-        value: outcome.paused.value,
-        ...(outcome.task.dispatchArgs !== undefined
-          ? { dispatchArgs: outcome.task.dispatchArgs }
-          : {}),
-        ...(outcome.task.resumeValues !== undefined && outcome.task.resumeValues.length > 0
-          ? { satisfied: outcome.task.resumeValues }
-          : {}),
-      });
-    }
-
     const allWrites: ChannelWrite[] = [];
     const newDynamicTasks: PlannedTask[] = [];
-    for (const outcome of taskOutcomes) {
+    for (const outcome of orderedOutcomes) {
       if (outcome.status !== 'completed') continue;
       for (const w of outcome.writes) allWrites.push(w);
       for (const t of outcome.pendingDispatches) newDynamicTasks.push(t);
     }
 
-    const applied = applyWrites<TState>({
-      state: internal.state,
-      versions: internal.versions,
-      channels,
-      writes: allWrites,
-    });
+    // workflow-05: a merge-time failure (MultiWriteError / ReducerError /
+    // InvalidChannelWriteError) is a real step failure — persist the
+    // terminal 'failed' checkpoint instead of leaking a 'running' thread
+    // with an open step span.
+    let applied: ReturnType<typeof applyWrites<TState>>;
+    try {
+      applied = applyWrites<TState>({
+        state: internal.state,
+        versions: internal.versions,
+        channels,
+        writes: allWrites,
+      });
+    } catch (err) {
+      const checkpointId = await persistCheckpoint({
+        config,
+        namespace,
+        threadId,
+        internal,
+        durability,
+        status: 'failed',
+        nodeName: '<channel-merge>',
+        frontier: frontierFromInternal(internal, config),
+      });
+      stepSpan?.recordException(err);
+      stepSpan?.setStatus('error');
+      stepSpan?.end();
+      if (includeCheckpointEvents && checkpointId !== null) {
+        yield checkpointEvent<TState>(checkpointId, internal.stepNumber);
+      }
+      internal.status = 'failed';
+      throw err;
+    }
 
     if (config.validateState !== undefined) {
       try {
@@ -918,11 +1201,16 @@ async function* driveRun<TState extends object>(
           stepNumber: internal.stepNumber,
           channel: channelName as keyof TState & string,
           version: internal.versions[channelName] ?? 0,
+          // workflow-07: ephemeral values are wiped from state before the
+          // next round — this event is their one observation point.
+          ...(channelName in applied.ephemeralValues
+            ? { value: applied.ephemeralValues[channelName] }
+            : {}),
         } satisfies WorkflowEvent<TState>;
       }
     }
 
-    internal.lastCompletedNodes = taskOutcomes
+    internal.lastCompletedNodes = orderedOutcomes
       .filter((t) => t.status === 'completed')
       .map((t) => t.task.nodeName);
     internal.pendingDynamicTasks = newDynamicTasks;
@@ -956,7 +1244,7 @@ async function* driveRun<TState extends object>(
         durability,
         status: 'suspended',
         nodeName: first.nodeName,
-        frontier: frontierFromInternal(internal),
+        frontier: frontierFromInternal(internal, config),
       });
       stepSpan?.setStatus('ok');
       stepSpan?.end();
@@ -991,7 +1279,7 @@ async function* driveRun<TState extends object>(
       internal,
       durability,
       status: 'running',
-      frontier: frontierFromInternal(internal),
+      frontier: frontierFromInternal(internal, config),
     });
     stepSpan?.setStatus('ok');
     stepSpan?.end();
@@ -1014,6 +1302,18 @@ async function* driveRun<TState extends object>(
     internal.stepNumber += 1;
 
     if (signal?.aborted) {
+      // workflow-12: mirror the loop-top contract — the step's 'running'
+      // checkpoint was just written, so stamp the terminal status too.
+      internal.status = 'aborted';
+      await persistCheckpoint({
+        config,
+        namespace,
+        threadId,
+        internal,
+        durability,
+        status: 'aborted',
+        frontier: frontierFromInternal(internal, config),
+      });
       throw new WorkflowAbortedError(threadId, signalAbortReason(signal));
     }
   }
@@ -1078,11 +1378,14 @@ function planTasks<TState extends object>(
     }
   }
 
-  if (planned.length === 0 && fromCompleted.includes(START_NODE) === false) {
+  if (planned.length === 0 && fromCompleted.length > 0) {
     if (reachableEnd(config, fromCompleted, internal.state)) {
       return { tasks: [] };
     }
-    // WF-14: nothing fired and no END edge is satisfied — a dead end.
+    // WF-14 + workflow-06: nothing fired and no END edge is satisfied —
+    // a dead end. The bootstrap round is no longer excluded: an
+    // all-false conditional fan out of __start__ raises instead of
+    // silently completing a workflow that never ran a node.
     return { tasks: [], deadEnd: [...fromCompleted] };
   }
 
@@ -1185,9 +1488,14 @@ function harvestNodeOutput<TState>(input: {
 }
 
 function isDispatchLike(value: unknown): value is DispatchLike {
+  // workflow-13: the structural fallback (for Dispatch values that
+  // crossed a realm boundary and lost their prototype) now requires the
+  // cross-realm brand — a plain state object that happens to carry
+  // `nodeName` + `args` keys is channel WRITES, never a dispatch.
   return (
     typeof value === 'object' &&
     value !== null &&
+    (value as { __graphorinDispatch?: unknown }).__graphorinDispatch === true &&
     typeof (value as { nodeName?: unknown }).nodeName === 'string' &&
     'args' in value
   );
@@ -1322,7 +1630,19 @@ async function persistCheckpoint<TState extends object>(
 
   try {
     if (!skipPut) {
-      await config.checkpointStore.put(threadId, namespace, checkpoint, metadata);
+      // workflow-01: stores that honour `expectedLatestId` perform the
+      // compare-and-set atomically, closing the TOCTOU window of the
+      // pre-check above; legacy stores ignore the extra argument and the
+      // pre-check remains the (best-effort) guard.
+      await config.checkpointStore.put(
+        threadId,
+        namespace,
+        checkpoint,
+        metadata,
+        internal.parentCheckpointId !== undefined
+          ? { expectedLatestId: internal.parentCheckpointId }
+          : {},
+      );
     }
 
     if (args.pendingWritesByTask) {
@@ -1344,6 +1664,13 @@ async function persistCheckpoint<TState extends object>(
   } catch (err) {
     checkpointSpan?.setStatus('error');
     checkpointSpan?.end();
+    if (err instanceof CheckpointConflictError) {
+      throw new CheckpointVersionConflictError(
+        threadId,
+        err.expectedLatestId ?? '<fresh-run>',
+        err.actualLatestId ?? '<none>',
+      );
+    }
     throw err;
   }
   checkpointSpan?.setStatus('ok');
@@ -1391,6 +1718,202 @@ function signalAbortReason(signal: AbortSignal): string {
   return 'aborted';
 }
 
+/** Reserved journal keys for opt-in step journaling (D1 / workflow-04). */
+const STEP_INTENT_TASK_ID = '__graphorin_step_intent__' as const;
+const STEP_INTENT_CHANNEL = '__graphorin_step_intent__' as const;
+const TASK_DONE_CHANNEL = '__graphorin_task_done__' as const;
+
+interface StepIntentTask {
+  readonly taskId: string;
+  readonly nodeName: string;
+  readonly source: PlannedTask['source'];
+  readonly dispatchArgs?: unknown;
+  readonly resumeValues?: ReadonlyArray<unknown>;
+  readonly staticBefore?: boolean;
+}
+
+/**
+ * D1 / workflow-04: decode the interrupted step's journal from the
+ * latest checkpoint's pending writes. Returns `null` when no intent for
+ * the expected step is journaled (crash happened outside a journaled
+ * step, or journaling was off) — the caller then falls back to the
+ * plain frontier fan-out.
+ */
+function readStepJournal(
+  tuple: {
+    readonly pendingWrites?: ReadonlyArray<{
+      readonly taskId: string;
+      readonly index: number;
+      readonly channel: string;
+      readonly value: unknown;
+    }>;
+  },
+  expectedStepNumber: number,
+): {
+  readonly replayWrites: ChannelWrite[];
+  readonly completedNodes: string[];
+  readonly rerunTasks: PlannedTask[];
+} | null {
+  const rows = tuple.pendingWrites ?? [];
+  const intentRow = rows.find(
+    (r) => r.taskId === STEP_INTENT_TASK_ID && r.channel === STEP_INTENT_CHANNEL,
+  );
+  if (intentRow === undefined) return null;
+  const intent = intentRow.value as {
+    v?: number;
+    stepNumber?: number;
+    tasks?: ReadonlyArray<StepIntentTask>;
+  };
+  if (intent?.v !== 1 || intent.stepNumber !== expectedStepNumber) return null;
+  const tasks = Array.isArray(intent.tasks) ? intent.tasks : [];
+  if (tasks.length === 0) return null;
+
+  const doneIds = new Set(rows.filter((r) => r.channel === TASK_DONE_CHANNEL).map((r) => r.taskId));
+  const nameByTask = new Map(tasks.map((t) => [t.taskId, t.nodeName] as const));
+  const replayWrites: ChannelWrite[] = [];
+  // Replay in intent (planned) order for workflow-02 determinism.
+  for (const t of tasks) {
+    if (!doneIds.has(t.taskId)) continue;
+    for (const row of rows) {
+      if (row.taskId !== t.taskId || row.channel === TASK_DONE_CHANNEL) continue;
+      replayWrites.push({
+        nodeName: nameByTask.get(row.taskId) ?? '<replay>',
+        taskId: row.taskId,
+        index: row.index,
+        channel: row.channel,
+        value: row.value,
+      });
+    }
+  }
+  const completedNodes = tasks.filter((t) => doneIds.has(t.taskId)).map((t) => t.nodeName);
+  const rerunTasks: PlannedTask[] = tasks
+    .filter((t) => !doneIds.has(t.taskId))
+    .map((t) => ({
+      taskId: newId('task'),
+      nodeName: t.nodeName,
+      source: t.source === 'resume' ? ('resume' as const) : ('dispatch' as const),
+      ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
+      ...(t.resumeValues !== undefined ? { resumeValues: [...t.resumeValues] } : {}),
+      ...(t.staticBefore === true ? { staticBefore: true } : {}),
+    }));
+  return { replayWrites, completedNodes, rerunTasks };
+}
+
+/**
+ * D1 / workflow-10: minimal counting semaphore for the per-step task
+ * pool. `limit` undefined / non-positive ⇒ unbounded (a no-op acquire).
+ */
+function createSemaphore(limit: number | undefined): {
+  acquire(): Promise<void>;
+  release(): void;
+} {
+  if (limit === undefined || !Number.isFinite(limit) || limit < 1) {
+    return { acquire: async () => {}, release: () => {} };
+  }
+  let inFlight = 0;
+  const waiters: Array<() => void> = [];
+  return {
+    async acquire(): Promise<void> {
+      if (inFlight < limit) {
+        inFlight += 1;
+        return;
+      }
+      await new Promise<void>((resolve) => {
+        waiters.push(resolve);
+      });
+      inFlight += 1;
+    },
+    release(): void {
+      inFlight -= 1;
+      const next = waiters.shift();
+      next?.();
+    },
+  };
+}
+
+/**
+ * D1 / workflow-03: run a node body under its per-node policy.
+ *
+ * - `timeoutMs` is a hard per-TASK wall-clock budget: on expiry the
+ *   task's own controller aborts (so a well-behaved body can stop) and
+ *   the task fails with `node-timeout`. Bodies that ignore the signal
+ *   keep running in the background — the same contract as cancellation.
+ * - `retry` re-invokes the body on thrown failures only: `pause(...)`
+ *   suspensions, step-level aborts, and timeouts never retry. Backoff
+ *   doubles per attempt and counts against the timeout budget.
+ */
+async function runNodeWithPolicy<TState extends object>(args: {
+  readonly node: WorkflowNode<TState>;
+  readonly ctx: WorkflowContext<TState>;
+  readonly task: PlannedTask;
+  readonly timeoutMs: number | undefined;
+  readonly retry: WorkflowNodeRetryPolicy | undefined;
+  readonly stepController: AbortController;
+  readonly taskController: AbortController;
+}): Promise<unknown> {
+  const { node, ctx, task, timeoutMs, retry, stepController, taskController } = args;
+  const maxAttempts = Math.max(1, Math.floor(retry?.maxAttempts ?? 1));
+  const backoffBase = Math.max(0, retry?.backoffMs ?? 250);
+
+  const invoke = async (): Promise<unknown> => {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        if (task.source === 'resume') {
+          return await runResumedNode(node, ctx, task.resumeValues ?? []);
+        }
+        return await Promise.resolve(node.run(ctx.state, ctx));
+      } catch (err) {
+        if (isPauseSignal(err)) throw err;
+        if (stepController.signal.aborted || taskController.signal.aborted) throw err;
+        lastError = err;
+        if (attempt >= maxAttempts) throw err;
+        const backoff = backoffBase * 2 ** (attempt - 1);
+        if (backoff > 0) {
+          await abortableDelay(backoff, taskController.signal);
+          if (taskController.signal.aborted) throw err;
+        }
+      }
+    }
+    throw lastError;
+  };
+
+  if (timeoutMs === undefined || !Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    return invoke();
+  }
+  let timeoutId: NodeJS.Timeout | undefined;
+  const timedOut = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      const timeoutError = new NodeTimeoutError(task.nodeName, timeoutMs);
+      taskController.abort(timeoutError);
+      reject(timeoutError);
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([invoke(), timedOut]);
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  }
+}
+
+function abortableDelay(ms: number, signal: AbortSignal): Promise<void> {
+  return new Promise<void>((resolve) => {
+    if (signal.aborted) {
+      resolve();
+      return;
+    }
+    const id = setTimeout(() => {
+      signal.removeEventListener('abort', onAbort);
+      resolve();
+    }, ms);
+    const onAbort = (): void => {
+      clearTimeout(id);
+      resolve();
+    };
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
 const PAUSE_TAG_PREFIX = 'pause:' as const;
 const FRONTIER_TAG_PREFIX = 'frontier:' as const;
 
@@ -1400,6 +1923,8 @@ const FRONTIER_TAG_PREFIX = 'frontier:' as const;
  */
 interface FrontierEnvelope {
   readonly v: 1;
+  /** Workflow definition version pin at persist time (D1). */
+  readonly version?: string;
   /** Every pause raised by the suspension — parallel pausers included. */
   readonly pauses: ReadonlyArray<PendingPauseRecord>;
   /** Dispatch-scheduled tasks that have not run yet. */
@@ -1421,9 +1946,11 @@ function emptyFrontier(): FrontierEnvelope {
 
 function frontierFromInternal<TState extends object>(
   internal: RunInternalState<TState>,
+  config?: { readonly version?: string },
 ): FrontierEnvelope {
   return {
     v: 1,
+    ...(config?.version !== undefined ? { version: config.version } : {}),
     pauses: [...internal.pendingPauses],
     dynamic: internal.pendingDynamicTasks.map((t) => ({
       nodeName: t.nodeName,
@@ -1444,7 +1971,7 @@ function encodeFrontier(frontier: FrontierEnvelope): string[] {
   return tags;
 }
 
-function readFrontier(metadata: CheckpointMetadata): FrontierEnvelope {
+export function readFrontier(metadata: CheckpointMetadata): FrontierEnvelope {
   const frontierTag = metadata.tags?.find((t) => t.startsWith(FRONTIER_TAG_PREFIX));
   if (frontierTag) {
     try {
@@ -1453,6 +1980,7 @@ function readFrontier(metadata: CheckpointMetadata): FrontierEnvelope {
       ) as Partial<FrontierEnvelope>;
       return {
         v: 1,
+        ...(typeof parsed.version === 'string' ? { version: parsed.version } : {}),
         pauses: Array.isArray(parsed.pauses)
           ? parsed.pauses.filter((p) => typeof p?.nodeName === 'string')
           : [],
