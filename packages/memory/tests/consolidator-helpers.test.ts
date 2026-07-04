@@ -202,9 +202,62 @@ describe('consolidator/budget', () => {
       onExceed: 'log',
       resetSemantics: 'utc',
       now: () => Date.parse('2026-04-21T00:00:00Z'),
+      logger: () => {},
     });
     tracker.record({ phase: 'standard', tokens: 200, costUsd: 0 });
     expect(tracker.snapshot().paused).toBe(false);
+  });
+
+  it('`log` actually WARNs — once per resource per window (memory-consolidation-02)', () => {
+    const warnings: string[] = [];
+    let now = Date.parse('2026-04-21T00:00:00Z');
+    const tracker = new BudgetTracker({
+      maxTokensPerDay: 100,
+      maxCostPerDay: 0.1,
+      onExceed: 'log',
+      resetSemantics: 'utc',
+      now: () => now,
+      logger: (message) => warnings.push(message),
+    });
+    tracker.record({ phase: 'standard', tokens: 200, costUsd: 0 });
+    tracker.record({ phase: 'standard', tokens: 200, costUsd: 0 });
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toContain('tokens budget exceeded');
+    expect(warnings[0]).toContain("onExceed: 'log'");
+    // The cost leg warns independently.
+    tracker.record({ phase: 'deep', tokens: 0, costUsd: 0.5 });
+    expect(warnings).toHaveLength(2);
+    expect(warnings[1]).toContain('cost budget exceeded');
+    // A new budget window re-arms the WARN.
+    now = Date.parse('2026-04-22T01:00:00Z');
+    tracker.record({ phase: 'standard', tokens: 200, costUsd: 0 });
+    expect(warnings).toHaveLength(3);
+  });
+
+  it('a configured priceUsage makes the USD ceiling trip (memory-consolidation-02)', () => {
+    // The tracker itself accumulates whatever costUsd the phases record;
+    // this pins the pause behaviour once cost is finally non-zero.
+    const tracker = new BudgetTracker({
+      maxTokensPerDay: 1_000_000,
+      maxCostPerDay: 0.01,
+      onExceed: 'pause',
+      resetSemantics: 'utc',
+      now: () => Date.parse('2026-04-21T00:00:00Z'),
+    });
+    const priceUsage = ({
+      promptTokens,
+      completionTokens,
+    }: {
+      promptTokens: number;
+      completionTokens: number;
+    }): number => (promptTokens * 3 + completionTokens * 15) / 1_000_000;
+    tracker.record({
+      phase: 'standard',
+      tokens: 5_000,
+      costUsd: priceUsage({ promptTokens: 4_000, completionTokens: 1_000 }),
+    });
+    expect(tracker.snapshot().paused).toBe(true);
+    expect(tracker.precheck('standard').reason).toBe('cost-exceeded');
   });
 
   it('resets at UTC midnight', () => {

@@ -936,10 +936,12 @@ describe('context-engine-04 — guard and floor share the full-buffer basis', ()
 });
 
 describe('buildSummarizerPrompt — dump hardening (context-engine-07/09)', () => {
+  // A minimal 4-section stand-in for the real 11-tuple; the prompt
+  // builder only maps over the array.
   const TEMPLATE = {
     preamble: 'Summarize.',
     sections: ['Context', 'Decisions', 'Recent turns', 'Metadata'],
-  };
+  } as unknown as Parameters<typeof buildSummarizerPrompt>[0]['template'];
 
   it('neutralizes older_messages markers inside message text (context-engine-09)', () => {
     const prompt = buildSummarizerPrompt({

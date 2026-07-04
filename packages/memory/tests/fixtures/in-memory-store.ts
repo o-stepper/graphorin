@@ -353,6 +353,7 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
   readonly pending: Array<{
     readonly id: number;
     readonly input: PendingConflictInputLike;
+    enqueuedAt: number;
     attemptedAt: number | null;
     resolvedAt: number | null;
     decision: ConflictAuditDecision | null;
@@ -370,7 +371,16 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
   async enqueuePending(input: PendingConflictInputLike): Promise<{ readonly id: number }> {
     this.#seq += 1;
     const id = this.#seq;
-    this.pending.push({ id, input, attemptedAt: null, resolvedAt: null, decision: null });
+    // Mirror sqlite: enqueuedAt is stamped at ENQUEUE time (the old
+    // fixture stamped it at list time, hiding age-based expiry).
+    this.pending.push({
+      id,
+      input,
+      enqueuedAt: Date.now(),
+      attemptedAt: null,
+      resolvedAt: null,
+      decision: null,
+    });
     return { id };
   }
 
@@ -378,7 +388,6 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
     scope: SessionScope,
     limit = 50,
   ): Promise<ReadonlyArray<PendingConflictRowLike>> {
-    const now = Date.now();
     return this.pending
       .filter((p) => p.input.scope.userId === scope.userId && p.resolvedAt === null)
       .map(
@@ -389,7 +398,7 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
           candidateText: p.input.candidateText,
           stage: p.input.stage,
           reason: p.input.reason ?? null,
-          enqueuedAt: now,
+          enqueuedAt: p.enqueuedAt,
           attemptedAt: p.attemptedAt,
           resolvedAt: p.resolvedAt,
           decision: p.decision,

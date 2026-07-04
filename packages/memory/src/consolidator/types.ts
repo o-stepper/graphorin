@@ -52,7 +52,12 @@ export interface ConsolidatorTriggerReason {
 }
 
 /**
- * Hard cost ceilings enforced atomically per UTC day. The default
+ * Daily cost ceilings, tracked per budget window. How a breach is
+ * handled depends on {@link OnBudgetExceed}: `'pause'` / `'throw'`
+ * enforce, `'log'` (the shipped standard/full presets) only WARNs and
+ * keeps running. The USD leg accumulates only when a `priceUsage`
+ * pricer is configured (memory-consolidation-02) — without one every
+ * call prices at $0 and `maxCostPerDay` can never trip. The default
  * ceiling shape per tier is captured in
  * {@link CONSOLIDATOR_TIER_DEFAULTS}.
  *
@@ -355,6 +360,19 @@ export interface CreateConsolidatorOptions {
   readonly phases?: ReadonlyArray<ConsolidatorPhase>;
   readonly ceilings?: Partial<ConsolidatorCeilings>;
   readonly onExceed?: OnBudgetExceed;
+  /**
+   * USD pricer for phase LLM usage (memory-consolidation-02). Wire it
+   * to `@graphorin/pricing`'s `calculateCost` (or any per-token rate)
+   * so the `maxCostPerDay` ceiling can actually accumulate spend —
+   * without it every phase prices its calls at $0 and the USD ceiling
+   * never trips at any tier.
+   *
+   * ```ts
+   * priceUsage: ({ promptTokens, completionTokens }) =>
+   *   (promptTokens * 3 + completionTokens * 15) / 1_000_000
+   * ```
+   */
+  readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
   /**
    * Provider routed to the standard phase (extraction / episode /
    * reconcile / situating-context calls) when set (MCON-7). Falls back

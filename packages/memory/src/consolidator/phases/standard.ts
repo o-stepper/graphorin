@@ -483,6 +483,10 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
 }
 
 function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequest {
+  // memory-consolidation-08: temporal anchoring — state today's date and
+  // instruct the model to resolve relative time into absolute dates, so
+  // "I'm interviewing next Friday" becomes a dated, durable fact.
+  const today = new Date(deps.now?.() ?? Date.now()).toISOString().slice(0, 10);
   return {
     messages: [
       {
@@ -490,7 +494,10 @@ function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequ
         content: `Conversation slice:\n${transcript}`,
       },
     ],
-    systemMessage: EXTRACTION_SYSTEM_PROMPT,
+    systemMessage:
+      `${EXTRACTION_SYSTEM_PROMPT} Today is ${today}. Each transcript line carries its ` +
+      'timestamp in parentheses; resolve relative dates ("next Friday", "last month") ' +
+      'into absolute ISO dates in the extracted fact text.',
     temperature: 0,
     maxTokens: EXTRACTION_MAX_TOKENS,
     metadata: {
@@ -539,7 +546,13 @@ function renderTranscript(messages: ReadonlyArray<SessionMessageRecord>): string
     .map((m) => {
       const role = m.message.role;
       const text = renderText(m.message);
-      return `[${m.sequence}] ${role}: ${text}`;
+      // memory-consolidation-08: per-message timestamps anchor the
+      // extraction — without them relative time ("next Friday", "last
+      // month") distils into facts with no resolvable timeframe.
+      const stamp = typeof m.createdAt === 'string' && m.createdAt.length > 0 ? m.createdAt : '';
+      return stamp.length > 0
+        ? `[${m.sequence}] (${stamp}) ${role}: ${text}`
+        : `[${m.sequence}] ${role}: ${text}`;
     })
     .join('\n');
 }

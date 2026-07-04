@@ -203,6 +203,11 @@ export interface CreateMemoryOptions {
     readonly phases?: ReadonlyArray<ConsolidatorPhase>;
     readonly ceilings?: Partial<ConsolidatorCeilings>;
     readonly onExceed?: OnBudgetExceed;
+    /**
+     * USD pricer for phase LLM usage (memory-consolidation-02) — wire
+     * to `@graphorin/pricing` so `maxCostPerDay` can actually trip.
+     */
+    readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
     /** Provider routed to the standard phase when set (MCON-7); falls back to `provider`. */
     readonly cheapProvider?: Provider | null;
     /** Provider routed to the deep + reflection passes when set (MCON-7). */
@@ -625,6 +630,7 @@ function buildConsolidator(
     ...(opts.phases !== undefined ? { phases: opts.phases } : {}),
     ...(opts.ceilings !== undefined ? { ceilings: opts.ceilings } : {}),
     ...(opts.onExceed !== undefined ? { onExceed: opts.onExceed } : {}),
+    ...(opts.priceUsage !== undefined ? { priceUsage: opts.priceUsage } : {}),
     ...(opts.cheapProvider !== undefined ? { cheapProvider: opts.cheapProvider } : {}),
     ...(opts.deepProvider !== undefined ? { deepProvider: opts.deepProvider } : {}),
     ...(opts.cheapModel !== undefined ? { cheapModel: opts.cheapModel } : {}),

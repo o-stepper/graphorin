@@ -274,13 +274,24 @@ Induction fires on **success only** — a failed run never calls the inducer —
 
 ## Background consolidator
 
-A separate background process (`Consolidator`) distils long conversations into long-term knowledge. It runs in three phases with a built-in cost budget so it can never run away with your bill:
+A background pipeline (`Consolidator`) distils long conversations into long-term knowledge. It runs in three phases with a built-in cost budget so it can never run away with your bill:
 
 | Phase | What it does |
 |---|---|
-| **Light** | Summarisation, conflict-resolution flush of pending rows, and **multi-signal forgetting** — low-salience facts are soft-archived (recoverable). |
-| **Standard** | **Neighbour-aware** semantic promotion + reconciliation, **episode formation with auto-importance scoring**, and (opt-in) `'llm'` contextual-retrieval enrichment. |
-| **Deep** | Cross-session pattern detection, **reflection / insight synthesis**, procedural extraction, shared-tier promotion. |
+| **Light** | Zero-LLM housekeeping: **multi-signal forgetting** — low-salience facts are soft-archived (recoverable) — plus the opt-in capacity-bounded eviction pass. |
+| **Standard** | One LLM extraction pass over new session slices (**temporally anchored** — per-message timestamps + "today is" so relative dates resolve), **neighbour-aware** reconciliation (add / supersede / defer-to-deep), an embedder-independent exact-duplicate guard, **episode formation with auto-importance scoring**, and (opt-in) `'llm'` contextual-retrieval enrichment. Extracted facts land **quarantined** until validated. |
+| **Deep** | An LLM judge drains the pending CONFLICT-CHECK queue (supersede / soft dedup / admit) and, at the `full` tier, runs **reflection / insight synthesis**. |
+
+Procedural induction is **not** phase-scheduled — call `memory.procedural.induce(...)` / `induceFromRun(...)` yourself; there is no cross-agent shared-tier promotion.
+
+### Making it run
+
+In library mode the consolidator is **dormant until you start and trigger it** — constructing `createMemory({ consolidator: {...} })` alone never spends a token:
+
+1. `await memory.consolidator.start()` — arms the runtime (idempotent).
+2. Something must fire it: pass `triggers` (a `ConsolidatorTriggerSpec[]` consumed by the `@graphorin/triggers` scheduler inside `graphorin start`), or call `memory.consolidator.fireNow('standard', scope)` / `.trigger({ kind: 'turn' }, scope)` from your own loop.
+
+Every `trigger(...)` dispatch first replays ready dead-letter batches (backoff-gated) and, at tiers without a deep phase, expires CONFLICT-CHECK rows older than 7 days as `admit` so the pending queue cannot grow unbounded.
 
 Per-tier defaults from `CONSOLIDATOR_TIER_DEFAULTS`:
 
