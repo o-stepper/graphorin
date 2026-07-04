@@ -101,6 +101,17 @@ jobs:
       # LongMemEval numbers; the emitted RESULTS header records which provider
       # ran. PROVIDER/MODEL/base-url/key all flow via env (never interpolated
       # into the shell) to avoid injection.
+      # C8 (evals-03): the offline plumbing gate — the committed stub+fixture
+      # baseline makes the regression machinery REAL in every dispatch, even
+      # when the real-provider legs run with a placeholder. Fails hard.
+      - name: Fixture plumbing gate (offline, committed baseline)
+        run: |
+          node benchmarks/longmemeval/dist/runner.js \
+            --provider stub \
+            --baseline benchmarks/longmemeval/baselines/longmemeval.fixture.stub.json \
+            --results benchmarks/longmemeval/reports/fixture-gate.md \
+            --gate-on regressions
+
       - name: Run per-ability regression gates
         env:
           LOADER: ${{ inputs.loader }}

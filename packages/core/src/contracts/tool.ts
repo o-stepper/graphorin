@@ -216,6 +216,19 @@ export interface ResolvedTool<TInput = unknown, TOutput = unknown, TDeps = unkno
 export interface ToolReturn<TOutput = unknown> {
   readonly output: TOutput;
   readonly contentParts?: ReadonlyArray<MessageContent>;
+  /**
+   * C6: per-result taint override the data-flow ledger honours when
+   * recording this output. Lets a FIRST-PARTY tool whose CONTENT is not
+   * first-party (e.g. memory recall returning quarantined /
+   * foreign-provenance facts) re-arm the taint ledger, closing the
+   * cross-session poisoning leg. Flags only ever WIDEN the derived label
+   * (they cannot launder an untrusted tool's output into trusted).
+   */
+  readonly taint?: {
+    readonly untrusted?: boolean;
+    readonly sensitive?: boolean;
+    readonly sourceKind?: string;
+  };
 }
 
 /**

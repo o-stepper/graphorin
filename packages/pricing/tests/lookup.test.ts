@@ -154,3 +154,66 @@ describe('@graphorin/pricing — calculateCost', () => {
     expect((withCache?.amount ?? 0) - (noCache?.amount ?? 0)).toBeCloseTo(cachedRate * 1_000, 12);
   });
 });
+
+describe('prompt-cache write pricing + date-suffix fallback (core-provider-02/03)', () => {
+  beforeEach(() => {
+    _resetLookupWarningsForTesting();
+    setLookupWarnSink(() => {});
+  });
+
+  it('resolves a dated model id through its dateless alias entry', () => {
+    const dated = lookupPrice({ provider: 'anthropic', model: 'claude-haiku-4-5-20251001' });
+    const alias = lookupPrice({ provider: 'anthropic', model: 'claude-haiku-4-5' });
+    expect(dated).not.toBeNull();
+    expect(dated).toEqual(alias);
+  });
+
+  it('does NOT strip non-date suffixes', () => {
+    // An 8-digit-suffix regex must not eat version-ish tails like -20b.
+    expect(lookupPrice({ provider: 'anthropic', model: 'claude-unknown-20b' })).toBeNull();
+  });
+
+  it('bills cacheWriteTokens at cacheWriteUsdPerToken when the entry declares one', () => {
+    const price = lookupPrice({ provider: 'anthropic', model: 'claude-sonnet-4-5' });
+    expect(price?.cacheWriteUsdPerToken).toBeDefined();
+    const base = calculateCost({
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-5',
+      inputTokens: 1_000,
+      outputTokens: 0,
+    });
+    const withWrite = calculateCost({
+      provider: 'anthropic',
+      model: 'claude-sonnet-4-5',
+      inputTokens: 1_000,
+      outputTokens: 0,
+      cacheWriteTokens: 1_000,
+    });
+    const writeRate = price?.cacheWriteUsdPerToken ?? 0;
+    expect((withWrite?.amount ?? 0) - (base?.amount ?? 0)).toBeCloseTo(writeRate * 1_000, 12);
+    // Anthropic write premium is 1.25x input.
+    const inputRate = price?.inputUsdPerToken ?? 0;
+    expect(writeRate).toBeCloseTo(inputRate * 1.25, 15);
+  });
+
+  it('falls back to the input rate for cache writes when the entry has no write price', () => {
+    // gpt-5 has cachedRead but no cacheWrite (OpenAI does not bill writes).
+    const price = lookupPrice({ provider: 'openai', model: 'gpt-5' });
+    expect(price?.cacheWriteUsdPerToken).toBeUndefined();
+    const base = calculateCost({
+      provider: 'openai',
+      model: 'gpt-5',
+      inputTokens: 0,
+      outputTokens: 0,
+    });
+    const withWrite = calculateCost({
+      provider: 'openai',
+      model: 'gpt-5',
+      inputTokens: 0,
+      outputTokens: 0,
+      cacheWriteTokens: 2_000,
+    });
+    const inputRate = price?.inputUsdPerToken ?? 0;
+    expect((withWrite?.amount ?? 0) - (base?.amount ?? 0)).toBeCloseTo(inputRate * 2_000, 12);
+  });
+});

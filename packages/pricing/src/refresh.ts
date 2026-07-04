@@ -133,6 +133,9 @@ function parseEntry(raw: unknown): ModelPrice {
     ...(typeof e.cachedReadUsdPerToken === 'number'
       ? { cachedReadUsdPerToken: e.cachedReadUsdPerToken }
       : {}),
+    ...(typeof e.cacheWriteUsdPerToken === 'number'
+      ? { cacheWriteUsdPerToken: e.cacheWriteUsdPerToken }
+      : {}),
     ...(typeof e.reasoningUsdPerToken === 'number'
       ? { reasoningUsdPerToken: e.reasoningUsdPerToken }
       : {}),

@@ -28,6 +28,7 @@ import { parseNdJsonStream } from '../internal/sse.js';
 import { stripTrailingSlashes } from '../internal/url-utils.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
+import { foldToolExamples } from '../tool-examples.js';
 import {
   classifyLocalProvider,
   type LocalProviderClassification,
@@ -252,7 +253,9 @@ function buildBody(
     body.options = optionsBlock;
   }
   if (req.tools !== undefined && req.tools.length > 0) {
-    body.tools = req.tools.map((t) => ({
+    // C2: fold worked examples in the adapter itself (idempotent when an
+    // upstream createProvider fold already ran).
+    body.tools = foldToolExamples(req.tools).map((t) => ({
       type: 'function',
       function: {
         name: t.name,

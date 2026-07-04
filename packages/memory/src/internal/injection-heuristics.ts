@@ -1,5 +1,5 @@
 /**
- * Offline, dependency-free heuristics that flag obvious memory-injection
+ * Offline heuristics (no provider calls) that flag obvious memory-injection
  * markers in candidate memory text (P1-4). Long-lived memory is the prime
  * target for poisoning: an injected instruction planted today fires weeks
  * later when semantically recalled, defeating session-scoped prompt-injection
@@ -17,6 +17,8 @@
  *
  * @packageDocumentation
  */
+
+import { normalizeForMatching } from '@graphorin/security/guardrails';
 
 /**
  * A single named injection-detection rule. The `label` is a stable,
@@ -121,13 +123,19 @@ export function detectMemoryInjection(
   options: InjectionHeuristicOptions = {},
 ): InjectionScan {
   const rules = options.rules ?? DEFAULT_INJECTION_RULES;
+  // C6: also scan the NFKC/zero-width-stripped fold so cheap
+  // character-injection (zero-width splits, fullwidth homoglyphs) does
+  // not slip a poisoned memory past the quarantine gate.
+  const normalized = normalizeForMatching(text);
+  const scanBoth = (pattern: RegExp): boolean =>
+    pattern.test(text) || (normalized !== text && pattern.test(normalized));
   const markers: string[] = [];
   for (const rule of rules) {
-    if (rule.pattern.test(text)) markers.push(rule.label);
+    if (scanBoth(rule.pattern)) markers.push(rule.label);
   }
   if (options.extraRules !== undefined) {
     for (const rule of options.extraRules) {
-      if (!markers.includes(rule.label) && rule.pattern.test(text)) markers.push(rule.label);
+      if (!markers.includes(rule.label) && scanBoth(rule.pattern)) markers.push(rule.label);
     }
   }
   return { flagged: markers.length > 0, markers: Object.freeze(markers) };

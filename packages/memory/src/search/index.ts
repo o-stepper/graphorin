@@ -12,6 +12,13 @@ export {
   type RecalledMemoryExplanation,
 } from './explain.js';
 export {
+  type FitFusionCase,
+  type FitFusionOptions,
+  type FitFusionResult,
+  fitFusionWeights,
+  ndcgAtK,
+} from './fit-weights.js';
+export {
   assessQueryDifficulty,
   buildGradeRequest,
   createProviderRetrievalGrader,
@@ -43,4 +50,5 @@ export {
   type QueryTransformOptions,
 } from './query-transform.js';
 export { fuseRrf, fuseWeighted, RRF_DEFAULT_K, RRFReranker, WeightedRRFReranker } from './rrf.js';
+export { isForeignProvenance, trustDiscount } from './trust.js';
 export type { ReRanker, ReRankOptions } from './types.js';

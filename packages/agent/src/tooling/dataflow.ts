@@ -13,10 +13,12 @@
  * Because the agent builds one executor that serves the whole run (and the
  * code-mode quiet executor too), the guard keeps a per-run ledger map.
  * The live ledger (with its verbatim-probe spans) is in-memory and
- * run-scoped, but its COARSE summary survives suspend/resume: the agent
- * persists `snapshotLedger()` onto `RunState.taintSummary` on every exit
- * and re-seeds via `seedLedger()` on resume (AG-19 / agent-08) — only the
- * span-level verbatim probe restarts. The map is bounded by
+ * run-scoped, but its summary survives suspend/resume: the agent persists
+ * `snapshotLedger()` onto `RunState.taintSummary` on every exit and
+ * re-seeds via `seedLedger()` on resume (AG-19 / agent-08). The summary
+ * carries the coarse flags plus ONE-WAY span-tile hashes (C6) — never
+ * untrusted text — so the verbatim probe re-arms for pre-suspend content
+ * at tile granularity while live spans keep full sensitivity. The map is bounded by
  * insertion-order eviction so a long-lived agent never leaks ledgers.
  *
  * @packageDocumentation
@@ -67,6 +69,13 @@ export interface DataFlowGuardWithLedgers extends DataFlowGuard {
   snapshotLedger(runId: string): TaintLedgerSnapshot | undefined;
   /** Pre-seed a run's ledger from a persisted summary on resume. */
   seedLedger(runId: string, summary: TaintLedgerSnapshot): void;
+  /**
+   * C6: record the model's own step output as derived-untrusted (no-op on
+   * an untainted run). Makes the verbatim probe catch args the model
+   * copied from its own untrusted-derived phrasing, and feeds the
+   * `derivedTaint: 'strict'` policy leg.
+   */
+  recordAssistant(runId: string, text: string): void;
 }
 
 export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardWithLedgers {
@@ -118,7 +127,7 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
 
     record(input: DataFlowRecordInput): void {
       const ledger = ledgerFor(input.runContext.runId);
-      const label = deriveTaintLabel({
+      const derived = deriveTaintLabel({
         trustClass: input.trustClass,
         ...(input.source !== undefined ? { source: input.source } : {}),
         ...(input.sensitivity !== undefined ? { sensitivity: input.sensitivity } : {}),
@@ -126,7 +135,27 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
         // configured tiers (default secret-only ⇒ byte-identical).
         ...(config.sensitiveTiers !== undefined ? { sensitiveTiers: config.sensitiveTiers } : {}),
       });
+      // C6: a ToolReturn taint override only ever WIDENS the derived
+      // label — a first-party recall tool can mark quarantined content
+      // untrusted, but nothing can launder an untrusted tool's output.
+      const override = input.taintOverride;
+      const label =
+        override === undefined
+          ? derived
+          : {
+              ...derived,
+              untrusted: derived.untrusted || override.untrusted === true,
+              sensitive: derived.sensitive || override.sensitive === true,
+              ...(override.untrusted === true && override.sourceKind !== undefined
+                ? { sourceKind: override.sourceKind }
+                : {}),
+            };
       ledger.recordOutput(label, input.outputText);
+    },
+
+    recordAssistant(runId: string, text: string): void {
+      if (text.length === 0) return;
+      ledgerFor(runId).recordAssistantOutput?.(text);
     },
 
     // AG-19: snapshot/rehydrate the run's coarse taint summary across a

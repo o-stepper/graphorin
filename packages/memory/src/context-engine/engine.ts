@@ -504,7 +504,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       ? {
           kind: 'summarize-old-preserve-recent',
           preserveRecentTurns: 6,
-          templateName: 'summary-9-section',
+          templateName: 'summary-sections',
         }
       : compactionInput.strategy;
   // SOTA-4 reclaim-floor: defer a compaction whose older (compactable) portion
@@ -708,6 +708,32 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
   let lastCompactionAfterTokens: number | null = null;
   const REARM_GROWTH_TOKENS = 256;
 
+  // C4 (context-engine-06/07 hardening): a persistently-failing summarizer
+  // previously re-fired an LLM call at the top of EVERY step (the
+  // anti-thrash guard arms only on success). Count consecutive failures —
+  // including "successful" passes that did not actually shrink the buffer
+  // — retry each pass once with a short backoff, and after
+  // MAX_CONSECUTIVE_COMPACTION_FAILURES disable the AUTO trigger until a
+  // later compactNow (e.g. a manual compact with a fixed summarizer)
+  // succeeds and re-arms it.
+  let consecutiveCompactionFailures = 0;
+  let autoCompactionDisabledByFailures = false;
+  const MAX_CONSECUTIVE_COMPACTION_FAILURES = 3;
+  const COMPACTION_RETRY_BACKOFF_MS = 250;
+
+  function recordCompactionFailure(reason: string): void {
+    consecutiveCompactionFailures += 1;
+    if (
+      consecutiveCompactionFailures >= MAX_CONSECUTIVE_COMPACTION_FAILURES &&
+      !autoCompactionDisabledByFailures
+    ) {
+      autoCompactionDisabledByFailures = true;
+      process.stderr.write(
+        `[graphorin/memory] auto-compaction disabled after ${consecutiveCompactionFailures} consecutive failed passes (last: ${reason}). Manual compactNow() still runs and re-enables the trigger on success.\n`,
+      );
+    }
+  }
+
   async function shouldCompact(
     messages: ReadonlyArray<Message>,
     options: {
@@ -716,6 +742,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     } = {},
   ): Promise<boolean> {
     if (!compactionEnabled) return false;
+    if (autoCompactionDisabledByFailures) return false;
     if (compactionThresholdTokens === Number.POSITIVE_INFINITY) return false;
     const total = options.precomputedTokens ?? (await countMessageTokens(messages, tokenCounter));
     if (total < compactionThresholdTokens) return false;
@@ -790,7 +817,55 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       now,
       ...(callInput.signal !== undefined ? { signal: callInput.signal } : {}),
     };
-    const result = await executeCompaction(compactionInputCall);
+    // C4: one retry with a short backoff on summarizer failure, then a
+    // strictly-smaller-than-input assert — a pass that dropped messages
+    // yet did not shrink the buffer is a failure (a looping/echoing
+    // summarizer), not a success to arm the anti-thrash guard with.
+    let result: CompactionResult;
+    try {
+      result = await executeCompaction(compactionInputCall);
+    } catch (firstError) {
+      if (callInput.signal?.aborted === true) throw firstError;
+      await new Promise<void>((resolve) => setTimeout(resolve, COMPACTION_RETRY_BACKOFF_MS));
+      try {
+        result = await executeCompaction(compactionInputCall);
+      } catch (secondError) {
+        recordCompactionFailure(
+          secondError instanceof Error ? secondError.message : String(secondError),
+        );
+        throw secondError;
+      }
+    }
+    if (result.droppedMessageIndices.length > 0 && result.afterTokens >= result.beforeTokens) {
+      const reason = `compaction did not shrink the buffer (${result.beforeTokens} -> ${result.afterTokens} tokens)`;
+      if (callInput.source === 'auto-trigger') {
+        // The auto loop must never keep paying for passes that grow the
+        // buffer (the Gemini-CLI compression-loop class) — fail the pass.
+        recordCompactionFailure(reason);
+        throw new Error(`[graphorin/memory] ${reason}`);
+      }
+      // An operator-requested compaction of a small window can
+      // legitimately cost more than it reclaims (the summary skeleton
+      // has a floor) — warn, hand back the result, count nothing.
+      process.stderr.write(`[graphorin/memory] ${reason} (source: ${callInput.source}).\n`);
+    } else if (result.droppedMessageIndices.length > 0) {
+      // A pass that actually reclaimed space re-arms the auto trigger.
+      consecutiveCompactionFailures = 0;
+      if (autoCompactionDisabledByFailures) {
+        autoCompactionDisabledByFailures = false;
+        process.stderr.write(
+          '[graphorin/memory] auto-compaction re-enabled after a successful pass.\n',
+        );
+      }
+    }
+    // C4: hand hooks the DROPPED message content (not just indices) so
+    // re-anchoring hooks like reanchorRecentResults can recover the
+    // result handles that just left the window. Reference-diff against
+    // trimmedMessages (both strategies carry surviving originals by
+    // reference; the per-strategy index spaces differ, so indices are
+    // not usable here).
+    const survivors = new Set(result.trimmedMessages);
+    const droppedMessages = callInput.messages.filter((m) => !survivors.has(m));
     const ctx = {
       result,
       scope: callInput.scope,
@@ -798,6 +873,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       sessionId: callInput.sessionId,
       agentId: callInput.agentId,
       source: callInput.source,
+      droppedMessages,
     };
     const hookFailures: Array<{ readonly hookName: string; readonly reason: string }> = [];
     const extraContent: MessageContent[] = [];

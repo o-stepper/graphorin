@@ -27,6 +27,15 @@ export interface ToolSearchToolOptions {
   readonly defaultK?: number;
   /** Hard cap on `k` (model-supplied). Default `15`. */
   readonly maxK?: number;
+  /**
+   * When matched tools become callable, reflected in the model-facing
+   * description so the model is never promised availability the harness
+   * does not deliver. `'next-step'` (default) matches the agent's
+   * immediate promotion mode; `'next-run'` matches
+   * `toolPromotion: 'run-boundary'` (C1), where the catalogue is frozen
+   * for the current run.
+   */
+  readonly availability?: 'next-step' | 'next-run';
 }
 
 const inputSchema = z.object({
@@ -59,10 +68,13 @@ export function createToolSearchTool(
 ): Tool<ToolSearchInput, ToolSearchOutput> {
   const defaultK = opts.defaultK ?? 5;
   const maxK = opts.maxK ?? 15;
+  const availabilityText =
+    opts.availability === 'next-run'
+      ? "the matched tools are recorded and become available on the agent's NEXT run (the current run's catalogue is frozen)."
+      : 'the matched tools become available on the NEXT step of the agent loop.';
   return tool<ToolSearchInput, ToolSearchOutput>({
     name: 'tool_search',
-    description:
-      "Search the agent's deferred-tool catalogue for tools matching a natural-language query. Returns up to `k` matched tools with their name, description, JSON Schema, score, and the ranking stage that produced the match. Invoke this tool BEFORE attempting an unknown tool — the matched tools become available on the NEXT step of the agent loop.",
+    description: `Search the agent's deferred-tool catalogue for tools matching a natural-language query. Returns up to \`k\` matched tools with their name, description, JSON Schema, score, and the ranking stage that produced the match. Invoke this tool BEFORE attempting an unknown tool — ${availabilityText}`,
     inputSchema,
     outputSchema,
     sideEffectClass: 'read-only',

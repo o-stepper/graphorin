@@ -48,8 +48,8 @@ export function detectProviderFamily(args: {
   const modelLower = args.model.toLowerCase().replace(/^(?:us|eu|apac|jp|au|us-gov)\./, '');
   // The AI SDK reports dotted provider ids ('anthropic.messages',
   // 'amazon-bedrock.messages'), so match by prefix / substring.
-  const providerIsAnthropic = provider !== undefined && provider.startsWith('anthropic');
-  const providerIsBedrock = provider !== undefined && provider.includes('bedrock');
+  const providerIsAnthropic = provider?.startsWith('anthropic');
+  const providerIsBedrock = provider?.includes('bedrock');
   if (
     providerIsAnthropic ||
     modelLower.startsWith('claude') ||

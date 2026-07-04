@@ -263,3 +263,46 @@ function flattenToText(content: string | ReadonlyArray<MessageContent>): string 
   }
   return buffer.join('');
 }
+
+/**
+ * Decorate the first and last converted conversation messages with an
+ * Anthropic `cacheControl` provider option (core-provider-02).
+ *
+ * The first-message anchor makes tools + system + the stable prefix a
+ * cache segment that is written once and read on every later step; the
+ * last-message anchor caches the whole conversation so each step's write
+ * becomes the next step's read. Non-Anthropic models ignore the option.
+ * A single-message conversation gets one anchor.
+ */
+export function applyCacheAnchors(
+  messages: ReadonlyArray<Readonly<Record<string, unknown>>>,
+  ttl?: '5m' | '1h',
+): ReadonlyArray<Readonly<Record<string, unknown>>> {
+  if (messages.length === 0) return messages;
+  const cacheControl: Record<string, unknown> = {
+    type: 'ephemeral',
+    ...(ttl === '1h' ? { ttl: '1h' } : {}),
+  };
+  const decorate = (msg: Readonly<Record<string, unknown>>): Readonly<Record<string, unknown>> => {
+    const existing =
+      typeof msg.providerOptions === 'object' && msg.providerOptions !== null
+        ? (msg.providerOptions as Record<string, unknown>)
+        : {};
+    const anthropic =
+      typeof existing.anthropic === 'object' && existing.anthropic !== null
+        ? (existing.anthropic as Record<string, unknown>)
+        : {};
+    return {
+      ...msg,
+      providerOptions: { ...existing, anthropic: { ...anthropic, cacheControl } },
+    };
+  };
+  if (messages.length === 1) {
+    const only = messages[0];
+    return only === undefined ? messages : [decorate(only)];
+  }
+  const first = messages[0];
+  const last = messages[messages.length - 1];
+  if (first === undefined || last === undefined) return messages;
+  return [decorate(first), ...messages.slice(1, -1), decorate(last)];
+}

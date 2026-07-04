@@ -19,7 +19,7 @@
  * @packageDocumentation
  */
 
-import type { Sensitivity, SideEffectClass, ToolSource, ToolTrustClass } from '@graphorin/core';
+import type { Sensitivity, SideEffectClass, ToolTrustClass } from '@graphorin/core';
 
 /**
  * Operating mode for {@link DataFlowPolicy}.
@@ -48,10 +48,16 @@ export type DataFlowMode = 'off' | 'shadow' | 'enforce';
  *   even when no verbatim carry is provable. Catches the paraphrased
  *   "untrusted instruction drives a secret exfiltration" case at the cost
  *   of more false positives (hence shadow-mode-first + declassification).
+ * - `'derived-untrusted-to-sink'` (C6, `derivedTaint: 'strict'`) — the
+ *   CaMeL-style control-flow-integrity signal: once untrusted content has
+ *   entered the run, EVERY subsequent model-driven sink call is treated
+ *   as derived from it — paraphrase-robust by construction, deliberately
+ *   coarse. Fires only when the verbatim probe did not already match
+ *   (verbatim keeps the precise label).
  *
  * @stable
  */
-export type TaintFlowKind = 'untrusted-to-sink' | 'lethal-trifecta';
+export type TaintFlowKind = 'untrusted-to-sink' | 'lethal-trifecta' | 'derived-untrusted-to-sink';
 
 /**
  * Provenance label derived from a tool's registration metadata. Describes
@@ -63,8 +69,13 @@ export type TaintFlowKind = 'untrusted-to-sink' | 'lethal-trifecta';
 export interface TaintLabel {
   /** Resolved trust class of the producing tool. */
   readonly trustClass: ToolTrustClass;
-  /** The producing tool's source kind (`'unknown'` when unattributed). */
-  readonly sourceKind: ToolSource['kind'] | 'unknown';
+  /**
+   * The producing tool's source kind (`'unknown'` when unattributed).
+   * Typically a `ToolSource['kind']`; C6 widens the type to `string` so
+   * derived labels can carry descriptive kinds (`'llm-derived'`,
+   * `'memory-recall'`, `'resumed-untrusted'`).
+   */
+  readonly sourceKind: string;
   /** The producing tool's declared sensitivity (`'unknown'` when absent). */
   readonly sensitivity: Sensitivity | 'unknown';
   /**
@@ -112,6 +123,15 @@ export interface ArgsTaintProbe {
 export interface TaintLedger {
   /** Record one tool output's provenance (and its text, if untrusted). */
   recordOutput(label: TaintLabel, outputText: string): void;
+  /**
+   * C6: record the MODEL's own output as derived-untrusted once untrusted
+   * content has entered the run. Tracks the text as untrusted spans (source
+   * kind `'llm-derived'`) so a later sink call whose args copy the model's
+   * paraphrase-adjacent phrasing still trips the verbatim probe. No-op
+   * while the run is untainted. Optional so third-party ledgers keep
+   * compiling; the built-in ledger implements it.
+   */
+  recordAssistantOutput?(text: string): void;
   /** Probe a sink's serialized arguments for verbatim untrusted carry. */
   inspectArgs(argsText: string): ArgsTaintProbe;
   /** `true` once any untrusted-source output has entered the run. */
@@ -141,6 +161,16 @@ export interface TaintLedgerSnapshot {
   readonly untrustedSeen: boolean;
   readonly sensitiveSeen: boolean;
   readonly untrustedSourceKinds: ReadonlyArray<string>;
+  /**
+   * C6: one-way FNV-1a hashes of non-overlapping normalized-text tiles of
+   * the tracked untrusted spans (stride = the probe window). Lets a
+   * resumed run re-arm the verbatim probe for content ingested BEFORE the
+   * suspend without persisting any untrusted text (hashes only). A
+   * rehydrated probe detects copies of at least `2*window-1` normalized
+   * chars; live spans recorded after the resume keep full stride-1
+   * sensitivity.
+   */
+  readonly spanTileHashes?: ReadonlyArray<string>;
 }
 
 /**
@@ -192,6 +222,19 @@ export interface DataFlowPolicyConfig {
    * (SDF-5). Default `20`.
    */
   readonly minSpanLength?: number;
+  /**
+   * C6 (pairs security-05): derived-taint propagation mode.
+   *
+   * - `'off'` (default) — current behaviour: sinks gate on verbatim carry
+   *   and (optionally) the lethal trifecta.
+   * - `'strict'` — CaMeL-style control-flow integrity: once untrusted
+   *   content has entered the run, EVERY model-driven sink call fires the
+   *   `derived-untrusted-to-sink` flow (paraphrase-robust by
+   *   construction). Deliberately coarse — in `'enforce'` mode this
+   *   blocks all post-ingestion sinks except `declassifySinks`; pair with
+   *   shadow mode first to size the impact.
+   */
+  readonly derivedTaint?: 'off' | 'strict';
 }
 
 /**

@@ -288,3 +288,94 @@ describe('openAICompatibleAdapter', () => {
     ).rejects.toThrow(/timed out after 25ms/);
   });
 });
+
+describe('prompt-cache usage on the OpenAI wire (core-provider-02)', () => {
+  it('maps prompt_tokens_details.cached_tokens onto Usage.cachedReadTokens', async () => {
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-test',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({
+        body: makeSseStream([
+          { choices: [{ delta: { content: 'hi' } }] },
+          {
+            choices: [{ finish_reason: 'stop' }],
+            usage: {
+              prompt_tokens: 120,
+              completion_tokens: 4,
+              total_tokens: 124,
+              prompt_tokens_details: { cached_tokens: 100 },
+            },
+          },
+          '[DONE]',
+        ]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    // prompt_tokens already INCLUDES the cached subset on this wire.
+    expect(finish.usage.promptTokens).toBe(120);
+    expect(finish.usage.cachedReadTokens).toBe(100);
+    expect(finish.usage.cacheWriteTokens).toBeUndefined();
+  });
+
+  it('absent details leave the pre-cache Usage shape untouched', async () => {
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-test',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({
+        body: makeSseStream([
+          { choices: [{ delta: { content: 'hi' } }] },
+          {
+            choices: [{ finish_reason: 'stop' }],
+            usage: { prompt_tokens: 8, completion_tokens: 2, total_tokens: 10 },
+          },
+          '[DONE]',
+        ]),
+      }),
+      logger: () => {},
+    });
+    const events = await collect(provider.stream({ messages: [{ role: 'user', content: 'hi' }] }));
+    const finish = events.at(-1);
+    if (finish?.type !== 'finish') throw new Error('expected finish');
+    expect(finish.usage).toEqual({ promptTokens: 8, completionTokens: 2, totalTokens: 10 });
+  });
+});
+
+describe('C2 — adapter-level worked-example folding (OpenAI wire)', () => {
+  it('folds examples into function.description on the raw adapter path', async () => {
+    const capture: { init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-test',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({
+        body: makeSseStream([
+          { choices: [{ delta: { content: 'ok' } }] },
+          { choices: [{ finish_reason: 'stop' }] },
+          '[DONE]',
+        ]),
+        capture,
+      }),
+      logger: () => {},
+    });
+    await collect(
+      provider.stream({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: [
+          {
+            name: 'weather',
+            description: 'look up the weather',
+            inputSchema: { type: 'object' },
+            examples: [{ input: { city: 'kyiv' }, output: 'sunny' }],
+          },
+        ],
+      }),
+    );
+    const body = JSON.parse(String(capture.init?.body ?? '{}')) as {
+      tools?: Array<{ function?: { description?: string } }>;
+    };
+    expect(body.tools?.[0]?.function?.description).toContain('Examples:');
+    expect(body.tools?.[0]?.function?.description).toContain('"city":"kyiv"');
+  });
+});

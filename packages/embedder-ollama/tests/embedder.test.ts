@@ -284,8 +284,11 @@ describe('createOllamaEmbedder', () => {
   }
 });
 
+// The two integration tests below open real sqlite stores on disk; the
+// windows-latest CI runner routinely needs >5s for that (observed 4.4-5s+),
+// so they carry an explicit 20s timeout instead of the 5s default.
 describe('lock-on-first integration with @graphorin/store-sqlite', () => {
-  it('per-model embedder_id is distinct for each Ollama family', async () => {
+  it('per-model embedder_id is distinct for each Ollama family', { timeout: 20_000 }, async () => {
     // Use mkdtemp to keep the test self-contained; we import store-sqlite
     // dynamically because it's a sibling workspace package.
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-ollama-lock-'));
@@ -321,7 +324,9 @@ describe('lock-on-first integration with @graphorin/store-sqlite', () => {
     await store.close();
   });
 
-  it('lock-on-first rejects a second incompatible Ollama embedder', async () => {
+  it('lock-on-first rejects a second incompatible Ollama embedder', {
+    timeout: 20_000,
+  }, async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-ollama-lock2-'));
     const { createSqliteStore } = await import('@graphorin/store-sqlite');
     const store = await createSqliteStore({

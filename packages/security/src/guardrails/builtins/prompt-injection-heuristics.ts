@@ -20,6 +20,7 @@
  */
 
 import { defineInputGuardrail } from '../builders.js';
+import { normalizeForMatching } from '../normalize.js';
 import type { GuardrailResult, InputGuardrail } from '../types.js';
 
 /**
@@ -75,9 +76,15 @@ export function promptInjectionHeuristics<TValue = unknown>(
     name,
     check: (value: TValue): GuardrailResult<TValue> => {
       const text = textOf(value);
+      // C6: match against the raw text AND the NFKC/zero-width-stripped
+      // fold, so cheap character-injection (zero-width splits, fullwidth
+      // homoglyphs) does not slip past the catalogue.
+      const normalized = normalizeForMatching(text);
       const matched: string[] = [];
       for (const pattern of patterns) {
-        if (pattern.test(text)) matched.push(pattern.source);
+        if (pattern.test(text) || (normalized !== text && pattern.test(normalized))) {
+          matched.push(pattern.source);
+        }
       }
       if (matched.length === 0) return { ok: true };
       return {

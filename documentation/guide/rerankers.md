@@ -17,6 +17,17 @@ network, and no extra dependency — it is the always-on default and is usually
 enough. Reach for a learned reranker only when you measure a relevance gain on
 your own data.
 
+After fusion (and decay, when enabled), a **rank-time trust discount** applies:
+quarantined-but-included rows are down-weighted by `1 - quarantine` (default
+0.3x) and foreign-provenance rows (`tool` / `imported` / `reflection` /
+`induction`) by `1 - foreignProvenance` (default 0.8x), reusing the eviction
+path's `SalienceWeights`. First-party active facts keep factor `1`, so ordinary
+rankings are unchanged — the discount only stops a poisoned or foreign memory
+from outranking the user's own words on pure similarity (the MINJA
+memory-poisoning defense). The factor appears as the `trust` signal on hits and
+in `explainRecall`; pass `trustWeighting: 'off'` per call for inspector or
+calibration paths.
+
 ## Weighted fusion
 
 RRF treats the keyword ranking and the vector ranking as equally trustworthy.
@@ -37,13 +48,34 @@ and behaviour is unchanged; *equal weights reproduce RRF exactly*, so weighting 
 a safe, incremental lever. Weights default to `1`, and a missing or malformed
 weight degrades to neutral rather than poisoning the ranking.
 
-For offline weight tuning against your eval set, the pure
-`fuseWeighted(lists, weights, k)` function and the `WeightedRRFReranker` class are
-exported from `@graphorin/memory/search`; pass the reranker to `setReranker(...)`
-or `createMemory({ reranker })` to make a calibrated weighting the default for
-every query.
+For offline weight tuning against labelled queries, use
+`fitFusionWeights(cases, { grid, k })` from `@graphorin/memory/search`: give it
+per-kind candidate lists (run your FTS and vector retrievers once per query)
+plus the relevant ids, and it grid-searches the weights that maximize mean
+nDCG@k — returning the plain-RRF baseline alongside, so you only adopt a
+weighting that measurably wins. Feed the result to the per-call
+`fusion: { strategy: 'weighted', weights }` option shown above.
+
+::: warning Do not install a raw `WeightedRRFReranker` as the process default
+`WeightedRRFReranker` takes a **positional** weights array. The built-in search
+fans candidate lists out conditionally (`fts_0, vector_0, fts_1, …, hyde,
+graph` under `multiQuery`/`hyde`/`expandHops`), so position N no longer means
+"FTS" or "vector" — `search()` makes weights safe only by rebuilding a per-call
+reranker from the *kind-keyed* `fusion.weights`. A fixed positional array
+installed via `setReranker(...)` / `createMemory({ reranker })` silently
+mis-assigns weights the moment any fan-out option is used; prefer the per-call
+`fusion` option, which survives fan-out by construction.
+:::
 
 ## Optional learned rerankers
+
+When you outgrow fusion, reach for the **local cross-encoder first**
+(`@graphorin/reranker-transformersjs`): pointwise cross-encoders dominate
+LLM-as-judge reranking on every axis in published benchmarks (~0.74 vs 0.68
+NDCG@10, ~12ms vs ~185ms per query, an order of magnitude cheaper), run fully
+in-process after the one-time model download, and are deterministic. Reserve
+`@graphorin/reranker-llm` for the cases a cross-encoder cannot express (bespoke
+scoring instructions, non-text criteria).
 
 | | `@graphorin/reranker-llm` | `@graphorin/reranker-transformersjs` |
 |---|---|---|

@@ -575,13 +575,35 @@ export async function createMCPClientFromSdkTransport(
     }
     lastToolFingerprints = adapted.fingerprints;
     // MC-6: operator pins from a previously approved snapshot — the
-    // rug-pull (approve-then-swap across restarts) posture.
-    const pins = toolsOpts?.pinnedFingerprints;
+    // rug-pull (approve-then-swap across restarts) posture. C6 extends it
+    // with durable trust-on-first-use via `pinStore`: the first snapshot
+    // is RECORDED, later snapshots are COMPARED, and a store-backed
+    // mismatch defaults to 'reject' (a persisted first approval is an
+    // explicit trust decision).
+    let pins = toolsOpts?.pinnedFingerprints;
+    let mismatchAction = toolsOpts?.onPinMismatch ?? 'warn';
+    const pinStore = toolsOpts?.pinStore;
+    if (pins === undefined && pinStore !== undefined) {
+      const stored = await pinStore.get(serverIdentity.id);
+      if (stored === undefined) {
+        const recorded: Record<string, string> = {};
+        for (const [name, hash] of adapted.fingerprints) recorded[name] = hash;
+        await pinStore.set(serverIdentity.id, recorded);
+        incrementCounter('mcp.tools.pins-recorded.total', { server: serverIdentity.id });
+        options.logger?.('info', 'mcp.tools.pins-recorded: first-use fingerprints stored', {
+          server: serverIdentity.id,
+          tools: Object.keys(recorded).length,
+        });
+      } else {
+        pins = stored;
+        mismatchAction = toolsOpts?.onPinMismatch ?? 'reject';
+      }
+    }
     if (pins !== undefined) {
       for (const [name, pinned] of Object.entries(pins)) {
         const current = adapted.fingerprints.get(name);
         if (current !== undefined && current !== pinned) {
-          if (toolsOpts?.onPinMismatch === 'reject') {
+          if (mismatchAction === 'reject') {
             throw new MCPToolPinningError(
               `MCP tool '${name}' no longer matches its pinned definition fingerprint — the server changed the definition behind an approved name.`,
               { metadata: { server: serverIdentity.id, tool: name } },

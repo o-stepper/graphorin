@@ -2,7 +2,7 @@
  * Auto-compaction subsystem core (RB-46 / suggested DEC-162 /
  * ADR-050). Trims the in-flight ContextEngine message buffer when
  * the assembled token count crosses a per-provider threshold; the
- * trim is summarized via the configured 9-section template; the
+ * trim is summarized via the configured section template; the
  * trim is followed by synchronous-await firing of registered
  * post-compaction hooks (lifecycle owned by Phase 12; this module
  * exposes the trim primitive).
@@ -162,8 +162,32 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   while (olderCount > 0 && input.messages[olderCount]?.role === 'tool') {
     olderCount -= 1;
   }
-  const olderMessages = input.messages.slice(0, olderCount);
-  const preservedMessages = input.messages.slice(olderCount);
+  const olderRaw = input.messages.slice(0, olderCount);
+  const preservedTail = input.messages.slice(olderCount);
+
+  // C4: keep the most recent USER messages verbatim across compaction —
+  // only assistant/tool content gets summarized away. User words are the
+  // task statement; a paraphrase in the summary routinely drops the
+  // constraint that mattered. The carried messages are removed from the
+  // summarizer's input (no double-counting) and re-inserted between the
+  // summary and the preserved tail, keeping their relative order.
+  const preserveUserMessages = Math.max(0, input.strategy.preserveUserMessages ?? 2);
+  const carriedUserIndices = new Set<number>();
+  if (preserveUserMessages > 0) {
+    for (let i = olderRaw.length - 1; i >= 0 && carriedUserIndices.size < preserveUserMessages; ) {
+      if (olderRaw[i]?.role === 'user') carriedUserIndices.add(i);
+      i -= 1;
+    }
+  }
+  // Degenerate guard: on a tiny (user-dominated) window, carrying users
+  // could empty the summarizable slice and turn the whole compaction into
+  // a no-op — there, positional summarization wins.
+  if (carriedUserIndices.size > 0 && carriedUserIndices.size === olderRaw.length) {
+    carriedUserIndices.clear();
+  }
+  const olderMessages = olderRaw.filter((_, idx) => !carriedUserIndices.has(idx));
+  const carriedUserMessages = olderRaw.filter((_, idx) => carriedUserIndices.has(idx));
+  const preservedMessages = [...carriedUserMessages, ...preservedTail];
 
   if (olderMessages.length === 0) {
     return Object.freeze({
@@ -291,6 +315,12 @@ async function executeClearStrategy(
       ...(strategy.clearAtLeast !== undefined ? { clearAtLeast: strategy.clearAtLeast } : {}),
       ...(strategy.excludeTools !== undefined ? { excludeTools: strategy.excludeTools } : {}),
       ...(strategy.externalize !== undefined ? { externalize: strategy.externalize } : {}),
+      ...(strategy.clearToolInputs !== undefined
+        ? { clearToolInputs: strategy.clearToolInputs }
+        : {}),
+      ...(strategy.readResultToolName !== undefined
+        ? { readResultToolName: strategy.readResultToolName }
+        : {}),
     },
     counter,
   );

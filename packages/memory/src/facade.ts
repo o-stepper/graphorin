@@ -413,6 +413,10 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     ...(options.iterativeRetrieval?.maxIterations !== undefined
       ? { iterativeMaxIterations: options.iterativeRetrieval.maxIterations }
       : {}),
+    // C5: the same weights drive eviction salience and rank-time trust.
+    ...(options.consolidator?.salienceWeights !== undefined
+      ? { trustWeights: options.consolidator.salienceWeights }
+      : {}),
   });
   // P2-2: build the (opt-in) workflow inducer. Absent ⇒ `null` ⇒
   // `ProceduralMemory.induce(...)` throws and the tier stays offline CRUD.

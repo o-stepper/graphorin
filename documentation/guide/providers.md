@@ -221,9 +221,32 @@ import { createDefaultCounter, setGlobalTokenCounter } from '@graphorin/provider
 setGlobalTokenCounter(createDefaultCounter({ model: 'gpt-4o' }));
 ```
 
+## Prompt caching
+
+Prompt-cache reads are billed at roughly a tenth of the input price, and for a multi-step agent that resends its transcript every step the cache hit rate is the single biggest cost lever. Graphorin's support has three legs:
+
+1. **Usage accounting.** `Usage` carries `cachedReadTokens` / `cacheWriteTokens` (both subsets of `promptTokens`). The vercel adapter maps the AI SDK's `inputTokenDetails`; the OpenAI-compatible adapter maps `prompt_tokens_details.cached_tokens`. The fields flow through `step.end` events, `RunState.usage`, `usageByModel`, and `withCostTracking`'s `onUsage` hook.
+2. **Cost.** `ModelPrice` has `cachedReadUsdPerToken` and `cacheWriteUsdPerToken`; `calculateCost(...)` and `withCostTracking`'s `priceLookup` bill each leg at its own rate (a missing cache rate falls back to the full input rate, never cheaper than reality).
+3. **Breakpoints.** Caching on Anthropic is opt-in per request. Set the policy once on the agent and every request carries it:
+
+```ts
+const agent = createAgent({
+  name: 'assistant',
+  instructions: '...',
+  provider,
+  cachePolicy: { breakpoints: 'auto' }, // optional ttl: '1h'
+});
+```
+
+With `breakpoints: 'auto'` the vercel adapter anchors `cache_control` markers on the first and last conversation messages, so tools + system + the stable prefix are written once and read at the discounted rate on every later step; each step's write becomes the next step's read. OpenAI caches automatically (no markers needed); providers without a cache concept ignore the policy.
+
+Two loop-side properties protect the cache hit rate: the transcript is append-only with a pinned system prefix, and the tool catalogue grows append-only — eager tools and handoffs serialize before promoted tools, so a `tool_search` promotion appends at the end instead of shifting the prefix. If even that invalidation is too expensive, `toolPromotion: 'run-boundary'` freezes the advertised catalogue for the whole run (discoveries persist on `RunState.promotedTools` and join the catalogue on the next run).
+
 ## Pricing
 
 `@graphorin/pricing` ships a bundled snapshot of LLM pricing data sourced from the public [`@pydantic/genai-prices`](https://github.com/pydantic/genai-prices) dataset (MIT). The snapshot is **never refreshed automatically** — call `graphorin pricing refresh` to update it on demand. See [Pricing](/reference/pricing) for the full lifecycle.
+
+Models released after the bundled snapshot date (for example the Claude 5 family) intentionally have **no entry**: cost tracking reports `null` plus one WARN per model instead of an invented number, and a release-gate test (`snapshot-coverage.test.ts`) keeps the classifier and the snapshot from drifting apart silently. Refresh the snapshot or contribute the entry once vendor pricing is public.
 
 ## Next steps
 

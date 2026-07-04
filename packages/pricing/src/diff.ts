@@ -12,6 +12,7 @@ const COMPARED_FIELDS: ReadonlyArray<keyof ModelPrice> = [
   'inputUsdPerToken',
   'outputUsdPerToken',
   'cachedReadUsdPerToken',
+  'cacheWriteUsdPerToken',
   'reasoningUsdPerToken',
   'region',
   'notes',

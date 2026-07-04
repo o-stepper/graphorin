@@ -197,3 +197,150 @@ describe('vercelAdapter against the real AI SDK', () => {
     ).rejects.toThrow(/messages do not match|InvalidPrompt|system messages are not allowed/i);
   });
 });
+
+describe('prompt-cache economics against the real AI SDK (core-provider-02)', () => {
+  it('stream(): v7 inputTokenDetails map onto Usage cache legs; reasoning is split out', async () => {
+    const model = new MockLanguageModelV4({
+      doStream: (async () => ({
+        stream: convertArrayToReadableStream([
+          { type: 'stream-start', warnings: [] },
+          { type: 'text-start', id: 't1' },
+          { type: 'text-delta', id: 't1', delta: 'hi' },
+          { type: 'text-end', id: 't1' },
+          {
+            type: 'finish',
+            finishReason: 'stop',
+            usage: {
+              inputTokens: { total: 100, noCache: 10, cacheRead: 80, cacheWrite: 10 },
+              outputTokens: { total: 9, text: 5, reasoning: 4 },
+            },
+          },
+        ] as never),
+      })) as never,
+    });
+    const adapter = vercelAdapter(model, { runtimeOverrides: realRuntime() });
+
+    let finish: Extract<ProviderEvent, { type: 'finish' }> | undefined;
+    for await (const event of adapter.stream({ messages: TOOL_CONVERSATION })) {
+      if (event.type === 'finish') finish = event;
+    }
+
+    expect(finish?.usage.promptTokens).toBe(100);
+    expect(finish?.usage.cachedReadTokens).toBe(80);
+    expect(finish?.usage.cacheWriteTokens).toBe(10);
+    // Exclusive split: completion + reasoning === the wire's output total.
+    expect(finish?.usage.completionTokens).toBe(5);
+    expect(finish?.usage.reasoningTokens).toBe(4);
+  });
+
+  it('generate(): cache legs survive the one-shot path too', async () => {
+    const model = new MockLanguageModelV4({
+      doGenerate: (async () => ({
+        finishReason: 'stop',
+        usage: {
+          inputTokens: { total: 50, noCache: 50 },
+          outputTokens: { total: 3, text: 3 },
+        },
+        content: [{ type: 'text', text: 'ok' }],
+        warnings: [],
+      })) as never,
+    });
+    const adapter = vercelAdapter(model, { runtimeOverrides: realRuntime() });
+    const response = await adapter.generate({ messages: TOOL_CONVERSATION });
+    expect(response.usage.promptTokens).toBe(50);
+    // Zero cache activity leaves the pre-cache Usage shape untouched.
+    expect(response.usage.cachedReadTokens).toBeUndefined();
+    expect(response.usage.cacheWriteTokens).toBeUndefined();
+  });
+
+  it("cachePolicy 'auto' anchors cache_control on the first and last conversation messages", async () => {
+    let seenParams: Record<string, unknown> | undefined;
+    const model = new MockLanguageModelV4({
+      doGenerate: (async (params: unknown) => {
+        seenParams = params as Record<string, unknown>;
+        return {
+          finishReason: 'stop',
+          usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+          content: [{ type: 'text', text: 'ok' }],
+          warnings: [],
+        };
+      }) as never,
+    });
+    const adapter = vercelAdapter(model, { runtimeOverrides: realRuntime() });
+
+    await adapter.generate({
+      messages: TOOL_CONVERSATION,
+      tools: [WEATHER_TOOL],
+      cachePolicy: { breakpoints: 'auto', ttl: '1h' },
+    });
+
+    // The system message was hoisted, so the anchored conversation is
+    // [user, assistant, tool]: first + last carry the anthropic
+    // cacheControl provider option, the middle stays untouched.
+    const prompt = seenParams?.prompt as ReadonlyArray<{
+      role: string;
+      providerOptions?: { anthropic?: { cacheControl?: { type?: string; ttl?: string } } };
+    }>;
+    const conversation = prompt.filter((m) => m.role !== 'system');
+    expect(conversation).toHaveLength(3);
+    expect(conversation[0]?.providerOptions?.anthropic?.cacheControl).toEqual({
+      type: 'ephemeral',
+      ttl: '1h',
+    });
+    expect(conversation[1]?.providerOptions).toBeUndefined();
+    expect(conversation[2]?.providerOptions?.anthropic?.cacheControl).toEqual({
+      type: 'ephemeral',
+      ttl: '1h',
+    });
+  });
+
+  it("cachePolicy 'none' / absent leaves messages byte-identical", async () => {
+    let seenParams: Record<string, unknown> | undefined;
+    const model = new MockLanguageModelV4({
+      doGenerate: (async (params: unknown) => {
+        seenParams = params as Record<string, unknown>;
+        return {
+          finishReason: 'stop',
+          usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+          content: [{ type: 'text', text: 'ok' }],
+          warnings: [],
+        };
+      }) as never,
+    });
+    const adapter = vercelAdapter(model, { runtimeOverrides: realRuntime() });
+    await adapter.generate({ messages: TOOL_CONVERSATION, cachePolicy: { breakpoints: 'none' } });
+    const prompt = seenParams?.prompt as ReadonlyArray<Record<string, unknown>>;
+    expect(prompt.every((m) => m.providerOptions === undefined)).toBe(true);
+  });
+});
+
+describe('C2 — adapter-level worked-example folding', () => {
+  it('folds ToolDefinition.examples into the wire description on the RAW adapter path', async () => {
+    let seenParams: Record<string, unknown> | undefined;
+    const model = new MockLanguageModelV4({
+      doGenerate: (async (params: unknown) => {
+        seenParams = params as Record<string, unknown>;
+        return {
+          finishReason: 'stop',
+          usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+          content: [{ type: 'text', text: 'ok' }],
+          warnings: [],
+        };
+      }) as never,
+    });
+    const adapter = vercelAdapter(model, { runtimeOverrides: realRuntime() });
+    await adapter.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      tools: [
+        {
+          ...WEATHER_TOOL,
+          examples: [{ input: { city: 'kyiv' }, output: 'sunny, 25C', comment: 'plain city name' }],
+        },
+      ],
+    });
+    const tools = seenParams?.tools as ReadonlyArray<{ description?: string }>;
+    expect(tools[0]?.description).toContain('Examples:');
+    expect(tools[0]?.description).toContain('"city":"kyiv"');
+    expect(tools[0]?.description).toContain('// plain city name');
+  });
+});

@@ -24,6 +24,7 @@
 import type {
   AISpan,
   CompletedToolCall,
+  RecoveryHint,
   ResolvedTool,
   RunContext,
   Sandbox,
@@ -70,6 +71,7 @@ import {
   type SecretResolverHook,
   withSecretsScope,
 } from './tool-context.js';
+import { ToolRateLimitError } from './tool-errors.js';
 
 /** Union of `tool.execute.*` events the executor forwards through `streamingSink`. */
 export type ExecutorEvent =
@@ -179,6 +181,23 @@ export interface ExecutorOptions {
    * continues. Default {@link DEFAULT_INLINE_TOOL_TIMEOUT_MS} (60s).
    */
   readonly inlineToolTimeoutMs?: number;
+  /**
+   * C3: transparent bounded retry for transient tool failures. A failed
+   * attempt whose error kind is in `kinds` is silently re-executed with
+   * exponential backoff (a ToolRateLimitError's `retryAfterMs` wins over
+   * the computed backoff) up to `maxAttempts` TOTAL attempts — but only
+   * for `pure` / `read-only` tools or tools declaring an
+   * `idempotencyKey`, so a retry can never double a side effect.
+   *
+   * Defaults: `maxAttempts: 3`, `backoffMs: 250`, `kinds: ['rate_limited']`
+   * ('timeout' is deliberately not retried by default — stacked wall-clock
+   * timeouts multiply run latency; opt in via `kinds` when you want it).
+   */
+  readonly retry?: {
+    readonly maxAttempts?: number;
+    readonly backoffMs?: number;
+    readonly kinds?: ReadonlyArray<ToolErrorKind>;
+  };
 }
 
 /**
@@ -218,6 +237,16 @@ export interface DataFlowInspectInput {
 export interface DataFlowRecordInput {
   readonly toolName: string;
   readonly trustClass: ToolTrustClass;
+  /**
+   * C6: per-result taint override from the tool's ToolReturn envelope.
+   * Flags only ever WIDEN the derived label (guards must never let an
+   * override downgrade an untrusted tool's output).
+   */
+  readonly taintOverride?: {
+    readonly untrusted?: boolean;
+    readonly sensitive?: boolean;
+    readonly sourceKind?: string;
+  };
   readonly sensitivity?: Sensitivity;
   readonly source?: ToolSource;
   /** The (sanitized) output text the model will see. */
@@ -309,6 +338,61 @@ class InlineToolTimeoutError extends Error {
   constructor(readonly limitMs: number) {
     super(`Tool execution exceeded the ${limitMs}ms wall-clock timeout.`);
     this.name = 'InlineToolTimeoutError';
+  }
+}
+
+/**
+ * tools-06: structured carrier for a non-ok `SandboxResult` so the error
+ * kind the sandbox reported survives to the model-visible `ToolError`
+ * instead of flattening to `execution_failed`.
+ */
+class SandboxOutcomeError extends Error {
+  constructor(
+    readonly sandboxErrorKind:
+      | 'timeout'
+      | 'memory-exceeded'
+      | 'sandbox-violation'
+      | 'aborted'
+      | 'execution-failed',
+    sandboxId: string,
+    message: string,
+    cause?: unknown,
+  ) {
+    super(
+      `[sandbox:${sandboxId}] ${sandboxErrorKind}: ${message}`,
+      ...(cause !== undefined ? [{ cause }] : []),
+    );
+    this.name = 'SandboxOutcomeError';
+  }
+}
+
+/** Narrow a loosely-typed sandbox error kind onto the contract union. */
+function normalizeSandboxErrorKind(
+  kind: string,
+): 'timeout' | 'memory-exceeded' | 'sandbox-violation' | 'aborted' | 'execution-failed' {
+  switch (kind) {
+    case 'timeout':
+    case 'memory-exceeded':
+    case 'sandbox-violation':
+    case 'aborted':
+      return kind;
+    default:
+      return 'execution-failed';
+  }
+}
+
+/** Map a sandbox-reported error kind onto the model-visible ToolErrorKind. */
+function toolErrorKindForSandbox(err: SandboxOutcomeError): ToolErrorKind {
+  switch (err.sandboxErrorKind) {
+    case 'timeout':
+      return 'timeout';
+    case 'sandbox-violation':
+    case 'memory-exceeded':
+      return 'sandbox_violation';
+    case 'aborted':
+      return 'aborted';
+    default:
+      return 'execution_failed';
   }
 }
 
@@ -461,31 +545,85 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       return frozenCompleted(call, error, stepNumber);
     }
 
-    // Wrap the entire execution in a `tool.execute` AISpan so the
-    // observability layer captures `args`, `result`, `durationMs`, the
-    // resolved sandbox kind, the memory-guard tier, the sensitivity
-    // tier, the side-effect class, and the streaming hint per the
-    // GenAI Semantic Conventions extension.
-    return runContext.tracer.span<'tool.execute', CompletedToolCall>(
-      {
-        type: 'tool.execute',
-        attrs: {
-          'graphorin.tool.name': tool.name,
-          'graphorin.tool.call_id': call.toolCallId,
-          'graphorin.tool.side_effect_class': tool.__sideEffectClass,
-          'graphorin.tool.streaming_hint': tool.__streamingHint,
-          'graphorin.tool.trust_class': tool.__trustClass,
-          ...(tool.sensitivity !== undefined
-            ? { 'graphorin.tool.sensitivity': tool.sensitivity }
-            : {}),
-          ...(tool.memoryGuardTier !== undefined
-            ? { 'graphorin.tool.memory_guard.tier': tool.memoryGuardTier }
-            : {}),
+    const attempt = (): Promise<CompletedToolCall> =>
+      // Wrap the entire execution in a `tool.execute` AISpan so the
+      // observability layer captures `args`, `result`, `durationMs`, the
+      // resolved sandbox kind, the memory-guard tier, the sensitivity
+      // tier, the side-effect class, and the streaming hint per the
+      // GenAI Semantic Conventions extension.
+      runContext.tracer.span<'tool.execute', CompletedToolCall>(
+        {
+          type: 'tool.execute',
+          // C7: parent under the current agent.step span when present, so
+          // tool spans join the run's trace tree instead of starting one.
+          ...(runContext.span !== undefined ? { parent: runContext.span } : {}),
+          attrs: {
+            'graphorin.tool.name': tool.name,
+            'graphorin.tool.call_id': call.toolCallId,
+            'gen_ai.operation.name': 'execute_tool',
+            'gen_ai.tool.name': tool.name,
+            'gen_ai.tool.call.id': call.toolCallId,
+            'graphorin.tool.side_effect_class': tool.__sideEffectClass,
+            'graphorin.tool.streaming_hint': tool.__streamingHint,
+            'graphorin.tool.trust_class': tool.__trustClass,
+            ...(tool.sensitivity !== undefined
+              ? { 'graphorin.tool.sensitivity': tool.sensitivity }
+              : {}),
+            ...(tool.memoryGuardTier !== undefined
+              ? { 'graphorin.tool.memory_guard.tier': tool.memoryGuardTier }
+              : {}),
+          },
         },
-      },
-      (span) =>
-        executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span, disableRepair),
-    );
+        (span) =>
+          executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span, disableRepair),
+      );
+
+    // C3: transparent bounded retry for transient failures. Only kinds in
+    // the retry set are eligible, and — critical for correctness — only
+    // when re-running cannot double a side effect: pure/read-only tools,
+    // or tools declaring an idempotencyKey. Each attempt gets its own
+    // tool.execute span; the model never sees the swallowed attempts.
+    const retryCfg = opts.retry;
+    const maxAttempts = Math.max(1, retryCfg?.maxAttempts ?? 3);
+    const retryKinds: ReadonlySet<ToolErrorKind> = new Set(retryCfg?.kinds ?? ['rate_limited']);
+    const baseBackoffMs = retryCfg?.backoffMs ?? 250;
+    const retrySafe =
+      tool.__sideEffectClass === 'pure' ||
+      tool.__sideEffectClass === 'read-only' ||
+      tool.__hasIdempotencyKey;
+
+    let completed = await attempt();
+    let attemptsUsed = 1;
+    while (
+      attemptsUsed < maxAttempts &&
+      retrySafe &&
+      'kind' in completed.outcome &&
+      retryKinds.has(completed.outcome.kind) &&
+      !runContext.signal.aborted
+    ) {
+      const failedKind = completed.outcome.kind;
+      const retryAfterMs =
+        completed.outcome.cause instanceof ToolRateLimitError
+          ? completed.outcome.cause.retryAfterMs
+          : undefined;
+      const delayMs = retryAfterMs ?? baseBackoffMs * 2 ** (attemptsUsed - 1);
+      incrementCounter('tool.executor.retry.total', { toolName: tool.name, kind: failedKind });
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, delayMs);
+        runContext.signal.addEventListener(
+          'abort',
+          () => {
+            clearTimeout(timer);
+            resolve();
+          },
+          { once: true },
+        );
+      });
+      if (runContext.signal.aborted) break;
+      completed = await attempt();
+      attemptsUsed += 1;
+    }
+    return completed;
   }
 
   async function executeOneInSpan(
@@ -808,7 +946,14 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
             kind: 'execution-failed',
             message: 'sandbox returned a non-ok result without error metadata',
           };
-          executeError = new Error(`[sandbox:${sandbox.id}] ${errInfo.kind}: ${errInfo.message}`);
+          // tools-06: preserve the sandbox's structured kind so a
+          // violation/timeout reaches the model as its own ToolErrorKind.
+          executeError = new SandboxOutcomeError(
+            normalizeSandboxErrorKind(errInfo.kind),
+            sandbox.id,
+            errInfo.message,
+            (errInfo as { cause?: unknown }).cause,
+          );
         }
       } else {
         // TL-4: inline closures get an enforced wall-clock limit — the
@@ -904,14 +1049,25 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     if (executeError !== undefined) {
       const cancelled = linkedAbort.signal.aborted;
+      // tools-06: honour the structured carriers before flattening —
+      // sandbox results keep their reported kind, and an author-thrown
+      // ToolRateLimitError reaches the model as 'rate_limited'.
       const kind: ToolErrorKind = cancelled
         ? 'aborted'
         : executeError instanceof InlineToolTimeoutError
           ? 'timeout'
-          : 'execution_failed';
+          : executeError instanceof SandboxOutcomeError
+            ? toolErrorKindForSandbox(executeError)
+            : executeError instanceof ToolRateLimitError
+              ? 'rate_limited'
+              : 'execution_failed';
       const partialOutput =
         aggregator.chunks.length > 0
           ? toResultEnvelope({ raw: undefined, chunks: aggregator.chunks }).output
+          : undefined;
+      const retryAfterHint =
+        executeError instanceof ToolRateLimitError && executeError.retryAfterMs !== undefined
+          ? `retry after ${executeError.retryAfterMs}ms`
           : undefined;
       const error: ToolError = {
         toolCallId: call.toolCallId,
@@ -919,9 +1075,11 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         kind,
         message: cancelled ? 'Tool execution cancelled' : describe(executeError),
         cause: executeError,
-        ...(partialOutput !== undefined
-          ? { hint: 'partial output captured in stream buffer' }
-          : {}),
+        ...(retryAfterHint !== undefined
+          ? { hint: retryAfterHint }
+          : partialOutput !== undefined
+            ? { hint: 'partial output captured in stream buffer' }
+            : {}),
       };
       if (cancelled) {
         incrementCounter('tool.streaming.events.dropped.total', {
@@ -1277,6 +1435,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         ...(effectiveSensitivity !== undefined ? { sensitivity: effectiveSensitivity } : {}),
         source: effectiveSource,
         outputText: sanitization.body,
+        ...(envelope.taint !== undefined ? { taintOverride: envelope.taint } : {}),
         runContext,
       });
     }
@@ -1407,6 +1566,35 @@ interface SandboxResultLike {
   readonly error?: { readonly kind: string; readonly message: string };
 }
 
+/**
+ * C3: derive the recoverable flag + model-facing recovery hint from the
+ * error kind. Central so every error path (failWith, inline sites,
+ * synthesizeFailure) carries the envelope without per-site bookkeeping.
+ */
+function recoveryForKind(kind: ToolErrorKind): {
+  readonly recoverable: boolean;
+  readonly recoveryHint?: RecoveryHint;
+} {
+  switch (kind) {
+    case 'rate_limited':
+    case 'timeout':
+      return { recoverable: true, recoveryHint: 'retry_later' };
+    case 'invalid_input':
+      return { recoverable: false, recoveryHint: 'check_input' };
+    case 'invalid_output':
+    case 'unknown_tool':
+    case 'execution_failed':
+      return { recoverable: false, recoveryHint: 'try_alternative' };
+    case 'approval_denied':
+    case 'sandbox_violation':
+    case 'inbound_sanitization_blocked':
+    case 'dataflow_policy_blocked':
+      return { recoverable: false, recoveryHint: 'report_to_user' };
+    default:
+      return { recoverable: false };
+  }
+}
+
 function frozenCompleted(
   call: ToolCall,
   outcome: ToolOutcome,
@@ -1414,9 +1602,13 @@ function frozenCompleted(
   durationMs?: number,
 ): CompletedToolCall {
   void durationMs;
+  // C3: stamp the recovery envelope on every error outcome at the single
+  // completion funnel (explicit per-site values win when already set).
+  const finalized: ToolOutcome =
+    'kind' in outcome ? { ...recoveryForKind(outcome.kind), ...outcome } : outcome;
   return Object.freeze({
     call: Object.freeze({ ...call }),
-    outcome: Object.freeze({ ...outcome }) as ToolOutcome,
+    outcome: Object.freeze({ ...finalized }) as ToolOutcome,
     stepNumber,
   });
 }

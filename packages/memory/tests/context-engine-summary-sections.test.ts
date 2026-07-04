@@ -34,6 +34,6 @@ describe('SOTA-6: Errors + Next-steps summary sections', () => {
   });
 
   it('bumps the template version', () => {
-    expect(SUMMARY_TEMPLATE_VERSION).toBe('1.2');
+    expect(SUMMARY_TEMPLATE_VERSION).toBe('1.3');
   });
 });

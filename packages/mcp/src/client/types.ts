@@ -218,10 +218,21 @@ export interface MCPToToolsOptions {
   readonly pinnedFingerprints?: Readonly<Record<string, string>>;
   /**
    * What to do on a pinned-fingerprint mismatch (MC-6). `'warn'`
-   * (default) audits `mcp.tools.pin-mismatch.total` and continues;
-   * `'reject'` throws `MCPToolPinningError`.
+   * (default without a {@link pinStore}) audits
+   * `mcp.tools.pin-mismatch.total` and continues; `'reject'` (the
+   * default WHEN a `pinStore` is wired — a persisted first approval is
+   * an explicit trust decision) throws `MCPToolPinningError`.
    */
   readonly onPinMismatch?: 'warn' | 'reject';
+  /**
+   * C6: durable trust-on-first-use pin storage. On the first `toTools()`
+   * the current definition fingerprints are RECORDED
+   * (`mcp.tools.pins-recorded.total`); on every later call they are
+   * COMPARED — drift is handled per {@link onPinMismatch}, which
+   * defaults to `'reject'` when a store is present (the rug-pull
+   * defense). Explicit `pinnedFingerprints` win over the store.
+   */
+  readonly pinStore?: MCPPinStore;
   /**
    * Per-server `defer_loading` override. When unset and
    * `listTools()` returns more than `deferLoadingThreshold` entries
@@ -381,4 +392,22 @@ export interface MCPClient {
 export interface MCPPromptMessage {
   readonly role: 'user' | 'assistant';
   readonly content: MCPContentPart;
+}
+
+/**
+ * C6: durable storage for trust-on-first-use MCP tool pins. Keyed by the
+ * server identity id; values are `toolName -> sha256 fingerprint` maps
+ * (the same shape as `pinnedFingerprints`). Implementations may be sync
+ * or async — a JSON file, a SQLite table, a secret store.
+ *
+ * @stable
+ */
+export interface MCPPinStore {
+  get(
+    serverId: string,
+  ):
+    | Readonly<Record<string, string>>
+    | undefined
+    | Promise<Readonly<Record<string, string>> | undefined>;
+  set(serverId: string, fingerprints: Readonly<Record<string, string>>): void | Promise<void>;
 }

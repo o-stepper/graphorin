@@ -171,6 +171,55 @@ const agent = createAgent({
 
 Governance is preserved: each in-script call runs through the **same executor**, so per-tool `secretsAllowed` / `inboundSanitization` / `maxResultTokens` still apply to the value handed back to the script (set a tool's `maxResultTokens` high when the script must process its full output). The sandbox blocks network and filesystem access and exposes **no** host object beyond the bound tools. Two limitations to note: **approval-gated tools** (`needsApproval`) are excluded from the code API (there is no durable-HITL suspend mid-script — call those in `'direct'` mode), and code-mode does **not** honour a per-step `prepareStep` `tools` override. The default `'direct'` path is completely unchanged. See [code-mode](/guide/tools#code-mode) in the tools guide for the building blocks.
 
+## Tool-failure recovery envelope
+
+Every failed tool call reaches the model with its typed kind plus a recovery envelope, not just a bare message:
+
+```text
+Error: upstream said slow down
+[kind: rate_limited; recoverable: yes; suggested action: retry_later; retry after 1500ms]
+```
+
+The `recoverable` flag and `recoveryHint` (`retry_later` / `check_input` / `try_alternative` / `report_to_user`) are derived from the error kind in the executor; practitioner evidence consistently shows these two fields are what change model behaviour after a failure. Underneath, the executor also retries transient failures transparently: a `rate_limited` outcome from a `pure` / `read-only` tool (or one with an `idempotencyKey` — a retry must never double a side effect) is re-executed with exponential backoff up to 3 total attempts before the model ever sees it. Tune or widen via `toolRetry: { maxAttempts, backoffMs, kinds }`; a `ToolRateLimitError`'s `retryAfterMs` wins over the computed backoff. Tools that return an empty body render as an explicit `(tool ran successfully with no output)` marker instead of a blank message the model tends to read as a glitch.
+
+## Verifiers
+
+`verifiers` run when the model emits a terminal (no-tool-call) response — the last moment before the run completes. Each is a deterministic check (a lint runner, a test command, a format validator); a failure feeds its feedback back to the model as a user message and the loop continues, up to `maxVerifierRounds` (default 1) extra rounds:
+
+```ts
+const agent = createAgent({
+  name: 'coder',
+  instructions: '...',
+  provider,
+  verifiers: [
+    {
+      id: 'compiles',
+      verify: async ({ output }) => {
+        const result = await runTsc(extractCode(output));
+        return result.ok ? { ok: true } : { ok: false, feedback: result.stderr };
+      },
+    },
+  ],
+  maxVerifierRounds: 2,
+});
+```
+
+Every check emits a `verifier.result` event (also on the final, passing round), and a verifier that throws is treated as passed — a buggy verifier must never take down a run. This is deliberately **not** an evidence-free "reflect on your answer" step: intrinsic self-correction without an external signal degrades performance (Huang et al., ICLR 2024); wire verifiers to real commands and exit codes.
+
+## Deterministic replay
+
+With `recordProviderResponses: true` the loop journals each step's raw model response (text + tool calls + model id) onto `RunState.steps[].providerResponse`. `createReplayProvider(state)` then serves those responses back in order, so the same input re-executes the entire run — tools really run, the transcript rebuilds — with zero live model calls:
+
+```ts
+const original = createAgent({ name: 'a', instructions: '...', provider, tools, recordProviderResponses: true });
+const result = await original.run('do the thing');
+
+const replayed = createAgent({ name: 'a', instructions: '...', provider: createReplayProvider(result.state), tools });
+const replayResult = await replayed.run('do the thing'); // deterministic, offline
+```
+
+The replay provider is strict: it throws when the state has no journaled responses and surfaces an error when the replayed run diverges (asks for more steps than were recorded) instead of inventing a response. Use it for reproducible integration tests of agent behaviour and for debugging a production run offline.
+
 ## Durable HITL
 
 `runStateToJSON(runState)` / `runStateFromJSON(serialised)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can resume by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.
@@ -271,9 +320,11 @@ By default the agent's system prompt is its `instructions` alone, and the model 
 
 The `context.compacted` event carries `beforeTokens`, `afterTokens`, `summaryTokens`, `durationMs`, `hooksFiredCount`, and `source: 'auto-trigger'` (manual `agent.compact(...)` and pre-step compaction reuse the same event shape with their own `source`).
 
-**Zero-LLM clearing tier.** Beyond the default summarize strategy, `compaction.strategy` accepts `{ kind: 'clear-old-tool-results' }` — a cheaper pre-compaction tier that replaces the oldest tool results with compact placeholders *without* an LLM call. `keepToolUses` keeps the most-recent results verbatim, `excludeTools` are never touched, and `clearAtLeast` skips clearing entirely when it would reclaim fewer than that many tokens. The summarizer runs only if clearing left the buffer over threshold (`summarizeFallback`, default on; set `false` for a pure zero-LLM tier) — and then over the already-reduced window, so a buffer with a few large tool results compacts for free. A `clear-old-tool-results` result reports `summary: ''` plus the cleared message indices. By default the cleared content is dropped (the placeholder says "re-run the tool"); wire `externalize` to make clearing **recoverable** — the original tool-result is saved behind a handle and the placeholder references it, so the model can re-fetch the full result via `read_result` instead of losing it (it fires only for clears that actually commit, so a `clearAtLeast`-rejected pass never spills). Separately, `compaction.trigger.minReclaimTokens` defers any compaction whose older (compactable) portion is below that floor, avoiding compact-thrash near the threshold; unset means no floor.
+**Zero-LLM clearing tier.** Beyond the default summarize strategy, `compaction.strategy` accepts `{ kind: 'clear-old-tool-results' }` — a cheaper pre-compaction tier that replaces the oldest tool results with compact placeholders *without* an LLM call. `keepToolUses` keeps the most-recent results verbatim, `excludeTools` are never touched, and `clearAtLeast` skips clearing entirely when it would reclaim fewer than that many tokens. The summarizer runs only if clearing left the buffer over threshold (`summarizeFallback`, default on; set `false` for a pure zero-LLM tier) — and then over the already-reduced window, so a buffer with a few large tool results compacts for free. A `clear-old-tool-results` result reports `summary: ''` plus the cleared message indices. By default the cleared content is dropped (the placeholder says "re-run the tool"); wire `externalize` to make clearing **recoverable** — the original tool-result is saved behind a handle and the placeholder references it, so the model can re-fetch the full result via `read_result` instead of losing it (it fires only for clears that actually commit, so a `clearAtLeast`-rejected pass never spills). Two parity options complete the `clear_tool_uses_20250919` shape: `clearToolInputs: true` additionally blanks the PAIRED assistant tool-call arguments for every cleared result, and `readResultToolName: null` makes the handle placeholder tool-neutral when your runtime does not register `read_result` (so the placeholder never promises a tool the model cannot call). Separately, `compaction.trigger.minReclaimTokens` defers any compaction whose older (compactable) portion is below that floor, avoiding compact-thrash near the threshold; unset means no floor.
 
 **Manual `agent.compact(...)`.** The run loop owns the live message buffer, so a manual compaction is serviced *through the loop*: `compact()` enqueues the request and the loop picks it up at the next step boundary, runs the summarizer with `source: 'manual'` (or your `'pre-step'`), applies the **same prefix-pinned splice** as auto-compaction, and emits `context.compacted` — the next provider request really does carry the summary plus the trimmed tail. `preserveRecentTurns` is forwarded to the engine as a per-call strategy override. The returned `CompactionApiResult` is honest about what happened: `applied: true` after a real splice, otherwise `applied: false` with a `skippedReason` — `'no-memory'`, `'no-active-run'` (idle call, or the run ended before the loop reached another step), `'nothing-to-trim'` (the body already fits within the preserve-recent window), or `'sensitivity-gated'` (the `'secret'`-tier gate below applies to manual compaction too). `hooksFiredCount` reports the number of post-compaction hooks that actually fired, matching the event. Because the request is serviced at the next step boundary, do not `await agent.compact()` from inside a tool handler — the loop cannot reach the next step until the tool returns; fire it without awaiting and inspect the promise after the run if you need the result.
+
+**Failure hardening and verbatim user turns.** A failing summarizer is retried once with a short backoff; a pass that drops messages without shrinking the buffer counts as a failure (the compression-loop class), and after 3 consecutive failed passes the AUTO trigger disables itself (one WARN) until a later successful pass — manual `compactNow` keeps working throughout and re-arms it. The summarize strategy also keeps the most recent user messages verbatim across compaction (`preserveUserMessages`, default 2; `0` disables): user words are the task statement, and only assistant/tool content is summarized away. The summary itself is framed as a handoff to another LLM, must quote identifiers (paths, ids, error strings) verbatim, and carries a dedicated "Constraints and non-negotiables" section (template id `summary-sections`, v1.3). Post-compaction hooks now receive `ctx.droppedMessages`, and the new `reanchorRecentResults({ maxResults, maxChars, readPreview? })` hook re-injects the result handles the compaction just dropped — with bounded previews when you wire `readPreview` to your result reader — so the model picks its working set back up via `read_result` instead of re-running tools.
 
 **KV-cache prefix stability.** Auto-compaction never rewrites the trusted system-prompt prefix: the leading run of `system` messages established at run start is pinned, and only the conversational body after it is summarised. The prefix stays byte-identical across every step, so the provider's cache breakpoint is real and a long run never re-pays for the system prompt. Each compaction inserts its summary *after* the prefix, where the next pass folds it into a fresh summary-of-summary — so summaries never stack unbounded.
 

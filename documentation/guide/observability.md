@@ -11,18 +11,17 @@ description: OpenTelemetry-native traces with the GenAI Semantic Conventions, se
 
 ```mermaid
 flowchart LR
-    A[agent.run.step] --> B[provider.stream]
-    A --> C[tool.execute]
-    A --> D[memory.compile]
-    A --> E[memory.semantic.remember]
-    A --> F[memory.conflict]
-    A --> G[workflow.run]
-    G --> H[workflow.step]
+    R[agent.run] --> S[agent.step]
+    S --> B[provider.stream / provider.generate]
+    S --> C[tool.execute]
+    W[workflow.run] --> H[workflow.step]
     H --> I[workflow.task]
     H --> J[workflow.checkpoint]
 ```
 
-Every span carries the right `gen_ai.*` attributes (`gen_ai.system`, `gen_ai.request.model`, `gen_ai.usage.input_tokens`, `gen_ai.usage.output_tokens`, etc.) plus Graphorin-specific ones (`graphorin.tool.name`, `graphorin.tool.sensitivity`, `graphorin.tool.sandbox.kind`, `graphorin.memory.tier`, `graphorin.workflow.thread_id`, …).
+The agent loop opens one `agent.run` span per run and one `agent.step` span per step (C7); `tool.execute` parents under the current step via `RunContext.span`, and a `withTracing`-wrapped provider parents its `provider.stream`/`provider.generate` span under the step via `ProviderRequest.parentSpan` — so a run is ONE trace tree and parent-based sampling has a real parent to follow. Memory-tier spans (`memory.search.semantic`, consolidator phases) still start their own traces today: the tiers hold their own tracer handle and are called outside the step context — a known limitation, not a wiring bug.
+
+Run/step/tool spans carry OTel GenAI attributes (`gen_ai.operation.name` = `invoke_agent` / `execute_tool` / `chat`, `gen_ai.agent.id`, `gen_ai.tool.name`, `gen_ai.request.model`, `gen_ai.usage.input_tokens` / `output_tokens` on close) plus Graphorin-specific ones (`graphorin.run.id`, `graphorin.step.number`, `graphorin.tool.name`, `graphorin.tool.sensitivity`, `graphorin.tool.sandbox.kind`, …).
 
 ## Wiring a tracer
 
@@ -137,10 +136,12 @@ The framework exposes a small set of counters for high-frequency events:
 
 | Counter | Where |
 |---|---|
-| `graphorin.tool.executor.memory_guard.mismatch.total{toolName,tier}` | A tool's memory-guard verify step disagreed with the snapshot. |
-| `graphorin.memory.conflict.total{stage,zone}` | Conflict-pipeline decisions per stage / zone. |
-| `graphorin.provider.stream.error.total{adapter,kind}` | Errors normalised through the provider adapter. |
-| `graphorin.workflow.checkpoint.total{outcome}` | Checkpoint write outcomes. |
+| `tool.executor.memory_guard.mismatch.total{toolName,tier}` | A tool's memory-guard verify step disagreed with the snapshot. |
+| `memory.conflict.total{stage,zone}` | Conflict-pipeline decisions per stage / zone. |
+| `provider.stream.error.total{adapter,kind}` | Errors normalised through the provider adapter. |
+| `workflow.checkpoint.total{outcome}` | Checkpoint write outcomes. |
+
+Counter names are unprefixed in-process (`snapshotCounters()`); add your own namespace prefix at the export boundary if your metrics backend needs one.
 
 ## Next steps
 

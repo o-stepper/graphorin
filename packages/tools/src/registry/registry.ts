@@ -611,7 +611,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
     if (matches.size < k) {
       const docs = deferred.map((entry) => ({
         id: entry.name,
-        text: `${entry.name} ${entry.description}`,
+        text: searchableToolText(entry),
       }));
       const bm25 = defineBm25Index(docs);
       const bm25Matches = bm25(query, k);
@@ -660,9 +660,10 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
       if (queryVec === undefined) return [];
       const toEmbed: { entry: RegistryEntry; cacheKey: string; text: string }[] = [];
       for (const entry of pool) {
-        const cacheKey = `${embedder.id()}:${entry.name}:${entry.description}`;
+        const text = searchableToolText(entry);
+        const cacheKey = `${embedder.id()}:${entry.name}:${text}`;
         if (embeddingCache.has(cacheKey)) continue;
-        toEmbed.push({ entry, cacheKey, text: entry.description });
+        toEmbed.push({ entry, cacheKey, text });
       }
       if (toEmbed.length > 0) {
         const fresh = await embedder.embed(toEmbed.map((t) => t.text));
@@ -676,7 +677,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
       }
       const scored: ToolSearchMatch[] = [];
       for (const entry of pool) {
-        const cacheKey = `${embedder.id()}:${entry.name}:${entry.description}`;
+        const cacheKey = `${embedder.id()}:${entry.name}:${searchableToolText(entry)}`;
         const vec = embeddingCache.get(cacheKey);
         if (vec === undefined) continue;
         const sim = cosine(queryVec, vec);
@@ -717,6 +718,22 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
     size,
     clear,
   };
+}
+
+/**
+ * C2: the text a deferred tool is FOUND by — name + description + tags +
+ * worked-example comments. Example comments routinely carry the concrete
+ * phrasing a model searches with ("resize an image to a width"), so
+ * indexing them measurably widens recall over name+description alone.
+ * Example input/output VALUES are deliberately excluded (JSON noise).
+ */
+function searchableToolText(entry: ResolvedTool): string {
+  const parts: string[] = [entry.name, entry.description];
+  if (entry.tags !== undefined && entry.tags.length > 0) parts.push(entry.tags.join(' '));
+  for (const example of entry.examples ?? []) {
+    if (example.comment !== undefined && example.comment.length > 0) parts.push(example.comment);
+  }
+  return parts.join(' ');
 }
 
 function toMatch(

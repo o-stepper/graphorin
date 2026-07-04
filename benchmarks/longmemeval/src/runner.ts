@@ -170,80 +170,88 @@ function normalizeForFts(text: string): string {
   return text.replace(/\.(?=\s|$)/g, '');
 }
 
-const STOPWORDS = new Set([
-  'the',
-  'and',
-  'for',
-  'what',
-  'which',
-  'when',
-  'where',
-  'who',
-  'whom',
-  'how',
-  'did',
-  'does',
-  'was',
-  'were',
-  'are',
-  'his',
-  'her',
-  'their',
-  'your',
-  'user',
-  'with',
-  'from',
-  'that',
-  'this',
-  'into',
-  'about',
-  'they',
-  'them',
-  'you',
-  'have',
-  'has',
-]);
+/**
+ * Retrieval configuration the benchmark A/B-tests (evals-01/02). Each mode
+ * maps onto the library's real search surface — the harness adds NOTHING
+ * on top (the pre-C8 keyword fan-out booster is gone, evals-06), so the
+ * numbers measure the search path users actually get.
+ */
+export type RetrievalMode = 'default' | 'multi-query' | 'hyde' | 'iterative' | 'graph';
 
-function keywordTokens(question: string): string[] {
-  const raw = question.toLowerCase().match(/[a-z0-9@._-]{3,}/g) ?? [];
-  const out: string[] = [];
-  const seen = new Set<string>();
-  for (const t of raw) {
-    if (STOPWORDS.has(t) || seen.has(t)) continue;
-    seen.add(t);
-    out.push(t);
-  }
-  return out;
+/** Which embedder the memory system runs with (evals-01). */
+export type EmbedderMode = 'none' | 'fake';
+
+/** Iterative-retrieval abstention accounting (C8). */
+export interface RetrievalStats {
+  queries: number;
+  abstained: number;
+  insufficient: number;
 }
 
-type SearchHit = { readonly record: { readonly id: string; readonly text: string } };
+/** A fresh, zeroed {@link RetrievalStats}. */
+export function createRetrievalStats(): RetrievalStats {
+  return { queries: 0, abstained: 0, insufficient: 0 };
+}
+
+/**
+ * Deterministic, offline bag-of-words hash embedder (evals-01). Not a real
+ * semantic model — it exists so the VECTOR leg of hybrid search (and the
+ * graph/HyDE paths that ride it) can be exercised and A/B-compared in CI
+ * without a model download. Real embedding quality needs a real embedder.
+ */
+export function createFakeEmbedder(dim = 64): import('@graphorin/core').EmbedderProvider {
+  function embedOne(text: string): Float32Array {
+    const vec = new Float32Array(dim);
+    const tokens = text.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+    for (const token of tokens) {
+      let hash = 0x811c9dc5;
+      for (let i = 0; i < token.length; i++) {
+        hash ^= token.charCodeAt(i);
+        hash = Math.imul(hash, 0x01000193);
+      }
+      const slot = (hash >>> 0) % dim;
+      vec[slot] = (vec[slot] ?? 0) + 1;
+    }
+    let norm = 0;
+    for (const v of vec) norm += v * v;
+    norm = Math.sqrt(norm);
+    if (norm > 0) {
+      for (let i = 0; i < dim; i++) vec[i] = (vec[i] ?? 0) / norm;
+    }
+    return vec;
+  }
+  return {
+    id: () => `fake:bow-${dim}`,
+    dim: () => dim,
+    configHash: () => `fake-bow-${dim}`,
+    embed: async (texts) => texts.map((t) => embedOne(t)),
+  };
+}
 
 async function recall(
   memory: Memory,
   scope: SessionScope,
   question: string,
   topK: number,
+  retrieval: RetrievalMode,
+  stats: RetrievalStats | undefined,
 ): Promise<string> {
-  const seen = new Set<string>();
-  const texts: string[] = [];
-  const collect = (hits: ReadonlyArray<SearchHit>): void => {
-    for (const h of hits) {
-      if (seen.has(h.record.id)) continue;
-      seen.add(h.record.id);
-      texts.push(h.record.text);
+  if (retrieval === 'iterative') {
+    const result = await memory.semantic.searchIterative(scope, question, { topK });
+    if (stats !== undefined) {
+      stats.queries += 1;
+      if (result.abstained) stats.abstained += 1;
+      if (!result.sufficient) stats.insufficient += 1;
     }
-  };
-  collect(await memory.semantic.search(scope, question, { topK }));
-  // Per-keyword fan-out. As of MRET-1 the store tokenises FTS queries itself
-  // (each whitespace token is OR-quoted), so the natural-language search above
-  // already recalls on individual terms; this loop is now a redundant recall
-  // booster retained pending the EB-1 benchmark rework. It no longer
-  // compensates for a library gap.
-  const perToken = Math.max(4, Math.floor(topK / 2));
-  for (const token of keywordTokens(question)) {
-    collect(await memory.semantic.search(scope, token, { topK: perToken }));
+    return result.hits.map((h) => h.record.text).join('\n');
   }
-  return texts.join('\n');
+  const hits = await memory.semantic.search(scope, question, {
+    topK,
+    ...(retrieval === 'multi-query' ? { multiQuery: 3 } : {}),
+    ...(retrieval === 'hyde' ? { hyde: true } : {}),
+    ...(retrieval === 'graph' ? { expandHops: 1 as const } : {}),
+  });
+  return hits.map((h) => h.record.text).join('\n');
 }
 
 /** Which system-under-test the runner evaluates (SOTA-1). */
@@ -340,6 +348,12 @@ export interface MemorySystemAgentOptions {
   readonly consolidate?: boolean;
   /** Optional token/latency meter shared with the runner (SOTA-1). */
   readonly meter?: BenchMeter;
+  /** Retrieval configuration under test (C8). Default `'default'`. */
+  readonly retrieval?: RetrievalMode;
+  /** Embedder under test (C8). Default `'none'` (FTS-only). */
+  readonly embedder?: EmbedderMode;
+  /** Iterative-retrieval abstention stats sink (C8). */
+  readonly retrievalStats?: RetrievalStats;
   /**
    * EB-11 hook: fired once per ACTUAL conversation ingest (a cache miss), NOT
    * per QA case — lets a caller/test confirm a sample's N questions ingest the
@@ -372,44 +386,66 @@ export function createMemorySystemAgent(
   // The :memory: stores stay open for the run's lifetime (a short-lived
   // benchmark process) — not closed per case, since later questions of the same
   // sample still read them.
-  const ingestCache = new WeakMap<object, Memory>();
+  const retrieval: RetrievalMode = options.retrieval ?? 'default';
+  // evals-09: cache the in-flight PROMISE (not the resolved Memory) so two
+  // concurrent cases sharing one haystack cannot both miss and double-ingest.
+  const ingestCache = new WeakMap<object, Promise<Memory>>();
 
-  async function ingestConversation(input: MemoryEvalInput): Promise<Memory> {
+  function ingestConversation(input: MemoryEvalInput): Promise<Memory> {
     const cached = ingestCache.get(input.haystackSessions);
     if (cached !== undefined) return cached;
-    const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
-    await store.init();
-    const memory = createMemory({
-      store: store.memory as never,
-      embeddings: store.embeddings,
-      resolveScope: () => scope,
-      conflictPipeline: { mode: 'off' },
-      consolidator:
-        options.consolidate === true
-          ? { enabled: true, provider: options.provider, tier: 'standard', defaultScope: scope }
-          : { enabled: false },
-    });
-    for (const session of input.haystackSessions) {
-      for (const turn of session.turns) {
-        const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
-        await memory.semantic.remember(scope, {
-          text: normalizeForFts(`${turn.role}${stamp}: ${turn.content}`),
-          sensitivity: 'internal',
-        });
+    const pending = (async (): Promise<Memory> => {
+      const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
+      await store.init();
+      const memory = createMemory({
+        store: store.memory as never,
+        embeddings: store.embeddings,
+        resolveScope: () => scope,
+        conflictPipeline: { mode: 'off' },
+        // C8 (evals-01/02): the A/B switches wire the REAL library config.
+        ...(options.embedder === 'fake' ? { embedder: createFakeEmbedder() } : {}),
+        ...(retrieval === 'multi-query' || retrieval === 'hyde'
+          ? { queryTransform: { provider: options.provider } }
+          : {}),
+        ...(retrieval === 'iterative'
+          ? { iterativeRetrieval: { provider: options.provider } }
+          : {}),
+        ...(retrieval === 'graph' ? { graph: { entityResolution: true } } : {}),
+        consolidator:
+          options.consolidate === true
+            ? { enabled: true, provider: options.provider, tier: 'standard', defaultScope: scope }
+            : { enabled: false },
+      });
+      for (const session of input.haystackSessions) {
+        for (const turn of session.turns) {
+          const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
+          await memory.semantic.remember(scope, {
+            text: normalizeForFts(`${turn.role}${stamp}: ${turn.content}`),
+            sensitivity: 'internal',
+          });
+        }
       }
-    }
-    if (options.consolidate === true) {
-      await memory.consolidator.fireNow('standard', scope);
-    }
-    ingestCache.set(input.haystackSessions, memory);
-    options.onIngest?.();
-    return memory;
+      if (options.consolidate === true) {
+        await memory.consolidator.fireNow('standard', scope);
+      }
+      options.onIngest?.();
+      return memory;
+    })();
+    ingestCache.set(input.haystackSessions, pending);
+    return pending;
   }
 
   return {
     async run(input: MemoryEvalInput): Promise<string> {
       const memory = await ingestConversation(input);
-      const context = await recall(memory, scope, input.question, topK);
+      const context = await recall(
+        memory,
+        scope,
+        input.question,
+        topK,
+        retrieval,
+        options.retrievalStats,
+      );
       return answerFromContext(options.provider, input, context, options.meter);
     },
   };
@@ -474,6 +510,14 @@ export interface RunLongMemEvalOptions {
   readonly mode?: BenchMode;
   /** Optional usage meter; populated with tokens/query across the run (SOTA-1). */
   readonly meter?: BenchMeter;
+  /** Retrieval configuration under test (C8). Default `'default'`. */
+  readonly retrieval?: RetrievalMode;
+  /** Embedder under test (C8). Default `'none'`. */
+  readonly embedder?: EmbedderMode;
+  /** Iterative-retrieval abstention stats sink (C8). */
+  readonly retrievalStats?: RetrievalStats;
+  /** Repeat every case N times for variance reporting (C8). Default 1. */
+  readonly iterations?: number;
 }
 
 /** Run the benchmark and return the eval report (does not write RESULTS). */
@@ -499,13 +543,73 @@ export async function runLongMemEvalBenchmark(
           ...(options.topK !== undefined ? { topK: options.topK } : {}),
           ...(options.consolidate !== undefined ? { consolidate: options.consolidate } : {}),
           ...(options.meter !== undefined ? { meter: options.meter } : {}),
+          ...(options.retrieval !== undefined ? { retrieval: options.retrieval } : {}),
+          ...(options.embedder !== undefined ? { embedder: options.embedder } : {}),
+          ...(options.retrievalStats !== undefined
+            ? { retrievalStats: options.retrievalStats }
+            : {}),
         });
   return runEvals<MemoryEvalInput, string>({
     agent,
     dataset: { cases },
     scorers: [judgeScorer(options.judgeProvider ?? options.provider), abstentionScorer()],
     concurrency: options.concurrency ?? 1,
+    ...(options.iterations !== undefined && options.iterations > 1
+      ? { iterations: options.iterations }
+      : {}),
   });
+}
+
+/**
+ * C8: per-iteration variance + abstention-rate aggregates. `runEvals`
+ * folds all iterations into one flat report; this decomposes it so RESULTS
+ * can print mean ± stddev instead of a single point estimate, plus the
+ * abstention rate the LongMemEval literature asks for.
+ */
+export interface BenchAggregates {
+  /** Pass rate per iteration (single-element for iterations=1). */
+  readonly passRates: ReadonlyArray<number>;
+  readonly passRateMean: number;
+  readonly passRateStddev: number;
+  /** Fraction of abstention-ability cases that correctly abstained (or null). */
+  readonly abstentionRate: number | null;
+}
+
+export function computeBenchAggregates(
+  report: EvalReport<MemoryEvalInput, string>,
+): BenchAggregates {
+  // runEvals suffixes repeated case ids with `-iter-N`.
+  const byIteration = new Map<number, { total: number; passed: number }>();
+  let abstentionTotal = 0;
+  let abstentionPassed = 0;
+  for (const result of report.results) {
+    const match = /-iter-(\d+)$/.exec(result.caseId);
+    const iteration = match !== null ? Number.parseInt(match[1] ?? '0', 10) : 0;
+    const bucket = byIteration.get(iteration) ?? { total: 0, passed: 0 };
+    bucket.total += 1;
+    const passedAll = result.scores.every((s) => s.result.pass);
+    if (passedAll) bucket.passed += 1;
+    byIteration.set(iteration, bucket);
+    if (result.input.ability === 'abstention') {
+      abstentionTotal += 1;
+      const abstention = result.scores.find((s) => s.scorer === 'abstention');
+      if (abstention?.result.pass === true) abstentionPassed += 1;
+    }
+  }
+  const passRates = [...byIteration.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([, b]) => (b.total > 0 ? b.passed / b.total : 0));
+  const mean = passRates.length > 0 ? passRates.reduce((a, b) => a + b, 0) / passRates.length : 0;
+  const variance =
+    passRates.length > 1
+      ? passRates.reduce((acc, r) => acc + (r - mean) ** 2, 0) / (passRates.length - 1)
+      : 0;
+  return {
+    passRates,
+    passRateMean: mean,
+    passRateStddev: Math.sqrt(variance),
+    abstentionRate: abstentionTotal > 0 ? abstentionPassed / abstentionTotal : null,
+  };
 }
 
 async function loadDataset(
@@ -538,6 +642,17 @@ interface CliArgs {
   baseUrl?: string;
   /** SOTA-1 system-under-test (default: memory). */
   mode?: BenchMode;
+  /** C8 (evals-04): dedicated judge provider — never grade yourself. */
+  judgeProviderName?: string;
+  judgeModel?: string;
+  judgeBaseUrl?: string;
+  /** C8: opt-out for the self-judged-baseline refusal. */
+  allowSelfJudge: boolean;
+  /** C8 (evals-01/02): A/B switches. */
+  retrieval?: RetrievalMode;
+  embedder?: EmbedderMode;
+  /** C8 (evals-05): repeat cases for variance. */
+  iterations?: number;
 }
 
 function pkgRoot(): string {
@@ -552,6 +667,7 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     results: join(pkgRoot(), 'RESULTS.md'),
     consolidate: false,
     gateOn: 'all',
+    allowSelfJudge: false,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -595,6 +711,26 @@ function parseArgs(argv: ReadonlyArray<string>): CliArgs {
     } else if (a === '--mode' && next !== undefined) {
       args.mode = next === 'full-context' ? 'full-context' : 'memory';
       i++;
+    } else if (a === '--judge-provider' && next !== undefined) {
+      args.judgeProviderName = next;
+      i++;
+    } else if (a === '--judge-model' && next !== undefined) {
+      args.judgeModel = next;
+      i++;
+    } else if (a === '--judge-base-url' && next !== undefined) {
+      args.judgeBaseUrl = next;
+      i++;
+    } else if (a === '--retrieval' && next !== undefined) {
+      args.retrieval = next as RetrievalMode;
+      i++;
+    } else if (a === '--embedder' && next !== undefined) {
+      args.embedder = next as EmbedderMode;
+      i++;
+    } else if (a === '--iterations' && next !== undefined) {
+      args.iterations = Number.parseInt(next, 10);
+      i++;
+    } else if (a === '--allow-self-judge') {
+      args.allowSelfJudge = true;
     } else if (a === '--smoke') {
       args.smoke = true;
     } else if (a === '--consolidate') {
@@ -611,6 +747,22 @@ export interface ResultsMeta {
   /** Mean provider tokens per QA query (the honest cost axis next to accuracy). */
   readonly tokensPerQuery?: number;
   readonly generatedAt?: string;
+  /** C8 (evals-01): the retrieval configuration the run measured. */
+  readonly retrieval?: RetrievalMode;
+  readonly embedder?: EmbedderMode;
+  readonly topK?: number;
+  readonly consolidate?: boolean;
+  /** C8 (evals-04): who graded — and whether it graded itself. */
+  readonly judge?: string;
+  readonly selfJudged?: boolean;
+  /** C8 (evals-05): iteration count + variance. */
+  readonly iterations?: number;
+  readonly passRateMean?: number;
+  readonly passRateStddev?: number;
+  /** C8: abstention-rate aggregate (abstention-ability cases only). */
+  readonly abstentionRate?: number | null;
+  /** C8: iterative-retrieval abstentions (retrieval='iterative' only). */
+  readonly retrievalAbstained?: number;
 }
 
 /**
@@ -627,8 +779,29 @@ export function buildResultsHeader(providerLabel: string, meta: ResultsMeta = {}
     `**Provider:** ${providerLabel}`,
   ];
   if (meta.mode !== undefined) lines.push(`**Mode:** ${meta.mode}`);
+  if (meta.retrieval !== undefined || meta.embedder !== undefined || meta.topK !== undefined) {
+    lines.push(
+      `**Retrieval config:** retrieval=${meta.retrieval ?? 'default'} embedder=${meta.embedder ?? 'none'} topK=${meta.topK ?? DEFAULT_TOP_K} consolidate=${meta.consolidate === true}`,
+    );
+  }
+  if (meta.judge !== undefined) {
+    lines.push(
+      `**Judge:** ${meta.judge}${meta.selfJudged === true ? ' (SELF-JUDGED — do not compare across systems)' : ''}`,
+    );
+  }
   if (meta.tokensPerQuery !== undefined) {
     lines.push(`**Tokens/query:** ${meta.tokensPerQuery.toFixed(0)}`);
+  }
+  if (meta.iterations !== undefined && meta.iterations > 1) {
+    lines.push(
+      `**Pass rate:** ${((meta.passRateMean ?? 0) * 100).toFixed(1)}% ± ${((meta.passRateStddev ?? 0) * 100).toFixed(1)}pp over ${meta.iterations} iterations`,
+    );
+  }
+  if (meta.abstentionRate !== undefined && meta.abstentionRate !== null) {
+    lines.push(`**Abstention rate:** ${(meta.abstentionRate * 100).toFixed(1)}%`);
+  }
+  if (meta.retrievalAbstained !== undefined) {
+    lines.push(`**Iterative-retrieval abstentions:** ${meta.retrievalAbstained}`);
   }
   lines.push('', `_Generated: ${meta.generatedAt ?? new Date().toISOString()}_`, '');
   return lines.join('\n');
@@ -672,7 +845,39 @@ export async function main(): Promise<void> {
     console.log(`[benchmark-longmemeval] provider=${label}`);
   }
   const mode: BenchMode = args.mode ?? 'memory';
+  // C8 (evals-04): a dedicated judge, resolved exactly like the SUT
+  // provider (judge env vars fall back to the SUT env). Without one, the
+  // SUT grades itself — legal for plumbing, poisonous for baselines.
+  const judgeName = args.judgeProviderName ?? process.env.GRAPHORIN_BENCH_JUDGE_PROVIDER;
+  const judgeModel = args.judgeModel ?? process.env.GRAPHORIN_BENCH_JUDGE_MODEL;
+  const judgeBaseUrl = args.judgeBaseUrl ?? process.env.GRAPHORIN_BENCH_JUDGE_BASE_URL;
+  const judgeResolved =
+    judgeName !== undefined
+      ? resolveBenchProvider({
+          name: judgeName,
+          ...(judgeModel !== undefined ? { model: judgeModel } : {}),
+          ...(judgeBaseUrl !== undefined ? { baseUrl: judgeBaseUrl } : {}),
+          ...(apiKey !== undefined ? { apiKey } : {}),
+        })
+      : undefined;
+  const judgeLabel = judgeResolved?.label ?? label;
+  const selfJudged = judgeResolved === undefined && !label.startsWith('stub');
+  if (selfJudged) {
+    console.warn(
+      '[benchmark-longmemeval] the system-under-test provider is grading ITSELF (evals-04). ' +
+        'Pass --judge-provider/--judge-model for numbers you can compare across systems.',
+    );
+    if (args.json !== undefined && !args.allowSelfJudge) {
+      console.error(
+        '[benchmark-longmemeval] refusing to write a --json baseline from a SELF-JUDGED real-provider run. ' +
+          'Pass --judge-provider (recommended) or --allow-self-judge to override.',
+      );
+      process.exitCode = 1;
+      return;
+    }
+  }
   const meter = createBenchMeter();
+  const retrievalStats = createRetrievalStats();
   const report = await runLongMemEvalBenchmark({
     datasetPath: args.dataset,
     loader: args.loader,
@@ -684,16 +889,61 @@ export async function main(): Promise<void> {
     mode,
     meter,
     provider,
+    ...(judgeResolved !== undefined ? { judgeProvider: judgeResolved.provider } : {}),
+    ...(args.retrieval !== undefined ? { retrieval: args.retrieval } : {}),
+    ...(args.embedder !== undefined ? { embedder: args.embedder } : {}),
+    ...(args.iterations !== undefined ? { iterations: args.iterations } : {}),
+    retrievalStats,
   });
   const tokensPerQuery = meter.queries > 0 ? meter.totalTokens / meter.queries : 0;
+  const aggregates = computeBenchAggregates(report);
   console.log(
     `[benchmark-longmemeval] loader=${args.loader} mode=${mode}${args.ability !== undefined ? ` ability=${args.ability}` : ''} ` +
+      `retrieval=${args.retrieval ?? 'default'} embedder=${args.embedder ?? 'none'} ` +
       `cases=${report.summary.total} passed=${report.summary.passed} failed=${report.summary.failed} ` +
-      `avgMs=${report.summary.avgDurationMs.toFixed(2)} tokens/query=${tokensPerQuery.toFixed(0)}`,
+      `avgMs=${report.summary.avgDurationMs.toFixed(2)} tokens/query=${tokensPerQuery.toFixed(0)}` +
+      (aggregates.abstentionRate !== null
+        ? ` abstentionRate=${(aggregates.abstentionRate * 100).toFixed(1)}%`
+        : ''),
   );
-  await writeResults(args.results, report, label, { mode, tokensPerQuery });
+  const benchConfig = {
+    mode,
+    retrieval: args.retrieval ?? 'default',
+    embedder: args.embedder ?? 'none',
+    topK: args.topK ?? DEFAULT_TOP_K,
+    consolidate: args.consolidate,
+    provider: label,
+    judge: judgeLabel,
+    selfJudged,
+    iterations: args.iterations ?? 1,
+    loader: args.loader,
+    ...(args.variant !== undefined ? { variant: args.variant } : {}),
+    ...(args.ability !== undefined ? { ability: args.ability } : {}),
+  };
+  await writeResults(args.results, report, label, {
+    mode,
+    tokensPerQuery,
+    retrieval: benchConfig.retrieval,
+    embedder: benchConfig.embedder,
+    topK: benchConfig.topK,
+    consolidate: args.consolidate,
+    judge: judgeLabel,
+    selfJudged,
+    iterations: benchConfig.iterations,
+    passRateMean: aggregates.passRateMean,
+    passRateStddev: aggregates.passRateStddev,
+    abstentionRate: aggregates.abstentionRate,
+    ...(args.retrieval === 'iterative' ? { retrievalAbstained: retrievalStats.abstained } : {}),
+  });
   if (args.json !== undefined) {
-    await writeFile(args.json, JSON.stringify(report, null, 2), 'utf8');
+    // benchConfig rides as an EXTRA key: detectRegressions reads only
+    // results/summary, so existing baselines stay compatible while every
+    // new report says exactly what it measured (evals-01).
+    await writeFile(
+      args.json,
+      JSON.stringify({ ...report, benchConfig, aggregates }, null, 2),
+      'utf8',
+    );
     console.log(`[benchmark-longmemeval] wrote JSON report to ${args.json}`);
   }
 

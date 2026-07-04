@@ -40,6 +40,7 @@ export type {
   FinishReason,
   OutputSpec,
   Provider,
+  ProviderCachePolicy,
   ProviderCapabilities,
   ProviderError,
   ProviderErrorKind,

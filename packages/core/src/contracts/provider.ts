@@ -66,6 +66,24 @@ export interface ProviderCapabilities {
 }
 
 /**
+ * Opt-in prompt-cache breakpoint policy (core-provider-02).
+ *
+ * `breakpoints: 'auto'` asks the adapter to place provider-native cache
+ * anchors around the stable request prefix: the Anthropic path (via the
+ * vercel adapter) marks the first and last conversation messages with
+ * `cache_control: { type: 'ephemeral' }` so tools + system + the stable
+ * prefix are written once and read at ~0.1x input price on subsequent
+ * steps. Providers with automatic caching (OpenAI) or no cache concept
+ * ignore the policy. `ttl` maps to Anthropic's extended cache TTL.
+ *
+ * @stable
+ */
+export interface ProviderCachePolicy {
+  readonly breakpoints: 'auto' | 'none';
+  readonly ttl?: '5m' | '1h';
+}
+
+/**
  * Provider-call request payload.
  *
  * @stable
@@ -80,6 +98,14 @@ export interface ProviderRequest {
   readonly maxTokens?: number;
   readonly signal?: AbortSignal;
   readonly providerOptions?: Readonly<Record<string, unknown>>;
+  readonly cachePolicy?: ProviderCachePolicy;
+  /**
+   * C7: live parent span for the provider call. Like `signal`, this is a
+   * runtime handle (never serialized): `withTracing` parents its
+   * provider.generate/stream span under it so a run's traces form one
+   * tree instead of disconnected fragments.
+   */
+  readonly parentSpan?: import('./tracer.js').AISpan;
   readonly metadata?: ProviderRequestMetadata;
   /**
    * Per-request override of the provider's auto-detected

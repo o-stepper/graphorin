@@ -1,6 +1,7 @@
 import type { Tool } from '@graphorin/core';
 import { tool } from '@graphorin/tools';
 import { z } from 'zod';
+import { recallTaint } from './taint.js';
 import type { MemoryToolDeps } from './types.js';
 
 const sensitivityEnum = z.enum(['public', 'internal', 'secret']);
@@ -196,7 +197,7 @@ export function createFactSearchTool(
         ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
         signal: ctx.signal,
       });
-      return {
+      const output = {
         hits: hits.map((hit) => ({
           factId: hit.record.id,
           text: hit.record.text,
@@ -211,6 +212,10 @@ export function createFactSearchTool(
             : {}),
         })),
       };
+      // C6: recalled quarantined / foreign-provenance content re-arms the
+      // taint ledger — the cross-session poisoning leg.
+      const taint = recallTaint(hits.map((h) => h.record));
+      return taint === undefined ? output : { output, taint };
     },
   });
 }

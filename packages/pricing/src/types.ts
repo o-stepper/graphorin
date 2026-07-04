@@ -25,6 +25,12 @@ export interface ModelPrice {
   readonly outputUsdPerToken: number;
   /** Optional cached-read price (Anthropic / OpenAI prompt caching). */
   readonly cachedReadUsdPerToken?: number;
+  /**
+   * Optional cache-write (cache-creation) price. Anthropic bills prompt
+   * tokens written to the 5-minute cache at 1.25x the input rate; OpenAI
+   * does not charge (or report) cache writes, so its entries omit this.
+   */
+  readonly cacheWriteUsdPerToken?: number;
   /** Optional reasoning-token price (OpenAI o1 / Gemini 2 thinking). */
   readonly reasoningUsdPerToken?: number;
   /** Optional region label (e.g. `'us-east-1'`). */
@@ -67,6 +73,7 @@ export interface LookupPriceResult {
   readonly inputUsdPerToken: number;
   readonly outputUsdPerToken: number;
   readonly cachedReadUsdPerToken?: number;
+  readonly cacheWriteUsdPerToken?: number;
   readonly reasoningUsdPerToken?: number;
   readonly source: string;
   readonly snapshotDate: string;

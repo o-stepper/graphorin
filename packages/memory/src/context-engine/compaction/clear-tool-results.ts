@@ -55,6 +55,21 @@ export interface ClearToolResultsOptions {
       readonly clearedTokens: number;
     },
   ) => Promise<{ readonly handleId: string; readonly preview?: string }>;
+  /**
+   * C4 (context-engine-11): the tool the externalized-handle placeholder
+   * advertises. The memory package cannot know whether the agent
+   * registered `read_result` (that depends on spill wiring), so callers
+   * whose runtime does NOT expose it pass `null` and the placeholder
+   * degrades to a tool-neutral phrasing instead of promising a tool the
+   * model cannot call. Default `'read_result'` (the agent built-in).
+   */
+  readonly readResultToolName?: string | null;
+  /**
+   * C4 (clear_tool_uses_20250919 parity): additionally blank the PAIRED
+   * assistant message's tool-call arguments for every cleared result,
+   * reclaiming the input side of verbose calls too. Default `false`.
+   */
+  readonly clearToolInputs?: boolean;
 }
 
 /** Result of a clearing pass. `clearedIndices` empty ⇒ nothing changed. */
@@ -74,9 +89,16 @@ function handlePlaceholder(info: {
   clearedTokens: number;
   handleId: string;
   preview?: string;
+  readToolName?: string | null;
 }): string {
   const preview = info.preview !== undefined && info.preview.length > 0 ? ` · ${info.preview}` : '';
-  return `${CLEARED_TOOL_RESULT_MARKER} · ${info.toolName ?? 'tool'} · ${info.clearedTokens} tokens · full result via read_result handle: ${info.handleId}${preview}]`;
+  // C4 (context-engine-11): only advertise a retrieval tool the caller
+  // vouches exists; `null` degrades to a tool-neutral phrasing.
+  const retrieval =
+    info.readToolName === null
+      ? `full result externalized to handle: ${info.handleId}`
+      : `full result via ${info.readToolName ?? 'read_result'} handle: ${info.handleId}`;
+  return `${CLEARED_TOOL_RESULT_MARKER} · ${info.toolName ?? 'tool'} · ${info.clearedTokens} tokens · ${retrieval}${preview}]`;
 }
 
 function isAlreadyCleared(content: Message['content']): boolean {
@@ -168,12 +190,40 @@ export async function clearOldToolResults(
           clearedTokens,
           handleId: handle.handleId,
           ...(handle.preview !== undefined ? { preview: handle.preview } : {}),
+          ...(options.readResultToolName !== undefined
+            ? { readToolName: options.readResultToolName }
+            : {}),
         }),
       });
     }
   }
 
-  const out = messages.map((m, i) => replacements.get(i) ?? m);
+  let out: Message[] = messages.map((m, i) => replacements.get(i) ?? m);
+
+  // C4 (clear_tool_uses parity): blank the paired assistant tool-call
+  // ARGUMENTS for every cleared result. The call's name and id survive
+  // (the transcript stays well-formed); only the argument payload is
+  // replaced with a marker object.
+  if (options.clearToolInputs === true && replacements.size > 0) {
+    const clearedCallIds = new Set<string>();
+    for (const idx of replacements.keys()) {
+      const tm = messages[idx] as ToolMessage;
+      clearedCallIds.add(tm.toolCallId);
+    }
+    out = out.map((m) => {
+      if (m.role !== 'assistant' || m.toolCalls === undefined) return m;
+      if (!m.toolCalls.some((tc) => clearedCallIds.has(tc.toolCallId))) return m;
+      return {
+        ...m,
+        toolCalls: m.toolCalls.map((tc) =>
+          clearedCallIds.has(tc.toolCallId)
+            ? { ...tc, args: { cleared: '[tool input elided by context clearing]' } }
+            : tc,
+        ),
+      };
+    });
+  }
+
   return {
     messages: out,
     clearedIndices: [...replacements.keys()],

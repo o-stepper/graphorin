@@ -24,6 +24,10 @@ export interface CostTrackingTotals {
   readonly promptTokens: number;
   readonly completionTokens: number;
   readonly totalTokens: number;
+  /** Prompt tokens served from the provider cache (subset of promptTokens). */
+  readonly cachedReadTokens: number;
+  /** Prompt tokens written to the provider cache (subset of promptTokens). */
+  readonly cacheWriteTokens: number;
   readonly costUsd: number;
 }
 
@@ -51,6 +55,8 @@ const ZERO_TOTALS: CostTrackingTotals = Object.freeze({
   promptTokens: 0,
   completionTokens: 0,
   totalTokens: 0,
+  cachedReadTokens: 0,
+  cacheWriteTokens: 0,
   costUsd: 0,
 });
 
@@ -72,6 +78,8 @@ export function createCostAccumulator(): CostAccumulator {
         promptTokens: prev.promptTokens + info.promptTokens,
         completionTokens: prev.completionTokens + info.completionTokens,
         totalTokens: prev.totalTokens + info.totalTokens,
+        cachedReadTokens: prev.cachedReadTokens + (info.cachedReadTokens ?? 0),
+        cacheWriteTokens: prev.cacheWriteTokens + (info.cacheWriteTokens ?? 0),
         costUsd: prev.costUsd + info.costUsd,
       });
     },
@@ -98,17 +106,26 @@ export interface WithCostTrackingOptions {
     readonly promptTokens: number;
     readonly completionTokens: number;
     readonly totalTokens: number;
+    readonly cachedReadTokens?: number;
+    readonly cacheWriteTokens?: number;
     readonly costUsd: number;
     readonly metadata: Readonly<Record<string, unknown>> | undefined;
   }) => void;
   /**
    * Optional pricing lookup. When set, the middleware computes
    * `costUsd` from the returned price and surfaces it on the hook.
+   *
+   * `cachedReadPerMtok` / `cacheWritePerMtok` price the prompt-cache legs
+   * (core-provider-02); when omitted, cache tokens are billed at the full
+   * input rate (never cheaper than reality, so absent price data degrades
+   * to the pre-cache behaviour).
    */
-  readonly priceLookup?: (info: {
-    readonly providerName: string;
-    readonly modelId: string;
-  }) => { readonly inputPerMtok?: number; readonly outputPerMtok?: number } | null;
+  readonly priceLookup?: (info: { readonly providerName: string; readonly modelId: string }) => {
+    readonly inputPerMtok?: number;
+    readonly outputPerMtok?: number;
+    readonly cachedReadPerMtok?: number;
+    readonly cacheWritePerMtok?: number;
+  } | null;
 }
 
 /**
@@ -170,11 +187,20 @@ function emitUsage(
   // Reasoning tokens are billed at the output rate (the PS-19 contract
   // in @graphorin/pricing) — providers that report them separately from
   // completionTokens must not get them for free.
+  // Cache legs (core-provider-02): promptTokens INCLUDES cache reads and
+  // writes, so subtract them from the base-rate leg and bill each at its
+  // own rate; a missing cache rate falls back to the full input rate.
+  const cachedRead = usage.cachedReadTokens ?? 0;
+  const cacheWrite = usage.cacheWriteTokens ?? 0;
+  const basePromptTokens = Math.max(0, usage.promptTokens - cachedRead - cacheWrite);
+  const inputRate = price?.inputPerMtok ?? 0;
   const costUsd =
     price !== null
-      ? (usage.promptTokens * (price.inputPerMtok ?? 0)) / 1_000_000 +
-        ((usage.completionTokens + (usage.reasoningTokens ?? 0)) * (price.outputPerMtok ?? 0)) /
-          1_000_000
+      ? (basePromptTokens * inputRate +
+          cachedRead * (price.cachedReadPerMtok ?? inputRate) +
+          cacheWrite * (price.cacheWritePerMtok ?? inputRate) +
+          (usage.completionTokens + (usage.reasoningTokens ?? 0)) * (price.outputPerMtok ?? 0)) /
+        1_000_000
       : (usage.cost?.amount ?? 0);
   opts.onUsage({
     providerName: next.name,
@@ -182,6 +208,8 @@ function emitUsage(
     promptTokens: usage.promptTokens,
     completionTokens: usage.completionTokens,
     totalTokens: usage.totalTokens,
+    ...(usage.cachedReadTokens !== undefined ? { cachedReadTokens: usage.cachedReadTokens } : {}),
+    ...(usage.cacheWriteTokens !== undefined ? { cacheWriteTokens: usage.cacheWriteTokens } : {}),
     costUsd,
     metadata,
   });

@@ -1,0 +1,203 @@
+{
+  "results": [
+    {
+      "caseId": "fixture_ie_1",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s1",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I just adopted a cat named Mochi.",
+                "timestamp": "2023/05/15 (Mon) 10:00"
+              },
+              {
+                "role": "assistant",
+                "content": "Congratulations on adopting Mochi!",
+                "timestamp": "2023/05/15 (Mon) 10:00"
+              }
+            ]
+          },
+          {
+            "id": "s2",
+            "turns": [
+              {
+                "role": "user",
+                "content": "Mochi keeps me company while I work from home.",
+                "timestamp": "2023/05/20 (Sat) 14:00"
+              },
+              {
+                "role": "assistant",
+                "content": "That sounds lovely.",
+                "timestamp": "2023/05/20 (Sat) 14:00"
+              }
+            ]
+          }
+        ],
+        "question": "What is the name of the user's cat?",
+        "askedAt": "2023/06/01 (Thu) 09:00",
+        "ability": "info-extraction"
+      },
+      "output": "user [2023/05/15 (Mon) 10:00]: I just adopted a cat named Mochi",
+      "durationMs": 33,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "fixture_temp_1",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s3",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I moved to Berlin this month for a new job.",
+                "timestamp": "2023/03/10 (Fri) 08:00"
+              },
+              {
+                "role": "assistant",
+                "content": "Exciting — welcome to Berlin!",
+                "timestamp": "2023/03/10 (Fri) 08:00"
+              }
+            ]
+          }
+        ],
+        "question": "Which city did the user move to in March 2023?",
+        "askedAt": "2023/06/01 (Thu) 09:00",
+        "ability": "temporal"
+      },
+      "output": "user [2023/03/10 (Fri) 08:00]: I moved to Berlin this month for a new job",
+      "durationMs": 9,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": true,
+            "reason": "n/a (not an abstention case)"
+          }
+        }
+      ]
+    },
+    {
+      "caseId": "fixture_abs_1_abs",
+      "input": {
+        "haystackSessions": [
+          {
+            "id": "s4",
+            "turns": [
+              {
+                "role": "user",
+                "content": "I had a great lunch today.",
+                "timestamp": "2023/05/01 (Mon) 12:00"
+              },
+              {
+                "role": "assistant",
+                "content": "Glad to hear it!",
+                "timestamp": "2023/05/01 (Mon) 12:00"
+              }
+            ]
+          }
+        ],
+        "question": "What is the user's blood type?",
+        "askedAt": "2023/06/01 (Thu) 09:00",
+        "ability": "abstention"
+      },
+      "output": "CURRENT DATE: 2023/06/01 (Thu) 09:00",
+      "durationMs": 10,
+      "scores": [
+        {
+          "scorer": "llm-judge-j",
+          "result": {
+            "pass": true,
+            "score": 0.8,
+            "metadata": {
+              "raw": 8,
+              "clamped": 8,
+              "passThreshold": 7,
+              "maxScore": 10
+            }
+          }
+        },
+        {
+          "scorer": "abstention",
+          "result": {
+            "pass": false,
+            "score": 0,
+            "reason": "failed to abstain on an unanswerable question"
+          }
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1,
+    "avgDurationMs": 17.333333333333332,
+    "byScorer": {
+      "llm-judge-j": {
+        "passed": 3,
+        "failed": 0,
+        "avgScore": 0.8000000000000002
+      },
+      "abstention": {
+        "passed": 2,
+        "failed": 1,
+        "avgScore": 0
+      }
+    }
+  },
+  "benchConfig": {
+    "mode": "memory",
+    "retrieval": "default",
+    "embedder": "none",
+    "topK": 12,
+    "consolidate": false,
+    "provider": "stub (plumbing-only)",
+    "judge": "stub (plumbing-only)",
+    "selfJudged": false,
+    "iterations": 1,
+    "loader": "longmemeval"
+  },
+  "aggregates": {
+    "passRates": [0.6666666666666666],
+    "passRateMean": 0.6666666666666666,
+    "passRateStddev": 0,
+    "abstentionRate": 0
+  }
+}

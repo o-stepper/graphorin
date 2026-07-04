@@ -43,6 +43,7 @@ export type {
   ToolExecutePartialEvent,
   ToolExecuteProgressEvent,
   ToolExecuteStartEvent,
+  VerifierResultEvent,
 } from './agent-event.js';
 export type {
   Handoff,
@@ -90,6 +91,7 @@ export {
   type RunStateUsageByModel,
   type RunStatus,
   type RunStep,
+  type RunStepProviderResponse,
   type RunTaintSummary,
 } from './run.js';
 export type { Sensitivity } from './sensitivity.js';
@@ -102,6 +104,7 @@ export type {
   ContentChunk,
   InboundSanitizationPolicy,
   MemoryGuardTier,
+  RecoveryHint,
   ResultHandle,
   SandboxPolicy,
   SideEffectClass,

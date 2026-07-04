@@ -263,6 +263,12 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     ...(usageRaw.reasoningTokens !== undefined
       ? { reasoningTokens: Number(usageRaw.reasoningTokens) }
       : {}),
+    ...(usageRaw.cachedReadTokens !== undefined
+      ? { cachedReadTokens: Number(usageRaw.cachedReadTokens) }
+      : {}),
+    ...(usageRaw.cacheWriteTokens !== undefined
+      ? { cacheWriteTokens: Number(usageRaw.cacheWriteTokens) }
+      : {}),
     ...(isRecord(usageRaw.cost)
       ? {
           cost: {
@@ -299,6 +305,12 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
         ...(entryRaw.reasoningTokens !== undefined
           ? { reasoningTokens: Number(entryRaw.reasoningTokens) }
           : {}),
+        ...(entryRaw.cachedReadTokens !== undefined
+          ? { cachedReadTokens: Number(entryRaw.cachedReadTokens) }
+          : {}),
+        ...(entryRaw.cacheWriteTokens !== undefined
+          ? { cacheWriteTokens: Number(entryRaw.cacheWriteTokens) }
+          : {}),
         ...(isRecord(entryRaw.cost)
           ? {
               cost: {
@@ -324,12 +336,16 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
   let taintSummary: RunTaintSummary | undefined;
   if (isRecord(payload.taintSummary)) {
     const ts = payload.taintSummary;
+    const tileHashes = Array.isArray(ts.spanTileHashes)
+      ? ts.spanTileHashes.filter((h): h is string => typeof h === 'string')
+      : undefined;
     taintSummary = {
       untrustedSeen: ts.untrustedSeen === true,
       sensitiveSeen: ts.sensitiveSeen === true,
       untrustedSourceKinds: Array.isArray(ts.untrustedSourceKinds)
         ? ts.untrustedSourceKinds.filter((k): k is string => typeof k === 'string')
         : [],
+      ...(tileHashes !== undefined && tileHashes.length > 0 ? { spanTileHashes: tileHashes } : {}),
     };
   }
   const promotedTools = Array.isArray(payload.promotedTools)
@@ -422,6 +438,16 @@ export function addModelUsage(state: RunState, modelId: string, delta: Usage): v
               reasoningTokens: (prev.reasoningTokens ?? 0) + (delta.reasoningTokens ?? 0),
             }
           : {}),
+        ...(delta.cachedReadTokens !== undefined || prev.cachedReadTokens !== undefined
+          ? {
+              cachedReadTokens: (prev.cachedReadTokens ?? 0) + (delta.cachedReadTokens ?? 0),
+            }
+          : {}),
+        ...(delta.cacheWriteTokens !== undefined || prev.cacheWriteTokens !== undefined
+          ? {
+              cacheWriteTokens: (prev.cacheWriteTokens ?? 0) + (delta.cacheWriteTokens ?? 0),
+            }
+          : {}),
         attemptCount: prev.attemptCount + 1,
         ...(prev.cost !== undefined ? { cost: prev.cost } : {}),
       }
@@ -445,7 +471,11 @@ export function aggregateUsageFromByModel(byModel: RunStateUsageByModel | undefi
   let ct = 0;
   let tt = 0;
   let rt = 0;
+  let cr = 0;
+  let cw = 0;
   let hasReasoning = false;
+  let hasCachedRead = false;
+  let hasCacheWrite = false;
   for (const entry of Object.values(byModel)) {
     pt += entry.promptTokens;
     ct += entry.completionTokens;
@@ -454,12 +484,22 @@ export function aggregateUsageFromByModel(byModel: RunStateUsageByModel | undefi
       rt += entry.reasoningTokens;
       hasReasoning = true;
     }
+    if (entry.cachedReadTokens !== undefined) {
+      cr += entry.cachedReadTokens;
+      hasCachedRead = true;
+    }
+    if (entry.cacheWriteTokens !== undefined) {
+      cw += entry.cacheWriteTokens;
+      hasCacheWrite = true;
+    }
   }
   return {
     promptTokens: pt,
     completionTokens: ct,
     totalTokens: tt,
     ...(hasReasoning ? { reasoningTokens: rt } : {}),
+    ...(hasCachedRead ? { cachedReadTokens: cr } : {}),
+    ...(hasCacheWrite ? { cacheWriteTokens: cw } : {}),
   };
 }
 

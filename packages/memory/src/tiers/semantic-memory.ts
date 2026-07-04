@@ -10,6 +10,7 @@ import type {
 } from '@graphorin/core';
 import { md5 } from '@graphorin/core';
 import type { ConflictDecision, ConflictPipeline } from '../conflict/index.js';
+import { DEFAULT_SALIENCE_WEIGHTS, type SalienceWeights } from '../consolidator/decay.js';
 import { QuarantinePromotionRefusedError } from '../errors/index.js';
 import type { EntityResolver } from '../graph/entity-resolver.js';
 import { contextualize } from '../internal/contextualize.js';
@@ -26,6 +27,7 @@ import {
 } from '../search/iterative.js';
 import type { QueryTransformer } from '../search/query-transform.js';
 import { fuseRrf, fuseWeighted, WeightedRRFReranker } from '../search/rrf.js';
+import { trustDiscount } from '../search/trust.js';
 import type { ReRanker } from '../search/types.js';
 
 /**
@@ -143,6 +145,18 @@ export interface FactSearchOptions {
    * @stable
    */
   readonly includeQuarantined?: boolean;
+  /**
+   * Rank-time trust discount (C5). `'on'` (default) multiplies each
+   * hit's fused score by its trust factor — quarantined-but-included
+   * rows by `1 - quarantine` (default 0.3x), foreign-provenance rows by
+   * `1 - foreignProvenance` (default 0.8x); first-party active facts are
+   * untouched. `'off'` restores pure similarity ranking (inspector /
+   * calibration paths). Factors surface as the `trust` signal on hits
+   * and in `explainRecall`.
+   *
+   * @stable
+   */
+  readonly trustWeighting?: 'on' | 'off';
   /**
    * Include superseded / validity-expired facts (memory-retrieval-01).
    * Defaults to `false`: a default read behaves as `asOf = now`, so a
@@ -338,6 +352,7 @@ export class SemanticMemory {
   readonly #grader: RetrievalGrader | null;
   readonly #iterativeMaxIterations: number;
   #reranker: ReRanker;
+  readonly #trustWeights: SalienceWeights;
 
   constructor(args: {
     store: MemoryStoreAdapter;
@@ -381,6 +396,12 @@ export class SemanticMemory {
     grader?: RetrievalGrader;
     /** Default total-pass cap for `searchIterative`. Default 3. */
     iterativeMaxIterations?: number;
+    /**
+     * Weights for the rank-time trust discount (C5). Reuses the
+     * eviction-path `SalienceWeights` semantics; defaults to
+     * `DEFAULT_SALIENCE_WEIGHTS`.
+     */
+    trustWeights?: SalienceWeights;
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
@@ -393,6 +414,7 @@ export class SemanticMemory {
     this.#entityResolver = args.entityResolver ?? null;
     this.#grader = args.grader ?? null;
     this.#iterativeMaxIterations = args.iterativeMaxIterations ?? DEFAULT_MAX_ITERATIONS;
+    this.#trustWeights = args.trustWeights ?? DEFAULT_SALIENCE_WEIGHTS;
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -769,7 +791,13 @@ export class SemanticMemory {
                 return opts.tags?.some((t) => recordTags.includes(t)) === true;
               })
             : decayed;
-        const ranked = filtered.slice(0, finalTopK);
+        // C5: rank-time trust discount — quarantined-but-included and
+        // foreign-provenance hits are down-weighted BEFORE the final cut,
+        // mirroring the eviction-path securityFactor. First-party active
+        // facts keep factor 1, so ordinary rankings are unchanged.
+        const trusted =
+          opts.trustWeighting === 'off' ? filtered : this.#applyTrustDiscount(filtered);
+        const ranked = trusted.slice(0, finalTopK);
         // MRET-7: recall reinforces the recalled facts — stamp
         // last-accessed + bump strength so "recently accessed facts decay
         // slower" actually holds. Bookkeeping only: a failure here must
@@ -1256,6 +1284,26 @@ export class SemanticMemory {
       includeQuarantined,
       includeSuperseded,
     );
+  }
+
+  /**
+   * C5: multiply each hit's fused score by its trust factor and re-sort.
+   * No-ops (returns the same array) when every factor is 1.
+   */
+  #applyTrustDiscount(hits: ReadonlyArray<MemoryHit<Fact>>): ReadonlyArray<MemoryHit<Fact>> {
+    let changed = false;
+    const discounted = hits.map((hit) => {
+      const factor = trustDiscount(hit.record, this.#trustWeights);
+      if (factor >= 1) return hit;
+      changed = true;
+      return {
+        record: hit.record,
+        score: hit.score * factor,
+        signals: Object.freeze({ ...(hit.signals ?? {}), trust: factor }),
+      };
+    });
+    if (!changed) return hits;
+    return [...discounted].sort((a, b) => b.score - a.score);
   }
 
   async #applyDecay(

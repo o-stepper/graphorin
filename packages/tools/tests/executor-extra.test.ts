@@ -303,7 +303,7 @@ describe('ToolExecutor — sandbox dispatch (DoD: SandboxImpl wired)', () => {
     }
   });
 
-  it("surfaces the sandbox failure as ToolError({ kind: 'execution_failed' })", async () => {
+  it("surfaces a sandbox timeout as ToolError({ kind: 'timeout' }) (tools-06)", async () => {
     const registry = createToolRegistry();
     registry.register(
       tool({
@@ -337,7 +337,7 @@ describe('ToolExecutor — sandbox dispatch (DoD: SandboxImpl wired)', () => {
       stepNumber: 1,
     });
     if ('kind' in completed[0]!.outcome) {
-      expect(completed[0]!.outcome.kind).toBe('execution_failed');
+      expect(completed[0]!.outcome.kind).toBe('timeout');
       expect(completed[0]!.outcome.message).toMatch(/timeout/);
     }
   });

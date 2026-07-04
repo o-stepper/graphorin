@@ -112,6 +112,10 @@ const agent = createAgent({
 
 MCP servers can call *back* to the client mid-request. Graphorin surfaces the two most useful patterns through opt-in callbacks on `createMCPClient`. Both are **gated**: the client advertises the capability — and a conforming server only issues the request — when you supply the matching handler. The default client advertises neither (no implicit prompting, no implicit model calls — Principle #1).
 
+::: warning Deprecation notice (MCP 2026-07-28 RC)
+The 2026-07-28 protocol revision **deprecates Sampling, Roots, and protocol-level Logging** with a 12-month removal window; long-running work moves to the **Tasks extension** (a separate extension, not the 2025-11 experimental core feature). Graphorin keeps its gated sampling/elicitation callbacks for compatibility with 2025-11 servers, but treat sampling as frozen: no new capabilities will be layered on it, and new integrations should not depend on it. Any future Tasks support will target the extension shape.
+:::
+
 ### Elicitation (`elicitation/create`)
 
 A server can ask the human for structured input in the middle of a tool call. Back it with your HITL surface (a CLI prompt, the agent's approval channel, …):
@@ -215,6 +219,9 @@ The client throws typed `@graphorin/mcp` errors; the tool **executor** then maps
 Two call-level knobs complete the picture: `callTool(name, args, { signal, timeoutMs })` honours the abort signal (an aborted agent run sends `notifications/cancelled` to the server — adapted tools forward their `ToolExecutionContext.signal` automatically) and maps `timeoutMs` onto the SDK request timeout, surfacing expiry as `MCPCallTimeoutError` (`kind: 'call-timeout'`). `toTools({ callTimeoutMs })` applies the same timeout to every adapted tool's calls.
 
 ## Definition pinning and `list_changed`
+
+**Durable trust-on-first-use (`pinStore`).** Pass `toTools({ pinStore })` — any `{ get(serverId), set(serverId, fingerprints) }` store (a JSON file, a SQLite table) — and the client records each server's definition fingerprints on first sight (`mcp.tools.pins-recorded.total`) and compares on every later call. With a store present, a mismatch **rejects by default** (`MCPToolPinningError` — a persisted first approval is an explicit trust decision; pass `onPinMismatch: 'warn'` to downgrade). Explicit `pinnedFingerprints` win over the store. Tool descriptions additionally run through the injection heuristics at registration; hits are stripped AND counted (`mcp.tool-description.injection-flagged.total`) so a poisoning server is visible, not silently laundered.
+
 
 Tool definitions are a poisoning surface: a server can change a tool's description or schema behind an already-approved name (the **approve-then-swap rug-pull**). The client makes this visible (MC-6):
 

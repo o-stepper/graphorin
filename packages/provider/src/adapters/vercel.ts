@@ -37,7 +37,13 @@ import { ProviderHttpError, ProviderStreamParseError } from '../errors/errors.js
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { inferReasoningContract } from '../reasoning/classify-contract.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
-import { toAiSdkPrompt, toAiSdkToolChoice, toAiSdkTools } from './vercel-messages.js';
+import { foldToolExamples } from '../tool-examples.js';
+import {
+  applyCacheAnchors,
+  toAiSdkPrompt,
+  toAiSdkToolChoice,
+  toAiSdkTools,
+} from './vercel-messages.js';
 
 /**
  * Structural shape the adapter expects from the AI SDK language model
@@ -405,11 +411,20 @@ function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
   const system = [req.systemMessage, prompt.system]
     .filter((s): s is string => s !== undefined && s.length > 0)
     .join('\n\n');
+  const messages =
+    req.cachePolicy?.breakpoints === 'auto'
+      ? applyCacheAnchors(prompt.messages, req.cachePolicy.ttl)
+      : prompt.messages;
   return {
     model,
-    messages: prompt.messages,
+    messages,
     ...(system.length > 0 ? { system } : {}),
-    ...(req.tools !== undefined && req.tools.length > 0 ? { tools: toAiSdkTools(req.tools) } : {}),
+    // C2: fold worked examples in the adapter itself, so raw-adapter use
+    // (no createProvider wrapper) still puts them in front of the model.
+    // Idempotent: an upstream fold already dropped the structured field.
+    ...(req.tools !== undefined && req.tools.length > 0
+      ? { tools: toAiSdkTools(foldToolExamples(req.tools)) }
+      : {}),
     ...(req.toolChoice !== undefined ? { toolChoice: toAiSdkToolChoice(req.toolChoice) } : {}),
     ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
     // v4 reads `maxTokens`; v7 renamed it `maxOutputTokens` — send both
@@ -511,17 +526,44 @@ function mapUsage(input: unknown): Usage | undefined {
     outputTokens?: number;
     reasoningTokens?: number;
     totalTokens?: number;
+    // v7 runtime-normalized detail splits (core-provider-02): inputTokens
+    // is the TOTAL including cache reads/writes; outputTokens the TOTAL
+    // including reasoning.
+    inputTokenDetails?: {
+      cacheReadTokens?: number;
+      cacheWriteTokens?: number;
+      noCacheTokens?: number;
+    };
+    outputTokenDetails?: { reasoningTokens?: number; textTokens?: number };
   };
   const promptTokens = u.promptTokens ?? u.inputTokens ?? 0;
-  const completionTokens = u.completionTokens ?? u.outputTokens ?? 0;
-  const totalTokens = u.totalTokens ?? promptTokens + completionTokens;
+  const rawCompletion = u.completionTokens ?? u.outputTokens ?? 0;
+  const totalTokens = u.totalTokens ?? promptTokens + rawCompletion;
+  const cachedReadTokens = numberOrUndefined(u.inputTokenDetails?.cacheReadTokens);
+  const cacheWriteTokens = numberOrUndefined(u.inputTokenDetails?.cacheWriteTokens);
+  // The v7 detail reports reasoning as a SUBSET of outputTokens; core Usage
+  // declares reasoningTokens EXCLUSIVE of completionTokens, so split the
+  // total (sum unchanged). The flat field (v4/v5 peers) is already exclusive.
+  const detailReasoning = numberOrUndefined(u.outputTokenDetails?.reasoningTokens);
+  let completionTokens = rawCompletion;
+  let reasoningTokens = u.reasoningTokens;
+  if (reasoningTokens === undefined && detailReasoning !== undefined && detailReasoning > 0) {
+    reasoningTokens = detailReasoning;
+    completionTokens = Math.max(0, rawCompletion - detailReasoning);
+  }
   const usage: Usage = {
     promptTokens,
     completionTokens,
     totalTokens,
-    ...(u.reasoningTokens !== undefined ? { reasoningTokens: u.reasoningTokens } : {}),
+    ...(reasoningTokens !== undefined ? { reasoningTokens } : {}),
+    ...(cachedReadTokens !== undefined && cachedReadTokens > 0 ? { cachedReadTokens } : {}),
+    ...(cacheWriteTokens !== undefined && cacheWriteTokens > 0 ? { cacheWriteTokens } : {}),
   };
   return usage;
+}
+
+function numberOrUndefined(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
 let cachedRuntime: VercelRuntimeOverrides | null = null;

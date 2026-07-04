@@ -109,6 +109,9 @@ const EXTRACTION_SYSTEM_PROMPT = [
   'You are a memory-extraction assistant for a long-running personal-assistant runtime.',
   'Read the supplied conversation slice and return the durable facts it asserts about the user, the world, or stable preferences.',
   'Skip greetings, banter, transient state, and anything the assistant produced as boilerplate.',
+  // C5 (memory-consolidation-08): decontextualization — proposition-
+  // granular retrieval only works when each stored fact stands alone.
+  'Each fact text MUST be a self-contained proposition understandable with no surrounding context: resolve pronouns and ellipses to the named person or thing ("she" -> "Maria"), inline the concrete entities, and never write a fact that needs a neighbouring fact to make sense.',
   'For each fact also rate how important it is for remembering the user, on an integer scale from 1 (incidental detail) to 10 (identity-defining).',
   'Return a single JSON object: { "facts": [{ "text": string, "subject"?: string, "predicate"?: string, "object"?: string, "confidence"?: number, "importance"?: number }] }.',
   'If the slice contains no durable facts, return { "facts": [] }.',

@@ -2,6 +2,7 @@ import type { Tracer } from '../contracts/tracer.js';
 import type { HandoffRecord } from './handoff.js';
 import type { Message } from './message.js';
 import type { CompletedToolCall, ToolApproval } from './tool.js';
+import type { ToolCall } from './tool-call.js';
 import type { ModelUsage, Usage, UsageAccumulator } from './usage.js';
 
 /**
@@ -28,6 +29,27 @@ export interface RunStep {
    * Stable agent id active for this step (changes after a handoff).
    */
   readonly agentId: string;
+  /**
+   * The model response this step produced, recorded when the agent runs
+   * with `recordProviderResponses: true` (C3). Enables deterministic
+   * replay: `createReplayProvider(state)` serves these back in order so
+   * a run re-executes without live model calls.
+   */
+  readonly providerResponse?: RunStepProviderResponse;
+}
+
+/**
+ * Journaled model response for one step (C3, opt-in via the agent's
+ * `recordProviderResponses`). Captures the RAW model output — the text
+ * before any lateral-leak block replaced it in the transcript — so a
+ * replay reproduces the original run faithfully.
+ *
+ * @stable
+ */
+export interface RunStepProviderResponse {
+  readonly modelId: string;
+  readonly text?: string;
+  readonly toolCalls?: ReadonlyArray<ToolCall>;
 }
 
 /**
@@ -106,6 +128,13 @@ export interface RunTaintSummary {
   readonly untrustedSeen: boolean;
   readonly sensitiveSeen: boolean;
   readonly untrustedSourceKinds: ReadonlyArray<string>;
+  /**
+   * C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms
+   * the verbatim-carry probe after a resume at tile granularity. Hashes
+   * only — no untrusted text is ever persisted (the invariant above
+   * holds).
+   */
+  readonly spanTileHashes?: ReadonlyArray<string>;
 }
 
 /**
@@ -170,4 +199,10 @@ export interface RunContext<TDeps = unknown> {
   readonly stepNumber: number;
   readonly messages: ReadonlyArray<Message>;
   readonly state: RunState;
+  /**
+   * C7: the current `agent.step` span (when the runtime traces). Spans
+   * created inside tool execution parent under it so a run's traces
+   * form one tree.
+   */
+  readonly span?: import('../contracts/tracer.js').AISpan;
 }
