@@ -37,6 +37,7 @@ import { ProviderHttpError, ProviderStreamParseError } from '../errors/errors.js
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { inferReasoningContract } from '../reasoning/classify-contract.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
+import { foldToolExamples } from '../tool-examples.js';
 import {
   applyCacheAnchors,
   toAiSdkPrompt,
@@ -418,7 +419,12 @@ function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
     model,
     messages,
     ...(system.length > 0 ? { system } : {}),
-    ...(req.tools !== undefined && req.tools.length > 0 ? { tools: toAiSdkTools(req.tools) } : {}),
+    // C2: fold worked examples in the adapter itself, so raw-adapter use
+    // (no createProvider wrapper) still puts them in front of the model.
+    // Idempotent: an upstream fold already dropped the structured field.
+    ...(req.tools !== undefined && req.tools.length > 0
+      ? { tools: toAiSdkTools(foldToolExamples(req.tools)) }
+      : {}),
     ...(req.toolChoice !== undefined ? { toolChoice: toAiSdkToolChoice(req.toolChoice) } : {}),
     ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
     // v4 reads `maxTokens`; v7 renamed it `maxOutputTokens` — send both

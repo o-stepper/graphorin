@@ -313,3 +313,34 @@ describe('prompt-cache economics against the real AI SDK (core-provider-02)', ()
     expect(prompt.every((m) => m.providerOptions === undefined)).toBe(true);
   });
 });
+
+describe('C2 — adapter-level worked-example folding', () => {
+  it('folds ToolDefinition.examples into the wire description on the RAW adapter path', async () => {
+    let seenParams: Record<string, unknown> | undefined;
+    const model = new MockLanguageModelV4({
+      doGenerate: (async (params: unknown) => {
+        seenParams = params as Record<string, unknown>;
+        return {
+          finishReason: 'stop',
+          usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+          content: [{ type: 'text', text: 'ok' }],
+          warnings: [],
+        };
+      }) as never,
+    });
+    const adapter = vercelAdapter(model, { runtimeOverrides: realRuntime() });
+    await adapter.generate({
+      messages: [{ role: 'user', content: 'hi' }],
+      tools: [
+        {
+          ...WEATHER_TOOL,
+          examples: [{ input: { city: 'kyiv' }, output: 'sunny, 25C', comment: 'plain city name' }],
+        },
+      ],
+    });
+    const tools = seenParams?.tools as ReadonlyArray<{ description?: string }>;
+    expect(tools[0]?.description).toContain('Examples:');
+    expect(tools[0]?.description).toContain('"city":"kyiv"');
+    expect(tools[0]?.description).toContain('// plain city name');
+  });
+});

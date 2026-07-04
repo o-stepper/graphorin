@@ -22,6 +22,7 @@ import type {
 import { LocalProviderInsecureTransportError, ProviderStreamParseError } from '../errors/errors.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
+import { foldToolExamples } from '../tool-examples.js';
 import {
   classifyLocalProvider,
   type LocalProviderClassification,
@@ -355,7 +356,9 @@ function buildBody(
   if (req.temperature !== undefined) body.temperature = req.temperature;
   if (req.maxTokens !== undefined) body.max_tokens = req.maxTokens;
   if (req.tools !== undefined && req.tools.length > 0) {
-    body.tools = req.tools.map((t) => ({
+    // C2: fold worked examples in the adapter itself (idempotent when an
+    // upstream createProvider fold already ran).
+    body.tools = foldToolExamples(req.tools).map((t) => ({
       type: 'function',
       function: {
         name: t.name,

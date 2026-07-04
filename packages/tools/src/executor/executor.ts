@@ -70,6 +70,7 @@ import {
   type SecretResolverHook,
   withSecretsScope,
 } from './tool-context.js';
+import { ToolRateLimitError } from './tool-errors.js';
 
 /** Union of `tool.execute.*` events the executor forwards through `streamingSink`. */
 export type ExecutorEvent =
@@ -309,6 +310,61 @@ class InlineToolTimeoutError extends Error {
   constructor(readonly limitMs: number) {
     super(`Tool execution exceeded the ${limitMs}ms wall-clock timeout.`);
     this.name = 'InlineToolTimeoutError';
+  }
+}
+
+/**
+ * tools-06: structured carrier for a non-ok `SandboxResult` so the error
+ * kind the sandbox reported survives to the model-visible `ToolError`
+ * instead of flattening to `execution_failed`.
+ */
+class SandboxOutcomeError extends Error {
+  constructor(
+    readonly sandboxErrorKind:
+      | 'timeout'
+      | 'memory-exceeded'
+      | 'sandbox-violation'
+      | 'aborted'
+      | 'execution-failed',
+    sandboxId: string,
+    message: string,
+    cause?: unknown,
+  ) {
+    super(
+      `[sandbox:${sandboxId}] ${sandboxErrorKind}: ${message}`,
+      ...(cause !== undefined ? [{ cause }] : []),
+    );
+    this.name = 'SandboxOutcomeError';
+  }
+}
+
+/** Narrow a loosely-typed sandbox error kind onto the contract union. */
+function normalizeSandboxErrorKind(
+  kind: string,
+): 'timeout' | 'memory-exceeded' | 'sandbox-violation' | 'aborted' | 'execution-failed' {
+  switch (kind) {
+    case 'timeout':
+    case 'memory-exceeded':
+    case 'sandbox-violation':
+    case 'aborted':
+      return kind;
+    default:
+      return 'execution-failed';
+  }
+}
+
+/** Map a sandbox-reported error kind onto the model-visible ToolErrorKind. */
+function toolErrorKindForSandbox(err: SandboxOutcomeError): ToolErrorKind {
+  switch (err.sandboxErrorKind) {
+    case 'timeout':
+      return 'timeout';
+    case 'sandbox-violation':
+    case 'memory-exceeded':
+      return 'sandbox_violation';
+    case 'aborted':
+      return 'aborted';
+    default:
+      return 'execution_failed';
   }
 }
 
@@ -808,7 +864,14 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
             kind: 'execution-failed',
             message: 'sandbox returned a non-ok result without error metadata',
           };
-          executeError = new Error(`[sandbox:${sandbox.id}] ${errInfo.kind}: ${errInfo.message}`);
+          // tools-06: preserve the sandbox's structured kind so a
+          // violation/timeout reaches the model as its own ToolErrorKind.
+          executeError = new SandboxOutcomeError(
+            normalizeSandboxErrorKind(errInfo.kind),
+            sandbox.id,
+            errInfo.message,
+            (errInfo as { cause?: unknown }).cause,
+          );
         }
       } else {
         // TL-4: inline closures get an enforced wall-clock limit — the
@@ -904,14 +967,25 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     if (executeError !== undefined) {
       const cancelled = linkedAbort.signal.aborted;
+      // tools-06: honour the structured carriers before flattening —
+      // sandbox results keep their reported kind, and an author-thrown
+      // ToolRateLimitError reaches the model as 'rate_limited'.
       const kind: ToolErrorKind = cancelled
         ? 'aborted'
         : executeError instanceof InlineToolTimeoutError
           ? 'timeout'
-          : 'execution_failed';
+          : executeError instanceof SandboxOutcomeError
+            ? toolErrorKindForSandbox(executeError)
+            : executeError instanceof ToolRateLimitError
+              ? 'rate_limited'
+              : 'execution_failed';
       const partialOutput =
         aggregator.chunks.length > 0
           ? toResultEnvelope({ raw: undefined, chunks: aggregator.chunks }).output
+          : undefined;
+      const retryAfterHint =
+        executeError instanceof ToolRateLimitError && executeError.retryAfterMs !== undefined
+          ? `retry after ${executeError.retryAfterMs}ms`
           : undefined;
       const error: ToolError = {
         toolCallId: call.toolCallId,
@@ -919,9 +993,11 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         kind,
         message: cancelled ? 'Tool execution cancelled' : describe(executeError),
         cause: executeError,
-        ...(partialOutput !== undefined
-          ? { hint: 'partial output captured in stream buffer' }
-          : {}),
+        ...(retryAfterHint !== undefined
+          ? { hint: retryAfterHint }
+          : partialOutput !== undefined
+            ? { hint: 'partial output captured in stream buffer' }
+            : {}),
       };
       if (cancelled) {
         incrementCounter('tool.streaming.events.dropped.total', {

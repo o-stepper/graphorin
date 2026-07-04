@@ -342,3 +342,40 @@ describe('prompt-cache usage on the OpenAI wire (core-provider-02)', () => {
     expect(finish.usage).toEqual({ promptTokens: 8, completionTokens: 2, totalTokens: 10 });
   });
 });
+
+describe('C2 — adapter-level worked-example folding (OpenAI wire)', () => {
+  it('folds examples into function.description on the raw adapter path', async () => {
+    const capture: { init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'gpt-test',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({
+        body: makeSseStream([
+          { choices: [{ delta: { content: 'ok' } }] },
+          { choices: [{ finish_reason: 'stop' }] },
+          '[DONE]',
+        ]),
+        capture,
+      }),
+      logger: () => {},
+    });
+    await collect(
+      provider.stream({
+        messages: [{ role: 'user', content: 'hi' }],
+        tools: [
+          {
+            name: 'weather',
+            description: 'look up the weather',
+            inputSchema: { type: 'object' },
+            examples: [{ input: { city: 'kyiv' }, output: 'sunny' }],
+          },
+        ],
+      }),
+    );
+    const body = JSON.parse(String(capture.init?.body ?? '{}')) as {
+      tools?: Array<{ function?: { description?: string } }>;
+    };
+    expect(body.tools?.[0]?.function?.description).toContain('Examples:');
+    expect(body.tools?.[0]?.function?.description).toContain('"city":"kyiv"');
+  });
+});

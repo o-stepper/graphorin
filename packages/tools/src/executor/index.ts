@@ -19,3 +19,4 @@ export {
   buildToolExecutionContext,
   type ToolContextOptions,
 } from './tool-context.js';
+export { ToolRateLimitError } from './tool-errors.js';
