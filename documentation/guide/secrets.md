@@ -75,15 +75,27 @@ const raw = value.reveal();
 Tools never see the application's full secret scope. The agent runtime calls `withChildToolSecretsContext({...})` from `@graphorin/security/secrets` to narrow the visible refs **per tool execution**:
 
 ```ts
-import { resolveSecret, withChildToolSecretsContext } from '@graphorin/security';
+import { resolveSecret, withChildToolSecretsContext, type SecretValue } from '@graphorin/security';
+import { tool } from '@graphorin/tools';
+import { z } from 'zod';
+
+const refundSchema = z.object({ orderId: z.string(), amountUsd: z.number() });
+const receiptSchema = z.object({ receiptId: z.string() });
+
+// your integration
+declare function callPaymentApi(
+  input: z.infer<typeof refundSchema>,
+  apiKey: SecretValue,
+): Promise<z.infer<typeof receiptSchema>>;
 
 const refundTool = tool({
   name: 'refund.create',
+  description: 'Issue a refund for a previously placed order.',
   inputSchema: refundSchema,
   outputSchema: receiptSchema,
   async execute(input, ctx) {
     return withChildToolSecretsContext(
-      { allowedRefs: ['keyring:payments_api_key'] },
+      { toolName: 'refund.create', secretsAllowed: ['keyring:payments_api_key'] },
       async () => {
         const apiKey = await resolveSecret('keyring:payments_api_key');
         return callPaymentApi(input, apiKey);
@@ -147,7 +159,7 @@ op://<vault>/<item>/[<section>/]<field>
 ```
 
 ```ts
-import { registerResolver } from '@graphorin/security';
+import { registerResolver, resolveSecret } from '@graphorin/security';
 import {
   createOnePasswordResolver,
   onePasswordResolver,

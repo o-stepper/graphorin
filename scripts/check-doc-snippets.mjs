@@ -42,10 +42,23 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CHECKED = [
   'documentation/guide/embedders.md',
   'documentation/guide/persistence.md',
-  // Many illustrative fragments; check just the embedder-migration snippet.
+  // E10 (docs-06): every compile-verified doc bug of the 2026-07 audit sat on
+  // an un-gated page (ctx.fetch, allowedRefs, createLlamaCppNodeAdapter,
+  // RRFReranker({k}), client.runAgent). These pages are now enforced;
+  // deliberately-partial fragments carry a `ts no-check` info token.
+  'documentation/guide/quickstart.md',
+  'documentation/guide/tools.md',
+  'documentation/guide/secrets.md',
+  'documentation/guide/standalone-server.md',
+  'documentation/guide/agent-runtime.md',
+  // Many illustrative fragments; check the API-bearing snippets.
   { file: 'documentation/guide/memory-system.md', includes: 'migrateEmbedder(' },
-  // Check the token-counter snippet (the rest reference external context).
+  { file: 'documentation/guide/memory-system.md', includes: 'RRFReranker(' },
+  // Check the token-counter + llama.cpp snippets (the vercel block imports
+  // @ai-sdk/* which is not installed in this workspace; the rest reference
+  // external context).
   { file: 'documentation/guide/providers.md', includes: 'setGlobalTokenCounter' },
+  { file: 'documentation/guide/providers.md', includes: 'llamaCppNodeAdapter' },
 ];
 
 const COMPILER_OPTIONS = {
@@ -70,7 +83,14 @@ const COMPILER_OPTIONS = {
     // Subpath exports need their own entry (the `@graphorin/*` glob below maps
     // the package name only). Add one per subpath a checked snippet imports.
     '@graphorin/memory/migration': ['packages/memory/dist/migration'],
+    '@graphorin/security/guardrails': ['packages/security/dist/guardrails'],
+    '@graphorin/security/sandbox': ['packages/security/dist/sandbox'],
+    '@graphorin/tools/code-mode': ['packages/tools/dist/code-mode'],
     '@graphorin/*': ['packages/*/dist'],
+    // Third-party deps a snippet may import are not in root node_modules
+    // (the repo root does not depend on them); resolve through a package
+    // that does.
+    zod: ['packages/tools/node_modules/zod'],
   },
 };
 

@@ -22,7 +22,7 @@ graphorin migrate-config <path> — migrate an older graphorin.config.* file
 graphorin doctor                — audit POSIX modes + sanity checks
 graphorin token <subcommand>    — create / list / revoke / rotate / rekey / verify
 graphorin secrets <subcommand>  — list / get / set / delete / ref / rotate
-graphorin storage <subcommand>  — status / encrypt / rekey / cleanup-backups
+graphorin storage <subcommand>  — status / encrypt / rekey / backup / cleanup-backups
 graphorin audit <subcommand>    — verify / prune / export
 graphorin memory <subcommand>   — status / inspect / activity / why / review / migrate
 graphorin consolidator <subcommand> — status / set-tier / stop
@@ -40,11 +40,11 @@ graphorin tools lint <path>     — lint workspace tools against the @graphorin/
 ## `graphorin start`
 
 ```bash
-graphorin start --config ./graphorin.config.toml
-graphorin start --port 8787 --storage ./assistant.db
+graphorin start --config ./graphorin.config.mjs
+graphorin start --host 127.0.0.1 --port 8787
 ```
 
-Boots the standalone server. Honours every config field listed in [Standalone server § Configuration](/guide/standalone-server#configuration). The process emits a single startup line with the resolved configuration (with secrets redacted).
+Boots the standalone server. Honours every config field listed in [Standalone server § Configuration](/guide/standalone-server#configuration) (the config loader reads `.ts` / `.js` / `.mjs` / `.json` files, not TOML). The process emits a single startup line with the resolved configuration (with secrets redacted).
 
 ## `graphorin doctor`
 
@@ -87,7 +87,7 @@ Use `--secrets-source <auto|keyring|encrypted-file|env>` and `--strict-secrets` 
 
 ```bash
 graphorin pricing status
-graphorin pricing refresh                     # fetches a fresh snapshot on demand
+graphorin pricing refresh --url <url>         # fetches a fresh snapshot on demand (network)
 graphorin pricing diff
 graphorin pricing lookup <model>              # resolve one model's entry
 graphorin pricing missing                     # models with no pricing data
@@ -98,7 +98,8 @@ The bundled snapshot is **never refreshed automatically** — only an explicit i
 ## `graphorin skills`
 
 ```bash
-graphorin skills install --source npm-package --name @org/skill --signature-policy required
+graphorin skills install npm:@org/skill --version 1.2.0 --trust-level trusted
+graphorin skills install git:https://github.com/org/skill --ref v1.2.0 --dry-run
 graphorin skills inspect <path-or-package>
 graphorin skills audit                       # checks signatures + sandbox tier
 graphorin skills migrate-frontmatter <path>  # idempotent dry-run by default
@@ -107,7 +108,7 @@ graphorin skills migrate-frontmatter <path>  # idempotent dry-run by default
 ## `graphorin auth`
 
 ```bash
-graphorin auth login mcp.example.com
+graphorin auth login --server https://mcp.example.com
 graphorin auth list                  # configured servers + whether a refresh token resolves
 graphorin auth refresh <server-id>   # real across restarts — the refresh token persists in the secrets store (SPL-1)
 graphorin auth revoke <server-id>    # RFC-7009 server-side revoke; the audit records 'error' when unconfirmed
@@ -127,10 +128,10 @@ graphorin memory activity --limit 20     # store-wide consolidator / reflection 
 graphorin memory why --session s1 --limit 5   # explain why facts were recalled (ranking signals) from persisted spans
 graphorin memory review                  # list quarantined facts / episodes / insights / procedures
 graphorin memory review --promote <id> --reason "reviewed"   # promote a reviewed item out of quarantine
-graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedders ./embedders.mjs
+graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedders ./embedders.mjs   # not yet supported (exit 2)
 ```
 
-`status`, `inspect`, `activity`, `why`, and `review` accept `--json` for a structured document. `memory inspect`, `memory activity`, and `memory why` are the operator side of [recall explainability](/guide/memory-system#recall-explainability) — `why` decodes the per-fact ranking signals from the persisted recall spans (RP-17). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` performs an [embedder migration](/guide/memory-system#embedder-migration) — `--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`, and `--embedders` points at a module exporting the source / target factories.
+`status`, `inspect`, `activity`, `why`, and `review` accept `--json` for a structured document. `memory inspect`, `memory activity`, and `memory why` are the operator side of [recall explainability](/guide/memory-system#recall-explainability) — `why` decodes the per-fact ranking signals from the persisted recall spans (RP-17). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` is **not yet supported**: `--embedders` module resolution is planned, and today the command always exits with code `2` (UNSUPPORTED) after printing the programmatic pointer. Run an [embedder migration](/guide/memory-system#embedder-migration) programmatically via `migrateEmbedder()` from `@graphorin/memory` instead (`--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`).
 
 ## `graphorin consolidator`
 
@@ -145,7 +146,7 @@ graphorin consolidator stop
 ## `graphorin migrate-export`
 
 ```bash
-graphorin migrate-export ./session.jsonl --session-id s1 --schema-version 1.0
+graphorin migrate-export ./session.jsonl --to-schema 1.0 --json
 ```
 
 Produces a deterministic JSONL export — see [Sessions § JSONL export schema 1.0](/guide/sessions#jsonl-export-schema-1-0).
@@ -161,7 +162,7 @@ graphorin telemetry inspect           # dump the resolved exporter + redaction c
 
 ## Privacy
 
-The CLI never phones home. The only outbound calls happen on commands that explicitly initiate a network operation (`graphorin pricing refresh`, `graphorin auth login`, `graphorin skills install --source npm-package`). Each one is documented in `--help` and audited.
+The CLI never phones home. The only outbound calls happen on commands that explicitly initiate a network operation (`graphorin pricing refresh`, `graphorin auth login`, `graphorin skills install npm:<name>`). Each one is documented in `--help` and audited.
 
 ## Next steps
 

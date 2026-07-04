@@ -20,7 +20,7 @@ export type { EncryptionCipher };
 export const DEFAULT_CIPHER: EncryptionCipher = 'sqlcipher';
 
 /**
- * Cipher-specific PRAGMAs that must be applied **immediately after**
+ * Cipher-specific PRAGMAs that must be applied **before**
  * `PRAGMA key = ...` for SQLite3MultipleCiphers to interpret the key
  * correctly. The list mirrors the upstream documentation.
  *

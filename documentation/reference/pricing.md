@@ -63,16 +63,16 @@ console.log(`Models tracked: ${BUNDLED_SNAPSHOT.models.length}`);
 When you want the latest prices, opt in explicitly:
 
 ```bash
-graphorin pricing refresh
+graphorin pricing refresh --url <snapshot-url>
 ```
 
-…or programmatically:
+`--url` is required (there is no baked-in refresh endpoint); pass `--out <file>` to persist the refreshed snapshot. Or programmatically:
 
 ```ts
 import { refreshPricing } from '@graphorin/pricing';
 
-const result = await refreshPricing();
-console.log(`Updated ${result.updatedCount} entries.`);
+const snapshot = await refreshPricing({ url: 'https://example.com/pricing.json' });
+console.log(`Fetched ${snapshot.entries.length} entries.`);
 ```
 
 `refreshPricing()` is the **only** network-touching code path in `@graphorin/pricing`. The repository's `pnpm run check-no-network` script allow-lists exactly this entry point.
@@ -82,7 +82,7 @@ console.log(`Updated ${result.updatedCount} entries.`);
 ```ts
 import { diffPricing, BUNDLED_SNAPSHOT, refreshPricing } from '@graphorin/pricing';
 
-const fresh = await refreshPricing({ apply: false });
+const fresh = await refreshPricing({ url: 'https://example.com/pricing.json' });
 const diff = diffPricing(BUNDLED_SNAPSHOT, fresh);
 console.log(diff.added, diff.removed, diff.changed);
 ```
@@ -142,7 +142,7 @@ When `@graphorin/observability` and `@graphorin/pricing` are both installed, the
 
 - [Providers](/guide/providers) — how the pricing snapshot integrates with the provider middleware.
 - [Observability](/guide/observability) — `gen_ai.usage.cost.usd` attribute.
-- [CLI](/guide/cli) — `graphorin pricing show / refresh / diff`.
+- [CLI](/guide/cli) — `graphorin pricing status / refresh / diff`.
 
 ---
 

@@ -35,7 +35,7 @@ exitOnFailures(report); // exit non-zero if any case failed
 
 ## Scorers
 
-A scorer takes the case input + the agent's output and returns a `{ passed, score, ... }` verdict. Compose as many as you need — a case passes when every scorer passes.
+A scorer takes the case input + the agent's output and returns a `{ pass, score, ... }` verdict. Compose as many as you need — a case passes when every scorer passes.
 
 - **`code/`** — deterministic, no model: `exactMatch`, `regexMatch` (stateless — `/g`/`/y` flags are stripped per case), `jsonPath`, and arbitrary `predicate` scorers.
 - **`llm/`** — an LLM-as-judge scorer (`llmJudge`) for open-ended answers. Hardened against prompt injection in the candidate output; a judge that fails to parse surfaces a scorer error rather than a silent zero.

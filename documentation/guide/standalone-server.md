@@ -84,7 +84,16 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/triggers/:id/enable` | Re-enable a paused trigger (the next fire is recomputed from now). |
 | `DELETE` | `/v1/triggers/:id` | **Destructive** — unregister and remove the trigger. |
 | `GET` | `/v1/workflows` | List configured workflows. |
+| `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
+| `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement `resume()`. Scope `workflows:resume:<id>`. |
+| `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`. Scope `workflows:read:<id>`. |
+| `GET` | `/v1/workflows/:id/checkpoints` | List a thread's checkpoints (`?threadId=...`). Scope `workflows:read:<id>`. |
+| `POST` | `/v1/workflows/:id/fork` | **Not implemented** on the server surface yet: answers an honest `501`; fork the thread programmatically via the workflow API. Scope `workflows:execute:<id>`. |
 | `POST` | `/v1/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
+
+::: info Terminal run state is short-lived
+`GET /v1/runs/:runId/state` reads the in-memory run tracker, and terminal records (completed / aborted / failed) are retained for about 5 minutes after completion (`DEFAULT_RUN_RETENTION_MS = 5 * 60_000`). Once the periodic sweep prunes the record, the route answers `404 run-not-found`. Read the final state promptly (or consume the event stream) rather than treating the endpoint as durable storage.
+:::
 
 ## Authentication modes
 
@@ -104,13 +113,30 @@ The `'none'` contract is explicit and total: there is no half-open state. Either
 ```ts
 import { GraphorinClient } from '@graphorin/client';
 
-const client = new GraphorinClient({
-  baseURL: 'wss://assistant.example.com',
-  token: process.env.SERVER_TOKEN,
+// 1. Start the run over REST. The route answers 202 with the runId
+//    and the WS subject the events are emitted on.
+const res = await fetch('https://assistant.example.com/v1/agents/planner/stream', {
+  method: 'POST',
+  headers: {
+    Authorization: `Bearer ${process.env.SERVER_TOKEN}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ input: 'Plan a hike.' }),
 });
+const { runId } = (await res.json()) as { runId: string };
 
-for await (const event of client.runAgent('planner', { prompt: 'Plan a hike.' })) {
-  if (event.type === 'text.delta') process.stdout.write(event.delta);
+// 2. Subscribe to the run's event stream over WebSocket.
+const client = new GraphorinClient({
+  baseUrl: 'wss://assistant.example.com',
+  auth: { kind: 'bearer', token: process.env.SERVER_TOKEN ?? '' },
+});
+await client.connect();
+
+const sub = await client.subscribe({ target: 'agent', id: 'planner', runId });
+for await (const event of sub.events()) {
+  if (event.type === 'text.delta') {
+    process.stdout.write((event.payload as { delta: string }).delta);
+  }
 }
 ```
 
@@ -133,6 +159,12 @@ Declare a trigger using the four typed factories:
 
 ```ts
 import { cron, interval, idle, event, createScheduler } from '@graphorin/triggers';
+import { createSqliteStore } from '@graphorin/store-sqlite';
+import type { Agent } from '@graphorin/agent';
+
+declare const agent: Agent; // your assembled agent (see the agent-runtime guide)
+
+const sqlite = await createSqliteStore({ path: './assistant.db' });
 
 const morningSummary = cron(
   'morning-summary',
@@ -187,28 +219,33 @@ Provider checks are passive — the server never opens an outbound connection it
 
 ## Configuration
 
-```toml
-# graphorin.config.toml
-[server]
-host = "127.0.0.1"
-port = 8787
+```js
+// graphorin.config.mjs
+import { defineConfig } from '@graphorin/server';
 
-[storage]
-path = "./assistant.db"
-encryption-at-rest = "keyring:graphorin_db_key?service=graphorin"
-
-[secrets]
-backend = "keychain"
-
-[triggers]
-enabled = true
-
-[observability]
-exporter = "otlp"
-otlp-url = "https://otel.example.com/v1/traces"
+export default defineConfig({
+  server: {
+    host: '127.0.0.1',
+    port: 8787,
+  },
+  storage: {
+    path: './assistant.db',
+    encryption: {
+      enabled: true,
+      cipher: 'sqlcipher',
+      passphraseRef: 'keyring:graphorin_db_key?service=graphorin',
+    },
+  },
+  secrets: {
+    source: 'keyring',
+  },
+  observability: {
+    logger: 'json',
+  },
+});
 ```
 
-The CLI command `graphorin start --config graphorin.config.toml` boots the server.
+The CLI command `graphorin start --config graphorin.config.mjs` boots the server. The config loader reads `.ts` / `.js` / `.mjs` / `.json` files (TOML is not supported); `defineConfig` is a typed pass-through that gives editor autocomplete over the full schema, and every field is optional with a documented default.
 
 ## Process model
 

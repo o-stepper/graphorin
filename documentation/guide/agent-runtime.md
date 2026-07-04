@@ -30,7 +30,7 @@ const agent = createAgent({
   name: 'helpful-assistant',
   instructions: 'You are a helpful, concise assistant.',
   provider: createProvider(
-    ollamaAdapter({ baseURL: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
     { acceptsSensitivity: ['public', 'internal'] },
   ),
 });
@@ -133,7 +133,7 @@ Because execution now flows through the executor, several tool-classification fi
 |---|---|
 | `secretsAllowed` | **Enforced** — per-tool secrets ACL; a tool requesting a ref outside its ACL is denied. |
 | `inboundSanitization` | **Enforced** — untrusted tool output is flagged / stripped / wrapped before it re-enters context. |
-| `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens), **text and structured object outputs alike**; the model sees the bounded text, never the full object. An over-cap structured output spills by default, storing the full body behind a handle (see [result handles](#result-handles-and-read_result)). |
+| `maxResultTokens` / `truncationStrategy` | **Enforced** — oversized results are truncated (default `16384` tokens), **text and structured object outputs alike**; the model sees the bounded text, never the full object. An over-cap structured output spills by default, storing the full body behind a handle (see [result handles](#result-handles-and-read-result)). |
 | `needsApproval` | **Enforced** — the run suspends for durable HITL (below) *before* the call runs. |
 | inline wall-clock timeout | **Enforced** (TL-4) — inline tools are bounded by the tier-resolved per-tool `timeoutMs` (or the executor default, 60s); a hanging tool that ignores `ctx.signal` fails with `ToolError({ kind: 'timeout' })` and the run continues. |
 | `sandboxPolicy` | Resolved and surfaced on the `tool.execute` span / audit, but inline `config.tools` run **in-process** — out-of-process isolation applies to module-loadable skill / MCP tools and is wired when those land. |
@@ -149,15 +149,15 @@ A tool declared `defer_loading: true` is **withheld** from the per-step catalogu
 
 ### Result handles and `read_result`
 
-A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint — so a large result never enters the context window **even when the tool returns a structured object** (which the executor now bounds and, on the default strategy, spills by default rather than inlining whole) — and auto-registers the built-in **`read_result`** tool whenever some tool spills. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root — never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. Reads also carry the **producer's taint** (TL-6): content read back from a handle whose producing tool was untrusted (MCP / web-search / untrusted skill) is re-sanitized with the producer's policy and recorded in the dataflow ledger under the producer's trust class — `read_result`'s own built-in trust never launders it. See [result handles](/guide/tools#result-handles-and-read_result) in the tools guide.
+A tool with `truncationStrategy: 'spill-to-file'` does more than truncate: the executor writes the full body to a run-scoped artifact and surfaces a `ResultHandle` on the result. The loop then inlines only the bounded **preview** plus a retrieval hint — so a large result never enters the context window **even when the tool returns a structured object** (which the executor now bounds and, on the default strategy, spills by default rather than inlining whole) — and auto-registers the built-in **`read_result`** tool whenever some tool spills. The model fetches just what it needs by byte range (`offset`/`length`) or line range (`startLine`/`endLine`). Handles are **opaque** (resolved only within the spill root — never an arbitrary-file read) and gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store. Reads also carry the **producer's taint** (TL-6): content read back from a handle whose producing tool was untrusted (MCP / web-search / untrusted skill) is re-sanitized with the producer's policy and recorded in the dataflow ledger under the producer's trust class — `read_result`'s own built-in trust never launders it. See [result handles](/guide/tools#result-handles-and-read-result) in the tools guide.
 
-The same `read_result` path resolves **external** handles too. An MCP `resource_link` tool result surfaces a handle (the resource URI) rather than inlining the body; wire `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` and the loop composes those readers after the spill reader (tried in order, each rejecting handles it does not own), so the model pages an MCP resource on demand exactly like a spilled artifact. Supplying any `resultReaders` force-registers `read_result`. See the [MCP client guide](/guide/mcp-client#large-resources-resource_link-result-handles).
+The same `read_result` path resolves **external** handles too. An MCP `resource_link` tool result surfaces a handle (the resource URI) rather than inlining the body; wire `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` and the loop composes those readers after the spill reader (tried in order, each rejecting handles it does not own), so the model pages an MCP resource on demand exactly like a spilled artifact. Supplying any `resultReaders` force-registers `read_result`. See the [MCP client guide](/guide/mcp-client#large-resources-and-result-handles).
 
 ### Code-mode (`toolInvocation: 'code-mode'`)
 
 By default (`toolInvocation: 'direct'`) the model emits one provider tool-call per tool and each result is inlined into the conversation. Set `toolInvocation: 'code-mode'` to flip the model into **programmatic tool calling**: the agent advertises only two meta-tools — `code_execute` and `code_search` — and the model reaches every real tool by writing a script.
 
-```ts
+```ts no-check
 const agent = createAgent({
   name: 'analyst',
   instructions: '…',
@@ -186,7 +186,7 @@ The `recoverable` flag and `recoveryHint` (`retry_later` / `check_input` / `try_
 
 `verifiers` run when the model emits a terminal (no-tool-call) response — the last moment before the run completes. Each is a deterministic check (a lint runner, a test command, a format validator); a failure feeds its feedback back to the model as a user message and the loop continues, up to `maxVerifierRounds` (default 1) extra rounds:
 
-```ts
+```ts no-check
 const agent = createAgent({
   name: 'coder',
   instructions: '...',
@@ -210,7 +210,7 @@ Every check emits a `verifier.result` event (also on the final, passing round), 
 
 With `recordProviderResponses: true` the loop journals each step's raw model response (text + tool calls + model id) onto `RunState.steps[].providerResponse`. `createReplayProvider(state)` then serves those responses back in order, so the same input re-executes the entire run — tools really run, the transcript rebuilds — with zero live model calls:
 
-```ts
+```ts no-check
 const original = createAgent({ name: 'a', instructions: '...', provider, tools, recordProviderResponses: true });
 const result = await original.run('do the thing');
 
@@ -232,7 +232,7 @@ What re-resuming a **stale pre-execution snapshot** (the suspend-time state, aft
 
 The `tool.approval.requested` event carries the `toolCallId` plus the tool's classification metadata. Operators that need to suspend the run combine the event with a snapshot of the current `RunState`:
 
-```ts
+```ts no-check
 import { runStateToJSON } from '@graphorin/agent';
 
 for await (const event of agent.stream('Summarise the status of my last order', {
@@ -264,7 +264,7 @@ Two `toTool` options complete the orchestrator-worker recipe (D2):
 - `contextFold: true | { maxChars }` — instead of the child's raw output, the parent's tool result is a compact distilled outcome: status, step / tool-call counts, the tools used, and the final text clamped to `maxChars` (default 2000). Tool-heavy child runs stop flooding the parent window.
 - `propagateTaint` (default `true`) — when the child run saw untrusted or sensitive content, the tool result carries a widen-only taint override (`sourceKind: 'sub-agent'`) that re-arms the **parent's** data-flow ledger, so provenance survives the fold. A no-op when the parent has no `dataFlowPolicy`.
 
-```ts
+```ts no-check
 const worker = createAgent({ name: 'researcher', provider, tools: readOnlyTools });
 const orchestrator = createAgent({
   name: 'lead',
@@ -310,15 +310,20 @@ Tool-use loops round-trip `reasoning` content parts (with opaque `meta` such as 
 ## Agent-level model fallback
 
 ```ts
+import { createAgent } from '@graphorin/agent';
 import { createProvider, ollamaAdapter, vercelAdapter } from '@graphorin/provider';
+
+// Vercel AI SDK model values (e.g. `openai('gpt-4o')` from `@ai-sdk/openai`).
+declare const gpt4o: Parameters<typeof vercelAdapter>[0];
+declare const gpt4oMini: Parameters<typeof vercelAdapter>[0];
 
 const agent = createAgent({
   name: 'helpful-assistant',
   instructions: 'You are a helpful, concise assistant.',
-  provider: createProvider(vercelAdapter({ provider: 'openai', model: 'gpt-4o' })),
+  provider: createProvider(vercelAdapter(gpt4o)),
   fallbackModels: [
     {
-      provider: createProvider(vercelAdapter({ provider: 'openai', model: 'gpt-4o-mini' })),
+      provider: createProvider(vercelAdapter(gpt4oMini)),
       model: 'gpt-4o-mini',
     },
     {
@@ -347,9 +352,11 @@ The `context.compacted` event carries `beforeTokens`, `afterTokens`, `summaryTok
 
 **Failure hardening and verbatim user turns.** A failing summarizer is retried once with a short backoff; a pass that drops messages without shrinking the buffer counts as a failure (the compression-loop class), and after 3 consecutive failed passes the AUTO trigger disables itself (one WARN) until a later successful pass — manual `compactNow` keeps working throughout and re-arms it. The summarize strategy also keeps the most recent user messages verbatim across compaction (`preserveUserMessages`, default 2; `0` disables): user words are the task statement, and only assistant/tool content is summarized away. The summary itself is framed as a handoff to another LLM, must quote identifiers (paths, ids, error strings) verbatim, and carries a dedicated "Constraints and non-negotiables" section (template id `summary-sections`, v1.3). Post-compaction hooks now receive `ctx.droppedMessages`, and the new `reanchorRecentResults({ maxResults, maxChars, readPreview? })` hook re-injects the result handles the compaction just dropped — with bounded previews when you wire `readPreview` to your result reader — so the model picks its working set back up via `read_result` instead of re-running tools.
 
+**Emergency tier at hard context overflow.** The threshold trigger can still be outrun by a single oversized step, and the run then hits a provider error with kind `'context-length'`. Before that error is surfaced, the loop fires one emergency compaction (at most once per run): a forced, aggressive pass with `preserveRecentTurns: 2` that bypasses trigger evaluation, then retries the same provider candidate, since the members of a fallback chain usually share the same window. This is a last-resort safety net, distinct from the threshold trigger above. It is skipped when no `memory` is wired or the run is `'secret'`-tier, and when the pass trims nothing the original error proceeds to the fallback chain or the terminal failure as usual; a committed emergency pass emits the same `context.compacted` event.
+
 **KV-cache prefix stability.** Auto-compaction never rewrites the trusted system-prompt prefix: the leading run of `system` messages established at run start is pinned, and only the conversational body after it is summarised. The prefix stays byte-identical across every step, so the provider's cache breakpoint is real and a long run never re-pays for the system prompt. Each compaction inserts its summary *after* the prefix, where the next pass folds it into a fresh summary-of-summary — so summaries never stack unbounded.
 
-**Sensitivity gate.** A run whose `sensitivity` is `'secret'` is never auto-compacted: summarisation is an LLM call, and secret-tier history is not shipped to a (potentially less-trusted) summarizer. Large individual tool outputs leave context the complementary way — via [result handles](#result-handles-and-read_result), which likewise refuse to spill a `'secret'`-tier body to the shared store.
+**Sensitivity gate.** A run whose `sensitivity` is `'secret'` is never auto-compacted: summarisation is an LLM call, and secret-tier history is not shipped to a (potentially less-trusted) summarizer. Large individual tool outputs leave context the complementary way — via [result handles](#result-handles-and-read-result), which likewise refuse to spill a `'secret'`-tier body to the shared store.
 
 **Summary trust (CE-15).** The spliced summary is a `system`-role message, but it is **not unconditionally trusted**: when the compacted window contained `<<<untrusted_content>>>`-wrapped tool results — or the injection heuristics flag the summarizer's own output — the compactor commits the LLM-authored body inside a `<<<untrusted_content trust="derived" tool="compaction-summarizer">>>` envelope (marker sequences in the body are neutralized so injected text cannot break out, and the envelope stays sticky across repeated compactions). The classification is surfaced as `CompactionResult.summaryTrust`. See [Security § Compaction summary trust](/guide/security#compaction-summary-trust).
 
@@ -359,7 +366,7 @@ When `@graphorin/memory.contextEngine` auto-compacts the buffer, the runtime fir
 
 ## Agent-step-level fan-out
 
-```ts
+```ts no-check
 const result = await agent.fanOut({
   children: [
     { agentId: 'researcher', invoke: () => childA.run('Research the topic') },
@@ -398,6 +405,132 @@ const result = await agent.fanOut({
 
 Recitation combats lost-in-the-middle drift on long runs (Manus todo.md evidence). It is **request-only and cache-layout-aware**: the block is appended to the per-step request copy (alongside the structured-output instruction), never to the shared message buffer or the persisted `RunState`, so it rides the last prompt-cache anchor and leaves the stable prefix untouched. Off by default; the tool surface is unchanged unless `plan: true` is set.
 
+## Guardrails
+
+`createAgent({ guardrails: { input: [...], output: [...] } })` wires deterministic screening around the run boundary (AG-2). The canonical contract lives in `@graphorin/security/guardrails`: a `GuardrailDefinition<TValue>` is `{ kind: 'input' | 'output', name, check(value, ctx) }`, and `check` returns a `GuardrailResult`: `{ ok: true }` to pass, or `{ ok: false, action, message, rewrite? }` to trip. The `GuardrailContext` handed to every check carries the stage plus the run / session / agent ids. Build your own with `defineInputGuardrail(...)` / `defineOutputGuardrail(...)`; `composeGuardrails(...)` is the underlying runner (the first `'block'` short-circuits, `'rewrite'` threads the rewritten value forward through the remaining checks).
+
+**Input guardrails** run over each fresh-run seed user message (string content) *before* the first provider call, so a blocked run never reaches the model. Resumed runs skip the pass; their seed was screened when first submitted. **Output guardrails** run over the final output on the completed path, immediately before `agent.end`. With a structured [`outputType`](#structured-output-outputtype) they screen the *parsed* value, not the raw text.
+
+| Action | Input stage | Output stage |
+|---|---|---|
+| `'block'` | The run fails with `error.code: 'guardrail-blocked'`; the model is never called. | The run fails with `error.code: 'guardrail-blocked'`. |
+| `'rewrite'` | Replaces the message content; the rewrite is mirrored into the persisted `RunState`, so the original text reaches neither the provider nor storage. | Replaces the durable `result.output`. Text deltas were already streamed; the rewrite governs what is persisted and returned, not the live token stream. |
+| `'warn'` | Advisory; the run continues unchanged. | Advisory; the run continues unchanged. |
+
+A blocking trip emits a `guardrail.tripped` event (`guardrailName`, `phase: 'input' | 'output'`, `reason`) ahead of the `agent.error`.
+
+Seven built-ins ship as the `guardrails.*` namespace, imported from `@graphorin/security/guardrails`:
+
+| Built-in | Stage | What it does |
+|---|---|---|
+| `guardrails.maxLength({ chars?, tokens?, countTokens? })` | `stage` option (default input) | Hard character / token ceiling; token counting via an injectable counter. |
+| `guardrails.promptInjectionHeuristics()` | input | Conservative regex catalogue for the canonical injection phrasings ("ignore previous instructions", system-prompt override); also matches the NFKC / zero-width-stripped fold of the text. |
+| `guardrails.piiDetection()` | `stage` option (default input) | Detects common PII patterns; default action `'rewrite'` (masked value). |
+| `guardrails.languageWhitelist({ allowed })` | input | Blocks input outside the allowed language set (`'unknown'` accepted by default). |
+| `guardrails.llmModeration({ provider })` | input | Moderation via an injectable `ModerationProvider` callback. |
+| `guardrails.outputModeration({ provider })` | output | The same decision surface, over the final output. |
+| `guardrails.toolUsageValidator({ requiredTools?, forbiddenTools?, maxCalls?, maxPerTool?, predicate? })` | output | Validates observed tool usage against required / forbidden / cardinality rules. |
+
+One typing note: `maxLength` and `piiDetection` pick their stage at runtime via the `stage` option and are therefore typed as the unnarrowed `GuardrailDefinition`; narrow them (for example `as InputGuardrail<string>`) when placing them in the typed config arrays. The other five return the stage-narrowed type directly.
+
+```ts
+import { createAgent } from '@graphorin/agent';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+import {
+  defineInputGuardrail,
+  defineOutputGuardrail,
+  guardrails,
+} from '@graphorin/security/guardrails';
+
+const agent = createAgent({
+  name: 'guarded-assistant',
+  instructions: 'You are a helpful, concise assistant.',
+  provider: createProvider(
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+    { acceptsSensitivity: ['public', 'internal'] },
+  ),
+  guardrails: {
+    input: [
+      guardrails.promptInjectionHeuristics<string>(),
+      defineInputGuardrail<string>({
+        name: 'mask-card-numbers',
+        check: (value) =>
+          /\b\d{16}\b/.test(value)
+            ? {
+                ok: false,
+                action: 'rewrite',
+                message: 'card number masked',
+                rewrite: value.replace(/\b\d{16}\b/g, '[card]'),
+              }
+            : { ok: true },
+      }),
+    ],
+    output: [
+      defineOutputGuardrail<string>({
+        name: 'no-internal-hosts',
+        check: (value) =>
+          value.includes('.internal.example.com')
+            ? { ok: false, action: 'block', message: 'internal hostname in output' }
+            : { ok: true },
+      }),
+    ],
+  },
+});
+```
+
+## Structured output (`outputType`)
+
+`createAgent({ outputType })` accepts an `OutputSpec<TOutput>`:
+
+| Field | Meaning |
+|---|---|
+| `kind` | `'text'` (the default behaviour) or `'structured'`. |
+| `schema` | Local validator: anything with `parse(value: unknown): TOutput` (a zod schema qualifies). Applied to the final model output on the completed path. |
+| `description` | Optional description shown to the model alongside the schema. |
+| `jsonSchema` | Wire-format JSON Schema: forwarded on `ProviderRequest.outputType` for adapters with native structured output, and embedded in the fallback JSON instruction appended as a trailing system message. |
+
+On the completed path the loop parses the final text as JSON (a fenced JSON code block is unwrapped first) and runs it through `schema.parse`; `result.output` is the typed value. A parse failure fails the run with `error.code: 'output-validation-failed'`; there is never a silent cast to the declared type. [Output guardrails](#guardrails) run *after* the parse, so they screen the typed value. Providers with native JSON mode consume the `jsonSchema` (mapped onto OpenAI-shaped `response_format` / Ollama's `format`); see [structured output on the provider side](/guide/providers#request-timeouts-structured-output).
+
+```ts
+import { createAgent } from '@graphorin/agent';
+import { createProvider, ollamaAdapter } from '@graphorin/provider';
+import { z } from 'zod';
+
+const TripPlan = z.object({
+  destination: z.string(),
+  days: z.number().int().min(1),
+  activities: z.array(z.string()),
+});
+
+const agent = createAgent<unknown, z.infer<typeof TripPlan>>({
+  name: 'planner',
+  instructions: 'You plan trips. Answer as JSON.',
+  provider: createProvider(
+    ollamaAdapter({ baseUrl: 'http://127.0.0.1:11434', model: 'qwen2.5:7b-instruct' }),
+    { acceptsSensitivity: ['public', 'internal'] },
+  ),
+  outputType: {
+    kind: 'structured',
+    schema: TripPlan,
+    description: 'The final trip plan envelope.',
+    jsonSchema: {
+      type: 'object',
+      properties: {
+        destination: { type: 'string' },
+        days: { type: 'number' },
+        activities: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['destination', 'days', 'activities'],
+    },
+  },
+});
+
+const result = await agent.run('Plan a 3-day trip to Tbilisi');
+if (result.status === 'completed') {
+  for (const activity of result.output.activities) console.log(activity);
+}
+```
+
 ## Progress artifacts
 
 `agent.progress.write(content, { role, seq, sensitivity, tags })` and `agent.progress.read({ runId, role, sinceSeq, maxArtifacts })` persist UTF-8 text artifacts to the artifact root via atomic-write `.tmp + rename` discipline so cross-session continuity holds even on hard crashes.
@@ -406,12 +539,16 @@ Recitation combats lost-in-the-middle drift on long runs (Manus todo.md evidence
 
 ```ts
 import { tool } from '@graphorin/tools';
+import { z } from 'zod';
 
 const planTool = tool({
   name: 'plan',
   description: 'Generate a multi-step plan',
   preferredModel: 'smart',
-  // …
+  inputSchema: z.object({ objective: z.string() }),
+  async execute({ objective }) {
+    return `1. Research ${objective}\n2. Draft\n3. Review`;
+  },
 });
 ```
 
@@ -436,7 +573,7 @@ Where the lateral-leak guards above match *patterns*, `dataFlowPolicy` (P1-3, op
 
 **Handle-level taint inheritance (TL-6/SDF-7).** Content fetched back through `read_result` carries its *producer's* taint, not the reader's built-in trust — so a spilled untrusted body re-entering context records as untrusted, and a sink echoing it verbatim trips the gate exactly as a direct flow would. Practically, enforce mode blocks *more* than it did before handle inheritance: flows that previously laundered through spill+fetch are now gated.
 
-```ts
+```ts no-check
 const agent = createAgent({
   name: 'assistant',
   instructions: '…',

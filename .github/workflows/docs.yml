@@ -85,11 +85,15 @@ jobs:
           echo 'preview log:' >&2 && cat /tmp/docs-preview.log >&2 || true
           exit 1
 
+      # E10 (docs-14): --include-fragments makes lychee validate #anchors
+      # against the target page's heading ids - without it seven broken
+      # in-site anchors (VitePress slugifies '_' to '-') sailed through.
       - name: Link check (lychee, loopback-only)
         uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2
         with:
           args: >-
             --no-progress
+            --include-fragments
             --exclude '.*'
             --include '^http://127\.0\.0\.1:8765'
             --base-url http://127.0.0.1:8765/

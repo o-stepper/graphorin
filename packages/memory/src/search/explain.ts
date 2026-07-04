@@ -36,8 +36,11 @@ export interface RecalledMemoryExplanation {
   /**
    * Raw per-signal scores contributing to `score`, exactly as the
    * pipeline recorded them on the hit: FTS (`bm25`), vector similarity
-   * (`vector`), the fused reciprocal-rank terms (`rrf` + per-list
-   * `rrf.list_N`), and the decay multiplier (`decay`) when decay ran.
+   * (`vector`), the fused reciprocal-rank terms (`rrf` plus one
+   * `rrf.<label>` entry per fused list keyed by the retriever kind,
+   * e.g. `rrf.fts` / `rrf.vector`, with `rrf.list_N` as the fallback
+   * when a list carries no label), and the decay multiplier (`decay`)
+   * when decay ran.
    */
   readonly signals: Readonly<Record<string, number>>;
 }

@@ -15,7 +15,7 @@ Graphorin is **vendor-neutral by principle**. A single `Provider` interface adap
 | `ollamaAdapter(...)` | A local [Ollama](https://ollama.com/) daemon over HTTP. | Local-first deployments that already run an Ollama daemon. |
 | `openAICompatibleAdapter(...)` | Any HTTP server speaking the OpenAI Chat Completions wire format. | LM Studio, LocalAI, vLLM, Together.ai, llama-server's OpenAI-compat mode, …  |
 | `llamaCppServerAdapter(...)` | The standalone `llama-server` binary from [`llama.cpp`](https://github.com/ggml-org/llama.cpp). | When you want the canonical `llama.cpp` server but not in-process. |
-| `createLlamaCppNodeAdapter(...)` (in `@graphorin/provider-llamacpp-node`) | [`node-llama-cpp@^3.5`](https://node-llama-cpp.withcat.ai/) (MIT). | In-process GGUF execution. Companion package (opt-in install). |
+| `llamaCppNodeAdapter(...)` (in `@graphorin/provider-llamacpp-node`) | [`node-llama-cpp@^3.5`](https://node-llama-cpp.withcat.ai/) (MIT). | In-process GGUF execution. Companion package (opt-in install). |
 
 ## Why a `Provider` and not the raw SDK?
 
@@ -53,12 +53,12 @@ import { createProvider, ollamaAdapter } from '@graphorin/provider';
 
 const provider = createProvider(
   ollamaAdapter({
-    baseURL: 'http://127.0.0.1:11434',
+    baseUrl: 'http://127.0.0.1:11434',
     model: 'qwen2.5:7b-instruct-q4_K_M',
   }),
   {
     acceptsSensitivity: ['public', 'internal'],
-    reasoningRetention: 'preserve',
+    reasoningRetention: 'pass-through-all',
   },
 );
 ```
@@ -106,12 +106,14 @@ export const heavyPlanner = tool({
 Map tiers to concrete Providers on the agent:
 
 ```ts
+import { openai } from '@ai-sdk/openai';
+
 const agent = createAgent({
   // …
   modelTierMap: {
     fast: createProvider(ollamaAdapter({ model: 'qwen2.5:1.5b' })),
     balanced: createProvider(ollamaAdapter({ model: 'qwen2.5:7b-instruct' })),
-    smart: createProvider(vercelAdapter({ provider: 'openai', model: 'gpt-4o' })),
+    smart: createProvider(vercelAdapter(openai('gpt-4o'))),
   },
 });
 ```
@@ -128,9 +130,9 @@ Some providers expose internal reasoning content (extended thinking, scratch pad
 
 | Mode | Behaviour |
 |---|---|
-| `'preserve'` | Round-trip reasoning into the next call (best for tool-use loops). |
-| `'cache-internal'` | Keep reasoning local for the next call but redact it from traces. |
-| `'strip'` | Drop reasoning entirely after the response. |
+| `'strip'` | Drop reasoning from the next request body. Default for hidden chain-of-thought providers (OpenAI o1 / o3, Gemini reasoning) and the conservative default for unknown providers. |
+| `'pass-through-claude'` | Round-trip Anthropic-shaped thinking blocks byte-equal to the previous assistant message. Default for round-trip-required providers (Claude tool-use with thinking). |
+| `'pass-through-all'` | Round-trip every reasoning content part the provider returns, regardless of vendor shape. Useful for custom providers with `reasoningContract: 'optional'` that still benefit from preserving the chain. |
 
 Handoffs always strip reasoning — `filters.stripReasoning()` is unconditional at the boundary.
 
@@ -145,15 +147,16 @@ The same adapters now consume `ProviderRequest.outputType` (set by the agent's `
 ### Vercel AI SDK
 
 ```ts
+import { openai } from '@ai-sdk/openai';
 import { createProvider, vercelAdapter } from '@graphorin/provider';
 
 const provider = createProvider(
-  vercelAdapter({ provider: 'openai', model: 'gpt-4o' }),
+  vercelAdapter(openai('gpt-4o')),
   { acceptsSensitivity: ['public'] },
 );
 ```
 
-The Vercel AI SDK provides the underlying connection to OpenAI, Anthropic, Google, Mistral, Groq, Cohere, etc. Configure provider-specific options (API key resolution, base URL, headers) on the adapter.
+`vercelAdapter(model, options?)` takes an AI SDK language-model object as its first argument (e.g. `openai('gpt-4o')` from `@ai-sdk/openai`, `anthropic('claude-...')` from `@ai-sdk/anthropic`). The Vercel AI SDK provides the underlying connection to OpenAI, Anthropic, Google, Mistral, Groq, Cohere, etc. Configure provider-specific options (API key resolution, base URL, headers) on the AI SDK model; the adapter's own `options` cover naming and capability overrides.
 
 ### Ollama
 
@@ -162,7 +165,7 @@ import { ollamaAdapter, createProvider } from '@graphorin/provider';
 
 const provider = createProvider(
   ollamaAdapter({
-    baseURL: 'http://127.0.0.1:11434',
+    baseUrl: 'http://127.0.0.1:11434',
     model: 'qwen2.5:7b-instruct-q4_K_M',
   }),
   { acceptsSensitivity: ['public', 'internal'] },
@@ -176,7 +179,7 @@ import { openAICompatibleAdapter, createProvider } from '@graphorin/provider';
 
 const provider = createProvider(
   openAICompatibleAdapter({
-    baseURL: 'http://127.0.0.1:1234/v1',
+    baseUrl: 'http://127.0.0.1:1234/v1',
     apiKey: 'lm-studio',
     model: 'qwen2.5-7b-instruct',
   }),
@@ -190,7 +193,10 @@ const provider = createProvider(
 import { llamaCppServerAdapter, createProvider } from '@graphorin/provider';
 
 const provider = createProvider(
-  llamaCppServerAdapter({ baseURL: 'http://127.0.0.1:8080' }),
+  llamaCppServerAdapter({
+    model: 'qwen2.5:7b-instruct-q4_k_m',
+    baseUrl: 'http://127.0.0.1:8080',
+  }),
   { acceptsSensitivity: ['public', 'internal'] },
 );
 ```
@@ -199,11 +205,11 @@ const provider = createProvider(
 
 ```ts
 // pnpm add @graphorin/provider-llamacpp-node
-import { createLlamaCppNodeAdapter } from '@graphorin/provider-llamacpp-node';
+import { llamaCppNodeAdapter } from '@graphorin/provider-llamacpp-node';
 import { createProvider } from '@graphorin/provider';
 
 const provider = createProvider(
-  await createLlamaCppNodeAdapter({ modelPath: '/abs/path/qwen2.5-7b.Q4_K_M.gguf' }),
+  llamaCppNodeAdapter({ modelPath: '/abs/path/qwen2.5-7b.Q4_K_M.gguf' }),
   { acceptsSensitivity: ['public', 'internal'] },
 );
 ```

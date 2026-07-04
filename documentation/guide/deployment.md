@@ -78,7 +78,8 @@ Type=simple
 User=graphorin
 Group=graphorin
 WorkingDirectory=/var/lib/graphorin
-ExecStart=/usr/bin/node /usr/lib/graphorin/cli/dist/cli.js start --config /etc/graphorin/graphorin.config.toml
+# The config loader reads .ts / .js / .mjs / .json files (not TOML).
+ExecStart=/usr/bin/node /usr/lib/graphorin/cli/dist/cli.js start --config /etc/graphorin/graphorin.config.mjs
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536

@@ -33,7 +33,11 @@ export const weather = tool({
   preferredModel: 'fast',
   async execute({ city, unit }, ctx) {
     ctx.signal.throwIfAborted();
-    const data = await ctx.fetch(`/weather?q=${encodeURIComponent(city)}&unit=${unit}`);
+    const res = await fetch(
+      `https://weather.example.com/v1?q=${encodeURIComponent(city)}&unit=${unit}`,
+      { signal: ctx.signal },
+    );
+    const data = await res.json();
     return { summary: data.summary, temperature: data.temperature };
   },
 });
@@ -56,6 +60,15 @@ Every tool declares two safety attributes plus an explicit approval predicate:
 Approval is **driven by `needsApproval`**, not by `sideEffectClass`. The latter is a classification used for idempotency checks, sandbox defaults, and audit emphasis; whether a specific call gates on a human is the operator's decision.
 
 ```ts
+import { tool } from '@graphorin/tools';
+import { z } from 'zod';
+
+// your integration
+declare function callPaymentApi(input: {
+  orderId: string;
+  amountUsd: number;
+}): Promise<{ receiptId: string }>;
+
 export const refundOrder = tool({
   name: 'refund.create',
   description: 'Issue a refund for a previously placed order.',
@@ -75,6 +88,15 @@ export const refundOrder = tool({
 A tool may ship up to **five** worked `examples` — `{ input, output, comment? }` triples validated against the tool's `inputSchema` / `outputSchema` at registration. The agent projects them onto the `ToolDefinition` it sends the provider, and the fold into the tool's model-facing **description** happens in the adapters themselves (as well as in `createProvider`, idempotently), so the model sees concrete input→output pairs next to the schema even on a raw-adapter setup (Anthropic reports complex-parameter accuracy rising 72% → 90% with worked examples). Example `comment`s also join the deferred-tool search index, so `tool_search` finds a tool by the phrasing its examples document:
 
 ```ts
+import { tool } from '@graphorin/tools';
+import { z } from 'zod';
+
+// your integration
+declare function lookupWeather(
+  city: string,
+  unit: string,
+): Promise<{ summary: string; temperature: number }>;
+
 export const weather = tool({
   name: 'weather.lookup',
   description: 'Look up the current weather for a city.',
@@ -88,8 +110,8 @@ export const weather = tool({
       comment: 'Typical summer afternoon.',
     },
   ],
-  async execute({ city, unit }, ctx) {
-    /* … */
+  async execute({ city, unit }) {
+    return lookupWeather(city, unit);
   },
 });
 ```
@@ -108,7 +130,7 @@ This keeps large, deferred tool sets lean: a deferred tool adds nothing to the p
 
 `createToolRegistry(...)` takes **no tool list**. You register each tool with its provenance (a `ToolSource`), then resolve any cross-source name collisions in one deterministic pass:
 
-```ts
+```ts no-check
 import { createToolRegistry } from '@graphorin/tools';
 
 const registry = createToolRegistry({ semanticScoreThreshold: 0.5 });
@@ -132,7 +154,7 @@ The optional second argument to `register(...)` is the tool's `ToolSource` — `
 
 ## ToolExecutor
 
-```ts
+```ts no-check
 import { createToolExecutor } from '@graphorin/tools';
 
 const executor = createToolExecutor({
@@ -167,7 +189,7 @@ What you get out of the box:
 
 Every tool result is bounded by `maxResultTokens` (default **16384**) — **text and structured (object/array) outputs alike**. When a result exceeds the cap, the executor applies the tool's `truncationStrategy` (`'middle'` / `'tail'` / `'spill-to-file'` / `'summarize'`); the bounded text is what reaches the model, never the full object. A structured output on the default `'middle'` strategy is routed through **spill-to-file by default**, so the full blob is preserved behind a `read_result` handle while only a bounded preview enters context. The 16k default sits deliberately below the ~25k single-result norm some providers tolerate; raise it per tool when a tool legitimately returns more, or set `maxResultTokens: 0` to disable the cap (the registry emits a WARN — uncapped results can blow the context window):
 
-```ts
+```ts no-check
 export const bigReport = tool({
   name: 'report.export',
   // …
@@ -181,6 +203,21 @@ export const bigReport = tool({
 For tools that can return many rows, prefer **pagination over one large response**. The convention is a `limit` + `cursor` input and a `nextCursor` in the output, so the model fetches one bounded page at a time instead of truncating a giant blob:
 
 ```ts
+import { tool } from '@graphorin/tools';
+import { z } from 'zod';
+
+const orderSchema = z.object({
+  id: z.string(),
+  placedAt: z.string(),
+  totalUsd: z.number(),
+});
+
+// your integration
+declare function queryOrders(args: {
+  limit: number;
+  cursor?: string;
+}): Promise<{ orders: z.infer<typeof orderSchema>[]; nextCursor?: string }>;
+
 export const listOrders = tool({
   name: 'orders.list',
   description: 'List orders, newest first. Pass the returned nextCursor to page.',
@@ -193,8 +230,8 @@ export const listOrders = tool({
     nextCursor: z.string().optional(),
   }),
   sideEffectClass: 'read-only',
-  async execute({ limit, cursor }, ctx) {
-    /* … */
+  async execute({ limit, cursor }) {
+    return queryOrders({ limit, cursor });
   },
 });
 ```
@@ -204,11 +241,14 @@ export const listOrders = tool({
 `'spill-to-file'` does more than truncate: the executor writes the **full** body to a run-scoped artifact (`<tmpdir>/graphorin-spill/<runId>/<toolCallId>.<ext>`, mode `0600`) and surfaces a structured `ResultHandle` on the `ToolResult`:
 
 ```ts
+import type { ToolTrustClass } from '@graphorin/core';
+
 interface ResultHandle {
   uri: string; // opaque, run-scoped — e.g. "graphorin-spill:<runId>/<toolCallId>.json"
   kind: 'spill-file' | 'resource-link'; // 'resource-link' = an MCP resource_link (see below)
   preview: string; // the bounded slice already inlined in context
   bytes?: number; // size of the full artifact
+  mediaType?: string; // MIME type of the stored artifact, when known
   producerTrustClass?: ToolTrustClass; // who produced the stored body (TL-6)
 }
 ```
@@ -219,7 +259,7 @@ interface ResultHandle {
 
 The agent inlines only `preview` (plus a one-line retrieval hint) — so a multi-megabyte result never enters the context window, **even when the tool returns a structured object** — and auto-registers the built-in **`read_result`** tool whenever at least one registered tool spills. The model then fetches just what it needs, by byte range or by line range:
 
-```ts
+```ts no-check
 // model-issued call, paging through the spilled artifact:
 read_result({ handle: 'graphorin-spill:run-42/orders.json', startLine: 1, endLine: 50 });
 read_result({ handle: 'graphorin-spill:run-42/orders.json', offset: 4096, length: 2048 });
@@ -228,7 +268,7 @@ read_result({ handle: 'graphorin-spill:run-42/orders.json', offset: 4096, length
 
 The `uri` is **opaque**: the spill reader resolves it only within the spill artifact root, so a handle can never be used to read arbitrary files (a `..` traversal or a non-`graphorin-spill:` scheme is rejected). Handles are gated by **sensitivity**: a `sensitivity: 'secret'` tool is never spilled to the shared store — its body is truncated in place and no handle is produced. Operators that need a sandbox-aware artifact path inject their own writer + reader via `createToolExecutor({ spill })` and `createReadResultTool({ reader })`.
 
-**External handles (`'resource-link'`).** The same machinery resolves non-spill handles. An MCP `resource_link` tool result surfaces a `resource-link` handle (the resource `uri`) instead of inlining the body; the agent resolves it on demand by composing extra readers after the spill reader — pass `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` so `read_result` pages an MCP resource exactly like a spilled artifact. Readers are tried in order and each rejects handles it does not own, so resolution falls through cleanly. See the [MCP client guide](/guide/mcp-client#large-resources-resource_link-result-handles).
+**External handles (`'resource-link'`).** The same machinery resolves non-spill handles. An MCP `resource_link` tool result surfaces a `resource-link` handle (the resource `uri`) instead of inlining the body; the agent resolves it on demand by composing extra readers after the spill reader — pass `createAgent({ resultReaders: [createMcpResourceReader({ clients })] })` so `read_result` pages an MCP resource exactly like a spilled artifact. Readers are tried in order and each rejects handles it does not own, so resolution falls through cleanly. See the [MCP client guide](/guide/mcp-client#large-resources-and-result-handles).
 
 ## Code-mode
 
@@ -237,6 +277,9 @@ Code-mode lets the model orchestrate many tools in one sandboxed script, so inte
 ```ts
 import { projectToolApi, createCodeExecuteTool, createCodeSearchTool } from '@graphorin/tools/code-mode';
 import { runBridgedSource } from '@graphorin/security/sandbox';
+import type { ToolRegistry } from '@graphorin/tools';
+
+declare const registry: ToolRegistry; // the resolved registry from createToolRegistry(...)
 
 // Project the resolved tools as a typed code API the model can read:
 const projection = projectToolApi(registry.list());
@@ -281,7 +324,7 @@ The two sandbox peers are opt-in and not installed by default. See [Security](/g
 
 The executor accepts an optional `dataFlowGuard` (P1-3) that enforces data-flow rules at the tool boundary using provenance rather than pattern scans — defusing the lethal trifecta (untrusted content + private data + an exfiltration sink). The agent wires it from `createAgent({ dataFlowPolicy })`; the pure engine lives in `@graphorin/security/dataflow`:
 
-```ts
+```ts no-check
 import {
   createDataFlowPolicy,
   createTaintLedger,

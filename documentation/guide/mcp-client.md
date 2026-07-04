@@ -7,6 +7,8 @@ description: An in-core Model Context Protocol client over stdio and Streamable 
 
 `@graphorin/mcp` is an in-core Model Context Protocol client wrapping [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk). It exposes connections, tool discovery, prompt discovery, resource discovery, OAuth-protected transports, and the bridge that turns an MCP-discovered tool into a Graphorin `Tool` your agent can call.
 
+The scoping is deliberate and consume-only: Graphorin is an MCP **client** (stdio / Streamable HTTP / SSE) and nothing more. It does not expose its own tools or agents over MCP; there is no MCP server in the framework. To invoke Graphorin tools or agents remotely, use the REST / WebSocket [standalone server](/guide/standalone-server) (`@graphorin/server`). That server's `/v1/mcp/servers` routes (list / register / remove, scope `mcp:admin`) manage which *external* MCP servers the runtime connects to as a client; they are a management surface, not an MCP endpoint.
+
 ## Transports
 
 Two transports are supported, matching the current MCP specification (a deprecated SSE transport is also accepted with a one-time warning):
@@ -86,7 +88,7 @@ The adapter:
 - routes execution back through the client's `callTool(name, input)`;
 - emits `mcp.call.invoked.total` / `mcp.call.failed.total` / `mcp.call.cancelled.total` counters per call (there is no MCP-specific span today; adapted tools still get the executor's regular `tool.execute` span).
 
-## Large resources: `resource_link` → result handles
+## Large resources and result handles
 
 When a tool result includes a `resource_link` content part, the adapter does **not** inline the resource body. It surfaces a compact preview plus the resource `uri` as a *result handle* (ties to the P1-4 result handles), so a large dataset enters context only if the model asks for it. The model fetches it on demand through the built-in `read_result` tool, backed by an MCP resource reader:
 
