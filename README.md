@@ -63,11 +63,9 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.5.0`** pre-release line. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.5.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
-Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup.
-
-Published packages will appear on the npm registry under the `@graphorin/*` scope as each implementation phase completes — see the documentation at <https://docs.graphorin.com> for the rollout details.
+Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
 ## Use cases
 
@@ -97,14 +95,27 @@ What Graphorin **does not** ship (intentional): channel adapters (Telegram, Slac
 
 ## Quick start
 
-> **Note.** The published `@graphorin/*` packages are not yet available on the npm registry — they will land as each implementation phase of the `v0.5.0` line completes. The instructions below describe how to work with the framework once the relevant packages have been released. The full quickstart lives at **<https://docs.graphorin.com/guide/quickstart>**.
+The `@graphorin/*` packages are published on the npm registry (since `v0.5.0`). The full quickstart — a 20-line memory-backed agent that streams tokens and persists facts to local SQLite via local embeddings — lives at **<https://docs.graphorin.com/guide/quickstart>**.
 
 ### Prerequisites
 
 - **Node.js** 22.x LTS or newer (see [`.nvmrc`](./.nvmrc)).
-- **pnpm** as the package manager (the project default — `npm` and `yarn` work for *consumers* of published `@graphorin/*` packages, but development of the framework itself uses pnpm).
+- Any package manager — **pnpm** is the project default; `npm` and `yarn` work fine for consumers.
+- ESM-only modules: your project must be `"type": "module"` (or use `.mjs` files).
 
-### From source
+### Install from npm
+
+A memory-backed local assistant needs at minimum the agent runtime, the memory facade, a provider, and a storage adapter:
+
+```bash
+pnpm add @graphorin/agent @graphorin/memory @graphorin/provider \
+        @graphorin/store-sqlite @graphorin/embedder-transformersjs \
+        zod
+```
+
+See the [Installation guide](https://docs.graphorin.com/guide/installation) for `npm`/`yarn` equivalents, what each package does, and the optional adapters.
+
+### From source (framework development)
 
 ```bash
 git clone https://github.com/o-stepper/graphorin.git
@@ -114,8 +125,6 @@ pnpm install --frozen-lockfile
 pnpm -r build
 pnpm -r test
 ```
-
-A 20-line "hello world" script that creates a memory-backed agent, streams tokens, and persists facts to local SQLite via local embeddings will be published with the `v0.5.0` release. Until then, the same example is available in the [Quickstart guide](https://docs.graphorin.com/guide/quickstart).
 
 ## Architecture at a glance
 

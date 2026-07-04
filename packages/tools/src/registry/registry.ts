@@ -33,6 +33,7 @@ import {
   type ToolAuditEvent,
 } from '../audit/index.js';
 import { DuplicateToolNameError, ToolCollisionError } from '../errors/index.js';
+import { projectSchemaToJsonSchema } from '../schema/to-json-schema.js';
 import { defineBm25Index } from './bm25.js';
 import { normaliseTool } from './normalize.js';
 import type {
@@ -714,9 +715,12 @@ function toMatch(
   source: 'semantic' | 'bm25' | 'regex-name',
 ): ToolSearchMatch {
   const bounded = Math.max(0, Math.min(1, score));
-  const inputSchema = (entry.inputSchema as { _input?: unknown } | undefined) ?? {};
+  // tools-01: project the live validator (plain Zod, toJSON-bearing, or
+  // already-JSON-Schema) onto a JSON Schema record — `tool_search` output
+  // is model-facing, so serialising Zod internals here would ship garbage.
+  const inputSchema = projectSchemaToJsonSchema(entry.inputSchema) ?? {};
   // A5: carry the output schema so code-mode can render the signature's return type.
-  const outputSchema = entry.outputSchema as Readonly<Record<string, unknown>> | undefined;
+  const outputSchema = projectSchemaToJsonSchema(entry.outputSchema);
   return Object.freeze({
     name: entry.name,
     description: entry.description,

@@ -265,7 +265,18 @@ export interface ContextEngine {
    */
   shouldCompact(
     messages: ReadonlyArray<Message>,
-    options?: { readonly precomputedTokens?: number },
+    options?: {
+      readonly precomputedTokens?: number;
+      /**
+       * Index of the first COMPACTABLE message (context-engine-04): the
+       * caller's pinned, never-compacted system prefix ends here. The
+       * SOTA-4 reclaim floor counts only `messages.slice(from)` older
+       * turns as reclaimable — without it a large system prompt is
+       * counted as reclaimable and the floor fires the summarizer for
+       * near-zero real reclaim. Default `0` (everything compactable).
+       */
+      readonly compactableFromIndex?: number;
+    },
   ): Promise<boolean>;
   /**
    * Run a compaction call. Phase 12 calls this when the trigger
@@ -285,6 +296,16 @@ export interface ContextEngine {
     readonly preserveRecentTurns?: number;
     /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
     readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
+    /**
+     * The caller's pinned system prefix — the messages EXCLUDED from
+     * `messages` before this call (context-engine-04). Used only for
+     * accounting: the anti-thrash guard and the "still above threshold"
+     * warning must compare against the FULL post-splice context
+     * (prefix + summary + preserved + essentials), or a real system
+     * prompt defeats the guard and a summarizer call fires every step
+     * at the context edge. Never compacted, never returned.
+     */
+    readonly prefixMessages?: ReadonlyArray<Message>;
     readonly signal?: AbortSignal;
   }): Promise<{
     readonly result: CompactionResult;
@@ -689,7 +710,10 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
 
   async function shouldCompact(
     messages: ReadonlyArray<Message>,
-    options: { readonly precomputedTokens?: number } = {},
+    options: {
+      readonly precomputedTokens?: number;
+      readonly compactableFromIndex?: number;
+    } = {},
   ): Promise<boolean> {
     if (!compactionEnabled) return false;
     if (compactionThresholdTokens === Number.POSITIVE_INFINITY) return false;
@@ -703,11 +727,16 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     }
     // SOTA-4 reclaim-floor: skip when the older (compactable) portion is too
     // small to be worth a summarizer call — avoids compact-thrash at the
-    // threshold. Counts only the older slice; cheap relative to the avoided call.
+    // threshold. Counts only the older slice; cheap relative to the avoided
+    // call. context-engine-04: the caller's pinned system prefix
+    // (`compactableFromIndex`) is NOT reclaimable and must not be counted —
+    // a 10k-token prefix would otherwise satisfy any floor while the body
+    // holds near-zero reclaimable tokens.
     if (compactionMinReclaimTokens > 0) {
-      const olderCount = Math.max(0, messages.length - reclaimPreserveTurns);
-      if (olderCount === 0) return false;
-      const olderTokens = await countMessageTokens(messages.slice(0, olderCount), tokenCounter);
+      const from = Math.max(0, Math.min(options.compactableFromIndex ?? 0, messages.length));
+      const olderCount = Math.max(from, messages.length - reclaimPreserveTurns);
+      if (olderCount <= from) return false;
+      const olderTokens = await countMessageTokens(messages.slice(from, olderCount), tokenCounter);
       if (olderTokens < compactionMinReclaimTokens) return false;
     }
     return true;
@@ -726,6 +755,8 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     readonly preserveRecentTurns?: number;
     /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
     readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
+    /** The caller's pinned system prefix — accounting only (context-engine-04). */
+    readonly prefixMessages?: ReadonlyArray<Message>;
     readonly signal?: AbortSignal;
   }): Promise<{
     readonly result: CompactionResult;
@@ -771,6 +802,19 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const hookFailures: Array<{ readonly hookName: string; readonly reason: string }> = [];
     const extraContent: MessageContent[] = [];
     let hooksFired = 0;
+    // context-engine-02: the same D2 privacy decision `assemble()` applies
+    // to blocks / rules / facts, handed to the hooks — their output is
+    // spliced into the buffer and shipped to the provider, so it must obey
+    // the same filter or secret-tier content leaks on the first compaction.
+    const allowSensitivity = (sensitivity: Sensitivity | undefined): boolean =>
+      privacyDecide(sensitivity, {
+        ...(privacy.providerAcceptsSensitivity !== undefined
+          ? { providerAcceptsSensitivity: privacy.providerAcceptsSensitivity }
+          : {}),
+        providerTrust,
+        cloudUploadConsent,
+        defaultSensitivity,
+      }).decision === 'pass';
     for (const hook of compactionHooks) {
       try {
         // CE-6: hooks receive the REAL compaction context — the old code
@@ -781,6 +825,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
             memory: callInput.memory,
             scope: callInput.scope,
             ...(callInput.procedural !== undefined ? { procedural: callInput.procedural } : {}),
+            allowSensitivity,
           },
           ctx,
         );
@@ -799,13 +844,30 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     });
     // CE-7: arm the anti-thrash guard and surface the failure mode where
     // compaction could not get under the trigger threshold.
-    lastCompactionAfterTokens = enrichedResult.afterTokens;
+    //
+    // context-engine-04: `shouldCompact` compares the FULL buffer total
+    // (pinned prefix included) against this baseline, so the baseline must
+    // be full-basis too: body afterTokens + the caller's pinned prefix +
+    // the Context-Essentials message the caller splices in. Arming with
+    // the body-only number let any real system prompt (> 256 tokens)
+    // defeat the guard, re-firing a summarizer LLM call at the top of
+    // EVERY step whenever compaction could not get under the threshold.
+    const prefixTokens =
+      callInput.prefixMessages !== undefined && callInput.prefixMessages.length > 0
+        ? await countMessageTokens(callInput.prefixMessages, tokenCounter)
+        : 0;
+    let essentialsTokens = 0;
+    for (const part of extraContent) {
+      if (part.type === 'text') essentialsTokens += await tokenCounter.countText(part.text);
+    }
+    const fullAfterTokens = enrichedResult.afterTokens + prefixTokens + essentialsTokens;
+    lastCompactionAfterTokens = fullAfterTokens;
     if (
       compactionThresholdTokens !== Number.POSITIVE_INFINITY &&
-      enrichedResult.afterTokens >= compactionThresholdTokens
+      fullAfterTokens >= compactionThresholdTokens
     ) {
       process.stderr.write(
-        `[graphorin/memory] compaction finished at ${enrichedResult.afterTokens} tokens — still at/above the ${compactionThresholdTokens}-token trigger (oversized preserved turns?). The immediate re-trigger is suppressed until the buffer grows.\n`,
+        `[graphorin/memory] compaction finished at ${fullAfterTokens} tokens (body ${enrichedResult.afterTokens} + pinned prefix ${prefixTokens} + essentials ${essentialsTokens}) — still at/above the ${compactionThresholdTokens}-token trigger (oversized preserved turns?). The immediate re-trigger is suppressed until the buffer grows.\n`,
       );
     }
     return Object.freeze({

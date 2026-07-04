@@ -33,6 +33,12 @@ export function reanchorPinnedFacts(options: {
       for (const id of ids) {
         const fact = await deps.memory.semantic.get(deps.scope, id).catch(() => null);
         if (fact === null || fact.deletedAt !== undefined) continue;
+        // context-engine-02: pinning is not a privacy override — a
+        // secret-tier fact the D2 filter withholds from the assembled
+        // prompt must not re-enter via the post-compaction splice.
+        if (deps.allowSensitivity !== undefined && !deps.allowSensitivity(fact.sensitivity)) {
+          continue;
+        }
         const tagBlob =
           fact.tags !== undefined ? ` tags="${escapeXml((fact.tags ?? []).join(','))}"` : '';
         const fragment = `  <fact id="${escapeXml(fact.id)}"${tagBlob}>${escapeXml(fact.text)}</fact>`;

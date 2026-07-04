@@ -292,17 +292,19 @@ async function loadFromFolder(
   const parsed = parseAndValidate(skillMd, options);
   const { diagnostics, body } = parsed;
   // RP-9: trust is granted by the integrator, never the artifact. An operator
-  // override on the source wins; absent one, a folder's self-declared
+  // override on the source wins; absent one, the artifact's self-declared
   // 'trusted'/'trusted-with-scripts' is capped at 'unknown' so a downloaded
-  // directory cannot promote itself out of the sandbox + taint-marking. The
+  // skill cannot promote itself out of the sandbox + taint-marking. The cap
+  // applies to EVERY source kind (mcp-skills-01): npm/git sources previously
+  // took the SKILL.md's self-declared level verbatim, and — because the
+  // signature trust root allows an inline key in the same SKILL.md — a
+  // malicious package could inline its own key, self-sign, declare
+  // 'trusted', and load unsandboxed with no operator involvement. The
   // resolved level is written back onto the metadata so every downstream
   // consumer (tool stamping, sandbox tier, inbound sanitization) sees it.
   const operatorTrust = extractTrustLevel(source);
   const effectiveTrust: SkillsTrustLevel =
-    operatorTrust ??
-    (source.kind === 'folder'
-      ? capSelfDeclaredTrust(parsed.metadata.graphorinTrustLevel)
-      : parsed.metadata.graphorinTrustLevel);
+    operatorTrust ?? capSelfDeclaredTrust(parsed.metadata.graphorinTrustLevel);
   const metadata: SkillMetadata =
     effectiveTrust === parsed.metadata.graphorinTrustLevel
       ? parsed.metadata

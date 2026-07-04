@@ -53,6 +53,13 @@ export type JsonSchemaLike =
  * contract from `@graphorin/core` (a `parse` method that throws + a
  * `safeParse` method that returns a `ZodLikeSafeParseResult`).
  *
+ * The validator also retains the **source JSON Schema** and exposes it
+ * via `toJSON()` (tools-01): `toolToDefinition` and the code-mode
+ * signature projection honour `toJSON()`, so without it an MCP tool's
+ * parameters serialise to `{}` on the provider wire body — the model
+ * would see an argument-less tool. Boolean schemas normalise to their
+ * record equivalents (`true` → `{}`, `false` → `{ not: {} }`).
+ *
  * @stable
  */
 export function buildJsonSchemaValidator<T = unknown>(schema: JsonSchemaLike): ZodLikeSchema<T> {
@@ -68,7 +75,12 @@ export function buildJsonSchemaValidator<T = unknown>(schema: JsonSchemaLike): Z
     }
     return { success: false, error: buildError(issues) };
   }
-  return Object.freeze({ parse, safeParse });
+  function toJSON(): Readonly<Record<string, unknown>> {
+    if (schema === true) return {};
+    if (schema === false) return { not: {} };
+    return schema;
+  }
+  return Object.freeze({ parse, safeParse, toJSON });
 }
 
 interface Issue {

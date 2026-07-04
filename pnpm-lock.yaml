@@ -480,6 +480,10 @@ importers:
       '@graphorin/tools':
         specifier: workspace:*
         version: link:../tools
+    devDependencies:
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
 
   packages/cli:
     dependencies:

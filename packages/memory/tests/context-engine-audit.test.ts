@@ -183,6 +183,49 @@ describe('Phase 10d audit — token counter adapter (TokenCounter from @graphori
     expect(out).toContain('thinking');
     expect(out).toContain('[non-text-part]');
   });
+
+  it('renderMessageText renders assistant tool-call args so they contribute tokens (context-engine-03)', async () => {
+    const script = 'x'.repeat(4000);
+    const withCall: Message = {
+      role: 'assistant',
+      content: 'running the script',
+      toolCalls: [{ toolCallId: 't1', toolName: 'code_execute', args: { source: script } }],
+    };
+    const withoutCall: Message = { role: 'assistant', content: 'running the script' };
+    const rendered = renderMessageText(withCall);
+    expect(rendered).toContain('[tool-call:code_execute]');
+    expect(rendered).toContain(script);
+    // Large tool args must raise the count — pre-fix they contributed ZERO
+    // while the provider serialized and billed for them, so compaction
+    // fired late and the provider could 400 with context-length first.
+    const withTokens = await countMessageTokens([withCall], HEURISTIC_TOKEN_COUNTER);
+    const withoutTokens = await countMessageTokens([withoutCall], HEURISTIC_TOKEN_COUNTER);
+    expect(withTokens).toBeGreaterThan(withoutTokens + 900);
+  });
+
+  it('adaptTokenCounter preserves the native count(messages) fast path (context-engine-03)', async () => {
+    let messagePathCalls = 0;
+    const counter: TokenCounter = {
+      id: 'native',
+      version: '1.0',
+      async count(messages) {
+        messagePathCalls += 1;
+        return messages.length * 11;
+      },
+      async countText(text) {
+        return text.length;
+      },
+    };
+    const adapted = adaptTokenCounter(counter);
+    const messages: Message[] = [
+      { role: 'user', content: 'a' },
+      { role: 'assistant', content: 'b' },
+    ];
+    // The adapter used to strip `count`, forcing the per-message render
+    // path (which ignored tool calls) for every real counter.
+    expect(await countMessageTokens(messages, adapted)).toBe(22);
+    expect(messagePathCalls).toBe(1);
+  });
 });
 
 describe('Phase 10d audit — auto-compaction edge cases', () => {

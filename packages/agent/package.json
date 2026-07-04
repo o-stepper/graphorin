@@ -111,5 +111,8 @@
   "publishConfig": {
     "access": "public",
     "provenance": true
+  },
+  "devDependencies": {
+    "zod": "^3.25.0"
   }
 }

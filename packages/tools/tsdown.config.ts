@@ -13,6 +13,7 @@ export default defineConfig({
     'src/audit/index.ts',
     'src/errors/index.ts',
     'src/code-mode/index.ts',
+    'src/schema/index.ts',
   ],
   format: ['esm'],
   platform: 'node',

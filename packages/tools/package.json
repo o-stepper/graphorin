@@ -72,6 +72,10 @@
       "types": "./dist/result/index.d.ts",
       "import": "./dist/result/index.js"
     },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./dist/schema/index.js"
+    },
     "./built-in": {
       "types": "./dist/built-in/index.d.ts",
       "import": "./dist/built-in/index.js"

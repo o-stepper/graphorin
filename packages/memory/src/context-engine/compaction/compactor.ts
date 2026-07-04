@@ -148,7 +148,20 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   // Slice the older portion + preserve the recent N turns. We treat
   // a "turn" as a single message for the v0.1 surface; the spec
   // notes more nuanced segmentation is post-MVP per Q-121.
-  const olderCount = Math.max(0, input.messages.length - preserveRecentTurns);
+  let olderCount = Math.max(0, input.messages.length - preserveRecentTurns);
+  // context-engine-01: never split an assistant/tool pair. A purely
+  // positional slice can strand a `role:'tool'` message at the head of
+  // the preserved window while its `tool_calls` assistant partner is
+  // summarized away — OpenAI-compatible servers 400 on the orphan and
+  // `invalid-request` is fallback-ineligible, so the run would die right
+  // after an otherwise successful compaction. Snap the boundary backward
+  // until the preserved slice starts on a non-`tool` message: preserving
+  // more than requested is always transcript-safe. (The
+  // clear-tool-results strategy is immune by construction — it replaces
+  // content in place and never removes messages.)
+  while (olderCount > 0 && input.messages[olderCount]?.role === 'tool') {
+    olderCount -= 1;
+  }
   const olderMessages = input.messages.slice(0, olderCount);
   const preservedMessages = input.messages.slice(olderCount);
 

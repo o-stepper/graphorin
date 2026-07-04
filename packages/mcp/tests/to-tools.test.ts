@@ -53,6 +53,14 @@ describe('MCPClient.toTools — adapter', () => {
     expect(tools.length).toBe(1);
     expect(tools[0]?.name).toBe('search');
     expect(tools[0]?.description).toBe('Search for issues.');
+    // tools-01: the adapted tool's validator must serialise back to the
+    // server-declared JSON Schema (pre-fix it JSON.stringify'd to `{}`,
+    // so providers saw an argument-less tool).
+    expect(JSON.parse(JSON.stringify(tools[0]?.inputSchema))).toEqual({
+      type: 'object',
+      properties: { query: { type: 'string' } },
+      required: ['query'],
+    });
   });
 
   it('honours the per-server namespace', async () => {

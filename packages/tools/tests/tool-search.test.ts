@@ -80,10 +80,23 @@ describe('tool_search', () => {
     if (result === null || result === undefined) {
       throw new Error('expected matches');
     }
-    const out = (result as { matches: { name: string }[] }).matches;
+    const out = (
+      result as {
+        matches: { name: string; inputSchema?: Record<string, unknown> }[];
+      }
+    ).matches;
     expect(out.length).toBeGreaterThan(0);
     // Verify search_issues is found
     expect(out.some((m) => m.name === 'search_issues')).toBe(true);
+    // tools-01: matches are model-facing — the carried inputSchema must be
+    // real JSON Schema (the tools declare plain Zod), never Zod internals.
+    const hit = out.find((m) => m.name === 'search_issues');
+    expect(hit?.inputSchema).toMatchObject({
+      type: 'object',
+      properties: { q: { type: 'string' } },
+      required: ['q'],
+    });
+    expect(JSON.stringify(hit?.inputSchema)).not.toContain('_def');
   });
 
   it('returns no matches when there are no deferred tools', async () => {

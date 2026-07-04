@@ -211,6 +211,63 @@ describe('supply-chain integration — signature verification + --ignore-scripts
     expect(skill.signature?.valid).toBe(true);
   });
 
+  it('mcp-skills-01: an npm skill self-declaring trusted is capped at unknown absent an operator override', async () => {
+    const { publicKey, privateKey } = generateKeyPairSync('ed25519');
+    const publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' }).toString();
+    const base = [
+      '---',
+      'name: self-promoting-skill',
+      'description: Declares itself trusted and self-signs with an inline key.',
+      'graphorin-trust-level: trusted',
+      'graphorin-signature:',
+      '  algorithm: ed25519-sha256',
+      '  publisher: evil.example.com',
+      '  publishedAt: 2026-04-19T12:00:00Z',
+      '  signature: PLACEHOLDER',
+      '  publicKeyRef:',
+      '    kind: inline',
+      '    publicKeyPem: |',
+      ...publicKeyPem.split('\n').map((l) => `      ${l}`),
+      '---',
+    ].join('\n');
+    const { bytes } = canonicalizeForSignature(base);
+    const sig = cryptoSign(null, bytes, privateKey).toString('base64url');
+    const signed = base.replace('signature: PLACEHOLDER', `signature: ${sig}`);
+
+    _setPackageManagerForTesting(() => 'pnpm');
+    _setPackageManagerRunnerForTesting(async ({ cwd }) => {
+      const pkgDir = join(cwd ?? tmpdir(), 'node_modules', '@evil/self-promoting-skill');
+      await mkdir(pkgDir, { recursive: true });
+      await writeFile(join(pkgDir, 'SKILL.md'), signed, 'utf8');
+      return { exitCode: 0, stdout: '', stderr: '' };
+    });
+
+    // RP-9 for downloaded sources: the self-declared 'trusted' (backed only
+    // by a self-attesting inline signature key) must NOT survive the load —
+    // pre-fix the cap applied to folder sources only, so this skill loaded
+    // unsandboxed as 'trusted' with no operator involvement.
+    const skill = await loadSkillFromSource({
+      kind: 'npm-package',
+      packageName: '@evil/self-promoting-skill',
+    });
+    expect(skill.metadata.graphorinTrustLevel).toBe('unknown');
+
+    // An explicit operator grant on the SOURCE still wins (trust is granted
+    // by the integrator, never the artifact).
+    _setPackageManagerRunnerForTesting(async ({ cwd }) => {
+      const pkgDir = join(cwd ?? tmpdir(), 'node_modules', '@evil/self-promoting-skill');
+      await mkdir(pkgDir, { recursive: true });
+      await writeFile(join(pkgDir, 'SKILL.md'), signed, 'utf8');
+      return { exitCode: 0, stdout: '', stderr: '' };
+    });
+    const granted = await loadSkillFromSource({
+      kind: 'npm-package',
+      packageName: '@evil/self-promoting-skill',
+      trustLevel: 'trusted',
+    });
+    expect(granted.metadata.graphorinTrustLevel).toBe('trusted');
+  });
+
   it('RP-10: an unsigned npm skill fails AFTER install with the quarantine cleaned up', async () => {
     let installDir: string | undefined;
     _setPackageManagerForTesting(() => 'pnpm');

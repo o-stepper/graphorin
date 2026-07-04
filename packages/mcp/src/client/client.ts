@@ -244,23 +244,55 @@ export async function createMCPClientFromSdkTransport(
   }
   let structuredContentSeenLogged = false;
 
+  /**
+   * mcp-skills-02: MCP list operations are cursor-paginated (protocol
+   * 2024-11-05+) and the SDK does NOT auto-paginate — a single call
+   * returns page 1 only. Ignoring `nextCursor` silently truncated the
+   * catalogue: tools beyond the first page never reached `toTools()`,
+   * defer-loading thresholds counted a partial catalogue, pin
+   * fingerprints covered a partial catalogue, and resources/prompts were
+   * under-listed. Every list surface now drains the cursor chain, with a
+   * defensive page cap against buggy/adversarial servers that never
+   * terminate it.
+   */
+  const MAX_LIST_PAGES = 100;
+
+  function warnListPageCap(what: 'tools' | 'resources' | 'prompts', collected: number): void {
+    options.logger?.(
+      'warn',
+      `mcp.list.${what}.page-cap-reached: server kept returning nextCursor after ${MAX_LIST_PAGES} pages; the ${what} catalogue is truncated at ${collected} entries.`,
+      { server: serverIdentity.id },
+    );
+  }
+
   async function listTools(opts?: {
     signal?: AbortSignal;
   }): Promise<ReadonlyArray<MCPToolDefinition>> {
     const requestOptions = opts?.signal === undefined ? {} : { signal: opts.signal };
-    let result: Awaited<ReturnType<typeof sdkClient.listTools>>;
-    try {
-      result = await sdkClient.listTools({}, requestOptions);
-    } catch (cause) {
-      throw mapSdkError(cause, {});
-    }
-    const tools = (result.tools ?? []) as ReadonlyArray<{
+    type SdkTool = {
       name: string;
       description?: string;
       inputSchema: Readonly<Record<string, unknown>>;
       outputSchema?: Readonly<Record<string, unknown>>;
       title?: string;
-    }>;
+    };
+    const tools: SdkTool[] = [];
+    let cursor: string | undefined;
+    for (let page = 0; ; page++) {
+      if (page >= MAX_LIST_PAGES) {
+        warnListPageCap('tools', tools.length);
+        break;
+      }
+      let result: Awaited<ReturnType<typeof sdkClient.listTools>>;
+      try {
+        result = await sdkClient.listTools(cursor === undefined ? {} : { cursor }, requestOptions);
+      } catch (cause) {
+        throw mapSdkError(cause, {});
+      }
+      tools.push(...((result.tools ?? []) as ReadonlyArray<SdkTool>));
+      cursor = (result as { nextCursor?: string }).nextCursor;
+      if (cursor === undefined) break;
+    }
     if (!structuredContentSeenLogged && tools.some((t) => t.outputSchema !== undefined)) {
       structuredContentSeenLogged = true;
       if (options.logger !== undefined) {
@@ -286,18 +318,32 @@ export async function createMCPClientFromSdkTransport(
     signal?: AbortSignal;
   }): Promise<ReadonlyArray<MCPResourceDefinition>> {
     const requestOptions = opts?.signal === undefined ? {} : { signal: opts.signal };
-    let result: Awaited<ReturnType<typeof sdkClient.listResources>>;
-    try {
-      result = await sdkClient.listResources({}, requestOptions);
-    } catch (cause) {
-      throw mapSdkError(cause, {});
-    }
-    const items = (result.resources ?? []) as ReadonlyArray<{
+    type SdkResource = {
       uri: string;
       name?: string;
       description?: string;
       mimeType?: string;
-    }>;
+    };
+    const items: SdkResource[] = [];
+    let cursor: string | undefined;
+    for (let page = 0; ; page++) {
+      if (page >= MAX_LIST_PAGES) {
+        warnListPageCap('resources', items.length);
+        break;
+      }
+      let result: Awaited<ReturnType<typeof sdkClient.listResources>>;
+      try {
+        result = await sdkClient.listResources(
+          cursor === undefined ? {} : { cursor },
+          requestOptions,
+        );
+      } catch (cause) {
+        throw mapSdkError(cause, {});
+      }
+      items.push(...((result.resources ?? []) as ReadonlyArray<SdkResource>));
+      cursor = (result as { nextCursor?: string }).nextCursor;
+      if (cursor === undefined) break;
+    }
     return Object.freeze(
       items.map((r) =>
         Object.freeze({
@@ -314,17 +360,31 @@ export async function createMCPClientFromSdkTransport(
     signal?: AbortSignal;
   }): Promise<ReadonlyArray<MCPPromptDefinition>> {
     const requestOptions = opts?.signal === undefined ? {} : { signal: opts.signal };
-    let result: Awaited<ReturnType<typeof sdkClient.listPrompts>>;
-    try {
-      result = await sdkClient.listPrompts({}, requestOptions);
-    } catch (cause) {
-      throw mapSdkError(cause, {});
-    }
-    const items = (result.prompts ?? []) as ReadonlyArray<{
+    type SdkPrompt = {
       name: string;
       description?: string;
       arguments?: ReadonlyArray<{ name: string; description?: string; required?: boolean }>;
-    }>;
+    };
+    const items: SdkPrompt[] = [];
+    let cursor: string | undefined;
+    for (let page = 0; ; page++) {
+      if (page >= MAX_LIST_PAGES) {
+        warnListPageCap('prompts', items.length);
+        break;
+      }
+      let result: Awaited<ReturnType<typeof sdkClient.listPrompts>>;
+      try {
+        result = await sdkClient.listPrompts(
+          cursor === undefined ? {} : { cursor },
+          requestOptions,
+        );
+      } catch (cause) {
+        throw mapSdkError(cause, {});
+      }
+      items.push(...((result.prompts ?? []) as ReadonlyArray<SdkPrompt>));
+      cursor = (result as { nextCursor?: string }).nextCursor;
+      if (cursor === undefined) break;
+    }
     return Object.freeze(
       items.map((p) =>
         Object.freeze({

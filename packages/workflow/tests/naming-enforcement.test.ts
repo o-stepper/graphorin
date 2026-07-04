@@ -60,6 +60,9 @@ async function* walk(root: string): AsyncIterable<string> {
 }
 
 describe('naming enforcement', () => {
+  // The walk reads every source/docs file in the package; cold Windows CI
+  // runners routinely blow the default 5 s per-test budget on this I/O,
+  // hence the explicit 30 s timeout on the scan.
   it('source files do not reference third-party workflow library identifiers', async () => {
     const offences: Array<{ path: string; match: string }> = [];
     for await (const file of walk(PACKAGE_ROOT)) {
@@ -71,7 +74,7 @@ describe('naming enforcement', () => {
       }
     }
     expect(offences).toEqual([]);
-  });
+  }, 30_000);
 
   it('the public API exposes the Graphorin-named primitives', async () => {
     const mod = await import('../src/index.js');

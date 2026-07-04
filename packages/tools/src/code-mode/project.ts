@@ -16,8 +16,9 @@
  *   disclosure, so the full parameter detail is fetched only when the
  *   model asks for it.
  *
- * The renderer is deliberately best-effort: a tool whose `inputSchema`
- * does not expose a `toJSON()` JSON-Schema fragment projects to
+ * The renderer is deliberately best-effort: plain Zod schemas (v3/v4)
+ * and `toJSON()`-bearing schemas render typed parameters via the shared
+ * schema projection; a schema the projection cannot read renders as
  * `input: unknown` rather than failing. The projection is a *hint* for
  * the model, never a validation authority — the real schema check still
  * happens inside the executor when the bridged call runs.
@@ -26,6 +27,8 @@
  */
 
 import type { ToolSource } from '@graphorin/core';
+
+import { projectSchemaToJsonSchema } from '../schema/to-json-schema.js';
 
 /** Structural view of a tool this module can project. */
 export interface ProjectableTool {
@@ -87,23 +90,14 @@ function oneLine(description: string | undefined): string {
 }
 
 /**
- * Coerce a tool's `inputSchema` to a JSON-Schema fragment. Handles both
- * Zod-like schemas (via `toJSON()`) and the already-JSON-Schema records
- * that `ToolSearchMatch.inputSchema` carries. Mirrors `toolToDefinition`
- * in the agent. `undefined` only for a non-object / missing schema.
+ * Coerce a tool's `inputSchema` to a JSON-Schema fragment. Handles plain
+ * Zod schemas (v3/v4 structural conversion), `toJSON()`-bearing schemas,
+ * and the already-JSON-Schema records that `ToolSearchMatch.inputSchema`
+ * carries (tools-01: the shared converter, mirrored by the agent's
+ * `toolToDefinition`). `undefined` for a missing or unprojectable schema.
  */
 function schemaToJson(inputSchema: unknown): Record<string, unknown> | undefined {
-  if (inputSchema === null || typeof inputSchema !== 'object') return undefined;
-  const toJson = (inputSchema as { toJSON?: () => unknown }).toJSON;
-  if (typeof toJson === 'function') {
-    try {
-      const json = toJson.call(inputSchema);
-      if (json !== null && typeof json === 'object') return json as Record<string, unknown>;
-    } catch {
-      // fall through to treating the object as a JSON-Schema record
-    }
-  }
-  return inputSchema as Record<string, unknown>;
+  return projectSchemaToJsonSchema(inputSchema);
 }
 
 /** Render a JSON-Schema fragment as a (best-effort) TypeScript type. */
