@@ -221,6 +221,10 @@ function composeResultReaders(readers: ReadonlyArray<ResultReader>): ResultReade
 const CODE_EXECUTE_NAME = 'code_execute';
 const CODE_SEARCH_NAME = 'code_search';
 
+/** Structural check: is this tool approval-gated (static or predicate form)? */
+const isApprovalGated = (t: { readonly needsApproval?: unknown }): boolean =>
+  t.needsApproval === true || typeof t.needsApproval === 'function';
+
 /**
  * Wire code-mode (P1-2) into `registry`: register the `code_search` /
  * `code_execute` meta-tools and return them as the tools to advertise in
@@ -245,8 +249,6 @@ function registerCodeMode(
   reservedNames: ReadonlySet<string>,
 ): ReadonlyArray<Tool<unknown, unknown, unknown>> {
   if (registry.get(CODE_EXECUTE_NAME) !== undefined) return []; // already wired
-  const isApprovalGated = (t: { readonly needsApproval?: unknown }): boolean =>
-    t.needsApproval === true || typeof t.needsApproval === 'function';
   const codeTools = registry
     .list()
     .filter((entry) => !reservedNames.has(entry.name) && !isApprovalGated(entry));
@@ -1267,6 +1269,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // AG-1: approved gated calls collected from a resume directive, executed
     // for real once every approval is resolved (see the dispatch below).
     const resumedApprovedCalls: ToolCall[] = [];
+    // agent-02: the ToolApproval records behind `resumedApprovedCalls`,
+    // kept so the write-ahead intent checkpoint can re-attach them to
+    // `pendingApprovals` (a crash-retry against the intent re-dispatches).
+    const grantedApprovals: ToolApproval[] = [];
     // Step-journal: tool calls already completed on a prior resume are recorded
     // in the journal (`state.steps`); a re-resume must not run their side effects
     // again. Collect their ids so an approved call already journaled is replayed,
@@ -1308,16 +1314,17 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           ) {
             continue;
           }
-          // AG-1: queue the approved call for REAL execution once every
-          // approval is resolved (dispatched below). It runs through the same
-          // ToolExecutor as any other tool call — taint / audit / result
-          // recording — instead of pushing a "[not actually executed]"
-          // placeholder that left the gated side effect unreachable.
+          // AG-1: queue the approved call for REAL execution (dispatched
+          // below). It runs through the same ToolExecutor as any other tool
+          // call — taint / audit / result recording — instead of pushing a
+          // "[not actually executed]" placeholder that left the gated side
+          // effect unreachable.
           resumedApprovedCalls.push({
             toolCallId: approval.toolCallId,
             toolName: approval.toolName,
             args: approval.args,
           });
+          grantedApprovals.push(approval);
         } else {
           yield {
             type: 'tool.approval.denied',
@@ -1369,21 +1376,55 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state,
     };
 
-    // AG-14: a resumed run that is still suspended (`awaiting_approval` with
-    // approvals the directive did not resolve) or already terminal-failed must
-    // not re-enter the provider loop — that would re-issue a dangling tool_use
-    // real providers reject, or silently complete a failed run. Return it as-is.
-    if (resumed && (state.status === 'awaiting_approval' || state.status === 'failed')) {
+    // AG-14 (failed half): a terminal-failed run must never re-enter the
+    // provider loop or dispatch anything — that would silently complete a
+    // failed run. Return it as-is.
+    if (resumed && state.status === 'failed') {
       return yield* finishRun(state, finalSnapshot);
     }
 
-    // AG-1: every approval is now resolved (status is 'running'), so execute the
-    // approved gated calls for REAL before the provider loop — the model sees
-    // their genuine results on the first step. They run through the shared
-    // ToolExecutor (taint / audit) and record CompletedToolCalls in a resume
-    // step. Dispatching here (outside the loop's approval pre-screen) also means
-    // the gated call never re-suspends, so there is no livelock.
+    // AG-1: execute the approved gated calls for REAL before the provider
+    // loop — the model sees their genuine results on the first step. They
+    // run through the shared ToolExecutor (taint / audit) and record
+    // CompletedToolCalls in a resume step. Dispatching here (outside the
+    // loop's approval pre-screen) also means the gated call never
+    // re-suspends, so there is no livelock.
+    //
+    // agent-07: this dispatch runs even when OTHER approvals remain
+    // pending. A granted call has already been removed from
+    // `pendingApprovals`, so skipping it (as the old order did — the
+    // suspended-guard returned before the dispatch) stranded it
+    // unrunnable forever; the run re-suspends with the remainder below.
     if (resumed && resumedApprovedCalls.length > 0) {
+      // agent-02 write-ahead intent: persist a checkpoint equivalent to
+      // the pre-dispatch suspended state (granted approvals re-attached
+      // to `pendingApprovals`) BEFORE any side effect runs. A crash-retry
+      // against this checkpoint re-resumes with the same directive and
+      // re-dispatches — the documented at-most-one-re-execution bound —
+      // and its nodeName records that a grant arrived and dispatch was in
+      // flight.
+      if (config.checkpointStore !== undefined) {
+        const prevStatus = state.status;
+        state.status = 'awaiting_approval';
+        state.pendingApprovals.unshift(...grantedApprovals);
+        const intentState = serializeRunState(state, { stripTracingApiKey: true });
+        state.pendingApprovals.splice(0, grantedApprovals.length);
+        state.status = prevStatus;
+        await config.checkpointStore.put(
+          state.id,
+          'agent',
+          {
+            id: state.id,
+            threadId: state.id,
+            namespace: 'agent',
+            state: intentState,
+            channelVersions: {},
+            stepNumber: 0,
+            createdAt: new Date().toISOString(),
+          },
+          { source: 'sync', status: 'suspended', nodeName: 'agent.resume.intent' },
+        );
+      }
       state.steps.push({
         stepNumber: 0,
         startedAt: new Date().toISOString(),
@@ -1392,12 +1433,52 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         toolCalls: [],
         agentId: state.currentAgentId,
       });
+      // tools-02: a human granted exactly `approval.args` — the repair
+      // hook must not rewrite a pre-approved payload behind the grant, so
+      // a (should-be-impossible) validation failure surfaces as
+      // `invalid_input` instead of executing args nobody saw.
       yield* dispatchBatch(
         resumedApprovedCalls,
         toolExecutor,
         { ...runContextBase, stepNumber: 0, messages },
         0,
+        { disableRepair: true },
       );
+      // agent-02: persist the journaled post-dispatch state. From THIS
+      // checkpoint a re-delivered resume is exactly-once: the granted ids
+      // are no longer pending and their journal entries + tool messages
+      // are present, so nothing re-dispatches. (For the manual JSON flow,
+      // the same state is returned as `result.state` — persist it after
+      // every resume to get the same guarantee.)
+      if (config.checkpointStore !== undefined) {
+        await config.checkpointStore.put(
+          state.id,
+          'agent',
+          {
+            id: state.id,
+            threadId: state.id,
+            namespace: 'agent',
+            state: serializeRunState(state, { stripTracingApiKey: true }),
+            channelVersions: {},
+            stepNumber: 0,
+            createdAt: new Date().toISOString(),
+          },
+          {
+            source: 'sync',
+            status: state.status === 'awaiting_approval' ? 'suspended' : 'running',
+            nodeName: 'agent.resume.dispatched',
+          },
+        );
+      }
+    }
+
+    // AG-14 (suspended half): a resumed run still awaiting approvals the
+    // directive did not resolve must not re-enter the provider loop — that
+    // would re-issue a dangling tool_use real providers reject. The granted
+    // subset (above) HAS executed and is journaled; return the re-suspended
+    // state carrying its results.
+    if (resumed && state.status === 'awaiting_approval') {
+      return yield* finishRun(state, finalSnapshot);
     }
 
     // WI-05: deferred tools promoted by a `tool_search` call this run.
@@ -1440,6 +1521,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       executor: ToolExecutor,
       runContext: RunContext<TDeps>,
       stepNum: number,
+      dispatchOpts: { readonly disableRepair?: boolean } = {},
     ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
       if (calls.length === 0) return;
       for (const call of calls) {
@@ -1448,7 +1530,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
       const bridge = createExecutorEventBridge();
       activeExecutorBridge = bridge;
-      const resultsPromise = executor.executeBatch({ calls, runContext, stepNumber: stepNum });
+      const resultsPromise = executor.executeBatch({
+        calls,
+        runContext,
+        stepNumber: stepNum,
+        ...(dispatchOpts.disableRepair !== undefined
+          ? { disableRepair: dispatchOpts.disableRepair }
+          : {}),
+      });
       // Close the bridge once the batch settles so `drain()` ends; the
       // executor catches per-call errors, so the batch never rejects.
       const closeOnSettle = resultsPromise.then(
@@ -2276,9 +2365,48 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             // never executed and never approvable, leaving dangling
             // `tool_use` ids in the persisted transcript).
             const resolvedTool = stepRegistry.get(call.toolName);
+            // tools-02 (agent mirror): the approval decision must be made
+            // on the input that will actually execute. For gated tools the
+            // args are validated HERE: a schema failure fails the call fast
+            // as `invalid_input` (a human is never asked to approve args
+            // that cannot run, and the resumed dispatch can therefore never
+            // hit the repair hook), and the predicate receives the parsed
+            // value its typed signature promises — not raw pre-coercion
+            // JSON.
+            let gateInput: unknown = call.args;
+            if (resolvedTool !== undefined && isApprovalGated(resolvedTool)) {
+              const parsed = safeParseGatedArgs(resolvedTool, call.args);
+              if (parsed !== undefined && !parsed.success) {
+                const toolError: ToolError = {
+                  toolCallId: call.toolCallId,
+                  toolName: call.toolName,
+                  kind: 'invalid_input',
+                  message: `Invalid arguments for approval-gated tool '${call.toolName}': ${parsed.message}`,
+                };
+                const stepEntry = state.steps[state.steps.length - 1];
+                if (stepEntry !== undefined) {
+                  (stepEntry.toolCalls as CompletedToolCall[]).push({
+                    call,
+                    outcome: toolError,
+                    stepNumber,
+                  });
+                }
+                yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+                yield {
+                  type: 'tool.execute.error',
+                  toolCallId: call.toolCallId,
+                  error: toolError,
+                };
+                const text = `Error: ${toolError.message}`;
+                messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+                state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
+                continue;
+              }
+              if (parsed !== undefined) gateInput = parsed.data;
+            }
             const needsApproval = await invokeNeedsApproval(
               resolvedTool,
-              call.args,
+              gateInput,
               execRunContext,
               signal,
             );
@@ -2779,4 +2907,41 @@ function probeSecretsAccessor(): ToolExecutionContext['secrets'] {
   const rejector = (_key: string, _options?: { readonly optional?: boolean }): Promise<never> =>
     Promise.reject(new Error('secrets.require is unavailable inside a needsApproval predicate'));
   return { require: rejector } as unknown as ToolExecutionContext['secrets'];
+}
+
+/**
+ * tools-02: validate an approval-gated call's args at the pre-screen so
+ * the gate decision — and what a human is asked to approve — is the input
+ * that will actually execute. Structural + defensive: `undefined` when
+ * the tool exposes no callable `safeParse` (nothing to validate here; the
+ * executor still validates at dispatch); a throwing schema counts as a
+ * validation failure rather than crashing the loop.
+ */
+function safeParseGatedArgs(
+  tool: { readonly inputSchema?: unknown },
+  args: unknown,
+):
+  | { readonly success: true; readonly data: unknown }
+  | { readonly success: false; readonly message: string }
+  | undefined {
+  const schema = tool.inputSchema as { safeParse?: (value: unknown) => unknown } | null | undefined;
+  const safeParse = schema?.safeParse;
+  if (typeof safeParse !== 'function') return undefined;
+  try {
+    const parsed = safeParse.call(schema, args) as {
+      readonly success?: boolean;
+      readonly data?: unknown;
+      readonly error?: { readonly message?: string };
+    };
+    if (parsed.success === true) return { success: true, data: parsed.data };
+    return {
+      success: false,
+      message: parsed.error?.message ?? 'schema validation failed',
+    };
+  } catch (cause) {
+    return {
+      success: false,
+      message: cause instanceof Error ? cause.message : String(cause),
+    };
+  }
 }

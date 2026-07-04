@@ -265,6 +265,13 @@ export interface ExecuteBatchOptions {
   readonly stepNumber: number;
   /** Trust level for the per-tool sandbox resolution. Default `'user-defined'`. */
   readonly trustLevel?: SandboxTrustLevel;
+  /**
+   * Disable the single-round repair hook for this batch (tools-02).
+   * Used for PRE-APPROVED calls replayed on a durable-HITL resume: a
+   * human granted exactly these args, so a repair rewrite must fail as
+   * `invalid_input` rather than execute a payload nobody saw.
+   */
+  readonly disableRepair?: boolean;
 }
 
 /** Public executor surface. */
@@ -277,6 +284,8 @@ export interface ToolExecutor {
     readonly runContext: RunContext;
     readonly stepNumber: number;
     readonly trustLevel?: SandboxTrustLevel;
+    /** See {@link ExecuteBatchOptions.disableRepair}. */
+    readonly disableRepair?: boolean;
   }): Promise<CompletedToolCall>;
 }
 
@@ -383,6 +392,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           runContext: batch.runContext,
           stepNumber: batch.stepNumber,
           trustLevel,
+          ...(batch.disableRepair !== undefined ? { disableRepair: batch.disableRepair } : {}),
         });
       } catch (cause) {
         completed = synthesizeFailure(call, cause);
@@ -405,6 +415,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
             runContext: batch.runContext,
             stepNumber: batch.stepNumber,
             trustLevel,
+            ...(batch.disableRepair !== undefined ? { disableRepair: batch.disableRepair } : {}),
           })
             .catch((cause: unknown) => synthesizeFailure(call, cause))
             .then((completed) => {
@@ -430,9 +441,11 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     readonly runContext: RunContext;
     readonly stepNumber: number;
     readonly trustLevel?: SandboxTrustLevel;
+    readonly disableRepair?: boolean;
   }): Promise<CompletedToolCall> {
     const { call, runContext, stepNumber } = opts2;
     const trustLevel = opts2.trustLevel ?? 'user-defined';
+    const disableRepair = opts2.disableRepair === true;
     const tool = opts.registry.get(call.toolName);
 
     if (tool === undefined) {
@@ -468,7 +481,8 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
             : {}),
         },
       },
-      (span) => executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span),
+      (span) =>
+        executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span, disableRepair),
     );
   }
 
@@ -479,13 +493,70 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     stepNumber: number,
     trustLevel: SandboxTrustLevel,
     span: AISpan<'tool.execute'>,
+    disableRepair = false,
   ): Promise<CompletedToolCall> {
     incrementCounter('tool.executor.invocations.total', { toolName: tool.name });
     if (tool.__streamingHint) {
       incrementCounter('tool.streaming.tools.invoked.total', { toolName: tool.name });
     }
 
-    // Approval flow.
+    // Validate args FIRST (with optional single-round repair) — tools-02.
+    // The approval flow used to run before validation on raw `call.args`,
+    // which was a TOCTOU on a security control: a human could approve
+    // invalid args X, after which the repair hook rewrote them into
+    // schema-valid Y and Y executed without re-gating; predicates also saw
+    // pre-coercion values their typed signature never promised. Now the
+    // gate evaluates the VALIDATED input, the approval record carries the
+    // post-repair raw-shaped args (what will actually run), and nothing
+    // can change between the grant and the execution.
+    let validatedInput: unknown;
+    // Raw-shaped args that passed the schema (post-repair when repair ran)
+    // — what an approval gate / human is shown and what a resume replays.
+    let effectiveArgs: unknown = call.args;
+    {
+      const parsed = tool.inputSchema.safeParse(call.args);
+      if (parsed.success) {
+        validatedInput = parsed.data;
+      } else if (opts.repair !== undefined && disableRepair !== true) {
+        try {
+          const repaired = await opts.repair.repair({
+            toolName: tool.name,
+            invalidArgs: call.args,
+            schemaError: parsed.error,
+            signal: runContext.signal,
+          });
+          if (repaired === null) {
+            return failWith(
+              call,
+              tool,
+              'invalid_input',
+              parsed.error.message,
+              runContext,
+              stepNumber,
+            );
+          }
+          const reparsed = tool.inputSchema.safeParse(repaired);
+          if (!reparsed.success) {
+            return failWith(
+              call,
+              tool,
+              'invalid_input',
+              reparsed.error.message,
+              runContext,
+              stepNumber,
+            );
+          }
+          effectiveArgs = repaired;
+          validatedInput = reparsed.data;
+        } catch (cause) {
+          return failWith(call, tool, 'invalid_input', describe(cause), runContext, stepNumber);
+        }
+      } else {
+        return failWith(call, tool, 'invalid_input', parsed.error.message, runContext, stepNumber);
+      }
+    }
+
+    // Approval flow — evaluated on the validated input.
     if (tool.needsApproval !== undefined) {
       // TL-11: a static `needsApproval: true` needs no context at all;
       // the function form gets one that is DISPOSED right after the
@@ -494,7 +565,14 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       // that was thrown away while its run-signal listener lived on.
       let needsApproval: boolean;
       if (typeof tool.needsApproval === 'function') {
-        const predicateCtx = await prepareContext(call, tool, runContext, stepNumber, trustLevel);
+        const predicateCtx = await prepareContext(
+          call,
+          tool,
+          runContext,
+          stepNumber,
+          trustLevel,
+          validatedInput,
+        );
         try {
           needsApproval = await tool.needsApproval(predicateCtx.input, predicateCtx.ctx);
         } finally {
@@ -508,7 +586,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
         const approval: ToolApproval = {
           toolCallId: call.toolCallId,
           toolName: tool.name,
-          args: call.args,
+          args: effectiveArgs,
           requestedAt: new Date().toISOString(),
         };
         emit({
@@ -550,50 +628,6 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           ts: Date.now(),
           context: { runId: runContext.runId, stepNumber, toolCallId: call.toolCallId },
         });
-      }
-    }
-
-    // Validate args (with optional single-round repair).
-    let validatedInput: unknown;
-    {
-      const parsed = tool.inputSchema.safeParse(call.args);
-      if (parsed.success) {
-        validatedInput = parsed.data;
-      } else if (opts.repair !== undefined) {
-        try {
-          const repaired = await opts.repair.repair({
-            toolName: tool.name,
-            invalidArgs: call.args,
-            schemaError: parsed.error,
-            signal: runContext.signal,
-          });
-          if (repaired === null) {
-            return failWith(
-              call,
-              tool,
-              'invalid_input',
-              parsed.error.message,
-              runContext,
-              stepNumber,
-            );
-          }
-          const reparsed = tool.inputSchema.safeParse(repaired);
-          if (!reparsed.success) {
-            return failWith(
-              call,
-              tool,
-              'invalid_input',
-              reparsed.error.message,
-              runContext,
-              stepNumber,
-            );
-          }
-          validatedInput = reparsed.data;
-        } catch (cause) {
-          return failWith(call, tool, 'invalid_input', describe(cause), runContext, stepNumber);
-        }
-      } else {
-        return failWith(call, tool, 'invalid_input', parsed.error.message, runContext, stepNumber);
       }
     }
 
