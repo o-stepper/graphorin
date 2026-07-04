@@ -10,6 +10,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { detectRegressions } from '@graphorin/evals';
 import { describe, expect, it } from 'vitest';
 import {
@@ -23,7 +24,9 @@ import {
 } from '../src/runner.js';
 import { createDefaultStubProvider } from '../src/stub-provider.js';
 
-const FIXTURE = join(new URL('..', import.meta.url).pathname, 'data', 'fixture.json');
+// fileURLToPath (not URL.pathname) — pathname yields '/D:/…' on Windows.
+const PKG_ROOT = fileURLToPath(new URL('..', import.meta.url));
+const FIXTURE = join(PKG_ROOT, 'data', 'fixture.json');
 
 describe('C8 — retrieval/embedder A/B switches', () => {
   const modes: RetrievalMode[] = ['default', 'multi-query', 'hyde', 'iterative', 'graph'];
@@ -98,11 +101,7 @@ describe('C8 — ingest promise cache (evals-09)', () => {
 
 describe('C8 — committed stub baseline is reproducible', () => {
   it('a fresh stub run shows no regression against the committed baseline', async () => {
-    const baselinePath = join(
-      new URL('..', import.meta.url).pathname,
-      'baselines',
-      'longmemeval.fixture.stub.json',
-    );
+    const baselinePath = join(PKG_ROOT, 'baselines', 'longmemeval.fixture.stub.json');
     const baseline = JSON.parse(await readFile(baselinePath, 'utf8'));
     const report = await runLongMemEvalBenchmark({
       datasetPath: FIXTURE,
