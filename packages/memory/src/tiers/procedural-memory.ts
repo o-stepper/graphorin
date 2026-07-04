@@ -1,4 +1,6 @@
 import type {
+  MemoryHit,
+  MemoryOwner,
   MemoryProvenance,
   MemoryStatus,
   Rule,
@@ -56,6 +58,8 @@ export interface RuleInput {
   readonly variables?: ReadonlyArray<string>;
   /** Verifiable success criteria stored with the procedure (P2-2). */
   readonly successCriteria?: ReadonlyArray<string>;
+  /** Principal dimension (D3). Absent ⇒ NULL (treated `'user'`). */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -206,6 +210,7 @@ export class ProceduralMemory {
         ...(input.successCriteria !== undefined
           ? { successCriteria: Object.freeze([...input.successCriteria]) }
           : {}),
+        ...(input.owner !== undefined ? { owner: input.owner } : {}),
         createdAt: now,
         updatedAt: now,
       };
@@ -264,6 +269,8 @@ export class ProceduralMemory {
           // actions, so it lands quarantined + provenance-tagged (P1-4).
           provenance: 'induction' satisfies MemoryProvenance,
           status: 'quarantined' satisfies MemoryStatus,
+          // D3: an induced procedure is the agent's own inference.
+          owner: 'agent',
           createdAt: now,
           updatedAt: now,
         };
@@ -335,6 +342,76 @@ export class ProceduralMemory {
   }
 
   /**
+   * Runbook content search (D3): "find the procedure for this task" —
+   * lexical recall over rule text, as opposed to predicate
+   * {@link activate}. Returns **whole validated procedures** (the full
+   * {@link Rule} incl. steps / variables / success criteria) so a match
+   * can be followed file-style rather than re-synthesized from
+   * fragments. Quarantined (unvalidated induced) procedures are
+   * excluded — they must not drive actions — unless the inspector opts
+   * in via `includeQuarantined`.
+   *
+   * Uses the storage adapter's FTS surface when available
+   * (`procedural.search`, the default `@graphorin/store-sqlite` adapter
+   * implements it via migration 028); otherwise degrades to an offline
+   * in-memory token-overlap scan over {@link list}, so custom adapters
+   * keep working without the index.
+   */
+  async search(
+    scope: SessionScope,
+    query: string,
+    opts: { readonly topK?: number; readonly includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<MemoryHit<Rule>>> {
+    return withMemorySpan(
+      this.#tracer,
+      'memory.read.procedural',
+      scope,
+      { 'memory.procedural.action': 'search' },
+      async (span) => {
+        const topK = opts.topK ?? 5;
+        const store = this.#store.procedural;
+        if (typeof store.search === 'function') {
+          const hits = await store.search(scope, query, {
+            topK,
+            ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
+          });
+          span.setAttributes({
+            'memory.read.procedural.count': hits.length,
+            'memory.read.procedural.search_backend': 'store',
+          });
+          return hits;
+        }
+        // Fallback: offline token-overlap scoring over list(). Coarse by
+        // design — it exists so the runbook surface degrades instead of
+        // disappearing on adapters without an FTS index.
+        const tokens = tokenizeForRunbook(query);
+        const rules = await this.list(scope);
+        const scored = rules
+          .filter((rule) => opts.includeQuarantined === true || rule.status !== 'quarantined')
+          .map((rule) => {
+            const haystack = tokenizeForRunbook(
+              [rule.text, ...(rule.steps ?? []), ...(rule.tags ?? [])].join(' '),
+            );
+            const overlap = tokens.filter((t) => haystack.includes(t)).length;
+            return { rule, overlap };
+          })
+          .filter((entry) => entry.overlap > 0)
+          .sort((a, b) => b.overlap - a.overlap || (a.rule.id < b.rule.id ? -1 : 1))
+          .slice(0, topK);
+        span.setAttributes({
+          'memory.read.procedural.count': scored.length,
+          'memory.read.procedural.search_backend': 'fallback',
+        });
+        return scored.map((entry) => ({
+          record: entry.rule,
+          score: tokens.length === 0 ? 0 : entry.overlap / tokens.length,
+          signals: { lexical: entry.overlap },
+        }));
+      },
+    );
+  }
+
+  /**
    * Promote a quarantined (induced) procedure into `activate()` (MCON-2).
    * Mirrors {@link SemanticMemory.validate}: re-derives the injection verdict
    * from the stored rule text and **refuses** promotion of an injection-flagged
@@ -381,6 +458,14 @@ export class ProceduralMemory {
 function renderProcedureText(procedure: InducedProcedure): string {
   const lines = [procedure.title, ...procedure.steps.map((step, i) => `${i + 1}. ${step}`)];
   return lines.join('\n');
+}
+
+/** Lowercased word tokens for the offline runbook-search fallback (D3). */
+function tokenizeForRunbook(text: string): ReadonlyArray<string> {
+  return text
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((token) => token.length > 1);
 }
 
 function predicateMatches(rule: Rule, context: RuleActivationContext): boolean {

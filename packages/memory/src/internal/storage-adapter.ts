@@ -7,11 +7,13 @@ import type {
   GraphEntity,
   Insight,
   MemoryHit,
+  MemoryOwner,
   MemoryStatus,
   MemoryStore,
   Message,
   MessageRef,
   ProceduralMemoryStore,
+  Rule,
   SemanticMemoryStore,
   SessionListOptions,
   SessionMemoryStore,
@@ -118,6 +120,11 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
      * evaluate validity at NOW (memory-retrieval-01).
      */
     includeSuperseded?: boolean,
+    /**
+     * Retrieval-time principal filter (D3). Rows with no stored owner
+     * are treated as `'user'`. Absent ⇒ no owner filter.
+     */
+    owner?: MemoryOwner | ReadonlyArray<MemoryOwner>,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>>;
   /** Lookup a single fact by id (returns `null` when absent or soft-deleted). */
   get?(id: string): Promise<Fact | null>;
@@ -576,6 +583,12 @@ export interface DecayMemoryStoreExt {
       readonly status: string;
       /** Trust-provenance tag (P1-4); `null` for first-party rows. */
       readonly provenance: string | null;
+      /**
+       * Monotonic retrieval-access counter (D3, migration 027). Feeds
+       * the opt-in `accessReinforcement` salience weight. Optional —
+       * adapters without the column omit it (treated as `0`).
+       */
+      readonly accessCount?: number;
     }>
   >;
   /**
@@ -681,6 +694,19 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
    * `memory_history` audit row. Powers {@link ProceduralMemory.validate}.
    */
   setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
+  /**
+   * Lexical runbook search over rule text (D3, migration 028) — content
+   * recall for "find the procedure for this task", as opposed to
+   * predicate activation. Quarantined (unvalidated induced) procedures
+   * are excluded unless the inspector opts in. Optional — adapters
+   * without the index omit it and {@link ProceduralMemory.search} falls
+   * back to an in-memory lexical scan over `list(...)`.
+   */
+  search?(
+    scope: SessionScope,
+    query: string,
+    opts?: { readonly topK?: number; readonly includeQuarantined?: boolean },
+  ): Promise<ReadonlyArray<MemoryHit<Rule>>>;
   /**
    * Record one demonstrated successful reuse of a rule and return the
    * new counter value (MCON-2 part 4). Powers

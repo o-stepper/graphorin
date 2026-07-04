@@ -190,6 +190,8 @@ export function createConsolidatorPlaceholder(
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
     contextualRetrieval: 'late-chunk',
+    learnedContext: false,
+    learnedContextMaxChars: 1200,
   });
 
   const status = async (): Promise<ConsolidatorStatus> =>

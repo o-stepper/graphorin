@@ -62,6 +62,7 @@ export type {
   MemoryHit,
   MemoryKind,
   MemoryMetadata,
+  MemoryOwner,
   MemoryProvenance,
   MemoryRecord,
   MemorySearchOptions,

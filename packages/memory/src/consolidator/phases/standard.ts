@@ -436,6 +436,8 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
             ...(importance !== undefined ? { importance } : {}),
             provenance: 'extraction',
             status: 'quarantined',
+            // D3: an auto-formed episode is the agent's own synthesis.
+            owner: 'agent',
           });
           episodesFormed = 1;
         }
@@ -709,6 +711,8 @@ function buildFactInput(fact: ExtractedFact): FactInput {
   return {
     text: fact.text,
     provenance: 'extraction',
+    // D3: an extracted fact is the agent's own inference about the user.
+    owner: 'agent',
     ...(fact.subject !== undefined ? { subject: fact.subject } : {}),
     ...(fact.predicate !== undefined ? { predicate: fact.predicate } : {}),
     ...(fact.object !== undefined ? { object: fact.object } : {}),

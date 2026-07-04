@@ -182,6 +182,16 @@ export interface CreateMemoryOptions {
     readonly afterSuccesses: number;
   };
   /**
+   * Register the gated `runbook_search` tool (D3) so the model can look
+   * up validated procedures by task description (content recall over
+   * procedural memory, returning whole runbooks). Fully offline — the
+   * default `@graphorin/store-sqlite` adapter serves it from the rules
+   * FTS index (migration 028); adapters without the index degrade to an
+   * in-memory lexical scan. Default `false` — the tool surface stays at
+   * the canonical eleven.
+   */
+  readonly runbookSearch?: boolean;
+  /**
    * Resolver that produces the live {@link SessionScope} for each
    * memory-tool invocation. Defaults to a closure that throws — the
    * agent runtime overrides it in Phase 12.
@@ -246,6 +256,17 @@ export interface CreateMemoryOptions {
      * and `'off'` defer to the write-path mode. Per-tier default.
      */
     readonly contextualRetrieval?: ContextualRetrievalMode;
+    /**
+     * Maintain the learned-context digest block (D3): after each deep
+     * phase, one budgeted LLM call rewrites the reserved
+     * `learned_context` working block (previous digest + recent
+     * episodes / active insights / procedures), so the assembled system
+     * prompt carries a compact standing summary. Default `false` at
+     * every tier (Wave-D trial).
+     */
+    readonly learnedContext?: boolean;
+    /** Character bound for the learned-context digest (D3). Default `1200`. */
+    readonly learnedContextMaxChars?: number;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
     /** Override the wall clock — used by tests. */
@@ -459,7 +480,12 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     },
     // P2-4: the gated `deep_recall` tool is registered only when a grader
     // is configured — the offline default stays at exactly eleven tools.
-    { includeDeepRecall: grader !== null },
+    // D3: `runbook_search` is a second gated appendix, opt-in via
+    // `runbookSearch: true`.
+    {
+      includeDeepRecall: grader !== null,
+      includeRunbookSearch: options.runbookSearch === true,
+    },
   );
 
   const consolidatorOpts = options.consolidator;
@@ -468,6 +494,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     options.store,
     semantic,
     episodic,
+    working,
     tracer,
   );
   consolidatorForSpend = consolidator;
@@ -609,6 +636,7 @@ function buildConsolidator(
   store: CreateMemoryOptions['store'],
   semantic: SemanticMemory,
   episodic: EpisodicMemory,
+  working: WorkingMemory,
   tracer: Tracer,
 ): Consolidator {
   if (opts === undefined) {
@@ -625,6 +653,7 @@ function buildConsolidator(
     store,
     semantic,
     episodic,
+    working,
     tracer,
     ...(opts.provider !== undefined ? { provider: opts.provider } : {}),
     ...(opts.now !== undefined ? { now: opts.now } : {}),
@@ -670,6 +699,10 @@ function buildConsolidator(
       : {}),
     ...(opts.contextualRetrieval !== undefined
       ? { contextualRetrieval: opts.contextualRetrieval }
+      : {}),
+    ...(opts.learnedContext !== undefined ? { learnedContext: opts.learnedContext } : {}),
+    ...(opts.learnedContextMaxChars !== undefined
+      ? { learnedContextMaxChars: opts.learnedContextMaxChars }
       : {}),
     ...(opts.defaultScope !== undefined ? { defaultScope: opts.defaultScope } : {}),
   });

@@ -95,6 +95,9 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
             importance: row.importance,
             quarantined: row.status === 'quarantined',
             foreignProvenance: isForeignProvenance(row.provenance),
+            // D3: retrieval-frequency reinforcement — inert at the
+            // default weight 0; adapters without the column report 0.
+            accessCount: row.accessCount ?? 0,
             weights: deps.salienceWeights,
           });
           if (score < deps.decayArchiveThreshold) {

@@ -2,6 +2,7 @@ import type {
   EmbedderProvider,
   Fact,
   MemoryHit,
+  MemoryOwner,
   MemoryProvenance,
   MemoryStatus,
   Sensitivity,
@@ -67,6 +68,13 @@ export interface FactInput {
    * time.
    */
   readonly importance?: number;
+  /**
+   * Principal dimension (D3). The consolidator stamps `'agent'` on
+   * synthesized writes; user-authored writes may pass `'user'`. Absent
+   * (the default) leaves the column NULL — treated as `'user'` at
+   * filter time. Never gates default recall.
+   */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -237,6 +245,19 @@ export interface FactSearchOptions {
    * @stable
    */
   readonly expandHops?: 0 | 1;
+  /**
+   * Retrieval-time principal filter (D3). When set, only facts whose
+   * `owner` is in the requested set are returned — `'user'` for
+   * user-stated facts, `'agent'` for the agent's own inferences,
+   * `'shared'` for multi-agent shared records. Rows written before the
+   * feature (owner NULL) are treated as `'user'`. Applied in-store on
+   * the FTS + vector legs and as a record-level filter on the fused
+   * result so the HyDE / graph legs obey it too. Absent (the default)
+   * ⇒ **no owner filter** — recall is byte-identical.
+   *
+   * @stable
+   */
+  readonly owner?: MemoryOwner | ReadonlyArray<MemoryOwner>;
 }
 
 /**
@@ -511,6 +532,8 @@ export class SemanticMemory {
         ...(input.supersedes !== undefined ? { supersedes: input.supersedes } : {}),
         ...(provenance !== undefined ? { provenance } : {}),
         status,
+        // D3: carry the principal dimension; absent ⇒ NULL (treated 'user').
+        ...(input.owner !== undefined ? { owner: input.owner } : {}),
         createdAt: now,
         updatedAt: now,
       };
@@ -705,6 +728,8 @@ export class SemanticMemory {
             ...(opts.tags !== undefined && opts.tags.length > 0 ? { tags: opts.tags } : {}),
             ...(opts.includeQuarantined === true ? { includeQuarantined: true } : {}),
             ...(opts.includeSuperseded === true ? { includeSuperseded: true } : {}),
+            // D3: in-store principal filter on the FTS leg.
+            ...(opts.owner !== undefined ? { owner: opts.owner } : {}),
             ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
           });
           lists.push(ftsHits);
@@ -717,6 +742,7 @@ export class SemanticMemory {
             opts.asOf,
             opts.includeQuarantined,
             opts.includeSuperseded,
+            opts.owner,
           );
           if (vectorHits.length > 0) {
             lists.push(vectorHits);
@@ -768,7 +794,7 @@ export class SemanticMemory {
         // otherwise untagged candidates occupy fused ranks, get
         // filtered, and the search silently returns fewer than topK.
         const fusedTopK =
-          opts.decay !== undefined || (opts.tags?.length ?? 0) > 0
+          opts.decay !== undefined || (opts.tags?.length ?? 0) > 0 || opts.owner !== undefined
             ? Math.max(
                 finalTopK,
                 lists.reduce((n, l) => n + l.length, 0),
@@ -791,12 +817,25 @@ export class SemanticMemory {
                 return opts.tags?.some((t) => recordTags.includes(t)) === true;
               })
             : decayed;
+        // D3: the HyDE / graph legs have no store-level owner predicate —
+        // enforce the principal filter on the fused records so every leg
+        // obeys it. Rows with no stored owner count as 'user'.
+        const wantedOwners =
+          opts.owner === undefined
+            ? null
+            : typeof opts.owner === 'string'
+              ? [opts.owner]
+              : opts.owner;
+        const ownerFiltered =
+          wantedOwners !== null
+            ? filtered.filter((h) => wantedOwners.includes(h.record.owner ?? 'user'))
+            : filtered;
         // C5: rank-time trust discount — quarantined-but-included and
         // foreign-provenance hits are down-weighted BEFORE the final cut,
         // mirroring the eviction-path securityFactor. First-party active
         // facts keep factor 1, so ordinary rankings are unchanged.
         const trusted =
-          opts.trustWeighting === 'off' ? filtered : this.#applyTrustDiscount(filtered);
+          opts.trustWeighting === 'off' ? ownerFiltered : this.#applyTrustDiscount(ownerFiltered);
         const ranked = trusted.slice(0, finalTopK);
         // MRET-7: recall reinforces the recalled facts — stamp
         // last-accessed + bump strength so "recently accessed facts decay
@@ -1263,6 +1302,7 @@ export class SemanticMemory {
     asOf?: string,
     includeQuarantined?: boolean,
     includeSuperseded?: boolean,
+    owner?: MemoryOwner | ReadonlyArray<MemoryOwner>,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const embedderId = this.#embedderIdProvider();
     if (
@@ -1283,6 +1323,7 @@ export class SemanticMemory {
       asOf,
       includeQuarantined,
       includeSuperseded,
+      owner,
     );
   }
 
