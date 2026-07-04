@@ -17,10 +17,9 @@ on:
 # an accidental main-branch push never publishes before the registry side is
 # configured. Maintainer provisioning order:
 #
-#   1. Create an npm automation token with publish rights to `@graphorin/*`
-#      (and `graphorin`); add it as the repo secret `NPM_TOKEN`. Ensure the
-#      `@graphorin` scope exists and the token can publish each (still-
-#      unpublished) package name.
+#   1. Create an npm automation token with publish rights to the `@graphorin`
+#      scope (there is no unscoped `graphorin` package - the root manifest of
+#      that name is private) and add it as the repo secret `NPM_TOKEN`.
 #   2. Rehearse with a `workflow_dispatch` run (the dry-run step below fires
 #      whenever RELEASE_ENABLED is not yet 'true') to confirm auth + the set.
 #   3. Set the repository variable `RELEASE_ENABLED=true`. From then on
@@ -38,6 +37,7 @@ jobs:
   release:
     name: Version & publish via Changesets
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     # CI-15: a `workflow_dispatch` can be triggered from any branch that carries
     # this file. Gate the job on `main` so a dispatch from a feature branch is
     # skipped (it would otherwise version/publish branch content). Mirrors the
@@ -113,12 +113,22 @@ jobs:
           workdir="$(mktemp -d)"
           cd "$workdir"
           npm init -y >/dev/null 2>&1
-          # Absorb brief registry propagation lag right after publish.
+          # Absorb brief registry propagation lag right after publish. E2: the
+          # gate must fail EXPLICITLY when the install never succeeds - running
+          # `npm audit signatures` against an empty project can exit 0
+          # ("audited 0 packages"), turning the one gate whose job is to catch
+          # a bad release into a false green.
+          installed=false
           for attempt in 1 2 3; do
             if npm install "@graphorin/core@${version}" --no-audit --no-fund; then
+              installed=true
               break
             fi
             echo "::warning::install attempt ${attempt} failed (registry propagation?); retrying in 15s"
             sleep 15
           done
+          if [ "$installed" != "true" ]; then
+            echo "::error::@graphorin/core@${version} never installed from the registry; provenance cannot be verified"
+            exit 1
+          fi
           npm audit signatures

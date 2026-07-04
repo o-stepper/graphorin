@@ -1,5 +1,4 @@
 ---
-'@graphorin/benchmark-longmemeval': minor
 '@graphorin/agent': patch
 ---
 
