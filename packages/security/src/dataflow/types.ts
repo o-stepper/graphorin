@@ -19,7 +19,7 @@
  * @packageDocumentation
  */
 
-import type { Sensitivity, SideEffectClass, ToolSource, ToolTrustClass } from '@graphorin/core';
+import type { Sensitivity, SideEffectClass, ToolTrustClass } from '@graphorin/core';
 
 /**
  * Operating mode for {@link DataFlowPolicy}.
