@@ -126,6 +126,12 @@ export async function createMCPClient(options: CreateMCPClientOptions): Promise<
     ...(options.clientVersion === undefined ? {} : { clientVersion: options.clientVersion }),
     ...(options.elicitation === undefined ? {} : { elicitation: options.elicitation }),
     ...(options.sampling === undefined ? {} : { sampling: options.sampling }),
+    ...(options.onTransportClose === undefined
+      ? {}
+      : { onTransportClose: options.onTransportClose }),
+    ...(options.onTransportError === undefined
+      ? {}
+      : { onTransportError: options.onTransportError }),
   });
 }
 
@@ -146,6 +152,8 @@ export interface CreateMCPClientFromSdkTransportOptions {
   readonly clientVersion?: string;
   readonly elicitation?: CreateMCPClientOptions['elicitation'];
   readonly sampling?: CreateMCPClientOptions['sampling'];
+  readonly onTransportClose?: CreateMCPClientOptions['onTransportClose'];
+  readonly onTransportError?: CreateMCPClientOptions['onTransportError'];
 }
 
 /**
@@ -217,6 +225,22 @@ export async function createMCPClientFromSdkTransport(
   // Backfill the server id so the client-side request handlers
   // (registered before connect) label their counters with it.
   serverIdRef.current = serverIdentity.id;
+  // mcp-skills-10: surface transport lifecycle. Without these a dead
+  // stdio child / dropped HTTP session is observable only as
+  // MCPProtocolErrors on subsequent calls. The SDK Protocol base
+  // exposes assignable onclose/onerror callbacks (the transport's own
+  // handlers are managed by the SDK — never overwrite those).
+  sdkClient.onclose = () => {
+    incrementCounter('mcp.transport.closed.total', { server: serverIdentity.id });
+    options.logger?.('warn', 'MCP transport closed — rebuild the client to reconnect', {
+      server: serverIdentity.id,
+    });
+    options.onTransportClose?.({ server: serverIdentity.id });
+  };
+  sdkClient.onerror = (error: Error) => {
+    incrementCounter('mcp.transport.error.total', { server: serverIdentity.id });
+    options.onTransportError?.(error, { server: serverIdentity.id });
+  };
   const collisionStrategy: CollisionStrategy = options.collisionStrategy ?? 'auto-prefix';
 
   // MC-1: the client-side eventStore option was removed — per the
@@ -449,10 +473,10 @@ export async function createMCPClientFromSdkTransport(
     });
   }
 
-  async function readResource(
+  async function readResourceContents(
     uri: string,
     opts?: { signal?: AbortSignal },
-  ): Promise<MCPResourceContent> {
+  ): Promise<ReadonlyArray<MCPResourceContent>> {
     const requestOptions = opts?.signal === undefined ? {} : { signal: opts.signal };
     let result: Awaited<ReturnType<typeof sdkClient.readResource>>;
     try {
@@ -460,13 +484,35 @@ export async function createMCPClientFromSdkTransport(
     } catch (cause) {
       throw mapSdkError(cause, {});
     }
-    const first = ((result.contents ?? []) as ReadonlyArray<MCPResourceContent>)[0];
-    if (first === undefined) {
+    const contents = (result.contents ?? []) as ReadonlyArray<MCPResourceContent>;
+    if (contents.length === 0) {
       throw new MCPProtocolError(`MCP server returned no contents for resource '${uri}'.`, {
         metadata: { server: serverIdentity.id },
       });
     }
-    return Object.freeze(first);
+    return Object.freeze(contents.map((c) => Object.freeze(c)));
+  }
+
+  async function readResource(
+    uri: string,
+    opts?: { signal?: AbortSignal },
+  ): Promise<MCPResourceContent> {
+    const contents = await readResourceContents(uri, opts);
+    // mcp-skills-11: the `resources/read` result is an ARRAY precisely
+    // because one URI can yield multiple contents. The single-content
+    // convenience keeps its shape, but a silent truncation is now a
+    // visible one.
+    if (contents.length > 1) {
+      incrementCounter('mcp.resource.multi-content-truncated.total', {
+        server: serverIdentity.id,
+      });
+      options.logger?.(
+        'warn',
+        `resource '${uri}' returned ${contents.length} content items; readResource() surfaces only the first — use readResourceContents() for all of them`,
+        { server: serverIdentity.id },
+      );
+    }
+    return contents[0] as MCPResourceContent;
   }
 
   async function getPrompt(
@@ -581,6 +627,7 @@ export async function createMCPClientFromSdkTransport(
     listPrompts,
     callTool,
     readResource,
+    readResourceContents,
     getPrompt,
     toTools,
     close,

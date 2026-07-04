@@ -31,7 +31,20 @@ export interface McpResourceReaderOptions {
   readonly clients: ReadonlyArray<MCPClient>;
   /** Default `maxBytes` when `read(...)` is called without one. Default `65536`. */
   readonly defaultMaxBytes?: number;
+  /**
+   * mcp-skills-06: allow a BARE (unscoped) resource URI to be tried
+   * against every configured client. Default `false` — handles minted
+   * by the adapter are scoped (`mcp:<serverId>:<uri>`) and resolve
+   * ONLY against their originating server, so a malicious server's
+   * link (or a prompt-injected model) cannot fetch a resource from a
+   * different, more-trusted server (the cross-server confused-deputy
+   * hop). Enable only when you accept that risk for legacy handles.
+   */
+  readonly allowCrossServer?: boolean;
 }
+
+/** Scoped-handle grammar minted by the tool adapter: `mcp:<serverId>:<uri>`. */
+const SCOPED_HANDLE = /^mcp:([^:]+):(.+)$/;
 
 /**
  * Build a {@link ResultReader} that resolves MCP resource URIs through
@@ -43,14 +56,39 @@ export function createMcpResourceReader(opts: McpResourceReaderOptions): ResultR
   const clients = [...opts.clients];
   const defaultMaxBytes = opts.defaultMaxBytes ?? 65_536;
   return {
-    async read(uri, range): Promise<ResultReadOutcome> {
+    async read(handle, range): Promise<ResultReadOutcome> {
       if (clients.length === 0) {
         throw new Error(
           'createMcpResourceReader: no MCP clients configured to resolve resource handles.',
         );
       }
+      // mcp-skills-06: a scoped handle (`mcp:<serverId>:<uri>`) resolves
+      // ONLY against its originating server. The try-every-client loop
+      // survives solely for bare URIs behind the explicit
+      // `allowCrossServer` opt-in.
+      const scoped = SCOPED_HANDLE.exec(handle);
+      let uri = handle;
+      let candidates = clients;
+      if (scoped !== null) {
+        const serverId = scoped[1] ?? '';
+        uri = scoped[2] ?? '';
+        candidates = clients.filter((c) => c.serverIdentity.id === serverId);
+        if (candidates.length === 0) {
+          throw new Error(
+            `createMcpResourceReader: no configured client matches the handle's server ` +
+              `'${serverId}' — a handle only resolves against its originating server.`,
+          );
+        }
+      } else if (opts.allowCrossServer !== true) {
+        throw new Error(
+          `createMcpResourceReader: refusing to resolve the unscoped resource URI ` +
+            `${JSON.stringify(handle)} against every configured server (cross-server ` +
+            `confused-deputy risk). Use the scoped handle from the tool result ` +
+            `('mcp:<serverId>:<uri>'), or opt in with allowCrossServer: true.`,
+        );
+      }
       let lastError: unknown;
-      for (const client of clients) {
+      for (const client of candidates) {
         let content: MCPResourceContent;
         try {
           content = await client.readResource(uri);

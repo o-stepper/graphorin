@@ -110,12 +110,14 @@ describe('WI-13 — createMcpResourceReader', () => {
     });
     const reader = createMcpResourceReader({ clients: [client] });
 
-    const whole = await reader.read('file:///doc.txt');
+    // mcp-skills-06: handles are server-scoped ('mcp:<serverId>:<uri>').
+    const handle = `mcp:${client.id}:file:///doc.txt`;
+    const whole = await reader.read(handle);
     expect(whole.content).toBe('line1\nline2\nline3');
     expect(whole.totalBytes).toBe(17);
     expect(whole.eof).toBe(true);
 
-    const oneLine = await reader.read('file:///doc.txt', { startLine: 2, endLine: 2 });
+    const oneLine = await reader.read(handle, { startLine: 2, endLine: 2 });
     expect(oneLine.content).toBe('line2');
 
     expect(getCounterForTesting('mcp.resource-link.resolved.total', { server: client.id })).toBe(2);
@@ -123,8 +125,67 @@ describe('WI-13 — createMcpResourceReader', () => {
 
   it('throws when no configured server resolves the URI', async () => {
     const client = await build({ resources: [] });
-    const reader = createMcpResourceReader({ clients: [client] });
+    const reader = createMcpResourceReader({ clients: [client], allowCrossServer: true });
     await expect(reader.read('file:///missing.txt')).rejects.toThrow(/no configured MCP server/);
+  });
+
+  it('a scoped handle resolves ONLY against its originating server (mcp-skills-06)', async () => {
+    const serverA = await build(
+      {
+        resources: [
+          { uri: 'file:///a.txt', name: 'a', mimeType: 'text/plain', content: { text: 'from A' } },
+        ],
+      },
+      { serverInfoName: 'server-a' },
+    );
+    const serverB = await build(
+      {
+        resources: [
+          { uri: 'file:///b.txt', name: 'b', mimeType: 'text/plain', content: { text: 'from B' } },
+        ],
+      },
+      { serverInfoName: 'server-b' },
+    );
+    const reader = createMcpResourceReader({ clients: [serverA, serverB] });
+    // The scoped handle resolves against its own server…
+    const own = await reader.read(`mcp:${serverA.id}:file:///a.txt`);
+    expect(own.content).toBe('from A');
+    // …but a handle minted by server A cannot fetch server B's
+    // resource (the cross-server confused-deputy hop): scoping pins the
+    // lookup to A, where b.txt does not exist.
+    await expect(reader.read(`mcp:${serverA.id}:file:///b.txt`)).rejects.toThrow(
+      /no configured MCP server resolved/,
+    );
+  });
+
+  it('multi-content resources: readResource warns+truncates, readResourceContents returns all (mcp-skills-11)', async () => {
+    const client = await build({
+      resources: [
+        { uri: 'file:///dir', name: 'dir-1', mimeType: 'text/plain', content: { text: 'first' } },
+        { uri: 'file:///dir', name: 'dir-2', mimeType: 'text/plain', content: { text: 'second' } },
+      ],
+    });
+    const all = await client.readResourceContents('file:///dir');
+    expect(all.map((c) => c.text)).toEqual(['first', 'second']);
+    // The single-content convenience keeps its shape but is no longer a
+    // SILENT truncation.
+    const first = await client.readResource('file:///dir');
+    expect(first.text).toBe('first');
+    expect(
+      getCounterForTesting('mcp.resource.multi-content-truncated.total', { server: client.id }),
+    ).toBe(1);
+  });
+
+  it('a BARE uri is refused unless allowCrossServer is opted in (mcp-skills-06)', async () => {
+    const client = await build({
+      resources: [
+        { uri: 'file:///doc.txt', name: 'doc', mimeType: 'text/plain', content: { text: 'x' } },
+      ],
+    });
+    const strict = createMcpResourceReader({ clients: [client] });
+    await expect(strict.read('file:///doc.txt')).rejects.toThrow(/refusing to resolve/);
+    const permissive = createMcpResourceReader({ clients: [client], allowCrossServer: true });
+    await expect(permissive.read('file:///doc.txt')).resolves.toMatchObject({ content: 'x' });
   });
 
   it('throws when no clients are configured', async () => {
@@ -262,6 +323,40 @@ describe('WI-13 — sampling', () => {
     expect(text).toContain('model:stub-model-1');
     expect(text).toContain('a terse summary');
     expect(getCounterForTesting('mcp.sampling.completed.total', { server: client.id })).toBe(1);
+  });
+
+  it('rejects sampling-with-tools with an error (2025-11-25 MUST; mcp-skills-05)', async () => {
+    const client = await build(
+      {
+        tools: [{ name: 'summarize', inputSchema: {} }],
+        callToolHandler: async (_n, _a, extra) => {
+          try {
+            await extra.sample({
+              messages: [{ role: 'user', content: { type: 'text', text: 'hi' } }],
+              maxTokens: 16,
+              tools: [{ name: 't', inputSchema: { type: 'object' } }],
+            } as never);
+            return { content: [{ type: 'text', text: 'sampled' }] };
+          } catch (e) {
+            return {
+              content: [{ type: 'text', text: `rejected:${(e as Error).message}` }],
+              isError: true,
+            };
+          }
+        },
+      },
+      {
+        sampling: async () => ({
+          role: 'assistant' as const,
+          content: { type: 'text' as const, text: 'should never run' },
+          model: 'stub',
+        }),
+      },
+    );
+    const result = await client.callTool('summarize', {});
+    const text = (result.content[0] as { type: 'text'; text: string }).text;
+    expect(text).toContain('rejected');
+    expect(text).toContain('sampling with tools is not supported');
   });
 
   it('is gated: without a handler the server cannot sample', async () => {

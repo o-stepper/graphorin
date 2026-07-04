@@ -276,6 +276,16 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
     // Idempotent re-registration from the exact same source replaces.
     const sameSourceIndex = bucket.findIndex((e) => sameSource(e.__source, source));
     if (sameSourceIndex >= 0) {
+      // mcp-skills-04 (adjusted): same-source replace is the designed
+      // idempotent refresh path (a toTools() re-run), but it is ALSO
+      // how two DISTINCT server instances reporting the same identity
+      // silently swallow each other's tools — the registry cannot tell
+      // them apart. Count every replace so an identity collision is
+      // observable churn instead of a silent swap.
+      incrementCounter('tool.registry.same-source-replaced.total', {
+        toolName: resolved.name,
+        sourceKind: source.kind,
+      });
       bucket[sameSourceIndex] = resolved as RegistryEntry;
     } else {
       bucket.push(resolved as RegistryEntry);

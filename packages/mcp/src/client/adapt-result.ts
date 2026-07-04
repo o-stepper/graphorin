@@ -67,9 +67,9 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
         server: serverIdentity.id,
         tool: toolName,
       });
-      resourceLinkPreviews.push(formatResourceLinkPreview(part));
+      resourceLinkPreviews.push(formatResourceLinkPreview(part, serverIdentity.id));
     }
-    const messagePart = mcpContentToMessageContent(part);
+    const messagePart = mcpContentToMessageContent(part, serverIdentity.id);
     if (messagePart !== undefined) contentParts.push(messagePart);
   }
   const textParts = (result.content ?? []).filter(
@@ -168,7 +168,10 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
   });
 }
 
-function mcpContentToMessageContent(part: MCPContentPart): MessageContent | undefined {
+function mcpContentToMessageContent(
+  part: MCPContentPart,
+  serverId: string,
+): MessageContent | undefined {
   switch (part.type) {
     case 'text':
       return { type: 'text', text: part.text };
@@ -200,18 +203,22 @@ function mcpContentToMessageContent(part: MCPContentPart): MessageContent | unde
       return { type: 'text', text: `Resource ${part.resource.uri}` };
     }
     case 'resource_link':
-      return { type: 'text', text: formatResourceLinkPreview(part) };
+      return { type: 'text', text: formatResourceLinkPreview(part, serverId) };
   }
 }
 
 /**
  * Render the compact, model-facing preview for a `resource_link`. The
- * `uri` doubles as the `read_result` handle — an
+ * handle is SCOPED to the originating server (mcp-skills-06):
+ * `mcp:<serverId>:<uri>` — an
  * {@link import('./mcp-resource-reader.js').createMcpResourceReader}
- * resolves it on demand via {@link MCPClient.readResource}.
+ * parses the prefix and consults ONLY that server, so a malicious
+ * server's link (or a prompt-injected model) cannot fetch a resource
+ * from a different, more-trusted server through the handle.
  */
 function formatResourceLinkPreview(
   part: Extract<MCPContentPart, { type: 'resource_link' }>,
+  serverId: string,
 ): string {
   const label = part.title === undefined || part.title.length === 0 ? part.name : part.title;
   const meta: string[] = [];
@@ -220,7 +227,17 @@ function formatResourceLinkPreview(
   const metaStr = meta.length === 0 ? '' : ` (${meta.join(', ')})`;
   const desc =
     part.description === undefined || part.description.length === 0 ? '' : ` — ${part.description}`;
-  return `[resource_link] ${label}${metaStr}${desc}\nFetch the full contents on demand with read_result, handle: ${part.uri}`;
+  return `[resource_link] ${label}${metaStr}${desc}\nFetch the full contents on demand with read_result, handle: ${scopedResourceHandle(serverId, part.uri)}`;
+}
+
+/**
+ * Build the server-scoped `read_result` handle for an MCP resource
+ * (mcp-skills-06): `mcp:<serverId>:<uri>`.
+ *
+ * @stable
+ */
+export function scopedResourceHandle(serverId: string, uri: string): string {
+  return `mcp:${serverId}:${uri}`;
 }
 
 /** Human-readable size of a base64 payload's decoded bytes (MC-8). */

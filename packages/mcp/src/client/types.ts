@@ -86,6 +86,17 @@ export interface CreateMCPClientOptions {
    * (gated).
    */
   readonly sampling?: MCPSamplingHandler;
+  /**
+   * mcp-skills-10: called when the underlying transport closes (a
+   * stdio child dying, an HTTP session dropping beyond the SDK's SSE
+   * resume). Without it a disconnect is observable only as
+   * `MCPProtocolError`s on subsequent calls. The client does NOT
+   * auto-reconnect — rebuild it via `createMCPClient(...)` (and re-run
+   * `toTools()` for the drift diff) when this fires.
+   */
+  readonly onTransportClose?: (info: { readonly server: string }) => void;
+  /** mcp-skills-10: called on transport-level errors (see {@link onTransportClose}). */
+  readonly onTransportError?: (error: Error, info: { readonly server: string }) => void;
 }
 
 /**
@@ -345,7 +356,18 @@ export interface MCPClient {
     args: unknown,
     opts?: { signal?: AbortSignal; timeoutMs?: number },
   ): Promise<MCPCallToolResult>;
+  /**
+   * First content item of the resource. mcp-skills-11: a multi-content
+   * response (one URI can yield several items) is truncated to the
+   * FIRST item — a WARN + counter fire when that happens; use
+   * {@link readResourceContents} for the full array.
+   */
   readResource(uri: string, opts?: { signal?: AbortSignal }): Promise<MCPResourceContent>;
+  /** Every content item of the resource (mcp-skills-11). */
+  readResourceContents(
+    uri: string,
+    opts?: { signal?: AbortSignal },
+  ): Promise<ReadonlyArray<MCPResourceContent>>;
   getPrompt(
     name: string,
     args?: unknown,

@@ -203,19 +203,19 @@ export async function startInMemoryServer(
 
   server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
     const uri = req.params.uri;
-    const match = (opts.resources ?? []).find((r) => r.uri === uri);
-    if (match === undefined) {
+    // Several fixture entries may share one uri — the MCP result is an
+    // ARRAY for exactly that reason (mcp-skills-11 coverage).
+    const matches = (opts.resources ?? []).filter((r) => r.uri === uri);
+    if (matches.length === 0) {
       throw new Error(`resource not found: ${uri}`);
     }
     return {
-      contents: [
-        {
-          uri: match.uri,
-          ...(match.mimeType === undefined ? {} : { mimeType: match.mimeType }),
-          ...(match.content?.text === undefined ? {} : { text: match.content.text }),
-          ...(match.content?.blob === undefined ? {} : { blob: match.content.blob }),
-        },
-      ],
+      contents: matches.map((match) => ({
+        uri: match.uri,
+        ...(match.mimeType === undefined ? {} : { mimeType: match.mimeType }),
+        ...(match.content?.text === undefined ? {} : { text: match.content.text }),
+        ...(match.content?.blob === undefined ? {} : { blob: match.content.blob }),
+      })),
     };
   });
 

@@ -98,12 +98,24 @@ export function resolveSkillField<T = unknown>(
   const conflictingSources: string[] = [];
   const presentInBase = field in frontmatter;
   const meta = frontmatter.metadata;
-  const presentInMeta =
-    meta !== undefined &&
-    meta !== null &&
-    typeof meta === 'object' &&
-    !Array.isArray(meta) &&
-    `graphorin.${field}` in (meta as Record<string, unknown>);
+  const metaRecord =
+    meta !== undefined && meta !== null && typeof meta === 'object' && !Array.isArray(meta)
+      ? (meta as Record<string, unknown>)
+      : undefined;
+  // mcp-skills-09 (F-10): the docs' preferred authoring form is the
+  // NESTED object (`metadata: { graphorin: { sensitivity: ... } }`),
+  // which YAML parses to a nested record — the old resolver only read
+  // the flat dotted key (`metadata: { 'graphorin.sensitivity': ... }`)
+  // and silently dropped nested values. Both shapes now resolve; the
+  // flat key wins when both are present (it was the only working form).
+  const nested = metaRecord?.graphorin;
+  const nestedRecord =
+    nested !== undefined && nested !== null && typeof nested === 'object' && !Array.isArray(nested)
+      ? (nested as Record<string, unknown>)
+      : undefined;
+  const presentInMetaFlat = metaRecord !== undefined && `graphorin.${field}` in metaRecord;
+  const presentInMetaNested = nestedRecord !== undefined && field in nestedRecord;
+  const presentInMeta = presentInMetaFlat || presentInMetaNested;
   const presentInPrefix = `graphorin-${field}` in frontmatter;
   if (presentInBase) conflictingSources.push(field);
   if (presentInMeta) conflictingSources.push(`metadata.graphorin.${field}`);
@@ -120,7 +132,9 @@ export function resolveSkillField<T = unknown>(
   }
   if (presentInMeta) {
     return Object.freeze({
-      value: (meta as Record<string, unknown>)[`graphorin.${field}`] as T,
+      value: (presentInMetaFlat
+        ? (metaRecord as Record<string, unknown>)[`graphorin.${field}`]
+        : (nestedRecord as Record<string, unknown>)[field]) as T,
       source: 'metadata-graphorin' as const,
       conflicting,
       conflictingSources,
