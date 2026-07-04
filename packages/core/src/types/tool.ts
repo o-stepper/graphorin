@@ -235,6 +235,24 @@ export type ToolErrorKind =
   | 'rate_limited';
 
 /**
+ * Model-facing recovery guidance attached to a {@link ToolError} (C3).
+ * Practitioner evidence converges on these two fields being what changes
+ * model behaviour after a failure:
+ *
+ * - `'retry_later'`      — transient; the same call is expected to work
+ *                          after a pause (rate limits, timeouts).
+ * - `'check_input'`      — the arguments are wrong; re-read the schema
+ *                          and fix them before retrying.
+ * - `'try_alternative'`  — this tool/approach failed non-transiently;
+ *                          try a different tool or strategy.
+ * - `'report_to_user'`   — a policy/authorization stop; do not retry,
+ *                          surface the situation instead.
+ *
+ * @stable
+ */
+export type RecoveryHint = 'retry_later' | 'check_input' | 'try_alternative' | 'report_to_user';
+
+/**
  * The unsuccessful outcome of a tool invocation. The model sees a textual
  * representation of `message`; the runtime sees the typed shape.
  *
@@ -249,6 +267,14 @@ export interface ToolError {
   readonly cause?: unknown;
   /** Optional remediation hint for human readers. */
   readonly hint?: string;
+  /**
+   * Whether retrying the SAME call can plausibly succeed (C3). Stamped
+   * from the error kind by the executor; the harness-side transparent
+   * retry consults it together with the tool's side-effect safety.
+   */
+  readonly recoverable?: boolean;
+  /** Model-facing recovery guidance derived from the error kind (C3). */
+  readonly recoveryHint?: RecoveryHint;
 }
 
 /**

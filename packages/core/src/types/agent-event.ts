@@ -50,6 +50,7 @@ export type AgentEvent<TOutput = string> =
   | SourceCitedEvent
   | StepEndEvent
   | GuardrailTrippedEvent
+  | VerifierResultEvent
   | AgentEndEvent<TOutput>
   | AgentErrorEvent;
 
@@ -247,6 +248,21 @@ export interface GuardrailTrippedEvent {
   readonly guardrailName: string;
   readonly phase: 'input' | 'output';
   readonly reason?: string;
+}
+
+/**
+ * Outcome of a terminal-response verifier check (C3). Emitted once per
+ * verifier per verification round; a failed verifier's `feedback` is
+ * also appended to the transcript so the model can address it.
+ *
+ * @stable
+ */
+export interface VerifierResultEvent {
+  readonly type: 'verifier.result';
+  readonly verifierId: string;
+  readonly ok: boolean;
+  readonly feedback?: string;
+  readonly stepNumber: number;
 }
 
 /** @stable */

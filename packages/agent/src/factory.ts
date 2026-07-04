@@ -127,6 +127,7 @@ import type {
   AgentToToolOptions,
   CompactionApiResult,
   CompactOptions,
+  VerifierResult,
 } from './types.js';
 
 const sha256Hex = (input: string): string =>
@@ -834,6 +835,22 @@ function addUsage(a: Usage, b: Usage): Usage {
   };
 }
 
+/**
+ * C3: render a ToolError for the model. The first line keeps the
+ * long-standing `Error: <message>` shape; a bracketed second line carries
+ * the typed kind + the recovery envelope, which is what actually changes
+ * model behaviour after a failure (retry vs. fix args vs. give up).
+ */
+function renderToolErrorMessage(error: ToolError): string {
+  const parts: string[] = [`kind: ${error.kind}`];
+  if (error.recoverable !== undefined) {
+    parts.push(error.recoverable ? 'recoverable: yes' : 'recoverable: no');
+  }
+  if (error.recoveryHint !== undefined) parts.push(`suggested action: ${error.recoveryHint}`);
+  if (error.hint !== undefined) parts.push(error.hint);
+  return `Error: ${error.message}\n[${parts.join('; ')}]`;
+}
+
 /** In-place variant of {@link addUsage} for mutable accumulators. */
 function accumulateUsage(target: Usage, delta: Usage): void {
   target.promptTokens += delta.promptTokens;
@@ -1105,6 +1122,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       ...(config.maxParallelTools !== undefined
         ? { maxParallelTools: config.maxParallelTools }
         : {}),
+      ...(config.toolRetry !== undefined ? { retry: config.toolRetry } : {}),
     });
   const toolExecutor = makeToolExecutor(toolRegistry);
 
@@ -1671,7 +1689,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         const outcome = result.outcome;
         if ('kind' in outcome) {
           yield { type: 'tool.execute.error', toolCallId: call.toolCallId, error: outcome };
-          const text = `Error: ${outcome.message}`;
+          const text = renderToolErrorMessage(outcome);
           messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
           state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
           causalityMonitor?.recordCall(`tool.error:${call.toolName}`);
@@ -1689,7 +1707,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           // via `read_result`. Inlined results serialise exactly as before
           // (preserves the happy-path message contract, R10).
           const handle = outcome.resultHandle;
-          const text =
+          const rendered =
             handle !== undefined
               ? `${handle.preview}\n\n[Full result${
                   handle.bytes !== undefined ? ` (${handle.bytes} bytes)` : ''
@@ -1699,6 +1717,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               : typeof output === 'string'
                 ? output
                 : JSON.stringify(output);
+          // C3 (ACI): an empty body reads as a glitch to models; say
+          // explicitly that the tool ran and simply had nothing to print.
+          const text =
+            rendered === undefined || rendered.trim().length === 0
+              ? '(tool ran successfully with no output)'
+              : rendered;
           messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
           state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
           causalityMonitor?.recordCall(`tool:${call.toolName}`);
@@ -1930,6 +1954,8 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     const handoffNames = Array.from(handoffMap.keys());
     let stepNumber = 0;
+    // C3: verifier-triggered continuation rounds consumed this run.
+    let verifierRoundsUsed = 0;
     // AG-15: tools the model actually called on the PREVIOUS step — the
     // per-tool preferred-model ladder consults these, never the full
     // advertised catalogue.
@@ -2393,6 +2419,17 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           usage: stepUsage,
           toolCalls: [],
           agentId: state.currentAgentId,
+          // C3: journal the RAW model response (pre-leak-block text) so
+          // createReplayProvider(state) can re-drive the run offline.
+          ...(config.recordProviderResponses === true
+            ? {
+                providerResponse: {
+                  modelId: lastModelId,
+                  ...(textBuffer.length > 0 ? { text: textBuffer } : {}),
+                  ...(finalCalls.length > 0 ? { toolCalls: [...finalCalls] } : {}),
+                },
+              }
+            : {}),
         };
         state.steps.push(stepRecord);
         lastStepCalledToolNames = finalCalls.map((c) => c.toolName);
@@ -2493,7 +2530,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                   toolCallId: call.toolCallId,
                   error: toolError,
                 };
-                const text = `Error: ${toolError.message}`;
+                const text = renderToolErrorMessage(toolError);
                 messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
                 state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
                 continue;
@@ -2569,7 +2606,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
                   toolCallId: call.toolCallId,
                   error: toolError,
                 };
-                const text = `Error: ${toolError.message}`;
+                const text = renderToolErrorMessage(toolError);
                 messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
                 state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
                 continue;
@@ -2647,6 +2684,47 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         yield { type: 'step.end', stepNumber, usage: stepUsage };
 
         if (finalCalls.length === 0) {
+          // C3: verifier seam — deterministic checks run on EVERY terminal
+          // response (so the outcome is always observable via
+          // verifier.result events). Failures feed structured feedback back
+          // as a user message and the loop continues, but only while
+          // continuation rounds remain (maxVerifierRounds, default 1);
+          // exhausted rounds complete with the last output. A verifier that
+          // throws is treated as passed (a buggy verifier must not fail the
+          // run).
+          if (config.verifiers !== undefined && config.verifiers.length > 0) {
+            const feedbacks: string[] = [];
+            for (const verifier of config.verifiers) {
+              let result: VerifierResult;
+              try {
+                result = await verifier.verify({
+                  output: String(finalSnapshot.output ?? ''),
+                  state,
+                  stepNumber,
+                });
+              } catch {
+                result = { ok: true };
+              }
+              yield {
+                type: 'verifier.result',
+                verifierId: verifier.id,
+                ok: result.ok,
+                ...(result.ok ? {} : { feedback: result.feedback }),
+                stepNumber,
+              };
+              if (!result.ok) feedbacks.push(`[verifier:${verifier.id}] ${result.feedback}`);
+            }
+            if (feedbacks.length > 0 && verifierRoundsUsed < (config.maxVerifierRounds ?? 1)) {
+              verifierRoundsUsed += 1;
+              const feedbackMessage: Message = {
+                role: 'user',
+                content: `Your response failed ${feedbacks.length} verification check(s). Address the feedback and answer again:\n${feedbacks.join('\n')}`,
+              };
+              messages.push(feedbackMessage);
+              state.messages.push(feedbackMessage);
+              continue;
+            }
+          }
           state.status = 'completed';
           break;
         }

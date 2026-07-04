@@ -143,6 +143,10 @@ export {
   type SerializeRunStateOptions,
   serializeRunState,
 } from './run-state/index.js';
+export {
+  createReplayProvider,
+  type ReplayProviderOptions,
+} from './testing/replay-provider.js';
 export type {
   AbortOptions,
   Agent,
@@ -156,6 +160,8 @@ export type {
   PostCompactionHook,
   PrepareStepHook,
   PrepareStepOverrides,
+  ResponseVerifier,
   ResumeDirective,
   SkillsRegistryLike,
+  VerifierResult,
 } from './types.js';

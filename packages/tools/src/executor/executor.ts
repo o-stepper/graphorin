@@ -24,6 +24,7 @@
 import type {
   AISpan,
   CompletedToolCall,
+  RecoveryHint,
   ResolvedTool,
   RunContext,
   Sandbox,
@@ -180,6 +181,23 @@ export interface ExecutorOptions {
    * continues. Default {@link DEFAULT_INLINE_TOOL_TIMEOUT_MS} (60s).
    */
   readonly inlineToolTimeoutMs?: number;
+  /**
+   * C3: transparent bounded retry for transient tool failures. A failed
+   * attempt whose error kind is in `kinds` is silently re-executed with
+   * exponential backoff (a ToolRateLimitError's `retryAfterMs` wins over
+   * the computed backoff) up to `maxAttempts` TOTAL attempts — but only
+   * for `pure` / `read-only` tools or tools declaring an
+   * `idempotencyKey`, so a retry can never double a side effect.
+   *
+   * Defaults: `maxAttempts: 3`, `backoffMs: 250`, `kinds: ['rate_limited']`
+   * ('timeout' is deliberately not retried by default — stacked wall-clock
+   * timeouts multiply run latency; opt in via `kinds` when you want it).
+   */
+  readonly retry?: {
+    readonly maxAttempts?: number;
+    readonly backoffMs?: number;
+    readonly kinds?: ReadonlyArray<ToolErrorKind>;
+  };
 }
 
 /**
@@ -517,31 +535,79 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       return frozenCompleted(call, error, stepNumber);
     }
 
-    // Wrap the entire execution in a `tool.execute` AISpan so the
-    // observability layer captures `args`, `result`, `durationMs`, the
-    // resolved sandbox kind, the memory-guard tier, the sensitivity
-    // tier, the side-effect class, and the streaming hint per the
-    // GenAI Semantic Conventions extension.
-    return runContext.tracer.span<'tool.execute', CompletedToolCall>(
-      {
-        type: 'tool.execute',
-        attrs: {
-          'graphorin.tool.name': tool.name,
-          'graphorin.tool.call_id': call.toolCallId,
-          'graphorin.tool.side_effect_class': tool.__sideEffectClass,
-          'graphorin.tool.streaming_hint': tool.__streamingHint,
-          'graphorin.tool.trust_class': tool.__trustClass,
-          ...(tool.sensitivity !== undefined
-            ? { 'graphorin.tool.sensitivity': tool.sensitivity }
-            : {}),
-          ...(tool.memoryGuardTier !== undefined
-            ? { 'graphorin.tool.memory_guard.tier': tool.memoryGuardTier }
-            : {}),
+    const attempt = (): Promise<CompletedToolCall> =>
+      // Wrap the entire execution in a `tool.execute` AISpan so the
+      // observability layer captures `args`, `result`, `durationMs`, the
+      // resolved sandbox kind, the memory-guard tier, the sensitivity
+      // tier, the side-effect class, and the streaming hint per the
+      // GenAI Semantic Conventions extension.
+      runContext.tracer.span<'tool.execute', CompletedToolCall>(
+        {
+          type: 'tool.execute',
+          attrs: {
+            'graphorin.tool.name': tool.name,
+            'graphorin.tool.call_id': call.toolCallId,
+            'graphorin.tool.side_effect_class': tool.__sideEffectClass,
+            'graphorin.tool.streaming_hint': tool.__streamingHint,
+            'graphorin.tool.trust_class': tool.__trustClass,
+            ...(tool.sensitivity !== undefined
+              ? { 'graphorin.tool.sensitivity': tool.sensitivity }
+              : {}),
+            ...(tool.memoryGuardTier !== undefined
+              ? { 'graphorin.tool.memory_guard.tier': tool.memoryGuardTier }
+              : {}),
+          },
         },
-      },
-      (span) =>
-        executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span, disableRepair),
-    );
+        (span) =>
+          executeOneInSpan(call, tool, runContext, stepNumber, trustLevel, span, disableRepair),
+      );
+
+    // C3: transparent bounded retry for transient failures. Only kinds in
+    // the retry set are eligible, and — critical for correctness — only
+    // when re-running cannot double a side effect: pure/read-only tools,
+    // or tools declaring an idempotencyKey. Each attempt gets its own
+    // tool.execute span; the model never sees the swallowed attempts.
+    const retryCfg = opts.retry;
+    const maxAttempts = Math.max(1, retryCfg?.maxAttempts ?? 3);
+    const retryKinds: ReadonlySet<ToolErrorKind> = new Set(retryCfg?.kinds ?? ['rate_limited']);
+    const baseBackoffMs = retryCfg?.backoffMs ?? 250;
+    const retrySafe =
+      tool.__sideEffectClass === 'pure' ||
+      tool.__sideEffectClass === 'read-only' ||
+      tool.__hasIdempotencyKey;
+
+    let completed = await attempt();
+    let attemptsUsed = 1;
+    while (
+      attemptsUsed < maxAttempts &&
+      retrySafe &&
+      'kind' in completed.outcome &&
+      retryKinds.has(completed.outcome.kind) &&
+      !runContext.signal.aborted
+    ) {
+      const failedKind = completed.outcome.kind;
+      const retryAfterMs =
+        completed.outcome.cause instanceof ToolRateLimitError
+          ? completed.outcome.cause.retryAfterMs
+          : undefined;
+      const delayMs = retryAfterMs ?? baseBackoffMs * 2 ** (attemptsUsed - 1);
+      incrementCounter('tool.executor.retry.total', { toolName: tool.name, kind: failedKind });
+      await new Promise<void>((resolve) => {
+        const timer = setTimeout(resolve, delayMs);
+        runContext.signal.addEventListener(
+          'abort',
+          () => {
+            clearTimeout(timer);
+            resolve();
+          },
+          { once: true },
+        );
+      });
+      if (runContext.signal.aborted) break;
+      completed = await attempt();
+      attemptsUsed += 1;
+    }
+    return completed;
   }
 
   async function executeOneInSpan(
@@ -1483,6 +1549,35 @@ interface SandboxResultLike {
   readonly error?: { readonly kind: string; readonly message: string };
 }
 
+/**
+ * C3: derive the recoverable flag + model-facing recovery hint from the
+ * error kind. Central so every error path (failWith, inline sites,
+ * synthesizeFailure) carries the envelope without per-site bookkeeping.
+ */
+function recoveryForKind(kind: ToolErrorKind): {
+  readonly recoverable: boolean;
+  readonly recoveryHint?: RecoveryHint;
+} {
+  switch (kind) {
+    case 'rate_limited':
+    case 'timeout':
+      return { recoverable: true, recoveryHint: 'retry_later' };
+    case 'invalid_input':
+      return { recoverable: false, recoveryHint: 'check_input' };
+    case 'invalid_output':
+    case 'unknown_tool':
+    case 'execution_failed':
+      return { recoverable: false, recoveryHint: 'try_alternative' };
+    case 'approval_denied':
+    case 'sandbox_violation':
+    case 'inbound_sanitization_blocked':
+    case 'dataflow_policy_blocked':
+      return { recoverable: false, recoveryHint: 'report_to_user' };
+    default:
+      return { recoverable: false };
+  }
+}
+
 function frozenCompleted(
   call: ToolCall,
   outcome: ToolOutcome,
@@ -1490,9 +1585,13 @@ function frozenCompleted(
   durationMs?: number,
 ): CompletedToolCall {
   void durationMs;
+  // C3: stamp the recovery envelope on every error outcome at the single
+  // completion funnel (explicit per-site values win when already set).
+  const finalized: ToolOutcome =
+    'kind' in outcome ? { ...recoveryForKind(outcome.kind), ...outcome } : outcome;
   return Object.freeze({
     call: Object.freeze({ ...call }),
-    outcome: Object.freeze({ ...outcome }) as ToolOutcome,
+    outcome: Object.freeze({ ...finalized }) as ToolOutcome,
     stepNumber,
   });
 }

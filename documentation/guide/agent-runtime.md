@@ -171,6 +171,55 @@ const agent = createAgent({
 
 Governance is preserved: each in-script call runs through the **same executor**, so per-tool `secretsAllowed` / `inboundSanitization` / `maxResultTokens` still apply to the value handed back to the script (set a tool's `maxResultTokens` high when the script must process its full output). The sandbox blocks network and filesystem access and exposes **no** host object beyond the bound tools. Two limitations to note: **approval-gated tools** (`needsApproval`) are excluded from the code API (there is no durable-HITL suspend mid-script — call those in `'direct'` mode), and code-mode does **not** honour a per-step `prepareStep` `tools` override. The default `'direct'` path is completely unchanged. See [code-mode](/guide/tools#code-mode) in the tools guide for the building blocks.
 
+## Tool-failure recovery envelope
+
+Every failed tool call reaches the model with its typed kind plus a recovery envelope, not just a bare message:
+
+```text
+Error: upstream said slow down
+[kind: rate_limited; recoverable: yes; suggested action: retry_later; retry after 1500ms]
+```
+
+The `recoverable` flag and `recoveryHint` (`retry_later` / `check_input` / `try_alternative` / `report_to_user`) are derived from the error kind in the executor; practitioner evidence consistently shows these two fields are what change model behaviour after a failure. Underneath, the executor also retries transient failures transparently: a `rate_limited` outcome from a `pure` / `read-only` tool (or one with an `idempotencyKey` — a retry must never double a side effect) is re-executed with exponential backoff up to 3 total attempts before the model ever sees it. Tune or widen via `toolRetry: { maxAttempts, backoffMs, kinds }`; a `ToolRateLimitError`'s `retryAfterMs` wins over the computed backoff. Tools that return an empty body render as an explicit `(tool ran successfully with no output)` marker instead of a blank message the model tends to read as a glitch.
+
+## Verifiers
+
+`verifiers` run when the model emits a terminal (no-tool-call) response — the last moment before the run completes. Each is a deterministic check (a lint runner, a test command, a format validator); a failure feeds its feedback back to the model as a user message and the loop continues, up to `maxVerifierRounds` (default 1) extra rounds:
+
+```ts
+const agent = createAgent({
+  name: 'coder',
+  instructions: '...',
+  provider,
+  verifiers: [
+    {
+      id: 'compiles',
+      verify: async ({ output }) => {
+        const result = await runTsc(extractCode(output));
+        return result.ok ? { ok: true } : { ok: false, feedback: result.stderr };
+      },
+    },
+  ],
+  maxVerifierRounds: 2,
+});
+```
+
+Every check emits a `verifier.result` event (also on the final, passing round), and a verifier that throws is treated as passed — a buggy verifier must never take down a run. This is deliberately **not** an evidence-free "reflect on your answer" step: intrinsic self-correction without an external signal degrades performance (Huang et al., ICLR 2024); wire verifiers to real commands and exit codes.
+
+## Deterministic replay
+
+With `recordProviderResponses: true` the loop journals each step's raw model response (text + tool calls + model id) onto `RunState.steps[].providerResponse`. `createReplayProvider(state)` then serves those responses back in order, so the same input re-executes the entire run — tools really run, the transcript rebuilds — with zero live model calls:
+
+```ts
+const original = createAgent({ name: 'a', instructions: '...', provider, tools, recordProviderResponses: true });
+const result = await original.run('do the thing');
+
+const replayed = createAgent({ name: 'a', instructions: '...', provider: createReplayProvider(result.state), tools });
+const replayResult = await replayed.run('do the thing'); // deterministic, offline
+```
+
+The replay provider is strict: it throws when the state has no journaled responses and surfaces an error when the replayed run diverges (asks for more steps than were recorded) instead of inventing a response. Use it for reproducible integration tests of agent behaviour and for debugging a production run offline.
+
 ## Durable HITL
 
 `runStateToJSON(runState)` / `runStateFromJSON(serialised)` round-trip the full run state through any storage the caller picks (file, SQLite, KV, S3). A pending approval can be persisted, the process can shut down, and another machine can resume by re-invoking `agent.run(savedRunState, { directive: { approvals: [...] } })`.

@@ -284,12 +284,76 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    *   every step of a run.
    */
   readonly toolPromotion?: 'immediate' | 'run-boundary';
+  /**
+   * C3: rules-based verifiers that run when the model emits a terminal
+   * (no-tool-call) response. A failing verifier's feedback is appended
+   * to the transcript as a user message and the loop continues, up to
+   * `maxVerifierRounds` extra rounds. Verifiers are DETERMINISTIC checks
+   * (lint/test runners, format validators, exit codes) — deliberately
+   * not an evidence-free "reflect on your answer" step, which the
+   * self-correction literature shows degrades performance.
+   */
+  readonly verifiers?: ReadonlyArray<ResponseVerifier>;
+  /**
+   * Cap on verifier-triggered continuation rounds per run (C3).
+   * @default 1
+   */
+  readonly maxVerifierRounds?: number;
+  /**
+   * C3: transparent bounded retry for transient tool failures, forwarded
+   * to the executor. Defaults (when set): `maxAttempts: 3`,
+   * `backoffMs: 250`, `kinds: ['rate_limited']`; retries only ever run
+   * for `pure` / `read-only` tools or tools with an `idempotencyKey`.
+   */
+  readonly toolRetry?: {
+    readonly maxAttempts?: number;
+    readonly backoffMs?: number;
+    readonly kinds?: ReadonlyArray<import('@graphorin/core').ToolErrorKind>;
+  };
+  /**
+   * C3: journal each step's raw model response (text + tool calls +
+   * model id) onto `RunState.steps[].providerResponse`, enabling
+   * deterministic replay via `createReplayProvider(state)` — reproduce
+   * an entire run without live model calls.
+   * @default false
+   */
+  readonly recordProviderResponses?: boolean;
   readonly tracer?: Tracer;
   readonly checkpointStore?: CheckpointStore;
   readonly sensitivity?: Sensitivity;
   readonly sessionId?: string;
   readonly userId?: string;
   readonly deps?: TDeps;
+}
+
+/**
+ * Outcome of one {@link ResponseVerifier} check (C3).
+ *
+ * @stable
+ */
+export type VerifierResult =
+  | { readonly ok: true }
+  | { readonly ok: false; readonly feedback: string };
+
+/**
+ * A deterministic check over the model's terminal response (C3). Runs
+ * when the loop is about to complete; `ok: false` feeds `feedback` back
+ * to the model (as a user message prefixed `[verifier:<id>]`) and the
+ * loop continues for up to `AgentConfig.maxVerifierRounds` extra rounds.
+ *
+ * A verifier that THROWS is treated as passed (and logged): a buggy
+ * verifier must never take down a run.
+ *
+ * @stable
+ */
+export interface ResponseVerifier {
+  readonly id: string;
+  verify(ctx: {
+    /** The model's terminal text output (raw, pre-structured-parse). */
+    readonly output: string;
+    readonly state: RunState;
+    readonly stepNumber: number;
+  }): VerifierResult | Promise<VerifierResult>;
 }
 
 /**
