@@ -365,7 +365,7 @@ describe('P2-1 search({ expandHops }) end-to-end', () => {
 
 describe('P2-1 types', () => {
   it('exposes the graph search + resolver surface', () => {
-    expectTypeOf<FactSearchOptions['expandHops']>().toEqualTypeOf<0 | 1 | undefined>();
+    expectTypeOf<FactSearchOptions['expandHops']>().toEqualTypeOf<0 | 1 | 2 | undefined>();
     expectTypeOf<CreateMemoryOptions['graph']>().toMatchTypeOf<
       { readonly entityResolution?: boolean } | undefined
     >();

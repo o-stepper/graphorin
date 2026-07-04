@@ -6,6 +6,7 @@ import type {
   GraphEntity,
   Insight,
   MemoryHit,
+  MemoryOwner,
   MemoryProvenance,
   MemoryRecord,
   MemorySearchOptions,
@@ -47,6 +48,31 @@ import { scoreFromDistance, VectorTableManager } from './vector-table-mgr.js';
 const FACT_VALIDITY_CLAUSE =
   'AND (f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)';
 const EPISODE_VALIDITY_CLAUSE = 'AND e.started_at <= ?';
+
+/**
+ * Normalize the D3 owner filter to a bind list. `undefined` (the
+ * default) ⇒ `null` ⇒ no predicate, so reads are byte-identical until a
+ * caller opts in. Rows written before migration 026 have `owner IS
+ * NULL` and are treated as `'user'` at filter time.
+ */
+function normalizeOwnerFilter(
+  owner: MemoryOwner | ReadonlyArray<MemoryOwner> | undefined,
+): ReadonlyArray<string> | null {
+  if (owner === undefined) return null;
+  const list = (Array.isArray(owner) ? owner : [owner]) as ReadonlyArray<string>;
+  return list.length > 0 ? list : null;
+}
+
+/** WHERE fragment for the owner filter; each entry binds one `?`. */
+function ownerPredicate(alias: string, count: number): string {
+  const marks = Array.from({ length: count }, () => '?').join(', ');
+  return `AND COALESCE(${alias}.owner, 'user') IN (${marks})`;
+}
+
+/** Map a stored `owner` column to the typed union (unknown values drop). */
+function ownerFromRow(value: string | null | undefined): MemoryOwner | undefined {
+  return value === 'user' || value === 'agent' || value === 'shared' ? value : undefined;
+}
 
 /**
  * Resolve the validity epoch for a fact read (memory-retrieval-01):
@@ -602,8 +628,8 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
         `INSERT INTO episodes (
            id, scope_user_id, scope_session_id, scope_agent_id, summary, started_at, ended_at,
            importance, embedder_id, source_message_ids_json, sensitivity, tags_json,
-           provenance, status, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           provenance, status, owner, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            summary = excluded.summary,
            ended_at = excluded.ended_at,
@@ -611,6 +637,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
            embedder_id = excluded.embedder_id,
            provenance = excluded.provenance,
            status = excluded.status,
+           owner = excluded.owner,
            updated_at = excluded.updated_at,
            tags_json = excluded.tags_json`,
         [
@@ -628,6 +655,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
           episode.tags ? JSON.stringify(episode.tags) : null,
           episode.provenance ?? null,
           episode.status ?? 'active',
+          episode.owner ?? null,
           toEpoch(episode.createdAt),
           episode.updatedAt ? toEpoch(episode.updatedAt) : null,
         ],
@@ -875,10 +903,10 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            id, scope_user_id, scope_session_id, scope_agent_id, text,
            subject, predicate, object, confidence, sensitivity, tags_json,
            embedder_id, source_message_ids_json,
-           valid_from, valid_to, supersedes, superseded_by, provenance, status,
+           valid_from, valid_to, supersedes, superseded_by, provenance, status, owner,
            importance, strength, last_accessed_at,
            created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
            subject = excluded.subject,
@@ -893,6 +921,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            superseded_by = excluded.superseded_by,
            provenance = excluded.provenance,
            status = excluded.status,
+           owner = excluded.owner,
            importance = excluded.importance,
            -- CS-5: adopt the new embedder_id only when this write actually
            -- carries an embedding (excluded.embedder_id IS NOT NULL). A
@@ -928,6 +957,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
           fact.supersededBy ?? null,
           fact.provenance ?? null,
           fact.status ?? 'active',
+          fact.owner ?? null,
           fact.importance ?? null,
           1.0,
           null,
@@ -970,9 +1000,12 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     // ignored). A fact matches when it carries AT LEAST ONE of the
     // requested tags; rows without tags never match a tag filter.
     const tags = opts.tags !== undefined && opts.tags.length > 0 ? [...opts.tags] : null;
+    // D3: retrieval-time principal filter — absent ⇒ no predicate.
+    const owners = normalizeOwnerFilter(opts.owner);
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
     if (asOf !== null) binds.push(asOf, asOf);
     if (tags !== null) binds.push(...tags);
+    if (owners !== null) binds.push(...owners);
     binds.push(topK);
     const rows = this.#conn.all<FactRow & { bm25_score: number }>(
       `SELECT f.*, bm25(facts_fts) AS bm25_score
@@ -982,6 +1015,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
          ${opts.includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
          ${asOf !== null ? FACT_VALIDITY_CLAUSE : ''}
          ${tags !== null ? factTagsPredicate(tags.length) : ''}
+         ${owners !== null ? ownerPredicate('f', owners.length) : ''}
        ORDER BY bm25_score
        LIMIT ?`,
       binds,
@@ -1012,6 +1046,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     asOf?: string,
     includeQuarantined?: boolean,
     includeSuperseded?: boolean,
+    owner?: MemoryOwner | ReadonlyArray<MemoryOwner>,
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     const meta = this.#embeddings.get(embedderId);
     if (meta === null) return [];
@@ -1023,6 +1058,8 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
     // memory-retrieval-01: default reads evaluate validity at NOW.
     const asOfEpoch = resolveFactValidityEpoch(asOf, includeSuperseded);
+    // D3: retrieval-time principal filter — absent ⇒ no predicate.
+    const owners = normalizeOwnerFilter(owner);
     const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
         Buffer.from(embedding.buffer),
@@ -1031,6 +1068,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
         embedderId,
       ];
       if (asOfEpoch !== null) binds.push(asOfEpoch, asOfEpoch);
+      if (owners !== null) binds.push(...owners);
       return this.#conn.all<FactRow & { distance: number }>(
         `SELECT f.*, v.distance AS distance
          FROM ${quoteIdent(tableName)} v
@@ -1043,6 +1081,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
            AND f.archived = 0
            ${includeQuarantined === true ? '' : FACT_NOT_QUARANTINED}
            ${asOfEpoch !== null ? FACT_VALIDITY_CLAUSE : ''}
+           ${owners !== null ? ownerPredicate('f', owners.length) : ''}
          ORDER BY v.distance`,
         binds,
       );
@@ -1217,6 +1256,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       readonly importance: number | null;
       readonly status: string;
       readonly provenance: string | null;
+      readonly accessCount: number;
     }>
   > {
     // MCON-6: archived facts never receive access bumps, so they pin the
@@ -1235,9 +1275,10 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       importance: number | null;
       status: string;
       provenance: string | null;
+      access_count: number;
     }>(
       `SELECT id, text, strength, last_accessed_at, created_at, archived,
-              importance, status, provenance
+              importance, status, provenance, access_count
        FROM facts
        WHERE scope_user_id = ? AND deleted_at IS NULL ${archivedPredicate}
        ORDER BY COALESCE(last_accessed_at, created_at) ASC
@@ -1254,6 +1295,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       importance: row.importance,
       status: row.status,
       provenance: row.provenance,
+      accessCount: row.access_count,
     }));
   }
 
@@ -1270,9 +1312,13 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     if (ids.length === 0) return;
     const at = accessedAt ?? Date.now();
     const placeholders = ids.map(() => '?').join(', ');
+    // D3 (migration 027): the monotonic access counter runs alongside
+    // the capped strength bump — strength saturates at 2.0, the counter
+    // never does, giving salience a true frequency signal.
     this.#conn.run(
       `UPDATE facts
-       SET last_accessed_at = ?, strength = MIN(2.0, strength + 0.1)
+       SET last_accessed_at = ?, strength = MIN(2.0, strength + 0.1),
+           access_count = access_count + 1
        WHERE id IN (${placeholders})`,
       [at, ...ids],
     );
@@ -1415,30 +1461,69 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
     this.#conn = conn;
   }
   async add(rule: Rule): Promise<void> {
-    this.#conn.run(
-      `INSERT INTO rules (
-         id, scope_user_id, scope_session_id, scope_agent_id, text, condition,
-         priority, sensitivity, tags_json, created_at,
-         steps_json, variables_json, success_criteria_json, provenance, status
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        rule.id,
-        rule.userId,
-        rule.sessionId ?? null,
-        rule.agentId ?? null,
-        rule.text,
-        rule.condition ?? null,
-        rule.priority,
-        rule.sensitivity,
-        rule.tags ? JSON.stringify(rule.tags) : null,
-        toEpoch(rule.createdAt),
-        rule.steps ? JSON.stringify(rule.steps) : null,
-        rule.variables ? JSON.stringify(rule.variables) : null,
-        rule.successCriteria ? JSON.stringify(rule.successCriteria) : null,
-        rule.provenance ?? null,
-        rule.status ?? null,
-      ],
+    this.#conn.transaction(() => {
+      this.#conn.run(
+        `INSERT INTO rules (
+           id, scope_user_id, scope_session_id, scope_agent_id, text, condition,
+           priority, sensitivity, tags_json, created_at,
+           steps_json, variables_json, success_criteria_json, provenance, status, owner
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          rule.id,
+          rule.userId,
+          rule.sessionId ?? null,
+          rule.agentId ?? null,
+          rule.text,
+          rule.condition ?? null,
+          rule.priority,
+          rule.sensitivity,
+          rule.tags ? JSON.stringify(rule.tags) : null,
+          toEpoch(rule.createdAt),
+          rule.steps ? JSON.stringify(rule.steps) : null,
+          rule.variables ? JSON.stringify(rule.variables) : null,
+          rule.successCriteria ? JSON.stringify(rule.successCriteria) : null,
+          rule.provenance ?? null,
+          rule.status ?? null,
+          rule.owner ?? null,
+        ],
+      );
+      // D3 (migration 028): keep the runbook lexical index in sync. Rule
+      // text is immutable after add; soft-deleted rows are filtered by
+      // the join in search().
+      this.#conn.run(
+        `INSERT OR REPLACE INTO rules_fts (rowid, text) VALUES ((SELECT rowid FROM rules WHERE id = ?), ?)`,
+        [rule.id, rule.text],
+      );
+    });
+  }
+
+  /**
+   * Lexical runbook search over rule text (D3, migration 028) — powers
+   * "find the procedure for this task" content recall, as opposed to
+   * predicate activation. Returns whole rules; quarantined (unvalidated
+   * induced) procedures are excluded unless the inspector opts in.
+   */
+  async search(
+    scope: SessionScope,
+    query: string,
+    opts: { readonly topK?: number; readonly includeQuarantined?: boolean } = {},
+  ): Promise<ReadonlyArray<MemoryHit<Rule>>> {
+    const topK = opts.topK ?? 5;
+    const rows = this.#conn.all<RuleRow & { bm25_score: number }>(
+      `SELECT r.*, bm25(rules_fts) AS bm25_score
+       FROM rules_fts
+       JOIN rules r ON r.rowid = rules_fts.rowid
+       WHERE rules_fts MATCH ? AND r.scope_user_id = ? AND r.deleted_at IS NULL
+         ${opts.includeQuarantined === true ? '' : "AND COALESCE(r.status, 'active') != 'quarantined'"}
+       ORDER BY bm25_score
+       LIMIT ?`,
+      [escapeFtsQuery(query), scope.userId, topK],
     );
+    return rows.map((row) => ({
+      record: rowToRule(row),
+      score: -row.bm25_score,
+      signals: { bm25: row.bm25_score },
+    }));
   }
   async list(scope: SessionScope): Promise<ReadonlyArray<Rule>> {
     const rows = this.#conn.all<RuleRow>(
@@ -1560,14 +1645,15 @@ export class SqliteInsightStore {
       this.#conn.run(
         `INSERT INTO insights (
            id, scope_user_id, scope_session_id, scope_agent_id, text, cites_json, salience,
-           provenance, status, embedder_id, sensitivity, tags_json, created_at, updated_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           provenance, status, owner, embedder_id, sensitivity, tags_json, created_at, updated_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            text = excluded.text,
            cites_json = excluded.cites_json,
            salience = excluded.salience,
            provenance = excluded.provenance,
            status = excluded.status,
+           owner = excluded.owner,
            updated_at = excluded.updated_at,
            tags_json = excluded.tags_json`,
         [
@@ -1580,6 +1666,7 @@ export class SqliteInsightStore {
           insight.salience,
           insight.provenance ?? 'reflection',
           insight.status ?? 'quarantined',
+          insight.owner ?? null,
           null,
           insight.sensitivity,
           insight.tags ? JSON.stringify(insight.tags) : null,
@@ -2039,6 +2126,126 @@ export class SqliteGraphStore {
     );
     return rows.map(rowToFact);
   }
+
+  /**
+   * PPR-lite graded expansion (D5): the same recursive entity-graph walk
+   * as {@link expandOneHop}, but returns each reachable fact with its
+   * MINIMUM hop distance from the seed set, so callers can weight
+   * neighbours by damped spreading activation instead of a flat score.
+   */
+  async expandActivation(
+    scope: SessionScope,
+    seedFactIds: ReadonlyArray<string>,
+    opts: {
+      readonly maxHops?: number;
+      readonly limit?: number;
+      readonly includeQuarantined?: boolean;
+      readonly asOf?: string;
+      readonly includeSuperseded?: boolean;
+    } = {},
+  ): Promise<ReadonlyArray<{ readonly fact: Fact; readonly depth: number }>> {
+    if (seedFactIds.length === 0) return [];
+    const maxHops = opts.maxHops ?? 2;
+    const limit = opts.limit ?? 60;
+    const incQ = opts.includeQuarantined === true ? 1 : 0;
+    const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
+    const seedsJson = JSON.stringify([...seedFactIds]);
+    const rows = this.#conn.all<FactRow & { depth: number }>(
+      `WITH RECURSIVE
+         seed_ids(fact_id) AS (
+           SELECT f.id FROM facts f
+           JOIN json_each(?) j ON j.value = f.id
+           WHERE f.scope_user_id = ?
+         ),
+         walk(fact_id, depth) AS (
+             SELECT fact_id, 0 FROM seed_ids
+           UNION
+             SELECT fe2.fact_id, w.depth + 1
+             FROM walk w
+             JOIN facts fb ON fb.id = w.fact_id
+               AND fb.scope_user_id = ?
+               AND fb.deleted_at IS NULL
+               AND fb.archived = 0
+               AND (? = 1 OR fb.status != 'quarantined')
+               AND (? IS NULL OR ((fb.valid_from IS NULL OR fb.valid_from <= ?) AND (fb.valid_to IS NULL OR fb.valid_to > ?)))
+             JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
+             JOIN entities e1 ON e1.id = fe1.entity_id
+             JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
+             JOIN fact_entities fe2 ON fe2.entity_id = e2.id
+             WHERE w.depth < ?
+         )
+       SELECT f.*, MIN(reached.depth) AS depth FROM facts f
+       JOIN (SELECT fact_id, MIN(depth) AS depth FROM walk WHERE depth > 0 GROUP BY fact_id) reached
+         ON reached.fact_id = f.id
+       WHERE f.id NOT IN (SELECT fact_id FROM seed_ids)
+         AND f.scope_user_id = ?
+         AND f.deleted_at IS NULL
+         AND f.archived = 0
+         AND (? = 1 OR f.status != 'quarantined')
+         AND (? IS NULL OR ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?)))
+       GROUP BY f.id
+       ORDER BY depth ASC, f.created_at DESC
+       LIMIT ?`,
+      [
+        seedsJson,
+        scope.userId,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        maxHops,
+        scope.userId,
+        incQ,
+        asOf,
+        asOf,
+        asOf,
+        limit,
+      ],
+    );
+    return rows.map((row) => ({ fact: rowToFact(row), depth: row.depth }));
+  }
+
+  /**
+   * Exact entity-match retriever (D5): facts linked to the entity whose
+   * normalized name equals `normalizedName` (canonicalising merges).
+   * Powers a precise "facts about <entity>" candidate leg distinct from
+   * the fuzzy vector/FTS legs.
+   */
+  async factsForEntityName(
+    scope: SessionScope,
+    normalizedName: string,
+    opts: {
+      readonly limit?: number;
+      readonly includeQuarantined?: boolean;
+      readonly asOf?: string;
+      readonly includeSuperseded?: boolean;
+    } = {},
+  ): Promise<ReadonlyArray<Fact>> {
+    const limit = opts.limit ?? 30;
+    const incQ = opts.includeQuarantined === true ? 1 : 0;
+    const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
+    const binds: Array<string | number> = [scope.userId, normalizedName, scope.userId];
+    if (asOf !== null) binds.push(asOf, asOf);
+    binds.push(limit);
+    const rows = this.#conn.all<FactRow>(
+      `SELECT DISTINCT f.* FROM facts f
+       JOIN fact_entities fe ON fe.fact_id = f.id
+       JOIN entities e ON e.id = fe.entity_id
+       JOIN entities canon ON COALESCE(canon.merged_into, canon.id) = COALESCE(e.merged_into, e.id)
+       WHERE canon.scope_user_id = ?
+         AND canon.normalized_name = ?
+         AND f.scope_user_id = ?
+         AND f.deleted_at IS NULL
+         AND f.archived = 0
+         ${incQ === 1 ? '' : "AND f.status != 'quarantined'"}
+         ${asOf !== null ? 'AND ((f.valid_from IS NULL OR f.valid_from <= ?) AND (f.valid_to IS NULL OR f.valid_to > ?))' : ''}
+       ORDER BY f.created_at DESC
+       LIMIT ?`,
+      binds,
+    );
+    return rows.map(rowToFact);
+  }
 }
 
 function f32ToBlob(vec: Float32Array): Buffer {
@@ -2128,6 +2335,7 @@ interface EpisodeRow {
   tags_json: string | null;
   provenance: string | null;
   status: string;
+  owner: string | null;
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
@@ -2154,9 +2362,11 @@ interface FactRow {
   superseded_by: string | null;
   provenance: string | null;
   status: string;
+  owner: string | null;
   importance: number | null;
   strength: number;
   last_accessed_at: number | null;
+  access_count: number;
   created_at: number;
   updated_at: number | null;
   deleted_at: number | null;
@@ -2173,6 +2383,7 @@ interface InsightRow {
   salience: number;
   provenance: string | null;
   status: string;
+  owner: string | null;
   embedder_id: string | null;
   sensitivity: 'public' | 'internal' | 'secret';
   tags_json: string | null;
@@ -2202,6 +2413,8 @@ interface RuleRow {
   status: string | null;
   // MCON-2 part 4: demonstrated-success counter (migration 020).
   success_count: number;
+  // D3 (migration 026): principal dimension. NULL ⇒ treated 'user'.
+  owner: string | null;
 }
 
 function rowToBlock(row: WorkingBlockRow): Block {
@@ -2263,6 +2476,7 @@ function rowToEpisode(row: EpisodeRow): Episode {
     importance: row.importance ?? undefined,
     provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
     status: row.status as MemoryStatus,
+    owner: ownerFromRow(row.owner),
     sensitivity: row.sensitivity,
     tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
     createdAt: new Date(row.created_at).toISOString(),
@@ -2295,6 +2509,7 @@ function rowToInsight(row: InsightRow): Insight {
     salience: row.salience,
     provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
     status: row.status as MemoryStatus,
+    owner: ownerFromRow(row.owner),
     sensitivity: row.sensitivity,
     tags: row.tags_json ? (JSON.parse(row.tags_json) as readonly string[]) : undefined,
     createdAt: new Date(row.created_at).toISOString(),
@@ -2325,6 +2540,7 @@ function rowToFact(row: FactRow): Fact {
     supersededBy: row.superseded_by ?? undefined,
     provenance: (row.provenance ?? undefined) as MemoryProvenance | undefined,
     status: row.status as MemoryStatus,
+    owner: ownerFromRow(row.owner),
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: row.updated_at !== null ? new Date(row.updated_at).toISOString() : undefined,
     deletedAt: row.deleted_at !== null ? new Date(row.deleted_at).toISOString() : undefined,
@@ -2358,6 +2574,7 @@ function rowToRule(row: RuleRow): Rule {
     status: row.status !== null ? (row.status as MemoryStatus) : undefined,
     // MCON-2 part 4 (migration 020): absent on legacy snapshots ⇒ 0.
     successCount: row.success_count ?? 0,
+    owner: ownerFromRow(row.owner),
   } as Rule;
 }
 

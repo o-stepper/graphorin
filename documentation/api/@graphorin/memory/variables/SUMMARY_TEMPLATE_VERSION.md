@@ -7,10 +7,10 @@
 # Variable: SUMMARY\_TEMPLATE\_VERSION
 
 ```ts
-const SUMMARY_TEMPLATE_VERSION: "1.2" = '1.2';
+const SUMMARY_TEMPLATE_VERSION: "1.3" = '1.3';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:36
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:41
 
 Template version surfaced into the summary's section 9 metadata.
 Bumped when the section structure / preamble wording changes in

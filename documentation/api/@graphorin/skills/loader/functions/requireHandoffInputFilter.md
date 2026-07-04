@@ -10,7 +10,7 @@
 function requireHandoffInputFilter(metadata): HandoffInputFilterDeclaration;
 ```
 
-Defined in: packages/skills/src/loader/index.ts:787
+Defined in: packages/skills/src/loader/index.ts:789
 
 Required handoff-filter declaration helper. Returns the typed
 declaration the loader parsed from frontmatter; throws

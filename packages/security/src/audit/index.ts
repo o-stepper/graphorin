@@ -45,6 +45,24 @@ export {
   bridgeMemoryGuardToAudit,
   type MemoryGuardBridgeTeardown,
 } from './memory-guard-bridge.js';
+export type {
+  AuditInclusionProof,
+  AuditTreeHead,
+  SignedAuditCheckpoint,
+} from './merkle.js';
+export {
+  computeAuditTreeHead,
+  generateAuditSigningKeyPair,
+  leafHash as auditLeafHash,
+  merkleTreeHash as auditMerkleTreeHash,
+  proveAuditConsistency,
+  proveAuditInclusion,
+  signAuditCheckpoint,
+  verifyAuditAgainstCheckpoint,
+  verifyAuditCheckpointSignature,
+  verifyAuditConsistency,
+  verifyAuditInclusion,
+} from './merkle.js';
 export {
   type BridgeOAuthToAuditOptions,
   bridgeOAuthToAudit,

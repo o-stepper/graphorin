@@ -9,11 +9,13 @@ export type {
   Checkpoint,
   CheckpointId,
   CheckpointMetadata,
+  CheckpointPutOptions,
   CheckpointStore,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
 } from './checkpoint-store.js';
+export { CheckpointConflictError } from './checkpoint-store.js';
 
 export type { EmbedderProvider, EmbedOptions } from './embedder.js';
 export type { EvalSample, EvalScore, EvalScorer } from './eval-scorer.js';

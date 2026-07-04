@@ -6,7 +6,7 @@
 
 # Interface: ToolExecuteStartEvent
 
-Defined in: packages/core/src/types/agent-event.ts:110
+Defined in: packages/core/src/types/agent-event.ts:111
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/core/src/types/agent-event.ts:110
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:112 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.start"` | packages/core/src/types/agent-event.ts:111 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:113 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.start"` | packages/core/src/types/agent-event.ts:112 |

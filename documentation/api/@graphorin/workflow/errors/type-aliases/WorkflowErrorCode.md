@@ -24,7 +24,11 @@ type WorkflowErrorCode =
   | "reducer-failed"
   | "state-validation-failed"
   | "dead-end"
-  | "state-not-serializable";
+  | "state-not-serializable"
+  | "node-timeout"
+  | "workflow-version-mismatch"
+  | "workflow-divergence"
+  | "pause-not-found";
 ```
 
 Defined in: packages/workflow/src/errors/index.ts:16

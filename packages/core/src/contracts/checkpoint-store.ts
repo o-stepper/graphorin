@@ -33,7 +33,13 @@ export interface Checkpoint {
  * @stable
  */
 export interface CheckpointMetadata {
-  readonly source: 'sync' | 'async' | 'exit';
+  /**
+   * Durability mode that produced this write. The legacy `'async'`
+   * value was removed (workflow-14 / WF-7 — it was byte-identical to
+   * `'sync'`); adapters normalize legacy persisted rows to `'sync'` at
+   * read time.
+   */
+  readonly source: 'sync' | 'exit';
   readonly status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   readonly nodeName?: string;
   readonly tags?: ReadonlyArray<string>;
@@ -78,6 +84,47 @@ export interface ListOptions {
 }
 
 /**
+ * Optional atomicity contract for {@link CheckpointStore.put} (D1 /
+ * workflow-01). When `expectedLatestId` is supplied, the store MUST
+ * perform the latest-checkpoint comparison and the insert atomically
+ * (single transaction / synchronous critical section) and throw
+ * {@link CheckpointConflictError} on mismatch — closing the TOCTOU
+ * window an engine-level read-then-write cannot. `null` means "expect
+ * no checkpoint for this thread yet"; `undefined` (or a store that
+ * ignores the argument) preserves the unguarded legacy behaviour, which
+ * the engine backstops with its own pre-check.
+ *
+ * @stable
+ */
+export interface CheckpointPutOptions {
+  readonly expectedLatestId?: CheckpointId | null;
+}
+
+/**
+ * Thrown by a {@link CheckpointStore.put} honouring
+ * {@link CheckpointPutOptions.expectedLatestId} when another writer
+ * advanced the thread in between. The workflow engine maps it to its
+ * `checkpoint-version-conflict` error.
+ *
+ * @stable
+ */
+export class CheckpointConflictError extends Error {
+  readonly threadId: string;
+  readonly expectedLatestId: CheckpointId | null;
+  readonly actualLatestId: CheckpointId | null;
+
+  constructor(threadId: string, expected: CheckpointId | null, actual: CheckpointId | null) {
+    super(
+      `checkpoint conflict on thread "${threadId}": expected latest ${expected ?? '<none>'}, found ${actual ?? '<none>'}`,
+    );
+    this.name = 'CheckpointConflictError';
+    this.threadId = threadId;
+    this.expectedLatestId = expected;
+    this.actualLatestId = actual;
+  }
+}
+
+/**
  * Pluggable checkpoint storage interface. The default implementation
  * lives in `@graphorin/store-sqlite`.
  *
@@ -89,6 +136,7 @@ export interface CheckpointStore {
     namespace: string,
     checkpoint: Checkpoint,
     metadata: CheckpointMetadata,
+    opts?: CheckpointPutOptions,
   ): Promise<CheckpointId>;
 
   putWrites(

@@ -10,11 +10,12 @@
 function createNode<TState>(opts): WorkflowNode<TState>;
 ```
 
-Defined in: packages/workflow/src/node.ts:18
+Defined in: packages/workflow/src/node.ts:24
 
 Construct a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md). The wrapper exists to give the
 engine a stable shape and to keep `createWorkflow({...})` callers
-from instantiating nodes by hand.
+from instantiating nodes by hand. Carries the optional per-node
+execution policy (D1 / workflow-03): `timeoutMs` + `retry`.
 
 ## Type Parameters
 
@@ -26,9 +27,11 @@ from instantiating nodes by hand.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \{ `name`: `string`; `run`: [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt;; \} |
+| `opts` | \{ `name`: `string`; `retry?`: [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md); `run`: [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt;; `timeoutMs?`: `number`; \} |
 | `opts.name` | `string` |
+| `opts.retry?` | [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md) |
 | `opts.run` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt; |
+| `opts.timeoutMs?` | `number` |
 
 ## Returns
 

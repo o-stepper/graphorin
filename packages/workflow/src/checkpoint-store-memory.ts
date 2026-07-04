@@ -10,11 +10,13 @@ import type {
   Checkpoint,
   CheckpointId,
   CheckpointMetadata,
+  CheckpointPutOptions,
   CheckpointStore,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
 } from '@graphorin/core';
+import { CheckpointConflictError } from '@graphorin/core';
 
 interface StoredCheckpoint {
   readonly checkpoint: Checkpoint;
@@ -39,7 +41,19 @@ export class InMemoryCheckpointStore implements CheckpointStore {
     namespace: string,
     checkpoint: Checkpoint,
     metadata: CheckpointMetadata,
+    opts?: CheckpointPutOptions,
   ): Promise<CheckpointId> {
+    // D1 / workflow-01: honour the atomic compare-and-set contract. The
+    // whole method body is synchronous, so the check + insert cannot be
+    // interleaved by another writer on the same event loop.
+    if (opts?.expectedLatestId !== undefined) {
+      const ids = this.#threadIndex.get(`${threadId}::${namespace}`) ?? [];
+      const latest = this.#latestStored(threadId, namespace, ids);
+      const latestId = latest?.checkpoint.id ?? null;
+      if (latestId !== opts.expectedLatestId) {
+        throw new CheckpointConflictError(threadId, opts.expectedLatestId, latestId);
+      }
+    }
     const key = makeKey(threadId, namespace, checkpoint.id);
     const existing = this.#checkpoints.get(key);
     this.#checkpoints.set(key, {

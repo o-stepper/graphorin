@@ -16,7 +16,7 @@ type ToolChoice =
 };
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:240
+Defined in: packages/core/src/contracts/provider.ts:266
 
 Tool selection strategy.
 

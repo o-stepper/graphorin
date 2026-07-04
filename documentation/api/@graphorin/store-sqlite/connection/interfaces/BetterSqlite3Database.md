@@ -18,10 +18,34 @@ load to runtime and keep the module load free of side effects.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-intransaction"></a> `inTransaction` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:29 |
-| <a id="property-open"></a> `open` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:28 |
+| <a id="property-intransaction"></a> `inTransaction` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:42 |
+| <a id="property-open"></a> `open` | `readonly` | `boolean` | packages/store-sqlite/src/driver-types.ts:41 |
 
 ## Methods
+
+### backup()
+
+```ts
+backup(destinationPath): Promise<unknown>;
+```
+
+Defined in: packages/store-sqlite/src/driver-types.ts:38
+
+Online page-level backup (store-02/05). Consistent under a live
+writer and preserves rowids (so FTS5 external-content mappings
+survive — unlike `VACUUM INTO`).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `destinationPath` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`unknown`\&gt;
+
+***
 
 ### close()
 
@@ -29,7 +53,7 @@ load to runtime and keep the module load free of side effects.
 close(): void;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:26
+Defined in: packages/store-sqlite/src/driver-types.ts:39
 
 #### Returns
 
@@ -63,7 +87,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:23
 loadExtension(path): void;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:27
+Defined in: packages/store-sqlite/src/driver-types.ts:40
 
 #### Parameters
 
@@ -122,10 +146,18 @@ Defined in: packages/store-sqlite/src/driver-types.ts:24
 ### transaction()
 
 ```ts
-transaction<T>(fn): T;
+transaction<T>(fn): T & {
+  deferred: T;
+  exclusive: T;
+  immediate: T;
+};
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:25
+Defined in: packages/store-sqlite/src/driver-types.ts:30
+
+The returned wrapper also carries the `.deferred` / `.immediate` /
+`.exclusive` variants (store-06 uses `.immediate` for every write
+transaction).
 
 #### Type Parameters
 
@@ -141,4 +173,8 @@ Defined in: packages/store-sqlite/src/driver-types.ts:25
 
 #### Returns
 
-`T`
+`T` & \{
+  `deferred`: `T`;
+  `exclusive`: `T`;
+  `immediate`: `T`;
+\}

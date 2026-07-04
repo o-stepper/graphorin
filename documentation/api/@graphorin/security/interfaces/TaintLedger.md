@@ -6,7 +6,7 @@
 
 # Interface: TaintLedger
 
-Defined in: packages/security/src/dataflow/types.ts:112
+Defined in: packages/security/src/dataflow/types.ts:123
 
 Per-run taint state. Records the provenance of each tool output and
 answers two questions a sink check needs: *has untrusted/sensitive
@@ -21,9 +21,9 @@ Implementations are stateful and run-scoped; create one per run.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | `true` once any secret-tier output has entered the run. | packages/security/src/dataflow/types.ts:120 |
-| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | `true` once any untrusted-source output has entered the run. | packages/security/src/dataflow/types.ts:118 |
-| <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | Distinct untrusted source kinds observed so far. | packages/security/src/dataflow/types.ts:122 |
+| <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | `true` once any secret-tier output has entered the run. | packages/security/src/dataflow/types.ts:140 |
+| <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | `true` once any untrusted-source output has entered the run. | packages/security/src/dataflow/types.ts:138 |
+| <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | Distinct untrusted source kinds observed so far. | packages/security/src/dataflow/types.ts:142 |
 
 ## Methods
 
@@ -33,7 +33,7 @@ Implementations are stateful and run-scoped; create one per run.
 inspectArgs(argsText): ArgsTaintProbe;
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:116
+Defined in: packages/security/src/dataflow/types.ts:136
 
 Probe a sink's serialized arguments for verbatim untrusted carry.
 
@@ -49,13 +49,40 @@ Probe a sink's serialized arguments for verbatim untrusted carry.
 
 ***
 
+### recordAssistantOutput()?
+
+```ts
+optional recordAssistantOutput(text): void;
+```
+
+Defined in: packages/security/src/dataflow/types.ts:134
+
+C6: record the MODEL's own output as derived-untrusted once untrusted
+content has entered the run. Tracks the text as untrusted spans (source
+kind `'llm-derived'`) so a later sink call whose args copy the model's
+paraphrase-adjacent phrasing still trips the verbatim probe. No-op
+while the run is untainted. Optional so third-party ledgers keep
+compiling; the built-in ledger implements it.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `text` | `string` |
+
+#### Returns
+
+`void`
+
+***
+
 ### recordOutput()
 
 ```ts
 recordOutput(label, outputText): void;
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:114
+Defined in: packages/security/src/dataflow/types.ts:125
 
 Record one tool output's provenance (and its text, if untrusted).
 
@@ -78,7 +105,7 @@ Record one tool output's provenance (and its text, if untrusted).
 snapshot(): TaintLedgerSnapshot;
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:130
+Defined in: packages/security/src/dataflow/types.ts:150
 
 Coarse, serializable summary of the load-bearing trifecta-gate signal —
 the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked

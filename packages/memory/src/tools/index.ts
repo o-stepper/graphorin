@@ -28,6 +28,7 @@ import {
   createDeepRecallTool,
   createRecallEpisodesTool,
 } from './recall-tools.js';
+import { createRunbookSearchTool } from './runbook-tools.js';
 import type { MemoryToolDeps } from './types.js';
 
 export {
@@ -48,6 +49,7 @@ export {
   createDeepRecallTool,
   createRecallEpisodesTool,
 } from './recall-tools.js';
+export { createRunbookSearchTool } from './runbook-tools.js';
 export type { MemoryToolDeps, ScopeResolver } from './types.js';
 
 /**
@@ -62,6 +64,12 @@ export interface BuildMemoryToolsOptions {
    * default tool surface stays at the canonical eleven. Default `false`.
    */
   readonly includeDeepRecall?: boolean;
+  /**
+   * Append the gated `runbook_search` tool (D3). The facade sets this
+   * only when `createMemory({ runbookSearch: true })` opts in, so the
+   * default tool surface is unchanged. Default `false`.
+   */
+  readonly includeRunbookSearch?: boolean;
 }
 
 /**
@@ -93,6 +101,9 @@ export function buildMemoryTools(
   ];
   if (options.includeDeepRecall === true) {
     tools.push(createDeepRecallTool(deps) as Tool);
+  }
+  if (options.includeRunbookSearch === true) {
+    tools.push(createRunbookSearchTool(deps) as Tool);
   }
   return Object.freeze(tools);
 }

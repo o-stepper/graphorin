@@ -6,7 +6,7 @@
 
 # Interface: PostCompactionHookContext
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:160
+Defined in: packages/memory/src/context-engine/compaction/types.ts:193
 
 Per-call context handed to a post-compaction hook.
 
@@ -14,11 +14,12 @@ Per-call context handed to a post-compaction hook.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:165 |
-| <a id="property-result"></a> `result` | `readonly` | [`CompactionResult`](/api/@graphorin/memory/interfaces/CompactionResult.md) | packages/memory/src/context-engine/compaction/types.ts:161 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:163 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | packages/memory/src/context-engine/compaction/types.ts:162 |
-| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/memory/src/context-engine/compaction/types.ts:164 |
-| <a id="property-source"></a> `source` | `readonly` | [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md) | packages/memory/src/context-engine/compaction/types.ts:166 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | packages/memory/src/context-engine/compaction/types.ts:198 |
+| <a id="property-droppedmessages"></a> `droppedMessages?` | `readonly` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | C4: the messages this compaction dropped (summarized away / cleared), in original order. Lets re-anchoring hooks recover references — e.g. `reanchorRecentResults` re-lists the result handles that just left the window. | packages/memory/src/context-engine/compaction/types.ts:206 |
+| <a id="property-result"></a> `result` | `readonly` | [`CompactionResult`](/api/@graphorin/memory/interfaces/CompactionResult.md) | - | packages/memory/src/context-engine/compaction/types.ts:194 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | - | packages/memory/src/context-engine/compaction/types.ts:196 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/memory/src/context-engine/compaction/types.ts:195 |
+| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | - | packages/memory/src/context-engine/compaction/types.ts:197 |
+| <a id="property-source"></a> `source` | `readonly` | [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md) | - | packages/memory/src/context-engine/compaction/types.ts:199 |

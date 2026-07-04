@@ -10,13 +10,13 @@
 function vercelAdapter(model, options?): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/vercel.ts:169
+Defined in: packages/provider/src/adapters/vercel.ts:184
 
 Wrap a Vercel AI SDK language-model value in a Graphorin
-[Provider](/api/@graphorin/core/interfaces/Provider.md). The adapter passes Graphorin `Message`s through
-directly — both formats use the same role + content discriminated
-shape — and translates the streaming chunks emitted by the AI SDK
-onto Graphorin `ProviderEvent`s.
+[Provider](/api/@graphorin/core/interfaces/Provider.md). Outbound requests are converted onto the AI SDK
+call contract (name-keyed tools, `tool-call` / `tool-result` content
+parts — see `vercel-messages.ts`); the streaming chunks emitted by
+the AI SDK are translated back onto Graphorin `ProviderEvent`s.
 
 The adapter auto-detects the model's
 import('@graphorin/core').ReasoningContract from its

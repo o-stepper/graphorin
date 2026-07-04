@@ -10,7 +10,7 @@
 function createToolExecutor(opts): ToolExecutor;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:311
+Defined in: packages/tools/src/executor/executor.ts:440
 
 ## Parameters
 

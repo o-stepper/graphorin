@@ -606,6 +606,12 @@ Re-exports [runStart](/api/@graphorin/cli/functions/runStart.md)
 
 ***
 
+### runStorageBackup
+
+Re-exports [runStorageBackup](/api/@graphorin/cli/functions/runStorageBackup.md)
+
+***
+
 ### runStorageCleanupBackups
 
 Re-exports [runStorageCleanupBackups](/api/@graphorin/cli/functions/runStorageCleanupBackups.md)
@@ -843,6 +849,18 @@ Re-exports [SkillTrustLevelInput](/api/@graphorin/cli/type-aliases/SkillTrustLev
 ### StartCommandOptions
 
 Re-exports [StartCommandOptions](/api/@graphorin/cli/interfaces/StartCommandOptions.md)
+
+***
+
+### StorageBackupOptions
+
+Re-exports [StorageBackupOptions](/api/@graphorin/cli/interfaces/StorageBackupOptions.md)
+
+***
+
+### StorageBackupResult
+
+Re-exports [StorageBackupResult](/api/@graphorin/cli/interfaces/StorageBackupResult.md)
 
 ***
 

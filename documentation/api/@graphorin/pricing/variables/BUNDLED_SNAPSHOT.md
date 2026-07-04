@@ -10,7 +10,7 @@
 const BUNDLED_SNAPSHOT: PricingSnapshot;
 ```
 
-Defined in: pricing/src/snapshot/bundled.ts:173
+Defined in: pricing/src/snapshot/bundled.ts:298
 
 The bundled snapshot. The `sha256` digest is computed over the
 canonical JSON form of `entries` at module load time so consumers

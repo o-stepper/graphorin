@@ -10,7 +10,7 @@
 type PostCompactionHook = (ctx) => Promise<ReadonlyArray<MessageContent>>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/types.ts:176
+Defined in: packages/memory/src/context-engine/compaction/types.ts:216
 
 Post-compaction hook signature. Each hook returns the
 `MessageContent[]` parts the harness should append to the

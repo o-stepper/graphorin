@@ -79,6 +79,15 @@ export interface VerifySkillSignatureOptions {
    * publisher key.
    */
   readonly publicKeySource?: { readonly publicKeyPem: string; readonly publisher?: string };
+  /**
+   * Operator trust root (D4 / security-01). When supplied, the RESOLVED
+   * signing key must match the trust root or verification fails
+   * `valid: false` with `reason: 'untrusted-key'` — a self-signed skill
+   * whose inline key is not in the root can no longer verify green. The
+   * root is checked AFTER the ed25519 signature itself is valid, so the
+   * result distinguishes a bad signature from an untrusted signer.
+   */
+  readonly trustRoot?: SkillTrustRoot;
   /** Cancellation. */
   readonly signal?: AbortSignal;
   /** Optional pre-installed strategy registry override. */
@@ -188,6 +197,27 @@ export async function verifySkillSignature(
       reason: 'ed25519 verification failed',
     });
   }
+  // D4 / security-01: a valid signature from an UNTRUSTED key is not
+  // authenticity. When an operator trust root is supplied, the resolved
+  // key (fingerprint) and/or publisher must be in it; an inline
+  // self-signed key that is not rooted verifies `valid: false`.
+  if (options.trustRoot !== undefined) {
+    const rootDecision = evaluateTrustRoot(options.trustRoot, {
+      fingerprint,
+      publisher: block.publisher,
+      publicKeySource,
+    });
+    if (!rootDecision.trusted) {
+      return Object.freeze({
+        valid: false,
+        publisher: block.publisher,
+        publicKeySource,
+        ...(fingerprint === undefined ? {} : { fingerprint }),
+        ...(signerId === undefined ? {} : { signerId }),
+        reason: rootDecision.reason,
+      });
+    }
+  }
   return Object.freeze({
     valid: true,
     publisher: block.publisher,
@@ -195,6 +225,47 @@ export async function verifySkillSignature(
     ...(fingerprint === undefined ? {} : { fingerprint }),
     ...(signerId === undefined ? {} : { signerId }),
   });
+}
+
+/**
+ * Operator trust root for skill signatures (D4 / security-01). At least
+ * one leg must be non-empty to trust anything: a signer is accepted when
+ * its resolved key fingerprint is in `fingerprints` OR its publisher is
+ * in `publishers`. `allowSigstore` (default `true`) exempts sigstore-
+ * resolved keys (their identity/issuer were already checked by the
+ * verifier). Treat an inline key absent from the root as unverified.
+ *
+ * @stable
+ */
+export interface SkillTrustRoot {
+  /** Trusted key fingerprints (`sha256:<hex>`; matching is fold-normalised). */
+  readonly fingerprints?: ReadonlyArray<string>;
+  /** Trusted publisher identifiers (exact match against the `publisher` field). */
+  readonly publishers?: ReadonlyArray<string>;
+  /** Trust sigstore-resolved keys without a fingerprint/publisher entry. Default `true`. */
+  readonly allowSigstore?: boolean;
+}
+
+function evaluateTrustRoot(
+  root: SkillTrustRoot,
+  ctx: {
+    readonly fingerprint: string | undefined;
+    readonly publisher: string;
+    readonly publicKeySource: SkillPublicKeyRef['kind'];
+  },
+): { readonly trusted: true } | { readonly trusted: false; readonly reason: string } {
+  if (ctx.publicKeySource === 'sigstore' && root.allowSigstore !== false) {
+    return { trusted: true };
+  }
+  const fpRoot = (root.fingerprints ?? []).map(normaliseFingerprint);
+  const fpMatch =
+    ctx.fingerprint !== undefined && fpRoot.includes(normaliseFingerprint(ctx.fingerprint));
+  const pubMatch = (root.publishers ?? []).includes(ctx.publisher);
+  if (fpMatch || pubMatch) return { trusted: true };
+  return {
+    trusted: false,
+    reason: 'untrusted-key: signer is not in the operator trust root',
+  };
 }
 
 interface ResolvedPublicKey {

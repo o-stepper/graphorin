@@ -1,0 +1,71 @@
+[**Graphorin API reference v0.5.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / policy
+
+# policy
+
+Declarative tool-argument policies + Rule-of-Two capability profiles
+(D4). Pure decision engines consumed by the tool executor's policy
+hook and the agent runtime's capability floor.
+
+## References
+
+### buildRuleOfTwoPolicy
+
+Re-exports [buildRuleOfTwoPolicy](/api/@graphorin/security/functions/buildRuleOfTwoPolicy.md)
+
+***
+
+### evaluateToolArgumentPolicy
+
+Re-exports [evaluateToolArgumentPolicy](/api/@graphorin/security/functions/evaluateToolArgumentPolicy.md)
+
+***
+
+### PolicySideEffectClass
+
+Re-exports [PolicySideEffectClass](/api/@graphorin/security/type-aliases/PolicySideEffectClass.md)
+
+***
+
+### RuleOfTwoCompilation
+
+Re-exports [RuleOfTwoCompilation](/api/@graphorin/security/interfaces/RuleOfTwoCompilation.md)
+
+***
+
+### RuleOfTwoProfile
+
+Re-exports [RuleOfTwoProfile](/api/@graphorin/security/interfaces/RuleOfTwoProfile.md)
+
+***
+
+### ToolArgumentPolicy
+
+Re-exports [ToolArgumentPolicy](/api/@graphorin/security/interfaces/ToolArgumentPolicy.md)
+
+***
+
+### ToolArgumentRule
+
+Re-exports [ToolArgumentRule](/api/@graphorin/security/interfaces/ToolArgumentRule.md)
+
+***
+
+### ToolCallFacts
+
+Re-exports [ToolCallFacts](/api/@graphorin/security/interfaces/ToolCallFacts.md)
+
+***
+
+### ToolPolicyDecision
+
+Re-exports [ToolPolicyDecision](/api/@graphorin/security/type-aliases/ToolPolicyDecision.md)
+
+***
+
+### TrifectaLeg
+
+Re-exports [TrifectaLeg](/api/@graphorin/security/type-aliases/TrifectaLeg.md)

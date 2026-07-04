@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorTriggerReason
 
-Defined in: packages/memory/src/consolidator/types.ts:49
+Defined in: packages/memory/src/consolidator/types.ts:50
 
 Triggering reason surfaced through `Consolidator.trigger(...)`.
 
@@ -16,5 +16,5 @@ Triggering reason surfaced through `Consolidator.trigger(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"manual"` | packages/memory/src/consolidator/types.ts:50 |
-| <a id="property-value"></a> `value?` | `readonly` | `string` \| `number` | packages/memory/src/consolidator/types.ts:51 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"turn"` \| `"idle"` \| `"cron"` \| `"event"` \| `"budget"` \| `"manual"` | packages/memory/src/consolidator/types.ts:51 |
+| <a id="property-value"></a> `value?` | `readonly` | `string` \| `number` | packages/memory/src/consolidator/types.ts:52 |

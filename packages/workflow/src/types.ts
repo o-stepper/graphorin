@@ -141,6 +141,18 @@ export interface WorkflowExecuteOptions {
 export interface WorkflowResumeOptions {
   readonly stream?: StreamMode;
   readonly signal?: AbortSignal;
+  /**
+   * Override the durability mode for this resume (workflow-14) —
+   * mirrors {@link WorkflowExecuteOptions.durability}.
+   */
+  readonly durability?: DurabilityMode;
+  /**
+   * Skip the {@link WorkflowConfig.version} pin check (D1). By default a
+   * resume whose stored frontier was written by a different workflow
+   * version fails loudly with `workflow-version-mismatch` instead of
+   * replaying state through changed code.
+   */
+  readonly allowVersionMismatch?: boolean;
 }
 
 /**
@@ -156,6 +168,32 @@ export interface WorkflowResumeOptions {
 export interface WorkflowNode<TState extends object = Record<string, unknown>> {
   readonly name: string;
   readonly run: WorkflowNodeRun<TState>;
+  /**
+   * Per-node wall-clock budget in milliseconds (D1 / workflow-03).
+   * When the body exceeds it, the task's `ctx.signal` aborts and the
+   * task fails with a `node-timeout` error. Overrides
+   * {@link WorkflowConfig.nodeDefaults}. Absent ⇒ no timeout.
+   */
+  readonly timeoutMs?: number;
+  /**
+   * Per-node bounded retry policy (D1 / workflow-03). Retries fire only
+   * for thrown failures — never for `pause(...)` suspensions or
+   * aborts — with exponential backoff. Overrides
+   * {@link WorkflowConfig.nodeDefaults}. Absent ⇒ no retries.
+   */
+  readonly retry?: WorkflowNodeRetryPolicy;
+}
+
+/**
+ * Bounded retry policy for a workflow node (D1 / workflow-03).
+ *
+ * @stable
+ */
+export interface WorkflowNodeRetryPolicy {
+  /** Total attempts including the first (clamped to >= 1). Default 1. */
+  readonly maxAttempts?: number;
+  /** Base backoff in ms, doubling per retry. Default 250. */
+  readonly backoffMs?: number;
 }
 
 /**
@@ -188,11 +226,15 @@ export type NodeRunResult<TState extends object = Record<string, unknown>> =
 
 /**
  * Structural shape used to identify {@link Dispatch} instances without
- * pulling the concrete class into this module's import graph.
+ * pulling the concrete class into this module's import graph. Requires
+ * the cross-realm brand (workflow-13): a bare `{ nodeName, args }`
+ * state object is channel WRITES, never a dispatch — construct
+ * dispatches via `dispatch(nodeName, args)` / `new Dispatch(...)`.
  *
  * @internal
  */
 export interface DispatchLike {
+  readonly __graphorinDispatch: true;
   readonly nodeName: string;
   readonly args: unknown;
 }
@@ -266,6 +308,39 @@ export interface WorkflowConfig<TState extends object = Record<string, unknown>>
    * `state-validation-failed` workflow error and aborts the run.
    */
   readonly validateState?: (state: TState) => void;
+  /**
+   * Default per-node execution policy (D1 / workflow-03), overridden by
+   * the same fields on an individual {@link WorkflowNode}.
+   */
+  readonly nodeDefaults?: {
+    readonly timeoutMs?: number;
+    readonly retry?: WorkflowNodeRetryPolicy;
+  };
+  /**
+   * Cap on tasks executing concurrently within one step (D1 /
+   * workflow-10). Planned tasks beyond the cap queue and start as slots
+   * free up; `Dispatch` fan-outs are bounded the same way. Absent ⇒
+   * unbounded (the pre-D1 behaviour).
+   */
+  readonly maxConcurrentTasks?: number;
+  /**
+   * Workflow definition version pin (D1 / workflow-14). Stamped into
+   * every persisted frontier; a resume whose stored version differs
+   * fails loudly with `workflow-version-mismatch` (opt out per call via
+   * {@link WorkflowResumeOptions.allowVersionMismatch}). Absent ⇒ no
+   * pinning.
+   */
+  readonly version?: string;
+  /**
+   * Step-result journaling (D1 / workflow-04, opt-in). When `true`, the
+   * engine journals a step-intent record plus each completed task's
+   * channel writes against the PARENT checkpoint as tasks finish, so a
+   * crash between task completion and the step checkpoint no longer
+   * re-runs completed side effects: crash recovery replays the
+   * journaled writes and re-runs only the unfinished tasks. Default
+   * `false` (one extra store write per completed task when on).
+   */
+  readonly journalSteps?: boolean;
 }
 
 /**
@@ -283,6 +358,13 @@ export interface WorkflowState<TState extends object = Record<string, unknown>> 
   readonly checkpointId: CheckpointId;
   /** Carries the value passed to `pause(value)` when status is `suspended`. */
   readonly pendingPause?: PendingPauseRecord;
+  /**
+   * The FULL pending-pause set from the persisted frontier (D1) —
+   * parallel pausers, durable timers (`wakeAt`), awakeables and
+   * approvals (`name`) included. `pendingPause` remains the first entry
+   * for backwards compatibility.
+   */
+  readonly pendingPauses?: ReadonlyArray<PendingPauseRecord>;
 }
 
 /**
@@ -307,6 +389,18 @@ export interface PendingPauseRecord {
    * the next cursor.
    */
   readonly satisfied?: ReadonlyArray<unknown>;
+  /**
+   * Epoch ms at which a durable timer becomes due (D1) — present when
+   * the suspension came from `sleepUntil(...)` / `sleepFor(...)`.
+   * `workflow.tick(threadId)` resumes the thread once due.
+   */
+  readonly wakeAt?: number;
+  /**
+   * Awakeable / approval name (D1) — present when the suspension came
+   * from `awaitExternal(name)` or `requestApproval(name)`. Targeted by
+   * `workflow.resolveAwakeable(...)` / `workflow.approve(...)`.
+   */
+  readonly name?: string;
 }
 
 /**
@@ -332,6 +426,41 @@ export interface Workflow<
    * from their persisted pending writes; only the failed work re-runs.
    */
   retry(threadId: string, opts?: WorkflowResumeOptions): AsyncIterable<WorkflowEvent<TState>>;
+  /**
+   * Fire due durable timers (D1). Scans the thread's pending pauses for
+   * `sleepUntil` records whose `wakeAt` has passed; when one is due the
+   * thread resumes (draining the resulting events internally). Returns
+   * whether a timer fired and the next earliest wake-at (epoch ms) still
+   * pending, so schedulers know when to call again.
+   */
+  tick(
+    threadId: string,
+    opts?: { readonly now?: number },
+  ): Promise<{
+    readonly fired: boolean;
+    readonly nextWakeAt: number | null;
+  }>;
+  /**
+   * Resolve a named awakeable (durable promise, D1): the suspended
+   * `awaitExternal(name)` call returns `value` and the thread resumes.
+   * Fails with `pause-not-found` when no pending pause carries the name.
+   */
+  resolveAwakeable(
+    threadId: string,
+    name: string,
+    value?: unknown,
+    opts?: WorkflowResumeOptions,
+  ): AsyncIterable<WorkflowEvent<TState>>;
+  /**
+   * Resolve a named persisted approval (D1) — sugar over
+   * {@link resolveAwakeable} for `requestApproval(name)` suspensions.
+   */
+  approve(
+    threadId: string,
+    name: string,
+    decision: unknown,
+    opts?: WorkflowResumeOptions,
+  ): AsyncIterable<WorkflowEvent<TState>>;
   getState(threadId: string): Promise<WorkflowState<TState>>;
   listCheckpoints(threadId: string): Promise<ReadonlyArray<import('@graphorin/core').Checkpoint>>;
   fork(threadId: string, fromCheckpointId: CheckpointId): Promise<{ readonly newThreadId: string }>;

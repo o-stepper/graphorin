@@ -10,16 +10,18 @@
 function md5(content): string;
 ```
 
-Defined in: packages/core/src/utils/hash.ts:15
+Defined in: packages/core/src/utils/hash.ts:17
 
 MD5 hex digest. Used by the memory layer for content deduplication
 (`MD5(content)` is the dedup key for incoming facts / messages).
 
-MD5 is **not** a cryptographic primitive in this codebase — it's used
-exclusively for collision-resistant content addressing where
-collision-resistance is the desired property, not pre-image resistance.
-Do not use this helper for password hashing, MAC, or any other
-security-sensitive use case (use `@graphorin/security` for those).
+MD5 is **not** collision-resistant (practical chosen-prefix
+collisions exist) and is **not** used as a cryptographic primitive
+here — it is a fast content-addressing convenience where an
+adversarial collision merely suppresses a duplicate memory write.
+Do not use this helper for password hashing, MAC, tamper evidence,
+or any other security-sensitive use case (use `@graphorin/security`
+for those; the audit log uses SHA-256).
 
 ## Parameters
 

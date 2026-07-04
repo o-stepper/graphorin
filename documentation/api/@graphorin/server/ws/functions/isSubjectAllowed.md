@@ -10,7 +10,7 @@
 function isSubjectAllowed(granted, subject): boolean;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:147
+Defined in: packages/server/src/ws/subjects.ts:153
 
 Compatibility shim — re-exports `scopeMatches` so consumers don't
 have to learn the security package's surface.

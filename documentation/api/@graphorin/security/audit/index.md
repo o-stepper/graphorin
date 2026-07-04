@@ -104,9 +104,33 @@ Re-exports [AuditExportWriter](/api/@graphorin/security/interfaces/AuditExportWr
 
 ***
 
+### AuditInclusionProof
+
+Re-exports [AuditInclusionProof](/api/@graphorin/security/interfaces/AuditInclusionProof.md)
+
+***
+
+### auditLeafHash
+
+Re-exports [auditLeafHash](/api/@graphorin/security/functions/auditLeafHash.md)
+
+***
+
+### auditMerkleTreeHash
+
+Re-exports [auditMerkleTreeHash](/api/@graphorin/security/functions/auditMerkleTreeHash.md)
+
+***
+
 ### AuditPayloadSerializationError
 
 Re-exports [AuditPayloadSerializationError](/api/@graphorin/security/classes/AuditPayloadSerializationError.md)
+
+***
+
+### AuditTreeHead
+
+Re-exports [AuditTreeHead](/api/@graphorin/security/interfaces/AuditTreeHead.md)
 
 ***
 
@@ -188,6 +212,12 @@ Re-exports [computeAuditHash](/api/@graphorin/security/functions/computeAuditHas
 
 ***
 
+### computeAuditTreeHead
+
+Re-exports [computeAuditTreeHead](/api/@graphorin/security/functions/computeAuditTreeHead.md)
+
+***
+
 ### exportAudit
 
 Re-exports [exportAudit](/api/@graphorin/security/functions/exportAudit.md)
@@ -197,6 +227,12 @@ Re-exports [exportAudit](/api/@graphorin/security/functions/exportAudit.md)
 ### ExportAuditOptions
 
 Re-exports [ExportAuditOptions](/api/@graphorin/security/interfaces/ExportAuditOptions.md)
+
+***
+
+### generateAuditSigningKeyPair
+
+Re-exports [generateAuditSigningKeyPair](/api/@graphorin/security/functions/generateAuditSigningKeyPair.md)
 
 ***
 
@@ -242,6 +278,18 @@ Re-exports [OpenAuditDbOptions](/api/@graphorin/security/interfaces/OpenAuditDbO
 
 ***
 
+### proveAuditConsistency
+
+Re-exports [proveAuditConsistency](/api/@graphorin/security/functions/proveAuditConsistency.md)
+
+***
+
+### proveAuditInclusion
+
+Re-exports [proveAuditInclusion](/api/@graphorin/security/functions/proveAuditInclusion.md)
+
+***
+
 ### pruneAudit
 
 Re-exports [pruneAudit](/api/@graphorin/security/functions/pruneAudit.md)
@@ -278,6 +326,18 @@ Re-exports [SecretsBridgeTeardown](/api/@graphorin/security/interfaces/SecretsBr
 
 ***
 
+### signAuditCheckpoint
+
+Re-exports [signAuditCheckpoint](/api/@graphorin/security/functions/signAuditCheckpoint.md)
+
+***
+
+### SignedAuditCheckpoint
+
+Re-exports [SignedAuditCheckpoint](/api/@graphorin/security/interfaces/SignedAuditCheckpoint.md)
+
+***
+
 ### StoredAuditEntry
 
 Re-exports [StoredAuditEntry](/api/@graphorin/security/interfaces/StoredAuditEntry.md)
@@ -290,6 +350,30 @@ Re-exports [SupplyChainBridgeTeardown](/api/@graphorin/security/interfaces/Suppl
 
 ***
 
+### verifyAuditAgainstCheckpoint
+
+Re-exports [verifyAuditAgainstCheckpoint](/api/@graphorin/security/functions/verifyAuditAgainstCheckpoint.md)
+
+***
+
 ### verifyAuditChain
 
 Re-exports [verifyAuditChain](/api/@graphorin/security/functions/verifyAuditChain.md)
+
+***
+
+### verifyAuditCheckpointSignature
+
+Re-exports [verifyAuditCheckpointSignature](/api/@graphorin/security/functions/verifyAuditCheckpointSignature.md)
+
+***
+
+### verifyAuditConsistency
+
+Re-exports [verifyAuditConsistency](/api/@graphorin/security/functions/verifyAuditConsistency.md)
+
+***
+
+### verifyAuditInclusion
+
+Re-exports [verifyAuditInclusion](/api/@graphorin/security/functions/verifyAuditInclusion.md)

@@ -10,7 +10,7 @@
 function canonicalConfigHash(config): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:299
+Defined in: packages/embedder-transformersjs/src/index.ts:321
 
 Canonical-JSON deterministic hash of an embedder configuration.
 Object keys are sorted lexicographically; primitives flow through as

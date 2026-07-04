@@ -25,6 +25,7 @@ import type {
 } from '../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
+import type { WorkingMemory } from '../tiers/working-memory.js';
 import { BudgetTracker } from './budget.js';
 import { DEFAULT_SALIENCE_WEIGHTS } from './decay.js';
 import { classifyError, describeError, nextBackoffMs } from './dlq.js';
@@ -33,6 +34,7 @@ import { tipMessageId } from './idempotency.js';
 import { LockManager } from './lock.js';
 import type { NoiseFilterPreset } from './noise-filter.js';
 import { runDeepPhase } from './phases/deep.js';
+import { runLearnedContextPass } from './phases/learned-context.js';
 import { runLightPhase } from './phases/light.js';
 import { runReflectionPass } from './phases/reflect.js';
 import { runStandardPhase } from './phases/standard.js';
@@ -122,6 +124,7 @@ export function createConsolidator(opts: CreateConsolidatorOptions): Consolidato
 class ConsolidatorImpl implements Consolidator {
   readonly #semantic: SemanticMemory;
   readonly #episodic: EpisodicMemory | null;
+  readonly #working: WorkingMemory | null;
   readonly #store: MemoryStoreAdapter;
   readonly #consolidatorStore: ConsolidatorMemoryStoreExt | null;
   readonly #tracer: Tracer;
@@ -166,6 +169,7 @@ class ConsolidatorImpl implements Consolidator {
   constructor(opts: CreateConsolidatorOptions) {
     this.#semantic = opts.semantic;
     this.#episodic = opts.episodic ?? null;
+    this.#working = opts.working ?? null;
     this.#store = opts.store;
     this.#consolidatorStore = this.#store.consolidator ?? null;
     this.#tracer = opts.tracer ?? NOOP_TRACER;
@@ -759,6 +763,7 @@ class ConsolidatorImpl implements Consolidator {
     // config, an episodic tier present (importance source), and an
     // insight-capable storage adapter. The accumulated-importance
     // threshold is enforced inside the pass.
+    let out: PhaseOutcome = deepOut;
     const insightStore = this.#store.insights;
     if (this.#config.reflection && this.#episodic !== null && insightStore !== undefined) {
       // MCON-13: read the persisted reflection watermark so the gate only
@@ -788,17 +793,44 @@ class ConsolidatorImpl implements Consolidator {
           reflectionWatermark: reflection.nextWatermark,
         });
       }
-      return {
-        ...deepOut,
+      out = {
+        ...out,
         insightsCreated: reflection.insightsCreated,
-        llmTokensUsed: deepOut.llmTokensUsed + reflection.tokens,
+        llmTokensUsed: out.llmTokensUsed + reflection.tokens,
         llmCostUsd:
-          deepOut.llmCostUsd === null && reflection.costUsd === 0
+          out.llmCostUsd === null && reflection.costUsd === 0
             ? null
-            : (deepOut.llmCostUsd ?? 0) + reflection.costUsd,
+            : (out.llmCostUsd ?? 0) + reflection.costUsd,
       };
     }
-    return deepOut;
+    // Learned-context pass (D3) runs last, folding the run's fresh
+    // synthesis into the standing digest block. Double-gated: enabled by
+    // config and a working-tier handle wired. Rides the deep provider +
+    // budget like reflection.
+    if (this.#config.learnedContext && this.#working !== null) {
+      const learned = await runLearnedContextPass({
+        provider: deepProvider,
+        tracer: this.#tracer,
+        scope,
+        working: this.#working,
+        episodic: this.#episodic,
+        store: this.#store,
+        budget: this.#budget,
+        maxChars: this.#config.learnedContextMaxChars,
+        now: this.#now,
+        ...(this.#priceUsage !== null ? { priceUsage: this.#priceUsage } : {}),
+      });
+      out = {
+        ...out,
+        learnedContextUpdated: learned.updated,
+        llmTokensUsed: out.llmTokensUsed + learned.tokens,
+        llmCostUsd:
+          out.llmCostUsd === null && learned.costUsd === 0
+            ? null
+            : (out.llmCostUsd ?? 0) + learned.costUsd,
+      };
+    }
+    return out;
   }
 
   #emit(
@@ -886,6 +918,8 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
     reflectionMaxQuestions: opts.reflectionMaxQuestions ?? preset.reflectionMaxQuestions,
     contextualRetrieval: opts.contextualRetrieval ?? preset.contextualRetrieval,
+    learnedContext: opts.learnedContext ?? preset.learnedContext,
+    learnedContextMaxChars: opts.learnedContextMaxChars ?? preset.learnedContextMaxChars,
   });
 }
 

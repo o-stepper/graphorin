@@ -6,7 +6,7 @@
 
 # Interface: UsageSnapshot
 
-Defined in: packages/core/src/types/usage.ts:74
+Defined in: packages/core/src/types/usage.ts:98
 
 Immutable, JSON-serializable snapshot of a `UsageAccumulator`.
 
@@ -16,5 +16,5 @@ Immutable, JSON-serializable snapshot of a `UsageAccumulator`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-bymodel"></a> `byModel` | `readonly` | readonly [`ModelUsage`](/api/@graphorin/core/interfaces/ModelUsage.md)[] | packages/core/src/types/usage.ts:76 |
-| <a id="property-total"></a> `total` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | packages/core/src/types/usage.ts:75 |
+| <a id="property-bymodel"></a> `byModel` | `readonly` | readonly [`ModelUsage`](/api/@graphorin/core/interfaces/ModelUsage.md)[] | packages/core/src/types/usage.ts:100 |
+| <a id="property-total"></a> `total` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | packages/core/src/types/usage.ts:99 |

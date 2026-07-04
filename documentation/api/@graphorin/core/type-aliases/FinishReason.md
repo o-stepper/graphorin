@@ -10,7 +10,7 @@
 type FinishReason = "stop" | "length" | "tool-calls" | "content-filter" | "error" | "aborted";
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:130
+Defined in: packages/core/src/contracts/provider.ts:156
 
 Reason a provider call ended.
 

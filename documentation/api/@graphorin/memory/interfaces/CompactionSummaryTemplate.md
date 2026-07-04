@@ -8,13 +8,13 @@
 
 Defined in: packages/memory/src/context-engine/locale-packs/types.ts:67
 
-Structured 9-section summary template fragments used by the
-auto-compaction summarizer (RB-46). Section order is fixed; only
-the per-section header / preamble text is locale-extensible.
+Structured section-template fragments used by the auto-compaction
+summarizer (RB-46). Section order is fixed; only the per-section
+header / preamble text is locale-extensible.
 
 Each entry is the human-readable header for the corresponding
 section. Section indices are 1-based to match the documented
-9-section layout in the architecture doc.
+layout in the architecture doc.
 
 ## Stable
 
@@ -23,4 +23,4 @@ section. Section indices are 1-based to match the documented
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-preamble"></a> `preamble` | `readonly` | `string` | Preamble injected at the top of the summarizer prompt. | packages/memory/src/context-engine/locale-packs/types.ts:69 |
-| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | 11 section headers. The last two are filled by the harness. | packages/memory/src/context-engine/locale-packs/types.ts:71 |
+| <a id="property-sections"></a> `sections` | `readonly` | readonly \[`string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`, `string`\] | 12 section headers. The last two are filled by the harness. | packages/memory/src/context-engine/locale-packs/types.ts:71 |

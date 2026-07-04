@@ -13,6 +13,7 @@ export {
   type DataFlowVerdict,
   type ExecuteBatchOptions,
   type ExecutorOptions,
+  type ToolArgumentPolicyGuard,
   type ToolExecutor,
 } from './executor.js';
 export {

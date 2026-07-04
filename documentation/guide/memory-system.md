@@ -162,6 +162,16 @@ The ambiguous-similarity band **mints a new entity by default** — it never aut
 
 The resolver also refuses to compare embeddings **across different embedders**: if a candidate entity was embedded by a different model than the current one, the cosine step is skipped (different models occupy different vector spaces), so a half-migrated graph cannot produce garbage merges from incomparable vectors.
 
+### PPR-lite, graph fusion weight, and exact entity-match (D5)
+
+Three opt-in refinements to the graph leg:
+
+- **PPR-lite spreading activation** — `search(scope, q, { expandHops: 2, graphScoring: 'ppr' })` widens to two-hop expansion and scores neighbours by damped spreading activation (`damping^hopDepth`, HippoRAG-style) instead of a flat `1`, so a fact two hops from a strong seed ranks below a direct neighbour. Seeding from query-matched entities (rather than the retrieved candidates) is the eval-gated extension.
+- **Graph as a tunable fusion weight** — the graph leg was hardcoded neutral; `fusion: { strategy: 'weighted', weights: { graph, entity } }` now weights it like the FTS / vector legs once its reliability is calibrated against labels.
+- **Exact entity-match retriever** — `search(scope, q, { entityMatch: true })` adds a precise "facts about `<entity>`" candidate leg: the query terms are normalized to entity names and facts linked to a matching canonical entity are fused in (with the `entity` weight), distinct from the fuzzy FTS / vector legs.
+
+The `longmemeval` harness exposes `--retrieval ppr` and `--retrieval entity` alongside `graph` for A/B measurement. Bitemporal event-time, Matryoshka embedding truncation, and cascade LLM reranking remain **eval-gated** (built only once the numbers justify), per the roadmap.
+
 ## Agentic / iterative retrieval
 
 For hard multi-hop or temporal questions one pass can't answer, `searchIterative` runs a **grade-then-reformulate loop** (CRAG / Self-RAG). A cheap **local difficulty gate** keeps simple lookups single-shot; only a query judged *hard* — and only when a grader is configured — is graded for sufficiency and, when weak, reformulated and retrieved again (widening to one-hop graph expansion each round), up to a hard-capped `maxIterations` (≤ 5). If it still can't satisfy the question it **abstains** rather than confabulating:
@@ -258,6 +268,10 @@ Quarantine is **fail-safe by default** — paid distillation stays invisible unt
 
 Quarantine is a **retrieval gate, never a delete** — quarantined rows stay fully auditable. This is the precondition for safely shipping synthesised memory (reflection / reconciliation / induction) against memory-poisoning attacks. See [Security](/guide/security#memory-safety-provenance-quarantine) for the threat model.
 
+### Principal / owner dimension
+
+Orthogonal to provenance (*where a memory came from*), every fact / episode / rule / insight can carry an `owner` (*who it belongs to*): `'user'` for user-stated content, `'agent'` for the agent's own inferences (the consolidator stamps extraction facts, auto-formed episodes, reflection insights, and induced procedures), `'shared'` for records deliberately published to a multi-agent tier. Default reads apply **no owner filter** — recall is byte-identical — and rows written before the feature count as `'user'`. Opt in at retrieval time: `semantic.search(scope, query, { owner: 'agent' })` (or an array) filters in-store on the FTS + vector legs and record-level on the fused result, separating "the user said X" from "I inferred X".
+
 ## Procedural memory & induction
 
 The procedural tier stores *how to do things*. You can author procedures directly with `define(...)`, or — opt-in — let the assistant **learn** them from its own successful runs (Agent Workflow Memory):
@@ -271,6 +285,10 @@ const rule = await memory.procedural.induceFromRun(scope, runState);
 ```
 
 Induction fires on **success only** — a failed run never calls the inducer — and the result lands **quarantined** with `provenance: 'induction'`. Because procedures drive *actions*, this is the highest-risk synthesised write, so induced procedures are **excluded from `activate()`** until validated (`list()` still surfaces them for review). `trajectoryFromRunState(runState)` distils the agent's already-emitted run state, so capturing a trajectory needs **no agent change**. Without `procedureInduction`, `induce(...)` throws `ProcedureInductionNotConfiguredError` and the tier stays pure offline CRUD.
+
+### Runbook search (opt-in)
+
+Procedures used to be reachable only through their activation predicate (`'always'` / `'topic='` / `'tag='`). `memory.procedural.search(scope, 'deploy the docs site')` adds **content recall**: a lexical search over rule text (the default SQLite adapter serves it from a rules FTS index; adapters without one degrade to an offline token-overlap scan) that returns **whole validated procedures** — title, numbered steps, variables, success criteria — so the model can follow a known-good workflow file-style instead of re-deriving it. Quarantined (unvalidated induced) procedures never surface. `createMemory({ runbookSearch: true })` additionally registers the gated `runbook_search` tool; the default tool surface stays at the canonical eleven.
 
 ## Background consolidator
 
@@ -320,11 +338,15 @@ createMemory({
 
 At the `full` tier, once the accumulated importance of recent episodes crosses a threshold, the deep phase asks the model for the few most salient questions, retrieves evidence for each, and synthesises a higher-order **insight** (Generative Agents). Insights land `provenance: 'reflection'` + `status: 'quarantined'`, carry **mandatory citations set from the retrieved evidence** (never hallucinated), and are **rank-capped below the facts they cite**. Read them through `memory.insights.search` / `memory.insights.list`.
 
+### Learned-context digest (opt-in)
+
+`consolidator: { learnedContext: true }` adds a Letta-style sleep-time pass after the deep phase: one budgeted LLM call rewrites the reserved `learned_context` working block from the previous digest + recent episodes + active insights + active procedures. Because it is an ordinary working block, the digest is spliced into layer 3 of the assembled system prompt automatically (inside the stable KV-cache prefix), survives compaction via the persona-block re-anchor pattern (`reanchorPersonaBlock({ blockLabel: 'learned_context' })`), and stays editable by the agent through the `block_*` tools — the pass folds any agent edits into its next rewrite. Size-bounded by `learnedContextMaxChars` (default 1200). Off by default at **every** tier; a silent no-op when the facade has no working tier or the pass finds no evidence (no paid call).
+
 ### Multi-signal forgetting
 
 Forgetting is **cost / staleness control, not an accuracy lever**. The light phase scores each fact with `salience(...)` — the Ebbinghaus `retention` curve (recency + access frequency) combined with the fact's `importance` hint and a security-risk negative term (a quarantined or foreign-provenance fact is evicted sooner). With neutral importance on an active, first-party fact, `salience === retention`, so behaviour is unchanged until you opt in. Setting `decayCapacity` bounds storage: the lowest-salience facts are **soft-archived** (recoverable — `archived = 1`, never deleted) until the window fits.
 
-Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `lastAccessedAt` and bumps their `strength` (capped at 2.0), so recently-recalled facts genuinely decay slower (MRET-7) — the bookkeeping write is best-effort and never breaks the read path. The decay window itself excludes archived rows (MCON-6): they receive no access bumps, so without the filter they would pin the LRU head and silently stop live facts from decaying once enough of them accumulated; inspection paths pass `listForDecay(scope, limit, { includeArchived: true })`.
+Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `lastAccessedAt`, bumps their `strength` (capped at 2.0), and increments a monotonic `access_count` (D3), so recently-recalled facts genuinely decay slower (MRET-7) — the bookkeeping write is best-effort and never breaks the read path. The counter feeds an opt-in **retrieval-frequency reinforcement** term: set `salienceWeights: { ...DEFAULT_SALIENCE_WEIGHTS, accessReinforcement: 0.3 }` and a heavily-used fact keeps up to 1.3x its retention (log1p-saturating at 32 accesses); at the default weight `0` the factor is exactly `1` and salience is byte-identical. The decay window itself excludes archived rows (MCON-6): they receive no access bumps, so without the filter they would pin the LRU head and silently stop live facts from decaying once enough of them accumulated; inspection paths pass `listForDecay(scope, limit, { includeArchived: true })`.
 
 ```ts
 createMemory({ /* … */ consolidator: { tier: 'standard', enabled: true, provider, decayCapacity: 50_000 } });

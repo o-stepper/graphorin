@@ -10,7 +10,7 @@
 function completedToolCallsFromState(state): readonly CompletedToolCall<unknown>[];
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:473
+Defined in: packages/agent/src/run-state/index.ts:529
 
 The "tools used" surface of a completed run. Cheap to compute
 from `RunState.steps`; surfaced as a stand-alone helper for

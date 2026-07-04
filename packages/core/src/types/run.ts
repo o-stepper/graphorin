@@ -112,6 +112,13 @@ export interface RunState {
    * across suspend/resume so discovered tools remain in the per-step catalogue.
    */
   promotedTools?: ReadonlyArray<string>;
+  /**
+   * D6 structured plan/todo list — the agent's own working plan,
+   * journaled so it survives suspend/resume (a TodoWrite-style tool
+   * mutates it, and attention-recitation renders it back into the
+   * prompt each turn). Absent until the agent writes one.
+   */
+  todos?: ReadonlyArray<TodoItem>;
   readonly startedAt: string;
   finishedAt?: string;
   error?: RunError;
@@ -135,6 +142,19 @@ export interface RunTaintSummary {
    * holds).
    */
   readonly spanTileHashes?: ReadonlyArray<string>;
+}
+
+/**
+ * One item in the agent's structured plan (D6). `status` drives both
+ * the recitation rendering and progress reporting; `id` lets a
+ * status-flip mutation target an item without rewriting the list.
+ *
+ * @stable
+ */
+export interface TodoItem {
+  readonly id: string;
+  readonly content: string;
+  readonly status: 'pending' | 'in_progress' | 'completed';
 }
 
 /**

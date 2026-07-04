@@ -65,6 +65,12 @@ Re-exports [DEFAULT_MAX_QUERY_VARIANTS](/api/@graphorin/memory/variables/DEFAULT
 
 ***
 
+### DEFAULT\_PPR\_DAMPING
+
+Re-exports [DEFAULT_PPR_DAMPING](/api/@graphorin/memory/variables/DEFAULT_PPR_DAMPING.md)
+
+***
+
 ### DifficultyAssessment
 
 Re-exports [DifficultyAssessment](/api/@graphorin/memory/interfaces/DifficultyAssessment.md)
@@ -80,6 +86,30 @@ Re-exports [DifficultyGateOptions](/api/@graphorin/memory/interfaces/DifficultyG
 ### explainRecall
 
 Re-exports [explainRecall](/api/@graphorin/memory/functions/explainRecall.md)
+
+***
+
+### FitFusionCase
+
+Re-exports [FitFusionCase](/api/@graphorin/memory/interfaces/FitFusionCase.md)
+
+***
+
+### FitFusionOptions
+
+Re-exports [FitFusionOptions](/api/@graphorin/memory/interfaces/FitFusionOptions.md)
+
+***
+
+### FitFusionResult
+
+Re-exports [FitFusionResult](/api/@graphorin/memory/interfaces/FitFusionResult.md)
+
+***
+
+### fitFusionWeights
+
+Re-exports [fitFusionWeights](/api/@graphorin/memory/functions/fitFusionWeights.md)
 
 ***
 
@@ -107,6 +137,12 @@ Re-exports [HYDE_SYSTEM_PROMPT](/api/@graphorin/memory/variables/HYDE_SYSTEM_PRO
 
 ***
 
+### isForeignProvenance
+
+Re-exports [isForeignProvenance](/api/@graphorin/memory/functions/isForeignProvenance.md)
+
+***
+
 ### IterativeRetrievalDeps
 
 Re-exports [IterativeRetrievalDeps](/api/@graphorin/memory/interfaces/IterativeRetrievalDeps.md)
@@ -131,6 +167,12 @@ Re-exports [MAX_ITERATIONS_CEILING](/api/@graphorin/memory/variables/MAX_ITERATI
 
 ***
 
+### ndcgAtK
+
+Re-exports [ndcgAtK](/api/@graphorin/memory/functions/ndcgAtK.md)
+
+***
+
 ### parseGrade
 
 Re-exports [parseGrade](/api/@graphorin/memory/functions/parseGrade.md)
@@ -146,6 +188,12 @@ Re-exports [parseHypothetical](/api/@graphorin/memory/functions/parseHypothetica
 ### parseQueryVariants
 
 Re-exports [parseQueryVariants](/api/@graphorin/memory/functions/parseQueryVariants.md)
+
+***
+
+### pprActivation
+
+Re-exports [pprActivation](/api/@graphorin/memory/functions/pprActivation.md)
 
 ***
 
@@ -230,6 +278,12 @@ Re-exports [RRFReranker](/api/@graphorin/memory/classes/RRFReranker.md)
 ### runIterativeRetrieval
 
 Re-exports [runIterativeRetrieval](/api/@graphorin/memory/functions/runIterativeRetrieval.md)
+
+***
+
+### trustDiscount
+
+Re-exports [trustDiscount](/api/@graphorin/memory/functions/trustDiscount.md)
 
 ***
 

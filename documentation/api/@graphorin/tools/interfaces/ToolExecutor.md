@@ -6,7 +6,7 @@
 
 # Interface: ToolExecutor
 
-Defined in: packages/tools/src/executor/executor.ts:271
+Defined in: packages/tools/src/executor/executor.ts:341
 
 Public executor surface.
 
@@ -18,7 +18,7 @@ Public executor surface.
 executeBatch(opts): Promise<readonly CompletedToolCall<unknown>[]>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:273
+Defined in: packages/tools/src/executor/executor.ts:343
 
 Run a batch of tool calls.
 
@@ -40,19 +40,21 @@ Run a batch of tool calls.
 executeOne(opts): Promise<CompletedToolCall<unknown>>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:275
+Defined in: packages/tools/src/executor/executor.ts:345
 
 Run a single tool call.
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `opts` | \{ `call`: [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md); `runContext`: [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md); `stepNumber`: `number`; `trustLevel?`: [`SandboxTrustLevel`](/api/@graphorin/security/type-aliases/SandboxTrustLevel.md); \} |
-| `opts.call` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) |
-| `opts.runContext` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) |
-| `opts.stepNumber` | `number` |
-| `opts.trustLevel?` | [`SandboxTrustLevel`](/api/@graphorin/security/type-aliases/SandboxTrustLevel.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `opts` | \{ `call`: [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md); `capability?`: `"read-only"`; `disableRepair?`: `boolean`; `runContext`: [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md); `stepNumber`: `number`; `trustLevel?`: [`SandboxTrustLevel`](/api/@graphorin/security/type-aliases/SandboxTrustLevel.md); \} | - |
+| `opts.call` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) | - |
+| `opts.capability?` | `"read-only"` | See [ExecuteBatchOptions.capability](/api/@graphorin/tools/interfaces/ExecuteBatchOptions.md#property-capability). |
+| `opts.disableRepair?` | `boolean` | See [ExecuteBatchOptions.disableRepair](/api/@graphorin/tools/interfaces/ExecuteBatchOptions.md#property-disablerepair). |
+| `opts.runContext` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - |
+| `opts.stepNumber` | `number` | - |
+| `opts.trustLevel?` | [`SandboxTrustLevel`](/api/@graphorin/security/type-aliases/SandboxTrustLevel.md) | - |
 
 #### Returns
 

@@ -6,7 +6,7 @@
 
 # Interface: ProviderError
 
-Defined in: packages/core/src/contracts/provider.ts:177
+Defined in: packages/core/src/contracts/provider.ts:203
 
 Provider-side error shape carried by `provider-error` events.
 
@@ -16,6 +16,6 @@ Provider-side error shape carried by `provider-error` events.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | packages/core/src/contracts/provider.ts:180 |
-| <a id="property-kind"></a> `kind` | `readonly` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) | packages/core/src/contracts/provider.ts:178 |
-| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/contracts/provider.ts:179 |
+| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | packages/core/src/contracts/provider.ts:206 |
+| <a id="property-kind"></a> `kind` | `readonly` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) | packages/core/src/contracts/provider.ts:204 |
+| <a id="property-message"></a> `message` | `readonly` | `string` | packages/core/src/contracts/provider.ts:205 |

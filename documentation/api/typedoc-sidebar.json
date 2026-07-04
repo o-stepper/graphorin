@@ -1235,6 +1235,10 @@
               {
                 "text": "buildMemoryTools",
                 "link": "/api/@graphorin/memory/tools/functions/buildMemoryTools.md"
+              },
+              {
+                "text": "createRunbookSearchTool",
+                "link": "/api/@graphorin/memory/tools/functions/createRunbookSearchTool.md"
               }
             ]
           }
@@ -2366,6 +2370,10 @@
       {
         "text": "oauth",
         "link": "/api/@graphorin/security/oauth/"
+      },
+      {
+        "text": "policy",
+        "link": "/api/@graphorin/security/policy/"
       },
       {
         "text": "sandbox",
@@ -3789,6 +3797,10 @@
         "link": "/api/@graphorin/tools/result/"
       },
       {
+        "text": "schema",
+        "link": "/api/@graphorin/tools/schema/"
+      },
+      {
         "text": "streaming",
         "link": "/api/@graphorin/tools/streaming/"
       }
@@ -3906,6 +3918,14 @@
                 "link": "/api/@graphorin/workflow/errors/classes/NodeExecutionError.md"
               },
               {
+                "text": "NodeTimeoutError",
+                "link": "/api/@graphorin/workflow/errors/classes/NodeTimeoutError.md"
+              },
+              {
+                "text": "PauseNotFoundError",
+                "link": "/api/@graphorin/workflow/errors/classes/PauseNotFoundError.md"
+              },
+              {
                 "text": "ReducerError",
                 "link": "/api/@graphorin/workflow/errors/classes/ReducerError.md"
               },
@@ -3930,8 +3950,16 @@
                 "link": "/api/@graphorin/workflow/errors/classes/WorkflowAbortedError.md"
               },
               {
+                "text": "WorkflowDivergenceError",
+                "link": "/api/@graphorin/workflow/errors/classes/WorkflowDivergenceError.md"
+              },
+              {
                 "text": "WorkflowError",
                 "link": "/api/@graphorin/workflow/errors/classes/WorkflowError.md"
+              },
+              {
+                "text": "WorkflowVersionMismatchError",
+                "link": "/api/@graphorin/workflow/errors/classes/WorkflowVersionMismatchError.md"
               }
             ]
           },

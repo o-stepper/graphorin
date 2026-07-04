@@ -112,7 +112,27 @@ export interface SalienceWeights {
    * user. At the default `0.2` such a fact keeps `0.8` of its retention.
    */
   readonly foreignProvenance: number;
+  /**
+   * Retrieval-frequency reinforcement (D3) — the use-it-or-lose-it
+   * signal. How strongly the monotonic access counter stretches
+   * retention: the factor is
+   * `1 + weight * min(1, log1p(count) / log1p(saturation))`, saturating
+   * at {@link ACCESS_REINFORCEMENT_SATURATION} accesses. At the default
+   * `0` the factor is exactly `1` — behaviour is byte-identical until an
+   * operator opts in (e.g. `0.3` ⇒ a heavily-used fact keeps up to 1.3x
+   * its retention). Optional so existing weight literals stay valid.
+   */
+  readonly accessReinforcement?: number;
 }
+
+/**
+ * Access count at which retrieval-frequency reinforcement saturates
+ * (D3). `log1p`-scaled, so the first few accesses matter most and
+ * anything past this count contributes the full weight.
+ *
+ * @stable
+ */
+export const ACCESS_REINFORCEMENT_SATURATION = 32;
 
 /**
  * Default {@link SalienceWeights}. Chosen so that an active,
@@ -126,6 +146,9 @@ export const DEFAULT_SALIENCE_WEIGHTS: SalienceWeights = Object.freeze({
   importance: 0.6,
   quarantine: 0.7,
   foreignProvenance: 0.2,
+  // D3: reinforcement is opt-in — the default weight 0 keeps salience
+  // byte-identical for every fact regardless of its access count.
+  accessReinforcement: 0,
 });
 
 /**
@@ -157,6 +180,12 @@ export function salience(args: {
   readonly quarantined: boolean;
   /** P1-4: a non-first-party fact gets the {@link SalienceWeights.foreignProvenance} penalty. */
   readonly foreignProvenance: boolean;
+  /**
+   * Monotonic retrieval-access count (D3); `null` / absent ⇒ `0`.
+   * Contributes only when {@link SalienceWeights.accessReinforcement}
+   * is non-zero (the default `0` keeps salience unchanged).
+   */
+  readonly accessCount?: number | null;
   /** Defaults to {@link DEFAULT_SALIENCE_WEIGHTS}. */
   readonly weights?: SalienceWeights;
 }): number {
@@ -175,7 +204,17 @@ export function salience(args: {
     : args.foreignProvenance
       ? Math.max(0, 1 - weights.foreignProvenance)
       : 1;
-  return Math.max(0, base * importanceFactor * securityFactor);
+  // D3: use-it-or-lose-it reinforcement. log1p-saturating in the access
+  // count so early accesses matter most; identity at the default weight 0.
+  const reinforcementWeight = weights.accessReinforcement ?? 0;
+  const count = Math.max(0, args.accessCount ?? 0);
+  const reinforcementFactor =
+    reinforcementWeight === 0
+      ? 1
+      : 1 +
+        reinforcementWeight *
+          Math.min(1, Math.log1p(count) / Math.log1p(ACCESS_REINFORCEMENT_SATURATION));
+  return Math.max(0, base * importanceFactor * securityFactor * reinforcementFactor);
 }
 
 /**

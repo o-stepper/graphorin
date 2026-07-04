@@ -7,7 +7,7 @@
 # Variable: SNAPSHOT\_DATE
 
 ```ts
-const SNAPSHOT_DATE: "2026-04-30" = '2026-04-30';
+const SNAPSHOT_DATE: "2026-07-04" = '2026-07-04';
 ```
 
 Defined in: pricing/src/snapshot/bundled.ts:19

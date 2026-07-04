@@ -4,6 +4,7 @@ import {
   createNode,
   createWorkflow,
   Directive,
+  dispatch,
   InMemoryCheckpointStore,
   latestValue,
   listAggregate,
@@ -156,10 +157,12 @@ describe('Dispatch — dynamic parallelism', () => {
       nodes: {
         fanOut: createNode<DState>({
           name: 'fanOut',
+          // workflow-13: dispatches carry the Dispatch brand — a bare
+          // `{ nodeName, args }` object is channel writes, not a dispatch.
           run: () => [
-            { nodeName: 'process', args: { id: 'a' } },
-            { nodeName: 'process', args: { id: 'b' } },
-            { nodeName: 'process', args: { id: 'c' } },
+            dispatch('process', { id: 'a' }),
+            dispatch('process', { id: 'b' }),
+            dispatch('process', { id: 'c' }),
           ],
         }),
         process: createNode<DState>({
@@ -345,10 +348,7 @@ describe('Stream channel + concurrency', () => {
       nodes: {
         seed: createNode<SState>({
           name: 'seed',
-          run: () => [
-            { nodeName: 'emitA', args: undefined },
-            { nodeName: 'emitB', args: undefined },
-          ],
+          run: () => [dispatch('emitA', undefined), dispatch('emitB', undefined)],
         }),
         emitA: createNode<SState>({
           name: 'emitA',

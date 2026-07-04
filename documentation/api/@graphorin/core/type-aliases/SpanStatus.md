@@ -10,7 +10,7 @@
 type SpanStatus = "ok" | "error" | "cancelled";
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:62
+Defined in: packages/core/src/contracts/tracer.ts:63
 
 Status of a finished span. Mirrors the OTel status convention with
 `'ok' | 'error'` short forms instead of the verbose tristate.

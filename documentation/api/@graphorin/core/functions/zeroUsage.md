@@ -10,7 +10,7 @@
 function zeroUsage(): Usage;
 ```
 
-Defined in: packages/core/src/types/usage.ts:84
+Defined in: packages/core/src/types/usage.ts:108
 
 Returns a fresh, zeroed `Usage` value.
 

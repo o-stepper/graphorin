@@ -18,7 +18,7 @@ type FusionStrategy =
 };
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:99
+Defined in: packages/memory/src/tiers/semantic-memory.ts:119
 
 Score-fusion strategy for [SemanticMemory.search](/api/@graphorin/memory/classes/SemanticMemory.md#search) (X-2).
 
@@ -54,8 +54,8 @@ Score-fusion strategy for [SemanticMemory.search](/api/@graphorin/memory/classes
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `k?` | `number` | Override the RRF constant for the weighted fuse. Default `60`. | packages/memory/src/tiers/semantic-memory.ts:105 |
-| `strategy` | `"weighted"` | - | packages/memory/src/tiers/semantic-memory.ts:102 |
-| `weights` | [`FusionWeights`](/api/@graphorin/memory/interfaces/FusionWeights.md) | - | packages/memory/src/tiers/semantic-memory.ts:103 |
+| `k?` | `number` | Override the RRF constant for the weighted fuse. Default `60`. | packages/memory/src/tiers/semantic-memory.ts:125 |
+| `strategy` | `"weighted"` | - | packages/memory/src/tiers/semantic-memory.ts:122 |
+| `weights` | [`FusionWeights`](/api/@graphorin/memory/interfaces/FusionWeights.md) | - | packages/memory/src/tiers/semantic-memory.ts:123 |
 
 ## Stable

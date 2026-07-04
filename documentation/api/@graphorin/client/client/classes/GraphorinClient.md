@@ -42,7 +42,7 @@ get transportKind():
   | undefined;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:445
+Defined in: packages/client/src/graphorin-client.ts:448
 
 Return the active transport kind (or `undefined` if not connected).
 
@@ -59,7 +59,7 @@ Return the active transport kind (or `undefined` if not connected).
 cancel(runId, opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:323
+Defined in: packages/client/src/graphorin-client.ts:326
 
 Cancel a server-side run. Sends the `run.cancel` RPC and
 resolves with the server's `result` payload (typically
@@ -87,7 +87,7 @@ resolves with the server's `result` payload (typically
 cancelNotify(requestId): void;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:403
+Defined in: packages/client/src/graphorin-client.ts:406
 
 Send an MCP-compatible cancellation notification. Does not wait
 for a server reply (notifications have no `id`).
@@ -131,7 +131,7 @@ it during another `connect()` returns the same promise.
 disconnect(): Promise<void>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:421
+Defined in: packages/client/src/graphorin-client.ts:424
 
 Disconnect the underlying transport and abort every pending RPC
 + subscription. Idempotent.
@@ -167,7 +167,7 @@ resume(
 opts?): Promise<unknown>;
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:357
+Defined in: packages/client/src/graphorin-client.ts:360
 
 Resume a paused (HITL) run. The WebSocket protocol intentionally
 does NOT carry a `resume` control message — resumes are durable

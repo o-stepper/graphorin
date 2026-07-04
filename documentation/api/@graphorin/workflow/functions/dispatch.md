@@ -10,7 +10,7 @@
 function dispatch<TArgs>(nodeName, args): Dispatch<TArgs>;
 ```
 
-Defined in: packages/core/dist/channels/dispatch.d.ts:23
+Defined in: packages/core/dist/channels/dispatch.d.ts:31
 
 Convenience factory equivalent to `new Dispatch(nodeName, args)`.
 

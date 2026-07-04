@@ -26,6 +26,7 @@ export * from './guard/index.js';
 export * from './guardrails/index.js';
 export * from './hardening/index.js';
 export * from './oauth/index.js';
+export * from './policy/index.js';
 export * from './sandbox/index.js';
 export * from './secrets/index.js';
 export * from './supply-chain/index.js';

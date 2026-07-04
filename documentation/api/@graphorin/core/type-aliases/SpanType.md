@@ -39,6 +39,7 @@ type SpanType =
   | "memory.consolidate.standard"
   | "memory.consolidate.deep"
   | "memory.consolidate.reflect"
+  | "memory.consolidate.learned-context"
   | "memory.search.insight"
   | "memory.read.insight"
   | "memory.write.insight"

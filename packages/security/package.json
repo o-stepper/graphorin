@@ -91,6 +91,10 @@
       "types": "./dist/oauth/index.d.ts",
       "import": "./dist/oauth/index.js"
     },
+    "./policy": {
+      "types": "./dist/policy/index.d.ts",
+      "import": "./dist/policy/index.js"
+    },
     "./supply-chain": {
       "types": "./dist/supply-chain/index.d.ts",
       "import": "./dist/supply-chain/index.js"

@@ -10,7 +10,7 @@
 function diffPricing(before, after): readonly PricingDiffEntry[];
 ```
 
-Defined in: pricing/src/diff.ts:27
+Defined in: pricing/src/diff.ts:28
 
 Compare two snapshots and return one entry per (provider, model)
 pair that has been added, removed, or changed. The result is sorted

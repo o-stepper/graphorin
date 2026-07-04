@@ -10,7 +10,7 @@
 function projectToolApi(tools): CodeApiProjection;
 ```
 
-Defined in: packages/tools/src/code-mode/project.ts:183
+Defined in: packages/tools/src/code-mode/project.ts:177
 
 Project a set of resolved tools as a typed code API. See the module
 docstring.

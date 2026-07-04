@@ -6,7 +6,7 @@
 
 # Interface: MCPResourceContent
 
-Defined in: packages/mcp/src/client/types.ts:267
+Defined in: packages/mcp/src/client/types.ts:289
 
 Resource content returned by `readResource(...)`.
 
@@ -14,7 +14,7 @@ Resource content returned by `readResource(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-blob"></a> `blob?` | `readonly` | `string` | packages/mcp/src/client/types.ts:271 |
-| <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | packages/mcp/src/client/types.ts:269 |
-| <a id="property-text"></a> `text?` | `readonly` | `string` | packages/mcp/src/client/types.ts:270 |
-| <a id="property-uri"></a> `uri` | `readonly` | `string` | packages/mcp/src/client/types.ts:268 |
+| <a id="property-blob"></a> `blob?` | `readonly` | `string` | packages/mcp/src/client/types.ts:293 |
+| <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | packages/mcp/src/client/types.ts:291 |
+| <a id="property-text"></a> `text?` | `readonly` | `string` | packages/mcp/src/client/types.ts:292 |
+| <a id="property-uri"></a> `uri` | `readonly` | `string` | packages/mcp/src/client/types.ts:290 |

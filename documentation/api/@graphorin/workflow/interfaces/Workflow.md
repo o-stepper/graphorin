@@ -6,7 +6,7 @@
 
 # Interface: Workflow\&lt;TState, TInput\&gt;
 
-Defined in: packages/workflow/src/types.ts:317
+Defined in: packages/workflow/src/types.ts:411
 
 Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/functions/createWorkflow.md).
 
@@ -23,10 +23,40 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:321 |
-| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:322 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/types.ts:415 |
+| <a id="property-nodenames"></a> `nodeNames` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:416 |
 
 ## Methods
+
+### approve()
+
+```ts
+approve(
+   threadId, 
+   name, 
+   decision, 
+opts?): AsyncIterable<WorkflowEvent<TState>>;
+```
+
+Defined in: packages/workflow/src/types.ts:458
+
+Resolve a named persisted approval (D1) — sugar over
+[resolveAwakeable](/api/@graphorin/workflow/interfaces/Workflow.md#resolveawakeable) for `requestApproval(name)` suspensions.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `name` | `string` |
+| `decision` | `unknown` |
+| `opts?` | [`WorkflowResumeOptions`](/api/@graphorin/workflow/interfaces/WorkflowResumeOptions.md) |
+
+#### Returns
+
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+
+***
 
 ### execute()
 
@@ -34,7 +64,7 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 execute(input, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:323
+Defined in: packages/workflow/src/types.ts:417
 
 #### Parameters
 
@@ -57,7 +87,7 @@ fork(threadId, fromCheckpointId): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:337
+Defined in: packages/workflow/src/types.ts:466
 
 #### Parameters
 
@@ -80,7 +110,7 @@ Defined in: packages/workflow/src/types.ts:337
 getState(threadId): Promise<WorkflowState<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:335
+Defined in: packages/workflow/src/types.ts:464
 
 #### Parameters
 
@@ -100,7 +130,7 @@ Defined in: packages/workflow/src/types.ts:335
 listCheckpoints(threadId): Promise<readonly Checkpoint[]>;
 ```
 
-Defined in: packages/workflow/src/types.ts:336
+Defined in: packages/workflow/src/types.ts:465
 
 #### Parameters
 
@@ -114,6 +144,37 @@ Defined in: packages/workflow/src/types.ts:336
 
 ***
 
+### resolveAwakeable()
+
+```ts
+resolveAwakeable(
+   threadId, 
+   name, 
+   value?, 
+opts?): AsyncIterable<WorkflowEvent<TState>>;
+```
+
+Defined in: packages/workflow/src/types.ts:448
+
+Resolve a named awakeable (durable promise, D1): the suspended
+`awaitExternal(name)` call returns `value` and the thread resumes.
+Fails with `pause-not-found` when no pending pause carries the name.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `name` | `string` |
+| `value?` | `unknown` |
+| `opts?` | [`WorkflowResumeOptions`](/api/@graphorin/workflow/interfaces/WorkflowResumeOptions.md) |
+
+#### Returns
+
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+
+***
+
 ### resume()
 
 ```ts
@@ -123,7 +184,7 @@ resume(
 opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:324
+Defined in: packages/workflow/src/types.ts:418
 
 #### Parameters
 
@@ -145,7 +206,7 @@ Defined in: packages/workflow/src/types.ts:324
 retry(threadId, opts?): AsyncIterable<WorkflowEvent<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:334
+Defined in: packages/workflow/src/types.ts:428
 
 Restart a `'failed'` thread from its last failure checkpoint
 (WF-3/WF-6): successful sibling tasks of the failed step replay
@@ -161,3 +222,37 @@ from their persisted pending writes; only the failed work re-runs.
 #### Returns
 
 `AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+
+***
+
+### tick()
+
+```ts
+tick(threadId, opts?): Promise<{
+  fired: boolean;
+  nextWakeAt: number | null;
+}>;
+```
+
+Defined in: packages/workflow/src/types.ts:436
+
+Fire due durable timers (D1). Scans the thread's pending pauses for
+`sleepUntil` records whose `wakeAt` has passed; when one is due the
+thread resumes (draining the resulting events internally). Returns
+whether a timer fired and the next earliest wake-at (epoch ms) still
+pending, so schedulers know when to call again.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `opts?` | \{ `now?`: `number`; \} |
+| `opts.now?` | `number` |
+
+#### Returns
+
+`Promise`\<\{
+  `fired`: `boolean`;
+  `nextWakeAt`: `number` \| `null`;
+\}\>

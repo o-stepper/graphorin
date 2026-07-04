@@ -15,24 +15,27 @@ function calculateCost(args, snapshot?):
   | null;
 ```
 
-Defined in: pricing/src/lookup.ts:106
+Defined in: pricing/src/lookup.ts:127
 
 Multiply a per-token price by an integer token count. Returns `null`
 when the price is unknown. Useful when caller wants to compute cost
 for a single LLM call without instantiating the cost tracker.
 
 Token-count contract (PS-19):
-- `inputTokens` **excludes** `cachedReadTokens` — cached reads are billed
-  separately at the cheaper cached rate, so pass the non-cached prompt count
-  to avoid double-billing.
+- `inputTokens` **excludes** `cachedReadTokens` and `cacheWriteTokens` —
+  the cache legs are billed separately at their own rates, so pass the
+  non-cached prompt count to avoid double-billing.
 - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
   declares an explicit `reasoningUsdPerToken`.
+- `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
+  declares one, else at the full input rate (a cache write is at minimum a
+  normal input token — the fallback never under-bills relative to no cache).
 
 ## Parameters
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `args` | [`LookupPriceArgs`](/api/@graphorin/pricing/interfaces/LookupPriceArgs.md) & \{ `cachedReadTokens?`: `number`; `inputTokens`: `number`; `outputTokens`: `number`; `reasoningTokens?`: `number`; \} | `undefined` |
+| `args` | [`LookupPriceArgs`](/api/@graphorin/pricing/interfaces/LookupPriceArgs.md) & \{ `cachedReadTokens?`: `number`; `cacheWriteTokens?`: `number`; `inputTokens`: `number`; `outputTokens`: `number`; `reasoningTokens?`: `number`; \} | `undefined` |
 | `snapshot` | [`PricingSnapshot`](/api/@graphorin/pricing/interfaces/PricingSnapshot.md) | `BUNDLED_SNAPSHOT` |
 
 ## Returns

@@ -6,7 +6,7 @@
 
 # Interface: PricingTraceSpanLike
 
-Defined in: pricing/src/types.ts:96
+Defined in: pricing/src/types.ts:103
 
 Span-shape input accepted by [listMissingModels](/api/@graphorin/pricing/functions/listMissingModels.md). Lightweight
 subset of `SpanRecord` from `@graphorin/observability` so the
@@ -18,4 +18,4 @@ pricing package stays free of an observability dependency.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-attributes"></a> `attributes` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | pricing/src/types.ts:97 |
+| <a id="property-attributes"></a> `attributes` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | pricing/src/types.ts:104 |

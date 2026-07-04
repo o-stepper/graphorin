@@ -2,6 +2,7 @@ import type {
   EmbedderProvider,
   Episode,
   MemoryHit,
+  MemoryOwner,
   MemoryProvenance,
   MemoryStatus,
   Sensitivity,
@@ -42,6 +43,8 @@ export interface EpisodeInput {
    * they are excluded from action-driving recall until validated.
    */
   readonly status?: MemoryStatus;
+  /** Principal dimension (D3). `'agent'` on auto-formed episodes. */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -137,6 +140,7 @@ export class EpisodicMemory {
         ...(input.tags !== undefined ? { tags: Object.freeze([...input.tags]) } : {}),
         ...(input.provenance !== undefined ? { provenance: input.provenance } : {}),
         ...(input.status !== undefined ? { status: input.status } : {}),
+        ...(input.owner !== undefined ? { owner: input.owner } : {}),
         createdAt: now,
         updatedAt: now,
       };

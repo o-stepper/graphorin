@@ -10,7 +10,7 @@
 function renderFinalSummary(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:129
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:190
 
 Render the produced summary into the final text the harness commits
 to the in-flight buffer. The LLM-produced sections come from

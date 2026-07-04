@@ -30,7 +30,11 @@ export type WorkflowErrorCode =
   | 'reducer-failed'
   | 'state-validation-failed'
   | 'dead-end'
-  | 'state-not-serializable';
+  | 'state-not-serializable'
+  | 'node-timeout'
+  | 'workflow-version-mismatch'
+  | 'workflow-divergence'
+  | 'pause-not-found';
 
 /**
  * Base error class for all `@graphorin/workflow` failures.
@@ -189,6 +193,95 @@ export class NodeExecutionError extends WorkflowError {
     super('node-execution-failed', `node "${nodeName}" failed during execution`, { cause });
     this.name = 'NodeExecutionError';
     this.nodeName = nodeName;
+  }
+}
+
+/**
+ * Thrown when a node body exceeds its wall-clock budget (D1 /
+ * workflow-03). The task's `ctx.signal` is aborted first so a
+ * well-behaved body can stop; bodies that ignore the signal keep
+ * running in the background (same contract as cancellation).
+ */
+export class NodeTimeoutError extends WorkflowError {
+  readonly nodeName: string;
+  readonly timeoutMs: number;
+
+  constructor(nodeName: string, timeoutMs: number) {
+    super('node-timeout', `node "${nodeName}" exceeded its ${timeoutMs}ms timeout`, {
+      hint: 'raise timeoutMs on the node / nodeDefaults, or honour ctx.signal in the body',
+    });
+    this.name = 'NodeTimeoutError';
+    this.nodeName = nodeName;
+    this.timeoutMs = timeoutMs;
+  }
+}
+
+/**
+ * Thrown on resume when the stored frontier was written by a different
+ * {@link WorkflowConfig.version} (D1 / workflow-14) — replaying
+ * persisted state through changed code must fail loudly, not silently
+ * diverge. Opt out per call via `allowVersionMismatch`.
+ */
+export class WorkflowVersionMismatchError extends WorkflowError {
+  readonly threadId: string;
+  readonly storedVersion: string;
+  readonly currentVersion: string;
+
+  constructor(threadId: string, storedVersion: string, currentVersion: string) {
+    super(
+      'workflow-version-mismatch',
+      `thread "${threadId}" was suspended by workflow version "${storedVersion}" but the current definition is "${currentVersion}"`,
+      {
+        hint: 'migrate the thread, or resume with { allowVersionMismatch: true } after verifying compatibility',
+      },
+    );
+    this.name = 'WorkflowVersionMismatchError';
+    this.threadId = threadId;
+    this.storedVersion = storedVersion;
+    this.currentVersion = currentVersion;
+  }
+}
+
+/**
+ * Thrown on resume when the persisted frontier references nodes that no
+ * longer exist in the workflow definition (D1) — the definition changed
+ * mid-flight and a silent re-plan would diverge from the journal.
+ */
+export class WorkflowDivergenceError extends WorkflowError {
+  readonly threadId: string;
+  readonly missingNodes: ReadonlyArray<string>;
+
+  constructor(threadId: string, missingNodes: ReadonlyArray<string>) {
+    super(
+      'workflow-divergence',
+      `thread "${threadId}" cannot resume: the persisted frontier references node(s) ${missingNodes.map((n) => `"${n}"`).join(', ')} that are absent from the current definition`,
+      {
+        hint: 'restore the original definition, or fork the thread and migrate its state explicitly',
+      },
+    );
+    this.name = 'WorkflowDivergenceError';
+    this.threadId = threadId;
+    this.missingNodes = missingNodes;
+  }
+}
+
+/**
+ * Thrown by `resolveAwakeable` / `approve` (D1) when no pending pause
+ * carries the requested name.
+ */
+export class PauseNotFoundError extends WorkflowError {
+  readonly threadId: string;
+  readonly pauseName: string;
+
+  constructor(threadId: string, pauseName: string) {
+    super(
+      'pause-not-found',
+      `thread "${threadId}" has no pending awakeable/approval named "${pauseName}"`,
+      { hint: 'inspect getState(threadId).pendingPauses for the names currently awaited' },
+    );
+    this.name = 'PauseNotFoundError';
+    this.threadId = threadId;
+    this.pauseName = pauseName;
   }
 }
 

@@ -6,7 +6,7 @@
 
 # Interface: WorkflowEndEvent\&lt;TState\&gt;
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:81
+Defined in: packages/core/dist/types/workflow-event.d.ts:88
 
 ## Stable
 
@@ -20,6 +20,6 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:81
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:84 |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:83 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.end"` | packages/core/dist/types/workflow-event.d.ts:82 |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:91 |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:90 |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.end"` | packages/core/dist/types/workflow-event.d.ts:89 |

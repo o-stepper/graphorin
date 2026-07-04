@@ -16,7 +16,7 @@ function createFactForgetTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:244
+Defined in: packages/memory/src/tools/fact-tools.ts:264
 
 `fact_forget` — soft-delete a fact (kept for replay; never hard-
 deleted at this layer).

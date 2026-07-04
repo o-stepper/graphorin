@@ -18,6 +18,6 @@ type ProviderErrorKind =
   | "unknown";
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:184
+Defined in: packages/core/src/contracts/provider.ts:210
 
 ## Stable

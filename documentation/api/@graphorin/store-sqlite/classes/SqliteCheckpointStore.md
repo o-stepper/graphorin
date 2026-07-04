@@ -6,7 +6,7 @@
 
 # Class: SqliteCheckpointStore
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:18
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:20
 
 Default `CheckpointStore` implementation. Workflow state is encoded
 as JSON blobs; per-task pending writes survive partial step failure.
@@ -25,7 +25,7 @@ as JSON blobs; per-task pending writes survive partial step failure.
 new SqliteCheckpointStore(conn): SqliteCheckpointStore;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:20
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:22
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:20
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:132
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:162
 
 #### Parameters
 
@@ -74,7 +74,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:74
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:104
 
 #### Parameters
 
@@ -105,7 +105,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:109
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:139
 
 #### Parameters
 
@@ -132,10 +132,11 @@ put(
    threadId, 
    namespace, 
    checkpoint, 
-metadata): Promise<string>;
+   metadata, 
+opts?): Promise<string>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:24
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:26
 
 #### Parameters
 
@@ -145,6 +146,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:24
 | `namespace` | `string` |
 | `checkpoint` | [`Checkpoint`](/api/@graphorin/core/interfaces/Checkpoint.md) |
 | `metadata` | [`CheckpointMetadata`](/api/@graphorin/core/interfaces/CheckpointMetadata.md) |
+| `opts?` | [`CheckpointPutOptions`](/api/@graphorin/core/interfaces/CheckpointPutOptions.md) |
 
 #### Returns
 
@@ -167,7 +169,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:53
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:83
 
 #### Parameters
 

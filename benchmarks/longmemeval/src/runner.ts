@@ -176,7 +176,14 @@ function normalizeForFts(text: string): string {
  * on top (the pre-C8 keyword fan-out booster is gone, evals-06), so the
  * numbers measure the search path users actually get.
  */
-export type RetrievalMode = 'default' | 'multi-query' | 'hyde' | 'iterative' | 'graph';
+export type RetrievalMode =
+  | 'default'
+  | 'multi-query'
+  | 'hyde'
+  | 'iterative'
+  | 'graph'
+  | 'ppr'
+  | 'entity';
 
 /** Which embedder the memory system runs with (evals-01). */
 export type EmbedderMode = 'none' | 'fake';
@@ -250,6 +257,10 @@ async function recall(
     ...(retrieval === 'multi-query' ? { multiQuery: 3 } : {}),
     ...(retrieval === 'hyde' ? { hyde: true } : {}),
     ...(retrieval === 'graph' ? { expandHops: 1 as const } : {}),
+    // D5: PPR-lite two-hop damped spreading activation, and the exact
+    // entity-match retriever.
+    ...(retrieval === 'ppr' ? { expandHops: 2 as const, graphScoring: 'ppr' as const } : {}),
+    ...(retrieval === 'entity' ? { entityMatch: true } : {}),
   });
   return hits.map((h) => h.record.text).join('\n');
 }
@@ -410,7 +421,9 @@ export function createMemorySystemAgent(
         ...(retrieval === 'iterative'
           ? { iterativeRetrieval: { provider: options.provider } }
           : {}),
-        ...(retrieval === 'graph' ? { graph: { entityResolution: true } } : {}),
+        ...(retrieval === 'graph' || retrieval === 'ppr' || retrieval === 'entity'
+          ? { graph: { entityResolution: true } }
+          : {}),
         consolidator:
           options.consolidate === true
             ? { enabled: true, provider: options.provider, tier: 'standard', defaultScope: scope }

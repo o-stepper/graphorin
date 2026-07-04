@@ -6,7 +6,7 @@
 
 # Interface: Transport
 
-Defined in: packages/client/src/transport/types.ts:84
+Defined in: packages/client/src/transport/types.ts:92
 
 Active transport handle. The client owns the handle and disposes
 it via [Transport.close](/api/@graphorin/client/interfaces/Transport.md#close) on every cleanup path.
@@ -17,9 +17,9 @@ it via [Transport.close](/api/@graphorin/client/interfaces/Transport.md#close) o
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | [`TransportKind`](/api/@graphorin/client/type-aliases/TransportKind.md) | - | packages/client/src/transport/types.ts:85 |
-| <a id="property-lasteventid"></a> `lastEventId` | `readonly` | `string` \| `undefined` | Last server-issued event id observed on this connection. | packages/client/src/transport/types.ts:97 |
-| <a id="property-url"></a> `url` | `readonly` | `string` | - | packages/client/src/transport/types.ts:86 |
+| <a id="property-kind"></a> `kind` | `readonly` | [`TransportKind`](/api/@graphorin/client/type-aliases/TransportKind.md) | - | packages/client/src/transport/types.ts:93 |
+| <a id="property-lasteventid"></a> `lastEventId` | `readonly` | `string` \| `undefined` | Last server-issued event id observed on this connection. | packages/client/src/transport/types.ts:105 |
+| <a id="property-url"></a> `url` | `readonly` | `string` | - | packages/client/src/transport/types.ts:94 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ it via [Transport.close](/api/@graphorin/client/interfaces/Transport.md#close) o
 close(code?, reason?): void;
 ```
 
-Defined in: packages/client/src/transport/types.ts:95
+Defined in: packages/client/src/transport/types.ts:103
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: packages/client/src/transport/types.ts:95
 send(frame): void;
 ```
 
-Defined in: packages/client/src/transport/types.ts:94
+Defined in: packages/client/src/transport/types.ts:102
 
 Send a client → server frame. Throws when the transport is not
 in the open state, or when the underlying back-end does not

@@ -160,6 +160,12 @@ Re-exports [ModerationProvider](/api/@graphorin/security/type-aliases/Moderation
 
 ***
 
+### normalizeForMatching
+
+Re-exports [normalizeForMatching](/api/@graphorin/security/functions/normalizeForMatching.md)
+
+***
+
 ### ObservedToolCall
 
 Re-exports [ObservedToolCall](/api/@graphorin/security/interfaces/ObservedToolCall.md)

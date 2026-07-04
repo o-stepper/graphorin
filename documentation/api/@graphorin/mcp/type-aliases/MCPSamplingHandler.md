@@ -12,7 +12,7 @@ type MCPSamplingHandler = (request, opts) =>
 | Promise<MCPSamplingResult>;
 ```
 
-Defined in: packages/mcp/src/client/types.ts:177
+Defined in: packages/mcp/src/client/types.ts:188
 
 Handler for server-initiated sampling requests.
 

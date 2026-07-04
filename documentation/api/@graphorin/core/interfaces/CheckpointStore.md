@@ -6,7 +6,7 @@
 
 # Interface: CheckpointStore
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:86
+Defined in: packages/core/src/contracts/checkpoint-store.ts:133
 
 Pluggable checkpoint storage interface. The default implementation
 lives in `@graphorin/store-sqlite`.
@@ -21,7 +21,7 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:110
+Defined in: packages/core/src/contracts/checkpoint-store.ts:158
 
 #### Parameters
 
@@ -46,7 +46,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:102
+Defined in: packages/core/src/contracts/checkpoint-store.ts:150
 
 #### Parameters
 
@@ -73,7 +73,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:108
+Defined in: packages/core/src/contracts/checkpoint-store.ts:156
 
 #### Parameters
 
@@ -96,10 +96,11 @@ put(
    threadId, 
    namespace, 
    checkpoint, 
-metadata): Promise<string>;
+   metadata, 
+opts?): Promise<string>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:87
+Defined in: packages/core/src/contracts/checkpoint-store.ts:134
 
 #### Parameters
 
@@ -109,6 +110,7 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:87
 | `namespace` | `string` |
 | `checkpoint` | [`Checkpoint`](/api/@graphorin/core/interfaces/Checkpoint.md) |
 | `metadata` | [`CheckpointMetadata`](/api/@graphorin/core/interfaces/CheckpointMetadata.md) |
+| `opts?` | [`CheckpointPutOptions`](/api/@graphorin/core/interfaces/CheckpointPutOptions.md) |
 
 #### Returns
 
@@ -127,7 +129,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:94
+Defined in: packages/core/src/contracts/checkpoint-store.ts:142
 
 #### Parameters
 

@@ -31,7 +31,7 @@ import {
   runPackageManager,
 } from './package-manager.js';
 import { assertPolicyAllows, resolveTrustPolicy } from './policy.js';
-import { verifySkillSignature } from './signature.js';
+import { type SkillTrustRoot, verifySkillSignature } from './signature.js';
 import type {
   SkillInstallationStatus,
   SkillSignatureVerificationResult,
@@ -50,6 +50,12 @@ export interface InstallSkillFromNpmOptions {
   readonly version?: string;
   readonly trustLevel?: SkillTrustLevel;
   readonly policy?: SupplyChainPolicy;
+  /**
+   * Operator trust root (D4 / security-01) threaded into signature
+   * verification: a valid signature from a key not in the root is
+   * rejected. See {@link SkillTrustRoot}.
+   */
+  readonly trustRoot?: SkillTrustRoot;
   /** Where to install the package. Defaults to a fresh temp dir. */
   readonly cwd?: string;
   /** Forwarded to the package-manager runner. */
@@ -143,6 +149,7 @@ export async function installSkillFromNpm(
   const signature = await verifyAfterInstall({
     skillId,
     trust,
+    ...(options.trustRoot !== undefined ? { trustRoot: options.trustRoot } : {}),
     resolveSkillMd: () =>
       resolveInstalledSkillMd(options.skillMd, options.dryRun === true, cwd, source, {
         packageName: options.packageName,
@@ -197,6 +204,8 @@ export async function installSkillFromNpm(
  * @stable
  */
 export interface InstallSkillFromGitOptions {
+  /** Operator trust root (D4 / security-01). See {@link SkillTrustRoot}. */
+  readonly trustRoot?: SkillTrustRoot;
   readonly repoUrl: string;
   readonly ref?: string;
   readonly trustLevel?: SkillTrustLevel;
@@ -263,6 +272,7 @@ export async function installSkillFromGit(
   const signature = await verifyAfterInstall({
     skillId,
     trust,
+    ...(options.trustRoot !== undefined ? { trustRoot: options.trustRoot } : {}),
     resolveSkillMd: () =>
       resolveInstalledSkillMd(options.skillMd, options.dryRun === true, dest, source, {}),
     onReject: () => {
@@ -321,8 +331,9 @@ async function verifyAfterInstall(args: {
   trust: ReturnType<typeof resolveTrustPolicy>;
   resolveSkillMd: () => string | undefined;
   onReject: () => void;
+  trustRoot?: SkillTrustRoot;
 }): Promise<SkillSignatureVerificationResult | undefined> {
-  const { skillId, trust, resolveSkillMd, onReject } = args;
+  const { skillId, trust, resolveSkillMd, onReject, trustRoot } = args;
   if (!trust.signature.required) return undefined;
   const skillMd = resolveSkillMd();
   if (skillMd === undefined) {
@@ -339,7 +350,10 @@ async function verifyAfterInstall(args: {
   // behind.
   let result: SkillSignatureVerificationResult;
   try {
-    result = await verifySkillSignature({ skillMd });
+    result = await verifySkillSignature({
+      skillMd,
+      ...(trustRoot !== undefined ? { trustRoot } : {}),
+    });
   } catch (err) {
     onReject();
     throw err;

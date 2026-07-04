@@ -10,7 +10,7 @@
 function createToolRegistry(opts?): ToolRegistry;
 ```
 
-Defined in: packages/tools/src/registry/registry.ts:126
+Defined in: packages/tools/src/registry/registry.ts:127
 
 Build a [ToolRegistry](/api/@graphorin/tools/interfaces/ToolRegistry.md) instance.
 

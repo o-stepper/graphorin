@@ -18,6 +18,7 @@ export {
   fitFusionWeights,
   ndcgAtK,
 } from './fit-weights.js';
+export { DEFAULT_PPR_DAMPING, pprActivation } from './graph-ppr.js';
 export {
   assessQueryDifficulty,
   buildGradeRequest,

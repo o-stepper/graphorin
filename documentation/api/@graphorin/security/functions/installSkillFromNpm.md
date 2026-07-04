@@ -10,7 +10,7 @@
 function installSkillFromNpm(options): Promise<SkillInstallationStatus>;
 ```
 
-Defined in: packages/security/src/supply-chain/installer.ts:72
+Defined in: packages/security/src/supply-chain/installer.ts:78
 
 Install a skill from the npm registry.
 

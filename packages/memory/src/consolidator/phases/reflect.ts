@@ -249,6 +249,8 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
           salience: STARTING_SALIENCE,
           provenance: 'reflection',
           status: 'quarantined',
+          // D3: a synthesized insight is the agent's own inference.
+          owner: 'agent',
           sensitivity: 'internal',
           createdAt: iso,
           updatedAt: iso,

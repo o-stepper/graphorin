@@ -16,6 +16,7 @@ import type { ContextualRetrievalMode } from '../internal/contextualize.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../tiers/episodic-memory.js';
 import type { SemanticMemory } from '../tiers/semantic-memory.js';
+import type { WorkingMemory } from '../tiers/working-memory.js';
 import type { SalienceWeights } from './decay.js';
 
 /**
@@ -210,6 +211,17 @@ export interface ConsolidatorConfig {
    * write path never has a provider for contextualization.
    */
   readonly contextualRetrieval: ContextualRetrievalMode;
+  /**
+   * Maintain the learned-context digest block (D3): after the deep
+   * phase, one budgeted LLM call rewrites the reserved
+   * `learned_context` working block from the previous digest + recent
+   * episodes / active insights / active procedures, so the system
+   * prompt carries a compact standing summary. Defaults **off at every
+   * tier** (Wave-D trial) — a no-op without a working tier handle.
+   */
+  readonly learnedContext: boolean;
+  /** Character bound enforced on the learned-context digest. Default `1200`. */
+  readonly learnedContextMaxChars: number;
 }
 
 /**
@@ -298,6 +310,8 @@ export interface PhaseOutcome {
   readonly episodesFormed: number;
   /** Insights synthesized by the deep-phase reflection pass (P1-1). */
   readonly insightsCreated: number;
+  /** True when the learned-context digest block was rewritten (D3). */
+  readonly learnedContextUpdated?: boolean;
   readonly noiseFilteredCount: number;
   readonly emptyExtractions: number;
   readonly llmTokensUsed: number;
@@ -344,6 +358,13 @@ export interface CreateConsolidatorOptions {
    * processed slice (P1-2). Omitted ⇒ episode formation is skipped.
    */
   readonly episodic?: EpisodicMemory;
+  /**
+   * The {@link WorkingMemory} tier instance from the parent
+   * `createMemory(...)` facade (D3). Required for the learned-context
+   * pass — without it the pass is a silent no-op even when
+   * `learnedContext` is enabled.
+   */
+  readonly working?: WorkingMemory;
   /**
    * Provider used by the standard + deep phases. Required when the
    * tier enables either phase; ignored when the active phases
@@ -417,6 +438,10 @@ export interface CreateConsolidatorOptions {
   readonly reflectionMaxQuestions?: number;
   /** Override the per-tier {@link ConsolidatorConfig.contextualRetrieval} default (P1-3). */
   readonly contextualRetrieval?: ContextualRetrievalMode;
+  /** Override the per-tier {@link ConsolidatorConfig.learnedContext} default (D3). */
+  readonly learnedContext?: boolean;
+  /** Override the {@link ConsolidatorConfig.learnedContextMaxChars} default (D3). */
+  readonly learnedContextMaxChars?: number;
   /** Default scope used by event triggers + the manual `fireNow` path. */
   readonly defaultScope?: SessionScope;
 }
@@ -443,6 +468,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
       readonly importanceThreshold: number;
       readonly reflectionMaxQuestions: number;
       readonly contextualRetrieval: ContextualRetrievalMode;
+      readonly learnedContext: boolean;
+      readonly learnedContextMaxChars: number;
     }
   >
 > = Object.freeze({
@@ -464,6 +491,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
     contextualRetrieval: 'late-chunk',
+    learnedContext: false,
+    learnedContextMaxChars: 1200,
   },
   cheap: {
     ceilings: {
@@ -483,6 +512,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
     contextualRetrieval: 'late-chunk',
+    learnedContext: false,
+    learnedContextMaxChars: 1200,
   },
   standard: {
     ceilings: {
@@ -502,6 +533,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
     contextualRetrieval: 'late-chunk',
+    learnedContext: false,
+    learnedContextMaxChars: 1200,
   },
   full: {
     ceilings: {
@@ -521,6 +554,8 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
     contextualRetrieval: 'late-chunk',
+    learnedContext: false,
+    learnedContextMaxChars: 1200,
   },
   custom: {
     ceilings: {
@@ -540,5 +575,7 @@ export const CONSOLIDATOR_TIER_DEFAULTS: Readonly<
     importanceThreshold: 3,
     reflectionMaxQuestions: 3,
     contextualRetrieval: 'late-chunk',
+    learnedContext: false,
+    learnedContextMaxChars: 1200,
   },
 });

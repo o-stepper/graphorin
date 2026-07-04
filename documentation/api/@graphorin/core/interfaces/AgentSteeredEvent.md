@@ -6,7 +6,7 @@
 
 # Interface: AgentSteeredEvent
 
-Defined in: packages/core/src/types/agent-event.ts:271
+Defined in: packages/core/src/types/agent-event.ts:287
 
 Emitted when `agent.steer(...)` queues an intervention to flow into
 the next provider call within the current run.
@@ -17,5 +17,5 @@ the next provider call within the current run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:273 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.steered"` | packages/core/src/types/agent-event.ts:272 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:289 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.steered"` | packages/core/src/types/agent-event.ts:288 |

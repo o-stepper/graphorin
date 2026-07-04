@@ -10,7 +10,7 @@
 function isRuntimeCompatSatisfied(range, version): boolean;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:553
+Defined in: packages/skills/src/frontmatter/index.ts:567
 
 Best-effort semver-range satisfaction check. Supports the patterns
 the framework actually emits (`^x.y.z`, `~x.y.z`, `>=x.y.z`,

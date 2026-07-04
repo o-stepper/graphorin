@@ -10,7 +10,7 @@
 type ConsolidatorPhase = "light" | "standard" | "deep";
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:98
+Defined in: packages/memory/src/consolidator/types.ts:104
 
 Phase identifier used by the runtime + audit rows.
 

@@ -21,7 +21,7 @@ function createToolSearchTool(opts): Tool<{
 }>;
 ```
 
-Defined in: packages/tools/src/built-in/tool-search.ts:57
+Defined in: packages/tools/src/built-in/tool-search.ts:66
 
 Build a `tool_search` tool bound to a specific registry.
 

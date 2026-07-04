@@ -10,7 +10,7 @@
 function runStorageEncrypt(options): Promise<StorageEncryptResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:163
+Defined in: packages/cli/src/commands/storage.ts:230
 
 `graphorin storage encrypt --passphrase-from <ref>` — encrypt a
 previously unencrypted SQLite store. Delegates to the optional Phase

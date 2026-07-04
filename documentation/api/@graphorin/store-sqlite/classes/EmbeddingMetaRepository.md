@@ -41,7 +41,7 @@ Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:79
 assertKnown(id): void;
 ```
 
-Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:194
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:206
 
 Verify that the given `embedder_id` is registered. Used at every
 write boundary so unknown ids fail fast.
@@ -145,7 +145,7 @@ in effect and a different active embedder is already registered.
 retire(id, retiredAt?): void;
 ```
 
-Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:185
+Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:197
 
 Mark an embedder retired. Read-only after retirement.
 

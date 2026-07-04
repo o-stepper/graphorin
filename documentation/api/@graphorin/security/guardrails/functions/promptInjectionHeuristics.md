@@ -10,7 +10,7 @@
 function promptInjectionHeuristics<TValue>(opts?): InputGuardrail<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts:64
+Defined in: packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts:65
 
 Construct the heuristics input guardrail.
 

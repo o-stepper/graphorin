@@ -181,6 +181,7 @@ function describeToolErrorKind(k: ToolErrorKind): string {
     case 'inbound_sanitization_blocked':
     case 'rate_limited':
     case 'dataflow_policy_blocked':
+    case 'capability_blocked':
       return k;
     default:
       return assertNever(k);

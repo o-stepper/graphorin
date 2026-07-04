@@ -281,6 +281,12 @@ Re-exports [SkillTrustLevel](/api/@graphorin/security/type-aliases/SkillTrustLev
 
 ***
 
+### SkillTrustRoot
+
+Re-exports [SkillTrustRoot](/api/@graphorin/security/interfaces/SkillTrustRoot.md)
+
+***
+
 ### splitFrontmatter
 
 Re-exports [splitFrontmatter](/api/@graphorin/security/functions/splitFrontmatter.md)

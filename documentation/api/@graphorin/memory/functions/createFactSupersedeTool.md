@@ -17,11 +17,12 @@ function createFactSupersedeTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:211
+Defined in: packages/memory/src/tools/fact-tools.ts:231
 
 `fact_supersede` — soft-supersede an old fact by storing a new one
-that replaces it. The old fact is kept for replay but ranked below
-the new one.
+that replaces it. The old fact is kept for replay but no longer
+surfaced by default reads (they evaluate validity at NOW); it stays
+reachable via `asOf` / inspector paths.
 
 ## Parameters
 

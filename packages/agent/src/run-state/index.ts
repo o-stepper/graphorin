@@ -19,6 +19,7 @@ import type {
   RunStatus,
   RunStep,
   RunTaintSummary,
+  TodoItem,
   ToolApproval,
   Usage,
 } from '@graphorin/core';
@@ -63,6 +64,8 @@ export interface SerializedRunState {
   readonly taintSummary?: RunTaintSummary;
   /** AG-19: deferred tools promoted by `tool_search` this run. */
   readonly promotedTools?: ReadonlyArray<string>;
+  /** D6: journaled structured plan/todo list. */
+  readonly todos?: ReadonlyArray<TodoItem>;
   readonly startedAt: string;
   readonly finishedAt?: string;
   readonly error?: { readonly message: string; readonly code: string; readonly details?: unknown };
@@ -113,6 +116,7 @@ export function serializeRunState(
     ...(state.usageByModel !== undefined ? { usageByModel: state.usageByModel } : {}),
     ...(state.taintSummary !== undefined ? { taintSummary: state.taintSummary } : {}),
     ...(state.promotedTools !== undefined ? { promotedTools: state.promotedTools } : {}),
+    ...(state.todos !== undefined ? { todos: state.todos } : {}),
     startedAt: state.startedAt,
     ...(state.finishedAt !== undefined ? { finishedAt: state.finishedAt } : {}),
     ...(state.error !== undefined ? { error: state.error } : {}),
@@ -351,6 +355,17 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
   const promotedTools = Array.isArray(payload.promotedTools)
     ? payload.promotedTools.filter((t): t is string => typeof t === 'string')
     : undefined;
+  const todos = Array.isArray(payload.todos)
+    ? payload.todos
+        .filter(isRecord)
+        .filter(
+          (t): t is { id: string; content: string; status: TodoItem['status'] } =>
+            typeof t.id === 'string' &&
+            typeof t.content === 'string' &&
+            (t.status === 'pending' || t.status === 'in_progress' || t.status === 'completed'),
+        )
+        .map((t) => ({ id: t.id, content: t.content, status: t.status }))
+    : undefined;
 
   const out: RunState = {
     id,
@@ -367,6 +382,7 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
     ...(usageByModel !== undefined ? { usageByModel } : {}),
     ...(taintSummary !== undefined ? { taintSummary } : {}),
     ...(promotedTools !== undefined ? { promotedTools } : {}),
+    ...(todos !== undefined ? { todos } : {}),
     startedAt,
     ...(typeof finishedAtRaw === 'string' ? { finishedAt: finishedAtRaw } : {}),
     ...(error !== undefined ? { error } : {}),

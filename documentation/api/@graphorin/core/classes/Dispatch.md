@@ -32,7 +32,7 @@ The class is intentionally tiny — the engine inspects only the public
 new Dispatch<TArgs>(nodeName, args): Dispatch<TArgs>;
 ```
 
-Defined in: packages/core/src/channels/dispatch.ts:16
+Defined in: packages/core/src/channels/dispatch.ts:24
 
 #### Parameters
 
@@ -47,7 +47,8 @@ Defined in: packages/core/src/channels/dispatch.ts:16
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `TArgs` | packages/core/src/channels/dispatch.ts:14 |
-| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | packages/core/src/channels/dispatch.ts:13 |
+| Property | Modifier | Type | Default value | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| <a id="property-__graphorindispatch"></a> `__graphorinDispatch` | `readonly` | `true` | `true` | Cross-realm brand (workflow-13): the engine's structural fallback requires this marker so a plain state object that happens to carry `nodeName` + `args` keys is treated as channel WRITES, never silently swallowed as a dispatch. A plain own property (not a symbol) so it survives `structuredClone` across worker boundaries. | packages/core/src/channels/dispatch.ts:20 |
+| <a id="property-args"></a> `args` | `readonly` | `TArgs` | `undefined` | - | packages/core/src/channels/dispatch.ts:22 |
+| <a id="property-nodename"></a> `nodeName` | `readonly` | `string` | `undefined` | - | packages/core/src/channels/dispatch.ts:21 |

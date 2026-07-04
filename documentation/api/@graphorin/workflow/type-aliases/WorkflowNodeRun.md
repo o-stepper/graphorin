@@ -12,7 +12,7 @@ type WorkflowNodeRun<TState> = (state, ctx) =>
 | NodeRunResult<TState>;
 ```
 
-Defined in: packages/workflow/src/types.ts:166
+Defined in: packages/workflow/src/types.ts:204
 
 Per-node run callback.
 

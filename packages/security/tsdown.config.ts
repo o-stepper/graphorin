@@ -12,6 +12,7 @@ export default defineConfig({
     'src/guardrails/index.ts',
     'src/hardening/index.ts',
     'src/oauth/index.ts',
+    'src/policy/index.ts',
     'src/supply-chain/index.ts',
   ],
   format: ['esm'],

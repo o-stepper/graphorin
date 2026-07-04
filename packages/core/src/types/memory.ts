@@ -53,6 +53,21 @@ export type MemoryProvenance =
 export type MemoryStatus = 'active' | 'quarantined';
 
 /**
+ * Principal a memory belongs to (D3) — the *who-owns-this* dimension,
+ * orthogonal to {@link MemoryProvenance} (*where-it-came-from*):
+ * `user` for user-stated content, `agent` for the agent's own
+ * inferences (consolidator extraction / reflection / induction stamp
+ * this), `shared` for records deliberately published to a multi-agent
+ * shared tier. Absent (rows written before the feature, or writers
+ * that do not care) is treated as `user` at filter time; default
+ * reads apply **no owner filter**, so behaviour is unchanged until a
+ * caller opts into a retrieval-time scope filter.
+ *
+ * @stable
+ */
+export type MemoryOwner = 'user' | 'agent' | 'shared';
+
+/**
  * Snapshot of memory-tier counters surfaced to the model via the
  * memory-aware system prompt. Implementations live in `@graphorin/memory`;
  * the type sits here so the agent runtime can include it in its
@@ -167,6 +182,12 @@ export interface Fact extends MemoryRecord {
    * default recall.
    */
   readonly status?: MemoryStatus;
+  /**
+   * Principal dimension (D3). `'agent'` on consolidator-synthesized
+   * facts; absent ⇒ treated as `'user'` at filter time. Never gates
+   * default recall — only an explicit owner search filter reads it.
+   */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -187,6 +208,8 @@ export interface Episode extends MemoryRecord {
   readonly provenance?: MemoryProvenance;
   /** Retrieval-trust state (P1-4). See {@link MemoryStatus}. */
   readonly status?: MemoryStatus;
+  /** Principal dimension (D3). See {@link MemoryOwner}. */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -240,6 +263,8 @@ export interface Rule extends MemoryRecord {
    * Absent ⇒ never counted (adapters without the column).
    */
   readonly successCount?: number;
+  /** Principal dimension (D3). `'agent'` on induced procedures. See {@link MemoryOwner}. */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -285,6 +310,8 @@ export interface Insight extends MemoryRecord {
    * {@link MemoryStatus}.
    */
   readonly status?: MemoryStatus;
+  /** Principal dimension (D3). Reflection-synthesized insights are `'agent'`. */
+  readonly owner?: MemoryOwner;
 }
 
 /**
@@ -367,6 +394,13 @@ export interface MemorySearchOptions {
    * {@link asOf} is supplied.
    */
   readonly includeSuperseded?: boolean;
+  /**
+   * Retrieval-time principal filter (D3). When set, only records whose
+   * owner is in the requested set match; rows written before the
+   * feature (owner absent) are treated as `'user'`. Absent ⇒ no owner
+   * filter — behaviour is unchanged.
+   */
+  readonly owner?: MemoryOwner | ReadonlyArray<MemoryOwner>;
 }
 
 /**

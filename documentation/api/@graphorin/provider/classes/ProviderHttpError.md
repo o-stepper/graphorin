@@ -6,7 +6,7 @@
 
 # Class: ProviderHttpError
 
-Defined in: packages/provider/src/errors/errors.ts:208
+Defined in: packages/provider/src/errors/errors.ts:248
 
 Wrapped HTTP error returned by an adapter. Carries the original
 status code so middleware (`withRetry`, `withFallback`) can decide
@@ -26,14 +26,16 @@ whether the error is retryable.
 new ProviderHttpError(args): ProviderHttpError;
 ```
 
-Defined in: packages/provider/src/errors/errors.ts:213
+Defined in: packages/provider/src/errors/errors.ts:266
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `args` | \{ `cause?`: `unknown`; `message`: `string`; `providerName`: `string`; `status`: `number`; \} |
+| `args` | \{ `cause?`: `unknown`; `errorKind?`: [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md); `headers?`: `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\>; `message`: `string`; `providerName`: `string`; `status`: `number`; \} |
 | `args.cause?` | `unknown` |
+| `args.errorKind?` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) |
+| `args.headers?` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> |
 | `args.message` | `string` |
 | `args.providerName` | `string` |
 | `args.status` | `number` |
@@ -51,13 +53,15 @@ Defined in: packages/provider/src/errors/errors.ts:213
 | Property | Modifier | Type | Default value | Description | Overrides | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`cause`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:21 |
-| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:19 |
+| <a id="property-errorkind"></a> `errorKind` | `readonly` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) | `undefined` | The canonical `ProviderErrorKind` mapped from the HTTP status via [classifyHttpStatus](/api/@graphorin/provider/functions/classifyHttpStatus.md) (the `kind` field keeps its stable `'provider-http'` discriminant). Middleware predicates consult this so a 429 fails over / retries as a rate limit. | - | - | packages/provider/src/errors/errors.ts:258 |
+| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | `undefined` | Backoff-relevant response headers captured from the failed response (`retry-after`, `x-ratelimit-*`), lowercased. `withRetry`'s Retry-After hint reader consumes them. | - | - | packages/provider/src/errors/errors.ts:264 |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:23 |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`message`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
-| <a id="property-name"></a> `name` | `readonly` | `"ProviderHttpError"` | `'ProviderHttpError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | packages/provider/src/errors/errors.ts:209 |
-| <a id="property-providername"></a> `providerName` | `readonly` | `string` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:211 |
+| <a id="property-name"></a> `name` | `readonly` | `"ProviderHttpError"` | `'ProviderHttpError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | packages/provider/src/errors/errors.ts:249 |
+| <a id="property-providername"></a> `providerName` | `readonly` | `string` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:251 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`stack`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-stack) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |
-| <a id="property-status"></a> `status` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:210 |
+| <a id="property-status"></a> `status` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:250 |
 | <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | `undefined` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`stackTraceLimit`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-stacktracelimit) | node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68 |
 
 ## Methods

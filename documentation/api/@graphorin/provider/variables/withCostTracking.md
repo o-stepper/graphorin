@@ -10,7 +10,7 @@
 const withCostTracking: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:117
+Defined in: packages/provider/src/middleware/with-cost-tracking.ts:134
 
 ## Parameters
 

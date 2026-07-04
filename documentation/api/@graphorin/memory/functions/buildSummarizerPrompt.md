@@ -10,7 +10,7 @@
 function buildSummarizerPrompt(input): string;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:73
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:78
 
 Build the prompt the summarizer LLM receives. The prompt
 contains:
@@ -27,11 +27,12 @@ result is committed to the in-flight buffer.
 
 ## Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | \{ `olderMessages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `template`: [`RenderedTemplate`](/api/@graphorin/memory/interfaces/RenderedTemplate.md); \} |
-| `input.olderMessages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] |
-| `input.template` | [`RenderedTemplate`](/api/@graphorin/memory/interfaces/RenderedTemplate.md) |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | \{ `maxDumpChars?`: `number`; `olderMessages`: readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]; `template`: [`RenderedTemplate`](/api/@graphorin/memory/interfaces/RenderedTemplate.md); \} | - |
+| `input.maxDumpChars?` | `number` | Character budget for the message dump (context-engine-07). When the rendered dump exceeds it, the OLDEST lines are elided (newest kept) and a marker notes how many were dropped. `undefined` ⇒ default DEFAULT\_SUMMARIZER\_DUMP\_CHAR\_BUDGET; `0` disables the cap. |
+| `input.olderMessages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
+| `input.template` | [`RenderedTemplate`](/api/@graphorin/memory/interfaces/RenderedTemplate.md) | - |
 
 ## Returns
 

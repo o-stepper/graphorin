@@ -6,7 +6,7 @@
 
 # Class: ProceduralMemory
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:97
+Defined in: packages/memory/src/tiers/procedural-memory.ts:101
 
 `ProceduralMemory` — standing orders activated when the agent's
 current context matches the rule's predicate. The activation rules
@@ -29,7 +29,7 @@ from [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory
 new ProceduralMemory(args): ProceduralMemory;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:108
+Defined in: packages/memory/src/tiers/procedural-memory.ts:112
 
 #### Parameters
 
@@ -53,7 +53,7 @@ Defined in: packages/memory/src/tiers/procedural-memory.ts:108
 activate(scope, context?): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:327
+Defined in: packages/memory/src/tiers/procedural-memory.ts:334
 
 Return the rules active under `context`. Rules without a
 `condition` are always active; the bundled predicate vocabulary
@@ -84,7 +84,7 @@ feeds the system prompt — never surfaces it.
 define(scope, input): Promise<Rule>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:188
+Defined in: packages/memory/src/tiers/procedural-memory.ts:192
 
 Persist a rule. Returns the stored record.
 
@@ -110,7 +110,7 @@ induce(
 opts?): Promise<Rule | null>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:230
+Defined in: packages/memory/src/tiers/procedural-memory.ts:235
 
 Induce a reusable procedure (P2-2) from a successful agent trajectory
 and store it **quarantined** + `provenance: 'induction'` (P1-4). Returns
@@ -143,7 +143,7 @@ induceFromRun(
 opts?): Promise<Rule | null>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:286
+Defined in: packages/memory/src/tiers/procedural-memory.ts:293
 
 Convenience over [induce](/api/@graphorin/memory/classes/ProceduralMemory.md#induce): distil the [Trajectory](/api/@graphorin/memory/interfaces/Trajectory.md) from a
 completed [RunState](/api/@graphorin/core/interfaces/RunState.md) (the agent's already-emitted run state) and
@@ -169,7 +169,7 @@ induce a procedure. The success signal is `status === 'completed'`.
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:308
+Defined in: packages/memory/src/tiers/procedural-memory.ts:315
 
 List every active (non-deleted) rule for the supplied scope.
 
@@ -198,7 +198,7 @@ recordOutcome(
 }>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:138
+Defined in: packages/memory/src/tiers/procedural-memory.ts:142
 
 Record the outcome of one demonstrated reuse of a procedure
 (MCON-2 part 4). A success increments the rule's persistent
@@ -242,7 +242,7 @@ remove(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:295
+Defined in: packages/memory/src/tiers/procedural-memory.ts:302
 
 Soft-delete a rule.
 
@@ -260,6 +260,48 @@ Soft-delete a rule.
 
 ***
 
+### search()
+
+```ts
+search(
+   scope, 
+   query, 
+opts?): Promise<readonly MemoryHit<Rule>[]>;
+```
+
+Defined in: packages/memory/src/tiers/procedural-memory.ts:360
+
+Runbook content search (D3): "find the procedure for this task" —
+lexical recall over rule text, as opposed to predicate
+[activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate). Returns **whole validated procedures** (the full
+[Rule](/api/@graphorin/core/interfaces/Rule.md) incl. steps / variables / success criteria) so a match
+can be followed file-style rather than re-synthesized from
+fragments. Quarantined (unvalidated induced) procedures are
+excluded — they must not drive actions — unless the inspector opts
+in via `includeQuarantined`.
+
+Uses the storage adapter's FTS surface when available
+(`procedural.search`, the default `@graphorin/store-sqlite` adapter
+implements it via migration 028); otherwise degrades to an offline
+in-memory token-overlap scan over [list](/api/@graphorin/memory/classes/ProceduralMemory.md#list), so custom adapters
+keep working without the index.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
+| `query` | `string` |
+| `opts` | \{ `includeQuarantined?`: `boolean`; `topK?`: `number`; \} |
+| `opts.includeQuarantined?` | `boolean` |
+| `opts.topK?` | `number` |
+
+#### Returns
+
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\&gt;[]\>
+
+***
+
 ### validate()
 
 ```ts
@@ -270,7 +312,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:344
+Defined in: packages/memory/src/tiers/procedural-memory.ts:421
 
 Promote a quarantined (induced) procedure into `activate()` (MCON-2).
 Mirrors [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict

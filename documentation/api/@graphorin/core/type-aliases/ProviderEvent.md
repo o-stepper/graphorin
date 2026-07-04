@@ -56,7 +56,7 @@ type ProviderEvent =
 };
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:144
+Defined in: packages/core/src/contracts/provider.ts:170
 
 Streamed provider event. Shape matches the wire-stable subset of the
 provider event union — adapters hide vendor specifics.

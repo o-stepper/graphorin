@@ -7,15 +7,19 @@
 # Function: adaptTokenCounter()
 
 ```ts
-function adaptTokenCounter(counter): ContextTokenCounter;
+function adaptTokenCounter(counter): ContextTokenCounter & Pick<TokenCounter, "count">;
 ```
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:72
+Defined in: packages/memory/src/context-engine/token-counter.ts:76
 
 Wrap a real [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) into the narrower
-[ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface. Calls `countText(text)`
-directly for max precision; falls back to the synthetic
-single-message bridge when only `count(messages)` is supported.
+[ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface — PRESERVING the native
+message-level `count(messages)` (context-engine-03). The adapter
+used to keep only `countText`, which forced
+[countMessageTokens](/api/@graphorin/memory/functions/countMessageTokens.md) onto the per-message render path for
+every real counter; combined with `renderMessageText` ignoring
+tool calls, tool-call arguments contributed zero to every trigger /
+before / after count while the provider billed for them.
 
 ## Parameters
 
@@ -25,6 +29,6 @@ single-message bridge when only `count(messages)` is supported.
 
 ## Returns
 
-[`ContextTokenCounter`](/api/@graphorin/memory/interfaces/ContextTokenCounter.md)
+[`ContextTokenCounter`](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) & `Pick`\&lt;[`TokenCounter`](/api/@graphorin/core/interfaces/TokenCounter.md), `"count"`\&gt;
 
 ## Stable

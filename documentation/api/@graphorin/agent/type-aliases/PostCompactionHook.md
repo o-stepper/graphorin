@@ -10,7 +10,7 @@
 type PostCompactionHook = PostCompactionHook;
 ```
 
-Defined in: packages/agent/src/types.ts:99
+Defined in: packages/agent/src/types.ts:101
 
 Compaction post-hook factory accepted by `createAgent({...})`.
 Re-exported from `@graphorin/memory` here for ergonomic typing.
