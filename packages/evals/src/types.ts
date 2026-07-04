@@ -94,6 +94,18 @@ export interface RegressionOptions {
    * absolute duration gate; leave unset to ignore duration entirely.
    */
   readonly maxAvgDurationIncreaseMs?: number;
+  /**
+   * E8 (evals-05/08): when `true`, a `pass-rate-drop` finding is only kept if
+   * McNemar's paired test over the shared cases rejects "no real change" at
+   * {@link significanceAlpha} - a fixed percentage tolerance is blind to
+   * sample size (a 5pp drop is one case in a 20-case suite). Off by default
+   * so existing gates keep their exact behavior; the computed `pValue` is
+   * attached to the finding either way whenever both reports carry per-case
+   * results.
+   */
+  readonly requireSignificance?: boolean;
+  /** Significance level for {@link requireSignificance}. Default `0.05`. */
+  readonly significanceAlpha?: number;
 }
 
 /**
@@ -114,4 +126,10 @@ export interface RegressionFinding {
   readonly scorer?: string;
   readonly message: string;
   readonly delta: number;
+  /**
+   * Two-sided McNemar p-value over the cases shared by both reports
+   * (E8; only on `pass-rate-drop` findings, and only when both reports
+   * carry per-case results to pair on).
+   */
+  readonly pValue?: number;
 }

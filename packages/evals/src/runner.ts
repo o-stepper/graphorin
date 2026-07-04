@@ -15,6 +15,7 @@
  * @packageDocumentation
  */
 
+import { passHatK, wilsonInterval } from './stats.js';
 import type { Case, EvalCaseResult, EvalReport, RunOptions, ScoreResult, Scorer } from './types.js';
 
 /**
@@ -195,6 +196,14 @@ function summarize<I, O>(
       avgScore: b.scoreCount === 0 ? null : b.scoreSum / b.scoreCount,
     };
   }
+  // E8 (evals-05): a bare pass count over a small suite communicates false
+  // precision - attach the 95% Wilson interval, and under `iterations > 1`
+  // the pass^k stability metric (mean pass rate hides a flaky case).
+  const outcomes = results.map((r) => ({
+    caseId: r.caseId,
+    pass: r.scores.every((s) => s.result.pass),
+  }));
+  const stability = passHatK(outcomes);
   return {
     results,
     summary: {
@@ -203,6 +212,8 @@ function summarize<I, O>(
       failed,
       avgDurationMs: total === 0 ? 0 : durationSum / total,
       byScorer: Object.freeze(summaryByScorer),
+      passRateCi: wilsonInterval(passed, total),
+      ...(stability.k > 1 ? { passHatK: stability } : {}),
     },
   };
 }

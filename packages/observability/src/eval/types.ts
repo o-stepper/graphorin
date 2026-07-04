@@ -86,6 +86,21 @@ export interface EvalReport<I, O> {
         { readonly passed: number; readonly failed: number; readonly avgScore: number | null }
       >
     >;
+    /**
+     * 95% Wilson score interval on the overall pass rate (E8 / evals-05).
+     * Always present on reports produced by `runEvals`; optional so older
+     * persisted reports keep parsing.
+     */
+    readonly passRateCi?: { readonly lo: number; readonly hi: number };
+    /**
+     * pass^k stability metric - fraction of base cases whose EVERY repeat
+     * iteration passed. Present only when the run used `iterations > 1`.
+     */
+    readonly passHatK?: {
+      readonly k: number;
+      readonly baseCases: number;
+      readonly value: number;
+    };
   };
   /**
    * `true` when the run was cut short by an aborted signal — `results` and

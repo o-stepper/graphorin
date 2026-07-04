@@ -38,7 +38,14 @@ export function listMissingModels(
 ): ReadonlyArray<MissingModelEntry> {
   const seen = new Map<string, MissingModelEntry & { count: number }>();
   for (const span of spans) {
-    const provider = stringAttr(span, ['gen_ai.system', 'graphorin.provider.id']);
+    // E8: `gen_ai.provider.name` is the current OTel GenAI attribute (what
+    // withTracing emits); `gen_ai.system` is its deprecated predecessor kept
+    // for older recorded traces.
+    const provider = stringAttr(span, [
+      'gen_ai.provider.name',
+      'gen_ai.system',
+      'graphorin.provider.id',
+    ]);
     const model = stringAttr(span, [
       'gen_ai.request.model',
       'gen_ai.response.model',

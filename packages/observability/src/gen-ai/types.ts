@@ -49,6 +49,10 @@ export type GenAIToolType =
  * @stable
  */
 export type GenAIOperationName =
+  // E8: `invoke_agent` is the canonical OTel GenAI agent operation and what
+  // the runtime emits; the legacy `agent.run`/`agent.step` members remain for
+  // compatibility with older recorded traces.
+  | 'invoke_agent'
   | 'agent.run'
   | 'agent.step'
   | 'agent.handoff'
