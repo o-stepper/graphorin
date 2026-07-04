@@ -83,4 +83,111 @@ describe('@graphorin/no-implicit-network-call', () => {
     });
     expect(messages).toEqual([]);
   });
+
+  // EB-10 parity: the rule must stay in lockstep with
+  // scripts/check-no-network.mjs, which also catches undici/got calls,
+  // raw sockets, WebSocket/EventSource, and HTTP-client imports.
+  it('flags undici.request / got.get namespace calls', () => {
+    const messages = lintSource({
+      source: `
+        await undici.request('https://example.com');
+        await got.get('https://example.com');
+        await undici.stream('https://example.com');
+      `,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(messages.length).toBe(3);
+    expect(messages.every((m) => m.messageId === 'forbidden')).toBe(true);
+  });
+
+  it('flags raw socket primitives (net/tls/dgram)', () => {
+    const messages = lintSource({
+      source: `
+        const a = net.createConnection({ port: 80 });
+        const b = net.connect(80, 'example.com');
+        const c = tls.connect({ port: 443 });
+        const d = dgram.createSocket('udp4');
+      `,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(messages.length).toBe(4);
+  });
+
+  it('flags new WebSocket() and new EventSource()', () => {
+    const messages = lintSource({
+      source: `
+        const ws = new WebSocket('wss://example.com');
+        const es = new EventSource('https://example.com/stream');
+      `,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(messages.length).toBe(2);
+    expect(messages.every((m) => m.messageId === 'forbidden')).toBe(true);
+  });
+
+  it('flags static, dynamic, and require() imports of HTTP clients', () => {
+    const staticImport = lintSource({
+      source: `import { request } from 'undici';`,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(staticImport).toHaveLength(1);
+    expect(staticImport[0]?.messageId).toBe('forbiddenImport');
+
+    const dynamicImport = lintSource({
+      source: `const got = await import('got');`,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(dynamicImport).toHaveLength(1);
+    expect(dynamicImport[0]?.messageId).toBe('forbiddenImport');
+
+    const required = lintSource({
+      source: `const ky = require('ky');`,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(required).toHaveLength(1);
+    expect(required[0]?.messageId).toBe('forbiddenImport');
+  });
+
+  it('honours the opt-out comment on imports and does not flag benign imports', () => {
+    const allowed = lintSource({
+      source: `
+        // graphorin-allow-network: MCP websocket transport; user-configured endpoint
+        import WebSocket from 'ws';
+      `,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(allowed).toEqual([]);
+
+    const benign = lintSource({
+      source: `
+        import { readFile } from 'node:fs/promises';
+        const path = await import('node:path');
+        const util = require('node:util');
+      `,
+      rule: 'no-implicit-network-call',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(benign).toEqual([]);
+  });
+
+  it('does NOT flag the new shapes in non-framework consumer code', () => {
+    const messages = lintSource({
+      source: `
+        import { request } from 'undici';
+        const ws = new WebSocket('wss://example.com');
+        await got.get('https://example.com');
+        const sock = net.createConnection({ port: 80 });
+      `,
+      rule: 'no-implicit-network-call',
+      filename: APP_PATH,
+    });
+    expect(messages).toEqual([]);
+  });
 });
