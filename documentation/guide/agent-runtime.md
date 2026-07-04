@@ -384,6 +384,20 @@ const result = await agent.fanOut({
 
 `evaluatorOptimizer({...})` is a Generator → Evaluator iteration loop with three rubric kinds (`'free-form'`, `'zod'`, `'llm-judge'`) and a required iteration cap.
 
+## Structured plan & attention recitation (D6)
+
+`createAgent({ plan: true })` registers the `update_plan` tool (TodoWrite-style: a full-replace checklist of `{ id, content, status }` items) and turns on **attention recitation**. The plan is journaled in `RunState.todos` so it survives suspend/resume, and each step re-renders it into a compact `<plan>` block appended near the END of the request messages:
+
+```
+<plan reminder="stay on task; keep one item in progress">
+[x] gather sources
+[~] write the summary
+[ ] cite the evidence
+</plan>
+```
+
+Recitation combats lost-in-the-middle drift on long runs (Manus todo.md evidence). It is **request-only and cache-layout-aware**: the block is appended to the per-step request copy (alongside the structured-output instruction), never to the shared message buffer or the persisted `RunState`, so it rides the last prompt-cache anchor and leaves the stable prefix untouched. Off by default; the tool surface is unchanged unless `plan: true` is set.
+
 ## Progress artifacts
 
 `agent.progress.write(content, { role, seq, sensitivity, tags })` and `agent.progress.read({ runId, role, sinceSeq, maxArtifacts })` persist UTF-8 text artifacts to the artifact root via atomic-write `.tmp + rename` discipline so cross-session continuity holds even on hard crashes.

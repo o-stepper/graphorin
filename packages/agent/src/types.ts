@@ -347,6 +347,13 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * the preset is designed to prevent. See `@graphorin/security/policy`.
    */
   readonly ruleOfTwo?: RuleOfTwoProfile;
+  /**
+   * Register the D6 structured plan tool (`update_plan`, TodoWrite-style)
+   * and recite the plan back into each step's prompt (attention
+   * recitation). The plan is journaled in `RunState.todos` and survives
+   * resume. Default `false` — off keeps the tool surface unchanged.
+   */
+  readonly plan?: boolean;
   readonly sessionId?: string;
   readonly userId?: string;
   readonly deps?: TDeps;

@@ -116,6 +116,7 @@ import {
 } from './tooling/adapters.js';
 import { orderPromotedTools } from './tooling/catalogue.js';
 import { buildDataFlowGuard } from './tooling/dataflow.js';
+import { createPlanTool, PLAN_TOOL_NAME, renderPlanRecitation } from './tooling/plan.js';
 import { buildToolArgumentPolicy } from './tooling/policy.js';
 import { buildToolRegistry } from './tooling/registry-build.js';
 import type {
@@ -825,6 +826,30 @@ function countLeadingSystemMessages(messages: ReadonlyArray<Message>): number {
  * legs, core-provider-02) appear in the result only when at least one
  * side carries them, so pre-cache serialized shapes stay byte-identical.
  */
+/**
+ * D6: assemble the per-step request messages. Trailing, request-only
+ * additions ride the LAST prompt-cache anchor and never touch the shared
+ * `messages` buffer or the persisted RunState: the structured-output
+ * instruction (AG-3) and the attention-recitation plan block are both
+ * appended here, in that order, so the stable prompt prefix is unchanged
+ * and only the small trailing tail is re-sent each step.
+ */
+function buildStepMessages(
+  messages: ReadonlyArray<Message>,
+  structuredInstruction: string | undefined,
+  todos: ReadonlyArray<import('@graphorin/core').TodoItem> | undefined,
+): Message[] {
+  const out: Message[] = [...messages];
+  if (structuredInstruction !== undefined) {
+    out.push({ role: 'system', content: structuredInstruction });
+  }
+  const recitation = renderPlanRecitation(todos);
+  if (recitation !== null) {
+    out.push({ role: 'system', content: recitation });
+  }
+  return out;
+}
+
 function addUsage(a: Usage, b: Usage): Usage {
   const optional = (x: number | undefined, y: number | undefined): number | undefined =>
     x === undefined && y === undefined ? undefined : (x ?? 0) + (y ?? 0);
@@ -1004,6 +1029,21 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     toolRegistry,
     config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
   );
+
+  // D6: opt-in structured plan tool (TodoWrite-style, journaled). It
+  // mutates the ACTIVE run's todos through a closure; attention
+  // recitation renders them back into each step's request copy.
+  if (config.plan === true && toolRegistry.get(PLAN_TOOL_NAME) === undefined) {
+    toolRegistry.register(
+      createPlanTool((todos) => {
+        if (activeRunState !== undefined) {
+          (activeRunState as { todos?: ReadonlyArray<import('@graphorin/core').TodoItem> }).todos =
+            todos;
+        }
+      }) as unknown as Parameters<typeof toolRegistry.register>[0],
+      { kind: 'built-in', subsystem: 'planning' },
+    );
+  }
 
   // WI-10 (result references / handles / P1-4): construct one spill
   // writer + reader pair at warm-up. The writer is handed to the executor
@@ -2229,10 +2269,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           // in the request copy — never in the shared buffer or the
           // persisted RunState. Adapters with native structured output
           // additionally receive `outputType` below (PS-24 consumes it).
-          messages:
-            structuredInstruction === undefined
-              ? messages
-              : [...messages, { role: 'system' as const, content: structuredInstruction }],
+          messages: buildStepMessages(messages, structuredInstruction, activeRunState?.todos),
           ...(config.outputType !== undefined
             ? {
                 outputType: {
@@ -2369,10 +2406,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
               if (shrank) {
                 requestForStep = {
                   ...baseRequest,
-                  messages:
-                    structuredInstruction === undefined
-                      ? messages
-                      : [...messages, { role: 'system' as const, content: structuredInstruction }],
+                  messages: buildStepMessages(
+                    messages,
+                    structuredInstruction,
+                    activeRunState?.todos,
+                  ),
                 };
                 chainIdx -= 1; // negate the loop increment: retry this candidate
                 continue;
