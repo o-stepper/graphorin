@@ -265,10 +265,72 @@ export class SqliteSessionStore implements SessionStoreExt {
 
   /** Cascade-delete one session's rows. Caller owns the transaction. */
   #deleteSessionCascade(sessionId: string): void {
+    this.#purgeSessionContent(sessionId);
     this.#conn.run('DELETE FROM session_handoffs WHERE session_id = ?', [sessionId]);
     this.#conn.run('DELETE FROM session_workflow_runs WHERE session_id = ?', [sessionId]);
     this.#conn.run('DELETE FROM session_audit WHERE session_id = ?', [sessionId]);
     this.#conn.run('DELETE FROM sessions WHERE id = ?', [sessionId]);
+  }
+
+  /**
+   * store-01: a hard-delete must remove the CONTENT, not just the registry
+   * rows. Pre-fix, nothing anywhere deleted `session_messages` (nor its
+   * FTS/vec index rows), so a "deleted" conversation stayed permanently
+   * searchable via `memory.session.list/search` — misleading for a
+   * privacy-positioned framework and a GDPR hazard for the RP-6 retention
+   * sweep. Episodes scoped to the session are purged for the same reason:
+   * they quote the session's content. Caller owns the transaction.
+   */
+  #purgeSessionContent(sessionId: string): void {
+    // Index rows first (they key off the base rows' rowid / id). The vec0
+    // deletes mirror the proven per-id pattern of the fact `purge()` path —
+    // sqlite-vec virtual tables handle `WHERE <id_col> = ?` reliably.
+    this.#conn.run(
+      `DELETE FROM session_messages_fts WHERE rowid IN
+         (SELECT rowid FROM session_messages WHERE scope_session_id = ?)`,
+      [sessionId],
+    );
+    const messageVecTables = this.#contentVecTables('session_messages_vec_');
+    if (messageVecTables.length > 0) {
+      const messageIds = this.#conn
+        .all<{ id: string }>('SELECT id FROM session_messages WHERE scope_session_id = ?', [
+          sessionId,
+        ])
+        .map((r) => r.id);
+      for (const table of messageVecTables) {
+        for (const id of messageIds) {
+          this.#conn.run(`DELETE FROM ${table} WHERE message_id = ?`, [id]);
+        }
+      }
+    }
+    this.#conn.run('DELETE FROM session_messages WHERE scope_session_id = ?', [sessionId]);
+
+    this.#conn.run(
+      `DELETE FROM episodes_fts WHERE rowid IN
+         (SELECT rowid FROM episodes WHERE scope_session_id = ?)`,
+      [sessionId],
+    );
+    const episodeVecTables = this.#contentVecTables('episodes_vec_');
+    if (episodeVecTables.length > 0) {
+      const episodeIds = this.#conn
+        .all<{ id: string }>('SELECT id FROM episodes WHERE scope_session_id = ?', [sessionId])
+        .map((r) => r.id);
+      for (const table of episodeVecTables) {
+        for (const id of episodeIds) {
+          this.#conn.run(`DELETE FROM ${table} WHERE episode_id = ?`, [id]);
+        }
+      }
+    }
+    this.#conn.run('DELETE FROM episodes WHERE scope_session_id = ?', [sessionId]);
+  }
+
+  /** Discover per-embedder vec0 tables by prefix, identifier-validated. */
+  #contentVecTables(prefix: 'session_messages_vec_' | 'episodes_vec_'): string[] {
+    const rows = this.#conn.all<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE ? ESCAPE '\\'",
+      [`${prefix.replace(/_/g, '\\_')}%`],
+    );
+    return rows.map((r) => r.name).filter((name) => /^[A-Za-z0-9_]+$/.test(name));
   }
 }
 

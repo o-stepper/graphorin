@@ -135,9 +135,11 @@ export interface SessionStoreExt extends SessionStore {
   pruneAuditEntries(beforeEpochMs: number): Promise<number>;
   /**
    * Hard-delete a session and cascade its session-owned rows — handoffs,
-   * workflow-run attachments, and audit entries (RP-6). Message rows live in
-   * the `SessionMemoryStore` and are purged separately. A no-op for an unknown
-   * id.
+   * workflow-run attachments, and audit entries (RP-6) — **plus the
+   * session's content**: its `session_messages` rows (with their FTS and
+   * vector index entries) and any episodes scoped to the session
+   * (store-01). After this call the conversation is no longer retrievable
+   * through `memory.session.*` search surfaces. A no-op for an unknown id.
    */
   deleteSession(sessionId: string): Promise<void>;
   /**

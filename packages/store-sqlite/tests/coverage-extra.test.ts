@@ -191,11 +191,42 @@ describe('extra coverage', () => {
     });
     expect((await store.sessions.listHandoffs('del-1')).length).toBe(1);
 
+    // store-01: the session's CONTENT must die with the session — the
+    // pre-fix cascade left `session_messages` (and its FTS rows) plus
+    // session-scoped episodes permanently searchable after a hard-delete.
+    const contentScope = { userId: 'u1', sessionId: 'del-1' };
+    await store.memory.session.push(contentScope, {
+      role: 'user',
+      content: 'my bank PIN is nine nine two four',
+    });
+    await store.memory.episodic.put({
+      id: 'ep-del-1',
+      kind: 'episodic',
+      userId: 'u1',
+      sessionId: 'del-1',
+      summary: 'User shared their bank PIN during onboarding.',
+      startedAt: t,
+      endedAt: t,
+      sensitivity: 'internal',
+      createdAt: t,
+    });
+    expect((await store.memory.session.search(contentScope, 'bank')).length).toBe(1);
+    expect((await store.memory.episodic.search({ userId: 'u1' }, { query: 'bank' })).length).toBe(
+      1,
+    );
+
     await store.sessions.deleteSession('del-1');
     expect(await store.sessions.getSession('del-1')).toBeNull();
     expect((await store.sessions.listHandoffs('del-1')).length).toBe(0);
     expect((await store.sessions.listWorkflowRuns('del-1')).length).toBe(0);
     expect((await store.sessions.listAuditEntries('del-1')).length).toBe(0);
+    // Content is gone: rows, FTS hits, and the session-scoped episode.
+    expect((await store.memory.session.list(contentScope)).length).toBe(0);
+    expect((await store.memory.session.search(contentScope, 'bank')).length).toBe(0);
+    expect(await store.memory.episodic.get('ep-del-1')).toBeNull();
+    expect((await store.memory.episodic.search({ userId: 'u1' }, { query: 'bank' })).length).toBe(
+      0,
+    );
 
     // Retention sweep: closed session swept, open one kept.
     await store.sessions.createSession({ id: 'open-1', userId: 'u1', agentId: 'a', createdAt: t });
