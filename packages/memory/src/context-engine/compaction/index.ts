@@ -23,6 +23,7 @@ export type { HookDeps, NamedPostCompactionHook } from './hooks/types.js';
 export {
   buildSummarizerPrompt,
   type CompactionMetadataPayload,
+  DEFAULT_SUMMARIZER_DUMP_CHAR_BUDGET,
   type RenderedTemplate,
   renderFinalSummary,
   SUMMARY_TEMPLATE_NAME,

@@ -455,8 +455,27 @@ function lastUserText(messages: ReadonlyArray<Message>): string | undefined {
  * `kind` carried by `@graphorin/provider`'s `GraphorinProviderError` subclasses
  * without importing them, keeping the agent decoupled from the provider package.
  */
+/** Canonical `ProviderErrorKind` values honoured off a thrown error's `errorKind`. */
+const CANONICAL_PROVIDER_ERROR_KINDS: ReadonlySet<string> = new Set([
+  'rate-limit',
+  'capacity',
+  'context-length',
+  'transient',
+  'invalid-request',
+  'unauthorized',
+  'content-filter',
+]);
+
 function classifyThrownProviderErrorKind(cause: unknown): ProviderErrorKind {
-  if (typeof cause === 'object' && cause !== null && 'kind' in cause) {
+  if (typeof cause === 'object' && cause !== null) {
+    // B1: `ProviderHttpError` carries the canonical mapped kind on
+    // `errorKind` (its `kind` stays the stable 'provider-http'
+    // discriminant) — honour it so a thrown 429 / context overflow is
+    // classified like the structured-event equivalent.
+    const errorKind = (cause as { readonly errorKind?: unknown }).errorKind;
+    if (typeof errorKind === 'string' && CANONICAL_PROVIDER_ERROR_KINDS.has(errorKind)) {
+      return errorKind as ProviderErrorKind;
+    }
     switch ((cause as { readonly kind?: unknown }).kind) {
       case 'rate-limit-exceeded':
         return 'rate-limit';
@@ -767,9 +786,27 @@ function stripReasoningFromMessages(messages: Message[]): { stripped: number } {
  * each prior summary inside the compactable body, where the next pass
  * folds it into a fresh summary-of-summary.
  */
+/**
+ * Marker prefix stamped on every compaction summary (see the memory
+ * package's summary template). context-engine-05: the prefix scan must
+ * stop at it — after a compact-then-suspend cycle the summary is a
+ * SYSTEM message sitting right after the true prefix, and counting it
+ * in would pin it (and every later summary) outside the compactable
+ * window forever, growing the uncompactable prefix by one summary per
+ * cycle.
+ */
+const COMPACTION_SUMMARY_MARKER = '<graphorin_compaction_summary';
+
 function countLeadingSystemMessages(messages: ReadonlyArray<Message>): number {
   let i = 0;
-  while (i < messages.length && messages[i]?.role === 'system') i += 1;
+  while (i < messages.length) {
+    const msg = messages[i];
+    if (msg?.role !== 'system') break;
+    if (typeof msg.content === 'string' && msg.content.startsWith(COMPACTION_SUMMARY_MARKER)) {
+      break;
+    }
+    i += 1;
+  }
   return i;
 }
 
@@ -1704,6 +1741,52 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     }
 
     /**
+     * context-engine-06: last-resort tier at hard context overflow. When
+     * a provider rejects the request as over-window, force ONE aggressive
+     * compaction (`preserveRecentTurns: 2`, trigger evaluation bypassed)
+     * and let the caller retry the same provider — the fallback chain's
+     * members usually share the same window, so without this the run just
+     * dies. Returns `true` when the buffer actually shrank (retry is
+     * worthwhile); `false` when memory is not wired, the run is
+     * secret-tier, compaction trimmed nothing, or the engine threw.
+     */
+    async function* tryEmergencyCompact(): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
+      const mem = memory;
+      if (mem === undefined || config.sensitivity === 'secret') return false;
+      const startedAt = Date.now();
+      const envelope = await mem.contextEngine
+        .compactNow({
+          scope: { userId: state.userId ?? agentId, sessionId, agentId },
+          runId: state.id,
+          sessionId,
+          agentId,
+          source: 'auto-trigger',
+          messages: messages.slice(systemPrefixLength),
+          prefixMessages: messages.slice(0, systemPrefixLength),
+          memory: mem,
+          preserveRecentTurns: 2,
+        })
+        .catch(() => undefined);
+      if (envelope === undefined || envelope.result.droppedMessageIndices.length === 0) {
+        return false;
+      }
+      spliceCompacted(envelope);
+      yield {
+        type: 'context.compacted',
+        runId: state.id,
+        sessionId,
+        agentId,
+        beforeTokens: envelope.result.beforeTokens,
+        afterTokens: envelope.result.afterTokens,
+        summaryTokens: envelope.result.summaryTokens,
+        durationMs: Date.now() - startedAt,
+        source: 'auto-trigger',
+        hooksFiredCount: envelope.result.hooksFiredCount,
+      };
+      return true;
+    }
+
+    /**
      * Prefix-pinned splice shared by the auto + manual compaction paths
      * (CE-3): stable system prefix + [summary, ...recent turns], with the
      * post-compaction hooks' text Context Essentials re-anchored as a
@@ -2034,6 +2117,11 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         let lastError: ProviderError | undefined;
         let finalCalls: ToolCall[] = [];
         let stepReasoningParts: ReasoningContent[] = [];
+        // context-engine-06: the request actually sent — rebuilt after an
+        // emergency compaction so the retry carries the shrunk buffer
+        // even on the structured-output path (which snapshots messages).
+        let requestForStep = baseRequest;
+        let emergencyCompactTried = false;
 
         for (let chainIdx = 0; chainIdx < fallbackChain.length; chainIdx++) {
           const candidate = fallbackChain[chainIdx];
@@ -2069,7 +2157,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           let providerCallCompleted = false;
           let providerStepUsage: Usage = zeroUsage();
           try {
-            const stream = providerForStep.stream(baseRequest);
+            const stream = providerForStep.stream(requestForStep);
             for await (const ev of stream) {
               // AG-6 `drain`: the default hard-kills the in-flight provider
               // stream mid-event; `abort({ drain: true })` instead lets the
@@ -2124,6 +2212,25 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           }
           if (providerError !== undefined) {
             lastError = providerError;
+            // context-engine-06: a hard context overflow gets ONE
+            // emergency-compaction retry against the SAME candidate
+            // before the fallback chain (whose members usually share the
+            // window) or a terminal failure.
+            if (providerError.kind === 'context-length' && !emergencyCompactTried) {
+              emergencyCompactTried = true;
+              const shrank = yield* tryEmergencyCompact();
+              if (shrank) {
+                requestForStep = {
+                  ...baseRequest,
+                  messages:
+                    structuredInstruction === undefined
+                      ? messages
+                      : [...messages, { role: 'system' as const, content: structuredInstruction }],
+                };
+                chainIdx -= 1; // negate the loop increment: retry this candidate
+                continue;
+              }
+            }
             const eligibility = isAgentFallbackEligible(providerError, fallbackPolicy);
             if (!eligibility.eligible || chainIdx === fallbackChain.length - 1) {
               yield {

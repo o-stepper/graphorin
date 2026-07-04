@@ -2,9 +2,10 @@ import type { AgentEvent, Message, Tool } from '@graphorin/core';
 import { isStepCount } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
 import { describe, expect, it } from 'vitest';
-import { createAgent } from '../src/index.js';
+import { createAgent, runStateFromJSON } from '../src/index.js';
 import {
   createMockProvider,
+  errorScript,
   type MockProviderScript,
   textOnlyScript,
   toolCallScript,
@@ -56,6 +57,8 @@ interface FakeMemoryHandle {
   readonly compactNowCalls: () => number;
   /** The most recent `compactNow` input (source, preserveRecentTurns, ...). */
   readonly lastCompactNowInput: () => Record<string, unknown> | undefined;
+  /** The most recent `shouldCompact` options (compactableFromIndex, ...). */
+  readonly lastShouldCompactOptions: () => Record<string, unknown> | undefined;
 }
 
 /**
@@ -70,9 +73,14 @@ function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
   let shouldCompactCalls = 0;
   let compactNowCalls = 0;
   let lastCompactNowInput: Record<string, unknown> | undefined;
+  let lastShouldCompactOptions: Record<string, unknown> | undefined;
   const engine = {
-    async shouldCompact(messages: ReadonlyArray<Message>): Promise<boolean> {
+    async shouldCompact(
+      messages: ReadonlyArray<Message>,
+      options?: Record<string, unknown>,
+    ): Promise<boolean> {
       shouldCompactCalls += 1;
+      lastShouldCompactOptions = options;
       return messages.length >= opts.triggerAtMessages;
     },
     async compactNow(input: {
@@ -115,6 +123,7 @@ function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
     shouldCompactCalls: () => shouldCompactCalls,
     compactNowCalls: () => compactNowCalls,
     lastCompactNowInput: () => lastCompactNowInput,
+    lastShouldCompactOptions: () => lastShouldCompactOptions,
   };
 }
 
@@ -645,5 +654,112 @@ describe('TL-10 — run-scoped spill artifacts are cleared when the run ends', (
     const runDir2 = path.join(spillRoot, result2.state.id);
     await expect(fsp.stat(runDir2)).resolves.toBeDefined(); // kept for resume
     await fsp.rm(runDir2, { recursive: true, force: true }).catch(() => {});
+  });
+});
+
+describe('context-engine-05 — a resumed compaction summary stays outside the pinned prefix', () => {
+  it('the prefix scan stops at the summary marker on resume', async () => {
+    const { memory, lastShouldCompactOptions } = makeFakeMemory({
+      triggerAtMessages: 999,
+      preserveRecent: 1,
+    });
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [textOnlyScript('done')],
+    });
+    const agent = createAgent({
+      name: 'prefix-resume',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+    });
+    // A run that compacted, then suspended: on disk the buffer is
+    // [system prompt, system SUMMARY, ...]. Pre-fix the prefix scan
+    // counted the summary INTO the pinned prefix (compactableFromIndex
+    // 2), shielding it from every future compaction — each
+    // compact-then-resume cycle grew the uncompactable prefix by one
+    // summary, exactly the unbounded stacking the engine guards against.
+    const resumed = runStateFromJSON(
+      JSON.stringify({
+        version: 'graphorin-run-state/1.1',
+        id: 'run-prefix',
+        agentId: agent.id,
+        currentAgentId: agent.id,
+        sessionId: 's',
+        status: 'running',
+        steps: [],
+        messages: [
+          { role: 'system', content: 'INSTRUCTIONS' },
+          {
+            role: 'system',
+            content:
+              '<graphorin_compaction_summary>\nprior summary\n</graphorin_compaction_summary>',
+          },
+          { role: 'user', content: 'continue' },
+        ],
+        pendingApprovals: [],
+        handoffs: [],
+        usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+        startedAt: new Date().toISOString(),
+      }),
+    );
+    for await (const _ of agent.stream(resumed)) {
+      // drain
+    }
+    expect(lastShouldCompactOptions()?.compactableFromIndex).toBe(1);
+  });
+});
+
+describe('context-engine-06 — emergency compaction at hard context overflow', () => {
+  it('a context-length provider error triggers ONE forced compaction and a retry that succeeds', async () => {
+    const { memory, compactNowCalls, lastCompactNowInput } = makeFakeMemory({
+      // The auto trigger never fires — only the emergency path compacts.
+      triggerAtMessages: 999,
+      preserveRecent: 0,
+    });
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [errorScript({ kind: 'context-length' }), textOnlyScript('recovered')],
+    });
+    const agent = createAgent({
+      name: 'emergency-compact',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+    });
+    const events: AgentEvent<string>[] = [];
+    for await (const ev of agent.stream('go')) events.push(ev);
+    const end = events.find((e) => e.type === 'agent.end');
+    if (end?.type !== 'agent.end') throw new Error('expected agent.end');
+    // The run RECOVERED instead of dying on the overflow.
+    expect(end.result.status).toBe('completed');
+    expect(end.result.output).toBe('recovered');
+    expect(compactNowCalls()).toBe(1);
+    // Aggressive knobs: emergency preserves only the last 2 turns.
+    expect(lastCompactNowInput()?.preserveRecentTurns).toBe(2);
+    expect(events.some((e) => e.type === 'context.compacted')).toBe(true);
+  });
+
+  it('when compaction cannot shrink the buffer the run still fails cleanly (no retry loop)', async () => {
+    const { memory, compactNowCalls } = makeFakeMemory({
+      triggerAtMessages: 999,
+      // preserveRecent so large nothing is ever dropped — compaction is futile.
+      preserveRecent: 99,
+    });
+    const provider = createMockProvider({
+      modelId: 'mock',
+      scripts: [errorScript({ kind: 'context-length' })],
+    });
+    const agent = createAgent({
+      name: 'emergency-futile',
+      instructions: 'INSTRUCTIONS',
+      provider,
+      memory,
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('failed');
+    expect(result.error?.code).toBe('context-length');
+    // Exactly one compaction attempt — no infinite retry.
+    expect(compactNowCalls()).toBe(1);
   });
 });
