@@ -23,7 +23,7 @@
  * `@graphorin/tools/executor`, `@graphorin/tools/streaming`,
  * `@graphorin/tools/inbound`, `@graphorin/tools/result`,
  * `@graphorin/tools/built-in`, `@graphorin/tools/audit`,
- * `@graphorin/tools/errors`).
+ * `@graphorin/tools/errors`, `@graphorin/tools/schema`).
  *
  * @packageDocumentation
  */
@@ -39,4 +39,5 @@ export * from './executor/index.js';
 export * from './inbound/index.js';
 export * from './registry/index.js';
 export * from './result/index.js';
+export * from './schema/index.js';
 export * from './streaming/index.js';

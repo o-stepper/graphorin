@@ -78,6 +78,7 @@ import {
   createFileResultReader,
   type ResultReader,
 } from '@graphorin/tools/result';
+import { projectSchemaToJsonSchema } from '@graphorin/tools/schema';
 import {
   AgentRuntimeError,
   ConcurrentRunError,
@@ -462,13 +463,34 @@ function classifyThrownProviderErrorKind(cause: unknown): ProviderErrorKind {
   return 'unknown';
 }
 
-/** Resolve a Zod-like schema to a JSON-Schema record (via `toJSON`), else pass an object through. */
-function projectSchema(raw: unknown): Readonly<Record<string, unknown>> | undefined {
-  if (raw === null || raw === undefined) return undefined;
-  const toJson = (raw as { toJSON?: () => unknown }).toJSON;
-  if (typeof toJson === 'function') return toJson.call(raw) as Readonly<Record<string, unknown>>;
-  if (typeof raw === 'object') return raw as Readonly<Record<string, unknown>>;
-  return undefined;
+/** WARN-once keys for schemas the projection cannot read (per process). */
+const unprojectableSchemaWarned = new Set<string>();
+
+/**
+ * Resolve a tool's declared schema — plain Zod (v3/v4), `toJSON()`-bearing,
+ * or already-JSON-Schema data — to a JSON Schema record via the shared
+ * projection (tools-01). Pre-fix this only honoured `toJSON()` and passed
+ * everything else through verbatim, so every plain-Zod tool serialised as
+ * `{"_def":...}` internals on OpenAI-shaped/Ollama/vercel wire bodies.
+ * `undefined` when nothing usable can be projected (caller substitutes a
+ * permissive `{}`), with a WARN so the degradation is never silent.
+ */
+function projectSchema(
+  raw: unknown,
+  toolName: string,
+  slot: 'input' | 'output',
+): Readonly<Record<string, unknown>> | undefined {
+  return projectSchemaToJsonSchema(raw, {
+    onUnsupported: (detail) => {
+      const key = `${toolName}:${slot}:${detail}`;
+      if (unprojectableSchemaWarned.has(key)) return;
+      unprojectableSchemaWarned.add(key);
+      console.warn(
+        `[graphorin/agent] tool '${toolName}' ${slot} schema: '${detail}' cannot be projected ` +
+          'to JSON Schema — that fragment degrades to a permissive {} on the provider wire body.',
+      );
+    },
+  });
 }
 
 function toolToDefinition(tool: Tool): ToolDefinition {
@@ -476,10 +498,10 @@ function toolToDefinition(tool: Tool): ToolDefinition {
     readonly inputSchema?: unknown;
     readonly outputSchema?: unknown;
   };
-  const inputSchema = projectSchema(ts.inputSchema) ?? {};
+  const inputSchema = projectSchema(ts.inputSchema, tool.name, 'input') ?? {};
   // A5: project the output schema so structured-output providers + typed
   // code-mode see the tool's result shape.
-  const outputSchema = projectSchema(ts.outputSchema);
+  const outputSchema = projectSchema(ts.outputSchema, tool.name, 'output');
   const examples = renderToolExamples(tool);
   return {
     name: tool.name,

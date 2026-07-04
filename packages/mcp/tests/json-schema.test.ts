@@ -96,4 +96,26 @@ describe('buildJsonSchemaValidator', () => {
     expect(buildJsonSchemaValidator(true).safeParse('anything').success).toBe(true);
     expect(buildJsonSchemaValidator(false).safeParse('anything').success).toBe(false);
   });
+
+  it('retains the source JSON Schema and exposes it via toJSON() (tools-01)', () => {
+    const source = {
+      type: 'object',
+      properties: { query: { type: 'string' } },
+      required: ['query'],
+    } as const;
+    const validator = buildJsonSchemaValidator(source) as {
+      toJSON?: () => Record<string, unknown>;
+    };
+    // toolToDefinition serialises tool schemas via toJSON(); without this
+    // every MCP tool advertised `{}` (no parameters) on the provider body.
+    expect(typeof validator.toJSON).toBe('function');
+    expect(validator.toJSON?.()).toBe(source);
+    expect(JSON.stringify(validator)).toContain('"query"');
+
+    // Boolean schemas normalise to record equivalents.
+    const yes = buildJsonSchemaValidator(true) as { toJSON?: () => Record<string, unknown> };
+    const no = buildJsonSchemaValidator(false) as { toJSON?: () => Record<string, unknown> };
+    expect(yes.toJSON?.()).toEqual({});
+    expect(no.toJSON?.()).toEqual({ not: {} });
+  });
 });

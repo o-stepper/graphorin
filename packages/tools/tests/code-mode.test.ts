@@ -1,5 +1,6 @@
 import type { ToolExecutionContext } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 import {
   type CodeExecuteBridge,
   createCodeExecuteTool,
@@ -50,7 +51,27 @@ describe('projectToolApi', () => {
     ]);
     const sig = projection.signatureFor('weird.name');
     expect(sig).toContain('tools["weird.name"]'); // dotted name → bracket form
-    expect(sig).toContain('input: unknown'); // no JSON Schema → unknown
+    expect(sig).toContain('input: unknown'); // unreadable validator → unknown
+  });
+
+  it('renders a typed signature from a plain Zod schema (tools-01)', () => {
+    // The documented way to declare a tool — no hand-written toJSON().
+    const projection = projectToolApi([
+      {
+        name: 'search_orders',
+        description: 'Search orders.',
+        inputSchema: z.object({
+          query: z.string(),
+          limit: z.number().int().optional(),
+        }),
+        outputSchema: z.object({ ids: z.array(z.string()) }),
+      },
+    ]);
+    const sig = projection.signatureFor('search_orders');
+    expect(sig).toContain('"query": string');
+    expect(sig).toContain('"limit"?: number');
+    expect(sig).toContain('Promise<{ "ids": string[] }>');
+    expect(sig).not.toContain('input: unknown');
   });
 
   it('search() matches name or description (case-insensitive)', () => {
