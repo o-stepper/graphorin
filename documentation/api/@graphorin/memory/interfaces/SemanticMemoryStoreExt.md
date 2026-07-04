@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:99
+Defined in: packages/memory/src/internal/storage-adapter.ts:101
 
 Extension of the typed `SemanticMemoryStore` with optional
 embedding-aware helpers + lifecycle helpers that storage adapters
@@ -26,7 +26,7 @@ may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:133
+Defined in: packages/memory/src/internal/storage-adapter.ts:145
 
 Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
 the default recall filters (live, non-archived, non-quarantined), never
@@ -75,7 +75,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:90
 optional get(id): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:118
+Defined in: packages/memory/src/internal/storage-adapter.ts:130
 
 Lookup a single fact by id (returns `null` when absent or soft-deleted).
 
@@ -97,7 +97,7 @@ Lookup a single fact by id (returns `null` when absent or soft-deleted).
 optional historyOf(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:149
+Defined in: packages/memory/src/internal/storage-adapter.ts:161
 
 Walk the bi-temporal supersede chain that `factId` belongs to and
 return every fact in it, oldest → newest (by `validFrom`),
@@ -126,7 +126,7 @@ cycle-safe; returns `[]` for an unknown id. Powers
 optional purge(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:139
+Defined in: packages/memory/src/internal/storage-adapter.ts:151
 
 Hard-delete a fact (GDPR path). The audit log row is preserved
 but the row itself + every per-embedder vec0 entry is removed.
@@ -175,7 +175,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:87
 optional rememberWithEmbedding(fact, options): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:100
+Defined in: packages/memory/src/internal/storage-adapter.ts:102
 
 #### Parameters
 
@@ -224,10 +224,12 @@ optional searchVector(
    embedderId, 
    topK, 
    asOf?, 
-includeQuarantined?): Promise<readonly MemoryHit<Fact>[]>;
+   includeQuarantined?, 
+   includeSuperseded?, 
+owner?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:101
+Defined in: packages/memory/src/internal/storage-adapter.ts:103
 
 #### Parameters
 
@@ -239,6 +241,8 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:101
 | `topK` | `number` | - |
 | `asOf?` | `string` | Point-in-time filter applied after KNN: only facts whose validity interval contains `asOf` (ISO-8601) survive. P0-2. |
 | `includeQuarantined?` | `boolean` | Include quarantined facts in the KNN result (validation / inspector path). Default reads exclude them. P1-4. |
+| `includeSuperseded?` | `boolean` | Include superseded / validity-expired facts. Default reads evaluate validity at NOW (memory-retrieval-01). |
+| `owner?` | \| [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md) \| readonly [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md)[] | Retrieval-time principal filter (D3). Rows with no stored owner are treated as `'user'`. Absent ⇒ no owner filter. |
 
 #### Returns
 
@@ -255,7 +259,7 @@ optional setStatus(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:127
+Defined in: packages/memory/src/internal/storage-adapter.ts:139
 
 Set a fact's retrieval-trust `status` and write a `memory_history`
 audit row (P1-4). Promotes a quarantined fact to `active` (the

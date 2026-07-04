@@ -6,7 +6,7 @@
 
 # Interface: DataFlowRecordInput
 
-Defined in: packages/tools/src/executor/executor.ts:218
+Defined in: packages/tools/src/executor/executor.ts:246
 
 Input to [DataFlowGuard.record](/api/@graphorin/tools/interfaces/DataFlowGuard.md#record).
 
@@ -14,9 +14,13 @@ Input to [DataFlowGuard.record](/api/@graphorin/tools/interfaces/DataFlowGuard.m
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-outputtext"></a> `outputText` | `readonly` | `string` | The (sanitized) output text the model will see. | packages/tools/src/executor/executor.ts:224 |
-| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | packages/tools/src/executor/executor.ts:225 |
-| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/tools/src/executor/executor.ts:221 |
-| <a id="property-source"></a> `source?` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | packages/tools/src/executor/executor.ts:222 |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | - | packages/tools/src/executor/executor.ts:219 |
-| <a id="property-trustclass"></a> `trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - | packages/tools/src/executor/executor.ts:220 |
+| <a id="property-outputtext"></a> `outputText` | `readonly` | `string` | The (sanitized) output text the model will see. | packages/tools/src/executor/executor.ts:262 |
+| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md) | - | packages/tools/src/executor/executor.ts:263 |
+| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | - | packages/tools/src/executor/executor.ts:259 |
+| <a id="property-source"></a> `source?` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | packages/tools/src/executor/executor.ts:260 |
+| <a id="property-taintoverride"></a> `taintOverride?` | `readonly` | \{ `sensitive?`: `boolean`; `sourceKind?`: `string`; `untrusted?`: `boolean`; \} | C6: per-result taint override from the tool's ToolReturn envelope. Flags only ever WIDEN the derived label (guards must never let an override downgrade an untrusted tool's output). | packages/tools/src/executor/executor.ts:254 |
+| `taintOverride.sensitive?` | `readonly` | `boolean` | - | packages/tools/src/executor/executor.ts:256 |
+| `taintOverride.sourceKind?` | `readonly` | `string` | - | packages/tools/src/executor/executor.ts:257 |
+| `taintOverride.untrusted?` | `readonly` | `boolean` | - | packages/tools/src/executor/executor.ts:255 |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | - | packages/tools/src/executor/executor.ts:247 |
+| <a id="property-trustclass"></a> `trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - | packages/tools/src/executor/executor.ts:248 |

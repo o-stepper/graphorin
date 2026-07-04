@@ -6,7 +6,7 @@
 
 # Interface: MCPCallToolResult
 
-Defined in: packages/mcp/src/client/types.ts:275
+Defined in: packages/mcp/src/client/types.ts:297
 
 Tool result envelope returned by `callTool(...)`.
 
@@ -14,6 +14,6 @@ Tool result envelope returned by `callTool(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | readonly [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md)[] | packages/mcp/src/client/types.ts:276 |
-| <a id="property-iserror"></a> `isError?` | `readonly` | `boolean` | packages/mcp/src/client/types.ts:278 |
-| <a id="property-structuredcontent"></a> `structuredContent?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/mcp/src/client/types.ts:277 |
+| <a id="property-content"></a> `content` | `readonly` | readonly [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md)[] | packages/mcp/src/client/types.ts:298 |
+| <a id="property-iserror"></a> `isError?` | `readonly` | `boolean` | packages/mcp/src/client/types.ts:300 |
+| <a id="property-structuredcontent"></a> `structuredContent?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/mcp/src/client/types.ts:299 |

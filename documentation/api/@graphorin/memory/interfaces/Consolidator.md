@@ -6,7 +6,7 @@
 
 # Interface: Consolidator
 
-Defined in: packages/memory/src/consolidator/runtime.ts:65
+Defined in: packages/memory/src/consolidator/runtime.ts:74
 
 Consolidator runtime surface returned by [createConsolidator](/api/@graphorin/memory/functions/createConsolidator.md).
 Compatible with the placeholder shape so the facade can swap the
@@ -22,7 +22,7 @@ implementation without breaking consumers.
 config(): ConsolidatorConfig;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:90
+Defined in: packages/memory/src/consolidator/runtime.ts:99
 
 Active config — frozen snapshot.
 
@@ -38,7 +38,7 @@ Active config — frozen snapshot.
 drainDlq(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:103
+Defined in: packages/memory/src/consolidator/runtime.ts:112
 
 Drain DLQ rows whose `nextRetryAt` <= now.
 
@@ -62,7 +62,7 @@ fireNow(phase, scope?): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:74
+Defined in: packages/memory/src/consolidator/runtime.ts:83
 
 Manual trigger for the requested phase. Skips phase gating + the
 idle/cron scheduler so admins can flush the queue on demand.
@@ -88,7 +88,7 @@ idle/cron scheduler so admins can flush the queue on demand.
 isFree(): boolean;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:101
+Defined in: packages/memory/src/consolidator/runtime.ts:110
 
 True when `tier === 'free'`.
 
@@ -104,7 +104,7 @@ True when `tier === 'free'`.
 onPhaseFinished(listener): () => void;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:82
+Defined in: packages/memory/src/consolidator/runtime.ts:91
 
 Subscribe to phase-finished notifications. Returns an unsubscribe.
 
@@ -126,7 +126,7 @@ Subscribe to phase-finished notifications. Returns an unsubscribe.
 pause(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:78
+Defined in: packages/memory/src/consolidator/runtime.ts:87
 
 Pause the consolidator until the next budget reset.
 
@@ -142,7 +142,7 @@ Pause the consolidator until the next budget reset.
 recordExternalSpend(tokens, costUsd?): void;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:88
+Defined in: packages/memory/src/consolidator/runtime.ts:97
 
 Record memory-pipeline LLM spend that happened OUTSIDE a phase run
 (MCON-15 — e.g. workflow induction) so the daily ceilings cover it.
@@ -167,7 +167,7 @@ Counted under the deep-phase bucket.
 registerWithScheduler(scheduler): Promise<RegisterTriggersResult>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:99
+Defined in: packages/memory/src/consolidator/runtime.ts:108
 
 Register this consolidator's cron / idle triggers with a
 `@graphorin/triggers` scheduler so they fire `trigger(...)`
@@ -194,7 +194,7 @@ this in `beforeStart`.
 resume(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:80
+Defined in: packages/memory/src/consolidator/runtime.ts:89
 
 Resume after `pause()`.
 
@@ -210,7 +210,7 @@ Resume after `pause()`.
 setTier(tier): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:76
+Defined in: packages/memory/src/consolidator/runtime.ts:85
 
 Replace the active tier — recomputes ceilings + phase set.
 
@@ -232,7 +232,7 @@ Replace the active tier — recomputes ceilings + phase set.
 start(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:66
+Defined in: packages/memory/src/consolidator/runtime.ts:75
 
 #### Returns
 
@@ -246,7 +246,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:66
 status(): Promise<ConsolidatorStatus>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:69
+Defined in: packages/memory/src/consolidator/runtime.ts:78
 
 #### Returns
 
@@ -260,7 +260,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:69
 stop(): Promise<void>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:67
+Defined in: packages/memory/src/consolidator/runtime.ts:76
 
 #### Returns
 
@@ -276,7 +276,7 @@ trigger(reason, scope): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:68
+Defined in: packages/memory/src/consolidator/runtime.ts:77
 
 #### Parameters
 

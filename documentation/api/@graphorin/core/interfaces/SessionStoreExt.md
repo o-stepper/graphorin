@@ -172,12 +172,14 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 deleteSession(sessionId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:142
+Defined in: packages/core/src/contracts/session-store.ts:144
 
 Hard-delete a session and cascade its session-owned rows — handoffs,
-workflow-run attachments, and audit entries (RP-6). Message rows live in
-the `SessionMemoryStore` and are purged separately. A no-op for an unknown
-id.
+workflow-run attachments, and audit entries (RP-6) — **plus the
+session's content**: its `session_messages` rows (with their FTS and
+vector index entries) and any episodes scoped to the session
+(store-01). After this call the conversation is no longer retrievable
+through `memory.session.*` search surfaces. A no-op for an unknown id.
 
 #### Parameters
 
@@ -359,7 +361,7 @@ Delete audit rows older than the supplied epoch ms.
 pruneSessions(opts): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:149
+Defined in: packages/core/src/contracts/session-store.ts:151
 
 Retention sweep (RP-6): hard-delete (cascade) every session matching the
 policy. `beforeEpochMs` limits to sessions created before that instant;

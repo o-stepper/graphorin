@@ -6,7 +6,7 @@
 
 # Interface: WorkflowSuspendedEvent\&lt;TState\&gt;
 
-Defined in: packages/core/src/types/workflow-event.ts:85
+Defined in: packages/core/src/types/workflow-event.ts:92
 
 Workflow paused — for HITL approvals or programmatic `pause(value)`
 calls. Carries the value passed to `pause(...)` so the caller can
@@ -24,8 +24,8 @@ choose how to surface the prompt to the user.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/src/types/workflow-event.ts:89 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/workflow-event.ts:88 |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:87 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.suspended"` | packages/core/src/types/workflow-event.ts:86 |
-| <a id="property-value"></a> `value` | `readonly` | `unknown` | packages/core/src/types/workflow-event.ts:90 |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/src/types/workflow-event.ts:96 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/workflow-event.ts:95 |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:94 |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.suspended"` | packages/core/src/types/workflow-event.ts:93 |
+| <a id="property-value"></a> `value` | `readonly` | `unknown` | packages/core/src/types/workflow-event.ts:97 |

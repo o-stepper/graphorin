@@ -6,7 +6,7 @@
 
 # Class: AnthropicAPICounter
 
-Defined in: packages/provider/src/counters/anthropic.ts:38
+Defined in: packages/provider/src/counters/anthropic.ts:44
 
 Counter that talks to `POST /v1/messages/count_tokens` when an API
 key is configured. Without an API key, the counter delegates to
@@ -27,7 +27,7 @@ proxy for Anthropic's tokenizer.
 new AnthropicAPICounter(options): AnthropicAPICounter;
 ```
 
-Defined in: packages/provider/src/counters/anthropic.ts:47
+Defined in: packages/provider/src/counters/anthropic.ts:55
 
 #### Parameters
 
@@ -43,8 +43,8 @@ Defined in: packages/provider/src/counters/anthropic.ts:47
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/anthropic.ts:39 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/anthropic.ts:40 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/anthropic.ts:45 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/anthropic.ts:46 |
 
 ## Methods
 
@@ -54,7 +54,7 @@ Defined in: packages/provider/src/counters/anthropic.ts:47
 count(messages): Promise<number>;
 ```
 
-Defined in: packages/provider/src/counters/anthropic.ts:57
+Defined in: packages/provider/src/counters/anthropic.ts:66
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -80,7 +80,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: packages/provider/src/counters/anthropic.ts:78
+Defined in: packages/provider/src/counters/anthropic.ts:97
 
 Count tokens in a raw text string.
 

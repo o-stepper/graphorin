@@ -12,7 +12,7 @@ function parseHandoffInputFilter(value):
   | null;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:449
+Defined in: packages/skills/src/frontmatter/index.ts:463
 
 Parse the `handoff-input-filter` field into a structured
 declaration. Returns `null` for unsupported shapes; callers should

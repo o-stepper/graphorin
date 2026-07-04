@@ -1,0 +1,27 @@
+[**Graphorin API reference v0.5.0**](../../../index.md)
+
+***
+
+[Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / isTimerPauseValue
+
+# Function: isTimerPauseValue()
+
+```ts
+function isTimerPauseValue(value): value is TimerPauseValue;
+```
+
+Defined in: packages/core/dist/channels/durable.d.ts:55
+
+Type guard for [TimerPauseValue](/api/@graphorin/workflow/interfaces/TimerPauseValue.md).
+
+## Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `value` | `unknown` |
+
+## Returns
+
+`value is TimerPauseValue`
+
+## Stable

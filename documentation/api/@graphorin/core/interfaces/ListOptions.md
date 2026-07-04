@@ -6,7 +6,7 @@
 
 # Interface: ListOptions
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:74
+Defined in: packages/core/src/contracts/checkpoint-store.ts:80
 
 Optional listing range for `CheckpointStore.list(...)`.
 
@@ -16,6 +16,6 @@ Optional listing range for `CheckpointStore.list(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-before"></a> `before?` | `readonly` | `string` | packages/core/src/contracts/checkpoint-store.ts:76 |
-| <a id="property-limit"></a> `limit?` | `readonly` | `number` | packages/core/src/contracts/checkpoint-store.ts:75 |
-| <a id="property-status"></a> `status?` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | packages/core/src/contracts/checkpoint-store.ts:77 |
+| <a id="property-before"></a> `before?` | `readonly` | `string` | packages/core/src/contracts/checkpoint-store.ts:82 |
+| <a id="property-limit"></a> `limit?` | `readonly` | `number` | packages/core/src/contracts/checkpoint-store.ts:81 |
+| <a id="property-status"></a> `status?` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | packages/core/src/contracts/checkpoint-store.ts:83 |

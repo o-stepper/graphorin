@@ -6,7 +6,7 @@
 
 # Interface: AgentEvaluatorIterationEvent
 
-Defined in: packages/core/src/types/agent-event.ts:378
+Defined in: packages/core/src/types/agent-event.ts:394
 
 Emitted per iteration of an `evaluatorOptimizer({...})` loop.
 
@@ -16,12 +16,12 @@ Emitted per iteration of an `evaluatorOptimizer({...})` loop.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:382 |
-| <a id="property-critique"></a> `critique` | `readonly` | `string` | packages/core/src/types/agent-event.ts:386 |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/core/src/types/agent-event.ts:387 |
-| <a id="property-iteration"></a> `iteration` | `readonly` | `number` | packages/core/src/types/agent-event.ts:383 |
-| <a id="property-pass"></a> `pass` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:385 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:380 |
-| <a id="property-score"></a> `score` | `readonly` | `number` | packages/core/src/types/agent-event.ts:384 |
-| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:381 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.evaluator.iteration"` | packages/core/src/types/agent-event.ts:379 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:398 |
+| <a id="property-critique"></a> `critique` | `readonly` | `string` | packages/core/src/types/agent-event.ts:402 |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/core/src/types/agent-event.ts:403 |
+| <a id="property-iteration"></a> `iteration` | `readonly` | `number` | packages/core/src/types/agent-event.ts:399 |
+| <a id="property-pass"></a> `pass` | `readonly` | `boolean` | packages/core/src/types/agent-event.ts:401 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:396 |
+| <a id="property-score"></a> `score` | `readonly` | `number` | packages/core/src/types/agent-event.ts:400 |
+| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:397 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.evaluator.iteration"` | packages/core/src/types/agent-event.ts:395 |

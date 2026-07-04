@@ -6,7 +6,7 @@
 
 # Interface: TransportListeners
 
-Defined in: packages/client/src/transport/types.ts:56
+Defined in: packages/client/src/transport/types.ts:64
 
 Minimal listener surface the transport invokes in lifecycle order:
 `onOpen` ⇒ `onFrame*` (zero or more) ⇒ `onClose`. `onError` may
@@ -22,7 +22,7 @@ fire at any time before `onClose`.
 onClose(reason): void;
 ```
 
-Defined in: packages/client/src/transport/types.ts:60
+Defined in: packages/client/src/transport/types.ts:68
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/client/src/transport/types.ts:60
 onError(error): void;
 ```
 
-Defined in: packages/client/src/transport/types.ts:59
+Defined in: packages/client/src/transport/types.ts:67
 
 #### Parameters
 
@@ -62,7 +62,7 @@ Defined in: packages/client/src/transport/types.ts:59
 onFrame(frame): void;
 ```
 
-Defined in: packages/client/src/transport/types.ts:58
+Defined in: packages/client/src/transport/types.ts:66
 
 #### Parameters
 
@@ -82,7 +82,7 @@ Defined in: packages/client/src/transport/types.ts:58
 onOpen(): void;
 ```
 
-Defined in: packages/client/src/transport/types.ts:57
+Defined in: packages/client/src/transport/types.ts:65
 
 #### Returns
 

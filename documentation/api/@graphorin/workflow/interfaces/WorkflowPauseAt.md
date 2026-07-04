@@ -6,7 +6,7 @@
 
 # Interface: WorkflowPauseAt
 
-Defined in: packages/workflow/src/types.ts:226
+Defined in: packages/workflow/src/types.ts:268
 
 Static `pauseAt` declaration. The engine consults the lists when
 scheduling tasks: nodes named in `before` suspend before their `run`
@@ -19,5 +19,5 @@ suspends right before the next planning round.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-after"></a> `after?` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:228 |
-| <a id="property-before"></a> `before?` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:227 |
+| <a id="property-after"></a> `after?` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:270 |
+| <a id="property-before"></a> `before?` | `readonly` | readonly `string`[] | packages/workflow/src/types.ts:269 |

@@ -6,7 +6,7 @@
 
 # Interface: NamedPostCompactionHook
 
-Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:44
+Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:56
 
 Tagged hook returned by every factory below. The `id` field is
 surfaced on the `context.compaction.hook.executed.total{hookName}`
@@ -18,7 +18,7 @@ counter family.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/compaction/hooks/types.ts:45 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/compaction/hooks/types.ts:57 |
 
 ## Methods
 
@@ -28,7 +28,7 @@ counter family.
 resolveContent(deps, ctx?): Promise<readonly MessageContent[]>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:52
+Defined in: packages/memory/src/context-engine/compaction/hooks/types.ts:64
 
 `ctx` carries the REAL compaction outcome (CE-6) — result, scope,
 runId, sessionId, agentId, source — built by `compactNow` after the

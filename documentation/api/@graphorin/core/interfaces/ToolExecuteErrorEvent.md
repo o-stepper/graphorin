@@ -6,7 +6,7 @@
 
 # Interface: ToolExecuteErrorEvent
 
-Defined in: packages/core/src/types/agent-event.ts:160
+Defined in: packages/core/src/types/agent-event.ts:161
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:160
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error` | `readonly` | [`ToolError`](/api/@graphorin/core/interfaces/ToolError.md) | packages/core/src/types/agent-event.ts:163 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:162 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.error"` | packages/core/src/types/agent-event.ts:161 |
+| <a id="property-error"></a> `error` | `readonly` | [`ToolError`](/api/@graphorin/core/interfaces/ToolError.md) | packages/core/src/types/agent-event.ts:164 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:163 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.error"` | packages/core/src/types/agent-event.ts:162 |

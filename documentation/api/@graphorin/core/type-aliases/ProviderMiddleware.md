@@ -10,7 +10,7 @@
 type ProviderMiddleware = (next) => Provider;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:263
+Defined in: packages/core/src/contracts/provider.ts:289
 
 Provider middleware: a function that wraps a `Provider` and returns a
 new `Provider` with extra behaviour (retry, fallback, redaction, …).

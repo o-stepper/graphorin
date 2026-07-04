@@ -16,7 +16,7 @@ function createFactValidateTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:329
+Defined in: packages/memory/src/tools/fact-tools.ts:349
 
 `fact_validate` — promote a quarantined fact to active (P1-4). The
 validation path that admits a synthesized (consolidator / reflection)

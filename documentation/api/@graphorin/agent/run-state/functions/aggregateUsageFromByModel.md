@@ -10,7 +10,7 @@
 function aggregateUsageFromByModel(byModel): Usage;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:442
+Defined in: packages/agent/src/run-state/index.ts:484
 
 Recompute the aggregate usage from `usageByModel`. Returns the
 sum that callers can compare against `state.usage` to verify the

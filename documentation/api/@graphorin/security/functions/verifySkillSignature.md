@@ -10,7 +10,7 @@
 function verifySkillSignature(options): Promise<SkillSignatureVerificationResult>;
 ```
 
-Defined in: packages/security/src/supply-chain/signature.ts:98
+Defined in: packages/security/src/supply-chain/signature.ts:107
 
 Verify the ed25519 signature embedded in `skillMd`. Returns a
 structured result instead of throwing for the validation outcome —

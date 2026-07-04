@@ -6,7 +6,7 @@
 
 # Interface: Agent\&lt;TDeps, TOutput\&gt;
 
-Defined in: packages/agent/src/types.ts:425
+Defined in: packages/agent/src/types.ts:594
 
 Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/functions/createAgent.md).
 
@@ -23,10 +23,10 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:427 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:426 |
-| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:456 |
-| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:464 |
+| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:596 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:595 |
+| <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:625 |
+| <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:633 |
 
 ## Methods
 
@@ -36,7 +36,7 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 abort(options?): void;
 ```
 
-Defined in: packages/agent/src/types.ts:438
+Defined in: packages/agent/src/types.ts:607
 
 #### Parameters
 
@@ -56,7 +56,7 @@ Defined in: packages/agent/src/types.ts:438
 compact(options?): Promise<CompactionApiResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:440
+Defined in: packages/agent/src/types.ts:609
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: packages/agent/src/types.ts:440
 fanOut<TFanOutOutput>(options): Promise<FanOutResult<TFanOutOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:448
+Defined in: packages/agent/src/types.ts:617
 
 Convenience wrapper around the standalone `runFanOut(...)`. The
 returned `FanOutResult` carries per-child status + the merged
@@ -108,7 +108,7 @@ strategy decides whether to propagate).
 followUp(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:437
+Defined in: packages/agent/src/types.ts:606
 
 #### Parameters
 
@@ -128,7 +128,7 @@ Defined in: packages/agent/src/types.ts:437
 run(input, options?): Promise<AgentResult<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:432
+Defined in: packages/agent/src/types.ts:601
 
 #### Parameters
 
@@ -149,7 +149,7 @@ Defined in: packages/agent/src/types.ts:432
 steer(message): void;
 ```
 
-Defined in: packages/agent/src/types.ts:436
+Defined in: packages/agent/src/types.ts:605
 
 #### Parameters
 
@@ -169,7 +169,7 @@ Defined in: packages/agent/src/types.ts:436
 stream(input, options?): AsyncIterable<AgentEvent<TOutput>>;
 ```
 
-Defined in: packages/agent/src/types.ts:428
+Defined in: packages/agent/src/types.ts:597
 
 #### Parameters
 
@@ -192,7 +192,7 @@ toTool(options?): Tool<{
 }, TOutput, TDeps>;
 ```
 
-Defined in: packages/agent/src/types.ts:439
+Defined in: packages/agent/src/types.ts:608
 
 #### Parameters
 

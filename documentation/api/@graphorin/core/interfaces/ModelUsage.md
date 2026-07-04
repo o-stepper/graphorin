@@ -6,7 +6,7 @@
 
 # Interface: ModelUsage
 
-Defined in: packages/core/src/types/usage.ts:37
+Defined in: packages/core/src/types/usage.ts:59
 
 Per-model breakdown used by aggregators (e.g. `CostTracker` in
 `@graphorin/observability`).
@@ -17,10 +17,12 @@ Per-model breakdown used by aggregators (e.g. `CostTracker` in
 
 | Property | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-callcount"></a> `callCount` | `number` | packages/core/src/types/usage.ts:44 |
-| <a id="property-completiontokens"></a> `completionTokens` | `number` | packages/core/src/types/usage.ts:40 |
-| <a id="property-cost"></a> `cost?` | [`Cost`](/api/@graphorin/core/interfaces/Cost.md) | packages/core/src/types/usage.ts:43 |
-| <a id="property-modelid"></a> `modelId` | `string` | packages/core/src/types/usage.ts:38 |
-| <a id="property-prompttokens"></a> `promptTokens` | `number` | packages/core/src/types/usage.ts:39 |
-| <a id="property-reasoningtokens"></a> `reasoningTokens?` | `number` | packages/core/src/types/usage.ts:41 |
-| <a id="property-totaltokens"></a> `totalTokens` | `number` | packages/core/src/types/usage.ts:42 |
+| <a id="property-cachedreadtokens"></a> `cachedReadTokens?` | `number` | packages/core/src/types/usage.ts:64 |
+| <a id="property-cachewritetokens"></a> `cacheWriteTokens?` | `number` | packages/core/src/types/usage.ts:65 |
+| <a id="property-callcount"></a> `callCount` | `number` | packages/core/src/types/usage.ts:68 |
+| <a id="property-completiontokens"></a> `completionTokens` | `number` | packages/core/src/types/usage.ts:62 |
+| <a id="property-cost"></a> `cost?` | [`Cost`](/api/@graphorin/core/interfaces/Cost.md) | packages/core/src/types/usage.ts:67 |
+| <a id="property-modelid"></a> `modelId` | `string` | packages/core/src/types/usage.ts:60 |
+| <a id="property-prompttokens"></a> `promptTokens` | `number` | packages/core/src/types/usage.ts:61 |
+| <a id="property-reasoningtokens"></a> `reasoningTokens?` | `number` | packages/core/src/types/usage.ts:63 |
+| <a id="property-totaltokens"></a> `totalTokens` | `number` | packages/core/src/types/usage.ts:66 |

@@ -41,6 +41,7 @@ type AgentEvent<TOutput> =
   | SourceCitedEvent
   | StepEndEvent
   | GuardrailTrippedEvent
+  | VerifierResultEvent
   | AgentEndEvent<TOutput>
   | AgentErrorEvent;
 ```

@@ -16,7 +16,7 @@ type DataFlowDecision =
 } & DataFlowFinding;
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:247
+Defined in: packages/security/src/dataflow/types.ts:290
 
 The verdict [DataFlowPolicy.evaluate](/api/@graphorin/security/interfaces/DataFlowPolicy.md#evaluate) returns for a sink call.
 

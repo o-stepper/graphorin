@@ -6,7 +6,7 @@
 
 # Interface: DataFlowFinding
 
-Defined in: packages/security/src/dataflow/types.ts:224
+Defined in: packages/security/src/dataflow/types.ts:267
 
 The details attached to a non-`allow` [DataFlowDecision](/api/@graphorin/security/type-aliases/DataFlowDecision.md).
 
@@ -16,6 +16,6 @@ The details attached to a non-`allow` [DataFlowDecision](/api/@graphorin/securit
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-flow"></a> `flow` | `readonly` | [`TaintFlowKind`](/api/@graphorin/security/type-aliases/TaintFlowKind.md) | Which flow tripped the policy. | packages/security/src/dataflow/types.ts:226 |
-| <a id="property-reason"></a> `reason` | `readonly` | `string` | Human-readable, *metadata-only* explanation (never raw arg/output bytes). | packages/security/src/dataflow/types.ts:228 |
-| <a id="property-sourcekinds"></a> `sourceKinds` | `readonly` | readonly `string`[] | Untrusted source kinds implicated in the flow. | packages/security/src/dataflow/types.ts:230 |
+| <a id="property-flow"></a> `flow` | `readonly` | [`TaintFlowKind`](/api/@graphorin/security/type-aliases/TaintFlowKind.md) | Which flow tripped the policy. | packages/security/src/dataflow/types.ts:269 |
+| <a id="property-reason"></a> `reason` | `readonly` | `string` | Human-readable, *metadata-only* explanation (never raw arg/output bytes). | packages/security/src/dataflow/types.ts:271 |
+| <a id="property-sourcekinds"></a> `sourceKinds` | `readonly` | readonly `string`[] | Untrusted source kinds implicated in the flow. | packages/security/src/dataflow/types.ts:273 |

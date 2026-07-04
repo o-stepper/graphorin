@@ -12,6 +12,13 @@ path: it speaks the AI SDK's `streamText` / `generateText` API and
 maps the resulting events onto the canonical
 import('@graphorin/core').ProviderEvent discriminated union.
 
+Outbound, the adapter converts Graphorin messages / tools onto the
+AI SDK call contract (see `vercel-messages.ts`): tool definitions
+become a name-keyed record with `jsonSchema()`-shaped input schemas,
+assistant `toolCalls` become `tool-call` content parts, and
+`ToolMessage`s become `tool-result` messages — the SDK zod-validates
+all of these and rejects the raw Graphorin shapes.
+
 The AI SDK is an **optional peer dependency** of `@graphorin/provider`.
 Production callers leave `runtimeOverrides` unset and the adapter
 dynamically imports the package on first use; test fixtures pass a
@@ -34,4 +41,4 @@ library.
 | Function | Description |
 | ------ | ------ |
 | [\_\_resetVercelRuntimeCache](/api/@graphorin/provider/adapters/vercel/functions/resetVercelRuntimeCache.md) | Test-only hook that resets the cached AI SDK runtime. Provider tests that mutate the cache (e.g. by injecting a mock then verifying the default loader runs) call this between scenarios. |
-| [vercelAdapter](/api/@graphorin/provider/adapters/vercel/functions/vercelAdapter.md) | Wrap a Vercel AI SDK language-model value in a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md). The adapter passes Graphorin `Message`s through directly — both formats use the same role + content discriminated shape — and translates the streaming chunks emitted by the AI SDK onto Graphorin `ProviderEvent`s. |
+| [vercelAdapter](/api/@graphorin/provider/adapters/vercel/functions/vercelAdapter.md) | Wrap a Vercel AI SDK language-model value in a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md). Outbound requests are converted onto the AI SDK call contract (name-keyed tools, `tool-call` / `tool-result` content parts — see `vercel-messages.ts`); the streaming chunks emitted by the AI SDK are translated back onto Graphorin `ProviderEvent`s. |

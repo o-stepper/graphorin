@@ -13,7 +13,7 @@ function clearOldToolResults(
 counter): Promise<ClearToolResultsOutcome>;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/clear-tool-results.ts:92
+Defined in: packages/memory/src/context-engine/compaction/clear-tool-results.ts:114
 
 Replace the oldest clearable tool results with placeholders. Returns the new
 buffer (same length — content is replaced in place, never removed) plus the

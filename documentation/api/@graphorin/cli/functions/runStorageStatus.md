@@ -10,7 +10,7 @@
 function runStorageStatus(options?): Promise<StorageStatusResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:64
+Defined in: packages/cli/src/commands/storage.ts:68
 
 ## Parameters
 

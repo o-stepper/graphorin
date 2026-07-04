@@ -12,7 +12,7 @@ type PrepareStepHook<TDeps> = (ctx) =>
 | PrepareStepOverrides<TDeps>;
 ```
 
-Defined in: packages/agent/src/types.ts:80
+Defined in: packages/agent/src/types.ts:82
 
 Per-step override hook. Receives the current `RunContext` and may
 return overrides applied to the next provider call only.

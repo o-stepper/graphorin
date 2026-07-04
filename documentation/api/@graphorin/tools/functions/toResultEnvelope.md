@@ -10,7 +10,7 @@
 function toResultEnvelope<TOutput>(opts): ResultEnvelope<TOutput>;
 ```
 
-Defined in: packages/tools/src/result/envelope.ts:35
+Defined in: packages/tools/src/result/envelope.ts:41
 
 Convert a raw `execute(...)` return value into a canonical
 [ResultEnvelope](/api/@graphorin/tools/interfaces/ResultEnvelope.md). Streaming-hint tools that returned `void`

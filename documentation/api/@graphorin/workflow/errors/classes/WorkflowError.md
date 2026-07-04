@@ -6,7 +6,7 @@
 
 # Class: WorkflowError
 
-Defined in: packages/workflow/src/errors/index.ts:40
+Defined in: packages/workflow/src/errors/index.ts:44
 
 Base error class for all `@graphorin/workflow` failures.
 
@@ -28,6 +28,10 @@ Base error class for all `@graphorin/workflow` failures.
 - [`ResumeWithoutSuspensionError`](/api/@graphorin/workflow/errors/classes/ResumeWithoutSuspensionError.md)
 - [`WorkflowAbortedError`](/api/@graphorin/workflow/errors/classes/WorkflowAbortedError.md)
 - [`NodeExecutionError`](/api/@graphorin/workflow/errors/classes/NodeExecutionError.md)
+- [`NodeTimeoutError`](/api/@graphorin/workflow/errors/classes/NodeTimeoutError.md)
+- [`WorkflowVersionMismatchError`](/api/@graphorin/workflow/errors/classes/WorkflowVersionMismatchError.md)
+- [`WorkflowDivergenceError`](/api/@graphorin/workflow/errors/classes/WorkflowDivergenceError.md)
+- [`PauseNotFoundError`](/api/@graphorin/workflow/errors/classes/PauseNotFoundError.md)
 - [`CheckpointVersionConflictError`](/api/@graphorin/workflow/errors/classes/CheckpointVersionConflictError.md)
 - [`DeadEndError`](/api/@graphorin/workflow/errors/classes/DeadEndError.md)
 - [`StateNotSerializableError`](/api/@graphorin/workflow/errors/classes/StateNotSerializableError.md)
@@ -44,7 +48,7 @@ new WorkflowError(
    opts?): WorkflowError;
 ```
 
-Defined in: packages/workflow/src/errors/index.ts:45
+Defined in: packages/workflow/src/errors/index.ts:49
 
 #### Parameters
 
@@ -70,9 +74,9 @@ Error.constructor
 
 | Property | Modifier | Type | Description | Overrides | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | `Error.cause` | - | packages/workflow/src/errors/index.ts:42 |
-| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | - | - | packages/workflow/src/errors/index.ts:41 |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | - | - | packages/workflow/src/errors/index.ts:43 |
+| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | `Error.cause` | - | packages/workflow/src/errors/index.ts:46 |
+| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | - | - | packages/workflow/src/errors/index.ts:45 |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | - | - | packages/workflow/src/errors/index.ts:47 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | - | `Error.message` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | - | `Error.name` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | - | `Error.stack` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

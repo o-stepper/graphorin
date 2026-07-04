@@ -10,7 +10,7 @@
 function truncateBody(opts): Promise<TruncationOutcome>;
 ```
 
-Defined in: packages/tools/src/result/truncate.ts:146
+Defined in: packages/tools/src/result/truncate.ts:171
 
 Apply the per-strategy truncation pipeline.
 

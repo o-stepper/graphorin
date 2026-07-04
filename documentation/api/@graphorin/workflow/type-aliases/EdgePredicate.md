@@ -10,7 +10,7 @@
 type EdgePredicate<TState> = (state) => boolean;
 ```
 
-Defined in: packages/workflow/src/types.ts:201
+Defined in: packages/workflow/src/types.ts:243
 
 Predicate evaluated by the engine when deciding which edges to fire.
 

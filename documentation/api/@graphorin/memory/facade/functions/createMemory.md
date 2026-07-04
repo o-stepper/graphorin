@@ -10,7 +10,7 @@
 function createMemory(options): Memory;
 ```
 
-Defined in: packages/memory/src/facade.ts:316
+Defined in: packages/memory/src/facade.ts:342
 
 Wire every memory subsystem in one call. Returns the typed
 `Memory` facade ready to be passed into `createAgent({...})`.

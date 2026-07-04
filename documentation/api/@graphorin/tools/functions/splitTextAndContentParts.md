@@ -14,7 +14,7 @@ function splitTextAndContentParts(envelope): {
 };
 ```
 
-Defined in: packages/tools/src/result/envelope.ts:69
+Defined in: packages/tools/src/result/envelope.ts:76
 
 Split an envelope into its text-shaped payload (subject to the
 truncation pipeline + inbound sanitization scan) and its non-text
@@ -38,8 +38,8 @@ content parts (passed through untouched).
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `nonText` | readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | packages/tools/src/result/envelope.ts:71 |
-| `text` | `string` | packages/tools/src/result/envelope.ts:70 |
-| `textParts` | readonly [`TextContent`](/api/@graphorin/core/interfaces/TextContent.md)[] | packages/tools/src/result/envelope.ts:72 |
+| `nonText` | readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | packages/tools/src/result/envelope.ts:78 |
+| `text` | `string` | packages/tools/src/result/envelope.ts:77 |
+| `textParts` | readonly [`TextContent`](/api/@graphorin/core/interfaces/TextContent.md)[] | packages/tools/src/result/envelope.ts:79 |
 
 ## Stable

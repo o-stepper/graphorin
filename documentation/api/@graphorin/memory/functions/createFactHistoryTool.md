@@ -22,7 +22,7 @@ function createFactHistoryTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:274
+Defined in: packages/memory/src/tools/fact-tools.ts:294
 
 `fact_history` — trace how a fact changed over time. Returns the
 full bi-temporal supersede chain the given fact belongs to, oldest →

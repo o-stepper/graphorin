@@ -6,7 +6,7 @@
 
 # Interface: VercelRuntimeOverrides
 
-Defined in: packages/provider/src/adapters/vercel.ts:76
+Defined in: packages/provider/src/adapters/vercel.ts:89
 
 Subset of the AI SDK surface used by the adapter.
 
@@ -16,5 +16,5 @@ Subset of the AI SDK surface used by the adapter.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-generatetext"></a> `generateText` | `readonly` | (`args`) => `Promise`\<\{ `finishReason?`: `string`; `providerMetadata?`: `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>; `text?`: `string`; `toolCalls?`: readonly \{ `args`: `unknown`; `toolCallId`: `string`; `toolName`: `string`; \}[]; `usage?`: `Partial`\&lt;[`Usage`](/api/@graphorin/core/interfaces/Usage.md)\&gt; & \{ `inputTokens?`: `number`; `outputTokens?`: `number`; `totalTokens?`: `number`; \}; \}\> | packages/provider/src/adapters/vercel.ts:90 |
-| <a id="property-streamtext"></a> `streamText` | `readonly` | (`args`) => \{ `fullStream`: `AsyncIterable`\&lt;[`AISDKChunk`](/api/@graphorin/provider/adapters/vercel/interfaces/AISDKChunk.md)\&gt;; \} | packages/provider/src/adapters/vercel.ts:77 |
+| <a id="property-generatetext"></a> `generateText` | `readonly` | (`args`) => `Promise`\<\{ `finishReason?`: `string`; `providerMetadata?`: `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>; `text?`: `string`; `toolCalls?`: readonly \{ `args`: `unknown`; `toolCallId`: `string`; `toolName`: `string`; \}[]; `usage?`: `Partial`\&lt;[`Usage`](/api/@graphorin/core/interfaces/Usage.md)\&gt; & \{ `inputTokens?`: `number`; `outputTokens?`: `number`; `totalTokens?`: `number`; \}; \}\> | packages/provider/src/adapters/vercel.ts:104 |
+| <a id="property-streamtext"></a> `streamText` | `readonly` | (`args`) => \{ `fullStream`: `AsyncIterable`\&lt;[`AISDKChunk`](/api/@graphorin/provider/adapters/vercel/interfaces/AISDKChunk.md)\&gt;; \} | packages/provider/src/adapters/vercel.ts:90 |

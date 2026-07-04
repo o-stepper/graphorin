@@ -10,7 +10,7 @@
 function createWorkflow<TState, TInput>(config): Workflow<TState, TInput>;
 ```
 
-Defined in: packages/workflow/src/factory.ts:47
+Defined in: packages/workflow/src/factory.ts:49
 
 Build a [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) from the supplied configuration. The
 factory performs eager validation so misuse is caught at build time

@@ -6,7 +6,7 @@
 
 # Interface: RuleActivationContext
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:78
+Defined in: packages/memory/src/tiers/procedural-memory.ts:82
 
 Predicate context passed to [ProceduralMemory.activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate).
 
@@ -16,5 +16,5 @@ Predicate context passed to [ProceduralMemory.activate](/api/@graphorin/memory/c
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/memory/src/tiers/procedural-memory.ts:80 |
-| <a id="property-topic"></a> `topic?` | `readonly` | `string` | packages/memory/src/tiers/procedural-memory.ts:79 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/memory/src/tiers/procedural-memory.ts:84 |
+| <a id="property-topic"></a> `topic?` | `readonly` | `string` | packages/memory/src/tiers/procedural-memory.ts:83 |

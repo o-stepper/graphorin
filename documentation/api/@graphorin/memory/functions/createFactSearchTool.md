@@ -18,12 +18,14 @@ function createFactSearchTool(deps): Tool<{
      provenance?: "user" | "tool" | "extraction" | "reflection" | "induction" | "imported";
      score: number;
      sensitivity: "public" | "internal" | "secret";
+     supersededBy?: string;
      text: string;
+     validTo?: string;
   }[];
 }>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:167
+Defined in: packages/memory/src/tools/fact-tools.ts:176
 
 `fact_search` — hybrid (vector + FTS5) search over the user's
 semantic memory. Results merged through the configured reranker.
@@ -47,7 +49,9 @@ semantic memory. Results merged through the configured reranker.
      `provenance?`: `"user"` \| `"tool"` \| `"extraction"` \| `"reflection"` \| `"induction"` \| `"imported"`;
      `score`: `number`;
      `sensitivity`: `"public"` \| `"internal"` \| `"secret"`;
+     `supersededBy?`: `string`;
      `text`: `string`;
+     `validTo?`: `string`;
   \}[];
 \}\>
 

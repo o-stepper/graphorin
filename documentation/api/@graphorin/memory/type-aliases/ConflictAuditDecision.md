@@ -10,7 +10,7 @@
 type ConflictAuditDecision = "admit" | "dedup" | "supersede" | "pending" | "judge-unparseable";
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:253
+Defined in: packages/memory/src/internal/storage-adapter.ts:265
 
 Final pipeline outcome recorded against the candidate fact. Matches
 the storage adapter's `ConflictPipelineDecision` exactly.

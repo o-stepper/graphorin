@@ -6,7 +6,7 @@
 
 # Interface: Cost
 
-Defined in: core/dist/types/usage.d.ts:24
+Defined in: core/dist/types/usage.d.ts:46
 
 Money figure attached to a `Usage`. Always carries a 3-letter currency
 code so that consumers can perform aggregation safely.
@@ -17,5 +17,5 @@ code so that consumers can perform aggregation safely.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-amount"></a> `amount` | `number` | Amount in the smallest fractional unit of the declared currency. | core/dist/types/usage.d.ts:26 |
-| <a id="property-currency"></a> `currency` | `string` | ISO-4217 currency code; default `'USD'`. | core/dist/types/usage.d.ts:28 |
+| <a id="property-amount"></a> `amount` | `number` | Amount in the smallest fractional unit of the declared currency. | core/dist/types/usage.d.ts:48 |
+| <a id="property-currency"></a> `currency` | `string` | ISO-4217 currency code; default `'USD'`. | core/dist/types/usage.d.ts:50 |

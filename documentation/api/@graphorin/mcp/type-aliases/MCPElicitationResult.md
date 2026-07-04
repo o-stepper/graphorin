@@ -20,7 +20,7 @@ type MCPElicitationResult =
 };
 ```
 
-Defined in: packages/mcp/src/client/types.ts:110
+Defined in: packages/mcp/src/client/types.ts:121
 
 Operator response to an [MCPElicitationRequest](/api/@graphorin/mcp/interfaces/MCPElicitationRequest.md). `accept` returns
 the collected flat values; `decline`/`cancel` carry no content.

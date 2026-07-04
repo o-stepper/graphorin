@@ -18,6 +18,7 @@ type ToolErrorKind =
   | "aborted"
   | "inbound_sanitization_blocked"
   | "dataflow_policy_blocked"
+  | "capability_blocked"
   | "rate_limited";
 ```
 

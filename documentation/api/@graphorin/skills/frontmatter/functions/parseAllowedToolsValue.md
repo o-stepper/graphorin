@@ -10,7 +10,7 @@
 function parseAllowedToolsValue(value): readonly string[] | null;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:423
+Defined in: packages/skills/src/frontmatter/index.ts:437
 
 Parse the `allowed-tools` field. Accepts either a string (with
 whitespace-separated entries) or a string array. Returns `null` for

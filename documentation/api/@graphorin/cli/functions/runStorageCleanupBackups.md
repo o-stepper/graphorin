@@ -10,7 +10,7 @@
 function runStorageCleanupBackups(options?): Promise<StorageCleanupBackupsResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:288
+Defined in: packages/cli/src/commands/storage.ts:355
 
 Drop stale `.bak`, `.bak.<ts>`, and `.tmp.<ts>` siblings of the
 configured storage path. Useful after `encrypt` / `rekey` runs that

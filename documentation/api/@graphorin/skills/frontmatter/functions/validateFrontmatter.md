@@ -10,7 +10,7 @@
 function validateFrontmatter(frontmatter, options?): ValidatedFrontmatter;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:193
+Defined in: packages/skills/src/frontmatter/index.ts:207
 
 Validate a parsed frontmatter against the bundled spec snapshot and
 the `graphorin-*` extension catalogue.

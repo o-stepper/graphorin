@@ -64,6 +64,12 @@ Re-exports [ExecutorOptions](/api/@graphorin/tools/interfaces/ExecutorOptions.md
 
 ***
 
+### ToolArgumentPolicyGuard
+
+Re-exports [ToolArgumentPolicyGuard](/api/@graphorin/tools/interfaces/ToolArgumentPolicyGuard.md)
+
+***
+
 ### ToolContextOptions
 
 Re-exports [ToolContextOptions](/api/@graphorin/tools/interfaces/ToolContextOptions.md)
@@ -73,3 +79,9 @@ Re-exports [ToolContextOptions](/api/@graphorin/tools/interfaces/ToolContextOpti
 ### ToolExecutor
 
 Re-exports [ToolExecutor](/api/@graphorin/tools/interfaces/ToolExecutor.md)
+
+***
+
+### ToolRateLimitError
+
+Re-exports [ToolRateLimitError](/api/@graphorin/tools/classes/ToolRateLimitError.md)

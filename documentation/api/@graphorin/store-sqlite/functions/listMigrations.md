@@ -10,7 +10,7 @@
 function listMigrations(): readonly Migration[];
 ```
 
-Defined in: packages/store-sqlite/src/migrations/registry.ts:92
+Defined in: packages/store-sqlite/src/migrations/registry.ts:97
 
 Returns the full ordered migration list (built-ins + any registered
 dynamic migrations). Sorted by `version`. Verifies that no two entries

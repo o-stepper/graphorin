@@ -6,7 +6,7 @@
 
 # Interface: StorageCommonOptions
 
-Defined in: packages/cli/src/commands/storage.ts:44
+Defined in: packages/cli/src/commands/storage.ts:48
 
 ## Stable
 
@@ -16,6 +16,7 @@ Defined in: packages/cli/src/commands/storage.ts:44
 
 ## Extended by
 
+- [`StorageBackupOptions`](/api/@graphorin/cli/interfaces/StorageBackupOptions.md)
 - [`StorageCleanupBackupsOptions`](/api/@graphorin/cli/interfaces/StorageCleanupBackupsOptions.md)
 - [`StorageEncryptOptions`](/api/@graphorin/cli/interfaces/StorageEncryptOptions.md)
 - [`StorageRekeyOptions`](/api/@graphorin/cli/interfaces/StorageRekeyOptions.md)
@@ -24,7 +25,7 @@ Defined in: packages/cli/src/commands/storage.ts:44
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | packages/cli/src/commands/storage.ts:45 |
+| <a id="property-config"></a> `config?` | `readonly` | `string` | - | - | packages/cli/src/commands/storage.ts:49 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | `CommonOutputOptions.json` | packages/cli/src/internal/output.ts:71 |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam — capture JSON documents instead of writing to stdout. | `CommonOutputOptions.jsonPrint` | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | `CommonOutputOptions.nonInteractive` | packages/cli/src/internal/output.ts:73 |

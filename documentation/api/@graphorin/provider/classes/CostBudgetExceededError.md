@@ -6,7 +6,7 @@
 
 # Class: CostBudgetExceededError
 
-Defined in: packages/provider/src/errors/errors.ts:98
+Defined in: packages/provider/src/errors/errors.ts:100
 
 `withCostLimit` exceeded its configured ceiling. Carries the
 triggering scope (`session`, `agent`, `run`, …) so the caller can
@@ -26,7 +26,7 @@ decide how to surface the breach.
 new CostBudgetExceededError(args): CostBudgetExceededError;
 ```
 
-Defined in: packages/provider/src/errors/errors.ts:104
+Defined in: packages/provider/src/errors/errors.ts:106
 
 #### Parameters
 
@@ -51,13 +51,13 @@ Defined in: packages/provider/src/errors/errors.ts:104
 | Property | Modifier | Type | Default value | Description | Overrides | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`cause`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:21 |
-| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:19 |
-| <a id="property-limit"></a> `limit` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:101 |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:23 |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
+| <a id="property-limit"></a> `limit` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:103 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`message`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
-| <a id="property-name"></a> `name` | `readonly` | `"CostBudgetExceededError"` | `'CostBudgetExceededError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | packages/provider/src/errors/errors.ts:99 |
-| <a id="property-observed"></a> `observed` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:102 |
-| <a id="property-scope"></a> `scope` | `readonly` | `string` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:100 |
+| <a id="property-name"></a> `name` | `readonly` | `"CostBudgetExceededError"` | `'CostBudgetExceededError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | packages/provider/src/errors/errors.ts:101 |
+| <a id="property-observed"></a> `observed` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:104 |
+| <a id="property-scope"></a> `scope` | `readonly` | `string` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:102 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`stack`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-stack) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |
 | <a id="property-stacktracelimit"></a> `stackTraceLimit` | `static` | `number` | `undefined` | The `Error.stackTraceLimit` property specifies the number of stack frames collected by a stack trace (whether generated by `new Error().stack` or `Error.captureStackTrace(obj)`). The default value is `10` but may be set to any valid JavaScript number. Changes will affect any stack trace captured _after_ the value has been changed. If set to a non-number value, or set to a negative number, stack traces will not capture any frames. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`stackTraceLimit`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-stacktracelimit) | node\_modules/.pnpm/@types+node@22.19.17/node\_modules/@types/node/globals.d.ts:68 |
 

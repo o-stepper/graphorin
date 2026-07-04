@@ -10,7 +10,7 @@
 function isE5Model(model): boolean;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:287
+Defined in: packages/embedder-transformersjs/src/index.ts:309
 
 True when a model id belongs to the E5 family, which requires asymmetric
 `query:` / `passage:` prefixes (PS-10). Matches an `e5` token bounded by a

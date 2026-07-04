@@ -14,6 +14,25 @@ Loaded chat session capable of streaming responses.
 
 ## Methods
 
+### dispose()?
+
+```ts
+optional dispose(): void;
+```
+
+Defined in: runtime.ts:53
+
+Release the per-request context / sequence backing this session.
+node-llama-cpp contexts hold KV-cache memory (hundreds of MB at
+large context sizes); the adapter calls this in a `finally` after
+every stream so long-running agents do not leak until OOM.
+
+#### Returns
+
+`void`
+
+***
+
 ### promptStreamingResponse()
 
 ```ts

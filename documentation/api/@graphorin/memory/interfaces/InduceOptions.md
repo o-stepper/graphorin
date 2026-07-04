@@ -6,7 +6,7 @@
 
 # Interface: InduceOptions
 
-Defined in: packages/memory/src/tiers/procedural-memory.ts:66
+Defined in: packages/memory/src/tiers/procedural-memory.ts:70
 
 Options for [ProceduralMemory.induce](/api/@graphorin/memory/classes/ProceduralMemory.md#induce).
 
@@ -16,5 +16,5 @@ Options for [ProceduralMemory.induce](/api/@graphorin/memory/classes/ProceduralM
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-priority"></a> `priority?` | `readonly` | `number` | Priority of the stored procedure. Default INDUCED\_PRIORITY (40). | packages/memory/src/tiers/procedural-memory.ts:70 |
-| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Sensitivity of the stored procedure. Default `'internal'`. | packages/memory/src/tiers/procedural-memory.ts:68 |
+| <a id="property-priority"></a> `priority?` | `readonly` | `number` | Priority of the stored procedure. Default INDUCED\_PRIORITY (40). | packages/memory/src/tiers/procedural-memory.ts:74 |
+| <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Sensitivity of the stored procedure. Default `'internal'`. | packages/memory/src/tiers/procedural-memory.ts:72 |

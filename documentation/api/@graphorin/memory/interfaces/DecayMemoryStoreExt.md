@@ -6,7 +6,7 @@
 
 # Interface: DecayMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:541
+Defined in: packages/memory/src/internal/storage-adapter.ts:553
 
 Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
@@ -25,7 +25,7 @@ with an INFO log.
 archiveFact(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:580
+Defined in: packages/memory/src/internal/storage-adapter.ts:598
 
 Soft-archive a fact (sets `archived = 1`). The audit row in
 `memory_history` records the archive event.
@@ -54,7 +54,7 @@ optional listDecaySignals(ids): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:595
+Defined in: packages/memory/src/internal/storage-adapter.ts:613
 
 Narrow decay-column read for exactly the given fact ids (MRET-8) —
 powers per-search decay re-ranking without the old O(scope)
@@ -85,6 +85,7 @@ listForDecay(
    scope, 
    limit?, 
    opts?): Promise<readonly {
+  accessCount?: number;
   archived: boolean;
   createdAt: number;
   id: string;
@@ -97,7 +98,7 @@ listForDecay(
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:556
+Defined in: packages/memory/src/internal/storage-adapter.ts:568
 
 List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
@@ -124,6 +125,7 @@ salience score that orders capacity-bounded eviction.
 #### Returns
 
 `Promise`\<readonly \{
+  `accessCount?`: `number`;
   `archived`: `boolean`;
   `createdAt`: `number`;
   `id`: `string`;
@@ -143,7 +145,7 @@ salience score that orders capacity-bounded eviction.
 optional markAccessed(ids, accessedAt?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:588
+Defined in: packages/memory/src/internal/storage-adapter.ts:606
 
 Record a retrieval access for the given facts (MRET-7): stamp
 `lastAccessedAt` and reinforce `strength` (implementation-capped).

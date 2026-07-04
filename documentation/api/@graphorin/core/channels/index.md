@@ -26,6 +26,36 @@ Re-exports [AnyValue](/api/@graphorin/core/interfaces/AnyValue.md)
 
 ***
 
+### APPROVAL\_PAUSE\_KIND
+
+Re-exports [APPROVAL_PAUSE_KIND](/api/@graphorin/core/variables/APPROVAL_PAUSE_KIND.md)
+
+***
+
+### ApprovalPauseValue
+
+Re-exports [ApprovalPauseValue](/api/@graphorin/core/interfaces/ApprovalPauseValue.md)
+
+***
+
+### awaitExternal
+
+Re-exports [awaitExternal](/api/@graphorin/core/functions/awaitExternal.md)
+
+***
+
+### AWAKEABLE\_PAUSE\_KIND
+
+Re-exports [AWAKEABLE_PAUSE_KIND](/api/@graphorin/core/variables/AWAKEABLE_PAUSE_KIND.md)
+
+***
+
+### AwakeablePauseValue
+
+Re-exports [AwakeablePauseValue](/api/@graphorin/core/interfaces/AwakeablePauseValue.md)
+
+***
+
 ### barrier
 
 Re-exports [barrier](/api/@graphorin/core/functions/barrier.md)
@@ -86,9 +116,27 @@ Re-exports [Ephemeral](/api/@graphorin/core/interfaces/Ephemeral.md)
 
 ***
 
+### isApprovalPauseValue
+
+Re-exports [isApprovalPauseValue](/api/@graphorin/core/functions/isApprovalPauseValue.md)
+
+***
+
+### isAwakeablePauseValue
+
+Re-exports [isAwakeablePauseValue](/api/@graphorin/core/functions/isAwakeablePauseValue.md)
+
+***
+
 ### isPauseSignal
 
 Re-exports [isPauseSignal](/api/@graphorin/core/functions/isPauseSignal.md)
+
+***
+
+### isTimerPauseValue
+
+Re-exports [isTimerPauseValue](/api/@graphorin/core/functions/isTimerPauseValue.md)
 
 ***
 
@@ -152,9 +200,27 @@ Re-exports [Reducer](/api/@graphorin/core/interfaces/Reducer.md)
 
 ***
 
+### requestApproval
+
+Re-exports [requestApproval](/api/@graphorin/core/functions/requestApproval.md)
+
+***
+
 ### runWithPauseResume
 
 Re-exports [runWithPauseResume](/api/@graphorin/core/functions/runWithPauseResume.md)
+
+***
+
+### sleepFor
+
+Re-exports [sleepFor](/api/@graphorin/core/functions/sleepFor.md)
+
+***
+
+### sleepUntil
+
+Re-exports [sleepUntil](/api/@graphorin/core/functions/sleepUntil.md)
 
 ***
 
@@ -167,3 +233,15 @@ Re-exports [stream](/api/@graphorin/core/functions/stream.md)
 ### Stream
 
 Re-exports [Stream](/api/@graphorin/core/interfaces/Stream.md)
+
+***
+
+### TIMER\_PAUSE\_KIND
+
+Re-exports [TIMER_PAUSE_KIND](/api/@graphorin/core/variables/TIMER_PAUSE_KIND.md)
+
+***
+
+### TimerPauseValue
+
+Re-exports [TimerPauseValue](/api/@graphorin/core/interfaces/TimerPauseValue.md)

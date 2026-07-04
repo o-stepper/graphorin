@@ -15,9 +15,9 @@ sidecar table for efficient listing.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-nodename"></a> `nodeName?` | `readonly` | `string` | packages/core/dist/contracts/checkpoint-store.d.ts:37 |
-| <a id="property-source"></a> `source` | `readonly` | `"sync"` \| `"exit"` \| `"async"` | packages/core/dist/contracts/checkpoint-store.d.ts:35 |
-| <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | packages/core/dist/contracts/checkpoint-store.d.ts:36 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/core/dist/contracts/checkpoint-store.d.ts:38 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-nodename"></a> `nodeName?` | `readonly` | `string` | - | packages/core/dist/contracts/checkpoint-store.d.ts:43 |
+| <a id="property-source"></a> `source` | `readonly` | `"sync"` \| `"exit"` | Durability mode that produced this write. The legacy `'async'` value was removed (workflow-14 / WF-7 — it was byte-identical to `'sync'`); adapters normalize legacy persisted rows to `'sync'` at read time. | packages/core/dist/contracts/checkpoint-store.d.ts:41 |
+| <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | - | packages/core/dist/contracts/checkpoint-store.d.ts:42 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | packages/core/dist/contracts/checkpoint-store.d.ts:44 |

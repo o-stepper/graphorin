@@ -24,6 +24,7 @@ underlying memory facade.
 | Function | Description |
 | ------ | ------ |
 | [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical eleven-memory-tool array. Order is stable — consumers can rely on the indices for snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are appended last so the original nine indices are unchanged. With `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is appended as a twelfth, after the stable eleven. |
+| [createRunbookSearchTool](/api/@graphorin/memory/tools/functions/createRunbookSearchTool.md) | `runbook_search` — find validated procedures matching a task description. Quarantined (unvalidated induced) procedures never surface here: they must not drive actions until validated. |
 
 ## References
 

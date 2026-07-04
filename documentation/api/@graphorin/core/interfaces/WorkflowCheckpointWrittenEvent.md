@@ -6,7 +6,7 @@
 
 # Interface: WorkflowCheckpointWrittenEvent
 
-Defined in: packages/core/src/types/workflow-event.ts:72
+Defined in: packages/core/src/types/workflow-event.ts:79
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/workflow-event.ts:72
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-checkpointid"></a> `checkpointId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:74 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/workflow-event.ts:75 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.checkpoint.written"` | packages/core/src/types/workflow-event.ts:73 |
+| <a id="property-checkpointid"></a> `checkpointId` | `readonly` | `string` | packages/core/src/types/workflow-event.ts:81 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/workflow-event.ts:82 |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.checkpoint.written"` | packages/core/src/types/workflow-event.ts:80 |

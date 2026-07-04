@@ -40,6 +40,12 @@ Re-exports [Checkpoint](/api/@graphorin/core/interfaces/Checkpoint.md)
 
 ***
 
+### CheckpointConflictError
+
+Re-exports [CheckpointConflictError](/api/@graphorin/core/classes/CheckpointConflictError.md)
+
+***
+
 ### CheckpointId
 
 Re-exports [CheckpointId](/api/@graphorin/core/type-aliases/CheckpointId.md)
@@ -49,6 +55,12 @@ Re-exports [CheckpointId](/api/@graphorin/core/type-aliases/CheckpointId.md)
 ### CheckpointMetadata
 
 Re-exports [CheckpointMetadata](/api/@graphorin/core/interfaces/CheckpointMetadata.md)
+
+***
+
+### CheckpointPutOptions
+
+Re-exports [CheckpointPutOptions](/api/@graphorin/core/interfaces/CheckpointPutOptions.md)
 
 ***
 
@@ -229,6 +241,12 @@ Re-exports [ProceduralMemoryStore](/api/@graphorin/core/interfaces/ProceduralMem
 ### Provider
 
 Re-exports [Provider](/api/@graphorin/core/interfaces/Provider.md)
+
+***
+
+### ProviderCachePolicy
+
+Re-exports [ProviderCachePolicy](/api/@graphorin/core/interfaces/ProviderCachePolicy.md)
 
 ***
 

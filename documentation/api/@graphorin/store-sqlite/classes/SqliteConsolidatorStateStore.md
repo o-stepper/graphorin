@@ -46,7 +46,7 @@ acquireLock(
 maxAgeMs): Promise<boolean>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:241
+Defined in: packages/store-sqlite/src/consolidator-store.ts:235
 
 #### Parameters
 
@@ -72,7 +72,7 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:388
+Defined in: packages/store-sqlite/src/consolidator-store.ts:384
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:388
 enqueueFailedBatch(input): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:366
+Defined in: packages/store-sqlite/src/consolidator-store.ts:362
 
 #### Parameters
 
@@ -138,7 +138,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:162
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:436
+Defined in: packages/store-sqlite/src/consolidator-store.ts:432
 
 #### Parameters
 
@@ -169,7 +169,7 @@ listRecentRuns(scope, limit?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:328
+Defined in: packages/store-sqlite/src/consolidator-store.ts:324
 
 #### Parameters
 
@@ -203,7 +203,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:418
+Defined in: packages/store-sqlite/src/consolidator-store.ts:414
 
 #### Parameters
 
@@ -225,7 +225,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:418
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:405
+Defined in: packages/store-sqlite/src/consolidator-store.ts:401
 
 #### Parameters
 
@@ -245,7 +245,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:405
 recordRunFinish(finish): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:299
+Defined in: packages/store-sqlite/src/consolidator-store.ts:295
 
 #### Parameters
 
@@ -265,7 +265,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:299
 recordRunStart(input): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:282
+Defined in: packages/store-sqlite/src/consolidator-store.ts:278
 
 #### Parameters
 
@@ -285,7 +285,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:282
 releaseLock(scope, runId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:272
+Defined in: packages/store-sqlite/src/consolidator-store.ts:266
 
 #### Parameters
 
@@ -309,7 +309,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:409
+Defined in: packages/store-sqlite/src/consolidator-store.ts:405
 
 #### Parameters
 

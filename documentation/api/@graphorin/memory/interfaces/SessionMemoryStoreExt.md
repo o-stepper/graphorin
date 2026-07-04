@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:175
+Defined in: packages/memory/src/internal/storage-adapter.ts:187
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
@@ -26,7 +26,7 @@ storage adapters may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:204
+Defined in: packages/memory/src/internal/storage-adapter.ts:216
 
 Count the live messages in the scoped session (CE-5) — a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
@@ -78,7 +78,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:194
+Defined in: packages/memory/src/internal/storage-adapter.ts:206
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -191,7 +191,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:176
+Defined in: packages/memory/src/internal/storage-adapter.ts:188
 
 #### Parameters
 
@@ -214,7 +214,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:176
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:187
+Defined in: packages/memory/src/internal/storage-adapter.ts:199
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so

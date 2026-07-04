@@ -10,7 +10,7 @@
 type OnBudgetExceed = "pause" | "log" | "throw";
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:91
+Defined in: packages/memory/src/consolidator/types.ts:97
 
 Behaviour applied by the budget enforcer when a ceiling is hit
 mid-run. `'pause'` is the conservative default — the consolidator

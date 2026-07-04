@@ -18,7 +18,7 @@ function createConversationSearchTool(deps): Tool<{
 }>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:132
+Defined in: packages/memory/src/tools/recall-tools.ts:147
 
 `conversation_search` — FTS5 search over the active session
 messages.

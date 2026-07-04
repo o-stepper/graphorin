@@ -6,7 +6,7 @@
 
 # Class: InMemoryCheckpointStore
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:33
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:35
 
 Pure in-memory [CheckpointStore](/api/@graphorin/workflow/interfaces/CheckpointStore.md) implementation. Thread-safe
 within a single Node.js event loop because every mutation is
@@ -39,7 +39,7 @@ new InMemoryCheckpointStore(): InMemoryCheckpointStore;
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:141
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:155
 
 #### Parameters
 
@@ -68,7 +68,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:81
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:95
 
 #### Parameters
 
@@ -99,7 +99,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:105
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:119
 
 #### Parameters
 
@@ -126,10 +126,11 @@ put(
    threadId, 
    namespace, 
    checkpoint, 
-metadata): Promise<string>;
+   metadata, 
+opts?): Promise<string>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:37
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:39
 
 #### Parameters
 
@@ -139,6 +140,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:37
 | `namespace` | `string` |
 | `checkpoint` | [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md) |
 | `metadata` | [`CheckpointMetadata`](/api/@graphorin/workflow/interfaces/CheckpointMetadata.md) |
+| `opts?` | [`CheckpointPutOptions`](/api/@graphorin/core/interfaces/CheckpointPutOptions.md) |
 
 #### Returns
 
@@ -161,7 +163,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:59
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:73
 
 #### Parameters
 
@@ -189,7 +191,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:59
 size(): number;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:159
+Defined in: packages/workflow/src/checkpoint-store-memory.ts:173
 
 Test-only helper that exposes the raw count of stored checkpoints
 — handy for assertions like "the runtime wrote exactly N

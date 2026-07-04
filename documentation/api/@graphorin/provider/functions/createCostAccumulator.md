@@ -10,7 +10,7 @@
 function createCostAccumulator(): CostAccumulator;
 ```
 
-Defined in: packages/provider/src/middleware/with-cost-tracking.ts:63
+Defined in: packages/provider/src/middleware/with-cost-tracking.ts:69
 
 Create a [CostAccumulator](/api/@graphorin/provider/interfaces/CostAccumulator.md) — the process-local accumulator described on
 [withCostTracking](/api/@graphorin/provider/variables/withCostTracking.md). Keys totals by `'<providerName>::<modelId>'`.

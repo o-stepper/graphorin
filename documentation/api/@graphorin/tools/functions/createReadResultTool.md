@@ -18,12 +18,16 @@ function createReadResultTool(opts): Tool<{
   bytes: number;
   content: string;
   eof: boolean;
+  producerSensitivity?: string;
+  producerSource?: objectOutputType<{
+     kind: ZodString;
+  }, ZodTypeAny, "passthrough">;
   producerTrustClass?: string;
   totalBytes: number;
 }>;
 ```
 
-Defined in: packages/tools/src/built-in/read-result.ts:57
+Defined in: packages/tools/src/built-in/read-result.ts:61
 
 Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md).
 
@@ -46,6 +50,10 @@ Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/to
   `bytes`: `number`;
   `content`: `string`;
   `eof`: `boolean`;
+  `producerSensitivity?`: `string`;
+  `producerSource?`: `objectOutputType`\<\{
+     `kind`: `ZodString`;
+  \}, `ZodTypeAny`, `"passthrough"`\>;
   `producerTrustClass?`: `string`;
   `totalBytes`: `number`;
 \}\>

@@ -6,7 +6,7 @@
 
 # Interface: PricingSnapshot
 
-Defined in: pricing/src/types.ts:41
+Defined in: pricing/src/types.ts:47
 
 Single bundled snapshot.
 
@@ -16,9 +16,9 @@ Single bundled snapshot.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-currency"></a> `currency` | `readonly` | `"USD"` | pricing/src/types.ts:45 |
-| <a id="property-entries"></a> `entries` | `readonly` | readonly [`ModelPrice`](/api/@graphorin/pricing/interfaces/ModelPrice.md)[] | pricing/src/types.ts:47 |
-| <a id="property-sha256"></a> `sha256` | `readonly` | `string` | pricing/src/types.ts:46 |
-| <a id="property-snapshotdate"></a> `snapshotDate` | `readonly` | `string` | pricing/src/types.ts:44 |
-| <a id="property-source"></a> `source` | `readonly` | `string` | pricing/src/types.ts:43 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | pricing/src/types.ts:42 |
+| <a id="property-currency"></a> `currency` | `readonly` | `"USD"` | pricing/src/types.ts:51 |
+| <a id="property-entries"></a> `entries` | `readonly` | readonly [`ModelPrice`](/api/@graphorin/pricing/interfaces/ModelPrice.md)[] | pricing/src/types.ts:53 |
+| <a id="property-sha256"></a> `sha256` | `readonly` | `string` | pricing/src/types.ts:52 |
+| <a id="property-snapshotdate"></a> `snapshotDate` | `readonly` | `string` | pricing/src/types.ts:50 |
+| <a id="property-source"></a> `source` | `readonly` | `string` | pricing/src/types.ts:49 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | pricing/src/types.ts:48 |

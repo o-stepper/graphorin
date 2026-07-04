@@ -10,6 +10,12 @@ Public error surface for `@graphorin/provider`.
 
 ## References
 
+### classifyHttpStatus
+
+Re-exports [classifyHttpStatus](/api/@graphorin/provider/functions/classifyHttpStatus.md)
+
+***
+
 ### CostBudgetExceededError
 
 Re-exports [CostBudgetExceededError](/api/@graphorin/provider/classes/CostBudgetExceededError.md)

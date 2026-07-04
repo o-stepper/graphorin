@@ -7,10 +7,10 @@
 # Type Alias: TaintFlowKind
 
 ```ts
-type TaintFlowKind = "untrusted-to-sink" | "lethal-trifecta";
+type TaintFlowKind = "untrusted-to-sink" | "lethal-trifecta" | "derived-untrusted-to-sink";
 ```
 
-Defined in: packages/security/src/dataflow/types.ts:54
+Defined in: packages/security/src/dataflow/types.ts:60
 
 The kind of tainted data flow the policy detected at a sink.
 
@@ -22,5 +22,11 @@ The kind of tainted data flow the policy detected at a sink.
   even when no verbatim carry is provable. Catches the paraphrased
   "untrusted instruction drives a secret exfiltration" case at the cost
   of more false positives (hence shadow-mode-first + declassification).
+- `'derived-untrusted-to-sink'` (C6, `derivedTaint: 'strict'`) — the
+  CaMeL-style control-flow-integrity signal: once untrusted content has
+  entered the run, EVERY subsequent model-driven sink call is treated
+  as derived from it — paraphrase-robust by construction, deliberately
+  coarse. Fires only when the verbatim probe did not already match
+  (verbatim keeps the precise label).
 
 ## Stable

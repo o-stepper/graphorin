@@ -10,7 +10,7 @@
 function createDefaultSpillWriter(options?): SpillWriter;
 ```
 
-Defined in: packages/tools/src/result/spill.ts:48
+Defined in: packages/tools/src/result/spill.ts:61
 
 Build the default spill writer — writes the un-truncated body to
 `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`

@@ -10,7 +10,7 @@
 function openAICompatibleAdapter(options): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/openai-compatible.ts:61
+Defined in: packages/provider/src/adapters/openai-compatible.ts:74
 
 Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by an OpenAI-compatible
 HTTP server. The same code path serves LMStudio, LocalAI, vLLM, and

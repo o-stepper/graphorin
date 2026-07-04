@@ -10,7 +10,7 @@
 type ConsolidatorTier = "free" | "cheap" | "standard" | "full" | "custom";
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:42
+Defined in: packages/memory/src/consolidator/types.ts:43
 
 Tier preset that selects a consolidator behaviour bundle. The
 `'free'` preset is the default per DEC-144 / ADR-038 — no LLM call

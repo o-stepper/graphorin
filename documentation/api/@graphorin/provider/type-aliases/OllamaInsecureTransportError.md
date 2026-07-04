@@ -10,7 +10,7 @@
 type OllamaInsecureTransportError = LocalProviderInsecureTransportError;
 ```
 
-Defined in: packages/provider/src/errors/errors.ts:198
+Defined in: packages/provider/src/errors/errors.ts:200
 
 Legacy alias preserved for one minor; prefer
 [LocalProviderInsecureTransportError](/api/@graphorin/provider/classes/LocalProviderInsecureTransportError.md). Removed in v0.2.

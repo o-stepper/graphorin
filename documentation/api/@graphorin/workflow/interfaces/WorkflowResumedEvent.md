@@ -6,7 +6,7 @@
 
 # Interface: WorkflowResumedEvent\&lt;TState\&gt;
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:74
+Defined in: packages/core/dist/types/workflow-event.d.ts:81
 
 ## Stable
 
@@ -20,7 +20,7 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:74
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:78 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/dist/types/workflow-event.d.ts:77 |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:76 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.resumed"` | packages/core/dist/types/workflow-event.d.ts:75 |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:85 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/dist/types/workflow-event.d.ts:84 |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:83 |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.resumed"` | packages/core/dist/types/workflow-event.d.ts:82 |

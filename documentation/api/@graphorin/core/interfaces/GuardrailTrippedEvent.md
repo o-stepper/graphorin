@@ -6,7 +6,7 @@
 
 # Interface: GuardrailTrippedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:245
+Defined in: packages/core/src/types/agent-event.ts:246
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:245
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-guardrailname"></a> `guardrailName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:247 |
-| <a id="property-phase"></a> `phase` | `readonly` | `"input"` \| `"output"` | packages/core/src/types/agent-event.ts:248 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:249 |
-| <a id="property-type"></a> `type` | `readonly` | `"guardrail.tripped"` | packages/core/src/types/agent-event.ts:246 |
+| <a id="property-guardrailname"></a> `guardrailName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:248 |
+| <a id="property-phase"></a> `phase` | `readonly` | `"input"` \| `"output"` | packages/core/src/types/agent-event.ts:249 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:250 |
+| <a id="property-type"></a> `type` | `readonly` | `"guardrail.tripped"` | packages/core/src/types/agent-event.ts:247 |

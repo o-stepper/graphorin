@@ -7,10 +7,10 @@
 # Variable: SUMMARY\_TEMPLATE\_NAME
 
 ```ts
-const SUMMARY_TEMPLATE_NAME: "summary-9-section" = 'summary-9-section';
+const SUMMARY_TEMPLATE_NAME: "summary-sections" = 'summary-sections';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:43
+Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:48
 
 Stable identifier of the bundled template.
 

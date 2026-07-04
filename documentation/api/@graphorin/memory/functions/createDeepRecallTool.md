@@ -14,19 +14,22 @@ function createDeepRecallTool(deps): Tool<{
   topK?: number;
 }, {
   abstained: boolean;
+  graded: boolean;
   hits: {
      factId: string;
      provenance?: string;
      score: number;
      sensitivity: "public" | "internal" | "secret";
+     supersededBy?: string;
      text: string;
+     validTo?: string;
   }[];
   iterations: number;
   sufficient: boolean;
 }>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:176
+Defined in: packages/memory/src/tools/recall-tools.ts:191
 
 `deep_recall` — gated, multi-pass ("deep") recall over the user's
 factual memory for HARD questions (P2-4). A local difficulty gate keeps
@@ -54,12 +57,15 @@ pass, so prefer the cheaper `fact_search` for ordinary lookups.
   `topK?`: `number`;
 \}, \{
   `abstained`: `boolean`;
+  `graded`: `boolean`;
   `hits`: \{
      `factId`: `string`;
      `provenance?`: `string`;
      `score`: `number`;
      `sensitivity`: `"public"` \| `"internal"` \| `"secret"`;
+     `supersededBy?`: `string`;
      `text`: `string`;
+     `validTo?`: `string`;
   \}[];
   `iterations`: `number`;
   `sufficient`: `boolean`;

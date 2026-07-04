@@ -310,6 +310,12 @@ Re-exports [MemoryMetadata](/api/@graphorin/core/interfaces/MemoryMetadata.md)
 
 ***
 
+### MemoryOwner
+
+Re-exports [MemoryOwner](/api/@graphorin/core/type-aliases/MemoryOwner.md)
+
+***
+
 ### MemoryProvenance
 
 Re-exports [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance.md)
@@ -394,6 +400,12 @@ Re-exports [ReasoningDeltaEvent](/api/@graphorin/core/interfaces/ReasoningDeltaE
 
 ***
 
+### RecoveryHint
+
+Re-exports [RecoveryHint](/api/@graphorin/core/type-aliases/RecoveryHint.md)
+
+***
+
 ### ResultHandle
 
 Re-exports [ResultHandle](/api/@graphorin/core/interfaces/ResultHandle.md)
@@ -439,6 +451,12 @@ Re-exports [RunStatus](/api/@graphorin/core/type-aliases/RunStatus.md)
 ### RunStep
 
 Re-exports [RunStep](/api/@graphorin/core/interfaces/RunStep.md)
+
+***
+
+### RunStepProviderResponse
+
+Re-exports [RunStepProviderResponse](/api/@graphorin/core/interfaces/RunStepProviderResponse.md)
 
 ***
 
@@ -517,6 +535,12 @@ Re-exports [TextContent](/api/@graphorin/core/interfaces/TextContent.md)
 ### TextDeltaEvent
 
 Re-exports [TextDeltaEvent](/api/@graphorin/core/interfaces/TextDeltaEvent.md)
+
+***
+
+### TodoItem
+
+Re-exports [TodoItem](/api/@graphorin/core/interfaces/TodoItem.md)
 
 ***
 
@@ -667,6 +691,12 @@ Re-exports [UsageSnapshot](/api/@graphorin/core/interfaces/UsageSnapshot.md)
 ### UserMessage
 
 Re-exports [UserMessage](/api/@graphorin/core/interfaces/UserMessage.md)
+
+***
+
+### VerifierResultEvent
+
+Re-exports [VerifierResultEvent](/api/@graphorin/core/interfaces/VerifierResultEvent.md)
 
 ***
 
