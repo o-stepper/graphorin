@@ -54,7 +54,7 @@ If everything is green, you are ready to make changes.
 
 ## Development workflow
 
-1. **Create a branch.** `phase-NN-<slug>` for one-phase work, `phase-NN-<sub-track>-<slug>` for sub-tracks within a heavy phase, or `hotfix/<short-description>` for unplanned fixes. Never push directly to `main`.
+1. **Create a branch.** `feat/<slug>` for feature work, `fix/<slug>` for bug fixes, `chore/<slug>` for maintenance, or `hotfix/<short-description>` for unplanned fixes. Never push directly to `main`. Branches are **deleted on merge** (pass `--delete-branch` or enable auto-delete); do not resurrect a merged branch for follow-up work - cut a fresh one from `main` so you never rebase onto pre-fix code.
 2. **Make your change** inside the relevant `packages/<scope>` or `examples/<app>` workspace.
 3. **Add or update tests.** Vitest runs across the whole workspace.
 4. **Run the local checks** before opening a PR:
