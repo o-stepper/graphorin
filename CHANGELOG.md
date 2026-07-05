@@ -19,7 +19,7 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 The second framework-wide **audit release** - waves A-E of the 2026-07-04
 audit (220 findings) - plus a full documentation accuracy + character-rules
 sweep. Per-package details live in each package's `CHANGELOG.md`; upgrade
-notes are in the [migration guide](documentation/guide/migration.md).
+notes are in the migration guide (`documentation/guide/migration.md`).
 
 ### Security & correctness (waves A-B)
 
@@ -87,9 +87,8 @@ notes are in the [migration guide](documentation/guide/migration.md).
   class cannot silently recur (28 compile-checked snippets, CLI-docs
   flag validation, anchor-checking lychee in offline file mode).
 - A character-rules sweep across all markdown, TSDoc, and user-facing
-  strings (ASCII punctuation only), and a new
-  [Performance & scale](documentation/guide/performance.md) guide with
-  measured 100k-fact numbers.
+  strings (ASCII punctuation only), and a new Performance & scale guide
+  (`documentation/guide/performance.md`) with measured 100k-fact numbers.
 
 ## 0.5.0 - 2026-06-14
 
