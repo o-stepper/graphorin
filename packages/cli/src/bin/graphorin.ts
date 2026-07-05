@@ -51,6 +51,7 @@ import {
   runMemoryActivity,
   runMemoryInspect,
   runMemoryMigrate,
+  runMemoryPruneHistory,
   runMemoryReview,
   runMemoryStatus,
   runMemoryWhy,
@@ -726,6 +727,24 @@ function registerMemoryCommands(program: Command): void {
       const limit = opts.limit !== undefined ? Number.parseInt(opts.limit, 10) : undefined;
       await runMemoryActivity({
         ...(limit !== undefined && Number.isFinite(limit) ? { limit } : {}),
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
+  memory
+    .command('prune-history')
+    .description(
+      'Delete memory_history rows older than the threshold (storage-cost hygiene; purge() already scrubs sensitive text).',
+    )
+    .requiredOption(
+      '--older-than <duration|date>',
+      "Age threshold: a duration ('30d', '12h') or a past ISO date. Mandatory - destructive.",
+    )
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (opts: { olderThan: string; config?: string; json?: boolean }) => {
+      await runMemoryPruneHistory({
+        olderThan: opts.olderThan,
         ...(opts.config !== undefined ? { config: opts.config } : {}),
         ...(opts.json !== undefined ? { json: opts.json } : {}),
       });

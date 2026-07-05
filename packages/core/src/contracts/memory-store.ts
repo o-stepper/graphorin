@@ -35,6 +35,29 @@ export interface MemoryStore {
   close(): Promise<void>;
 }
 
+/**
+ * Maintenance extension over {@link MemoryStore} (W-066), mirroring
+ * the `SessionStoreExt` precedent: capabilities the sqlite adapter
+ * guarantees but a custom `MemoryStore` is not obliged to implement.
+ * The base contract is unchanged - existing implementations keep
+ * compiling.
+ *
+ * @stable
+ */
+export interface MemoryStoreExt extends MemoryStore {
+  /**
+   * Delete `memory_history` rows older than the given AGE in
+   * milliseconds. The argument is an AGE (the implementation computes
+   * `cutoff = now - olderThanMs`), never an epoch cutoff - passing an
+   * epoch value would compute a nonsense cutoff far in the past and
+   * silently prune nothing. Returns the number of rows removed.
+   * History grows by design (every supersede / quarantine transition
+   * appends) and `purge()` already scrubs sensitive text; this is the
+   * storage-cost hygiene lever - nothing prunes automatically.
+   */
+  pruneHistory(olderThanMs: number): Promise<number>;
+}
+
 /** @stable */
 export interface WorkingMemoryStore {
   list(scope: SessionScope): Promise<ReadonlyArray<Block>>;

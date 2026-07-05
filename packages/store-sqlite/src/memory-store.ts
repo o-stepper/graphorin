@@ -17,7 +17,7 @@ import type {
 } from '@graphorin/core';
 import type {
   EpisodicMemoryStore,
-  MemoryStore,
+  MemoryStoreExt,
   MessageRef,
   ProceduralMemoryStore,
   SemanticMemoryStore,
@@ -186,7 +186,7 @@ export interface SqliteMemoryWriteOptions {
  *
  * @stable
  */
-export class SqliteMemoryStore implements MemoryStore {
+export class SqliteMemoryStore implements MemoryStoreExt {
   #conn: SqliteConnection;
   #embeddings: EmbeddingMetaRepository;
   #vectorMgr: VectorTableManager;

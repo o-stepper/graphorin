@@ -24,7 +24,7 @@ graphorin token <subcommand>    - create / list / revoke / rotate / rekey / veri
 graphorin secrets <subcommand>  - list / get / set / delete / ref / rotate
 graphorin storage <subcommand>  - status / encrypt / rekey / backup / cleanup-backups
 graphorin audit <subcommand>    - verify / prune / export
-graphorin memory <subcommand>   - status / inspect / activity / why / review / migrate
+graphorin memory <subcommand>   - status / inspect / activity / why / review / prune-history / migrate
 graphorin consolidator <subcommand> - status / set-tier / stop
 graphorin triggers <subcommand> - list / status / fire / disable / prune
 graphorin auth <subcommand>     - login / list / refresh / revoke / status (OAuth flows)
@@ -128,10 +128,11 @@ graphorin memory activity --limit 20     # store-wide consolidator / reflection 
 graphorin memory why --session s1 --limit 5   # explain why facts were recalled (ranking signals) from persisted spans
 graphorin memory review                  # list quarantined facts / episodes / insights / procedures
 graphorin memory review --promote <id> --reason "reviewed"   # promote a reviewed item out of quarantine
+graphorin memory prune-history --older-than 90d   # delete memory_history rows older than the threshold
 graphorin memory migrate --from <id> --to <id> --strategy auto-migrate --embedders ./embedders.mjs   # not yet supported (exit 2)
 ```
 
-`status`, `inspect`, `activity`, `why`, and `review` accept `--json` for a structured document. `memory inspect`, `memory activity`, and `memory why` are the operator side of [recall explainability](/guide/memory-system#recall-explainability) - `why` decodes the per-fact ranking signals from the persisted recall spans (RP-17). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` is **not yet supported**: `--embedders` module resolution is planned, and today the command always exits with code `2` (UNSUPPORTED) after printing the programmatic pointer. Run an [embedder migration](/guide/memory-system#embedder-migration) programmatically via `migrateEmbedder()` from `@graphorin/memory` instead (`--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`).
+`status`, `inspect`, `activity`, `why`, `review`, and `prune-history` accept `--json` for a structured document. `memory prune-history` is the supported retention lever over `memory_history`: the table grows by design (every supersede / quarantine transition appends a row) and `purge()` already scrubs sensitive text from it, so pruning is storage-cost hygiene, not a privacy control. `--older-than` is mandatory (destructive by design, no default) and takes an age (`30d`, `12h`) or a past ISO date; the resolved value is an AGE, matching `MemoryStoreExt.pruneHistory(olderThanMs)`. `memory inspect`, `memory activity`, and `memory why` are the operator side of [recall explainability](/guide/memory-system#recall-explainability) - `why` decodes the per-fact ranking signals from the persisted recall spans (RP-17). `memory review` lists everything the consolidator left quarantined and promotes a reviewed item out of quarantine; promotion runs through the same injection gate the agent faces, so an injection-flagged memory is **refused** unless you pass `--force` from a trusted operator context after review. `migrate` is **not yet supported**: `--embedders` module resolution is planned, and today the command always exits with code `2` (UNSUPPORTED) after printing the programmatic pointer. Run an [embedder migration](/guide/memory-system#embedder-migration) programmatically via `migrateEmbedder()` from `@graphorin/memory` instead (`--strategy` is one of `lock-on-first` | `auto-migrate` | `multi-active`).
 
 ## `graphorin consolidator`
 

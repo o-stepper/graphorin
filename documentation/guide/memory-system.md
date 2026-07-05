@@ -350,6 +350,8 @@ Forgetting is **cost / staleness control, not an accuracy lever**. The light pha
 
 Recall reinforces: every `semantic.search(...)` stamps the recalled facts' `lastAccessedAt`, bumps their `strength` (capped at 2.0), and increments a monotonic `access_count` (D3), so recently-recalled facts genuinely decay slower (MRET-7) - the bookkeeping write is best-effort and never breaks the read path. The counter feeds an opt-in **retrieval-frequency reinforcement** term: set `salienceWeights: { ...DEFAULT_SALIENCE_WEIGHTS, accessReinforcement: 0.3 }` and a heavily-used fact keeps up to 1.3x its retention (log1p-saturating at 32 accesses); at the default weight `0` the factor is exactly `1` and salience is byte-identical. The decay window itself excludes archived rows (MCON-6): they receive no access bumps, so without the filter they would pin the LRU head and silently stop live facts from decaying once enough of them accumulated; inspection paths pass `listForDecay(scope, limit, { includeArchived: true })`.
 
+Separately from fact decay, the `memory_history` audit trail grows **by design**: every supersede, purge, and quarantine transition appends a row (seven insert sites in the sqlite adapter), and nothing prunes it automatically. `purge()` already scrubs sensitive text from history rows, so the retained rows are event skeletons - keeping them is a storage-cost question, not a privacy one. The supported retention lever is `graphorin memory prune-history --older-than 90d` (or `store.memory.pruneHistory(olderThanMs)` on the `MemoryStoreExt` facade of the sqlite store); the argument is an AGE in milliseconds, not an epoch cutoff.
+
 ```ts
 createMemory({ /* … */ consolidator: { tier: 'standard', enabled: true, provider, decayCapacity: 50_000 } });
 ```
