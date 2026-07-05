@@ -83,8 +83,12 @@ const PATTERNS: readonly RedactionPattern[] = [
   {
     name: 'graphorin-token',
     category: 'secret',
-    description: 'Graphorin server token (`kru_<env>_v1_<entropy>_<crc32>`).',
-    regex: /kru_(?:dev|test|prod)_v1_[A-Za-z0-9]{20,80}_[A-Za-z0-9]{6}/g,
+    // Matches the DEFAULT token prefix from @graphorin/security
+    // (DEFAULT_TOKEN_PREFIX = 'gph'); deployments that configure a
+    // custom prefix must register their own pattern. The env label is
+    // matched loosely because `acceptEnvironments` is operator-extensible.
+    description: 'Graphorin server token (`gph_<env>_v1_<entropy>_<crc32>`; default prefix).',
+    regex: /gph_[a-z0-9]{2,12}_v1_[A-Za-z0-9]{20,80}_[A-Za-z0-9]{6}/g,
     mask: '[REDACTED graphorin-token]',
   },
   {
