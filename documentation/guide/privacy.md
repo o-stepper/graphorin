@@ -65,6 +65,34 @@ GRAPHORIN_OFFLINE=1 GRAPHORIN_LLM_RECIPE=stub \
 
 Network sniffers (`lsof -i -nP | grep node`, `tcpdump`, `Wireshark`) should show traffic only to the endpoints you explicitly configured - never beyond.
 
+## Erasure and retention
+
+Deletion in a memory-bearing framework spans roughly a dozen persistence surfaces. This table is the reference for which primitive covers each one; the canonical, machine-checked source of truth for the session cascade is the exported `SESSION_SCOPED_PURGES` registry in `@graphorin/store-sqlite` and its schema-introspection gate test (any new table with a session column fails the suite until it gets an erasure decision).
+
+| Surface | What it stores | Deleted by | Not covered by |
+|---|---|---|---|
+| `sessions`, `session_messages`, `episodes` (+ FTS/vec rows) | conversation transcript and episode summaries | `deleteSession` / `pruneSessions` cascade | - |
+| `facts`, `insights`, `rules`, `working_blocks` (+ FTS/vec rows, entity links) | distilled memory | session-scoped rows: the same cascade; user-scoped rows: `MemoryStore.purge(id)` per record | a session delete never touches user-level rows (`scope_session_id IS NULL`) |
+| `memory_history` | audit trail of memory mutations | values are scrubbed to event skeletons by the cascade and by `purge()`; row skeletons remain | full row deletion (use `graphorin memory prune-history --older-than`) |
+| `workflow_checkpoints`, `workflow_pending_writes` | suspended-run snapshots (full serialized conversation) | session cascade (via the `sessionId` metadata stamped on HITL suspends and the workflow-run mapping); age-based: `CheckpointStoreExt.pruneThreads`; per-thread: `deleteThread` / `compactThread` | - |
+| `spans` | run traces (tool names, error strings, memory-search ids) | session cascade; age-based: `graphorin traces prune --before` / `pruneSpans` | spans with no session id are only deleted by age |
+| `idempotency_records` | request-replay keys | the server's hourly sweep (expired rows) | - |
+| `consolidator_runs`, `consolidator_failed_batches` | consolidation run log + dead-letter queue | `pruneRuns` / `pruneExhaustedBatches`; `graphorin consolidator dlq-clear` | batches still awaiting retry (explicit flag required) |
+| `session_audit` / `audit.db` | lifecycle + security audit chains | `pruneAuditEntries(beforeEpochMs)`; `graphorin audit prune` (re-anchors the Merkle chain - see the runbook in [Security](/guide/security)) | - |
+| spill artifacts (`graphorin-spill:...`) | oversized tool results | cleared on terminal runs; startup TTL sweep (7 days) for orphans | - |
+| encryption backups (`*.bak.*`) | point-in-time database copies | `graphorin storage cleanup-backups` | **erasure does not propagate into existing backups** (see below) |
+
+### Backups do not forget
+
+`graphorin storage backup` takes a point-in-time copy. Deleting a session (or purging a fact) afterwards changes the live database only - every backup taken before the deletion still contains the data. Two operational rules follow: keep backup retention no longer than your erasure obligations, and re-run the erasure after any restore from a pre-deletion backup. The same applies to the timestamped `.bak.<ts>` files that `storage encrypt --swap` leaves behind.
+
+### Erasing a person end-to-end
+
+1. `listSessions({ userId })` on the sessions facade (or `GET /v1/sessions?userId=...`), then `deleteSession(id)` for each - the cascade removes transcripts, episodes, session-scoped facts/insights/rules/blocks, suspended-run checkpoints and spans.
+2. Purge user-scoped memory: enumerate the user's remaining facts/insights/rules (they carry `scope_user_id`) and call `MemoryStore.purge(id)` per record - this also scrubs `memory_history` values.
+3. Sweep the residuals: `graphorin traces prune` for any unsessioned spans in the retention window, `graphorin audit prune` if the audit chain must forget (mind the Merkle re-anchor runbook), `graphorin memory prune-history` for history skeletons.
+4. Apply the backup caveat above to every backup that predates the erasure.
+
 ## Reporting a regression
 
 If you believe you have observed Graphorin making a network call that the runtime did not invite, please open an issue on GitHub or report it privately per the [Security policy](/contributing/security).

@@ -153,6 +153,10 @@ Every replay writes one audit row.
 
 `@graphorin/memory.session.*` is the **single source of truth** for session messages. The `@graphorin/sessions` facade is a typed view over that storage that adds the multi-agent surface (registry, handoffs, attribution, JSONL, replays). There is no duplicate message log to keep in sync.
 
+## Deleting sessions
+
+`sessions.deleteSession(id)` is a hard delete with a full cascade: the session row, its handoffs, workflow-run attachments and lifecycle audit rows, the conversation content (messages and episodes with their FTS/vector index rows), every session-scoped memory surface (facts, insights, rules, working blocks, consolidator state - the `SESSION_SCOPED_PURGES` registry in `@graphorin/store-sqlite` is the canonical list), the session's persisted spans, and the checkpoints of suspended runs linked to the session. `memory_history` values originating from the session are scrubbed to event skeletons. After the call the conversation is neither searchable nor resumable, and `session.replay()` has nothing to reconstruct - that is the point. `pruneSessions({ beforeEpochMs, closedOnly })` runs the same cascade as a retention sweep. Erasure does not reach into previously-taken backups - see [Erasure and retention](/guide/privacy#erasure-and-retention).
+
 ## Composition with the standalone server
 
 The standalone server (`@graphorin/server`) exposes the session surface under `/v1/sessions/...`. See [Standalone server](/guide/standalone-server) for the full REST table.

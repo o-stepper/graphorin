@@ -56,7 +56,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `GET` | `/v1/sessions` | List sessions. |
 | `POST` | `/v1/sessions` | Create a session. |
 | `GET` | `/v1/sessions/:id` | Read a session. |
-| `DELETE` | `/v1/sessions/:id` | Delete a session. |
+| `DELETE` | `/v1/sessions/:id` | Hard-delete a session with the full erasure cascade (content, session-scoped memory, suspended-run checkpoints, spans - see [Erasure and retention](/guide/privacy#erasure-and-retention)). |
 | `GET` | `/v1/sessions/:id/messages` | List messages. |
 | `GET` | `/v1/sessions/:id/handoffs` | List handoffs. |
 | `POST` | `/v1/sessions/:id/export` | Stream a JSONL export. |
