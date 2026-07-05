@@ -67,6 +67,50 @@ describe('C5 - rank-time trust discount in search', () => {
     expect(userHit?.signals?.trust).toBeUndefined();
   });
 
+  it('W-085: the trust discount can displace a foreign hit ACROSS the page boundary', async () => {
+    const memory = makeMemory();
+    // Three foreign facts + one first-party, all matching the query.
+    // With topK=3 and NO widening, the fused cut would fix membership
+    // before the discount runs and the first-party fact (fused rank 4,
+    // inserted last => lowest bm25 tie-break) could never enter the page.
+    for (let i = 0; i < 3; i += 1) {
+      await memory.semantic.remember(scope, {
+        text: `standup meeting cadence note variant ${i}`,
+        provenance: 'imported',
+      });
+    }
+    const mine = await memory.semantic.remember(scope, {
+      text: 'standup meeting cadence note authored by the user',
+      provenance: 'user',
+    });
+    const page = await memory.semantic.search(scope, 'standup meeting cadence', { topK: 3 });
+    expect(page).toHaveLength(3);
+    // The first-party fact IS in the final page - a foreign hit was
+    // displaced past the cut.
+    expect(page.some((h) => h.record.id === mine.id)).toBe(true);
+    expect(page.filter((h) => h.record.provenance === 'imported')).toHaveLength(2);
+
+    // With the discount off, membership reverts to pure fused order.
+    const raw = await memory.semantic.search(scope, 'standup meeting cadence', {
+      topK: 3,
+      trustWeighting: 'off',
+    });
+    expect(raw).toHaveLength(3);
+  });
+
+  it('W-085 regression: a purely first-party result set is byte-identical with the widening', async () => {
+    const memory = makeMemory();
+    const a = await memory.semantic.remember(scope, { text: 'first party alpha note' });
+    const b = await memory.semantic.remember(scope, { text: 'first party beta note' });
+    const hits = await memory.semantic.search(scope, 'first party', { topK: 2 });
+    const off = await memory.semantic.search(scope, 'first party', {
+      topK: 2,
+      trustWeighting: 'off',
+    });
+    expect(hits.map((h) => [h.record.id, h.score])).toEqual(off.map((h) => [h.record.id, h.score]));
+    expect(new Set(hits.map((h) => h.record.id))).toEqual(new Set([a.id, b.id]));
+  });
+
   it("trustWeighting: 'off' restores pure similarity ranking", async () => {
     const memory = makeMemory();
     await memory.semantic.remember(scope, {

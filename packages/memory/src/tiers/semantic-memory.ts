@@ -835,12 +835,25 @@ export class SemanticMemory {
         // predicate), so a tagged search must widen the same way -
         // otherwise untagged candidates occupy fused ranks, get
         // filtered, and the search silently returns fewer than topK.
+        // MRET-8 / memory-retrieval-03 / W-085: whenever ANY post-fusion
+        // stage can reorder or drop hits (decay, tags, owner, graph legs,
+        // entity match, the C5 trust discount, or quarantined-included
+        // reads), the reranker must return the FULL fused pool - cutting
+        // to finalTopK first would fix page membership before those
+        // stages run, so a 0.8x-discounted foreign-provenance hit could
+        // never be displaced by a first-party candidate at fused rank
+        // topK+1. trustWeighting is ON by default, making the widening
+        // near-always active; for a purely first-party result set the
+        // discount factor is 1 everywhere, so order AND membership stay
+        // byte-identical to the unwidened cut.
         const fusedTopK =
           opts.decay !== undefined ||
           (opts.tags?.length ?? 0) > 0 ||
           opts.owner !== undefined ||
           (opts.expandHops ?? 0) > 0 ||
-          opts.entityMatch === true
+          opts.entityMatch === true ||
+          opts.trustWeighting !== 'off' ||
+          opts.includeQuarantined === true
             ? Math.max(
                 finalTopK,
                 lists.reduce((n, l) => n + l.length, 0),
