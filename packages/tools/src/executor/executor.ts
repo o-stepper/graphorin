@@ -255,8 +255,16 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     });
     if (policyBlock !== null) return policyBlock;
 
-    // Data-flow provenance gate (WI-12 / P1-3) - sinks only.
-    const dataFlowBlock = runDataFlowSinkGate(rt, { call, tool, runContext, stepNumber });
+    // Data-flow provenance gate (WI-12 / P1-3) - sinks only. Probes
+    // `effectiveArgs` (raw-shaped, post-repair), consistent with the
+    // approval gate and the argument policy above (W-118).
+    const dataFlowBlock = runDataFlowSinkGate(rt, {
+      call,
+      tool,
+      runContext,
+      stepNumber,
+      effectiveArgs,
+    });
     if (dataFlowBlock !== null) return dataFlowBlock;
 
     // Build the per-call context.

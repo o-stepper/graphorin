@@ -234,4 +234,66 @@ describe('ToolExecutor - data-flow provenance gate (WI-12 / P1-3)', () => {
     });
     expect('output' in completed!.outcome).toBe(true);
   });
+
+  it('W-118: the guard inspects POST-REPAIR args, not the raw call.args', async () => {
+    const registry = createToolRegistry();
+    registry.register(
+      tool({
+        name: 'send',
+        description: 'external sink',
+        inputSchema: z.object({ message: z.string() }),
+        sideEffectClass: 'external-stateful',
+        async execute() {
+          return 'sent';
+        },
+      }),
+    );
+    const { guard, inspected } = makeFakeGuard();
+    const executor = createToolExecutor({
+      registry,
+      dataFlowGuard: guard,
+      repair: {
+        async repair() {
+          // Fix the invalid args by introducing a string the raw args
+          // never carried - the gate must see it.
+          return { message: 'repair-introduced-untrusted-span' };
+        },
+      },
+    });
+    const [completed] = await executor.executeBatch({
+      // Invalid against the schema (message missing) - triggers repair.
+      calls: [{ toolCallId: 'c1', toolName: 'send', args: { wrong: true } }],
+      runContext: makeRunContext(),
+      stepNumber: 1,
+    });
+    expect('output' in completed!.outcome).toBe(true);
+    expect(inspected).toHaveLength(1);
+    expect(inspected[0]!.args).toEqual({ message: 'repair-introduced-untrusted-span' });
+    expect(inspected[0]!.args).not.toEqual({ wrong: true });
+  });
+
+  it('W-118 regression: without repair the inspected args are the raw call.args', async () => {
+    const registry = createToolRegistry();
+    registry.register(
+      tool({
+        name: 'send',
+        description: 'external sink',
+        inputSchema: z.object({ message: z.string() }),
+        sideEffectClass: 'external-stateful',
+        async execute() {
+          return 'sent';
+        },
+      }),
+    );
+    const { guard, inspected } = makeFakeGuard();
+    const executor = createToolExecutor({ registry, dataFlowGuard: guard });
+    const args = { message: 'plain valid args' };
+    await executor.executeBatch({
+      calls: [{ toolCallId: 'c1', toolName: 'send', args }],
+      runContext: makeRunContext(),
+      stepNumber: 1,
+    });
+    expect(inspected).toHaveLength(1);
+    expect(inspected[0]!.args).toEqual(args);
+  });
 });

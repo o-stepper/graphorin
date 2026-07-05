@@ -199,7 +199,14 @@ export interface DataFlowInspectInput {
   readonly trustClass: ToolTrustClass;
   readonly sensitivity?: Sensitivity;
   readonly source?: ToolSource;
-  /** The raw tool-call arguments (stringified by the guard for probing). */
+  /**
+   * Raw-shaped POST-REPAIR arguments (stringified by the guard for
+   * probing): what the approval gate saw and what the validate phase
+   * derives the executed input from (W-118). Bytes-equal to the
+   * model's `call.args` when no repair hook ran. Residual limitation:
+   * probed before schema coercion, so spans introduced purely by Zod
+   * `transform`/`default` are not visible to the verbatim probe.
+   */
   readonly args: unknown;
   readonly runContext: RunContext;
 }
