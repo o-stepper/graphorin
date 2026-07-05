@@ -73,11 +73,22 @@ function grepTracked(pattern, globs) {
   }
 }
 
-const srcGlobs = ['packages/*/src', 'packages/*/tests', 'examples/*/src', 'examples/*/tests'];
-for (const hit of grepTracked("export const VERSION = '", srcGlobs)) {
+const codeGlobs = [
+  'packages/*/src',
+  'packages/*/tests',
+  'examples/*/src',
+  'examples/*/tests',
+  'benchmarks/*/src',
+  'benchmarks/*/tests',
+];
+// The constant-shape guard also covers markdown (a doc sample showing the
+// pre-refactor `export const VERSION = '<semver>'` form would teach readers
+// the drifting pattern back).
+const constGuardGlobs = [...codeGlobs, 'packages/*/README.md', 'examples/*/README.md'];
+for (const hit of grepTracked("export const VERSION = '", constGuardGlobs)) {
   failures.push(`${hit} <- hardcoded VERSION constant; derive from package.json instead`);
 }
-for (const hit of grepTracked(`'${canonical.replaceAll('.', '\\.')}'`, srcGlobs)) {
+for (const hit of grepTracked(`'${canonical.replaceAll('.', '\\.')}'`, codeGlobs)) {
   failures.push(`${hit} <- framework version literal in code; derive from package.json instead`);
 }
 

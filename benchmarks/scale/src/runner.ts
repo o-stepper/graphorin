@@ -1,3 +1,4 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
@@ -32,7 +33,7 @@ import type { EmbedderProvider, SessionScope } from '@graphorin/core';
 import { createMemory } from '@graphorin/memory';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 function pkgRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..');

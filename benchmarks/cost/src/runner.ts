@@ -26,7 +26,7 @@ import type { Message, Provider, ProviderEvent, ProviderRequest, Tool } from '@g
 import { calculateCost } from '@graphorin/pricing';
 import { JsTiktokenCounter } from '@graphorin/provider/counters';
 
-export const VERSION = '0.2.0';
+export const VERSION: string = pkg.version;
 
 /** A Provider that records every assembled request and returns a terminal text reply. */
 function createCapturingProvider(): { provider: Provider; captured: ProviderRequest[] } {

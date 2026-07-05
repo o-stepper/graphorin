@@ -1,5 +1,6 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
- * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * FTS memory-search latency probe (no embedder). Emits p50/p95/p99 on a
  * synthetic fact corpus. Streaming TTFT and fact-extraction latency are NOT
@@ -15,7 +16,7 @@ import type { SessionScope } from '@graphorin/core';
 import { createMemory } from '@graphorin/memory';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 function pkgRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..');

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 /**
  * bump-version.mjs
  *
@@ -23,9 +24,9 @@
  * mentions (they do not match the anchored patterns).
  */
 
+import { spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { spawnSync } from 'node:child_process';
 
 import {
   canonicalVersion,
@@ -81,10 +82,14 @@ console.log(
   `[bump-version] v${target}: ${manifestsChanged} manifest(s) + ${sitesChanged} text file(s) updated.`,
 );
 console.log('[bump-version] manual follow-ups the script cannot decide for you:');
-console.log('  - root CHANGELOG.md: write the release section (changesets only writes per-package logs)');
+console.log(
+  '  - root CHANGELOG.md: write the release section (changesets only writes per-package logs)',
+);
 console.log('  - README.md "Latest release" line: refresh the date + highlights text');
 console.log('  - documentation/guide/migration.md: retitle the "-> next (unreleased)" section');
-console.log('  - regenerate documentation/api (pnpm --filter @graphorin/docs run clean && build:typedoc && build:sanitise)');
+console.log(
+  '  - regenerate documentation/api (pnpm --filter @graphorin/docs run clean && build:typedoc && build:sanitise)',
+);
 
 const check = spawnSync(process.execPath, [join(ROOT, 'scripts/check-version-consistency.mjs')], {
   stdio: 'inherit',

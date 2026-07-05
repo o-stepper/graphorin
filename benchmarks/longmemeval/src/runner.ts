@@ -1,3 +1,4 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
@@ -56,7 +57,7 @@ import { createSqliteStore } from '@graphorin/store-sqlite';
 
 import { createDefaultStubProvider } from './stub-provider.js';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 const DEFAULT_TOP_K = 12;
 

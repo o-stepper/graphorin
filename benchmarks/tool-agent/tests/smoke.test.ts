@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
@@ -9,8 +13,8 @@ import { runToolAgentBenchmark, VERSION } from '../src/runner.js';
 import { brokenTask, DEFAULT_TASKS } from '../src/tasks.js';
 
 describe('benchmarks/tool-agent', () => {
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runs the default suite fully offline and deterministically (pass^k = 1)', async () => {

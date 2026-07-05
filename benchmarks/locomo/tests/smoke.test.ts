@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
 
 import { dirname, join } from 'node:path';
@@ -8,8 +12,8 @@ import { describe, expect, it } from 'vitest';
 import { runLocomoBenchmark, VERSION } from '../src/runner.js';
 
 describe('benchmarks/locomo', () => {
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('smoke subset passes all seeded cases', async () => {

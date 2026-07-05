@@ -1,3 +1,4 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
@@ -14,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 
 import { runToolAgentSuite, type SuiteMetrics } from './harness.js';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 interface BaselineFile {
   readonly suiteId: string;

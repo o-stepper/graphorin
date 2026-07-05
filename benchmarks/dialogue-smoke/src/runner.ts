@@ -1,5 +1,6 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
- * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Dialogue smoke test: a few fixed turns carry one structured fact;
  * assistant lines echo acknowledgement. After the turns, the fact should
@@ -16,7 +17,7 @@ import type { SessionScope } from '@graphorin/core';
 import { createMemory } from '@graphorin/memory';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 function pkgRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..');

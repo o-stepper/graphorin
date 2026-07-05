@@ -8,7 +8,7 @@ implementation (sandbox, secrets store, memory store, provider adapters,
 agent runtime, workflow engine, server, …) lives in a sibling package and
 depends on the interfaces declared here.
 
-- **Status:** v0.6.0 - type and contract surface for the v0.1 release line.
+- **Status:** v0.6.1 - type and contract surface for the v0.1 release line.
 - **License:** [MIT](./LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Runtime dependencies:** none.
@@ -70,4 +70,4 @@ records are still being refined for v0.2.
 
 ---
 
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

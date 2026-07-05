@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.6.0**](../../../index.md)
+[**Graphorin API reference v0.6.1**](../../../index.md)
 
 ***
 
