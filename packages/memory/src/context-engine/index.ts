@@ -15,6 +15,12 @@
  * @packageDocumentation
  */
 
+/**
+ * Re-export `MemoryMetadata` for ergonomic call-site typing.
+ *
+ * @stable
+ */
+export type { MemoryMetadata } from '@graphorin/core';
 export {
   annotate,
   CONTENT_ORIGIN_ATTR,
@@ -46,6 +52,10 @@ export {
   type PrivacyConfig,
   type ResolvedContextEngineConfig,
 } from './engine.js';
+// The `memory.compile(...)` surface types live in the io-types leaf
+// (issue #22); re-exported here so the public import path is
+// unchanged.
+export type { CompileOptions, CompileScope, MemoryContextBlocks } from './io-types.js';
 export {
   type AutoRecallTriggers,
   type BaseTemplateFragments,
@@ -106,51 +116,3 @@ export {
   HEURISTIC_TOKEN_COUNTER,
   renderMessageText,
 } from './token-counter.js';
-
-/**
- * Compile result. Layered into the system prompt by the agent
- * runtime. Preserved as a stable surface from Phase 10a so
- * existing consumers (`memory.compile(scope)`) keep working
- * unchanged after Phase 10d.
- *
- * @stable
- */
-export interface MemoryContextBlocks {
-  /** XML-rendered working memory blocks, when any. */
-  readonly workingBlocks?: string;
-  /** Active procedural rules block. */
-  readonly rules?: string;
-  /** Static narrative base (English by default; locale-aware). */
-  readonly base?: string;
-  /** Bucketed memory metadata block. */
-  readonly metadata?: string;
-  /** Optional auto-recalled memory hints. */
-  readonly autoRecalled?: string;
-  /** Optional `cache_control` hints for prompt-cache aware providers. */
-  readonly cacheHints?: ReadonlyArray<string>;
-}
-
-/**
- * Per-call options accepted by `memory.compile(...)`.
- *
- * @stable
- */
-export interface CompileOptions {
-  readonly maxBlocks?: number;
-  readonly includeMetadata?: boolean;
-  readonly providerAcceptsSensitivity?: ReadonlyArray<'public' | 'internal' | 'secret'>;
-}
-
-/**
- * Author-time scope passed through to the context engine.
- *
- * @stable
- */
-export type CompileScope = import('@graphorin/core').SessionScope;
-
-/**
- * Re-export `MemoryMetadata` for ergonomic call-site typing.
- *
- * @stable
- */
-export type { MemoryMetadata } from '@graphorin/core';

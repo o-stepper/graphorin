@@ -18,7 +18,7 @@
  */
 
 import type { MessageContent, Sensitivity, SessionScope } from '@graphorin/core';
-import type { Memory } from '../../../facade.js';
+import type { Memory } from '../../../memory-interface.js';
 
 /**
  * Resolved dependency surface every built-in hook reads. Threaded

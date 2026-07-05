@@ -30,7 +30,7 @@ import type {
   SessionScope,
   TokenCounter,
 } from '@graphorin/core';
-import type { Memory } from '../facade.js';
+import type { ContextEngine, Memory } from '../memory-interface.js';
 import { annotate, type ContentAnnotation, shouldFireInboundPreamble } from './annotations.js';
 import {
   type AutoRecallStrategy,
@@ -57,6 +57,12 @@ import type {
   CompactionSummarizer,
   PostCompactionHook,
 } from './compaction/types.js';
+import type {
+  AnnotatedPart,
+  AssembledPrompt,
+  AssembleInput,
+  ResolvedContextEngineConfig,
+} from './io-types.js';
 import {
   type ContextLocalePack,
   enLocalePack,
@@ -71,10 +77,8 @@ import {
   composeLayer2,
   composeLayer4Skills,
   type MemoryBaseMode,
-  type SkillMetadataCard,
 } from './templates/composer.js';
 import {
-  type AllocationResult,
   allocate as allocateLayers,
   type LayerAllocation,
   type LayerCandidate,
@@ -177,171 +181,19 @@ export interface ContextEngineConfig {
   readonly now?: () => number;
 }
 
-/**
- * Per-call runtime context handed to {@link ContextEngine.assemble}.
- *
- * @stable
- */
-export interface AssembleInput {
-  readonly scope: SessionScope;
-  readonly agentId: string;
-  readonly sessionId: string;
-  readonly runId: string;
-  readonly agentInstructions?: string;
-  readonly skills?: ReadonlyArray<SkillMetadataCard>;
-  readonly proceduralActivation?: {
-    readonly topic?: string;
-    readonly tags?: ReadonlyArray<string>;
-  };
-  readonly lastUserMessage?: string;
-  readonly autoRecallStrategyOverride?: AutoRecallStrategy;
-  /**
-   * Optional inbound-trust annotations carried by upstream
-   * messages (`session_messages` rows tagged by Phase 12 / Phase
-   * 07 / Phase 09). When at least one part has `inboundTrust !==
-   * 'trusted' && inboundTrust !== 'n/a'`, the per-step preamble
-   * fires (see RB-43 / DEC-159).
-   */
-  readonly upstreamAnnotations?: ReadonlyArray<ContentAnnotation>;
-}
-
-/**
- * Single annotated `MessageContent` part assembled by the engine.
- *
- * @stable
- */
-export interface AnnotatedPart {
-  readonly content: MessageContent;
-  readonly annotation: ContentAnnotation;
-}
-
-/**
- * Output of {@link ContextEngine.assemble}.
- *
- * @stable
- */
-export interface AssembledPrompt {
-  /** Single system message ready for `provider.stream(...)`. */
-  readonly systemMessage: { readonly role: 'system'; readonly content: string };
-  /**
-   * Per-part annotations, in the same order as the assembled
-   * system content. Span-only - never serialized to the wire payload.
-   */
-  readonly annotations: ReadonlyArray<AnnotatedPart>;
-  /**
-   * Per-layer allocation snapshot. Surfaced for tests + diagnostics.
-   */
-  readonly layerAllocation: AllocationResult;
-  /** Whether the per-step inbound preamble fragment fired this assembly. */
-  readonly inboundPreambleFired: boolean;
-  /** Privacy-filter counters surfaced to the metadata block. */
-  readonly privacyCounters: Readonly<Record<PrivacyDecisionReason, number>>;
-  /** Resolved locale id (`'en'` for the default; custom otherwise). */
-  readonly localeId: string;
-  /** Resolved memory base mode. */
-  readonly memoryBaseMode: MemoryBaseMode;
-  /** Whether auto-recall was triggered this assembly. */
-  readonly autoRecall: AutoRecallTriggerResult;
-}
-
-/**
- * Public surface of the {@link ContextEngine} instance returned by
- * {@link createContextEngine}.
- *
- * @stable
- */
-export interface ContextEngine {
-  /** Assemble the layered system prompt for a single step. */
-  assemble(memory: Memory, input: AssembleInput): Promise<AssembledPrompt>;
-  /**
-   * Trigger evaluation primitive used by Phase 12 (agent runtime)
-   * at the top of every step. Returns `true` when the in-flight
-   * buffer's token count crosses the per-provider trigger
-   * threshold. Pass `precomputedTokens` to amortize the count
-   * via the per-message cache surfaced by
-   * `SessionMemoryStoreExt.totalCachedTokens(scope)` (DEC-131) -
-   * the production hot path is an O(1) comparison when the cache
-   * is warm.
-   */
-  shouldCompact(
-    messages: ReadonlyArray<Message>,
-    options?: {
-      readonly precomputedTokens?: number;
-      /**
-       * Index of the first COMPACTABLE message (context-engine-04): the
-       * caller's pinned, never-compacted system prefix ends here. The
-       * SOTA-4 reclaim floor counts only `messages.slice(from)` older
-       * turns as reclaimable - without it a large system prompt is
-       * counted as reclaimable and the floor fires the summarizer for
-       * near-zero real reclaim. Default `0` (everything compactable).
-       */
-      readonly compactableFromIndex?: number;
-    },
-  ): Promise<boolean>;
-  /**
-   * Run a compaction call. Phase 12 calls this when the trigger
-   * fires (`source: 'auto-trigger'`) or the operator invokes
-   * `agent.compact(...)` (`source: 'manual'`).
-   */
-  compactNow(input: {
-    readonly scope: SessionScope;
-    readonly runId: string;
-    readonly sessionId: string;
-    readonly agentId: string;
-    readonly source: CompactionSource;
-    readonly messages: ReadonlyArray<Message>;
-    readonly memory: Memory;
-    readonly summarizer?: CompactionSummarizer;
-    /** Per-call override of the strategy's preserve-recent count (CE-3). */
-    readonly preserveRecentTurns?: number;
-    /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
-    readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
-    /**
-     * The caller's pinned system prefix - the messages EXCLUDED from
-     * `messages` before this call (context-engine-04). Used only for
-     * accounting: the anti-thrash guard and the "still above threshold"
-     * warning must compare against the FULL post-splice context
-     * (prefix + summary + preserved + essentials), or a real system
-     * prompt defeats the guard and a summarizer call fires every step
-     * at the context edge. Never compacted, never returned.
-     */
-    readonly prefixMessages?: ReadonlyArray<Message>;
-    readonly signal?: AbortSignal;
-  }): Promise<{
-    readonly result: CompactionResult;
-    readonly extraContent: ReadonlyArray<MessageContent>;
-    readonly hookFailures: ReadonlyArray<{ readonly hookName: string; readonly reason: string }>;
-  }>;
-  /** Resolved configuration snapshot. */
-  config(): ResolvedContextEngineConfig;
-}
-
-/**
- * Resolved configuration snapshot returned by
- * {@link ContextEngine.config}.
- *
- * @stable
- */
-export interface ResolvedContextEngineConfig {
-  readonly memoryBaseMode: MemoryBaseMode;
-  readonly localeId: string;
-  readonly maxContextTokens: number;
-  readonly reservedForResponse: number;
-  readonly reservedForCompaction: number;
-  readonly compactionEnabled: boolean;
-  /**
-   * Whether compaction can actually fire (CE-12): `compactionEnabled` **and** a
-   * `providerContextWindow` was supplied. `compactionEnabled: true` with
-   * `compactionEffective: false` is the honest signal that compaction is
-   * configured-on but a no-op for want of a context window.
-   */
-  readonly compactionEffective: boolean;
-  readonly compactionThresholdTokens: number;
-  readonly providerContextWindow: number | null;
-  readonly providerTrust: LocalProviderTrust;
-  readonly cloudUploadConsent: boolean;
-  readonly defaultSensitivity: Sensitivity;
-}
+// The IO shapes (AssembleInput / AnnotatedPart / AssembledPrompt /
+// ResolvedContextEngineConfig) live in the io-types leaf and the
+// ContextEngine interface itself is co-located with `Memory` in
+// memory-interface.ts (issue #22 - the pair is mutually recursive).
+// Both are re-exported here so every existing import path keeps
+// working unchanged.
+export type { ContextEngine } from '../memory-interface.js';
+export type {
+  AnnotatedPart,
+  AssembledPrompt,
+  AssembleInput,
+  ResolvedContextEngineConfig,
+} from './io-types.js';
 
 const DEFAULT_LAYER_CAPS: Readonly<
   Record<keyof Required<NonNullable<ContextEngineConfig['layers']>>, number | undefined>
