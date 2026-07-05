@@ -17,6 +17,7 @@ import { z } from 'zod';
 import { WorkflowNotFoundError } from '../errors/index.js';
 import type { ServerVariables } from '../internal/context.js';
 import { newRequestId } from '../internal/ids.js';
+import { toWireError } from '../internal/wire-error.js';
 import { createScopeMiddleware } from '../middleware/scope.js';
 import type { WorkflowRegistry } from '../registry/index.js';
 import type { RunStateTracker } from '../runtime/run-state.js';
@@ -341,9 +342,13 @@ function backgroundExecute(
       }
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'completed');
     } catch (err) {
+      // W-052: the frame carries the normalized machine-readable code
+      // next to the unchanged message, so clients can retry
+      // `checkpoint-version-conflict` and abandon
+      // `node-execution-failed` without parsing prose.
       streaming.dispatcher?.emit(streaming.subject, {
         type: 'workflow.error',
-        payload: { runId, message: err instanceof Error ? err.message : String(err) },
+        payload: { runId, ...toWireError(err) },
       });
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'failed', err);
     }
@@ -384,9 +389,10 @@ function backgroundResume(
       }
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'completed');
     } catch (err) {
+      // W-052: same envelope as the execute path.
       streaming.dispatcher?.emit(streaming.subject, {
         type: 'workflow.error',
-        payload: { runId, message: err instanceof Error ? err.message : String(err) },
+        payload: { runId, ...toWireError(err) },
       });
       runs.complete(runId, tracker.signal.aborted ? 'aborted' : 'failed', err);
     }

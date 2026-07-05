@@ -14,6 +14,8 @@
  * @packageDocumentation
  */
 
+import { toWireError } from '../internal/wire-error.js';
+
 /**
  * Stable status discriminator for a run snapshot. Mirrors the values
  * exposed on the public REST surface.
@@ -68,7 +70,7 @@ export interface RunStateSnapshot {
   readonly status: RunStatus;
   readonly startedAt?: number;
   readonly completedAt?: number;
-  readonly error?: { readonly message: string };
+  readonly error?: { readonly message: string; readonly code?: string; readonly hint?: string };
   readonly agentId?: string;
   readonly workflowId?: string;
   readonly threadId?: string;
@@ -119,7 +121,7 @@ interface RunRecord {
   controller: AbortController;
   startedAt?: number;
   completedAt?: number;
-  error?: { readonly message: string };
+  error?: { readonly message: string; readonly code?: string; readonly hint?: string };
 }
 
 /**
@@ -214,7 +216,9 @@ export class RunStateTracker {
     record.status = status;
     record.completedAt = this.#now();
     if (err !== undefined) {
-      record.error = { message: err instanceof Error ? err.message : String(err) };
+      // W-052: keep the machine-readable code next to the message so
+      // the GET run-status surface reports it too.
+      record.error = toWireError(err);
     }
     if (!wasTerminal) this.#emitTerminal(record);
   }
