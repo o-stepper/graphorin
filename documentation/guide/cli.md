@@ -31,10 +31,10 @@ graphorin auth <subcommand>     - login / list / refresh / revoke / status (OAut
 graphorin pricing <subcommand>  - status / refresh / diff / lookup / missing
 graphorin skills <subcommand>   - install / inspect / audit / migrate-frontmatter
 graphorin traces <subcommand>   - status / prune
-graphorin migrate-export <path> - export a JSONL session from the local DB
+graphorin migrate-export <path> - migrate an existing JSONL session export file to the current schema
 graphorin guard <subcommand>    - status / explain memory-modification policies
 graphorin telemetry <subcommand> - status / enable / disable / inspect
-graphorin tools lint <path>     - lint workspace tools against the @graphorin/eslint-plugin rules
+graphorin tools lint            - lint workspace tools against the @graphorin/eslint-plugin rules
 ```
 
 ## `graphorin start`
@@ -88,9 +88,9 @@ Use `--secrets-source <auto|keyring|encrypted-file|env>` and `--strict-secrets` 
 ```bash
 graphorin pricing status
 graphorin pricing refresh --url <url>         # fetches a fresh snapshot on demand (network)
-graphorin pricing diff
-graphorin pricing lookup <model>              # resolve one model's entry
-graphorin pricing missing                     # models with no pricing data
+graphorin pricing diff --snapshot ./snapshot.json            # diff a supplied snapshot against the bundled one
+graphorin pricing lookup --provider openai --model gpt-4o    # resolve one (provider, model) entry
+graphorin pricing missing --spans ./spans.json               # models with no pricing data
 ```
 
 The bundled snapshot is **never refreshed automatically** - only an explicit invocation of `graphorin pricing refresh` reaches the network. See [Pricing](/reference/pricing).
@@ -147,7 +147,7 @@ graphorin consolidator stop
 ## `graphorin migrate-export`
 
 ```bash
-graphorin migrate-export ./session.jsonl --to-schema 1.0 --json
+graphorin migrate-export ./session.jsonl --to ./session.migrated.jsonl --to-schema 1.0 --json
 ```
 
 Produces a deterministic JSONL export - see [Sessions § JSONL export schema 1.0](/guide/sessions#jsonl-export-schema-1-0).

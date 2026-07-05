@@ -813,7 +813,9 @@ function registerConsolidatorCommands(program: Command): void {
       });
     });
   c.command('set-tier <tier>')
-    .description('Persist a tier hint (free | cheap | standard | full | custom).')
+    .description(
+      'Runtime tier switching is not wired yet: reports UNSUPPORTED (exit 2) and points at consolidator.tier in the config (IP-4).',
+    )
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (tier: string, opts: { config?: string; json?: boolean }) => {
@@ -824,7 +826,9 @@ function registerConsolidatorCommands(program: Command): void {
       });
     });
   c.command('stop')
-    .description('Persist a pause flag the running daemon honours.')
+    .description(
+      'Runtime pause is not wired yet: reports UNSUPPORTED (exit 2); stop the server process to stop consolidation (IP-4).',
+    )
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (opts: { config?: string; json?: boolean }) => {
@@ -1261,7 +1265,7 @@ function registerToolsCommands(program: Command): void {
     .command('lint')
     .description(
       [
-        'Static AST analysis of every tool({...}) registration; per-tool grader + threshold gate (RB-49).',
+        'Text-based static scan of every tool({...}) registration; per-tool grader + threshold gate (RB-49).',
         '',
         'Grader rubric (40 + 30 + 30 = 100 points):',
         '  description axis (0..40): 0 if missing/placeholder/<20 chars; 16/24/32/40 by length.',
