@@ -77,6 +77,18 @@ const WORKSPACE_REQUIRED_LICENSE = 'MIT';
  * upstream relicense) re-triggers the audit.
  */
 const DEPENDENCY_EXCEPTIONS = new Map([
+  // Ships NO license field in its manifest. Upstream
+  // github.com/andrewbranch/untar.js carries a plain MIT LICENSE file
+  // (Copyright (c) 2015 Kevin Kwok; fork by the @arethetypeswrong
+  // author). Dev-only transitive dep of @arethetypeswrong/cli (the
+  // pack gate, W-071); never reachable from published artifacts.
+  [
+    '@andrewbranch/untar.js',
+    {
+      license: null,
+      reason: 'manifest omits the field; upstream LICENSE is plain MIT (verified)',
+    },
+  ],
   // The package literally writes `"license": "SEE LICENSE IN LICENSE"`
   // in its manifest. Inspecting `node_modules/.pnpm/.../spawndamnit/LICENSE`
   // shows the standard MIT permission text (Copyright (c) 2017-present
