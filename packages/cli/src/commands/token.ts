@@ -178,11 +178,12 @@ export async function runTokenRevoke(
       const print = options.print ?? defaultPrintSink;
       if (result === undefined) {
         print(brand(`token '${options.id}' not found.`));
-        process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
         return;
       }
       print(brand(`token '${result.id}' revoked at ${result.revokedAt ?? '<now>'}`));
     });
+    // W-002: exit code independent of --json (see runAuditVerify).
+    if (result === undefined) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
     return result;
   } finally {
     await ctx.close();
@@ -323,8 +324,9 @@ export function runTokenVerify(options: TokenVerifyOptions): TokenVerifyResult {
       return;
     }
     print(brand(`token format ${statusMarker('fail')} (${out.reason ?? 'unknown reason'})`));
-    process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
   });
+  // W-002: exit code independent of --json (see runAuditVerify).
+  if (!out.ok) process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;
   return out;
 }
 

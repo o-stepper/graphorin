@@ -82,6 +82,12 @@ export interface CommonOutputOptions {
  * `--json`. Used by every Phase 15 subcommand that produces a single
  * status payload (e.g. `graphorin doctor`, `graphorin token list`).
  *
+ * WARNING (W-002): `human()` runs ONLY in non-JSON mode. Side effects
+ * that are part of the machine contract - `process.exitCode` above all
+ * - are FORBIDDEN inside it: they would silently vanish for exactly
+ * the `--json` consumers (CI) they exist for. Compute the failure
+ * predicate before calling this and set the exit code after it.
+ *
  * @internal
  */
 export function emitReport(
