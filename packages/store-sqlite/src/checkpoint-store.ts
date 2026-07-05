@@ -3,21 +3,24 @@ import type {
   CheckpointId,
   CheckpointMetadata,
   CheckpointPutOptions,
-  CheckpointStore,
+  CheckpointStoreExt,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
+  PruneThreadsOptions,
 } from '@graphorin/core/contracts';
 import { CheckpointConflictError } from '@graphorin/core/contracts';
 import type { SqliteConnection } from './connection.js';
 
 /**
- * Default `CheckpointStore` implementation. Workflow state is encoded
- * as JSON blobs; per-task pending writes survive partial step failure.
+ * Default `CheckpointStore` implementation (including the W-009
+ * `CheckpointStoreExt` retention primitives). Workflow state is
+ * encoded as JSON blobs; per-task pending writes survive partial step
+ * failure.
  *
  * @stable
  */
-export class SqliteCheckpointStore implements CheckpointStore {
+export class SqliteCheckpointStore implements CheckpointStoreExt {
   #conn: SqliteConnection;
   constructor(conn: SqliteConnection) {
     this.#conn = conn;
@@ -165,6 +168,85 @@ export class SqliteCheckpointStore implements CheckpointStore {
       this.#conn.run('DELETE FROM workflow_pending_writes WHERE thread_id = ?', [threadId]);
       this.#conn.run('DELETE FROM workflow_checkpoints WHERE thread_id = ?', [threadId]);
     });
+  }
+
+  /**
+   * W-009 retention sweep. Policy: a `(thread_id, namespace)` pair
+   * qualifies when its LATEST checkpoint (by step_number) is older than
+   * the cutoff and - unless `onlyTerminal: false` - terminal
+   * ('completed' / 'failed' / 'aborted'); suspended pairs hold live
+   * HITL approvals / awakeables and are protected by default.
+   *
+   * CRITICAL: never delegates to `deleteThread` - that primitive is
+   * namespace-blind, and with a reused threadId (e.g. a sessionId used
+   * by two workflows) pruning workflow A's terminal thread would erase
+   * workflow B's suspended checkpoints, breaking the onlyTerminal
+   * guarantee. Each qualifying pair is deleted with namespace-scoped
+   * statements in its own transaction so a long sweep never holds the
+   * writer lock across the whole table.
+   */
+  async pruneThreads(opts: PruneThreadsOptions): Promise<number> {
+    const onlyTerminal = opts.onlyTerminal !== false;
+    const pairs = this.#conn.all<{ thread_id: string; namespace: string }>(
+      `SELECT thread_id, namespace FROM (
+         SELECT thread_id, namespace, status, created_at,
+                ROW_NUMBER() OVER (
+                  PARTITION BY thread_id, namespace ORDER BY step_number DESC
+                ) AS rn
+         FROM workflow_checkpoints
+       )
+       WHERE rn = 1 AND created_at < ?${
+         onlyTerminal ? " AND status IN ('completed', 'failed', 'aborted')" : ''
+       }`,
+      [opts.beforeEpochMs],
+    );
+    for (const pair of pairs) {
+      this.#conn.transaction(() => {
+        this.#conn.run(
+          'DELETE FROM workflow_pending_writes WHERE thread_id = ? AND namespace = ?',
+          [pair.thread_id, pair.namespace],
+        );
+        this.#conn.run('DELETE FROM workflow_checkpoints WHERE thread_id = ? AND namespace = ?', [
+          pair.thread_id,
+          pair.namespace,
+        ]);
+      });
+    }
+    return pairs.length;
+  }
+
+  /**
+   * W-009 compaction: keep only the `keepLast` newest checkpoints (by
+   * step_number) of one `(thread_id, namespace)` pair. Resume reads the
+   * latest tuple, so `keepLast >= 1` never breaks resumability; the
+   * oldest surviving checkpoint's parent_id may point at a deleted row,
+   * which getTuple/list never resolve and the CAS compares only the
+   * latest id - safe, but time-travel/fork targets are gone.
+   */
+  async compactThread(threadId: string, namespace: string, keepLast: number): Promise<number> {
+    const keep = Math.max(1, Math.floor(keepLast));
+    let deleted = 0;
+    this.#conn.transaction(() => {
+      const victims = this.#conn.all<{ id: string }>(
+        `SELECT id FROM workflow_checkpoints
+         WHERE thread_id = ? AND namespace = ?
+         ORDER BY step_number DESC
+         LIMIT -1 OFFSET ?`,
+        [threadId, namespace, keep],
+      );
+      for (const victim of victims) {
+        this.#conn.run(
+          'DELETE FROM workflow_pending_writes WHERE thread_id = ? AND namespace = ? AND checkpoint_id = ?',
+          [threadId, namespace, victim.id],
+        );
+        this.#conn.run(
+          'DELETE FROM workflow_checkpoints WHERE thread_id = ? AND namespace = ? AND id = ?',
+          [threadId, namespace, victim.id],
+        );
+      }
+      deleted = victims.length;
+    });
+    return deleted;
   }
 }
 

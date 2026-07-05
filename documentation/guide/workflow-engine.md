@@ -286,6 +286,16 @@ Two of these are planning-honesty guarantees: a conditional fan where **no** edg
 
 Pass the `tracer` from `@graphorin/observability` to record `workflow.run`, `workflow.step`, `workflow.task`, and `workflow.checkpoint` spans.
 
+## Retention and cleanup
+
+The engine writes a full JSON snapshot of the workflow state on every superstep, plus `workflow_pending_writes` rows; with `journalSteps` the step journal rides inside the state and inflates every snapshot. Storage therefore grows as roughly `state size x steps` per thread, and the engine itself never deletes anything: a finished thread is still needed for inspection and duplicate-resume refusal, and how long to keep it is an operator decision. Three primitives cover the lifecycle (the first two live on `CheckpointStoreExt`, implemented by both `@graphorin/store-sqlite` and the in-memory store):
+
+- `pruneThreads({ beforeEpochMs, onlyTerminal })` - the retention sweep. A `(threadId, namespace)` pair qualifies when its latest checkpoint is older than the cutoff and (by default) terminal: suspended threads hold live HITL approvals and awakeables and survive the sweep unless you pass `onlyTerminal: false`. The sweep is namespace-scoped by construction - with a reused `threadId` (for example a session id shared by two workflows), pruning workflow A's finished thread never touches workflow B's suspended checkpoints.
+- `compactThread(threadId, namespace, keepLast)` - in-place history compaction for long-lived threads. Resume always reads the latest tuple, so `keepLast >= 1` never breaks resumability. Compaction does delete time-travel/fork targets, and the oldest surviving checkpoint's `parentId` may point at a deleted row - `getTuple`/`list` never resolve parents and the CAS compares only the latest id, so this is safe, but forks from compacted history are gone.
+- `deleteThread(threadId)` - full erasure of one thread across ALL namespaces (the host calls it when a thread's data must disappear, e.g. after exporting results). Because it is namespace-blind, never use it as a retention sweep - that is what `pruneThreads` is for.
+
+Session-linked checkpoints (agent HITL suspends and threads attached via `Session.attachWorkflowRun`) are additionally erased by the session hard-delete cascade - see the erasure guide in [Privacy](/guide/privacy).
+
 ## Next steps
 
 - [Agent runtime](/guide/agent-runtime) - pair workflows with agent runs.

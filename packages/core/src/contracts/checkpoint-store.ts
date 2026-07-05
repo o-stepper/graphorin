@@ -165,5 +165,68 @@ export interface CheckpointStore {
 
   list(threadId: string, namespace: string, opts?: ListOptions): AsyncIterable<CheckpointTuple>;
 
+  /**
+   * Full erasure primitive: delete every checkpoint and pending write of
+   * this thread across ALL namespaces. Namespace-blind by contract -
+   * retention sweeps must use {@link CheckpointStoreExt.pruneThreads}
+   * instead, which is namespace-scoped and protects suspended threads.
+   */
   deleteThread(threadId: string): Promise<void>;
+}
+
+/**
+ * Options for {@link CheckpointStoreExt.pruneThreads}.
+ *
+ * @stable
+ */
+export interface PruneThreadsOptions {
+  /**
+   * Cutoff: a `(threadId, namespace)` pair qualifies when its LATEST
+   * checkpoint (by `stepNumber`) was created before this epoch-ms
+   * instant.
+   */
+  readonly beforeEpochMs: number;
+  /**
+   * When `true` (the default), only pairs whose latest checkpoint has a
+   * terminal status (`completed` / `failed` / `aborted`) are pruned -
+   * suspended threads hold live HITL approvals / awakeables and must
+   * survive a retention sweep. Set to `false` for a hard age-based
+   * sweep that also removes suspended threads.
+   */
+  readonly onlyTerminal?: boolean;
+}
+
+/**
+ * Retention extension over {@link CheckpointStore} (W-009). The engine
+ * intentionally never deletes finished threads itself - a completed
+ * thread is still needed for inspection and duplicate-resume refusal;
+ * how long to keep it is an operator decision. These primitives are
+ * what an operator (or a host scheduler) drives.
+ *
+ * Additive: third-party `CheckpointStore` implementations compile
+ * unchanged; hosts feature-detect with `'pruneThreads' in store`.
+ *
+ * @stable
+ */
+export interface CheckpointStoreExt extends CheckpointStore {
+  /**
+   * Namespace-scoped retention sweep: for every `(threadId, namespace)`
+   * pair matching the policy, delete that pair's checkpoints and pending
+   * writes - and ONLY that pair's. Never implemented via
+   * {@link CheckpointStore.deleteThread} (namespace-blind): with a
+   * reused threadId, pruning a terminal thread of workflow A must not
+   * erase the suspended checkpoints of workflow B. Returns the number
+   * of pairs pruned.
+   */
+  pruneThreads(opts: PruneThreadsOptions): Promise<number>;
+
+  /**
+   * Keep only the `keepLast` most recent checkpoints (by `stepNumber`)
+   * of one `(threadId, namespace)` pair, deleting older ones together
+   * with their pending writes. `keepLast >= 1`; resume works from the
+   * latest tuple, so compaction never breaks resumability - it does
+   * remove time-travel/fork targets. Returns the number of checkpoints
+   * deleted.
+   */
+  compactThread(threadId: string, namespace: string, keepLast: number): Promise<number>;
 }

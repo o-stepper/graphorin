@@ -11,9 +11,11 @@ export type {
   CheckpointMetadata,
   CheckpointPutOptions,
   CheckpointStore,
+  CheckpointStoreExt,
   CheckpointTuple,
   ListOptions,
   PendingWrite,
+  PruneThreadsOptions,
 } from './checkpoint-store.js';
 export { CheckpointConflictError } from './checkpoint-store.js';
 
