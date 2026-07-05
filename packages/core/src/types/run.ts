@@ -73,8 +73,12 @@ export interface RunStateUsageByModel {
  * to the checkpoint store on every `awaiting_approval` boundary, so a
  * separate process can resume the run.
  *
- * The shape is intentionally JSON-stable: every nested type is plain
- * `JSON`-encodable (no `Map`, no `Set`, no `Date`).
+ * JSON stability is guaranteed by the serializer, not by naive
+ * `JSON.stringify`: `messages` and tool-outcome `contentParts` may carry
+ * `Uint8Array | URL` payloads, which the documented wire projection
+ * (`WireRunState` via `toJsonSafeRunState`) encodes as base64 / href
+ * envelopes before stringification. No `Map`, `Set` or `Date` appears
+ * anywhere in the shape.
  *
  * @stable
  */

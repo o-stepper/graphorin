@@ -22,6 +22,109 @@ describe('createInitialRunState', () => {
 });
 
 describe('runStateToJSON / runStateFromJSON', () => {
+  it('pins the current schema version to 1.2', () => {
+    expect(RUN_STATE_SCHEMA_VERSION).toBe('graphorin-run-state/1.2');
+  });
+
+  it('W-004: a multimodal run survives serialize -> JSON -> deserialize byte-for-byte', () => {
+    const bytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 255]);
+    const base = createInitialRunState({ id: 'run-mm', agentId: 'a-1', sessionId: 's-1' });
+    const original = {
+      ...base,
+      messages: [
+        {
+          role: 'user' as const,
+          content: [
+            { type: 'image' as const, image: bytes, mimeType: 'image/png' },
+            {
+              type: 'file' as const,
+              file: new URL('https://example.com/spec.pdf'),
+              mimeType: 'application/pdf',
+            },
+          ],
+        },
+      ],
+      steps: [
+        {
+          stepNumber: 1,
+          startedAt: 'now',
+          agentId: 'a-1',
+          toolCalls: [
+            {
+              call: { toolCallId: 'tc-1', toolName: 'render', args: {} },
+              outcome: {
+                toolCallId: 'tc-1',
+                toolName: 'render',
+                output: 'ok',
+                durationMs: 3,
+                contentParts: [{ type: 'image' as const, image: bytes, mimeType: 'image/png' }],
+              },
+              stepNumber: 1,
+            },
+          ],
+        },
+      ],
+    };
+    const round = runStateFromJSON(runStateToJSON(original));
+    const message = round.messages[0] as { content: readonly { type: string }[] };
+    const image = message.content[0] as unknown as { image: Uint8Array };
+    const file = message.content[1] as unknown as { file: URL };
+    expect(image.image).toBeInstanceOf(Uint8Array);
+    expect(image.image).toEqual(bytes);
+    expect(file.file).toBeInstanceOf(URL);
+    expect(file.file.href).toBe('https://example.com/spec.pdf');
+    const outcome = round.steps[0]?.toolCalls[0]?.outcome as {
+      contentParts: readonly { image: Uint8Array }[];
+    };
+    expect(outcome.contentParts[0]?.image).toBeInstanceOf(Uint8Array);
+    expect(outcome.contentParts[0]?.image).toEqual(bytes);
+  });
+
+  it('W-004: repairs a legacy 1.1 payload whose bytes were stringify-corrupted', () => {
+    const legacy = JSON.stringify({
+      version: 'graphorin-run-state/1.1',
+      id: 'r',
+      agentId: 'a',
+      currentAgentId: 'a',
+      sessionId: 's',
+      status: 'running',
+      steps: [],
+      messages: [
+        {
+          role: 'user',
+          // JSON.stringify(new Uint8Array([1, 2, 3])) shape.
+          content: [{ type: 'image', image: { '0': 1, '1': 2, '2': 3 } }],
+        },
+      ],
+      pendingApprovals: [],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: 'now',
+    });
+    const round = runStateFromJSON(legacy);
+    const message = round.messages[0] as { content: readonly { image: unknown }[] };
+    expect(message.content[0]?.image).toBeInstanceOf(Uint8Array);
+    expect(message.content[0]?.image).toEqual(new Uint8Array([1, 2, 3]));
+  });
+
+  it('still reads 1.0 payloads', () => {
+    const old = JSON.stringify({
+      version: 'graphorin-run-state/1.0',
+      id: 'r',
+      agentId: 'a',
+      currentAgentId: 'a',
+      sessionId: 's',
+      status: 'running',
+      steps: [],
+      messages: [],
+      pendingApprovals: [],
+      handoffs: [],
+      usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      startedAt: 'now',
+    });
+    expect(runStateFromJSON(old).id).toBe('r');
+  });
+
   it('round-trips an empty fresh state', () => {
     const original = createInitialRunState({
       id: 'run-1',
