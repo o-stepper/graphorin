@@ -13,9 +13,8 @@
  */
 
 import type { SessionScope } from '@graphorin/core';
-import type { Consolidator } from './runtime.js';
 import { type ParsedTrigger, parseTriggerSpec, reasonFromTrigger } from './triggers.js';
-import type { ConsolidatorTriggerSpec } from './types.js';
+import type { ConsolidatorTriggerReason, ConsolidatorTriggerSpec, PhaseOutcome } from './types.js';
 
 /**
  * Catch-up policy applied when a trigger missed one or more fires
@@ -26,6 +25,20 @@ import type { ConsolidatorTriggerSpec } from './types.js';
  * @stable
  */
 export type ConsolidatorCatchupPolicy = 'none' | 'last' | 'all';
+
+/**
+ * Subset of the `Consolidator` runtime surface the bridge needs.
+ * Defined structurally - mirroring {@link SchedulerLike} - so this
+ * module never imports `./runtime.js` (which imports the bridge) and
+ * the consolidator module graph stays acyclic (issue #22). The full
+ * `Consolidator` is assignable as-is.
+ *
+ * @stable
+ */
+export interface ConsolidatorLike {
+  trigger(reason: ConsolidatorTriggerReason, scope: SessionScope): Promise<PhaseOutcome | null>;
+  config(): { readonly triggers: ReadonlyArray<ConsolidatorTriggerSpec> };
+}
 
 /**
  * Subset of the `@graphorin/triggers` Scheduler surface the bridge
@@ -123,7 +136,7 @@ export interface RegisterTriggersResult {
  * @stable
  */
 export async function registerConsolidatorTriggers(
-  consolidator: Consolidator,
+  consolidator: ConsolidatorLike,
   scheduler: SchedulerLike,
   options: RegisterTriggersOptions,
 ): Promise<RegisterTriggersResult> {

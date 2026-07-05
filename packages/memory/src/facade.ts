@@ -12,15 +12,10 @@ import type {
   MemoryMetadata,
   Provider,
   SessionScope,
-  Tool,
   Tracer,
 } from '@graphorin/core';
 import { NOOP_TRACER } from '@graphorin/core';
-import {
-  type ConflictPipeline,
-  type ConflictPipelineOptions,
-  createConflictPipeline,
-} from './conflict/index.js';
+import { type ConflictPipelineOptions, createConflictPipeline } from './conflict/index.js';
 import {
   type Consolidator,
   type ConsolidatorCeilings,
@@ -51,6 +46,7 @@ import { type EntityResolutionConfig, EntityResolver } from './graph/entity-reso
 import type { ContextualRetrievalMode } from './internal/contextualize.js';
 import { bindEmbedder } from './internal/embedder-binding.js';
 import type { EmbeddingMetaRegistryLike, MemoryStoreAdapter } from './internal/storage-adapter.js';
+import type { Memory } from './memory-interface.js';
 import { createProviderRetrievalGrader } from './search/iterative.js';
 import { createProviderQueryTransformer } from './search/query-transform.js';
 import { RRFReranker } from './search/rrf.js';
@@ -294,44 +290,12 @@ export interface CreateMemoryOptions {
   readonly contextEngine?: ContextEngineConfig;
 }
 
-/**
- * The facade returned by {@link createMemory}.
- *
- * @stable
- */
-export interface Memory {
-  readonly working: WorkingMemory;
-  readonly session: SessionMemory;
-  readonly episodic: EpisodicMemory;
-  readonly semantic: SemanticMemory;
-  readonly procedural: ProceduralMemory;
-  readonly shared: SharedMemory;
-  /**
-   * Read surface over reflection insights (P1-1). A no-op (returns
-   * empty) when the storage adapter does not expose the optional
-   * insight surface.
-   */
-  readonly insights: InsightMemory;
-  readonly tools: ReadonlyArray<Tool>;
-  readonly consolidator: Consolidator;
-  /** The configured conflict pipeline. Surfaced for tests + CLI tooling. */
-  readonly conflictPipeline: ConflictPipeline;
-  /** The configured context engine (Phase 10d). */
-  readonly contextEngine: ContextEngine;
-  /** The active embedder, when configured. `null` otherwise. */
-  readonly embedder: EmbedderProvider | null;
-  /** The canonical id of the active embedder, when configured. */
-  embedderId(): string | null;
-  /**
-   * Compile a system-prompt block bundle. The bundle carries the
-   * static fragments per memory tier; the agent runtime consumes
-   * the {@link ContextEngine} surface (`memory.contextEngine`)
-   * directly for the full six-layer assembly.
-   */
-  compile(scope: CompileScope, options?: CompileOptions): Promise<MemoryContextBlocks>;
-  /** Counter snapshot consumed by Phase 10d's metadata layer. */
-  metadata(scope: SessionScope): Promise<MemoryMetadata>;
-}
+// The `Memory` interface is co-located with `ContextEngine` in
+// memory-interface.ts (issue #22 - the pair is mutually recursive and
+// keeping it here put a type-only cycle into the module graph).
+// Re-exported so `import type { Memory } from './facade.js'` and the
+// public barrel keep working unchanged.
+export type { Memory } from './memory-interface.js';
 
 /**
  * Wire every memory subsystem in one call. Returns the typed
