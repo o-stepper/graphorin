@@ -5,10 +5,13 @@ name: LongMemEval benchmark
 #                  stub fixtures, fails hard, no LLM-judge, no real cost).
 #   2. weekly real-provider — THIS workflow: LLM-judged real-provider run against
 #                  the gated datasets, per-ability regression gates. Dispatch-only
-#                  by default (a meaningful run needs a real Provider key + the
-#                  large datasets, which would bust offline/`check-no-network` and
-#                  cost money); a maintainer enables a weekly `schedule:` trigger
-#                  here once the provider secrets are wired.
+#                  by default (a meaningful run needs a real Provider key, a
+#                  non-self JUDGE (judge_provider/judge_model inputs + the
+#                  GRAPHORIN_BENCH_JUDGE_* secrets; evals-04 refuses self-judged
+#                  baselines) and the large datasets, which would bust
+#                  offline/`check-no-network` and cost money); a maintainer
+#                  enables a weekly `schedule:` trigger here once the provider
+#                  AND judge secrets are wired.
 #   3. release-full — full sweep + baseline comparison at release (added with the
 #                  first npm publication; out of scope until the release contour
 #                  goes live).
@@ -44,6 +47,19 @@ on:
           - openai-compatible
       model:
         description: Model id for a real provider (ignored for stub)
+        type: string
+        default: ''
+      judge_provider:
+        description: Judge provider (required for real-provider runs; evals-04 forbids self-judged baselines)
+        type: choice
+        default: none
+        options:
+          - none
+          - ollama
+          - llamacpp
+          - openai-compatible
+      judge_model:
+        description: Judge model id (ignored when judge_provider is empty)
         type: string
         default: ''
 
@@ -97,11 +113,13 @@ jobs:
       # passed via env (never interpolated into the shell) to avoid injection.
       #
       # The runner resolves its Provider from --provider (default `stub` =
-      # plumbing-only, no real numbers). Select a real provider in the dispatch
-      # form and supply its endpoint/key as repo secrets to produce real
-      # LongMemEval numbers; the emitted RESULTS header records which provider
-      # ran. PROVIDER/MODEL/base-url/key all flow via env (never interpolated
-      # into the shell) to avoid injection.
+      # plumbing-only, no real numbers). Real LongMemEval numbers need BOTH the
+      # SUT provider (dispatch input + endpoint/key secrets) AND a judge
+      # (judge_provider/judge_model inputs + GRAPHORIN_BENCH_JUDGE_* secrets):
+      # the runner refuses to write --json baselines from a self-judged
+      # real-provider run (evals-04). The emitted RESULTS header records which
+      # provider and judge ran. PROVIDER/MODEL/base-url/key all flow via env
+      # (never interpolated into the shell) to avoid injection.
       # C8 (evals-03): the offline plumbing gate — the committed stub+fixture
       # baseline makes the regression machinery REAL in every dispatch, even
       # when the real-provider legs run with a placeholder. Fails hard.
@@ -113,6 +131,15 @@ jobs:
             --results benchmarks/longmemeval/reports/fixture-gate.md \
             --gate-on regressions
 
+      # W-021 fail-fast: a real provider without a judge would fail all five
+      # ability legs identically at startup (self-judged --json refusal). Fail
+      # once, before the loop, with one actionable message instead.
+      - name: Require a judge for real-provider runs
+        if: inputs.provider != 'stub' && (inputs.judge_provider == 'none' || inputs.judge_provider == '')
+        run: |
+          echo "::error::Real-provider runs need a judge: set the judge_provider (and judge_model) dispatch inputs. The runner refuses self-judged --json baselines (evals-04)."
+          exit 1
+
       - name: Run per-ability regression gates
         env:
           LOADER: ${{ inputs.loader }}
@@ -122,6 +149,12 @@ jobs:
           GRAPHORIN_BENCH_MODEL: ${{ inputs.model }}
           GRAPHORIN_BENCH_BASE_URL: ${{ secrets.GRAPHORIN_BENCH_BASE_URL }}
           GRAPHORIN_BENCH_API_KEY: ${{ secrets.GRAPHORIN_BENCH_API_KEY }}
+          # 'none' (the dispatch-form sentinel) maps to an empty string; the
+          # runner treats empty judge env vars as absent.
+          GRAPHORIN_BENCH_JUDGE_PROVIDER: ${{ inputs.judge_provider == 'none' && '' || inputs.judge_provider }}
+          GRAPHORIN_BENCH_JUDGE_MODEL: ${{ inputs.judge_model }}
+          GRAPHORIN_BENCH_JUDGE_BASE_URL: ${{ secrets.GRAPHORIN_BENCH_JUDGE_BASE_URL }}
+          GRAPHORIN_BENCH_JUDGE_API_KEY: ${{ secrets.GRAPHORIN_BENCH_JUDGE_API_KEY }}
         run: |
           set -u
           DATASET="benchmarks/.datasets/$DATASET_FILE"

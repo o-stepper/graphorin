@@ -835,6 +835,35 @@ async function writeResults(
   );
 }
 
+/**
+ * W-021: resolve the judge configuration from CLI flags + env. CLI
+ * wins; env fills the gaps; EMPTY strings (how CI dispatch forms and
+ * unset repo secrets surface) never arm or half-configure the judge.
+ * The judge often lives on a DIFFERENT endpoint than the SUT (that is
+ * the point of a non-self judge), so `GRAPHORIN_BENCH_JUDGE_API_KEY`
+ * takes precedence, falling back to the shared SUT key for
+ * single-endpoint setups. Returns `undefined` when no judge is named.
+ */
+export function resolveJudgeSpec(
+  cli: { readonly name?: string; readonly model?: string; readonly baseUrl?: string },
+  env: Record<string, string | undefined>,
+  sutApiKey: string | undefined,
+): { name: string; model?: string; baseUrl?: string; apiKey?: string } | undefined {
+  const nonEmpty = (value: string | undefined): string | undefined =>
+    value !== undefined && value.length > 0 ? value : undefined;
+  const name = nonEmpty(cli.name) ?? nonEmpty(env.GRAPHORIN_BENCH_JUDGE_PROVIDER);
+  if (name === undefined) return undefined;
+  const model = nonEmpty(cli.model) ?? nonEmpty(env.GRAPHORIN_BENCH_JUDGE_MODEL);
+  const baseUrl = nonEmpty(cli.baseUrl) ?? nonEmpty(env.GRAPHORIN_BENCH_JUDGE_BASE_URL);
+  const apiKey = nonEmpty(env.GRAPHORIN_BENCH_JUDGE_API_KEY) ?? nonEmpty(sutApiKey);
+  return {
+    name,
+    ...(model !== undefined ? { model } : {}),
+    ...(baseUrl !== undefined ? { baseUrl } : {}),
+    ...(apiKey !== undefined ? { apiKey } : {}),
+  };
+}
+
 export async function main(): Promise<void> {
   const args = parseArgs(process.argv);
   // CLI flags win; env (GRAPHORIN_BENCH_*) fills the gaps. The API key is
@@ -862,18 +891,16 @@ export async function main(): Promise<void> {
   // C8 (evals-04): a dedicated judge, resolved exactly like the SUT
   // provider (judge env vars fall back to the SUT env). Without one, the
   // SUT grades itself - legal for plumbing, poisonous for baselines.
-  const judgeName = args.judgeProviderName ?? process.env.GRAPHORIN_BENCH_JUDGE_PROVIDER;
-  const judgeModel = args.judgeModel ?? process.env.GRAPHORIN_BENCH_JUDGE_MODEL;
-  const judgeBaseUrl = args.judgeBaseUrl ?? process.env.GRAPHORIN_BENCH_JUDGE_BASE_URL;
-  const judgeResolved =
-    judgeName !== undefined
-      ? resolveBenchProvider({
-          name: judgeName,
-          ...(judgeModel !== undefined ? { model: judgeModel } : {}),
-          ...(judgeBaseUrl !== undefined ? { baseUrl: judgeBaseUrl } : {}),
-          ...(apiKey !== undefined ? { apiKey } : {}),
-        })
-      : undefined;
+  const judgeSpec = resolveJudgeSpec(
+    {
+      ...(args.judgeProviderName !== undefined ? { name: args.judgeProviderName } : {}),
+      ...(args.judgeModel !== undefined ? { model: args.judgeModel } : {}),
+      ...(args.judgeBaseUrl !== undefined ? { baseUrl: args.judgeBaseUrl } : {}),
+    },
+    process.env,
+    apiKey,
+  );
+  const judgeResolved = judgeSpec !== undefined ? resolveBenchProvider(judgeSpec) : undefined;
   const judgeLabel = judgeResolved?.label ?? label;
   const selfJudged = judgeResolved === undefined && !label.startsWith('stub');
   if (selfJudged) {

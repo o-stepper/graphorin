@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { buildResultsHeader, resolveBenchProvider } from '../src/runner.js';
+import { buildResultsHeader, resolveBenchProvider, resolveJudgeSpec } from '../src/runner.js';
 
 describe('EB-1: real-provider resolution', () => {
   it('defaults to the offline stub, labelled plumbing-only', () => {
@@ -56,5 +56,68 @@ describe('EB-1: RESULTS provenance stamp', () => {
   it('stamps a real provider label into the RESULTS header', () => {
     const header = buildResultsHeader('ollama:llama3.1');
     expect(header).toContain('**Provider:** ollama:llama3.1');
+  });
+});
+
+describe('W-021: judge resolution from CLI + env', () => {
+  it('returns undefined when no judge is named (unset or EMPTY env, as CI dispatch forms produce)', () => {
+    expect(resolveJudgeSpec({}, {}, undefined)).toBeUndefined();
+    expect(
+      resolveJudgeSpec(
+        {},
+        { GRAPHORIN_BENCH_JUDGE_PROVIDER: '', GRAPHORIN_BENCH_JUDGE_MODEL: '' },
+        'sut-key',
+      ),
+    ).toBeUndefined();
+  });
+
+  it('arms the judge from env, preferring the dedicated judge key', () => {
+    const spec = resolveJudgeSpec(
+      {},
+      {
+        GRAPHORIN_BENCH_JUDGE_PROVIDER: 'ollama',
+        GRAPHORIN_BENCH_JUDGE_MODEL: 'judge-model',
+        GRAPHORIN_BENCH_JUDGE_BASE_URL: 'http://judge.local:11434',
+        GRAPHORIN_BENCH_JUDGE_API_KEY: 'judge-key',
+      },
+      'sut-key',
+    );
+    expect(spec).toEqual({
+      name: 'ollama',
+      model: 'judge-model',
+      baseUrl: 'http://judge.local:11434',
+      apiKey: 'judge-key',
+    });
+  });
+
+  it('falls back to the SUT key when the judge key is unset or empty', () => {
+    const viaUnset = resolveJudgeSpec(
+      {},
+      { GRAPHORIN_BENCH_JUDGE_PROVIDER: 'ollama', GRAPHORIN_BENCH_JUDGE_MODEL: 'm' },
+      'sut-key',
+    );
+    expect(viaUnset?.apiKey).toBe('sut-key');
+    const viaEmpty = resolveJudgeSpec(
+      {},
+      {
+        GRAPHORIN_BENCH_JUDGE_PROVIDER: 'ollama',
+        GRAPHORIN_BENCH_JUDGE_MODEL: 'm',
+        GRAPHORIN_BENCH_JUDGE_API_KEY: '',
+      },
+      'sut-key',
+    );
+    expect(viaEmpty?.apiKey).toBe('sut-key');
+  });
+
+  it('CLI flags win over env, and the spec resolves to a REAL provider distinct from the SUT', () => {
+    const spec = resolveJudgeSpec(
+      { name: 'ollama', model: 'cli-model' },
+      { GRAPHORIN_BENCH_JUDGE_PROVIDER: 'llamacpp', GRAPHORIN_BENCH_JUDGE_MODEL: 'env-model' },
+      undefined,
+    );
+    expect(spec).toEqual({ name: 'ollama', model: 'cli-model' });
+    const resolved = resolveBenchProvider(spec ?? {});
+    expect(resolved.provider.name).not.toBe('stub');
+    expect(resolved.label).toBe('ollama:cli-model');
   });
 });
