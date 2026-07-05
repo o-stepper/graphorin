@@ -125,3 +125,112 @@ describe('WS sanitization on the wire', () => {
     expect(JSON.stringify(second.payload)).toBe(JSON.stringify(first.payload));
   });
 });
+
+describe('WS replay path sanitization (W-027)', () => {
+  function buildDispatcher() {
+    const decisions: DeliveryCommentaryDecision[] = [];
+    const dispatcher = createWsDispatcher({
+      commentary: { sink: { onDecision: (d) => decisions.push(d) } },
+    });
+    return { dispatcher, decisions };
+  }
+
+  it('a fresh subscription (no cursor) receives buffered frames sanitized, with decisions', () => {
+    const { dispatcher, decisions } = buildDispatcher();
+    // Emit with NO live subscriber: the frame lands in the replay
+    // buffer raw and no decision fires yet.
+    dispatcher.emit('session:abc/events', {
+      type: 'tool.execute.end',
+      payload: { toolCallId: 'call-1', result: { text: LEAK_TEXT } },
+    });
+    expect(decisions).toHaveLength(0);
+    const rec = makeRecorder(['sessions:read:*']);
+    dispatcher.registerSubscriber(rec.handle);
+    const result = dispatcher.subscribe({
+      subscriberId: rec.handle.id,
+      subject: 'session:abc/events',
+      subscriptionId: 'sub-replay',
+    });
+    expect(result.ok).toBe(true);
+    const event = rec.received.find(
+      (frame): frame is ServerEventFrame => 'kind' in frame && frame.kind === 'event',
+    );
+    expect(event).toBeDefined();
+    expect(JSON.stringify(event?.payload)).toContain('<<<commentary>>>');
+    expect(JSON.stringify(event?.payload)).not.toContain('"type":"tool.execute.end","toolCallId"');
+    expect(decisions).toHaveLength(1);
+    expect(decisions[0]?.transport).toBe('ws');
+  });
+
+  it('reconnect-resume (sinceEventId) also delivers sanitized frames', () => {
+    const { dispatcher, decisions } = buildDispatcher();
+    dispatcher.emit('session:abc/events', { type: 'tool.execute.end', payload: { seq: 1 } });
+    dispatcher.emit('session:abc/events', {
+      type: 'tool.execute.end',
+      payload: { seq: 2, result: { text: LEAK_TEXT } },
+    });
+    const rec = makeRecorder(['sessions:read:*']);
+    dispatcher.registerSubscriber(rec.handle);
+    // Resume from the first event's id: only the second (leaky) frame replays.
+    const firstId = (() => {
+      const probe = makeRecorder(['sessions:read:*']);
+      probe.handle.id = 'rec-probe';
+      dispatcher.registerSubscriber(probe.handle);
+      dispatcher.subscribe({
+        subscriberId: probe.handle.id,
+        subject: 'session:abc/events',
+        subscriptionId: 'sub-probe',
+      });
+      const first = probe.received.find(
+        (frame): frame is ServerEventFrame => 'kind' in frame && frame.kind === 'event',
+      );
+      return first?.eventId ?? '';
+    })();
+    dispatcher.subscribe({
+      subscriberId: rec.handle.id,
+      subject: 'session:abc/events',
+      subscriptionId: 'sub-resume',
+      sinceEventId: firstId,
+    });
+    const events = rec.received.filter(
+      (frame): frame is ServerEventFrame => 'kind' in frame && frame.kind === 'event',
+    );
+    expect(events).toHaveLength(1);
+    expect(JSON.stringify(events[0]?.payload)).toContain('<<<commentary>>>');
+    expect(decisions.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('replayed bytes equal live bytes for the same frame (single sanitize per delivery)', () => {
+    const { dispatcher } = buildDispatcher();
+    const live = makeRecorder(['sessions:read:*']);
+    live.handle.id = 'rec-live';
+    dispatcher.registerSubscriber(live.handle);
+    dispatcher.subscribe({
+      subscriberId: live.handle.id,
+      subject: 'session:abc/events',
+      subscriptionId: 'sub-live',
+    });
+    dispatcher.emit('session:abc/events', {
+      type: 'tool.execute.end',
+      payload: { result: { text: LEAK_TEXT } },
+    });
+    const replayer = makeRecorder(['sessions:read:*']);
+    replayer.handle.id = 'rec-replay';
+    dispatcher.registerSubscriber(replayer.handle);
+    dispatcher.subscribe({
+      subscriberId: replayer.handle.id,
+      subject: 'session:abc/events',
+      subscriptionId: 'sub-after',
+    });
+    const liveEvent = live.received.find(
+      (frame): frame is ServerEventFrame => 'kind' in frame && frame.kind === 'event',
+    );
+    const replayEvent = replayer.received.find(
+      (frame): frame is ServerEventFrame => 'kind' in frame && frame.kind === 'event',
+    );
+    expect(replayEvent).toBeDefined();
+    // Not double-wrapped: bytes equal the live delivery (modulo subscriptionId).
+    expect(JSON.stringify(replayEvent?.payload)).toBe(JSON.stringify(liveEvent?.payload));
+    expect(replayEvent?.eventId).toBe(liveEvent?.eventId);
+  });
+});
