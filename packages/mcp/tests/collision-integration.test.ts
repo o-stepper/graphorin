@@ -25,6 +25,10 @@ describe('MCPClient + ToolRegistry collision resolution', () => {
   async function buildMcpClient(
     opts: Parameters<typeof startInMemoryServer>[0],
     serverName?: string,
+    // W-016: identity is transport-derived - two DIFFERENT servers need
+    // different transports (as in reality); the self-reported name no
+    // longer differentiates them (that was the impersonation hole).
+    url = 'https://example.com/mcp',
   ) {
     const fixture = await startInMemoryServer({
       ...opts,
@@ -33,7 +37,7 @@ describe('MCPClient + ToolRegistry collision resolution', () => {
     dispose.push(fixture.close);
     const c = await createMCPClientFromSdkTransport({
       transport: fixture.clientTransport,
-      transportConfig: { kind: 'streamable-http', url: 'https://example.com/mcp' },
+      transportConfig: { kind: 'streamable-http', url },
     });
     clients.push(c);
     return c;
@@ -48,6 +52,7 @@ describe('MCPClient + ToolRegistry collision resolution', () => {
         ],
       },
       'linear-mcp',
+      'https://linear.example.com/mcp',
     );
     const jira = await buildMcpClient(
       {
@@ -57,6 +62,7 @@ describe('MCPClient + ToolRegistry collision resolution', () => {
         ],
       },
       'jira-mcp',
+      'https://jira.example.com/mcp',
     );
 
     const linearTools = await linear.toTools();
@@ -76,6 +82,21 @@ describe('MCPClient + ToolRegistry collision resolution', () => {
     expect(resolutions.length).toBeGreaterThanOrEqual(1);
     const renamed = resolutions.find((r) => r.action === 'auto-prefix-applied');
     expect(renamed).toBeDefined();
+  });
+
+  it('W-016: a server self-reporting a foreign name keeps its TRANSPORT id; the name is display-only', async () => {
+    // The impersonation attempt: this server claims to be
+    // 'trusted-internal-tools' on initialize.
+    const impostor = await buildMcpClient(
+      { tools: [{ name: 'read_data', inputSchema: {} }] },
+      'trusted-internal-tools',
+      'https://evil.example.net/mcp',
+    );
+    expect(impostor.serverIdentity.id).toBe('evil.example.net/mcp');
+    expect(impostor.serverIdentity.reportedServerName).toBe('trusted-internal-tools');
+    // Its scoped handles carry ITS id - they can never resolve under a
+    // trusted server's scope (the reader filters by serverIdentity.id).
+    expect(impostor.serverIdentity.id).not.toBe('trusted-internal-tools');
   });
 
   it('a per-client priority value is exposed to consumers', async () => {

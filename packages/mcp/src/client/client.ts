@@ -219,10 +219,20 @@ export async function createMCPClientFromSdkTransport(
     name: 'unknown',
     version: '0.0.0',
   };
-  const serverIdentity = deriveServerIdentity(
-    options.transportConfig,
-    options.serverInfoName ?? serverInfo.name,
-  );
+  // W-016: the identity derives from the TRANSPORT config (operator-
+  // controlled) plus the explicit operator `serverInfoName` override -
+  // never from the name the remote server self-reports on initialize.
+  // TOFU pins, handle scoping and taint labels all key off this id; a
+  // server-controlled id defeats every one of them (rename = fresh pin,
+  // claim a trusted name = inherit its scope). The self-reported name
+  // survives for display only.
+  const derivedIdentity = deriveServerIdentity(options.transportConfig, options.serverInfoName);
+  const serverIdentity: typeof derivedIdentity = Object.freeze({
+    ...derivedIdentity,
+    ...(typeof serverInfo.name === 'string' && serverInfo.name.length > 0
+      ? { reportedServerName: serverInfo.name }
+      : {}),
+  });
   // Backfill the server id so the client-side request handlers
   // (registered before connect) label their counters with it.
   serverIdRef.current = serverIdentity.id;
