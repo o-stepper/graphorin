@@ -186,7 +186,7 @@ function registerLifecycleCommands(program: Command): void {
   program
     .command('init')
     .description(
-      '[Bootstrap] Generate a fresh graphorin.config.ts and a one-shot bootstrap admin token.',
+      '[Bootstrap] Generate a fresh graphorin.config.ts + the server pepper (mint tokens afterwards with token create).',
     )
     .option('-o, --out <path>', 'Output path; defaults to ./graphorin.config.ts.')
     .option('--non-interactive', 'Accept defaults / env vars without prompting.', false)

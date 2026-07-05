@@ -26,15 +26,27 @@ describe('runInit', () => {
     expect(result.configPath).toBe(join(dir, 'graphorin.config.ts'));
     expect(result.cloudConsent).toBe('public-only');
     expect(result.storageEncrypted).toBe(false);
-    expect(result.bootstrapToken).toMatch(/^gph_live_v1_/);
     expect(result.serverPepperHex).toMatch(/^[0-9a-f]+$/);
     const written = await readFile(result.configPath, 'utf8');
     expect(written).toContain("import { defineConfig } from '@graphorin/server';");
     expect(written).toContain("source: 'auto'");
     expect(written).toContain('public-only');
-    // Bootstrap token + pepper appear in the printed lines, never in the file.
-    expect(lines.some((l) => l.includes(result.bootstrapToken))).toBe(true);
-    expect(written).not.toContain(result.bootstrapToken);
+    const joined = lines.join('\n');
+    // W-003: no phantom credential. Init cannot mint a verifiable token
+    // (that needs migrations + the persisted pepper), so it must not
+    // print one that is guaranteed to 401.
+    expect(joined).not.toContain('gph_live_v1_');
+    expect(joined).not.toContain('bootstrap admin token');
+    // Next-steps walk the WORKING path: stdin pepper -> migrate ->
+    // token create -> start.
+    expect(joined).toContain('--from-stdin');
+    expect(joined).toContain('graphorin token create');
+    // W-041: the pepper never appears as an argv value in the guidance.
+    expect(joined).not.toMatch(/secrets set \S+ --value/);
+    // The pepper hex itself is printed exactly once, and never lands in
+    // the config file.
+    const pepperLines = lines.filter((l) => l.includes(result.serverPepperHex));
+    expect(pepperLines).toHaveLength(1);
     expect(written).not.toContain(result.serverPepperHex);
   });
 
