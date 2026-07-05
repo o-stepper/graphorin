@@ -159,4 +159,53 @@ describe('mcp-skills-07 - server-supplied pattern hardening (ReDoS)', () => {
     expect(validator.safeParse({ s: 'abbbc' }).success).toBe(true);
     expect(validator.safeParse({ s: 'zzz' }).success).toBe(false);
   });
+
+  it('W-078: alternation-overlap patterns are guarded out within a time budget', {
+    timeout: 2_000,
+  }, () => {
+    for (const pattern of ['^(a|a)+$', '^(\\w|\\d)*$', '^(x|xy)+z$']) {
+      const validator = buildJsonSchemaValidator({
+        type: 'object',
+        properties: { s: { type: 'string', pattern } },
+      });
+      const hostile = `${'a'.repeat(900)}!`;
+      const started = Date.now();
+      // Pre-fix these exponential shapes passed looksCatastrophic
+      // (no quantifier directly before the closing paren) and ran on
+      // the raw engine - a ~900-char non-matching input would hang
+      // the event loop practically forever.
+      const result = validator.safeParse({ s: hostile });
+      expect(Date.now() - started).toBeLessThan(1_000);
+      expect(result.success).toBe(true);
+    }
+  });
+
+  it('W-078: benign alternation WITHOUT a quantified group still really validates', () => {
+    const validator = buildJsonSchemaValidator({
+      type: 'object',
+      properties: { s: { type: 'string', pattern: '^(foo|bar)$' } },
+    });
+    expect(validator.safeParse({ s: 'foo' }).success).toBe(true);
+    expect(validator.safeParse({ s: 'baz' }).success).toBe(false);
+  });
+
+  it('W-078: classic nested quantifiers remain blocked', () => {
+    const validator = buildJsonSchemaValidator({
+      type: 'object',
+      properties: { s: { type: 'string', pattern: '(a+)+$' } },
+    });
+    expect(validator.safeParse({ s: `${'a'.repeat(64)}b` }).success).toBe(true);
+  });
+
+  it('W-078: a quantified group without overlap runs under the REDUCED test-string cap', () => {
+    const validator = buildJsonSchemaValidator({
+      type: 'object',
+      properties: { s: { type: 'string', pattern: '^(ab)+$' } },
+    });
+    // Under the reduced 1000-char cap: really validated.
+    expect(validator.safeParse({ s: 'ab'.repeat(400) }).success).toBe(true);
+    expect(validator.safeParse({ s: `${'ab'.repeat(400)}x` }).success).toBe(false);
+    // Over the reduced cap (but under the general 10k cap): permissive.
+    expect(validator.safeParse({ s: `${'ab'.repeat(700)}x` }).success).toBe(true);
+  });
 });
