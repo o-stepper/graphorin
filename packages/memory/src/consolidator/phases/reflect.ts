@@ -30,6 +30,9 @@ import type { BudgetTracker } from '../budget.js';
 /** ExpeL starting salience for a freshly-synthesized insight. */
 const STARTING_SALIENCE = 2;
 
+/** W-082 default bound on the unreviewed quarantined-insight queue. */
+const DEFAULT_MAX_QUARANTINED_INSIGHTS = 100;
+
 /** How many recent episode summaries to show the salient-questions prompt. */
 const RECENT_CONTEXT_LIMIT = 20;
 
@@ -56,6 +59,14 @@ export interface ReflectionDeps {
   readonly reflectionWatermark?: number | null;
   /** Upper bound on salient questions asked per pass. */
   readonly maxQuestions: number;
+  /**
+   * W-082: cap on the quarantined-insight review queue. Quarantined
+   * insights are EXEMPT from pass-decay (they are invisible to
+   * retrieval, so use-it-or-lose-it cannot apply); this cap keeps the
+   * unreviewed queue from growing without bound - beyond it the OLDEST
+   * quarantined insights are pruned. Defaults to 100.
+   */
+  readonly maxQuarantinedInsights?: number;
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
   /** Override the wall clock - used by tests. */
   readonly now?: () => number;
@@ -265,20 +276,44 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         insightsCreated += 1;
       }
 
-      // 5. ExpeL forgetting (MCON-16): decay every existing insight by 1
-      // per reflection pass. Retrieval bumps +1 (InsightMemory.search),
-      // so an insight recalled since the last pass nets level-or-better
-      // while an unused one slides toward the prune floor - starting
-      // salience 2 ⇒ pruned after two idle passes. Fresh insights from
-      // THIS pass are exempt (they were inserted above at full salience
-      // and have had no retrieval window yet).
+      // 5. ExpeL forgetting (MCON-16): decay every existing VALIDATED
+      // insight by 1 per reflection pass. Retrieval bumps +1
+      // (InsightMemory.search), so an insight recalled since the last
+      // pass nets level-or-better while an unused one slides toward the
+      // prune floor - starting salience 2 ⇒ pruned after two idle
+      // passes. Fresh insights from THIS pass are exempt (inserted
+      // above at full salience, no retrieval window yet). QUARANTINED
+      // insights are exempt too (W-082): default retrieval cannot see
+      // them, so the +1 bump can never fire - decaying them soft-deleted
+      // every paid synthesis after two passes unless a human reviewed
+      // it in time. Their decay clock starts at validation.
       const freshIds = new Set(created);
+      const quarantinedQueue: Array<{ id: string; createdAt: string; salience: number }> = [];
       for (const existing of await deps.insights.list(deps.scope, {
         includeQuarantined: true,
         limit: 500,
       })) {
         if (freshIds.has(existing.id)) continue;
+        if (existing.status === 'quarantined') {
+          quarantinedQueue.push({
+            id: existing.id,
+            createdAt: existing.createdAt,
+            salience: existing.salience,
+          });
+          continue;
+        }
         await deps.insights.bumpSalience(existing.id, -1, 'reflection-pass-decay');
+      }
+      // W-082: bound the unreviewed queue - beyond the cap the OLDEST
+      // quarantined insights are dropped (salience to 0, then the
+      // shared prune below sweeps them).
+      const cap = Math.max(0, deps.maxQuarantinedInsights ?? DEFAULT_MAX_QUARANTINED_INSIGHTS);
+      if (quarantinedQueue.length > cap) {
+        quarantinedQueue.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
+        const overflow = quarantinedQueue.slice(0, quarantinedQueue.length - cap);
+        for (const item of overflow) {
+          await deps.insights.bumpSalience(item.id, -item.salience, 'quarantine-cap');
+        }
       }
       await deps.insights.prune(deps.scope);
 

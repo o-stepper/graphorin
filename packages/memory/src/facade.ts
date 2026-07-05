@@ -245,6 +245,8 @@ export interface CreateMemoryOptions {
     readonly importanceThreshold?: number;
     /** Upper bound on salient questions reflection asks per pass (P1-1). */
     readonly reflectionMaxQuestions?: number;
+    /** Override the quarantined-insight queue cap (W-082). Default 100. */
+    readonly reflectionMaxQuarantinedInsights?: number;
     /**
      * Contextual retrieval for standard-phase fact writes (P1-3).
      * `'llm'` opts into one budgeted cheap-model call per write to author
@@ -660,6 +662,9 @@ function buildConsolidator(
       : {}),
     ...(opts.reflectionMaxQuestions !== undefined
       ? { reflectionMaxQuestions: opts.reflectionMaxQuestions }
+      : {}),
+    ...(opts.reflectionMaxQuarantinedInsights !== undefined
+      ? { reflectionMaxQuarantinedInsights: opts.reflectionMaxQuarantinedInsights }
       : {}),
     ...(opts.contextualRetrieval !== undefined
       ? { contextualRetrieval: opts.contextualRetrieval }
