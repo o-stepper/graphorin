@@ -81,7 +81,11 @@ export const VERSION_PATTERNS = [
   { name: 'readme status line', regex: /\*\*Status:\*\* v(\d+\.\d+\.\d+)/g, kind: 'full' },
   { name: 'version badge url', regex: /badge\/version-v(\d+\.\d+\.\d+)-blue/g, kind: 'full' },
   { name: 'version badge alt', regex: /!\[Version: (\d+\.\d+\.\d+)\]/g, kind: 'full' },
-  { name: 'latest release teaser', regex: /Latest release: \*\*(\d+\.\d+\.\d+)\*\*/g, kind: 'full' },
+  {
+    name: 'latest release teaser',
+    regex: /Latest release: \*\*(\d+\.\d+\.\d+)\*\*/g,
+    kind: 'full',
+  },
   { name: 'pre-release line', regex: /`v(\d+\.\d+\.\d+)`(?:\*\*)? pre-release/g, kind: 'full' },
   { name: 'docker image tag', regex: /graphorin:(\d+\.\d+\.\d+)/g, kind: 'full' },
   {

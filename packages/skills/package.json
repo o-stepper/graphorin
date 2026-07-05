@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/skills",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Skills surface for the Graphorin framework: loader for the SKILL.md packaging format with three-tier progressive disclosure (metadata / body / resources), frontmatter validator implementing the field-resolution algorithm and conflict policy from ADR-043, registry with auto-activation + slash-command activation, supply-chain hardening (signature verification + `--ignore-scripts` enforcement via @graphorin/security), sandbox-tier propagation for untrusted skills, handoff input-filter declaration recognition, and idempotent migrate-frontmatter library.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

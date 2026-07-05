@@ -25,6 +25,27 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.6.1 - 2026-07-05
+
+Patch release.
+
+### Fixed
+
+- **observability**: the default-on `graphorin-token` redaction pattern was
+  hardcoded to a stale `kru_` token shape and never matched real framework
+  tokens; it now matches the actual `gph_<env>_v1_<entropy>_<crc32>` format
+  (deployments with a custom token prefix must register their own pattern).
+
+### Changed
+
+- **all packages**: version constants and version-bearing strings (writer
+  ids, client/server info, OTLP attributes, the build-info metric) now derive
+  from each package's manifest at build time; rendered values are
+  byte-identical at this version. Release bumps no longer edit source, the
+  remaining text surface is rewritten by `pnpm run bump-version -- --sync`,
+  and the new `check-version-consistency` CI gate fails any reintroduced
+  hardcoded framework version.
+
 ## 0.6.0 - 2026-07-05
 
 The second framework-wide **audit release** - waves A-E of the 2026-07-04

@@ -1,5 +1,16 @@
 # @graphorin/observability
 
+## 0.6.1
+
+### Patch Changes
+
+- [#140](https://github.com/o-stepper/graphorin/pull/140) [`826ee59`](https://github.com/o-stepper/graphorin/commit/826ee5933ad38693b0dd2f20a110abfecba7d23d) Thanks [@o-stepper](https://github.com/o-stepper)! - Fix the default-on `graphorin-token` redaction pattern: it was hardcoded to a stale `kru_(dev|test|prod)` token shape and never matched real framework tokens, which use the `gph` default prefix with `live|test|local` environment labels (`@graphorin/security` `DEFAULT_TOKEN_PREFIX`). The pattern now matches `gph_<env>_v1_<entropy>_<crc32>` with a loose env label (operators can extend `acceptEnvironments`); deployments that configure a custom token prefix must register their own pattern.
+
+- [#142](https://github.com/o-stepper/graphorin/pull/142) [`436d6ca`](https://github.com/o-stepper/graphorin/commit/436d6ca5ebbd16df094e915682d3915c279a8430) Thanks [@o-stepper](https://github.com/o-stepper)! - Version constants and version-bearing strings now derive from each package's manifest at build time (`VERSION = pkg.version`; writer ids, client/server info, OTLP framework attributes, build-info metrics interpolate it). No behavioral change at the current version: the rendered strings are byte-identical. A release bump no longer edits source; the new `check-version-consistency` gate fails any reintroduced hardcoded framework version.
+
+- Updated dependencies [[`436d6ca`](https://github.com/o-stepper/graphorin/commit/436d6ca5ebbd16df094e915682d3915c279a8430)]:
+  - @graphorin/core@0.6.1
+
 ## 0.6.0
 
 ### Minor Changes
