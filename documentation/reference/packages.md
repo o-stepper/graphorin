@@ -110,4 +110,4 @@ Once Graphorin reaches `1.0`, strict SemVer applies and optional packages can mo
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

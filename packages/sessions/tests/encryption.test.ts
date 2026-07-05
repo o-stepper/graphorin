@@ -27,7 +27,7 @@ describe('Session export AES-256-GCM helpers', () => {
   it('wraps an actual JSONL export through encrypt / decrypt and re-parses correctly', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
       hash: true,
     });
     await writer.writeRecord({
@@ -56,7 +56,7 @@ describe('Session export AES-256-GCM helpers', () => {
     const key = await deriveSessionExportKey('top-secret-pass', salt);
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
       hash: true,
       encrypt: { key },
     });

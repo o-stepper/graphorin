@@ -12,7 +12,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.5.0](https://img.shields.io/badge/version-v0.5.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.6.0](https://img.shields.io/badge/version-v0.6.0-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -63,7 +63,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Status
 
-Graphorin is currently on the **`v0.5.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.6.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
@@ -95,7 +95,7 @@ What Graphorin **does not** ship (intentional): channel adapters (Telegram, Slac
 
 ## Quick start
 
-The `@graphorin/*` packages are published on the npm registry (since `v0.5.0`). The full quickstart - a 20-line memory-backed agent that streams tokens and persists facts to local SQLite via local embeddings - lives at **<https://docs.graphorin.com/guide/quickstart>**.
+The `@graphorin/*` packages are published on the npm registry (since `v0.6.0`). The full quickstart - a 20-line memory-backed agent that streams tokens and persists facts to local SQLite via local embeddings - lives at **<https://docs.graphorin.com/guide/quickstart>**.
 
 ### Prerequisites
 
@@ -259,7 +259,7 @@ AUTHORS.md               Project authorship.
 
 ## Release readiness
 
-The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.5.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk).
+The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.6.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk).
 
 The same command is invoked by the [`release.yml`](./.github/workflows/release.yml) workflow before any package gets published.
 
@@ -313,7 +313,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

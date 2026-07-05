@@ -263,4 +263,4 @@ Models released after the bundled snapshot date (for example the Claude 5 family
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

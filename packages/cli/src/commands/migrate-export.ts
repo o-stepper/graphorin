@@ -43,7 +43,7 @@ export interface MigrateExportOptions extends CommonOutputOptions {
   readonly to: string;
   /** Defaults to the writer's current schema (e.g. `'1.0'`). */
   readonly toSchema?: string;
-  /** Surfaced on the meta header. Defaults to `'graphorin-cli@0.5.0'`. */
+  /** Surfaced on the meta header. Defaults to `'graphorin-cli@0.6.0'`. */
   readonly writer?: string;
 }
 
@@ -85,7 +85,7 @@ export async function runMigrateExport(
 
   const buffer = createBufferSink();
   const writer = createSessionExportWriter(buffer.sink, {
-    writer: options.writer ?? 'graphorin-cli@0.5.0',
+    writer: options.writer ?? 'graphorin-cli@0.6.0',
     ...(parsed.meta.embedderIds !== undefined ? { embedderIds: parsed.meta.embedderIds } : {}),
   });
   for (const record of parsed.records) {

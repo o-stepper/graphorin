@@ -13,7 +13,7 @@ import { createHash } from 'node:crypto';
 import type { EmbedderProvider, EmbedOptions } from '@graphorin/core/contracts';
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 /**
  * Pooling strategy. Defaults to `'mean'` per the multilingual-e5 model

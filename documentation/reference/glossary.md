@@ -161,4 +161,4 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

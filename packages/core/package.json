@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Core types, contracts, and utilities for the Graphorin framework. Dependency-free root package every other @graphorin/* package depends on.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",

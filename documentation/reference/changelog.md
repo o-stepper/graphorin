@@ -25,6 +25,83 @@ Per-package changelogs live in each package's `CHANGELOG.md`.
 
 ---
 
+## 0.6.0 - 2026-07-05
+
+The second framework-wide **audit release** - waves A-E of the 2026-07-04
+audit (220 findings) - plus a full documentation accuracy + character-rules
+sweep. Per-package details live in each package's `CHANGELOG.md`; upgrade
+notes are in the [migration guide](documentation/guide/migration.md).
+
+### Security & correctness (waves A-B)
+
+- Tool parameters are **real JSON Schema on the provider wire**: a structural
+  Zod v3/v4 converter (`@graphorin/tools/schema`) replaces serialized
+  validator internals; unprojectable schemas degrade loudly.
+- **Durable HITL resume is exactly-once**: an approved call's resume writes a
+  write-ahead intent checkpoint before dispatch and the journaled state after
+  it; stale pre-execution snapshots stay bounded at one re-execution.
+- Transcript well-formedness invariant in the step builder, hook-level
+  `allowSensitivity`, session `purge()` cascade, `disableRepair`,
+  `prefixMessages` token basis, spill-file taint sidecars,
+  superseded-facts-excluded-by-default reads, an emergency compaction tier,
+  IMMEDIATE SQLite transactions + an online backup API, MCP result-handle
+  scoping + ReDoS guards, and the `ai` v7 provider-contract conversion.
+
+### SOTA adopts (wave C)
+
+- **Prompt-cache economics end-to-end**: `Usage` cache read/write legs, the
+  opt-in `cachePolicy` breakpoint anchors, a cache-friendly tool catalogue,
+  and cache-aware cost tracking over a regenerated pricing snapshot.
+- Recoverable tool-error envelope + transparent bounded retry, the verifier
+  seam, deterministic replay (`recordProviderResponses` +
+  `createReplayProvider`), compaction hardening (`preserveUserMessages`),
+  trust-aware recall ranking + `fitFusionWeights`, derived-taint `'strict'`
+  mode with recall re-arm and MCP TOFU pinning, one-trace-tree `agent.run` /
+  `agent.step` spans, and eval A/B switches with a non-self judge.
+
+### Durable runtime (wave D)
+
+- **Step-journal workflow durability**: durable timers, awakeables,
+  approvals, and compare-and-set checkpoint writes
+  (`CheckpointStore.put({ expectedLatestId })`); the `'async'` durability
+  source is removed.
+- Sub-agent isolation (read-only capability, `contextFold`, taint
+  propagation), memory learned-context / owner / access-counters / runbooks
+  (migrations 026-028), Merkle audit checkpoints + a skill-signing trust
+  root + Progent / Rule-of-Two argument policies, and PPR-lite graph
+  retrieval with entity-match fusion.
+
+### Cross-cutting (wave E)
+
+- **A ~2000x graph-CTE query-plan fix** in the SQLite store's entity
+  expansion, found by the new 100k-fact scale probe (`benchmarks/scale`);
+  the latency and memory-sim benchmark gates are armed for real.
+- Release pipeline: the changesets 1.0.0 peer-escalation landmine defused
+  (ranged internal peers + `onlyUpdatePeerDependentsWhenOutOfRange` +
+  private-package ignore), tarball surface fixes (`@graphorin/memory`
+  `./conflict` runtime-empty subpath, per-package CHANGELOG backfill),
+  stricter `mvp-readiness` release gates.
+- Supply chain + CI: SHA-256-pinned eval datasets (`scripts/datasets.lock.json`),
+  failure notifications for scheduled workflows, job timeouts everywhere.
+- Deployment templates fixed against reality (kubectl YAML-1.1 octal
+  `defaultMode`, systemd `ExecReload` removal, docker config/secrets
+  mounts), the Windows `storage cleanup-backups` no-op fixed, OTel GenAI
+  span-name alignment, and eval statistics (Wilson intervals, pass^k,
+  McNemar paired significance) attached to every eval summary.
+
+### Documentation
+
+- Every authored page re-verified against the code: 40 confirmed drift
+  fixes (fictional `calculateCost` examples, health-check shapes,
+  session-export record kinds, redaction-pattern catalogue, deployment
+  template claims, and more), with the doc gates extended so the drift
+  class cannot silently recur (28 compile-checked snippets, CLI-docs
+  flag validation, anchor-checking lychee in offline file mode).
+- A character-rules sweep across all markdown, TSDoc, and user-facing
+  strings (ASCII punctuation only), and a new
+  [Performance & scale](documentation/guide/performance.md) guide with
+  measured 100k-fact numbers.
+
 ## 0.5.0 - 2026-06-14
 
 A framework-wide **audit-remediation** release - waves 0-4 of a 301-finding

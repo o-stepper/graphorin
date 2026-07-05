@@ -190,7 +190,7 @@ export async function createWsUpgradeEvents(
         sendRpcSuccess(ws, message.id, {
           serverInfo: {
             name: 'graphorin-server',
-            version: '0.5.0',
+            version: '0.6.0',
           },
           capabilities: {
             subscriptions: true,

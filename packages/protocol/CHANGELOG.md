@@ -1,5 +1,7 @@
 # @graphorin/protocol
 
+## 0.6.0
+
 ## 0.5.0
 
 First version published to the npm registry (with Sigstore build

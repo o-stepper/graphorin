@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/approval-workflow`. Every assertion
  * runs against the real `SqliteCheckpointStore` from `@graphorin/store-
@@ -77,8 +77,8 @@ describe('examples/approval-workflow — smoke', () => {
     await handle.close();
   });
 
-  it('exposes VERSION = 0.5.0', () => {
-    expect(VERSION).toBe('0.5.0');
+  it('exposes VERSION = 0.6.0', () => {
+    expect(VERSION).toBe('0.6.0');
   });
 
   it('auto-approves a $50 expense end-to-end without pausing', async () => {

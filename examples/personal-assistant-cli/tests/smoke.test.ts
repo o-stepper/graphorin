@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/personal-assistant-cli`. Exercises the
  * stub provider end-to-end (so CI never depends on a live LLM), the
@@ -20,8 +20,8 @@ import {
 import { STUB_ECHO_PREFIX } from '../src/stub-provider.js';
 
 describe('examples/personal-assistant-cli — smoke', () => {
-  it('exposes VERSION = 0.5.0', () => {
-    expect(VERSION).toBe('0.5.0');
+  it('exposes VERSION = 0.6.0', () => {
+    expect(VERSION).toBe('0.6.0');
   });
 
   it('runChatTurn echoes the input deterministically through the stub provider', async () => {

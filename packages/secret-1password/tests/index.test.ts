@@ -4,7 +4,7 @@ import * as pkg from '../src/index.js';
 
 describe('@graphorin/secret-1password public surface', () => {
   it('declares the canonical version constant', () => {
-    expect(pkg.VERSION).toBe('0.5.0');
+    expect(pkg.VERSION).toBe('0.6.0');
   });
 
   it('re-exports the resolver factory and the default instance', () => {

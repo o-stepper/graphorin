@@ -244,4 +244,4 @@ The client itself emits **counters**, not audit rows or spans: `mcp.call.invoked
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

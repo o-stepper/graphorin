@@ -77,7 +77,7 @@ The `benchmarks/*` workspaces wrap the harness for specific suites - `benchmark-
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 ## Honest LongMemEval runs (C8)
 

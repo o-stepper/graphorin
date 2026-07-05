@@ -198,5 +198,5 @@ text.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy
 Stepurenko · <https://github.com/o-stepper/graphorin>

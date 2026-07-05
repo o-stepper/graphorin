@@ -28,7 +28,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 // AG-2 / SDF-4: the canonical guardrail contract lives in
 // `@graphorin/security`; re-exported here for config ergonomics.

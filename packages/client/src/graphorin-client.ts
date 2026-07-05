@@ -241,7 +241,7 @@ export class GraphorinClient {
   async #initializeRpc(): Promise<void> {
     if (this.#transport?.kind !== 'ws') return;
     await this.#sendRpc('initialize', {
-      clientInfo: { name: 'graphorin-client', version: '0.5.0' },
+      clientInfo: { name: 'graphorin-client', version: '0.6.0' },
     });
   }
 
@@ -968,7 +968,7 @@ function buildRpcFrame(
         jsonrpc: '2.0',
         id,
         method: 'initialize',
-        params: (params ?? { clientInfo: { name: 'graphorin-client', version: '0.5.0' } }) as never,
+        params: (params ?? { clientInfo: { name: 'graphorin-client', version: '0.6.0' } }) as never,
       };
     case 'subscription.subscribe':
       return {

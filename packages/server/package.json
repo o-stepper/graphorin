@@ -1,6 +1,6 @@
 {
   "name": "@graphorin/server",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Standalone server runtime for the Graphorin framework: createServer({...}) factory, Hono HTTP app, REST endpoints (agents / workflows / sessions / memory / skills / mcp / tokens / audit / health / health/secrets / metrics / triggers / runs/:runId/replay / sessions/:id/replay / audit/verify), per-request authentication + scope middleware (HMAC-SHA256 + pepper, server pepper required), brute-force lockout, IETF draft-07 Idempotency-Key middleware with SQLite backing + LRU read cache, deny-by-default CORS, double-submit CSRF for browser flows, sliding-window rate limit, audit middleware that streams every authenticated request through the tamper-evident hash chain, programmatic AgentRegistry / WorkflowRegistry, lifecycle hooks (beforeStart / onReady / beforeShutdown), pre-bind secrets resolution + storage migration runner that fails fast on missing pepper / unresolvable SecretRef / missing encryption peer, graceful SIGTERM drain with state preservation, durable triggers daemon (cron / interval / idle / event survive process restart per the catch-up policy contract), consolidator daemon lifecycle integration with hard stop timeout, per-subsystem health rollup (storage / embedder / secrets / encryption / consolidator / triggers / replay-buffer), Prometheus text exposition `/v1/metrics` with the canonical graphorin_* metric inventory, scope-enforced replay endpoints (sanitized by default, raw requires `traces:read:raw` admin scope, every invocation appended to the audit chain), and `POST /v1/audit/verify` chain integrity check. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
@@ -144,10 +144,10 @@
     "provenance": true
   },
   "devDependencies": {
-    "@graphorin/agent": "workspace:>=0.5.0 <1.0.0",
-    "@graphorin/memory": "workspace:>=0.5.0 <1.0.0",
-    "@graphorin/sessions": "workspace:>=0.5.0 <1.0.0",
-    "@graphorin/workflow": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/agent": "workspace:>=0.6.0",
+    "@graphorin/memory": "workspace:>=0.6.0",
+    "@graphorin/sessions": "workspace:>=0.6.0",
+    "@graphorin/workflow": "workspace:>=0.6.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/ws": "^8.18.1",
     "better-sqlite3": "^12.9.0",

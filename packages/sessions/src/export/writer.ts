@@ -25,7 +25,7 @@ import {
  * @stable
  */
 export interface SessionExportWriterOptions {
-  /** Writer identifier surfaced in the meta header (e.g. `'graphorin@0.5.0'`). */
+  /** Writer identifier surfaced in the meta header (e.g. `'graphorin@0.6.0'`). */
   readonly writer: string;
   /** Minimum runtime version that can read the resulting file. */
   readonly minRuntimeVersion?: string;

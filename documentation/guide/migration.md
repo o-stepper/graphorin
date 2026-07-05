@@ -52,7 +52,7 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
-### 0.5.x -> next (unreleased)
+### 0.5.x -> 0.6.0
 
 - **Durable HITL resume is exactly-once.** With a `checkpointStore` wired, an
   approved call's resume writes a write-ahead intent checkpoint before

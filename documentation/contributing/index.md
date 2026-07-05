@@ -125,7 +125,7 @@ Versions are tracked with [Changesets](https://github.com/changesets/changesets)
 
 > Release mechanics: the `0.2.0` through `0.5.0` bumps were applied by the maintainer as **manual passes** because `changeset version` kept computing a bogus **major** bump: with `@graphorin/server` declaring `workspace:*` peer dependencies on four sibling packages, Changesets escalated any minor/patch bump of those peers into a major for `server`, and the `fixed` lockstep group then lifted every package to `1.0.0`. That root cause is fixed (audit E2): the internal peers are now ranged (`workspace:>=0.5.0 <1.0.0`) and `onlyUpdatePeerDependentsWhenOutOfRange` is enabled, so the automated "Version Packages" PR opened by `release.yml` computes the correct lockstep bump and regenerates per-package CHANGELOGs (the `@changesets/changelog-github` generator works in CI, where a `GITHUB_TOKEN` is present; it needs one locally too). The `mvp-readiness` workspace audit now also rejects a release whose per-package CHANGELOG top entry does not match the version being released. Do not hand-bump versions in a feature PR: author a changeset and let the release pass apply it.
 
-> Git tags & provenance: the tag history starts at `0.5.0`, the first version published to the npm registry (each published package carries a `@graphorin/<pkg>@0.5.0` tag created by the release pipeline). The earlier `0.2.0`, `0.3.0`, and `0.4.0` bumps were internal-only and were never published, so no retro tags were backfilled for them: audit item CI-7 keeps the changelog backfill and these CONTRIBUTING notes, but retro-tagging never-published versions is a deliberate skip. Every real publish is provenance-checked in CI by the post-publish `npm audit signatures` smoke in `.github/workflows/release.yml`.
+> Git tags & provenance: the tag history starts at `0.5.0`, the first version published to the npm registry (each published package carries a `@graphorin/<pkg>@<version>` tag created by the release pipeline). The earlier `0.2.0`, `0.3.0`, and `0.4.0` bumps were internal-only and were never published, so no retro tags were backfilled for them: audit item CI-7 keeps the changelog backfill and these CONTRIBUTING notes, but retro-tagging never-published versions is a deliberate skip. Every real publish is provenance-checked in CI by the post-publish `npm audit signatures` smoke in `.github/workflows/release.yml`.
 
 ## Privacy & no-phone-home
 
@@ -146,4 +146,4 @@ By contributing to Graphorin, you agree that your contributions will be licensed
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
