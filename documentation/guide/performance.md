@@ -22,34 +22,51 @@ never assert absolute wall-clock values - only deterministic plumbing
 ## Measured at 100k facts
 
 Corpus: 100,000 synthetic facts, every one carrying a 64-dim vector (vec0)
-plus `s/p/o` entity links (~2k canonical entities), seeded through the public
-`memory.semantic.remember` path with entity resolution on.
+plus `s/p/o` entity links, seeded through the public
+`memory.semantic.remember` path with entity resolution on. The probe's
+deterministic bag-of-words embedder makes many entity names
+embedding-identical, so resolution merges them into a small set of **extreme
+hub canonicals** (127 canonical entities across 100k facts) - treat the graph
+rows below as a dense-hub stress scenario, not a typical entity distribution.
+
+Measured 2026-07-05 on an Apple Silicon workstation (local NVMe):
 
 | Metric | Result |
 | --- | --- |
-| Seeding throughput (write path: FTS + vec0 + entity linking) | TBD facts/s |
-| Hybrid search (FTS + vector + RRF), p50 / p95 over 200 queries | TBD / TBD ms |
-| Graph-expanded search (`expandHops: 2`, `graphScoring: 'ppr'`), p50 / p95 | TBD / TBD ms |
-| Consolidator light phase (decay/salience sweep over the corpus) | TBD s |
-| DB size on disk (after WAL checkpoint) | TBD |
+| Seeding throughput (write path: FTS + vec0 + entity linking) | 388 facts/s (100k in ~4.3 min) |
+| Hybrid search (FTS + vector + RRF), p50 / p95 over 200 queries | 103 / 321 ms |
+| Graph-expanded search (`expandHops: 1`, `'ppr'`), p50 / p95, dense hubs | 1.8 / 2.0 s |
+| Graph-expanded search (`expandHops: 2`, `'ppr'`), p50 / p95 over 5 queries | 89 / 99 s (documented hot spot) |
+| Consolidator light phase (per-pass, ceiling-bounded) | < 0.1 s |
+| DB size on disk (after WAL checkpoint) | 125.6 MiB (~1.3 KiB/fact) |
+
+For contrast, at **2k facts** (the CI smoke corpus) the same probe measures
+hybrid p95 ~5 ms and hop-1 graph p95 ~53 ms.
 
 ## Practical guidance
 
-- **Up to ~100k facts per scope** the hybrid read path stays interactive
-  (double-digit milliseconds); nothing in the schema degrades suddenly - the
-  vec0 KNN and the FTS MATCH both scale smoothly, and the fused RRF adds a
-  constant overhead.
+- **The vector leg is the read-path driver at scale.** vec0's KNN is a
+  brute-force scan, so hybrid latency grows linearly with corpus size:
+  ~5 ms p95 at 2k facts, ~320 ms p95 at 100k (64-dim). FTS-only recall stays
+  in single-digit milliseconds throughout (see `benchmarks/latency`). If you
+  need sub-100ms hybrid search beyond ~30-50k facts, shrink the vector
+  dimension, shard by scope, or gate the vector leg per query.
+- **Graph expansion is per-query opt-in for a reason.** Hop-1 cost scales
+  with seed-candidate count x entity fanout: milliseconds on well-separated
+  entities, ~2 s at 100k facts under dense hubs. Hop-2 re-expands the hub
+  fanout per reached fact and lands in the tens of seconds there - keep
+  `expandHops: 2` for offline/analysis flows, not interactive recall.
 - **Writes are the expensive direction.** Every `remember` is an FTS insert +
-  a vector insert + (with the graph on) entity resolution and linking. Bulk
-  imports should batch and can disable `graph.entityResolution` during the
-  load, then backfill.
-- **The consolidator light phase is a full-corpus sweep.** Its cost grows
-  linearly with live facts; at 100k it is a background-job duration, not an
-  inline one. Schedule it (the default triggers already do) rather than
-  awaiting it on a request path.
-- **DB size** is dominated by the vector table at small text sizes
-  (64-dim float32 = 256 bytes/fact raw, plus vec0 index overhead). Budget
-  roughly linearly per fact from the table above.
+  a vector insert + (with the graph on) entity resolution and linking;
+  ~390 facts/s sustained on a workstation. Bulk imports should batch and can
+  disable `graph.entityResolution` during the load, then backfill.
+- **The consolidator light phase is ceiling-bounded per pass**, so a single
+  pass stays sub-second regardless of corpus size; sweeping a large corpus is
+  a matter of scheduled repeat passes (the default triggers do this), not one
+  long blocking call.
+- **DB size** budgets roughly linearly: ~1.3 KiB/fact at 64-dim vectors and
+  short texts (vector table + FTS index dominate). 1M facts of this shape
+  would be ~1.3 GiB.
 - **One writer.** SQLite is single-writer: keep one process writing per DB
   file (the k8s template pins `replicas: 1` for exactly this reason).
 
