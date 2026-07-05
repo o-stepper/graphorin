@@ -17,7 +17,10 @@
  */
 
 import type { Message, ModelSpec, SystemMessage } from '@graphorin/core';
-import { scanImperativePatterns } from '@graphorin/observability/redaction';
+import {
+  type ImperativeScanResult as ScanResult,
+  scanImperativePatterns,
+} from '@graphorin/observability/redaction';
 import type { ContextLocalePack } from '../locale-packs/index.js';
 import {
   type ContextTokenCounter,
@@ -55,12 +58,32 @@ const UNTRUSTED_MARKER = '<<<untrusted_content';
 /**
  * Wall-clock budget for the CE-15 injection scan of the summarizer
  * output. The scanner's 5ms default exists for the per-tool-result
- * hot path; here a compaction already paid for an LLM call, and on a
- * contended host (slow CI runners included) scheduler noise can cross
- * 5ms between pattern iterations - making the scanner return `null`
- * (verdict unknown) and the security check silently fail open.
+ * hot path; a compaction already paid for an LLM call, the summary
+ * body is a single bounded text, and the pattern catalogue is fixed,
+ * so the scan here runs UNBUDGETED - a wall-clock budget only turned
+ * scheduler noise into a `null` verdict (a 50ms budget was observed
+ * expiring on a degraded CI runner, silently failing the check open).
  */
-const COMPACTION_SCAN_BUDGET_MS = 50;
+const COMPACTION_SCAN_BUDGET_MS = Number.POSITIVE_INFINITY;
+
+/**
+ * CE-15 trust decision for a freshly produced summary. Exported for
+ * unit tests because the `scan === null` branch (scanner budget
+ * exceeded) MUST fail closed: the scanner's contract is "null = the
+ * caller applies its own best-effort degradation", and treating null
+ * as "no hits" would commit a poisoned summary as trusted exactly on
+ * the contended hosts where the budget expires.
+ *
+ * @internal
+ */
+export function resolveSummaryTrust(
+  windowUntrusted: boolean,
+  scan: ScanResult | null,
+): 'trusted' | 'untrusted-derived' {
+  if (windowUntrusted) return 'untrusted-derived';
+  if (scan === null) return 'untrusted-derived';
+  return scan.hits.length > 0 ? 'untrusted-derived' : 'trusted';
+}
 
 /** CE-15: does the compacted window carry inbound-untrusted envelopes? */
 function windowContainsUntrusted(messages: ReadonlyArray<Message>): boolean {
@@ -253,10 +276,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   // inside a derived-trust envelope (sticky across re-compactions:
   // the envelope re-triggers this detection next time around).
   const summaryScan = scanImperativePatterns(summarized.text, undefined, COMPACTION_SCAN_BUDGET_MS);
-  const summaryTrust: 'trusted' | 'untrusted-derived' =
-    windowContainsUntrusted(olderMessages) || (summaryScan !== null && summaryScan.hits.length > 0)
-      ? 'untrusted-derived'
-      : 'trusted';
+  const summaryTrust = resolveSummaryTrust(windowContainsUntrusted(olderMessages), summaryScan);
   const finalSummary = renderFinalSummary({
     template,
     summaryFromLlm:
