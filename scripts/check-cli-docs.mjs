@@ -103,9 +103,10 @@ export function parseCommandTree(src) {
       for (const s of subs) set.add(s.name);
       groups.set(group, set);
     }
-    const all = [...blockTop.map((d) => ({ ...d, key: d.name })), ...subs.map((d) => ({ ...d, key: group !== undefined ? `${group} ${d.name}` : d.name }))].sort(
-      (a, b) => a.index - b.index,
-    );
+    const all = [
+      ...blockTop.map((d) => ({ ...d, key: d.name })),
+      ...subs.map((d) => ({ ...d, key: group !== undefined ? `${group} ${d.name}` : d.name })),
+    ].sort((a, b) => a.index - b.index);
     for (let i = 0; i < all.length; i++) {
       const d = all[i];
       const end = all[i + 1]?.index ?? block.length;
@@ -210,7 +211,10 @@ export function diffInvocations(tree, invocations) {
       const flag = t.split('=')[0];
       if (!/^--?[\w-]+$/.test(flag)) continue;
       if (meta.options.has(flag) || tree.globalOptions.has(flag)) continue;
-      const known = [...meta.options].filter((f) => f.startsWith('--')).sort().join(' ');
+      const known = [...meta.options]
+        .filter((f) => f.startsWith('--'))
+        .sort()
+        .join(' ');
       violations.add(
         `'${label} ${flag}' — flag not declared by the command (real: ${known.length > 0 ? known : '<none>'})`,
       );

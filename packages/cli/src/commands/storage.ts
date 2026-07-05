@@ -28,7 +28,7 @@
  */
 
 import { readdir, stat, unlink } from 'node:fs/promises';
-import { basename as pathBasename, dirname, isAbsolute, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, basename as pathBasename, resolve } from 'node:path';
 import process from 'node:process';
 
 import { resolveSecret, type SecretValue } from '@graphorin/security';

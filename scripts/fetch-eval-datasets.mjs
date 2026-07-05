@@ -182,7 +182,9 @@ function updateLockEntry(lock, ds, buf) {
       `[fetch-eval-datasets] ${ds.id}: re-pinning from an env-override URL — make sure that source is trusted.`,
     );
   }
-  console.log(`[fetch-eval-datasets] ${ds.id}: lock updated (sha256 ${lock.datasets[ds.id].sha256}).`);
+  console.log(
+    `[fetch-eval-datasets] ${ds.id}: lock updated (sha256 ${lock.datasets[ds.id].sha256}).`,
+  );
 }
 
 async function download(ds) {
@@ -254,7 +256,9 @@ async function main() {
       updateLockEntry(lock, ds, dl.body);
       lockDirty = true;
     } else {
-      const verdict = verifyAgainstPin(ds, entry, dl.body, { where: `after download from ${ds.url}` });
+      const verdict = verifyAgainstPin(ds, entry, dl.body, {
+        where: `after download from ${ds.url}`,
+      });
       if (verdict === 'mismatch') {
         // Refuse to write a poisoned file where the benchmarks would read it.
         errored++;

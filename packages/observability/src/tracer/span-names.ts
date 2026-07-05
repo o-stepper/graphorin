@@ -30,10 +30,7 @@ function attrString(
 /**
  * @stable
  */
-export function spanNameFor(
-  type: SpanType,
-  attrs?: Readonly<Record<string, unknown>>,
-): string {
+export function spanNameFor(type: SpanType, attrs?: Readonly<Record<string, unknown>>): string {
   switch (type) {
     case 'provider.generate':
     case 'provider.stream': {

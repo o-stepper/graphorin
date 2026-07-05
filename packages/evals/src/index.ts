@@ -69,16 +69,6 @@ export {
 } from './loaders/index.js';
 export { detectRegressions as detectRegressionsFromReports } from './regression.js';
 export {
-  mean,
-  type PairedSignificance,
-  pairedPassSignificance,
-  passByBaseCase,
-  passHatK,
-  sampleStddev,
-  stripIterationSuffix,
-  wilsonInterval,
-} from './stats.js';
-export {
   renderHtmlReport,
   renderJsonReport,
   renderJunitReport,
@@ -117,6 +107,16 @@ export {
   type TrajectoryToolCall,
   toxicityScorer,
 } from './scorers/index.js';
+export {
+  mean,
+  type PairedSignificance,
+  pairedPassSignificance,
+  passByBaseCase,
+  passHatK,
+  sampleStddev,
+  stripIterationSuffix,
+  wilsonInterval,
+} from './stats.js';
 export type {
   AgentLike,
   Case,
