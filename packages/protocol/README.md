@@ -24,7 +24,7 @@
 
 ## Direct dependencies
 
-- [`zod`](https://zod.dev) (`^3.25.0`) — runtime schema validation. The MIT-licensed Zod project supplies the discriminated union, strict-object, and `safeParse` primitives that back every `*Schema` export. No other runtime dependency exists; the package is otherwise pure TypeScript.
+- [`zod`](https://zod.dev) (`^3.25.0`) - runtime schema validation. The MIT-licensed Zod project supplies the discriminated union, strict-object, and `safeParse` primitives that back every `*Schema` export. No other runtime dependency exists; the package is otherwise pure TypeScript.
 
 ## Install
 

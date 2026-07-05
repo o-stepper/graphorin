@@ -6,7 +6,7 @@ editLink: false
 
 <!--
   This page is auto-synced from /SECURITY.md on every documentation build.
-  Do not edit it directly — change /SECURITY.md in the repository root.
+  Do not edit it directly - change /SECURITY.md in the repository root.
 -->
 
 # Security policy
@@ -25,7 +25,7 @@ Please **do not** open a public GitHub issue for security vulnerabilities.
 
 Instead, report privately through one of the following channels:
 
-1. **Preferred — GitHub Security Advisories.** Open a private advisory at
+1. **Preferred - GitHub Security Advisories.** Open a private advisory at
    <https://github.com/o-stepper/graphorin/security/advisories/new>. GitHub Security Advisories handle the disclosure privately and let us coordinate a fix and release in one place.
 2. **Email.** Send a report to the project maintainer at <step.oleksiy@gmail.com>. If you do not receive an acknowledgement within 48 hours, please fall back to a GitHub Security Advisory.
 

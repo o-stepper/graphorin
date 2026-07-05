@@ -6,7 +6,7 @@ editLink: false
 
 <!--
   This page is auto-synced from /CODE_OF_CONDUCT.md on every documentation build.
-  Do not edit it directly — change /CODE_OF_CONDUCT.md in the repository root.
+  Do not edit it directly - change /CODE_OF_CONDUCT.md in the repository root.
 -->
 
 # Code of Conduct

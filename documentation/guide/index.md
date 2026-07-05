@@ -5,7 +5,7 @@ description: A TypeScript framework for building long-living personal AI assista
 
 # What is Graphorin?
 
-> Graphorin is a TypeScript framework for building long-living personal AI assistants — a personal trainer, tutor, financial advisor, or business co-pilot that remembers, endures, and stays yours.
+> Graphorin is a TypeScript framework for building long-living personal AI assistants - a personal trainer, tutor, financial advisor, or business co-pilot that remembers, endures, and stays yours.
 
 It is intentionally a **framework**, not a product. Assistant bots are built **on top of** Graphorin: the framework owns the agent loop, the six-tier memory system, the durable workflow engine, the tools / skills / MCP surface, sessions, observability, secrets, and an optional standalone server runtime. Higher-level products (channel adapters, UIs, business logic) live in your application code.
 
@@ -17,7 +17,7 @@ It is intentionally a **framework**, not a product. Assistant bots are built **o
 - **Vendor-neutral on LLMs.** Multi-provider through a single `Provider` abstraction.
 - **Rich memory model.** Working / session / episodic / semantic / procedural / shared, with explicit lifecycle handling.
 - **Durable workflow.** Agent state survives a process restart; human-in-the-loop is a primitive, not a bolt-on.
-- **Tools, Skills, MCP, RAG, observability** — supported as typed first-class surfaces.
+- **Tools, Skills, MCP, RAG, observability** - supported as typed first-class surfaces.
 - **Local-first.** By default, user data lives on the user's machine. Outbound LLM calls are minimised and explicit.
 - **Streaming-first API.** Tokens, tool calls, intermediate steps, and memory writes are a single typed event stream.
 
@@ -41,10 +41,10 @@ The documentation is written for the people who will integrate Graphorin into a 
 
 | Area | Capability |
 |---|---|
-| Memory | Six-tier memory system — working / session / episodic / semantic / procedural / shared, with pluggable storage and a background consolidation pipeline. |
+| Memory | Six-tier memory system - working / session / episodic / semantic / procedural / shared, with pluggable storage and a background consolidation pipeline. |
 | Workflow | Durable step-graph runtime with checkpoints, pause / resume, and human-in-the-loop primitives. |
 | Local-first | SQLite + the `sqlite-vec` extension + FTS5; multilingual embeddings via `@huggingface/transformers`; cloud is opt-in. |
-| Privacy | Zero default telemetry — no phone-home, no version pings, no analytics. Verified by a CI check. |
+| Privacy | Zero default telemetry - no phone-home, no version pings, no analytics. Verified by a CI check. |
 | Providers | Multi-vendor LLM access through Graphorin's own `Provider` interface, built on top of the Vercel AI SDK. |
 | Tools / Skills / MCP | Typed tools, an Agent Skills `SKILL.md`-format-compatible loader with progressive disclosure, and an in-core MCP client. |
 | Observability | OpenTelemetry-native tracing with the GenAI Semantic Conventions, sensitivity-aware redaction, and replay. |

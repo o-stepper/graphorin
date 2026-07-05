@@ -21,9 +21,9 @@ const HOME_URL = 'https://graphorin.com';
 const baseConfig = defineConfig({
   lang: 'en-US',
   title: 'Graphorin',
-  titleTemplate: ':title — Graphorin',
+  titleTemplate: ':title - Graphorin',
   description:
-    'TypeScript framework for building long-living personal AI assistants — six-tier memory, durable workflow, observability, secrets, and an optional standalone runtime.',
+    'TypeScript framework for building long-living personal AI assistants - six-tier memory, durable workflow, observability, secrets, and an optional standalone runtime.',
   cleanUrls: true,
   lastUpdated: true,
   // The TypeDoc-generated tree links to per-package README anchors and
@@ -53,7 +53,7 @@ const baseConfig = defineConfig({
       {
         property: 'og:description',
         content:
-          'TypeScript framework for building long-living personal AI assistants — local-first, vendor-neutral, durable, observable, type-safe.',
+          'TypeScript framework for building long-living personal AI assistants - local-first, vendor-neutral, durable, observable, type-safe.',
       },
     ],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],

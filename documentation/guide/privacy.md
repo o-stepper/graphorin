@@ -52,7 +52,7 @@ The CI workflow that runs the check is [`.github/workflows/check-no-network.yml`
 
 `createProvider(adapter, { acceptsSensitivity })` is the **first-run sensitivity prompt**. The default for an unfamiliar provider is **deny everything except `public`** until you opt in. Memory rows tagged `secret` are filtered before any payload reaches the adapter, regardless of the configuration.
 
-Sensitivity governs *who may see* a memory. It is orthogonal to **provenance / quarantine**, which governs *whether a memory is trusted enough to recall at all* — synthesised or injection-flagged rows are quarantined out of recall until a human validates them. See [Security § Memory safety](/guide/security#memory-safety-provenance-quarantine).
+Sensitivity governs *who may see* a memory. It is orthogonal to **provenance / quarantine**, which governs *whether a memory is trusted enough to recall at all* - synthesised or injection-flagged rows are quarantined out of recall until a human validates them. See [Security § Memory safety](/guide/security#memory-safety-provenance-quarantine).
 
 ## Verifying the contract yourself
 
@@ -63,7 +63,7 @@ GRAPHORIN_OFFLINE=1 GRAPHORIN_LLM_RECIPE=stub \
   pnpm --filter ./examples/personal-assistant-cli dev
 ```
 
-Network sniffers (`lsof -i -nP | grep node`, `tcpdump`, `Wireshark`) should show traffic only to the endpoints you explicitly configured — never beyond.
+Network sniffers (`lsof -i -nP | grep node`, `tcpdump`, `Wireshark`) should show traffic only to the endpoints you explicitly configured - never beyond.
 
 ## Reporting a regression
 
@@ -71,9 +71,9 @@ If you believe you have observed Graphorin making a network call that the runtim
 
 ## Next steps
 
-- [Security](/guide/security) — sandbox + audit log + supply chain.
-- [Observability](/guide/observability) — redaction layer.
-- [Standalone server](/guide/standalone-server) — health checks + Prometheus metrics.
+- [Security](/guide/security) - sandbox + audit log + supply chain.
+- [Observability](/guide/observability) - redaction layer.
+- [Standalone server](/guide/standalone-server) - health checks + Prometheus metrics.
 
 ---
 

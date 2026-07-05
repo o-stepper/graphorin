@@ -33,12 +33,12 @@
 | **Prometheus metrics** | `/v1/metrics` text exposition v0.0.4 with `graphorin_*` prefix discipline. The canonical inventory covers agent runs, tool calls, provider tokens / cost, WAL size, idempotency hit ratio, trigger fires, redaction drops, consolidator queue depth / DLQ / budget, OAuth token freshness, replay buffer size, in-flight runs, server uptime, and a static `graphorin_build_info` gauge. |
 | **Replay endpoints** | `POST /v1/runs/:runId/replay` and `POST /v1/sessions/:id/replay` enforce `traces:read:sanitized` (default) or `traces:read:raw` (admin); every invocation appends an audit chain entry. |
 | **Graceful shutdown** | Drains in-flight runs within the configured timeout (default 30 s), preserves run state via `RunStateTracker`, propagates `AbortSignal` cancellation to handlers, tears down WebSocket subscriptions cleanly. |
-| **No phone home** | Zero implicit network calls — verified by the repository-wide `pnpm run check-no-network` CI check. |
+| **No phone home** | Zero implicit network calls - verified by the repository-wide `pnpm run check-no-network` CI check. |
 
 ## Out of scope for Phase 14
 
-- Multi-tenant runtime — **v0.3+**.
-- OpenTelemetry metrics export (in addition to Prometheus) — post-MVP.
+- Multi-tenant runtime - **v0.3+**.
+- OpenTelemetry metrics export (in addition to Prometheus) - post-MVP.
 
 ## Install
 

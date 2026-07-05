@@ -13,7 +13,7 @@ in the repository-level
 
 ### Minor Changes
 
-- Phase 07 — initial release. The `@graphorin/tools` package ships the
+- Phase 07 - initial release. The `@graphorin/tools` package ships the
   typed `tool({...})` builder, the strategy-aware `ToolRegistry`, the
   `ToolExecutor` with parallel/sequential dispatch, the approval flow,
   the inbound prompt-injection sanitization layer, the four-strategy

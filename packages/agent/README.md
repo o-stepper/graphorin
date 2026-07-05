@@ -17,22 +17,22 @@ the optional standalone server.
 
 ## Dependencies
 
-- `@graphorin/core` — typed contracts (`AgentEvent`, `RunState`,
+- `@graphorin/core` - typed contracts (`AgentEvent`, `RunState`,
   `RunContext`, `Provider`, `Tool`, `StopCondition`, `HandoffFilter`,
   `Sensitivity`, …).
-- `@graphorin/provider` — middleware composer assertion + token
+- `@graphorin/provider` - middleware composer assertion + token
   counter dispatcher + per-provider model-tier auto-classifier.
-- `@graphorin/tools` — `ToolRegistry` + `ToolExecutor` (parallel /
+- `@graphorin/tools` - `ToolRegistry` + `ToolExecutor` (parallel /
   sequential dispatch, approval flow, sandbox enforcement, inbound
   sanitization).
-- `@graphorin/skills` — skill metadata cards, lazy body loading.
-- `@graphorin/memory` — `Memory` facade + `ContextEngine` for
+- `@graphorin/skills` - skill metadata cards, lazy body loading.
+- `@graphorin/memory` - `Memory` facade + `ContextEngine` for
   per-step prompt assembly + auto-compaction trigger.
-- `@graphorin/sessions` — multi-agent attribution, handoff records,
+- `@graphorin/sessions` - multi-agent attribution, handoff records,
   `AgentRegistry`, audit trail.
-- `@graphorin/observability` — `Tracer`, span attributes, counter
+- `@graphorin/observability` - `Tracer`, span attributes, counter
   receivers.
-- `@graphorin/security` — `SecretsAccessScope` for sub-agent
+- `@graphorin/security` - `SecretsAccessScope` for sub-agent
   inheritance, audit chain, lateral-leak guard primitives.
 
 ## Quick start
@@ -71,7 +71,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   abort signal, deps, and sessionId propagate into the sub-run;
   without an `inputFilter` the sub-agent sees only the input string
   (no parent conversation crosses the boundary), and there is no
-  secret-inheritance mechanism at this boundary at all — least
+  secret-inheritance mechanism at this boundary at all - least
   authority by construction.
 - **Filter library.** `filters.lastN(n)`, `filters.lastUser`,
   `filters.summary({...})`, `filters.bySensitivity({...})`,
@@ -79,7 +79,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   `filters.stripToolCalls()`, `filters.compose(...)`. Every filter
   returns a serializable `HandoffInputFilterDescriptor` so the
   JSONL session export can replay it byte-equal.
-- **Cancellation.** `agent.abort({ drain, onPendingApprovals })` —
+- **Cancellation.** `agent.abort({ drain, onPendingApprovals })` -
   the default hard-kills the in-flight provider stream mid-event;
   `drain: true` lets the current step's stream finish (reach its step
   boundary) before stopping. A mid-stream abort ends the run as
@@ -128,7 +128,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   (Agentic Reference Monitor pattern), `Agent.mergeGuard` (per-child
   trust scoring + bias detection on `'judge-merge'`; `detect-and-block`
   refuses the merge with `MergeBlockedError`), the protocol
-  injection guard (`guardOutboundContent` — an exported helper for
+  injection guard (`guardOutboundContent` - an exported helper for
   the server boundary, not an `AgentConfig` knob), and
   commentary-phase trace sanitization at the session-output
   boundary compose orthogonally with the other security layers

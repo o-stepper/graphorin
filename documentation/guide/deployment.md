@@ -1,23 +1,23 @@
 ---
 title: Deployment
-description: Run Graphorin in production — systemd, Docker, Kubernetes, GitHub Actions integration, file modes, and observability hookup.
+description: Run Graphorin in production - systemd, Docker, Kubernetes, GitHub Actions integration, file modes, and observability hookup.
 ---
 
 # Deployment
 
 Graphorin runs in two shapes:
 
-- **Library mode** — embedded in your existing Node.js process. No deployment story beyond your own application's.
-- **Daemon mode** — `@graphorin/server` running as a long-lived process. The rest of this page covers production deployment of the daemon.
+- **Library mode** - embedded in your existing Node.js process. No deployment story beyond your own application's.
+- **Daemon mode** - `@graphorin/server` running as a long-lived process. The rest of this page covers production deployment of the daemon.
 
 ## Reference templates
 
 The repository ships templates for the four most common production environments:
 
-- `examples/systemd/` — a hardened unit file for systemd-managed servers.
-- `examples/docker/` — a multi-stage `Dockerfile` (see its README for the `docker run` flags).
-- `examples/k8s/` — a `Deployment` + `Service` + `ConfigMap` manifest set.
-- `examples/github-actions/` — a workflow that exercises Graphorin from CI.
+- `examples/systemd/` - a hardened unit file for systemd-managed servers.
+- `examples/docker/` - a multi-stage `Dockerfile` (see its README for the `docker run` flags).
+- `examples/k8s/` - a `Deployment` + `Service` + `ConfigMap` manifest set.
+- `examples/github-actions/` - a workflow that exercises Graphorin from CI.
 
 All four templates run Graphorin as a **non-root** user with the audit log on its own mount and the secrets store unreadable by the application's main filesystem path.
 
@@ -33,7 +33,7 @@ Before promoting a Graphorin deployment to production:
 2. **Encryption-at-rest**
    - The audit log is **always** encrypted (mandatory).
    - Enable database encryption-at-rest via `@graphorin/store-sqlite-encrypted` for any deployment that stores user secrets or `secret`-tagged memory rows.
-   - The passphrase resolves through `SecretRef` — keep it in the OS keychain or a managed vault, never in plain config files.
+   - The passphrase resolves through `SecretRef` - keep it in the OS keychain or a managed vault, never in plain config files.
 
 3. **Tokens**
    - Issue tokens with `graphorin token create --scopes <list> --expires-in <duration>`.
@@ -43,7 +43,7 @@ Before promoting a Graphorin deployment to production:
 
 4. **Observability**
    - Wire `OTLP_URL` (or another supported exporter). The default is **no remote export**.
-   - Confirm `withValidation(...)` is in the exporter chain — the tracer factory throws if it is missing, so this is a soft check.
+   - Confirm `withValidation(...)` is in the exporter chain - the tracer factory throws if it is missing, so this is a soft check.
    - Configure the redaction allowlist for any high-cardinality attribute that's safe to ship un-redacted.
 
 5. **Triggers**
@@ -133,7 +133,7 @@ The `examples/k8s/` manifest set runs Graphorin as a non-root pod with:
 
 ## GitHub Actions
 
-The `examples/github-actions/` template exercises Graphorin from a CI pipeline — a hermetic `pnpm` install, a stub-provider agent run, a smoke test against the standalone server, and a JSONL session export.
+The `examples/github-actions/` template exercises Graphorin from a CI pipeline - a hermetic `pnpm` install, a stub-provider agent run, a smoke test against the standalone server, and a JSONL session export.
 
 ## Health checks
 
@@ -141,10 +141,10 @@ Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The
 
 ## Next steps
 
-- [Standalone server](/guide/standalone-server) — REST endpoints, configuration.
-- [CLI](/guide/cli) — `graphorin doctor`, `graphorin token`.
-- [Security](/guide/security) — production hardening checklist.
-- [Observability](/guide/observability) — OTLP exporter wiring.
+- [Standalone server](/guide/standalone-server) - REST endpoints, configuration.
+- [CLI](/guide/cli) - `graphorin doctor`, `graphorin token`.
+- [Security](/guide/security) - production hardening checklist.
+- [Observability](/guide/observability) - OTLP exporter wiring.
 
 ---
 

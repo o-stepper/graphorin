@@ -1,6 +1,6 @@
 ---
 title: Troubleshooting
-description: Common Graphorin issues and how to resolve them — install & runtime, storage, providers, memory, and the standalone server.
+description: Common Graphorin issues and how to resolve them - install & runtime, storage, providers, memory, and the standalone server.
 ---
 
 # Troubleshooting
@@ -32,7 +32,7 @@ Local providers can stall if the backend is down. The Ollama embedder and
 
 **`MissingProductionMiddlewareError` at startup.**
 In production, `withRedaction` is required in the provider middleware chain
-(fail-fast). Compose it via `composeProviderMiddleware` — it is enforced as the
+(fail-fast). Compose it via `composeProviderMiddleware` - it is enforced as the
 innermost layer so retries/fallbacks always see redacted payloads.
 
 **Token-cost numbers look off.**
@@ -67,7 +67,7 @@ unencrypted. Empty passphrases are rejected. See [Storage backends](/guide/stora
 **Server refuses to start: pepper required.**
 Token auth requires a pepper at startup (resolved from a `SecretRef`). Weak /
 placeholder peppers (e.g. a long single-character run) are rejected by the
-weak-secret detector — generate one with `crypto.randomBytes(32)` or
+weak-secret detector - generate one with `crypto.randomBytes(32)` or
 `generatePepper()`.
 
 **WebSocket upgrade fails in the browser.**
@@ -81,4 +81,4 @@ the `graphorin.protocol.v1` and a `ticket.<value>` subprotocol token. See
 Examples default to a deterministic `stub` recipe
 (`GRAPHORIN_LLM_RECIPE=stub`). `local-stack-cli` needs a real Ollama daemon;
 with `GRAPHORIN_OFFLINE=1` it fails fast with an actionable message and exit
-code 2 — that is expected. See the [example apps](/guide/examples).
+code 2 - that is expected. See the [example apps](/guide/examples).

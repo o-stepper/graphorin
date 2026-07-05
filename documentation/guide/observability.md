@@ -5,7 +5,7 @@ description: OpenTelemetry-native traces with the GenAI Semantic Conventions, se
 
 # Observability
 
-`@graphorin/observability` ships an OpenTelemetry-native tracing surface implementing the **OpenTelemetry GenAI Semantic Conventions** and a sensitivity-aware redaction layer that is **mandatory** on every exporter — there is no way to accidentally ship un-redacted spans to a remote collector.
+`@graphorin/observability` ships an OpenTelemetry-native tracing surface implementing the **OpenTelemetry GenAI Semantic Conventions** and a sensitivity-aware redaction layer that is **mandatory** on every exporter - there is no way to accidentally ship un-redacted spans to a remote collector.
 
 ## What gets traced
 
@@ -19,7 +19,7 @@ flowchart LR
     H --> J[workflow.checkpoint]
 ```
 
-The agent loop opens one `agent.run` span per run and one `agent.step` span per step (C7); `tool.execute` parents under the current step via `RunContext.span`, and a `withTracing`-wrapped provider parents its `provider.stream`/`provider.generate` span under the step via `ProviderRequest.parentSpan` — so a run is ONE trace tree and parent-based sampling has a real parent to follow. Memory-tier spans (`memory.search.semantic`, consolidator phases) still start their own traces today: the tiers hold their own tracer handle and are called outside the step context — a known limitation, not a wiring bug.
+The agent loop opens one `agent.run` span per run and one `agent.step` span per step (C7); `tool.execute` parents under the current step via `RunContext.span`, and a `withTracing`-wrapped provider parents its `provider.stream`/`provider.generate` span under the step via `ProviderRequest.parentSpan` - so a run is ONE trace tree and parent-based sampling has a real parent to follow. Memory-tier spans (`memory.search.semantic`, consolidator phases) still start their own traces today: the tiers hold their own tracer handle and are called outside the step context - a known limitation, not a wiring bug.
 
 Run/step/tool spans carry OTel GenAI attributes (`gen_ai.operation.name` = `invoke_agent` / `execute_tool` / `chat`, `gen_ai.agent.id`, `gen_ai.tool.name`, `gen_ai.request.model`, `gen_ai.usage.input_tokens` / `output_tokens` on close) plus Graphorin-specific ones (`graphorin.run.id`, `graphorin.step.number`, `graphorin.tool.name`, `graphorin.tool.sensitivity`, `graphorin.tool.sandbox.kind`, …).
 
@@ -36,7 +36,7 @@ const tracer = createTracer({
 });
 ```
 
-The tracer **auto-wraps every exporter** with `withValidation(...)` by default — you do not have to opt in. To bypass auto-wrapping, set `validation: 'off'` on the tracer config; in that mode every exporter you pass MUST already be wrapped via `withValidation(...)` or the tracer throws `UnvalidatedExporterError` at startup.
+The tracer **auto-wraps every exporter** with `withValidation(...)` by default - you do not have to opt in. To bypass auto-wrapping, set `validation: 'off'` on the tracer config; in that mode every exporter you pass MUST already be wrapped via `withValidation(...)` or the tracer throws `UnvalidatedExporterError` at startup.
 
 The validation layer enforces:
 
@@ -58,7 +58,7 @@ flowchart LR
     Strip --> Out
 ```
 
-Redaction is **attribute-granular**: an attribute that exceeds the configured floor (or matches a secret / PII pattern) is stripped and counted, and the rest of the span still reaches the exporter. A single untagged or over-tier attribute never makes the whole span vanish — before this fix (RP-18) framework spans, which carry untagged attributes by default, disappeared from every exporter and operators saw empty traces.
+Redaction is **attribute-granular**: an attribute that exceeds the configured floor (or matches a secret / PII pattern) is stripped and counted, and the rest of the span still reaches the exporter. A single untagged or over-tier attribute never makes the whole span vanish - before this fix (RP-18) framework spans, which carry untagged attributes by default, disappeared from every exporter and operators saw empty traces.
 
 You **cannot** disable the validation wrapper. You can:
 
@@ -74,11 +74,11 @@ For local development, set:
 GRAPHORIN_TRACE=console
 ```
 
-…and every finished span is pretty-printed to your terminal. The example apps in the repository use this to make iteration fast — see the [Examples](/guide/examples) page.
+…and every finished span is pretty-printed to your terminal. The example apps in the repository use this to make iteration fast - see the [Examples](/guide/examples) page.
 
 ## OTLP export
 
-`@graphorin/observability` exposes the OTLP-HTTP exporter from `@opentelemetry/exporter-trace-otlp-http`. The exporter only fires when the operator wires a collector URL — Graphorin never opens an OTLP connection on its own.
+`@graphorin/observability` exposes the OTLP-HTTP exporter from `@opentelemetry/exporter-trace-otlp-http`. The exporter only fires when the operator wires a collector URL - Graphorin never opens an OTLP connection on its own.
 
 ```ts
 import { createTracer, withValidation } from '@graphorin/observability';
@@ -145,9 +145,9 @@ Counter names are unprefixed in-process (`snapshotCounters()`); add your own nam
 
 ## Next steps
 
-- [Security](/guide/security) — sensitivity flow + sandbox + audit log.
-- [Privacy](/guide/privacy) — the no-phone-home contract.
-- [Standalone server](/guide/standalone-server) — replay + Prometheus metrics endpoints.
+- [Security](/guide/security) - sensitivity flow + sandbox + audit log.
+- [Privacy](/guide/privacy) - the no-phone-home contract.
+- [Standalone server](/guide/standalone-server) - replay + Prometheus metrics endpoints.
 
 ---
 

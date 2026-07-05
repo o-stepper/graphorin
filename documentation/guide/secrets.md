@@ -39,10 +39,10 @@ apiKey.dispose();
 
 Two static helpers cover the common construction paths:
 
-- `SecretValue.fromString(raw, opts?)` — wrap a UTF-8 string at the I/O boundary.
-- `SecretValue.fromBuffer(buf, opts?)` — wrap a `Buffer` (defensively copied).
+- `SecretValue.fromString(raw, opts?)` - wrap a UTF-8 string at the I/O boundary.
+- `SecretValue.fromBuffer(buf, opts?)` - wrap a `Buffer` (defensively copied).
 
-`SecretValue` is also exposed in `@graphorin/core` as an **interface** (the contract), so any package that types a parameter as `SecretValue` depends only on `@graphorin/core` — the concrete class lives in `@graphorin/security`.
+`SecretValue` is also exposed in `@graphorin/core` as an **interface** (the contract), so any package that types a parameter as `SecretValue` depends only on `@graphorin/core` - the concrete class lives in `@graphorin/security`.
 
 ## `SecretRef` URI scheme
 
@@ -68,7 +68,7 @@ console.log(value.length); // safe; never reveals
 const raw = value.reveal();
 ```
 
-`parseSecretRef(uri)` strict-parses the URI and throws a typed `SecretRefParseError` on malformed input. `resolveSecret(refOrUri)` walks the resolver registry and returns a `SecretValue`. Resolvers register a single `scheme` and own the parsing of their scheme-specific part — see `registerResolver(...)` for plugging in your own.
+`parseSecretRef(uri)` strict-parses the URI and throws a typed `SecretRefParseError` on malformed input. `resolveSecret(refOrUri)` walks the resolver registry and returns a `SecretValue`. Resolvers register a single `scheme` and own the parsing of their scheme-specific part - see `registerResolver(...)` for plugging in your own.
 
 ## Per-tool secrets ACL
 
@@ -121,7 +121,7 @@ Every transition writes one audit row.
 
 ## OS keychain
 
-`KeyringSecretsStore` is backed by the OS keychain — Keychain on macOS, Credential Manager on Windows, libsecret-compatible services on Linux — through the optional `@napi-rs/keyring` (MIT) peer dependency.
+`KeyringSecretsStore` is backed by the OS keychain - Keychain on macOS, Credential Manager on Windows, libsecret-compatible services on Linux - through the optional `@napi-rs/keyring` (MIT) peer dependency.
 
 ```bash
 graphorin secrets list
@@ -146,13 +146,13 @@ The store is selected through the `--secrets-source encrypted-file` flag, the ma
 
 **Durability and recovery.** The store treats the bundle as precious data:
 
-- **Fail-loud on a wrong passphrase or corruption.** A read that fails because the passphrase is wrong (or rotated), or because the bundle is tampered, truncated, or malformed, **throws** — it never silently re-initialises an empty bundle. A fresh empty bundle is created only when the file genuinely does not exist yet (`ENOENT`). This means a mistyped/rotated `GRAPHORIN_MASTER_PASSPHRASE` surfaces as an error on the next `get`/`set`/`delete` rather than wiping every stored secret. **Recovery:** restore the correct passphrase — the on-disk bundle is left untouched by a failed write.
+- **Fail-loud on a wrong passphrase or corruption.** A read that fails because the passphrase is wrong (or rotated), or because the bundle is tampered, truncated, or malformed, **throws** - it never silently re-initialises an empty bundle. A fresh empty bundle is created only when the file genuinely does not exist yet (`ENOENT`). This means a mistyped/rotated `GRAPHORIN_MASTER_PASSPHRASE` surfaces as an error on the next `get`/`set`/`delete` rather than wiping every stored secret. **Recovery:** restore the correct passphrase - the on-disk bundle is left untouched by a failed write.
 - **Atomic writes.** Every write goes to a temp sibling (`<path>.tmp`, mode `0o600`) and is then `rename`d onto the target, so a crash mid-write can never truncate or corrupt the existing bundle; a reader only ever sees the old or the new file in full.
-- **In-process single-writer guard.** Concurrent `set`/`delete` calls on one store instance are serialised so their read-modify-write cycles cannot interleave and clobber each other. Cross-process concurrent writers are out of scope (the atomic rename still rules out corruption — worst case is last-write-wins).
+- **In-process single-writer guard.** Concurrent `set`/`delete` calls on one store instance are serialised so their read-modify-write cycles cannot interleave and clobber each other. Cross-process concurrent writers are out of scope (the atomic rename still rules out corruption - worst case is last-write-wins).
 
 ## Optional 1Password adapter
 
-The `@graphorin/secret-1password` package is an optional reference adapter that delegates to the system [1Password CLI (`op`)](https://developer.1password.com/docs/cli/get-started/). It does **not** bundle the CLI — install the binary yourself. The adapter exposes a `SecretResolver` for the canonical `op://` URI scheme defined by 1Password:
+The `@graphorin/secret-1password` package is an optional reference adapter that delegates to the system [1Password CLI (`op`)](https://developer.1password.com/docs/cli/get-started/). It does **not** bundle the CLI - install the binary yourself. The adapter exposes a `SecretResolver` for the canonical `op://` URI scheme defined by 1Password:
 
 ```text
 op://<vault>/<item>/[<section>/]<field>
@@ -199,24 +199,24 @@ secrets store the tokens live in process memory only (the command warns).
 
 ## Telemetry redaction for `SecretValue`s
 
-Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory. The validator substitutes a redacted placeholder for any attribute whose serialised form matches a known `SecretValue` shape. Operators that pass `validation: 'off'` must wrap exporters explicitly — the tracer refuses to register a raw exporter in that mode and throws `UnvalidatedExporterError` at startup.
+Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory. The validator substitutes a redacted placeholder for any attribute whose serialised form matches a known `SecretValue` shape. Operators that pass `validation: 'off'` must wrap exporters explicitly - the tracer refuses to register a raw exporter in that mode and throws `UnvalidatedExporterError` at startup.
 
 ## Capability matrix
 
 | Capability | OS keychain | Encrypted-file | 1Password CLI |
 |---|---|---|---|
-| Read | ✓ | ✓ | ✓ |
-| Write | ✓ | ✓ | (read-only) |
-| List | ✓ | ✓ | ✓ |
-| Per-tool ACL | ✓ | ✓ | ✓ |
-| Audit log | ✓ | ✓ | ✓ |
-| Headless / CI | — | ✓ | ✓ |
+| Read | yes | yes | yes |
+| Write | yes | yes | no (read-only) |
+| List | yes | yes | yes |
+| Per-tool ACL | yes | yes | yes |
+| Audit log | yes | yes | yes |
+| Headless / CI | no | yes | yes |
 
 ## Next steps
 
-- [Security](/guide/security) — sandbox, audit log, OAuth.
-- [Privacy](/guide/privacy) — the zero-default-telemetry promise.
-- [CLI](/guide/cli) — `graphorin secrets`, `graphorin auth`, `graphorin token`.
+- [Security](/guide/security) - sandbox, audit log, OAuth.
+- [Privacy](/guide/privacy) - the zero-default-telemetry promise.
+- [CLI](/guide/cli) - `graphorin secrets`, `graphorin auth`, `graphorin token`.
 
 ---
 

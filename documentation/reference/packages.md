@@ -13,13 +13,13 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 
 <FrameworkBadge />
 
-## Tier 0 — Foundation
+## Tier 0 - Foundation
 
 | Package | Status | Role |
 |---|---|---|
 | [`@graphorin/core`](/api/) | stable | Core types, contracts, errors, ESM-only utilities. Dependency-free root every other `@graphorin/*` package depends on. |
 
-## Tier 1 — Cross-cutting infrastructure
+## Tier 1 - Cross-cutting infrastructure
 
 | Package | Status | Role |
 |---|---|---|
@@ -27,18 +27,18 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 | `@graphorin/observability` | stable | Tracing, redaction, eval interfaces. |
 | `@graphorin/pricing` | stable | Bundled LLM pricing snapshot + opt-in refresh. |
 
-## Tier 2 — Persistence + Provider
+## Tier 2 - Persistence + Provider
 
 | Package | Status | Role |
 |---|---|---|
 | `@graphorin/store-sqlite` | stable | Default storage adapter on top of `better-sqlite3` + `sqlite-vec` + FTS5. |
 | `@graphorin/embedder-transformersjs` | stable | Default in-process embedder (multilingual). |
 | `@graphorin/embedder-ollama` | stable | First-class opt-in embedder against an Ollama daemon. |
-| `@graphorin/triggers` | stable | Background tasks — cron / interval / idle / event. |
+| `@graphorin/triggers` | stable | Background tasks - cron / interval / idle / event. |
 | `@graphorin/provider` | stable | `Provider` interface and adapters (Vercel AI SDK, Ollama, OpenAI-compatible, llama.cpp HTTP server). |
-| `@graphorin/provider-llamacpp-node` | stable | Companion package — in-process GGUF execution. |
+| `@graphorin/provider-llamacpp-node` | stable | Companion package - in-process GGUF execution. |
 
-## Tier 3 — External surface
+## Tier 3 - External surface
 
 | Package | Status | Role |
 |---|---|---|
@@ -46,27 +46,27 @@ Looking for the auto-generated TypeScript signatures? See the [API reference](/a
 | `@graphorin/skills` | stable | Loader for the public Agent Skills `SKILL.md` packaging format with three-tier progressive disclosure. |
 | `@graphorin/mcp` | stable | Model Context Protocol client (stdio + Streamable HTTP). |
 
-## Tier 4 — Memory & Sessions
+## Tier 4 - Memory & Sessions
 
 | Package | Status | Role |
 |---|---|---|
 | `@graphorin/memory` | stable | Six-tier memory (+ derived insights): hybrid search with weighted fusion, an entity graph with one-hop expansion, bi-temporal time-travel, a provenance/quarantine safety gate, plus the multi-stage conflict pipeline and consolidator. |
 | `@graphorin/sessions` | stable | Hybrid session facade, agent registry, handoffs, JSONL export, replay reconstruction. |
 
-## Tier 5 — Runtime
+## Tier 5 - Runtime
 
 | Package | Status | Role |
 |---|---|---|
-| `@graphorin/agent` | stable | Agent runtime — typed `model -> tool calls -> model` loop, streaming events, durable HITL, multi-agent handoffs, fan-out, evaluator-optimizer. |
+| `@graphorin/agent` | stable | Agent runtime - typed `model -> tool calls -> model` loop, streaming events, durable HITL, multi-agent handoffs, fan-out, evaluator-optimizer. |
 | `@graphorin/workflow` | stable | Durable step-graph runtime with checkpoints, `pause` / `resume`, `Dispatch`, channel kinds. |
 
-## Tier 6 — Standalone server + DX
+## Tier 6 - Standalone server + DX
 
 | Package | Status | Role |
 |---|---|---|
 | `@graphorin/server` | stable | Optional standalone server with REST + WebSocket + SSE fallback. |
 | `@graphorin/cli` | stable | Operator CLI. |
-| `@graphorin/protocol` | stable | WebSocket protocol contract — `graphorin.protocol.v1`. |
+| `@graphorin/protocol` | stable | WebSocket protocol contract - `graphorin.protocol.v1`. |
 | `@graphorin/client` | stable | Browser-friendly client for the standalone server. |
 
 ## Optional packages

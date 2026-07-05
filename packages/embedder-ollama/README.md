@@ -52,7 +52,7 @@ runtime caller may pass an explicit `acceptsSensitivity` override.
 
 The canonical id includes the Ollama model digest discovered via
 `POST /api/show` at construction time. A model upgrade in the same
-Ollama instance produces a different digest — and therefore a
+Ollama instance produces a different digest - and therefore a
 different `embedder_id`. The default `lock-on-first` policy in
 `@graphorin/store-sqlite` then fires the same migration path the
 existing `transformersjs` swap takes.

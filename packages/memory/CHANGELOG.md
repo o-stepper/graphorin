@@ -13,7 +13,7 @@ in the repository-level
 
 ### Minor Changes
 
-- Phase 10a — initial release of `@graphorin/memory`. Ships the
+- Phase 10a - initial release of `@graphorin/memory`. Ships the
   `createMemory()` facade with six tier sub-modules (working,
   session, episodic, semantic, procedural, shared), nine memory
   tools registered through `@graphorin/tools`, the built-in

@@ -84,7 +84,7 @@ graphorin migrate --config ./graphorin.config.ts
 graphorin start --config ./graphorin.config.ts
 ```
 
-`GRAPHORIN_OFFLINE=1` is honoured by every subcommand — the CLI never makes implicit network calls (verified by the repository-wide `pnpm run check-no-network` CI check).
+`GRAPHORIN_OFFLINE=1` is honoured by every subcommand - the CLI never makes implicit network calls (verified by the repository-wide `pnpm run check-no-network` CI check).
 
 ## Programmatic usage
 
@@ -116,10 +116,10 @@ await runStart({ config: './graphorin.config.ts', port: 8090 });
 
 Phase 15 ships ready-to-copy templates for production deployments:
 
-- `examples/systemd/graphorin.service` — hardened systemd unit (refuse-as-root, `UMask=0077`, `ProtectSystem=strict`, `NoNewPrivileges=true`).
-- `examples/docker/Dockerfile` — multi-stage Node 22-slim image with a non-root user (UID 10001), read-only rootfs friendly, `--cap-drop=ALL` ready.
-- `examples/k8s/deployment.yaml` — Pod-Security-Standards "restricted" profile with `runAsNonRoot`, `seccompProfile: RuntimeDefault`, projected secret mounts.
-- `examples/github-actions/{security.yml,release.yml,renovate.json,audit-ignore.json}` — supply-chain workflows (`pnpm audit`, Sigstore provenance verification, Changesets-driven releases).
+- `examples/systemd/graphorin.service` - hardened systemd unit (refuse-as-root, `UMask=0077`, `ProtectSystem=strict`, `NoNewPrivileges=true`).
+- `examples/docker/Dockerfile` - multi-stage Node 22-slim image with a non-root user (UID 10001), read-only rootfs friendly, `--cap-drop=ALL` ready.
+- `examples/k8s/deployment.yaml` - Pod-Security-Standards "restricted" profile with `runAsNonRoot`, `seccompProfile: RuntimeDefault`, projected secret mounts.
+- `examples/github-actions/{security.yml,release.yml,renovate.json,audit-ignore.json}` - supply-chain workflows (`pnpm audit`, Sigstore provenance verification, Changesets-driven releases).
 
 ## Status
 

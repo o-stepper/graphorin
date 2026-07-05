@@ -31,7 +31,7 @@
 pnpm add @graphorin/reranker-llm
 ```
 
-The reranker reuses your existing `Provider` instance — no extra
+The reranker reuses your existing `Provider` instance - no extra
 network credentials beyond what the provider already needs.
 
 ---
@@ -120,7 +120,7 @@ Every result attaches:
 
 ## Related decisions
 
-- ADR-024 — Reciprocal Rank Fusion default + pluggable rerankers.
+- ADR-024 - Reciprocal Rank Fusion default + pluggable rerankers.
 
 ---
 

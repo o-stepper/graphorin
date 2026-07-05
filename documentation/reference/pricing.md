@@ -9,7 +9,7 @@ description: A bundled, never-auto-refreshed snapshot of LLM pricing data, sourc
 
 - A bundled snapshot of LLM pricing data sourced from [`@pydantic/genai-prices`](https://github.com/pydantic/genai-prices) (MIT).
 - A `lookupPrice({ provider, model })` resolver.
-- A `calculateCost(spec, usage)` helper.
+- A `calculateCost({ provider, model, inputTokens, outputTokens, ... })` helper.
 - An opt-in `refreshPricing(...)` hook (the only network-touching path; never invoked automatically).
 - A `listMissingModels(...)` utility used by trace audits.
 
@@ -39,23 +39,27 @@ if (price !== null) {
   console.log(`Input: $${price.inputUsdPerToken} / token`);
 }
 
-const cost = calculateCost(
-  { provider: 'openai', model: 'gpt-4o-2024-11-20' },
-  { input: 1200, output: 350 },
-);
+const cost = calculateCost({
+  provider: 'openai',
+  model: 'gpt-4o-2024-11-20',
+  inputTokens: 1200,
+  outputTokens: 350,
+});
 
-console.log(`This call costs $${cost.totalUsd.toFixed(6)}.`);
+if (cost !== null) {
+  console.log(`This call costs $${cost.amount.toFixed(6)} ${cost.currency}.`);
+}
 ```
 
 ## Bundled snapshot
 
-The bundled snapshot is a **point-in-time copy** of the upstream dataset. It is **never automatically refreshed** — Graphorin's privacy contract forbids auto-update and version-ping behaviour.
+The bundled snapshot is a **point-in-time copy** of the upstream dataset. It is **never automatically refreshed** - Graphorin's privacy contract forbids auto-update and version-ping behaviour.
 
 ```ts
 import { BUNDLED_SNAPSHOT } from '@graphorin/pricing';
 
-console.log(`Snapshot date: ${BUNDLED_SNAPSHOT.recordedAt}`);
-console.log(`Models tracked: ${BUNDLED_SNAPSHOT.models.length}`);
+console.log(`Snapshot date: ${BUNDLED_SNAPSHOT.snapshotDate}`);
+console.log(`Models tracked: ${BUNDLED_SNAPSHOT.entries.length}`);
 ```
 
 ## Refreshing on demand
@@ -84,14 +88,18 @@ import { diffPricing, BUNDLED_SNAPSHOT, refreshPricing } from '@graphorin/pricin
 
 const fresh = await refreshPricing({ url: 'https://example.com/pricing.json' });
 const diff = diffPricing(BUNDLED_SNAPSHOT, fresh);
-console.log(diff.added, diff.removed, diff.changed);
+for (const kind of ['added', 'removed', 'changed'] as const) {
+  console.log(`${kind}: ${diff.filter((d) => d.kind === kind).length}`);
+}
 ```
+
+`diffPricing` returns a flat array of `PricingDiffEntry` rows; each row carries `provider`, `model`, a `kind` discriminator, and (for `changed`) the `before` / `after` entries plus `changedFields`.
 
 The CLI command `graphorin pricing diff` prints the same diff in human-readable form.
 
 ## Listing missing models
 
-When you wire `@graphorin/observability` against a custom provider whose pricing isn't in the snapshot, the trace audit can't compute a cost for those calls. `listMissingModels(...)` enumerates every `(provider, model)` pair the audit saw without a matching price entry — useful for telling you which entries to add to a custom snapshot.
+When you wire `@graphorin/observability` against a custom provider whose pricing isn't in the snapshot, the trace audit can't compute a cost for those calls. `listMissingModels(...)` enumerates every `(provider, model)` pair the audit saw without a matching price entry - useful for telling you which entries to add to a custom snapshot.
 
 ```ts
 import { listMissingModels } from '@graphorin/pricing';
@@ -107,11 +115,16 @@ for (const { provider, model, count } of missing) {
 Pass any `PricingSnapshot` to `lookupPrice` / `calculateCost` to override the bundled defaults:
 
 ```ts
-import { calculateCost } from '@graphorin/pricing';
+import { calculateCost, type PricingSnapshot } from '@graphorin/pricing';
 
-const customSnapshot = {
-  recordedAt: '2026-05-01',
-  models: [
+const customSnapshot: PricingSnapshot = {
+  version: '1',
+  source: 'my-vendor-price-list',
+  snapshotDate: '2026-05-01',
+  currency: 'USD',
+  // Stamped by refreshPricing() over fetched data; never verified on lookup.
+  sha256: '',
+  entries: [
     {
       provider: 'my-vendor',
       model: 'my-model',
@@ -122,27 +135,26 @@ const customSnapshot = {
 };
 
 const cost = calculateCost(
-  { provider: 'my-vendor', model: 'my-model' },
-  { input: 5000, output: 800 },
-  { snapshot: customSnapshot },
+  { provider: 'my-vendor', model: 'my-model', inputTokens: 5000, outputTokens: 800 },
+  customSnapshot,
 );
 ```
 
 ## Cost telemetry
 
-When `@graphorin/observability` and `@graphorin/pricing` are both installed, the tracer attaches `gen_ai.usage.cost.usd` to every provider span automatically — provided the model is in the active snapshot.
+When `@graphorin/observability` and `@graphorin/pricing` are both installed, the tracer attaches `gen_ai.usage.cost.usd` to every provider span automatically - provided the model is in the active snapshot.
 
 ## Privacy
 
-- Bundled snapshot ships **inside** the npm tarball — no first-run download.
+- Bundled snapshot ships **inside** the npm tarball - no first-run download.
 - `refreshPricing(...)` is opt-in, idempotent, and audited.
 - Cost computation is purely local; no telemetry of pricing decisions ever leaves the process.
 
 ## Next steps
 
-- [Providers](/guide/providers) — how the pricing snapshot integrates with the provider middleware.
-- [Observability](/guide/observability) — `gen_ai.usage.cost.usd` attribute.
-- [CLI](/guide/cli) — `graphorin pricing status / refresh / diff`.
+- [Providers](/guide/providers) - how the pricing snapshot integrates with the provider middleware.
+- [Observability](/guide/observability) - `gen_ai.usage.cost.usd` attribute.
+- [CLI](/guide/cli) - `graphorin pricing status / refresh / diff`.
 
 ---
 

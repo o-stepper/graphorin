@@ -111,7 +111,7 @@ function sanitise(markdown) {
     if (tagName && HTML_TAG_ALLOWLIST.has(tagName)) {
       return whole;
     }
-    // Comment-style or DOCTYPE — leave alone.
+    // Comment-style or DOCTYPE - leave alone.
     if (trimmed.startsWith('!')) {
       return whole;
     }

@@ -26,7 +26,7 @@ in the repository-level
   `withSignal`, `assertNever`, `md5`, `xxhash`, …).
 - Workflow channel primitives under `@graphorin/core/channels`:
   `Directive`, `Dispatch`, `pause`, `LatestValue`, `Reducer`, `Stream`,
-  `Barrier`, `Ephemeral`, `AnyValue`, `ListAggregate` — Graphorin's own
+  `Barrier`, `Ephemeral`, `AnyValue`, `ListAggregate` - Graphorin's own
   vocabulary; names are part of the public API.
 - Typed no-op defaults `NOOP_TRACER` and `NOOP_LOGGER` so downstream
   packages can carry a non-null observability surface without taking the

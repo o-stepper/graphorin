@@ -104,21 +104,21 @@ flowchart LR
     H --> I[Done]
 ```
 
-Every execution step ends with a checkpoint written through the pluggable `CheckpointStore`. A new process — even on a different machine — can pick up exactly where the previous one left off via `workflow.resume(threadId, directive)`. HITL is a primitive, not a bolt-on.
+Every execution step ends with a checkpoint written through the pluggable `CheckpointStore`. A new process - even on a different machine - can pick up exactly where the previous one left off via `workflow.resume(threadId, directive)`. HITL is a primitive, not a bolt-on.
 
 ### What the checkpoint carries
 
-Each checkpoint persists the merged state, the per-channel versions, **and the resumable frontier**: every pending pause (parallel pausers included), every `Dispatch` task that has not run yet, and every node that completed but whose outgoing edges have not been walked. Nothing in flight is lost at a suspend/crash boundary — a sibling that completed while another node paused still fires its edges after resume.
+Each checkpoint persists the merged state, the per-channel versions, **and the resumable frontier**: every pending pause (parallel pausers included), every `Dispatch` task that has not run yet, and every node that completed but whose outgoing edges have not been walked. Nothing in flight is lost at a suspend/crash boundary - a sibling that completed while another node paused still fires its edges after resume.
 
 ### Recovery matrix
 
 | Latest checkpoint status | How to continue | What happens |
 |---|---|---|
 | `suspended` | `resume(threadId, directive)` | The paused node re-runs with the directive value; parallel pausers re-suspend with their own values intact. |
-| `running` | `resume(threadId)` | Crash recovery — the process died mid-run; execution continues from the last completed step. Completed steps are never re-run. |
+| `running` | `resume(threadId)` | Crash recovery - the process died mid-run; execution continues from the last completed step. Completed steps are never re-run. |
 | `aborted` | `resume(threadId)` or `retry(threadId)` | A clean `AbortSignal` boundary stop. Completed tasks of the aborted step replay from their persisted writes. |
-| `failed` | `retry(threadId)` | Successful sibling tasks of the failed step replay from their persisted pending writes — **only the failed work re-runs**. |
-| `completed` | — | `resume` reports `resume-without-suspension`. |
+| `failed` | `retry(threadId)` | Successful sibling tasks of the failed step replay from their persisted pending writes - **only the failed work re-runs**. |
+| `completed` | n/a | `resume` reports `resume-without-suspension`. |
 
 ### Concurrency control
 
@@ -128,19 +128,19 @@ Within one step, `maxConcurrentTasks` bounds how many planned tasks (including `
 
 ### The re-execution contract
 
-Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Temporal-style event-sourced re-execution — that would handcuff all user code to determinism). The consequences you must design for:
+Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Temporal-style event-sourced re-execution - that would handcuff all user code to determinism). The consequences you must design for:
 
 - On resume, the paused node's body re-executes **from the top**. Earlier `pause()` calls inside the same body replay their already-delivered values in order; only the first unsatisfied `pause()` suspends again.
 - **Side effects before a `pause()` run again on every resume of that node.** Make them idempotent, or move them into a separate upstream node (whose completed step is never re-run).
-- A `pauseAt.before` static gate re-runs the gated node with *no* replayed values — operator approval of the node is not an answer to any programmatic `pause()` inside it.
+- A `pauseAt.before` static gate re-runs the gated node with *no* replayed values - operator approval of the node is not an answer to any programmatic `pause()` inside it.
 
 ### State must be JSON-safe
 
-Checkpoint state must survive a JSON round-trip and this is enforced identically on every store: a `Map`/`Set`/`Date`/class instance in a channel fails the checkpoint immediately with the typed `state-not-serializable` error naming the channel and path — instead of round-tripping in dev (in-memory `structuredClone`) and silently degrading to `{}`/strings under the SQLite store.
+Checkpoint state must survive a JSON round-trip and this is enforced identically on every store: a `Map`/`Set`/`Date`/class instance in a channel fails the checkpoint immediately with the typed `state-not-serializable` error naming the channel and path - instead of round-tripping in dev (in-memory `structuredClone`) and silently degrading to `{}`/strings under the SQLite store.
 
 ### Durability modes
 
-`durability: 'sync'` persists every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) — under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked. (The former `'async'` mode was removed: it was byte-identical to `'sync'`; a legacy `'async'` input is coerced to `'sync'` with a one-time warning.)
+`durability: 'sync'` persists every step; `'exit'` skips intermediate `running` checkpoints (only suspensions, failures, and completion are durable) - under `'exit'` there is no crash-recovery point between suspensions, and skipped checkpoints are never reported or parent-linked. (The former `'async'` mode was removed: it was byte-identical to `'sync'`; a legacy `'async'` input is coerced to `'sync'` with a one-time warning.)
 
 ## Synchronous-step semantics
 
@@ -164,7 +164,7 @@ These names are part of the public API of `@graphorin/core/channels` and are not
 
 A node calls `pause(value)`; the engine catches the signal, persists state, and yields a `workflow.suspended` event with the supplied value attached. Calling `workflow.resume(threadId, new Directive({ resume }))` re-enters the paused node with the resumed value.
 
-A node body may pause **several times**: each resume satisfies the next `pause()` in order (earlier ones replay their already-delivered values — see the re-execution contract above). Parallel nodes that pause in the same step each keep their own pending pause; resuming answers the first, and the others re-suspend untouched.
+A node body may pause **several times**: each resume satisfies the next `pause()` in order (earlier ones replay their already-delivered values - see the re-execution contract above). Parallel nodes that pause in the same step each keep their own pending pause; resuming answers the first, and the others re-suspend untouched.
 
 ### Durable timers, awakeables, and approvals
 
@@ -188,7 +188,7 @@ const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' }
 // ...elsewhere: workflow.approve(threadId, 'deploy-prod', { ok: true })
 ```
 
-`getState(threadId).pendingPauses` surfaces the full pending set — timers carry `wakeAt`, awakeables/approvals carry `name` — so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
+`getState(threadId).pendingPauses` surfaces the full pending set - timers carry `wakeAt`, awakeables/approvals carry `name` - so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
 
 ### Per-node timeout and retry
 
@@ -197,15 +197,15 @@ createNode({ name: 'fetch', run, timeoutMs: 30_000, retry: { maxAttempts: 3, bac
 // or workflow-wide: createWorkflow({ ..., nodeDefaults: { timeoutMs, retry } })
 ```
 
-`timeoutMs` is a hard per-task wall-clock budget: on expiry the task's `ctx.signal` aborts (a well-behaved body stops; one that ignores the signal keeps running in the background, same contract as cancellation) and the task fails with `node-timeout`. `retry` re-invokes the body on thrown failures only — `pause(...)` suspensions, aborts, and timeouts never retry — with exponential backoff.
+`timeoutMs` is a hard per-task wall-clock budget: on expiry the task's `ctx.signal` aborts (a well-behaved body stops; one that ignores the signal keeps running in the background, same contract as cancellation) and the task fails with `node-timeout`. `retry` re-invokes the body on thrown failures only - `pause(...)` suspensions, aborts, and timeouts never retry - with exponential backoff.
 
 ### Version pinning and divergence detection
 
-`createWorkflow({ ..., version: '2.1.0' })` stamps the definition version into every persisted frontier. A resume whose stored version differs fails loudly with `workflow-version-mismatch` (override per call with `{ allowVersionMismatch: true }` after verifying compatibility). Independently, a resume whose frontier references nodes absent from the current definition fails with `workflow-divergence` — persisted state never silently replays through changed code.
+`createWorkflow({ ..., version: '2.1.0' })` stamps the definition version into every persisted frontier. A resume whose stored version differs fails loudly with `workflow-version-mismatch` (override per call with `{ allowVersionMismatch: true }` after verifying compatibility). Independently, a resume whose frontier references nodes absent from the current definition fails with `workflow-divergence` - persisted state never silently replays through changed code.
 
 ### Step journaling (opt-in)
 
-`createWorkflow({ ..., journalSteps: true })` closes the crash-between-execute-and-persist window: before each step the engine journals a step-intent record against the parent checkpoint, and each completed task journals its channel writes as it finishes. Crash recovery from a `running` checkpoint then replays the journaled writes of completed tasks and re-runs **only** the unfinished ones — completed side effects do not repeat. Costs one extra store write per completed task; the first step of a run has no parent checkpoint to journal against and re-runs whole on a crash.
+`createWorkflow({ ..., journalSteps: true })` closes the crash-between-execute-and-persist window: before each step the engine journals a step-intent record against the parent checkpoint, and each completed task journals its channel writes as it finishes. Crash recovery from a `running` checkpoint then replays the journaled writes of completed tasks and re-runs **only** the unfinished ones - completed side effects do not repeat. Costs one extra store write per completed task; the first step of a run has no parent checkpoint to journal against and re-runs whole on a crash.
 
 ## Static `pauseAt`
 
@@ -220,7 +220,7 @@ createWorkflow({
 
 ## Dynamic parallelism via `Dispatch(node, args)`
 
-A node returns one or more `Dispatch('processOrder', { orderId })` directives; the engine schedules each as a parallel task in the next execution step. Construct them via `dispatch(...)` / `new Dispatch(...)` — a bare `{ nodeName, args }` object is treated as channel writes (workflow-13), so a state shape that happens to use those keys is never silently swallowed as a task. `Directive.goto` remains a destructive operator escape hatch: it discards the restored frontier (pending pauses included) in favour of the single goto task.
+A node returns one or more `Dispatch('processOrder', { orderId })` directives; the engine schedules each as a parallel task in the next execution step. Construct them via `dispatch(...)` / `new Dispatch(...)` - a bare `{ nodeName, args }` object is treated as channel writes (workflow-13), so a state shape that happens to use those keys is never silently swallowed as a task. `Directive.goto` remains a destructive operator escape hatch: it discards the restored frontier (pending pauses included) in favour of the single goto task.
 
 ## Cancellation
 
@@ -255,7 +255,7 @@ workflow.execute(input, { stream: 'updates' });
 
 ## Composition with `@graphorin/agent`
 
-`@graphorin/workflow` does **not** depend on `@graphorin/agent`. The two compose orthogonally — a workflow node may invoke `agent.run(...)` directly from its `run(state, ctx)` body, but no import edge ever crosses between the two packages. Pick the right primitive for the job:
+`@graphorin/workflow` does **not** depend on `@graphorin/agent`. The two compose orthogonally - a workflow node may invoke `agent.run(...)` directly from its `run(state, ctx)` body, but no import edge ever crosses between the two packages. Pick the right primitive for the job:
 
 | Primitive | Lives in | Lifecycle | Durability |
 |---|---|---|---|
@@ -278,7 +278,7 @@ Use `agent.fanOut(...)` when:
 
 `WorkflowError` is the base class with a stable `code` discriminator. The full `WorkflowErrorCode` union covers:
 
-`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired), `node-execution-failed`, `reducer-failed`, `state-validation-failed`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine — runaway loops are bounded by `maxSteps`.)
+`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
 
 Two of these are planning-honesty guarantees: a conditional fan where **no** edge fires and no `__end__` edge is satisfied raises `dead-end` instead of silently completing, and non-JSON-safe channel values raise `state-not-serializable` at the first checkpoint on every store.
 
@@ -288,10 +288,10 @@ Pass the `tracer` from `@graphorin/observability` to record `workflow.run`, `wor
 
 ## Next steps
 
-- [Agent runtime](/guide/agent-runtime) — pair workflows with agent runs.
-- [Persistence](/guide/persistence) — wire a SQLite-backed checkpoint store.
-- [Standalone server](/guide/standalone-server) — expose workflow lifecycle over REST.
-- [Examples](/guide/examples) — durable approval workflow walkthrough in the repository.
+- [Agent runtime](/guide/agent-runtime) - pair workflows with agent runs.
+- [Persistence](/guide/persistence) - wire a SQLite-backed checkpoint store.
+- [Standalone server](/guide/standalone-server) - expose workflow lifecycle over REST.
+- [Examples](/guide/examples) - durable approval workflow walkthrough in the repository.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Rerankers
-description: After memory retrieves candidates, a reranker reorders them by relevance before they enter the context window — a pluggable stage behind the ReRanker contract.
+description: After memory retrieves candidates, a reranker reorders them by relevance before they enter the context window - a pluggable stage behind the ReRanker contract.
 ---
 
 # Rerankers
@@ -13,7 +13,7 @@ to the query before they enter the context window. Rerankers implement the
 
 Out of the box, memory fuses the FTS5 keyword ranking and the vector-search
 ranking with **Reciprocal Rank Fusion** (`k = 60`). RRF needs no model, no
-network, and no extra dependency — it is the always-on default and is usually
+network, and no extra dependency - it is the always-on default and is usually
 enough. Reach for a learned reranker only when you measure a relevance gain on
 your own data.
 
@@ -22,7 +22,7 @@ quarantined-but-included rows are down-weighted by `1 - quarantine` (default
 0.3x) and foreign-provenance rows (`tool` / `imported` / `reflection` /
 `induction`) by `1 - foreignProvenance` (default 0.8x), reusing the eviction
 path's `SalienceWeights`. First-party active facts keep factor `1`, so ordinary
-rankings are unchanged — the discount only stops a poisoned or foreign memory
+rankings are unchanged - the discount only stops a poisoned or foreign memory
 from outranking the user's own words on pure similarity (the MINJA
 memory-poisoning defense). The factor appears as the `trust` signal on hits and
 in `explainRecall`; pass `trustWeighting: 'off'` per call for inspector or
@@ -31,7 +31,7 @@ calibration paths.
 ## Weighted fusion
 
 RRF treats the keyword ranking and the vector ranking as equally trustworthy.
-Once you have labelled data — for example from the `@graphorin/evals` harness — a
+Once you have labelled data - for example from the `@graphorin/evals` harness - a
 **calibrated weighting** often does better. Weight each retriever's contribution
 by its *kind* (FTS vs. vector) per call:
 
@@ -43,7 +43,7 @@ await memory.semantic.search(scope, 'where does anna live now', {
 
 This fuses through the built-in `WeightedRRFReranker`, scaling each candidate
 list's reciprocal-rank contribution by its weight (a HyDE list counts as
-`vector`). **RRF stays the default** — omit `fusion` (or pass `{ strategy: 'rrf' }`)
+`vector`). **RRF stays the default** - omit `fusion` (or pass `{ strategy: 'rrf' }`)
 and behaviour is unchanged; *equal weights reproduce RRF exactly*, so weighting is
 a safe, incremental lever. Weights default to `1`, and a missing or malformed
 weight degrades to neutral rather than poisoning the ranking.
@@ -52,7 +52,7 @@ For offline weight tuning against labelled queries, use
 `fitFusionWeights(cases, { grid, k })` from `@graphorin/memory/search`: give it
 per-kind candidate lists (run your FTS and vector retrievers once per query)
 plus the relevant ids, and it grid-searches the weights that maximize mean
-nDCG@k — returning the plain-RRF baseline alongside, so you only adopt a
+nDCG@k - returning the plain-RRF baseline alongside, so you only adopt a
 weighting that measurably wins. Feed the result to the per-call
 `fusion: { strategy: 'weighted', weights }` option shown above.
 
@@ -60,7 +60,7 @@ weighting that measurably wins. Feed the result to the per-call
 `WeightedRRFReranker` takes a **positional** weights array. The built-in search
 fans candidate lists out conditionally (`fts_0, vector_0, fts_1, …, hyde,
 graph` under `multiQuery`/`hyde`/`expandHops`), so position N no longer means
-"FTS" or "vector" — `search()` makes weights safe only by rebuilding a per-call
+"FTS" or "vector" - `search()` makes weights safe only by rebuilding a per-call
 reranker from the *kind-keyed* `fusion.weights`. A fixed positional array
 installed via `setReranker(...)` / `createMemory({ reranker })` silently
 mis-assigns weights the moment any fan-out option is used; prefer the per-call
@@ -104,7 +104,7 @@ const memory = createMemory({
   passages pressure memory.
 - **`reranker-llm`** scores in batches (default `5`). On an unparseable model
   response it falls back to a neutral score (`fallbackScore`, default `0`)
-  rather than failing the whole query — tune this for your provider. The
+  rather than failing the whole query - tune this for your provider. The
   scoring prompt is English by default; pass a `scoringPrompt` builder for
   other locales.
 
@@ -114,9 +114,9 @@ Reranking only helps if the right candidates were retrieved in the first place.
 When the question and the stored fact use different words, **query
 transformation** widens recall *before* fusion:
 
-- **`multiQuery: N`** — rewrites the query into up to `N − 1` paraphrases
+- **`multiQuery: N`** - rewrites the query into up to `N - 1` paraphrases
   (RAG-Fusion), retrieves each, and fuses every list through the reranker.
-- **`hyde: true`** — embeds a *hypothetical answer* to the query
+- **`hyde: true`** - embeds a *hypothetical answer* to the query
   ([HyDE](https://arxiv.org/abs/2212.10496)) and fuses its nearest neighbours.
 
 ```ts
@@ -130,7 +130,7 @@ Both are **opt-in** and require a provider:
 `createMemory({ queryTransform: { provider } })`. With no transformer configured
 (the default) these options are silent no-ops and search stays offline +
 single-shot. They add provider latency, so reserve them for retrieval-heavy
-recall — and fix recall (contextual retrieval / multi-query) *before* reaching
+recall - and fix recall (contextual retrieval / multi-query) *before* reaching
 for a learned reranker, which only pays off on an already-high-recall candidate
 set.
 

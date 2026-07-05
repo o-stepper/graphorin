@@ -8,7 +8,7 @@ package owns:
 
 - An in-tree 5-field **cron parser** (`* * * * *`, ranges, lists,
   steps; no third-party dependency).
-- A `Scheduler` runtime — a process-bound loop that fires registered
+- A `Scheduler` runtime - a process-bound loop that fires registered
   triggers and persists their state via the `TriggerStore` contract
   from `@graphorin/core/contracts`.
 - Per-trigger **catch-up policies** (`'none'` default, `'last'`,

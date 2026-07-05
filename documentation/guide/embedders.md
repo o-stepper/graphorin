@@ -1,6 +1,6 @@
 ---
 title: Embedders
-description: Embedders turn text into dense vectors for semantic memory search via the EmbedderProvider contract — local Transformers.js / Ollama backends, dimension locking, and migration.
+description: Embedders turn text into dense vectors for semantic memory search via the EmbedderProvider contract - local Transformers.js / Ollama backends, dimension locking, and migration.
 ---
 
 # Embedders
@@ -80,9 +80,9 @@ vector rows by that id, so swapping models or upgrading the underlying model
 triggers the configured migration policy rather than silently mixing
 incompatible vectors:
 
-- **`lock-on-first`** — the first embedder id wins; a mismatch refuses to start.
-- **`multi-active`** — multiple embedder ids coexist (read across, write newest).
-- **`auto-migrate`** — re-embed existing rows into the new id in the background.
+- **`lock-on-first`** - the first embedder id wins; a mismatch refuses to start.
+- **`multi-active`** - multiple embedder ids coexist (read across, write newest).
+- **`auto-migrate`** - re-embed existing rows into the new id in the background.
 
 See the [Memory system](/guide/memory-system) guide for how vector search,
 the RRF fusion step, and [rerankers](/guide/rerankers) fit together.

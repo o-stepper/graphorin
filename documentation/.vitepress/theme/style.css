@@ -1,5 +1,5 @@
 /* =============================================================
-   Graphorin documentation — VitePress theme overrides
+   Graphorin documentation - VitePress theme overrides
 
    Palette is sourced from the landing-page CSS at
    https://graphorin.com/styles.css so the docs feel like one
@@ -8,13 +8,13 @@
    ============================================================= */
 
 :root {
-  /* Brand (terracotta — matches the logo and landing accent) */
+  /* Brand (terracotta - matches the logo and landing accent) */
   --vp-c-brand-1: #ff7a2e;
   --vp-c-brand-2: #e8590c;
   --vp-c-brand-3: #b8460a;
   --vp-c-brand-soft: rgba(232, 89, 12, 0.18);
 
-  /* Notes / tips / warnings — keep terracotta on the warm side */
+  /* Notes / tips / warnings - keep terracotta on the warm side */
   --vp-c-note-1: var(--vp-c-brand-1);
 
   /* Typography */
@@ -39,7 +39,7 @@
   --vp-home-hero-image-filter: blur(72px);
 }
 
-/* ---------- Dark theme — graphite surfaces ---------- */
+/* ---------- Dark theme - graphite surfaces ---------- */
 .dark {
   /* Surface */
   --vp-c-bg: #0b0b0d;
@@ -83,7 +83,7 @@
   --vp-c-selection-bg: rgba(232, 89, 12, 0.45);
 }
 
-/* ---------- Light theme — kept legible but with the same warm accent ---------- */
+/* ---------- Light theme - kept legible but with the same warm accent ---------- */
 :root:not(.dark) {
   --vp-c-bg: #fbfbfc;
   --vp-c-bg-alt: #f4f4f6;
@@ -101,7 +101,7 @@
   scrollbar-color: #2a2a30 var(--vp-c-bg);
 }
 
-/* ---------- Nav — site title: darker terracotta by default, lighter on hover (like graphorin.com) ---------- */
+/* ---------- Nav - site title: darker terracotta by default, lighter on hover (like graphorin.com) ---------- */
 .VPNavBarTitle .title {
   color: var(--vp-c-brand-2);
 }
@@ -144,7 +144,7 @@
   box-shadow: 0 0 12px rgba(232, 89, 12, 0.65);
 }
 
-/* ---------- Mermaid block — match graphite surface ---------- */
+/* ---------- Mermaid block - match graphite surface ---------- */
 .graphorin-mermaid {
   background: var(--vp-c-bg-alt);
   border: 1px solid var(--vp-c-border);
@@ -162,7 +162,7 @@
   overflow: visible;
 }
 
-/* ---------- Footer — small caps, muted ---------- */
+/* ---------- Footer - small caps, muted ---------- */
 .VPFooter {
   border-top: 1px solid var(--vp-c-border);
   background: var(--vp-c-bg-alt);

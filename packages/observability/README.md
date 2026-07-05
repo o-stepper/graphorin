@@ -19,18 +19,18 @@ outbound network calls without an explicit user action.
 - **Mandatory `withValidation(...)` wrapper.** Every exporter passed to
   `createTracer({ exporters })` is wrapped through the configured
   `RedactionValidator`. Registering a raw exporter while
-  `validation: 'off'` triggers `UnvalidatedExporterError` at startup —
+  `validation: 'off'` triggers `UnvalidatedExporterError` at startup -
   there is no silent path.
 - **`RedactionValidator` with 14 built-in patterns.** API key / JWT /
   PEM private key / GitHub PAT / AWS access key / Graphorin token /
   bearer header / basic-auth header / email / credit card / US SSN /
-  E.164 phone / IBAN — all on by default. Three additional patterns
+  E.164 phone / IBAN - all on by default. Three additional patterns
   (IPv4, IPv6, GCP service account) are opt-in.
 - **OpenTelemetry GenAI semantic-conventions conformance.**
   `emitGenAIAttributes(span, {...})`, `emitGenAIMessageEvents(span, [...])`,
   and `deriveGenAISystem(...)` ship the canonical
   `gen_ai.*` attribute family alongside the existing
-  `graphorin.*` attributes — additive, never replacing.
+  `graphorin.*` attributes - additive, never replacing.
 - **OpenInference span-kind layer.** `emitOpenInferenceKind(span)` emits
   the `openinference.span.kind` attribute via the canonical
   per-`SpanType` mapping (`agent.*` → `AGENT`,
@@ -64,7 +64,7 @@ outbound network calls without an explicit user action.
 
 ```bash
 pnpm add @graphorin/observability
-# Optional peer deps for OTLP export — install only when you need them:
+# Optional peer deps for OTLP export - install only when you need them:
 pnpm add @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/exporter-trace-otlp-http
 ```
 
@@ -83,7 +83,7 @@ const tracer = createTracer({
   exporters: [
     // Auto-wrapped via the tracer-managed validator.
     createConsoleExporter({ pretty: true }),
-    // Manually wrapped — useful when each exporter needs its own policy.
+    // Manually wrapped - useful when each exporter needs its own policy.
     withValidation(createJSONLExporter({ path: './traces' }), {
       minTier: 'internal',
     }),

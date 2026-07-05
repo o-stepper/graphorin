@@ -110,7 +110,7 @@ const reranker = createCrossEncoderReranker<MyRecord>({
 
 ## Related decisions
 
-- ADR-024 — Reciprocal Rank Fusion default + pluggable rerankers.
+- ADR-024 - Reciprocal Rank Fusion default + pluggable rerankers.
 
 ---
 

@@ -28,7 +28,7 @@ features:
     linkText: Read the promise
 
   - title: Six memory layers
-    details: Working, session, episodic, semantic, procedural, and shared tiers—each tuned for how fast it changes, how it is searched, and who may read or write it—not a single lump of "context."
+    details: Working, session, episodic, semantic, procedural, and shared tiers - each tuned for how fast it changes, how it is searched, and who may read or write it - not a single lump of "context."
     link: /guide/memory-system
     linkText: Memory system
 
@@ -38,7 +38,7 @@ features:
     linkText: Workflow engine
 
   - title: One API, many models
-    details: Switch between cloud SDKs, local Ollama, OpenAI-compatible servers, llama.cpp, or GGUF without rewriting your agent—the same provider surface everywhere.
+    details: Switch between cloud SDKs, local Ollama, OpenAI-compatible servers, llama.cpp, or GGUF without rewriting your agent - the same provider surface everywhere.
     link: /guide/providers
     linkText: Providers
 
@@ -48,7 +48,7 @@ features:
     linkText: Observability
 
   - title: Tools, Skills, and MCP
-    details: Typed tools, standard Agent Skills packs, and a built-in MCP client for stdio and Streamable HTTP—so your assistant can reach the systems you already rely on.
+    details: Typed tools, standard Agent Skills packs, and a built-in MCP client for stdio and Streamable HTTP - so your assistant can reach the systems you already rely on.
     link: /guide/tools
     linkText: External surface
 

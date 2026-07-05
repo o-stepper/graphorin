@@ -6,7 +6,7 @@ editLink: false
 
 <!--
   This page is auto-synced from /THIRD_PARTY_NOTICES.md on every documentation build.
-  Do not edit it directly — change /THIRD_PARTY_NOTICES.md in the repository root.
+  Do not edit it directly - change /THIRD_PARTY_NOTICES.md in the repository root.
 -->
 
 # Third-party notices
@@ -15,7 +15,7 @@ The Graphorin framework (`@graphorin/*` packages, MIT-licensed,
 © 2026 Oleksiy Stepurenko) integrates several third-party software
 components at runtime, build-time, and as optional peer dependencies.
 Each component is distributed under its own license and is integrated
-through public APIs only — the Graphorin source tree does not bundle,
+through public APIs only - the Graphorin source tree does not bundle,
 fork, or redistribute any third-party source code.
 
 This file documents the components, their pinned versions, their
@@ -54,7 +54,7 @@ documented exception in `DEPENDENCY_EXCEPTIONS` inside
   `@img/sharp-libvips-*` source distribution. This exception is
   audited per-release.
 - The `spawndamnit` package (transitive via the Changesets CLI;
-  build-time only) declares `"license": "SEE LICENSE IN LICENSE"` —
+  build-time only) declares `"license": "SEE LICENSE IN LICENSE"` -
   inspection of the upstream `LICENSE` file shows the standard MIT
   permission text. Pure manifest-format quirk; not a substantive
   license deviation.

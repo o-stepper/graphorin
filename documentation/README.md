@@ -3,7 +3,7 @@
 This workspace builds the public documentation site published at <https://docs.graphorin.com>. The site is built with [VitePress](https://vitepress.dev), with API reference auto-generated from TypeScript by [TypeDoc](https://typedoc.org), Mermaid diagrams via [`vitepress-plugin-mermaid`](https://github.com/emersonbottero/vitepress-plugin-mermaid), and type-aware code samples via [Twoslash](https://shiki.style/packages/twoslash).
 
 - **Project owner:** Oleksiy Stepurenko (<step.oleksiy@gmail.com>)
-- **License:** [MIT](../LICENSE) — © 2026 Oleksiy Stepurenko
+- **License:** [MIT](../LICENSE) - © 2026 Oleksiy Stepurenko
 - **Website:** <https://graphorin.com>
 - **Repository:** <https://github.com/o-stepper/graphorin>
 
@@ -45,7 +45,7 @@ documentation/
 
 ## Deployment
 
-The [`docs`](../.github/workflows/docs.yml) GitHub Actions workflow builds the site on every pull request and deploys to Cloudflare Pages on every push to `main`. The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets — when they are not yet provisioned, the job emits a warning and exits cleanly, matching the existing `release.yml` `NPM_TOKEN` pattern.
+The [`docs`](../.github/workflows/docs.yml) GitHub Actions workflow builds the site on every pull request and deploys to Cloudflare Pages on every push to `main`. The deploy job is gated on the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets - when they are not yet provisioned, the job emits a warning and exits cleanly, matching the existing `release.yml` `NPM_TOKEN` pattern.
 
 ## License
 

@@ -2,8 +2,8 @@
 
 > ESLint rules for projects that build on **Graphorin**.
 
-- **Status:** v0.5.0 — final Phase 16 ruleset.
-- **License:** [MIT](./LICENSE) — © 2026 Oleksiy Stepurenko.
+- **Status:** v0.5.0 - final Phase 16 ruleset.
+- **License:** [MIT](./LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Peer dependency:** `eslint >= 9`.
 
@@ -13,7 +13,7 @@
 pnpm add -D eslint @graphorin/eslint-plugin
 ```
 
-## Usage (ESLint flat config — `eslint.config.js`)
+## Usage (ESLint flat config - `eslint.config.js`)
 
 ```js
 import graphorin from '@graphorin/eslint-plugin';
@@ -37,7 +37,7 @@ export default [
 ```
 
 The bundled config wires every active rule at the severities documented below.
-For ESLint 9+ flat config (`eslint.config.js`), spread `flat/recommended` — it
+For ESLint 9+ flat config (`eslint.config.js`), spread `flat/recommended` - it
 maps the `@graphorin` namespace to the plugin object for you:
 
 ```js

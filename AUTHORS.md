@@ -2,7 +2,7 @@
 
 Graphorin was created and is maintained by:
 
-- **Oleksiy Stepurenko** — creator, owner, maintainer · <step.oleksiy@gmail.com> · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>.
+- **Oleksiy Stepurenko** - creator, owner, maintainer · <step.oleksiy@gmail.com> · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>.
 
 ## Contributors
 

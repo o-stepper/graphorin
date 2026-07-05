@@ -1,13 +1,13 @@
 ---
 title: FAQ
-description: Frequently asked questions about Graphorin — what it is, what it isn't, and how to use it in production.
+description: Frequently asked questions about Graphorin - what it is, what it isn't, and how to use it in production.
 ---
 
 # FAQ
 
 ## What is Graphorin in one sentence?
 
-Graphorin is a TypeScript framework for building **long-living personal AI assistants** — a personal trainer, tutor, financial advisor, or business co-pilot that remembers, endures, and stays yours.
+Graphorin is a TypeScript framework for building **long-living personal AI assistants** - a personal trainer, tutor, financial advisor, or business co-pilot that remembers, endures, and stays yours.
 
 ## Is Graphorin a product?
 
@@ -33,7 +33,7 @@ No. Graphorin makes **zero implicit network calls**. The only outbound traffic i
 
 Through the `Provider` interface, **any** LLM that speaks one of the supported wire formats:
 
-- The Vercel AI SDK (`ai` package) — covers OpenAI, Anthropic, Google, Mistral, Groq, Cohere, etc.
+- The Vercel AI SDK (`ai` package) - covers OpenAI, Anthropic, Google, Mistral, Groq, Cohere, etc.
 - Ollama (HTTP).
 - OpenAI-compatible HTTP servers (LM Studio, LocalAI, vLLM, Together.ai, …).
 - The `llama.cpp` HTTP server.
@@ -59,11 +59,11 @@ ESM is Node.js' native module system, and async-flow primitives behave correctly
 
 ## Can I use Graphorin in a browser?
 
-The `@graphorin/client` package is the browser-friendly client for the standalone server. It depends only on `@graphorin/protocol`. The runtime packages (memory, agent, workflow, server) are Node.js-only — they assume `better-sqlite3` and OS-level facilities.
+The `@graphorin/client` package is the browser-friendly client for the standalone server. It depends only on `@graphorin/protocol`. The runtime packages (memory, agent, workflow, server) are Node.js-only - they assume `better-sqlite3` and OS-level facilities.
 
 ## How does the memory system handle conflicts?
 
-Through a five-stage pipeline — exact dedup, embedding three-zone classification, locale-aware regex heuristics, subject / predicate split, and a deferred LLM judge in the consolidator's deep phase. See [Memory system](/guide/memory-system).
+Through a five-stage pipeline - exact dedup, embedding three-zone classification, locale-aware regex heuristics, subject / predicate split, and a deferred LLM judge in the consolidator's deep phase. See [Memory system](/guide/memory-system).
 
 ## How big can a session get?
 
@@ -71,13 +71,13 @@ Sessions are append-only and stream. The context engine auto-compacts the buffer
 
 ## What's a "trigger"?
 
-A scheduled invocation of an agent — cron, fixed interval, idle, or event. See [Standalone server § Triggers](/guide/standalone-server#triggers).
+A scheduled invocation of an agent - cron, fixed interval, idle, or event. See [Standalone server § Triggers](/guide/standalone-server#triggers).
 
 ## How does HITL work?
 
 Two complementary mechanisms:
 
-1. **Tool approvals.** Tools whose `needsApproval` predicate returns `true` raise a `tool.approval.requested` event. The run state can be persisted, the process can shut down, and another machine can resume it later via `agent.run(savedRunState, { directive: { approvals: [...] } })`. On resume, a **granted approval executes the approved call for real, through the same executor as any other tool call** — do **not** also perform the side effect in your own code, or it happens twice. Operational contract: persist `result.state` after **every** resume (or wire a `checkpointStore`, which persists the journaled post-dispatch state automatically) and resume from that latest state — then a re-delivered resume cannot double-fire. Re-resuming a *stale pre-execution snapshot* re-executes the call (bounded at one re-execution per stale resume), so give payment-class tools an idempotency key. See [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).
+1. **Tool approvals.** Tools whose `needsApproval` predicate returns `true` raise a `tool.approval.requested` event. The run state can be persisted, the process can shut down, and another machine can resume it later via `agent.run(savedRunState, { directive: { approvals: [...] } })`. On resume, a **granted approval executes the approved call for real, through the same executor as any other tool call** - do **not** also perform the side effect in your own code, or it happens twice. Operational contract: persist `result.state` after **every** resume (or wire a `checkpointStore`, which persists the journaled post-dispatch state automatically) and resume from that latest state - then a re-delivered resume cannot double-fire. Re-resuming a *stale pre-execution snapshot* re-executes the call (bounded at one re-execution per stale resume), so give payment-class tools an idempotency key. See [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).
 2. **Workflow `pause` / `resume`.** A workflow node calls `pause(value)`; the engine yields a `workflow.suspended` event and persists the checkpoint. `workflow.resume(threadId, directive)` re-enters the paused node.
 
 See [Agent runtime](/guide/agent-runtime) and [Workflow engine](/guide/workflow-engine).
@@ -92,7 +92,7 @@ Skills can come from a local folder, an npm package, or a Git repository. Untrus
 
 ## What is MCP, exactly?
 
-The Model Context Protocol — a public protocol for tool / prompt / resource servers. Graphorin's client wraps `@modelcontextprotocol/sdk` over stdio and Streamable HTTP. See [MCP client](/guide/mcp-client).
+The Model Context Protocol - a public protocol for tool / prompt / resource servers. Graphorin's client wraps `@modelcontextprotocol/sdk` over stdio and Streamable HTTP. See [MCP client](/guide/mcp-client).
 
 ## How do I deploy Graphorin in production?
 

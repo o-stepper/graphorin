@@ -20,7 +20,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/<name> dev
 
 ## `personal-assistant-cli`
 
-A 30-minute hands-on tour through Graphorin — wire `createAgent({...})` to a six-tier `Memory` backed by SQLite + local embeddings, hook it up to one of three opt-in local-LLM stacks, and stream a real conversation through your terminal.
+A 30-minute hands-on tour through Graphorin - wire `createAgent({...})` to a six-tier `Memory` backed by SQLite + local embeddings, hook it up to one of three opt-in local-LLM stacks, and stream a real conversation through your terminal.
 
 - Recipes: `stub`, `ollama`, `llamacpp-server`, `llamacpp-node`.
 - Demonstrates: agent loop, memory, sensitivity gating, durable HITL, the `GRAPHORIN_OFFLINE=1` contract.
@@ -42,7 +42,7 @@ A three-agent crew driving the `evaluatorOptimizer({...})` loop with a typed Zod
 
 ## `approval-workflow`
 
-A durable HITL workflow built on `@graphorin/workflow`. The flow validates an order, pauses for human approval (`pause(...)`), and ships once the approver resumes the thread — even on a different process.
+A durable HITL workflow built on `@graphorin/workflow`. The flow validates an order, pauses for human approval (`pause(...)`), and ships once the approver resumes the thread - even on a different process.
 
 - Demonstrates: durable workflow, `pause(value)` / `resume(directive)`, checkpoint store.
 - Source: [`examples/approval-workflow/`](https://github.com/o-stepper/graphorin/tree/main/examples/approval-workflow).
@@ -63,14 +63,14 @@ Drives `@graphorin/memory`'s background consolidator across a long-running sessi
 
 ## `slack-bot-integration`
 
-An adapter sketch showing how to mount Graphorin as the brain behind a Slack bot — without making channel adapters part of the framework. The Slack bot is the consumer; Graphorin emits typed events the bot turns into messages.
+An adapter sketch showing how to mount Graphorin as the brain behind a Slack bot - without making channel adapters part of the framework. The Slack bot is the consumer; Graphorin emits typed events the bot turns into messages.
 
 - Demonstrates: library-mode embedding, event-driven UI, sensitivity-aware payload filtering.
 - Source: [`examples/slack-bot-integration/`](https://github.com/o-stepper/graphorin/tree/main/examples/slack-bot-integration).
 
 ## `local-stack-cli`
 
-A single-binary CLI that wires the standalone server, the triggers daemon, the encrypted-file secrets store, and a couple of skills into a turnkey local stack — useful as a starting point for production-shaped local deployments.
+A single-binary CLI that wires the standalone server, the triggers daemon, the encrypted-file secrets store, and a couple of skills into a turnkey local stack - useful as a starting point for production-shaped local deployments.
 
 - Demonstrates: standalone server, `graphorin doctor`, `graphorin secrets`, triggers, skills.
 - Source: [`examples/local-stack-cli/`](https://github.com/o-stepper/graphorin/tree/main/examples/local-stack-cli).
@@ -88,18 +88,18 @@ The shared helper `examples/example-trace-helper/` wires the console exporter co
 
 ## Production deployment templates
 
-Four deployment templates live alongside the examples — they're not standalone apps, but reference manifests for shipping the standalone server:
+Four deployment templates live alongside the examples - they're not standalone apps, but reference manifests for shipping the standalone server:
 
-- [`examples/systemd/`](https://github.com/o-stepper/graphorin/tree/main/examples/systemd) — hardened systemd unit.
-- [`examples/docker/`](https://github.com/o-stepper/graphorin/tree/main/examples/docker) — multi-stage Dockerfile + Compose.
-- [`examples/k8s/`](https://github.com/o-stepper/graphorin/tree/main/examples/k8s) — Kubernetes manifest set.
-- [`examples/github-actions/`](https://github.com/o-stepper/graphorin/tree/main/examples/github-actions) — CI workflow that exercises Graphorin end-to-end.
+- [`examples/systemd/`](https://github.com/o-stepper/graphorin/tree/main/examples/systemd) - hardened systemd unit.
+- [`examples/docker/`](https://github.com/o-stepper/graphorin/tree/main/examples/docker) - multi-stage Dockerfile + Compose.
+- [`examples/k8s/`](https://github.com/o-stepper/graphorin/tree/main/examples/k8s) - Kubernetes manifest set.
+- [`examples/github-actions/`](https://github.com/o-stepper/graphorin/tree/main/examples/github-actions) - CI workflow that exercises Graphorin end-to-end.
 
 ## Next steps
 
-- [Quickstart](/guide/quickstart) — the 20-line minimum end-to-end script.
-- [Standalone server](/guide/standalone-server) — promote your assistant to a daemon.
-- [Deployment](/guide/deployment) — production checklists.
+- [Quickstart](/guide/quickstart) - the 20-line minimum end-to-end script.
+- [Standalone server](/guide/standalone-server) - promote your assistant to a daemon.
+- [Deployment](/guide/deployment) - production checklists.
 
 ---
 

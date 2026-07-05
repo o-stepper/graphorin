@@ -6,12 +6,12 @@ editLink: false
 
 <!--
   This page is auto-synced from /CONTRIBUTING.md on every documentation build.
-  Do not edit it directly — change /CONTRIBUTING.md in the repository root.
+  Do not edit it directly - change /CONTRIBUTING.md in the repository root.
 -->
 
 # Contributing
 
-Thanks for your interest in contributing to **Graphorin** — a TypeScript framework for building long-living personal AI assistants. This document explains how to set up the repository, the development workflow, and the project conventions.
+Thanks for your interest in contributing to **Graphorin** - a TypeScript framework for building long-living personal AI assistants. This document explains how to set up the repository, the development workflow, and the project conventions.
 
 By participating, you agree to abide by the [Code of Conduct](/contributing/code-of-conduct).
 
@@ -20,7 +20,7 @@ By participating, you agree to abide by the [Code of Conduct](/contributing/code
 ## Prerequisites
 
 - **Node.js** 22.x LTS or newer (see [`.nvmrc`](https://github.com/o-stepper/graphorin/blob/main/.nvmrc)).
-- **pnpm** (the project's package manager). The exact version is pinned in the root `package.json` `packageManager` field — `corepack` will activate it automatically:
+- **pnpm** (the project's package manager). The exact version is pinned in the root `package.json` `packageManager` field - `corepack` will activate it automatically:
 
 ```bash
 corepack enable
@@ -85,13 +85,13 @@ Pick the affected packages, the bump type (`patch` / `minor` / `major`), and wri
 
 Graphorin follows the [Conventional Commits](https://www.conventionalcommits.org) specification:
 
-- `feat(scope): ...` — new feature
-- `fix(scope): ...` — bug fix
-- `docs(scope): ...` — documentation only
-- `chore(scope): ...` — tooling, dependencies, internal housekeeping
-- `refactor(scope): ...` — non-behavioural refactor
-- `test(scope): ...` — tests only
-- `perf(scope): ...` — performance improvement
+- `feat(scope): ...` - new feature
+- `fix(scope): ...` - bug fix
+- `docs(scope): ...` - documentation only
+- `chore(scope): ...` - tooling, dependencies, internal housekeeping
+- `refactor(scope): ...` - non-behavioural refactor
+- `test(scope): ...` - tests only
+- `perf(scope): ...` - performance improvement
 - A trailing `!` (e.g. `feat(core)!: ...`) plus a `BREAKING CHANGE:` footer marks a breaking change.
 
 The **scope** is the package name without the `@graphorin/` prefix, e.g. `core`, `agent`, `memory`, `server`, `cli`.
