@@ -531,7 +531,7 @@ function registerStorageCommands(program: Command): void {
     )
     .option(
       '--swap',
-      'Atomically swap the encrypted output into the storage path; original kept under .bak.<ts>.',
+      'Atomically swap the encrypted output into the storage path (REQUIRES a stopped server - refused when another process holds the DB); original kept under .bak.<ts>.',
     )
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(

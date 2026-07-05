@@ -51,6 +51,14 @@ export interface EncryptDatabaseOptions {
    * integrity check passes. The original `sourcePath` is renamed to
    * `${sourcePath}.bak.${timestamp}` so an operator can recover.
    * Default `false` - the CLI does the swap explicitly.
+   *
+   * REQUIRES A STOPPED SERVER (W-012): a live writer keeps its file
+   * descriptor on the renamed `.bak` inode and every post-snapshot
+   * commit silently diverges from the new encrypted file (and is later
+   * deleted by `storage cleanup-backups`). A best-effort live-writer
+   * probe refuses the swap with {@link EncryptSwapLiveWriterError}
+   * when another connection holds the database; the probe-to-rename
+   * window remains a documented residual race.
    */
   readonly swap?: boolean;
   /**
@@ -81,6 +89,28 @@ export interface EncryptDatabaseResult {
  *
  * @stable
  */
+/**
+ * Thrown when `encryptDatabase({ swap: true })` detects another live
+ * connection on the source database (W-012). The swap path renames the
+ * source file; a live writer would keep writing into the renamed
+ * `.bak.<ts>` inode and silently diverge from the encrypted copy.
+ *
+ * @stable
+ */
+export class EncryptSwapLiveWriterError extends Error {
+  readonly sourcePath: string;
+  constructor(sourcePath: string, cause: unknown) {
+    super(
+      `[graphorin/store-sqlite-encrypted] ${sourcePath} appears to be open by another process; ` +
+        'stop the server before running storage encrypt with --swap (writes committed after the ' +
+        'snapshot would land in the renamed .bak file and be lost).',
+      { cause },
+    );
+    this.name = 'EncryptSwapLiveWriterError';
+    this.sourcePath = sourcePath;
+  }
+}
+
 export async function encryptDatabase(
   options: EncryptDatabaseOptions,
 ): Promise<EncryptDatabaseResult> {
@@ -108,6 +138,37 @@ export async function encryptDatabase(
   }
 
   const Ctor = await loadCipherPeer();
+
+  // W-012: --swap renames the source out from under any live writer,
+  // so probe for one FIRST. Empirically (real sqlite3mc peer): a
+  // journal-mode switch is refused with "database is locked" while any
+  // other connection is open, making it a cheap liveness probe. The
+  // mode is restored in `finally` so a crash mid-probe cannot leave the
+  // file in DELETE mode. Best-effort: the probe-to-rename window stays.
+  if (options.swap === true) {
+    const probe = new Ctor(sourcePath);
+    let switched = false;
+    try {
+      try {
+        probe.pragma('journal_mode = DELETE');
+        switched = true;
+      } catch (err) {
+        if (isBusyError(err)) throw new EncryptSwapLiveWriterError(sourcePath, err);
+        throw err;
+      }
+    } finally {
+      if (switched) {
+        try {
+          probe.pragma('journal_mode = WAL');
+        } catch {
+          // The WAL restore is best-effort; the conversion below sets
+          // journal modes explicitly anyway.
+        }
+      }
+      if (probe.open) probe.close();
+    }
+  }
+
   try {
     // 1+2. Online page-level copy via the driver's backup API
     //    (store-05). The old checkpoint-close-then-copyFileSync left a
@@ -205,4 +266,12 @@ export async function encryptDatabase(
 
 function absolute(p: string): string {
   return isAbsolute(p) ? p : resolve(p);
+}
+
+function isBusyError(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const code = (err as { code?: unknown }).code;
+  if (typeof code === 'string' && code.includes('SQLITE_BUSY')) return true;
+  const message = (err as { message?: unknown }).message;
+  return typeof message === 'string' && /database is locked|busy/i.test(message);
 }

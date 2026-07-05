@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { _resetCipherPeerCacheForTesting, _setCipherPeerForTesting } from '../src/cipher-peer.js';
-import { encryptDatabase } from '../src/encrypt.js';
+import { EncryptSwapLiveWriterError, encryptDatabase } from '../src/encrypt.js';
 import { buildStubDriver, clearStubHistory, getStubHistory } from './_stub-driver.js';
 
 afterEach(() => {
@@ -64,6 +64,54 @@ describe('encryptDatabase', () => {
     expect(result.swap?.originalRenamedTo).toMatch(/data\.db\.bak\.\d+$/);
     expect(readFileSync(src, 'utf8')).toMatch(/^STUB_ENCRYPTED:/);
     expect(readFileSync(result.swap?.originalRenamedTo ?? '', 'utf8')).toBe('unencrypted-bytes');
+  });
+
+  it('W-012: swap refuses when the source is held by another connection - before any rename', async () => {
+    const { Ctor } = buildStubDriver();
+    const { src, tgt } = setupTempDb();
+    // Emulate the real sqlite3mc behavior: a journal-mode switch on a
+    // database another connection holds fails with "database is locked".
+    class BusySourceCtor extends (Ctor as new (
+      path: string,
+      o?: unknown,
+    ) => InstanceType<typeof Ctor>) {
+      override pragma(stmt: string, o?: { simple?: boolean }): unknown {
+        if (/journal_mode\s*=\s*DELETE/.test(stmt) && this.path === src) {
+          const err = new Error('database is locked') as Error & { code: string };
+          err.code = 'SQLITE_BUSY';
+          throw err;
+        }
+        return super.pragma(stmt, o);
+      }
+    }
+    _setCipherPeerForTesting(BusySourceCtor as never);
+    await expect(
+      encryptDatabase({ sourcePath: src, targetPath: tgt, passphrase: 'topsecret', swap: true }),
+    ).rejects.toThrow(EncryptSwapLiveWriterError);
+    // The source was NOT renamed and still carries the plaintext bytes.
+    expect(readFileSync(src, 'utf8')).toBe('unencrypted-bytes');
+  });
+
+  it('W-012: the probe restores WAL mode and runs ONLY on the swap path', async () => {
+    const { Ctor } = buildStubDriver();
+    _setCipherPeerForTesting(Ctor as never);
+    const { src, tgt } = setupTempDb();
+    await encryptDatabase({ sourcePath: src, targetPath: tgt, passphrase: 'topsecret' });
+    // swap: false - no probe pragmas on the source.
+    const noSwapHistory = getStubHistory(src);
+    expect(noSwapHistory?.pragmas.some((p) => /journal_mode/.test(p))).toBe(false);
+  });
+
+  it('W-012: on the swap path the probe switches DELETE then restores WAL', async () => {
+    const { Ctor } = buildStubDriver();
+    _setCipherPeerForTesting(Ctor as never);
+    const { src, tgt } = setupTempDb();
+    await encryptDatabase({ sourcePath: src, targetPath: tgt, passphrase: 'x', swap: true });
+    // src was renamed by the swap; its history bucket keeps the probe trace.
+    const history = getStubHistory(src);
+    const journalPragmas = (history?.pragmas ?? []).filter((p) => /journal_mode/.test(p));
+    expect(journalPragmas[0]).toMatch(/DELETE/);
+    expect(journalPragmas[1]).toMatch(/WAL/);
   });
 
   it('respects a non-default cipher selection', async () => {
