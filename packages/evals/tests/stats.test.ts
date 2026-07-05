@@ -120,7 +120,7 @@ describe('stats (E8): paired McNemar significance', () => {
     const current = new Map<string, boolean>();
     for (let i = 0; i < 30; i++) {
       baseline.set(`case-${i}`, true);
-      current.set(`case-${i}`, i < 12 ? false : true); // 12 regressions, 0 improvements
+      current.set(`case-${i}`, i >= 12); // 12 regressions, 0 improvements
     }
     const out = pairedPassSignificance(current, baseline);
     expect(out.regressed).toBe(12);

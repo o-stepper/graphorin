@@ -240,7 +240,7 @@ describe('runbook search (D3)', () => {
     const hits = await memory.procedural.search(SCOPE, 'deploy docs site');
     expect(hits.length).toBe(1);
     expect(hits[0]?.record.steps).toEqual(['build the site', 'push to pages']);
-    expect(hits[0]?.signals?.['lexical']).toBeGreaterThan(0);
+    expect(hits[0]?.signals?.lexical).toBeGreaterThan(0);
 
     const none = await memory.procedural.search(SCOPE, 'unrelated query zebra');
     expect(none.length).toBe(0);
