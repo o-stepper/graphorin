@@ -15,6 +15,7 @@
  * @packageDocumentation
  */
 
+import { toWireAgentEvent } from '@graphorin/core';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -219,7 +220,11 @@ function backgroundStreamAgent(
             typeof (ev as { type?: unknown }).type === 'string'
               ? (ev as { type: string }).type
               : 'agent.event';
-          emit(type, ev);
+          // W-046: binary-bearing variants (file.generated,
+          // tool.execute.partial, agent.end with its full RunState) must
+          // be projected to their JSON-safe wire twins before the
+          // dispatcher stringifies the frame. Unknown types pass through.
+          emit(type, toWireAgentEvent(ev as Parameters<typeof toWireAgentEvent>[0]));
         }
       } else {
         const output = await agent.run(input, callOpts);

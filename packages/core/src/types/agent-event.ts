@@ -9,10 +9,15 @@ import type { Usage } from './usage.js';
  * union is exhaustive: `assertNever(...)` catches missed variants at
  * compile time.
  *
- * The shape is wire-stable: the protocol package (`@graphorin/protocol`,
- * created in a later phase) re-exports this union as its server-to-client
- * payload schema. Adding a variant here therefore counts as a wire-format
- * change; track it through changesets.
+ * Wire contract (two layers): the server delivers events inside an
+ * envelope `{ eventId, subject, type, payload }` where `payload` is the
+ * JSON-safe `WireAgentEvent` projection (`toWireAgentEvent`), NOT this
+ * raw union - three variants (`file.generated`, `tool.execute.partial`,
+ * `agent.end`) carry `Uint8Array`/`URL` payloads that plain
+ * `JSON.stringify` would corrupt. `@graphorin/protocol` validates the
+ * envelope and leaves `payload` opaque (`z.unknown()`); clients decode
+ * with `fromWireAgentEvent`. Adding a variant here counts as a
+ * wire-format change; track it through changesets.
  *
  * @stable
  */

@@ -5,6 +5,7 @@
  * grammatical) `workflow:<id>/runs/<runId>/events` subject.
  */
 
+import { fromWireAgentEvent } from '@graphorin/core';
 import type { ServerMessage } from '@graphorin/protocol';
 import { parseScope } from '@graphorin/security/auth';
 import { Hono } from 'hono';
@@ -67,6 +68,57 @@ function buildApp(): {
       },
     },
   });
+  agents.register({
+    id: 'binary',
+    agent: {
+      id: 'binary',
+      async run() {
+        return 'ran';
+      },
+      // W-046 fixture: binary-bearing events that plain JSON.stringify
+      // would corrupt - the route must project them to wire form.
+      async *stream() {
+        await new Promise((r) => setTimeout(r, 25));
+        yield {
+          type: 'file.generated',
+          mimeType: 'image/png',
+          data: new Uint8Array([137, 80, 78, 71]),
+        };
+        yield {
+          type: 'agent.end',
+          result: {
+            status: 'completed',
+            output: 'done',
+            usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+            state: {
+              id: 'run-b',
+              agentId: 'binary',
+              currentAgentId: 'binary',
+              sessionId: 's-1',
+              status: 'completed',
+              steps: [],
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    {
+                      type: 'image',
+                      image: new Uint8Array([137, 80, 78, 71]),
+                      mimeType: 'image/png',
+                    },
+                  ],
+                },
+              ],
+              pendingApprovals: [],
+              handoffs: [],
+              usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+              startedAt: 'now',
+            },
+          },
+        };
+      },
+    },
+  });
   workflows.register({
     id: 'flowy',
     workflow: {
@@ -111,6 +163,8 @@ function buildApp(): {
         grantedScopes: [
           parseScope('agents:invoke:streamy'),
           parseScope('agents:read:streamy'),
+          parseScope('agents:invoke:binary'),
+          parseScope('agents:read:binary'),
           parseScope('workflows:execute:flowy'),
           parseScope('workflows:resume:flowy'),
           parseScope('workflows:read:flowy'),
@@ -159,6 +213,49 @@ describe('IP-2 - the streaming endpoints actually stream', () => {
     expect(JSON.stringify(sub.sent)).toContain('agent.end');
     expect(runs.snapshot(body.runId)?.status).toBe('completed');
     void types;
+  });
+
+  it('W-046: file.generated and a multimodal agent.end survive the WS path decodable', async () => {
+    const { app, dispatcher } = buildApp();
+    const res = await app.request('/agents/binary/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: 'hi' }),
+    });
+    expect(res.status).toBe(202);
+    const body = (await res.json()) as { subscribe: { websocket: string } };
+    const sub = makeSubscriber(['agents:read:binary']);
+    dispatcher.registerSubscriber(sub.handle);
+    dispatcher.subscribe({
+      subscriberId: sub.handle.id,
+      subject: body.subscribe.websocket,
+      subscriptionId: 'sub-bin',
+    });
+    await new Promise((r) => setTimeout(r, 120));
+    // Simulate the real transport: every frame is JSON-stringified once.
+    const frames = sub.sent
+      .map(
+        (f) => JSON.parse(JSON.stringify(f)) as { kind?: string; type?: string; payload?: unknown },
+      )
+      .filter((f) => f.kind === 'event');
+    const fileFrame = frames.find((f) => f.type === 'file.generated');
+    const endFrame = frames.find((f) => f.type === 'agent.end');
+    expect(fileFrame).toBeDefined();
+    expect(endFrame).toBeDefined();
+    // The corruption signature of a raw stringified Uint8Array must not appear.
+    expect(JSON.stringify(fileFrame)).not.toContain('"0":137');
+    expect(JSON.stringify(endFrame)).not.toContain('"0":137');
+    const decodedFile = fromWireAgentEvent(fileFrame?.payload as never) as unknown as {
+      data: Uint8Array;
+    };
+    expect(decodedFile.data).toBeInstanceOf(Uint8Array);
+    expect(decodedFile.data).toEqual(new Uint8Array([137, 80, 78, 71]));
+    const decodedEnd = fromWireAgentEvent(endFrame?.payload as never) as unknown as {
+      result: { state: { messages: readonly { content: readonly { image: Uint8Array }[] }[] } };
+    };
+    const image = decodedEnd.result.state.messages[0]?.content[0];
+    expect(image?.image).toBeInstanceOf(Uint8Array);
+    expect(image?.image).toEqual(new Uint8Array([137, 80, 78, 71]));
   });
 
   it('workflow events are delivered on the (now grammatical) workflow run subject', async () => {
