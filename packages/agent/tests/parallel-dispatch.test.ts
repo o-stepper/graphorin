@@ -142,11 +142,37 @@ describe('parallel tool dispatch (WI-04)', () => {
         textOnlyScript('done', 4),
       ],
     });
+    // Causal completion inversion, no wall clock: `slow` parks on a
+    // deferred that `fast` resolves as it completes, so `fast` ALWAYS
+    // finishes first - a loaded runner once fired a 0 ms timer after a
+    // 40 ms one and flipped the timer-based precondition this replaces.
+    // (If parallel dispatch ever broke, `slow` would deadlock and the
+    // test would fail loudly on its timeout.)
+    let releaseSlow!: () => void;
+    const fastDone = new Promise<void>((resolve) => {
+      releaseSlow = resolve;
+    });
+    const slowTool = makeTool('slow', async () => {
+      tracker.active += 1;
+      tracker.maxConcurrent = Math.max(tracker.maxConcurrent, tracker.active);
+      await fastDone;
+      tracker.completionOrder.push('slow');
+      tracker.active -= 1;
+      return 'SLOW';
+    });
+    const fastTool = makeTool('fast', async () => {
+      tracker.active += 1;
+      tracker.maxConcurrent = Math.max(tracker.maxConcurrent, tracker.active);
+      tracker.completionOrder.push('fast');
+      tracker.active -= 1;
+      releaseSlow();
+      return 'FAST';
+    });
     const agent = createAgent({
       name: 'ordering',
       instructions: 'noop',
       provider,
-      tools: [trackedTool('slow', tracker, 40, 'SLOW'), trackedTool('fast', tracker, 0, 'FAST')],
+      tools: [slowTool, fastTool],
     });
 
     const endOrder: string[] = [];
