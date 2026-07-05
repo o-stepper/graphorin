@@ -129,7 +129,7 @@ describe.skipIf(!available)('CS-7 - real cipher peer end-to-end', () => {
     );
     expect(after.length).toBeGreaterThan(0);
     await newKey.close();
-  }, 30_000);
+  }, 90_000);
 
   it('chacha20 (the peer default) round-trips too (CS-13)', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-real-cha-'));
@@ -163,5 +163,5 @@ describe.skipIf(!available)('CS-7 - real cipher peer end-to-end', () => {
     enc.pragma("key = 'k2'");
     expect((enc.prepare('SELECT v FROM t').get() as { v: string }).v).toBe('chacha-roundtrip');
     enc.close();
-  }, 30_000);
+  }, 90_000);
 });

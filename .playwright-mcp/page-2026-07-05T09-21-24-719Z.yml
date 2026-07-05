@@ -1,0 +1,615 @@
+- generic [active] [ref=e1]:
+  - banner:
+    - generic [ref=e2]:
+      - link "Skip to main content":
+        - /url: "#main"
+      - generic [ref=e4]:
+        - link "OpenAI Home" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e8]
+        - generic [ref=e10]:
+          - navigation "Main Navigation" [ref=e12]:
+            - list [ref=e13]:
+              - listitem [ref=e14]:
+                - link "Research" [ref=e15] [cursor=pointer]:
+                  - /url: /research/index/
+                  - generic [ref=e17]: Research
+                - button "Research menu"
+              - listitem [ref=e18]:
+                - button "Products" [ref=e19] [cursor=pointer]:
+                  - generic [ref=e21]: Products
+                - button "Products menu"
+              - listitem [ref=e22]:
+                - link "Business" [ref=e23] [cursor=pointer]:
+                  - /url: /business/
+                  - generic [ref=e25]: Business
+                - button "Business menu"
+              - listitem [ref=e26]:
+                - link "Developers" [ref=e27] [cursor=pointer]:
+                  - /url: /api/
+                  - generic [ref=e29]: Developers
+                - button "Developers menu"
+              - listitem [ref=e30]:
+                - link "Company" [ref=e31] [cursor=pointer]:
+                  - /url: /about/
+                  - generic [ref=e33]: Company
+                - button "Company menu"
+              - listitem [ref=e34]:
+                - link "Foundation (opens in a new window)" [ref=e35] [cursor=pointer]:
+                  - /url: https://openaifoundation.org/
+                  - generic [ref=e37]: Foundation
+                  - generic [ref=e38]: (opens in a new window)
+          - generic [ref=e40]:
+            - button "Open Search" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+            - button "Close Search" [ref=e45] [cursor=pointer]:
+              - img [ref=e46]
+          - generic [ref=e49]:
+            - button "Log in" [ref=e50] [cursor=pointer]:
+              - text: Log in
+              - img [ref=e51]
+            - link "Try ChatGPT (opens in a new window)" [ref=e53] [cursor=pointer]:
+              - /url: https://chatgpt.com/?openaicom-did=6f94b036-9169-4f0f-8d2c-7e54f0586e01&openaicom_referred=true
+              - text: Try ChatGPT
+              - img [ref=e54]
+              - generic [ref=e56]: (opens in a new window)
+  - generic [ref=e57]:
+    - main [ref=e58]:
+      - generic [ref=e59]: The next evolution of the Agents SDK | OpenAI
+      - article [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e65]:
+            - generic [ref=e66]:
+              - paragraph [ref=e67]: April 15, 2026
+              - link "Product" [ref=e68] [cursor=pointer]:
+                - /url: /news/product-releases/
+            - heading "The next evolution of the Agents SDK" [level=1] [ref=e69]
+            - paragraph [ref=e71]: The updated Agents SDK helps developers build agents that can inspect files, run commands, edit code, and work on long-horizon tasks within controlled sandbox environments.
+          - generic [ref=e75]:
+            - generic [ref=e78]:
+              - button "Play audio of page text" [disabled] [ref=e79]:
+                - img [ref=e80]
+              - generic [ref=e82]: Loading…
+            - button "Share" [ref=e87] [cursor=pointer]:
+              - img [ref=e88]
+              - text: Share
+        - generic [ref=e91]:
+          - navigation "Table of contents" [ref=e92]:
+            - paragraph [ref=e93]: Table of contents
+            - list [ref=e94]:
+              - listitem [ref=e95]:
+                - link "A more capable harness for the agent loop" [ref=e97] [cursor=pointer]:
+                  - /url: "#a-more-capable-harness-for-the-agent-loop"
+              - listitem [ref=e98]:
+                - link "Native sandbox execution" [ref=e100] [cursor=pointer]:
+                  - /url: "#native-sandbox-execution"
+              - listitem [ref=e101]:
+                - link "Separating harness from compute for security, durability, and scale" [ref=e103] [cursor=pointer]:
+                  - /url: "#separating-harness-from-compute-for-security-durability-and-scale"
+              - listitem [ref=e104]:
+                - link "Pricing and availability" [ref=e106] [cursor=pointer]:
+                  - /url: "#pricing-and-availability"
+              - listitem [ref=e107]:
+                - link "What’s next" [ref=e109] [cursor=pointer]:
+                  - /url: "#whats-next"
+          - generic [ref=e110]:
+            - paragraph [ref=e112]:
+              - text: We’re introducing new capabilities to the
+              - link "Agents SDK⁠ (opens in a new window)" [ref=e113] [cursor=pointer]:
+                - /url: https://developers.openai.com/api/docs/guides/agents
+                - text: Agents SDK⁠
+                - generic [ref=e114]: (opens in a new window)
+              - text: "that give developers standardized infrastructure that is easy to get started with and is built correctly for OpenAI models: a model-native harness that lets agents work across files and tools on a computer, plus native sandbox execution for running that work safely."
+            - paragraph [ref=e116]: "For example, developers can give an agent a controlled workspace, explicit instructions, and the tools it needs to inspect evidence:"
+            - generic [ref=e120]:
+              - generic [ref=e121]:
+                - heading "Python" [level=4] [ref=e122]
+                - button "Copy code block" [ref=e123] [cursor=pointer]:
+                  - img [ref=e124]
+              - code [ref=e127]:
+                - generic [ref=e128]:
+                  - generic [ref=e129]:
+                    - generic [ref=e130]: "1"
+                    - generic [ref=e131]: "# pip install \"openai-agents>=0.14.0\""
+                  - generic [ref=e133]: "2"
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: "3"
+                    - generic [ref=e137]: import asyncio
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: "4"
+                    - generic [ref=e140]: import tempfile
+                  - generic [ref=e141]:
+                    - generic [ref=e142]: "5"
+                    - generic [ref=e143]: from pathlib import Path
+                  - generic [ref=e145]: "6"
+                  - generic [ref=e147]:
+                    - generic [ref=e148]: "7"
+                    - generic [ref=e149]: from agents import Runner
+                  - generic [ref=e150]:
+                    - generic [ref=e151]: "8"
+                    - generic [ref=e152]: from agents.run import RunConfig
+                  - generic [ref=e153]:
+                    - generic [ref=e154]: "9"
+                    - generic [ref=e155]: from agents.sandbox import Manifest, SandboxAgent, SandboxRunConfig
+                  - generic [ref=e156]:
+                    - generic [ref=e157]: "10"
+                    - generic [ref=e158]: from agents.sandbox.entries import LocalDir
+                  - generic [ref=e159]:
+                    - generic [ref=e160]: "11"
+                    - generic [ref=e161]: from agents.sandbox.sandboxes import UnixLocalSandboxClient
+                  - generic [ref=e163]: "12"
+                  - generic [ref=e166]: "13"
+                  - generic [ref=e168]:
+                    - generic [ref=e169]: "14"
+                    - generic [ref=e170]: "async def main() -> None:"
+                  - generic [ref=e171]:
+                    - generic [ref=e172]: "15"
+                    - generic [ref=e173]: "with tempfile.TemporaryDirectory() as tmp:"
+                  - generic [ref=e174]:
+                    - generic [ref=e175]: "16"
+                    - generic [ref=e176]: dataroom = Path(tmp) / "dataroom"
+                  - generic [ref=e177]:
+                    - generic [ref=e178]: "17"
+                    - generic [ref=e179]: dataroom.mkdir()
+                  - generic [ref=e180]:
+                    - generic [ref=e181]: "18"
+                    - generic [ref=e182]: (dataroom / "metrics.md").write_text(
+                  - generic [ref=e183]:
+                    - generic [ref=e184]: "19"
+                    - generic [ref=e185]: "\"\"\"# Annual metrics"
+                  - generic [ref=e187]: "20"
+                  - generic [ref=e189]:
+                    - generic [ref=e190]: "21"
+                    - generic [ref=e191]: "| Year | Revenue | Operating income | Operating cash flow |"
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: "22"
+                    - generic [ref=e194]: "| --- | ---: | ---: | ---: |"
+                  - generic [ref=e195]:
+                    - generic [ref=e196]: "23"
+                    - generic [ref=e197]: "| FY2025 | $124.3M | $18.6M | $24.1M |"
+                  - generic [ref=e198]:
+                    - generic [ref=e199]: "24"
+                    - generic [ref=e200]: "| FY2024 | $98.7M | $12.4M | $17.9M |"
+                  - generic [ref=e201]:
+                    - generic [ref=e202]: "25"
+                    - generic [ref=e203]: "\"\"\","
+                  - generic [ref=e204]:
+                    - generic [ref=e205]: "26"
+                    - generic [ref=e206]: encoding="utf-8",
+                  - generic [ref=e207]:
+                    - generic [ref=e208]: "27"
+                    - generic [ref=e209]: )
+                  - generic [ref=e211]: "28"
+                  - generic [ref=e213]:
+                    - generic [ref=e214]: "29"
+                    - generic [ref=e215]: agent = SandboxAgent(
+                  - generic [ref=e216]:
+                    - generic [ref=e217]: "30"
+                    - generic [ref=e218]: name="Dataroom Analyst",
+                  - generic [ref=e219]:
+                    - generic [ref=e220]: "31"
+                    - generic [ref=e221]: model="gpt-5.4",
+                  - generic [ref=e222]:
+                    - generic [ref=e223]: "32"
+                    - generic [ref=e224]: instructions="Answer using only files in data/. Cite source filenames.",
+                  - generic [ref=e225]:
+                    - generic [ref=e226]: "33"
+                    - generic [ref=e227]: "default_manifest=Manifest(entries={\"data\": LocalDir(src=dataroom)}),"
+                  - generic [ref=e228]:
+                    - generic [ref=e229]: "34"
+                    - generic [ref=e230]: )
+                  - generic [ref=e232]: "35"
+                  - generic [ref=e234]:
+                    - generic [ref=e235]: "36"
+                    - generic [ref=e236]: result = await Runner.run(
+                  - generic [ref=e237]:
+                    - generic [ref=e238]: "37"
+                    - generic [ref=e239]: agent,
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: "38"
+                    - generic [ref=e242]: "\"Compare FY2025 revenue, operating income, and operating cash flow with FY2024.\","
+                  - generic [ref=e243]:
+                    - generic [ref=e244]: "39"
+                    - generic [ref=e245]: run_config=RunConfig(
+                  - generic [ref=e246]:
+                    - generic [ref=e247]: "40"
+                    - generic [ref=e248]: sandbox=SandboxRunConfig(client=UnixLocalSandboxClient()),
+                  - generic [ref=e249]:
+                    - generic [ref=e250]: "41"
+                    - generic [ref=e251]: ),
+                  - generic [ref=e252]:
+                    - generic [ref=e253]: "42"
+                    - generic [ref=e254]: )
+                  - generic [ref=e255]:
+                    - generic [ref=e256]: "43"
+                    - generic [ref=e257]: print(result.final_output)
+                  - generic [ref=e259]: "44"
+                  - generic [ref=e262]: "45"
+                  - generic [ref=e264]:
+                    - generic [ref=e265]: "46"
+                    - generic [ref=e266]: "if __name__ == \"__main__\":"
+                  - generic [ref=e267]:
+                    - generic [ref=e268]: "47"
+                    - generic [ref=e269]: asyncio.run(main())
+                  - generic [ref=e271]: "48"
+            - paragraph [ref=e274]: Developers need more than the best models to build useful agents—they need systems that support how agents inspect files, run commands, write code, and keep working across many steps.
+            - paragraph [ref=e276]: The systems that exist today come with tradeoffs as teams move from prototypes to production. Model-agnostic frameworks are flexible but do not fully utilize frontier models capabilities ; model-provider SDKs can be closer to the model but often lack enough visibility into the harness; and managed agent APIs can simplify deployment but constrain where agents run and how they access sensitive data.
+            - paragraph [ref=e278]: "Here’s what some of the customers who tested the new SDK with us had to say:"
+            - generic [ref=e280]:
+              - tablist "Tabs" [ref=e283]:
+                - generic [ref=e286]:
+                  - tab "Oscar Health" [selected] [ref=e287] [cursor=pointer]:
+                    - generic [ref=e288]: Oscar Health
+                  - tab "Actively" [ref=e289] [cursor=pointer]:
+                    - generic [ref=e290]: Actively
+                  - tab "LexisNexis" [ref=e291] [cursor=pointer]:
+                    - generic [ref=e292]: LexisNexis
+                  - tab "FurtherAI" [ref=e293] [cursor=pointer]:
+                    - generic [ref=e294]: FurtherAI
+                  - tab "Thomson Reuters" [ref=e295] [cursor=pointer]:
+                    - generic [ref=e296]: Thomson Reuters
+                  - tab "Zoom" [ref=e297] [cursor=pointer]:
+                    - generic [ref=e298]: Zoom
+                  - tab "Tomoro AI" [ref=e299] [cursor=pointer]:
+                    - generic [ref=e300]: Tomoro AI
+              - tabpanel "Oscar Health" [ref=e302]:
+                - generic [ref=e304]:
+                  - blockquote [ref=e305]: “The updated Agents SDK made it production-viable for us to automate a critical clinical records workflow that previous approaches couldn’t handle reliably enough. For us, the difference was not just extracting the right metadata, but correctly understanding the boundaries of each encounter in long, complex records. As a result, we can more quickly understand what's happening for each patient in a given visit, helping members with their care needs and improving their experience with us.”
+                  - generic [ref=e306]: — Rachael Burns, Staff Engineer & AI Tech Lead, Oscar Health
+            - heading "A more capable harness for the agent loop" [level=2] [ref=e310]
+            - paragraph [ref=e312]: With today’s release, the Agents SDK harness becomes more capable for agents that work with documents, files, and systems. It now has configurable memory, sandbox-aware orchestration, Codex-like filesystem tools, and standardized integrations with primitives that are becoming common in frontier agent systems.
+            - paragraph [ref=e314]:
+              - text: These primitives include tool use via
+              - link "MCP⁠ (opens in a new window)" [ref=e315] [cursor=pointer]:
+                - /url: https://modelcontextprotocol.io
+                - generic [ref=e316]: MCP
+                - text: ⁠
+                - generic [ref=e317]: (opens in a new window)
+              - text: ", progressive disclosure via"
+              - link "skills⁠ (opens in a new window)" [ref=e318] [cursor=pointer]:
+                - /url: https://agentskills.io
+                - generic [ref=e319]: skills
+                - text: ⁠
+                - generic [ref=e320]: (opens in a new window)
+              - text: ", custom instructions via"
+              - link "AGENTS.md⁠ (opens in a new window)" [ref=e321] [cursor=pointer]:
+                - /url: https://agents.md
+                - generic [ref=e322]: AGENTS.md
+                - text: ⁠
+                - generic [ref=e323]: (opens in a new window)
+              - text: ", code execution using the"
+              - link "shell⁠ (opens in a new window)" [ref=e324] [cursor=pointer]:
+                - /url: https://developers.openai.com/api/docs/guides/tools-shell
+                - generic [ref=e325]: shell
+                - text: ⁠
+                - generic [ref=e326]: (opens in a new window)
+              - text: tool, file edits using the
+              - link "apply patch⁠ (opens in a new window)" [ref=e327] [cursor=pointer]:
+                - /url: https://developers.openai.com/api/docs/guides/tools-apply-patch
+                - generic [ref=e328]: apply patch
+                - text: ⁠
+                - generic [ref=e329]: (opens in a new window)
+              - text: tool, and more. The harness will continue to incorporate new agentic patterns and primitives over time, so developers can spend less time on core infrastructure updates and more time on the domain-specific logic that makes their agents useful.
+            - generic [ref=e333]:
+              - img "Diagram showing how the Agent SDK connects user input, models, and tools to build AI agents." [ref=e342]
+              - img "Diagram showing how to build AI agents using the Agent SDK with models, tools, and orchestration." [ref=e351]
+            - paragraph [ref=e353]: The harness also helps developers unlock more of a frontier model’s capability by aligning execution with the way those models perform best. That keeps agents closer to the model’s natural operating pattern, improving reliability and performance on complex tasks—particularly when work is long-running or coordinated across a diverse set of tools and systems.
+            - paragraph [ref=e355]: In addition, we realize each product is unique and rarely fits neatly into a mold. We designed Agents SDK to support this diversity. Developers get a harness that’s turnkey yet flexible—making it easy to adapt it to their own stack—including tool use, memory, and sandbox environment.
+            - heading "Native sandbox execution" [level=2] [ref=e359]
+            - paragraph [ref=e361]: The updated Agents SDK supports sandbox execution natively, so agents can run in controlled computer environments with the files, tools, and dependencies they need for a task.
+            - paragraph [ref=e363]: Many useful agents need a workspace where they can read and write files, install dependencies, run code, and use tools safely. Native sandbox support gives developers that execution layer out of the box, instead of forcing them to piece it together themselves.
+            - paragraph [ref=e365]: Developers can bring their own sandbox or use built-in support for Blaxel, Cloudflare, Daytona, E2B, Modal, Runloop, and Vercel.
+            - paragraph [ref=e367]: To make those environments portable across providers, the SDK also introduces a Manifest abstraction for describing the agent’s workspace. Developers can mount local files, define output directories, and bring in data from storage providers including AWS S3, Google Cloud Storage, Azure Blob Storage, and Cloudflare R2.
+            - paragraph [ref=e369]: "This gives developers a consistent way to shape the agent’s environment from local prototype to production deployment. It also gives the model a predictable workspace: where to find inputs, where to write outputs, and how to keep work organized across a long-running task."
+            - img "Logos for Daytona, E2B, Modal, Cloudflare, Vercel, Blaxel, Runloop" [ref=e379]
+            - heading "Separating harness from compute for security, durability, and scale" [level=2] [ref=e383]
+            - paragraph [ref=e385]: Agent systems should be designed assuming prompt-injection and exfiltration attempts. Separating harness and compute helps keep credentials out of environments where model-generated code executes.
+            - paragraph [ref=e387]: It also enables durable execution. When the agent’s state is externalized, losing a sandbox container does not mean losing the run. With built-in snapshotting and rehydration, the Agents SDK can restore the agent’s state in a fresh container and continue from the last checkpoint if the original environment fails or expires.
+            - paragraph [ref=e389]: Finally, it makes agents more scalable. Agent runs can use one sandbox or many, invoke sandboxes only when needed, route subagents to isolated environments, and parallelize work across containers for faster execution.
+            - generic [ref=e393]:
+              - img "Flow diagram illustrating how the Agent SDK enables AI agents to use additional compute resources for more complex tasks." [ref=e402]
+              - img "Diagram depicting how AI agents built with the Agent SDK can orchestrate separate compute systems, allowing workloads to run independently while supporting more advanced tasks." [ref=e411]
+            - heading "Pricing and availability" [level=2] [ref=e415]
+            - paragraph [ref=e417]: These new Agents SDK capabilities are generally available to all customers via the API and use standard API pricing, based on tokens and tool use.
+            - heading "What’s next" [level=2] [ref=e421]
+            - paragraph [ref=e423]: As we continue to develop the Agents SDK, we’ll keep expanding what developers can build with it, making it easier to bring more capable agents into production with less custom infrastructure, while preserving the flexibility and control developers need to fit agents into their own environments.
+            - paragraph [ref=e425]: The new harness and sandbox capabilities are launching first in Python, with TypeScript support planned for a future release. We’re also working to bring additional agent capabilities, including code mode and subagents, to both Python and TypeScript.
+            - paragraph [ref=e427]: In addition, we want to help bring the broader agent ecosystem together over time, with support for more sandbox providers, more integrations, and more ways for developers to plug the SDK into the tools and systems they already use.
+        - generic [ref=e430]:
+          - list [ref=e432]:
+            - listitem [ref=e433]:
+              - link "2026" [ref=e434] [cursor=pointer]:
+                - /url: /news/?tags=2026
+            - listitem [ref=e435]:
+              - link "API Platform" [ref=e436] [cursor=pointer]:
+                - /url: /news/?tags=api-platform
+          - generic [ref=e437]:
+            - heading "Author" [level=2] [ref=e438]
+            - generic [ref=e439]: OpenAI
+        - generic [ref=e440]:
+          - generic [ref=e441]:
+            - heading "Keep reading" [level=2] [ref=e443]
+            - link "View all" [ref=e444] [cursor=pointer]:
+              - /url: /news/
+          - generic [ref=e447]:
+            - generic [ref=e449]:
+              - img "Art Card 1x1" [ref=e455]
+              - 'link "Previewing GPT-5.6 Sol: a next-generation model - Product - Jun 26, 2026" [ref=e456] [cursor=pointer]':
+                - /url: /index/previewing-gpt-5-6-sol/
+                - generic [ref=e457]:
+                  - generic [ref=e458]: "Previewing GPT-5.6 Sol: a next-generation model"
+                  - paragraph [ref=e459]:
+                    - generic [ref=e460]: Product
+                    - time [ref=e462]: Jun 26, 2026
+            - generic [ref=e464]:
+              - img "Spend Controls_Artcard.png" [ref=e470]
+              - link "New usage analytics and updated spend controls for enterprises - Product - Jun 18, 2026" [ref=e471] [cursor=pointer]:
+                - /url: /index/chatgpt-enterprise-spend-controls/
+                - generic [ref=e472]:
+                  - generic [ref=e473]: New usage analytics and updated spend controls for enterprises
+                  - paragraph [ref=e474]:
+                    - generic [ref=e475]: Product
+                    - time [ref=e477]: Jun 18, 2026
+            - generic [ref=e479]:
+              - img "1x1 Health Art 1" [ref=e485]
+              - link "Improving health intelligence in ChatGPT - Product - Jun 18, 2026" [ref=e486] [cursor=pointer]:
+                - /url: /index/improving-health-intelligence-in-chatgpt/
+                - generic [ref=e487]:
+                  - generic [ref=e488]: Improving health intelligence in ChatGPT
+                  - paragraph [ref=e489]:
+                    - generic [ref=e490]: Product
+                    - time [ref=e492]: Jun 18, 2026
+    - contentinfo [ref=e493]:
+      - generic [ref=e495]:
+        - generic [ref=e496]:
+          - generic [ref=e497]:
+            - heading "Research" [level=2] [ref=e498]
+            - list [ref=e499]:
+              - listitem [ref=e500]:
+                - link "Research Index" [ref=e501] [cursor=pointer]:
+                  - /url: /research/index/
+              - listitem [ref=e502]:
+                - link "Research Overview" [ref=e503] [cursor=pointer]:
+                  - /url: /research/
+              - listitem [ref=e504]:
+                - link "Economic Research" [ref=e505] [cursor=pointer]:
+                  - /url: /signals/
+          - generic [ref=e506]:
+            - heading "Latest Advancements" [level=2] [ref=e507]
+            - list [ref=e508]:
+              - listitem [ref=e509]:
+                - link "GPT-5.5" [ref=e510] [cursor=pointer]:
+                  - /url: /index/introducing-gpt-5-5/
+              - listitem [ref=e511]:
+                - link "GPT-5.4" [ref=e512] [cursor=pointer]:
+                  - /url: /index/introducing-gpt-5-4/
+              - listitem [ref=e513]:
+                - link "GPT-5.3 Instant" [ref=e514] [cursor=pointer]:
+                  - /url: /index/gpt-5-3-instant/
+          - generic [ref=e515]:
+            - heading "Safety" [level=2] [ref=e516]
+            - list [ref=e517]:
+              - listitem [ref=e518]:
+                - link "Safety Approach" [ref=e519] [cursor=pointer]:
+                  - /url: /safety/
+              - listitem [ref=e520]:
+                - link "Deployment Safety (opens in a new window)" [ref=e521] [cursor=pointer]:
+                  - /url: https://deploymentsafety.openai.com/
+                  - text: Deployment Safety
+                  - img [ref=e522]
+                  - generic [ref=e524]: (opens in a new window)
+              - listitem [ref=e525]:
+                - link "Security & Privacy" [ref=e526] [cursor=pointer]:
+                  - /url: /security-and-privacy/
+              - listitem [ref=e527]:
+                - link "Trust & Transparency" [ref=e528] [cursor=pointer]:
+                  - /url: /trust-and-transparency/
+        - generic [ref=e529]:
+          - generic [ref=e530]:
+            - heading "Products" [level=2] [ref=e531]
+            - list [ref=e532]:
+              - listitem [ref=e533]:
+                - link "ChatGPT (opens in a new window)" [ref=e534] [cursor=pointer]:
+                  - /url: https://chatgpt.com/?openaicom-did=6f94b036-9169-4f0f-8d2c-7e54f0586e01&openaicom_referred=true
+                  - text: ChatGPT
+                  - img [ref=e535]
+                  - generic [ref=e537]: (opens in a new window)
+              - listitem [ref=e538]:
+                - link "ChatGPT Business (opens in a new window)" [ref=e539] [cursor=pointer]:
+                  - /url: https://chatgpt.com/business/?openaicom-did=6f94b036-9169-4f0f-8d2c-7e54f0586e01&openaicom_referred=true
+                  - text: ChatGPT Business
+                  - img [ref=e540]
+                  - generic [ref=e542]: (opens in a new window)
+              - listitem [ref=e543]:
+                - link "ChatGPT Enterprise (opens in a new window)" [ref=e544] [cursor=pointer]:
+                  - /url: https://chatgpt.com/business/enterprise/?openaicom-did=6f94b036-9169-4f0f-8d2c-7e54f0586e01&openaicom_referred=true
+                  - text: ChatGPT Enterprise
+                  - img [ref=e545]
+                  - generic [ref=e547]: (opens in a new window)
+              - listitem [ref=e548]:
+                - link "ChatGPT for Education (opens in a new window)" [ref=e549] [cursor=pointer]:
+                  - /url: https://chatgpt.com/business/education/?openaicom-did=6f94b036-9169-4f0f-8d2c-7e54f0586e01&openaicom_referred=true
+                  - text: ChatGPT for Education
+                  - img [ref=e550]
+                  - generic [ref=e552]: (opens in a new window)
+              - listitem [ref=e553]:
+                - link "Codex" [ref=e554] [cursor=pointer]:
+                  - /url: /codex/
+              - listitem [ref=e555]:
+                - link "Release Notes" [ref=e556] [cursor=pointer]:
+                  - /url: /products/release-notes/
+          - generic [ref=e557]:
+            - heading "API Platform" [level=2] [ref=e558]
+            - list [ref=e559]:
+              - listitem [ref=e560]:
+                - link "Overview" [ref=e561] [cursor=pointer]:
+                  - /url: /api/
+              - listitem [ref=e562]:
+                - link "API Log In (opens in a new window)" [ref=e563] [cursor=pointer]:
+                  - /url: https://platform.openai.com/login
+                  - text: API Log In
+                  - img [ref=e564]
+                  - generic [ref=e566]: (opens in a new window)
+              - listitem [ref=e567]:
+                - link "Docs (opens in a new window)" [ref=e568] [cursor=pointer]:
+                  - /url: https://developers.openai.com/api/docs
+                  - text: Docs
+                  - img [ref=e569]
+                  - generic [ref=e571]: (opens in a new window)
+        - generic [ref=e572]:
+          - generic [ref=e573]:
+            - heading "Business" [level=2] [ref=e574]
+            - list [ref=e575]:
+              - listitem [ref=e576]:
+                - link "Overview" [ref=e577] [cursor=pointer]:
+                  - /url: /business/
+              - listitem [ref=e578]:
+                - link "Solutions" [ref=e579] [cursor=pointer]:
+                  - /url: /solutions/
+              - listitem [ref=e580]:
+                - link "Resources" [ref=e581] [cursor=pointer]:
+                  - /url: /business/learn/
+              - listitem [ref=e582]:
+                - link "Customer Stories" [ref=e583] [cursor=pointer]:
+                  - /url: /business/customer-stories/
+              - listitem [ref=e584]:
+                - link "Partner Network" [ref=e585] [cursor=pointer]:
+                  - /url: /business/partners/
+              - listitem [ref=e586]:
+                - link "Contact Sales" [ref=e587] [cursor=pointer]:
+                  - /url: /contact-sales/
+          - generic [ref=e588]:
+            - heading "Developers" [level=2] [ref=e589]
+            - list [ref=e590]:
+              - listitem [ref=e591]:
+                - link "Apps SDK (opens in a new window)" [ref=e592] [cursor=pointer]:
+                  - /url: https://developers.openai.com/apps-sdk
+                  - text: Apps SDK
+                  - img [ref=e593]
+                  - generic [ref=e595]: (opens in a new window)
+              - listitem [ref=e596]:
+                - link "Open Models" [ref=e597] [cursor=pointer]:
+                  - /url: /open-models/
+              - listitem [ref=e598]:
+                - link "Docs (opens in a new window)" [ref=e599] [cursor=pointer]:
+                  - /url: https://developers.openai.com/
+                  - text: Docs
+                  - img [ref=e600]
+                  - generic [ref=e602]: (opens in a new window)
+              - listitem [ref=e603]:
+                - link "Resources (opens in a new window)" [ref=e604] [cursor=pointer]:
+                  - /url: https://developers.openai.com/learn
+                  - text: Resources
+                  - img [ref=e605]
+                  - generic [ref=e607]: (opens in a new window)
+              - listitem [ref=e608]:
+                - link "Developer Forum (opens in a new window)" [ref=e609] [cursor=pointer]:
+                  - /url: https://community.openai.com/
+                  - text: Developer Forum
+                  - img [ref=e610]
+                  - generic [ref=e612]: (opens in a new window)
+        - generic [ref=e613]:
+          - generic [ref=e614]:
+            - heading "Company" [level=2] [ref=e615]
+            - list [ref=e616]:
+              - listitem [ref=e617]:
+                - link "About Us" [ref=e618] [cursor=pointer]:
+                  - /url: /about/
+              - listitem [ref=e619]:
+                - link "Our Charter" [ref=e620] [cursor=pointer]:
+                  - /url: /charter/
+              - listitem [ref=e621]:
+                - link "Careers" [ref=e622] [cursor=pointer]:
+                  - /url: /careers/
+              - listitem [ref=e623]:
+                - link "News" [ref=e624] [cursor=pointer]:
+                  - /url: /news/
+          - generic [ref=e625]:
+            - heading "Support" [level=2] [ref=e626]
+            - list [ref=e627]:
+              - listitem [ref=e628]:
+                - link "Help Center (opens in a new window)" [ref=e629] [cursor=pointer]:
+                  - /url: https://help.openai.com/
+                  - text: Help Center
+                  - img [ref=e630]
+                  - generic [ref=e632]: (opens in a new window)
+        - generic [ref=e633]:
+          - generic [ref=e634]:
+            - heading "More" [level=2] [ref=e635]
+            - list [ref=e636]:
+              - listitem [ref=e637]:
+                - link "Stories" [ref=e638] [cursor=pointer]:
+                  - /url: /stories/
+              - listitem [ref=e639]:
+                - link "Academy" [ref=e640] [cursor=pointer]:
+                  - /url: /academy/
+              - listitem [ref=e641]:
+                - link "Livestreams" [ref=e642] [cursor=pointer]:
+                  - /url: /live/
+              - listitem [ref=e643]:
+                - link "Podcast" [ref=e644] [cursor=pointer]:
+                  - /url: /podcast/
+              - listitem [ref=e645]:
+                - link "RSS" [ref=e646] [cursor=pointer]:
+                  - /url: /news/rss.xml
+          - generic [ref=e647]:
+            - heading "Terms & Policies" [level=2] [ref=e648]
+            - list [ref=e649]:
+              - listitem [ref=e650]:
+                - link "Terms of Use" [ref=e651] [cursor=pointer]:
+                  - /url: /policies/terms-of-use/
+              - listitem [ref=e652]:
+                - link "Privacy Policy" [ref=e653] [cursor=pointer]:
+                  - /url: /policies/privacy-policy/
+              - listitem [ref=e654]:
+                - link "Other Policies" [ref=e655] [cursor=pointer]:
+                  - /url: /policies/
+      - generic [ref=e656]:
+        - generic [ref=e657]:
+          - link "X" [ref=e658] [cursor=pointer]:
+            - /url: https://x.com/OpenAI
+            - img [ref=e659]
+            - generic [ref=e661]: (opens in a new window)
+          - link "YouTube" [ref=e662] [cursor=pointer]:
+            - /url: https://www.youtube.com/OpenAI
+            - img [ref=e663]
+            - generic [ref=e665]: (opens in a new window)
+          - link "LinkedIn" [ref=e666] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/openai
+            - img [ref=e667]
+            - generic [ref=e669]: (opens in a new window)
+          - link "GitHub" [ref=e670] [cursor=pointer]:
+            - /url: https://github.com/openai
+            - img [ref=e671]
+            - generic [ref=e673]: (opens in a new window)
+          - link "Instagram" [ref=e674] [cursor=pointer]:
+            - /url: https://www.instagram.com/openai/
+            - img [ref=e675]
+            - generic [ref=e677]: (opens in a new window)
+          - link "TikTok" [ref=e678] [cursor=pointer]:
+            - /url: https://www.tiktok.com/@openai
+            - img [ref=e679]
+            - generic [ref=e681]: (opens in a new window)
+          - link "Discord" [ref=e682] [cursor=pointer]:
+            - /url: https://discord.gg/openai
+            - img [ref=e683]
+            - generic [ref=e685]: (opens in a new window)
+        - generic [ref=e686]:
+          - generic [ref=e687]: OpenAI © 2015–2026
+          - button "Manage Cookies" [ref=e688] [cursor=pointer]
+        - generic [ref=e689]:
+          - button "Change language" [ref=e690] [cursor=pointer]:
+            - generic [ref=e691]:
+              - img [ref=e692]
+              - generic [ref=e695]:
+                - text: English
+                - generic [ref=e696]: United States
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - img
+                    - textbox "Search locales by name or region":
+                      - /placeholder: Search
+  - alert [ref=e697]

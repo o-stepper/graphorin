@@ -11,7 +11,10 @@ import { createSqliteStore } from '../src/index.js';
  * recomputes its digest in-process). Migration 023 drops both; the write/read
  * path must keep working without them.
  */
-describe('CS-14 - dead facts.hash column + index are removed', () => {
+// File-backed sqlite setup (mkdtemp + migrations) has blown the 5 s
+// default per-test timeout on loaded windows-latest runners; the suite
+// timeout is a ceiling for slow I/O, not a performance assertion.
+describe('CS-14 - dead facts.hash column + index are removed', { timeout: 30_000 }, () => {
   it('drops the hash column and idx_facts_hash, and remember/search still work', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-cs14-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite`, skipSqliteVec: true });

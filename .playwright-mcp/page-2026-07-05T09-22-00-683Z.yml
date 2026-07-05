@@ -1,0 +1,913 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - link "Morph Morph" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - img "Morph" [ref=e7]
+        - generic [ref=e8]: Morph
+      - navigation [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e11]: Models
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: Open Source Models
+                  - generic:
+                    - 'link "GLM-5.2 744B MoE, 1M context. #1 on Design Arena."':
+                      - /url: /products/models
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "GLM-5.2" [level=3]
+                        - paragraph: "744B MoE, 1M context. #1 on Design Arena."
+                    - link "Qwen 397B MoE, 262k context.":
+                      - /url: /products/models
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Qwen" [level=3]
+                        - paragraph: 397B MoE, 262k context.
+                    - link "MiniMax 230B MoE for agentic workflows.":
+                      - /url: /products/models
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "MiniMax" [level=3]
+                        - paragraph: 230B MoE for agentic workflows.
+                    - link "DeepSeek 1M-context model, served fast.":
+                      - /url: /products/models
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "DeepSeek" [level=3]
+                        - paragraph: 1M-context model, served fast.
+                - generic:
+                  - generic: Specialized
+                  - generic:
+                    - link "Reflex Classify every agent trace for any behavior that matters, in under 90ms.":
+                      - /url: /products/reflex
+                      - generic:
+                        - heading "Reflex" [level=3]
+                        - paragraph: Classify every agent trace for any behavior that matters, in under 90ms.
+                    - link "Fast Apply Merge AI-generated code edits instantly.":
+                      - /url: /products/fastapply
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Fast Apply" [level=3]
+                        - paragraph: Merge AI-generated code edits instantly.
+                    - link "WarpGrep AI search subagent with sub-6s searches.":
+                      - /url: /products/warpgrep
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "WarpGrep" [level=3]
+                        - paragraph: AI search subagent with sub-6s searches.
+                    - link "Compact Verbatim context compaction for long-running agents.":
+                      - /url: /products/compact
+                      - generic:
+                        - heading "Compact" [level=3]
+                        - paragraph: Verbatim context compaction for long-running agents.
+                    - link "Model Router Auto-route each prompt to the best model.":
+                      - /url: https://docs.morphllm.com/sdk/components/router
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Model Router" [level=3]
+                        - paragraph: Auto-route each prompt to the best model.
+              - generic:
+                - link "SDK":
+                  - /url: https://docs.morphllm.com/sdk
+                  - generic:
+                    - img
+                  - heading "SDK" [level=3]
+        - link "Docs" [ref=e12] [cursor=pointer]:
+          - /url: https://docs.morphllm.com/quickstart
+        - link "Pricing" [ref=e13] [cursor=pointer]:
+          - /url: /pricing
+        - link "MCP" [ref=e14] [cursor=pointer]:
+          - /url: /setup
+        - generic [ref=e15]:
+          - generic [ref=e16]: Resources
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - link "Blog Engineering deep dives and product updates.":
+                      - /url: /blog
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Blog" [level=3]
+                        - paragraph: Engineering deep dives and product updates.
+                    - link "Startup Credits Up to $5K in API credits for startups.":
+                      - /url: /startups
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Startup Credits" [level=3]
+                        - paragraph: Up to $5K in API credits for startups.
+                    - link "Contact Us Talk to the team about your use case.":
+                      - /url: /contact
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Contact Us" [level=3]
+                        - paragraph: Talk to the team about your use case.
+                - generic:
+                  - generic:
+                    - link "About How we train and deploy models.":
+                      - /url: /about
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "About" [level=3]
+                        - paragraph: How we train and deploy models.
+                    - link "Careers Join a small team shipping daily.":
+                      - /url: https://www.ycombinator.com/companies/morph/jobs/
+                      - generic:
+                        - img
+                      - generic:
+                        - heading "Careers" [level=3]
+                        - paragraph: Join a small team shipping daily.
+      - generic [ref=e17]:
+        - link "Book a Call" [ref=e18] [cursor=pointer]:
+          - /url: https://calendar.app.google/xN2RcfSYtfQERQYG8
+          - button "Book a Call" [ref=e19]:
+            - generic [ref=e20]: Book a Call
+        - link "Sign Up / Log In" [ref=e22] [cursor=pointer]:
+          - /url: /sign-up
+          - button "Sign Up / Log In" [ref=e23]:
+            - generic [ref=e24]: Sign Up / Log In
+  - main [ref=e25]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - navigation [ref=e29]:
+          - link "Home" [ref=e30] [cursor=pointer]:
+            - /url: /
+          - text: "/AI Agent Frameworks (2026 Update): 8 SDKs Compared + the Claude Agent SDK Primitive Reference"
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - 'heading "AI Agent Frameworks (2026 Update): 8 SDKs Compared + the Claude Agent SDK Primitive Reference" [level=1] [ref=e33]'
+            - paragraph [ref=e34]: "8 AI agent frameworks compared with exact 2026 releases: Claude Agent SDK, OpenAI Agents SDK, Google ADK, LangGraph, CrewAI (52.4k stars), Smolagents, Pydantic AI, Microsoft Agent Framework 1.0. Plus the full Claude Agent SDK reference: query() primitive, lifecycle hooks, subagents, schema, streaming, isolation, token handling, MCP, and A2A."
+            - generic [ref=e35]: June 9, 2026 · 1 min read
+          - 'img "AI Agent Frameworks (2026 Update): 8 SDKs Compared + the Claude Agent SDK Primitive Reference" [ref=e37]'
+      - generic [ref=e39]:
+        - complementary [ref=e40]:
+          - navigation [ref=e42]:
+            - link "What Changed in 2026 (Releases)" [ref=e43] [cursor=pointer]:
+              - /url: "#whats-new-2026"
+            - link "Framework Comparison Table" [ref=e44] [cursor=pointer]:
+              - /url: "#comparison-table"
+            - link "1. Claude Agent SDK" [ref=e45] [cursor=pointer]:
+              - /url: "#claude-agent-sdk"
+            - link "Claude Agent SDK Primitive Reference" [ref=e46] [cursor=pointer]:
+              - /url: "#agent-sdk-reference"
+            - link "2. OpenAI Agents SDK" [ref=e47] [cursor=pointer]:
+              - /url: "#openai-agents-sdk"
+            - link "3. Google ADK" [ref=e48] [cursor=pointer]:
+              - /url: "#google-adk"
+            - link "4. LangGraph" [ref=e49] [cursor=pointer]:
+              - /url: "#langgraph"
+            - link "5. CrewAI" [ref=e50] [cursor=pointer]:
+              - /url: "#crewai"
+            - link "6. Smolagents" [ref=e51] [cursor=pointer]:
+              - /url: "#smolagents"
+            - link "7. Pydantic AI" [ref=e52] [cursor=pointer]:
+              - /url: "#pydantic-ai"
+            - link "8. AutoGen / Microsoft Agent Framework" [ref=e53] [cursor=pointer]:
+              - /url: "#autogen"
+            - 'link "Protocol Layer: MCP, ACP, and A2A" [ref=e54] [cursor=pointer]':
+              - /url: "#protocol-layer"
+            - link "Multi-Agent Patterns" [ref=e55] [cursor=pointer]:
+              - /url: "#multi-agent-patterns"
+            - link "When to Use Each Framework" [ref=e56] [cursor=pointer]:
+              - /url: "#when-to-use"
+            - link "Running Open-Source Models Underneath" [ref=e57] [cursor=pointer]:
+              - /url: "#infrastructure"
+            - link "FAQ" [ref=e58] [cursor=pointer]:
+              - /url: "#faq"
+        - article [ref=e59]:
+          - paragraph [ref=e60]: Every major AI lab ships an agent framework now, and the 2026 releases landed fast. Microsoft Agent Framework 1.0 went GA on April 3, 2026, merging AutoGen and Semantic Kernel into one .NET and Python SDK. CrewAI passed 52,000 GitHub stars. Google shipped ADK 1.0 for Java and Go. Anthropic's Claude Agent SDK started drawing subscription usage from a separate monthly Agent SDK credit on June 15, 2026.
+          - paragraph [ref=e61]: The protocol layer consolidated. ACP merged into A2A under the Linux Foundation. MCP crossed 200 server implementations. The question is no longer whether to use an agent framework but which one, and what you will regret in six months.
+          - paragraph [ref=e62]:
+            - text: This guide compares 8 frameworks with exact 2026 release facts, then gives the full Claude Agent SDK primitive reference (the
+            - code [ref=e63]: query()
+            - text: generator, lifecycle hooks, subagents, governance schema, streaming, agent isolation, and token handling) that the long-tail and AI-grounding queries ask for. It closes with the model-inference layer that sits underneath every framework.
+          - generic [ref=e64]:
+            - generic [ref=e65]:
+              - generic [ref=e66]: "8"
+              - generic [ref=e67]: Frameworks compared
+            - generic [ref=e68]:
+              - generic [ref=e69]: "3"
+              - generic [ref=e70]: Protocols compared
+            - generic [ref=e71]:
+              - generic [ref=e72]: "4"
+              - generic [ref=e73]: ADK SDK languages
+            - generic [ref=e74]:
+              - generic [ref=e75]: 200+
+              - generic [ref=e76]: MCP servers available
+          - generic [ref=e77]:
+            - heading "What Changed in 2026 (Framework Releases and Updates)" [level=2] [ref=e78]
+            - paragraph [ref=e79]: If you read a framework comparison written before 2026, most of the dates and versions below are now wrong. Here is what actually shipped, with sources verified as of June 2026.
+            - figure "AI Agent Framework Releases (2026)" [ref=e80]:
+              - generic [ref=e81]: AI Agent Framework Releases (2026)
+              - table [ref=e83]:
+                - rowgroup [ref=e84]:
+                  - row "Date Release What it means" [ref=e85]:
+                    - columnheader "Date" [ref=e86]
+                    - columnheader "Release" [ref=e87]
+                    - columnheader "What it means" [ref=e88]
+                - rowgroup [ref=e89]:
+                  - row "Feb 19, 2026 Microsoft Agent Framework RC API surface frozen ahead of 1.0 GA" [ref=e90]:
+                    - cell "Feb 19, 2026" [ref=e91]
+                    - cell "Microsoft Agent Framework RC" [ref=e92]
+                    - cell "API surface frozen ahead of 1.0 GA" [ref=e93]
+                  - row "Apr 3, 2026 Microsoft Agent Framework 1.0 GA AutoGen + Semantic Kernel unified, MCP + A2A support, .NET and Python" [ref=e94]:
+                    - cell "Apr 3, 2026" [ref=e95]
+                    - cell "Microsoft Agent Framework 1.0 GA" [ref=e96]
+                    - cell "AutoGen + Semantic Kernel unified, MCP + A2A support, .NET and Python" [ref=e97]
+                  - 'row "Early 2026 Google ADK Java 1.0 and Go 1.0 Four-language SDK: Python, TypeScript, Java, Go" [ref=e98]':
+                    - cell "Early 2026" [ref=e99]
+                    - cell "Google ADK Java 1.0 and Go 1.0" [ref=e100]
+                    - 'cell "Four-language SDK: Python, TypeScript, Java, Go" [ref=e101]'
+                  - row "May 28, 2026 CrewAI 1.14.6 (52.4k stars) ~2 billion agent executions in the prior 12 months" [ref=e102]:
+                    - cell "May 28, 2026" [ref=e103]
+                    - cell "CrewAI 1.14.6 (52.4k stars)" [ref=e104]
+                    - cell "~2 billion agent executions in the prior 12 months" [ref=e105]
+                  - row "Jun 15, 2026 Claude Agent SDK subscription credit Agent SDK and claude -p draw from a separate monthly credit" [ref=e106]:
+                    - cell "Jun 15, 2026" [ref=e107]
+                    - cell "Claude Agent SDK subscription credit" [ref=e108]
+                    - cell "Agent SDK and claude -p draw from a separate monthly credit" [ref=e109]
+            - paragraph [ref=e110]:
+              - text: "The single most material change for production teams: starting June 15, 2026, Agent SDK usage and non-interactive"
+              - code [ref=e111]: claude -p
+              - text: runs on subscription plans draw from a monthly Agent SDK credit separate from interactive limits ($20 on Pro, $100 on Max 5x, $200 on Max 20x). When exhausted, usage flows to standard API rates if enabled, otherwise requests stop. Unused credit does not roll over. Budget for this if you run Claude-based agents in CI or scheduled jobs.
+          - generic [ref=e112]:
+            - heading "Framework Comparison Table" [level=2] [ref=e113]
+            - paragraph [ref=e114]: "The landscape splits into two categories: provider-native SDKs (Claude, OpenAI, Google) that are optimized for one model family, and independent frameworks (LangGraph, CrewAI, Smolagents, Pydantic AI, AutoGen) that work across providers. Neither category is universally better. The right choice depends on whether you prioritize depth of integration or model flexibility."
+            - figure "AI Agent Frameworks (June 2026)" [ref=e115]:
+              - generic [ref=e116]: AI Agent Frameworks (June 2026)
+              - table [ref=e118]:
+                - rowgroup [ref=e119]:
+                  - row "Framework Language Multi-Agent MCP A2A/ACP Best For" [ref=e120]:
+                    - columnheader "Framework" [ref=e121]
+                    - columnheader "Language" [ref=e122]
+                    - columnheader "Multi-Agent" [ref=e123]
+                    - columnheader "MCP" [ref=e124]
+                    - columnheader "A2A/ACP" [ref=e125]
+                    - columnheader "Best For" [ref=e126]
+                - rowgroup [ref=e127]:
+                  - row "Claude Agent SDK Python, TS Subagents Native (deepest) No Coding agents, OS access" [ref=e128]:
+                    - cell "Claude Agent SDK" [ref=e129]
+                    - cell "Python, TS" [ref=e130]
+                    - cell "Subagents" [ref=e131]
+                    - cell "Native (deepest)" [ref=e132]
+                    - cell "No" [ref=e133]
+                    - cell "Coding agents, OS access" [ref=e134]
+                  - row "OpenAI Agents SDK Python, TS Handoffs Adopted No Lightweight handoff chains" [ref=e135]:
+                    - cell "OpenAI Agents SDK" [ref=e136]
+                    - cell "Python, TS" [ref=e137]
+                    - cell "Handoffs" [ref=e138]
+                    - cell "Adopted" [ref=e139]
+                    - cell "No" [ref=e140]
+                    - cell "Lightweight handoff chains" [ref=e141]
+                  - row "Google ADK Python, TS, Java, Go Hierarchical Via adapters Native Enterprise multi-language" [ref=e142]:
+                    - cell "Google ADK" [ref=e143]
+                    - cell "Python, TS, Java, Go" [ref=e144]
+                    - cell "Hierarchical" [ref=e145]
+                    - cell "Via adapters" [ref=e146]
+                    - cell "Native" [ref=e147]
+                    - cell "Enterprise multi-language" [ref=e148]
+                  - row "LangGraph Python, TS Graph nodes Via adapters No Stateful workflows" [ref=e149]:
+                    - cell "LangGraph" [ref=e150]
+                    - cell "Python, TS" [ref=e151]
+                    - cell "Graph nodes" [ref=e152]
+                    - cell "Via adapters" [ref=e153]
+                    - cell "No" [ref=e154]
+                    - cell "Stateful workflows" [ref=e155]
+                  - row "CrewAI Python Role-based crews Native Native (A2A) Rapid prototyping" [ref=e156]:
+                    - cell "CrewAI" [ref=e157]
+                    - cell "Python" [ref=e158]
+                    - cell "Role-based crews" [ref=e159]
+                    - cell "Native" [ref=e160]
+                    - cell "Native (A2A)" [ref=e161]
+                    - cell "Rapid prototyping" [ref=e162]
+                  - row "Smolagents Python Multi-agent Supported No Code-generating agents" [ref=e163]:
+                    - cell "Smolagents" [ref=e164]
+                    - cell "Python" [ref=e165]
+                    - cell "Multi-agent" [ref=e166]
+                    - cell "Supported" [ref=e167]
+                    - cell "No" [ref=e168]
+                    - cell "Code-generating agents" [ref=e169]
+                  - row "Pydantic AI Python No No No Type-safe structured output" [ref=e170]:
+                    - cell "Pydantic AI" [ref=e171]
+                    - cell "Python" [ref=e172]
+                    - cell "No" [ref=e173]
+                    - cell "No" [ref=e174]
+                    - cell "No" [ref=e175]
+                    - cell "Type-safe structured output" [ref=e176]
+                  - row "MS Agent Framework 1.0 Python, .NET Group chat + graph Native Native Azure / .NET, human-in-the-loop" [ref=e177]:
+                    - cell "MS Agent Framework 1.0" [ref=e178]
+                    - cell "Python, .NET" [ref=e179]
+                    - cell "Group chat + graph" [ref=e180]
+                    - cell "Native" [ref=e181]
+                    - cell "Native" [ref=e182]
+                    - cell "Azure / .NET, human-in-the-loop" [ref=e183]
+          - generic [ref=e184]:
+            - heading "1. Claude Agent SDK (Anthropic)" [level=2] [ref=e185]
+            - paragraph [ref=e186]: "Anthropic renamed the Claude Code SDK to the Claude Agent SDK in early 2026. The rename reflects a broader ambition: the SDK builds agents that go beyond code. Email assistants, research agents, customer support bots, finance analyzers. But the core design philosophy remains the same: give the agent a computer."
+            - paragraph [ref=e187]:
+              - text: The SDK provides built-in tools for file system and shell access, eliminating the boilerplate that other frameworks require. Its MCP integration is the deepest of any framework. Playwright, Slack, GitHub, and hundreds of other MCP servers connect with a single configuration line. The
+              - code [ref=e188]: "@tool"
+              - text: decorator supports
+              - code [ref=e189]: typing.Annotated
+              - text: for per-parameter descriptions, which means your tool schemas stay close to your function signatures.
+            - heading "Architecture" [level=3] [ref=e190]
+            - paragraph [ref=e191]: Claude Agent SDK centers on hooks and subagents. Hooks intercept agent behavior at lifecycle points (before tool calls, after responses, on errors). Subagents handle task delegation through child agents, each with their own context window and tool set. This gives precise control over what an agent can and cannot do, which matters in production where unconstrained agents are a liability.
+            - heading "Strengths" [level=3] [ref=e192]
+            - list [ref=e193]:
+              - listitem [ref=e194]: "Deepest MCP integration of any framework: 200+ servers, single-line config"
+              - listitem [ref=e195]: Built-in file system and shell access (no custom tool wrappers needed)
+              - listitem [ref=e196]: Extended thinking for complex reasoning chains
+              - listitem [ref=e197]: Hooks system for lifecycle control (pre-tool, post-response, error handling)
+              - listitem [ref=e198]: Session management with custom session IDs and context usage tracking
+            - heading "Weaknesses" [level=3] [ref=e199]
+            - list [ref=e200]:
+              - listitem [ref=e201]: Locked to Claude models (no model swapping without rewriting tool schemas)
+              - listitem [ref=e202]: No native A2A/ACP support for cross-vendor agent communication
+              - listitem [ref=e203]: Python and TypeScript only (no Java, Go, or .NET)
+            - paragraph [ref=e204]:
+              - strong [ref=e205]: "When to use:"
+              - text: You are building coding agents, research agents, or any system that needs deep OS-level access. You want the simplest path from "I have an idea" to "the agent is editing files and running commands." You are committed to Claude models.
+          - generic [ref=e206]:
+            - 'heading "Claude Agent SDK Primitive Reference: Core Primitives, Lifecycle, Hooks, Schema, Streaming" [level=2] [ref=e207]'
+            - paragraph [ref=e208]: Most framework comparisons stop at "Claude Agent SDK is good for coding." This section is the documentation-grade reference for the primitives, lifecycle, governance schema, streaming model, agent isolation, and token handling, verified against code.claude.com docs as of June 2026.
+            - heading "Installation and authentication" [level=3] [ref=e209]
+            - paragraph [ref=e210]:
+              - text: "TypeScript:"
+              - code [ref=e211]: npm install @anthropic-ai/claude-agent-sdk
+              - text: "(it bundles a native Claude Code binary as an optional dependency, so no separate Claude Code install is needed). Python:"
+              - code [ref=e212]: pip install claude-agent-sdk
+              - text: ", which requires Python 3.10 or newer. Auth defaults to"
+              - code [ref=e213]: export ANTHROPIC_API_KEY=...
+              - text: ; for third-party providers set
+              - code [ref=e214]: CLAUDE_CODE_USE_BEDROCK=1
+              - text: ","
+              - code [ref=e215]: CLAUDE_CODE_USE_VERTEX=1
+              - text: ", or"
+              - code [ref=e216]: CLAUDE_CODE_USE_FOUNDRY=1
+              - text: . Using claude.ai login auth inside third-party SDK products is not permitted.
+            - 'heading "Core primitive: the query() generator" [level=3] [ref=e217]'
+            - paragraph [ref=e218]:
+              - text: The SDK is built on one async generator,
+              - code [ref=e219]: query()
+              - text: ". You iterate the messages it yields. TypeScript:"
+            - code [ref=e221]: "for await (const message of query({ prompt: \"Refactor the auth module\", options: { allowedTools: [\"Read\", \"Edit\", \"Bash\"] } })) { // handle streamed message }"
+            - paragraph [ref=e222]: "Python:"
+            - code [ref=e224]: "async for message in query( prompt=\"Refactor the auth module\", options=ClaudeAgentOptions(allowed_tools=[\"Read\", \"Edit\", \"Bash\"]), ): ... # handle streamed message"
+            - paragraph [ref=e225]:
+              - text: Built-in tools include
+              - code [ref=e226]: Read
+              - text: ","
+              - code [ref=e227]: Write
+              - text: ","
+              - code [ref=e228]: Edit
+              - text: ","
+              - code [ref=e229]: Bash
+              - text: ","
+              - code [ref=e230]: Glob
+              - text: ","
+              - code [ref=e231]: Grep
+              - text: ","
+              - code [ref=e232]: WebSearch
+              - text: ","
+              - code [ref=e233]: WebFetch
+              - text: ", and"
+              - code [ref=e234]: AskUserQuestion
+              - text: . You scope what the agent may call through
+              - code [ref=e235]: allowedTools
+              - text: .
+            - heading "Lifecycle hooks (in-process callbacks)" [level=3] [ref=e236]
+            - paragraph [ref=e237]:
+              - text: SDK hooks are in-process callbacks, not shell commands like the Claude Code CLI hooks. Register them on
+              - code [ref=e238]: options.hooks
+              - text: . Available events include
+              - code [ref=e239]: PreToolUse
+              - text: ","
+              - code [ref=e240]: PostToolUse
+              - text: ","
+              - code [ref=e241]: Stop
+              - text: ","
+              - code [ref=e242]: SessionStart
+              - text: ","
+              - code [ref=e243]: SessionEnd
+              - text: ", and"
+              - code [ref=e244]: UserPromptSubmit
+              - text: ". TypeScript:"
+            - code [ref=e246]: "options.hooks = { PostToolUse: [{ matcher: \"Edit|Write\", hooks: [callbackFn] }] }"
+            - paragraph [ref=e247]: "Python:"
+            - code [ref=e249]: "hooks={\"PostToolUse\": [HookMatcher(matcher=\"Edit|Write\", hooks=[fn])]}"
+            - paragraph [ref=e250]:
+              - text: "Matcher syntax mirrors Claude Code:"
+              - code [ref=e251]: "\"*\""
+              - text: or omitted matches all; letters, digits, underscores, and pipes are an exact or pipe-separated list (
+              - code [ref=e252]: "\"Edit|Write\""
+              - text: ); anything else is treated as a JavaScript regex (
+              - code [ref=e253]: "\"mcp__memory__.*\""
+              - text: ). MCP tools are named
+              - code [ref=e254]: mcp__<server>__<tool>
+              - text: .
+            - 'heading "Governance: permission modes and the schema" [level=3] [ref=e255]'
+            - paragraph [ref=e256]:
+              - text: The
+              - code [ref=e257]: permissionMode
+              - text: "option accepts the same modes as the CLI:"
+              - code [ref=e258]: default
+              - text: (prompts on first use),
+              - code [ref=e259]: acceptEdits
+              - text: (auto-accepts file edits and in-dir file ops),
+              - code [ref=e260]: plan
+              - text: (read-only exploration),
+              - code [ref=e261]: dontAsk
+              - text: (auto-denies anything not pre-approved), and
+              - code [ref=e262]: bypassPermissions
+              - text: (skips prompts). PreToolUse hooks can deny, force a prompt, rewrite tool input via
+              - code [ref=e263]: updatedInput
+              - text: ", or allow, but a hook decision never overrides a deny permission rule. Evaluation order across scopes is deny, then ask, then allow, and a deny at any level cannot be re-allowed by another. The settings schema is published at"
+              - code [ref=e264]: json.schemastore.org/claude-code-settings.json
+              - text: .
+            - paragraph [ref=e265]:
+              - text: The SDK loads filesystem config from
+              - code [ref=e266]: .claude/
+              - text: and
+              - code [ref=e267]: ~/.claude/
+              - text: by default (skills at
+              - code [ref=e268]: .claude/skills/*/SKILL.md
+              - text: ", commands, and CLAUDE.md memory). Restrict that with"
+              - code [ref=e269]: settingSources
+              - text: in TypeScript or
+              - code [ref=e270]: setting_sources
+              - text: in Python.
+            - heading "Streaming" [level=3] [ref=e271]
+            - paragraph [ref=e272]:
+              - text: "Streaming is the default consumption model:"
+              - code [ref=e273]: query()
+              - text: is an async generator, so each assistant message, tool call, and tool result arrives as it is produced rather than after the full turn completes. The first message is an init system message; capture its
+              - code [ref=e274]: session_id
+              - text: if you intend to resume the session later.
+            - heading "Subagents, agent isolation, and token handling" [level=3] [ref=e275]
+            - paragraph [ref=e276]:
+              - text: Define subagents through
+              - code [ref=e277]: options.agents
+              - text: ". TypeScript:"
+            - code [ref=e279]: "options.agents = { \"code-reviewer\": { description: \"Reviews diffs for correctness\", prompt: \"You are a strict code reviewer.\", tools: [\"Read\", \"Glob\", \"Grep\"] } }"
+            - paragraph [ref=e280]:
+              - text: Python uses
+              - code [ref=e281]: "agents={\"code-reviewer\": AgentDefinition(...)}"
+              - text: . Include
+              - code [ref=e282]: "\"Agent\""
+              - text: in
+              - code [ref=e283]: allowedTools
+              - text: "to auto-approve invocations. Each subagent runs with its own context window and its own tool set, which is the isolation boundary: a subagent cannot read or pollute the parent context, and its narrower tool list limits blast radius. Subagent messages carry"
+              - code [ref=e284]: parent_tool_use_id
+              - text: for attribution and cost tracking. Sessions resume by capturing
+              - code [ref=e285]: session_id
+              - text: from the init system message and passing
+              - code [ref=e286]: options.resume
+              - text: .
+            - heading "MCP and tool integration" [level=3] [ref=e287]
+            - paragraph [ref=e288]:
+              - text: MCP servers attach via
+              - code [ref=e289]: options.mcpServers
+              - text: ", for example"
+              - code [ref=e290]: "{playwright: {command: \"npx\", args: [\"@playwright/mcp@latest\"]}}"
+              - text: . That single line of config is the deepest MCP integration of any framework in this guide and connects the agent to any of the 200-plus MCP servers (GitHub, Slack, Postgres, Notion, and others). For tool integration patterns where you need to run untrusted generated code, route Bash and code execution through an isolated sandbox rather than the host shell.
+          - generic [ref=e291]:
+            - heading "2. OpenAI Agents SDK" [level=2] [ref=e292]
+            - paragraph [ref=e293]: "OpenAI shipped the Agents SDK in March 2025 as Swarm's production successor. Where Swarm was an experimental sketch of multi-agent patterns, the Agents SDK is what you deploy. The core primitives: Agents (LLMs with instructions and tools), Handoffs (transferring control between agents), Guardrails (input/output validation), and Tracing (built-in debugging)."
+            - paragraph [ref=e294]:
+              - text: The handoff model is the cleanest in the ecosystem. When Agent A decides to delegate to Agent B, it executes a specialized tool call (
+              - code [ref=e295]: transfer_to_agent_b
+              - text: ) that passes control along with conversation history. No shared state bus, no message queues. The simplicity is the point.
+            - heading "Architecture" [level=3] [ref=e296]
+            - paragraph [ref=e297]: "The SDK runs an agentic loop: the agent receives input, calls tools or makes handoffs, and the loop continues until the agent produces a final output or a guardrail trips. Guardrails run in parallel with agent execution by default. If a guardrail fails, execution stops immediately, even mid-generation. Three guardrail types: input (validates user messages), output (validates final responses), and tool (wraps individual tool calls)."
+            - heading "Strengths" [level=3] [ref=e298]
+            - list [ref=e299]:
+              - listitem [ref=e300]: "Cleanest handoff model: agent-to-agent delegation as typed tool calls"
+              - listitem [ref=e301]: Three-tier guardrails (input, output, tool) running in parallel by default
+              - listitem [ref=e302]: Built-in tracing with the OpenAI Traces dashboard for debugging
+              - listitem [ref=e303]: Voice agent support via gpt-realtime with interruption detection
+              - listitem [ref=e304]: "Lightweight: very few abstractions, fast to prototype"
+            - heading "Weaknesses" [level=3] [ref=e305]
+            - list [ref=e306]:
+              - listitem [ref=e307]: No built-in state persistence (you manage checkpointing yourself)
+              - listitem [ref=e308]: Handoffs are linear chains, not arbitrary graph topologies
+              - listitem [ref=e309]: No native A2A support for cross-vendor agent discovery
+              - listitem [ref=e310]: Voice features lock you into OpenAI-specific models
+            - paragraph [ref=e311]:
+              - strong [ref=e312]: "When to use:"
+              - text: You need a lightweight framework where multi-agent coordination is handled through explicit handoffs, not complex orchestration graphs. Customer service routing, triage systems, and pipeline-style workflows where Agent A always hands off to Agent B or Agent C.
+          - generic [ref=e313]:
+            - heading "3. Google ADK (Agent Development Kit)" [level=2] [ref=e314]
+            - paragraph [ref=e315]: "Google ADK launched with a clear thesis: agent development should feel like software development. The framework is model-agnostic and deployment-agnostic, though it is optimized for Gemini and the Google Cloud ecosystem. What sets it apart: four language SDKs (Python, TypeScript, Java, Go), native A2A support, and a visual Agent Designer in the Google Cloud console."
+            - paragraph [ref=e316]: ADK Java 1.0 and ADK Go 1.0 both shipped in early 2026. This matters because most AI agent frameworks are Python-only, which forces enterprise Java and Go teams to maintain separate stacks. ADK lets a Python agent talk to a Java agent via A2A without either side knowing the other's language.
+            - heading "Architecture" [level=3] [ref=e317]
+            - paragraph [ref=e318]:
+              - text: ADK builds hierarchical agent trees. A parent agent delegates to child agents, each with their own tools and capabilities. The
+              - code [ref=e319]: to_a2a()
+              - text: function auto-generates Agent Cards (JSON capability descriptions) from your ADK agent, enabling discovery by external agents. The Agent Designer provides low-code visual design for prototyping before transitioning to code.
+            - heading "Strengths" [level=3] [ref=e320]
+            - list [ref=e321]:
+              - listitem [ref=e322]: "Four language SDKs: Python, TypeScript, Java, Go (widest language support)"
+              - listitem [ref=e323]: Native A2A protocol with auto-generated Agent Cards
+              - listitem [ref=e324]: Agent Designer for visual low-code prototyping
+              - listitem [ref=e325]: OpenTelemetry integration for distributed tracing
+              - listitem [ref=e326]: Deploys to Vertex AI Agent Engine for managed scaling
+            - heading "Weaknesses" [level=3] [ref=e327]
+            - list [ref=e328]:
+              - listitem [ref=e329]: Heavy Google Cloud dependency for production deployments
+              - listitem [ref=e330]: More manual plumbing for security compared to provider-native SDKs
+              - listitem [ref=e331]: MCP support is through adapters, not native integration
+              - listitem [ref=e332]: Community is smaller than LangChain or CrewAI ecosystems
+            - paragraph [ref=e333]:
+              - strong [ref=e334]: "When to use:"
+              - text: Enterprise teams that need multi-language agent systems. Organizations already on Google Cloud. Any project that requires cross-vendor agent discovery via A2A. If your agents need to advertise capabilities and be discovered by agents you did not build, ADK's A2A support is the most mature.
+          - generic [ref=e335]:
+            - heading "4. LangGraph (LangChain)" [level=2] [ref=e336]
+            - paragraph [ref=e337]: LangGraph treats agents as state machines. Nodes are functions. Edges are transitions (conditional or unconditional). State is immutable and checkpointed after every step. This is the framework you reach for when your agent workflow has branches, retries, human approval gates, and needs to survive server restarts.
+            - paragraph [ref=e338]: The persistence layer is the real differentiator. MemorySaver, SqliteSaver, and PostgresSaver checkpoint state after every node execution. If your agent crashes mid-workflow, it resumes from the last checkpoint. Time-travel debugging lets you roll back to any previous state and replay with different parameters. No other framework in this list offers comparable crash recovery out of the box.
+            - heading "Architecture" [level=3] [ref=e339]
+            - paragraph [ref=e340]: Directed acyclic graphs (or cyclic, if your workflow loops) with typed state that flows through nodes. Each node can modify state, call tools, or invoke sub-graphs. Conditional edges route based on state values. LangSmith provides observability with trace visualization, token tracking, and latency breakdowns.
+            - heading "Strengths" [level=3] [ref=e341]
+            - list [ref=e342]:
+              - listitem [ref=e343]: Persistent checkpointing with automatic crash recovery
+              - listitem [ref=e344]: "Time-travel debugging: roll back and replay from any state"
+              - listitem [ref=e345]: Graph visualization for complex multi-step workflows
+              - listitem [ref=e346]: Human-in-the-loop gates at any node (pause, wait for approval, resume)
+              - listitem [ref=e347]: LangSmith observability with tracing, evaluation, and monitoring
+            - heading "Weaknesses" [level=3] [ref=e348]
+            - list [ref=e349]:
+              - listitem [ref=e350]: Overkill for simple single-agent use cases
+              - listitem [ref=e351]: Graph-based design requires more upfront architectural thinking
+              - listitem [ref=e352]: LangChain dependency adds weight (you get the full abstraction stack)
+              - listitem [ref=e353]: Debugging graph state transitions is harder than debugging linear code
+            - paragraph [ref=e354]:
+              - strong [ref=e355]: "When to use:"
+              - text: Complex workflows with branching logic, retries, and human approval steps. Document review pipelines, multi-step research tasks, or any agent system where "what happens when it crashes at step 7 of 12" is a real concern. If you need checkpointing and recovery, LangGraph is the default choice.
+          - generic [ref=e356]:
+            - heading "5. CrewAI" [level=2] [ref=e357]
+            - paragraph [ref=e358]: CrewAI models multi-agent collaboration as a team. You define agents with roles, backstories, and goals, then assemble them into a crew with tasks. A Researcher agent gathers data. A Writer agent drafts content. A Reviewer agent checks quality. The metaphor is intuitive, and that is both its strength and its limitation.
+            - paragraph [ref=e359]:
+              - text: At 52,400+ GitHub stars and roughly 5 million monthly downloads (27 million-plus on PyPI overall), CrewAI has the largest community among multi-agent frameworks. Version 1.14.6 (May 2026) ships native MCP support through
+              - code [ref=e360]: crewai-tools[mcp]
+              - text: and A2A task delegation. The framework manages connection lifecycle, transport negotiation (Stdio, SSE, Streamable HTTPS), and tool discovery automatically.
+            - heading "Architecture" [level=3] [ref=e361]
+            - paragraph [ref=e362]: "Role-based agents execute sequential or parallel tasks within a crew. The framework handles task dependency resolution: if Task B depends on Task A's output, CrewAI ensures execution order. A2A support allows agents in one crew to delegate to agents in another, which is useful when different teams maintain different agent systems."
+            - heading "Strengths" [level=3] [ref=e363]
+            - list [ref=e364]:
+              - listitem [ref=e365]: "Fastest setup: define agents with natural language role descriptions"
+              - listitem [ref=e366]: Native MCP and A2A protocol support
+              - listitem [ref=e367]: 52,400+ GitHub stars, ~5M monthly downloads (largest community)
+              - listitem [ref=e368]: Automatic task dependency resolution and execution ordering
+              - listitem [ref=e369]: ~2 billion agent executions across the prior 12 months
+            - heading "Weaknesses" [level=3] [ref=e370]
+            - list [ref=e371]:
+              - listitem [ref=e372]: Role-playing abstraction adds performance overhead (extra LLM calls for "staying in character")
+              - listitem [ref=e373]: Less control over execution flow than graph-based alternatives
+              - listitem [ref=e374]: Debugging multi-agent interactions is opaque (hard to trace why Agent A delegated to Agent B)
+              - listitem [ref=e375]: Python only
+            - paragraph [ref=e376]:
+              - strong [ref=e377]: "When to use:"
+              - text: Rapid prototyping of multi-agent workflows where the team metaphor maps naturally to your problem. Content generation pipelines, research teams, QA workflows. Avoid for latency-sensitive systems where the role-playing overhead matters.
+          - generic [ref=e378]:
+            - heading "6. Smolagents (Hugging Face)" [level=2] [ref=e379]
+            - paragraph [ref=e380]:
+              - text: Smolagents is the minimalist entry. The entire agent logic fits in roughly 1,000 lines of code (
+              - code [ref=e381]: agents.py
+              - text: "). The key insight: instead of generating JSON tool calls, CodeAgent writes Python code snippets that invoke tools directly. This approach reduces LLM calls by about 30% compared to standard tool-calling methods on complex benchmarks."
+            - paragraph [ref=e382]: "At 26,000+ GitHub stars with active commits through March 2026, Smolagents has grown fast. It is model-agnostic: local Transformers models, Ollama, OpenAI, Anthropic, and others via LiteLLM. For security, code execution runs in sandboxed environments through E2B, Modal, Docker, or Pyodide+Deno WebAssembly."
+            - heading "Architecture" [level=3] [ref=e383]
+            - paragraph [ref=e384]: "Two agent types: CodeAgent (generates Python tool invocations) and ToolCallingAgent (uses standard function calling). CodeAgent is the default and the reason to choose Smolagents. The agent generates a code snippet, the framework executes it in a sandbox, captures the output, and feeds it back. Multi-agent support through agent hierarchies where a manager agent delegates to specialized sub-agents."
+            - heading "Strengths" [level=3] [ref=e385]
+            - list [ref=e386]:
+              - listitem [ref=e387]: ~1,000 lines of core logic (easiest to understand and modify)
+              - listitem [ref=e388]: Code-generating agents reduce LLM calls by ~30% vs tool-calling
+              - listitem [ref=e389]: "Model-agnostic: local models, cloud APIs, or any LiteLLM-supported provider"
+              - listitem [ref=e390]: Sandbox execution via E2B, Modal, Docker, or WebAssembly
+              - listitem [ref=e391]: Free Hugging Face Agents course for onboarding
+            - heading "Weaknesses" [level=3] [ref=e392]
+            - list [ref=e393]:
+              - listitem [ref=e394]: No built-in persistence or checkpointing
+              - listitem [ref=e395]: Multi-agent capabilities are basic compared to CrewAI or LangGraph
+              - listitem [ref=e396]: Code execution agents have a larger attack surface than tool-calling agents
+              - listitem [ref=e397]: Python only
+            - paragraph [ref=e398]:
+              - strong [ref=e399]: "When to use:"
+              - text: You want the simplest possible agent framework, prefer code generation over JSON tool calling, or need to run agents on open-source models locally. Research teams and prototypers who want to understand every line of agent logic. Not ideal for complex multi-agent orchestration.
+          - generic [ref=e400]:
+            - heading "7. Pydantic AI" [level=2] [ref=e401]
+            - paragraph [ref=e402]: "Pydantic AI is not a multi-agent framework. It is a type-safe agent framework built by the Pydantic team, the same people whose validation library powers OpenAI, Anthropic, Google, and LangChain under the hood. The design philosophy mirrors FastAPI: type hints drive everything, and your IDE catches errors before runtime."
+            - paragraph [ref=e403]: "Three structured output methods: Tool Output (tool calls produce typed results), Native Output (model generates JSON matching a schema), and Prompted Output (schema injected into instructions, plain text parsed). Streamed structured output with immediate validation means you get typed data as it generates, not after."
+            - heading "Architecture" [level=3] [ref=e404]
+            - paragraph [ref=e405]: Single-agent by design. You define an agent with a system prompt, result type (a Pydantic model), and tools. The framework handles schema generation, validation, retries on malformed output, and streaming. No orchestration layer, no multi-agent primitives. If you need multi-agent, compose Pydantic AI agents manually or use it inside another framework.
+            - heading "Strengths" [level=3] [ref=e406]
+            - list [ref=e407]:
+              - listitem [ref=e408]: "Fully type-safe: IDE autocompletion and type checking catch errors at write-time"
+              - listitem [ref=e409]: Three structured output methods (tool, native, prompted) with automatic fallbacks
+              - listitem [ref=e410]: Streamed structured output with real-time validation
+              - listitem [ref=e411]: "Model-agnostic: OpenAI, Anthropic, Gemini, Mistral, Ollama, Groq"
+              - listitem [ref=e412]: 16k+ GitHub stars, built by the Pydantic team (trusted validation layer)
+            - heading "Weaknesses" [level=3] [ref=e413]
+            - list [ref=e414]:
+              - listitem [ref=e415]: No multi-agent orchestration (single-agent only)
+              - listitem [ref=e416]: No MCP or A2A protocol support
+              - listitem [ref=e417]: Python only
+              - listitem [ref=e418]: Not suited for complex workflows (no state persistence, no graph execution)
+            - paragraph [ref=e419]:
+              - strong [ref=e420]: "When to use:"
+              - text: You need reliable structured output from LLMs and type safety is a priority. Data extraction pipelines, form processing, classification tasks, or any use case where "the model must return data matching this exact schema" is the core requirement. Pair with LangGraph or CrewAI if you also need orchestration.
+          - generic [ref=e421]:
+            - heading "8. AutoGen / Microsoft Agent Framework" [level=2] [ref=e422]
+            - paragraph [ref=e423]: "AutoGen pioneered the multi-agent conversation pattern: agents talk to each other in group chats, debate solutions, and reach consensus. A 4-agent debate with 5 rounds is 20 LLM calls minimum. That cost is the trade-off for AutoGen's unique strength: human-in-the-loop conversations where an agent can pause, ask a human for input, and resume."
+            - paragraph [ref=e424]: "The major 2026 development: Microsoft merged AutoGen and Semantic Kernel into the Microsoft Agent Framework. Release Candidate shipped February 19, 2026, and 1.0 GA shipped April 3, 2026 with stable APIs and a long-term-support commitment. AutoGen continues to receive bug fixes and security patches, but new features go into the unified framework. Greenfield projects should target Microsoft Agent Framework 1.0 directly."
+            - heading "Architecture" [level=3] [ref=e425]
+            - paragraph [ref=e426]: AutoGen v0.4 introduced an asynchronous, event-driven architecture with stronger observability. Agent Framework 1.0 keeps AutoGen's simple agent abstractions and adds Semantic Kernel's enterprise features (session-based state, type safety, middleware, telemetry, Azure AI integration), plus graph-based workflows and the orchestration patterns sequential, concurrent, handoff, group chat, and Magentic-One. It ships native MCP and A2A support across .NET and Python. Agents communicate through conversation turns with configurable termination conditions (max turns, keyword triggers, human approval).
+            - heading "Strengths" [level=3] [ref=e427]
+            - list [ref=e428]:
+              - listitem [ref=e429]: "Best human-in-the-loop support: agents pause for human input mid-conversation"
+              - listitem [ref=e430]: GroupChat pattern for multi-agent debate and consensus building
+              - listitem [ref=e431]: Agent Framework 1.0 (GA April 3, 2026) merges AutoGen + Semantic Kernel
+              - listitem [ref=e432]: Python and .NET support with native MCP and A2A (Azure ecosystem)
+              - listitem [ref=e433]: Graph-based workflows plus sequential, concurrent, handoff, and Magentic-One patterns
+            - heading "Weaknesses" [level=3] [ref=e434]
+            - list [ref=e435]:
+              - listitem [ref=e436]: "Token cost: every agent turn in GroupChat is a full LLM call with accumulated history"
+              - listitem [ref=e437]: AutoGen is in maintenance mode (new features go to Microsoft Agent Framework 1.0)
+              - listitem [ref=e438]: Existing AutoGen and Semantic Kernel projects still need a migration pass to 1.0
+              - listitem [ref=e439]: Production deployment leans on the Azure ecosystem
+            - paragraph [ref=e440]:
+              - strong [ref=e441]: "When to use:"
+              - text: Systems where agents need to deliberate, humans need to intervene mid-workflow, or you are already in the Microsoft/Azure ecosystem. Research applications where multi-agent debate produces better results than single-agent reasoning. Avoid for latency-sensitive pipelines where 20+ LLM calls per interaction is too expensive.
+          - generic [ref=e442]:
+            - 'heading "Protocol Layer: MCP, ACP, and A2A" [level=2] [ref=e443]'
+            - paragraph [ref=e444]: Frameworks define how you build agents. Protocols define how agents connect to the outside world and to each other. Three protocols matter in 2026, and understanding the boundary between them prevents you from using the wrong tool for the wrong problem.
+            - generic [ref=e445]:
+              - generic [ref=e446]: Protocol vs Framework
+              - generic [ref=e447]: Protocols are communication standards. Frameworks are development tools. MCP defines how to invoke tools. A2A defines how to invoke agents. Frameworks like CrewAI and Google ADK implement these protocols. The protocol choice constrains your interoperability. The framework choice constrains your development experience.
+            - heading "MCP (Model Context Protocol)" [level=3] [ref=e448]
+            - paragraph [ref=e449]: "Created by Anthropic. MCP standardizes how AI models access tools, APIs, and data sources. JSON-RPC client-server interface with typed data exchange. Think of it as \"USB for AI tools.\" Connect once, works everywhere that speaks MCP. Over 200 server implementations exist: GitHub, Slack, Google Drive, PostgreSQL, Notion, Jira, Salesforce, and more."
+            - paragraph [ref=e450]:
+              - text: MCP handles
+              - strong [ref=e451]: vertical integration
+              - text: ": application-to-model. It answers \"how does my agent call this tool?\" It does not answer \"how do two agents talk to each other.\" MCP is stateless at the protocol level, though individual servers can implement their own state."
+            - heading "ACP (Agent Communication Protocol)" [level=3] [ref=e452]
+            - paragraph [ref=e453]: Developed by IBM Research as part of the BeeAI platform. ACP introduced REST-native messaging, multimodal agent communication, and asynchronous streaming for agent-to-agent coordination. Agents could discover each other, delegate tasks, and exchange information in a shared local environment.
+            - paragraph [ref=e454]: In late 2025, the ACP team joined Google's A2A protocol under the Linux Foundation. The merger preserved ACP's RESTful simplicity while incorporating A2A's enterprise features. New projects should target A2A directly. ACP's contribution lives on in A2A's REST-native endpoints and multimodal message format.
+            - heading "A2A (Agent-to-Agent Protocol)" [level=3] [ref=e455]
+            - paragraph [ref=e456]: "Google's protocol, now the unified standard for agent-to-agent communication under the Linux Foundation. A2A enables peer-to-peer task outsourcing through Agent Cards: JSON documents that describe an agent's identity, capabilities, skills, and authentication requirements. Any agent can discover any other agent by reading its Agent Card."
+            - paragraph [ref=e457]:
+              - text: A2A handles
+              - strong [ref=e458]: horizontal integration
+              - text: ": agent-to-agent. Three state management levels: session-level context, agent-level internal state, and task-level persistence through TaskStore. 50+ launch partners including Google, Salesforce, SAP, and others."
+            - figure "Protocol Comparison (June 2026)" [ref=e459]:
+              - generic [ref=e460]: Protocol Comparison (June 2026)
+              - table [ref=e462]:
+                - rowgroup [ref=e463]:
+                  - row "Protocol Purpose Direction Transport Status" [ref=e464]:
+                    - columnheader "Protocol" [ref=e465]
+                    - columnheader "Purpose" [ref=e466]
+                    - columnheader "Direction" [ref=e467]
+                    - columnheader "Transport" [ref=e468]
+                    - columnheader "Status" [ref=e469]
+                - rowgroup [ref=e470]:
+                  - row "MCP Model-to-tool access Vertical (app to model) JSON-RPC Active, 200+ servers" [ref=e471]:
+                    - cell "MCP" [ref=e472]
+                    - cell "Model-to-tool access" [ref=e473]
+                    - cell "Vertical (app to model)" [ref=e474]
+                    - cell "JSON-RPC" [ref=e475]
+                    - cell "Active, 200+ servers" [ref=e476]
+                  - row "A2A Agent-to-agent tasks Horizontal (peer-to-peer) REST + streaming Active, absorbed ACP" [ref=e477]:
+                    - cell "A2A" [ref=e478]
+                    - cell "Agent-to-agent tasks" [ref=e479]
+                    - cell "Horizontal (peer-to-peer)" [ref=e480]
+                    - cell "REST + streaming" [ref=e481]
+                    - cell "Active, absorbed ACP" [ref=e482]
+                  - row "ACP Agent communication Horizontal (local env) REST-native Merged into A2A (2025)" [ref=e483]:
+                    - cell "ACP" [ref=e484]
+                    - cell "Agent communication" [ref=e485]
+                    - cell "Horizontal (local env)" [ref=e486]
+                    - cell "REST-native" [ref=e487]
+                    - cell "Merged into A2A (2025)" [ref=e488]
+            - heading "Which frameworks support which protocols?" [level=3] [ref=e489]
+            - paragraph [ref=e490]:
+              - strong [ref=e491]: MCP support
+              - text: is widespread. Claude Agent SDK has the deepest integration. CrewAI supports it natively via
+              - code [ref=e492]: crewai-tools[mcp]
+              - text: . LangGraph integrates MCP servers as tools via adapters. Google ADK, Smolagents, and OpenAI products all have some level of MCP compatibility.
+            - paragraph [ref=e493]:
+              - strong [ref=e494]: A2A support
+              - text: is narrower. Google ADK has native A2A with auto-generated Agent Cards. CrewAI added A2A task delegation in 2026. Most other frameworks have no A2A support yet. If cross-vendor agent interoperability matters to your architecture, this limits your choices to ADK or CrewAI.
+          - generic [ref=e495]:
+            - heading "Multi-Agent Patterns That Actually Ship" [level=2] [ref=e496]
+            - paragraph [ref=e497]: The 2026 multi-agent landscape organizes into four patterns. Each framework excels at one or two. None does all four well.
+            - generic [ref=e498]:
+              - generic [ref=e499]:
+                - heading "Subagents (delegation)" [level=3] [ref=e500]:
+                  - generic [ref=e501]: Subagents (delegation)
+                - paragraph [ref=e502]: A supervisor agent delegates tasks to specialized child agents, each with their own tools and context. Claude Agent SDK and Google ADK use this pattern. Clean separation of concerns, but the supervisor becomes a bottleneck.
+              - generic [ref=e503]:
+                - heading "Handoffs (relay)" [level=3] [ref=e504]:
+                  - generic [ref=e505]: Handoffs (relay)
+                - paragraph [ref=e506]: Agent A finishes its portion and passes control to Agent B. OpenAI Agents SDK does this best. Simple to reason about, but limited to linear or branching chains.
+              - generic [ref=e507]:
+                - heading "Crews (role-play)" [level=3] [ref=e508]:
+                  - generic [ref=e509]: Crews (role-play)
+                - paragraph [ref=e510]: Agents take on roles (Researcher, Writer, Reviewer) and collaborate on shared tasks. CrewAI's core pattern. Intuitive for content and research workflows, but the role-playing abstraction adds token overhead.
+              - generic [ref=e511]:
+                - heading "Conversations (debate)" [level=3] [ref=e512]:
+                  - generic [ref=e513]: Conversations (debate)
+                - paragraph [ref=e514]: Agents discuss in a group chat, debating until they reach consensus. AutoGen's pattern. Produces high-quality outputs through deliberation, but costs 20+ LLM calls per interaction.
+            - paragraph [ref=e515]: "Anthropic's research found multi-agent architectures outperform single-agent benchmarks by up to 90% when parallel sub-agents are coordinated by a lead planner. Cognition measured that coding agents spend 60% of their time on search, not generation. These numbers argue for specialization: a search agent, a generation agent, and an orchestrator."
+            - paragraph [ref=e516]: The pattern you choose determines your cost profile. Subagents are cheap (one LLM call per delegation). Conversations are expensive (N agents x M rounds). Handoffs land in the middle. Match the pattern to the problem, not the other way around.
+          - generic [ref=e517]:
+            - heading "When to Use Each Framework" [level=2] [ref=e518]
+            - paragraph [ref=e519]: Decision trees are more useful than feature matrices. Here is how to pick based on what you are actually building.
+            - generic [ref=e520]:
+              - generic [ref=e521]:
+                - heading "Building a coding agent?" [level=3] [ref=e522]:
+                  - generic [ref=e523]: Building a coding agent?
+                - paragraph [ref=e524]: Claude Agent SDK. Deepest OS access, built-in file and shell tools, strongest MCP ecosystem. No other framework makes 'give the agent a computer' this easy.
+              - generic [ref=e525]:
+                - heading "Customer service routing?" [level=3] [ref=e526]:
+                  - generic [ref=e527]: Customer service routing?
+                - paragraph [ref=e528]: OpenAI Agents SDK. Handoff model maps directly to triage > specialist > escalation flows. Guardrails catch bad inputs before they reach specialist agents.
+              - generic [ref=e529]:
+                - heading "Enterprise multi-language?" [level=3] [ref=e530]:
+                  - generic [ref=e531]: Enterprise multi-language?
+                - paragraph [ref=e532]: Google ADK. Python, TypeScript, Java, and Go SDKs. A2A Agent Cards for cross-team agent discovery. Vertex AI Agent Engine for managed deployment.
+              - generic [ref=e533]:
+                - heading "Complex stateful workflows?" [level=3] [ref=e534]:
+                  - generic [ref=e535]: Complex stateful workflows?
+                - paragraph [ref=e536]: LangGraph. Persistent checkpointing, crash recovery, time-travel debugging. The only framework where 'what happens when step 7 fails' has a first-class answer.
+              - generic [ref=e537]:
+                - heading "Quick prototyping?" [level=3] [ref=e538]:
+                  - generic [ref=e539]: Quick prototyping?
+                - paragraph [ref=e540]: CrewAI. Define agents by role in natural language, connect MCP tools, ship a working prototype in hours. Refactor to a more structured framework later if needed.
+              - generic [ref=e541]:
+                - heading "Structured data extraction?" [level=3] [ref=e542]:
+                  - generic [ref=e543]: Structured data extraction?
+                - paragraph [ref=e544]: Pydantic AI. Type-safe schemas, three output methods, streaming validation. Pair with LangGraph or CrewAI if you also need orchestration.
+              - generic [ref=e545]:
+                - heading "Open-source model agents?" [level=3] [ref=e546]:
+                  - generic [ref=e547]: Open-source model agents?
+                - paragraph [ref=e548]: Smolagents. Model-agnostic with LiteLLM, code-generating agents that reduce LLM calls by 30%, sandboxed execution. The simplest framework to fork and modify.
+              - generic [ref=e549]:
+                - heading "Human-in-the-loop deliberation?" [level=3] [ref=e550]:
+                  - generic [ref=e551]: Human-in-the-loop deliberation?
+                - paragraph [ref=e552]: AutoGen / Microsoft Agent Framework. GroupChat debates, human approval gates, Azure integration. Accept the token cost if deliberation quality matters more than latency.
+          - generic [ref=e553]:
+            - heading "Running Open-Source Models Underneath the Framework" [level=2] [ref=e554]
+            - paragraph [ref=e555]: "The framework routes intent. A model executes it. Most of the frameworks here (LangGraph, CrewAI, Smolagents, Pydantic AI) are model-agnostic, which means the bigger lever on agent cost and quality is the inference endpoint you point them at, not the orchestration library. For agents built on open-source models like DeepSeek, two things decide output quality: whether the provider quantizes, and whether the inference stack is tuned for code."
+            - generic [ref=e556]:
+              - generic [ref=e557]: Why activation precision matters for DeepSeek
+              - generic [ref=e558]:
+                - text: Most serverless providers quantize activations to fp8 to cut cost, which degrades output quality.
+                - link "Morph" [ref=e559] [cursor=pointer]:
+                  - /url: /products/models
+                - text: serves DeepSeek with 16-bit (bf16) activations, no fp8 or int8 quantization, so responses match the reference weights. When output fidelity matters, that makes Morph the best place to run DeepSeek.
+            - paragraph [ref=e560]:
+              - text: For coding agents specifically, Morph runs codegen-tuned speculative decoding plus custom low-level inference kernels built for code generation. These are not a general-purpose menu; they make Morph the fastest and highest-quality option for code agents in particular.
+              - code [ref=e561]: morph-v3-fast
+              - text: applies code edits at ~10,500 tok/s.
+            - figure "Morph Open Source Models pricing (June 2026)" [ref=e562]:
+              - generic [ref=e563]: Morph Open Source Models pricing (June 2026)
+              - table [ref=e565]:
+                - rowgroup [ref=e566]:
+                  - row "Model Input ($/1M tokens) Output ($/1M tokens) Notes" [ref=e567]:
+                    - columnheader "Model" [ref=e568]
+                    - columnheader "Input ($/1M tokens)" [ref=e569]
+                    - columnheader "Output ($/1M tokens)" [ref=e570]
+                    - columnheader "Notes" [ref=e571]
+                - rowgroup [ref=e572]:
+                  - row "morph-dsv4flash (DeepSeek V4 Flash) $0.139 $0.278 16-bit activations, no quantization" [ref=e573]:
+                    - cell "morph-dsv4flash (DeepSeek V4 Flash)" [ref=e574]
+                    - cell "$0.139" [ref=e575]
+                    - cell "$0.278" [ref=e576]
+                    - cell "16-bit activations, no quantization" [ref=e577]
+                  - row "WarpGrep (code search) $0 / 100k requests (free) $1 / 1M requests (Pro) Request-priced, not token-priced" [ref=e578]:
+                    - cell "WarpGrep (code search)" [ref=e579]
+                    - cell "$0 / 100k requests (free)" [ref=e580]
+                    - cell "$1 / 1M requests (Pro)" [ref=e581]
+                    - cell "Request-priced, not token-priced" [ref=e582]
+            - paragraph [ref=e583]:
+              - text: Morph is framework-agnostic. Point Claude Agent SDK, LangGraph, CrewAI, or OpenAI Agents SDK at the endpoint and the API does not care which framework dispatched the request. See
+              - link "Models" [ref=e584] [cursor=pointer]:
+                - /url: /products/models
+              - text: and
+              - link "Pricing" [ref=e585] [cursor=pointer]:
+                - /url: /pricing
+              - text: for the full catalog.
+            - generic [ref=e586]:
+              - heading "Run DeepSeek and codegen models at full precision" [level=3] [ref=e587]
+              - paragraph [ref=e588]: Morph serves DeepSeek with 16-bit activations and codegen-tuned speculative decoding. morph-dsv4flash is $0.139 per 1M input tokens. Works with any AI agent framework.
+              - generic [ref=e589]:
+                - link "View Models" [ref=e590] [cursor=pointer]:
+                  - /url: /products/models
+                  - generic [ref=e592]: View Models
+                - link "See Pricing" [ref=e593] [cursor=pointer]:
+                  - /url: /pricing
+                  - generic [ref=e595]: See Pricing
+          - generic [ref=e596]:
+            - heading "FAQ" [level=2] [ref=e597]
+            - heading "What is the best AI agent framework in 2026?" [level=3] [ref=e598]
+            - paragraph [ref=e599]: There is no single best. Claude Agent SDK for coding agents with deep OS access. OpenAI Agents SDK for lightweight handoff chains. Google ADK for multi-language enterprise systems. LangGraph for stateful workflows with persistence. CrewAI for rapid prototyping. Microsoft Agent Framework 1.0 (GA April 3, 2026) for .NET and Azure. The best framework is the one that matches your specific orchestration pattern and deployment constraints.
+            - heading "What AI agent frameworks were released or updated in 2026?" [level=3] [ref=e600]
+            - paragraph [ref=e601]: Microsoft Agent Framework reached RC on February 19, 2026 and 1.0 GA on April 3, 2026, unifying AutoGen and Semantic Kernel with native MCP and A2A. Google shipped ADK Java 1.0 and Go 1.0 in early 2026, giving it four language SDKs. CrewAI reached 1.14.6 (52.4k stars) by May 2026. Anthropic's Claude Agent SDK began drawing subscription usage from a separate monthly Agent SDK credit on June 15, 2026.
+            - heading "What are the core primitives of the Claude Agent SDK?" [level=3] [ref=e602]
+            - paragraph [ref=e603]:
+              - text: The core primitive is the async
+              - code [ref=e604]: query()
+              - text: generator that you iterate for streamed messages. Built-in tools include Read, Write, Edit, Bash, Glob, Grep, WebSearch, WebFetch, and AskUserQuestion, scoped through
+              - code [ref=e605]: allowedTools
+              - text: . Lifecycle hooks (PreToolUse, PostToolUse, Stop, SessionStart, SessionEnd, UserPromptSubmit) are in-process callbacks registered on
+              - code [ref=e606]: options.hooks
+              - text: . Subagents are defined on
+              - code [ref=e607]: options.agents
+              - text: with their own context window and tools, and MCP servers attach via
+              - code [ref=e608]: options.mcpServers
+              - text: . See the primitive reference section above for the full schema, streaming, and isolation details.
+            - heading "What is the difference between MCP, ACP, and A2A?" [level=3] [ref=e609]
+            - paragraph [ref=e610]: "MCP (Model Context Protocol) handles vertical integration: connecting AI models to tools and data sources via JSON-RPC. A2A (Agent-to-Agent Protocol) handles horizontal integration: agents discovering each other and delegating tasks via Agent Cards and REST endpoints. ACP (Agent Communication Protocol) was IBM's REST-native standard for agent communication that merged into A2A under the Linux Foundation in late 2025. Use MCP for tool access. Use A2A for agent-to-agent coordination."
+            - heading "Which AI agent frameworks support MCP?" [level=3] [ref=e611]
+            - paragraph [ref=e612]: Claude Agent SDK has the deepest MCP integration. CrewAI supports MCP natively. LangGraph and Google ADK integrate MCP via adapters. OpenAI adopted MCP across its products. Smolagents supports MCP tool servers. Most major frameworks have some MCP compatibility, but depth of integration varies significantly.
+            - heading "Should I use a provider-native SDK or an independent framework?" [level=3] [ref=e613]
+            - paragraph [ref=e614]: Provider-native SDKs (Claude, OpenAI, Google) offer tighter model integration and simpler setup but create vendor lock-in. Independent frameworks (LangGraph, CrewAI, Smolagents) give model flexibility but add abstraction layers. For production systems where you need to swap models, use an independent framework. For maximum integration depth with one provider, use their native SDK.
+            - heading "Is ACP still relevant after merging with A2A?" [level=3] [ref=e615]
+            - paragraph [ref=e616]: ACP as a standalone protocol is no longer actively developed. Its contributions (RESTful simplicity, multimodal messaging) live on inside the A2A specification. New projects should target A2A directly. If you built on ACP, the migration path to A2A preserves the REST patterns you were already using.
+            - heading "How do I choose between LangGraph and CrewAI?" [level=3] [ref=e617]
+            - paragraph [ref=e618]: LangGraph for complex workflows where you need persistence, checkpointing, crash recovery, and fine-grained control over execution flow. CrewAI for rapid prototyping where the team/role metaphor maps naturally to your problem. LangGraph requires more upfront design. CrewAI gets you to a working prototype faster. Many teams prototype in CrewAI and migrate to LangGraph for production.
+  - contentinfo [ref=e619]:
+    - generic [ref=e621]:
+      - generic [ref=e622]:
+        - generic [ref=e623]:
+          - generic [ref=e624]:
+            - img "Morph" [ref=e625]
+            - generic [ref=e626]: Morph
+          - generic [ref=e627]:
+            - paragraph [ref=e628]: Applied research building for the future of codegen.
+            - paragraph [ref=e629]: © 2026 AutoInfra, Inc. All rights reserved.
+        - generic [ref=e630]:
+          - generic [ref=e631]:
+            - link "Follow us on X" [ref=e632] [cursor=pointer]:
+              - /url: https://x.com/morphllm
+              - img [ref=e633]
+            - link "Join our Discord" [ref=e635] [cursor=pointer]:
+              - /url: https://discord.com/invite/AdXta4yxEK
+              - img [ref=e636]
+            - link "Follow us on LinkedIn" [ref=e638] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/morphllm
+              - img [ref=e639]
+            - link "Follow us on LinkedIn" [ref=e641] [cursor=pointer]:
+              - /url: mailto:info@morphllm.com
+              - img [ref=e642]
+          - generic [ref=e645]:
+            - generic [ref=e646]: "Y"
+            - generic [ref=e647]: Backed by Y Combinator
+      - list [ref=e649]:
+        - listitem [ref=e650]:
+          - link "Documentation" [ref=e651] [cursor=pointer]:
+            - /url: https://docs.morphllm.com
+        - listitem [ref=e652]:
+          - link "Blog" [ref=e653] [cursor=pointer]:
+            - /url: /blog
+        - listitem [ref=e654]:
+          - link "Trust Center" [ref=e655] [cursor=pointer]:
+            - /url: https://trust.delve.co/morph
+        - listitem [ref=e656]:
+          - link "Careers We're Hiring!" [ref=e657] [cursor=pointer]:
+            - /url: https://www.ycombinator.com/companies/morph/jobs
+            - text: Careers
+            - generic [ref=e658]: We're Hiring!
+      - list [ref=e660]:
+        - listitem [ref=e661]:
+          - link "Privacy Policy" [ref=e662] [cursor=pointer]:
+            - /url: /privacy
+        - listitem [ref=e663]:
+          - link "Terms of Service" [ref=e664] [cursor=pointer]:
+            - /url: /privacy/tos
+        - listitem [ref=e665]:
+          - link "EULA" [ref=e666] [cursor=pointer]:
+            - /url: /eula
+        - listitem [ref=e667]:
+          - link "Service Status" [ref=e668] [cursor=pointer]:
+            - /url: https://morphllm.betteruptime.com/
+            - text: Service Status
+        - listitem [ref=e670]:
+          - link "Book a Call" [ref=e671] [cursor=pointer]:
+            - /url: https://calendar.app.google/xN2RcfSYtfQERQYG8
+  - region "Notifications alt+T"
+  - alert [ref=e672]
+  - iframe
