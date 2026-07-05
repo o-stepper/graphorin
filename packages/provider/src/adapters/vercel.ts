@@ -288,6 +288,51 @@ async function* streamFromVercel(
         }
         break;
       }
+      // W-024: per-block reasoning terminators. AI SDK v4 streams a
+      // separate 'reasoning-signature' chunk ({signature}) and
+      // 'redacted-reasoning' ({data}); v7 closes each block with
+      // 'reasoning-end' carrying providerMetadata.anthropic.signature /
+      // .redactedData. All three become the Graphorin 'reasoning-end'
+      // event whose meta the retention pipeline round-trips
+      // ('pass-through-claude' -> providerOptions.anthropic.signature).
+      case 'reasoning-signature': {
+        const signature = pickString(chunk.signature);
+        if (!emittedStart) yield startEvent();
+        yield {
+          type: 'reasoning-end',
+          meta: { provider: 'anthropic', ...(signature !== undefined ? { signature } : {}) },
+        };
+        break;
+      }
+      case 'redacted-reasoning': {
+        const data = pickString(chunk.data);
+        if (!emittedStart) yield startEvent();
+        yield {
+          type: 'reasoning-end',
+          meta: { provider: 'anthropic', ...(data !== undefined ? { data } : {}) },
+        };
+        break;
+      }
+      case 'reasoning-end': {
+        const anthropicMeta =
+          typeof chunk.providerMetadata === 'object' && chunk.providerMetadata !== null
+            ? ((chunk.providerMetadata as { anthropic?: unknown }).anthropic as
+                | { signature?: unknown; redactedData?: unknown }
+                | undefined)
+            : undefined;
+        const signature = pickString(anthropicMeta?.signature);
+        const data = pickString(anthropicMeta?.redactedData);
+        if (!emittedStart) yield startEvent();
+        yield {
+          type: 'reasoning-end',
+          meta: {
+            provider: 'anthropic',
+            ...(signature !== undefined ? { signature } : {}),
+            ...(data !== undefined ? { data } : {}),
+          },
+        };
+        break;
+      }
       // PS-6 dual-shape: AI SDK v4 streams `tool-call-streaming-start` /
       // `tool-call-delta` keyed by `toolCallId`/`argsTextDelta`; v7 streams
       // `tool-input-start` / `tool-input-delta` keyed by `id`/`delta`.

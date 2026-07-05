@@ -1,4 +1,4 @@
-import type { Message } from '../types/message.js';
+import type { Message, ReasoningContentMeta } from '../types/message.js';
 import type { Sensitivity } from '../types/sensitivity.js';
 import type { Usage } from '../types/usage.js';
 import type { ReasoningContract, ReasoningRetention } from './reasoning-retention.js';
@@ -170,6 +170,16 @@ export type FinishReason =
 export type ProviderEvent =
   | { readonly type: 'stream-start'; readonly metadata: ResponseMetadata }
   | { readonly type: 'reasoning-delta'; readonly delta: string }
+  /**
+   * Closes the current reasoning block (W-024). Deltas stay textual;
+   * this terminator carries the provider's opaque round-trip metadata
+   * (e.g. the Anthropic thinking-block `signature`, or `data` for a
+   * redacted block) so multi-step tool use with extended thinking can
+   * replay the block byte-equal on the next request. Adapters without
+   * per-block structure simply never emit it - consumers fall back to
+   * collapsing the deltas.
+   */
+  | { readonly type: 'reasoning-end'; readonly meta?: ReasoningContentMeta }
   | { readonly type: 'text-delta'; readonly delta: string }
   | { readonly type: 'tool-call-start'; readonly toolCallId: string; readonly toolName: string }
   | {
