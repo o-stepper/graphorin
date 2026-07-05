@@ -63,6 +63,7 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '028': '@graphorin/memory (rules FTS / runbook recall)',
   '029': '@graphorin/store-sqlite (checkpoint session linkage / erasure cascade)',
   '030': '@graphorin/store-sqlite (span end-time retention index)',
+  '031': '@graphorin/store-sqlite (drop dead trigger_fire_log table)',
 };
 
 const dynamicMigrations: Migration[] = [];

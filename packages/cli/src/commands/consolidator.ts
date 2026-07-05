@@ -199,6 +199,172 @@ export async function runConsolidatorStop(
   }
 }
 
+/** One dead-letter batch as surfaced by `consolidator dlq list`. @stable */
+export interface ConsolidatorDlqEntry {
+  readonly id: string;
+  readonly userId: string | null;
+  readonly phase: string | null;
+  readonly errorKind: string | null;
+  readonly retryCount: number;
+  readonly failedAt: string;
+  /** `true` when retries are exhausted (`next_retry_at IS NULL`). */
+  readonly exhausted: boolean;
+}
+
+/** @stable */
+export interface ConsolidatorDlqListOptions extends ConsolidatorCommonOptions {
+  /** Narrow to one user's batches (`scope_user_id`). */
+  readonly user?: string;
+  readonly limit?: number;
+}
+
+/**
+ * W-065: make the permanent `dead-letter queue: N` status warning
+ * actionable. Operator-level (DB-wide) view, like the `dlqSize`
+ * counter in `runConsolidatorStatus` - `listFailedBatches` on the
+ * store is scoped to one `SessionScope.userId`, which a CLI does not
+ * have; use `--user` to narrow.
+ *
+ * @stable
+ */
+export async function runConsolidatorDlqList(
+  options: ConsolidatorDlqListOptions = {},
+): Promise<ReadonlyArray<ConsolidatorDlqEntry>> {
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+  });
+  try {
+    const conn = ctx.store.connection;
+    const limit = options.limit ?? 100;
+    const rows =
+      options.user !== undefined
+        ? conn.all<DlqRow>(
+            'SELECT id, scope_user_id, phase, error_kind, retry_count, failed_at, next_retry_at FROM consolidator_failed_batches WHERE scope_user_id = ? ORDER BY failed_at DESC LIMIT ?',
+            [options.user, limit],
+          )
+        : conn.all<DlqRow>(
+            'SELECT id, scope_user_id, phase, error_kind, retry_count, failed_at, next_retry_at FROM consolidator_failed_batches ORDER BY failed_at DESC LIMIT ?',
+            [limit],
+          );
+    const out: ReadonlyArray<ConsolidatorDlqEntry> = Object.freeze(
+      rows.map((row) =>
+        Object.freeze({
+          id: row.id,
+          userId: row.scope_user_id,
+          phase: row.phase,
+          errorKind: row.error_kind,
+          retryCount: row.retry_count,
+          failedAt: new Date(row.failed_at).toISOString(),
+          exhausted: row.next_retry_at === null,
+        }),
+      ),
+    );
+    emitReport(options, out, () => {
+      const print = options.print ?? defaultPrintSink;
+      if (out.length === 0) {
+        print(brand('dead-letter queue is empty.'));
+        return;
+      }
+      print(brand(`dead-letter queue: ${out.length} batch(es)`));
+      for (const entry of out) {
+        const state = entry.exhausted ? 'EXHAUSTED' : 'awaiting retry';
+        print(
+          `  ${entry.id}  user=${entry.userId ?? '-'}  phase=${entry.phase ?? '-'}  kind=${entry.errorKind ?? '-'}  retries=${entry.retryCount}  failedAt=${entry.failedAt}  [${state}]`,
+        );
+      }
+    });
+    return out;
+  } finally {
+    await ctx.close();
+  }
+}
+
+/** @stable */
+export interface ConsolidatorDlqClearOptions extends ConsolidatorCommonOptions {
+  /**
+   * Only clear EXHAUSTED batches (`next_retry_at IS NULL`). Default
+   * `true` - batches still awaiting retry belong to
+   * `claimReadyBatches` and are only removed with an explicit
+   * `--exhausted-only=false`.
+   */
+  readonly exhaustedOnly?: boolean;
+  /** ISO date / epoch-ms: only batches that failed before this instant. */
+  readonly before?: string;
+  /** Clear one batch by id. */
+  readonly id?: string;
+  /** Narrow to one user's batches (`scope_user_id`). */
+  readonly user?: string;
+}
+
+/** @stable */
+export interface ConsolidatorDlqClearResult {
+  readonly removed: number;
+}
+
+/**
+ * W-065: clear dead-letter batches. Defaults are conservative:
+ * exhausted-only, all users, no age bound. The batch payload (message
+ * ids) is lost on delete - that is the explicit point of the command.
+ *
+ * @stable
+ */
+export async function runConsolidatorDlqClear(
+  options: ConsolidatorDlqClearOptions = {},
+): Promise<ConsolidatorDlqClearResult> {
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+  });
+  try {
+    const conn = ctx.store.connection;
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    if (options.id !== undefined) {
+      conditions.push('id = ?');
+      params.push(options.id);
+    }
+    if (options.exhaustedOnly !== false) {
+      conditions.push('next_retry_at IS NULL');
+    }
+    if (options.before !== undefined) {
+      const ms = Number.isFinite(Number(options.before))
+        ? Number(options.before)
+        : Date.parse(options.before);
+      if (!Number.isFinite(ms)) {
+        throw new Error(
+          `[graphorin/cli] --before '${options.before}' is not a valid ISO date or epoch-ms value.`,
+        );
+      }
+      conditions.push('failed_at < ?');
+      params.push(ms);
+    }
+    if (options.user !== undefined) {
+      conditions.push('scope_user_id = ?');
+      params.push(options.user);
+    }
+    const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    const result = conn.run(`DELETE FROM consolidator_failed_batches ${where}`, params);
+    const out: ConsolidatorDlqClearResult = Object.freeze({ removed: result.changes ?? 0 });
+    emitReport(options, out, () => {
+      const print = options.print ?? defaultPrintSink;
+      const mark = out.removed > 0 ? statusMarker('ok') : statusMarker('info');
+      print(brand(`${mark} cleared ${out.removed} dead-letter batch(es).`));
+    });
+    return out;
+  } finally {
+    await ctx.close();
+  }
+}
+
+interface DlqRow {
+  readonly id: string;
+  readonly scope_user_id: string | null;
+  readonly phase: string | null;
+  readonly error_kind: string | null;
+  readonly retry_count: number;
+  readonly failed_at: number;
+  readonly next_retry_at: number | null;
+}
+
 function isTier(value: unknown): value is ConsolidatorTier {
   return typeof value === 'string' && (VALID_TIERS as ReadonlyArray<string>).includes(value);
 }

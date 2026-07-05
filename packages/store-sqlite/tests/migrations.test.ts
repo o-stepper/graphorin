@@ -56,7 +56,8 @@ describe('migrations', () => {
     expect(names.has('session_handoffs')).toBe(true);
     expect(names.has('session_workflow_runs')).toBe(true);
     expect(names.has('trigger_state')).toBe(true);
-    expect(names.has('trigger_fire_log')).toBe(true);
+    // Migration 031 dropped the dead trigger_fire_log table (W-065).
+    expect(names.has('trigger_fire_log')).toBe(false);
     expect(names.has('auth_tokens')).toBe(true);
     expect(names.has('oauth_servers')).toBe(true);
     expect(names.has('idempotency_records')).toBe(true);

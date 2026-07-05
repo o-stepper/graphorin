@@ -41,6 +41,8 @@ import {
   runAuthRefresh,
   runAuthRevoke,
   runAuthStatus,
+  runConsolidatorDlqClear,
+  runConsolidatorDlqList,
   runConsolidatorSetTier,
   runConsolidatorStatus,
   runConsolidatorStop,
@@ -837,6 +839,49 @@ function registerConsolidatorCommands(program: Command): void {
         ...(opts.json !== undefined ? { json: opts.json } : {}),
       });
     });
+  c.command('dlq-list')
+    .description('List dead-letter batches (all users; narrow with --user).')
+    .option('--user <id>', 'Only batches scoped to this user id.')
+    .option('--limit <n>', 'Maximum rows to list.', '100')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (opts: { user?: string; limit?: string; config?: string; json?: boolean }) => {
+      await runConsolidatorDlqList({
+        ...(opts.user !== undefined ? { user: opts.user } : {}),
+        ...(opts.limit !== undefined ? { limit: Number(opts.limit) } : {}),
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
+  c.command('dlq-clear')
+    .description(
+      'Delete dead-letter batches. Default: only EXHAUSTED batches (retries used up); batches awaiting retry need --exhausted-only=false.',
+    )
+    .option('--exhausted-only [bool]', 'Only exhausted batches (default true).', 'true')
+    .option('--before <date>', 'Only batches that failed before this ISO date / epoch ms.')
+    .option('--id <id>', 'Clear one batch by id.')
+    .option('--user <id>', 'Only batches scoped to this user id.')
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(
+      async (opts: {
+        exhaustedOnly?: string | boolean;
+        before?: string;
+        id?: string;
+        user?: string;
+        config?: string;
+        json?: boolean;
+      }) => {
+        await runConsolidatorDlqClear({
+          exhaustedOnly: String(opts.exhaustedOnly ?? 'true') !== 'false',
+          ...(opts.before !== undefined ? { before: opts.before } : {}),
+          ...(opts.id !== undefined ? { id: opts.id } : {}),
+          ...(opts.user !== undefined ? { user: opts.user } : {}),
+          ...(opts.config !== undefined ? { config: opts.config } : {}),
+          ...(opts.json !== undefined ? { json: opts.json } : {}),
+        });
+      },
+    );
 }
 
 function registerTriggersCommands(program: Command): void {
