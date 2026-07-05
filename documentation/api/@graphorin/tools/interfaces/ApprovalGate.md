@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ApprovalGate
 
-Defined in: packages/tools/src/executor/executor.ts:286
+Defined in: packages/tools/src/executor/executor.ts:287
 
 Approval gate the executor consults before executing a gated tool.
 
@@ -18,7 +18,7 @@ Approval gate the executor consults before executing a gated tool.
 request(call, approval): Promise<ApprovalDecision>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:291
+Defined in: packages/tools/src/executor/executor.ts:292
 
 Request approval for the tool call. Returns `{ granted: true }` to
 proceed, `{ granted: false, reason? }` to deny.

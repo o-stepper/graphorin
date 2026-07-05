@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ counter): Promise<ClearToolResultsOutcome>;
 Defined in: packages/memory/src/context-engine/compaction/clear-tool-results.ts:114
 
 Replace the oldest clearable tool results with placeholders. Returns the new
-buffer (same length — content is replaced in place, never removed) plus the
+buffer (same length - content is replaced in place, never removed) plus the
 cleared indices and reclaimed token count. Idempotent: already-cleared
 placeholders are skipped on a second pass.
 

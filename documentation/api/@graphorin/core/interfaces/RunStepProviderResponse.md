@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,8 +9,8 @@
 Defined in: packages/core/src/types/run.ts:49
 
 Journaled model response for one step (C3, opt-in via the agent's
-`recordProviderResponses`). Captures the RAW model output — the text
-before any lateral-leak block replaced it in the transcript — so a
+`recordProviderResponses`). Captures the RAW model output - the text
+before any lateral-leak block replaced it in the transcript - so a
 replay reproduces the original run faithfully.
 
 ## Stable

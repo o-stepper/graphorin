@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,8 +13,8 @@ built-in provider-backed implementation lives in
 [createProviderRetrievalGrader](/api/@graphorin/memory/functions/createProviderRetrievalGrader.md); advanced callers can supply a
 bespoke grader (e.g. a deterministic heuristic).
 
-Implementations MUST degrade gracefully — return a "stop" grade rather
-than throw — so a grader failure never breaks recall.
+Implementations MUST degrade gracefully - return a "stop" grade rather
+than throw - so a grader failure never breaks recall.
 
 ## Stable
 

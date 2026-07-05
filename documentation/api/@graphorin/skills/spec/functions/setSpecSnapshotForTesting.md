@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function _setSpecSnapshotForTesting(snapshot): void;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:67
+Defined in: packages/skills/src/spec/index.ts:71
 
 **`Experimental`**
 

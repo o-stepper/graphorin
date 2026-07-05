@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,8 +15,8 @@ Defined in: packages/triggers/src/index.ts:26
 Catch-up policy applied when a trigger missed one or more fires
 while the scheduler was offline.
 
-- `'none'` — drop missed fires (default; safest for personal-assistant scenarios).
-- `'last'` — fire once on resume (best for cron-style daily jobs).
-- `'all'` — fire each missed run up to `maxCatchupRuns` within `catchupWindowMs`.
+- `'none'` - drop missed fires (default; safest for personal-assistant scenarios).
+- `'last'` - fire once on resume (best for cron-style daily jobs).
+- `'all'` - fire each missed run up to `maxCatchupRuns` within `catchupWindowMs`.
 
 ## Stable

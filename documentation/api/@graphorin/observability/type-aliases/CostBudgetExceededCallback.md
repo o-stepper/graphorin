@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ type CostBudgetExceededCallback = (event) => void;
 Defined in: packages/observability/src/cost/types.ts:94
 
 Callback invoked when an aggregation scope crosses its configured
-budget. The handler receives a sanitized payload — the secret-free
+budget. The handler receives a sanitized payload - the secret-free
 scope id + the breached numbers.
 
 ## Parameters

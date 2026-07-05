@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ Clients announce supported subprotocols in the
 `Sec-WebSocket-Protocol` upgrade header. The server is expected to
 pick exactly one and echo it back; mismatches abort the handshake
 per RFC 6455 § 4. Browsers also accept additional comma-separated
-tokens — Graphorin uses this slot to attach a single-use ticket
+tokens - Graphorin uses this slot to attach a single-use ticket
 via the `ticket.<value>` form (the WebSocket browser API does not
 accept arbitrary headers, so the ticket has to ride the
 subprotocol channel).
@@ -31,5 +31,5 @@ subprotocol channel).
 | Function | Description |
 | ------ | ------ |
 | [formatTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/formatTicketSubprotocol.md) | Format a ticket value as a `Sec-WebSocket-Protocol` token suitable for browser clients (which cannot attach an `Authorization` header on the WebSocket upgrade). The companion server helper is [parseTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md). |
-| [negotiateSubprotocol](/api/@graphorin/protocol/subprotocol/functions/negotiateSubprotocol.md) | Pick the single subprotocol the server should echo back. Returns `SUBPROTOCOL_NAME` when the client offered it, or `null` when no compatible variant was advertised. The function ignores `ticket.*` tokens — those are handled separately via [parseTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md). |
+| [negotiateSubprotocol](/api/@graphorin/protocol/subprotocol/functions/negotiateSubprotocol.md) | Pick the single subprotocol the server should echo back. Returns `SUBPROTOCOL_NAME` when the client offered it, or `null` when no compatible variant was advertised. The function ignores `ticket.*` tokens - those are handled separately via [parseTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md). |
 | [parseTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md) | Extract the ticket value from a single comma-separated client list (e.g. `'graphorin.protocol.v1, ticket.abc-123'`). Returns `undefined` if no `ticket.*` token is present. Whitespace around each comma-separated token is ignored. |

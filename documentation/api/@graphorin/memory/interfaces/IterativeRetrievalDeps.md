@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/memory/src/search/iterative.ts:373
 
 Dependencies injected into [runIterativeRetrieval](/api/@graphorin/memory/functions/runIterativeRetrieval.md). The loop does
-no I/O of its own — `retrieve` and `grader` own all side effects.
+no I/O of its own - `retrieve` and `grader` own all side effects.
 
 ## Stable
 

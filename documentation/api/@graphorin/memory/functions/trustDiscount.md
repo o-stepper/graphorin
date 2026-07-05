@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function trustDiscount(record, weights?): number;
 Defined in: packages/memory/src/search/trust.ts:48
 
 Rank-time trust multiplier for one record. `1` for first-party active
-facts (the common case — zero ranking change), `1 - quarantine` for
+facts (the common case - zero ranking change), `1 - quarantine` for
 quarantined-but-included rows, `1 - foreignProvenance` for foreign
 origin. Quarantine wins when both apply (same branch order as
 `salience()`).

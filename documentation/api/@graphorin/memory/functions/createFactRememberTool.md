@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ function createFactRememberTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/fact-tools.ts:133
 
-`fact_remember` — persist a single semantic fact. The minimum-viable
+`fact_remember` - persist a single semantic fact. The minimum-viable
 pipeline writes the fact straight through with MD5 deduplication;
 Phase 10b extends the body with the multi-stage conflict resolution.
 

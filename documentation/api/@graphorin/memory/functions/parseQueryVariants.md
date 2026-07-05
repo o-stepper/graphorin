@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/memory/src/search/query-transform.ts:156
 Parse the variant-generation model output into a deduped, capped list
 of reworded queries. Tolerates a JSON array, a `{ "variants": [...] }`
 / `{ "queries": [...] }` wrapper, fenced blocks, and (as a last
-resort) a newline / numbered list — so a chatty model never breaks
+resort) a newline / numbered list - so a chatty model never breaks
 recall. Empty strings and case-insensitive duplicates are dropped;
 the result is capped at `max`.
 

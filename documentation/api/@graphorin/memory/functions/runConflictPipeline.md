@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function runConflictPipeline(args): Promise<ConflictDecision>;
 Defined in: packages/memory/src/conflict/pipeline.ts:50
 
 One-shot helper that mirrors RB-02 §8.1's `runConflictPipeline({...})`
-spec — convenient for callers that do not need to pre-build + cache
+spec - convenient for callers that do not need to pre-build + cache
 the pipeline. Production wiring should still go through
 [createConflictPipeline](/api/@graphorin/memory/functions/createConflictPipeline.md) (`SemanticMemory` re-uses the cached
 instance per `Memory`).

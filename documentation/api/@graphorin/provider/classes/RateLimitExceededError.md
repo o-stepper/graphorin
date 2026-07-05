@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -47,7 +47,7 @@ Defined in: packages/provider/src/errors/errors.ts:131
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`cause`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:23 |
-| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant - `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`message`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `readonly` | `"RateLimitExceededError"` | `'RateLimitExceededError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | packages/provider/src/errors/errors.ts:128 |
 | <a id="property-retryafterms"></a> `retryAfterMs` | `readonly` | `number` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:129 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Compute PPR-lite activation for graded neighbours. `damping` in
 `(0, 1]`; a neighbour at `depth` d contributes `damping^d` per seed
 that reaches it. Since `expandActivation` already returns the MINIMUM
 depth per neighbour (dedup across seeds), the score here is a pure
-function of that min-depth — `damping^depth`, clamped to `[0, 1]`.
+function of that min-depth - `damping^depth`, clamped to `[0, 1]`.
 A neighbour list produced with `maxHops: 1` reproduces a flat-ish
 score of `damping` at every node; `maxHops: 2` separates the tiers.
 

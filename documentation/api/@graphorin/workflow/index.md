@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -23,9 +23,9 @@ package without the optional standalone server.
 
 ## Dependencies
 
-- `@graphorin/core` — typed contracts (`WorkflowEvent`, `Channel`,
+- `@graphorin/core` - typed contracts (`WorkflowEvent`, `Channel`,
   `Directive`, `Dispatch`, `pause`, `CheckpointStore`, …).
-- `@graphorin/observability` — the `Tracer` interface used to record
+- `@graphorin/observability` - the `Tracer` interface used to record
   `workflow.run / workflow.step / workflow.task / workflow.checkpoint`
   spans.
 
@@ -110,14 +110,14 @@ for await (const event of stream) {
   `@graphorin/core`, carrying the full resumable frontier (pending
   pauses, `Dispatch` tasks, completed-but-unwalked nodes). A new
   process can pick up exactly where the previous one left off via
-  `workflow.resume(threadId, directive)` — including crashed threads
-  whose latest checkpoint is `running` — and `retry(threadId)`
+  `workflow.resume(threadId, directive)` - including crashed threads
+  whose latest checkpoint is `running` - and `retry(threadId)`
   restarts a `failed` thread re-running only the failed work
   (successful siblings replay from persisted writes). Checkpoint
   writes are CAS-guarded: a racing resume loses with
   `checkpoint-version-conflict` instead of forking the timeline.
   Resume re-executes the paused node body from the top (snapshot
-  resume, not deterministic replay) — side effects before a
+  resume, not deterministic replay) - side effects before a
   `pause()` must be idempotent. Checkpoint state must be JSON-safe;
   `Map`/`Set`/`Date` fail fast with `state-not-serializable` on every
   store.
@@ -130,7 +130,7 @@ for await (const event of stream) {
   (overwrite, error on collision), `AnyValue` (last-writer-wins),
   `Reducer((prev, next) => merged)`, `ListAggregate` (append),
   `Stream` (append-only queue, optional uniqueness), `Barrier(['a',
-  'b'])` (keyed join — a node fed by 2+ of the barrier's writers waits
+  'b'])` (keyed join - a node fed by 2+ of the barrier's writers waits
   for every writer and runs exactly once), `Ephemeral` (per-step
   value).
 - **HITL via `pause(value)`.** A node calls `pause(...)`; the engine
@@ -171,7 +171,7 @@ for await (const event of stream) {
 ## Composition with `@graphorin/agent`
 
 `@graphorin/workflow` does **not** depend on `@graphorin/agent`. The
-two compose orthogonally — a workflow node may invoke
+two compose orthogonally - a workflow node may invoke
 `agent.run(...)` directly from its `run(state, ctx)` body, but no
 import edge ever crosses between the two packages. The agent's
 in-loop fan-out helper (`Agent.fanOut(...)`) and the workflow's
@@ -199,20 +199,20 @@ change.
 
 ## License
 
-MIT © Oleksiy Stepurenko. See [LICENSE](../../_media/LICENSE-8) for the full
+MIT © Oleksiy Stepurenko. See [LICENSE](https://github.com/o-stepper/graphorin/blob/main/LICENSE) for the full
 text.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy
 Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/workflow/README.md) | `@graphorin/workflow` — step-graph workflow engine for the Graphorin framework. |
+| [](/api/@graphorin/workflow/README.md) | `@graphorin/workflow` - step-graph workflow engine for the Graphorin framework. |
 | [checkpoint-store-memory](/api/@graphorin/workflow/checkpoint-store-memory/index.md) | In-memory [CheckpointStore](/api/@graphorin/workflow/interfaces/CheckpointStore.md) adapter. Useful in tests, REPL sessions, and small examples where SQLite would be overkill. The production-grade adapter lives in `@graphorin/store-sqlite`. |
 | [errors](/api/@graphorin/workflow/errors/index.md) | Typed error surface for `@graphorin/workflow`. Every workflow-level failure lands as a subclass of [WorkflowError](/api/@graphorin/workflow/errors/classes/WorkflowError.md) carrying the stable string `code` discriminator so consumers can pattern-match without inspecting messages. |
-| [factory](/api/@graphorin/workflow/factory/index.md) | `createWorkflow({...})` — the public entry point for the workflow runtime. Validates the supplied configuration and returns the [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) handle that exposes `execute / resume / getState / listCheckpoints / fork`. |
-| [node](/api/@graphorin/workflow/node/index.md) | `createNode({...})` — minimal factory wrapper for declaring a workflow node. Returns a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md) carrying the supplied `name` + `run(...)` callback. |
+| [factory](/api/@graphorin/workflow/factory/index.md) | `createWorkflow({...})` - the public entry point for the workflow runtime. Validates the supplied configuration and returns the [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) handle that exposes `execute / resume / getState / listCheckpoints / fork`. |
+| [node](/api/@graphorin/workflow/node/index.md) | `createNode({...})` - minimal factory wrapper for declaring a workflow node. Returns a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md) carrying the supplied `name` + `run(...)` callback. |

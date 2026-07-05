@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/provider/src/adapters/vercel.ts:184
 Wrap a Vercel AI SDK language-model value in a Graphorin
 [Provider](/api/@graphorin/core/interfaces/Provider.md). Outbound requests are converted onto the AI SDK
 call contract (name-keyed tools, `tool-call` / `tool-result` content
-parts — see `vercel-messages.ts`); the streaming chunks emitted by
+parts - see `vercel-messages.ts`); the streaming chunks emitted by
 the AI SDK are translated back onto Graphorin `ProviderEvent`s.
 
 The adapter auto-detects the model's

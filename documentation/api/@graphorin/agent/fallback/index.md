@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ Layering: this module is the **agent-step-level** fallback
 (re-tries the whole step against a different model on rate-limit
 / capacity / context-length / transient errors). The
 **request-level** `withFallback` provider middleware
-(`@graphorin/provider`) is a separate concern — it retries against
+(`@graphorin/provider`) is a separate concern - it retries against
 an alternate provider serving the **same** model concept on
 transient errors inside one `provider.stream(...)` call.
 

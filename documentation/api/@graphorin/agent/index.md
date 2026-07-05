@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -23,22 +23,22 @@ the optional standalone server.
 
 ## Dependencies
 
-- `@graphorin/core` — typed contracts (`AgentEvent`, `RunState`,
+- `@graphorin/core` - typed contracts (`AgentEvent`, `RunState`,
   `RunContext`, `Provider`, `Tool`, `StopCondition`, `HandoffFilter`,
   `Sensitivity`, …).
-- `@graphorin/provider` — middleware composer assertion + token
+- `@graphorin/provider` - middleware composer assertion + token
   counter dispatcher + per-provider model-tier auto-classifier.
-- `@graphorin/tools` — `ToolRegistry` + `ToolExecutor` (parallel /
+- `@graphorin/tools` - `ToolRegistry` + `ToolExecutor` (parallel /
   sequential dispatch, approval flow, sandbox enforcement, inbound
   sanitization).
-- `@graphorin/skills` — skill metadata cards, lazy body loading.
-- `@graphorin/memory` — `Memory` facade + `ContextEngine` for
+- `@graphorin/skills` - skill metadata cards, lazy body loading.
+- `@graphorin/memory` - `Memory` facade + `ContextEngine` for
   per-step prompt assembly + auto-compaction trigger.
-- `@graphorin/sessions` — multi-agent attribution, handoff records,
+- `@graphorin/sessions` - multi-agent attribution, handoff records,
   `AgentRegistry`, audit trail.
-- `@graphorin/observability` — `Tracer`, span attributes, counter
+- `@graphorin/observability` - `Tracer`, span attributes, counter
   receivers.
-- `@graphorin/security` — `SecretsAccessScope` for sub-agent
+- `@graphorin/security` - `SecretsAccessScope` for sub-agent
   inheritance, audit chain, lateral-leak guard primitives.
 
 ## Quick start
@@ -77,7 +77,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   abort signal, deps, and sessionId propagate into the sub-run;
   without an `inputFilter` the sub-agent sees only the input string
   (no parent conversation crosses the boundary), and there is no
-  secret-inheritance mechanism at this boundary at all — least
+  secret-inheritance mechanism at this boundary at all - least
   authority by construction.
 - **Filter library.** `filters.lastN(n)`, `filters.lastUser`,
   `filters.summary({...})`, `filters.bySensitivity({...})`,
@@ -85,7 +85,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   `filters.stripToolCalls()`, `filters.compose(...)`. Every filter
   returns a serializable `HandoffInputFilterDescriptor` so the
   JSONL session export can replay it byte-equal.
-- **Cancellation.** `agent.abort({ drain, onPendingApprovals })` —
+- **Cancellation.** `agent.abort({ drain, onPendingApprovals })` -
   the default hard-kills the in-flight provider stream mid-event;
   `drain: true` lets the current step's stream finish (reach its step
   boundary) before stopping. A mid-stream abort ends the run as
@@ -134,7 +134,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   (Agentic Reference Monitor pattern), `Agent.mergeGuard` (per-child
   trust scoring + bias detection on `'judge-merge'`; `detect-and-block`
   refuses the merge with `MergeBlockedError`), the protocol
-  injection guard (`guardOutboundContent` — an exported helper for
+  injection guard (`guardOutboundContent` - an exported helper for
   the server boundary, not an `AgentConfig` knob), and
   commentary-phase trace sanitization at the session-output
   boundary compose orthogonally with the other security layers
@@ -156,25 +156,25 @@ reference). The package's `CHANGELOG.md` records every change.
 
 ## License
 
-MIT © Oleksiy Stepurenko. See [LICENSE](../../_media/LICENSE) for the full
+MIT © Oleksiy Stepurenko. See [LICENSE](https://github.com/o-stepper/graphorin/blob/main/LICENSE) for the full
 text.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy
 Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/agent/README.md) | `@graphorin/agent` — agent runtime for the Graphorin framework. |
+| [](/api/@graphorin/agent/README.md) | `@graphorin/agent` - agent runtime for the Graphorin framework. |
 | [errors](/api/@graphorin/agent/errors/index.md) | Typed error surface for `@graphorin/agent`. |
-| [evaluator-optimizer](/api/@graphorin/agent/evaluator-optimizer/index.md) | `evaluatorOptimizer({...})` — Generator → Evaluator iteration loop with three rubric kinds and a REQUIRED iteration cap. |
-| [factory](/api/@graphorin/agent/factory/index.md) | `createAgent({...})` — the agent factory entry point. |
+| [evaluator-optimizer](/api/@graphorin/agent/evaluator-optimizer/index.md) | `evaluatorOptimizer({...})` - Generator → Evaluator iteration loop with three rubric kinds and a REQUIRED iteration cap. |
+| [factory](/api/@graphorin/agent/factory/index.md) | `createAgent({...})` - the agent factory entry point. |
 | [fallback](/api/@graphorin/agent/fallback/index.md) | Agent-level model fallback chain primitives. |
-| [fanout](/api/@graphorin/agent/fanout/index.md) | Agent-step-level fan-out — `Agent.fanOut(...)` convenience that spawns N sub-agents in parallel under a bounded-fanout cap with per-child budgets and four built-in merge strategies. |
-| [filters](/api/@graphorin/agent/filters/index.md) | Handoff filter library — a small set of pure, composable functions that take the parent agent's message history and return a filtered subset suitable for forwarding to a child agent. |
+| [fanout](/api/@graphorin/agent/fanout/index.md) | Agent-step-level fan-out - `Agent.fanOut(...)` convenience that spawns N sub-agents in parallel under a bounded-fanout cap with per-child budgets and four built-in merge strategies. |
+| [filters](/api/@graphorin/agent/filters/index.md) | Handoff filter library - a small set of pure, composable functions that take the parent agent's message history and return a filtered subset suitable for forwarding to a child agent. |
 | [lateral-leak](/api/@graphorin/agent/lateral-leak/index.md) | Lateral-leak defense layer aggregate exports. |
 | [preferred-model](/api/@graphorin/agent/preferred-model/index.md) | Per-tool / per-agent preferred-model resolution. Pure functions consulted by the agent loop AFTER the model has decided which tool(s) to call but BEFORE `provider.stream(...)` is invoked. |
 | [progress](/api/@graphorin/agent/progress/index.md) | Structured progress-artifact IO. Persists UTF-8 text artifacts under `<artifactRoot>/<runId>/progress/<role>.<seqPadded>.txt` via atomic-write `.tmp + rename` discipline. |

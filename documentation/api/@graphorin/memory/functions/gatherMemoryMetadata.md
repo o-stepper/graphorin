@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function gatherMemoryMetadata(scope, deps): Promise<MemoryMetadata>;
 
 Defined in: packages/memory/src/context-engine/metadata.ts:37
 
-Build the [MemoryMetadata](/api/@graphorin/core/interfaces/MemoryMetadata.md) block. Pure async — no side
+Build the [MemoryMetadata](/api/@graphorin/core/interfaces/MemoryMetadata.md) block. Pure async - no side
 effects beyond the storage reads.
 
 ## Parameters

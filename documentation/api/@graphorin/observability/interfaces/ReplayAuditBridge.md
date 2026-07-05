@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/observability/src/replay/types.ts:31
 
 Audit-bridge contract used by the replay layer. Every replay
-invocation emits one entry through the bridge — sanitized + raw
+invocation emits one entry through the bridge - sanitized + raw
 alike. The actual audit storage lives in `@graphorin/security`; the
 replay layer keeps the bridge generic so the package stays free of
 a hard dependency on the security package.

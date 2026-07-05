@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # trust
 
-Trust subsystem barrel — exports the shared classifier and the
+Trust subsystem barrel - exports the shared classifier and the
 per-tier sensitivity defaults.
 
 ## References

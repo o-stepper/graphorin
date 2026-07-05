@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # adapters/openai-compatible
 
-Generic OpenAI-compatible adapter — works against any HTTP server
+Generic OpenAI-compatible adapter - works against any HTTP server
 that speaks the `/v1/chat/completions` REST contract. Tested
 deployments include LMStudio (default port 1234), LocalAI (default
 port 8080), vLLM (`python -m vllm.entrypoints.openai.api_server`,
@@ -14,7 +14,7 @@ default port 8000), Together-style self-host endpoints, and any
 other server in the OpenAI-compatible ecosystem.
 
 The adapter shares the same `LocalProviderTrust` classifier as
-`ollamaAdapter` and `llamaCppServerAdapter` — one classifier, one
+`ollamaAdapter` and `llamaCppServerAdapter` - one classifier, one
 policy table, one error type.
 
 ## Interfaces

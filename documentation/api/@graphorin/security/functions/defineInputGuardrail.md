@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function defineInputGuardrail<TValue>(spec): InputGuardrail<TValue>;
 Defined in: packages/security/src/guardrails/builders.ts:28
 
 Create a typed input guardrail. Thin wrapper around the
-declarative shape — the helper exists so call-sites stay
+declarative shape - the helper exists so call-sites stay
 declarative.
 
 ## Type Parameters

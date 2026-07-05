@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -26,6 +26,6 @@ to [registerMigration](/api/@graphorin/store-sqlite/functions/registerMigration.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-name"></a> `name` | `readonly` | `string` | Human-readable slug, e.g. `'memory'`. | packages/store-sqlite/src/migrations/registry.ts:23 |
-| <a id="property-owner"></a> `owner` | `readonly` | `string` | Owning module — surfaced in error messages. | packages/store-sqlite/src/migrations/registry.ts:27 |
+| <a id="property-owner"></a> `owner` | `readonly` | `string` | Owning module - surfaced in error messages. | packages/store-sqlite/src/migrations/registry.ts:27 |
 | <a id="property-sql"></a> `sql` | `readonly` | `string` | Raw SQL body (multi-statement). | packages/store-sqlite/src/migrations/registry.ts:25 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Zero-padded sequence number — must be globally unique. | packages/store-sqlite/src/migrations/registry.ts:21 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Zero-padded sequence number - must be globally unique. | packages/store-sqlite/src/migrations/registry.ts:21 |

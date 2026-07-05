@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Options for [withRateLimit](/api/@graphorin/provider/variables/withRateLimit.md)
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-burst"></a> `burst?` | `readonly` | `number` | Burst size — defaults to `requestsPerMinute / 4` (rounded up to >= 1). | packages/provider/src/middleware/with-rate-limit.ts:24 |
+| <a id="property-burst"></a> `burst?` | `readonly` | `number` | Burst size - defaults to `requestsPerMinute / 4` (rounded up to >= 1). | packages/provider/src/middleware/with-rate-limit.ts:24 |
 | <a id="property-mode"></a> `mode?` | `readonly` | `"throw"` \| `"queue"` | What to do on overflow. Default `'throw'`. | packages/provider/src/middleware/with-rate-limit.ts:26 |
 | <a id="property-nowimpl"></a> `nowImpl?` | `readonly` | () => `number` | Test hook overriding `Date.now`. | packages/provider/src/middleware/with-rate-limit.ts:28 |
 | <a id="property-requestsperminute"></a> `requestsPerMinute` | `readonly` | `number` | Allowed requests per minute. | packages/provider/src/middleware/with-rate-limit.ts:22 |

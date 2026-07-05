@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -31,7 +31,7 @@ record once the span ends and runs it through the validator.
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/observability/src/exporters/types.ts:29 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/observability/src/exporters/types.ts:32 |
 | <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | - | packages/observability/src/exporters/types.ts:31 |
-| <a id="property-sensitivitybyattribute"></a> `sensitivityByAttribute?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> | Optional per-attribute sensitivity map — see `setAttribute({ sensitivity })`. | packages/observability/src/exporters/types.ts:40 |
+| <a id="property-sensitivitybyattribute"></a> `sensitivityByAttribute?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> | Optional per-attribute sensitivity map - see `setAttribute({ sensitivity })`. | packages/observability/src/exporters/types.ts:40 |
 | <a id="property-startunixnano"></a> `startUnixNano` | `readonly` | `number` | - | packages/observability/src/exporters/types.ts:33 |
 | <a id="property-status"></a> `status` | `readonly` | [`SpanStatus`](/api/@graphorin/core/type-aliases/SpanStatus.md) | - | packages/observability/src/exporters/types.ts:35 |
 | <a id="property-statusmessage"></a> `statusMessage?` | `readonly` | `string` | - | packages/observability/src/exporters/types.ts:36 |

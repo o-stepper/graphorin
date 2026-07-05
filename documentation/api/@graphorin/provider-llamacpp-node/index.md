@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -7,7 +7,7 @@
 # `@graphorin/provider-llamacpp-node`
 
 > Companion package to
-> [`@graphorin/provider`](/api/@graphorin/provider/index.md) — in-process GGUF
+> [`@graphorin/provider`](/api/@graphorin/provider/index.md) - in-process GGUF
 > execution for the
 > [**Graphorin**](https://github.com/o-stepper/graphorin) framework.
 
@@ -56,14 +56,14 @@ tighter than the cl100k_base proxy used by the HTTP-shaped adapters.
 ## HITL durable-resume tradeoff
 
 The in-process adapter does **not** survive a process restart
-mid-stream — the model context lives in the running process and is
+mid-stream - the model context lives in the running process and is
 lost on exit. For human-in-the-loop workflows that need durable
 mid-stream resume across restarts, prefer one of the HTTP-shaped
 adapters instead:
 
-- `ollamaAdapter` — Ollama HTTP daemon
-- `llamaCppServerAdapter` — upstream `llama-server` binary
-- `openAICompatibleAdapter` — LMStudio / LocalAI / vLLM /
+- `ollamaAdapter` - Ollama HTTP daemon
+- `llamaCppServerAdapter` - upstream `llama-server` binary
+- `openAICompatibleAdapter` - LMStudio / LocalAI / vLLM /
   Together-style endpoints
 
 ## GGUF model provenance
@@ -84,13 +84,13 @@ discipline rather than enforcing it at runtime.
 
 ## Project metadata
 
-- **Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+- **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>
 
-@graphorin/provider-llamacpp-node — in-process GGUF execution
+@graphorin/provider-llamacpp-node - in-process GGUF execution
 adapter for the Graphorin framework. The package wraps
 `node-llama-cpp@^3.5` to load `.gguf` model files directly into the
-same Node process — no daemon, no port to manage, no GPU contention
+same Node process - no daemon, no port to manage, no GPU contention
 with other processes.
 
 The adapter declares `trust: 'loopback'` permanently because the
@@ -99,7 +99,7 @@ symmetry mirrors `@graphorin/embedder-transformersjs` (in-process
 embedder; same trust boundary).
 
 The companion package is operationally simpler than the HTTP-shaped
-adapters but does NOT survive a process restart mid-stream — the
+adapters but does NOT survive a process restart mid-stream - the
 model context lives in the process and is lost on exit. For HITL
 durable mid-stream resume, one of the HTTP-shaped adapters
 (`ollamaAdapter`, `llamaCppServerAdapter`, `openAICompatibleAdapter`)

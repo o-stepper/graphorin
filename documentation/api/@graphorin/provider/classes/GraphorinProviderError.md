@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/provider/src/errors/errors.ts:18
 
 Base class for every error thrown by `@graphorin/provider`. Consumers
-narrow on the discriminant `kind` rather than `instanceof` — both
+narrow on the discriminant `kind` rather than `instanceof` - both
 work, but discriminants are subclass-friendly.
 
 ## Stable
@@ -69,7 +69,7 @@ Error.constructor
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | `Error.cause` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | - | packages/provider/src/errors/errors.ts:23 |
-| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | - | packages/provider/src/errors/errors.ts:21 |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant - `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | - | packages/provider/src/errors/errors.ts:21 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | `Error.message` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | `'GraphorinProviderError'` | - | `Error.name` | - | packages/provider/src/errors/errors.ts:19 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | `undefined` | - | - | `Error.stack` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

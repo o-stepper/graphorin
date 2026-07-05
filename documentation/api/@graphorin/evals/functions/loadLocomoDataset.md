@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function loadLocomoDataset(options): Promise<Dataset<MemoryEvalInput, string, Re
 Defined in: evals/src/loaders/locomo.ts:62
 
 Read a LOCOMO JSON file and return a fully-materialised
-[Dataset](/api/@graphorin/evals/interfaces/Dataset.md) — one case per QA pair, scored against the reference
+[Dataset](/api/@graphorin/evals/interfaces/Dataset.md) - one case per QA pair, scored against the reference
 answer string (LLM-judge "J").
 
 ## Parameters

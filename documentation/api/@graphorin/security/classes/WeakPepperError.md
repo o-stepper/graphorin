@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/security/src/auth/errors.ts:132
 
 Raised when `createToken` / `rekeyTokens` are
-invoked with a pepper value that fails the strength check — either
+invoked with a pepper value that fails the strength check - either
 below the 32-byte minimum, or a low-entropy / placeholder value
 (e.g. a long run of identical bytes). See `assessSecretStrength`.
 

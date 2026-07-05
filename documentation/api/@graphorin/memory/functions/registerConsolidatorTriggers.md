@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,7 +21,7 @@ supplied consolidator with the scheduler. Each trigger fires
 paths converge on the same handler.
 
 Turn triggers (`turn:N`) and event triggers (`event:NAME`) are
-skipped — the scheduler cannot count user turns autonomously, and
+skipped - the scheduler cannot count user turns autonomously, and
 event triggers fire from the consumer's emit path. The runtime
 caller is responsible for those (e.g. invoking
 `consolidator.trigger(...)` from the agent loop).

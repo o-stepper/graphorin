@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,8 +15,8 @@ provider-backed implementation lives in
 bespoke one (e.g. a deterministic synonym expander) to
 `new SemanticMemory({ queryTransformer })`.
 
-Implementations MUST degrade gracefully — return `[]` / `null` rather
-than throw — so a transform failure never breaks recall.
+Implementations MUST degrade gracefully - return `[]` / `null` rather
+than throw - so a transform failure never breaks recall.
 
 ## Stable
 

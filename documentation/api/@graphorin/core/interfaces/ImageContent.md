@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/core/src/types/message.ts:44
 
 Image attachment. The `image` field accepts either raw bytes or a `URL`
-— adapters dereference the URL when the provider only accepts inline
+- adapters dereference the URL when the provider only accepts inline
 payloads.
 
 ## Stable

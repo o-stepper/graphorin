@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -7,9 +7,9 @@
 # Variable: VERSION
 
 ```ts
-const VERSION: "0.5.0" = '0.5.0';
+const VERSION: "0.6.0" = '0.6.0';
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:107
+Defined in: packages/store-sqlite/src/index.ts:108
 
 Canonical version constant. Mirrors the `package.json` version.

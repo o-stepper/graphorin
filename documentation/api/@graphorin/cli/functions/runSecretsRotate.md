@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ function runSecretsRotate(options): Promise<{
 
 Defined in: packages/cli/src/commands/secrets.ts:252
 
-`graphorin secrets rotate <key>` — overwrite the existing value
+`graphorin secrets rotate <key>` - overwrite the existing value
 with a fresh one. Functionally identical to `set` but the CLI
 surfaces the operation explicitly so audit logs can distinguish
 a rotation from an initial write.

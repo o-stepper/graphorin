@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,6 +8,7 @@
 
 ```ts
 type GenAIOperationName = 
+  | "invoke_agent"
   | "agent.run"
   | "agent.step"
   | "agent.handoff"

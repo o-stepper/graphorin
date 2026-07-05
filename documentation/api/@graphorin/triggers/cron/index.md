@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -27,10 +27,10 @@ Each field accepts:
 The parser is intentionally **strict**: any unrecognised character
 raises [CronParseError](/api/@graphorin/triggers/cron/classes/CronParseError.md) so a typo never silently never-fires.
 
-**Day vs. day-of-week semantics — AND, not OR.** When *both* `day`
+**Day vs. day-of-week semantics - AND, not OR.** When *both* `day`
 and `dayOfWeek` are restricted (neither is the every-value
 wildcard), Graphorin requires **both** to match for a fire to
-happen — i.e. `0 12 1-7 * 1` means "noon on the first Monday of
+happen - i.e. `0 12 1-7 * 1` means "noon on the first Monday of
 every month". This differs from Vixie / POSIX cron, which
 OR-combines the two restricted fields. AND semantics are easier to
 reason about in personal-assistant scenarios; the framework stays

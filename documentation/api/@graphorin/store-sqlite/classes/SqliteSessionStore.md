@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -404,7 +404,7 @@ pruneSessions(opts): Promise<number>;
 
 Defined in: packages/store-sqlite/src/session-store.ts:245
 
-RP-6: retention sweep — delete every session matching the policy.
+RP-6: retention sweep - delete every session matching the policy.
 
 #### Parameters
 

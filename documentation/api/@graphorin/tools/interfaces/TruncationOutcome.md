@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -24,7 +24,7 @@ the metadata the audit emitter writes into the
 | <a id="property-droppedtokens"></a> `droppedTokens` | `readonly` | `number` | - | packages/tools/src/result/truncate.ts:57 |
 | <a id="property-kepttokens"></a> `keptTokens` | `readonly` | `number` | - | packages/tools/src/result/truncate.ts:56 |
 | <a id="property-originaltokens"></a> `originalTokens` | `readonly` | `number` | - | packages/tools/src/result/truncate.ts:55 |
-| <a id="property-resulthandle"></a> `resultHandle?` | `readonly` | `string` | Opaque, run-scoped handle URI for the spill artifact — e.g. `graphorin-spill:<runId>/<toolCallId>.<ext>` (only set for `'spill-to-file'`). This is the model-facing reference embedded in the truncation annotation; unlike [artifactPath](/api/@graphorin/tools/interfaces/TruncationOutcome.md#property-artifactpath) it carries no raw filesystem path. Resolve it with `createFileResultReader` / the built-in `read_result` tool. | packages/tools/src/result/truncate.ts:71 |
+| <a id="property-resulthandle"></a> `resultHandle?` | `readonly` | `string` | Opaque, run-scoped handle URI for the spill artifact - e.g. `graphorin-spill:<runId>/<toolCallId>.<ext>` (only set for `'spill-to-file'`). This is the model-facing reference embedded in the truncation annotation; unlike [artifactPath](/api/@graphorin/tools/interfaces/TruncationOutcome.md#property-artifactpath) it carries no raw filesystem path. Resolve it with `createFileResultReader` / the built-in `read_result` tool. | packages/tools/src/result/truncate.ts:71 |
 | <a id="property-strategyapplied"></a> `strategyApplied` | `readonly` | [`TruncationStrategy`](/api/@graphorin/core/type-aliases/TruncationStrategy.md) | - | packages/tools/src/result/truncate.ts:58 |
 | <a id="property-summarizermodel"></a> `summarizerModel?` | `readonly` | `string` | Model name of the summarizer (only set for `'summarize'`). | packages/tools/src/result/truncate.ts:73 |
 | <a id="property-truncated"></a> `truncated` | `readonly` | `boolean` | - | packages/tools/src/result/truncate.ts:53 |

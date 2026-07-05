@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function buildExpansionRequest(
 
 Defined in: packages/memory/src/search/query-transform.ts:108
 
-Build the multi-query expansion request. Pure — no I/O. A higher
+Build the multi-query expansion request. Pure - no I/O. A higher
 temperature is used deliberately so the variants diverge (the
 downstream retrieval + RRF fusion stays deterministic).
 

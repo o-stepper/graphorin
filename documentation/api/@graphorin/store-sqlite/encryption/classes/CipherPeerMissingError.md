@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/store-sqlite/src/encryption/index.ts:94
 Raised when the operator opts in to encryption-at-rest but the
 cipher peer (`better-sqlite3-multiple-ciphers`) is missing. The
 Phase 05 acceptance criteria require this to be a fatal startup
-error — never silently downgrade to an unencrypted DB.
+error - never silently downgrade to an unencrypted DB.
 
 ## Stable
 

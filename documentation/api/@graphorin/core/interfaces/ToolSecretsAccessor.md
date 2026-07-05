@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/core/src/contracts/tool.ts:280
 Per-call secrets accessor surface. Implemented by the executor; the
 tool author calls `require(...)` to obtain a `SecretValue` wrapper.
 
-The accessor is intentionally narrow — the ACL enforcement happens
+The accessor is intentionally narrow - the ACL enforcement happens
 inside `require(...)`, so the tool author never accidentally
 unwraps a secret outside the tool's permitted set.
 

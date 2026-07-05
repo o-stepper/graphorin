@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,9 +10,9 @@
 function formatRecallExplanation(explanation): string;
 ```
 
-Defined in: packages/memory/src/search/explain.ts:105
+Defined in: packages/memory/src/search/explain.ts:108
 
-Render a [RecallExplanation](/api/@graphorin/memory/interfaces/RecallExplanation.md) as a compact ASCII block — a
+Render a [RecallExplanation](/api/@graphorin/memory/interfaces/RecallExplanation.md) as a compact ASCII block - a
 header line plus one line per recalled memory with its signal
 breakdown. Pure (returns a string, no I/O); used by operator tooling
 and trace inspectors.

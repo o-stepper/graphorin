@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/memory/src/conflict/types.ts:35
 
 Configurable similarity thresholds for Stage 2 (embedding three-
-zone). Defaults pinned at `0.95 / 0.85 / 0.4` per RB-02 §8 — the
+zone). Defaults pinned at `0.95 / 0.85 / 0.4` per RB-02 §8 - the
 production values for the default `Xenova/multilingual-e5-base`
 embedder (DEC-130).
 

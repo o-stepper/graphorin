@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/context-engine/compaction/types.ts:242
 
-Summarizer adapter — accepts a prompt and returns the produced
+Summarizer adapter - accepts a prompt and returns the produced
 summary. The Phase 06 `Provider` adapters implement this
 signature; tests pass a deterministic stub. The summarizer
 adapter is intentionally narrow so the compaction subsystem

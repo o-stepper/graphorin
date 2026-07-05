@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -33,7 +33,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:38
 
 Online page-level backup (store-02/05). Consistent under a live
 writer and preserves rowids (so FTS5 external-content mappings
-survive — unlike `VACUUM INTO`).
+survive - unlike `VACUUM INTO`).
 
 #### Parameters
 

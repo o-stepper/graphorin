@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -28,7 +28,7 @@ optional count(scope): Promise<number>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:145
 
-Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
+Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
 the default recall filters (live, non-archived, non-quarantined), never
 materialising rows. Powers honest `metadata()` counts.
 
@@ -264,7 +264,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:139
 Set a fact's retrieval-trust `status` and write a `memory_history`
 audit row (P1-4). Promotes a quarantined fact to `active` (the
 validation path) or re-quarantines an active one. Never touches
-content / embedding / tombstone — quarantine is a retrieval gate.
+content / embedding / tombstone - quarantine is a retrieval gate.
 Powers [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate); the default
 `@graphorin/store-sqlite` adapter implements it.
 

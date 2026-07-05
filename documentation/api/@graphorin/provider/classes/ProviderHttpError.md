@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: packages/provider/src/errors/errors.ts:266
 | <a id="property-errorkind"></a> `errorKind` | `readonly` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) | `undefined` | The canonical `ProviderErrorKind` mapped from the HTTP status via [classifyHttpStatus](/api/@graphorin/provider/functions/classifyHttpStatus.md) (the `kind` field keeps its stable `'provider-http'` discriminant). Middleware predicates consult this so a 429 fails over / retries as a rate limit. | - | - | packages/provider/src/errors/errors.ts:258 |
 | <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | `undefined` | Backoff-relevant response headers captured from the failed response (`retry-after`, `x-ratelimit-*`), lowercased. `withRetry`'s Retry-After hint reader consumes them. | - | - | packages/provider/src/errors/errors.ts:264 |
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:23 |
-| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
+| <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant - `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`message`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `readonly` | `"ProviderHttpError"` | `'ProviderHttpError'` | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`name`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-name) | - | packages/provider/src/errors/errors.ts:249 |
 | <a id="property-providername"></a> `providerName` | `readonly` | `string` | `undefined` | - | - | - | packages/provider/src/errors/errors.ts:251 |

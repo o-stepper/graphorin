@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Configuration shape for [createOTLPHttpExporter](/api/@graphorin/observability/f
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | Optional `fetch` override — useful for testing without the network. | packages/observability/src/exporters/otlp-http.ts:39 |
+| <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | Optional `fetch` override - useful for testing without the network. | packages/observability/src/exporters/otlp-http.ts:39 |
 | <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | Optional headers (auth, tenant id, …). Avoid passing secrets in plain. | packages/observability/src/exporters/otlp-http.ts:35 |
 | <a id="property-id"></a> `id?` | `readonly` | `string` | Identifier reported via `exporter.id`. Defaults to `'otlp-http'`. | packages/observability/src/exporters/otlp-http.ts:31 |
 | <a id="property-servicename"></a> `serviceName?` | `readonly` | `string` | Service name embedded in the OTLP `Resource`. | packages/observability/src/exporters/otlp-http.ts:37 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function getActiveToolSecretsContext():
 Defined in: packages/security/src/secrets/acl.ts:53
 
 Read the active per-tool secrets context, if any. Returns
-`undefined` outside an explicit `withToolSecretsContext(...)` scope —
+`undefined` outside an explicit `withToolSecretsContext(...)` scope -
 which means "no ACL enforcement".
 
 ## Returns

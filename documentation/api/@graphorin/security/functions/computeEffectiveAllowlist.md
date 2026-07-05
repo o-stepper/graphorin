@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/security/src/secrets/acl.ts:95
 Compute the **effective** allowlist for a child scope: intersection
 of the parent's allowlist and the child's declared list. The
 intersection is the foundation of the deny-by-default sub-agent
-inheritance contract — passing an additional key in a child only
+inheritance contract - passing an additional key in a child only
 works when the parent already permits it.
 
 ## Parameters

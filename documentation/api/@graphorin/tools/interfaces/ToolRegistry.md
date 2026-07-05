@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -67,7 +67,7 @@ clear(): void;
 
 Defined in: packages/tools/src/registry/registry.ts:119
 
-Tear down the registry — clears every entry.
+Tear down the registry - clears every entry.
 
 #### Returns
 

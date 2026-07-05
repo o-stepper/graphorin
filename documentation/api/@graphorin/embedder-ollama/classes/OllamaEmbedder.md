@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -46,7 +46,7 @@ configHash(): string;
 
 Defined in: packages/embedder-ollama/src/index.ts:207
 
-Deterministic hash over the embedder's full configuration —
+Deterministic hash over the embedder's full configuration -
 including the discovered digest. A model upgrade in the same
 Ollama instance changes the digest (and therefore the hash), so
 `lock-on-first` correctly fires a migration path instead of
@@ -70,7 +70,7 @@ dim(): number;
 
 Defined in: packages/embedder-ollama/src/index.ts:189
 
-Output dimension — the explicit `dim` option, the resolved width from the
+Output dimension - the explicit `dim` option, the resolved width from the
 first `embed()`, or a known-family default. PS-11: throws for an unknown
 model with no `dim` hint instead of returning `0` (which the store would
 persist and use to create a `float[0]` vec0 table, silently breaking
@@ -121,7 +121,7 @@ id(): string;
 
 Defined in: packages/embedder-ollama/src/index.ts:175
 
-The canonical embedder id — `'ollama:<model>@<dim-or-digest>'`.
+The canonical embedder id - `'ollama:<model>@<dim-or-digest>'`.
 
 #### Returns
 

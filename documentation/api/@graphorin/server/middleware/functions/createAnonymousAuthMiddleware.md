@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ Build the no-auth middleware mounted when `auth.kind = 'none'`. It stamps
 `state.auth = { kind: 'anonymous', grantedScopes: [admin:*] }` so the
 scope middleware, SSE handler and replay routes all treat the request as a
 fully-authorized principal. This is the documented trusted-loopback /
-single-operator mode — never mount it on a non-loopback deployment without
+single-operator mode - never mount it on a non-loopback deployment without
 understanding that every endpoint becomes open.
 
 ## Returns

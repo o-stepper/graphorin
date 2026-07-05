@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function trajectoryFromRunState(run): Trajectory;
 Defined in: packages/memory/src/consolidator/phases/induce.ts:297
 
 Distil a [RunState](/api/@graphorin/core/interfaces/RunState.md) into the minimal [Trajectory](/api/@graphorin/memory/interfaces/Trajectory.md) the inducer
-needs. Pure — consumes the agent's already-emitted run state, so capturing
+needs. Pure - consumes the agent's already-emitted run state, so capturing
 a trajectory + its success signal needs no agent-loop change. The success
 signal is `status === 'completed'`.
 

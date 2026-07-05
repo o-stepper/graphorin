@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: packages/server/src/runtime/run-state.ts:137
 | ------ | ------ | ------ |
 | `options` | \{ `now?`: () => `number`; `onTerminal?`: (`info`) => `void`; \} | - |
 | `options.now?` | () => `number` | - |
-| `options.onTerminal?` | (`info`) => `void` | IP-15: invoked exactly once per run, the first time it settles into a terminal state. Used to drive the run-count + duration metrics. Never throws into the tracker — wrap your handler if it might. |
+| `options.onTerminal?` | (`info`) => `void` | IP-15: invoked exactly once per run, the first time it settles into a terminal state. Used to drive the run-count + duration metrics. Never throws into the tracker - wrap your handler if it might. |
 
 #### Returns
 
@@ -167,7 +167,7 @@ Defined in: packages/server/src/runtime/run-state.ts:266
 
 Number of runs currently in `pending` or `running`. Useful for
 snapshots / metrics. Note that `pending` runs hold a reservation
-but have not yet started any work — see [runningCount](/api/@graphorin/server/classes/RunStateTracker.md#runningcount) for
+but have not yet started any work - see [runningCount](/api/@graphorin/server/classes/RunStateTracker.md#runningcount) for
 the drain-blocking subset.
 
 #### Returns
@@ -207,7 +207,7 @@ runningCount(): number;
 Defined in: packages/server/src/runtime/run-state.ts:280
 
 Number of runs with active work in progress (`running`). The
-lifecycle drain blocks on this counter only — pending runs are a
+lifecycle drain blocks on this counter only - pending runs are a
 pure reservation (e.g. an awaited WS subscription) and can be
 aborted immediately when SIGTERM arrives.
 

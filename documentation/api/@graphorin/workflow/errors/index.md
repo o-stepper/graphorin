@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,9 +16,9 @@ without inspecting messages.
 | Class | Description |
 | ------ | ------ |
 | [CheckpointNotFoundError](/api/@graphorin/workflow/errors/classes/CheckpointNotFoundError.md) | Thrown when Workflow.fork cannot find the named checkpoint. |
-| [CheckpointVersionConflictError](/api/@graphorin/workflow/errors/classes/CheckpointVersionConflictError.md) | Thrown when a checkpoint write detects that another writer advanced the thread concurrently (WF-12) — the loser must not fork the timeline. |
+| [CheckpointVersionConflictError](/api/@graphorin/workflow/errors/classes/CheckpointVersionConflictError.md) | Thrown when a checkpoint write detects that another writer advanced the thread concurrently (WF-12) - the loser must not fork the timeline. |
 | [ConcurrentResumeError](/api/@graphorin/workflow/errors/classes/ConcurrentResumeError.md) | Thrown when a second concurrent resume is attempted for the same thread. |
-| [DeadEndError](/api/@graphorin/workflow/errors/classes/DeadEndError.md) | Thrown when planning stalls with no runnable tasks and no satisfied END edge (WF-14) — an all-false conditional fan is an error, not a silent completion. |
+| [DeadEndError](/api/@graphorin/workflow/errors/classes/DeadEndError.md) | Thrown when planning stalls with no runnable tasks and no satisfied END edge (WF-14) - an all-false conditional fan is an error, not a silent completion. |
 | [InvalidChannelWriteError](/api/@graphorin/workflow/errors/classes/InvalidChannelWriteError.md) | Thrown when a node writes a key not declared in `stateSchema`. |
 | [InvalidWorkflowConfigError](/api/@graphorin/workflow/errors/classes/InvalidWorkflowConfigError.md) | Thrown by createWorkflow on configuration validation failure. |
 | [MultiWriteError](/api/@graphorin/workflow/errors/classes/MultiWriteError.md) | Thrown when more than one writer in a single execution step writes a `LatestValue`. |
@@ -27,13 +27,13 @@ without inspecting messages.
 | [PauseNotFoundError](/api/@graphorin/workflow/errors/classes/PauseNotFoundError.md) | Thrown by `resolveAwakeable` / `approve` (D1) when no pending pause carries the requested name. |
 | [ReducerError](/api/@graphorin/workflow/errors/classes/ReducerError.md) | Thrown when a Reducer channel's `reduce(...)` callback throws. |
 | [ResumeWithoutSuspensionError](/api/@graphorin/workflow/errors/classes/ResumeWithoutSuspensionError.md) | Thrown by Workflow.resume when the named thread is not in a suspended state. |
-| [StateNotSerializableError](/api/@graphorin/workflow/errors/classes/StateNotSerializableError.md) | Thrown at checkpoint time when a channel value would not survive a JSON round-trip (WF-10) — Map/Set/Date/class instances silently degrade with the SQLite store, so every store rejects them eagerly. |
+| [StateNotSerializableError](/api/@graphorin/workflow/errors/classes/StateNotSerializableError.md) | Thrown at checkpoint time when a channel value would not survive a JSON round-trip (WF-10) - Map/Set/Date/class instances silently degrade with the SQLite store, so every store rejects them eagerly. |
 | [ThreadNotFoundError](/api/@graphorin/workflow/errors/classes/ThreadNotFoundError.md) | Thrown when Workflow.resume cannot find the named thread. |
 | [UnknownNodeError](/api/@graphorin/workflow/errors/classes/UnknownNodeError.md) | Thrown by createWorkflow when an edge references a node that is not registered. |
 | [WorkflowAbortedError](/api/@graphorin/workflow/errors/classes/WorkflowAbortedError.md) | Thrown when a workflow run is cancelled via `AbortSignal`. |
-| [WorkflowDivergenceError](/api/@graphorin/workflow/errors/classes/WorkflowDivergenceError.md) | Thrown on resume when the persisted frontier references nodes that no longer exist in the workflow definition (D1) — the definition changed mid-flight and a silent re-plan would diverge from the journal. |
+| [WorkflowDivergenceError](/api/@graphorin/workflow/errors/classes/WorkflowDivergenceError.md) | Thrown on resume when the persisted frontier references nodes that no longer exist in the workflow definition (D1) - the definition changed mid-flight and a silent re-plan would diverge from the journal. |
 | [WorkflowError](/api/@graphorin/workflow/errors/classes/WorkflowError.md) | Base error class for all `@graphorin/workflow` failures. |
-| [WorkflowVersionMismatchError](/api/@graphorin/workflow/errors/classes/WorkflowVersionMismatchError.md) | Thrown on resume when the stored frontier was written by a different WorkflowConfig.version (D1 / workflow-14) — replaying persisted state through changed code must fail loudly, not silently diverge. Opt out per call via `allowVersionMismatch`. |
+| [WorkflowVersionMismatchError](/api/@graphorin/workflow/errors/classes/WorkflowVersionMismatchError.md) | Thrown on resume when the stored frontier was written by a different WorkflowConfig.version (D1 / workflow-14) - replaying persisted state through changed code must fail loudly, not silently diverge. Opt out per call via `allowVersionMismatch`. |
 
 ## Type Aliases
 

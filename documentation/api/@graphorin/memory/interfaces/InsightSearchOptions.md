@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,6 +14,6 @@ Per-call options accepted by [InsightMemory.search](/api/@graphorin/memory/class
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (P1-4). Defaults to `false`. Since reflection-synthesized insights *always* land quarantined, set this `true` to surface them for the validation / inspector path — never for auto-recall fed back into the model. | packages/memory/src/tiers/insight-memory.ts:31 |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (P1-4). Defaults to `false`. Since reflection-synthesized insights *always* land quarantined, set this `true` to surface them for the validation / inspector path - never for auto-recall fed back into the model. | packages/memory/src/tiers/insight-memory.ts:31 |
 | <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/memory/src/tiers/insight-memory.ts:32 |
 | <a id="property-topk"></a> `topK?` | `readonly` | `number` | - | packages/memory/src/tiers/insight-memory.ts:24 |

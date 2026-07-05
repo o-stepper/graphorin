@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,9 +8,9 @@
 
 Code-mode / programmatic tool calling (P1-2). Public surface:
 
-- [projectToolApi](/api/@graphorin/tools/code-mode/functions/projectToolApi.md) — project a resolved tool set as a typed code
+- [projectToolApi](/api/@graphorin/tools/code-mode/functions/projectToolApi.md) - project a resolved tool set as a typed code
   API (catalogue + per-tool signatures).
-- [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md) / [createCodeSearchTool](/api/@graphorin/tools/code-mode/functions/createCodeSearchTool.md) — the two
+- [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functions/createCodeExecuteTool.md) / [createCodeSearchTool](/api/@graphorin/tools/code-mode/functions/createCodeSearchTool.md) - the two
   Graphorin-named meta-tools the agent advertises in code-mode.
 
 The sandbox primitive these build on, `runBridgedSource`, lives in

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function evaluateMerge(perChild, cfg): MergeBiasDecision;
 
 Defined in: packages/agent/src/lateral-leak/merge-guard.ts:120
 
-Evaluate whether the merge is biased — a child with
+Evaluate whether the merge is biased - a child with
 `sourceTrust < lowTrustThreshold` contributing more than
 `maxLowTrustWeight` of the merged output.
 

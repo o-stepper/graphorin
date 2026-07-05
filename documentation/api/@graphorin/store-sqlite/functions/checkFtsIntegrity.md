@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,8 +14,8 @@ Defined in: packages/store-sqlite/src/fts-integrity.ts:59
 
 Count orphaned FTS rows (rowids with no matching base row) for every FTS
 table that exists. An empty array means every FTS index is consistent with
-its base table. A non-empty result is a sign of rowid drift — most likely a
-hand-run `VACUUM` — and means search may return the wrong records.
+its base table. A non-empty result is a sign of rowid drift - most likely a
+hand-run `VACUUM` - and means search may return the wrong records.
 
 Tables absent from the schema (e.g. before their migration has run) are
 skipped rather than reported.

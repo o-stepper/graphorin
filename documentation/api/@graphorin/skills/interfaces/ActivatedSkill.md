@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/skills/src/types/index.ts:303
 
-Activated skill — what the agent runtime sees after the model (or a
+Activated skill - what the agent runtime sees after the model (or a
 slash command) elects a skill. Carries the loaded body + declared
 tools so the runtime can inject them into the conversation.
 
@@ -23,4 +23,4 @@ tools so the runtime can inject them into the conversation.
 | <a id="property-body"></a> `body` | `readonly` | `string` | - | packages/skills/src/types/index.ts:305 |
 | <a id="property-resources"></a> `resources` | `readonly` | readonly [`SkillResource`](/api/@graphorin/skills/interfaces/SkillResource.md)[] | - | packages/skills/src/types/index.ts:306 |
 | <a id="property-skill"></a> `skill` | `readonly` | [`Skill`](/api/@graphorin/skills/interfaces/Skill.md) | - | packages/skills/src/types/index.ts:304 |
-| <a id="property-tools"></a> `tools` | `readonly` | readonly [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[] | Tools made available to the model while the skill is active. The agent runtime (Phase 12) is the canonical producer — it resolves the skill's `tools/` directory or the inline-supplied `Tool[]` and feeds each entry through `stampSkillTool(...)` so the resulting `ResolvedTool` carries the right trust class + sandbox tier. | packages/skills/src/types/index.ts:315 |
+| <a id="property-tools"></a> `tools` | `readonly` | readonly [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[] | Tools made available to the model while the skill is active. The agent runtime (Phase 12) is the canonical producer - it resolves the skill's `tools/` directory or the inline-supplied `Tool[]` and feeds each entry through `stampSkillTool(...)` so the resulting `ResolvedTool` carries the right trust class + sandbox tier. | packages/skills/src/types/index.ts:315 |

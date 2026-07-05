@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -72,11 +72,11 @@ MIT © 2026 [Oleksiy Stepurenko](https://github.com/o-stepper).
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/pricing/README.md) | @graphorin/pricing — bundled LLM pricing snapshot for the Graphorin framework. |
+| [](/api/@graphorin/pricing/README.md) | @graphorin/pricing - bundled LLM pricing snapshot for the Graphorin framework. |
 | [snapshot](/api/@graphorin/pricing/snapshot/index.md) | Bundled pricing snapshot surface. |

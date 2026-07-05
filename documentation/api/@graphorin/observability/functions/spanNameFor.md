@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -7,16 +7,17 @@
 # Function: spanNameFor()
 
 ```ts
-function spanNameFor(type): string;
+function spanNameFor(type, attrs?): string;
 ```
 
-Defined in: packages/observability/src/tracer/span-names.ts:14
+Defined in: packages/observability/src/tracer/span-names.ts:33
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `type` | [`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md) |
+| `attrs?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 ## Returns
 

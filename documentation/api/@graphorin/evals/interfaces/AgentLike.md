@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: evals/src/types.ts:31
 
 Agent shape consumed by the runner. Anything with a `run(input)`
-method satisfies the contract — the framework's own `Agent` type
+method satisfies the contract - the framework's own `Agent` type
 matches by structural typing.
 
 ## Stable

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -24,7 +24,7 @@ function createFactHistoryTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/fact-tools.ts:294
 
-`fact_history` — trace how a fact changed over time. Returns the
+`fact_history` - trace how a fact changed over time. Returns the
 full bi-temporal supersede chain the given fact belongs to, oldest →
 newest, including superseded entries, so the agent can answer "what
 did the user say before" / "how did this change". Read-only. P0-2.

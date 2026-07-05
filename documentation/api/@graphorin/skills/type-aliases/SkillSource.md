@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -35,11 +35,11 @@ Defined in: packages/skills/src/types/index.ts:72
 
 Source descriptor for a [loadSkills](/api/@graphorin/skills/loader/functions/loadSkills.md) request.
 
-- `'folder'`      — load from a directory on disk.
-- `'npm-package'` — install via the supply-chain installer + load.
-- `'git-repo'`    — shallow-clone via the supply-chain installer +
+- `'folder'`      - load from a directory on disk.
+- `'npm-package'` - install via the supply-chain installer + load.
+- `'git-repo'`    - shallow-clone via the supply-chain installer +
   load.
-- `'inline'`      — the caller supplies a parsed skill structure;
+- `'inline'`      - the caller supplies a parsed skill structure;
   useful for tests and embedded fixtures.
 
 ## Union Members
@@ -58,7 +58,7 @@ Source descriptor for a [loadSkills](/api/@graphorin/skills/loader/functions/loa
 | ------ | ------ | ------ | ------ |
 | `kind` | `"folder"` | - | packages/skills/src/types/index.ts:74 |
 | `path` | `string` | - | packages/skills/src/types/index.ts:75 |
-| `trustLevel?` | [`SkillTrustLevel`](/api/@graphorin/skills/type-aliases/SkillTrustLevel.md) | Operator-supplied trust level. When present it overrides the skill's self-declared `graphorin-trust-level`. Without it, a folder's self-declared `trusted` / `trusted-with-scripts` is capped at `'unknown'` — a downloaded directory cannot promote itself; trust is granted by the integrator, never the artifact. | packages/skills/src/types/index.ts:83 |
+| `trustLevel?` | [`SkillTrustLevel`](/api/@graphorin/skills/type-aliases/SkillTrustLevel.md) | Operator-supplied trust level. When present it overrides the skill's self-declared `graphorin-trust-level`. Without it, a folder's self-declared `trusted` / `trusted-with-scripts` is capped at `'unknown'` - a downloaded directory cannot promote itself; trust is granted by the integrator, never the artifact. | packages/skills/src/types/index.ts:83 |
 
 ***
 

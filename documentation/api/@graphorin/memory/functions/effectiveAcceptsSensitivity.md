@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ Defaults (DEC-149, ADR-013 ext):
 - `'public-tls'` / `'public-mtls'` → `['public']`.
 - `'public-cleartext'` → `['public']`.
 
-Per-provider overrides always win over the defaults — pass
+Per-provider overrides always win over the defaults - pass
 `providerAcceptsSensitivity` explicitly to override.
 
 ## Parameters

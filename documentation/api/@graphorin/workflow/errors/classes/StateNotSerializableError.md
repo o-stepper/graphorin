@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:337
 
 Thrown at checkpoint time when a channel value would not survive a
-JSON round-trip (WF-10) — Map/Set/Date/class instances silently
+JSON round-trip (WF-10) - Map/Set/Date/class instances silently
 degrade with the SQLite store, so every store rejects them eagerly.
 
 ## Extends

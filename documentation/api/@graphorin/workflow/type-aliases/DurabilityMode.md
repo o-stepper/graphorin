@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Allowed durability modes for the checkpoint writer.
 
 WF-7: the advertised `'async'` mode was byte-identical to `'sync'`
 (both awaited the same put), so it was removed rather than shipped
-as a fake third behaviour — a fire-and-forget writer would conflict
+as a fake third behaviour - a fire-and-forget writer would conflict
 with the WF-12 compare-and-set guard and the WF-8 only-report-real-
 writes contract. The runtime still coerces a legacy `'async'` input
 to `'sync'` with a one-time warning.

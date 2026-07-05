@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function runStateToJSON(state, options?): string;
 Defined in: packages/agent/src/run-state/index.ts:184
 
 Render the canonical JSON string representation of the supplied
-[RunState](/api/@graphorin/core/interfaces/RunState.md). `JSON.stringify(serializeRunState(state))` —
+[RunState](/api/@graphorin/core/interfaces/RunState.md). `JSON.stringify(serializeRunState(state))` -
 provided as a convenience.
 
 ## Parameters

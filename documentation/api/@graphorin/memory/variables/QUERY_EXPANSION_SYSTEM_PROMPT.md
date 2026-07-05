@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,4 +16,4 @@ Defined in: packages/memory/src/search/query-transform.ts:82
 
 System prompt for multi-query variant generation. Asks for a bare
 JSON array of standalone rephrasings that preserve the original
-intent — [parseQueryVariants](/api/@graphorin/memory/functions/parseQueryVariants.md) also tolerates a chatty model.
+intent - [parseQueryVariants](/api/@graphorin/memory/functions/parseQueryVariants.md) also tolerates a chatty model.

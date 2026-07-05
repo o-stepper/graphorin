@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -8,11 +8,11 @@
 
 > Standalone server runtime for the [Graphorin](https://github.com/o-stepper/graphorin) framework.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.5.0
-- **License:** [MIT](../../_media/LICENSE-7) (© 2026 Oleksiy Stepurenko)
+- **Version:** v0.6.0
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/server>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -39,12 +39,12 @@
 | **Prometheus metrics** | `/v1/metrics` text exposition v0.0.4 with `graphorin_*` prefix discipline. The canonical inventory covers agent runs, tool calls, provider tokens / cost, WAL size, idempotency hit ratio, trigger fires, redaction drops, consolidator queue depth / DLQ / budget, OAuth token freshness, replay buffer size, in-flight runs, server uptime, and a static `graphorin_build_info` gauge. |
 | **Replay endpoints** | `POST /v1/runs/:runId/replay` and `POST /v1/sessions/:id/replay` enforce `traces:read:sanitized` (default) or `traces:read:raw` (admin); every invocation appends an audit chain entry. |
 | **Graceful shutdown** | Drains in-flight runs within the configured timeout (default 30 s), preserves run state via `RunStateTracker`, propagates `AbortSignal` cancellation to handlers, tears down WebSocket subscriptions cleanly. |
-| **No phone home** | Zero implicit network calls — verified by the repository-wide `pnpm run check-no-network` CI check. |
+| **No phone home** | Zero implicit network calls - verified by the repository-wide `pnpm run check-no-network` CI check. |
 
 ## Out of scope for Phase 14
 
-- Multi-tenant runtime — **v0.3+**.
-- OpenTelemetry metrics export (in addition to Prometheus) — post-MVP.
+- Multi-tenant runtime - **v0.3+**.
+- OpenTelemetry metrics export (in addition to Prometheus) - post-MVP.
 
 ## Install
 
@@ -115,26 +115,26 @@ The most-frequently-touched options:
 
 ## Status
 
-`@graphorin/server` is part of the Graphorin framework's `v0.5.0` pre-release. Once published, the package follows the lockstep release cadence shared by every `@graphorin/*` package on the `0.x` line.
+`@graphorin/server` is part of the Graphorin framework's `v0.6.0` pre-release. Once published, the package follows the lockstep release cadence shared by every `@graphorin/*` package on the `0.x` line.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/server/README.md) | `@graphorin/server` — standalone server runtime for the Graphorin framework. |
+| [](/api/@graphorin/server/README.md) | `@graphorin/server` - standalone server runtime for the Graphorin framework. |
 | [commentary](/api/@graphorin/server/commentary/index.md) | Delivery-layer commentary-phase trace sanitization for `@graphorin/server`. |
 | [config](/api/@graphorin/server/config/index.md) | Strongly-typed configuration loader for the Graphorin server. |
-| [consolidator](/api/@graphorin/server/consolidator/index.md) | `@graphorin/server/consolidator` — Phase 14c lifecycle adapter for the consolidator runtime. |
+| [consolidator](/api/@graphorin/server/consolidator/index.md) | `@graphorin/server/consolidator` - Phase 14c lifecycle adapter for the consolidator runtime. |
 | [errors](/api/@graphorin/server/errors/index.md) | Typed error surface for `@graphorin/server`. Every server-side configuration / lifecycle / runtime failure that an operator must be able to reason about flows through one of the classes in this module so it carries a stable `kind` discriminator + `hint` field pointing the operator at the next remediation step. |
-| [health](/api/@graphorin/server/health/index.md) | `@graphorin/server/health` — Phase 14c health + Prometheus metrics surface. Phase 14a's `/v1/health` is superseded by the extended routes built here when consumers wire the additional probes. |
-| [metrics](/api/@graphorin/server/metrics/index.md) | `@graphorin/server/metrics` — Phase 14c Prometheus exposition layer. |
+| [health](/api/@graphorin/server/health/index.md) | `@graphorin/server/health` - Phase 14c health + Prometheus metrics surface. Phase 14a's `/v1/health` is superseded by the extended routes built here when consumers wire the additional probes. |
+| [metrics](/api/@graphorin/server/metrics/index.md) | `@graphorin/server/metrics` - Phase 14c Prometheus exposition layer. |
 | [middleware](/api/@graphorin/server/middleware/index.md) | Middleware barrel for `@graphorin/server`. Every entry is a Hono `MiddlewareHandler`; they are composed by the `createServer({...})` factory in a fixed order: |
 | [registry](/api/@graphorin/server/registry/index.md) | Registry plumbing that lets the server route handlers locate user- defined agents, workflows, sessions, memory, skills, and MCP server bindings without taking a hard peer dependency on every sibling package. |
-| [replay](/api/@graphorin/server/replay/index.md) | `@graphorin/server/replay` — Phase 14c scope-enforced replay endpoints + audit integration. |
+| [replay](/api/@graphorin/server/replay/index.md) | `@graphorin/server/replay` - Phase 14c scope-enforced replay endpoints + audit integration. |
 | [sse](/api/@graphorin/server/sse/index.md) | Server-Sent Events fallback transport for `@graphorin/server`. |
-| [triggers](/api/@graphorin/server/triggers/index.md) | `@graphorin/server/triggers` — daemon + REST routes for the triggers scheduler. Phase 14c surface. |
-| [ws](/api/@graphorin/server/ws/index.md) | `@graphorin/server/ws` — WebSocket protocol implementation for the Graphorin standalone server. Combines the dispatcher (which fans events out to subscribers + applies the delivery-layer commentary sanitization), the in-memory ticket store (browser single-use ticket flow), the per-subject replay buffer, the strict subject grammar parser + scope check, and the `@hono/node-ws` upgrade handler. |
+| [triggers](/api/@graphorin/server/triggers/index.md) | `@graphorin/server/triggers` - daemon + REST routes for the triggers scheduler. Phase 14c surface. |
+| [ws](/api/@graphorin/server/ws/index.md) | `@graphorin/server/ws` - WebSocket protocol implementation for the Graphorin standalone server. Combines the dispatcher (which fans events out to subscribers + applies the delivery-layer commentary sanitization), the in-memory ticket store (browser single-use ticket flow), the per-subject replay buffer, the strict subject grammar parser + scope check, and the `@hono/node-ws` upgrade handler. |

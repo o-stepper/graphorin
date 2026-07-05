@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function setVaultAdapter(adapter): void;
 Defined in: packages/security/src/secrets/resolvers/vault.ts:31
 
 Register a runtime adapter for the `vault://` scheme. Calling this
-twice replaces the previous adapter — matching the documented
+twice replaces the previous adapter - matching the documented
 "last registration wins" contract.
 
 ## Parameters

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,5 +21,5 @@ Defined in: packages/secret-1password/src/resolver.ts:25
 | `connect.host` | `readonly` | `string` | - | packages/secret-1password/src/resolver.ts:47 |
 | `connect.token` | `readonly` | `string` | - | packages/secret-1password/src/resolver.ts:47 |
 | <a id="property-preservecase"></a> `preserveCase?` | `readonly` | `boolean` | If `true`, do **not** lowercase the URI before forwarding to the CLI. Default `false`. Toggle only when interoperating with a deployment that intentionally relies on case-sensitive keys. | packages/secret-1password/src/resolver.ts:58 |
-| <a id="property-serviceaccounttoken"></a> `serviceAccountToken?` | `readonly` | `string` | Optional service-account token. When set the resolver forwards it via `OP_SERVICE_ACCOUNT_TOKEN` so the CLI runs in headless mode. The token is itself a secret — pass a previously-resolved `SecretValue` and use `.use(...)` to scope its lifetime. | packages/secret-1password/src/resolver.ts:41 |
+| <a id="property-serviceaccounttoken"></a> `serviceAccountToken?` | `readonly` | `string` | Optional service-account token. When set the resolver forwards it via `OP_SERVICE_ACCOUNT_TOKEN` so the CLI runs in headless mode. The token is itself a secret - pass a previously-resolved `SecretValue` and use `.use(...)` to scope its lifetime. | packages/secret-1password/src/resolver.ts:41 |
 | <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Hard timeout per resolve. Default `15000` ms. | packages/secret-1password/src/resolver.ts:34 |

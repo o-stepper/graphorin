@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -26,7 +26,7 @@ pause payload.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-checkpointid"></a> `checkpointId` | `readonly` | `string` | - | packages/workflow/src/types.ts:358 |
 | <a id="property-pendingpause"></a> `pendingPause?` | `readonly` | [`PendingPauseRecord`](/api/@graphorin/workflow/interfaces/PendingPauseRecord.md) | Carries the value passed to `pause(value)` when status is `suspended`. | packages/workflow/src/types.ts:360 |
-| <a id="property-pendingpauses"></a> `pendingPauses?` | `readonly` | readonly [`PendingPauseRecord`](/api/@graphorin/workflow/interfaces/PendingPauseRecord.md)[] | The FULL pending-pause set from the persisted frontier (D1) — parallel pausers, durable timers (`wakeAt`), awakeables and approvals (`name`) included. `pendingPause` remains the first entry for backwards compatibility. | packages/workflow/src/types.ts:367 |
+| <a id="property-pendingpauses"></a> `pendingPauses?` | `readonly` | readonly [`PendingPauseRecord`](/api/@graphorin/workflow/interfaces/PendingPauseRecord.md)[] | The FULL pending-pause set from the persisted frontier (D1) - parallel pausers, durable timers (`wakeAt`), awakeables and approvals (`name`) included. `pendingPause` remains the first entry for backwards compatibility. | packages/workflow/src/types.ts:367 |
 | <a id="property-state"></a> `state` | `readonly` | `TState` | - | packages/workflow/src/types.ts:357 |
 | <a id="property-status"></a> `status` | `readonly` | `"running"` \| `"suspended"` \| `"completed"` \| `"failed"` \| `"aborted"` | - | packages/workflow/src/types.ts:356 |
 | <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/workflow/src/types.ts:355 |

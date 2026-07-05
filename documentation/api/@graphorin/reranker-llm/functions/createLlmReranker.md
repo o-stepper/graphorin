@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function createLlmReranker<TRecord>(options): LlmReRanker<TRecord>;
 Defined in: reranker.ts:85
 
 Build an LLM-as-reranker. The reranker is stateless past the
-provider reference — the provider's own session / connection
+provider reference - the provider's own session / connection
 lifecycle owns the network resources.
 
 ## Type Parameters

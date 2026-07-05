@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:225
 
 Thrown on resume when the stored frontier was written by a different
-WorkflowConfig.version (D1 / workflow-14) — replaying
+WorkflowConfig.version (D1 / workflow-14) - replaying
 persisted state through changed code must fail loudly, not silently
 diverge. Opt out per call via `allowVersionMismatch`.
 

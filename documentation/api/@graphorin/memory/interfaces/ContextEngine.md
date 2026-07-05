@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -65,7 +65,7 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 | `input.agentId` | `string` | - |
 | `input.memory` | [`Memory`](/api/@graphorin/memory/facade/interfaces/Memory.md) | - |
 | `input.messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
-| `input.prefixMessages?` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | The caller's pinned system prefix — the messages EXCLUDED from `messages` before this call (context-engine-04). Used only for accounting: the anti-thrash guard and the "still above threshold" warning must compare against the FULL post-splice context (prefix + summary + preserved + essentials), or a real system prompt defeats the guard and a summarizer call fires every step at the context edge. Never compacted, never returned. |
+| `input.prefixMessages?` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | The caller's pinned system prefix - the messages EXCLUDED from `messages` before this call (context-engine-04). Used only for accounting: the anti-thrash guard and the "still above threshold" warning must compare against the FULL post-splice context (prefix + summary + preserved + essentials), or a real system prompt defeats the guard and a summarizer call fires every step at the context edge. Never compacted, never returned. |
 | `input.preserveRecentTurns?` | `number` | Per-call override of the strategy's preserve-recent count (CE-3). |
 | `input.procedural?` | \{ `tags?`: readonly `string`[]; `topic?`: `string`; \} | Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). |
 | `input.procedural.tags?` | readonly `string`[] | - |
@@ -119,7 +119,7 @@ at the top of every step. Returns `true` when the in-flight
 buffer's token count crosses the per-provider trigger
 threshold. Pass `precomputedTokens` to amortize the count
 via the per-message cache surfaced by
-`SessionMemoryStoreExt.totalCachedTokens(scope)` (DEC-131) —
+`SessionMemoryStoreExt.totalCachedTokens(scope)` (DEC-131) -
 the production hot path is an O(1) comparison when the cache
 is warm.
 
@@ -129,7 +129,7 @@ is warm.
 | ------ | ------ | ------ |
 | `messages` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - |
 | `options?` | \{ `compactableFromIndex?`: `number`; `precomputedTokens?`: `number`; \} | - |
-| `options.compactableFromIndex?` | `number` | Index of the first COMPACTABLE message (context-engine-04): the caller's pinned, never-compacted system prefix ends here. The SOTA-4 reclaim floor counts only `messages.slice(from)` older turns as reclaimable — without it a large system prompt is counted as reclaimable and the floor fires the summarizer for near-zero real reclaim. Default `0` (everything compactable). |
+| `options.compactableFromIndex?` | `number` | Index of the first COMPACTABLE message (context-engine-04): the caller's pinned, never-compacted system prefix ends here. The SOTA-4 reclaim floor counts only `messages.slice(from)` older turns as reclaimable - without it a large system prompt is counted as reclaimable and the floor fires the summarizer for near-zero real reclaim. Default `0` (everything compactable). |
 | `options.precomputedTokens?` | `number` | - |
 
 #### Returns

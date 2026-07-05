@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ function verifyAuditConsistency(
 Defined in: packages/security/src/audit/merkle.ts:277
 
 Verify a consistency proof between two heads (RFC 6962 §2.1.2). A
-`true` result means `newer` is an append-only extension of `older` —
+`true` result means `newer` is an append-only extension of `older` -
 nothing covered by `older` was rewritten, reordered, or truncated.
 
 ## Parameters

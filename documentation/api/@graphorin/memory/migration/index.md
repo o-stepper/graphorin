@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # migration
 
-Embedder migration runner — one of the three deliverables that turns
+Embedder migration runner - one of the three deliverables that turns
 `@graphorin/memory` into a long-running, embedder-aware system.
 
 ## References

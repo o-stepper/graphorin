@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/contracts/secrets-store.ts:13
 
-Pluggable secret resolver — turns a parsed `SecretRef` into a live
+Pluggable secret resolver - turns a parsed `SecretRef` into a live
 `SecretValue`. Concrete resolvers live in `@graphorin/security` (env,
 keyring, file, encrypted-file, literal, ref, vault) and in optional
 adapter packages (`@graphorin/secret-1password`, …).

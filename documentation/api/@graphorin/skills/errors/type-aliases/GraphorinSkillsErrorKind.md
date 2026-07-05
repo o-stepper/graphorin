@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -20,4 +20,4 @@ type GraphorinSkillsErrorKind =
 
 Defined in: packages/skills/src/errors/index.ts:154
 
-Convenience union — every `kind` discriminator the package may emit.
+Convenience union - every `kind` discriminator the package may emit.

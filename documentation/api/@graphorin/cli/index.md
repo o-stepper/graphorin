@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -8,11 +8,11 @@
 
 > Operator CLI for the [Graphorin](https://github.com/o-stepper/graphorin) framework.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.5.0
-- **License:** [MIT](../../_media/LICENSE-1) (© 2026 Oleksiy Stepurenko)
+- **Version:** v0.6.0
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/cli>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -90,7 +90,7 @@ graphorin migrate --config ./graphorin.config.ts
 graphorin start --config ./graphorin.config.ts
 ```
 
-`GRAPHORIN_OFFLINE=1` is honoured by every subcommand — the CLI never makes implicit network calls (verified by the repository-wide `pnpm run check-no-network` CI check).
+`GRAPHORIN_OFFLINE=1` is honoured by every subcommand - the CLI never makes implicit network calls (verified by the repository-wide `pnpm run check-no-network` CI check).
 
 ## Programmatic usage
 
@@ -122,22 +122,22 @@ await runStart({ config: './graphorin.config.ts', port: 8090 });
 
 Phase 15 ships ready-to-copy templates for production deployments:
 
-- `examples/systemd/graphorin.service` — hardened systemd unit (refuse-as-root, `UMask=0077`, `ProtectSystem=strict`, `NoNewPrivileges=true`).
-- `examples/docker/Dockerfile` — multi-stage Node 22-slim image with a non-root user (UID 10001), read-only rootfs friendly, `--cap-drop=ALL` ready.
-- `examples/k8s/deployment.yaml` — Pod-Security-Standards "restricted" profile with `runAsNonRoot`, `seccompProfile: RuntimeDefault`, projected secret mounts.
-- `examples/github-actions/{security.yml,release.yml,renovate.json,audit-ignore.json}` — supply-chain workflows (`pnpm audit`, Sigstore provenance verification, Changesets-driven releases).
+- `examples/systemd/graphorin.service` - hardened systemd unit (refuse-as-root, `UMask=0077`, `ProtectSystem=strict`, `NoNewPrivileges=true`).
+- `examples/docker/Dockerfile` - multi-stage Node 22-slim image with a non-root user (UID 10001), read-only rootfs friendly, `--cap-drop=ALL` ready.
+- `examples/k8s/deployment.yaml` - Pod-Security-Standards "restricted" profile with `runAsNonRoot`, `seccompProfile: RuntimeDefault`, projected secret mounts.
+- `examples/github-actions/{security.yml,release.yml,renovate.json,audit-ignore.json}` - supply-chain workflows (`pnpm audit`, Sigstore provenance verification, Changesets-driven releases).
 
 ## Status
 
-`@graphorin/cli` is part of the Graphorin framework's `v0.5.0` pre-release. Once published, the package follows the lockstep release cadence shared by every `@graphorin/*` package on the `0.x` line.
+`@graphorin/cli` is part of the Graphorin framework's `v0.6.0` pre-release. Once published, the package follows the lockstep release cadence shared by every `@graphorin/*` package on the `0.x` line.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/cli/README.md) | `@graphorin/cli` — operator CLI for the Graphorin framework. |
+| [](/api/@graphorin/cli/README.md) | `@graphorin/cli` - operator CLI for the Graphorin framework. |
 | [commands](/api/@graphorin/cli/commands/index.md) | Public command entry points. The CLI binary thin-wraps these helpers; tests + downstream automations consume them directly so they never spawn a child process to exercise the contract. |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,6 +10,6 @@
 type FieldStability = "stable" | "standardized" | "experimental";
 ```
 
-Defined in: packages/skills/src/spec/index.ts:25
+Defined in: packages/skills/src/spec/index.ts:29
 
 Stability classification of a known upstream field.

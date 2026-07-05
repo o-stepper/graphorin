@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/provider/src/adapters/vercel.ts:79
 
 Loose chunk shape emitted by the AI SDK's `streamText`. The shape is
-intentionally permissive — we accept anything that carries the
+intentionally permissive - we accept anything that carries the
 fields we use and ignore the rest. This keeps the adapter tolerant
 of additive AI SDK schema changes.
 

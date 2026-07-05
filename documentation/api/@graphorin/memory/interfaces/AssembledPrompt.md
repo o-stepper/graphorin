@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Output of [ContextEngine.assemble](/api/@graphorin/memory/interfaces/ContextEngi
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-annotations"></a> `annotations` | `readonly` | readonly [`AnnotatedPart`](/api/@graphorin/memory/interfaces/AnnotatedPart.md)[] | Per-part annotations, in the same order as the assembled system content. Span-only — never serialized to the wire payload. | packages/memory/src/context-engine/engine.ts:230 |
+| <a id="property-annotations"></a> `annotations` | `readonly` | readonly [`AnnotatedPart`](/api/@graphorin/memory/interfaces/AnnotatedPart.md)[] | Per-part annotations, in the same order as the assembled system content. Span-only - never serialized to the wire payload. | packages/memory/src/context-engine/engine.ts:230 |
 | <a id="property-autorecall"></a> `autoRecall` | `readonly` | [`AutoRecallTriggerResult`](/api/@graphorin/memory/interfaces/AutoRecallTriggerResult.md) | Whether auto-recall was triggered this assembly. | packages/memory/src/context-engine/engine.ts:244 |
 | <a id="property-inboundpreamblefired"></a> `inboundPreambleFired` | `readonly` | `boolean` | Whether the per-step inbound preamble fragment fired this assembly. | packages/memory/src/context-engine/engine.ts:236 |
 | <a id="property-layerallocation"></a> `layerAllocation` | `readonly` | [`AllocationResult`](/api/@graphorin/memory/interfaces/AllocationResult.md) | Per-layer allocation snapshot. Surfaced for tests + diagnostics. | packages/memory/src/context-engine/engine.ts:234 |

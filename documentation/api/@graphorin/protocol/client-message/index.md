@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # client-message
 
-`ClientMessage` — discriminated union of every frame a Graphorin
+`ClientMessage` - discriminated union of every frame a Graphorin
 WebSocket client may send to the server. The wire is hybrid: the
 control plane uses JSON-RPC-shaped requests / notifications; the
 data plane uses typed push events emitted exclusively by the server
@@ -35,7 +35,7 @@ The matching subprotocol identifier is `graphorin.protocol.v1`
 | Function | Description |
 | ------ | ------ |
 | [isCancelledNotification](/api/@graphorin/protocol/client-message/functions/isCancelledNotification.md) | - |
-| [isInitializeRequest](/api/@graphorin/protocol/client-message/functions/isInitializeRequest.md) | Type guard helpers — one per `method` literal — so consumers can narrow the `ClientMessage` union without re-stringifying the discriminator. |
+| [isInitializeRequest](/api/@graphorin/protocol/client-message/functions/isInitializeRequest.md) | Type guard helpers - one per `method` literal - so consumers can narrow the `ClientMessage` union without re-stringifying the discriminator. |
 | [isPingRequest](/api/@graphorin/protocol/client-message/functions/isPingRequest.md) | - |
 | [isRunCancelRequest](/api/@graphorin/protocol/client-message/functions/isRunCancelRequest.md) | - |
 | [isSubscribeRequest](/api/@graphorin/protocol/client-message/functions/isSubscribeRequest.md) | - |

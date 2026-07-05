@@ -2,7 +2,7 @@
   "name": "@graphorin/benchmark-latency",
   "version": "0.6.0",
   "private": true,
-  "description": "FTS memory-search latency probe for the Graphorin framework. Measures p50/p95/p99 latency for semantic-memory search over a synthetic FTS corpus (no embedder) and emits RESULTS.md. Streaming TTFT and fact-extraction latency are NOT measured here — they need a cached embedder and a live provider on a workstation profile. Created and maintained by Oleksiy Stepurenko.",
+  "description": "FTS memory-search latency probe for the Graphorin framework. Measures p50/p95/p99 latency for semantic-memory search over a synthetic FTS corpus (no embedder) and emits RESULTS.md. Streaming TTFT and fact-extraction latency are NOT measured here - they need a cached embedder and a live provider on a workstation profile. Created and maintained by Oleksiy Stepurenko.",
   "license": "MIT",
   "author": "Oleksiy Stepurenko",
   "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/latency",

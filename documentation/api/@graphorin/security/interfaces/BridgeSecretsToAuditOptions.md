@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/security/src/audit/secrets-bridge.ts:28
 Subscribe the audit-log subsystem to the secrets-layer event
 emitter. Returns a teardown function that detaches the listener.
 
-Failures inside the bridge never propagate — the audit subsystem
+Failures inside the bridge never propagate - the audit subsystem
 cannot tear down the secret-access path.
 
 ## Stable

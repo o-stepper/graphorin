@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ type EncryptionCipher = "sqlcipher" | "chacha20" | "aes256cbc" | "aes128cbc" | "
 Defined in: packages/store-sqlite/dist/encryption/index.d.ts:14
 
 Cipher selection, validated against the real sqlite3mc vocabulary
-(CS-13 — `'wxsqlite3'` is the library's name, not a cipher; the peer
+(CS-13 - `'wxsqlite3'` is the library's name, not a cipher; the peer
 rejects it with "Cipher 'wxsqlite3' unknown"). `'sqlcipher'` is the
 Graphorin default (SQLCipher v4 compatible); `'chacha20'` is the
 peer's own default cipher.

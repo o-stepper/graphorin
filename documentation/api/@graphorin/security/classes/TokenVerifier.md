@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -161,8 +161,8 @@ verify(rawToken, ctx?): Promise<VerifyResult>;
 Defined in: packages/security/src/auth/verify.ts:209
 
 Run the verify pipeline against a single raw token. Resolves with a
-`{ ok: false, reason }` result for every authentication failure —
-including IP/token lockout — so callers can map them straight to HTTP
+`{ ok: false, reason }` result for every authentication failure -
+including IP/token lockout - so callers can map them straight to HTTP
 responses; it does NOT reject for a failed verification. The single
 exception is backpressure: when more than `maxConcurrent` verifications
 are already in flight it throws [TokenVerifyOverloadError](/api/@graphorin/security/classes/TokenVerifyOverloadError.md) so the

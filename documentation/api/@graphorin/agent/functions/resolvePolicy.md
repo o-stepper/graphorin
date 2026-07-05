@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function resolvePolicy(boundary, cfg?): ProtocolEscapePolicy;
 
 Defined in: packages/agent/src/lateral-leak/protocol-guard.ts:58
 
-Resolved policy lookup. Pure function — no side effects.
+Resolved policy lookup. Pure function - no side effects.
 
 ## Parameters
 

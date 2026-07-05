@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function detectHeadless(): {
 
 Defined in: packages/security/src/secrets/factory.ts:144
 
-Detect whether the host is "headless" — that is, no interactive
+Detect whether the host is "headless" - that is, no interactive
 terminal is attached and the process is likely running unattended.
 The result drives the `'auto'` chain's keyring vs. encrypted-file
 decision.

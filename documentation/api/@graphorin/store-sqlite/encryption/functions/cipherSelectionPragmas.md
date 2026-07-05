@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/store-sqlite/src/encryption/index.ts:37
 The cipher-selection PRAGMAs that must run **before** `PRAGMA key`
 on a freshly opened connection (CS-7). sqlite3mc defaults to
 `chacha20`, so opening a SQLCipher-v4 database with `key` alone
-reads garbage — every keyed open must pin the cipher first.
+reads garbage - every keyed open must pin the cipher first.
 
 ## Parameters
 

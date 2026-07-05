@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -170,10 +170,10 @@ opts?): Promise<unknown>;
 Defined in: packages/client/src/graphorin-client.ts:360
 
 Resume a paused (HITL) run. The WebSocket protocol intentionally
-does NOT carry a `resume` control message — resumes are durable
+does NOT carry a `resume` control message - resumes are durable
 + idempotent + body-carrying, which maps onto the REST endpoint
 `POST /v1/runs/:runId/resume`. NOTE (IP-14): the server endpoint
-currently answers **501** — server-side durable resume is not
+currently answers **501** - server-side durable resume is not
 implemented yet. Library-mode callers resume directly:
 `agent.run(result.state, { directive })`.
 

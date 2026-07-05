@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/core/src/types/message.ts:58
 
 Audio attachment (e.g. voice messages). Note: voice realtime / TTS / STT
-are out of scope for v0.1 — these messages are static blobs.
+are out of scope for v0.1 - these messages are static blobs.
 
 ## Stable
 

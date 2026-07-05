@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,4 +23,4 @@ Options accepted by [verifySkillSignature](/api/@graphorin/security/functions/ve
 | <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Cancellation. | packages/security/src/supply-chain/signature.ts:92 |
 | <a id="property-sigstoreverifier"></a> `sigstoreVerifier?` | `readonly` | [`SigstoreVerifier`](/api/@graphorin/security/type-aliases/SigstoreVerifier.md) | - | packages/security/src/supply-chain/signature.ts:95 |
 | <a id="property-skillmd"></a> `skillMd` | `readonly` | `string` | Raw SKILL.md content (UTF-8 string). | packages/security/src/supply-chain/signature.ts:75 |
-| <a id="property-trustroot"></a> `trustRoot?` | `readonly` | [`SkillTrustRoot`](/api/@graphorin/security/interfaces/SkillTrustRoot.md) | Operator trust root (D4 / security-01). When supplied, the RESOLVED signing key must match the trust root or verification fails `valid: false` with `reason: 'untrusted-key'` — a self-signed skill whose inline key is not in the root can no longer verify green. The root is checked AFTER the ed25519 signature itself is valid, so the result distinguishes a bad signature from an untrusted signer. | packages/security/src/supply-chain/signature.ts:90 |
+| <a id="property-trustroot"></a> `trustRoot?` | `readonly` | [`SkillTrustRoot`](/api/@graphorin/security/interfaces/SkillTrustRoot.md) | Operator trust root (D4 / security-01). When supplied, the RESOLVED signing key must match the trust root or verification fails `valid: false` with `reason: 'untrusted-key'` - a self-signed skill whose inline key is not in the root can no longer verify green. The root is checked AFTER the ed25519 signature itself is valid, so the result distinguishes a bad signature from an untrusted signer. | packages/security/src/supply-chain/signature.ts:90 |

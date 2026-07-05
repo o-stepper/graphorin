@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -107,7 +107,7 @@ snapshot(): TaintLedgerSnapshot;
 
 Defined in: packages/security/src/dataflow/types.ts:150
 
-Coarse, serializable summary of the load-bearing trifecta-gate signal —
+Coarse, serializable summary of the load-bearing trifecta-gate signal -
 the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked
 verbatim spans (those are untrusted text and must not be persisted). Used
 to rehydrate the ledger across a suspend/resume so the sink gate is not

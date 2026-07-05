@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ function guardOutboundContent(
 Defined in: packages/agent/src/lateral-leak/protocol-guard.ts:169
 
 Apply the configured escape policy to a single string body. Pure
-— never mutates inputs.
+- never mutates inputs.
 
 ## Parameters
 

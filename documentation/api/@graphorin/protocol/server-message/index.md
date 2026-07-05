@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,18 +6,18 @@
 
 # server-message
 
-`ServerMessage` — discriminated union of every frame a Graphorin
+`ServerMessage` - discriminated union of every frame a Graphorin
 server may push to a client. Three families share the channel:
 
-  1. **RPC responses** (`{ jsonrpc, id, result | error }`) —
+  1. **RPC responses** (`{ jsonrpc, id, result | error }`) -
      correlate with a previously-issued client request.
   2. **Typed push events** (`{ kind: 'event', subject, type,
-     payload, eventId }`) — the streaming-first data plane;
+     payload, eventId }`) - the streaming-first data plane;
      consumers ignore unknown `type` strings per the agent-event
      extensibility convention.
   3. **Asynchronous server frames** (`{ kind: 'lifecycle' | 'error'
      | 'pong' | 'subscribed' | 'unsubscribed' | 'replay-marker' }`)
-     — server-initiated messages that do not correlate with a
+     - server-initiated messages that do not correlate with a
      single client RPC id.
 
 Every frame carries the `v: '1'` literal so future revisions can

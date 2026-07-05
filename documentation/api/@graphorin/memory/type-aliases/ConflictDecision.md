@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -38,8 +38,8 @@ type ConflictDecision =
 
 Defined in: packages/memory/src/conflict/types.ts:61
 
-Final pipeline outcome — discriminated union returned by
-[runConflictPipeline](/api/@graphorin/memory/functions/runConflictPipeline.md). Mirrors RB-02 §8.1 / DEC-117 — every
+Final pipeline outcome - discriminated union returned by
+[runConflictPipeline](/api/@graphorin/memory/functions/runConflictPipeline.md). Mirrors RB-02 §8.1 / DEC-117 - every
 variant carries the originating `stage` so audit + replay tooling
 can pattern-match without inspecting the message.
 

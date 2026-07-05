@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function operationNameFor(type):
   | undefined;
 ```
 
-Defined in: packages/observability/src/gen-ai/operation-mapping.ts:75
+Defined in: packages/observability/src/gen-ai/operation-mapping.ts:78
 
 Resolve the canonical `gen_ai.operation.name` value for a Graphorin
 span type. Returns `undefined` if no mapping exists (e.g. for

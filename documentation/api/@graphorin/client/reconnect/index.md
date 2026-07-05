@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Pure-functional reconnect-backoff helper. Encapsulated in its own
 module so the GraphorinClient stays free of timing
-heuristics — and so tests can drive the policy with a deterministic
+heuristics - and so tests can drive the policy with a deterministic
 RNG.
 
 Algorithm: exponential backoff with full-jitter

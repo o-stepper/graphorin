@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -176,7 +176,7 @@ render(): string;
 Defined in: packages/server/src/metrics/registry.ts:150
 
 Render the current snapshot in Prometheus text exposition
-format (v0.0.4). Never throws — incomplete sample buckets are
+format (v0.0.4). Never throws - incomplete sample buckets are
 skipped instead of failing the scrape.
 
 #### Returns

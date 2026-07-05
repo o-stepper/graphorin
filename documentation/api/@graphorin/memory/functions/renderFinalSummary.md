@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-se
 
 Render the produced summary into the final text the harness commits
 to the in-flight buffer. The LLM-produced sections come from
-`summaryFromLlm`; the last two are stitched in mechanically — the
+`summaryFromLlm`; the last two are stitched in mechanically - the
 preserved recent turns and the `metadata` block.
 
 ## Parameters

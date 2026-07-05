@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:298
 
-Pending-queue payload — Stage 5 (defer-to-deep) hands the row over
+Pending-queue payload - Stage 5 (defer-to-deep) hands the row over
 to the deep-phase LLM judge (Phase 10c).
 
 ## Stable

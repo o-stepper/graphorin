@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function fuseRrf<TRecord>(
 
 Defined in: packages/memory/src/search/rrf.ts:119
 
-Pure functional core of the RRF reranker — the equal-weight case of
+Pure functional core of the RRF reranker - the equal-weight case of
 [fuseWeighted](/api/@graphorin/memory/functions/fuseWeighted.md). Exported separately so the test suite (and the
 property-based fuzzer) can exercise the math without the `Promise<…>`
 wrapping of the public surface.

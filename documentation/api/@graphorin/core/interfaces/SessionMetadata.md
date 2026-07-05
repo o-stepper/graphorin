@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/core/src/contracts/session-store.ts:11
 
 Lightweight session metadata persisted by the sessions package. The
 actual `session_messages` rows are owned by `MemoryStore` (single source
-of truth — the sessions package delegates message CRUD to memory).
+of truth - the sessions package delegates message CRUD to memory).
 
 ## Stable
 

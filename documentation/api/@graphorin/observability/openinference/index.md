@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Graphorin spans.
 The mapping is the canonical table published in the architecture
 documentation. Span types without a clean OpenInference equivalent
 (`skill.*`, `mcp.connect`, `mcp.list-tools`, `replay.*`) are NOT
-emitted — the caller can introspect via [openInferenceKindFor](/api/@graphorin/observability/openinference/functions/openInferenceKindFor.md)
+emitted - the caller can introspect via [openInferenceKindFor](/api/@graphorin/observability/openinference/functions/openInferenceKindFor.md)
 and decide whether to log a fallback attribute.
 
 ## Type Aliases
@@ -27,8 +27,8 @@ and decide whether to log a fallback attribute.
 
 | Variable | Description |
 | ------ | ------ |
-| [OPEN\_INFERENCE\_EXCLUDED\_TYPES](/api/@graphorin/observability/openinference/variables/OPEN_INFERENCE_EXCLUDED_TYPES.md) | Span types intentionally excluded from OpenInference span-kind emission per the canonical table — `skill.*`, `mcp.connect`, `mcp.list-tools`, and `replay.*` markers do not have a clean OpenInference equivalent. |
-| [OPEN\_INFERENCE\_KIND\_TABLE](/api/@graphorin/observability/openinference/variables/OPEN_INFERENCE_KIND_TABLE.md) | Full canonical span-to-kind table — exposed for tooling and tests that need to introspect the mapping. |
+| [OPEN\_INFERENCE\_EXCLUDED\_TYPES](/api/@graphorin/observability/openinference/variables/OPEN_INFERENCE_EXCLUDED_TYPES.md) | Span types intentionally excluded from OpenInference span-kind emission per the canonical table - `skill.*`, `mcp.connect`, `mcp.list-tools`, and `replay.*` markers do not have a clean OpenInference equivalent. |
+| [OPEN\_INFERENCE\_KIND\_TABLE](/api/@graphorin/observability/openinference/variables/OPEN_INFERENCE_KIND_TABLE.md) | Full canonical span-to-kind table - exposed for tooling and tests that need to introspect the mapping. |
 
 ## Functions
 

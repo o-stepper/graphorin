@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/workflow/src/types.ts:280
 
 Configuration accepted by [createWorkflow](/api/@graphorin/workflow/factory/functions/createWorkflow.md). The shape is the
 single point of contact between a consumer's workflow definition and
-the runtime — every other public type derives from it.
+the runtime - every other public type derives from it.
 
 ## Stable
 
@@ -29,10 +29,10 @@ the runtime — every other public type derives from it.
 | <a id="property-checkpointstore"></a> `checkpointStore` | `readonly` | [`CheckpointStore`](/api/@graphorin/workflow/interfaces/CheckpointStore.md) | - | packages/workflow/src/types.ts:288 |
 | <a id="property-durability"></a> `durability?` | `readonly` | [`DurabilityMode`](/api/@graphorin/workflow/type-aliases/DurabilityMode.md) | Default durability mode. Defaults to `sync`. | packages/workflow/src/types.ts:290 |
 | <a id="property-edges"></a> `edges` | `readonly` | readonly [`WorkflowEdge`](/api/@graphorin/workflow/interfaces/WorkflowEdge.md)\&lt;`TState`\&gt;[] | - | packages/workflow/src/types.ts:283 |
-| <a id="property-initialstate"></a> `initialState?` | `readonly` | `Partial`\&lt;`TState`\&gt; | Optional initial state — merged with the input on `execute(...)`. | packages/workflow/src/types.ts:286 |
+| <a id="property-initialstate"></a> `initialState?` | `readonly` | `Partial`\&lt;`TState`\&gt; | Optional initial state - merged with the input on `execute(...)`. | packages/workflow/src/types.ts:286 |
 | <a id="property-journalsteps"></a> `journalSteps?` | `readonly` | `boolean` | Step-result journaling (D1 / workflow-04, opt-in). When `true`, the engine journals a step-intent record plus each completed task's channel writes against the PARENT checkpoint as tasks finish, so a crash between task completion and the step checkpoint no longer re-runs completed side effects: crash recovery replays the journaled writes and re-runs only the unfinished tasks. Default `false` (one extra store write per completed task when on). | packages/workflow/src/types.ts:343 |
 | <a id="property-maxconcurrenttasks"></a> `maxConcurrentTasks?` | `readonly` | `number` | Cap on tasks executing concurrently within one step (D1 / workflow-10). Planned tasks beyond the cap queue and start as slots free up; `Dispatch` fan-outs are bounded the same way. Absent ⇒ unbounded (the pre-D1 behaviour). | packages/workflow/src/types.ts:325 |
-| <a id="property-maxsteps"></a> `maxSteps?` | `readonly` | `number` | Maximum number of execution steps before the engine bails out — an infinite-loop safeguard that surfaces as a structured error. Default: 200. | packages/workflow/src/types.ts:298 |
+| <a id="property-maxsteps"></a> `maxSteps?` | `readonly` | `number` | Maximum number of execution steps before the engine bails out - an infinite-loop safeguard that surfaces as a structured error. Default: 200. | packages/workflow/src/types.ts:298 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/workflow/src/types.ts:281 |
 | <a id="property-nodedefaults"></a> `nodeDefaults?` | `readonly` | \{ `retry?`: [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md); `timeoutMs?`: `number`; \} | Default per-node execution policy (D1 / workflow-03), overridden by the same fields on an individual [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md). | packages/workflow/src/types.ts:315 |
 | `nodeDefaults.retry?` | `readonly` | [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md) | - | packages/workflow/src/types.ts:317 |

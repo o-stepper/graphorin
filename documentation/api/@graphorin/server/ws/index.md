@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # ws
 
-`@graphorin/server/ws` — WebSocket protocol implementation for
+`@graphorin/server/ws` - WebSocket protocol implementation for
 the Graphorin standalone server. Combines the dispatcher (which
 fans events out to subscribers + applies the delivery-layer
 commentary sanitization), the in-memory ticket store (browser
@@ -24,7 +24,7 @@ upgrade handler.
 
 | Function | Description |
 | ------ | ------ |
-| [isSubjectAllowed](/api/@graphorin/server/ws/functions/isSubjectAllowed.md) | Compatibility shim — re-exports `scopeMatches` so consumers don't have to learn the security package's surface. |
+| [isSubjectAllowed](/api/@graphorin/server/ws/functions/isSubjectAllowed.md) | Compatibility shim - re-exports `scopeMatches` so consumers don't have to learn the security package's surface. |
 
 ## References
 

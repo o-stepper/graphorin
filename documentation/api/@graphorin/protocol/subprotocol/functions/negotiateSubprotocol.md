@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: subprotocol.ts:87
 Pick the single subprotocol the server should echo back. Returns
 `SUBPROTOCOL_NAME` when the client offered it, or `null` when no
 compatible variant was advertised. The function ignores `ticket.*`
-tokens — those are handled separately via [parseTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md).
+tokens - those are handled separately via [parseTicketSubprotocol](/api/@graphorin/protocol/subprotocol/functions/parseTicketSubprotocol.md).
 
 ## Parameters
 

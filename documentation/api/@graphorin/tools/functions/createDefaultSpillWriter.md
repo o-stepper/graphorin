@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function createDefaultSpillWriter(options?): SpillWriter;
 
 Defined in: packages/tools/src/result/spill.ts:61
 
-Build the default spill writer — writes the un-truncated body to
+Build the default spill writer - writes the un-truncated body to
 `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
 permissions and tier-aware sensitivity inheritance.
 

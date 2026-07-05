@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -11,19 +11,19 @@
 
 The package owns four moving parts:
 
-1. **`createProvider(...)`** — wraps any adapter in a stable `Provider`
+1. **`createProvider(...)`** - wraps any adapter in a stable `Provider`
    shape with sensitivity, capability, and reasoning-retention defaults.
-2. **Adapters** — `vercelAdapter` (default cloud path; wraps the Vercel
+2. **Adapters** - `vercelAdapter` (default cloud path; wraps the Vercel
    AI SDK), `ollamaAdapter` (direct Ollama HTTP), `llamaCppServerAdapter`
    (the upstream `llama-server` binary from llama.cpp), and
    `openAICompatibleAdapter` (LMStudio / LocalAI / vLLM / Together-style
    self-host endpoints).
-3. **Middleware** — `composeProviderMiddleware([...])` enforces a
+3. **Middleware** - `composeProviderMiddleware([...])` enforces a
    canonical order at startup and throws `MiddlewareOrderingError` on
    violation. Built-ins: `withTracing`, `withRetry`, `withRateLimit`,
    `withCostLimit`, `withCostTracking`, `withFallback`, and
    `withRedaction` (mandatory in production).
-4. **Token counting** — pluggable `TokenCounter` dispatcher. Default
+4. **Token counting** - pluggable `TokenCounter` dispatcher. Default
    `JsTiktokenCounter` for OpenAI-compatible models; per-vendor native
    counters for Anthropic, Google, and Bedrock; heuristic fallback for
    unknown providers with a one-time WARN.
@@ -78,7 +78,7 @@ const safeProvider = composeProviderMiddleware([
 ```ts
 import { ollamaAdapter } from '@graphorin/provider/adapters/ollama';
 
-// Auto-classified as 'loopback' — no warning, no first-run prompt.
+// Auto-classified as 'loopback' - no warning, no first-run prompt.
 const local = createProvider(
   ollamaAdapter({ model: 'llama3.1:8b', baseUrl: 'http://127.0.0.1:11434' }),
 );
@@ -87,7 +87,7 @@ const local = createProvider(
 The same `LocalProviderTrust` classifier (`'loopback' | 'private' |
 'public-tls' | 'public-cleartext'`) drives the trust auto-detection,
 the sensitivity-tier defaults, and the `withRedaction` policy table
-for every `baseUrl`-driven adapter — `ollamaAdapter`,
+for every `baseUrl`-driven adapter - `ollamaAdapter`,
 `llamaCppServerAdapter`, and `openAICompatibleAdapter`. The classifier
 lives at `@graphorin/provider/trust`. Public-cleartext URLs refuse to
 start with `LocalProviderInsecureTransportError`.
@@ -107,21 +107,21 @@ recommendations.
 
 ## Project metadata
 
-- **Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+- **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/provider/README.md) | @graphorin/provider — vendor-neutral LLM provider layer for the Graphorin framework. |
+| [](/api/@graphorin/provider/README.md) | @graphorin/provider - vendor-neutral LLM provider layer for the Graphorin framework. |
 | [adapters/llamacpp-server](/api/@graphorin/provider/adapters/llamacpp-server/index.md) | Direct adapter for the upstream `llama-server` binary from the llama.cpp project. The binary speaks the OpenAI-compatible REST contract end-to-end (`POST /v1/chat/completions`, `POST /v1/completions`, `POST /v1/embeddings`); streaming is via `text/event-stream` chunks terminated by `data: [DONE]` exactly as the upstream OpenAI shape. |
-| [adapters/ollama](/api/@graphorin/provider/adapters/ollama/index.md) | Direct adapter for the Ollama HTTP API. The adapter speaks the native Ollama streaming JSON protocol (`POST /api/chat` returning newline-delimited JSON objects). For operators who prefer the OpenAI-compatible variant exposed by recent Ollama releases, the generic openAICompatibleAdapter is the better choice — both adapters share the same LocalProviderTrust classifier and [LocalProviderInsecureTransportError](/api/@graphorin/provider/classes/LocalProviderInsecureTransportError.md) startup behaviour. |
-| [adapters/openai-compatible](/api/@graphorin/provider/adapters/openai-compatible/index.md) | Generic OpenAI-compatible adapter — works against any HTTP server that speaks the `/v1/chat/completions` REST contract. Tested deployments include LMStudio (default port 1234), LocalAI (default port 8080), vLLM (`python -m vllm.entrypoints.openai.api_server`, default port 8000), Together-style self-host endpoints, and any other server in the OpenAI-compatible ecosystem. |
-| [adapters/vercel](/api/@graphorin/provider/adapters/vercel/index.md) | `vercelAdapter` — wraps a Vercel AI SDK `LanguageModel`-shaped value into a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md). The adapter is the default cloud path: it speaks the AI SDK's `streamText` / `generateText` API and maps the resulting events onto the canonical import('@graphorin/core').ProviderEvent discriminated union. |
+| [adapters/ollama](/api/@graphorin/provider/adapters/ollama/index.md) | Direct adapter for the Ollama HTTP API. The adapter speaks the native Ollama streaming JSON protocol (`POST /api/chat` returning newline-delimited JSON objects). For operators who prefer the OpenAI-compatible variant exposed by recent Ollama releases, the generic openAICompatibleAdapter is the better choice - both adapters share the same LocalProviderTrust classifier and [LocalProviderInsecureTransportError](/api/@graphorin/provider/classes/LocalProviderInsecureTransportError.md) startup behaviour. |
+| [adapters/openai-compatible](/api/@graphorin/provider/adapters/openai-compatible/index.md) | Generic OpenAI-compatible adapter - works against any HTTP server that speaks the `/v1/chat/completions` REST contract. Tested deployments include LMStudio (default port 1234), LocalAI (default port 8080), vLLM (`python -m vllm.entrypoints.openai.api_server`, default port 8000), Together-style self-host endpoints, and any other server in the OpenAI-compatible ecosystem. |
+| [adapters/vercel](/api/@graphorin/provider/adapters/vercel/index.md) | `vercelAdapter` - wraps a Vercel AI SDK `LanguageModel`-shaped value into a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md). The adapter is the default cloud path: it speaks the AI SDK's `streamText` / `generateText` API and maps the resulting events onto the canonical import('@graphorin/core').ProviderEvent discriminated union. |
 | [counters](/api/@graphorin/provider/counters/index.md) | Token-counter dispatcher and per-vendor strategies. |
 | [errors](/api/@graphorin/provider/errors/index.md) | Public error surface for `@graphorin/provider`. |
-| [middleware](/api/@graphorin/provider/middleware/index.md) | Middleware barrel — the canonical-order composer plus seven built-in middlewares. |
+| [middleware](/api/@graphorin/provider/middleware/index.md) | Middleware barrel - the canonical-order composer plus seven built-in middlewares. |
 | [model-tier](/api/@graphorin/provider/model-tier/index.md) | Per-provider model-tier auto-classifier. |
 | [reasoning](/api/@graphorin/provider/reasoning/index.md) | Reasoning-content lifecycle helpers. |
-| [trust](/api/@graphorin/provider/trust/index.md) | Trust subsystem barrel — exports the shared classifier and the per-tier sensitivity defaults. |
+| [trust](/api/@graphorin/provider/trust/index.md) | Trust subsystem barrel - exports the shared classifier and the per-tier sensitivity defaults. |

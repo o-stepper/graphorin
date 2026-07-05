@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/server/src/ws/ticket.ts:91
 
 Build the default in-memory ticket store. Production deployments
 use exactly one store per process (multiple processes would each
-issue their own tickets — there is no shared state because the
+issue their own tickets - there is no shared state because the
 single-user-per-process default applies).
 
 ## Parameters

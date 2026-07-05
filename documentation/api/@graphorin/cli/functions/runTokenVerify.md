@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/token.ts:311
 
 Offline checksum verification. Confirms the structural shape, the
 environment marker, and the CRC checksum but does NOT consult the
-token store — it only proves the token was minted by a Graphorin
+token store - it only proves the token was minted by a Graphorin
 helper.
 
 ## Parameters

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ defined agents, workflows, sessions, memory, skills, and MCP
 server bindings without taking a hard peer dependency on every
 sibling package.
 
-Every entry is keyed by string id; lookups never throw — callers
+Every entry is keyed by string id; lookups never throw - callers
 receive `undefined` and the route handler decides how to surface
 the miss (typically a 404 with a typed error body).
 

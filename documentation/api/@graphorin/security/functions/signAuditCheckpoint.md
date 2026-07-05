@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -20,7 +20,7 @@ Compute and sign the current tree head.
 | ------ | ------ | ------ |
 | `db` | [`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md) | - |
 | `opts` | \{ `now?`: () => `number`; `privateKeyPem`: `string`; `writerId`: `string`; \} | - |
-| `opts.now?` | () => `number` | Override the wall clock — used by tests. |
+| `opts.now?` | () => `number` | Override the wall clock - used by tests. |
 | `opts.privateKeyPem` | `string` | - |
 | `opts.writerId` | `string` | - |
 

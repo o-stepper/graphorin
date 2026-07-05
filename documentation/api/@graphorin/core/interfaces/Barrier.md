@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/channels/channels.ts:102
 
-Barrier — completes when every writer in `from` has produced a value.
+Barrier - completes when every writer in `from` has produced a value.
 
 ## Stable
 

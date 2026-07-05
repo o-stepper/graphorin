@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -73,7 +73,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:350
 Stamp `attemptedAt` on a pending row whose judge call failed
 (MCON-9). The deep phase closes the row as `'judge-unparseable'`
 on the NEXT failure, so a poisoned row is billed at most twice.
-Optional — without it the deep phase falls back to skip-and-retry.
+Optional - without it the deep phase falls back to skip-and-retry.
 
 #### Parameters
 

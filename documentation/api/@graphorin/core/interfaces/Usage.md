@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/core/src/types/usage.ts:10
 Token / cost metrics for a single LLM call.
 
 `cost` is optional because the framework cannot compute it without a
-pricing snapshot — providers/middleware fill it in (e.g. through the
+pricing snapshot - providers/middleware fill it in (e.g. through the
 separate `@graphorin/pricing` package) when the snapshot is available.
 
 ## Stable

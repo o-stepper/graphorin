@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # facade
 
-`createSessionManager(...)` and the `Session` facade — the hybrid
+`createSessionManager(...)` and the `Session` facade - the hybrid
 facade-with-state surface for the sessions module. Per the
 single-source-of-truth principle, this package OWNS sessions /
 agents / handoffs / workflow attachments / audit metadata, and

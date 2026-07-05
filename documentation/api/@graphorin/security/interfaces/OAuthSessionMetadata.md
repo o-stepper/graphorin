@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/oauth/types.ts:167
 
-Audit-safe view of an OAuth session — never carries token material.
+Audit-safe view of an OAuth session - never carries token material.
 Used by `listOAuthSessions(...)` and the `/v1/health/secrets`
 surface (Phase 14a).
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/store-sqlite/src/migrations/runner.ts:10
 
-Result row of the `schema_migrations` bookkeeping table — one row per
+Result row of the `schema_migrations` bookkeeping table - one row per
 applied migration.
 
 ## Stable

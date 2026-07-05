@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/types/memory.ts:198
 
-Episode — a summarized stretch of past activity.
+Episode - a summarized stretch of past activity.
 
 ## Stable
 

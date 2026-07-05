@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,14 +19,14 @@ Defined in: packages/core/src/types/agent-event.ts:483
 Lateral-leak vector classification surfaced on
 [AgentLateralLeakDetectedEvent.vector](/api/@graphorin/core/interfaces/AgentLateralLeakDetectedEvent.md#property-vector).
 
-- `'causality-laundering'` — the assistant message references
+- `'causality-laundering'` - the assistant message references
   information about a denied earlier action via an indirect chain.
-- `'commentary-phase'`     — operator-only commentary content was
+- `'commentary-phase'`     - operator-only commentary content was
   about to escape the session-output boundary.
-- `'sideways-injection'`   — a low-trust child of an
+- `'sideways-injection'`   - a low-trust child of an
   `Agent.fanOut(...)` `'judge-merge'` strategy contributed
   disproportionately to the merged output.
-- `'protocol-header'`      — control-character bytes or a
+- `'protocol-header'`      - control-character bytes or a
   protocol-frame separator was about to escape one of the
   internal-service delivery boundaries.
 

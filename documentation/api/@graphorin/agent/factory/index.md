@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # factory
 
-`createAgent({...})` — the agent factory entry point.
+`createAgent({...})` - the agent factory entry point.
 
 Wires the typed `model -> tool calls -> model` loop, the streamed
 event surface, the steering / followUp queues, durable HITL via

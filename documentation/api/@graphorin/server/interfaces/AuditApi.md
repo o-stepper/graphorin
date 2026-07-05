@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: packages/server/src/routes/audit.ts:45
 
 Verify the chain integrity of every audit row in the inclusive
 range. Phase 14c surfaces this through `POST /v1/audit/verify`.
-Optional — operators that opt out of the audit chain should
+Optional - operators that opt out of the audit chain should
 leave this method off.
 
 #### Parameters

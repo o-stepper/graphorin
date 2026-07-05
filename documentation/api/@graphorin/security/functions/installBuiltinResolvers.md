@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function installBuiltinResolvers(opts?): void;
 Defined in: packages/security/src/secrets/resolvers/index.ts:26
 
 Idempotently install the seven built-in resolvers. Safe to call
-multiple times — replays no-op if the registry already has them.
+multiple times - replays no-op if the registry already has them.
 
 ## Parameters
 

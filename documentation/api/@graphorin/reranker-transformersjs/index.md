@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > entirely in-process. Implements the `ReRanker` contract from
 > `@graphorin/memory/search`.
 >
-> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.5.0 (optional sub-pack)
+- **Published:** v0.6.0 (optional sub-pack)
 - **Default model:** locale-aware (`Xenova/bge-reranker-base` for
   English, `BAAI/bge-reranker-v2-m3` for everything else).
 - **Default precision:** FP16 (`'fp16'` dtype).
@@ -116,7 +116,7 @@ const reranker = createCrossEncoderReranker<MyRecord>({
 
 ## Related decisions
 
-- ADR-024 — Reciprocal Rank Fusion default + pluggable rerankers.
+- ADR-024 - Reciprocal Rank Fusion default + pluggable rerankers.
 
 ---
 
@@ -126,9 +126,9 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/reranker-transformersjs — cross-encoder reranker adapter
+@graphorin/reranker-transformersjs - cross-encoder reranker adapter
 for the Graphorin framework.
 
 Wraps `@huggingface/transformers@^4.1.0` to score `(query, passage)`
@@ -154,7 +154,7 @@ Locale-aware default model:
    multilingual baseline).
 
 Operators that want a narrower / language-specific cross-encoder
-pass an explicit `model` option — the package's defaults
+pass an explicit `model` option - the package's defaults
 deliberately avoid privileging any single language pair.
 
 ## Classes
@@ -197,7 +197,7 @@ deliberately avoid privileging any single language pair.
 | [\_resetPipelineFactoryCacheForTesting](/api/@graphorin/reranker-transformersjs/functions/resetPipelineFactoryCacheForTesting.md) | Test-only helper. Drops the cached pipeline factory so the next loader call re-imports the peer. |
 | [createCrossEncoderReranker](/api/@graphorin/reranker-transformersjs/functions/createCrossEncoderReranker.md) | Build a cross-encoder reranker. Lazy: the pipeline is constructed on the first `rerank()` call so packaging the reranker pays no model-load cost. |
 | [defaultPassageExtractor](/api/@graphorin/reranker-transformersjs/functions/defaultPassageExtractor.md) | Returns the best-effort passage text for a [MemoryRecord](/api/@graphorin/core/interfaces/MemoryRecord.md). The order of preference, top-down: |
-| [extractPairScores](/api/@graphorin/reranker-transformersjs/functions/extractPairScores.md) | Normalises the raw pipeline output to a flat `score[]` aligned with the input pair order. Cross-encoder classifiers return either a single-best `{label, score}` per pair (the default single-logit bge exports) or an array of `topk` entries. For the array shape we read the POSITIVE label's confidence — NOT the max of any label (PS-16): an irrelevant pair's most confident class is the *negative* one, so taking the max would invert the ranking for any 2-label classifier. When no label looks positive (single-logit or unrecognised labels) we fall back to the top score. |
+| [extractPairScores](/api/@graphorin/reranker-transformersjs/functions/extractPairScores.md) | Normalises the raw pipeline output to a flat `score[]` aligned with the input pair order. Cross-encoder classifiers return either a single-best `{label, score}` per pair (the default single-logit bge exports) or an array of `topk` entries. For the array shape we read the POSITIVE label's confidence - NOT the max of any label (PS-16): an irrelevant pair's most confident class is the *negative* one, so taking the max would invert the ranking for any 2-label classifier. When no label looks positive (single-logit or unrecognised labels) we fall back to the top score. |
 | [loadDefaultPipelineFactory](/api/@graphorin/reranker-transformersjs/functions/loadDefaultPipelineFactory.md) | - |
 | [mergeAndDedupe](/api/@graphorin/reranker-transformersjs/functions/mergeAndDedupe.md) | Merge the per-source lists into a single deduplicated array, preserving the **highest** initial score per record id and the **first-seen order** for stable tie-breaking. Pure function; exported for the unit test fixture. |
 | [pickRerankerModel](/api/@graphorin/reranker-transformersjs/functions/pickRerankerModel.md) | Pick a reranker model from the agent locale. Pure function so callers (and tests) can pre-resolve the choice without constructing the reranker. |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/security/src/guard/audit-emitter.ts:71
 
 One audit event. The payload never contains the raw contents of a
-memory region — only the digest, the region name, and the actor.
+memory region - only the digest, the region name, and the actor.
 
 ## Stable
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/sessions/src/errors/index.ts:275
 
 Thrown by `Session.push(...)` when the session has been closed (RP-6).
-`close()` is a real lifecycle boundary, not advisory — reopen the session
+`close()` is a real lifecycle boundary, not advisory - reopen the session
 (a fresh `create`) or write to a different one.
 
 ## Stable

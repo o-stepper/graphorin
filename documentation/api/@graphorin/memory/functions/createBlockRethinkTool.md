@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ function createBlockRethinkTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/block-tools.ts:105
 
-`block_rethink` — rewrite a working memory block from scratch.
+`block_rethink` - rewrite a working memory block from scratch.
 
 ## Parameters
 

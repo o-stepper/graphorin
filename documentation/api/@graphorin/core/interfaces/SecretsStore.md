@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -72,7 +72,7 @@ list(scope?): Promise<readonly SecretMetadata[]>;
 
 Defined in: packages/core/src/contracts/secrets-store.ts:63
 
-Returns metadata about every key — never the values themselves.
+Returns metadata about every key - never the values themselves.
 
 #### Parameters
 

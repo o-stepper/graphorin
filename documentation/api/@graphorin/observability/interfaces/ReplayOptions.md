@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Configuration shape for [createReplay](/api/@graphorin/observability/functions/c
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-audit"></a> `audit?` | `readonly` | [`ReplayAuditBridge`](/api/@graphorin/observability/interfaces/ReplayAuditBridge.md) | Optional audit bridge — called once per replay invocation. | packages/observability/src/replay/types.ts:88 |
+| <a id="property-audit"></a> `audit?` | `readonly` | [`ReplayAuditBridge`](/api/@graphorin/observability/interfaces/ReplayAuditBridge.md) | Optional audit bridge - called once per replay invocation. | packages/observability/src/replay/types.ts:88 |
 | <a id="property-canreadraw"></a> `canReadRaw?` | `readonly` | (`context`) => `boolean` | Scope check invoked when the caller asks for `mode: 'raw'`. Returns `true` to allow, `false` to deny. The server (Phase 14) wires this to the `traces:read:raw` token scope; in library mode it defaults to `() => true` (operators trust their own process). | packages/observability/src/replay/types.ts:97 |
 | <a id="property-defaultactor"></a> `defaultActor?` | `readonly` | \{ `id`: `string`; `kind`: `"agent"` \| `"system"` \| `"token"` \| `"cli"`; \} | Default actor reported via `audit.actor` when none is supplied. | packages/observability/src/replay/types.ts:90 |
 | `defaultActor.id` | `readonly` | `string` | - | packages/observability/src/replay/types.ts:42 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -12,15 +12,15 @@
 > pluggable `SecretResolver` registry by shelling out to the official
 > 1Password CLI (`op read 'op://<vault>/<item>/<field>'`).
 >
-> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.5.0 (optional sub-pack)
-- Reference adapter — community packages should follow this template
+- **Published:** v0.6.0 (optional sub-pack)
+- Reference adapter - community packages should follow this template
   when wiring HashiCorp Vault, AWS Secrets Manager, GCP Secret
   Manager, Azure Key Vault, Bitwarden, or Unix `pass`.
 
@@ -34,7 +34,7 @@ pnpm add @graphorin/secret-1password
 
 The package shells out to the **system** `op` binary; install it from
 [1Password's official CLI distribution](https://developer.1password.com/docs/cli/get-started/).
-The package does NOT bundle the CLI — the operator chooses how it is
+The package does NOT bundle the CLI - the operator chooses how it is
 provisioned (homebrew, scoop, apt, official tarball, k8s init
 container, etc.).
 
@@ -155,15 +155,15 @@ Vault, Bitwarden, or Unix `pass`:
    truth for the actual lookup.
 4. Wrap upstream errors in `SecretResolutionError` so existing `catch`
    paths keep working.
-5. Test with a stub `<Tool>Cli` — never reach the network or the
+5. Test with a stub `<Tool>Cli` - never reach the network or the
    real binary in CI.
 
 ---
 
 ## Related decisions
 
-- ADR-026 — `SecretValue` and `SecretsStore` end-to-end contract.
-- ADR-028 — `SecretRef` URI scheme (`env:` / `keyring:` / `file:` / `encrypted-file:` / `op://` / `vault://` / `ref:`).
+- ADR-026 - `SecretValue` and `SecretsStore` end-to-end contract.
+- ADR-028 - `SecretRef` URI scheme (`env:` / `keyring:` / `file:` / `encrypted-file:` / `op://` / `vault://` / `ref:`).
 
 ---
 
@@ -173,9 +173,9 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/secret-1password — reference 1Password secret-resolver
+@graphorin/secret-1password - reference 1Password secret-resolver
 adapter for the Graphorin framework.
 
 Registers the `op://` scheme on top of `@graphorin/security`'s

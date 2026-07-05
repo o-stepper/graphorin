@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/types/workflow-event.ts:92
 
-Workflow paused — for HITL approvals or programmatic `pause(value)`
+Workflow paused - for HITL approvals or programmatic `pause(value)`
 calls. Carries the value passed to `pause(...)` so the caller can
 choose how to surface the prompt to the user.
 

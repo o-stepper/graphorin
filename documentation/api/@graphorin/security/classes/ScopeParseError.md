@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -49,7 +49,7 @@ Defined in: packages/security/src/auth/errors.ts:59
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`cause`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint (CLI command or doc link). | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`hint`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-hint) | packages/security/src/secrets/errors.ts:21 |
-| <a id="property-input"></a> `input` | `readonly` | `string` | `undefined` | Original input string. Safe to log — never carries a secret. | - | - | packages/security/src/auth/errors.ts:57 |
+| <a id="property-input"></a> `input` | `readonly` | `string` | `undefined` | Original input string. Safe to log - never carries a secret. | - | - | packages/security/src/auth/errors.ts:57 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"scope-parse-error"` | `'scope-parse-error'` | Stable lowercase discriminator. Subclasses fix this to a literal. | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`kind`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-kind) | - | packages/security/src/auth/errors.ts:55 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`message`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | `undefined` | - | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`name`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-name) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |

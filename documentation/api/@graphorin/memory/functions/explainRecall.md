@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function explainRecall<TRecord>(hits, opts): RecallExplanation;
 ```
 
-Defined in: packages/memory/src/search/explain.ts:75
+Defined in: packages/memory/src/search/explain.ts:78
 
 Build a [RecallExplanation](/api/@graphorin/memory/interfaces/RecallExplanation.md) from a ranked hit list. Pure and
 deterministic: it surfaces whatever per-signal scores the hybrid

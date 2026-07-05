@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # replay
 
-`@graphorin/server/replay` — Phase 14c scope-enforced replay
+`@graphorin/server/replay` - Phase 14c scope-enforced replay
 endpoints + audit integration.
 
 ## References

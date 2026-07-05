@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ function createBlockReplaceTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/block-tools.ts:78
 
-`block_replace` — replace a unique substring inside a working
+`block_replace` - replace a unique substring inside a working
 memory block. Throws when the substring is missing or appears more
 than once.
 

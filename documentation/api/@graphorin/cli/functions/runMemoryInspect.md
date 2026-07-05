@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runMemoryInspect(options): Promise<MemoryInspectResult>;
 
 Defined in: packages/cli/src/commands/memory.ts:272
 
-`graphorin memory inspect <factId>` — surface everything the store
+`graphorin memory inspect <factId>` - surface everything the store
 knows about one fact: its retrieval-trust status + provenance, the
 full bi-temporal supersede chain it belongs to, the audit-log events
 recorded against it, the conflict decisions that referenced it, and

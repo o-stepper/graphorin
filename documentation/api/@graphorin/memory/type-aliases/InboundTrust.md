@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,18 +21,18 @@ Defined in: packages/memory/src/context-engine/annotations.ts:81
 Trust-class discriminator for an assembled message-content part.
 Sibling axis to [ContentOrigin](/api/@graphorin/memory/type-aliases/ContentOrigin.md); the two are independent.
 
-- `'trusted'` — built-in framework tools + trusted-skill-bundled
+- `'trusted'` - built-in framework tools + trusted-skill-bundled
   tools; D4 preamble does NOT fire on steps containing only
   these parts.
-- `'user-defined'` — tools registered via `tool({...})` from user
+- `'user-defined'` - tools registered via `tool({...})` from user
   application code; D4 preamble fires.
-- `'untrusted-skill'` — tools bundled by an untrusted skill; D4
+- `'untrusted-skill'` - tools bundled by an untrusted skill; D4
   preamble fires; default policy is strip-and-wrap.
-- `'mcp'` — every `Tool` produced by `MCPClient.toTools(...)`; D4
+- `'mcp'` - every `Tool` produced by `MCPClient.toTools(...)`; D4
   preamble fires; default policy is strip-and-wrap.
-- `'web-search'` — built-in `web_search` adapter; D4 preamble
+- `'web-search'` - built-in `web_search` adapter; D4 preamble
   fires; default policy is strip-and-wrap.
-- `'n/a'` — non-tool-result parts for which the inbound-trust
+- `'n/a'` - non-tool-result parts for which the inbound-trust
   axis is meaningless (`'user:input'`, `'memory:tier-filtered'`,
   `'system:framework'`, `'agent:instructions'`,
   `'tool-call:args'`).

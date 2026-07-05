@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function buildGradeRequest(
 
 Defined in: packages/memory/src/search/iterative.ts:240
 
-Build the grade request. Pure — no I/O. Temperature 0 so the verdict
+Build the grade request. Pure - no I/O. Temperature 0 so the verdict
 is as stable as the model allows.
 
 ## Parameters

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/sessions/src/export/writer.ts:88
 Streaming writer. Call `writeRecord(...)` per body record (in any
 order, but `kind: 'meta'` and `kind: 'footer'` are owned by the
 writer) and `close()` to emit the footer. The writer itself does
-not own the destination — every emission is delivered via the
+not own the destination - every emission is delivered via the
 caller-supplied `sink`.
 
 ## Stable

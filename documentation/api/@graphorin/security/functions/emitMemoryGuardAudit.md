@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function emitMemoryGuardAudit(event): void;
 Defined in: packages/security/src/guard/audit-emitter.ts:126
 
 Emit an event to every subscriber. Listeners that throw are
-isolated — a faulty listener never tears down the guard.
+isolated - a faulty listener never tears down the guard.
 
 ## Parameters
 

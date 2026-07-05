@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function getGraphorinMapping(field):
   | undefined;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:121
+Defined in: packages/skills/src/spec/index.ts:125
 
 Resolve the mapping entry for a `graphorin-*` field. Returns
 `undefined` if the field is not known to the snapshot.

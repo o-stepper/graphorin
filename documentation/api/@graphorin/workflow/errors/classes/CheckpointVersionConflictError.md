@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:293
 
 Thrown when a checkpoint write detects that another writer advanced
-the thread concurrently (WF-12) — the loser must not fork the
+the thread concurrently (WF-12) - the loser must not fork the
 timeline.
 
 ## Extends

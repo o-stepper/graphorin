@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # middleware
 
-Middleware barrel — the canonical-order composer plus seven built-in
+Middleware barrel - the canonical-order composer plus seven built-in
 middlewares.
 
 ## References

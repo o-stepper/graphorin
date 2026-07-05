@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ Configuration shape consumed by [createTracer](/api/@graphorin/observability/fun
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-defaultattributesensitivity"></a> `defaultAttributeSensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Default sensitivity for attributes that omit `setAttribute(_, _, { sensitivity })`. Defaults to `'internal'` per the default-deny non-public posture. | packages/observability/src/tracer/tracer.ts:65 |
-| <a id="property-exporters"></a> `exporters` | `readonly` | readonly [`TraceExporter`](/api/@graphorin/observability/interfaces/TraceExporter.md)[] | Configured exporters. Each exporter MUST be wrapped via `withValidation(...)` before reaching the tracer — pass them through unwrapped to use the tracer-managed validator (set by `validation`) or pass already-wrapped exporters when you want per-exporter policies. | packages/observability/src/tracer/tracer.ts:45 |
+| <a id="property-exporters"></a> `exporters` | `readonly` | readonly [`TraceExporter`](/api/@graphorin/observability/interfaces/TraceExporter.md)[] | Configured exporters. Each exporter MUST be wrapped via `withValidation(...)` before reaching the tracer - pass them through unwrapped to use the tracer-managed validator (set by `validation`) or pass already-wrapped exporters when you want per-exporter policies. | packages/observability/src/tracer/tracer.ts:45 |
 | <a id="property-now"></a> `now?` | `readonly` | () => `number` | **`Internal`** Override the wall clock used for span timestamps. Returns milliseconds-since-epoch as a `number`. Default: `Date.now`. | packages/observability/src/tracer/tracer.ts:78 |
 | <a id="property-sampling"></a> `sampling?` | `readonly` | [`SamplingOptions`](/api/@graphorin/observability/interfaces/SamplingOptions.md) | Sampler configuration. | packages/observability/src/tracer/tracer.ts:60 |
 | <a id="property-servicename"></a> `serviceName?` | `readonly` | `string` | Logical service name. Embedded in the OTLP `Resource`. | packages/observability/src/tracer/tracer.ts:37 |

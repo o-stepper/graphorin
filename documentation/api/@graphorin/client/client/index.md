@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # client
 
-`GraphorinClient` — ergonomic façade over the
+`GraphorinClient` - ergonomic façade over the
 [Transport](/api/@graphorin/client/interfaces/Transport.md) contract. Handles:
 
   - WS handshake (`openWebSocketTransport`) with optional ticket flow.

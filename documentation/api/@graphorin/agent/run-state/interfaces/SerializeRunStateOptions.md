@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -16,4 +16,4 @@ Options accepted by [serializeRunState](/api/@graphorin/agent/run-state/function
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-striptracingapikey"></a> `stripTracingApiKey?` | `readonly` | `boolean` | Deep-redact secret-named keys (`apiKey`, `authorization`, `bearerToken` / `accessToken` / `refreshToken`, `password`, `secret`, …) anywhere in the snapshot — tool results and messages included — replacing their values with `'[redacted]'`. Defaults to `false` for the round-trip canonical helper; the agent runtime passes `true` when persisting through the checkpoint store (AG-23). Redaction is best-effort by key name: secrets stored under unrelated keys are not detected. | packages/agent/src/run-state/index.ts:90 |
+| <a id="property-striptracingapikey"></a> `stripTracingApiKey?` | `readonly` | `boolean` | Deep-redact secret-named keys (`apiKey`, `authorization`, `bearerToken` / `accessToken` / `refreshToken`, `password`, `secret`, …) anywhere in the snapshot - tool results and messages included - replacing their values with `'[redacted]'`. Defaults to `false` for the round-trip canonical helper; the agent runtime passes `true` when persisting through the checkpoint store (AG-23). Redaction is best-effort by key name: secrets stored under unrelated keys are not detected. | packages/agent/src/run-state/index.ts:90 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function getSpecSnapshot(): SpecSnapshot;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:77
+Defined in: packages/skills/src/spec/index.ts:81
 
 Return the currently active snapshot. Loads the bundled JSON file
 on first call, then caches the parsed object.

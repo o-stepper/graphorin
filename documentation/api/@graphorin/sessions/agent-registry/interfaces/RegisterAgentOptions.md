@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/sessions/src/agent-registry.ts:37
 
 Optional options accepted by [AgentRegistry.register](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md#register). The
-registration is idempotent on `id` — re-registering the same id
+registration is idempotent on `id` - re-registering the same id
 refreshes the display name + tags.
 
 ## Stable

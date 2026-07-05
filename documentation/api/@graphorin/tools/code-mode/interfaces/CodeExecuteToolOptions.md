@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Configuration for [createCodeExecuteTool](/api/@graphorin/tools/code-mode/functi
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-allowedtools"></a> `allowedTools` | `readonly` | readonly `string`[] | Names the script may call. Discovered (deferred) names may be added. | packages/tools/src/code-mode/meta-tools.ts:147 |
-| <a id="property-approvalgatedtools"></a> `approvalGatedTools?` | `readonly` | readonly `string`[] | Approval-gated tool names (TL-8) — listed in the catalogue with a call-directly marker (they cannot suspend for HITL mid-script). | packages/tools/src/code-mode/meta-tools.ts:158 |
+| <a id="property-approvalgatedtools"></a> `approvalGatedTools?` | `readonly` | readonly `string`[] | Approval-gated tool names (TL-8) - listed in the catalogue with a call-directly marker (they cannot suspend for HITL mid-script). | packages/tools/src/code-mode/meta-tools.ts:158 |
 | <a id="property-executetool"></a> `executeTool` | `readonly` | [`CodeExecuteBridge`](/api/@graphorin/tools/code-mode/type-aliases/CodeExecuteBridge.md) | Host bridge for each `tools.<name>(args)` call. | packages/tools/src/code-mode/meta-tools.ts:149 |
 | <a id="property-limits"></a> `limits?` | `readonly` | [`CodeExecuteLimits`](/api/@graphorin/tools/code-mode/interfaces/CodeExecuteLimits.md) | Sandbox limits. | packages/tools/src/code-mode/meta-tools.ts:151 |
 | <a id="property-projection"></a> `projection` | `readonly` | [`CodeApiProjection`](/api/@graphorin/tools/code-mode/interfaces/CodeApiProjection.md) | Projection over the eager tool set, embedded in the description. | packages/tools/src/code-mode/meta-tools.ts:145 |

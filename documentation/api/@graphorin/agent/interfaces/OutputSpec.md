@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ Output type specification.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description shown to the model alongside the schema. | packages/agent/src/types.ts:65 |
-| <a id="property-jsonschema"></a> `jsonSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | Wire-format JSON Schema advertised to the model: forwarded on `ProviderRequest.outputType` for adapters with native structured output, and embedded in the fallback JSON instruction appended as a trailing system message (the documented contract until adapters consume `outputType` natively — PS-24). | packages/agent/src/types.ts:73 |
+| <a id="property-jsonschema"></a> `jsonSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | Wire-format JSON Schema advertised to the model: forwarded on `ProviderRequest.outputType` for adapters with native structured output, and embedded in the fallback JSON instruction appended as a trailing system message (the documented contract until adapters consume `outputType` natively - PS-24). | packages/agent/src/types.ts:73 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"text"` \| `"structured"` | - | packages/agent/src/types.ts:57 |
-| <a id="property-schema"></a> `schema?` | `readonly` | \{ `parse`: `TOutput`; \} | Local validator (Zod-compatible `{ parse }`) applied to the final model output on the completed path (AG-3). A parse failure fails the run with `output-validation-failed` — never a silent cast. | packages/agent/src/types.ts:63 |
+| <a id="property-schema"></a> `schema?` | `readonly` | \{ `parse`: `TOutput`; \} | Local validator (Zod-compatible `{ parse }`) applied to the final model output on the completed path (AG-3). A parse failure fails the run with `output-validation-failed` - never a silent cast. | packages/agent/src/types.ts:63 |
 | `schema.parse` | `public` | `TOutput` | - | packages/agent/src/types.ts:63 |

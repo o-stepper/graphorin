@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -22,14 +22,14 @@ when the price is unknown. Useful when caller wants to compute cost
 for a single LLM call without instantiating the cost tracker.
 
 Token-count contract (PS-19):
-- `inputTokens` **excludes** `cachedReadTokens` and `cacheWriteTokens` —
+- `inputTokens` **excludes** `cachedReadTokens` and `cacheWriteTokens` -
   the cache legs are billed separately at their own rates, so pass the
   non-cached prompt count to avoid double-billing.
 - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
   declares an explicit `reasoningUsdPerToken`.
 - `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
   declares one, else at the full input rate (a cache write is at minimum a
-  normal input token — the fallback never under-bills relative to no cache).
+  normal input token - the fallback never under-bills relative to no cache).
 
 ## Parameters
 

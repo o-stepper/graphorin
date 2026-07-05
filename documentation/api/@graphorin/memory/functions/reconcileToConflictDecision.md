@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Map a [ReconcileDecision](/api/@graphorin/memory/type-aliases/ReconcileDecision.
 so reconcile outcomes land in `fact_conflicts` through the same audit
 path as the inline pipeline (no new stage / schema): `add` → `admit`,
 `noop` → `dedup`, `update` / `conflict` → `supersede`. All reconcile
-decisions are stamped with the `defer-to-deep` stage — the reconcile
+decisions are stamped with the `defer-to-deep` stage - the reconcile
 loop is the consolidator's replacement for the deferred deep-judge
 step it supersedes.
 

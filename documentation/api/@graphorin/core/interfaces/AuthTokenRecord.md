@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -25,4 +25,4 @@ grammar; raw tokens are never persisted (the runtime carries them via
 | <a id="property-label"></a> `label?` | `readonly` | `string` | Optional human-readable label rendered in CLI listings. | packages/core/src/contracts/auth-token-store.ts:14 |
 | <a id="property-lastusedat"></a> `lastUsedAt?` | `readonly` | `string` | - | packages/core/src/contracts/auth-token-store.ts:20 |
 | <a id="property-revokedat"></a> `revokedAt?` | `readonly` | `string` | - | packages/core/src/contracts/auth-token-store.ts:19 |
-| <a id="property-scopes"></a> `scopes` | `readonly` | readonly `string`[] | Scope grammar — opaque strings of the form `<resource>:<action>[:<id-or-glob>]`. | packages/core/src/contracts/auth-token-store.ts:16 |
+| <a id="property-scopes"></a> `scopes` | `readonly` | readonly `string`[] | Scope grammar - opaque strings of the form `<resource>:<action>[:<id-or-glob>]`. | packages/core/src/contracts/auth-token-store.ts:16 |

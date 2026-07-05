@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -30,6 +30,6 @@ Options accepted by [createCrossEncoderReranker](/api/@graphorin/reranker-transf
 | <a id="property-locale"></a> `locale?` | `readonly` | `string` | BCP 47 locale tag used to select the default model. Default `'en'`. | packages/reranker-transformersjs/src/reranker.ts:37 |
 | <a id="property-model"></a> `model?` | `readonly` | `string` | Override the auto-picked model. Default: derived from `locale`. | packages/reranker-transformersjs/src/reranker.ts:35 |
 | <a id="property-now"></a> `now?` | `readonly` | () => `number` | **`Internal`** Override the wall-clock provider. Used by tests so the idle-eviction timer can be exercised deterministically. | packages/reranker-transformersjs/src/reranker.ts:77 |
-| <a id="property-passageextractor"></a> `passageExtractor?` | `readonly` | [`PassageExtractor`](/api/@graphorin/reranker-transformersjs/type-aliases/PassageExtractor.md)\&lt;`TRecord`\&gt; | Optional passage extractor — replaces the default heuristic that walks `text → summary → value → label → id`. Useful when a custom `MemoryRecord` schema attaches the canonical text elsewhere. | packages/reranker-transformersjs/src/reranker.ts:64 |
+| <a id="property-passageextractor"></a> `passageExtractor?` | `readonly` | [`PassageExtractor`](/api/@graphorin/reranker-transformersjs/type-aliases/PassageExtractor.md)\&lt;`TRecord`\&gt; | Optional passage extractor - replaces the default heuristic that walks `text → summary → value → label → id`. Useful when a custom `MemoryRecord` schema attaches the canonical text elsewhere. | packages/reranker-transformersjs/src/reranker.ts:64 |
 | <a id="property-pipelinefactory"></a> `pipelineFactory?` | `readonly` | [`CrossEncoderPipelineFactory`](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipelineFactory.md) | Inject a `pipelineFactory`. Used by tests to stub the underlying `@huggingface/transformers` pipeline. Production callers leave this unset so the package lazily loads the peer. | packages/reranker-transformersjs/src/reranker.ts:70 |
 | <a id="property-revision"></a> `revision?` | `readonly` | `string` | Optional revision pin (`'main'` if unset). | packages/reranker-transformersjs/src/reranker.ts:41 |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/mcp/src/errors/index.ts:101
 
 Raised when a pinned tool-definition fingerprint does not match the
 server's current definition and `onPinMismatch: 'reject'` is set
-(MC-6) — the approve-then-swap rug-pull posture.
+(MC-6) - the approve-then-swap rug-pull posture.
 
 ## Extends
 

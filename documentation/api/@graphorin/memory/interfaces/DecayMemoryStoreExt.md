@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
 archives facts whose retention curve falls below the configured
 threshold. Adapters that do not maintain decay columns may omit
-the surface entirely — the light phase skips the archive step
+the surface entirely - the light phase skips the archive step
 with an INFO log.
 
 ## Stable
@@ -56,7 +56,7 @@ optional listDecaySignals(ids): Promise<readonly {
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:613
 
-Narrow decay-column read for exactly the given fact ids (MRET-8) —
+Narrow decay-column read for exactly the given fact ids (MRET-8) -
 powers per-search decay re-ranking without the old O(scope)
 1000-row window read. Optional; absent ⇒ the tier falls back to
 `listForDecay`.
@@ -104,7 +104,7 @@ List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
 whole table. `limit` defaults to `1000`.
 
-Archived rows are EXCLUDED by default (MCON-6) — they never receive
+Archived rows are EXCLUDED by default (MCON-6) - they never receive
 access bumps, so they would pin the LRU head and saturate the decay
 window, structurally stopping threshold-archiving and capacity
 eviction for live facts. Inspection paths pass
@@ -149,7 +149,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:606
 
 Record a retrieval access for the given facts (MRET-7): stamp
 `lastAccessedAt` and reinforce `strength` (implementation-capped).
-Optional — adapters without decay columns may omit it; callers
+Optional - adapters without decay columns may omit it; callers
 MUST treat failures as non-fatal (the read path never breaks on a
 bookkeeping write).
 

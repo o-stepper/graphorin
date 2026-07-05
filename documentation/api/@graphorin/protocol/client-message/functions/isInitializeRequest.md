@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function isInitializeRequest(message): message is { id: string | number; jsonrpc
 
 Defined in: client-message.ts:163
 
-Type guard helpers — one per `method` literal — so consumers can
+Type guard helpers - one per `method` literal - so consumers can
 narrow the `ClientMessage` union without re-stringifying the
 discriminator.
 

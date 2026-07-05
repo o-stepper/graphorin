@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/tiers/procedural-memory.ts:101
 
-`ProceduralMemory` — standing orders activated when the agent's
+`ProceduralMemory` - standing orders activated when the agent's
 current context matches the rule's predicate. The activation rules
 are deterministic so the agent runtime + ContextEngine can render
 the active set into the system prompt every step.
@@ -62,8 +62,8 @@ supports the literals `'always'`, `'topic=<topic>'`, and
 always-active so callers do not silently lose rules.
 
 **Quarantined procedures are excluded** (P1-4 / P2-2): an induced
-procedure must not drive actions until validated, so activation — which
-feeds the system prompt — never surfaces it.
+procedure must not drive actions until validated, so activation - which
+feeds the system prompt - never surfaces it.
 
 #### Parameters
 
@@ -204,12 +204,12 @@ Record the outcome of one demonstrated reuse of a procedure
 (MCON-2 part 4). A success increments the rule's persistent
 `successCount`; when `procedurePromotion.afterSuccesses` is
 configured and a QUARANTINED procedure reaches the threshold it is
-promoted through [validate](/api/@graphorin/memory/classes/ProceduralMemory.md#validate) — the injection gate still
+promoted through [validate](/api/@graphorin/memory/classes/ProceduralMemory.md#validate) - the injection gate still
 applies, so a flagged text refuses promotion (surfaced as
 `refused: true`) no matter how many successes accumulate.
 Failures are observed but not persisted (no negative counter yet).
 
-Callers decide what "success" means — typically
+Callers decide what "success" means - typically
 `checkSuccessCriteria(...)` over the procedure's stored
 `successCriteria`, or an operator's judgement.
 
@@ -271,13 +271,13 @@ opts?): Promise<readonly MemoryHit<Rule>[]>;
 
 Defined in: packages/memory/src/tiers/procedural-memory.ts:360
 
-Runbook content search (D3): "find the procedure for this task" —
+Runbook content search (D3): "find the procedure for this task" -
 lexical recall over rule text, as opposed to predicate
 [activate](/api/@graphorin/memory/classes/ProceduralMemory.md#activate). Returns **whole validated procedures** (the full
 [Rule](/api/@graphorin/core/interfaces/Rule.md) incl. steps / variables / success criteria) so a match
 can be followed file-style rather than re-synthesized from
 fragments. Quarantined (unvalidated induced) procedures are
-excluded — they must not drive actions — unless the inspector opts
+excluded - they must not drive actions - unless the inspector opts
 in via `includeQuarantined`.
 
 Uses the storage adapter's FTS surface when available

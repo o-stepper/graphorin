@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ contract end-to-end (`POST /v1/chat/completions`, `POST /v1/completions`,
 terminated by `data: [DONE]` exactly as the upstream OpenAI shape.
 
 The adapter shares a single `LocalProviderTrust` classifier with
-`ollamaAdapter` and `openAICompatibleAdapter` — one classifier, one
+`ollamaAdapter` and `openAICompatibleAdapter` - one classifier, one
 policy table, one error type.
 
 ## Interfaces
@@ -32,4 +32,4 @@ policy table, one error type.
 
 | Function | Description |
 | ------ | ------ |
-| [llamaCppServerAdapter](/api/@graphorin/provider/adapters/llamacpp-server/functions/llamaCppServerAdapter.md) | Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by the upstream `llama-server` binary. The factory does not start the binary — operators launch it themselves with the desired model + GPU flags and pass the URL here. |
+| [llamaCppServerAdapter](/api/@graphorin/provider/adapters/llamacpp-server/functions/llamaCppServerAdapter.md) | Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by the upstream `llama-server` binary. The factory does not start the binary - operators launch it themselves with the desired model + GPU flags and pass the URL here. |

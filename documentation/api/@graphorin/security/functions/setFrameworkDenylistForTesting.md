@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/security/src/supply-chain/policy.ts:44
 **`Experimental`**
 
 Override the framework-maintained denylist. The MVP keeps this
-dormant — only the operator-managed denylist is consulted unless
+dormant - only the operator-managed denylist is consulted unless
 tests inject patterns here.
 
 ## Parameters

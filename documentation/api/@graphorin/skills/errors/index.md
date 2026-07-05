@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -32,4 +32,4 @@ link).
 
 | Type Alias | Description |
 | ------ | ------ |
-| [GraphorinSkillsErrorKind](/api/@graphorin/skills/errors/type-aliases/GraphorinSkillsErrorKind.md) | Convenience union — every `kind` discriminator the package may emit. |
+| [GraphorinSkillsErrorKind](/api/@graphorin/skills/errors/type-aliases/GraphorinSkillsErrorKind.md) | Convenience union - every `kind` discriminator the package may emit. |

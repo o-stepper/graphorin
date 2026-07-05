@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/tiers/shared-memory.ts:13
 
-`SharedMemory` — many-to-many attach mode for blocks / facts /
+`SharedMemory` - many-to-many attach mode for blocks / facts /
 rules across multiple agents. Storage adapters represent
 attachments as a join table (`shared_attachments` in
 `@graphorin/store-sqlite`).

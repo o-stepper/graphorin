@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,12 +12,12 @@ via atomic-write `.tmp + rename` discipline.
 
 Cross-session continuity flow:
 
-1. The current agent calls `agent.progress.write(content)` —
+1. The current agent calls `agent.progress.write(content)` -
    runtime persists the file and queues the
    `agent.progress.written` event (drained into the active or
    next consumed stream).
 2. A sibling / future agent calls
-   `agent.progress.read({ runId: priorRunId })` — runtime
+   `agent.progress.read({ runId: priorRunId })` - runtime
    discovers existing files (no implicit auto-discovery; the
    operator must supply the `runId` cursor).
 

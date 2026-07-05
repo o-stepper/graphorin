@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/memory/src/consolidator/phases/induce.ts:104
 
 Provider-agnostic seam: turn one successful trajectory into a procedure.
-Returns `null` when nothing inducible (degraded provider, empty output) —
+Returns `null` when nothing inducible (degraded provider, empty output) -
 never throws.
 
 ## Stable

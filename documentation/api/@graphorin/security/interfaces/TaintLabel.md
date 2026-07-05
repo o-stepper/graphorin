@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -22,4 +22,4 @@ sensitive for the purposes of downstream sink checks.
 | <a id="property-sensitivity"></a> `sensitivity` | `readonly` | \| `"unknown"` \| [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | The producing tool's declared sensitivity (`'unknown'` when absent). | packages/security/src/dataflow/types.ts:80 |
 | <a id="property-sourcekind"></a> `sourceKind` | `readonly` | `string` | The producing tool's source kind (`'unknown'` when unattributed). Typically a `ToolSource['kind']`; C6 widens the type to `string` so derived labels can carry descriptive kinds (`'llm-derived'`, `'memory-recall'`, `'resumed-untrusted'`). | packages/security/src/dataflow/types.ts:78 |
 | <a id="property-trustclass"></a> `trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | Resolved trust class of the producing tool. | packages/security/src/dataflow/types.ts:71 |
-| <a id="property-untrusted"></a> `untrusted` | `readonly` | `boolean` | `true` when the output originates from an untrusted source (`mcp-derived`, `web-search`, `skill-untrusted`) — content a prompt injection could be hidden in. | packages/security/src/dataflow/types.ts:86 |
+| <a id="property-untrusted"></a> `untrusted` | `readonly` | `boolean` | `true` when the output originates from an untrusted source (`mcp-derived`, `web-search`, `skill-untrusted`) - content a prompt injection could be hidden in. | packages/security/src/dataflow/types.ts:86 |

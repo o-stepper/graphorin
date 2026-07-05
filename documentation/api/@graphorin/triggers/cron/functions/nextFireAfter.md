@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ cron schedule. Returns a UTC `Date` (the scheduler treats every
 trigger as UTC; operators that need local time express that in
 their cron expression).
 
-Returns `null` if no fire happens in the next 4 years (defensive —
+Returns `null` if no fire happens in the next 4 years (defensive -
 impossible for a well-formed cron expression except a vacuous
 combination that never aligns).
 

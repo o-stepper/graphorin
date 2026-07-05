@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/run.ts:169
 
 Snapshot helper used by `@graphorin/observability` aggregators to
 convert the on-disk `usageByModel` shape into the canonical
-[ModelUsage](/api/@graphorin/core/interfaces/ModelUsage.md) array. Pure utility — kept in core so consumers
+[ModelUsage](/api/@graphorin/core/interfaces/ModelUsage.md) array. Pure utility - kept in core so consumers
 do not have to take an observability dependency just to flatten a
 run-state breakdown.
 

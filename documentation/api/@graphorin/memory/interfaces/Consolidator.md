@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -24,7 +24,7 @@ config(): ConsolidatorConfig;
 
 Defined in: packages/memory/src/consolidator/runtime.ts:99
 
-Active config — frozen snapshot.
+Active config - frozen snapshot.
 
 #### Returns
 
@@ -145,7 +145,7 @@ recordExternalSpend(tokens, costUsd?): void;
 Defined in: packages/memory/src/consolidator/runtime.ts:97
 
 Record memory-pipeline LLM spend that happened OUTSIDE a phase run
-(MCON-15 — e.g. workflow induction) so the daily ceilings cover it.
+(MCON-15 - e.g. workflow induction) so the daily ceilings cover it.
 Counted under the deep-phase bucket.
 
 #### Parameters
@@ -171,7 +171,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:108
 
 Register this consolidator's cron / idle triggers with a
 `@graphorin/triggers` scheduler so they fire `trigger(...)`
-automatically (the daemon ↔ triggers bridge — MCON-4). Uses the
+automatically (the daemon ↔ triggers bridge - MCON-4). Uses the
 configured `defaultScope`; throws if none was set. Turn / event
 triggers are skipped (consumer-emitted). The standalone server calls
 this in `beforeStart`.
@@ -212,7 +212,7 @@ setTier(tier): Promise<void>;
 
 Defined in: packages/memory/src/consolidator/runtime.ts:85
 
-Replace the active tier — recomputes ceilings + phase set.
+Replace the active tier - recomputes ceilings + phase set.
 
 #### Parameters
 

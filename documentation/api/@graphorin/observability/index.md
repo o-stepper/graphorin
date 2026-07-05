@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -25,18 +25,18 @@ outbound network calls without an explicit user action.
 - **Mandatory `withValidation(...)` wrapper.** Every exporter passed to
   `createTracer({ exporters })` is wrapped through the configured
   `RedactionValidator`. Registering a raw exporter while
-  `validation: 'off'` triggers `UnvalidatedExporterError` at startup —
+  `validation: 'off'` triggers `UnvalidatedExporterError` at startup -
   there is no silent path.
 - **`RedactionValidator` with 14 built-in patterns.** API key / JWT /
   PEM private key / GitHub PAT / AWS access key / Graphorin token /
   bearer header / basic-auth header / email / credit card / US SSN /
-  E.164 phone / IBAN — all on by default. Three additional patterns
+  E.164 phone / IBAN - all on by default. Three additional patterns
   (IPv4, IPv6, GCP service account) are opt-in.
 - **OpenTelemetry GenAI semantic-conventions conformance.**
   `emitGenAIAttributes(span, {...})`, `emitGenAIMessageEvents(span, [...])`,
   and `deriveGenAISystem(...)` ship the canonical
   `gen_ai.*` attribute family alongside the existing
-  `graphorin.*` attributes — additive, never replacing.
+  `graphorin.*` attributes - additive, never replacing.
 - **OpenInference span-kind layer.** `emitOpenInferenceKind(span)` emits
   the `openinference.span.kind` attribute via the canonical
   per-`SpanType` mapping (`agent.*` → `AGENT`,
@@ -70,7 +70,7 @@ outbound network calls without an explicit user action.
 
 ```bash
 pnpm add @graphorin/observability
-# Optional peer deps for OTLP export — install only when you need them:
+# Optional peer deps for OTLP export - install only when you need them:
 pnpm add @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/exporter-trace-otlp-http
 ```
 
@@ -89,7 +89,7 @@ const tracer = createTracer({
   exporters: [
     // Auto-wrapped via the tracer-managed validator.
     createConsoleExporter({ pretty: true }),
-    // Manually wrapped — useful when each exporter needs its own policy.
+    // Manually wrapped - useful when each exporter needs its own policy.
     withValidation(createJSONLExporter({ path: './traces' }), {
       minTier: 'internal',
     }),
@@ -118,13 +118,13 @@ MIT © 2026 [Oleksiy Stepurenko](https://github.com/o-stepper).
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/observability/README.md) | @graphorin/observability — observability primitives for the Graphorin framework. Ships: |
+| [](/api/@graphorin/observability/README.md) | @graphorin/observability - observability primitives for the Graphorin framework. Ships: |
 | [cost](/api/@graphorin/observability/cost/index.md) | Cost / token tracker surface. |
 | [eval](/api/@graphorin/observability/eval/index.md) | Minimal inline eval runner. |
 | [exporters](/api/@graphorin/observability/exporters/index.md) | Exporter surface for `@graphorin/observability`. |
@@ -133,7 +133,7 @@ MIT © 2026 [Oleksiy Stepurenko](https://github.com/o-stepper).
 | [openinference](/api/@graphorin/observability/openinference/index.md) | OpenInference span-kind emission. Adds the `openinference.span.kind` attribute (one of `AGENT`, `EVALUATOR`, `LLM`, `TOOL`, `RETRIEVER`, `EMBEDDING`, `CHAIN`) to applicable Graphorin spans. |
 | [redaction](/api/@graphorin/observability/redaction/index.md) | Sensitivity-aware redaction surface for `@graphorin/observability`. |
 | [redaction/imperative-patterns](/api/@graphorin/observability/redaction/imperative-patterns/index.md) | Imperative-pattern catalogue for inbound prompt-injection defence. |
-| [redaction/patterns](/api/@graphorin/observability/redaction/patterns/index.md) | Built-in PII / secret detection patterns. The catalogue is intentionally conservative — every pattern has both positive and negative test fixtures and is documented so operators understand exactly what is matched. |
+| [redaction/patterns](/api/@graphorin/observability/redaction/patterns/index.md) | Built-in PII / secret detection patterns. The catalogue is intentionally conservative - every pattern has both positive and negative test fixtures and is documented so operators understand exactly what is matched. |
 | [replay](/api/@graphorin/observability/replay/index.md) | Sanitized-by-default replay surface. |
 | [telemetry](/api/@graphorin/observability/telemetry/index.md) | Zero-default telemetry stub. |
 | [tracer](/api/@graphorin/observability/tracer/index.md) | Tracer surface for `@graphorin/observability`. |

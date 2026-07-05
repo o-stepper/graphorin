@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/security/src/auth/audit-emitter.ts:45
 
 One auth audit event. The payload never carries the raw token or the
-pepper — only the token id / metadata safe to log.
+pepper - only the token id / metadata safe to log.
 
 ## Stable
 

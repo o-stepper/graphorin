@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Optional storage extension for the reflection `insights` table
 (P1-1). The consolidator's reflection pass inserts quarantined,
 cited insights here; the thin `InsightMemory` read surface lists /
 searches them; the ExpeL salience loop bumps + prunes them. Search is
-FTS-only by design — insights are a soft, rank-capped inspector
+FTS-only by design - insights are a soft, rank-capped inspector
 surface, not primary recall.
 
 Adapters that opt out leave the property undefined; reflection then
@@ -128,7 +128,7 @@ prune(scope): Promise<number>;
 Defined in: packages/memory/src/internal/storage-adapter.ts:681
 
 Soft-delete every salience-0 insight for the scope (the ExpeL
-forgetting step). Returns the number pruned. Tombstone only —
+forgetting step). Returns the number pruned. Tombstone only -
 pruned insights stay auditable.
 
 #### Parameters
@@ -181,7 +181,7 @@ reason?): Promise<void>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:670
 
-Set an insight's retrieval-trust `status` (MCON-2) — promote a quarantined
+Set an insight's retrieval-trust `status` (MCON-2) - promote a quarantined
 (reflection) insight or re-quarantine an active one, with a
 `memory_history` audit row. Powers [InsightMemory.validate](/api/@graphorin/memory/classes/InsightMemory.md#validate).
 

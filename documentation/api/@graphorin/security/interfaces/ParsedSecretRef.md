@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/security/src/secrets/secret-ref.ts:57
 
 Internal parsed shape for a single `SecretRef` URI. Conforms to the
 cross-package `SecretRef` contract declared in `@graphorin/core` and
-adds nothing on top of it — richer access (split authority, per-key
+adds nothing on top of it - richer access (split authority, per-key
 multi-value query) is exposed through dedicated helpers below.
 
 ## Stable

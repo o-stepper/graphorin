@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ const DEFAULT_CIPHER: EncryptionCipher = 'sqlcipher';
 
 Defined in: packages/store-sqlite-encrypted/src/cipher-config.ts:20
 
-Default cipher. Matches ADR-030 § 2 — SQLCipher v4 compatible
+Default cipher. Matches ADR-030 § 2 - SQLCipher v4 compatible
 (AES-256-CBC + HMAC-SHA1, `legacy=4` parameter set).
 
 ## Stable

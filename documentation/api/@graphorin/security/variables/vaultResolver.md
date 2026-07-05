@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ const vaultResolver: SecretResolver;
 Defined in: packages/security/src/secrets/resolvers/vault.ts:42
 
 Built-in `vault://` resolver. Acts as a router for an optional
-adapter — when no adapter is registered, it raises a typed
+adapter - when no adapter is registered, it raises a typed
 resolution error pointing at the documented escape hatch.
 
 ## Stable

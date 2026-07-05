@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function buildToolExecutionContext<TDeps>(opts): ToolExecutionContext<TDeps>;
 Defined in: packages/tools/src/executor/tool-context.ts:70
 
 Build a [ToolExecutionContext](/api/@graphorin/core/interfaces/ToolExecutionContext.md) for one invocation. The
-returned context honours the tool's `secretsAllowed` ACL — calls to
+returned context honours the tool's `secretsAllowed` ACL - calls to
 `ctx.secrets.require(...)` for keys outside the allowlist throw
 `SecretAccessDeniedError`.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ type RegistryEntry<TInput, TOutput, TDeps> = ResolvedTool<TInput, TOutput, TDeps
 Defined in: packages/tools/src/registry/types.ts:121
 
 Public entry inserted into the registry. Mirrors the canonical
-`ResolvedTool` shape — every consumer reads from this single record
+`ResolvedTool` shape - every consumer reads from this single record
 shape regardless of registration source.
 
 ## Type Parameters

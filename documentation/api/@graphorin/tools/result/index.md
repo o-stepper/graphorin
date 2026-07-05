@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # result
 
-Tool result envelope helpers for `@graphorin/tools` — token counting,
+Tool result envelope helpers for `@graphorin/tools` - token counting,
 truncation pipeline (`'middle' | 'tail' | 'spill-to-file' |
 'summarize'`), and the `ToolReturn` content-parts pass-through
 convention.

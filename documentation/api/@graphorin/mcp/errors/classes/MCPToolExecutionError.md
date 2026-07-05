@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/mcp/src/errors/index.ts:112
 
 Raised when the MCP server reports a tool-level failure
 (`CallToolResult.isError === true`, MC-4). The server's content text
-rides in the message so the model keeps its self-correction signal —
+rides in the message so the model keeps its self-correction signal -
 while the executor records a real tool FAILURE (audit, retry and
 error policies all engage) instead of a fake success.
 

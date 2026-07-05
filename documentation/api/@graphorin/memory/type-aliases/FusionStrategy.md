@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:119
 Score-fusion strategy for [SemanticMemory.search](/api/@graphorin/memory/classes/SemanticMemory.md#search) (X-2).
 
 - `'rrf'` (the default when `fusion` is omitted) fuses the candidate
-  lists through the configured reranker — the zero-tuning
+  lists through the configured reranker - the zero-tuning
   [RRFReranker](/api/@graphorin/memory/classes/RRFReranker.md) unless one was overridden.
 - `'weighted'` fuses through [WeightedRRFReranker](/api/@graphorin/memory/classes/WeightedRRFReranker.md), scaling each
   list's reciprocal-rank contribution by its [FusionWeights](/api/@graphorin/memory/interfaces/FusionWeights.md), for

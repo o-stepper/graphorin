@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/security/src/hardening/crypto.ts:65
 
 Encode a `Uint8Array` as base62url. The optional `padTo` argument
 left-pads the output with the base62 zero character so every
-emitted string has the same width — useful for fixed-width
+emitted string has the same width - useful for fixed-width
 downstream parsers. The zero-byte preserve rule still holds: if
 every source byte is `0x00`, the returned string is
 `'0'.repeat(max(padTo, bytes.length))`.

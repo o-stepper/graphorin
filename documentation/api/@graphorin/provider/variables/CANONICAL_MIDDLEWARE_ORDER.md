@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ const CANONICAL_MIDDLEWARE_ORDER: readonly string[];
 
 Defined in: packages/provider/src/middleware/compose.ts:53
 
-Canonical middleware ordering — outermost → innermost. The table
+Canonical middleware ordering - outermost → innermost. The table
 is enforced by [composeProviderMiddleware](/api/@graphorin/provider/functions/composeProviderMiddleware.md) and is part of the
 provider layer's public contract (DEC-145 / ADR-039).
 
@@ -21,8 +21,8 @@ provider layer's public contract (DEC-145 / ADR-039).
 Composition is outermost-first, so a request flows top→bottom and a
 response flows bottom→top:
 
-- `withTracing` is outermost so the span wraps everything below —
-  including retries — and records true end-to-end latency.
+- `withTracing` is outermost so the span wraps everything below -
+  including retries - and records true end-to-end latency.
 - `withRetry` sits above the rate/cost limiters so each retry
   attempt is independently counted and throttled.
 - `withRateLimit` → `withCostLimit` → `withCostTracking` form the
@@ -32,7 +32,7 @@ response flows bottom→top:
   secondary provider still passes through the redactor.
 - `withRedaction` is **innermost** (closest to the provider) so it
   is the last thing to touch the outbound payload and the first to
-  touch the inbound stream — guaranteeing every retry, fallback, and
+  touch the inbound stream - guaranteeing every retry, fallback, and
   cost-tracked request sees an already-redacted payload and no
   secret can bypass it.
 

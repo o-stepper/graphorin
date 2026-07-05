@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/tiers/working-memory.ts:105
 
-`WorkingMemory` — labeled, character-bounded blocks rendered into
+`WorkingMemory` - labeled, character-bounded blocks rendered into
 every system prompt. Operations:
 
  - `define(spec)`: idempotently registers a block definition; the
@@ -121,7 +121,7 @@ minimum-viable rendering used by the smoke acceptance criteria.
 
 The optional `agentId` argument is reserved for the per-agent
 filtering Phase 10d wires through. In Phase 10a the argument is
-accepted but ignored — the rendering is scope-wide.
+accepted but ignored - the rendering is scope-wide.
 
 #### Parameters
 

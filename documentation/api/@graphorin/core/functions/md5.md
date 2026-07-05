@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ MD5 hex digest. Used by the memory layer for content deduplication
 
 MD5 is **not** collision-resistant (practical chosen-prefix
 collisions exist) and is **not** used as a cryptographic primitive
-here — it is a fast content-addressing convenience where an
+here - it is a fast content-addressing convenience where an
 adversarial collision merely suppresses a duplicate memory write.
 Do not use this helper for password hashing, MAC, tamper evidence,
 or any other security-sensitive use case (use `@graphorin/security`

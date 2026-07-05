@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function findOAuthStrategies(args): readonly OAuthStrategy[];
 Defined in: packages/security/src/oauth/strategies.ts:35
 
 Find every strategy that matches the given server descriptor. The
-matching is `OR` — either the URL or the ID regex matching is
+matching is `OR` - either the URL or the ID regex matching is
 enough to enrol the strategy.
 
 ## Parameters

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -28,7 +28,7 @@ scoped to the tool's `secretsAllowed` ACL.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-logger"></a> `logger` | `readonly` | [`Logger`](/api/@graphorin/core/interfaces/Logger.md) | - | packages/core/src/contracts/tool.ts:248 |
 | <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\&lt;`TDeps`\&gt; | - | packages/core/src/contracts/tool.ts:245 |
-| <a id="property-secrets"></a> `secrets` | `readonly` | [`ToolSecretsAccessor`](/api/@graphorin/core/interfaces/ToolSecretsAccessor.md) | Per-call secrets accessor. The accessor enforces the tool's `secretsAllowed` ACL — calling `require(...)` for a key that is not on the allowlist throws `SecretAccessDeniedError`. | packages/core/src/contracts/tool.ts:254 |
+| <a id="property-secrets"></a> `secrets` | `readonly` | [`ToolSecretsAccessor`](/api/@graphorin/core/interfaces/ToolSecretsAccessor.md) | Per-call secrets accessor. The accessor enforces the tool's `secretsAllowed` ACL - calling `require(...)` for a key that is not on the allowlist throws `SecretAccessDeniedError`. | packages/core/src/contracts/tool.ts:254 |
 | <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | - | packages/core/src/contracts/tool.ts:246 |
 | <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:244 |
 | <a id="property-tracer"></a> `tracer` | `readonly` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | - | packages/core/src/contracts/tool.ts:247 |

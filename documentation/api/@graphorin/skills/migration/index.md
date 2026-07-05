@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,12 +6,12 @@
 
 # migration
 
-`migrate-frontmatter` — idempotent rewrite helper that migrates
+`migrate-frontmatter` - idempotent rewrite helper that migrates
 legacy `graphorin-*` frontmatter fields onto their upstream
 equivalents per the `deprecate-graphorin-prefix` mappings recorded
 in the bundled spec snapshot.
 
-The function is dry-run by default — callers must opt in to
+The function is dry-run by default - callers must opt in to
 persisting the rewritten bytes. The CLI binary in Phase 15 wraps
 this surface; the library is exposed here so other tooling can
 reuse it.

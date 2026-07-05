@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -20,7 +20,7 @@ loader uses for skills that have no explicit declaration. The
 sandbox tier resolver treats `'unknown'` like `'untrusted'`
 (mandatory `worker-threads + no-net + no-fs`); the supply-chain
 installer treats it as untrusted EXCEPT that the signature
-requirement is downgraded from mandatory to optional — signature
+requirement is downgraded from mandatory to optional - signature
 is a trust upgrade, not a gate (Phase 08 § Risks & mitigations).
 
 ## Stable

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # fanout
 
-Agent-step-level fan-out — `Agent.fanOut(...)` convenience that
+Agent-step-level fan-out - `Agent.fanOut(...)` convenience that
 spawns N sub-agents in parallel under a bounded-fanout cap with
 per-child budgets and four built-in merge strategies.
 
@@ -21,7 +21,7 @@ The two compose orthogonally.
 
 | Interface | Description |
 | ------ | ------ |
-| [ChildResult](/api/@graphorin/agent/fanout/interfaces/ChildResult.md) | Per-child outcome surfaced on [FanOutResult.children](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md#property-children). Failed-child isolation: a child that throws produces a `ChildResult` with `status: 'failed'` — never an exception thrown from the fan-out call itself. |
+| [ChildResult](/api/@graphorin/agent/fanout/interfaces/ChildResult.md) | Per-child outcome surfaced on [FanOutResult.children](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md#property-children). Failed-child isolation: a child that throws produces a `ChildResult` with `status: 'failed'` - never an exception thrown from the fan-out call itself. |
 | [FanOutOptions](/api/@graphorin/agent/fanout/interfaces/FanOutOptions.md) | Per-call options accepted by `Agent.fanOut(...)`. |
 | [FanOutResult](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md) | Aggregate result returned by `Agent.fanOut(...)`. |
 | [PerChildBudget](/api/@graphorin/agent/fanout/interfaces/PerChildBudget.md) | Per-child budget. Defaults derived from the canonical 2026 scaling-rule table for agent fan-out workloads. |
@@ -36,4 +36,4 @@ The two compose orthogonally.
 
 | Function | Description |
 | ------ | ------ |
-| [runFanOut](/api/@graphorin/agent/fanout/functions/runFanOut.md) | Run a fan-out and produce the aggregate [FanOutResult](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md). Pure with respect to side effects — the runtime emits events / audit rows / counter increments via the supplied `emit` callback. |
+| [runFanOut](/api/@graphorin/agent/fanout/functions/runFanOut.md) | Run a fan-out and produce the aggregate [FanOutResult](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md). Pure with respect to side effects - the runtime emits events / audit rows / counter increments via the supplied `emit` callback. |

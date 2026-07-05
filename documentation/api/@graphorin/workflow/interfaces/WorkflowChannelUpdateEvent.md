@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,5 +23,5 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:47
 | <a id="property-channel"></a> `channel` | `readonly` | keyof `TState` & `string` | - | packages/core/dist/types/workflow-event.d.ts:50 |
 | <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/core/dist/types/workflow-event.d.ts:49 |
 | <a id="property-type"></a> `type` | `readonly` | `"workflow.channel.update"` | - | packages/core/dist/types/workflow-event.d.ts:48 |
-| <a id="property-value"></a> `value?` | `readonly` | `unknown` | The merged value, carried ONLY for `ephemeral` channels (workflow-07): their values are wiped from state before the next planning round, so this event is the one place a consumer can observe them. Persistent channels omit it — read the state instead. | packages/core/dist/types/workflow-event.d.ts:58 |
+| <a id="property-value"></a> `value?` | `readonly` | `unknown` | The merged value, carried ONLY for `ephemeral` channels (workflow-07): their values are wiped from state before the next planning round, so this event is the one place a consumer can observe them. Persistent channels omit it - read the state instead. | packages/core/dist/types/workflow-event.d.ts:58 |
 | <a id="property-version"></a> `version` | `readonly` | `number` | - | packages/core/dist/types/workflow-event.d.ts:51 |

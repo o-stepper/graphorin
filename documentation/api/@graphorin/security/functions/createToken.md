@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/security/src/auth/crud.ts:65
 
 Mint a new token, persist its HMAC hash through the injected store,
 and return the raw token wrapped in a `SecretValue`. The plaintext
-value is shown to the user exactly once — at the call site of this
+value is shown to the user exactly once - at the call site of this
 function.
 
 ## Parameters
