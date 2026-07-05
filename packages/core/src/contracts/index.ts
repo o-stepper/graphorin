@@ -90,6 +90,8 @@ export type {
 } from './tool.js';
 export type {
   AISpan,
+  CustomSpanType,
+  KnownSpanType,
   SpanAttributes,
   SpanAttributeValue,
   SpanStatus,
