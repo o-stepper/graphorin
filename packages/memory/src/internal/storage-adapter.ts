@@ -150,6 +150,16 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    */
   purge?(id: string, reason?: string): Promise<void>;
   /**
+   * W-019: record a PENDING supersede link - set `newId.supersedes =
+   * oldId` WITHOUT closing the old fact's validity interval. Used when
+   * a supersede's successor lands quarantined: the old fact must stay
+   * in default recall until the successor is validated, at which point
+   * {@link SemanticMemory.validate} completes the closure via
+   * {@link SemanticMemoryStore.supersede}. No schema change - the
+   * `supersedes` column already exists.
+   */
+  linkPendingSupersede?(newId: string, oldId: string): Promise<void>;
+  /**
    * Walk the bi-temporal supersede chain that `factId` belongs to and
    * return every fact in it, oldest → newest (by `validFrom`),
    * including superseded / soft-deleted rows so callers can answer

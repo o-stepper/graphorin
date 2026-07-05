@@ -355,11 +355,18 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
             break;
           }
           case 'update': {
+            // W-019: the escape hatch applies to update/conflict routes
+            // exactly like the 'add' route (the documented contract of
+            // autoPromoteExtraction); without it the successor stays
+            // quarantined and the supersede is PENDING - the old fact
+            // remains recall-visible until fact_validate promotes the
+            // successor.
             const { new: stored } = await deps.semantic.supersede(
               deps.scope,
               decision.targetId,
               input,
               decision.reason,
+              { autoPromoteSynthesized: deps.autoPromoteExtraction },
             );
             candidateId = stored.id;
             factsUpdated += 1;
@@ -371,6 +378,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
               decision.targetId,
               input,
               decision.reason,
+              { autoPromoteSynthesized: deps.autoPromoteExtraction },
             );
             candidateId = stored.id;
             factsUpdated += 1;

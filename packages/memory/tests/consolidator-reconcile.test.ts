@@ -106,7 +106,11 @@ function firstNeighborId(promptContent: string): string {
   return /\[id: (fact_[a-z0-9]+)\]/.exec(promptContent)?.[1] ?? '';
 }
 
-async function setup(opts: { embedder: EmbedderProvider; provider: Provider }): Promise<{
+async function setup(opts: {
+  embedder: EmbedderProvider;
+  provider: Provider;
+  consolidator?: { autoPromoteExtraction?: boolean };
+}): Promise<{
   memory: ReturnType<typeof createMemory>;
   audit: () => ReadonlyArray<{ decision: string; existingId?: string; stage: string }>;
 }> {
@@ -115,7 +119,12 @@ async function setup(opts: { embedder: EmbedderProvider; provider: Provider }): 
     store,
     embeddings: new InMemoryEmbeddingRegistry(),
     embedder: opts.embedder,
-    consolidator: { tier: 'standard', provider: opts.provider, defaultScope: SCOPE },
+    consolidator: {
+      tier: 'standard',
+      provider: opts.provider,
+      defaultScope: SCOPE,
+      ...(opts.consolidator?.autoPromoteExtraction === true ? { autoPromoteExtraction: true } : {}),
+    },
   });
   await memory.consolidator.start();
   return {
@@ -155,8 +164,9 @@ describe('consolidator standard phase - neighbour-aware reconcile (P0-3)', () =>
     expect(outcome?.factsCreated).toBe(0);
     expect(provider.reconcileCalls).toBe(1);
 
-    // Bi-temporal supersede chain: old fact closed + linked, new fact
-    // quarantined (P1-4) and pointing back at the old one.
+    // W-019 PENDING supersede: the successor is quarantined (P1-4), so
+    // the OLD fact's interval stays OPEN - the knowledge must not
+    // vanish from default recall before the successor is validated.
     const chain = await memory.semantic.history(SCOPE, python.id);
     expect(chain.map((f) => f.id)).toEqual([python.id, chain[1]?.id]);
     expect(chain).toHaveLength(2);
@@ -164,12 +174,63 @@ describe('consolidator standard phase - neighbour-aware reconcile (P0-3)', () =>
     expect(newFact?.supersedes).toBe(python.id);
     expect(newFact?.status).toBe('quarantined');
     expect(newFact?.provenance).toBe('extraction');
-    expect(chain[0]?.supersededBy).toBe(newFact?.id);
-    expect(chain[0]?.validTo).toBeDefined(); // old interval closed
+    expect(chain[0]?.supersededBy).toBeUndefined(); // NOT closed yet
+    expect(chain[0]?.validTo).toBeUndefined();
+
+    // Old knowledge remains in default recall at every point of the
+    // lifecycle (the W-019 acceptance criterion).
+    const preValidate = await memory.semantic.search(SCOPE, 'programming language');
+    expect(preValidate.some((h) => h.record.id === python.id)).toBe(true);
+
+    // Validation completes the deferred supersede: interval closes,
+    // successor takes over.
+    await memory.semantic.validate(SCOPE, newFact?.id ?? '', 'operator review');
+    const after = await memory.semantic.history(SCOPE, python.id);
+    expect(after[0]?.supersededBy).toBe(newFact?.id);
+    expect(after[0]?.validTo).toBeDefined();
+    const postValidate = await memory.semantic.search(SCOPE, 'programming language');
+    expect(postValidate.some((h) => h.record.id === newFact?.id)).toBe(true);
+    expect(postValidate.some((h) => h.record.id === python.id)).toBe(false);
+
+    // Idempotent: a second validate does not double-close or throw.
+    await memory.semantic.validate(SCOPE, newFact?.id ?? '', 'again');
 
     // The supersede is auditable in fact_conflicts.
     const supersede = audit().find((a) => a.decision === 'supersede');
     expect(supersede?.existingId).toBe(python.id);
+  });
+
+  it('W-019: autoPromoteExtraction applies to the update route - successor active, interval closed immediately', async () => {
+    const provider = reconcileProvider({
+      facts: [{ text: 'The user now uses Rust as their main language' }],
+      reconcile: (content) => ({
+        action: 'update',
+        targetId: firstNeighborId(content),
+        reason: 'switched to Rust',
+      }),
+    });
+    const { memory } = await setup({
+      embedder: zoneEmbedder(
+        [
+          ['python', [1, 0, 0]],
+          ['rust', [0.6, 0.8, 0]],
+        ],
+        [0, 0, 1],
+      ),
+      provider,
+      consolidator: { autoPromoteExtraction: true },
+    });
+    const python = await memory.semantic.remember(SCOPE, {
+      text: 'Primary programming language is Python',
+    });
+    await memory.session.push(SCOPE, { role: 'user', content: 'I switched to Rust this year.' });
+    const outcome = await memory.consolidator.fireNow('standard', SCOPE);
+    expect(outcome?.factsUpdated).toBe(1);
+    const chain = await memory.semantic.history(SCOPE, python.id);
+    expect(chain).toHaveLength(2);
+    expect(chain[1]?.status).toBe('active');
+    expect(chain[0]?.supersededBy).toBe(chain[1]?.id);
+    expect(chain[0]?.validTo).toBeDefined();
   });
 
   it('noop: a near-duplicate is deduped without an LLM call and writes no new fact', async () => {

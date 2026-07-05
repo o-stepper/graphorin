@@ -268,6 +268,8 @@ The same `validate(...)` exists on **every derived tier** - `memory.episodic.val
 
 Quarantine is **fail-safe by default** - paid distillation stays invisible until validated. Where that trade-off is wrong for a deployment, the consolidator's opt-in `autoPromoteExtraction` flag (`createMemory({ consolidator: { autoPromoteExtraction: true } })`, **off by default**) admits **injection-clean extraction facts** as `active` directly. Injection-flagged facts always stay quarantined, and episodes / insights / induced procedures are unaffected - they remain quarantined-until-validated.
 
+When the reconciler routes a candidate as an **update / conflict** of an existing ACTIVE fact, the supersede is **pending** by default (W-019): the successor lands quarantined and the old fact's validity interval stays OPEN, so default recall keeps returning the old knowledge instead of nothing. Validating the successor (`fact_validate`, `graphorin memory review --promote`, or `semantic.validate`) promotes it AND completes the supersede - the old interval closes at that moment. With `autoPromoteExtraction` the injection-clean successor is active immediately and the interval closes right away, on the add and update/conflict routes alike. At no point in the lifecycle are both versions hidden.
+
 Quarantine is a **retrieval gate, never a delete** - quarantined rows stay fully auditable. This is the precondition for safely shipping synthesised memory (reflection / reconciliation / induction) against memory-poisoning attacks. See [Security](/guide/security#memory-safety-provenance-quarantine) for the threat model.
 
 ### Principal / owner dimension

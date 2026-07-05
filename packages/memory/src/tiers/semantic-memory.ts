@@ -1127,23 +1127,58 @@ export class SemanticMemory {
         }
         span.setAttributes({ 'memory.semantic.validate.forced': force });
         await this.#store.semantic.setStatus(factId, 'active', reason);
+        // W-019: complete a PENDING supersede. If this fact was written
+        // as a (quarantined) successor of an active fact, the old
+        // fact's interval was deliberately left open; close it now that
+        // the successor is recall-visible. Store-level supersede is an
+        // upsert + COALESCE(valid_to) - idempotent, and it never
+        // clobbers an interval already closed by a racing path.
+        if (existing !== null && existing.supersedes !== undefined) {
+          const oldFact = await this.#fetchExisting(existing.supersedes);
+          const stillOpen =
+            oldFact !== null && oldFact.supersededBy === undefined && oldFact.validTo === undefined;
+          if (stillOpen) {
+            span.setAttributes({ 'memory.semantic.validate.completed_supersede': true });
+            await this.#store.semantic.supersede(
+              existing.supersedes,
+              { ...existing, status: 'active' },
+              reason ?? 'validated-supersede',
+            );
+          }
+        }
       },
     );
   }
 
-  /** Mark `oldId` superseded by a new fact. Returns the new record. */
+  /**
+   * Mark `oldId` superseded by a new fact. Returns the new record.
+   *
+   * W-019 (security-first, knowledge-preserving): when the successor
+   * lands QUARANTINED (the default for `extraction`/synthesized
+   * provenance), the old ACTIVE fact's validity interval is NOT closed
+   * - default recall keeps returning the old knowledge until the
+   * successor passes {@link validate}, which completes the closure.
+   * The link is recorded on the successor's `supersedes` field. With
+   * `autoPromoteSynthesized` (threaded from the consolidator's
+   * `autoPromoteExtraction` escape hatch) an injection-clean successor
+   * is active immediately and the interval closes right away - the
+   * pre-W-019 behaviour. Inverting the default (auto-activating the
+   * successor) would hand a MINJA attacker instant active memory via
+   * any text the reconciler classifies as an 'update'.
+   */
   async supersede(
     scope: SessionScope,
     oldId: string,
     newInput: FactInput,
     reason?: string,
+    options?: { readonly autoPromoteSynthesized?: boolean },
   ): Promise<{ readonly old: string; readonly new: Fact }> {
     return withMemorySpan(
       this.#tracer,
       'memory.write.semantic',
       scope,
       { 'memory.semantic.action': 'supersede' },
-      async () => {
+      async (span) => {
         // Bypass the conflict pipeline - the explicit supersede call
         // is the user's authoritative decision; a second pipeline
         // pass would race with itself (the new fact is by definition
@@ -1152,8 +1187,18 @@ export class SemanticMemory {
         const newFact = await this.remember(
           scope,
           { ...newInput, supersedes: oldId },
-          { pipeline: 'off' },
+          {
+            pipeline: 'off',
+            ...(options?.autoPromoteSynthesized === true ? { autoPromoteSynthesized: true } : {}),
+          },
         );
+        if (newFact.status === 'quarantined') {
+          // Deferred closing: the successor is not recall-visible yet,
+          // so the old fact must remain. `remember` already persisted
+          // the `supersedes` link on the successor row.
+          span.setAttributes({ 'memory.semantic.supersede.pending': true });
+          return { old: oldId, new: newFact };
+        }
         await this.#store.semantic.supersede(oldId, newFact, reason);
         return { old: oldId, new: newFact };
       },
