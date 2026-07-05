@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ function createBlockAppendTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/block-tools.ts:49
 
-`block_append` — append text (with a newline separator) to a working
+`block_append` - append text (with a newline separator) to a working
 memory block.
 
 ## Parameters

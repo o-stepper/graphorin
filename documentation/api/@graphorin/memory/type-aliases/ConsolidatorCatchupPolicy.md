@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/memory/src/consolidator/scheduler.ts:28
 
 Catch-up policy applied when a trigger missed one or more fires
 while the scheduler was offline. Mirrors
-`@graphorin/triggers`'s `CatchupPolicy` — duplicated here so the
+`@graphorin/triggers`'s `CatchupPolicy` - duplicated here so the
 memory package stays import-free at the type level.
 
 ## Stable

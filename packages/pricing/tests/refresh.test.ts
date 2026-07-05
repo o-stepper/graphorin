@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { computeEntriesDigest, refreshPricing } from '../src/index.js';
 
-describe('@graphorin/pricing — refreshPricing', () => {
+describe('@graphorin/pricing - refreshPricing', () => {
   it('parses the upstream JSON and returns a frozen snapshot', async () => {
     const snapshot = await refreshPricing({
       url: 'https://example.com/pricing.json',

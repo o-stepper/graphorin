@@ -9,12 +9,12 @@ import type { ResolvedTool, ToolSource } from '@graphorin/core';
 /**
  * Strategy for resolving cross-source tool-name collisions.
  *
- * - `'auto-prefix'` (default) — rename losers with a stable
+ * - `'auto-prefix'` (default) - rename losers with a stable
  *   namespace-derived prefix (e.g. `linear.search_issues` for an MCP
  *   server identifying as `linear`).
- * - `'priority'`              — keep the highest-priority registration
+ * - `'priority'`              - keep the highest-priority registration
  *   per the precedence ladder; drop the rest.
- * - `'manual'`                — refuse to register the loser; throw
+ * - `'manual'`                - refuse to register the loser; throw
  *   {@link ToolCollisionError} with a structured payload so the
  *   operator can configure either renaming or filtering.
  *
@@ -113,7 +113,7 @@ export interface ToolSearchEmbedder {
 
 /**
  * Public entry inserted into the registry. Mirrors the canonical
- * `ResolvedTool` shape — every consumer reads from this single record
+ * `ResolvedTool` shape - every consumer reads from this single record
  * shape regardless of registration source.
  *
  * @stable

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -71,7 +71,7 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
 - **Streamable HTTP sessions.** The client persists the assigned
   `Mcp-Session-Id` and the SDK transport auto-reconnects with
   `Last-Event-ID` after a transient disconnect. Event replay is the
-  SERVER's responsibility per the Streamable HTTP spec — the client
+  SERVER's responsibility per the Streamable HTTP spec - the client
   surfaces `sessionIdPresent` (stateful routing detected; not a
   replay guarantee).
 
@@ -188,7 +188,7 @@ const issues = await createMCPClient({
   // `authProvider.resolveHeader()` on every outgoing request, so the
   // refresh-ahead window fires automatically and a long-lived session
   // survives token expiry without re-creating the client. Do **not**
-  // resolve the token once into static `headers` — that pins a single
+  // resolve the token once into static `headers` - that pins a single
   // token and defeats the refresh.
   authProvider,
 });
@@ -213,7 +213,7 @@ client persists it for stateful routing and exposes
 alias). A session id is **not** a replay guarantee: per the
 Streamable HTTP spec, event replay is the **server's**
 responsibility, and the SDK transport already auto-reconnects with
-the `Last-Event-ID` header after a transient disconnect — no client
+the `Last-Event-ID` header after a transient disconnect - no client
 configuration needed. (The former client-side `eventStore` option
 was removed: a client-held store cannot drive replay; passing the
 legacy option logs a warning.)
@@ -262,14 +262,14 @@ Every error class extends `GraphorinMCPError` and carries a
 stable lowercase `kind` discriminator and an actionable `hint`
 field where applicable:
 
-- `MCPConnectionError`               — transport could not be established or was dropped.
-- `MCPProtocolError`                 — JSON-RPC / MCP protocol-level error.
-- `MCPAuthError`                     — authentication / authorization failure.
-- `MCPToolNotFoundError`             — the requested tool is not registered with the server.
-- `MCPCallTimeoutError`              — tool call exceeded the configured timeout (variant `'session-lost'` for the resume-handshake-lost path).
-- `MCPCancelledError`                — call was cancelled by an `AbortSignal`.
-- `MCPInvalidConfigError`            — the supplied `MCPTransportConfig` is invalid.
-- `MCPTransportNotSupportedError`    — the supplied configuration requested an unsupported transport / capability combination (variant `'transport-resumable-not-supported'` for resumable sessions on `'stdio'` / `'sse'`).
+- `MCPConnectionError`               - transport could not be established or was dropped.
+- `MCPProtocolError`                 - JSON-RPC / MCP protocol-level error.
+- `MCPAuthError`                     - authentication / authorization failure.
+- `MCPToolNotFoundError`             - the requested tool is not registered with the server.
+- `MCPCallTimeoutError`              - tool call exceeded the configured timeout (variant `'session-lost'` for the resume-handshake-lost path).
+- `MCPCancelledError`                - call was cancelled by an `AbortSignal`.
+- `MCPInvalidConfigError`            - the supplied `MCPTransportConfig` is invalid.
+- `MCPTransportNotSupportedError`    - the supplied configuration requested an unsupported transport / capability combination (variant `'transport-resumable-not-supported'` for resumable sessions on `'stdio'` / `'sse'`).
 
 ## Acceptance & testing
 
@@ -295,17 +295,17 @@ field where applicable:
 
 ## License
 
-MIT — © 2026 Oleksiy Stepurenko.
+MIT - © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/mcp/README.md) | `@graphorin/mcp` — Model Context Protocol client for the Graphorin framework. |
+| [](/api/@graphorin/mcp/README.md) | `@graphorin/mcp` - Model Context Protocol client for the Graphorin framework. |
 | [client](/api/@graphorin/mcp/client/index.md) | Public surface for the MCP client. |
 | [errors](/api/@graphorin/mcp/errors/index.md) | Typed error union for the `@graphorin/mcp` package. |
 | [helpers](/api/@graphorin/mcp/helpers/index.md) | Helper utilities exposed by `@graphorin/mcp`. |

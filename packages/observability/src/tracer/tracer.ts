@@ -1,5 +1,5 @@
 /**
- * `createTracer(...)` — the public entry point for the observability
+ * `createTracer(...)` - the public entry point for the observability
  * tracer. Wires together the {@link Sampler}, the
  * {@link RedactionValidator}, and the registered {@link TraceExporter}s.
  *
@@ -37,7 +37,7 @@ export interface TracerOptions {
   readonly serviceName?: string;
   /**
    * Configured exporters. Each exporter MUST be wrapped via
-   * `withValidation(...)` before reaching the tracer — pass them
+   * `withValidation(...)` before reaching the tracer - pass them
    * through unwrapped to use the tracer-managed validator (set by
    * `validation`) or pass already-wrapped exporters when you want
    * per-exporter policies.
@@ -129,7 +129,7 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
 
   if (validationMode === 'off') {
     warnSink(
-      "[graphorin/observability] WARN: validation: 'off' — exporters are NOT " +
+      "[graphorin/observability] WARN: validation: 'off' - exporters are NOT " +
         'auto-wrapped. Every exporter must call withValidation(...) explicitly. ' +
         'See ADR-035: OTLP RedactionValidator + default-deny non-public.',
     );
@@ -191,7 +191,7 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     const parentId = spec.parent?.id;
     // RP-19: a real parent-sampled flag for `'parent-based'` sampling. An
     // unsampled parent is a noop span (no `setAttribute`), so `asGraphorinSpan`
-    // returns null — `parentId !== undefined` used to treat that as
+    // returns null - `parentId !== undefined` used to treat that as
     // parent-sampled and record the child as an orphan.
     const parentSampled =
       spec.parent === undefined ? undefined : asGraphorinSpan(spec.parent) !== null;
@@ -266,7 +266,7 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     if (attrs === undefined) return undefined;
     // RP-19: initial attrs that omit an explicit `setAttribute(_, _, {
     // sensitivity })` default to `defaultAttributeSensitivity`. Threading it
-    // here makes the knob effective — untagged framework attributes carry the
+    // here makes the knob effective - untagged framework attributes carry the
     // configured tier instead of the validator's hardcoded fallback.
     const out: Record<string, Sensitivity> = {};
     for (const key of Object.keys(attrs)) out[key] = defaultAttrSensitivity;

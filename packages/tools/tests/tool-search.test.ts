@@ -88,7 +88,7 @@ describe('tool_search', () => {
     expect(out.length).toBeGreaterThan(0);
     // Verify search_issues is found
     expect(out.some((m) => m.name === 'search_issues')).toBe(true);
-    // tools-01: matches are model-facing — the carried inputSchema must be
+    // tools-01: matches are model-facing - the carried inputSchema must be
     // real JSON Schema (the tools declare plain Zod), never Zod internals.
     const hit = out.find((m) => m.name === 'search_issues');
     expect(hit?.inputSchema).toMatchObject({

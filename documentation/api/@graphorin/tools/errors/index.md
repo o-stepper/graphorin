@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Typed error classes for `@graphorin/tools`.
 
 Every error carries a lowercase `kind` discriminator and (where
 relevant) a human-readable `hint` field surfaced in CLI output. Never
-throw plain `Error` from framework code — the runtime depends on the
+throw plain `Error` from framework code - the runtime depends on the
 `kind` discriminator to drive recovery / replay logic.
 
 ## Classes

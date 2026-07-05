@@ -124,7 +124,7 @@ async function setup(opts: { embedder: EmbedderProvider; provider: Provider }): 
   };
 }
 
-describe('consolidator standard phase — neighbour-aware reconcile (P0-3)', () => {
+describe('consolidator standard phase - neighbour-aware reconcile (P0-3)', () => {
   it('update: a changed fact supersedes its neighbour (bi-temporal, no delete)', async () => {
     const provider = reconcileProvider({
       facts: [{ text: 'The user now uses Rust as their main language' }],
@@ -194,7 +194,7 @@ describe('consolidator standard phase — neighbour-aware reconcile (P0-3)', () 
     expect(outcome?.factsUpdated).toBe(0);
     expect(provider.reconcileCalls).toBe(0); // pre-filter short-circuited the dedup
 
-    // No new fact landed — only the pre-seeded one exists.
+    // No new fact landed - only the pre-seeded one exists.
     const all = await memory.semantic.search(SCOPE, 'espresso', { includeQuarantined: true });
     expect(all).toHaveLength(1);
     expect(audit().some((a) => a.decision === 'dedup')).toBe(true);
@@ -245,7 +245,7 @@ describe('consolidator standard phase — neighbour-aware reconcile (P0-3)', () 
     await memory.session.push(SCOPE, { role: 'user', content: 'Climbing + Rust update.' });
 
     const outcome = await memory.consolidator.fireNow('standard', SCOPE);
-    // Exactly one reconcile call — for the single mid-zone candidate.
+    // Exactly one reconcile call - for the single mid-zone candidate.
     expect(provider.reconcileCalls).toBe(1);
     // Both candidates ended up added (cold directly, mid via reconcile→add).
     expect(outcome?.factsCreated).toBe(2);

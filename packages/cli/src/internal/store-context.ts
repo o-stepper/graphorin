@@ -29,12 +29,12 @@ export interface OpenStoreContextOptions {
   readonly config?: string;
   /**
    * When `true`, refuse to continue when `auth.pepperRef` cannot be
-   * resolved. Default `false` — callers that do not need the pepper
+   * resolved. Default `false` - callers that do not need the pepper
    * (e.g. `graphorin audit verify`) skip resolution entirely.
    */
   readonly requirePepper?: boolean;
   /**
-   * Override the store factory — tests inject a fake store so they
+   * Override the store factory - tests inject a fake store so they
    * can run subcommand integration without touching a real DB.
    */
   readonly storeFactory?: (options: CreateSqliteStoreOptions) => Promise<GraphorinSqliteStore>;

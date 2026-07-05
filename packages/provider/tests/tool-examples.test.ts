@@ -3,7 +3,7 @@
  * The wire contract already carries worked examples (the agent projects them
  * from `Tool.examples`), but no adapter rendered them, so the model never saw
  * them. `foldToolExamples` appends a compact Examples section to the description
- * — Anthropic reports complex-parameter accuracy 72% → 90% from this.
+ * - Anthropic reports complex-parameter accuracy 72% → 90% from this.
  */
 
 import type { Provider, ProviderRequest, ProviderResponse, ToolDefinition } from '@graphorin/core';

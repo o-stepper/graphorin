@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -55,7 +55,7 @@ Defined in: packages/security/src/audit/types.ts:34
 
 Canonical action discriminator. Listed here as an open string union
 so deployments can extend with their own actions without forking
-the framework — but the well-known set is documented for tooling
+the framework - but the well-known set is documented for tooling
 (filter dropdowns, tests, etc.).
 
 ## Stable

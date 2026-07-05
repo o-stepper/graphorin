@@ -10,7 +10,7 @@
  *
  * `orderPromotedTools` instead emits promoted tools in PROMOTION order (the
  * insertion order of the promoted-name set), so a newly promoted tool always
- * joins the END — the catalogue grows append-only and earlier promotions keep
+ * joins the END - the catalogue grows append-only and earlier promotions keep
  * their byte position. A long-running assistant re-pays only for the new tail.
  *
  * @packageDocumentation

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -22,4 +22,4 @@ the lighter shapes the skills loader produces.
 | <a id="property-name"></a> `name?` | `readonly` | `string` | - | packages/security/src/guard/classifier.ts:27 |
 | <a id="property-secretsallowed"></a> `secretsAllowed?` | `readonly` | readonly `string`[] | Per-tool ACL declared by `tool({ secretsAllowed })`. | packages/security/src/guard/classifier.ts:30 |
 | <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | packages/security/src/guard/classifier.ts:28 |
-| <a id="property-trustlevel"></a> `trustLevel?` | `readonly` | `"untrusted"` \| `"built-in"` \| `"user-defined"` \| `"trusted"` | Source trust level — `'untrusted'` forces the strict tier. | packages/security/src/guard/classifier.ts:34 |
+| <a id="property-trustlevel"></a> `trustLevel?` | `readonly` | `"untrusted"` \| `"built-in"` \| `"user-defined"` \| `"trusted"` | Source trust level - `'untrusted'` forces the strict tier. | packages/security/src/guard/classifier.ts:34 |

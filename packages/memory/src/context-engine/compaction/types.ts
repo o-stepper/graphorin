@@ -57,7 +57,7 @@ export interface CompactionResult {
    * Trust classification of the produced summary (CE-15).
    * `'untrusted-derived'` when the compacted window contained
    * `<<<untrusted_content>>>` envelopes or the injection heuristics
-   * flagged the summarizer output — the LLM-authored summary body is
+   * flagged the summarizer output - the LLM-authored summary body is
    * then wrapped in a `trust="derived"` envelope so taint survives
    * compaction instead of laundering into an authoritative system
    * message. `'trusted'` (or absent, for custom strategies that
@@ -77,9 +77,9 @@ export interface CompactionTriggerConfig {
   readonly thresholdTokens?: number;
   readonly thresholdRatio?: number;
   /**
-   * SOTA-4 reclaim-floor: defer a compaction whose predicted reclaim — the
+   * SOTA-4 reclaim-floor: defer a compaction whose predicted reclaim - the
    * older, compactable portion of the buffer (everything but the preserved
-   * recent turns) — is below this many tokens. Prevents compact-thrash at the
+   * recent turns) - is below this many tokens. Prevents compact-thrash at the
    * threshold (paying a summarizer call to reclaim a handful of tokens). Opt-in;
    * unset / `0` ⇒ no floor (current behaviour).
    */
@@ -111,7 +111,7 @@ export type CompactionStrategy =
        * summarizer prompt (context-engine-07). Without a cap the
        * single-shot prompt carries the ENTIRE older window (~85% of the
        * main model's window at default thresholds) and overflows any
-       * smaller `summarizerModel` — the failure is swallowed, so the
+       * smaller `summarizerModel` - the failure is swallowed, so the
        * run silently never compacts. When the dump exceeds the budget
        * the OLDEST messages are elided (a marker notes how many) and
        * the newest are kept verbatim. Default 96_000 chars (~24k
@@ -121,7 +121,7 @@ export type CompactionStrategy =
       /**
        * C4: keep the most recent N USER messages from the summarized
        * window verbatim (re-inserted between the summary and the
-       * preserved tail) — only assistant/tool content is summarized
+       * preserved tail) - only assistant/tool content is summarized
        * away. User words are the task statement; paraphrase loses
        * constraints. Default `2`; `0` disables.
        */
@@ -153,7 +153,7 @@ export type CompactionStrategy =
        */
       readonly readResultToolName?: string | null;
       /**
-       * A6 / SOTA-2 — recoverable clearing. Wire to a spill / `read_result`
+       * A6 / SOTA-2 - recoverable clearing. Wire to a spill / `read_result`
        * registry: cleared content is saved behind a handle and the placeholder
        * references it so the model can re-fetch via `read_result`. Omitted ⇒ bare
        * placeholders (irrecoverable). Only fires for clears that commit.
@@ -200,7 +200,7 @@ export interface PostCompactionHookContext {
   /**
    * C4: the messages this compaction dropped (summarized away /
    * cleared), in original order. Lets re-anchoring hooks recover
-   * references — e.g. `reanchorRecentResults` re-lists the result
+   * references - e.g. `reanchorRecentResults` re-lists the result
    * handles that just left the window.
    */
   readonly droppedMessages?: ReadonlyArray<Message>;
@@ -231,7 +231,7 @@ export interface CompactionConfig {
 }
 
 /**
- * Summarizer adapter — accepts a prompt and returns the produced
+ * Summarizer adapter - accepts a prompt and returns the produced
  * summary. The Phase 06 `Provider` adapters implement this
  * signature; tests pass a deterministic stub. The summarizer
  * adapter is intentionally narrow so the compaction subsystem

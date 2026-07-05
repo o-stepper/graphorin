@@ -55,7 +55,7 @@ async function connectAndAck(client: GraphorinClient): Promise<void> {
   await promise;
 }
 
-describe('GraphorinClient — constructor + connect', () => {
+describe('GraphorinClient - constructor + connect', () => {
   it('rejects an empty baseUrl at construction', () => {
     expect(
       () =>
@@ -105,7 +105,7 @@ describe('GraphorinClient — constructor + connect', () => {
   });
 });
 
-describe('GraphorinClient — RPC + subscriptions', () => {
+describe('GraphorinClient - RPC + subscriptions', () => {
   it('correlates subscribe RPC with the matching reply and pushes events to the iterator', async () => {
     const client = new GraphorinClient({
       baseUrl: 'ws://localhost',
@@ -207,7 +207,7 @@ describe('GraphorinClient — RPC + subscriptions', () => {
       v: '1',
       jsonrpc: '2.0',
       id: sent.id,
-      // -32004 === RPC_ERROR_CODES.RATE_LIMITED — must surface as its own kind,
+      // -32004 === RPC_ERROR_CODES.RATE_LIMITED - must surface as its own kind,
       // not the generic 'protocol-violation'.
       error: { code: -32004, message: 'rate limited' },
     });
@@ -261,7 +261,7 @@ describe('GraphorinClient — RPC + subscriptions', () => {
     // momentarily unhandled.
     const rejection = expect(pending).rejects.toBeInstanceOf(ClientAbortedError);
 
-    // Abnormal teardown must propagate to the parked waiter as a rejection —
+    // Abnormal teardown must propagate to the parked waiter as a rejection -
     // not a silent { done: true } that swallows the disconnect.
     await client.disconnect();
     await rejection;
@@ -417,7 +417,7 @@ describe('GraphorinClient — RPC + subscriptions', () => {
       };
       expect(sent.params.subject).toBe(expected);
     }
-    // periphery-09: the server grammar has NO bare `run:` form — the
+    // periphery-09: the server grammar has NO bare `run:` form - the
     // old `run:<id>/events` fallback always failed server-side with an
     // opaque unknown-subject error. Fail fast client-side instead.
     await expect(client.subscribe({ target: 'run', runId: 'r' })).rejects.toThrow(
@@ -427,7 +427,7 @@ describe('GraphorinClient — RPC + subscriptions', () => {
   });
 });
 
-describe('IP-7 — the same iterator survives a reconnect with the replay cursor', () => {
+describe('IP-7 - the same iterator survives a reconnect with the replay cursor', () => {
   it('resubscribe sends the subscription cursor and rebinds the SAME object', async () => {
     const client = new GraphorinClient({
       baseUrl: 'ws://localhost',
@@ -466,7 +466,7 @@ describe('IP-7 — the same iterator survives a reconnect with the replay cursor
       payload: { delta: 'a' },
     });
 
-    // Drop the transport — the client reconnects in the background
+    // Drop the transport - the client reconnects in the background
     // (the backoff sleeps real milliseconds, so wait on a timer).
     socket1.close(1006, 'connection reset');
     let socket2 = socket1;
@@ -494,7 +494,7 @@ describe('IP-7 — the same iterator survives a reconnect with the replay cursor
     expect(resub.method).toBe('subscription.subscribe');
     // IP-7: the SUBSCRIPTION's own cursor reaches the server so the
     // replay buffer is consulted (the old code read the fresh
-    // transport's lastEventId — always undefined).
+    // transport's lastEventId - always undefined).
     expect(resub.params?.sinceEventId).toBe('evt-1');
     socket2.fireMessage({
       v: '1',
@@ -505,7 +505,7 @@ describe('IP-7 — the same iterator survives a reconnect with the replay cursor
     // Let the rebind continuation (map re-key) land before the event.
     await new Promise((r) => setTimeout(r, 20));
     // The replayed/missed event arrives on the NEW server id but the
-    // SAME client-side subscription — the consumer's for-await lives.
+    // SAME client-side subscription - the consumer's for-await lives.
     socket2.fireMessage({
       v: '1',
       kind: 'event',

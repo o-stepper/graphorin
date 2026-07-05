@@ -1,26 +1,26 @@
 /**
- * `@graphorin/server` — standalone server runtime for the Graphorin
+ * `@graphorin/server` - standalone server runtime for the Graphorin
  * framework.
  *
  * Phase 14a entry point. Ships:
  *
- * - {@link createServer} — the single programmatic entry that wires
+ * - {@link createServer} - the single programmatic entry that wires
  *   the Hono app, the auth + scope + idempotency + audit middleware
  *   stack, REST endpoints (agents / workflows / sessions / memory /
  *   skills / mcp / tokens / audit / health), the lifecycle hooks
  *   (`beforeStart` / `onReady` / `beforeShutdown` / `onError`), the
  *   pre-bind secrets-resolution + storage-migration runner, and the
  *   graceful SIGTERM drain.
- * - {@link defineConfig} + {@link parseServerConfig} — typed
+ * - {@link defineConfig} + {@link parseServerConfig} - typed
  *   configuration loader with a Zod-validated schema; missing fields
  *   fall back to documented production-ready defaults.
- * - {@link AgentRegistry} + {@link WorkflowRegistry} — read/write
+ * - {@link AgentRegistry} + {@link WorkflowRegistry} - read/write
  *   registries the route handlers consult to look up user-defined
  *   agents / workflows.
- * - {@link RunStateTracker} — in-memory bookkeeping for in-flight
+ * - {@link RunStateTracker} - in-memory bookkeeping for in-flight
  *   runs (run id, status, AbortController). Phase 14b/c promote the
  *   tracker to a SQLite-backed durable variant.
- * - The full middleware factory suite — re-exported from
+ * - The full middleware factory suite - re-exported from
  *   `@graphorin/server/middleware` so operators can compose a custom
  *   Hono app on top of the same primitives.
  *
@@ -28,7 +28,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export {
   type CreateServerOptions,

@@ -1,12 +1,12 @@
 /**
- * `graphorin memory` — long-term memory operator commands.
+ * `graphorin memory` - long-term memory operator commands.
  *
  * Surface (per Phase 15 § Memory):
  *
- *  - `graphorin memory status` — counts + active embedder + migration
+ *  - `graphorin memory status` - counts + active embedder + migration
  *    state. Pure read-only inspection of the SQLite store.
  *  - `graphorin memory migrate --from <embedder> --to <embedder>
- *    --strategy <lock-on-first|auto-migrate|multi-active>` — embedder
+ *    --strategy <lock-on-first|auto-migrate|multi-active>` - embedder
  *    swap. The runner itself lives in `@graphorin/memory`
  *    ({@link migrateEmbedder}); the CLI is a thin wrapper that loads
  *    the operator's `embedders.ts` module if supplied through
@@ -88,7 +88,7 @@ export async function runMemoryStatus(
       const print = options.print ?? defaultPrintSink;
       print(brand(`memory status (${out.storagePath})`));
       if (out.embedders.length === 0) {
-        print(brand(`  no embedders registered yet — run createMemory({ embedder }) once.`));
+        print(brand(`  no embedders registered yet - run createMemory({ embedder }) once.`));
       } else {
         print(brand(`  embedders (${out.embedders.length}):`));
         for (const e of out.embedders) {
@@ -124,7 +124,7 @@ export interface MemoryMigrateOptions extends MemoryCommonOptions {
 }
 
 /**
- * `graphorin memory migrate` — embedder swap. The migration logic lives
+ * `graphorin memory migrate` - embedder swap. The migration logic lives
  * in `@graphorin/memory`'s `migrateEmbedder(...)`; the CLI prints a
  * pointer when the operator did not supply the embedder factory module
  * (the framework cannot guess the operator's embedder configuration).
@@ -163,12 +163,12 @@ export async function runMemoryMigrate(options: MemoryMigrateOptions): Promise<n
 }
 
 // ---------------------------------------------------------------------------
-// `graphorin memory inspect` / `graphorin memory activity` (X-3) — read-only
+// `graphorin memory inspect` / `graphorin memory activity` (X-3) - read-only
 // introspection over the SQLite store: a fact's supersede chain, quarantine /
 // provenance, the insights that cite it, the conflict decisions and audit
 // trail it appears in, plus a store-wide activity view (what the consolidator
 // / reflection formed, merged, and quarantined). All reads go through
-// `store.connection` exactly like `memory status`'s count queries — no embedder
+// `store.connection` exactly like `memory status`'s count queries - no embedder
 // or provider required, fully offline.
 // ---------------------------------------------------------------------------
 
@@ -261,7 +261,7 @@ export interface MemoryInspectOptions extends MemoryCommonOptions {
 }
 
 /**
- * `graphorin memory inspect <factId>` — surface everything the store
+ * `graphorin memory inspect <factId>` - surface everything the store
  * knows about one fact: its retrieval-trust status + provenance, the
  * full bi-temporal supersede chain it belongs to, the audit-log events
  * recorded against it, the conflict decisions that referenced it, and
@@ -379,7 +379,7 @@ export async function runMemoryInspect(
       );
       print(`  text: ${f.text}`);
       print(
-        `  importance: ${f.importance !== null ? f.importance.toFixed(2) : '(unset — neutral salience)'}`,
+        `  importance: ${f.importance !== null ? f.importance.toFixed(2) : '(unset - neutral salience)'}`,
       );
       print(`  valid: ${f.validFrom ?? 'open'} .. ${f.validTo ?? 'open'}`);
       if (out.linkedEntities.length > 0) {
@@ -458,7 +458,7 @@ export interface MemoryActivityOptions extends MemoryCommonOptions {
 }
 
 /**
- * `graphorin memory activity` — a store-wide view of what the
+ * `graphorin memory activity` - a store-wide view of what the
  * consolidator and reflection passes have been doing: how many facts /
  * episodes / insights currently sit in quarantine, the most recent
  * audit-log events (supersede / validate / quarantine / archive), and
@@ -558,7 +558,7 @@ export async function runMemoryActivity(
 }
 
 // ---------------------------------------------------------------------------
-// `graphorin memory why` (RP-17 / X-3) — "why was this recalled?" Decodes the
+// `graphorin memory why` (RP-17 / X-3) - "why was this recalled?" Decodes the
 // `memory.search.semantic.explain` attribute the memory search records on each
 // `memory.search.semantic` span (now durable via the RP-17 `spans` table) into
 // the per-fact ranking signals (FTS bm25, vector similarity, fused RRF, decay).
@@ -597,7 +597,7 @@ interface SpanExplainRow {
 }
 
 /**
- * `graphorin memory why` — explain why facts were recalled, by decoding the
+ * `graphorin memory why` - explain why facts were recalled, by decoding the
  * `memory.search.semantic.explain` attribute off the persisted recall spans.
  * Pure read-only inspection; requires the SQLite span exporter to have recorded
  * spans (RP-17). Empty when nothing was recorded.
@@ -635,7 +635,7 @@ export async function runMemoryWhy(options: MemoryWhyOptions): Promise<MemoryWhy
           results = Object.freeze(parsed) as MemoryWhyRecall['results'];
         }
       } catch {
-        // Malformed attribute payload — surface an empty recall, not a throw.
+        // Malformed attribute payload - surface an empty recall, not a throw.
       }
       return Object.freeze({ spanId: r.span_id, at: r.start_unix_nano, results });
     });
@@ -670,7 +670,7 @@ export async function runMemoryWhy(options: MemoryWhyOptions): Promise<MemoryWhy
 }
 
 // ---------------------------------------------------------------------------
-// `graphorin memory review` (MCON-2) — list what the consolidator left in
+// `graphorin memory review` (MCON-2) - list what the consolidator left in
 // quarantine across every tier, and promote a reviewed item out of it. The
 // promote path runs through the tier's `validate(...)`, so an injection-flagged
 // memory is refused unless the operator passes `--force` after review.
@@ -713,7 +713,7 @@ const EMPTY_REVIEW: MemoryReviewResult = Object.freeze({
 });
 
 /**
- * `graphorin memory review` — list the facts / episodes / insights / induced
+ * `graphorin memory review` - list the facts / episodes / insights / induced
  * procedures the consolidator left in quarantine (read-only), or promote a
  * reviewed item out of quarantine with `--promote <id>`. The promote path runs
  * through the tier `validate(...)`, so an injection-flagged memory is refused
@@ -781,7 +781,7 @@ export async function runMemoryReview(
       procedures: listQuarantined(conn, 'rules', 'text', limit),
     });
     emitReport(options, out, () => {
-      print(brand('memory review — quarantined'));
+      print(brand('memory review - quarantined'));
       printReviewItems(print, 'facts', out.facts);
       printReviewItems(print, 'episodes', out.episodes);
       printReviewItems(print, 'insights', out.insights);

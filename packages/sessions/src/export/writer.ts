@@ -25,14 +25,14 @@ import {
  * @stable
  */
 export interface SessionExportWriterOptions {
-  /** Writer identifier surfaced in the meta header (e.g. `'graphorin@0.5.0'`). */
+  /** Writer identifier surfaced in the meta header (e.g. `'graphorin@0.6.0'`). */
   readonly writer: string;
   /** Minimum runtime version that can read the resulting file. */
   readonly minRuntimeVersion?: string;
   /**
    * Optional `schemaUrl` to embed in the meta header. Conventionally a
    * stable URL that serves the JSON Schema document for the session
-   * export format — for example a `raw.githubusercontent.com` URL
+   * export format - for example a `raw.githubusercontent.com` URL
    * pointing at the schema file in this repository.
    */
   readonly schemaUrl?: string;
@@ -80,7 +80,7 @@ export interface SessionExportEncryptionConfig {
  * Streaming writer. Call `writeRecord(...)` per body record (in any
  * order, but `kind: 'meta'` and `kind: 'footer'` are owned by the
  * writer) and `close()` to emit the footer. The writer itself does
- * not own the destination — every emission is delivered via the
+ * not own the destination - every emission is delivered via the
  * caller-supplied `sink`.
  *
  * @stable

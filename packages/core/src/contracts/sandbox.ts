@@ -47,7 +47,7 @@ export interface SandboxRunOptions<TInput = unknown> {
 }
 
 /**
- * Result of a sandboxed run. The shape mirrors the `ToolOutcome` union —
+ * Result of a sandboxed run. The shape mirrors the `ToolOutcome` union -
  * the runtime maps `SandboxResult` to `ToolOutcome` after the call.
  *
  * @stable

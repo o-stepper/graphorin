@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,4 +21,4 @@ distinguish silent dedups from active inserts.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-decision"></a> `decision` | `readonly` | [`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md) | - | packages/memory/src/tiers/semantic-memory.ts:372 |
 | <a id="property-fact"></a> `fact` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | - | packages/memory/src/tiers/semantic-memory.ts:371 |
-| <a id="property-quarantinereason"></a> `quarantineReason?` | `readonly` | `"injection"` \| `"synthesized"` | Why this write landed quarantined, if it did (P1-4 / MRET-3). `'injection'` — the offline injection heuristics flagged the text (a memory-poisoning candidate). `'synthesized'` — a consolidator / reflection / induction write awaiting validation. Absent when the fact is `active` or when a dedup returned a pre-existing row. | packages/memory/src/tiers/semantic-memory.ts:380 |
+| <a id="property-quarantinereason"></a> `quarantineReason?` | `readonly` | `"injection"` \| `"synthesized"` | Why this write landed quarantined, if it did (P1-4 / MRET-3). `'injection'` - the offline injection heuristics flagged the text (a memory-poisoning candidate). `'synthesized'` - a consolidator / reflection / induction write awaiting validation. Absent when the fact is `active` or when a dedup returned a pre-existing row. | packages/memory/src/tiers/semantic-memory.ts:380 |

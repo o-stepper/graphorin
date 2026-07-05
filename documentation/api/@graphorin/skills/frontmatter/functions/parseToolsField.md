@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function parseToolsField(value):
 Defined in: packages/skills/src/frontmatter/index.ts:530
 
 Parse the `tools` field. Accepts either an array of strings (tool
-names — the loader resolves modules through naming convention) or
+names - the loader resolves modules through naming convention) or
 an array of objects with `name`, `module`, `description`, `tags`.
 Returns `null` for unsupported shapes.
 

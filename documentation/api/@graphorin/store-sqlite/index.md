@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ higher-level package (`@graphorin/memory`, `@graphorin/sessions`,
 
 The package owns:
 
-- **Connection lifecycle** — a single `better-sqlite3` connection in
+- **Connection lifecycle** - a single `better-sqlite3` connection in
   library mode; an opt-in `WorkerPool` wrapper (1 writer + N readers)
   in server mode. WAL hardening pragmas are mandatory:
   `journal_mode=WAL`, `synchronous=NORMAL`, `busy_timeout=5000`,
@@ -25,7 +25,7 @@ The package owns:
   `foreign_keys=ON`. A `CheckpointManager` performs periodic
   `PRAGMA wal_checkpoint(RESTART)` (default every 5 minutes; off in
   library mode) and surfaces `graphorin.storage.wal.size_bytes`.
-- **Migration runner** — atomic, all-or-nothing per startup. Tracks
+- **Migration runner** - atomic, all-or-nothing per startup. Tracks
   applied versions in a `schema_migrations` row and supports
   resumable per-record vector migrations through the `migration_state`
   table. The bundled migrations cover every table the framework needs
@@ -33,35 +33,35 @@ The package owns:
   servers, idempotency cache, consolidator state, conflict-check
   queue). Future packages register additional migration files here so
   every schema lives in one place.
-- **Multi-embedder vec0 layout** — every memory record carries an
+- **Multi-embedder vec0 layout** - every memory record carries an
   `embedder_id` (canonical: `'<provider>:<model>@<dim>'`) and lives in
   a per-embedder `vec0` virtual table created lazily by
   `vector-table-mgr`. The default `lock-on-first` policy refuses
   silent embedder swaps; alternative policies (`auto-migrate`,
   `multi-active`) opt in through `createSqliteStore`.
-- **Multilingual FTS5** — every `_fts` virtual table uses
+- **Multilingual FTS5** - every `_fts` virtual table uses
   `unicode61 remove_diacritics 2 tokenchars '-_.@/'` so Cyrillic /
   diacritic / URL / email tokens index cleanly without per-language
   routing.
-- **`MemoryStore`** — CRUD for the six tiers (working, session,
+- **`MemoryStore`** - CRUD for the six tiers (working, session,
   episodic, semantic, procedural, shared). Search composition
   (RRF / re-ranking) lives in `@graphorin/memory`; the store ships only
   the raw `searchVector` / `searchFTS` / `searchExact` primitives.
-- **`CheckpointStore`** — durable workflow checkpoints + per-task
+- **`CheckpointStore`** - durable workflow checkpoints + per-task
   pending writes (resume safety after partial step failure).
-- **`SessionStore`** — session metadata, agent registry, handoff
+- **`SessionStore`** - session metadata, agent registry, handoff
   records, workflow-run mapping. Per `DEC-147`, the `session_messages`
   rows themselves are owned by `MemoryStore` (single source of truth).
-- **`TriggerStore`** — durable `trigger_state` rows for the
+- **`TriggerStore`** - durable `trigger_state` rows for the
   `@graphorin/triggers` package.
-- **`AuthTokenStore`** — server token records (HMAC-SHA256 hash + scope
+- **`AuthTokenStore`** - server token records (HMAC-SHA256 hash + scope
   grammar; raw tokens are never persisted).
-- **`OAuthServerStore`** — OAuth registration metadata; raw tokens live
+- **`OAuthServerStore`** - OAuth registration metadata; raw tokens live
   in `@graphorin/security`'s secret store and are referenced from here
   by `SecretRef` URI.
-- **`IdempotencyStore`** — REST `Idempotency-Key` cache (consumed by
+- **`IdempotencyStore`** - REST `Idempotency-Key` cache (consumed by
   `@graphorin/server`).
-- **Encryption hook** — interface-only in v0.1; default OFF. If the
+- **Encryption hook** - interface-only in v0.1; default OFF. If the
   caller passes `encryption.enabled: true`, the connection layer
   resolves the configured passphrase resolver and looks up
   `better-sqlite3-multiple-ciphers`; if the cipher peer is missing, the
@@ -139,7 +139,7 @@ covers every Phase 05 deliverable:
 | 009    | `009-consolidator.sql` | memory     |
 | 010    | `010-conflict-check.sql` | memory   |
 
-The runner is idempotent — re-running on a fully-migrated database
+The runner is idempotent - re-running on a fully-migrated database
 skips every applied migration. A migration is wrapped in a
 transaction; a failure rolls the whole step back, leaving the DB
 exactly as it was before the run.
@@ -155,13 +155,13 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/store-sqlite/README.md) | @graphorin/store-sqlite — default SQLite-backed persistence layer for the Graphorin framework. |
+| [](/api/@graphorin/store-sqlite/README.md) | @graphorin/store-sqlite - default SQLite-backed persistence layer for the Graphorin framework. |
 | [connection](/api/@graphorin/store-sqlite/connection/index.md) | - |
 | [encryption](/api/@graphorin/store-sqlite/encryption/index.md) | Encryption-at-rest interface hooks. |
 | [migrations](/api/@graphorin/store-sqlite/migrations/index.md) | Migration registry + runner for `@graphorin/store-sqlite`. |

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/skills/src/types/index.ts:176
 
 Validated skill metadata. Always available on the registry without
-loading the body — this is the always-present **Tier 1** payload
+loading the body - this is the always-present **Tier 1** payload
 that the system prompt advertises.
 
 ## Stable
@@ -34,4 +34,4 @@ that the system prompt advertises.
 | <a id="property-license"></a> `license?` | `readonly` | `string` | - | packages/skills/src/types/index.ts:179 |
 | <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | - | packages/skills/src/types/index.ts:181 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/skills/src/types/index.ts:177 |
-| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | Raw frontmatter (read-only) for power users — every loader user can re-derive bespoke fields. | packages/skills/src/types/index.ts:195 |
+| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | Raw frontmatter (read-only) for power users - every loader user can re-derive bespoke fields. | packages/skills/src/types/index.ts:195 |

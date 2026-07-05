@@ -87,7 +87,7 @@ export interface EpisodeSearchOptions {
   /**
    * Include quarantined episodes in the result set (P1-4). Defaults to
    * `false`: action-driving recall never returns quarantined rows. Set
-   * `true` only for the validation / inspector path — never for
+   * `true` only for the validation / inspector path - never for
    * auto-recall fed back into the model. Auto-formed episodes (P1-2)
    * land quarantined, so this is how an operator surfaces them for
    * review.
@@ -98,7 +98,7 @@ export interface EpisodeSearchOptions {
 }
 
 /**
- * `EpisodicMemory` — record + retrieve summarized stretches of past
+ * `EpisodicMemory` - record + retrieve summarized stretches of past
  * activity. Stored embeddings power triple-signal retrieval (recency
  * × relevance × importance).
  *
@@ -201,7 +201,7 @@ export class EpisodicMemory {
           query,
           topK: topK * 2,
           ...(opts.asOf !== undefined ? { asOf: opts.asOf } : {}),
-          // MRET-4: forward the date filter — it was accepted by the
+          // MRET-4: forward the date filter - it was accepted by the
           // recall_episodes tool and silently dropped right here.
           ...(opts.dateRange !== undefined ? { dateRange: opts.dateRange } : {}),
           ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
@@ -217,7 +217,7 @@ export class EpisodicMemory {
           opts.includeQuarantined,
         );
         // MRET-4: the vector leg's store signature is positional (no
-        // dateRange parameter) — apply the same overlap semantics to its
+        // dateRange parameter) - apply the same overlap semantics to its
         // hits so both legs agree before the merge.
         const from = opts.dateRange?.from !== undefined ? Date.parse(opts.dateRange.from) : null;
         const to = opts.dateRange?.to !== undefined ? Date.parse(opts.dateRange.to) : null;
@@ -270,7 +270,7 @@ export class EpisodicMemory {
 
   /**
    * Most-recent episodes by end time (newest first), with no embedding / FTS
-   * query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` — the default
+   * query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` - the default
    * `@graphorin/store-sqlite` adapter implements it. Optionally includes
    * quarantined episodes (the importance source for the reflection gate).
    */
@@ -446,7 +446,7 @@ function computeRecency(now: number, episode: Episode): number {
 }
 
 function normalizeRelevance(score: number): number {
-  // MRET-5/MST-7: the store returns `score = -bm25(...)` — POSITIVE for
+  // MRET-5/MST-7: the store returns `score = -bm25(...)` - POSITIVE for
   // every FTS match (SQLite bm25 is always negative), so the old
   // `1 / (1 + max(0, -score))` collapsed every lexical hit to exactly
   // 1.0 and the DEC-105 triple-signal ranking degraded to

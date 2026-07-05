@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,8 +15,8 @@ Defined in: packages/core/src/contracts/provider.ts:302
 Type signature for the canonical middleware composer (the runtime
 implementation lives in `@graphorin/provider`).
 
-The concrete composer guarantees a deterministic ordering — order of
-arguments mirrors order of execution from outermost to innermost — and
+The concrete composer guarantees a deterministic ordering - order of
+arguments mirrors order of execution from outermost to innermost - and
 is the only blessed entry point for chaining middleware in
 `@graphorin/*` code (per the security-first ordering rule).
 

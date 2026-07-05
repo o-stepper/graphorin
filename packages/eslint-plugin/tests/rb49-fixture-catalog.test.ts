@@ -57,7 +57,7 @@ export const examplesPiiTool = tool({
 });
 `;
 
-describe('RB-49 fixture catalog — calibrated scores', () => {
+describe('RB-49 fixture catalog - calibrated scores', () => {
   it('wellDescribedTool scores 82', () => {
     const tools = discoverToolCallsInSource('src/tools/well.ts', WELL_DESCRIBED);
     expect(tools).toHaveLength(1);

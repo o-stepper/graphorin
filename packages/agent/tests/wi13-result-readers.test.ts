@@ -42,7 +42,7 @@ function fakeExternalReader(seen: string[]): ResultReader {
   };
 }
 
-describe('WI-13 — agent resultReaders hook', () => {
+describe('WI-13 - agent resultReaders hook', () => {
   it('force-registers read_result when resultReaders are supplied (even with no spilling tool)', () => {
     const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('hi')] });
     const agent = createAgent({

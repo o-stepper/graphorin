@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function llamaCppServerAdapter(options): Provider;
 Defined in: packages/provider/src/adapters/llamacpp-server.ts:81
 
 Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by the upstream
-`llama-server` binary. The factory does not start the binary —
+`llama-server` binary. The factory does not start the binary -
 operators launch it themselves with the desired model + GPU flags
 and pass the URL here.
 

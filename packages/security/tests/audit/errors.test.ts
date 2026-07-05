@@ -6,7 +6,7 @@ import {
   AuditPayloadSerializationError,
 } from '../../src/audit/errors.js';
 
-describe('@graphorin/security/audit — errors', () => {
+describe('@graphorin/security/audit - errors', () => {
   it('AuditDbCipherUnavailableError carries the binding id and a hint', () => {
     const err = new AuditDbCipherUnavailableError('better-sqlite3-multiple-ciphers');
     expect(err.kind).toBe('audit-db-cipher-unavailable');

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -28,7 +28,7 @@ optional count(scope): Promise<number>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:216
 
-Count the live messages in the scoped session (CE-5) — a `COUNT(*)`, never
+Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
 counts instead of `list(...)`-materialising up to 1000 rows.
 

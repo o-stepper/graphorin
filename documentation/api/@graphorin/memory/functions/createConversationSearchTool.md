@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -20,7 +20,7 @@ function createConversationSearchTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/recall-tools.ts:147
 
-`conversation_search` — FTS5 search over the active session
+`conversation_search` - FTS5 search over the active session
 messages.
 
 ## Parameters

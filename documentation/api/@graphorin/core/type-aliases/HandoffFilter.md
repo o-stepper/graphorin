@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ to a target agent. Implementations live in `@graphorin/agent` (e.g.
 `HandoffFilter` without an agent dependency.
 
 The default for the agent runtime is `lastN(10)` (per the security-first
-compose policy). Filters should be **pure** — they receive a frozen
+compose policy). Filters should be **pure** - they receive a frozen
 history and return a fresh array.
 
 ## Parameters

@@ -1,5 +1,5 @@
 /**
- * Tests for reflection / insight synthesis (P1-1) — the pure
+ * Tests for reflection / insight synthesis (P1-1) - the pure
  * parse/rank helpers, the `InsightMemory` read surface, and the
  * end-to-end deep-phase reflection flow driven through the
  * consolidator against the in-memory fixture. A branching provider
@@ -30,7 +30,7 @@ const SCOPE: SessionScope = { userId: 'alex', sessionId: 's1' };
 const T0 = '2026-05-01T00:00:00.000Z';
 const T1 = '2026-05-01T01:00:00.000Z';
 
-describe('parseQuestions — salient-questions parsing (P1-1)', () => {
+describe('parseQuestions - salient-questions parsing (P1-1)', () => {
   it('parses { questions: [...] } and a bare [...]', () => {
     expect(parseQuestions('{"questions":["Why cancel evenings?","Overcommitted?"]}')).toEqual([
       'Why cancel evenings?',
@@ -52,7 +52,7 @@ describe('parseQuestions — salient-questions parsing (P1-1)', () => {
   });
 });
 
-describe('parseInsight — insight-synthesis parsing (P1-1)', () => {
+describe('parseInsight - insight-synthesis parsing (P1-1)', () => {
   it('parses { insight } and falls back to { text }', () => {
     expect(parseInsight('{"insight":"They overcommit on evenings."}')).toBe(
       'They overcommit on evenings.',
@@ -72,7 +72,7 @@ describe('parseInsight — insight-synthesis parsing (P1-1)', () => {
   });
 });
 
-describe('capInsightsBelowFacts — rank ceiling (P1-1)', () => {
+describe('capInsightsBelowFacts - rank ceiling (P1-1)', () => {
   const fact = (id: string, score: number): MemoryHit<Fact> => ({
     record: {
       id,
@@ -166,7 +166,7 @@ function reflectionProvider(
           finishReason: 'stop',
         };
       }
-      // Deep-phase conflict judge (unused here — no pending conflicts).
+      // Deep-phase conflict judge (unused here - no pending conflicts).
       return {
         text: JSON.stringify({ decision: 'admit', reason: 'n/a' }),
         usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
@@ -232,7 +232,7 @@ async function seedEpisodes(
   return [a.id, b.id];
 }
 
-describe('consolidator deep phase — reflection (P1-1)', () => {
+describe('consolidator deep phase - reflection (P1-1)', () => {
   it('synthesizes a quarantined, cited insight when accumulated importance crosses the threshold', async () => {
     const provider = reflectionProvider();
     const { memory } = await setup({

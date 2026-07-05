@@ -1,5 +1,5 @@
 /**
- * Stage 4 — Subject / predicate match.
+ * Stage 4 - Subject / predicate match.
  *
  * Naively splits each fact body into `(subject, predicate, object)`
  * triples using the locale pack's predicate normalisers. When the

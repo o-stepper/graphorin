@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Minimal audit-database surface consumed by the chain operations.
 Concrete bindings can expose more, but the contract is intentionally
 small so the verifier remains binding-agnostic.
 
-The methods are deliberately synchronous on the read path — the
+The methods are deliberately synchronous on the read path - the
 single-file SQLite default is already in-process, and asynchrony
 would add no I/O parallelism but would force every audit consumer
 to plumb promise-state through hot loops.

@@ -1,9 +1,9 @@
 /**
- * Reasoning-retention resolver — picks the effective
+ * Reasoning-retention resolver - picks the effective
  * {@link ReasoningRetention} value for a request given:
  *
  * 1. an explicit per-request `reasoningRetention` field (highest
- *    precedence — user override always wins),
+ *    precedence - user override always wins),
  * 2. an instance-level override supplied to `createProvider({...})`,
  *    and
  * 3. the auto-detected default derived from the adapter's declared

@@ -7,7 +7,7 @@ import {
   InMemoryEmbeddingRegistry,
 } from './fixtures/in-memory-store.js';
 
-describe('@graphorin/memory — createMemory facade', () => {
+describe('@graphorin/memory - createMemory facade', () => {
   it('wires every six tier sub-module + eleven memory tools', () => {
     const memory = createMemory({
       store: createInMemoryStore(),

@@ -1,12 +1,12 @@
 /**
- * `graphorin guard` — inspect the memory-modification guard tier
+ * `graphorin guard` - inspect the memory-modification guard tier
  * policy.
  *
  * Surface (per Phase 15 § Guard):
  *
- *  - `graphorin guard status` — print the four tiers + their guard
+ *  - `graphorin guard status` - print the four tiers + their guard
  *    variants (per DEC-153).
- *  - `graphorin guard explain <toolName>` — derive the tier the
+ *  - `graphorin guard explain <toolName>` - derive the tier the
  *    classifier would assign to a tool with the supplied trust class
  *    and tags. The CLI accepts the metadata via `--tags` /
  *    `--trust-level` / `--allowed-secrets` so the explain operation

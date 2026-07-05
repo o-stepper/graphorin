@@ -33,7 +33,7 @@ export interface BetterSqlite3Database {
   /**
    * Online page-level backup (store-02/05). Consistent under a live
    * writer and preserves rowids (so FTS5 external-content mappings
-   * survive — unlike `VACUUM INTO`).
+   * survive - unlike `VACUUM INTO`).
    */
   backup(destinationPath: string): Promise<unknown>;
   close(): void;

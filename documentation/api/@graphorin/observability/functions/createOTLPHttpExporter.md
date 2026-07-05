@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ Build a minimal OTLP-over-HTTP trace exporter. Call
 `withValidation(exporter)` before passing the result to
 `createTracer({ exporters })`.
 
-The implementation issues one `POST` per finished span — no
+The implementation issues one `POST` per finished span - no
 batching. Operators wanting batching should wrap this exporter
 with their own queue or use a sidecar collector.
 

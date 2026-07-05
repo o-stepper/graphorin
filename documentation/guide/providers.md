@@ -11,7 +11,7 @@ Graphorin is **vendor-neutral by principle**. A single `Provider` interface adap
 
 | Adapter | Backed by | Use when |
 |---|---|---|
-| `vercelAdapter(...)` | [Vercel AI SDK](https://github.com/vercel/ai) (`ai@^7.0.0-beta.76`, Apache-2.0) | A frontier cloud provider — OpenAI, Anthropic, Google, etc. |
+| `vercelAdapter(...)` | [Vercel AI SDK](https://github.com/vercel/ai) (`ai@^7.0.0-beta.76`, Apache-2.0) | A frontier cloud provider - OpenAI, Anthropic, Google, etc. |
 | `ollamaAdapter(...)` | A local [Ollama](https://ollama.com/) daemon over HTTP. | Local-first deployments that already run an Ollama daemon. |
 | `openAICompatibleAdapter(...)` | Any HTTP server speaking the OpenAI Chat Completions wire format. | LM Studio, LocalAI, vLLM, Together.ai, llama-server's OpenAI-compat mode, …  |
 | `llamaCppServerAdapter(...)` | The standalone `llama-server` binary from [`llama.cpp`](https://github.com/ggml-org/llama.cpp). | When you want the canonical `llama.cpp` server but not in-process. |
@@ -26,7 +26,7 @@ Graphorin is **vendor-neutral by principle**. A single `Provider` interface adap
 - default `reasoningRetention` resolution from the adapter's declared `reasoningContract`,
 - a single attachment surface for every middleware below.
 
-The optional middleware composer (`composeProviderMiddleware([...])`) wraps the result in a chain whose order is validated against the **canonical order** — outermost to innermost:
+The optional middleware composer (`composeProviderMiddleware([...])`) wraps the result in a chain whose order is validated against the **canonical order** - outermost to innermost:
 
 ```text
 withTracing → withRetry → withRateLimit → withCostLimit → withCostTracking → withFallback → withRedaction → adapter
@@ -44,7 +44,7 @@ A `MiddlewareOrderingError` is thrown the moment the array argument violates the
 | `withFallback` | Composes a chain of fallback providers. |
 | `withRedaction` | Innermost: strips secrets / PII immediately before the adapter call. User-supplied patterns match **every** occurrence (the `/g` flag is forced), and the streaming scan keeps a bounded tail buffer so a secret split across two `text-delta` chunks is still caught. |
 
-Token counting, model-tier classification, and reasoning-retention policy are **separate APIs** (`createDefaultCounter(...)`, `classifyModelTier(...)`, `resolveReasoningRetention(...)`) — not middleware. They run as part of the agent runtime's per-step planning, not inside the middleware chain.
+Token counting, model-tier classification, and reasoning-retention policy are **separate APIs** (`createDefaultCounter(...)`, `classifyModelTier(...)`, `resolveReasoningRetention(...)`) - not middleware. They run as part of the agent runtime's per-step planning, not inside the middleware chain.
 
 ## Quick start
 
@@ -71,12 +71,12 @@ Every adapter normalises its native stream into the same `ProviderEvent` discrim
 
 | Event type | Meaning |
 |---|---|
-| `stream-start` | The stream opened — carries response metadata. |
+| `stream-start` | The stream opened - carries response metadata. |
 | `text-delta` | A token of the assistant message. |
 | `reasoning-delta` | A token of an extended-reasoning channel (e.g. `<thinking>`). |
 | `tool-call-start` / `tool-call-input-delta` / `tool-call-end` | Streaming tool calls. |
 | `file` / `source` | A generated file part, or a source citation. |
-| `finish` | Terminal event — carries the `finishReason` **and** the `usage` (input / output / total tokens). An aborted stream reports `finishReason: 'aborted'` (not `'stop'`), and abort is excluded from `withRetry` / `withFallback`. |
+| `finish` | Terminal event - carries the `finishReason` **and** the `usage` (input / output / total tokens). An aborted stream reports `finishReason: 'aborted'` (not `'stop'`), and abort is excluded from `withRetry` / `withFallback`. |
 | `error` | A normalised, typed error. |
 
 The agent runtime consumes this stream and emits its own `AgentEvent`s on top.
@@ -134,13 +134,13 @@ Some providers expose internal reasoning content (extended thinking, scratch pad
 | `'pass-through-claude'` | Round-trip Anthropic-shaped thinking blocks byte-equal to the previous assistant message. Default for round-trip-required providers (Claude tool-use with thinking). |
 | `'pass-through-all'` | Round-trip every reasoning content part the provider returns, regardless of vendor shape. Useful for custom providers with `reasoningContract: 'optional'` that still benefit from preserving the chain. |
 
-Handoffs always strip reasoning — `filters.stripReasoning()` is unconditional at the boundary.
+Handoffs always strip reasoning - `filters.stripReasoning()` is unconditional at the boundary.
 
 ## Request timeouts & structured output
 
-The HTTP adapters (Ollama, OpenAI-compatible, `llama.cpp` server) apply a **default time-to-response timeout of 120 s** per request (PS-24): a hung server that never answers surfaces as a retryable `ProviderHttpError` ("request timed out…") instead of stalling `generate()` forever. The timer is scoped to the response headers — once the server starts answering, a long streaming body is never killed. Override per adapter with `timeoutMs` (`0` disables); the caller's `signal` always composes.
+The HTTP adapters (Ollama, OpenAI-compatible, `llama.cpp` server) apply a **default time-to-response timeout of 120 s** per request (PS-24): a hung server that never answers surfaces as a retryable `ProviderHttpError` ("request timed out…") instead of stalling `generate()` forever. The timer is scoped to the response headers - once the server starts answering, a long streaming body is never killed. Override per adapter with `timeoutMs` (`0` disables); the caller's `signal` always composes.
 
-The same adapters now consume `ProviderRequest.outputType` (set by the agent's `outputType` config and the memory pipelines): a structured request maps to OpenAI-shaped `response_format` (`json_schema` when `outputType.jsonSchema` is supplied, `json_object` otherwise) and to Ollama's native `format` field. The mapping is gated on the adapter's `capabilities.structuredOutput` — override it to `false` for servers that reject `response_format`.
+The same adapters now consume `ProviderRequest.outputType` (set by the agent's `outputType` config and the memory pipelines): a structured request maps to OpenAI-shaped `response_format` (`json_schema` when `outputType.jsonSchema` is supplied, `json_object` otherwise) and to Ollama's native `format` field. The mapping is gated on the adapter's `capabilities.structuredOutput` - override it to `false` for servers that reject `response_format`.
 
 ## Adapters at a glance
 
@@ -214,11 +214,11 @@ const provider = createProvider(
 );
 ```
 
-Trade-off: in-process loses durable mid-stream resume because the model context lives in the Node.js process — durable resume across a restart needs the [Standalone server](/guide/standalone-server).
+Trade-off: in-process loses durable mid-stream resume because the model context lives in the Node.js process - durable resume across a restart needs the [Standalone server](/guide/standalone-server).
 
 ## Token counting
 
-`@graphorin/provider` ships a dispatcher with built-in counters for Anthropic and OpenAI / `tiktoken`-style models. Install one tuned to your model — or your own implementation of the `TokenCounter` contract (`{ id, version, count, countText }`) — as the process-global counter:
+`@graphorin/provider` ships a dispatcher with built-in counters for Anthropic and OpenAI / `tiktoken`-style models. Install one tuned to your model - or your own implementation of the `TokenCounter` contract (`{ id, version, count, countText }`) - as the process-global counter:
 
 ```ts
 import { createDefaultCounter, setGlobalTokenCounter } from '@graphorin/provider';
@@ -246,21 +246,21 @@ const agent = createAgent({
 
 With `breakpoints: 'auto'` the vercel adapter anchors `cache_control` markers on the first and last conversation messages, so tools + system + the stable prefix are written once and read at the discounted rate on every later step; each step's write becomes the next step's read. OpenAI caches automatically (no markers needed); providers without a cache concept ignore the policy.
 
-Two loop-side properties protect the cache hit rate: the transcript is append-only with a pinned system prefix, and the tool catalogue grows append-only — eager tools and handoffs serialize before promoted tools, so a `tool_search` promotion appends at the end instead of shifting the prefix. If even that invalidation is too expensive, `toolPromotion: 'run-boundary'` freezes the advertised catalogue for the whole run (discoveries persist on `RunState.promotedTools` and join the catalogue on the next run).
+Two loop-side properties protect the cache hit rate: the transcript is append-only with a pinned system prefix, and the tool catalogue grows append-only - eager tools and handoffs serialize before promoted tools, so a `tool_search` promotion appends at the end instead of shifting the prefix. If even that invalidation is too expensive, `toolPromotion: 'run-boundary'` freezes the advertised catalogue for the whole run (discoveries persist on `RunState.promotedTools` and join the catalogue on the next run).
 
 ## Pricing
 
-`@graphorin/pricing` ships a bundled snapshot of LLM pricing data sourced from the public [`@pydantic/genai-prices`](https://github.com/pydantic/genai-prices) dataset (MIT). The snapshot is **never refreshed automatically** — call `graphorin pricing refresh` to update it on demand. See [Pricing](/reference/pricing) for the full lifecycle.
+`@graphorin/pricing` ships a bundled snapshot of LLM pricing data sourced from the public [`@pydantic/genai-prices`](https://github.com/pydantic/genai-prices) dataset (MIT). The snapshot is **never refreshed automatically** - call `graphorin pricing refresh` to update it on demand. See [Pricing](/reference/pricing) for the full lifecycle.
 
 Models released after the bundled snapshot date (for example the Claude 5 family) intentionally have **no entry**: cost tracking reports `null` plus one WARN per model instead of an invented number, and a release-gate test (`snapshot-coverage.test.ts`) keeps the classifier and the snapshot from drifting apart silently. Refresh the snapshot or contribute the entry once vendor pricing is public.
 
 ## Next steps
 
-- [Memory system](/guide/memory-system) — how memory is filtered before it reaches the provider.
-- [Observability](/guide/observability) — what spans the provider middleware emits.
-- [Security](/guide/security) — sensitivity gating and the redaction layer.
-- [Pricing](/reference/pricing) — bundled snapshot + refresh.
+- [Memory system](/guide/memory-system) - how memory is filtered before it reaches the provider.
+- [Observability](/guide/observability) - what spans the provider middleware emits.
+- [Security](/guide/security) - sensitivity gating and the redaction layer.
+- [Pricing](/reference/pricing) - bundled snapshot + refresh.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

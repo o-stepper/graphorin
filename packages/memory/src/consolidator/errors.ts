@@ -30,7 +30,7 @@ export class BudgetExceededError extends GraphorinMemoryError {
     resource: 'tokens' | 'cost';
   }) {
     super(
-      `[graphorin/memory] consolidator budget exceeded — phase=${args.phase} resource=${args.resource} actual=${args.actual} budget=${args.budget}`,
+      `[graphorin/memory] consolidator budget exceeded - phase=${args.phase} resource=${args.resource} actual=${args.actual} budget=${args.budget}`,
       { hint: 'Pass `onExceed: "log"` to keep running, or upgrade the tier ceilings.' },
     );
     this.phase = args.phase;
@@ -54,7 +54,7 @@ export class CustomTierMisconfiguredError extends GraphorinMemoryError {
 
   constructor(missing: ReadonlyArray<string>) {
     super(
-      `[graphorin/memory] tier='custom' requires explicit ceilings — missing: ${missing.join(', ')}`,
+      `[graphorin/memory] tier='custom' requires explicit ceilings - missing: ${missing.join(', ')}`,
       {
         hint: 'Set `ceilings.maxTokensPerDay` + `ceilings.maxCostPerDay` (and `cheapModel` / `deepModel` if those phases are enabled).',
       },

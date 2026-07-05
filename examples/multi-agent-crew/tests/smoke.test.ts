@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/multi-agent-crew`. Exercises every
  * RB-33 acceptance scenario against the deterministic stub provider so
@@ -68,8 +68,8 @@ function makeToolContext<TDeps>(deps: TDeps): ToolExecutionContext<TDeps> {
 }
 
 describe('examples/multi-agent-crew — smoke', () => {
-  it('exposes VERSION = 0.5.0', () => {
-    expect(VERSION).toBe('0.5.0');
+  it('exposes VERSION = 0.6.0', () => {
+    expect(VERSION).toBe('0.6.0');
   });
 
   it('runCrew streams supervisor + 2 workers and produces a joined synthesis', async () => {

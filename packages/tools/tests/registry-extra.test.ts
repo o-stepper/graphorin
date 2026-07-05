@@ -58,7 +58,7 @@ describe('counters surface', () => {
   });
 });
 
-describe('ToolRegistry — auto-prefix without first-party participant', () => {
+describe('ToolRegistry - auto-prefix without first-party participant', () => {
   beforeEach(() => resetCountersForTesting());
 
   it('renames the lower-priority registration when two MCP servers collide', () => {
@@ -76,7 +76,7 @@ describe('ToolRegistry — auto-prefix without first-party participant', () => {
   });
 });
 
-describe('ToolRegistry — semantic search', () => {
+describe('ToolRegistry - semantic search', () => {
   it('uses the embedder when supplied and returns semantic matches', async () => {
     const embedder: ToolSearchEmbedder = {
       id: () => 'fixture-embedder',
@@ -174,7 +174,7 @@ describe('ToolRegistry — semantic search', () => {
   });
 });
 
-describe('ToolRegistry — manual without first-party participant', () => {
+describe('ToolRegistry - manual without first-party participant', () => {
   it("'manual' throws ToolCollisionError when two MCP servers collide and there is no first-party", () => {
     const registry = createToolRegistry();
     registry.register(makeTool('shared'), MCP_A);
@@ -185,7 +185,7 @@ describe('ToolRegistry — manual without first-party participant', () => {
   });
 });
 
-describe('ToolRegistry — clear', () => {
+describe('ToolRegistry - clear', () => {
   it('removes every registered entry', () => {
     const registry = createToolRegistry();
     registry.register(makeTool('a'));
@@ -196,7 +196,7 @@ describe('ToolRegistry — clear', () => {
   });
 });
 
-describe('ToolRegistry — unregister', () => {
+describe('ToolRegistry - unregister', () => {
   it('returns true when a tool is removed and false otherwise', () => {
     const registry = createToolRegistry();
     registry.register(makeTool('a'));

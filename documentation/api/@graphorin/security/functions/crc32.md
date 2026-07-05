@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function crc32(input): number;
 
 Defined in: packages/security/src/auth/token-format.ts:130
 
-CRC32/IEEE 802.3 implementation. Pure JS, branchless inner loop —
+CRC32/IEEE 802.3 implementation. Pure JS, branchless inner loop -
 matches the polynomial used by GZIP / PNG / Ethernet (`0xEDB88320`).
 Returns an unsigned 32-bit integer so it can be base62-encoded
 without further bit-fiddling.

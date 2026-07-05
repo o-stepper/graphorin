@@ -1,10 +1,10 @@
 /**
- * `DockerSandbox` — opt-in adapter that runs a sandboxed container
+ * `DockerSandbox` - opt-in adapter that runs a sandboxed container
  * via the optional `dockerode` peer dependency. Suitable for
  * heavyweight tools or for executions where kernel-level isolation
  * is required.
  *
- * The adapter is intentionally minimal — it spawns a one-shot
+ * The adapter is intentionally minimal - it spawns a one-shot
  * container from an operator-supplied image, mounts an empty tmpfs at
  * `/work`, writes the `input` payload as JSON onto stdin, reads JSON
  * back from stdout, and tears the container down. Production
@@ -251,7 +251,7 @@ export function createDockerSandbox(opts: DockerSandboxOptions = {}): SandboxImp
         try {
           await container?.remove({ force: true });
         } catch {
-          /* noop — best-effort cleanup */
+          /* noop - best-effort cleanup */
         }
       }
     },

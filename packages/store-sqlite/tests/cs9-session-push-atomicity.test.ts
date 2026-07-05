@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { createSqliteStore, type GraphorinSqliteStore } from '../src/index.js';
 
 /**
- * CS-9 — `session_messages.push` must be atomic (the message row and its FTS
+ * CS-9 - `session_messages.push` must be atomic (the message row and its FTS
  * row commit together or not at all) and `(scope_session_id, sequence)` must be
  * unique so two processes can't silently mint duplicate sequences.
  */
@@ -19,7 +19,7 @@ async function makeStore(): Promise<GraphorinSqliteStore> {
 
 const scope = { userId: 'alex', sessionId: 's1' };
 
-describe('CS-9 — session push atomicity + sequence uniqueness', () => {
+describe('CS-9 - session push atomicity + sequence uniqueness', () => {
   it('rolls the message back when the FTS insert fails (no committed message without FTS)', async () => {
     const store = await makeStore();
     const realRun = store.connection.run.bind(store.connection);
@@ -49,7 +49,7 @@ describe('CS-9 — session push atomicity + sequence uniqueness', () => {
     const store = await makeStore();
     await store.memory.session.push(scope, { role: 'user', content: 'first' });
     await store.memory.session.push(scope, { role: 'assistant', content: 'second' });
-    // A second process racing MAX+1 could compute sequence 1 again — the schema
+    // A second process racing MAX+1 could compute sequence 1 again - the schema
     // must reject the duplicate instead of silently storing it.
     expect(() =>
       store.connection.run(

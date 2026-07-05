@@ -30,7 +30,7 @@ const REGISTRY: ExportMigrator[] = [];
 
 /**
  * Register a migrator. Idempotent on the `(fromVersion, toVersion)`
- * pair — re-registering replaces the prior entry.
+ * pair - re-registering replaces the prior entry.
  *
  * @stable
  */

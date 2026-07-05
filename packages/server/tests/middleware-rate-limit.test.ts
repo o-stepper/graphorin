@@ -52,7 +52,7 @@ describe('createRateLimitMiddleware', () => {
   });
 });
 
-describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
+describe('IP-10/IP-11 - per-socket buckets + header honesty', () => {
   it('two clients with different socket addresses get independent buckets (trustProxy=false)', async () => {
     const { Hono } = await import('hono');
     const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
@@ -74,7 +74,7 @@ describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
     expect((await app.request('/x', {}, env('10.0.0.2'))).status).toBe(200);
   });
 
-  it('X-Real-IP / X-Forwarded-For are ignored when trustProxy=false — the socket wins', async () => {
+  it('X-Real-IP / X-Forwarded-For are ignored when trustProxy=false - the socket wins', async () => {
     const { Hono } = await import('hono');
     const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
     const app = new Hono();
@@ -91,7 +91,7 @@ describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
   });
 
   // Inserts >10k window entries through real requests; loaded windows CI
-  // runners blow the 5s default — functional assertion, explicit headroom.
+  // runners blow the 5s default - functional assertion, explicit headroom.
   it('the window map is swept once it crosses the cap', { timeout: 20_000 }, async () => {
     const { Hono } = await import('hono');
     const { createRequestStateMiddleware } = await import('../src/middleware/request-state.js');
@@ -118,7 +118,7 @@ describe('IP-10/IP-11 — per-socket buckets + header honesty', () => {
     nowMs += 5_000;
     const res = await app.request('/x', {}, env(99_999));
     expect(res.status).toBe(200);
-    // No direct map handle — the behavioural proof is that the request
+    // No direct map handle - the behavioural proof is that the request
     // path stays correct after the sweep; the bound is structural.
   });
 });

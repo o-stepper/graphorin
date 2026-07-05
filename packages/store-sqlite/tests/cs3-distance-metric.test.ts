@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { createSqliteStore } from '../src/index.js';
 import { scoreFromDistance } from '../src/vector-table-mgr.js';
 
-describe('CS-3 — distance metric is honoured + scored in [0,1]', () => {
+describe('CS-3 - distance metric is honoured + scored in [0,1]', () => {
   it('scoreFromDistance maps cosine + euclidean distances into [0,1]', () => {
     // Cosine distance ∈ [0,2] (1 - cos): 0 → identical → 1; 2 → opposite → 0.
     expect(scoreFromDistance('cosine', 0)).toBe(1);

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runMemoryWhy(options): Promise<MemoryWhyResult>;
 
 Defined in: packages/cli/src/commands/memory.ts:607
 
-`graphorin memory why` — explain why facts were recalled, by decoding the
+`graphorin memory why` - explain why facts were recalled, by decoding the
 `memory.search.semantic.explain` attribute off the persisted recall spans.
 Pure read-only inspection; requires the SQLite span exporter to have recorded
 spans (RP-17). Empty when nothing was recorded.

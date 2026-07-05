@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function registerExportMigrator(migrator): void;
 Defined in: packages/sessions/src/migrations/index.ts:37
 
 Register a migrator. Idempotent on the `(fromVersion, toVersion)`
-pair — re-registering replaces the prior entry.
+pair - re-registering replaces the prior entry.
 
 ## Parameters
 

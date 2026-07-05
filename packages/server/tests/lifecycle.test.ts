@@ -295,7 +295,7 @@ describe('Consolidator trigger bridge (MCON-4)', () => {
     };
   }
 
-  it('start() registers the consolidator on the triggers scheduler — no manual wiring (MCON-4)', async () => {
+  it('start() registers the consolidator on the triggers scheduler - no manual wiring (MCON-4)', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
     process.env.GRAPHORIN_HOOKS_PEPPER = 'hooks-pepper-bytes-9XaQ7uvPyR';

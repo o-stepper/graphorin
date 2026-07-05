@@ -4,7 +4,7 @@ The Graphorin framework (`@graphorin/*` packages, MIT-licensed,
 © 2026 Oleksiy Stepurenko) integrates several third-party software
 components at runtime, build-time, and as optional peer dependencies.
 Each component is distributed under its own license and is integrated
-through public APIs only — the Graphorin source tree does not bundle,
+through public APIs only - the Graphorin source tree does not bundle,
 fork, or redistribute any third-party source code.
 
 This file documents the components, their pinned versions, their
@@ -12,7 +12,7 @@ licenses (SPDX identifiers), and the role each plays inside Graphorin.
 Per-package `package.json` files are the authoritative source for the
 exact versions installed in any given build; this file is a
 human-readable rollup of the runtime, peer, and optional-peer
-dependency surface as of the v0.5.0 release.
+dependency surface as of the v0.6.0 release.
 
 ---
 
@@ -29,7 +29,7 @@ Anything outside this list requires an explicit PR-level review and a
 documented exception in `DEPENDENCY_EXCEPTIONS` inside
 [`scripts/check-licenses.mjs`](./scripts/check-licenses.mjs).
 
-### Documented exceptions (v0.5.0)
+### Documented exceptions (v0.6.0)
 
 - The `@img/sharp-libvips-*` family of platform-specific binaries is
   brought in transitively by
@@ -43,7 +43,7 @@ documented exception in `DEPENDENCY_EXCEPTIONS` inside
   `@img/sharp-libvips-*` source distribution. This exception is
   audited per-release.
 - The `spawndamnit` package (transitive via the Changesets CLI;
-  build-time only) declares `"license": "SEE LICENSE IN LICENSE"` —
+  build-time only) declares `"license": "SEE LICENSE IN LICENSE"` -
   inspection of the upstream `LICENSE` file shows the standard MIT
   permission text. Pure manifest-format quirk; not a substantive
   license deviation.
@@ -177,4 +177,4 @@ is security-sensitive.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

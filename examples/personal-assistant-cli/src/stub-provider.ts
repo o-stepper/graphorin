@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` used by the smoke test (and as the
  * `recipe: 'stub'` fallback in the CLI). The stub never opens a

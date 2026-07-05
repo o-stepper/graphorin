@@ -1,15 +1,15 @@
 /**
- * Consolidator runtime — orchestrates the three phases, the lock,
+ * Consolidator runtime - orchestrates the three phases, the lock,
  * the budget, the cursor, and the DLQ. The factory is the public
  * surface; the class lives below it as a private implementation
  * detail.
  *
- * The runtime is **library-mode** by default — it does not start a
+ * The runtime is **library-mode** by default - it does not start a
  * background scheduler. Cron / idle triggers are realised by
  * registering them with a `@graphorin/triggers` scheduler via
  * `registerWithScheduler(...)` (the standalone server calls this in
  * `beforeStart` whenever a consolidator + a triggers scheduler are both
- * supplied). Turn / event triggers are consumer-emitted — the scheduler
+ * supplied). Turn / event triggers are consumer-emitted - the scheduler
  * cannot fire them on its own, so the consumer must call
  * `trigger({ kind: 'turn' | 'event' }, ...)` from its own loop. Manual
  * `trigger(...)` / `fireNow(...)` calls work in either mode.
@@ -59,7 +59,7 @@ import {
 
 /**
  * Age after which an unresolved CONFLICT-CHECK row is expired as
- * `'admit'` at tiers with no deep phase (memory-consolidation-04) —
+ * `'admit'` at tiers with no deep phase (memory-consolidation-04) -
  * the judge that would resolve it never runs there.
  */
 const PENDING_CONFLICT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -81,7 +81,7 @@ export interface Consolidator {
    * idle/cron scheduler so admins can flush the queue on demand.
    */
   fireNow(phase: ConsolidatorPhase, scope?: SessionScope): Promise<PhaseOutcome | null>;
-  /** Replace the active tier — recomputes ceilings + phase set. */
+  /** Replace the active tier - recomputes ceilings + phase set. */
   setTier(tier: ConsolidatorTier): Promise<void>;
   /** Pause the consolidator until the next budget reset. */
   pause(): Promise<void>;
@@ -91,16 +91,16 @@ export interface Consolidator {
   onPhaseFinished(listener: PhaseListener): () => void;
   /**
    * Record memory-pipeline LLM spend that happened OUTSIDE a phase run
-   * (MCON-15 — e.g. workflow induction) so the daily ceilings cover it.
+   * (MCON-15 - e.g. workflow induction) so the daily ceilings cover it.
    * Counted under the deep-phase bucket.
    */
   recordExternalSpend(tokens: number, costUsd?: number): void;
-  /** Active config — frozen snapshot. */
+  /** Active config - frozen snapshot. */
   config(): ConsolidatorConfig;
   /**
    * Register this consolidator's cron / idle triggers with a
    * `@graphorin/triggers` scheduler so they fire `trigger(...)`
-   * automatically (the daemon ↔ triggers bridge — MCON-4). Uses the
+   * automatically (the daemon ↔ triggers bridge - MCON-4). Uses the
    * configured `defaultScope`; throws if none was set. Turn / event
    * triggers are skipped (consumer-emitted). The standalone server calls
    * this in `beforeStart`.
@@ -153,7 +153,7 @@ class ConsolidatorImpl implements Consolidator {
   /**
    * Message ids of the batch the most recent `#dispatch` operated on
    * (MCON-10). Captured so a thrown phase can enqueue its DLQ row with
-   * the REAL failed slice instead of `[]` — replays must target the
+   * the REAL failed slice instead of `[]` - replays must target the
    * window that failed, not whatever the cursor points at later.
    */
   #lastDispatchMessageIds: ReadonlyArray<string> = [];
@@ -258,7 +258,7 @@ class ConsolidatorImpl implements Consolidator {
     }
     if (tier === 'custom') {
       throw new Error(
-        '[graphorin/memory] consolidator.setTier("custom") requires explicit ceilings — re-create the consolidator with `tier: "custom"` + `ceilings`.',
+        '[graphorin/memory] consolidator.setTier("custom") requires explicit ceilings - re-create the consolidator with `tier: "custom"` + `ceilings`.',
       );
     }
     this.#config = Object.freeze({
@@ -359,18 +359,18 @@ class ConsolidatorImpl implements Consolidator {
     if (!this.#running) return null;
     if (this.#manuallyPaused) return null;
     // memory-consolidation-03: `drainDlq` finally has a production
-    // caller — failed batches whose backoff has elapsed replay here
+    // caller - failed batches whose backoff has elapsed replay here
     // instead of accumulating forever. Cheap when the queue is empty
     // (one SELECT); replays are backoff-gated by the store.
     await this.drainDlq(scope).catch(() => 0);
     // memory-consolidation-04: tiers without a deep phase never drain
-    // the pending CONFLICT-CHECK queue — expire stale rows as 'admit'
+    // the pending CONFLICT-CHECK queue - expire stale rows as 'admit'
     // so it cannot grow monotonically at the free/cheap defaults.
     await this.#expireStalePendingConflicts(scope).catch(() => {});
     const phases = this.#planPhases(reason);
     if (phases.length === 0) return null;
     // MCON-8: enforce the cooldown the runtime always PERSISTED but never
-    // read — back-to-back triggers used to fire with zero quiet period.
+    // read - back-to-back triggers used to fire with zero quiet period.
     // Checked ONCE per trigger dispatch (phases within one dispatch chain
     // freely); manual fireNow(...) / DLQ replays bypass it.
     if (reason.kind !== 'manual' && this.#config.ceilings.cooldownMs > 0) {
@@ -402,11 +402,11 @@ class ConsolidatorImpl implements Consolidator {
       );
     }
     if (!this.#config.phases.includes(phase) && phase !== 'light') {
-      // MCON-17: manual flushes bypass phase gating ON PURPOSE — but the
+      // MCON-17: manual flushes bypass phase gating ON PURPOSE - but the
       // operator should know they are running a phase the tier disabled
       // (the old empty branch promised a warn and emitted nothing).
       process.stderr.write(
-        `[graphorin/memory] consolidator.fireNow('${phase}') runs a phase not enabled for tier '${this.#config.tier}' — proceeding (manual flushes bypass phase gating).\n`,
+        `[graphorin/memory] consolidator.fireNow('${phase}') runs a phase not enabled for tier '${this.#config.tier}' - proceeding (manual flushes bypass phase gating).\n`,
       );
     }
     return this.#runPhase(phase, target, { kind: 'manual', value: phase });
@@ -415,7 +415,7 @@ class ConsolidatorImpl implements Consolidator {
   /**
    * memory-consolidation-04: at tiers with no deep phase the pending
    * CONFLICT-CHECK queue has no drain. Resolve rows older than 7 days
-   * as `'admit'` (the safe direction — the candidate fact stays live;
+   * as `'admit'` (the safe direction - the candidate fact stays live;
    * only the never-coming judge call is skipped), bounded per sweep.
    */
   async #expireStalePendingConflicts(scope: SessionScope): Promise<void> {
@@ -445,8 +445,8 @@ class ConsolidatorImpl implements Consolidator {
       let deferred = false;
       let lastError: unknown = null;
       try {
-        // MCON-10: replays run through the FULL phase envelope — budget
-        // precheck, scope lock, and recordRunStart/Finish — so they are
+        // MCON-10: replays run through the FULL phase envelope - budget
+        // precheck, scope lock, and recordRunStart/Finish - so they are
         // visible in `consolidator_runs` and cannot race a live run or
         // spend past a pause.
         const outcome = await this.#runPhase(replayPhase, scope, {
@@ -470,7 +470,7 @@ class ConsolidatorImpl implements Consolidator {
         continue;
       }
       if (deferred) {
-        // Lock contention / budget pause is transient — reschedule at the
+        // Lock contention / budget pause is transient - reschedule at the
         // SAME retry count so contention cannot exhaust the row.
         const delayMs = nextBackoffMs({
           retryCount: row.retryCount + 1,
@@ -530,7 +530,7 @@ class ConsolidatorImpl implements Consolidator {
       const deferredRunId = this.#randomId();
       const deferredAt = this.#now();
       // Persist the deferral as a `consolidator_runs` row so the
-      // counter survives process restart (DEC-150 — same code path
+      // counter survives process restart (DEC-150 - same code path
       // lib + server). Adapters that do not expose the consolidator
       // surface fall through to the in-memory adjustment counter.
       if (this.#consolidatorStore !== null) {
@@ -602,7 +602,7 @@ class ConsolidatorImpl implements Consolidator {
         llmCostUsd: null,
         errorMessage: describeError(err),
       };
-      // MCON-10: a failed DLQ *replay* must not enqueue a fresh DLQ row —
+      // MCON-10: a failed DLQ *replay* must not enqueue a fresh DLQ row -
       // the original row already tracks the failure (drainDlq reschedules
       // or exhausts it); double-tracking multiplies rows per drain.
       const isDlqReplay =
@@ -629,7 +629,7 @@ class ConsolidatorImpl implements Consolidator {
               maxMs: this.#config.dlqMaxBackoffMs,
             }),
           retryCount: 0,
-          // MCON-10: persist the failed phase — replays must re-run the
+          // MCON-10: persist the failed phase - replays must re-run the
           // SAME phase, not an inferred 'standard'.
           phase,
         });
@@ -651,7 +651,7 @@ class ConsolidatorImpl implements Consolidator {
         noiseFilteredCount: outcome.noiseFilteredCount,
         emptyExtractions: outcome.emptyExtractions,
         // MCON-17: the P1-2 / P1-1 counters were computed on the outcome
-        // and then dropped — the run audit lost them.
+        // and then dropped - the run audit lost them.
         episodesFormed: outcome.episodesFormed,
         insightsCreated: outcome.insightsCreated,
         errorMessage: outcome.errorMessage,
@@ -865,7 +865,7 @@ function skipOutcome(
     emptyExtractions: 0,
     llmTokensUsed: 0,
     llmCostUsd: null,
-    errorMessage: `phase skipped — ${reason}`,
+    errorMessage: `phase skipped - ${reason}`,
   };
 }
 
@@ -912,7 +912,7 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
     dlqMaxBackoffMs: opts.dlqMaxBackoffMs ?? 60 * 60 * 1000,
     formEpisodes: opts.formEpisodes ?? preset.formEpisodes,
     importanceScoring: opts.importanceScoring ?? preset.importanceScoring,
-    // MCON-2: opt-in only — fail-safe (quarantine) stays the default at every tier.
+    // MCON-2: opt-in only - fail-safe (quarantine) stays the default at every tier.
     autoPromoteExtraction: opts.autoPromoteExtraction ?? false,
     reflection: opts.reflection ?? preset.reflection,
     importanceThreshold: opts.importanceThreshold ?? preset.importanceThreshold,
@@ -926,7 +926,7 @@ function resolveConfig(opts: CreateConsolidatorOptions): ConsolidatorConfig {
 function defaultTriggers(): ConsolidatorTriggerSpec[] {
   // `idle:5m` drives the light + standard phases between sessions; the daily
   // cron is what makes the **deep** phase reachable (it drains the deferred
-  // conflict-check queue + runs reflection — `#planPhases` only schedules deep
+  // conflict-check queue + runs reflection - `#planPhases` only schedules deep
   // for cron / manual / budget reasons). A `turn:N` default was dropped: the
   // scheduler cannot count user turns, so it was inert unless a consumer
   // emitted `trigger({ kind: 'turn' })` itself (MCON-4).

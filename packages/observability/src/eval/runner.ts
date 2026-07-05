@@ -1,9 +1,9 @@
 /**
- * `runEval(...)` — minimal inline eval runner. Walks every case in
+ * `runEval(...)` - minimal inline eval runner. Walks every case in
  * the dataset, calls `agent.run(case.input)`, applies every supplied
  * scorer, and returns an aggregated {@link EvalReport}.
  *
- * The runner is deliberately tiny — it has no parallelism, no
+ * The runner is deliberately tiny - it has no parallelism, no
  * retries, no reporters, no dataset loaders. Production scenarios
  * that need any of those should `pnpm add @graphorin/evals` (post-MVP).
  *
@@ -33,7 +33,7 @@ export async function runEval<I, O>(opts: RunEvalOptions<I, O>): Promise<EvalRep
       const sampleCase = opts.dataset.cases[idx];
       if (sampleCase === undefined) continue;
       // EB-6: disambiguate a caller-provided id per iteration too, not just the
-      // synthetic fallback — otherwise iterations>1 emits duplicate caseIds.
+      // synthetic fallback - otherwise iterations>1 emits duplicate caseIds.
       const baseId = sampleCase.id ?? `case-${idx}`;
       const caseId = iterations === 1 ? baseId : `${baseId}-iter-${iter}`;
 

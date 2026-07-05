@@ -43,7 +43,7 @@ const KEY_RE = /^[A-Za-z0-9_\-:]{8,255}$/;
  */
 export interface IdempotencyMiddlewareOptions {
   /**
-   * Paths whose responses are NEVER cached or replayed (IP-6) — the
+   * Paths whose responses are NEVER cached or replayed (IP-6) - the
    * middleware passes straight through. Used for secret-bearing
    * endpoints (`POST /v1/tokens` returns a raw token; caching it would
    * persist the secret plaintext in durable SQLite for the TTL).
@@ -81,7 +81,7 @@ export function createIdempotencyMiddleware(
   const now = options.now ?? Date.now;
   const lru = new SimpleLru<string, CacheEntry>(config.lruCacheSize);
 
-  // periphery-08: keys whose execution is currently in flight — a
+  // periphery-08: keys whose execution is currently in flight - a
   // concurrent duplicate is rejected (409) instead of double-executing.
   const inFlight = new Set<string>();
 
@@ -106,7 +106,7 @@ export function createIdempotencyMiddleware(
       return;
     }
     // IP-6: secret-bearing endpoints opt out of response caching
-    // entirely — repeats re-execute and no body is ever persisted.
+    // entirely - repeats re-execute and no body is ever persisted.
     if (excluded.has(c.req.path)) {
       await next();
       return;
@@ -123,7 +123,7 @@ export function createIdempotencyMiddleware(
           400,
         );
       }
-      // 'warn' / 'off' — pass-through with a hint header.
+      // 'warn' / 'off' - pass-through with a hint header.
       if (config.requireKey === 'warn') {
         c.header('Idempotency-Status', 'header-missing');
       }
@@ -153,7 +153,7 @@ export function createIdempotencyMiddleware(
     }
     // IP-6: the verified principal the record is bound to. Replays are
     // served only to the SAME principal that originally executed the
-    // request (who passed the route's scope checks at execute time) —
+    // request (who passed the route's scope checks at execute time) -
     // a different token cannot fetch someone else's cached response,
     // closing the scope-bypass the pre-router mount opened.
     const auth = c.get('state').auth;
@@ -194,7 +194,7 @@ export function createIdempotencyMiddleware(
           },
         });
       }
-      // Expired — fall through to re-execute.
+      // Expired - fall through to re-execute.
       lru.delete(key);
       await store.delete(key);
     }
@@ -226,12 +226,12 @@ export function createIdempotencyMiddleware(
 
       const status = c.res.status;
       if (NON_CACHEABLE_STATUS.has(status)) {
-        // Retry-eligible — leave nothing in the cache.
+        // Retry-eligible - leave nothing in the cache.
         return;
       }
       const responseBody = await captureJsonResponse(c);
       if (responseBody === null) {
-        // Non-JSON or empty body — skip caching to keep the schema
+        // Non-JSON or empty body - skip caching to keep the schema
         // simple; clients that need response replay can use bodied
         // POSTs.
         return;
@@ -253,7 +253,7 @@ export function createIdempotencyMiddleware(
         lru.set(key, { record: record_, cachedAt: now() });
       } catch {
         // Best-effort cache. Persistence failures must not break the
-        // hot path — operators see them via the audit log + logger.
+        // hot path - operators see them via the audit log + logger.
       }
     } finally {
       inFlight.delete(key);

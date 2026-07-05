@@ -1,7 +1,7 @@
 /**
  * Built-in structured summary template (RB-46 § 5.2). Historically named
  * "9-section" (the file name is retained for import stability); the
- * template has since grown to 12 sections — the stable id below says
+ * template has since grown to 12 sections - the stable id below says
  * `summary-sections` so metadata no longer misstates the shape
  * (context-engine-14).
  * The template ships in English by default; locale-extensible via
@@ -11,15 +11,15 @@
  * `<<<untrusted_content>>>`-wrapped tool results as data, not
  * instructions (cross-cut RB-43). The produced summary is NOT
  * unconditionally trusted (CE-15): when the compacted window carried
- * untrusted envelopes — or the injection heuristics flag the
- * summarizer output — the compactor wraps the LLM-authored body in a
+ * untrusted envelopes - or the injection heuristics flag the
+ * summarizer output - the compactor wraps the LLM-authored body in a
  * `trust="derived"` envelope (see `CompactionResult.summaryTrust`),
  * so taint survives compaction instead of laundering into an
  * authoritative system message.
  *
  * The last two sections ("Recent turns preserved verbatim" and
  * "Compaction metadata") are filled by the harness, NOT by the
- * summarizer — those contracts are mechanical and auditable. The
+ * summarizer - those contracts are mechanical and auditable. The
  * other sections (incl. the SOTA-6 "Errors encountered and
  * resolutions" / "Next steps" and the C4 "Constraints and
  * non-negotiables") are produced by the LLM call.
@@ -96,7 +96,7 @@ export function buildSummarizerPrompt(input: {
         `  ${idx + 1}. ${header}${idx >= harnessFrom ? ' (filled by harness; do NOT generate)' : ''}`,
     )
     .join('\n');
-  // context-engine-09: the dump rides inside a data-only envelope — a
+  // context-engine-09: the dump rides inside a data-only envelope - a
   // tool result carrying the closing marker would break out of it and
   // inject instructions straight into the summarizer. Neutralize the
   // marker sequences the same way `wrapSummaryAsDerived` does.
@@ -121,7 +121,7 @@ export function buildSummarizerPrompt(input: {
 
 /**
  * Default character budget for the summarizer's older-messages dump
- * (~24k tokens at 4 chars/token) — bounded so pointing
+ * (~24k tokens at 4 chars/token) - bounded so pointing
  * `summarizerModel` at a smaller model does not overflow its window
  * (context-engine-07).
  *
@@ -138,7 +138,7 @@ function neutralizeDumpMarkers(text: string): string {
 
 /**
  * Cap the dump to `budget` characters by dropping the OLDEST lines
- * first — the newest older-window messages carry the state the summary
+ * first - the newest older-window messages carry the state the summary
  * must preserve for continuity. A leading marker records the elision.
  */
 function capDumpLines(lines: ReadonlyArray<string>, budget: number): string {
@@ -182,7 +182,7 @@ export interface CompactionMetadataPayload {
 /**
  * Render the produced summary into the final text the harness commits
  * to the in-flight buffer. The LLM-produced sections come from
- * `summaryFromLlm`; the last two are stitched in mechanically — the
+ * `summaryFromLlm`; the last two are stitched in mechanically - the
  * preserved recent turns and the `metadata` block.
  *
  * @stable
@@ -197,7 +197,7 @@ export function renderFinalSummary(input: {
   // The two harness-filled sections are always the last two (SOTA-6).
   const recentTurnsHeader = template.sections[template.sections.length - 2];
   const metadataHeader = template.sections[template.sections.length - 1];
-  // CE-7: one-line digests, NOT verbatim — the preserved turns also live
+  // CE-7: one-line digests, NOT verbatim - the preserved turns also live
   // on as real messages after the splice, so verbatim rendering doubled
   // them in the post-compaction buffer (and in afterTokens).
   const recentTurns = preservedMessages

@@ -7,7 +7,7 @@
  * The mapping is the canonical table published in the architecture
  * documentation. Span types without a clean OpenInference equivalent
  * (`skill.*`, `mcp.connect`, `mcp.list-tools`, `replay.*`) are NOT
- * emitted — the caller can introspect via {@link openInferenceKindFor}
+ * emitted - the caller can introspect via {@link openInferenceKindFor}
  * and decide whether to log a fallback attribute.
  *
  * @packageDocumentation
@@ -80,7 +80,7 @@ const KIND_TABLE: ReadonlyArray<readonly [SpanType, OpenInferenceSpanKind]> = Ob
 
 /**
  * Span types intentionally excluded from OpenInference span-kind
- * emission per the canonical table — `skill.*`, `mcp.connect`,
+ * emission per the canonical table - `skill.*`, `mcp.connect`,
  * `mcp.list-tools`, and `replay.*` markers do not have a clean
  * OpenInference equivalent.
  *
@@ -125,7 +125,7 @@ export function emitOpenInferenceKind<T extends SpanType>(span: AISpan<T>): void
 }
 
 /**
- * Full canonical span-to-kind table — exposed for tooling and tests
+ * Full canonical span-to-kind table - exposed for tooling and tests
  * that need to introspect the mapping.
  *
  * @stable

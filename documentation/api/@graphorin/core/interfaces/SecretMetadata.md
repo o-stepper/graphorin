@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/contracts/secrets-store.ts:83
 
-Public metadata about a stored secret. Safe to log — never carries the
+Public metadata about a stored secret. Safe to log - never carries the
 value itself.
 
 ## Stable

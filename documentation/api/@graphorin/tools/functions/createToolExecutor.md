@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function createToolExecutor(opts): ToolExecutor;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:440
+Defined in: packages/tools/src/executor/executor.ts:441
 
 ## Parameters
 

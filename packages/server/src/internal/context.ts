@@ -22,7 +22,7 @@ export type AuthState =
     }
   // IP-13: authentication is disabled server-wide (`auth.kind = 'none'`,
   // the documented trusted-loopback / single-operator mode). There is no
-  // token, but the request is fully authorized — `grantedScopes` carries
+  // token, but the request is fully authorized - `grantedScopes` carries
   // `admin:*` so every scope check passes uniformly.
   | {
       readonly kind: 'anonymous';

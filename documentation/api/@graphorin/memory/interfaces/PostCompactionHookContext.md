@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,7 +17,7 @@ Per-call context handed to a post-compaction hook.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | packages/memory/src/context-engine/compaction/types.ts:198 |
-| <a id="property-droppedmessages"></a> `droppedMessages?` | `readonly` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | C4: the messages this compaction dropped (summarized away / cleared), in original order. Lets re-anchoring hooks recover references — e.g. `reanchorRecentResults` re-lists the result handles that just left the window. | packages/memory/src/context-engine/compaction/types.ts:206 |
+| <a id="property-droppedmessages"></a> `droppedMessages?` | `readonly` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | C4: the messages this compaction dropped (summarized away / cleared), in original order. Lets re-anchoring hooks recover references - e.g. `reanchorRecentResults` re-lists the result handles that just left the window. | packages/memory/src/context-engine/compaction/types.ts:206 |
 | <a id="property-result"></a> `result` | `readonly` | [`CompactionResult`](/api/@graphorin/memory/interfaces/CompactionResult.md) | - | packages/memory/src/context-engine/compaction/types.ts:194 |
 | <a id="property-runid"></a> `runId` | `readonly` | `string` | - | packages/memory/src/context-engine/compaction/types.ts:196 |
 | <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/memory/src/context-engine/compaction/types.ts:195 |

@@ -1,5 +1,5 @@
 /**
- * `createGuard(...)` — pick the guard implementation that matches a
+ * `createGuard(...)` - pick the guard implementation that matches a
  * tier. Mirrors the dispatch table from DEC-153.
  *
  * @packageDocumentation

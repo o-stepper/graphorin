@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function setLiteralAllowed(allowed): void;
 
 Defined in: packages/security/src/secrets/resolvers/literal.ts:23
 
-Programmatic gate — set from `secrets.allowLiteral: true` in user
+Programmatic gate - set from `secrets.allowLiteral: true` in user
 config. Must be combined with the env gate to actually unlock the
 `literal:` scheme.
 

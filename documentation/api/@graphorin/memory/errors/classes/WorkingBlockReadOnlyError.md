@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/memory/src/errors/index.ts:136
 
 Thrown when any mutation targets a block defined with
 `readOnly: true` (MRET-14). Previously this guard threw
-`WorkingBlockReplaceMismatchError(label, 0)` — semantically "your
+`WorkingBlockReplaceMismatchError(label, 0)` - semantically "your
 unique substring matched 0 times", which misled callers that retry
 replace operations on mismatch.
 

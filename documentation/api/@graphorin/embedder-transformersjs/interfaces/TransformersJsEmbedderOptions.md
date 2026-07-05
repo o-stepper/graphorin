@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,6 +23,6 @@ Configuration accepted by [createTransformersJsEmbedder](/api/@graphorin/embedde
 | <a id="property-dtype"></a> `dtype?` | `readonly` | `string` | Optional dtype hint (`'fp32' | 'fp16' | 'q8' | 'q4'`). When unset, the runtime picks the model's recommended default. | packages/embedder-transformersjs/src/index.ts:50 |
 | <a id="property-model"></a> `model?` | `readonly` | `string` | Default `'Xenova/multilingual-e5-base'` (768-dim). | packages/embedder-transformersjs/src/index.ts:33 |
 | <a id="property-normalize"></a> `normalize?` | `readonly` | `boolean` | Default `true`. | packages/embedder-transformersjs/src/index.ts:37 |
-| <a id="property-pipelinefactory"></a> `pipelineFactory?` | `readonly` | [`PipelineFactory`](/api/@graphorin/embedder-transformersjs/type-aliases/PipelineFactory.md) | Override the underlying `pipeline` factory — used by the test suite to inject a stub. Production callers should leave this unset so the package lazily loads `@huggingface/transformers`. | packages/embedder-transformersjs/src/index.ts:58 |
+| <a id="property-pipelinefactory"></a> `pipelineFactory?` | `readonly` | [`PipelineFactory`](/api/@graphorin/embedder-transformersjs/type-aliases/PipelineFactory.md) | Override the underlying `pipeline` factory - used by the test suite to inject a stub. Production callers should leave this unset so the package lazily loads `@huggingface/transformers`. | packages/embedder-transformersjs/src/index.ts:58 |
 | <a id="property-pooling"></a> `pooling?` | `readonly` | [`Pooling`](/api/@graphorin/embedder-transformersjs/type-aliases/Pooling.md) | Default `'mean'`. | packages/embedder-transformersjs/src/index.ts:35 |
 | <a id="property-revision"></a> `revision?` | `readonly` | `string` | Optional model revision pin (`'main'` if unset). | packages/embedder-transformersjs/src/index.ts:39 |

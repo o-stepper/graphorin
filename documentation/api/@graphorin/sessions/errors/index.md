@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -23,7 +23,7 @@ callers can `switch` on it without parsing messages.
 | [CassetteIdempotencyMismatchError](/api/@graphorin/sessions/errors/classes/CassetteIdempotencyMismatchError.md) | Thrown when a cassette record's `sha256OfArgs` does not match the live invocation's argument hash AND `failOnIdempotencyMismatch: true` is configured. Default behaviour is to continue with the recorded result and surface the divergence in the event stream. |
 | [CassetteSchemaMismatchError](/api/@graphorin/sessions/errors/classes/CassetteSchemaMismatchError.md) | Thrown when a cassette's recorded `output` no longer validates against the tool's `outputSchema` AND `failOnSchemaMismatch: true` is configured (the default). |
 | [ReplayAccessDeniedError](/api/@graphorin/sessions/errors/classes/ReplayAccessDeniedError.md) | Thrown by `Session.replay({ raw: true })` when the calling context's scope set does not include `traces:read:raw`. |
-| [SessionClosedError](/api/@graphorin/sessions/errors/classes/SessionClosedError.md) | Thrown by `Session.push(...)` when the session has been closed (RP-6). `close()` is a real lifecycle boundary, not advisory — reopen the session (a fresh `create`) or write to a different one. |
+| [SessionClosedError](/api/@graphorin/sessions/errors/classes/SessionClosedError.md) | Thrown by `Session.push(...)` when the session has been closed (RP-6). `close()` is a real lifecycle boundary, not advisory - reopen the session (a fresh `create`) or write to a different one. |
 | [SessionError](/api/@graphorin/sessions/errors/classes/SessionError.md) | Base class for every error thrown from `@graphorin/sessions`. |
 | [SessionExportChecksumMismatchError](/api/@graphorin/sessions/errors/classes/SessionExportChecksumMismatchError.md) | Thrown when a `--hash` footer's checksum does not match the recomputed body checksum on import. |
 | [SessionExportEncryptionRequiredError](/api/@graphorin/sessions/errors/classes/SessionExportEncryptionRequiredError.md) | Thrown when `--encrypt` was used at write time but the import caller did not supply the matching passphrase. |

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { createTransformersJsEmbedder } from '../src/index.js';
 
 /**
- * Network-gated tests — exercise the real Hugging Face model download
+ * Network-gated tests - exercise the real Hugging Face model download
  * path. Skipped by default; run explicitly with:
  *
  *   RUN_NETWORK_TESTS=1 pnpm test
@@ -17,7 +17,7 @@ import { createTransformersJsEmbedder } from '../src/index.js';
  */
 const enabled = process.env.RUN_NETWORK_TESTS === '1';
 
-describe.skipIf(!enabled)('transformersjs embedder — network-gated', () => {
+describe.skipIf(!enabled)('transformersjs embedder - network-gated', () => {
   it('downloads the default model on first use and reuses the cache on second use', async () => {
     const cacheDir = await mkdtemp(join(tmpdir(), 'graphorin-tjs-network-'));
     process.env.GRAPHORIN_CACHE_DIR = cacheDir;

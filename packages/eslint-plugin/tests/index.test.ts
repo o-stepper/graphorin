@@ -13,7 +13,7 @@ describe('@graphorin/eslint-plugin', () => {
   });
 
   it('exports the canonical version constant', () => {
-    expect(VERSION).toBe('0.5.0');
+    expect(VERSION).toBe('0.6.0');
     expect(meta.version).toBe(VERSION);
   });
 
@@ -71,7 +71,7 @@ describe('@graphorin/eslint-plugin', () => {
     expect(plugin.configs.recommended.plugins).toEqual(['@graphorin']);
 
     // Smoke: a flat-config array spreading the preset lints a fixture and the
-    // rules fire (the whole point — flat-config consumers couldn't use the
+    // rules fire (the whole point - flat-config consumers couldn't use the
     // string-array `recommended`). `cwd` must prefix the `files` glob match.
     const filename = '/repo/packages/example/src/example.js';
     const linter = new Linter({ cwd: dirname(filename) });

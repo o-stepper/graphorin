@@ -17,7 +17,7 @@
  * - `tool.preferred-model.*` (per-tool model hints)
  * - `tool.executor.*` (general execution counters)
  *
- * Cardinality is bounded — every label is a finite enum or a
+ * Cardinality is bounded - every label is a finite enum or a
  * tool-name (which is per-deployment bounded by the registered
  * catalogue size).
  *

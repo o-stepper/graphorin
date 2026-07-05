@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createInMemoryOAuthServerStore } from '../../src/oauth/index.js';
 
-describe('@graphorin/security/oauth — in-memory store', () => {
+describe('@graphorin/security/oauth - in-memory store', () => {
   it('round-trips records and supports patch updates', async () => {
     const store = createInMemoryOAuthServerStore();
     await store.put({

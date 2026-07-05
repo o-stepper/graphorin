@@ -10,12 +10,12 @@ import type { EmbeddingMetaRegistryLike } from '../internal/storage-adapter.js';
 /**
  * Coexistence policy for embedder swaps.
  *
- *  - `'lock-on-first'` (default) — refuses to register a second active
+ *  - `'lock-on-first'` (default) - refuses to register a second active
  *    embedder; surfaces an actionable error pointing at the planned
  *    migration runner.
- *  - `'multi-active'` — keeps both embedders alive (read union, write
+ *  - `'multi-active'` - keeps both embedders alive (read union, write
  *    to active); used while a long migration is in flight.
- *  - `'auto-migrate'` — re-embeds existing rows in resumable batches
+ *  - `'auto-migrate'` - re-embeds existing rows in resumable batches
  *    until the source embedder has zero rows, then retires it.
  *
  * @stable
@@ -28,7 +28,7 @@ export type EmbedderMigrationStrategy = 'lock-on-first' | 'multi-active' | 'auto
  * @stable
  */
 export interface MigrationProgress {
-  /** `'fact'`, `'episode'`, or `'message'` — which entity is being migrated. */
+  /** `'fact'`, `'episode'`, or `'message'` - which entity is being migrated. */
   readonly kind: 'fact' | 'episode' | 'message';
   /** Number of records processed so far. */
   readonly processed: number;
@@ -40,7 +40,7 @@ export interface MigrationProgress {
   readonly target: string;
   /**
    * Identifier for this migration run. MST-12: this is an in-memory id for
-   * the current run — there is no persisted `migration_state` cursor today, so
+   * the current run - there is no persisted `migration_state` cursor today, so
    * a migration does not resume across processes.
    */
   readonly migrationId: string;
@@ -72,12 +72,12 @@ export interface MigrateEmbedderOptions {
   readonly maxRecordsPerKind?: number;
   /**
    * Hook that returns the next batch of rows to re-embed for a given kind.
-   * MST-12: this is **caller-supplied** — there is no store-side helper that
+   * MST-12: this is **caller-supplied** - there is no store-side helper that
    * auto-wires it today, and `auto-migrate` throws without it. Pass a paging
    * function over your source rows to drive the migration.
    */
   readonly nextBatch?: NextBatchHook;
-  /** Optional abort signal — aborting yields one final progress event. */
+  /** Optional abort signal - aborting yields one final progress event. */
   readonly signal?: AbortSignal;
 }
 

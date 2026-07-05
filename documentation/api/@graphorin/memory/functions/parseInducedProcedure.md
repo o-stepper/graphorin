@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ Defined in: packages/memory/src/consolidator/phases/induce.ts:177
 
 Parse the induction response into an [InducedProcedure](/api/@graphorin/memory/interfaces/InducedProcedure.md), tolerating
 chatty / fenced output. Returns `null` when absent / unparseable / it
-yields no steps. **Never throws on model output** — only normalizes.
+yields no steps. **Never throws on model output** - only normalizes.
 
 The returned `variables` are reconciled with the steps: every `{name}`
 placeholder actually present in the steps is guaranteed to appear, so the

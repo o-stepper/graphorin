@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type MemoryOwner = "user" | "agent" | "shared";
 
 Defined in: packages/core/src/types/memory.ts:68
 
-Principal a memory belongs to (D3) — the *who-owns-this* dimension,
+Principal a memory belongs to (D3) - the *who-owns-this* dimension,
 orthogonal to [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance.md) (*where-it-came-from*):
 `user` for user-stated content, `agent` for the agent's own
 inferences (consolidator extraction / reflection / induction stamp

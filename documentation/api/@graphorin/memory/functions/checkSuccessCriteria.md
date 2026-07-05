@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/memory/src/consolidator/phases/induce.ts:322
 
 Self-verify a reuse against an induced procedure's success criteria. A
 criterion is met when any observed signal contains it (case-insensitive
-substring) — a deterministic, offline check the agent runtime can feed
+substring) - a deterministic, offline check the agent runtime can feed
 actual run observations into on reuse. With **no criteria**, the reuse
 cannot be self-verified, so `verified` is `false`.
 

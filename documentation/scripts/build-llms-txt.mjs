@@ -5,9 +5,9 @@
  * Generates two LLM-friendly artefacts in the VitePress build output
  * (and also into `public/` so `pnpm dev` serves them):
  *
- *   - llms.txt      — the short, navigable index defined by the
+ *   - llms.txt      - the short, navigable index defined by the
  *                     llmstxt.org convention.
- *   - llms-full.txt — concatenated Markdown body of every published
+ *   - llms-full.txt - concatenated Markdown body of every published
  *                     page, sectioned with stable URL anchors.
  *
  * The script walks the documentation source tree (Markdown only) and
@@ -143,11 +143,11 @@ async function main() {
   const llmsTxt = indexLines.join('\n');
 
   const fullChunks = [
-    '# Graphorin — full documentation snapshot',
+    '# Graphorin - full documentation snapshot',
     '',
     'This is the auto-generated, machine-readable concatenation of every',
     'public documentation page. It is intended for consumption by AI',
-    'assistants — see the short index at /llms.txt.',
+    'assistants - see the short index at /llms.txt.',
     '',
     `Source: ${SITE_URL}`,
     'Repository: https://github.com/o-stepper/graphorin',
@@ -187,7 +187,7 @@ async function main() {
     await writeFile(join(distDir, 'llms-full.txt'), llmsFullTxt, 'utf8');
     console.log('[graphorin/docs] llms.txt: mirrored into .vitepress/dist');
   } catch {
-    /* no build output yet — running before `vitepress build`; ok */
+    /* no build output yet - running before `vitepress build`; ok */
   }
 }
 

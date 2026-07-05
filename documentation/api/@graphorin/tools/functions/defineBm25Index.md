@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function defineBm25Index(docs, opts?): (query, k?) => Bm25Match[];
 Defined in: packages/tools/src/registry/bm25.ts:100
 
 Build a BM25 query function over `docs`. The returned function
-runs in `O(query tokens × matching docs)` per invocation — bounded
+runs in `O(query tokens × matching docs)` per invocation - bounded
 by the registry size.
 
 ## Parameters

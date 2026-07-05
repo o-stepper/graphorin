@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function verifyAuditCheckpointSignature(checkpoint, publicKeyPem): boolean;
 Defined in: packages/security/src/audit/merkle.ts:408
 
 Verify a signed checkpoint's Ed25519 signature against a pinned
-public key (pure — no database access).
+public key (pure - no database access).
 
 ## Parameters
 

@@ -16,7 +16,7 @@ const reasoningScript = (reasoning: string, text: string): { events: ProviderEve
   ],
 });
 
-describe('Agent — intra-loop reasoning preservation (RB-42)', () => {
+describe('Agent - intra-loop reasoning preservation (RB-42)', () => {
   it('preserves reasoning content parts on the assistant message when retention != strip', async () => {
     let captured: Message[] = [];
     const provider = createMockProvider({
@@ -68,7 +68,7 @@ describe('Agent — intra-loop reasoning preservation (RB-42)', () => {
     for await (const ev of agent.stream('hi')) {
       if (ev.type === 'text.complete') {
         // Assistant message would have been built with strip
-        // policy — `content` is a string, not array of parts.
+        // policy - `content` is a string, not array of parts.
       }
     }
     expect(assistantMessage).toBeUndefined();

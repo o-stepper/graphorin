@@ -8,7 +8,7 @@ import {
   toolCallScript,
 } from './fixtures/mock-provider.js';
 
-describe('Agent — tool execution loop', () => {
+describe('Agent - tool execution loop', () => {
   it('executes a single tool call, appends the tool message, and continues to a final text', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -156,7 +156,7 @@ describe('Agent — tool execution loop', () => {
   });
 });
 
-describe('Agent — multi-agent (toTool + handoff)', () => {
+describe('Agent - multi-agent (toTool + handoff)', () => {
   it('toTool() produces a tool whose execute() runs the sub-agent', async () => {
     const subProvider = createMockProvider({
       modelId: 'sub',
@@ -165,7 +165,7 @@ describe('Agent — multi-agent (toTool + handoff)', () => {
     const sub = createAgent({ name: 'sub', instructions: 'noop', provider: subProvider });
     const subTool = sub.toTool({ name: 'sub_invoke', exposeTurns: 'final' });
     // The minimal-loop `toTool().execute(...)` does not consult the
-    // tool-execution context — the helper rebinds to the parent
+    // tool-execution context - the helper rebinds to the parent
     // agent's run loop. We pass `undefined` as the context to
     // exercise the public surface; the cast keeps the test readable.
     const exec = subTool.execute as (
@@ -176,7 +176,7 @@ describe('Agent — multi-agent (toTool + handoff)', () => {
     expect(result).toBe('sub-result');
   });
 
-  it('honours a handoff target — registers transfer_to_<name> and runs the sub-agent on call', async () => {
+  it('honours a handoff target - registers transfer_to_<name> and runs the sub-agent on call', async () => {
     const subProvider = createMockProvider({
       modelId: 'sub',
       scripts: [textOnlyScript('handed-off', 4)],
@@ -208,7 +208,7 @@ describe('Agent — multi-agent (toTool + handoff)', () => {
   });
 });
 
-describe('Agent — abort', () => {
+describe('Agent - abort', () => {
   it('emits agent.cancelling when abort is invoked between provider calls', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -298,7 +298,7 @@ describe('Agent — abort', () => {
     if (cancelling?.type === 'agent.cancelling') {
       expect(cancelling.onPendingApprovals).toBe('deny');
     }
-    // The run stopped early — it did NOT execute all three tool steps.
+    // The run stopped early - it did NOT execute all three tool steps.
     expect(events.filter((e) => e.type === 'tool.execute.end').length).toBeLessThan(3);
   });
 
@@ -347,7 +347,7 @@ describe('Agent — abort', () => {
     // A mid-stream abort is a cancellation, not a failed run.
     expect(types).toContain('agent.cancelling');
     expect(types).not.toContain('agent.error');
-    // Hard-kill (no drain): the in-flight stream is interrupted mid-event — the
+    // Hard-kill (no drain): the in-flight stream is interrupted mid-event - the
     // step never reaches its boundary.
     expect(types).not.toContain('step.end');
   });

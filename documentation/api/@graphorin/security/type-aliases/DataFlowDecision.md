@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -20,13 +20,13 @@ Defined in: packages/security/src/dataflow/types.ts:290
 
 The verdict [DataFlowPolicy.evaluate](/api/@graphorin/security/interfaces/DataFlowPolicy.md#evaluate) returns for a sink call.
 
-- `'allow'`       — no tainted flow (or the policy is off / the tool is
+- `'allow'`       - no tainted flow (or the policy is off / the tool is
   not a sink); proceed silently.
-- `'flag'`        — tainted flow detected in `'shadow'` mode: audit but
+- `'flag'`        - tainted flow detected in `'shadow'` mode: audit but
   proceed.
-- `'declassify'`  — tainted flow into an operator-declassified sink:
+- `'declassify'`  - tainted flow into an operator-declassified sink:
   audit and proceed (the audited escape hatch).
-- `'block'`       — tainted flow in `'enforce'` mode: do not run the
+- `'block'`       - tainted flow in `'enforce'` mode: do not run the
   sink; surface a `dataflow_policy_blocked` error.
 
 ## Stable

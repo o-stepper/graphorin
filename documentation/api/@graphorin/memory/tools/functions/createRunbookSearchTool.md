@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -25,7 +25,7 @@ function createRunbookSearchTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/runbook-tools.ts:46
 
-`runbook_search` — find validated procedures matching a task
+`runbook_search` - find validated procedures matching a task
 description. Quarantined (unvalidated induced) procedures never
 surface here: they must not drive actions until validated.
 

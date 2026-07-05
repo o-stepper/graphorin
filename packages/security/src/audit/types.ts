@@ -26,7 +26,7 @@ export interface AuditActor {
 /**
  * Canonical action discriminator. Listed here as an open string union
  * so deployments can extend with their own actions without forking
- * the framework — but the well-known set is documented for tooling
+ * the framework - but the well-known set is documented for tooling
  * (filter dropdowns, tests, etc.).
  *
  * @stable

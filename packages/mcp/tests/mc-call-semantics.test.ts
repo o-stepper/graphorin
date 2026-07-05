@@ -10,7 +10,7 @@ import {
 } from '../src/errors/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MC-4/MC-5/MC-3 — call semantics on the adapted path', () => {
+describe('MC-4/MC-5/MC-3 - call semantics on the adapted path', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 
@@ -60,7 +60,7 @@ describe('MC-4/MC-5/MC-3 — call semantics on the adapted path', () => {
       tools: [{ name: 'slow', description: 'never settles', inputSchema: {} }],
       callToolHandler: () =>
         new Promise(() => {
-          // never settles — cancellation must reach the wire
+          // never settles - cancellation must reach the wire
         }),
     });
     const tools = await c.toTools();

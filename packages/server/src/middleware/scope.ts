@@ -34,7 +34,7 @@ export function createScopeMiddleware(
     const auth = c.get('state').auth;
     if (auth.kind === 'anonymous') {
       // IP-13: auth is disabled server-wide (auth.kind='none'). There is no
-      // token to scope-check — the trusted-loopback operator is allowed
+      // token to scope-check - the trusted-loopback operator is allowed
       // through every gate.
       await next();
       return;

@@ -4,7 +4,7 @@
  * server bindings without taking a hard peer dependency on every
  * sibling package.
  *
- * Every entry is keyed by string id; lookups never throw — callers
+ * Every entry is keyed by string id; lookups never throw - callers
  * receive `undefined` and the route handler decides how to surface
  * the miss (typically a 404 with a typed error body).
  *
@@ -84,7 +84,7 @@ export interface WorkflowSummary {
 }
 
 /**
- * Internal registry entry — pairs the user-supplied object with the
+ * Internal registry entry - pairs the user-supplied object with the
  * metadata routes serve to clients.
  *
  * @internal
@@ -134,7 +134,7 @@ export interface WorkflowRegistration {
  * Read/write registry for agents the server should expose. Every
  * mutation is synchronous and the lookup is `O(1)`.
  *
- * The class is intentionally tiny — extension points (e.g. lazy
+ * The class is intentionally tiny - extension points (e.g. lazy
  * factory loading, per-tenant scoping) live in higher-level packages
  * and consume this surface as a primitive.
  *

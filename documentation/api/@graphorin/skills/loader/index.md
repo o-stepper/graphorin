@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,23 +10,23 @@ Skill loader.
 
 Implements three-tier progressive disclosure:
 
-- **Tier 1** (always): [Skill.metadata](/api/@graphorin/skills/interfaces/Skill.md#property-metadata) — parsed at load
+- **Tier 1** (always): [Skill.metadata](/api/@graphorin/skills/interfaces/Skill.md#property-metadata) - parsed at load
   time from the SKILL.md frontmatter.
-- **Tier 2** (on activation): [Skill.body](/api/@graphorin/skills/interfaces/Skill.md#body) — the loader
+- **Tier 2** (on activation): [Skill.body](/api/@graphorin/skills/interfaces/Skill.md#body) - the loader
   reads the markdown body lazily; subsequent calls return the
   cached value.
-- **Tier 3** (on demand): [Skill.resources](/api/@graphorin/skills/interfaces/Skill.md#resources) — the loader
+- **Tier 3** (on demand): [Skill.resources](/api/@graphorin/skills/interfaces/Skill.md#resources) - the loader
   walks the skill directory lazily; resource bytes are only read
   when [SkillResource.read](/api/@graphorin/skills/interfaces/SkillResource.md#read) is invoked.
 
 The loader supports four sources:
 
-- `{ kind: 'folder', path }`        — read SKILL.md from disk.
-- `{ kind: 'npm-package', ... }`    — install via the supply-chain
+- `{ kind: 'folder', path }`        - read SKILL.md from disk.
+- `{ kind: 'npm-package', ... }`    - install via the supply-chain
   helper from `@graphorin/security/supply-chain`, then read.
-- `{ kind: 'git-repo', ... }`       — shallow-clone via the
+- `{ kind: 'git-repo', ... }`       - shallow-clone via the
   supply-chain helper, then read.
-- `{ kind: 'inline', skill: ... }`  — caller supplies the parsed
+- `{ kind: 'inline', skill: ... }`  - caller supplies the parsed
   payload; the loader only validates the frontmatter. Useful for
   tests and bundled defaults.
 

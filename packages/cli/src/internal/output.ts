@@ -2,18 +2,18 @@
  * Shared output helpers for Phase 15 subcommands. The CLI keeps three
  * output flavours uniform across every command:
  *
- *  1. **Human** — single-line `[graphorin/cli] ...` messages on stderr
+ *  1. **Human** - single-line `[graphorin/cli] ...` messages on stderr
  *     (the default path in Phase 14a; preserved for backward
  *     compatibility).
- *  2. **JSON** — one structured JSON document per subcommand emitted on
+ *  2. **JSON** - one structured JSON document per subcommand emitted on
  *     stdout when `--json` is set. Phase 15 commands that produce a
  *     report (status / list / verify / lookup) ship a stable schema so
  *     CI pipelines can consume them.
- *  3. **Stub print sink** — every command accepts an optional
+ *  3. **Stub print sink** - every command accepts an optional
  *     `print(line: string)` callback so unit tests can capture output
  *     without spying on `process.stderr`.
  *
- * Helpers in this module are intentionally tiny — they exist so the
+ * Helpers in this module are intentionally tiny - they exist so the
  * sixteen Phase 15 subcommand groups share one channel surface
  * (single-source-of-truth per Hard Rule 5 in the working plan).
  *
@@ -32,7 +32,7 @@ import process from 'node:process';
 export type PrintSink = (line: string) => void;
 
 /**
- * Default `PrintSink` — appends a newline and writes to `stderr` so it
+ * Default `PrintSink` - appends a newline and writes to `stderr` so it
  * never collides with the JSON document on `stdout`.
  *
  * @internal
@@ -51,7 +51,7 @@ export function defaultPrintSink(line: string): void {
 export type JsonSink = (payload: unknown) => void;
 
 /**
- * Default `JsonSink` — writes a stable, two-space indented JSON
+ * Default `JsonSink` - writes a stable, two-space indented JSON
  * document to `stdout` plus a trailing newline so consumers can split
  * a multi-document stream by lines.
  *
@@ -71,9 +71,9 @@ export interface CommonOutputOptions {
   readonly json?: boolean;
   /** Force `--non-interactive` semantics (skip prompts; require flags / env). */
   readonly nonInteractive?: boolean;
-  /** Test seam — capture human lines instead of writing to stderr. */
+  /** Test seam - capture human lines instead of writing to stderr. */
   readonly print?: PrintSink;
-  /** Test seam — capture JSON documents instead of writing to stdout. */
+  /** Test seam - capture JSON documents instead of writing to stdout. */
   readonly jsonPrint?: JsonSink;
 }
 
@@ -130,7 +130,7 @@ export function brand(line: string): string {
 }
 
 /**
- * Convenience helper — writes a branded message via the chosen sink.
+ * Convenience helper - writes a branded message via the chosen sink.
  *
  * @internal
  */

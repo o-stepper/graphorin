@@ -1,5 +1,5 @@
 /**
- * Coverage for `createProvider` — the canonical Provider wrapper.
+ * Coverage for `createProvider` - the canonical Provider wrapper.
  */
 import type { Provider, ProviderRequest } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';

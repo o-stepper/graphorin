@@ -41,7 +41,7 @@ async function entriesOf(db: ReturnType<typeof createMemoryAuditDb>): Promise<St
   return out;
 }
 
-describe('audit Merkle — inclusion proofs', () => {
+describe('audit Merkle - inclusion proofs', () => {
   it('proves and verifies inclusion for every entry across sizes', async () => {
     for (const n of [1, 2, 3, 5, 8, 13]) {
       const db = await seed(n);
@@ -68,7 +68,7 @@ describe('audit Merkle — inclusion proofs', () => {
   });
 });
 
-describe('audit Merkle — consistency proofs', () => {
+describe('audit Merkle - consistency proofs', () => {
   it('proves append-only extension between two heads', async () => {
     const db = await seed(4);
     const older = await computeAuditTreeHead(db);
@@ -113,7 +113,7 @@ describe('audit Merkle — consistency proofs', () => {
   });
 });
 
-describe('audit Merkle — signed checkpoints (anchoring)', () => {
+describe('audit Merkle - signed checkpoints (anchoring)', () => {
   it('signs a tree head and verifies against the pinned key', async () => {
     const db = await seed(5);
     const { publicKeyPem, privateKeyPem } = generateAuditSigningKeyPair();
@@ -156,7 +156,7 @@ describe('audit Merkle — signed checkpoints (anchoring)', () => {
     const ok = await verifyAuditAgainstCheckpoint(db, checkpoint, { publicKeyPem });
     expect(ok.ok).toBe(true);
 
-    // Now rewrite a checkpointed entry — anchored verification fails.
+    // Now rewrite a checkpointed entry - anchored verification fails.
     const entries = await entriesOf(db);
     await db.replaceEntry({ ...(entries[0] as StoredAuditEntry), target: 'FORGED' });
     const bad = await verifyAuditAgainstCheckpoint(db, checkpoint, { publicKeyPem });

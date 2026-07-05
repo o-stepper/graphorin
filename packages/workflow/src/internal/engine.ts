@@ -9,8 +9,8 @@
  * 6. repeat until the run terminates (or `maxSteps` is reached).
  *
  * Durability contract (WF-1/2/3/12): every persisted checkpoint carries a
- * *frontier envelope* in `metadata.tags` — the full set of pending pauses,
- * dynamic tasks, and completed-but-unwalked nodes — so a resume (or a
+ * *frontier envelope* in `metadata.tags` - the full set of pending pauses,
+ * dynamic tasks, and completed-but-unwalked nodes - so a resume (or a
  * crash-recovery resume from a `'running'` checkpoint, or a `retry` from a
  * `'failed'` one) restores exactly the work that was in flight. Checkpoint
  * puts are guarded by a compare-and-set on the latest stored checkpoint so
@@ -73,7 +73,7 @@ import { applyWrites, buildInitialState, type ChannelWrite } from './channels.js
 import { newId } from './ids.js';
 
 /**
- * @internal — invocation parameters for a single run.
+ * @internal - invocation parameters for a single run.
  */
 export interface EngineRunOptions<TState extends object, TInput> {
   readonly config: WorkflowConfig<TState>;
@@ -85,7 +85,7 @@ export interface EngineRunOptions<TState extends object, TInput> {
 }
 
 /**
- * @internal — invocation parameters for a resume.
+ * @internal - invocation parameters for a resume.
  */
 export interface EngineResumeOptions<TState extends object> {
   readonly config: WorkflowConfig<TState>;
@@ -120,7 +120,7 @@ export interface EngineResumeOptions<TState extends object> {
 }
 
 /**
- * @internal — workflow namespace used in checkpoint store keys. The
+ * @internal - workflow namespace used in checkpoint store keys. The
  * engine binds the namespace to the workflow `name` so a single store
  * can host checkpoints from multiple workflows without collision.
  */
@@ -131,7 +131,7 @@ export function namespaceFor(config: { readonly name: string }): string {
 let warnedLegacyAsyncDurability = false;
 
 /**
- * WF-7: `'async'` was removed from {@link DurabilityMode} — it was
+ * WF-7: `'async'` was removed from {@link DurabilityMode} - it was
  * byte-identical to `'sync'`. Legacy JS callers that still pass it get
  * `'sync'` behaviour and a one-time warning instead of a crash.
  */
@@ -182,7 +182,7 @@ interface RunInternalState<TState extends object> {
 }
 
 /**
- * @internal — execute the engine's inner loop and yield workflow
+ * @internal - execute the engine's inner loop and yield workflow
  * events as they occur. The factory layer turns this into a plain
  * `AsyncIterable`.
  */
@@ -248,7 +248,7 @@ export async function* runEngine<TState extends object, TInput extends Partial<T
 }
 
 /**
- * @internal — resume a previously suspended (or crashed / aborted /
+ * @internal - resume a previously suspended (or crashed / aborted /
  * failed) thread.
  */
 export async function* resumeEngine<TState extends object>(
@@ -278,7 +278,7 @@ export async function* resumeEngine<TState extends object>(
       mode === 'retry'
         ? status === 'failed' || status === 'aborted'
         : // WF-3: a latest-checkpoint status of 'running' means the process
-          // died mid-run — the checkpoint is a valid recovery point, not an
+          // died mid-run - the checkpoint is a valid recovery point, not an
           // active lease. The store-level CAS protects the genuinely-live case.
           status === 'suspended' || status === 'running' || status === 'aborted';
     if (!resumable) {
@@ -289,7 +289,7 @@ export async function* resumeEngine<TState extends object>(
     const frontier = readFrontier(tuple.metadata);
 
     // D1 / workflow-14: fail loudly when the stored frontier was written
-    // by a different pinned workflow version — replaying state through
+    // by a different pinned workflow version - replaying state through
     // changed code silently diverges from the journal.
     if (
       opts.allowVersionMismatch !== true &&
@@ -303,7 +303,7 @@ export async function* resumeEngine<TState extends object>(
       );
       return;
     }
-    // D1: journal-divergence detection — the frontier must only reference
+    // D1: journal-divergence detection - the frontier must only reference
     // nodes the current definition still declares.
     const missingNodes = [
       ...new Set(
@@ -328,7 +328,7 @@ export async function* resumeEngine<TState extends object>(
       // WF-4: advance the step counter on resume so the first post-resume
       // checkpoint is strictly newer than the suspended one. Without this they
       // tie, and `getTuple` (max stepNumber) returns the STALE suspended
-      // checkpoint — re-running the pause node after a crash, and livelocking a
+      // checkpoint - re-running the pause node after a crash, and livelocking a
       // node that pauses twice in a row.
       stepNumber: tuple.checkpoint.stepNumber + 1,
       parentCheckpointId: tuple.checkpoint.id,
@@ -365,7 +365,7 @@ export async function* resumeEngine<TState extends object>(
       }
       internal.lastCompletedNodes = completed.map((t) => t.nodeName);
       // workflow-08: a task that PAUSED in the failed step re-runs with
-      // its already-delivered pause answers replayed — the failure
+      // its already-delivered pause answers replayed - the failure
       // frontier now persists the pause records, so satisfied values are
       // no longer dropped on sibling failure.
       const pauseByNode = new Map(frontier.pauses.map((p) => [p.nodeName, p] as const));
@@ -392,8 +392,8 @@ export async function* resumeEngine<TState extends object>(
         });
     } else {
       // Suspended or crash ('running') resume: restore the persisted
-      // frontier — completed-but-unwalked nodes and surviving dynamic
-      // tasks (WF-1) — then fan the pause records back out.
+      // frontier - completed-but-unwalked nodes and surviving dynamic
+      // tasks (WF-1) - then fan the pause records back out.
       internal.lastCompletedNodes = [...frontier.completed];
       internal.pendingDynamicTasks = frontier.dynamic.map((d) => ({
         taskId: newId('task'),
@@ -403,7 +403,7 @@ export async function* resumeEngine<TState extends object>(
       }));
 
       // D1 / workflow-04 (opt-in journalSteps): crash recovery from a
-      // 'running' checkpoint consumes the step journal when present —
+      // 'running' checkpoint consumes the step journal when present -
       // completed tasks of the interrupted step replay from their
       // journaled writes; only unfinished work re-runs. The journal
       // supersedes the frontier fan-out (the intent's task list already
@@ -432,7 +432,7 @@ export async function* resumeEngine<TState extends object>(
         // Frontier fan-out skipped: the journal's intent captured the
         // interrupted step's full task list at planning time.
       } else if (directive?.goto) {
-        // workflow-09: goto is DESTRUCTIVE by contract — the restored
+        // workflow-09: goto is DESTRUCTIVE by contract - the restored
         // frontier (dynamic tasks, unwalked nodes, pending pause records
         // with their delivered answers) is discarded in favour of the
         // single goto task. Documented on Directive.goto.
@@ -477,7 +477,7 @@ export async function* resumeEngine<TState extends object>(
               source: 'resume',
               ...(primary.dispatchArgs !== undefined ? { dispatchArgs: primary.dispatchArgs } : {}),
               // WF-2: replay every previously-delivered value, then the new
-              // directive value. A static-before gate replays NOTHING — the
+              // directive value. A static-before gate replays NOTHING - the
               // operator approved the node to run, not any inner pause().
               resumeValues: primary.staticBefore
                 ? []
@@ -488,7 +488,7 @@ export async function* resumeEngine<TState extends object>(
         }
         for (const record of others) {
           // Parallel pausers beyond the first re-run with only their
-          // already-satisfied values — they re-suspend rather than get lost.
+          // already-satisfied values - they re-suspend rather than get lost.
           if (record.staticAfter) {
             if (!internal.lastCompletedNodes.includes(record.nodeName)) {
               internal.lastCompletedNodes.push(record.nodeName);
@@ -637,7 +637,7 @@ async function* driveRun<TState extends object>(
     const { tasks, suspendBefore, deadEnd } = planTasks(config, internal);
 
     if (deadEnd) {
-      // WF-14: no fired edges, no END edge, no dynamic tasks — the graph is
+      // WF-14: no fired edges, no END edge, no dynamic tasks - the graph is
       // wedged. Persist 'failed' and surface a typed error instead of a
       // silent `workflow.end`.
       internal.status = 'failed';
@@ -735,7 +735,7 @@ async function* driveRun<TState extends object>(
     });
 
     // WF-15: task/custom events are pumped LIVE while the parallel
-    // tasks run — pushes wake the pump below instead of waiting for
+    // tasks run - pushes wake the pump below instead of waiting for
     // the whole step to settle.
     const stepEvents: WorkflowEvent<TState>[] = [];
     const customEvents: WorkflowEvent<TState>[] = [];
@@ -762,14 +762,14 @@ async function* driveRun<TState extends object>(
     }> = [];
 
     // WF-9: every task observes the same frozen checkpoint-equivalent
-    // snapshot — in-place mutation throws instead of corrupting siblings
+    // snapshot - in-place mutation throws instead of corrupting siblings
     // or the persisted state.
     const stateView = deepFreeze(structuredClone(internal.state)) as TState;
 
     // D1 / workflow-04 (opt-in): journal a step-intent record against the
     // parent checkpoint BEFORE execution so crash recovery knows exactly
     // which tasks were in flight; each completed task then journals its
-    // writes as it finishes. First step has no parent to attach to —
+    // writes as it finishes. First step has no parent to attach to -
     // a crash there re-runs the whole step (documented).
     const journalCheckpointId =
       config.journalSteps === true && internal.parentCheckpointId !== undefined
@@ -828,7 +828,7 @@ async function* driveRun<TState extends object>(
       }
       const start = Date.now();
       // WF-11: every executed task gets its advertised `workflow.task`
-      // span — ok/error mirrors the task outcome.
+      // span - ok/error mirrors the task outcome.
       const taskSpan = tracer?.startSpan({
         type: 'workflow.task',
         attrs: {
@@ -949,7 +949,7 @@ async function* driveRun<TState extends object>(
       // D1 / workflow-04: journal this completed task's writes (plus a
       // done marker so zero-write completions are recoverable) against
       // the parent checkpoint, as soon as it finishes. Best-effort by
-      // contract? No — a journal write failure must surface: silent loss
+      // contract? No - a journal write failure must surface: silent loss
       // here would defeat the exactly-once recovery the flag promises.
       if (journalCheckpointId !== null && status === 'completed') {
         await config.checkpointStore.putWrites(
@@ -1022,7 +1022,7 @@ async function* driveRun<TState extends object>(
 
     if (signal?.aborted && !nodeFailure) {
       // WF-11: a cancellation whose grace window expired with tasks
-      // still unsettled is its own advertised failure mode — distinct
+      // still unsettled is its own advertised failure mode - distinct
       // from a clean boundary abort.
       nodeFailure = {
         nodeName: tasks[0]?.nodeName ?? '<unknown>',
@@ -1039,7 +1039,7 @@ async function* driveRun<TState extends object>(
     }
 
     // workflow-02: apply channel writes in PLANNED task order, not
-    // completion order — non-commutative merges (any-value, reducers,
+    // completion order - non-commutative merges (any-value, reducers,
     // list/stream appends) become deterministic under parallel async
     // nodes. `taskOutcomes` is completion-ordered; re-key by task id.
     const outcomeByTaskId = new Map(taskOutcomes.map((o) => [o.task.taskId, o] as const));
@@ -1049,7 +1049,7 @@ async function* driveRun<TState extends object>(
 
     // WF-1/WF-2 + workflow-08: collect EVERY pause raised this step
     // BEFORE the failure branch, so a sibling failure no longer drops
-    // already-delivered pause answers — the failure frontier persists
+    // already-delivered pause answers - the failure frontier persists
     // them and `retry` replays them. Durable suspensions (timers /
     // awakeables / approvals, D1) stamp their wakeAt / name here.
     const pauseRecords: PendingPauseRecord[] = [];
@@ -1080,7 +1080,7 @@ async function* driveRun<TState extends object>(
         }
       }
       // WF-3: an abort where every task still completed cleanly is a
-      // boundary stop — persist 'aborted' (resumable), not 'failed'. A
+      // boundary stop - persist 'aborted' (resumable), not 'failed'. A
       // task that actually died (even abort-induced) stays 'failed'.
       const anyTaskFailed = taskOutcomes.some((t) => t.status === 'failed');
       const failStatus: 'failed' | 'aborted' =
@@ -1102,7 +1102,7 @@ async function* driveRun<TState extends object>(
           dynamic: [],
           completed: [],
           ...(config.version !== undefined ? { version: config.version } : {}),
-          // The full task list of the failed step — `retry` replays the
+          // The full task list of the failed step - `retry` replays the
           // completed ones from `pendingWrites` and re-runs the rest.
           stepTasks: tasks.map((t) => ({
             taskId: t.taskId,
@@ -1132,7 +1132,7 @@ async function* driveRun<TState extends object>(
     }
 
     // workflow-05: a merge-time failure (MultiWriteError / ReducerError /
-    // InvalidChannelWriteError) is a real step failure — persist the
+    // InvalidChannelWriteError) is a real step failure - persist the
     // terminal 'failed' checkpoint instead of leaking a 'running' thread
     // with an open step span.
     let applied: ReturnType<typeof applyWrites<TState>>;
@@ -1202,7 +1202,7 @@ async function* driveRun<TState extends object>(
           channel: channelName as keyof TState & string,
           version: internal.versions[channelName] ?? 0,
           // workflow-07: ephemeral values are wiped from state before the
-          // next round — this event is their one observation point.
+          // next round - this event is their one observation point.
           ...(channelName in applied.ephemeralValues
             ? { value: applied.ephemeralValues[channelName] }
             : {}),
@@ -1270,7 +1270,7 @@ async function* driveRun<TState extends object>(
     }
 
     // WF-3: the step's 'running' checkpoint (with its frontier) is
-    // persisted BEFORE `workflow.step.end` is reported — an abandoned
+    // persisted BEFORE `workflow.step.end` is reported - an abandoned
     // iterator / killed process can always recover the completed step.
     const checkpointId = await persistCheckpoint({
       config,
@@ -1293,7 +1293,7 @@ async function* driveRun<TState extends object>(
     if (includeCheckpointEvents && checkpointId !== null) {
       yield checkpointEvent<TState>(checkpointId, internal.stepNumber);
     }
-    // WF-8: under `durability: 'exit'` the running put is skipped — the
+    // WF-8: under `durability: 'exit'` the running put is skipped - the
     // parent pointer must keep referencing the last checkpoint that
     // actually exists in the store.
     if (checkpointId !== null) {
@@ -1302,7 +1302,7 @@ async function* driveRun<TState extends object>(
     internal.stepNumber += 1;
 
     if (signal?.aborted) {
-      // workflow-12: mirror the loop-top contract — the step's 'running'
+      // workflow-12: mirror the loop-top contract - the step's 'running'
       // checkpoint was just written, so stamp the terminal status too.
       internal.status = 'aborted';
       await persistCheckpoint({
@@ -1350,7 +1350,7 @@ function planTasks<TState extends object>(
 
   for (const nodeName of reachable) {
     if (planned.some((t) => t.nodeName === nodeName)) continue;
-    // WF-5: a node fed by 2+ writers of one Barrier channel is a join —
+    // WF-5: a node fed by 2+ writers of one Barrier channel is a join -
     // defer it until EVERY writer in the barrier's `from` has written.
     // The last writer's completion re-fires its edge, so the join runs
     // exactly once, with the complete map.
@@ -1382,7 +1382,7 @@ function planTasks<TState extends object>(
     if (reachableEnd(config, fromCompleted, internal.state)) {
       return { tasks: [] };
     }
-    // WF-14 + workflow-06: nothing fired and no END edge is satisfied —
+    // WF-14 + workflow-06: nothing fired and no END edge is satisfied -
     // a dead end. The bootstrap round is no longer excluded: an
     // all-false conditional fan out of __start__ raises instead of
     // silently completing a workflow that never ran a node.
@@ -1394,7 +1394,7 @@ function planTasks<TState extends object>(
 
 /**
  * WF-5 join gate. A node is barrier-gated when at least two of its
- * in-edge sources are writers of the same Barrier channel — the
+ * in-edge sources are writers of the same Barrier channel - the
  * declared fan-in join shape. Single-writer edges never defer, so a
  * barrier writer's unrelated out-edges keep firing normally.
  */
@@ -1435,7 +1435,7 @@ function reachableEnd<TState extends object>(
       return true;
     }
   }
-  // WF-14: completion must be EARNED by a satisfied END edge — the old
+  // WF-14: completion must be EARNED by a satisfied END edge - the old
   // vacuous `return true` here silently completed dead-ended graphs.
   return false;
 }
@@ -1490,7 +1490,7 @@ function harvestNodeOutput<TState>(input: {
 function isDispatchLike(value: unknown): value is DispatchLike {
   // workflow-13: the structural fallback (for Dispatch values that
   // crossed a realm boundary and lost their prototype) now requires the
-  // cross-realm brand — a plain state object that happens to carry
+  // cross-realm brand - a plain state object that happens to carry
   // `nodeName` + `args` keys is channel WRITES, never a dispatch.
   return (
     typeof value === 'object' &&
@@ -1558,11 +1558,11 @@ interface PersistCheckpointArgs<TState extends object> {
 
 /**
  * Persist one checkpoint. Returns the new checkpoint id, or `null` when
- * the configured durability mode skipped the put (WF-8) — callers must
+ * the configured durability mode skipped the put (WF-8) - callers must
  * not report or parent-link a checkpoint that does not exist.
  *
  * WF-12: before writing, the latest stored checkpoint is compared
- * against the run's parent pointer — if another writer advanced the
+ * against the run's parent pointer - if another writer advanced the
  * thread in between, a `checkpoint-version-conflict` error is thrown
  * instead of forking the timeline.
  */
@@ -1736,7 +1736,7 @@ interface StepIntentTask {
  * D1 / workflow-04: decode the interrupted step's journal from the
  * latest checkpoint's pending writes. Returns `null` when no intent for
  * the expected step is journaled (crash happened outside a journaled
- * step, or journaling was off) — the caller then falls back to the
+ * step, or journaling was off) - the caller then falls back to the
  * plain frontier fan-out.
  */
 function readStepJournal(
@@ -1837,7 +1837,7 @@ function createSemaphore(limit: number | undefined): {
  * - `timeoutMs` is a hard per-TASK wall-clock budget: on expiry the
  *   task's own controller aborts (so a well-behaved body can stop) and
  *   the task fails with `node-timeout`. Bodies that ignore the signal
- *   keep running in the background — the same contract as cancellation.
+ *   keep running in the background - the same contract as cancellation.
  * - `retry` re-invokes the body on thrown failures only: `pause(...)`
  *   suspensions, step-level aborts, and timeouts never retry. Backoff
  *   doubles per attempt and counts against the timeout budget.
@@ -1925,13 +1925,13 @@ interface FrontierEnvelope {
   readonly v: 1;
   /** Workflow definition version pin at persist time (D1). */
   readonly version?: string;
-  /** Every pause raised by the suspension — parallel pausers included. */
+  /** Every pause raised by the suspension - parallel pausers included. */
   readonly pauses: ReadonlyArray<PendingPauseRecord>;
   /** Dispatch-scheduled tasks that have not run yet. */
   readonly dynamic: ReadonlyArray<{ readonly nodeName: string; readonly dispatchArgs?: unknown }>;
   /** Nodes that completed but whose outgoing edges were not walked yet. */
   readonly completed: ReadonlyArray<string>;
-  /** Task list of a failed step — drives `retry` replay (WF-3/WF-6). */
+  /** Task list of a failed step - drives `retry` replay (WF-3/WF-6). */
   readonly stepTasks?: ReadonlyArray<{
     readonly taskId: string;
     readonly nodeName: string;
@@ -2046,7 +2046,7 @@ function restoreState<TState extends object>(
 }
 
 /**
- * @internal — restore a `Workflow.fork` clone. Copies the source
+ * @internal - restore a `Workflow.fork` clone. Copies the source
  * thread's state into a fresh thread id while leaving the original
  * timeline untouched.
  */
@@ -2065,7 +2065,7 @@ export async function forkThread<TState extends object>(input: {
 
   const newThreadId = newId('thread');
   const newCheckpointId = newId('cp');
-  // WF-17: the forked root is self-contained — its parentId must NOT
+  // WF-17: the forked root is self-contained - its parentId must NOT
   // dangle into the source thread (the parent only exists there).
   const { parentId: _droppedParentId, ...rest } = tuple.checkpoint;
   const newCheckpoint: Checkpoint = {
@@ -2080,7 +2080,7 @@ export async function forkThread<TState extends object>(input: {
     ...(tuple.metadata.nodeName !== undefined ? { nodeName: tuple.metadata.nodeName } : {}),
     ...(tuple.metadata.tags !== undefined ? { tags: [...tuple.metadata.tags] } : {}),
   });
-  // WF-17: pending writes ride along — a forked 'failed'/'aborted'
+  // WF-17: pending writes ride along - a forked 'failed'/'aborted'
   // checkpoint stays `retry()`-able without re-running (or losing) the
   // tasks that already succeeded.
   const writes = tuple.pendingWrites ?? [];
@@ -2125,7 +2125,7 @@ interface PersistedStateEnvelope {
 function serializeState<TState extends object>(state: TState): PersistedStateEnvelope {
   // WF-10: checkpoint state must be JSON-safe on EVERY store. The
   // in-memory store would happily structuredClone a Map/Set/Date that
-  // the production SQLite store JSON.stringify-es into junk — fail
+  // the production SQLite store JSON.stringify-es into junk - fail
   // fast and identically instead of corrupting silently later.
   for (const [channel, value] of Object.entries(state as Record<string, unknown>)) {
     const offender = findNonJsonSafe(value, channel);
@@ -2188,7 +2188,7 @@ function findNonJsonSafe(
 
 export function unwrapPersistedState(raw: unknown): unknown {
   // Versioned envelope. Older alpha/dev checkpoints written before the
-  // envelope existed unwrap as the raw object — we accept either shape
+  // envelope existed unwrap as the raw object - we accept either shape
   // so existing data on disk does not have to be discarded.
   if (typeof raw === 'object' && raw !== null) {
     const record = raw as { schema?: unknown; state?: unknown };

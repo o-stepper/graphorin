@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ appends one row per noteworthy lifecycle step (`created`, `closed`,
 `commentary-sanitized`, …) plus per-session-handoff. Adapters can
 surface the rows verbatim from disk.
 
-The `metadata` field is intentionally an open record — storage
+The `metadata` field is intentionally an open record - storage
 adapters serialize it as JSON. Callers should keep it small and
 never include secret values.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/security/src/guardrails/builtins/tool-usage-validator.ts:24
 
 Shape of one observed tool call. Aligned with `ToolCall` from
-`@graphorin/core` but decoupled — the validator reads only what it
+`@graphorin/core` but decoupled - the validator reads only what it
 needs so deployments can repurpose it for other shapes.
 
 ## Stable

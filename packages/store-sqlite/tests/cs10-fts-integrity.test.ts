@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { checkFtsIntegrity, createSqliteStore, formatFtsIntegrityWarning } from '../src/index.js';
 
 /**
- * CS-10 — the FTS5 indexes key on the base table's implicit rowid, which a
+ * CS-10 - the FTS5 indexes key on the base table's implicit rowid, which a
  * hand-run VACUUM could renumber and silently corrupt. We never VACUUM, so the
  * guard is a cheap open-time orphan-row check + loud warning.
  */
@@ -15,7 +15,7 @@ async function freshPath(): Promise<string> {
   return `${dir}/db.sqlite`;
 }
 
-describe('CS-10 — FTS↔rowid integrity guard', () => {
+describe('CS-10 - FTS↔rowid integrity guard', () => {
   it('reports no orphans for a consistent store and formats to null', async () => {
     const store = await createSqliteStore({ path: await freshPath(), skipSqliteVec: true });
     await store.init();

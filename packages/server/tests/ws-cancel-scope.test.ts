@@ -95,7 +95,7 @@ describe('IP-8: WS cancel scope enforcement', () => {
   });
 
   it('IP-21: a frame before initialize is a PROTOCOL_VIOLATION, not AUTH_REQUIRED', async () => {
-    // run.cancel sent before `initialize` — a protocol-sequencing error on an
+    // run.cancel sent before `initialize` - a protocol-sequencing error on an
     // already-authenticated connection.
     const { sent } = await drive(['agents:invoke'], [CANCEL]);
     const last = JSON.parse(sent[sent.length - 1] ?? '{}');

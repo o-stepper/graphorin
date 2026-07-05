@@ -3,12 +3,12 @@
  *
  * The flow is broken into three phases:
  *
- * 1. **Local server bind** — start the localhost callback server
+ * 1. **Local server bind** - start the localhost callback server
  *    (random port in the operator-supplied range).
- * 2. **Browser open** — render the authorization URL via the
+ * 2. **Browser open** - render the authorization URL via the
  *    operator-supplied `openAuthorizationUrl` callback (defaults to
  *    `openInBrowser(...)`).
- * 3. **Token exchange** — once the callback fires, POST the code +
+ * 3. **Token exchange** - once the callback fires, POST the code +
  *    PKCE verifier to the token endpoint.
  *
  * Cancellation via `AbortSignal` aborts every phase.
@@ -56,7 +56,7 @@ export async function runAuthorizationCodeFlow(
   if (signal?.aborted === true) throw new OAuthFlowAbortedError('callback');
 
   // SPL-12: a caller-supplied redirectUri has no callback waiter in this
-  // flow — reject BEFORE opening a browser the user would dead-end in.
+  // flow - reject BEFORE opening a browser the user would dead-end in.
   if (options.redirectUri !== undefined) {
     throw new OAuthCallbackError(
       'A redirectUri was supplied without a callback handler. Either omit redirectUri to use the built-in localhost callback or run the flow with your own waiter.',
@@ -92,19 +92,19 @@ export async function runAuthorizationCodeFlow(
   let code: string;
   let returnedState: string | undefined;
   try {
-    // SPL-12: the documented 5-minute default is real — an undefined
+    // SPL-12: the documented 5-minute default is real - an undefined
     // callbackTimeoutMs no longer waits forever.
     const params = await waitWithTimeout(
       callback.waitForCallback(signal),
       options.callbackTimeoutMs ?? DEFAULT_CALLBACK_TIMEOUT_MS,
     );
-    // SPL-6: the client ALWAYS sends `state` — a callback omitting it
+    // SPL-6: the client ALWAYS sends `state` - a callback omitting it
     // is rejected outright instead of skipping the CSRF/code-injection
     // comparison (a drive-by request to the loopback callback could
     // otherwise deliver an attacker-chosen code without knowing state).
     if (params.state === undefined) {
       throw new OAuthCallbackError(
-        'Authorization callback did not return the `state` parameter — rejected (CSRF defense; the request always includes one).',
+        'Authorization callback did not return the `state` parameter - rejected (CSRF defense; the request always includes one).',
       );
     }
     returnedState = params.state;
@@ -128,7 +128,7 @@ export async function runAuthorizationCodeFlow(
     code_verifier: verifier,
   };
   if (registration.clientSecret !== undefined) {
-    // Confidential client — Basic auth header is preferred per
+    // Confidential client - Basic auth header is preferred per
     // RFC 6749 § 2.3.1.
     const basic = encodeBasicAuth(registration.clientId, registration.clientSecret.reveal());
     return await exchangeForTokens(server.tokenEndpoint, params, signal, basic, serverId);

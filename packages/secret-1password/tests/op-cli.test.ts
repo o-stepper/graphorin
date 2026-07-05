@@ -70,7 +70,7 @@ describe('createDefaultOpCli', () => {
   });
 });
 
-describe('createOpCli — SPL-22 timeout escalation', () => {
+describe('createOpCli - SPL-22 timeout escalation', () => {
   it('escalates to SIGKILL and rejects when the child ignores SIGTERM', async () => {
     const signals: string[] = [];
     // A fake child that ignores SIGTERM (never closes) but dies on SIGKILL.

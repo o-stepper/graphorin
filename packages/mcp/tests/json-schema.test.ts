@@ -120,7 +120,7 @@ describe('buildJsonSchemaValidator', () => {
   });
 });
 
-describe('mcp-skills-07 — server-supplied pattern hardening (ReDoS)', () => {
+describe('mcp-skills-07 - server-supplied pattern hardening (ReDoS)', () => {
   it('a catastrophic-backtracking pattern is guarded out (degrades to permissive) within a time budget', () => {
     const validator = buildJsonSchemaValidator({
       type: 'object',
@@ -145,7 +145,7 @@ describe('mcp-skills-07 — server-supplied pattern hardening (ReDoS)', () => {
     });
     const big = 'y'.repeat(20_000);
     const result = validator.safeParse({ s: big });
-    // Over the cap: pattern not evaluated (permissive) — the mismatch
+    // Over the cap: pattern not evaluated (permissive) - the mismatch
     // is deliberately NOT reported rather than scanning 20k chars of
     // attacker-controlled input per property.
     expect(result.success).toBe(true);

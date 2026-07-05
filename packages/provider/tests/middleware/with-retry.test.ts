@@ -1,5 +1,5 @@
 /**
- * Coverage for `withRetry` — exponential backoff loop, retryable
+ * Coverage for `withRetry` - exponential backoff loop, retryable
  * predicate plumbing, abort short-circuiting, and the empty-stream
  * synthetic-finish guarantee.
  */
@@ -120,7 +120,7 @@ describe('withRetry', () => {
     expect(flaky.calls).toBe(1);
   });
 
-  it('AbortSignal.aborted short-circuits — error is propagated, no retries', async () => {
+  it('AbortSignal.aborted short-circuits - error is propagated, no retries', async () => {
     const flaky = flakyAdapter({ failures: 5, fail: () => ({ kind: 'transient' }) });
     const ac = new AbortController();
     ac.abort();

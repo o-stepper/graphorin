@@ -1,5 +1,5 @@
 /**
- * @graphorin/tools — typed tool surface for the Graphorin framework.
+ * @graphorin/tools - typed tool surface for the Graphorin framework.
  *
  * The package owns:
  *
@@ -29,7 +29,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './audit/index.js';
 export * from './builder/index.js';

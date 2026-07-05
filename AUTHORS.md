@@ -2,7 +2,7 @@
 
 Graphorin was created and is maintained by:
 
-- **Oleksiy Stepurenko** — creator, owner, maintainer · <step.oleksiy@gmail.com> · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>.
+- **Oleksiy Stepurenko** - creator, owner, maintainer · <step.oleksiy@gmail.com> · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>.
 
 ## Contributors
 
@@ -16,4 +16,4 @@ Contributions are welcome under the project's MIT License. See [`LICENSE`](./LIC
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

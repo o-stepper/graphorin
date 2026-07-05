@@ -80,7 +80,7 @@ export interface SanitizationOutcome {
  * Operators running high-assurance deployments opt in per-tool via
  * `tool({ failClosed: true })`. Defaulting it to `true` globally would
  * convert every web-search / MCP result that quotes imperative text
- * into a tool failure — which is why it stays opt-in.
+ * into a tool failure - which is why it stays opt-in.
  *
  * @stable
  */
@@ -111,11 +111,11 @@ export function applyInboundSanitization(opts: {
 
   const patterns = opts.patterns ?? BUILT_IN_IMPERATIVE_PATTERNS;
   // Default scan budget. 5 ms is the long-term production target but is
-  // empirically too tight on cold V8 — the very first scan after a fresh
+  // empirically too tight on cold V8 - the very first scan after a fresh
   // worker / serverless cold-start measures 6-12 ms on hosted CI runners, and a
   // *loaded* shared runner (e.g. windows-latest under a full matrix) has been
   // observed past 50 ms. On a timeout the strip pass is SKIPPED and the body is
-  // returned unredacted (fail-open by design — see below), so an over-tight
+  // returned unredacted (fail-open by design - see below), so an over-tight
   // budget silently lets injection through under load. A 250 ms ceiling is
   // still well below any user-perceptible (registration-time, one-shot)
   // latency and keeps the strip pass running on slow/loaded machines. Callers
@@ -144,7 +144,7 @@ export function applyInboundSanitization(opts: {
   let body = opts.body;
   let stripped = false;
   let bytesStripped = 0;
-  // Skip the strip pass entirely when the scan timed out — we have no
+  // Skip the strip pass entirely when the scan timed out - we have no
   // confidence the catalogue ran to completion, so applying mutations
   // could over-redact OR under-redact unpredictably. The wrap envelope
   // (when requested) still applies because it does not depend on a

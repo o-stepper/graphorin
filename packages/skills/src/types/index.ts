@@ -23,7 +23,7 @@ import type {
  * sandbox tier resolver treats `'unknown'` like `'untrusted'`
  * (mandatory `worker-threads + no-net + no-fs`); the supply-chain
  * installer treats it as untrusted EXCEPT that the signature
- * requirement is downgraded from mandatory to optional — signature
+ * requirement is downgraded from mandatory to optional - signature
  * is a trust upgrade, not a gate (Phase 08 § Risks & mitigations).
  *
  * @stable
@@ -60,11 +60,11 @@ export type SkillTrustLevelValue = SkillsTrustLevel;
 /**
  * Source descriptor for a {@link loadSkills} request.
  *
- * - `'folder'`      — load from a directory on disk.
- * - `'npm-package'` — install via the supply-chain installer + load.
- * - `'git-repo'`    — shallow-clone via the supply-chain installer +
+ * - `'folder'`      - load from a directory on disk.
+ * - `'npm-package'` - install via the supply-chain installer + load.
+ * - `'git-repo'`    - shallow-clone via the supply-chain installer +
  *   load.
- * - `'inline'`      — the caller supplies a parsed skill structure;
+ * - `'inline'`      - the caller supplies a parsed skill structure;
  *   useful for tests and embedded fixtures.
  *
  * @stable
@@ -77,7 +77,7 @@ export type SkillSource =
        * Operator-supplied trust level. When present it overrides the
        * skill's self-declared `graphorin-trust-level`. Without it, a
        * folder's self-declared `trusted` / `trusted-with-scripts` is
-       * capped at `'unknown'` — a downloaded directory cannot promote
+       * capped at `'unknown'` - a downloaded directory cannot promote
        * itself; trust is granted by the integrator, never the artifact.
        */
       readonly trustLevel?: SkillTrustLevel;
@@ -98,7 +98,7 @@ export type SkillSource =
 
 /**
  * Pre-built tool record accepted by the inline source. The loader
- * does not parse the tool — it forwards the record to the agent
+ * does not parse the tool - it forwards the record to the agent
  * runtime which feeds it through `stampSkillTool(...)` before
  * registering with `@graphorin/tools`.
  *
@@ -121,7 +121,7 @@ export interface InlineSkill {
    * these via {@link Skill.tools} so {@link SkillRegistry.tools}
    * returns them deduplicated by `tool.name`.
    *
-   * Folder / npm / git sources do not carry tool implementations —
+   * Folder / npm / git sources do not carry tool implementations -
    * the agent runtime (Phase 12) materialises them from the skill's
    * `tools/` directory. The inline source is the only path through
    * which tests + bundled defaults can ship pre-built tools.
@@ -168,7 +168,7 @@ export interface FrontmatterDiagnostic {
 
 /**
  * Validated skill metadata. Always available on the registry without
- * loading the body — this is the always-present **Tier 1** payload
+ * loading the body - this is the always-present **Tier 1** payload
  * that the system prompt advertises.
  *
  * @stable
@@ -191,7 +191,7 @@ export interface SkillMetadata {
   readonly graphorinAnthropicSpec?: string;
   /** Author-declared graphorin runtime / extension version. */
   readonly graphorinVersion?: string;
-  /** Raw frontmatter (read-only) for power users — every loader user can re-derive bespoke fields. */
+  /** Raw frontmatter (read-only) for power users - every loader user can re-derive bespoke fields. */
   readonly raw: Readonly<Record<string, unknown>>;
 }
 
@@ -262,12 +262,12 @@ export interface SkillResource {
  * Loaded skill record returned by {@link SkillRegistry.getSkill} and
  * {@link loadSkills}. Three-tier semantics:
  *
- * - {@link Skill.metadata} — always available (parsed at load time).
- * - {@link Skill.body}     — lazy; resolved on first call. Cached for
+ * - {@link Skill.metadata} - always available (parsed at load time).
+ * - {@link Skill.body}     - lazy; resolved on first call. Cached for
  *   subsequent calls.
- * - {@link Skill.resources} — lazy listing; resource bytes are only
+ * - {@link Skill.resources} - lazy listing; resource bytes are only
  *   read when {@link SkillResource.read} is invoked.
- * - {@link Skill.tools}    — derived from the `graphorin-tools`
+ * - {@link Skill.tools}    - derived from the `graphorin-tools`
  *   declarations; the actual `Tool[]` is materialised by the agent
  *   runtime through the `@graphorin/tools` registry.
  *
@@ -294,7 +294,7 @@ export interface Skill {
 }
 
 /**
- * Activated skill — what the agent runtime sees after the model (or a
+ * Activated skill - what the agent runtime sees after the model (or a
  * slash command) elects a skill. Carries the loaded body + declared
  * tools so the runtime can inject them into the conversation.
  *
@@ -306,7 +306,7 @@ export interface ActivatedSkill {
   readonly resources: ReadonlyArray<SkillResource>;
   /**
    * Tools made available to the model while the skill is active.
-   * The agent runtime (Phase 12) is the canonical producer — it
+   * The agent runtime (Phase 12) is the canonical producer - it
    * resolves the skill's `tools/` directory or the inline-supplied
    * `Tool[]` and feeds each entry through `stampSkillTool(...)` so
    * the resulting `ResolvedTool` carries the right trust class +

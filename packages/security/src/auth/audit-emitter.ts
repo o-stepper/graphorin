@@ -1,7 +1,7 @@
 /**
  * Typed in-process event emitter for server-token auth events (SPL-5).
  * The audit-log subsystem subscribes via {@link bridgeAuthToAudit} to
- * write these into the dedicated audit database — the auth layer never
+ * write these into the dedicated audit database - the auth layer never
  * reaches across the package boundary to write rows itself, mirroring
  * the secrets / oauth / supply-chain bridges.
  *
@@ -38,7 +38,7 @@ export interface AuthAuditActor {
 
 /**
  * One auth audit event. The payload never carries the raw token or the
- * pepper — only the token id / metadata safe to log.
+ * pepper - only the token id / metadata safe to log.
  *
  * @stable
  */
@@ -79,7 +79,7 @@ export function _resetAuthAuditListenersForTesting(): void {
   listeners.clear();
 }
 
-/** @experimental — test seam to assert wiring. */
+/** @experimental - test seam to assert wiring. */
 export function _getAuthAuditListenerCountForTesting(): number {
   return listeners.size;
 }

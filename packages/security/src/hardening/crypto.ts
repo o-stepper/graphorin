@@ -1,10 +1,10 @@
 /**
  * Cryptographic helpers used by the framework's startup paths.
  *
- *  - `generateBootstrapToken()` — 256-bit `crypto.randomBytes` →
+ *  - `generateBootstrapToken()` - 256-bit `crypto.randomBytes` →
  *    base62url-encoded string. Used by `graphorin init` (Phase 15)
  *    to mint the first server token.
- *  - `generateAesSalt()` — 16-byte salt for AES-GCM key derivation.
+ *  - `generateAesSalt()` - 16-byte salt for AES-GCM key derivation.
  *
  * Per DEC-135 the framework uses `crypto.randomBytes(32)` (256 bits)
  * for tokens, never `crypto.randomUUID()` (122 bits).
@@ -30,7 +30,7 @@ export const BOOTSTRAP_TOKEN_LENGTH = 43;
 /**
  * Generate a 256-bit bootstrap token encoded with base62url. Always
  * emits `BOOTSTRAP_TOKEN_LENGTH` (43) characters. Source entropy is
- * `crypto.randomBytes(32)` per DEC-135 — never `crypto.randomUUID()`
+ * `crypto.randomBytes(32)` per DEC-135 - never `crypto.randomUUID()`
  * (only 122 bits).
  *
  * @stable
@@ -52,7 +52,7 @@ export function generateAesSalt(): Uint8Array {
 /**
  * Encode a `Uint8Array` as base62url. The optional `padTo` argument
  * left-pads the output with the base62 zero character so every
- * emitted string has the same width — useful for fixed-width
+ * emitted string has the same width - useful for fixed-width
  * downstream parsers. The zero-byte preserve rule still holds: if
  * every source byte is `0x00`, the returned string is
  * `'0'.repeat(max(padTo, bytes.length))`.

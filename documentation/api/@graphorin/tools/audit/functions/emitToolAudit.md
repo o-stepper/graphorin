@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function emitToolAudit(event): void;
 
 Defined in: packages/tools/src/audit/index.ts:159
 
-Emit an audit event. Never throws across listener boundaries —
+Emit an audit event. Never throws across listener boundaries -
 a listener that throws is isolated so it cannot tear down the
 tool execution path.
 

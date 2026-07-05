@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/memory/src/context-engine/token-counter.ts:27
 Pluggable text-token counter used inside the ContextEngine. The
 surface is narrower than [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) because the engine
 never assembles a message list during the budget-allocation
-phase — it operates on rendered text fragments.
+phase - it operates on rendered text fragments.
 
 ## Stable
 

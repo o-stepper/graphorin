@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -25,4 +25,4 @@ Full prompt-redaction policy.
 | <a id="property-patterns"></a> `patterns?` | `readonly` | readonly [`RedactionPattern`](/api/@graphorin/observability/redaction/patterns/interfaces/RedactionPattern.md)[] | Pattern catalogue. Defaults to the 14 built-in patterns. | packages/provider/src/middleware/with-redaction.ts:88 |
 | <a id="property-scanscope"></a> `scanScope?` | `readonly` | [`PromptRedactionScanScope`](/api/@graphorin/provider/type-aliases/PromptRedactionScanScope.md) | Range of fields scanned. Defaults to `'all'`. | packages/provider/src/middleware/with-redaction.ts:94 |
 | <a id="property-stripcachecontrolonhit"></a> `stripCacheControlOnHit?` | `readonly` | `boolean` | Strip Anthropic-shape `cache_control` markers on hit. | packages/provider/src/middleware/with-redaction.ts:98 |
-| <a id="property-trustclassoverride"></a> `trustClassOverride?` | `readonly` | [`LocalProviderTrust`](/api/@graphorin/provider/type-aliases/LocalProviderTrust.md) | Test hook — synthetic trust class. | packages/provider/src/middleware/with-redaction.ts:106 |
+| <a id="property-trustclassoverride"></a> `trustClassOverride?` | `readonly` | [`LocalProviderTrust`](/api/@graphorin/provider/type-aliases/LocalProviderTrust.md) | Test hook - synthetic trust class. | packages/provider/src/middleware/with-redaction.ts:106 |

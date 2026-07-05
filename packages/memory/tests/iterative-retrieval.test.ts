@@ -161,7 +161,7 @@ describe('parseGrade (P2-4)', () => {
       false,
     );
     expect(
-      parseGrade('Sure! Here: {"sufficient": true, "reformulation": null} — done').sufficient,
+      parseGrade('Sure! Here: {"sufficient": true, "reformulation": null} - done').sufficient,
     ).toBe(true);
   });
 
@@ -225,7 +225,7 @@ describe('createProviderRetrievalGrader (P2-4)', () => {
 });
 
 // --------------------------------------------------------------------------
-// The bounded loop — the acceptance criteria
+// The bounded loop - the acceptance criteria
 // --------------------------------------------------------------------------
 
 describe('runIterativeRetrieval (P2-4)', () => {
@@ -261,7 +261,7 @@ describe('runIterativeRetrieval (P2-4)', () => {
       forceHard: true,
     });
     expect(noGrader.graded).toBe(false);
-    // A graded pass — sufficient is now a real verdict.
+    // A graded pass - sufficient is now a real verdict.
     const graded = await runIterativeRetrieval(
       'q',
       makeDeps({ q: ['a'] }, scriptGrader([SUFFICIENT])).deps,
@@ -363,7 +363,7 @@ describe('runIterativeRetrieval (P2-4)', () => {
     const { deps } = makeDeps({ q: noise, 'better query': ['answer', 'n0'] }, grader);
     const r = await runIterativeRetrieval('q', deps, { forceHard: true, maxResults: 5 });
     expect(r.sufficient).toBe(true);
-    // The re-grade window is NOT byte-identical to grade 1's — the
+    // The re-grade window is NOT byte-identical to grade 1's - the
     // pass-2 answer snippet is in it (the old flat slice replayed
     // pass 1's head forever and the loop span to the cap).
     expect(windows[1]).toContain('text:answer');
@@ -385,7 +385,7 @@ describe('runIterativeRetrieval (P2-4)', () => {
     const { deps } = makeDeps({ q: ['a'], 'narrow sub-question': ['b'] }, grader);
     await runIterativeRetrieval('q', deps, { forceHard: true });
     expect(graded[0]?.query).toBe('q');
-    // The re-grade is judged against the ORIGINAL question — never the
+    // The re-grade is judged against the ORIGINAL question - never the
     // narrowed reformulation (premature sufficient=true otherwise).
     expect(graded[1]?.query).toBe('q');
     expect(graded[1]?.tried).toEqual(['narrow sub-question']);
@@ -395,7 +395,7 @@ describe('runIterativeRetrieval (P2-4)', () => {
     const grader = scriptGrader([insufficient('r1'), SUFFICIENT]);
     const { deps } = makeDeps({ q: ['a', 'b'], r1: ['c', 'a'] }, grader);
     // A fuse that ranks by cross-pass frequency then by name puts the
-    // consensus hit first — the cut keeps it even at maxResults 1.
+    // consensus hit first - the cut keeps it even at maxResults 1.
     const fused = await runIterativeRetrieval(
       'q',
       {
@@ -467,7 +467,7 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
     const b = await memory.semantic.remember(scope, { text: 'sapiens recommendation' });
 
     // Pass 1 ("tbilisi") FTS-matches only `a`; the grader reformulates to
-    // "sapiens", which pass 2 matches — so the loop recovers `b`.
+    // "sapiens", which pass 2 matches - so the loop recovers `b`.
     const r = await memory.semantic.searchIterative(scope, 'tbilisi', { forceHard: true });
     expect(r.iterations).toBe(2);
     expect(r.sufficient).toBe(true);
@@ -492,7 +492,7 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
     const tool = memory.tools.find((t) => t.name === 'deep_recall');
     expect(tool).toBeDefined();
     // A genuinely hard query (multi-hop + temporal + multi-clause) so the
-    // real difficulty gate — not a `forceHard` override — admits it to the
+    // real difficulty gate - not a `forceHard` override - admits it to the
     // loop; the seeded memory can't answer it, so the tool abstains.
     const out = (await tool?.execute(
       { query: 'who did the person I met before recommend, and which book?', maxIterations: 2 },
@@ -509,7 +509,7 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
     // 0.5, English-only regexes) rejected the tool's own documented
     // examples, so deep_recall returned single-shot `sufficient: true`
     // without any grading. The model choosing deep_recall IS the
-    // hardness signal — the tool now passes forceHard.
+    // hardness signal - the tool now passes forceHard.
     const provider = scriptProvider([
       '{"sufficient": true, "confidence": 0.9, "reformulation": null}',
     ]);
@@ -527,7 +527,7 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
       graded: boolean;
       iterations: number;
     };
-    // The grader RAN (one provider call) — a simple query is no longer
+    // The grader RAN (one provider call) - a simple query is no longer
     // waved through ungraded.
     expect(provider.calls).toHaveLength(1);
     expect(out.graded).toBe(true);
@@ -539,7 +539,7 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
 // Type-level contracts
 // --------------------------------------------------------------------------
 
-describe('iterative retrieval — type contracts (P2-4)', () => {
+describe('iterative retrieval - type contracts (P2-4)', () => {
   it('exposes the documented public shapes', () => {
     expectTypeOf<DifficultyAssessment['hard']>().toEqualTypeOf<boolean>();
     expectTypeOf<DifficultyAssessment['signals']>().toEqualTypeOf<ReadonlyArray<string>>();

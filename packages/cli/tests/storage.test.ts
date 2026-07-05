@@ -45,8 +45,8 @@ describe('graphorin storage status', () => {
 
   it('resolves a relative storage.path against the CWD, not the config-file dir (IP-20)', async () => {
     // The config lives in a temp dir that is NOT process.cwd(); a relative
-    // storage.path must resolve against the CWD — the same rule the server
-    // (createServer → createSqliteStore) and openStoreContext use — so every
+    // storage.path must resolve against the CWD - the same rule the server
+    // (createServer → createSqliteStore) and openStoreContext use - so every
     // command + the server inspect ONE database from any working directory.
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-cli-ip20-'));
     const cfg = join(dir, 'graphorin.config.json');

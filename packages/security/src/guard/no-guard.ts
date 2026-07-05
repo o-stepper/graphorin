@@ -1,5 +1,5 @@
 /**
- * `NO_GUARD` — pass-through guard for `'pure'` and
+ * `NO_GUARD` - pass-through guard for `'pure'` and
  * `'side-effecting-no-memory'` tools per DEC-153.
  *
  * The implementation is intentionally trivial: it returns an empty

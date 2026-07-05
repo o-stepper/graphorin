@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ handoff. Persisted alongside `HandoffRecord` and round-tripped through
 the JSONL session export so a replay can re-construct the filter
 stack even after the runtime filter implementations evolve.
 
-The discriminator `kind` is an open string union — well-known kinds
+The discriminator `kind` is an open string union - well-known kinds
 include `'full' | 'last-n' | 'last-user' | 'summary' |
 'sensitivity-filter' | 'compose' | 'custom'`. The accompanying `meta`
 carries kind-specific data (for example `{ n: 10 }` for `'last-n'`,

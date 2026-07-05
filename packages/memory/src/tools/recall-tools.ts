@@ -22,7 +22,7 @@ const recallEpisodesOutputSchema = z.object({
       score: z.number(),
       startedAt: z.string(),
       endedAt: z.string(),
-      /** Trust-provenance tag (MST-10) — synthesized episodes say so. */
+      /** Trust-provenance tag (MST-10) - synthesized episodes say so. */
       provenance: z.string().optional(),
     }),
   ),
@@ -61,7 +61,7 @@ const deepRecallOutputSchema = z.object({
       text: z.string(),
       score: z.number(),
       sensitivity: deepRecallSensitivityEnum,
-      /** Trust-provenance tag (MST-10) — synthesized facts say so. */
+      /** Trust-provenance tag (MST-10) - synthesized facts say so. */
       provenance: z.string().optional(),
       /** Closed validity end (only surfaces on `asOf` reads). */
       validTo: z.string().optional(),
@@ -84,7 +84,7 @@ type DeepRecallInput = z.infer<typeof deepRecallInputSchema>;
 type DeepRecallOutput = z.infer<typeof deepRecallOutputSchema>;
 
 /**
- * `recall_episodes` — triple-signal episode retrieval (recency ×
+ * `recall_episodes` - triple-signal episode retrieval (recency ×
  * relevance × importance).
  *
  * @stable
@@ -125,7 +125,7 @@ export function createRecallEpisodesTool(
           startedAt: hit.record.startedAt,
           endedAt: hit.record.endedAt,
           // MST-10: surface origin so a consumer can tell a synthesized
-          // (consolidator-extracted) episode from a first-party record —
+          // (consolidator-extracted) episode from a first-party record -
           // recalled text re-enters the model as trusted tool output.
           ...(hit.record.provenance !== undefined ? { provenance: hit.record.provenance } : {}),
         })),
@@ -139,7 +139,7 @@ export function createRecallEpisodesTool(
 }
 
 /**
- * `conversation_search` — FTS5 search over the active session
+ * `conversation_search` - FTS5 search over the active session
  * messages.
  *
  * @stable
@@ -175,13 +175,13 @@ export function createConversationSearchTool(
 }
 
 /**
- * `deep_recall` — gated, multi-pass ("deep") recall over the user's
+ * `deep_recall` - gated, multi-pass ("deep") recall over the user's
  * factual memory for HARD questions (P2-4). A local difficulty gate keeps
  * simple lookups single-shot; only queries judged hard trigger a
  * grade-and-reformulate loop (bounded by `maxIterations`, hard-capped at
  * 5), widening to one-hop graph expansion on reformulation passes. The
  * output reports `abstained: true` when memory was insufficient even
- * after reformulating — the agent should then say it lacks the
+ * after reformulating - the agent should then say it lacks the
  * information rather than guess. Registered only when the facade is
  * created with `iterativeRetrieval`; otherwise it degrades to a single
  * pass, so prefer the cheaper `fact_search` for ordinary lookups.
@@ -194,7 +194,7 @@ export function createDeepRecallTool(
   return tool<DeepRecallInput, DeepRecallOutput>({
     name: 'deep_recall',
     description:
-      "Multi-pass ('deep') recall over the user's long-term factual memory for HARD multi-hop or temporal questions one search can't answer (e.g. 'who recommended the book the person I met in Tbilisi mentioned?'). A difficulty gate keeps simple lookups single-shot; hard questions trigger a bounded grade-and-reformulate loop. If `abstained` is true the memory was insufficient even after reformulating — tell the user you don't have enough stored to answer and DO NOT guess. Prefer the cheaper fact_search for ordinary lookups.",
+      "Multi-pass ('deep') recall over the user's long-term factual memory for HARD multi-hop or temporal questions one search can't answer (e.g. 'who recommended the book the person I met in Tbilisi mentioned?'). A difficulty gate keeps simple lookups single-shot; hard questions trigger a bounded grade-and-reformulate loop. If `abstained` is true the memory was insufficient even after reformulating - tell the user you don't have enough stored to answer and DO NOT guess. Prefer the cheaper fact_search for ordinary lookups.",
     inputSchema: deepRecallInputSchema,
     outputSchema: deepRecallOutputSchema,
     sideEffectClass: 'read-only',
@@ -209,7 +209,7 @@ export function createDeepRecallTool(
         ...(input.maxIterations !== undefined ? { maxIterations: input.maxIterations } : {}),
         ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
         // memory-retrieval-02: the model choosing deep_recall over
-        // fact_search IS the hardness signal — the local heuristic gate
+        // fact_search IS the hardness signal - the local heuristic gate
         // rejected the tool's own documented multi-hop examples
         // (W_MULTI_HOP 0.4 < threshold 0.5) and is English-only. The
         // cap + grader stop conditions still bound cost.
@@ -234,7 +234,7 @@ export function createDeepRecallTool(
         graded: result.graded,
         iterations: result.iterations,
       };
-      // C6: mirror fact_search — recalled poisoned content re-arms the ledger.
+      // C6: mirror fact_search - recalled poisoned content re-arms the ledger.
       const taint = recallTaint(result.hits.map((h) => h.record));
       return taint === undefined ? output : { output, taint };
     },

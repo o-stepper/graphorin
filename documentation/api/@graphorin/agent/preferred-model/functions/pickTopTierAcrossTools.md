@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ Defined in: packages/agent/src/preferred-model/index.ts:84
 
 Pick the highest-cost tier across the supplied per-tool hints.
 Explicit `ModelSpec` entries are treated as the highest tier
-(`'smart'`) for tie-breaking — the conservative-correctness rule
+(`'smart'`) for tie-breaking - the conservative-correctness rule
 documented in DEC-169 / suggested ADR-057.
 
 Returns the picked hint together with the original `ModelSpec`

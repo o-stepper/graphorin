@@ -1,5 +1,5 @@
 /**
- * `applyProcessHardening(...)` — startup helper that:
+ * `applyProcessHardening(...)` - startup helper that:
  *
  *  - refuses to run as `root` on POSIX hosts (DEC-135);
  *  - sets `process.umask(0o077)` early so subsequent file creates

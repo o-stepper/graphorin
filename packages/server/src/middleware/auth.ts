@@ -30,7 +30,7 @@ const ANONYMOUS_GRANTED_SCOPES: ReadonlyArray<ParsedScope> = Object.freeze([pars
  * `state.auth = { kind: 'anonymous', grantedScopes: [admin:*] }` so the
  * scope middleware, SSE handler and replay routes all treat the request as a
  * fully-authorized principal. This is the documented trusted-loopback /
- * single-operator mode — never mount it on a non-loopback deployment without
+ * single-operator mode - never mount it on a non-loopback deployment without
  * understanding that every endpoint becomes open.
  *
  * @stable
@@ -133,7 +133,7 @@ export function createAuthMiddleware(
   const allowAnonymous = options.allowAnonymous ?? false;
   return async (c, next: Next) => {
     const token = extractBearer(c);
-    // IP-11: the request-state middleware is the ONLY IP authority —
+    // IP-11: the request-state middleware is the ONLY IP authority -
     // it resolves the client IP per the configured trustProxy policy
     // (proxy headers when trusted, else the socket address). The old
     // fallback read attacker-controlled X-Real-IP unconditionally,
@@ -169,7 +169,7 @@ export function createAuthMiddleware(
       grantedScopes.push(scope);
     }
     // Defensive: any string scopes coming from the store also parse here
-    // even though the verifier itself parses them — see scope.ts.
+    // even though the verifier itself parses them - see scope.ts.
     void tryParseScope;
     c.set('state', {
       ...c.get('state'),

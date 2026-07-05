@@ -10,7 +10,7 @@ import {
   TrustLevelEscalationError,
 } from '../../src/supply-chain/index.js';
 
-describe('@graphorin/security/supply-chain — policy resolver', () => {
+describe('@graphorin/security/supply-chain - policy resolver', () => {
   beforeEach(() => {
     _setFrameworkDenylistForTesting([]);
   });

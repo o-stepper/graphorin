@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # node
 
-`createNode({...})` — minimal factory wrapper for declaring a
+`createNode({...})` - minimal factory wrapper for declaring a
 workflow node. Returns a [WorkflowNode](/api/@graphorin/workflow/interfaces/WorkflowNode.md) carrying the
 supplied `name` + `run(...)` callback.
 

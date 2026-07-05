@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -90,7 +90,7 @@ Defined in: reranker.ts:162
 
 Number of per-passage provider failures swallowed (→ `fallbackScore`) on
 the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
-is partially degraded — surface it for observability.
+is partially degraded - surface it for observability.
 
 ##### Returns
 

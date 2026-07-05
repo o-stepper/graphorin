@@ -28,7 +28,7 @@ import { TokenVerifier, verifyToken } from '../../src/auth/verify.js';
 
 import { createMemoryAuthTokenStore } from './_helpers.js';
 
-describe('Phase 03b — DoD conformance', () => {
+describe('Phase 03b - DoD conformance', () => {
   describe('verifyOffline rejects malformed tokens without DB hit', () => {
     it('rejects wrong prefix without a single store call', async () => {
       const inner = createMemoryAuthTokenStore();
@@ -163,7 +163,7 @@ describe('Phase 03b — DoD conformance', () => {
       expect(after.ok).toBe(false);
       if (!after.ok) expect(after.reason).toBe('token-locked-out');
 
-      // Walk far past the 5 min window — lockout still in force.
+      // Walk far past the 5 min window - lockout still in force.
       now += 10 * 60_000;
       const stillLocked = await verifier.verify(raw);
       expect(stillLocked.ok).toBe(false);

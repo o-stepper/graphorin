@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function classifyTool(tool, patterns?): MemoryGuardTier;
 
 Defined in: packages/security/src/guard/classifier.ts:63
 
-Classify a tool. Pure function — never inspects runtime state.
+Classify a tool. Pure function - never inspects runtime state.
 
 Precedence (top wins):
   1. Operator-set `memoryGuardTier`.

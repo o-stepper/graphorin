@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ wrapper class lives in `@graphorin/security`. Downstream packages typing
 a parameter as `SecretValue` therefore avoid taking a security
 dependency.
 
-Note: `SecretValue` is **not** a TypeScript branded primitive — it is
+Note: `SecretValue` is **not** a TypeScript branded primitive - it is
 a full wrapper class with explicit leakage barriers
 (`Symbol.toPrimitive`, `toJSON`, `[nodejs.util.inspect.custom]`, …).
 Any conforming implementation must ensure that:

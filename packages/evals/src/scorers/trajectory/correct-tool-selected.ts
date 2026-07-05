@@ -1,5 +1,5 @@
 /**
- * `correctToolSelected` — passes when the trajectory called the expected
+ * `correctToolSelected` - passes when the trajectory called the expected
  * tool(s). With `requireOrder`, the expected names must appear as an
  * ordered subsequence of the actual calls (other calls may interleave);
  * otherwise every expected name must appear at least once.

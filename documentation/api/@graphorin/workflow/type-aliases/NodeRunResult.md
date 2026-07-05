@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -20,11 +20,11 @@ Defined in: packages/workflow/src/types.ts:221
 
 Permissible return shapes from a node's `run(...)` callback.
 
-- `undefined` — the node performed a side effect with no state writes.
-- `Partial<TState>` — channel writes (one entry per channel).
-- `Dispatch | Dispatch[]` — schedule additional tasks for the next
+- `undefined` - the node performed a side effect with no state writes.
+- `Partial<TState>` - channel writes (one entry per channel).
+- `Dispatch | Dispatch[]` - schedule additional tasks for the next
   execution step (see [Dispatch](/api/@graphorin/workflow/classes/Dispatch.md)).
-- `(Partial<TState> | Dispatch)[]` — mix of writes and dispatches
+- `(Partial<TState> | Dispatch)[]` - mix of writes and dispatches
   produced in a single call.
 
 ## Type Parameters

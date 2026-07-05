@@ -3,13 +3,13 @@
  * adapter. Emits one of four discriminant values per
  * {@link LocalProviderTrust}:
  *
- * - `'loopback'`         — the URL points at the same host as the
+ * - `'loopback'`         - the URL points at the same host as the
  *   running process (`localhost`, `127.0.0.0/8`, `::1`, or a
  *   `unix:///path` socket).
- * - `'private'`          — RFC 1918 / RFC 6598 / link-local /
+ * - `'private'`          - RFC 1918 / RFC 6598 / link-local /
  *   multicast-DNS-style hostname.
- * - `'public-tls'`       — public host AND `https://`.
- * - `'public-cleartext'` — public host AND `http://`.
+ * - `'public-tls'`       - public host AND `https://`.
+ * - `'public-cleartext'` - public host AND `http://`.
  *
  * The dispatcher is a pure function: it sees the URL string and
  * nothing else. DNS resolution is deferred to the adapter layer
@@ -30,7 +30,7 @@ import type { LocalProviderTrust, Sensitivity } from '@graphorin/core';
  */
 export interface LocalProviderClassification {
   readonly trust: LocalProviderTrust;
-  /** One-line reason — `'loopback IP 127.0.0.1'`, `'public IP 5.6.7.8 over HTTPS'`, ... */
+  /** One-line reason - `'loopback IP 127.0.0.1'`, `'public IP 5.6.7.8 over HTTPS'`, ... */
   readonly reason: string;
   /** Default `acceptsSensitivity` for this trust class. */
   readonly acceptsSensitivity: ReadonlyArray<Sensitivity>;
@@ -184,7 +184,7 @@ function isPrivateIpv4(ip: readonly [number, number, number, number]): boolean {
   if (ip[0] === 10) return true;
   if (ip[0] === 192 && ip[1] === 168) return true;
   if (ip[0] === 172 && ip[1] >= 16 && ip[1] <= 31) return true;
-  // RFC 6598 (CGNAT — Tailscale-friendly)
+  // RFC 6598 (CGNAT - Tailscale-friendly)
   if (ip[0] === 100 && ip[1] >= 64 && ip[1] <= 127) return true;
   // Link-local
   if (ip[0] === 169 && ip[1] === 254) return true;

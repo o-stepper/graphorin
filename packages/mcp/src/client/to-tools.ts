@@ -1,18 +1,18 @@
 /**
- * `toTools()` adapter — bridges MCP tool descriptors into the
+ * `toTools()` adapter - bridges MCP tool descriptors into the
  * Graphorin tool registry.
  *
  * The adapter orchestrates three extracted concerns (F-MCP-001):
  *
  * 1. Filters / namespaces the `listTools()` output, then resolves the
- *    per-server effective `defer_loading` flag — see
+ *    per-server effective `defer_loading` flag - see
  *    {@link import('./defer-loading.js').resolveDeferLoading}.
  * 2. Resolves the per-server inbound prompt-injection policy and strips
- *    imperative payloads from each description — see
+ *    imperative payloads from each description - see
  *    {@link import('./inbound-filters.js')}.
  * 3. Converts each MCP tool into a strongly-typed Graphorin `Tool` whose
  *    `execute(...)` calls back into {@link MCPClient.callTool} and adapts
- *    the result — see {@link import('./adapt-result.js').adaptCallResult}.
+ *    the result - see {@link import('./adapt-result.js').adaptCallResult}.
  *
  * The trust class is pinned to `'mcp-derived'` so the agent runtime's
  * per-step preamble fires regardless of the body-level policy.
@@ -207,7 +207,7 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
       input: unknown,
       ctx?: import('@graphorin/core').ToolExecutionContext<unknown>,
     ): Promise<ToolReturn<unknown>> {
-      // MC-5: the agent's per-call AbortSignal reaches the wire — an
+      // MC-5: the agent's per-call AbortSignal reaches the wire - an
       // aborted run sends `notifications/cancelled` instead of orphaning
       // the JSON-RPC request on the server. MC-3: the per-server call
       // timeout rides along.
@@ -224,8 +224,8 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
       });
     },
   } satisfies Tool<unknown, unknown, unknown>;
-  // MC-7: pre-stamp the provenance so the agent's inferToolSource —
-  // which honours an existing stamp — classifies tools passed via
+  // MC-7: pre-stamp the provenance so the agent's inferToolSource -
+  // which honours an existing stamp - classifies tools passed via
   // `config.tools` as 'mcp-derived' (untrusted for the WI-12 dataflow
   // policy) instead of first-party. Zero operator boilerplate.
   return Object.assign(tool, {

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/contracts/provider.ts:255
 
-A single worked example as projected onto the provider wire contract —
+A single worked example as projected onto the provider wire contract -
 a serializable, schema-agnostic view of a `ToolExample`. `input` /
 `output` carry the example's already-parsed values; `comment` is the
 optional rationale shown to the model.

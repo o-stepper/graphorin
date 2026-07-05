@@ -1,5 +1,5 @@
 /**
- * C4 — context-engineering adoptions:
+ * C4 - context-engineering adoptions:
  * - compaction failure hardening (retry, disable-after-3, shrink assert)
  * - recent user messages kept verbatim across compaction
  * - clearing-tier parity (clearToolInputs, readResultToolName honesty)
@@ -75,7 +75,7 @@ function compactCall(memory: ReturnType<typeof makeEngineMemory>, messages: Mess
   };
 }
 
-describe('C4 — compaction failure hardening', () => {
+describe('C4 - compaction failure hardening', () => {
   it('retries a failing summarizer once and succeeds on the second attempt', async () => {
     const summarizer = makeSummarizer({ failTimes: 1 });
     const memory = makeEngineMemory(summarizer);
@@ -110,7 +110,7 @@ describe('C4 — compaction failure hardening', () => {
 
   it('fails an auto-trigger pass whose output is not strictly smaller', async () => {
     // An echoing summarizer returns the whole prompt as the "summary",
-    // so the compacted buffer GROWS — the Gemini-CLI compression-loop
+    // so the compacted buffer GROWS - the Gemini-CLI compression-loop
     // class this assert exists for.
     const summarizer = makeSummarizer({ echoInput: true });
     const memory = makeEngineMemory(summarizer);
@@ -120,7 +120,7 @@ describe('C4 — compaction failure hardening', () => {
   });
 });
 
-describe('C4 — recent user messages survive compaction verbatim', () => {
+describe('C4 - recent user messages survive compaction verbatim', () => {
   it('carries the last 2 user messages out of the summarized window by default', async () => {
     const summarizer = makeSummarizer();
     const memory = makeEngineMemory(summarizer);
@@ -129,7 +129,7 @@ describe('C4 — recent user messages survive compaction verbatim', () => {
     const preserved = out.result.trimmedMessages;
     // Default positional tail = 6 (indices 14..19); user messages from the
     // summarized window (indices 0..13) with the highest indices are 12
-    // and 10 — both must survive verbatim between the summary and the tail.
+    // and 10 - both must survive verbatim between the summary and the tail.
     const texts = preserved.map((m) => (typeof m.content === 'string' ? m.content : ''));
     expect(texts.some((t) => t.startsWith('turn 12 '))).toBe(true);
     expect(texts.some((t) => t.startsWith('turn 10 '))).toBe(true);
@@ -138,7 +138,7 @@ describe('C4 — recent user messages survive compaction verbatim', () => {
   });
 });
 
-describe('C4 — clearing-tier parity', () => {
+describe('C4 - clearing-tier parity', () => {
   const toolLoop: Message[] = [
     { role: 'user', content: 'start' },
     {
@@ -191,7 +191,7 @@ describe('C4 — clearing-tier parity', () => {
   });
 });
 
-describe('C4 — reanchorRecentResults hook', () => {
+describe('C4 - reanchorRecentResults hook', () => {
   const droppedMessages: Message[] = [
     { role: 'user', content: 'go' },
     {
@@ -252,7 +252,7 @@ describe('C4 — reanchorRecentResults hook', () => {
   });
 });
 
-describe('C4 — summary prompt upgrades', () => {
+describe('C4 - summary prompt upgrades', () => {
   it('frames the summary as a handoff and demands verbatim identifiers', () => {
     const prompt = buildSummarizerPrompt({
       template: enLocalePack.compactionSummaryTemplate,

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -8,11 +8,11 @@
 
 > Reference TypeScript client for the [Graphorin](https://github.com/o-stepper/graphorin) standalone server.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.5.0
-- **License:** [MIT](../../_media/LICENSE-2) (© 2026 Oleksiy Stepurenko)
+- **Version:** v0.6.0
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/client>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -24,14 +24,14 @@
 |---|---|
 | **WebSocket transport** | Honours the `graphorin.protocol.v1` subprotocol; supports both bearer-token (Node SDK) and ticket-flow (browser) authentication. |
 | **SSE fallback** | Read-only `EventSource` transport for environments that block WebSocket upgrades. Control-plane operations (`subscribe`, `cancel`, `resume`) fall back to REST. |
-| **Async-iterable subscriptions** | `for await (const event of sub.events())` — typed `AgentEvent` / `WorkflowEvent` payload via `@graphorin/protocol`. |
+| **Async-iterable subscriptions** | `for await (const event of sub.events())` - typed `AgentEvent` / `WorkflowEvent` payload via `@graphorin/protocol`. |
 | **Reconnect** | Exponential backoff with full jitter; resubscribes with the recorded `lastEventId` so the server replays buffered events. |
 | **Bundle hygiene** | Browser-friendly. Zero Node-only dependencies; runtime depends only on `@graphorin/protocol` and `zod`. |
 
 ## Direct dependencies
 
-- [`@graphorin/protocol`](/api/@graphorin/protocol/index.md) — single source of truth for the wire format.
-- [`zod`](https://zod.dev) (`^3.25.0`) — schema validation re-exported transitively through `@graphorin/protocol`.
+- [`@graphorin/protocol`](/api/@graphorin/protocol/index.md) - single source of truth for the wire format.
+- [`zod`](https://zod.dev) (`^3.25.0`) - schema validation re-exported transitively through `@graphorin/protocol`.
 
 ## Install
 
@@ -91,18 +91,18 @@ The client attaches the ticket as a second `Sec-WebSocket-Protocol` token (`tick
 
 ## License
 
-MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](../../_media/LICENSE-2).
+MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/graphorin/blob/main/LICENSE).
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/client/README.md) | `@graphorin/client` — reference TypeScript client for the Graphorin standalone server. |
-| [client](/api/@graphorin/client/client/index.md) | `GraphorinClient` — ergonomic façade over the [Transport](/api/@graphorin/client/interfaces/Transport.md) contract. Handles: |
+| [](/api/@graphorin/client/README.md) | `@graphorin/client` - reference TypeScript client for the Graphorin standalone server. |
+| [client](/api/@graphorin/client/client/index.md) | `GraphorinClient` - ergonomic façade over the [Transport](/api/@graphorin/client/interfaces/Transport.md) contract. Handles: |
 | [errors](/api/@graphorin/client/errors/index.md) | Typed error hierarchy surfaced by `@graphorin/client`. Every error class extends the JavaScript built-in `Error` and exposes a stable `kind` discriminator so consumers can pattern-match without relying on `instanceof` (which behaves badly across module-system boundaries when the package is dual-loaded). |
-| [reconnect](/api/@graphorin/client/reconnect/index.md) | Pure-functional reconnect-backoff helper. Encapsulated in its own module so the GraphorinClient stays free of timing heuristics — and so tests can drive the policy with a deterministic RNG. |
+| [reconnect](/api/@graphorin/client/reconnect/index.md) | Pure-functional reconnect-backoff helper. Encapsulated in its own module so the GraphorinClient stays free of timing heuristics - and so tests can drive the policy with a deterministic RNG. |
 | [transport](/api/@graphorin/client/transport/index.md) | Transport barrel for `@graphorin/client`. |

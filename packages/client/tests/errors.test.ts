@@ -47,7 +47,7 @@ describe('GraphorinClientError hierarchy', () => {
   });
 });
 
-describe('kindForRpcCode (IP-19) — RPC error code → discriminated kind', () => {
+describe('kindForRpcCode (IP-19) - RPC error code → discriminated kind', () => {
   it('maps each meaningful JSON-RPC error code to its own kind', () => {
     expect(kindForRpcCode(RPC_ERROR_CODES.RATE_LIMITED)).toBe('rate-limited');
     expect(kindForRpcCode(RPC_ERROR_CODES.SCOPE_DENIED)).toBe('scope-denied');

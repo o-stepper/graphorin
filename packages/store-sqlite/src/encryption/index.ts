@@ -17,7 +17,7 @@ import type { BetterSqlite3Constructor } from '../driver-types.js';
 
 /**
  * Cipher selection, validated against the real sqlite3mc vocabulary
- * (CS-13 — `'wxsqlite3'` is the library's name, not a cipher; the peer
+ * (CS-13 - `'wxsqlite3'` is the library's name, not a cipher; the peer
  * rejects it with "Cipher 'wxsqlite3' unknown"). `'sqlcipher'` is the
  * Graphorin default (SQLCipher v4 compatible); `'chacha20'` is the
  * peer's own default cipher.
@@ -30,7 +30,7 @@ export type EncryptionCipher = 'sqlcipher' | 'chacha20' | 'aes256cbc' | 'aes128c
  * The cipher-selection PRAGMAs that must run **before** `PRAGMA key`
  * on a freshly opened connection (CS-7). sqlite3mc defaults to
  * `chacha20`, so opening a SQLCipher-v4 database with `key` alone
- * reads garbage — every keyed open must pin the cipher first.
+ * reads garbage - every keyed open must pin the cipher first.
  *
  * @stable
  */
@@ -87,7 +87,7 @@ export type PassphraseResolver = () => Promise<string | Buffer>;
  * Raised when the operator opts in to encryption-at-rest but the
  * cipher peer (`better-sqlite3-multiple-ciphers`) is missing. The
  * Phase 05 acceptance criteria require this to be a fatal startup
- * error — never silently downgrade to an unencrypted DB.
+ * error - never silently downgrade to an unencrypted DB.
  *
  * @stable
  */
@@ -97,7 +97,7 @@ export class CipherPeerMissingError extends Error {
 
 /**
  * Loads the cipher peer (`better-sqlite3-multiple-ciphers`). Lazy by
- * design — the import only fires when encryption-at-rest is enabled.
+ * design - the import only fires when encryption-at-rest is enabled.
  *
  * @stable
  */

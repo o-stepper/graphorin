@@ -7,14 +7,14 @@
 > encrypt / rekey / integrity-check runners that back the `graphorin storage`
 > CLI subcommand group.
 >
-> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.5.0 (optional sub-pack)
+- **Published:** v0.6.0 (optional sub-pack)
 - **Default cipher:** `sqlcipher` (SQLCipher v4 compatible, `legacy=4`)
 - **Defaults:** encryption-at-rest is **OFF by default**. Opt in through
   `graphorin init --encrypted`.
@@ -111,8 +111,8 @@ await rekeyDatabase({
 
 ## Cipher selection
 
-The default cipher is `'sqlcipher'` with the `legacy=4` parameter set —
-SQLCipher v4 compatible — chosen for ecosystem tooling compatibility
+The default cipher is `'sqlcipher'` with the `legacy=4` parameter set -
+SQLCipher v4 compatible - chosen for ecosystem tooling compatibility
 (DB Browser for SQLCipher, `sqlcipher` CLI, GUI inspectors). Other
 cipher modes shipped by the cipher peer are accepted; pass them via the
 `cipher` option:
@@ -136,7 +136,7 @@ cipher modes shipped by the cipher peer are accepted; pass them via the
 - **WAL housekeeping bytes** are visible to an attacker on file leak
   (page numbers, lengths). Row contents are not. See ADR-030 § 5
   for the threat-model nuance.
-- **Performance overhead** is typically 5–15 % on OLTP workloads (read
+- **Performance overhead** is typically 5-15 % on OLTP workloads (read
   / write of small rows). The triggers cron that runs the daily
   `cipher_integrity_check` is a read-only pragma so it does not
   block writers.
@@ -148,8 +148,8 @@ cipher modes shipped by the cipher peer are accepted; pass them via the
 
 ## Related decisions
 
-- ADR-030 — SQLite encryption at rest (SQLCipher v4 baseline + KDF parameters).
-- ADR-008 — Storage default `better-sqlite3` (synchronous embedded SQLite + WAL hardening).
+- ADR-030 - SQLite encryption at rest (SQLCipher v4 baseline + KDF parameters).
+- ADR-008 - Storage default `better-sqlite3` (synchronous embedded SQLite + WAL hardening).
 
 ---
 
@@ -159,4 +159,4 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

@@ -19,7 +19,7 @@ A single `Provider` interface adapts every backend. Switching models is a one-li
 
 ### 3. Streaming-first API
 
-Every operation is an `AsyncIterable<...>` of typed events. Nothing happens behind the curtain — tokens, tool calls, memory writes, handoffs, compaction, fallback transitions are all events your code can react to.
+Every operation is an `AsyncIterable<...>` of typed events. Nothing happens behind the curtain - tokens, tool calls, memory writes, handoffs, compaction, fallback transitions are all events your code can react to.
 
 ### 4. ESM-only
 
@@ -43,11 +43,11 @@ The audit log is encrypted-at-rest and SHA-256 hash-chained. Tampering breaks th
 
 ### 9. The runtime is durable
 
-Workflows checkpoint after every step. Agent runs serialise to JSON. Pending approvals can survive a process restart on a different machine. (One current limit: a granted approval resumed on another machine is recorded but the approved tool is not re-executed yet — see the caveat in [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).)
+Workflows checkpoint after every step. Agent runs serialise to JSON. Pending approvals can survive a process restart on a different machine. (One current limit: a granted approval resumed on another machine is recorded but the approved tool is not re-executed yet - see the caveat in [Agent runtime § Durable HITL](/guide/agent-runtime#durable-hitl).)
 
 ### 10. Human-in-the-loop is a primitive
 
-`pause(value)` in the workflow engine and `tool.approval.requested` in the agent runtime are first-class — not bolted on, not opaque, not forced through a hosted dashboard.
+`pause(value)` in the workflow engine and `tool.approval.requested` in the agent runtime are first-class - not bolted on, not opaque, not forced through a hosted dashboard.
 
 ### 11. Memory is a real model, not a vector DB
 
@@ -112,10 +112,10 @@ A few feature requests have been turned down because they would contradict a pri
 
 ## Next steps
 
-- [Privacy](/guide/privacy) — the no-phone-home contract.
-- [Security](/guide/security) — sandbox + audit + supply chain.
-- [Architecture](/guide/architecture) — the layered design.
+- [Privacy](/guide/privacy) - the no-phone-home contract.
+- [Security](/guide/security) - sandbox + audit + supply chain.
+- [Architecture](/guide/architecture) - the layered design.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

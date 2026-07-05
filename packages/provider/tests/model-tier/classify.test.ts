@@ -35,7 +35,7 @@ function provider(modelId: string): Provider {
   };
 }
 
-describe('classifyModelTier — per-family fixtures', () => {
+describe('classifyModelTier - per-family fixtures', () => {
   it.each([
     ['claude-haiku-4-5', 'fast'],
     ['anthropic/claude-sonnet-4-5', 'balanced'],
@@ -84,7 +84,7 @@ describe('classifyModelTier — per-family fixtures', () => {
   });
 });
 
-describe('classifyModelTier — error paths', () => {
+describe('classifyModelTier - error paths', () => {
   it('throws InvalidProviderError on null provider', () => {
     expect(() => classifyModelTier(null as unknown as { name: string; modelId: string })).toThrow(
       InvalidProviderError,
@@ -102,7 +102,7 @@ describe('classifyModelTier — error paths', () => {
   });
 });
 
-describe('classifyModelTier — Bedrock cross-region ids (core-provider-11)', () => {
+describe('classifyModelTier - Bedrock cross-region ids (core-provider-11)', () => {
   it.each([
     ['us.anthropic.claude-haiku-4-5-v1:0', 'fast'],
     ['eu.anthropic.claude-sonnet-4-5-20250929-v1:0', 'balanced'],

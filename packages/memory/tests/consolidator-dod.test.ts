@@ -102,7 +102,7 @@ function captureSpans(): Tracer & {
   };
 }
 
-describe('Phase 10c DoD — Deep phase drains 10 fixture pending pairs', () => {
+describe('Phase 10c DoD - Deep phase drains 10 fixture pending pairs', () => {
   beforeEach(() => {
     _resetBypassWarningForTesting();
   });
@@ -206,7 +206,7 @@ describe('Phase 10c DoD — Deep phase drains 10 fixture pending pairs', () => {
     const closed = rows.find((p) => p.input.factId === candidate.id);
     expect(closed?.decision).toBe('judge-unparseable');
 
-    // Run 3: nothing left to bill — the poisoned row never re-fires.
+    // Run 3: nothing left to bill - the poisoned row never re-fires.
     await memory.consolidator.fireNow('deep', scope);
     expect(provider.calls.length).toBe(2);
     consoleWarn.mockRestore();
@@ -254,7 +254,7 @@ describe('Phase 10c DoD — Deep phase drains 10 fixture pending pairs', () => {
   });
 });
 
-describe('Phase 10c DoD — DLQ retry succeeds after backoff; permanent-failure after max attempts', () => {
+describe('Phase 10c DoD - DLQ retry succeeds after backoff; permanent-failure after max attempts', () => {
   it('transitions a DLQ row to permanent failure after dlqMaxRetries attempts', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -275,7 +275,7 @@ describe('Phase 10c DoD — DLQ retry succeeds after backoff; permanent-failure 
         maxOutput: 4_000,
       },
       async generate() {
-        throw new Error('429 rate limit — provider down');
+        throw new Error('429 rate limit - provider down');
       },
       stream: () => {
         throw new Error('not implemented');
@@ -301,7 +301,7 @@ describe('Phase 10c DoD — DLQ retry succeeds after backoff; permanent-failure 
     expect(failed?.status).toBe('failed');
     expect(store.__consolidator?.dlq.length ?? 0).toBe(1);
 
-    // Run drain three times — each one fails again and reschedules
+    // Run drain three times - each one fails again and reschedules
     // until the row hits `dlqMaxRetries`.
     for (let attempt = 0; attempt < 5; attempt++) {
       clock += 60_000;
@@ -318,7 +318,7 @@ describe('Phase 10c DoD — DLQ retry succeeds after backoff; permanent-failure 
   });
 });
 
-describe('MCON-10 — DLQ rows carry phase + slice; drainDlq replays under the run envelope', () => {
+describe('MCON-10 - DLQ rows carry phase + slice; drainDlq replays under the run envelope', () => {
   it('records the failed phase + messageIds at enqueue, and the replay is a real consolidator run', async () => {
     const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
     let clock = 0;
@@ -339,7 +339,7 @@ describe('MCON-10 — DLQ rows carry phase + slice; drainDlq replays under the r
       async generate() {
         if (failNext) {
           failNext = false;
-          throw new Error('429 rate limit — provider down');
+          throw new Error('429 rate limit - provider down');
         }
         return {
           text: '{"facts":[]}',
@@ -388,7 +388,7 @@ describe('MCON-10 — DLQ rows carry phase + slice; drainDlq replays under the r
     expect(replay?.triggerKind).toBe('manual');
   });
 
-  it('replays the PERSISTED phase — a failed deep run is retried as deep, not extraction', async () => {
+  it('replays the PERSISTED phase - a failed deep run is retried as deep, not extraction', async () => {
     const store = createInMemoryStore({ withConflictStore: true, withConsolidatorStore: true });
     let clock = 0;
     const judged: string[] = [];
@@ -461,7 +461,7 @@ describe('MCON-10 — DLQ rows carry phase + slice; drainDlq replays under the r
   });
 });
 
-describe('Phase 10c DoD — UTC reset across simulated date change', () => {
+describe('Phase 10c DoD - UTC reset across simulated date change', () => {
   it('budget resets when the wall clock crosses UTC midnight + the standard phase resumes', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -526,7 +526,7 @@ describe('Phase 10c DoD — UTC reset across simulated date change', () => {
     await memory.consolidator.fireNow('standard', scope);
     expect(extractCalls).toBe(1);
 
-    // Cross UTC midnight — budget resets and the phase runs again.
+    // Cross UTC midnight - budget resets and the phase runs again.
     clock = Date.parse('2026-04-22T00:05:00Z');
     await memory.session.push(scope, { role: 'user', content: 'second conversation slice' });
     await memory.consolidator.fireNow('standard', scope);
@@ -536,7 +536,7 @@ describe('Phase 10c DoD — UTC reset across simulated date change', () => {
   });
 });
 
-describe('Phase 10c DoD — Every phase emits memory.consolidate AISpan', () => {
+describe('Phase 10c DoD - Every phase emits memory.consolidate AISpan', () => {
   it('records duration_ms / facts_extracted / budget_used_usd attributes', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -578,7 +578,7 @@ describe('Phase 10c DoD — Every phase emits memory.consolidate AISpan', () => 
   });
 });
 
-describe('Phase 10c DoD — consolidator.status() shape', () => {
+describe('Phase 10c DoD - consolidator.status() shape', () => {
   it('exposes lastRuns / queueDepth / dlqSize / deferredRuns / budgetRemaining', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -608,7 +608,7 @@ describe('Phase 10c DoD — consolidator.status() shape', () => {
   });
 });
 
-describe('Phase 10c DoD — Decay reflected in search ranking + age-14 ≈ exp(-2)', () => {
+describe('Phase 10c DoD - Decay reflected in search ranking + age-14 ≈ exp(-2)', () => {
   it('boosts the score of fresh facts over decayed facts', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -639,7 +639,7 @@ describe('Phase 10c DoD — Decay reflected in search ranking + age-14 ≈ exp(-
   });
 });
 
-describe('Phase 10c DoD — Lock contention serializes runs and persists deferred_runs', () => {
+describe('Phase 10c DoD - Lock contention serializes runs and persists deferred_runs', () => {
   it('competing trigger defers and the counter survives status() reload', async () => {
     const store = createInMemoryStore({ withConsolidatorStore: true });
     const scope: SessionScope = { userId: 'alex' };
@@ -667,7 +667,7 @@ describe('Phase 10c DoD — Lock contention serializes runs and persists deferre
 
 vi.mock; // keep vi import alive across compiles
 
-describe('Phase 10c DoD — Trigger spec deserves @graphorin/triggers wiring (DEC-150)', () => {
+describe('Phase 10c DoD - Trigger spec deserves @graphorin/triggers wiring (DEC-150)', () => {
   it('registers cron + idle triggers; the callback fires consolidator.trigger(...)', async () => {
     const store = createInMemoryStore({ withConsolidatorStore: true });
     const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
@@ -719,7 +719,7 @@ describe('Phase 10c DoD — Trigger spec deserves @graphorin/triggers wiring (DE
     expect(cronEntry?.spec).toBe('0 3 * * *');
 
     // Firing the registered callback dispatches a phase via the
-    // consolidator — same code path as a manual `trigger(...)` call
+    // consolidator - same code path as a manual `trigger(...)` call
     // (DEC-150).
     await memory.session.push(scope, {
       role: 'user',
@@ -732,7 +732,7 @@ describe('Phase 10c DoD — Trigger spec deserves @graphorin/triggers wiring (DE
   });
 });
 
-describe('Phase 10c DoD — Standard phase advances the cursor + replay is a no-op', () => {
+describe('Phase 10c DoD - Standard phase advances the cursor + replay is a no-op', () => {
   it('second invocation without new messages produces zero new facts', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -767,7 +767,7 @@ describe('Phase 10c DoD — Standard phase advances the cursor + replay is a no-
   });
 });
 
-describe('MCON-7/MCON-8 — per-phase providers + enforced cooldown', () => {
+describe('MCON-7/MCON-8 - per-phase providers + enforced cooldown', () => {
   function namedProvider(name: string, reply: () => string) {
     const calls: ProviderRequest[] = [];
     const provider: Provider & { calls: ProviderRequest[] } = {
@@ -858,7 +858,7 @@ describe('MCON-7/MCON-8 — per-phase providers + enforced cooldown', () => {
     const first = await memory.consolidator.trigger({ kind: 'idle' }, scope);
     expect(first?.status).not.toBe('deferred');
 
-    // 10s later — well inside the 60s cooldown: the trigger defers.
+    // 10s later - well inside the 60s cooldown: the trigger defers.
     clock += 10_000;
     await memory.session.push(scope, { role: 'user', content: 'second slice' });
     const second = await memory.consolidator.trigger({ kind: 'idle' }, scope);

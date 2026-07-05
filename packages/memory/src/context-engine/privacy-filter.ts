@@ -1,7 +1,7 @@
 /**
  * D2 sensitivity-tier filter. Tags every memory record with a
  * decision (`'pass'` / `'drop'`) before the assembled prompt is
- * compiled. The filter is *tier-based* — it trusts the
+ * compiled. The filter is *tier-based* - it trusts the
  * `record.sensitivity` tag the consolidator / writer set; the
  * outbound prompt-redaction middleware (D3, ADR-045) is the
  * universal backstop for content the filter cannot see (raw user
@@ -33,7 +33,7 @@ export interface PrivacyFilterContext {
   readonly providerTrust?: LocalProviderTrust;
   /**
    * Per-user opt-in for cloud upload of `'internal'`-tier content.
-   * Default `false` — `'internal'` content does not leave the
+   * Default `false` - `'internal'` content does not leave the
    * loopback boundary unless the user explicitly opts in.
    */
   readonly cloudUploadConsent?: boolean;
@@ -75,7 +75,7 @@ export type PrivacyDecisionReason =
  * - `'public-tls'` / `'public-mtls'` → `['public']`.
  * - `'public-cleartext'` → `['public']`.
  *
- * Per-provider overrides always win over the defaults — pass
+ * Per-provider overrides always win over the defaults - pass
  * `providerAcceptsSensitivity` explicitly to override.
  *
  * @stable

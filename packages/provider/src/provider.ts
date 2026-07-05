@@ -1,5 +1,5 @@
 /**
- * `createProvider(...)` — wrap an adapter return value in the canonical
+ * `createProvider(...)` - wrap an adapter return value in the canonical
  * Graphorin `Provider` shape and apply optional sensitivity / capability
  * overrides.
  *

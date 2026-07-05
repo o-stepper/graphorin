@@ -1,5 +1,5 @@
 /**
- * Coverage for `withCostTracking` — onUsage hook fires on stream
+ * Coverage for `withCostTracking` - onUsage hook fires on stream
  * `finish` events and on `generate()`; `priceLookup` populates
  * `costUsd`; absent hook is a no-op.
  */

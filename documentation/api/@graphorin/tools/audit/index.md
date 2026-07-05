@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,9 +10,9 @@ Audit-event emitter + counter registry for `@graphorin/tools`.
 
 Two surfaces:
 
-- `emitToolAudit(...)` / `onToolAudit(...)` — sanitized audit-event
+- `emitToolAudit(...)` / `onToolAudit(...)` - sanitized audit-event
   broadcasting, mirroring the discipline used by `@graphorin/security`.
-- `incrementCounter(...)` / `snapshotCounters(...)` — in-process
+- `incrementCounter(...)` / `snapshotCounters(...)` - in-process
   metrics registry exported through [CounterSnapshot](/api/@graphorin/tools/interfaces/CounterSnapshot.md).
 
 ## Interfaces
@@ -20,7 +20,7 @@ Two surfaces:
 | Interface | Description |
 | ------ | ------ |
 | [ToolAuditActor](/api/@graphorin/tools/audit/interfaces/ToolAuditActor.md) | Lightweight actor descriptor for tool-subsystem audit events. |
-| [ToolAuditEvent](/api/@graphorin/tools/audit/interfaces/ToolAuditEvent.md) | Sanitized payload emitted by the tool subsystem. Listeners receive only metadata that is safe to log — the actual tool args, the matched bytes, the secret values are NEVER forwarded. |
+| [ToolAuditEvent](/api/@graphorin/tools/audit/interfaces/ToolAuditEvent.md) | Sanitized payload emitted by the tool subsystem. Listeners receive only metadata that is safe to log - the actual tool args, the matched bytes, the secret values are NEVER forwarded. |
 
 ## Type Aliases
 
@@ -36,7 +36,7 @@ Two surfaces:
 | [\_getToolAuditListenerCountForTesting](/api/@graphorin/tools/audit/functions/getToolAuditListenerCountForTesting.md) | Snapshot of currently-registered listener count. Used by tests. |
 | [\_resetToolAuditListenersForTesting](/api/@graphorin/tools/audit/functions/resetToolAuditListenersForTesting.md) | Reset listener registry. Used by tests. |
 | [createRegisteredEvent](/api/@graphorin/tools/audit/functions/createRegisteredEvent.md) | Convenience factory for the `tool:registered` audit row. Carries the resolved trust class + side-effect class + per-tool fields the downstream cassette / replay layers care about. |
-| [emitToolAudit](/api/@graphorin/tools/audit/functions/emitToolAudit.md) | Emit an audit event. Never throws across listener boundaries — a listener that throws is isolated so it cannot tear down the tool execution path. |
+| [emitToolAudit](/api/@graphorin/tools/audit/functions/emitToolAudit.md) | Emit an audit event. Never throws across listener boundaries - a listener that throws is isolated so it cannot tear down the tool execution path. |
 | [onToolAudit](/api/@graphorin/tools/audit/functions/onToolAudit.md) | Subscribe to tool-subsystem audit events. Returns a teardown function that removes the listener; callers must invoke it on shutdown to avoid leaks in long-running server processes. |
 
 ## References

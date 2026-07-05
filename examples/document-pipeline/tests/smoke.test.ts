@@ -1,12 +1,12 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/document-pipeline`. Every assertion
  * runs against the real `InMemoryCheckpointStore` shipped by
  * `@graphorin/workflow` so concurrency + channel semantics are
  * exercised end-to-end:
  *
- *  1. `VERSION` mirrors `package.json` (`0.5.0`).
+ *  1. `VERSION` mirrors `package.json` (`0.6.0`).
  *  2. A 4-page synthetic document drives the pipeline to `completed`
  *     with chunks, embeddings, all 4 page summaries, the index
  *     timestamp, and a populated `parserNotice` — and the per-channel
@@ -49,8 +49,8 @@ function pages(): ReturnType<typeof buildSyntheticDocument> {
 }
 
 describe('examples/document-pipeline — smoke', () => {
-  it('exposes VERSION = 0.5.0', () => {
-    expect(VERSION).toBe('0.5.0');
+  it('exposes VERSION = 0.6.0', () => {
+    expect(VERSION).toBe('0.6.0');
   });
 
   it('runs the 4-page pipeline end-to-end with all expected state populated', async () => {

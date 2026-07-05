@@ -1,5 +1,5 @@
 /**
- * Phase 03b performance benchmark — `verifyToken` warm-cache hit
+ * Phase 03b performance benchmark - `verifyToken` warm-cache hit
  * latency. The DoD requires < 100 µs p95 for cache-hit verifications
  * (matches the ~30 µs target in the architecture spec). The actual
  * threshold is left somewhat loose so the test is stable on slow CI
@@ -14,7 +14,7 @@ import { TokenVerifier } from '../../src/auth/verify.js';
 
 import { createMemoryAuthTokenStore } from './_helpers.js';
 
-describe('Phase 03b — verifyToken warm-cache latency', () => {
+describe('Phase 03b - verifyToken warm-cache latency', () => {
   it('p95 cache-hit verify is below 200 µs (DoD: < 100 µs target, headroom for CI)', async () => {
     const tokenStore = createMemoryAuthTokenStore();
     const pepper = generatePepper();

@@ -5,9 +5,9 @@
  *   GET    /triggers                    (scope `triggers:read`)
  *   GET    /triggers/:id                (scope `triggers:read`)
  *   POST   /triggers/:id/fire           (scope `triggers:fire`)
- *   POST   /triggers/:id/disable        (scope `triggers:disable`) — flag flip
- *   POST   /triggers/:id/enable         (scope `triggers:disable`) — flag flip
- *   DELETE /triggers/:id                (scope `triggers:disable`) — unregister
+ *   POST   /triggers/:id/disable        (scope `triggers:disable`) - flag flip
+ *   POST   /triggers/:id/enable         (scope `triggers:disable`) - flag flip
+ *   DELETE /triggers/:id                (scope `triggers:disable`) - unregister
  *   POST   /triggers/prune              (scope `triggers:disable`)
  *
  * Response shapes mirror the persisted `TriggerState` rows so CLI +

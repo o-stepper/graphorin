@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # agent-registry
 
-`AgentRegistry` — the per-session-manager catalogue of every agent
+`AgentRegistry` - the per-session-manager catalogue of every agent
 that has ever produced a message in a session. The registry exists
 to keep replay working long after the agent has been renamed or
 deleted: orphan `agent_id` references on stored messages can always
@@ -27,7 +27,7 @@ never construct an `AgentRegistry` directly.
 
 | Interface | Description |
 | ------ | ------ |
-| [RegisterAgentOptions](/api/@graphorin/sessions/agent-registry/interfaces/RegisterAgentOptions.md) | Optional options accepted by [AgentRegistry.register](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md#register). The registration is idempotent on `id` — re-registering the same id refreshes the display name + tags. |
+| [RegisterAgentOptions](/api/@graphorin/sessions/agent-registry/interfaces/RegisterAgentOptions.md) | Optional options accepted by [AgentRegistry.register](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md#register). The registration is idempotent on `id` - re-registering the same id refreshes the display name + tags. |
 | [RetireAgentOptions](/api/@graphorin/sessions/agent-registry/interfaces/RetireAgentOptions.md) | Optional options accepted by [AgentRegistry.retire](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md#retire) and [AgentRegistry.delete](/api/@graphorin/sessions/agent-registry/classes/AgentRegistry.md#delete). |
 
 ## Type Aliases

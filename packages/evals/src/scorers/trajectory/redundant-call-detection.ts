@@ -1,5 +1,5 @@
 /**
- * `redundantCallDetection` — passes when the harness made no more than
+ * `redundantCallDetection` - passes when the harness made no more than
  * `maxRedundant` (default `0`) redundant repeat calls. A call is redundant
  * when an *earlier successful* call with the same name and deep-equal
  * arguments already produced that result. Only prior `'ok'` calls seed the

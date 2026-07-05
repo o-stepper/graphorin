@@ -266,9 +266,9 @@ describe('deferred loading + tool_search (WI-05)', () => {
   });
 });
 
-// --- TL-7 — promotions persist on RunState across suspend/resume --------------
+// --- TL-7 - promotions persist on RunState across suspend/resume --------------
 
-describe('TL-7 — tool_search promotions survive suspend/resume', () => {
+describe('TL-7 - tool_search promotions survive suspend/resume', () => {
   it('persists promoted names on RunState and keeps them in the resumed catalogue', async () => {
     const sharedTools = (): Tool<unknown, unknown, unknown>[] => [
       makeTool('echo', noop),
@@ -294,7 +294,7 @@ describe('TL-7 — tool_search promotions survive suspend/resume', () => {
     });
     const result = await agent.run('go');
     expect(result.status).toBe('awaiting_approval');
-    // The discovery is part of the trajectory — it must be ON the state.
+    // The discovery is part of the trajectory - it must be ON the state.
     expect(result.state.promotedTools).toContain('weather_lookup');
 
     // Resume on a FRESH instance (process restart): the promoted tool is

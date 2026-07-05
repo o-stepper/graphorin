@@ -1,5 +1,5 @@
 /**
- * `AUDIT_ONLY_GUARD` — the framework default for `'unknown'` tools
+ * `AUDIT_ONLY_GUARD` - the framework default for `'unknown'` tools
  * per DEC-153. Hashes every region declared by the reader before and
  * after the tool runs; on mismatch it emits a
  * `memory:guard:mismatch` audit event but does **not** roll back.

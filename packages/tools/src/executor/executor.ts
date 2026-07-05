@@ -1,5 +1,5 @@
 /**
- * `createToolExecutor(...)` — runs `Tool[]` invocations.
+ * `createToolExecutor(...)` - runs `Tool[]` invocations.
  *
  * Responsibilities, per the working-plan deliverables:
  *
@@ -97,7 +97,7 @@ export interface ExecutorOptions {
   readonly maxParallelTools?: number;
   /** Audit emitter override. Defaults to the global registry. */
   readonly emitAudit?: (event: ToolAuditEvent) => void;
-  /** Approval gate — invoked when a tool's `needsApproval` resolves to `true`. */
+  /** Approval gate - invoked when a tool's `needsApproval` resolves to `true`. */
   readonly approvalGate?: ApprovalGate;
   /**
    * Declarative tool-argument policy guard (D4 / Progent). Consulted
@@ -195,12 +195,12 @@ export interface ExecutorOptions {
    * C3: transparent bounded retry for transient tool failures. A failed
    * attempt whose error kind is in `kinds` is silently re-executed with
    * exponential backoff (a ToolRateLimitError's `retryAfterMs` wins over
-   * the computed backoff) up to `maxAttempts` TOTAL attempts — but only
+   * the computed backoff) up to `maxAttempts` TOTAL attempts - but only
    * for `pure` / `read-only` tools or tools declaring an
    * `idempotencyKey`, so a retry can never double a side effect.
    *
    * Defaults: `maxAttempts: 3`, `backoffMs: 250`, `kinds: ['rate_limited']`
-   * ('timeout' is deliberately not retried by default — stacked wall-clock
+   * ('timeout' is deliberately not retried by default - stacked wall-clock
    * timeouts multiply run latency; opt in via `kinds` when you want it).
    */
   readonly retry?: {
@@ -269,10 +269,10 @@ export interface DataFlowRecordInput {
  * `@graphorin/security`'s `DataFlowDecision`; the agent maps one to the
  * other so the executor takes no security dependency.
  *
- * - `'allow'`      — proceed silently.
- * - `'flag'`       — shadow-mode detection: audit, then proceed.
- * - `'declassify'` — operator-authorized tainted flow: audit, then proceed.
- * - `'block'`      — enforce-mode block: surface `dataflow_policy_blocked`.
+ * - `'allow'`      - proceed silently.
+ * - `'flag'`       - shadow-mode detection: audit, then proceed.
+ * - `'declassify'` - operator-authorized tainted flow: audit, then proceed.
+ * - `'block'`      - enforce-mode block: surface `dataflow_policy_blocked`.
  */
 export type DataFlowVerdict =
   | { readonly action: 'allow' }
@@ -312,10 +312,10 @@ export interface ExecuteBatchOptions {
    */
   readonly disableRepair?: boolean;
   /**
-   * Run-level capability restriction (D2 — single-writer constraint).
+   * Run-level capability restriction (D2 - single-writer constraint).
    * `'read-only'` deterministically blocks every `side-effecting` /
    * `external-stateful` tool with a `capability_blocked` outcome, no
-   * matter what the model asked for — the enforcement half of the
+   * matter what the model asked for - the enforcement half of the
    * agent-side advertise filter. Absent ⇒ all capabilities (legacy).
    */
   readonly capability?: 'read-only';
@@ -363,7 +363,7 @@ export interface ToolExecutor {
 /**
  * Default wall-clock limit for INLINE tool execution (TL-4). Sandbox
  * tiers carry their own per-tier defaults; inline closures previously
- * had none — a hanging tool that ignored `ctx.signal` blocked the run
+ * had none - a hanging tool that ignored `ctx.signal` blocked the run
  * indefinitely.
  *
  * @stable
@@ -446,14 +446,14 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
   const sandboxResolver = opts.sandboxResolver ?? (() => null);
   const memoryGuardFactory = opts.memoryGuardFactory ?? (() => null);
   const memoryRegionReader = opts.memoryRegionReader;
-  // Default spill writer — writes to `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>`
+  // Default spill writer - writes to `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>`
   // with `0600` permissions and tier-aware sensitivity inheritance.
   const spillWriter = opts.spill ?? createDefaultSpillWriter();
   // TL-6: trust class of the tool that PRODUCED each spill artifact,
   // keyed by handle URI. Handle reads (read_result) re-apply inbound
   // sanitization + dataflow provenance by the PRODUCER's class so an
   // untrusted body cannot launder to trusted through the built-in
-  // reader. In-memory per executor — handles from another executor or
+  // reader. In-memory per executor - handles from another executor or
   // a resumed prior process fall back to the reader-reported class,
   // which the default file reader recovers from the artifact's taint
   // sidecar (tools-03), so the taint survives both boundaries.
@@ -491,7 +491,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     // Run sequential tools first (deterministic ordering).
     // TL-12 (tools-07): `executeOne` is designed not to throw, but a
     // user-supplied hook that does (e.g. a throwing `tracer.span`) must
-    // never SHRINK the batch — a missing slot means the agent pushes no
+    // never SHRINK the batch - a missing slot means the agent pushes no
     // `tool` message for that id, leaving a dangling `tool_use` the next
     // provider request is rejected for. Synthesize an `execution_failed`
     // outcome instead of dropping the slot.
@@ -525,7 +525,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       if (idx !== undefined) results[idx] = completed;
     }
 
-    // Parallel tools — concurrency-bounded.
+    // Parallel tools - concurrency-bounded.
     let inFlight = 0;
     const queue = [...parallelCalls];
     await new Promise<void>((resolve) => {
@@ -586,7 +586,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     }
 
     // D2 single-writer constraint: a read-only run deterministically
-    // blocks writer tools BEFORE validation/approval — the enforcement
+    // blocks writer tools BEFORE validation/approval - the enforcement
     // half behind the agent's advertise filter, so a model (or injected
     // instruction) calling an unadvertised writer still cannot execute.
     if (
@@ -639,7 +639,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       );
 
     // C3: transparent bounded retry for transient failures. Only kinds in
-    // the retry set are eligible, and — critical for correctness — only
+    // the retry set are eligible, and - critical for correctness - only
     // when re-running cannot double a side effect: pure/read-only tools,
     // or tools declaring an idempotencyKey. Each attempt gets its own
     // tool.execute span; the model never sees the swallowed attempts.
@@ -700,7 +700,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       incrementCounter('tool.streaming.tools.invoked.total', { toolName: tool.name });
     }
 
-    // Validate args FIRST (with optional single-round repair) — tools-02.
+    // Validate args FIRST (with optional single-round repair) - tools-02.
     // The approval flow used to run before validation on raw `call.args`,
     // which was a TOCTOU on a security control: a human could approve
     // invalid args X, after which the repair hook rewrote them into
@@ -711,7 +711,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     // can change between the grant and the execution.
     let validatedInput: unknown;
     // Raw-shaped args that passed the schema (post-repair when repair ran)
-    // — what an approval gate / human is shown and what a resume replays.
+    // - what an approval gate / human is shown and what a resume replays.
     let effectiveArgs: unknown = call.args;
     {
       const parsed = tool.inputSchema.safeParse(call.args);
@@ -756,11 +756,11 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       }
     }
 
-    // Approval flow — evaluated on the validated input.
+    // Approval flow - evaluated on the validated input.
     if (tool.needsApproval !== undefined) {
       // TL-11: a static `needsApproval: true` needs no context at all;
       // the function form gets one that is DISPOSED right after the
-      // predicate — previously both forms eagerly built a full per-call
+      // predicate - previously both forms eagerly built a full per-call
       // context (sandbox resolve + streaming channel + abort listener)
       // that was thrown away while its run-signal listener lived on.
       let needsApproval: boolean;
@@ -833,7 +833,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     // D4 Progent tool-argument policy: forbid-before-allow rules over the
     // validated args, evaluated after approval and before the sink gate.
-    // A forbid verdict is a deterministic pre-execution block — the
+    // A forbid verdict is a deterministic pre-execution block - the
     // preventive complement to the (detective) data-flow gate below.
     if (opts.argumentPolicy !== undefined) {
       const decision = opts.argumentPolicy.evaluate({
@@ -935,7 +935,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       'graphorin.tool.sandbox.no_filesystem': prepared.sandbox.noFilesystem,
     });
 
-    // Memory-modification guard — snapshot before; verify after. The
+    // Memory-modification guard - snapshot before; verify after. The
     // guard factory returns null when the configured tier is `'pure'`
     // / `'side-effecting-no-memory'` / when no factory is configured;
     // we then skip the snapshot/verify dance.
@@ -1041,7 +1041,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
           );
         }
       } else {
-        // TL-4: inline closures get an enforced wall-clock limit — the
+        // TL-4: inline closures get an enforced wall-clock limit - the
         // tier-resolved per-tool timeout when set, else the executor
         // default. A tool that hangs and ignores `ctx.signal` fails with
         // kind 'timeout' instead of blocking the run forever.
@@ -1080,7 +1080,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       executeError = caught;
     } finally {
       channel.abort('finished');
-      // TL-11: detach the per-call linked signal — without this every
+      // TL-11: detach the per-call linked signal - without this every
       // settled call left one listener on the run signal for the rest
       // of the run (MaxListeners warnings on long gated runs).
       linkedAbort.release();
@@ -1134,7 +1134,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
 
     if (executeError !== undefined) {
       const cancelled = linkedAbort.signal.aborted;
-      // tools-06: honour the structured carriers before flattening —
+      // tools-06: honour the structured carriers before flattening -
       // sandbox results keep their reported kind, and an author-thrown
       // ToolRateLimitError reaches the model as 'rate_limited'.
       const kind: ToolErrorKind = cancelled
@@ -1222,12 +1222,12 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     // TL-2: a structured (object/array) output that overflows the cap must
     // not be inlined whole. `normalize` always resolves a concrete strategy
     // (default `'middle'`), so when a structured output lands on that default
-    // we route it through spill-to-file instead — the model sees a bounded
+    // we route it through spill-to-file instead - the model sees a bounded
     // preview + a `read_result` handle while the full blob is preserved out of
     // context. An explicitly pinned `'tail'` / `'summarize'` / `'spill-to-file'`
     // is honoured. Under the cap `truncateBody` is a no-op regardless, so small
     // objects and all string outputs pass through unchanged.
-    // TL-6 / tools-03: resolve the PRODUCER's taint before truncation —
+    // TL-6 / tools-03: resolve the PRODUCER's taint before truncation -
     // a handle read returns content produced by an earlier tool, and a
     // re-spill of that content must persist the producer's class (not
     // read_result's own) into the new artifact's sidecar. Resolution
@@ -1367,14 +1367,14 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
       });
     }
 
-    // TL-6: a handle read returns content PRODUCED by an earlier tool —
+    // TL-6: a handle read returns content PRODUCED by an earlier tool -
     // sanitize and record provenance by the PRODUCER's trust class
     // (resolved above, before truncation), not the reader's own
     // (read_result is a trusted built-in; without this an untrusted
     // spill laundered to trusted on the way back in).
     // TL-6: object outputs bypass `wrapOutput` untouched (WI-10), so for
     // a tainted handle read the `content` string field is defanged
-    // in place — that is the channel the model actually reads.
+    // in place - that is the channel the model actually reads.
     let effectiveOutput = envelope.output;
     if (
       producerTaint !== undefined &&
@@ -1397,7 +1397,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     const sanitization = applyInboundSanitization({
       body: truncation.body,
       // When producer taint fired, the producer-class default (always
-      // 'detect-and-strip-and-wrap' — taint only fires for untrusted
+      // 'detect-and-strip-and-wrap' - taint only fires for untrusted
       // classes) overrides the reader's own baked policy: the reader was
       // classified for ITS provenance, not for the content it relays.
       policy:
@@ -1512,7 +1512,7 @@ export function createToolExecutor(opts: ExecutorOptions): ToolExecutor {
     }
     // Record this output's provenance so later sink gates can detect
     // untrusted-to-sink flows (WI-12 / P1-3). Uses the sanitized text the
-    // model will actually see — that is the only content it can forward.
+    // model will actually see - that is the only content it can forward.
     if (opts.dataFlowGuard !== undefined) {
       opts.dataFlowGuard.record({
         toolName: tool.name,
@@ -1727,7 +1727,7 @@ function mapSandboxPolicy(
 function linkSignal(parent: AbortSignal): {
   readonly signal: AbortSignal;
   readonly abort: () => void;
-  /** TL-11: detach from the parent — settled calls must not accumulate listeners. */
+  /** TL-11: detach from the parent - settled calls must not accumulate listeners. */
   readonly release: () => void;
 } {
   const ac = new AbortController();
@@ -1777,11 +1777,11 @@ async function raceWithCancellation<T>(
 
 function wrapOutput(rawOutput: unknown, sanitizedText: string, originalText: string): unknown {
   // When the rendered text is byte-identical to the original (nothing was
-  // truncated or sanitized), pass the typed output through unchanged — small
+  // truncated or sanitized), pass the typed output through unchanged - small
   // objects keep their structure for downstream consumers (code-mode, etc).
   if (sanitizedText === originalText) return rawOutput;
   // Otherwise the body was bounded (truncated) and/or had imperative content
-  // stripped. The model must see exactly that bounded text — never the full
+  // stripped. The model must see exactly that bounded text - never the full
   // structured object (TL-2). Previously a non-string output was returned
   // whole here, so the cap + inbound sanitization were computed and thrown
   // away and the agent inlined the entire blob (and any injection past the

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function runStart(options?): Promise<{
 
 Defined in: packages/cli/src/commands/start.ts:54
 
-Programmatic entry — used both by the CLI binary and by tests so
+Programmatic entry - used both by the CLI binary and by tests so
 the spawn cost of running the binary is paid only when an operator
 actually invokes `graphorin start` from a shell.
 

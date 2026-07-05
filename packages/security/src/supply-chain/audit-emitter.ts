@@ -37,7 +37,7 @@ export interface SupplyChainAuditActor {
 }
 
 /**
- * One audit event. The payload is intentionally minimal — never
+ * One audit event. The payload is intentionally minimal - never
  * carry credentials or token material; only safe metadata.
  *
  * @stable

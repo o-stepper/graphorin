@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/secrets/stores/env.ts:45
 
-`SecretsStore` backed by `process.env`. Read-only by default —
+`SecretsStore` backed by `process.env`. Read-only by default -
 enabling `allowMutation: true` keeps the API workable for tests but
 still emits a single `console.warn` per mutation.
 
@@ -106,7 +106,7 @@ list(_scope?): Promise<readonly SecretMetadata[]>;
 
 Defined in: packages/security/src/secrets/stores/env.ts:157
 
-Returns metadata about every key — never the values themselves.
+Returns metadata about every key - never the values themselves.
 
 #### Parameters
 

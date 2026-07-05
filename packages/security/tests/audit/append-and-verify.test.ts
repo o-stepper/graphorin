@@ -5,7 +5,7 @@ import { verifyAuditChain } from '../../src/audit/verify-chain.js';
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('@graphorin/security/audit — appendAudit + verifyAuditChain', () => {
+describe('@graphorin/security/audit - appendAudit + verifyAuditChain', () => {
   it('appends a single entry with the genesis prev hash', async () => {
     const db = createMemoryAuditDb();
     const entry = await appendAudit(db, {

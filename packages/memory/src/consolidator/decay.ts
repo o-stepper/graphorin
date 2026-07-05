@@ -15,7 +15,7 @@
 export const DEFAULT_DECAY_TAU_DAYS = 7;
 
 /**
- * Default archive threshold — facts whose retention falls below this
+ * Default archive threshold - facts whose retention falls below this
  * value are soft-archived in the light phase. `0.05` matches the
  * documented forgetting policy for the memory system.
  *
@@ -27,7 +27,7 @@ export const DEFAULT_DECAY_ARCHIVE_THRESHOLD = 0.05;
  * Compute the retention score for a fact given its age, last-access
  * recency, and accumulated `strength`. Larger `strength` means the
  * fact has been accessed more often, so the retention curve flattens
- * — `score = base * exp(-elapsedDays / (tau * strength))`.
+ * - `score = base * exp(-elapsedDays / (tau * strength))`.
  *
  * @stable
  */
@@ -75,7 +75,7 @@ export function shouldArchive(args: {
 }
 
 /**
- * Neutral importance used when a fact carries no importance hint —
+ * Neutral importance used when a fact carries no importance hint -
  * the midpoint of the `[0, 1]` range, so an unscored fact contributes
  * an importance factor of exactly `1.0` (`salience === retention`).
  *
@@ -99,7 +99,7 @@ export interface SalienceWeights {
    */
   readonly importance: number;
   /**
-   * Penalty applied to a **quarantined** fact (P1-4) — the explicit
+   * Penalty applied to a **quarantined** fact (P1-4) - the explicit
    * security-risk negative term. At the default `0.7`, a quarantined
    * fact keeps only `0.3` of its retention, so it is evicted first under
    * capacity pressure. Never a hard delete: the fact is archived,
@@ -107,18 +107,18 @@ export interface SalienceWeights {
    */
   readonly quarantine: number;
   /**
-   * Mild penalty for a fact with non-first-party provenance (P1-4) —
+   * Mild penalty for a fact with non-first-party provenance (P1-4) -
    * e.g. `'tool'` / `'imported'` content that did not originate with the
    * user. At the default `0.2` such a fact keeps `0.8` of its retention.
    */
   readonly foreignProvenance: number;
   /**
-   * Retrieval-frequency reinforcement (D3) — the use-it-or-lose-it
+   * Retrieval-frequency reinforcement (D3) - the use-it-or-lose-it
    * signal. How strongly the monotonic access counter stretches
    * retention: the factor is
    * `1 + weight * min(1, log1p(count) / log1p(saturation))`, saturating
    * at {@link ACCESS_REINFORCEMENT_SATURATION} accesses. At the default
-   * `0` the factor is exactly `1` — behaviour is byte-identical until an
+   * `0` the factor is exactly `1` - behaviour is byte-identical until an
    * operator opts in (e.g. `0.3` ⇒ a heavily-used fact keeps up to 1.3x
    * its retention). Optional so existing weight literals stay valid.
    */
@@ -146,7 +146,7 @@ export const DEFAULT_SALIENCE_WEIGHTS: SalienceWeights = Object.freeze({
   importance: 0.6,
   quarantine: 0.7,
   foreignProvenance: 0.2,
-  // D3: reinforcement is opt-in — the default weight 0 keeps salience
+  // D3: reinforcement is opt-in - the default weight 0 keeps salience
   // byte-identical for every fact regardless of its access count.
   accessReinforcement: 0,
 });
@@ -162,7 +162,7 @@ export const DEFAULT_SALIENCE_WEIGHTS: SalienceWeights = Object.freeze({
  * ```
  *
  * Sold as **cost / staleness control, not accuracy**: it only orders
- * what gets archived first when storage is bounded — it never gates
+ * what gets archived first when storage is bounded - it never gates
  * recall. With neutral importance, an active fact, and first-party
  * provenance the factors are all `1`, so `salience === retention`.
  *

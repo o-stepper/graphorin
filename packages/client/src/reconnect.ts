@@ -1,7 +1,7 @@
 /**
  * Pure-functional reconnect-backoff helper. Encapsulated in its own
  * module so the {@link GraphorinClient} stays free of timing
- * heuristics — and so tests can drive the policy with a deterministic
+ * heuristics - and so tests can drive the policy with a deterministic
  * RNG.
  *
  * Algorithm: exponential backoff with full-jitter

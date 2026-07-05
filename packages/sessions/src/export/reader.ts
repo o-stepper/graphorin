@@ -75,7 +75,7 @@ export interface SessionExportReadOptions {
    * not match the supplied `activeEmbedderIds` set, embeddings on
    * imported messages are dropped (with a warning per embedder).
    * Defaults to an empty set, meaning embeddings are always dropped
-   * (the safest default — embeddings produced under a different
+   * (the safest default - embeddings produced under a different
    * embedder are not interchangeable byte-for-byte).
    */
   readonly activeEmbedderIds?: ReadonlyArray<string>;
@@ -209,7 +209,7 @@ export function readSessionExport(
     });
   }
 
-  // Embedder-mismatch warnings — single warning per mismatch encountered.
+  // Embedder-mismatch warnings - single warning per mismatch encountered.
   const accepted = new Set(options.activeEmbedderIds ?? []);
   if (meta.embedderIds !== undefined) {
     for (const id of meta.embedderIds) {

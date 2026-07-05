@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Delivery-layer commentary-phase trace sanitization for
 | Interface | Description |
 | ------ | ------ |
 | [CommentaryAuditSink](/api/@graphorin/server/commentary/interfaces/CommentaryAuditSink.md) | A commentary sink that also exposes a `drain()` so callers (and tests) can await any in-flight audit writes. |
-| [LateBoundCommentarySink](/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md) | A [DeliveryCommentarySink](/api/@graphorin/server/interfaces/DeliveryCommentarySink.md) whose real target is installed later. The WS dispatcher is created before the audit DB opens (IP-21); the server hands it this forwarding sink and calls [LateBoundCommentarySink.bind](/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md#bind) once the audit-writing sink exists. Decisions emitted before binding are dropped — the dispatcher only sanitizes once it is live (after `start()`, by which point the audit DB, if configured, has opened and bound). |
+| [LateBoundCommentarySink](/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md) | A [DeliveryCommentarySink](/api/@graphorin/server/interfaces/DeliveryCommentarySink.md) whose real target is installed later. The WS dispatcher is created before the audit DB opens (IP-21); the server hands it this forwarding sink and calls [LateBoundCommentarySink.bind](/api/@graphorin/server/commentary/interfaces/LateBoundCommentarySink.md#bind) once the audit-writing sink exists. Decisions emitted before binding are dropped - the dispatcher only sanitizes once it is live (after `start()`, by which point the audit DB, if configured, has opened and bound). |
 
 ## Variables
 
@@ -26,7 +26,7 @@ Delivery-layer commentary-phase trace sanitization for
 
 | Function | Description |
 | ------ | ------ |
-| [bridgeCommentaryToAudit](/api/@graphorin/server/commentary/functions/bridgeCommentaryToAudit.md) | Build a commentary sink that appends each sanitization decision to the audit log. Writes serialise through `appendAudit` so concurrent decisions never race on `seq`; a failed write is isolated from the wire — `onWriteError` (default: a console warning) runs instead of throwing. |
+| [bridgeCommentaryToAudit](/api/@graphorin/server/commentary/functions/bridgeCommentaryToAudit.md) | Build a commentary sink that appends each sanitization decision to the audit log. Writes serialise through `appendAudit` so concurrent decisions never race on `seq`; a failed write is isolated from the wire - `onWriteError` (default: a console warning) runs instead of throwing. |
 | [commentaryDecisionToAuditInput](/api/@graphorin/server/commentary/functions/commentaryDecisionToAuditInput.md) | Translate a sanitizer decision into an audit entry. The digests + matched pattern bucket land in `metadata`; raw payloads never do (the sanitizer only ever exposes SHA-256s of the before/after bodies). |
 | [createLateBoundCommentarySink](/api/@graphorin/server/commentary/functions/createLateBoundCommentarySink.md) | - |
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ type VaultAdapter = (ref, ctx) => Promise<SecretValue>;
 Defined in: packages/security/src/secrets/resolvers/vault.ts:17
 
 Concrete adapter signature plugged into `setVaultAdapter(...)`. The
-built-in resolver only ships the **pattern** — a real Vault adapter
+built-in resolver only ships the **pattern** - a real Vault adapter
 lives in the optional `@graphorin/secret-vault` package (post-MVP).
 
 ## Parameters

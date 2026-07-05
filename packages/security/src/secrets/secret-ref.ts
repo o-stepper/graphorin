@@ -49,7 +49,7 @@ export const AUTHORITY_OPTIONAL_SCHEMES: ReadonlySet<string> = new Set([
 /**
  * Internal parsed shape for a single `SecretRef` URI. Conforms to the
  * cross-package `SecretRef` contract declared in `@graphorin/core` and
- * adds nothing on top of it — richer access (split authority, per-key
+ * adds nothing on top of it - richer access (split authority, per-key
  * multi-value query) is exposed through dedicated helpers below.
  *
  * @stable
@@ -85,7 +85,7 @@ export interface SecretRefValidationResult {
  */
 export interface ValidateSecretRefsOptions {
   /**
-   * Allow `literal:` refs in the input. Off by default — `literal:` is
+   * Allow `literal:` refs in the input. Off by default - `literal:` is
    * gated by the resolver, but validation can fail-fast as well.
    */
   readonly allowLiteral?: boolean;
@@ -413,7 +413,7 @@ export function parseSecretRef(uri: string): ParsedSecretRef {
   // Authority semantics per scheme:
   // - schemes in OPAQUE_ONLY_SCHEMES forbid the `//` prefix
   //   (already enforced earlier).
-  // - every other scheme — built-in or user-registered — accepts both
+  // - every other scheme - built-in or user-registered - accepts both
   //   the opaque (`scheme:path`) and authority-bearing (`scheme://host`)
   //   forms. Stricter requirements for individual schemes (e.g.
   //   `op://`, `azure-kv://` requiring an authority) are the resolver's
@@ -585,7 +585,7 @@ export function validateSecretRefs(
   }> = [];
 
   const matcher = opts.fieldNameMatcher ?? DEFAULT_REF_FIELD_MATCHER;
-  // SPL-15: as documented — BUILTIN_SCHEMES plus every scheme registered
+  // SPL-15: as documented - BUILTIN_SCHEMES plus every scheme registered
   // through registerResolver, consulted at CALL time (op:// etc. no
   // longer flags unknown once its resolver is installed).
   const knownSchemes = new Set(
@@ -663,7 +663,7 @@ export function assertNotNakedString(input: string): void {
   // body (e.g. `:foo`).
   const colonIdx = input.indexOf(':');
   if (colonIdx <= 0) {
-    // SPL-8: a naked string IS the likely raw secret — never echo it
+    // SPL-8: a naked string IS the likely raw secret - never echo it
     // whole into the message or `SecretRefParseError.input` (documented
     // safe-to-log). Keep a 4-char head + length for diagnosis.
     const redacted = `${input.slice(0, 4)}…(${input.length} chars)`;

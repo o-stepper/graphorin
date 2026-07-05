@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -36,7 +36,7 @@ a hard block (`ToolError({ kind: 'inbound_sanitization_blocked' })`).
 Operators running high-assurance deployments opt in per-tool via
 `tool({ failClosed: true })`. Defaulting it to `true` globally would
 convert every web-search / MCP result that quotes imperative text
-into a tool failure — which is why it stays opt-in.
+into a tool failure - which is why it stays opt-in.
 
 ## Parameters
 

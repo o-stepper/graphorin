@@ -51,8 +51,8 @@ afterEach(async () => {
 
 // --- sensitivity gate (truncation pipeline) ---------------------------------
 
-describe('WI-10 — spill sensitivity gate', () => {
-  it('never spills a secret-tier body — falls back to in-place truncation, no handle', async () => {
+describe('WI-10 - spill sensitivity gate', () => {
+  it('never spills a secret-tier body - falls back to in-place truncation, no handle', async () => {
     const { writer, writes } = recordingSpillWriter();
     const result = await truncateBody({
       body: 'S'.repeat(4000),
@@ -94,7 +94,7 @@ describe('WI-10 — spill sensitivity gate', () => {
 
 // --- file result reader -----------------------------------------------------
 
-describe('WI-10 — createFileResultReader', () => {
+describe('WI-10 - createFileResultReader', () => {
   it('reads the full artifact when no range is given', async () => {
     const { root, uri } = await seedArtifact('run-1/call-1.txt', 'hello world');
     const reader = createFileResultReader({ artifactRoot: root });
@@ -152,7 +152,7 @@ describe('WI-10 — createFileResultReader', () => {
 
 // --- read_result built-in tool ----------------------------------------------
 
-describe('WI-10 — createReadResultTool', () => {
+describe('WI-10 - createReadResultTool', () => {
   it('round-trips a spilled artifact: spill writer writes, read_result fetches a range', async () => {
     const writer = createDefaultSpillWriter();
     tmpRoots.push(writer.artifactRoot); // best-effort cleanup of the run dir

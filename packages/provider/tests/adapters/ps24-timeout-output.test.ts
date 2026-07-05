@@ -30,7 +30,7 @@ function captureFetch(capture: { body?: unknown }): typeof fetch {
 function hangingFetch(): typeof fetch {
   return ((_input: unknown, init?: RequestInit): Promise<Response> =>
     new Promise<Response>((_resolve, reject) => {
-      // Honour the abort signal like real fetch does — the timeout
+      // Honour the abort signal like real fetch does - the timeout
       // must surface, not hang the test.
       init?.signal?.addEventListener('abort', () => {
         reject(Object.assign(new Error('aborted'), { name: 'AbortError' }));
@@ -38,7 +38,7 @@ function hangingFetch(): typeof fetch {
     })) as typeof fetch;
 }
 
-describe('PS-24 — default request timeout', () => {
+describe('PS-24 - default request timeout', () => {
   it('llamacpp-server generate() times out against a hung server with a typed error', async () => {
     const provider = llamaCppServerAdapter({
       model: 'qwen2.5',
@@ -68,7 +68,7 @@ describe('PS-24 — default request timeout', () => {
   });
 });
 
-describe('PS-24 — structured output plumbing', () => {
+describe('PS-24 - structured output plumbing', () => {
   it('openai-shaped path maps outputType.jsonSchema to response_format json_schema', async () => {
     const capture: { body?: unknown } = {};
     const provider = llamaCppServerAdapter({

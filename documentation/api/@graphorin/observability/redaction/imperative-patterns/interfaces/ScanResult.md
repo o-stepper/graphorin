@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/observability/src/redaction/imperative-patterns.ts:173
 
 Compiled scan helper. Returns the list of pattern names that fired
 AND the number of bytes the strip would remove if applied. Bounded
-by the budget hint — when exceeded, returns `null` to let the caller
+by the budget hint - when exceeded, returns `null` to let the caller
 apply the best-effort `'detect-failed'` annotation.
 
 ## Stable

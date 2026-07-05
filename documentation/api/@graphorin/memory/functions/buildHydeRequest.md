@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function buildHydeRequest(query, options?): ProviderRequest;
 
 Defined in: packages/memory/src/search/query-transform.ts:133
 
-Build the HyDE pseudo-document request. Pure — no I/O.
+Build the HyDE pseudo-document request. Pure - no I/O.
 
 ## Parameters
 

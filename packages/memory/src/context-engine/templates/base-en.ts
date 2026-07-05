@@ -3,7 +3,7 @@
  * fragments so call sites can import the bundled defaults without
  * dragging the full locale pack.
  *
- * The framework is locale-agnostic — no language is privileged in
+ * The framework is locale-agnostic - no language is privileged in
  * core. Application code can register additional locales via
  * `defineContextLocalePack`.
  *

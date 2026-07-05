@@ -1,5 +1,5 @@
 /**
- * Trust subsystem barrel — exports the shared classifier and the
+ * Trust subsystem barrel - exports the shared classifier and the
  * per-tier sensitivity defaults.
  *
  * @packageDocumentation

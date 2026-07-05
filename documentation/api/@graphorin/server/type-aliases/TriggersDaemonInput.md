@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -20,7 +20,7 @@ Defined in: packages/server/src/app.ts:310
 
 Discriminated union accepted by `CreateServerOptions.triggers`. A
 caller may either supply a fully-built daemon (e.g. constructed
-around a custom `Scheduler`) or just the underlying scheduler — the
+around a custom `Scheduler`) or just the underlying scheduler - the
 server wraps it with [createTriggersDaemon](/api/@graphorin/server/functions/createTriggersDaemon.md) automatically.
 
 ## Stable

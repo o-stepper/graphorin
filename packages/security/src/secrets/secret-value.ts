@@ -103,7 +103,7 @@ let activeCallerContextProvider: (() => SecretValueCallerContext | undefined) | 
 
 /**
  * Internal hook used by `acl.ts` to provide the AsyncLocalStorage-bound
- * caller context. Re-export only for the secrets module — never expose
+ * caller context. Re-export only for the secrets module - never expose
  * to consumers.
  *
  * @internal
@@ -161,7 +161,7 @@ export class SecretValue implements SecretValueContract {
 
   private constructor(buf: Buffer, opts?: SecretValueOptions & { ttlMs?: number }) {
     // Defensive copy: callers may mutate the buffer they passed in. We
-    // also intentionally allow zero-length buffers — `parseSecretRef`
+    // also intentionally allow zero-length buffers - `parseSecretRef`
     // returns SecretValue(0) for empty `env:KEY` lookups.
     this.#value = Buffer.from(buf);
     this.fetchedAt = Date.now();
@@ -181,7 +181,7 @@ export class SecretValue implements SecretValueContract {
 
   /**
    * Wrap a UTF-8 string. Use this at the I/O boundary (env reads,
-   * keyring reads, file reads, OAuth callback response) — not from
+   * keyring reads, file reads, OAuth callback response) - not from
    * deep inside business logic where the raw value would already have
    * leaked to a V8 string.
    *
@@ -204,7 +204,7 @@ export class SecretValue implements SecretValueContract {
   /**
    * Cross-realm safe `instanceof` replacement. Returns `true` for any
    * object carrying `Symbol.for('graphorin.SecretValue')` set to `true`
-   * — including instances constructed in Worker threads / vm contexts.
+   * - including instances constructed in Worker threads / vm contexts.
    *
    * @stable
    */
@@ -282,7 +282,7 @@ export class SecretValue implements SecretValueContract {
   }
 
   /**
-   * One-shot escape hatch — returns the unwrapped string. Audited.
+   * One-shot escape hatch - returns the unwrapped string. Audited.
    * Prefer `.use(fn)` whenever possible.
    *
    * @stable
@@ -304,7 +304,7 @@ export class SecretValue implements SecretValueContract {
   /**
    * @deprecated Use `.reveal()` for the explicit one-shot read or
    *   `.use(fn)` for the preferred scoped read. Retained for the
-   *   `0.x` compatibility window only — slated for removal in the
+   *   `0.x` compatibility window only - slated for removal in the
    *   next major release. The companion lint rule
    *   `@graphorin/no-secret-unwrap` flags every use of this method.
    *
@@ -317,7 +317,7 @@ export class SecretValue implements SecretValueContract {
   /**
    * Best-effort zeroization of the underlying buffer. Idempotent. Does
    * not affect derived V8 strings already created via `.use(fn)` /
-   * `.reveal()` — that limitation is fundamental and documented.
+   * `.reveal()` - that limitation is fundamental and documented.
    *
    * @stable
    */
@@ -359,7 +359,7 @@ export class SecretValue implements SecretValueContract {
 
   /**
    * `JSON.stringify({ apiKey: secret })` invokes `toJSON()` per
-   * ECMA-262 § 25.5.2 — returning the placeholder ensures structured
+   * ECMA-262 § 25.5.2 - returning the placeholder ensures structured
    * logging never serializes the raw value.
    *
    * @stable
@@ -390,7 +390,7 @@ export class SecretValue implements SecretValueContract {
 
 // Pin the cross-realm brand on the prototype so that
 // `(value as Record<symbol, unknown>)[SECRET_VALUE_BRAND]` succeeds for
-// instances constructed in Worker threads — the prototype lookup
+// instances constructed in Worker threads - the prototype lookup
 // works even when the constructor identity differs.
 Reflect.defineProperty(SecretValue.prototype, SECRET_VALUE_BRAND, {
   value: true,

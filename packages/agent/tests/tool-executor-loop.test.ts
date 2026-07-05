@@ -70,7 +70,7 @@ const echoTool = makeTool('echo', async (input) => `echo:${(input as { msg: stri
 
 // --- golden-trace parity (R10) ----------------------------------------------
 
-describe('ToolExecutor loop wiring — golden-trace parity', () => {
+describe('ToolExecutor loop wiring - golden-trace parity', () => {
   it('emits the exact happy-path AgentEvent sequence for a single tool call', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -117,7 +117,7 @@ describe('ToolExecutor loop wiring — golden-trace parity', () => {
 
 // --- now-enforced tool fields ----------------------------------------------
 
-describe('ToolExecutor loop wiring — activated tool fields', () => {
+describe('ToolExecutor loop wiring - activated tool fields', () => {
   it('applies maxResultTokens truncation to the tool result', async () => {
     const big = 'x'.repeat(8000);
     const provider = createMockProvider({
@@ -174,7 +174,7 @@ describe('ToolExecutor loop wiring — activated tool fields', () => {
     expect(endResult).toContain('some external content');
   });
 
-  it('enforces the secretsAllowed ACL — a non-allowlisted secret denies the call', async () => {
+  it('enforces the secretsAllowed ACL - a non-allowlisted secret denies the call', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
       scripts: [
@@ -246,7 +246,7 @@ describe('ToolExecutor loop wiring — activated tool fields', () => {
 
 // --- durable HITL preserved -------------------------------------------------
 
-describe('ToolExecutor loop wiring — durable HITL', () => {
+describe('ToolExecutor loop wiring - durable HITL', () => {
   it('pre-screens approval and suspends before the executor runs (start → requested, no end)', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -278,7 +278,7 @@ describe('ToolExecutor loop wiring — durable HITL', () => {
 
 // --- prepareStep tool overrides + parallel dispatch -------------------------
 
-describe('ToolExecutor loop wiring — step-scoped + multi-call', () => {
+describe('ToolExecutor loop wiring - step-scoped + multi-call', () => {
   it('executes a tool supplied only via a prepareStep tools override', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -292,7 +292,7 @@ describe('ToolExecutor loop wiring — step-scoped + multi-call', () => {
       name: 'override-agent',
       instructions: 'noop',
       provider,
-      // No config.tools — the tool exists only for this step.
+      // No config.tools - the tool exists only for this step.
       prepareStep: () => ({ tools: [overrideTool] }),
     });
 

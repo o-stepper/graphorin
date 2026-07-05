@@ -11,7 +11,7 @@ import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js'
  * regressions if the public surface ever requires more
  * boilerplate to hit the simple "say hi" path.
  */
-describe('Agent — Hello world acceptance (< 20 lines)', () => {
+describe('Agent - Hello world acceptance (< 20 lines)', () => {
   it('runs a one-shot greeting in 9 effective lines of user code', async () => {
     // ---------------- begin user script ----------------
     const provider = createMockProvider({

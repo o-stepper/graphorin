@@ -1,10 +1,10 @@
 /**
- * `languageWhitelist` — block when the input is not in the operator's
+ * `languageWhitelist` - block when the input is not in the operator's
  * allowed-language list. Uses a hand-rolled n-gram-style scoring
  * function so the security package does not pull a third-party
  * language detector. The detector is intentionally conservative: when
  * the score is ambiguous, the guardrail returns `ok: true` to avoid
- * false positives — operators who need stricter detection should
+ * false positives - operators who need stricter detection should
  * inject a custom `detectLanguage(...)` callback.
  *
  * Coverage out-of-the-box: English (`'en'`), Russian (`'ru'`),

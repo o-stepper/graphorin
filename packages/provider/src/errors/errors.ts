@@ -10,14 +10,14 @@ import type { ProviderErrorKind } from '@graphorin/core';
 
 /**
  * Base class for every error thrown by `@graphorin/provider`. Consumers
- * narrow on the discriminant `kind` rather than `instanceof` — both
+ * narrow on the discriminant `kind` rather than `instanceof` - both
  * work, but discriminants are subclass-friendly.
  *
  * @stable
  */
 export class GraphorinProviderError extends Error {
   override readonly name: string = 'GraphorinProviderError';
-  /** Stable discriminant — `'middleware-ordering'`, `'rate-limit-exceeded'`, … */
+  /** Stable discriminant - `'middleware-ordering'`, `'rate-limit-exceeded'`, … */
   readonly kind: string;
   /** Optional remediation hint shown alongside the message. */
   readonly hint?: string;
@@ -139,7 +139,7 @@ export class RateLimitExceededError extends GraphorinProviderError {
 /**
  * `withRedaction` detected a hit AND the policy is configured for
  * `failClosed: true`. The matched value is **never** part of the
- * message — only the pattern name and field path.
+ * message - only the pattern name and field path.
  *
  * @stable
  */

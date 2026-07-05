@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Workflow dynamic-task primitive. A node returns one or more
 `Dispatch(nodeName, args)` values to schedule additional tasks in the
 next execution step.
 
-The class is intentionally tiny — the engine inspects only the public
+The class is intentionally tiny - the engine inspects only the public
 `nodeName` and `args` fields. The shape is **Graphorin's own design**
 (the name `Dispatch` is part of the public API).
 

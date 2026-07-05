@@ -1,7 +1,7 @@
 /**
  * C2 / SEP-1303 conformance (tools-06): every ToolErrorKind the executor
- * can produce surfaces as a RETURNED, model-visible `ToolError` outcome —
- * never a thrown protocol error — so the model can read the kind and
+ * can produce surfaces as a RETURNED, model-visible `ToolError` outcome -
+ * never a thrown protocol error - so the model can read the kind and
  * self-correct. Also pins the two previously-dead kinds now produced:
  * `sandbox_violation` (from the sandbox's structured result) and
  * `rate_limited` (from an author-thrown ToolRateLimitError).
@@ -46,7 +46,7 @@ async function runOne(args: {
     stepNumber: 1,
     ...(args.capability !== undefined ? { capability: args.capability } : {}),
   });
-  // SEP-1303: the batch NEVER shrinks and never throws — the failure is a
+  // SEP-1303: the batch NEVER shrinks and never throws - the failure is a
   // returned outcome.
   expect(completed).toHaveLength(1);
   const outcome = completed[0]?.outcome;
@@ -56,7 +56,7 @@ async function runOne(args: {
   return outcome;
 }
 
-describe('SEP-1303 — every producible ToolErrorKind returns as a model-visible outcome', () => {
+describe('SEP-1303 - every producible ToolErrorKind returns as a model-visible outcome', () => {
   it("unknown_tool: unregistered name returns 'unknown_tool'", async () => {
     const registry = createToolRegistry();
     const error = await runOne({ registry, toolName: 'nope' });

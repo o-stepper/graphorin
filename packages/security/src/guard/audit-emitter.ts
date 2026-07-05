@@ -64,7 +64,7 @@ export interface MemoryGuardActor {
 
 /**
  * One audit event. The payload never contains the raw contents of a
- * memory region — only the digest, the region name, and the actor.
+ * memory region - only the digest, the region name, and the actor.
  *
  * @stable
  */
@@ -119,7 +119,7 @@ export function _getMemoryGuardAuditListenerCountForTesting(): number {
 
 /**
  * Emit an event to every subscriber. Listeners that throw are
- * isolated — a faulty listener never tears down the guard.
+ * isolated - a faulty listener never tears down the guard.
  *
  * @stable
  */

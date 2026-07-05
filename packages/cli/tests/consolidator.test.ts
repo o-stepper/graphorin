@@ -71,7 +71,7 @@ describe('graphorin consolidator', () => {
     expect(out.pendingConflicts).toBe(1);
   });
 
-  it('set-tier reports UNSUPPORTED honestly — no phantom persistence (IP-4)', async () => {
+  it('set-tier reports UNSUPPORTED honestly - no phantom persistence (IP-4)', async () => {
     const cfg = await fixture();
     const before = process.exitCode;
     const out = await runConsolidatorSetTier({
@@ -96,7 +96,7 @@ describe('graphorin consolidator', () => {
     ).rejects.toThrow(/invalid tier/);
   });
 
-  it('stop reports UNSUPPORTED honestly — never claims the daemon stopped (IP-4)', async () => {
+  it('stop reports UNSUPPORTED honestly - never claims the daemon stopped (IP-4)', async () => {
     const cfg = await fixture();
     const before = process.exitCode;
     const out = await runConsolidatorStop({ config: cfg, print: () => undefined });

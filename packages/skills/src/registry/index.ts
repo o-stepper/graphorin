@@ -1,18 +1,18 @@
 /**
- * `SkillRegistry` — registry over loaded skills.
+ * `SkillRegistry` - registry over loaded skills.
  *
  * The registry is the surface the agent runtime (Phase 12) and the
  * standalone server (Phase 14) consume. It exposes:
  *
- * - `getMetadata()` — every skill's Tier-1 metadata, used by the
+ * - `getMetadata()` - every skill's Tier-1 metadata, used by the
  *   ContextEngine to assemble the system prompt's skill metadata
  *   block (Phase 10d).
- * - `activate(triggers)` / `getActivationRequest(triggers)` —
+ * - `activate(triggers)` / `getActivationRequest(triggers)` -
  *   match a list of trigger strings (slash commands and / or model-
  *   emitted skill names) and return the corresponding
  *   {@link ActivatedSkill} records.
- * - `getSkill(name)` — direct lookup.
- * - `tools()` — flat list of declared tool entries; the runtime
+ * - `getSkill(name)` - direct lookup.
+ * - `tools()` - flat list of declared tool entries; the runtime
  *   resolves the actual `Tool[]` through the `@graphorin/tools`
  *   registry.
  *
@@ -58,7 +58,7 @@ export interface SkillRegistryOptions {
   /**
    * Optional stamping function (RP-11). When supplied, `activate()` runs each
    * skill's pre-built `Tool[]` through it and surfaces the results on
-   * {@link ActivatedSkill.tools}. Without it, `activate()` surfaces no tools —
+   * {@link ActivatedSkill.tools}. Without it, `activate()` surfaces no tools -
    * the agent runtime resolves and stamps them itself.
    */
   readonly stampTool?: SkillToolStamper;
@@ -70,7 +70,7 @@ export interface SkillRegistry {
   /**
    * Upsert a skill by name (RP-11). Unlike {@link SkillRegistry.register},
    * `replace` overwrites an existing registration instead of throwing on a
-   * name collision — the upgrade path for hot-reloading a re-loaded skill.
+   * name collision - the upgrade path for hot-reloading a re-loaded skill.
    */
   replace(skill: Skill): void;
   unregister(name: string): boolean;
@@ -94,7 +94,7 @@ export interface SkillRegistry {
    * Resolve a single trigger (model-emitted skill name OR the raw
    * `/skill:<name>` slash-command body) into an {@link ActivationRequest}.
    * Returns `null` when no skill matches and the trigger looked like a
-   * slash command — callers that want a strict mode should call
+   * slash command - callers that want a strict mode should call
    * {@link parseActivationTrigger} themselves.
    */
   resolveTrigger(trigger: string): ActivationRequest | null;
@@ -264,7 +264,7 @@ export function createSkillRegistry(options: SkillRegistryOptions = {}): SkillRe
     const skill = skillsByName.get(parsed.name);
     if (skill === undefined) return null;
     if (parsed.activationKind === 'auto' && skill.metadata.disableModelInvocation) {
-      // Auto-activation refused — the skill opted out.
+      // Auto-activation refused - the skill opted out.
       return null;
     }
     const request: Mutable<ActivationRequest> = {

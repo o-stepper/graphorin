@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/memory/src/consolidator/types.ts:271
 Status snapshot returned by [Consolidator.status](/api/@graphorin/memory/interfaces/Consolidator.md#status).
 
 Public shape: `{ tier, queueDepth, dlqSize, lastRuns,
-budgetRemaining, deferredRuns }` — extended with a few additional
+budgetRemaining, deferredRuns }` - extended with a few additional
 fields the server health endpoint and the
 `graphorin consolidator status` CLI consume.
 
@@ -26,7 +26,7 @@ compatibility.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-budget"></a> `budget` | `readonly` | [`ConsolidatorBudgetSnapshot`](/api/@graphorin/memory/interfaces/ConsolidatorBudgetSnapshot.md) | - | packages/memory/src/consolidator/types.ts:289 |
-| <a id="property-budgetremaining"></a> `budgetRemaining` | `readonly` | \{ `costUsd`: `number`; `tokens`: `number`; \} | Spec alias — surfaces remaining-budget figures at the top level. | packages/memory/src/consolidator/types.ts:291 |
+| <a id="property-budgetremaining"></a> `budgetRemaining` | `readonly` | \{ `costUsd`: `number`; `tokens`: `number`; \} | Spec alias - surfaces remaining-budget figures at the top level. | packages/memory/src/consolidator/types.ts:291 |
 | `budgetRemaining.costUsd` | `readonly` | `number` | - | packages/memory/src/consolidator/types.ts:293 |
 | `budgetRemaining.tokens` | `readonly` | `number` | - | packages/memory/src/consolidator/types.ts:292 |
 | <a id="property-deferredruns"></a> `deferredRuns` | `readonly` | `number` | - | packages/memory/src/consolidator/types.ts:287 |

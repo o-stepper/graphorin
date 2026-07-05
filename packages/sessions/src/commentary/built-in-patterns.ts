@@ -11,7 +11,7 @@
  * pattern families cover non-overlapping concerns by construction so
  * no double-counting on a single content part.
  *
- * Add to this catalogue freely — the only requirement is that the
+ * Add to this catalogue freely - the only requirement is that the
  * `reason` discriminator stays bounded so counter cardinality stays
  * predictable.
  *
@@ -32,7 +32,7 @@ export const BUILT_IN_COMMENTARY_PATTERNS: ReadonlyArray<CommentaryPattern> = Ob
     reason: 'tool.call.start-payload-signature',
     regex: /\{\s*"type"\s*:\s*"tool\.call\.start"[\s\S]*?"toolName"\s*:\s*"[^"]+"[\s\S]*?\}/g,
     description:
-      'JSON-encoded `tool.call.start` event with a `toolName` field — leaks the internal tool dispatch.',
+      'JSON-encoded `tool.call.start` event with a `toolName` field - leaks the internal tool dispatch.',
   }),
   Object.freeze({
     reason: 'tool.call.delta-payload-signature',

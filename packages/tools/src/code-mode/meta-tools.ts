@@ -7,7 +7,7 @@
  * - **`code_execute`** runs a model-written script in a sandbox
  *   ({@link runBridgedSource}). The script calls tools via an injected
  *   `tools.<name>(args)` object; each call round-trips to the host
- *   {@link CodeExecuteToolOptions.executeTool} bridge — which the agent
+ *   {@link CodeExecuteToolOptions.executeTool} bridge - which the agent
  *   wires to the real {@link ToolExecutor}, so per-tool ACL /
  *   sanitization / truncation still apply. Intermediate values stay in
  *   the sandbox; only the script's final `return` value comes back, so a
@@ -17,7 +17,7 @@
  *   model can write correct code without every signature being inlined
  *   up front (progressive disclosure).
  *
- * They are named `code_execute` / `code_search` — Graphorin-owned, not a
+ * They are named `code_execute` / `code_search` - Graphorin-owned, not a
  * vendor runtime name (no `python` / `bash` / `code_interpreter`), so the
  * model treats them as plain tools without importing memorised
  * vendor-specific behaviour (Principle #15). They render with underscores
@@ -50,7 +50,7 @@ export interface CodeSearchToolOptions {
   /** Projection over the eager (advertised) tool set. */
   readonly projection: CodeApiProjection;
   /**
-   * Approval-gated tool names (TL-8) — excluded from the code API but
+   * Approval-gated tool names (TL-8) - excluded from the code API but
    * surfaced in matches with a call-directly marker so the model is
    * never silently missing a capability.
    */
@@ -102,12 +102,12 @@ export function createCodeSearchTool(opts: CodeSearchToolOptions): Tool<CodeSear
         }
       }
       incrementCounter('tool.code_mode.search.executed.total', undefined);
-      // TL-8: gated tools are findable too — with the marker, never silent.
+      // TL-8: gated tools are findable too - with the marker, never silent.
       const gatedMatches = (opts.approvalGatedTools ?? [])
         .filter((name) => name.toLowerCase().includes(input.query.toLowerCase()))
         .map(
           (name) =>
-            `${name} — requires approval; call it directly as a normal tool call, not from code_execute`,
+            `${name} - requires approval; call it directly as a normal tool call, not from code_execute`,
         )
         .join('\n');
       const blocks = [eager, deferred, gatedMatches].filter((s) => s.length > 0).join('\n\n');
@@ -152,7 +152,7 @@ export interface CodeExecuteToolOptions {
   /** Override the runner (tests inject a fake). Default {@link runBridgedSource}. */
   readonly run?: (o: BridgedSourceOptions) => ReturnType<typeof runBridgedSource>;
   /**
-   * Approval-gated tool names (TL-8) — listed in the catalogue with a
+   * Approval-gated tool names (TL-8) - listed in the catalogue with a
    * call-directly marker (they cannot suspend for HITL mid-script).
    */
   readonly approvalGatedTools?: ReadonlyArray<string>;
@@ -172,13 +172,13 @@ function buildExecuteDescription(
       ? []
       : [
           '',
-          'NOT callable from code_execute (each requires approval — call it directly as a normal tool call so the run can pause for a human decision):',
+          'NOT callable from code_execute (each requires approval - call it directly as a normal tool call so the run can pause for a human decision):',
           approvalGatedTools.map((name) => `  ${name}`).join('\n'),
         ];
   return [
     'Run a JavaScript snippet that orchestrates several tool calls in a sandbox and returns only the final result. Prefer this over calling tools one at a time when a task needs multiple tool calls whose intermediate outputs you do not need to read: the intermediates stay inside the sandbox and never enter the conversation, so large or numerous results do not consume your context.',
     '',
-    'Write the body of an async function. Call a tool with `await tools.NAME(args)` (use `await tools["NAME"](args)` for names containing dots). `return` your final answer — any JSON-serialisable value; only the returned value comes back. Tool arguments and results must be JSON-serialisable. The script runs in an isolated worker thread: network and filesystem access are blocked (best-effort) and host environment variables are not available — `process.env` is empty. The only way to reach the outside world is through the `tools` object.',
+    'Write the body of an async function. Call a tool with `await tools.NAME(args)` (use `await tools["NAME"](args)` for names containing dots). `return` your final answer - any JSON-serialisable value; only the returned value comes back. Tool arguments and results must be JSON-serialisable. The script runs in an isolated worker thread: network and filesystem access are blocked (best-effort) and host environment variables are not available - `process.env` is empty. The only way to reach the outside world is through the `tools` object.',
     '',
     'Example source:',
     '  const orders = await tools.list_orders({ customerId: "c1" });',

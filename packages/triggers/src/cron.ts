@@ -20,10 +20,10 @@
  * The parser is intentionally **strict**: any unrecognised character
  * raises {@link CronParseError} so a typo never silently never-fires.
  *
- * **Day vs. day-of-week semantics — AND, not OR.** When *both* `day`
+ * **Day vs. day-of-week semantics - AND, not OR.** When *both* `day`
  * and `dayOfWeek` are restricted (neither is the every-value
  * wildcard), Graphorin requires **both** to match for a fire to
- * happen — i.e. `0 12 1-7 * 1` means "noon on the first Monday of
+ * happen - i.e. `0 12 1-7 * 1` means "noon on the first Monday of
  * every month". This differs from Vixie / POSIX cron, which
  * OR-combines the two restricted fields. AND semantics are easier to
  * reason about in personal-assistant scenarios; the framework stays
@@ -170,7 +170,7 @@ function parseNumeric(name: string, raw: string | undefined, expression: string)
  * trigger as UTC; operators that need local time express that in
  * their cron expression).
  *
- * Returns `null` if no fire happens in the next 4 years (defensive —
+ * Returns `null` if no fire happens in the next 4 years (defensive -
  * impossible for a well-formed cron expression except a vacuous
  * combination that never aligns).
  *

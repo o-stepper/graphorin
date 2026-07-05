@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/secrets/audit-emitter.ts:54
 
-One audit event. The payload is intentionally minimal — never carry
+One audit event. The payload is intentionally minimal - never carry
 the secret value itself, only metadata that is safe to log
 (resolver / store identifier, key name, actor pointer).
 

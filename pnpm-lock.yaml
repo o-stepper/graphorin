@@ -831,16 +831,16 @@ importers:
         version: 3.25.76
     devDependencies:
       '@graphorin/agent':
-        specifier: workspace:>=0.5.0 <1.0.0
+        specifier: workspace:>=0.6.0
         version: link:../agent
       '@graphorin/memory':
-        specifier: workspace:>=0.5.0 <1.0.0
+        specifier: workspace:>=0.6.0
         version: link:../memory
       '@graphorin/sessions':
-        specifier: workspace:>=0.5.0 <1.0.0
+        specifier: workspace:>=0.6.0
         version: link:../sessions
       '@graphorin/workflow':
-        specifier: workspace:>=0.5.0 <1.0.0
+        specifier: workspace:>=0.6.0
         version: link:../workflow
       '@types/better-sqlite3':
         specifier: ^7.6.13

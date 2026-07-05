@@ -81,7 +81,7 @@ async function makeProject(): Promise<string> {
   return root;
 }
 
-describe('graphorin tools lint — RB-49 acceptance', () => {
+describe('graphorin tools lint - RB-49 acceptance', () => {
   let savedExitCode: typeof process.exitCode;
   beforeEach(() => {
     savedExitCode = process.exitCode;

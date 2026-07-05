@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function getKnownField(field):
   | undefined;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:111
+Defined in: packages/skills/src/spec/index.ts:115
 
 Resolve a known-field entry by name. Returns `undefined` if the
 field is not part of the upstream specification.

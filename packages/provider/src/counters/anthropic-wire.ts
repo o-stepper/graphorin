@@ -30,7 +30,7 @@ export interface AnthropicCountPayload {
  * local fallback instead of paying an HTTP round trip for a 400).
  *
  * Consecutive same-role turns are merged and the transcript is forced
- * to start with a user turn — both hard requirements of the API.
+ * to start with a user turn - both hard requirements of the API.
  * Parts with no wire representation for counting purposes (audio,
  * non-PDF files, unsigned reasoning) are skipped; the count is then a
  * slight undercount rather than a guaranteed 400.

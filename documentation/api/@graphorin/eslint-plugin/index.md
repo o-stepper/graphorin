@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -8,8 +8,8 @@
 
 > ESLint rules for projects that build on **Graphorin**.
 
-- **Status:** v0.5.0 — final Phase 16 ruleset.
-- **License:** [MIT](../../_media/LICENSE-4) — © 2026 Oleksiy Stepurenko.
+- **Status:** v0.6.0 - final Phase 16 ruleset.
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Peer dependency:** `eslint >= 9`.
 
@@ -19,7 +19,7 @@
 pnpm add -D eslint @graphorin/eslint-plugin
 ```
 
-## Usage (ESLint flat config — `eslint.config.js`)
+## Usage (ESLint flat config - `eslint.config.js`)
 
 ```js
 import graphorin from '@graphorin/eslint-plugin';
@@ -43,7 +43,7 @@ export default [
 ```
 
 The bundled config wires every active rule at the severities documented below.
-For ESLint 9+ flat config (`eslint.config.js`), spread `flat/recommended` — it
+For ESLint 9+ flat config (`eslint.config.js`), spread `flat/recommended` - it
 maps the `@graphorin` namespace to the plugin object for you:
 
 ```js
@@ -65,12 +65,11 @@ The legacy `.eslintrc` form is still exported as `configs.recommended`
 | `tool-examples-recommended` | Active. Flags missing or empty `examples` arrays and rejects more than the documented upper bound (5). |
 | `tool-parameter-naming` | Active. Flags ambiguous single-word parameter names (`user`, `id`, `name`, `value`, `data`, `input`, `output`, `result`, `to`, `from`, `key`, `field`) and numeric-suffix names (`arg1`, `param2`) on `inputSchema: z.object({ ... })`. Per-tool opt-out via `tags: ['experimental']` or `tags: ['legacy']`. |
 | `no-secret-unwrap` | Active. Flags `.unwrap()` and `.reveal()` calls on `SecretValue`-shaped expressions. `.unwrap()` is reported as `'error'` regardless of comments (the method is `@deprecated`); `.reveal()` honours the `// graphorin-allow-secret-unwrap: <reason>` opt-out. |
-| `no-secret-in-deps` | Active. Flags `Agent.toTool({ inheritSecrets: [...] })` calls whose allowlist is non-empty and lacks an `// rb-24-justification: <reason>` comment. |
+| `no-secret-in-deps` | Active. Flags `withChildToolSecretsContext({ secretsAllowed: [...] })` grants whose allowlist is non-empty and lacks an `// rb-24-justification: <reason>` comment (DEC-137). |
 | `provider-middleware-order` | Active. Lint-time enforcement of the canonical `withTracing → withRetry → withRateLimit → withCostLimit → withCostTracking → withFallback → withRedaction` ordering. |
-| `no-implicit-network-call` | Active. Flags bare `fetch(...)` / `axios.get(...)` / `https.request(...)` / `new XMLHttpRequest()` invocations in `@graphorin/*` framework code without the explicit `// graphorin-allow-network: <reason>` opt-out. |
+| `no-implicit-network-call` | Active. Flags network primitives in `@graphorin/*` framework code without the explicit `// graphorin-allow-network: <reason>` opt-out: `fetch(...)` / `axios.*` / `undici.*` / `got.*` / `http(s).request` / raw `net`·`tls`·`dgram` sockets / `new WebSocket` / `new EventSource` / `new XMLHttpRequest`, plus static, dynamic, and `require()` imports of HTTP clients (`node-fetch`, `undici`, `got`, `axios`, `ky`, `ws`). Kept in lockstep with `scripts/check-no-network.mjs`. |
 | `no-third-party-workflow-aliases` | Active. Flags identifiers that mirror third-party-library workflow primitives in the `@graphorin/workflow` package's source so the framework keeps its own naming. |
 | `no-bare-tool-exec` | Active. Flags `tool({ execute })` functions that do not reference `signal` so long-running tools always propagate the cancellation contract. |
-| `no-console-in-public-api` | Scaffold (no-op). Will flag `console.*` calls in code that is part of a package's public surface; activates after the v0.1 public-API freeze. |
 
 ## Programmatic discovery (single source of truth)
 
@@ -101,25 +100,25 @@ for (const tool of tools) {
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/eslint-plugin — ESLint plugin for projects that build on
+@graphorin/eslint-plugin - ESLint plugin for projects that build on
 the Graphorin framework.
 
 Phase 16 final ruleset:
 
-  - `no-secret-unwrap`                  — DEC-020 / ADR-026. Active.
-  - `no-secret-in-deps`                 — DEC-137. Active.
-  - `provider-middleware-order`         — DEC-145 / ADR-039. Active.
-  - `no-implicit-network-call`          — DEC-154 / ADR-041. Active.
-  - `no-third-party-workflow-aliases`   — DEC-019 / ADR-029. Active.
-  - `no-bare-tool-exec`                 — principle 3 / DEC-143. Active.
-  - `tool-description-required`         — Active.
-  - `tool-examples-recommended`         — Active.
-  - `tool-parameter-naming`             — Active.
+  - `no-secret-unwrap`                  - DEC-020 / ADR-026. Active.
+  - `no-secret-in-deps`                 - DEC-137. Active.
+  - `provider-middleware-order`         - DEC-145 / ADR-039. Active.
+  - `no-implicit-network-call`          - DEC-154 / ADR-041. Active.
+  - `no-third-party-workflow-aliases`   - DEC-019 / ADR-029. Active.
+  - `no-bare-tool-exec`                 - principle 3 / DEC-143. Active.
+  - `tool-description-required`         - Active.
+  - `tool-examples-recommended`         - Active.
+  - `tool-parameter-naming`             - Active.
 
-(The former `no-console-in-public-api` scaffold — a permanent no-op
-since Phase 01 — was removed in the v0.4 hygiene pass (PS-21) rather
+(The former `no-console-in-public-api` scaffold - a permanent no-op
+since Phase 01 - was removed in the v0.4 hygiene pass (PS-21) rather
 than shipped inert.)
 
 ## Interfaces

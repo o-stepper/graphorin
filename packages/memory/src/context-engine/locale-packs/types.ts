@@ -5,7 +5,7 @@
  * additional locales are supplied by application code via
  * {@link defineContextLocalePack}.
  *
- * The framework is locale-agnostic — no language is privileged in
+ * The framework is locale-agnostic - no language is privileged in
  * core. Every consumer-facing string is reachable through this
  * surface so consumers can swap them without forking the framework.
  *
@@ -88,7 +88,7 @@ export interface CompactionSummaryTemplate {
  * A `LocalePack` collects every consumer-facing string the
  * ContextEngine renders. Consumers register additional locales via
  * {@link defineContextLocalePack}. The framework is locale-agnostic
- * — no language is privileged in core.
+ * - no language is privileged in core.
  *
  * @stable
  */
@@ -99,7 +99,7 @@ export interface ContextLocalePack {
   readonly baseTemplate: BaseTemplateFragments;
   /** Auto-recall trigger regex set. */
   readonly autoRecallTriggers: AutoRecallTriggers;
-  /** Inbound-sanitization preamble (D4 — RB-43). */
+  /** Inbound-sanitization preamble (D4 - RB-43). */
   readonly inboundSanitizationPreamble: InboundSanitizationPreamble;
   /** Structured compaction summary template (RB-46). */
   readonly compactionSummaryTemplate: CompactionSummaryTemplate;

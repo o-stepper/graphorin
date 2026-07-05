@@ -13,7 +13,7 @@ import {
 } from '../src/index.js';
 import { createInMemoryStore, InMemoryEmbeddingRegistry } from './fixtures/in-memory-store.js';
 
-describe('context-engine — assemble() (Phase 10d)', () => {
+describe('context-engine - assemble() (Phase 10d)', () => {
   it('assembles all six layers in priority order with content-origin annotations', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
@@ -83,7 +83,7 @@ describe('context-engine — assemble() (Phase 10d)', () => {
   it("assembled fixture: 'minimal' ≤ 200 tokens (empty fixture; DoD bound)", async () => {
     const { HEURISTIC_TOKEN_COUNTER: counter } = await import('../src/index.js');
     // Per the DoD: `memoryBaseMode: 'minimal'` is the opt-in for
-    // top-tier models — the bound applies when the operator opts
+    // top-tier models - the bound applies when the operator opts
     // into the compact narrative AND the per-step fixture stays
     // small. With no working blocks / no rules / no skills, the
     // assembled prompt is well under the 200-token ceiling.
@@ -293,7 +293,7 @@ describe('context-engine — assemble() (Phase 10d)', () => {
       upstreamAnnotations: [annotate('tool:result', 'mcp')],
     });
     expect(out.inboundPreambleFired).toBe(true);
-    // Preamble lives at the very end of the assembled prompt — after every other layer.
+    // Preamble lives at the very end of the assembled prompt - after every other layer.
     expect(out.systemMessage.content).toContain('untrusted_content');
     const inboundIdx = out.systemMessage.content.indexOf('untrusted_content');
     const metadataIdx = out.systemMessage.content.indexOf('<memory_metadata>');

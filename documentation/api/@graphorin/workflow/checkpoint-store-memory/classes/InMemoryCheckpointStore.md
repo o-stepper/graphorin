@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -194,7 +194,7 @@ size(): number;
 Defined in: packages/workflow/src/checkpoint-store-memory.ts:173
 
 Test-only helper that exposes the raw count of stored checkpoints
-— handy for assertions like "the runtime wrote exactly N
+- handy for assertions like "the runtime wrote exactly N
 checkpoints across the run".
 
 #### Returns

@@ -1,5 +1,5 @@
 /**
- * Coverage for `openAICompatibleAdapter` — same SSE shape as
+ * Coverage for `openAICompatibleAdapter` - same SSE shape as
  * `llamaCppServerAdapter`. Includes reasoning_content streaming and
  * sensitivity-override audit log.
  */
@@ -239,7 +239,7 @@ describe('openAICompatibleAdapter', () => {
       }),
     );
     const body = JSON.parse(String(capture.init?.body)) as Record<string, unknown>;
-    // JSON.stringify drops the undefined override — the field is gone.
+    // JSON.stringify drops the undefined override - the field is gone.
     expect('stream_options' in body).toBe(false);
   });
 
@@ -343,7 +343,7 @@ describe('prompt-cache usage on the OpenAI wire (core-provider-02)', () => {
   });
 });
 
-describe('C2 — adapter-level worked-example folding (OpenAI wire)', () => {
+describe('C2 - adapter-level worked-example folding (OpenAI wire)', () => {
   it('folds examples into function.description on the raw adapter path', async () => {
     const capture: { init?: RequestInit } = {};
     const provider = openAICompatibleAdapter({

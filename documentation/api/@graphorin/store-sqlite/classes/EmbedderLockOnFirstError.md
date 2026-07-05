@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:38
 
-Lock-on-first conflict — registering a second active embedder for an
+Lock-on-first conflict - registering a second active embedder for an
 already-locked database fails fast with this error pointing at
 `graphorin memory migrate` (Phase 15).
 

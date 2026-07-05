@@ -5,7 +5,7 @@
  * MCP list operations are cursor-paginated since protocol 2024-11-05 and
  * the SDK does not auto-paginate. Pre-fix the client called each list
  * once and ignored `nextCursor`, so a paginating server's catalogue was
- * silently truncated to page 1 — tools beyond it were invisible to
+ * silently truncated to page 1 - tools beyond it were invisible to
  * `toTools()`, defer-loading thresholds counted a partial catalogue, and
  * pin fingerprints covered a partial catalogue.
  */

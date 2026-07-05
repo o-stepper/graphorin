@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # evaluator-optimizer
 
-`evaluatorOptimizer({...})` — Generator → Evaluator iteration
+`evaluatorOptimizer({...})` - Generator → Evaluator iteration
 loop with three rubric kinds and a REQUIRED iteration cap.
 
 Iteration boundary discipline: each iteration is a fresh
@@ -20,7 +20,7 @@ Generator's iteration-(N-1) internal message history).
 
 | Interface | Description |
 | ------ | ------ |
-| [EvaluatorOptimizerOptions](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOptions.md) | Options accepted by [evaluatorOptimizer](/api/@graphorin/agent/evaluator-optimizer/functions/evaluatorOptimizer.md). `maxIterations` is REQUIRED — the helper asserts `>= 1` at construction time. |
+| [EvaluatorOptimizerOptions](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOptions.md) | Options accepted by [evaluatorOptimizer](/api/@graphorin/agent/evaluator-optimizer/functions/evaluatorOptimizer.md). `maxIterations` is REQUIRED - the helper asserts `>= 1` at construction time. |
 | [EvaluatorOptimizerOutcome](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md) | Aggregate outcome of an `evaluatorOptimizer({...})` run. |
 | [EvaluatorOutcome](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOutcome.md) | Per-iteration evaluation outcome returned by the Evaluator. |
 

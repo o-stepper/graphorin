@@ -38,7 +38,7 @@ export interface AdaptCallResultArgs {
  */
 export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> {
   const { result, outputSchema, serverIdentity, toolName } = args;
-  // MC-4: the SDK deliberately does NOT throw on isError results — the
+  // MC-4: the SDK deliberately does NOT throw on isError results - the
   // failure marker must not launder into a successful ToolReturn. Throw
   // the typed error so the executor records a real failure; the server's
   // text rides in the message for model self-correction.
@@ -76,7 +76,7 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
     (p): p is { type: 'text'; text: string } => p.type === 'text',
   );
   // MC-8: the typed `output` is the ONLY channel the agent loop
-  // serialises into the tool message — non-text parts must leave a
+  // serialises into the tool message - non-text parts must leave a
   // text trace there (the full payloads stay in `contentParts`), and
   // embedded resource TEXT joins the concatenation outright.
   const outputSegments: string[] = [];
@@ -94,7 +94,7 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
           outputSegments.push(part.resource.text);
         } else if (part.resource.blob !== undefined) {
           outputSegments.push(
-            `[resource ${part.resource.uri} ${part.resource.mimeType ?? 'application/octet-stream'}, ~${approxDecodedSize(part.resource.blob)} — full payload in contentParts]`,
+            `[resource ${part.resource.uri} ${part.resource.mimeType ?? 'application/octet-stream'}, ~${approxDecodedSize(part.resource.blob)} - full payload in contentParts]`,
           );
         } else {
           outputSegments.push(`Resource ${part.resource.uri}`);
@@ -129,7 +129,7 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
         server: serverIdentity.id,
         tool: toolName,
       });
-      // MC-11: a schema mismatch must not silently drop the payload —
+      // MC-11: a schema mismatch must not silently drop the payload -
       // log and mirror the structured content as JSON text, exactly
       // like the no-schema branch does.
       args.logger?.(
@@ -210,7 +210,7 @@ function mcpContentToMessageContent(
 /**
  * Render the compact, model-facing preview for a `resource_link`. The
  * handle is SCOPED to the originating server (mcp-skills-06):
- * `mcp:<serverId>:<uri>` — an
+ * `mcp:<serverId>:<uri>` - an
  * {@link import('./mcp-resource-reader.js').createMcpResourceReader}
  * parses the prefix and consults ONLY that server, so a malicious
  * server's link (or a prompt-injected model) cannot fetch a resource
@@ -226,7 +226,7 @@ function formatResourceLinkPreview(
   if (part.size !== undefined) meta.push(`${part.size} bytes`);
   const metaStr = meta.length === 0 ? '' : ` (${meta.join(', ')})`;
   const desc =
-    part.description === undefined || part.description.length === 0 ? '' : ` — ${part.description}`;
+    part.description === undefined || part.description.length === 0 ? '' : ` - ${part.description}`;
   return `[resource_link] ${label}${metaStr}${desc}\nFetch the full contents on demand with read_result, handle: ${scopedResourceHandle(serverId, part.uri)}`;
 }
 
@@ -248,7 +248,7 @@ function approxDecodedSize(base64: string): string {
 
 /** Text descriptor for a non-text content part (MC-8). */
 function describeBinaryPart(kind: 'image' | 'audio', mimeType: string, data: string): string {
-  return `[${kind} ${mimeType}, ~${approxDecodedSize(data)} — full payload in contentParts]`;
+  return `[${kind} ${mimeType}, ~${approxDecodedSize(data)} - full payload in contentParts]`;
 }
 
 function decodeBase64(value: string): Uint8Array {

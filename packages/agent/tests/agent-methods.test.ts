@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
 import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
 
-describe('Agent — fanOut and progress methods on the Agent surface', () => {
+describe('Agent - fanOut and progress methods on the Agent surface', () => {
   it('exposes Agent.fanOut(...) that delegates to runFanOut', async () => {
     const provider = createMockProvider({ modelId: 'm', scripts: [textOnlyScript('idle', 4)] });
     const agent = createAgent({ name: 'parent', instructions: 'noop', provider });
@@ -28,7 +28,7 @@ describe('Agent — fanOut and progress methods on the Agent surface', () => {
   });
 });
 
-describe('Agent — steer + followUp emit lifecycle events', () => {
+describe('Agent - steer + followUp emit lifecycle events', () => {
   it('queues a steer message and emits agent.steered on the next step', async () => {
     const provider = createMockProvider({
       modelId: 'm',
@@ -79,9 +79,9 @@ describe('Agent — steer + followUp emit lifecycle events', () => {
   });
 });
 
-// --- AG-12 — followUp() is honest next-turn metadata --------------------------
+// --- AG-12 - followUp() is honest next-turn metadata --------------------------
 
-describe('AG-12 — followUp() queues for the NEXT run, never corrupts the finished one', () => {
+describe('AG-12 - followUp() queues for the NEXT run, never corrupts the finished one', () => {
   it('a run with a queued followUp still ends terminal, without a dangling user message', async () => {
     const provider = createMockProvider({ modelId: 'm', scripts: [textOnlyScript('done', 4)] });
     const agent = createAgent({ name: 'fu-terminal', instructions: 'noop', provider });

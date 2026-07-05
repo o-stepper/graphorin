@@ -1,5 +1,5 @@
 /**
- * `createMCPClient(...)` — the entry point for opening a typed MCP
+ * `createMCPClient(...)` - the entry point for opening a typed MCP
  * client connection.
  *
  * The returned {@link MCPClient}:
@@ -53,7 +53,7 @@ import type {
 } from './types.js';
 
 const DEFAULT_CLIENT_NAME = 'graphorin-mcp-client';
-const DEFAULT_CLIENT_VERSION = '0.5.0';
+const DEFAULT_CLIENT_VERSION = '0.6.0';
 
 /**
  * Process-scoped dedup flag for the deprecated SSE transport WARN.
@@ -137,7 +137,7 @@ export async function createMCPClient(options: CreateMCPClientOptions): Promise<
 
 /**
  * Internal factory that takes a pre-built SDK `Transport`. Exposed
- * for the test seam — production code uses {@link createMCPClient}.
+ * for the test seam - production code uses {@link createMCPClient}.
  *
  * @internal
  */
@@ -173,7 +173,7 @@ export async function createMCPClientFromSdkTransport(
 
   // WI-13 (P2-2): advertise + register the server-initiated request
   // handlers (elicitation / sampling) before connecting, so they are in
-  // place when the session starts. Both are gated — capabilities are
+  // place when the session starts. Both are gated - capabilities are
   // advertised only when the operator supplied the matching callback.
   const clientCapabilities = computeClientCapabilities({
     elicitation: options.elicitation,
@@ -188,7 +188,7 @@ export async function createMCPClientFromSdkTransport(
     ...(options.sampling === undefined ? {} : { sampling: options.sampling }),
     serverIdRef,
   });
-  // MC-6: surface server-side catalogue churn — at minimum an audit
+  // MC-6: surface server-side catalogue churn - at minimum an audit
   // counter + log line; operators re-run toTools() to refresh and
   // re-sanitize the catalogue (which also re-runs the drift diff).
   sdkClient.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
@@ -197,7 +197,7 @@ export async function createMCPClientFromSdkTransport(
     });
     options.logger?.(
       'warn',
-      'mcp.tools.list_changed received — re-run toTools() to refresh + re-sanitize the catalogue',
+      'mcp.tools.list_changed received - re-run toTools() to refresh + re-sanitize the catalogue',
       { server: serverIdRef.current },
     );
   });
@@ -229,10 +229,10 @@ export async function createMCPClientFromSdkTransport(
   // stdio child / dropped HTTP session is observable only as
   // MCPProtocolErrors on subsequent calls. The SDK Protocol base
   // exposes assignable onclose/onerror callbacks (the transport's own
-  // handlers are managed by the SDK — never overwrite those).
+  // handlers are managed by the SDK - never overwrite those).
   sdkClient.onclose = () => {
     incrementCounter('mcp.transport.closed.total', { server: serverIdentity.id });
-    options.logger?.('warn', 'MCP transport closed — rebuild the client to reconnect', {
+    options.logger?.('warn', 'MCP transport closed - rebuild the client to reconnect', {
       server: serverIdentity.id,
     });
     options.onTransportClose?.({ server: serverIdentity.id });
@@ -243,7 +243,7 @@ export async function createMCPClientFromSdkTransport(
   };
   const collisionStrategy: CollisionStrategy = options.collisionStrategy ?? 'auto-prefix';
 
-  // MC-1: the client-side eventStore option was removed — per the
+  // MC-1: the client-side eventStore option was removed - per the
   // Streamable HTTP spec event replay is the SERVER's responsibility,
   // and the SDK transport auto-reconnects with Last-Event-ID on its
   // own. Warn legacy callers instead of silently ignoring the option.
@@ -270,7 +270,7 @@ export async function createMCPClientFromSdkTransport(
 
   /**
    * mcp-skills-02: MCP list operations are cursor-paginated (protocol
-   * 2024-11-05+) and the SDK does NOT auto-paginate — a single call
+   * 2024-11-05+) and the SDK does NOT auto-paginate - a single call
    * returns page 1 only. Ignoring `nextCursor` silently truncated the
    * catalogue: tools beyond the first page never reached `toTools()`,
    * defer-loading thresholds counted a partial catalogue, pin
@@ -437,7 +437,7 @@ export async function createMCPClientFromSdkTransport(
     args: unknown,
     opts?: { signal?: AbortSignal; timeoutMs?: number },
   ): Promise<MCPCallToolResult> {
-    // MC-3: `timeoutMs` maps onto the SDK's RequestOptions — both the
+    // MC-3: `timeoutMs` maps onto the SDK's RequestOptions - both the
     // per-attempt and the total ceiling, so progress notifications
     // cannot extend past the caller's budget.
     const requestOptions = {
@@ -508,7 +508,7 @@ export async function createMCPClientFromSdkTransport(
       });
       options.logger?.(
         'warn',
-        `resource '${uri}' returned ${contents.length} content items; readResource() surfaces only the first — use readResourceContents() for all of them`,
+        `resource '${uri}' returned ${contents.length} content items; readResource() surfaces only the first - use readResourceContents() for all of them`,
         { server: serverIdentity.id },
       );
     }
@@ -554,7 +554,7 @@ export async function createMCPClientFromSdkTransport(
       ...(toolsOpts === undefined ? {} : { options: toolsOpts }),
       ...(options.logger === undefined ? {} : { logger: options.logger }),
     });
-    // MC-6: cross-snapshot drift — a definition changing behind an
+    // MC-6: cross-snapshot drift - a definition changing behind an
     // already-seen name within this client's lifetime is audited.
     if (lastToolFingerprints !== undefined) {
       for (const [name, hash] of adapted.fingerprints) {
@@ -574,7 +574,7 @@ export async function createMCPClientFromSdkTransport(
       }
     }
     lastToolFingerprints = adapted.fingerprints;
-    // MC-6: operator pins from a previously approved snapshot — the
+    // MC-6: operator pins from a previously approved snapshot - the
     // rug-pull (approve-then-swap across restarts) posture. C6 extends it
     // with durable trust-on-first-use via `pinStore`: the first snapshot
     // is RECORDED, later snapshots are COMPARED, and a store-backed
@@ -605,7 +605,7 @@ export async function createMCPClientFromSdkTransport(
         if (current !== undefined && current !== pinned) {
           if (mismatchAction === 'reject') {
             throw new MCPToolPinningError(
-              `MCP tool '${name}' no longer matches its pinned definition fingerprint — the server changed the definition behind an approved name.`,
+              `MCP tool '${name}' no longer matches its pinned definition fingerprint - the server changed the definition behind an approved name.`,
               { metadata: { server: serverIdentity.id, tool: name } },
             );
           }
@@ -686,7 +686,7 @@ function mapSdkError(cause: unknown, ctx: { readonly tool?: string }): Error {
     if (name === 'AbortError' || /aborted|cancell/i.test(message)) {
       return new MCPCancelledError('MCP request was cancelled.', { metadata, cause });
     }
-    // MC-3: the SDK reports request-timeout as a plain McpError — map it
+    // MC-3: the SDK reports request-timeout as a plain McpError - map it
     // onto the advertised typed class instead of MCPProtocolError.
     if (/request timed out|timed out/i.test(message)) {
       return new MCPCallTimeoutError(

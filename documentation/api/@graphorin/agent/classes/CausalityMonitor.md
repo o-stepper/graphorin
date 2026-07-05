@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -99,7 +99,7 @@ flush(reason): {
 Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:215
 
 Drain the chain to the audit log on `agent.run` completion or
-`agent.abort`. The runtime supplies the audit emitter — the
+`agent.abort`. The runtime supplies the audit emitter - the
 primitive itself is storage-agnostic.
 
 #### Parameters
@@ -134,7 +134,7 @@ Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:110
 
 Append an entry to the causality chain, dropping the oldest
 when the chain exceeds `maxChainDepth`. Bounded-length, no PII,
-no secret values — entries are short opaque strings like
+no secret values - entries are short opaque strings like
 `tool:slack-notify`, `tool.error:SecretAccessDenied`,
 `subagent:research-east`, `compaction:auto-trigger`.
 
@@ -158,7 +158,7 @@ reset(): void;
 
 Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:120
 
-Reset the chain — e.g. on `agent.run` boundary.
+Reset the chain - e.g. on `agent.run` boundary.
 
 #### Returns
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { BUNDLED_SNAPSHOT, computeEntriesDigest, SNAPSHOT_DATE } from '../src/index.js';
 
-describe('@graphorin/pricing — bundled snapshot', () => {
+describe('@graphorin/pricing - bundled snapshot', () => {
   it('declares provenance metadata', () => {
     expect(BUNDLED_SNAPSHOT.version).toBe('graphorin/0.1');
     expect(BUNDLED_SNAPSHOT.snapshotDate).toBe(SNAPSHOT_DATE);

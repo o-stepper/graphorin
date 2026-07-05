@@ -10,7 +10,7 @@ import {
   type ToolArgumentPolicy,
 } from '../../src/policy/index.js';
 
-describe('evaluateToolArgumentPolicy — forbid-before-allow', () => {
+describe('evaluateToolArgumentPolicy - forbid-before-allow', () => {
   it('allows by default with no rules', () => {
     const policy: ToolArgumentPolicy = { rules: [] };
     expect(
@@ -95,7 +95,7 @@ describe('evaluateToolArgumentPolicy — forbid-before-allow', () => {
   });
 });
 
-describe('buildRuleOfTwoPolicy — capability profiles', () => {
+describe('buildRuleOfTwoPolicy - capability profiles', () => {
   it('flags the full trifecta and produces no capability floor', () => {
     const c = buildRuleOfTwoPolicy({
       untrustedInput: true,

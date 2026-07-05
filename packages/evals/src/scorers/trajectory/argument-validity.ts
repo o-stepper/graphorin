@@ -1,8 +1,8 @@
 /**
- * `argumentValidity` — passes when every tool call's arguments are
+ * `argumentValidity` - passes when every tool call's arguments are
  * accepted by that tool's own `inputSchema` (a Zod-like `safeParse`).
  * Calls to tools not present in the supplied set are ignored. Validates
- * arguments only — a call whose args are valid but whose execution failed
+ * arguments only - a call whose args are valid but whose execution failed
  * is still counted valid here (use {@link recoveryAfterError} for that).
  *
  * @packageDocumentation

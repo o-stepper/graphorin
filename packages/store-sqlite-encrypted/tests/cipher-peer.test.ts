@@ -76,7 +76,7 @@ describe('cipher-peer', () => {
     _resetCipherPeerCacheForTesting();
     // Spy on `import()` would require esm-loader hooks; instead we
     // simulate the error by intercepting `_setCipherPeerForTesting`.
-    // The escape hatches are not enough on their own — the production
+    // The escape hatches are not enough on their own - the production
     // dynamic-import path is exercised by the workspace install when
     // the peer is genuinely missing. In CI the peer IS installed, so
     // we assert the behaviour by injecting a thrown loader through a

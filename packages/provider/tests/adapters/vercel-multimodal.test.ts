@@ -39,7 +39,7 @@ function makeOverrides(capture: { lastArgs?: Record<string, unknown> }): VercelR
   };
 }
 
-describe('vercelAdapter — multimodal content pass-through', () => {
+describe('vercelAdapter - multimodal content pass-through', () => {
   it('forwards image content parts unchanged', async () => {
     const capture: { lastArgs?: Record<string, unknown> } = {};
     const adapter = vercelAdapter(MODEL, { runtimeOverrides: makeOverrides(capture) });
@@ -81,7 +81,7 @@ describe('vercelAdapter — multimodal content pass-through', () => {
       mediaType?: string;
       mimeType?: string;
     }>;
-    // The AI SDK has no dedicated audio user part — audio rides as a
+    // The AI SDK has no dedicated audio user part - audio rides as a
     // `file` part with `data` + `mediaType` (+ v4's `mimeType`).
     expect(parts[0]?.type).toBe('file');
     expect(parts[0]?.data).toBe(audioBytes);

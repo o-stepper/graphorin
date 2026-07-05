@@ -8,11 +8,11 @@
 
 **A TypeScript framework for building long-living personal AI assistants.**
 
-Six-tier memory · durable workflow · streaming-first API · observability · secrets · optional standalone runtime — local-first by default.
+Six-tier memory · durable workflow · streaming-first API · observability · secrets · optional standalone runtime - local-first by default.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](./.nvmrc)
-[![Version: 0.5.0](https://img.shields.io/badge/version-v0.5.0-blue.svg)](./CHANGELOG.md)
+[![Version: 0.6.0](https://img.shields.io/badge/version-v0.6.0-blue.svg)](./CHANGELOG.md)
 [![Status: pre-release](https://img.shields.io/badge/status-pre--release-orange.svg)](#status)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![ESM only](https://img.shields.io/badge/modules-ESM%20only-purple.svg)](https://nodejs.org/api/esm.html)
@@ -29,7 +29,7 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ---
 
-> **Graphorin** is a foundation layer for higher-level assistant products — a personal trainer, a personal tutor, a personal business assistant, a personal financial advisor, and so on. It is intentionally a **framework**, not a product: assistant bots are built **on top of** it.
+> **Graphorin** is a foundation layer for higher-level assistant products - a personal trainer, a personal tutor, a personal business assistant, a personal financial advisor, and so on. It is intentionally a **framework**, not a product: assistant bots are built **on top of** it.
 
 ## Table of contents
 
@@ -53,17 +53,17 @@ Six-tier memory · durable workflow · streaming-first API · observability · s
 
 ## Why Graphorin?
 
-- **Long-living, not single-shot.** Assistants built on Graphorin are designed to **remember**, **endure**, and **stay yours** — a six-tier memory model and a durable workflow runtime mean state survives a process restart and finishes on a different machine if it has to.
-- **Local-first by default.** Zero implicit network calls. No version pings, no usage analytics, no auto-update phone-home. The only outbound traffic is the traffic your code initiates — verified by a continuous-integration check that fails the build on any forbidden socket call.
+- **Long-living, not single-shot.** Assistants built on Graphorin are designed to **remember**, **endure**, and **stay yours** - a six-tier memory model and a durable workflow runtime mean state survives a process restart and finishes on a different machine if it has to.
+- **Local-first by default.** Zero implicit network calls. No version pings, no usage analytics, no auto-update phone-home. The only outbound traffic is the traffic your code initiates - verified by a continuous-integration check that fails the build on any forbidden socket call.
 - **Vendor-neutral on LLMs.** A single `Provider` abstraction adapts cloud models, local Ollama daemons, OpenAI-compatible HTTP servers, and in-process GGUF execution. Switch models with a one-line change.
-- **Streaming-first API.** Every operation is a typed `AsyncIterable<AgentEvent>` — tokens, tool calls, memory writes, handoffs, fallback transitions and human approvals all surface as events your UI can react to.
+- **Streaming-first API.** Every operation is a typed `AsyncIterable<AgentEvent>` - tokens, tool calls, memory writes, handoffs, fallback transitions and human approvals all surface as events your UI can react to.
 - **Type-safe end-to-end.** Zero `any` in public APIs. Schemas flow through tools, memory blocks, and structured outputs. Discriminated-union events come with exhaustive `assertNever(...)` checks.
 - **Privacy and security as primitives.** A `SecretValue` type that cannot be accidentally logged, a `SecretRef` URI scheme, OS keychain integration, OAuth 2.1 with PKCE, sensitivity-aware payload tagging, optional encryption-at-rest, and a SHA-256 hash-chained audit log.
 - **Embed or run as a daemon.** Use any package as a library inside your Node.js process, or promote your assistant to the optional standalone server with REST + WebSocket + SSE fallback and durable triggers.
 
 ## Status
 
-Graphorin is currently on the **`v0.5.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
+Graphorin is currently on the **`v0.6.0`** pre-release line, **published on the npm registry** under the `@graphorin/*` scope. The framework follows **lockstep versioning** across all `@graphorin/*` packages while the framework is on the `0.x` line; once it reaches `1.0`, optional packages and adapters are versioned independently.
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
@@ -71,11 +71,11 @@ Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything
 
 Graphorin is the **engine**. You ship the **assistant**. The framework is intentionally domain-agnostic so the same primitives can power a wide range of personal AI products:
 
-- **Personal trainer** — multi-week training plans, progressive overload memory, habit tracking.
-- **Personal tutor** — long-running learner profiles, spaced repetition, durable lesson workflows.
-- **Personal business assistant** — meeting prep, follow-ups, contact memory, durable approval flows.
-- **Personal financial advisor** — bi-temporal facts, sensitivity-aware payloads, audited tool execution.
-- **Health & wellness companions, knowledge workers, research copilots** — anywhere you need an assistant that remembers across sessions and survives process restarts.
+- **Personal trainer** - multi-week training plans, progressive overload memory, habit tracking.
+- **Personal tutor** - long-running learner profiles, spaced repetition, durable lesson workflows.
+- **Personal business assistant** - meeting prep, follow-ups, contact memory, durable approval flows.
+- **Personal financial advisor** - bi-temporal facts, sensitivity-aware payloads, audited tool execution.
+- **Health & wellness companions, knowledge workers, research copilots** - anywhere you need an assistant that remembers across sessions and survives process restarts.
 
 What Graphorin **does not** ship (intentional): channel adapters (Telegram, Slack, iMessage, WhatsApp), a UI, a SaaS, or a model-serving stack. Those belong to higher-level assistant products built **on top of** Graphorin.
 
@@ -83,10 +83,10 @@ What Graphorin **does not** ship (intentional): channel adapters (Telegram, Slac
 
 | Area | Capability |
 |---|---|
-| **Memory** | Six-tier memory system — working / session / episodic / semantic / procedural / shared, with pluggable storage and a background consolidation pipeline. |
+| **Memory** | Six-tier memory system - working / session / episodic / semantic / procedural / shared, with pluggable storage and a background consolidation pipeline. |
 | **Workflow** | Durable step-graph runtime with checkpoints, pause / resume across process restarts, and human-in-the-loop primitives. |
 | **Local-first** | SQLite + the `sqlite-vec` extension + FTS5; multilingual embeddings via `@huggingface/transformers`; cloud is opt-in. |
-| **Privacy** | Zero default telemetry — no phone-home, no version pings, no analytics. Verified by a CI check. |
+| **Privacy** | Zero default telemetry - no phone-home, no version pings, no analytics. Verified by a CI check. |
 | **Providers** | Multi-vendor LLM access through Graphorin's own `Provider` interface, built on top of the Vercel AI SDK. |
 | **Tools / Skills / MCP** | Typed tools, a `SKILL.md` packaging-format-compatible loader with three-tier progressive disclosure, and an in-core Model Context Protocol client. |
 | **Observability** | OpenTelemetry-native tracing with the GenAI Semantic Conventions, sensitivity-aware redaction, and replay. |
@@ -95,12 +95,12 @@ What Graphorin **does not** ship (intentional): channel adapters (Telegram, Slac
 
 ## Quick start
 
-The `@graphorin/*` packages are published on the npm registry (since `v0.5.0`). The full quickstart — a 20-line memory-backed agent that streams tokens and persists facts to local SQLite via local embeddings — lives at **<https://docs.graphorin.com/guide/quickstart>**.
+The `@graphorin/*` packages are published on the npm registry (since `v0.6.0`). The full quickstart - a 20-line memory-backed agent that streams tokens and persists facts to local SQLite via local embeddings - lives at **<https://docs.graphorin.com/guide/quickstart>**.
 
 ### Prerequisites
 
 - **Node.js** 22.x LTS or newer (see [`.nvmrc`](./.nvmrc)).
-- Any package manager — **pnpm** is the project default; `npm` and `yarn` work fine for consumers.
+- Any package manager - **pnpm** is the project default; `npm` and `yarn` work fine for consumers.
 - ESM-only modules: your project must be `"type": "module"` (or use `.mjs` files).
 
 ### Install from npm
@@ -128,7 +128,7 @@ pnpm -r test
 
 ## Architecture at a glance
 
-Graphorin is built as a stack of focused packages. Each layer depends only on the layers below it, so you can pick the slice that matches your application — from a 20-line embedded agent up to a long-running daemon with REST + WebSocket and durable triggers.
+Graphorin is built as a stack of focused packages. Each layer depends only on the layers below it, so you can pick the slice that matches your application - from a 20-line embedded agent up to a long-running daemon with REST + WebSocket and durable triggers.
 
 ```
 Tier 6  Standalone server + DX     @graphorin/server · cli · protocol · client
@@ -155,9 +155,9 @@ The framework is published as a set of focused packages on the npm registry unde
 | `@graphorin/store-sqlite` | Default storage adapter on top of `better-sqlite3` + `sqlite-vec` + FTS5. |
 | `@graphorin/embedder-transformersjs` | Default in-process multilingual embedder. |
 | `@graphorin/embedder-ollama` | First-class opt-in embedder against an Ollama daemon. |
-| `@graphorin/triggers` | Background tasks — cron / interval / idle / event. |
+| `@graphorin/triggers` | Background tasks - cron / interval / idle / event. |
 | `@graphorin/provider` | `Provider` interface and adapters (Vercel AI SDK, Ollama, OpenAI-compatible HTTP, llama.cpp HTTP server). |
-| `@graphorin/provider-llamacpp-node` | Companion package — in-process GGUF execution. |
+| `@graphorin/provider-llamacpp-node` | Companion package - in-process GGUF execution. |
 | `@graphorin/tools` | Typed tool definitions and execution. |
 | `@graphorin/skills` | `SKILL.md` packaging-format-compatible loader with three-tier progressive disclosure. |
 | `@graphorin/mcp` | Model Context Protocol client (stdio + Streamable HTTP). |
@@ -167,14 +167,14 @@ The framework is published as a set of focused packages on the npm registry unde
 | `@graphorin/workflow` | Durable workflow engine. |
 | `@graphorin/server` | Optional standalone server with REST + WebSocket + SSE fallback. |
 | `@graphorin/cli` | Operator CLI. |
-| `@graphorin/protocol` | WebSocket protocol contract — `graphorin.protocol.v1`. |
+| `@graphorin/protocol` | WebSocket protocol contract - `graphorin.protocol.v1`. |
 | `@graphorin/client` | Browser-friendly client for the standalone server. |
 | `@graphorin/store-sqlite-encrypted` | Optional SQLCipher v4 encryption-at-rest. |
 | `@graphorin/secret-1password` | Optional reference adapter for the 1Password CLI. |
 | `@graphorin/reranker-transformersjs` | Optional cross-encoder reranker via `@huggingface/transformers`. |
 | `@graphorin/reranker-llm` | Optional LLM-judge reranker. |
 | `@graphorin/eslint-plugin` | ESLint rules for projects that build on Graphorin. |
-| `@graphorin/evals` | Optional evaluation primitives — scorers, datasets, reporters, regression detection. |
+| `@graphorin/evals` | Optional evaluation primitives - scorers, datasets, reporters, regression detection. |
 
 The full per-package reference (status, role, public surface) lives at **<https://docs.graphorin.com/reference/packages>**.
 
@@ -195,7 +195,7 @@ The repository ships a `pnpm run check-no-network` CI check that fails if a non-
 
 ## Direct dependencies
 
-Graphorin uses the libraries below at runtime. Each is integrated through public APIs — the framework's source tree does not bundle, fork, or redistribute any third-party source. The full list (with pinned versions, SPDX identifiers, and transitive notes) lives in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+Graphorin uses the libraries below at runtime. Each is integrated through public APIs - the framework's source tree does not bundle, fork, or redistribute any third-party source. The full list (with pinned versions, SPDX identifiers, and transitive notes) lives in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
 
 | Library | License | Role inside Graphorin |
 |---|---|---|
@@ -259,7 +259,7 @@ AUTHORS.md               Project authorship.
 
 ## Release readiness
 
-The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.5.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk).
+The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.6.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk).
 
 The same command is invoked by the [`release.yml`](./.github/workflows/release.yml) workflow before any package gets published.
 
@@ -286,7 +286,7 @@ Please **do not** open a public GitHub issue for security vulnerabilities. The p
 
 ## License
 
-Graphorin is released under the **MIT License** — a permissive license that allows commercial and non-commercial use, modification, and redistribution under the same terms. The full text lives in [`LICENSE`](./LICENSE).
+Graphorin is released under the **MIT License** - a permissive license that allows commercial and non-commercial use, modification, and redistribution under the same terms. The full text lives in [`LICENSE`](./LICENSE).
 
 ```
 Copyright (c) 2026 Oleksiy Stepurenko
@@ -298,10 +298,10 @@ The bundled [`NOTICE`](./NOTICE) file is referenced by the MIT LICENSE and lists
 
 Graphorin is created, owned, and maintained by **Oleksiy Stepurenko**.
 
-- **Email** — <step.oleksiy@gmail.com>
-- **Website** — <https://graphorin.com>
-- **Documentation** — <https://docs.graphorin.com>
-- **Repository** — <https://github.com/o-stepper/graphorin>
+- **Email** - <step.oleksiy@gmail.com>
+- **Website** - <https://graphorin.com>
+- **Documentation** - <https://docs.graphorin.com>
+- **Repository** - <https://github.com/o-stepper/graphorin>
 
 For commercial enquiries, partnerships, or anything that does not fit a public issue, please reach out by email.
 
@@ -313,7 +313,7 @@ For commercial enquiries, partnerships, or anything that does not fit a public i
   <img src="https://graphorin.com/assets/logo.svg" alt="Graphorin" width="48" height="48" />
 </a>
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 
 [graphorin.com](https://graphorin.com) · [docs.graphorin.com](https://docs.graphorin.com) · [github.com/o-stepper/graphorin](https://github.com/o-stepper/graphorin) · <step.oleksiy@gmail.com>
 

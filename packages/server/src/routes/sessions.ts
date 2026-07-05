@@ -213,7 +213,7 @@ export function createSessionRoutes(deps: SessionRoutesDeps): Hono<{ Variables: 
   // scope-laddered, audit-backed implementation). The Phase-14a stub
   // that lived here SHADOWED it (mounted earlier on the same path)
   // while advertising a `session:<id>/replay` subject the WS grammar
-  // cannot parse — deleted.
+  // cannot parse - deleted.
 
   return app;
 }

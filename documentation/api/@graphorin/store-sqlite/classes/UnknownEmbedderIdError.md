@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:48
 
-Read access for unknown `embedder_id` — the runtime fails fast on
+Read access for unknown `embedder_id` - the runtime fails fast on
 any record write that references an unregistered embedder.
 
 ## Stable

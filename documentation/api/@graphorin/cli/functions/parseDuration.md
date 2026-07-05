@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/cli/src/commands/token.ts:338
 **`Internal`**
 
 Tiny duration parser. Accepts `Ns`, `Nm`, `Nh`, `Nd`. Returns
-milliseconds. Throws on invalid input — surfaced as a fail-fast at
+milliseconds. Throws on invalid input - surfaced as a fail-fast at
 the CLI boundary.
 
 ## Parameters

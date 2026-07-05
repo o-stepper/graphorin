@@ -1,5 +1,5 @@
 /**
- * `pruneAudit(...)` — drop a contiguous prefix of the audit chain
+ * `pruneAudit(...)` - drop a contiguous prefix of the audit chain
  * while preserving the integrity of the surviving suffix.
  *
  * The retention policy is a deliberate trade-off: the framework keeps
@@ -10,8 +10,8 @@
  * Only the longest *contiguous* run of fully-expired entries at the
  * front of the chain is removed. Because the chain is a hash chain it
  * can only be trimmed at the front, so an expired entry that sits (by
- * `seq`) behind a not-yet-expired one — e.g. when timestamps are not
- * monotonic in `seq` order — is retained rather than punching a hole in
+ * `seq`) behind a not-yet-expired one - e.g. when timestamps are not
+ * monotonic in `seq` order - is retained rather than punching a hole in
  * the chain. Deleting fewer entries than the wall-clock cutoff implies
  * is the safe behaviour here, never a silent gap.
  *
@@ -19,7 +19,7 @@
  * to the genesis value so `verifyAuditChain(...)` keeps returning
  * `{ ok: true }` on the surviving suffix. This recomputes every
  * surviving entry's `hash`, so any entry hashes previously archived via
- * `exportAudit(...)` will no longer match the post-prune chain — treat a
+ * `exportAudit(...)` will no longer match the post-prune chain - treat a
  * prune as invalidating the hashes of earlier exports.
  *
  * @packageDocumentation
@@ -99,8 +99,8 @@ export async function pruneAudit(
   if (total === 0) return Object.freeze({ deleted: 0 });
 
   // Collect candidate seqs while respecting the retain floor. We
-  // walk the iterator twice — once to identify the threshold and
-  // once to find the first surviving entry — so we never have to
+  // walk the iterator twice - once to identify the threshold and
+  // once to find the first surviving entry - so we never have to
   // load the entire chain into memory.
   let lastQualifyingSeq: number | undefined;
   let walked = 0;
@@ -118,7 +118,7 @@ export async function pruneAudit(
   // surviving entry's `prevHash` (and consequently its `hash`) is
   // recomputed so `verifyAuditChain` keeps reporting a clean chain
   // on the trimmed log. The cryptographic link to the deleted prefix
-  // is severed by design — that is the documented retention contract.
+  // is severed by design - that is the documented retention contract.
   let prevHash = GENESIS_PREV_HASH;
   let firstSurviving: StoredAuditEntry | undefined;
   for await (const entry of db.iterate()) {

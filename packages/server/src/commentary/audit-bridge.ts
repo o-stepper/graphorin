@@ -1,9 +1,9 @@
 /**
  * IP-21: bridge the delivery-commentary sanitizer's audit decisions into the
  * tamper-evident audit log. `createWsDispatcher` ran the sanitizer without a
- * `sink`, so every documented sanitization decision — what was wrapped or
+ * `sink`, so every documented sanitization decision - what was wrapped or
  * stripped on the wire, with before/after digests and the matched-pattern
- * bucket — was silently dropped instead of landing in the audit chain.
+ * bucket - was silently dropped instead of landing in the audit chain.
  *
  * The WS dispatcher is constructed before the audit DB is unsealed (the DB
  * opens during `start()`), so the server hands the dispatcher a
@@ -64,7 +64,7 @@ export interface CommentaryAuditSink extends DeliveryCommentarySink {
 /**
  * Build a commentary sink that appends each sanitization decision to the audit
  * log. Writes serialise through `appendAudit` so concurrent decisions never
- * race on `seq`; a failed write is isolated from the wire — `onWriteError`
+ * race on `seq`; a failed write is isolated from the wire - `onWriteError`
  * (default: a console warning) runs instead of throwing.
  *
  * @stable
@@ -102,7 +102,7 @@ function defaultOnWriteError(_decision: DeliveryCommentaryDecision, error: unkno
  * A {@link DeliveryCommentarySink} whose real target is installed later. The WS
  * dispatcher is created before the audit DB opens (IP-21); the server hands it
  * this forwarding sink and calls {@link LateBoundCommentarySink.bind} once the
- * audit-writing sink exists. Decisions emitted before binding are dropped — the
+ * audit-writing sink exists. Decisions emitted before binding are dropped - the
  * dispatcher only sanitizes once it is live (after `start()`, by which point
  * the audit DB, if configured, has opened and bound).
  *

@@ -1,21 +1,21 @@
 /**
- * `@graphorin/memory/consolidator` — Phase 10c runtime that turns
+ * `@graphorin/memory/consolidator` - Phase 10c runtime that turns
  * raw conversation turns into long-lived facts and episodes. The
  * module ships:
  *
- * - {@link createConsolidator} — the production factory that wires
+ * - {@link createConsolidator} - the production factory that wires
  *   triggers, the budget envelope, the wait-then-defer lock, the
  *   idempotent cursor, the DLQ, and the three phases (light /
  *   standard / deep) into a single `Consolidator` handle.
- * - {@link createConsolidatorPlaceholder} — kept for back-compat
+ * - {@link createConsolidatorPlaceholder} - kept for back-compat
  *   with consumers that wired the no-op stub during Phase 10a; it
  *   honours the same shape but does no background work.
  * - Pure helpers (`noise-filter`, `decay`, `budget`, `lock`, `dlq`,
- *   `idempotency`, `triggers`) and the per-phase orchestrators —
+ *   `idempotency`, `triggers`) and the per-phase orchestrators -
  *   exported so tests + the standalone server (Phase 14) can compose
  *   them without re-implementing the algorithm.
  *
- * The `Consolidator` interface is **stable** — Phase 14 wires the
+ * The `Consolidator` interface is **stable** - Phase 14 wires the
  * runtime into the lifecycle hooks, and Phase 15 surfaces every
  * method through `graphorin consolidator …` CLI commands.
  *
@@ -243,7 +243,7 @@ export function createConsolidatorPlaceholder(
       paused = false;
     },
     recordExternalSpend(): void {
-      // Placeholder — no budget to record against.
+      // Placeholder - no budget to record against.
     },
     onPhaseFinished(listener) {
       listeners.add(listener);

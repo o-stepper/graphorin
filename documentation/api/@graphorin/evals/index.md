@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -13,14 +13,14 @@
 > bounded concurrency, and regression detection that compares the
 > current run against a stored baseline.
 >
-> Project Graphorin · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko ·
+> Project Graphorin · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko ·
 > <https://github.com/o-stepper/graphorin>
 
 ---
 
 ## Status
 
-- **Published:** v0.5.0 (optional sub-pack; the full orchestrator is
+- **Published:** v0.6.0 (optional sub-pack; the full orchestrator is
   decoupled from `@graphorin/observability` per RB-17 / DEC-152).
 
 ---
@@ -68,7 +68,7 @@ exitOnFailures(report);
 | `code/`     | `exactMatch`, `regexMatch`, `jsonPath`, `predicate` | Pure-code grading. No provider call.|
 | `llm/`      | `llmJudge`                                          | LLM-as-judge. Default `gpt-4o-mini`-class judge with `temperature: 0`. |
 | `prebuilt/` | `toxicityScorer`, `factualityScorer`, `helpfulnessScorer` | Wrap `llmJudge` with a project-tested rubric. |
-| `trajectory/` | `correctToolSelected`, `argumentValidity`, `redundantCallDetection`, `recoveryAfterError`, `finalStateCorrect` | Pure-code, offline scorers over a `Trajectory` (the tool calls a harness made). Measure harness reliability — tool selection, argument validity, redundant work, error recovery, goal state. |
+| `trajectory/` | `correctToolSelected`, `argumentValidity`, `redundantCallDetection`, `recoveryAfterError`, `finalStateCorrect` | Pure-code, offline scorers over a `Trajectory` (the tool calls a harness made). Measure harness reliability - tool selection, argument validity, redundant work, error recovery, goal state. |
 
 ---
 
@@ -125,7 +125,7 @@ const regression = detectRegressions(report, baseline, {
 });
 if (regression.hasRegressions) {
   for (const f of regression.findings) {
-    console.error(`regression — ${f.kind}: ${f.message}`);
+    console.error(`regression - ${f.kind}: ${f.message}`);
   }
 }
 exitOnFailures(report, regression);
@@ -150,7 +150,7 @@ await writeReports({
 
 ## Related decisions
 
-- DEC-152 — Eval split: keep evaluation interfaces in `@graphorin/observability`, ship the full eval framework as `@graphorin/evals`.
+- DEC-152 - Eval split: keep evaluation interfaces in `@graphorin/observability`, ship the full eval framework as `@graphorin/evals`.
 
 ---
 
@@ -160,13 +160,13 @@ MIT © 2026 Oleksiy Stepurenko
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/evals/README.md) | @graphorin/evals — eval framework for the Graphorin framework. |
+| [](/api/@graphorin/evals/README.md) | @graphorin/evals - eval framework for the Graphorin framework. |
 | [cli](/api/@graphorin/evals/cli/index.md) | CLI integration helpers. Convenience wrappers that combine the runner + a reporter + an exit-code mapping so consumer scripts can stay short. |
 | [loaders](/api/@graphorin/evals/loaders/index.md) | Dataset loaders. Every loader returns a fully-materialised Dataset that the runner can iterate over without further I/O. Streaming loaders are a post-MVP follow-up. |
 | [reporters](/api/@graphorin/evals/reporters/index.md) | Barrel export for every shipped reporter. Each renderer takes an `EvalReport` and returns the canonical text representation; the caller decides where to write it (`writeFile`, `process.stdout`, GitHub Actions step summary, etc.). |

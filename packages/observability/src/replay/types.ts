@@ -21,7 +21,7 @@ export type ReplayMode = 'sanitized' | 'raw';
 
 /**
  * Audit-bridge contract used by the replay layer. Every replay
- * invocation emits one entry through the bridge — sanitized + raw
+ * invocation emits one entry through the bridge - sanitized + raw
  * alike. The actual audit storage lives in `@graphorin/security`; the
  * replay layer keeps the bridge generic so the package stays free of
  * a hard dependency on the security package.
@@ -84,7 +84,7 @@ export type ReplayEvent =
 export interface ReplayOptions {
   /** Validator used to sanitize records when `mode === 'sanitized'`. */
   readonly validator?: RedactionValidatorInstance;
-  /** Optional audit bridge — called once per replay invocation. */
+  /** Optional audit bridge - called once per replay invocation. */
   readonly audit?: ReplayAuditBridge;
   /** Default actor reported via `audit.actor` when none is supplied. */
   readonly defaultActor?: ReplayAuditEvent['actor'];

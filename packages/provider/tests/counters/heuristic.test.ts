@@ -21,7 +21,7 @@ describe('HeuristicCounter', () => {
     const b = userMessage('1234');
     const total = await counter.count([a, b]);
     // Each message serialises as `[user]\n<content>`; we don't assert
-    // exact numbers (serialisation is internal) — we assert linearity:
+    // exact numbers (serialisation is internal) - we assert linearity:
     // counting the two together equals counting each individually.
     const single = await counter.count([a]);
     const single2 = await counter.count([b]);

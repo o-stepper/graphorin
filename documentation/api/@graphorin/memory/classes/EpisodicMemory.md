@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/tiers/episodic-memory.ts:107
 
-`EpisodicMemory` — record + retrieve summarized stretches of past
+`EpisodicMemory` - record + retrieve summarized stretches of past
 activity. Stored embeddings power triple-signal retrieval (recency
 × relevance × importance).
 
@@ -106,7 +106,7 @@ opts?): Promise<readonly Episode[]>;
 Defined in: packages/memory/src/tiers/episodic-memory.ts:277
 
 Most-recent episodes by end time (newest first), with no embedding / FTS
-query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` — the default
+query (MCON-1). Requires `EpisodicMemoryStoreExt.listRecent` - the default
 `@graphorin/store-sqlite` adapter implements it. Optionally includes
 quarantined episodes (the importance source for the reflection gate).
 

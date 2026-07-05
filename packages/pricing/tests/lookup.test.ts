@@ -8,7 +8,7 @@ import {
   setLookupWarnSink,
 } from '../src/index.js';
 
-describe('@graphorin/pricing — lookupPrice', () => {
+describe('@graphorin/pricing - lookupPrice', () => {
   beforeEach(() => {
     _resetLookupWarningsForTesting();
     setLookupWarnSink(() => {});
@@ -91,7 +91,7 @@ describe('@graphorin/pricing — lookupPrice', () => {
   });
 });
 
-describe('@graphorin/pricing — calculateCost', () => {
+describe('@graphorin/pricing - calculateCost', () => {
   beforeEach(() => {
     _resetLookupWarningsForTesting();
     setLookupWarnSink(() => {});
@@ -150,7 +150,7 @@ describe('@graphorin/pricing — calculateCost', () => {
       outputTokens: 0,
     });
     // inputTokens is the NON-cached prompt; cached tokens add only the cached
-    // rate — they are never also billed at the (higher) input rate.
+    // rate - they are never also billed at the (higher) input rate.
     expect((withCache?.amount ?? 0) - (noCache?.amount ?? 0)).toBeCloseTo(cachedRate * 1_000, 12);
   });
 });

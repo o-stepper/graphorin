@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ const OPEN_INFERENCE_KIND_TABLE: readonly readonly [SpanType, OpenInferenceSpanK
 
 Defined in: packages/observability/src/openinference/index.ts:133
 
-Full canonical span-to-kind table — exposed for tooling and tests
+Full canonical span-to-kind table - exposed for tooling and tests
 that need to introspect the mapping.
 
 ## Stable

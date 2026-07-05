@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,9 +13,9 @@ Pipeline configuration accepted by `createMemory({ conflictPipeline:
 
 The `mode` field is the master switch:
 
- - `'on'` (default) — the multi-stage pipeline runs on every
+ - `'on'` (default) - the multi-stage pipeline runs on every
    `SemanticMemory.remember(...)` call.
- - `'off'` — bypass the pipeline and fall back to 10a's straight-
+ - `'off'` - bypass the pipeline and fall back to 10a's straight-
    through write. Emits a one-shot WARN (per process) so operators
    notice the regression risk.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -26,8 +26,8 @@ Public configuration accepted by [GraphorinClient](/api/@graphorin/client/client
 | `EventSource.prototype` | `public` | `EventSource` | - | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.dom.d.ts:11551 |
 | <a id="property-fetch"></a> `fetch?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | Inject a `fetch` implementation (defaults to `globalThis.fetch`). | packages/client/src/graphorin-client.ts:129 |
 | <a id="property-reconnect"></a> `reconnect?` | `readonly` | [`BackoffPolicy`](/api/@graphorin/client/reconnect/interfaces/BackoffPolicy.md) | - | packages/client/src/graphorin-client.ts:123 |
-| <a id="property-rpctimeoutms"></a> `rpcTimeoutMs?` | `readonly` | `number` | IP-19: per-RPC reply timeout in milliseconds. When set (and > 0), an RPC that receives no matching reply within this window rejects with a [TransportFailedError](/api/@graphorin/client/errors/classes/TransportFailedError.md) instead of hanging forever on a non-responsive server. Default: unset — no timeout, so a legitimately slow server reply is never aborted (opt-in). | packages/client/src/graphorin-client.ts:139 |
-| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | Session bound to the SSE fallback (IP-3): substituted into the `:sessionId` slot of `sseSessionPath`. Required to connect over SSE — the old client sent the literal template and could never receive an event. | packages/client/src/graphorin-client.ts:105 |
+| <a id="property-rpctimeoutms"></a> `rpcTimeoutMs?` | `readonly` | `number` | IP-19: per-RPC reply timeout in milliseconds. When set (and > 0), an RPC that receives no matching reply within this window rejects with a [TransportFailedError](/api/@graphorin/client/errors/classes/TransportFailedError.md) instead of hanging forever on a non-responsive server. Default: unset - no timeout, so a legitimately slow server reply is never aborted (opt-in). | packages/client/src/graphorin-client.ts:139 |
+| <a id="property-sessionid"></a> `sessionId?` | `readonly` | `string` | Session bound to the SSE fallback (IP-3): substituted into the `:sessionId` slot of `sseSessionPath`. Required to connect over SSE - the old client sent the literal template and could never receive an event. | packages/client/src/graphorin-client.ts:105 |
 | <a id="property-ssesessionpath"></a> `sseSessionPath?` | `readonly` | `string` | SSE path template. The placeholder `:sessionId` is replaced at subscribe time. Default: `'/v1/sessions/:sessionId/events'`. Required when the transport is `'sse'` or when the WS handshake fails on `'auto'`. | packages/client/src/graphorin-client.ts:122 |
 | <a id="property-transport"></a> `transport?` | `readonly` | [`TransportPreference`](/api/@graphorin/client/client/type-aliases/TransportPreference.md) | - | packages/client/src/graphorin-client.ts:113 |
 | <a id="property-websocket"></a> `WebSocket?` | `readonly` | \{ (`url`, `protocols?`): `WebSocket`; `CLOSED`: `3`; `CLOSING`: `2`; `CONNECTING`: `0`; `OPEN`: `1`; `prototype`: `WebSocket`; \} | Inject a `WebSocket` constructor (Node SDKs / tests). | packages/client/src/graphorin-client.ts:125 |

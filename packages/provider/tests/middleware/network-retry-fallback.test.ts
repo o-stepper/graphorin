@@ -1,8 +1,8 @@
 /**
  * Coverage for PS-2 (network errors are retryable + fallback-eligible by
  * default) and PS-1 (withRetry never restarts a stream that already emitted
- * events). The headline scenario — a local provider that is down
- * (ECONNREFUSED) — surfaces as `ProviderHttpError{ status: 0 }`; before these
+ * events). The headline scenario - a local provider that is down
+ * (ECONNREFUSED) - surfaces as `ProviderHttpError{ status: 0 }`; before these
  * fixes neither default predicate accepted it, so retry/fallback never fired.
  */
 import type { Provider, ProviderEvent, ProviderRequest, ProviderResponse } from '@graphorin/core';
@@ -43,7 +43,7 @@ async function collect(stream: AsyncIterable<ProviderEvent>): Promise<ProviderEv
   return out;
 }
 
-describe('withRetry — network errors (PS-2)', () => {
+describe('withRetry - network errors (PS-2)', () => {
   it('retries a status:0 ProviderHttpError (ECONNREFUSED-shaped) then succeeds', async () => {
     let calls = 0;
     const provider: Provider = {
@@ -82,7 +82,7 @@ describe('withRetry — network errors (PS-2)', () => {
         throw networkError(abort);
       },
     };
-    // req.signal is NOT aborted, so the loop reaches the predicate — the
+    // req.signal is NOT aborted, so the loop reaches the predicate - the
     // exclusion must come from the error's AbortError cause, not the signal.
     const wrapped = withRetry({ maxRetries: 5, jitter: false, sleepImpl: () => Promise.resolve() })(
       provider,
@@ -92,7 +92,7 @@ describe('withRetry — network errors (PS-2)', () => {
   });
 });
 
-describe('withFallback — network errors (PS-2)', () => {
+describe('withFallback - network errors (PS-2)', () => {
   it('falls back to the secondary when the primary throws a status:0 error', async () => {
     const primary: Provider = {
       name: 'primary',
@@ -123,7 +123,7 @@ describe('withFallback — network errors (PS-2)', () => {
   });
 });
 
-describe('withRetry — mid-stream failure (PS-1)', () => {
+describe('withRetry - mid-stream failure (PS-1)', () => {
   it('does NOT restart a stream that already emitted events', async () => {
     let streamStarts = 0;
     const provider: Provider = {
@@ -134,7 +134,7 @@ describe('withRetry — mid-stream failure (PS-1)', () => {
         streamStarts++;
         yield { type: 'text-delta', delta: 'Hel' };
         yield { type: 'text-delta', delta: 'lo' };
-        // A *retryable* (503) failure AFTER emitting — on the current code the
+        // A *retryable* (503) failure AFTER emitting - on the current code the
         // retry loop restarts the stream from scratch and the consumer sees
         // the two deltas twice. PS-1: once any event has been emitted the
         // error must propagate instead of restarting.
@@ -153,7 +153,7 @@ describe('withRetry — mid-stream failure (PS-1)', () => {
         for await (const ev of wrapped.stream(REQ)) seen.push(ev);
       })(),
     ).rejects.toBeInstanceOf(ProviderHttpError);
-    // The stream was attempted exactly once — no restart, no duplicates.
+    // The stream was attempted exactly once - no restart, no duplicates.
     expect(streamStarts).toBe(1);
     const deltas = seen.filter((e) => e.type === 'text-delta');
     expect(deltas).toHaveLength(2);

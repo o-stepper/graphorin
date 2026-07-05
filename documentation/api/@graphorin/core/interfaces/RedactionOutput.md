@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/contracts/redaction-validator.ts:51
 
-Result of `RedactionValidator.validate(...)` — either the sanitized
+Result of `RedactionValidator.validate(...)` - either the sanitized
 payload (possibly equal to the input) or `null` if the value must be
 dropped entirely.
 

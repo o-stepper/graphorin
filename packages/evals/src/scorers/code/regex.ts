@@ -1,5 +1,5 @@
 /**
- * `regexMatch` — passes when the (stringified) `output` matches a
+ * `regexMatch` - passes when the (stringified) `output` matches a
  * caller-supplied regex.
  *
  * @packageDocumentation
@@ -17,10 +17,10 @@ export interface RegexMatchOptions {
 /** @stable */
 export function regexMatch<I = unknown>(options: RegexMatchOptions): Scorer<I, unknown> {
   const name = options.name ?? 'regex-match';
-  // EB-5: a caller-supplied `/g` or `/y` RegExp makes `.test()` STATEFUL — it
+  // EB-5: a caller-supplied `/g` or `/y` RegExp makes `.test()` STATEFUL - it
   // advances `lastIndex`, so reusing the scorer across cases (or iterations)
   // would skip or drop matches non-deterministically. Match against a clone
-  // with the stateful flags stripped (other flags — i/m/s/u — preserved); a
+  // with the stateful flags stripped (other flags - i/m/s/u - preserved); a
   // whole-string `.test()` never needs `g`/`y`. Built once; never mutated.
   const matcher =
     options.pattern.global || options.pattern.sticky

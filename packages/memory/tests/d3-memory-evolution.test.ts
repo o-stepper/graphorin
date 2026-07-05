@@ -116,7 +116,7 @@ function learnedContextProvider(): Provider & { readonly calls: ProviderRequest[
           finishReason: 'stop',
         };
       }
-      // Deep-phase conflict judge (unused here — no pending conflicts).
+      // Deep-phase conflict judge (unused here - no pending conflicts).
       return {
         text: JSON.stringify({ decision: 'admit', reason: 'n/a' }),
         usage: { promptTokens: 5, completionTokens: 2, totalTokens: 7 },
@@ -158,7 +158,7 @@ async function setupDeep(consolidatorExtra: Record<string, unknown>): Promise<{
   return { memory, provider };
 }
 
-describe('consolidator deep phase — learned-context digest (D3)', () => {
+describe('consolidator deep phase - learned-context digest (D3)', () => {
   it('rewrites the learned_context block from evidence when enabled', async () => {
     const { memory, provider } = await setupDeep({ learnedContext: true });
     await memory.episodic.record(SCOPE, {

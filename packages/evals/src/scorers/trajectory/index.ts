@@ -1,8 +1,8 @@
 /**
  * Trajectory scorers: pure-code, offline scorers over a {@link Trajectory}
  * (the recorded sequence of tool calls a harness made for a task). They
- * measure *harness reliability* — tool selection, argument validity,
- * redundant work, error recovery, and goal-state correctness — and gate
+ * measure *harness reliability* - tool selection, argument validity,
+ * redundant work, error recovery, and goal-state correctness - and gate
  * regressions in CI without a model or network.
  *
  * @packageDocumentation

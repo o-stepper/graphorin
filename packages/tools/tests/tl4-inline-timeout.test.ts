@@ -6,7 +6,7 @@ import { createToolExecutor } from '../src/executor/index.js';
 import { createToolRegistry } from '../src/registry/index.js';
 import { makeRunContext } from './fixtures.js';
 
-describe('TL-4 — inline tools get an enforced wall-clock timeout', () => {
+describe('TL-4 - inline tools get an enforced wall-clock timeout', () => {
   it('a hanging signal-ignoring inline tool fails with kind "timeout"; the run continues', async () => {
     const registry = createToolRegistry();
     registry.register(

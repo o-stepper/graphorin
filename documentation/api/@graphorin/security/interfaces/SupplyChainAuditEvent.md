@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/supply-chain/audit-emitter.ts:45
 
-One audit event. The payload is intentionally minimal — never
+One audit event. The payload is intentionally minimal - never
 carry credentials or token material; only safe metadata.
 
 ## Stable

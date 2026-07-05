@@ -1,16 +1,16 @@
 /**
  * Durable workflow primitives (D1) built on the `pause(...)` substrate:
  *
- * - {@link sleepUntil} / {@link sleepFor} — **durable timers**: the node
+ * - {@link sleepUntil} / {@link sleepFor} - **durable timers**: the node
  *   suspends with a persisted wake-at timestamp; `workflow.tick(threadId)`
  *   (or any scheduler calling it) resumes the thread once the deadline
  *   passes. The timer survives process restarts because it lives in the
  *   checkpointed frontier, not in a `setTimeout`.
- * - {@link awaitExternal} — **durable promises (awakeables)**: the node
+ * - {@link awaitExternal} - **durable promises (awakeables)**: the node
  *   suspends under a caller-chosen name; an external system resolves it
  *   later via `workflow.resolveAwakeable(threadId, name, value)` and the
  *   node receives `value` as the call's return.
- * - {@link requestApproval} — **first-class persisted approvals**: an
+ * - {@link requestApproval} - **first-class persisted approvals**: an
  *   awakeable specialized for human sign-off, resolved via
  *   `workflow.approve(threadId, name, decision)`.
  *

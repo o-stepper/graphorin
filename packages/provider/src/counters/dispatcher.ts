@@ -1,5 +1,5 @@
 /**
- * `createDefaultCounter` — model-id classifier that returns the
+ * `createDefaultCounter` - model-id classifier that returns the
  * recommended {@link TokenCounter} for a given `(provider, model)`
  * pair. The same classifier is reused by the model-tier dispatcher
  * (`@graphorin/provider/model-tier`) so provider-family detection

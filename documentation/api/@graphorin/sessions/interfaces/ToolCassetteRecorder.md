@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/sessions/src/cassette/recorder.ts:53
 
 Surface returned by [createToolCassetteRecorder](/api/@graphorin/sessions/functions/createToolCassetteRecorder.md). The
-recorder is async-only — every event the runtime drains is a
+recorder is async-only - every event the runtime drains is a
 Promise so backpressure does not block the agent loop.
 
 ## Stable

@@ -70,7 +70,7 @@ describe('semantic as_of point-in-time queries (FTS)', () => {
     await store.memory.semantic.remember(factA());
     await store.memory.semantic.remember(factB());
 
-    // fA's interval closed in 2024 — it must not surface as current.
+    // fA's interval closed in 2024 - it must not surface as current.
     const current = await store.memory.semantic.search(SCOPE, { query: 'Residence' });
     expect(current.map((h) => h.record.id)).toEqual(['fB']);
 
@@ -273,7 +273,7 @@ describe('semantic supersede closes the old validity interval (P0-3)', () => {
       'SELECT valid_to FROM facts WHERE id = ?',
       ['fA'],
     );
-    // COALESCE keeps the explicit A_TO close — supersede does not move it.
+    // COALESCE keeps the explicit A_TO close - supersede does not move it.
     expect(rows[0]?.valid_to).toBe(Date.parse(A_TO));
     await store.close();
   });

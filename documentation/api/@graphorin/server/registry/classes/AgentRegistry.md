@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/server/src/registry/index.ts:143
 Read/write registry for agents the server should expose. Every
 mutation is synchronous and the lookup is `O(1)`.
 
-The class is intentionally tiny — extension points (e.g. lazy
+The class is intentionally tiny - extension points (e.g. lazy
 factory loading, per-tenant scoping) live in higher-level packages
 and consume this surface as a primitive.
 

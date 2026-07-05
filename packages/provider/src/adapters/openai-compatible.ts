@@ -1,5 +1,5 @@
 /**
- * Generic OpenAI-compatible adapter — works against any HTTP server
+ * Generic OpenAI-compatible adapter - works against any HTTP server
  * that speaks the `/v1/chat/completions` REST contract. Tested
  * deployments include LMStudio (default port 1234), LocalAI (default
  * port 8080), vLLM (`python -m vllm.entrypoints.openai.api_server`,
@@ -7,7 +7,7 @@
  * other server in the OpenAI-compatible ecosystem.
  *
  * The adapter shares the same `LocalProviderTrust` classifier as
- * `ollamaAdapter` and `llamaCppServerAdapter` — one classifier, one
+ * `ollamaAdapter` and `llamaCppServerAdapter` - one classifier, one
  * policy table, one error type.
  *
  * @packageDocumentation

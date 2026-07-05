@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/tools/src/audit/index.ts:102
 
 Sanitized payload emitted by the tool subsystem. Listeners receive
-only metadata that is safe to log — the actual tool args, the
+only metadata that is safe to log - the actual tool args, the
 matched bytes, the secret values are NEVER forwarded.
 
 ## Stable

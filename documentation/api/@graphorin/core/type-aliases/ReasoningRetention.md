@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,16 +19,16 @@ run.
 Three independent lifecycle operations exist for reasoning content
 in the provider layer:
 
-1. **Intra-loop transmission** — controlled by this enum. Default is
+1. **Intra-loop transmission** - controlled by this enum. Default is
    auto-detected per provider:
    - Hidden chain-of-thought providers (e.g. OpenAI o1/o3, Google
      Gemini reasoning): `'strip'`.
    - Round-trip-required providers (e.g. Anthropic Claude tool-use
      with thinking blocks): `'pass-through-claude'`.
-2. **Sub-agent handoff transmission** — always strips reasoning
+2. **Sub-agent handoff transmission** - always strips reasoning
    regardless of this setting; lives in
    `@graphorin/sessions` handoff filters.
-3. **Prompt-cache key calculation** — reasoning blocks are excluded
+3. **Prompt-cache key calculation** - reasoning blocks are excluded
    from cache-key hashes but included in outbound transmission.
 
 ## Stable

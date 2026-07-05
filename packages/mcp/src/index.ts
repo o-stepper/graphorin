@@ -1,5 +1,5 @@
 /**
- * `@graphorin/mcp` — Model Context Protocol client for the Graphorin
+ * `@graphorin/mcp` - Model Context Protocol client for the Graphorin
  * framework.
  *
  * The package owns:
@@ -38,7 +38,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './client/index.js';
 export * from './errors/index.js';

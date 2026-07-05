@@ -10,7 +10,7 @@ import {
 
 import { resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — discovery', () => {
+describe('@graphorin/security/oauth - discovery', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });
@@ -118,9 +118,9 @@ describe('@graphorin/security/oauth — discovery', () => {
   });
 });
 
-// --- SPL-7 — https-only endpoints, issuer consistency, path-insertion ---------
+// --- SPL-7 - https-only endpoints, issuer consistency, path-insertion ---------
 
-describe('SPL-7 — discovery hardening', () => {
+describe('SPL-7 - discovery hardening', () => {
   beforeEach(() => resetOAuthSubsystem());
   afterEach(() => resetOAuthSubsystem());
 

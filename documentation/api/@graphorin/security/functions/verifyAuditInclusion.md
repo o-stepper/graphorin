@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ function verifyAuditInclusion(
 
 Defined in: packages/security/src/audit/merkle.ts:211
 
-Verify an inclusion proof (RFC 6962 §2.1.1 verification algorithm) —
+Verify an inclusion proof (RFC 6962 §2.1.1 verification algorithm) -
 pure; needs only the entry, the proof, and the trusted head.
 
 ## Parameters

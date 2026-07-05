@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -181,7 +181,7 @@ Defined in: packages/skills/src/registry/index.ts:75
 
 Upsert a skill by name (RP-11). Unlike [SkillRegistry.register](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#register),
 `replace` overwrites an existing registration instead of throwing on a
-name collision — the upgrade path for hot-reloading a re-loaded skill.
+name collision - the upgrade path for hot-reloading a re-loaded skill.
 
 #### Parameters
 
@@ -208,7 +208,7 @@ Defined in: packages/skills/src/registry/index.ts:100
 Resolve a single trigger (model-emitted skill name OR the raw
 `/skill:<name>` slash-command body) into an [ActivationRequest](/api/@graphorin/skills/registry/interfaces/ActivationRequest.md).
 Returns `null` when no skill matches and the trigger looked like a
-slash command — callers that want a strict mode should call
+slash command - callers that want a strict mode should call
 [parseActivationTrigger](/api/@graphorin/skills/registry/functions/parseActivationTrigger.md) themselves.
 
 #### Parameters

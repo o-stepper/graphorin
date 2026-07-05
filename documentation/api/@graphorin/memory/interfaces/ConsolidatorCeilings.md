@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Daily cost ceilings, tracked per budget window. How a breach is
 handled depends on [OnBudgetExceed](/api/@graphorin/memory/type-aliases/OnBudgetExceed.md): `'pause'` / `'throw'`
 enforce, `'log'` (the shipped standard/full presets) only WARNs and
 keeps running. The USD leg accumulates only when a `priceUsage`
-pricer is configured (memory-consolidation-02) — without one every
+pricer is configured (memory-consolidation-02) - without one every
 call prices at $0 and `maxCostPerDay` can never trip. The default
 ceiling shape per tier is captured in
 [CONSOLIDATOR\_TIER\_DEFAULTS](/api/@graphorin/memory/variables/CONSOLIDATOR_TIER_DEFAULTS.md).

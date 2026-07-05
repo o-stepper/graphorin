@@ -1,7 +1,7 @@
 /**
  * CI assertion that `@graphorin/workflow` does NOT depend on
  * `@graphorin/agent` (or any subpath import). The two packages compose
- * orthogonally — the workflow runtime knows nothing about agents and
+ * orthogonally - the workflow runtime knows nothing about agents and
  * the agent runtime knows nothing about workflows. Operators wiring
  * agents-as-nodes do so in user code only.
  *

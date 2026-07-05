@@ -1,5 +1,5 @@
 /**
- * Server-Sent-Events transport — the read-only fallback for clients
+ * Server-Sent-Events transport - the read-only fallback for clients
  * stuck behind proxies that block WebSocket upgrades. The transport
  * is unidirectional (server → client only); control-plane operations
  * (subscribe / abort / resume) must go through REST endpoints
@@ -7,10 +7,10 @@
  *
  * IP-3: implemented on **fetch streaming**, not `EventSource`. The
  * server writes *named* events (`event: <frame.type>`), which an
- * `EventSource` delivers only to listeners registered per type — an
+ * `EventSource` delivers only to listeners registered per type - an
  * unbounded catalogue the old `message`-only listener never saw.
  * Every frame's full JSON rides in `data:`, so a direct SSE parse
- * that ignores the event name delivers everything — and `fetch`
+ * that ignores the event name delivers everything - and `fetch`
  * sends the `Authorization` header natively (no polyfill seam).
  *
  * @packageDocumentation
@@ -79,7 +79,7 @@ export async function openSseTransport(
 
   // Consume the stream in the background: split on newlines, parse
   // `id:` / `data:` fields, dispatch on blank lines. The `event:`
-  // name is intentionally ignored — the full frame JSON is in `data:`.
+  // name is intentionally ignored - the full frame JSON is in `data:`.
   void (async () => {
     const decoder = new TextDecoder();
     let buffer = '';

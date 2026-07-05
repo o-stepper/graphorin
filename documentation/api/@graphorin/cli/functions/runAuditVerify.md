@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runAuditVerify(options?): Promise<AuditVerifyResult>;
 
 Defined in: packages/cli/src/commands/audit.ts:65
 
-`graphorin audit verify` — replay the chain and report the first
+`graphorin audit verify` - replay the chain and report the first
 broken link (if any).
 
 ## Parameters

@@ -6,7 +6,7 @@ editLink: false
 
 <!--
   This page is auto-synced from /CODE_OF_CONDUCT.md on every documentation build.
-  Do not edit it directly — change /CODE_OF_CONDUCT.md in the repository root.
+  Do not edit it directly - change /CODE_OF_CONDUCT.md in the repository root.
 -->
 
 # Code of Conduct
@@ -133,4 +133,4 @@ For answers to common questions about this code of conduct, see the FAQ at [http
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

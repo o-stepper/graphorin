@@ -51,7 +51,7 @@ describe('durability modes', () => {
         { from: 'b', to: '__end__' },
       ],
       checkpointStore: store,
-      // Legacy mode removed by WF-7 — runtime coerces it to 'sync'.
+      // Legacy mode removed by WF-7 - runtime coerces it to 'sync'.
       durability: 'async' as unknown as import('../src/types.js').DurabilityMode,
     });
     const warnings: string[] = [];

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createCostTracker } from '../../src/cost/index.js';
 
-describe('@graphorin/observability/cost — createCostTracker', () => {
+describe('@graphorin/observability/cost - createCostTracker', () => {
   it('rolls up tokens and cost per session', () => {
     const tracker = createCostTracker();
     tracker.record({

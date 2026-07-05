@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,4 +17,4 @@ Options for `registerResolver(...)`.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-allowreplace"></a> `allowReplace?` | `readonly` | `boolean` | When false, throws if a resolver is already registered. Default true. | packages/security/src/secrets/resolvers/registry.ts:31 |
-| <a id="property-source"></a> `source?` | `readonly` | `"builtin"` \| `"user"` | Internal flag — used by the built-in resolvers; consumers leave this off. | packages/security/src/secrets/resolvers/registry.ts:33 |
+| <a id="property-source"></a> `source?` | `readonly` | `"builtin"` \| `"user"` | Internal flag - used by the built-in resolvers; consumers leave this off. | packages/security/src/secrets/resolvers/registry.ts:33 |

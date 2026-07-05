@@ -1,5 +1,5 @@
 /**
- * `@graphorin/memory` — seven-tier memory system for the Graphorin
+ * `@graphorin/memory` - seven-tier memory system for the Graphorin
  * framework (MST-13: working / session / episodic / semantic /
  * procedural / shared + the read-only insight tier from P1-1).
  *
@@ -35,7 +35,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './conflict/index.js';
 export {

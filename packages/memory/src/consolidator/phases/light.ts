@@ -1,8 +1,8 @@
 /**
- * Light phase — no LLM. Decays every fact's retention curve and
+ * Light phase - no LLM. Decays every fact's retention curve and
  * archives facts whose salience has fallen below the configured
  * threshold (plus the X-1 capacity pass). Noise filtering happens in
- * the standard phase where the batch is actually consumed — the old
+ * the standard phase where the batch is actually consumed - the old
  * advisory re-count here read the same unconsumed messages on every
  * pass for a counter nothing acted on (MCON-17).
  *
@@ -32,7 +32,7 @@ export interface LightPhaseDeps {
    * Capacity-bounded eviction (X-1). When non-null, the light phase
    * archives the lowest-salience live facts in the decay window down to
    * this many, in addition to the threshold archiving. `null` (the
-   * default) leaves storage unbounded — behaviour identical to pre-X-1.
+   * default) leaves storage unbounded - behaviour identical to pre-X-1.
    */
   readonly decayCapacity: number | null;
   /** Weights for the multi-signal salience score (X-1). */
@@ -40,7 +40,7 @@ export interface LightPhaseDeps {
   readonly noiseFilters: ReadonlyArray<NoiseFilterPreset>;
   readonly maxBatchSize: number;
   readonly lastProcessedMessageId: string | null;
-  /** The active consolidator tier — surfaced on the AISpan attribute. */
+  /** The active consolidator tier - surfaced on the AISpan attribute. */
   readonly tier?: 'free' | 'cheap' | 'standard' | 'full' | 'custom';
 }
 
@@ -78,7 +78,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
         // Bind once so the optional method stays narrowed across `await`
         // (and keeps its `this`); `undefined` ⇒ the store can't archive.
         const archiveFact = deps.store.semantic.archiveFact?.bind(deps.store.semantic);
-        // Pass 1 — multi-signal threshold archiving. Salience folds the
+        // Pass 1 - multi-signal threshold archiving. Salience folds the
         // Ebbinghaus retention curve together with the P1-2 importance hint
         // and the P1-4 security-risk negative term, so a stale, low-value,
         // or quarantined fact crosses the threshold sooner. Neutral inputs
@@ -95,7 +95,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
             importance: row.importance,
             quarantined: row.status === 'quarantined',
             foreignProvenance: isForeignProvenance(row.provenance),
-            // D3: retrieval-frequency reinforcement — inert at the
+            // D3: retrieval-frequency reinforcement - inert at the
             // default weight 0; adapters without the column report 0.
             accessCount: row.accessCount ?? 0,
             weights: deps.salienceWeights,
@@ -109,7 +109,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
           }
           survivors.push({ id: row.id, salience: score });
         }
-        // Pass 2 — capacity-bounded eviction. Archive the lowest-salience
+        // Pass 2 - capacity-bounded eviction. Archive the lowest-salience
         // survivors (security-flagged first) until the window fits.
         if (deps.decayCapacity !== null && archiveFact !== undefined) {
           const evictIds = selectForCapacityEviction(survivors, deps.decayCapacity);
@@ -122,7 +122,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
       }
 
       // MCON-17: the light phase no longer re-reads the unconsumed batch
-      // just to produce an advisory dropped-count — the standard phase
+      // just to produce an advisory dropped-count - the standard phase
       // filters where extraction actually consumes the messages.
       const noiseFilteredCount = 0;
 
@@ -155,7 +155,7 @@ export async function runLightPhase(deps: LightPhaseDeps): Promise<PhaseOutcome>
 }
 
 /**
- * `true` for provenance that did not originate first-party (P1-4) — used
+ * `true` for provenance that did not originate first-party (P1-4) - used
  * to apply the mild salience penalty in capacity eviction. First-party
  * is `null` (legacy / direct write), `'user'`, and `'extraction'` (the
  * consolidator distilling the user's own session); `'tool'`,

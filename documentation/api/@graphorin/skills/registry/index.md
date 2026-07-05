@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,20 +6,20 @@
 
 # registry
 
-`SkillRegistry` — registry over loaded skills.
+`SkillRegistry` - registry over loaded skills.
 
 The registry is the surface the agent runtime (Phase 12) and the
 standalone server (Phase 14) consume. It exposes:
 
-- `getMetadata()` — every skill's Tier-1 metadata, used by the
+- `getMetadata()` - every skill's Tier-1 metadata, used by the
   ContextEngine to assemble the system prompt's skill metadata
   block (Phase 10d).
-- `activate(triggers)` / `getActivationRequest(triggers)` —
+- `activate(triggers)` / `getActivationRequest(triggers)` -
   match a list of trigger strings (slash commands and / or model-
   emitted skill names) and return the corresponding
   [ActivatedSkill](/api/@graphorin/skills/interfaces/ActivatedSkill.md) records.
-- `getSkill(name)` — direct lookup.
-- `tools()` — flat list of declared tool entries; the runtime
+- `getSkill(name)` - direct lookup.
+- `tools()` - flat list of declared tool entries; the runtime
   resolves the actual `Tool[]` through the `@graphorin/tools`
   registry.
 

@@ -12,13 +12,13 @@
  *
  * History: this rule originally matched `Agent.toTool({
  * inheritSecrets: [...] })`, a pre-0.5 API shape that no longer
- * exists — `AgentToToolOptions` deliberately has no secret-inheritance
+ * exists - `AgentToToolOptions` deliberately has no secret-inheritance
  * mechanism at that boundary. The DEC-137 grant point today is the
  * explicit child ACL scope opened via `withChildToolSecretsContext`
  * from `@graphorin/security` (whose `secretsAllowed` is intersected
  * with the parent allowlist), so that is what the rule matches now.
  *
- * The rule is intentionally syntactic — it operates on the literal
+ * The rule is intentionally syntactic - it operates on the literal
  * call site without trying to resolve the value of the array. This
  * keeps the rule cheap and avoids false negatives from spread /
  * function-call expressions that hide the inheritance shape.

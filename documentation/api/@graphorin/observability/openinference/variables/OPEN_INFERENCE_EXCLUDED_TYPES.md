@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ const OPEN_INFERENCE_EXCLUDED_TYPES: ReadonlyArray<SpanType>;
 Defined in: packages/observability/src/openinference/index.ts:89
 
 Span types intentionally excluded from OpenInference span-kind
-emission per the canonical table — `skill.*`, `mcp.connect`,
+emission per the canonical table - `skill.*`, `mcp.connect`,
 `mcp.list-tools`, and `replay.*` markers do not have a clean
 OpenInference equivalent.
 

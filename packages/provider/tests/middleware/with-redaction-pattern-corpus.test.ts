@@ -1,5 +1,5 @@
 /**
- * Pattern-corpus coverage — verifies that `withRedaction` with the
+ * Pattern-corpus coverage - verifies that `withRedaction` with the
  * default `BUILT_IN_PATTERNS` catalogue and `scanScope: 'all'`
  * detects every one of the 14 default-on patterns.
  */
@@ -78,7 +78,7 @@ const FIXTURES: ReadonlyArray<{
   { pattern: 'iban', value: 'GB29NWBK60161331926819' },
 ];
 
-describe('withRedaction — BUILT_IN_PATTERNS corpus', () => {
+describe('withRedaction - BUILT_IN_PATTERNS corpus', () => {
   it('exposes exactly 14 default-on patterns', () => {
     expect(BUILT_IN_PATTERNS).toHaveLength(14);
   });

@@ -127,7 +127,7 @@ export async function tryProtectedResourceMetadata(
 }
 
 function wellKnownCandidates(serverUrl: string): ReadonlyArray<string> {
-  // SPL-7: RFC 8414 §3 prescribes PATH-INSERTION — the well-known
+  // SPL-7: RFC 8414 §3 prescribes PATH-INSERTION - the well-known
   // segment goes between the origin and the issuer path. The
   // suffix-append form is kept as a fallback for servers that
   // implemented the pre-RFC convention. For path-less issuers both
@@ -142,7 +142,7 @@ function wellKnownCandidates(serverUrl: string): ReadonlyArray<string> {
 }
 
 /**
- * Strip trailing '/' characters without a regex — `/\/+$/` is a
+ * Strip trailing '/' characters without a regex - `/\/+$/` is a
  * polynomial-backtracking ReDoS hazard on attacker-influenced metadata
  * URLs (CodeQL js/redos). Linear scan instead.
  */
@@ -183,7 +183,7 @@ function isLoopbackHost(hostname: string): boolean {
 
 /**
  * SPL-7: refuse non-https endpoints (refresh tokens and Basic client
- * secrets get POSTed to whatever discovery names) — http is allowed
+ * secrets get POSTed to whatever discovery names) - http is allowed
  * only for loopback hosts. Mirrors the supply-chain key fetcher's
  * https-only posture.
  */
@@ -209,7 +209,7 @@ function normalizeIssuer(value: string): string {
 
 /**
  * SPL-7 / RFC 8414 §3.3: the metadata `issuer` MUST be identical to the
- * issuer URL the well-known document was resolved for — otherwise a
+ * issuer URL the well-known document was resolved for - otherwise a
  * compromised document can redirect token traffic to attacker-chosen
  * endpoints under a trusted discovery URL.
  */

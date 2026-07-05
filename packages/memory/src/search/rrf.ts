@@ -59,7 +59,7 @@ export class RRFReranker implements ReRanker {
  * Weighted-RRF reranker (X-2). Fuses parallel ranked lists through
  * {@link fuseWeighted}, applying a per-list `weights[i]` so a caller who
  * has calibrated list reliability against labels (the P0-1 eval harness)
- * can trust one retriever over another — e.g. up-weight dense vector
+ * can trust one retriever over another - e.g. up-weight dense vector
  * hits over lexical FTS hits. `weights` is **positional**: aligned to the
  * input `lists` order (the built-in hybrid search passes FTS first, then
  * vector). At equal weights it is identical to {@link RRFReranker}; RRF
@@ -109,7 +109,7 @@ export class WeightedRRFReranker implements ReRanker {
 }
 
 /**
- * Pure functional core of the RRF reranker — the equal-weight case of
+ * Pure functional core of the RRF reranker - the equal-weight case of
  * {@link fuseWeighted}. Exported separately so the test suite (and the
  * property-based fuzzer) can exercise the math without the `Promise<…>`
  * wrapping of the public surface.
@@ -137,9 +137,9 @@ export function fuseRrf<TRecord extends MemoryRecord>(
  *
  * Like {@link fuseRrf} the fusion is deterministic, tie-broken by
  * first-seen order, and preserves any upstream `signals` (FTS `bm25`,
- * vector similarity) the hits carried in — the `rrf` / `rrf.list_N`
+ * vector similarity) the hits carried in - the `rrf` / `rrf.list_N`
  * signals it records are the *weighted* contributions, so the fused
- * `score` still equals their sum. Note that — unlike RRF — the result
+ * `score` still equals their sum. Note that - unlike RRF - the result
  * depends on input list *order*, because each weight is bound to a list
  * position.
  *
@@ -163,7 +163,7 @@ export function fuseWeighted<TRecord extends MemoryRecord>(
     const list = lists[listIdx] ?? [];
     const weight = resolveWeight(weights, listIdx);
     // MRET-13: explanation signals key by the caller's retriever-kind
-    // label when supplied — `rrf.list_N` is an ephemeral position that
+    // label when supplied - `rrf.list_N` is an ephemeral position that
     // changes meaning whenever a leg (vector / HyDE / graph) is
     // conditionally absent from the fan-out.
     const signalKey = `rrf.${labels?.[listIdx] ?? `list_${listIdx}`}`;

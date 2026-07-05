@@ -163,7 +163,7 @@ export type FinishReason =
 
 /**
  * Streamed provider event. Shape matches the wire-stable subset of the
- * provider event union — adapters hide vendor specifics.
+ * provider event union - adapters hide vendor specifics.
  *
  * @stable
  */
@@ -245,7 +245,7 @@ export interface ToolDefinition {
 }
 
 /**
- * A single worked example as projected onto the provider wire contract —
+ * A single worked example as projected onto the provider wire contract -
  * a serializable, schema-agnostic view of a `ToolExample`. `input` /
  * `output` carry the example's already-parsed values; `comment` is the
  * optional rationale shown to the model.
@@ -292,8 +292,8 @@ export type ProviderMiddleware = (next: Provider) => Provider;
  * Type signature for the canonical middleware composer (the runtime
  * implementation lives in `@graphorin/provider`).
  *
- * The concrete composer guarantees a deterministic ordering — order of
- * arguments mirrors order of execution from outermost to innermost — and
+ * The concrete composer guarantees a deterministic ordering - order of
+ * arguments mirrors order of execution from outermost to innermost - and
  * is the only blessed entry point for chaining middleware in
  * `@graphorin/*` code (per the security-first ordering rule).
  *

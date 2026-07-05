@@ -119,9 +119,9 @@ describe('withSecret(...)', () => {
   });
 });
 
-// --- SPL-14 — get() honours the per-tool ACL too -------------------------------
+// --- SPL-14 - get() honours the per-tool ACL too -------------------------------
 
-describe('SPL-14 — get() inside a tool scope honours the allowlist', () => {
+describe('SPL-14 - get() inside a tool scope honours the allowlist', () => {
   it('a denied key reads as null from get() instead of bypassing the ACL', async () => {
     const store = new MemorySecretsStore();
     await store.set('email_api_key', 'k-email');
@@ -131,7 +131,7 @@ describe('SPL-14 — get() inside a tool scope honours the allowlist', () => {
       async () => {
         const allowed = await store.get('email_api_key');
         expect(allowed).not.toBeNull();
-        // The old behaviour: get() skipped enforceSecretAcl entirely —
+        // The old behaviour: get() skipped enforceSecretAcl entirely -
         // any code holding the raw store read ANY key inside the scope.
         const denied = await store.get('db_password');
         expect(denied).toBeNull();

@@ -1,5 +1,5 @@
 /**
- * `JSONLExporter` — append-only newline-delimited JSON output. Used as
+ * `JSONLExporter` - append-only newline-delimited JSON output. Used as
  * the default trace replay log; encryption-at-rest is opt-in via the
  * encryption hook (Phase 16).
  *
@@ -10,7 +10,7 @@
  * - flushes every write (no internal buffer) so the file is suitable
  *   for tail-style replay even after a crash.
  *
- * The output is deterministic — see {@link serializableRecord}.
+ * The output is deterministic - see {@link serializableRecord}.
  *
  * @packageDocumentation
  */
@@ -20,7 +20,7 @@ import { dirname, join } from 'node:path';
 import { serializableRecord } from './console.js';
 import type { SpanRecord, TraceExporter } from './types.js';
 
-/** @internal — used by tests to override the date provider. */
+/** @internal - used by tests to override the date provider. */
 export type DateProvider = () => Date;
 
 /**
@@ -81,7 +81,7 @@ export function createJSONLExporter(opts: JSONLExporterOptions): JSONLExporter {
 
   // Pool of file handles, keyed by absolute path. Each handle is opened
   // in append mode the first time we touch the path; subsequent exports
-  // re-use the existing handle. The pool is LRU-bounded (RP-20) — the Map's
+  // re-use the existing handle. The pool is LRU-bounded (RP-20) - the Map's
   // insertion order is the recency order, so the first entry is the LRU.
   const handles = new Map<string, FileHandleEntry>();
   let closed = false;
@@ -132,7 +132,7 @@ async function openOrReuse(
 
   // RP-20: evict least-recently-used handles before exceeding the cap so the
   // open-fd count stays bounded. An evicted path simply re-opens (append mode)
-  // on its next export — no data is lost.
+  // on its next export - no data is lost.
   while (pool.size >= maxOpenHandles) {
     const lruKey = pool.keys().next().value;
     if (lruKey === undefined) break;
@@ -142,7 +142,7 @@ async function openOrReuse(
       try {
         await lru.handle.close();
       } catch {
-        // Best-effort — a failed close must not block the new open.
+        // Best-effort - a failed close must not block the new open.
       }
     }
   }

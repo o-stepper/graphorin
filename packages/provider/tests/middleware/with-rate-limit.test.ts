@@ -1,5 +1,5 @@
 /**
- * Coverage for `withRateLimit` — bucket exhaustion, queue mode wait
+ * Coverage for `withRateLimit` - bucket exhaustion, queue mode wait
  * arithmetic, and refill timing via injected `nowImpl` / `sleepImpl`.
  */
 import type { Provider, ProviderEvent, ProviderRequest } from '@graphorin/core';
@@ -44,14 +44,14 @@ async function consume(stream: AsyncIterable<ProviderEvent>): Promise<void> {
   for await (const _ of stream) void _;
 }
 
-describe('withRateLimit — option validation', () => {
+describe('withRateLimit - option validation', () => {
   it('throws when requestsPerMinute is not positive', () => {
     expect(() => withRateLimit({ requestsPerMinute: 0 })(quietProvider())).toThrow(RangeError);
     expect(() => withRateLimit({ requestsPerMinute: -1 })(quietProvider())).toThrow(RangeError);
   });
 });
 
-describe('withRateLimit — throw mode', () => {
+describe('withRateLimit - throw mode', () => {
   it('raises RateLimitExceededError once the bucket is exhausted', async () => {
     const now = 1_000_000;
     const wrapped = withRateLimit({
@@ -95,7 +95,7 @@ describe('withRateLimit — throw mode', () => {
   });
 });
 
-describe('withRateLimit — queue mode', () => {
+describe('withRateLimit - queue mode', () => {
   it('waits via injected sleepImpl when the bucket is empty', async () => {
     const sleeps: number[] = [];
     let now = 0;
@@ -158,7 +158,7 @@ describe('withRateLimit — queue mode', () => {
     expect(granted.length).toBe(0); // nothing granted before the clock advances
 
     await advanceTo(1000);
-    expect(granted.length).toBe(1); // ONE per interval — not a burst of 3
+    expect(granted.length).toBe(1); // ONE per interval - not a burst of 3
     await advanceTo(2000);
     expect(granted.length).toBe(2);
     await advanceTo(3000);
@@ -166,7 +166,7 @@ describe('withRateLimit — queue mode', () => {
   });
 });
 
-describe('withRateLimit — stream surface', () => {
+describe('withRateLimit - stream surface', () => {
   it('acquires a token before yielding stream events', async () => {
     const now = 0;
     const wrapped = withRateLimit({

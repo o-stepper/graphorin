@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Thrown by `pause(value)` from inside a workflow node. The runtime
 catches it, persists state with a pending pause, and suspends the
 thread until `Workflow.resume(threadId, directive)` is called.
 
-Application code should never construct or catch this directly —
+Application code should never construct or catch this directly -
 always go through `pause(...)`.
 
 ## Stable

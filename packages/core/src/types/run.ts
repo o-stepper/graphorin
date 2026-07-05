@@ -40,8 +40,8 @@ export interface RunStep {
 
 /**
  * Journaled model response for one step (C3, opt-in via the agent's
- * `recordProviderResponses`). Captures the RAW model output — the text
- * before any lateral-leak block replaced it in the transcript — so a
+ * `recordProviderResponses`). Captures the RAW model output - the text
+ * before any lateral-leak block replaced it in the transcript - so a
  * replay reproduces the original run faithfully.
  *
  * @stable
@@ -103,7 +103,7 @@ export interface RunState {
    * resumed run does not start with an empty ledger that silently un-gates
    * sinks exposed before the suspend. Structurally matches
    * `@graphorin/security`'s `TaintLedgerSnapshot` (core takes no security
-   * dependency); only the load-bearing flags are persisted — never the tracked
+   * dependency); only the load-bearing flags are persisted - never the tracked
    * untrusted text spans.
    */
   taintSummary?: RunTaintSummary;
@@ -113,7 +113,7 @@ export interface RunState {
    */
   promotedTools?: ReadonlyArray<string>;
   /**
-   * D6 structured plan/todo list — the agent's own working plan,
+   * D6 structured plan/todo list - the agent's own working plan,
    * journaled so it survives suspend/resume (a TodoWrite-style tool
    * mutates it, and attention-recitation renders it back into the
    * prompt each turn). Absent until the agent writes one.
@@ -138,7 +138,7 @@ export interface RunTaintSummary {
   /**
    * C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms
    * the verbatim-carry probe after a resume at tile granularity. Hashes
-   * only — no untrusted text is ever persisted (the invariant above
+   * only - no untrusted text is ever persisted (the invariant above
    * holds).
    */
   readonly spanTileHashes?: ReadonlyArray<string>;
@@ -160,7 +160,7 @@ export interface TodoItem {
 /**
  * Snapshot helper used by `@graphorin/observability` aggregators to
  * convert the on-disk `usageByModel` shape into the canonical
- * {@link ModelUsage} array. Pure utility — kept in core so consumers
+ * {@link ModelUsage} array. Pure utility - kept in core so consumers
  * do not have to take an observability dependency just to flatten a
  * run-state breakdown.
  *

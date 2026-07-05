@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { canonicalJson } from '../../src/audit/canonical-json.js';
 import { AuditPayloadSerializationError } from '../../src/audit/errors.js';
 
-describe('@graphorin/security/audit — canonical JSON', () => {
+describe('@graphorin/security/audit - canonical JSON', () => {
   it('sorts object keys lexicographically', () => {
     expect(canonicalJson({ b: 1, a: 2, c: 3 })).toBe('{"a":2,"b":1,"c":3}');
   });

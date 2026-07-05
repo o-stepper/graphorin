@@ -1,5 +1,5 @@
 /**
- * `reanchorProjectRules({ ruleTagsAllowlist? })` — built-in
+ * `reanchorProjectRules({ ruleTagsAllowlist? })` - built-in
  * post-compaction hook. Queries `memory.procedural.activate(...)`
  * and returns the active rule set as a system-content fragment for
  * re-injection into the trimmed buffer.
@@ -26,7 +26,7 @@ export function reanchorProjectRules(
       const procedural = deps.procedural ?? {};
       const rules = await deps.memory.procedural.activate(deps.scope, procedural);
       // context-engine-02: apply the same D2 privacy decision `assemble()`
-      // applies to active rules — the hook's output ships to the provider.
+      // applies to active rules - the hook's output ships to the provider.
       const visible =
         deps.allowSensitivity === undefined
           ? rules

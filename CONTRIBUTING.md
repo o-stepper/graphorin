@@ -1,6 +1,6 @@
 # Contributing to Graphorin
 
-Thanks for your interest in contributing to **Graphorin** — a TypeScript framework for building long-living personal AI assistants. This document explains how to set up the repository, the development workflow, and the project conventions.
+Thanks for your interest in contributing to **Graphorin** - a TypeScript framework for building long-living personal AI assistants. This document explains how to set up the repository, the development workflow, and the project conventions.
 
 By participating, you agree to abide by the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
@@ -9,7 +9,7 @@ By participating, you agree to abide by the [Code of Conduct](./CODE_OF_CONDUCT.
 ## Prerequisites
 
 - **Node.js** 22.x LTS or newer (see [`.nvmrc`](./.nvmrc)).
-- **pnpm** (the project's package manager). The exact version is pinned in the root `package.json` `packageManager` field — `corepack` will activate it automatically:
+- **pnpm** (the project's package manager). The exact version is pinned in the root `package.json` `packageManager` field - `corepack` will activate it automatically:
 
 ```bash
 corepack enable
@@ -74,13 +74,13 @@ Pick the affected packages, the bump type (`patch` / `minor` / `major`), and wri
 
 Graphorin follows the [Conventional Commits](https://www.conventionalcommits.org) specification:
 
-- `feat(scope): ...` — new feature
-- `fix(scope): ...` — bug fix
-- `docs(scope): ...` — documentation only
-- `chore(scope): ...` — tooling, dependencies, internal housekeeping
-- `refactor(scope): ...` — non-behavioural refactor
-- `test(scope): ...` — tests only
-- `perf(scope): ...` — performance improvement
+- `feat(scope): ...` - new feature
+- `fix(scope): ...` - bug fix
+- `docs(scope): ...` - documentation only
+- `chore(scope): ...` - tooling, dependencies, internal housekeeping
+- `refactor(scope): ...` - non-behavioural refactor
+- `test(scope): ...` - tests only
+- `perf(scope): ...` - performance improvement
 - A trailing `!` (e.g. `feat(core)!: ...`) plus a `BREAKING CHANGE:` footer marks a breaking change.
 
 The **scope** is the package name without the `@graphorin/` prefix, e.g. `core`, `agent`, `memory`, `server`, `cli`.
@@ -114,7 +114,7 @@ Versions are tracked with [Changesets](https://github.com/changesets/changesets)
 
 > Release mechanics: the `0.2.0` through `0.5.0` bumps were applied by the maintainer as **manual passes** because `changeset version` kept computing a bogus **major** bump: with `@graphorin/server` declaring `workspace:*` peer dependencies on four sibling packages, Changesets escalated any minor/patch bump of those peers into a major for `server`, and the `fixed` lockstep group then lifted every package to `1.0.0`. That root cause is fixed (audit E2): the internal peers are now ranged (`workspace:>=0.5.0 <1.0.0`) and `onlyUpdatePeerDependentsWhenOutOfRange` is enabled, so the automated "Version Packages" PR opened by `release.yml` computes the correct lockstep bump and regenerates per-package CHANGELOGs (the `@changesets/changelog-github` generator works in CI, where a `GITHUB_TOKEN` is present; it needs one locally too). The `mvp-readiness` workspace audit now also rejects a release whose per-package CHANGELOG top entry does not match the version being released. Do not hand-bump versions in a feature PR: author a changeset and let the release pass apply it.
 
-> Git tags & provenance: the tag history starts at `0.5.0`, the first version published to the npm registry (each published package carries a `@graphorin/<pkg>@0.5.0` tag created by the release pipeline). The earlier `0.2.0`, `0.3.0`, and `0.4.0` bumps were internal-only and were never published, so no retro tags were backfilled for them: audit item CI-7 keeps the changelog backfill and these CONTRIBUTING notes, but retro-tagging never-published versions is a deliberate skip. Every real publish is provenance-checked in CI by the post-publish `npm audit signatures` smoke in `.github/workflows/release.yml`.
+> Git tags & provenance: the tag history starts at `0.5.0`, the first version published to the npm registry (each published package carries a `@graphorin/<pkg>@<version>` tag created by the release pipeline). The earlier `0.2.0`, `0.3.0`, and `0.4.0` bumps were internal-only and were never published, so no retro tags were backfilled for them: audit item CI-7 keeps the changelog backfill and these CONTRIBUTING notes, but retro-tagging never-published versions is a deliberate skip. Every real publish is provenance-checked in CI by the post-publish `npm audit signatures` smoke in `.github/workflows/release.yml`.
 
 ## Privacy & no-phone-home
 
@@ -135,4 +135,4 @@ By contributing to Graphorin, you agree that your contributions will be licensed
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

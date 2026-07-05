@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/security/src/secrets/audit-emitter.ts:39
 
 Optional identifier of who initiated the event. The secrets layer
-never invents identities — it forwards whatever the per-tool ACL or
+never invents identities - it forwards whatever the per-tool ACL or
 factory caller supplied.
 
 ## Stable

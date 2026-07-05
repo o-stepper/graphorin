@@ -5,7 +5,7 @@
  * Uses Okapi BM25 with `k1 = 1.2`, `b = 0.75` per the canonical
  * defaults. Operators that need locale-tuned stopword lists pass
  * them through `defineBm25Index({ stopwords })`. The implementation
- * is intentionally small — the tool-search corpus is bounded by the
+ * is intentionally small - the tool-search corpus is bounded by the
  * registry size, so a full inverted-index rebuild on every register /
  * unregister is acceptable.
  *
@@ -42,7 +42,7 @@ const DEFAULT_STOPWORDS = new Set<string>([
   'with',
 ]);
 
-/** Tokenise a body — lowercase, alphanumeric runs only, drop stopwords. */
+/** Tokenise a body - lowercase, alphanumeric runs only, drop stopwords. */
 export function tokenise(
   text: string,
   stopwords: ReadonlySet<string> = DEFAULT_STOPWORDS,
@@ -92,7 +92,7 @@ export interface Bm25Match {
 
 /**
  * Build a BM25 query function over `docs`. The returned function
- * runs in `O(query tokens × matching docs)` per invocation — bounded
+ * runs in `O(query tokens × matching docs)` per invocation - bounded
  * by the registry size.
  *
  * @stable
@@ -162,7 +162,7 @@ function compileIndex(
   const idf = new Map<string, number>();
   for (const [token, perToken] of postings) {
     const df = perToken.size;
-    // Robertson-Spärck Jones IDF (always positive — clamped to 0).
+    // Robertson-Spärck Jones IDF (always positive - clamped to 0).
     const value = Math.log((N - df + 0.5) / (df + 0.5) + 1);
     idf.set(token, Math.max(0, value));
   }

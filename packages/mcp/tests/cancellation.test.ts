@@ -8,8 +8,8 @@ import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
 /**
  * Sleep duration for the slow tool handler. Picked far above
- * `CANCEL_BUDGET_MS` so a real regression — abort failing to
- * short-circuit the call — manifests as a deterministic test failure
+ * `CANCEL_BUDGET_MS` so a real regression - abort failing to
+ * short-circuit the call - manifests as a deterministic test failure
  * regardless of runner speed: the test would have to wait the full
  * sleep before the handler resolves.
  */
@@ -29,7 +29,7 @@ const HANDLER_SLEEP_MS = 5_000;
  */
 const CANCEL_BUDGET_MS = process.env.CI === 'true' ? 1_500 : 200;
 
-describe('MCPClient — AbortSignal cancellation discipline', () => {
+describe('MCPClient - AbortSignal cancellation discipline', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 
@@ -59,7 +59,7 @@ describe('MCPClient — AbortSignal cancellation discipline', () => {
         // Simulate a long-running tool call. The sleep length is far
         // above CANCEL_BUDGET_MS so a regression where the abort
         // fails to short-circuit the call is detected deterministically
-        // — the handler would resolve only after HANDLER_SLEEP_MS,
+        // - the handler would resolve only after HANDLER_SLEEP_MS,
         // well past every plausible CI scheduling jitter.
         await new Promise((resolve) => setTimeout(resolve, HANDLER_SLEEP_MS));
         return { content: [{ type: 'text', text: 'done' }] };

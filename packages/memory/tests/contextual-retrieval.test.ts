@@ -30,7 +30,7 @@ import { createInMemoryStore, InMemoryEmbeddingRegistry } from './fixtures/in-me
 const SCOPE: SessionScope = { userId: 'alex', sessionId: 's1' };
 
 // ---------------------------------------------------------------------------
-// buildSituatingContext — deterministic, signals-only
+// buildSituatingContext - deterministic, signals-only
 // ---------------------------------------------------------------------------
 
 describe('buildSituatingContext (P1-3)', () => {
@@ -70,7 +70,7 @@ describe('buildSituatingContext (P1-3)', () => {
   });
 });
 
-describe('contextualize — late-chunk (P1-3)', () => {
+describe('contextualize - late-chunk (P1-3)', () => {
   it('returns the canonical text unchanged when there is no context', () => {
     expect(contextualize({ text: 'moved there in March' })).toBe('moved there in March');
   });
@@ -83,7 +83,7 @@ describe('contextualize — late-chunk (P1-3)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// contextualizeWithLlm — opt-in enrichment with resilient fallbacks
+// contextualizeWithLlm - opt-in enrichment with resilient fallbacks
 // ---------------------------------------------------------------------------
 
 function fixedProvider(over: {
@@ -122,7 +122,7 @@ function fixedProvider(over: {
   };
 }
 
-describe('contextualizeWithLlm — opt-in enrichment (P1-3)', () => {
+describe('contextualizeWithLlm - opt-in enrichment (P1-3)', () => {
   it('prepends the model prefix and keeps the canonical text; returns usage', async () => {
     const provider = fixedProvider({ text: 'Anna relocated to Berlin.' });
     const res = await contextualizeWithLlm(
@@ -197,7 +197,7 @@ describe('SemanticMemory write-path contextualization (P1-3)', () => {
     expect(got?.text).toBe('moved there in March');
   });
 
-  it("'off' indexes the bare text — the context token misses, the text token hits", async () => {
+  it("'off' indexes the bare text - the context token misses, the text token hits", async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
       embeddings: new InMemoryEmbeddingRegistry(),
@@ -232,7 +232,7 @@ describe('SemanticMemory write-path contextualization (P1-3)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Vector surface — contextual embedding is closer to a vague query
+// Vector surface - contextual embedding is closer to a vague query
 // ---------------------------------------------------------------------------
 
 /** Deterministic bag-of-words embedder: shared tokens ⇒ positive cosine. */
@@ -415,7 +415,7 @@ describe('consolidator `llm` contextual retrieval (P1-3)', () => {
 // Type-level
 // ---------------------------------------------------------------------------
 
-describe('contextual retrieval — types (P1-3)', () => {
+describe('contextual retrieval - types (P1-3)', () => {
   it('exposes the mode union and config knobs', () => {
     expectTypeOf<ContextualRetrievalMode>().toEqualTypeOf<'off' | 'late-chunk' | 'llm'>();
     expectTypeOf<CreateMemoryOptions['contextualRetrieval']>().toEqualTypeOf<

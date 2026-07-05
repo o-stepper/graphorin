@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/provider/src/counters/anthropic.ts:44
 
 Counter that talks to `POST /v1/messages/count_tokens` when an API
 key is configured. Without an API key, the counter delegates to
-`JsTiktokenCounter('cl100k_base')` — the closest publicly-available
+`JsTiktokenCounter('cl100k_base')` - the closest publicly-available
 proxy for Anthropic's tokenizer.
 
 ## Stable

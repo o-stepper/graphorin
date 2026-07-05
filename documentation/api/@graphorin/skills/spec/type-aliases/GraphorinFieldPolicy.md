@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,6 +10,6 @@
 type GraphorinFieldPolicy = "deprecate-graphorin-prefix" | "co-exist" | "graphorin-only";
 ```
 
-Defined in: packages/skills/src/spec/index.ts:28
+Defined in: packages/skills/src/spec/index.ts:32
 
 Migration policy applied to a `graphorin-*` field that maps to an upstream field.

@@ -8,11 +8,11 @@ implementation (sandbox, secrets store, memory store, provider adapters,
 agent runtime, workflow engine, server, …) lives in a sibling package and
 depends on the interfaces declared here.
 
-- **Status:** v0.5.0 — type and contract surface for the v0.1 release line.
-- **License:** [MIT](./LICENSE) — © 2026 Oleksiy Stepurenko.
+- **Status:** v0.6.0 - type and contract surface for the v0.1 release line.
+- **License:** [MIT](./LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Runtime dependencies:** none.
-- **Peer dependency:** `zod` (`^3.23 || ^4`) — used for schema-typed values
+- **Peer dependency:** `zod` (`^3.23 || ^4`) - used for schema-typed values
   (`stateSchema`, `inputSchema`, `outputSchema`, `EvalScorer`, …). Bring
   whichever Zod version your application already uses.
 
@@ -52,8 +52,8 @@ sub-paths so that consumers can import only what they need:
 
 Every exported type is annotated with one of two TSDoc tags:
 
-- `@stable` — covered by semver guarantees for the `v0.x` line.
-- `@experimental` — may change between minor versions; a deprecation note
+- `@stable` - covered by semver guarantees for the `v0.x` line.
+- `@experimental` - may change between minor versions; a deprecation note
   in the `CHANGELOG.md` will accompany every removal.
 
 The vast majority of the surface ships as `@stable`; the deliberately
@@ -67,4 +67,4 @@ records are still being refined for v0.2.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

@@ -166,7 +166,7 @@ export async function decryptBundle(
     throw new SecretResolutionError(
       'encrypted-file',
       '<bundle>',
-      'Authentication tag mismatch — bundle is tampered, truncated, or the passphrase is wrong.',
+      'Authentication tag mismatch - bundle is tampered, truncated, or the passphrase is wrong.',
       { cause: err },
     );
   } finally {

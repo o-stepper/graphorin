@@ -1,5 +1,5 @@
 /**
- * Coverage for `withTracing` — uses `NOOP_TRACER` (no-op pass-through)
+ * Coverage for `withTracing` - uses `NOOP_TRACER` (no-op pass-through)
  * and a custom counting tracer to assert span lifecycle invocations.
  */
 import type {
@@ -74,7 +74,7 @@ function countingTracer(): { tracer: Tracer; calls: SpanCalls } {
 
 const REQ: ProviderRequest = { messages: [{ role: 'user', content: 'hi' }] };
 
-describe('withTracing — no tracer', () => {
+describe('withTracing - no tracer', () => {
   it('is a pure pass-through when no tracer is supplied', async () => {
     const wrapped = withTracing({})(bareAdapter());
     const result = await wrapped.generate(REQ);
@@ -87,7 +87,7 @@ describe('withTracing — no tracer', () => {
   });
 });
 
-describe('withTracing — NOOP_TRACER', () => {
+describe('withTracing - NOOP_TRACER', () => {
   it('runs without errors when the no-op tracer is supplied', async () => {
     const wrapped = withTracing({ tracer: NOOP_TRACER })(bareAdapter());
     await wrapped.generate(REQ);
@@ -95,7 +95,7 @@ describe('withTracing — NOOP_TRACER', () => {
   });
 });
 
-describe('withTracing — counting tracer', () => {
+describe('withTracing - counting tracer', () => {
   it('starts and ends a span on stream() with status ok', async () => {
     const { tracer, calls } = countingTracer();
     const wrapped = withTracing({ tracer })(bareAdapter());
@@ -111,7 +111,7 @@ describe('withTracing — counting tracer', () => {
     const wrapped = withTracing({ tracer })(bareAdapter());
     for await (const _ of wrapped.stream(REQ)) {
       void _;
-      break; // abort after the first event — the normal streaming-UI abort path
+      break; // abort after the first event - the normal streaming-UI abort path
     }
     expect(calls.startSpan).toBe(1);
     expect(calls.end).toBe(1); // span closed despite skipping the success path

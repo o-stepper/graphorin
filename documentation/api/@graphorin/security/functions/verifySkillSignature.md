@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function verifySkillSignature(options): Promise<SkillSignatureVerificationResult
 Defined in: packages/security/src/supply-chain/signature.ts:107
 
 Verify the ed25519 signature embedded in `skillMd`. Returns a
-structured result instead of throwing for the validation outcome —
+structured result instead of throwing for the validation outcome -
 callers branch on `valid`. Parser-level errors (missing block,
 malformed YAML) are still thrown via the supply-chain error
 hierarchy.

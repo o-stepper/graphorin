@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function createEncryptedConnection(options): Promise<SqliteConnection>;
 Defined in: packages/store-sqlite-encrypted/src/connection.ts:35
 
 Opens an encrypted SQLite connection. Differs from `openConnection`
-only in that the cipher peer driver is preloaded — callers that
+only in that the cipher peer driver is preloaded - callers that
 supply an `encryption.passphraseResolver` get the same behaviour as
 `openConnection({ encryption })` plus an explicit fail-fast on a
 missing cipher peer.

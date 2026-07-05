@@ -1,5 +1,5 @@
 /**
- * Standard phase — extracts new facts from session messages via the
+ * Standard phase - extracts new facts from session messages via the
  * configured cheap-tier provider. The phase is gated by the active
  * tier (DEC-144 / ADR-038) and the budget tracker; it never runs
  * under `tier: 'free'`.
@@ -77,10 +77,10 @@ export interface StandardPhaseDeps {
   /** Computes USD cost for the recorded usage. Defaults to 0 when omitted. */
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
   readonly tier: 'cheap' | 'standard' | 'full' | 'custom';
-  /** Override the wall clock — used by tests + the runtime clock seam. */
+  /** Override the wall clock - used by tests + the runtime clock seam. */
   readonly now?: () => number;
   /**
-   * Pre-fetched message batch — when supplied, the phase skips its
+   * Pre-fetched message batch - when supplied, the phase skips its
    * own `listMessagesSince(...)` call and operates on the supplied
    * rows. The runtime always pre-fetches the batch so the cursor
    * advance can use the same data the phase processed.
@@ -109,7 +109,7 @@ const EXTRACTION_SYSTEM_PROMPT = [
   'You are a memory-extraction assistant for a long-running personal-assistant runtime.',
   'Read the supplied conversation slice and return the durable facts it asserts about the user, the world, or stable preferences.',
   'Skip greetings, banter, transient state, and anything the assistant produced as boilerplate.',
-  // C5 (memory-consolidation-08): decontextualization — proposition-
+  // C5 (memory-consolidation-08): decontextualization - proposition-
   // granular retrieval only works when each stored fact stands alone.
   'Each fact text MUST be a self-contained proposition understandable with no surrounding context: resolve pronouns and ellipses to the named person or thing ("she" -> "Maria"), inline the concrete entities, and never write a fact that needs a neighbouring fact to make sense.',
   'For each fact also rate how important it is for remembering the user, on an integer scale from 1 (incidental detail) to 10 (identity-defining).',
@@ -129,13 +129,13 @@ const EPISODE_MAX_TOKENS = 512;
 
 const EPISODE_SUMMARY_SYSTEM_PROMPT = [
   'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
-  'Read the supplied conversation slice and write one concise third-person summary of what happened — the episode.',
+  'Read the supplied conversation slice and write one concise third-person summary of what happened - the episode.',
   'Return a single JSON object: { "summary": string }.',
 ].join(' ');
 
 const EPISODE_SUMMARY_IMPORTANCE_SYSTEM_PROMPT = [
   'You are an episode-summarization assistant for a long-running personal-assistant runtime.',
-  'Read the supplied conversation slice and write one concise third-person summary of what happened — the episode.',
+  'Read the supplied conversation slice and write one concise third-person summary of what happened - the episode.',
   'Also rate how important / poignant this episode is for remembering the user, on an integer scale from 1 (mundane) to 10 (deeply significant).',
   'Return a single JSON object: { "summary": string, "importance": number }.',
 ].join(' ');
@@ -281,7 +281,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
             costUsd: callCost,
           });
         } else if (route.route === 'reconcile') {
-          // Mid-zone but the budget is exhausted — fall back to a safe
+          // Mid-zone but the budget is exhausted - fall back to a safe
           // additive write rather than spending an over-budget LLM call.
           decision = { action: 'add', reason: 'reconcile-budget-paused' };
           audited = { kind: 'admit', stage: 'defer-to-deep', reason: 'reconcile-budget-paused' };
@@ -303,7 +303,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         }
 
         // Apply the decision. Updates / conflicts route through the
-        // bi-temporal supersede (close the old interval, insert the new) —
+        // bi-temporal supersede (close the old interval, insert the new) -
         // never a destructive delete (P0-3).
         let candidateId: string;
         switch (decision.action) {
@@ -313,7 +313,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
             // author a situating prefix and pass it as the write's index
             // text; the helper degrades to the deterministic late-chunk
             // prefix on any failure. `'late-chunk'` / `'off'` add nothing
-            // here — the shared SemanticMemory instance contextualizes the
+            // here - the shared SemanticMemory instance contextualizes the
             // write. This LLM call is the only contextualization that
             // touches a provider, keeping `'llm'` strictly consolidator-only.
             let indexText: string | undefined;
@@ -341,7 +341,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
               contextualCost += ctxCost;
               deps.budget.record({ phase: 'standard', tokens: ctxTokens, costUsd: ctxCost });
             }
-            // `pipeline: 'off'` — the standard phase has already made the
+            // `pipeline: 'off'` - the standard phase has already made the
             // conflict decision; a second inline pass would re-search +
             // double-audit.
             const stored = await deps.semantic.remember(deps.scope, input, {
@@ -354,7 +354,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
             break;
           }
           case 'noop': {
-            // Duplicate of `targetId` — record the dedup, write nothing.
+            // Duplicate of `targetId` - record the dedup, write nothing.
             candidateId = newMemoryId('fact');
             break;
           }
@@ -383,7 +383,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
           }
         }
 
-        // Every decision is auditable in `fact_conflicts` (best-effort —
+        // Every decision is auditable in `fact_conflicts` (best-effort -
         // a store without the conflict surface simply skips it).
         await recordConflictDecision(deps.store, deps.scope, candidateId, audited);
       }
@@ -393,7 +393,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
       // episodic triple-signal ranking (recency × relevance × importance)
       // runs on all three signals. Budget-gated + provenance-tagged
       // (P1-4): skipped when `formEpisodes` is off, no episodic tier is
-      // wired, or the budget is exhausted — the slice still advanced the
+      // wired, or the budget is exhausted - the slice still advanced the
       // cursor, so the phase degrades to fact-only behaviour.
       let episodesFormed = 0;
       let episodeTokens = 0;
@@ -488,7 +488,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
 }
 
 function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequest {
-  // memory-consolidation-08: temporal anchoring — state today's date and
+  // memory-consolidation-08: temporal anchoring - state today's date and
   // instruct the model to resolve relative time into absolute dates, so
   // "I'm interviewing next Friday" becomes a dated, durable fact.
   const today = new Date(deps.now?.() ?? Date.now()).toISOString().slice(0, 10);
@@ -552,7 +552,7 @@ function renderTranscript(messages: ReadonlyArray<SessionMessageRecord>): string
       const role = m.message.role;
       const text = renderText(m.message);
       // memory-consolidation-08: per-message timestamps anchor the
-      // extraction — without them relative time ("next Friday", "last
+      // extraction - without them relative time ("next Friday", "last
       // month") distils into facts with no resolvable timeframe.
       const stamp = typeof m.createdAt === 'string' && m.createdAt.length > 0 ? m.createdAt : '';
       return stamp.length > 0
@@ -677,14 +677,14 @@ function sliceJsonObject(text: string): string | null {
 
 /**
  * Build the {@link FactInput} for an extracted candidate. P1-4:
- * distilled-from-transcript facts are synthesized memory — tagged
+ * distilled-from-transcript facts are synthesized memory - tagged
  * `extraction` so they land quarantined (excluded from action-driving
  * recall until validated).
  */
 /**
  * Embedder-independent exact-duplicate lookup
  * (memory-consolidation-07): FTS top hits + strict string equality.
- * Returns the existing fact's id or `null`. Failures are swallowed —
+ * Returns the existing fact's id or `null`. Failures are swallowed -
  * the guard is an optimization, never a reason to fail the slice.
  */
 async function findExactTextDuplicate(
@@ -693,7 +693,7 @@ async function findExactTextDuplicate(
   text: string,
 ): Promise<string | null> {
   try {
-    // Extraction output lands quarantined (P1-4) — the committed copy a
+    // Extraction output lands quarantined (P1-4) - the committed copy a
     // replay would duplicate is exactly a quarantined row, so the guard
     // must look past the retrieval gate.
     const hits = await semantic.search(scope, text, { topK: 5, includeQuarantined: true });

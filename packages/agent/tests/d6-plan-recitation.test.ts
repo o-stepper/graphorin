@@ -58,7 +58,7 @@ function systemContents(req: ProviderRequest | undefined): string {
     .join('\n');
 }
 
-describe('D6 — plan tool journaling + recitation', () => {
+describe('D6 - plan tool journaling + recitation', () => {
   it('journals the plan into RunState.todos and recites it on the next step', async () => {
     const plan = {
       todos: [

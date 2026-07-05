@@ -1,10 +1,10 @@
 /**
- * Procedural memory extraction (P2-2) — AWM-style workflow induction. From
+ * Procedural memory extraction (P2-2) - AWM-style workflow induction. From
  * a **successful** agent trajectory, distil a reusable procedure: a goal, a
  * value-abstracted step sequence (`"search for {product}"`), the variable
  * names that abstraction introduced, and Voyager-style success criteria the
  * reuse can self-verify against. The induced procedure is stored in the
- * procedural tier **quarantined** + `provenance: 'induction'` (P1-4) —
+ * procedural tier **quarantined** + `provenance: 'induction'` (P1-4) -
  * procedures drive *actions*, so this is the highest-poisoning-risk write in
  * the system and must never bypass the quarantine gate.
  *
@@ -14,14 +14,14 @@
  * ({@link createProviderWorkflowInducer}) + a pure orchestrator
  * ({@link runWorkflowInduction}) that does no I/O of its own. The module
  * imports only `@graphorin/core` types, so the default (no-inducer) path is
- * fully offline — induction only ever calls a model when a provider is wired
+ * fully offline - induction only ever calls a model when a provider is wired
  * via `createMemory({ procedureInduction: { provider } })`.
  *
  * "Capture the trajectory + success signal" (the proposal's agent-side
  * dependency) needs **no agent change**: the agent already emits the full,
  * serializable {@link RunState} (`steps[]` + `messages[]` + `status`).
  * {@link trajectoryFromRunState} distils it into the minimal
- * {@link Trajectory} the inducer consumes — `succeeded = status ===
+ * {@link Trajectory} the inducer consumes - `succeeded = status ===
  * 'completed'` is the AWM online-mode success signal (no ground truth
  * needed).
  *
@@ -43,7 +43,7 @@ export const MAX_TRAJECTORY_STEPS_SHOWN = 60;
 const VARIABLE_PLACEHOLDER = /\{([a-zA-Z][\w-]*)\}/gu;
 
 /**
- * One distilled step of an agent trajectory — model-agnostic, so the
+ * One distilled step of an agent trajectory - model-agnostic, so the
  * inducer never sees raw provider/tool wire formats.
  *
  * @stable
@@ -58,7 +58,7 @@ export interface TrajectoryStep {
 /**
  * The minimal trajectory an inducer needs: the goal, the ordered steps, and
  * whether the run succeeded. Induction fires on **success only** (AWM online
- * mode) — {@link runWorkflowInduction} returns `null` for a failed run.
+ * mode) - {@link runWorkflowInduction} returns `null` for a failed run.
  *
  * @stable
  */
@@ -67,7 +67,7 @@ export interface Trajectory {
   readonly goal: string;
   /** Ordered steps the agent took. */
   readonly steps: ReadonlyArray<TrajectoryStep>;
-  /** Whether the run succeeded — the induction gate. */
+  /** Whether the run succeeded - the induction gate. */
   readonly succeeded: boolean;
 }
 
@@ -96,7 +96,7 @@ export interface WorkflowInductionOptions {
 
 /**
  * Provider-agnostic seam: turn one successful trajectory into a procedure.
- * Returns `null` when nothing inducible (degraded provider, empty output) —
+ * Returns `null` when nothing inducible (degraded provider, empty output) -
  * never throws.
  *
  * @stable
@@ -121,7 +121,7 @@ export const INDUCTION_SYSTEM_PROMPT = [
   'sequence of steps an agent took to SUCCEED at a task, distil a reusable procedure a future',
   'agent could follow for the same kind of task. Abstract concrete values into {snake_case}',
   'variables (e.g. "dry cat food" → {product}, "Monday" → {day}) so the procedure generalizes;',
-  'keep the steps short and imperative. Also state a few verifiable success criteria — concrete,',
+  'keep the steps short and imperative. Also state a few verifiable success criteria - concrete,',
   'checkable conditions that indicate the task is done. Do NOT invent steps that did not occur.',
   'Return strictly JSON: { "title": string, "steps": string[], "variables": string[],',
   '"successCriteria": string[] }.',
@@ -165,7 +165,7 @@ export function buildInductionRequest(
 /**
  * Parse the induction response into an {@link InducedProcedure}, tolerating
  * chatty / fenced output. Returns `null` when absent / unparseable / it
- * yields no steps. **Never throws on model output** — only normalizes.
+ * yields no steps. **Never throws on model output** - only normalizes.
  *
  * The returned `variables` are reconciled with the steps: every `{name}`
  * placeholder actually present in the steps is guaranteed to appear, so the
@@ -221,14 +221,14 @@ export function normalizeInducedProcedure(raw: {
 
 /**
  * Resilient provider-backed inducer. A provider throw or unparseable output
- * degrades to `null` (no procedure) — induction never breaks the write path.
+ * degrades to `null` (no procedure) - induction never breaks the write path.
  */
 export function createProviderWorkflowInducer(
   provider: Provider,
   options: {
     readonly maxTokens?: number;
     /**
-     * Usage callback (MCON-15) — induction is the framework's highest
+     * Usage callback (MCON-15) - induction is the framework's highest
      * poisoning-risk LLM spend and previously flowed past every budget
      * envelope. `createMemory` wires this into the consolidator budget
      * when one is enabled; standalone callers can record it themselves.
@@ -267,7 +267,7 @@ export function createProviderWorkflowInducer(
 /**
  * Pure orchestrator: induce a procedure from a trajectory.
  *
- * **Gate — successful trajectories only** (AWM online mode): a failed /
+ * **Gate - successful trajectories only** (AWM online mode): a failed /
  * aborted run, or one with no steps, yields `null` without calling the
  * inducer. Otherwise the inducer runs and the result is normalized.
  */
@@ -290,7 +290,7 @@ export async function runWorkflowInduction(
 
 /**
  * Distil a {@link RunState} into the minimal {@link Trajectory} the inducer
- * needs. Pure — consumes the agent's already-emitted run state, so capturing
+ * needs. Pure - consumes the agent's already-emitted run state, so capturing
  * a trajectory + its success signal needs no agent-loop change. The success
  * signal is `status === 'completed'`.
  */
@@ -315,7 +315,7 @@ export function trajectoryFromRunState(run: RunState): Trajectory {
 /**
  * Self-verify a reuse against an induced procedure's success criteria. A
  * criterion is met when any observed signal contains it (case-insensitive
- * substring) — a deterministic, offline check the agent runtime can feed
+ * substring) - a deterministic, offline check the agent runtime can feed
  * actual run observations into on reuse. With **no criteria**, the reuse
  * cannot be self-verified, so `verified` is `false`.
  */

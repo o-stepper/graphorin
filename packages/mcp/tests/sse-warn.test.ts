@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { _resetSseWarnDedupForTesting, createMCPClient } from '../src/client/index.js';
 import { MCPConnectionError } from '../src/errors/index.js';
 
-describe('SSE deprecated transport WARN — once per process', () => {
+describe('SSE deprecated transport WARN - once per process', () => {
   let warnings: string[] = [];
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('SSE deprecated transport WARN — once per process', () => {
   });
 
   it('emits exactly one WARN per process even across multiple createMCPClient calls', async () => {
-    // The actual transport will fail to connect (no real server) — we
+    // The actual transport will fail to connect (no real server) - we
     // only care about the warning emission, not the connection.
     const tryOpen = async () => {
       try {
@@ -30,7 +30,7 @@ describe('SSE deprecated transport WARN — once per process', () => {
           },
         });
       } catch {
-        // Expected — no server is listening.
+        // Expected - no server is listening.
       }
     };
     await tryOpen();
@@ -53,14 +53,14 @@ describe('SSE deprecated transport WARN — once per process', () => {
         },
       });
     } catch {
-      // Expected — no server is listening.
+      // Expected - no server is listening.
     }
     const sseWarnings = warnings.filter((w) => w.includes('SSE transport is deprecated'));
     expect(sseWarnings.length).toBe(0);
   });
 });
 
-describe('createMCPClient — connection failure surfaces as MCPConnectionError', () => {
+describe('createMCPClient - connection failure surfaces as MCPConnectionError', () => {
   it('a refused stdio command surfaces as MCPConnectionError', async () => {
     await expect(
       createMCPClient({

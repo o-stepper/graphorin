@@ -1,11 +1,11 @@
 /**
  * Sensitivity tier for any piece of data flowing through Graphorin.
  *
- * - `'public'`   — non-sensitive content; safe for any provider, any sink.
- * - `'internal'` — default for user-generated content; safe for trusted
+ * - `'public'`   - non-sensitive content; safe for any provider, any sink.
+ * - `'internal'` - default for user-generated content; safe for trusted
  *   providers (loopback / private-network) but redacted for public-tls
  *   exporters and replay consumers.
- * - `'secret'`   — credentials, tokens, encryption keys; only ever stays
+ * - `'secret'`   - credentials, tokens, encryption keys; only ever stays
  *   in-process and is never serialized to the wire by default.
  *
  * @stable

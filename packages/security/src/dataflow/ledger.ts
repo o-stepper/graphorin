@@ -22,7 +22,7 @@ const MIN_TRUSTWORTHY_WINDOW = 8;
  * for the spaces), and control / zero-width characters in a single pass.
  *
  * SDF-11: the previous lowercase + collapse-whitespace fold was defeated by
- * trivial obfuscation — a single inserted punctuation or zero-width character
+ * trivial obfuscation - a single inserted punctuation or zero-width character
  * every `<window` chars broke every shingle. This fold is still best-effort
  * verbatim detection: it does NOT defeat aggressive paraphrase or cross-script
  * confusables (e.g. a Cyrillic «а» is a distinct code point NFKC leaves apart),
@@ -62,7 +62,7 @@ interface TrackedSpan {
 /** Cap on persisted span-tile hashes (C6). */
 const MAX_PERSISTED_TILE_HASHES = 8192;
 
-/** FNV-1a 32-bit over a string, hex-encoded — one-way, cheap, stable. */
+/** FNV-1a 32-bit over a string, hex-encoded - one-way, cheap, stable. */
 function fnv1a32(text: string): string {
   let hash = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {
@@ -81,7 +81,7 @@ function fnv1a32(text: string): string {
  * evicted first). Comparison runs over an NFKC + alphanumeric-only fold
  * (SDF-11), so case, whitespace, inserted punctuation, zero-width and
  * fullwidth-homoglyph obfuscation do not defeat it. Detection is therefore
- * **best-effort** — it catches verbatim / near-verbatim forwarding of
+ * **best-effort** - it catches verbatim / near-verbatim forwarding of
  * untrusted content, not aggressive paraphrase or cross-script confusables,
  * and degrades gracefully past the budget. The conservative
  * {@link TaintLedger.untrustedSeen}/`sensitiveSeen` flags are never lossy:
@@ -103,14 +103,14 @@ export function createTaintLedger(opts?: {
   /**
    * SDF-8 / FIDES-lattice: optional predicate run over each tool output. When it
    * returns `true`, the read counts toward `sensitiveSeen` even if the tool's
-   * declared `sensitivity` is not `'secret'` — so PII/user-content exfiltration
+   * declared `sensitivity` is not `'secret'` - so PII/user-content exfiltration
    * trips the lethal-trifecta leg. Wire `containsPii` here to opt in; omit for
    * byte-identical behaviour.
    */
   readonly piiSensitivity?: (text: string) => boolean;
 }): TaintLedger {
   // SDF-5: the verbatim probe needs a window of at least
-  // MIN_TRUSTWORTHY_WINDOW chars to be meaningful — a sub-floor
+  // MIN_TRUSTWORTHY_WINDOW chars to be meaningful - a sub-floor
   // minSpanLength used to silently make `inspectArgs` always-negative
   // (the opposite of the documented "lower = more sensitive"). Clamp
   // UP to the floor so detection stays on.
@@ -124,7 +124,7 @@ export function createTaintLedger(opts?: {
   let untrustedSeen = opts?.initial?.untrustedSeen ?? false;
   let sensitiveSeen = opts?.initial?.sensitiveSeen ?? false;
   const untrustedSourceKinds = new Set<string>(opts?.initial?.untrustedSourceKinds ?? []);
-  // C6: hashed span tiles from a prior run leg — re-arms the verbatim
+  // C6: hashed span tiles from a prior run leg - re-arms the verbatim
   // probe for pre-suspend content without ever persisting untrusted text.
   const rehydratedTiles = new Set<string>(opts?.initial?.spanTileHashes ?? []);
   const piiSensitivity = opts?.piiSensitivity;
@@ -160,7 +160,7 @@ export function createTaintLedger(opts?: {
     },
 
     recordAssistantOutput(text: string): void {
-      // C6: only meaningful once the run is tainted — an untainted run's
+      // C6: only meaningful once the run is tainted - an untainted run's
       // model output derives from trusted context only.
       if (!untrustedSeen) return;
       const normalized = normalize(text);
@@ -216,7 +216,7 @@ export function createTaintLedger(opts?: {
     },
 
     snapshot(): TaintLedgerSnapshot {
-      // Coarse flags plus ONE-WAY tile hashes — never the tracked spans
+      // Coarse flags plus ONE-WAY tile hashes - never the tracked spans
       // themselves (untrusted text is not persisted; hashes cannot be
       // inverted and carry no content).
       const tiles: string[] = [];

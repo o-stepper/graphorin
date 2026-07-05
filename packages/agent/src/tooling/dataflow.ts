@@ -16,8 +16,8 @@
  * run-scoped, but its summary survives suspend/resume: the agent persists
  * `snapshotLedger()` onto `RunState.taintSummary` on every exit and
  * re-seeds via `seedLedger()` on resume (AG-19 / agent-08). The summary
- * carries the coarse flags plus ONE-WAY span-tile hashes (C6) — never
- * untrusted text — so the verbatim probe re-arms for pre-suspend content
+ * carries the coarse flags plus ONE-WAY span-tile hashes (C6) - never
+ * untrusted text - so the verbatim probe re-arms for pre-suspend content
  * at tile granularity while live spans keep full sensitivity. The map is bounded by
  * insertion-order eviction so a long-lived agent never leaks ledgers.
  *
@@ -136,7 +136,7 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
         ...(config.sensitiveTiers !== undefined ? { sensitiveTiers: config.sensitiveTiers } : {}),
       });
       // C6: a ToolReturn taint override only ever WIDENS the derived
-      // label — a first-party recall tool can mark quarantined content
+      // label - a first-party recall tool can mark quarantined content
       // untrusted, but nothing can launder an untrusted tool's output.
       const override = input.taintOverride;
       const label =
@@ -160,7 +160,7 @@ export function buildDataFlowGuard(config: DataFlowPolicyConfig): DataFlowGuardW
 
     // AG-19: snapshot/rehydrate the run's coarse taint summary across a
     // suspend/resume so the sink gate is not silently un-gated on the HITL
-    // boundary. Only the load-bearing flags cross the boundary — never spans.
+    // boundary. Only the load-bearing flags cross the boundary - never spans.
     snapshotLedger(runId: string): TaintLedgerSnapshot | undefined {
       return ledgers.get(runId)?.snapshot();
     },

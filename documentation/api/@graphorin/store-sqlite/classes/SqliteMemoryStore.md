@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -118,7 +118,7 @@ pruneHistory(olderThanMs): Promise<number>;
 
 Defined in: packages/store-sqlite/src/memory-store.ts:252
 
-store-04: retention prune for the `memory_history` audit trail —
+store-04: retention prune for the `memory_history` audit trail -
 without one the table grows unboundedly (every supersede /
 quarantine transition appends). Deletes rows older than
 `olderThanMs`; returns the number pruned. Operators call this from

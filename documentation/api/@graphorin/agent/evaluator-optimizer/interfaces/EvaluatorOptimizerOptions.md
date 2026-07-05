@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/agent/src/evaluator-optimizer/index.ts:72
 
 Options accepted by [evaluatorOptimizer](/api/@graphorin/agent/evaluator-optimizer/functions/evaluatorOptimizer.md). `maxIterations`
-is REQUIRED — the helper asserts `>= 1` at construction time.
+is REQUIRED - the helper asserts `>= 1` at construction time.
 
 ## Stable
 

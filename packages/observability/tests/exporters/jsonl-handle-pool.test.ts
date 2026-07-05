@@ -1,6 +1,6 @@
 /**
  * RP-20: the JSONL exporter's file-handle pool keys by `(session, UTC-month)`
- * and was never evicted — one open fd per pair until the process exits. The
+ * and was never evicted - one open fd per pair until the process exits. The
  * pool is now LRU-bounded.
  */
 import { mkdtemp, readFile } from 'node:fs/promises';
@@ -24,7 +24,7 @@ function rec(sessionId: string): SpanRecord {
   };
 }
 
-describe('JSONL exporter — bounded handle pool (RP-20)', () => {
+describe('JSONL exporter - bounded handle pool (RP-20)', () => {
   it('caps open handles and re-opens an evicted path without losing data', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-jsonl-pool-'));
     const fixedNow = (): Date => new Date('2026-06-13T12:00:00.000Z');

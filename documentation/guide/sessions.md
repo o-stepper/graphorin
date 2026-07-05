@@ -13,10 +13,10 @@ A **session** is the unit of conversation that survives across turns, agent step
 
 - a stable `sessionId` and `userId`;
 - the rolling list of messages (owned by `@graphorin/memory`'s session tier);
-- the agent registry — every agent that participated, with metadata;
-- handoff records — the typed log of when control passed between agents;
+- the agent registry - every agent that participated, with metadata;
+- handoff records - the typed log of when control passed between agents;
 - per-agent attribution on every message;
-- the optional JSONL export — a byte-equal replay of the entire session.
+- the optional JSONL export - a byte-equal replay of the entire session.
 
 ## The hybrid facade
 
@@ -49,10 +49,8 @@ await session.push({
 Every agent that participates in any session registers once on the manager-level registry:
 
 ```ts
-manager.agents.register({
-  id: 'planner',
-  name: 'Trip planner',
-  description: 'Plans hikes, trips, and itineraries.',
+manager.agents.register('planner', {
+  displayName: 'Trip planner',
   tags: ['travel'],
 });
 
@@ -88,35 +86,35 @@ The `lastN(10)` default plus the filter library from `@graphorin/agent` mean the
 
 ## JSONL export schema 1.0
 
-`session.export({ schema: '1.0', writer })` writes a deterministic JSONL stream conforming to **schema 1.0** (`graphorin-session-export/1.0`). Each line is a typed record:
+`session.export({ schema: '1.0', sink })` writes a deterministic JSONL stream conforming to **schema 1.0** (`graphorin-session-export/1.0`) into the supplied `SessionExportSink`; the optional `writer` string is a label stamped on the meta header. Each line is a typed record:
 
 | Record kind | When emitted |
 |---|---|
-| `session-open` | Once at the start. |
-| `agent-registered` | When `agents.register(...)` is called. |
+| `meta` | Once at the start (schema id, writer label, hash mode). |
+| `session` | The exported session's descriptor. |
+| `agent` | One per agent known to the registry. |
 | `message` | Every user / assistant / system message. |
-| `tool-call` | Every tool invocation. |
-| `tool-result` | Every tool result. |
 | `handoff` | Every handoff between agents. |
-| `compaction` | Every auto-compaction by the context engine. |
-| `progress-write` | Every `agent.progress.write(...)` artifact. |
-| `session-close` | Once at the end (when explicitly closed). |
+| `audit` | Audit entries included in the export. |
+| `footer` | Once at the end (record counts, optional hash / cipher stamps). |
 
-The schema is byte-stable — replays always produce the same payload byte-for-byte for the same input.
+Tool calls and results travel in the separate **tool cassette** stream (schema `graphorin-tool-cassette/1.0`), not in the session export. The schema is byte-stable - replays always produce the same payload byte-for-byte for the same input.
 
 ### Encryption (opt-in)
 
-Pass `encrypt` to the writer to AES-256-GCM the body. Each body record is
+Encryption lives on the low-level export writer (`session.export` does not
+forward an `encrypt` option today). Pass `encrypt` to
+`createSessionExportWriter` to AES-256-GCM the body. Each body record is
 encrypted independently and emitted as a self-identifying `{"enc":"…"}` line;
 the meta header and footer stay plaintext so an importer can fail fast, and the
 footer stamps `cipher: "aes256gcm"`. Supply either a pre-derived 32-byte `key`
 or a `passphrase` + `salt` (derived via `deriveSessionExportKey`).
 
 ```ts
-import { deriveSessionExportKey } from '@graphorin/sessions/export';
+import { createSessionExportWriter, deriveSessionExportKey } from '@graphorin/sessions/export';
 
 const key = await deriveSessionExportKey(passphrase, salt);
-await session.export({ schema: '1.0', writer, encrypt: { key } });
+const writer = createSessionExportWriter(sink, { encrypt: { key } });
 // Import: readSessionExport(body, { decryptionKey: key }).
 // Without the key, the reader throws SessionExportEncryptionRequiredError.
 ```
@@ -128,7 +126,7 @@ non-encrypted export never stamps `cipher`.
 
 Independently of encryption, the footer records `recordCount` / `messageCount` /
 `handoffCount` / `agentCount`, and the reader cross-checks them against the
-records it actually parsed — a truncated or tampered body surfaces a
+records it actually parsed - a truncated or tampered body surfaces a
 `footer-count-mismatch` warning. Pass `hash: true` to additionally stamp a
 SHA-256 `checksum` of the body on the footer; the importer then verifies it and
 throws `SessionExportChecksumMismatchError` on any mismatch.
@@ -141,9 +139,9 @@ const replayed = await session.replay({
 });
 ```
 
-`session.replay()` reads its spans from the `traceSource` you pass, or — when you construct the manager with `replayTraceSource: (id) => traceSourceForSession(store.connection, id)` (the durable span sink from `@graphorin/store-sqlite`, migration 024) — from the persisted spans for that session. With no source wired, replay falls back to the empty source and emits only `replay.start` / `replay.end`. See [Observability § Replay](/guide/observability#replay).
+`session.replay()` reads its spans from the `traceSource` you pass, or - when you construct the manager with `replayTraceSource: (id) => traceSourceForSession(store.connection, id)` (the durable span sink from `@graphorin/store-sqlite`, migration 024) - from the persisted spans for that session. With no source wired, replay falls back to the empty source and emits only `replay.start` / `replay.end`. See [Observability § Replay](/guide/observability#replay).
 
-By default, replays are **sanitised** — sensitive content is redacted, and external side-effects (real provider calls, real tool executions with side-effects) are stubbed against recorded "tool cassettes" (`graphorin-tool-cassette/1.0`). The `toolReplayMode` knob honours per-tool `sideEffectClass` so `'pure'` and `'read-only'` tools may be re-executed live while `'side-effecting'` and `'external-stateful'` tools default to the recorded cassette.
+By default, replays are **sanitised** - sensitive content is redacted, and external side-effects (real provider calls, real tool executions with side-effects) are stubbed against recorded "tool cassettes" (`graphorin-tool-cassette/1.0`). The `toolReplayMode` knob honours per-tool `sideEffectClass` so `'pure'` and `'read-only'` tools may be re-executed live while `'side-effecting'` and `'external-stateful'` tools default to the recorded cassette.
 
 Every replay writes one audit row.
 
@@ -159,15 +157,15 @@ Every replay writes one audit row.
 
 The standalone server (`@graphorin/server`) exposes the session surface under `/v1/sessions/...`. See [Standalone server](/guide/standalone-server) for the full REST table.
 
-The CLI command `graphorin migrate-export <path>` produces a JSONL export from the local SQLite database.
+The CLI command `graphorin migrate-export <input> --to <out>` migrates an existing session-export JSONL file to a target schema version (`--to-schema`); it never reads the SQLite database itself.
 
 ## Next steps
 
-- [Memory system](/guide/memory-system) — session tier surface.
-- [Agent runtime](/guide/agent-runtime) — handoffs, filters, attribution.
-- [Standalone server](/guide/standalone-server) — REST endpoints.
-- [CLI](/guide/cli) — `graphorin migrate-export`.
+- [Memory system](/guide/memory-system) - session tier surface.
+- [Agent runtime](/guide/agent-runtime) - handoffs, filters, attribution.
+- [Standalone server](/guide/standalone-server) - REST endpoints.
+- [CLI](/guide/cli) - `graphorin migrate-export`.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

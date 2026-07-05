@@ -1,5 +1,5 @@
 /**
- * `AgentRegistry` — the per-session-manager catalogue of every agent
+ * `AgentRegistry` - the per-session-manager catalogue of every agent
  * that has ever produced a message in a session. The registry exists
  * to keep replay working long after the agent has been renamed or
  * deleted: orphan `agent_id` references on stored messages can always
@@ -29,7 +29,7 @@ export type AgentRegistryLookup =
 
 /**
  * Optional options accepted by {@link AgentRegistry.register}. The
- * registration is idempotent on `id` — re-registering the same id
+ * registration is idempotent on `id` - re-registering the same id
  * refreshes the display name + tags.
  *
  * @stable

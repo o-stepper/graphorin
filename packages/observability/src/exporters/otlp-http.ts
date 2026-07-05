@@ -1,5 +1,5 @@
 /**
- * `OTLPHttpExporter` — reference implementation that POSTs span
+ * `OTLPHttpExporter` - reference implementation that POSTs span
  * records to an OpenTelemetry HTTP endpoint.
  *
  * The exporter is deliberately minimal: production hardening (retry
@@ -10,7 +10,7 @@
  *
  * Operators wanting the upstream OpenTelemetry SDK exporter
  * (`@opentelemetry/exporter-trace-otlp-http`) can adapt
- * {@link toOtlpEnvelope} into their own wrapper — the helper is
+ * {@link toOtlpEnvelope} into their own wrapper - the helper is
  * exported so the OTel adapter does not need to duplicate the wire
  * shape.
  *
@@ -35,7 +35,7 @@ export interface OTLPHttpExporterOptions {
   readonly headers?: Readonly<Record<string, string>>;
   /** Service name embedded in the OTLP `Resource`. */
   readonly serviceName?: string;
-  /** Optional `fetch` override — useful for testing without the network. */
+  /** Optional `fetch` override - useful for testing without the network. */
   readonly fetchImpl?: typeof fetch;
   /** Optional timeout (ms). Defaults to 10000. */
   readonly timeoutMs?: number;
@@ -46,7 +46,7 @@ export interface OTLPHttpExporterOptions {
  * `withValidation(exporter)` before passing the result to
  * `createTracer({ exporters })`.
  *
- * The implementation issues one `POST` per finished span — no
+ * The implementation issues one `POST` per finished span - no
  * batching. Operators wanting batching should wrap this exporter
  * with their own queue or use a sidecar collector.
  *
@@ -100,7 +100,7 @@ export function createOTLPHttpExporter(opts: OTLPHttpExporterOptions): TraceExpo
 }
 
 /**
- * @internal — exposed for unit tests
+ * @internal - exposed for unit tests
  */
 export function toOtlpEnvelope(record: SpanRecord, serviceName: string): unknown {
   const otelStatus = record.status === 'ok' ? 1 : record.status === 'error' ? 2 : 0;
@@ -110,12 +110,12 @@ export function toOtlpEnvelope(record: SpanRecord, serviceName: string): unknown
         resource: {
           attributes: [
             { key: 'service.name', value: { stringValue: serviceName } },
-            { key: 'graphorin.framework.version', value: { stringValue: '0.5.0' } },
+            { key: 'graphorin.framework.version', value: { stringValue: '0.6.0' } },
           ],
         },
         scopeSpans: [
           {
-            scope: { name: '@graphorin/observability', version: '0.5.0' },
+            scope: { name: '@graphorin/observability', version: '0.6.0' },
             spans: [
               {
                 traceId: record.traceId,

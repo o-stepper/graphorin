@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -155,7 +155,7 @@ Defined in: packages/security/src/secrets/secret-value.ts:324
 
 Best-effort zeroization of the underlying buffer. Idempotent. Does
 not affect derived V8 strings already created via `.use(fn)` /
-`.reveal()` — that limitation is fundamental and documented.
+`.reveal()` - that limitation is fundamental and documented.
 
 #### Returns
 
@@ -177,7 +177,7 @@ reveal(): string;
 
 Defined in: packages/security/src/secrets/secret-value.ts:290
 
-One-shot escape hatch — returns the unwrapped string. Audited.
+One-shot escape hatch - returns the unwrapped string. Audited.
 Prefer `.use(fn)` whenever possible.
 
 #### Returns
@@ -201,7 +201,7 @@ toJSON(): string;
 Defined in: packages/security/src/secrets/secret-value.ts:367
 
 `JSON.stringify({ apiKey: secret })` invokes `toJSON()` per
-ECMA-262 § 25.5.2 — returning the placeholder ensures structured
+ECMA-262 § 25.5.2 - returning the placeholder ensures structured
 logging never serializes the raw value.
 
 #### Returns
@@ -251,7 +251,7 @@ Defined in: packages/security/src/secrets/secret-value.ts:313
 
 Use `.reveal()` for the explicit one-shot read or
   `.use(fn)` for the preferred scoped read. Retained for the
-  `0.x` compatibility window only — slated for removal in the
+  `0.x` compatibility window only - slated for removal in the
   next major release. The companion lint rule
   `@graphorin/no-secret-unwrap` flags every use of this method.
 
@@ -366,7 +366,7 @@ static fromString(raw, opts?): SecretValue;
 Defined in: packages/security/src/secrets/secret-value.ts:190
 
 Wrap a UTF-8 string. Use this at the I/O boundary (env reads,
-keyring reads, file reads, OAuth callback response) — not from
+keyring reads, file reads, OAuth callback response) - not from
 deep inside business logic where the raw value would already have
 leaked to a V8 string.
 
@@ -395,7 +395,7 @@ Defined in: packages/security/src/secrets/secret-value.ts:211
 
 Cross-realm safe `instanceof` replacement. Returns `true` for any
 object carrying `Symbol.for('graphorin.SecretValue')` set to `true`
-— including instances constructed in Worker threads / vm contexts.
+- including instances constructed in Worker threads / vm contexts.
 
 #### Parameters
 

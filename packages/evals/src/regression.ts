@@ -1,6 +1,6 @@
 /**
- * Compares two `EvalReport`s — typically the freshly-produced report
- * vs a stored baseline — and lists every metric that regressed beyond
+ * Compares two `EvalReport`s - typically the freshly-produced report
+ * vs a stored baseline - and lists every metric that regressed beyond
  * the configured tolerance.
  *
  * @packageDocumentation
@@ -17,7 +17,7 @@ import type {
 const DEFAULT_PASS_RATE_DROP_PCT = 5;
 const DEFAULT_AVG_SCORE_DROP = 0.05;
 // EB-4: the avg-duration gate is OPT-IN (default off). Absolute wall-clock
-// budgets are environment-sensitive — a baseline recorded on a fast
+// budgets are environment-sensitive - a baseline recorded on a fast
 // workstation vs a loaded CI runner, or real LLM-latency jitter of whole
 // seconds, would flag spurious "regressions". Callers that genuinely want a
 // duration budget pass an explicit finite `maxAvgDurationIncreaseMs`.
@@ -60,7 +60,7 @@ export function detectRegressions<I, O>(
         message:
           `pass rate dropped by ${passRateDropPct.toFixed(2)}% ` +
           `(${(currentPassRate * 100).toFixed(2)}% < baseline ${(baselinePassRate * 100).toFixed(2)}% ` +
-          `− tolerance ${maxPassRateDropPct.toFixed(2)}%)` +
+          `- tolerance ${maxPassRateDropPct.toFixed(2)}%)` +
           (havePairs
             ? ` [paired: ${significance.regressed} regressed / ${significance.improved} improved over ${significance.pairs} shared case(s), McNemar p=${significance.pValue.toFixed(4)}]`
             : '') +
@@ -78,7 +78,7 @@ export function detectRegressions<I, O>(
       message:
         `avg duration increased by ${durationDelta.toFixed(2)} ms ` +
         `(${current.summary.avgDurationMs.toFixed(2)} ms > baseline ` +
-        `${baseline.summary.avgDurationMs.toFixed(2)} ms − tolerance ${maxAvgDurationIncreaseMs} ms).`,
+        `${baseline.summary.avgDurationMs.toFixed(2)} ms - tolerance ${maxAvgDurationIncreaseMs} ms).`,
       delta: durationDelta,
     });
   }
@@ -103,7 +103,7 @@ export function detectRegressions<I, O>(
           message:
             `'${scorer}' avg score dropped by ${drop.toFixed(4)} ` +
             `(${currentRow.avgScore.toFixed(4)} < baseline ${baselineRow.avgScore.toFixed(4)} ` +
-            `− tolerance ${maxAvgScoreDrop}).`,
+            `- tolerance ${maxAvgScoreDrop}).`,
           delta: -drop,
         });
       }

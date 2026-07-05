@@ -1,5 +1,5 @@
 /**
- * `InsightMemory` — the thin, read-only surface over the reflection
+ * `InsightMemory` - the thin, read-only surface over the reflection
  * insights the consolidator synthesizes (P1-1). Insights are *derived*
  * (quarantined + `provenance: 'reflection'`), carry mandatory citations,
  * and are retrieval-ranked **below the primary facts they cite**. The
@@ -7,7 +7,7 @@
  * reflection pass; this tier only lists / searches for the validation /
  * inspector path.
  *
- * Search is FTS-only — insights are a soft inspector surface, not
+ * Search is FTS-only - insights are a soft inspector surface, not
  * primary recall, so no embedder is wired here.
  *
  * @packageDocumentation
@@ -25,7 +25,7 @@ export interface InsightSearchOptions {
   /**
    * Include quarantined insights (P1-4). Defaults to `false`. Since
    * reflection-synthesized insights *always* land quarantined, set this
-   * `true` to surface them for the validation / inspector path — never
+   * `true` to surface them for the validation / inspector path - never
    * for auto-recall fed back into the model.
    */
   readonly includeQuarantined?: boolean;
@@ -40,7 +40,7 @@ export interface InsightListOptions {
 }
 
 /**
- * `InsightMemory` — list / search reflection insights. A no-op (returns
+ * `InsightMemory` - list / search reflection insights. A no-op (returns
  * empty) when the storage adapter does not expose the optional
  * `insights` surface.
  *
@@ -78,8 +78,8 @@ export class InsightMemory {
             ? { includeQuarantined: opts.includeQuarantined }
             : {}),
         });
-        // MCON-16: retrieval reinforces (ExpeL) — a recalled insight gains
-        // +1 salience, offsetting the per-reflection-pass −1 decay, so
+        // MCON-16: retrieval reinforces (ExpeL) - a recalled insight gains
+        // +1 salience, offsetting the per-reflection-pass -1 decay, so
         // used insights persist while unused ones slide to the prune
         // floor. Best-effort bookkeeping: never break the read path.
         for (const hit of hits) {
@@ -169,14 +169,14 @@ const RANK_CAP_EPSILON = 1e-6;
  * Enforce the P1-1 rank ceiling: an insight may never outrank a primary
  * fact **it cites**. For each insight hit, if any fact it cites is
  * present in `factHits`, its score is lowered to strictly below that
- * cited fact's score — so concatenating the two lists and sorting by
+ * cited fact's score - so concatenating the two lists and sorting by
  * score descending can never place the insight above the evidence it
  * was synthesized from. Insights whose cited facts are absent from
  * `factHits` are returned unchanged; this is a relative, not a global,
  * cap (per the execution plan: "never outrank the primary facts they
  * cite").
  *
- * Pure + deterministic — does not mutate its inputs.
+ * Pure + deterministic - does not mutate its inputs.
  *
  * @stable
  */

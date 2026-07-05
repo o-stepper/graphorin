@@ -1,5 +1,5 @@
 /**
- * `exactMatch` — passes when `output` deeply equals `case.expected`.
+ * `exactMatch` - passes when `output` deeply equals `case.expected`.
  * Useful for deterministic outputs (numeric / parsed JSON / classifier
  * label).
  *

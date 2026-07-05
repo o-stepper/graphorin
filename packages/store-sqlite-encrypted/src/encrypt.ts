@@ -1,18 +1,18 @@
 /**
- * `encryptDatabase` — converts an unencrypted SQLite database file
+ * `encryptDatabase` - converts an unencrypted SQLite database file
  * into an encrypted one. Backs `graphorin storage encrypt` per
  * ADR-030 § 8.
  *
  * Strategy (CS-7): sqlite3mc ships **no** `sqlcipher_export` function
- * (verified against the real peer — the old ATTACH+export path threw
+ * (verified against the real peer - the old ATTACH+export path threw
  * "no such function" on every real run), so the export is a
  * **checkpoint → file copy → in-place `PRAGMA rekey`** sequence:
  *
  *  1. open the plaintext source, `wal_checkpoint(TRUNCATE)`, close;
  *  2. byte-copy the file to the target (this trivially preserves every
- *     rowid, so FTS5 external-content mappings stay intact — CS-10);
+ *     rowid, so FTS5 external-content mappings stay intact - CS-10);
  *  3. open the copy through the cipher peer with NO key, apply the
- *     cipher-selection pragmas, then `PRAGMA rekey = <key>` — sqlite3mc
+ *     cipher-selection pragmas, then `PRAGMA rekey = <key>` - sqlite3mc
  *     encrypts a plaintext database in place;
  *  4. re-open with the key and verify via `PRAGMA integrity_check`.
  *
@@ -50,7 +50,7 @@ export interface EncryptDatabaseOptions {
    * If `true`, atomically rename `targetPath` -> `sourcePath` after the
    * integrity check passes. The original `sourcePath` is renamed to
    * `${sourcePath}.bak.${timestamp}` so an operator can recover.
-   * Default `false` — the CLI does the swap explicitly.
+   * Default `false` - the CLI does the swap explicitly.
    */
   readonly swap?: boolean;
   /**
@@ -122,7 +122,7 @@ export async function encryptDatabase(
       if (source.open) source.close();
     }
 
-    // 3. In-place conversion: cipher pragmas first, then `rekey` —
+    // 3. In-place conversion: cipher pragmas first, then `rekey` -
     //    sqlite3mc encrypts a plaintext database in place.
     const target = new Ctor(targetPath);
     try {
@@ -130,7 +130,7 @@ export async function encryptDatabase(
         target.pragma(pragma);
       }
       // sqlite3mc refuses `rekey` in WAL journal mode (real-peer
-      // verified) — drop to DELETE for the conversion, restore after.
+      // verified) - drop to DELETE for the conversion, restore after.
       target.pragma('journal_mode = DELETE');
       const encodedKey = encodePassphraseForPragma(options.passphrase);
       target.pragma(`rekey = ${encodedKey}`);

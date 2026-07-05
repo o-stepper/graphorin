@@ -21,7 +21,7 @@
  * to wait for CI to flag a missed network gate.
  *
  * The rule is intentionally limited to the framework's own code paths
- * — consumer applications can call `fetch` freely. The rule activates
+ * - consumer applications can call `fetch` freely. The rule activates
  * whenever the linted file path matches `/packages/<pkg>/src/`.
  *
  * @packageDocumentation
@@ -124,7 +124,7 @@ const rule: Rule.RuleModule = {
   },
 };
 
-/** `require('<http client>')` — import-shaped despite being a call. */
+/** `require('<http client>')` - import-shaped despite being a call. */
 function requiredClientSpecifier(node: CallExpression): string | null {
   if (node.callee.type !== 'Identifier') return null;
   if ((node.callee as Identifier).name !== 'require') return null;

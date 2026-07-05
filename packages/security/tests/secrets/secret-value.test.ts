@@ -32,7 +32,7 @@ describe('SecretValue', () => {
   it('exposes a deprecated unwrap() method that delegates to reveal()', () => {
     const s = SecretValue.fromString('legacy-call-site');
     expect(s.unwrap()).toBe('legacy-call-site');
-    // unwrap() must run the same audit as reveal() — exercised by the
+    // unwrap() must run the same audit as reveal() - exercised by the
     // audit emitter test below; checked here via behavioural parity.
     expect(s.unwrap()).toBe(s.reveal());
   });
@@ -59,7 +59,7 @@ describe('SecretValue', () => {
     const s = SecretValue.fromString('cross-realm');
     expect(SecretValue.isSecretValue(s)).toBe(true);
 
-    // Simulate a cross-realm object — same brand symbol via Symbol.for.
+    // Simulate a cross-realm object - same brand symbol via Symbol.for.
     const fake = { [SECRET_VALUE_BRAND]: true } as object;
     expect(SecretValue.isSecretValue(fake)).toBe(true);
 

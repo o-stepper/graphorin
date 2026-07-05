@@ -29,7 +29,7 @@ function buildApp(verifier: TokenVerifier, trustProxy = false) {
   return app;
 }
 
-describe('createAuthMiddleware — failure reasons', () => {
+describe('createAuthMiddleware - failure reasons', () => {
   it('returns 401 with auth-revoked when the token is revoked', async () => {
     const { verifier, created, tokenStore, raw } = await setup();
     await tokenStore.revoke(created.record.id, new Date().toISOString());
@@ -72,7 +72,7 @@ describe('createAuthMiddleware — failure reasons', () => {
       perIpLockoutMs: 60_000,
     });
     const app = buildApp(verifier, true);
-    // Each request from the same IP fails — after 2 failures the lockout trips.
+    // Each request from the same IP fails - after 2 failures the lockout trips.
     const headers = { Authorization: 'Bearer not-real', 'X-Forwarded-For': '9.9.9.9' };
     await app.request('/echo', { headers });
     await app.request('/echo', { headers });

@@ -1,5 +1,5 @@
 /**
- * `validateMCPServerConfig(...)` — sanity-check a transport configuration
+ * `validateMCPServerConfig(...)` - sanity-check a transport configuration
  * before {@link createMCPClient} runs the network-level handshake.
  *
  * The validator catches the most common configuration mistakes

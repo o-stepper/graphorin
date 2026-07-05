@@ -1,4 +1,4 @@
-<!-- Fork of vitepress-plugin-mermaid/dist/Mermaid.vue — uses a render host container (see mermaid-render-host.ts). -->
+<!-- Fork of vitepress-plugin-mermaid/dist/Mermaid.vue - uses a render host container (see mermaid-render-host.ts). -->
 <template>
   <div v-html="svg" :class="props.class"></div>
 </template>

@@ -1,14 +1,14 @@
 /**
- * `graphorin traces` — operate on the local trace cache.
+ * `graphorin traces` - operate on the local trace cache.
  *
  * Surface (per Phase 15 § Traces):
  *
- *  - `graphorin traces status` — count rows + report TTL config.
- *  - `graphorin traces prune [--before <date>]` — manual TTL
+ *  - `graphorin traces status` - count rows + report TTL config.
+ *  - `graphorin traces prune [--before <date>]` - manual TTL
  *    enforcement.
  *
  * The trace cache lives in the SQLite store under the `traces` table
- * (registered in Phase 04). This command is read + delete only — the
+ * (registered in Phase 04). This command is read + delete only - the
  * trace producer is the running `@graphorin/observability` exporter.
  *
  * @packageDocumentation
@@ -63,7 +63,7 @@ export async function runTracesStatus(
       const print = options.print ?? defaultPrintSink;
       if (!out.tableExists) {
         print(
-          brand('traces table not found — the observability exporter has not initialized it yet.'),
+          brand('traces table not found - the observability exporter has not initialized it yet.'),
         );
         return;
       }

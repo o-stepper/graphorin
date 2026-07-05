@@ -1,5 +1,5 @@
 /**
- * `getTraceLog(...)` / `pruneTraces(...)` — minimal helpers for reading
+ * `getTraceLog(...)` / `pruneTraces(...)` - minimal helpers for reading
  * back the JSONL files produced by {@link createJSONLExporter} and
  * pruning old files based on retention policy.
  *
@@ -26,7 +26,7 @@ export async function* getTraceLog(filePath: string): AsyncIterable<SpanRecord> 
       const parsed = JSON.parse(line) as SpanRecord;
       yield parsed;
     } catch {
-      // Skip malformed lines — replay must keep going.
+      // Skip malformed lines - replay must keep going.
     }
   }
 }

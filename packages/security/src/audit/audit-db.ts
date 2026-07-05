@@ -4,7 +4,7 @@
  *
  * - Encryption-at-rest is **mandatory** for the audit log even when
  *   the main store is unencrypted (the audit log carries attribution
- *   data — token id, route, IP hash — that must never sit at rest in
+ *   data - token id, route, IP hash - that must never sit at rest in
  *   plain bytes).
  * - The audit log can be archived, exported, and rotated on its own
  *   schedule.
@@ -24,7 +24,7 @@ import type { StoredAuditEntry } from './types.js';
 
 /**
  * Stored binding identifier. The framework default is the
- * `better-sqlite3-multiple-ciphers` package — registered by
+ * `better-sqlite3-multiple-ciphers` package - registered by
  * `@graphorin/store-sqlite` at startup. Custom enterprise deployments
  * can register their own binding here without touching the secrets
  * layer.
@@ -56,7 +56,7 @@ export interface OpenAuditDbOptions {
 /**
  * Shape of a registered binding. The factory is asynchronous so it
  * can perform the file-mode check and run the cipher self-test before
- * returning. (It does NOT write an `audit:db-opened` chain entry — the
+ * returning. (It does NOT write an `audit:db-opened` chain entry - the
  * database is not yet ready to record its own opening; an operator that
  * wants one appends it after `openAuditDb(...)` resolves.)
  *
@@ -76,7 +76,7 @@ export interface AuditDbBinding {
  * Concrete bindings can expose more, but the contract is intentionally
  * small so the verifier remains binding-agnostic.
  *
- * The methods are deliberately synchronous on the read path — the
+ * The methods are deliberately synchronous on the read path - the
  * single-file SQLite default is already in-process, and asynchrony
  * would add no I/O parallelism but would force every audit consumer
  * to plumb promise-state through hot loops.

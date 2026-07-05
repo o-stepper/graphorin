@@ -1,22 +1,22 @@
 /**
- * `graphorin storage` — manage the SQLite store and its encryption-
+ * `graphorin storage` - manage the SQLite store and its encryption-
  * at-rest opt-in.
  *
  * Surface (per Phase 15 § Storage):
  *
- *  - `graphorin storage status` — reports cipher peer + WAL + size +
+ *  - `graphorin storage status` - reports cipher peer + WAL + size +
  *    encryption mode.
- *  - `graphorin storage encrypt --passphrase-from <ref>` — opt-in
+ *  - `graphorin storage encrypt --passphrase-from <ref>` - opt-in
  *    encryption migration. Requires the `@graphorin/store-sqlite-
  *    encrypted` sub-pack from Phase 16.
- *  - `graphorin storage rekey --new-passphrase-from <ref>` — re-key
+ *  - `graphorin storage rekey --new-passphrase-from <ref>` - re-key
  *    an already-encrypted DB.
- *  - `graphorin storage cleanup-backups` — drop stale `.bak` /
+ *  - `graphorin storage cleanup-backups` - drop stale `.bak` /
  *    `.bak.<ts>` files left by previous encrypt / rekey runs.
- *  - `graphorin storage backup <dest>` — online, consistent copy via
+ *  - `graphorin storage backup <dest>` - online, consistent copy via
  *    the driver's page-level backup API (store-02). Safe under a live
  *    writer, preserves rowids (FTS5 mappings survive). Never use
- *    `VACUUM INTO` — rowid renumbering corrupts FTS mappings.
+ *    `VACUUM INTO` - rowid renumbering corrupts FTS mappings.
  *
  * `encrypt`, `rekey`, and `cleanup-backups` need the cipher peer
  * (`better-sqlite3-multiple-ciphers`) which ships in the optional
@@ -145,7 +145,7 @@ export interface StorageBackupResult {
 }
 
 /**
- * store-02: online backup via the driver's page-level `backup()` API —
+ * store-02: online backup via the driver's page-level `backup()` API -
  * consistent under a live writer (the daemon can keep running),
  * preserves rowids so FTS5 external-content mappings survive, and for
  * an encrypted store produces an equally-encrypted copy (same key).
@@ -219,7 +219,7 @@ export interface StorageEncryptResult {
 }
 
 /**
- * `graphorin storage encrypt --passphrase-from <ref>` — encrypt a
+ * `graphorin storage encrypt --passphrase-from <ref>` - encrypt a
  * previously unencrypted SQLite store. Delegates to the optional Phase
  * 16 sub-pack `@graphorin/store-sqlite-encrypted` once installed; when
  * the sub-pack is missing the CLI exits `2` (`UNSUPPORTED`) with an
@@ -501,8 +501,8 @@ async function statSafely(
   }
 }
 
-// IP-20: resolve a relative storage path against the CWD — the SAME rule the
-// server (`createServer` → `createSqliteStore`) and `openStoreContext` use — so
+// IP-20: resolve a relative storage path against the CWD - the SAME rule the
+// server (`createServer` → `createSqliteStore`) and `openStoreContext` use - so
 // `graphorin storage status / encrypt` from any directory reports the same
 // database the server and the other CLI commands (`memory`, …) open. Resolving
 // against the config-file dir made `storage status` the lone outlier: from a

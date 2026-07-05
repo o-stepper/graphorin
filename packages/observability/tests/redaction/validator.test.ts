@@ -7,7 +7,7 @@ import {
   RedactionValidationError,
 } from '../../src/redaction/index.js';
 
-describe('@graphorin/observability/redaction — validator', () => {
+describe('@graphorin/observability/redaction - validator', () => {
   it('drops values whose declared tier exceeds the floor', () => {
     const v = createRedactionValidator({ minTier: 'public' });
     const out = v.validate({ value: 'hello', tier: 'internal' });
@@ -37,7 +37,7 @@ describe('@graphorin/observability/redaction — validator', () => {
     // A real Visa test number (Luhn-valid) is redacted.
     const pan = v.validate({ value: 'card 4111 1111 1111 1111', tier: 'public' });
     expect(pan?.value).toContain('[REDACTED creditcard]');
-    // A 13-digit millisecond epoch is not a valid PAN (Luhn fails) — pre-RP-21
+    // A 13-digit millisecond epoch is not a valid PAN (Luhn fails) - pre-RP-21
     // the regex masked it, corrupting the payload.
     const ts = v.validate({ value: 'ts=1718000000000', tier: 'public' });
     expect(ts?.value).toBe('ts=1718000000000');

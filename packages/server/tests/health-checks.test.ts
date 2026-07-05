@@ -26,7 +26,7 @@ afterEach(async () => {
 
 describe('health/checks', () => {
   it('rollup() promotes the worst per-check status', () => {
-    // rollup() only reads `.status` — the slim literals stand in for full checks.
+    // rollup() only reads `.status` - the slim literals stand in for full checks.
     expect(rollup({})).toBe('ok');
     expect(rollup({ storage: { status: 'ok' } as StorageCheck })).toBe('ok');
     expect(rollup({ storage: { status: 'warn' } as StorageCheck })).toBe('degraded');

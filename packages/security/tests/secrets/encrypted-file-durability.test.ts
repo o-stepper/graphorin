@@ -19,10 +19,10 @@ vi.mock('node:fs/promises', async (importActual) => {
   };
 });
 
-// Argon2id (m=64MiB, t=3) is slow on shared CI runners — match stores.test.ts.
+// Argon2id (m=64MiB, t=3) is slow on shared CI runners - match stores.test.ts.
 const KDF_TEST_TIMEOUT_MS = 30_000;
 
-describe('EncryptedFileSecretsStore — durability (SPL-3)', () => {
+describe('EncryptedFileSecretsStore - durability (SPL-3)', () => {
   let workDir: string;
   beforeEach(() => {
     workDir = mkdtempSync(join(tmpdir(), 'graphorin-encfile-dura-'));
@@ -53,7 +53,7 @@ describe('EncryptedFileSecretsStore — durability (SPL-3)', () => {
       // 'foo' while reporting success. FIX: the read fails loud, so set() throws.
       await expect(wrong.set('baz', 'qux')).rejects.toThrow(/Authentication tag mismatch/);
 
-      // The original bundle must be byte-identical — nothing was overwritten.
+      // The original bundle must be byte-identical - nothing was overwritten.
       expect(readFileSync(path).equals(onDiskBefore)).toBe(true);
 
       // The correct passphrase still reads the original secret.
@@ -74,7 +74,7 @@ describe('EncryptedFileSecretsStore — durability (SPL-3)', () => {
         path,
         passphrase: SecretValue.fromString('correct'),
       });
-      // Must NOT throw — a missing file is the legitimate first-write case.
+      // Must NOT throw - a missing file is the legitimate first-write case.
       await store.set('foo', 'bar');
       expect((await store.get('foo'))?.reveal()).toBe('bar');
     },

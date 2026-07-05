@@ -222,7 +222,7 @@ describe('createCrossEncoderReranker', () => {
       expect(reranker.pipelineLoaded).toBe(true);
       vi.advanceTimersByTime(5_001);
       // The setTimeout body fires synchronously after `advanceTimersByTime`
-      // — no further awaits needed.
+      // - no further awaits needed.
       expect(reranker.pipelineLoaded).toBe(false);
     } finally {
       vi.useRealTimers();

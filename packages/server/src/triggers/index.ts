@@ -1,5 +1,5 @@
 /**
- * `@graphorin/server/triggers` — daemon + REST routes for the
+ * `@graphorin/server/triggers` - daemon + REST routes for the
  * triggers scheduler. Phase 14c surface.
  *
  * @packageDocumentation

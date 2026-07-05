@@ -87,7 +87,7 @@ describe('truncateBody', () => {
     expect(captured!.toolCallId).toBe('call-1');
     expect(result.strategyApplied).toBe('spill-to-file');
     expect(result.artifactPath).toMatch(/^\/tmp\/graphorin\/run-1\/call-1\./);
-    // WI-10: the model-facing body carries the opaque, run-scoped handle —
+    // WI-10: the model-facing body carries the opaque, run-scoped handle -
     // not the raw absolute path (which is retained only on the outcome for
     // the operator audit row).
     expect(result.resultHandle).toBe('graphorin-spill:run-1/call-1.txt');
@@ -126,7 +126,7 @@ describe('truncateBody', () => {
   });
 
   it('truncation annotation does not match imperative-pattern catalogue', async () => {
-    // The annotation prefix is `/* graphorin:result:truncated` — not in
+    // The annotation prefix is `/* graphorin:result:truncated` - not in
     // the imperative-pattern family. Verify by importing the scan helper
     // and confirming zero hits on the annotation alone.
     const { scanImperativePatterns } = await import('@graphorin/observability/redaction');
@@ -156,7 +156,7 @@ describe('A8: actionable truncation annotations', () => {
       strategy: 'middle',
     });
     expect(result.truncated).toBe(true);
-    // Not just "truncated" — an actionable next step the model can take.
+    // Not just "truncated" - an actionable next step the model can take.
     expect(result.body).toMatch(/re-run|narrower|date range|filter/i);
   });
 

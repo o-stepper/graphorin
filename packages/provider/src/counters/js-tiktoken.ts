@@ -1,5 +1,5 @@
 /**
- * `JsTiktokenCounter` — default counter for OpenAI / OpenAI-compatible
+ * `JsTiktokenCounter` - default counter for OpenAI / OpenAI-compatible
  * models. The package depends on the `js-tiktoken` peer; when the peer
  * is missing, instantiation throws at first call rather than silently
  * downgrading to a heuristic.

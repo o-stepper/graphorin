@@ -25,7 +25,7 @@ type AdapterLogger = (
 
 /**
  * Process-scoped dedup keys for the `pass-through` override WARN. The
- * spec mandates exactly-one WARN per server identity per process — the
+ * spec mandates exactly-one WARN per server identity per process - the
  * Set retains the keys for the lifetime of the process. Tests reset via
  * {@link import('./to-tools.js')._resetMcpAdapterDedupForTesting}.
  */
@@ -100,7 +100,7 @@ export function sanitizeDescription(args: {
     failClosed: false,
   });
   // C6: tool-description poisoning is a registration-time SIGNAL, not
-  // just a silent strip — count it so operators see which server ships
+  // just a silent strip - count it so operators see which server ships
   // imperative-laden descriptions (Invariant Labs tool-poisoning class).
   if (outcome.patternsHit.length > 0) {
     incrementCounter('mcp.tool-description.injection-flagged.total', {

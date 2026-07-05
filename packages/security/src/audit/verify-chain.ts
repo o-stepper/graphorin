@@ -1,5 +1,5 @@
 /**
- * `verifyAuditChain(...)` — walk the chain and report the first
+ * `verifyAuditChain(...)` - walk the chain and report the first
  * divergent link.
  *
  * @packageDocumentation

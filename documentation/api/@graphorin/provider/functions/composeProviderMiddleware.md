@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,13 +14,13 @@ Defined in: packages/provider/src/middleware/compose.ts:136
 
 Wrap an adapter in a middleware chain whose order is validated
 against [CANONICAL\_MIDDLEWARE\_ORDER](/api/@graphorin/provider/variables/CANONICAL_MIDDLEWARE_ORDER.md). The argument array MUST
-be ordered outermost → innermost — the same way the layers appear
+be ordered outermost → innermost - the same way the layers appear
 in the documented composition example. The composer validates that
 every kind known to the canonical order is monotonically non-
 decreasing in index, throws otherwise.
 
 Custom middleware whose kind is NOT in the canonical order is
-silently allowed at any position — operators registering bespoke
+silently allowed at any position - operators registering bespoke
 layers via [defineProviderMiddleware](/api/@graphorin/provider/functions/defineProviderMiddleware.md) carry the
 responsibility of placing them sensibly.
 

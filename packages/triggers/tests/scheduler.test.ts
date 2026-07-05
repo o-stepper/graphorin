@@ -43,7 +43,7 @@ class FakeClock {
     for (;;) {
       // Drain microtask chains (async fire() bodies are several awaits
       // deep over the sync-sqlite store) so timers they arm participate
-      // in this same advance — otherwise a re-arm lands after the scan
+      // in this same advance - otherwise a re-arm lands after the scan
       // and periodic triggers appear dead.
       await this.#settle();
       const next = this.#pending[0];
@@ -218,7 +218,7 @@ describe('Scheduler', () => {
     expect(count).toBe(1);
 
     await scheduler.stop();
-    // Now re-register with catchupPolicy: 'last' — the existing
+    // Now re-register with catchupPolicy: 'last' - the existing
     // record indicates a previous fire within the catchupWindow, so
     // 'last' adds one extra fire on resume.
     const triggerStore2 = await makeStore();
@@ -472,7 +472,7 @@ describe('Scheduler', () => {
     await s1.fire('cron-none-missed');
     await s1.stop();
 
-    // Restart five minutes later — no 09:00 boundary crossed.
+    // Restart five minutes later - no 09:00 boundary crossed.
     await clock.advance(5 * 60 * 1000);
 
     let resumedFires = 0;
@@ -617,7 +617,7 @@ describe('Scheduler', () => {
   });
 });
 
-describe('scheduler correctness — RP-13/14/15', () => {
+describe('scheduler correctness - RP-13/14/15', () => {
   let clock: FakeClock;
   let triggerStore: import('@graphorin/core/contracts').TriggerStore;
   let scheduler: Scheduler;
@@ -655,7 +655,7 @@ describe('scheduler correctness — RP-13/14/15', () => {
     expect(count).toBe(3);
   });
 
-  it('RP-14: a throwing callback does not kill the trigger — it fires again next period', async () => {
+  it('RP-14: a throwing callback does not kill the trigger - it fires again next period', async () => {
     let calls = 0;
     await scheduler.register(
       interval('flaky', 1_000, () => {
@@ -718,7 +718,7 @@ describe('scheduler correctness — RP-13/14/15', () => {
   });
 });
 
-describe('setDisabled — flag flip, not removal (IP-17)', () => {
+describe('setDisabled - flag flip, not removal (IP-17)', () => {
   it('disable stops firing but keeps the trigger; enable re-arms from now', async () => {
     _resetLibModeWarningForTesting();
     const clock = new FakeClock();
@@ -749,7 +749,7 @@ describe('setDisabled — flag flip, not removal (IP-17)', () => {
 
     const enabled = await scheduler.setDisabled('toggler', false);
     expect(enabled.disabled).toBe(false);
-    // Re-armed from now — no immediate stale-nextFireAt fire.
+    // Re-armed from now - no immediate stale-nextFireAt fire.
     expect(count).toBe(1);
     await clock.advance(1_000);
     expect(count).toBe(2);

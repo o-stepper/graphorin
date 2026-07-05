@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ callers can `switch` on it without parsing messages.
 | ------ | ------ |
 | [AgentResolutionError](/api/@graphorin/agent/errors/classes/AgentResolutionError.md) | Thrown by `runStateFromJSON(...)` when the agent name in the serialized state cannot be resolved against the supplied agent graph (renamed agent / removed handoff). |
 | [AgentRuntimeError](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md) | Base class for every error thrown from `@graphorin/agent`. |
-| [ConcurrentRunError](/api/@graphorin/agent/errors/classes/ConcurrentRunError.md) | Thrown when a second `run()` / `stream()` starts while another run is in flight on the same `Agent` instance (AG-11). The public surface (`steer` / `followUp` / `abort` / `compact`) addresses "the run" without a run handle, so overlapping runs would share the abort controller, steer queue, and executor bridge — start the second run on its own `createAgent(...)` instance instead. |
+| [ConcurrentRunError](/api/@graphorin/agent/errors/classes/ConcurrentRunError.md) | Thrown when a second `run()` / `stream()` starts while another run is in flight on the same `Agent` instance (AG-11). The public surface (`steer` / `followUp` / `abort` / `compact`) addresses "the run" without a run handle, so overlapping runs would share the abort controller, steer queue, and executor bridge - start the second run on its own `createAgent(...)` instance instead. |
 | [EvaluatorOptimizerConfigError](/api/@graphorin/agent/errors/classes/EvaluatorOptimizerConfigError.md) | Thrown by `evaluatorOptimizer({...})` when `maxIterations < 1` at construction time. The helper purposely surfaces the misuse early rather than failing on the first run. |
 | [InvalidAgentConfigError](/api/@graphorin/agent/errors/classes/InvalidAgentConfigError.md) | Thrown by `createAgent({...})` when the supplied options fail structural validation (missing `provider`, empty `name`, an `outputType` of kind `'text'` carrying a `schema`, ...). |
 | [InvalidPreferredModelError](/api/@graphorin/agent/errors/classes/InvalidPreferredModelError.md) | Thrown by `createAgent({...})` when `preferredModel` carries an unknown literal (any value outside the `'fast' | 'balanced' | 'smart'` cost-tier vocabulary AND not a valid `ModelSpec`). |

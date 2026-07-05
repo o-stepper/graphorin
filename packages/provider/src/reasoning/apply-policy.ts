@@ -1,13 +1,13 @@
 /**
- * `applyReasoningPolicy` — given a list of `Message`s and the resolved
+ * `applyReasoningPolicy` - given a list of `Message`s and the resolved
  * {@link ReasoningRetention}, return a transformed list with
  * `reasoning` content parts treated according to the policy:
  *
- * - `'strip'`              — drop every `reasoning` content part.
- * - `'pass-through-claude'` — keep parts that carry Anthropic-shaped
+ * - `'strip'`              - drop every `reasoning` content part.
+ * - `'pass-through-claude'` - keep parts that carry Anthropic-shaped
  *   metadata (`provider === 'anthropic'` OR a `signature` field);
  *   drop the rest.
- * - `'pass-through-all'`   — keep every `reasoning` content part
+ * - `'pass-through-all'`   - keep every `reasoning` content part
  *   unchanged.
  *
  * The transformation is shallow: only the `assistant` role's content

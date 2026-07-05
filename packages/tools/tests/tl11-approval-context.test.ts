@@ -7,7 +7,7 @@ import { createToolExecutor } from '../src/executor/index.js';
 import { createToolRegistry } from '../src/registry/index.js';
 import { makeRunContext } from './fixtures.js';
 
-describe('TL-11 — approval flow does not leak per-call contexts', () => {
+describe('TL-11 - approval flow does not leak per-call contexts', () => {
   it('abort listeners on the run signal stay bounded across many gated calls', async () => {
     const registry = createToolRegistry();
     let executions = 0;

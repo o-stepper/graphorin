@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -104,7 +104,7 @@ listRecentDecisions(scope, limit?): Promise<readonly {
 Defined in: packages/store-sqlite/src/conflict-store.ts:267
 
 Read-back helper used by the audit-replay surface (Phase 14c) and
-the test suite — returns up to `limit` recent rows for the scope.
+the test suite - returns up to `limit` recent rows for the scope.
 
 #### Parameters
 

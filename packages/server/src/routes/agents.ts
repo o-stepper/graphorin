@@ -144,7 +144,7 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
       const userId = parsed.success ? parsed.data.userId : undefined;
       const input = parsed.success ? (parsed.data.input ?? '') : '';
       // IP-2: actually run the agent. The old handler parsed the input
-      // and threw it away — the run sat 'pending' forever while the 202
+      // and threw it away - the run sat 'pending' forever while the 202
       // advertised subjects nothing would ever emit on.
       const tracker = deps.runs.start(runId, {
         kind: 'agent',
@@ -171,7 +171,7 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
           status: 'running',
           subscribe: {
             // The SSE URL previously advertised here pointed at a path
-            // that was never mounted — the WebSocket subject is the
+            // that was never mounted - the WebSocket subject is the
             // delivery channel (IP-2).
             websocket: subject,
           },
@@ -273,7 +273,7 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
     // IP-14: a 202 that persists nothing and resumes nothing is a lie
     // the client SDK was built on. Until the server can rehydrate the
     // RunState and re-enter the agent loop (the persisted-approvals
-    // work — Wave 3), the honest answer is 501 with the working
+    // work - Wave 3), the honest answer is 501 with the working
     // library-side path: `agent.run(result.state, { directive })`
     // executes approved tools for real (AG-1/AG-9).
     return c.json(
@@ -283,7 +283,7 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
         status: state.status,
         message:
           'Server-side HITL resume is not implemented yet. Resume library-side: ' +
-          'agent.run(result.state, { directive }) — the suspended RunState is on the AgentResult.',
+          'agent.run(result.state, { directive }) - the suspended RunState is on the AgentResult.',
       },
       501,
     );

@@ -6,12 +6,12 @@ import { describe, expect, it } from 'vitest';
 import { createSqliteStore } from '../src/index.js';
 
 /**
- * CS-14 — `facts.hash` + `idx_facts_hash` were dead schema: the only write path
+ * CS-14 - `facts.hash` + `idx_facts_hash` were dead schema: the only write path
  * bound NULL unconditionally and nothing ever read the column (stage-1 dedup
  * recomputes its digest in-process). Migration 023 drops both; the write/read
  * path must keep working without them.
  */
-describe('CS-14 — dead facts.hash column + index are removed', () => {
+describe('CS-14 - dead facts.hash column + index are removed', () => {
   it('drops the hash column and idx_facts_hash, and remember/search still work', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-cs14-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite`, skipSqliteVec: true });

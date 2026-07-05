@@ -83,7 +83,7 @@ interface InternalEntry {
 /**
  * Build the default in-memory ticket store. Production deployments
  * use exactly one store per process (multiple processes would each
- * issue their own tickets — there is no shared state because the
+ * issue their own tickets - there is no shared state because the
  * single-user-per-process default applies).
  *
  * @stable
@@ -163,7 +163,7 @@ export function createWsTicketStore(options: WsTicketStoreOptions = {}): WsTicke
 }
 
 function encodeTicket(bytes: Uint8Array): string {
-  // URL-safe base64 — Buffer.from is available in every supported
+  // URL-safe base64 - Buffer.from is available in every supported
   // Node runtime; the implementation never touches the value once
   // encoded so the choice is purely cosmetic.
   return Buffer.from(bytes)

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 function runEvals<I, O>(opts): Promise<EvalReport<I, O>>;
 ```
 
-Defined in: evals/src/runner.ts:23
+Defined in: evals/src/runner.ts:24
 
 ## Type Parameters
 

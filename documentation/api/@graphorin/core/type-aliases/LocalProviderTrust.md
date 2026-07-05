@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,15 +21,15 @@ prompt redaction) can type-check against it without depending on
 
 Tier semantics:
 
-- `'loopback'`         — `localhost` / `127.0.0.0/8` / `::1` /
+- `'loopback'`         - `localhost` / `127.0.0.0/8` / `::1` /
   `unix:///path` (or any in-process adapter that has no `baseUrl`).
   Same trust boundary as the host process.
-- `'private'`          — RFC 1918 (`10/8`, `172.16/12`,
+- `'private'`          - RFC 1918 (`10/8`, `172.16/12`,
   `192.168/16`); RFC 6598 CGNAT (`100.64/10`); link-local
   (`169.254/16`, `fe80::/10`); `*.local` / `*.lan` / `*.internal` /
   `*.home.arpa`.
-- `'public-tls'`       — public IP / hostname AND `https://`.
-- `'public-cleartext'` — public IP / hostname AND `http://`. Adapters
+- `'public-tls'`       - public IP / hostname AND `https://`.
+- `'public-cleartext'` - public IP / hostname AND `http://`. Adapters
   refuse to start unless explicitly overridden.
 
 ## Stable

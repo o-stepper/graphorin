@@ -1,8 +1,8 @@
 /**
- * @graphorin/evals — eval framework for the Graphorin framework.
+ * @graphorin/evals - eval framework for the Graphorin framework.
  *
  * Builds on the eval primitives shipped from `@graphorin/observability`
- * (RB-17 / DEC-152) — full orchestrator lives here, post-MVP, decoupled
+ * (RB-17 / DEC-152) - full orchestrator lives here, post-MVP, decoupled
  * from the core observability bundle so consumers do not pay the
  * dataset / reporter cost when only the inline runner is needed.
  *
@@ -30,7 +30,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export {
   detectRegressions,

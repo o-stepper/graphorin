@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ function createFactForgetTool(deps): Tool<{
 
 Defined in: packages/memory/src/tools/fact-tools.ts:264
 
-`fact_forget` — soft-delete a fact (kept for replay; never hard-
+`fact_forget` - soft-delete a fact (kept for replay; never hard-
 deleted at this layer).
 
 ## Parameters

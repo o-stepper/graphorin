@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:11
 
 Default `AuthTokenStore` implementation. Persists HMAC-SHA256 hashes
 of issued server tokens (DEC-122 / ADR-027). Raw tokens are never
-persisted — the runtime carries them via `SecretValue`.
+persisted - the runtime carries them via `SecretValue`.
 
 ## Stable
 
@@ -79,7 +79,7 @@ getByHash(hashHex): Promise<
 Defined in: packages/store-sqlite/src/auth-token-store.ts:40
 
 Indexed lookup by HMAC hash (SPL-19). When present, the verifier
-uses it on cache-miss instead of walking `list()` — O(1) instead of
+uses it on cache-miss instead of walking `list()` - O(1) instead of
 an O(n) full-table scan per verification.
 
 #### Parameters

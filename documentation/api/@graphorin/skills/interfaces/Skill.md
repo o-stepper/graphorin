@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,12 +11,12 @@ Defined in: packages/skills/src/types/index.ts:276
 Loaded skill record returned by [SkillRegistry.getSkill](/api/@graphorin/skills/registry/interfaces/SkillRegistry.md#getskill) and
 [loadSkills](/api/@graphorin/skills/loader/functions/loadSkills.md). Three-tier semantics:
 
-- [Skill.metadata](/api/@graphorin/skills/interfaces/Skill.md#property-metadata) — always available (parsed at load time).
-- [Skill.body](/api/@graphorin/skills/interfaces/Skill.md#body)     — lazy; resolved on first call. Cached for
+- [Skill.metadata](/api/@graphorin/skills/interfaces/Skill.md#property-metadata) - always available (parsed at load time).
+- [Skill.body](/api/@graphorin/skills/interfaces/Skill.md#body)     - lazy; resolved on first call. Cached for
   subsequent calls.
-- [Skill.resources](/api/@graphorin/skills/interfaces/Skill.md#resources) — lazy listing; resource bytes are only
+- [Skill.resources](/api/@graphorin/skills/interfaces/Skill.md#resources) - lazy listing; resource bytes are only
   read when [SkillResource.read](/api/@graphorin/skills/interfaces/SkillResource.md#read) is invoked.
-- [Skill.tools](/api/@graphorin/skills/interfaces/Skill.md#tools)    — derived from the `graphorin-tools`
+- [Skill.tools](/api/@graphorin/skills/interfaces/Skill.md#tools)    - derived from the `graphorin-tools`
   declarations; the actual `Tool[]` is materialised by the agent
   runtime through the `@graphorin/tools` registry.
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,6 +19,6 @@ across suspend/resume (AG-19). Structurally identical to
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-sensitiveseen"></a> `sensitiveSeen` | `readonly` | `boolean` | - | packages/core/src/types/run.ts:136 |
-| <a id="property-spantilehashes"></a> `spanTileHashes?` | `readonly` | readonly `string`[] | C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms the verbatim-carry probe after a resume at tile granularity. Hashes only — no untrusted text is ever persisted (the invariant above holds). | packages/core/src/types/run.ts:144 |
+| <a id="property-spantilehashes"></a> `spanTileHashes?` | `readonly` | readonly `string`[] | C6: one-way FNV-1a hashes of normalized untrusted-span tiles. Re-arms the verbatim-carry probe after a resume at tile granularity. Hashes only - no untrusted text is ever persisted (the invariant above holds). | packages/core/src/types/run.ts:144 |
 | <a id="property-untrustedseen"></a> `untrustedSeen` | `readonly` | `boolean` | - | packages/core/src/types/run.ts:135 |
 | <a id="property-untrustedsourcekinds"></a> `untrustedSourceKinds` | `readonly` | readonly `string`[] | - | packages/core/src/types/run.ts:137 |

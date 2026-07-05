@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Optional consolidator-state surface every storage adapter exposes
 for Phase 10c. Mirrors the `consolidator_state`,
 `consolidator_runs`, and `consolidator_failed_batches` tables
 shipped in Phase 05's migration 009. Adapters that do not
-implement the surface degrade gracefully — the consolidator runs
+implement the surface degrade gracefully - the consolidator runs
 in stateless mode (no DLQ, no cursor persistence) and emits a
 one-shot WARN.
 
@@ -229,7 +229,7 @@ markBatchSucceeded(id): Promise<void>;
 
 Defined in: packages/memory/src/internal/storage-adapter.ts:523
 
-Mark the row succeeded — removes it from the DLQ.
+Mark the row succeeded - removes it from the DLQ.
 
 #### Parameters
 

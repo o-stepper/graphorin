@@ -6,11 +6,11 @@
  *
  * Exit codes follow the small documented contract:
  *
- *  - `0` — success (subcommand completed without warnings or with
+ *  - `0` - success (subcommand completed without warnings or with
  *    informational warnings only).
- *  - `1` — recoverable failure (config invalid, secret missing,
+ *  - `1` - recoverable failure (config invalid, secret missing,
  *    threshold exceeded). Operator can fix and re-run.
- *  - `2` — unsupported invocation (e.g. `graphorin storage encrypt`
+ *  - `2` - unsupported invocation (e.g. `graphorin storage encrypt`
  *    when the Phase 16 sub-pack is not installed). Operator must
  *    install / configure something before retrying.
  *

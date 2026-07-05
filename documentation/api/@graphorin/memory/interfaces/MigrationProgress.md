@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,8 +16,8 @@ Per-iteration progress snapshot yielded by [migrateEmbedder](/api/@graphorin/mem
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"fact"` \| `"episode"` \| `"message"` | `'fact'`, `'episode'`, or `'message'` — which entity is being migrated. | packages/memory/src/migration/embedder-migration.ts:32 |
-| <a id="property-migrationid"></a> `migrationId` | `readonly` | `string` | Identifier for this migration run. MST-12: this is an in-memory id for the current run — there is no persisted `migration_state` cursor today, so a migration does not resume across processes. | packages/memory/src/migration/embedder-migration.ts:46 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"fact"` \| `"episode"` \| `"message"` | `'fact'`, `'episode'`, or `'message'` - which entity is being migrated. | packages/memory/src/migration/embedder-migration.ts:32 |
+| <a id="property-migrationid"></a> `migrationId` | `readonly` | `string` | Identifier for this migration run. MST-12: this is an in-memory id for the current run - there is no persisted `migration_state` cursor today, so a migration does not resume across processes. | packages/memory/src/migration/embedder-migration.ts:46 |
 | <a id="property-phase"></a> `phase` | `readonly` | `"aborted"` \| `"paused"` \| `"running"` \| `"planning"` \| `"committed"` | Phase discriminator. | packages/memory/src/migration/embedder-migration.ts:48 |
 | <a id="property-processed"></a> `processed` | `readonly` | `number` | Number of records processed so far. | packages/memory/src/migration/embedder-migration.ts:34 |
 | <a id="property-source"></a> `source` | `readonly` | `string` | Identifier of the source embedder (`'<adapter>:<model>@<dim>'`). | packages/memory/src/migration/embedder-migration.ts:38 |

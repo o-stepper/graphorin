@@ -41,7 +41,7 @@ export interface SessionCompactionResult {
 }
 
 /**
- * `SessionMemory` — append-only message log per session. Owns the
+ * `SessionMemory` - append-only message log per session. Owns the
  * `session_messages` storage by single-source-of-truth (DEC-147); the
  * `@graphorin/sessions` package wraps this surface in Phase 11.
  *
@@ -152,7 +152,7 @@ export class SessionMemory {
   }
 
   /**
-   * NOT IMPLEMENTED (MRET-12) — always resolves `{ flushed: 0 }` and
+   * NOT IMPLEMENTED (MRET-12) - always resolves `{ flushed: 0 }` and
    * performs no work. The consolidator pipeline (extraction → facts /
    * episodes) superseded the planned "silent flush turn"; this method
    * remains only for contract stability. Do not branch on its counter.
@@ -172,12 +172,12 @@ export class SessionMemory {
   }
 
   /**
-   * NOT IMPLEMENTED (MRET-12) — always resolves
+   * NOT IMPLEMENTED (MRET-12) - always resolves
    * `{ removed: 0, summarized: 0 }` and deletes / summarizes nothing.
    * Session-context compaction is owned by the context engine
    * (`memory.contextEngine.compactNow`, driven by the agent runtime);
    * this tier-level method previously FABRICATED counts (it reported
-   * `total - keepLastN` as "removed" while removing nothing — with the
+   * `total - keepLastN` as "removed" while removing nothing - with the
    * default `keepLastN: 0` it claimed to have compacted the whole
    * session). It now reports the truth until a real message splice
    * exists at this layer.
@@ -207,9 +207,9 @@ export class SessionMemory {
    * `compactAtRatio * contextWindow` (default `0.9` per DEC-104). The
    * second argument can be either:
    *
-   *  - a `number` — interpreted as the live `contextWindow` size in
+   *  - a `number` - interpreted as the live `contextWindow` size in
    *    tokens (matches the documented memory-system spec signature);
-   *  - an options bag — `{ usedTokens?, contextWindow? }`. When
+   *  - an options bag - `{ usedTokens?, contextWindow? }`. When
    *    `usedTokens` is supplied the call is purely arithmetic; when
    *    omitted, the storage adapter's per-message `token_count`
    *    cache (DEC-131) is consulted via `totalCachedTokens(scope)`,
@@ -244,7 +244,7 @@ export class SessionMemory {
   }
 
   /**
-   * NOT IMPLEMENTED (MRET-12) — always resolves `[]`. The agent
+   * NOT IMPLEMENTED (MRET-12) - always resolves `[]`. The agent
    * registry lives in `@graphorin/sessions` and has never been
    * threaded into this tier; the previous JSDoc claimed the default
    * sqlite adapter "resolves" registry rows here, which was false. Use

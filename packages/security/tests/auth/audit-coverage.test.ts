@@ -16,7 +16,7 @@ import { createMemoryAuthTokenStore } from './_helpers.js';
 
 const PEPPER = 'vRq8sJ2mKx0aZpW4uTn7eYb5cHd9fLg1';
 
-describe('SPL-5 — server-token auth lifecycle writes audit rows', () => {
+describe('SPL-5 - server-token auth lifecycle writes audit rows', () => {
   beforeEach(() => _resetAuthAuditListenersForTesting());
   afterEach(() => _resetAuthAuditListenersForTesting());
 

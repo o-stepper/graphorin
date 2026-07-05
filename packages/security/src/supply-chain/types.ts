@@ -3,13 +3,13 @@
  *
  * The framework distinguishes three trust levels:
  *
- * - `'trusted'` — folder-installed skills the operator authored or
+ * - `'trusted'` - folder-installed skills the operator authored or
  *   audited. The installer runs `--ignore-scripts` by default and
  *   only enables them with the explicit `'trusted-with-scripts'`
  *   override.
- * - `'trusted-with-scripts'` — folder-installed skills allowed to run
+ * - `'trusted-with-scripts'` - folder-installed skills allowed to run
  *   their `postinstall` lifecycle. Mandates a verifiable signature.
- * - `'untrusted'` — skills installed from the npm registry or a git
+ * - `'untrusted'` - skills installed from the npm registry or a git
  *   repository. The installer enforces `--ignore-scripts` with no
  *   override and rejects unsigned skills outright.
  *
@@ -133,7 +133,7 @@ export interface SupplyChainPolicy {
    * deny list. `'allow-wins'` (the default) lets the allowlist short-circuit,
    * so an operator can deny a whole scope yet allow specific exceptions
    * inside it. `'deny-wins'` evaluates the deny lists first, so an explicit
-   * denylist entry is never overridden by a broad allowlist glob — the safer
+   * denylist entry is never overridden by a broad allowlist glob - the safer
    * posture when the denylist is the security-critical list.
    *
    * SPL-20: defaults to `'allow-wins'` (byte-identical to prior behaviour).

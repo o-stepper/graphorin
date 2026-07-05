@@ -208,7 +208,7 @@ describe('consolidator/budget', () => {
     expect(tracker.snapshot().paused).toBe(false);
   });
 
-  it('`log` actually WARNs — once per resource per window (memory-consolidation-02)', () => {
+  it('`log` actually WARNs - once per resource per window (memory-consolidation-02)', () => {
     const warnings: string[] = [];
     let now = Date.parse('2026-04-21T00:00:00Z');
     const tracker = new BudgetTracker({
@@ -317,7 +317,7 @@ describe('consolidator/budget', () => {
     tracker.record({ phase: 'standard', tokens: 60, costUsd: 0 });
     expect(tracker.snapshot().tokensUsedToday).toBe(60);
 
-    // < 24h later the spend is preserved — not zeroed on every check.
+    // < 24h later the spend is preserved - not zeroed on every check.
     now += HOUR;
     expect(tracker.snapshot().tokensUsedToday).toBe(60);
 

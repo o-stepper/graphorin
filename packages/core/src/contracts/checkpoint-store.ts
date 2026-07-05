@@ -18,7 +18,7 @@ export interface Checkpoint {
   readonly threadId: string;
   readonly namespace: string;
   readonly parentId?: CheckpointId;
-  /** Serialized state blob — adapter-specific encoding (JSON / superjson / …). */
+  /** Serialized state blob - adapter-specific encoding (JSON / superjson / …). */
   readonly state: unknown;
   /** Per-channel monotonic versions used by the workflow scheduler. */
   readonly channelVersions: Readonly<Record<string, number>>;
@@ -35,7 +35,7 @@ export interface Checkpoint {
 export interface CheckpointMetadata {
   /**
    * Durability mode that produced this write. The legacy `'async'`
-   * value was removed (workflow-14 / WF-7 — it was byte-identical to
+   * value was removed (workflow-14 / WF-7 - it was byte-identical to
    * `'sync'`); adapters normalize legacy persisted rows to `'sync'` at
    * read time.
    */
@@ -68,7 +68,7 @@ export interface PendingWrite {
   readonly taskId: string;
   readonly index: number;
   readonly channel: string;
-  /** Serialized value blob — adapter-specific encoding. */
+  /** Serialized value blob - adapter-specific encoding. */
   readonly value: unknown;
 }
 
@@ -88,7 +88,7 @@ export interface ListOptions {
  * workflow-01). When `expectedLatestId` is supplied, the store MUST
  * perform the latest-checkpoint comparison and the insert atomically
  * (single transaction / synchronous critical section) and throw
- * {@link CheckpointConflictError} on mismatch — closing the TOCTOU
+ * {@link CheckpointConflictError} on mismatch - closing the TOCTOU
  * window an engine-level read-then-write cannot. `null` means "expect
  * no checkpoint for this thread yet"; `undefined` (or a store that
  * ignores the argument) preserves the unguarded legacy behaviour, which

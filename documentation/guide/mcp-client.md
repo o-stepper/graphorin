@@ -69,7 +69,7 @@ const mcpTools = await stdioClient.toTools({
 });
 
 // `createToolRegistry()` takes no tool list. Register each tool with its
-// source — the strategy-aware registry uses the `serverIdentity` to
+// source - the strategy-aware registry uses the `serverIdentity` to
 // auto-prefix names that collide across servers.
 const registry = createToolRegistry();
 for (const tool of mcpTools) {
@@ -112,7 +112,7 @@ const agent = createAgent({
 
 ## Server-initiated requests: elicitation & sampling
 
-MCP servers can call *back* to the client mid-request. Graphorin surfaces the two most useful patterns through opt-in callbacks on `createMCPClient`. Both are **gated**: the client advertises the capability — and a conforming server only issues the request — when you supply the matching handler. The default client advertises neither (no implicit prompting, no implicit model calls — Principle #1).
+MCP servers can call *back* to the client mid-request. Graphorin surfaces the two most useful patterns through opt-in callbacks on `createMCPClient`. Both are **gated**: the client advertises the capability - and a conforming server only issues the request - when you supply the matching handler. The default client advertises neither (no implicit prompting, no implicit model calls - Principle #1).
 
 ::: warning Deprecation notice (MCP 2026-07-28 RC)
 The 2026-07-28 protocol revision **deprecates Sampling, Roots, and protocol-level Logging** with a 12-month removal window; long-running work moves to the **Tasks extension** (a separate extension, not the 2025-11 experimental core feature). Graphorin keeps its gated sampling/elicitation callbacks for compatibility with 2025-11 servers, but treat sampling as frozen: no new capabilities will be layered on it, and new integrations should not depend on it. Any future Tasks support will target the extension shape.
@@ -135,11 +135,11 @@ const client = await createMCPClient({
 });
 ```
 
-Because an elicitation arrives while a `callTool(...)` request is in flight, the handler resolves **in-process** — it does not durably suspend a Graphorin run. (Durable-suspend elicitation across the request lifetime is a planned follow-up.)
+Because an elicitation arrives while a `callTool(...)` request is in flight, the handler resolves **in-process** - it does not durably suspend a Graphorin run. (Durable-suspend elicitation across the request lifetime is a planned follow-up.)
 
 ### Sampling (`sampling/createMessage`)
 
-A server can ask the client's model to generate a completion. Back it with a `Provider`. The request messages are **MCP-derived (untrusted)** — run them through the same redaction / sensitivity middleware you use elsewhere:
+A server can ask the client's model to generate a completion. Back it with a `Provider`. The request messages are **MCP-derived (untrusted)** - run them through the same redaction / sensitivity middleware you use elsewhere:
 
 ```ts
 const client = await createMCPClient({
@@ -179,7 +179,7 @@ const httpClient = await createMCPClient({
 });
 ```
 
-Do **not** resolve the token once into static `headers` — that pins a single token and defeats the refresh-ahead window. For a rare pre-shared token, pass `bearerToken` instead; `authProvider` and `bearerToken` are mutually exclusive and supplying both throws `MCPInvalidConfigError`.
+Do **not** resolve the token once into static `headers` - that pins a single token and defeats the refresh-ahead window. For a rare pre-shared token, pass `bearerToken` instead; `authProvider` and `bearerToken` are mutually exclusive and supplying both throws `MCPInvalidConfigError`.
 
 ## Lifecycle
 
@@ -205,7 +205,7 @@ sequenceDiagram
 
 ## OAuth discovery hardening
 
-Discovery is a trust boundary (SPL-7): metadata names the endpoints that will receive authorization codes, refresh tokens and Basic client secrets. The client therefore **rejects non-https endpoints** (plain `http` is allowed only for loopback hosts — `localhost`, `127.0.0.1`, `[::1]` — for local development), **enforces RFC 8414 §3.3 issuer consistency** (the metadata `issuer` must equal the discovery URL it was fetched for), and builds well-known URLs via **RFC 8414 path-insertion** for path-bearing issuers (the suffix-append form is kept as a fallback for pre-RFC servers). The authorization callback also **requires the `state` parameter** (SPL-6) — a callback omitting it is rejected outright as a CSRF/code-injection attempt.
+Discovery is a trust boundary (SPL-7): metadata names the endpoints that will receive authorization codes, refresh tokens and Basic client secrets. The client therefore **rejects non-https endpoints** (plain `http` is allowed only for loopback hosts - `localhost`, `127.0.0.1`, `[::1]` - for local development), **enforces RFC 8414 §3.3 issuer consistency** (the metadata `issuer` must equal the discovery URL it was fetched for), and builds well-known URLs via **RFC 8414 path-insertion** for path-bearing issuers (the suffix-append form is kept as a fallback for pre-RFC servers). The authorization callback also **requires the `state` parameter** (SPL-6) - a callback omitting it is rejected outright as a CSRF/code-injection attempt.
 
 ## Error mapping
 
@@ -216,13 +216,13 @@ The client throws typed `@graphorin/mcp` errors; the tool **executor** then maps
 | `MCPProtocolError` (transport / RPC failures) | `'execution_failed'` |
 | `MCPCallTimeoutError` (`timeoutMs` expiry, `kind: 'call-timeout'`) | `'execution_failed'` |
 | Abort via the run signal | `'aborted'` |
-| `CallToolResult.isError: true` | tool **failure** — `MCPToolExecutionError` (`kind: 'tool-execution'`) with the server's content text in the message, so the executor records a real failure (audit, retry and error policies engage) while the model keeps the self-correction signal |
+| `CallToolResult.isError: true` | tool **failure** - `MCPToolExecutionError` (`kind: 'tool-execution'`) with the server's content text in the message, so the executor records a real failure (audit, retry and error policies engage) while the model keeps the self-correction signal |
 
-Two call-level knobs complete the picture: `callTool(name, args, { signal, timeoutMs })` honours the abort signal (an aborted agent run sends `notifications/cancelled` to the server — adapted tools forward their `ToolExecutionContext.signal` automatically) and maps `timeoutMs` onto the SDK request timeout, surfacing expiry as `MCPCallTimeoutError` (`kind: 'call-timeout'`). `toTools({ callTimeoutMs })` applies the same timeout to every adapted tool's calls.
+Two call-level knobs complete the picture: `callTool(name, args, { signal, timeoutMs })` honours the abort signal (an aborted agent run sends `notifications/cancelled` to the server - adapted tools forward their `ToolExecutionContext.signal` automatically) and maps `timeoutMs` onto the SDK request timeout, surfacing expiry as `MCPCallTimeoutError` (`kind: 'call-timeout'`). `toTools({ callTimeoutMs })` applies the same timeout to every adapted tool's calls.
 
 ## Definition pinning and `list_changed`
 
-**Durable trust-on-first-use (`pinStore`).** Pass `toTools({ pinStore })` — any `{ get(serverId), set(serverId, fingerprints) }` store (a JSON file, a SQLite table) — and the client records each server's definition fingerprints on first sight (`mcp.tools.pins-recorded.total`) and compares on every later call. With a store present, a mismatch **rejects by default** (`MCPToolPinningError` — a persisted first approval is an explicit trust decision; pass `onPinMismatch: 'warn'` to downgrade). Explicit `pinnedFingerprints` win over the store. Tool descriptions additionally run through the injection heuristics at registration; hits are stripped AND counted (`mcp.tool-description.injection-flagged.total`) so a poisoning server is visible, not silently laundered.
+**Durable trust-on-first-use (`pinStore`).** Pass `toTools({ pinStore })` - any `{ get(serverId), set(serverId, fingerprints) }` store (a JSON file, a SQLite table) - and the client records each server's definition fingerprints on first sight (`mcp.tools.pins-recorded.total`) and compares on every later call. With a store present, a mismatch **rejects by default** (`MCPToolPinningError` - a persisted first approval is an explicit trust decision; pass `onPinMismatch: 'warn'` to downgrade). Explicit `pinnedFingerprints` win over the store. Tool descriptions additionally run through the injection heuristics at registration; hits are stripped AND counted (`mcp.tool-description.injection-flagged.total`) so a poisoning server is visible, not silently laundered.
 
 
 Tool definitions are a poisoning surface: a server can change a tool's description or schema behind an already-approved name (the **approve-then-swap rug-pull**). The client makes this visible (MC-6):
@@ -230,7 +230,7 @@ Tool definitions are a poisoning surface: a server can change a tool's descripti
 - Every adapted tool carries a stable sha256 **`__definitionHash`** (over name + description + input/output schema + title, key-sorted). Persist it alongside your approval record.
 - Within one client's lifetime, a definition drifting between `toTools()` snapshots is audited (`mcp.tools.changed.total` + a warn log with both hashes).
 - Across restarts, pass your stored pins back: `toTools({ pinnedFingerprints: { toolName: hash }, onPinMismatch: 'reject' })` throws `MCPToolPinningError` (`kind: 'pin-mismatch'`) on divergence; the default `'warn'` audits `mcp.tools.pin-mismatch.total` and continues.
-- `notifications/tools/list_changed` is subscribed: each one bumps `mcp.tools.list-changed.total` and logs a warning — re-run `toTools()` to refresh and re-sanitize the catalogue (which also re-runs the drift diff).
+- `notifications/tools/list_changed` is subscribed: each one bumps `mcp.tools.list-changed.total` and logs a warning - re-run `toTools()` to refresh and re-sanitize the catalogue (which also re-runs the drift diff).
 
 ## Audit + observability
 
@@ -238,10 +238,10 @@ The client itself emits **counters**, not audit rows or spans: `mcp.call.invoked
 
 ## Next steps
 
-- [Tools](/guide/tools) — how the bridged tools coexist with first-party tools.
-- [Security](/guide/security) — OAuth + sandbox model for untrusted servers.
-- [CLI](/guide/cli) — `graphorin auth login` flow.
+- [Tools](/guide/tools) - how the bridged tools coexist with first-party tools.
+- [Security](/guide/security) - OAuth + sandbox model for untrusted servers.
+- [CLI](/guide/cli) - `graphorin auth login` flow.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

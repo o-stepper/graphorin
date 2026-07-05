@@ -1,17 +1,17 @@
 /**
- * `graphorin pricing` — operate on the bundled LLM pricing snapshot.
+ * `graphorin pricing` - operate on the bundled LLM pricing snapshot.
  *
  * Surface (per Phase 15 § Pricing):
  *
- *  - `graphorin pricing status` — bundled snapshot version + entry
+ *  - `graphorin pricing status` - bundled snapshot version + entry
  *    count + canonical digest.
- *  - `graphorin pricing refresh --url <url>` — opt-in network call
+ *  - `graphorin pricing refresh --url <url>` - opt-in network call
  *    that fetches a fresh snapshot. Honours `GRAPHORIN_OFFLINE=1`.
- *  - `graphorin pricing diff` — row-by-row delta vs the bundled
+ *  - `graphorin pricing diff` - row-by-row delta vs the bundled
  *    snapshot.
- *  - `graphorin pricing lookup --provider <name> --model <id>` — print
+ *  - `graphorin pricing lookup --provider <name> --model <id>` - print
  *    the per-token price for a single (provider, model) pair.
- *  - `graphorin pricing missing` — read trace spans from a JSON file
+ *  - `graphorin pricing missing` - read trace spans from a JSON file
  *    and report unknown (provider, model) pairs.
  *
  * @packageDocumentation
@@ -78,7 +78,7 @@ export interface PricingRefreshOptions extends PricingCommonOptions {
    * CLI prints a status summary only; `--out` triggers a JSON write.
    */
   readonly out?: string;
-  /** Test seam — inject a fetch implementation. */
+  /** Test seam - inject a fetch implementation. */
   readonly fetchImpl?: typeof fetch;
 }
 

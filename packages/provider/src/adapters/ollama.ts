@@ -3,7 +3,7 @@
  * native Ollama streaming JSON protocol (`POST /api/chat` returning
  * newline-delimited JSON objects). For operators who prefer the
  * OpenAI-compatible variant exposed by recent Ollama releases, the
- * generic {@link openAICompatibleAdapter} is the better choice — both
+ * generic {@link openAICompatibleAdapter} is the better choice - both
  * adapters share the same {@link LocalProviderTrust} classifier and
  * {@link LocalProviderInsecureTransportError} startup behaviour.
  *
@@ -264,7 +264,7 @@ function buildBody(
       },
     }));
   }
-  // PS-24: Ollama's native structured output — `format` takes a JSON
+  // PS-24: Ollama's native structured output - `format` takes a JSON
   // schema object (or 'json' for schema-less JSON mode).
   if (structuredOutput && req.outputType?.kind === 'structured') {
     body.format = req.outputType.jsonSchema ?? 'json';

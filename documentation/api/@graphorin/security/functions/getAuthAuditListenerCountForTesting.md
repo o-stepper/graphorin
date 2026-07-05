@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/security/src/auth/audit-emitter.ts:83
 
 **`Experimental`**
 
-— test seam to assert wiring.
+- test seam to assert wiring.
 
 ## Returns
 

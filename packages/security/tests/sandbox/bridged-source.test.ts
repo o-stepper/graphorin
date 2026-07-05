@@ -38,7 +38,7 @@ describe('runBridgedSource', () => {
     expect(calls).toEqual([{ name: 'add', args: { a: 2, b: 3 } }]);
   });
 
-  it('keeps intermediate values in the worker — only the final result crosses back', async () => {
+  it('keeps intermediate values in the worker - only the final result crosses back', async () => {
     // `big` would be ~200 KB if inlined; the script reduces it to a count.
     const { dispatch } = recordingDispatch({
       fetchBig: () => 'X'.repeat(200_000),

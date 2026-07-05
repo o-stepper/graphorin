@@ -1,6 +1,6 @@
 /**
  * Persisted metadata for an OAuth server registration. The framework
- * never stores raw token material here — the access, refresh, id, and
+ * never stores raw token material here - the access, refresh, id, and
  * client-secret tokens live in the {@link SecretsStore} and this
  * record only holds the {@link SecretRef} URIs that resolve them.
  *

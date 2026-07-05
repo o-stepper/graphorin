@@ -1,5 +1,5 @@
 /**
- * `@graphorin/server/health` — Phase 14c health + Prometheus metrics
+ * `@graphorin/server/health` - Phase 14c health + Prometheus metrics
  * surface. Phase 14a's `/v1/health` is superseded by the extended
  * routes built here when consumers wire the additional probes.
  *

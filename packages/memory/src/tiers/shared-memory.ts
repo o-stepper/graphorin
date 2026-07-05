@@ -3,7 +3,7 @@ import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 
 /**
- * `SharedMemory` — many-to-many attach mode for blocks / facts /
+ * `SharedMemory` - many-to-many attach mode for blocks / facts /
  * rules across multiple agents. Storage adapters represent
  * attachments as a join table (`shared_attachments` in
  * `@graphorin/store-sqlite`).

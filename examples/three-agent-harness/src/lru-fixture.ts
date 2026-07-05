@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Canonical "expected Generator output" for the three-agent harness
  * smoke test. The Planner / Generator / Evaluator workload prompts

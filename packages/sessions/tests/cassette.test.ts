@@ -23,7 +23,7 @@ describe('Tool cassette format', () => {
   it('writes a valid sentinel header + footer with body checksum on `--hash`', async () => {
     const buffer = createCassetteBufferSink();
     const writer = createToolCassetteWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
       sessionId: 'sess-1',
       runId: 'run-1',
       hash: true,
@@ -180,7 +180,7 @@ describe('Tool cassette format', () => {
   });
 });
 
-describe('Cassette decision engine — sideEffectClass policy', () => {
+describe('Cassette decision engine - sideEffectClass policy', () => {
   const baseRecord = {
     kind: 'tool-call' as const,
     stepNumber: 1,
@@ -301,7 +301,7 @@ describe('Cassette decision engine — sideEffectClass policy', () => {
   });
 });
 
-describe('Tool cassette recorder — flushToFile', () => {
+describe('Tool cassette recorder - flushToFile', () => {
   let tmpDir: string;
   beforeEach(() => {
     tmpDir = mkdtempSync(join(tmpdir(), 'graphorin-cassette-'));
@@ -313,7 +313,7 @@ describe('Tool cassette recorder — flushToFile', () => {
   it('writes the cassette to disk and returns the summary', async () => {
     const outputPath = join(tmpDir, 'cassette.jsonl');
     const recorder = createToolCassetteRecorder({
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
       sessionId: 'sess-1',
       runId: 'run-1',
       outputPath,

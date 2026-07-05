@@ -6,7 +6,7 @@
  * `'deferred'` so the trigger is recorded but no phase runs.
  *
  * The lock honours DEC-114 ("memory does not block the agent loop")
- * by capping the wait — the agent loop never observes a memory
+ * by capping the wait - the agent loop never observes a memory
  * blocker.
  *
  * @packageDocumentation
@@ -84,7 +84,7 @@ export class LockManager {
   }
 
   /**
-   * Release the lock. Idempotent — releasing an already-released
+   * Release the lock. Idempotent - releasing an already-released
    * lock is a no-op.
    *
    * @stable

@@ -12,7 +12,7 @@ import type { EncryptionCipher } from '@graphorin/store-sqlite/encryption';
 export type { EncryptionCipher };
 
 /**
- * Default cipher. Matches ADR-030 § 2 — SQLCipher v4 compatible
+ * Default cipher. Matches ADR-030 § 2 - SQLCipher v4 compatible
  * (AES-256-CBC + HMAC-SHA1, `legacy=4` parameter set).
  *
  * @stable

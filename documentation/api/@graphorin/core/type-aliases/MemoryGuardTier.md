@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -24,14 +24,14 @@ memory-modification guard so downstream packages can type their tool
 metadata against this discriminator without a hard dependency on the
 security package.
 
-- `'pure'`                     — no side effects of any kind.
-- `'side-effecting-no-memory'` — observable side effects outside of
+- `'pure'`                     - no side effects of any kind.
+- `'side-effecting-no-memory'` - observable side effects outside of
   the framework's memory tiers (e.g. external HTTP).
-- `'memory-aware'`             — mutates the framework's memory
+- `'memory-aware'`             - mutates the framework's memory
   tiers via the sanctioned `ctx.memory.*` surface only.
-- `'unknown'`                  — no declaration; the runtime applies
+- `'unknown'`                  - no declaration; the runtime applies
   the audit-only baseline.
-- `'untrusted'`                — third-party / untrusted skill code;
+- `'untrusted'`                - third-party / untrusted skill code;
   the runtime forces the strictest snapshot policy.
 
 ## Stable

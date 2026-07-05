@@ -1,5 +1,5 @@
 /**
- * `runConflictPipeline` — orchestrator for the multi-stage conflict
+ * `runConflictPipeline` - orchestrator for the multi-stage conflict
  * resolution pipeline shipped in `@graphorin/memory` Phase 10b
  * (DEC-117 / ADR-018 ext / RB-02).
  *
@@ -29,7 +29,7 @@ import {
 let bypassWarnedOnce = false;
 
 /**
- * Reset the one-shot bypass-warning flag. Test-only helper — production
+ * Reset the one-shot bypass-warning flag. Test-only helper - production
  * callers never invoke this.
  *
  * @internal
@@ -40,7 +40,7 @@ export function _resetBypassWarningForTesting(): void {
 
 /**
  * One-shot helper that mirrors RB-02 §8.1's `runConflictPipeline({...})`
- * spec — convenient for callers that do not need to pre-build + cache
+ * spec - convenient for callers that do not need to pre-build + cache
  * the pipeline. Production wiring should still go through
  * {@link createConflictPipeline} (`SemanticMemory` re-uses the cached
  * instance per `Memory`).
@@ -304,7 +304,7 @@ async function collectVectorCandidates(
   if (typeof adapter.searchVector !== 'function') return [];
   checkAbort(deps.signal);
   // PS-10: the candidate is compared against stored facts, which are embedded
-  // as `passage` — keep it in the same space for the asymmetric (E5) embedder.
+  // as `passage` - keep it in the same space for the asymmetric (E5) embedder.
   const [vector] = await deps.embedder.embed([candidate.text], { taskType: 'passage' });
   if (vector === undefined) return [];
   checkAbort(deps.signal);
@@ -365,7 +365,7 @@ function warnBypass(): void {
   // regression risk per the Phase 10b spec ("WARN-once per process").
   console.warn(
     '[graphorin/memory] conflict pipeline disabled (mode: "off"). ' +
-      'Semantic writes fall back to a straight-through path — bi-temporal supersede / dedup ' +
+      'Semantic writes fall back to a straight-through path - bi-temporal supersede / dedup ' +
       'will not fire until you re-enable the pipeline.',
   );
 }

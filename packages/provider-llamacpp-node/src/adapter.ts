@@ -1,5 +1,5 @@
 /**
- * `llamaCppNodeAdapter` — in-process GGUF adapter built on
+ * `llamaCppNodeAdapter` - in-process GGUF adapter built on
  * `node-llama-cpp@^3.5`. The adapter declares `trust: 'loopback'`
  * permanently because the model lives in the same trust boundary as
  * the host process.
@@ -28,7 +28,7 @@ import {
 } from './runtime.js';
 
 /**
- * Default sensitivity envelope for the in-process adapter — same as
+ * Default sensitivity envelope for the in-process adapter - same as
  * the loopback HTTP path.
  *
  * @stable
@@ -160,7 +160,7 @@ export function llamaCppNodeAdapter(options: LlamaCppNodeAdapterOptions): Provid
         }
       }
       // PS-4: a swallowed mid-stream error returned truncated text
-      // indistinguishable from success — and a never-throwing
+      // indistinguishable from success - and a never-throwing
       // generate() bypasses withRetry / withFallback entirely.
       if (streamError !== undefined) {
         throw new ProviderHttpError({
@@ -250,7 +250,7 @@ async function* streamLlamaCppNode(
   }
   yield {
     type: 'finish',
-    // PS-4: a mid-stream failure must not masquerade as a clean stop —
+    // PS-4: a mid-stream failure must not masquerade as a clean stop -
     // partial text would be indistinguishable from success. PS-12: an
     // aborted stream reports 'aborted', mirroring the HTTP adapters.
     finishReason: errored ? 'error' : aborted ? 'aborted' : 'stop',

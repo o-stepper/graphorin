@@ -13,7 +13,7 @@ import {
 
 import { resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — library helpers', () => {
+describe('@graphorin/security/oauth - library helpers', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });

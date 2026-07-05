@@ -1,10 +1,10 @@
 /**
- * Runbook tool (D3) — gated content recall over procedural memory.
+ * Runbook tool (D3) - gated content recall over procedural memory.
  * `runbook_search` finds validated procedures whose text / steps match
  * a task description and returns them **whole** (title line, numbered
  * steps, variables, success criteria), so the model can follow a known
  * workflow file-style instead of re-deriving it. Registered only when
- * the facade opts in (`createMemory({ runbookSearch: true })`) — the
+ * the facade opts in (`createMemory({ runbookSearch: true })`) - the
  * default tool surface is unchanged.
  *
  * @packageDocumentation
@@ -37,7 +37,7 @@ type RunbookSearchInput = z.infer<typeof runbookSearchInputSchema>;
 type RunbookSearchOutput = z.infer<typeof runbookSearchOutputSchema>;
 
 /**
- * `runbook_search` — find validated procedures matching a task
+ * `runbook_search` - find validated procedures matching a task
  * description. Quarantined (unvalidated induced) procedures never
  * surface here: they must not drive actions until validated.
  *

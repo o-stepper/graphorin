@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -174,8 +174,8 @@ deleteSession(sessionId): Promise<void>;
 
 Defined in: packages/core/src/contracts/session-store.ts:144
 
-Hard-delete a session and cascade its session-owned rows — handoffs,
-workflow-run attachments, and audit entries (RP-6) — **plus the
+Hard-delete a session and cascade its session-owned rows - handoffs,
+workflow-run attachments, and audit entries (RP-6) - **plus the
 session's content**: its `session_messages` rows (with their FTS and
 vector index entries) and any episodes scoped to the session
 (store-01). After this call the conversation is no longer retrievable

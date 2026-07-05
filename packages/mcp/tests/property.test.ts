@@ -12,7 +12,7 @@ const dummyServerIdentity: ServerIdentity = Object.freeze({
   urlPath: '/',
 });
 
-describe('property — adaptCallResult', () => {
+describe('property - adaptCallResult', () => {
   it('forwards content[] text parts unchanged when no structuredContent is present', () => {
     fc.assert(
       fc.property(
@@ -56,7 +56,7 @@ describe('property — adaptCallResult', () => {
   });
 });
 
-describe('property — buildJsonSchemaValidator', () => {
+describe('property - buildJsonSchemaValidator', () => {
   it('always accepts inputs that the schema explicitly enumerates', () => {
     fc.assert(
       fc.property(

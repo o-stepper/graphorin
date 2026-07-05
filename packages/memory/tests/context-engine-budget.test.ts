@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { allocateTokenBudget, HEURISTIC_TOKEN_COUNTER, truncateToTokens } from '../src/index.js';
 
-describe('context-engine — token budget allocator (Phase 10d)', () => {
+describe('context-engine - token budget allocator (Phase 10d)', () => {
   it('allocates within budget when every layer fits', async () => {
     const result = await allocateTokenBudget(
       [
@@ -90,9 +90,9 @@ describe('context-engine — token budget allocator (Phase 10d)', () => {
   });
 });
 
-// --- CE-16(e) — structure-aware truncation -------------------------------------
+// --- CE-16(e) - structure-aware truncation -------------------------------------
 
-describe('CE-16(e) — structure-aware truncateToTokens', () => {
+describe('CE-16(e) - structure-aware truncateToTokens', () => {
   it('never cuts mid-tag: angle brackets stay balanced across the cut', async () => {
     const body = Array.from({ length: 300 }, (_, i) => `<t${i}>v</t${i}>`).join('');
     const out = await truncateToTokens(body, 25, HEURISTIC_TOKEN_COUNTER);

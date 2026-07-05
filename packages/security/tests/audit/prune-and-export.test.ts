@@ -7,7 +7,7 @@ import { verifyAuditChain } from '../../src/audit/verify-chain.js';
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('@graphorin/security/audit — prune + export', () => {
+describe('@graphorin/security/audit - prune + export', () => {
   it('pruneAudit drops old entries and rewrites the surviving prevHash', async () => {
     const db = createMemoryAuditDb();
     const baseTs = 1_700_000_000_000;
@@ -52,7 +52,7 @@ describe('@graphorin/security/audit — prune + export', () => {
     const db = createMemoryAuditDb();
     const cutoff = 1_700_000_000_000;
     // seq 1 expired · seq 2 in the FUTURE (out-of-order ts) · seq 3 expired.
-    // Only the leading contiguous expired prefix [seq 1] may be removed — seq 3
+    // Only the leading contiguous expired prefix [seq 1] may be removed - seq 3
     // is expired but cannot be deleted without punching a hole behind seq 2,
     // which must survive. Deleting fewer than the wall-clock cutoff implies is
     // the safe, chain-preserving behaviour.

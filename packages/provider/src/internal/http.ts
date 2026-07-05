@@ -54,7 +54,7 @@ export function toOpenAIChatMessages(
  * Convert a graphorin `Message` to Ollama's **native** `/api/chat` shape
  * (PS-13). Unlike the OpenAI form, Ollama's Go server expects `tool_calls`
  * with object `arguments` (a `map[string]any`, never a JSON string) and no
- * `id` / `type` fields — sending those breaks its unmarshaller and any
+ * `id` / `type` fields - sending those breaks its unmarshaller and any
  * multi-turn replay of assistant tool calls.
  *
  * @internal
@@ -126,7 +126,7 @@ function flattenContent(parts: ReadonlyArray<unknown>): string {
 
 /**
  * Wrap a `fetch` call with HTTP error mapping. The helper does not
- * assume any particular streaming format — callers receive the raw
+ * assume any particular streaming format - callers receive the raw
  * `Response` and dispatch on its body.
  *
  * @internal
@@ -134,7 +134,7 @@ function flattenContent(parts: ReadonlyArray<unknown>): string {
 /**
  * Default per-request timeout for the baseUrl adapters (PS-24). Scoped
  * to time-to-response (headers): the timer is cleared the moment the
- * server answers, so long streaming bodies are never killed — only a
+ * server answers, so long streaming bodies are never killed - only a
  * hung server that never responds. Generous because a cold local
  * llama-server can take tens of seconds to load a model.
  *

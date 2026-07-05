@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: packages/security/src/secrets/stores/memory.ts:27
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"memory"` | Stable identifier — surfaced in `getSecretsStoreStatus()`. | packages/security/src/secrets/stores/memory.ts:24 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"memory"` | Stable identifier - surfaced in `getSecretsStoreStatus()`. | packages/security/src/secrets/stores/memory.ts:24 |
 
 ## Accessors
 
@@ -124,7 +124,7 @@ list(scope?): Promise<readonly SecretMetadata[]>;
 
 Defined in: packages/security/src/secrets/stores/memory.ts:91
 
-Returns metadata about every key — never the values themselves.
+Returns metadata about every key - never the values themselves.
 
 #### Parameters
 

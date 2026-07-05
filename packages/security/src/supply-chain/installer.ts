@@ -6,9 +6,9 @@
  *
  * Two transports are supported:
  *
- * - {@link installSkillFromNpm} — `pnpm add` / `npm install` /
+ * - {@link installSkillFromNpm} - `pnpm add` / `npm install` /
  *   `yarn add` with `--ignore-scripts` enforcement.
- * - {@link installSkillFromGit} — shallow clone into the OS temp
+ * - {@link installSkillFromGit} - shallow clone into the OS temp
  *   directory; identical trust-policy resolution.
  *
  * @packageDocumentation
@@ -323,8 +323,8 @@ export async function installSkillFromGit(
  * verify). The `resolveSkillMd` thunk is only invoked when the trust policy
  * requires a signature, so a softer policy never touches the install path.
  * On a rejection (missing / tampered signature under a strict policy) the
- * `onReject` hook fires — used to remove the quarantine directory + emit an
- * error audit — before the typed exception propagates to the caller.
+ * `onReject` hook fires - used to remove the quarantine directory + emit an
+ * error audit - before the typed exception propagates to the caller.
  */
 async function verifyAfterInstall(args: {
   skillId: string;
@@ -346,7 +346,7 @@ async function verifyAfterInstall(args: {
   // `verifySkillSignature` throws (e.g. `SkillSignatureMissingError` for a
   // manifest with no `graphorin-signature` block) rather than always
   // returning a `valid: false` shape, so the cleanup hook must fire on a
-  // throw too — otherwise a rejected package would leave the quarantine dir
+  // throw too - otherwise a rejected package would leave the quarantine dir
   // behind.
   let result: SkillSignatureVerificationResult;
   try {
@@ -364,7 +364,7 @@ async function verifyAfterInstall(args: {
   // SkillSignatureInvalidError`. The `valid: false` shape is reserved
   // for callers that opt into a softer policy by passing a trust
   // level that does not require signature verification (none in v0.1
-  // — kept here for forward-compatibility).
+  // - kept here for forward-compatibility).
   if (!result.valid && trust.signature.rejectIfMissing) {
     onReject();
     throw new SkillSignatureInvalidError(
@@ -380,8 +380,8 @@ const SKILL_MANIFEST_FILENAME = 'SKILL.md';
 
 /**
  * Resolve the SKILL.md used for signature verification (RP-10). A caller-
- * supplied `provided` value (offline / pre-fetch) wins; otherwise — and only
- * for a real install — the manifest is read from the install path. In
+ * supplied `provided` value (offline / pre-fetch) wins; otherwise - and only
+ * for a real install - the manifest is read from the install path. In
  * `dryRun` mode nothing was installed, so there is nothing to read.
  */
 function resolveInstalledSkillMd(
@@ -422,7 +422,7 @@ function readInstalledManifest(
       }
     }
   } catch {
-    // Install path unreadable — treat as no manifest.
+    // Install path unreadable - treat as no manifest.
   }
   return undefined;
 }
@@ -439,7 +439,7 @@ function safeRemoveDir(path: string): void {
   try {
     rmSync(path, { recursive: true, force: true });
   } catch {
-    // Best-effort cleanup — a leftover quarantine dir is not worth failing on.
+    // Best-effort cleanup - a leftover quarantine dir is not worth failing on.
   }
 }
 

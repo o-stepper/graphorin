@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -11,10 +11,10 @@
 `@graphorin/security` ships the runtime building blocks every other
 `@graphorin/*` package uses to handle credentials safely:
 
-- `SecretValue` — a runtime-safe wrapper class with full leakage barriers
+- `SecretValue` - a runtime-safe wrapper class with full leakage barriers
   (`toString`, `toJSON`, `Symbol.toPrimitive`, `[Symbol.for('nodejs.util.inspect.custom')]`)
   and a cross-realm brand (`Symbol.for('graphorin.SecretValue')`).
-- `SecretRef` — strict RFC 3986 URI parser for the `env:` / `keyring:` /
+- `SecretRef` - strict RFC 3986 URI parser for the `env:` / `keyring:` /
   `file:` / `encrypted-file:` / `literal:` / `ref:` / `vault://` schemes
   that appear in `*Ref` config fields.
 - A pluggable `SecretResolver` registry that turns a parsed `SecretRef`
@@ -27,20 +27,20 @@
 - Per-tool `secretsAllowed` ACL plumbing built on `AsyncLocalStorage`,
   `withSecret(...)` scope tracking, and an in-process audit emitter the
   audit-log subsystem subscribes to.
-- **Server token auth** — generator + parser for the canonical
+- **Server token auth** - generator + parser for the canonical
   `<prefix>_<env>_v1_<entropy>_<crc32>` token format, scope grammar
   (`<resource>:<action>[:<id-or-glob>]`), `TokenVerifier` with
   HMAC-SHA256-against-pepper verification, an LRU warm cache, per-IP
   and per-token brute-force lockouts, a concurrent-verify cap, and a
   set of CRUD helpers (`createToken`, `revokeToken`, `rotateToken`,
   `rekeyTokens`, `generatePepper`).
-- **Tamper-evident audit log** — `appendAudit`, `verifyAuditChain`,
+- **Tamper-evident audit log** - `appendAudit`, `verifyAuditChain`,
   `pruneAudit`, `exportAudit`, a canonical-JSON serialiser, an
   `AuditDb` interface, a binding registry that fail-fasts when the
   encrypted-SQLite peer is missing, and the `bridgeSecretsToAudit` /
   `bridgeMemoryGuardToAudit` subscribers that forward events from
   the secrets and memory-guard layers.
-- **Sandbox** — `createNoneSandbox`, `createWorkerThreadsSandbox`
+- **Sandbox** - `createNoneSandbox`, `createWorkerThreadsSandbox`
   (default for user-defined tools, with optional `noNetwork` /
   `noFilesystem` shields), `createIsolatedVMSandbox` (opt-in peer
   dependency, auto-fallback to worker-threads with WARN-once when
@@ -48,25 +48,25 @@
   `dockerode` peer), and the `resolveSandbox(...)` tier resolver
   that mandates the `worker-threads + no-network + no-filesystem`
   policy on untrusted skills.
-- **Memory-modification guard** — `classifyTool(...)` →
+- **Memory-modification guard** - `classifyTool(...)` →
   `'pure' | 'side-effecting-no-memory' | 'memory-aware' | 'unknown' | 'untrusted'`,
   the four guard implementations (`NO_GUARD`, `API_BOUNDARY_GUARD`,
   `AUDIT_ONLY_GUARD`, `STRICT_FULL_GUARD`), an xxhash integrity
   helper, and a typed `memoryGuardAuditEmitter` the audit log
   subscribes to.
-- **Guardrails** — `defineInputGuardrail` / `defineOutputGuardrail`
+- **Guardrails** - `defineInputGuardrail` / `defineOutputGuardrail`
   builders, `composeGuardrails(...)` runner with documented
   `block` / `warn` / `rewrite` short-circuit semantics, and seven
   built-ins under `guardrails.*`: `maxLength`,
   `promptInjectionHeuristics`, `piiDetection`, `languageWhitelist`,
   `llmModeration`, `outputModeration`, `toolUsageValidator`.
-- **Process hardening** — `applyProcessHardening({ refuseRoot, umask })`
+- **Process hardening** - `applyProcessHardening({ refuseRoot, umask })`
   startup helper, `ensureFileMode` / `ensureDirMode` /
   `verifyFileMode` POSIX-mode utilities, the `graphorin doctor`
   library functions (`checkPerms`, `checkSecrets`, `checkEncryption`,
   `checkSystemd`), and the `generateBootstrapToken` /
   `generateAesSalt` helpers.
-- **Outbound OAuth** — `createOAuthClient(...)` wires the OAuth 2.1
+- **Outbound OAuth** - `createOAuthClient(...)` wires the OAuth 2.1
   surface required by the MCP authorization spec: discovery
   (RFC 8414 + RFC 9728), Dynamic Client Registration (RFC 7591),
   Authorization Code + PKCE-S256 (RFC 7636) with a built-in
@@ -80,7 +80,7 @@
   `oauth.refreshed` / `oauth.revoked` / `oauth.registered` /
   `mcp.auth.expired` events; a sibling audit emitter feeds the
   tamper-evident chain via `bridgeOAuthToAudit({ db })`.
-- **Skills supply chain** — `verifySkillSignature(...)` parses the
+- **Skills supply chain** - `verifySkillSignature(...)` parses the
   `graphorin-signature:` block from a SKILL.md frontmatter and
   verifies the ed25519-SHA-256 signature via Node's built-in
   `crypto.verify(...)` against a publisher key resolved from a
@@ -97,11 +97,11 @@
 
 ## Status
 
-- **Version:** v0.5.0 — secrets foundations + server token auth +
+- **Version:** v0.6.0 - secrets foundations + server token auth +
   tamper-evident audit log + sandbox / memory-guard / guardrails /
   process-hardening runtime safety + outbound OAuth flows + skills
   supply-chain helpers.
-- **License:** [MIT](../../_media/LICENSE-6) — © 2026 Oleksiy Stepurenko.
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 
 ## Installation
@@ -213,7 +213,7 @@ import {
 // Wrap a raw string at the I/O boundary (e.g. directly after env read).
 const apiKey = SecretValue.fromString(process.env.OPENAI_API_KEY ?? '');
 
-// Scoped access — the preferred read pattern.
+// Scoped access - the preferred read pattern.
 await apiKey.use((raw) => fetch(url, { headers: { Authorization: `Bearer ${raw}` } }));
 
 // Auto-pick the best store for the current environment.
@@ -326,8 +326,8 @@ await installSkillFromNpm({
 
 Every exported symbol carries one of two TSDoc tags:
 
-- `@stable` — covered by semver guarantees for the `v0.x` line.
-- `@experimental` — may change between minor versions; release notes call
+- `@stable` - covered by semver guarantees for the `v0.x` line.
+- `@experimental` - may change between minor versions; release notes call
   out every breaking change.
 
 ## Versioning
@@ -338,13 +338,13 @@ line.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/security/README.md) | @graphorin/security — security primitives for the Graphorin framework. Ships the `SecretValue` runtime-safe wrapper, the strict `SecretRef` URI parser, four `SecretsStore` implementations, the pluggable resolver registry, the per-tool ACL primitives, the `createSecretsStore({ kind: 'auto' })` factory, the server token- auth surface (HMAC-SHA256 + pepper, scope grammar, token CRUD, verify pipeline), and the tamper-evident audit log primitives. |
+| [](/api/@graphorin/security/README.md) | @graphorin/security - security primitives for the Graphorin framework. Ships the `SecretValue` runtime-safe wrapper, the strict `SecretRef` URI parser, four `SecretsStore` implementations, the pluggable resolver registry, the per-tool ACL primitives, the `createSecretsStore({ kind: 'auto' })` factory, the server token- auth surface (HMAC-SHA256 + pepper, scope grammar, token CRUD, verify pipeline), and the tamper-evident audit log primitives. |
 | [audit](/api/@graphorin/security/audit/index.md) | Audit-log surface for `@graphorin/security`. Provides the tamper-evident chain primitives (`appendAudit`, `verifyAuditChain`, `pruneAudit`, `exportAudit`), the `AuditDb` lifecycle plumbing, the binding registry, and the secrets-layer bridge that turns `SecretsAuditEvent`s into chain entries. |
 | [auth](/api/@graphorin/security/auth/index.md) | Server token-auth surface for `@graphorin/security`. Combines the token format primitives, the scope grammar, the verify pipeline, and the token CRUD library functions used by `@graphorin/server` and the CLI. |
 | [dataflow](/api/@graphorin/security/dataflow/index.md) | Provenance / taint-based data-flow policy for `@graphorin/security` (P1-3, toward CaMeL). |

@@ -4,7 +4,7 @@
  * subcommand (Phase 15) so the rule logic has a single source of
  * truth (per the working plan acceptance criteria for RB-49).
  *
- * The discovery is intentionally text-based — it scans a source
+ * The discovery is intentionally text-based - it scans a source
  * string for `tool(` call expressions and extracts the immediate
  * object literal that follows. The extractor handles the common
  * formatting cases (single-line, multi-line, nested object/array
@@ -281,7 +281,7 @@ export function runToolRules(
         ),
       );
     }
-    // PII sub-check — fires once per matched email pattern in the
+    // PII sub-check - fires once per matched email pattern in the
     // examples block. Operators usually want synthetic data, not real
     // addresses scraped from the corpus.
     const emailMatch = EMAIL_PATTERN.exec(extractExamplesBlock(tool.source));
@@ -389,7 +389,7 @@ function scoreExamples(tool: DiscoveredTool, findings: ReadonlyArray<LintFinding
 
 function scoreParameterNaming(tool: DiscoveredTool, findings: ReadonlyArray<LintFinding>): number {
   if (tool.parameterNames.length === 0) {
-    // No discoverable params — neither a positive nor a negative
+    // No discoverable params - neither a positive nor a negative
     // signal. Award the median.
     return 15;
   }

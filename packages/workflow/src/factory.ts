@@ -1,5 +1,5 @@
 /**
- * `createWorkflow({...})` — the public entry point for the workflow
+ * `createWorkflow({...})` - the public entry point for the workflow
  * runtime. Validates the supplied configuration and returns the
  * {@link Workflow} handle that exposes `execute / resume / getState /
  * listCheckpoints / fork`.
@@ -210,7 +210,7 @@ export function createWorkflow<
         state: { ...(stateRecord as object) } as TState,
         checkpointId: tuple.checkpoint.id,
         ...(pendingPause !== undefined ? { pendingPause } : {}),
-        // D1: the FULL pause set — timers (wakeAt), awakeables /
+        // D1: the FULL pause set - timers (wakeAt), awakeables /
         // approvals (name), parallel pausers.
         ...(frontierPauses.length > 0 ? { pendingPauses: frontierPauses } : {}),
       };
@@ -283,7 +283,7 @@ function validateConfig<TState extends object>(config: WorkflowConfig<TState>): 
   }
   if (!hasStartEdge) {
     throw new InvalidWorkflowConfigError(
-      `the edges list must contain at least one edge from "${START_NODE}" — workflows always start there`,
+      `the edges list must contain at least one edge from "${START_NODE}" - workflows always start there`,
     );
   }
   if (typeof config.channels !== 'object' || config.channels === null) {
@@ -300,18 +300,18 @@ function validateConfig<TState extends object>(config: WorkflowConfig<TState>): 
   }
   if (!config.checkpointStore) {
     throw new InvalidWorkflowConfigError(
-      'createWorkflow({ checkpointStore }) is required — supply an InMemoryCheckpointStore for tests or a SqliteCheckpointStore for production',
+      'createWorkflow({ checkpointStore }) is required - supply an InMemoryCheckpointStore for tests or a SqliteCheckpointStore for production',
     );
   }
   if (
     config.durability !== undefined &&
     config.durability !== 'sync' &&
     config.durability !== 'exit' &&
-    // WF-7: legacy value — the engine coerces it to 'sync' with a warn.
+    // WF-7: legacy value - the engine coerces it to 'sync' with a warn.
     (config.durability as string) !== 'async'
   ) {
     throw new InvalidWorkflowConfigError(
-      `durability mode "${config.durability}" is invalid — accepted values are "sync" | "exit"`,
+      `durability mode "${config.durability}" is invalid - accepted values are "sync" | "exit"`,
     );
   }
   if (

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/server/src/commentary/types.ts:100
 
 Single audit + counter sink consumed by the sanitizer when a
-decision fires. Wiring is optional — operators that do not need
+decision fires. Wiring is optional - operators that do not need
 audit telemetry can skip the sink and the sanitizer becomes a
 pure transform.
 

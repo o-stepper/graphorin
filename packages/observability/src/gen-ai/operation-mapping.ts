@@ -80,7 +80,7 @@ export function operationNameFor(type: SpanType): GenAIOperationName | undefined
 }
 
 /**
- * Full canonical span-to-operation table — exposed for tooling
+ * Full canonical span-to-operation table - exposed for tooling
  * (documentation generators, fixture tests) that need to introspect
  * the mapping.
  *

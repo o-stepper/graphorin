@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/consolidator/phases/induce.ts:51
 
-One distilled step of an agent trajectory — model-agnostic, so the
+One distilled step of an agent trajectory - model-agnostic, so the
 inducer never sees raw provider/tool wire formats.
 
 ## Stable

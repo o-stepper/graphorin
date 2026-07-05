@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ const VALIDATED_EXPORTER_BRAND: unique symbol;
 
 Defined in: packages/observability/src/exporters/types.ts:16
 
-Discriminator marker — every exporter that has been wrapped via
+Discriminator marker - every exporter that has been wrapped via
 `withValidation(...)` is branded with this symbol so the tracer can
 fail-fast at startup when a raw exporter is registered.
 

@@ -39,7 +39,7 @@ export interface ReRankOptions {
   readonly topK?: number;
   readonly signal?: AbortSignal;
   /**
-   * Stable per-list labels for the explanation signals (MRET-13) —
+   * Stable per-list labels for the explanation signals (MRET-13) -
    * `rrf.<label>` instead of the ephemeral `rrf.list_<index>`. Callers
    * that fan lists out conditionally (multi-query, HyDE, graph) pass
    * retriever-kind labels so X-3 consumers can identify which leg a

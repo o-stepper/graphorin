@@ -82,7 +82,7 @@ import { loadSkillFromSource, createSkillRegistry } from '@graphorin/skills';
 
 const skill = await loadSkillFromSource(
   { kind: 'folder', path: './skills/finance-helper' },
-  { conflictPolicy: 'warn', runtimeVersion: '0.5.0' },
+  { conflictPolicy: 'warn', runtimeVersion: '0.6.0' },
 );
 
 const registry = createSkillRegistry();
@@ -111,7 +111,7 @@ license: MIT
 disable-model-invocation: false
 
 # === Graphorin extensions (namespaced) ===
-graphorin-runtime-compat: ^0.5.0
+graphorin-runtime-compat: ^0.6.0
 graphorin-trust-level: trusted
 graphorin-sensitivity: internal
 graphorin-handoff-input-filter: lastUser
@@ -145,19 +145,19 @@ The body of the SKILL.md is loaded lazily on activation.
 
 The supply-chain layer enforces `--ignore-scripts` and signature
 verification through `@graphorin/security/supply-chain`. The skills
-loader does not duplicate that logic — it delegates and surfaces the
+loader does not duplicate that logic - it delegates and surfaces the
 resulting `ResolvedSkillTrustPolicy` alongside the loaded skill.
 
 ## Dependencies
 
-- `yaml@^2.8.0` — required runtime dependency. Used for frontmatter
+- `yaml@^2.8.0` - required runtime dependency. Used for frontmatter
   parsing and migrator output.
-- `@graphorin/core` — typed contracts (`ResolvedTool`, …) consumed by
+- `@graphorin/core` - typed contracts (`ResolvedTool`, …) consumed by
   the registry's tool-declaration surface.
-- `@graphorin/security` — supply-chain installer, ed25519 signature
+- `@graphorin/security` - supply-chain installer, ed25519 signature
   verifier, trust-policy resolver. Skills loaded from `npm-package`
   and `git-repo` sources go through this package.
-- `@graphorin/tools` — peer surface the agent runtime uses to
+- `@graphorin/tools` - peer surface the agent runtime uses to
   register skill-bundled tools after activation. The skills loader
   does not import the runtime registry directly; it returns a typed
   `RegisteredToolDeclaration[]` the runtime consumes.
@@ -168,4 +168,4 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

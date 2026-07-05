@@ -32,7 +32,7 @@ import { enforceSecretAcl, withChildToolSecretsContext } from '@graphorin/securi
 import type { StreamingChannel } from '../streaming/channel.js';
 
 /**
- * Resolver hook the executor wires to the configured `SecretsStore` —
+ * Resolver hook the executor wires to the configured `SecretsStore` -
  * implementations call `resolve(key)` and either return the resolved
  * `SecretValue` or `null` when the key is absent.
  *
@@ -57,7 +57,7 @@ export interface ToolContextOptions<TDeps = unknown> {
 
 /**
  * Build a {@link ToolExecutionContext} for one invocation. The
- * returned context honours the tool's `secretsAllowed` ACL — calls to
+ * returned context honours the tool's `secretsAllowed` ACL - calls to
  * `ctx.secrets.require(...)` for keys outside the allowlist throw
  * `SecretAccessDeniedError`.
  *
@@ -126,7 +126,7 @@ function makeSecretsAccessor(
 }
 
 /**
- * Internal helper — wrap a tool execution in the per-tool secrets
+ * Internal helper - wrap a tool execution in the per-tool secrets
  * context that backs the ACL enforcement.
  *
  * @stable

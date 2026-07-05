@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ default).
 
 Sub-namespaces map 1:1 to the six tiers so each implementation can
 pick its own physical layout (one big table, six tables, mixed) while
-preserving append-only semantics — soft-delete only.
+preserving append-only semantics - soft-delete only.
 
 ## Stable
 

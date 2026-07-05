@@ -10,7 +10,7 @@ import {
 
 import { buildSyntheticServerMetadata, resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — Authorization Code + PKCE flow', () => {
+describe('@graphorin/security/oauth - Authorization Code + PKCE flow', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });
@@ -136,9 +136,9 @@ describe('@graphorin/security/oauth — Authorization Code + PKCE flow', () => {
   });
 });
 
-// --- SPL-6 — state is REQUIRED on the callback ---------------------------------
+// --- SPL-6 - state is REQUIRED on the callback ---------------------------------
 
-describe('SPL-6 — callbacks without state are rejected', () => {
+describe('SPL-6 - callbacks without state are rejected', () => {
   it('rejects a callback that simply OMITS the state parameter', async () => {
     _setTokenEndpointFetcherForTesting(async () => {
       throw new Error('token endpoint should not be reached');

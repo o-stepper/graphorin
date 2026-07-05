@@ -71,7 +71,7 @@ async function pushUserMessages(
   }
 }
 
-describe('consolidator/runtime — light phase', () => {
+describe('consolidator/runtime - light phase', () => {
   it('runs without LLM and archives stale facts', async () => {
     const store = createInMemoryStore({ withConsolidatorStore: true });
     const memory = createMemory({
@@ -106,7 +106,7 @@ describe('consolidator/runtime — light phase', () => {
   });
 });
 
-describe('consolidator/runtime — standard phase', () => {
+describe('consolidator/runtime - standard phase', () => {
   it('extracts facts via the provider and advances the cursor', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -185,14 +185,14 @@ describe('consolidator/runtime — standard phase', () => {
   });
 });
 
-describe('consolidator/runtime — deep phase — dedup decision', () => {
+describe('consolidator/runtime - deep phase - dedup decision', () => {
   it('soft-forgets (NEVER purges) the candidate when the judge picks dedup', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
       withConsolidatorStore: true,
     });
     // memory-consolidation-01: a background LLM verdict must never
-    // trigger the GDPR hard-delete — spy on purge to prove it stays cold.
+    // trigger the GDPR hard-delete - spy on purge to prove it stays cold.
     const semanticStore = store.semantic as {
       purge?: (id: string, reason?: string) => Promise<void>;
     };
@@ -237,7 +237,7 @@ describe('consolidator/runtime — deep phase — dedup decision', () => {
     const outcome = await memory.consolidator.fireNow('deep', scope);
     expect(outcome?.conflictsResolved).toBe(1);
     expect(outcome?.factsUpdated).toBe(1);
-    // The candidate is gone from recall — but via the SOFT, replayable
+    // The candidate is gone from recall - but via the SOFT, replayable
     // tombstone, never the destructive purge.
     const remaining = await memory.semantic.get(scope, candidate.id);
     expect(remaining).toBeNull();
@@ -334,7 +334,7 @@ describe('consolidator/runtime — deep phase — dedup decision', () => {
   });
 });
 
-describe('consolidator/runtime — deep phase', () => {
+describe('consolidator/runtime - deep phase', () => {
   it('drains pending conflicts via the LLM judge', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -383,7 +383,7 @@ describe('consolidator/runtime — deep phase', () => {
   });
 });
 
-describe('consolidator/runtime — wiring', () => {
+describe('consolidator/runtime - wiring', () => {
   it('placeholder honours the public surface', async () => {
     const ph = createConsolidatorPlaceholder({ tier: 'free' });
     await ph.start();
@@ -630,7 +630,7 @@ describe('consolidator/runtime — wiring', () => {
   });
 });
 
-describe('consolidator/runtime — Wave B operational fixes', () => {
+describe('consolidator/runtime - Wave B operational fixes', () => {
   it('expires stale CONFLICT-CHECK rows as admit at tiers without a deep phase (memory-consolidation-04)', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -664,7 +664,7 @@ describe('consolidator/runtime — Wave B operational fixes', () => {
     await memory.consolidator.trigger({ kind: 'turn' }, scope);
     // The 'cheap' tier has no deep phase: without the TTL sweep this row
     // would sit unresolved forever. It is resolved as ADMIT (the safe
-    // direction — the candidate fact stays live).
+    // direction - the candidate fact stays live).
     const left = await store.conflicts.listPending(scope);
     expect(left).toHaveLength(0);
     const survivor = await memory.semantic.get(scope, fact.id);
@@ -768,7 +768,7 @@ describe('consolidator/runtime — Wave B operational fixes', () => {
   });
 });
 
-describe('consolidator/runtime — trigger() drains the DLQ (memory-consolidation-03)', () => {
+describe('consolidator/runtime - trigger() drains the DLQ (memory-consolidation-03)', () => {
   it('a later trigger replays a failed batch without any explicit drainDlq call', async () => {
     const store = createInMemoryStore({
       withConflictStore: true,
@@ -815,8 +815,8 @@ describe('consolidator/runtime — trigger() drains the DLQ (memory-consolidatio
     expect(failed?.status).toBe('failed');
     expect((await memory.consolidator.status()).dlqSize).toBeGreaterThan(0);
 
-    // Advance past backoff + cooldown; an ordinary trigger — the loop's
-    // normal heartbeat — now replays the batch. Pre-fix drainDlq had NO
+    // Advance past backoff + cooldown; an ordinary trigger - the loop's
+    // normal heartbeat - now replays the batch. Pre-fix drainDlq had NO
     // production caller and failed batches accumulated forever.
     clock += 2 * 60 * 60 * 1000;
     await memory.consolidator.trigger({ kind: 'turn' }, scope);

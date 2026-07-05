@@ -1,7 +1,7 @@
 # `@graphorin/provider-llamacpp-node`
 
 > Companion package to
-> [`@graphorin/provider`](../provider/README.md) — in-process GGUF
+> [`@graphorin/provider`](../provider/README.md) - in-process GGUF
 > execution for the
 > [**Graphorin**](https://github.com/o-stepper/graphorin) framework.
 
@@ -50,14 +50,14 @@ tighter than the cl100k_base proxy used by the HTTP-shaped adapters.
 ## HITL durable-resume tradeoff
 
 The in-process adapter does **not** survive a process restart
-mid-stream — the model context lives in the running process and is
+mid-stream - the model context lives in the running process and is
 lost on exit. For human-in-the-loop workflows that need durable
 mid-stream resume across restarts, prefer one of the HTTP-shaped
 adapters instead:
 
-- `ollamaAdapter` — Ollama HTTP daemon
-- `llamaCppServerAdapter` — upstream `llama-server` binary
-- `openAICompatibleAdapter` — LMStudio / LocalAI / vLLM /
+- `ollamaAdapter` - Ollama HTTP daemon
+- `llamaCppServerAdapter` - upstream `llama-server` binary
+- `openAICompatibleAdapter` - LMStudio / LocalAI / vLLM /
   Together-style endpoints
 
 ## GGUF model provenance
@@ -78,5 +78,5 @@ discipline rather than enforcing it at runtime.
 
 ## Project metadata
 
-- **Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+- **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>

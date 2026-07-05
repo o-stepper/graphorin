@@ -1,5 +1,5 @@
 /**
- * Compatibility test — the structural `SchedulerLike` shape exposed
+ * Compatibility test - the structural `SchedulerLike` shape exposed
  * by `@graphorin/memory/consolidator/scheduler` is satisfied by the
  * production `@graphorin/triggers` Scheduler. Wires a real Scheduler
  * into the consolidator and asserts that registered idle triggers
@@ -50,7 +50,7 @@ function inMemoryTriggerStore(): TriggerStore {
   };
 }
 
-describe('@graphorin/memory consolidator <> @graphorin/triggers — Scheduler bridge', () => {
+describe('@graphorin/memory consolidator <> @graphorin/triggers - Scheduler bridge', () => {
   it('wires idle triggers into a real Scheduler that fires consolidator.trigger', async () => {
     _resetLibModeWarningForTesting();
     const store = createInMemoryStore({ withConsolidatorStore: true });
@@ -97,7 +97,7 @@ describe('@graphorin/memory consolidator <> @graphorin/triggers — Scheduler br
     expect(result.registered.length).toBe(1);
     expect(result.registered[0]?.kind).toBe('idle');
 
-    // Drive the timer one step — the scheduled callback fires the
+    // Drive the timer one step - the scheduled callback fires the
     // consolidator's trigger() handler.
     expect(handles.length).toBeGreaterThan(0);
     const next = handles[handles.length - 1];

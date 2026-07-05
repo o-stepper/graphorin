@@ -40,7 +40,7 @@ import { scoreFromDistance, VectorTableManager } from './vector-table-mgr.js';
  *
  * memory-retrieval-01: default fact reads (no explicit `asOf`) behave
  * as `asOf = now`, so superseded / validity-expired facts no longer
- * surface as current — exactly what the `fact_supersede` tool
+ * surface as current - exactly what the `fact_supersede` tool
  * promises. Callers opt back into the full history with
  * `includeSuperseded: true` (the inspector / audit path). An explicit
  * `asOf` always wins.
@@ -91,7 +91,7 @@ function resolveFactValidityEpoch(
 /**
  * MRET-9 / store-03: the vec0 k-nearest slice is GLOBAL (no user
  * partition) and every scope / validity / quarantine filter applies
- * AFTER the cut — a minority user could be starved to zero by a
+ * AFTER the cut - a minority user could be starved to zero by a
  * dominant user's vectors. Over-fetch and widen iteratively until
  * `topK` rows survive the filters or the table is exhausted. Shared by
  * the fact and episode KNN paths.
@@ -135,7 +135,7 @@ function factTagsPredicate(tagCount: number): string {
 }
 
 /**
- * MRET-4: episode/date-range overlap — an episode matches when its
+ * MRET-4: episode/date-range overlap - an episode matches when its
  * `[started_at, ended_at]` span intersects `[from, to]` (missing bounds
  * are open). The caller appends `from` / `to` epoch binds in order.
  */
@@ -161,7 +161,7 @@ export interface EmbeddingPayload {
 /**
  * Extended write surface for fact / episode / message writes. The base
  * `SemanticMemoryStore.remember(...)` / `EpisodicMemoryStore.put(...)`
- * methods leave embeddings out — {@link SqliteMemoryStore} accepts an
+ * methods leave embeddings out - {@link SqliteMemoryStore} accepts an
  * optional embedding through these helpers.
  *
  * @stable
@@ -172,8 +172,8 @@ export interface SqliteMemoryWriteOptions {
    * Contextual-retrieval index text (P1-3). When supplied, the FTS5 row
    * is indexed against this (context-prepended) text instead of the
    * canonical `fact.text`, so a terse fact stays findable by a
-   * vaguely-worded query. The persisted `facts.text` column — the value
-   * shown to the user / audit trail — is always the canonical text; only
+   * vaguely-worded query. The persisted `facts.text` column - the value
+   * shown to the user / audit trail - is always the canonical text; only
    * the lexical index is affected. The caller's `embedding.vector` should
    * be computed from the same index text so the vector and FTS surfaces
    * agree. Absent ⇒ the FTS row uses `fact.text` (pre-P1-3 behaviour).
@@ -241,7 +241,7 @@ export class SqliteMemoryStore implements MemoryStore {
   }
 
   /**
-   * store-04: retention prune for the `memory_history` audit trail —
+   * store-04: retention prune for the `memory_history` audit trail -
    * without one the table grows unboundedly (every supersede /
    * quarantine transition appends). Deletes rows older than
    * `olderThanMs`; returns the number pruned. Operators call this from
@@ -340,7 +340,7 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     // CS-9: the MAX+1 read, the message INSERT, and the FTS INSERT run in one
     // transaction so a crash never leaves a committed message without its FTS
     // row (silently unsearchable), and the UNIQUE(scope_session_id, sequence)
-    // constraint (migration 022) is evaluated atomically with the read — a
+    // constraint (migration 022) is evaluated atomically with the read - a
     // cross-process race that recomputes the same sequence fails loudly here
     // instead of minting a duplicate.
     let sequence = 1;
@@ -452,7 +452,7 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
   }
 
   /**
-   * Count the live messages in the scoped session (CE-5) — a `COUNT(*)`, never
+   * Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
    * materialising rows. Returns `0` for a user-only scope (no session to count).
    */
   async count(scope: SessionScope): Promise<number> {
@@ -503,12 +503,12 @@ class SessionMemoryStoreImpl implements SessionMemoryStore {
     });
   }
 
-  /** Test/integration helper — exposes the manager so writers can opt in to vector indexing. */
+  /** Test/integration helper - exposes the manager so writers can opt in to vector indexing. */
   vectorTableManager(): VectorTableManager {
     return this.#vectorMgr;
   }
 
-  /** Test/integration helper — exposes the registry. */
+  /** Test/integration helper - exposes the registry. */
   embeddingMetaRepository(): EmbeddingMetaRepository {
     return this.#embeddings;
   }
@@ -612,7 +612,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   }
 
   /**
-   * Extended write — accepts an optional embedding payload. The
+   * Extended write - accepts an optional embedding payload. The
    * embedder must already be registered (`embedding_meta`) and the
    * vector dimension must match.
    *
@@ -688,7 +688,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     const topK = opts.topK ?? 10;
     const asOf = opts.asOf !== undefined ? toEpoch(opts.asOf) : null;
     // MRET-4: dateRange filter (declared on MemorySearchOptions,
-    // previously ignored) — overlap semantics on [started_at, ended_at].
+    // previously ignored) - overlap semantics on [started_at, ended_at].
     const from = opts.dateRange?.from !== undefined ? toEpoch(opts.dateRange.from) : null;
     const to = opts.dateRange?.to !== undefined ? toEpoch(opts.dateRange.to) : null;
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
@@ -726,7 +726,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
 
   /**
    * Most-recent episodes by `ended_at` (newest first), with no FTS / vector
-   * query — recency, not relevance (MCON-1). Powers the deep-phase reflection
+   * query - recency, not relevance (MCON-1). Powers the deep-phase reflection
    * gate and `EpisodicMemory.recent()`, both of which previously probed with a
    * `'*'` FTS query that matches zero rows on real SQLite.
    */
@@ -794,7 +794,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
         binds,
       );
     };
-    // store-03: the MRET-9 over-fetch loop, ported from the fact side —
+    // store-03: the MRET-9 over-fetch loop, ported from the fact side -
     // the vec0 k-nearest slice is GLOBAL, so a minority user on a
     // multi-user (or heavily archived) store could be starved to zero
     // by the post-KNN filters. Widen until `topK` rows survive.
@@ -827,7 +827,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
 
   /**
    * Promote / demote an episode's retrieval-trust `status` (MCON-2) and write a
-   * `memory_history` audit row. Mirrors `setStatus` on facts — a retrieval gate
+   * `memory_history` audit row. Mirrors `setStatus` on facts - a retrieval gate
    * only. Powers {@link EpisodicMemory.validate} so a quarantined (auto-formed)
    * episode can be promoted into default recall.
    */
@@ -855,7 +855,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
   }
 
   /**
-   * Count the recall-eligible episodes for the scope (CE-5) — a `COUNT(*)`
+   * Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`
    * with the same default filters as the FTS search (live, non-quarantined).
    */
   async count(scope: SessionScope): Promise<number> {
@@ -886,7 +886,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Extended write — accepts an optional embedding payload. The
+   * Extended write - accepts an optional embedding payload. The
    * embedder must already be registered (`embedding_meta`) and the
    * vector dimension must match.
    *
@@ -1000,7 +1000,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     // ignored). A fact matches when it carries AT LEAST ONE of the
     // requested tags; rows without tags never match a tag filter.
     const tags = opts.tags !== undefined && opts.tags.length > 0 ? [...opts.tags] : null;
-    // D3: retrieval-time principal filter — absent ⇒ no predicate.
+    // D3: retrieval-time principal filter - absent ⇒ no predicate.
     const owners = normalizeOwnerFilter(opts.owner);
     const binds: Array<string | number> = [escapeFtsQuery(opts.query), scope.userId];
     if (asOf !== null) binds.push(asOf, asOf);
@@ -1058,7 +1058,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const tableName = this.#vectorMgr.ensureTable('facts', meta);
     // memory-retrieval-01: default reads evaluate validity at NOW.
     const asOfEpoch = resolveFactValidityEpoch(asOf, includeSuperseded);
-    // D3: retrieval-time principal filter — absent ⇒ no predicate.
+    // D3: retrieval-time principal filter - absent ⇒ no predicate.
     const owners = normalizeOwnerFilter(owner);
     const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
@@ -1101,7 +1101,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const now = Date.now();
     // Bi-temporal supersede (P0-3): close the old fact's validity interval
     // so point-in-time (`asOf`) queries stop returning it once the new
-    // version takes effect — previously only `superseded_by` was set, which
+    // version takes effect - previously only `superseded_by` was set, which
     // left the old interval open forever and broke `asOf(now)`. The interval
     // closes at the new fact's `validFrom` (the instant the replacement takes
     // effect) so the hand-off is seamless. `COALESCE` makes it idempotent and
@@ -1112,7 +1112,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     // inside the close transaction; inverting the order makes the close
     // depend on a durable successor instead of the reverse. A crash between
     // the two steps leaves the old fact fully intact (open interval, no
-    // `superseded_by`) — recoverable — rather than closed in favour of, and
+    // `superseded_by`) - recoverable - rather than closed in favour of, and
     // pointing at, a row that was never written.
     await this.remember(newFact);
     this.#conn.transaction(() => {
@@ -1173,7 +1173,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
 
   async forget(id: string, reason?: string): Promise<void> {
     this.#conn.run('UPDATE facts SET deleted_at = ?, archived = 1 WHERE id = ?', [Date.now(), id]);
-    // MRET-9: a tombstoned fact must not keep occupying k-nearest slots —
+    // MRET-9: a tombstoned fact must not keep occupying k-nearest slots -
     // dead embeddings crowd the GLOBAL vec0 slice and starve live hits.
     // The tombstone is terminal for recall, so the vector goes with it
     // (purge already did this; forget leaked).
@@ -1188,7 +1188,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   /**
    * Set a fact's retrieval-trust `status` (P1-4) and write a
    * `memory_history` audit row. Quarantine is a retrieval gate, so this
-   * touches neither the row's content nor its embedding / tombstone —
+   * touches neither the row's content nor its embedding / tombstone -
    * it only flips eligibility for default recall. Promotion
    * (`'active'`) is logged as a `VALIDATE` event; demotion
    * (`'quarantined'`) as `QUARANTINE`. Surfaced through
@@ -1220,7 +1220,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
+   * Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
    * the same default filters as the FTS search (live, non-archived,
    * non-quarantined). Replaces the old `search({ query: '*', topK: 1 })` probe
    * that returned at most 1 and was deterministically 0 on real SQLite.
@@ -1260,7 +1260,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     }>
   > {
     // MCON-6: archived facts never receive access bumps, so they pin the
-    // LRU head forever and saturate the window — after ~LIMIT archived
+    // LRU head forever and saturate the window - after ~LIMIT archived
     // rows every light pass would see only them and live facts would stop
     // decaying. The decay window therefore excludes archived rows by
     // default; inspection paths opt in via `includeArchived`.
@@ -1304,7 +1304,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
    * `last_accessed_at` and bumps `strength` by 0.1 per access, capped
    * at 2.0 (the decay model reads `tauMs * max(0.5, strength)`, so the
    * cap bounds how far reinforcement can stretch retention). Failures
-   * here must never break the read path — callers wrap in try/catch.
+   * here must never break the read path - callers wrap in try/catch.
    *
    * @stable
    */
@@ -1313,7 +1313,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const at = accessedAt ?? Date.now();
     const placeholders = ids.map(() => '?').join(', ');
     // D3 (migration 027): the monotonic access counter runs alongside
-    // the capped strength bump — strength saturates at 2.0, the counter
+    // the capped strength bump - strength saturates at 2.0, the counter
     // never does, giving salience a true frequency signal.
     this.#conn.run(
       `UPDATE facts
@@ -1358,7 +1358,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
   }
 
   /**
-   * Soft-archive a fact — sets `archived = 1` and writes a
+   * Soft-archive a fact - sets `archived = 1` and writes a
    * `memory_history` audit row. Distinct from {@link forget}: this
    * does not set `deleted_at`, so search results can still surface
    * the fact when explicit archive-aware queries are issued.
@@ -1408,7 +1408,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
         [id],
       );
       // store-04: hard-deleted fact CONTENT must not survive in the
-      // audit trail — history rows are scrubbed to the event skeleton
+      // audit trail - history rows are scrubbed to the event skeleton
       // inside the same transaction. Two sweeps: (a) every row keyed
       // to this id, and (b) every row VALUE-matching this fact's text
       // (a SUPERSEDE row carries the new fact's text on the OLD
@@ -1448,7 +1448,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
       // `foreign_keys = ON`, so deleting a linked fact would otherwise raise
       // FOREIGN KEY constraint failed and roll back the whole purge (including
       // the PURGE audit row). The canonical `entities` are shared data and are
-      // intentionally left intact — only this fact's links are removed.
+      // intentionally left intact - only this fact's links are removed.
       this.#conn.run('DELETE FROM fact_entities WHERE fact_id = ?', [id]);
       this.#conn.run('DELETE FROM facts WHERE id = ?', [id]);
     });
@@ -1498,7 +1498,7 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
   }
 
   /**
-   * Lexical runbook search over rule text (D3, migration 028) — powers
+   * Lexical runbook search over rule text (D3, migration 028) - powers
    * "find the procedure for this task" content recall, as opposed to
    * predicate activation. Returns whole rules; quarantined (unvalidated
    * induced) procedures are excluded unless the inspector opts in.
@@ -1539,7 +1539,7 @@ class ProceduralMemoryStoreImpl implements ProceduralMemoryStore {
 
   /**
    * Promote / demote a procedural rule's retrieval-trust `status` (MCON-2) and
-   * write a `memory_history` audit row. Mirrors `setStatus` on facts — a
+   * write a `memory_history` audit row. Mirrors `setStatus` on facts - a
    * retrieval gate only, never touching content. Powers
    * {@link ProceduralMemory.validate} so an induced (quarantined) procedure can
    * be promoted into `activate()`.
@@ -1621,12 +1621,12 @@ class SharedMemoryStoreImpl implements SharedMemoryStore {
 }
 
 /**
- * `SqliteInsightStore` — owns the `insights` + `insights_fts` tables
+ * `SqliteInsightStore` - owns the `insights` + `insights_fts` tables
  * shipped in migration 014 (P1-1). Implements the structural
  * `InsightMemoryStoreExt` surface defined in
  * `@graphorin/memory/internal/storage-adapter.ts`.
  *
- * Search is FTS5-only — insights are a soft, rank-capped inspector
+ * Search is FTS5-only - insights are a soft, rank-capped inspector
  * surface, not primary recall, so no per-embedder vec0 table is
  * created. Pruning (the ExpeL forgetting step) is a soft-delete
  * (`deleted_at`), never a hard purge, so pruned insights remain
@@ -1730,7 +1730,7 @@ export class SqliteInsightStore {
 
   /**
    * Promote / demote an insight's retrieval-trust `status` (MCON-2) and write a
-   * `memory_history` audit row. Mirrors `setStatus` on facts — a retrieval gate
+   * `memory_history` audit row. Mirrors `setStatus` on facts - a retrieval gate
    * only. Powers {@link InsightMemory.validate} so a quarantined (reflection)
    * insight can be promoted out of quarantine.
    */
@@ -1758,7 +1758,7 @@ export class SqliteInsightStore {
 
   /**
    * Adjust an insight's ExpeL salience by `delta`, clamped at 0 (the
-   * floor at which `prune` removes it). Never touches content / cites —
+   * floor at which `prune` removes it). Never touches content / cites -
    * salience is the only mutable field.
    */
   async bumpSalience(id: string, delta: number, reason?: string): Promise<void> {
@@ -1771,7 +1771,7 @@ export class SqliteInsightStore {
 
   /**
    * Soft-delete every salience-0 insight for the scope (the ExpeL
-   * forgetting step). Returns the number pruned. Tombstone only — the
+   * forgetting step). Returns the number pruned. Tombstone only - the
    * row stays for audit.
    */
   async prune(scope: SessionScope): Promise<number> {
@@ -1966,7 +1966,7 @@ export class SqliteGraphStore {
    * Merge `fromId` into `intoId` (resolved to its root). Sets
    * `from.merged_into` and re-points `from`'s children to keep the
    * pointer single-level, then records a `'merge'` audit row.
-   * `fact_entities` are never rewritten — reads canonicalise via
+   * `fact_entities` are never rewritten - reads canonicalise via
    * `merged_into`. A self-merge is a no-op.
    */
   async mergeEntities(
@@ -2069,7 +2069,7 @@ export class SqliteGraphStore {
     const rows = this.#conn.all<FactRow>(
       // CS-15: the recursive step only bridges THROUGH a fact that is itself
       // visible to the caller (in-scope, not tombstoned/archived/quarantined,
-      // valid at `asOf`) — joining `facts fb ON fb.id = w.fact_id` with the
+      // valid at `asOf`) - joining `facts fb ON fb.id = w.fact_id` with the
       // same predicates. Without it a tombstoned/quarantined intermediate fact
       // silently conducts a link between two otherwise-unrelated records at
       // maxHops > 1. Seeds are also intersected with the caller scope so a
@@ -2644,7 +2644,7 @@ function escapeFtsQuery(query: string): string {
   return tokens.map((token) => `"${token.replace(/"/g, '""')}"`).join(' OR ');
 }
 
-/** Quote a SQL identifier — only `[A-Za-z0-9_]` allowed. */
+/** Quote a SQL identifier - only `[A-Za-z0-9_]` allowed. */
 function quoteIdent(ident: string): string {
   if (!/^[A-Za-z0-9_]+$/.test(ident)) {
     throw new Error(`[graphorin/store-sqlite] invalid SQL identifier: ${ident}`);

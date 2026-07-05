@@ -1,5 +1,5 @@
 /**
- * @graphorin/security — security primitives for the Graphorin
+ * @graphorin/security - security primitives for the Graphorin
  * framework. Ships the `SecretValue` runtime-safe wrapper, the strict
  * `SecretRef` URI parser, four `SecretsStore` implementations, the
  * pluggable resolver registry, the per-tool ACL primitives, the
@@ -17,7 +17,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './audit/index.js';
 export * from './auth/index.js';

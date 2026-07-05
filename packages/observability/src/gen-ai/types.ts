@@ -109,7 +109,7 @@ export interface GenAIMessage {
 /**
  * Per-span attribute payload expected by {@link emitGenAIAttributes}.
  * The fields mirror the OpenTelemetry GenAI semantic conventions and
- * are merged with the existing Graphorin-prefixed attributes — the
+ * are merged with the existing Graphorin-prefixed attributes - the
  * `gen_ai.*` family is additive, never replacing.
  *
  * @stable

@@ -3,7 +3,7 @@
  *
  * The on-disk shape carries an explicit `version` field so future
  * schema bumps can detect older payloads. v0.1 ships
- * `'graphorin-run-state/1.0'` — additive fields that older readers
+ * `'graphorin-run-state/1.0'` - additive fields that older readers
  * do not understand are ignored under the lenient-forward-parse
  * discipline.
  *
@@ -80,8 +80,8 @@ export interface SerializeRunStateOptions {
   /**
    * Deep-redact secret-named keys (`apiKey`, `authorization`,
    * `bearerToken` / `accessToken` / `refreshToken`, `password`,
-   * `secret`, …) anywhere in the snapshot — tool results and messages
-   * included — replacing their values with `'[redacted]'`. Defaults to
+   * `secret`, …) anywhere in the snapshot - tool results and messages
+   * included - replacing their values with `'[redacted]'`. Defaults to
    * `false` for the round-trip canonical helper; the agent runtime
    * passes `true` when persisting through the checkpoint store
    * (AG-23). Redaction is best-effort by key name: secrets stored
@@ -121,7 +121,7 @@ export function serializeRunState(
     ...(state.finishedAt !== undefined ? { finishedAt: state.finishedAt } : {}),
     ...(state.error !== undefined ? { error: state.error } : {}),
   };
-  // AG-23: the snapshot must be DETACHED from the live MutableRunState —
+  // AG-23: the snapshot must be DETACHED from the live MutableRunState -
   // a post-suspend mutation must never reach an already-persisted
   // checkpoint. The JSON round-trip doubles as the plain-JSON guarantee
   // this function documents (no Map/Set/Date survive it).
@@ -148,7 +148,7 @@ function redactSecretKeysInPlace(value: unknown): void {
     return;
   }
   const record = value as Record<string, unknown>;
-  // Tool messages embed the tool output as a JSON STRING in `content` —
+  // Tool messages embed the tool output as a JSON STRING in `content` -
   // parse, redact, and re-stringify so a secret inside the string form
   // is caught too.
   if (record.role === 'tool' && typeof record.content === 'string') {
@@ -176,7 +176,7 @@ function redactJsonString(content: string): string {
 
 /**
  * Render the canonical JSON string representation of the supplied
- * {@link RunState}. `JSON.stringify(serializeRunState(state))` —
+ * {@link RunState}. `JSON.stringify(serializeRunState(state))` -
  * provided as a convenience.
  *
  * @stable
@@ -435,7 +435,7 @@ export function createInitialRunState(args: {
 
 /**
  * Append a per-model usage entry to {@link RunState.usageByModel}.
- * Mutates the supplied state in place — used by the agent runtime's
+ * Mutates the supplied state in place - used by the agent runtime's
  * per-step retry loop. Pure callers that need an immutable update
  * should clone the state first.
  *
@@ -469,7 +469,7 @@ export function addModelUsage(state: RunState, modelId: string, delta: Usage): v
       }
     : { ...delta, attemptCount: 1 };
   current[modelId] = merged;
-  // Mutate via the writable typing — `usageByModel` is declared
+  // Mutate via the writable typing - `usageByModel` is declared
   // optional; the runtime owns the field's lifecycle.
   (state as { usageByModel?: RunStateUsageByModel }).usageByModel = current;
 }

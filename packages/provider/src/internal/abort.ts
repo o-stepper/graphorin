@@ -2,7 +2,7 @@
  * Abort detection shared by the retry / fallback predicates (PS-2).
  *
  * A network failure surfaces as `ProviderHttpError{ status: 0, cause }`,
- * and a user/agent abort surfaces the same way — the distinguishing
+ * and a user/agent abort surfaces the same way - the distinguishing
  * signal is an `AbortError` (DOMException) somewhere on the `cause`
  * chain. Network errors should be retried and failed over; an abort must
  * not be, even though the retry/fallback loops also short-circuit on
@@ -12,7 +12,7 @@
  */
 
 /**
- * True when `err` — or any error on its `cause` chain — is an abort
+ * True when `err` - or any error on its `cause` chain - is an abort
  * (`name === 'AbortError'` or Node's `code === 'ABORT_ERR'`). Walks at
  * most a few links so a cyclic / pathological cause chain cannot loop.
  *

@@ -3,7 +3,7 @@
  *
  * `ToolDefinition` already carries `examples` on the wire (the agent projects
  * them from `Tool.examples`), and the contract notes implementations MAY fold
- * them into the description — but no adapter did, so the model never saw them.
+ * them into the description - but no adapter did, so the model never saw them.
  * Anthropic reports complex-parameter accuracy jumps 72% → 90% with worked
  * examples in the tool text. This renders them deterministically (so the tool
  * spec stays prompt-cache-stable) and drops the now-redundant structured field.
@@ -25,7 +25,7 @@ function renderExamplesSection(examples: ReadonlyArray<ToolDefinitionExample>): 
 /**
  * Fold each tool's `examples` into its `description` and drop the structured
  * field. Non-destructive: a tool with no examples is returned by reference, and
- * the whole array is returned unchanged (same reference) when nothing folds — so
+ * the whole array is returned unchanged (same reference) when nothing folds - so
  * callers can cheaply detect a no-op.
  */
 export function foldToolExamples(
@@ -42,7 +42,7 @@ export function foldToolExamples(
         ? `${tool.description}\n\n${section}`
         : section;
     // Rebuild without `examples` (now in the description text), preserving every
-    // other field — notably `outputSchema` (A5).
+    // other field - notably `outputSchema` (A5).
     return {
       name: tool.name,
       inputSchema: tool.inputSchema,

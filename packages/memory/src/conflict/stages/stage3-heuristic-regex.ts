@@ -1,5 +1,5 @@
 /**
- * Stage 3 — Heuristic regex (per-locale, pluggable).
+ * Stage 3 - Heuristic regex (per-locale, pluggable).
  *
  * Inspects the candidate fact body for explicit supersede or negation
  * markers from the active locale pack (English by default). When a

@@ -98,7 +98,7 @@ describe('createDefaultCounter', () => {
     expect(createDefaultCounter({ model: 'mystery' })).toBeInstanceOf(HeuristicCounter);
   });
 
-  // PS-20: the OpenAI fallback encoding must track the model family — gpt-4o /
+  // PS-20: the OpenAI fallback encoding must track the model family - gpt-4o /
   // gpt-4.1 / gpt-5+ / o-series use o200k_base; legacy gpt-4 / gpt-3.5 stay on
   // cl100k_base. The counter's `version` carries the resolved encoding.
   it.each([

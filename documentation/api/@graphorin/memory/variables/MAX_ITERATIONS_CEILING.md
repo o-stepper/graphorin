@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,5 +13,5 @@ const MAX_ITERATIONS_CEILING: 5 = 5;
 Defined in: packages/memory/src/search/iterative.ts:45
 
 Absolute clamp on total retrieval passes, applied regardless of the
-caller's `maxIterations` — a latency guardrail so a mis-configured
+caller's `maxIterations` - a latency guardrail so a mis-configured
 caller can never unbound the loop.

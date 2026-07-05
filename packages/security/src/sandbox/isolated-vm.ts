@@ -1,5 +1,5 @@
 /**
- * `IsolatedVMSandbox` — opt-in adapter that runs `code.kind === 'source'`
+ * `IsolatedVMSandbox` - opt-in adapter that runs `code.kind === 'source'`
  * inside a fresh V8 isolate via the optional `isolated-vm` peer
  * dependency. The adapter offers stronger isolation than
  * `WorkerThreadsSandbox` at the cost of a more demanding install
@@ -195,7 +195,7 @@ export function createIsolatedVMSandbox(opts: IsolatedVMSandboxOptions = {}): Sa
         try {
           script?.release();
         } catch {
-          /* noop — best effort cleanup */
+          /* noop - best effort cleanup */
         }
         try {
           context?.release();

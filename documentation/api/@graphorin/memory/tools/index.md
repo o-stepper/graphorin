@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -7,7 +7,7 @@
 # tools
 
 Eleven memory tools registered with `@graphorin/tools` by the
-`createMemory()` facade — plus an opt-in twelfth, `deep_recall` (P2-4),
+`createMemory()` facade - plus an opt-in twelfth, `deep_recall` (P2-4),
 appended only when iterative retrieval is configured. Each factory
 takes a [MemoryToolDeps](/api/@graphorin/memory/interfaces/MemoryToolDeps.md) bundle so consumers can scope the tool
 surface (per-tier ACL, scope resolver, etc.) without rebuilding the
@@ -23,8 +23,8 @@ underlying memory facade.
 
 | Function | Description |
 | ------ | ------ |
-| [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical eleven-memory-tool array. Order is stable — consumers can rely on the indices for snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are appended last so the original nine indices are unchanged. With `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is appended as a twelfth, after the stable eleven. |
-| [createRunbookSearchTool](/api/@graphorin/memory/tools/functions/createRunbookSearchTool.md) | `runbook_search` — find validated procedures matching a task description. Quarantined (unvalidated induced) procedures never surface here: they must not drive actions until validated. |
+| [buildMemoryTools](/api/@graphorin/memory/tools/functions/buildMemoryTools.md) | Build the canonical eleven-memory-tool array. Order is stable - consumers can rely on the indices for snapshot tests. `fact_history` (P0-2) and `fact_validate` (P1-4) are appended last so the original nine indices are unchanged. With `{ includeDeepRecall: true }` the gated `deep_recall` tool (P2-4) is appended as a twelfth, after the stable eleven. |
+| [createRunbookSearchTool](/api/@graphorin/memory/tools/functions/createRunbookSearchTool.md) | `runbook_search` - find validated procedures matching a task description. Quarantined (unvalidated induced) procedures never surface here: they must not drive actions until validated. |
 
 ## References
 

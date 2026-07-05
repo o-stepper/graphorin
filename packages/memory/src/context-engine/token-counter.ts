@@ -5,7 +5,7 @@
  * `@graphorin/provider`); the fallback path is a deterministic
  * heuristic that keeps unit tests dependency-free.
  *
- * The fallback counts ~1 token per 4 characters — close enough for
+ * The fallback counts ~1 token per 4 characters - close enough for
  * budgeting decisions, intentionally less precise than a real BPE
  * tokenizer. Production deployments wire a real
  * {@link TokenCounter} through `createMemory({ contextEngine: {
@@ -20,7 +20,7 @@ import type { Message, TokenCounter } from '@graphorin/core';
  * Pluggable text-token counter used inside the ContextEngine. The
  * surface is narrower than {@link TokenCounter} because the engine
  * never assembles a message list during the budget-allocation
- * phase — it operates on rendered text fragments.
+ * phase - it operates on rendered text fragments.
  *
  * @stable
  */
@@ -31,12 +31,12 @@ export interface ContextTokenCounter {
 
 /**
  * Script-aware heuristic (CE-13). The flat chars/4 rule undercounts
- * non-Latin scripts ~4x — real tokenizers emit roughly one token per
+ * non-Latin scripts ~4x - real tokenizers emit roughly one token per
  * CJK character (and per kana / hangul syllable), so a 200k-window
  * threshold expressed in "heuristic tokens" let CJK conversations blow
  * past the provider limit before compaction ever fired. Characters
  * outside the Latin-ish range count at one token each; Latin text keeps
- * the classic chars/4. Still a heuristic — wire a real `TokenCounter`
+ * the classic chars/4. Still a heuristic - wire a real `TokenCounter`
  * (e.g. the provider package's JsTiktokenCounter) for production
  * accuracy.
  */
@@ -45,7 +45,7 @@ const DENSE_SCRIPT_RE =
   /[ᄀ-ᇿ⺀-〿぀-ヿ㄰-㆏ㇰ-䶿一-鿿ꥠ-꥿가-퟿豈-﫿＀-￯]/g;
 
 /**
- * Built-in heuristic counter — chars/4 for Latin-ish text plus one
+ * Built-in heuristic counter - chars/4 for Latin-ish text plus one
  * token per dense-script (CJK/kana/hangul) character (CE-13). Stable
  * default when the operator does not pass a real {@link TokenCounter}.
  *
@@ -63,7 +63,7 @@ export const HEURISTIC_TOKEN_COUNTER: ContextTokenCounter = Object.freeze({
 
 /**
  * Wrap a real {@link TokenCounter} into the narrower
- * {@link ContextTokenCounter} surface — PRESERVING the native
+ * {@link ContextTokenCounter} surface - PRESERVING the native
  * message-level `count(messages)` (context-engine-03). The adapter
  * used to keep only `countText`, which forced
  * {@link countMessageTokens} onto the per-message render path for
@@ -113,7 +113,7 @@ export async function countMessageTokens(
  * for token counting. Multimodal parts other than `'text'` /
  * `'reasoning'` contribute a constant approximation so the counter
  * does not silently under-count. Assistant tool calls render their
- * name + serialized args (context-engine-03) — file writes and
+ * name + serialized args (context-engine-03) - file writes and
  * `code_execute` scripts are frequently the dominant tokens of an
  * agentic step, and the provider serializes + counts them, so the
  * engine's arithmetic must too (mirrors the provider-side

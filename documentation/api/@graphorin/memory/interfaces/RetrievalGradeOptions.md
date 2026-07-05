@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,4 +17,4 @@ Per-call options for a [RetrievalGrader](/api/@graphorin/memory/interfaces/Retri
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Cancellation signal forwarded to the underlying provider call. | packages/memory/src/search/iterative.ts:187 |
-| <a id="property-triedqueries"></a> `triedQueries?` | `readonly` | readonly `string`[] | Reformulations already attempted (MRET-11). Surfaced to the grader as context so it can propose something genuinely new — the grade itself is ALWAYS judged against the original question, never a reformulation (a narrowed sub-query must not be declared "sufficient" while the original multi-hop question is not). | packages/memory/src/search/iterative.ts:195 |
+| <a id="property-triedqueries"></a> `triedQueries?` | `readonly` | readonly `string`[] | Reformulations already attempted (MRET-11). Surfaced to the grader as context so it can propose something genuinely new - the grade itself is ALWAYS judged against the original question, never a reformulation (a narrowed sub-query must not be declared "sufficient" while the original multi-hop question is not). | packages/memory/src/search/iterative.ts:195 |

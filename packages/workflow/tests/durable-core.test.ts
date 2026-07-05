@@ -1,5 +1,5 @@
 /**
- * WF-16: adversarial specs for the durable-engine failure modes — each
+ * WF-16: adversarial specs for the durable-engine failure modes - each
  * written as the regression spec for its finding (WF-1/2/3/8/9/12/14)
  * and RED on the pre-fix engine.
  */
@@ -25,7 +25,7 @@ interface S {
   second?: string;
 }
 
-describe('WF-1 — the resumable frontier survives suspension', () => {
+describe('WF-1 - the resumable frontier survives suspension', () => {
   it('a sibling that COMPLETED while another paused still fires its edges after resume', async () => {
     const ran: string[] = [];
     const store = new InMemoryCheckpointStore();
@@ -168,7 +168,7 @@ describe('WF-1 — the resumable frontier survives suspension', () => {
   });
 });
 
-describe('WF-2 — two sequential pause() calls in ONE node body', () => {
+describe('WF-2 - two sequential pause() calls in ONE node body', () => {
   it('completes over two resumes with correct value delivery', async () => {
     const store = new InMemoryCheckpointStore();
     const build = () =>
@@ -203,7 +203,7 @@ describe('WF-2 — two sequential pause() calls in ONE node body', () => {
     const end = run3.at(-1);
     expect(end?.type).toBe('workflow.end');
     if (end?.type === 'workflow.end') {
-      // WF-2: value #1 reaches pause #1, value #2 reaches pause #2 — the
+      // WF-2: value #1 reaches pause #1, value #2 reaches pause #2 - the
       // old single-slot scope delivered 'beta' to pause #1 forever.
       expect(end.state.decision).toBe('alpha');
       expect(end.state.second).toBe('beta');
@@ -211,7 +211,7 @@ describe('WF-2 — two sequential pause() calls in ONE node body', () => {
   });
 });
 
-describe('WF-3 — crash recovery + aborted status', () => {
+describe('WF-3 - crash recovery + aborted status', () => {
   it("a thread whose last checkpoint is 'running' (simulated crash) resumes from it", async () => {
     const ran: string[] = [];
     const store = new InMemoryCheckpointStore();
@@ -252,7 +252,7 @@ describe('WF-3 — crash recovery + aborted status', () => {
       if (n.done) break;
       if (n.value.type === 'workflow.step.end' && ran.includes('A')) break;
     }
-    // The iterator is abandoned mid-run — the latest checkpoint is 'running'.
+    // The iterator is abandoned mid-run - the latest checkpoint is 'running'.
     await it1.return?.(undefined as never);
 
     const resumed = await collect(build(false).resume('cr-1'));
@@ -310,7 +310,7 @@ describe('WF-3 — crash recovery + aborted status', () => {
     const retried = await collect(wf2.retry('rt-1'));
     const end = retried.at(-1);
     expect(end?.type).toBe('workflow.end');
-    // WF-3/WF-6: the successful sibling did NOT re-run — its persisted
+    // WF-3/WF-6: the successful sibling did NOT re-run - its persisted
     // pendingWrites were replayed instead.
     expect(ran.filter((r) => r === 'good').length).toBe(goodRuns);
     expect(ran.filter((r) => r === 'flaky').length).toBe(2);
@@ -349,7 +349,7 @@ describe('WF-3 — crash recovery + aborted status', () => {
   });
 });
 
-describe('WF-12 — double-resume of one suspended thread', () => {
+describe('WF-12 - double-resume of one suspended thread', () => {
   it('exactly one of two racing resumes wins; the loser gets checkpoint-version-conflict', async () => {
     const store = new InMemoryCheckpointStore();
     const build = () =>
@@ -397,7 +397,7 @@ describe('WF-12 — double-resume of one suspended thread', () => {
   });
 });
 
-describe('WF-12 — concurrent execute() on one threadId', () => {
+describe('WF-12 - concurrent execute() on one threadId', () => {
   it('exactly one of two racing executes completes; the loser gets checkpoint-version-conflict', async () => {
     const store = new InMemoryCheckpointStore();
     const build = () =>
@@ -437,7 +437,7 @@ describe('WF-12 — concurrent execute() on one threadId', () => {
   });
 });
 
-describe('WF-9 — ctx.state is a real frozen snapshot', () => {
+describe('WF-9 - ctx.state is a real frozen snapshot', () => {
   it('a node mutating ctx.state cannot corrupt siblings or the checkpoint', async () => {
     const store = new InMemoryCheckpointStore();
     const seen: Array<string[] | undefined> = [];
@@ -476,7 +476,7 @@ describe('WF-9 — ctx.state is a real frozen snapshot', () => {
   });
 });
 
-describe('WF-14 — dead ends are errors, not silent completions', () => {
+describe('WF-14 - dead ends are errors, not silent completions', () => {
   it('an all-false conditional fan reports a dead end instead of completing', async () => {
     const store = new InMemoryCheckpointStore();
     const wf = createWorkflow<S>({

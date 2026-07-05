@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -30,7 +30,7 @@ create(args): Promise<Session>;
 Defined in: packages/sessions/src/facade.ts:302
 
 Create a fresh session. The optional `commentaryPolicy` overrides
-the manager-level default just for this session — useful for
+the manager-level default just for this session - useful for
 deployments that pin a stricter posture per-conversation (e.g.
 `'strip'` for compliance-sensitive sessions while everything else
 uses the `'wrap'` default).

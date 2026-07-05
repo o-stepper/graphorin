@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/tiers/semantic-memory.ts:396
 
-`SemanticMemory` — long-term factual store. Hybrid (vector + FTS5)
+`SemanticMemory` - long-term factual store. Hybrid (vector + FTS5)
 search merges the two ranked lists through the configured
 [ReRanker](/api/@graphorin/memory/interfaces/ReRanker.md) (default [RRFReranker](/api/@graphorin/memory/classes/RRFReranker.md) with `k = 60`).
 
@@ -36,7 +36,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:410
 | ------ | ------ | ------ |
 | `args` | \{ `conflictPipeline?`: [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md); `contextualRetrieval?`: `"off"` \| `"late-chunk"`; `embedder`: \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null`; `embedderIdProvider`: () => `string` \| `null`; `entityResolver?`: [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md); `grader?`: [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md); `iterativeMaxIterations?`: `number`; `queryTransformer?`: [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md); `reranker`: [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md); `store`: [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md); `tracer`: [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md); `trustWeights?`: `SalienceWeights`; \} | - |
 | `args.conflictPipeline?` | [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md) | - |
-| `args.contextualRetrieval?` | `"off"` \| `"late-chunk"` | Contextual-retrieval mode for the write path (P1-3). `'late-chunk'` (default) prepends a deterministic situating context to the text that is embedded + FTS-indexed, leaving the canonical `text` untouched; `'off'` indexes the bare text. The hot write path never makes an LLM call — the `'llm'` enrichment is confined to the background consolidator, which supplies a precomputed `indexText`. |
+| `args.contextualRetrieval?` | `"off"` \| `"late-chunk"` | Contextual-retrieval mode for the write path (P1-3). `'late-chunk'` (default) prepends a deterministic situating context to the text that is embedded + FTS-indexed, leaving the canonical `text` untouched; `'off'` indexes the bare text. The hot write path never makes an LLM call - the `'llm'` enrichment is confined to the background consolidator, which supplies a precomputed `indexText`. |
 | `args.embedder` | \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null` | - |
 | `args.embedderIdProvider` | () => `string` \| `null` | - |
 | `args.entityResolver?` | [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md) | Entity resolver for the relation graph (P2-1). When supplied, `remember(...)` resolves a fact's subject / object to canonical entities and links them, enabling `search(..., { expandHops: 1 })`. Omitted (the default) ⇒ writes carry s/p/o but form no entity links, and the write path stays offline + unchanged. |
@@ -145,7 +145,7 @@ Return the full bi-temporal supersede chain that `factId` belongs
 to, oldest → newest, including superseded / soft-deleted rows so
 callers can answer "how did this fact change over time". Requires
 a storage adapter that implements
-`SemanticMemoryStoreExt.historyOf(...)` — the default
+`SemanticMemoryStoreExt.historyOf(...)` - the default
 `@graphorin/store-sqlite` adapter wires this through. P0-2.
 
 #### Parameters
@@ -180,7 +180,7 @@ and decay so the cosine scores survive intact (the conflict-pipeline
 zone thresholds are calibrated against them), and it **includes
 quarantined facts** so prior synthesized memories are visible to
 reconciliation. Returns `[]` when no embedder / vector adapter is
-configured — the consolidator then treats every candidate as a
+configured - the consolidator then treats every candidate as a
 fresh `add`, degrading gracefully to the pre-reconcile behaviour.
 
 #### Parameters
@@ -214,7 +214,7 @@ Defined in: packages/memory/src/tiers/semantic-memory.ts:1183
 Hard-delete a fact (GDPR path). Distinct from [forget](/api/@graphorin/memory/classes/SemanticMemory.md#forget): the
 record is removed from storage entirely instead of soft-archived.
 Requires a storage adapter that implements
-`SemanticMemoryStoreExt.purge(...)` — the default
+`SemanticMemoryStoreExt.purge(...)` - the default
 `@graphorin/store-sqlite` adapter wires this through.
 
 #### Parameters
@@ -354,8 +354,8 @@ query is even a loop candidate; simple lookups take exactly one
 hard *and* with a grader configured
 (`createMemory({ iterativeRetrieval })`), the retrieved set is graded
 for sufficiency and, when weak, the query is reformulated and
-retrieved again — **widening to one-hop graph expansion**
-(`expandHops: 1`) on each reformulation pass — up to `maxIterations`
+retrieved again - **widening to one-hop graph expansion**
+(`expandHops: 1`) on each reformulation pass - up to `maxIterations`
 (hard-capped at 5). When still insufficient it returns
 `abstained: true` so the caller can decline to answer instead of
 confabulating.
@@ -452,12 +452,12 @@ Promote a quarantined fact to `active` (P1-4). The validation path
 that admits a synthesized memory into action-driving recall once a
 human (or trusted non-agent caller) has reviewed it. Writes a
 `memory_history` audit row. Requires a storage adapter that
-implements `SemanticMemoryStoreExt.setStatus(...)` — the default
+implements `SemanticMemoryStoreExt.setStatus(...)` - the default
 `@graphorin/store-sqlite` adapter wires this through.
 
 MRET-3 / MST-1: promotion of a fact whose text still trips the
 offline injection heuristics is **refused** with
-[QuarantinePromotionRefusedError](/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md) — the model-facing
+[QuarantinePromotionRefusedError](/api/@graphorin/memory/errors/classes/QuarantinePromotionRefusedError.md) - the model-facing
 `fact_validate` tool calls this with no `force`, so a poisoned
 memory can never be promoted by the agent itself (the one-turn
 `fact_remember(poison)` → `fact_validate(id)` chain is closed). An
@@ -491,7 +491,7 @@ static fuseRrf<TRecord>(lists, k?): readonly MemoryHit<TRecord>[];
 
 Defined in: packages/memory/src/tiers/semantic-memory.ts:1211
 
-Pure-fusion helper — exposed for callers that already collected results.
+Pure-fusion helper - exposed for callers that already collected results.
 
 #### Type Parameters
 
@@ -523,7 +523,7 @@ static fuseWeighted<TRecord>(
 
 Defined in: packages/memory/src/tiers/semantic-memory.ts:1224
 
-Pure weighted-fusion helper (X-2) — like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
+Pure weighted-fusion helper (X-2) - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by
 `weights[i]`. A missing / invalid entry defaults to `1`, so equal or
 absent weights reproduce RRF.

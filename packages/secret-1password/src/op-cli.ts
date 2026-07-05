@@ -4,7 +4,7 @@
  * errors for the most common operator-fixable failure modes.
  *
  * The wrapper is split out so the resolver can be unit-tested without
- * touching the real `op` binary — tests inject a stub `OpCli`
+ * touching the real `op` binary - tests inject a stub `OpCli`
  * implementation through {@link createOnePasswordResolver}.
  *
  * @packageDocumentation

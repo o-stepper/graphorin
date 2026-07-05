@@ -7,7 +7,7 @@ import { SecretValue } from '../../src/secrets/secret-value.js';
 
 import { createMemoryAuthTokenStore } from './_helpers.js';
 
-describe('@graphorin/security/auth — verify pipeline', () => {
+describe('@graphorin/security/auth - verify pipeline', () => {
   it('rejects a malformed token without touching the store', async () => {
     const tokenStore = createMemoryAuthTokenStore();
     let listed = 0;
@@ -290,7 +290,7 @@ describe('@graphorin/security/auth — verify pipeline', () => {
   });
 
   it('uses the pepper as a SecretValue without leaking it', async () => {
-    // SPL-11: 'a'.repeat(32) is now refused as a placeholder — use a
+    // SPL-11: 'a'.repeat(32) is now refused as a placeholder - use a
     // realistic high-entropy pepper.
     const pepper = SecretValue.fromString('vRq8sJ2mKx0aZpW4uTn7eYb5cHd9fLg1');
     const tokenStore = createMemoryAuthTokenStore();
@@ -307,9 +307,9 @@ describe('@graphorin/security/auth — verify pipeline', () => {
   });
 });
 
-// --- SPL-19 — scale traps -------------------------------------------------------
+// --- SPL-19 - scale traps -------------------------------------------------------
 
-describe('SPL-19 — verifier scale behaviour', () => {
+describe('SPL-19 - verifier scale behaviour', () => {
   it('uses getByHash on cache-miss instead of walking list()', async () => {
     const pepper = SecretValue.fromString('vRq8sJ2mKx0aZpW4uTn7eYb5cHd9fLg1');
     const inner = createMemoryAuthTokenStore();

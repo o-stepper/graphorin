@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/memory/src/errors/index.ts:258
 
 Raised when ProceduralMemory.induce (P2-2) is called but no
 workflow inducer was configured. Induction abstracts concrete values into
-variables, which needs a provider — so the capability is opt-in and the
+variables, which needs a provider - so the capability is opt-in and the
 default (offline) procedural tier never silently no-ops a requested
 induction.
 

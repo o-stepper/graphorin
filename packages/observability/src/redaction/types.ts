@@ -13,7 +13,7 @@ export type { RedactionInput, RedactionOutput, RedactionValidator } from '@graph
 /**
  * Optional sink invoked every time the validator drops a value or
  * masks a pattern. Useful for emitting custom metrics, audit entries,
- * or alert hooks. The callback receives only sanitized data — secret
+ * or alert hooks. The callback receives only sanitized data - secret
  * values are never forwarded.
  *
  * @stable

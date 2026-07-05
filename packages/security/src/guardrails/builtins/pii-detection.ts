@@ -1,5 +1,5 @@
 /**
- * `piiDetection` — block / rewrite when the value contains common PII
+ * `piiDetection` - block / rewrite when the value contains common PII
  * patterns. The default catalogue covers email, credit card (Luhn),
  * IBAN, US SSN, US phone, and Bitcoin address shapes; it is not
  * exhaustive and is intentionally English-locale-friendly. The
@@ -187,7 +187,7 @@ export function piiDetection<TValue = unknown>(
         ok: false,
         action,
         message: `value contains ${matchedKinds.length} PII match(es): ${[...new Set(matchedKinds)].join(', ')}`,
-        // SDF-6 invariant: a rewrite is never the unredacted input —
+        // SDF-6 invariant: a rewrite is never the unredacted input -
         // string leaves with matches were replaced above for every
         // value shape (string, array, object).
         ...(action === 'rewrite' ? { rewrite: redacted as TValue } : {}),

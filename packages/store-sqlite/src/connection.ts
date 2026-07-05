@@ -207,7 +207,7 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
   const db = new Ctor(absolutePath);
 
   if (resolvedEncryption.enabled && cipherPassphrase !== undefined) {
-    // CS-7: pin the cipher BEFORE `PRAGMA key` — sqlite3mc defaults to
+    // CS-7: pin the cipher BEFORE `PRAGMA key` - sqlite3mc defaults to
     // chacha20, so a SQLCipher-v4 database opened with `key` alone
     // reads garbage. The selection pragmas are a no-op on the stub
     // driver and on databases already using the peer default.
@@ -266,10 +266,10 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
     transaction<T>(fn: () => T): T {
       // store-06: write transactions BEGIN IMMEDIATE. Every
       // `.transaction(...)` caller in this package bundles writes
-      // (several read-then-write — session push, supersede, graph
+      // (several read-then-write - session push, supersede, graph
       // upsert), and under WAL a DEFERRED transaction that reads first
       // and then upgrades fails with SQLITE_BUSY_SNAPSHOT when another
-      // process (server + CLI on one db) commits in between —
+      // process (server + CLI on one db) commits in between -
       // `busy_timeout` does not retry that case. IMMEDIATE takes the
       // write lock up front, so the busy handler waits instead.
       const wrapped = db.transaction(fn as (...args: unknown[]) => unknown);
@@ -308,7 +308,7 @@ export function readWalSize(conn: SqliteConnection): number {
   const result = conn.pragma('wal_checkpoint(PASSIVE)') as
     | ReadonlyArray<{ busy: number; log: number; checkpointed: number }>
     | undefined;
-  // The `log` column returns the number of WAL pages — convert to bytes.
+  // The `log` column returns the number of WAL pages - convert to bytes.
   const pages = result?.[0]?.log ?? 0;
   const pageSize = (conn.pragma('page_size', { simple: true }) as number) ?? 4096;
   return pages * pageSize;

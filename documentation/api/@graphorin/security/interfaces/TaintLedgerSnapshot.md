@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/dataflow/types.ts:160
 
-Serializable coarse summary of a [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md) — the trifecta-gate
+Serializable coarse summary of a [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md) - the trifecta-gate
 flags only. Round-trips through `createTaintLedger({ initial })`. Carries no
 untrusted text content, so it is safe to persist in a `RunState`.
 

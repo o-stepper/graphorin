@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -102,7 +102,7 @@ optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMeta
 Defined in: packages/sessions/src/facade.ts:91
 
 List messages with their persisted identity (RP-5): the stored message id,
-sequence, and `createdAt`. Optional — when absent, export falls back to
+sequence, and `createdAt`. Optional - when absent, export falls back to
 fabricating those fields (the legacy behaviour). Implemented by
 `@graphorin/memory.session` over the store's real rows.
 

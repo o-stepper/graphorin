@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/core/src/contracts/oauth-server-store.ts:12
 
 Persisted metadata for an OAuth server registration. The framework
-never stores raw token material here — the access, refresh, id, and
+never stores raw token material here - the access, refresh, id, and
 client-secret tokens live in the [SecretsStore](/api/@graphorin/core/interfaces/SecretsStore.md) and this
 record only holds the [SecretRef](/api/@graphorin/core/interfaces/SecretRef.md) URIs that resolve them.
 

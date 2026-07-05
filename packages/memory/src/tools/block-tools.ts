@@ -41,7 +41,7 @@ type BlockRethinkInput = z.infer<typeof blockRethinkInputSchema>;
 type BlockRethinkOutput = z.infer<typeof blockRethinkOutputSchema>;
 
 /**
- * `block_append` — append text (with a newline separator) to a working
+ * `block_append` - append text (with a newline separator) to a working
  * memory block.
  *
  * @stable
@@ -69,7 +69,7 @@ export function createBlockAppendTool(
 }
 
 /**
- * `block_replace` — replace a unique substring inside a working
+ * `block_replace` - replace a unique substring inside a working
  * memory block. Throws when the substring is missing or appears more
  * than once.
  *
@@ -98,7 +98,7 @@ export function createBlockReplaceTool(
 }
 
 /**
- * `block_rethink` — rewrite a working memory block from scratch.
+ * `block_rethink` - rewrite a working memory block from scratch.
  *
  * @stable
  */

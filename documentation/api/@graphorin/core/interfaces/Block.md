@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/types/memory.ts:124
 
-Working-memory block — a labeled, char-bounded slot rendered into the
+Working-memory block - a labeled, char-bounded slot rendered into the
 system prompt every turn.
 
 ## Stable

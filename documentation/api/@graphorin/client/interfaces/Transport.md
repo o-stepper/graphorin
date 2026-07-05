@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -55,7 +55,7 @@ Defined in: packages/client/src/transport/types.ts:102
 Send a client → server frame. Throws when the transport is not
 in the open state, or when the underlying back-end does not
 support send (the SSE transport throws every send via
-import('../errors.js').TransportFailedError — clients
+import('../errors.js').TransportFailedError - clients
 should fall back to REST for control-plane operations on SSE).
 
 #### Parameters

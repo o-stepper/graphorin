@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -40,7 +40,7 @@ opts?): AsyncIterable<WorkflowEvent<TState>>;
 
 Defined in: packages/workflow/src/types.ts:458
 
-Resolve a named persisted approval (D1) — sugar over
+Resolve a named persisted approval (D1) - sugar over
 [resolveAwakeable](/api/@graphorin/workflow/interfaces/Workflow.md#resolveawakeable) for `requestApproval(name)` suspensions.
 
 #### Parameters

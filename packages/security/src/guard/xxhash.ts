@@ -3,7 +3,7 @@
  *
  * The implementation is re-exported verbatim from
  * `@graphorin/core`'s pure-JS XXH32 helper. xxhash is **not**
- * collision-resistant — it is the integrity hash for the guard, not
+ * collision-resistant - it is the integrity hash for the guard, not
  * for the audit log. The audit log uses SHA-256 (subsystem 03b).
  *
  * @packageDocumentation

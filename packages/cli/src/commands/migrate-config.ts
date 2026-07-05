@@ -1,5 +1,5 @@
 /**
- * `graphorin migrate-config <input>` — config-schema migration helper.
+ * `graphorin migrate-config <input>` - config-schema migration helper.
  *
  * v0.1 ships exactly one config schema; the migrator is therefore a
  * compatibility shell that round-trips the operator's config through
@@ -7,7 +7,7 @@
  * disk. Future MAJOR bumps replace this body with the rewriter that
  * upgrades old field shapes; the CLI surface stays the same.
  *
- * The output path is always derived from the input — `migrate-config`
+ * The output path is always derived from the input - `migrate-config`
  * writes `<input>.migrated` next to the source unless `--out` is
  * supplied. The original is never modified.
  *

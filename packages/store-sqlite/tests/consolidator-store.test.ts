@@ -60,7 +60,7 @@ describe('SqliteConsolidatorStateStore', () => {
     const scope = { userId: 'alex' };
     // Process A reads (lock free)… process B acquires… A patches an
     // UNRELATED field. Pre-fix A's read-merge-write wrote EVERY column
-    // back, silently reverting B's lock to NULL — two consolidator
+    // back, silently reverting B's lock to NULL - two consolidator
     // runs then raced.
     await asConsolidator(store).getState(scope);
     expect(await asConsolidator(store).acquireLock(scope, 'runner-b', 1_000, 60_000)).toBe(true);
@@ -114,7 +114,7 @@ describe('SqliteConsolidatorStateStore', () => {
     expect(runs[0]?.factsUpdated).toBe(1);
   });
 
-  it('manages the DLQ — enqueue / claim / reschedule / mark / exhaust', async () => {
+  it('manages the DLQ - enqueue / claim / reschedule / mark / exhaust', async () => {
     const scope = { userId: 'alex' };
     await asConsolidator(store).enqueueFailedBatch({
       id: 'b1',

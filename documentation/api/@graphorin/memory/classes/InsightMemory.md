@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/tiers/insight-memory.ts:49
 
-`InsightMemory` — list / search reflection insights. A no-op (returns
+`InsightMemory` - list / search reflection insights. A no-op (returns
 empty) when the storage adapter does not expose the optional
 `insights` surface.
 

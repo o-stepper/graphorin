@@ -35,7 +35,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Conflict pipeline.** The five-stage pipeline that decides whether a new fact dedups, supersedes, gets admitted as `pending`, or is admitted clean. Lives in `@graphorin/memory`.
 
-**Consolidator.** Background process that distils long conversations into long-term memory in three phases — light / standard / deep. Lives in `@graphorin/memory`.
+**Consolidator.** Background process that distils long conversations into long-term memory in three phases - light / standard / deep. Lives in `@graphorin/memory`.
 
 **Context engine.** The component that can assemble a memory-aware system prompt and drives auto-compaction. Today the agent runtime invokes it for **auto-compaction** only; the per-step prompt is built from the agent's `instructions`, and the model reaches memory through the memory tools it calls (`tools: memory.tools`).
 
@@ -57,11 +57,11 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **`Ephemeral`.** Channel descriptor whose value lives only for the current step. Lives in `@graphorin/core/channels`.
 
-**Episodic memory.** The "autobiography" tier — events, decisions, and milestones with bi-temporal validity.
+**Episodic memory.** The "autobiography" tier - events, decisions, and milestones with bi-temporal validity.
 
 ## F
 
-**Fan-out.** `agent.fanOut({...})` (a thin wrapper over the standalone `runFanOut(...)`) — agent-step-level parallelism with bounded concurrency, per-child budgets, and four built-in merge strategies (`'concat'`, `'first-success'`, `'judge-merge'`, `'custom'`).
+**Fan-out.** `agent.fanOut({...})` (a thin wrapper over the standalone `runFanOut(...)`) - agent-step-level parallelism with bounded concurrency, per-child budgets, and four built-in merge strategies (`'concat'`, `'first-success'`, `'judge-merge'`, `'custom'`).
 
 **Filter.** Serialisable transform applied to messages crossing a multi-agent handoff boundary. Lives in `@graphorin/agent`.
 
@@ -77,7 +77,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Insight.** Derived, higher-order memory synthesised by the consolidator's reflection pass from episodes + facts. Read-only (`memory.insights`); carries mandatory citations and is quarantined until validated.
 
-**Iterative retrieval.** A gated grade-then-reformulate recall loop (CRAG / Self-RAG) for hard multi-hop questions — `searchIterative(...)` and the opt-in `deep_recall` tool. Abstains rather than confabulating.
+**Iterative retrieval.** A gated grade-then-reformulate recall loop (CRAG / Self-RAG) for hard multi-hop questions - `searchIterative(...)` and the opt-in `deep_recall` tool. Abstains rather than confabulating.
 
 ## L
 
@@ -89,7 +89,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 ## M
 
-**MCP.** Model Context Protocol — a public protocol for tool / prompt / resource servers. Graphorin's client wraps `@modelcontextprotocol/sdk` over stdio and Streamable HTTP.
+**MCP.** Model Context Protocol - a public protocol for tool / prompt / resource servers. Graphorin's client wraps `@modelcontextprotocol/sdk` over stdio and Streamable HTTP.
 
 **Memory tier.** One of `working` / `session` / `episodic` / `semantic` / `procedural` / `shared`. Each has its own lifecycle and surface.
 
@@ -101,7 +101,7 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **`Provider`.** The single interface every LLM adapter implements. Lives in `@graphorin/provider`.
 
-**Procedural memory.** The "how-to" tier — workflows, recipes, learned patterns. Procedures can be authored (`define`) or **induced** from successful agent trajectories (AWM-style; `induce`), the latter quarantined until validated.
+**Procedural memory.** The "how-to" tier - workflows, recipes, learned patterns. Procedures can be authored (`define`) or **induced** from successful agent trajectories (AWM-style; `induce`), the latter quarantined until validated.
 
 **Progress artifact.** UTF-8 text artifact persisted via atomic-write `.tmp + rename` for cross-session continuity. Owned by `agent.progress`.
 
@@ -161,4 +161,4 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

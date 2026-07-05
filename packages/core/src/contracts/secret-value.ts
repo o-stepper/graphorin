@@ -27,7 +27,7 @@ export const NODEJS_INSPECT_CUSTOM: unique symbol = Symbol.for('nodejs.util.insp
  * a parameter as `SecretValue` therefore avoid taking a security
  * dependency.
  *
- * Note: `SecretValue` is **not** a TypeScript branded primitive — it is
+ * Note: `SecretValue` is **not** a TypeScript branded primitive - it is
  * a full wrapper class with explicit leakage barriers
  * (`Symbol.toPrimitive`, `toJSON`, `[nodejs.util.inspect.custom]`, …).
  * Any conforming implementation must ensure that:

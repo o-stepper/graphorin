@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ the JSONL session export. The shape is wire-stable.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-at"></a> `at` | `readonly` | `string` | - | packages/core/src/types/handoff.ts:86 |
 | <a id="property-fromagentid"></a> `fromAgentId` | `readonly` | `string` | - | packages/core/src/types/handoff.ts:83 |
-| <a id="property-inheritedsecrets"></a> `inheritedSecrets?` | `readonly` | readonly `string`[] | Keys inherited by the sub-agent under the `'inherit-allowlist'` / `'forward-explicit'` policies. Never the secret values themselves — only the public key names. | packages/core/src/types/handoff.ts:105 |
+| <a id="property-inheritedsecrets"></a> `inheritedSecrets?` | `readonly` | readonly `string`[] | Keys inherited by the sub-agent under the `'inherit-allowlist'` / `'forward-explicit'` policies. Never the secret values themselves - only the public key names. | packages/core/src/types/handoff.ts:105 |
 | <a id="property-inputfilter"></a> `inputFilter?` | `readonly` | [`HandoffInputFilterDescriptor`](/api/@graphorin/core/interfaces/HandoffInputFilterDescriptor.md) | Serializable input-filter descriptor applied at handoff time. When undefined the runtime defaults applied (commonly `compose(lastN(10), stripReasoning, stripSensitiveOutputs)`); the concrete filter implementations live in `@graphorin/agent`. | packages/core/src/types/handoff.ts:94 |
 | <a id="property-reason"></a> `reason?` | `readonly` | `string` | - | packages/core/src/types/handoff.ts:87 |
 | <a id="property-secretsinheritance"></a> `secretsInheritance?` | `readonly` | [`HandoffSecretsInheritance`](/api/@graphorin/core/type-aliases/HandoffSecretsInheritance.md) | Sub-agent secrets propagation policy. Defaults to `'inherit-allowlist'` with empty `inheritedSecrets`. | packages/core/src/types/handoff.ts:99 |

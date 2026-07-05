@@ -86,7 +86,7 @@ export interface CreateOAuthClientOptions {
    * Secrets store the actual tokens are persisted into (SPL-1). When
    * supplied, `persistSession` writes the access / refresh / id tokens
    * under the `oauth:<serverId>:<kind>` keys the record's refs point
-   * at, and refresh / revoke / status resolve them back — so sessions
+   * at, and refresh / revoke / status resolve them back - so sessions
    * survive process restarts. Without it, tokens live only in process
    * memory (the pre-SPL-1 behavior, documented).
    */
@@ -158,7 +158,7 @@ export interface OAuthSession {
 }
 
 /**
- * Audit-safe view of an OAuth session — never carries token material.
+ * Audit-safe view of an OAuth session - never carries token material.
  * Used by `listOAuthSessions(...)` and the `/v1/health/secrets`
  * surface (Phase 14a).
  *

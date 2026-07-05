@@ -1,5 +1,5 @@
 /**
- * C3 — agent harness quality:
+ * C3 - agent harness quality:
  * - tool errors reach the model with the typed kind + recovery envelope
  * - empty tool outputs are rendered as an explicit success marker
  * - the verifier seam feeds deterministic feedback back before completion
@@ -44,7 +44,7 @@ function finalState(events: AgentEvent[]) {
   return end.result;
 }
 
-describe('C3 — recovery envelope reaches the model', () => {
+describe('C3 - recovery envelope reaches the model', () => {
   it('renders kind + recoverable + suggested action into the tool error message', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -93,7 +93,7 @@ describe('C3 — recovery envelope reaches the model', () => {
   });
 });
 
-describe('C3 — verifier seam', () => {
+describe('C3 - verifier seam', () => {
   it('feeds failing-verifier feedback back and completes on the improved round', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -174,7 +174,7 @@ describe('C3 — verifier seam', () => {
   });
 });
 
-describe('C3 — provider-response journaling + deterministic replay', () => {
+describe('C3 - provider-response journaling + deterministic replay', () => {
   it('journals each step and replays the run without live calls', async () => {
     let toolRuns = 0;
     const tools = [

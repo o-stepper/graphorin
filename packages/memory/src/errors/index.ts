@@ -127,7 +127,7 @@ export class WorkingBlockReplaceMismatchError extends GraphorinMemoryError {
 /**
  * Thrown when any mutation targets a block defined with
  * `readOnly: true` (MRET-14). Previously this guard threw
- * `WorkingBlockReplaceMismatchError(label, 0)` — semantically "your
+ * `WorkingBlockReplaceMismatchError(label, 0)` - semantically "your
  * unique substring matched 0 times", which misled callers that retry
  * replace operations on mismatch.
  *
@@ -139,7 +139,7 @@ export class WorkingBlockReadOnlyError extends GraphorinMemoryError {
   readonly label: string;
 
   constructor(label: string) {
-    super(`[graphorin/memory] block '${label}' is read-only — mutations are not allowed.`, {
+    super(`[graphorin/memory] block '${label}' is read-only - mutations are not allowed.`, {
       hint: 'Define the block without readOnly, or write through an operator path that redefines it.',
     });
     this.label = label;
@@ -235,7 +235,7 @@ export class QuarantinePromotionRefusedError extends GraphorinMemoryError {
     super(
       `[graphorin/memory] refusing to promote fact '${factId}' out of quarantine: ` +
         `its text trips the injection heuristics (${markers.join(', ')}). ` +
-        'Promotion of an injection-flagged memory is an operator action — ' +
+        'Promotion of an injection-flagged memory is an operator action - ' +
         'pass `{ force: true }` to validate(...) from a trusted (non-agent) caller after review.',
       {
         hint: 'Review the quarantined fact, then promote it with validate(scope, id, reason, { force: true }) from an operator context.',
@@ -249,7 +249,7 @@ export class QuarantinePromotionRefusedError extends GraphorinMemoryError {
 /**
  * Raised when {@link ProceduralMemory.induce} (P2-2) is called but no
  * workflow inducer was configured. Induction abstracts concrete values into
- * variables, which needs a provider — so the capability is opt-in and the
+ * variables, which needs a provider - so the capability is opt-in and the
  * default (offline) procedural tier never silently no-ops a requested
  * induction.
  *

@@ -1,5 +1,5 @@
 /**
- * `listMissingModels(...)` — scan a sequence of trace spans and return
+ * `listMissingModels(...)` - scan a sequence of trace spans and return
  * the unique (provider, model) pairs that the snapshot does not
  * recognise.
  *

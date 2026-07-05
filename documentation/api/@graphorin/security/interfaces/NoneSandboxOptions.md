@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/security/src/sandbox/none.ts:48
 Options for `NoneSandbox`. Hosting code passes a registry of
 handlers; lookups are by `module + export` for `'handler'` codes
 and by `'inline'` key for `'source'` / `'file'` codes (which the
-adapter rejects — directly executing JS source bypasses the trust
+adapter rejects - directly executing JS source bypasses the trust
 tier the user explicitly opted out of).
 
 ## Stable

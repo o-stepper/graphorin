@@ -17,13 +17,13 @@ import { fileURLToPath } from 'node:url';
  * @stable
  */
 export interface Migration {
-  /** Zero-padded sequence number — must be globally unique. */
+  /** Zero-padded sequence number - must be globally unique. */
   readonly version: string;
   /** Human-readable slug, e.g. `'memory'`. */
   readonly name: string;
   /** Raw SQL body (multi-statement). */
   readonly sql: string;
-  /** Owning module — surfaced in error messages. */
+  /** Owning module - surfaced in error messages. */
   readonly owner: string;
 }
 

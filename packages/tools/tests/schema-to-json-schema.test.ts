@@ -2,7 +2,7 @@
  * tools-01 regression: the shared Zod-to-JSON-Schema projection.
  *
  * Pre-fix, `projectSchema`/`schemaToJson`/`toMatch` only honoured a
- * `toJSON()` method — which no real Zod schema has — so plain-Zod tools
+ * `toJSON()` method - which no real Zod schema has - so plain-Zod tools
  * serialised as `{"_def":...}` internals on every provider wire body.
  * These tests drive **real** `zod` (v3 classic) and **real** `zod/v4`
  * schema instances through the converter, never hand-crafted fixtures.
@@ -26,7 +26,7 @@ describe('detection', () => {
     const v4 = z4.object({ q: z4.string() });
     expect(isZodV3Schema(v3)).toBe(true);
     expect(isZodV4Schema(v3)).toBe(false);
-    // v4 instances carry `_def` too — v4 detection must win.
+    // v4 instances carry `_def` too - v4 detection must win.
     expect(isZodV4Schema(v4)).toBe(true);
     expect(isZodV3Schema(v4)).toBe(false);
     expect(isZodSchema({ parse: () => ({}), safeParse: () => ({}) })).toBe(false);
@@ -68,7 +68,7 @@ describe('zod v3 classic conversion', () => {
         tags: { type: 'array', items: { type: 'string' } },
       },
     });
-    // The old bug shipped `_def` internals — assert they are gone.
+    // The old bug shipped `_def` internals - assert they are gone.
     expect(JSON.stringify(json)).not.toContain('_def');
   });
 

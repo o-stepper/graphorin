@@ -26,7 +26,7 @@ async function exists(p: string): Promise<boolean> {
   );
 }
 
-describe('TL-10 — spill artifact lifecycle', () => {
+describe('TL-10 - spill artifact lifecycle', () => {
   it('clear(runId) removes exactly that run directory', async () => {
     const root = await isolatedRoot();
     const writer = createDefaultSpillWriter({ root, startupSweepTtlMs: false });

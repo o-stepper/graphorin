@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:316
 
 Thrown when planning stalls with no runnable tasks and no satisfied
-END edge (WF-14) — an all-false conditional fan is an error, not a
+END edge (WF-14) - an all-false conditional fan is an error, not a
 silent completion.
 
 ## Extends

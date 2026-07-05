@@ -62,7 +62,7 @@ function recordingTracer(): { tracer: Tracer; spans: RecordedSpan[] } {
   return { tracer, spans };
 }
 
-describe('WF-11 — advertised diagnostics are real', () => {
+describe('WF-11 - advertised diagnostics are real', () => {
   it('emits workflow.task and workflow.checkpoint spans', async () => {
     const { tracer, spans } = recordingTracer();
     const checkpointStore = new InMemoryCheckpointStore();
@@ -104,7 +104,7 @@ describe('WF-11 — advertised diagnostics are real', () => {
       edges: [
         { from: '__start__', to: 'a' },
         { from: 'a', to: 'b' },
-        { from: 'b', to: 'a' }, // legal cycle — bounded by maxSteps
+        { from: 'b', to: 'a' }, // legal cycle - bounded by maxSteps
       ],
       checkpointStore: new InMemoryCheckpointStore(),
       maxSteps: 3,

@@ -8,14 +8,14 @@
  * ## Subprotocol + browser ticket flow
  *
  * The negotiated subprotocol is always {@link SUBPROTOCOL_NAME}
- * (`graphorin.protocol.v1`) — the canonical wire contract lives in
+ * (`graphorin.protocol.v1`) - the canonical wire contract lives in
  * `@graphorin/protocol`'s `subprotocol.ts`. Two auth paths exist:
  *
  * - **Bearer (non-browser):** the client sends `Authorization:
  *   Bearer <token>` and a single `Sec-WebSocket-Protocol:
  *   graphorin.protocol.v1` token.
  * - **Ticket (browser):** the `WebSocket` constructor cannot set
- *   headers, so the browser client offers two subprotocol tokens —
+ *   headers, so the browser client offers two subprotocol tokens -
  *   `graphorin.protocol.v1` and `ticket.<value>`. The server echoes
  *   back only the canonical name (in `app.ts`'s `handleProtocols`),
  *   and {@link resolveUpgradeAuth} extracts the ticket via
@@ -132,7 +132,7 @@ export async function createWsUpgradeEvents(
           ws.close(code, reason);
         },
         // IP-9: surface the socket's real backlog so the dispatcher's
-        // backpressure threshold measures something — the synchronous
+        // backpressure threshold measures something - the synchronous
         // outstanding-events counter never accumulates.
         bufferedAmount: () => {
           const raw = (ws as { raw?: { bufferedAmount?: number } }).raw;
@@ -176,7 +176,7 @@ export async function createWsUpgradeEvents(
       }
       if (!initialized && !isInitializeRequest(message) && !isPingRequest(message)) {
         // IP-21: a frame before `initialize` is a protocol-sequencing error,
-        // not an auth failure — the connection is already authenticated.
+        // not an auth failure - the connection is already authenticated.
         sendRpcError(
           ws,
           message.id,
@@ -190,7 +190,7 @@ export async function createWsUpgradeEvents(
         sendRpcSuccess(ws, message.id, {
           serverInfo: {
             name: 'graphorin-server',
-            version: '0.5.0',
+            version: '0.6.0',
           },
           capabilities: {
             subscriptions: true,
@@ -378,7 +378,7 @@ async function resolveUpgradeAuth(
       grantedScopes: state.auth.grantedScopes,
     };
   }
-  // IP-13: no-auth loopback mode — accept the upgrade with a full scope grant
+  // IP-13: no-auth loopback mode - accept the upgrade with a full scope grant
   // instead of silently failing to mount. Checked before ticket/bearer so the
   // verifier may legitimately be absent.
   if (options.anonymous === true) {
@@ -398,7 +398,7 @@ async function resolveUpgradeAuth(
     const token = header.slice(7).trim();
     // P-05: pass the client IP like the HTTP auth middleware does, so
     // the verifier's per-IP failure threshold / lockout engages for
-    // upgrade attempts too — without it `GET /v1/ws` was a
+    // upgrade attempts too - without it `GET /v1/ws` was a
     // lockout-free brute-force surface.
     const ip = c.get('state')?.clientIp;
     const verified = await options.verifier.verify(token, ip !== undefined ? { ip } : {});
@@ -414,7 +414,7 @@ async function resolveUpgradeAuth(
 
 /**
  * IP-8: the `agents:invoke` scope required to cancel a run over the WS
- * transport — the same requirement the REST `POST /runs/:runId/abort` route
+ * transport - the same requirement the REST `POST /runs/:runId/abort` route
  * enforces. `scopeMatches` honours wildcards (`agents:*`, `admin:*`).
  */
 const INVOKE_SCOPE: ParsedScope = parseScope('agents:invoke');

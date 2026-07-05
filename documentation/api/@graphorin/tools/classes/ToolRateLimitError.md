@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,8 +10,8 @@ Defined in: packages/tools/src/executor/tool-errors.ts:24
 
 Throw from a tool's `execute(...)` when the upstream service rate-limits
 the call. The executor maps it to the `'rate_limited'` ToolErrorKind and
-surfaces `retryAfterMs` (when known) on the error hint so the model —
-and any harness-side retry — can pace correctly.
+surfaces `retryAfterMs` (when known) on the error hint so the model -
+and any harness-side retry - can pace correctly.
 
 ## Stable
 

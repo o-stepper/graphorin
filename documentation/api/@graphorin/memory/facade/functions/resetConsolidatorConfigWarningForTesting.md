@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/memory/src/facade.ts:718
 
 **`Internal`**
 
-— test seam for the one-time disabled-config warning.
+- test seam for the one-time disabled-config warning.
 
 ## Returns
 

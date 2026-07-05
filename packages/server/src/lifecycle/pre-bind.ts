@@ -9,10 +9,10 @@
  *  2. Confirm the server pepper resolved to non-empty bytes.
  *  3. Confirm the encryption peer is loadable when
  *     `storage.encryption.enabled === true` (or `audit.enabled === true`).
- *  4. Run pending storage migrations — failures bubble up as
+ *  4. Run pending storage migrations - failures bubble up as
  *     `MigrationFailedError`.
  *
- * The function is idempotent — calling it more than once for the
+ * The function is idempotent - calling it more than once for the
  * same {@link createSqliteStore} handle re-validates the secrets but
  * leaves the underlying database untouched.
  *

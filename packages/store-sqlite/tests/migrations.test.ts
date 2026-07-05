@@ -66,7 +66,7 @@ describe('migrations', () => {
     expect(names.has('conflict_check_pending')).toBe(true);
     expect(names.has('fact_conflicts')).toBe(true);
     // Migration 012 added the `conflicting_ids_json` column to
-    // `conflict_check_pending` — make sure it actually landed.
+    // `conflict_check_pending` - make sure it actually landed.
     const cols = conn.all<{ name: string }>(
       "SELECT name FROM pragma_table_info('conflict_check_pending')",
     );
@@ -298,7 +298,7 @@ describe('migrations', () => {
 
     _resetDynamicMigrationsForTesting();
 
-    // Re-open and register the same version with EDITED SQL — the
+    // Re-open and register the same version with EDITED SQL - the
     // runner must refuse on checksum mismatch.
     const conn2 = await openConnection({
       path: `${dir}/db.sqlite`,
@@ -324,10 +324,10 @@ describe('migrations', () => {
     runMigrations(conn);
 
     const fixtures: ReadonlyArray<{ id: string; text: string }> = [
-      { id: 'f1', text: 'Контакт: alex@example.com — встреча в горах' },
+      { id: 'f1', text: 'Контакт: alex@example.com - встреча в горах' },
       { id: 'f2', text: 'Loves espresso and mountain hiking weekends' },
       { id: 'f3', text: 'Bookmark: https://hiking.example.com/trail/sequoia-1' },
-      { id: 'f4', text: 'Préférences café espresso — éclair au chocolat' },
+      { id: 'f4', text: 'Préférences café espresso - éclair au chocolat' },
       { id: 'f5', text: 'Контактный email: ольга@пример.рф' },
     ];
     for (const f of fixtures) {
@@ -354,11 +354,11 @@ describe('migrations', () => {
     expect(search('"встреча"')).toEqual(['f1']);
     // English word match.
     expect(search('"espresso"').sort()).toEqual(['f2', 'f4']);
-    // Email — '@' and '.' are tokenchars so the full address is a token.
+    // Email - '@' and '.' are tokenchars so the full address is a token.
     expect(search('"alex@example.com"')).toEqual(['f1']);
-    // URL — '/' and '.' tokenchars + '-' tokenchar.
+    // URL - '/' and '.' tokenchars + '-' tokenchar.
     expect(search('"https://hiking.example.com/trail/sequoia-1"')).toEqual(['f3']);
-    // Diacritic-folded match — `café` finds via `cafe` (diacritics removed).
+    // Diacritic-folded match - `café` finds via `cafe` (diacritics removed).
     expect(search('"cafe"')).toEqual(['f4']);
     expect(search('"café"')).toEqual(['f4']);
     // Unicode email (Cyrillic local + IDN-like host).

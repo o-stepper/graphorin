@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,6 +21,6 @@ Defined in: packages/cli/src/commands/token.ts:122
 | <a id="property-config"></a> `config?` | `readonly` | `string` | - | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`config`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-config) | packages/cli/src/commands/token.ts:49 |
 | <a id="property-includerevoked"></a> `includeRevoked?` | `readonly` | `boolean` | - | - | packages/cli/src/commands/token.ts:123 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-json) | packages/cli/src/internal/output.ts:71 |
-| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam — capture JSON documents instead of writing to stdout. | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
+| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-noninteractive) | packages/cli/src/internal/output.ts:73 |
-| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam — capture human lines instead of writing to stderr. | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |
+| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam - capture human lines instead of writing to stderr. | [`TokenCommonOptions`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/TokenCommonOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |

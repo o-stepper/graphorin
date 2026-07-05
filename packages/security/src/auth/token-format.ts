@@ -6,14 +6,14 @@
  * <prefix>_<env>_v1_<43-char base62 entropy>_<6-char base62 crc32>
  * ```
  *
- * - `prefix` — short string identifying the token issuer (`gph` for
+ * - `prefix` - short string identifying the token issuer (`gph` for
  *   the framework default; configurable per deployment).
- * - `env` — short environment label (`live`, `test`, `local`, …).
- * - `v1` — explicit version segment so future formats can coexist by
+ * - `env` - short environment label (`live`, `test`, `local`, …).
+ * - `v1` - explicit version segment so future formats can coexist by
  *   prefix dispatch.
- * - 43-char base62 entropy block — encodes 256 bits from
+ * - 43-char base62 entropy block - encodes 256 bits from
  *   `crypto.randomBytes(32)` (≈ `Math.log2(62) * 43 ≈ 256` bits).
- * - 6-char base62 CRC32 checksum of the entropy block — enables an
+ * - 6-char base62 CRC32 checksum of the entropy block - enables an
  *   offline malformed-token reject without a database round-trip.
  *
  * The format is intentionally project-specific (the prefix and version
@@ -120,7 +120,7 @@ export interface GenerateRawTokenOptions {
 const ENV_LABEL_RE = /^[a-z][a-z0-9-]{0,15}$/;
 
 /**
- * CRC32/IEEE 802.3 implementation. Pure JS, branchless inner loop —
+ * CRC32/IEEE 802.3 implementation. Pure JS, branchless inner loop -
  * matches the polynomial used by GZIP / PNG / Ethernet (`0xEDB88320`).
  * Returns an unsigned 32-bit integer so it can be base62-encoded
  * without further bit-fiddling.
@@ -187,7 +187,7 @@ export function encodeBase62Integer(value: number, width: number): string {
  * base62 characters.
  *
  * Bias note (CodeQL `js/biased-cryptographic-random`): this is **not** a
- * `byte % 62` reduction over CSPRNG bytes — that would indeed bias the
+ * `byte % 62` reduction over CSPRNG bytes - that would indeed bias the
  * output. Instead we perform full big-integer long division, so each
  * emitted base62 character represents a distinct "digit" of the input
  * integer in base 62. As long as the input is uniform over `[0, 256^n)`
@@ -196,7 +196,7 @@ export function encodeBase62Integer(value: number, width: number): string {
  * positions; only the most-significant position can carry a small bias
  * when `256^n` is not an exact power of 62, and that position is what
  * `width` left-pads to a constant length for. Callers that need
- * fixed-entropy tokens should pick `n` such that `256^n >= 62^width` —
+ * fixed-entropy tokens should pick `n` such that `256^n >= 62^width` -
  * the existing `encodeRandomToken` helpers do.
  *
  * @stable

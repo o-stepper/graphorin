@@ -5,7 +5,7 @@ import {
   privacyDecide,
 } from '../src/index.js';
 
-describe('context-engine — privacy filter (D2; Phase 10d)', () => {
+describe('context-engine - privacy filter (D2; Phase 10d)', () => {
   it("'public' content always passes regardless of trust class", () => {
     expect(privacyDecide('public', { providerTrust: 'public-tls' }).decision).toBe('pass');
     expect(privacyDecide('public', { providerTrust: 'loopback' }).decision).toBe('pass');

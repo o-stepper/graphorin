@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runMemoryMigrate(options): Promise<never>;
 
 Defined in: packages/cli/src/commands/memory.ts:134
 
-`graphorin memory migrate` — embedder swap. The migration logic lives
+`graphorin memory migrate` - embedder swap. The migration logic lives
 in `@graphorin/memory`'s `migrateEmbedder(...)`; the CLI prints a
 pointer when the operator did not supply the embedder factory module
 (the framework cannot guess the operator's embedder configuration).

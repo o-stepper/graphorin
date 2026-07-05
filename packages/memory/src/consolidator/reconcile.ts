@@ -1,11 +1,11 @@
 /**
- * Neighbour-aware write reconciliation (P0-3) — the `reconcile` half of
+ * Neighbour-aware write reconciliation (P0-3) - the `reconcile` half of
  * Mem0's extract→reconcile loop (arXiv:2504.19413), with Graphorin's
  * bi-temporal twist.
  *
  * Two pieces live here:
  *
- *  - {@link preFilterCandidate} — a *cheap*, LLM-free classifier that
+ *  - {@link preFilterCandidate} - a *cheap*, LLM-free classifier that
  *    reuses the conflict pipeline's Stage 1 (exact-dedup) + Stage 2
  *    (embedding three-zone) over the candidate's nearest neighbours.
  *    Clear hot / near-dup neighbours short-circuit to `noop`; a clearly
@@ -13,7 +13,7 @@
  *    the ambiguous CONFLICT-CHECK mid-zone is routed to `reconcile`, so
  *    the consolidator spends an LLM call only where it actually helps.
  *
- *  - {@link reconcileCandidate} — one provider pass that, with the
+ *  - {@link reconcileCandidate} - one provider pass that, with the
  *    neighbours *in view*, chooses ADD / UPDATE / NOOP / CONFLICT.
  *    Parsing is defensive: malformed output, an unknown action, or a
  *    `targetId` that is not one of the supplied neighbours all fall back
@@ -200,7 +200,7 @@ export function parseReconcile(
     const targetId = typeof obj.targetId === 'string' ? obj.targetId : null;
     if (targetId === null || !validTargetIds.has(targetId)) {
       // The model referenced a fact that is not one of the supplied
-      // neighbours — never rewrite an unverified id; add instead.
+      // neighbours - never rewrite an unverified id; add instead.
       return { action: 'add', reason: 'reconcile-invalid-target' };
     }
     if (obj.action === 'noop') {
@@ -228,7 +228,7 @@ function buildReconcileRequest(args: ReconcileCandidateArgs): ProviderRequest {
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: RECONCILE_SYSTEM_PROMPT,
     temperature: 0,
-    // MCON-14: per-call output cap — the decision shape is tiny.
+    // MCON-14: per-call output cap - the decision shape is tiny.
     maxTokens: 256,
     metadata: {
       userId: args.scope.userId,
@@ -241,7 +241,7 @@ function buildReconcileRequest(args: ReconcileCandidateArgs): ProviderRequest {
 
 /**
  * Minimal candidate `Fact` for the pre-filter stage context. Stage 1
- * reads only `text`; Stage 2 reads only the neighbour scores — the
+ * reads only `text`; Stage 2 reads only the neighbour scores - the
  * other fields are never inspected, so a synthetic id/scope is safe.
  */
 function synthCandidate(text: string): Fact {

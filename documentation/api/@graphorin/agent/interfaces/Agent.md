@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -81,7 +81,7 @@ Defined in: packages/agent/src/types.ts:617
 Convenience wrapper around the standalone `runFanOut(...)`. The
 returned `FanOutResult` carries per-child status + the merged
 output. Per-child failures are captured in `children[].status`
-— this method never throws on a child failure (the merge
+- this method never throws on a child failure (the merge
 strategy decides whether to propagate).
 
 #### Type Parameters

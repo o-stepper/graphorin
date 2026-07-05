@@ -8,19 +8,19 @@ description: Install the @graphorin/* packages from the npm registry. Node.js 22
 Graphorin is published as a set of focused packages on the npm registry under the `@graphorin/*` scope. Packages are released **lockstep** at the same version while the framework is on the `0.x` line.
 
 ::: tip Status
-The `@graphorin/*` packages are published on the npm registry since `v0.5.0`. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for new versions.
+The `@graphorin/*` packages are published on the npm registry since `v0.6.0`. Watch the [repository releases](https://github.com/o-stepper/graphorin/releases) for new versions.
 :::
 
 ## Prerequisites
 
 - **Node.js 22.x LTS or newer** (the project pins `>=22.0.0`).
-- A package manager — **pnpm** is the project default; **npm** and **yarn** work too for consumers of the published packages.
-- ESM-only modules. Your project must be `"type": "module"` (or use `.mjs` files) — Graphorin ships ESM.
+- A package manager - **pnpm** is the project default; **npm** and **yarn** work too for consumers of the published packages.
+- ESM-only modules. Your project must be `"type": "module"` (or use `.mjs` files) - Graphorin ships ESM.
 
 ## Supported platforms
 
 The default stack pulls native modules (`better-sqlite3`, the `sqlite-vec`
-vector extension, and — via `@graphorin/embedder-transformersjs` —
+vector extension, and - via `@graphorin/embedder-transformersjs` -
 `onnxruntime`), so platform support is defined by their prebuilt binaries:
 
 | Tier | Platforms | Notes |
@@ -33,7 +33,7 @@ Additional platform notes:
 
 - **Native build fallback.** If a prebuild is missing for an exotic target,
   `better-sqlite3`, the SQLCipher peer
-  (`better-sqlite3-multiple-ciphers`), and `isolated-vm` compile from source —
+  (`better-sqlite3-multiple-ciphers`), and `isolated-vm` compile from source -
   that requires a C++ toolchain and Python 3 at install time. `sqlite-vec`
   does not have this fallback (prebuilt-only).
 - **Windows shutdown semantics.** `graphorin start` installs `SIGTERM` +
@@ -75,7 +75,7 @@ See the [Packages reference](/reference/packages) for the full list and one-line
 | Package | Role |
 |---|---|
 | `@graphorin/core` | Type system + cross-package contracts. Pulled in transitively. |
-| `@graphorin/agent` | Agent runtime — the typed `model -> tool calls -> model` loop. |
+| `@graphorin/agent` | Agent runtime - the typed `model -> tool calls -> model` loop. |
 | `@graphorin/memory` | Six-tier memory system with the consolidation pipeline. |
 | `@graphorin/provider` | `Provider` interface + adapters (Vercel AI SDK, Ollama, OpenAI-compatible, llama.cpp HTTP). |
 | `@graphorin/store-sqlite` | Default storage adapter on top of `better-sqlite3` + `sqlite-vec` + FTS5. |
@@ -122,4 +122,4 @@ See the [Contributing guide](/contributing/) for the full development workflow.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -41,7 +41,7 @@ export function parseTriggerSpec(spec: ConsolidatorTriggerSpec): ParsedTrigger {
   const colon = spec.indexOf(':');
   if (colon < 0) {
     throw new TypeError(
-      `[graphorin/memory] invalid trigger spec '${spec}' — expected 'kind:value'`,
+      `[graphorin/memory] invalid trigger spec '${spec}' - expected 'kind:value'`,
     );
   }
   const kind = spec.slice(0, colon);
@@ -52,7 +52,7 @@ export function parseTriggerSpec(spec: ConsolidatorTriggerSpec): ParsedTrigger {
       const count = Number.parseInt(value, 10);
       if (!Number.isFinite(count) || count <= 0) {
         throw new TypeError(
-          `[graphorin/memory] invalid turn trigger '${spec}' — expected positive integer`,
+          `[graphorin/memory] invalid turn trigger '${spec}' - expected positive integer`,
         );
       }
       return { kind: 'turn', count, raw: spec };
@@ -61,7 +61,7 @@ export function parseTriggerSpec(spec: ConsolidatorTriggerSpec): ParsedTrigger {
       const match = IDLE_PATTERN.exec(value);
       if (match === null) {
         throw new TypeError(
-          `[graphorin/memory] invalid idle trigger '${spec}' — expected '5m' / '30s' / '1h'`,
+          `[graphorin/memory] invalid idle trigger '${spec}' - expected '5m' / '30s' / '1h'`,
         );
       }
       const num = Number.parseFloat(match[1] ?? 'NaN');
@@ -69,21 +69,21 @@ export function parseTriggerSpec(spec: ConsolidatorTriggerSpec): ParsedTrigger {
       const idleMs = toMs(num, unit);
       if (!Number.isFinite(idleMs) || idleMs <= 0) {
         throw new TypeError(
-          `[graphorin/memory] invalid idle trigger '${spec}' — non-positive duration`,
+          `[graphorin/memory] invalid idle trigger '${spec}' - non-positive duration`,
         );
       }
       return { kind: 'idle', idleMs, raw: spec };
     }
     case 'cron': {
       if (value.trim().length === 0) {
-        throw new TypeError(`[graphorin/memory] invalid cron trigger '${spec}' — empty expression`);
+        throw new TypeError(`[graphorin/memory] invalid cron trigger '${spec}' - empty expression`);
       }
       return { kind: 'cron', expression: value, raw: spec };
     }
     case 'event': {
       if (value.length === 0) {
         throw new TypeError(
-          `[graphorin/memory] invalid event trigger '${spec}' — empty event name`,
+          `[graphorin/memory] invalid event trigger '${spec}' - empty event name`,
         );
       }
       return { kind: 'event', name: value, raw: spec };
@@ -92,7 +92,7 @@ export function parseTriggerSpec(spec: ConsolidatorTriggerSpec): ParsedTrigger {
       const threshold = Number.parseFloat(value);
       if (!Number.isFinite(threshold) || threshold <= 0 || threshold >= 1) {
         throw new TypeError(
-          `[graphorin/memory] invalid budget trigger '${spec}' — expected fraction between 0 and 1`,
+          `[graphorin/memory] invalid budget trigger '${spec}' - expected fraction between 0 and 1`,
         );
       }
       return { kind: 'budget', threshold, raw: spec };

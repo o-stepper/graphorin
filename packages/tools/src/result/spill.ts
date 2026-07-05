@@ -43,7 +43,7 @@ export function sidecarPathFor(artifactPath: string): string {
 }
 
 /**
- * Build the default spill writer — writes the un-truncated body to
+ * Build the default spill writer - writes the un-truncated body to
  * `<os.tmpdir()>/graphorin-spill/<runId>/<toolCallId>.<ext>` with `0600`
  * permissions and tier-aware sensitivity inheritance.
  *
@@ -68,7 +68,7 @@ export function createDefaultSpillWriter(options: DefaultSpillWriterOptions = {}
     try {
       entries = await fs.readdir(root);
     } catch {
-      return 0; // root does not exist yet — nothing to sweep
+      return 0; // root does not exist yet - nothing to sweep
     }
     for (const entry of entries) {
       const dir = path.join(root, entry);
@@ -80,7 +80,7 @@ export function createDefaultSpillWriter(options: DefaultSpillWriterOptions = {}
           removed += 1;
         }
       } catch {
-        // raced with another sweep / permission issue — best effort
+        // raced with another sweep / permission issue - best effort
       }
     }
     return removed;
@@ -98,7 +98,7 @@ export function createDefaultSpillWriter(options: DefaultSpillWriterOptions = {}
       const file = path.join(dir, `${opts.toolCallId}.${opts.extension}`);
       await fs.writeFile(file, opts.body, { mode: 0o600 });
       // tools-03: persist the producer's taint next to the artifact so a
-      // reader in another executor / a resumed process re-applies it —
+      // reader in another executor / a resumed process re-applies it -
       // the executor's in-memory taint map does not survive either
       // boundary, and without the sidecar an untrusted spill read back
       // through the trusted `read_result` built-in laundered to trusted.

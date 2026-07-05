@@ -8,7 +8,7 @@
  * reference answer string, graded by the `llmJudge` "J" scorer.
  *
  * This module is intentionally **type-only** and carries no dependency
- * on `@graphorin/memory` — the concrete system-under-test agent lives
+ * on `@graphorin/memory` - the concrete system-under-test agent lives
  * in the benchmark package so `@graphorin/evals` stays a generic
  * harness.
  *

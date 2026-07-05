@@ -1,5 +1,5 @@
 /**
- * `@graphorin/cli` — operator CLI for the Graphorin framework.
+ * `@graphorin/cli` - operator CLI for the Graphorin framework.
  *
  * Phase 14a shipped the minimal `graphorin` binary with three
  * lifecycle commands: `start`, `init`, and `migrate`. Phase 15
@@ -17,7 +17,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './commands/index.js';
 export {

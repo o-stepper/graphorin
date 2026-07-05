@@ -5,7 +5,7 @@
  * The executor's `handleProducerTaint` map is in-memory. Pre-fix, an
  * untrusted spill produced in one executor (code-mode's quiet executor)
  * and read back via `read_result` on ANOTHER executor sharing the same
- * spill root — or in a resumed process — got no taint: the reader
+ * spill root - or in a resumed process - got no taint: the reader
  * reported no producer class, the content laundered to trusted, and
  * both inbound sanitization and the dataflow ledger recorded it as the
  * trusted built-in's own class.
@@ -76,7 +76,7 @@ function untrustedProducerRegistry(): ReturnType<typeof createToolRegistry> {
   return registry;
 }
 
-describe('tools-03 — spill taint sidecar', () => {
+describe('tools-03 - spill taint sidecar', () => {
   it('the default writer persists a 0600 sidecar carrying the producer taint', async () => {
     const root = await tmpRoot();
     const spill = createDefaultSpillWriter({ root, startupSweepTtlMs: false });
@@ -118,7 +118,7 @@ describe('tools-03 — spill taint sidecar', () => {
     if (handle === undefined) throw new Error('expected a spill handle');
 
     // Executor B: a DIFFERENT executor (fresh in-memory taint map) whose
-    // read_result pages the same root — the main executor in the
+    // read_result pages the same root - the main executor in the
     // code-mode scenario, or a resumed process.
     const readerRegistry = createToolRegistry();
     readerRegistry.register(
@@ -175,7 +175,7 @@ describe('tools-03 — spill taint sidecar', () => {
       typeof outcome.output === 'string' ? outcome.output : JSON.stringify(outcome.output);
     expect(text).toContain('legacy body');
     // No sidecar, no in-memory entry: the read records the built-in's own
-    // class — exactly the pre-sidecar behaviour, no crash.
+    // class - exactly the pre-sidecar behaviour, no crash.
     expect(records.find((r) => r.toolName === 'read_result')?.trustClass).toBe(
       'first-party-built-in',
     );

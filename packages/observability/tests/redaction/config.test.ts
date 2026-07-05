@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_VALIDATION_CONFIG } from '../../src/redaction/index.js';
 
-describe('@graphorin/observability/redaction — DEFAULT_VALIDATION_CONFIG', () => {
+describe('@graphorin/observability/redaction - DEFAULT_VALIDATION_CONFIG', () => {
   it('defaults minTier to public (default-deny non-public)', () => {
     expect(DEFAULT_VALIDATION_CONFIG.minTier).toBe('public');
   });

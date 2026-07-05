@@ -1,7 +1,7 @@
 /**
  * Internal helpers shared by the trajectory scorers: structural deep
  * equality, dot-path reads, and an order-insensitive canonical key used to
- * de-duplicate tool calls by `(name, args)`. Private to the family — not
+ * de-duplicate tool calls by `(name, args)`. Private to the family - not
  * exported from the package surface.
  *
  * @packageDocumentation

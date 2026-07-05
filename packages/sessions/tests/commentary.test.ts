@@ -144,7 +144,7 @@ describe('Commentary sanitizer', () => {
     expect(out.decisions[0]?.applied).toBe(true);
     expect(out.decisions[0]?.reasons.length).toBeGreaterThanOrEqual(2);
     if (out.message.role === 'assistant' && typeof out.message.content === 'string') {
-      // Two distinct envelopes — both fragments wrapped, plain prose preserved.
+      // Two distinct envelopes - both fragments wrapped, plain prose preserved.
       expect((out.message.content.match(/<<<commentary>>>/g) ?? []).length).toBe(2);
       expect(out.message.content).toContain('pre ');
       expect(out.message.content).toContain('mid ');
@@ -184,7 +184,7 @@ describe('Commentary sanitizer', () => {
     }
     timings.sort((a, b) => a - b);
     const p95 = timings[Math.floor(timings.length * 0.95)] ?? 0;
-    // Generous bound: 5 ms for CI noise tolerance — the spec target is 2 ms p95.
+    // Generous bound: 5 ms for CI noise tolerance - the spec target is 2 ms p95.
     expect(p95).toBeLessThan(5);
   });
 });

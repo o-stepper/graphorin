@@ -1,5 +1,5 @@
 /**
- * Protocol/header injection guard — escapes control characters in
+ * Protocol/header injection guard - escapes control characters in
  * tool result bodies before they cross internal-service delivery
  * boundaries (SSE, WebSocket, REST body, HTTP header, audit row).
  *
@@ -12,7 +12,7 @@
  * - `'ws' | 'rest-body'`     → `'replace'` (replace with the Unicode
  *   replacement character `\uFFFD`).
  * - `'audit'`                → `'strict'`  (regulated deployments).
- * - `'reject'` is operator opt-in — the guard throws
+ * - `'reject'` is operator opt-in - the guard throws
  *   {@link ProtocolInjectionRejectError} when control characters are
  *   detected.
  *
@@ -51,7 +51,7 @@ export interface ProtocolGuardConfig {
 }
 
 /**
- * Resolved policy lookup. Pure function — no side effects.
+ * Resolved policy lookup. Pure function - no side effects.
  *
  * @stable
  */
@@ -80,7 +80,7 @@ export function resolvePolicy(
 
 // Control-character catalogue used to detect injection attempts at
 // the framework's outbound delivery boundaries. Building the regex
-// programmatically avoids embedding control bytes in the source —
+// programmatically avoids embedding control bytes in the source -
 // the bytes are exactly the ones a malicious tool result might
 // inject to escape framing on cleartext protocols.
 function buildControlCharsRegex(): RegExp {
@@ -162,7 +162,7 @@ function findMatchedPattern(input: string): string | undefined {
 
 /**
  * Apply the configured escape policy to a single string body. Pure
- * — never mutates inputs.
+ * - never mutates inputs.
  *
  * @stable
  */

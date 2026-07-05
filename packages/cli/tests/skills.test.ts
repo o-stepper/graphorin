@@ -113,7 +113,7 @@ describe('graphorin skills migrate-frontmatter', () => {
     });
     expect(dryRun.applied).toBe(false);
     // Only assert that the dry-run + apply variants behave consistently
-    // against the bundled spec snapshot — exact rewrite count varies
+    // against the bundled spec snapshot - exact rewrite count varies
     // with the snapshot's mapping table.
     const applied = await runSkillsMigrateFrontmatter({
       path: dir,

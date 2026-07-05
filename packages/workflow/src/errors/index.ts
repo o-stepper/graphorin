@@ -161,7 +161,7 @@ export class ResumeWithoutSuspensionError extends WorkflowError {
   constructor(threadId: string, status: string) {
     super(
       'resume-without-suspension',
-      `cannot resume thread "${threadId}" — current status is "${status}", expected "suspended"`,
+      `cannot resume thread "${threadId}" - current status is "${status}", expected "suspended"`,
     );
     this.name = 'ResumeWithoutSuspensionError';
     this.threadId = threadId;
@@ -218,7 +218,7 @@ export class NodeTimeoutError extends WorkflowError {
 
 /**
  * Thrown on resume when the stored frontier was written by a different
- * {@link WorkflowConfig.version} (D1 / workflow-14) — replaying
+ * {@link WorkflowConfig.version} (D1 / workflow-14) - replaying
  * persisted state through changed code must fail loudly, not silently
  * diverge. Opt out per call via `allowVersionMismatch`.
  */
@@ -244,7 +244,7 @@ export class WorkflowVersionMismatchError extends WorkflowError {
 
 /**
  * Thrown on resume when the persisted frontier references nodes that no
- * longer exist in the workflow definition (D1) — the definition changed
+ * longer exist in the workflow definition (D1) - the definition changed
  * mid-flight and a silent re-plan would diverge from the journal.
  */
 export class WorkflowDivergenceError extends WorkflowError {
@@ -287,7 +287,7 @@ export class PauseNotFoundError extends WorkflowError {
 
 /**
  * Thrown when a checkpoint write detects that another writer advanced
- * the thread concurrently (WF-12) — the loser must not fork the
+ * the thread concurrently (WF-12) - the loser must not fork the
  * timeline.
  */
 export class CheckpointVersionConflictError extends WorkflowError {
@@ -298,7 +298,7 @@ export class CheckpointVersionConflictError extends WorkflowError {
   constructor(threadId: string, expectedParentId: string, actualLatestId: string) {
     super(
       'checkpoint-version-conflict',
-      `thread "${threadId}" advanced concurrently — expected latest checkpoint "${expectedParentId}" but found "${actualLatestId}"`,
+      `thread "${threadId}" advanced concurrently - expected latest checkpoint "${expectedParentId}" but found "${actualLatestId}"`,
       { hint: 'another resume/run of this thread won the race; re-read state before retrying' },
     );
     this.name = 'CheckpointVersionConflictError';
@@ -310,7 +310,7 @@ export class CheckpointVersionConflictError extends WorkflowError {
 
 /**
  * Thrown when planning stalls with no runnable tasks and no satisfied
- * END edge (WF-14) — an all-false conditional fan is an error, not a
+ * END edge (WF-14) - an all-false conditional fan is an error, not a
  * silent completion.
  */
 export class DeadEndError extends WorkflowError {
@@ -331,7 +331,7 @@ export class DeadEndError extends WorkflowError {
 
 /**
  * Thrown at checkpoint time when a channel value would not survive a
- * JSON round-trip (WF-10) — Map/Set/Date/class instances silently
+ * JSON round-trip (WF-10) - Map/Set/Date/class instances silently
  * degrade with the SQLite store, so every store rejects them eagerly.
  */
 export class StateNotSerializableError extends WorkflowError {
@@ -341,7 +341,7 @@ export class StateNotSerializableError extends WorkflowError {
   constructor(channel: string, path: string, kind: string) {
     super(
       'state-not-serializable',
-      `channel "${channel}" holds a non-JSON-safe value (${kind} at ${path}) — checkpoint state must survive a JSON round-trip`,
+      `channel "${channel}" holds a non-JSON-safe value (${kind} at ${path}) - checkpoint state must survive a JSON round-trip`,
       {
         hint: 'store plain objects/arrays/primitives in workflow state; convert Map/Set/Date to JSON-safe shapes before writing the channel',
       },

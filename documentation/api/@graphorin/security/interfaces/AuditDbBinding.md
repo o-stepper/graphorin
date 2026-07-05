@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/security/src/audit/audit-db.ts:65
 
 Shape of a registered binding. The factory is asynchronous so it
 can perform the file-mode check and run the cipher self-test before
-returning. (It does NOT write an `audit:db-opened` chain entry — the
+returning. (It does NOT write an `audit:db-opened` chain entry - the
 database is not yet ready to record its own opening; an operator that
 wants one appends it after `openAuditDb(...)` resolves.)
 

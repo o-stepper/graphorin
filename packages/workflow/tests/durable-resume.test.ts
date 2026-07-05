@@ -78,7 +78,7 @@ describe('durable HITL resume', () => {
     const reader = buildWorkflow(store);
     await collect(reader.resume('wf4', new Directive({ resume: 'yes' })));
 
-    // No post-resume checkpoint may reuse the suspended stepNumber — otherwise a
+    // No post-resume checkpoint may reuse the suspended stepNumber - otherwise a
     // crash-recovery / second pause would tie and `getTuple` could return the
     // stale suspended checkpoint, re-running the pause node.
     const all = await collect(store.list('wf4', namespace));

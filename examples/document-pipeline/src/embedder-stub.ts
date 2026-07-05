@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub embedder used by the `document-pipeline` example.
  * `embed(text)` returns an 8-dim L2-normalised vector derived from a

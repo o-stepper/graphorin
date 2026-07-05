@@ -167,7 +167,7 @@ export class InMemoryCheckpointStore implements CheckpointStore {
 
   /**
    * Test-only helper that exposes the raw count of stored checkpoints
-   * — handy for assertions like "the runtime wrote exactly N
+   * - handy for assertions like "the runtime wrote exactly N
    * checkpoints across the run".
    */
   size(): number {

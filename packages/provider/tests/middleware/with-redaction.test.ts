@@ -1,5 +1,5 @@
 /**
- * Coverage for `withRedaction` — pattern detection, masking, fail-closed
+ * Coverage for `withRedaction` - pattern detection, masking, fail-closed
  * behaviour, SecretValue brand detection, per-trust-class scoping, and
  * stream-side observability scanning. All tests use the
  * `trustClassOverride` injection hook so the suite never has to fake a
@@ -110,7 +110,7 @@ async function consume(stream: AsyncIterable<ProviderEvent>): Promise<ProviderEv
   return out;
 }
 
-describe('withRedaction — default action: redact', () => {
+describe('withRedaction - default action: redact', () => {
   it('replaces email addresses with the [REDACTED <name>] mask', async () => {
     const adapter = capturingAdapter();
     const wrapped = withRedaction({
@@ -198,13 +198,13 @@ describe('withRedaction — default action: redact', () => {
   });
 });
 
-describe('withRedaction — PS-22 all-occurrence + cross-delta', () => {
+describe('withRedaction - PS-22 all-occurrence + cross-delta', () => {
   it('redacts every occurrence of a non-global user pattern, not just the first', async () => {
     const adapter = capturingAdapter();
     const wrapped = withRedaction({
       logger: () => undefined,
       trustClassOverride: 'public-tls',
-      // No /g flag — pre-fix, .replace() only masks the first occurrence.
+      // No /g flag - pre-fix, .replace() only masks the first occurrence.
       patterns: [
         {
           name: 'ticket',
@@ -250,7 +250,7 @@ describe('withRedaction — PS-22 all-occurrence + cross-delta', () => {
   });
 });
 
-describe('withRedaction — failClosed', () => {
+describe('withRedaction - failClosed', () => {
   it('throws PromptRedactionError on the first hit when failClosed: true', async () => {
     const adapter = capturingAdapter();
     const wrapped = withRedaction({
@@ -277,7 +277,7 @@ describe('withRedaction — failClosed', () => {
   });
 });
 
-describe('withRedaction — SecretValue brand detection', () => {
+describe('withRedaction - SecretValue brand detection', () => {
   it('detects an opaque SecretValue-shaped object inside tool-call args', async () => {
     const violations: PromptRedactionViolation[] = [];
     const adapter = capturingAdapter();
@@ -302,7 +302,7 @@ describe('withRedaction — SecretValue brand detection', () => {
   });
 });
 
-describe('withRedaction — loopback scope', () => {
+describe('withRedaction - loopback scope', () => {
   it('defaults loopback to secret-value-only and skips regex hits', async () => {
     const adapter = capturingAdapter();
     const wrapped = withRedaction({
@@ -337,7 +337,7 @@ describe('withRedaction — loopback scope', () => {
   });
 });
 
-describe('withRedaction — stream-side scanning', () => {
+describe('withRedaction - stream-side scanning', () => {
   it('emits violations on text-delta chunks but does NOT mutate the delta', async () => {
     const violations: PromptRedactionViolation[] = [];
     const adapter = capturingAdapter([
@@ -362,7 +362,7 @@ describe('withRedaction — stream-side scanning', () => {
   });
 });
 
-describe('withRedaction — pattern catalogue surface', () => {
+describe('withRedaction - pattern catalogue surface', () => {
   it('uses the same shared BUILT_IN_PATTERNS array exported by @graphorin/observability', () => {
     expect(Array.isArray(BUILT_IN_PATTERNS)).toBe(true);
     const names = BUILT_IN_PATTERNS.map((p) => p.name);

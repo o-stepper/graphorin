@@ -54,7 +54,7 @@ function bigBody(): string {
 
 const runContext = makeRunContext({ runId: 'run-tl6' });
 
-describe('TL-6 — handle reads carry the PRODUCER taint, not the reader trust class', () => {
+describe('TL-6 - handle reads carry the PRODUCER taint, not the reader trust class', () => {
   it('an untrusted spill read back via read_result is re-sanitized and recorded as the producer class', async () => {
     const spill = await isolatedSpill();
     const reader = createFileResultReader({ artifactRoot: spill.artifactRoot });

@@ -1,5 +1,5 @@
 /**
- * `createMemory()` — the facade that wires every tier sub-module (the
+ * `createMemory()` - the facade that wires every tier sub-module (the
  * seven-tier system) + the eleven (+1 gated) memory tools + the search
  * reranker + the context engine
  * stubs + the consolidator placeholder.
@@ -74,9 +74,9 @@ export interface CreateMemoryOptions {
   readonly store: MemoryStoreAdapter;
   /** Embedder registry. The default sqlite store exposes one as `sqlite.embeddings`. */
   readonly embeddings: EmbeddingMetaRegistryLike;
-  /** Embedder provider (default: none — vector search is disabled). */
+  /** Embedder provider (default: none - vector search is disabled). */
   readonly embedder?: EmbedderProvider;
-  /** Pre-declared working blocks (idempotent — re-defining is a no-op). */
+  /** Pre-declared working blocks (idempotent - re-defining is a no-op). */
   readonly workingBlocks?: ReadonlyArray<BlockDefinition>;
   /**
    * Tracer used for every `memory.*` span. Defaults to the no-op
@@ -93,7 +93,7 @@ export interface CreateMemoryOptions {
    * structured fields) to the text that is embedded + FTS-indexed, so a
    * terse fact stays findable; the canonical `text` is preserved. `'off'`
    * indexes the bare text. The `'llm'` enrichment is **not** available on
-   * the hot path — it is a consolidator-only opt-in configured via
+   * the hot path - it is a consolidator-only opt-in configured via
    * `consolidator: { contextualRetrieval: 'llm' }`.
    */
   readonly contextualRetrieval?: 'off' | 'late-chunk';
@@ -101,7 +101,7 @@ export interface CreateMemoryOptions {
    * Query transformation for retrieval (P2-3, opt-in). When supplied,
    * `SemanticMemory.search(..., { multiQuery })` fans the query into
    * reworded variants (multi-query / RAG-Fusion) and `{ hyde }` adds a
-   * hypothetical-answer embedding — both via one cheap LLM call on the
+   * hypothetical-answer embedding - both via one cheap LLM call on the
    * given provider, fused through the existing RRF reranker. Omitted (the
    * default) ⇒ search stays **offline + single-shot** and the
    * `multiQuery` / `hyde` search options become silent no-ops. Reserve it
@@ -142,7 +142,7 @@ export interface CreateMemoryOptions {
    * when memory is insufficient. Omitted (the default) ⇒ `searchIterative`
    * stays a single difficulty-gated pass with **no provider call**, and
    * `deep_recall` is **not** registered (the tool surface stays at the
-   * canonical eleven). Reserve it for hard multi-hop / temporal recall —
+   * canonical eleven). Reserve it for hard multi-hop / temporal recall -
    * it adds provider latency per pass.
    */
   readonly iterativeRetrieval?: {
@@ -159,7 +159,7 @@ export interface CreateMemoryOptions {
    * trajectory and stores it **quarantined** + `provenance: 'induction'`.
    * Omitted (the default) ⇒ `induce(...)` throws
    * {@link ProcedureInductionNotConfiguredError} and the procedural tier
-   * stays pure offline CRUD — no provider call.
+   * stays pure offline CRUD - no provider call.
    */
   readonly procedureInduction?: {
     /** Provider used to abstract trajectory values into a procedure. */
@@ -169,7 +169,7 @@ export interface CreateMemoryOptions {
   };
   /**
    * Promotion-by-demonstrated-success for quarantined induced
-   * procedures (MCON-2 part 4). Fully offline — orthogonal to
+   * procedures (MCON-2 part 4). Fully offline - orthogonal to
    * `procedureInduction` (no provider needed). When configured,
    * `procedural.recordOutcome(scope, id, true)` increments the rule's
    * persistent success counter and promotes it into `activate()` once
@@ -184,16 +184,16 @@ export interface CreateMemoryOptions {
   /**
    * Register the gated `runbook_search` tool (D3) so the model can look
    * up validated procedures by task description (content recall over
-   * procedural memory, returning whole runbooks). Fully offline — the
+   * procedural memory, returning whole runbooks). Fully offline - the
    * default `@graphorin/store-sqlite` adapter serves it from the rules
    * FTS index (migration 028); adapters without the index degrade to an
-   * in-memory lexical scan. Default `false` — the tool surface stays at
+   * in-memory lexical scan. Default `false` - the tool surface stays at
    * the canonical eleven.
    */
   readonly runbookSearch?: boolean;
   /**
    * Resolver that produces the live {@link SessionScope} for each
-   * memory-tool invocation. Defaults to a closure that throws — the
+   * memory-tool invocation. Defaults to a closure that throws - the
    * agent runtime overrides it in Phase 12.
    */
   readonly resolveScope?: ScopeResolver;
@@ -201,8 +201,8 @@ export interface CreateMemoryOptions {
    * Consolidator configuration. When omitted, empty, or
    * `enabled: false`, the facade installs the Phase 10a no-op
    * placeholder so consumers can still type their interactions without
-   * paying the runtime cost. ANY other setting — including offline
-   * knobs like `decayCapacity` or `contextualRetrieval` — implicitly
+   * paying the runtime cost. ANY other setting - including offline
+   * knobs like `decayCapacity` or `contextualRetrieval` - implicitly
    * enables the production runtime (MST-4); `enabled: false` together
    * with other settings warns once and keeps the placeholder.
    */
@@ -214,7 +214,7 @@ export interface CreateMemoryOptions {
     readonly ceilings?: Partial<ConsolidatorCeilings>;
     readonly onExceed?: OnBudgetExceed;
     /**
-     * USD pricer for phase LLM usage (memory-consolidation-02) — wire
+     * USD pricer for phase LLM usage (memory-consolidation-02) - wire
      * to `@graphorin/pricing` so `maxCostPerDay` can actually trip.
      */
     readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
@@ -269,9 +269,9 @@ export interface CreateMemoryOptions {
     readonly learnedContextMaxChars?: number;
     readonly defaultScope?: SessionScope;
     readonly provider?: Provider | null;
-    /** Override the wall clock — used by tests. */
+    /** Override the wall clock - used by tests. */
     readonly now?: () => number;
-    /** Stable id seed — used by tests. */
+    /** Stable id seed - used by tests. */
     readonly randomId?: () => string;
     /** Subscribe to phase-finished events. */
     readonly onPhaseFinished?: PhaseListener;
@@ -347,7 +347,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     (() => {
       throw new TypeError(
         '[graphorin/memory] memory tool invoked without a scope resolver. ' +
-          'Pass `resolveScope` to createMemory({...}) — the agent runtime supplies one in Phase 12.',
+          'Pass `resolveScope` to createMemory({...}) - the agent runtime supplies one in Phase 12.',
       );
     });
 
@@ -441,7 +441,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
   });
   // P2-2: build the (opt-in) workflow inducer. Absent ⇒ `null` ⇒
   // `ProceduralMemory.induce(...)` throws and the tier stays offline CRUD.
-  // MCON-15: induction spend is recorded into the consolidator budget —
+  // MCON-15: induction spend is recorded into the consolidator budget -
   // the consolidator is constructed AFTER the inducer, so the callback
   // routes through a slot filled below (placeholder ⇒ no-op).
   let consolidatorForSpend: Consolidator | null = null;
@@ -479,7 +479,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
       resolveScope,
     },
     // P2-4: the gated `deep_recall` tool is registered only when a grader
-    // is configured — the offline default stays at exactly eleven tools.
+    // is configured - the offline default stays at exactly eleven tools.
     // D3: `runbook_search` is a second gated appendix, opt-in via
     // `runbookSearch: true`.
     {
@@ -530,7 +530,7 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     const out: { -readonly [K in keyof MemoryContextBlocks]: MemoryContextBlocks[K] } = {};
     const blocks = await options.store.working.list(scope);
     // Quarantined (e.g. P2-2-induced) procedures are provisional and must not
-    // reach the system prompt — `activate()` already excludes them, and
+    // reach the system prompt - `activate()` already excludes them, and
     // compile() (public `@stable`) must agree or a compile()-based prompt
     // builder ingests unvalidated induction procedures (MST-3).
     const rules = (await options.store.procedural.list(scope)).filter(
@@ -714,13 +714,13 @@ function buildConsolidator(
 
 let consolidatorConfigIgnoredWarned = false;
 
-/** @internal — test seam for the one-time disabled-config warning. */
+/** @internal - test seam for the one-time disabled-config warning. */
 export function _resetConsolidatorConfigWarningForTesting(): void {
   consolidatorConfigIgnoredWarned = false;
 }
 
 function shouldEnableConsolidator(opts: NonNullable<CreateMemoryOptions['consolidator']>): boolean {
-  // MST-4: ANY non-empty consolidator config implicitly enables — the old
+  // MST-4: ANY non-empty consolidator config implicitly enables - the old
   // allow-list silently ignored offline knobs (`decayCapacity`,
   // `formEpisodes`, `reflection`, `contextualRetrieval`, …): the caller
   // got a no-op placeholder while believing the feature was on.
@@ -731,7 +731,7 @@ function shouldEnableConsolidator(opts: NonNullable<CreateMemoryOptions['consoli
     if (keys.length > 0 && !consolidatorConfigIgnoredWarned) {
       consolidatorConfigIgnoredWarned = true;
       process.stderr.write(
-        `[graphorin/memory] consolidator config (${keys.join(', ')}) was supplied together with enabled: false — the settings are ignored until the consolidator is enabled.\n`,
+        `[graphorin/memory] consolidator config (${keys.join(', ')}) was supplied together with enabled: false - the settings are ignored until the consolidator is enabled.\n`,
       );
     }
     return false;

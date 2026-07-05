@@ -21,7 +21,7 @@ function buildBody(
 ): string {
   const buffer = createBufferSink();
   const writer = createSessionExportWriter(buffer.sink, {
-    writer: '@graphorin/sessions@0.5.0',
+    writer: '@graphorin/sessions@0.6.0',
     ...(opts.hash !== undefined ? { hash: opts.hash } : {}),
   });
   return (async () => {
@@ -120,7 +120,7 @@ describe('Session export writer + reader', () => {
       },
     ];
     const body = await buildBody(records); // footer declares 2 messages / 2 records
-    // Drop the second message line (simulate truncation) — footer is untouched.
+    // Drop the second message line (simulate truncation) - footer is untouched.
     const lines = body.split('\n').filter((l) => l.length > 0);
     const truncated = `${[lines[0], lines[1], lines[lines.length - 1]].join('\n')}\n`;
     const warns: SessionExportWarning[] = [];
@@ -151,7 +151,7 @@ describe('Session export writer + reader', () => {
   it('forward-parses unknown record kinds with a WARN', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
     });
     await writer.writeRecord({
       kind: 'message',
@@ -206,7 +206,7 @@ describe('Session export writer + reader', () => {
   it('emits an embedder-mismatch warning when meta declares unknown embedder ids', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
       embedderIds: ['xenova-multilingual-e5-base@dim-768'],
     });
     await writer.close();
@@ -218,7 +218,7 @@ describe('Session export writer + reader', () => {
   it('rejects records emitted before the header is written via writeRecord("meta")', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.5.0',
+      writer: '@graphorin/sessions@0.6.0',
     });
     await expect(
       writer.writeRecord({

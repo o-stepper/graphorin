@@ -1,5 +1,5 @@
 /**
- * @graphorin/observability — observability primitives for the
+ * @graphorin/observability - observability primitives for the
  * Graphorin framework. Ships:
  *
  * - the typed `AISpan<T>` tracer over OpenTelemetry,
@@ -20,7 +20,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './cost/index.js';
 export * from './eval/index.js';

@@ -41,7 +41,7 @@ function lastEvent<T>(events: ReadonlyArray<WorkflowEvent<T>>): WorkflowEvent<T>
 
 const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe('workflow-02 — deterministic write order', () => {
+describe('workflow-02 - deterministic write order', () => {
   it('applies channel writes in planned order regardless of completion order', async () => {
     interface S {
       log: ReadonlyArray<string>;
@@ -83,7 +83,7 @@ describe('workflow-02 — deterministic write order', () => {
     expect(final?.type).toBe('workflow.end');
     if (final?.type === 'workflow.end') {
       const state = final.state as S;
-      // Planned order was [slow, fast] — completion order was the
+      // Planned order was [slow, fast] - completion order was the
       // reverse. Both the append log and the any-value last-wins slot
       // must follow the PLANNED order.
       expect(state.log).toEqual(['slow', 'fast']);
@@ -92,7 +92,7 @@ describe('workflow-02 — deterministic write order', () => {
   });
 });
 
-describe('workflow-05 — merge failures persist a terminal checkpoint', () => {
+describe('workflow-05 - merge failures persist a terminal checkpoint', () => {
   it('marks the thread failed when a reducer throws at merge time', async () => {
     interface S {
       n: number;
@@ -124,7 +124,7 @@ describe('workflow-05 — merge failures persist a terminal checkpoint', () => {
   });
 });
 
-describe('workflow-06 — all-false start edges dead-end loudly', () => {
+describe('workflow-06 - all-false start edges dead-end loudly', () => {
   it('raises dead-end instead of silently completing', async () => {
     interface S {
       go: boolean;
@@ -148,7 +148,7 @@ describe('workflow-06 — all-false start edges dead-end loudly', () => {
   });
 });
 
-describe('workflow-07 — ephemeral values observable on channel.update', () => {
+describe('workflow-07 - ephemeral values observable on channel.update', () => {
   it('carries the merged ephemeral value on the update event', async () => {
     interface S {
       note: string;
@@ -192,7 +192,7 @@ describe('workflow-07 — ephemeral values observable on channel.update', () => 
   });
 });
 
-describe('workflow-08 — satisfied pause answers survive sibling failure', () => {
+describe('workflow-08 - satisfied pause answers survive sibling failure', () => {
   it('replays already-delivered answers on retry after a sibling failed', async () => {
     interface S {
       out: ReadonlyArray<string>;
@@ -241,7 +241,7 @@ describe('workflow-08 — satisfied pause answers survive sibling failure', () =
     // same step via goto-free dynamic dispatch: resume delivers v1 to
     // gate; gate re-pauses at 'need-second' while boom (scheduled via
     // update->edge is not possible, so dispatch it from the directive
-    // resume step using a second seed) — instead schedule boom through
+    // resume step using a second seed) - instead schedule boom through
     // the directive's update? Simplest: resume gate with v1; it pauses
     // at 'need-second' with satisfied [v1]; then resume AGAIN while a
     // sibling fails is emulated by dispatching boom from gate itself.
@@ -318,7 +318,7 @@ describe('workflow-08 — satisfied pause answers survive sibling failure', () =
   });
 });
 
-describe('workflow-10 — bounded step concurrency', () => {
+describe('workflow-10 - bounded step concurrency', () => {
   it('caps concurrent task execution at maxConcurrentTasks', async () => {
     interface S {
       out: ReadonlyArray<string>;
@@ -367,7 +367,7 @@ describe('workflow-10 — bounded step concurrency', () => {
   });
 });
 
-describe('workflow-12 — boundary aborts persist terminal status', () => {
+describe('workflow-12 - boundary aborts persist terminal status', () => {
   it('persists aborted on a pre-aborted signal', async () => {
     interface S {
       x: number;
@@ -422,7 +422,7 @@ describe('workflow-12 — boundary aborts persist terminal status', () => {
   });
 });
 
-describe('workflow-13 — dispatch requires the brand', () => {
+describe('workflow-13 - dispatch requires the brand', () => {
   it('treats a bare { nodeName, args } object as channel writes', async () => {
     interface S {
       nodeName: string;
@@ -437,7 +437,7 @@ describe('workflow-13 — dispatch requires the brand', () => {
       nodes: {
         n: createNode<S>({
           name: 'n',
-          // A state shape that HAPPENS to look like a dispatch — it must
+          // A state shape that HAPPENS to look like a dispatch - it must
           // land in the channels, not be swallowed as a task.
           run: () => ({ nodeName: 'value-a', args: 'value-b' }),
         }),
@@ -458,7 +458,7 @@ describe('workflow-13 — dispatch requires the brand', () => {
   });
 });
 
-describe('workflow-01 — atomic checkpoint CAS', () => {
+describe('workflow-01 - atomic checkpoint CAS', () => {
   it('rejects a put whose expectedLatestId lost the race', async () => {
     const store = new InMemoryCheckpointStore();
     const cp = (id: string, step: number) => ({
@@ -481,7 +481,7 @@ describe('workflow-01 — atomic checkpoint CAS', () => {
   });
 });
 
-describe('D1 — per-node timeout and retry', () => {
+describe('D1 - per-node timeout and retry', () => {
   it('retries a flaky node up to maxAttempts', async () => {
     interface S {
       ok: boolean;
@@ -549,7 +549,7 @@ describe('D1 — per-node timeout and retry', () => {
   });
 });
 
-describe('D1 — durable timers', () => {
+describe('D1 - durable timers', () => {
   const wakeAt = Date.parse('2030-01-01T00:00:00.000Z');
 
   function timerWorkflow(store: InMemoryCheckpointStore) {
@@ -599,7 +599,7 @@ describe('D1 — durable timers', () => {
   });
 });
 
-describe('D1 — awakeables and approvals', () => {
+describe('D1 - awakeables and approvals', () => {
   it('resolves a named awakeable with a value', async () => {
     interface S {
       got: string;
@@ -675,7 +675,7 @@ describe('D1 — awakeables and approvals', () => {
   });
 });
 
-describe('D1 — version pinning and divergence', () => {
+describe('D1 - version pinning and divergence', () => {
   interface S {
     got: string;
   }
@@ -744,7 +744,7 @@ describe('D1 — version pinning and divergence', () => {
   });
 });
 
-describe('D1 — opt-in step journaling (workflow-04)', () => {
+describe('D1 - opt-in step journaling (workflow-04)', () => {
   interface S {
     out: ReadonlyArray<string>;
   }
@@ -886,7 +886,7 @@ describe('D1 — opt-in step journaling (workflow-04)', () => {
   });
 });
 
-describe('D1 — resume durability override (workflow-14)', () => {
+describe('D1 - resume durability override (workflow-14)', () => {
   it('accepts a durability override on resume', async () => {
     interface S {
       got: string;

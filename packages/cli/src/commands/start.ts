@@ -45,7 +45,7 @@ export interface StartCommandOptions {
 }
 
 /**
- * Programmatic entry — used both by the CLI binary and by tests so
+ * Programmatic entry - used both by the CLI binary and by tests so
  * the spawn cost of running the binary is paid only when an operator
  * actually invokes `graphorin start` from a shell.
  *

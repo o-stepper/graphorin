@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -8,11 +8,11 @@
 
 > Wire-format contract for the [Graphorin](https://github.com/o-stepper/graphorin) framework's WebSocket subprotocol.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.5.0
-- **License:** [MIT](../../_media/LICENSE-5) (© 2026 Oleksiy Stepurenko)
+- **Version:** v0.6.0
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/protocol>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -30,7 +30,7 @@
 
 ## Direct dependencies
 
-- [`zod`](https://zod.dev) (`^3.25.0`) — runtime schema validation. The MIT-licensed Zod project supplies the discriminated union, strict-object, and `safeParse` primitives that back every `*Schema` export. No other runtime dependency exists; the package is otherwise pure TypeScript.
+- [`zod`](https://zod.dev) (`^3.25.0`) - runtime schema validation. The MIT-licensed Zod project supplies the discriminated union, strict-object, and `safeParse` primitives that back every `*Schema` export. No other runtime dependency exists; the package is otherwise pure TypeScript.
 
 ## Install
 
@@ -70,18 +70,18 @@ if (isEventFrame(incoming)) {
 
 ## License
 
-MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](../../_media/LICENSE-5).
+MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/graphorin/blob/main/LICENSE).
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/protocol/README.md) | `@graphorin/protocol` — wire-format contract for the Graphorin WebSocket subprotocol. |
-| [client-message](/api/@graphorin/protocol/client-message/index.md) | `ClientMessage` — discriminated union of every frame a Graphorin WebSocket client may send to the server. The wire is hybrid: the control plane uses JSON-RPC-shaped requests / notifications; the data plane uses typed push events emitted exclusively by the server (see `./server-message.ts`). |
+| [](/api/@graphorin/protocol/README.md) | `@graphorin/protocol` - wire-format contract for the Graphorin WebSocket subprotocol. |
+| [client-message](/api/@graphorin/protocol/client-message/index.md) | `ClientMessage` - discriminated union of every frame a Graphorin WebSocket client may send to the server. The wire is hybrid: the control plane uses JSON-RPC-shaped requests / notifications; the data plane uses typed push events emitted exclusively by the server (see `./server-message.ts`). |
 | [close-codes](/api/@graphorin/protocol/close-codes/index.md) | Custom WebSocket close-code taxonomy used by `@graphorin/server` and `@graphorin/client`. The numeric values live in the 4xxx application-private range per RFC 6455 § 7.4. |
-| [server-message](/api/@graphorin/protocol/server-message/index.md) | `ServerMessage` — discriminated union of every frame a Graphorin server may push to a client. Three families share the channel: |
+| [server-message](/api/@graphorin/protocol/server-message/index.md) | `ServerMessage` - discriminated union of every frame a Graphorin server may push to a client. Three families share the channel: |
 | [subprotocol](/api/@graphorin/protocol/subprotocol/index.md) | Subprotocol identifier + negotiation helpers for the Graphorin WebSocket protocol. |

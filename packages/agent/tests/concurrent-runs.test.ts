@@ -42,7 +42,7 @@ function recordingProvider(base: Provider): {
   return { provider, requests };
 }
 
-describe('AG-11 — one in-flight run per Agent instance', () => {
+describe('AG-11 - one in-flight run per Agent instance', () => {
   it('rejects a second concurrent run with a typed concurrent-run error; the first run is unaffected', async () => {
     const base = createMockProvider({
       modelId: 'mock',
@@ -78,7 +78,7 @@ describe('AG-11 — one in-flight run per Agent instance', () => {
     const first = await agent.run('run-1');
     expect(first.status).toBe('completed');
 
-    // The run is over — this steer has no run to attach to and must NOT
+    // The run is over - this steer has no run to attach to and must NOT
     // surface in a later, unrelated run.
     agent.steer('LEAKED STEER');
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:250
 
 Thrown on resume when the persisted frontier references nodes that no
-longer exist in the workflow definition (D1) — the definition changed
+longer exist in the workflow definition (D1) - the definition changed
 mid-flight and a silent re-plan would diverge from the journal.
 
 ## Extends

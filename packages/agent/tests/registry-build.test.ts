@@ -43,7 +43,7 @@ const skillsFrom = (entries: ReadonlyArray<unknown>): SkillsRegistryLike => ({
 
 // --- sources & counts -------------------------------------------------------
 
-describe('buildToolRegistry — sources & counts', () => {
+describe('buildToolRegistry - sources & counts', () => {
   it('builds an empty registry with no sources', () => {
     const { registry, resolutions, registered, skippedSkillEntries } = buildToolRegistry();
     expect(registry.size()).toBe(0);
@@ -76,7 +76,7 @@ describe('buildToolRegistry — sources & counts', () => {
 
 // --- collision resolution ---------------------------------------------------
 
-describe('buildToolRegistry — collision resolution', () => {
+describe('buildToolRegistry - collision resolution', () => {
   it('auto-prefixes the non-first-party loser and keeps first-party un-prefixed', () => {
     const { registry, resolutions } = buildToolRegistry({
       tools: [
@@ -97,7 +97,7 @@ describe('buildToolRegistry — collision resolution', () => {
   });
 
   it('preserves an explicit MCP __source stamp through the registry (Adapter F)', () => {
-    // MCP tools are NOT auto-stamped by adaptMCPTools — the source is
+    // MCP tools are NOT auto-stamped by adaptMCPTools - the source is
     // honoured only when present on the tool. A non-colliding stamped
     // tool keeps its name + derived trust class.
     const { registry } = buildToolRegistry({
@@ -137,7 +137,7 @@ describe('buildToolRegistry — collision resolution', () => {
 
 // --- skills -----------------------------------------------------------------
 
-describe('buildToolRegistry — skills', () => {
+describe('buildToolRegistry - skills', () => {
   it('derives skill-trusted vs skill-untrusted from the skill trust level', () => {
     const { registry } = buildToolRegistry({
       skills: skillsFrom([
@@ -176,7 +176,7 @@ describe('buildToolRegistry — skills', () => {
 
 // --- options passthrough ----------------------------------------------------
 
-describe('buildToolRegistry — options', () => {
+describe('buildToolRegistry - options', () => {
   it('honours a non-default collision strategy + context', () => {
     // 'priority' drops the loser instead of renaming it.
     const { registry, resolutions } = buildToolRegistry({

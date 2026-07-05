@@ -3,7 +3,7 @@
 > Default in-process embedder for the Graphorin framework.
 
 `@graphorin/embedder-transformersjs` wraps `@huggingface/transformers@^4.1.0`
-to produce dense embeddings inside the Graphorin process — no external
+to produce dense embeddings inside the Graphorin process - no external
 service, no network call after the first model download. The default
 model is `Xenova/multilingual-e5-base` (768-dim, multilingual). Other
 multilingual variants from the same family (`multilingual-e5-small`,
@@ -13,11 +13,11 @@ factory.
 The package implements the `EmbedderProvider` contract from
 `@graphorin/core/contracts`:
 
-- `id()` — canonical id, e.g.
+- `id()` - canonical id, e.g.
   `'transformersjs:Xenova/multilingual-e5-base@768'`.
-- `dim()` — output vector dimensionality (resolved at first `embed`).
-- `configHash()` — deterministic hex hash over canonical-JSON config.
-- `embed(texts)` — batched, lazy. Returns one `Float32Array` per text.
+- `dim()` - output vector dimensionality (resolved at first `embed`).
+- `configHash()` - deterministic hex hash over canonical-JSON config.
+- `embed(texts)` - batched, lazy. Returns one `Float32Array` per text.
 
 ## Install
 
@@ -43,7 +43,7 @@ console.log(embedder.id(), embedder.dim(), vec.length);
 ## E5 asymmetric prefixes
 
 E5-family models (the default, and any model id carrying an `e5` token) require
-asymmetric `query:` / `passage:` prefixes — omitting them measurably degrades
+asymmetric `query:` / `passage:` prefixes - omitting them measurably degrades
 retrieval. The embedder applies them automatically: pass `taskType: 'query'`
 when embedding a search query and `taskType: 'passage'` (the default) for stored
 content. The Graphorin memory tiers thread this for you (`query` on search,
@@ -52,7 +52,7 @@ content. The Graphorin memory tiers thread this for you (`query` on search,
 > **Migration:** enabling the prefixes (the new default for E5) changes the
 > embedder's `configHash`, and therefore its `id`. Under the default
 > `lock-on-first` policy an existing index built before this change reports an
-> embedder mismatch — run `graphorin memory migrate` to re-embed it, or pass
+> embedder mismatch - run `graphorin memory migrate` to re-embed it, or pass
 > `disableTaskPrefix: true` to keep the old (unprefixed) behaviour and id.
 
 ## Cache directory
@@ -81,4 +81,4 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

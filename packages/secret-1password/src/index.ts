@@ -1,5 +1,5 @@
 /**
- * @graphorin/secret-1password — reference 1Password secret-resolver
+ * @graphorin/secret-1password - reference 1Password secret-resolver
  * adapter for the Graphorin framework.
  *
  * Registers the `op://` scheme on top of `@graphorin/security`'s
@@ -25,7 +25,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export {
   createDefaultOpCli,

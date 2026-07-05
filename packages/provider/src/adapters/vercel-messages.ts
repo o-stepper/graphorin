@@ -31,7 +31,7 @@ import type { Message, MessageContent, ToolChoice, ToolDefinition } from '@graph
  * Registered symbols used by the AI SDK's `asSchema()` detection. They
  * are created with `Symbol.for(...)` in the SDK, so a structurally
  * hand-rolled wrapper is indistinguishable from the SDK's own
- * `jsonSchema()` output — including across duplicated copies of the
+ * `jsonSchema()` output - including across duplicated copies of the
  * SDK in a node_modules tree.
  */
 const AI_SDK_SCHEMA_SYMBOL = Symbol.for('vercel.ai.schema');
@@ -94,7 +94,7 @@ export function toAiSdkToolChoice(choice: ToolChoice): unknown {
 /**
  * Result of {@link toAiSdkPrompt}: the converted message array plus the
  * hoisted system text (the SDK rejects `role: 'system'` entries inside
- * `messages` — system prompts ride the request-level option).
+ * `messages` - system prompts ride the request-level option).
  *
  * @internal
  */

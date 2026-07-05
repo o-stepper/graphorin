@@ -1,23 +1,23 @@
 ---
 title: Deployment
-description: Run Graphorin in production — systemd, Docker, Kubernetes, GitHub Actions integration, file modes, and observability hookup.
+description: Run Graphorin in production - systemd, Docker, Kubernetes, GitHub Actions integration, file modes, and observability hookup.
 ---
 
 # Deployment
 
 Graphorin runs in two shapes:
 
-- **Library mode** — embedded in your existing Node.js process. No deployment story beyond your own application's.
-- **Daemon mode** — `@graphorin/server` running as a long-lived process. The rest of this page covers production deployment of the daemon.
+- **Library mode** - embedded in your existing Node.js process. No deployment story beyond your own application's.
+- **Daemon mode** - `@graphorin/server` running as a long-lived process. The rest of this page covers production deployment of the daemon.
 
 ## Reference templates
 
 The repository ships templates for the four most common production environments:
 
-- `examples/systemd/` — a hardened unit file for systemd-managed servers.
-- `examples/docker/` — a multi-stage `Dockerfile` (see its README for the `docker run` flags).
-- `examples/k8s/` — a `Deployment` + `Service` + `ConfigMap` manifest set.
-- `examples/github-actions/` — a workflow that exercises Graphorin from CI.
+- `examples/systemd/` - a hardened unit file for systemd-managed servers.
+- `examples/docker/` - a multi-stage `Dockerfile` (see its README for the `docker run` flags).
+- `examples/k8s/` - a `Deployment` + `Service` + `ConfigMap` manifest set.
+- `examples/github-actions/` - a workflow that exercises Graphorin from CI.
 
 All four templates run Graphorin as a **non-root** user with the audit log on its own mount and the secrets store unreadable by the application's main filesystem path.
 
@@ -33,7 +33,7 @@ Before promoting a Graphorin deployment to production:
 2. **Encryption-at-rest**
    - The audit log is **always** encrypted (mandatory).
    - Enable database encryption-at-rest via `@graphorin/store-sqlite-encrypted` for any deployment that stores user secrets or `secret`-tagged memory rows.
-   - The passphrase resolves through `SecretRef` — keep it in the OS keychain or a managed vault, never in plain config files.
+   - The passphrase resolves through `SecretRef` - keep it in the OS keychain or a managed vault, never in plain config files.
 
 3. **Tokens**
    - Issue tokens with `graphorin token create --scopes <list> --expires-in <duration>`.
@@ -43,7 +43,7 @@ Before promoting a Graphorin deployment to production:
 
 4. **Observability**
    - Wire `OTLP_URL` (or another supported exporter). The default is **no remote export**.
-   - Confirm `withValidation(...)` is in the exporter chain — the tracer factory throws if it is missing, so this is a soft check.
+   - Confirm `withValidation(...)` is in the exporter chain - the tracer factory throws if it is missing, so this is a soft check.
    - Configure the redaction allowlist for any high-cardinality attribute that's safe to ship un-redacted.
 
 5. **Triggers**
@@ -112,40 +112,45 @@ WantedBy=multi-user.target
 The `examples/docker/` template ships a multi-stage build that produces a slim image with only the runtime dependencies. A prebuilt registry image is **not published yet** (see the root README), so build it locally from the template, then run:
 
 ```bash
-docker build -t graphorin:0.5.0 -f examples/docker/Dockerfile .
+docker build -t graphorin:0.6.0 -f examples/docker/Dockerfile .
 docker run -d --name graphorin \
-  -v graphorin-data:/var/lib/graphorin \
-  -p 127.0.0.1:8787:8787 \
-  -e OTLP_URL=https://otel.example.com/v1/traces \
-  graphorin:0.5.0
+  --read-only --tmpfs /tmp \
+  --security-opt no-new-privileges \
+  --cap-drop=ALL \
+  -v graphorin-data:/data \
+  -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
+  -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
+  -p 8080:8080 \
+  graphorin:0.6.0
 ```
 
-Mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation.
+The image stores its state under `/data` and listens on `8080`; mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation, and mount a `config.json` (the server only reads `--config`) plus the `file:`-referenced secrets under `/run/secrets/graphorin`.
 
 ## Kubernetes
 
 The `examples/k8s/` manifest set runs Graphorin as a non-root pod with:
 
-- a `PersistentVolumeClaim` for the data directory;
-- a `Secret` for the deployment pepper;
-- a `ConfigMap` for the rest of the configuration;
-- a `NetworkPolicy` that pins egress to the configured provider, MCP, and OTLP endpoints only.
+- a single-replica `Deployment` (SQLite is single-writer) with a hardened security context;
+- a `Service` for cluster-internal access;
+- a `ConfigMap` for the server configuration.
+
+Two objects are prerequisites you create out-of-band (the manifest's header comment spells them out): the `graphorin-secrets` `Secret` (deployment pepper + provider keys) and the `graphorin-data` `PersistentVolumeClaim`.
 
 ## GitHub Actions
 
-The `examples/github-actions/` template exercises Graphorin from a CI pipeline — a hermetic `pnpm` install, a stub-provider agent run, a smoke test against the standalone server, and a JSONL session export.
+The `examples/github-actions/` folder ships CI/CD workflow **templates** for a downstream app that embeds Graphorin: a Changesets-based release pipeline (`release.yml`), a security job with dependency audit + Sigstore verification (`security.yml`), and a `renovate.json`. They are starting points to copy into your own repository, not runnable example apps.
 
 ## Health checks
 
-Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The endpoint returns a `200 OK` only when storage, the audit log, the secrets store, and the triggers daemon are all healthy.
+Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The endpoint aggregates the storage, embedder, secrets, encryption, consolidator, triggers, and replay-buffer probes; it answers `200` while the rollup is `ok` or `degraded` and short-circuits to `503` only when a subsystem is `failing`, so probes do not flap on minor degradations.
 
 ## Next steps
 
-- [Standalone server](/guide/standalone-server) — REST endpoints, configuration.
-- [CLI](/guide/cli) — `graphorin doctor`, `graphorin token`.
-- [Security](/guide/security) — production hardening checklist.
-- [Observability](/guide/observability) — OTLP exporter wiring.
+- [Standalone server](/guide/standalone-server) - REST endpoints, configuration.
+- [CLI](/guide/cli) - `graphorin doctor`, `graphorin token`.
+- [Security](/guide/security) - production hardening checklist.
+- [Observability](/guide/observability) - OTLP exporter wiring.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

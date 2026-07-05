@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
 import { createMockProvider, textOnlyScript, toolCallScript } from './fixtures/mock-provider.js';
 
-describe('Agent — CausalityMonitor wired into the loop (RB-55)', () => {
+describe('Agent - CausalityMonitor wired into the loop (RB-55)', () => {
   it('does not emit lateral-leak events when no monitor is configured', async () => {
     const provider = createMockProvider({
       modelId: 'm',
@@ -37,9 +37,9 @@ describe('Agent — CausalityMonitor wired into the loop (RB-55)', () => {
   });
 });
 
-// --- AG-10 — detect-and-block actually blocks; per-run chain reset ------------
+// --- AG-10 - detect-and-block actually blocks; per-run chain reset ------------
 
-describe('AG-10 — detect-and-block blocks; chain resets per run', () => {
+describe('AG-10 - detect-and-block blocks; chain resets per run', () => {
   const passthroughSchema = {
     parse: (v: unknown) => v,
     safeParse: (v: unknown) => ({ success: true as const, data: v }),
@@ -93,7 +93,7 @@ describe('AG-10 — detect-and-block blocks; chain resets per run', () => {
     const endEv = events.find((e) => e.type === 'agent.end');
     if (endEv?.type !== 'agent.end') throw new Error('expected agent.end');
     const persisted = endEv.result.state.messages;
-    // The laundered commentary never lands in the durable history —
+    // The laundered commentary never lands in the durable history -
     // i.e. it cannot reach any subsequent provider request.
     expect(
       persisted.some(
@@ -114,7 +114,7 @@ describe('AG-10 — detect-and-block blocks; chain resets per run', () => {
     for await (const _ of agent.stream('one')) {
       // drain
     }
-    // Run 2 mentions the pattern but has NO denial in ITS chain — a
+    // Run 2 mentions the pattern but has NO denial in ITS chain - a
     // shared (un-reset) monitor would false-positive here.
     const events: AgentEvent[] = [];
     for await (const ev of agent.stream('two')) events.push(ev);

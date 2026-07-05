@@ -6,7 +6,7 @@ import { createDockerSandbox } from '../../src/sandbox/docker.js';
  * Phase 03c DoD: "DockerSandbox integration test (CI gated; skipped
  * on machines without Docker)." The integration body is gated
  * behind the explicit `GRAPHORIN_DOCKER_TEST=1` opt-in so it never
- * runs by accident — CI sets the env var only on runners where the
+ * runs by accident - CI sets the env var only on runners where the
  * daemon, the optional `dockerode` peer dependency, AND the
  * required image have been pre-pulled. Without the opt-in the body
  * surfaces as a `skipped` row so the DoD line "skipped on machines
@@ -81,7 +81,7 @@ describe('DockerSandbox', () => {
     });
   });
 
-  describe.skipIf(dockerOptIn)('without an opt-in (default — DoD `skipped` row)', () => {
+  describe.skipIf(dockerOptIn)('without an opt-in (default - DoD `skipped` row)', () => {
     it('reports the CI-gated path as skipped (DoD compliance row)', () => {
       // Marker test that the suite is correctly skipping when the
       // operator has not opted into Docker integration. Keeps the

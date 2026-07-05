@@ -1,5 +1,5 @@
 /**
- * `NoneSandbox` — direct in-process execution. The framework only
+ * `NoneSandbox` - direct in-process execution. The framework only
  * dispatches built-in trusted tools through this adapter (DEC-148).
  *
  * The adapter exists so `Sandbox.run<T>(...)` is callable with a
@@ -40,7 +40,7 @@ export type NoneSandboxHandler<TInput = unknown, TOutput = unknown> = (
  * Options for `NoneSandbox`. Hosting code passes a registry of
  * handlers; lookups are by `module + export` for `'handler'` codes
  * and by `'inline'` key for `'source'` / `'file'` codes (which the
- * adapter rejects — directly executing JS source bypasses the trust
+ * adapter rejects - directly executing JS source bypasses the trust
  * tier the user explicitly opted out of).
  *
  * @stable

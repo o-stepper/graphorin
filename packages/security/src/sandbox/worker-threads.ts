@@ -1,5 +1,5 @@
 /**
- * `WorkerThreadsSandbox` — the default adapter for user-defined tools
+ * `WorkerThreadsSandbox` - the default adapter for user-defined tools
  * per DEC-148. Runs the supplied code inside a `node:worker_threads`
  * `Worker`. The adapter:
  *
@@ -113,7 +113,7 @@ if (data && data.env) {
   for (const k of Object.keys(data.env)) process.env[k] = data.env[k];
 }
 
-// SDF-9: process-level escapes are ALWAYS blocked — child_process, vm,
+// SDF-9: process-level escapes are ALWAYS blocked - child_process, vm,
 // worker_threads (nested), cluster, inspector all defeat the untrusted
 // tier regardless of the fs/network flags. Defence in depth; the real
 // isolation guarantee still needs isolated-vm / docker.
@@ -162,14 +162,14 @@ if (data.noNetwork) {
 
 // Scrub the environment before user code runs: keep only the explicit
 // data.env allowlist. Defence in depth on top of the Worker's env: {}
-// construction; safe after register() — the loader thread captured
+// construction; safe after register() - the loader thread captured
 // GRAPHORIN_SANDBOX_BLOCKED during the synchronous registration.
 const allowedEnv = (data && data.env) || {};
 for (const k of Object.keys(process.env)) {
   if (!Object.prototype.hasOwnProperty.call(allowedEnv, k)) delete process.env[k];
 }
 
-// SDF-9: the ESM resolve hook does not see CJS require() — patch
+// SDF-9: the ESM resolve hook does not see CJS require() - patch
 // Module._load (after the runtime's own setup requires) so a
 // createRequire()-based require('node:child_process') / require('fs')
 // is denied too.

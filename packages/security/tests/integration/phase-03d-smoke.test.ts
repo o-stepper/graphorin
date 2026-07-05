@@ -23,7 +23,7 @@ import { createMemoryAuditDb } from '../audit/_helpers.js';
 import { resetOAuthSubsystem } from '../oauth/_helpers.js';
 import { buildSignedSkill, resetSupplyChain } from '../supply-chain/_helpers.js';
 
-describe('phase 03d — smoke conformance', () => {
+describe('phase 03d - smoke conformance', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
     resetSupplyChain();

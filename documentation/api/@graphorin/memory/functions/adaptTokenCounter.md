@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function adaptTokenCounter(counter): ContextTokenCounter & Pick<TokenCounter, "c
 Defined in: packages/memory/src/context-engine/token-counter.ts:76
 
 Wrap a real [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) into the narrower
-[ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface — PRESERVING the native
+[ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface - PRESERVING the native
 message-level `count(messages)` (context-engine-03). The adapter
 used to keep only `countText`, which forced
 [countMessageTokens](/api/@graphorin/memory/functions/countMessageTokens.md) onto the per-message render path for

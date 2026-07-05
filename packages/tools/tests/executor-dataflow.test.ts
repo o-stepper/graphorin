@@ -37,7 +37,7 @@ function captureAudit(): { events: ToolAuditEvent[]; stop: () => void } {
   return { events, stop };
 }
 
-describe('ToolExecutor — data-flow provenance gate (WI-12 / P1-3)', () => {
+describe('ToolExecutor - data-flow provenance gate (WI-12 / P1-3)', () => {
   const teardowns: Array<() => void> = [];
   afterEach(() => {
     for (const t of teardowns.splice(0)) t();
@@ -82,7 +82,7 @@ describe('ToolExecutor — data-flow provenance gate (WI-12 / P1-3)', () => {
     expect(recorded.map((r) => r.toolName).sort()).toEqual(['reader', 'sink']);
   });
 
-  it('blocks a sink on a "block" verdict — execute never runs', async () => {
+  it('blocks a sink on a "block" verdict - execute never runs', async () => {
     const registry = createToolRegistry();
     let executed = false;
     registry.register(
@@ -122,7 +122,7 @@ describe('ToolExecutor — data-flow provenance gate (WI-12 / P1-3)', () => {
     expect(events.some((e) => e.action === 'tool:dataflow:blocked')).toBe(true);
   });
 
-  it('proceeds (and audits) on a "flag" verdict — shadow mode', async () => {
+  it('proceeds (and audits) on a "flag" verdict - shadow mode', async () => {
     const registry = createToolRegistry();
     let executed = false;
     registry.register(

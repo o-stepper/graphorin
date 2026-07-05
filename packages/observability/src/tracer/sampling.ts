@@ -49,7 +49,7 @@ export interface SamplingOptions {
   readonly now?: () => number;
   /**
    * Optional override for streaming-event sampling.
-   * @see RB-52 — streaming event family `tool.execute.{progress,partial}`.
+   * @see RB-52 - streaming event family `tool.execute.{progress,partial}`.
    */
   readonly streaming?: {
     readonly eventSamplingRate?: number;
@@ -77,7 +77,7 @@ export interface Sampler {
 
 /**
  * Build a {@link Sampler} from the supplied options. The sampler is
- * intentionally inexpensive — every decision boils down to a single
+ * intentionally inexpensive - every decision boils down to a single
  * `random < threshold` comparison.
  *
  * @stable
@@ -101,7 +101,7 @@ export function createSampler(opts: SamplingOptions = {}): Sampler {
     shouldSample(type, parentSampled): boolean {
       if (decisionMaker === 'always-on') return true;
       if (decisionMaker === 'parent-based') {
-        // RP-19: true parent-based — follow the parent's real sampling
+        // RP-19: true parent-based - follow the parent's real sampling
         // decision. A child of an unsampled parent is NOT recorded (it would
         // otherwise be an orphan); a root span (no parent) falls through to
         // the rate.

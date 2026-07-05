@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,6 +12,6 @@ const enLocalePack: LocalePack;
 
 Defined in: packages/memory/src/conflict/locale-packs/en.ts:22
 
-The default English `LocalePack`. Frozen — share the singleton.
+The default English `LocalePack`. Frozen - share the singleton.
 
 ## Stable

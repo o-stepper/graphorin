@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/secrets/factory.ts:92
 
-Snapshot of the active store chain — surfaces in the
+Snapshot of the active store chain - surfaces in the
 `/v1/health/secrets` admin endpoint (consumed by the standalone
 server) and the `graphorin doctor --check-secrets` CLI command.
 

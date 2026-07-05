@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,9 +21,9 @@ Search options shared across memory tiers.
 | `dateRange.from?` | `readonly` | `string` | - | packages/core/src/types/memory.ts:369 |
 | `dateRange.to?` | `readonly` | `string` | - | packages/core/src/types/memory.ts:369 |
 | <a id="property-includearchived"></a> `includeArchived?` | `readonly` | `boolean` | - | packages/core/src/types/memory.ts:370 |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined memories in the result set (P1-4). Defaults to `false`: action-driving recall never returns quarantined rows. Set `true` only for the validation / inspector path — never for auto-recall fed back into the model. | packages/core/src/types/memory.ts:377 |
-| <a id="property-includesuperseded"></a> `includeSuperseded?` | `readonly` | `boolean` | Include superseded / validity-expired facts in the result set (memory-retrieval-01). Defaults to `false`: a default read behaves as `asOf = now`, so a fact whose `validTo` was closed (e.g. by `supersede`) never surfaces as current — exactly what the `fact_supersede` tool promises. Set `true` only for inspector / audit paths that need the full history. Ignored when an explicit [asOf](/api/@graphorin/core/interfaces/MemorySearchOptions.md#property-asof) is supplied. | packages/core/src/types/memory.ts:396 |
-| <a id="property-owner"></a> `owner?` | `readonly` | \| [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md) \| readonly [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md)[] | Retrieval-time principal filter (D3). When set, only records whose owner is in the requested set match; rows written before the feature (owner absent) are treated as `'user'`. Absent ⇒ no owner filter — behaviour is unchanged. | packages/core/src/types/memory.ts:403 |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined memories in the result set (P1-4). Defaults to `false`: action-driving recall never returns quarantined rows. Set `true` only for the validation / inspector path - never for auto-recall fed back into the model. | packages/core/src/types/memory.ts:377 |
+| <a id="property-includesuperseded"></a> `includeSuperseded?` | `readonly` | `boolean` | Include superseded / validity-expired facts in the result set (memory-retrieval-01). Defaults to `false`: a default read behaves as `asOf = now`, so a fact whose `validTo` was closed (e.g. by `supersede`) never surfaces as current - exactly what the `fact_supersede` tool promises. Set `true` only for inspector / audit paths that need the full history. Ignored when an explicit [asOf](/api/@graphorin/core/interfaces/MemorySearchOptions.md#property-asof) is supplied. | packages/core/src/types/memory.ts:396 |
+| <a id="property-owner"></a> `owner?` | `readonly` | \| [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md) \| readonly [`MemoryOwner`](/api/@graphorin/core/type-aliases/MemoryOwner.md)[] | Retrieval-time principal filter (D3). When set, only records whose owner is in the requested set match; rows written before the feature (owner absent) are treated as `'user'`. Absent ⇒ no owner filter - behaviour is unchanged. | packages/core/src/types/memory.ts:403 |
 | <a id="property-query"></a> `query` | `readonly` | `string` | - | packages/core/src/types/memory.ts:366 |
 | <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/core/src/types/memory.ts:378 |
 | <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | - | packages/core/src/types/memory.ts:368 |

@@ -62,7 +62,7 @@ function authWrappedFetch(baseFetch: typeof fetch, auth: TransportAuthSource): t
  *
  * When an `auth` source is supplied (HTTP transports only) the factory
  * installs a per-request fetch-wrapper that re-resolves the
- * `Authorization` header on every outgoing call — this is the seam that
+ * `Authorization` header on every outgoing call - this is the seam that
  * makes a long-lived agent session survive OAuth token expiry without
  * re-creating the client.
  *

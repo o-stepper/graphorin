@@ -19,7 +19,7 @@ import {
 import { afterEach, describe, expect, it } from 'vitest';
 import { loadSkillFromSource, loadSkills } from '../src/loader/index.js';
 
-describe('supply-chain integration — signature verification + --ignore-scripts enforcement', () => {
+describe('supply-chain integration - signature verification + --ignore-scripts enforcement', () => {
   afterEach(() => {
     _setPublicKeyFetcherForTesting(null);
     _setSigstoreVerifierForTesting(null);
@@ -106,7 +106,7 @@ describe('supply-chain integration — signature verification + --ignore-scripts
     // The supply-chain policy refuses to escalate npm-package /
     // git-repo sources to 'trusted-with-scripts' (those install paths
     // ALWAYS run --ignore-scripts). For folder-based installs we
-    // build a folder source manually — the loader does not call
+    // build a folder source manually - the loader does not call
     // installSkillFromNpm for folders, but the trust policy resolver
     // still derives ignoreScripts === false.
     const { resolveTrustPolicy } = await import('@graphorin/security/supply-chain');
@@ -201,7 +201,7 @@ describe('supply-chain integration — signature verification + --ignore-scripts
       return { exitCode: 0, stdout: '', stderr: '' };
     });
 
-    // Default (untrusted) trust level — no manual skillMd. Pre-fix this threw
+    // Default (untrusted) trust level - no manual skillMd. Pre-fix this threw
     // SkillSignatureMissingError BEFORE the install ever ran.
     const skill = await loadSkillFromSource({
       kind: 'npm-package',
@@ -243,7 +243,7 @@ describe('supply-chain integration — signature verification + --ignore-scripts
     });
 
     // RP-9 for downloaded sources: the self-declared 'trusted' (backed only
-    // by a self-attesting inline signature key) must NOT survive the load —
+    // by a self-attesting inline signature key) must NOT survive the load -
     // pre-fix the cap applied to folder sources only, so this skill loaded
     // unsandboxed as 'trusted' with no operator involvement.
     const skill = await loadSkillFromSource({

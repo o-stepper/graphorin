@@ -1,5 +1,5 @@
 /**
- * @graphorin/reranker-llm — LLM-as-reranker adapter for the Graphorin
+ * @graphorin/reranker-llm - LLM-as-reranker adapter for the Graphorin
  * framework.
  *
  * Asks the configured `Provider` to score `(query, passage)` pairs
@@ -28,7 +28,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export {
   createLlmReranker,

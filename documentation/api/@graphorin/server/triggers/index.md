@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # triggers
 
-`@graphorin/server/triggers` — daemon + REST routes for the
+`@graphorin/server/triggers` - daemon + REST routes for the
 triggers scheduler. Phase 14c surface.
 
 ## References

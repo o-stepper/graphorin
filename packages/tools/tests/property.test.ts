@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { tool } from '../src/builder/index.js';
 
-describe('tool() — property tests', () => {
+describe('tool() - property tests', () => {
   it('accepts arbitrary valid Zod schemas without throwing', () => {
     fc.assert(
       fc.property(fc.string({ minLength: 1, maxLength: 64 }), (raw) => {

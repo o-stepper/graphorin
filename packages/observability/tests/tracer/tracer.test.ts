@@ -10,7 +10,7 @@ import {
 import { UnvalidatedExporterError } from '../../src/redaction/errors.js';
 import { asGraphorinSpan, createSampler, createTracer } from '../../src/tracer/index.js';
 
-describe('@graphorin/observability/tracer — createTracer', () => {
+describe('@graphorin/observability/tracer - createTracer', () => {
   it('rejects un-wrapped exporters when validation is off', () => {
     const exporter = createConsoleExporter({ sink: () => {} });
     expect(() =>
@@ -36,7 +36,7 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     const records: SpanRecord[] = [];
     const exporter = mockExporter((record) => records.push(record));
     // Default validation floor is 'public'. The untagged `memory.scope.user_id`
-    // attribute defaults to the 'internal' tier — before RP-18 this made the
+    // attribute defaults to the 'internal' tier - before RP-18 this made the
     // whole span vanish from every exporter (operators saw empty traces).
     const tracer = createTracer({ exporters: [exporter], warnSink: () => {} });
     await tracer.span(
@@ -224,7 +224,7 @@ describe('@graphorin/observability/tracer — createTracer', () => {
     const exporter = mockExporter((r) => records.push(r));
     // With the default sensitivity set to 'public' against the default
     // 'public' floor, an untagged initial attribute survives instead of being
-    // stripped — proving the knob is effective.
+    // stripped - proving the knob is effective.
     const tracer = createTracer({
       exporters: [exporter],
       defaultAttributeSensitivity: 'public',

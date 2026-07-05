@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -28,9 +28,9 @@ or poisons the ranking.
 
 Like [fuseRrf](/api/@graphorin/memory/functions/fuseRrf.md) the fusion is deterministic, tie-broken by
 first-seen order, and preserves any upstream `signals` (FTS `bm25`,
-vector similarity) the hits carried in — the `rrf` / `rrf.list_N`
+vector similarity) the hits carried in - the `rrf` / `rrf.list_N`
 signals it records are the *weighted* contributions, so the fused
-`score` still equals their sum. Note that — unlike RRF — the result
+`score` still equals their sum. Note that - unlike RRF - the result
 depends on input list *order*, because each weight is bound to a list
 position.
 

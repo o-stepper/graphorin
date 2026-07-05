@@ -94,7 +94,7 @@ export function resolveAutoCompactionDefault(
     case 'loopback':
       return 'disabled';
     case 'private':
-      // Private LANs are the ambiguous tier — treat as enabled
+      // Private LANs are the ambiguous tier - treat as enabled
       // because operators rarely run dense sessions on them; the
       // override is one config line away.
       return 'enabled';

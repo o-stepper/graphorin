@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -17,14 +17,14 @@ Public surface of an active MCP client.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-collisionstrategy"></a> `collisionStrategy` | `readonly` | [`CollisionStrategy`](/api/@graphorin/tools/type-aliases/CollisionStrategy.md) | Per-client default collision strategy. | packages/mcp/src/client/types.ts:347 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Stable identifier — derived from the transport. | packages/mcp/src/client/types.ts:341 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Stable identifier - derived from the transport. | packages/mcp/src/client/types.ts:341 |
 | <a id="property-priority"></a> `priority?` | `readonly` | `number` | Per-client priority value used by the `'priority'` strategy. | packages/mcp/src/client/types.ts:349 |
-| <a id="property-resumable"></a> ~~`resumable`~~ | `readonly` | `boolean` | **Deprecated** Alias of [sessionIdPresent](/api/@graphorin/mcp/interfaces/MCPClient.md#property-sessionidpresent) — same value, misleading name. | packages/mcp/src/client/types.ts:360 |
+| <a id="property-resumable"></a> ~~`resumable`~~ | `readonly` | `boolean` | **Deprecated** Alias of [sessionIdPresent](/api/@graphorin/mcp/interfaces/MCPClient.md#property-sessionidpresent) - same value, misleading name. | packages/mcp/src/client/types.ts:360 |
 | <a id="property-serveridentity"></a> `serverIdentity` | `readonly` | [`ServerIdentity`](/api/@graphorin/mcp/type-aliases/ServerIdentity.md) | Server identity descriptor consumed by the tool-registry resolver. | packages/mcp/src/client/types.ts:345 |
 | <a id="property-serverinfo"></a> `serverInfo` | `readonly` | \{ `name`: `string`; `version`: `string`; \} | Server-advertised information from the `initialize` handshake. | packages/mcp/src/client/types.ts:343 |
 | `serverInfo.name` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:343 |
 | `serverInfo.version` | `readonly` | `string` | - | packages/mcp/src/client/types.ts:343 |
-| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time (MC-9). A session id means stateful routing — it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | packages/mcp/src/client/types.ts:358 |
+| <a id="property-sessionidpresent"></a> `sessionIdPresent` | `readonly` | `boolean` | Whether the Streamable HTTP server assigned an `Mcp-Session-Id` at `initialize` time (MC-9). A session id means stateful routing - it is NOT a replay guarantee: per the Streamable HTTP spec, event replay is the SERVER's responsibility, and the SDK transport already auto-reconnects with `Last-Event-ID` when the server supports it. | packages/mcp/src/client/types.ts:358 |
 
 ## Methods
 
@@ -172,7 +172,7 @@ Defined in: packages/mcp/src/client/types.ts:376
 
 First content item of the resource. mcp-skills-11: a multi-content
 response (one URI can yield several items) is truncated to the
-FIRST item — a WARN + counter fire when that happens; use
+FIRST item - a WARN + counter fire when that happens; use
 [readResourceContents](/api/@graphorin/mcp/interfaces/MCPClient.md#readresourcecontents) for the full array.
 
 #### Parameters

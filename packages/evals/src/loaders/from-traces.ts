@@ -1,5 +1,5 @@
 /**
- * `loadDatasetFromTraces` — distil a dataset from the framework's
+ * `loadDatasetFromTraces` - distil a dataset from the framework's
  * replay log. The caller supplies the JSONL replay file and a small
  * extraction function that pulls the `(input, output)` pair out of
  * each event group; the loader handles the JSONL parsing + grouping

@@ -25,7 +25,7 @@ const buildSendEmailTool = (): Tool<unknown, unknown, unknown> =>
     },
   }) as unknown as Tool<unknown, unknown, unknown>;
 
-describe('Agent — HITL approval flow', () => {
+describe('Agent - HITL approval flow', () => {
   it('suspends on a needsApproval tool call, persists RunState, and resumes via directive', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
@@ -46,18 +46,18 @@ describe('Agent — HITL approval flow', () => {
       tools: [buildSendEmailTool()],
     });
 
-    // First run — capture the suspended RunState by walking the stream.
+    // First run - capture the suspended RunState by walking the stream.
     const events1: AgentEvent[] = [];
     for await (const ev of agent.stream('email Alice')) {
       events1.push(ev);
       if (ev.type === 'tool.approval.requested') {
         // `agent.run(...)` now returns the suspended RunState directly
-        // (`result.state`, AG-9 — covered in agent-result.test.ts); this
+        // (`result.state`, AG-9 - covered in agent-result.test.ts); this
         // test keeps the synthetic-state path to pin the serialized
         // wire format a durable store would rehydrate from.
       }
     }
-    // The suspended run still ends with a terminal `agent.end` (AG-20) —
+    // The suspended run still ends with a terminal `agent.end` (AG-20) -
     // its result carries status 'awaiting_approval', which is how stream
     // consumers (e.g. an SSE bridge) learn the stream is over but resumable.
     const end1 = events1.find((e) => e.type === 'agent.end');
@@ -100,7 +100,7 @@ describe('Agent — HITL approval flow', () => {
     const rehydrated = runStateFromJSON(json);
     expect(rehydrated.pendingApprovals.length).toBe(1);
 
-    // Resume with a granted directive — the loop emits
+    // Resume with a granted directive - the loop emits
     // `tool.approval.granted` and produces a follow-up text.
     const provider2 = createMockProvider({
       modelId: 'mock',
@@ -127,7 +127,7 @@ describe('Agent — HITL approval flow', () => {
     }
   });
 
-  it('executes the approved tool on resume — real side effect, exactly once (AG-1)', async () => {
+  it('executes the approved tool on resume - real side effect, exactly once (AG-1)', async () => {
     const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done', 4)] });
     const agent = createAgent({
       name: 'mailer',
@@ -162,7 +162,7 @@ describe('Agent — HITL approval flow', () => {
     })) {
       events.push(ev);
     }
-    // The approved tool actually ran — exactly once — and its real result (not a
+    // The approved tool actually ran - exactly once - and its real result (not a
     // placeholder) reached the message buffer.
     const execEnds = events.filter((e) => e.type === 'tool.execute.end');
     expect(execEnds).toHaveLength(1);
@@ -216,7 +216,7 @@ describe('Agent — HITL approval flow', () => {
     expect(events.some((e) => e.type === 'tool.approval.denied')).toBe(true);
   });
 
-  it('resuming an awaiting-approval run WITHOUT a directive stays suspended — no provider call (AG-14)', async () => {
+  it('resuming an awaiting-approval run WITHOUT a directive stays suspended - no provider call (AG-14)', async () => {
     const provider = createMockProvider({
       modelId: 'mock',
       scripts: [textOnlyScript('should not run', 4)],
@@ -252,7 +252,7 @@ describe('Agent — HITL approval flow', () => {
     for await (const ev of agent.stream(runStateFromJSON(JSON.stringify(suspended)))) {
       events.push(ev);
     }
-    // Still suspended — the loop never re-issued the dangling tool_use.
+    // Still suspended - the loop never re-issued the dangling tool_use.
     expect(events.some((e) => e.type === 'step.start')).toBe(false);
     expect(events.some((e) => e.type === 'text.complete')).toBe(false);
   });

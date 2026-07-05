@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -21,4 +21,4 @@ for whole-step retries against the next model in the chain.
 | <a id="property-capacityeligible"></a> `capacityEligible?` | `readonly` | `boolean` | Default `true`. | packages/agent/src/fallback/index.ts:33 |
 | <a id="property-contextlengtheligible"></a> `contextLengthEligible?` | `readonly` | `boolean` | Default `true`. | packages/agent/src/fallback/index.ts:35 |
 | <a id="property-ratelimiteligible"></a> `rateLimitEligible?` | `readonly` | `boolean` | Default `true`. | packages/agent/src/fallback/index.ts:31 |
-| <a id="property-transienteligible"></a> `transientEligible?` | `readonly` | `boolean` | Default `false` — `withRetry` already covers transient errors. | packages/agent/src/fallback/index.ts:37 |
+| <a id="property-transienteligible"></a> `transientEligible?` | `readonly` | `boolean` | Default `false` - `withRetry` already covers transient errors. | packages/agent/src/fallback/index.ts:37 |

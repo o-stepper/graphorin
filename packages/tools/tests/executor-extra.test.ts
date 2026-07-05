@@ -11,7 +11,7 @@ import { createToolExecutor } from '../src/executor/index.js';
 import { createToolRegistry } from '../src/registry/index.js';
 import { makeRunContext } from './fixtures.js';
 
-describe('ToolExecutor — secrets ACL enforcement (DoD)', () => {
+describe('ToolExecutor - secrets ACL enforcement (DoD)', () => {
   beforeEach(() => resetCountersForTesting());
 
   it('throws SecretAccessDeniedError when ctx.secrets.require() asks for a key outside `secretsAllowed`', async () => {
@@ -109,7 +109,7 @@ describe('ToolExecutor — secrets ACL enforcement (DoD)', () => {
   });
 });
 
-describe('ToolExecutor — tool repair second-failure path (DoD)', () => {
+describe('ToolExecutor - tool repair second-failure path (DoD)', () => {
   it('returns ToolError({ kind: "invalid_input" }) when the repaired payload also fails validation', async () => {
     const registry = createToolRegistry();
     registry.register(
@@ -142,7 +142,7 @@ describe('ToolExecutor — tool repair second-failure path (DoD)', () => {
   });
 });
 
-describe('ToolExecutor — tracer span emission (DoD: GenAI semantic conventions)', () => {
+describe('ToolExecutor - tracer span emission (DoD: GenAI semantic conventions)', () => {
   it('wraps each tool execution in a `tool.execute` AISpan with rich attributes', async () => {
     const captured: { type: string; attrs: Record<string, unknown>; statuses: string[] }[] = [];
     const fakeTracer = makeRecordingTracer(captured);
@@ -214,7 +214,7 @@ describe('ToolExecutor — tracer span emission (DoD: GenAI semantic conventions
   });
 });
 
-describe('ToolExecutor — content-parts pass-through (DoD: ToolReturn<TOutput>.contentParts)', () => {
+describe('ToolExecutor - content-parts pass-through (DoD: ToolReturn<TOutput>.contentParts)', () => {
   it('preserves non-text content parts bytes-equal and surfaces them on the span', async () => {
     const captured: { type: string; attrs: Record<string, unknown>; statuses: string[] }[] = [];
     const fakeTracer = makeRecordingTracer(captured);
@@ -259,7 +259,7 @@ describe('ToolExecutor — content-parts pass-through (DoD: ToolReturn<TOutput>.
   });
 });
 
-describe('ToolExecutor — sandbox dispatch (DoD: SandboxImpl wired)', () => {
+describe('ToolExecutor - sandbox dispatch (DoD: SandboxImpl wired)', () => {
   it('delegates to SandboxImpl.run() when a sandbox resolver returns a non-null impl', async () => {
     const registry = createToolRegistry();
     registry.register(
@@ -343,7 +343,7 @@ describe('ToolExecutor — sandbox dispatch (DoD: SandboxImpl wired)', () => {
   });
 });
 
-describe('ToolExecutor — memory-modification guard (DoD)', () => {
+describe('ToolExecutor - memory-modification guard (DoD)', () => {
   it('invokes guard.snapshot before and guard.verify after execution', async () => {
     const calls: string[] = [];
     const registry = createToolRegistry();
@@ -447,7 +447,7 @@ describe('ToolExecutor — memory-modification guard (DoD)', () => {
   });
 });
 
-describe('ToolExecutor — default spill writer (DoD)', () => {
+describe('ToolExecutor - default spill writer (DoD)', () => {
   it('writes the un-truncated body to a per-run / per-call file under os.tmpdir() with mode 0o600', async () => {
     const fs = await import('node:fs/promises');
     const registry = createToolRegistry();
@@ -498,7 +498,7 @@ describe('ToolExecutor — default spill writer (DoD)', () => {
   });
 });
 
-describe('ToolExecutor — first-chunk duration histogram (DoD)', () => {
+describe('ToolExecutor - first-chunk duration histogram (DoD)', () => {
   it('records tool.streaming.first-chunk.duration_ms on first chunk emit', async () => {
     resetCountersForTesting();
     const registry = createToolRegistry();

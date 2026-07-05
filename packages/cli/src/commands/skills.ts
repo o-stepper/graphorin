@@ -1,18 +1,18 @@
 /**
- * `graphorin skills` — install + audit + migrate operator-managed
+ * `graphorin skills` - install + audit + migrate operator-managed
  * skill packages.
  *
  * Surface (per Phase 15 § Skills):
  *
- *  - `graphorin skills install <source>` — `npm:` or `git:` source.
+ *  - `graphorin skills install <source>` - `npm:` or `git:` source.
  *    Honours allowlist / denylist + signature verification (DEC-140 /
  *    ADR-034). Refuses when `GRAPHORIN_OFFLINE=1` is set.
- *  - `graphorin skills inspect <name>` — frontmatter + signature +
+ *  - `graphorin skills inspect <name>` - frontmatter + signature +
  *    supply-chain status of an installed skill.
- *  - `graphorin skills audit` — full audit of every recorded
+ *  - `graphorin skills audit` - full audit of every recorded
  *    installation.
  *  - `graphorin skills migrate-frontmatter [--apply] [--recursive]`
- *    — DEC-156: rewrites legacy `graphorin-*` frontmatter fields onto
+ *    - DEC-156: rewrites legacy `graphorin-*` frontmatter fields onto
  *    their upstream equivalents.
  *
  * @packageDocumentation

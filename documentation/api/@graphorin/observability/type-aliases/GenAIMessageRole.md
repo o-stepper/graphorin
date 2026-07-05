@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@
 type GenAIMessageRole = "system" | "user" | "assistant" | "tool";
 ```
 
-Defined in: packages/observability/src/gen-ai/types.ts:85
+Defined in: packages/observability/src/gen-ai/types.ts:89
 
 Per-message event type used by [emitGenAIMessageEvents](/api/@graphorin/observability/functions/emitGenAIMessageEvents.md).
 

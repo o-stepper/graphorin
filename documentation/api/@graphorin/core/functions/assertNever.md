@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,7 +15,7 @@ Defined in: packages/core/src/utils/assert-never.ts:22
 Exhaustiveness helper. Place at the end of a `switch (...)` over a
 discriminated union: TypeScript narrows the operand to `never` if
 every variant is handled. Adding a new variant later turns the call
-site into a compile error — the regression net for our event unions.
+site into a compile error - the regression net for our event unions.
 
 ## Parameters
 

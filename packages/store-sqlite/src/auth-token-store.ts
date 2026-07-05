@@ -4,7 +4,7 @@ import type { SqliteConnection } from './connection.js';
 /**
  * Default `AuthTokenStore` implementation. Persists HMAC-SHA256 hashes
  * of issued server tokens (DEC-122 / ADR-027). Raw tokens are never
- * persisted — the runtime carries them via `SecretValue`.
+ * persisted - the runtime carries them via `SecretValue`.
  *
  * @stable
  */

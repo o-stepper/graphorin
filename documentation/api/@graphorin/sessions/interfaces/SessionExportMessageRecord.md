@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -18,7 +18,7 @@ commentary-phase sanitization) plus storage metadata.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | - | packages/sessions/src/export/types.ts:126 |
-| <a id="property-embedderid"></a> `embedderId?` | `readonly` | `string` | Optional embedding metadata. The bytes themselves are NOT included — only the embedder id; importers re-compute embeddings locally if the embedder matches, or drop them under mismatch. | packages/sessions/src/export/types.ts:136 |
+| <a id="property-embedderid"></a> `embedderId?` | `readonly` | `string` | Optional embedding metadata. The bytes themselves are NOT included - only the embedder id; importers re-compute embeddings locally if the embedder matches, or drop them under mismatch. | packages/sessions/src/export/types.ts:136 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"message"` | - | packages/sessions/src/export/types.ts:122 |
 | <a id="property-message"></a> `message` | `readonly` | [`Message`](/api/@graphorin/core/type-aliases/Message.md) | - | packages/sessions/src/export/types.ts:130 |
 | <a id="property-messageid"></a> `messageId` | `readonly` | `string` | - | packages/sessions/src/export/types.ts:124 |

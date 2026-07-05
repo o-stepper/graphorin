@@ -90,7 +90,7 @@ function rewriteLinks(body) {
 }
 
 /**
- * Strip the first level-1 heading (`# Title`) — VitePress will render the
+ * Strip the first level-1 heading (`# Title`) - VitePress will render the
  * frontmatter `title` instead (we also inject `# ${title}`), so leaving the
  * source H1 in place duplicates the heading on the docs page.
  *
@@ -135,13 +135,13 @@ async function syncOne({ from, to, title, description }) {
   try {
     source = await readFile(sourcePath, 'utf8');
   } catch (err) {
-    console.warn(`[graphorin/docs] sync-root-docs: skipped '${from}' — ${err?.message || err}`);
+    console.warn(`[graphorin/docs] sync-root-docs: skipped '${from}' - ${err?.message || err}`);
     return;
   }
   const banner = [
     '<!--',
     `  This page is auto-synced from /${from} on every documentation build.`,
-    `  Do not edit it directly — change /${from} in the repository root.`,
+    `  Do not edit it directly - change /${from} in the repository root.`,
     '-->',
   ].join('\n');
   const frontmatterLines = [

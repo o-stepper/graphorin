@@ -1,5 +1,5 @@
 /**
- * `ConsoleExporter` — pretty-prints finished spans to `console.log`.
+ * `ConsoleExporter` - pretty-prints finished spans to `console.log`.
  *
  * Useful for development and unit testing. Production deployments
  * should use {@link JSONLExporter} (for replay) or

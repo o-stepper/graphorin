@@ -1,5 +1,5 @@
 /**
- * `STRICT_FULL_GUARD` — the strict tier for tools sourced from
+ * `STRICT_FULL_GUARD` - the strict tier for tools sourced from
  * untrusted skills (DEC-153). Every region is hashed before and
  * after; on mismatch the guard returns `ok: false` so the caller can
  * roll back via the savepoint mechanism (the agent runtime in

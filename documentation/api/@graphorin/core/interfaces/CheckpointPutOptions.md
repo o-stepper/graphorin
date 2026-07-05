@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Optional atomicity contract for [CheckpointStore.put](/api/@graphorin/core/inter
 workflow-01). When `expectedLatestId` is supplied, the store MUST
 perform the latest-checkpoint comparison and the insert atomically
 (single transaction / synchronous critical section) and throw
-[CheckpointConflictError](/api/@graphorin/core/classes/CheckpointConflictError.md) on mismatch — closing the TOCTOU
+[CheckpointConflictError](/api/@graphorin/core/classes/CheckpointConflictError.md) on mismatch - closing the TOCTOU
 window an engine-level read-then-write cannot. `null` means "expect
 no checkpoint for this thread yet"; `undefined` (or a store that
 ignores the argument) preserves the unguarded legacy behaviour, which

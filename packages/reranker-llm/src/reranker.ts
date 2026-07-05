@@ -5,9 +5,9 @@
  *
  * Defaults follow ADR-024 / DEC-120 § LLM reranker:
  *
- *  - `temperature: 0` — deterministic for the same model + prompt.
- *  - `batchSize: 5` — five concurrent provider calls per merged batch.
- *  - `maxScore: 10` — operators can widen for finer granularity.
+ *  - `temperature: 0` - deterministic for the same model + prompt.
+ *  - `batchSize: 5` - five concurrent provider calls per merged batch.
+ *  - `maxScore: 10` - operators can widen for finer granularity.
  *  - English scoring prompt; users translate or replace per locale.
  *
  * @packageDocumentation
@@ -47,7 +47,7 @@ export interface LlmRerankerOptions<TRecord extends MemoryRecord = MemoryRecord>
    */
   readonly scoringPrompt?: ScoringPromptBuilder;
   /**
-   * Override the passage extractor — replaces the default heuristic
+   * Override the passage extractor - replaces the default heuristic
    * that walks `text → summary → value → label → id`.
    */
   readonly passageExtractor?: PassageExtractor<TRecord>;
@@ -58,7 +58,7 @@ export interface LlmRerankerOptions<TRecord extends MemoryRecord = MemoryRecord>
   readonly temperature?: number;
   /**
    * Optional max-tokens hint for the integer-only output. Default
-   * `8` — large enough for multi-digit `maxScore` values, small
+   * `8` - large enough for multi-digit `maxScore` values, small
    * enough to fail-fast if the model drifts into a verbose response.
    */
   readonly maxOutputTokens?: number;
@@ -77,7 +77,7 @@ export interface LlmRerankerOptions<TRecord extends MemoryRecord = MemoryRecord>
 
 /**
  * Build an LLM-as-reranker. The reranker is stateless past the
- * provider reference — the provider's own session / connection
+ * provider reference - the provider's own session / connection
  * lifecycle owns the network resources.
  *
  * @stable
@@ -157,7 +157,7 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
   /**
    * Number of per-passage provider failures swallowed (→ `fallbackScore`) on
    * the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
-   * is partially degraded — surface it for observability.
+   * is partially degraded - surface it for observability.
    */
   get lastErrorCount(): number {
     return this.#lastErrorCount;
@@ -253,7 +253,7 @@ export class LlmReRanker<TRecord extends MemoryRecord = MemoryRecord> implements
       return { idx, score: parsed };
     } catch (err) {
       // PS-15: a single provider failure (429 / timeout / transient) must not
-      // collapse the whole rerank — this is an optional quality layer over
+      // collapse the whole rerank - this is an optional quality layer over
       // memory search. Degrade that one passage to the neutral fallback and
       // record the error. A deliberate abort is not transient: re-throw it.
       if (isAbortError(err)) throw err;
@@ -297,9 +297,9 @@ export function mergeAndDedupe<TRecord extends MemoryRecord>(
 /**
  * Parse the model's reply into a non-negative integer. Accepts:
  *
- *  - `'7'` — bare integer.
- *  - `'7\n'` / `' 7 '` — surrounding whitespace stripped.
- *  - `'Score: 7'` / `'7/10'` — first integer in the string is taken.
+ *  - `'7'` - bare integer.
+ *  - `'7\n'` / `' 7 '` - surrounding whitespace stripped.
+ *  - `'Score: 7'` / `'7/10'` - first integer in the string is taken.
  *
  * Returns `null` when no integer can be extracted; the reranker
  * substitutes the fallback score.

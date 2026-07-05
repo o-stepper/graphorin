@@ -3,7 +3,7 @@
  * snapshot. The old code stored a live `MutableRunState` reference
  * (post-suspend mutations leaked into in-memory stores) and
  * `serializeRunState`'s documented `stripTracingApiKey` option was
- * `void options;` — dead.
+ * `void options;` - dead.
  */
 
 import type { Checkpoint, CheckpointMetadata, Tool } from '@graphorin/core';
@@ -34,7 +34,7 @@ function baseState() {
   return state;
 }
 
-describe('AG-23 — serializeRunState is a detached snapshot', () => {
+describe('AG-23 - serializeRunState is a detached snapshot', () => {
   it('deep-clones: mutations of the source AFTER serializing do not reach the snapshot', () => {
     const state = baseState();
     const snapshot = serializeRunState(state);
@@ -101,7 +101,7 @@ const sendTool = (): Tool<unknown, unknown, unknown> =>
     },
   }) as unknown as Tool<unknown, unknown, unknown>;
 
-describe('AG-23 — the suspend checkpoint is serialized, stripped, and detached', () => {
+describe('AG-23 - the suspend checkpoint is serialized, stripped, and detached', () => {
   it('persists a version-stamped snapshot with secrets redacted; post-suspend mutations stay invisible', async () => {
     const puts: Array<{ checkpoint: Checkpoint; metadata: CheckpointMetadata }> = [];
     const checkpointStore = {

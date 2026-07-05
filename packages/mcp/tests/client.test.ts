@@ -6,7 +6,7 @@ import type { MCPClient } from '../src/client/index.js';
 import { MCPProtocolError, MCPToolNotFoundError } from '../src/errors/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MCPClient — integration against the in-memory MCP server', () => {
+describe('MCPClient - integration against the in-memory MCP server', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 
@@ -150,7 +150,7 @@ describe('MCPClient — integration against the in-memory MCP server', () => {
       resources: [
         {
           uri: 'mem://nope',
-          // No content body — the fixture returns `contents: [...]` with
+          // No content body - the fixture returns `contents: [...]` with
           // a single entry; we test the empty-array branch by using a
           // missing resource.
         },

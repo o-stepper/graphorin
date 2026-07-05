@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -21,6 +21,6 @@ Defined in: packages/cli/src/commands/traces.ts:83
 | <a id="property-before"></a> `before` | `readonly` | `string` | ISO date / epoch ms cutoff. Required so the helper never silently empties the table. | - | packages/cli/src/commands/traces.ts:86 |
 | <a id="property-config"></a> `config?` | `readonly` | `string` | - | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`config`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-config) | packages/cli/src/commands/traces.ts:28 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-json) | packages/cli/src/internal/output.ts:71 |
-| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam — capture JSON documents instead of writing to stdout. | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
+| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-noninteractive) | packages/cli/src/internal/output.ts:73 |
-| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam — capture human lines instead of writing to stderr. | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |
+| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam - capture human lines instead of writing to stderr. | [`TracesCommonOptions`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/TracesCommonOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |

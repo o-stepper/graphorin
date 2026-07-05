@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function buildMemoryTools(deps, options?): readonly Tool<unknown, unknown, unkno
 
 Defined in: packages/memory/src/tools/index.ts:85
 
-Build the canonical eleven-memory-tool array. Order is stable —
+Build the canonical eleven-memory-tool array. Order is stable -
 consumers can rely on the indices for snapshot tests. `fact_history`
 (P0-2) and `fact_validate` (P1-4) are appended last so the original
 nine indices are unchanged. With `{ includeDeepRecall: true }` the

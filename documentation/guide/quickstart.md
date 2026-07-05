@@ -5,7 +5,7 @@ description: A 20-line memory-backed agent that streams tokens and persists fact
 
 # Quickstart
 
-This walkthrough is the smallest end-to-end Graphorin assistant. Everything runs on your laptop — SQLite for storage, multilingual embeddings via `@huggingface/transformers`, and a deterministic stub provider for the LLM. No API keys, no telemetry, no phone-home.
+This walkthrough is the smallest end-to-end Graphorin assistant. Everything runs on your laptop - SQLite for storage, multilingual embeddings via `@huggingface/transformers`, and a deterministic stub provider for the LLM. No API keys, no telemetry, no phone-home.
 
 ## What you'll build
 
@@ -56,7 +56,7 @@ await sqlite.close();
 ## The stub provider
 
 `createStubProvider()` is a tiny, deterministic `Provider` that echoes the last
-user message — no API keys, no network. Save it next to the snippet above as
+user message - no API keys, no network. Save it next to the snippet above as
 `stub-provider.ts`:
 
 ```ts
@@ -129,7 +129,7 @@ sequenceDiagram
     Agent-->>App: event.type === "text.delta"
 ```
 
-> The model reaches memory only through the **memory tools** it calls — the agent does not auto-compile a memory-aware prompt or auto-persist facts. Pass `tools: memory.tools` (below) to make those tools available; the only automatic memory integration today is [auto-compaction](/guide/agent-runtime#context-management-in-the-loop).
+> The model reaches memory only through the **memory tools** it calls - the agent does not auto-compile a memory-aware prompt or auto-persist facts. Pass `tools: memory.tools` (below) to make those tools available; the only automatic memory integration today is [auto-compaction](/guide/agent-runtime#context-management-in-the-loop).
 
 ## Try it with a real local LLM
 
@@ -177,11 +177,11 @@ A few of the most common event types:
 | `agent.lateral-leak.detected` | The lateral-leak defense layer flagged outbound content. |
 | `guardrail.tripped` | An input or output guardrail tripped. |
 
-The discriminated `AgentEvent<TOutput>` union is exhaustive and verified at compile time — `assertNever(event)` in the default branch keeps your handlers honest.
+The discriminated `AgentEvent<TOutput>` union is exhaustive and verified at compile time - `assertNever(event)` in the default branch keeps your handlers honest.
 
 ## Persisting facts
 
-Passing `tools: memory.tools` (as in the agent above) exposes the eleven memory tools to the model (a twelfth, `deep_recall`, when iterative retrieval is configured) — without it the model has no memory tools to call. You can also drive the same tiers directly from your own code, no agent required:
+Passing `tools: memory.tools` (as in the agent above) exposes the eleven memory tools to the model (a twelfth, `deep_recall`, when iterative retrieval is configured) - without it the model has no memory tools to call. You can also drive the same tiers directly from your own code, no agent required:
 
 ```ts no-check
 await memory.semantic.remember(
@@ -199,12 +199,12 @@ See [Memory system](/guide/memory-system) for the full tier model and the confli
 
 ## Next steps
 
-- [Architecture](/guide/architecture) — how the layers fit together.
-- [Memory system](/guide/memory-system) — the six tiers, hybrid search, and the consolidator.
-- [Agent runtime](/guide/agent-runtime) — streaming, HITL, multi-agent handoffs.
-- [Providers](/guide/providers) — switch from the stub to Ollama, llama.cpp, or any cloud provider.
-- [Examples](/guide/examples) — full end-to-end example apps in the repository.
+- [Architecture](/guide/architecture) - how the layers fit together.
+- [Memory system](/guide/memory-system) - the six tiers, hybrid search, and the consolidator.
+- [Agent runtime](/guide/agent-runtime) - streaming, HITL, multi-agent handoffs.
+- [Providers](/guide/providers) - switch from the stub to Ollama, llama.cpp, or any cloud provider.
+- [Examples](/guide/examples) - full end-to-end example apps in the repository.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

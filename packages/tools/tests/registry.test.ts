@@ -36,7 +36,7 @@ function makeTool(name: string, sideEffect: 'pure' | 'side-effecting' = 'pure') 
   });
 }
 
-describe('ToolRegistry — register/get/list', () => {
+describe('ToolRegistry - register/get/list', () => {
   beforeEach(() => resetCountersForTesting());
   afterEach(() => resetCountersForTesting());
 
@@ -80,7 +80,7 @@ describe('ToolRegistry — register/get/list', () => {
   });
 });
 
-describe('ToolRegistry — assertNoDuplicates() pure detection (back-compat)', () => {
+describe('ToolRegistry - assertNoDuplicates() pure detection (back-compat)', () => {
   beforeEach(() => resetCountersForTesting());
 
   it('throws DuplicateToolNameError eagerly when two first-party tools collide at register time', () => {
@@ -97,7 +97,7 @@ describe('ToolRegistry — assertNoDuplicates() pure detection (back-compat)', (
   });
 });
 
-describe('ToolRegistry — strategy-aware overload', () => {
+describe('ToolRegistry - strategy-aware overload', () => {
   beforeEach(() => resetCountersForTesting());
 
   it("'auto-prefix': renames the MCP-derived tool when colliding with a first-party tool", () => {
@@ -143,7 +143,7 @@ describe('ToolRegistry — strategy-aware overload', () => {
     );
   });
 
-  it("first-party precedence over MCP — `'priority'` keeps first-party regardless of priority", () => {
+  it("first-party precedence over MCP - `'priority'` keeps first-party regardless of priority", () => {
     const registry = createToolRegistry();
     registry.register(makeTool('c'));
     registry.register(makeTool('c'), MCP_LINEAR);

@@ -1,5 +1,5 @@
 /**
- * `ContextEngine` — the layered six-layer system prompt assembler.
+ * `ContextEngine` - the layered six-layer system prompt assembler.
  *
  * Combines:
  *
@@ -109,10 +109,10 @@ export type AutoRecallConfig =
       readonly topK?: number;
       /**
        * Minimum fused score a hit must reach to be injected. **Default `0`**
-       * (CE-4) — `topK` already bounds the volume. The scale is
+       * (CE-4) - `topK` already bounds the volume. The scale is
        * reranker-dependent: the default RRF reranker fuses the FTS + vector
        * candidate lists as `1/(60 + rank)` per list, so scores top out near
-       * `2/(60 + 1) ≈ 0.033` — any positive default would silently drop every
+       * `2/(60 + 1) ≈ 0.033` - any positive default would silently drop every
        * hit. Set this only when calibrating against a known reranker's scale.
        */
       readonly threshold?: number;
@@ -225,7 +225,7 @@ export interface AssembledPrompt {
   readonly systemMessage: { readonly role: 'system'; readonly content: string };
   /**
    * Per-part annotations, in the same order as the assembled
-   * system content. Span-only — never serialized to the wire payload.
+   * system content. Span-only - never serialized to the wire payload.
    */
   readonly annotations: ReadonlyArray<AnnotatedPart>;
   /**
@@ -259,7 +259,7 @@ export interface ContextEngine {
    * buffer's token count crosses the per-provider trigger
    * threshold. Pass `precomputedTokens` to amortize the count
    * via the per-message cache surfaced by
-   * `SessionMemoryStoreExt.totalCachedTokens(scope)` (DEC-131) —
+   * `SessionMemoryStoreExt.totalCachedTokens(scope)` (DEC-131) -
    * the production hot path is an O(1) comparison when the cache
    * is warm.
    */
@@ -271,7 +271,7 @@ export interface ContextEngine {
        * Index of the first COMPACTABLE message (context-engine-04): the
        * caller's pinned, never-compacted system prefix ends here. The
        * SOTA-4 reclaim floor counts only `messages.slice(from)` older
-       * turns as reclaimable — without it a large system prompt is
+       * turns as reclaimable - without it a large system prompt is
        * counted as reclaimable and the floor fires the summarizer for
        * near-zero real reclaim. Default `0` (everything compactable).
        */
@@ -297,7 +297,7 @@ export interface ContextEngine {
     /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
     readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
     /**
-     * The caller's pinned system prefix — the messages EXCLUDED from
+     * The caller's pinned system prefix - the messages EXCLUDED from
      * `messages` before this call (context-engine-04). Used only for
      * accounting: the anti-thrash guard and the "still above threshold"
      * warning must compare against the FULL post-splice context
@@ -365,7 +365,7 @@ function warnCompactionIneffective(message: string): void {
 }
 
 /**
- * Test-only — reset the one-time CE-12 compaction warning so a test can assert
+ * Test-only - reset the one-time CE-12 compaction warning so a test can assert
  * it fires.
  *
  * @internal
@@ -374,19 +374,19 @@ export function _resetCompactionWarningForTesting(): void {
   compactionIneffectiveWarned = false;
 }
 
-/** @internal — test seam for the one-time heuristic-counter warning (CE-13). */
+/** @internal - test seam for the one-time heuristic-counter warning (CE-13). */
 export function _resetHeuristicCounterWarningForTesting(): void {
   heuristicCounterWarned = false;
 }
 
 /**
- * Emission order for the assembled layers — deliberately **distinct from the
+ * Emission order for the assembled layers - deliberately **distinct from the
  * truncation priority ladder** (CE-9). Allocation still trims by
  * `DEFAULT_LAYER_PRIORITY` (lowest priority first), but layers are *emitted* in
  * this order so the volatile blocks that change every turn (`memoryMetadata`'s
  * counts, `autoRecall`'s injected facts) sit **after** the stable Layer 1-4
- * prefix (identity / rules / blocks / skills). That keeps the provider's — and a
- * local llama.cpp / vLLM server's — KV-cache breakpoint real: the prefix stays
+ * prefix (identity / rules / blocks / skills). That keeps the provider's - and a
+ * local llama.cpp / vLLM server's - KV-cache breakpoint real: the prefix stays
  * byte-identical across turns even as the message count and recalled facts move.
  */
 const LAYER_EMIT_ORDER: Readonly<Record<LayerAllocation['id'], number>> = Object.freeze({
@@ -437,7 +437,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       : (config.tokenCounter as ContextTokenCounter)
     : HEURISTIC_TOKEN_COUNTER;
   // CE-13: budgeting against a real provider window with the heuristic
-  // counter is approximate — say so once instead of failing silently
+  // counter is approximate - say so once instead of failing silently
   // late (the heuristic's failure mode is a provider context-length
   // error before compaction fires).
   if (
@@ -481,7 +481,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
         })
       : Number.POSITIVE_INFINITY;
   // CE-12: compaction enabled without a `providerContextWindow` leaves the
-  // threshold at Infinity, so `shouldCompact` returns false forever — a
+  // threshold at Infinity, so `shouldCompact` returns false forever - a
   // silently-dead default-on protection. Surface it: throw if the operator
   // explicitly configured compaction, warn (once) if it is on by the default
   // trust policy. Auto-detecting the window from the provider is not
@@ -491,7 +491,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const message =
       'context-engine compaction is enabled but `providerContextWindow` is not set, so the ' +
       'trigger threshold is Infinity and compaction will never fire. Pass `providerContextWindow` ' +
-      "(your model's context window, in tokens) — auto-detection from the provider is not implemented.";
+      "(your model's context window, in tokens) - auto-detection from the provider is not implemented.";
     if (compactionInput !== undefined && compactionInput !== false) {
       throw new Error(`[graphorin/memory] ${message}`);
     }
@@ -547,12 +547,12 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
   });
 
   async function assemble(memory: Memory, input: AssembleInput): Promise<AssembledPrompt> {
-    // Layer 1 — base template.
+    // Layer 1 - base template.
     const layer1Text = layersEnabled.identity ? composeLayer1(localePack, memoryBaseMode) : '';
-    // Layer 2 — agent instructions.
+    // Layer 2 - agent instructions.
     const layer2Text = composeLayer2(input.agentInstructions);
 
-    // Layer 3 — working blocks (filter D2).
+    // Layer 3 - working blocks (filter D2).
     const blocks = await memory.working.list(input.scope);
     const blocksKept: Array<(typeof blocks)[number]> = [];
     const privacyCounters: Record<PrivacyDecisionReason, number> = {
@@ -575,7 +575,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     }
     const layer3Text = layersEnabled.workingBlocks ? renderWorkingBlocks(blocksKept) : '';
 
-    // Layer 4 — procedural rules + skills (filter D2 on rules).
+    // Layer 4 - procedural rules + skills (filter D2 on rules).
     const rules = await memory.procedural.activate(input.scope, input.proceduralActivation ?? {});
     const rulesKept: Array<(typeof rules)[number]> = [];
     for (const rule of rules) {
@@ -595,13 +595,13 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       ? composeLayer4Skills(input.skills ?? [])
       : '';
 
-    // Layer 5 — memory metadata.
+    // Layer 5 - memory metadata.
     const meta = await memory.metadata(input.scope);
     const layer5Text = layersEnabled.memoryMetadata
       ? renderMetadataBlock(enrichMetadataTags(meta, localeId, memory.embedderId()))
       : '';
 
-    // Layer 6 — auto-recall.
+    // Layer 6 - auto-recall.
     let autoRecall: AutoRecallTriggerResult = { factsTriggered: false };
     let layer6Text = '';
     if (factsAutoRecall !== false && layersEnabled.autoRecall) {
@@ -613,7 +613,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       });
       if (autoRecall.factsTriggered) {
         const topK = factsAutoRecall.topK ?? layerCfg.autoRecall?.topK ?? 5;
-        // CE-4: default 0 — rank-based `topK` already bounds the injected
+        // CE-4: default 0 - rank-based `topK` already bounds the injected
         // volume, and the threshold's scale is reranker-dependent (the default
         // RRF reranker fuses 2 candidate lists, so scores top out near
         // `2/(60+1) ≈ 0.033` and any positive default would silently drop
@@ -661,7 +661,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
 
     const allocation = await allocateLayers(candidates, maxContextTokens, tokenCounter);
 
-    // D4 inbound preamble — fires on steps containing untrusted upstream parts.
+    // D4 inbound preamble - fires on steps containing untrusted upstream parts.
     const preambleFired = shouldFireInboundPreamble(input.upstreamAnnotations ?? []);
     const preambleText = preambleFired ? composeInboundPreamble(localePack) : '';
 
@@ -675,7 +675,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     if (preambleText.length > 0) finalParts.push(preambleText);
     const systemContent = finalParts.join('\n\n');
 
-    // Annotations — one per assembled fragment, in the same order
+    // Annotations - one per assembled fragment, in the same order
     // as `finalParts` so observers can correlate.
     const annotations: AnnotatedPart[] = assembledLayers.map((layer) => ({
       content: { type: 'text', text: layer.text } as MessageContent,
@@ -703,16 +703,16 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
   // CE-7 anti-thrash: after a compaction whose afterTokens still sits at
   // or above the trigger threshold (e.g. huge tool results among the
   // preserved turns), an immediate re-trigger would summarize the
-  // previous summary — spend with no reclaim. Track the last outcome and
+  // previous summary - spend with no reclaim. Track the last outcome and
   // require the buffer to have GROWN past it before firing again.
   let lastCompactionAfterTokens: number | null = null;
   const REARM_GROWTH_TOKENS = 256;
 
   // C4 (context-engine-06/07 hardening): a persistently-failing summarizer
   // previously re-fired an LLM call at the top of EVERY step (the
-  // anti-thrash guard arms only on success). Count consecutive failures —
+  // anti-thrash guard arms only on success). Count consecutive failures -
   // including "successful" passes that did not actually shrink the buffer
-  // — retry each pass once with a short backoff, and after
+  // - retry each pass once with a short backoff, and after
   // MAX_CONSECUTIVE_COMPACTION_FAILURES disable the AUTO trigger until a
   // later compactNow (e.g. a manual compact with a fixed summarizer)
   // succeeds and re-arms it.
@@ -753,10 +753,10 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       return false;
     }
     // SOTA-4 reclaim-floor: skip when the older (compactable) portion is too
-    // small to be worth a summarizer call — avoids compact-thrash at the
+    // small to be worth a summarizer call - avoids compact-thrash at the
     // threshold. Counts only the older slice; cheap relative to the avoided
     // call. context-engine-04: the caller's pinned system prefix
-    // (`compactableFromIndex`) is NOT reclaimable and must not be counted —
+    // (`compactableFromIndex`) is NOT reclaimable and must not be counted -
     // a 10k-token prefix would otherwise satisfy any floor while the body
     // holds near-zero reclaimable tokens.
     if (compactionMinReclaimTokens > 0) {
@@ -782,7 +782,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     readonly preserveRecentTurns?: number;
     /** Topic/tags narrowing for the procedural-rules re-anchor hook (CE-6). */
     readonly procedural?: { readonly topic?: string; readonly tags?: ReadonlyArray<string> };
-    /** The caller's pinned system prefix — accounting only (context-engine-04). */
+    /** The caller's pinned system prefix - accounting only (context-engine-04). */
     readonly prefixMessages?: ReadonlyArray<Message>;
     readonly signal?: AbortSignal;
   }): Promise<{
@@ -818,7 +818,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       ...(callInput.signal !== undefined ? { signal: callInput.signal } : {}),
     };
     // C4: one retry with a short backoff on summarizer failure, then a
-    // strictly-smaller-than-input assert — a pass that dropped messages
+    // strictly-smaller-than-input assert - a pass that dropped messages
     // yet did not shrink the buffer is a failure (a looping/echoing
     // summarizer), not a success to arm the anti-thrash guard with.
     let result: CompactionResult;
@@ -840,13 +840,13 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       const reason = `compaction did not shrink the buffer (${result.beforeTokens} -> ${result.afterTokens} tokens)`;
       if (callInput.source === 'auto-trigger') {
         // The auto loop must never keep paying for passes that grow the
-        // buffer (the Gemini-CLI compression-loop class) — fail the pass.
+        // buffer (the Gemini-CLI compression-loop class) - fail the pass.
         recordCompactionFailure(reason);
         throw new Error(`[graphorin/memory] ${reason}`);
       }
       // An operator-requested compaction of a small window can
       // legitimately cost more than it reclaims (the summary skeleton
-      // has a floor) — warn, hand back the result, count nothing.
+      // has a floor) - warn, hand back the result, count nothing.
       process.stderr.write(`[graphorin/memory] ${reason} (source: ${callInput.source}).\n`);
     } else if (result.droppedMessageIndices.length > 0) {
       // A pass that actually reclaimed space re-arms the auto trigger.
@@ -879,7 +879,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
     const extraContent: MessageContent[] = [];
     let hooksFired = 0;
     // context-engine-02: the same D2 privacy decision `assemble()` applies
-    // to blocks / rules / facts, handed to the hooks — their output is
+    // to blocks / rules / facts, handed to the hooks - their output is
     // spliced into the buffer and shipped to the provider, so it must obey
     // the same filter or secret-tier content leaks on the first compaction.
     const allowSensitivity = (sensitivity: Sensitivity | undefined): boolean =>
@@ -893,7 +893,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       }).decision === 'pass';
     for (const hook of compactionHooks) {
       try {
-        // CE-6: hooks receive the REAL compaction context — the old code
+        // CE-6: hooks receive the REAL compaction context - the old code
         // built `ctx` and then `void ctx;`-discarded it while the
         // function-form wrapper fabricated a zeroed result.
         const parts = await hook.resolveContent(
@@ -943,7 +943,7 @@ export function createContextEngine(config: ContextEngineConfig = {}): ContextEn
       fullAfterTokens >= compactionThresholdTokens
     ) {
       process.stderr.write(
-        `[graphorin/memory] compaction finished at ${fullAfterTokens} tokens (body ${enrichedResult.afterTokens} + pinned prefix ${prefixTokens} + essentials ${essentialsTokens}) — still at/above the ${compactionThresholdTokens}-token trigger (oversized preserved turns?). The immediate re-trigger is suppressed until the buffer grows.\n`,
+        `[graphorin/memory] compaction finished at ${fullAfterTokens} tokens (body ${enrichedResult.afterTokens} + pinned prefix ${prefixTokens} + essentials ${essentialsTokens}) - still at/above the ${compactionThresholdTokens}-token trigger (oversized preserved turns?). The immediate re-trigger is suppressed until the buffer grows.\n`,
       );
     }
     return Object.freeze({
@@ -979,7 +979,7 @@ function annotationForLayer(layer: LayerAllocation): ContentAnnotation {
       // agent_instructions (Layer 2) into one trusted fragment, tagged
       // `system:framework` so D3 skips re-scanning it under
       // `scanScope: 'untrusted'`. (Both halves are first-party prompt text, so
-      // the merged layer carries a single framework trust tag — `LayerAllocation`
+      // the merged layer carries a single framework trust tag - `LayerAllocation`
       // does not surface which halves were present.)
       return annotate('system:framework', 'n/a');
     case 'memoryMetadata':
@@ -1083,7 +1083,7 @@ function resolveDefaultHooks(
             // silently fabricating zeros (the old behaviour).
             if (ctx === undefined) {
               throw new TypeError(
-                '[graphorin/memory] post-compaction hooks require the compaction context — call through ContextEngine.compactNow(...).',
+                '[graphorin/memory] post-compaction hooks require the compaction context - call through ContextEngine.compactNow(...).',
               );
             }
             const result = await hook(ctx);

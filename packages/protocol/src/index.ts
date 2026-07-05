@@ -1,5 +1,5 @@
 /**
- * `@graphorin/protocol` — wire-format contract for the Graphorin
+ * `@graphorin/protocol` - wire-format contract for the Graphorin
  * WebSocket subprotocol.
  *
  * The package is the **single source of truth** for the shape of
@@ -15,7 +15,7 @@
  */
 
 /** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 export * from './client-message.js';
 export * from './close-codes.js';

@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const README_PATH = resolve(__dirname, '..', 'README.md');
 
-describe('package README — reverse-proxy operational snippet', () => {
+describe('package README - reverse-proxy operational snippet', () => {
   let readme: string;
 
   it('reads the package README file', async () => {

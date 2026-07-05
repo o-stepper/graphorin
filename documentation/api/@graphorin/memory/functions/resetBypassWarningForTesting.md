@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/memory/src/conflict/pipeline.ts:37
 
 **`Internal`**
 
-Reset the one-shot bypass-warning flag. Test-only helper — production
+Reset the one-shot bypass-warning flag. Test-only helper - production
 callers never invoke this.
 
 ## Returns

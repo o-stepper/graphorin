@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,6 +19,6 @@ Options for [createScheduler](/api/@graphorin/triggers/functions/createScheduler
 | <a id="property-_resetlibmodeflag"></a> `_resetLibModeFlag?` | `readonly` | `boolean` | **`Internal`** Resets the per-process WARN-once flag. Used by the test suite to verify the warning fires exactly once per run. | packages/triggers/src/index.ts:194 |
 | <a id="property-cleartimeout"></a> `clearTimeout?` | `readonly` | (`handle`) => `void` | - | packages/triggers/src/index.ts:187 |
 | <a id="property-mode"></a> `mode?` | `readonly` | `"lib"` \| `"server"` | Default `'lib'`. Server mode skips the lib-mode warning. | packages/triggers/src/index.ts:178 |
-| <a id="property-now"></a> `now?` | `readonly` | () => `number` | Override the wall clock — used by tests. | packages/triggers/src/index.ts:180 |
+| <a id="property-now"></a> `now?` | `readonly` | () => `number` | Override the wall clock - used by tests. | packages/triggers/src/index.ts:180 |
 | <a id="property-settimeout"></a> `setTimeout?` | `readonly` | (`cb`, `ms`) => `unknown` | Override `setTimeout`. The callback receives the chosen delay in milliseconds; the return value is the handle the scheduler later passes to `clearTimeout`. Tests inject a controllable timer. | packages/triggers/src/index.ts:186 |
 | <a id="property-store"></a> `store` | `readonly` | [`TriggerStore`](/api/@graphorin/core/interfaces/TriggerStore.md) | - | packages/triggers/src/index.ts:176 |

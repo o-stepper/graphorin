@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
-- **Version:** v0.5.0
+- **Version:** v0.6.0
 - **License:** [MIT](./LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/protocol>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
@@ -24,7 +24,7 @@
 
 ## Direct dependencies
 
-- [`zod`](https://zod.dev) (`^3.25.0`) — runtime schema validation. The MIT-licensed Zod project supplies the discriminated union, strict-object, and `safeParse` primitives that back every `*Schema` export. No other runtime dependency exists; the package is otherwise pure TypeScript.
+- [`zod`](https://zod.dev) (`^3.25.0`) - runtime schema validation. The MIT-licensed Zod project supplies the discriminated union, strict-object, and `safeParse` primitives that back every `*Schema` export. No other runtime dependency exists; the package is otherwise pure TypeScript.
 
 ## Install
 
@@ -68,4 +68,4 @@ MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](./LICENSE).
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>

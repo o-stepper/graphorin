@@ -52,7 +52,7 @@ function capturingAdapter(): CapturingAdapter {
   return { provider, seen };
 }
 
-describe('withRedaction — stripCacheControlOnHit', () => {
+describe('withRedaction - stripCacheControlOnHit', () => {
   it('strips providerOptions.anthropic.cache_control when a regex pattern hits', async () => {
     const adapter = capturingAdapter();
     const wrapped = withRedaction({

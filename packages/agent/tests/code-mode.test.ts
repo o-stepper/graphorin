@@ -19,10 +19,10 @@ const passthroughSchema = {
 } as Tool<unknown, unknown, unknown>['inputSchema'];
 
 /**
- * A real tool that returns ~100 KB of data — the kind code-mode keeps out
+ * A real tool that returns ~100 KB of data - the kind code-mode keeps out
  * of context. `maxResultTokens` is set high so the in-script call receives
  * the full body (inner calls go through the executor, so a tool's own
- * truncation budget still applies to its result — code-mode does not
+ * truncation budget still applies to its result - code-mode does not
  * bypass per-tool governance).
  */
 const fetchBig: Tool<unknown, unknown, unknown> = {
@@ -34,7 +34,7 @@ const fetchBig: Tool<unknown, unknown, unknown> = {
   execute: async () => 'X'.repeat(100_000),
 } as Tool<unknown, unknown, unknown>;
 
-/** An approval-gated tool — must be excluded from the code API. */
+/** An approval-gated tool - must be excluded from the code API. */
 const dangerTool: Tool<unknown, unknown, unknown> = {
   name: 'danger',
   description: 'Does something that needs human approval.',
@@ -89,7 +89,7 @@ afterEach(async () => {
 
 // --- registration & catalogue ----------------------------------------------
 
-describe('WI-11 — code-mode registration', () => {
+describe('WI-11 - code-mode registration', () => {
   it('registers the meta-tools and advertises only them (not the real tools)', async () => {
     const provider = recordingProvider([textOnlyScript('hi')]);
     const agent = createAgent({
@@ -146,7 +146,7 @@ describe('WI-11 — code-mode registration', () => {
     });
     const description = agent.registry?.get('code_execute')?.description ?? '';
     expect(description).toContain('fetch_big'); // a normal tool is offered
-    // TL-8: the gated tool is NOT a callable signature — but it is named
+    // TL-8: the gated tool is NOT a callable signature - but it is named
     // in the call-directly section instead of being silently absent.
     expect(description).not.toContain('tools.danger(');
     const gatedSection = description.slice(description.indexOf('NOT callable'));
@@ -156,7 +156,7 @@ describe('WI-11 — code-mode registration', () => {
 
 // --- the acceptance: only the final result re-enters context ----------------
 
-describe('WI-11 — only the final result re-enters context', () => {
+describe('WI-11 - only the final result re-enters context', () => {
   it('runs a multi-tool script in a sandbox; the large intermediates never enter messages', async () => {
     const source = [
       'const a = await tools.fetch_big({});',
@@ -206,9 +206,9 @@ function trackSpill(content: string): void {
   if (runId !== undefined) spillDirsToClean.push(path.join(os.tmpdir(), 'graphorin-spill', runId));
 }
 
-// --- TL-8 — approval-gated tools are VISIBLE, with a call-directly marker -----
+// --- TL-8 - approval-gated tools are VISIBLE, with a call-directly marker -----
 
-describe('TL-8 — gated tools are visible in code-mode instead of silently absent', () => {
+describe('TL-8 - gated tools are visible in code-mode instead of silently absent', () => {
   it('the code_execute catalogue names gated tools with the approval marker', async () => {
     const provider = recordingProvider([textOnlyScript('hi')]);
     const agent = createAgent({

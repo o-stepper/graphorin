@@ -1,6 +1,6 @@
 /**
  * C5: offline fusion-weight fitting. Tuned convex/weighted fusion beats
- * RRF with a handful of labelled queries (Bruch et al., TOIS 2023) — this
+ * RRF with a handful of labelled queries (Bruch et al., TOIS 2023) - this
  * module turns that into a small, pure routine: grid-search
  * {@link FusionWeights} over labelled cases and return the setting that
  * maximizes mean nDCG@k, together with the plain-RRF baseline so the
@@ -43,7 +43,7 @@ export interface FitFusionResult {
   readonly weights: { readonly fts: number; readonly vector: number };
   /** Mean nDCG@k of the winning weights across the cases. */
   readonly score: number;
-  /** Mean nDCG@k of unit weights (plain RRF) — compare before adopting. */
+  /** Mean nDCG@k of unit weights (plain RRF) - compare before adopting. */
   readonly baseline: number;
 }
 

@@ -77,7 +77,7 @@ export function readToolCassette(body: string): ToolCassetteReadResult {
   // RP-4: track the tool-call ids seen in the CURRENT step. Parallel tool-calls
   // share a step and their provider ids carry no lexicographic order, so the
   // cursor only rejects a step regression or an exact (same step + same id)
-  // duplicate — not a "decreasing" id within the step.
+  // duplicate - not a "decreasing" id within the step.
   let stepToolCallIds = new Set<string>();
   for (let i = 1; i < lines.length; i += 1) {
     const line = lines[i];
@@ -104,7 +104,7 @@ export function readToolCassette(body: string): ToolCassetteReadResult {
         );
       }
       if (tcRecord.stepNumber !== lastStepNumber) {
-        // A new step — reset the per-step id set.
+        // A new step - reset the per-step id set.
         stepToolCallIds = new Set<string>();
         lastStepNumber = tcRecord.stepNumber;
       }

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ Defined in: packages/tools/src/builder/tool.ts:26
 
 Spec accepted by the [tool](/api/@graphorin/tools/functions/tool.md) factory. Mirrors the [Tool](/api/@graphorin/core/interfaces/Tool.md)
 interface but accepts the `execute` field as the second positional
-parameter or as a property — both work equivalently.
+parameter or as a property - both work equivalently.
 
 ## Type Declaration
 

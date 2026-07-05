@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` for the local-stack-cli smoke test.
  * The stub never opens a socket, never spawns a child process, and

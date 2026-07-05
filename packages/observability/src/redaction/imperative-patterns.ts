@@ -1,7 +1,7 @@
 /**
  * Imperative-pattern catalogue for inbound prompt-injection defence.
  *
- * Sibling to {@link BUILT_IN_PATTERNS} (PII / secrets) — the two
+ * Sibling to {@link BUILT_IN_PATTERNS} (PII / secrets) - the two
  * catalogues are disjoint by construction. The imperative catalogue
  * is consumed by the inbound sanitization layer in `@graphorin/tools`
  * to scan tool / MCP results before they reach the agent's message
@@ -10,7 +10,7 @@
  * exporter.
  *
  * The patterns target the canonical English "ignore previous
- * instructions" / "system override" injection family — the concrete
+ * instructions" / "system override" injection family - the concrete
  * surface that an untrusted-skill or MCP server result might use to
  * smuggle imperative content into the next provider call. The
  * catalogue is intentionally conservative: every entry has a fixed-
@@ -68,7 +68,7 @@ const PATTERNS: readonly ImperativePattern[] = [
   {
     name: 'ignore-previous-instructions',
     description:
-      'The canonical "ignore previous instructions" injection — the most common form of prompt injection seen across MCP results.',
+      'The canonical "ignore previous instructions" injection - the most common form of prompt injection seen across MCP results.',
     prefilter: ['ignore', 'disregard', 'forget'],
     regex:
       /\b(?:ignore|disregard|forget)\s+(?:all\s+)?(?:the\s+)?(?:previous|prior|above|earlier|preceding|original)\s+(?:instructions?|prompts?|messages?|directives?|rules?)\b/gi,
@@ -110,7 +110,7 @@ const PATTERNS: readonly ImperativePattern[] = [
   {
     name: 'developer-mode',
     description:
-      'Requests to enter "developer mode" / "DAN" / unrestricted modes — a long-running jailbreak family.',
+      'Requests to enter "developer mode" / "DAN" / unrestricted modes - a long-running jailbreak family.',
     prefilter: ['developer mode', 'admin mode', 'unrestricted'],
     regex:
       /\b(?:enter|enable|activate)\s+(?:developer|admin|debug|unrestricted|god|root)\s+mode\b/gi,
@@ -165,7 +165,7 @@ export const IMPERATIVE_PREFILTER_SUBSTRINGS: ReadonlyArray<string> = Object.fre
 /**
  * Compiled scan helper. Returns the list of pattern names that fired
  * AND the number of bytes the strip would remove if applied. Bounded
- * by the budget hint — when exceeded, returns `null` to let the caller
+ * by the budget hint - when exceeded, returns `null` to let the caller
  * apply the best-effort `'detect-failed'` annotation.
  *
  * @stable

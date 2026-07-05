@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,8 +14,8 @@ function projectSchemaToJsonSchema(raw, opts?):
 
 Defined in: packages/tools/src/schema/to-json-schema.ts:804
 
-Project a tool's declared `inputSchema` / `outputSchema` — whatever the
-author supplied — onto a JSON Schema record fit for a provider wire
+Project a tool's declared `inputSchema` / `outputSchema` - whatever the
+author supplied - onto a JSON Schema record fit for a provider wire
 body or a code-mode signature. Resolution order:
 
 1. `undefined`/`null` → `undefined`.
@@ -24,7 +24,7 @@ body or a code-mode signature. Resolution order:
 3. A Zod v4 or v3 schema → [zodToJsonSchema](/api/@graphorin/tools/functions/zodToJsonSchema.md).
 4. Plain JSON-Schema-shaped data → passed through as-is.
 5. Anything else (an opaque validator this converter cannot read) →
-   `undefined`, reported via `onUnsupported` — callers substitute a
+   `undefined`, reported via `onUnsupported` - callers substitute a
    permissive `{}` rather than shipping serialized internals.
 
 ## Parameters

@@ -12,7 +12,7 @@ export interface IdempotencyRecord {
   readonly key: string;
   readonly requestHash: string;
   readonly statusCode: number;
-  /** Cached response body — adapter-specific encoding (JSON in v0.1). */
+  /** Cached response body - adapter-specific encoding (JSON in v0.1). */
   readonly response: unknown;
   readonly responseHeaders?: Readonly<Record<string, string>>;
   readonly scope?: string;

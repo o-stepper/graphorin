@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/types.ts:121
 
 Optional context passed to [Workflow.execute](/api/@graphorin/workflow/interfaces/Workflow.md#execute). `threadId` is
-the stable resume key — supply it explicitly when the caller wants
+the stable resume key - supply it explicitly when the caller wants
 deterministic IDs (CLI / tests); omit to let the runtime generate a
 fresh ULID-style identifier.
 

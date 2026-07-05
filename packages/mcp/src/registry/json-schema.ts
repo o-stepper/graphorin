@@ -56,7 +56,7 @@ export type JsonSchemaLike =
  * The validator also retains the **source JSON Schema** and exposes it
  * via `toJSON()` (tools-01): `toolToDefinition` and the code-mode
  * signature projection honour `toJSON()`, so without it an MCP tool's
- * parameters serialise to `{}` on the provider wire body — the model
+ * parameters serialise to `{}` on the provider wire body - the model
  * would see an argument-less tool. Boolean schemas normalise to their
  * record equivalents (`true` → `{}`, `false` → `{ not: {} }`).
  *
@@ -254,7 +254,7 @@ function validateString(
   }
   if (typeof schema.pattern === 'string') {
     // mcp-skills-07: the pattern comes VERBATIM from the (untrusted)
-    // MCP server and runs on every validated input — a
+    // MCP server and runs on every validated input - a
     // catastrophic-backtracking pattern (`(a+)+$`) plus a long
     // model-generated string stalls the agent's event loop. Guards:
     // cap the pattern and the tested-string length, and reject the

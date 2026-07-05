@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,9 +8,9 @@
 
 Built-in tools shipped with `@graphorin/tools`.
 
-- `tool_search` — deferred-tool catalogue lookup. Always registered
+- `tool_search` - deferred-tool catalogue lookup. Always registered
   when at least one tool in the registry is deferred.
-- `read_result` — fetch (a range of) a large tool result stored behind a
+- `read_result` - fetch (a range of) a large tool result stored behind a
   handle. Registered when at least one tool spills to file.
 
 ## References

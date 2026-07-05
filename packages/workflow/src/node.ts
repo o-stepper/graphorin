@@ -1,5 +1,5 @@
 /**
- * `createNode({...})` — minimal factory wrapper for declaring a
+ * `createNode({...})` - minimal factory wrapper for declaring a
  * workflow node. Returns a {@link WorkflowNode} carrying the
  * supplied `name` + `run(...)` callback.
  *

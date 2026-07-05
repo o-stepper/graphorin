@@ -150,7 +150,7 @@ export class SlashCommandParseError extends GraphorinSkillsError {
   }
 }
 
-/** Convenience union — every `kind` discriminator the package may emit. */
+/** Convenience union - every `kind` discriminator the package may emit. */
 export type GraphorinSkillsErrorKind =
   | 'frontmatter:conflict'
   | 'manifest:parse'

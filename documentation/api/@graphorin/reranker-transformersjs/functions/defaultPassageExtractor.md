@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -15,9 +15,9 @@ Defined in: packages/reranker-transformersjs/src/text-extraction.ts:27
 Returns the best-effort passage text for a [MemoryRecord](/api/@graphorin/core/interfaces/MemoryRecord.md). The
 order of preference, top-down:
 
-  1. `text` — facts, rules, generic text-bearing tiers.
-  2. `summary` — episodes.
-  3. `value` — working-memory blocks.
+  1. `text` - facts, rules, generic text-bearing tiers.
+  2. `summary` - episodes.
+  3. `value` - working-memory blocks.
   4. `id` fallback so the reranker never sees an empty passage.
 
 ## Parameters

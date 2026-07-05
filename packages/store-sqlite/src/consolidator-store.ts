@@ -1,11 +1,11 @@
 /**
- * `SqliteConsolidatorStateStore` — owns the `consolidator_state`,
+ * `SqliteConsolidatorStateStore` - owns the `consolidator_state`,
  * `consolidator_runs`, and `consolidator_failed_batches` tables
  * shipped in Phase 05's migration 009. The class implements the
  * structural `ConsolidatorMemoryStoreExt` surface defined in
  * `@graphorin/memory/internal/storage-adapter.ts`.
  *
- * No `@graphorin/memory` import lives here — the storage side stays
+ * No `@graphorin/memory` import lives here - the storage side stays
  * dependency-free per the layered architecture.
  *
  * @packageDocumentation
@@ -177,11 +177,11 @@ export class SqliteConsolidatorStateStore {
     // store-07: build the UPDATE from the SUPPLIED patch keys only,
     // inside one (IMMEDIATE) transaction. The old read-merge-write
     // wrote EVERY column back, so a concurrent `acquireLock` landing
-    // between the read and the write was silently reverted to NULL —
+    // between the read and the write was silently reverted to NULL -
     // partially defeating CS-8's atomic lock and letting two
     // consolidator runs race.
     //
-    // Sentinel-empty-string keying — SQLite treats NULLs as distinct
+    // Sentinel-empty-string keying - SQLite treats NULLs as distinct
     // in the composite primary key, so we collapse undefined session
     // / agent ids to '' before insert. The reverse mapping in
     // `rowToState` converts '' back to `undefined`.
@@ -238,7 +238,7 @@ export class SqliteConsolidatorStateStore {
     now: number,
     maxAgeMs: number,
   ): Promise<boolean> {
-    // CS-8: a single conditional UPSERT — better-sqlite3 is synchronous,
+    // CS-8: a single conditional UPSERT - better-sqlite3 is synchronous,
     // so the read-modify-write window that let two runners (in-process
     // microtasks, or server + CLI on one WAL db) both win is gone. The
     // lock is granted iff it is currently free, already ours, or stale.
@@ -264,7 +264,7 @@ export class SqliteConsolidatorStateStore {
   }
 
   async releaseLock(scope: SessionScope, runId: string): Promise<void> {
-    // store-07: one atomic conditional UPDATE — the old read-then-write
+    // store-07: one atomic conditional UPDATE - the old read-then-write
     // could clear a lock a DIFFERENT runner acquired in between.
     this.#conn.run(
       `UPDATE consolidator_state
@@ -470,7 +470,7 @@ function rowToDlq(row: DlqRowDb, scope: SessionScope): DlqBatchRow {
       messageIds = parsed.filter((v): v is string => typeof v === 'string');
     }
   } catch {
-    // Corrupt payload — fall through with an empty list so callers
+    // Corrupt payload - fall through with an empty list so callers
     // can still surface the failed row to the operator.
   }
   return {

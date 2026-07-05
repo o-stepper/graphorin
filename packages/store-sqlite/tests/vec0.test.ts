@@ -205,7 +205,7 @@ describe('vec0 integration via sqlite-vec', () => {
   });
 });
 
-describe('MRET-9 — KNN over-fetch + tombstone hygiene', () => {
+describe('MRET-9 - KNN over-fetch + tombstone hygiene', () => {
   it('a minority user gets their full topK despite a dominant user saturating the slice', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-mret9-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
@@ -269,8 +269,8 @@ describe('MRET-9 — KNN over-fetch + tombstone hygiene', () => {
         },
       );
     }
-    // Pre-fix: k = topK bound the GLOBAL slice to the 5 nearest rows —
-    // all dominant — and the minority scope filtered down to zero.
+    // Pre-fix: k = topK bound the GLOBAL slice to the 5 nearest rows -
+    // all dominant - and the minority scope filtered down to zero.
     const hits = await semantic.searchVector({ userId: 'minority' }, target, meta.id, 5);
     expect(hits.length).toBe(5);
     expect(hits.every((h) => h.record.id.startsWith('min-'))).toBe(true);
@@ -288,7 +288,7 @@ describe('MRET-9 — KNN over-fetch + tombstone hygiene', () => {
   });
 });
 
-describe('store-03 — episode KNN over-fetch (MRET-9 ported)', () => {
+describe('store-03 - episode KNN over-fetch (MRET-9 ported)', () => {
   it('a minority user gets their full topK of EPISODES despite a dominant user saturating the slice', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-store03-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
@@ -335,7 +335,7 @@ describe('store-03 — episode KNN over-fetch (MRET-9 ported)', () => {
         embedding: { embedderId: meta.id, vector: new Float32Array([0, 1, 0.001 * i, 0]) },
       });
     }
-    // Pre-fix: `topK` bound directly as the GLOBAL vec0 k — the
+    // Pre-fix: `topK` bound directly as the GLOBAL vec0 k - the
     // dominant user's 95 near vectors filled the k=5 slice and the
     // minority scope filter starved the result to zero.
     const hits = await episodic.searchVector(

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function emitSecretsAudit(event): void;
 Defined in: packages/security/src/secrets/audit-emitter.ts:109
 
 Emit an event to every subscriber. Listeners that throw are
-isolated — a faulty listener never tears down the secret access
+isolated - a faulty listener never tears down the secret access
 path.
 
 ## Parameters

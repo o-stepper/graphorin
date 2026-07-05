@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: packages/observability/src/redaction/types.ts:21
 
 Optional sink invoked every time the validator drops a value or
 masks a pattern. Useful for emitting custom metrics, audit entries,
-or alert hooks. The callback receives only sanitized data — secret
+or alert hooks. The callback receives only sanitized data - secret
 values are never forwarded.
 
 ## Parameters

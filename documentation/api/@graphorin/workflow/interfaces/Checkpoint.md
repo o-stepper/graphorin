@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -22,6 +22,6 @@ step.
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/core/dist/contracts/checkpoint-store.d.ts:17 |
 | <a id="property-namespace"></a> `namespace` | `readonly` | `string` | - | packages/core/dist/contracts/checkpoint-store.d.ts:19 |
 | <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | - | packages/core/dist/contracts/checkpoint-store.d.ts:20 |
-| <a id="property-state"></a> `state` | `readonly` | `unknown` | Serialized state blob — adapter-specific encoding (JSON / superjson / …). | packages/core/dist/contracts/checkpoint-store.d.ts:22 |
+| <a id="property-state"></a> `state` | `readonly` | `unknown` | Serialized state blob - adapter-specific encoding (JSON / superjson / …). | packages/core/dist/contracts/checkpoint-store.d.ts:22 |
 | <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | - | packages/core/dist/contracts/checkpoint-store.d.ts:25 |
 | <a id="property-threadid"></a> `threadId` | `readonly` | `string` | - | packages/core/dist/contracts/checkpoint-store.d.ts:18 |

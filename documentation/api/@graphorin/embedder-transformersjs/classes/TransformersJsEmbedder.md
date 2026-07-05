@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -66,11 +66,11 @@ dim(): number;
 
 Defined in: packages/embedder-transformersjs/src/index.ts:177
 
-Output dimension — the explicit `dim` option, a known-model
+Output dimension - the explicit `dim` option, a known-model
 default, or the width resolved from the first `embed()`.
 periphery-05 (the PS-11 fix ported from the Ollama embedder):
 throws for an unknown model with no `dim` hint instead of silently
-assuming 768 — a wrong assumed width bakes a wrong-width id AND a
+assuming 768 - a wrong assumed width bakes a wrong-width id AND a
 wrong-width vec0 table, and the id then CHANGES after the first
 `embed()` resolves the truth, which `lock-on-first` reads as an
 embedder swap.

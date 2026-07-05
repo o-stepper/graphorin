@@ -10,7 +10,7 @@ import {
   validateScopeSet,
 } from '../../src/auth/scope.js';
 
-describe('@graphorin/security/auth — scope grammar', () => {
+describe('@graphorin/security/auth - scope grammar', () => {
   it('parses two-segment scopes', () => {
     const parsed = parseScope('agents:read');
     expect(parsed.kind).toBe('two-segment');

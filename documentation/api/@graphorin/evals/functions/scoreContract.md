@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function scoreContract(maxScore): string;
 
 Defined in: evals/src/scorers/llm/judge.ts:134
 
-EB-7: the canonical instruction `llmJudge` appends to every prompt — defines
+EB-7: the canonical instruction `llmJudge` appends to every prompt - defines
 the parseable output marker and forbids following instructions inside fences.
 
 ## Parameters

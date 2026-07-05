@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { createSqliteStore } from '../src/index.js';
 
 /**
- * CS-5 — the facts `ON CONFLICT(id) DO UPDATE` set must carry `embedder_id`
+ * CS-5 - the facts `ON CONFLICT(id) DO UPDATE` set must carry `embedder_id`
  * when (and only when) a re-write actually supplies an embedding. Missing it
  * hides late-embedded facts from vector search forever; nulling it
  * unconditionally would hide an existing fact when `supersede()` re-remembers
@@ -52,7 +52,7 @@ async function setup(): Promise<{
 const base = { kind: 'semantic' as const, userId: 'alex', sensitivity: 'internal' as const };
 const vec = new Float32Array([1, 0, 0, 0]);
 
-describe('CS-5 — embedder_id is updated on a late-embedded upsert', () => {
+describe('CS-5 - embedder_id is updated on a late-embedded upsert', () => {
   it('a fact first written without an embedding becomes vector-searchable after re-embedding', async () => {
     const { semantic, embedderId, close } = await setup();
     // First write: no embedding ⇒ facts.embedder_id is NULL.

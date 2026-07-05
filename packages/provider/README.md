@@ -5,19 +5,19 @@
 
 The package owns four moving parts:
 
-1. **`createProvider(...)`** — wraps any adapter in a stable `Provider`
+1. **`createProvider(...)`** - wraps any adapter in a stable `Provider`
    shape with sensitivity, capability, and reasoning-retention defaults.
-2. **Adapters** — `vercelAdapter` (default cloud path; wraps the Vercel
+2. **Adapters** - `vercelAdapter` (default cloud path; wraps the Vercel
    AI SDK), `ollamaAdapter` (direct Ollama HTTP), `llamaCppServerAdapter`
    (the upstream `llama-server` binary from llama.cpp), and
    `openAICompatibleAdapter` (LMStudio / LocalAI / vLLM / Together-style
    self-host endpoints).
-3. **Middleware** — `composeProviderMiddleware([...])` enforces a
+3. **Middleware** - `composeProviderMiddleware([...])` enforces a
    canonical order at startup and throws `MiddlewareOrderingError` on
    violation. Built-ins: `withTracing`, `withRetry`, `withRateLimit`,
    `withCostLimit`, `withCostTracking`, `withFallback`, and
    `withRedaction` (mandatory in production).
-4. **Token counting** — pluggable `TokenCounter` dispatcher. Default
+4. **Token counting** - pluggable `TokenCounter` dispatcher. Default
    `JsTiktokenCounter` for OpenAI-compatible models; per-vendor native
    counters for Anthropic, Google, and Bedrock; heuristic fallback for
    unknown providers with a one-time WARN.
@@ -72,7 +72,7 @@ const safeProvider = composeProviderMiddleware([
 ```ts
 import { ollamaAdapter } from '@graphorin/provider/adapters/ollama';
 
-// Auto-classified as 'loopback' — no warning, no first-run prompt.
+// Auto-classified as 'loopback' - no warning, no first-run prompt.
 const local = createProvider(
   ollamaAdapter({ model: 'llama3.1:8b', baseUrl: 'http://127.0.0.1:11434' }),
 );
@@ -81,7 +81,7 @@ const local = createProvider(
 The same `LocalProviderTrust` classifier (`'loopback' | 'private' |
 'public-tls' | 'public-cleartext'`) drives the trust auto-detection,
 the sensitivity-tier defaults, and the `withRedaction` policy table
-for every `baseUrl`-driven adapter — `ollamaAdapter`,
+for every `baseUrl`-driven adapter - `ollamaAdapter`,
 `llamaCppServerAdapter`, and `openAICompatibleAdapter`. The classifier
 lives at `@graphorin/provider/trust`. Public-cleartext URLs refuse to
 start with `LocalProviderInsecureTransportError`.
@@ -101,5 +101,5 @@ recommendations.
 
 ## Project metadata
 
-- **Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+- **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>

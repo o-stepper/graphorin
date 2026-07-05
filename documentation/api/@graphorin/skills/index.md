@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -34,9 +34,11 @@ the `graphorin-*` prefix.
 - **Spec-snapshot tracking.** A bundled
   `anthropic-spec-snapshot.json` records the upstream fields the
   framework recognises and the migration policy for every
-  `graphorin-*` extension. The `pnpm run check-anthropic-spec` CI
-  helper diffs the snapshot against the published specification so
-  maintainers can promote new fields with a clear changelog entry.
+  `graphorin-*` extension. The `pnpm run check-anthropic-spec` helper
+  diffs the snapshot against a maintainer-supplied upstream snapshot
+  (`--upstream <path>`) so new fields can be promoted with a clear
+  changelog entry; it runs manually or via the release `mvp-readiness`
+  gate (no scheduled job, no auto-refresh).
 - **Supply-chain aware.** Loading from `npm-package` and `git-repo`
   sources delegates to the supply-chain helpers in
   `@graphorin/security` so untrusted skills install with
@@ -86,7 +88,7 @@ import { loadSkillFromSource, createSkillRegistry } from '@graphorin/skills';
 
 const skill = await loadSkillFromSource(
   { kind: 'folder', path: './skills/finance-helper' },
-  { conflictPolicy: 'warn', runtimeVersion: '0.5.0' },
+  { conflictPolicy: 'warn', runtimeVersion: '0.6.0' },
 );
 
 const registry = createSkillRegistry();
@@ -115,7 +117,7 @@ license: MIT
 disable-model-invocation: false
 
 # === Graphorin extensions (namespaced) ===
-graphorin-runtime-compat: ^0.5.0
+graphorin-runtime-compat: ^0.6.0
 graphorin-trust-level: trusted
 graphorin-sensitivity: internal
 graphorin-handoff-input-filter: lastUser
@@ -149,19 +151,19 @@ The body of the SKILL.md is loaded lazily on activation.
 
 The supply-chain layer enforces `--ignore-scripts` and signature
 verification through `@graphorin/security/supply-chain`. The skills
-loader does not duplicate that logic — it delegates and surfaces the
+loader does not duplicate that logic - it delegates and surfaces the
 resulting `ResolvedSkillTrustPolicy` alongside the loaded skill.
 
 ## Dependencies
 
-- `yaml@^2.8.0` — required runtime dependency. Used for frontmatter
+- `yaml@^2.8.0` - required runtime dependency. Used for frontmatter
   parsing and migrator output.
-- `@graphorin/core` — typed contracts (`ResolvedTool`, …) consumed by
+- `@graphorin/core` - typed contracts (`ResolvedTool`, …) consumed by
   the registry's tool-declaration surface.
-- `@graphorin/security` — supply-chain installer, ed25519 signature
+- `@graphorin/security` - supply-chain installer, ed25519 signature
   verifier, trust-policy resolver. Skills loaded from `npm-package`
   and `git-repo` sources go through this package.
-- `@graphorin/tools` — peer surface the agent runtime uses to
+- `@graphorin/tools` - peer surface the agent runtime uses to
   register skill-bundled tools after activation. The skills loader
   does not import the runtime registry directly; it returns a typed
   `RegisteredToolDeclaration[]` the runtime consumes.
@@ -172,17 +174,17 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/skills/README.md) | `@graphorin/skills` — skills surface for the Graphorin framework. |
+| [](/api/@graphorin/skills/README.md) | `@graphorin/skills` - skills surface for the Graphorin framework. |
 | [activation](/api/@graphorin/skills/activation/index.md) | Activation surface for `@graphorin/skills`. |
 | [errors](/api/@graphorin/skills/errors/index.md) | Typed error hierarchy for `@graphorin/skills`. |
 | [frontmatter](/api/@graphorin/skills/frontmatter/index.md) | Frontmatter validator for `SKILL.md` files. |
 | [loader](/api/@graphorin/skills/loader/index.md) | Skill loader. |
-| [migration](/api/@graphorin/skills/migration/index.md) | `migrate-frontmatter` — idempotent rewrite helper that migrates legacy `graphorin-*` frontmatter fields onto their upstream equivalents per the `deprecate-graphorin-prefix` mappings recorded in the bundled spec snapshot. |
-| [registry](/api/@graphorin/skills/registry/index.md) | `SkillRegistry` — registry over loaded skills. |
+| [migration](/api/@graphorin/skills/migration/index.md) | `migrate-frontmatter` - idempotent rewrite helper that migrates legacy `graphorin-*` frontmatter fields onto their upstream equivalents per the `deprecate-graphorin-prefix` mappings recorded in the bundled spec snapshot. |
+| [registry](/api/@graphorin/skills/registry/index.md) | `SkillRegistry` - registry over loaded skills. |
 | [spec](/api/@graphorin/skills/spec/index.md) | Bundled snapshot loader for the `SKILL.md` packaging-format specification. |

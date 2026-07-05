@@ -1,12 +1,12 @@
 /**
- * `SqliteConflictStore` — stores the per-decision audit log
+ * `SqliteConflictStore` - stores the per-decision audit log
  * (`fact_conflicts`) and the deferred queue (`conflict_check_pending`)
  * written by the multi-stage conflict resolution pipeline shipped in
  * `@graphorin/memory` Phase 10b.
  *
  * The class implements the structural `ConflictMemoryStoreExt`
  * surface defined in `@graphorin/memory/internal/storage-adapter.ts`.
- * No `@graphorin/memory` import lives here — the store-side stays
+ * No `@graphorin/memory` import lives here - the store-side stays
  * dependency-free per the layered architecture.
  *
  * @packageDocumentation
@@ -260,7 +260,7 @@ export class SqliteConflictStore {
 
   /**
    * Read-back helper used by the audit-replay surface (Phase 14c) and
-   * the test suite — returns up to `limit` recent rows for the scope.
+   * the test suite - returns up to `limit` recent rows for the scope.
    *
    * @stable
    */

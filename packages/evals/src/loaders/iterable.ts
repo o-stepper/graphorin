@@ -1,5 +1,5 @@
 /**
- * `fromIterable` — wrap an in-memory array / iterable as a
+ * `fromIterable` - wrap an in-memory array / iterable as a
  * {@link Dataset}. Useful for tests + ad-hoc data.
  *
  * @packageDocumentation

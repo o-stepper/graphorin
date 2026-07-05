@@ -7,7 +7,7 @@ This is a deployment *template*, not a runnable example app.
 ## Prerequisites
 
 - An image built and pushed from [`../docker/Dockerfile`](../docker), tagged
-  e.g. `ghcr.io/<org>/graphorin:0.5.0`. There is no official published image;
+  e.g. `ghcr.io/<org>/graphorin:0.6.0`. There is no official published image;
   the operator builds it (CI only smoke-builds the Dockerfile).
 - A `Secret` named `graphorin-secrets` in the namespace with keys `pepper`,
   `db-passphrase`, `audit-passphrase`.

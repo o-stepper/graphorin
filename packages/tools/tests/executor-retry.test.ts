@@ -42,7 +42,7 @@ function flaky(
   };
 }
 
-describe('C3 — executor transparent retry', () => {
+describe('C3 - executor transparent retry', () => {
   it('retries rate_limited up to maxAttempts and returns the eventual success', async () => {
     resetCountersForTesting();
     const registry = createToolRegistry();

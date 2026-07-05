@@ -165,7 +165,7 @@ describe('createSkillRegistry', () => {
   });
 });
 
-describe('stampSkillToolFromMetadata — sandbox tier propagation', () => {
+describe('stampSkillToolFromMetadata - sandbox tier propagation', () => {
   it('untrusted skill forces worker-threads + no-net + no-fs regardless of override', async () => {
     const skill = await inlineSkill('untrusted', [
       'graphorin-trust-level: untrusted',
@@ -241,7 +241,7 @@ describe('stampSkillToolFromMetadata — sandbox tier propagation', () => {
   });
 });
 
-describe('SkillRegistry — getMetadataBlock + search + tools', () => {
+describe('SkillRegistry - getMetadataBlock + search + tools', () => {
   it('getMetadataBlock excludes disable-model-invocation skills + emits empty for empty registry', async () => {
     const registry = createSkillRegistry();
     expect(registry.getMetadataBlock()).toBe('');

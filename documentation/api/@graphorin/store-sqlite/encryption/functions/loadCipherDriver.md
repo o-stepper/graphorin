@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function loadCipherDriver(): Promise<BetterSqlite3Constructor>;
 Defined in: packages/store-sqlite/src/encryption/index.ts:104
 
 Loads the cipher peer (`better-sqlite3-multiple-ciphers`). Lazy by
-design — the import only fires when encryption-at-rest is enabled.
+design - the import only fires when encryption-at-rest is enabled.
 
 ## Returns
 

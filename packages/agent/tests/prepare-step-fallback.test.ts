@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
 import { createMockProvider, errorScript, textOnlyScript } from './fixtures/mock-provider.js';
 
-describe('Agent — prepareStep precedence over fallback chain (RB-48)', () => {
+describe('Agent - prepareStep precedence over fallback chain (RB-48)', () => {
   it('uses the prepareStep override and does NOT consult fallbackModels on its failure', async () => {
     const fallback = createMockProvider({
       modelId: 'haiku',

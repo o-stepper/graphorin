@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/channels/channels.ts:114
 
-Value scoped to a single execution step — discarded when the step
+Value scoped to a single execution step - discarded when the step
 ends.
 
 ## Stable

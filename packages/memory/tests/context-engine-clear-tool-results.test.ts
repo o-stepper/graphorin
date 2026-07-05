@@ -1,5 +1,5 @@
 /**
- * SOTA-1: `clear-old-tool-results` — a zero-LLM pre-compaction tier (Anthropic
+ * SOTA-1: `clear-old-tool-results` - a zero-LLM pre-compaction tier (Anthropic
  * `clear_tool_uses` pattern). Old tool results are replaced by compact
  * placeholders BEFORE any summarizer call; the LLM compactor runs only if
  * clearing did not reclaim enough. Fully offline, mechanical, testable.
@@ -20,7 +20,7 @@ import {
 const scope = { userId: 'u', sessionId: 's', agentId: 'a' };
 const BIG = 'RESULT-PAYLOAD '.repeat(200); // ~3kB tool output
 
-/** Records calls and throws if ever invoked — proves the zero-LLM path. */
+/** Records calls and throws if ever invoked - proves the zero-LLM path. */
 function neverSummarizer(): CompactionSummarizer & { calls: number } {
   const s = {
     id: 'never',

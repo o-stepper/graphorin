@@ -1,5 +1,5 @@
 /**
- * `graphorin auth` — outbound OAuth subsystem (e.g. for MCP servers).
+ * `graphorin auth` - outbound OAuth subsystem (e.g. for MCP servers).
  *
  * Surface (per Phase 15 § Auth):
  *
@@ -9,7 +9,7 @@
  *  - `graphorin auth revoke <id>`
  *  - `graphorin auth status`
  *
- * Honours `GRAPHORIN_OFFLINE=1` — when set, every subcommand short-
+ * Honours `GRAPHORIN_OFFLINE=1` - when set, every subcommand short-
  * circuits with an explanatory message and exits `1` so CI pipelines
  * see the failure.
  *
@@ -39,7 +39,7 @@ import { openStoreContext } from '../internal/store-context.js';
 /**
  * Resolve the CLI's secrets store for OAuth token persistence (SPL-1):
  * the already-active store when one exists, else the default auto
- * chain (keyring → encrypted-file → env). Best-effort — a store
+ * chain (keyring → encrypted-file → env). Best-effort - a store
  * failure degrades to the in-memory-only pre-SPL-1 behavior instead of
  * blocking the auth command.
  */
@@ -65,7 +65,7 @@ export interface AuthLoginOptions extends AuthCommonOptions {
   readonly scope?: string;
   readonly deviceFlow?: boolean;
   /**
-   * Optional pre-existing client identifier — skips Dynamic Client
+   * Optional pre-existing client identifier - skips Dynamic Client
    * Registration when supplied.
    */
   readonly clientId?: string;

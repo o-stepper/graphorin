@@ -1,5 +1,5 @@
 /**
- * `createServer({...})` — the single programmatic entry point.
+ * `createServer({...})` - the single programmatic entry point.
  *
  * The factory returns a {@link GraphorinServer} handle the operator
  * controls via `start()` / `stop()`. The same handle is consumed by
@@ -279,13 +279,13 @@ export interface GraphorinServer {
    */
   readonly wsTickets: WsTicketStore | undefined;
   /**
-   * Optional triggers daemon — populated when the operator wired a
+   * Optional triggers daemon - populated when the operator wired a
    * scheduler (or an in-process trigger surface) at construction
    * time. Phase 14c integration.
    */
   readonly triggers: TriggersDaemon | undefined;
   /**
-   * Optional consolidator daemon — populated when the operator
+   * Optional consolidator daemon - populated when the operator
    * supplied a `Consolidator` instance via `createServer({
    * consolidator })`. Phase 14c integration.
    */
@@ -302,7 +302,7 @@ export interface GraphorinServer {
 /**
  * Discriminated union accepted by `CreateServerOptions.triggers`. A
  * caller may either supply a fully-built daemon (e.g. constructed
- * around a custom `Scheduler`) or just the underlying scheduler — the
+ * around a custom `Scheduler`) or just the underlying scheduler - the
  * server wraps it with {@link createTriggersDaemon} automatically.
  *
  * @stable
@@ -315,7 +315,7 @@ export type TriggersDaemonInput =
  * @stable
  */
 export interface CreateServerOptions {
-  /** Loaded `graphorin.config.ts` payload — see `defineConfig({...})`. */
+  /** Loaded `graphorin.config.ts` payload - see `defineConfig({...})`. */
   readonly config?: ServerConfigInput;
   /**
    * Optional pre-validated config. When supplied, `config` is ignored
@@ -343,7 +343,7 @@ export interface CreateServerOptions {
    */
   readonly consolidator?: ConsolidatorLike;
   /**
-   * Optional triggers daemon — pass an existing one (e.g. built
+   * Optional triggers daemon - pass an existing one (e.g. built
    * from `createScheduler`) or a triggers configuration the server
    * should wrap with the daemon adapter.
    */
@@ -381,7 +381,7 @@ export interface CreateServerOptions {
 /**
  * @stable
  */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 /**
  * Build a fully-wired Graphorin server. The returned handle is
@@ -398,7 +398,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
 
   // IP-1: when encryption is configured, resolve the passphrase ref
   // BEFORE constructing the store and thread the encryption config
-  // through — `graphorin init --encrypted` produced a config nothing
+  // through - `graphorin init --encrypted` produced a config nothing
   // honoured, and a database encrypted via `storage encrypt` could not
   // be opened by the server at all.
   let storeEncryption:
@@ -439,7 +439,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   metricRegistry.set(SERVER_METRIC_NAMES.buildInfo, 1, { version });
 
   // IP-15: agent / workflow run completions move graphorin_agent_runs_total +
-  // graphorin_agent_run_duration_seconds. The tracker stays metric-agnostic —
+  // graphorin_agent_run_duration_seconds. The tracker stays metric-agnostic -
   // it fires a terminal callback the server turns into samples.
   const runs =
     options.runs ??
@@ -500,7 +500,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   let wsAdapter: ReturnType<typeof createNodeWebSocket> | undefined;
   // IP-21: the dispatcher is built here, before the audit DB opens in start().
   // Hand it a late-bound commentary sink now and install the audit-writing
-  // target once the DB exists — otherwise the sanitizer's documented decisions
+  // target once the DB exists - otherwise the sanitizer's documented decisions
   // (wrapped/stripped frames with before/after digests) are dropped.
   let commentaryAuditSink: LateBoundCommentarySink | undefined;
   if (config.server.ws.enabled) {
@@ -544,7 +544,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
       if (negotiated !== null) return negotiated;
       // Browser ticket flow: the `WebSocket` constructor cannot set an
       // `Authorization` header, so the browser client offers two
-      // subprotocol tokens — the canonical `graphorin.protocol.v1`
+      // subprotocol tokens - the canonical `graphorin.protocol.v1`
       // name plus a `ticket.<value>` token (see the wire contract in
       // `@graphorin/protocol`'s `subprotocol.ts`:
       // `SUBPROTOCOL_NAME` / `TICKET_SUBPROTOCOL_PREFIX` /
@@ -667,7 +667,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
 
         // Start the consolidator first so it is ready to handle fired
         // triggers, bridge its cron / idle triggers onto the scheduler
-        // (MCON-4 — without this nothing pipes triggers into the
+        // (MCON-4 - without this nothing pipes triggers into the
         // consolidator and background consolidation never runs), then start
         // the scheduler last so it only fires fully-wired triggers.
         if (consolidatorDaemon !== undefined) {
@@ -879,12 +879,12 @@ function mountRoutes(
   // IP-13: `auth.kind='none'` disables authentication on every route. It is the
   // documented trusted-loopback / single-operator mode, but binding a
   // non-loopback host with auth off exposes full admin access (including the WS
-  // stream) to anyone who can reach it — warn loudly rather than silently.
+  // stream) to anyone who can reach it - warn loudly rather than silently.
   if (config.auth.kind === 'none' && !isLoopbackHost(config.server.host)) {
     console.warn(
       `[graphorin/server] WARN: auth.kind='none' disables authentication on every endpoint, ` +
         `but the server binds the non-loopback host '${config.server.host}'. Anyone who can reach ` +
-        `it has full admin access — use auth.kind='token' for non-loopback deployments or bind a ` +
+        `it has full admin access - use auth.kind='token' for non-loopback deployments or bind a ` +
         `loopback host.`,
     );
   }
@@ -897,7 +897,7 @@ function mountRoutes(
       console.warn(
         `[graphorin/server] WARN: /metrics is unauthenticated (metrics.requireAuth=false) and ` +
           `the server binds the non-loopback host '${config.server.host}'. The exposition leaks ` +
-          `operational detail to anyone who can reach it — set metrics.requireAuth=true or bind a ` +
+          `operational detail to anyone who can reach it - set metrics.requireAuth=true or bind a ` +
           `loopback host.`,
       );
     }
@@ -944,7 +944,7 @@ function mountRoutes(
     return false;
   }
   // IP-13: in the no-auth loopback mode (`auth.kind='none'`) there is no
-  // verifier, but the authenticated subtree must still be reachable — install
+  // verifier, but the authenticated subtree must still be reachable - install
   // an anonymous middleware that stamps a fully-authorized principal so the
   // domain routes serve instead of every one of them returning 401.
   const anonymousAuth = ctx.verifier === undefined && config.auth.kind === 'none';
@@ -972,7 +972,7 @@ function mountRoutes(
     }
   }
 
-  // Idempotency middleware — applied to side-effecting endpoints. We
+  // Idempotency middleware - applied to side-effecting endpoints. We
   // mount it once on the authenticated subtree so handlers don't have
   // to duplicate the configuration per-route.
   if (config.server.idempotency.enabled) {
@@ -980,7 +980,7 @@ function mountRoutes(
       store: ctx.store.idempotency,
       config: config.server.idempotency,
       now: ctx.now,
-      // IP-6: token minting returns a raw secret — never cache it.
+      // IP-6: token minting returns a raw secret - never cache it.
       excludeResponseCachePaths: [`${base}/tokens`],
       // IP-15: publish the live cache hit ratio gauge.
       metricRegistry: ctx.metricRegistry,
@@ -1061,7 +1061,7 @@ function mountRoutes(
   }
   // IP-13: mount the WS upgrade when a verifier is wired OR auth is disabled
   // (`auth.kind='none'`). The old condition required a verifier, so
-  // `ws.enabled: true` under no-auth was silently ignored — the route never
+  // `ws.enabled: true` under no-auth was silently ignored - the route never
   // mounted and clients got a bare 404 with no explanation.
   if (
     ctx.wsDispatcher !== undefined &&
@@ -1257,7 +1257,7 @@ function buildDefaultHealthProbes(
     walWarnThresholdBytes: config.health.walWarnThresholdBytes,
     encryptionEnabled: config.storage.encryption.enabled,
     // IP-1: when this process built the encrypted store itself, the
-    // keyed open at boot proved the cipher peer — report the fact.
+    // keyed open at boot proved the cipher peer - report the fact.
     ...(config.storage.encryption.enabled ? { cipherPeerInstalled: true } : {}),
   };
   if (triggersDaemon !== undefined) out.triggers = triggersDaemon;

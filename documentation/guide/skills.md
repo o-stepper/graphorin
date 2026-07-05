@@ -65,8 +65,8 @@ before drafting an itinerary.
 
 ## Resources
 
-- `cities.csv` — supported cities + IATA codes.
-- `prompts/draft.md` — the canonical itinerary template.
+- `cities.csv` - supported cities + IATA codes.
+- `prompts/draft.md` - the canonical itinerary template.
 ```
 
 The frontmatter `name`, `description`, and any other upstream-spec fields are honoured as-is. Graphorin-specific fields live under `graphorin-*` (legacy authoring slot) or `metadata.graphorin.*` (preferred).
@@ -112,7 +112,7 @@ The validator walks this ladder for every recognised field. Direct collisions tr
 }
 ```
 
-Skills that opt out via `disable-model-invocation: true` are excluded from auto-activation but remain reachable through the slash command — useful for human-only workflows.
+Skills that opt out via `disable-model-invocation: true` are excluded from auto-activation but remain reachable through the slash command - useful for human-only workflows.
 
 ## Composition with `@graphorin/tools`
 
@@ -136,10 +136,10 @@ The skill installer never runs `npm postinstall` scripts on untrusted packages. 
 
 ## Next steps
 
-- [Tools](/guide/tools) — what skill tools register against.
-- [Security](/guide/security) — sandbox tiers + signature trust model.
-- [MCP client](/guide/mcp-client) — how MCP-derived tools coexist with skills.
+- [Tools](/guide/tools) - what skill tools register against.
+- [Security](/guide/security) - sandbox tiers + signature trust model.
+- [MCP client](/guide/mcp-client) - how MCP-derived tools coexist with skills.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

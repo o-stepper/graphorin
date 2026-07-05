@@ -1,7 +1,7 @@
 /**
  * IP-13: `auth.kind='none'` (the documented trusted-loopback / single-operator
- * mode) must actually work — every domain route reachable without a token, the
- * WS upgrade mounted instead of silently dropped — and must warn loudly when
+ * mode) must actually work - every domain route reachable without a token, the
+ * WS upgrade mounted instead of silently dropped - and must warn loudly when
  * combined with a non-loopback host.
  */
 
@@ -38,7 +38,7 @@ afterEach(async () => {
   }
 });
 
-describe('IP-13 — auth.kind=none serves the authenticated subtree anonymously', () => {
+describe('IP-13 - auth.kind=none serves the authenticated subtree anonymously', () => {
   it('answers domain routes with 200 instead of 401 when no token is presented', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
@@ -104,7 +104,7 @@ describe('IP-13 — auth.kind=none serves the authenticated subtree anonymously'
     const listening = await server.start();
     const port = listening.port;
 
-    // Connect with ONLY the base subprotocol — no ticket, no bearer.
+    // Connect with ONLY the base subprotocol - no ticket, no bearer.
     const outcome = await new Promise<{ opened: boolean; protocol: string | undefined }>(
       (resolve) => {
         const ws = new WebSocket(`ws://127.0.0.1:${port}/v1/ws`, ['graphorin.protocol.v1']);

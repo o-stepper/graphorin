@@ -1,12 +1,12 @@
 /**
- * SOTA-1: zero-LLM tool-result clearing — the cheapest pre-compaction tier.
+ * SOTA-1: zero-LLM tool-result clearing - the cheapest pre-compaction tier.
  *
  * Mirrors Anthropic context editing (`clear_tool_uses_20250919`): when the
  * buffer crosses the compaction threshold, replace the oldest tool results with
  * a compact placeholder BEFORE paying for a summarizer LLM call. The most recent
  * `keepToolUses` results stay verbatim, `excludeTools` are never touched, and
  * clearing is skipped entirely when it would reclaim fewer than `clearAtLeast`
- * tokens (not worth the context churn). Pure + deterministic — no provider call.
+ * tokens (not worth the context churn). Pure + deterministic - no provider call.
  *
  * @packageDocumentation
  */
@@ -18,7 +18,7 @@ import {
   renderMessageText,
 } from '../token-counter.js';
 
-/** Placeholder prefix on a cleared tool result — makes clearing idempotent. */
+/** Placeholder prefix on a cleared tool result - makes clearing idempotent. */
 export const CLEARED_TOOL_RESULT_MARKER = '[cleared tool result';
 
 /** Default count of most-recent tool results kept verbatim. */
@@ -39,7 +39,7 @@ export interface ClearToolResultsOptions {
     readonly clearedTokens: number;
   }) => string;
   /**
-   * A6 / SOTA-2 — recoverable clearing. When provided, the original tool-result
+   * A6 / SOTA-2 - recoverable clearing. When provided, the original tool-result
    * text of each cleared message is handed to this callback (wire it to a spill
    * store / the `read_result` handle registry) and the placeholder references the
    * returned handle id + preview, so the model can re-fetch the full result via
@@ -107,7 +107,7 @@ function isAlreadyCleared(content: Message['content']): boolean {
 
 /**
  * Replace the oldest clearable tool results with placeholders. Returns the new
- * buffer (same length — content is replaced in place, never removed) plus the
+ * buffer (same length - content is replaced in place, never removed) plus the
  * cleared indices and reclaimed token count. Idempotent: already-cleared
  * placeholders are skipped on a second pass.
  */

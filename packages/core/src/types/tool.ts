@@ -19,14 +19,14 @@ export type SandboxPolicy = 'none' | 'sandboxed' | 'isolated' | 'docker';
  * metadata against this discriminator without a hard dependency on the
  * security package.
  *
- * - `'pure'`                     — no side effects of any kind.
- * - `'side-effecting-no-memory'` — observable side effects outside of
+ * - `'pure'`                     - no side effects of any kind.
+ * - `'side-effecting-no-memory'` - observable side effects outside of
  *   the framework's memory tiers (e.g. external HTTP).
- * - `'memory-aware'`             — mutates the framework's memory
+ * - `'memory-aware'`             - mutates the framework's memory
  *   tiers via the sanctioned `ctx.memory.*` surface only.
- * - `'unknown'`                  — no declaration; the runtime applies
+ * - `'unknown'`                  - no declaration; the runtime applies
  *   the audit-only baseline.
- * - `'untrusted'`                — third-party / untrusted skill code;
+ * - `'untrusted'`                - third-party / untrusted skill code;
  *   the runtime forces the strictest snapshot policy.
  *
  * @stable
@@ -44,13 +44,13 @@ export type MemoryGuardTier =
  * Surfaced uniformly by the tool dispatcher, downstream session
  * cassette layers, retry middleware, and approval-policy derivations.
  *
- * - `'pure'`              — deterministic; same `(input, ctx)` always
+ * - `'pure'`              - deterministic; same `(input, ctx)` always
  *   yields the same output; no I/O of any kind.
- * - `'read-only'`         — queries external systems but never
+ * - `'read-only'`         - queries external systems but never
  *   mutates them (e.g. database SELECT, HTTP GET).
- * - `'side-effecting'`    — mutates state inside the agent's logical
+ * - `'side-effecting'`    - mutates state inside the agent's logical
  *   boundary (e.g. memory writes, cache writes).
- * - `'external-stateful'` — mutates state outside the agent's
+ * - `'external-stateful'` - mutates state outside the agent's
  *   boundary that other systems can observe (e.g. issue creation,
  *   message dispatch, payment).
  *
@@ -62,15 +62,15 @@ export type SideEffectClass = 'pure' | 'read-only' | 'side-effecting' | 'externa
  * Inbound prompt-injection sanitization policy applied to a tool's
  * result body before it reaches the conversation history.
  *
- * - `'pass-through'`              — no scan; bytes-equal forwarding
+ * - `'pass-through'`              - no scan; bytes-equal forwarding
  *   (the trusted-built-in default).
- * - `'detect-and-flag'`           — scan; emit a flag span attribute
+ * - `'detect-and-flag'`           - scan; emit a flag span attribute
  *   + audit row but do not modify the body.
- * - `'detect-and-strip'`          — replace each match with the
+ * - `'detect-and-strip'`          - replace each match with the
  *   `[REDACTED:imperative-pattern]` literal token.
- * - `'detect-and-wrap'`           — wrap the body in the
+ * - `'detect-and-wrap'`           - wrap the body in the
  *   `<<<untrusted_content>>>` envelope without stripping matches.
- * - `'detect-and-strip-and-wrap'` — both strip matches and wrap the
+ * - `'detect-and-strip-and-wrap'` - both strip matches and wrap the
  *   resulting body (the untrusted-source default).
  *
  * @stable
@@ -86,14 +86,14 @@ export type InboundSanitizationPolicy =
  * Result-envelope truncation strategy applied to a tool's assembled
  * output before it reaches the conversation history.
  *
- * - `'middle'`         — keep head and tail; insert annotation in the
+ * - `'middle'`         - keep head and tail; insert annotation in the
  *   middle (the default).
- * - `'tail'`           — keep the tail; insert annotation at the
+ * - `'tail'`           - keep the tail; insert annotation at the
  *   head.
- * - `'spill-to-file'`  — keep the head; spill the un-truncated body
+ * - `'spill-to-file'`  - keep the head; spill the un-truncated body
  *   to a per-run artifact file; insert annotation with the artifact
  *   path.
- * - `'summarize'`      — invoke the agent's configured summarizer
+ * - `'summarize'`      - invoke the agent's configured summarizer
  *   and replace the body with the summary.
  *
  * @stable
@@ -171,7 +171,7 @@ export interface ToolResult<TOutput = unknown> {
   readonly durationMs: number;
   /**
    * Set when the tool's output was large enough to be stored behind a
-   * handle (the `'spill-to-file'` truncation strategy, or — later — an MCP
+   * handle (the `'spill-to-file'` truncation strategy, or - later - an MCP
    * `resource_link`) instead of being inlined in full. The runtime inlines
    * only the bounded {@link ResultHandle.preview} and lets the model fetch
    * the rest on demand via the built-in `read_result` tool. Absent for
@@ -185,14 +185,14 @@ export interface ToolResult<TOutput = unknown> {
  * out of the conversation buffer rather than inlined in full. The agent
  * inlines {@link preview} (plus a retrieval hint) and registers the
  * built-in `read_result` tool so the model can page through the full
- * artifact behind {@link uri} on demand — keeping large results out of the
+ * artifact behind {@link uri} on demand - keeping large results out of the
  * context window (P1-4).
  *
  * @stable
  */
 export interface ResultHandle {
   /**
-   * Opaque, run-scoped URI — e.g. `graphorin-spill:<runId>/<toolCallId>.json`
+   * Opaque, run-scoped URI - e.g. `graphorin-spill:<runId>/<toolCallId>.json`
    * for a spill artifact. Never a raw filesystem path: the reader resolves
    * it within the configured artifact root, so the model cannot use it to
    * read arbitrary files.
@@ -240,13 +240,13 @@ export type ToolErrorKind =
  * Practitioner evidence converges on these two fields being what changes
  * model behaviour after a failure:
  *
- * - `'retry_later'`      — transient; the same call is expected to work
+ * - `'retry_later'`      - transient; the same call is expected to work
  *                          after a pause (rate limits, timeouts).
- * - `'check_input'`      — the arguments are wrong; re-read the schema
+ * - `'check_input'`      - the arguments are wrong; re-read the schema
  *                          and fix them before retrying.
- * - `'try_alternative'`  — this tool/approach failed non-transiently;
+ * - `'try_alternative'`  - this tool/approach failed non-transiently;
  *                          try a different tool or strategy.
- * - `'report_to_user'`   — a policy/authorization stop; do not retry,
+ * - `'report_to_user'`   - a policy/authorization stop; do not retry,
  *                          surface the situation instead.
  *
  * @stable
@@ -280,7 +280,7 @@ export interface ToolError {
 
 /**
  * Either a `ToolResult` or a `ToolError`. The runtime always returns one
- * of the two — there is no implicit "tool fell through" outcome.
+ * of the two - there is no implicit "tool fell through" outcome.
  *
  * @stable
  */

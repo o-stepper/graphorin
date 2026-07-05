@@ -7,7 +7,7 @@ import { type CollisionResolution, createToolRegistry } from '../src/registry/in
 
 const MCP_LINEAR: ToolSource = { kind: 'mcp', serverIdentity: 'linear-mcp' };
 
-describe('ToolRegistry — bytes-equal preservation across auto-prefix rename', () => {
+describe('ToolRegistry - bytes-equal preservation across auto-prefix rename', () => {
   beforeEach(() => resetCountersForTesting());
   afterEach(() => resetCountersForTesting());
 
@@ -92,7 +92,7 @@ describe('ToolRegistry — bytes-equal preservation across auto-prefix rename', 
   });
 });
 
-describe('ToolRegistry — CollisionResolution data integrity', () => {
+describe('ToolRegistry - CollisionResolution data integrity', () => {
   beforeEach(() => resetCountersForTesting());
   afterEach(() => resetCountersForTesting());
 
@@ -148,7 +148,7 @@ describe('ToolRegistry — CollisionResolution data integrity', () => {
   });
 });
 
-describe('ToolRegistry — idempotency-key WARN for MCP-derived auto-defaulted tools', () => {
+describe('ToolRegistry - idempotency-key WARN for MCP-derived auto-defaulted tools', () => {
   beforeEach(() => resetCountersForTesting());
   afterEach(() => resetCountersForTesting());
 
@@ -196,7 +196,7 @@ describe('ToolRegistry — idempotency-key WARN for MCP-derived auto-defaulted t
   });
 });
 
-describe('ToolRegistry — MCP-derived sideEffectClass auto-default suppression', () => {
+describe('ToolRegistry - MCP-derived sideEffectClass auto-default suppression', () => {
   beforeEach(() => resetCountersForTesting());
   afterEach(() => resetCountersForTesting());
 
@@ -240,7 +240,7 @@ describe('ToolRegistry — MCP-derived sideEffectClass auto-default suppression'
   });
 });
 
-describe('ToolRegistry — listByTag', () => {
+describe('ToolRegistry - listByTag', () => {
   it('returns every registered tool whose tags include `tag` in registration order', () => {
     const registry = createToolRegistry();
     registry.register(

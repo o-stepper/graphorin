@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # metrics
 
-`@graphorin/server/metrics` — Phase 14c Prometheus exposition layer.
+`@graphorin/server/metrics` - Phase 14c Prometheus exposition layer.
 
 ## References
 

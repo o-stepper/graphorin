@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -37,7 +37,7 @@ type StageOutcome =
 Defined in: packages/memory/src/conflict/types.ts:139
 
 Per-stage outcome surfaced to the orchestrator. `'admit'` means the
-stage decided not to short-circuit — the pipeline continues to the
+stage decided not to short-circuit - the pipeline continues to the
 next stage. Every other variant terminates the pipeline.
 
 ## Stable

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/core/src/contracts/session-store.ts:30
 
 Agent registry entry. Captures stable metadata about every agent that
-ever produced a message — so JSONL exports / replays can resolve a
+ever produced a message - so JSONL exports / replays can resolve a
 `Message.agentId` to a human-readable name even after the agent was
 renamed or retired.
 

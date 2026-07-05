@@ -58,7 +58,7 @@ export interface OutputSpec<TOutput> {
   /**
    * Local validator (Zod-compatible `{ parse }`) applied to the final
    * model output on the completed path (AG-3). A parse failure fails
-   * the run with `output-validation-failed` — never a silent cast.
+   * the run with `output-validation-failed` - never a silent cast.
    */
   readonly schema?: { parse(value: unknown): TOutput };
   /** Optional description shown to the model alongside the schema. */
@@ -68,7 +68,7 @@ export interface OutputSpec<TOutput> {
    * `ProviderRequest.outputType` for adapters with native structured
    * output, and embedded in the fallback JSON instruction appended as
    * a trailing system message (the documented contract until adapters
-   * consume `outputType` natively — PS-24).
+   * consume `outputType` natively - PS-24).
    */
   readonly jsonSchema?: Readonly<Record<string, unknown>>;
 }
@@ -121,7 +121,7 @@ export interface SkillsRegistryLike {
  */
 // `TOutput` is existential here: handoff targets legitimately vary in
 // output type, and `Agent` is invariant in `TOutput` (the result is
-// covariant, `guardrails.output` is contravariant) — `unknown` would
+// covariant, `guardrails.output` is contravariant) - `unknown` would
 // reject every concretely-typed agent.
 export type HandoffEntry<TDeps = unknown> =
   // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
@@ -157,7 +157,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * runtime calls `memory.contextEngine.assemble(...)` once at run start: the
    * agent's `instructions` become Layer 2 and the engine prepends the memory
    * base and appends working blocks, procedural rules, skill cards, the
-   * metadata counts, and — when `factsAutoRecall` is configured — auto-recalled
+   * metadata counts, and - when `factsAutoRecall` is configured - auto-recalled
    * facts. Defaults `false`: the prompt is built from `instructions` alone and
    * the model reaches memory only through the memory tools it calls (the
    * documented explicit pattern). Has no effect without `memory`.
@@ -167,7 +167,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly outputType?: OutputSpec<TOutput>;
   /**
    * Deterministic checks run by the loop (AG-2; canonical contract is
-   * `@graphorin/security`'s `GuardrailDefinition` — SDF-4).
+   * `@graphorin/security`'s `GuardrailDefinition` - SDF-4).
    *
    * - `input` guardrails run over each **fresh-run seed user message**
    *   (string content) before the first provider call. `'block'` fails
@@ -177,7 +177,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * - `output` guardrails run over the **final output** on the
    *   completed path before `agent.end`. `'block'` fails the run;
    *   `'rewrite'` replaces `result.output` (text deltas were already
-   *   streamed — the rewrite governs the durable result, not the
+   *   streamed - the rewrite governs the durable result, not the
    *   live token stream).
    *
    * Every trip emits a `guardrail.tripped` event.
@@ -193,9 +193,9 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   /**
    * How the model invokes tools (P1-2).
    *
-   * - `'direct'` (default) — the model emits one provider tool-call per
+   * - `'direct'` (default) - the model emits one provider tool-call per
    *   tool, each result inlined into the conversation.
-   * - `'code-mode'` — the agent advertises only the `code_execute` /
+   * - `'code-mode'` - the agent advertises only the `code_execute` /
    *   `code_search` meta-tools; the model writes a script that calls
    *   tools in a sandbox via `tools.<name>(args)`, and **only the
    *   script's final result re-enters context** (intermediate results
@@ -235,13 +235,13 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * Graphorin already tracks (trust class + source + sensitivity), to
    * defuse the lethal trifecta: a sink (`side-effecting` /
    * `external-stateful` tool) is blocked when untrusted content flows
-   * into it verbatim, or — conservatively — when it fires while both
+   * into it verbatim, or - conservatively - when it fires while both
    * untrusted content and secret-tier data are present in the run.
    *
-   * - `mode: 'shadow'`  — audit-only; tainted flows are flagged
+   * - `mode: 'shadow'`  - audit-only; tainted flows are flagged
    *   (`tool:dataflow:flagged` audit + counter) but never blocked. Ship
    *   this first to surface false positives.
-   * - `mode: 'enforce'` — tainted flows are blocked (the sink does not
+   * - `mode: 'enforce'` - tainted flows are blocked (the sink does not
    *   run; the call yields a `dataflow_policy_blocked` error) unless the
    *   sink is listed in `declassifySinks` (an audited operator override).
    *
@@ -267,18 +267,18 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * so the stable prefix (tools + system + early turns) is written to the
    * provider cache once and read at the discounted rate on every later
    * step. Providers with automatic caching ignore it. Pair with the
-   * append-only transcript the loop already maintains — cache hit rate is
+   * append-only transcript the loop already maintains - cache hit rate is
    * the #1 production cost lever for multi-step agents.
    */
   readonly cachePolicy?: ProviderCachePolicy;
   /**
    * When deferred-tool promotions (via `tool_search`) take effect (C1):
    *
-   * - `'immediate'` (default) — a promoted tool joins the catalogue on the
+   * - `'immediate'` (default) - a promoted tool joins the catalogue on the
    *   NEXT step. Costs one provider-cache invalidation per promotion
    *   (the tools block changes), which is the standard trade for tool
    *   discovery.
-   * - `'run-boundary'` — the catalogue advertised to the model is frozen
+   * - `'run-boundary'` - the catalogue advertised to the model is frozen
    *   for the whole run; promotions are still recorded (and persisted on
    *   `RunState.promotedTools`) but only join the catalogue on the next
    *   run / resume. Keeps the provider prompt cache byte-stable across
@@ -290,7 +290,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * (no-tool-call) response. A failing verifier's feedback is appended
    * to the transcript as a user message and the loop continues, up to
    * `maxVerifierRounds` extra rounds. Verifiers are DETERMINISTIC checks
-   * (lint/test runners, format validators, exit codes) — deliberately
+   * (lint/test runners, format validators, exit codes) - deliberately
    * not an evidence-free "reflect on your answer" step, which the
    * self-correction literature shows degrades performance.
    */
@@ -314,7 +314,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   /**
    * C3: journal each step's raw model response (text + tool calls +
    * model id) onto `RunState.steps[].providerResponse`, enabling
-   * deterministic replay via `createReplayProvider(state)` — reproduce
+   * deterministic replay via `createReplayProvider(state)` - reproduce
    * an entire run without live model calls.
    * @default false
    */
@@ -351,7 +351,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    * Register the D6 structured plan tool (`update_plan`, TodoWrite-style)
    * and recite the plan back into each step's prompt (attention
    * recitation). The plan is journaled in `RunState.todos` and survives
-   * resume. Default `false` — off keeps the tool surface unchanged.
+   * resume. Default `false` - off keeps the tool surface unchanged.
    */
   readonly plan?: boolean;
   readonly sessionId?: string;
@@ -435,7 +435,7 @@ export interface AgentCallOptions<TDeps> {
    */
   readonly directive?: ResumeDirective;
   /**
-   * Per-run capability restriction (D2) — overrides
+   * Per-run capability restriction (D2) - overrides
    * {@link AgentConfig.capability} for this invocation. See that field
    * for semantics. Not persisted in `RunState`: re-supply it when
    * resuming a suspended run.
@@ -444,7 +444,7 @@ export interface AgentCallOptions<TDeps> {
 }
 
 /**
- * Run-level capability restriction (D2 — the single-writer constraint
+ * Run-level capability restriction (D2 - the single-writer constraint
  * from multi-agent practice). `'read-only'` makes the run
  * side-effect-free by construction: writer tools (`side-effecting` /
  * `external-stateful`) and handoffs are never advertised to the model,
@@ -470,7 +470,7 @@ export interface AgentToToolOptions {
    * Shapes the sub-agent seed from the parent history (AG-17): when
    * supplied, the sub-agent is seeded with
    * `[...inputFilter(parentMessages), { role: 'user', content: input }]`.
-   * Without a filter the sub-agent sees ONLY the input string — no
+   * Without a filter the sub-agent sees ONLY the input string - no
    * parent conversation crosses the boundary (least authority by
    * construction; there is no secret-inheritance mechanism at this
    * boundary at all).
@@ -485,7 +485,7 @@ export interface AgentToToolOptions {
   readonly capability?: AgentCapability;
   /**
    * Context folding at the sub-agent boundary (D2): instead of the raw
-   * final output, the parent receives a compact distilled outcome —
+   * final output, the parent receives a compact distilled outcome -
    * status, step/tool-call counts, tools used, and the final text
    * clamped to `maxChars` (default 2000). Keeps tool-heavy child runs
    * from flooding the parent window. Default off (raw output).
@@ -519,9 +519,9 @@ export interface AbortOptions {
    * What to do with approvals that were already requested but not
    * resolved at abort time.
    *
-   * - `'deny'` (default) — auto-deny pending approvals.
-   * - `'hold'`            — keep the approvals on `RunState.pendingApprovals`.
-   * - `'fail'`            — reject the run with `RunError(code: 'run-aborted')`.
+   * - `'deny'` (default) - auto-deny pending approvals.
+   * - `'hold'`            - keep the approvals on `RunState.pendingApprovals`.
+   * - `'fail'`            - reject the run with `RunError(code: 'run-aborted')`.
    */
   readonly onPendingApprovals?: 'deny' | 'hold' | 'fail';
 }
@@ -561,7 +561,7 @@ export interface CompactionApiResult {
 /**
  * Per-call shape accepted by `Agent.fanOut(...)`. Mirrors the
  * pure-function {@link FanOutOptions} but omits the runtime-supplied
- * identifiers — the `Agent` instance carries those.
+ * identifiers - the `Agent` instance carries those.
  *
  * @stable
  */
@@ -611,7 +611,7 @@ export interface Agent<TDeps = unknown, TOutput = string> {
    * Convenience wrapper around the standalone `runFanOut(...)`. The
    * returned `FanOutResult` carries per-child status + the merged
    * output. Per-child failures are captured in `children[].status`
-   * — this method never throws on a child failure (the merge
+   * - this method never throws on a child failure (the merge
    * strategy decides whether to propagate).
    */
   fanOut<TFanOutOutput = unknown>(

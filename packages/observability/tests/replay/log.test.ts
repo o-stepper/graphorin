@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getTraceLog, pruneTraces } from '../../src/replay/log.js';
 
-describe('@graphorin/observability/replay — getTraceLog / pruneTraces', () => {
+describe('@graphorin/observability/replay - getTraceLog / pruneTraces', () => {
   it('reads JSONL records back', async () => {
     const root = await mkdtemp(join(tmpdir(), 'graphorin-log-read-'));
     const file = join(root, 'one.jsonl');

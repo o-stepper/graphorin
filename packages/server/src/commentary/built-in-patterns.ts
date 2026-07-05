@@ -31,7 +31,7 @@ export const DEFAULT_DELIVERY_COMMENTARY_PATTERNS: ReadonlyArray<DeliveryComment
       reason: 'tool.call.start-payload-signature',
       regex: /\{\s*"type"\s*:\s*"tool\.call\.start"[\s\S]*?"toolName"\s*:\s*"[^"]+"[\s\S]*?\}/g,
       description:
-        'JSON-encoded `tool.call.start` event with a `toolName` field — leaks the internal tool dispatch.',
+        'JSON-encoded `tool.call.start` event with a `toolName` field - leaks the internal tool dispatch.',
     }),
     Object.freeze({
       reason: 'tool.call.delta-payload-signature',

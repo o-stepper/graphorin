@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -11,7 +11,7 @@ Defined in: packages/memory/src/search/rrf.ts:73
 Weighted-RRF reranker (X-2). Fuses parallel ranked lists through
 [fuseWeighted](/api/@graphorin/memory/functions/fuseWeighted.md), applying a per-list `weights[i]` so a caller who
 has calibrated list reliability against labels (the P0-1 eval harness)
-can trust one retriever over another — e.g. up-weight dense vector
+can trust one retriever over another - e.g. up-weight dense vector
 hits over lexical FTS hits. `weights` is **positional**: aligned to the
 input `lists` order (the built-in hybrid search passes FTS first, then
 vector). At equal weights it is identical to [RRFReranker](/api/@graphorin/memory/classes/RRFReranker.md); RRF

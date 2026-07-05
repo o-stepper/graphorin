@@ -129,7 +129,7 @@ function makeFakeMemory(opts: FakeEngineOptions): FakeMemoryHandle {
 
 // --- auto-compaction trigger ------------------------------------------------
 
-describe('WI-09 — auto-compaction trigger', () => {
+describe('WI-09 - auto-compaction trigger', () => {
   it('fires context.compacted with the full event shape when the buffer crosses threshold', async () => {
     const { memory, compactNowCalls } = makeFakeMemory({
       triggerAtMessages: 6,
@@ -227,7 +227,7 @@ describe('WI-09 — auto-compaction trigger', () => {
 
 // --- KV-cache prefix stability ----------------------------------------------
 
-describe('WI-09 — KV-cache system-prefix stability', () => {
+describe('WI-09 - KV-cache system-prefix stability', () => {
   it('keeps the system-prompt prefix byte-identical across steps, including a compaction', async () => {
     const { memory, compactNowCalls } = makeFakeMemory({
       triggerAtMessages: 6,
@@ -257,7 +257,7 @@ describe('WI-09 — KV-cache system-prefix stability', () => {
 
     expect(compactNowCalls()).toBeGreaterThanOrEqual(1); // a compaction happened
     expect(prefixContents.length).toBeGreaterThan(1); // observed multiple steps
-    // The instruction prefix is never rewritten — not even by the
+    // The instruction prefix is never rewritten - not even by the
     // summary system message (which is spliced *after* the prefix).
     for (const content of prefixContents) {
       expect(content).toBe('INSTRUCTIONS');
@@ -267,7 +267,7 @@ describe('WI-09 — KV-cache system-prefix stability', () => {
 
 // --- bounded context on long runs -------------------------------------------
 
-describe('WI-09 — bounded context on long runs', () => {
+describe('WI-09 - bounded context on long runs', () => {
   it('keeps the buffer bounded across many steps via repeated compaction', async () => {
     const { memory, compactNowCalls } = makeFakeMemory({
       triggerAtMessages: 8,
@@ -304,7 +304,7 @@ describe('WI-09 — bounded context on long runs', () => {
 
 // --- sensitivity gate -------------------------------------------------------
 
-describe('WI-09 — sensitivity gate', () => {
+describe('WI-09 - sensitivity gate', () => {
   it('never compacts a secret-tier run (secret history is not shipped to the summarizer)', async () => {
     const { memory, shouldCompactCalls, compactNowCalls } = makeFakeMemory({
       triggerAtMessages: 6,
@@ -333,7 +333,7 @@ describe('WI-09 — sensitivity gate', () => {
 
 // --- re-injected Context Essentials -----------------------------------------
 
-describe('WI-09 — post-compaction Context Essentials', () => {
+describe('WI-09 - post-compaction Context Essentials', () => {
   it('re-injects post-compaction hook text content as a trailing system message', async () => {
     const { memory } = makeFakeMemory({
       triggerAtMessages: 6,
@@ -367,9 +367,9 @@ describe('WI-09 — post-compaction Context Essentials', () => {
 
 // --- manual agent.compact() through the loop (CE-3/AG-13) ---------------------
 
-describe('CE-3/AG-13 — manual agent.compact() splices through the loop', () => {
+describe('CE-3/AG-13 - manual agent.compact() splices through the loop', () => {
   /**
-   * A `noop`-named tool whose Nth execution invokes `onKick` — lets a test
+   * A `noop`-named tool whose Nth execution invokes `onKick` - lets a test
    * fire `agent.compact()` from inside a live run without awaiting it
    * (awaiting inside the tool would deadlock: the loop services the
    * request at the next step boundary).
@@ -599,9 +599,9 @@ describe('CE-3/AG-13 — manual agent.compact() splices through the loop', () =>
   });
 });
 
-// --- TL-10 — spill artifacts cleared on terminal runs --------------------------
+// --- TL-10 - spill artifacts cleared on terminal runs --------------------------
 
-describe('TL-10 — run-scoped spill artifacts are cleared when the run ends', () => {
+describe('TL-10 - run-scoped spill artifacts are cleared when the run ends', () => {
   it('a completed run removes its spill directory; awaiting_approval keeps it', async () => {
     const { promises: fsp } = await import('node:fs');
     const os = await import('node:os');
@@ -657,7 +657,7 @@ describe('TL-10 — run-scoped spill artifacts are cleared when the run ends', (
   });
 });
 
-describe('context-engine-05 — a resumed compaction summary stays outside the pinned prefix', () => {
+describe('context-engine-05 - a resumed compaction summary stays outside the pinned prefix', () => {
   it('the prefix scan stops at the summary marker on resume', async () => {
     const { memory, lastShouldCompactOptions } = makeFakeMemory({
       triggerAtMessages: 999,
@@ -676,7 +676,7 @@ describe('context-engine-05 — a resumed compaction summary stays outside the p
     // A run that compacted, then suspended: on disk the buffer is
     // [system prompt, system SUMMARY, ...]. Pre-fix the prefix scan
     // counted the summary INTO the pinned prefix (compactableFromIndex
-    // 2), shielding it from every future compaction — each
+    // 2), shielding it from every future compaction - each
     // compact-then-resume cycle grew the uncompactable prefix by one
     // summary, exactly the unbounded stacking the engine guards against.
     const resumed = runStateFromJSON(
@@ -710,10 +710,10 @@ describe('context-engine-05 — a resumed compaction summary stays outside the p
   });
 });
 
-describe('context-engine-06 — emergency compaction at hard context overflow', () => {
+describe('context-engine-06 - emergency compaction at hard context overflow', () => {
   it('a context-length provider error triggers ONE forced compaction and a retry that succeeds', async () => {
     const { memory, compactNowCalls, lastCompactNowInput } = makeFakeMemory({
-      // The auto trigger never fires — only the emergency path compacts.
+      // The auto trigger never fires - only the emergency path compacts.
       triggerAtMessages: 999,
       preserveRecent: 0,
     });
@@ -743,7 +743,7 @@ describe('context-engine-06 — emergency compaction at hard context overflow', 
   it('when compaction cannot shrink the buffer the run still fails cleanly (no retry loop)', async () => {
     const { memory, compactNowCalls } = makeFakeMemory({
       triggerAtMessages: 999,
-      // preserveRecent so large nothing is ever dropped — compaction is futile.
+      // preserveRecent so large nothing is ever dropped - compaction is futile.
       preserveRecent: 99,
     });
     const provider = createMockProvider({
@@ -759,7 +759,7 @@ describe('context-engine-06 — emergency compaction at hard context overflow', 
     const result = await agent.run('go');
     expect(result.status).toBe('failed');
     expect(result.error?.code).toBe('context-length');
-    // Exactly one compaction attempt — no infinite retry.
+    // Exactly one compaction attempt - no infinite retry.
     expect(compactNowCalls()).toBe(1);
   });
 });

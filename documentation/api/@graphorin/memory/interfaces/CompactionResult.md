@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -26,5 +26,5 @@ Outcome of a compaction call.
 | <a id="property-source"></a> `source` | `readonly` | [`CompactionSource`](/api/@graphorin/memory/type-aliases/CompactionSource.md) | - | packages/memory/src/context-engine/compaction/types.ts:53 |
 | <a id="property-summary"></a> `summary` | `readonly` | `string` | - | packages/memory/src/context-engine/compaction/types.ts:45 |
 | <a id="property-summarytokens"></a> `summaryTokens` | `readonly` | `number` | - | packages/memory/src/context-engine/compaction/types.ts:46 |
-| <a id="property-summarytrust"></a> `summaryTrust?` | `readonly` | `"trusted"` \| `"untrusted-derived"` | Trust classification of the produced summary (CE-15). `'untrusted-derived'` when the compacted window contained `<<<untrusted_content>>>` envelopes or the injection heuristics flagged the summarizer output — the LLM-authored summary body is then wrapped in a `trust="derived"` envelope so taint survives compaction instead of laundering into an authoritative system message. `'trusted'` (or absent, for custom strategies that predate the field) otherwise. | packages/memory/src/context-engine/compaction/types.ts:66 |
+| <a id="property-summarytrust"></a> `summaryTrust?` | `readonly` | `"trusted"` \| `"untrusted-derived"` | Trust classification of the produced summary (CE-15). `'untrusted-derived'` when the compacted window contained `<<<untrusted_content>>>` envelopes or the injection heuristics flagged the summarizer output - the LLM-authored summary body is then wrapped in a `trust="derived"` envelope so taint survives compaction instead of laundering into an authoritative system message. `'trusted'` (or absent, for custom strategies that predate the field) otherwise. | packages/memory/src/context-engine/compaction/types.ts:66 |
 | <a id="property-trimmedmessages"></a> `trimmedMessages` | `readonly` | readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[] | - | packages/memory/src/context-engine/compaction/types.ts:52 |

@@ -54,17 +54,17 @@ export interface FactInput {
   /**
    * Trust-provenance tag (P1-4). Writers that synthesize memory pass
    * `'extraction'` / `'reflection'` so the fact lands quarantined;
-   * first-party writers pass `'user'` / `'tool'` (or omit it — absent ⇒
+   * first-party writers pass `'user'` / `'tool'` (or omit it - absent ⇒
    * treated as first-party `active`). The `status` is *derived* from
    * this tag plus the injection heuristics; it is never author-set.
    */
   readonly provenance?: MemoryProvenance;
   /**
    * Importance hint in `[0, 1]` (X-1 / MCON-12). Feeds the multi-signal
-   * salience score that orders decay archiving and capacity eviction —
+   * salience score that orders decay archiving and capacity eviction -
    * higher importance ⇒ evicted later. Values are clamped to `[0, 1]`;
    * non-finite values are dropped. The consolidator's extraction pass
-   * fills this from the model's per-fact 1–10 rating
+   * fills this from the model's per-fact 1-10 rating
    * (`normalizeImportance`); absent ⇒ the neutral midpoint at scoring
    * time.
    */
@@ -72,7 +72,7 @@ export interface FactInput {
   /**
    * Principal dimension (D3). The consolidator stamps `'agent'` on
    * synthesized writes; user-authored writes may pass `'user'`. Absent
-   * (the default) leaves the column NULL — treated as `'user'` at
+   * (the default) leaves the column NULL - treated as `'user'` at
    * filter time. Never gates default recall.
    */
   readonly owner?: MemoryOwner;
@@ -95,7 +95,7 @@ export interface FusionWeights {
   /**
    * Weight applied to the graph-expansion candidate list (D5). Default
    * `1` (the previous neutral behaviour). Tune it once the graph leg's
-   * reliability is calibrated against labels — the roadmap's "graph as a
+   * reliability is calibrated against labels - the roadmap's "graph as a
    * first-class tunable fusion weight" (was hardcoded neutral).
    */
   readonly graph?: number;
@@ -107,7 +107,7 @@ export interface FusionWeights {
  * Score-fusion strategy for {@link SemanticMemory.search} (X-2).
  *
  * - `'rrf'` (the default when `fusion` is omitted) fuses the candidate
- *   lists through the configured reranker — the zero-tuning
+ *   lists through the configured reranker - the zero-tuning
  *   {@link RRFReranker} unless one was overridden.
  * - `'weighted'` fuses through {@link WeightedRRFReranker}, scaling each
  *   list's reciprocal-rank contribution by its {@link FusionWeights}, for
@@ -155,7 +155,7 @@ export interface FactSearchOptions {
   readonly asOf?: string;
   /**
    * Include quarantined facts in the result (P1-4). Defaults to
-   * `false` — action-driving recall (`fact_search`, auto-recall) never
+   * `false` - action-driving recall (`fact_search`, auto-recall) never
    * returns quarantined rows. Set `true` only for the validation /
    * inspector path that surfaces quarantined facts to a human for
    * promotion via {@link SemanticMemory.validate}.
@@ -165,7 +165,7 @@ export interface FactSearchOptions {
   readonly includeQuarantined?: boolean;
   /**
    * Rank-time trust discount (C5). `'on'` (default) multiplies each
-   * hit's fused score by its trust factor — quarantined-but-included
+   * hit's fused score by its trust factor - quarantined-but-included
    * rows by `1 - quarantine` (default 0.3x), foreign-provenance rows by
    * `1 - foreignProvenance` (default 0.8x); first-party active facts are
    * untouched. `'off'` restores pure similarity ranking (inspector /
@@ -179,7 +179,7 @@ export interface FactSearchOptions {
    * Include superseded / validity-expired facts (memory-retrieval-01).
    * Defaults to `false`: a default read behaves as `asOf = now`, so a
    * fact whose validity interval was closed (e.g. by `supersede`)
-   * never surfaces as current — what the `fact_supersede` tool
+   * never surfaces as current - what the `fact_supersede` tool
    * promises. Set `true` only for inspector / audit paths. Ignored
    * when an explicit {@link asOf} is supplied.
    *
@@ -208,7 +208,7 @@ export interface FactSearchOptions {
    * transformer is configured (`createMemory({ queryTransform })`), the
    * query is fanned into up to `N - 1` reworded variants via one cheap
    * LLM call; each variant is retrieved (FTS + vector) and **all** lists
-   * are fused through the existing RRF reranker — recovering memories
+   * are fused through the existing RRF reranker - recovering memories
    * whose stored wording differs from the user's phrasing. `N` bounds
    * the *total* query strings, including the original. Offline (no
    * transformer, or `N <= 1`) this is a **silent no-op**: search stays
@@ -219,11 +219,11 @@ export interface FactSearchOptions {
    */
   readonly multiQuery?: number;
   /**
-   * HyDE — Hypothetical Document Embeddings (arXiv:2212.10496), P2-3.
+   * HyDE - Hypothetical Document Embeddings (arXiv:2212.10496), P2-3.
    * When `true` *and* both a query transformer and an embedder are
    * configured, generate a short hypothetical answer, embed it, and fuse
    * its vector neighbours into the result. Helps short / ambiguous
-   * queries but adds a generate + embed round-trip and can drift — hence
+   * queries but adds a generate + embed round-trip and can drift - hence
    * opt-in. With no transformer (or no embedder) this is a silent no-op
    * and no provider call is made.
    *
@@ -232,7 +232,7 @@ export interface FactSearchOptions {
   readonly hyde?: boolean;
   /**
    * Score-fusion strategy (X-2). Omitted (the default) ⇒ RRF via the
-   * configured reranker — behaviour is unchanged. `{ strategy:
+   * configured reranker - behaviour is unchanged. `{ strategy:
    * 'weighted', weights }` fuses through {@link WeightedRRFReranker},
    * up-/down-weighting the FTS vs vector candidate lists per
    * {@link FusionWeights}; reserve it for callers who have calibrated the
@@ -247,11 +247,11 @@ export interface FactSearchOptions {
    * storage adapter (`store.graph`), the facts retrieved by the lexical /
    * vector candidate pass are treated as seeds: facts sharing a canonical
    * entity (subject / object) are fetched via a recursive CTE and fused
-   * in as an extra candidate list before rerank — surfacing connected
+   * in as an extra candidate list before rerank - surfacing connected
    * facts the query never matched directly ("what did the person I met in
    * Tbilisi recommend?"). `0` (the default) or a graph-less adapter ⇒ a
    * silent no-op; recall is unchanged. Opt-in + retrieval-heavy. `2`
-   * (D5) widens to two-hop expansion — pair with `graphScoring: 'ppr'`
+   * (D5) widens to two-hop expansion - pair with `graphScoring: 'ppr'`
    * so distant neighbours decay instead of tying with direct ones.
    *
    * @stable
@@ -279,13 +279,13 @@ export interface FactSearchOptions {
   readonly entityMatch?: boolean;
   /**
    * Retrieval-time principal filter (D3). When set, only facts whose
-   * `owner` is in the requested set are returned — `'user'` for
+   * `owner` is in the requested set are returned - `'user'` for
    * user-stated facts, `'agent'` for the agent's own inferences,
    * `'shared'` for multi-agent shared records. Rows written before the
    * feature (owner NULL) are treated as `'user'`. Applied in-store on
    * the FTS + vector legs and as a record-level filter on the fused
    * result so the HyDE / graph legs obey it too. Absent (the default)
-   * ⇒ **no owner filter** — recall is byte-identical.
+   * ⇒ **no owner filter** - recall is byte-identical.
    *
    * @stable
    */
@@ -293,7 +293,7 @@ export interface FactSearchOptions {
 }
 
 /**
- * Per-call options for {@link SemanticMemory.searchIterative} (P2-4) —
+ * Per-call options for {@link SemanticMemory.searchIterative} (P2-4) -
  * the gated grade-then-reformulate loop. Extends {@link FactSearchOptions}
  * (every base option applies to each retrieval pass); `topK` doubles as
  * the cap on the accumulated result count.
@@ -318,7 +318,7 @@ export interface IterativeSearchOptions extends FactSearchOptions {
 /**
  * Outcome of {@link SemanticMemory.searchIterative}. Beyond the ranked
  * `hits`, `sufficient` / `abstained` tell the caller whether the memory
- * actually answered the query — `abstained: true` means it should say so
+ * actually answered the query - `abstained: true` means it should say so
  * rather than confabulate.
  *
  * @stable
@@ -341,7 +341,7 @@ export interface FactRememberOptions {
   /**
    * Precomputed contextual-retrieval index text (P1-3, advanced). When
    * supplied it overrides the instance's `'late-chunk'` computation: the
-   * embedding is computed from — and the FTS row indexed against — this
+   * embedding is computed from - and the FTS row indexed against - this
    * text, while the canonical `text` is stored unchanged. The background
    * consolidator passes this in its `'llm'` mode (the one place an LLM is
    * allowed to write the situating context); first-party callers normally
@@ -352,7 +352,7 @@ export interface FactRememberOptions {
    * Auto-promotion policy (MCON-2). When `true`, a *synthesized* write
    * (consolidator extraction) that is **clean** by the injection heuristics is
    * stored `active` instead of quarantined. Injection-flagged writes always
-   * stay quarantined — the security gate is preserved. Off by default; the
+   * stay quarantined - the security gate is preserved. Off by default; the
    * consolidator passes it only when the operator opts in via
    * `autoPromoteExtraction`. No effect on non-synthesized writes.
    */
@@ -372,8 +372,8 @@ export interface RememberOutcome {
   readonly decision: ConflictDecision;
   /**
    * Why this write landed quarantined, if it did (P1-4 / MRET-3).
-   * `'injection'` — the offline injection heuristics flagged the text
-   * (a memory-poisoning candidate). `'synthesized'` — a consolidator /
+   * `'injection'` - the offline injection heuristics flagged the text
+   * (a memory-poisoning candidate). `'synthesized'` - a consolidator /
    * reflection / induction write awaiting validation. Absent when the
    * fact is `active` or when a dedup returned a pre-existing row.
    */
@@ -381,7 +381,7 @@ export interface RememberOutcome {
 }
 
 /**
- * `SemanticMemory` — long-term factual store. Hybrid (vector + FTS5)
+ * `SemanticMemory` - long-term factual store. Hybrid (vector + FTS5)
  * search merges the two ranked lists through the configured
  * {@link ReRanker} (default {@link RRFReranker} with `k = 60`).
  *
@@ -427,7 +427,7 @@ export class SemanticMemory {
      * (default) prepends a deterministic situating context to the text
      * that is embedded + FTS-indexed, leaving the canonical `text`
      * untouched; `'off'` indexes the bare text. The hot write path never
-     * makes an LLM call — the `'llm'` enrichment is confined to the
+     * makes an LLM call - the `'llm'` enrichment is confined to the
      * background consolidator, which supplies a precomputed `indexText`.
      */
     contextualRetrieval?: 'off' | 'late-chunk';
@@ -515,7 +515,7 @@ export class SemanticMemory {
       const text = input.text;
       // P1-4: derive the retrieval-trust status. Synthesized writes
       // (consolidator extraction / reflection) and candidates that trip
-      // the offline injection heuristics land quarantined — excluded
+      // the offline injection heuristics land quarantined - excluded
       // from default recall until a human validates them. First-party
       // writes (user / tool / imported / unset) stay active. `status`
       // is never author-set; it is always derived here.
@@ -534,7 +534,7 @@ export class SemanticMemory {
       // MRET-3: surface *why* a fresh write was quarantined so callers
       // (the fact_remember tool, harnesses) can tell an injection-flagged
       // poison candidate apart from a synthesized-but-clean consolidator
-      // write. Injection takes precedence — it is the security-relevant
+      // write. Injection takes precedence - it is the security-relevant
       // reason and gates promotion in validate().
       const quarantineReason: 'injection' | 'synthesized' | undefined =
         status === 'quarantined' ? (injection.flagged ? 'injection' : 'synthesized') : undefined;
@@ -680,7 +680,7 @@ export class SemanticMemory {
       }
     }
     // No embedder, but contextualization still needs to reach the lexical
-    // index — route through the extended write when the adapter supports
+    // index - route through the extended write when the adapter supports
     // it. Plain (non-contextualized) writes keep the canonical fast path.
     if (
       contextualized &&
@@ -702,7 +702,7 @@ export class SemanticMemory {
    * P2-1: resolve the fact's subject / object to canonical entities and
    * link them so one-hop expansion can traverse this fact. A no-op when
    * no resolver is configured (the default) or the fact has no s/p/o, and
-   * resilient — a resolution failure never breaks the write that just
+   * resilient - a resolution failure never breaks the write that just
    * committed.
    */
   async #linkEntities(scope: SessionScope, fact: Fact, signal?: AbortSignal): Promise<void> {
@@ -713,7 +713,7 @@ export class SemanticMemory {
         ...(signal !== undefined ? { signal } : {}),
       });
     } catch {
-      // Graph linking is a soft enrichment — never fail a committed write.
+      // Graph linking is a soft enrichment - never fail a committed write.
     }
   }
 
@@ -743,7 +743,7 @@ export class SemanticMemory {
         const wEntity = weighted?.weights.entity ?? 1;
         // P2-3: fan the query into reworded variants when opted-in *and*
         // a transformer is configured; otherwise this is just `[query]`
-        // (single-shot, no provider call — the offline default).
+        // (single-shot, no provider call - the offline default).
         const queries = await this.#expandQueries(query, opts);
         const lists: Array<ReadonlyArray<MemoryHit<Fact>>> = [];
         const listWeights: number[] = [];
@@ -797,7 +797,7 @@ export class SemanticMemory {
           listWeights.push(wVector);
           listLabels.push('hyde');
         }
-        // P2-1: one-hop graph expansion — seed on the candidates gathered
+        // P2-1: one-hop graph expansion - seed on the candidates gathered
         // so far and fuse in facts that share a canonical entity (a third
         // candidate kind ⇒ neutral fusion weight). A no-op without
         // `expandHops` / a graph adapter.
@@ -807,7 +807,7 @@ export class SemanticMemory {
           listWeights.push(wGraph);
           listLabels.push('graph');
         }
-        // D5: exact entity-match leg — a precise "facts about <entity>"
+        // D5: exact entity-match leg - a precise "facts about <entity>"
         // candidate list, fused with its own weight.
         const entityHits = await this.#tryEntityMatch(scope, query, opts, candidateTopK);
         if (entityHits.length > 0) {
@@ -832,7 +832,7 @@ export class SemanticMemory {
         // finalTopK cut moves to AFTER decay + filters.
         // memory-retrieval-03: the tags filter also runs AFTER fusion
         // (the vector / HyDE / graph legs have no store-level tags
-        // predicate), so a tagged search must widen the same way —
+        // predicate), so a tagged search must widen the same way -
         // otherwise untagged candidates occupy fused ranks, get
         // filtered, and the search silently returns fewer than topK.
         const fusedTopK =
@@ -853,7 +853,7 @@ export class SemanticMemory {
         });
         const decayed = await this.#applyDecay(scope, fused, opts.decay);
         // MRET-4: the vector / HyDE / graph legs have no store-level tags
-        // predicate — enforce the any-of filter on the fused records so
+        // predicate - enforce the any-of filter on the fused records so
         // every leg obeys it.
         const filtered =
           opts.tags !== undefined && opts.tags.length > 0
@@ -863,7 +863,7 @@ export class SemanticMemory {
                 return opts.tags?.some((t) => recordTags.includes(t)) === true;
               })
             : decayed;
-        // D3: the HyDE / graph legs have no store-level owner predicate —
+        // D3: the HyDE / graph legs have no store-level owner predicate -
         // enforce the principal filter on the fused records so every leg
         // obeys it. Rows with no stored owner count as 'user'.
         const wantedOwners =
@@ -876,14 +876,14 @@ export class SemanticMemory {
           wantedOwners !== null
             ? filtered.filter((h) => wantedOwners.includes(h.record.owner ?? 'user'))
             : filtered;
-        // C5: rank-time trust discount — quarantined-but-included and
+        // C5: rank-time trust discount - quarantined-but-included and
         // foreign-provenance hits are down-weighted BEFORE the final cut,
         // mirroring the eviction-path securityFactor. First-party active
         // facts keep factor 1, so ordinary rankings are unchanged.
         const trusted =
           opts.trustWeighting === 'off' ? ownerFiltered : this.#applyTrustDiscount(ownerFiltered);
         const ranked = trusted.slice(0, finalTopK);
-        // MRET-7: recall reinforces the recalled facts — stamp
+        // MRET-7: recall reinforces the recalled facts - stamp
         // last-accessed + bump strength so "recently accessed facts decay
         // slower" actually holds. Bookkeeping only: a failure here must
         // never break the read path.
@@ -913,7 +913,7 @@ export class SemanticMemory {
           'memory.search.semantic.expand_hops': opts.expandHops ?? 0,
           'memory.search.semantic.graph_count': graphHits.length,
           // X-3: per-signal recall explanation (ids + scores + signals,
-          // no query text — the query is surfaced only as `query_length`
+          // no query text - the query is surfaced only as `query_length`
           // above to keep traces free of recall content).
           'memory.search.semantic.explain': JSON.stringify(explanation.results),
           ...(opts.asOf !== undefined ? { 'memory.search.semantic.as_of': opts.asOf } : {}),
@@ -934,8 +934,8 @@ export class SemanticMemory {
    * hard *and* with a grader configured
    * (`createMemory({ iterativeRetrieval })`), the retrieved set is graded
    * for sufficiency and, when weak, the query is reformulated and
-   * retrieved again — **widening to one-hop graph expansion**
-   * (`expandHops: 1`) on each reformulation pass — up to `maxIterations`
+   * retrieved again - **widening to one-hop graph expansion**
+   * (`expandHops: 1`) on each reformulation pass - up to `maxIterations`
    * (hard-capped at 5). When still insufficient it returns
    * `abstained: true` so the caller can decline to answer instead of
    * confabulating.
@@ -1008,7 +1008,7 @@ export class SemanticMemory {
    * zone thresholds are calibrated against them), and it **includes
    * quarantined facts** so prior synthesized memories are visible to
    * reconciliation. Returns `[]` when no embedder / vector adapter is
-   * configured — the consolidator then treats every candidate as a
+   * configured - the consolidator then treats every candidate as a
    * fresh `add`, degrading gracefully to the pre-reconcile behaviour.
    *
    * @stable
@@ -1047,7 +1047,7 @@ export class SemanticMemory {
    * to, oldest → newest, including superseded / soft-deleted rows so
    * callers can answer "how did this fact change over time". Requires
    * a storage adapter that implements
-   * `SemanticMemoryStoreExt.historyOf(...)` — the default
+   * `SemanticMemoryStoreExt.historyOf(...)` - the default
    * `@graphorin/store-sqlite` adapter wires this through. P0-2.
    *
    * @stable
@@ -1077,12 +1077,12 @@ export class SemanticMemory {
    * that admits a synthesized memory into action-driving recall once a
    * human (or trusted non-agent caller) has reviewed it. Writes a
    * `memory_history` audit row. Requires a storage adapter that
-   * implements `SemanticMemoryStoreExt.setStatus(...)` — the default
+   * implements `SemanticMemoryStoreExt.setStatus(...)` - the default
    * `@graphorin/store-sqlite` adapter wires this through.
    *
    * MRET-3 / MST-1: promotion of a fact whose text still trips the
    * offline injection heuristics is **refused** with
-   * {@link QuarantinePromotionRefusedError} — the model-facing
+   * {@link QuarantinePromotionRefusedError} - the model-facing
    * `fact_validate` tool calls this with no `force`, so a poisoned
    * memory can never be promoted by the agent itself (the one-turn
    * `fact_remember(poison)` → `fact_validate(id)` chain is closed). An
@@ -1144,7 +1144,7 @@ export class SemanticMemory {
       scope,
       { 'memory.semantic.action': 'supersede' },
       async () => {
-        // Bypass the conflict pipeline — the explicit supersede call
+        // Bypass the conflict pipeline - the explicit supersede call
         // is the user's authoritative decision; a second pipeline
         // pass would race with itself (the new fact is by definition
         // a near-dup of the old one) and could silently reroute the
@@ -1177,7 +1177,7 @@ export class SemanticMemory {
    * Hard-delete a fact (GDPR path). Distinct from {@link forget}: the
    * record is removed from storage entirely instead of soft-archived.
    * Requires a storage adapter that implements
-   * `SemanticMemoryStoreExt.purge(...)` — the default
+   * `SemanticMemoryStoreExt.purge(...)` - the default
    * `@graphorin/store-sqlite` adapter wires this through.
    */
   async purge(scope: SessionScope, factId: string, reason?: string): Promise<void> {
@@ -1207,7 +1207,7 @@ export class SemanticMemory {
     return this.#reranker.rerank(query, lists, options);
   }
 
-  /** Pure-fusion helper — exposed for callers that already collected results. */
+  /** Pure-fusion helper - exposed for callers that already collected results. */
   static fuseRrf<TRecord extends Fact>(
     lists: ReadonlyArray<ReadonlyArray<MemoryHit<TRecord>>>,
     k = 60,
@@ -1216,7 +1216,7 @@ export class SemanticMemory {
   }
 
   /**
-   * Pure weighted-fusion helper (X-2) — like {@link SemanticMemory.fuseRrf}
+   * Pure weighted-fusion helper (X-2) - like {@link SemanticMemory.fuseRrf}
    * but scales each list `i`'s reciprocal-rank contribution by
    * `weights[i]`. A missing / invalid entry defaults to `1`, so equal or
    * absent weights reproduce RRF.
@@ -1232,7 +1232,7 @@ export class SemanticMemory {
   /**
    * Multi-query expansion (P2-3). Returns the original query followed by
    * up to `multiQuery - 1` deduped reworded variants. A no-op (`[query]`)
-   * when `multiQuery` is unset / `<= 1` or no transformer is configured —
+   * when `multiQuery` is unset / `<= 1` or no transformer is configured -
    * so the default path makes no provider call. A transformer failure
    * degrades to `[query]` rather than breaking recall.
    */
@@ -1263,7 +1263,7 @@ export class SemanticMemory {
    * HyDE retrieval (P2-3). Generates a hypothetical answer, embeds it,
    * and returns its vector neighbours to fuse into the result. A no-op
    * (`[]`) unless `hyde` is set, a transformer is configured, **and** an
-   * embedder + vector surface exist — the embedder guard is checked
+   * embedder + vector surface exist - the embedder guard is checked
    * *first* so a missing embedder skips the LLM call entirely rather than
    * generating a passage that can never be embedded.
    */
@@ -1296,7 +1296,7 @@ export class SemanticMemory {
    * One-hop graph expansion (P2-1). Seeds on the unique fact ids already
    * gathered into `lists` and fuses in facts sharing a canonical entity,
    * via the adapter's recursive-CTE `graph.expandOneHop`. A no-op (`[]`)
-   * unless `expandHops >= 1` and the adapter exposes `graph` — and
+   * unless `expandHops >= 1` and the adapter exposes `graph` - and
    * resilient: a traversal error degrades to no expansion rather than
    * breaking recall. Neighbours carry a `graph` signal so explanations
    * (X-3) can attribute a hit to the hop.
@@ -1459,7 +1459,7 @@ export class SemanticMemory {
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
     if (decay === undefined || hits.length === 0) return hits;
     // MRET-8: read decay columns ONLY for the hit ids (narrow IN-list)
-    // instead of re-reading the scope's 1000 oldest rows per search —
+    // instead of re-reading the scope's 1000 oldest rows per search -
     // the old window was O(scope) per query AND, being the LRU head,
     // could even miss the hits entirely.
     const semantic = this.#store.semantic;

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/context-engine/token-budget.ts:87
 
-Output of [allocate](/api/@graphorin/memory/functions/allocateTokenBudget.md) — one entry per surviving layer in
+Output of [allocate](/api/@graphorin/memory/functions/allocateTokenBudget.md) - one entry per surviving layer in
 priority order, plus a `truncated` flag for observability.
 
 ## Stable

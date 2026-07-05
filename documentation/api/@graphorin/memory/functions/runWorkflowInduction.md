@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,7 +19,7 @@ Defined in: packages/memory/src/consolidator/phases/induce.ts:274
 
 Pure orchestrator: induce a procedure from a trajectory.
 
-**Gate — successful trajectories only** (AWM online mode): a failed /
+**Gate - successful trajectories only** (AWM online mode): a failed /
 aborted run, or one with no steps, yields `null` without calling the
 inducer. Otherwise the inducer runs and the result is normalized.
 

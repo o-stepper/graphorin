@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -22,5 +22,5 @@ vector list and takes the `vector` weight.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-entity"></a> `entity?` | `readonly` | `number` | Weight applied to the exact entity-match candidate list (D5). Default `1`. | packages/memory/src/tiers/semantic-memory.ts:103 |
 | <a id="property-fts"></a> `fts?` | `readonly` | `number` | Weight applied to every FTS5 (lexical) candidate list. Default `1`. | packages/memory/src/tiers/semantic-memory.ts:92 |
-| <a id="property-graph"></a> `graph?` | `readonly` | `number` | Weight applied to the graph-expansion candidate list (D5). Default `1` (the previous neutral behaviour). Tune it once the graph leg's reliability is calibrated against labels — the roadmap's "graph as a first-class tunable fusion weight" (was hardcoded neutral). | packages/memory/src/tiers/semantic-memory.ts:101 |
+| <a id="property-graph"></a> `graph?` | `readonly` | `number` | Weight applied to the graph-expansion candidate list (D5). Default `1` (the previous neutral behaviour). Tune it once the graph leg's reliability is calibrated against labels - the roadmap's "graph as a first-class tunable fusion weight" (was hardcoded neutral). | packages/memory/src/tiers/semantic-memory.ts:101 |
 | <a id="property-vector"></a> `vector?` | `readonly` | `number` | Weight applied to every vector (incl. HyDE) candidate list. Default `1`. | packages/memory/src/tiers/semantic-memory.ts:94 |

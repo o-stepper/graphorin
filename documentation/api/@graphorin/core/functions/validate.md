@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function validate<T>(schema, data): ValidationResult<T>;
 Defined in: packages/core/src/utils/validation.ts:51
 
 Synchronous validation wrapper. Does **not** swallow errors thrown by
-the schema's transformations — only normalizes the success / failure
+the schema's transformations - only normalizes the success / failure
 signal.
 
 ## Type Parameters

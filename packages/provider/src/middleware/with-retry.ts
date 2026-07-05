@@ -1,5 +1,5 @@
 /**
- * `withRetry` — retry idempotent failures (5xx, network, timeouts)
+ * `withRetry` - retry idempotent failures (5xx, network, timeouts)
  * with exponential backoff + jitter. Lives outside `withRateLimit`
  * per the canonical order so retried requests respect the rate-limit
  * bucket of the next attempt.
@@ -98,7 +98,7 @@ async function* retryingStream(
 ): AsyncIterable<ProviderEvent> {
   let attempt = 0;
   // Stream-level (not per-attempt): once *any* event has reached the
-  // consumer, a retryable failure mid-stream must NOT restart the stream —
+  // consumer, a retryable failure mid-stream must NOT restart the stream -
   // that would replay stream-start + already-delivered text/tool-call events
   // into the same iteration (duplicate output, potential double tool execution).
   // `withFallback` upholds the same invariant. Pre-yield failures still retry.
@@ -110,7 +110,7 @@ async function* retryingStream(
         yield event;
       }
       if (yieldedAny) return;
-      // Empty stream — surface a finish so callers do not hang.
+      // Empty stream - surface a finish so callers do not hang.
       yield {
         type: 'finish',
         finishReason: 'stop',
@@ -192,7 +192,7 @@ function defaultRetryable(err: unknown): boolean {
   if (isAbortError(err)) return false;
   const e = err as { kind?: string; errorKind?: string; status?: number; name?: string };
   // `ProviderHttpError.kind` is always 'provider-http'; the canonical
-  // mapped kind rides on `errorKind` — consult both.
+  // mapped kind rides on `errorKind` - consult both.
   const kinds = [e.kind, e.errorKind];
   if (
     kinds.includes('transient') ||
@@ -213,7 +213,7 @@ function defaultRetryable(err: unknown): boolean {
   if (typeof e.status === 'number' && e.status === 429) return true;
   if (typeof e.status === 'number' && e.status >= 500 && e.status < 600) return true;
   // PS-2: a `ProviderHttpError{ status: 0 }` is a fetch-level network failure
-  // (ECONNREFUSED, DNS, connection reset) — exactly the transient class
+  // (ECONNREFUSED, DNS, connection reset) - exactly the transient class
   // `withRetry` documents. Retry it (abort already excluded above).
   if (typeof e.status === 'number' && e.status === 0) return true;
   return false;

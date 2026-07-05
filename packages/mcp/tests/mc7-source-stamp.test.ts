@@ -7,7 +7,7 @@ import { createMCPClientFromSdkTransport } from '../src/client/client.js';
 import type { MCPClient } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MC-7 — adapted tools carry the mcp source stamp (taint survives config.tools)', () => {
+describe('MC-7 - adapted tools carry the mcp source stamp (taint survives config.tools)', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 

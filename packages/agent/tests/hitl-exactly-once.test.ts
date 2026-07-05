@@ -3,12 +3,12 @@
  * and approval-on-validated-input semantics.
  *
  * Pre-fix, the ONLY checkpoint the runtime ever wrote was the suspend
- * snapshot — the journal entry for the approved call was created during
+ * snapshot - the journal entry for the approved call was created during
  * the resume and never persisted, so an operator queue re-delivering the
  * resume against the stored snapshot double-fired the side effect
  * (empirically confirmed in the 2026-07 audit). Partial approval
  * directives silently DISCARDED granted calls (removed from
- * `pendingApprovals`, never dispatched — the suspended-guard returned
+ * `pendingApprovals`, never dispatched - the suspended-guard returned
  * before the dispatch). And gated calls with schema-invalid args
  * suspended anyway, asking a human to approve args that could later be
  * rewritten by the repair hook behind the grant.
@@ -159,7 +159,7 @@ describe('agent-02: checkpointed resume is exactly-once', () => {
     expect(suspended.status).toBe('awaiting_approval');
     expect(store.puts.map((p) => p.metadata.nodeName)).toEqual(['agent.run']);
 
-    // 2. Resume with a grant — the side effect fires exactly once, and the
+    // 2. Resume with a grant - the side effect fires exactly once, and the
     //    runtime persists a write-ahead intent + the journaled post-dispatch
     //    state (pre-fix: NOTHING was persisted after the suspend snapshot).
     const directive = { approvals: [{ toolCallId: 'tc-pay', granted: true as const }] };
@@ -265,7 +265,7 @@ describe('agent-07: partial approval directives', () => {
 
     // Grant ONLY tc-a. Pre-fix: tc-a was removed from pendingApprovals,
     // emitted tool.approval.granted, and then NEVER executed (the
-    // suspended-guard returned before the dispatch) — gone forever.
+    // suspended-guard returned before the dispatch) - gone forever.
     const partial = endOf(
       await drain(
         makeAgent([textOnlyScript('unused', 4)]).stream(
@@ -282,7 +282,7 @@ describe('agent-07: partial approval directives', () => {
       true,
     );
 
-    // Grant the remainder — run completes; nothing fired twice.
+    // Grant the remainder - run completes; nothing fired twice.
     const final = endOf(
       await drain(
         makeAgent([textOnlyScript('done', 4)]).stream(
@@ -297,7 +297,7 @@ describe('agent-07: partial approval directives', () => {
 });
 
 describe('tools-02 (agent mirror): approval gating on validated input', () => {
-  it('fails a gated call with schema-invalid args fast — no approval requested, run does not suspend', async () => {
+  it('fails a gated call with schema-invalid args fast - no approval requested, run does not suspend', async () => {
     const fired: Record<string, number> = {};
     const agent = createAgent({
       name: 'gate-validate',
@@ -306,7 +306,7 @@ describe('tools-02 (agent mirror): approval gating on validated input', () => {
         modelId: 'mock',
         scripts: [
           multiToolCallScript([
-            // Missing required 'to' — must never reach a human.
+            // Missing required 'to' - must never reach a human.
             { toolCallId: 'tc-bad', toolName: 'send_payment', args: {} },
           ]),
           textOnlyScript('recovered', 4),
@@ -321,7 +321,7 @@ describe('tools-02 (agent mirror): approval gating on validated input', () => {
     if (error?.type === 'tool.execute.error') {
       expect(error.error.kind).toBe('invalid_input');
     }
-    // The run recovered (model saw the error and answered) — no suspend.
+    // The run recovered (model saw the error and answered) - no suspend.
     expect(endOf(events).status).toBe('completed');
     expect(fired).toEqual({});
   });

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 Defined in: packages/core/src/channels/channels.ts:57
 
-Overwrite-on-write — collisions are silently allowed (last-write-wins
+Overwrite-on-write - collisions are silently allowed (last-write-wins
 semantics within a step).
 
 ## Stable

@@ -13,7 +13,7 @@ import {
 } from '../../src/gen-ai/index.js';
 import { createTracer } from '../../src/tracer/index.js';
 
-describe('@graphorin/observability/gen-ai — operation name mapping', () => {
+describe('@graphorin/observability/gen-ai - operation name mapping', () => {
   it('maps every Graphorin span type the doc enumerates', () => {
     const knownTypes: ReadonlyArray<SpanType> = [
       'agent.run',
@@ -40,7 +40,7 @@ describe('@graphorin/observability/gen-ai — operation name mapping', () => {
   });
 });
 
-describe('@graphorin/observability/gen-ai — auto-derivation', () => {
+describe('@graphorin/observability/gen-ai - auto-derivation', () => {
   beforeEach(() => {
     _resetGenAISystemWarningsForTesting();
     setGenAISystemWarnSink(() => {});
@@ -73,7 +73,7 @@ describe('@graphorin/observability/gen-ai — auto-derivation', () => {
   });
 });
 
-describe('@graphorin/observability/gen-ai — emitGenAIAttributes', () => {
+describe('@graphorin/observability/gen-ai - emitGenAIAttributes', () => {
   it('emits the canonical gen_ai.* attributes on a provider.generate span', async () => {
     const records: SpanRecord[] = [];
     const exporter = mockExporter((r) => records.push(r));
@@ -101,7 +101,7 @@ describe('@graphorin/observability/gen-ai — emitGenAIAttributes', () => {
   it('emits per-message events on the open span', async () => {
     const records: SpanRecord[] = [];
     const exporter = mockExporter((r) => records.push(r));
-    // Per-message events default to 'internal' tier — raise the floor
+    // Per-message events default to 'internal' tier - raise the floor
     // so the validator preserves them in the export.
     const tracer = createTracer({
       exporters: [exporter],

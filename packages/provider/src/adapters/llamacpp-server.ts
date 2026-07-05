@@ -6,7 +6,7 @@
  * terminated by `data: [DONE]` exactly as the upstream OpenAI shape.
  *
  * The adapter shares a single `LocalProviderTrust` classifier with
- * `ollamaAdapter` and `openAICompatibleAdapter` — one classifier, one
+ * `ollamaAdapter` and `openAICompatibleAdapter` - one classifier, one
  * policy table, one error type.
  *
  * @packageDocumentation
@@ -62,7 +62,7 @@ export interface LlamaCppServerAdapterOptions {
 
 /**
  * Build a Graphorin {@link Provider} backed by the upstream
- * `llama-server` binary. The factory does not start the binary —
+ * `llama-server` binary. The factory does not start the binary -
  * operators launch it themselves with the desired model + GPU flags
  * and pass the URL here.
  *

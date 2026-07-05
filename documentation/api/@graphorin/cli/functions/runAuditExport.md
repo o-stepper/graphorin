@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function runAuditExport(options): Promise<AuditExportResult>;
 
 Defined in: packages/cli/src/commands/audit.ts:158
 
-`graphorin audit export --to <file>` — stream every entry as JSONL.
+`graphorin audit export --to <file>` - stream every entry as JSONL.
 
 ## Parameters
 

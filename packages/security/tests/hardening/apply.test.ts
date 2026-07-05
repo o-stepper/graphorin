@@ -27,7 +27,7 @@ describe('applyProcessHardening', () => {
     if (process.platform === 'win32') {
       // POSIX-only: Windows has no umask concept; `process.umask()`
       // always returns 0 there and the call is a no-op. The hardening
-      // module already records `umask: null` on win32 internally —
+      // module already records `umask: null` on win32 internally -
       // mirror that here so the assertion is portable.
       const status = applyProcessHardening({ umask: 0o077 });
       expect(status.applied).toBe(true);

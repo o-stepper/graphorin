@@ -1,5 +1,5 @@
 /**
- * `rekeyDatabase` — re-keys an already encrypted SQLite database. The
+ * `rekeyDatabase` - re-keys an already encrypted SQLite database. The
  * runner backs `graphorin storage rekey`.
  *
  * Strategy: open the DB through the cipher peer with the **old** key,
@@ -83,7 +83,7 @@ export async function rekeyDatabase(options: RekeyDatabaseOptions): Promise<Reke
     // we rewrite pages with the new one.
     conn.pragma('user_version');
     // sqlite3mc refuses `rekey` in WAL journal mode (real-peer
-    // verified) — drop to DELETE for the rotation, restore after.
+    // verified) - drop to DELETE for the rotation, restore after.
     conn.pragma('journal_mode = DELETE');
     const newEncoded = encodePassphraseForPragma(options.newPassphrase);
     conn.pragma(`rekey = ${newEncoded}`);

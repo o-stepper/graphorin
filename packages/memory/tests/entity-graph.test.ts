@@ -1,5 +1,5 @@
 /**
- * P2-1 — relation graph in `@graphorin/memory`: the pure resolution
+ * P2-1 - relation graph in `@graphorin/memory`: the pure resolution
  * policy (normalize / cosine / decision / adjudication parsing), the
  * `EntityResolver` (lexical + embedding dedup, conservative ambiguous
  * handling, opt-in LLM adjudication), and the end-to-end write→link→
@@ -39,7 +39,7 @@ function vecEmbedder(map: Record<string, number[]>): EmbedderProvider {
   };
 }
 
-/** Minimal provider stub for adjudication — always replies `reply`. */
+/** Minimal provider stub for adjudication - always replies `reply`. */
 function fixedProvider(reply: string): Provider {
   return {
     async generate() {
@@ -107,7 +107,7 @@ describe('P2-1 pure resolution policy', () => {
   it('decision: never matches a candidate from a different embedder (MST-11)', () => {
     const identical = new Float32Array([1, 0, 0]);
     // A candidate whose vector is identical but came from a DIFFERENT embedder
-    // must be skipped — its cosine is meaningless across vector spaces.
+    // must be skipped - its cosine is meaningless across vector spaces.
     const crossEmbedder = resolveEntityDecision({
       normalizedName: 'anna s',
       vector: identical,
@@ -260,13 +260,13 @@ describe('CS-11 resolver candidate-window safety', () => {
   it('resolves an exact alias of an entity beyond the candidate cap (no scan, no dup)', async () => {
     const { graph, calls } = countingGraph(graphOf(createInMemoryStore({ withGraphStore: true })));
     const resolver = new EntityResolver({ store: graph });
-    // The oldest entity — pushed far outside any most-recent-N window.
+    // The oldest entity - pushed far outside any most-recent-N window.
     const alpha = await resolver.resolve(scope, 'Alpha');
     // Flood the store well past the 1000-row candidate cap.
     for (let i = 0; i < 1100; i++) await resolver.resolve(scope, `filler-${i}`);
     const before = calls();
     // An uncapped exact lookup resolves the old alias without deserializing
-    // the candidate window — and without minting a duplicate.
+    // the candidate window - and without minting a duplicate.
     const again = await resolver.resolve(scope, 'alpha');
     expect(again).toBe(alpha);
     expect(calls()).toBe(before); // no candidate scan on the exact-alias path
@@ -285,7 +285,7 @@ describe('CS-11 resolver candidate-window safety', () => {
 
 describe('P2-1 search({ expandHops }) end-to-end', () => {
   // No embedder ⇒ the fixture's thresholdless vector search is off, so a
-  // plain search returns only the lexical (FTS substring) match — the
+  // plain search returns only the lexical (FTS substring) match - the
   // neighbour can appear *only* via the graph hop.
   function memoryWithResolution(over: Partial<CreateMemoryOptions> = {}) {
     return createMemory({

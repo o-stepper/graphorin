@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -28,4 +28,4 @@ walks the chain.
 | [\_resetExportMigratorsForTesting](/api/@graphorin/sessions/migrations/functions/resetExportMigratorsForTesting.md) | Reset the registry. Test-only. |
 | [listExportMigrators](/api/@graphorin/sessions/migrations/functions/listExportMigrators.md) | Snapshot of the registry. Sorted by `fromVersion`. |
 | [migrateExport](/api/@graphorin/sessions/migrations/functions/migrateExport.md) | Walk the registered migrators to advance `records` from `fromVersion` to `toVersion`. Throws when no chain exists. |
-| [registerExportMigrator](/api/@graphorin/sessions/migrations/functions/registerExportMigrator.md) | Register a migrator. Idempotent on the `(fromVersion, toVersion)` pair — re-registering replaces the prior entry. |
+| [registerExportMigrator](/api/@graphorin/sessions/migrations/functions/registerExportMigrator.md) | Register a migrator. Idempotent on the `(fromVersion, toVersion)` pair - re-registering replaces the prior entry. |

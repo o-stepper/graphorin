@@ -1,5 +1,5 @@
 /**
- * `API_BOUNDARY_GUARD` — for `'memory-aware'` tools that declared
+ * `API_BOUNDARY_GUARD` - for `'memory-aware'` tools that declared
  * `allowedMemoryOps` in their definition. The guard does **not**
  * snapshot memory; instead it asserts that every `ctx.memory.*` call
  * the tool issued during execution belongs to the declared set.
@@ -55,7 +55,7 @@ export function createApiBoundaryGuard(opts: ApiBoundaryGuardOptions): MemoryMod
   return Object.freeze({
     tier: 'memory-aware' as const,
     snapshot: async (_reader: MemoryRegionReader): Promise<MemorySnapshot> => {
-      // No region snapshotting at this tier — the guard is purely
+      // No region snapshotting at this tier - the guard is purely
       // call-path-based. We still emit an audit event so the audit
       // chain records that the guard was active for the run.
       emitMemoryGuardAudit({

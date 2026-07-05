@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -13,7 +13,7 @@ function createSampler(opts?): Sampler;
 Defined in: packages/observability/src/tracer/sampling.ts:85
 
 Build a [Sampler](/api/@graphorin/observability/interfaces/Sampler.md) from the supplied options. The sampler is
-intentionally inexpensive — every decision boils down to a single
+intentionally inexpensive - every decision boils down to a single
 `random < threshold` comparison.
 
 ## Parameters

@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createJSONLExporter, type SpanRecord } from '../../src/exporters/index.js';
 
-describe('@graphorin/observability/exporters — JSONL determinism', () => {
+describe('@graphorin/observability/exporters - JSONL determinism', () => {
   it('produces deterministic output for the same input fixture', async () => {
     const root = await mkdtemp(join(tmpdir(), 'graphorin-jsonl-det-'));
     const fixedDate = new Date(Date.UTC(2026, 0, 15, 10, 0, 0));
@@ -60,7 +60,7 @@ describe('@graphorin/observability/exporters — JSONL determinism', () => {
       const month = (await readdir(root, { withFileTypes: true })).find((e) => e.isDirectory());
       if (month === undefined) throw new Error('no month directory');
       const monthInfo = await stat(join(root, month.name));
-      // 0o700 — owner read/write/execute, no group, no world
+      // 0o700 - owner read/write/execute, no group, no world
       expect(monthInfo.mode & 0o777).toBe(0o700);
       const file = (await readdir(join(root, month.name)))[0];
       if (file === undefined) throw new Error('no file');

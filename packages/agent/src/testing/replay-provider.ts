@@ -1,15 +1,15 @@
 /**
- * `createReplayProvider(state)` — a Provider that replays the model
+ * `createReplayProvider(state)` - a Provider that replays the model
  * responses journaled on `RunState.steps[].providerResponse` (C3, opt-in
  * via `AgentConfig.recordProviderResponses`). Re-running the same input
  * against a replay provider reproduces the original run deterministically
- * with zero live model calls — the mocked-completion harness that gives
+ * with zero live model calls - the mocked-completion harness that gives
  * agent loops reproducible integration tests.
  *
  * The provider is strict by design: it throws when the state carries no
  * journaled responses, and emits an error event when the replayed run
  * asks for more steps than were recorded (a divergence, not a fixture
- * gap — fail loudly instead of hallucinating a response).
+ * gap - fail loudly instead of hallucinating a response).
  *
  * @packageDocumentation
  */
@@ -44,7 +44,7 @@ export function createReplayProvider(
   }
   if (recorded.length === 0) {
     throw new TypeError(
-      'createReplayProvider: RunState carries no journaled provider responses — ' +
+      'createReplayProvider: RunState carries no journaled provider responses - ' +
         'run the original agent with recordProviderResponses: true.',
     );
   }
@@ -77,7 +77,7 @@ export function createReplayProvider(
           type: 'error',
           error: {
             kind: 'unknown',
-            message: `replay exhausted after ${recorded.length} recorded step(s) — the replayed run diverged from the original`,
+            message: `replay exhausted after ${recorded.length} recorded step(s) - the replayed run diverged from the original`,
           },
         };
         return;
@@ -105,7 +105,7 @@ export function createReplayProvider(
       const entry = nextRecorded();
       if (entry === undefined) {
         throw new Error(
-          `replay exhausted after ${recorded.length} recorded step(s) — the replayed run diverged from the original`,
+          `replay exhausted after ${recorded.length} recorded step(s) - the replayed run diverged from the original`,
         );
       }
       return {

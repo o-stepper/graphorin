@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/agent/src/fanout/index.ts:75
 
 Per-child outcome surfaced on
 [FanOutResult.children](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md#property-children). Failed-child isolation: a child
-that throws produces a `ChildResult` with `status: 'failed'` —
+that throws produces a `ChildResult` with `status: 'failed'` -
 never an exception thrown from the fan-out call itself.
 
 ## Stable

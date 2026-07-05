@@ -7,7 +7,7 @@ import {
   registerOAuthStrategy,
 } from '../../src/oauth/strategies.js';
 
-describe('@graphorin/security/oauth — strategies', () => {
+describe('@graphorin/security/oauth - strategies', () => {
   beforeEach(() => {
     _resetOAuthStrategiesForTesting();
   });

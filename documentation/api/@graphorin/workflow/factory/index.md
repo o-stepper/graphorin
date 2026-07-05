@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # factory
 
-`createWorkflow({...})` — the public entry point for the workflow
+`createWorkflow({...})` - the public entry point for the workflow
 runtime. Validates the supplied configuration and returns the
 [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) handle that exposes `execute / resume / getState /
 listCheckpoints / fork`.

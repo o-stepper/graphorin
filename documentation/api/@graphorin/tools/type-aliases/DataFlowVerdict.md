@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -19,13 +19,13 @@ type DataFlowVerdict =
 };
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:276
+Defined in: packages/tools/src/executor/executor.ts:277
 
 Verdict returned by [DataFlowGuard.inspect](/api/@graphorin/tools/interfaces/DataFlowGuard.md#inspect). Mirrors
 `@graphorin/security`'s `DataFlowDecision`; the agent maps one to the
 other so the executor takes no security dependency.
 
-- `'allow'`      — proceed silently.
-- `'flag'`       — shadow-mode detection: audit, then proceed.
-- `'declassify'` — operator-authorized tainted flow: audit, then proceed.
-- `'block'`      — enforce-mode block: surface `dataflow_policy_blocked`.
+- `'allow'`      - proceed silently.
+- `'flag'`       - shadow-mode detection: audit, then proceed.
+- `'declassify'` - operator-authorized tainted flow: audit, then proceed.
+- `'block'`      - enforce-mode block: surface `dataflow_policy_blocked`.

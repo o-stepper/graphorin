@@ -48,13 +48,13 @@ export type SecretRefParseErrorKind =
 /**
  * Raised when `parseSecretRef(...)` rejects an input. The parser is
  * strict-by-default and never silently falls through to a default
- * resolver — typos in `*Ref` config fields surface here at bootstrap.
+ * resolver - typos in `*Ref` config fields surface here at bootstrap.
  *
  * @stable
  */
 export class SecretRefParseError extends GraphorinSecretsError {
   override readonly kind: SecretRefParseErrorKind;
-  /** Original input string. Safe to log — never carries a secret value (naked-string inputs are stored REDACTED: 4-char head + length). */
+  /** Original input string. Safe to log - never carries a secret value (naked-string inputs are stored REDACTED: 4-char head + length). */
   readonly input: string;
   /** Optional offset into `input` where the parser stopped. */
   readonly position?: number;
@@ -83,7 +83,7 @@ export class UnknownSchemeError extends GraphorinSecretsError {
   override readonly kind: 'unknown-scheme' = 'unknown-scheme';
   /** Lowercased scheme that failed lookup. */
   readonly scheme: string;
-  /** Original ref input — safe to log. */
+  /** Original ref input - safe to log. */
   readonly ref: string;
 
   constructor(scheme: string, ref: string) {
@@ -105,7 +105,7 @@ export class SecretResolutionError extends GraphorinSecretsError {
   override readonly kind: 'resolution-failed' = 'resolution-failed';
   /** Lowercased scheme that ran. */
   readonly scheme: string;
-  /** Original ref input — safe to log. */
+  /** Original ref input - safe to log. */
   readonly ref: string;
 
   constructor(scheme: string, ref: string, reason: string, options?: { cause?: unknown }) {
@@ -129,7 +129,7 @@ export class LiteralSecretsForbiddenError extends GraphorinSecretsError {
   override readonly kind: 'literal-secrets-forbidden' = 'literal-secrets-forbidden';
 
   constructor(reason: string) {
-    super('literal-secrets-forbidden', `Refused to resolve literal: secret — ${reason}`, {
+    super('literal-secrets-forbidden', `Refused to resolve literal: secret - ${reason}`, {
       hint: "Use a 'keyring:' or 'encrypted-file:' SecretRef instead. The 'literal:' scheme is gated for tests only and requires GRAPHORIN_ALLOW_LITERAL_SECRETS=1 plus secrets.allowLiteral=true in code, and is forbidden in NODE_ENV=production unless GRAPHORIN_ALLOW_LITERAL_SECRETS_IN_PRODUCTION=1 is also set (deliberately discouraged).",
     });
   }

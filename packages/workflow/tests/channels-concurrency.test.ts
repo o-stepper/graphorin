@@ -23,7 +23,7 @@ import {
 import { applyWrites, buildInitialState, type ChannelWrite } from '../src/internal/channels.js';
 
 function shuffle<T>(input: ReadonlyArray<T>, seed = 1): T[] {
-  // Lehmer LCG — deterministic per-seed shuffle.
+  // Lehmer LCG - deterministic per-seed shuffle.
   let cursor = seed >>> 0;
   const next = (): number => {
     cursor = (cursor * 48271) % 0x7fffffff;
@@ -68,7 +68,7 @@ function makeWrite(
   return { nodeName, taskId: `task-${nodeName}`, index, channel, value };
 }
 
-describe('channels — concurrency invariants', () => {
+describe('channels - concurrency invariants', () => {
   it('Reducer over a commutative + associative function is order-independent', () => {
     const writes: ChannelWrite[] = writers.map((w, i) => makeWrite(w, 'total', i + 1));
     const merged = new Set<number>();
@@ -157,7 +157,7 @@ describe('channels — concurrency invariants', () => {
       });
       seen.add(result.state.flag);
     }
-    // Order-dependent by design — multiple distinct outcomes are
+    // Order-dependent by design - multiple distinct outcomes are
     // acceptable because the engine documents AnyValue as
     // last-writer-wins.
     expect(seen.size).toBeGreaterThan(0);
@@ -186,7 +186,7 @@ describe('channels — concurrency invariants', () => {
       makeWrite(`w${i}`, 'scratch' as never, v),
     );
     // Ephemeral applies a "last write wins" merge but the key is
-    // discarded after the step — verify both invariants.
+    // discarded after the step - verify both invariants.
     const result = applyWrites<{ scratch?: string }>({
       state: {},
       versions: {},

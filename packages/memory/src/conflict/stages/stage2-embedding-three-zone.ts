@@ -1,18 +1,18 @@
 /**
- * Stage 2 — Embedding three-zone classifier (RB-02 §8.1).
+ * Stage 2 - Embedding three-zone classifier (RB-02 §8.1).
  *
  * Inspects the candidate similarity against the top-K nearest
  * neighbours surfaced by the semantic vector store and routes the
  * decision into one of four zones:
  *
- *  - HOT (`sim ≥ thresholds.hot`): silent dedup — the existing fact is
+ *  - HOT (`sim ≥ thresholds.hot`): silent dedup - the existing fact is
  *    semantically identical, no audit-worthy conflict.
  *  - NEAR-DUP (`thresholds.nearDup ≤ sim < thresholds.hot`): same
- *    fact phrased differently — dedup with `near-dup` zone label so
+ *    fact phrased differently - dedup with `near-dup` zone label so
  *    operators can spot the case in `fact_conflicts`.
  *  - CONFLICT-CHECK (`thresholds.cold < sim < thresholds.nearDup`):
  *    candidate sounds related; defer decision to Stages 3 → 4 → 5.
- *  - COLD (`sim ≤ thresholds.cold`): no conflict — admit the candidate.
+ *  - COLD (`sim ≤ thresholds.cold`): no conflict - admit the candidate.
  *
  * @packageDocumentation
  */

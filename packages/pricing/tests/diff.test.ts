@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ModelPrice, PricingSnapshot } from '../src/index.js';
 import { BUNDLED_SNAPSHOT, computeEntriesDigest, diffPricing } from '../src/index.js';
 
-describe('@graphorin/pricing — diffPricing', () => {
+describe('@graphorin/pricing - diffPricing', () => {
   it('returns an empty array for identical snapshots', () => {
     expect(diffPricing(BUNDLED_SNAPSHOT, BUNDLED_SNAPSHOT)).toEqual([]);
   });

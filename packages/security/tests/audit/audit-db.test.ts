@@ -12,7 +12,7 @@ import { SecretValue } from '../../src/secrets/secret-value.js';
 
 import { createMemoryAuditDbBinding } from './_helpers.js';
 
-describe('@graphorin/security/audit — audit-db lifecycle', () => {
+describe('@graphorin/security/audit - audit-db lifecycle', () => {
   afterEach(() => {
     _resetAuditDbBindingsForTesting();
   });

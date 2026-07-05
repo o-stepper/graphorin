@@ -63,7 +63,7 @@ async function ackInitialize(): Promise<void> {
   throw new Error('No initialize frame seen.');
 }
 
-describe('GraphorinClient — SSE / fallback / misc', () => {
+describe('GraphorinClient - SSE / fallback / misc', () => {
   it('SSE subscribe serves the BOUND session and rejects other subjects (IP-3)', async () => {
     const client = new GraphorinClient({
       baseUrl: 'http://x',

@@ -1,8 +1,8 @@
 /**
- * `recoveryAfterError` — passes when the harness recovered from every
+ * `recoveryAfterError` - passes when the harness recovered from every
  * tool error: each `'error'` call must be followed by at least one later
  * `'ok'` call (the run did not dead-end on a failure). A trajectory with
- * no errors passes trivially. This measures harness resilience — that a
+ * no errors passes trivially. This measures harness resilience - that a
  * surfaced `ToolError` re-enters the loop as a tool message and the agent
  * makes forward progress afterwards.
  *

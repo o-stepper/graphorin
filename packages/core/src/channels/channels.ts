@@ -49,7 +49,7 @@ export interface LatestValue<T = unknown> {
 }
 
 /**
- * Overwrite-on-write — collisions are silently allowed (last-write-wins
+ * Overwrite-on-write - collisions are silently allowed (last-write-wins
  * semantics within a step).
  *
  * @stable
@@ -95,7 +95,7 @@ export interface Stream<T = unknown> {
 }
 
 /**
- * Barrier — completes when every writer in `from` has produced a value.
+ * Barrier - completes when every writer in `from` has produced a value.
  *
  * @stable
  */
@@ -106,7 +106,7 @@ export interface Barrier<T = unknown> {
 }
 
 /**
- * Value scoped to a single execution step — discarded when the step
+ * Value scoped to a single execution step - discarded when the step
  * ends.
  *
  * @stable

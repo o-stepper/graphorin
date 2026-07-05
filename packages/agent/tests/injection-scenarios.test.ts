@@ -1,5 +1,5 @@
 /**
- * C8 — AgentDojo-style injected-task scenarios with ADAPTIVE variants
+ * C8 - AgentDojo-style injected-task scenarios with ADAPTIVE variants
  * (attacker knows the defense). The scripted provider is the worst-case
  * model: it always follows the injected instruction. Each scenario then
  * asks: does the deterministic dataflow policy stop the exfiltration
@@ -10,7 +10,7 @@
  *   DEFAULT enforce policy (the shingle probe's NFKC fold covers cheap
  *   obfuscation),
  * - a PARAPHRASED exfiltration is NOT caught by the default policy (the
- *   documented gap — no false claims), and IS blocked under
+ *   documented gap - no false claims), and IS blocked under
  *   `derivedTaint: 'strict'` (C6), which is exactly what that mode is
  *   for.
  */
@@ -180,7 +180,7 @@ async function runScenario(
   return { sinkRan: state.sent, blockedKinds };
 }
 
-describe('C8 — injected-task scenarios (adaptive variants gate the defense claims)', () => {
+describe('C8 - injected-task scenarios (adaptive variants gate the defense claims)', () => {
   for (const scenario of SCENARIOS) {
     it(`default enforce policy: '${scenario.id}' ${scenario.blockedByDefault ? 'is blocked' : 'is NOT caught (documented gap)'}`, async () => {
       const outcome = await runScenario(scenario, { mode: 'enforce' });
@@ -189,7 +189,7 @@ describe('C8 — injected-task scenarios (adaptive variants gate the defense cla
         expect(outcome.blockedKinds.length).toBeGreaterThan(0);
       } else {
         // Asserted the honest way round: the paraphrase DOES exfiltrate
-        // under the default policy — any future claim otherwise must
+        // under the default policy - any future claim otherwise must
         // flip this test with evidence.
         expect(outcome.sinkRan).toBe(true);
       }

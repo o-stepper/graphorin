@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,10 +10,12 @@
 type SqliteStoreMode = "lib" | "server";
 ```
 
-Defined in: packages/store-sqlite/src/index.ts:116
+Defined in: packages/store-sqlite/src/index.ts:119
 
-Library mode — single in-process connection. Server mode — opt-in
-`WorkerPool` (1 writer + N readers); WAL hardening and the periodic
-`wal_checkpoint(RESTART)` are mandatory in this mode.
+Both modes run on a single in-process connection with the mandatory
+WAL-hardening pragmas (WAL journal mode, busy-timeout, etc.).
+`'server'` additionally starts the periodic `wal_checkpoint(RESTART)`
+manager automatically to bound WAL growth on long-running daemons;
+`'lib'` starts it only when `walCheckpointIntervalMs` is set.
 
 ## Stable

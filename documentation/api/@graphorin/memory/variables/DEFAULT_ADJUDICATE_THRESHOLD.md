@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,4 +12,4 @@ const DEFAULT_ADJUDICATE_THRESHOLD: 0.82 = 0.82;
 
 Defined in: packages/memory/src/graph/entity-resolver.ts:38
 
-Cosine in `[this, merge)` is *ambiguous* — adjudicate or mint new.
+Cosine in `[this, merge)` is *ambiguous* - adjudicate or mint new.

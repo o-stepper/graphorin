@@ -1,5 +1,5 @@
 /**
- * IP-16: `RunStateTracker.prune()` was never called — terminal run records
+ * IP-16: `RunStateTracker.prune()` was never called - terminal run records
  * (each holding an AbortController) accumulated forever on a long-living
  * server. `scheduleRunPruning` is the wired-in periodic sweep.
  */
@@ -17,7 +17,7 @@ describe('IP-16: scheduled run-state pruning', () => {
       const runs = new RunStateTracker({ now });
       runs.start('old', agentDesc);
       runs.complete('old', 'completed'); // completedAt = 1_000_000
-      runs.start('live', agentDesc); // running — no completedAt
+      runs.start('live', agentDesc); // running - no completedAt
       // Advance wall-clock well past the retention window.
       t = 1_000_000 + 60_000 + 10_000;
       const stop = scheduleRunPruning(runs, now, { intervalMs: 1_000, retentionMs: 60_000 });

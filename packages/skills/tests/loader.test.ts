@@ -39,7 +39,7 @@ async function makeSkillDir(
   return dir;
 }
 
-describe('loadSkillFromSource — folder', () => {
+describe('loadSkillFromSource - folder', () => {
   it('parses a minimal Anthropic-base skill verbatim', async () => {
     const dir = await makeSkillDir(
       'minimal',
@@ -73,14 +73,14 @@ describe('loadSkillFromSource — folder', () => {
       [{ path: 'examples/example.txt', content: 'example content' }],
     );
     const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
-    // Tier 1 — metadata is parsed at load time.
+    // Tier 1 - metadata is parsed at load time.
     expect(skill.metadata.name).toBe('three-tier');
-    // Tier 2 — body is resolved lazily and cached.
+    // Tier 2 - body is resolved lazily and cached.
     const body1 = await skill.body();
     expect(body1.trim()).toBe('BODY');
     const body2 = await skill.body();
     expect(body2).toBe(body1);
-    // Tier 3 — resources are listed lazily; bytes are only read on
+    // Tier 3 - resources are listed lazily; bytes are only read on
     // explicit `read()`.
     const resources = await skill.resources();
     expect(resources.map((r) => r.relativePath)).toContain('examples/example.txt');
@@ -125,7 +125,7 @@ describe('loadSkillFromSource — folder', () => {
       ].join('\n'),
     );
     const skill = await loadSkillFromSource({ kind: 'folder', path: dir });
-    // Artifact self-declaration is capped at 'unknown' — trust is granted by
+    // Artifact self-declaration is capped at 'unknown' - trust is granted by
     // the integrator, never the downloaded folder.
     expect(skill.metadata.graphorinTrustLevel).toBe('unknown');
     const stamped = stampSkillToolFromMetadata(
@@ -213,13 +213,13 @@ describe('loadSkillFromSource — folder', () => {
     await expect(
       loadSkillFromSource(
         { kind: 'folder', path: dir },
-        { runtimeVersion: '0.5.0', conflictPolicy: 'error' },
+        { runtimeVersion: '0.6.0', conflictPolicy: 'error' },
       ),
     ).rejects.toBeInstanceOf(SkillRuntimeCompatError);
-    // Default (warn) policy keeps it a diagnostic — the load still succeeds.
+    // Default (warn) policy keeps it a diagnostic - the load still succeeds.
     const skill = await loadSkillFromSource(
       { kind: 'folder', path: dir },
-      { runtimeVersion: '0.5.0' },
+      { runtimeVersion: '0.6.0' },
     );
     expect(skill.diagnostics().some((d) => d.kind === 'invalid-runtime-compat')).toBe(true);
   });
@@ -263,7 +263,7 @@ describe('loadSkillFromSource — folder', () => {
   });
 });
 
-describe('loadSkillFromSource — inline', () => {
+describe('loadSkillFromSource - inline', () => {
   it('loads an inline skill without touching the filesystem', async () => {
     const skill = await loadSkillFromSource({
       kind: 'inline',

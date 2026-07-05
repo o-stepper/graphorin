@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { listMissingModels, setLookupWarnSink } from '../src/index.js';
 
-describe('@graphorin/pricing — listMissingModels', () => {
+describe('@graphorin/pricing - listMissingModels', () => {
   setLookupWarnSink(() => {});
 
   it('reports unknown (provider, model) pairs sorted by descending count', () => {
@@ -10,7 +10,7 @@ describe('@graphorin/pricing — listMissingModels', () => {
       { attributes: { 'gen_ai.system': 'unknown', 'gen_ai.request.model': 'gpt-9' } },
       { attributes: { 'gen_ai.system': 'unknown', 'gen_ai.request.model': 'gpt-9' } },
       { attributes: { 'gen_ai.system': 'unknown', 'gen_ai.request.model': 'gpt-7' } },
-      // Known model — must not appear in the result.
+      // Known model - must not appear in the result.
       { attributes: { 'gen_ai.system': 'openai', 'gen_ai.request.model': 'gpt-4o-2024-11-20' } },
     ]);
     expect(result).toHaveLength(2);

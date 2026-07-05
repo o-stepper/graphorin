@@ -9,10 +9,10 @@
  *
  * - a compact **catalogue** (name + one-line description, grouped by
  *   `ToolSource`) cheap enough to embed in the `code_execute` tool
- *   description — the model's "tools filesystem" map; and
+ *   description - the model's "tools filesystem" map; and
  * - a per-tool **signature** (`function name(input: …): Promise<…>`,
  *   with the argument type rendered best-effort from the tool's JSON
- *   Schema) that `code_search` returns on demand — progressive
+ *   Schema) that `code_search` returns on demand - progressive
  *   disclosure, so the full parameter detail is fetched only when the
  *   model asks for it.
  *
@@ -20,7 +20,7 @@
  * and `toJSON()`-bearing schemas render typed parameters via the shared
  * schema projection; a schema the projection cannot read renders as
  * `input: unknown` rather than failing. The projection is a *hint* for
- * the model, never a validation authority — the real schema check still
+ * the model, never a validation authority - the real schema check still
  * happens inside the executor when the bridged call runs.
  *
  * @packageDocumentation

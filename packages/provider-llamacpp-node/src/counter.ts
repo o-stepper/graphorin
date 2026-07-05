@@ -1,5 +1,5 @@
 /**
- * `LlamaCppNativeCounter` — token counter that wraps the loaded
+ * `LlamaCppNativeCounter` - token counter that wraps the loaded
  * `node-llama-cpp` model's `tokenize(text)` function. The counter is
  * strictly tighter than the cl100k_base proxy because it uses the
  * exact tokenizer the GGUF file embeds.
@@ -69,7 +69,7 @@ export class LlamaCppNativeCounter implements TokenCounter {
 }
 
 function hash(value: string): string {
-  // Lightweight deterministic fingerprint — the framework only needs
+  // Lightweight deterministic fingerprint - the framework only needs
   // it for cache invalidation, not for cryptographic purposes.
   let h = 0;
   for (let i = 0; i < value.length; i++) {

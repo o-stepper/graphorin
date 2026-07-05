@@ -15,7 +15,7 @@ interface CorpusCase {
   readonly seed: string;
   readonly candidate: string;
   /**
-   * The expected pipeline outcome — `'supersede'` (Stage 3 / 4),
+   * The expected pipeline outcome - `'supersede'` (Stage 3 / 4),
    * `'dedup'` (Stage 1 / 2 hot or near-dup), `'pending'` (Stage 5),
    * or `'admit'` (no conflict / cold zone).
    */
@@ -23,7 +23,7 @@ interface CorpusCase {
 }
 
 /**
- * English fixture corpus — RB-02 §8.7 / Phase 10b DoD calls for ≥ 50
+ * English fixture corpus - RB-02 §8.7 / Phase 10b DoD calls for ≥ 50
  * positive/negative samples covering every documented marker family.
  * Threshold calibration on the production embedder is a Phase B3
  * follow-up (Q-032 / Q-033).
@@ -125,7 +125,7 @@ const CORPUS: ReadonlyArray<CorpusCase> = [
     candidate: 'Atlas lives in Boston',
     expect: ['dedup'],
   },
-  // Cold zone — wholly unrelated facts
+  // Cold zone - wholly unrelated facts
   {
     name: 'cold zone: completely different topics',
     seed: 'Has a golden retriever named Luna.',
@@ -138,7 +138,7 @@ const CORPUS: ReadonlyArray<CorpusCase> = [
     candidate: 'Subscribes to two industry newsletters every Friday.',
     expect: ['admit'],
   },
-  // Negative — looks like a conflict but is harmless
+  // Negative - looks like a conflict but is harmless
   {
     name: 'negative: similar wording but new info',
     seed: 'My cat is called Mochi.',
@@ -292,7 +292,7 @@ const CORPUS: ReadonlyArray<CorpusCase> = [
     candidate: 'Mochi loves salmon.',
     expect: ['supersede'],
   },
-  // Negative cases — wholly distinct topics that should NOT trigger supersede
+  // Negative cases - wholly distinct topics that should NOT trigger supersede
   {
     name: 'negative: hobby + skill (distinct facts)',
     seed: 'Plays chess every weekend.',
@@ -349,7 +349,7 @@ const CORPUS: ReadonlyArray<CorpusCase> = [
     candidate: 'Subscribed to a weekly photography newsletter.',
     expect: ['admit'],
   },
-  // Markers in low-similarity contexts — confirm pipeline still recognises the marker
+  // Markers in low-similarity contexts - confirm pipeline still recognises the marker
   {
     name: 'preference flip: switched to (related but not identical wording)',
     seed: 'Drinks pour-over coffee daily.',
@@ -358,7 +358,7 @@ const CORPUS: ReadonlyArray<CorpusCase> = [
   },
 ];
 
-describe('@graphorin/memory — conflict resolution corpus', () => {
+describe('@graphorin/memory - conflict resolution corpus', () => {
   for (const sample of CORPUS) {
     it(`[${sample.name}] produces an expected pipeline outcome`, async () => {
       const memory = createMemory({

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type EmbedderPolicy = "lock-on-first" | "multi-active" | "auto-migrate";
 
 Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:67
 
-Multi-embedder coexistence policy. `'lock-on-first'` is the default —
+Multi-embedder coexistence policy. `'lock-on-first'` is the default -
 the first registered embedder is the only writer; subsequent
 different embedders must run a migration. `'multi-active'` allows
 coexistence (read both, write to default). `'auto-migrate'` is a

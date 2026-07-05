@@ -1,5 +1,5 @@
 /**
- * Bundled pricing snapshot. The catalogue is intentionally small —
+ * Bundled pricing snapshot. The catalogue is intentionally small -
  * operators wanting the full upstream catalogue should run the opt-in
  * `refreshPricing(...)` flow at build time and persist the result to
  * a custom snapshot file.
@@ -15,16 +15,16 @@ import { createHash } from 'node:crypto';
 
 import type { ModelPrice, PricingSnapshot } from '../types.js';
 
-/** @internal — used for `lookupPrice` defaults. */
+/** @internal - used for `lookupPrice` defaults. */
 export const SNAPSHOT_DATE = '2026-07-04';
 
 const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
   // -----------------------------------------------------------------
-  // Anthropic — current families (core-provider-03). Dateless alias ids;
+  // Anthropic - current families (core-provider-03). Dateless alias ids;
   // dated ids (`claude-haiku-4-5-20251001`) resolve through the lookup's
   // date-suffix fallback. Cache-write = 1.25x input (5-minute cache).
   // NOTE: the Claude 5 family (fable/mythos) and any tier released after
-  // this snapshot date have NO entry on purpose — cost tracking reports
+  // this snapshot date have NO entry on purpose - cost tracking reports
   // null + one WARN instead of an invented number. Refresh via
   // `refreshPricing(...)` or contribute the entry when pricing is public.
   // -----------------------------------------------------------------
@@ -87,7 +87,7 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     cacheWriteUsdPerToken: 18.75 / 1_000_000,
   },
   // -----------------------------------------------------------------
-  // OpenAI — cache reads are automatic (no breakpoints) and there is no
+  // OpenAI - cache reads are automatic (no breakpoints) and there is no
   // cache-write charge, so entries carry only `cachedReadUsdPerToken`.
   // -----------------------------------------------------------------
   {
@@ -176,7 +176,7 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     cachedReadUsdPerToken: 0.55 / 1_000_000,
   },
   // -----------------------------------------------------------------
-  // Google — implicit-caching read discount; context-cache storage is
+  // Google - implicit-caching read discount; context-cache storage is
   // billed per hour upstream and is not modelled here.
   // -----------------------------------------------------------------
   {
@@ -247,7 +247,7 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     outputUsdPerToken: 0.6 / 1_000_000,
   },
   // -----------------------------------------------------------------
-  // Local providers — documented as zero-cost so cost rollups still
+  // Local providers - documented as zero-cost so cost rollups still
   // include the call counts.
   // -----------------------------------------------------------------
   {
@@ -255,14 +255,14 @@ const ENTRIES: ReadonlyArray<ModelPrice> = Object.freeze([
     model: '*',
     inputUsdPerToken: 0,
     outputUsdPerToken: 0,
-    notes: 'Local Ollama deployment — operator-priced.',
+    notes: 'Local Ollama deployment - operator-priced.',
   },
   {
     provider: 'graphorin-llamacpp',
     model: '*',
     inputUsdPerToken: 0,
     outputUsdPerToken: 0,
-    notes: 'Local llama.cpp deployment — operator-priced.',
+    notes: 'Local llama.cpp deployment - operator-priced.',
   },
 ] as const);
 

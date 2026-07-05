@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,12 +14,12 @@ Defined in: packages/memory/src/migration/embedder-migration.ts:23
 
 Coexistence policy for embedder swaps.
 
- - `'lock-on-first'` (default) — refuses to register a second active
+ - `'lock-on-first'` (default) - refuses to register a second active
    embedder; surfaces an actionable error pointing at the planned
    migration runner.
- - `'multi-active'` — keeps both embedders alive (read union, write
+ - `'multi-active'` - keeps both embedders alive (read union, write
    to active); used while a long migration is in flight.
- - `'auto-migrate'` — re-embeds existing rows in resumable batches
+ - `'auto-migrate'` - re-embeds existing rows in resumable batches
    until the source embedder has zero rows, then retires it.
 
 ## Stable

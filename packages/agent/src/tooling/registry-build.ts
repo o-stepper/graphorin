@@ -5,7 +5,7 @@
  *
  * This realises Principle #12 (one registry, one collision policy) and
  * gives `createToolRegistry(...)` its first production call-site
- * (`createAgent(...)` warm-up — see `factory.ts`). The run loop consumes
+ * (`createAgent(...)` warm-up - see `factory.ts`). The run loop consumes
  * the resulting registry in a later work item (WI-03); `tool_search`
  * uses it in WI-05. This module only *builds* it.
  *
@@ -21,7 +21,7 @@
  *    preserved regardless (operator override > trust-class default).
  *  - **Skill tool-stamping lives here, not in `@graphorin/skills`.** The
  *    skills loader defers it (it does not depend on a tools registry);
- *    the agent — which depends on both — stamps each inline skill tool
+ *    the agent - which depends on both - stamps each inline skill tool
  *    via `stampSkillTool(...)`.
  *
  * @packageDocumentation
@@ -99,7 +99,7 @@ export interface BuildToolRegistryResult {
  * is: every `tools` entry, then every inline tool of every skill.
  * Throws whatever `register(...)` throws for a malformed tool
  * (`InvalidExampleError`, `InvalidPreferredModelError`,
- * `InvalidSideEffectClassError`) — the registry is the validation
+ * `InvalidSideEffectClassError`) - the registry is the validation
  * authority, so a bad tool fails fast at build time.
  *
  * @stable
@@ -167,7 +167,7 @@ function isToolSource(value: unknown): value is ToolSource {
 }
 
 /**
- * Minimal structural view of a `@graphorin/skills` `Skill` — exactly the
+ * Minimal structural view of a `@graphorin/skills` `Skill` - exactly the
  * members {@link buildToolRegistry} reads. The agent's `SkillsRegistryLike`
  * is intentionally loose (`list?(): unknown[]`), so entries are validated
  * at runtime before being treated as skills.

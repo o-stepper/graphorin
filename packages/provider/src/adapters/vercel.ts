@@ -1,5 +1,5 @@
 /**
- * `vercelAdapter` — wraps a Vercel AI SDK `LanguageModel`-shaped value
+ * `vercelAdapter` - wraps a Vercel AI SDK `LanguageModel`-shaped value
  * into a Graphorin {@link Provider}. The adapter is the default cloud
  * path: it speaks the AI SDK's `streamText` / `generateText` API and
  * maps the resulting events onto the canonical
@@ -9,7 +9,7 @@
  * AI SDK call contract (see `vercel-messages.ts`): tool definitions
  * become a name-keyed record with `jsonSchema()`-shaped input schemas,
  * assistant `toolCalls` become `tool-call` content parts, and
- * `ToolMessage`s become `tool-result` messages — the SDK zod-validates
+ * `ToolMessage`s become `tool-result` messages - the SDK zod-validates
  * all of these and rejects the raw Graphorin shapes.
  *
  * The AI SDK is an **optional peer dependency** of `@graphorin/provider`.
@@ -66,7 +66,7 @@ export interface LanguageModelLike {
 
 /**
  * Loose chunk shape emitted by the AI SDK's `streamText`. The shape is
- * intentionally permissive — we accept anything that carries the
+ * intentionally permissive - we accept anything that carries the
  * fields we use and ignore the rest. This keeps the adapter tolerant
  * of additive AI SDK schema changes.
  *
@@ -169,7 +169,7 @@ const DEFAULT_CAPABILITIES: Omit<ProviderCapabilities, 'reasoningContract'> = {
  * Wrap a Vercel AI SDK language-model value in a Graphorin
  * {@link Provider}. Outbound requests are converted onto the AI SDK
  * call contract (name-keyed tools, `tool-call` / `tool-result` content
- * parts — see `vercel-messages.ts`); the streaming chunks emitted by
+ * parts - see `vercel-messages.ts`); the streaming chunks emitted by
  * the AI SDK are translated back onto Graphorin `ProviderEvent`s.
  *
  * The adapter auto-detects the model's
@@ -248,7 +248,7 @@ async function* streamFromVercel(
   for await (const chunk of stream) {
     if (req.signal?.aborted) {
       // PS-12: an aborted stream must report 'aborted', not the initial 'stop'
-      // — mirrors the openai-shaped and ollama adapters.
+      // - mirrors the openai-shaped and ollama adapters.
       finishReason = 'aborted';
       break;
     }
@@ -406,7 +406,7 @@ function applyRequestPreflight(
 
 function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
   const prompt = toAiSdkPrompt(req.messages);
-  // System-role transcript messages are hoisted here — the SDK rejects
+  // System-role transcript messages are hoisted here - the SDK rejects
   // them inside `messages`. The request-level systemMessage leads.
   const system = [req.systemMessage, prompt.system]
     .filter((s): s is string => s !== undefined && s.length > 0)
@@ -427,7 +427,7 @@ function buildCallArgs(model: LanguageModelLike, req: ProviderRequest) {
       : {}),
     ...(req.toolChoice !== undefined ? { toolChoice: toAiSdkToolChoice(req.toolChoice) } : {}),
     ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
-    // v4 reads `maxTokens`; v7 renamed it `maxOutputTokens` — send both
+    // v4 reads `maxTokens`; v7 renamed it `maxOutputTokens` - send both
     // so the cap is honoured against either peer (PS-6).
     ...(req.maxTokens !== undefined
       ? { maxTokens: req.maxTokens, maxOutputTokens: req.maxTokens }
@@ -465,7 +465,7 @@ function normalizeToolCall(tc: unknown): { toolCallId: string; toolName: string;
  * `APICallError` carries a numeric `statusCode`; surfacing it lets
  * `withRetry` / `withFallback` see a genuine 429 / 5xx instead of the
  * `status: 0` network-error placeholder. Returns `0` when no status is
- * present (a true transport-level failure or an abort) — `0` is itself
+ * present (a true transport-level failure or an abort) - `0` is itself
  * retryable / fallback-eligible by default, while an abort is excluded by
  * the predicates via the wrapped `cause`.
  */

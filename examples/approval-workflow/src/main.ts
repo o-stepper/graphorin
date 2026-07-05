@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.5.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Workflow HITL durable-resume acceptance demo — library mode. Wires
  * `@graphorin/workflow`'s step-graph engine to a four-node expense-
@@ -43,7 +43,7 @@ import {
 } from './types.js';
 
 /** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 
 /** Default stream mode used by every helper unless explicitly overridden. */
 const DEFAULT_STREAM_MODE: StreamMode = 'debug';

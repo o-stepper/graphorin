@@ -130,7 +130,7 @@ export interface SessionExportMessageRecord {
   readonly message: Message;
   /**
    * Optional embedding metadata. The bytes themselves are NOT
-   * included — only the embedder id; importers re-compute embeddings
+   * included - only the embedder id; importers re-compute embeddings
    * locally if the embedder matches, or drop them under mismatch.
    */
   readonly embedderId?: string;

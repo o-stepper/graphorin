@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -30,7 +30,7 @@ type SandboxResult<TOutput> =
 
 Defined in: packages/core/src/contracts/sandbox.ts:55
 
-Result of a sandboxed run. The shape mirrors the `ToolOutcome` union —
+Result of a sandboxed run. The shape mirrors the `ToolOutcome` union -
 the runtime maps `SandboxResult` to `ToolOutcome` after the call.
 
 ## Type Parameters

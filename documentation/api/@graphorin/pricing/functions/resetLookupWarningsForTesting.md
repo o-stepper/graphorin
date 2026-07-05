@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ Defined in: pricing/src/lookup.ts:30
 
 **`Internal`**
 
-— exposed for tests so the WARN-once cache can be reset.
+- exposed for tests so the WARN-once cache can be reset.
 
 ## Returns
 

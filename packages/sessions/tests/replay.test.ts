@@ -95,7 +95,7 @@ describe('Session replayer', () => {
       types.push(event.type);
     }
     // Without RP-17 wiring `replay()` would default to the empty source and
-    // emit only replay.start / replay.end — now the persisted spans replay.
+    // emit only replay.start / replay.end - now the persisted spans replay.
     expect(types.filter((t) => t === 'replay.event')).toHaveLength(2);
   });
 

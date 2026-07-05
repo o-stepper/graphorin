@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ type PatternCategory = "secret" | "pii";
 
 Defined in: packages/observability/src/redaction/patterns.ts:51
 
-Pattern category — `secret` matches always force a drop; `pii`
+Pattern category - `secret` matches always force a drop; `pii`
 matches respect the configured `enabledPatterns` allow-list.
 
 ## Stable

@@ -1,5 +1,5 @@
 /**
- * `withTracing` — outermost middleware. Wraps every `provider.stream`
+ * `withTracing` - outermost middleware. Wraps every `provider.stream`
  * / `provider.generate` call in a Graphorin OTel-shaped span so the
  * span captures retry decisions, rate-limit waits, and the underlying
  * provider call as one logical unit.
@@ -110,7 +110,7 @@ async function* tracedStream(
   } finally {
     // PS-7: a consumer `break`/early-return injects a generator `return` at the
     // `yield`, skipping both the success and catch paths. Ending the span in
-    // `finally` guarantees it is closed exactly once on every exit — normal
+    // `finally` guarantees it is closed exactly once on every exit - normal
     // completion, error, or early abort (which leaves the status unset).
     span.end();
   }

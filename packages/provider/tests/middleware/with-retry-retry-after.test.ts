@@ -60,7 +60,7 @@ function flakyAdapter(args: FlakyArgs): { provider: Provider; calls: number } {
 
 const REQ = { messages: [{ role: 'user' as const, content: 'hi' }] };
 
-describe('withRetry — Retry-After', () => {
+describe('withRetry - Retry-After', () => {
   it('honours retryAfterMs from a RateLimitExceededError', async () => {
     const delays: number[] = [];
     const flaky = flakyAdapter({

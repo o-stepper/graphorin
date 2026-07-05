@@ -86,7 +86,7 @@ describe('hardening/crypto', () => {
 
   it('encoder pads every output to the fixed bootstrap width when requested', () => {
     // Edge case: a 32-byte buffer beginning with many small bytes
-    // would otherwise round-trip into a 41–42 char string.
+    // would otherwise round-trip into a 41-42 char string.
     const small = new Uint8Array(32);
     small[0] = 1;
     expect(encodeBase62(small)).not.toBe(encodeBase62(small, 43));

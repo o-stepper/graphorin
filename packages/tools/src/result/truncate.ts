@@ -1,8 +1,8 @@
 /**
  * Tool result truncation pipeline.
  *
- * Four strategies — `'middle' | 'tail' | 'spill-to-file' |
- * 'summarize'` — all share the same outcome contract so the executor
+ * Four strategies - `'middle' | 'tail' | 'spill-to-file' |
+ * 'summarize'` - all share the same outcome contract so the executor
  * downstream can route each branch through the same audit / counter
  * paths.
  *
@@ -30,7 +30,7 @@ export interface TokenCounter {
 }
 
 /**
- * Heuristic token counter — 4 chars per token. Matches the
+ * Heuristic token counter - 4 chars per token. Matches the
  * fall-through behaviour the agent runtime applies when a per-
  * provider counter is unavailable (offline development; tests).
  *
@@ -61,7 +61,7 @@ export interface TruncationOutcome {
   /** Bytes written to the spill artifact (only set for `'spill-to-file'`). */
   readonly artifactBytes?: number;
   /**
-   * Opaque, run-scoped handle URI for the spill artifact — e.g.
+   * Opaque, run-scoped handle URI for the spill artifact - e.g.
    * `graphorin-spill:<runId>/<toolCallId>.<ext>` (only set for
    * `'spill-to-file'`). This is the model-facing reference embedded in the
    * truncation annotation; unlike {@link artifactPath} it carries no raw
@@ -74,7 +74,7 @@ export interface TruncationOutcome {
 }
 
 /**
- * Pluggable summarizer hook — the agent runtime supplies an
+ * Pluggable summarizer hook - the agent runtime supplies an
  * implementation backed by the consolidator-tier model. When absent
  * the `'summarize'` strategy gracefully degrades to `'middle'` and
  * records the fall-through on the outcome.
@@ -108,7 +108,7 @@ export interface SpillWriter {
      * Trust class of the tool that produced this body (TL-6 /
      * tools-03). Writers persist it (the default writer stores a
      * `<file>.meta.json` sidecar) so a reader in ANOTHER executor or a
-     * resumed process can re-taint the content — without it, an
+     * resumed process can re-taint the content - without it, an
      * untrusted spill read back through the trusted `read_result`
      * built-in launders to trusted.
      */
@@ -122,7 +122,7 @@ export interface SpillWriter {
   /**
    * Remove every artifact of one run (TL-10). The agent calls this when
    * a run ends `completed`/`failed`; `awaiting_approval` and `aborted`
-   * runs keep theirs (handles must survive resume). Optional — custom
+   * runs keep theirs (handles must survive resume). Optional - custom
    * writers without it rely on the TTL sweep / external rotation.
    */
   clear?(runId: string): Promise<void>;
@@ -259,7 +259,7 @@ async function spillToFile(
     options.runId === undefined ||
     options.toolCallId === undefined
   ) {
-    // Spill writer / context not wired — gracefully fall back to 'middle'.
+    // Spill writer / context not wired - gracefully fall back to 'middle'.
     return truncateMiddle(body, maxTokens, originalTokens, counter);
   }
   if (options.toolSensitivityTier === 'secret') {
@@ -283,7 +283,7 @@ async function spillToFile(
       : {}),
     ...(options.producerSource !== undefined ? { producerSource: options.producerSource } : {}),
   });
-  // Opaque, run-scoped handle URI relative to the writer's artifact root —
+  // Opaque, run-scoped handle URI relative to the writer's artifact root -
   // this, not the raw absolute path, is what the model sees in the
   // annotation (and what `read_result` resolves back). `artifactPath` is
   // retained on the outcome for the operator-facing spill audit row.

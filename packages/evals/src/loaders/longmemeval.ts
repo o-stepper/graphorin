@@ -1,5 +1,5 @@
 /**
- * LongMemEval dataset loader (ICLR 2025, arXiv:2410.10813 —
+ * LongMemEval dataset loader (ICLR 2025, arXiv:2410.10813 -
  * https://github.com/xiaowu0162/LongMemEval). LongMemEval ships as a
  * JSON **array** of question objects:
  *

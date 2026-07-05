@@ -1,6 +1,6 @@
 ---
 title: Migration (pre-1.0)
-description: How Graphorin versions move before 1.0 — the versioning policy, storage migrations, and what to expect when upgrading.
+description: How Graphorin versions move before 1.0 - the versioning policy, storage migrations, and what to expect when upgrading.
 ---
 
 # Migration (pre-1.0)
@@ -52,7 +52,7 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
-### 0.5.x -> next (unreleased)
+### 0.5.x -> 0.6.0
 
 - **Durable HITL resume is exactly-once.** With a `checkpointStore` wired, an
   approved call's resume writes a write-ahead intent checkpoint before
@@ -106,7 +106,7 @@ After upgrading:
   transaction. Take a backup and test on a staging copy before upgrading
   production. See [Storage backends](/guide/storage).
 - **Embedder changes** are governed by the migration policy
-  (`lock-on-first` / `multi-active` / `auto-migrate`) — see
+  (`lock-on-first` / `multi-active` / `auto-migrate`) - see
   [Embedders](/guide/embedders#embedder-identity-migrations). Changing the
   embedder model is a data migration, not just a config change.
 - **Durable run / workflow state** carries a schema version

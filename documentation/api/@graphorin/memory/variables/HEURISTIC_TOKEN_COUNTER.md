@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ const HEURISTIC_TOKEN_COUNTER: ContextTokenCounter;
 
 Defined in: packages/memory/src/context-engine/token-counter.ts:54
 
-Built-in heuristic counter — chars/4 for Latin-ish text plus one
+Built-in heuristic counter - chars/4 for Latin-ish text plus one
 token per dense-script (CJK/kana/hangul) character (CE-13). Stable
 default when the operator does not pass a real [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md).
 

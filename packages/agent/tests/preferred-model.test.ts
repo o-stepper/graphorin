@@ -41,7 +41,7 @@ describe('pickTopTierAcrossTools', () => {
   });
 });
 
-describe('resolvePreferredModel — precedence ladder', () => {
+describe('resolvePreferredModel - precedence ladder', () => {
   const haiku = fakeProvider('haiku', 'haiku-4.5');
   const opus = fakeProvider('opus', 'opus-4.7');
   const sonnet = fakeProvider('sonnet', 'sonnet-4.5');

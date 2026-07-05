@@ -212,7 +212,7 @@ export interface HandoffEvent {
 }
 
 /**
- * A provider-generated file surfaced from the model stream (AG-26) —
+ * A provider-generated file surfaced from the model stream (AG-26) -
  * previously these `'file'` provider events were silently dropped.
  *
  * @stable
@@ -224,7 +224,7 @@ export interface FileGeneratedEvent {
 }
 
 /**
- * A provider citation surfaced from the model stream (AG-26) —
+ * A provider citation surfaced from the model stream (AG-26) -
  * previously these `'source'` provider events were silently dropped.
  *
  * @stable
@@ -467,14 +467,14 @@ export interface AgentProgressReadEvent {
  * Lateral-leak vector classification surfaced on
  * {@link AgentLateralLeakDetectedEvent.vector}.
  *
- * - `'causality-laundering'` — the assistant message references
+ * - `'causality-laundering'` - the assistant message references
  *   information about a denied earlier action via an indirect chain.
- * - `'commentary-phase'`     — operator-only commentary content was
+ * - `'commentary-phase'`     - operator-only commentary content was
  *   about to escape the session-output boundary.
- * - `'sideways-injection'`   — a low-trust child of an
+ * - `'sideways-injection'`   - a low-trust child of an
  *   `Agent.fanOut(...)` `'judge-merge'` strategy contributed
  *   disproportionately to the merged output.
- * - `'protocol-header'`      — control-character bytes or a
+ * - `'protocol-header'`      - control-character bytes or a
  *   protocol-frame separator was about to escape one of the
  *   internal-service delivery boundaries.
  *
@@ -511,7 +511,7 @@ export interface AgentLateralLeakDetectedEvent {
  * `agent.run(...)` and carried by the `agent.end` event.
  *
  * A failed run **resolves** with `status: 'failed'` and the error in
- * `error` — `agent.run(...)` does not reject on run failure (only on
+ * `error` - `agent.run(...)` does not reject on run failure (only on
  * configuration/usage errors thrown before the loop starts). A suspended
  * run resolves with `status: 'awaiting_approval'` and a resumable
  * `state` (AG-9).
@@ -527,7 +527,7 @@ export interface AgentResult<TOutput = string> {
   readonly error?: RunError;
   /**
    * The run's final state. Resumable when `status === 'awaiting_approval'`
-   * — pass it back to `agent.run(...)` / `agent.stream(...)` (optionally
+   * - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally
    * round-tripped through `runStateToJSON`/`runStateFromJSON` for
    * durability). Treat as an immutable snapshot.
    */

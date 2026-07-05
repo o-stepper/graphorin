@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ function addModelUsage(
 Defined in: packages/agent/src/run-state/index.ts:444
 
 Append a per-model usage entry to [RunState.usageByModel](/api/@graphorin/core/interfaces/RunState.md#property-usagebymodel).
-Mutates the supplied state in place — used by the agent runtime's
+Mutates the supplied state in place - used by the agent runtime's
 per-step retry loop. Pure callers that need an immutable update
 should clone the state first.
 

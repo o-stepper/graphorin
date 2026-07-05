@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createNode, createWorkflow, InMemoryCheckpointStore, latestValue } from '../src/index.js';
 
-describe('createWorkflow — validateState hook', () => {
+describe('createWorkflow - validateState hook', () => {
   it('rejects an invalid post-step state and emits workflow.error', async () => {
     const store = new InMemoryCheckpointStore();
     const wf = createWorkflow<{ value: number }>({

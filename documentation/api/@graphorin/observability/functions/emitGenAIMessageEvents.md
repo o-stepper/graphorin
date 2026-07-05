@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -16,7 +16,7 @@ function emitGenAIMessageEvents<T>(
 Defined in: packages/observability/src/gen-ai/emit.ts:93
 
 Emit per-message OpenTelemetry GenAI span events. The helper records
-one event per message — the per-message-event emission shape per the
+one event per message - the per-message-event emission shape per the
 OTel semconv discipline (size-bounded individually; safer than the
 aggregate-attribute shape on large prompts).
 

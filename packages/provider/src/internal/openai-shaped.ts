@@ -370,7 +370,7 @@ function buildBody(
   if (req.toolChoice !== undefined) {
     body.tool_choice = mapToolChoice(req.toolChoice);
   }
-  // PS-24: structured output finally reaches the wire — gated on the
+  // PS-24: structured output finally reaches the wire - gated on the
   // declared capability so a structuredOutput:false override keeps the
   // request clean for servers that reject response_format.
   if (structuredOutput && req.outputType?.kind === 'structured') {

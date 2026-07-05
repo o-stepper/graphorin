@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ Thrown when a second `run()` / `stream()` starts while another run is
 in flight on the same `Agent` instance (AG-11). The public surface
 (`steer` / `followUp` / `abort` / `compact`) addresses "the run"
 without a run handle, so overlapping runs would share the abort
-controller, steer queue, and executor bridge — start the second run
+controller, steer queue, and executor bridge - start the second run
 on its own `createAgent(...)` instance instead.
 
 ## Stable

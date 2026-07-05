@@ -52,7 +52,7 @@ function recordingTracer(): { tracer: Tracer; spans: RecordedSpan[] } {
   return { tracer, spans };
 }
 
-describe('@graphorin/memory — recall explanation (X-3)', () => {
+describe('@graphorin/memory - recall explanation (X-3)', () => {
   describe('explainRecall', () => {
     it('decomposes per-signal scores in final-rank order', () => {
       const hits: ReadonlyArray<MemoryHit> = [
@@ -135,7 +135,7 @@ describe('@graphorin/memory — recall explanation (X-3)', () => {
       expect(decoded).toHaveLength(1);
       expect(decoded[0]?.kind).toBe('semantic');
       expect(decoded[0]?.signals.bm25).toBe(1);
-      // The query text must never ride the span — only `query_length`.
+      // The query text must never ride the span - only `query_length`.
       expect(JSON.stringify(span?.attrs)).not.toContain('Tbilisi');
     });
 

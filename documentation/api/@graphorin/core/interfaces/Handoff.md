@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -9,7 +9,7 @@
 Defined in: packages/core/src/types/handoff.ts:26
 
 Declarative handoff target. The value carries a reference to the target
-agent (`agentId` — looked up at runtime via the `AgentRegistry`) plus
+agent (`agentId` - looked up at runtime via the `AgentRegistry`) plus
 optional metadata used by the runtime when constructing the
 `transfer_to_<agentName>` virtual tool.
 

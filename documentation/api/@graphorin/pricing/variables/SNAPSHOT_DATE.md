@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -14,4 +14,4 @@ Defined in: pricing/src/snapshot/bundled.ts:19
 
 **`Internal`**
 
-— used for `lookupPrice` defaults.
+- used for `lookupPrice` defaults.

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -12,7 +12,7 @@ function tokenise(text, stopwords?): string[];
 
 Defined in: packages/tools/src/registry/bm25.ts:46
 
-Tokenise a body — lowercase, alphanumeric runs only, drop stopwords.
+Tokenise a body - lowercase, alphanumeric runs only, drop stopwords.
 
 ## Parameters
 

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../index.md)
+[**Graphorin API reference v0.6.0**](../../index.md)
 
 ***
 
@@ -14,7 +14,7 @@ package owns:
 
 - An in-tree 5-field **cron parser** (`* * * * *`, ranges, lists,
   steps; no third-party dependency).
-- A `Scheduler` runtime — a process-bound loop that fires registered
+- A `Scheduler` runtime - a process-bound loop that fires registered
   triggers and persists their state via the `TriggerStore` contract
   from `@graphorin/core/contracts`.
 - Per-trigger **catch-up policies** (`'none'` default, `'last'`,
@@ -75,11 +75,11 @@ MIT © 2026 Oleksiy Stepurenko.
 
 ---
 
-**Project Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
+**Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
 ## Modules
 
 | Module | Description |
 | ------ | ------ |
-| [](/api/@graphorin/triggers/README.md) | @graphorin/triggers — durable cron / interval / idle / event trigger scheduler for the Graphorin framework. |
+| [](/api/@graphorin/triggers/README.md) | @graphorin/triggers - durable cron / interval / idle / event trigger scheduler for the Graphorin framework. |
 | [cron](/api/@graphorin/triggers/cron/index.md) | Tiny in-tree 5-field cron parser used by `@graphorin/triggers`. |

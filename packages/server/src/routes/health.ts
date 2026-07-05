@@ -1,5 +1,5 @@
 /**
- * `GET /v1/health` — minimal health endpoint kept for backward
+ * `GET /v1/health` - minimal health endpoint kept for backward
  * compatibility with consumers that wired the Phase 14a route
  * factory directly. The active server now mounts the extended
  * Phase 14c routes from `@graphorin/server/health`. New code should

@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,13 +10,13 @@ Defined in: packages/core/src/types/memory.ts:342
 
 Canonical entity in the lightweight in-SQLite relation graph (P2-1).
 The entity resolver (`@graphorin/memory`) deduplicates the raw
-`subject`/`object` strings on facts into canonical entities — merging
+`subject`/`object` strings on facts into canonical entities - merging
 aliases ("Anna", "Anna S.", "my sister") via lexical + embedding
-similarity (with optional LLM adjudication) — so multi-hop recall can
+similarity (with optional LLM adjudication) - so multi-hop recall can
 traverse relationships instead of fragmenting them.
 
 Merges are **append-only and reversible**: a merged entity is never
-deleted — its [GraphEntity.mergedInto](/api/@graphorin/core/interfaces/GraphEntity.md#property-mergedinto) points at the surviving
+deleted - its [GraphEntity.mergedInto](/api/@graphorin/core/interfaces/GraphEntity.md#property-mergedinto) points at the surviving
 canonical entity, every merge / unmerge is recorded in an audit
 ledger, and `mergedInto` is single-level (it always points directly at
 a root), so `mergedInto ?? id` is the canonical id.

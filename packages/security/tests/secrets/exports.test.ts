@@ -4,7 +4,7 @@ import * as security from '../../src/index.js';
 
 describe('@graphorin/security barrel exports', () => {
   it('re-exports the canonical version constant', () => {
-    expect(security.VERSION).toBe('0.5.0');
+    expect(security.VERSION).toBe('0.6.0');
   });
 
   it('re-exports the SecretValue wrapper class', () => {
@@ -53,7 +53,7 @@ describe('@graphorin/security barrel exports', () => {
     expect(typeof security.createToken).toBe('function');
     expect(typeof security.revokeToken).toBe('function');
     expect(typeof security.rotateToken).toBe('function');
-    // SPL-10: rotatePepper removed (impossible mechanism) — rekeyTokens is the rotation.
+    // SPL-10: rotatePepper removed (impossible mechanism) - rekeyTokens is the rotation.
     expect('rotatePepper' in security).toBe(false);
     expect(typeof security.rekeyTokens).toBe('function');
     expect(typeof security.generatePepper).toBe('function');

@@ -6,7 +6,7 @@
  * - `@vendor/specific-skill` is an exact match.
  * - `*` is a wildcard within a single segment.
  *
- * The resolver consults three layers — operator allowlist, operator
+ * The resolver consults three layers - operator allowlist, operator
  * denylist, and the framework-curated denylist (post-MVP optional pull,
  * active only when `graphorinDenylist === 'auto'` AND a matching pattern
  * is registered via {@link _setFrameworkDenylistForTesting}).
@@ -14,10 +14,10 @@
  * The order of the allow vs deny layers is governed by `policy.precedence`
  * (SPL-20):
  *
- * - `'allow-wins'` (default) — the allowlist short-circuits to `'allow'`
+ * - `'allow-wins'` (default) - the allowlist short-circuits to `'allow'`
  *   before the deny lists are consulted, so an operator can deny a whole
  *   scope yet allow specific exceptions inside it.
- * - `'deny-wins'` — the deny lists are consulted first, so an explicit
+ * - `'deny-wins'` - the deny lists are consulted first, so an explicit
  *   denylist entry is never overridden by a broad allowlist glob.
  *
  * @packageDocumentation
@@ -36,7 +36,7 @@ let frameworkDenylist: ReadonlyArray<string> = [];
 
 /**
  * Override the framework-maintained denylist. The MVP keeps this
- * dormant — only the operator-managed denylist is consulted unless
+ * dormant - only the operator-managed denylist is consulted unless
  * tests inject patterns here.
  *
  * @experimental

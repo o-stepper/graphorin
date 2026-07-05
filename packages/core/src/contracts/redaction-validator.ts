@@ -42,7 +42,7 @@ export interface RedactionInput {
 }
 
 /**
- * Result of `RedactionValidator.validate(...)` — either the sanitized
+ * Result of `RedactionValidator.validate(...)` - either the sanitized
  * payload (possibly equal to the input) or `null` if the value must be
  * dropped entirely.
  *

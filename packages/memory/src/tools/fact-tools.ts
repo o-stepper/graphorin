@@ -53,7 +53,7 @@ const factSearchOutputSchema = z.object({
       provenance: provenanceEnum.optional(),
       /**
        * Set when the fact's validity interval was closed (superseded /
-       * expired). Only present on `asOf` reads — default reads exclude
+       * expired). Only present on `asOf` reads - default reads exclude
        * such facts entirely (memory-retrieval-01).
        */
       validTo: z.string().optional(),
@@ -124,7 +124,7 @@ type FactValidateInput = z.infer<typeof factValidateInputSchema>;
 type FactValidateOutput = z.infer<typeof factValidateOutputSchema>;
 
 /**
- * `fact_remember` — persist a single semantic fact. The minimum-viable
+ * `fact_remember` - persist a single semantic fact. The minimum-viable
  * pipeline writes the fact straight through with MD5 deduplication;
  * Phase 10b extends the body with the multi-stage conflict resolution.
  *
@@ -168,7 +168,7 @@ export function createFactRememberTool(
 }
 
 /**
- * `fact_search` — hybrid (vector + FTS5) search over the user's
+ * `fact_search` - hybrid (vector + FTS5) search over the user's
  * semantic memory. Results merged through the configured reranker.
  *
  * @stable
@@ -179,7 +179,7 @@ export function createFactSearchTool(
   return tool<FactSearchInput, FactSearchOutput>({
     name: 'fact_search',
     description:
-      "Search the user's long-term factual memory by natural-language query. Returns up to `topK` matched facts with their score and sensitivity. Use this BEFORE asking the user a question they may have answered earlier. Pass `asOf` (ISO-8601) to read memory as it was at a past instant — point-in-time / 'what was true on date X' — instead of the current state.",
+      "Search the user's long-term factual memory by natural-language query. Returns up to `topK` matched facts with their score and sensitivity. Use this BEFORE asking the user a question they may have answered earlier. Pass `asOf` (ISO-8601) to read memory as it was at a past instant - point-in-time / 'what was true on date X' - instead of the current state.",
     inputSchema: factSearchInputSchema,
     outputSchema: factSearchOutputSchema,
     sideEffectClass: 'read-only',
@@ -191,7 +191,7 @@ export function createFactSearchTool(
       const scope = await deps.resolveScope(ctx);
       const hits = await deps.semantic.search(scope, input.query, {
         ...(input.topK !== undefined ? { topK: input.topK } : {}),
-        // MRET-4: forward the tags filter — it was accepted by the
+        // MRET-4: forward the tags filter - it was accepted by the
         // schema and silently dropped here.
         ...(input.tags !== undefined && input.tags.length > 0 ? { tags: input.tags } : {}),
         ...(input.asOf !== undefined ? { asOf: input.asOf } : {}),
@@ -213,7 +213,7 @@ export function createFactSearchTool(
         })),
       };
       // C6: recalled quarantined / foreign-provenance content re-arms the
-      // taint ledger — the cross-session poisoning leg.
+      // taint ledger - the cross-session poisoning leg.
       const taint = recallTaint(hits.map((h) => h.record));
       return taint === undefined ? output : { output, taint };
     },
@@ -221,7 +221,7 @@ export function createFactSearchTool(
 }
 
 /**
- * `fact_supersede` — soft-supersede an old fact by storing a new one
+ * `fact_supersede` - soft-supersede an old fact by storing a new one
  * that replaces it. The old fact is kept for replay but no longer
  * surfaced by default reads (they evaluate validity at NOW); it stays
  * reachable via `asOf` / inspector paths.
@@ -234,7 +234,7 @@ export function createFactSupersedeTool(
   return tool<FactSupersedeInput, FactSupersedeOutput>({
     name: 'fact_supersede',
     description:
-      "Mark an old fact superseded by a new one. Use this when the user's situation changed (moved cities, updated a goal, switched a preference) — the old fact is preserved for replay but no longer surfaced as current.",
+      "Mark an old fact superseded by a new one. Use this when the user's situation changed (moved cities, updated a goal, switched a preference) - the old fact is preserved for replay but no longer surfaced as current.",
     inputSchema: factSupersedeInputSchema,
     outputSchema: factSupersedeOutputSchema,
     sideEffectClass: 'side-effecting',
@@ -256,7 +256,7 @@ export function createFactSupersedeTool(
 }
 
 /**
- * `fact_forget` — soft-delete a fact (kept for replay; never hard-
+ * `fact_forget` - soft-delete a fact (kept for replay; never hard-
  * deleted at this layer).
  *
  * @stable
@@ -284,7 +284,7 @@ export function createFactForgetTool(
 }
 
 /**
- * `fact_history` — trace how a fact changed over time. Returns the
+ * `fact_history` - trace how a fact changed over time. Returns the
  * full bi-temporal supersede chain the given fact belongs to, oldest →
  * newest, including superseded entries, so the agent can answer "what
  * did the user say before" / "how did this change". Read-only. P0-2.
@@ -324,20 +324,20 @@ export function createFactHistoryTool(
 }
 
 /**
- * `fact_validate` — promote a quarantined fact to active (P1-4). The
+ * `fact_validate` - promote a quarantined fact to active (P1-4). The
  * validation path that admits a synthesized (consolidator / reflection)
  * memory into action-driving recall once it has been reviewed; the
  * promotion is audited in `memory_history`.
  *
- * MRET-3 / MST-1 — two gates close the one-turn memory-poisoning chain
+ * MRET-3 / MST-1 - two gates close the one-turn memory-poisoning chain
  * (`fact_remember(poison)` → `fact_validate(id)` → active recall):
  *
- * 1. `needsApproval: true` — the run suspends for a human decision
+ * 1. `needsApproval: true` - the run suspends for a human decision
  *    before this tool ever executes, so the agent cannot silently
  *    promote any quarantined fact.
  * 2. The underlying `SemanticMemory.validate(...)` re-checks the fact's
  *    text against the injection heuristics and **refuses** (no `force`
- *    is passed here) — an injection-flagged memory cannot be promoted by
+ *    is passed here) - an injection-flagged memory cannot be promoted by
  *    the agent at all. Only an operator, via the programmatic API with
  *    `{ force: true }`, can override after review.
  *
@@ -352,10 +352,10 @@ export function createFactValidateTool(
   return tool<FactValidateInput, FactValidateOutput>({
     name: 'fact_validate',
     description:
-      'Promote a quarantined fact to active so it becomes eligible for normal recall. Quarantined facts are memories the system synthesized or flagged as risky; validating one is a deliberate, human-approved admission and never a routine step. This action requires approval, and facts flagged as prompt-injection cannot be promoted here — they are an operator-only decision.',
+      'Promote a quarantined fact to active so it becomes eligible for normal recall. Quarantined facts are memories the system synthesized or flagged as risky; validating one is a deliberate, human-approved admission and never a routine step. This action requires approval, and facts flagged as prompt-injection cannot be promoted here - they are an operator-only decision.',
     inputSchema: factValidateInputSchema,
     outputSchema: factValidateOutputSchema,
-    // MRET-3: the only real gate on a model-callable tool — suspend the
+    // MRET-3: the only real gate on a model-callable tool - suspend the
     // run for a human decision before promoting anything out of quarantine.
     needsApproval: true,
     sideEffectClass: 'side-effecting',

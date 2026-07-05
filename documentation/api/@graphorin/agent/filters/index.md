@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # filters
 
-Handoff filter library — a small set of pure, composable functions
+Handoff filter library - a small set of pure, composable functions
 that take the parent agent's message history and return a filtered
 subset suitable for forwarding to a child agent.
 
@@ -15,7 +15,7 @@ serializable [HandoffInputFilterDescriptor](/api/@graphorin/core/interfaces/Hand
 session export (`@graphorin/sessions`) can replay the filter stack
 even after the runtime implementations evolve.
 
-Reasoning content is **always** stripped at the handoff boundary —
+Reasoning content is **always** stripped at the handoff boundary -
 `filters.compose(...)` guarantees `stripReasoning()` runs last so a
 caller-supplied filter cannot accidentally forward reasoning to a
 child agent. This is the confidentiality + token-economy default
@@ -42,7 +42,7 @@ documented in the agent-loop reference.
 | [compose](/api/@graphorin/agent/filters/functions/compose.md) | Compose multiple filters left-to-right. The composer **always** appends `stripReasoning()` at the end so reasoning content never crosses a handoff boundary regardless of caller intent. |
 | [custom](/api/@graphorin/agent/filters/functions/custom.md) | Wrap a caller-supplied function as a [DescribedFilter](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) with the canonical `'custom'` descriptor. |
 | [defaultHandoffFilter](/api/@graphorin/agent/filters/functions/defaultHandoffFilter.md) | The canonical default applied by the agent runtime to every `Agent.toTool(...)` and `handoff(...)` invocation when the caller does not supply an explicit filter. |
-| [full](/api/@graphorin/agent/filters/functions/full.md) | The full unfiltered history. Discouraged — security-conscious callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead (a sub-agent rarely needs the parent's entire conversation). |
+| [full](/api/@graphorin/agent/filters/functions/full.md) | The full unfiltered history. Discouraged - security-conscious callers should pick [lastN](/api/@graphorin/agent/filters/functions/lastN.md) or [bySensitivity](/api/@graphorin/agent/filters/functions/bySensitivity.md) instead (a sub-agent rarely needs the parent's entire conversation). |
 | [lastN](/api/@graphorin/agent/filters/functions/lastN.md) | Keep the parent's system prompt and the last `n` non-system messages. Default `n = 10` per DEC-146 / RB-40 security-first compose. |
 | [lastUser](/api/@graphorin/agent/filters/functions/lastUser.md) | Keep only the parent's system prompt and the most recent user message. Useful for simple sub-agents that only need the question. |
 | [stripReasoning](/api/@graphorin/agent/filters/functions/stripReasoning.md) | Strip every `ReasoningContent` part from each message. Always applied at the handoff boundary (the `compose(...)` helper appends this filter automatically). |

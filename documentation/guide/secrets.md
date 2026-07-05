@@ -39,10 +39,10 @@ apiKey.dispose();
 
 Two static helpers cover the common construction paths:
 
-- `SecretValue.fromString(raw, opts?)` — wrap a UTF-8 string at the I/O boundary.
-- `SecretValue.fromBuffer(buf, opts?)` — wrap a `Buffer` (defensively copied).
+- `SecretValue.fromString(raw, opts?)` - wrap a UTF-8 string at the I/O boundary.
+- `SecretValue.fromBuffer(buf, opts?)` - wrap a `Buffer` (defensively copied).
 
-`SecretValue` is also exposed in `@graphorin/core` as an **interface** (the contract), so any package that types a parameter as `SecretValue` depends only on `@graphorin/core` — the concrete class lives in `@graphorin/security`.
+`SecretValue` is also exposed in `@graphorin/core` as an **interface** (the contract), so any package that types a parameter as `SecretValue` depends only on `@graphorin/core` - the concrete class lives in `@graphorin/security`.
 
 ## `SecretRef` URI scheme
 
@@ -54,7 +54,7 @@ A `SecretRef` is a URI of the form `<scheme>:<scheme-specific-part>` that names 
 | `keyring:openai_api_key?service=graphorin` | OS keychain entry (account, optional service prefix). Requires the `@napi-rs/keyring` peer. |
 | `file:///abs/path/to/secret` | File on disk. Optional `?encoding=`, `?warnOnPermissions=0`. |
 | `encrypted-file:/abs/path#key-name` | Entry inside an Argon2id + AES-256-GCM file. |
-| `vault:foo/bar` | Lookup through a registered `MemorySecretsStore` (operator-controlled). |
+| `vault:foo/bar` | Lookup through an operator-registered `VaultAdapter` (`setVaultAdapter(...)` at bootstrap; a packaged `@graphorin/secret-vault` adapter is planned post-MVP, not shipped yet). |
 | `ref:foo` | Indirection through the active `SecretsStore`. |
 | `literal:value` | Inline literal (off by default; opt in explicitly per environment). |
 | `op://<vault>/<item>/<field>` | 1Password CLI reference, via `@graphorin/secret-1password`. |
@@ -68,7 +68,7 @@ console.log(value.length); // safe; never reveals
 const raw = value.reveal();
 ```
 
-`parseSecretRef(uri)` strict-parses the URI and throws a typed `SecretRefParseError` on malformed input. `resolveSecret(refOrUri)` walks the resolver registry and returns a `SecretValue`. Resolvers register a single `scheme` and own the parsing of their scheme-specific part — see `registerResolver(...)` for plugging in your own.
+`parseSecretRef(uri)` strict-parses the URI and throws a typed `SecretRefParseError` on malformed input. `resolveSecret(refOrUri)` walks the resolver registry and returns a `SecretValue`. Resolvers register a single `scheme` and own the parsing of their scheme-specific part - see `registerResolver(...)` for plugging in your own.
 
 ## Per-tool secrets ACL
 
@@ -109,19 +109,13 @@ A tool that asks for a secret outside its declared ACL fails closed with `Secret
 
 ## Sub-agent inheritance
 
-`agent.toTool({ secretsInheritance, inheritSecrets })` enforces the principle of least authority across multi-agent boundaries:
+Sub-agents do **not** inherit the parent's secret scope, and `agent.toTool(...)` deliberately exposes no secret-forwarding option: a child agent resolves secrets only through its own tools' per-execution ACLs (`withChildToolSecretsContext`), so least authority holds across multi-agent boundaries by construction.
 
-| `secretsInheritance` | Behaviour |
-|---|---|
-| `'inherit-allowlist'` (default) | Sub-agent inherits only the secret refs explicitly listed in `inheritSecrets`. |
-| `'forward-explicit'` | Sub-agent receives only the refs forwarded for this specific call. |
-| `'isolated'` | Sub-agent receives no inherited secrets. |
-
-Every transition writes one audit row.
+Each handoff record stamps the resolved posture in its `inheritedSecrets` field. The `HandoffSecretsInheritance` type reserves `'inherit-allowlist'` / `'forward-explicit'` / `'isolated'` for a future configurable mechanism; today the recorded posture is always `'inherit-allowlist'` with an empty ref list.
 
 ## OS keychain
 
-`KeyringSecretsStore` is backed by the OS keychain — Keychain on macOS, Credential Manager on Windows, libsecret-compatible services on Linux — through the optional `@napi-rs/keyring` (MIT) peer dependency.
+`KeyringSecretsStore` is backed by the OS keychain - Keychain on macOS, Credential Manager on Windows, libsecret-compatible services on Linux - through the optional `@napi-rs/keyring` (MIT) peer dependency.
 
 ```bash
 graphorin secrets list
@@ -146,13 +140,13 @@ The store is selected through the `--secrets-source encrypted-file` flag, the ma
 
 **Durability and recovery.** The store treats the bundle as precious data:
 
-- **Fail-loud on a wrong passphrase or corruption.** A read that fails because the passphrase is wrong (or rotated), or because the bundle is tampered, truncated, or malformed, **throws** — it never silently re-initialises an empty bundle. A fresh empty bundle is created only when the file genuinely does not exist yet (`ENOENT`). This means a mistyped/rotated `GRAPHORIN_MASTER_PASSPHRASE` surfaces as an error on the next `get`/`set`/`delete` rather than wiping every stored secret. **Recovery:** restore the correct passphrase — the on-disk bundle is left untouched by a failed write.
+- **Fail-loud on a wrong passphrase or corruption.** A read that fails because the passphrase is wrong (or rotated), or because the bundle is tampered, truncated, or malformed, **throws** - it never silently re-initialises an empty bundle. A fresh empty bundle is created only when the file genuinely does not exist yet (`ENOENT`). This means a mistyped/rotated `GRAPHORIN_MASTER_PASSPHRASE` surfaces as an error on the next `get`/`set`/`delete` rather than wiping every stored secret. **Recovery:** restore the correct passphrase - the on-disk bundle is left untouched by a failed write.
 - **Atomic writes.** Every write goes to a temp sibling (`<path>.tmp`, mode `0o600`) and is then `rename`d onto the target, so a crash mid-write can never truncate or corrupt the existing bundle; a reader only ever sees the old or the new file in full.
-- **In-process single-writer guard.** Concurrent `set`/`delete` calls on one store instance are serialised so their read-modify-write cycles cannot interleave and clobber each other. Cross-process concurrent writers are out of scope (the atomic rename still rules out corruption — worst case is last-write-wins).
+- **In-process single-writer guard.** Concurrent `set`/`delete` calls on one store instance are serialised so their read-modify-write cycles cannot interleave and clobber each other. Cross-process concurrent writers are out of scope (the atomic rename still rules out corruption - worst case is last-write-wins).
 
 ## Optional 1Password adapter
 
-The `@graphorin/secret-1password` package is an optional reference adapter that delegates to the system [1Password CLI (`op`)](https://developer.1password.com/docs/cli/get-started/). It does **not** bundle the CLI — install the binary yourself. The adapter exposes a `SecretResolver` for the canonical `op://` URI scheme defined by 1Password:
+The `@graphorin/secret-1password` package is an optional reference adapter that delegates to the system [1Password CLI (`op`)](https://developer.1password.com/docs/cli/get-started/). It does **not** bundle the CLI - install the binary yourself. The adapter exposes a `SecretResolver` for the canonical `op://` URI scheme defined by 1Password:
 
 ```text
 op://<vault>/<item>/[<section>/]<field>
@@ -183,7 +177,7 @@ const apiKey = await resolveSecret('op://Production/Stripe API/credential');
 
 Beyond `serviceAccountToken`, the resolver options also support 1Password **Connect** mode (`connect: { host, token }`, wired through `OP_CONNECT_HOST` / `OP_CONNECT_TOKEN`) and an `account` override for machines signed in to multiple 1Password accounts. The `op` invocation has a hard wall-clock timeout that escalates `SIGTERM` → `SIGKILL`, so a wedged CLI can never hang the resolver.
 
-Errors from the CLI surface as typed `OpResolverError` codes (`'binary-missing'`, `'unauthenticated'`, `'item-not-found'`, …) so your code can react cleanly.
+Errors from the CLI surface as typed `OpCliError` codes (`'binary-missing'`, `'signed-out'`, `'reference-not-found'`, `'timeout'`, `'unknown'`) so your code can react cleanly.
 
 ## Where OAuth tokens live (SPL-1)
 
@@ -199,25 +193,25 @@ secrets store the tokens live in process memory only (the command warns).
 
 ## Telemetry redaction for `SecretValue`s
 
-Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory. The validator substitutes a redacted placeholder for any attribute whose serialised form matches a known `SecretValue` shape. Operators that pass `validation: 'off'` must wrap exporters explicitly — the tracer refuses to register a raw exporter in that mode and throws `UnvalidatedExporterError` at startup.
+Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory. The validator substitutes a redacted placeholder for any attribute whose serialised form matches a known `SecretValue` shape. Operators that pass `validation: 'off'` must wrap exporters explicitly - the tracer refuses to register a raw exporter in that mode and throws `UnvalidatedExporterError` at startup.
 
 ## Capability matrix
 
 | Capability | OS keychain | Encrypted-file | 1Password CLI |
 |---|---|---|---|
-| Read | ✓ | ✓ | ✓ |
-| Write | ✓ | ✓ | (read-only) |
-| List | ✓ | ✓ | ✓ |
-| Per-tool ACL | ✓ | ✓ | ✓ |
-| Audit log | ✓ | ✓ | ✓ |
-| Headless / CI | — | ✓ | ✓ |
+| Read | yes | yes | yes |
+| Write | yes | yes | no (read-only) |
+| List | yes | yes | yes |
+| Per-tool ACL | yes | yes | yes |
+| Audit log | yes | yes | yes |
+| Headless / CI | no | yes | yes |
 
 ## Next steps
 
-- [Security](/guide/security) — sandbox, audit log, OAuth.
-- [Privacy](/guide/privacy) — the zero-default-telemetry promise.
-- [CLI](/guide/cli) — `graphorin secrets`, `graphorin auth`, `graphorin token`.
+- [Security](/guide/security) - sandbox, audit log, OAuth.
+- [Privacy](/guide/privacy) - the zero-default-telemetry promise.
+- [CLI](/guide/cli) - `graphorin secrets`, `graphorin auth`, `graphorin token`.
 
 ---
 
-**Graphorin** · v0.5.0 · MIT License · © 2026 Oleksiy Stepurenko
+**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

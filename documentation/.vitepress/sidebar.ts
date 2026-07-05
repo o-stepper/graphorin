@@ -6,7 +6,7 @@ import type { DefaultTheme } from 'vitepress';
 const here = dirname(fileURLToPath(import.meta.url));
 
 /**
- * The narrative `/guide/` sidebar — one entry per public-facing topic.
+ * The narrative `/guide/` sidebar - one entry per public-facing topic.
  *
  * Sourced exclusively from the public surface of the framework (package
  * READMEs, top-level project files, source-level TSDoc, public CHANGELOG,

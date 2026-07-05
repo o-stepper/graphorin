@@ -8,7 +8,7 @@ import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
 const PNG_BYTES = Buffer.from([0x89, 0x50, 0x4e, 0x47, 1, 2, 3, 4]).toString('base64');
 
-describe('MC-8/MC-11 — non-text content and structured payloads are never silently lost', () => {
+describe('MC-8/MC-11 - non-text content and structured payloads are never silently lost', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 
@@ -68,7 +68,7 @@ describe('MC-8/MC-11 — non-text content and structured payloads are never sile
 
   it('MC-11: a structuredContent schema mismatch falls back to the JSON mirror, not an empty output', () => {
     // Unit-level: with a compliant server the SDK validates wire-side, so
-    // the CLIENT fallback fires only when the two validators diverge —
+    // the CLIENT fallback fires only when the two validators diverge -
     // exercised here with a stub schema that always rejects.
     const warnings: string[] = [];
     const result = adaptCallResult({

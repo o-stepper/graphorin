@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,7 +10,7 @@ Defined in: packages/security/src/secrets/errors.ts:55
 
 Raised when `parseSecretRef(...)` rejects an input. The parser is
 strict-by-default and never silently falls through to a default
-resolver — typos in `*Ref` config fields surface here at bootstrap.
+resolver - typos in `*Ref` config fields surface here at bootstrap.
 
 ## Stable
 
@@ -59,7 +59,7 @@ Defined in: packages/security/src/secrets/errors.ts:62
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`cause`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | Optional remediation hint (CLI command or doc link). | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`hint`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-hint) | packages/security/src/secrets/errors.ts:21 |
-| <a id="property-input"></a> `input` | `readonly` | `string` | Original input string. Safe to log — never carries a secret value (naked-string inputs are stored REDACTED: 4-char head + length). | - | - | packages/security/src/secrets/errors.ts:58 |
+| <a id="property-input"></a> `input` | `readonly` | `string` | Original input string. Safe to log - never carries a secret value (naked-string inputs are stored REDACTED: 4-char head + length). | - | - | packages/security/src/secrets/errors.ts:58 |
 | <a id="property-kind"></a> `kind` | `readonly` | [`SecretRefParseErrorKind`](/api/@graphorin/security/type-aliases/SecretRefParseErrorKind.md) | Stable lowercase discriminator. Subclasses fix this to a literal. | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`kind`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-kind) | - | packages/security/src/secrets/errors.ts:56 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`message`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | - | [`GraphorinSecretsError`](/api/@graphorin/security/classes/GraphorinSecretsError.md).[`name`](/api/@graphorin/security/classes/GraphorinSecretsError.md#property-name) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |

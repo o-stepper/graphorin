@@ -26,7 +26,7 @@ export interface ReplayLogConfig {
   /**
    * Auto-prune hint. `enabled` + `schedule` describe a daily prune of files
    * older than `retentionDays`, but **no built-in scheduler consumes this
-   * yet** (RP-19) — it is a declarative intent. Until a host wires it to a
+   * yet** (RP-19) - it is a declarative intent. Until a host wires it to a
    * trigger, callers must run `pruneTraces(...)` themselves; the default is
    * therefore `enabled: false` so the option is not an inert default-on.
    *

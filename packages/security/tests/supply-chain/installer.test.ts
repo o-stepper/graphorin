@@ -18,7 +18,7 @@ import {
 
 import { buildSignedSkill, resetSupplyChain, tamperSkillBody } from './_helpers.js';
 
-describe('@graphorin/security/supply-chain — installer', () => {
+describe('@graphorin/security/supply-chain - installer', () => {
   beforeEach(() => {
     resetSupplyChain();
   });

@@ -1,5 +1,5 @@
 /**
- * Integration adapters (A–E) that let the `@graphorin/tools` executor
+ * Integration adapters (A-E) that let the `@graphorin/tools` executor
  * consume the agent's `@graphorin/security` / `@graphorin/memory` /
  * `@graphorin/provider` surfaces.
  *
@@ -9,7 +9,7 @@
  *
  * Every adapter is typed against the executor's `ExecutorOptions` via
  * indexed access, so the values they produce are guaranteed assignable
- * to the hooks `createToolExecutor(...)` expects — without depending on
+ * to the hooks `createToolExecutor(...)` expects - without depending on
  * which individual hook types `@graphorin/tools` happens to re-export.
  *
  * @packageDocumentation
@@ -55,7 +55,7 @@ type ToolTokenCounter = NonNullable<ExecutorOptions['tokenCounter']>;
 type ExecutorEvent = Parameters<NonNullable<ExecutorOptions['streamingSink']>>[0];
 
 // ---------------------------------------------------------------------------
-// Adapter A — `secretResolver`
+// Adapter A - `secretResolver`
 // ---------------------------------------------------------------------------
 
 /**
@@ -64,7 +64,7 @@ type ExecutorEvent = Parameters<NonNullable<ExecutorOptions['streamingSink']>>[0
  * to `@graphorin/security`'s global resolver registry
  * (`resolveSecret(parseSecretRef(key))`), which **rejects** on a
  * malformed ref / unknown scheme / resolution failure and never returns
- * null — those rejections surface as tool errors through the executor's
+ * null - those rejections surface as tool errors through the executor's
  * secrets accessor.
  */
 export type SecretBackend = (key: string) => Promise<SecretValueOrNull>;
@@ -76,14 +76,14 @@ export interface SecretResolverOptions {
 }
 
 /**
- * Adapter A — build the executor's `secretResolver` hook.
+ * Adapter A - build the executor's `secretResolver` hook.
  *
  * This is a thin **value resolver**. The executor's secrets accessor
  * (`@graphorin/tools` `tool-context.ts`) already (1) enforces the
  * per-tool `secretsAllowed` ACL via `enforceSecretAcl(key)` inside a
  * `withChildToolSecretsContext(...)` scope and (2) maps a `null` result
  * onto the optional/required-secret error contract. This adapter must
- * therefore **not** re-implement ACL — it only resolves a key to a
+ * therefore **not** re-implement ACL - it only resolves a key to a
  * value.
  */
 export function buildSecretResolver(options: SecretResolverOptions = {}): SecretResolver {
@@ -93,7 +93,7 @@ export function buildSecretResolver(options: SecretResolverOptions = {}): Secret
 }
 
 // ---------------------------------------------------------------------------
-// Adapter B — `sandboxResolver`
+// Adapter B - `sandboxResolver`
 // ---------------------------------------------------------------------------
 
 /** Isolation kinds the default resolver knows how to construct. */
@@ -111,7 +111,7 @@ export interface SandboxResolverOptions {
    * Per-kind factory overrides. Defaults wire the three out-of-process
    * `@graphorin/security` adapters. Tests inject fakes so unit runs
    * never spawn real worker threads / containers (offline; R4). The
-   * factories are invoked **lazily** — never at build time — so the
+   * factories are invoked **lazily** - never at build time - so the
    * production default costs nothing until a tool actually needs that
    * isolation kind.
    */
@@ -119,7 +119,7 @@ export interface SandboxResolverOptions {
 }
 
 /**
- * Adapter B — build the executor's `sandboxResolver`.
+ * Adapter B - build the executor's `sandboxResolver`.
  *
  * Maps a `ResolvedSandboxPolicy.kind` to a cached `SandboxImpl`,
  * lazily constructing **one instance per kind**. Returns `null` for
@@ -154,7 +154,7 @@ export function buildSandboxResolver(options: SandboxResolverOptions = {}): Sand
 }
 
 // ---------------------------------------------------------------------------
-// Adapter C — `memoryGuardFactory` + `memoryRegionReader`
+// Adapter C - `memoryGuardFactory` + `memoryRegionReader`
 // ---------------------------------------------------------------------------
 
 /** Options for {@link buildMemoryGuard}. */
@@ -174,7 +174,7 @@ export interface MemoryGuardOptions {
   /**
    * The region reader the guard hashes pre/post execution. The reader
    * is **scope-bound** (it materialises memory regions for a specific
-   * run scope), so the runtime supplies it in WI-03 — the `Memory`
+   * run scope), so the runtime supplies it in WI-03 - the `Memory`
    * facade exposes no scope-free read surface. When omitted, the
    * executor skips the snapshot/verify cycle (it only runs the guard
    * when the reader is present).
@@ -189,11 +189,11 @@ export interface MemoryGuardWiring {
 }
 
 /**
- * Adapter C — build the executor's `memoryGuardFactory` (+ an optional
+ * Adapter C - build the executor's `memoryGuardFactory` (+ an optional
  * `memoryRegionReader`) from the agent's configured `Memory`.
  *
  * When `memory` is `undefined`, the factory returns `null` for every
- * tier and no reader is supplied — the executor degrades to its
+ * tier and no reader is supplied - the executor degrades to its
  * audit-only baseline (the guard step is skipped).
  */
 export function buildMemoryGuard(
@@ -245,7 +245,7 @@ export function createMemoryRegionReader(
 }
 
 // ---------------------------------------------------------------------------
-// Adapter D — `tokenCounter` (the sync/async impedance mismatch)
+// Adapter D - `tokenCounter` (the sync/async impedance mismatch)
 // ---------------------------------------------------------------------------
 
 /** A synchronous tokenizer (e.g. js-tiktoken's `encode`) returning a token array. */
@@ -262,7 +262,7 @@ export interface ToolTokenCounterOptions {
 }
 
 /**
- * Adapter D — build the **synchronous** token counter the executor's
+ * Adapter D - build the **synchronous** token counter the executor's
  * truncation pipeline requires.
  *
  * DESIGN DECISION (impedance mismatch §1.6.1): `@graphorin/tools`'
@@ -288,7 +288,7 @@ export function buildToolTokenCounter(options: ToolTokenCounterOptions = {}): To
 }
 
 // ---------------------------------------------------------------------------
-// Adapter E — `streamingSink` → `AgentEvent` stream bridge
+// Adapter E - `streamingSink` → `AgentEvent` stream bridge
 // ---------------------------------------------------------------------------
 
 /** Options for {@link createExecutorEventBridge}. */
@@ -331,7 +331,7 @@ export interface ExecutorEventBridge<T = ExecutorEvent> {
 }
 
 /**
- * Adapter E — bridge the executor's `streamingSink` callback to an
+ * Adapter E - bridge the executor's `streamingSink` callback to an
  * async iterator via a bounded queue.
  */
 export function createExecutorEventBridge<T = ExecutorEvent>(
@@ -348,7 +348,7 @@ export function createExecutorEventBridge<T = ExecutorEvent>(
       return;
     }
     if (pending !== null) {
-      // A consumer is parked — hand the event off directly.
+      // A consumer is parked - hand the event off directly.
       const resolve = pending;
       pending = null;
       resolve({ value: event, done: false });

@@ -9,7 +9,7 @@ import type { MCPClient } from '../src/client/index.js';
 import { _resetMcpAdapterDedupForTesting } from '../src/client/to-tools.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MCPClient.toTools — process-scoped dedup discipline', () => {
+describe('MCPClient.toTools - process-scoped dedup discipline', () => {
   let dispose: Array<() => Promise<void>> = [];
   let clients: MCPClient[] = [];
   let logEntries: { level: string; message: string; fields?: Record<string, unknown> }[] = [];

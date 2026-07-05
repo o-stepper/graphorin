@@ -85,7 +85,7 @@ export function detectPackageManager(env: NodeJS.ProcessEnv = process.env): Pack
   for (const candidate of ['pnpm', 'npm', 'yarn'] as const) {
     if (isOnPath(candidate, env)) return candidate;
   }
-  // Fall back to npm even when nothing was found — this surfaces a
+  // Fall back to npm even when nothing was found - this surfaces a
   // clear runtime error from `child_process.spawn` instead of
   // hiding the misconfiguration in the policy resolver.
   return 'npm';

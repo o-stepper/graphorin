@@ -1,4 +1,4 @@
-[**Graphorin API reference v0.5.0**](../../../index.md)
+[**Graphorin API reference v0.6.0**](../../../index.md)
 
 ***
 
@@ -10,9 +10,9 @@
 const OPERATION_NAME_TABLE: ReadonlyArray<readonly [SpanType, GenAIOperationName]> = TABLE;
 ```
 
-Defined in: packages/observability/src/gen-ai/operation-mapping.ts:86
+Defined in: packages/observability/src/gen-ai/operation-mapping.ts:89
 
-Full canonical span-to-operation table — exposed for tooling
+Full canonical span-to-operation table - exposed for tooling
 (documentation generators, fixture tests) that need to introspect
 the mapping.
 
