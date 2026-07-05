@@ -46,6 +46,14 @@ register, and execute tools the model can call:
     surfaces `ToolError({ kind: 'aborted' })` and
     `setStatus('cancelled')` on the span);
   - single-round tool repair via the operator-supplied repair hook;
+  - a recoverable-error envelope: every `ToolError` carries
+    `recoverable` + a `recoveryHint`
+    (`retry_later` / `check_input` / `try_alternative` /
+    `report_to_user`) rendered to the model under the error message;
+  - transparent bounded retry of `rate_limited` outcomes from pure /
+    read-only / idempotency-keyed tools (defaults `maxAttempts: 3`,
+    `backoffMs: 250`; `ToolRateLimitError.retryAfterMs` wins; tune via
+    `createToolExecutor({ retry })`);
   - per-execution `tool.execute` AISpan emitted via the run's
     tracer with rich attributes (`graphorin.tool.name`,
     `graphorin.tool.call_id`, `graphorin.tool.sandbox.kind`,
@@ -132,6 +140,9 @@ register, and execute tools the model can call:
 ```ts
 // Builder + tool spec.
 import { tool } from '@graphorin/tools/builder';
+
+// Zod v3/v4 -> JSON Schema converter (what goes on the provider wire).
+import { zodToJsonSchema, projectSchemaToJsonSchema } from '@graphorin/tools/schema';
 
 // Strategy-aware registry.
 import { createToolRegistry } from '@graphorin/tools/registry';

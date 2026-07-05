@@ -16,10 +16,10 @@ preservation, agent-level model fallback, post-compaction hooks,
 per-tool model-tier hints, lateral-leak defenses).
 
 The package is **library-mode-first**: every primitive that can be
-useful from a script (`createAgent`, `RunState.toJSON / fromJSON`,
-the filter library, `evaluatorOptimizer`, `Agent.fanOut`,
-`agent.progress.write / read`) ships from the npm package without
-the optional standalone server.
+useful from a script (`createAgent`, `runStateToJSON` /
+`runStateFromJSON`, the filter library, `evaluatorOptimizer`,
+`Agent.fanOut`, `agent.progress.write / read`) ships from the npm
+package without the optional standalone server.
 
 ## Dependencies
 
@@ -69,16 +69,36 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   progress artifacts, lateral-leak detections, model fallback
   transitions, …). `assertNever(...)` exhaustiveness is verified at
   compile time.
-- **Durable HITL.** `RunState.toJSON()` /
-  `RunState.fromJSON(serialized, agent)` round-trip the full run
-  state through any storage the caller picks (file, SQLite, KV, S3).
-- **Multi-agent.** `Agent.toTool({ exposeTurns, inputFilter })`
+- **Durable HITL.** `runStateToJSON(state)` /
+  `runStateFromJSON(serialized)` round-trip the full run state
+  through any storage the caller picks (file, SQLite, KV, S3); with a
+  `checkpointStore` wired, resuming a granted approval executes the
+  approved tool exactly once.
+- **Multi-agent.** `Agent.toTool({ exposeTurns, inputFilter, capability, contextFold, propagateTaint })`
   wraps an agent as a tool the parent agent can call. The parent's
   abort signal, deps, and sessionId propagate into the sub-run;
   without an `inputFilter` the sub-agent sees only the input string
   (no parent conversation crosses the boundary), and there is no
   secret-inheritance mechanism at this boundary at all - least
-  authority by construction.
+  authority by construction. `capability: 'read-only'` blocks
+  side-effecting tools in the child, `contextFold` returns a
+  distilled outcome instead of the raw transcript tail, and taint
+  from the child's untrusted inputs propagates to the parent by
+  default.
+- **Prompt-cache economics.** Opt-in `cachePolicy: { breakpoints: 'auto' }`
+  anchors provider cache breakpoints on the stable prefix so long
+  conversations are written once and read at the discounted rate;
+  cache read/write token legs flow through `Usage` and cost
+  tracking.
+- **Verifiers + deterministic replay.** `verifiers` run deterministic
+  checks on every terminal response (`verifier.result` events, up to
+  `maxVerifierRounds` feedback rounds); opt-in
+  `recordProviderResponses` journals raw model responses onto
+  `RunState` so `createReplayProvider(state)` re-drives the run
+  offline and fails loudly on divergence.
+- **Structured planning.** `plan: true` gives the model an
+  `update_plan` tool and surfaces the live plan as
+  `RunState.todos`.
 - **Filter library.** `filters.lastN(n)`, `filters.lastUser`,
   `filters.summary({...})`, `filters.bySensitivity({...})`,
   `filters.stripReasoning()`, `filters.stripSensitiveOutputs()`,

@@ -39,14 +39,17 @@ sub-paths so that consumers can import only what they need:
 | `@graphorin/core/types`   | Plain TypeScript types: `Message`, `AgentEvent`, `WorkflowEvent`, `RunContext`, `RunState`, `Usage`, …   |
 | `@graphorin/core/contracts` | Interfaces consumed by other `@graphorin/*` packages: `Provider`, `MemoryStore`, `Tracer`, `Sandbox`, … |
 | `@graphorin/core/utils`   | Tiny dependency-free helpers: `collect`, `mapStream`, `merge`, `withSignal`, `md5`, `xxhash`, …          |
-| `@graphorin/core/channels`| Workflow channel types: `LatestValue`, `Reducer`, `Stream`, `Barrier`, `Ephemeral`, `AnyValue`.          |
+| `@graphorin/core/channels`| Workflow channel types (`LatestValue`, `Reducer`, `Stream`, `Barrier`, `Ephemeral`, `AnyValue`) plus the durable primitives `sleepFor` / `sleepUntil`, `awaitExternal`, and `requestApproval`. |
 
 ## Naming notes
 
 - The workflow primitive set in `@graphorin/core/channels` is **Graphorin's
   own design**: `Directive` for control flow, `Dispatch` for dynamic tasks,
-  `pause(value)` for programmatic suspension, plus the channel kinds
-  `LatestValue`, `Reducer`, `Stream`, `Barrier`, `Ephemeral`, `AnyValue`.
+  `pause(value)` for programmatic suspension, the channel kinds
+  `LatestValue`, `Reducer`, `Stream`, `Barrier`, `Ephemeral`, `AnyValue`,
+  and the durable-suspension primitives `sleepFor` / `sleepUntil` (durable
+  timers), `awaitExternal` (awakeables), and `requestApproval` (persisted
+  approvals) that `@graphorin/workflow` executes.
   These names are part of the public API and must not be aliased to terms
   from other workflow libraries (a dedicated lint rule lands later in the
   release).

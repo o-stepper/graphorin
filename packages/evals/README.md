@@ -103,6 +103,25 @@ const report = await runEvals({
 });
 ```
 
+Every report summary carries a Wilson 95% confidence interval for the
+pass rate (`summary.passRateCi`), and, when `iterations > 1`,
+`summary.passHatK` - the pass^k estimate over the per-case iteration
+outcomes (the probability that all k iterations of a case pass).
+
+---
+
+## Statistics
+
+Sample-size-aware statistics ship as plain exported functions:
+
+```ts
+import { mean, sampleStddev, wilsonInterval, passHatK, pairedPassSignificance } from '@graphorin/evals';
+
+wilsonInterval(18, 20);            // { lo, hi } - 95% CI for 18/20 passes
+passHatK(outcomesByCase);          // pass^k over `-iter-N` outcome groups
+pairedPassSignificance(a, b);      // McNemar paired test between two runs
+```
+
 ---
 
 ## Regression detection
@@ -116,6 +135,9 @@ const regression = detectRegressions(report, baseline, {
   maxPassRateDropPct: 5,
   maxAvgScoreDrop: 0.05,
   maxAvgDurationIncreaseMs: 250,
+  // Opt-in: veto pass-rate-drop findings the McNemar paired test
+  // cannot distinguish from noise at the given alpha (default 0.05).
+  requireSignificance: true,
 });
 if (regression.hasRegressions) {
   for (const f of regression.findings) {
@@ -124,6 +146,10 @@ if (regression.hasRegressions) {
 }
 exitOnFailures(report, regression);
 ```
+
+Pass-rate findings are annotated with the paired regressed / improved
+case counts and the McNemar p-value, so a 3-point drop on 20 cases
+reads differently from the same drop on 2000.
 
 ---
 

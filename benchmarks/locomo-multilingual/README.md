@@ -8,7 +8,7 @@ This package holds **optional locale-specific question files** for the memory-re
 
 Per-locale folders may be added under this directory (for example `ru/`, `es/`, `zh/`). Each folder should contain:
 
-- `questions.jsonl` — same schema as the bundled seed: `{ "id"?, "facts": string[], "question": string, "expected": string }` per line.
+- `questions.jsonl` - same schema as the bundled seed: `{ "id"?, "facts": string[], "question": string, "expected": string }` per line.
 
 ## Contributing a locale pack
 

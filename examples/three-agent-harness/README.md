@@ -1,10 +1,10 @@
 # three-agent-harness
 
-> A canonical **Planner / Generator / Evaluator** orchestration template for **graphorin** — three `createAgent({...})` calls wired through `evaluatorOptimizer({...})` with structured-handoff artifacts (`agent.progress.write/read`) that survive process restart, plus an opt-in `Agent.fanOut({...})` research-and-decide variant with a minimal `createCitationAgent({...})` post-processing step.
+> A canonical **Planner / Generator / Evaluator** orchestration template for **graphorin** - three `createAgent({...})` calls wired through `evaluatorOptimizer({...})` with structured-handoff artifacts (`agent.progress.write/read`) that survive process restart, plus an opt-in `Agent.fanOut({...})` research-and-decide variant with a minimal `createCitationAgent({...})` post-processing step.
 
 This example is the smallest end-to-end demonstration of the multi-agent loop most production agent stacks reinvent: a Planner expands a request into a phased plan, a Generator implements the next unfinished phase, an Evaluator scores the candidate against a rubric, and the loop self-revises until the rubric passes (or the iteration cap fires). A second variant fans the Generator out into N parallel research sub-agents and folds the per-source claims back through a citation step.
 
-CI exercises the harness against a deterministic stub provider — no API keys, no daemon, no network — so the smoke suite stays well under 30 seconds.
+CI exercises the harness against a deterministic stub provider - no API keys, no daemon, no network - so the smoke suite stays well under 30 seconds.
 
 ---
 
@@ -12,7 +12,7 @@ CI exercises the harness against a deterministic stub provider — no API keys, 
 
 - **Node.js 22+** (the workspace pins `>=22.0.0`).
 - **pnpm 10.28+** (`corepack enable && corepack prepare pnpm@10.28.2 --activate`).
-- **Optional** — a local [Ollama](https://ollama.com/) daemon listening on `http://127.0.0.1:11434` if you want the `recipe: 'ollama'` swap-in.
+- **Optional** - a local [Ollama](https://ollama.com/) daemon listening on `http://127.0.0.1:11434` if you want the `recipe: 'ollama'` swap-in.
 
 The default recipe (`'stub'`) needs neither the daemon nor any model file.
 
@@ -37,7 +37,7 @@ pnpm --filter ./examples/three-agent-harness dev
 Expected output (artifact root defaults to `./.graphorin/three-agent-harness`):
 
 ```
-graphorin v0.6.0 three-agent-harness — recipe='stub', runId='harness_..._...', termination='pass', iterations=1, finalScore=9.
+graphorin v0.6.0 three-agent-harness - recipe='stub', runId='harness_..._...', termination='pass', iterations=1, finalScore=9.
 ```
 
 Add the research-and-decide variant on top:
@@ -48,14 +48,14 @@ GRAPHORIN_HARNESS_VARIANT=research-and-decide \
 ```
 
 ```
-graphorin v0.6.0 three-agent-harness research-and-decide — children=3, bound=3, unbound=0.
+graphorin v0.6.0 three-agent-harness research-and-decide - children=3, bound=3, unbound=0.
 ```
 
 ---
 
 ## The Planner / Generator / Evaluator template
 
-Three plain `createAgent({...})` calls, distinguished by their `instructions` strings — that is the entire pattern. The harness wires them together with `evaluatorOptimizer({...})` and a single `createProgressIO({...})` instance so all three roles share an artifact root.
+Three plain `createAgent({...})` calls, distinguished by their `instructions` strings - that is the entire pattern. The harness wires them together with `evaluatorOptimizer({...})` and a single `createProgressIO({...})` instance so all three roles share an artifact root.
 
 ```ts
 import { createAgent, createProgressIO, evaluatorOptimizer } from '@graphorin/agent';
@@ -118,7 +118,7 @@ const outcome = await evaluatorOptimizer<string>(request, {
 
 `evaluatorOptimizer({...})` enforces three boundary contracts you would otherwise reinvent:
 
-1. **Iteration boundary discipline**. Each iteration is a fresh `agent.run(...)`-equivalent boundary. The Generator's iteration-N input is the original user input + the Evaluator's iteration-(N-1) critique — *not* the Generator's iteration-(N-1) internal message history. RB-42 / DEC-158.
+1. **Iteration boundary discipline**. Each iteration is a fresh `agent.run(...)`-equivalent boundary. The Generator's iteration-N input is the original user input + the Evaluator's iteration-(N-1) critique - *not* the Generator's iteration-(N-1) internal message history. RB-42 / DEC-158.
 2. **`maxIterations >= 1` enforcement**. The helper throws `EvaluatorOptimizerConfigError` if you pass `0` or a non-finite number. No accidental infinite loops.
 3. **Structured `EvaluatorOutcome`**. The `evaluator` callable must return `{ score: number, pass: boolean, critique: string }`. The harness's `parseEvaluatorOutcome(...)` extracts this from the agent's JSON reply with a sane fallback.
 
@@ -136,7 +136,7 @@ The returned `EvaluatorOptimizerOutcome` carries `terminationReason: 'pass' | 'm
 
 `<seq>` is a 3-digit zero-padded counter that auto-increments per `(runId, role)`. The Planner's first write becomes `planner.001.txt`; subsequent Generator writes are `generator.001.txt`, `generator.002.txt`, … The harness atomic-writes via `.tmp + rename` so a crashed write does not leave half-written artifacts.
 
-`agent.progress.read({ role, runId? })` returns the same `ProgressArtifactRef[]` shape the writer emits. Cross-run reads require an explicit `runId` cursor (see `ProgressIO.read` in `@graphorin/agent`). This example surfaces that cursor as `runHarness({ priorRunId })` or **`GRAPHORIN_HARNESS_PRIOR_RUN_ID`** so a new Planner pass can load the prior session’s planner artifacts from the same `artifactRoot`. Listing prior runs without a cursor remains out of scope for v0.1.
+`agent.progress.read({ role, runId? })` returns the same `ProgressArtifactRef[]` shape the writer emits. Cross-run reads require an explicit `runId` cursor (see `ProgressIO.read` in `@graphorin/agent`). This example surfaces that cursor as `runHarness({ priorRunId })` or **`GRAPHORIN_HARNESS_PRIOR_RUN_ID`** so a new Planner pass can load the prior session’s planner artifacts from the same `artifactRoot`. Listing prior runs without a cursor remains out of scope for this example.
 
 ### Sandbox-tier-aware path mapping
 
@@ -158,7 +158,7 @@ If you persist artifacts under `./.graphorin/...` (the project tier default), ad
 .graphorin/progress/
 ```
 
-Generator artifacts in particular can include large code blobs and intermediate critiques — they are operator-facing forensic state, not version-controlled review material.
+Generator artifacts in particular can include large code blobs and intermediate critiques - they are operator-facing forensic state, not version-controlled review material.
 
 ---
 
@@ -166,8 +166,8 @@ Generator artifacts in particular can include large code blobs and intermediate 
 
 `runResearchAndDecideVariant({...})` swaps the Generator phase for a fan-out + judge-merge composition:
 
-1. **Fan-out**. The Generator agent calls `generator.fanOut({...})` with `children: [webSearchAgent x 3]` under `maxConcurrentChildren: 4`. The harness ships a stubbed web-search sub-agent that emits a different one-line snippet per child index — three siblings in parallel, no shared state.
-2. **`'judge-merge'`**. The merge strategy is a `comparisonJudge` agent that receives the per-child evidence snippets and emits a single decision paragraph. `Agent.fanOut({...})` enforces failed-child isolation — a child that throws produces a `ChildResult { status: 'failed' }` instead of aborting the merge.
+1. **Fan-out**. The Generator agent calls `generator.fanOut({...})` with `children: [webSearchAgent x 3]` under `maxConcurrentChildren: 4`. The harness ships a stubbed web-search sub-agent that emits a different one-line snippet per child index - three siblings in parallel, no shared state.
+2. **`'judge-merge'`**. The merge strategy is a `comparisonJudge` agent that receives the per-child evidence snippets and emits a single decision paragraph. `Agent.fanOut({...})` enforces failed-child isolation - a child that throws produces a `ChildResult { status: 'failed' }` instead of aborting the merge.
 3. **Citation post-processing**. A minimal `createCitationAgent({ sources, mode: 'inline' })` helper splits the judge's draft into claims and binds each to the supplied source list via lowercased substring overlap. Bound claims are rewritten with inline `[Source N]` markers; unbound claims pass through unchanged. The helper increments `agent.citation.bound.total` / `agent.citation.unbound.total` counters via the configured `Tracer` if one is wired (otherwise it counts in-memory and surfaces the totals on `CitationResult`).
 
 ```ts
@@ -188,7 +188,7 @@ const citationAgent = createCitationAgent({ sources, mode: 'inline' });
 const { text, boundCount, unboundCount } = citationAgent.bind(fanOutResult.output);
 ```
 
-> **Note** — `createCitationAgent({...})` is shipped here as an example helper, ship in the framework later. The implementation in `src/citation-agent.ts` is intentionally small and isolated so reviewers can read the substring-overlap heuristic end-to-end inside one file. A future graphorin release will expose a richer version (embeddings + LLM judge + retrieval index).
+> **Note** - `createCitationAgent({...})` is shipped here as an example helper, ship in the framework later. The implementation in `src/citation-agent.ts` is intentionally small and isolated so reviewers can read the substring-overlap heuristic end-to-end inside one file. A future graphorin release will expose a richer version (embeddings + LLM judge + retrieval index).
 
 ---
 
@@ -202,7 +202,7 @@ The two patterns combine cleanly: an outer workflow can `Dispatch(...)` per Plan
 
 ## Cost expectations
 
-With hosted frontier models (fast tier for rubric scoring, capable tier for planning and code generation), a full LRU-cache harness run often lands roughly **USD $0.50–2.00** per end-to-end execution, depending on iteration count and provider list prices. The research-and-decide branch adds parallel lookup simulations plus a merge step — plan extra headroom accordingly.
+With hosted frontier models (fast tier for rubric scoring, capable tier for planning and code generation), a full LRU-cache harness run often lands roughly **USD $0.50-2.00** per end-to-end execution, depending on iteration count and provider list prices. The research-and-decide branch adds parallel lookup simulations plus a merge step - plan extra headroom accordingly.
 
 These figures are indicative only. The default CI recipe uses the stub provider and incurs no usage charges.
 
@@ -215,8 +215,8 @@ The example exposes one configurable recipe through `GRAPHORIN_LLM_RECIPE`:
 | Recipe   | Default? | Network? | What it does                                                                  |
 | -------- | -------- | -------- | ----------------------------------------------------------------------------- |
 | `stub`   | yes      | no       | Deterministic per-role replies. CI safe.                                      |
-| `ollama` | no       | localhost only | Wraps `ollamaAdapter({ baseUrl, model })` — set `GRAPHORIN_OLLAMA_BASE_URL` and `GRAPHORIN_LLM_MODEL` to override defaults. |
-| `GRAPHORIN_HARNESS_PRIOR_RUN_ID` | — | no | Optional. When set, the Planner prompt includes planner artifacts from that `runId` under the same `GRAPHORIN_ARTIFACT_ROOT` (continuation after restart). |
+| `ollama` | no       | localhost only | Wraps `ollamaAdapter({ baseUrl, model })` - set `GRAPHORIN_OLLAMA_BASE_URL` and `GRAPHORIN_LLM_MODEL` to override defaults. |
+| `GRAPHORIN_HARNESS_PRIOR_RUN_ID` | - | no | Optional. When set, the Planner prompt includes planner artifacts from that `runId` under the same `GRAPHORIN_ARTIFACT_ROOT` (continuation after restart). |
 
 Use the broader recipe matrix from [`examples/personal-assistant-cli`](../personal-assistant-cli/README.md) (`llamacpp-server`, `llamacpp-node`) if you need other local-LLM stacks.
 
@@ -242,10 +242,10 @@ examples/three-agent-harness/
 
 ## Troubleshooting
 
-- **`Unknown GRAPHORIN_LLM_RECIPE='...'`** — pick one of `stub`, `ollama`.
-- **`GRAPHORIN_HARNESS_PRIOR_RUN_ID` has no effect** — the id must match a `runId` directory that already exists under your `GRAPHORIN_ARTIFACT_ROOT` (default `./.graphorin/three-agent-harness`) and contain `progress/planner.*.txt`.
-- **`'maxIterations' must be >= 1`** — `evaluatorOptimizer({...})` rejects `0` and non-finite numbers; pass a positive integer.
-- **Generator output mismatch in the smoke test** — the stub emits `LRU_FIXTURE_SOURCE` byte-for-byte; if you tweak the fixture, update the test assertion.
+- **`Unknown GRAPHORIN_LLM_RECIPE='...'`** - pick one of `stub`, `ollama`.
+- **`GRAPHORIN_HARNESS_PRIOR_RUN_ID` has no effect** - the id must match a `runId` directory that already exists under your `GRAPHORIN_ARTIFACT_ROOT` (default `./.graphorin/three-agent-harness`) and contain `progress/planner.*.txt`.
+- **`'maxIterations' must be >= 1`** - `evaluatorOptimizer({...})` rejects `0` and non-finite numbers; pass a positive integer.
+- **Generator output mismatch in the smoke test** - the stub emits `LRU_FIXTURE_SOURCE` byte-for-byte; if you tweak the fixture, update the test assertion.
 
 ---
 

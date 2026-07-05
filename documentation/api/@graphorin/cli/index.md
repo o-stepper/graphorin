@@ -50,7 +50,7 @@
 
 | Command | Purpose |
 |---|---|
-| `graphorin storage status / encrypt / rekey / cleanup-backups` | Inspect + encrypt + re-key the SQLite store. `encrypt` and `rekey` require the `@graphorin/store-sqlite-encrypted` sub-pack from Phase 16. |
+| `graphorin storage status / backup / encrypt / rekey / cleanup-backups` | Inspect, back up (online, consistent copy via the driver's page-level backup API), encrypt, and re-key the SQLite store. `encrypt` and `rekey` require the `@graphorin/store-sqlite-encrypted` sub-pack from Phase 16. |
 | `graphorin audit verify / prune / export` | Operate on the encrypted, hash-chained audit log (DEC-124). |
 | `graphorin memory status / migrate` | Inspect counts + active embedder; `migrate` swaps embedders. |
 | `graphorin consolidator status / set-tier / stop` | Inspect + steer the background memory consolidator (DEC-134 / ADR-038). |

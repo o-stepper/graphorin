@@ -5,7 +5,7 @@
 > Slack via `chat.postMessage`, and survives a `pkill graphorin` mid-
 > approval boundary thanks to the SQLite-backed durable HITL flow.
 
-The smoke test stubs the real Slack `WebClient` and the LLM provider —
+The smoke test stubs the real Slack `WebClient` and the LLM provider -
 `pnpm test` exits in well under a second and never touches the network.
 
 ---
@@ -27,7 +27,7 @@ The smoke test stubs the real Slack `WebClient` and the LLM provider —
    in the deployment environment. The bridge validates every inbound
    request with HMAC-SHA256 before forwarding it to the agent loop.
 5. Save the **bot token** (`xoxb-…`) and inject it into your real
-   `SlackClient` adapter — the example ships a stub that records every
+   `SlackClient` adapter - the example ships a stub that records every
    `chat.postMessage` call into an in-memory log; production callers
    pass `slackClient: new SlackWebApiAdapter(token)` instead.
 
@@ -91,7 +91,7 @@ returns a typed handle exposing `agent`, `server`, `slackClient`,
 `processSlackEvent`, `handleSlackApproval`, and `listPendingApprovals`.
 Production deployments are free to split the listener (a Hono `/slack/
 events` route mounted on the framework's `GraphorinServer.app`) from
-the agent host (`@graphorin/server` running on a different node) — the
+the agent host (`@graphorin/server` running on a different node) - the
 contract between them is the same `RunState` shape that `agent.run`
 serializes to the checkpoint store.
 
@@ -128,7 +128,7 @@ const result = await processSlackEvent({
 console.log(result.status, result.assistantText);
 ```
 
-The `skipSignatureCheck: true` option short-circuits the HMAC step —
+The `skipSignatureCheck: true` option short-circuits the HMAC step -
 useful for the smoke test, never for production traffic.
 
 ---
@@ -154,7 +154,7 @@ const result = await simulateApprovalLifecycle({
   decision: 'approve',
   reason: 'OK',
   // The factory closes the in-flight handle and re-opens a brand-new
-  // app on top of the same SQLite store — bytes-equivalent to a process
+  // app on top of the same SQLite store - bytes-equivalent to a process
   // restart from the agent runtime's perspective.
   restartFactory: async (oldApp) => {
     await oldApp.close();
@@ -163,7 +163,7 @@ const result = await simulateApprovalLifecycle({
 });
 
 console.log(result.resume.status); // 'completed'
-console.log(result.pendingAfterRestart.length); // 1 — surfaced from the checkpoint store.
+console.log(result.pendingAfterRestart.length); // 1 - surfaced from the checkpoint store.
 console.log(result.slackMessages.map((m) => m.text));
 ```
 
@@ -208,7 +208,7 @@ tiers without per-client divergence.
 ## Token-based auth (HMAC + pepper)
 
 The smoke test exercises the framework's bearer-token path end-to-end
-against the in-process Hono app — no port binding required.
+against the in-process Hono app - no port binding required.
 
 ```ts
 import { createSlackBotApp } from '@graphorin/example-slack-bot-integration';

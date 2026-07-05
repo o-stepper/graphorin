@@ -12,7 +12,7 @@ examples smoke test.
 
 To allowlist a reviewed advisory, use pnpm's own config in your `package.json`
 (`"pnpm": { "auditConfig": { "ignoreCves": ["CVE-…"], "ignoreGhsas": ["GHSA-…"] } }`)
-— pnpm has no separate `audit-ignore.json` mechanism.
+- pnpm has no separate `audit-ignore.json` mechanism.
 
 ## Use
 
@@ -28,11 +28,9 @@ cp examples/github-actions/renovate.json renovate.json
 Then provision the referenced secrets (e.g. `NPM_TOKEN`) and adjust branch
 names / package globs for your repo.
 
-::: tip Pin actions by SHA
-Graphorin's own workflows pin every action to a commit SHA (with a `# vX`
-comment) rather than a mutable tag. Do the same in copied workflows to harden
-against tag-mutation supply-chain attacks.
-:::
+> **Tip: pin actions by SHA.** Graphorin's own workflows pin every action to
+> a commit SHA (with a `# vX` comment) rather than a mutable tag. Do the same
+> in copied workflows to harden against tag-mutation supply-chain attacks.
 
 Related templates: [`../docker`](../docker), [`../k8s`](../k8s),
 [`../systemd`](../systemd).

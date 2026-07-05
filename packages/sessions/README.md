@@ -82,7 +82,7 @@ default production adapter is `@graphorin/store-sqlite`).
 ```ts
 import { createMemory } from '@graphorin/memory';
 import { createSqliteStore } from '@graphorin/store-sqlite';
-import { createSession, createSessionManager } from '@graphorin/sessions';
+import { createSessionManager } from '@graphorin/sessions';
 
 const store = await createSqliteStore({ path: './assistant.db' });
 await store.init();

@@ -1,6 +1,6 @@
 # local-stack-cli
 
-> **Fully-local stack: Ollama LLM + Ollama embeddings + SQLite + sqlite-vec.** Wire `createAgent({...})` to a six-tier `Memory` whose vectors come from a local Ollama embedder, whose chat completions come from a local Ollama LLM, and whose persistence lives in a SQLite database file on disk. Zero non-`localhost` packets — provable with `GRAPHORIN_OFFLINE=1`.
+> **Fully-local stack: Ollama LLM + Ollama embeddings + SQLite + sqlite-vec.** Wire `createAgent({...})` to a six-tier `Memory` whose vectors come from a local Ollama embedder, whose chat completions come from a local Ollama LLM, and whose persistence lives in a SQLite database file on disk. Zero non-`localhost` packets - provable with `GRAPHORIN_OFFLINE=1`.
 
 This example is the narrowest end-to-end **graphorin** assistant. It ships a single recipe (`'ollama'`) plus a deterministic `'stub'` for CI. If you want the broader recipe matrix (in-process llama.cpp, llama.cpp HTTP server, …), see [`examples/personal-assistant-cli`](../personal-assistant-cli/README.md).
 
@@ -42,7 +42,7 @@ pnpm --filter ./examples/local-stack-cli dev
 Expected first-run banner:
 
 ```
-graphorin v0.6.0 local-stack-cli — recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
+graphorin v0.6.0 local-stack-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
 > hello
 …streamed reply from your local Ollama daemon…
 > Ctrl+C
@@ -89,7 +89,7 @@ for await (const ev of agent.stream(input, { sessionId, userId })) {
 }
 ```
 
-The full source is in [`src/main.ts`](./src/main.ts). The stub provider + stub embedder used by `tests/smoke.test.ts` live in [`src/stub-provider.ts`](./src/stub-provider.ts) and [`src/stub-embedder.ts`](./src/stub-embedder.ts) — both are network-free.
+The full source is in [`src/main.ts`](./src/main.ts). The stub provider + stub embedder used by `tests/smoke.test.ts` live in [`src/stub-provider.ts`](./src/stub-provider.ts) and [`src/stub-embedder.ts`](./src/stub-embedder.ts) - both are network-free.
 
 ---
 
@@ -101,21 +101,21 @@ graphorin classifies provider endpoints into `loopback` / `private` / `public-tl
 createProvider(adapter, { acceptsSensitivity: ['public', 'internal', 'secret'] });
 ```
 
-There is **no first-run sensitivity prompt** for this example — the daemon is on your loopback interface, the operating system already gates loopback to processes on this host, and graphorin's Sensitivity tiering is happy to forward all three classes. If you swap the daemon URL for a non-loopback host (e.g. a colleague's LAN box) the classifier downgrades trust and the `secret` tier falls out of the default — pin the array explicitly to override.
+There is **no first-run sensitivity prompt** for this example - the daemon is on your loopback interface, the operating system already gates loopback to processes on this host, and graphorin's Sensitivity tiering is happy to forward all three classes. If you swap the daemon URL for a non-loopback host (e.g. a colleague's LAN box) the classifier downgrades trust and the `secret` tier falls out of the default - pin the array explicitly to override.
 
 ---
 
-## `GRAPHORIN_OFFLINE=1` — proving zero non-loopback packets
+## `GRAPHORIN_OFFLINE=1` - proving zero non-loopback packets
 
 The only network calls this example makes are to the configured Ollama daemon (default `http://127.0.0.1:11434`). To prove this, set `GRAPHORIN_OFFLINE=1`. The CLI probes the daemon URL during startup and refuses to launch if it is unreachable:
 
 ```bash
 GRAPHORIN_OFFLINE=1 pnpm --filter ./examples/local-stack-cli dev
 # When Ollama is running:
-graphorin v0.6.0 local-stack-cli — recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. ...
+graphorin v0.6.0 local-stack-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. ...
 
 # When Ollama is NOT running:
-[graphorin/example-local-stack-cli] Ollama daemon is not reachable at 'http://127.0.0.1:11434'. Start it with `ollama serve` (and `ollama pull qwen2.5:7b-instruct-q4_K_M && ollama pull nomic-embed-text`) — or unset GRAPHORIN_OFFLINE to surface the underlying network error.
+[graphorin/example-local-stack-cli] Ollama daemon is not reachable at 'http://127.0.0.1:11434'. Start it with `ollama serve` (and `ollama pull qwen2.5:7b-instruct-q4_K_M && ollama pull nomic-embed-text`) - or unset GRAPHORIN_OFFLINE to surface the underlying network error.
 # (exit code 2)
 ```
 
@@ -126,7 +126,7 @@ sudo lsof -i -nP | grep node
 # expect to see only TCP traffic to 127.0.0.1:11434 (and SQLite holding a file lock under ./.graphorin/)
 ```
 
-`GRAPHORIN_OFFLINE=1` flips a single boolean inside [`buildProvider`](./src/main.ts) — the underlying `ollamaAdapter(...)` does the actual chat / embedding HTTP calls and never talks to anything other than the configured `baseUrl`.
+`GRAPHORIN_OFFLINE=1` flips a single boolean inside [`buildProvider`](./src/main.ts) - the underlying `ollamaAdapter(...)` does the actual chat / embedding HTTP calls and never talks to anything other than the configured `baseUrl`.
 
 ---
 
@@ -144,7 +144,7 @@ ollama pull bge-m3
 GRAPHORIN_EMBED_MODEL=bge-m3 pnpm --filter ./examples/local-stack-cli dev
 ```
 
-If you want to consolidate vectors across embedders later, run `migrateEmbedder(...)` from `@graphorin/memory` — it streams the source table through the new embedder and writes into the destination table.
+If you want to consolidate vectors across embedders later, run `migrateEmbedder(...)` from `@graphorin/memory` - it streams the source table through the new embedder and writes into the destination table.
 
 ---
 
@@ -155,8 +155,8 @@ The fully-local recipe in [`examples/personal-assistant-cli` § Local LLM provid
 | Concern                              | This example (Ollama)                    | personal-assistant-cli (`llamacpp-node`) |
 | ------------------------------------ | ---------------------------------------- | ---------------------------------------- |
 | Single-process throughput            | extra HTTP roundtrip (slower)            | direct ffi (faster)                      |
-| Durable mid-stream resume            | yes — daemon survives a Node restart     | no — model context lives inside Node     |
-| Multi-process sharing                | yes — every shell uses the same daemon   | no — each Node process loads its own GGUF|
+| Durable mid-stream resume            | yes - daemon survives a Node restart     | no - model context lives inside Node     |
+| Multi-process sharing                | yes - every shell uses the same daemon   | no - each Node process loads its own GGUF|
 | Model swap without restart           | `ollama pull` + `GRAPHORIN_LLM_MODEL=...`| restart Node                             |
 | Memory pressure                      | one process holds the model              | every Node process holds a copy          |
 
@@ -198,11 +198,11 @@ examples/local-stack-cli/
 
 ## Troubleshooting
 
-- **`Ollama daemon is not reachable at 'http://127.0.0.1:11434'`** — run `ollama serve`, confirm with `curl http://127.0.0.1:11434`, re-run.
-- **`/api/show returned 404 for model 'nomic-embed-text'`** — pull the embedder: `ollama pull nomic-embed-text`.
-- **`embedding dim drifted: expected 768, got 1024`** — you swapped the embed model mid-database. Either roll back, or `migrateEmbedder(...)` to a fresh vec0 table.
-- **`Unknown GRAPHORIN_LLM_RECIPE='...'`** — pick `ollama` or `stub`.
-- **`Loopback-only stack` TypeError** — `GRAPHORIN_OLLAMA_BASE_URL` must use hostname `127.0.0.1`, `localhost`, or `::1`. Remote or LAN hosts belong in `examples/personal-assistant-cli`.
+- **`Ollama daemon is not reachable at 'http://127.0.0.1:11434'`** - run `ollama serve`, confirm with `curl http://127.0.0.1:11434`, re-run.
+- **`/api/show returned 404 for model 'nomic-embed-text'`** - pull the embedder: `ollama pull nomic-embed-text`.
+- **`embedding dim drifted: expected 768, got 1024`** - you swapped the embed model mid-database. Either roll back, or `migrateEmbedder(...)` to a fresh vec0 table.
+- **`Unknown GRAPHORIN_LLM_RECIPE='...'`** - pick `ollama` or `stub`.
+- **`Loopback-only stack` TypeError** - `GRAPHORIN_OLLAMA_BASE_URL` must use hostname `127.0.0.1`, `localhost`, or `::1`. Remote or LAN hosts belong in `examples/personal-assistant-cli`.
 
 ---
 

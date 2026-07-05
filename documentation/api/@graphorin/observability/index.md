@@ -36,7 +36,11 @@ outbound network calls without an explicit user action.
   `emitGenAIAttributes(span, {...})`, `emitGenAIMessageEvents(span, [...])`,
   and `deriveGenAISystem(...)` ship the canonical
   `gen_ai.*` attribute family alongside the existing
-  `graphorin.*` attributes - additive, never replacing.
+  `graphorin.*` attributes - additive, never replacing. Span names
+  follow the semconv `{operation} {target}` shape (`chat <model>`,
+  `execute_tool <tool>`, `invoke_agent <agent>`) via the exported
+  `spanNameFor(type, attrs)` helper, applied by the tracer
+  automatically.
 - **OpenInference span-kind layer.** `emitOpenInferenceKind(span)` emits
   the `openinference.span.kind` attribute via the canonical
   per-`SpanType` mapping (`agent.*` → `AGENT`,

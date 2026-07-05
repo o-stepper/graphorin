@@ -1,6 +1,6 @@
 # personal-assistant-cli
 
-> A 30-minute hands-on tour through **graphorin** — wire `createAgent({...})` to a six-tier `Memory` backed by SQLite + local embeddings, hook it up to one of three opt-in local-LLM stacks, and stream a real conversation through your terminal.
+> A 30-minute hands-on tour through **graphorin** - wire `createAgent({...})` to a six-tier `Memory` backed by SQLite + local embeddings, hook it up to one of three opt-in local-LLM stacks, and stream a real conversation through your terminal.
 
 This example is the smallest end-to-end graphorin assistant. Everything runs on your laptop: SQLite for storage, transformers.js for embeddings, and your choice of Ollama, llama.cpp HTTP server, or in-process llama.cpp for the language model. No API keys, no telemetry, no phone-home.
 
@@ -10,12 +10,12 @@ This example is the smallest end-to-end graphorin assistant. Everything runs on 
 
 - **Node.js 22+** (the workspace pins `>=22.0.0`).
 - **pnpm 10.28+** (`corepack enable && corepack prepare pnpm@10.28.2 --activate`).
-- **Optional** — at least one of:
+- **Optional** - at least one of:
   - [Ollama](https://ollama.com/) daemon listening on `http://127.0.0.1:11434`.
   - [llama.cpp `llama-server`](https://github.com/ggml-org/llama.cpp) listening on `http://127.0.0.1:8080`.
   - A locally cached `*.gguf` file plus `pnpm add @graphorin/provider-llamacpp-node` inside this example directory (the in-process recipe).
 
-You can skip the LLM entirely and run the deterministic `stub` recipe — handy for plumbing tests and CI.
+You can skip the LLM entirely and run the deterministic `stub` recipe - handy for plumbing tests and CI.
 
 ---
 
@@ -38,7 +38,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/personal-assistant-cli dev
 Expected first-run output:
 
 ```
-graphorin v0.6.0 personal-assistant-cli — recipe='stub', model='stub-echo'. Type a message and press Enter; Ctrl+C to exit.
+graphorin v0.6.0 personal-assistant-cli - recipe='stub', model='stub-echo'. Type a message and press Enter; Ctrl+C to exit.
 > hello there
 stub-echo: hello there
 >
@@ -48,7 +48,7 @@ Press `Ctrl+C` to drain the current turn (`agent.abort({ drain: true, onPendingA
 
 ---
 
-## Recipe 1 — Ollama (default)
+## Recipe 1 - Ollama (default)
 
 Ollama is the simplest local-LLM stack: install once, `ollama pull qwen2.5:7b-instruct-q4_K_M`, and the daemon stays alive in the background.
 
@@ -63,18 +63,18 @@ GRAPHORIN_LLM_MODEL=qwen2.5:7b-instruct-q4_K_M \
 Expected first-run banner:
 
 ```
-graphorin v0.6.0 personal-assistant-cli — recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
+graphorin v0.6.0 personal-assistant-cli - recipe='ollama', model='qwen2.5:7b-instruct-q4_K_M'. Type a message and press Enter; Ctrl+C to exit.
 > remember I prefer metric units
-Got it — I'll keep that in mind.
+Got it - I'll keep that in mind.
 > what's the weather in San Francisco?
 …streamed reply, in metric…
 ```
 
-The `Provider` is wrapped through `createProvider(adapter, { acceptsSensitivity: ['public', 'internal'] })` — that array IS the first-run sensitivity prompt. Memory rows tagged `secret` are filtered out before any payload reaches the daemon.
+The `Provider` is wrapped through `createProvider(adapter, { acceptsSensitivity: ['public', 'internal'] })` - that array IS the first-run sensitivity prompt. Memory rows tagged `secret` are filtered out before any payload reaches the daemon.
 
 Override the daemon URL with `GRAPHORIN_LLM_BASEURL=http://other-host:11434`. Override the model with `GRAPHORIN_LLM_MODEL=...`.
 
-## Recipe 2 — llama.cpp HTTP server
+## Recipe 2 - llama.cpp HTTP server
 
 Run [`llama-server`](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md) on a port of your choice (default `8080`):
 
@@ -88,14 +88,14 @@ GRAPHORIN_LLM_BASEURL=http://127.0.0.1:8080 \
 Expected banner:
 
 ```
-graphorin v0.6.0 personal-assistant-cli — recipe='llamacpp-server', model='llama'. ...
+graphorin v0.6.0 personal-assistant-cli - recipe='llamacpp-server', model='llama'. ...
 ```
 
 The HTTP shape is OpenAI-compatible; graphorin's `llamaCppServerAdapter(...)` handles the wire translation.
 
-## Recipe 3 — In-process llama.cpp (`llamacpp-node`)
+## Recipe 3 - In-process llama.cpp (`llamacpp-node`)
 
-This recipe loads a GGUF model directly inside the Node process via [`node-llama-cpp`](https://node-llama-cpp.withcat.ai/). It is the only recipe whose runtime is opt-in — the example does NOT statically depend on the companion package so the workspace lockfile stays small.
+This recipe loads a GGUF model directly inside the Node process via [`node-llama-cpp`](https://node-llama-cpp.withcat.ai/). It is the only recipe whose runtime is opt-in - the example does NOT statically depend on the companion package so the workspace lockfile stays small.
 
 ```bash
 pnpm --filter ./examples/personal-assistant-cli add @graphorin/provider-llamacpp-node
@@ -110,7 +110,7 @@ The first turn pays the model-load cost (a few seconds for a 4-bit 7B model on a
 
 ## Hello world (< 20 source lines)
 
-The snippet at [`src/hello-world.ts`](./src/hello-world.ts) is a self-contained walkthrough — `createAgent` + `Memory` + streaming + the first-run sensitivity choice — that runs against the stub provider so you can see the wiring without provisioning an LLM:
+The snippet at [`src/hello-world.ts`](./src/hello-world.ts) is a self-contained walkthrough - `createAgent` + `Memory` + streaming + the first-run sensitivity choice - that runs against the stub provider so you can see the wiring without provisioning an LLM:
 
 ```ts
 import { createAgent } from '@graphorin/agent';
@@ -143,7 +143,7 @@ pnpm --filter ./examples/personal-assistant-cli exec tsx src/hello-world.ts
 
 ## Why `tier: 'cheap'` on the consolidator?
 
-The default `tier: 'free'` consolidator pins zero-token ceilings — useful for CI but unsatisfying for an actual assistant: memory consolidation never runs, so facts never get summarised and rules never settle. The example overrides this with:
+The default `tier: 'free'` consolidator pins zero-token ceilings - useful for CI but unsatisfying for an actual assistant: memory consolidation never runs, so facts never get summarised and rules never settle. The example overrides this with:
 
 ```ts
 createMemory({
@@ -165,7 +165,7 @@ graphorin's HITL (human-in-the-loop) durable-resume contract requires the runtim
 | Recipe              | Durable mid-stream resume? | Notes                                                                 |
 | ------------------- | -------------------------- | --------------------------------------------------------------------- |
 | `ollama`            | yes                        | Ollama daemon survives the Node process; `RunState.toJSON` round-trips. |
-| `llamacpp-server`   | yes                        | Same shape as Ollama — HTTP server holds the model context.           |
+| `llamacpp-server`   | yes                        | Same shape as Ollama - HTTP server holds the model context.           |
 | `llamacpp-node`     | **no**                     | Model context lives inside Node; restart loses it.                    |
 | `stub`              | n/a                        | No real model state.                                                  |
 
@@ -180,7 +180,7 @@ graphorin promises **zero implicit network calls**. You can prove this by settin
 ```bash
 GRAPHORIN_OFFLINE=1 GRAPHORIN_LLM_RECIPE=stub \
   pnpm --filter ./examples/personal-assistant-cli dev
-# starts cleanly — the stub provider never opens a socket
+# starts cleanly - the stub provider never opens a socket
 ```
 
 With the `ollama` recipe, the example probes the daemon URL once at startup. Unreachable endpoints raise `OfflineRecipeUnreachableError` (exit code 2) with a helpful message:
@@ -213,9 +213,9 @@ examples/personal-assistant-cli/
 
 ## Troubleshooting
 
-- **`Unknown GRAPHORIN_LLM_RECIPE='...'`** — pick one of `ollama`, `llamacpp-server`, `llamacpp-node`, `stub`.
-- **`recipe 'llamacpp-node' needs '@graphorin/provider-llamacpp-node'`** — install the companion package: `pnpm --filter ./examples/personal-assistant-cli add @graphorin/provider-llamacpp-node`.
-- **Ollama daemon refuses connections** — confirm `ollama serve` is running (`curl http://127.0.0.1:11434`) and the model has been pulled (`ollama list`).
+- **`Unknown GRAPHORIN_LLM_RECIPE='...'`** - pick one of `ollama`, `llamacpp-server`, `llamacpp-node`, `stub`.
+- **`recipe 'llamacpp-node' needs '@graphorin/provider-llamacpp-node'`** - install the companion package: `pnpm --filter ./examples/personal-assistant-cli add @graphorin/provider-llamacpp-node`.
+- **Ollama daemon refuses connections** - confirm `ollama serve` is running (`curl http://127.0.0.1:11434`) and the model has been pulled (`ollama list`).
 
 ---
 

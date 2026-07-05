@@ -1,6 +1,6 @@
 # multi-agent-crew
 
-> A supervisor + 2 workers acceptance demo for **graphorin** — wires `createAgent({ handoffs: [...] })` so the agent runtime auto-generates `transfer_to_<worker>` tools, emits a `HandoffRecord` per transfer, and lets one shared `SessionManager` reconstruct the full multi-agent conversation from JSONL export → `session.list({ agentId })` → `session.replay({ ... })`.
+> A supervisor + 2 workers acceptance demo for **graphorin** - wires `createAgent({ handoffs: [...] })` so the agent runtime auto-generates `transfer_to_<worker>` tools, emits a `HandoffRecord` per transfer, and lets one shared `SessionManager` reconstruct the full multi-agent conversation from JSONL export → `session.list({ agentId })` → `session.replay({ ... })`.
 
 The example is small (≈300 lines of source, three files) but it exercises **every** RB-33 acceptance criterion against a deterministic in-tree stub provider so CI never depends on a live LLM.
 
@@ -20,7 +20,7 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/multi-agent-crew dev
 Expected dev output:
 
 ```
-graphorin v0.6.0 multi-agent-crew — recipe='stub', handoffs=2, messages=4, agents=3, output='Crew synthesis — researcher said: "[researched] Key findings about 'Summarise the design considerations…'.
+graphorin v0.6.0 multi-agent-crew - recipe='stub', handoffs=2, messages=4, agents=3, output='Crew synthesis - researcher said: "[researched] Key findings about 'Summarise the design considerations…'.
 ```
 
 **What just happened?**
@@ -53,7 +53,7 @@ examples/multi-agent-crew/
 
 ---
 
-## Advanced — the supervisor + workers pattern
+## Advanced - the supervisor + workers pattern
 
 Every agent is a plain `createAgent({...})` call. The supervisor names the workers in its `handoffs: [...]` array, which makes the agent runtime auto-generate `transfer_to_worker-a` / `transfer_to_worker-b` virtual tools and append a `HandoffRecord` whenever the model invokes one.
 
@@ -157,7 +157,7 @@ The agent runtime auto-emits a `handoff` event AND appends a `HandoffRecord` to 
 
 ### 5. Sub-agent secrets isolation (DEC-137)
 
-The supervisor mounts a `SecretValue` on its `deps`; workers default to `inheritSecrets: []` (empty allowlist) and ship `deps: undefined` — so a worker tool reading `ctx.runContext.deps?.secret` always sees `undefined`:
+The supervisor mounts a `SecretValue` on its `deps`; workers inherit no secret refs (the recorded `HandoffRecord.inheritedSecrets` allowlist is empty) and ship `deps: undefined` - so a worker tool reading `ctx.runContext.deps?.secret` always sees `undefined`:
 
 ```ts
 expect(handle.supervisor.config.deps?.secret).toBeDefined();      // ← supervisor has it
@@ -180,7 +180,7 @@ await secret.use((raw) => raw)       // → returns the raw string inside a scop
 
 To explicitly opt INTO secret forwarding, declare the keys via `Agent.toTool({ secretsInheritance: 'inherit-allowlist', inheritSecrets: ['MY_KEY'] })` on the parent.
 
-### 6. Handoff `inputFilter` defaults — `lastN(10) + stripReasoning` (DEC-146 / RB-40)
+### 6. Handoff `inputFilter` defaults - `lastN(10) + stripReasoning` (DEC-146 / RB-40)
 
 `filters.compose(...)` always appends `stripReasoning()` so reasoning content can never cross a handoff boundary, regardless of caller intent. The example's explicit filter is `compose(lastN(10), stripReasoning())`; the resulting `HandoffRecord.inputFilter` descriptor surfaces the composition stack:
 
@@ -209,7 +209,7 @@ handoffs: [
 
 ## How the deterministic stub provider works
 
-`./src/stub-provider.ts` ships a single `Provider` that powers all three roles. It dispatches on the role marker (`[role:supervisor]` / `[role:researcher]` / `[role:writer]`) embedded in the agent's `instructions` system prompt — exactly the same convention as the [`three-agent-harness`](../three-agent-harness/) example.
+`./src/stub-provider.ts` ships a single `Provider` that powers all three roles. It dispatches on the role marker (`[role:supervisor]` / `[role:researcher]` / `[role:writer]`) embedded in the agent's `instructions` system prompt - exactly the same convention as the [`three-agent-harness`](../three-agent-harness/) example.
 
 The supervisor stub is stateful per call: it counts the tool messages already in `req.messages` and decides:
 
@@ -228,15 +228,15 @@ GRAPHORIN_LLM_RECIPE=stub pnpm --filter ./examples/multi-agent-crew dev
 GRAPHORIN_CREW_TASK='Plan a marketing rollout' pnpm --filter ./examples/multi-agent-crew dev
 ```
 
-Set `GRAPHORIN_USER_ID=...` to override the session `userId`. The recipe enumeration only ships `'stub'` in v0.1; `GRAPHORIN_LLM_RECIPE=anything-else` raises `TypeError`.
+Set `GRAPHORIN_USER_ID=...` to override the session `userId`. The recipe enumeration only ships `'stub'` today; `GRAPHORIN_LLM_RECIPE=anything-else` raises `TypeError`.
 
 ---
 
 ## Troubleshooting
 
-- **`Module '"@graphorin/agent"' has no exported member ...`** — ensure you ran `pnpm install` at the workspace root; the example consumes the workspace-linked packages.
-- **Replay "completes" with only `replay.start` + `replay.end`** — that's the lib-mode default. `Session.replay({ traceSource })` accepts an `AsyncIterable<SpanRecord>` from `@graphorin/observability/exporters` if you want to hydrate against a real trace log.
-- **`session.list({ agentId })` returns nothing** — only assistant messages carry `agentId`; user / system / tool rows are filtered out by the SQL store. Check that `runCrew(...)` ran to completion AND that you used the registered worker name (`worker-a` / `worker-b`).
+- **`Module '"@graphorin/agent"' has no exported member ...`** - ensure you ran `pnpm install` at the workspace root; the example consumes the workspace-linked packages.
+- **Replay "completes" with only `replay.start` + `replay.end`** - that's the lib-mode default. `Session.replay({ traceSource })` accepts an `AsyncIterable<SpanRecord>` from `@graphorin/observability/exporters` if you want to hydrate against a real trace log.
+- **`session.list({ agentId })` returns nothing** - only assistant messages carry `agentId`; user / system / tool rows are filtered out by the SQL store. Check that `runCrew(...)` ran to completion AND that you used the registered worker name (`worker-a` / `worker-b`).
 
 ---
 
