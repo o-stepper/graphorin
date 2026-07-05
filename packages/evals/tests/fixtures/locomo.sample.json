@@ -35,18 +35,13 @@
       {
         "question": "What instrument did Caroline start learning?",
         "answer": "the violin",
-        "evidence": [
-          "D1:1"
-        ],
+        "evidence": ["D1:1"],
         "category": 4
       },
       {
         "question": "How long after starting the violin did Caroline perform at a recital?",
         "answer": "about six weeks",
-        "evidence": [
-          "D1:1",
-          "D2:1"
-        ],
+        "evidence": ["D1:1", "D2:1"],
         "category": 2
       },
       {
@@ -57,18 +52,13 @@
       {
         "question": "Who congratulated Caroline on her recital, and what had she started learning earlier?",
         "answer": "Melanie congratulated her; she had started learning the violin.",
-        "evidence": [
-          "D1:1",
-          "D2:2"
-        ],
+        "evidence": ["D1:1", "D2:2"],
         "category": 1
       },
       {
         "question": "In which year did Caroline first perform publicly?",
         "answer": 2022,
-        "evidence": [
-          "D2:1"
-        ],
+        "evidence": ["D2:1"],
         "category": 4
       },
       {
