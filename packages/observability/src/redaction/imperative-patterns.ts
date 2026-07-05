@@ -36,7 +36,8 @@ export type ImperativePatternName =
   | 'developer-mode'
   | 'jailbreak-marker'
   | 'tool-call-injection'
-  | 'role-tag-injection';
+  | 'role-tag-injection'
+  | 'untrusted-content-delimiter-injection';
 
 /**
  * One entry in the imperative-pattern catalogue. The shape mirrors
@@ -137,6 +138,18 @@ const PATTERNS: readonly ImperativePattern[] = [
       'Chat-role tags injected into tool results to spoof a system / assistant message in the conversation.',
     prefilter: ['<|im_start|', '<|system|', '<|assistant|', '<|user|'],
     regex: /<\|(?:im_start|system|assistant|user|im_end)\|>/gi,
+    mask: '[REDACTED:imperative-pattern]',
+  },
+  {
+    name: 'untrusted-content-delimiter-injection',
+    description:
+      'Fabricated `<<<untrusted_content>>>` envelope delimiters inside untrusted content - an attempt to prematurely close, or spoof a nested opening of, the inbound trust envelope. The regex is scoped STRICTLY to the envelope markers (never bare `<<<` / `>>>` runs) so legitimate Python doctest / REPL `>>>` and shell heredoc fragments are untouched.',
+    // The word alone is the prefilter: any marker form the regex can
+    // match necessarily contains it, including whitespace-padded
+    // variants like `<<< untrusted_content` that a tighter
+    // `<<<untrusted_content` prefilter would miss.
+    prefilter: ['untrusted_content'],
+    regex: /<<<\s*\/?\s*untrusted_content/gi,
     mask: '[REDACTED:imperative-pattern]',
   },
 ];
