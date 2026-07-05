@@ -53,8 +53,15 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # The 30s default-timeout override retires the wall-clock flake
+      # class on shared runners: five different tests blew the 5s vitest
+      # default on degraded runner days (sqlite setup, Argon2id KDF,
+      # server app wiring), each a slow-I/O or CPU-starvation artifact,
+      # never a hang. Local runs keep the strict 5s default; explicit
+      # per-test/per-suite timeouts still take precedence over this
+      # CLI-level default.
       - name: Test
-        run: pnpm test
+        run: pnpm test -- --testTimeout=30000
 
       - name: Build
         run: pnpm build
