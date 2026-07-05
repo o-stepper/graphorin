@@ -463,5 +463,13 @@ export interface Workflow<
   ): AsyncIterable<WorkflowEvent<TState>>;
   getState(threadId: string): Promise<WorkflowState<TState>>;
   listCheckpoints(threadId: string): Promise<ReadonlyArray<import('@graphorin/core').Checkpoint>>;
+  /**
+   * Delete every checkpoint and pending write of `threadId` across all
+   * namespaces (W-005) - the operator lever for per-thread hygiene and
+   * targeted erasure requests. Idempotent: deleting an unknown thread
+   * is a no-op. Deleting a merely-suspended thread (pending approval /
+   * timer / awakeable) destroys its resume state - the caller decides.
+   */
+  deleteThread(threadId: string): Promise<void>;
   fork(threadId: string, fromCheckpointId: CheckpointId): Promise<{ readonly newThreadId: string }>;
 }

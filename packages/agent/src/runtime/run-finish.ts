@@ -9,7 +9,7 @@
  * @packageDocumentation
  */
 
-import type { AgentEvent, AgentResult, RunState } from '@graphorin/core';
+import type { AgentEvent, AgentResult, CheckpointStore, RunState } from '@graphorin/core';
 import type { createDefaultSpillWriter } from '@graphorin/tools/result';
 import { noopCompactionResult, type PendingManualCompact } from './run-compaction.js';
 import type { InternalRunSnapshot, MutableRunState } from './run-input.js';
@@ -18,6 +18,9 @@ import type { InternalRunSnapshot, MutableRunState } from './run-input.js';
 export interface RunFinisherDeps {
   readonly pendingManualCompacts: PendingManualCompact[];
   readonly spillWriter: ReturnType<typeof createDefaultSpillWriter>;
+  /** W-005: thread erasure on terminal runs (`'delete-on-terminal'`). */
+  readonly checkpointStore?: CheckpointStore | undefined;
+  readonly checkpointPolicy?: 'keep' | 'delete-on-terminal' | undefined;
 }
 
 /**
@@ -30,7 +33,7 @@ export function createRunFinisher<TOutput>(
   state: MutableRunState,
   snapshot: InternalRunSnapshot<TOutput>,
 ) => AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
-  const { pendingManualCompacts, spillWriter } = deps;
+  const { pendingManualCompacts, spillWriter, checkpointStore, checkpointPolicy } = deps;
 
   /**
    * Terminal wrapper around {@link finalize}: every exit path of the run
@@ -53,6 +56,13 @@ export function createRunFinisher<TOutput>(
     // startup TTL sweep.
     if (result.status === 'completed' || result.status === 'failed') {
       await spillWriter.clear?.(result.state.id).catch(() => {});
+      // W-005: opt-in checkpoint hygiene mirrors the spill lifecycle -
+      // same statuses, best-effort, and NEVER for awaiting_approval /
+      // aborted runs (their thread is the resume state). Default 'keep'
+      // preserves post-hoc debugging and process-restart resume.
+      if (checkpointPolicy === 'delete-on-terminal' && checkpointStore !== undefined) {
+        await checkpointStore.deleteThread(result.state.id).catch(() => {});
+      }
     }
     yield { type: 'agent.end', runId: result.state.id, result };
     return result;

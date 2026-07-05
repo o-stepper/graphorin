@@ -243,6 +243,35 @@ export function createWorkflowRoutes(
     },
   );
 
+  // W-005: the reachable per-thread erasure lever. 204 on success (the
+  // store delete is idempotent - deleting an unknown thread is a no-op),
+  // 404 for an unknown workflow, 400 when the registered entry does not
+  // expose deleteThread.
+  app.delete(
+    '/:id/threads/:threadId',
+    createScopeMiddleware((_path, params) => `workflows:delete:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const threadId = c.req.param('threadId');
+      const workflow = deps.workflows.get(id);
+      if (workflow === undefined) {
+        const err = new WorkflowNotFoundError(id);
+        return c.json({ error: err.kind, message: err.message }, 404);
+      }
+      if (workflow.deleteThread === undefined) {
+        return c.json(
+          {
+            error: 'workflow-delete-thread-unsupported',
+            message: 'Workflow does not implement deleteThread().',
+          },
+          400,
+        );
+      }
+      await workflow.deleteThread(threadId);
+      return c.body(null, 204);
+    },
+  );
+
   app.post(
     '/:id/fork',
     createScopeMiddleware((_path, params) => `workflows:execute:${params.id}`),

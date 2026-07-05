@@ -88,6 +88,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement `resume()`. Scope `workflows:resume:<id>`. |
 | `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`. Scope `workflows:read:<id>`. |
 | `GET` | `/v1/workflows/:id/checkpoints` | List a thread's checkpoints (`?threadId=...`). Scope `workflows:read:<id>`. |
+| `DELETE` | `/v1/workflows/:id/threads/:threadId` | Delete every checkpoint + pending write of one thread (idempotent; `204` on success, `400` when the entry does not expose `deleteThread()`). Scope `workflows:delete:<id>`. |
 | `POST` | `/v1/workflows/:id/fork` | **Not implemented** on the server surface yet: answers an honest `501`; fork the thread programmatically via the workflow API. Scope `workflows:execute:<id>`. |
 | `POST` | `/v1/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 

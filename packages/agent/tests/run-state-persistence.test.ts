@@ -9,7 +9,7 @@
 import type { Checkpoint, CheckpointMetadata, Tool } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 import { createAgent, createInitialRunState, serializeRunState } from '../src/index.js';
-import { createMockProvider, toolCallScript } from './fixtures/mock-provider.js';
+import { createMockProvider, textOnlyScript, toolCallScript } from './fixtures/mock-provider.js';
 
 function baseState() {
   const state = createInitialRunState({
@@ -170,5 +170,76 @@ describe('AG-23 - the suspend checkpoint is serialized, stripped, and detached',
     expect((persisted.steps as unknown[]).length).toBe(stepsAtSuspend);
     expect((persisted.messages as unknown[]).length).toBe(messagesAtSuspend);
     expect(JSON.stringify(persisted)).not.toContain('AFTER-SUSPEND');
+  });
+});
+
+describe('W-005 - checkpointPolicy: thread hygiene on terminal runs', () => {
+  function trackingStore() {
+    const deleted: string[] = [];
+    const store = {
+      async put() {},
+      async putWrites() {},
+      async getTuple() {
+        return null;
+      },
+      async *list() {},
+      async delete() {},
+      async deleteThread(threadId: string) {
+        deleted.push(threadId);
+      },
+    };
+    return { store, deleted };
+  }
+
+  it("'delete-on-terminal' deletes the thread after a completed run", async () => {
+    const { store, deleted } = trackingStore();
+    const agent = createAgent({
+      name: 'clean',
+      instructions: 'Answer.',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done')] }),
+      checkpointStore: store as never,
+      checkpointPolicy: 'delete-on-terminal',
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('completed');
+    expect(deleted).toEqual([result.state.id]);
+  });
+
+  it("'delete-on-terminal' NEVER deletes an awaiting_approval thread (it IS the resume state)", async () => {
+    const { store, deleted } = trackingStore();
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'Send.',
+      provider: createMockProvider({
+        modelId: 'mock',
+        scripts: [
+          toolCallScript({
+            toolCallId: 'tc-send',
+            toolName: 'send_email',
+            args: { to: 'a@b.c' },
+            totalTokens: 8,
+          }),
+        ],
+      }),
+      tools: [sendTool()],
+      checkpointStore: store as never,
+      checkpointPolicy: 'delete-on-terminal',
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('awaiting_approval');
+    expect(deleted).toEqual([]);
+  });
+
+  it("default 'keep' leaves the thread after a completed run (byte-identical to today)", async () => {
+    const { store, deleted } = trackingStore();
+    const agent = createAgent({
+      name: 'keeper',
+      instructions: 'Answer.',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('done')] }),
+      checkpointStore: store as never,
+    });
+    const result = await agent.run('go');
+    expect(result.status).toBe('completed');
+    expect(deleted).toEqual([]);
   });
 });

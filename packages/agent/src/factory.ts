@@ -805,7 +805,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   // Terminal path: settle the manual-compact queue, finalize the
   // result, clear terminal-run spill artifacts and emit `agent.end`
   // (see `runtime/run-finish.ts`).
-  const finishRunBase = createRunFinisher<TOutput>({ pendingManualCompacts, spillWriter });
+  const finishRunBase = createRunFinisher<TOutput>({
+    pendingManualCompacts,
+    spillWriter,
+    checkpointStore: config.checkpointStore,
+    checkpointPolicy: config.checkpointPolicy,
+  });
 
   // The public call surface over the run loop (AG-9; see
   // `runtime/agent-surface.ts`).
