@@ -144,6 +144,69 @@ describe('encryption hooks', () => {
     ).rejects.toBeInstanceOf(CipherPeerMissingError);
   });
 
+  it('W-110: openAuditDatabase pins the cipher BEFORE PRAGMA key (default chacha20)', async () => {
+    const { openAuditDatabase } = await import('../src/audit-db.js');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-audit-cipher-'));
+    const pragmas: string[] = [];
+    class FakeDriver {
+      open = true;
+      constructor(_path: string) {}
+      pragma(stmt: string): unknown {
+        pragmas.push(stmt);
+        return [];
+      }
+      exec(): void {}
+      prepare(): never {
+        throw new Error('not needed');
+      }
+      close(): void {
+        this.open = false;
+      }
+    }
+    const handle = await openAuditDatabase({
+      path: `${dir}/audit.db`,
+      encryption: { enabled: true, passphraseResolver: async () => 'topsecret' },
+      driver: FakeDriver as never,
+    });
+    handle.close();
+    const cipherIdx = pragmas.findIndex((p) => p.startsWith('cipher = '));
+    const keyIdx = pragmas.findIndex((p) => p.startsWith('key = '));
+    expect(pragmas[cipherIdx]).toBe("cipher = 'chacha20'");
+    expect(cipherIdx).toBeGreaterThanOrEqual(0);
+    expect(cipherIdx).toBeLessThan(keyIdx);
+  });
+
+  it('W-110: an explicit audit cipher is honoured (sqlcipher pins legacy=4 before key)', async () => {
+    const { openAuditDatabase } = await import('../src/audit-db.js');
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-audit-cipher2-'));
+    const pragmas: string[] = [];
+    class FakeDriver {
+      open = true;
+      constructor(_path: string) {}
+      pragma(stmt: string): unknown {
+        pragmas.push(stmt);
+        return [];
+      }
+      exec(): void {}
+      prepare(): never {
+        throw new Error('not needed');
+      }
+      close(): void {
+        this.open = false;
+      }
+    }
+    const handle = await openAuditDatabase({
+      path: `${dir}/audit.db`,
+      encryption: { enabled: true, cipher: 'sqlcipher', passphraseResolver: async () => 'x' },
+      driver: FakeDriver as never,
+    });
+    handle.close();
+    const keyIdx = pragmas.findIndex((p) => p.startsWith('key = '));
+    expect(pragmas.indexOf("cipher = 'sqlcipher'")).toBeLessThan(keyIdx);
+    expect(pragmas.indexOf('legacy = 4')).toBeLessThan(keyIdx);
+    expect(pragmas.indexOf("cipher = 'sqlcipher'")).toBeGreaterThanOrEqual(0);
+  });
+
   it('openAuditDatabase rethrows non-cipher errors from the loader', async () => {
     const { openAuditDatabase } = await import('../src/audit-db.js');
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-audit-nonpeer-'));

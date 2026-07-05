@@ -77,7 +77,7 @@ Every privileged operation writes one row to the audit log:
 - token issuance / revocation;
 - OAuth flows (initiation / token issuance / refresh).
 
-The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain.
+The audit log lives in a dedicated SQLite database with **mandatory encryption-at-rest** (via [`better-sqlite3-multiple-ciphers`](https://github.com/m4heshd/better-sqlite3-multiple-ciphers)) and a **SHA-256 hash chain** that links every row to its predecessor. Tampering breaks the chain. `config.audit.cipher` selects the cipher and is pinned before `PRAGMA key` on both open paths (W-110); the audit default is `chacha20` - deliberately DIFFERENT from the main store's `sqlcipher` (ADR-030) because every pre-fix audit.db was created in the sqlite3mc default format and pinning `chacha20` keeps them byte-compatible. If you set `audit.cipher: 'sqlcipher'` in a config where it was previously ignored, an existing chacha20 file will now fail to open (correct fail-fast, not data loss) - re-encrypt it or drop the setting.
 
 The CLI command `graphorin audit verify` walks the chain and reports any breaks (`graphorin audit export` / `prune` round out the group).
 

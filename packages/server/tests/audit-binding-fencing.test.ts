@@ -43,6 +43,47 @@ async function freshAuditPath(): Promise<string> {
   return join(dir, 'audit.db');
 }
 
+describe('W-110 - audit.db cipher compatibility', () => {
+  it('a pre-fix audit.db (created with key only, no cipher pragmas) still opens', async () => {
+    const path = await freshAuditPath();
+    // Recreate the OLD open path byte-for-byte: raw driver, PRAGMA key,
+    // schema, close - no cipher-selection pragmas (= sqlite3mc default).
+    const { loadCipherDriver } = await import('@graphorin/store-sqlite');
+    const driver = await loadCipherDriver();
+    const Db = driver as unknown as new (
+      p: string,
+    ) => {
+      pragma(s: string): unknown;
+      exec(s: string): unknown;
+      close(): void;
+    };
+    const legacy = new Db(path);
+    legacy.pragma("key = 'fence-passphrase-1234567890'");
+    legacy.exec(
+      `CREATE TABLE IF NOT EXISTS audit_log (
+        seq INTEGER PRIMARY KEY, ts INTEGER NOT NULL, actor_json TEXT NOT NULL,
+        action TEXT NOT NULL, target TEXT NOT NULL, decision TEXT NOT NULL,
+        context_json TEXT, metadata_json TEXT, prev_hash TEXT NOT NULL,
+        hash TEXT NOT NULL UNIQUE
+      ) WITHOUT ROWID;`,
+    );
+    legacy.close();
+    // The NEW code pins chacha20 explicitly - byte-compatible with the
+    // legacy default, so the file opens without SQLITE_NOTADB.
+    const passphrase = await resolveSecret(`env:${PASS_ENV_VAR}`);
+    const db = await openAuditDb({ path, passphrase });
+    expect(await db.count()).toBe(0);
+    await appendAudit(db, {
+      actor: { kind: 'system', id: 'compat' },
+      action: 'secrets:read',
+      target: 'compat',
+      decision: 'success',
+    });
+    expect(await db.count()).toBe(1);
+    await db.close();
+  });
+});
+
 describe('W-011 - cross-thread contention on one audit.db', () => {
   it('two writer threads: no entry lost, chain verifies', { timeout: 60_000 }, async () => {
     const path = await freshAuditPath();

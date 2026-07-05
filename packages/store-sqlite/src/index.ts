@@ -74,6 +74,7 @@ import {
 } from './embedding-meta-repo.js';
 import {
   CipherPeerMissingError,
+  cipherSelectionPragmas,
   type EncryptionCipher,
   type EncryptionConfig,
   loadCipherDriver,
@@ -330,6 +331,7 @@ export {
   type ConsolidatorStateRow,
   // FTS integrity (CS-10)
   checkFtsIntegrity,
+  cipherSelectionPragmas,
   // span persistence (RP-17)
   createSqliteSpanExporter,
   type DlqBatchInput,
