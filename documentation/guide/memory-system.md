@@ -28,7 +28,7 @@ flowchart LR
 
 | Tier | What it stores | Read surface | Write surface |
 |---|---|---|---|
-| **working** | Short structured blocks holding what the assistant is doing right now - persona, current task, immediate context. | `list`, `read`, `compile` | `define`, `write`, `patch`, `attach`, `detach` |
+| **working** | Short structured blocks holding what the assistant is doing right now - persona, current task, immediate context. | `list`, `read`, `compile` | `define`, `write`, `append`, `replace`, `rethink`, `attach`, `detach` |
 | **session** | The rolling message log of the current conversation. | `list`, `search`, `attributedFor` | `push`, `flushImportant`, `compact` |
 | **episodic** | Things that happened - decisions, events, milestones - captured with proper bi-temporal validity. | `recent`, `search` | `record` |
 | **semantic** | Facts about you, the world, the task. Conflicts resolved through a multi-stage pipeline. | `search`, `searchIterative`, `history` | `remember`, `supersede`, `forget`, `validate` |
@@ -374,8 +374,8 @@ const sqlite = await createSqliteStore({ path: './assistant.db' });
 const source = createOllamaEmbedder(); // the embedder that produced the existing vectors
 const target = createTransformersJsEmbedder({ model: 'Xenova/multilingual-e5-large' });
 
-// The default sqlite adapter wires the `nextBatch` hook for you via
-// `@graphorin/store-sqlite`; supply your own when using a custom store.
+// `nextBatch` is always caller-supplied: a paging function over the
+// source rows to re-embed. `auto-migrate` throws without it.
 for await (const progress of migrateEmbedder({
   source,
   target,
@@ -390,7 +390,7 @@ for await (const progress of migrateEmbedder({
 |---|---|
 | `lock-on-first` (default) | Refuses any silent embedder swap with an actionable error pointing at the planned migration. |
 | `multi-active` | Keeps both `vec0` tables alive - reads union, writes go to the active embedder. |
-| `auto-migrate` | Re-embeds existing rows in resumable batches (checkpointed via `migration_state`; cancellable with `AbortSignal`). |
+| `auto-migrate` | Re-embeds existing rows in streamed batches within a single run (cancellable with `AbortSignal`; an aborted migration starts again from the beginning - there is no cross-process checkpoint yet). |
 
 ## Context assembly (the six layers)
 

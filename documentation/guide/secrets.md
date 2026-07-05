@@ -54,7 +54,7 @@ A `SecretRef` is a URI of the form `<scheme>:<scheme-specific-part>` that names 
 | `keyring:openai_api_key?service=graphorin` | OS keychain entry (account, optional service prefix). Requires the `@napi-rs/keyring` peer. |
 | `file:///abs/path/to/secret` | File on disk. Optional `?encoding=`, `?warnOnPermissions=0`. |
 | `encrypted-file:/abs/path#key-name` | Entry inside an Argon2id + AES-256-GCM file. |
-| `vault:foo/bar` | Lookup through a registered `MemorySecretsStore` (operator-controlled). |
+| `vault:foo/bar` | Lookup through an operator-registered `VaultAdapter` (`setVaultAdapter(...)` at bootstrap; a packaged `@graphorin/secret-vault` adapter is planned post-MVP, not shipped yet). |
 | `ref:foo` | Indirection through the active `SecretsStore`. |
 | `literal:value` | Inline literal (off by default; opt in explicitly per environment). |
 | `op://<vault>/<item>/<field>` | 1Password CLI reference, via `@graphorin/secret-1password`. |
@@ -109,15 +109,9 @@ A tool that asks for a secret outside its declared ACL fails closed with `Secret
 
 ## Sub-agent inheritance
 
-`agent.toTool({ secretsInheritance, inheritSecrets })` enforces the principle of least authority across multi-agent boundaries:
+Sub-agents do **not** inherit the parent's secret scope, and `agent.toTool(...)` deliberately exposes no secret-forwarding option: a child agent resolves secrets only through its own tools' per-execution ACLs (`withChildToolSecretsContext`), so least authority holds across multi-agent boundaries by construction.
 
-| `secretsInheritance` | Behaviour |
-|---|---|
-| `'inherit-allowlist'` (default) | Sub-agent inherits only the secret refs explicitly listed in `inheritSecrets`. |
-| `'forward-explicit'` | Sub-agent receives only the refs forwarded for this specific call. |
-| `'isolated'` | Sub-agent receives no inherited secrets. |
-
-Every transition writes one audit row.
+Each handoff record stamps the resolved posture in its `inheritedSecrets` field. The `HandoffSecretsInheritance` type reserves `'inherit-allowlist'` / `'forward-explicit'` / `'isolated'` for a future configurable mechanism; today the recorded posture is always `'inherit-allowlist'` with an empty ref list.
 
 ## OS keychain
 
@@ -183,7 +177,7 @@ const apiKey = await resolveSecret('op://Production/Stripe API/credential');
 
 Beyond `serviceAccountToken`, the resolver options also support 1Password **Connect** mode (`connect: { host, token }`, wired through `OP_CONNECT_HOST` / `OP_CONNECT_TOKEN`) and an `account` override for machines signed in to multiple 1Password accounts. The `op` invocation has a hard wall-clock timeout that escalates `SIGTERM` → `SIGKILL`, so a wedged CLI can never hang the resolver.
 
-Errors from the CLI surface as typed `OpResolverError` codes (`'binary-missing'`, `'unauthenticated'`, `'item-not-found'`, …) so your code can react cleanly.
+Errors from the CLI surface as typed `OpCliError` codes (`'binary-missing'`, `'signed-out'`, `'reference-not-found'`, `'timeout'`, `'unknown'`) so your code can react cleanly.
 
 ## Where OAuth tokens live (SPL-1)
 

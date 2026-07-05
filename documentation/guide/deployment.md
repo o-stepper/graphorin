@@ -114,30 +114,35 @@ The `examples/docker/` template ships a multi-stage build that produces a slim i
 ```bash
 docker build -t graphorin:0.5.0 -f examples/docker/Dockerfile .
 docker run -d --name graphorin \
-  -v graphorin-data:/var/lib/graphorin \
-  -p 127.0.0.1:8787:8787 \
-  -e OTLP_URL=https://otel.example.com/v1/traces \
+  --read-only --tmpfs /tmp \
+  --security-opt no-new-privileges \
+  --cap-drop=ALL \
+  -v graphorin-data:/data \
+  -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
+  -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
+  -p 8080:8080 \
   graphorin:0.5.0
 ```
 
-Mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation.
+The image stores its state under `/data` and listens on `8080`; mount the data directory as a named volume so SQLite + the audit log + the secrets store survive container recreation, and mount a `config.json` (the server only reads `--config`) plus the `file:`-referenced secrets under `/run/secrets/graphorin`.
 
 ## Kubernetes
 
 The `examples/k8s/` manifest set runs Graphorin as a non-root pod with:
 
-- a `PersistentVolumeClaim` for the data directory;
-- a `Secret` for the deployment pepper;
-- a `ConfigMap` for the rest of the configuration;
-- a `NetworkPolicy` that pins egress to the configured provider, MCP, and OTLP endpoints only.
+- a single-replica `Deployment` (SQLite is single-writer) with a hardened security context;
+- a `Service` for cluster-internal access;
+- a `ConfigMap` for the server configuration.
+
+Two objects are prerequisites you create out-of-band (the manifest's header comment spells them out): the `graphorin-secrets` `Secret` (deployment pepper + provider keys) and the `graphorin-data` `PersistentVolumeClaim`.
 
 ## GitHub Actions
 
-The `examples/github-actions/` template exercises Graphorin from a CI pipeline - a hermetic `pnpm` install, a stub-provider agent run, a smoke test against the standalone server, and a JSONL session export.
+The `examples/github-actions/` folder ships CI/CD workflow **templates** for a downstream app that embeds Graphorin: a Changesets-based release pipeline (`release.yml`), a security job with dependency audit + Sigstore verification (`security.yml`), and a `renovate.json`. They are starting points to copy into your own repository, not runnable example apps.
 
 ## Health checks
 
-Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The endpoint returns a `200 OK` only when storage, the audit log, the secrets store, and the triggers daemon are all healthy.
+Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The endpoint aggregates the storage, embedder, secrets, encryption, consolidator, triggers, and replay-buffer probes; it answers `200` while the rollup is `ok` or `degraded` and short-circuits to `503` only when a subsystem is `failing`, so probes do not flap on minor degradations.
 
 ## Next steps
 

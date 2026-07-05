@@ -42,7 +42,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 
 | Method | Path | Purpose |
 |---|---|---|
-| `GET` | `/v1/health` | Liveness + readiness summary (probes for storage, audit log, secrets, triggers, encryption). |
+| `GET` | `/v1/health` | Liveness + readiness summary (probes for storage, embedder, secrets, encryption, consolidator, triggers, replay buffer). |
 | `GET` | `/v1/health/secrets` | Authenticated drilldown of the active `SecretsStore`. |
 | `GET` | `/v1/metrics` | Prometheus exposition (path configurable; auth optional). |
 | `GET` | `/v1/agents` | List registered agents. |
@@ -51,7 +51,7 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `POST` | `/v1/agents/:id/stream` | **Starts the run** and returns `202` with `runId` + the WS subject (`agent:<id>/runs/<runId>/events`) the events are emitted on (IP-2). Subscribe over WebSocket; workflow runs use `workflow:<id>/runs/<runId>/events`. |
 | `GET` | `/v1/runs/:runId/state` | Read the current `RunState`. |
 | `POST` | `/v1/runs/:runId/abort` | Abort a run. |
-| `POST` | `/v1/runs/:runId/resume` | Resume a paused run with a directive (Phase 14a stub today). |
+| `POST` | `/v1/runs/:runId/resume` | Answers an honest `501 resume-not-implemented` today (IP-14); resume programmatically via the library `agent.run(state, { directive })`. |
 | `POST` | `/v1/runs/:runId/replay` | Replay a recorded run from the audit / cassette artefacts. |
 | `GET` | `/v1/sessions` | List sessions. |
 | `POST` | `/v1/sessions` | Create a session. |
@@ -195,27 +195,30 @@ Runs are **not** tied to the client connection: a background run started via `PO
 
 ## Health checks
 
-`GET /v1/health` returns:
+`GET /v1/health` returns the rollup, the server version, the uptime, and a per-check breakdown (every check is an object carrying a `status` of `ok` / `warn` / `fail` plus check-specific detail fields):
 
 ```json
 {
   "status": "ok",
   "version": "0.5.0",
+  "uptimeSeconds": 4711,
   "checks": {
-    "storage": "ok",
-    "audit-log": "ok",
-    "secrets": "ok",
-    "triggers": "ok",
-    "providers": { "openai": "ok", "ollama": "unreachable" }
+    "storage": { "status": "ok" },
+    "embedder": { "status": "ok" },
+    "secrets": { "status": "ok" },
+    "encryption": { "status": "ok" },
+    "consolidator": { "status": "ok" },
+    "triggers": { "status": "ok" },
+    "replayBuffer": { "status": "ok" }
   }
 }
 ```
 
-Provider checks are passive - the server never opens an outbound connection it doesn't already have.
+The route answers `200` for both `ok` and `degraded` rollups so liveness probes do not flap on minor degradations (e.g. WAL above the warn threshold); only a `failing` rollup short-circuits with `503`.
 
 ## Prometheus metrics
 
-`GET /metrics` exposes the counters from [Observability](/guide/observability#counters) in Prometheus exposition format, plus the standard process / Node.js metrics.
+`GET /v1/metrics` exposes the `graphorin_*` series from [Observability](/guide/observability#counters) in Prometheus exposition format. The registry deliberately omits the stock process / Node.js collectors - only framework series are emitted.
 
 ## Configuration
 

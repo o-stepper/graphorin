@@ -73,7 +73,7 @@ Fact rows in semantic memory are bi-temporal:
 |---|---|
 | `validFrom` | When the fact became true (defaults to write time). |
 | `validTo` | When the fact ceased to be true (`NULL` = still valid; closed on supersede). |
-| `recordedAt` | When the row was written (immutable). |
+| `createdAt` | When the row was written (immutable; SQL column `created_at`). |
 | `supersededBy` | Pointer to the row that replaced it (when applicable). |
 | `importance` | Soft salience hint in `[0, 1]` used by forgetting (`NULL` = neutral). |
 | `provenance` | Origin tag - `user` / `tool` / `extraction` / `reflection` / `induction` / `imported`. |
@@ -145,7 +145,7 @@ Recommended defaults are `0600` for the secrets store and the audit log, and `06
 
 ## Pluggable adapters
 
-The contracts in `@graphorin/core/contracts` are deliberately small. Build a non-SQLite adapter (Postgres, libSQL, DuckDB, in-memory) by implementing the `MemoryStore`, `EmbeddingStore`, `SessionStore`, `CheckpointStore`, `AuditStore`, and `TriggerStore` interfaces. Existing packages depend only on the contracts.
+The contracts in `@graphorin/core/contracts` are deliberately small. Build a non-SQLite adapter (Postgres, libSQL, DuckDB, in-memory) by implementing the `MemoryStore`, `SessionStore`, `CheckpointStore`, `TriggerStore`, `AuthTokenStore`, `OAuthServerStore`, and `SecretsStore` interfaces (embedding metadata and the audit database are store-sqlite internals, not core contracts). Existing packages depend only on the contracts.
 
 ## Next steps
 

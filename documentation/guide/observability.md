@@ -41,7 +41,7 @@ The tracer **auto-wraps every exporter** with `withValidation(...)` by default -
 The validation layer enforces:
 
 - **Sensitivity-aware filtering.** Spans with sensitivity `'secret'` never leave the process. `'internal'` spans are passed through only if the operator opted in.
-- **PII redaction.** 14 built-in patterns cover credit-card numbers, SSNs, emails, phone numbers, IPv4 / IPv6 addresses, JWT tokens, AWS access keys, GitHub tokens, OpenAI keys, private keys, IBANs, MAC addresses, and bare bearer tokens.
+- **PII redaction.** 14 built-in default-on patterns cover credit-card numbers, US SSNs, emails, E.164 phone numbers, JWTs, bearer and basic-auth headers, private-key PEM blocks, AWS access keys, GitHub tokens, OpenAI / Anthropic / Graphorin tokens, and IBANs. IPv4 / IPv6 address patterns ship opt-in (enable them via `validation.enabledPatterns`).
 - **Per-attribute allowlists.** Configurable per exporter for advanced setups.
 
 ## Sensitivity-aware redaction
@@ -62,19 +62,19 @@ Redaction is **attribute-granular**: an attribute that exceeds the configured fl
 
 You **cannot** disable the validation wrapper. You can:
 
-- extend the pattern catalogue with your own regexes via `withRedaction({ patterns: [...] })`;
-- pin attribute keys to specific sensitivity tags via the `sensitivityMap`;
+- extend the pattern catalogue with your own regexes via `createTracer({ validation: { patterns: [...] } })`;
+- raise or lower the export floor with `validation.minTier`, and toggle individual built-ins via `validation.enabledPatterns` / `validation.disabledPatterns`;
 - add allowlists for specific high-cardinality attributes that are safe.
 
 ## Local console export
 
-For local development, set:
+The repository's example apps read:
 
 ```bash
 GRAPHORIN_TRACE=console
 ```
 
-…and every finished span is pretty-printed to your terminal. The example apps in the repository use this to make iteration fast - see the [Examples](/guide/examples) page.
+…via their shared trace helper (`examples/example-trace-helper`) and pretty-print every finished span to the terminal. The framework itself never reads this variable - it is the example harness's convention, not a `@graphorin/observability` feature; wire an exporter explicitly through `createTracer(...)` to get the same behavior in your app. See the [Examples](/guide/examples) page.
 
 ## OTLP export
 
@@ -132,14 +132,15 @@ The framework targets the published OpenTelemetry GenAI conventions. Common attr
 
 ## Counters
 
-The framework exposes a small set of counters for high-frequency events:
+The framework exposes in-process counters for high-frequency events in two families: `tool.*` (emitted by `@graphorin/tools` - executor invocations/errors/retries, truncation and spill, collision handling, sanitization hits, dataflow decisions, code-mode and streaming activity) and `mcp.*` (emitted by `@graphorin/mcp` - call outcomes, resource-link and structured-content handling, pin mismatches, injection flags, transport lifecycle). A few representative series:
 
 | Counter | Where |
 |---|---|
 | `tool.executor.memory_guard.mismatch.total{toolName,tier}` | A tool's memory-guard verify step disagreed with the snapshot. |
-| `memory.conflict.total{stage,zone}` | Conflict-pipeline decisions per stage / zone. |
-| `provider.stream.error.total{adapter,kind}` | Errors normalised through the provider adapter. |
-| `workflow.checkpoint.total{outcome}` | Checkpoint write outcomes. |
+| `tool.executor.retry.total` | Transparent bounded retry of a rate-limited tool fired. |
+| `tool.inbound.sanitization.hit.total` | An inbound sanitization filter matched tool output. |
+| `mcp.call.tool-error.total` | An MCP tool call returned `isError`. |
+| `mcp.tools.pin-mismatch.total` | A pinned MCP tool's fingerprint drifted (rug-pull defense). |
 
 Counter names are unprefixed in-process (`snapshotCounters()`); add your own namespace prefix at the export boundary if your metrics backend needs one.
 

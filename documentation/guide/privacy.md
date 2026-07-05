@@ -43,7 +43,7 @@ The CI workflow that runs the check is [`.github/workflows/check-no-network.yml`
 | Storage | SQLite file on the user's disk. No remote DB. |
 | Embedder | `@huggingface/transformers` running fully in-process. Models downloaded once on first use. |
 | Provider | None until you configure one. |
-| Tracer | Console exporter (when `GRAPHORIN_TRACE=console` is set) or no exporter at all. |
+| Tracer | No exporter at all until you wire one via `createTracer(...)` (the repository's example apps opt into a console exporter with `GRAPHORIN_TRACE=console`). |
 | Audit log | Encrypted SQLite file on disk. |
 | Secrets | OS keychain (when available). |
 | Updates | Manual. Graphorin never pings npm or any other endpoint to check for new versions. |

@@ -91,9 +91,9 @@ The shared helper `examples/example-trace-helper/` wires the console exporter co
 Four deployment templates live alongside the examples - they're not standalone apps, but reference manifests for shipping the standalone server:
 
 - [`examples/systemd/`](https://github.com/o-stepper/graphorin/tree/main/examples/systemd) - hardened systemd unit.
-- [`examples/docker/`](https://github.com/o-stepper/graphorin/tree/main/examples/docker) - multi-stage Dockerfile + Compose.
+- [`examples/docker/`](https://github.com/o-stepper/graphorin/tree/main/examples/docker) - hardened multi-stage Dockerfile.
 - [`examples/k8s/`](https://github.com/o-stepper/graphorin/tree/main/examples/k8s) - Kubernetes manifest set.
-- [`examples/github-actions/`](https://github.com/o-stepper/graphorin/tree/main/examples/github-actions) - CI workflow that exercises Graphorin end-to-end.
+- [`examples/github-actions/`](https://github.com/o-stepper/graphorin/tree/main/examples/github-actions) - release + security workflow templates for downstream apps.
 
 ## Next steps
 
