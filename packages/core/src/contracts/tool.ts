@@ -174,6 +174,26 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
 }
 
 /**
+ * Existentially-typed {@link Tool} for collection seams (W-100).
+ *
+ * `Tool` is invariant in `TInput` (the `needsApproval` /
+ * `idempotencyKey` predicate properties are contravariant in it), so a
+ * concretely-typed `Tool<{ q: string }, number, D>` is NOT assignable
+ * to `Tool<unknown, unknown, D>` - which forced `as unknown as Tool`
+ * casts wherever tools are collected. `AnyTool` erases `TInput` /
+ * `TOutput` existentially, following the `HandoffEntry` precedent in
+ * `@graphorin/agent`.
+ *
+ * Use it on COLLECTION seams (`createAgent({ tools })`, executor
+ * options, registries); implement tools against the typed `Tool` via
+ * the `tool({...})` factory.
+ *
+ * @stable
+ */
+// biome-ignore lint/suspicious/noExplicitAny: existential TInput/TOutput (see above)
+export type AnyTool<TDeps = unknown> = Tool<any, any, TDeps>;
+
+/**
  * Worked example for a `Tool`. Type-parameterized on the same generics
  * as `Tool`, so a `ToolExample` for `Tool<{ q: string }, { hits: T[] }>`
  * cannot specify an `input` shape that does not match.

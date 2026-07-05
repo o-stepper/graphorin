@@ -9,6 +9,7 @@
 import type {
   AgentEvent,
   AgentResult,
+  AnyTool,
   CheckpointStore,
   HandoffFilter,
   Message,
@@ -86,7 +87,7 @@ export type PrepareStepHook<TDeps = unknown> = (
 /** @stable */
 export interface PrepareStepOverrides<TDeps = unknown> {
   readonly provider?: Provider;
-  readonly tools?: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+  readonly tools?: ReadonlyArray<AnyTool<TDeps>>;
   readonly toolChoice?: ToolChoice;
   readonly temperature?: number;
   readonly maxTokens?: number;
@@ -148,7 +149,7 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
    */
   readonly instructions: string | ((ctx: RunContext<TDeps>) => string | Promise<string>);
   readonly provider: Provider;
-  readonly tools?: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
+  readonly tools?: ReadonlyArray<AnyTool<TDeps>>;
   readonly skills?: SkillsRegistryLike;
   readonly memory?: Memory;
   /**
