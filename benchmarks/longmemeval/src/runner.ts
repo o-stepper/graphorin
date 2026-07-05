@@ -342,7 +342,9 @@ export function createFullContextAgent(
         .flatMap((session) =>
           session.turns.map((turn) => {
             const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
-            return `${turn.role}${stamp}: ${turn.content}`;
+            // W-022: prefer the dataset-native speaker name - LOCOMO
+            // questions reference speakers by name, not by role.
+            return `${turn.speaker ?? turn.role}${stamp}: ${turn.content}`;
           }),
         )
         .join('\n');
@@ -434,7 +436,7 @@ export function createMemorySystemAgent(
         for (const turn of session.turns) {
           const stamp = turn.timestamp !== undefined ? ` [${turn.timestamp}]` : '';
           await memory.semantic.remember(scope, {
-            text: normalizeForFts(`${turn.role}${stamp}: ${turn.content}`),
+            text: normalizeForFts(`${turn.speaker ?? turn.role}${stamp}: ${turn.content}`),
             sensitivity: 'internal',
           });
         }
