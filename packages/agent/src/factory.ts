@@ -13,24 +13,12 @@
  * @packageDocumentation
  */
 
-import { createHash } from 'node:crypto';
 import type {
   AgentEvent,
   AgentResult,
   AISpan,
-  AssistantMessage,
-  CompletedToolCall,
-  HandoffRecord,
   Message,
-  MessageContent,
-  ModelSpec,
-  Provider,
-  ProviderError,
-  ProviderErrorKind,
-  ProviderEvent,
   ProviderRequest,
-  ReasoningContent,
-  ReasoningRetention,
   RunContext,
   RunState,
   RunStep,
@@ -38,865 +26,94 @@ import type {
   Tool,
   ToolApproval,
   ToolCall,
-  ToolChoice,
   ToolDefinition,
-  ToolDefinitionExample,
-  ToolError,
-  ToolExecutionContext,
-  Usage,
 } from '@graphorin/core';
-import { isStepCount, NOOP_LOGGER, NOOP_TRACER, zeroUsage } from '@graphorin/core';
+import { isStepCount, NOOP_TRACER } from '@graphorin/core';
 import type { Memory } from '@graphorin/memory';
 
-/** Return envelope of `ContextEngine.compactNow` (shared splice paths, CE-3). */
-type CompactionEnvelope = Awaited<ReturnType<Memory['contextEngine']['compactNow']>>;
-
-/**
- * Replacement content committed in place of assistant commentary the
- * causality monitor blocked (AG-10). Worded to not match any built-in
- * denial pattern, so the notice itself never re-triggers the monitor.
- */
-const LATERAL_LEAK_BLOCKED_NOTICE =
-  '[graphorin] assistant commentary withheld by the lateral-leak defense.';
-
-import { composeGuardrails } from '@graphorin/security/guardrails';
-import { createReadResultTool, createToolSearchTool } from '@graphorin/tools/built-in';
-import {
-  type CodeExecuteBridge,
-  createCodeExecuteTool,
-  createCodeSearchTool,
-  type ProjectableTool,
-  projectToolApi,
-} from '@graphorin/tools/code-mode';
-import {
-  createToolExecutor,
-  type ExecutorOptions,
-  type ToolExecutor,
-} from '@graphorin/tools/executor';
-import type { ToolRegistry } from '@graphorin/tools/registry';
-import {
-  createDefaultSpillWriter,
-  createFileResultReader,
-  type ResultReader,
-} from '@graphorin/tools/result';
-import { projectSchemaToJsonSchema } from '@graphorin/tools/schema';
 import {
   AgentRuntimeError,
   ConcurrentRunError,
   InvalidAgentConfigError,
   InvalidPreferredModelError,
   MultipleHandoffsInStepError,
-  ToolNotFoundError,
 } from './errors/index.js';
-import { type AgentFallbackPolicy, isAgentFallbackEligible } from './fallback/index.js';
-import {
-  type FanOutResult,
-  type FanOutOptions as RunFanOutOptions,
-  runFanOut,
-} from './fanout/index.js';
-import { type DescribedFilter, filters as filterLib } from './filters/index.js';
+import type { AgentFallbackPolicy } from './fallback/index.js';
+import type { DescribedFilter } from './filters/index.js';
 import { newId } from './internal/ids.js';
 import { InMemoryUsageAccumulator } from './internal/usage-accumulator.js';
 import { CausalityMonitor } from './lateral-leak/causality-monitor.js';
-import { type PreferredModelResolution, resolvePreferredModel } from './preferred-model/index.js';
+import { createProgressIO, type ProgressIO } from './progress/index.js';
+import { addModelUsage } from './run-state/index.js';
 import {
-  createProgressIO,
-  type ProgressIO,
-  type ProgressReadOptions,
-  type ProgressWriteOptions,
-} from './progress/index.js';
-import { addModelUsage, createInitialRunState, serializeRunState } from './run-state/index.js';
+  createCompactMethod,
+  createFanOutMethod,
+  createProgressSurface,
+  createRunMethods,
+} from './runtime/agent-surface.js';
+import { createToTool } from './runtime/agent-to-tool.js';
 import {
-  buildMemoryGuard,
-  buildSecretResolver,
-  buildToolTokenCounter,
-  createExecutorEventBridge,
-  createMemoryRegionReader,
-  type ExecutorEventBridge,
-} from './tooling/adapters.js';
-import { orderPromotedTools } from './tooling/catalogue.js';
-import { buildDataFlowGuard } from './tooling/dataflow.js';
-import { createPlanTool, PLAN_TOOL_NAME, renderPlanRecitation } from './tooling/plan.js';
-import { buildToolArgumentPolicy } from './tooling/policy.js';
-import { buildToolRegistry } from './tooling/registry-build.js';
+  dispatchResumedApprovals,
+  processResumeDirective,
+  type ResumedDispatchEnv,
+  type ResumeRunEnv,
+} from './runtime/approvals.js';
+import { type DispatchRunEnv, dispatchToolBatch } from './runtime/dispatch.js';
+import { wireToolExecution } from './runtime/executor-wiring.js';
+import { type FallbackChainEnv, runProviderFallbackChain } from './runtime/fallback-chain.js';
+import { HANDOFF_TOOL_PREFIX, isDescribedFilter } from './runtime/handoff.js';
+import {
+  accumulateUsage,
+  applyReasoningRetention,
+  countLeadingSystemMessages,
+} from './runtime/messages.js';
+import {
+  type CompactionRunEnv,
+  maybeAutoCompact,
+  noopCompactionResult,
+  type PendingManualCompact,
+  tryEmergencyCompact,
+} from './runtime/run-compaction.js';
+import { createRunFinisher } from './runtime/run-finish.js';
+import {
+  type AssistantCommitEnv,
+  buildStructuredInstruction,
+  type CancellationEnv,
+  commitAssistantMessage,
+  emitCancellation,
+  finalizeRunOutput,
+  type GuardrailScreenEnv,
+  type RunOutputEnv,
+  runVerifierGate,
+  screenInputGuardrails,
+  type VerifierGateEnv,
+} from './runtime/run-gates.js';
+import { initializeRunState, seedInitialMessages } from './runtime/run-init.js';
+import {
+  asMessages,
+  type InternalRunSnapshot,
+  isModelHintLike,
+  isModelSpecLike,
+  type MutableRunState,
+  validatePreferredModel,
+} from './runtime/run-input.js';
+import {
+  buildBaseRequest,
+  resolveStepToolContext,
+  type StepCatalogueEnv,
+  type StepRequestEnv,
+  toolToDefinition,
+} from './runtime/step-catalogue.js';
+import { processStepToolCalls, type ToolCallWalkEnv } from './runtime/tool-call-walk.js';
+import type { ExecutorEventBridge } from './tooling/adapters.js';
 import type {
   AbortOptions,
   Agent,
   AgentCallOptions,
   AgentConfig,
-  AgentFanOutOptions,
   AgentInput,
   AgentProgressIO,
-  AgentToToolOptions,
-  CompactionApiResult,
-  CompactOptions,
-  VerifierResult,
 } from './types.js';
-
-const sha256Hex = (input: string): string =>
-  createHash('sha256').update(input, 'utf8').digest('hex');
-
-const HANDOFF_TOOL_PREFIX = 'transfer_to_';
-
-/** The built-in deferred-discovery tool's stable name (WI-05 / P0-3). */
-const TOOL_SEARCH_NAME = 'tool_search';
-
-/**
- * Register the built-in `tool_search` into `registry` when - and only
- * when - the registry holds at least one deferred tool
- * (`defer_loading: true`). `tool_search` is itself eager (so it is
- * always advertised while a deferred pool exists) and resolvable by the
- * executor like any other tool, so a model can both *see* it in the
- * per-step catalogue and *call* it.
- *
- * No-op when nothing defers (zero overhead - the tool never appears) or
- * when a user tool already occupies the name (the user's tool wins; we
- * never clobber it). Because deferral is decided at registration time
- * (`normaliseTool`), the deferred set is fixed for the life of the
- * registry - this runs once per registry, not per step.
- */
-function registerToolSearch(registry: ToolRegistry, availability?: 'next-step' | 'next-run'): void {
-  if (registry.listDeferred().length === 0) return;
-  if (registry.get(TOOL_SEARCH_NAME) !== undefined) return;
-  registry.register(
-    createToolSearchTool({ registry, ...(availability !== undefined ? { availability } : {}) }),
-    {
-      kind: 'built-in',
-      subsystem: 'tool-discovery',
-    },
-  );
-}
-
-/** The built-in result-handle reader tool's stable name (WI-10 / P1-4). */
-const READ_RESULT_NAME = 'read_result';
-
-/**
- * Register the built-in `read_result` into `registry` when at least one
- * registered tool opts into the `'spill-to-file'` truncation strategy
- * (the sole producer of spill handles today) - or when `force` is set,
- * which the agent passes when an operator wires external result readers
- * (e.g. an MCP `resource_link` reader; WI-13). The tool is eager, so it
- * is advertised alongside the producing tool and the model can fetch a
- * handle back on demand instead of inlining the full blob. No-op when
- * nothing produces handles (zero overhead) or when a user tool already
- * occupies the name (the user's tool wins).
- */
-function registerReadResult(
-  registry: ToolRegistry,
-  reader: ResultReader,
-  opts?: { readonly force?: boolean },
-): void {
-  if (
-    opts?.force !== true &&
-    !registry.list().some((entry) => entry.truncationStrategy === 'spill-to-file')
-  ) {
-    return;
-  }
-  if (registry.get(READ_RESULT_NAME) !== undefined) return;
-  registry.register(createReadResultTool({ reader }), {
-    kind: 'built-in',
-    subsystem: 'result-handle',
-  });
-}
-
-/**
- * Compose result readers into one that tries each in order, returning
- * the first that resolves the handle (WI-13). The spill-file reader is
- * placed first so `graphorin-spill:` handles resolve locally; operator
- * readers (e.g. an MCP resource reader) resolve the rest. Each reader
- * rejects handles it does not own, so resolution falls through cleanly.
- */
-function composeResultReaders(readers: ReadonlyArray<ResultReader>): ResultReader {
-  return {
-    async read(uri, range) {
-      let lastError: unknown;
-      for (const r of readers) {
-        try {
-          return await r.read(uri, range);
-        } catch (err) {
-          lastError = err;
-        }
-      }
-      throw lastError instanceof Error
-        ? lastError
-        : new Error(`No result reader resolved handle ${JSON.stringify(uri)}.`);
-    },
-  };
-}
-
-/** The code-mode meta-tools' stable names (WI-11 / P1-2). */
-const CODE_EXECUTE_NAME = 'code_execute';
-const CODE_SEARCH_NAME = 'code_search';
-
-/** Structural check: is this tool approval-gated (static or predicate form)? */
-const isApprovalGated = (t: { readonly needsApproval?: unknown }): boolean =>
-  t.needsApproval === true || typeof t.needsApproval === 'function';
-
-/**
- * Wire code-mode (P1-2) into `registry`: register the `code_search` /
- * `code_execute` meta-tools and return them as the tools to advertise in
- * place of the full catalogue. The model reaches every other tool through
- * `code_execute`, whose in-script `tools.<name>(args)` calls route back
- * through `quietExecutor.executeOne(...)` under the calling step's
- * `runContext` - so per-tool ACL / sanitization / truncation still apply,
- * exactly as in direct mode. `quietExecutor` carries no `streamingSink`,
- * so the inner calls do not interleave `tool.execute.*` events into the
- * outer stream.
- *
- * Excluded from the code API (`reservedNames`): the meta-tools, the
- * discovery / handle built-ins, handoff tools (which stay first-class
- * provider tools), and - supplied by the caller - any approval-gated
- * tool, since code-mode has no durable-HITL path to suspend mid-script.
- *
- * Returns `[]` (registering nothing) when no real tool is exposable.
- */
-function registerCodeMode(
-  registry: ToolRegistry,
-  quietExecutor: ToolExecutor,
-  reservedNames: ReadonlySet<string>,
-  getRunCapability?: () => 'read-only' | undefined,
-): ReadonlyArray<Tool<unknown, unknown, unknown>> {
-  if (registry.get(CODE_EXECUTE_NAME) !== undefined) return []; // already wired
-  const codeTools = registry
-    .list()
-    .filter((entry) => !reservedNames.has(entry.name) && !isApprovalGated(entry));
-  if (codeTools.length === 0) return [];
-
-  // TL-8: gated tools cannot suspend for HITL mid-script, so they are
-  // excluded from the code API - but VISIBLY: they appear in the
-  // catalogue/search with a call-directly marker, and a bridged call
-  // fails with the same hint instead of an opaque unknown-tool error.
-  const approvalGatedTools = registry
-    .list()
-    .filter((entry) => !reservedNames.has(entry.name) && isApprovalGated(entry))
-    .map((entry) => entry.name);
-  const approvalGatedSet = new Set(approvalGatedTools);
-
-  const allowedTools = [...codeTools.map((entry) => entry.name), ...approvalGatedTools];
-  const allowedSet = new Set(codeTools.map((entry) => entry.name));
-  const eagerProjectable = codeTools.filter(
-    (entry) => entry.__effectiveDeferLoading !== true,
-  ) as unknown as ReadonlyArray<ProjectableTool>;
-  const projection = projectToolApi(eagerProjectable);
-
-  const executeTool: CodeExecuteBridge = async (call, ctx) => {
-    if (approvalGatedSet.has(call.name)) {
-      throw new Error(
-        `${call.name} requires human approval and cannot run inside code_execute - call it directly as a standalone tool call so the run can suspend for the approval.`,
-      );
-    }
-    const runCapability = getRunCapability?.();
-    const completed = await quietExecutor.executeOne({
-      call: { toolCallId: newId('codecall'), toolName: call.name, args: call.args },
-      runContext: ctx.runContext,
-      stepNumber: ctx.runContext.stepNumber,
-      // D2: in-script calls inherit the active run's capability.
-      ...(runCapability !== undefined ? { capability: runCapability } : {}),
-    });
-    const { outcome } = completed;
-    if ('kind' in outcome) throw new Error(`${call.name}: ${outcome.message}`);
-    return outcome.output;
-  };
-
-  const codeSearch = createCodeSearchTool({
-    projection,
-    approvalGatedTools,
-    searchDeferred: async (query, k) =>
-      (await registry.searchDeferred(query, k)).filter((match) => allowedSet.has(match.name)),
-  });
-  const codeExecute = createCodeExecuteTool({
-    projection,
-    allowedTools,
-    executeTool,
-    approvalGatedTools,
-  });
-  registry.register(codeSearch, { kind: 'built-in', subsystem: 'code-mode' });
-  registry.register(codeExecute, { kind: 'built-in', subsystem: 'code-mode' });
-  return [codeSearch, codeExecute] as ReadonlyArray<Tool<unknown, unknown, unknown>>;
-}
-
-/**
- * Fold a completed `tool_search` result into the per-run promotion set:
- * every matched tool name becomes advertised (and thus callable) on the
- * next step. Tolerant of unexpected shapes (e.g. a user-shadowed
- * `tool_search`) - only string `name`s inside a `matches` array promote.
- */
-function recordToolSearchPromotions(output: unknown, promoted: Set<string>): void {
-  if (typeof output !== 'object' || output === null) return;
-  const matches = (output as { readonly matches?: unknown }).matches;
-  if (!Array.isArray(matches)) return;
-  for (const match of matches) {
-    const name = (match as { readonly name?: unknown } | null)?.name;
-    if (typeof name === 'string') promoted.add(name);
-  }
-}
-
-/**
- * Internal mutable view of {@link RunState}. The public type marks
- * most fields `readonly` to guard against accidental mutation by
- * consumers; the runtime owns the lifecycle and writes through
- * this view.
- */
-interface MutableRunState {
-  status: RunState['status'];
-  currentAgentId: string;
-  readonly steps: RunStep[];
-  readonly messages: Message[];
-  readonly pendingApprovals: ToolApproval[];
-  readonly handoffs: HandoffRecord[];
-  usage: Usage;
-  error?: RunState['error'];
-  finishedAt?: string;
-  usageByModel?: RunState['usageByModel'];
-}
-
-interface InternalRunSnapshot<TOutput> {
-  output: TOutput;
-}
-
-function isModelHintLike(value: unknown): boolean {
-  return value === 'fast' || value === 'balanced' || value === 'smart';
-}
-
-function isModelSpecLike(value: unknown): boolean {
-  if (typeof value !== 'object' || value === null) return false;
-  const v = value as Record<string, unknown>;
-  if (typeof v.modelId === 'string' && typeof v.name === 'string') return true;
-  if (typeof v.provider === 'object' && v.provider !== null && typeof v.model === 'string') {
-    return true;
-  }
-  return false;
-}
-
-function validatePreferredModel(value: unknown): void {
-  if (value === undefined) return;
-  if (isModelHintLike(value)) return;
-  if (isModelSpecLike(value)) return;
-  throw new InvalidPreferredModelError(value);
-}
-
-function isMessageObject(value: unknown): value is Message {
-  if (typeof value !== 'object' || value === null) return false;
-  const role = (value as { role?: unknown }).role;
-  return role === 'system' || role === 'user' || role === 'assistant' || role === 'tool';
-}
-
-function isRunStateObject(value: unknown): value is RunState {
-  if (typeof value !== 'object' || value === null) return false;
-  const v = value as Record<string, unknown>;
-  return (
-    typeof v.id === 'string' &&
-    typeof v.agentId === 'string' &&
-    Array.isArray(v.messages) &&
-    Array.isArray(v.steps)
-  );
-}
-
-function asMessages(input: AgentInput | RunState): {
-  readonly seed: Message[];
-  readonly resumed?: RunState;
-} {
-  if (typeof input === 'string') {
-    return { seed: [{ role: 'user', content: input }] };
-  }
-  if (Array.isArray(input)) {
-    return { seed: [...input] as Message[] };
-  }
-  if (isMessageObject(input)) {
-    return { seed: [input] };
-  }
-  if (isRunStateObject(input)) {
-    return { seed: [], resumed: input };
-  }
-  throw new InvalidAgentConfigError(`unrecognized AgentInput shape`);
-}
-
-/**
- * Strip a single Markdown code fence around a JSON payload (AG-3).
- * Models often wrap structured output in ```json fences even when told
- * not to. ReDoS-safe: the info string is matched with `[^\n]*`.
- */
-function stripJsonFence(text: string): string {
-  const trimmed = text.trim();
-  const match = /^```[^\n]*\n([\s\S]*?)\n?```$/.exec(trimmed);
-  return match?.[1] ?? trimmed;
-}
-
-/**
- * The AG-3 fallback instruction: one trailing system message that
- * pins JSON-only output and embeds the wire schema / description.
- * This is the documented structured-output contract for adapters that
- * do not yet consume `ProviderRequest.outputType` natively (PS-24).
- */
-function buildStructuredInstruction(spec: {
-  readonly description?: string;
-  readonly jsonSchema?: Readonly<Record<string, unknown>>;
-}): string {
-  const parts = [
-    'Respond with a single valid JSON value only - no prose, no Markdown code fences.',
-  ];
-  if (spec.description !== undefined && spec.description.length > 0) {
-    parts.push(spec.description);
-  }
-  if (spec.jsonSchema !== undefined) {
-    parts.push(`The JSON MUST conform to this JSON Schema:\n${JSON.stringify(spec.jsonSchema)}`);
-  }
-  return parts.join('\n');
-}
-
-/** Most-recent user-role text in `messages` (for context-engine auto-recall). */
-function lastUserText(messages: ReadonlyArray<Message>): string | undefined {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const m = messages[i];
-    if (m?.role !== 'user') continue;
-    if (typeof m.content === 'string') return m.content;
-    const text = m.content
-      .filter((p): p is { readonly type: 'text'; readonly text: string } => p.type === 'text')
-      .map((p) => p.text)
-      .join(' ');
-    return text.length > 0 ? text : undefined;
-  }
-  return undefined;
-}
-
-/**
- * AG-21: classify a **thrown** provider error into a {@link ProviderErrorKind}
- * so the fallback chain can act on it, instead of flattening every exception to
- * `'unknown'` (which is always fallback-ineligible). Structural - reads the
- * `kind` carried by `@graphorin/provider`'s `GraphorinProviderError` subclasses
- * without importing them, keeping the agent decoupled from the provider package.
- */
-/** Canonical `ProviderErrorKind` values honoured off a thrown error's `errorKind`. */
-const CANONICAL_PROVIDER_ERROR_KINDS: ReadonlySet<string> = new Set([
-  'rate-limit',
-  'capacity',
-  'context-length',
-  'transient',
-  'invalid-request',
-  'unauthorized',
-  'content-filter',
-]);
-
-function classifyThrownProviderErrorKind(cause: unknown): ProviderErrorKind {
-  if (typeof cause === 'object' && cause !== null) {
-    // B1: `ProviderHttpError` carries the canonical mapped kind on
-    // `errorKind` (its `kind` stays the stable 'provider-http'
-    // discriminant) - honour it so a thrown 429 / context overflow is
-    // classified like the structured-event equivalent.
-    const errorKind = (cause as { readonly errorKind?: unknown }).errorKind;
-    if (typeof errorKind === 'string' && CANONICAL_PROVIDER_ERROR_KINDS.has(errorKind)) {
-      return errorKind as ProviderErrorKind;
-    }
-    switch ((cause as { readonly kind?: unknown }).kind) {
-      case 'rate-limit-exceeded':
-        return 'rate-limit';
-    }
-  }
-  return 'unknown';
-}
-
-/** WARN-once keys for schemas the projection cannot read (per process). */
-const unprojectableSchemaWarned = new Set<string>();
-
-/**
- * Resolve a tool's declared schema - plain Zod (v3/v4), `toJSON()`-bearing,
- * or already-JSON-Schema data - to a JSON Schema record via the shared
- * projection (tools-01). Pre-fix this only honoured `toJSON()` and passed
- * everything else through verbatim, so every plain-Zod tool serialised as
- * `{"_def":...}` internals on OpenAI-shaped/Ollama/vercel wire bodies.
- * `undefined` when nothing usable can be projected (caller substitutes a
- * permissive `{}`), with a WARN so the degradation is never silent.
- */
-function projectSchema(
-  raw: unknown,
-  toolName: string,
-  slot: 'input' | 'output',
-): Readonly<Record<string, unknown>> | undefined {
-  return projectSchemaToJsonSchema(raw, {
-    onUnsupported: (detail) => {
-      const key = `${toolName}:${slot}:${detail}`;
-      if (unprojectableSchemaWarned.has(key)) return;
-      unprojectableSchemaWarned.add(key);
-      console.warn(
-        `[graphorin/agent] tool '${toolName}' ${slot} schema: '${detail}' cannot be projected ` +
-          'to JSON Schema - that fragment degrades to a permissive {} on the provider wire body.',
-      );
-    },
-  });
-}
-
-function toolToDefinition(tool: Tool): ToolDefinition {
-  const ts = tool as Tool & {
-    readonly inputSchema?: unknown;
-    readonly outputSchema?: unknown;
-  };
-  const inputSchema = projectSchema(ts.inputSchema, tool.name, 'input') ?? {};
-  // A5: project the output schema so structured-output providers + typed
-  // code-mode see the tool's result shape.
-  const outputSchema = projectSchema(ts.outputSchema, tool.name, 'output');
-  const examples = renderToolExamples(tool);
-  return {
-    name: tool.name,
-    description: tool.description,
-    inputSchema,
-    ...(outputSchema !== undefined ? { outputSchema } : {}),
-    ...(examples !== undefined ? { examples } : {}),
-  };
-}
-
-/**
- * Project a tool's worked `examples` onto the provider wire contract
- * (WI-06 / P2-3). Examples are rendered only when the tool eagerly
- * renders them: the registry resolves the `defer_loading` auto-rule into
- * `examplesEagerlyRendered`, so a deferred tool resolves to `false` and is
- * skipped (its examples stay out of context even once `tool_search`
- * promotes it). `undefined` - the "runtime decides" case for a plain
- * eager tool - renders, since the tool is already advertised this step.
- *
- * Bounded to ≤5 to honour the `ToolExample` `[1,5]` contract even when a
- * tool slipped past the registry's overflow WARN (which does not truncate).
- */
-function renderToolExamples(tool: Tool): ReadonlyArray<ToolDefinitionExample> | undefined {
-  const examples = tool.examples;
-  if (examples === undefined || examples.length === 0) return undefined;
-  if (tool.examplesEagerlyRendered === false) return undefined;
-  return examples.slice(0, 5).map((ex) => ({
-    input: ex.input,
-    output: ex.output,
-    ...(ex.comment !== undefined ? { comment: ex.comment } : {}),
-  }));
-}
-
-const PASSTHROUGH_SCHEMA = {
-  parse: <T>(value: unknown): T => value as T,
-  safeParse: <T>(value: unknown) => ({ success: true as const, data: value as T }),
-  toJSON: (): Record<string, unknown> => ({ type: 'object' }),
-} as const;
-
-function isDescribedFilter(value: unknown): value is DescribedFilter {
-  return (
-    typeof value === 'function' &&
-    'descriptor' in value &&
-    typeof (value as DescribedFilter).descriptor === 'object'
-  );
-}
-
-function buildHandoffTool<TDeps>(target: Agent<TDeps, unknown>): Tool<unknown, unknown, TDeps> {
-  const cfg = target.config;
-  const name = `${HANDOFF_TOOL_PREFIX}${cfg.name}`;
-  const tool: Tool<unknown, unknown, TDeps> = {
-    name,
-    description: `Hand off control to agent '${cfg.name}'.`,
-    inputSchema: PASSTHROUGH_SCHEMA as unknown as Tool<unknown, unknown, TDeps>['inputSchema'],
-    sideEffectClass: 'pure',
-    async execute(): Promise<string> {
-      return `[handoff: ${cfg.name}]`;
-    },
-  };
-  return tool;
-}
-
-function specToProvider(spec: ModelSpec): Provider {
-  if ('provider' in spec) return spec.provider as Provider;
-  return spec as Provider;
-}
-
-interface ToolCallAccumulator {
-  readonly toolCallId: string;
-  toolName: string;
-  argsBuffer: string;
-}
-
-interface ProviderEventOutcome {
-  readonly emit?: AgentEvent;
-  readonly providerError?: ProviderError;
-  readonly usage?: Usage;
-  readonly finished?: boolean;
-}
-
-interface ProviderEventCollector {
-  textBuffer: string;
-  reasoningBuffer: string;
-  reasoningParts: ReasoningContent[];
-  calls: Map<string, ToolCallAccumulator>;
-  finalCalls: ToolCall[];
-}
-
-function handleProviderEvent(
-  ev: ProviderEvent,
-  state: ProviderEventCollector,
-): ProviderEventOutcome {
-  switch (ev.type) {
-    case 'stream-start':
-      return {};
-    case 'reasoning-delta':
-      state.reasoningBuffer += ev.delta;
-      return { emit: { type: 'reasoning.delta', delta: ev.delta } };
-    case 'text-delta':
-      state.textBuffer += ev.delta;
-      return { emit: { type: 'text.delta', delta: ev.delta } };
-    case 'tool-call-start':
-      state.calls.set(ev.toolCallId, {
-        toolCallId: ev.toolCallId,
-        toolName: ev.toolName,
-        argsBuffer: '',
-      });
-      return {
-        emit: {
-          type: 'tool.call.start',
-          toolCallId: ev.toolCallId,
-          toolName: ev.toolName,
-          args: undefined,
-        },
-      };
-    case 'tool-call-input-delta': {
-      const acc = state.calls.get(ev.toolCallId);
-      if (acc !== undefined) acc.argsBuffer += ev.argsDelta;
-      return {
-        emit: { type: 'tool.call.delta', toolCallId: ev.toolCallId, argsDelta: ev.argsDelta },
-      };
-    }
-    case 'tool-call-end': {
-      const acc = state.calls.get(ev.toolCallId);
-      if (acc === undefined) {
-        // AG-26: an end without a matching start has no tool name - the
-        // old path dispatched it as the unknown tool ''. Drop it loudly.
-        process.stderr.write(
-          `[graphorin/agent] dropped tool-call-end '${ev.toolCallId}' with no matching tool-call-start.\n`,
-        );
-        return {};
-      }
-      state.finalCalls.push({
-        toolCallId: ev.toolCallId,
-        toolName: acc.toolName,
-        args: ev.finalArgs,
-      });
-      return {
-        emit: { type: 'tool.call.end', toolCallId: ev.toolCallId, finalArgs: ev.finalArgs },
-      };
-    }
-    // AG-26: provider-generated files / citations are consumer-observable
-    // events instead of silently vanishing.
-    case 'file':
-      return { emit: { type: 'file.generated', mimeType: ev.mimeType, data: ev.data } };
-    case 'source':
-      return {
-        emit: {
-          type: 'source.cited',
-          uri: ev.uri,
-          ...(ev.title !== undefined ? { title: ev.title } : {}),
-        },
-      };
-    case 'finish':
-      return { usage: ev.usage, finished: true };
-    case 'error':
-      return { providerError: ev.error };
-    default: {
-      const _exhaustive: never = ev;
-      void _exhaustive;
-      return {};
-    }
-  }
-}
-
-/**
- * Resolve the effective {@link ReasoningRetention} for a step. The
- * agent-level setting wins over the provider-level default; when
- * neither is supplied, the provider's `reasoningContract`
- * capability drives the default per RB-42 / suggested DEC-158.
- */
-function effectiveReasoningRetention(
-  agentOverride: ReasoningRetention | undefined,
-  provider: Provider,
-): ReasoningRetention {
-  if (agentOverride !== undefined) return agentOverride;
-  const contract = provider.capabilities.reasoningContract;
-  switch (contract) {
-    case 'round-trip-required':
-      return 'pass-through-claude';
-    case 'optional':
-      return 'pass-through-all';
-    case 'hidden':
-      return 'strip';
-    default:
-      return 'strip';
-  }
-}
-
-/**
- * Build the assistant message that the runtime appends to the
- * message buffer after a successful provider call. When the
- * effective {@link ReasoningRetention} is not `'strip'`, the
- * assembled `reasoning` content parts ride along on `content` so
- * the next provider call honours the wire-correct round-trip
- * contract per RB-42.
- */
-function buildAssistantMessage(
-  text: string,
-  reasoningParts: ReadonlyArray<ReasoningContent>,
-  toolCalls: ReadonlyArray<ToolCall>,
-  agentId: string,
-  retention: ReasoningRetention,
-): AssistantMessage {
-  const preserveReasoning = retention !== 'strip' && reasoningParts.length > 0;
-  if (preserveReasoning) {
-    const parts: MessageContent[] = [...reasoningParts];
-    if (text.length > 0) parts.push({ type: 'text', text });
-    return {
-      role: 'assistant',
-      content: parts,
-      ...(toolCalls.length > 0 ? { toolCalls } : {}),
-      agentId,
-    };
-  }
-  return {
-    role: 'assistant',
-    content: text,
-    ...(toolCalls.length > 0 ? { toolCalls } : {}),
-    agentId,
-  };
-}
-
-/**
- * Strip every {@link ReasoningContent} part from each message in
- * the supplied list. Used at the swap point when `prepareStep`
- * downgrades the provider's `reasoningContract` mid-run.
- */
-function stripReasoningFromMessages(messages: Message[]): { stripped: number } {
-  let stripped = 0;
-  for (let i = 0; i < messages.length; i++) {
-    const msg = messages[i];
-    if (msg === undefined) continue;
-    if (msg.role === 'system' || msg.role === 'tool') continue;
-    if (typeof msg.content === 'string') continue;
-    const filtered = msg.content.filter((p) => p.type !== 'reasoning');
-    if (filtered.length === msg.content.length) continue;
-    stripped += msg.content.length - filtered.length;
-    if (msg.role === 'assistant') {
-      messages[i] = { ...msg, content: filtered };
-    } else {
-      messages[i] = { ...msg, content: filtered };
-    }
-  }
-  return { stripped };
-}
-
-/**
- * Count the leading contiguous run of `system` messages in the initial
- * buffer - the trusted, KV-cache-stable instruction prefix. Captured
- * once at run start (WI-09 / P1-1): auto-compaction summarises only the
- * messages after this prefix, so the prefix stays byte-identical across
- * every step (the provider's cache breakpoint is real) and a long run
- * never re-pays for the system prompt.
- *
- * The length is fixed for the run rather than re-derived per compaction
- * on purpose: each compaction inserts its summary as a `system` message
- * right after the prefix, so re-scanning the leading run would absorb
- * that summary into the prefix and shield it from the next compaction -
- * summaries would stack unbounded. Pinning the original length keeps
- * each prior summary inside the compactable body, where the next pass
- * folds it into a fresh summary-of-summary.
- */
-/**
- * Marker prefix stamped on every compaction summary (see the memory
- * package's summary template). context-engine-05: the prefix scan must
- * stop at it - after a compact-then-suspend cycle the summary is a
- * SYSTEM message sitting right after the true prefix, and counting it
- * in would pin it (and every later summary) outside the compactable
- * window forever, growing the uncompactable prefix by one summary per
- * cycle.
- */
-const COMPACTION_SUMMARY_MARKER = '<graphorin_compaction_summary';
-
-function countLeadingSystemMessages(messages: ReadonlyArray<Message>): number {
-  let i = 0;
-  while (i < messages.length) {
-    const msg = messages[i];
-    if (msg?.role !== 'system') break;
-    if (typeof msg.content === 'string' && msg.content.startsWith(COMPACTION_SUMMARY_MARKER)) {
-      break;
-    }
-    i += 1;
-  }
-  return i;
-}
-
-/**
- * Immutable usage sum. Optional token fields (reasoning + prompt-cache
- * legs, core-provider-02) appear in the result only when at least one
- * side carries them, so pre-cache serialized shapes stay byte-identical.
- */
-/**
- * D6: assemble the per-step request messages. Trailing, request-only
- * additions ride the LAST prompt-cache anchor and never touch the shared
- * `messages` buffer or the persisted RunState: the structured-output
- * instruction (AG-3) and the attention-recitation plan block are both
- * appended here, in that order, so the stable prompt prefix is unchanged
- * and only the small trailing tail is re-sent each step.
- */
-function buildStepMessages(
-  messages: ReadonlyArray<Message>,
-  structuredInstruction: string | undefined,
-  todos: ReadonlyArray<import('@graphorin/core').TodoItem> | undefined,
-): Message[] {
-  const out: Message[] = [...messages];
-  if (structuredInstruction !== undefined) {
-    out.push({ role: 'system', content: structuredInstruction });
-  }
-  const recitation = renderPlanRecitation(todos);
-  if (recitation !== null) {
-    out.push({ role: 'system', content: recitation });
-  }
-  return out;
-}
-
-function addUsage(a: Usage, b: Usage): Usage {
-  const optional = (x: number | undefined, y: number | undefined): number | undefined =>
-    x === undefined && y === undefined ? undefined : (x ?? 0) + (y ?? 0);
-  const reasoningTokens = optional(a.reasoningTokens, b.reasoningTokens);
-  const cachedReadTokens = optional(a.cachedReadTokens, b.cachedReadTokens);
-  const cacheWriteTokens = optional(a.cacheWriteTokens, b.cacheWriteTokens);
-  return {
-    promptTokens: a.promptTokens + b.promptTokens,
-    completionTokens: a.completionTokens + b.completionTokens,
-    totalTokens: a.totalTokens + b.totalTokens,
-    ...(reasoningTokens !== undefined ? { reasoningTokens } : {}),
-    ...(cachedReadTokens !== undefined ? { cachedReadTokens } : {}),
-    ...(cacheWriteTokens !== undefined ? { cacheWriteTokens } : {}),
-  };
-}
-
-/**
- * C3: render a ToolError for the model. The first line keeps the
- * long-standing `Error: <message>` shape; a bracketed second line carries
- * the typed kind + the recovery envelope, which is what actually changes
- * model behaviour after a failure (retry vs. fix args vs. give up).
- */
-function renderToolErrorMessage(error: ToolError): string {
-  const parts: string[] = [`kind: ${error.kind}`];
-  if (error.recoverable !== undefined) {
-    parts.push(error.recoverable ? 'recoverable: yes' : 'recoverable: no');
-  }
-  if (error.recoveryHint !== undefined) parts.push(`suggested action: ${error.recoveryHint}`);
-  if (error.hint !== undefined) parts.push(error.hint);
-  return `Error: ${error.message}\n[${parts.join('; ')}]`;
-}
-
-/** In-place variant of {@link addUsage} for mutable accumulators. */
-function accumulateUsage(target: Usage, delta: Usage): void {
-  target.promptTokens += delta.promptTokens;
-  target.completionTokens += delta.completionTokens;
-  target.totalTokens += delta.totalTokens;
-  if (delta.reasoningTokens !== undefined) {
-    target.reasoningTokens = (target.reasoningTokens ?? 0) + delta.reasoningTokens;
-  }
-  if (delta.cachedReadTokens !== undefined) {
-    target.cachedReadTokens = (target.cachedReadTokens ?? 0) + delta.cachedReadTokens;
-  }
-  if (delta.cacheWriteTokens !== undefined) {
-    target.cacheWriteTokens = (target.cacheWriteTokens ?? 0) + delta.cacheWriteTokens;
-  }
-}
 
 /**
  * Build a fresh {@link Agent} from the supplied configuration.
@@ -974,246 +191,38 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   let runInFlight = false;
   const externalEventQueue: AgentEvent<TOutput>[] = [];
 
-  /**
-   * Manual-compaction requests enqueued by `agent.compact()` (CE-3 /
-   * AG-13). The run loop owns the live message buffer, so the splice
-   * must happen inside the loop: `maybeAutoCompact` services the queue
-   * at the next step boundary, and `finishRun` settles leftovers as
-   * explicit no-ops.
-   */
-  interface PendingManualCompact {
-    readonly options: CompactOptions | undefined;
-    readonly resolve: (result: CompactionApiResult) => void;
-    readonly reject: (cause: unknown) => void;
-  }
   const pendingManualCompacts: PendingManualCompact[] = [];
-
-  const noopCompactionResult = (
-    skippedReason: NonNullable<CompactionApiResult['skippedReason']>,
-  ): CompactionApiResult => ({
-    beforeTokens: 0,
-    afterTokens: 0,
-    summaryTokens: 0,
-    durationMs: 0,
-    hooksFiredCount: 0,
-    summary: '',
-    applied: false,
-    skippedReason,
-  });
 
   const memory: Memory | undefined = config.memory;
   const progressIO: ProgressIO = createProgressIO({
     ...(config.sensitivity !== undefined ? { defaultSensitivity: config.sensitivity } : {}),
   });
 
-  // Assemble the unified tool registry at warm-up (Principle #12): one
-  // registry across first-party + skill sources, with deterministic
-  // cross-source collision resolution. Exposed read-only as
-  // `agent.registry`; the run loop and `tool_search` consume it. The
-  // registry is the tool-validation authority, so a malformed tool
-  // fails fast here at construction.
-  const toolRegistry = buildToolRegistry({
-    ...(config.tools !== undefined
-      ? { tools: config.tools as ReadonlyArray<Tool<unknown, unknown, unknown>> }
-      : {}),
-    ...(config.skills !== undefined ? { skills: config.skills } : {}),
-  }).registry;
-
-  // WI-05 (deferred loading + tool_search / P0-3): if any registered
-  // tool sets `defer_loading: true`, register the built-in `tool_search`
-  // so the model can discover those tools on demand. Tools that defer are
-  // withheld from the per-step catalogue (see the loop below) until a
-  // `tool_search` match promotes them, keeping large tool sets out of the
-  // context window. When nothing defers this is a no-op.
-  registerToolSearch(
+  // Warm-up tool stack (Principle #12 / WI-03 / WI-05 / WI-10 / WI-11 /
+  // WI-13 / D6): registry assembly, built-in registration (tool_search,
+  // plan, read_result), guard hooks, the shared ToolExecutor factory and
+  // the code-mode surface - wired in `runtime/executor-wiring.ts`. The
+  // registry is exposed read-only as `agent.registry`.
+  const executorBridgeSlot: { current: ExecutorEventBridge | undefined } = { current: undefined };
+  const {
     toolRegistry,
-    config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
-  );
-
-  // D6: opt-in structured plan tool (TodoWrite-style, journaled). It
-  // mutates the ACTIVE run's todos through a closure; attention
-  // recitation renders them back into each step's request copy.
-  if (config.plan === true && toolRegistry.get(PLAN_TOOL_NAME) === undefined) {
-    toolRegistry.register(
-      createPlanTool((todos) => {
-        if (activeRunState !== undefined) {
-          (activeRunState as { todos?: ReadonlyArray<import('@graphorin/core').TodoItem> }).todos =
-            todos;
-        }
-      }) as unknown as Parameters<typeof toolRegistry.register>[0],
-      { kind: 'built-in', subsystem: 'planning' },
-    );
-  }
-
-  // WI-10 (result references / handles / P1-4): construct one spill
-  // writer + reader pair at warm-up. The writer is handed to the executor
-  // so a tool's `'spill-to-file'` truncation strategy externalises large
-  // bodies to disk (0600, run-scoped); the reader - over the *same*
-  // artifact root - backs the built-in `read_result` tool so the model can
-  // page through a spilled artifact on demand instead of inlining the
-  // whole blob. `read_result` is registered only when some tool spills.
-  const spillWriter = createDefaultSpillWriter();
-  const fileResultReader = createFileResultReader({ artifactRoot: spillWriter.artifactRoot });
-  // WI-13 (P2-2): compose any operator-supplied result readers (e.g. an
-  // MCP resource reader from `createMcpResourceReader`, for resolving
-  // `resource_link` handles) after the spill-file reader. `read_result`
-  // then pages both `graphorin-spill:` artifacts and external handles,
-  // and is force-registered when external readers exist (even if no tool
-  // spills) so those handles are resolvable.
-  const externalResultReaders = config.resultReaders ?? [];
-  const resultReader: ResultReader =
-    externalResultReaders.length === 0
-      ? fileResultReader
-      : composeResultReaders([fileResultReader, ...externalResultReaders]);
-  registerReadResult(toolRegistry, resultReader, { force: externalResultReaders.length > 0 });
-
-  // Construct the unified ToolExecutor once at warm-up (WI-03 / P0-1),
-  // bound to the registry above. Routing tool execution through the
-  // executor activates the documented tool fields the inline loop
-  // bypassed: per-tool `secretsAllowed` ACL, result truncation
-  // (`maxResultTokens` / `truncationStrategy`), inbound sanitization,
-  // memory-guard, idempotency keys and single-round repair.
-  //
-  // Durable HITL stays in the agent: approval is pre-screened below and
-  // suspends the run, so the executor's `ApprovalGate` only ever sees
-  // no-approval / pre-approved calls - it auto-grants and never blocks
-  // the generator (Adapter G).
-  //
-  // Sandbox note: `config.tools` are inline `tool({...})` closures that
-  // cannot be serialised to an out-of-process sandbox, and
-  // `resolveSandbox` defaults user-defined tools to `worker-threads`.
-  // Wiring a resolver that returned a real sandbox for that kind would
-  // break every inline tool, so `sandboxResolver` is intentionally left
-  // unset (the executor then runs inline - its documented fallback).
-  // The resolved policy is still surfaced on the tool-execute span /
-  // audit; real isolation applies to module-loadable (skill / MCP)
-  // tools and is wired when those land.
-  let activeExecutorBridge: ExecutorEventBridge | undefined;
-  const toolApprovalGate: NonNullable<ExecutorOptions['approvalGate']> = {
-    request: async () => ({ granted: true }),
-  };
-  const toolSecretResolver = buildSecretResolver();
-  const toolTokenCounter = buildToolTokenCounter();
-  // SDF-1: when memory is wired, bind a scope-aware region reader so the
-  // executor's DEC-153 snapshot/verify cycle actually runs (the scope
-  // resolves lazily from the in-flight run - the executor only invokes
-  // the reader mid-run). Without memory the guard tiers stay skipped,
-  // and a one-time WARN below makes that silent no-op visible.
-  const memoryGuardWiring = buildMemoryGuard(
+    spillWriter,
+    resultReader,
+    makeToolExecutor,
+    toolExecutor,
+    toolDataFlowGuard,
+    ruleOfTwoCapabilityFloor,
+    isCodeMode,
+    codeModeAdvertised,
+  } = wireToolExecution<TDeps, TOutput>({
+    config,
     memory,
-    memory === undefined
-      ? {}
-      : {
-          regionReader: createMemoryRegionReader(['working'], async (region) => {
-            if (region !== 'working') return '';
-            const scope = {
-              userId: activeRunState?.userId ?? agentId,
-              ...(activeRunState?.sessionId !== undefined
-                ? { sessionId: activeRunState.sessionId }
-                : {}),
-              agentId,
-            };
-            const working = (
-              memory as unknown as {
-                working?: { compile?: (s: unknown, a?: string) => Promise<string> };
-              }
-            ).working;
-            if (working?.compile === undefined) return '';
-            try {
-              return await working.compile(scope, agentId);
-            } catch {
-              // The reader is best-effort: a failed region read must not
-              // turn the guard step into a run failure.
-              return '';
-            }
-          }),
-        },
-  );
-  const toolMemoryGuardFactory = memoryGuardWiring.memoryGuardFactory;
-  if (memory === undefined) {
-    const guarded = (config.tools ?? []).filter((t) => t.memoryGuardTier !== undefined);
-    if (guarded.length > 0) {
-      console.warn(
-        `[graphorin/agent] ${guarded.length} tool(s) declare memoryGuardTier but no memory is wired - ` +
-          'the DEC-153 snapshot/verify guard is skipped (SDF-1). Wire `memory` to activate it.',
-      );
-    }
-  }
-  // Provenance / data-flow guard (WI-12 / P1-3, opt-in). Built once and
-  // shared by every executor (direct + code-mode quiet), so the sink gate
-  // and taint recording apply uniformly. Off unless configured with a
-  // non-`'off'` mode - zero overhead on the default path.
-  const toolDataFlowGuard =
-    config.dataFlowPolicy !== undefined && config.dataFlowPolicy.mode !== 'off'
-      ? buildDataFlowGuard(config.dataFlowPolicy)
-      : undefined;
-  // D4 Progent tool-argument policy + Rule-of-Two floor. `ruleOfTwo`
-  // compiles to a policy (+ a read-only capability floor when it denies
-  // external side effects); an explicit `toolPolicy` composes on top
-  // (its rules are appended, so an explicit forbid still wins). Built
-  // once, shared by every executor.
-  const { guard: toolArgumentPolicyGuard, capabilityFloor: ruleOfTwoCapabilityFloor } =
-    buildToolArgumentPolicy(config.toolPolicy, config.ruleOfTwo);
-  const toolStreamingSink: NonNullable<ExecutorOptions['streamingSink']> = (event) =>
-    activeExecutorBridge?.sink(event);
-  // `quiet` builds an executor without the streaming sink - used for
-  // code-mode's in-script tool calls (WI-11), whose `tool.execute.*`
-  // events must not interleave into the outer agent stream.
-  const makeToolExecutor = (
-    registry: ToolRegistry,
-    opts?: { readonly quiet?: boolean },
-  ): ToolExecutor =>
-    createToolExecutor({
-      registry,
-      approvalGate: toolApprovalGate,
-      secretResolver: toolSecretResolver,
-      tokenCounter: toolTokenCounter,
-      memoryGuardFactory: toolMemoryGuardFactory,
-      ...(memoryGuardWiring.memoryRegionReader !== undefined
-        ? { memoryRegionReader: memoryGuardWiring.memoryRegionReader }
-        : {}),
-      spill: spillWriter,
-      ...(toolDataFlowGuard !== undefined ? { dataFlowGuard: toolDataFlowGuard } : {}),
-      ...(toolArgumentPolicyGuard !== undefined ? { argumentPolicy: toolArgumentPolicyGuard } : {}),
-      ...(opts?.quiet === true ? {} : { streamingSink: toolStreamingSink }),
-      ...(config.maxParallelTools !== undefined
-        ? { maxParallelTools: config.maxParallelTools }
-        : {}),
-      ...(config.toolRetry !== undefined ? { retry: config.toolRetry } : {}),
-    });
-  const toolExecutor = makeToolExecutor(toolRegistry);
-
-  // Code-mode (WI-11 / P1-2, opt-in): advertise only the `code_search` /
-  // `code_execute` meta-tools and let the model orchestrate tools inside a
-  // sandbox, so intermediate results stay out of context. A quiet executor
-  // backs the in-script tool bridge (same per-tool governance as direct
-  // mode). `read_result` is registered after the meta-tools because
-  // `code_execute` opts into `'spill-to-file'`, so a large final result can
-  // be fetched back on demand. Default `'direct'` mode leaves all of this
-  // untouched - `codeModeAdvertised` stays empty and the loop is unchanged.
-  const isCodeMode = config.toolInvocation === 'code-mode';
-  let codeModeAdvertised: ReadonlyArray<Tool<unknown, unknown, TDeps>> = [];
-  if (isCodeMode) {
-    const reserved = new Set<string>([
-      CODE_EXECUTE_NAME,
-      CODE_SEARCH_NAME,
-      TOOL_SEARCH_NAME,
-      READ_RESULT_NAME,
-      ...handoffMap.keys(),
-    ]);
-    const metas = registerCodeMode(
-      toolRegistry,
-      makeToolExecutor(toolRegistry, { quiet: true }),
-      reserved,
-      () => activeRunCapability,
-    );
-    registerReadResult(toolRegistry, resultReader);
-    const readResult = toolRegistry.get(READ_RESULT_NAME);
-    codeModeAdvertised = [
-      ...metas,
-      ...(readResult !== undefined ? [readResult] : []),
-    ] as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
-  }
+    agentId,
+    handoffToolNames: handoffMap.keys(),
+    getActiveRunState: () => activeRunState,
+    getActiveRunCapability: () => activeRunCapability,
+    executorBridgeSlot,
+  });
 
   const causalityMonitor = config.causalityMonitor
     ? new CausalityMonitor(config.causalityMonitor)
@@ -1296,45 +305,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     }
 
     const usageAcc = new InMemoryUsageAccumulator();
-    const baseState: RunState = resumed
-      ? resumed
-      : createInitialRunState({
-          id: newId('run'),
-          agentId,
-          sessionId,
-          ...(userId !== undefined ? { userId } : {}),
-        });
-    // Mutable view (the public RunState is `readonly` but the runtime
-    // owns the lifecycle; cast to a writable shape here).
-    const state = baseState as RunState as unknown as MutableRunState & RunState;
+    // Bootstrap the run state, the AG-19 security rehydration and the
+    // `tool_search` promotion set (see `runtime/run-init.ts`).
+    const { state, promotedDeferred, runStartPromotions } = initializeRunState<TDeps, TOutput>(
+      { config, agentId, sessionId, userId, toolDataFlowGuard },
+      resumed,
+    );
     activeRunState = state;
-
-    // AG-19: rehydrate the run-scoped security state BEFORE any tool runs this
-    // resume. Seeding the data-flow ledger with the persisted coarse taint
-    // summary keeps an enforce-mode sink gated across the suspend/resume
-    // boundary (the promoted-tool set is restored below, once it exists).
-    if (resumed && state.taintSummary !== undefined) {
-      toolDataFlowGuard?.seedLedger(state.id, state.taintSummary);
-    }
-
-    // WI-05: deferred tools promoted by a `tool_search` call this run.
-    // Membership grows as the model discovers tools and gates which
-    // deferred entries the per-step catalogue advertises. TL-7/AG-19:
-    // persisted onto `RunState.promotedTools` at every exit and
-    // rehydrated here, so a resumed run keeps its discoveries.
-    const promotedDeferred = new Set<string>();
-    // AG-19: restore deferred tools promoted by `tool_search` before the suspend
-    // so they remain in the per-step catalogue after a resume.
-    if (resumed && state.promotedTools !== undefined) {
-      for (const name of state.promotedTools) promotedDeferred.add(name);
-    }
-    // C1: under `toolPromotion: 'run-boundary'` the advertised catalogue is
-    // frozen to the promotions known at run start (incl. those restored
-    // above), keeping the provider prompt cache byte-stable for the whole
-    // run. New promotions still land in `promotedDeferred` (and persist),
-    // taking effect on the next run / resume.
-    const runStartPromotions =
-      config.toolPromotion === 'run-boundary' ? new Set(promotedDeferred) : undefined;
 
     // agent-08 (F4): capture the run-scoped security state on EVERY exit
     // through finishRun - not just the approval suspend. An 'aborted' run
@@ -1358,60 +335,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
 
     const messages: Message[] = resumed ? [...state.messages] : [];
     if (!resumed) {
-      // Inject the agent's system prompt at the top of the buffer
-      // exactly once per run, before any seed messages.
-      const instructionsRaw = config.instructions;
-      // AG-8: resolve the function form of `instructions` (sync or async). It is
-      // resolved ONCE per run (the per-run contract documented on `AgentConfig`),
-      // against a RunContext snapshot at step 0; the result is pinned as the
-      // run's system-prompt prefix. A function that previously returned nothing
-      // observable now actually seeds the system message.
-      let instructionsText: string;
-      if (typeof instructionsRaw === 'string') {
-        instructionsText = instructionsRaw;
-      } else {
-        const instructionsCtx: RunContext<TDeps> = {
-          runId: state.id,
-          sessionId,
-          ...(userId !== undefined ? { userId } : {}),
-          agentId,
-          deps: (options.deps ?? config.deps) as TDeps,
-          tracer,
-          signal,
-          usage: usageAcc,
-          stepNumber: 0,
-          messages,
-          state,
-        };
-        instructionsText = await instructionsRaw(instructionsCtx);
-      }
-      let systemPrompt = instructionsText;
-      if (config.autoAssembleContext === true && memory !== undefined) {
-        // CE-1 (opt-in): build the memory-aware 6-layer system prompt via the
-        // context engine. The instructions become Layer 2; the engine prepends
-        // the memory base and appends working blocks, procedural rules, skill
-        // cards, the metadata counts, and (when `factsAutoRecall` is configured)
-        // auto-recalled facts. Default-off keeps the explicit memory-tools
-        // pattern, so the system prompt is `instructions` alone.
-        const lastUser = lastUserText(seed);
-        const assembled = await memory.contextEngine.assemble(memory, {
-          scope: { userId: userId ?? agentId, sessionId, agentId },
-          agentId,
-          sessionId,
-          runId: state.id,
-          ...(instructionsText.length > 0 ? { agentInstructions: instructionsText } : {}),
-          ...(lastUser !== undefined ? { lastUserMessage: lastUser } : {}),
-        });
-        systemPrompt = assembled.systemMessage.content;
-      }
-      if (systemPrompt.length > 0) {
-        messages.push({ role: 'system', content: systemPrompt });
-      }
-      messages.push(...seed);
-      // Mirror the assembled messages into RunState so the JSONL
-      // session export and any downstream consumers see what the
-      // agent saw.
-      for (const m of messages) state.messages.push(m);
+      // Fresh run: resolve `instructions` (AG-8), optionally assemble
+      // the memory-aware system prompt (CE-1), and seed the buffer +
+      // RunState mirror (see `runtime/run-init.ts`).
+      await seedInitialMessages<TDeps, TOutput>(
+        { config, options, memory, agentId, sessionId, userId, tracer, signal, usageAcc, state },
+        messages,
+        seed,
+      );
     }
 
     const finalSnapshot: InternalRunSnapshot<TOutput> = {
@@ -1445,34 +376,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // when first submitted.
     const inputGuards = config.guardrails?.input;
     if (!resumed && inputGuards !== undefined && inputGuards.length > 0) {
-      for (let i = 0; i < messages.length; i++) {
-        const msg = messages[i];
-        if (msg === undefined || msg.role !== 'user' || typeof msg.content !== 'string') continue;
-        const composed = await composeGuardrails(inputGuards, msg.content, {
-          stage: 'input',
-          runId: state.id,
-          sessionId,
-          agentId,
-        });
-        if (!composed.ok) {
-          yield {
-            type: 'guardrail.tripped',
-            guardrailName: composed.name,
-            phase: 'input',
-            reason: composed.message,
-          };
-          const message = `input guardrail '${composed.name}' blocked the run: ${composed.message}`;
-          yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
-          state.status = 'failed';
-          state.error = { message, code: 'guardrail-blocked' };
-          return yield* finishRun(state, finalSnapshot);
-        }
-        if (composed.value !== msg.content) {
-          const rewritten: Message = { ...msg, content: composed.value };
-          const stateIdx = state.messages.indexOf(msg);
-          messages[i] = rewritten;
-          if (stateIdx !== -1) state.messages[stateIdx] = rewritten;
-        }
+      const blocked = yield* screenInputGuardrails<TOutput>(
+        { state, messages, sessionId, agentId },
+        inputGuards,
+      );
+      if (blocked) {
+        return yield* finishRun(state, finalSnapshot);
       }
     }
 
@@ -1490,15 +399,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // kept so the write-ahead intent checkpoint can re-attach them to
     // `pendingApprovals` (a crash-retry against the intent re-dispatches).
     const grantedApprovals: ToolApproval[] = [];
-    // Step-journal: tool calls already completed on a prior resume are recorded
-    // in the journal (`state.steps`); a re-resume must not run their side effects
-    // again. Collect their ids so an approved call already journaled is replayed,
-    // not re-executed (exactly-once; AG-1).
-    const journaledCallIds = new Set<string>();
-    for (const step of state.steps) {
-      for (const completed of step.toolCalls) journaledCallIds.add(completed.call.toolCallId);
-    }
-
     // Process resume directive - apply approval decisions to any
     // pending approvals captured in the previous suspend.
     if (
@@ -1506,66 +406,12 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       options.directive?.approvals !== undefined &&
       state.pendingApprovals.length > 0
     ) {
-      const decisions = new Map(options.directive.approvals.map((d) => [d.toolCallId, d]));
-      const stillPending: ToolApproval[] = [];
-      for (const approval of state.pendingApprovals) {
-        const decision = decisions.get(approval.toolCallId);
-        if (decision === undefined) {
-          stillPending.push(approval);
-          continue;
-        }
-        if (decision.granted) {
-          yield {
-            type: 'tool.approval.granted',
-            toolCallId: approval.toolCallId,
-          };
-          // Step-journal: if this approved call already ran on a prior resume -
-          // journaled in `state.steps` with its result still in the message
-          // buffer - replay it instead of running the side effect again
-          // (exactly-once across re-resumes). If the journal entry exists but its
-          // result message was lost, fall through to a single re-execution (the
-          // documented "at most one re-execution" bound).
-          if (
-            journaledCallIds.has(approval.toolCallId) &&
-            messages.some((m) => m.role === 'tool' && m.toolCallId === approval.toolCallId)
-          ) {
-            continue;
-          }
-          // AG-1: queue the approved call for REAL execution (dispatched
-          // below). It runs through the same ToolExecutor as any other tool
-          // call - taint / audit / result recording - instead of pushing a
-          // "[not actually executed]" placeholder that left the gated side
-          // effect unreachable.
-          resumedApprovedCalls.push({
-            toolCallId: approval.toolCallId,
-            toolName: approval.toolName,
-            args: approval.args,
-          });
-          grantedApprovals.push(approval);
-        } else {
-          yield {
-            type: 'tool.approval.denied',
-            toolCallId: approval.toolCallId,
-            ...(decision.reason !== undefined ? { reason: decision.reason } : {}),
-          };
-          messages.push({
-            role: 'tool',
-            toolCallId: approval.toolCallId,
-            content: `Error: tool approval denied${decision.reason ? `: ${decision.reason}` : ''}`,
-          });
-          state.messages.push({
-            role: 'tool',
-            toolCallId: approval.toolCallId,
-            content: `Error: tool approval denied${decision.reason ? `: ${decision.reason}` : ''}`,
-          });
-        }
-      }
-      // Clear the queue + restore the running status so the loop
-      // resumes from where it paused.
-      state.pendingApprovals.splice(0, state.pendingApprovals.length, ...stillPending);
-      if (stillPending.length === 0) {
-        state.status = 'running';
-      }
+      yield* processResumeDirective<TOutput>(
+        { state, messages },
+        options.directive.approvals,
+        resumedApprovedCalls,
+        grantedApprovals,
+      );
     }
     // AG-14: the resumed status is left untouched here. A 'failed' run is NOT
     // silently rewritten to 'completed' (the terminal/suspended guard below
@@ -1593,6 +439,74 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       state,
     };
 
+    const handoffNames = Array.from(handoffMap.keys());
+
+    /**
+     * One run-scoped env threaded into every extracted runtime module
+     * (issue #23): the intersection structurally satisfies each
+     * module's env interface, so a single object carries the live loop
+     * references the former closures captured (field names mirror the
+     * original locals). `getPendingAbort` / `getActiveTodos` are live
+     * reads of the factory's mutable scratch; `tryEmergencyCompact` and
+     * `dispatchBatch` are pre-bound to this same env.
+     */
+    type RunLoopEnv = DispatchRunEnv &
+      CompactionRunEnv &
+      CancellationEnv &
+      GuardrailScreenEnv &
+      AssistantCommitEnv &
+      FallbackChainEnv<TOutput> &
+      StepCatalogueEnv<TDeps, TOutput> &
+      StepRequestEnv<TDeps, TOutput> &
+      ToolCallWalkEnv<TDeps, TOutput> &
+      ResumeRunEnv &
+      ResumedDispatchEnv<TDeps, TOutput> &
+      VerifierGateEnv<TDeps, TOutput> &
+      RunOutputEnv<TDeps, TOutput>;
+    const runEnv: RunLoopEnv = {
+      config,
+      options,
+      memory,
+      state,
+      messages,
+      sessionId,
+      agentId,
+      userId,
+      signal,
+      stopWhen,
+      fallbackPolicy,
+      structuredInstruction,
+      systemPrefixLength,
+      runContextBase,
+      handoffMap,
+      handoffNames,
+      isCodeMode,
+      toolRegistry,
+      toolExecutor,
+      makeToolExecutor,
+      resultReader,
+      codeModeAdvertised,
+      causalityMonitor,
+      toolDataFlowGuard,
+      promotedDeferred,
+      runStartPromotions,
+      activeRunCapability,
+      executorBridgeSlot,
+      pendingManualCompacts,
+      getPendingAbort: () => pendingAbort,
+      getActiveTodos: () => activeRunState?.todos,
+      tryEmergencyCompact: () => tryEmergencyCompact<TOutput>(runEnv),
+      dispatchBatch: (calls, executor, runContext, stepNum, dispatchOpts) =>
+        dispatchToolBatch<TDeps, TOutput>(
+          runEnv,
+          calls,
+          executor,
+          runContext,
+          stepNum,
+          dispatchOpts,
+        ),
+    };
+
     // AG-14 (failed half): a terminal-failed run must never re-enter the
     // provider loop or dispatch anything - that would silently complete a
     // failed run. Return it as-is.
@@ -1600,93 +514,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       return yield* finishRun(state, finalSnapshot);
     }
 
-    // AG-1: execute the approved gated calls for REAL before the provider
-    // loop - the model sees their genuine results on the first step. They
-    // run through the shared ToolExecutor (taint / audit) and record
-    // CompletedToolCalls in a resume step. Dispatching here (outside the
-    // loop's approval pre-screen) also means the gated call never
-    // re-suspends, so there is no livelock.
-    //
-    // agent-07: this dispatch runs even when OTHER approvals remain
-    // pending. A granted call has already been removed from
-    // `pendingApprovals`, so skipping it (as the old order did - the
-    // suspended-guard returned before the dispatch) stranded it
-    // unrunnable forever; the run re-suspends with the remainder below.
+    // AG-1 / agent-02 / agent-07: execute the approved gated calls for
+    // REAL before the provider loop, bracketed by the write-ahead intent
+    // + post-dispatch checkpoints (see `runtime/approvals.ts`).
     if (resumed && resumedApprovedCalls.length > 0) {
-      // agent-02 write-ahead intent: persist a checkpoint equivalent to
-      // the pre-dispatch suspended state (granted approvals re-attached
-      // to `pendingApprovals`) BEFORE any side effect runs. A crash-retry
-      // against this checkpoint re-resumes with the same directive and
-      // re-dispatches - the documented at-most-one-re-execution bound -
-      // and its nodeName records that a grant arrived and dispatch was in
-      // flight.
-      if (config.checkpointStore !== undefined) {
-        const prevStatus = state.status;
-        state.status = 'awaiting_approval';
-        state.pendingApprovals.unshift(...grantedApprovals);
-        const intentState = serializeRunState(state, { stripTracingApiKey: true });
-        state.pendingApprovals.splice(0, grantedApprovals.length);
-        state.status = prevStatus;
-        await config.checkpointStore.put(
-          state.id,
-          'agent',
-          {
-            id: state.id,
-            threadId: state.id,
-            namespace: 'agent',
-            state: intentState,
-            channelVersions: {},
-            stepNumber: 0,
-            createdAt: new Date().toISOString(),
-          },
-          { source: 'sync', status: 'suspended', nodeName: 'agent.resume.intent' },
-        );
-      }
-      state.steps.push({
-        stepNumber: 0,
-        startedAt: new Date().toISOString(),
-        endedAt: new Date().toISOString(),
-        usage: zeroUsage(),
-        toolCalls: [],
-        agentId: state.currentAgentId,
-      });
-      // tools-02: a human granted exactly `approval.args` - the repair
-      // hook must not rewrite a pre-approved payload behind the grant, so
-      // a (should-be-impossible) validation failure surfaces as
-      // `invalid_input` instead of executing args nobody saw.
-      yield* dispatchBatch(
+      yield* dispatchResumedApprovals<TDeps, TOutput>(
+        runEnv,
         resumedApprovedCalls,
-        toolExecutor,
-        { ...runContextBase, stepNumber: 0, messages },
-        0,
-        { disableRepair: true },
+        grantedApprovals,
       );
-      // agent-02: persist the journaled post-dispatch state. From THIS
-      // checkpoint a re-delivered resume is exactly-once: the granted ids
-      // are no longer pending and their journal entries + tool messages
-      // are present, so nothing re-dispatches. (For the manual JSON flow,
-      // the same state is returned as `result.state` - persist it after
-      // every resume to get the same guarantee.)
-      if (config.checkpointStore !== undefined) {
-        await config.checkpointStore.put(
-          state.id,
-          'agent',
-          {
-            id: state.id,
-            threadId: state.id,
-            namespace: 'agent',
-            state: serializeRunState(state, { stripTracingApiKey: true }),
-            channelVersions: {},
-            stepNumber: 0,
-            createdAt: new Date().toISOString(),
-          },
-          {
-            source: 'sync',
-            status: state.status === 'awaiting_approval' ? 'suspended' : 'running',
-            nodeName: 'agent.resume.dispatched',
-          },
-        );
-      }
     }
 
     // AG-14 (suspended half): a resumed run still awaiting approvals the
@@ -1698,343 +534,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       return yield* finishRun(state, finalSnapshot);
     }
 
-    /**
-     * Dispatch a batch of (non-handoff) tool calls through the
-     * {@link ToolExecutor} and surface the results as `AgentEvent`s.
-     *
-     * The agent owns the `tool.execute.start` / `.end` / `.error`
-     * lifecycle (derived deterministically from the returned
-     * {@link CompletedToolCall} outcomes) so every outcome kind -
-     * success, unknown-tool, invalid-input, sanitization-blocked,
-     * execution error - yields a consistent event and tool message,
-     * preserving the pre-WI-03 stream shape (R10). The executor's
-     * genuinely-live streaming events (`tool.execute.progress` /
-     * `.partial`, emitted only by streaming-hint tools) are bridged
-     * through Adapter E while the batch runs and are purely additive.
-     *
-     * Parallelism (WI-04): the executor runs independent calls in this
-     * batch concurrently, bounded by `maxParallelTools`. `tool.execute.start`
-     * is emitted up-front in call order and `.end` / `.error` after the
-     * batch settles, also in call order - so result mapping and tool-message
-     * history are deterministic regardless of which call finishes first,
-     * while `.progress` / `.partial` events for concurrent calls interleave
-     * (keyed by `toolCallId`). Tools declaring `executionMode: 'sequential'`
-     * are serialised by the executor and never overlap.
-     */
-    async function* dispatchBatch(
-      calls: ReadonlyArray<ToolCall>,
-      executor: ToolExecutor,
-      runContext: RunContext<TDeps>,
-      stepNum: number,
-      dispatchOpts: { readonly disableRepair?: boolean } = {},
-    ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-      if (calls.length === 0) return;
-      for (const call of calls) {
-        yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
-      }
-
-      const bridge = createExecutorEventBridge();
-      activeExecutorBridge = bridge;
-      const resultsPromise = executor.executeBatch({
-        calls,
-        runContext,
-        stepNumber: stepNum,
-        ...(dispatchOpts.disableRepair !== undefined
-          ? { disableRepair: dispatchOpts.disableRepair }
-          : {}),
-        // D2: the run's capability restriction rides every batch.
-        ...(activeRunCapability !== undefined ? { capability: activeRunCapability } : {}),
-      });
-      // Close the bridge once the batch settles so `drain()` ends; the
-      // executor catches per-call errors, so the batch never rejects.
-      const closeOnSettle = resultsPromise.then(
-        () => bridge.close(),
-        () => bridge.close(),
-      );
-      for await (const event of bridge.drain()) {
-        if (event.type === 'tool.execute.progress' || event.type === 'tool.execute.partial') {
-          yield event as AgentEvent<TOutput>;
-        }
-      }
-      await closeOnSettle;
-      activeExecutorBridge = undefined;
-
-      const completed = await resultsPromise;
-      const byCallId = new Map(completed.map((c) => [c.outcome.toolCallId, c]));
-      const stepEntry = state.steps[state.steps.length - 1];
-      for (const call of calls) {
-        const result = byCallId.get(call.toolCallId);
-        if (result === undefined) continue;
-        if (stepEntry !== undefined) {
-          (stepEntry.toolCalls as CompletedToolCall[]).push(result);
-        }
-        const outcome = result.outcome;
-        if ('kind' in outcome) {
-          yield { type: 'tool.execute.error', toolCallId: call.toolCallId, error: outcome };
-          const text = renderToolErrorMessage(outcome);
-          messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-          state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-          causalityMonitor?.recordCall(`tool.error:${call.toolName}`);
-        } else {
-          const output = outcome.output;
-          yield {
-            type: 'tool.execute.end',
-            toolCallId: call.toolCallId,
-            result: output,
-            durationMs: outcome.durationMs,
-          };
-          // WI-10 (P1-4): when the result spilled to a handle, inline only
-          // the bounded preview plus a retrieval hint so the full blob never
-          // enters the context window - the model fetches the rest on demand
-          // via `read_result`. Inlined results serialise exactly as before
-          // (preserves the happy-path message contract, R10).
-          const handle = outcome.resultHandle;
-          const rendered =
-            handle !== undefined
-              ? `${handle.preview}\n\n[Full result${
-                  handle.bytes !== undefined ? ` (${handle.bytes} bytes)` : ''
-                } stored behind a handle. Call read_result with handle ${JSON.stringify(
-                  handle.uri,
-                )} to retrieve it - optionally narrow with offset/length (bytes) or startLine/endLine.]`
-              : typeof output === 'string'
-                ? output
-                : JSON.stringify(output);
-          // C3 (ACI): an empty body reads as a glitch to models; say
-          // explicitly that the tool ran and simply had nothing to print.
-          const text =
-            rendered === undefined || rendered.trim().length === 0
-              ? '(tool ran successfully with no output)'
-              : rendered;
-          messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-          state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-          causalityMonitor?.recordCall(`tool:${call.toolName}`);
-          // WI-05: a successful `tool_search` promotes its matches so the
-          // catalogue advertises them on the next step.
-          if (call.toolName === TOOL_SEARCH_NAME) {
-            recordToolSearchPromotions(output, promotedDeferred);
-          }
-        }
-      }
-    }
-
-    /**
-     * Auto-compaction trigger (WI-09 / P1-1). Before assembling each
-     * provider request, ask the memory {@link ContextEngine} whether the
-     * in-flight buffer has crossed its per-provider threshold
-     * (`shouldCompact`); when it has, summarise the older turns
-     * (`compactNow`, `source: 'auto-trigger'`), splice the result back in
-     * - preserving the byte-stable system prefix and the most-recent
-     * turns verbatim - and emit `context.compacted`. The compaction is
-     * configured on the memory facade (`createMemory({ contextEngine })`,
-     * RB-46); there is no parallel agent-level knob.
-     *
-     * No-op when no memory is wired, when compaction is disabled or below
-     * threshold (the engine returns `false`), or for `secret`-tier runs
-     * (secret history is never shipped to the summarizer - a less-trusted
-     * external sink; per-result handle references land in WI-10). Best
-     * effort: a misconfigured engine (e.g. no summarizer) is swallowed and
-     * the run proceeds uncompacted rather than aborting mid-flight.
-     *
-     * Operator-requested compactions (`agent.compact()`, CE-3/AG-13) are
-     * serviced here too, FIRST - the queue carries the `compact()` promise
-     * resolvers, and manual requests bypass the trigger evaluation.
-     */
-    async function* maybeAutoCompact(): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-      while (pendingManualCompacts.length > 0) {
-        const pending = pendingManualCompacts.shift();
-        if (pending !== undefined) yield* serviceManualCompact(pending);
-      }
-      const mem = memory;
-      if (mem === undefined) return;
-      // Sensitivity gate (WI-09 step 2): drop, never re-route, secret-tier
-      // content. Auto-compaction is an LLM summarizer call, so a secret
-      // run is left un-compacted here.
-      if (config.sensitivity === 'secret') return;
-      const engine = mem.contextEngine;
-      // context-engine-04: trigger, reclaim floor, and anti-thrash guard
-      // share one basis - the engine sees the full buffer for the trigger
-      // total, learns where the pinned (uncompactable) prefix ends, and
-      // receives the prefix messages so the guard arms against the FULL
-      // post-splice context instead of the sliced body.
-      const triggered = await engine
-        .shouldCompact(messages, { compactableFromIndex: systemPrefixLength })
-        .catch(() => false);
-      if (!triggered) return;
-
-      const startedAt = Date.now();
-      const envelope = await engine
-        .compactNow({
-          scope: { userId: state.userId ?? agentId, sessionId, agentId },
-          runId: state.id,
-          sessionId,
-          agentId,
-          source: 'auto-trigger',
-          messages: messages.slice(systemPrefixLength),
-          prefixMessages: messages.slice(0, systemPrefixLength),
-          memory: mem,
-        })
-        // No summarizer configured (or the strategy threw) - proceed with
-        // the un-compacted buffer rather than failing a live run.
-        .catch(() => undefined);
-      if (envelope === undefined) return;
-      // Nothing was old enough to trim (body ≤ preserve-recent) - skip the
-      // splice + event so `context.compacted` only fires on real work.
-      if (envelope.result.droppedMessageIndices.length === 0) return;
-
-      spliceCompacted(envelope);
-      yield {
-        type: 'context.compacted',
-        runId: state.id,
-        sessionId,
-        agentId,
-        beforeTokens: envelope.result.beforeTokens,
-        afterTokens: envelope.result.afterTokens,
-        summaryTokens: envelope.result.summaryTokens,
-        durationMs: Date.now() - startedAt,
-        source: 'auto-trigger',
-        hooksFiredCount: envelope.result.hooksFiredCount,
-      };
-    }
-
-    /**
-     * context-engine-06: last-resort tier at hard context overflow. When
-     * a provider rejects the request as over-window, force ONE aggressive
-     * compaction (`preserveRecentTurns: 2`, trigger evaluation bypassed)
-     * and let the caller retry the same provider - the fallback chain's
-     * members usually share the same window, so without this the run just
-     * dies. Returns `true` when the buffer actually shrank (retry is
-     * worthwhile); `false` when memory is not wired, the run is
-     * secret-tier, compaction trimmed nothing, or the engine threw.
-     */
-    async function* tryEmergencyCompact(): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
-      const mem = memory;
-      if (mem === undefined || config.sensitivity === 'secret') return false;
-      const startedAt = Date.now();
-      const envelope = await mem.contextEngine
-        .compactNow({
-          scope: { userId: state.userId ?? agentId, sessionId, agentId },
-          runId: state.id,
-          sessionId,
-          agentId,
-          source: 'auto-trigger',
-          messages: messages.slice(systemPrefixLength),
-          prefixMessages: messages.slice(0, systemPrefixLength),
-          memory: mem,
-          preserveRecentTurns: 2,
-        })
-        .catch(() => undefined);
-      if (envelope === undefined || envelope.result.droppedMessageIndices.length === 0) {
-        return false;
-      }
-      spliceCompacted(envelope);
-      yield {
-        type: 'context.compacted',
-        runId: state.id,
-        sessionId,
-        agentId,
-        beforeTokens: envelope.result.beforeTokens,
-        afterTokens: envelope.result.afterTokens,
-        summaryTokens: envelope.result.summaryTokens,
-        durationMs: Date.now() - startedAt,
-        source: 'auto-trigger',
-        hooksFiredCount: envelope.result.hooksFiredCount,
-      };
-      return true;
-    }
-
-    /**
-     * Prefix-pinned splice shared by the auto + manual compaction paths
-     * (CE-3): stable system prefix + [summary, ...recent turns], with the
-     * post-compaction hooks' text Context Essentials re-anchored as a
-     * trailing system message so they survive the trim (RB-46). Mutates
-     * BOTH the live loop buffer and `state.messages`.
-     */
-    function spliceCompacted(envelope: CompactionEnvelope): void {
-      const prefix = messages.slice(0, systemPrefixLength);
-      const rebuilt: Message[] = [...prefix, ...envelope.result.trimmedMessages];
-      const essentials = envelope.extraContent
-        .map((part) =>
-          typeof part === 'object' && part !== null && 'text' in part
-            ? String((part as { readonly text: unknown }).text)
-            : '',
-        )
-        .filter((text) => text.length > 0)
-        .join('\n\n');
-      if (essentials.length > 0) {
-        rebuilt.push({ role: 'system', content: essentials });
-      }
-      messages.splice(0, messages.length, ...rebuilt);
-      state.messages.splice(0, state.messages.length, ...rebuilt);
-    }
-
-    /**
-     * Service one `agent.compact()` request inside the loop (CE-3/AG-13):
-     * same prefix-pinned splice as the auto path, `source: 'manual'` (or
-     * the caller's `'pre-step'`), `preserveRecentTurns` forwarded as a
-     * per-call strategy override. An engine failure rejects the caller's
-     * promise but never aborts the live run; a summarize that trims
-     * nothing resolves `applied: false` without an event.
-     */
-    async function* serviceManualCompact(
-      pending: PendingManualCompact,
-    ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-      const mem = memory;
-      if (mem === undefined) {
-        pending.resolve(noopCompactionResult('no-memory'));
-        return;
-      }
-      const source = pending.options?.source ?? 'manual';
-      const startedAt = Date.now();
-      let envelope: CompactionEnvelope;
-      try {
-        envelope = await mem.contextEngine.compactNow({
-          scope: { userId: state.userId ?? agentId, sessionId, agentId },
-          runId: state.id,
-          sessionId,
-          agentId,
-          source,
-          messages: messages.slice(systemPrefixLength),
-          // context-engine-04: same accounting basis as the auto path.
-          prefixMessages: messages.slice(0, systemPrefixLength),
-          memory: mem,
-          ...(pending.options?.preserveRecentTurns !== undefined
-            ? { preserveRecentTurns: pending.options.preserveRecentTurns }
-            : {}),
-        });
-      } catch (cause) {
-        pending.reject(cause);
-        return;
-      }
-      const { result } = envelope;
-      const applied = result.droppedMessageIndices.length > 0;
-      if (applied) {
-        spliceCompacted(envelope);
-        yield {
-          type: 'context.compacted',
-          runId: state.id,
-          sessionId,
-          agentId,
-          beforeTokens: result.beforeTokens,
-          afterTokens: result.afterTokens,
-          summaryTokens: result.summaryTokens,
-          durationMs: Date.now() - startedAt,
-          source,
-          hooksFiredCount: result.hooksFiredCount,
-        };
-      }
-      pending.resolve({
-        beforeTokens: result.beforeTokens,
-        afterTokens: result.afterTokens,
-        summaryTokens: result.summaryTokens,
-        durationMs: Date.now() - startedAt,
-        hooksFiredCount: result.hooksFiredCount,
-        summary: result.summary ?? '',
-        applied,
-        ...(applied ? {} : { skippedReason: 'nothing-to-trim' as const }),
-      });
-    }
-
-    const handoffNames = Array.from(handoffMap.keys());
     let stepNumber = 0;
     // C3: verifier-triggered continuation rounds consumed this run.
     let verifierRoundsUsed = 0;
@@ -2042,41 +541,6 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // per-tool preferred-model ladder consults these, never the full
     // advertised catalogue.
     let lastStepCalledToolNames: ReadonlyArray<string> = [];
-
-    // AG-6: shared cancellation path for both the loop-top abort check and a
-    // mid-stream provider abort. Yields `agent.cancelling`, applies the
-    // `onPendingApprovals` policy, and returns `true` when the run was finalized
-    // as 'failed' (the 'fail' policy - the caller must `return finalize(...)`);
-    // otherwise it sets `state.status = 'aborted'` and returns `false`.
-    async function* emitCancellation(): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
-      yield {
-        type: 'agent.cancelling',
-        runId: state.id,
-        drain: pendingAbort?.drain ?? false,
-        onPendingApprovals: pendingAbort?.onPendingApprovals ?? 'deny',
-      };
-      const policy = pendingAbort?.onPendingApprovals ?? 'deny';
-      if (policy === 'deny') {
-        const drained = state.pendingApprovals.splice(0, state.pendingApprovals.length);
-        for (const approval of drained) {
-          yield {
-            type: 'tool.approval.denied',
-            toolCallId: approval.toolCallId,
-            reason: 'auto-denied: agent.abort()',
-          };
-        }
-      } else if (policy === 'fail') {
-        state.status = 'failed';
-        state.error = { message: 'aborted with pending approvals', code: 'run-aborted' };
-        yield {
-          type: 'agent.error',
-          error: { message: 'aborted with pending approvals', code: 'run-aborted' },
-        };
-        return true;
-      }
-      state.status = 'aborted';
-      return false;
-    }
 
     try {
       while (!stopWhen.check(state)) {
@@ -2087,7 +551,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           if (ev !== undefined) yield ev;
         }
         if (signal.aborted) {
-          if (yield* emitCancellation()) return yield* finishRun(state, finalSnapshot);
+          if (yield* emitCancellation<TOutput>(runEnv)) {
+            return yield* finishRun(state, finalSnapshot);
+          }
           break;
         }
         stepNumber += 1;
@@ -2122,7 +588,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         // when the memory ContextEngine's trigger crosses threshold; a
         // no-memory / below-threshold / secret-tier step is a no-op, so
         // the happy-path event stream is unchanged (R10).
-        yield* maybeAutoCompact();
+        yield* maybeAutoCompact<TOutput>(runEnv);
 
         const stepCtx: RunContext<TDeps> = {
           ...runContextBase,
@@ -2132,324 +598,51 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         };
         const overrides = config.prepareStep ? await config.prepareStep(stepCtx) : {};
 
-        // Resolve the registry + executor for this step. The warm-up
-        // pair is bound to config.tools + skills; a `prepareStep` tool
-        // override builds a step-scoped pair so the advertised catalogue
-        // and the executor agree on the same tool set (incl. deferred
-        // discovery for the overridden set). Code-mode does not honour a
-        // per-step `tools` override (the meta-tools + bridge are bound to
-        // the warm-up registry), so it always uses the warm-up pair.
-        const useOverrideRegistry = overrides.tools !== undefined && !isCodeMode;
-        const stepRegistry: ToolRegistry = useOverrideRegistry
-          ? buildToolRegistry({
-              tools: overrides.tools as ReadonlyArray<Tool<unknown, unknown, unknown>>,
-            }).registry
-          : toolRegistry;
-        if (useOverrideRegistry) {
-          registerToolSearch(
-            stepRegistry,
-            config.toolPromotion === 'run-boundary' ? 'next-run' : 'next-step',
-          );
-          registerReadResult(stepRegistry, resultReader);
-        }
-        const stepExecutor: ToolExecutor = useOverrideRegistry
-          ? makeToolExecutor(stepRegistry)
-          : toolExecutor;
+        // Resolve the step's registry / executor / catalogue / preferred
+        // model / fallback chain (see `runtime/step-catalogue.ts`).
+        const { stepRegistry, stepExecutor, stepTools, primary, fallbackChain } =
+          resolveStepToolContext<TDeps, TOutput>(runEnv, overrides, lastStepCalledToolNames);
 
-        // Build the per-step tool catalogue. Handoff tools are synthetic
-        // per-step entries and are always advertised.
-        const handoffTools: Tool<unknown, unknown, TDeps>[] = handoffNames.map((n) => {
-          const h = handoffMap.get(n);
-          if (h === undefined) throw new ToolNotFoundError(n);
-          return buildHandoffTool<TDeps>(h.agent);
-        });
-        // Code-mode (WI-11): advertise only the `code_search` /
-        // `code_execute` (+ `read_result`) meta-tools - the model reaches
-        // every real tool through `code_execute`, so the real tools stay
-        // registered (executable via the in-script bridge) but out of the
-        // model's catalogue. Otherwise (WI-05): advertise the eager tools
-        // (`tool_search` is itself eager iff a deferred tool exists) plus
-        // any deferred tools already promoted by a `tool_search` this run -
-        // never the rest of the deferred pool.
-        // D2 single-writer constraint: a read-only run never ADVERTISES
-        // writer tools (side-effecting / external-stateful) nor handoffs
-        // (a transfer hands the writer pen to another agent). The
-        // executor-level capability gate backs this up for calls the
-        // model fabricates anyway.
-        const readOnlyRun = activeRunCapability === 'read-only';
-        const keepReadOnly = (t: Tool<unknown, unknown, TDeps>): boolean => {
-          const cls = (t as { __sideEffectClass?: string }).__sideEffectClass ?? t.sideEffectClass;
-          return cls === 'pure' || cls === 'read-only';
-        };
-        let stepTools: ReadonlyArray<Tool<unknown, unknown, TDeps>>;
-        if (isCodeMode) {
-          stepTools = readOnlyRun
-            ? [...codeModeAdvertised.filter(keepReadOnly)]
-            : [...codeModeAdvertised, ...handoffTools];
-        } else {
-          const eagerTools = stepRegistry.listEager() as ReadonlyArray<
-            Tool<unknown, unknown, TDeps>
-          >;
-          // A7: emit promoted deferred tools in PROMOTION order (append-only) so
-          // a later promotion joins the END and the prompt-cache prefix stays
-          // byte-stable across steps. C1 (agent-11): handoff tools serialize
-          // BEFORE the growing promoted section - handoffs are fixed per run,
-          // so the stable prefix is now eager + handoffs + earlier promotions
-          // and a new promotion shifts nothing that came before it.
-          // 'run-boundary' promotion advertises only the run-start snapshot.
-          const advertisedPromotions = runStartPromotions ?? promotedDeferred;
-          const promotedTools = (
-            advertisedPromotions.size === 0
-              ? []
-              : orderPromotedTools(advertisedPromotions, stepRegistry.listDeferred())
-          ) as ReadonlyArray<Tool<unknown, unknown, TDeps>>;
-          stepTools = readOnlyRun
-            ? [...eagerTools.filter(keepReadOnly), ...promotedTools.filter(keepReadOnly)]
-            : [...eagerTools, ...handoffTools, ...promotedTools];
-        }
-
-        // AG-15: consult the hints of the tools the model CALLED on the
-        // previous step - a smart-hinted but never-called tool must not
-        // pin the whole conversation to the top cost tier. Steps with no
-        // prior calls fall through to the agent-preferred default.
-        const calledLastStep = new Set(lastStepCalledToolNames);
-        const toolPreferences = stepTools
-          .filter((t) => calledLastStep.has(t.name))
-          .map((t) => {
-            const tt = t as Tool<unknown, unknown, TDeps> & { readonly preferredModel?: unknown };
-            return tt.preferredModel as Parameters<
-              typeof resolvePreferredModel
-            >[0]['toolPreferredModels'][number];
-          });
-
-        const primary: PreferredModelResolution = resolvePreferredModel({
-          ...(overrides.provider !== undefined ? { prepareStepProvider: overrides.provider } : {}),
-          toolPreferredModels: toolPreferences,
-          ...(config.preferredModel !== undefined
-            ? { agentPreferredModel: config.preferredModel }
-            : {}),
-          agentDefaultProvider: config.provider,
-          ...(config.modelTierMap !== undefined ? { modelTierMap: config.modelTierMap } : {}),
-        });
-
-        // RB-48: when `prepareStep` returns an explicit provider
-        // override, the fallback chain is NOT consulted for this
-        // step (the operator's explicit choice supersedes the
-        // implicit fallback chain).
-        const fallbackChain: Provider[] =
-          primary.source === 'prepare-step'
-            ? [primary.resolvedProvider]
-            : [primary.resolvedProvider, ...(config.fallbackModels ?? []).map(specToProvider)];
-
-        // Resolve the effective reasoning-retention policy for
-        // this step (RB-42). Drop any buffered reasoning when the
-        // contract downgrades to `'strip'`.
-        const reasoningPolicy = effectiveReasoningRetention(
+        // Resolve the effective reasoning-retention policy for this step
+        // (RB-42), dropping buffered reasoning when the contract
+        // downgrades to `'strip'` (see `runtime/messages.ts`).
+        const reasoningPolicy = applyReasoningRetention(
           config.reasoningRetention,
           primary.resolvedProvider,
+          messages,
+          state.messages,
         );
-        if (reasoningPolicy === 'strip') {
-          const { stripped } = stripReasoningFromMessages(messages);
-          // Mirror the strip into RunState so the persisted state
-          // matches the in-flight buffer.
-          if (stripped > 0) {
-            // The structural drop is bytes-equal across `messages`
-            // and `state.messages` (both arrays carry the same
-            // references); re-strip RunState explicitly to be safe.
-            stripReasoningFromMessages(state.messages);
-          }
-        }
 
         const toolDefs: ReadonlyArray<ToolDefinition> = stepTools.map((t) =>
           toolToDefinition(t as Tool<unknown, unknown, unknown>),
         );
 
-        const baseRequest: ProviderRequest = {
-          // AG-3 fallback contract: for structured output the request
-          // carries ONE trailing system instruction (JSON-only + schema)
-          // in the request copy - never in the shared buffer or the
-          // persisted RunState. Adapters with native structured output
-          // additionally receive `outputType` below (PS-24 consumes it).
-          messages: buildStepMessages(messages, structuredInstruction, activeRunState?.todos),
-          ...(config.outputType !== undefined
-            ? {
-                outputType: {
-                  kind: config.outputType.kind,
-                  ...(config.outputType.description !== undefined
-                    ? { description: config.outputType.description }
-                    : {}),
-                  ...(config.outputType.jsonSchema !== undefined
-                    ? { jsonSchema: config.outputType.jsonSchema }
-                    : {}),
-                },
-              }
-            : {}),
-          tools: toolDefs,
-          ...(overrides.toolChoice !== undefined
-            ? { toolChoice: overrides.toolChoice }
-            : config.toolChoice !== undefined
-              ? { toolChoice: config.toolChoice as ToolChoice }
-              : {}),
-          metadata: {
-            sessionId,
-            agentId,
-            ...(userId !== undefined ? { userId } : {}),
-            runId: state.id,
-            stepNumber,
-          },
-          signal,
-          ...(overrides.temperature !== undefined ? { temperature: overrides.temperature } : {}),
-          ...(overrides.maxTokens !== undefined ? { maxTokens: overrides.maxTokens } : {}),
-          ...(config.cachePolicy !== undefined ? { cachePolicy: config.cachePolicy } : {}),
-          ...(currentStepSpan !== undefined ? { parentSpan: currentStepSpan } : {}),
-          reasoningRetention: reasoningPolicy,
-        };
+        // Assemble the step's base provider request (AG-3 / D6 / RB-42;
+        // see `runtime/step-catalogue.ts`).
+        const baseRequest: ProviderRequest = buildBaseRequest<TDeps, TOutput>(
+          runEnv,
+          overrides,
+          toolDefs,
+          reasoningPolicy,
+          stepNumber,
+          currentStepSpan,
+        );
 
-        const stepUsage: Usage = zeroUsage();
-        let attempt = 0;
-        let textBuffer = '';
-        let providerForStep = primary.resolvedProvider;
-        let lastModelId = primary.resolvedModelId;
-        let modelSucceeded = false;
-        let lastError: ProviderError | undefined;
-        let finalCalls: ToolCall[] = [];
-        let stepReasoningParts: ReasoningContent[] = [];
-        // context-engine-06: the request actually sent - rebuilt after an
-        // emergency compaction so the retry carries the shrunk buffer
-        // even on the structured-output path (which snapshots messages).
-        let requestForStep = baseRequest;
-        let emergencyCompactTried = false;
-
-        for (let chainIdx = 0; chainIdx < fallbackChain.length; chainIdx++) {
-          const candidate = fallbackChain[chainIdx];
-          if (candidate === undefined) continue;
-          providerForStep = candidate;
-          const providerModelId = providerForStep.modelId;
-          if (chainIdx > 0) {
-            attempt += 1;
-            const reason = lastError
-              ? (isAgentFallbackEligible(lastError, fallbackPolicy).reason ?? 'transient')
-              : 'transient';
-            yield {
-              type: 'agent.model.fellback',
-              runId: state.id,
-              sessionId,
-              agentId,
-              from: lastModelId,
-              to: providerModelId,
-              reason,
-              stepNumber,
-              attempt,
-            };
-            lastModelId = providerModelId;
-          }
-          const evState: ProviderEventCollector = {
-            textBuffer: '',
-            reasoningBuffer: '',
-            reasoningParts: [],
-            calls: new Map<string, ToolCallAccumulator>(),
-            finalCalls: [] as ToolCall[],
-          };
-          let providerError: ProviderError | undefined;
-          let providerCallCompleted = false;
-          let providerStepUsage: Usage = zeroUsage();
-          try {
-            const stream = providerForStep.stream(requestForStep);
-            for await (const ev of stream) {
-              // AG-6 `drain`: the default hard-kills the in-flight provider
-              // stream mid-event; `abort({ drain: true })` instead lets the
-              // current step finish (the documented "wait for the current step
-              // to complete") and stops gracefully at the next loop-top check.
-              if (signal.aborted && pendingAbort?.drain !== true) {
-                throw new AgentRuntimeError('run-aborted', 'aborted');
-              }
-              const out = handleProviderEvent(ev, evState);
-              if (out.emit !== undefined) {
-                yield out.emit as AgentEvent<TOutput>;
-              }
-              if (out.providerError !== undefined) {
-                providerError = out.providerError;
-              }
-              if (out.usage !== undefined) {
-                providerStepUsage = addUsage(providerStepUsage, out.usage);
-              }
-              if (out.finished === true) providerCallCompleted = true;
-            }
-          } catch (cause) {
-            // AG-6: a mid-stream abort (our run-aborted sentinel, or any error
-            // once the signal is aborted - e.g. a native AbortError from the
-            // provider) is NOT a provider failure. Break out of the fallback
-            // chain WITHOUT a providerError; the post-stream abort check below
-            // ends the run as 'aborted', never 'no-provider-completed'. Don't
-            // continue the fallback chain against an already-aborted signal.
-            if (
-              signal.aborted ||
-              (cause instanceof AgentRuntimeError && cause.code === 'run-aborted')
-            ) {
-              break;
-            }
-            const message = cause instanceof Error ? cause.message : String(cause);
-            // AG-21: preserve the thrown error's kind (e.g. a RateLimitExceededError
-            // from `withRateLimit`) so the fallback chain treats it like the same
-            // error emitted as a structured event, instead of flattening it to
-            // an always-ineligible 'unknown'.
-            providerError = { kind: classifyThrownProviderErrorKind(cause), message, cause };
-          }
-          if (providerError !== undefined) {
-            lastError = providerError;
-            // context-engine-06: a hard context overflow gets ONE
-            // emergency-compaction retry against the SAME candidate
-            // before the fallback chain (whose members usually share the
-            // window) or a terminal failure.
-            if (providerError.kind === 'context-length' && !emergencyCompactTried) {
-              emergencyCompactTried = true;
-              const shrank = yield* tryEmergencyCompact();
-              if (shrank) {
-                requestForStep = {
-                  ...baseRequest,
-                  messages: buildStepMessages(
-                    messages,
-                    structuredInstruction,
-                    activeRunState?.todos,
-                  ),
-                };
-                chainIdx -= 1; // negate the loop increment: retry this candidate
-                continue;
-              }
-            }
-            const eligibility = isAgentFallbackEligible(providerError, fallbackPolicy);
-            if (!eligibility.eligible || chainIdx === fallbackChain.length - 1) {
-              yield {
-                type: 'agent.error',
-                error: { message: providerError.message, code: providerError.kind },
-              };
-              state.status = 'failed';
-              state.error = { message: providerError.message, code: providerError.kind };
-              return yield* finishRun(state, finalSnapshot);
-            }
-            continue;
-          }
-          if (providerCallCompleted) {
-            modelSucceeded = true;
-            textBuffer = evState.textBuffer;
-            finalCalls = evState.finalCalls;
-            // Materialize the streamed reasoning deltas into a
-            // single `ReasoningContent` part. Adapters that expose
-            // structured reasoning blocks may emit multiple
-            // deltas; v0.1 collapses them into one part - Phase
-            // 06 owns the per-block structure when it lands.
-            if (evState.reasoningBuffer.length > 0) {
-              stepReasoningParts = [
-                {
-                  type: 'reasoning',
-                  text: evState.reasoningBuffer,
-                },
-              ];
-            }
-            accumulateUsage(stepUsage, providerStepUsage);
-            break;
-          }
+        // Stream the step's provider call across the fallback chain
+        // (see `runtime/fallback-chain.ts`); a terminal provider
+        // failure is already recorded on `state` when `failed` is set.
+        const chain = yield* runProviderFallbackChain<TOutput>(
+          runEnv,
+          fallbackChain,
+          baseRequest,
+          primary,
+          stepNumber,
+        );
+        if (chain.failed) {
+          return yield* finishRun(state, finalSnapshot);
         }
+        const { modelSucceeded, textBuffer, finalCalls, stepReasoningParts } = chain;
+        const { stepUsage, lastModelId } = chain;
 
         // AG-6: a mid-stream abort that interrupted the stream (no completed
         // model) ends the run as a cancellation ('aborted', or 'failed' under
@@ -2458,7 +651,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         // (e.g. `drain: true` let the step finish), fall through so the step's
         // tool calls run and the graceful stop happens at the loop top.
         if (signal.aborted && !modelSucceeded) {
-          yield* emitCancellation();
+          yield* emitCancellation<TOutput>(runEnv);
           return yield* finishRun(state, finalSnapshot);
         }
 
@@ -2479,57 +672,16 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         addModelUsage(state, lastModelId, stepUsage);
         accumulateUsage(state.usage, stepUsage);
 
-        // Lateral-leak (RB-55 / AG-10): scan the outgoing assistant
-        // content BEFORE it is appended, so a 'block' decision keeps
-        // the laundered commentary out of the durable history - and
-        // therefore out of every subsequent provider request. The
-        // deltas already streamed; what 'block' protects is the
-        // persistent buffer and the run's final output.
-        const leakCheck =
-          causalityMonitor !== undefined && textBuffer.length > 0
-            ? causalityMonitor.checkMessage(textBuffer)
-            : undefined;
-        const leakBlocked = leakCheck?.leakDetected === true && leakCheck.decision === 'block';
-
-        const assistant: AssistantMessage = buildAssistantMessage(
-          leakBlocked ? LATERAL_LEAK_BLOCKED_NOTICE : textBuffer,
+        // Lateral-leak commit gate (RB-55 / AG-10 / C6): scan, commit
+        // the assistant message, record the taint span, and emit the
+        // detection event (see `runtime/run-gates.ts`).
+        const leakBlocked = yield* commitAssistantMessage<TOutput>(
+          runEnv,
+          textBuffer,
           stepReasoningParts,
           finalCalls,
-          agentId,
           reasoningPolicy,
         );
-        messages.push(assistant);
-        state.messages.push(assistant);
-
-        // C6: once the run is tainted, the model's own TEXT output is
-        // derived from untrusted context - record it so a later sink call
-        // copying the model's phrasing still trips the verbatim probe
-        // (no-op on untainted runs). Tool-call args are deliberately NOT
-        // recorded: the sink gate inspects those same args next, and
-        // recording them first would self-match every post-taint call,
-        // collapsing the precise verbatim signal into the coarse one.
-        if (toolDataFlowGuard !== undefined && textBuffer.length > 0 && !leakBlocked) {
-          toolDataFlowGuard.recordAssistant(state.id, textBuffer);
-        }
-
-        if (leakCheck?.leakDetected === true) {
-          const sha = sha256Hex(textBuffer);
-          yield {
-            type: 'agent.lateral-leak.detected',
-            runId: state.id,
-            sessionId,
-            agentId,
-            vector: leakCheck.vector,
-            severity: leakCheck.severity,
-            causalityChain: leakCheck.causalityChain,
-            messageContentSha256: sha,
-            ...(leakCheck.matchedPattern !== undefined
-              ? { matchedPattern: leakCheck.matchedPattern }
-              : {}),
-            decision: leakCheck.decision,
-            detectedAtIso: new Date().toISOString(),
-          };
-        }
 
         const handoffCalls = finalCalls.filter((c) => handoffMap.has(c.toolName));
         if (handoffCalls.length > 1) {
@@ -2574,238 +726,18 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             ...(currentStepSpan !== undefined ? { span: currentStepSpan } : {}),
           };
 
-          // Walk calls in finalCalls order. Handoffs are special-cased
-          // inline (≤1 per step) and never routed through the executor.
-          // Non-handoff calls accumulate into a batch dispatched through
-          // the ToolExecutor; the batch is flushed before a handoff and
-          // before each approval-gated call so execution order is kept.
-          // Gated calls are COLLECTED (all of them, agent-01) and the run
-          // suspends once after the walk, so every non-gated toolCallId
-          // has a tool message before the suspend snapshot - a dropped
-          // call would persist a dangling `tool_use` that real providers
-          // reject on resume.
-          let batch: ToolCall[] = [];
-          let stepApprovalsRequested = 0;
-
-          for (const call of finalCalls) {
-            const handoff = handoffMap.get(call.toolName);
-            if (handoff !== undefined) {
-              if (batch.length > 0) {
-                yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
-                batch = [];
-              }
-              yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
-              const filter = (handoff.filter ??
-                filterLib.defaultHandoffFilter()) as DescribedFilter;
-              const filtered = filter(messages);
-              const targetId = handoff.agent.id;
-              // The secrets fields record the structural reality: no
-              // inheritance mechanism exists at this boundary, so the
-              // target receives nothing - an empty allowlist is the
-              // factually-true provenance (AG-17).
-              const handoffRec: HandoffRecord = {
-                fromAgentId: agentId,
-                toAgentId: targetId,
-                stepNumber,
-                at: new Date().toISOString(),
-                inputFilter: filter.descriptor,
-                secretsInheritance: 'inherit-allowlist',
-                inheritedSecrets: [],
-              };
-              state.handoffs.push(handoffRec);
-              yield { type: 'handoff', fromAgentId: agentId, toAgentId: targetId };
-              state.currentAgentId = targetId;
-              const subAgent = handoff.agent;
-              // AG-22: the sub-agent inherits the parent's abort signal,
-              // deps, and sessionId; its terminal `agent.end` is observed
-              // so a failed/aborted sub-run surfaces as a TOOL ERROR -
-              // never an empty-string success with durationMs 0.
-              const subStart = Date.now();
-              const subOutputs: string[] = [];
-              let subResult: AgentResult<unknown> | undefined;
-              const subStream = subAgent.stream(filtered as Message[], {
-                signal,
-                ...(options.deps !== undefined || config.deps !== undefined
-                  ? { deps: (options.deps ?? config.deps) as TDeps }
-                  : {}),
-                sessionId,
-              });
-              for await (const subEv of subStream) {
-                if (subEv.type === 'text.complete') subOutputs.push(subEv.text);
-                else if (subEv.type === 'agent.end') {
-                  subResult = subEv.result as AgentResult<unknown>;
-                }
-              }
-              const subDurationMs = Date.now() - subStart;
-              const stepEntry = state.steps[state.steps.length - 1];
-              if (subResult !== undefined && subResult.status !== 'completed') {
-                const toolError: ToolError = {
-                  toolCallId: call.toolCallId,
-                  toolName: call.toolName,
-                  kind: subResult.status === 'aborted' ? 'aborted' : 'execution_failed',
-                  message: `handoff to '${targetId}' ${subResult.status}${
-                    subResult.error !== undefined ? `: ${subResult.error.message}` : ''
-                  }`,
-                };
-                if (stepEntry !== undefined) {
-                  (stepEntry.toolCalls as CompletedToolCall[]).push({
-                    call,
-                    outcome: toolError,
-                    stepNumber,
-                  });
-                }
-                yield {
-                  type: 'tool.execute.error',
-                  toolCallId: call.toolCallId,
-                  error: toolError,
-                };
-                const text = renderToolErrorMessage(toolError);
-                messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-                state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-                continue;
-              }
-              const result = subOutputs.join('');
-              const completed: CompletedToolCall = {
-                call,
-                outcome: {
-                  toolCallId: call.toolCallId,
-                  toolName: call.toolName,
-                  output: result,
-                  durationMs: subDurationMs,
-                },
-                stepNumber,
-              };
-              if (stepEntry !== undefined) {
-                (stepEntry.toolCalls as CompletedToolCall[]).push(completed);
-              }
-              yield {
-                type: 'tool.execute.end',
-                toolCallId: call.toolCallId,
-                result,
-                durationMs: subDurationMs,
-              };
-              messages.push({ role: 'tool', toolCallId: call.toolCallId, content: result });
-              state.messages.push({
-                role: 'tool',
-                toolCallId: call.toolCallId,
-                content: result,
-              });
-              continue;
-            }
-
-            // Approval pre-screen (Adapter G / durable HITL). Evaluate the
-            // registry-resolved `needsApproval`; a gated call flushes the
-            // queued batch (prior calls' side-effects complete first) and
-            // is recorded as a pending approval. The walk CONTINUES: later
-            // gated calls are collected too, and later non-gated calls
-            // still execute before the suspend (agent-01 - previously
-            // everything after the first gated call was silently dropped,
-            // never executed and never approvable, leaving dangling
-            // `tool_use` ids in the persisted transcript).
-            const resolvedTool = stepRegistry.get(call.toolName);
-            // tools-02 (agent mirror): the approval decision must be made
-            // on the input that will actually execute. For gated tools the
-            // args are validated HERE: a schema failure fails the call fast
-            // as `invalid_input` (a human is never asked to approve args
-            // that cannot run, and the resumed dispatch can therefore never
-            // hit the repair hook), and the predicate receives the parsed
-            // value its typed signature promises - not raw pre-coercion
-            // JSON.
-            let gateInput: unknown = call.args;
-            if (resolvedTool !== undefined && isApprovalGated(resolvedTool)) {
-              const parsed = safeParseGatedArgs(resolvedTool, call.args);
-              if (parsed !== undefined && !parsed.success) {
-                const toolError: ToolError = {
-                  toolCallId: call.toolCallId,
-                  toolName: call.toolName,
-                  kind: 'invalid_input',
-                  message: `Invalid arguments for approval-gated tool '${call.toolName}': ${parsed.message}`,
-                };
-                const stepEntry = state.steps[state.steps.length - 1];
-                if (stepEntry !== undefined) {
-                  (stepEntry.toolCalls as CompletedToolCall[]).push({
-                    call,
-                    outcome: toolError,
-                    stepNumber,
-                  });
-                }
-                yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
-                yield {
-                  type: 'tool.execute.error',
-                  toolCallId: call.toolCallId,
-                  error: toolError,
-                };
-                const text = renderToolErrorMessage(toolError);
-                messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-                state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-                continue;
-              }
-              if (parsed !== undefined) gateInput = parsed.data;
-            }
-            const needsApproval = await invokeNeedsApproval(
-              resolvedTool,
-              gateInput,
-              execRunContext,
-              signal,
-            );
-            if (needsApproval) {
-              if (batch.length > 0) {
-                yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
-                batch = [];
-              }
-              yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
-              const approval: ToolApproval = {
-                toolCallId: call.toolCallId,
-                toolName: call.toolName,
-                args: call.args,
-                requestedAt: new Date().toISOString(),
-              };
-              state.pendingApprovals.push(approval);
-              stepApprovalsRequested += 1;
-              yield {
-                type: 'tool.approval.requested',
-                toolCallId: call.toolCallId,
-              };
-              continue;
-            }
-
-            batch.push(call);
-          }
-
-          if (batch.length > 0) {
-            yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
-          }
-
-          // Durable-HITL suspend: once per step, carrying EVERY gated call
-          // the model batched. Runs after the final batch flush so the
-          // suspend snapshot already contains tool messages for the whole
-          // non-gated remainder of the step.
-          if (stepApprovalsRequested > 0) {
-            state.status = 'awaiting_approval';
-            // AG-19: persist the coarse taint summary + promoted-tool set into
-            // the suspended state so a resume rehydrates the sink gate and the
-            // discovered-tool catalogue instead of starting empty.
-            const taintSnap = toolDataFlowGuard?.snapshotLedger(state.id);
-            if (taintSnap !== undefined) state.taintSummary = taintSnap;
-            if (promotedDeferred.size > 0) state.promotedTools = [...promotedDeferred];
-            if (config.checkpointStore !== undefined) {
-              await config.checkpointStore.put(
-                state.id,
-                'agent',
-                {
-                  id: state.id,
-                  threadId: state.id,
-                  namespace: 'agent',
-                  // AG-23: persist a detached, secret-redacted snapshot -
-                  // never the live MutableRunState reference.
-                  state: serializeRunState(state, { stripTracingApiKey: true }),
-                  channelVersions: {},
-                  stepNumber,
-                  createdAt: new Date().toISOString(),
-                },
-                { source: 'sync', status: 'suspended', nodeName: 'agent.run' },
-              );
-            }
+          // Walk the calls (batch dispatch, inline handoff, approval
+          // pre-screen, once-per-step durable-HITL suspend; see
+          // `runtime/tool-call-walk.ts`).
+          const walked = yield* processStepToolCalls<TDeps, TOutput>(
+            runEnv,
+            finalCalls,
+            stepRegistry,
+            stepExecutor,
+            execRunContext,
+            stepNumber,
+          );
+          if (walked.suspended) {
             return yield* finishRun(state, finalSnapshot);
           }
         }
@@ -2819,46 +751,18 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         yield { type: 'step.end', stepNumber, usage: stepUsage };
 
         if (finalCalls.length === 0) {
-          // C3: verifier seam - deterministic checks run on EVERY terminal
-          // response (so the outcome is always observable via
-          // verifier.result events). Failures feed structured feedback back
-          // as a user message and the loop continues, but only while
-          // continuation rounds remain (maxVerifierRounds, default 1);
-          // exhausted rounds complete with the last output. A verifier that
-          // throws is treated as passed (a buggy verifier must not fail the
-          // run).
+          // C3: verifier gate on the terminal response (see
+          // `runtime/run-gates.ts`); a failed round feeds back and the
+          // loop takes another step while rounds remain.
           if (config.verifiers !== undefined && config.verifiers.length > 0) {
-            const feedbacks: string[] = [];
-            for (const verifier of config.verifiers) {
-              let result: VerifierResult;
-              try {
-                result = await verifier.verify({
-                  output: String(finalSnapshot.output ?? ''),
-                  state,
-                  stepNumber,
-                });
-              } catch {
-                result = { ok: true };
-              }
-              yield {
-                type: 'verifier.result',
-                verifierId: verifier.id,
-                ok: result.ok,
-                ...(result.ok ? {} : { feedback: result.feedback }),
-                stepNumber,
-              };
-              if (!result.ok) feedbacks.push(`[verifier:${verifier.id}] ${result.feedback}`);
-            }
-            if (feedbacks.length > 0 && verifierRoundsUsed < (config.maxVerifierRounds ?? 1)) {
-              verifierRoundsUsed += 1;
-              const feedbackMessage: Message = {
-                role: 'user',
-                content: `Your response failed ${feedbacks.length} verification check(s). Address the feedback and answer again:\n${feedbacks.join('\n')}`,
-              };
-              messages.push(feedbackMessage);
-              state.messages.push(feedbackMessage);
-              continue;
-            }
+            const gate = yield* runVerifierGate<TDeps, TOutput>(
+              runEnv,
+              finalSnapshot,
+              stepNumber,
+              verifierRoundsUsed,
+            );
+            verifierRoundsUsed = gate.verifierRoundsUsed;
+            if (gate.continueRun) continue;
           }
           state.status = 'completed';
           break;
@@ -2890,156 +794,22 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       }
     }
 
-    if (state.status === 'running') {
-      // AG-24: the loop exited via the stop condition (default
-      // isStepCount(50)) with work still pending - that is a CUT run,
-      // not a completion. Surface it as a typed failure so consumers
-      // can tell it apart from a clean finish.
-      const message = `run stopped by stop condition: ${stopWhen.description}`;
-      state.status = 'failed';
-      state.error = { message, code: 'stop-condition' };
-      yield { type: 'agent.error', error: { message, code: 'stop-condition' } };
-    }
-    // AG-3: structured output is parsed + validated on the completed
-    // path - a failure is a typed run failure (`output-validation-failed`),
-    // never a silent text-cast. Runs BEFORE output guardrails so they
-    // screen the PARSED value.
-    if (state.status === 'completed' && config.outputType?.kind === 'structured') {
-      const raw = String(finalSnapshot.output ?? '');
-      try {
-        const parsed: unknown = JSON.parse(stripJsonFence(raw));
-        finalSnapshot.output = (
-          config.outputType.schema !== undefined ? config.outputType.schema.parse(parsed) : parsed
-        ) as TOutput;
-      } catch (cause) {
-        const message = `structured output validation failed: ${
-          cause instanceof Error ? cause.message : String(cause)
-        }`;
-        yield { type: 'agent.error', error: { message, code: 'output-validation-failed' } };
-        state.status = 'failed';
-        state.error = { message, code: 'output-validation-failed' };
-      }
-    }
-
-    // AG-2 / SDF-4: output guardrails screen the final output on the
-    // completed path before `agent.end`. 'block' fails the run;
-    // 'rewrite' replaces the durable result (`result.output`) - the
-    // text deltas were already streamed, so the rewrite governs what
-    // is persisted/returned, not the live token stream.
-    const outputGuards = config.guardrails?.output;
-    if (state.status === 'completed' && outputGuards !== undefined && outputGuards.length > 0) {
-      const composed = await composeGuardrails(outputGuards, finalSnapshot.output, {
-        stage: 'output',
-        runId: state.id,
-        sessionId,
-        agentId,
-      });
-      if (!composed.ok) {
-        yield {
-          type: 'guardrail.tripped',
-          guardrailName: composed.name,
-          phase: 'output',
-          reason: composed.message,
-        };
-        const message = `output guardrail '${composed.name}' blocked the run: ${composed.message}`;
-        yield { type: 'agent.error', error: { message, code: 'guardrail-blocked' } };
-        state.status = 'failed';
-        state.error = { message, code: 'guardrail-blocked' };
-      } else if (composed.value !== finalSnapshot.output) {
-        finalSnapshot.output = composed.value;
-      }
-    }
+    // Terminal output phases in their frozen order: stop-condition cut
+    // (AG-24), structured-output parse (AG-3), output guardrails
+    // (AG-2 / SDF-4) - see `runtime/run-gates.ts`.
+    yield* finalizeRunOutput<TDeps, TOutput>(runEnv, finalSnapshot);
     activeRunState = undefined;
     return yield* finishRun(state, finalSnapshot);
   }
 
-  /**
-   * Terminal wrapper around {@link finalize}: every exit path of the run
-   * loop - completed, failed, aborted, suspended - ends the stream with
-   * an `agent.end` event carrying the final {@link AgentResult} (AG-20).
-   */
-  async function* finishRunBase(
-    state: MutableRunState,
-    snapshot: InternalRunSnapshot<TOutput>,
-  ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
-    // CE-3/AG-13: settle manual-compact requests the loop never serviced -
-    // the run is over, there is no live buffer left to splice.
-    while (pendingManualCompacts.length > 0) {
-      pendingManualCompacts.shift()?.resolve(noopCompactionResult('no-active-run'));
-    }
-    const result = finalize(state, snapshot);
-    // TL-10: spill artifacts are run-scoped scratch - drop them once the
-    // run is terminal. `awaiting_approval` and `aborted` runs keep
-    // theirs (handles must survive resume); orphans fall to the writer's
-    // startup TTL sweep.
-    if (result.status === 'completed' || result.status === 'failed') {
-      await spillWriter.clear?.(result.state.id).catch(() => {});
-    }
-    yield { type: 'agent.end', runId: result.state.id, result };
-    return result;
-  }
+  // Terminal path: settle the manual-compact queue, finalize the
+  // result, clear terminal-run spill artifacts and emit `agent.end`
+  // (see `runtime/run-finish.ts`).
+  const finishRunBase = createRunFinisher<TOutput>({ pendingManualCompacts, spillWriter });
 
-  function finalize(
-    state: MutableRunState,
-    snapshot: InternalRunSnapshot<TOutput>,
-  ): AgentResult<TOutput> {
-    state.finishedAt = state.finishedAt ?? new Date().toISOString();
-    // AG-9: the result carries the terminal status, the failure (when
-    // any), and the final RunState - a suspended run is resumable from
-    // the result alone, no checkpointStore required.
-    return {
-      output: snapshot.output,
-      usage: state.usage,
-      status: state.status,
-      ...(state.error !== undefined ? { error: state.error } : {}),
-      state: state as unknown as RunState,
-    };
-  }
-
-  const stream = (
-    input: AgentInput | RunState,
-    options?: AgentCallOptions<TDeps>,
-  ): AsyncIterable<AgentEvent<TOutput>> => {
-    const opts = options ?? {};
-    return {
-      [Symbol.asyncIterator]: () => {
-        const gen = runLoop(input, opts);
-        return {
-          async next(): Promise<IteratorResult<AgentEvent<TOutput>, void>> {
-            const r = await gen.next();
-            if (r.done === true) {
-              return { done: true, value: undefined };
-            }
-            return { done: false, value: r.value };
-          },
-          async return(): Promise<IteratorResult<AgentEvent<TOutput>, void>> {
-            await gen.return(undefined as unknown as AgentResult<TOutput>);
-            return { done: true, value: undefined };
-          },
-        };
-      },
-    };
-  };
-
-  const run = async (
-    input: AgentInput | RunState,
-    options?: AgentCallOptions<TDeps>,
-  ): Promise<AgentResult<TOutput>> => {
-    const opts = options ?? {};
-    const gen = runLoop(input, opts);
-    let next = await gen.next();
-    while (next.done !== true) {
-      next = await gen.next();
-    }
-    // Every terminal path of the run loop returns `finalize(...)`; an
-    // undefined return value would mean the generator was torn down
-    // externally - an invariant violation, not a run outcome (AG-9).
-    const result = next.value;
-    if (result === undefined) {
-      throw new Error('unreachable: agent run loop ended without a result');
-    }
-    return result;
-  };
+  // The public call surface over the run loop (AG-9; see
+  // `runtime/agent-surface.ts`).
+  const { stream, run } = createRunMethods<TDeps, TOutput>(runLoop);
 
   const steer = (message: AgentInput): void => {
     const { seed } = asMessages(message);
@@ -3068,236 +838,25 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     abortController?.abort();
   };
 
-  // D2: distil a completed child run into a compact, bounded outcome the
-  // parent folds into its context instead of the raw transcript/output.
-  const foldRunOutcome = (result: AgentResult<TOutput>, maxChars: number): string => {
-    const steps = result.state.steps;
-    const toolNames = [
-      ...new Set(steps.flatMap((step) => step.toolCalls.map((c) => c.call.toolName))),
-    ];
-    const header =
-      `[sub-agent '${config.name}' outcome] status=${result.status}; ` +
-      `steps=${steps.length}; toolCalls=${steps.reduce((n, st) => n + st.toolCalls.length, 0)}` +
-      (toolNames.length > 0 ? `; tools=${toolNames.join(', ')}` : '');
-    const text = typeof result.output === 'string' ? result.output : JSON.stringify(result.output);
-    const body =
-      text.length > maxChars
-        ? `${text.slice(0, maxChars)}\n[... ${text.length - maxChars} chars truncated by contextFold]`
-        : text;
-    return `${header}\n${body}`;
-  };
+  // `agent.toTool()` - the sub-agent tool surface, incl. contextFold
+  // and child-taint propagation (see `runtime/agent-to-tool.ts`).
+  const toTool = createToTool<TDeps, TOutput>({ config, run, stream });
 
-  // D2: carry the child's coarse taint flags across the fold so the
-  // parent's data-flow ledger re-arms (widen-only; a no-op when the
-  // parent has no dataFlowPolicy).
-  const taintFromChildState = (
-    state: RunState,
-  ): { untrusted?: boolean; sensitive?: boolean; sourceKind?: string } | undefined => {
-    const summary = state.taintSummary;
-    if (summary === undefined || (!summary.untrustedSeen && !summary.sensitiveSeen)) {
-      return undefined;
-    }
-    return {
-      ...(summary.untrustedSeen ? { untrusted: true } : {}),
-      ...(summary.sensitiveSeen ? { sensitive: true } : {}),
-      sourceKind: 'sub-agent',
-    };
+  // `compact` / `fanOut` / the progress IO surface (AG-13 / AG-7 /
+  // AG-20; see `runtime/agent-surface.ts`). The deps object reads the
+  // factory's mutable `activeRunState` scratch through a live getter.
+  const surfaceDeps = {
+    config,
+    memory,
+    agentId,
+    getActiveRunState: () => activeRunState,
+    externalEventQueue,
+    pendingManualCompacts,
+    progressIO,
   };
-
-  const toTool = (
-    options: AgentToToolOptions = {},
-  ): Tool<{ readonly input: string }, TOutput, TDeps> => {
-    const exposeTurns = options.exposeTurns ?? 'final';
-    const foldMaxChars =
-      options.contextFold === undefined || options.contextFold === false
-        ? null
-        : typeof options.contextFold === 'object'
-          ? (options.contextFold.maxChars ?? 2000)
-          : 2000;
-    const propagateTaint = options.propagateTaint !== false;
-    const toolName = options.name ?? `subagent_${config.name}`;
-    const description = options.description ?? `Invoke sub-agent '${config.name}'.`;
-    const schema = {
-      parse: (v: unknown): { readonly input: string } => v as { readonly input: string },
-      safeParse: (v: unknown) => ({
-        success: true as const,
-        data: v as { readonly input: string },
-      }),
-      toJSON: (): Record<string, unknown> => ({
-        type: 'object',
-        properties: { input: { type: 'string' } },
-        required: ['input'],
-      }),
-    };
-    const tool: Tool<{ readonly input: string }, TOutput, TDeps> = {
-      name: toolName,
-      description,
-      inputSchema: schema as unknown as Tool<
-        { readonly input: string },
-        TOutput,
-        TDeps
-      >['inputSchema'],
-      sideEffectClass: 'side-effecting',
-      async execute(input, ctx) {
-        // AG-17: the parent ToolExecutionContext propagates - the
-        // parent's abort stops the sub-agent, deps/sessionId flow
-        // through, and the optional `inputFilter` shapes a seed from
-        // the parent history. Least authority by default: without a
-        // filter the sub-agent sees ONLY the input string, never the
-        // parent conversation.
-        const callOpts: AgentCallOptions<TDeps> = {
-          ...(ctx?.signal !== undefined ? { signal: ctx.signal } : {}),
-          ...(ctx?.runContext.deps !== undefined ? { deps: ctx.runContext.deps as TDeps } : {}),
-          ...(ctx?.runContext.sessionId !== undefined
-            ? { sessionId: ctx.runContext.sessionId }
-            : {}),
-          // D2: run the child under a restricted capability (read-only
-          // workers in an orchestrator-worker fan-out).
-          ...(options.capability !== undefined ? { capability: options.capability } : {}),
-        };
-        const seed: AgentInput =
-          options.inputFilter !== undefined && ctx !== undefined
-            ? ([
-                ...options.inputFilter(ctx.runContext.messages),
-                { role: 'user' as const, content: input.input },
-              ] as Message[])
-            : input.input;
-        if (exposeTurns === 'all') {
-          // Replay the streamed text completions as the result so
-          // the parent agent sees every turn the sub-agent
-          // produced. `exposeTurns: 'final'` (default) and
-          // `'none'` skip the per-turn assembly.
-          const turns: string[] = [];
-          let endResult: AgentResult<TOutput> | undefined;
-          for await (const ev of stream(seed, callOpts)) {
-            if (ev.type === 'text.complete') turns.push(ev.text);
-            else if (ev.type === 'agent.end') endResult = ev.result;
-          }
-          if (endResult !== undefined && endResult.status !== 'completed') {
-            throw new Error(
-              `sub-agent '${config.name}' ${endResult.status}${
-                endResult.error !== undefined ? `: ${endResult.error.message}` : ''
-              }`,
-            );
-          }
-          const allOutput = (foldMaxChars !== null && endResult !== undefined
-            ? foldRunOutcome(endResult, foldMaxChars)
-            : turns.join('\n\n')) as unknown as TOutput;
-          const allTaint =
-            propagateTaint && endResult !== undefined
-              ? taintFromChildState(endResult.state)
-              : undefined;
-          return (allTaint !== undefined
-            ? { output: allOutput, taint: allTaint }
-            : allOutput) as unknown as TOutput;
-        }
-        const result = await run(seed, callOpts);
-        // AG-17/AG-22 class: a non-completed sub-run is a TOOL ERROR,
-        // never an empty-string success.
-        if (result.status !== 'completed') {
-          throw new Error(
-            `sub-agent '${config.name}' ${result.status}${
-              result.error !== undefined ? `: ${result.error.message}` : ''
-            }`,
-          );
-        }
-        const taint = propagateTaint ? taintFromChildState(result.state) : undefined;
-        const output = (exposeTurns === 'none'
-          ? ''
-          : foldMaxChars !== null
-            ? foldRunOutcome(result, foldMaxChars)
-            : result.output) as unknown as TOutput;
-        return (taint !== undefined ? { output, taint } : output) as unknown as TOutput;
-      },
-    };
-    return tool;
-  };
-
-  const compact = async (options?: CompactOptions): Promise<CompactionApiResult> => {
-    // No memory wired - an explicit no-op (AG-13), intentionally
-    // forgiving so example apps that don't wire memory don't crash
-    // on `agent.compact()`.
-    if (memory === undefined) return noopCompactionResult('no-memory');
-    // Sensitivity gate (WI-09 step 2) applies to MANUAL compaction
-    // too: secret-tier history never ships to the summarizer.
-    if (config.sensitivity === 'secret') return noopCompactionResult('sensitivity-gated');
-    // Idle - there is no live buffer to splice (AG-13's explicit
-    // no-op marker, where the old surface silently reported zeros).
-    if (activeRunState === undefined) return noopCompactionResult('no-active-run');
-    // CE-3/AG-13: the run loop owns the live buffer, so the splice
-    // happens there - enqueue and let `maybeAutoCompact` service the
-    // request at the next step boundary with the same prefix-pinned
-    // splice as auto-compaction. Don't await this from inside a tool
-    // handler: the loop can't reach the next step until the tool
-    // returns.
-    return await new Promise<CompactionApiResult>((resolve, reject) => {
-      pendingManualCompacts.push({ options, resolve, reject });
-    });
-  };
-
-  const fanOut = async <TFanOutOutput = unknown>(
-    options: AgentFanOutOptions<TFanOutOutput>,
-  ): Promise<FanOutResult<TFanOutOutput>> => {
-    const runId = activeRunState?.id ?? `run_${newId()}`;
-    const sessionId = activeRunState?.sessionId ?? `session_${newId()}`;
-    const fanOutOptions: RunFanOutOptions<TFanOutOutput> = {
-      children: options.children,
-      ...(options.maxConcurrentChildren !== undefined
-        ? { maxConcurrentChildren: options.maxConcurrentChildren }
-        : {}),
-      ...(options.perBudget !== undefined ? { perBudget: options.perBudget } : {}),
-      ...(options.mergeStrategy !== undefined ? { mergeStrategy: options.mergeStrategy } : {}),
-      ...(options.signal !== undefined ? { signal: options.signal } : {}),
-      // AG-7: fanout lifecycle events reach the agent stream - queued
-      // on the external-event queue and drained into the active (or
-      // next consumed) run, like steer/follow-up/progress events.
-      emit: (event) => {
-        externalEventQueue.push(event as AgentEvent<TOutput>);
-      },
-      // AG-7: the configured sideways-injection merge guard finally
-      // applies to the judge-merge path.
-      ...(config.mergeGuard !== undefined ? { mergeGuard: config.mergeGuard } : {}),
-      runId,
-      sessionId,
-      agentId,
-    };
-    return runFanOut<TFanOutOutput>(fanOutOptions);
-  };
-
-  // Stable fallback id so out-of-run `progress.write` → `progress.read`
-  // pairs resolve to the same artifact directory (a fresh id per call
-  // could never find what it just wrote).
-  const progressFallbackRunId = `run_${newId()}`;
-  const progress: AgentProgressIO = {
-    write: async (content: string, opts?: ProgressWriteOptions) => {
-      const runId = activeRunState?.id ?? progressFallbackRunId;
-      const ref = await progressIO.write(runId, content, opts);
-      // AG-20: surface the documented `agent.progress.written` event -
-      // queued here and drained into the active (or next consumed) stream.
-      externalEventQueue.push({
-        type: 'agent.progress.written',
-        runId,
-        sessionId: activeRunState?.sessionId ?? '',
-        agentId,
-        ref,
-      } as AgentEvent<TOutput>);
-      return ref;
-    },
-    read: async (opts?: ProgressReadOptions) => {
-      const queriedRunId = opts?.runId ?? activeRunState?.id ?? progressFallbackRunId;
-      const refs = await progressIO.read(queriedRunId, opts);
-      externalEventQueue.push({
-        type: 'agent.progress.read',
-        runId: activeRunState?.id ?? queriedRunId,
-        sessionId: activeRunState?.sessionId ?? '',
-        agentId,
-        refs,
-        queriedRunId,
-        queriedRole: opts?.role,
-      } as AgentEvent<TOutput>);
-      return refs;
-    },
-  };
+  const compact = createCompactMethod<TDeps, TOutput>(surfaceDeps);
+  const fanOut = createFanOutMethod<TDeps, TOutput>(surfaceDeps);
+  const progress: AgentProgressIO = createProgressSurface<TDeps, TOutput>(surfaceDeps);
 
   void config.sensitivity as Sensitivity | undefined;
 
@@ -3317,86 +876,4 @@ export function createAgent<TDeps = unknown, TOutput = string>(
   };
 
   return agent;
-}
-
-/**
- * Pre-execution approval screen (Adapter G / durable HITL). Evaluates a
- * (registry-resolved) tool's `needsApproval` against the realized args.
- * Returns `true` when the run must suspend before the tool executes.
- *
- * Actual execution flows through the `@graphorin/tools` executor, whose
- * `ApprovalGate` auto-grants because only no-approval / pre-approved
- * calls ever reach it; this probe is what keeps the suspend in the
- * agent so the durable-HITL contract (persist `RunState`, resume via
- * directive) is preserved.
- */
-async function invokeNeedsApproval(
-  tool: Pick<Tool, 'needsApproval'> | undefined,
-  args: unknown,
-  baseCtx: RunContext,
-  signal: AbortSignal,
-): Promise<boolean> {
-  const predicate = tool?.needsApproval;
-  if (predicate === undefined || predicate === false) return false;
-  if (predicate === true) return true;
-  const probeCtx: ToolExecutionContext = {
-    toolCallId: 'probe',
-    runContext: baseCtx,
-    signal,
-    tracer: baseCtx.tracer,
-    logger: NOOP_LOGGER,
-    secrets: probeSecretsAccessor(),
-    reportProgress: () => {},
-    streamContent: () => {},
-  };
-  return Boolean(await predicate(args as never, probeCtx));
-}
-
-/**
- * Rejecting secrets accessor used only by the {@link invokeNeedsApproval}
- * probe. Real tool execution resolves secrets through the executor's
- * ACL-scoped accessor; an approval predicate has no legitimate need to
- * read secret material, so every `require(...)` rejects.
- */
-function probeSecretsAccessor(): ToolExecutionContext['secrets'] {
-  const rejector = (_key: string, _options?: { readonly optional?: boolean }): Promise<never> =>
-    Promise.reject(new Error('secrets.require is unavailable inside a needsApproval predicate'));
-  return { require: rejector } as unknown as ToolExecutionContext['secrets'];
-}
-
-/**
- * tools-02: validate an approval-gated call's args at the pre-screen so
- * the gate decision - and what a human is asked to approve - is the input
- * that will actually execute. Structural + defensive: `undefined` when
- * the tool exposes no callable `safeParse` (nothing to validate here; the
- * executor still validates at dispatch); a throwing schema counts as a
- * validation failure rather than crashing the loop.
- */
-function safeParseGatedArgs(
-  tool: { readonly inputSchema?: unknown },
-  args: unknown,
-):
-  | { readonly success: true; readonly data: unknown }
-  | { readonly success: false; readonly message: string }
-  | undefined {
-  const schema = tool.inputSchema as { safeParse?: (value: unknown) => unknown } | null | undefined;
-  const safeParse = schema?.safeParse;
-  if (typeof safeParse !== 'function') return undefined;
-  try {
-    const parsed = safeParse.call(schema, args) as {
-      readonly success?: boolean;
-      readonly data?: unknown;
-      readonly error?: { readonly message?: string };
-    };
-    if (parsed.success === true) return { success: true, data: parsed.data };
-    return {
-      success: false,
-      message: parsed.error?.message ?? 'schema validation failed',
-    };
-  } catch (cause) {
-    return {
-      success: false,
-      message: cause instanceof Error ? cause.message : String(cause),
-    };
-  }
 }
