@@ -141,3 +141,4 @@ Phase 15 ships ready-to-copy templates for production deployments:
 | ------ | ------ |
 | [](/api/@graphorin/cli/README.md) | `@graphorin/cli` - operator CLI for the Graphorin framework. |
 | [commands](/api/@graphorin/cli/commands/index.md) | Public command entry points. The CLI binary thin-wraps these helpers; tests + downstream automations consume them directly so they never spawn a child process to exercise the contract. |
+| [package.json](/api/@graphorin/cli/package.json/index.md) | - |

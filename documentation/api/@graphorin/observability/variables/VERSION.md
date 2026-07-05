@@ -7,9 +7,7 @@
 # Variable: VERSION
 
 ```ts
-const VERSION: "0.6.0" = '0.6.0';
+const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/observability/src/index.ts:23
-
-Canonical version constant. Mirrors the `package.json` version.
+Defined in: packages/observability/src/index.ts:25

@@ -101,6 +101,3 @@ Four deployment templates live alongside the examples - they're not standalone a
 - [Standalone server](/guide/standalone-server) - promote your assistant to a daemon.
 - [Deployment](/guide/deployment) - production checklists.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

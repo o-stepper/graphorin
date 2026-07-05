@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * The in-memory retail "world" the benchmark tools mutate, plus the plain
  * `Tool` objects that act on it. Tools are hand-rolled plain objects with a

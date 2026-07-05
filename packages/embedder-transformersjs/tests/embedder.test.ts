@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 import {
   canonicalConfigHash,
@@ -39,7 +43,7 @@ function makeCapturingPipelineFactory(dim: number, captured: string[][]): Pipeli
 
 describe('TransformersJsEmbedder', () => {
   it('VERSION constant matches the package version', () => {
-    expect(VERSION).toBe('0.6.0');
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('prefixes E5 inputs by taskType and never prefixes non-E5 models (PS-10)', async () => {

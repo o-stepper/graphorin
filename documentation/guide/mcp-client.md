@@ -242,6 +242,3 @@ The client itself emits **counters**, not audit rows or spans: `mcp.call.invoked
 - [Security](/guide/security) - OAuth + sandbox model for untrusted servers.
 - [CLI](/guide/cli) - `graphorin auth login` flow.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

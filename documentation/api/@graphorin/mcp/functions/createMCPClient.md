@@ -10,7 +10,7 @@
 function createMCPClient(options): Promise<MCPClient>;
 ```
 
-Defined in: packages/mcp/src/client/client.ts:80
+Defined in: packages/mcp/src/client/client.ts:81
 
 Open a typed MCP client connection.
 

@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / ScoringPromptInput
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / ScoringPromptInput
 
 # Interface: ScoringPromptInput
 
-Defined in: scoring-prompt.ts:15
+Defined in: src/scoring-prompt.ts:15
 
 Inputs passed to a [ScoringPromptBuilder](/api/@graphorin/reranker-llm/type-aliases/ScoringPromptBuilder.md).
 
@@ -16,6 +16,6 @@ Inputs passed to a [ScoringPromptBuilder](/api/@graphorin/reranker-llm/type-alia
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-maxscore"></a> `maxScore` | `readonly` | `number` | Maximum integer the model is allowed to return. | scoring-prompt.ts:19 |
-| <a id="property-passage"></a> `passage` | `readonly` | `string` | - | scoring-prompt.ts:17 |
-| <a id="property-query"></a> `query` | `readonly` | `string` | - | scoring-prompt.ts:16 |
+| <a id="property-maxscore"></a> `maxScore` | `readonly` | `number` | Maximum integer the model is allowed to return. | src/scoring-prompt.ts:19 |
+| <a id="property-passage"></a> `passage` | `readonly` | `string` | - | src/scoring-prompt.ts:17 |
+| <a id="property-query"></a> `query` | `readonly` | `string` | - | src/scoring-prompt.ts:16 |

@@ -170,6 +170,3 @@ The CLI never phones home. The only outbound calls happen on commands that expli
 - [Security](/guide/security) - `graphorin doctor`, `graphorin token`, `graphorin auth`.
 - [Privacy](/guide/privacy) - the no-phone-home contract.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

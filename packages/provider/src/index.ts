@@ -26,8 +26,10 @@
  * @packageDocumentation
  */
 
-/** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.6.0';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
+
+export const VERSION: string = pkg.version;
 
 export * from './adapters/index.js';
 export * from './counters/index.js';

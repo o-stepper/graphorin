@@ -131,6 +131,7 @@ MIT - © 2026 Oleksiy Stepurenko.
 | [commentary](/api/@graphorin/sessions/commentary/index.md) | Commentary-phase trace sanitization barrel for `@graphorin/sessions`. |
 | [errors](/api/@graphorin/sessions/errors/index.md) | Typed error surface for `@graphorin/sessions`. |
 | [export](/api/@graphorin/sessions/export/index.md) | Barrel for the JSONL session-export schema 1.0 surface. |
-| [facade](/api/@graphorin/sessions/facade/index.md) | `createSessionManager(...)` and the `Session` facade - the hybrid facade-with-state surface for the sessions module. Per the single-source-of-truth principle, this package OWNS sessions / agents / handoffs / workflow attachments / audit metadata, and DELEGATES message CRUD to `@graphorin/memory.session`. There is no duplicate `session_messages` table, no separate FTS index, and no message cache in this package. |
+| [facade](/api/@graphorin/sessions/facade/index.md) | - |
 | [migrations](/api/@graphorin/sessions/migrations/index.md) | Migration registry for the JSONL session-export schema. v0.1 ships MAJOR `1` only; the registry exists so future MAJOR bumps can plug a migrator in without forking this package. |
+| [package.json](/api/@graphorin/sessions/package.json/index.md) | - |
 | [replay](/api/@graphorin/sessions/replay/index.md) | Barrel for the session-level replay surface. |

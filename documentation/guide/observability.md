@@ -150,6 +150,3 @@ Counter names are unprefixed in-process (`snapshotCounters()`); add your own nam
 - [Privacy](/guide/privacy) - the no-phone-home contract.
 - [Standalone server](/guide/standalone-server) - replay + Prometheus metrics endpoints.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

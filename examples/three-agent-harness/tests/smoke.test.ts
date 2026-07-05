@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/three-agent-harness`. Exercises the
  * Planner / Generator / Evaluator pipeline end-to-end against the
@@ -25,7 +29,7 @@ import {
 } from '../src/main.js';
 import { COMPARISON_JUDGE_REPLY, EVALUATOR_REPLY, PLANNER_REPLY } from '../src/stub-provider.js';
 
-describe('examples/three-agent-harness — smoke', () => {
+describe('examples/three-agent-harness - smoke', () => {
   let artifactRoot = '';
 
   beforeEach(async () => {
@@ -38,8 +42,8 @@ describe('examples/three-agent-harness — smoke', () => {
     }
   });
 
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runHarness converges on iteration 1 with the LRU fixture', async () => {

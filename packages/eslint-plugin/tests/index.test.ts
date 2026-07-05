@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { dirname } from 'node:path';
 
 import { Linter } from 'eslint';
@@ -13,7 +17,7 @@ describe('@graphorin/eslint-plugin', () => {
   });
 
   it('exports the canonical version constant', () => {
-    expect(VERSION).toBe('0.6.0');
+    expect(VERSION).toBe(pkgVersion);
     expect(meta.version).toBe(VERSION);
   });
 

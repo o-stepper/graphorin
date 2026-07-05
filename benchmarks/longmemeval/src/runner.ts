@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * LongMemEval (+ real LOCOMO / DMR) memory-quality benchmark.
  *
@@ -9,13 +9,13 @@
  * the question from recall via the configured `Provider`. Answers are
  * graded by the `@graphorin/evals` LLM-judge ("J" score) plus a
  * deterministic per-ability abstention scorer. With `--baseline` the run
- * is compared against a stored report and fails on regression — run once
+ * is compared against a stored report and fails on regression - run once
  * per ability for per-category CI gates.
  *
  * The default `main()` uses a deterministic **offline stub** provider
  * (scores are plumbing-only); inject a real `Provider` programmatically
  * via {@link runLongMemEvalBenchmark} for real numbers. Datasets are
- * downloaded on demand by `scripts/fetch-eval-datasets.mjs` (dev-only) —
+ * downloaded on demand by `scripts/fetch-eval-datasets.mjs` (dev-only) -
  * nothing here touches the network.
  */
 
@@ -64,7 +64,7 @@ const DEFAULT_TOP_K = 12;
  * The regression-gate tolerances the dispatch CI job gates on. Quality-only:
  * `maxAvgDurationIncreaseMs` stays `Infinity` because real LLM latency swings by
  * whole seconds run to run (EB-4). Exported so the B2 negative-control test
- * exercises the EXACT values the gate uses — proving it fails on a real
+ * exercises the EXACT values the gate uses - proving it fails on a real
  * regression rather than being theater.
  */
 export const REGRESSION_TOLERANCES: RegressionOptions = {
@@ -81,9 +81,9 @@ type RealProviderName = (typeof REAL_PROVIDER_NAMES)[number];
 export interface BenchProviderSpec {
   /** `stub` (default) or one of {@link REAL_PROVIDER_NAMES}. */
   readonly name?: string;
-  /** Model id — required for every real provider. */
+  /** Model id - required for every real provider. */
   readonly model?: string;
-  /** Base URL — required for `openai-compatible`; loopback default for `ollama`/`llamacpp`. */
+  /** Base URL - required for `openai-compatible`; loopback default for `ollama`/`llamacpp`. */
   readonly baseUrl?: string;
   /** Bearer key for `openai-compatible` (env-only; never a CLI flag). */
   readonly apiKey?: string;
@@ -96,8 +96,8 @@ export interface ResolvedBenchProvider {
 }
 
 /**
- * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default — and any
- * `stub` name — is the deterministic offline stub, labelled
+ * Resolve a {@link Provider} from a CLI/env spec (EB-1). The default - and any
+ * `stub` name - is the deterministic offline stub, labelled
  * `stub (plumbing-only)` so a plumbing run can never be mistaken for a real
  * result. A real `--provider` constructs the matching HTTP adapter; the network
  * is only touched later at `generate()` time, so this stays offline-safe (and
@@ -140,7 +140,7 @@ export function resolveBenchProvider(spec: BenchProviderSpec = {}): ResolvedBenc
         label: `llamacpp:${model}`,
       };
     default: {
-      // openai-compatible — no loopback default; a base URL is mandatory.
+      // openai-compatible - no loopback default; a base URL is mandatory.
       if (baseUrl === undefined) {
         throw new Error(
           '[benchmark-longmemeval] --provider openai-compatible requires --base-url ' +
@@ -172,7 +172,7 @@ function normalizeForFts(text: string): string {
 
 /**
  * Retrieval configuration the benchmark A/B-tests (evals-01/02). Each mode
- * maps onto the library's real search surface — the harness adds NOTHING
+ * maps onto the library's real search surface - the harness adds NOTHING
  * on top (the pre-C8 keyword fan-out booster is gone, evals-06), so the
  * numbers measure the search path users actually get.
  */
@@ -202,7 +202,7 @@ export function createRetrievalStats(): RetrievalStats {
 
 /**
  * Deterministic, offline bag-of-words hash embedder (evals-01). Not a real
- * semantic model — it exists so the VECTOR leg of hybrid search (and the
+ * semantic model - it exists so the VECTOR leg of hybrid search (and the
  * graph/HyDE paths that ride it) can be exercised and A/B-compared in CI
  * without a model download. Real embedding quality needs a real embedder.
  */
@@ -282,7 +282,7 @@ export function createBenchMeter(): BenchMeter {
 /**
  * Shared answer path: build the QA prompt from the supplied context, answer via
  * the provider, and meter usage. The memory agent feeds *recalled* context; the
- * full-context baseline feeds the *entire* haystack — only the context differs.
+ * full-context baseline feeds the *entire* haystack - only the context differs.
  */
 async function answerFromContext(
   provider: Provider,
@@ -325,12 +325,12 @@ export interface FullContextAgentOptions {
 }
 
 /**
- * SOTA-1 baseline: inline the ENTIRE haystack into the prompt — no store, no
+ * SOTA-1 baseline: inline the ENTIRE haystack into the prompt - no store, no
  * retrieval window. Every memory-pipeline score is reported against this; on a
  * small corpus the honest result often favours full-context (ConvoMem: full
  * context beats memory systems below ~150 conversations) at a much higher token
  * cost, which the {@link BenchMeter} surfaces. It is the prerequisite for any
- * corpus-size-aware threshold (SOTA-2) — without it, thresholds are picked blind.
+ * corpus-size-aware threshold (SOTA-2) - without it, thresholds are picked blind.
  */
 export function createFullContextAgent(
   options: FullContextAgentOptions,
@@ -367,7 +367,7 @@ export interface MemorySystemAgentOptions {
   readonly retrievalStats?: RetrievalStats;
   /**
    * EB-11 hook: fired once per ACTUAL conversation ingest (a cache miss), NOT
-   * per QA case — lets a caller/test confirm a sample's N questions ingest the
+   * per QA case - lets a caller/test confirm a sample's N questions ingest the
    * haystack only once.
    */
   readonly onIngest?: () => void;
@@ -389,13 +389,13 @@ export function createMemorySystemAgent(
   const topK = options.topK ?? DEFAULT_TOP_K;
   // EB-11: the LOCOMO loader pushes the SAME `haystackSessions` array into
   // every QA case of one conversation, so a fresh per-case ingest re-loads the
-  // whole (~300-turn) conversation — and, with --consolidate, re-runs the LLM
-  // consolidation pass — once per QUESTION. Key the ingested memory by that
+  // whole (~300-turn) conversation - and, with --consolidate, re-runs the LLM
+  // consolidation pass - once per QUESTION. Key the ingested memory by that
   // shared array reference: each conversation is ingested once and its store is
   // reused (read-only) by its other questions; a different conversation is a
   // different array, so it gets a separate store and sample isolation holds.
   // The :memory: stores stay open for the run's lifetime (a short-lived
-  // benchmark process) — not closed per case, since later questions of the same
+  // benchmark process) - not closed per case, since later questions of the same
   // sample still read them.
   const retrieval: RetrievalMode = options.retrieval ?? 'default';
   // evals-09: cache the in-flight PROMISE (not the resolved Memory) so two
@@ -464,7 +464,7 @@ export function createMemorySystemAgent(
   };
 }
 
-/** The LongMemEval "J" judge — grades the candidate against the reference answer. */
+/** The LongMemEval "J" judge - grades the candidate against the reference answer. */
 function judgeScorer(provider: Provider): Scorer<MemoryEvalInput, string> {
   return llmJudge<MemoryEvalInput, string>({
     provider,
@@ -655,7 +655,7 @@ interface CliArgs {
   baseUrl?: string;
   /** SOTA-1 system-under-test (default: memory). */
   mode?: BenchMode;
-  /** C8 (evals-04): dedicated judge provider — never grade yourself. */
+  /** C8 (evals-04): dedicated judge provider - never grade yourself. */
   judgeProviderName?: string;
   judgeModel?: string;
   judgeBaseUrl?: string;
@@ -765,7 +765,7 @@ export interface ResultsMeta {
   readonly embedder?: EmbedderMode;
   readonly topK?: number;
   readonly consolidate?: boolean;
-  /** C8 (evals-04): who graded — and whether it graded itself. */
+  /** C8 (evals-04): who graded - and whether it graded itself. */
   readonly judge?: string;
   readonly selfJudged?: boolean;
   /** C8 (evals-05): iteration count + variance. */
@@ -779,13 +779,13 @@ export interface ResultsMeta {
 }
 
 /**
- * The RESULTS.md header, stamped with the provider provenance (EB-1) and — when
- * available — the run mode and tokens/query cost axis (SOTA-1). A stub run is
+ * The RESULTS.md header, stamped with the provider provenance (EB-1) and - when
+ * available - the run mode and tokens/query cost axis (SOTA-1). A stub run is
  * labelled `stub (plumbing-only)` so it can never read as a real result.
  */
 export function buildResultsHeader(providerLabel: string, meta: ResultsMeta = {}): string {
   const lines = [
-    '# LongMemEval — memory-quality benchmark results',
+    '# LongMemEval - memory-quality benchmark results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',
@@ -799,7 +799,7 @@ export function buildResultsHeader(providerLabel: string, meta: ResultsMeta = {}
   }
   if (meta.judge !== undefined) {
     lines.push(
-      `**Judge:** ${meta.judge}${meta.selfJudged === true ? ' (SELF-JUDGED — do not compare across systems)' : ''}`,
+      `**Judge:** ${meta.judge}${meta.selfJudged === true ? ' (SELF-JUDGED - do not compare across systems)' : ''}`,
     );
   }
   if (meta.tokensPerQuery !== undefined) {
@@ -837,7 +837,7 @@ async function writeResults(
 export async function main(): Promise<void> {
   const args = parseArgs(process.argv);
   // CLI flags win; env (GRAPHORIN_BENCH_*) fills the gaps. The API key is
-  // env-only — never put a secret on the command line.
+  // env-only - never put a secret on the command line.
   const providerName = args.providerName ?? process.env.GRAPHORIN_BENCH_PROVIDER;
   const model = args.model ?? process.env.GRAPHORIN_BENCH_MODEL;
   const baseUrl = args.baseUrl ?? process.env.GRAPHORIN_BENCH_BASE_URL;
@@ -850,7 +850,7 @@ export async function main(): Promise<void> {
   });
   if (label.startsWith('stub')) {
     console.warn(
-      '[benchmark-longmemeval] no real Provider selected; using the deterministic offline stub — ' +
+      '[benchmark-longmemeval] no real Provider selected; using the deterministic offline stub - ' +
         'scores are plumbing-only. Pass --provider ollama|llamacpp|openai-compatible (with --model, ' +
         'or the GRAPHORIN_BENCH_* env vars) for meaningful numbers.',
     );
@@ -860,7 +860,7 @@ export async function main(): Promise<void> {
   const mode: BenchMode = args.mode ?? 'memory';
   // C8 (evals-04): a dedicated judge, resolved exactly like the SUT
   // provider (judge env vars fall back to the SUT env). Without one, the
-  // SUT grades itself — legal for plumbing, poisonous for baselines.
+  // SUT grades itself - legal for plumbing, poisonous for baselines.
   const judgeName = args.judgeProviderName ?? process.env.GRAPHORIN_BENCH_JUDGE_PROVIDER;
   const judgeModel = args.judgeModel ?? process.env.GRAPHORIN_BENCH_JUDGE_MODEL;
   const judgeBaseUrl = args.judgeBaseUrl ?? process.env.GRAPHORIN_BENCH_JUDGE_BASE_URL;
@@ -967,7 +967,7 @@ export async function main(): Promise<void> {
       baselineText = await readFile(args.baseline, 'utf8');
     } catch {
       console.warn(
-        `[benchmark-longmemeval] no baseline at ${args.baseline} — skipping regression gate ` +
+        `[benchmark-longmemeval] no baseline at ${args.baseline} - skipping regression gate ` +
           '(seed one with --json).',
       );
     }

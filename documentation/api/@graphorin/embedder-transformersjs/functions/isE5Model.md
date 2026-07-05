@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / isE5Model
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / isE5Model
 
 # Function: isE5Model()
 
@@ -10,7 +10,7 @@
 function isE5Model(model): boolean;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:309
+Defined in: packages/embedder-transformersjs/src/index.ts:311
 
 True when a model id belongs to the E5 family, which requires asymmetric
 `query:` / `passage:` prefixes (PS-10). Matches an `e5` token bounded by a

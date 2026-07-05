@@ -10,7 +10,7 @@
 function _resetSseWarnDedupForTesting(): void;
 ```
 
-Defined in: packages/mcp/src/client/client.ts:71
+Defined in: packages/mcp/src/client/client.ts:72
 
 **`Experimental`**
 

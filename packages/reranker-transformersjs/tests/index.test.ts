@@ -1,10 +1,14 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 
 import * as pkg from '../src/index.js';
 
 describe('@graphorin/reranker-transformersjs public surface', () => {
   it('declares the canonical version constant', () => {
-    expect(pkg.VERSION).toBe('0.6.0');
+    expect(pkg.VERSION).toBe(pkgVersion);
   });
 
   it('re-exports the reranker factory + class + id', () => {

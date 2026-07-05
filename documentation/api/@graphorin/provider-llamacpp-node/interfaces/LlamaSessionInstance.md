@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / LlamaSessionInstance
+[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / [](/api/@graphorin/provider-llamacpp-node/README.md) / LlamaSessionInstance
 
 # Interface: LlamaSessionInstance
 
-Defined in: runtime.ts:38
+Defined in: src/runtime.ts:38
 
 **`Internal`**
 
@@ -20,7 +20,7 @@ Loaded chat session capable of streaming responses.
 optional dispose(): void;
 ```
 
-Defined in: runtime.ts:53
+Defined in: src/runtime.ts:53
 
 Release the per-request context / sequence backing this session.
 node-llama-cpp contexts hold KV-cache memory (hundreds of MB at
@@ -39,7 +39,7 @@ every stream so long-running agents do not leak until OOM.
 promptStreamingResponse(prompt, options?): AsyncIterable<string>;
 ```
 
-Defined in: runtime.ts:39
+Defined in: src/runtime.ts:39
 
 #### Parameters
 

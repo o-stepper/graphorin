@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Public types for the `approval-workflow` example. Captures the
  * expense-approval state shape, the input contract accepted by
@@ -50,7 +50,7 @@ export interface ManualReviewPause {
   readonly submitter: string;
 }
 
-/** Canonical node names — referenced by edges, tests, and README docs. */
+/** Canonical node names - referenced by edges, tests, and README docs. */
 export const NODE_NAMES = {
   receive: 'receive',
   decide: 'auto-approve-or-pause',

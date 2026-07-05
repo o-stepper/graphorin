@@ -10,7 +10,7 @@
 const TICKET_SUBPROTOCOL_PREFIX: "ticket." = 'ticket.';
 ```
 
-Defined in: subprotocol.ts:42
+Defined in: src/subprotocol.ts:42
 
 Prefix for the single-use ticket that browser clients attach to
 the `Sec-WebSocket-Protocol` header. The server's upgrade handler

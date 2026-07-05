@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Minimal in-tree implementation of the {@link SecretValue} contract from
  * `@graphorin/core`. The wrapper redacts every standard JavaScript
@@ -117,7 +117,7 @@ export class StubSecretValue implements SecretValue {
 }
 
 /**
- * Convenience helper used throughout the example — the stub provider's
+ * Convenience helper used throughout the example - the stub provider's
  * supervisor mounts the secret on its `deps`, the smoke test asserts
  * the worker cannot reach it.
  */

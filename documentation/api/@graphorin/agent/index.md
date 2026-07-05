@@ -196,6 +196,7 @@ Stepurenko · <https://github.com/o-stepper/graphorin>
 | [fanout](/api/@graphorin/agent/fanout/index.md) | Agent-step-level fan-out - `Agent.fanOut(...)` convenience that spawns N sub-agents in parallel under a bounded-fanout cap with per-child budgets and four built-in merge strategies. |
 | [filters](/api/@graphorin/agent/filters/index.md) | Handoff filter library - a small set of pure, composable functions that take the parent agent's message history and return a filtered subset suitable for forwarding to a child agent. |
 | [lateral-leak](/api/@graphorin/agent/lateral-leak/index.md) | Lateral-leak defense layer aggregate exports. |
+| [package.json](/api/@graphorin/agent/package.json/index.md) | - |
 | [preferred-model](/api/@graphorin/agent/preferred-model/index.md) | Per-tool / per-agent preferred-model resolution. Pure functions consulted by the agent loop AFTER the model has decided which tool(s) to call but BEFORE `provider.stream(...)` is invoked. |
 | [progress](/api/@graphorin/agent/progress/index.md) | Structured progress-artifact IO. Persists UTF-8 text artifacts under `<artifactRoot>/<runId>/progress/<role>.<seqPadded>.txt` via atomic-write `.tmp + rename` discipline. |
 | [run-state](/api/@graphorin/agent/run-state/index.md) | `RunState` JSON serialization and rehydration. |

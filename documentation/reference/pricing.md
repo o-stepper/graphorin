@@ -156,6 +156,3 @@ When `@graphorin/observability` and `@graphorin/pricing` are both installed, the
 - [Observability](/guide/observability) - `gen_ai.usage.cost.usd` attribute.
 - [CLI](/guide/cli) - `graphorin pricing status / refresh / diff`.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

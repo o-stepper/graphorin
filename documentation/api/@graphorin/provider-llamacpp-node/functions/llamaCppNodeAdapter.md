@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / llamaCppNodeAdapter
+[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / [](/api/@graphorin/provider-llamacpp-node/README.md) / llamaCppNodeAdapter
 
 # Function: llamaCppNodeAdapter()
 
@@ -10,7 +10,7 @@
 function llamaCppNodeAdapter(options): Provider;
 ```
 
-Defined in: adapter.ts:104
+Defined in: src/adapter.ts:104
 
 Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by an in-process GGUF
 model. The first call lazily loads the `node-llama-cpp` peer + the

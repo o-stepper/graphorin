@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { createToken } from '@graphorin/security';
 import {
   _resetResolversForTesting,
@@ -244,7 +248,7 @@ describe('REST integration - happy + error paths', () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as { status: string; version: string };
     expect(body.status).toBe('ok');
-    expect(body.version).toBe('0.6.0');
+    expect(body.version).toBe(pkgVersion);
   });
 
   it('GET /v1/agents returns the registry contents', async () => {

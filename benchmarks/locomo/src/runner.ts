@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Memory retrieval QA benchmark: loads JSONL cases (facts + question +
  * expected substring), materialises an isolated in-memory SQLite store per
@@ -313,7 +313,7 @@ async function writeResults(
   report: EvalReport<LocomoCaseInput, string>,
 ): Promise<void> {
   const header = [
-    '# Memory retrieval QA — benchmark results',
+    '# Memory retrieval QA - benchmark results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',

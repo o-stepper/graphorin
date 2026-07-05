@@ -28,7 +28,7 @@ type SubscriptionTarget =
 };
 ```
 
-Defined in: packages/client/src/graphorin-client.ts:71
+Defined in: packages/client/src/graphorin-client.ts:72
 
 Discriminator for the subscription target. Mirrors the strict
 subject grammar enforced by the server:

@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
 
 import { dirname, join } from 'node:path';

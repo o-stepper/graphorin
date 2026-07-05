@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / ScoringPromptBuilder
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / ScoringPromptBuilder
 
 # Type Alias: ScoringPromptBuilder
 
@@ -10,7 +10,7 @@
 type ScoringPromptBuilder = (input) => ScoringPrompt;
 ```
 
-Defined in: scoring-prompt.ts:39
+Defined in: src/scoring-prompt.ts:39
 
 Function shape consumed by [createLlmReranker](/api/@graphorin/reranker-llm/functions/createLlmReranker.md).
 

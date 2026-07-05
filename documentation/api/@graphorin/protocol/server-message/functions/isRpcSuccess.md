@@ -10,7 +10,7 @@
 function isRpcSuccess(message): message is { id: string | number; jsonrpc: "2.0"; result?: unknown; v: "1" };
 ```
 
-Defined in: server-message.ts:219
+Defined in: src/server-message.ts:219
 
 ## Parameters
 

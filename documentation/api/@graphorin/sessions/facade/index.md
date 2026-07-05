@@ -6,14 +6,6 @@
 
 # facade
 
-`createSessionManager(...)` and the `Session` facade - the hybrid
-facade-with-state surface for the sessions module. Per the
-single-source-of-truth principle, this package OWNS sessions /
-agents / handoffs / workflow attachments / audit metadata, and
-DELEGATES message CRUD to `@graphorin/memory.session`. There is no
-duplicate `session_messages` table, no separate FTS index, and no
-message cache in this package.
-
 ## Interfaces
 
 | Interface | Description |

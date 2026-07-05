@@ -1,7 +1,7 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Workflow HITL durable-resume acceptance demo — library mode. Wires
+ * Workflow HITL durable-resume acceptance demo - library mode. Wires
  * `@graphorin/workflow`'s step-graph engine to a four-node expense-
  * approval pipeline (`receive` → `auto-approve-or-pause` → `process-
  * approved` → `notify`). The middle node either fast-paths small
@@ -33,6 +33,8 @@ import {
   type StreamMode,
   type Workflow,
 } from '@graphorin/workflow';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import {
   type ApprovalDecision,
   AUTO_APPROVE_THRESHOLD,
@@ -42,8 +44,7 @@ import {
   NODE_NAMES,
 } from './types.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 /** Default stream mode used by every helper unless explicitly overridden. */
 const DEFAULT_STREAM_MODE: StreamMode = 'debug';
@@ -125,7 +126,7 @@ export function createApprovalWorkflow(
           if (state.approved !== true) {
             return {
               notifications: [
-                `skipped processing for ${state.submitter} — decision was not approved`,
+                `skipped processing for ${state.submitter} - decision was not approved`,
               ],
             };
           }
@@ -172,7 +173,7 @@ export interface RunApprovalDemoOptions {
   readonly justification?: string;
   readonly checkpointStore: CheckpointStore;
   readonly threadId: string;
-  /** Stream emission mode — defaults to `'debug'` (every event kind). */
+  /** Stream emission mode - defaults to `'debug'` (every event kind). */
   readonly stream?: StreamMode;
   readonly signal?: AbortSignal;
 }
@@ -241,7 +242,7 @@ export interface SimulateServerRestartResult {
  * Rebuild a brand-new `Workflow` instance from the supplied persistent
  * `CheckpointStore` and resume the paused thread with the operator's
  * directive. Because the previous in-process workflow handle is
- * discarded, this is byte-equivalent to a server restart mid-pause —
+ * discarded, this is byte-equivalent to a server restart mid-pause -
  * everything needed to continue lives in the checkpoint store.
  */
 export async function simulateServerRestart(
@@ -307,7 +308,7 @@ export async function main(): Promise<number> {
       threadId: 'demo-auto-approve',
     });
     process.stdout.write(
-      `graphorin v${VERSION} approval-workflow auto — ` +
+      `graphorin v${VERSION} approval-workflow auto - ` +
         `status=${auto.status}, approved=${auto.finalState.approved ?? false}, ` +
         `notifications=${auto.finalState.notifications.length}.\n`,
     );
@@ -320,7 +321,7 @@ export async function main(): Promise<number> {
       threadId: 'demo-manual-review',
     });
     process.stdout.write(
-      `graphorin v${VERSION} approval-workflow manual — ` +
+      `graphorin v${VERSION} approval-workflow manual - ` +
         `status=${initial.status}, suspendedAtNode='${initial.suspendedAtNode ?? '<none>'}'.\n`,
     );
 
@@ -333,7 +334,7 @@ export async function main(): Promise<number> {
         }),
       });
       process.stdout.write(
-        `graphorin v${VERSION} approval-workflow resume — ` +
+        `graphorin v${VERSION} approval-workflow resume - ` +
           `status=${resumed.status}, approved=${resumed.finalState.approved ?? false}, ` +
           `processedAt='${resumed.finalState.processedAt ?? '<none>'}', ` +
           `notifications=${resumed.finalState.notifications.length}.\n`,

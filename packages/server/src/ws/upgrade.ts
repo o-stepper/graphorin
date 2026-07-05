@@ -1,3 +1,4 @@
+import pkg from '../../package.json' with { type: 'json' };
 /**
  * Hono WebSocket upgrade handler. Wires the `@hono/node-ws` adapter
  * to the dispatcher: validates the subprotocol, runs auth (bearer
@@ -190,7 +191,7 @@ export async function createWsUpgradeEvents(
         sendRpcSuccess(ws, message.id, {
           serverInfo: {
             name: 'graphorin-server',
-            version: '0.6.0',
+            version: pkg.version,
           },
           capabilities: {
             subscriptions: true,

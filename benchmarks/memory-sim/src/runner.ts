@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Synthetic dialogue memory simulation: seeded PRNG emits short fact
  * strings, persists them via SemanticMemory, then checks whether hybrid
@@ -81,7 +81,7 @@ export async function main(): Promise<void> {
   const rounds = smoke ? 8 : 64;
   const { hitRate } = await runMemorySim({ seed: 0x9e37_79b9, rounds });
   const lines = [
-    '# Memory simulation — results',
+    '# Memory simulation - results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',
@@ -95,7 +95,7 @@ export async function main(): Promise<void> {
   ];
   await writeFile(join(pkgRoot(), 'RESULTS.md'), lines.join('\n'), 'utf8');
   console.log(`[benchmark-memory-sim] rounds=${rounds} hitRate=${hitRate.toFixed(4)}`);
-  // E7 (evals-12): the gate used to be `hitRate < 0.85 && !smoke` — and CI
+  // E7 (evals-12): the gate used to be `hitRate < 0.85 && !smoke` - and CI
   // only ever ran --smoke, so it could never fire. The sim is fully
   // deterministic (seeded PRNG + FTS recall), so arming the gate in smoke
   // mode carries zero flake risk.

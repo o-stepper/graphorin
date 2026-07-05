@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub embedder used by the `document-pipeline` example.
  * `embed(text)` returns an 8-dim L2-normalised vector derived from a
@@ -8,7 +8,7 @@
  * same vector so the smoke-test assertions stay byte-stable.
  */
 
-/** Vector arity — kept tiny so the example does not allocate big arrays. */
+/** Vector arity - kept tiny so the example does not allocate big arrays. */
 export const STUB_EMBEDDING_DIM = 8 as const;
 
 /**

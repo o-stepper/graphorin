@@ -10,7 +10,7 @@
 const PROTOCOL_VERSION: "1" = '1';
 ```
 
-Defined in: subprotocol.ts:31
+Defined in: src/subprotocol.ts:31
 
 Wire-format major version literal carried on every message body.
 The pair `(SUBPROTOCOL_NAME, PROTOCOL_VERSION)` is the binding

@@ -14,7 +14,7 @@ function event(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:131
+Defined in: packages/triggers/src/index.ts:133
 
 ## Parameters
 

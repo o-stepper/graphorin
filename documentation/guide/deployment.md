@@ -151,6 +151,3 @@ Wire your load balancer / orchestrator's liveness probe to `GET /v1/health`. The
 - [Security](/guide/security) - production hardening checklist.
 - [Observability](/guide/observability) - OTLP exporter wiring.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

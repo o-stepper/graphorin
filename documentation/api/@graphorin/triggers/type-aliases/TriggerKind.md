@@ -10,6 +10,6 @@
 type TriggerKind = "cron" | "interval" | "idle" | "event";
 ```
 
-Defined in: packages/triggers/src/index.ts:29
+Defined in: packages/triggers/src/index.ts:31
 
 ## Stable

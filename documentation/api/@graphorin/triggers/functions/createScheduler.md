@@ -10,7 +10,7 @@
 function createScheduler(options): Scheduler;
 ```
 
-Defined in: packages/triggers/src/index.ts:226
+Defined in: packages/triggers/src/index.ts:228
 
 ## Parameters
 

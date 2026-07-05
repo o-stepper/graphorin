@@ -1,10 +1,14 @@
+import testPkg from '../../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 
 import * as security from '../../src/index.js';
 
 describe('@graphorin/security barrel exports', () => {
   it('re-exports the canonical version constant', () => {
-    expect(security.VERSION).toBe('0.6.0');
+    expect(security.VERSION).toBe(pkgVersion);
   });
 
   it('re-exports the SecretValue wrapper class', () => {

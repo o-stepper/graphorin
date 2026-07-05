@@ -69,6 +69,13 @@ jobs:
       - name: CLI docs command diff
         run: pnpm run check-cli-docs
 
+      # Every version-bearing site (workspace manifests, badges, footers,
+      # image tags, baselines) must agree with packages/core/package.json;
+      # code derives its version from package.json, so a reintroduced
+      # hardcoded version literal fails here too.
+      - name: Version consistency
+        run: pnpm run check-version-consistency
+
       - name: Benchmark smoke + cost regression + doc guards
         run: pnpm run benchmark:ci
 

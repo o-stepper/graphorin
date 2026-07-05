@@ -10,7 +10,7 @@
 function formatTicketSubprotocol(ticket): string;
 ```
 
-Defined in: subprotocol.ts:52
+Defined in: src/subprotocol.ts:52
 
 Format a ticket value as a `Sec-WebSocket-Protocol` token suitable
 for browser clients (which cannot attach an `Authorization`

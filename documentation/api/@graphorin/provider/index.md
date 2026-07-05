@@ -128,5 +128,6 @@ recommendations.
 | [errors](/api/@graphorin/provider/errors/index.md) | Public error surface for `@graphorin/provider`. |
 | [middleware](/api/@graphorin/provider/middleware/index.md) | Middleware barrel - the canonical-order composer plus seven built-in middlewares. |
 | [model-tier](/api/@graphorin/provider/model-tier/index.md) | Per-provider model-tier auto-classifier. |
+| [package.json](/api/@graphorin/provider/package.json/index.md) | - |
 | [reasoning](/api/@graphorin/provider/reasoning/index.md) | Reasoning-content lifecycle helpers. |
 | [trust](/api/@graphorin/provider/trust/index.md) | Trust subsystem barrel - exports the shared classifier and the per-tier sensitivity defaults. |

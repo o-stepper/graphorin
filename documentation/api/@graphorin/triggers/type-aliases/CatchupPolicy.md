@@ -10,7 +10,7 @@
 type CatchupPolicy = "none" | "last" | "all";
 ```
 
-Defined in: packages/triggers/src/index.ts:26
+Defined in: packages/triggers/src/index.ts:28
 
 Catch-up policy applied when a trigger missed one or more fires
 while the scheduler was offline.

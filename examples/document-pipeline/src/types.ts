@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Public types for the `document-pipeline` example. Captures the
  * synthetic PDF input shape, the `DocumentState` carried across every
@@ -42,7 +42,7 @@ export interface DocumentEmbedding {
 /**
  * Brand applied to the per-node value written to the `gate` `Barrier`
  * channel. The runtime stores writes under the writer's `nodeName`, so
- * the channel's merged value is `Record<nodeName, GateState>` — the
+ * the channel's merged value is `Record<nodeName, GateState>` - the
  * type alias keeps the cast site narrow without resorting to `any`.
  */
 export type GateState = Readonly<Record<string, true>>;
@@ -66,7 +66,7 @@ export interface DocumentState {
   indexedAt?: string;
 }
 
-/** Canonical node names — referenced by edges, tests, and README docs. */
+/** Canonical node names - referenced by edges, tests, and README docs. */
 export const NODE_NAMES = {
   parse: 'parse',
   chunk: 'chunk',
@@ -80,7 +80,7 @@ export const NODE_NAMES = {
 
 export type NodeName = (typeof NODE_NAMES)[keyof typeof NODE_NAMES];
 
-/** Canonical state-field/channel names — kept in lockstep with `DocumentState`. */
+/** Canonical state-field/channel names - kept in lockstep with `DocumentState`. */
 export const CHANNEL_NAMES = {
   pages: 'pages',
   chunks: 'chunks',

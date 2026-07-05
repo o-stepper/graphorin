@@ -361,6 +361,3 @@ Tools, [Skills](/guide/skills), and [MCP servers](/guide/mcp-client) all surface
 - [Security](/guide/security) - sandbox and approval architecture.
 - [Memory system](/guide/memory-system) - the eleven memory tools wired through `@graphorin/tools`.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

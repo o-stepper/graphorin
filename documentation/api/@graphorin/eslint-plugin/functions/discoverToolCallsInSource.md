@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / discoverToolCallsInSource
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / discoverToolCallsInSource
 
 # Function: discoverToolCallsInSource()
 
@@ -10,7 +10,7 @@
 function discoverToolCallsInSource(file, source): DiscoveredTool[];
 ```
 
-Defined in: tool-discovery.ts:183
+Defined in: src/tool-discovery.ts:183
 
 Discover every `tool({...})` invocation in a source string. The
 returned findings are stable + frozen so callers can pass them

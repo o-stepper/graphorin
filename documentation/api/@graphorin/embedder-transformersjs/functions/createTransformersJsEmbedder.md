@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / createTransformersJsEmbedder
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / createTransformersJsEmbedder
 
 # Function: createTransformersJsEmbedder()
 
@@ -10,7 +10,7 @@
 function createTransformersJsEmbedder(options?): TransformersJsEmbedder;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:124
+Defined in: packages/embedder-transformersjs/src/index.ts:126
 
 Build a `TransformersJsEmbedder` instance. Lazy: the underlying
 pipeline is constructed on the first `embed()` call so packaging

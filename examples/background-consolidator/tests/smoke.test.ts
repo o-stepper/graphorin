@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/background-consolidator`. Every test
  * runs against `:memory:` SQLite + the deterministic stub provider so
@@ -10,7 +14,7 @@
  *     fires the registered light-tick interval trigger
  *     deterministically, and returns ≥ 1 completed `light` phase
  *     within the soft budget.
- *  3. Trigger durability across simulated restart (DEC-150) — the
+ *  3. Trigger durability across simulated restart (DEC-150) - the
  *     SQLite `TriggerStore` is the durable layer, so a fresh
  *     `Scheduler` sharing the same store re-discovers the persisted
  *     trigger rows after the previous scheduler stopped.
@@ -30,9 +34,9 @@ import {
   VERSION,
 } from '../src/main.js';
 
-describe('examples/background-consolidator — smoke', () => {
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+describe('examples/background-consolidator - smoke', () => {
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runConsolidatorCycle drives turns + fires the light-tick deterministically', async () => {
@@ -154,7 +158,7 @@ describe('examples/background-consolidator — smoke', () => {
 
       // Deterministic single fire.
       await app.scheduler.fire(triggerId);
-      // Second fire — counter must increment again.
+      // Second fire - counter must increment again.
       await app.scheduler.fire(triggerId);
 
       unsubscribe();

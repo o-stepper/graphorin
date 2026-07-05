@@ -25,6 +25,8 @@ import type {
   SessionStoreExt,
   TriggerStore,
 } from '@graphorin/core/contracts';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import {
   type AuditDatabase,
   type OpenAuditDatabaseOptions,
@@ -104,8 +106,7 @@ import {
 import { SqliteTriggerStore } from './trigger-store.js';
 import { VectorTableManager } from './vector-table-mgr.js';
 
-/** Canonical version constant. Mirrors the `package.json` version. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 /**
  * Both modes run on a single in-process connection with the mandatory

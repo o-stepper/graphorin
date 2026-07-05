@@ -135,6 +135,7 @@ MIT © 2026 [Oleksiy Stepurenko](https://github.com/o-stepper).
 | [gen-ai](/api/@graphorin/observability/gen-ai/index.md) | OpenTelemetry GenAI semantic-conventions conformance helpers. |
 | [logger](/api/@graphorin/observability/logger/index.md) | Structured logger surface. |
 | [openinference](/api/@graphorin/observability/openinference/index.md) | OpenInference span-kind emission. Adds the `openinference.span.kind` attribute (one of `AGENT`, `EVALUATOR`, `LLM`, `TOOL`, `RETRIEVER`, `EMBEDDING`, `CHAIN`) to applicable Graphorin spans. |
+| [package.json](/api/@graphorin/observability/package.json/index.md) | - |
 | [redaction](/api/@graphorin/observability/redaction/index.md) | Sensitivity-aware redaction surface for `@graphorin/observability`. |
 | [redaction/imperative-patterns](/api/@graphorin/observability/redaction/imperative-patterns/index.md) | Imperative-pattern catalogue for inbound prompt-injection defence. |
 | [redaction/patterns](/api/@graphorin/observability/redaction/patterns/index.md) | Built-in PII / secret detection patterns. The catalogue is intentionally conservative - every pattern has both positive and negative test fixtures and is documented so operators understand exactly what is matched. |

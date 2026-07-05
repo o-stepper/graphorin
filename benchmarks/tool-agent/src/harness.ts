@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * The benchmark harness. `runTask` drives the real `createAgent(...)` loop
  * with the deterministic stub provider and folds its `AgentEvent` stream

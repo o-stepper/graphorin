@@ -350,6 +350,3 @@ survives process restart for HITL approvals when run via
 `graphorin start`, and emits OpenTelemetry spans (file or console
 exporter). The example lives in `examples/personal-assistant-cli/`.
 
----
-
-**Project Graphorin** · v0.1.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

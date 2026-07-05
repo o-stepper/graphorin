@@ -128,6 +128,17 @@ function stripFirstH1(body) {
   return body.slice(0, i) + body.slice(j);
 }
 
+/**
+ * Drops the trailing `---` + `**Graphorin** · vX.Y.Z · ...` footer the
+ * root files carry for their GitHub rendering: the documentation site
+ * already renders a global footer (derived from the root
+ * `package.json`), so the synced copy would both duplicate it and pin
+ * a version string into a generated page.
+ */
+function stripTrailingFooter(body) {
+  return body.replace(/\n---\n\n\*\*(?:Project )?Graphorin\*\*[^\n]*\n*$/u, '\n');
+}
+
 async function syncOne({ from, to, title, description }) {
   const sourcePath = join(repoRoot, from);
   const targetPath = join(docsRoot, to);
@@ -152,7 +163,7 @@ async function syncOne({ from, to, title, description }) {
     '---',
   ].filter((line) => typeof line === 'string');
   const frontmatter = frontmatterLines.join('\n');
-  const body = stripFirstH1(rewriteLinks(source));
+  const body = stripTrailingFooter(stripFirstH1(rewriteLinks(source)));
   const finalBody = `${frontmatter}\n\n${banner}\n\n# ${title}\n\n${body}`.replace(
     /\n{3,}/g,
     '\n\n',

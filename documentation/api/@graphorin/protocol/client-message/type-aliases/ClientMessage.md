@@ -10,7 +10,7 @@
 type ClientMessage = z.infer<typeof ClientMessageSchema>;
 ```
 
-Defined in: client-message.ts:146
+Defined in: src/client-message.ts:146
 
 Inferred TypeScript union for the `ClientMessage` discriminator. A
 value satisfying this type round-trips through

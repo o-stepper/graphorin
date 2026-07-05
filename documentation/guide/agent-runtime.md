@@ -601,6 +601,3 @@ When the assembled message list contains any non-trusted `MessageContent` part, 
 - [Workflow engine](/guide/workflow-engine) - durable graph runs that span multiple agent steps.
 - [Sessions](/guide/sessions) - multi-agent attribution and replay.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

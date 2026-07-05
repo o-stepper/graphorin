@@ -267,6 +267,3 @@ All three templates run Graphorin as a **non-root** user with the audit log on i
 - [Security](/guide/security) - server-token authentication, audit log.
 - [Observability](/guide/observability) - what gets traced.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

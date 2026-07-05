@@ -128,76 +128,9 @@ MIT © 2026 Oleksiy Stepurenko
 
 **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/reranker-transformersjs - cross-encoder reranker adapter
-for the Graphorin framework.
+## Modules
 
-Wraps `@huggingface/transformers@^4.1.0` to score `(query, passage)`
-pairs in-process. Plug into the memory hybrid-search pipeline as a
-drop-in replacement for the built-in `RRFReranker`:
-
-```ts
-import { createMemory } from '@graphorin/memory';
-import { createCrossEncoderReranker } from '@graphorin/reranker-transformersjs';
-
-const memory = createMemory({
-  store,
-  embedder,
-  reranker: createCrossEncoderReranker({ locale: 'en' }),
-});
-```
-
-Locale-aware default model:
-
- - `'en'` / `'en-*'` → `Xenova/bge-reranker-base` (278M parameters,
-   FP16 quantized).
- - Every other locale → `BAAI/bge-reranker-v2-m3` (568M parameters,
-   multilingual baseline).
-
-Operators that want a narrower / language-specific cross-encoder
-pass an explicit `model` option - the package's defaults
-deliberately avoid privileging any single language pair.
-
-## Classes
-
-| Class | Description |
+| Module | Description |
 | ------ | ------ |
-| [CrossEncoderLoadError](/api/@graphorin/reranker-transformersjs/classes/CrossEncoderLoadError.md) | Raised when the `@huggingface/transformers` peer is missing or the configured cross-encoder model fails to load. |
-| [TransformersJsReRanker](/api/@graphorin/reranker-transformersjs/classes/TransformersJsReRanker.md) | `ReRanker` implementation. Matches the contract from `@graphorin/memory/search`. |
-
-## Interfaces
-
-| Interface | Description |
-| ------ | ------ |
-| [ClassifierResult](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md) | Output shape returned by `@huggingface/transformers`' text-classification pipeline. Each pair returns either a single `{ label, score }` object (top-k = 1) or an array of them. We normalise on the array form upstream so the cross-encoder always sees a consistent shape. |
-| [CrossEncoderRerankerOptions](/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderRerankerOptions.md) | Options accepted by [createCrossEncoderReranker](/api/@graphorin/reranker-transformersjs/functions/createCrossEncoderReranker.md). |
-
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [CrossEncoderPipeline](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipeline.md) | - |
-| [CrossEncoderPipelineFactory](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipelineFactory.md) | - |
-| [LocaleTag](/api/@graphorin/reranker-transformersjs/type-aliases/LocaleTag.md) | BCP 47 locale tag (e.g. `'en'`, `'en-GB'`, `'pt-BR'`, `'zh-Hans-CN'`). |
-| [PassageExtractor](/api/@graphorin/reranker-transformersjs/type-aliases/PassageExtractor.md) | Caller-supplied passage extractor. Receives the record + the surrounding metadata (kind, sensitivity, tags) and returns the passage to feed into the cross-encoder. |
-| [RerankerDtype](/api/@graphorin/reranker-transformersjs/type-aliases/RerankerDtype.md) | Numeric dtype hint. Default `'fp16'` per Phase 16 § `@graphorin/reranker-transformersjs`. |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [DEFAULT\_ENGLISH\_MODEL](/api/@graphorin/reranker-transformersjs/variables/DEFAULT_ENGLISH_MODEL.md) | - |
-| [DEFAULT\_MULTILINGUAL\_MODEL](/api/@graphorin/reranker-transformersjs/variables/DEFAULT_MULTILINGUAL_MODEL.md) | - |
-| [RERANKER\_ID](/api/@graphorin/reranker-transformersjs/variables/RERANKER_ID.md) | - |
-| [VERSION](/api/@graphorin/reranker-transformersjs/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [\_resetPipelineFactoryCacheForTesting](/api/@graphorin/reranker-transformersjs/functions/resetPipelineFactoryCacheForTesting.md) | Test-only helper. Drops the cached pipeline factory so the next loader call re-imports the peer. |
-| [createCrossEncoderReranker](/api/@graphorin/reranker-transformersjs/functions/createCrossEncoderReranker.md) | Build a cross-encoder reranker. Lazy: the pipeline is constructed on the first `rerank()` call so packaging the reranker pays no model-load cost. |
-| [defaultPassageExtractor](/api/@graphorin/reranker-transformersjs/functions/defaultPassageExtractor.md) | Returns the best-effort passage text for a [MemoryRecord](/api/@graphorin/core/interfaces/MemoryRecord.md). The order of preference, top-down: |
-| [extractPairScores](/api/@graphorin/reranker-transformersjs/functions/extractPairScores.md) | Normalises the raw pipeline output to a flat `score[]` aligned with the input pair order. Cross-encoder classifiers return either a single-best `{label, score}` per pair (the default single-logit bge exports) or an array of `topk` entries. For the array shape we read the POSITIVE label's confidence - NOT the max of any label (PS-16): an irrelevant pair's most confident class is the *negative* one, so taking the max would invert the ranking for any 2-label classifier. When no label looks positive (single-logit or unrecognised labels) we fall back to the top score. |
-| [loadDefaultPipelineFactory](/api/@graphorin/reranker-transformersjs/functions/loadDefaultPipelineFactory.md) | - |
-| [mergeAndDedupe](/api/@graphorin/reranker-transformersjs/functions/mergeAndDedupe.md) | Merge the per-source lists into a single deduplicated array, preserving the **highest** initial score per record id and the **first-seen order** for stable tie-breaking. Pure function; exported for the unit test fixture. |
-| [pickRerankerModel](/api/@graphorin/reranker-transformersjs/functions/pickRerankerModel.md) | Pick a reranker model from the agent locale. Pure function so callers (and tests) can pre-resolve the choice without constructing the reranker. |
+| [](/api/@graphorin/reranker-transformersjs/README.md) | @graphorin/reranker-transformersjs - cross-encoder reranker adapter for the Graphorin framework. |
+| [package.json](/api/@graphorin/reranker-transformersjs/package.json/index.md) | - |

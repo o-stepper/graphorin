@@ -92,6 +92,3 @@ The probe writes `benchmarks/scale/RESULTS.md` with the same table as above.
 - `benchmarks/cost` - assembled-prompt token cost regression gate (exact
   counts, fails the PR on >10% growth).
 
----
-
-**Graphorin** · MIT License · © 2026 Oleksiy Stepurenko

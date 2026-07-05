@@ -1,9 +1,9 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` used by the smoke test (and as the
  * `recipe: 'stub'` fallback in the CLI). The stub never opens a
- * socket, never spawns a child process, and never reads from disk —
+ * socket, never spawns a child process, and never reads from disk -
  * it inspects the inbound `ProviderRequest`, finds the most recent
  * user message, and yields a single `text-delta` event followed by a
  * zero-usage `finish` event. CI smoke coverage therefore runs without

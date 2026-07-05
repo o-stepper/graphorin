@@ -10,7 +10,7 @@
 function isErrorFrame(message): message is { code: string; data?: unknown; fatal?: boolean; kind: "error"; message: string; subscriptionId?: string; v: "1" };
 ```
 
-Defined in: server-message.ts:194
+Defined in: src/server-message.ts:194
 
 ## Parameters
 

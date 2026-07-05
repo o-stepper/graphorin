@@ -102,56 +102,9 @@ for (const tool of tools) {
 
 **Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/eslint-plugin - ESLint plugin for projects that build on
-the Graphorin framework.
+## Modules
 
-Phase 16 final ruleset:
-
-  - `no-secret-unwrap`                  - DEC-020 / ADR-026. Active.
-  - `no-secret-in-deps`                 - DEC-137. Active.
-  - `provider-middleware-order`         - DEC-145 / ADR-039. Active.
-  - `no-implicit-network-call`          - DEC-154 / ADR-041. Active.
-  - `no-third-party-workflow-aliases`   - DEC-019 / ADR-029. Active.
-  - `no-bare-tool-exec`                 - principle 3 / DEC-143. Active.
-  - `tool-description-required`         - Active.
-  - `tool-examples-recommended`         - Active.
-  - `tool-parameter-naming`             - Active.
-
-(The former `no-console-in-public-api` scaffold - a permanent no-op
-since Phase 01 - was removed in the v0.4 hygiene pass (PS-21) rather
-than shipped inert.)
-
-## Interfaces
-
-| Interface | Description |
+| Module | Description |
 | ------ | ------ |
-| [DiscoveredTool](/api/@graphorin/eslint-plugin/interfaces/DiscoveredTool.md) | - |
-| [LintFinding](/api/@graphorin/eslint-plugin/interfaces/LintFinding.md) | - |
-| [ToolGraderScore](/api/@graphorin/eslint-plugin/interfaces/ToolGraderScore.md) | - |
-
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [LintFindingKind](/api/@graphorin/eslint-plugin/type-aliases/LintFindingKind.md) | - |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [AMBIGUOUS\_PARAMETER\_NAMES](/api/@graphorin/eslint-plugin/variables/AMBIGUOUS_PARAMETER_NAMES.md) | Generic identifiers the parameter-naming rule flags as ambiguous. Tools whose `inputSchema` references only specific identifiers (e.g. `userId`, `recipientEmail`, `apiKey`) get full credit on the naming axis. |
-| [configs](/api/@graphorin/eslint-plugin/variables/configs.md) | - |
-| [default](/api/@graphorin/eslint-plugin/variables/default.md) | PS-17: ship BOTH config shapes. `recommended` is the legacy `.eslintrc` form (`plugins: ['@graphorin']`); `flat/recommended` is the ESLint 9+ flat-config form that maps the namespace to the plugin object, so flat-config consumers can `...plugin.configs['flat/recommended']` instead of hand-wiring ten rules. |
-| [meta](/api/@graphorin/eslint-plugin/variables/meta.md) | - |
-| [PARAMETER\_NAMING\_OPT\_OUT\_TAGS](/api/@graphorin/eslint-plugin/variables/PARAMETER_NAMING_OPT_OUT_TAGS.md) | Tag values that, when present in a tool's `tags: [...]` literal, suppress the parameter-naming rule for that tool. The opt-out exists so operators can defer the rename for a long tail of pre-RB-49 tools while the framework migrates without breaking calling code. |
-| [PLACEHOLDER\_DESCRIPTIONS](/api/@graphorin/eslint-plugin/variables/PLACEHOLDER_DESCRIPTIONS.md) | Placeholder values the description-required rule treats as non-descriptions. |
-| [rules](/api/@graphorin/eslint-plugin/variables/rules.md) | - |
-| [VERSION](/api/@graphorin/eslint-plugin/variables/VERSION.md) | - |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [discoverToolCallsInSource](/api/@graphorin/eslint-plugin/functions/discoverToolCallsInSource.md) | Discover every `tool({...})` invocation in a source string. The returned findings are stable + frozen so callers can pass them straight into a JSON report. |
-| [gradeTool](/api/@graphorin/eslint-plugin/functions/gradeTool.md) | Compute the per-tool grader score (0..100). Each axis is gated by the findings produced for that axis. The rubric is calibrated against the RB-49 fixture catalog (`wellDescribedTool` -> 82, `placeholderDescriptionTool` -> 20, `examplesPiiTool` -> 61). |
-| [runToolRules](/api/@graphorin/eslint-plugin/functions/runToolRules.md) | Run the three RB-49 rules against a discovered tool and return the findings. The CLI grader maps these findings into per-axis scores; the ESLint rules forward them to `context.report(...)`. |
+| [](/api/@graphorin/eslint-plugin/README.md) | @graphorin/eslint-plugin - ESLint plugin for projects that build on the Graphorin framework. |
+| [package.json](/api/@graphorin/eslint-plugin/package.json/index.md) | - |

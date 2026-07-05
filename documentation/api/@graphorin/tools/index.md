@@ -234,6 +234,7 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 | [errors](/api/@graphorin/tools/errors/index.md) | Typed error classes for `@graphorin/tools`. |
 | [executor](/api/@graphorin/tools/executor/index.md) | Tool executor surface for `@graphorin/tools`. |
 | [inbound](/api/@graphorin/tools/inbound/index.md) | Inbound prompt-injection sanitization surface for `@graphorin/tools`. |
+| [package.json](/api/@graphorin/tools/package.json/index.md) | - |
 | [registry](/api/@graphorin/tools/registry/index.md) | Strategy-aware tool registry surface for `@graphorin/tools`. |
 | [result](/api/@graphorin/tools/result/index.md) | Tool result envelope helpers for `@graphorin/tools` - token counting, truncation pipeline (`'middle' | 'tail' | 'spill-to-file' | 'summarize'`), and the `ToolReturn` content-parts pass-through convention. |
 | [schema](/api/@graphorin/tools/schema/index.md) | Schema projection surface: the shared Zod-to-JSON-Schema converter used by the agent's `toolToDefinition`, the code-mode signature projection, and `ToolSearchMatch` (tools-01). |

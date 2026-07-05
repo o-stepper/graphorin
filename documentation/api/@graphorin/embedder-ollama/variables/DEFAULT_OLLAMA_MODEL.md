@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / DEFAULT\_OLLAMA\_MODEL
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / [](/api/@graphorin/embedder-ollama/README.md) / DEFAULT\_OLLAMA\_MODEL
 
 # Variable: DEFAULT\_OLLAMA\_MODEL
 
@@ -10,7 +10,7 @@
 const DEFAULT_OLLAMA_MODEL: "nomic-embed-text" = 'nomic-embed-text';
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:28
+Defined in: packages/embedder-ollama/src/index.ts:30
 
 Default Ollama model. Matches the de-facto choice in the Ollama
 community for general-purpose multilingual embeddings.

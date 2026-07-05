@@ -10,7 +10,7 @@
 function _resetLibModeWarningForTesting(): void;
 ```
 
-Defined in: packages/triggers/src/index.ts:239
+Defined in: packages/triggers/src/index.ts:241
 
 **`Internal`**
 

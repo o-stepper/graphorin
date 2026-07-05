@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` for the multi-agent-crew example. The
  * same provider instance powers all three roles (supervisor / worker-a
@@ -69,7 +69,7 @@ export type CrewRole = 'supervisor' | 'researcher' | 'writer';
  * The agent runtime's handoff path injects the sub-agent's own
  * instructions FIRST (then appends the filtered parent history), which
  * means a worker's own marker always precedes the supervisor's marker
- * inside the worker's request — the linear walk picks the worker.
+ * inside the worker's request - the linear walk picks the worker.
  */
 export function classifyRequest(req: ProviderRequest): CrewRole {
   for (const m of req.messages) {
@@ -139,7 +139,7 @@ export function writerReply(researcherOutput: string): string {
 /** Canonical supervisor synthesis joining both worker outputs. */
 export function supervisorFinalReply(researcher: string, writer: string): string {
   return (
-    `Crew synthesis — ` +
+    `Crew synthesis - ` +
     `researcher said: "${researcher}"; ` +
     `writer said: "${writer}". ` +
     `Both contributions delivered.`

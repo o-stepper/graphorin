@@ -10,7 +10,7 @@
 function expectedFileModes(home): Readonly<Record<string, number>>;
 ```
 
-Defined in: packages/cli/src/commands/doctor.ts:190
+Defined in: packages/cli/src/commands/doctor.ts:191
 
 **`Internal`**
 

@@ -166,6 +166,3 @@ The CLI command `graphorin migrate-export <input> --to <out>` migrates an existi
 - [Standalone server](/guide/standalone-server) - REST endpoints.
 - [CLI](/guide/cli) - `graphorin migrate-export`.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

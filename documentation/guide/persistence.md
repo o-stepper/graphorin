@@ -154,6 +154,3 @@ The contracts in `@graphorin/core/contracts` are deliberately small. Build a non
 - [Secrets](/guide/secrets) - encrypted-file store + audit log.
 - [Standalone server](/guide/standalone-server) - REST endpoints over the same storage.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

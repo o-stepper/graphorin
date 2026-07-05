@@ -10,7 +10,7 @@
 function closeCodeFor(reason): number;
 ```
 
-Defined in: close-codes.ts:47
+Defined in: src/close-codes.ts:47
 
 Return the numeric close code for a Graphorin reason discriminator.
 

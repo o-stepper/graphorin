@@ -10,7 +10,7 @@
 function runMigrateExport(options): Promise<MigrateExportResult>;
 ```
 
-Defined in: packages/cli/src/commands/migrate-export.ts:60
+Defined in: packages/cli/src/commands/migrate-export.ts:61
 
 ## Parameters
 

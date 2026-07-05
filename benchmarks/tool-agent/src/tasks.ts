@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * The benchmark task set. Each task pins a deterministic provider script
  * (the model's fixed "plan" of tool calls) plus the goal-state and the
@@ -33,7 +33,7 @@ export interface ToolAgentTask {
   readonly goalDescription: string;
 }
 
-/** Task 1 — a simple ordered three-tool purchase flow. */
+/** Task 1 - a simple ordered three-tool purchase flow. */
 const placeSingleOrder: ToolAgentTask = {
   id: 'place-single-order',
   input: 'Find a blue tee and order one.',
@@ -57,7 +57,7 @@ const placeSingleOrder: ToolAgentTask = {
   goalDescription: 'exactly one placed order with one item and an empty cart',
 };
 
-/** Task 2 — recover from a transient payment failure, then settle the order. */
+/** Task 2 - recover from a transient payment failure, then settle the order. */
 const recoverFromPaymentFailure: ToolAgentTask = {
   id: 'recover-from-payment-failure',
   input: 'Order a red mug and pay for it.',
@@ -81,7 +81,7 @@ const recoverFromPaymentFailure: ToolAgentTask = {
   goalDescription: 'one order, settled to paid after a retried charge',
 };
 
-/** Task 3 — two cart adds dispatched in one step (parallel), then order. */
+/** Task 3 - two cart adds dispatched in one step (parallel), then order. */
 const parallelMultiAdd: ToolAgentTask = {
   id: 'parallel-multi-add',
   input: 'Add a red mug and a green cap, then order.',
@@ -121,5 +121,5 @@ export const brokenTask: ToolAgentTask = {
   expectedTools: ['cart.add', 'order.place'],
   requireOrder: true,
   goal: (s) => s.orderCount === 1 && s.orders[0]?.status === 'placed',
-  goalDescription: 'one placed order (never reached — the plan never adds to the cart)',
+  goalDescription: 'one placed order (never reached - the plan never adds to the cart)',
 };

@@ -6,7 +6,7 @@
 
 # Interface: Session
 
-Defined in: packages/sessions/src/facade.ts:176
+Defined in: packages/sessions/src/facade.ts:177
 
 Per-session ergonomic facade returned by
 [SessionManager.create](/api/@graphorin/sessions/facade/interfaces/SessionManager.md#create) / [SessionManager.get](/api/@graphorin/sessions/facade/interfaces/SessionManager.md#get).
@@ -17,9 +17,9 @@ Per-session ergonomic facade returned by
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-commentarypolicy"></a> `commentaryPolicy` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | Effective commentary policy for this session. | packages/sessions/src/facade.ts:180 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/sessions/src/facade.ts:177 |
-| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/sessions/src/facade.ts:178 |
+| <a id="property-commentarypolicy"></a> `commentaryPolicy` | `readonly` | [`CommentaryPolicy`](/api/@graphorin/sessions/type-aliases/CommentaryPolicy.md) | Effective commentary policy for this session. | packages/sessions/src/facade.ts:181 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/sessions/src/facade.ts:178 |
+| <a id="property-scope"></a> `scope` | `readonly` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) | - | packages/sessions/src/facade.ts:179 |
 
 ## Methods
 
@@ -29,7 +29,7 @@ Per-session ergonomic facade returned by
 appendHandoff(record): Promise<HandoffRecord>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:202
+Defined in: packages/sessions/src/facade.ts:203
 
 Append a handoff record. RP-2: this does **not** auto-fire from
 `Agent.toTool()` - the agent accumulates `HandoffRecord`s in its own
@@ -53,7 +53,7 @@ Append a handoff record. RP-2: this does **not** auto-fire from
 attachWorkflowRun(run): Promise<SessionWorkflowRun>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:211
+Defined in: packages/sessions/src/facade.ts:212
 
 Attach a workflow run to this session.
 
@@ -75,7 +75,7 @@ Attach a workflow run to this session.
 audit(opts?): Promise<readonly SessionAuditEntry[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:256
+Defined in: packages/sessions/src/facade.ts:257
 
 Recent audit rows for this session, newest-first.
 
@@ -98,7 +98,7 @@ Recent audit rows for this session, newest-first.
 close(): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:225
+Defined in: packages/sessions/src/facade.ts:226
 
 Mark the session closed. Idempotent.
 
@@ -118,7 +118,7 @@ compact(opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:192
+Defined in: packages/sessions/src/facade.ts:193
 
 Manual compaction - wraps `memory.session.compact(...)`.
 
@@ -145,7 +145,7 @@ Manual compaction - wraps `memory.session.compact(...)`.
 export(opts): Promise<SessionExportFooterRecord>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:239
+Defined in: packages/sessions/src/facade.ts:240
 
 Stream the session as a JSONL session-export 1.0 document.
 
@@ -167,7 +167,7 @@ Stream the session as a JSONL session-export 1.0 document.
 fork(opts?): Promise<Session>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:237
+Defined in: packages/sessions/src/facade.ts:238
 
 Fork the session at a given point. Returns a fresh `Session`
 with copied session-level metadata; the new session id is
@@ -198,7 +198,7 @@ forks remain post-v0.1.
 handoffsByAgent(agentId, direction?): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:206
+Defined in: packages/sessions/src/facade.ts:207
 
 Filter handoffs by agent + direction.
 
@@ -221,7 +221,7 @@ Filter handoffs by agent + direction.
 list(opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:185
+Defined in: packages/sessions/src/facade.ts:186
 
 List messages - wraps `memory.session.list(scope, ...)`.
 
@@ -243,7 +243,7 @@ List messages - wraps `memory.session.list(scope, ...)`.
 listHandoffs(): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:204
+Defined in: packages/sessions/src/facade.ts:205
 
 Every handoff in this session, oldest-first.
 
@@ -259,7 +259,7 @@ Every handoff in this session, oldest-first.
 metadata(): Promise<SessionMetadata>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:181
+Defined in: packages/sessions/src/facade.ts:182
 
 #### Returns
 
@@ -273,7 +273,7 @@ Defined in: packages/sessions/src/facade.ts:181
 push(message): Promise<MessageRef>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:183
+Defined in: packages/sessions/src/facade.ts:184
 
 Persist a new message - wraps `memory.session.push(scope, ...)`.
 
@@ -295,7 +295,7 @@ Persist a new message - wraps `memory.session.push(scope, ...)`.
 recordToolCassette(opts): ToolCassetteRecorder;
 ```
 
-Defined in: packages/sessions/src/facade.ts:254
+Defined in: packages/sessions/src/facade.ts:255
 
 Begin recording a tool cassette. RP-2: the recorder is **not** wired into
 the agent runtime automatically - the operator subscribes to the agent's
@@ -321,7 +321,7 @@ canonical wiring.
 replay(opts?): AsyncIterable<SessionReplayEvent>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:241
+Defined in: packages/sessions/src/facade.ts:242
 
 Sanitized-by-default replay.
 
@@ -343,7 +343,7 @@ Sanitized-by-default replay.
 search(query, opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:187
+Defined in: packages/sessions/src/facade.ts:188
 
 Hybrid (FTS5) search over messages - wraps `memory.session.search(...)`.
 
@@ -371,7 +371,7 @@ updateWorkflowRunStatus(
 status): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:219
+Defined in: packages/sessions/src/facade.ts:220
 
 Update a workflow run's status.
 
@@ -395,7 +395,7 @@ Update a workflow run's status.
 workflowRuns(): Promise<readonly SessionWorkflowRun[]>;
 ```
 
-Defined in: packages/sessions/src/facade.ts:217
+Defined in: packages/sessions/src/facade.ts:218
 
 List workflow runs attached to this session.
 

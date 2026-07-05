@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/slack-bot-integration`. Every test runs
  * against an in-memory SQLite store and stubs the Slack `WebClient`
@@ -72,9 +76,9 @@ async function buildApp(overrides: CreateSlackBotAppOptions = {}): Promise<{
   return { app, slack };
 }
 
-describe('examples/slack-bot-integration — smoke', () => {
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+describe('examples/slack-bot-integration - smoke', () => {
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('processSlackEvent forwards a small Slack message and posts the reply back', async () => {
@@ -175,7 +179,7 @@ describe('examples/slack-bot-integration — smoke', () => {
     );
     expect(finalMessage).toBeDefined();
 
-    // The post-restart app cleared the routing row — listPendingApprovals
+    // The post-restart app cleared the routing row - listPendingApprovals
     // is now empty.
     const after = await result.resumedApp.listPendingApprovals();
     expect(after).toHaveLength(0);

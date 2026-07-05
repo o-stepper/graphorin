@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 
 import { createServerMetricRegistry, SERVER_METRIC_NAMES } from '../src/metrics/catalog.js';
@@ -114,7 +118,7 @@ describe('MetricRegistry', () => {
 
   it('produces output that conforms to Prometheus text format constraints', () => {
     const registry = createServerMetricRegistry();
-    registry.set(SERVER_METRIC_NAMES.buildInfo, 1, { version: '0.6.0' });
+    registry.set(SERVER_METRIC_NAMES.buildInfo, 1, { version: pkgVersion });
     registry.inc(SERVER_METRIC_NAMES.triggersFiresTotal, { trigger_id: 'cron-1', status: 'ok' });
     const output = registry.render();
     // Every block must have HELP + TYPE preceding the first sample line.

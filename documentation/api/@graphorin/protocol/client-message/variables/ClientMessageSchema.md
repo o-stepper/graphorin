@@ -125,7 +125,7 @@ const ClientMessageSchema: ZodDiscriminatedUnion<"method", [ZodObject<{
 }>]>;
 ```
 
-Defined in: client-message.ts:130
+Defined in: src/client-message.ts:130
 
 Zod schema for every legal client → server frame. Use
 [ClientMessageSchema](/api/@graphorin/protocol/client-message/variables/ClientMessageSchema.md).safeParse() inside the server upgrade

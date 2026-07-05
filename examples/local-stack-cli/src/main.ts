@@ -1,7 +1,7 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Fully-local-stack CLI personal assistant — library mode. Wires
+ * Fully-local-stack CLI personal assistant - library mode. Wires
  * `createAgent({...})` to a six-tier `Memory` backed by SQLite +
  * sqlite-vec, an Ollama-served LLM (default `qwen2.5:7b-instruct-q4_K_M`),
  * and an Ollama-served embedder (default `nomic-embed-text`). The only
@@ -23,11 +23,12 @@ import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, defineBlock, type Memory } from '@graphorin/memory';
 import { createProvider, ollamaAdapter } from '@graphorin/provider';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { createStubEmbedder } from './stub-embedder.js';
 import { createStubProvider } from './stub-provider.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 /**
  * Recipe selector. The example only ships the all-local Ollama stack
@@ -58,7 +59,7 @@ export class OllamaUnreachableError extends Error {
     super(
       `[graphorin/example-local-stack-cli] Ollama daemon is not reachable at '${endpoint}'. ` +
         `Start it with \`ollama serve\` (and \`ollama pull qwen2.5:7b-instruct-q4_K_M && ` +
-        `ollama pull nomic-embed-text\`) — or unset GRAPHORIN_OFFLINE to surface the underlying ` +
+        `ollama pull nomic-embed-text\`) - or unset GRAPHORIN_OFFLINE to surface the underlying ` +
         `network error.`,
     );
     this.endpoint = endpoint;
@@ -165,7 +166,7 @@ export function assertLocalStackOllamaUrl(baseUrl: string): void {
 /**
  * Build the configured `Provider`. The Ollama recipe is wrapped through
  * `createProvider(adapter, { acceptsSensitivity: ['public', 'internal',
- * 'secret'] })` — loopback trust auto-elects the all-tiers default,
+ * 'secret'] })` - loopback trust auto-elects the all-tiers default,
  * but pinning it explicitly here documents the intent and keeps the
  * stub recipe consistent.
  */
@@ -348,7 +349,7 @@ export async function runChatTurn(
   }
   if (errored !== undefined) {
     throw new Error(
-      `[graphorin/example-local-stack-cli] agent run failed: ${errored.code} — ${errored.message}`,
+      `[graphorin/example-local-stack-cli] agent run failed: ${errored.code} - ${errored.message}`,
     );
   }
   return buffer;
@@ -381,7 +382,7 @@ export async function main(
   }
 
   const banner =
-    `graphorin v${VERSION} local-stack-cli — recipe='${handle.recipe}', ` +
+    `graphorin v${VERSION} local-stack-cli - recipe='${handle.recipe}', ` +
     `model='${handle.provider.modelId}'. Type a message and press Enter; Ctrl+C to exit.\n`;
   stdout.write(banner);
 

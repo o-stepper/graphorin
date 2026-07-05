@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / createLlmReranker
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / createLlmReranker
 
 # Function: createLlmReranker()
 
@@ -10,7 +10,7 @@
 function createLlmReranker<TRecord>(options): LlmReRanker<TRecord>;
 ```
 
-Defined in: reranker.ts:85
+Defined in: src/reranker.ts:85
 
 Build an LLM-as-reranker. The reranker is stateless past the
 provider reference - the provider's own session / connection

@@ -108,6 +108,3 @@ Graphorin follows [SemVer](https://semver.org). Pre-1.0, minor bumps may carry b
 
 Once Graphorin reaches `1.0`, strict SemVer applies and optional packages can move independently.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

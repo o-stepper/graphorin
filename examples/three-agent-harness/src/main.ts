@@ -1,7 +1,7 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Three-agent orchestration harness — library mode. Wires three
+ * Three-agent orchestration harness - library mode. Wires three
  * `createAgent({...})` calls (Planner / Generator / Evaluator) with
  * the canonical structured-handoff convention
  * (`<artifactRoot>/<runId>/progress/<role>.<seq>.txt`) and runs the
@@ -34,6 +34,8 @@ import type { AgentEvent, ProgressArtifactRef, Provider, Tracer } from '@graphor
 import { collect } from '@graphorin/core';
 import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createProvider, ollamaAdapter } from '@graphorin/provider';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { type CitationResult, type CitationSource, createCitationAgent } from './citation-agent.js';
 import { LRU_FIXTURE_SOURCE } from './lru-fixture.js';
 import {
@@ -45,10 +47,9 @@ import {
   WEB_SEARCH_REPLIES,
 } from './stub-provider.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
-/** Recipe selector — `'stub'` (default, hermetic) or `'ollama'`. */
+/** Recipe selector - `'stub'` (default, hermetic) or `'ollama'`. */
 export type Recipe = 'stub' | 'ollama';
 
 const ALL_RECIPES: ReadonlyArray<Recipe> = ['stub', 'ollama'];
@@ -107,7 +108,7 @@ export function createPlanner(options: RoleFactoryOptions): Agent<undefined, str
       'Expand the user request into a structured plan with explicit phases, ' +
       'success criteria, and suggested tools. Persist the plan via the ' +
       'structured-handoff artifact convention (the harness does the actual ' +
-      'write — your job is to produce the plan text).',
+      'write - your job is to produce the plan text).',
     provider,
     ...(options.sessionId !== undefined ? { sessionId: options.sessionId } : {}),
     ...(options.tracer !== undefined ? { tracer: options.tracer } : {}),
@@ -265,7 +266,7 @@ export async function runHarness(options: RunHarnessOptions): Promise<RunHarness
           return `[prior ${ref.role} seq ${ref.seq}]\n${body}`;
         }),
       );
-      plannerRequest = `${options.request}\n\n—— Prior run ${priorId} ——\n${blocks.join('\n\n')}`;
+      plannerRequest = `${options.request}\n\n -  - Prior run ${priorId} -  - \n${blocks.join('\n\n')}`;
     }
   }
 
@@ -443,7 +444,7 @@ async function streamAgent(
     } else if (ev.type === 'agent.error') {
       throw new Error(
         `[graphorin/example-three-agent-harness] '${agent.config.name}' failed: ` +
-          `${ev.error.code} — ${ev.error.message}`,
+          `${ev.error.code} - ${ev.error.message}`,
       );
     }
   }
@@ -504,7 +505,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
   });
 
   process.stdout.write(
-    `graphorin v${VERSION} three-agent-harness — recipe='${result.recipe}', ` +
+    `graphorin v${VERSION} three-agent-harness - recipe='${result.recipe}', ` +
       `runId='${result.runId}', termination='${result.outcome.terminationReason}', ` +
       `iterations=${result.outcome.iterations.length}, ` +
       `finalScore=${result.outcome.finalScore}.\n`,
@@ -517,7 +518,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
       env,
     });
     process.stdout.write(
-      `graphorin v${VERSION} three-agent-harness research-and-decide — ` +
+      `graphorin v${VERSION} three-agent-harness research-and-decide - ` +
         `children=${variant.fanOutResult.children.length}, ` +
         `bound=${variant.citationResult.boundCount}, ` +
         `unbound=${variant.citationResult.unboundCount}.\n`,

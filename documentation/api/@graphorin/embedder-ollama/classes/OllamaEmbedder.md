@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / OllamaEmbedder
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / [](/api/@graphorin/embedder-ollama/README.md) / OllamaEmbedder
 
 # Class: OllamaEmbedder
 
-Defined in: packages/embedder-ollama/src/index.ts:132
+Defined in: packages/embedder-ollama/src/index.ts:134
 
 `EmbedderProvider` implementation that talks to the Ollama HTTP API.
 
@@ -24,7 +24,7 @@ Defined in: packages/embedder-ollama/src/index.ts:132
 new OllamaEmbedder(options): OllamaEmbedder;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:146
+Defined in: packages/embedder-ollama/src/index.ts:148
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/embedder-ollama/src/index.ts:146
 configHash(): string;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:207
+Defined in: packages/embedder-ollama/src/index.ts:209
 
 Deterministic hash over the embedder's full configuration -
 including the discovered digest. A model upgrade in the same
@@ -68,7 +68,7 @@ silently reusing the same `embedder_id`.
 dim(): number;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:189
+Defined in: packages/embedder-ollama/src/index.ts:191
 
 Output dimension - the explicit `dim` option, the resolved width from the
 first `embed()`, or a known-family default. PS-11: throws for an unknown
@@ -92,7 +92,7 @@ vector search). Pass `dim` for any model not in [KNOWN\_OLLAMA\_MODEL\_DIMS](/ap
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:217
+Defined in: packages/embedder-ollama/src/index.ts:219
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 
@@ -119,7 +119,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 id(): string;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:175
+Defined in: packages/embedder-ollama/src/index.ts:177
 
 The canonical embedder id - `'ollama:<model>@<dim-or-digest>'`.
 

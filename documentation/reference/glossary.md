@@ -159,6 +159,3 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **Workflow.** Durable step-graph execution unit. Owned by `@graphorin/workflow`.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

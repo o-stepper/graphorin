@@ -186,5 +186,6 @@ MIT. Copyright © 2026 Oleksiy Stepurenko.
 | [frontmatter](/api/@graphorin/skills/frontmatter/index.md) | Frontmatter validator for `SKILL.md` files. |
 | [loader](/api/@graphorin/skills/loader/index.md) | Skill loader. |
 | [migration](/api/@graphorin/skills/migration/index.md) | `migrate-frontmatter` - idempotent rewrite helper that migrates legacy `graphorin-*` frontmatter fields onto their upstream equivalents per the `deprecate-graphorin-prefix` mappings recorded in the bundled spec snapshot. |
+| [package.json](/api/@graphorin/skills/package.json/index.md) | - |
 | [registry](/api/@graphorin/skills/registry/index.md) | `SkillRegistry` - registry over loaded skills. |
 | [spec](/api/@graphorin/skills/spec/index.md) | Bundled snapshot loader for the `SKILL.md` packaging-format specification. |

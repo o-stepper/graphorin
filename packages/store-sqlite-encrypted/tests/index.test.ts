@@ -1,10 +1,14 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 
 import * as encrypted from '../src/index.js';
 
 describe('@graphorin/store-sqlite-encrypted public surface', () => {
   it('declares VERSION matching the package.json release', () => {
-    expect(encrypted.VERSION).toBe('0.6.0');
+    expect(encrypted.VERSION).toBe(pkgVersion);
   });
 
   it('re-exports the cipher selection helpers', () => {

@@ -293,6 +293,3 @@ Pass the `tracer` from `@graphorin/observability` to record `workflow.run`, `wor
 - [Standalone server](/guide/standalone-server) - expose workflow lifecycle over REST.
 - [Examples](/guide/examples) - durable approval workflow walkthrough in the repository.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

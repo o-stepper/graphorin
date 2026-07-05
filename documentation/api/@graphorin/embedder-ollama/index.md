@@ -83,34 +83,9 @@ MIT © 2026 Oleksiy Stepurenko.
 
 **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/embedder-ollama - first-class opt-in alternative embedder
-for the Graphorin framework. Wraps the local Ollama HTTP API.
+## Modules
 
-## Classes
-
-| Class | Description |
+| Module | Description |
 | ------ | ------ |
-| [OllamaEmbedder](/api/@graphorin/embedder-ollama/classes/OllamaEmbedder.md) | `EmbedderProvider` implementation that talks to the Ollama HTTP API. |
-| [OllamaEmbedderError](/api/@graphorin/embedder-ollama/classes/OllamaEmbedderError.md) | Raised when the Ollama HTTP API returns a non-2xx response. |
-
-## Interfaces
-
-| Interface | Description |
-| ------ | ------ |
-| [OllamaEmbedderOptions](/api/@graphorin/embedder-ollama/interfaces/OllamaEmbedderOptions.md) | Options accepted by [createOllamaEmbedder](/api/@graphorin/embedder-ollama/functions/createOllamaEmbedder.md). |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [DEFAULT\_OLLAMA\_BASE\_URL](/api/@graphorin/embedder-ollama/variables/DEFAULT_OLLAMA_BASE_URL.md) | Default Ollama base URL. Operators that run Ollama on a non-default port pass an explicit `baseUrl`. |
-| [DEFAULT\_OLLAMA\_MODEL](/api/@graphorin/embedder-ollama/variables/DEFAULT_OLLAMA_MODEL.md) | Default Ollama model. Matches the de-facto choice in the Ollama community for general-purpose multilingual embeddings. |
-| [KNOWN\_OLLAMA\_MODEL\_DIMS](/api/@graphorin/embedder-ollama/variables/KNOWN_OLLAMA_MODEL_DIMS.md) | Model -> output-dimension hints used to seed the canonical id before the first `embed()` resolves the real width from a response. Only single-width families are listed; size-variant families (e.g. `qwen3-embedding`, whose dim depends on the `:0.6b` / `:4b` / `:8b` tag) are deliberately omitted so an ambiguous bind fails loudly rather than baking a wrong width (PS-11). |
-| [VERSION](/api/@graphorin/embedder-ollama/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [canonicalConfigHash](/api/@graphorin/embedder-ollama/functions/canonicalConfigHash.md) | Canonical-JSON deterministic hash over an embedder configuration. Object keys are sorted lexicographically so the resulting hash is stable across `JSON.stringify` reorderings. |
-| [createOllamaEmbedder](/api/@graphorin/embedder-ollama/functions/createOllamaEmbedder.md) | Build an Ollama-backed embedder. The first `embed()` call issues a `POST /api/show` to capture the model digest; subsequent calls hit the embedding endpoint directly. |
+| [](/api/@graphorin/embedder-ollama/README.md) | @graphorin/embedder-ollama - first-class opt-in alternative embedder for the Graphorin framework. Wraps the local Ollama HTTP API. |
+| [package.json](/api/@graphorin/embedder-ollama/package.json/index.md) | - |

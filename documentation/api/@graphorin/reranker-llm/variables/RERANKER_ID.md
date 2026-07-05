@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / RERANKER\_ID
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / RERANKER\_ID
 
 # Variable: RERANKER\_ID
 
@@ -10,6 +10,6 @@
 const RERANKER_ID: "llm-judge";
 ```
 
-Defined in: reranker.ts:23
+Defined in: src/reranker.ts:23
 
 ## Stable

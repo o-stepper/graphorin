@@ -30,6 +30,8 @@
     "check-doc-snippets": "node ./scripts/check-doc-snippets.mjs",
     "check-cli-docs": "node ./scripts/check-cli-docs.mjs",
     "check-example-docs": "node ./scripts/check-example-docs.mjs",
+    "check-version-consistency": "node ./scripts/check-version-consistency.mjs",
+    "bump-version": "node ./scripts/bump-version.mjs",
     "smoke-examples": "node ./scripts/smoke-examples.mjs",
     "mvp-readiness": "node ./scripts/mvp-readiness.mjs",
     "docs:dev": "pnpm --filter @graphorin/docs dev",

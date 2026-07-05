@@ -1,12 +1,12 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Multi-agent crew acceptance demo — library mode. Wires a supervisor +
+ * Multi-agent crew acceptance demo - library mode. Wires a supervisor +
  * two specialised worker agents (`worker-a` researcher / `worker-b`
  * writer) through `createAgent({ handoffs: [...] })` so the agent
  * runtime auto-generates `transfer_to_<worker>` tools and emits a
  * `HandoffRecord` per transfer. All three agents share one
- * `SessionManager` — every assistant message is pushed to the session
+ * `SessionManager` - every assistant message is pushed to the session
  * with its `agentId` so `session.list({ agentId: 'worker-a' })`,
  * `session.export({ sink })` (with both `kind: 'agent'` and
  * `kind: 'handoff'` records), and `session.replay(...)` (with
@@ -44,6 +44,8 @@ import {
   type SessionManager,
 } from '@graphorin/sessions';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { createStubSecret, type StubSecretValue } from './secret-stub.js';
 import {
   createCrewStubProvider,
@@ -52,10 +54,9 @@ import {
   WORKER_NAMES,
 } from './stub-provider.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
-/** Recipe selector — only `'stub'` ships in v0.1 (CI hermetic). */
+/** Recipe selector - only `'stub'` ships in v0.1 (CI hermetic). */
 export type Recipe = 'stub';
 
 const ALL_RECIPES: ReadonlyArray<Recipe> = ['stub'];
@@ -113,7 +114,7 @@ const READ_SECRET_TOOL_SCHEMA = {
  * Tool factory: a per-agent helper that reads `ctx.runContext.deps`
  * and reports whether the supervisor's secret is reachable. The
  * supervisor sees `secret-len=N`; workers, whose `deps` is `undefined`
- * by default, see `<no-secret>` — proving the DEC-137 isolation
+ * by default, see `<no-secret>` - proving the DEC-137 isolation
  * invariant.
  */
 export function buildReadSecretTool(): Tool<unknown, string, CrewDeps> {
@@ -138,7 +139,7 @@ export function buildReadSecretTool(): Tool<unknown, string, CrewDeps> {
 /**
  * Build the researcher (worker-a). Receives a research task from the
  * supervisor's `transfer_to_worker-a` handoff; produces a synthesised
- * snippet. Default `deps` is `undefined` — the worker has no access to
+ * snippet. Default `deps` is `undefined` - the worker has no access to
  * the supervisor's secret per DEC-137.
  */
 export function createResearcher(options: RoleFactoryOptions): Agent<CrewDeps, string> {
@@ -384,7 +385,7 @@ export async function runCrew(options: RunCrewOptions = {}): Promise<RunCrewResu
     if (ev.type === 'agent.error') {
       throw new Error(
         `[graphorin/example-multi-agent-crew] supervisor failed: ` +
-          `${ev.error.code} — ${ev.error.message}`,
+          `${ev.error.code} - ${ev.error.message}`,
       );
     }
   }
@@ -444,7 +445,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
   try {
     const { footer } = await exportSessionJsonl(handle.session);
     process.stdout.write(
-      `graphorin v${VERSION} multi-agent-crew — recipe='${recipe}', ` +
+      `graphorin v${VERSION} multi-agent-crew - recipe='${recipe}', ` +
         `handoffs=${handle.handoffs.length}, ` +
         `messages=${footer.messageCount}, ` +
         `agents=${footer.agentCount}, ` +

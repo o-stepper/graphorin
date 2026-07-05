@@ -59,6 +59,3 @@ Graphorin's security primitives target the following baselines:
 
 Implementation details and rationale ship with the corresponding `@graphorin/*` packages once they are released.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>

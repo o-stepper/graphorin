@@ -83,5 +83,6 @@ MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/gra
 | [](/api/@graphorin/protocol/README.md) | `@graphorin/protocol` - wire-format contract for the Graphorin WebSocket subprotocol. |
 | [client-message](/api/@graphorin/protocol/client-message/index.md) | `ClientMessage` - discriminated union of every frame a Graphorin WebSocket client may send to the server. The wire is hybrid: the control plane uses JSON-RPC-shaped requests / notifications; the data plane uses typed push events emitted exclusively by the server (see `./server-message.ts`). |
 | [close-codes](/api/@graphorin/protocol/close-codes/index.md) | Custom WebSocket close-code taxonomy used by `@graphorin/server` and `@graphorin/client`. The numeric values live in the 4xxx application-private range per RFC 6455 § 7.4. |
+| [package.json](/api/@graphorin/protocol/package.json/index.md) | - |
 | [server-message](/api/@graphorin/protocol/server-message/index.md) | `ServerMessage` - discriminated union of every frame a Graphorin server may push to a client. Three families share the channel: |
 | [subprotocol](/api/@graphorin/protocol/subprotocol/index.md) | Subprotocol identifier + negotiation helpers for the Graphorin WebSocket protocol. |

@@ -89,45 +89,9 @@ MIT © 2026 Oleksiy Stepurenko.
 
 **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/embedder-transformersjs - default in-process embedder.
+## Modules
 
-Wraps `@huggingface/transformers@^4.1.0` to produce dense embeddings
-inside the Graphorin process. Default model
-`Xenova/multilingual-e5-base` (768-dim, multilingual; DEC-130 /
-ADR-025).
-
-## Classes
-
-| Class | Description |
+| Module | Description |
 | ------ | ------ |
-| [EmbedderModelLoadError](/api/@graphorin/embedder-transformersjs/classes/EmbedderModelLoadError.md) | Raised when the underlying transformer model cannot be loaded (offline / corporate firewall / wrong cache dir). |
-| [TransformersJsEmbedder](/api/@graphorin/embedder-transformersjs/classes/TransformersJsEmbedder.md) | `EmbedderProvider` implementation backed by `@huggingface/transformers`. |
-
-## Interfaces
-
-| Interface | Description |
-| ------ | ------ |
-| [TransformersJsEmbedderOptions](/api/@graphorin/embedder-transformersjs/interfaces/TransformersJsEmbedderOptions.md) | Configuration accepted by [createTransformersJsEmbedder](/api/@graphorin/embedder-transformersjs/functions/createTransformersJsEmbedder.md). |
-
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [FeatureExtractor](/api/@graphorin/embedder-transformersjs/type-aliases/FeatureExtractor.md) | Tiny structural shape of `@huggingface/transformers`' feature- extraction pipeline used by this package. Declared inline so the embedder does not import the heavy peer at build time. |
-| [PipelineFactory](/api/@graphorin/embedder-transformersjs/type-aliases/PipelineFactory.md) | Pipeline-factory shape used for dependency injection in tests. |
-| [Pooling](/api/@graphorin/embedder-transformersjs/type-aliases/Pooling.md) | Pooling strategy. Defaults to `'mean'` per the multilingual-e5 model card. |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [VERSION](/api/@graphorin/embedder-transformersjs/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [\_resetPipelineFactoryCacheForTesting](/api/@graphorin/embedder-transformersjs/functions/resetPipelineFactoryCacheForTesting.md) | Test-only cache reset. |
-| [canonicalConfigHash](/api/@graphorin/embedder-transformersjs/functions/canonicalConfigHash.md) | Canonical-JSON deterministic hash of an embedder configuration. Object keys are sorted lexicographically; primitives flow through as `JSON.stringify` would render them. Used by the multi-table per- embedder vec0 layout to tell drift apart from a true model swap. |
-| [createTransformersJsEmbedder](/api/@graphorin/embedder-transformersjs/functions/createTransformersJsEmbedder.md) | Build a `TransformersJsEmbedder` instance. Lazy: the underlying pipeline is constructed on the first `embed()` call so packaging the embedder does not pay the model-load cost. |
-| [isE5Model](/api/@graphorin/embedder-transformersjs/functions/isE5Model.md) | True when a model id belongs to the E5 family, which requires asymmetric `query:` / `passage:` prefixes (PS-10). Matches an `e5` token bounded by a path / dash / underscore so it covers `multilingual-e5-base`, `e5-large`, `intfloat/e5-mistral`, etc. without false-matching unrelated names. |
+| [](/api/@graphorin/embedder-transformersjs/README.md) | @graphorin/embedder-transformersjs - default in-process embedder. |
+| [package.json](/api/@graphorin/embedder-transformersjs/package.json/index.md) | - |

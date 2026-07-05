@@ -269,7 +269,7 @@ AUTHORS.md               Project authorship.
 
 ## Release readiness
 
-The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.6.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk, a current top entry in every per-package `CHANGELOG.md`, and every `exports` target resolvable in the built output).
+The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, a version-consistency gate (every workspace manifest and every version-bearing text site agrees with `packages/core/package.json`; code derives its version from the manifest, so hardcoded version literals fail), and a workspace audit (consistent version, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk, a current top entry in every per-package `CHANGELOG.md`, and every `exports` target resolvable in the built output).
 
 The same command is invoked by the [`release.yml`](./.github/workflows/release.yml) workflow before any package gets published.
 
