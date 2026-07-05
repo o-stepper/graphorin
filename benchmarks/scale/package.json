@@ -1,0 +1,50 @@
+{
+  "name": "@graphorin/benchmark-scale",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Memory-store scale probe for the Graphorin framework (audit 2026-07-04, E7). Seeds a file-backed SQLite store with 100k+ synthetic facts (vectors via a deterministic bag-of-words embedder + an entity graph via s/p/o) and measures hybrid-search p50/p95, PPR graph-expansion search cost, the offline consolidator light-phase pass time, seeding throughput, and on-disk DB size. Reports numbers; the only gates are deterministic plumbing assertions (--smoke). Created and maintained by Oleksiy Stepurenko.",
+  "license": "MIT",
+  "author": "Oleksiy Stepurenko",
+  "homepage": "https://github.com/o-stepper/graphorin/tree/main/benchmarks/scale",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/o-stepper/graphorin.git",
+    "directory": "benchmarks/scale"
+  },
+  "bugs": {
+    "url": "https://github.com/o-stepper/graphorin/issues"
+  },
+  "keywords": [
+    "graphorin",
+    "ai",
+    "agents",
+    "framework",
+    "benchmark",
+    "memory-evaluation",
+    "scale"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "tsx ./src/runner.ts",
+    "build": "tsdown",
+    "start": "node ./dist/runner.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "vitest run",
+    "lint": "biome check .",
+    "clean": "rimraf dist .turbo *.tsbuildinfo",
+    "benchmark:run": "node ./dist/runner.js",
+    "benchmark:smoke": "node ./dist/runner.js --smoke"
+  },
+  "dependencies": {
+    "@graphorin/core": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/store-sqlite": "workspace:*"
+  },
+  "bin": {
+    "graphorin-benchmark-scale": "./dist/runner.js"
+  }
+}

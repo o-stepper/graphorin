@@ -14,8 +14,11 @@ import type { SpanType } from '@graphorin/core';
 import type { GenAIOperationName } from './types.js';
 
 const TABLE: ReadonlyArray<readonly [SpanType, GenAIOperationName]> = Object.freeze([
-  ['agent.run', 'agent.run'],
-  ['agent.step', 'agent.step'],
+  // E8: match what the runtime actually emits (agent factory stamps
+  // `gen_ai.operation.name: 'invoke_agent'` on both run + step spans) and the
+  // OTel GenAI operation enum, which has `invoke_agent` and no step concept.
+  ['agent.run', 'invoke_agent'],
+  ['agent.step', 'invoke_agent'],
   ['agent.handoff', 'agent.handoff'],
   ['agent.suspend', 'agent.suspend'],
   ['agent.resume', 'agent.resume'],

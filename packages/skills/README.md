@@ -28,9 +28,11 @@ the `graphorin-*` prefix.
 - **Spec-snapshot tracking.** A bundled
   `anthropic-spec-snapshot.json` records the upstream fields the
   framework recognises and the migration policy for every
-  `graphorin-*` extension. The `pnpm run check-anthropic-spec` CI
-  helper diffs the snapshot against the published specification so
-  maintainers can promote new fields with a clear changelog entry.
+  `graphorin-*` extension. The `pnpm run check-anthropic-spec` helper
+  diffs the snapshot against a maintainer-supplied upstream snapshot
+  (`--upstream <path>`) so new fields can be promoted with a clear
+  changelog entry; it runs manually or via the release `mvp-readiness`
+  gate (no scheduled job, no auto-refresh).
 - **Supply-chain aware.** Loading from `npm-package` and `git-repo`
   sources delegates to the supply-chain helpers in
   `@graphorin/security` so untrusted skills install with

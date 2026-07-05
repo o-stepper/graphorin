@@ -202,7 +202,7 @@ export function createTracer(opts: TracerOptions): GraphorinTracer {
     const sensitivities = readAttrSensitivities(spec.attrs);
     return createSpan<T>({
       type: spec.type,
-      name: spanNameFor(spec.type),
+      name: spanNameFor(spec.type, spec.attrs),
       traceId,
       id,
       ...(parentId === undefined ? {} : { parentId }),

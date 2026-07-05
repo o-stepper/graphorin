@@ -28,7 +28,7 @@
  */
 
 import { readdir, stat, unlink } from 'node:fs/promises';
-import { dirname, isAbsolute, resolve } from 'node:path';
+import { dirname, isAbsolute, join, basename as pathBasename, resolve } from 'node:path';
 import process from 'node:process';
 
 import { resolveSecret, type SecretValue } from '@graphorin/security';
@@ -359,7 +359,10 @@ export async function runStorageCleanupBackups(
   const config = parseServerConfig(loaded.config);
   const dbPath = resolveStoragePath(config.storage.path);
   const dir = dirname(dbPath);
-  const basename = dbPath.split('/').pop() ?? '';
+  // E6: node:path basename, NOT dbPath.split('/') - on Windows the path is
+  // backslash-separated, so the split returned the whole path, no readdir
+  // entry ever matched, and cleanup-backups was a silent no-op.
+  const basename = pathBasename(dbPath);
   let entries: string[];
   try {
     entries = await readdir(dir);
@@ -371,7 +374,7 @@ export async function runStorageCleanupBackups(
   const candidates = entries.filter((name) => isStaleBackup(basename, name));
   const removed: string[] = [];
   for (const name of candidates) {
-    const full = `${dir}/${name}`;
+    const full = join(dir, name);
     if (options.dryRun !== true) {
       try {
         await unlink(full);

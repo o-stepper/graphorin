@@ -160,6 +160,18 @@ importers:
         specifier: workspace:*
         version: link:../../packages/store-sqlite
 
+  benchmarks/scale:
+    dependencies:
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/store-sqlite
+
   benchmarks/tool-agent:
     dependencies:
       '@graphorin/agent':
@@ -819,16 +831,16 @@ importers:
         version: 3.25.76
     devDependencies:
       '@graphorin/agent':
-        specifier: workspace:*
+        specifier: workspace:>=0.5.0 <1.0.0
         version: link:../agent
       '@graphorin/memory':
-        specifier: workspace:*
+        specifier: workspace:>=0.5.0 <1.0.0
         version: link:../memory
       '@graphorin/sessions':
-        specifier: workspace:*
+        specifier: workspace:>=0.5.0 <1.0.0
         version: link:../sessions
       '@graphorin/workflow':
-        specifier: workspace:*
+        specifier: workspace:>=0.5.0 <1.0.0
         version: link:../workflow
       '@types/better-sqlite3':
         specifier: ^7.6.13

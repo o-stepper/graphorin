@@ -43,7 +43,7 @@ await sqlite.init(); // run pending migrations
 
 ## Migrations
 
-Every Graphorin package owns its own SQL migrations and registers them through the **migration registry** convention. On `sqlite.init()` the registry runs pending migrations in dependency order; each migration is wrapped in a transaction and recorded in the `migration_state` table.
+Every Graphorin package owns its own SQL migrations and registers them through the **migration registry** convention. On `sqlite.init()` the registry runs pending migrations in dependency order; each migration is wrapped in a transaction and recorded in the `schema_migrations` table.
 
 Migrations are **forward-only**. Down-migrations are not supported until the framework reaches `1.0`.
 

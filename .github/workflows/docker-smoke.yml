@@ -23,6 +23,7 @@ jobs:
   build-and-health:
     name: docker build + /v1/health
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -74,3 +75,12 @@ jobs:
       - name: Teardown
         if: always()
         run: docker rm -f graphorin-smoke || true
+
+  # E3: a red weekly run must not die silently in the Actions tab - this is
+  # the exact CI-11 regression class this workflow exists to catch.
+  notify-on-failure:
+    needs: [build-and-health]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/notify-scheduled-failure.yml

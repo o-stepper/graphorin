@@ -7,12 +7,16 @@
  * which `graphorin-*` extensions deprecate (or co-exist with) an
  * upstream field, and whether a skill author's
  * `graphorin-anthropic-spec` hint refers to a snapshot newer or older
- * than the bundled one. The snapshot is checked-in to the repository
- * and refreshed via the `pnpm run check-anthropic-spec` CI cron.
+ * than the bundled one. The snapshot is checked-in to the repository;
+ * `pnpm run check-anthropic-spec` diffs it against an upstream snapshot
+ * the maintainer supplies via `--upstream` (there is no scheduled CI
+ * job and no auto-refresh - the release `mvp-readiness` gate runs the
+ * helper in no-upstream skip mode, which only confirms the bundled
+ * snapshot parses).
  *
- * The loader does not fetch the upstream specification; the only
- * network call lives inside the CI helper script. The snapshot lookup
- * is deterministic and side-effect free at runtime.
+ * Neither the loader nor the helper fetches the upstream specification;
+ * the upstream snapshot is fetched manually. The snapshot lookup is
+ * deterministic and side-effect free at runtime.
  *
  * @packageDocumentation
  */

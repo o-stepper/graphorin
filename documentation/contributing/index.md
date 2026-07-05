@@ -54,7 +54,7 @@ If everything is green, you are ready to make changes.
 
 ## Development workflow
 
-1. **Create a branch.** `phase-NN-<slug>` for one-phase work, `phase-NN-<sub-track>-<slug>` for sub-tracks within a heavy phase, or `hotfix/<short-description>` for unplanned fixes. Never push directly to `main`.
+1. **Create a branch.** `feat/<slug>` for feature work, `fix/<slug>` for bug fixes, `chore/<slug>` for maintenance, or `hotfix/<short-description>` for unplanned fixes. Never push directly to `main`. Branches are **deleted on merge** (pass `--delete-branch` or enable auto-delete); do not resurrect a merged branch for follow-up work - cut a fresh one from `main` so you never rebase onto pre-fix code.
 2. **Make your change** inside the relevant `packages/<scope>` or `examples/<app>` workspace.
 3. **Add or update tests.** Vitest runs across the whole workspace.
 4. **Run the local checks** before opening a PR:
@@ -121,7 +121,11 @@ The **body** explains the *why*, not the *what*. One logical change per commit; 
 
 Graphorin follows [SemVer](https://semver.org). Pre-1.0, minor bumps cover breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). Once Graphorin reaches 1.0, strict SemVer applies. All `@graphorin/*` packages are released **lockstep** at the same version while on the 0.x line.
 
-Versions are managed by [Changesets](https://github.com/changesets/changesets). Do **not** bump versions by hand — let `pnpm changeset version` do it.
+Versions are tracked with [Changesets](https://github.com/changesets/changesets): open a PR with a changeset describing your change. All `@graphorin/*` packages release **lockstep** at the same version while on the 0.x line.
+
+> Release mechanics: the `0.2.0` through `0.5.0` bumps were applied by the maintainer as **manual passes** because `changeset version` kept computing a bogus **major** bump: with `@graphorin/server` declaring `workspace:*` peer dependencies on four sibling packages, Changesets escalated any minor/patch bump of those peers into a major for `server`, and the `fixed` lockstep group then lifted every package to `1.0.0`. That root cause is fixed (audit E2): the internal peers are now ranged (`workspace:>=0.5.0 <1.0.0`) and `onlyUpdatePeerDependentsWhenOutOfRange` is enabled, so the automated "Version Packages" PR opened by `release.yml` computes the correct lockstep bump and regenerates per-package CHANGELOGs (the `@changesets/changelog-github` generator works in CI, where a `GITHUB_TOKEN` is present; it needs one locally too). The `mvp-readiness` workspace audit now also rejects a release whose per-package CHANGELOG top entry does not match the version being released. Do not hand-bump versions in a feature PR: author a changeset and let the release pass apply it.
+
+> Git tags & provenance: the tag history starts at `0.5.0`, the first version published to the npm registry (each published package carries a `@graphorin/<pkg>@0.5.0` tag created by the release pipeline). The earlier `0.2.0`, `0.3.0`, and `0.4.0` bumps were internal-only and were never published, so no retro tags were backfilled for them: audit item CI-7 keeps the changelog backfill and these CONTRIBUTING notes, but retro-tagging never-published versions is a deliberate skip. Every real publish is provenance-checked in CI by the post-publish `npm audit signatures` smoke in `.github/workflows/release.yml`.
 
 ## Privacy & no-phone-home
 

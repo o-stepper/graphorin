@@ -4,7 +4,7 @@
   "snapshotDate": "2026-04-19",
   "specSource": "https://agentskills.io/specification",
   "specCommit": null,
-  "rationale": "Bundled snapshot of the publicly published `SKILL.md` file-format specification used to determine which frontmatter fields are recognised by the upstream loader. Updated through the `pnpm run check-anthropic-spec` CI cron whenever the published specification changes.",
+  "rationale": "Bundled snapshot of the publicly published `SKILL.md` file-format specification used to determine which frontmatter fields are recognised by the upstream loader. Updated manually: `pnpm run check-anthropic-spec -- --upstream <snapshot>` diffs this file against a maintainer-fetched upstream snapshot (no scheduled CI job refreshes it).",
   "knownFields": {
     "name": {
       "since": "2025-01-01",

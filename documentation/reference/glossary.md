@@ -119,8 +119,6 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 
 **`Reducer`.** Channel descriptor with a custom `(prev, next) => merged` merge function. Lives in `@graphorin/core/channels`.
 
-**`RunContext`.** The context object passed into tool `execute(input, ctx)` calls. Carries `signal`, `tracer`, `fetch`, scope-bound secrets, run identifiers.
-
 **`RunState`.** Serialisable snapshot of an agent run. `runStateToJSON(state)` / `runStateFromJSON(serialised)` round-trip the full state.
 
 ## S
@@ -146,6 +144,8 @@ The shared vocabulary used throughout the Graphorin documentation, in alphabetic
 **Token counter.** Per-provider strategy that estimates the token cost of a message list. Pluggable via `@graphorin/provider/counters`.
 
 **Tool.** Typed callable declared with `tool({...})` from `@graphorin/tools`. Carries Zod input / output schemas, `Sensitivity`, `sideEffectClass` (`'pure' | 'read-only' | 'side-effecting' | 'external-stateful'`), `needsApproval`, and sandbox-tier metadata.
+
+**`ToolExecutionContext`.** The context object passed into tool `execute(input, ctx)` calls. Carries `toolCallId`, the parent `runContext`, `signal`, `tracer`, `logger`, the scope-bound `secrets` accessor, and the `reportProgress` / `streamContent` emitters.
 
 **`ToolExecutor`.** Component that runs `Tool[]` invocations. Parallel-by-default, approval-aware, sandbox-aware.
 

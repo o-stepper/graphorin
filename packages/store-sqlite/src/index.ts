@@ -7,7 +7,8 @@
  *   `AuthTokenStore`, `OAuthServerStore`, `IdempotencyStore` —
  *   complete implementations of every storage contract from
  *   `@graphorin/core/contracts`.
- * - WAL hardening + WorkerPool-ready connection layer.
+ * - Single-connection layer with WAL + busy-timeout hardening applied
+ *   at open.
  * - Atomic migration runner with a registry every other package can
  *   plug additional migrations into.
  * - Multi-table per-embedder vec0 layout + multilingual FTS5.
@@ -107,9 +108,11 @@ import { VectorTableManager } from './vector-table-mgr.js';
 export const VERSION = '0.5.0';
 
 /**
- * Library mode — single in-process connection. Server mode — opt-in
- * `WorkerPool` (1 writer + N readers); WAL hardening and the periodic
- * `wal_checkpoint(RESTART)` are mandatory in this mode.
+ * Both modes run on a single in-process connection with the mandatory
+ * WAL-hardening pragmas (WAL journal mode, busy-timeout, etc.).
+ * `'server'` additionally starts the periodic `wal_checkpoint(RESTART)`
+ * manager automatically to bound WAL growth on long-running daemons;
+ * `'lib'` starts it only when `walCheckpointIntervalMs` is set.
  *
  * @stable
  */

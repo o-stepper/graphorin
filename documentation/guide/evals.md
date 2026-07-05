@@ -35,7 +35,7 @@ exitOnFailures(report); // exit non-zero if any case failed
 
 ## Scorers
 
-A scorer takes the case input + the agent's output and returns a `{ passed, score, ... }` verdict. Compose as many as you need — a case passes when every scorer passes.
+A scorer takes the case input + the agent's output and returns a `{ pass, score, ... }` verdict. Compose as many as you need — a case passes when every scorer passes.
 
 - **`code/`** — deterministic, no model: `exactMatch`, `regexMatch` (stateless — `/g`/`/y` flags are stripped per case), `jsonPath`, and arbitrary `predicate` scorers.
 - **`llm/`** — an LLM-as-judge scorer (`llmJudge`) for open-ended answers. Hardened against prompt injection in the candidate output; a judge that fails to parse surfaces a scorer error rather than a silent zero.
@@ -51,7 +51,7 @@ Loaders return a uniform case list:
 - **`loadLongMemEvalDataset`** — the real [LongMemEval](https://arxiv.org/abs/2410.10813) long-term-memory benchmark (ICLR 2025).
 - **`loadLocomoDataset`** — the real [LOCOMO](https://arxiv.org/abs/2402.17753) multi-session conversational-memory benchmark.
 
-The LongMemEval / LOCOMO datasets are not bundled; fetch them with `scripts/fetch-eval-datasets.mjs` (an explicit, user-initiated download), then point the loader at the local path.
+The LongMemEval / LOCOMO datasets are not bundled; fetch them with `scripts/fetch-eval-datasets.mjs` (an explicit, user-initiated download), then point the loader at the local path. Downloads are integrity-checked: every dataset is pinned in `scripts/datasets.lock.json` (SHA-256 + immutable-revision source URL), already-present files are re-verified rather than trusted, and a `GRAPHORIN_*_URL` env override changes the source but not the required hash. A hash mismatch fails loudly; re-pin deliberately with `--force --update-lock`.
 
 ## Reporters
 
@@ -61,9 +61,11 @@ Render the same `EvalReport` for humans or machines: `renderTerminalReport`, `re
 
 `detectRegressions(current, baseline, tolerances)` compares a fresh report against a stored baseline and flags drops beyond your tolerances (pass-rate, mean-score, duration). The duration gate is **opt-in and absolute** (a finite ms budget on the mean-duration delta; it defaults to off so it does not false-positive across runner hardware). Seed a baseline from a known-good run, commit it, and gate future runs against it.
 
+Reports now carry honest statistics: `summary.passRateCi` is a 95% Wilson interval on the pass rate, and under `iterations > 1` the summary adds `passHatK` (the fraction of base cases whose *every* repeat iteration passed - a flaky case fails pass^k while barely moving the mean). A `pass-rate-drop` finding is annotated with a paired **McNemar p-value** over the cases shared with the baseline; pass `requireSignificance: true` (with optional `significanceAlpha`, default 0.05) to keep a drop finding only when the paired test says the change is real - a fixed percentage tolerance alone is blind to sample size. The shared helpers (`wilsonInterval`, `passHatK`, `pairedPassSignificance`, `mean`, `sampleStddev`) are exported from `@graphorin/evals`.
+
 ## Benchmarks
 
-The `benchmarks/*` workspaces wrap the harness for specific suites — `benchmark-longmemeval`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, and others.The `longmemeval` benchmark ships the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
+The `benchmarks/*` workspaces wrap the harness for specific suites — `benchmark-longmemeval`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, `benchmark-scale` (see [Performance & scale](/guide/performance)), and others. The `longmemeval` benchmark ships the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
 
 > Real-provider benchmark runs cost real model calls; they are never run by default. The offline stub mode is what keeps the suite green in CI.
 

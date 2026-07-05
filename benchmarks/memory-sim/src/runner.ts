@@ -95,7 +95,11 @@ export async function main(): Promise<void> {
   ];
   await writeFile(join(pkgRoot(), 'RESULTS.md'), lines.join('\n'), 'utf8');
   console.log(`[benchmark-memory-sim] rounds=${rounds} hitRate=${hitRate.toFixed(4)}`);
-  if (hitRate < 0.85 && !smoke) process.exitCode = 1;
+  // E7 (evals-12): the gate used to be `hitRate < 0.85 && !smoke` — and CI
+  // only ever ran --smoke, so it could never fire. The sim is fully
+  // deterministic (seeded PRNG + FTS recall), so arming the gate in smoke
+  // mode carries zero flake risk.
+  if (hitRate < 0.85) process.exitCode = 1;
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

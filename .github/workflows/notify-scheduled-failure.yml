@@ -1,0 +1,79 @@
+name: Notify on scheduled failure
+
+# E3 (audit 2026-07-04): scheduled workflows fail silently. GitHub's default
+# behaviour for a red `schedule:` run is to email whoever last edited the
+# workflow file - routinely muted - so a broken nightly docs build or weekly
+# docker smoke can stay red for weeks with nobody noticing. Every workflow
+# with a cron trigger calls this reusable workflow from a trailing job:
+#
+#   notify-on-failure:
+#     needs: [<the jobs above>]
+#     if: failure() && github.event_name == 'schedule'
+#     permissions:
+#       issues: write
+#     uses: ./.github/workflows/notify-scheduled-failure.yml
+#
+# The job opens one `ci-failure`-labelled issue per workflow (deduplicated
+# by title) and comments on it for repeat failures, so a broken cron files
+# exactly one actionable issue instead of spamming the tracker.
+#
+# Permissions note: a workflow_call job inherits the CALLER job's token
+# permissions, which is why the caller snippet above grants `issues: write`
+# and this file declares none.
+
+on:
+  workflow_call: {}
+
+jobs:
+  file-issue:
+    name: Open or update the ci-failure issue
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Create or comment on the failure issue
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const title = `Scheduled workflow failing: ${context.workflow}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // Ensure the label exists (create is idempotent-by-catch).
+            try {
+              await github.rest.issues.createLabel({
+                ...context.repo,
+                name: 'ci-failure',
+                color: 'b60205',
+                description: 'A scheduled CI workflow is failing',
+              });
+            } catch {
+              // already exists
+            }
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              ...context.repo,
+              state: 'open',
+              labels: 'ci-failure',
+              per_page: 100,
+            });
+            const existing = open.find((issue) => issue.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                ...context.repo,
+                issue_number: existing.number,
+                body: `Still failing: ${runUrl}`,
+              });
+              return;
+            }
+            await github.rest.issues.create({
+              ...context.repo,
+              title,
+              labels: ['ci-failure'],
+              body: [
+                `The scheduled \`${context.workflow}\` run failed on \`${context.ref}\`.`,
+                '',
+                `Run: ${runUrl}`,
+                '',
+                'Filed automatically by `notify-scheduled-failure.yml` (audit E3).',
+                'Close this issue once the workflow is green again.',
+              ].join('\n'),
+            });

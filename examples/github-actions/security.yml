@@ -70,5 +70,13 @@ jobs:
             echo "pnpm audit signatures not available in this pnpm version; skipping."
           fi
 
+      # `check-no-network` is a Graphorin-monorepo script; a downstream app
+      # will not have it unless it adopted the guard. Skip-with-notice rather
+      # than fail on a script that does not exist in the consumer repo.
       - name: Verify no implicit network calls (DEC-154)
-        run: pnpm run check-no-network
+        run: |
+          if node -e "process.exit(require('./package.json').scripts?.['check-no-network'] ? 0 : 1)"; then
+            pnpm run check-no-network
+          else
+            echo "no check-no-network script in this repo; skipping (see Graphorin's scripts/check-no-network.mjs to adopt it)."
+          fi

@@ -88,7 +88,7 @@ The shared helper `examples/example-trace-helper/` wires the console exporter co
 
 ## Production deployment templates
 
-Three deployment templates live alongside the examples — they're not standalone apps, but reference manifests for shipping the standalone server:
+Four deployment templates live alongside the examples — they're not standalone apps, but reference manifests for shipping the standalone server:
 
 - [`examples/systemd/`](https://github.com/o-stepper/graphorin/tree/main/examples/systemd) — hardened systemd unit.
 - [`examples/docker/`](https://github.com/o-stepper/graphorin/tree/main/examples/docker) — multi-stage Dockerfile + Compose.

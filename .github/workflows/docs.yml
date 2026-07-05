@@ -40,6 +40,7 @@ jobs:
   build:
     name: Build documentation
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -64,42 +65,30 @@ jobs:
       - name: Build documentation site (sync + TypeDoc + VitePress + llms.txt)
         run: pnpm --filter @graphorin/docs run build:site
 
-      # VitePress emits site-root-relative URLs (/guide, /reference/changelog, …)
-      # because `cleanUrls: true` is on. Plain offline lychee resolves those as
-      # file:/// at the filesystem root, and a vanilla static server can't rewrite
-      # extensionless URLs to their backing .html files. `vitepress preview` does
-      # the rewrite the same way Cloudflare Pages will, so we serve dist over
-      # loopback and point lychee at it. The exclude regex keeps the link check
-      # offline (any non-loopback http(s) target is dropped).
-      - name: Start VitePress preview server for link check
-        run: |
-          nohup pnpm --filter @graphorin/docs exec vitepress preview . \
-            --host 127.0.0.1 --port 8765 \
-            >/tmp/docs-preview.log 2>&1 &
-          echo $! > /tmp/docs-preview.pid
-          for _ in $(seq 1 60); do
-            curl -sf "http://127.0.0.1:8765/" >/dev/null && echo "preview is up" && exit 0
-            sleep 1
-          done
-          echo 'preview log:' >&2 && cat /tmp/docs-preview.log >&2 || true
-          exit 1
-
-      - name: Link check (lychee, loopback-only)
+      # E10 (docs-14): --include-fragments makes lychee validate #anchors
+      # against the target page's heading ids - without it seven broken
+      # in-site anchors (VitePress slugifies '_' to '-') sailed through.
+      #
+      # The check runs in offline FILE mode, not against a preview server:
+      # with a server + --base-url, lychee resolves every same-page '#foo'
+      # link against the base URL root instead of the page it appears on,
+      # so all heading anchors false-fail. In file mode '#foo' resolves
+      # against the containing file; --root-dir resolves the
+      # site-root-relative hrefs VitePress emits under `cleanUrls: true`;
+      # --fallback-extensions maps those extensionless URLs to their
+      # backing .html files; --offline drops every remote target, which
+      # keeps the link check network-free.
+      - name: Link check (lychee, offline file mode)
         uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2
         with:
           args: >-
             --no-progress
-            --exclude '.*'
-            --include '^http://127\.0\.0\.1:8765'
-            --base-url http://127.0.0.1:8765/
+            --offline
+            --include-fragments
+            --root-dir ${{ github.workspace }}/documentation/.vitepress/dist
+            --fallback-extensions html
             ./documentation/.vitepress/dist/**/*.html
           fail: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Stop VitePress preview server
-        if: always()
-        run: kill "$(cat /tmp/docs-preview.pid)" 2>/dev/null || true
 
       - name: Upload built site
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -113,6 +102,7 @@ jobs:
     name: Deploy to Cloudflare Pages
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     # Deploy only from `main`, on either a real push/merge OR a manual
     # `workflow_dispatch` re-run from the Actions tab (the recovery path
     # the header comment + the "secrets not provisioned" step point to).
@@ -164,3 +154,12 @@ jobs:
           apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy documentation/.vitepress/dist --project-name=graphorin-docs --branch=main
+
+  # E3: the nightly cron is what catches docs drift on quiet branches - a
+  # silent red run defeats it.
+  notify-on-failure:
+    needs: [build]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/notify-scheduled-failure.yml

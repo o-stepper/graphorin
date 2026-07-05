@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '17 3 * * 1'
 
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
   contents: read
 
@@ -15,6 +19,7 @@ jobs:
   audit:
     name: pnpm audit + license allowlist
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -48,6 +53,7 @@ jobs:
   codeql:
     name: CodeQL · javascript-typescript
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       security-events: write
       contents: read
@@ -62,3 +68,12 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4
+
+  # E3: the weekly cron is the only run that catches a CVE disclosed between
+  # PRs - a silent red run defeats its purpose.
+  notify-on-failure:
+    needs: [audit, codeql]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/notify-scheduled-failure.yml

@@ -2111,6 +2111,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
           attrs: {
             'gen_ai.operation.name': 'invoke_agent',
             'gen_ai.agent.id': agentId,
+            'gen_ai.agent.name': config.name,
             'graphorin.run.id': state.id,
             'graphorin.step.number': stepNumber,
           },

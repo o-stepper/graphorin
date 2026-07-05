@@ -120,10 +120,10 @@
     "zod": "^3.25.0"
   },
   "peerDependencies": {
-    "@graphorin/agent": "workspace:*",
-    "@graphorin/memory": "workspace:*",
-    "@graphorin/sessions": "workspace:*",
-    "@graphorin/workflow": "workspace:*"
+    "@graphorin/agent": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/memory": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/sessions": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/workflow": "workspace:>=0.5.0 <1.0.0"
   },
   "peerDependenciesMeta": {
     "@graphorin/agent": {
@@ -144,10 +144,10 @@
     "provenance": true
   },
   "devDependencies": {
-    "@graphorin/agent": "workspace:*",
-    "@graphorin/memory": "workspace:*",
-    "@graphorin/sessions": "workspace:*",
-    "@graphorin/workflow": "workspace:*",
+    "@graphorin/agent": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/memory": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/sessions": "workspace:>=0.5.0 <1.0.0",
+    "@graphorin/workflow": "workspace:>=0.5.0 <1.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/ws": "^8.18.1",
     "better-sqlite3": "^12.9.0",

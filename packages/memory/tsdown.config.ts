@@ -9,6 +9,10 @@ export default defineConfig({
     'src/search/index.ts',
     'src/migration/index.ts',
     'src/errors/index.ts',
+    // E2: `./conflict` is a public exports subpath; without an explicit entry
+    // it only shipped because `src/index.ts` re-exports it (preserveModules
+    // side effect) - removing that re-export would silently 404 the subpath.
+    'src/conflict/index.ts',
   ],
   format: ['esm'],
   platform: 'node',

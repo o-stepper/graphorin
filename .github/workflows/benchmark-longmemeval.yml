@@ -58,6 +58,7 @@ jobs:
   longmemeval:
     name: LongMemEval (dispatch-only)
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -142,3 +143,13 @@ jobs:
             echo "::endgroup::"
           done
           exit $status
+
+  # E3: inert while this workflow is dispatch-only (a human is watching a
+  # dispatch run); arms automatically the day the weekly `schedule:` trigger
+  # from the header comment is enabled, so the cron cannot fail silently.
+  notify-on-failure:
+    needs: [longmemeval]
+    if: failure() && github.event_name == 'schedule'
+    permissions:
+      issues: write
+    uses: ./.github/workflows/notify-scheduled-failure.yml

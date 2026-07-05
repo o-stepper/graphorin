@@ -8,10 +8,22 @@ example app.
 
 ```bash
 sudo cp examples/systemd/graphorin.service /etc/systemd/system/graphorin.service
+sudo mkdir -p /etc/graphorin
+sudo cp examples/systemd/config.example.json /etc/graphorin/config.json
 sudo systemctl daemon-reload
 sudo systemctl enable --now graphorin.service
 sudo systemctl status graphorin.service
 ```
+
+The config file must be **JSON** (or a `.js`/`.mjs` module) - the loader does
+not read TOML. Edit `/etc/graphorin/config.json` before starting: the example
+enables token auth + storage encryption and expects the referenced secret
+files (`/etc/graphorin/pepper`, `/etc/graphorin/db-passphrase`,
+`/etc/graphorin/audit-passphrase`) to exist and be readable only by the
+`graphorin` user. `StateDirectory=graphorin` has systemd create
+`/var/lib/graphorin` (the DB lives there) owned by the service user. Note
+there is no reload support - `systemctl restart graphorin` re-reads the
+config (SIGHUP would kill the daemon, so the unit defines no `ExecReload=`).
 
 ## Verify hardening
 

@@ -18,6 +18,15 @@
  * non-tag-like body (whitespace, hyphenated words, multi-word phrases)
  * is escaped as `&lt;` / `&gt;` so the rendered output looks identical
  * but the Vue parser is happy.
+ *
+ * The walk also rewrites LICENSE file links: TypeDoc copies each
+ * package's LICENSE into `api/_media/` as extensionless `LICENSE`,
+ * `LICENSE-1`, ... and points README links there (badge links keep
+ * their original `./LICENSE` form). VitePress does not ship
+ * extensionless files into `dist`, so every one of those links 404s on
+ * the built site. All copies carry the same MIT text, so the links are
+ * redirected to the canonical file on GitHub (the same convention
+ * sync-root-docs.mjs applies to sibling-file links).
  */
 
 import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
@@ -125,6 +134,21 @@ function sanitise(markdown) {
   return masked;
 }
 
+const REPO_BLOB_BASE = 'https://github.com/o-stepper/graphorin/blob/main';
+
+/**
+ * Redirects markdown links whose destination is a TypeDoc-copied
+ * LICENSE file (`_media/LICENSE`, `_media/LICENSE-3`, `./LICENSE`, ...)
+ * to the canonical LICENSE on GitHub. See the header comment for why
+ * the local copies never make it into the built site.
+ */
+function rewriteLicenseLinks(markdown) {
+  return markdown.replace(
+    /\]\((?:\.\.?\/)*(?:_media\/)?LICENSE(?:-\d+)?\)/g,
+    `](${REPO_BLOB_BASE}/LICENSE)`,
+  );
+}
+
 async function* walkMarkdown(dir) {
   let entries;
   try {
@@ -155,7 +179,7 @@ async function main() {
   let count = 0;
   for await (const file of walkMarkdown(apiRoot)) {
     const before = await readFile(file, 'utf8');
-    const after = sanitise(before);
+    const after = rewriteLicenseLinks(sanitise(before));
     if (after !== before) {
       await writeFile(file, after, 'utf8');
       count += 1;

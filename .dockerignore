@@ -1,0 +1,15 @@
+# E4: keep the docker build context clean. examples/docker/Dockerfile is
+# built from the repo root and COPYs `packages ./packages`; without this
+# file the host's node_modules (platform-specific native bindings!), stale
+# dist output, and repo junk all leak into the build context and image.
+**/node_modules
+**/dist
+**/.turbo
+**/coverage
+**/*.tsbuildinfo
+.git
+tmp
+documentation/.vitepress/cache
+documentation/.vitepress/dist
+benchmarks/.datasets
+**/.DS_Store

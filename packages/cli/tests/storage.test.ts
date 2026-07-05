@@ -102,4 +102,26 @@ describe('graphorin storage cleanup-backups', () => {
     });
     expect(out.removed).toEqual([]);
   });
+
+  it('finds stale backups next to the DB on every platform (E6)', async () => {
+    // Regression: the base name used to come from dbPath.split('/'), which on
+    // Windows (backslash separators) yielded the WHOLE path, so no readdir
+    // entry ever matched and cleanup-backups was a silent no-op. node:path
+    // basename makes this test pass on win32 too.
+    const { cfg, dbPath } = await fixtureWithDb();
+    await writeFile(`${dbPath}.bak`, 'stale');
+    await writeFile(`${dbPath}.bak.1712000000`, 'stale');
+    await writeFile(`${dbPath}.tmp.42`, 'stale');
+    await writeFile(`${dbPath}.other`, 'not a backup');
+    const out = await runStorageCleanupBackups({
+      config: cfg,
+      dryRun: true,
+      print: () => undefined,
+    });
+    const names = out.removed.map((p) => p.slice(p.lastIndexOf('data.db')));
+    expect(names.sort()).toEqual(['data.db.bak', 'data.db.bak.1712000000', 'data.db.tmp.42']);
+    // dry-run must not delete anything
+    const { readFile } = await import('node:fs/promises');
+    await expect(readFile(`${dbPath}.bak`, 'utf8')).resolves.toBe('stale');
+  });
 });

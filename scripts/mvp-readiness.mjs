@@ -18,12 +18,20 @@
  *   8. workspace audit   — every published @graphorin/* package has a non-stub
  *                          version matching the root manifest (lockstep), license
  *                          MIT, author Oleksiy Stepurenko, publishConfig.provenance
- *                          true, and no `private: true` flag.
+ *                          true, and no `private: true` flag. E2 additions: the
+ *                          package CHANGELOG's top entry must equal the release
+ *                          version (docs-11 class: stale 0.1.0 changelogs shipped
+ *                          in every 0.5.0 tarball), and every `exports` target
+ *                          must resolve to a real file under the package dir
+ *                          (skipped under --skip-build, where dist/ may be absent).
  *
  * Flags:
  *   --skip-build     skip gates 3 + 4 (build + test). Useful for a fast
  *                    "is the surface release-shaped?" check; CI never
  *                    passes this flag.
+ *   --audit-only     run ONLY gate 8 (workspace audit, including the
+ *                    exports-map resolution — expects dist/ to exist).
+ *                    Maintainer convenience; CI never passes this flag.
  *   --json           emit a JSON report to stdout instead of the
  *                    human-friendly stream.
  *
@@ -59,6 +67,7 @@ function parseInvocation() {
     args: process.argv.slice(2),
     options: {
       'skip-build': { type: 'boolean', default: false },
+      'audit-only': { type: 'boolean', default: false },
       json: { type: 'boolean', default: false },
     },
     allowPositionals: false,
@@ -101,10 +110,29 @@ function runCommand(label, cmd, args, { quiet }) {
 }
 
 /**
+ * Collect every concrete file target reachable from an `exports` map
+ * value (strings + nested condition objects). Wildcard patterns (`*`)
+ * are skipped — they cannot be statted directly.
+ */
+function collectExportTargets(value, out) {
+  if (typeof value === 'string') {
+    if (!value.includes('*')) out.push(value);
+    return out;
+  }
+  if (value !== null && typeof value === 'object') {
+    for (const nested of Object.values(value)) collectExportTargets(nested, out);
+  }
+  return out;
+}
+
+/**
  * Workspace audit (gate 8). Returns a `WorkspaceAuditReport` with a
  * pass / fail decision per package + a flat list of violations.
+ *
+ * `checkExports: false` (the --skip-build fast path) skips the
+ * exports-map resolution — dist/ may legitimately be absent there.
  */
-async function workspaceAudit() {
+async function workspaceAudit({ checkExports } = { checkExports: true }) {
   const violations = [];
   const inspected = [];
   let entries;
@@ -148,7 +176,9 @@ async function workspaceAudit() {
       fail('publishConfig.provenance', true, manifest.publishConfig?.provenance);
     if (manifest.publishConfig?.access !== 'public')
       fail('publishConfig.access', 'public', manifest.publishConfig?.access);
-    if (!manifest.engines?.node?.includes('22'))
+    // E2: exact-match instead of the old `.includes('22')` substring test,
+    // which would have accepted e.g. `^0.22.0`.
+    if (manifest.engines?.node !== '>=22.0.0')
       fail('engines.node', '>=22.0.0', manifest.engines?.node);
     if (manifest.repository?.directory !== `packages/${entry.name}`)
       fail('repository.directory', `packages/${entry.name}`, manifest.repository?.directory);
@@ -172,6 +202,40 @@ async function workspaceAudit() {
         });
       }
     }
+
+    // E2 / docs-11: the tarball ships CHANGELOG.md, so its top entry must be
+    // the version being released — a changelog frozen at an old version
+    // reaching consumers is exactly what this gate exists to stop. (The
+    // 0.1.0-frozen set shipped inside every 0.5.0 tarball undetected.)
+    try {
+      const changelog = await readFile(join(PACKAGES_DIR, entry.name, 'CHANGELOG.md'), 'utf8');
+      const top = changelog.match(/^## (\d+\.\d+\.\d+)/m);
+      if (top === null) {
+        fail('CHANGELOG.md', `top entry ## ${REQUIRED_VERSION}`, 'no version heading found');
+      } else if (top[1] !== REQUIRED_VERSION) {
+        fail('CHANGELOG.md top entry', `## ${REQUIRED_VERSION}`, `## ${top[1]}`);
+      }
+    } catch {
+      // missing-on-disk already reported above
+    }
+
+    // E2: resolve every exports target to a real file so a subpath pointing
+    // at an unbuilt/renamed dist file cannot ship (mvp-readiness runs after
+    // the build gate, so dist/ must exist here).
+    if (checkExports && manifest.exports !== undefined) {
+      const targets = collectExportTargets(manifest.exports, []);
+      for (const target of targets) {
+        try {
+          await stat(join(PACKAGES_DIR, entry.name, target));
+        } catch {
+          violations.push({
+            pkg: manifest.name ?? entry.name,
+            field: 'exports',
+            message: `target ${JSON.stringify(target)} does not resolve to a file`,
+          });
+        }
+      }
+    }
   }
   return { ok: violations.length === 0, inspected, violations };
 }
@@ -186,6 +250,7 @@ async function main() {
   const flags = parseInvocation();
   const json = flags.json === true;
   const skipBuild = flags['skip-build'] === true;
+  const auditOnly = flags['audit-only'] === true;
 
   // Use the turbo-aware aliases for typecheck / build / test instead of
   // `pnpm -r ...`. The `typecheck` and `test` tasks declare
@@ -218,7 +283,9 @@ async function main() {
       args: ['run', 'check-licenses'],
     },
     { label: 'workspace-audit', kind: 'audit' },
-  ].filter(Boolean);
+  ]
+    .filter(Boolean)
+    .filter((gate) => !auditOnly || gate.kind === 'audit');
 
   const lines = [];
   const results = [];
@@ -244,7 +311,7 @@ async function main() {
     } else {
       if (!json) console.log(`\n--- gate ${index + 1}/${gates.length}: workspace-audit ---`);
       const startedAt = Date.now();
-      const audit = await workspaceAudit();
+      const audit = await workspaceAudit({ checkExports: auditOnly || !skipBuild });
       const elapsedMs = Date.now() - startedAt;
       const ok = audit.ok;
       results.push({

@@ -6,6 +6,7 @@
  * @packageDocumentation
  */
 
+import { pairedPassSignificance, passByBaseCase } from './stats.js';
 import type {
   EvalReport,
   RegressionFinding,
@@ -42,14 +43,32 @@ export function detectRegressions<I, O>(
   const baselinePassRate = total(baseline) === 0 ? 0 : baseline.summary.passed / total(baseline);
   const passRateDropPct = (baselinePassRate - currentPassRate) * 100;
   if (passRateDropPct > maxPassRateDropPct) {
-    findings.push({
-      kind: 'pass-rate-drop',
-      message:
-        `pass rate dropped by ${passRateDropPct.toFixed(2)}% ` +
-        `(${(currentPassRate * 100).toFixed(2)}% < baseline ${(baselinePassRate * 100).toFixed(2)}% ` +
-        `− tolerance ${maxPassRateDropPct.toFixed(2)}%).`,
-      delta: -passRateDropPct,
-    });
+    // E8 (evals-05/08): the fixed tolerance is sample-size blind, so pair the
+    // shared cases and run McNemar's test. The p-value is always attached for
+    // the report; it VETOES the finding only under opt-in requireSignificance.
+    const significance = pairedPassSignificance(
+      passByBaseCase(caseOutcomes(current)),
+      passByBaseCase(caseOutcomes(baseline)),
+    );
+    const havePairs = significance.pairs > 0;
+    const alpha = options.significanceAlpha ?? 0.05;
+    const vetoed =
+      options.requireSignificance === true && havePairs && significance.pValue >= alpha;
+    if (!vetoed) {
+      findings.push({
+        kind: 'pass-rate-drop',
+        message:
+          `pass rate dropped by ${passRateDropPct.toFixed(2)}% ` +
+          `(${(currentPassRate * 100).toFixed(2)}% < baseline ${(baselinePassRate * 100).toFixed(2)}% ` +
+          `− tolerance ${maxPassRateDropPct.toFixed(2)}%)` +
+          (havePairs
+            ? ` [paired: ${significance.regressed} regressed / ${significance.improved} improved over ${significance.pairs} shared case(s), McNemar p=${significance.pValue.toFixed(4)}]`
+            : '') +
+          '.',
+        delta: -passRateDropPct,
+        ...(havePairs ? { pValue: significance.pValue } : {}),
+      });
+    }
   }
 
   const durationDelta = current.summary.avgDurationMs - baseline.summary.avgDurationMs;
@@ -101,4 +120,14 @@ export function detectRegressions<I, O>(
 
 function total<I, O>(r: EvalReport<I, O>): number {
   return r.summary.total;
+}
+
+/** Per-iteration case outcomes (a case passes when every scorer passed). */
+function caseOutcomes<I, O>(
+  r: EvalReport<I, O>,
+): ReadonlyArray<{ readonly caseId: string; readonly pass: boolean }> {
+  return r.results.map((c) => ({
+    caseId: c.caseId,
+    pass: c.scores.every((s) => s.result.pass),
+  }));
 }

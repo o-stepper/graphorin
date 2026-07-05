@@ -106,9 +106,11 @@ Semantic memory composes dense-vector results with full-text (FTS5) results and 
 The FTS5 leg tokenises the query on whitespace and OR-combines the tokens — each quoted independently — so a multi-word natural-language question recalls facts that share **any** term, regardless of word order or adjacency: `where does Anna work` still finds *"Anna works at Acme"*. This matters most in the offline default, where (with no embedder configured) the FTS leg is the only retrieval signal. Per-token quoting also neutralises FTS5 operator characters, so punctuation in a query can never alter its structure or raise an error. Exact-phrase matching is not exposed as a separate mode; lean on the vector leg or [weighted fusion](/guide/rerankers) when you need phrase-level precision.
 
 ```ts
-import { RRFReranker } from '@graphorin/memory/search';
+import { RRFReranker } from '@graphorin/memory';
 
-memory.semantic.setReranker(new RRFReranker({ k: 60 }));
+const reranker = new RRFReranker(60); // k = 60, the framework default
+// Wire it onto the semantic tier of your memory facade:
+// memory.semantic.setReranker(reranker);
 ```
 
 Once you have labelled data (the `@graphorin/evals` harness), a **calibrated weighted fusion** can beat plain RRF — and **query transformation** can recover memories whose stored wording differs from the question. Both are covered in [Rerankers & fusion](/guide/rerankers). In brief:
@@ -390,9 +392,62 @@ for await (const progress of migrateEmbedder({
 | `multi-active` | Keeps both `vec0` tables alive — reads union, writes go to the active embedder. |
 | `auto-migrate` | Re-embeds existing rows in resumable batches (checkpointed via `migration_state`; cancellable with `AbortSignal`). |
 
+## Context assembly (the six layers)
+
+The facade's **context engine** (`memory.contextEngine`) compiles memory into the agent's per-run system prompt. The agent runtime calls `memory.contextEngine.assemble(...)` once at run start when you opt in with `createAgent({ memory, autoAssembleContext: true })` (see [memory-aware system prompt](/guide/agent-runtime#memory-aware-system-prompt-opt-in)); the assembled prompt stacks six layers:
+
+| Layer | Content | Source |
+|---|---|---|
+| 1 | `graphorin_memory_base`: the locale-pack base template that teaches the model how this memory works. `memoryBaseMode: 'full'` (default, ~250-350 tokens) or `'minimal'` (~80-120, for top-tier models). | Locale pack |
+| 2 | `agent_instructions`: your `createAgent({ instructions })`. | Agent config |
+| 3 | Working-memory blocks (persona, current task, the `learned_context` digest), each passed through the D2 privacy filter below. | `memory.working` |
+| 4 | Activated procedural rules (D2-filtered) plus skill metadata cards. | `memory.procedural` + skills |
+| 5 | Memory-metadata counters: what the store holds, per tier. | `memory.metadata` |
+| 6 | Opt-in auto-recall: when `factsAutoRecall` triggers on the last user message, a bounded `semantic.search` runs and the facts that pass the privacy filter are injected. | `memory.semantic` |
+
+Layers 1 and 2 are concatenated into a single `identity` candidate sharing one slot in the token-budget allocator, and the final prompt is emitted in **stability order**: the layer 1-4 prefix first, the volatile metadata and auto-recall content after it, so the provider's prompt-cache breakpoint survives across steps.
+
+Configure the engine on the facade, `createMemory({ contextEngine: { ... } })`:
+
+| `ContextEngineConfig` field | Default | Meaning |
+|---|---|---|
+| `memoryBaseMode` | `'full'` | Layer 1 template verbosity (`'minimal'` opts top-tier models into the compact form). |
+| `locale` | `'en'` | Locale pack: a string id or a pack built with `defineContextLocalePack`. |
+| `layers.{identity, memoryMetadata, activeRules, activeSkills, workingBlocks, autoRecall}` | all enabled | Per-layer `{ enabled?, cap? }` token caps; `layers.autoRecall` additionally takes `topK` / `threshold`. |
+| `factsAutoRecall` | `false` | Layer 6 trigger: `{ topK?, threshold?, strategy? }`. `topK` (default 5) bounds volume; `threshold` defaults to `0` because the fused-score scale is reranker-dependent. |
+| `privacy` | see below | The D2 privacy-filter configuration. |
+| `maxContextTokens` | unbounded | Hard token budget for the assembled prompt. |
+| `reservedForResponse` | `4096` | Tokens reserved for the model's response. |
+| `reservedForCompaction` | `8192` | Tokens reserved for the compaction summarizer call. |
+| `providerContextWindow` | unset | The active provider's context window; **required when `compaction` is enabled**. |
+| `compaction` / `summarizer` / `tokenCounter` | off / unset / heuristic | The in-flight message-history compaction axis; see [context management in the loop](/guide/agent-runtime#context-management-in-the-loop). |
+
+`assemble(...)` returns an `AssembledPrompt`: the single `systemMessage` plus diagnostics, including the per-layer `layerAllocation` snapshot (what each layer was granted under the budget) and the `privacyCounters` record of per-reason filter decisions.
+
 ## Privacy levels
 
 Every memory row carries a `Sensitivity` tag — `public`, `internal`, or `secret`. The tag flows through traces, exports, and the provider middleware. Sensitive content is redacted by default; you cannot accidentally turn redaction off. This is orthogonal to the [provenance / quarantine](#memory-safety-provenance-quarantine) trust gate above: sensitivity controls *who may see* a memory, provenance controls *whether it is trusted enough to recall*.
+
+### The D2 assembly filter
+
+At [context-assembly](#context-assembly-the-six-layers) time the tag becomes an active gate: every working block (layer 3), activated rule (layer 4), and auto-recalled fact (layer 6) passes the D2 filter before it may enter the prompt. The filter is configured through `contextEngine.privacy`:
+
+| `PrivacyConfig` field | Default | Meaning |
+|---|---|---|
+| `providerTrust` | `'public-tls'` | Trust class of the active provider: `'loopback'` / `'private'` / `'public-tls'` / `'public-cleartext'`. |
+| `providerAcceptsSensitivity` | derived from `providerTrust` | Explicit override of the sensitivity tiers the provider may receive. |
+| `cloudUploadConsent` | `false` | Per-user opt-in for sending `'internal'`-tier content to a cloud provider. |
+| `defaultSensitivity` | `'internal'` | Tier applied to records missing a tag. |
+
+Each record yields a `pass` or `drop` decision with a reason (`allowed`, `provider-rejects-secret`, `provider-rejects-internal`, `no-cloud-upload-consent`); the reasons are counted into `AssembledPrompt.privacyCounters` so per-tier drops are auditable.
+
+| Record tier | Passes when |
+|---|---|
+| `public` | Always. |
+| `internal` | The provider accepts `'internal'` **and** the trust class is `'loopback'` / `'private'`, or `cloudUploadConsent: true`. |
+| `secret` | The provider accepts `'secret'` **and** the trust class is `'loopback'`. It never leaves the machine otherwise. |
+
+Without an explicit `providerAcceptsSensitivity`, the accepted set derives from the trust class: `'loopback'` accepts all three tiers, `'private'` accepts `public` + `internal`, and both public classes accept `public` only. The filter trusts the record-level tag it was given; content it cannot see (raw user input, tool results, agent instructions) is covered by the outbound prompt-redaction middleware (D3), the universal backstop.
 
 ## Next steps
 

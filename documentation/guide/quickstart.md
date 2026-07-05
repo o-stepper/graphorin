@@ -17,7 +17,7 @@ A memory-backed agent that:
 
 ## 20-line hello world
 
-```ts
+```ts no-check
 import { createAgent } from '@graphorin/agent';
 import { createMemory } from '@graphorin/memory';
 import { createProvider } from '@graphorin/provider';
@@ -129,7 +129,7 @@ sequenceDiagram
     Agent-->>App: event.type === "text.delta"
 ```
 
-> The model reaches memory only through the **memory tools** it calls — the agent does not auto-compile a memory-aware prompt or auto-persist facts. Pass `tools: memory.tools` (below) to make those tools available; the only automatic memory integration today is [auto-compaction](/guide/agent-runtime#auto-compaction).
+> The model reaches memory only through the **memory tools** it calls — the agent does not auto-compile a memory-aware prompt or auto-persist facts. Pass `tools: memory.tools` (below) to make those tools available; the only automatic memory integration today is [auto-compaction](/guide/agent-runtime#context-management-in-the-loop).
 
 ## Try it with a real local LLM
 
@@ -140,7 +140,7 @@ import { ollamaAdapter, createProvider } from '@graphorin/provider';
 
 const provider = createProvider(
   ollamaAdapter({
-    baseURL: 'http://127.0.0.1:11434',
+    baseUrl: 'http://127.0.0.1:11434',
     model: 'qwen2.5:7b-instruct-q4_K_M',
   }),
   { acceptsSensitivity: ['public', 'internal'] },
@@ -183,7 +183,7 @@ The discriminated `AgentEvent<TOutput>` union is exhaustive and verified at comp
 
 Passing `tools: memory.tools` (as in the agent above) exposes the eleven memory tools to the model (a twelfth, `deep_recall`, when iterative retrieval is configured) — without it the model has no memory tools to call. You can also drive the same tiers directly from your own code, no agent required:
 
-```ts
+```ts no-check
 await memory.semantic.remember(
   { userId: 'alex' },
   { text: 'Loves mountain hiking and fresh espresso.' },

@@ -17,6 +17,33 @@ The `@graphorin/*` packages are published on the npm registry since `v0.5.0`. Wa
 - A package manager — **pnpm** is the project default; **npm** and **yarn** work too for consumers of the published packages.
 - ESM-only modules. Your project must be `"type": "module"` (or use `.mjs` files) — Graphorin ships ESM.
 
+## Supported platforms
+
+The default stack pulls native modules (`better-sqlite3`, the `sqlite-vec`
+vector extension, and — via `@graphorin/embedder-transformersjs` —
+`onnxruntime`), so platform support is defined by their prebuilt binaries:
+
+| Tier | Platforms | Notes |
+|---|---|---|
+| **CI-verified** | Linux x64, macOS arm64, Windows x64 | The full test suite runs on all three for every PR. |
+| **Prebuilt, not CI-run** | Linux arm64, macOS x64 | Every native dependency ships prebuilds; expected to work. |
+| **Partial** | Windows arm64 | Everything works **except vector search**: `sqlite-vec` publishes no `windows-arm64` binary and is a loadable extension with no compile-from-source fallback, so `@graphorin/store-sqlite` throws `SqliteVecMissingError` at first vector use. FTS + keyword recall still work. |
+
+Additional platform notes:
+
+- **Native build fallback.** If a prebuild is missing for an exotic target,
+  `better-sqlite3`, the SQLCipher peer
+  (`better-sqlite3-multiple-ciphers`), and `isolated-vm` compile from source —
+  that requires a C++ toolchain and Python 3 at install time. `sqlite-vec`
+  does not have this fallback (prebuilt-only).
+- **Windows shutdown semantics.** `graphorin start` installs `SIGTERM` +
+  `SIGINT` handlers for graceful drain. Windows never delivers a real
+  `SIGTERM`, so use Ctrl+C / `SIGINT` (or the REST surface) to stop the
+  daemon gracefully there; a service-manager TerminateProcess stop is abrupt.
+- **POSIX file-permission hardening** (`0600`/`0700` on secrets, spill files,
+  traces) applies on Linux/macOS only; on Windows, confidentiality of those
+  files rests on NTFS ACLs of the profile directory.
+
 ## Quickest install (memory-backed local assistant)
 
 Most assistants will need at minimum: the agent runtime, the memory facade, a provider, and a storage adapter.

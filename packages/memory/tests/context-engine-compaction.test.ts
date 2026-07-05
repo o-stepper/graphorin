@@ -448,12 +448,28 @@ describe("CE-6/CE-7 — real hook context, dedup'd preserved turns, anti-thrash"
 });
 
 describe('context-engine — trigger evaluation perf (RB-46; Phase 10d)', () => {
-  it('shouldCompact completes in < 2ms p95 with the DEC-131 cache amortization path', async () => {
+  it('shouldCompact with the DEC-131 cache amortization path never invokes the token counter', async () => {
+    // E6 de-flake: this used to assert `p95 < 2ms` over 50 awaited wall-clock
+    // samples — the tightest absolute microbenchmark in the suite, and pure
+    // scheduler/GC-jitter roulette on shared Windows CI runners. What DEC-131
+    // actually promises is STRUCTURAL: with `precomputedTokens` supplied, the
+    // hot path is an O(1) comparison that never re-counts the transcript. So
+    // count counter invocations instead of nanoseconds — deterministic on
+    // every platform, and a far stricter assertion than any time budget.
+    let countTextCalls = 0;
+    const countingCounter = {
+      id: 'test/counting-stub',
+      async countText(text: string): Promise<number> {
+        countTextCalls++;
+        return Math.ceil(text.length / 4);
+      },
+    };
     const engine = createContextEngine({
       providerContextWindow: 200_000,
       privacy: { providerTrust: 'public-tls' },
       compaction: { trigger: { thresholdTokens: 1_000_000 } }, // never trips so we measure pure cost
       summarizer: STUB_SUMMARIZER,
+      tokenCounter: countingCounter,
     });
     // Phase 12 (agent runtime) is the lifecycle owner: it reads the cached
     // total via `SessionMemoryStoreExt.totalCachedTokens(scope)` (DEC-131)
@@ -461,16 +477,14 @@ describe('context-engine — trigger evaluation perf (RB-46; Phase 10d)', () => 
     // hot path is then an O(1) comparison.
     const precomputedTokens = 500_000;
     const messages = buildMessages(1000);
-    await engine.shouldCompact(messages, { precomputedTokens });
-    const samples: number[] = [];
     for (let i = 0; i < 50; i++) {
-      const start = performance.now();
       await engine.shouldCompact(messages, { precomputedTokens });
-      samples.push(performance.now() - start);
     }
-    samples.sort((a, b) => a - b);
-    const p95 = samples[Math.floor(samples.length * 0.95) - 1] ?? 0;
-    expect(p95).toBeLessThan(2);
+    expect(countTextCalls).toBe(0);
+    // Prove the stub is live (the assertion above is not vacuous): without
+    // the precomputed total the engine falls back to per-message counting.
+    await engine.shouldCompact(messages);
+    expect(countTextCalls).toBeGreaterThan(0);
   });
 
   it('shouldCompact without the cache amortization path falls back to per-message counting', async () => {
