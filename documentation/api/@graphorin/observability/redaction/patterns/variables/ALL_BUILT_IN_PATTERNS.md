@@ -10,7 +10,7 @@
 const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:237
+Defined in: packages/observability/src/redaction/patterns.ts:241
 
 Full registry - for tooling that wants to introspect every pattern
 the framework knows about (e.g. CLI `graphorin redaction list`).

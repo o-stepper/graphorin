@@ -28,7 +28,7 @@ pnpm --filter ./examples/background-consolidator dev
 Expected output:
 
 ```
-graphorin v0.6.0 background-consolidator — recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=4, standardPhases=4, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
+graphorin v0.6.0 background-consolidator - recipe='stub', tier='cheap', running=true, turnsDriven=4, lightPhases=4, standardPhases=4, schedulerFires=1, triggers=[background-consolidator:idle-probe, background-consolidator:light-tick, consolidator:cron:0 3 * * *, consolidator:idle:10s].
 ```
 
 The dev script boots the app against `:memory:` SQLite, drives one cycle through `runConsolidatorCycle({ ... })`, prints the consolidator status, and exits cleanly.
@@ -41,7 +41,7 @@ The example wires four moving parts together:
 
 1. **`Memory` with a real consolidator.** `createMemory({ consolidator: { enabled: true, tier: 'cheap', triggers, provider, defaultScope } })` swaps the Phase 10a placeholder for the production runtime so the `light` + `standard` phases actually execute.
 2. **`Scheduler` from `@graphorin/triggers`.** The scheduler is constructed against the SQLite-backed `TriggerStore`. Trigger declarations become rows in `trigger_state`; the durable layer is what survives process restart per DEC-150.
-3. **`registerConsolidatorTriggers(consolidator, scheduler, { scope })`.** The bridge walks the consolidator's `triggers: [...]` list, parses each spec, and registers the cron / idle / interval kinds with the scheduler. The callback fires `consolidator.trigger(reason, scope)` so the lib-mode + server paths converge on the same handler. Turn / event / budget triggers are skipped here — the scheduler cannot count user turns autonomously.
+3. **`registerConsolidatorTriggers(consolidator, scheduler, { scope })`.** The bridge walks the consolidator's `triggers: [...]` list, parses each spec, and registers the cron / idle / interval kinds with the scheduler. The callback fires `consolidator.trigger(reason, scope)` so the lib-mode + server paths converge on the same handler. Turn / event / budget triggers are skipped here - the scheduler cannot count user turns autonomously.
 4. **`createServer({ consolidator, triggers: { scheduler } })`.** The standalone server hosts the consolidator daemon under its own lifecycle hooks. `GET /v1/health` reports `consolidator.running`, `consolidator.queueDepth`, and the active budget envelope; `graphorin consolidator status` (CLI, Phase 15) reads from the same daemon.
 
 ```ts
@@ -77,17 +77,17 @@ The example registers two layers of triggers:
 ```ts
 import { cron, idle, interval } from '@graphorin/triggers';
 
-// 1) Spec-derived triggers — one per ConsolidatorTriggerSpec, parsed
+// 1) Spec-derived triggers - one per ConsolidatorTriggerSpec, parsed
 //    by registerConsolidatorTriggers(...). The callback bound by the
 //    bridge calls `consolidator.trigger(reason, scope)` so the cron
 //    + idle parsings stay traceable end-to-end.
 //
 //    Default spec list (see DEFAULT_TRIGGERS):
-//      'turn:3'         — light + standard after every 3 turns (lib-side)
-//      'idle:10s'       — light + standard after 10s of no activity
-//      'cron:0 3 * * *' — nightly maintenance window for deep replays
+//      'turn:3'         - light + standard after every 3 turns (lib-side)
+//      'idle:10s'       - light + standard after 10s of no activity
+//      'cron:0 3 * * *' - nightly maintenance window for deep replays
 
-// 2) Operator-owned triggers — wired directly with `interval(...)` /
+// 2) Operator-owned triggers - wired directly with `interval(...)` /
 //    `idle(...)` so the example exposes a stable id callers can fire
 //    deterministically (e.g. from CI smoke coverage):
 const lightTick = interval(
@@ -112,7 +112,7 @@ await app.scheduler.register(lightTick);
 await app.scheduler.register(idleProbe);
 ```
 
-Both layers are fully durable through the SQLite `TriggerStore` — every `register(...)` call upserts a row keyed by `id`, so the next process can reuse the same id and pick up the existing schedule.
+Both layers are fully durable through the SQLite `TriggerStore` - every `register(...)` call upserts a row keyed by `id`, so the next process can reuse the same id and pick up the existing schedule.
 
 > **Library mode.** Pass `{ acknowledgeLibMode: true }` to suppress the per-process WARN that fires when callers register triggers without server-side ownership. The example threads the flag through `registerConsolidatorTriggers({ acknowledgeLibMode: true })` and through every operator-owned `interval(...)` / `idle(...)` declaration.
 
@@ -151,7 +151,7 @@ Or hit the server endpoint directly:
 
 ```bash
 # After `await app.server.start()` (or `graphorin start`):
-curl -s http://127.0.0.1:8787/v1/health | jq '.consolidator'
+curl -s http://127.0.0.1:8080/v1/health | jq '.consolidator'
 #   {
 #     "tier": "cheap",
 #     "running": true,
@@ -185,7 +185,7 @@ graphorin consolidator status
 
 ## `tier: 'cheap'` budget configuration (and how to switch back to `'free'`)
 
-The framework default per ADR-038 §4 is `tier: 'free'` — every LLM phase is disabled, the daily token / cost ceilings are pinned at `0`, and only the `light` phase runs. That is the right posture for personal assistants where the operator never wants a surprise bill.
+The framework default per ADR-038 §4 is `tier: 'free'` - every LLM phase is disabled, the daily token / cost ceilings are pinned at `0`, and only the `light` phase runs. That is the right posture for personal assistants where the operator never wants a surprise bill.
 
 This example overrides to `tier: 'cheap'` so the standard phase actually fires:
 
@@ -242,7 +242,7 @@ await scheduler1.register(
 await scheduler1.start();
 await scheduler1.stop();
 
-// Simulated restart — same durable TriggerStore, brand-new scheduler.
+// Simulated restart - same durable TriggerStore, brand-new scheduler.
 const scheduler2 = createScheduler({ store: store.triggers, mode: 'lib' });
 const survivors = await scheduler2.list();
 //   → [{ id: 'restart-survivor', kind: 'interval', spec: '60000', ... }]
@@ -266,11 +266,11 @@ sudo systemd-analyze security graphorin.service   # target score < 5
 
 Key knobs already wired into the unit:
 
-- `User=graphorin` / `Group=graphorin` — drops privileges; the framework refuses to run as root.
-- `ProtectSystem=strict` + `ReadWritePaths=/var/lib/graphorin /run/graphorin` — only the data dir is writable.
-- `RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX` + `SystemCallFilter=@system-service` — minimal syscall surface.
-- `Restart=on-failure` + `StartLimitBurst=5` — self-heals through transient errors without runaway restart loops.
-- `KillSignal=SIGTERM` + `TimeoutStopSec=30` — gives the consolidator + scheduler 30 s to drain in-flight phases before SIGKILL.
+- `User=graphorin` / `Group=graphorin` - drops privileges; the framework refuses to run as root.
+- `ProtectSystem=strict` + `ReadWritePaths=/var/lib/graphorin` - only the data dir is writable.
+- `RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX` + `SystemCallFilter=@system-service` - minimal syscall surface.
+- `Restart=on-failure` + `StartLimitBurst=5` - self-heals through transient errors without runaway restart loops.
+- `KillSignal=SIGTERM` + `TimeoutStopSec=30` - gives the consolidator + scheduler 30 s to drain in-flight phases before SIGKILL.
 
 ### Log rotation
 
@@ -295,7 +295,7 @@ If you instead route logs to a file (e.g. through the `@graphorin/observability`
 }
 ```
 
-Keep the rotation count generous — consolidator phase outcomes are the audit trail you need when a budget event surfaces and you have to reconstruct what the standard phase actually did.
+Keep the rotation count generous - consolidator phase outcomes are the audit trail you need when a budget event surfaces and you have to reconstruct what the standard phase actually did.
 
 ---
 
@@ -303,12 +303,12 @@ Keep the rotation count generous — consolidator phase outcomes are the audit t
 
 The example exports a small, typed surface other packages can build on:
 
-- `createBackgroundConsolidatorApp({ recipe?, dbPath?, tier?, triggers?, ... })` — boots the app handle. Lib-mode by default; the inner `server` is constructed but inert until you call `server.start()`.
-- `startBackgroundConsolidator({ ... })` — convenience wrapper that calls `app.server.start()` and returns the same handle.
-- `runConsolidatorCycle({ app, turns?, durationMs?, fireTriggerIds? })` — drives a deterministic cycle (synthetic turns + `scheduler.fire(...)`) and returns `{ snapshot, status, eventCounts, turnsDriven, outcomes }`.
-- `BACKGROUND_TICK_TRIGGER_ID`, `IDLE_PROBE_TRIGGER_ID`, `DEFAULT_TRIGGERS` — stable ids and the default consolidator trigger list.
+- `createBackgroundConsolidatorApp({ recipe?, dbPath?, tier?, triggers?, ... })` - boots the app handle. Lib-mode by default; the inner `server` is constructed but inert until you call `server.start()`.
+- `startBackgroundConsolidator({ ... })` - convenience wrapper that calls `app.server.start()` and returns the same handle.
+- `runConsolidatorCycle({ app, turns?, durationMs?, fireTriggerIds? })` - drives a deterministic cycle (synthetic turns + `scheduler.fire(...)`) and returns `{ snapshot, status, eventCounts, turnsDriven, outcomes }`.
+- `BACKGROUND_TICK_TRIGGER_ID`, `IDLE_PROBE_TRIGGER_ID`, `DEFAULT_TRIGGERS` - stable ids and the default consolidator trigger list.
 
-All public files start with the canonical `Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko` header and use only the public types from `@graphorin/agent`, `@graphorin/core`, `@graphorin/memory`, `@graphorin/sessions`, `@graphorin/triggers`, `@graphorin/server`, `@graphorin/store-sqlite`.
+All public files start with the canonical `Graphorin v0.6.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko` header and use only the public types from `@graphorin/agent`, `@graphorin/core`, `@graphorin/memory`, `@graphorin/sessions`, `@graphorin/triggers`, `@graphorin/server`, `@graphorin/store-sqlite`.
 
 ---
 

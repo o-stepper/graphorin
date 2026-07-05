@@ -67,6 +67,8 @@ Graphorin is currently on the **`v0.6.0`** pre-release line, **published on the 
 
 Pre-1.0, minor bumps may carry breaking changes and patch bumps cover everything else (the industry pre-1.0 norm). See [`CHANGELOG.md`](./CHANGELOG.md) for the authoritative rollup and the [repository releases](https://github.com/o-stepper/graphorin/releases) for what shipped when.
 
+Latest release: **0.6.0** (2026-07-05) - waves A-E of the second framework-wide audit (prompt-cache economics, exactly-once durable HITL, real JSON Schema on the provider wire, step-journal workflow durability, Merkle audit checkpoints, a ~2000x graph-query plan fix found by the new 100k-fact scale probe) plus a full documentation accuracy sweep.
+
 ## Use cases
 
 Graphorin is the **engine**. You ship the **assistant**. The framework is intentionally domain-agnostic so the same primitives can power a wide range of personal AI products:
@@ -91,6 +93,7 @@ What Graphorin **does not** ship (intentional): channel adapters (Telegram, Slac
 | **Tools / Skills / MCP** | Typed tools, a `SKILL.md` packaging-format-compatible loader with three-tier progressive disclosure, and an in-core Model Context Protocol client. |
 | **Observability** | OpenTelemetry-native tracing with the GenAI Semantic Conventions, sensitivity-aware redaction, and replay. |
 | **Secrets** | `SecretValue` wrapper, `SecretRef` URI scheme, OS keychain integration, optional encryption-at-rest. |
+| **Evals** | Offline-first eval harness - scorers (exact / regex / JSON-path / LLM-judge), dataset loaders with SHA-256 supply-chain pinning, statistical gates (Wilson intervals, pass^k, paired significance), and baseline regression detection. |
 | **Two-layer delivery** | Embed any package as a library, or run `@graphorin/server` as a daemon with REST + WebSocket and durable triggers. |
 
 ## Quick start
@@ -122,9 +125,11 @@ git clone https://github.com/o-stepper/graphorin.git
 cd graphorin
 corepack enable
 pnpm install --frozen-lockfile
-pnpm -r build
-pnpm -r test
+pnpm build
+pnpm test
 ```
+
+(`build` and `test` run through turbo, so repeat runs hit the cache; see [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the full local-gates checklist.)
 
 ## Architecture at a glance
 
@@ -232,8 +237,12 @@ The complete documentation is hosted at **<https://docs.graphorin.com>**.
 | [Providers](https://docs.graphorin.com/guide/providers) | Vendor-neutral provider matrix and the middleware composer. |
 | [Tools, Skills, MCP](https://docs.graphorin.com/guide/tools) | The external-surface primitives. |
 | [Standalone server](https://docs.graphorin.com/guide/standalone-server) | Promote your assistant to a daemon. |
+| [Deployment](https://docs.graphorin.com/guide/deployment) | Production checklists plus the docker / k8s / systemd templates. |
 | [Observability](https://docs.graphorin.com/guide/observability) | OpenTelemetry GenAI Semantic Conventions and the redaction layer. |
 | [Secrets](https://docs.graphorin.com/guide/secrets) | `SecretValue`, `SecretRef`, the keychain backend, and the audit log. |
+| [Evals](https://docs.graphorin.com/guide/evals) | The offline eval harness, scorers, statistics, and regression gates. |
+| [Performance & scale](https://docs.graphorin.com/guide/performance) | Measured limits at 100k facts and how to reproduce the numbers. |
+| [Migration](https://docs.graphorin.com/guide/migration) | Upgrade notes per version line, schema migrations, export formats. |
 | [API reference](https://docs.graphorin.com/api/) | The auto-generated TypeScript surface. |
 | [Design principles](https://docs.graphorin.com/reference/design-principles) | The eighteen principles encoded into the framework. |
 | [FAQ](https://docs.graphorin.com/reference/faq) | Frequently asked questions. |
@@ -243,7 +252,8 @@ The complete documentation is hosted at **<https://docs.graphorin.com>**.
 ```
 packages/                Each @graphorin/* package lives here as its own workspace.
 examples/                Stand-alone example apps that consume @graphorin/* packages.
-benchmarks/              Latency, cost, and memory-simulation runners.
+benchmarks/              Latency, cost, memory-simulation, LongMemEval / LoCoMo,
+                         tool-agent, and 100k-fact scale runners (PR-gated smokes).
 documentation/           Source for the public documentation site (https://docs.graphorin.com).
 scripts/                 Repo-wide maintenance scripts (license check, no-network guard,
                          release-readiness gate, example-doc drift, …).
@@ -259,7 +269,7 @@ AUTHORS.md               Project authorship.
 
 ## Release readiness
 
-The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.6.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk).
+The repository ships a single `pnpm run mvp-readiness` entry point that runs every release-readiness gate sequentially: `lint`, `typecheck`, `build`, `test`, the no-implicit-network guard, the SPDX license allowlist, the Skills-format snapshot drift check, and a workspace audit (consistent `v0.6.0`, MIT license, `Oleksiy Stepurenko` author, `publishConfig.provenance: true`, no `private: true` flag, `engines.node` set to `>=22`, required files present on disk, a current top entry in every per-package `CHANGELOG.md`, and every `exports` target resolvable in the built output).
 
 The same command is invoked by the [`release.yml`](./.github/workflows/release.yml) workflow before any package gets published.
 

@@ -39,7 +39,7 @@ describe('createCsrfMiddleware', () => {
     const app = buildApp();
     const res = await app.request('/echo', {
       method: 'POST',
-      headers: { Authorization: 'Bearer kru_x', 'Content-Type': 'application/json' },
+      headers: { Authorization: 'Bearer gph_x', 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     });
     expect(res.status).toBe(200);

@@ -59,7 +59,7 @@ const FIXTURES: ReadonlyArray<{
   readonly pattern: BuiltInPatternName;
   readonly value: string;
 }> = [
-  { pattern: 'graphorin-token', value: 'kru_dev_v1_AAAAAAAAAAAAAAAAAAAAAAAA_ABCDEF' },
+  { pattern: 'graphorin-token', value: 'gph_live_v1_AAAAAAAAAAAAAAAAAAAAAAAA_ABCDEF' },
   { pattern: 'openai-key', value: 'sk-AAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
   { pattern: 'anthropic-key', value: 'sk-ant-AAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
   { pattern: 'aws-access-key', value: 'AKIAABCDEFGHIJKLMNOP' },

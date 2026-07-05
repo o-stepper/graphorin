@@ -17,7 +17,7 @@
 | Capability | Detail |
 |---|---|
 | **WebSocket transport** | Honours the `graphorin.protocol.v1` subprotocol; supports both bearer-token (Node SDK) and ticket-flow (browser) authentication. |
-| **SSE fallback** | Read-only `EventSource` transport for environments that block WebSocket upgrades. Control-plane operations (`subscribe`, `cancel`, `resume`) fall back to REST. |
+| **SSE fallback** | Read-only fetch-streaming SSE transport (not `EventSource`) for environments that block WebSocket upgrades. It carries only the bound session stream, so it needs the `sessionId` client option and bearer auth; control-plane operations (`subscribe`, `cancel`, `resume`) fall back to REST. |
 | **Async-iterable subscriptions** | `for await (const event of sub.events())` - typed `AgentEvent` / `WorkflowEvent` payload via `@graphorin/protocol`. |
 | **Reconnect** | Exponential backoff with full jitter; resubscribes with the recorded `lastEventId` so the server replays buffered events. |
 | **Bundle hygiene** | Browser-friendly. Zero Node-only dependencies; runtime depends only on `@graphorin/protocol` and `zod`. |

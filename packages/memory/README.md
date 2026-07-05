@@ -20,7 +20,7 @@ The package depends on:
 - `@graphorin/security` - the memory-modification guard (`MemoryGuardTier`)
   every memory tool is wired against.
 - `@graphorin/tools` - the `tool({...})` builder used to declare the
-  ten memory tools.
+  eleven memory tools.
 - `zod` (peer) - schema typing for the memory tools.
 
 Storage is provided by any `MemoryStore` implementation; the default
@@ -122,9 +122,10 @@ any `EmbedderProvider`; the default is
   `graphorin memory activity` (consolidator / reflection activity).
 - **Multi-signal forgetting** (cost / staleness control, *not* an accuracy
   lever). The light phase scores each fact with `salience(...)` - the Ebbinghaus
-  `retention` curve (recency + access frequency) combined with the `importance`
-  hint and a security-risk negative term (a quarantined fact is evicted first, a
-  foreign-provenance one slightly sooner). With neutral importance + an active,
+  `retention` curve (recency + access frequency, including an opt-in
+  `accessReinforcement` term fed by per-fact recall counters) combined with the
+  `importance` hint and a security-risk negative term (a quarantined fact is
+  evicted first, a foreign-provenance one slightly sooner). With neutral importance + an active,
   first-party fact, `salience === retention`. Setting `decayCapacity`
   (`createMemory({ consolidator: { decayCapacity } })`, default unbounded)
   bounds storage: the lowest-salience facts are **soft-archived** (recoverable -
@@ -164,7 +165,11 @@ any `EmbedderProvider`; the default is
   (offline; lexical + embedding). The ambiguous-similarity band mints a *new*
   entity by default - it never auto-merges on weak evidence; opt into LLM
   adjudication (`graph: { llmAdjudication: true, provider }`) to resolve that band.
-  Omit it all and the default path is unchanged + fully offline (`expandHops`
+  On top of hop expansion: `graphScoring: 'ppr'` weights neighbours by a
+  PPR-lite random-walk score instead of flat inclusion, `entityMatch: true`
+  adds exact entity-name hits as a candidate list, and `expandHops: 2` is
+  available for offline / analysis flows (expensive under dense hubs). Omit it
+  all and the default path is unchanged + fully offline (`expandHops`
   defaults to `0`).
 - **Agentic / iterative retrieval** (search quality, gated + opt-in). A
   CRAG/Self-RAG-style grade-then-reformulate loop for hard multi-hop / temporal
@@ -193,6 +198,13 @@ any `EmbedderProvider`; the default is
   `createMemory({ procedureInduction: { provider } })`; omit it and `induce(...)`
   throws `ProcedureInductionNotConfiguredError` - the procedural tier stays pure
   offline CRUD with no provider call.
+- **Memory evolution knobs** (all opt-in). `runbookSearch: true` registers the
+  gated `runbook_search` tool over the procedural tier; `consolidator:
+  { learnedContext: true, learnedContextMaxChars }` maintains a compact
+  learned-context digest block from consolidation output; facts, episodes, and
+  rules carry an optional `owner` principal so multi-principal deployments can
+  filter reads per owner; and per-fact access counters feed the salience
+  `accessReinforcement` term.
 - **Per-record `embedder_id` enforced.** Every embedded write registers
   the embedder via the storage layer's `EmbeddingMetaRepository` and
   records the canonical id (`'<provider>:<model>@<dim>'`); attempts to
@@ -277,7 +289,7 @@ console.log(hits[0]?.record.text);
 
 | Tier        | Surface (read)                               | Surface (write)                                             |
 |-------------|-----------------------------------------------|-------------------------------------------------------------|
-| working     | `list`, `read`, `compile`                     | `define`, `write`, `patch`, `attach`, `detach`              |
+| working     | `list`, `read`, `compile`                     | `define`, `write`, `append`, `replace`, `rethink`, `forget`, `attach`, `detach` |
 | session     | `list`, `search`, `attributedFor`             | `push`, `flushImportant`, `compact`                         |
 | episodic    | `recent`, `search`                            | `record`                                                    |
 | semantic    | `search`                                      | `remember`, `supersede`, `forget`                           |
@@ -303,6 +315,11 @@ tool exactly once:
 | `conversation_search`| session    | FTS5 search over the active session messages.          |
 | `fact_history`       | semantic   | Trace a fact's bi-temporal supersede chain.            |
 | `fact_validate`      | semantic   | Promote a quarantined fact to active (audited).        |
+
+Two further tools are **gated** behind their configuration and absent by
+default: `deep_recall` (registered when `iterativeRetrieval` is configured)
+and `runbook_search` (procedural runbook lookup, registered when
+`createMemory({ runbookSearch: true })`).
 
 ## Embedder migration
 

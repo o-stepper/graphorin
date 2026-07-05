@@ -84,7 +84,7 @@ pnpm add better-sqlite3-multiple-ciphers
 ```ts
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
-const store = createSqliteStore({
+const store = await createSqliteStore({
   path: './assistant.db',
   mode: 'lib',
 });
@@ -105,7 +105,7 @@ await store.close();
 ## Server mode (WorkerPool)
 
 ```ts
-const store = createSqliteStore({
+const store = await createSqliteStore({
   path: './assistant.db',
   mode: 'server',
   workerPool: {
@@ -118,20 +118,15 @@ const store = createSqliteStore({
 ## Migrations
 
 Migrations are applied automatically on `store.init()`. The bundled set
-covers every Phase 05 deliverable:
+currently runs `001` through `028` (`src/migrations/`):
 
-| Number | File                | Owner       |
-|-------:|---------------------|-------------|
-| 001    | `001-memory.sql`    | memory      |
-| 002    | `002-checkpoints.sql` | workflow  |
-| 003    | `003-sessions.sql`  | sessions    |
-| 004    | `004-triggers.sql`  | triggers    |
-| 005    | `005-auth-tokens.sql` | server    |
-| 006    | `006-oauth-servers.sql` | mcp client |
-| 007    | `007-trigger-meta.sql` | triggers (catchup window) |
-| 008    | `008-idempotency.sql` | server     |
-| 009    | `009-consolidator.sql` | memory     |
-| 010    | `010-conflict-check.sql` | memory   |
+| Range | What it covers | Owner |
+|---|---|---|
+| 001-010 | Core tables: memory, checkpoints, sessions, triggers (+ catch-up meta), auth tokens, OAuth servers, idempotency, consolidator state, conflict-check queue. | memory / workflow / sessions / triggers / server / mcp |
+| 011-017 | The memory program: fact conflicts, provenance + quarantine, insights, fact importance, the entity graph, procedures. | memory |
+| 018-023 | Consolidator + runtime hygiene: reflection watermark, DLQ phase, rule success counters, run counters, session sequence uniqueness, dead-column cleanup. | memory / sessions |
+| 024 | Durable span sink (`spans` table) for replay + `memory why`. | observability |
+| 025-028 | 0.6.0 additions: fact-supersede indexes, the memory `owner` principal column, per-fact access counters, rules FTS. | memory |
 
 The runner is idempotent - re-running on a fully-migrated database
 skips every applied migration. A migration is wrapped in a

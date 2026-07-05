@@ -33,7 +33,16 @@
   `AuditDb` interface, a binding registry that fail-fasts when the
   encrypted-SQLite peer is missing, and the `bridgeSecretsToAudit` /
   `bridgeMemoryGuardToAudit` subscribers that forward events from
-  the secrets and memory-guard layers.
+  the secrets and memory-guard layers. On top of the hash chain, an
+  RFC-6962-style Merkle layer (`computeAuditTreeHead`,
+  `signAuditCheckpoint` / `verifyAuditAgainstCheckpoint` with Ed25519
+  keys, inclusion + consistency proofs) lets an external verifier
+  hold a signed tree head and prove the log was not rewritten.
+- **Tool-argument policies** (`@graphorin/security/policy`) -
+  Progent-style declarative constraints over tool arguments
+  (`evaluateToolArgumentPolicy`) plus a Rule-of-Two profile builder
+  (`buildRuleOfTwoPolicy`), wired into the agent via
+  `AgentConfig.toolPolicy` / `ruleOfTwo`.
 - **Sandbox** - `createNoneSandbox`, `createWorkerThreadsSandbox`
   (default for user-defined tools, with optional `noNetwork` /
   `noFilesystem` shields), `createIsolatedVMSandbox` (opt-in peer
@@ -79,7 +88,10 @@
   verifies the ed25519-SHA-256 signature via Node's built-in
   `crypto.verify(...)` against a publisher key resolved from a
   well-known URL (with optional pinned fingerprint), an inline PEM,
-  or an operator-installed Sigstore verifier. `installSkillFromNpm`
+  or an operator-installed Sigstore verifier. An operator `trustRoot`
+  (allowed publishers / pinned key fingerprints / `allowSigstore`)
+  caps which keys may verify at all - an unknown key fails closed
+  with `'untrusted-key'`. `installSkillFromNpm`
   / `installSkillFromGit` enforce `--ignore-scripts` for every
   untrusted install (no override; `pnpm` preferred, falling back to
   `npm` / `yarn` only when `pnpm` is missing) and reject unsigned
@@ -230,7 +242,7 @@ const auth = authorize(result, 'agents:invoke');
 
 ```ts
 // Open the audit log (the SQLite-backed binding ships from
-// @graphorin/store-sqlite once Phase 05 lands; deployments register
+// @graphorin/store-sqlite; deployments with a custom store register
 // their own binding via registerAuditDbBinding(...)).
 const db = await openAuditDb({ path: 'audit.db', passphrase });
 bridgeSecretsToAudit({ db });

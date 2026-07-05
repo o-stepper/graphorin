@@ -44,10 +44,10 @@ const FIXTURES: ReadonlyArray<Fixture> = [
   {
     name: 'graphorin-token',
     positives: [
-      'token=kru_prod_v1_AbCdEfGhIjKlMnOpQrStUvWx_a1b2c3',
-      'kru_test_v1_aaaaaaaaaaaaaaaaaaaa_zzzzzz',
+      'token=gph_live_v1_AbCdEfGhIjKlMnOpQrStUvWx_a1b2c3',
+      'gph_test_v1_aaaaaaaaaaaaaaaaaaaa_zzzzzz',
     ],
-    negatives: ['kru_unknown_v0_short', 'krp_prod_v1_too_short_xxxxxx'],
+    negatives: ['gph_live_v0_short', 'gpx_live_v1_too_short_xxxxxx'],
   },
   {
     name: 'openai-key',

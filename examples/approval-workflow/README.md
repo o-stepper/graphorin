@@ -1,6 +1,6 @@
 # approval-workflow
 
-> Workflow HITL durable-resume acceptance demo for **graphorin** — wires `@graphorin/workflow`'s step-graph engine to a four-node expense-approval pipeline that pauses on high-value submissions, survives a simulated server restart, and resumes from the persisted SQLite checkpoint with `new Directive({ resume: { approved: true, reason: 'OK' } })`.
+> Workflow HITL durable-resume acceptance demo for **graphorin** - wires `@graphorin/workflow`'s step-graph engine to a four-node expense-approval pipeline that pauses on high-value submissions, survives a simulated server restart, and resumes from the persisted SQLite checkpoint with `new Directive({ resume: { approved: true, reason: 'OK' } })`.
 
 The example is small (≈300 lines of source, two files) but it exercises every stream mode, every `WorkflowEvent` tag, and the full `pause(...)` / `Directive(resume)` lifecycle against the real `SqliteCheckpointStore` so CI never depends on a live LLM.
 
@@ -20,9 +20,9 @@ pnpm --filter ./examples/approval-workflow dev
 Expected dev output:
 
 ```
-graphorin v0.6.0 approval-workflow auto — status=completed, approved=true, notifications=4.
-graphorin v0.6.0 approval-workflow manual — status=suspended, suspendedAtNode='auto-approve-or-pause'.
-graphorin v0.6.0 approval-workflow resume — status=completed, approved=true, processedAt='2026-…', notifications=4.
+graphorin v0.6.0 approval-workflow auto - status=completed, approved=true, notifications=4.
+graphorin v0.6.0 approval-workflow manual - status=suspended, suspendedAtNode='auto-approve-or-pause'.
+graphorin v0.6.0 approval-workflow resume - status=completed, approved=true, processedAt='2026-…', notifications=4.
 ```
 
 **What just happened?**
@@ -54,7 +54,7 @@ examples/approval-workflow/
 
 ## The pause / resume pattern
 
-Every node is a plain `createNode({...})`. The headline is the middle node — it inspects state at runtime and either fast-paths small expenses or calls `pause(value)` to suspend:
+Every node is a plain `createNode({...})`. The headline is the middle node - it inspects state at runtime and either fast-paths small expenses or calls `pause(value)` to suspend:
 
 ```ts
 import { createNode, pause } from '@graphorin/workflow';
@@ -90,7 +90,7 @@ const decide = createNode<ExpenseState>({
 
 - The first time the runtime invokes `decide.run`, `pause(...)` throws a `PauseSignal` carrying the supplied payload.
 - The engine catches the signal, persists the workflow state to the configured `CheckpointStore`, and emits a `workflow.suspended` event whose `value` is exactly the payload passed to `pause(...)`.
-- When the operator supplies a directive via `workflow.resume(threadId, new Directive({ resume: { ... } }))`, the engine re-invokes `decide.run` inside a resume scope so `pause(...)` *returns* the directive's resume payload instead of throwing — the rest of the function body executes normally and writes the resolved decision to the channels.
+- When the operator supplies a directive via `workflow.resume(threadId, new Directive({ resume: { ... } }))`, the engine re-invokes `decide.run` inside a resume scope so `pause(...)` *returns* the directive's resume payload instead of throwing - the rest of the function body executes normally and writes the resolved decision to the channels.
 
 **The crucial invariant**: the `decide.run` function body is identical across pause and resume. The runtime alone decides whether `pause(...)` throws or returns. That symmetry is what lets the same source code survive a server restart mid-pause.
 
@@ -125,7 +125,7 @@ const initial = await runApprovalDemo({
 expect(initial.status).toBe('suspended');
 expect(initial.suspendedAtNode).toBe('auto-approve-or-pause');
 
-// The previous Workflow instance is dropped on the floor — only the
+// The previous Workflow instance is dropped on the floor - only the
 // SqliteCheckpointStore reference is forwarded.
 const resumed = await simulateServerRestart({
   checkpointStore: handle.checkpoints,
@@ -138,7 +138,7 @@ expect(resumed.finalState.reason).toBe('OK');
 expect(resumed.finalState.processedAt).toBeDefined();
 ```
 
-`simulateServerRestart(...)` instantiates a brand-new `Workflow` against the same `CheckpointStore` — byte-equivalent to the operator killing the host process between the suspend and the resume. The persistent SQLite database carries every channel value, every channel version, the pending-pause record, and the run status; a fresh runtime sees the suspended thread and resumes from the exact pause site.
+`simulateServerRestart(...)` instantiates a brand-new `Workflow` against the same `CheckpointStore` - byte-equivalent to the operator killing the host process between the suspend and the resume. The persistent SQLite database carries every channel value, every channel version, the pending-pause record, and the run status; a fresh runtime sees the suspended thread and resumes from the exact pause site.
 
 ---
 
@@ -169,7 +169,7 @@ Every event the workflow runtime can emit, in the order it typically appears:
 | `workflow.start`              | Run started. Carries the `threadId` and the workflow's stable `workflowId`. |
 | `workflow.step.start`         | A new execution step is about to plan + dispatch tasks. Carries the snapshot state. |
 | `workflow.task.start`         | A node task is starting inside the current step. Carries the `nodeName` + `taskId`. |
-| `workflow.task.end`           | A node task finished — `status` is `'completed'`, `'failed'`, or `'paused'`. |
+| `workflow.task.end`           | A node task finished - `status` is `'completed'`, `'failed'`, or `'paused'`. |
 | `workflow.channel.update`     | A channel value changed; carries the `channel` name and the bumped version. |
 | `workflow.checkpoint.written` | A new checkpoint was persisted to the `CheckpointStore`; carries the checkpoint id. |
 | `workflow.step.end`           | The step finished; carries the post-merge state. |
@@ -208,7 +208,7 @@ curl -X POST http://localhost:3000/v1/workflows/expense-approval/resume \
 curl http://localhost:3000/v1/workflows/expense-approval/state?threadId=thr_demo_500
 ```
 
-The smoke test stays at the workflow-library layer because spinning a server is unnecessary for the durability assertion — the round-trip through `SqliteCheckpointStore` is the proof. Use the curl examples above when you wire the example into a server deployment.
+The smoke test stays at the workflow-library layer because spinning a server is unnecessary for the durability assertion - the round-trip through `SqliteCheckpointStore` is the proof. Use the curl examples above when you wire the example into a server deployment.
 
 ---
 
@@ -220,9 +220,9 @@ pnpm --filter ./examples/approval-workflow dev
 
 The CLI runs both demos in sequence against an in-process `:memory:` SQLite store:
 
-1. `runApprovalDemo({ amount: 50, submitter: 'alice', threadId: 'demo-auto-approve' })` — completes without pausing.
-2. `runApprovalDemo({ amount: 500, submitter: 'bob', threadId: 'demo-manual-review' })` — pauses at `auto-approve-or-pause`.
-3. `simulateServerRestart({ threadId: 'demo-manual-review', directive: new Directive({ resume: { approved: true, reason: 'OK' } }) })` — drains the paused thread to completion.
+1. `runApprovalDemo({ amount: 50, submitter: 'alice', threadId: 'demo-auto-approve' })` - completes without pausing.
+2. `runApprovalDemo({ amount: 500, submitter: 'bob', threadId: 'demo-manual-review' })` - pauses at `auto-approve-or-pause`.
+3. `simulateServerRestart({ threadId: 'demo-manual-review', directive: new Directive({ resume: { approved: true, reason: 'OK' } }) })` - drains the paused thread to completion.
 
 There are no environment variables required. The example is hermetic by design: zero network I/O, zero external processes.
 
@@ -230,10 +230,10 @@ There are no environment variables required. The example is hermetic by design: 
 
 ## Troubleshooting
 
-- **`Module '"@graphorin/workflow"' has no exported member ...`** — ensure you ran `pnpm install` at the workspace root; the example consumes the workspace-linked packages.
-- **`workflow.suspended` event missing on the auto-approve path** — that's expected. The `auto-approve-or-pause` node only calls `pause(...)` when `state.amount >= 100`. The smoke test asserts the absence on the $50 case as a regression guard.
-- **`Stream mode 'values' returns no checkpoint events`** — also expected. `'values'` is a high-level mode; use `'debug'` to see every checkpoint write or `'checkpoints'` to see only those events.
-- **`SqliteCheckpointStore` survives across `Workflow` instances?** — yes. The store is a stateful `better-sqlite3` connection; closing the store closes the database. The simulated-server-restart helper deliberately re-uses the same store reference to demonstrate that the workflow object is the only thing reconstructed.
+- **`Module '"@graphorin/workflow"' has no exported member ...`** - ensure you ran `pnpm install` at the workspace root; the example consumes the workspace-linked packages.
+- **`workflow.suspended` event missing on the auto-approve path** - that's expected. The `auto-approve-or-pause` node only calls `pause(...)` when `state.amount >= 100`. The smoke test asserts the absence on the $50 case as a regression guard.
+- **`Stream mode 'values' returns no checkpoint events`** - also expected. `'values'` is a high-level mode; use `'debug'` to see every checkpoint write or `'checkpoints'` to see only those events.
+- **`SqliteCheckpointStore` survives across `Workflow` instances?** - yes. The store is a stateful `better-sqlite3` connection; closing the store closes the database. The simulated-server-restart helper deliberately re-uses the same store reference to demonstrate that the workflow object is the only thing reconstructed.
 
 ---
 

@@ -26,8 +26,15 @@ the existing outbound OAuth subsystem in `@graphorin/security`.
   that have not migrated yet (the runtime emits one WARN per
   process on selection).
 - **Typed `MCPClient` surface.** `listTools` / `listResources` /
-  `listPrompts` / `callTool` / `readResource` / `getPrompt` /
+  `listPrompts` / `callTool` / `readResource` /
+  `readResourceContents` (multi-content resources) / `getPrompt` /
   `close` plus the strategy-aware `toTools(...)` adapter.
+- **Tool pinning (TOFU rug-pull defense).** `toTools({ pinStore })`
+  records a fingerprint of each tool's name / description / schema on
+  first use and, when a pin store is present, **rejects** silent drift
+  by default (`onPinMismatch: 'warn'` downgrades to a warning);
+  description-injection heuristics at registration feed the
+  `mcp.tool-description.injection-flagged.total` counter.
 - **Strict default for MCP-derived tools.** Every `Tool` produced
   by `MCPClient.toTools()` defaults to the
   `'detect-and-strip-and-wrap'` inbound prompt-injection
@@ -267,8 +274,8 @@ field where applicable:
 
 ## Acceptance & testing
 
-- 109 unit + integration + property tests run under Vitest with
-  no network calls (verified by the workspace
+- The package's unit + integration + property tests run under Vitest
+  with no network calls (verified by the workspace
   `pnpm run check-no-network` script).
 - Integration tests use the SDK's `InMemoryTransport` linked-pair
   + a configurable in-process `Server` fixture; no child

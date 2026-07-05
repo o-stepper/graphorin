@@ -14,9 +14,9 @@ each run with the trajectory scorers from `@graphorin/evals` and reports
 
 ## Metrics
 
-- **`pass^1`** — fraction of tasks whose *first* attempt passed every gating
+- **`pass^1`** - fraction of tasks whose *first* attempt passed every gating
   scorer.
-- **`pass^k`** — fraction of tasks that passed every gating scorer on *all* `k`
+- **`pass^k`** - fraction of tasks that passed every gating scorer on *all* `k`
   attempts (worst-case reliability). With a deterministic provider each attempt
   is identical, so `pass^k == pass^1`; the `k`-run loop and "all must pass"
   semantics are in place for stochastic providers and as a structural guard.

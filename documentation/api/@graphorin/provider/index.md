@@ -17,11 +17,16 @@ The package owns four moving parts:
    AI SDK), `ollamaAdapter` (direct Ollama HTTP), `llamaCppServerAdapter`
    (the upstream `llama-server` binary from llama.cpp), and
    `openAICompatibleAdapter` (LMStudio / LocalAI / vLLM / Together-style
-   self-host endpoints).
+   self-host endpoints). Prompt caching: when a request carries
+   `cachePolicy: { breakpoints: 'auto' }`, the vercel adapter anchors
+   Anthropic `cache_control` breakpoints on the stable conversation
+   prefix, and cache read / write token legs flow back through
+   `Usage.cachedReadTokens` / `cacheWriteTokens`.
 3. **Middleware** - `composeProviderMiddleware([...])` enforces a
    canonical order at startup and throws `MiddlewareOrderingError` on
    violation. Built-ins: `withTracing`, `withRetry`, `withRateLimit`,
-   `withCostLimit`, `withCostTracking`, `withFallback`, and
+   `withCostLimit`, `withCostTracking` (cache-aware: bills cache reads
+   and writes at their own rates), `withFallback`, and
    `withRedaction` (mandatory in production).
 4. **Token counting** - pluggable `TokenCounter` dispatcher. Default
    `JsTiktokenCounter` for OpenAI-compatible models; per-vendor native

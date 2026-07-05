@@ -54,6 +54,11 @@ scheduler.register(
   }),
 );
 
+// Idle triggers measure idleness relative to the activity feed:
+// call this from your request/message handlers so "idle" means
+// "no user activity", not "process started 5 minutes ago".
+scheduler.recordActivity();
+
 scheduler.register(
   event('on-handoff', 'session.handoff', async (payload) => {
     // …fires whenever a handoff event is published

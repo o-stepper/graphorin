@@ -141,6 +141,17 @@ for await (const event of stream) {
 - **Static `pauseAt`.** Declare `pauseAt: { before: ['shipOrder'],
   after: ['chargeCard'] }` to suspend without hand-rolling
   `pause(...)` inside the node body.
+- **Durable primitives.** `sleepFor(ms)` / `sleepUntil(iso)` suspend a
+  thread on a durable timer (`workflow.tick()` fires due timers after
+  a restart); `awaitExternal(name)` parks the thread on an awakeable
+  that `workflow.resolveAwakeable(threadId, name, value)` completes;
+  `requestApproval(payload)` + `workflow.approve(threadId, approvalId,
+  decision)` persist a typed approval round-trip. Per-node
+  `timeoutMs` / `retry` (via `nodeDefaults` or per node) bound flaky
+  steps with `node-timeout`; `WorkflowConfig.version` pins a
+  definition to its checkpoints (`workflow-version-mismatch` /
+  `workflow-divergence` on drift), and `journalSteps` gives
+  crash-recovery an exactly-once step journal.
 - **Dynamic parallelism via `Dispatch(node, args)`.** A node returns
   one or more `Dispatch('processOrder', { orderId })` directives;
   the engine schedules each as a parallel task in the next execution
@@ -151,8 +162,8 @@ for await (const event of stream) {
   `WorkflowAbortedError`. Pending tasks see the same signal via
   `ctx.signal`.
 - **Stream modes.** Pass `{ stream: 'updates' }` (or `'values'`,
-  `'tasks'`, `'checkpoints'`, `'debug'`, `'custom'`) to choose the
-  granularity of the emitted events.
+  `'tasks'`, `'checkpoints'`, `'debug'`, `'custom'`; `'messages'` is
+  reserved) to choose the granularity of the emitted events.
 - **`fork(threadId, fromCheckpointId)`.** Create a parallel timeline
   branched off a previous checkpoint without touching the original
   thread.
@@ -163,9 +174,12 @@ for await (const event of stream) {
   `code` discriminator covers `invalid-config`,
   `invalid-channel-write`, `multi-write-into-latest-value`,
   `unknown-node`, `thread-not-found`, `checkpoint-not-found`,
-  `concurrent-resume-rejected`, `resume-without-suspension`,
-  `workflow-aborted`, `node-execution-failed`, `reducer-failed`,
-  `state-validation-failed`, `checkpoint-version-conflict`,
+  `checkpoint-version-conflict`, `resume-without-suspension`,
+  `concurrent-resume-rejected`, `pause-not-found`,
+  `workflow-aborted`, `workflow-cancel-timeout`,
+  `max-steps-exceeded`, `node-execution-failed`, `node-timeout`,
+  `reducer-failed`, `state-validation-failed`,
+  `workflow-version-mismatch`, `workflow-divergence`,
   `dead-end`, `state-not-serializable`.
 
 ## Composition with `@graphorin/agent`
