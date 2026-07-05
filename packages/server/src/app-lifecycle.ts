@@ -38,9 +38,14 @@ import type { MetricRegistry } from './metrics/registry.js';
 import type { AgentRegistry, WorkflowRegistry } from './registry/index.js';
 import type { ReplayApi } from './replay/index.js';
 import type { AuditApi, McpApi, MemoryApi, SessionApi, SkillsApi } from './routes/index.js';
-import { type RunStateTracker, scheduleRunPruning } from './runtime/run-state.js';
+import {
+  type RunStateTracker,
+  scheduleIdempotencyPruning,
+  scheduleRunPruning,
+} from './runtime/run-state.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
+import { scheduleReplayBufferPruning } from './ws/replay-buffer.js';
 
 /**
  * Subset of `CreateServerOptions` the lifecycle reads - hooks, test
@@ -115,6 +120,10 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
   let stopped = false;
   // IP-16: stops the periodic terminal-run prune sweep on shutdown.
   let stopRunPruning: (() => void) | undefined;
+  // W-028: stops the periodic WS replay-buffer TTL sweep on shutdown.
+  let stopReplayBufferPruning: (() => void) | undefined;
+  // W-061: stops the periodic idempotency-record sweep on shutdown.
+  let stopIdempotencyPruning: (() => void) | undefined;
   let auditDb: AuditDb | undefined;
   let preBind: Awaited<ReturnType<typeof runPreBind>> | undefined;
   let verifier: TokenVerifier | undefined;
@@ -252,6 +261,23 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         // otherwise accumulate forever; sweep them on a periodic timer.
         stopRunPruning = scheduleRunPruning(runs, now);
 
+        // W-028: finished-run replay subjects (fresh runId per run, no
+        // further push/replay activity) would otherwise hold up to
+        // maxEvents payloads forever; sweep the buffer's TTL
+        // periodically. Guarded: the dispatcher is absent on no-WS
+        // configurations.
+        if (dispatcher !== undefined) {
+          stopReplayBufferPruning = scheduleReplayBufferPruning(dispatcher.replayBuffer, {
+            intervalMs: config.server.stream.replayBuffer.pruneIntervalSeconds * 1000,
+          });
+        }
+
+        // W-061: expired idempotency records (full response bodies of
+        // keyed POSTs) were only ever rejected on read, never removed;
+        // sweep them hourly. Runs after runPreBind, so migrations have
+        // applied.
+        stopIdempotencyPruning = scheduleIdempotencyPruning(store.idempotency, now);
+
         if (options.skipListen !== true) {
           serverInstance = serve({
             fetch: app.fetch.bind(app),
@@ -301,6 +327,12 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
       // IP-16: halt the prune sweep before draining.
       stopRunPruning?.();
       stopRunPruning = undefined;
+      // W-028: halt the replay-buffer TTL sweep symmetrically.
+      stopReplayBufferPruning?.();
+      stopReplayBufferPruning = undefined;
+      // W-061: halt the idempotency sweep symmetrically.
+      stopIdempotencyPruning?.();
+      stopIdempotencyPruning = undefined;
       const drainTimeoutMs = force === true ? 0 : config.server.shutdown.drainTimeoutMs;
       try {
         if (options.hooks?.beforeShutdown !== undefined) {

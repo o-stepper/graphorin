@@ -2,6 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { appendAudit } from '../../src/audit/append.js';
 import { exportAudit } from '../../src/audit/export.js';
+import {
+  generateAuditSigningKeyPair,
+  signAuditCheckpoint,
+  verifyAuditAgainstCheckpoint,
+} from '../../src/audit/merkle.js';
 import { pruneAudit } from '../../src/audit/prune.js';
 import { verifyAuditChain } from '../../src/audit/verify-chain.js';
 
@@ -154,5 +159,42 @@ describe('@graphorin/security/audit - prune + export', () => {
       writer: { write: (l) => void lines.push(l) },
     });
     expect(result.rows).toBe(3);
+  });
+});
+
+describe('W-062: prune vs Merkle anchoring - executable contract', () => {
+  it('verifyAuditAgainstCheckpoint against a pre-prune checkpoint MUST fail after pruneAudit', async () => {
+    const db = createMemoryAuditDb();
+    const baseTs = 1_700_000_000_000;
+    for (let i = 0; i < 8; i += 1) {
+      await appendAudit(db, {
+        actor: { kind: 'system', id: 'graphorin' },
+        action: 'secret:get',
+        target: `KEY_${i}`,
+        decision: 'success',
+        ts: baseTs + i * 1_000,
+      });
+    }
+    const { publicKeyPem, privateKeyPem } = generateAuditSigningKeyPair();
+    const preCheckpoint = await signAuditCheckpoint(db, { privateKeyPem, writerId: 'test' });
+    // Sanity: the anchor verifies before the prune.
+    const before = await verifyAuditAgainstCheckpoint(db, preCheckpoint, { publicKeyPem });
+    expect(before.ok).toBe(true);
+
+    const pruned = await pruneAudit(db, { before: baseTs + 4_500, retain: 1 });
+    expect(pruned.deleted).toBeGreaterThan(0);
+
+    // The re-root recomputed every surviving hash: a legitimate
+    // retention prune is BY DESIGN indistinguishable from a
+    // truncate-and-re-root attack against the old anchor - the
+    // operator runbook (sign + distribute a fresh checkpoint) is the
+    // only thing that tells them apart.
+    const after = await verifyAuditAgainstCheckpoint(db, preCheckpoint, { publicKeyPem });
+    expect(after.ok).toBe(false);
+
+    // A FRESH post-prune checkpoint anchors the new head.
+    const postCheckpoint = await signAuditCheckpoint(db, { privateKeyPem, writerId: 'test' });
+    const fresh = await verifyAuditAgainstCheckpoint(db, postCheckpoint, { publicKeyPem });
+    expect(fresh.ok).toBe(true);
   });
 });

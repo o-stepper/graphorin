@@ -960,3 +960,89 @@ function countTable(
     return 0;
   }
 }
+
+/** @stable */
+export interface MemoryPruneHistoryOptions extends MemoryCommonOptions {
+  /**
+   * Age threshold: a duration (`'30d'`, `'12h'`, `'45m'`, `'30s'`) or
+   * an ISO date / `YYYY-MM-DD` strictly in the past. Mandatory - the
+   * command is destructive by design and must never default.
+   */
+  readonly olderThan: string;
+}
+
+/** @stable */
+export interface MemoryPruneHistoryResult {
+  readonly deleted: number;
+  /** The resolved AGE in milliseconds passed to `pruneHistory`. */
+  readonly olderThanMs: number;
+}
+
+/**
+ * `graphorin memory prune-history --older-than <duration|date>` (W-066)
+ * - the supported surface over `MemoryStoreExt.pruneHistory`.
+ * `memory_history` grows by design (every supersede / quarantine
+ * transition appends) and `purge()` already scrubs sensitive text;
+ * this is the storage-cost hygiene lever.
+ *
+ * @stable
+ */
+export async function runMemoryPruneHistory(
+  options: MemoryPruneHistoryOptions,
+): Promise<MemoryPruneHistoryResult> {
+  const olderThanMs = resolveOlderThanMs(options.olderThan);
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+  });
+  try {
+    // UNIT SEMANTICS: pruneHistory takes an AGE in ms (the store
+    // computes `cutoff = now - age`). An ISO date therefore converts
+    // as `now - date`, NEVER as the raw epoch value - passing an epoch
+    // here would be a silent near-no-op.
+    const deleted = await ctx.store.memory.pruneHistory(olderThanMs);
+    const out: MemoryPruneHistoryResult = Object.freeze({ deleted, olderThanMs });
+    emitReport(options, out, () => {
+      const print = options.print ?? defaultPrintSink;
+      print(
+        brand(
+          `pruned ${deleted} memory_history row(s) older than ${options.olderThan} (age ${olderThanMs} ms).`,
+        ),
+      );
+    });
+    return out;
+  } finally {
+    await ctx.close();
+  }
+}
+
+/** Resolve `--older-than` into an AGE in ms; fail fast on nonsense. */
+function resolveOlderThanMs(input: string): number {
+  const raw = input.trim();
+  const duration = /^(\d+)\s*([smhd])$/i.exec(raw);
+  if (duration !== null) {
+    const value = Number.parseInt(duration[1] as string, 10);
+    switch ((duration[2] as string).toLowerCase()) {
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60_000;
+      case 'h':
+        return value * 3_600_000;
+      default:
+        return value * 86_400_000;
+    }
+  }
+  const date = new Date(raw);
+  if (!Number.isNaN(date.getTime())) {
+    const age = Date.now() - date.getTime();
+    if (age <= 0) {
+      throw new Error(
+        `[graphorin/cli] --older-than '${input}' is not in the past - refusing (a future date would prune the entire history).`,
+      );
+    }
+    return age;
+  }
+  throw new Error(
+    `[graphorin/cli] invalid --older-than '${input}'. Use '<number><s|m|h|d>' (e.g. 30d) or a past ISO date.`,
+  );
+}

@@ -106,6 +106,15 @@ export interface OpenConnectionOptions {
    * @internal
    */
   readonly cipherLoader?: () => Promise<BetterSqlite3Constructor>;
+  /**
+   * W-067: how long the driver's busy handler waits for a contended
+   * write lock before the operation fails with {@link SqliteBusyError}.
+   * Applied AFTER the hardening pragmas so the exported
+   * {@link WAL_HARDENING_PRAGMAS} constant keeps its documented bytes;
+   * also honoured on the `disableWalHardening` / `:memory:` branch.
+   * @default 5000
+   */
+  readonly busyTimeoutMs?: number;
 }
 
 /** @internal */
@@ -179,6 +188,7 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
     loadVecExtension,
     disableWalHardening = false,
     cipherLoader,
+    busyTimeoutMs,
   } = options;
 
   const inMemory = path === ':memory:';
@@ -228,6 +238,11 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
     db.pragma('foreign_keys = ON');
     db.pragma('busy_timeout = 5000');
   }
+  if (busyTimeoutMs !== undefined && Number.isFinite(busyTimeoutMs) && busyTimeoutMs >= 0) {
+    // W-067: operator override, applied after the hardening defaults so
+    // the exported WAL_HARDENING_PRAGMAS constant stays untouched.
+    db.pragma(`busy_timeout = ${Math.floor(busyTimeoutMs)}`);
+  }
 
   if (!skipSqliteVec) {
     const loader = loadVecExtension ?? (await loadDefaultVecLoader());
@@ -241,24 +256,34 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
     pragma(query, opts) {
       return db.pragma(query, opts);
     },
+    // W-067: every adapter method translates raw driver SQLITE_BUSY /
+    // SQLITE_BUSY_SNAPSHOT errors into the typed SqliteBusyError.
+    // `prepare()` stays the documented raw escape hatch - statements it
+    // returns surface driver errors unmapped.
     exec(query) {
-      db.exec(query);
+      mapBusy('exec', () => db.exec(query));
     },
     execMany(sql) {
-      db.exec(sql);
+      mapBusy('execMany', () => db.exec(sql));
     },
     run(query, params = []) {
-      const stmt = db.prepare(query);
-      const r = stmt.run(...params);
-      return { changes: r.changes };
+      return mapBusy('run', () => {
+        const stmt = db.prepare(query);
+        const r = stmt.run(...params);
+        return { changes: r.changes };
+      });
     },
     get<T>(query: string, params: ReadonlyArray<unknown> = []): T | undefined {
-      const stmt = db.prepare(query);
-      return stmt.get<T>(...params);
+      return mapBusy('get', () => {
+        const stmt = db.prepare(query);
+        return stmt.get<T>(...params);
+      });
     },
     all<T>(query: string, params: ReadonlyArray<unknown> = []): T[] {
-      const stmt = db.prepare(query);
-      return stmt.all<T>(...params);
+      return mapBusy('all', () => {
+        const stmt = db.prepare(query);
+        return stmt.all<T>(...params);
+      });
     },
     prepare(query) {
       return db.prepare(query);
@@ -272,8 +297,10 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
       // process (server + CLI on one db) commits in between -
       // `busy_timeout` does not retry that case. IMMEDIATE takes the
       // write lock up front, so the busy handler waits instead.
-      const wrapped = db.transaction(fn as (...args: unknown[]) => unknown);
-      return wrapped.immediate() as T;
+      return mapBusy('transaction', () => {
+        const wrapped = db.transaction(fn as (...args: unknown[]) => unknown);
+        return wrapped.immediate() as T;
+      });
     },
     close() {
       if (db.open) db.close();
@@ -354,4 +381,51 @@ export class WalCheckpointManager {
 /** @stable */
 export class SqliteVecMissingError extends Error {
   override readonly name = 'SqliteVecMissingError';
+}
+
+/**
+ * Typed wrapper for the driver's raw `SQLITE_BUSY` /
+ * `SQLITE_BUSY_SNAPSHOT` errors (W-067): the write lock stayed
+ * contended past `busy_timeout`. Carries `code = 'SQLITE_BUSY'` for
+ * compatibility with callers that already branch on the driver's
+ * `err.code`, plus the driver error as `cause`. No auto-retry by
+ * design (deterministic policies; the busy handler already waited the
+ * full `busy_timeout`).
+ *
+ * @stable
+ */
+export class SqliteBusyError extends Error {
+  override readonly name = 'SqliteBusyError';
+  /** Stable machine discriminator, mirroring the driver's code. */
+  readonly code = 'SQLITE_BUSY';
+  /** Package-level error kind, matching the repo's `kind` convention. */
+  readonly kind = 'sqlite-busy';
+  constructor(operation: string, cause: unknown) {
+    super(
+      `SQLite write lock is busy (${operation}): another process holds the write lock on this database ` +
+        '(a running server next to a CLI command?). The busy handler already waited the configured ' +
+        "busy_timeout - retry later, stop the other writer, or raise 'busyTimeoutMs'.",
+      { cause },
+    );
+  }
+}
+
+/** W-067: does a driver error carry one of the busy codes? */
+function isDriverBusyError(err: unknown): boolean {
+  if (err === null || typeof err !== 'object') return false;
+  const code = (err as { code?: unknown }).code;
+  return code === 'SQLITE_BUSY' || code === 'SQLITE_BUSY_SNAPSHOT';
+}
+
+/**
+ * Run `fn`, translating raw driver busy errors into
+ * {@link SqliteBusyError}. Zero-allocation on the success path.
+ */
+function mapBusy<T>(operation: string, fn: () => T): T {
+  try {
+    return fn();
+  } catch (err) {
+    if (isDriverBusyError(err)) throw new SqliteBusyError(operation, err);
+    throw err;
+  }
 }

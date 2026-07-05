@@ -11,12 +11,24 @@
           "dia_id": "D1:1",
           "text": "I started learning the violin last week."
         },
-        { "speaker": "Melanie", "dia_id": "D1:2", "text": "That's wonderful, Caroline!" }
+        {
+          "speaker": "Melanie",
+          "dia_id": "D1:2",
+          "text": "That's wonderful, Caroline!"
+        }
       ],
       "session_2_date_time": "10:00 am on 20 June, 2023",
       "session_2": [
-        { "speaker": "Caroline", "dia_id": "D2:1", "text": "I performed at a recital yesterday." },
-        { "speaker": "Melanie", "dia_id": "D2:2", "text": "Congrats on the recital!" }
+        {
+          "speaker": "Caroline",
+          "dia_id": "D2:1",
+          "text": "I performed at a recital yesterday."
+        },
+        {
+          "speaker": "Melanie",
+          "dia_id": "D2:2",
+          "text": "Congrats on the recital!"
+        }
       ]
     },
     "qa": [
@@ -42,6 +54,16 @@
         "answer": "Melanie congratulated her; she had started learning the violin.",
         "evidence": ["D1:1", "D2:2"],
         "category": 1
+      },
+      {
+        "question": "In which year did Caroline first perform publicly?",
+        "answer": 2022,
+        "evidence": ["D2:1"],
+        "category": 4
+      },
+      {
+        "question": "This pair has no reference answer at all and must be skipped.",
+        "category": 3
       }
     ]
   }

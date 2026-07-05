@@ -115,6 +115,22 @@ describe('Workflow.getState / listCheckpoints', () => {
     const stepNumbers = checkpoints.map((c) => c.stepNumber);
     expect(new Set(stepNumbers).size).toBe(stepNumbers.length);
   });
+
+  it('W-005: deleteThread erases the thread and is idempotent; other threads survive', async () => {
+    const checkpointStore = new InMemoryCheckpointStore();
+    const wf = buildOrderProcessingWorkflow({ checkpointStore });
+    await collect(wf.execute({ amount: 25 }, { threadId: 'order-erase-1' }));
+    await collect(wf.execute({ amount: 30 }, { threadId: 'order-keep-1' }));
+    expect((await wf.listCheckpoints('order-erase-1')).length).toBeGreaterThan(0);
+
+    await wf.deleteThread('order-erase-1');
+    expect(await wf.listCheckpoints('order-erase-1')).toHaveLength(0);
+    // The neighbouring thread is untouched.
+    expect((await wf.listCheckpoints('order-keep-1')).length).toBeGreaterThan(0);
+    // Idempotent: deleting again (or an unknown thread) is a no-op.
+    await wf.deleteThread('order-erase-1');
+    await wf.deleteThread('never-existed');
+  });
 });
 
 describe('Workflow.fork', () => {

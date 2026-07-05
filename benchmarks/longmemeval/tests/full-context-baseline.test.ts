@@ -82,6 +82,36 @@ describe('SOTA-1: full-context baseline', () => {
     expect(seenContext).toContain('fact number 0 about topic 0');
   });
 
+  it('W-022: dataset-native speaker names reach the inlined context (LOCOMO-style turns)', async () => {
+    const sessions: MemoryEvalSession[] = [
+      {
+        id: 's1',
+        turns: [
+          { role: 'user', content: 'I started marathon training.', speaker: 'Melanie' },
+          { role: 'assistant', content: 'Congrats on the plan!', speaker: 'Caroline' },
+          { role: 'user', content: 'turn without a native speaker name' },
+        ],
+      },
+    ];
+    let seenContext = '';
+    const agent = createFullContextAgent({
+      provider: createStubProvider((req) => {
+        seenContext = JSON.stringify(req.messages);
+        return 'ok';
+      }),
+    });
+    await agent.run({
+      haystackSessions: sessions,
+      question: 'When did Melanie start marathon training?',
+      ability: 'temporal',
+    });
+    // Named turns render as `<name>: ...` so name-referencing questions
+    // have textual support; unnamed turns keep the role fallback.
+    expect(seenContext).toContain('Melanie: I started marathon training.');
+    expect(seenContext).toContain('Caroline: Congrats on the plan!');
+    expect(seenContext).toContain('user: turn without a native speaker name');
+  });
+
   it('meters tokens and query count across a run', async () => {
     const meter = createBenchMeter();
     const sessions: MemoryEvalSession[] = [{ id: 's1', turns: [{ role: 'user', content: 'hi' }] }];

@@ -33,6 +33,7 @@ import {
   _resetInboundFiltersDedupForTesting,
   resolveInboundPolicy,
   sanitizeDescription,
+  sanitizeSchemaAnnotations,
   warnOnPassthroughOverride,
 } from './inbound-filters.js';
 import { computeToolDefinitionHash } from './pinning.js';
@@ -111,11 +112,35 @@ export function adaptMCPTools(args: {
       namespace.length === 0 ? definition.name : `${namespace}.${definition.name}`;
     const sideEffectClass = opts.sideEffectClassByTool?.[namespacedName] ?? 'external-stateful';
     const preferredModel = opts.preferredModelByTool?.[namespacedName];
-    const inputValidator = buildJsonSchemaValidator(definition.inputSchema as JsonSchemaLike);
-    const outputValidator =
+    // W-018: strip imperative payloads from schema ANNOTATIONS
+    // (description / title / $comment / string examples at any depth -
+    // the Invariant Labs tool-poisoning hiding place) before the
+    // schema reaches the validator, whose `toJSON()` is what the
+    // provider wire and `tool_search` re-expose.
+    const sanitizedInput = sanitizeSchemaAnnotations({
+      schema: definition.inputSchema as JsonSchemaLike,
+      inboundSanitization: resolvedInbound,
+      toolName: namespacedName,
+      serverIdentity: args.serverIdentity,
+    });
+    const sanitizedOutput =
       definition.outputSchema === undefined
         ? undefined
-        : buildJsonSchemaValidator(definition.outputSchema as JsonSchemaLike);
+        : sanitizeSchemaAnnotations({
+            schema: definition.outputSchema as JsonSchemaLike,
+            inboundSanitization: resolvedInbound,
+            toolName: namespacedName,
+            serverIdentity: args.serverIdentity,
+          });
+    const inputValidator = buildJsonSchemaValidator(sanitizedInput.schema);
+    const outputValidator =
+      sanitizedOutput === undefined ? undefined : buildJsonSchemaValidator(sanitizedOutput.schema);
+    // TOFU invariant (MC-6): the fingerprint hashes the RAW definition,
+    // never the sanitized copy. Hashing redacted bytes would invalidate
+    // the pins of existing deployments AND collapse two
+    // differently-poisoned schemas into one redacted hash, hiding drift.
+    // `sanitizeSchemaAnnotations` returns a clone and never mutates
+    // `definition`, so the order here is belt-and-braces.
     const definitionHash = computeToolDefinitionHash(definition);
     fingerprints.set(definition.name, definitionHash);
     tools.push(
@@ -220,6 +245,7 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
         outputSchema: args.outputSchema,
         serverIdentity: args.serverIdentity,
         toolName: args.graphorinToolName,
+        inboundSanitization: args.inboundSanitization,
         ...(args.logger !== undefined ? { logger: args.logger } : {}),
       });
     },

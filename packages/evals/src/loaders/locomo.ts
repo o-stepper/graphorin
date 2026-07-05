@@ -28,6 +28,16 @@
  * (adversarial), everything else (`3` open-domain, `4` single-hop)
  * →info-extraction.
  *
+ * Answer handling (W-022): LOCOMO answers may be numbers (e.g. `2022`)
+ * - they are stringified, never silently coerced to `''`. A QA pair
+ * with NO answer at all (neither `answer` nor `adversarial_answer`) is
+ * SKIPPED rather than emitted with an empty `expected`: the LLM judge
+ * grading against an empty reference produces meaningless verdicts, so
+ * a missing reference must reduce the case count, not poison scores.
+ * Turns carry the dataset-native `speaker` name alongside the
+ * two-role mapping (~99 percent of LOCOMO questions reference speakers
+ * by name).
+ *
  * @packageDocumentation
  */
 
@@ -113,7 +123,9 @@ function appendSampleCases(
     if (question === undefined) continue;
     const category = typeof item.category === 'number' ? item.category : undefined;
     const ability = mapCategory(category);
-    const answer = asString(item.answer) ?? asString(item.adversarial_answer) ?? '';
+    const answer = answerToText(item.answer) ?? answerToText(item.adversarial_answer);
+    // No reference answer at all: skip the pair (see module docs, W-022).
+    if (answer === undefined) continue;
     const evidence = asArray(item.evidence).filter((e): e is string => typeof e === 'string');
     out.push({
       id: `${sampleId}-q${q}`,
@@ -152,7 +164,14 @@ function extractSessions(conversation: Record<string, unknown>): MemoryEvalSessi
         speakerA !== undefined && speaker !== undefined && speaker !== speakerA
           ? 'assistant'
           : 'user';
-      turns.push({ role, content, ...(date !== undefined ? { timestamp: date } : {}) });
+      turns.push({
+        role,
+        content,
+        ...(date !== undefined ? { timestamp: date } : {}),
+        // W-022: keep the dataset-native name; the role mapping stays
+        // for cross-dataset machinery compatibility.
+        ...(speaker !== undefined ? { speaker } : {}),
+      });
     }
     sessions.push({ id: `session_${n}`, turns });
   }
@@ -175,6 +194,18 @@ function mapCategory(category: number | undefined): MemoryEvalAbility {
 
 function asString(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
+}
+
+/**
+ * LOCOMO reference answers may be strings OR bare numbers (6 of the
+ * 1986 QA pairs ship e.g. `2022`). Stringify finite numbers instead of
+ * dropping them to `''` (W-022); a blank string counts as "no answer"
+ * so the judge never grades against an empty reference.
+ */
+function answerToText(value: unknown): string | undefined {
+  if (typeof value === 'string') return value.trim().length > 0 ? value : undefined;
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+  return undefined;
 }
 
 function asArray(value: unknown): ReadonlyArray<unknown> {

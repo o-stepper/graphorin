@@ -82,11 +82,25 @@ jobs:
         uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           publish: pnpm run release
+          # NOTE: a root script literally named `version` collides with the
+          # npm lifecycle hook of `npm version` - it is only ever invoked
+          # explicitly (here and by maintainers as `pnpm run version`), never
+          # through `npm version`. The script chains `changeset version` with
+          # `bump-version --sync`, which is idempotent and ends by running
+          # check-version-consistency (proxying its exit code), so a bot PR
+          # passes the gate without manual sync steps (W-015).
           version: pnpm run version
           commit: 'chore(release): version packages'
           title: 'chore(release): version packages'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # W-015: with a fine-grained RELEASE_PAT (contents + pull-requests,
+          # this repository only) the action can OPEN the Version Packages PR
+          # even though repo settings forbid the default GITHUB_TOKEN from
+          # creating PRs; without the secret the expression falls back to
+          # GITHUB_TOKEN and the documented manual flow stays in force.
+          # (Alternative: enable "Allow GitHub Actions to create and approve
+          # pull requests" in repo settings and keep GITHUB_TOKEN.)
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
           # `changesets/action` reads the env var named exactly `NPM_TOKEN` to
           # write its publish `.npmrc`; scoped to THIS step only (CI-10) so the
           # workspace build/test steps never see it. (Passing it as

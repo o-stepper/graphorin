@@ -222,6 +222,9 @@ export function createWorkflow<
       }
       return Object.freeze(out);
     },
+    async deleteThread(threadId: string): Promise<void> {
+      await config.checkpointStore.deleteThread(threadId);
+    },
     async fork(
       threadId: string,
       fromCheckpointId: CheckpointId,

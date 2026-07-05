@@ -83,6 +83,21 @@ function buildApp(): {
       },
     } as never,
   });
+  workflows.register({
+    id: 'crashy',
+    workflow: {
+      id: 'crashy',
+      // Emits one step, then fails - the typed failure IS the fixture.
+      async *execute() {
+        await new Promise((r) => setTimeout(r, 25));
+        yield { type: 'workflow.step.completed', stepNumber: 1 };
+        const err = new Error('node boom') as Error & { code: string; hint: string };
+        err.code = 'node-execution-failed';
+        err.hint = 'inspect the node logs';
+        throw err;
+      },
+    } as never,
+  });
 
   const app = new Hono<{ Variables: ServerVariables }>();
   app.use('*', async (c, next) => {
@@ -99,6 +114,8 @@ function buildApp(): {
           parseScope('workflows:execute:flowy'),
           parseScope('workflows:resume:flowy'),
           parseScope('workflows:read:flowy'),
+          parseScope('workflows:execute:crashy'),
+          parseScope('workflows:read:crashy'),
         ],
       },
     } as never);
@@ -173,6 +190,45 @@ describe('IP-2 - the streaming endpoints actually stream', () => {
     await new Promise((r) => setTimeout(r, 120));
     expect(JSON.stringify(sub.sent)).toContain('workflow.step.completed');
     expect(runs.snapshot(body.runId)?.status).toBe('completed');
+  });
+
+  it('W-052: a failing workflow delivers workflow.error with the machine-readable code + hint', async () => {
+    const { app, dispatcher, runs } = buildApp();
+    const res = await app.request('/workflows/crashy/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: {} }),
+    });
+    expect(res.status).toBe(202);
+    const body = (await res.json()) as { runId: string; subscribe: { websocket: string } };
+    const sub = makeSubscriber(['workflows:read:crashy']);
+    dispatcher.registerSubscriber(sub.handle);
+    dispatcher.subscribe({
+      subscriberId: sub.handle.id,
+      subject: body.subscribe.websocket,
+      subscriptionId: 'sub-err',
+    });
+    await new Promise((r) => setTimeout(r, 120));
+    const frames = sub.sent
+      .map((frame) => frame as { kind?: string; type?: string; payload?: Record<string, unknown> })
+      .filter((frame) => frame.type === 'workflow.error');
+    expect(frames).toHaveLength(1);
+    const payload = frames[0]?.payload as {
+      runId: string;
+      code: string;
+      message: string;
+      hint?: string;
+    };
+    // The message field is UNCHANGED; code + hint ride additively.
+    expect(payload.runId).toBe(body.runId);
+    expect(payload.code).toBe('node-execution-failed');
+    expect(payload.message).toBe('node boom');
+    expect(payload.hint).toBe('inspect the node logs');
+    // GET run-status reports the same code (run tracker serialization).
+    const snapshot = runs.snapshot(body.runId);
+    expect(snapshot?.status).toBe('failed');
+    expect(snapshot?.error?.code).toBe('node-execution-failed');
+    expect(snapshot?.error?.message).toBe('node boom');
   });
 
   it('periphery-01: POST /workflows/:id/resume actually resumes and emits on the subject', async () => {

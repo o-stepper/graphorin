@@ -26,6 +26,12 @@ import {
   stripImperativePatterns,
 } from '@graphorin/observability/redaction';
 
+import {
+  neutralizeEnvelopeDelimiters,
+  UNTRUSTED_CONTENT_CLOSE,
+  UNTRUSTED_CONTENT_OPEN_PREFIX,
+} from './envelope.js';
+
 /**
  * Outcome of {@link applyInboundSanitization}.
  *
@@ -187,7 +193,13 @@ function wrapEnvelope(
   origin?: string,
 ): string {
   const originAttr = origin === undefined ? '' : ` origin="${escapeAttr(origin)}"`;
-  return `<<<untrusted_content trust="${trustClass}" tool="${escapeAttr(toolName)}"${originAttr}>>>\n${body}\n<<</untrusted_content>>>`;
+  // Neutralize embedded envelope markers BEFORE interpolation so the
+  // body cannot prematurely close the envelope or spoof a nested one.
+  // This is the load-bearing defence: the strip pass above is skipped
+  // on scan timeout and only covers the catalogued patterns, while the
+  // envelope boundary must hold unconditionally.
+  const safeBody = neutralizeEnvelopeDelimiters(body);
+  return `${UNTRUSTED_CONTENT_OPEN_PREFIX} trust="${trustClass}" tool="${escapeAttr(toolName)}"${originAttr}>>>\n${safeBody}\n${UNTRUSTED_CONTENT_CLOSE}`;
 }
 
 function escapeAttr(raw: string): string {

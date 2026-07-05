@@ -367,15 +367,17 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     let replayed = 0;
     let snapshotEventId: string | undefined = replay.nextEventIdHint;
     for (const event of replay.events) {
-      const frame: ServerEventFrame = {
-        ...event,
-        subscriptionId: input.subscriptionId,
-      };
-      validateAndDispatch(record, frame);
-      record.lastEventId = frame.eventId;
+      // W-027: the buffer stores RAW frames, so the replay path (fresh
+      // subscription or reconnect-resume) must sanitize per delivery
+      // exactly like the live path and the SSE replay do - otherwise
+      // the commentary policy is defeated precisely on the reconnect
+      // scenario the buffer exists for.
+      dispatchSanitized(record, { ...event, subscriptionId: input.subscriptionId });
       replayed += 1;
     }
     if (replay.droppedCount > 0) {
+      // The replay-marker is dispatcher-authored (no payload to
+      // sanitize) and deliberately does NOT advance lastEventId.
       validateAndDispatch(record, {
         v: '1',
         kind: 'replay-marker',
@@ -404,13 +406,28 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     return true;
   }
 
+  /**
+   * W-027: single choke point for delivering a frame to a
+   * subscription. Sanitizes, dispatches, and advances `lastEventId` -
+   * BOTH the live path and the replay path go through here so a future
+   * delivery path cannot silently bypass the commentary sanitizer
+   * (structural regression guard). `sanitize` no-ops on non-`event`
+   * frames and never changes `eventId`, so the ordering invariant is
+   * untouched.
+   */
+  function dispatchSanitized(record: SubscriptionRecord, frame: ServerEventFrame): void {
+    const sanitized = sanitizer.sanitize(frame, 'ws');
+    validateAndDispatch(record, sanitized);
+    record.lastEventId = sanitized.eventId;
+  }
+
   function emit(subject: string, bare: BareEventFrame): void {
     const eventId = bare.eventId ?? nextEventId();
     // Buffer first so the replay layer captures every event, even
     // when there is no live subscriber. The buffered frame is
-    // sanitizer-neutral (the per-subscription dispatch sanitizes
-    // again on the wire so the second pass is idempotent - by
-    // construction matching wraps are not re-wrapped).
+    // sanitizer-neutral (both the live dispatch and the replay
+    // dispatch sanitize per delivery, so a buffered raw frame is
+    // sanitized exactly once on every path that reaches a wire).
     const bufferedFrame: ServerEventFrame = {
       v: '1',
       kind: 'event',
@@ -426,10 +443,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     for (const subscriptionId of subjectSubscribers) {
       const record = subscriptions.get(subscriptionId);
       if (record === undefined) continue;
-      const sanitized = sanitizer.sanitize({ ...bufferedFrame, subscriptionId }, 'ws');
-      validateAndDispatch(record, sanitized);
-      record.lastEventId = sanitized.eventId;
-      if (sanitized.eventId === eventId) continue;
+      dispatchSanitized(record, { ...bufferedFrame, subscriptionId });
     }
     void isEventFrame; // keep import warm
   }

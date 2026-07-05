@@ -52,6 +52,8 @@ const DOC_CMD = /graphorin\s+([a-z][\w-]*)(?:\s+([a-z][\w-]*))?/g;
 const CMD_DECL = /\b([a-z]\w*)\s*\.command\(\s*'([^']+)'/g;
 /** `.option('-x, --flag <v>')` / `.requiredOption(...)`; captures the flags string. */
 const OPTION_DECL = /\.(?:requiredOption|option)\(\s*'([^']+)'/g;
+/** W-040: `.requiredOption(...)` alone — feeds the required-flag pass. */
+const REQUIRED_OPTION_DECL = /\.requiredOption\(\s*'([^']+)'/g;
 
 /** Extract every long/short flag token from a commander flags string. */
 function flagsFrom(decl) {
@@ -63,10 +65,12 @@ function flagsFrom(decl) {
  * @returns {{
  *   topLevel: Set<string>,
  *   groups: Map<string, Set<string>>,
- *   commandMeta: Map<string, { takesArgs: boolean, options: Set<string> }>,
+ *   commandMeta: Map<string, { takesArgs: boolean, options: Set<string>, requiredFlags: Array<Set<string>> }>,
  *   globalOptions: Set<string>,
  * }}
- * `commandMeta` keys are `'group'` or `'group sub'`.
+ * `commandMeta` keys are `'group'` or `'group sub'`. `requiredFlags`
+ * holds one alias-set per `.requiredOption(...)` (short + long forms),
+ * so an example may satisfy the requirement with either alias (W-040).
  */
 export function parseCommandTree(src) {
   const topLevel = new Set();
@@ -115,12 +119,19 @@ export function parseCommandTree(src) {
       for (const m of span.matchAll(OPTION_DECL)) {
         for (const f of flagsFrom(m[1])) options.add(f);
       }
+      // W-040: one alias-set per required option — `flagsFrom` returns
+      // both the short and the long form, either satisfies the pass.
+      const requiredFlags = [];
+      for (const m of span.matchAll(REQUIRED_OPTION_DECL)) {
+        requiredFlags.push(new Set(flagsFrom(m[1])));
+      }
       const takesArgs = /[<[]/.test(d.decl);
       const prev = commandMeta.get(d.key);
       if (prev === undefined) {
-        commandMeta.set(d.key, { takesArgs, options });
+        commandMeta.set(d.key, { takesArgs, options, requiredFlags });
       } else {
         for (const f of options) prev.options.add(f);
+        prev.requiredFlags.push(...requiredFlags);
         if (takesArgs) prev.takesArgs = true;
       }
     }
@@ -234,6 +245,29 @@ export function diffInvocations(tree, invocations) {
         `'${label} ${first}' — '${key}' declares no positional arguments (did the docs mean a flag?)`,
       );
     }
+    // W-040: every `.requiredOption(...)` must appear in the invocation
+    // (any alias counts, `--flag=value` counts) — a copy-pasteable
+    // example missing a required option dies with commander's
+    // "required option not specified" (the `migrate-export` class).
+    const seenFlags = new Set(
+      rest.filter((t) => t.startsWith('-')).map((t) => t.split('=')[0] ?? t),
+    );
+    for (const aliases of meta.requiredFlags ?? []) {
+      let present = false;
+      for (const alias of aliases) {
+        if (seenFlags.has(alias)) {
+          present = true;
+          break;
+        }
+      }
+      if (!present) {
+        const display =
+          [...aliases].find((f) => f.startsWith('--')) ?? [...aliases][0] ?? '<unknown>';
+        violations.add(
+          `'${label}' — required option ${display} is missing from the documented invocation (copy-paste would fail)`,
+        );
+      }
+    }
   }
   return [...violations];
 }
@@ -306,7 +340,7 @@ function registerAuthCommands(program) {
 }
 function registerLifecycleCommands(program) {
   program.command('start').option('-c, --config <path>', 'config file');
-  program.command('migrate-export <input>');
+  program.command('migrate-export <input>').requiredOption('-o, --out <file>', 'output path');
 }
 `;
   const tree = parseCommandTree(src);
@@ -341,9 +375,11 @@ function registerLifecycleCommands(program) {
       want: 1,
     },
     {
+      // Two drifts: the phantom positional AND the missing required
+      // `--server` (W-040 requiredOption pass).
       label: 'bare positional on arg-less command fails',
       md: '```bash\ngraphorin auth login mcp.example.com\n```',
-      want: 1,
+      want: 2,
     },
     {
       label: 'positional on arg-taking command passes',
@@ -358,6 +394,28 @@ function registerLifecycleCommands(program) {
     {
       label: 'prose flags are NOT flag-checked',
       md: 'run graphorin start --storage in prose',
+      want: 0,
+    },
+    // W-040 requiredOption pass: copy-pasteable examples must carry
+    // every `.requiredOption(...)` (any alias, `--flag=value` counts).
+    {
+      label: 'missing required option fails',
+      md: '```bash\ngraphorin migrate-export ./x.jsonl\n```',
+      want: 1,
+    },
+    {
+      label: 'long form of a required option passes',
+      md: '```bash\ngraphorin migrate-export ./x.jsonl --out ./y.jsonl\n```',
+      want: 0,
+    },
+    {
+      label: 'short alias of a required option passes',
+      md: '```bash\ngraphorin migrate-export ./x.jsonl -o ./y.jsonl\n```',
+      want: 0,
+    },
+    {
+      label: '--flag=value form of a required option passes',
+      md: '```bash\ngraphorin migrate-export ./x.jsonl --out=./y.jsonl\n```',
       want: 0,
     },
   ];

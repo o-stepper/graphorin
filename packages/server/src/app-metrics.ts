@@ -43,8 +43,14 @@ export async function refreshLiveMetrics(options: RefreshLiveMetricsOptions): Pr
   registry.set(SERVER_METRIC_NAMES.inflightRuns, runs.runningCount());
 
   if (options.wsDispatcher !== undefined) {
-    const sizes = options.wsDispatcher.size();
-    registry.set(SERVER_METRIC_NAMES.replayBufferEvents, sizes.subscriptions);
+    // W-028: the gauge now reports buffered EVENTS, matching its name -
+    // previously it was filled with the subscription count. `stats` is
+    // optional on the @stable ReplayBuffer interface, so external
+    // implementations without it degrade to 0 instead of throwing.
+    registry.set(
+      SERVER_METRIC_NAMES.replayBufferEvents,
+      options.wsDispatcher.replayBuffer.stats?.().events ?? 0,
+    );
   }
 
   if (options.triggersDaemon !== undefined) {

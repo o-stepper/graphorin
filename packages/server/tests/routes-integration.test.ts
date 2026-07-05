@@ -189,6 +189,7 @@ async function bootServer(extraScopes?: ReadonlyArray<string>): Promise<{
     'workflows:read',
     'workflows:execute',
     'workflows:resume',
+    'workflows:delete',
     'sessions:read',
     'sessions:write',
     'sessions:export',
@@ -484,6 +485,55 @@ describe('REST integration - happy + error paths', () => {
       headers: { Authorization: `Bearer ${bearer}` },
     });
     expect(res.status).toBe(200);
+  });
+
+  it('DELETE /v1/workflows/:id/threads/:threadId deletes via the entry; 404/400 mapped (W-005)', async () => {
+    const deleted: string[] = [];
+    srv().workflows.register({
+      id: 'erasable',
+      workflow: {
+        name: 'erasable',
+        execute(): AsyncIterable<unknown> {
+          return (async function* () {})();
+        },
+        async deleteThread(threadId) {
+          deleted.push(threadId);
+        },
+      },
+    });
+    srv().workflows.register({
+      id: 'no-delete',
+      workflow: {
+        name: 'no-delete',
+        execute(): AsyncIterable<unknown> {
+          return (async function* () {})();
+        },
+      },
+    });
+    const ok = await srv().app.request('/v1/workflows/erasable/threads/t-9', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(ok.status).toBe(204);
+    expect(deleted).toEqual(['t-9']);
+
+    const missing = await srv().app.request('/v1/workflows/nope/threads/t-9', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(missing.status).toBe(404);
+
+    const unsupported = await srv().app.request('/v1/workflows/no-delete/threads/t-9', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${bearer}` },
+    });
+    expect(unsupported.status).toBe(400);
+
+    // Unauthenticated requests never reach the handler.
+    const denied = await srv().app.request('/v1/workflows/erasable/threads/t-9', {
+      method: 'DELETE',
+    });
+    expect([401, 403]).toContain(denied.status);
   });
 
   it('POST /v1/sessions creates + GET /v1/sessions lists sessions', async () => {

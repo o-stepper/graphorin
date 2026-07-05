@@ -28,7 +28,24 @@ const FTS_PAIRS: ReadonlyArray<readonly [fts: string, base: string]> = [
   ['episodes_fts', 'episodes'],
   ['session_messages_fts', 'session_messages'],
   ['insights_fts', 'insights'],
+  // W-113: added with migration 028 - the guard must cover every FTS
+  // index; the coverage self-check test enumerates `%_fts` tables from
+  // sqlite_master so a future index cannot be forgotten silently.
+  ['rules_fts', 'rules'],
 ];
+
+/**
+ * The FTS tables the CS-10 guard covers (W-113). Exported so the
+ * coverage self-check test can diff this list against the `%_fts`
+ * tables of a fully-migrated database - a new FTS index that is not
+ * registered here fails the test instead of silently escaping the
+ * integrity check.
+ *
+ * @internal
+ */
+export function listCheckedFtsTables(): ReadonlyArray<string> {
+  return FTS_PAIRS.map(([fts]) => fts);
+}
 
 /** One FTS table's integrity finding. */
 export interface FtsIntegrityReport {

@@ -37,9 +37,14 @@ multi-session | temporal | knowledge-update | abstention`.
    run can never be mistaken for a real baseline.
 
    Pass a **dedicated judge** (`--judge-provider/--judge-model/--judge-base-url`
-   or the `GRAPHORIN_BENCH_JUDGE_*` env vars) - the runner REFUSES to write a
+   or the `GRAPHORIN_BENCH_JUDGE_*` env vars; the judge key is env-only:
+   `GRAPHORIN_BENCH_JUDGE_API_KEY`, falling back to `GRAPHORIN_BENCH_API_KEY`
+   for single-endpoint setups) - the runner REFUSES to write a
    `--json` baseline from a self-judged real-provider run (evals-04; override
-   with `--allow-self-judge` only for throwaway experiments). Add
+   with `--allow-self-judge` only for throwaway experiments). The
+   `benchmark-longmemeval.yml` dispatch form exposes the judge as the
+   `judge_provider`/`judge_model` inputs and fails fast when a real provider
+   is selected without one. Add
    `--iterations 3` for a mean ± stddev pass rate instead of a point estimate
    (evals-05), and pick the config under test with `--retrieval
    default|multi-query|hyde|iterative|graph` and `--embedder none|fake`

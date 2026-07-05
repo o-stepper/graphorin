@@ -126,3 +126,39 @@ jobs:
       - name: Smoke-test examples
         run: pnpm run smoke-examples
 
+  # W-071: the pack gate. Everything above validates the WORKSPACE,
+  # where workspace:* symlinks and shared root devDependencies mask
+  # defects of the published artifacts; this job validates the packed
+  # tarballs (publint + attw + a one-shot npm-install scratch consumer
+  # + a tsc matrix). Registry access is deliberate here (it IS npm
+  # install), unlike the offline test suite. ubuntu-only by design:
+  # artifact signal, not platform signal (same rationale as
+  # examples-smoke). `--allow-fail zod4` tracks the known zod-4 d.ts
+  # break (W-013) until its fix lands - the leg still runs and reports.
+  package-shape:
+    name: Pack gate (publint + attw + scratch consumer)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Enable Corepack (activates pnpm pinned in package.json)
+        run: corepack enable
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: '22'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Registry flakes are the main noise source here - retry once
+      # before failing the job (mirrors the C4 post-publish smoke).
+      - name: Pack gate
+        run: |
+          node scripts/check-package-shape.mjs --allow-fail zod4 \
+            || node scripts/check-package-shape.mjs --skip-build --allow-fail zod4
+

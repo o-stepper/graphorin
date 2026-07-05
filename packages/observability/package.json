@@ -111,8 +111,8 @@
   },
   "peerDependencies": {
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/sdk-node": "^0.217.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.215.0"
+    "@opentelemetry/sdk-node": ">=0.215.0 <1.0.0",
+    "@opentelemetry/exporter-trace-otlp-http": ">=0.215.0 <1.0.0"
   },
   "peerDependenciesMeta": {
     "@opentelemetry/api": {
@@ -131,8 +131,8 @@
   },
   "devDependencies": {
     "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.215.0",
-    "@opentelemetry/sdk-node": "^0.217.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.220.0",
+    "@opentelemetry/sdk-node": "^0.220.0",
     "fast-check": "^3.23.0"
   }
 }

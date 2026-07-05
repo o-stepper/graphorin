@@ -25,6 +25,14 @@ export interface MemoryEvalTurn {
   readonly content: string;
   /** Dataset-native (often ISO-8601) timestamp, when the dataset provides one. */
   readonly timestamp?: string;
+  /**
+   * Dataset-native speaker NAME (e.g. LOCOMO's `"Melanie"`), when the
+   * dataset provides one (W-022). Distinct from `role`: two-speaker
+   * datasets map onto user/assistant for machinery compatibility, but
+   * most LOCOMO questions reference the speakers by name, so the
+   * system under test must see the names in the ingested text.
+   */
+  readonly speaker?: string;
 }
 
 /**

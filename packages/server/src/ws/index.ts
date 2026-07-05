@@ -25,6 +25,8 @@ export {
   type ReplayBuffer,
   type ReplayBufferOptions,
   type ReplayBufferSlice,
+  type ReplayBufferStats,
+  scheduleReplayBufferPruning,
 } from './replay-buffer.js';
 export {
   isSubjectAllowed,

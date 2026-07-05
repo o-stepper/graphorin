@@ -14,6 +14,8 @@
  * @packageDocumentation
  */
 
+import { toWireError } from '../internal/wire-error.js';
+
 /**
  * Stable status discriminator for a run snapshot. Mirrors the values
  * exposed on the public REST surface.
@@ -68,7 +70,7 @@ export interface RunStateSnapshot {
   readonly status: RunStatus;
   readonly startedAt?: number;
   readonly completedAt?: number;
-  readonly error?: { readonly message: string };
+  readonly error?: { readonly message: string; readonly code?: string; readonly hint?: string };
   readonly agentId?: string;
   readonly workflowId?: string;
   readonly threadId?: string;
@@ -119,7 +121,7 @@ interface RunRecord {
   controller: AbortController;
   startedAt?: number;
   completedAt?: number;
-  error?: { readonly message: string };
+  error?: { readonly message: string; readonly code?: string; readonly hint?: string };
 }
 
 /**
@@ -214,7 +216,9 @@ export class RunStateTracker {
     record.status = status;
     record.completedAt = this.#now();
     if (err !== undefined) {
-      record.error = { message: err instanceof Error ? err.message : String(err) };
+      // W-052: keep the machine-readable code next to the message so
+      // the GET run-status surface reports it too.
+      record.error = toWireError(err);
     }
     if (!wasTerminal) this.#emitTerminal(record);
   }
@@ -352,6 +356,34 @@ export function scheduleRunPruning(
   const retentionMs = opts.retentionMs ?? DEFAULT_RUN_RETENTION_MS;
   const timer = setInterval(() => {
     runs.prune(now() - retentionMs);
+  }, intervalMs);
+  if (typeof (timer as { unref?: () => void }).unref === 'function') {
+    (timer as { unref: () => void }).unref();
+  }
+  return () => clearInterval(timer);
+}
+
+/** Default cadence for the idempotency-record sweep (W-061). */
+export const DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS = 60 * 60_000;
+
+/**
+ * W-061: schedule a periodic prune of EXPIRED idempotency records.
+ * `idempotency_records` stores each keyed POST's full `response_json`
+ * with an `expires_at` column, but expiry was only ever checked on the
+ * READ path - the bodies accumulated on disk indefinitely. The sweep
+ * passes `now()` as the cutoff, deleting exactly the records the read
+ * path already refuses to replay (IETF-draft semantics unchanged).
+ * Best-effort: store errors are swallowed. Same shape as
+ * {@link scheduleRunPruning}: `unref`-ed timer + stop function.
+ */
+export function scheduleIdempotencyPruning(
+  store: { prune(olderThan: number): Promise<number> },
+  now: () => number,
+  opts: { readonly intervalMs?: number } = {},
+): () => void {
+  const intervalMs = opts.intervalMs ?? DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS;
+  const timer = setInterval(() => {
+    void store.prune(now()).catch(() => {});
   }, intervalMs);
   if (typeof (timer as { unref?: () => void }).unref === 'function') {
     (timer as { unref: () => void }).unref();

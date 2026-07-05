@@ -25,6 +25,7 @@ export { NOOP_LOGGER } from './logger.js';
 export type {
   EpisodicMemoryStore,
   MemoryStore,
+  MemoryStoreExt,
   MessageRef,
   ProceduralMemoryStore,
   SemanticMemoryStore,

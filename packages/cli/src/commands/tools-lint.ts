@@ -2,7 +2,7 @@
  * `graphorin tools lint` - RB-49 / suggested DEC-165.
  *
  * Discovers every `tool({...})` registration in the operator's project
- * via static AST analysis (no runtime probe; no `tsc` invocation), runs
+ * via a text-based static scan (no runtime probe; no `tsc` invocation), runs
  * the three RB-49 rules from `@graphorin/eslint-plugin`, computes the
  * per-tool grader score (40 + 30 + 30 = 100 points), aggregates a
  * structured report, and exits `1` when any tool falls below the

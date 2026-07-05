@@ -260,9 +260,15 @@ function validateString(
     // cap the pattern and the tested-string length, and reject the
     // classic nested-quantifier shapes heuristically. A guarded-out
     // pattern degrades to permissive (same as a malformed one).
+    // W-078 defense-in-depth: any quantified group can still backtrack
+    // polynomially even when the heuristic below admits it, so the
+    // tested-string cap shrinks whenever one is present.
+    const maxTestLength = QUANTIFIED_GROUP_RE.test(schema.pattern)
+      ? MAX_QUANTIFIED_GROUP_TEST_LENGTH
+      : MAX_PATTERN_TEST_LENGTH;
     if (
       schema.pattern.length <= MAX_PATTERN_LENGTH &&
-      value.length <= MAX_PATTERN_TEST_LENGTH &&
+      value.length <= maxTestLength &&
       !looksCatastrophic(schema.pattern)
     ) {
       try {
@@ -280,17 +286,35 @@ function validateString(
 /** mcp-skills-07: hard caps on server-supplied `pattern` evaluation. */
 const MAX_PATTERN_LENGTH = 1_000;
 const MAX_PATTERN_TEST_LENGTH = 10_000;
+/** W-078: reduced cap applied whenever the pattern has a quantified group. */
+const MAX_QUANTIFIED_GROUP_TEST_LENGTH = 1_000;
+
+/** A group that is itself quantified: `(...)+`, `(...)*`, `(...){2,}`. */
+const QUANTIFIED_GROUP_RE = /\)[*+]|\)\{\d+,(?:\d+)?\}/;
+/** A group whose inner expression ends with a quantifier: `...+)`. */
+const GROUP_BODY_ENDS_QUANTIFIED_RE = /[*+}]\s*\)/;
 
 /**
- * Cheap heuristic for the classic catastrophic-backtracking shape: a
- * group whose inner expression ends with a quantifier and which is
- * itself quantified (`(a+)+`, `(a*)*`, `(a+){2,}`, `(?:x+)*`). A
- * linear-time engine (re2) would make this exact; the heuristic errs
- * on the safe side for untrusted input, and a rejected pattern simply
- * degrades to permissive.
+ * Cheap heuristic for exponential-backtracking shapes in a quantified
+ * group (mcp-skills-07 / W-078). A pattern is rejected when a
+ * quantified group is present AND either:
+ *
+ * - the group body ends with a quantifier - the classic nested
+ *   quantifier family (`(a+)+`, `(a*)*`, `(a+){2,}`, `(?:x+)*`); or
+ * - the pattern contains an alternation - the alternation-overlap
+ *   family (`(a|a)+`, `^(\w|\d)*$`), where overlapping branches make
+ *   the quantified group ambiguous.
+ *
+ * Deliberately conservative: false positives (a harmless alternation
+ * inside a quantified group) merely degrade that pattern to permissive
+ * validation, which is the already-documented semantics for guarded
+ * and malformed patterns. A linear-time engine (re2) remains the exact
+ * solution; this heuristic plus the reduced test-string cap above
+ * bound the damage of an untrusted server-supplied pattern.
  */
 function looksCatastrophic(pattern: string): boolean {
-  return /\)[*+]|\)\{\d+,(?:\d+)?\}/.test(pattern) && /[*+}]\s*\)/.test(pattern);
+  if (!QUANTIFIED_GROUP_RE.test(pattern)) return false;
+  return GROUP_BODY_ENDS_QUANTIFIED_RE.test(pattern) || pattern.includes('|');
 }
 
 function validateNumber(

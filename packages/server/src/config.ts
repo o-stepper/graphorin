@@ -83,6 +83,7 @@ export interface ServerConfigSpec {
       readonly replayBuffer: {
         readonly maxEvents: number;
         readonly ttlSeconds: number;
+        readonly pruneIntervalSeconds: number;
       };
       readonly perConnectionQueueLimit: number;
     };
@@ -201,6 +202,9 @@ const streamReplayBufferSchema = z
   .object({
     maxEvents: z.number().int().positive().default(1_000),
     ttlSeconds: z.number().int().positive().default(300),
+    // W-028: interval of the periodic TTL sweep that releases
+    // finished-run subjects with no further push/replay activity.
+    pruneIntervalSeconds: z.number().int().positive().default(60),
   })
   .strict()
   .default({});

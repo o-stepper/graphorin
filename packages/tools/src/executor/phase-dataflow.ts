@@ -27,9 +27,16 @@ export function runDataFlowSinkGate(
     readonly tool: ResolvedTool;
     readonly runContext: RunContext;
     readonly stepNumber: number;
+    /**
+     * Raw-shaped post-repair arguments from the validate phase (W-118)
+     * - the same payload the approval gate saw and the payload the
+     * executed `validatedInput` is deterministically derived from.
+     * Bytes-equal to `call.args` when no repair ran.
+     */
+    readonly effectiveArgs: unknown;
   },
 ): CompletedToolCall | null {
-  const { call, tool, runContext, stepNumber } = input;
+  const { call, tool, runContext, stepNumber, effectiveArgs } = input;
   if (
     rt.options.dataFlowGuard === undefined ||
     (tool.__sideEffectClass !== 'side-effecting' && tool.__sideEffectClass !== 'external-stateful')
@@ -42,7 +49,7 @@ export function runDataFlowSinkGate(
     trustClass: tool.__trustClass,
     ...(tool.sensitivity !== undefined ? { sensitivity: tool.sensitivity } : {}),
     source: tool.__source,
-    args: call.args,
+    args: effectiveArgs,
     runContext,
   });
   if (verdict.action !== 'allow') {

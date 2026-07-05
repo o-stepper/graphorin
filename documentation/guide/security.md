@@ -105,6 +105,20 @@ const result = await verifyAuditAgainstCheckpoint(auditDb, checkpoint, { publicK
 
 Also available: `computeAuditTreeHead`, `proveAuditInclusion` / `verifyAuditInclusion` ("entry N is in the log with head H"), and `proveAuditConsistency` / `verifyAuditConsistency`. As long as one signed checkpoint survives outside the writer's reach, a rewrite, reorder, or truncate-and-re-root is detectable.
 
+### Retention and anchoring: the re-anchor runbook
+
+`pruneAudit` re-roots the surviving suffix (every surviving entry's `prevHash`/`hash` is recomputed), and the RFC-6962 leaves hash the canonical JSON of each entry INCLUDING those fields - so **verification against any checkpoint signed before the prune MUST fail afterwards, by design**. A legitimate retention prune is cryptographically indistinguishable from the truncate-and-re-root attack this layer exists to detect; only the operator's out-of-band procedure tells them apart. Run every retention prune as one atomic ceremony:
+
+1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`).
+2. Immediately sign a FRESH checkpoint of the new head: `signAuditCheckpoint(auditDb, { privateKeyPem, writerId })`.
+3. Distribute the new checkpoint to every out-of-band anchor location (other host, object store, ticket).
+4. Revoke or explicitly mark superseded every pre-prune checkpoint, recording the prune timestamp next to them - a later `verifyAuditAgainstCheckpoint` failure against one of them must read as "expected: pre-prune anchor", not as an alarm.
+5. Accept that anchored history restarts at the prune point: inclusion/consistency proofs only cover entries after it.
+
+A pre-prune checkpoint that keeps verifying is the actual alarm (it means the prune did not happen where you think it did).
+
+**Identifier-level erasure limitation.** `pruneAudit` is the only erasure primitive for the audit database and it trims a TIME PREFIX only - selective deletion of the entries of one user / session / actor is not possible without breaking the chain. For GDPR-style identifier-level requests: keep direct identifiers OUT of audit payloads (store opaque ids the primary database can unlink), or erase via a full prefix prune up to the qualifying date, re-anchoring as above.
+
 ## OAuth 2.1 with PKCE
 
 ```mermaid
@@ -212,7 +226,7 @@ Three modes (`DataFlowMode`):
 | `'shadow'` | Audit-only: a tripped flow emits a `tool:dataflow:flagged` row + counter but never blocks. **Ship this first** to surface false positives against real traffic. |
 | `'enforce'` | A tripped flow **blocks** the sink (the call yields a `dataflow_policy_blocked` error, surfaced as `tool.execute.error`) unless the sink's name is in `declassifySinks` - the explicit, audited operator escape hatch (`tool:dataflow:declassified`). |
 
-Findings are **metadata-only** - they name the flow kind and the implicated source kinds, never the raw argument or output bytes. Verbatim detection is best-effort (it catches verbatim / near-verbatim forwarding; paraphrase is what `derivedTaint: 'strict'` and the trifecta signal cover). The policy **composes with code-mode**: each in-script tool call runs through the same sink gate, so an injection cannot exfiltrate through a sandbox either.
+Findings are **metadata-only** - they name the flow kind and the implicated source kinds, never the raw argument or output bytes. Verbatim detection is best-effort (it catches verbatim / near-verbatim forwarding; paraphrase is what `derivedTaint: 'strict'` and the trifecta signal cover). The policy **composes with code-mode**: each in-script tool call runs through the same sink gate, so an injection cannot exfiltrate through a sandbox either. The sink gate probes the **post-repair** arguments - the same payload the approval gate saw and the payload the executed input is derived from - so spans introduced by the arg-repair hook are visible to the verbatim probe; the residual limitation is that probing happens before schema coercion, so text introduced purely by a Zod `transform`/`default` is not probed.
 
 Three additional propagation legs close gaps the run-local shingle probe cannot see:
 

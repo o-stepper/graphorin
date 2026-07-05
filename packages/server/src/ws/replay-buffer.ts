@@ -36,6 +36,18 @@ export interface ReplayBufferSlice {
 }
 
 /**
+ * Occupancy snapshot returned by {@link ReplayBuffer.stats}.
+ *
+ * @stable
+ */
+export interface ReplayBufferStats {
+  /** Number of subjects currently holding at least one buffered event. */
+  readonly subjects: number;
+  /** Total buffered events across all subjects. */
+  readonly events: number;
+}
+
+/**
  * Per-subject replay buffer. Stores up to `maxEvents` per subject
  * with a TTL; thread-safe under the single-writer Node event loop
  * model.
@@ -48,6 +60,13 @@ export interface ReplayBuffer {
   size(subject: string): number;
   forget(subject: string): void;
   prune(): void;
+  /**
+   * Occupancy snapshot (W-028). OPTIONAL so external implementations
+   * of this `@stable` interface keep compiling; `createReplayBuffer`
+   * always provides it. When absent, the `/v1/metrics` replay-buffer
+   * gauge degrades to `0`.
+   */
+  stats?(): ReplayBufferStats;
 }
 
 interface BufferedEvent {
@@ -81,7 +100,14 @@ export function createReplayBuffer(options: ReplayBufferOptions = {}): ReplayBuf
       list.splice(0, cutoffIndex);
       dropped.set(subject, (dropped.get(subject) ?? 0) + cutoffIndex);
     }
-    if (list.length === 0) buffers.delete(subject);
+    if (list.length === 0) {
+      // W-028: release the whole subject, including its dropped-count
+      // entry - otherwise every finished run leaves a Map entry behind
+      // forever. A resume with a stale cursor still signals the gap:
+      // `replay()` floors droppedCount at 1 when the cursor misses.
+      buffers.delete(subject);
+      dropped.delete(subject);
+    }
   }
 
   function push(subject: string, event: ServerEventFrame): void {
@@ -115,10 +141,13 @@ export function createReplayBuffer(options: ReplayBufferOptions = {}): ReplayBuf
     const startIndex = list.findIndex((entry) => entry.event.eventId === sinceEventId);
     if (startIndex < 0) {
       // Cursor predates the buffer; return everything we still have +
-      // signal the gap via `droppedCount`.
+      // signal the gap via `droppedCount`. The miss itself PROVES at
+      // least one event was dropped, so floor the count at 1 even
+      // after the dropped-map entry was released by pruning (W-028) -
+      // the dispatcher must still send the replay-marker.
       return {
         events: list.map((entry) => entry.event),
-        droppedCount,
+        droppedCount: Math.max(droppedCount, 1),
         nextEventIdHint: last?.event.eventId,
       };
     }
@@ -144,5 +173,37 @@ export function createReplayBuffer(options: ReplayBufferOptions = {}): ReplayBuf
     prune(): void {
       for (const subject of [...buffers.keys()]) pruneSubject(subject);
     },
+    stats(): ReplayBufferStats {
+      let events = 0;
+      for (const list of buffers.values()) events += list.length;
+      return { subjects: buffers.size, events };
+    },
   });
+}
+
+/**
+ * W-028: schedule a periodic {@link ReplayBuffer.prune} sweep. Without
+ * it TTL expiry only ran lazily inside `push`/`replay`/`size` FOR THE
+ * SAME SUBJECT, so every finished run-subject (a fresh runId per run)
+ * retained up to `maxEvents` full payloads forever on a long-living
+ * server. Mirrors `scheduleRunPruning` (IP-16): `unref`-ed timer,
+ * returns a stop function. The sweep applies only the already
+ * documented TTL - replay semantics inside the TTL window are
+ * unchanged (an immediate `forget` on run completion would break
+ * short-disconnect resume of terminal events).
+ *
+ * @stable
+ */
+export function scheduleReplayBufferPruning(
+  buffer: ReplayBuffer,
+  opts: { readonly intervalMs?: number } = {},
+): () => void {
+  const intervalMs = opts.intervalMs ?? 60_000;
+  const timer = setInterval(() => {
+    buffer.prune();
+  }, intervalMs);
+  if (typeof (timer as { unref?: () => void }).unref === 'function') {
+    (timer as { unref: () => void }).unref();
+  }
+  return () => clearInterval(timer);
 }

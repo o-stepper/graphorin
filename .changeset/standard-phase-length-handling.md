@@ -1,0 +1,5 @@
+---
+'@graphorin/memory': patch
+---
+
+Consolidation data-loss fix (W-020): the standard phase now reacts to `finishReason: 'length'` instead of parsing the truncated JSON to `[]` and letting the runtime advance the cursor over a lossy slice (facts of a dense batch were silently lost forever, indistinguishable from a genuinely empty slice). A truncated multi-message batch is split in half and re-extracted recursively (depth bounded by log2 of the batch size, every call budget-recorded, a paused budget aborts into the DLQ without advancing the cursor - the DLQ-only route was rejected because replay would deterministically truncate again); a truncated single-message slice is salvaged via the new `salvageTruncatedExtraction` (string/escape-aware recovery of the complete prefix - salvaged facts still flow through the ordinary reconcile/quarantine path). Facts are written only after every sub-slice extracted successfully. New span attributes `consolidator.standard.extraction_calls` / `length_splits` / `truncated_salvage` make 'empty slice' and 'truncated output' distinguishable.

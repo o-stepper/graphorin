@@ -85,9 +85,11 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `DELETE` | `/v1/triggers/:id` | **Destructive** - unregister and remove the trigger. |
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
+| | | On failure the run subject carries a `workflow.error` event whose payload is `{ runId, code, message, hint? }` - `code` is the machine-readable discriminator (`err.code`, falling back to `err.kind`, else `unknown`), so clients retry `checkpoint-version-conflict` and abandon `node-execution-failed` without parsing prose; the same `code` appears on the run-status `error` object. |
 | `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement `resume()`. Scope `workflows:resume:<id>`. |
 | `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`. Scope `workflows:read:<id>`. |
 | `GET` | `/v1/workflows/:id/checkpoints` | List a thread's checkpoints (`?threadId=...`). Scope `workflows:read:<id>`. |
+| `DELETE` | `/v1/workflows/:id/threads/:threadId` | Delete every checkpoint + pending write of one thread (idempotent; `204` on success, `400` when the entry does not expose `deleteThread()`). Scope `workflows:delete:<id>`. |
 | `POST` | `/v1/workflows/:id/fork` | **Not implemented** on the server surface yet: answers an honest `501`; fork the thread programmatically via the workflow API. Scope `workflows:execute:<id>`. |
 | `POST` | `/v1/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 
@@ -187,7 +189,7 @@ When you pass **both** a `consolidator` and a triggers scheduler to `createServe
 
 ## Idempotency
 
-Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute.
+Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute. Expired idempotency records (each stores the full response body) are swept from the database automatically on an hourly timer; the read path already refuses to replay them, so the sweep changes no replay semantics.
 
 ## Disconnects and reconnection
 

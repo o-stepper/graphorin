@@ -3,7 +3,12 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { checkFtsIntegrity, createSqliteStore, formatFtsIntegrityWarning } from '../src/index.js';
+import {
+  checkFtsIntegrity,
+  createSqliteStore,
+  formatFtsIntegrityWarning,
+  listCheckedFtsTables,
+} from '../src/index.js';
 
 /**
  * CS-10 - the FTS5 indexes key on the base table's implicit rowid, which a
@@ -80,5 +85,40 @@ describe('CS-10 - FTS↔rowid integrity guard', () => {
     await store2.init();
     expect(warnings).toEqual([]);
     await store2.close();
+  });
+});
+
+describe('W-113: rules_fts coverage + FTS_PAIRS completeness self-check', () => {
+  it('detects orphaned rules_fts rows', async () => {
+    const path = await freshPath();
+    const store = await createSqliteStore({ path, skipSqliteVec: true });
+    await store.init();
+    store.connection.run('INSERT INTO rules_fts (rowid, text) VALUES (?, ?)', [
+      222,
+      'ghost rule with no base row',
+    ]);
+    const reports = checkFtsIntegrity(store.connection);
+    const rules = reports.find((r) => r.table === 'rules_fts');
+    expect(rules?.orphanRows).toBe(1);
+    await store.close();
+  });
+
+  it('every %_fts table of a fully-migrated database is registered in FTS_PAIRS', async () => {
+    const path = await freshPath();
+    const store = await createSqliteStore({ path, skipSqliteVec: true });
+    await store.init();
+    // FTS5 creates shadow tables (`<name>_data`, `_idx`, `_content`,
+    // `_docsize`, `_config`) - only the virtual tables themselves count.
+    const virtualFts = store.connection
+      .all<{ name: string }>(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE '%\\_fts' ESCAPE '\\' AND sql LIKE '%fts5%'",
+      )
+      .map((r) => r.name)
+      .sort();
+    const covered = [...listCheckedFtsTables()].sort();
+    // A NEW *_fts table that is not in FTS_PAIRS fails here instead of
+    // silently escaping the CS-10 guard (how rules_fts was missed).
+    expect(virtualFts).toEqual(covered);
+    await store.close();
   });
 });

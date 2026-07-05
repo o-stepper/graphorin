@@ -21,6 +21,7 @@ import {
   type ImperativeScanResult as ScanResult,
   scanImperativePatterns,
 } from '@graphorin/observability/redaction';
+import { UNTRUSTED_CONTENT_OPEN_PREFIX, wrapUntrusted } from '../../internal/envelope.js';
 import type { ContextLocalePack } from '../locale-packs/index.js';
 import {
   type ContextTokenCounter,
@@ -53,7 +54,7 @@ import type {
 export const DEFAULT_PRESERVE_RECENT_TURNS = 6;
 
 /** Opening marker of the inbound-untrusted envelope (tools sanitize layer). */
-const UNTRUSTED_MARKER = '<<<untrusted_content';
+const UNTRUSTED_MARKER = UNTRUSTED_CONTENT_OPEN_PREFIX;
 
 /**
  * Wall-clock budget for the CE-15 injection scan of the summarizer
@@ -95,12 +96,13 @@ function windowContainsUntrusted(messages: ReadonlyArray<Message>): boolean {
  * envelope. Envelope marker sequences inside the body are neutralized
  * first so summarizer output influenced by injected text cannot break
  * out of the envelope and masquerade as authoritative system text.
+ * Delegates to the shared `internal/envelope.ts` helper (W-083) so the
+ * whole memory package neutralizes markers with one scheme; the
+ * output is byte-identical to the historical inline implementation on
+ * literal-marker inputs.
  */
 function wrapSummaryAsDerived(body: string): string {
-  const neutralized = body
-    .replaceAll('<<</untrusted_content>>>', '[[/untrusted_content]]')
-    .replaceAll(UNTRUSTED_MARKER, '[[untrusted_content');
-  return `<<<untrusted_content trust="derived" tool="compaction-summarizer">>>\n${neutralized}\n<<</untrusted_content>>>`;
+  return wrapUntrusted(body, { trust: 'derived', tool: 'compaction-summarizer' });
 }
 
 /**

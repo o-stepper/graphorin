@@ -359,11 +359,12 @@ describe('createSqliteStore', () => {
     expect(events.some((r) => r.event === 'SUPERSEDE')).toBe(true);
     expect(events.some((r) => r.event === 'PURGE')).toBe(true);
 
-    // Retention prune: rows older than the cutoff are deleted.
-    const memStore = store.memory as unknown as {
-      pruneHistory(olderThanMs: number): Promise<number>;
-    };
-    const pruned = await memStore.pruneHistory(0);
+    // Retention prune: rows older than the cutoff are deleted. The
+    // facade types `memory` as MemoryStoreExt (W-066) - no cast needed;
+    // the runtime probe guards against the untyped drift expectTypeOf
+    // cannot (tests/ are not tsc-gated).
+    expect(typeof store.memory.pruneHistory).toBe('function');
+    const pruned = await store.memory.pruneHistory(0);
     expect(pruned).toBeGreaterThan(0);
     const left = store.connection.get<{ n: number }>(
       "SELECT COUNT(*) AS n FROM memory_history WHERE memory_kind = 'fact'",

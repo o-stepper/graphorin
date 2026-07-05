@@ -59,6 +59,8 @@ export interface ServerWorkflowLike {
   resume?(threadId: string, directive?: { readonly resume?: unknown }): AsyncIterable<unknown>;
   getState?(threadId: string): Promise<unknown>;
   listCheckpoints?(threadId: string): Promise<ReadonlyArray<unknown>>;
+  /** W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`). */
+  deleteThread?(threadId: string): Promise<void>;
 }
 
 /**

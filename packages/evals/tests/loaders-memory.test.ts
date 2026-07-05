@@ -64,7 +64,7 @@ describe('loadLocomoDataset', () => {
   it('expands one sample into one case per QA pair with mapped abilities', async () => {
     const ds = await loadLocomoDataset({ path: join(FIXTURES, 'locomo.sample.json') });
     expect(ds.metadata?.name).toBe('locomo');
-    expect(ds.cases).toHaveLength(4);
+    expect(ds.cases).toHaveLength(5);
 
     const singleHop = ds.cases[0];
     expect(singleHop?.id).toBe('conv-1-q0');
@@ -77,6 +77,10 @@ describe('loadLocomoDataset', () => {
     expect(singleHop?.input.haystackSessions[0]?.turns[0]?.timestamp).toBe(
       '1:56 pm on 8 May, 2023',
     );
+    // W-022: the dataset-native speaker names ride on the turns of
+    // BOTH roles - most LOCOMO questions reference speakers by name.
+    expect(singleHop?.input.haystackSessions[0]?.turns[0]?.speaker).toBe('Caroline');
+    expect(singleHop?.input.haystackSessions[0]?.turns[1]?.speaker).toBe('Melanie');
     expect(singleHop?.metadata?.evidence).toEqual(['D1:1']);
 
     expect(ds.cases[1]?.input.ability).toBe('temporal');
@@ -85,6 +89,17 @@ describe('loadLocomoDataset', () => {
     expect(adversarial?.expected).toBe('Not mentioned in the conversation.');
     expect(adversarial?.metadata?.category).toBe(5);
     expect(ds.cases[3]?.input.ability).toBe('multi-session');
+  });
+
+  it('W-022: numeric answers are stringified; pairs with no answer are skipped', async () => {
+    const ds = await loadLocomoDataset({ path: join(FIXTURES, 'locomo.sample.json') });
+    // The numeric-answer pair (qa index 4) keeps its id and yields '2022'.
+    const numeric = ds.cases.find((c) => c.id === 'conv-1-q4');
+    expect(numeric?.expected).toBe('2022');
+    // The no-answer pair (qa index 5) is skipped entirely - the judge
+    // must never grade against an empty reference.
+    expect(ds.cases.some((c) => c.id === 'conv-1-q5')).toBe(false);
+    expect(ds.cases.every((c) => c.expected !== '')).toBe(true);
   });
 
   it('rejects non-array input', () => {

@@ -321,6 +321,17 @@ export interface AgentConfig<TDeps = unknown, TOutput = string> {
   readonly recordProviderResponses?: boolean;
   readonly tracer?: Tracer;
   readonly checkpointStore?: CheckpointStore;
+  /**
+   * What happens to the run's checkpoint thread when the run reaches a
+   * terminal status (W-005). `'keep'` (default) preserves the current
+   * behaviour: checkpoints survive for post-hoc debugging and
+   * process-restart resume. `'delete-on-terminal'` best-effort deletes
+   * the thread after `completed` / `failed` runs; `awaiting_approval`
+   * and `aborted` runs always keep theirs (the thread IS the resume
+   * state). Requires {@link AgentConfig.checkpointStore}.
+   * @default 'keep'
+   */
+  readonly checkpointPolicy?: 'keep' | 'delete-on-terminal';
   readonly sensitivity?: Sensitivity;
   /**
    * Agent-default capability restriction (D2). `'read-only'` builds a

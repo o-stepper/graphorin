@@ -10,8 +10,14 @@
  * @packageDocumentation
  */
 
-import type { MessageContent, ToolReturn, ZodLikeSchema } from '@graphorin/core';
+import type {
+  InboundSanitizationPolicy,
+  MessageContent,
+  ToolReturn,
+  ZodLikeSchema,
+} from '@graphorin/core';
 import { incrementCounter } from '@graphorin/tools/audit';
+import { applyInboundSanitization } from '@graphorin/tools/inbound';
 import { MCPToolExecutionError } from '../errors/index.js';
 import type { ServerIdentity } from '../transport/types.js';
 import type { MCPCallToolResult, MCPContentPart } from './types.js';
@@ -22,6 +28,14 @@ export interface AdaptCallResultArgs {
   readonly outputSchema?: ZodLikeSchema<unknown> | undefined;
   readonly serverIdentity: ServerIdentity;
   readonly toolName: string;
+  /**
+   * Effective per-server inbound-sanitization policy, applied to the
+   * `isError` text before it rides into `MCPToolExecutionError` (the
+   * executor never sanitizes the error path, so the trust-aware MCP
+   * boundary must). Defaults to the MCP-strict
+   * `'detect-and-strip-and-wrap'` when omitted.
+   */
+  readonly inboundSanitization?: InboundSanitizationPolicy;
   readonly logger?: (
     level: 'debug' | 'info' | 'warn' | 'error',
     message: string,
@@ -51,8 +65,34 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
       server: serverIdentity.id,
       tool: toolName,
     });
+    // W-017: the error text is mcp-derived and reaches the model as
+    // `ToolError.message` WITHOUT passing the executor's success-path
+    // sanitization (`describe(executeError)` never sanitizes - it
+    // cannot tell an untrusted MCP error apart from a trusted
+    // first-party one). The trust class IS known here, so sanitize at
+    // the source with the same policy the adapted tool declares:
+    // parity with the success path, including an operator's explicit
+    // `pass-through` override.
+    let message = errorText;
+    if (errorText.length > 0) {
+      const outcome = applyInboundSanitization({
+        body: errorText,
+        policy: args.inboundSanitization ?? 'detect-and-strip-and-wrap',
+        trustClass: 'mcp-derived',
+        toolName,
+        contentOrigin: `mcp:tool-error:${serverIdentity.id}`,
+        failClosed: false,
+      });
+      if (outcome.patternsHit.length > 0) {
+        incrementCounter('mcp.tool-error.injection-flagged.total', {
+          server: serverIdentity.id,
+          tool: toolName,
+        });
+      }
+      message = outcome.body;
+    }
     throw new MCPToolExecutionError(
-      errorText.length > 0 ? errorText : `MCP tool '${toolName}' reported an error result.`,
+      message.length > 0 ? message : `MCP tool '${toolName}' reported an error result.`,
       { metadata: { tool: toolName } },
     );
   }
