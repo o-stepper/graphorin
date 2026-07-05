@@ -134,6 +134,32 @@ export function ensureStoreAuditBinding(): void {
               entry.seq,
             );
           },
+          // W-011: cross-process fence. Raw BEGIN IMMEDIATE (not
+          // better-sqlite3's .transaction() - that helper rejects async
+          // functions, while this binding's methods are async-shaped
+          // with synchronous bodies; the in-process WRITE_CHAINS
+          // serialisation guarantees no foreign statement interleaves
+          // inside the transaction). ROLLBACK strictly in finally so an
+          // exception can never leave the handle wedged inside an open
+          // transaction.
+          async transact(fn) {
+            db.exec('BEGIN IMMEDIATE');
+            let committed = false;
+            try {
+              const result = await fn();
+              db.exec('COMMIT');
+              committed = true;
+              return result;
+            } finally {
+              if (!committed) {
+                try {
+                  db.exec('ROLLBACK');
+                } catch {
+                  // Already rolled back / connection unusable - nothing to release.
+                }
+              }
+            }
+          },
           async close() {
             if (db.open) db.close();
           },

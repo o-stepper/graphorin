@@ -108,6 +108,19 @@ export interface AuditDb {
    * and recompute the rolling chain hashes.
    */
   readonly replaceEntry: (entry: StoredAuditEntry) => Promise<void>;
+  /**
+   * OPTIONAL cross-process fence (W-011): run `fn` inside one write
+   * transaction on the underlying handle (`BEGIN IMMEDIATE` semantics -
+   * the write lock is held from entry to commit, and a failure rolls
+   * back). When present, `appendAudit` wraps its `latest()`+`insert()`
+   * read-modify-write in it so two PROCESSES sharing one audit file
+   * cannot both hash against the same tip, and `pruneAudit` runs its
+   * delete+rewrite atomically so a concurrent append never chains to a
+   * pre-prune tip. Additive: bindings without it keep compiling -
+   * `appendAudit` falls back to a bounded seq-conflict retry, and
+   * `pruneAudit` fails closed.
+   */
+  readonly transact?: <T>(fn: () => Promise<T>) => Promise<T>;
   /** Close the underlying handle. */
   readonly close: () => Promise<void>;
 }

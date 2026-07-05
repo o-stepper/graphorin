@@ -109,7 +109,7 @@ Also available: `computeAuditTreeHead`, `proveAuditInclusion` / `verifyAuditIncl
 
 `pruneAudit` re-roots the surviving suffix (every surviving entry's `prevHash`/`hash` is recomputed), and the RFC-6962 leaves hash the canonical JSON of each entry INCLUDING those fields - so **verification against any checkpoint signed before the prune MUST fail afterwards, by design**. A legitimate retention prune is cryptographically indistinguishable from the truncate-and-re-root attack this layer exists to detect; only the operator's out-of-band procedure tells them apart. Run every retention prune as one atomic ceremony:
 
-1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`).
+1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`). The delete + suffix re-hash executes inside ONE write transaction (W-011): the write lock is held for the whole rewrite, so live appends wait (`busy_timeout`) and then chain to the post-prune tip - schedule prunes of very large chains in a maintenance window. On a custom audit-db binding without the `transact` fence the prune refuses to run (fail closed) rather than risk a permanent chain break.
 2. Immediately sign a FRESH checkpoint of the new head: `signAuditCheckpoint(auditDb, { privateKeyPem, writerId })`.
 3. Distribute the new checkpoint to every out-of-band anchor location (other host, object store, ticket).
 4. Revoke or explicitly mark superseded every pre-prune checkpoint, recording the prune timestamp next to them - a later `verifyAuditAgainstCheckpoint` failure against one of them must read as "expected: pre-prune anchor", not as an alarm.

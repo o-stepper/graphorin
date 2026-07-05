@@ -50,10 +50,25 @@ export function createMemoryAuditDb(): AuditDb {
       if (idx === -1) return;
       rows[idx] = Object.freeze({ ...entry });
     },
+    // W-011: single-threaded in-memory fake - a passthrough transact is
+    // an honest fence here (no cross-process writers can exist).
+    async transact(fn) {
+      return fn();
+    },
     async close() {
       rows.length = 0;
     },
   };
+}
+
+/**
+ * W-011 negative fixture: an AuditDb WITHOUT the optional transact
+ * fence - the shape a legacy third-party binding presents.
+ */
+export function createMemoryAuditDbWithoutTransact(): AuditDb {
+  const { transact: _dropped, ...db } = createMemoryAuditDb();
+  void _dropped;
+  return db;
 }
 
 /** Minimal binding that produces a memory audit-db for registry tests. */
