@@ -18,6 +18,18 @@ const UNTRUSTED_TRUST_CLASSES: ReadonlySet<ToolTrustClass> = new Set<ToolTrustCl
 ]);
 
 /**
+ * Whether a tool trust class is an UNTRUSTED-content source (W-101).
+ * The single definition shared by the taint engine
+ * ({@link deriveTaintLabel}) and the Rule-of-Two `untrustedInput` leg -
+ * the two layers must never disagree about what "untrusted" means.
+ *
+ * @stable
+ */
+export function isUntrustedTrustClass(trustClass: ToolTrustClass): boolean {
+  return UNTRUSTED_TRUST_CLASSES.has(trustClass);
+}
+
+/**
  * Derive the provenance label for a tool's output from its resolved
  * trust class, source, and declared sensitivity.
  *

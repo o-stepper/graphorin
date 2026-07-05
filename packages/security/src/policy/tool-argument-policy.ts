@@ -35,6 +35,15 @@ export interface ToolCallFacts {
   readonly sideEffectClass: PolicySideEffectClass;
   /** `true` when the tool reads/handles sensitive data (e.g. `sensitivity: 'secret'`). */
   readonly sensitive?: boolean;
+  /**
+   * `true` when the tool is an untrusted-content SOURCE (W-101) - its
+   * trust class is one the taint engine treats as injection-bearing
+   * (mcp-derived / web-search / skill-untrusted; see
+   * `isUntrustedTrustClass` in `@graphorin/security/dataflow`). Powers
+   * the Rule-of-Two `untrustedInput` leg. The engine stays pure: the
+   * caller derives this from the tool's metadata.
+   */
+  readonly untrustedSource?: boolean;
   /** The validated arguments (post-schema, post-repair). */
   readonly args?: unknown;
 }
@@ -166,6 +175,22 @@ export function buildRuleOfTwoPolicy(profile: RuleOfTwoProfile): RuleOfTwoCompil
       when: (f) =>
         f.sideEffectClass === 'side-effecting' || f.sideEffectClass === 'external-stateful',
       reason: 'Rule-of-Two profile denies external side effects (writer tools blocked)',
+    });
+  }
+  // W-101: the untrustedInput leg was previously bookkeeping-only
+  // (heldLegs / holdsFullTrifecta) with NO enforcement point - a profile
+  // giving up this leg still had every web-search/MCP tool callable
+  // while both remaining legs were live: exactly the configuration the
+  // preset promises to prevent. Denying the leg now forbids calling
+  // untrusted-SOURCE tools (deterministic, by trust-class metadata -
+  // the same taxonomy the taint engine uses). Untrusted content
+  // arriving in user MESSAGES is out of this rule's scope.
+  if (!profile.untrustedInput) {
+    rules.push({
+      effect: 'forbid',
+      tool: '*',
+      when: (f) => f.untrustedSource === true,
+      reason: 'Rule-of-Two profile denies untrusted input (untrusted-source tools blocked)',
     });
   }
 
