@@ -10,7 +10,7 @@ CI exercises the harness against a deterministic stub provider - no API keys, no
 
 ## Prerequisites
 
-- **Node.js 22+** (the workspace pins `>=22.0.0`).
+- **Node.js 22.12+** (the workspace pins `>=22.12.0`).
 - **pnpm 10.28+** (`corepack enable && corepack prepare pnpm@10.28.2 --activate`).
 - **Optional** - a local [Ollama](https://ollama.com/) daemon listening on `http://127.0.0.1:11434` if you want the `recipe: 'ollama'` swap-in.
 

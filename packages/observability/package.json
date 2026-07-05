@@ -33,7 +33,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -41,55 +41,55 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./tracer": {
       "types": "./dist/tracer/index.d.ts",
-      "import": "./dist/tracer/index.js"
+      "default": "./dist/tracer/index.js"
     },
     "./redaction": {
       "types": "./dist/redaction/index.d.ts",
-      "import": "./dist/redaction/index.js"
+      "default": "./dist/redaction/index.js"
     },
     "./redaction/patterns": {
       "types": "./dist/redaction/patterns.d.ts",
-      "import": "./dist/redaction/patterns.js"
+      "default": "./dist/redaction/patterns.js"
     },
     "./redaction/imperative-patterns": {
       "types": "./dist/redaction/imperative-patterns.d.ts",
-      "import": "./dist/redaction/imperative-patterns.js"
+      "default": "./dist/redaction/imperative-patterns.js"
     },
     "./exporters": {
       "types": "./dist/exporters/index.d.ts",
-      "import": "./dist/exporters/index.js"
+      "default": "./dist/exporters/index.js"
     },
     "./gen-ai": {
       "types": "./dist/gen-ai/index.d.ts",
-      "import": "./dist/gen-ai/index.js"
+      "default": "./dist/gen-ai/index.js"
     },
     "./openinference": {
       "types": "./dist/openinference/index.d.ts",
-      "import": "./dist/openinference/index.js"
+      "default": "./dist/openinference/index.js"
     },
     "./cost": {
       "types": "./dist/cost/index.d.ts",
-      "import": "./dist/cost/index.js"
+      "default": "./dist/cost/index.js"
     },
     "./replay": {
       "types": "./dist/replay/index.d.ts",
-      "import": "./dist/replay/index.js"
+      "default": "./dist/replay/index.js"
     },
     "./eval": {
       "types": "./dist/eval/index.d.ts",
-      "import": "./dist/eval/index.js"
+      "default": "./dist/eval/index.js"
     },
     "./logger": {
       "types": "./dist/logger/index.d.ts",
-      "import": "./dist/logger/index.js"
+      "default": "./dist/logger/index.js"
     },
     "./telemetry": {
       "types": "./dist/telemetry/index.d.ts",
-      "import": "./dist/telemetry/index.js"
+      "default": "./dist/telemetry/index.js"
     },
     "./package.json": "./package.json"
   },

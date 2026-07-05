@@ -27,7 +27,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -36,23 +36,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./client": {
       "types": "./dist/graphorin-client.d.ts",
-      "import": "./dist/graphorin-client.js"
+      "default": "./dist/graphorin-client.js"
     },
     "./transport": {
       "types": "./dist/transport/index.d.ts",
-      "import": "./dist/transport/index.js"
+      "default": "./dist/transport/index.js"
     },
     "./reconnect": {
       "types": "./dist/reconnect.d.ts",
-      "import": "./dist/reconnect.js"
+      "default": "./dist/reconnect.js"
     },
     "./errors": {
       "types": "./dist/errors.d.ts",
-      "import": "./dist/errors.js"
+      "default": "./dist/errors.js"
     },
     "./package.json": "./package.json"
   },

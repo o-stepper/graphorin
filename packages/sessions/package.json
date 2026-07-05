@@ -33,7 +33,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -41,39 +41,39 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./facade": {
       "types": "./dist/facade.d.ts",
-      "import": "./dist/facade.js"
+      "default": "./dist/facade.js"
     },
     "./agent-registry": {
       "types": "./dist/agent-registry.d.ts",
-      "import": "./dist/agent-registry.js"
+      "default": "./dist/agent-registry.js"
     },
     "./commentary": {
       "types": "./dist/commentary/index.d.ts",
-      "import": "./dist/commentary/index.js"
+      "default": "./dist/commentary/index.js"
     },
     "./export": {
       "types": "./dist/export/index.d.ts",
-      "import": "./dist/export/index.js"
+      "default": "./dist/export/index.js"
     },
     "./replay": {
       "types": "./dist/replay/index.d.ts",
-      "import": "./dist/replay/index.js"
+      "default": "./dist/replay/index.js"
     },
     "./cassette": {
       "types": "./dist/cassette/index.d.ts",
-      "import": "./dist/cassette/index.js"
+      "default": "./dist/cassette/index.js"
     },
     "./migrations": {
       "types": "./dist/migrations/index.d.ts",
-      "import": "./dist/migrations/index.js"
+      "default": "./dist/migrations/index.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
-      "import": "./dist/errors/index.js"
+      "default": "./dist/errors/index.js"
     },
     "./package.json": "./package.json"
   },

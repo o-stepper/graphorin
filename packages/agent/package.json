@@ -34,7 +34,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -42,47 +42,47 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./factory": {
       "types": "./dist/factory.d.ts",
-      "import": "./dist/factory.js"
+      "default": "./dist/factory.js"
     },
     "./run-state": {
       "types": "./dist/run-state/index.d.ts",
-      "import": "./dist/run-state/index.js"
+      "default": "./dist/run-state/index.js"
     },
     "./filters": {
       "types": "./dist/filters/index.d.ts",
-      "import": "./dist/filters/index.js"
+      "default": "./dist/filters/index.js"
     },
     "./fallback": {
       "types": "./dist/fallback/index.d.ts",
-      "import": "./dist/fallback/index.js"
+      "default": "./dist/fallback/index.js"
     },
     "./preferred-model": {
       "types": "./dist/preferred-model/index.d.ts",
-      "import": "./dist/preferred-model/index.js"
+      "default": "./dist/preferred-model/index.js"
     },
     "./fanout": {
       "types": "./dist/fanout/index.d.ts",
-      "import": "./dist/fanout/index.js"
+      "default": "./dist/fanout/index.js"
     },
     "./evaluator-optimizer": {
       "types": "./dist/evaluator-optimizer/index.d.ts",
-      "import": "./dist/evaluator-optimizer/index.js"
+      "default": "./dist/evaluator-optimizer/index.js"
     },
     "./progress": {
       "types": "./dist/progress/index.d.ts",
-      "import": "./dist/progress/index.js"
+      "default": "./dist/progress/index.js"
     },
     "./lateral-leak": {
       "types": "./dist/lateral-leak/index.d.ts",
-      "import": "./dist/lateral-leak/index.js"
+      "default": "./dist/lateral-leak/index.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
-      "import": "./dist/errors/index.js"
+      "default": "./dist/errors/index.js"
     },
     "./package.json": "./package.json"
   },

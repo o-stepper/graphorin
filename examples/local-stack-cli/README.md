@@ -8,7 +8,7 @@ This example is the narrowest end-to-end **graphorin** assistant. It ships a sin
 
 ## Prerequisites
 
-- **Node.js 22+** (the workspace pins `>=22.0.0`).
+- **Node.js 22.12+** (the workspace pins `>=22.12.0`).
 - **pnpm 10.28+** (`corepack enable && corepack prepare pnpm@10.28.2 --activate`).
 - **[Ollama](https://ollama.com/)** daemon listening on `http://127.0.0.1:11434`. Start it once with `ollama serve` (or let the official installer launch the menu-bar service).
 

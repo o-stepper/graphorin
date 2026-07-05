@@ -36,7 +36,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -44,35 +44,35 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./facade": {
       "types": "./dist/facade.d.ts",
-      "import": "./dist/facade.js"
+      "default": "./dist/facade.js"
     },
     "./tiers": {
       "types": "./dist/tiers/index.d.ts",
-      "import": "./dist/tiers/index.js"
+      "default": "./dist/tiers/index.js"
     },
     "./tools": {
       "types": "./dist/tools/index.d.ts",
-      "import": "./dist/tools/index.js"
+      "default": "./dist/tools/index.js"
     },
     "./search": {
       "types": "./dist/search/index.d.ts",
-      "import": "./dist/search/index.js"
+      "default": "./dist/search/index.js"
     },
     "./conflict": {
       "types": "./dist/conflict/index.d.ts",
-      "import": "./dist/conflict/index.js"
+      "default": "./dist/conflict/index.js"
     },
     "./migration": {
       "types": "./dist/migration/index.d.ts",
-      "import": "./dist/migration/index.js"
+      "default": "./dist/migration/index.js"
     },
     "./errors": {
       "types": "./dist/errors/index.d.ts",
-      "import": "./dist/errors/index.js"
+      "default": "./dist/errors/index.js"
     },
     "./package.json": "./package.json"
   },

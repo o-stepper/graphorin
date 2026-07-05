@@ -136,11 +136,19 @@ for (const pkg of packages) {
     execFileSync(publintBin, [tarball, '--strict'], { stdio: 'pipe', encoding: 'utf8' });
   });
   leg(`attw:${pkg.name}`, () => {
-    // `--profile esm-only` gates what the packages currently CLAIM
-    // (import-only export maps). The require() condition is W-072,
-    // scheduled next wave - once it lands, tighten this to
-    // `--profile node16` so CJS resolution is gated too.
-    execFileSync(attwBin, ['--profile', 'esm-only', tarball], { stdio: 'pipe', encoding: 'utf8' });
+    // W-072: the export maps now end in a `default` condition, so CJS
+    // consumers resolve too (require(esm), Node >= 22.12) - gate the
+    // full node16 matrix instead of the old esm-only claim.
+    // `cjs-resolves-to-esm` is ignored BY DESIGN: attw's model predates
+    // stable require(esm) and flags exactly the state we ship (a
+    // require() that resolves to an ESM file). The runtime
+    // `require-esm-smoke` leg below proves the real behaviour instead.
+    // Tarball FIRST: --ignore-rules is variadic and would swallow it.
+    execFileSync(
+      attwBin,
+      [tarball, '--profile', 'node16', '--ignore-rules', 'cjs-resolves-to-esm'],
+      { stdio: 'pipe', encoding: 'utf8' },
+    );
   });
 }
 
@@ -220,6 +228,25 @@ leg('consumer-install', () => {
   // typescript + the zod-3 baseline ride along in the same call.
   specs.push('typescript@~5.9.0', 'zod@^3.25.0');
   npmInstall(consumerDir, specs, 'consumer-install');
+});
+
+// W-072: the `default` exports condition makes the packages consumable
+// from CommonJS via require(esm) on Node >= 22.12. Smoke it for real -
+// a runtime require of the installed tarball, not a type-level claim.
+leg('require-esm-smoke', () => {
+  const cjsFile = join(consumerDir, 'require-smoke.cjs');
+  writeFileSync(
+    cjsFile,
+    [
+      "const core = require('@graphorin/core');",
+      "if (typeof core.validate !== 'function') throw new Error('require(@graphorin/core) missing validate');",
+      "const tools = require('@graphorin/tools');",
+      "if (typeof tools.tool !== 'function') throw new Error('require(@graphorin/tools) missing tool');",
+      "console.log('require-esm ok');",
+      '',
+    ].join('\n'),
+  );
+  execFileSync(process.execPath, [cjsFile], { cwd: consumerDir, stdio: 'pipe', encoding: 'utf8' });
 });
 
 // ------------------------------------------------------------- tsc matrix

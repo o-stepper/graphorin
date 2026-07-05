@@ -8,7 +8,7 @@ The example is the smallest end-to-end illustration of the consolidator daemon: 
 
 ## Prerequisites
 
-- **Node.js 22+** (the workspace pins `>=22.0.0`).
+- **Node.js 22.12+** (the workspace pins `>=22.12.0`).
 - **pnpm 10.28+** (`corepack enable && corepack prepare pnpm@10.28.2 --activate`).
 - No external services required. The example ships a deterministic stub `Provider` so smoke coverage runs hermetically; swap in any `Provider` (Ollama, llama.cpp, …) by passing `providerOverride`.
 

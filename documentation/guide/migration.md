@@ -52,6 +52,25 @@ After upgrading:
   `pnpm up "@graphorin/*@latest"`. Mixed versions across the scope are not
   supported.
 
+### 0.7.x -> next (wave-2 remediation train)
+
+- **Node floor is now 22.12** (`engines.node: '>=22.12.0'`, previously
+  `>=22.0.0`): the packages' export maps switched from an `import`-only
+  condition to `default`, so CommonJS consumers can plain `require()`
+  them - stable `require(esm)` needs Node 22.12. Installs on Node
+  22.0-22.11 with `engine-strict` will refuse; upgrade Node. There is no
+  dual-instance hazard (no CJS build exists - `require()` returns the
+  same ESM instance).
+- **zod ^4 consumers now typecheck** against `@graphorin/core`,
+  `@graphorin/tools`, `@graphorin/memory` and `@graphorin/mcp` at
+  `skipLibCheck: false`. Type-level note: `ZodLikeError.issues[].path`
+  widened from `string | number` to `PropertyKey` elements.
+- See the release changelog for the rest of the wave-2 breaking notes
+  (transport-derived MCP identity re-pins TOFU records, `graphorin init`
+  no longer prints a bootstrap token, session hard-delete now erases
+  session-scoped memory and checkpoints, `SpanType`/`ProviderEvent`
+  unions gained variants).
+
 ### 0.5.x -> 0.6.0
 
 - **Durable HITL resume is exactly-once.** With a `checkpointStore` wired, an

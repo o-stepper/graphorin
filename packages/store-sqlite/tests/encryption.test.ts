@@ -150,7 +150,6 @@ describe('encryption hooks', () => {
     const pragmas: string[] = [];
     class FakeDriver {
       open = true;
-      constructor(_path: string) {}
       pragma(stmt: string): unknown {
         pragmas.push(stmt);
         return [];
@@ -182,7 +181,6 @@ describe('encryption hooks', () => {
     const pragmas: string[] = [];
     class FakeDriver {
       open = true;
-      constructor(_path: string) {}
       pragma(stmt: string): unknown {
         pragmas.push(stmt);
         return [];

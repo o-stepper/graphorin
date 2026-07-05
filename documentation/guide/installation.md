@@ -13,7 +13,7 @@ The `@graphorin/*` packages are published on the npm registry since `v0.6.0`. Wa
 
 ## Prerequisites
 
-- **Node.js 22.x LTS or newer** (the project pins `>=22.0.0`).
+- **Node.js 22.12 or newer** (the project pins `>=22.12.0` - the first line where `require(esm)` is stable, so the packages are ESM-first but consumable from CommonJS via plain `require()`).
 - A package manager - **pnpm** is the project default; **npm** and **yarn** work too for consumers of the published packages.
 - ESM-only modules. Your project must be `"type": "module"` (or use `.mjs` files) - Graphorin ships ESM.
 

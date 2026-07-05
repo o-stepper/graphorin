@@ -178,8 +178,10 @@ async function workspaceAudit({ checkExports } = { checkExports: true }) {
       fail('publishConfig.access', 'public', manifest.publishConfig?.access);
     // E2: exact-match instead of the old `.includes('22')` substring test,
     // which would have accepted e.g. `^0.22.0`.
-    if (manifest.engines?.node !== '>=22.0.0')
-      fail('engines.node', '>=22.0.0', manifest.engines?.node);
+    // W-072: floor raised to 22.12 - the first line where require(esm)
+    // is stable, required by the `default` exports condition.
+    if (manifest.engines?.node !== '>=22.12.0')
+      fail('engines.node', '>=22.12.0', manifest.engines?.node);
     if (manifest.repository?.directory !== `packages/${entry.name}`)
       fail('repository.directory', `packages/${entry.name}`, manifest.repository?.directory);
     if (
@@ -234,6 +236,44 @@ async function workspaceAudit({ checkExports } = { checkExports: true }) {
             message: `target ${JSON.stringify(target)} does not resolve to a file`,
           });
         }
+      }
+    }
+  }
+  // W-072: the Node floor must not drift by repository region - sweep
+  // EVERY workspace manifest (root, examples, benchmarks, docs), not
+  // just packages/. Private manifests skip the publish checks above but
+  // still pin the same engines floor.
+  const extraManifestGroups = [
+    ['', ['package.json']],
+    ['examples', null],
+    ['benchmarks', null],
+    ['documentation', ['documentation/package.json']],
+  ];
+  for (const [group, fixed] of extraManifestGroups) {
+    let manifestPaths = fixed;
+    if (manifestPaths === null) {
+      try {
+        const groupEntries = await readdir(join(ROOT, group), { withFileTypes: true });
+        manifestPaths = groupEntries
+          .filter((e) => e.isDirectory())
+          .map((e) => `${group}/${e.name}/package.json`);
+      } catch {
+        manifestPaths = [];
+      }
+    }
+    for (const rel of manifestPaths) {
+      let manifest;
+      try {
+        manifest = JSON.parse(await readFile(join(ROOT, rel), 'utf8'));
+      } catch {
+        continue; // group member without a manifest
+      }
+      if (manifest.engines?.node !== '>=22.12.0') {
+        violations.push({
+          pkg: manifest.name ?? rel,
+          field: 'engines.node',
+          message: `expected ">=22.12.0", got ${JSON.stringify(manifest.engines?.node)} (${rel})`,
+        });
       }
     }
   }

@@ -27,7 +27,7 @@
   ],
   "type": "module",
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.12.0"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -36,23 +36,23 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "default": "./dist/index.js"
     },
     "./client-message": {
       "types": "./dist/client-message.d.ts",
-      "import": "./dist/client-message.js"
+      "default": "./dist/client-message.js"
     },
     "./server-message": {
       "types": "./dist/server-message.d.ts",
-      "import": "./dist/server-message.js"
+      "default": "./dist/server-message.js"
     },
     "./subprotocol": {
       "types": "./dist/subprotocol.d.ts",
-      "import": "./dist/subprotocol.js"
+      "default": "./dist/subprotocol.js"
     },
     "./close-codes": {
       "types": "./dist/close-codes.d.ts",
-      "import": "./dist/close-codes.js"
+      "default": "./dist/close-codes.js"
     },
     "./package.json": "./package.json"
   },
