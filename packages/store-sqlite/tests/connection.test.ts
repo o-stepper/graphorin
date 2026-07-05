@@ -6,6 +6,7 @@ import {
   openConnection,
   readPragma,
   readWalSize,
+  SqliteBusyError,
   WAL_HARDENING_PRAGMAS,
   WalCheckpointManager,
 } from '../src/connection.js';
@@ -94,5 +95,111 @@ describe('openConnection', () => {
     const sep = process.platform === 'win32' ? '\\\\' : '/';
     expect(conn.path).toMatch(new RegExp(`deep${sep}nested${sep}dirs${sep}db\\.sqlite$`));
     conn.close();
+  });
+});
+
+describe('W-067: SqliteBusyError + busyTimeoutMs', () => {
+  /** Stub driver whose statements throw a raw driver busy error. */
+  function busyStubDriver(code: 'SQLITE_BUSY' | 'SQLITE_BUSY_SNAPSHOT') {
+    const busy = () => {
+      const err = new Error('database is locked') as Error & { code: string };
+      err.code = code;
+      throw err;
+    };
+    class StubDb {
+      open = true;
+      pragma(): unknown {
+        return undefined;
+      }
+      exec(): void {
+        busy();
+      }
+      prepare(): unknown {
+        return {
+          run: busy,
+          get: busy,
+          all: busy,
+        };
+      }
+      transaction(fn: () => unknown): { immediate: () => unknown } {
+        return {
+          immediate: () => {
+            busy();
+            return fn();
+          },
+        };
+      }
+      close(): void {
+        this.open = false;
+      }
+    }
+    return StubDb as never;
+  }
+
+  it('maps raw driver SQLITE_BUSY from run/get/all/exec/transaction to SqliteBusyError with cause', async () => {
+    for (const code of ['SQLITE_BUSY', 'SQLITE_BUSY_SNAPSHOT'] as const) {
+      const conn = await openConnection({
+        path: ':memory:',
+        skipSqliteVec: true,
+        driver: busyStubDriver(code),
+      });
+      const ops: Array<() => unknown> = [
+        () => conn.run('INSERT INTO t VALUES (1)'),
+        () => conn.get('SELECT 1'),
+        () => conn.all('SELECT 1'),
+        () => conn.exec('SELECT 1'),
+        () => conn.transaction(() => 1),
+      ];
+      for (const op of ops) {
+        let caught: unknown;
+        try {
+          op();
+        } catch (err) {
+          caught = err;
+        }
+        expect(caught).toBeInstanceOf(SqliteBusyError);
+        const busy = caught as SqliteBusyError;
+        expect(busy.code).toBe('SQLITE_BUSY');
+        expect(busy.kind).toBe('sqlite-busy');
+        expect(busy.message).toContain('another process holds the write lock');
+        expect((busy.cause as { code?: string }).code).toBe(code);
+      }
+    }
+  });
+
+  it('busyTimeoutMs overrides the hardening default on file-backed DBs', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-busy-'));
+    const conn = await openConnection({
+      path: `${dir}/busy.db`,
+      skipSqliteVec: true,
+      busyTimeoutMs: 1234,
+    });
+    expect(readPragma(conn, 'busy_timeout')).toBe(1234);
+    conn.close();
+  });
+
+  it('a real contended write fails fast with SqliteBusyError under a tiny busyTimeoutMs', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-contend-'));
+    const path = `${dir}/contend.db`;
+    const writer = await openConnection({ path, skipSqliteVec: true });
+    writer.exec('CREATE TABLE t (id INTEGER)');
+    const reader = await openConnection({ path, skipSqliteVec: true, busyTimeoutMs: 50 });
+    // Hold the write lock from the first connection...
+    writer.exec('BEGIN IMMEDIATE');
+    writer.run('INSERT INTO t VALUES (1)');
+    const started = Date.now();
+    let caught: unknown;
+    try {
+      // ...and contend from the second.
+      reader.run('INSERT INTO t VALUES (2)');
+    } catch (err) {
+      caught = err;
+    } finally {
+      writer.exec('COMMIT');
+    }
+    expect(caught).toBeInstanceOf(SqliteBusyError);
+    expect(Date.now() - started).toBeLessThan(1_000);
+    writer.close();
+    reader.close();
   });
 });

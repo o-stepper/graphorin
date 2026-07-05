@@ -48,6 +48,7 @@ import {
   openConnection,
   readPragma,
   readWalSize,
+  SqliteBusyError,
   type SqliteConnection,
   type SqliteVecMissingError,
   WAL_HARDENING_PRAGMAS,
@@ -150,6 +151,11 @@ export interface CreateSqliteStoreOptions {
   /** If `true`, skip the WAL hardening pragmas (only for `:memory:`). */
   readonly disableWalHardening?: boolean;
   /**
+   * W-067: busy-handler wait for a contended write lock before the
+   * operation fails with `SqliteBusyError`. Default `5000`.
+   */
+  readonly busyTimeoutMs?: number;
+  /**
    * Sink for non-fatal startup warnings - currently the CS-10 FTS↔rowid
    * integrity check. Defaults to `console.warn`.
    */
@@ -216,6 +222,7 @@ export async function createSqliteStore(
       ? { disableWalHardening: options.disableWalHardening }
       : {}),
     ...(options.cipherLoader !== undefined ? { cipherLoader: options.cipherLoader } : {}),
+    ...(options.busyTimeoutMs !== undefined ? { busyTimeoutMs: options.busyTimeoutMs } : {}),
   });
 
   let initialized = false;
@@ -350,6 +357,7 @@ export {
   runMigrations,
   SPAN_SESSION_ATTRIBUTE,
   SqliteAuthTokenStore,
+  SqliteBusyError,
   SqliteCheckpointStore,
   SqliteConflictStore,
   SqliteConsolidatorStateStore,

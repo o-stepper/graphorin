@@ -1,0 +1,5 @@
+---
+'@graphorin/store-sqlite': minor
+---
+
+Typed lock contention (W-067): raw driver `SQLITE_BUSY` / `SQLITE_BUSY_SNAPSHOT` errors from the connection adapter's `run`/`get`/`all`/`exec`/`execMany`/`transaction` now surface as the new `SqliteBusyError` - stable `name`, `code: 'SQLITE_BUSY'` (compatible with callers branching on the driver's `err.code`), `kind: 'sqlite-busy'`, the driver error as `cause`, and a message that actually says what happened: another process holds the write lock (a running server next to a CLI command), the busy handler already waited `busy_timeout`. `prepare()` stays the documented raw escape hatch. The timeout is now configurable: `OpenConnectionOptions.busyTimeoutMs` / `CreateSqliteStoreOptions.busyTimeoutMs` (default 5000, applied after the hardening pragmas - the exported `WAL_HARDENING_PRAGMAS` constant is unchanged, and the override also applies on the `disableWalHardening` branch). No auto-retry by design. The CLI's top-level error path prints the explanatory message instead of a bare "database is locked".
