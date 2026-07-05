@@ -161,6 +161,15 @@ graphorin telemetry inspect           # dump the resolved exporter + redaction c
 
 `status` prints the effective tracing configuration: exporters, redaction patterns, sensitivity allowlists, and the resolved `gen_ai.system` mappings. Honours the same `withValidation(...)` requirement as runtime - there is no way to disable redaction from the CLI.
 
+## `graphorin traces`
+
+```bash
+graphorin traces status                         # span count + time range
+graphorin traces prune --before 2026-06-01      # delete spans that FINISHED before the cutoff
+```
+
+Both operate on the `spans` table written by the SQLite span exporter (the same table that backs `session.replay()` and `graphorin memory why`). `status` reports the row count and the ISO time range of recorded span starts. `prune` deletes spans whose END time is strictly before `--before` (ISO date or epoch milliseconds; the ns conversion happens internally) - including spans not attached to any session, whose only deletion path is age. Session-scoped spans are also removed by the session hard-delete cascade. Put `traces prune` in cron to bound trace growth.
+
 ## Privacy
 
 The CLI never phones home. The only outbound calls happen on commands that explicitly initiate a network operation (`graphorin pricing refresh`, `graphorin auth login`, `graphorin skills install npm:<name>`). Each one is documented in `--help` and audited.

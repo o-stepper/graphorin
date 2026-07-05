@@ -1101,9 +1101,9 @@ function registerSkillsCommands(program: Command): void {
 }
 
 function registerTracesCommands(program: Command): void {
-  const t = program.command('traces').description('[Diagnostics] Operate on the trace cache.');
+  const t = program.command('traces').description('[Diagnostics] Operate on persisted spans.');
   t.command('status')
-    .description('Count rows + report TTL config.')
+    .description('Count persisted spans + report their time range.')
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (opts: { config?: string; json?: boolean }) => {
@@ -1113,8 +1113,11 @@ function registerTracesCommands(program: Command): void {
       });
     });
   t.command('prune')
-    .description('Manual TTL enforcement (cutoff is required).')
-    .requiredOption('--before <date>', 'ISO date / epoch ms cutoff.')
+    .description('Delete spans that FINISHED before the cutoff (cutoff is required).')
+    .requiredOption(
+      '--before <date>',
+      'ISO date / epoch ms cutoff (spans ending strictly before it are deleted).',
+    )
     .option('-c, --config <path>', 'Path to the graphorin.config file.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action(async (opts: { before: string; config?: string; json?: boolean }) => {
