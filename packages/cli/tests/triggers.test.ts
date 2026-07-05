@@ -2,6 +2,7 @@ import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { createSqliteStore } from '@graphorin/store-sqlite';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -27,8 +28,17 @@ async function fixture(): Promise<string> {
 }
 
 describe('graphorin triggers', () => {
-  it('list reports an empty registry on a fresh DB', async () => {
+  it('list reports an empty registry on a fresh (migrated) DB', async () => {
     const cfg = await fixture();
+    // W-068: `triggers list` runs with migrationPolicy 'check' and never
+    // migrates - initialize the schema the way a deployment would.
+    {
+      const dbPath = JSON.parse(await (await import('node:fs/promises')).readFile(cfg, 'utf8'))
+        .storage.path as string;
+      const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+      await store.init();
+      await store.close();
+    }
     const lines: string[] = [];
     const list = await runTriggersList({ config: cfg, print: (l) => lines.push(l) });
     expect(list).toEqual([]);

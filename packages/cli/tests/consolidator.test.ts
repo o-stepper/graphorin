@@ -28,8 +28,17 @@ async function fixture(): Promise<string> {
 }
 
 describe('graphorin consolidator', () => {
-  it('status returns zeroed counters on a fresh DB', async () => {
+  it('status returns zeroed counters on a fresh (migrated) DB', async () => {
     const cfg = await fixture();
+    // W-068: `consolidator status` runs with migrationPolicy 'check' and
+    // never migrates - initialize the schema first.
+    {
+      const dbPath = JSON.parse(await (await import('node:fs/promises')).readFile(cfg, 'utf8'))
+        .storage.path as string;
+      const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+      await store.init();
+      await store.close();
+    }
     const out = await runConsolidatorStatus({ config: cfg, print: () => undefined });
     expect(out.recentRuns).toBe(0);
     expect(out.dlqSize).toBe(0);

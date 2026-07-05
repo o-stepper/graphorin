@@ -42,6 +42,8 @@ export async function runTriggersList(
   options: TriggersCommonOptions = {},
 ): Promise<ReadonlyArray<TriggerState>> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {

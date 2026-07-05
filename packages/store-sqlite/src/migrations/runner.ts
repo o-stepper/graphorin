@@ -44,13 +44,30 @@ export function runMigrations(conn: SqliteConnection): readonly AppliedMigration
   for (const m of pending) {
     const checksum = computeChecksum(m.sql);
     const appliedAt = Date.now();
+    let skipped = false;
     conn.transaction(() => {
+      // W-068 TOCTOU fence: the applied-set above was read OUTSIDE any
+      // transaction, so a second process racing this one may have
+      // applied the migration in between. The IMMEDIATE transaction
+      // (conn.transaction) holds the write lock, so re-checking here is
+      // authoritative: the loser of the race turns into a no-op instead
+      // of crashing on a non-idempotent statement ("duplicate column
+      // name" from an ALTER TABLE).
+      const already = conn.get<{ version: string }>(
+        'SELECT version FROM schema_migrations WHERE version = ?',
+        [m.version],
+      );
+      if (already !== undefined) {
+        skipped = true;
+        return;
+      }
       conn.execMany(m.sql);
       conn.run(
         'INSERT INTO schema_migrations (version, name, applied_at, checksum) VALUES (?, ?, ?, ?)',
         [m.version, m.name, appliedAt, checksum],
       );
     });
+    if (skipped) continue;
     newlyApplied.push({
       version: m.version,
       name: m.name,
@@ -60,6 +77,24 @@ export function runMigrations(conn: SqliteConnection): readonly AppliedMigration
   }
 
   return newlyApplied;
+}
+
+/**
+ * The migrations bundled with this build that are NOT recorded as
+ * applied in the supplied database (W-068). Read-only: when the
+ * `schema_migrations` table does not exist yet (a database this code
+ * never touched), every bundled migration is pending and the foreign
+ * file is NOT marked by creating the table.
+ *
+ * @stable
+ */
+export function pendingMigrations(conn: SqliteConnection): readonly Migration[] {
+  const hasTable = conn.get<{ name: string }>(
+    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'schema_migrations'",
+  );
+  if (hasTable === undefined) return listMigrations();
+  const applied = readApplied(conn);
+  return listMigrations().filter((m) => !applied.has(m.version));
 }
 
 /**

@@ -97,7 +97,7 @@ import {
   type SqliteMemoryWriteOptions,
 } from './memory-store.js';
 import { listMigrations, type Migration, registerMigration } from './migrations/registry.js';
-import { type AppliedMigration, runMigrations } from './migrations/runner.js';
+import { type AppliedMigration, pendingMigrations, runMigrations } from './migrations/runner.js';
 import { SqliteOAuthServerStore } from './oauth-server-store.js';
 import {
   SESSION_SCOPED_PURGES,
@@ -359,6 +359,7 @@ export {
   type PassphraseResolver,
   type PendingConflictInput,
   type PendingConflictRow,
+  pendingMigrations,
   pruneSpans,
   type RegisterEmbedderInput,
   readPragma,

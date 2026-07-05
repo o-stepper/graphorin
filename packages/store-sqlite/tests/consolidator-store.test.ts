@@ -157,7 +157,7 @@ describe('SqliteConsolidatorStateStore', () => {
     await c.recordRunStart({
       id: 'run-old',
       scope,
-      triggerKind: 'periodic',
+      triggerKind: 'idle',
       phase: 'light',
       startedAt: Date.now() - 100_000,
     });
@@ -169,14 +169,14 @@ describe('SqliteConsolidatorStateStore', () => {
     await c.recordRunStart({
       id: 'run-live',
       scope,
-      triggerKind: 'periodic',
+      triggerKind: 'idle',
       phase: 'light',
       startedAt: Date.now() - 100_000,
     });
     await c.recordRunStart({
       id: 'run-fresh',
       scope,
-      triggerKind: 'periodic',
+      triggerKind: 'idle',
       phase: 'light',
       startedAt: Date.now(),
     });
@@ -193,8 +193,8 @@ describe('SqliteConsolidatorStateStore', () => {
   it('W-065: pruneExhaustedBatches deletes only exhausted batches past the cutoff', async () => {
     const scope = { userId: 'alex' };
     const c = asConsolidator(store);
-    const mkBatch = (id: string, nextRetryAt: number | null, failedAt: number) =>
-      c.enqueueFailedBatch({
+    const mkBatch = async (id: string, exhausted: boolean, failedAt: number): Promise<void> => {
+      await c.enqueueFailedBatch({
         id,
         consolidatorRunId: null,
         scope,
@@ -202,13 +202,16 @@ describe('SqliteConsolidatorStateStore', () => {
         errorKind: 'x',
         errorMessage: 'x',
         failedAt,
-        nextRetryAt,
+        nextRetryAt: Date.now() + 60_000,
         retryCount: 3,
         phase: 'deep',
       });
-    await mkBatch('exhausted-old', null, Date.now() - 100_000);
-    await mkBatch('exhausted-fresh', null, Date.now());
-    await mkBatch('retrying-old', Date.now() + 60_000, Date.now() - 100_000);
+      // Exhaustion happens through the production path (nulls next_retry_at).
+      if (exhausted) await c.markBatchExhausted(id, 'retries used up');
+    };
+    await mkBatch('exhausted-old', true, Date.now() - 100_000);
+    await mkBatch('exhausted-fresh', true, Date.now());
+    await mkBatch('retrying-old', false, Date.now() - 100_000);
 
     const removed = await c.pruneExhaustedBatches(Date.now() - 50_000);
     expect(removed).toBe(1);

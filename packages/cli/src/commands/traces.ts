@@ -52,6 +52,8 @@ export async function runTracesStatus(
   options: TracesCommonOptions = {},
 ): Promise<TracesStatusResult> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -113,6 +115,8 @@ export interface TracesPruneResult {
 export async function runTracesPrune(options: TracesPruneOptions): Promise<TracesPruneResult> {
   const cutoffMs = parseCutoff(options.before);
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {

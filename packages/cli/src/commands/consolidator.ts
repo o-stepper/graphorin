@@ -65,6 +65,8 @@ export async function runConsolidatorStatus(
   options: ConsolidatorCommonOptions = {},
 ): Promise<ConsolidatorStatusResult> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
@@ -231,6 +233,8 @@ export async function runConsolidatorDlqList(
   options: ConsolidatorDlqListOptions = {},
 ): Promise<ReadonlyArray<ConsolidatorDlqEntry>> {
   const ctx = await openStoreContext({
+    // W-068: read-only command - never auto-migrate a live database.
+    migrationPolicy: 'check',
     ...(options.config !== undefined ? { config: options.config } : {}),
   });
   try {
