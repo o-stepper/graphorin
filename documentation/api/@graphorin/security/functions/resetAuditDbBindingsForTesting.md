@@ -10,7 +10,7 @@
 function _resetAuditDbBindingsForTesting(): void;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:177
+Defined in: packages/security/src/audit/audit-db.ts:190
 
 **`Experimental`**
 

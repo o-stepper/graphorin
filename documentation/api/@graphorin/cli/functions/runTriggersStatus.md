@@ -12,7 +12,7 @@ function runTriggersStatus(options): Promise<
 | null>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:75
+Defined in: packages/cli/src/commands/triggers.ts:77
 
 ## Parameters
 

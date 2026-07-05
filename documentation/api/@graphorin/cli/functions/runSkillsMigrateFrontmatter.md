@@ -10,7 +10,7 @@
 function runSkillsMigrateFrontmatter(options?): Promise<SkillsMigrateFrontmatterResult>;
 ```
 
-Defined in: packages/cli/src/commands/skills.ts:184
+Defined in: packages/cli/src/commands/skills.ts:185
 
 ## Parameters
 

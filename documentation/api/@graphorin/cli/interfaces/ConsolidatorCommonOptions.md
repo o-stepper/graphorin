@@ -16,6 +16,8 @@ Defined in: packages/cli/src/commands/consolidator.ts:47
 
 ## Extended by
 
+- [`ConsolidatorDlqClearOptions`](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearOptions.md)
+- [`ConsolidatorDlqListOptions`](/api/@graphorin/cli/interfaces/ConsolidatorDlqListOptions.md)
 - [`ConsolidatorSetTierOptions`](/api/@graphorin/cli/interfaces/ConsolidatorSetTierOptions.md)
 - [`ConsolidatorStopOptions`](/api/@graphorin/cli/interfaces/ConsolidatorStopOptions.md)
 

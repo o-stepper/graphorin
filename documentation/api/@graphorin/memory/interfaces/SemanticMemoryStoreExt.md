@@ -97,7 +97,7 @@ Lookup a single fact by id (returns `null` when absent or soft-deleted).
 optional historyOf(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:161
+Defined in: packages/memory/src/internal/storage-adapter.ts:171
 
 Walk the bi-temporal supersede chain that `factId` belongs to and
 return every fact in it, oldest → newest (by `validFrom`),
@@ -117,6 +117,35 @@ cycle-safe; returns `[]` for an unknown id. Powers
 #### Returns
 
 `Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
+
+***
+
+### linkPendingSupersede()?
+
+```ts
+optional linkPendingSupersede(newId, oldId): Promise<void>;
+```
+
+Defined in: packages/memory/src/internal/storage-adapter.ts:161
+
+W-019: record a PENDING supersede link - set `newId.supersedes =
+oldId` WITHOUT closing the old fact's validity interval. Used when
+a supersede's successor lands quarantined: the old fact must stay
+in default recall until the successor is validated, at which point
+[SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate) completes the closure via
+[SemanticMemoryStore.supersede](/api/@graphorin/memory/interfaces/SemanticMemoryStoreExt.md#supersede). No schema change - the
+`supersedes` column already exists.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `newId` | `string` |
+| `oldId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
 
 ***
 

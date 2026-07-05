@@ -10,7 +10,7 @@
 function openAuditDatabase(options): Promise<AuditDatabase>;
 ```
 
-Defined in: packages/store-sqlite/src/audit-db.ts:50
+Defined in: packages/store-sqlite/src/audit-db.ts:55
 
 Opens the encrypted `audit.db` file.
 

@@ -7,12 +7,10 @@
 # Function: createCodeExecuteTool()
 
 ```ts
-function createCodeExecuteTool(opts): Tool<{
-  source: string;
-}, string>;
+function createCodeExecuteTool(opts): Tool<CodeExecuteInput, string>;
 ```
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:201
+Defined in: packages/tools/src/code-mode/meta-tools.ts:216
 
 Build the `code_execute` meta-tool. Its output is the script's final
 value rendered as a string, so the executor's `maxResultTokens` /
@@ -26,8 +24,6 @@ value rendered as a string, so the executor's `maxResultTokens` /
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `source`: `string`;
-\}, `string`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`CodeExecuteInput`, `string`\&gt;
 
 ## Stable

@@ -138,7 +138,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:162
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:432
+Defined in: packages/store-sqlite/src/consolidator-store.ts:464
 
 #### Parameters
 
@@ -236,6 +236,60 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:401
 #### Returns
 
 `Promise`\&lt;`void`\&gt;
+
+***
+
+### pruneExhaustedBatches()
+
+```ts
+pruneExhaustedBatches(beforeEpochMs): Promise<number>;
+```
+
+Defined in: packages/store-sqlite/src/consolidator-store.ts:456
+
+W-065: retention for the dead-letter queue. Deletes only EXHAUSTED
+batches (`next_retry_at IS NULL` - parked forever by
+`markBatchExhausted`) that failed before the cutoff; batches still
+awaiting a retry are never touched (they belong to
+`claimReadyBatches`). Returns rows deleted.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `beforeEpochMs` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Stable
+
+***
+
+### pruneRuns()
+
+```ts
+pruneRuns(beforeEpochMs): Promise<number>;
+```
+
+Defined in: packages/store-sqlite/src/consolidator-store.ts:439
+
+W-065: retention for the per-tick run log. Deletes terminal runs
+that started before the cutoff; in-flight rows
+(`status = 'running'`) always survive. Returns rows deleted.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `beforeEpochMs` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Stable
 
 ***
 

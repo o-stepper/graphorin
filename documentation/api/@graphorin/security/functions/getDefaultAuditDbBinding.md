@@ -12,7 +12,7 @@ function getDefaultAuditDbBinding():
   | undefined;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:168
+Defined in: packages/security/src/audit/audit-db.ts:181
 
 Read the identifier of the active default binding. Returns
 `undefined` if no binding has been registered.

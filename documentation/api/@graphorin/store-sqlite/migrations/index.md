@@ -40,6 +40,12 @@ Re-exports [Migration](/api/@graphorin/store-sqlite/interfaces/Migration.md)
 
 ***
 
+### pendingMigrations
+
+Re-exports [pendingMigrations](/api/@graphorin/store-sqlite/functions/pendingMigrations.md)
+
+***
+
 ### registerMigration
 
 Re-exports [registerMigration](/api/@graphorin/store-sqlite/functions/registerMigration.md)

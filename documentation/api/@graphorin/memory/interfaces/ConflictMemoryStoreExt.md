@@ -6,7 +6,7 @@
 
 # Interface: ConflictMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:336
+Defined in: packages/memory/src/internal/storage-adapter.ts:346
 
 Optional storage extension surfacing the audit + pending queue
 tables Phase 10b owns. Adapters that opt out leave the property
@@ -25,7 +25,7 @@ enqueuePending(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:341
+Defined in: packages/memory/src/internal/storage-adapter.ts:351
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:341
 listPending(scope, limit?): Promise<readonly PendingConflictRowLike[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:342
+Defined in: packages/memory/src/internal/storage-adapter.ts:352
 
 #### Parameters
 
@@ -68,7 +68,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:342
 optional markAttempted(id, attemptedAt?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:350
+Defined in: packages/memory/src/internal/storage-adapter.ts:360
 
 Stamp `attemptedAt` on a pending row whose judge call failed
 (MCON-9). The deep phase closes the row as `'judge-unparseable'`
@@ -94,7 +94,7 @@ Optional - without it the deep phase falls back to skip-and-retry.
 markResolved(id, decision): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:343
+Defined in: packages/memory/src/internal/storage-adapter.ts:353
 
 #### Parameters
 
@@ -118,7 +118,7 @@ recordDecision(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:337
+Defined in: packages/memory/src/internal/storage-adapter.ts:347
 
 #### Parameters
 

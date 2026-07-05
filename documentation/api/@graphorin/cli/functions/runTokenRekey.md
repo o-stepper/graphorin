@@ -14,7 +14,7 @@ function runTokenRekey(options?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:252
+Defined in: packages/cli/src/commands/token.ts:253
 
 Re-issue every active token. Used after a known compromise.
 

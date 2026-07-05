@@ -7,25 +7,10 @@
 # Function: createFactSearchTool()
 
 ```ts
-function createFactSearchTool(deps): Tool<{
-  asOf?: string;
-  query: string;
-  tags?: string[];
-  topK?: number;
-}, {
-  hits: {
-     factId: string;
-     provenance?: "user" | "tool" | "extraction" | "reflection" | "induction" | "imported";
-     score: number;
-     sensitivity: "public" | "internal" | "secret";
-     supersededBy?: string;
-     text: string;
-     validTo?: string;
-  }[];
-}>;
+function createFactSearchTool(deps): Tool<FactSearchInput, FactSearchOutput>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:176
+Defined in: packages/memory/src/tools/fact-tools.ts:274
 
 `fact_search` - hybrid (vector + FTS5) search over the user's
 semantic memory. Results merged through the configured reranker.
@@ -38,21 +23,6 @@ semantic memory. Results merged through the configured reranker.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `asOf?`: `string`;
-  `query`: `string`;
-  `tags?`: `string`[];
-  `topK?`: `number`;
-\}, \{
-  `hits`: \{
-     `factId`: `string`;
-     `provenance?`: `"user"` \| `"tool"` \| `"extraction"` \| `"reflection"` \| `"induction"` \| `"imported"`;
-     `score`: `number`;
-     `sensitivity`: `"public"` \| `"internal"` \| `"secret"`;
-     `supersededBy?`: `string`;
-     `text`: `string`;
-     `validTo?`: `string`;
-  \}[];
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactSearchInput`, `FactSearchOutput`\&gt;
 
 ## Stable

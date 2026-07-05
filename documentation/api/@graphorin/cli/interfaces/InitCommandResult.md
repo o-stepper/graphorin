@@ -6,7 +6,7 @@
 
 # Interface: InitCommandResult
 
-Defined in: packages/cli/src/commands/init.ts:42
+Defined in: packages/cli/src/commands/init.ts:50
 
 ## Stable
 
@@ -14,8 +14,7 @@ Defined in: packages/cli/src/commands/init.ts:42
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-bootstraptoken"></a> `bootstrapToken` | `readonly` | `string` | packages/cli/src/commands/init.ts:44 |
-| <a id="property-cloudconsent"></a> `cloudConsent` | `readonly` | `"public-only"` \| `"public-and-internal"` \| `"all-with-warnings"` | packages/cli/src/commands/init.ts:46 |
-| <a id="property-configpath"></a> `configPath` | `readonly` | `string` | packages/cli/src/commands/init.ts:43 |
-| <a id="property-serverpepperhex"></a> `serverPepperHex` | `readonly` | `string` | packages/cli/src/commands/init.ts:45 |
-| <a id="property-storageencrypted"></a> `storageEncrypted` | `readonly` | `boolean` | packages/cli/src/commands/init.ts:47 |
+| <a id="property-cloudconsent"></a> `cloudConsent` | `readonly` | `"public-only"` \| `"public-and-internal"` \| `"all-with-warnings"` | packages/cli/src/commands/init.ts:53 |
+| <a id="property-configpath"></a> `configPath` | `readonly` | `string` | packages/cli/src/commands/init.ts:51 |
+| <a id="property-serverpepperhex"></a> `serverPepperHex` | `readonly` | `string` | packages/cli/src/commands/init.ts:52 |
+| <a id="property-storageencrypted"></a> `storageEncrypted` | `readonly` | `boolean` | packages/cli/src/commands/init.ts:54 |

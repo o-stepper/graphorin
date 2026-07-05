@@ -10,7 +10,7 @@
 type ComposeProviderMiddleware = (middlewares) => ProviderMiddleware;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:302
+Defined in: packages/core/src/contracts/provider.ts:312
 
 Type signature for the canonical middleware composer (the runtime
 implementation lives in `@graphorin/provider`).

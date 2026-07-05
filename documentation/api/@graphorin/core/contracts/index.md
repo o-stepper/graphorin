@@ -76,6 +76,12 @@ Re-exports [CheckpointStore](/api/@graphorin/core/interfaces/CheckpointStore.md)
 
 ***
 
+### CheckpointStoreExt
+
+Re-exports [CheckpointStoreExt](/api/@graphorin/core/interfaces/CheckpointStoreExt.md)
+
+***
+
 ### CheckpointTuple
 
 Re-exports [CheckpointTuple](/api/@graphorin/core/interfaces/CheckpointTuple.md)
@@ -325,6 +331,12 @@ Re-exports [ProviderRequestMetadata](/api/@graphorin/core/interfaces/ProviderReq
 ### ProviderResponse
 
 Re-exports [ProviderResponse](/api/@graphorin/core/interfaces/ProviderResponse.md)
+
+***
+
+### PruneThreadsOptions
+
+Re-exports [PruneThreadsOptions](/api/@graphorin/core/interfaces/PruneThreadsOptions.md)
 
 ***
 

@@ -12,7 +12,7 @@ function runSecretsDelete(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:164
+Defined in: packages/cli/src/commands/secrets.ts:165
 
 ## Parameters
 

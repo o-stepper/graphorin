@@ -10,7 +10,7 @@
 function runMemoryPruneHistory(options): Promise<MemoryPruneHistoryResult>;
 ```
 
-Defined in: packages/cli/src/commands/memory.ts:990
+Defined in: packages/cli/src/commands/memory.ts:994
 
 `graphorin memory prune-history --older-than <duration|date>` (W-066)
 - the supported surface over `MemoryStoreExt.pruneHistory`.

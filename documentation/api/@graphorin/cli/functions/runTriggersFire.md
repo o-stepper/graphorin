@@ -13,7 +13,7 @@ function runTriggersFire(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:111
+Defined in: packages/cli/src/commands/triggers.ts:114
 
 ## Parameters
 

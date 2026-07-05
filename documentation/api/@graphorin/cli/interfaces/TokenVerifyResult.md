@@ -6,7 +6,7 @@
 
 # Interface: TokenVerifyResult
 
-Defined in: packages/cli/src/commands/token.ts:298
+Defined in: packages/cli/src/commands/token.ts:299
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/cli/src/commands/token.ts:298
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/cli/src/commands/token.ts:299 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/cli/src/commands/token.ts:300 |
+| <a id="property-ok"></a> `ok` | `readonly` | `boolean` | packages/cli/src/commands/token.ts:300 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/cli/src/commands/token.ts:301 |

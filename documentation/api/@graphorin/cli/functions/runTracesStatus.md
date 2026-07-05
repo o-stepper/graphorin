@@ -10,7 +10,7 @@
 function runTracesStatus(options?): Promise<TracesStatusResult>;
 ```
 
-Defined in: packages/cli/src/commands/traces.ts:40
+Defined in: packages/cli/src/commands/traces.ts:51
 
 ## Parameters
 

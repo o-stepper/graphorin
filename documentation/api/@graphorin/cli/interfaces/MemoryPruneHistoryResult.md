@@ -6,7 +6,7 @@
 
 # Interface: MemoryPruneHistoryResult
 
-Defined in: packages/cli/src/commands/memory.ts:975
+Defined in: packages/cli/src/commands/memory.ts:979
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/cli/src/commands/memory.ts:975
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | packages/cli/src/commands/memory.ts:976 |
-| <a id="property-olderthanms"></a> `olderThanMs` | `readonly` | `number` | The resolved AGE in milliseconds passed to `pruneHistory`. | packages/cli/src/commands/memory.ts:978 |
+| <a id="property-deleted"></a> `deleted` | `readonly` | `number` | - | packages/cli/src/commands/memory.ts:980 |
+| <a id="property-olderthanms"></a> `olderThanMs` | `readonly` | `number` | The resolved AGE in milliseconds passed to `pruneHistory`. | packages/cli/src/commands/memory.ts:982 |

@@ -7,16 +7,10 @@
 # Function: createBlockAppendTool()
 
 ```ts
-function createBlockAppendTool(deps): Tool<{
-  content: string;
-  label: string;
-}, {
-  label: string;
-  length: number;
-}>;
+function createBlockAppendTool(deps): Tool<BlockAppendInput, BlockAppendOutput>;
 ```
 
-Defined in: packages/memory/src/tools/block-tools.ts:49
+Defined in: packages/memory/src/tools/block-tools.ts:96
 
 `block_append` - append text (with a newline separator) to a working
 memory block.
@@ -29,12 +23,6 @@ memory block.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<\{
-  `content`: `string`;
-  `label`: `string`;
-\}, \{
-  `label`: `string`;
-  `length`: `number`;
-\}\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockAppendInput`, `BlockAppendOutput`\&gt;
 
 ## Stable

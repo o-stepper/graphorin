@@ -34,13 +34,14 @@ Defined in: packages/tools/src/executor/types.ts:301
 
 #### Parameters
 
-| Parameter | Type |
-| ------ | ------ |
-| `input` | \{ `args`: `unknown`; `sensitive`: `boolean`; `sideEffectClass`: [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md); `toolName`: `string`; \} |
-| `input.args` | `unknown` |
-| `input.sensitive` | `boolean` |
-| `input.sideEffectClass` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) |
-| `input.toolName` | `string` |
+| Parameter | Type | Description |
+| ------ | ------ | ------ |
+| `input` | \{ `args`: `unknown`; `sensitive`: `boolean`; `sideEffectClass`: [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md); `toolName`: `string`; `trustClass`: [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md); \} | - |
+| `input.args` | `unknown` | - |
+| `input.sensitive` | `boolean` | - |
+| `input.sideEffectClass` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | - |
+| `input.toolName` | `string` | - |
+| `input.trustClass` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | Trust class of the tool under evaluation (W-101) - lets guards enforce trust-taxonomy rules (Rule-of-Two `untrustedInput`). |
 
 #### Returns
 

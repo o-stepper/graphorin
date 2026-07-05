@@ -10,7 +10,7 @@
 function validate<T>(schema, data): ValidationResult<T>;
 ```
 
-Defined in: packages/core/src/utils/validation.ts:51
+Defined in: packages/core/src/utils/validation.ts:60
 
 Synchronous validation wrapper. Does **not** swallow errors thrown by
 the schema's transformations - only normalizes the success / failure

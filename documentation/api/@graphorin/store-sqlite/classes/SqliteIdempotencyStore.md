@@ -6,7 +6,7 @@
 
 # Class: SqliteIdempotencyStore
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:43
+Defined in: packages/store-sqlite/src/idempotency-store.ts:49
 
 Default `IdempotencyStore` implementation.
 
@@ -24,7 +24,7 @@ Default `IdempotencyStore` implementation.
 new SqliteIdempotencyStore(conn): SqliteIdempotencyStore;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:45
+Defined in: packages/store-sqlite/src/idempotency-store.ts:51
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:45
 delete(key): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:86
+Defined in: packages/store-sqlite/src/idempotency-store.ts:92
 
 #### Parameters
 
@@ -70,7 +70,7 @@ get(key): Promise<
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:67
+Defined in: packages/store-sqlite/src/idempotency-store.ts:73
 
 #### Parameters
 
@@ -96,7 +96,12 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:67
 prune(olderThan): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:90
+Defined in: packages/store-sqlite/src/idempotency-store.ts:96
+
+Delete records whose expiry is older than the supplied epoch-ms
+instant. Production caller: the server's hourly
+`scheduleIdempotencyPruning` sweep (started by `app-lifecycle`),
+so expired rows no longer accumulate forever (W-065).
 
 #### Parameters
 
@@ -120,7 +125,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:90
 put(record): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:49
+Defined in: packages/store-sqlite/src/idempotency-store.ts:55
 
 #### Parameters
 

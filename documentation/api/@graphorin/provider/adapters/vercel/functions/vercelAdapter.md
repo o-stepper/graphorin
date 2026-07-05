@@ -10,7 +10,7 @@
 function vercelAdapter(model, options?): Provider;
 ```
 
-Defined in: packages/provider/src/adapters/vercel.ts:184
+Defined in: packages/provider/src/adapters/vercel.ts:189
 
 Wrap a Vercel AI SDK language-model value in a Graphorin
 [Provider](/api/@graphorin/core/interfaces/Provider.md). Outbound requests are converted onto the AI SDK

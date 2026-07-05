@@ -6,7 +6,7 @@
 
 # Interface: SkillsAuditOptions
 
-Defined in: packages/cli/src/commands/skills.ts:142
+Defined in: packages/cli/src/commands/skills.ts:143
 
 ## Stable
 

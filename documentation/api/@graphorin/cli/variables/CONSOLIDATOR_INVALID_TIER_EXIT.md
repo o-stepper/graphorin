@@ -10,7 +10,7 @@
 const CONSOLIDATOR_INVALID_TIER_EXIT: 1 = EXIT_CODES.RECOVERABLE_FAILURE;
 ```
 
-Defined in: packages/cli/src/commands/consolidator.ts:212
+Defined in: packages/cli/src/commands/consolidator.ts:382
 
 Exit code emitted when a tier value fails validation. Re-exported
 so the binary can surface the same code to downstream callers.

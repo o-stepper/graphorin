@@ -10,7 +10,7 @@
 function runTriggersPrune(options?): Promise<TriggersPruneResult>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:190
+Defined in: packages/cli/src/commands/triggers.ts:193
 
 ## Parameters
 

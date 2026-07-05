@@ -6,7 +6,7 @@
 
 # Interface: MemoryActivityConflict
 
-Defined in: packages/cli/src/commands/memory.ts:435
+Defined in: packages/cli/src/commands/memory.ts:437
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: packages/cli/src/commands/memory.ts:435
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-candidateid"></a> `candidateId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:436 |
-| <a id="property-decision"></a> `decision` | `readonly` | `string` | packages/cli/src/commands/memory.ts:438 |
-| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:440 |
-| <a id="property-existingid"></a> `existingId` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:437 |
-| <a id="property-stage"></a> `stage` | `readonly` | `string` | packages/cli/src/commands/memory.ts:439 |
+| <a id="property-candidateid"></a> `candidateId` | `readonly` | `string` | packages/cli/src/commands/memory.ts:438 |
+| <a id="property-decision"></a> `decision` | `readonly` | `string` | packages/cli/src/commands/memory.ts:440 |
+| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `string` | packages/cli/src/commands/memory.ts:442 |
+| <a id="property-existingid"></a> `existingId` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:439 |
+| <a id="property-stage"></a> `stage` | `readonly` | `string` | packages/cli/src/commands/memory.ts:441 |

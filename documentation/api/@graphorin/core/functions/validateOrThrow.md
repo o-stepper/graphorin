@@ -13,7 +13,7 @@ function validateOrThrow<T>(
    what?): T;
 ```
 
-Defined in: packages/core/src/utils/validation.ts:64
+Defined in: packages/core/src/utils/validation.ts:73
 
 Throwing variant of `validate(...)` that surfaces a `TypeError` carrying
 a stable, parser-style message. Useful at module-boundary entry points

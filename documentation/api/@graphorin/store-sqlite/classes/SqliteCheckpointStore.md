@@ -6,16 +6,18 @@
 
 # Class: SqliteCheckpointStore
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:20
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:23
 
-Default `CheckpointStore` implementation. Workflow state is encoded
-as JSON blobs; per-task pending writes survive partial step failure.
+Default `CheckpointStore` implementation (including the W-009
+`CheckpointStoreExt` retention primitives). Workflow state is
+encoded as JSON blobs; per-task pending writes survive partial step
+failure.
 
 ## Stable
 
 ## Implements
 
-- [`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md)
+- [`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md)
 
 ## Constructors
 
@@ -25,7 +27,7 @@ as JSON blobs; per-task pending writes survive partial step failure.
 new SqliteCheckpointStore(conn): SqliteCheckpointStore;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:22
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:25
 
 #### Parameters
 
@@ -39,13 +41,54 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:22
 
 ## Methods
 
+### compactThread()
+
+```ts
+compactThread(
+   threadId, 
+   namespace, 
+keepLast): Promise<number>;
+```
+
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:226
+
+W-009 compaction: keep only the `keepLast` newest checkpoints (by
+step_number) of one `(thread_id, namespace)` pair. Resume reads the
+latest tuple, so `keepLast >= 1` never breaks resumability; the
+oldest surviving checkpoint's parent_id may point at a deleted row,
+which getTuple/list never resolve and the CAS compares only the
+latest id - safe, but time-travel/fork targets are gone.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `namespace` | `string` |
+| `keepLast` | `number` |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Implementation of
+
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`compactThread`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#compactthread)
+
+***
+
 ### deleteThread()
 
 ```ts
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:163
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:166
+
+Full erasure primitive: delete every checkpoint and pending write of
+this thread across ALL namespaces. Namespace-blind by contract -
+retention sweeps must use [CheckpointStoreExt.pruneThreads](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#prunethreads)
+instead, which is namespace-scoped and protects suspended threads.
 
 #### Parameters
 
@@ -59,7 +102,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:163
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md).[`deleteThread`](/api/@graphorin/core/interfaces/CheckpointStore.md#deletethread)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`deleteThread`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#deletethread)
 
 ***
 
@@ -74,7 +117,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:105
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:108
 
 #### Parameters
 
@@ -92,7 +135,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:105
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md).[`getTuple`](/api/@graphorin/core/interfaces/CheckpointStore.md#gettuple)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`getTuple`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#gettuple)
 
 ***
 
@@ -105,7 +148,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:140
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:143
 
 #### Parameters
 
@@ -121,7 +164,45 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:140
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md).[`list`](/api/@graphorin/core/interfaces/CheckpointStore.md#list)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`list`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#list)
+
+***
+
+### pruneThreads()
+
+```ts
+pruneThreads(opts): Promise<number>;
+```
+
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:188
+
+W-009 retention sweep. Policy: a `(thread_id, namespace)` pair
+qualifies when its LATEST checkpoint (by step_number) is older than
+the cutoff and - unless `onlyTerminal: false` - terminal
+('completed' / 'failed' / 'aborted'); suspended pairs hold live
+HITL approvals / awakeables and are protected by default.
+
+CRITICAL: never delegates to `deleteThread` - that primitive is
+namespace-blind, and with a reused threadId (e.g. a sessionId used
+by two workflows) pruning workflow A's terminal thread would erase
+workflow B's suspended checkpoints, breaking the onlyTerminal
+guarantee. Each qualifying pair is deleted with namespace-scoped
+statements in its own transaction so a long sweep never holds the
+writer lock across the whole table.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `opts` | [`PruneThreadsOptions`](/api/@graphorin/core/interfaces/PruneThreadsOptions.md) |
+
+#### Returns
+
+`Promise`\&lt;`number`\&gt;
+
+#### Implementation of
+
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`pruneThreads`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#prunethreads)
 
 ***
 
@@ -136,7 +217,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:26
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:29
 
 #### Parameters
 
@@ -154,7 +235,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:26
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md).[`put`](/api/@graphorin/core/interfaces/CheckpointStore.md#put)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`put`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#put)
 
 ***
 
@@ -169,7 +250,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:84
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:87
 
 #### Parameters
 
@@ -187,4 +268,4 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:84
 
 #### Implementation of
 
-[`CheckpointStore`](/api/@graphorin/core/interfaces/CheckpointStore.md).[`putWrites`](/api/@graphorin/core/interfaces/CheckpointStore.md#putwrites)
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`putWrites`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#putwrites)

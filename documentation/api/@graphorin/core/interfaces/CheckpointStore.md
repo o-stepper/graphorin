@@ -13,6 +13,10 @@ lives in `@graphorin/store-sqlite`.
 
 ## Stable
 
+## Extended by
+
+- [`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md)
+
 ## Methods
 
 ### deleteThread()
@@ -21,7 +25,12 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:168
+Defined in: packages/core/src/contracts/checkpoint-store.ts:174
+
+Full erasure primitive: delete every checkpoint and pending write of
+this thread across ALL namespaces. Namespace-blind by contract -
+retention sweeps must use [CheckpointStoreExt.pruneThreads](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#prunethreads)
+instead, which is namespace-scoped and protects suspended threads.
 
 #### Parameters
 

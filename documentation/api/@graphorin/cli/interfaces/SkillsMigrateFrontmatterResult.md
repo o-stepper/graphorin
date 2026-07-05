@@ -6,7 +6,7 @@
 
 # Interface: SkillsMigrateFrontmatterResult
 
-Defined in: packages/cli/src/commands/skills.ts:173
+Defined in: packages/cli/src/commands/skills.ts:174
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/cli/src/commands/skills.ts:173
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-applied"></a> `applied` | `readonly` | `boolean` | packages/cli/src/commands/skills.ts:180 |
-| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/skills.ts:174 |
-| <a id="property-migrated"></a> `migrated` | `readonly` | readonly \{ `file`: `string`; `result`: [`MigrationResult`](/api/@graphorin/skills/migration/interfaces/MigrationResult.md); \}[] | packages/cli/src/commands/skills.ts:176 |
-| <a id="property-visited"></a> `visited` | `readonly` | `number` | packages/cli/src/commands/skills.ts:175 |
+| <a id="property-applied"></a> `applied` | `readonly` | `boolean` | packages/cli/src/commands/skills.ts:181 |
+| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/skills.ts:175 |
+| <a id="property-migrated"></a> `migrated` | `readonly` | readonly \{ `file`: `string`; `result`: [`MigrationResult`](/api/@graphorin/skills/migration/interfaces/MigrationResult.md); \}[] | packages/cli/src/commands/skills.ts:177 |
+| <a id="property-visited"></a> `visited` | `readonly` | `number` | packages/cli/src/commands/skills.ts:176 |

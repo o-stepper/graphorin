@@ -6,7 +6,11 @@
 
 # Interface: TracesStatusResult
 
-Defined in: packages/cli/src/commands/traces.ts:32
+Defined in: packages/cli/src/commands/traces.ts:43
+
+Field names predate the spans retarget (they said `StartedAt` when the
+command aimed at the phantom `traces` table) and are kept for JSON
+output stability; values now come from `spans.start_unix_nano`.
 
 ## Stable
 
@@ -14,7 +18,7 @@ Defined in: packages/cli/src/commands/traces.ts:32
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-neweststartedat"></a> `newestStartedAt?` | `readonly` | `string` | packages/cli/src/commands/traces.ts:36 |
-| <a id="property-oldeststartedat"></a> `oldestStartedAt?` | `readonly` | `string` | packages/cli/src/commands/traces.ts:35 |
-| <a id="property-rows"></a> `rows` | `readonly` | `number` | packages/cli/src/commands/traces.ts:34 |
-| <a id="property-tableexists"></a> `tableExists` | `readonly` | `boolean` | packages/cli/src/commands/traces.ts:33 |
+| <a id="property-neweststartedat"></a> `newestStartedAt?` | `readonly` | `string` | packages/cli/src/commands/traces.ts:47 |
+| <a id="property-oldeststartedat"></a> `oldestStartedAt?` | `readonly` | `string` | packages/cli/src/commands/traces.ts:46 |
+| <a id="property-rows"></a> `rows` | `readonly` | `number` | packages/cli/src/commands/traces.ts:45 |
+| <a id="property-tableexists"></a> `tableExists` | `readonly` | `boolean` | packages/cli/src/commands/traces.ts:44 |

@@ -90,6 +90,30 @@ Re-exports [ConsolidatorCommonOptions](/api/@graphorin/cli/interfaces/Consolidat
 
 ***
 
+### ConsolidatorDlqClearOptions
+
+Re-exports [ConsolidatorDlqClearOptions](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearOptions.md)
+
+***
+
+### ConsolidatorDlqClearResult
+
+Re-exports [ConsolidatorDlqClearResult](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearResult.md)
+
+***
+
+### ConsolidatorDlqEntry
+
+Re-exports [ConsolidatorDlqEntry](/api/@graphorin/cli/interfaces/ConsolidatorDlqEntry.md)
+
+***
+
+### ConsolidatorDlqListOptions
+
+Re-exports [ConsolidatorDlqListOptions](/api/@graphorin/cli/interfaces/ConsolidatorDlqListOptions.md)
+
+***
+
 ### ConsolidatorSetTierOptions
 
 Re-exports [ConsolidatorSetTierOptions](/api/@graphorin/cli/interfaces/ConsolidatorSetTierOptions.md)
@@ -423,6 +447,18 @@ Re-exports [runAuthRevoke](/api/@graphorin/cli/functions/runAuthRevoke.md)
 ### runAuthStatus
 
 Re-exports [runAuthStatus](/api/@graphorin/cli/functions/runAuthStatus.md)
+
+***
+
+### runConsolidatorDlqClear
+
+Re-exports [runConsolidatorDlqClear](/api/@graphorin/cli/functions/runConsolidatorDlqClear.md)
+
+***
+
+### runConsolidatorDlqList
+
+Re-exports [runConsolidatorDlqList](/api/@graphorin/cli/functions/runConsolidatorDlqList.md)
 
 ***
 

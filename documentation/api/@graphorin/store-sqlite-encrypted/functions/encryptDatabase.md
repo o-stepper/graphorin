@@ -10,12 +10,7 @@
 function encryptDatabase(options): Promise<EncryptDatabaseResult>;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:84
-
-Encrypts an unencrypted SQLite database. Returns once the target
-file has been written and verified. Throws if the source is missing,
-the target already exists (and `overwriteTarget` is unset), the
-cipher peer is missing, or the integrity check fails.
+Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:114
 
 ## Parameters
 
@@ -26,5 +21,3 @@ cipher peer is missing, or the integrity check fails.
 ## Returns
 
 `Promise`\&lt;[`EncryptDatabaseResult`](/api/@graphorin/store-sqlite-encrypted/interfaces/EncryptDatabaseResult.md)\&gt;
-
-## Stable
