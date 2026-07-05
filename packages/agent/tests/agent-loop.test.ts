@@ -95,6 +95,50 @@ describe('Agent - tool execution loop', () => {
     }
   });
 
+  it('W-023: a MID-STREAM classified rate-limit error event triggers per-step fallback', async () => {
+    // The W-023 vercel taxonomy classifies mid-stream error chunks
+    // (previously kind 'unknown', which isAgentFallbackEligible
+    // rejects). This pins the downstream half: a classified mid-stream
+    // error reaches the fallback chain and the step restarts on the
+    // next candidate.
+    const primary = createMockProvider({
+      modelId: 'sonnet-4.5',
+      scripts: [
+        {
+          events: [
+            { type: 'stream-start', metadata: { providerName: 'mock', modelId: 'sonnet-4.5' } },
+            { type: 'text-delta', delta: 'partial that will be discarded' },
+            { type: 'error', error: { kind: 'rate-limit', message: 'mid-stream 429' } },
+          ],
+        },
+      ],
+    });
+    const fallback = createMockProvider({
+      modelId: 'haiku-4.5',
+      scripts: [textOnlyScript('answered after mid-stream fallback', 8)],
+    });
+    const agent = createAgent({
+      name: 'fb-mid',
+      instructions: 'noop',
+      provider: primary,
+      fallbackModels: [fallback],
+    });
+    const events: AgentEvent[] = [];
+    for await (const ev of agent.stream('go')) {
+      events.push(ev);
+    }
+    const fellback = events.find((e) => e.type === 'agent.model.fellback');
+    expect(fellback).toBeDefined();
+    if (fellback?.type === 'agent.model.fellback') {
+      expect(fellback.reason).toBe('rate-limit');
+      expect(fellback.to).toBe('haiku-4.5');
+    }
+    const completeEv = events.find((e) => e.type === 'text.complete');
+    if (completeEv?.type === 'text.complete') {
+      expect(completeEv.text).toBe('answered after mid-stream fallback');
+    }
+  });
+
   it('emits agent.error when every fallback also fails', async () => {
     const a = createMockProvider({ modelId: 'a', scripts: [errorScript({ kind: 'rate-limit' })] });
     const b = createMockProvider({ modelId: 'b', scripts: [errorScript({ kind: 'rate-limit' })] });

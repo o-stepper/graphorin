@@ -124,20 +124,90 @@ describe('vercelAdapter', () => {
     expect(end).toMatchObject({ toolCallId: 'c1', finalArgs: { q: 'x' } });
   });
 
-  it('forwards error chunks as ProviderEvent.error and keeps streaming', async () => {
+  it('W-023: an error chunk BEFORE any content throws a typed ProviderHttpError (retryable)', async () => {
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: makeOverrides({
+        streamChunks: [{ type: 'error', error: { message: 'boom', statusCode: 500 } }],
+      }),
+    });
+    await expect(collect(adapter.stream(REQ))).rejects.toMatchObject({
+      name: 'ProviderHttpError',
+      status: 500,
+      errorKind: 'transient',
+    });
+  });
+
+  it('W-023: a pre-content 429 chunk throws rate-limit with retry-after headers lifted', async () => {
     const adapter = vercelAdapter(MODEL, {
       runtimeOverrides: makeOverrides({
         streamChunks: [
-          { type: 'error', error: 'boom' },
-          { type: 'error', error: { message: 'wrapped' } },
+          {
+            type: 'error',
+            error: {
+              message: 'rate limited',
+              statusCode: 429,
+              responseHeaders: { 'retry-after': '2' },
+            },
+          },
+        ],
+      }),
+    });
+    await expect(collect(adapter.stream(REQ))).rejects.toMatchObject({
+      name: 'ProviderHttpError',
+      status: 429,
+      errorKind: 'rate-limit',
+      headers: { 'retry-after': '2' },
+    });
+  });
+
+  it('W-023: a mid-stream 529 yields a classified capacity error event and finishReason error', async () => {
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: makeOverrides({
+        streamChunks: [
+          { type: 'text-delta', textDelta: 'partial ' },
+          { type: 'error', error: { message: 'overloaded', statusCode: 529 } },
         ],
       }),
     });
     const events = await collect(adapter.stream(REQ));
-    const errors = events.filter((e) => e.type === 'error');
-    expect(errors).toHaveLength(2);
-    expect((errors[0] as { error: { message: string } }).error.message).toBe('boom');
-    expect((errors[1] as { error: { message: string } }).error.message).toBe('wrapped');
+    const error = events.find((e) => e.type === 'error');
+    expect(error).toMatchObject({ error: { kind: 'capacity', message: 'overloaded' } });
+    const finish = events.find((e) => e.type === 'finish');
+    expect(finish).toMatchObject({ finishReason: 'error' });
+    // The partial content was already delivered - PS-1 forbids a restart.
+    expect(events.some((e) => e.type === 'text-delta')).toBe(true);
+  });
+
+  it('W-023: an abort-shaped error chunk finishes as aborted, no error event, no throw', async () => {
+    const abortError = Object.assign(new Error('The operation was aborted'), {
+      name: 'AbortError',
+    });
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: makeOverrides({
+        streamChunks: [{ type: 'error', error: abortError }],
+      }),
+    });
+    const events = await collect(adapter.stream(REQ));
+    expect(events.some((e) => e.type === 'error')).toBe(false);
+    const finish = events.find((e) => e.type === 'finish');
+    expect(finish).toMatchObject({ finishReason: 'aborted' });
+  });
+
+  it('W-023: stream-start is emitted exactly once, before the first content event', async () => {
+    const adapter = vercelAdapter(MODEL, {
+      runtimeOverrides: makeOverrides({
+        streamChunks: [
+          { type: 'text-delta', textDelta: 'a' },
+          { type: 'text-delta', textDelta: 'b' },
+          { type: 'finish', finishReason: 'stop', usage: {} },
+        ],
+      }),
+    });
+    const events = await collect(adapter.stream(REQ));
+    const starts = events.filter((e) => e.type === 'stream-start');
+    expect(starts).toHaveLength(1);
+    expect(events[0]?.type).toBe('stream-start');
+    expect(events[1]?.type).toBe('text-delta');
   });
 
   it('wraps a synchronous streamText() throw into ProviderHttpError', async () => {

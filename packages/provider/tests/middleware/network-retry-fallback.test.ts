@@ -8,6 +8,8 @@
 import type { Provider, ProviderEvent, ProviderRequest, ProviderResponse } from '@graphorin/core';
 import { describe, expect, it } from 'vitest';
 
+import type { LanguageModelLike, VercelRuntimeOverrides } from '../../src/adapters/vercel.js';
+import { vercelAdapter } from '../../src/adapters/vercel.js';
 import { ProviderHttpError } from '../../src/errors/index.js';
 import { withFallback } from '../../src/middleware/with-fallback.js';
 import { withRetry } from '../../src/middleware/with-retry.js';
@@ -194,3 +196,68 @@ function ok(text = 'ok'): ProviderResponse {
     finishReason: 'stop',
   };
 }
+
+describe('W-023 - vercel in-band pre-content errors compose with retry/fallback', () => {
+  const MODEL: LanguageModelLike = {
+    provider: 'fixture',
+    modelId: 'fixture-model',
+    specificationVersion: 'v4',
+  };
+
+  function flakyOverrides(failures: number): VercelRuntimeOverrides {
+    let attempt = 0;
+    return {
+      streamText: () => ({
+        fullStream: (async function* () {
+          attempt += 1;
+          if (attempt <= failures) {
+            yield {
+              type: 'error',
+              error: { message: 'rate limited', statusCode: 429 },
+            } as never;
+            return;
+          }
+          yield { type: 'text-delta', textDelta: 'recovered' } as never;
+          yield { type: 'finish', finishReason: 'stop', usage: {} } as never;
+        })(),
+      }),
+      generateText: async () => ({ text: '' }),
+    };
+  }
+
+  it('withRetry restarts a stream whose FIRST chunk was a 429 error chunk', async () => {
+    const adapter = vercelAdapter(MODEL, { runtimeOverrides: flakyOverrides(1) });
+    const retried = withRetry({ maxRetries: 2, jitter: false, sleepImpl: () => Promise.resolve() })(
+      adapter,
+    );
+    const events = await collect(retried.stream(REQ));
+    expect(events.some((e) => e.type === 'text-delta')).toBe(true);
+    const finish = events.find((e) => e.type === 'finish');
+    expect(finish).toMatchObject({ finishReason: 'stop' });
+  });
+
+  it('withFallback switches providers on a pre-content 429 error chunk', async () => {
+    const primary = vercelAdapter(MODEL, { runtimeOverrides: flakyOverrides(99) });
+    const secondary = vercelAdapter(
+      { ...MODEL, modelId: 'fixture-secondary' },
+      {
+        runtimeOverrides: {
+          streamText: () => ({
+            fullStream: (async function* () {
+              yield { type: 'text-delta', textDelta: 'from-secondary' } as never;
+              yield { type: 'finish', finishReason: 'stop', usage: {} } as never;
+            })(),
+          }),
+          generateText: async () => ({ text: '' }),
+        },
+      },
+    );
+    const chained = withFallback({ fallbacks: [secondary], logger: () => {} })(primary);
+    const events = await collect(chained.stream(REQ));
+    const text = events
+      .filter((e): e is Extract<typeof e, { type: 'text-delta' }> => e.type === 'text-delta')
+      .map((e) => e.delta)
+      .join('');
+    expect(text).toBe('from-secondary');
+  });
+});

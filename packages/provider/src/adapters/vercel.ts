@@ -33,7 +33,12 @@ import type {
   Usage,
 } from '@graphorin/core';
 
-import { ProviderHttpError, ProviderStreamParseError } from '../errors/errors.js';
+import {
+  classifyHttpStatus,
+  ProviderHttpError,
+  ProviderStreamParseError,
+} from '../errors/errors.js';
+import { isAbortError } from '../internal/abort.js';
 import { applyReasoningPolicy } from '../reasoning/apply-policy.js';
 import { inferReasoningContract } from '../reasoning/classify-contract.js';
 import { resolveReasoningRetention } from '../reasoning/retention.js';
@@ -234,16 +239,28 @@ async function* streamFromVercel(
     });
   }
 
-  yield {
-    type: 'stream-start',
-    metadata: {
-      providerName,
-      modelId: model.modelId,
-    },
+  // W-023: the AI SDK never throws from streamText() synchronously -
+  // transport/HTTP failures (429/500/529) arrive as in-band
+  // `{type:'error'}` chunks. Emitting `stream-start` eagerly made every
+  // such failure post-yield, which forbids `withRetry`/`withFallback`
+  // from restarting the stream (PS-1). Defer it until the first REAL
+  // mapped event, so a pre-content failure can be THROWN as a typed
+  // `ProviderHttpError` (retryable / fallback-eligible) instead.
+  let emittedStart = false;
+  const startEvent = (): ProviderEvent => {
+    emittedStart = true;
+    return {
+      type: 'stream-start',
+      metadata: {
+        providerName,
+        modelId: model.modelId,
+      },
+    };
   };
 
   let finalUsage: Usage | undefined;
   let finishReason: FinishReason = 'stop';
+  let sawError = false;
 
   for await (const chunk of stream) {
     if (req.signal?.aborted) {
@@ -256,6 +273,7 @@ async function* streamFromVercel(
       case 'text-delta': {
         const delta = pickString(chunk.textDelta) ?? pickString(chunk.text) ?? '';
         if (delta.length > 0) {
+          if (!emittedStart) yield startEvent();
           yield { type: 'text-delta', delta };
         }
         break;
@@ -265,6 +283,7 @@ async function* streamFromVercel(
         const delta =
           pickString(chunk.textDelta) ?? pickString(chunk.delta) ?? pickString(chunk.text) ?? '';
         if (delta.length > 0) {
+          if (!emittedStart) yield startEvent();
           yield { type: 'reasoning-delta', delta };
         }
         break;
@@ -277,6 +296,7 @@ async function* streamFromVercel(
         const toolCallId = pickString(chunk.toolCallId) ?? pickString(chunk.id);
         const toolName = pickString(chunk.toolName);
         if (toolCallId !== undefined && toolName !== undefined) {
+          if (!emittedStart) yield startEvent();
           yield {
             type: 'tool-call-start',
             toolCallId,
@@ -293,6 +313,7 @@ async function* streamFromVercel(
           pickString(chunk.delta) ??
           pickString(chunk.inputTextDelta);
         if (toolCallId !== undefined && argsDelta !== undefined && argsDelta.length > 0) {
+          if (!emittedStart) yield startEvent();
           yield {
             type: 'tool-call-input-delta',
             toolCallId,
@@ -304,6 +325,7 @@ async function* streamFromVercel(
       case 'tool-call': {
         const toolCallId = pickString(chunk.toolCallId) ?? pickString(chunk.id);
         if (toolCallId !== undefined) {
+          if (!emittedStart) yield startEvent();
           yield {
             type: 'tool-call-end',
             toolCallId,
@@ -328,9 +350,37 @@ async function* streamFromVercel(
             : typeof errorField === 'object' && errorField !== null
               ? (pickString((errorField as { message?: unknown }).message) ?? 'unknown error')
               : 'unknown error';
+        // W-023: an abort surfacing as an error chunk is a cancellation,
+        // never a retryable failure (mirrors PS-12).
+        if (isAbortError(errorField) || req.signal?.aborted === true) {
+          finishReason = 'aborted';
+          break;
+        }
+        const status = statusFromCause(errorField);
+        if (!emittedStart) {
+          // Pre-content failure: nothing was yielded, so by PS-1 the
+          // middleware may restart this stream. Throw the classified
+          // typed error - `withRetry` retries 429/5xx pre-yield,
+          // `withFallback` switches providers, and the agent-level
+          // fallback chain reads `errorKind` off the throw.
+          const headers = headersFromCause(errorField);
+          throw new ProviderHttpError({
+            providerName,
+            status,
+            message,
+            cause: errorField,
+            ...(headers !== undefined ? { headers } : {}),
+          });
+        }
+        // Mid-stream failure: a restart is forbidden (PS-1) - surface a
+        // structural error event with the canonical kind so the
+        // agent-level per-step fallback can act on rate-limit/capacity
+        // instead of an inert 'unknown'. Status 0 classifies as
+        // 'transient' by the PS-2 network policy.
+        sawError = true;
         yield {
           type: 'error',
-          error: { kind: 'unknown', message },
+          error: { kind: classifyHttpStatus(status, message), message },
         };
         break;
       }
@@ -341,9 +391,12 @@ async function* streamFromVercel(
     }
   }
 
+  if (!emittedStart) yield startEvent();
   yield {
     type: 'finish',
-    finishReason,
+    // W-023: a stream that surfaced an error event must not end with a
+    // synthetic 'stop' + zero usage - parity with llamacpp-node (PS-4).
+    finishReason: sawError ? 'error' : finishReason,
     usage: finalUsage ?? { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
   };
 }
