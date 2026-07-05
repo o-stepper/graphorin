@@ -43,7 +43,7 @@
     "check-licenses": "node ./scripts/check-licenses.mjs",
     "check-anthropic-spec": "node ./scripts/check-anthropic-spec.mjs",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version": "changeset version && node scripts/bump-version.mjs --sync",
     "release": "turbo run build && changeset publish"
   },
   "devDependencies": {
