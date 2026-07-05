@@ -60,8 +60,11 @@ jobs:
       # never a hang. Local runs keep the strict 5s default; explicit
       # per-test/per-suite timeouts still take precedence over this
       # CLI-level default.
+      # Invoked through `turbo run ... --` directly: `pnpm test -- <flag>`
+      # forwards the flag WITHOUT turbo's own `--` separator and turbo
+      # rejects it as an unknown option (observed on windows-latest).
       - name: Test
-        run: pnpm test -- --testTimeout=30000
+        run: pnpm exec turbo run test -- --testTimeout=30000
 
       - name: Build
         run: pnpm build
