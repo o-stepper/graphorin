@@ -41,9 +41,17 @@
  */
 
 import { execFileSync, execSync } from 'node:child_process';
-import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -135,6 +143,48 @@ for (const pkg of packages) {
     execFileSync(attwBin, ['--profile', 'esm-only', tarball], { stdio: 'pipe', encoding: 'utf8' });
   });
 }
+
+// ------------------------------------------------- d.ts zod-generic scan
+// W-013: the published d.ts must never bake CONCRETE zod generics
+// (`z.ZodObject<...>`, `z.ZodEnum<...>`) - those are version-specific
+// shapes that fail typechecking under the other supported zod major.
+// Public schema positions go through the structural `ZodLikeSchema`.
+leg('dts-no-concrete-zod-generics', () => {
+  const offenders = [];
+  for (const pkg of packages) {
+    // Scope: packages where zod is a PEER (consumer-supplied version).
+    // Packages that ship zod as a direct dependency (protocol, server)
+    // resolve their d.ts against their OWN pinned zod - concrete
+    // generics there cannot mismatch the consumer's major (the zod4
+    // tsc leg proves it).
+    const manifest = JSON.parse(readFileSync(join(pkg.dir, 'package.json'), 'utf8'));
+    if (manifest.peerDependencies?.zod === undefined) continue;
+    const distDir = join(pkg.dir, 'dist');
+    if (!existsSync(distDir)) continue;
+    const stack = [distDir];
+    while (stack.length > 0) {
+      const dir = stack.pop();
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        const full = join(dir, entry.name);
+        if (entry.isDirectory()) {
+          stack.push(full);
+          continue;
+        }
+        if (!entry.name.endsWith('.d.ts')) continue;
+        const text = readFileSync(full, 'utf8');
+        // Type positions only: `: z.ZodX<` / `z.ZodObject<{`.
+        if (/z\.Zod\w+</.test(text)) {
+          offenders.push(relative(ROOT, full));
+        }
+      }
+    }
+  }
+  if (offenders.length > 0) {
+    throw new Error(
+      `concrete zod generics leaked into published d.ts (W-013):\n  ${offenders.join('\n  ')}`,
+    );
+  }
+});
 
 // -------------------------------------------- scratch consumer (one-shot)
 const consumerDir = join(scratch, 'consumer');

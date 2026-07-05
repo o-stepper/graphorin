@@ -147,7 +147,7 @@ describe('W-101 - Rule-of-Two untrustedInput leg is enforced', () => {
     });
     const composed = {
       rules: [...c.policy.rules, { effect: 'allow' as const, tool: 'web_search' }],
-      defaultDenySensitive: c.policy.defaultDenySensitive,
+      defaultDenySensitive: c.policy.defaultDenySensitive ?? false,
     };
     const verdict = evaluateToolArgumentPolicy(composed, {
       toolName: 'web_search',

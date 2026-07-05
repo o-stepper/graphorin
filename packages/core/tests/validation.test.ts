@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { z } from 'zod';
 
+import type { ZodLikeError, ZodLikeSchema } from '../src/utils/validation.js';
 import { validate, validateOrThrow } from '../src/utils/validation.js';
 
 describe('validate', () => {
@@ -33,5 +34,36 @@ describe('validateOrThrow', () => {
     expect(() => validateOrThrow(schema, { a: 1, b: 'oops' }, 'config')).toThrow(
       /validation failed for config/,
     );
+  });
+});
+
+describe('W-013 - zod 4 compatibility surface', () => {
+  it('validateOrThrow does not crash on symbol path elements (zod 4 PropertyKey paths)', () => {
+    const sym = Symbol('sym-key');
+    const schema: ZodLikeSchema<never> = {
+      safeParse: () => ({
+        success: false as const,
+        error: {
+          name: 'ZodError',
+          message: 'nope',
+          issues: [
+            { path: ['user', sym, 0], message: 'bad symbol field' },
+            { path: [], message: 'root issue' },
+          ],
+        },
+      }),
+    } as unknown as ZodLikeSchema<never>;
+    expect(() => validateOrThrow(schema, {}, 'test')).toThrowError(
+      /Symbol\(sym-key\).*bad symbol field|bad symbol field/,
+    );
+  });
+
+  it('zod3-like and zod4-like issue shapes are both assignable to ZodLikeError', () => {
+    // Structural fixtures - the shim must be a SUPERSET of both peers.
+    type Zod3Issue = { path: Array<string | number>; message: string };
+    type Zod4Issue = { path: PropertyKey[]; message: string };
+    type ShimIssue = ZodLikeError['issues'][number];
+    expectTypeOf<Zod3Issue>().toExtend<ShimIssue>();
+    expectTypeOf<Zod4Issue>().toExtend<ShimIssue>();
   });
 });

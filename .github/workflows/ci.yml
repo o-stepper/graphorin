@@ -133,8 +133,9 @@ jobs:
   # + a tsc matrix). Registry access is deliberate here (it IS npm
   # install), unlike the offline test suite. ubuntu-only by design:
   # artifact signal, not platform signal (same rationale as
-  # examples-smoke). `--allow-fail zod4` tracks the known zod-4 d.ts
-  # break (W-013) until its fix lands - the leg still runs and reports.
+  # examples-smoke). Every leg is enforced, including zod4 (its W-013
+  # break was fixed in wave 2 - the shim path is PropertyKey-based and
+  # no published d.ts carries concrete zod generics anymore).
   package-shape:
     name: Pack gate (publint + attw + scratch consumer)
     runs-on: ubuntu-latest
@@ -159,6 +160,6 @@ jobs:
       # before failing the job (mirrors the C4 post-publish smoke).
       - name: Pack gate
         run: |
-          node scripts/check-package-shape.mjs --allow-fail zod4 \
-            || node scripts/check-package-shape.mjs --skip-build --allow-fail zod4
+          node scripts/check-package-shape.mjs \
+            || node scripts/check-package-shape.mjs --skip-build
 

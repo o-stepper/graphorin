@@ -33,8 +33,35 @@ const runbookSearchOutputSchema = z.object({
   ),
 });
 
-type RunbookSearchInput = z.infer<typeof runbookSearchInputSchema>;
-type RunbookSearchOutput = z.infer<typeof runbookSearchOutputSchema>;
+/** W-013: explicit interfaces (see fact-tools.ts) - no zod generics in d.ts. */
+export interface RunbookSearchInput {
+  query: string;
+  topK?: number | undefined;
+}
+export interface RunbookProcedureHit {
+  id: string;
+  text: string;
+  steps?: string[] | undefined;
+  variables?: string[] | undefined;
+  successCriteria?: string[] | undefined;
+  priority: number;
+  score: number;
+}
+export interface RunbookSearchOutput {
+  procedures: RunbookProcedureHit[];
+}
+
+// W-013 parity gate (compile-time only, erased from the build and the
+// d.ts): each explicit interface must stay MUTUALLY assignable with its
+// schema's inference - a drifted transcription fails `tsc` right here.
+type W013Equals<A, B> = A extends B ? (B extends A ? true : false) : false;
+type W013Assert<T extends true> = T;
+type _W013Check1 = W013Assert<
+  W013Equals<RunbookSearchInput, z.infer<typeof runbookSearchInputSchema>>
+>;
+type _W013Check2 = W013Assert<
+  W013Equals<RunbookSearchOutput, z.infer<typeof runbookSearchOutputSchema>>
+>;
 
 /**
  * `runbook_search` - find validated procedures matching a task
