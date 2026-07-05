@@ -229,18 +229,29 @@ export async function verifySkillSignature(
 
 /**
  * Operator trust root for skill signatures (D4 / security-01). At least
- * one leg must be non-empty to trust anything: a signer is accepted when
- * its resolved key fingerprint is in `fingerprints` OR its publisher is
- * in `publishers`. `allowSigstore` (default `true`) exempts sigstore-
- * resolved keys (their identity/issuer were already checked by the
- * verifier). Treat an inline key absent from the root as unverified.
+ * one leg must be non-empty to trust anything. `allowSigstore` (default
+ * `true`) exempts sigstore-resolved keys (their identity/issuer were
+ * already checked by the verifier).
+ *
+ * W-026: the `publishers` leg counts ONLY for keys resolved through the
+ * `well-known` channel, whose URL host is verified to be the publisher's
+ * domain (or a subdomain). The frontmatter `publisher` string is NOT
+ * covered by the signature - anyone can claim any publisher - so an
+ * inline key can never satisfy this leg (self-sign + claim
+ * `publisher: trusted.example.com` used to pass). Inline keys require
+ * the `fingerprints` leg.
  *
  * @stable
  */
 export interface SkillTrustRoot {
   /** Trusted key fingerprints (`sha256:<hex>`; matching is fold-normalised). */
   readonly fingerprints?: ReadonlyArray<string>;
-  /** Trusted publisher identifiers (exact match against the `publisher` field). */
+  /**
+   * Trusted publisher DNS names. Satisfied only by `well-known`-resolved
+   * keys whose URL host equals the publisher (or is its subdomain) -
+   * control of the HTTPS endpoint on the publisher's domain is the one
+   * channel that can vouch for the unsigned `publisher` string (W-026).
+   */
   readonly publishers?: ReadonlyArray<string>;
   /** Trust sigstore-resolved keys without a fingerprint/publisher entry. Default `true`. */
   readonly allowSigstore?: boolean;
@@ -260,7 +271,13 @@ function evaluateTrustRoot(
   const fpRoot = (root.fingerprints ?? []).map(normaliseFingerprint);
   const fpMatch =
     ctx.fingerprint !== undefined && fpRoot.includes(normaliseFingerprint(ctx.fingerprint));
-  const pubMatch = (root.publishers ?? []).includes(ctx.publisher);
+  // W-026: the publisher string comes from ATTACKER-CONTROLLED
+  // frontmatter and is excluded from the signed payload. Only the
+  // well-known channel proves it (resolvePublicKey enforces
+  // host==publisher there), so the publishers leg never accepts an
+  // inline key.
+  const pubMatch =
+    ctx.publicKeySource === 'well-known' && (root.publishers ?? []).includes(ctx.publisher);
   if (fpMatch || pubMatch) return { trusted: true };
   return {
     trusted: false,
@@ -292,6 +309,31 @@ async function resolvePublicKey(
       };
     }
     case 'well-known': {
+      // W-102: the key URL comes from the same attacker-controlled
+      // frontmatter as `publisher` - without this binding, a key hosted
+      // ANYWHERE was accepted as "the publisher's". Web-PKI assumption:
+      // only control of an HTTPS endpoint on the publisher's own domain
+      // (or a subdomain, so keys.vendor.example.com works for
+      // vendor.example.com) can vouch for the publisher string.
+      let host: string;
+      try {
+        host = new URL(block.publicKeyRef.url).hostname.toLowerCase();
+      } catch {
+        throw new SkillSignatureInvalidError(
+          block.publisher,
+          `Malformed well-known key URL '${block.publicKeyRef.url}'.`,
+          block.publisher,
+        );
+      }
+      const publisher = block.publisher.toLowerCase();
+      if (host !== publisher && !host.endsWith(`.${publisher}`)) {
+        throw new SkillSignatureInvalidError(
+          block.publisher,
+          `Well-known key URL host '${host}' does not belong to publisher '${block.publisher}' ` +
+            '(the key must be served from the publisher domain or a subdomain of it).',
+          block.publisher,
+        );
+      }
       const pem = await ctx.fetcher(block.publicKeyRef.url, ctx.signal);
       const fp = fingerprintPem(pem);
       if (
@@ -370,7 +412,12 @@ async function defaultFetcher(url: string, signal?: AbortSignal): Promise<string
       `Refusing to fetch publisher key over insecure transport (${url}).`,
     );
   }
-  const response = await fetch(url, signal === undefined ? {} : { signal });
+  // W-102: an open redirect on the publisher's domain must not be able
+  // to substitute the key source - the fetch never follows redirects.
+  const response = await fetch(url, {
+    redirect: 'error',
+    ...(signal === undefined ? {} : { signal }),
+  });
   if (!response.ok) {
     throw new SkillSignatureInvalidError(
       'unknown',

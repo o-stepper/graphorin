@@ -172,7 +172,7 @@ An operator allow/deny policy gates which package names may be installed. By def
 await installSkillFromNpm({
   packageName: '@vendor/skill',
   trustRoot: {
-    publishers: ['vendor.example.com'],           // trusted publisher ids
+    publishers: ['vendor.example.com'],           // trusted publisher DOMAINS (well-known only)
     fingerprints: ['sha256:...'],                  // and/or pinned key fingerprints
     allowSigstore: true,                           // sigstore-resolved keys exempt (default)
   },
@@ -180,6 +180,8 @@ await installSkillFromNpm({
 ```
 
 The root check runs after the ed25519 signature itself is valid, so the result distinguishes a forged signature from an untrusted signer.
+
+The `publishers` leg is domain-bound (W-026): the frontmatter `publisher` string is NOT covered by the signature - anyone can claim any publisher - so the leg counts only for keys resolved through the `well-known` channel, and the key URL's host must be the publisher's domain or a subdomain of it (`keys.vendor.example.com` works for `vendor.example.com`; anything else is rejected at resolve time). The key fetch never follows redirects, so an open redirect on the publisher's domain cannot substitute the key source. Consequences: an inline key can never satisfy `publishers` (pin its fingerprint instead), and a publisher id that is not a DNS name (or a key hosted on an unrelated domain) needs the `fingerprints` leg.
 
 ## Lateral-leak defense layer
 
@@ -323,7 +325,7 @@ release enforces. Each is a design-class change (an operator trust root, a signe
 external anchor, a persisted registry) rather than a one-line fix, and is tracked
 rather than shipped speculatively.
 
-- **Skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key - but for an `inline` key that key comes from the (attacker-authored) frontmatter itself, and for a `well-known` key the pin fingerprint is frontmatter-supplied too. Without an operator-pinned `publicKeySource`, a *self-signed* skill verifies as `signatureVerified: true`. Treat signature verification as integrity-in-transit, not publisher authenticity, until you configure an operator trust root. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
+- **Without a trust root, skill-signature verification proves integrity, not provenance.** `verifySkillSignature` checks that a `SKILL.md` is internally consistent with a key - for an `inline` key that key comes from the (attacker-authored) frontmatter itself, so a *self-signed* skill verifies as `signatureVerified: true` until you configure an operator trust root. WITH a trust root the story is now stronger (W-026): the `publishers` leg is satisfied only by `well-known` keys served from the publisher's own domain (host-bound, redirects refused), which under the web-PKI assumption IS publisher provenance; the residual caveat applies to inline keys without a `fingerprints` pin. (Unsigned skills are still rejected outright, and the installer verifies the SKILL.md that actually landed on disk.)
 - **The audit chain is tamper-*evident*, not tamper-*resistant*.** It is an unkeyed SHA-256 hash chain with no signing key or external anchor. An actor with write access to the audit database - or a compromised process holding the at-rest passphrase - can delete or rewrite entries and re-root the chain so `verifyAuditChain` still reports clean (`pruneAudit` does exactly this re-rooting by design). It defends only against actors *without* DB write access. Anchor the chain head externally if you need resistance against privileged actors. A prune also rewrites surviving entries' hashes, so hashes archived from an earlier `exportAudit` no longer match the live chain.
 - **The installed-skills registry is process-memory only.** `auditInstalledSkills()` reflects only installations performed in the current process; it is not persisted across restarts. Relatedly, the `trusted-with-scripts` trust level is currently unreachable in practice (no folder installer constructs a `{ kind: 'folder' }` source), so skill `postinstall` lifecycles never run.
 
