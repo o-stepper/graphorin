@@ -358,3 +358,31 @@ export function scheduleRunPruning(
   }
   return () => clearInterval(timer);
 }
+
+/** Default cadence for the idempotency-record sweep (W-061). */
+export const DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS = 60 * 60_000;
+
+/**
+ * W-061: schedule a periodic prune of EXPIRED idempotency records.
+ * `idempotency_records` stores each keyed POST's full `response_json`
+ * with an `expires_at` column, but expiry was only ever checked on the
+ * READ path - the bodies accumulated on disk indefinitely. The sweep
+ * passes `now()` as the cutoff, deleting exactly the records the read
+ * path already refuses to replay (IETF-draft semantics unchanged).
+ * Best-effort: store errors are swallowed. Same shape as
+ * {@link scheduleRunPruning}: `unref`-ed timer + stop function.
+ */
+export function scheduleIdempotencyPruning(
+  store: { prune(olderThan: number): Promise<number> },
+  now: () => number,
+  opts: { readonly intervalMs?: number } = {},
+): () => void {
+  const intervalMs = opts.intervalMs ?? DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS;
+  const timer = setInterval(() => {
+    void store.prune(now()).catch(() => {});
+  }, intervalMs);
+  if (typeof (timer as { unref?: () => void }).unref === 'function') {
+    (timer as { unref: () => void }).unref();
+  }
+  return () => clearInterval(timer);
+}

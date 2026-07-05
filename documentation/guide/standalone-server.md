@@ -188,7 +188,7 @@ When you pass **both** a `consolidator` and a triggers scheduler to `createServe
 
 ## Idempotency
 
-Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute.
+Repeated submissions with the same `Idempotency-Key` + body return the original response **for the same principal only** - the record is bound to the executing token, a different token gets `409 idempotency-conflict` (IP-6). `POST /v1/tokens` is excluded from response caching entirely (it returns a raw secret), so repeated mint calls re-execute. Expired idempotency records (each stores the full response body) are swept from the database automatically on an hourly timer; the read path already refuses to replay them, so the sweep changes no replay semantics.
 
 ## Disconnects and reconnection
 
