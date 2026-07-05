@@ -12,7 +12,7 @@ interface LogCall {
   message: string;
 }
 
-describe('ollamaAdapter — public-tls trust class', () => {
+describe('ollamaAdapter - public-tls trust class', () => {
   it('accepts an https://public-host baseUrl and narrows sensitivity to public', () => {
     const log: LogCall[] = [];
     const fetchImpl: typeof fetch = (async () =>

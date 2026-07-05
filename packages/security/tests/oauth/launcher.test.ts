@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { _resolveLauncherForTesting } from '../../src/oauth/browser.js';
 
-describe('SPL-18 — Windows launcher does not re-parse the URL through cmd.exe', () => {
+describe('SPL-18 - Windows launcher does not re-parse the URL through cmd.exe', () => {
   it('the win32 launcher avoids cmd /c start (no cmd double-parse of the URL)', () => {
     const spec = _resolveLauncherForTesting('https://issuer.example.com/oauth/authorize', 'win32');
     expect(spec.command).not.toBe('cmd');

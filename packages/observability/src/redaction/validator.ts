@@ -1,5 +1,5 @@
 /**
- * `createRedactionValidator(...)` — the building block for the
+ * `createRedactionValidator(...)` - the building block for the
  * mandatory `withValidation()` wrapper applied to every exporter.
  *
  * @packageDocumentation
@@ -127,7 +127,7 @@ function applyPatterns(
       }
       continue;
     }
-    // RP-21: per-match predicate — only mask hits the verifier accepts (e.g.
+    // RP-21: per-match predicate - only mask hits the verifier accepts (e.g.
     // Luhn-valid PANs), and only count the pattern as matched when one did.
     const verify = p.verify;
     p.regex.lastIndex = 0;
@@ -203,7 +203,7 @@ export function createRedactionValidator(
     recordViolation(violation);
     if (failOnUnredacted) {
       throw new RedactionValidationError(
-        `RedactionValidator dropped value (${violation.reason}) — set ` +
+        `RedactionValidator dropped value (${violation.reason}) - set ` +
           'failOnUnredactedSensitive: false in production to keep the ' +
           'pipeline running.',
         violation,

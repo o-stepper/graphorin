@@ -1,8 +1,8 @@
 /**
- * `finalStateCorrect` — the goal-state compare. Passes when the
+ * `finalStateCorrect` - the goal-state compare. Passes when the
  * trajectory's `finalState` (optionally read at `path`) deep-equals
  * `expected`, or satisfies the `matches` predicate. This is the canonical
- * "did the harness actually accomplish the task" signal — it inspects the
+ * "did the harness actually accomplish the task" signal - it inspects the
  * world the tools mutated, not just the model's final words.
  *
  * @packageDocumentation

@@ -1,5 +1,5 @@
 /**
- * `withRateLimit` — token-bucket rate limiter keyed per `provider × model`.
+ * `withRateLimit` - token-bucket rate limiter keyed per `provider × model`.
  * Configurable mode: `'throw'` (default) raises
  * {@link RateLimitExceededError} on overflow; `'queue'` waits for the
  * next available slot.
@@ -20,7 +20,7 @@ import { defineProviderMiddleware } from './compose.js';
 export interface WithRateLimitOptions {
   /** Allowed requests per minute. */
   readonly requestsPerMinute: number;
-  /** Burst size — defaults to `requestsPerMinute / 4` (rounded up to >= 1). */
+  /** Burst size - defaults to `requestsPerMinute / 4` (rounded up to >= 1). */
   readonly burst?: number;
   /** What to do on overflow. Default `'throw'`. */
   readonly mode?: 'throw' | 'queue';
@@ -79,7 +79,7 @@ export const withRateLimit = defineProviderMiddleware<WithRateLimitOptions>({
       // PS-18: a single drain loop per bucket grants queued waiters ONE token at
       // a time, sleeping until the next token actually refills. Previously every
       // concurrent waiter computed the same wait, slept once, and then all
-      // passed — letting N requests through on ~1 token (a burst). FIFO order is
+      // passed - letting N requests through on ~1 token (a burst). FIFO order is
       // preserved and grants track the real refill schedule.
       const drain = (bucket: BucketState): void => {
         if (bucket.draining) return;

@@ -89,7 +89,7 @@ describe('createAuditOnlyGuard', () => {
     // idiom in the same package) so a single GC/scheduler pause
     // does not flake the suite while obvious regressions still trip.
     // The tighter 50 µs target is deferred to the optional native
-    // binding follow-up (post-MVP — DEC-153 perf-budget commentary).
+    // binding follow-up (post-MVP - DEC-153 perf-budget commentary).
     const big = 'x'.repeat(10_000);
     const guard = createAuditOnlyGuard();
     const { reader } = createReader({ a: big });
@@ -116,7 +116,7 @@ describe('createAuditOnlyGuard', () => {
     // Quiet machines (local M1 / dedicated runner): the p95 is well
     // below 200 µs and the 200 µs gate catches obvious regressions.
     // Shared GitHub-hosted runners suffer wild noise on µs-scale
-    // microbenchmarks — this very assertion has measured 1.1 ms and,
+    // microbenchmarks - this very assertion has measured 1.1 ms and,
     // on a loaded ubuntu-latest job, ~3.0 ms / call while the median
     // sample on the same job is still ~30 µs. Widen the gate to
     // 5000 µs under `CI=true` so a single GC / scheduler pause does

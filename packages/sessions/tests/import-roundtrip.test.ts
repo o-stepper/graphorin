@@ -87,7 +87,7 @@ describe('Session export / import round-trip', () => {
     const msgs = parsed.records.filter(
       (r): r is typeof r & { messageId: string; createdAt: string } => r.kind === 'message',
     );
-    // Stored ids/timestamps survive — not fresh ids or the export wall-clock.
+    // Stored ids/timestamps survive - not fresh ids or the export wall-clock.
     expect(msgs.map((m) => m.messageId)).toEqual(['msg-1', 'msg-2']);
     expect(msgs[0]?.createdAt).toBe('2026-05-08T10:00:00.000Z');
 

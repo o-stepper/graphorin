@@ -29,7 +29,7 @@ import { createStubEmbedder } from './fixtures/in-memory-store.js';
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
 /**
- * Branching stub provider for the deep-phase reflection flow — serves the
+ * Branching stub provider for the deep-phase reflection flow - serves the
  * salient-questions and insight-synthesis responses off their system prompts,
  * recording which reflection prompts it saw so a test can assert no re-fire.
  */
@@ -92,7 +92,7 @@ async function makeStore(opts: { withVec?: boolean } = {}): Promise<GraphorinSql
   return store;
 }
 
-describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
+describe('@graphorin/memory <> @graphorin/store-sqlite - integration', () => {
   it('createMemory wires every tier against the production sqlite adapter', async () => {
     const sqlite = await makeStore();
     try {
@@ -202,7 +202,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       expect((await memory.insights.list(SCOPE, { includeQuarantined: true })).length).toBe(1);
 
       // Second deep run with no new episodes: the watermark keeps the gate
-      // closed — no reflection LLM calls, no duplicate insight (MCON-13).
+      // closed - no reflection LLM calls, no duplicate insight (MCON-13).
       const second = await memory.consolidator.fireNow('deep', SCOPE);
       expect(second?.insightsCreated ?? 0).toBe(0);
       expect(provider.reflectionCalls.length).toBe(afterFirst);
@@ -355,7 +355,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
-  it('the decay window is not saturated by archived rows — live facts keep decaying (MCON-6)', async () => {
+  it('the decay window is not saturated by archived rows - live facts keep decaying (MCON-6)', async () => {
     const sqlite = await makeStore();
     try {
       const memory = createMemory({
@@ -385,7 +385,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
           id,
         ]);
       }
-      // One live fact, 40 days stale — retention e^(-40/7) ≈ 0.003 < 0.05.
+      // One live fact, 40 days stale - retention e^(-40/7) ≈ 0.003 < 0.05.
       await sqlite.memory.semantic.remember({
         id: 'live-stale',
         kind: 'semantic',
@@ -442,7 +442,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
         'f-untouched',
       ]);
 
-      // Recall only the climbing fact — search() must stamp its access.
+      // Recall only the climbing fact - search() must stamp its access.
       const hits = await memory.semantic.search(SCOPE, 'alpine climbing');
       expect(hits.map((h) => h.record.id)).toContain('f-accessed');
 
@@ -531,7 +531,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
     }
   });
 
-  it('decay re-ranks the full fused pool — a fresh fact beyond topK enters the page (MRET-8)', async () => {
+  it('decay re-ranks the full fused pool - a fresh fact beyond topK enters the page (MRET-8)', async () => {
     const sqlite = await makeStore();
     try {
       const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
@@ -565,7 +565,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       ]);
       conn.run('UPDATE facts SET created_at = ? WHERE id = ?', [now, 'fresh-11']);
 
-      // NOTE: decay first — MRET-7 marks every RETURNED fact as accessed,
+      // NOTE: decay first - MRET-7 marks every RETURNED fact as accessed,
       // which would refresh the stale ones for a later decay pass.
       const decayed = await memory.semantic.search(SCOPE, 'kayaking', {
         topK: 10,
@@ -574,7 +574,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       expect(decayed.map((h) => h.record.id)).toContain('fresh-11');
       expect(decayed.length).toBe(10);
 
-      // Без decay срез идёт по чистой лексике — fresh-11 за бортом.
+      // Без decay срез идёт по чистой лексике - fresh-11 за бортом.
       // (After the decayed search the returned ids got access-bumped,
       // but plain fusion ignores decay columns so the order holds.)
       const noDecay = await memory.semantic.search(SCOPE, 'kayaking', { topK: 10 });
@@ -590,7 +590,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       const memory = createMemory({ store: sqlite.memory, embeddings: sqlite.embeddings });
       const startedAt = '2026-05-01T00:00:00.000Z';
       const endedAt = '2026-05-01T01:00:00.000Z';
-      // Same recency, no importance — only lexical quality differs:
+      // Same recency, no importance - only lexical quality differs:
       // one episode mentions the query terms repeatedly, the other once.
       await sqlite.memory.episodic.put({
         id: 'ep-strong',
@@ -709,7 +709,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
         embedder,
       });
       const fact = await memory.semantic.remember(SCOPE, { text: 'embedded fact' });
-      // The semantic.get path round-trips through the adapter — proves
+      // The semantic.get path round-trips through the adapter - proves
       // the embedded write succeeded without raising the unknown-id
       // guard.
       const fetched = await memory.semantic.get(SCOPE, fact.id);
@@ -730,7 +730,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       });
       const r = await memory.session.push(SCOPE, { role: 'user', content: 'hi' });
       // Manually populate the token-count cache via a direct SQL
-      // update — the adapter exposes the cache column per DEC-131
+      // update - the adapter exposes the cache column per DEC-131
       // even though the public push() call leaves it null.
       sqlite.connection.run('UPDATE session_messages SET token_count = ? WHERE id = ?', [
         95,
@@ -798,7 +798,7 @@ describe('@graphorin/memory <> @graphorin/store-sqlite — integration', () => {
       const byName = new Map(memory.tools.map((t) => [t.name, t]));
       // Every `tool_name(arg, arg?)` mention in the system-prompt base
       // template must reference only parameters the registered schema
-      // actually accepts — the model "filters" with phantom params
+      // actually accepts - the model "filters" with phantom params
       // otherwise (non-strict zod strips unknown keys silently).
       const text = enLocalePack.baseTemplate.full;
       const mentions = [...text.matchAll(/\b([a-z][a-z0-9_]*)\(([^)]*)\)/g)];

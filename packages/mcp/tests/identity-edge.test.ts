@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { deriveServerIdentity, formatMCPServerName } from '../src/helpers/identity.js';
 
-describe('deriveServerIdentity — edge cases', () => {
+describe('deriveServerIdentity - edge cases', () => {
   it('strips trailing extensions from a stdio command basename', () => {
     const id = deriveServerIdentity({ kind: 'stdio', command: 'C:\\bin\\example.exe' });
     if (id.kind === 'mcp-stdio') {
@@ -26,7 +26,7 @@ describe('deriveServerIdentity — edge cases', () => {
   });
 });
 
-describe('formatMCPServerName — edge cases', () => {
+describe('formatMCPServerName - edge cases', () => {
   it('renders a stdio command with no arguments', () => {
     expect(formatMCPServerName({ kind: 'stdio', command: '/usr/bin/node' })).toBe('stdio:node');
   });

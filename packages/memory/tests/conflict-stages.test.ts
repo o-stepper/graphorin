@@ -38,7 +38,7 @@ function ctx(candidate: Fact, hits: ReadonlyArray<MemoryHit<Fact>>): StageContex
   };
 }
 
-describe('@graphorin/memory — conflict stage 1 (exact dedup)', () => {
+describe('@graphorin/memory - conflict stage 1 (exact dedup)', () => {
   it('returns dedup when an existing hit shares the canonical body', async () => {
     const candidate = fact('cand', '  Lives in Boston. ');
     const out = await stage1ExactDedup.evaluate(ctx(candidate, [hit('lives in boston.', 0.5)]));
@@ -83,7 +83,7 @@ describe('@graphorin/memory — conflict stage 1 (exact dedup)', () => {
   });
 });
 
-describe('@graphorin/memory — conflict stage 2 (embedding three-zone)', () => {
+describe('@graphorin/memory - conflict stage 2 (embedding three-zone)', () => {
   const candidate = fact('cand', 'lives in Boston');
 
   it('admits when no candidates were found', async () => {
@@ -130,7 +130,7 @@ describe('@graphorin/memory — conflict stage 2 (embedding three-zone)', () => 
   });
 });
 
-describe('@graphorin/memory — conflict stage 3 (heuristic regex)', () => {
+describe('@graphorin/memory - conflict stage 3 (heuristic regex)', () => {
   it('marks supersede when the candidate has a supersede marker', async () => {
     const out = await stage3HeuristicRegex.evaluate(
       ctx(fact('c', 'I just moved to Tbilisi.'), [hit('lives in Boston', 0.55)]),
@@ -165,7 +165,7 @@ describe('@graphorin/memory — conflict stage 3 (heuristic regex)', () => {
   });
 });
 
-describe('@graphorin/memory — conflict stage 4 (subject/predicate)', () => {
+describe('@graphorin/memory - conflict stage 4 (subject/predicate)', () => {
   it('marks supersede when subject + predicate match but object differs', async () => {
     const out = await stage4SubjectPredicate.evaluate(
       ctx(fact('c', 'Atlas lives in Tbilisi'), [hit('Atlas lives in Boston', 0.55)]),
@@ -198,7 +198,7 @@ describe('@graphorin/memory — conflict stage 4 (subject/predicate)', () => {
   });
 });
 
-describe('@graphorin/memory — conflict stage 5 (defer-to-deep)', () => {
+describe('@graphorin/memory - conflict stage 5 (defer-to-deep)', () => {
   it('returns pending with every CONFLICT-CHECK candidate id', async () => {
     const out = await stage5DeferToDeep.evaluate(
       ctx(fact('c', 'I love hiking', { id: 'cand-1' }), [

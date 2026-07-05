@@ -17,7 +17,7 @@ import type { SessionScope } from '../types/session-scope.js';
  *
  * Sub-namespaces map 1:1 to the six tiers so each implementation can
  * pick its own physical layout (one big table, six tables, mixed) while
- * preserving append-only semantics — soft-delete only.
+ * preserving append-only semantics - soft-delete only.
  *
  * @stable
  */

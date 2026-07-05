@@ -1,5 +1,5 @@
 /**
- * `exportAudit(...)` — stream stored audit entries as JSONL.
+ * `exportAudit(...)` - stream stored audit entries as JSONL.
  *
  * The function never loads the entire chain into memory; it writes
  * one canonical-JSON line per entry into the supplied writer.

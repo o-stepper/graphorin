@@ -1,7 +1,7 @@
 /**
  * FIDES-lattice (SDF-8) agent wiring: `DataFlowPolicyConfig.treatPiiAsSensitive`
- * threads `containsPii` into the run's taint ledger, so a tool emitting PII —
- * tagged only `'internal'`, not `'secret'` — arms the lethal-trifecta `sensitive`
+ * threads `containsPii` into the run's taint ledger, so a tool emitting PII -
+ * tagged only `'internal'`, not `'secret'` - arms the lethal-trifecta `sensitive`
  * leg. Default off ⇒ byte-identical.
  */
 

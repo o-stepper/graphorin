@@ -6,7 +6,7 @@ import { createMCPClientFromSdkTransport } from '../src/client/client.js';
 import type { MCPClient } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MCP-derived tools — trust class + registry integration', () => {
+describe('MCP-derived tools - trust class + registry integration', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 

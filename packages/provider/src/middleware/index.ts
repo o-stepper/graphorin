@@ -1,5 +1,5 @@
 /**
- * Middleware barrel — the canonical-order composer plus seven built-in
+ * Middleware barrel - the canonical-order composer plus seven built-in
  * middlewares.
  *
  * @packageDocumentation

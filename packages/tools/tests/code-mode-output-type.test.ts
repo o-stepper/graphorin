@@ -2,7 +2,7 @@
  * A5: structured tool output end-to-end. `code_search` projects each tool as a
  * `tools.NAME(input: …): Promise<…>` signature so the model writes correct code,
  * but the return was hardcoded `Promise<unknown>`. With a tool `outputSchema`,
- * render the real return type — the model now knows what each tool returns and
+ * render the real return type - the model now knows what each tool returns and
  * can chain calls. Groundwork for typed code-mode (E1) and field-level previews.
  */
 

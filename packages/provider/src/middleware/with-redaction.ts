@@ -1,5 +1,5 @@
 /**
- * `withRedaction` — outbound prompt-redaction middleware. Innermost
+ * `withRedaction` - outbound prompt-redaction middleware. Innermost
  * layer in the canonical order: it runs after every other middleware
  * has shaped the request and immediately before the underlying
  * provider call. The middleware:
@@ -19,7 +19,7 @@
  *    record (audit emission is delegated to the consumer via
  *    `onViolation`).
  * 7. Optionally scans streamed `text-delta` chunks for the same
- *    patterns — observability-only in v0.1, no stream mutation.
+ *    patterns - observability-only in v0.1, no stream mutation.
  *
  * @packageDocumentation
  */
@@ -102,7 +102,7 @@ export interface PromptRedactionPolicy {
   readonly onViolation?: (violation: PromptRedactionViolation) => void;
   /** Optional logger override. Defaults to `console.warn`. */
   readonly logger?: (message: string, meta?: object) => void;
-  /** Test hook — synthetic trust class. */
+  /** Test hook - synthetic trust class. */
   readonly trustClassOverride?: LocalProviderTrust;
 }
 
@@ -622,7 +622,7 @@ async function* scanStreamingResponse(
   let tail = '';
   for await (const event of source) {
     if (event.type === 'text-delta' && policy.scanScope === 'all') {
-      // Observability-only — match patterns and emit synthetic violation rows;
+      // Observability-only - match patterns and emit synthetic violation rows;
       // do NOT mutate the stream content (mid-stream mutation would break
       // structured-output / tool-call parsing).
       const haystack = tail + event.delta;

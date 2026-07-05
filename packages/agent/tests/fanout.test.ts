@@ -25,7 +25,7 @@ describe('runFanOut', () => {
     expect(types).toContain('agent.fanout.merged');
   });
 
-  it('isolates failed children — never throws from the fan-out call itself', async () => {
+  it('isolates failed children - never throws from the fan-out call itself', async () => {
     const r = await runFanOut<string>({
       children: [
         { agentId: 'ok', invoke: async () => 'ok' },
@@ -106,7 +106,7 @@ describe('runFanOut', () => {
   });
 });
 
-describe('runFanOut — merge guard + budgets (AG-7 / AG-16)', () => {
+describe('runFanOut - merge guard + budgets (AG-7 / AG-16)', () => {
   const lowTrustChild = {
     agentId: 'shady',
     invoke: async () => 'INJECTED PAYLOAD dominating the merge',

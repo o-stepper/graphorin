@@ -8,7 +8,7 @@ import type { Sensitivity, ToolSource, ToolTrustClass } from '@graphorin/core';
 import type { TaintLabel } from './types.js';
 
 /**
- * Trust classes whose output is treated as untrusted — content a prompt
+ * Trust classes whose output is treated as untrusted - content a prompt
  * injection could be hidden in. Mirrors the plan's P1-3 taint sources.
  */
 const UNTRUSTED_TRUST_CLASSES: ReadonlySet<ToolTrustClass> = new Set<ToolTrustClass>([
@@ -36,7 +36,7 @@ export function deriveTaintLabel(input: {
   readonly sensitivity?: Sensitivity;
   /**
    * Sensitivity tiers that count as "sensitive" for the lethal-trifecta
-   * leg (SDF-8). Default `['secret']` — out of the box only secret-tagged
+   * leg (SDF-8). Default `['secret']` - out of the box only secret-tagged
    * content arms the trifecta, so the gate does not fire on every run.
    * Widen to e.g. `['secret', 'internal']` to also treat ordinary
    * user/PII content (which defaults to `'internal'`) as sensitive.

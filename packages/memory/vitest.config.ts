@@ -17,7 +17,7 @@ export default defineConfig({
         'src/search/types.ts',
         'src/tools/types.ts',
         'src/context-engine/index.ts',
-        // Pure type-declaration modules — no runtime emission, hence 0%
+        // Pure type-declaration modules - no runtime emission, hence 0%
         // coverage by construction. Excluded from the threshold.
         'src/context-engine/compaction/types.ts',
         'src/context-engine/compaction/hooks/types.ts',

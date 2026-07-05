@@ -5,7 +5,7 @@
  *
  * Metric naming follows the documented `graphorin_*` prefix
  * discipline; label cardinality is bounded by construction (no PII
- * labels — see DEC-141 cross-cut).
+ * labels - see DEC-141 cross-cut).
  *
  * @packageDocumentation
  */
@@ -16,10 +16,10 @@ import { MetricRegistry } from './registry.js';
  * @stable
  */
 // IP-15: the catalog lists only metrics the server actually moves. Five
-// previously-registered series — `graphorin_tool_calls_total`,
+// previously-registered series - `graphorin_tool_calls_total`,
 // `graphorin_provider_tokens_total`, `graphorin_provider_cost_usd_total`,
 // `graphorin_redaction_drops_total` and `graphorin_oauth_tokens_freshness_seconds`
-// — had no producer anywhere in the monorepo (per-tool and provider usage live
+// - had no producer anywhere in the monorepo (per-tool and provider usage live
 // in the agent runtime, not the server; redaction drops in the observability
 // layer; OAuth freshness needs an MCP token store the server does not own). A
 // permanently-empty series is worse than an absent one for dashboards, so they

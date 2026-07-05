@@ -1,5 +1,5 @@
 /**
- * `@graphorin/client` — reference TypeScript client for the
+ * `@graphorin/client` - reference TypeScript client for the
  * Graphorin standalone server.
  *
  * Wraps the WebSocket subprotocol `graphorin.protocol.v1` (with an

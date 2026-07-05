@@ -1,5 +1,5 @@
 /**
- * `@graphorin/memory/context-engine` — Phase 10d. The layered
+ * `@graphorin/memory/context-engine` - Phase 10d. The layered
  * six-layer memory-aware system prompt assembler + locale-aware
  * base templates + per-record D2 privacy filter + token budget
  * allocator + per-step tool-catalogue cardinality allocator
@@ -7,7 +7,7 @@
  * D3 / D4 cooperation contract (`ContentOrigin` + `inbound:trust`
  * annotations).
  *
- * The framework is locale-agnostic — no language is privileged in
+ * The framework is locale-agnostic - no language is privileged in
  * core. Application code can register additional locales via
  * `defineContextLocalePack({ ... })`; missing surfaces fall back
  * to the bundled English default with a one-time WARN per locale.

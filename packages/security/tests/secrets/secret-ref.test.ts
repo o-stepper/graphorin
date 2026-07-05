@@ -15,7 +15,7 @@ import {
   validateSecretRefs,
 } from '../../src/secrets/secret-ref.js';
 
-describe('parseSecretRef — accepted forms', () => {
+describe('parseSecretRef - accepted forms', () => {
   it('parses env: refs', () => {
     const ref = parseSecretRef('env:OPENAI_API_KEY');
     expect(ref.scheme).toBe('env');
@@ -114,7 +114,7 @@ describe('parseSecretRef — accepted forms', () => {
   });
 });
 
-describe('parseSecretRef — rejected forms', () => {
+describe('parseSecretRef - rejected forms', () => {
   it.each([
     ['', 'empty-input'],
     ['no-colon', 'malformed-uri'],
@@ -299,9 +299,9 @@ describe('property: parseSecretRef round-trips', () => {
   });
 });
 
-// --- SPL-15 — registered resolver schemes are known schemes --------------------
+// --- SPL-15 - registered resolver schemes are known schemes --------------------
 
-describe('SPL-15 — validateSecretRefs consults the live resolver registry', () => {
+describe('SPL-15 - validateSecretRefs consults the live resolver registry', () => {
   it('does not flag a scheme registered via registerResolver as unknown', async () => {
     const { registerResolver, unregisterResolver } = await import(
       '../../src/secrets/resolvers/index.js'
@@ -312,7 +312,7 @@ describe('SPL-15 — validateSecretRefs consults the live resolver registry', ()
     } as never);
     try {
       // Negative control: an UNregistered scheme on the same key shape is
-      // flagged — proving the matcher sees the field at all.
+      // flagged - proving the matcher sees the field at all.
       const control = validateSecretRefs({ apiKeyRef: 'nope://vault/item' });
       expect(control.ok).toBe(false);
       const result = validateSecretRefs({ apiKeyRef: 'op://vault/item/field' });
@@ -324,9 +324,9 @@ describe('SPL-15 — validateSecretRefs consults the live resolver registry', ()
   });
 });
 
-// --- SPL-8 — naked secrets are never echoed back -------------------------------
+// --- SPL-8 - naked secrets are never echoed back -------------------------------
 
-describe('SPL-8 — naked-string errors redact the input', () => {
+describe('SPL-8 - naked-string errors redact the input', () => {
   it('the error message and .input carry a redacted form, not the raw secret', () => {
     const rawSecret = 'sk-live-EXTREMELY-SECRET-VALUE-1234567890';
     let caught: SecretRefParseError | undefined;

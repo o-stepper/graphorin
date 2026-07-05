@@ -1,5 +1,5 @@
 /**
- * `graphorin secrets` — manage the operator's secrets store.
+ * `graphorin secrets` - manage the operator's secrets store.
  *
  * Surface (per Phase 15 § Secrets):
  *
@@ -7,11 +7,11 @@
  *  - `graphorin secrets get <key>`
  *  - `graphorin secrets set <key> [--value <v>] [--from-stdin] [--scope <ref>]`
  *  - `graphorin secrets delete <key>`
- *  - `graphorin secrets ref <uri>` — test resolution of a `SecretRef` URI.
+ *  - `graphorin secrets ref <uri>` - test resolution of a `SecretRef` URI.
  *  - `graphorin secrets rotate <key> --new-value <v>`
  *
  * Honours `--secrets-source <kind>` and `--strict-secrets` per
- * DEC-136 — both flags are forwarded to `createSecretsStore(...)` so
+ * DEC-136 - both flags are forwarded to `createSecretsStore(...)` so
  * the CLI activates the same store the running server would.
  *
  * The CLI never logs raw secret bytes. `get` prints the value through
@@ -242,7 +242,7 @@ export interface SecretsRotateOptions extends SecretsCommonOptions {
 }
 
 /**
- * `graphorin secrets rotate <key>` — overwrite the existing value
+ * `graphorin secrets rotate <key>` - overwrite the existing value
  * with a fresh one. Functionally identical to `set` but the CLI
  * surfaces the operation explicitly so audit logs can distinguish
  * a rotation from an initial write.
@@ -256,7 +256,7 @@ export async function runSecretsRotate(
   const existing = await store.get(options.key);
   if (existing === null) {
     throw new Error(
-      `[graphorin/cli] cannot rotate '${options.key}' — secret does not exist (use 'graphorin secrets set' to create it).`,
+      `[graphorin/cli] cannot rotate '${options.key}' - secret does not exist (use 'graphorin secrets set' to create it).`,
     );
   }
   let raw = options.newValue;

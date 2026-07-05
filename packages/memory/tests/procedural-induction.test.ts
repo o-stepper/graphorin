@@ -254,7 +254,7 @@ describe('createProviderWorkflowInducer (P2-2)', () => {
 });
 
 // --------------------------------------------------------------------------
-// runWorkflowInduction (orchestrator — successful-trajectories-only gate)
+// runWorkflowInduction (orchestrator - successful-trajectories-only gate)
 // --------------------------------------------------------------------------
 
 describe('runWorkflowInduction (P2-2)', () => {
@@ -286,7 +286,7 @@ describe('runWorkflowInduction (P2-2)', () => {
 });
 
 // --------------------------------------------------------------------------
-// trajectoryFromRunState (adapter — no agent change needed)
+// trajectoryFromRunState (adapter - no agent change needed)
 // --------------------------------------------------------------------------
 
 describe('trajectoryFromRunState (P2-2)', () => {
@@ -361,7 +361,7 @@ describe('checkSuccessCriteria (P2-2)', () => {
 });
 
 // --------------------------------------------------------------------------
-// ProceduralMemory.induce — quarantine + provenance + activation gate
+// ProceduralMemory.induce - quarantine + provenance + activation gate
 // --------------------------------------------------------------------------
 
 describe('ProceduralMemory.induce (P2-2)', () => {
@@ -479,7 +479,7 @@ describe('createMemory({ procedureInduction }) (P2-2)', () => {
     expect(after.tokens).toBeLessThan(before.tokens);
   });
 
-  it('leaves induction unconfigured by default — no provider call path', async () => {
+  it('leaves induction unconfigured by default - no provider call path', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
       embeddings: new InMemoryEmbeddingRegistry(),
@@ -508,7 +508,7 @@ describe('P2-2 type-level contracts', () => {
 });
 
 // --------------------------------------------------------------------------
-// MCON-2 part 4 — promotion by demonstrated success
+// MCON-2 part 4 - promotion by demonstrated success
 // --------------------------------------------------------------------------
 
 describe('ProceduralMemory.recordOutcome (MCON-2 part 4)', () => {

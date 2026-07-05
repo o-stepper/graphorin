@@ -1,5 +1,5 @@
 /**
- * `jsonPath` — passes when the value at a JSON-pointer-shaped path
+ * `jsonPath` - passes when the value at a JSON-pointer-shaped path
  * deep-equals the caller-supplied target. Supports the dot-notation
  * subset (`a.b.c`) and array indices (`a.0.name`).
  *

@@ -5,9 +5,9 @@
  * `'pure'` / `'read-only'` / `'side-effecting'` / `'external-stateful'`
  * matrix.
  *
- * The orchestration with an actual agent runtime — actually invoking
+ * The orchestration with an actual agent runtime - actually invoking
  * tools live, threading the substituted result back into the agent
- * loop — lives in `@graphorin/agent`. This file owns the **decision**
+ * loop - lives in `@graphorin/agent`. This file owns the **decision**
  * layer: pure functions that take the cassette + the live invocation
  * and return an event the runtime acts on.
  *
@@ -223,7 +223,7 @@ export function decideToolReplay(
       };
     }
     default: {
-      // Unknown SideEffectClass — be conservative.
+      // Unknown SideEffectClass - be conservative.
       return {
         type: 'tool.cassette.replay.live',
         toolName: recorded.toolName,

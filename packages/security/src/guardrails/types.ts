@@ -21,11 +21,11 @@ export type GuardrailStage = 'input' | 'output';
 /**
  * Action requested by a failing guardrail.
  *
- * - `'block'` — the runtime refuses to proceed and surfaces the
+ * - `'block'` - the runtime refuses to proceed and surfaces the
  *   failure as a structured error.
- * - `'warn'` — the runtime continues but records a WARN-level event;
+ * - `'warn'` - the runtime continues but records a WARN-level event;
  *   suitable for telemetry-only rules.
- * - `'rewrite'` — the runtime substitutes the supplied `rewrite`
+ * - `'rewrite'` - the runtime substitutes the supplied `rewrite`
  *   value before continuing (e.g. PII redaction with a masked output).
  *
  * @stable

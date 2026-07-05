@@ -14,7 +14,7 @@ let configAllow = false;
 let warnedOnce = false;
 
 /**
- * Programmatic gate — set from `secrets.allowLiteral: true` in user
+ * Programmatic gate - set from `secrets.allowLiteral: true` in user
  * config. Must be combined with the env gate to actually unlock the
  * `literal:` scheme.
  *

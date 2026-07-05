@@ -55,7 +55,7 @@ function mkFact(over: Partial<Fact> = {}): Fact {
   } as Fact;
 }
 
-describe('contextual retrieval — storage layer (P1-3)', () => {
+describe('contextual retrieval - storage layer (P1-3)', () => {
   let store: ConcreteStore;
   beforeEach(async () => {
     store = await makeStore();

@@ -13,7 +13,7 @@
  * lone common verbs, so benign first-party facts ("I always run in the
  * mornings", "lives in Lisbon") are not quarantined. It is locale-aware via
  * pluggable {@link InjectionRule} lists and performs no network or model
- * calls — pure regex over the candidate string.
+ * calls - pure regex over the candidate string.
  *
  * @packageDocumentation
  */
@@ -51,7 +51,7 @@ export interface InjectionScan {
  */
 export interface InjectionHeuristicOptions {
   /**
-   * Replace the default English rule set wholesale (advanced — for a
+   * Replace the default English rule set wholesale (advanced - for a
    * fully custom locale). When omitted, {@link DEFAULT_INJECTION_RULES}
    * is used.
    */

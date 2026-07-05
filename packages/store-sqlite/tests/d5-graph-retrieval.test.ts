@@ -45,7 +45,7 @@ beforeEach(async () => {
   store = await makeStore();
 });
 
-describe('D5 — PPR-lite graded expansion (expandActivation)', () => {
+describe('D5 - PPR-lite graded expansion (expandActivation)', () => {
   it('returns each neighbour with its minimum hop depth', async () => {
     // Chain: f1 --Anna-- f2 --Bob-- f3. Seed f1 → f2 at depth 1, f3 at depth 2.
     await store.semantic.remember(mkFact({ id: 'p1', object: 'Anna' }));
@@ -70,7 +70,7 @@ describe('D5 — PPR-lite graded expansion (expandActivation)', () => {
   });
 });
 
-describe('D5 — exact entity-match retriever (factsForEntityName)', () => {
+describe('D5 - exact entity-match retriever (factsForEntityName)', () => {
   it('returns facts linked to the canonical entity, honouring merges', async () => {
     await store.semantic.remember(
       mkFact({ id: 'e1', text: 'Met Anna in Tbilisi', object: 'Anna' }),

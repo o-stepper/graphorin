@@ -1,7 +1,7 @@
 /**
  * Progent-style declarative tool-argument policies (D4 / tools-15) and
  * Rule-of-Two capability profiles (D4). Both are **pure, deterministic**
- * decision engines the tool executor consults BEFORE a call runs — the
+ * decision engines the tool executor consults BEFORE a call runs - the
  * preventive layer that turns the coarse lethal-trifecta trigger and the
  * inert `sandboxPolicy` advisory into an enforced default-deny.
  *
@@ -58,7 +58,7 @@ export interface ToolArgumentPolicy {
   readonly rules: ReadonlyArray<ToolArgumentRule>;
   /**
    * Default-deny a `sensitive` tool with no matching `allow` rule
-   * (Progent's posture for high-risk tools). Default `false` — a policy
+   * (Progent's posture for high-risk tools). Default `false` - a policy
    * with no rules and this off is a no-op (allows everything).
    */
   readonly defaultDenySensitive?: boolean;
@@ -136,7 +136,7 @@ export interface RuleOfTwoCompilation {
    * tools too), else `undefined`.
    */
   readonly capability?: 'read-only';
-  /** The legs the profile holds — `> 2` is flagged unsafe. */
+  /** The legs the profile holds - `> 2` is flagged unsafe. */
   readonly heldLegs: ReadonlyArray<TrifectaLeg>;
   /** `true` when the profile holds all three legs (the dangerous case). */
   readonly holdsFullTrifecta: boolean;
@@ -148,7 +148,7 @@ export interface RuleOfTwoCompilation {
  * `'read-only'` capability floor AND a forbid rule over writer tools;
  * when it denies sensitive data, sensitive tools are default-denied.
  * Holding all three legs is surfaced (`holdsFullTrifecta`) so the caller
- * can refuse or warn — the preset never silently permits the trifecta.
+ * can refuse or warn - the preset never silently permits the trifecta.
  *
  * @stable
  */

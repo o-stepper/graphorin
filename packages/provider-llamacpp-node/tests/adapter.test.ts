@@ -1,5 +1,5 @@
 /**
- * Coverage for `llamaCppNodeAdapter` — feeds stubbed `modelOverride`
+ * Coverage for `llamaCppNodeAdapter` - feeds stubbed `modelOverride`
  * + `sessionFactory` so the suite never loads the real
  * `node-llama-cpp` peer.
  */
@@ -35,7 +35,7 @@ async function consume(stream: AsyncIterable<ProviderEvent>): Promise<ProviderEv
   return out;
 }
 
-describe('llamaCppNodeAdapter — declarations', () => {
+describe('llamaCppNodeAdapter - declarations', () => {
   it('declares loopback sensitivity envelope by default', () => {
     expect(LLAMA_CPP_NODE_ACCEPTS_SENSITIVITY).toEqual(['public', 'internal', 'secret']);
     const provider = llamaCppNodeAdapter({
@@ -97,7 +97,7 @@ describe('llamaCppNodeAdapter — declarations', () => {
   });
 });
 
-describe('llamaCppNodeAdapter — stream()', () => {
+describe('llamaCppNodeAdapter - stream()', () => {
   it('yields stream-start, text-delta(s), and finish with computed token counts', async () => {
     const provider = llamaCppNodeAdapter({
       modelPath: '/tmp/fixture.gguf',
@@ -170,7 +170,7 @@ describe('llamaCppNodeAdapter — stream()', () => {
     const finish = events.at(-1);
     expect(finish?.type).toBe('finish');
     // core-provider-08: an aborted stream must not masquerade as a clean
-    // 'stop' — middleware and cost accounting key on the honest reason.
+    // 'stop' - middleware and cost accounting key on the honest reason.
     if (finish?.type === 'finish') expect(finish.finishReason).toBe('aborted');
   });
 
@@ -227,7 +227,7 @@ describe('llamaCppNodeAdapter — stream()', () => {
   });
 });
 
-describe('llamaCppNodeAdapter — generate()', () => {
+describe('llamaCppNodeAdapter - generate()', () => {
   it('collects all text-delta events into the response text field', async () => {
     const provider = llamaCppNodeAdapter({
       modelPath: '/tmp/fixture.gguf',
@@ -240,7 +240,7 @@ describe('llamaCppNodeAdapter — generate()', () => {
   });
 });
 
-describe('llamaCppNodeAdapter — real default sessionFactory (PS-3)', () => {
+describe('llamaCppNodeAdapter - real default sessionFactory (PS-3)', () => {
   it('streams through the default factory: createContext + LlamaChatSession from the (stubbed) peer', async () => {
     const ctorArgs: Array<{ contextSequence: unknown; systemPrompt?: string }> = [];
     class StubChatSession {
@@ -296,7 +296,7 @@ describe('llamaCppNodeAdapter — real default sessionFactory (PS-3)', () => {
   });
 });
 
-describe('llamaCppNodeAdapter — mid-stream error honesty (PS-4)', () => {
+describe('llamaCppNodeAdapter - mid-stream error honesty (PS-4)', () => {
   const failingSession = async (): Promise<LlamaSessionInstance> => ({
     async *promptStreamingResponse(): AsyncIterable<string> {
       yield 'partial ';
@@ -327,7 +327,7 @@ describe('llamaCppNodeAdapter — mid-stream error honesty (PS-4)', () => {
   });
 });
 
-describe('llamaCppNodeAdapter — multimodal user content', () => {
+describe('llamaCppNodeAdapter - multimodal user content', () => {
   it('flattens multimodal text parts when rendering the prompt', async () => {
     const provider = llamaCppNodeAdapter({
       modelPath: '/tmp/fixture.gguf',

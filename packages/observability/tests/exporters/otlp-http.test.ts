@@ -15,7 +15,7 @@ const baseRecord: SpanRecord = {
   events: [],
 };
 
-describe('@graphorin/observability/exporters — OTLPHttpExporter coverage', () => {
+describe('@graphorin/observability/exporters - OTLPHttpExporter coverage', () => {
   it('serialises every attribute value type', () => {
     const envelope = toOtlpEnvelope(
       {

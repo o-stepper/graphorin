@@ -3,14 +3,14 @@
  *
  * The full-text indexes (`facts_fts`, `episodes_fts`, `session_messages_fts`,
  * `insights_fts`) are keyed to their base tables by the base row's **implicit
- * rowid** — FTS rows are written with `rowid = (SELECT rowid FROM <base> WHERE
+ * rowid** - FTS rows are written with `rowid = (SELECT rowid FROM <base> WHERE
  * id = ?)` and searches join `base.rowid = fts.rowid`. SQLite documents that
  * `VACUUM` may renumber implicit rowids, which would silently re-point every
  * FTS hit at a different record.
  *
  * Graphorin never issues `VACUUM`, and the encrypted-export path copies the
  * database file byte-for-byte (preserving rowids) before an in-place rekey, so
- * the hazard is latent — but a human running `VACUUM <db>` by hand would
+ * the hazard is latent - but a human running `VACUUM <db>` by hand would
  * corrupt search. This module is the loud guard the audit asked for: a cheap
  * orphan-row count surfaced at open time (and reusable by `graphorin doctor`).
  *
@@ -48,8 +48,8 @@ function tableExists(conn: SqliteConnection, name: string): boolean {
 /**
  * Count orphaned FTS rows (rowids with no matching base row) for every FTS
  * table that exists. An empty array means every FTS index is consistent with
- * its base table. A non-empty result is a sign of rowid drift — most likely a
- * hand-run `VACUUM` — and means search may return the wrong records.
+ * its base table. A non-empty result is a sign of rowid drift - most likely a
+ * hand-run `VACUUM` - and means search may return the wrong records.
  *
  * Tables absent from the schema (e.g. before their migration has run) are
  * skipped rather than reported.
@@ -80,7 +80,7 @@ export function formatFtsIntegrityWarning(
   const detail = reports.map((r) => `${r.table}: ${r.orphanRows} orphan row(s)`).join('; ');
   return (
     `[graphorin/store-sqlite] FTS index integrity check found drift (${detail}). ` +
-    'This usually means VACUUM was run on the database — never VACUUM a Graphorin ' +
+    'This usually means VACUUM was run on the database - never VACUUM a Graphorin ' +
     'store; use the export/rekey maintenance path, which preserves rowids. ' +
     'Rebuild the affected FTS index to restore correct search results.'
   );

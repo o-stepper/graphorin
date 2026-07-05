@@ -6,7 +6,7 @@ import { createSqliteStore, SqliteConflictStore, type SqliteMemoryStore } from '
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
-/** The concrete store handle — tests reach past the `MemoryStore` contract. */
+/** The concrete store handle - tests reach past the `MemoryStore` contract. */
 type ConcreteStore = Omit<Awaited<ReturnType<typeof createSqliteStore>>, 'memory'> & {
   memory: SqliteMemoryStore;
 };
@@ -29,7 +29,7 @@ async function open(): Promise<{
   };
 }
 
-describe('SqliteConflictStore — Phase 10b audit + pending queue', () => {
+describe('SqliteConflictStore - Phase 10b audit + pending queue', () => {
   it('exposed on the SqliteMemoryStore.conflicts property', async () => {
     const { store, close } = await open();
     try {

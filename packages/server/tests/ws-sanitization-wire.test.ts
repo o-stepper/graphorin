@@ -108,7 +108,7 @@ describe('WS sanitization on the wire', () => {
     expect(decisions).toHaveLength(0);
   });
 
-  it('idempotency on second pass — sanitization output is bytes-equal', () => {
+  it('idempotency on second pass - sanitization output is bytes-equal', () => {
     const dispatcher = createWsDispatcher();
     const sanitizer = dispatcher.sanitizer;
     const original: ServerEventFrame = {

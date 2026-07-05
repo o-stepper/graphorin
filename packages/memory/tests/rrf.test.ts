@@ -18,7 +18,7 @@ function makeFactHit(id: string, score: number): MemoryHit<Fact> {
   };
 }
 
-describe('@graphorin/memory/search — RRFReranker', () => {
+describe('@graphorin/memory/search - RRFReranker', () => {
   it('exposes the canonical default k = 60', () => {
     const r = new RRFReranker();
     expect(RRF_DEFAULT_K).toBe(60);
@@ -131,7 +131,7 @@ function uniq(arr: readonly string[]): string[] {
   return out;
 }
 
-describe('MRET-13 — retriever-kind signal labels', () => {
+describe('MRET-13 - retriever-kind signal labels', () => {
   const labelHit = (id: string, score: number) => ({
     record: {
       id,

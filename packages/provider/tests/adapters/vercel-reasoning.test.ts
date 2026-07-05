@@ -55,7 +55,7 @@ const ANTHROPIC_HISTORY: ProviderRequest = {
   ],
 };
 
-describe('vercelAdapter — reasoningContract auto-detection', () => {
+describe('vercelAdapter - reasoningContract auto-detection', () => {
   it('declares round-trip-required for Anthropic Claude models', () => {
     const adapter = vercelAdapter(
       { provider: 'fixture', modelId: 'claude-sonnet-4-5' },
@@ -105,7 +105,7 @@ describe('vercelAdapter — reasoningContract auto-detection', () => {
   });
 });
 
-describe('vercelAdapter — reasoning preflight', () => {
+describe('vercelAdapter - reasoning preflight', () => {
   it('Anthropic adapter (round-trip-required) keeps Anthropic-shaped reasoning by default', async () => {
     const capture: { lastArgs?: Record<string, unknown> } = {};
     const adapter = vercelAdapter(

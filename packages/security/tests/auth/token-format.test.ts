@@ -15,7 +15,7 @@ import {
   verifyOffline,
 } from '../../src/auth/token-format.js';
 
-describe('@graphorin/security/auth — token format', () => {
+describe('@graphorin/security/auth - token format', () => {
   describe('crc32', () => {
     it('matches the canonical IEEE-802.3 reference vector for the empty input', () => {
       expect(crc32('')).toBe(0);

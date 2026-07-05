@@ -66,7 +66,7 @@ function provider(scripts: ReadonlyArray<MockProviderScript>): Provider {
   };
 }
 
-describe('D4 — Progent tool-argument policy', () => {
+describe('D4 - Progent tool-argument policy', () => {
   it('forbids a matching tool at the executor with capability_blocked', async () => {
     const ran = { ran: false };
     const agent = createAgent({
@@ -111,7 +111,7 @@ describe('D4 — Progent tool-argument policy', () => {
   });
 });
 
-describe('D4 — Rule-of-Two capability preset', () => {
+describe('D4 - Rule-of-Two capability preset', () => {
   it('denying external side effects blocks writer tools and forces read-only', async () => {
     const wrote = { ran: false };
     const agent = createAgent({
@@ -130,7 +130,7 @@ describe('D4 — Rule-of-Two capability preset', () => {
     expect(wrote.ran).toBe(false);
     const outcome = result.state.steps.flatMap((s) => s.toolCalls)[0]?.outcome;
     // Either the capability floor (advertise + executor gate) or the
-    // Progent writer-forbid blocks it — both surface capability_blocked.
+    // Progent writer-forbid blocks it - both surface capability_blocked.
     expect(outcome !== undefined && 'kind' in outcome ? outcome.kind : null).toBe(
       'capability_blocked',
     );

@@ -40,8 +40,8 @@ export interface OAuthAuditActor {
 }
 
 /**
- * One audit event. The payload is intentionally minimal — no token
- * material — only safe metadata (server identifier, scope, expiry,
+ * One audit event. The payload is intentionally minimal - no token
+ * material - only safe metadata (server identifier, scope, expiry,
  * registration kind).
  *
  * @stable
@@ -78,7 +78,7 @@ export function onOAuthAudit(listener: OAuthAuditListener): () => void {
 
 /**
  * Emit an event to every subscriber. Listeners that throw are
- * isolated — a faulty listener never tears down the OAuth fast
+ * isolated - a faulty listener never tears down the OAuth fast
  * path.
  *
  * @stable

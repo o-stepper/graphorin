@@ -9,7 +9,7 @@ import {
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('@graphorin/security/audit — oauth-bridge', () => {
+describe('@graphorin/security/audit - oauth-bridge', () => {
   beforeEach(() => {
     _resetOAuthAuditListenersForTesting();
   });

@@ -5,16 +5,16 @@
  *
  * The four-step precedence ladder (highest wins):
  *
- *   1. `prepareStep({ provider })` — the operator's explicit per-step
+ *   1. `prepareStep({ provider })` - the operator's explicit per-step
  *      override always wins.
- *   2. `Tool.preferredModel`        — the tool author's per-tool hint.
+ *   2. `Tool.preferredModel`        - the tool author's per-tool hint.
  *      Only the tools the model actually CALLED on the previous step
- *      are consulted (AG-15) — an advertised-but-uncalled hint never
+ *      are consulted (AG-15) - an advertised-but-uncalled hint never
  *      escalates the run. Multi-tool ties resolve to the highest cost
  *      tier (`'smart' > 'balanced' > 'fast'`; explicit `ModelSpec` is
  *      treated as the highest tier).
- *   3. `Agent.preferredModel?`      — the per-agent default.
- *   4. `Agent` default `provider`   — the v0.1-alpha behaviour.
+ *   3. `Agent.preferredModel?`      - the per-agent default.
+ *   4. `Agent` default `provider`   - the v0.1-alpha behaviour.
  *
  * Cost-tier resolution against `Agent.modelTierMap` is documented
  * as a hint: when the requested tier is unmapped, the resolver
@@ -73,7 +73,7 @@ function modelIdFromSpec(spec: ModelSpec): string {
 /**
  * Pick the highest-cost tier across the supplied per-tool hints.
  * Explicit `ModelSpec` entries are treated as the highest tier
- * (`'smart'`) for tie-breaking — the conservative-correctness rule
+ * (`'smart'`) for tie-breaking - the conservative-correctness rule
  * documented in DEC-169 / suggested ADR-057.
  *
  * Returns the picked hint together with the original `ModelSpec`
@@ -113,7 +113,7 @@ export function pickTopTierAcrossTools(
 
 /**
  * Walk the precedence ladder and return the resolved provider for a
- * single agent step. Pure function — no side effects.
+ * single agent step. Pure function - no side effects.
  *
  * @stable
  */

@@ -82,7 +82,7 @@ export interface VerifySkillSignatureOptions {
   /**
    * Operator trust root (D4 / security-01). When supplied, the RESOLVED
    * signing key must match the trust root or verification fails
-   * `valid: false` with `reason: 'untrusted-key'` — a self-signed skill
+   * `valid: false` with `reason: 'untrusted-key'` - a self-signed skill
    * whose inline key is not in the root can no longer verify green. The
    * root is checked AFTER the ed25519 signature itself is valid, so the
    * result distinguishes a bad signature from an untrusted signer.
@@ -97,7 +97,7 @@ export interface VerifySkillSignatureOptions {
 
 /**
  * Verify the ed25519 signature embedded in `skillMd`. Returns a
- * structured result instead of throwing for the validation outcome —
+ * structured result instead of throwing for the validation outcome -
  * callers branch on `valid`. Parser-level errors (missing block,
  * malformed YAML) are still thrown via the supply-chain error
  * hierarchy.

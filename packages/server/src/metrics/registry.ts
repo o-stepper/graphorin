@@ -7,7 +7,7 @@
  * The supported metric kinds are the three the runtime spec calls
  * out: `counter`, `gauge`, and `summary` (with hard-coded p50/p95
  * quantiles). Sample rendering follows Prometheus text exposition
- * format v0.0.4 — every metric block is preceded by `# HELP` + `# TYPE`
+ * format v0.0.4 - every metric block is preceded by `# HELP` + `# TYPE`
  * and labels are quoted-escaped per the spec.
  *
  * @packageDocumentation
@@ -144,7 +144,7 @@ export class MetricRegistry {
 
   /**
    * Render the current snapshot in Prometheus text exposition
-   * format (v0.0.4). Never throws — incomplete sample buckets are
+   * format (v0.0.4). Never throws - incomplete sample buckets are
    * skipped instead of failing the scrape.
    */
   render(): string {

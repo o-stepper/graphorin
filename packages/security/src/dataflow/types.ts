@@ -2,8 +2,8 @@
  * Provenance / taint types for the data-flow policy engine (P1-3).
  *
  * The engine derives *provenance* from the metadata Graphorin already
- * attaches to every registered tool — its {@link ToolTrustClass}, its
- * {@link ToolSource}, and its declared {@link Sensitivity} — and uses it
+ * attaches to every registered tool - its {@link ToolTrustClass}, its
+ * {@link ToolSource}, and its declared {@link Sensitivity} - and uses it
  * to enforce data-flow rules at the executor boundary rather than relying
  * on pattern scans alone. The goal is to defuse the *lethal trifecta*:
  * untrusted content + access to private data + an exfiltration/mutation
@@ -13,7 +13,7 @@
  * explicitly declassified it.
  *
  * Everything in this module is pure (no I/O, no clock, no network) so it
- * can be unit-tested exhaustively and embedded in any enforcement point —
+ * can be unit-tested exhaustively and embedded in any enforcement point -
  * the synchronous executor hot path or a code-mode interpreter alike.
  *
  * @packageDocumentation
@@ -24,13 +24,13 @@ import type { Sensitivity, SideEffectClass, ToolTrustClass } from '@graphorin/co
 /**
  * Operating mode for {@link DataFlowPolicy}.
  *
- * - `'off'`     — disabled; every flow is allowed (the engine is never
+ * - `'off'`     - disabled; every flow is allowed (the engine is never
  *   constructed in this mode by the agent, but the value exists so a
  *   config can disable the feature without becoming `undefined`).
- * - `'shadow'`  — audit-only: tainted flows are *flagged* (an audit row +
+ * - `'shadow'`  - audit-only: tainted flows are *flagged* (an audit row +
  *   counter) but never blocked. Ship this first to surface false
  *   positives against real traffic before enforcing.
- * - `'enforce'` — tainted flows are *blocked* (the sink does not run)
+ * - `'enforce'` - tainted flows are *blocked* (the sink does not run)
  *   unless the sink is operator-declassified.
  *
  * @stable
@@ -40,18 +40,18 @@ export type DataFlowMode = 'off' | 'shadow' | 'enforce';
 /**
  * The kind of tainted data flow the policy detected at a sink.
  *
- * - `'untrusted-to-sink'` — untrusted content (or a verbatim chunk of it)
+ * - `'untrusted-to-sink'` - untrusted content (or a verbatim chunk of it)
  *   is being passed *into* the sink's arguments. The precise, low
  *   false-positive signal: direct exfiltration of untrusted content.
- * - `'lethal-trifecta'`   — the conservative signal: a sink fires while
+ * - `'lethal-trifecta'`   - the conservative signal: a sink fires while
  *   both untrusted content **and** secret-tier data have entered the run,
  *   even when no verbatim carry is provable. Catches the paraphrased
  *   "untrusted instruction drives a secret exfiltration" case at the cost
  *   of more false positives (hence shadow-mode-first + declassification).
- * - `'derived-untrusted-to-sink'` (C6, `derivedTaint: 'strict'`) — the
+ * - `'derived-untrusted-to-sink'` (C6, `derivedTaint: 'strict'`) - the
  *   CaMeL-style control-flow-integrity signal: once untrusted content has
  *   entered the run, EVERY subsequent model-driven sink call is treated
- *   as derived from it — paraphrase-robust by construction, deliberately
+ *   as derived from it - paraphrase-robust by construction, deliberately
  *   coarse. Fires only when the verbatim probe did not already match
  *   (verbatim keeps the precise label).
  *
@@ -80,7 +80,7 @@ export interface TaintLabel {
   readonly sensitivity: Sensitivity | 'unknown';
   /**
    * `true` when the output originates from an untrusted source
-   * (`mcp-derived`, `web-search`, `skill-untrusted`) — content a prompt
+   * (`mcp-derived`, `web-search`, `skill-untrusted`) - content a prompt
    * injection could be hidden in.
    */
   readonly untrusted: boolean;
@@ -141,7 +141,7 @@ export interface TaintLedger {
   /** Distinct untrusted source kinds observed so far. */
   readonly untrustedSourceKinds: ReadonlyArray<string>;
   /**
-   * Coarse, serializable summary of the load-bearing trifecta-gate signal —
+   * Coarse, serializable summary of the load-bearing trifecta-gate signal -
    * the `untrusted`/`sensitive`/source-kind flags only, **never** the tracked
    * verbatim spans (those are untrusted text and must not be persisted). Used
    * to rehydrate the ledger across a suspend/resume so the sink gate is not
@@ -151,7 +151,7 @@ export interface TaintLedger {
 }
 
 /**
- * Serializable coarse summary of a {@link TaintLedger} — the trifecta-gate
+ * Serializable coarse summary of a {@link TaintLedger} - the trifecta-gate
  * flags only. Round-trips through `createTaintLedger({ initial })`. Carries no
  * untrusted text content, so it is safe to persist in a `RunState`.
  *
@@ -192,7 +192,7 @@ export interface DataFlowPolicyConfig {
   /**
    * Sensitivity tiers that arm the lethal-trifecta `sensitive` leg
    * (SDF-8). Default `['secret']` (out-of-the-box behaviour is
-   * byte-identical — only secret-tagged content counts). Set e.g.
+   * byte-identical - only secret-tagged content counts). Set e.g.
    * `['secret', 'internal']` so ordinary user/PII content (default
    * `'internal'`) also counts; the agent's guard builder threads this
    * into `deriveTaintLabel`. The verbatim `untrusted-to-sink` leg is
@@ -202,7 +202,7 @@ export interface DataFlowPolicyConfig {
   /**
    * FIDES-lattice (SDF-8): when `true`, a tool output that the PII catalogue
    * flags (email, SSN, card, …) arms the lethal-trifecta `sensitive` leg even
-   * without a `'secret'` tag — so exfiltrating user/PII content trips the gate.
+   * without a `'secret'` tag - so exfiltrating user/PII content trips the gate.
    * The agent's guard builder wires `containsPii` into the ledger. Default
    * `false` ⇒ byte-identical. Composes with {@link sensitiveTiers}.
    */
@@ -210,7 +210,7 @@ export interface DataFlowPolicyConfig {
   /**
    * Sink tool names pre-authorized by the operator to receive tainted
    * data. A tainted flow into one of these is audited as `declassified`
-   * and allowed even in `'enforce'` mode — the explicit, audited escape
+   * and allowed even in `'enforce'` mode - the explicit, audited escape
    * hatch for known-good flows.
    */
   readonly declassifySinks?: ReadonlyArray<string>;
@@ -225,12 +225,12 @@ export interface DataFlowPolicyConfig {
   /**
    * C6 (pairs security-05): derived-taint propagation mode.
    *
-   * - `'off'` (default) — current behaviour: sinks gate on verbatim carry
+   * - `'off'` (default) - current behaviour: sinks gate on verbatim carry
    *   and (optionally) the lethal trifecta.
-   * - `'strict'` — CaMeL-style control-flow integrity: once untrusted
+   * - `'strict'` - CaMeL-style control-flow integrity: once untrusted
    *   content has entered the run, EVERY model-driven sink call fires the
    *   `derived-untrusted-to-sink` flow (paraphrase-robust by
-   *   construction). Deliberately coarse — in `'enforce'` mode this
+   *   construction). Deliberately coarse - in `'enforce'` mode this
    *   blocks all post-ingestion sinks except `declassifySinks`; pair with
    *   shadow mode first to size the impact.
    */
@@ -276,13 +276,13 @@ export interface DataFlowFinding {
 /**
  * The verdict {@link DataFlowPolicy.evaluate} returns for a sink call.
  *
- * - `'allow'`       — no tainted flow (or the policy is off / the tool is
+ * - `'allow'`       - no tainted flow (or the policy is off / the tool is
  *   not a sink); proceed silently.
- * - `'flag'`        — tainted flow detected in `'shadow'` mode: audit but
+ * - `'flag'`        - tainted flow detected in `'shadow'` mode: audit but
  *   proceed.
- * - `'declassify'`  — tainted flow into an operator-declassified sink:
+ * - `'declassify'`  - tainted flow into an operator-declassified sink:
  *   audit and proceed (the audited escape hatch).
- * - `'block'`       — tainted flow in `'enforce'` mode: do not run the
+ * - `'block'`       - tainted flow in `'enforce'` mode: do not run the
  *   sink; surface a `dataflow_policy_blocked` error.
  *
  * @stable

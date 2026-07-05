@@ -19,7 +19,7 @@ import { vaultResolver } from './vault.js';
 
 /**
  * Idempotently install the seven built-in resolvers. Safe to call
- * multiple times — replays no-op if the registry already has them.
+ * multiple times - replays no-op if the registry already has them.
  *
  * @stable
  */

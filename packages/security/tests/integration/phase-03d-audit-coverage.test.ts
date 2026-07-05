@@ -17,14 +17,14 @@ import { createMemoryAuditDb } from '../audit/_helpers.js';
 import { resetOAuthSubsystem } from '../oauth/_helpers.js';
 
 /**
- * Phase 03d DoD: every OAuth lifecycle audit action — `oauth:granted`,
+ * Phase 03d DoD: every OAuth lifecycle audit action - `oauth:granted`,
  * `oauth:refreshed`, `oauth:revoked`, `oauth:registered`, and
- * `oauth:expired` — must reach the audit log via the Phase 03b
+ * `oauth:expired` - must reach the audit log via the Phase 03b
  * `appendAudit` chain. This test exercises a single happy + sad
  * cascade end-to-end and asserts every action shows up in the
  * tamper-evident chain.
  */
-describe('phase 03d — audit coverage for every OAuth lifecycle action', () => {
+describe('phase 03d - audit coverage for every OAuth lifecycle action', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
     _setDiscoveryFetcherForTesting(async (url) => {
@@ -134,7 +134,7 @@ describe('phase 03d — audit coverage for every OAuth lifecycle action', () => 
       });
       // Seed the client with a fresh session so it has a token to
       // revoke (the previous client's in-memory map is gone with
-      // the refreshed client). loginInteractive again — but skip
+      // the refreshed client). loginInteractive again - but skip
       // re-registration by reusing the same client_id.
       _setTokenEndpointFetcherForTesting(async () => ({
         ok: true,

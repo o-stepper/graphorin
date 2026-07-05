@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const FIXTURE_ROOT = resolve(__dirname, '__fixtures__');
 
-describe('fixtures — reference skills', () => {
+describe('fixtures - reference skills', () => {
   it('canonical pdf-processing skill loads with zero graphorin-specific changes', async () => {
     const skill = await loadSkillFromSource({
       kind: 'folder',
@@ -30,13 +30,13 @@ describe('fixtures — reference skills', () => {
     // signature.
     expect(skill.metadata.graphorinTrustLevel).toBe('unknown');
     expect(skill.metadata.graphorinSignaturePresent).toBe(false);
-    // Tier 2 — body resolved lazily and cached.
+    // Tier 2 - body resolved lazily and cached.
     const body = await skill.body();
     expect(body).toMatch(/# PDF Processing/u);
-    // Tier 3 — resources lazy-listed; bytes only on demand.
+    // Tier 3 - resources lazy-listed; bytes only on demand.
     const resources = await skill.resources();
     expect(resources.map((r) => r.relativePath)).toContain('examples/sample-form.txt');
-    // Skill ships a `metadata.version` field — recorded but not
+    // Skill ships a `metadata.version` field - recorded but not
     // confused with `graphorin-runtime-compat`.
     expect(skill.metadata.metadata?.version).toBe('1.2.0');
     expect(skill.metadata.graphorinRuntimeCompat).toBeUndefined();
@@ -56,7 +56,7 @@ describe('fixtures — reference skills', () => {
       { name: 'extract_url', description: 'Extract the readable text from a URL.' },
     ]);
 
-    // Stamp a sample tool — sandbox tier must be forced to
+    // Stamp a sample tool - sandbox tier must be forced to
     // worker-threads + no-net + no-fs even if the operator's policy
     // says otherwise.
     const stamped = stampSkillToolFromMetadata(

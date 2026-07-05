@@ -66,7 +66,7 @@ describe('migrateFrontmatter', () => {
       '---',
     ].join('\n');
     const result = migrateFrontmatter(skillMd, { apply: true });
-    // Migrator must not silently overwrite — operator is expected to
+    // Migrator must not silently overwrite - operator is expected to
     // remove the redundant graphorin-* field manually.
     expect(result.migratedSkillMd).toContain('graphorin-allowed-tools');
     expect(result.migratedSkillMd).toContain('allowed-tools: [read_file]');

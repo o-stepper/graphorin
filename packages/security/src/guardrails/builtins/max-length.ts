@@ -1,11 +1,11 @@
 /**
- * `maxLength` — block when the string-coerced value exceeds the
+ * `maxLength` - block when the string-coerced value exceeds the
  * configured character or token budget. Token counting is delegated
  * via an injectable `TokenCounter`-shaped callback so the guardrail
  * does not pull a tokenizer into the security package.
  *
  * Reference: the project's security architecture, § Guardrails + § Cost & rate limiting.
- * (resource limits — hard ceilings).
+ * (resource limits - hard ceilings).
  *
  * @packageDocumentation
  */

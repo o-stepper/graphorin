@@ -8,11 +8,11 @@
  * `zod` (already a `devDependencies` of the package). It exposes a
  * narrow API the test files can configure per scenario:
  *
- * - `tools`            — the catalogue surfaced by `tools/list`.
- * - `callToolHandler`  — handler invoked on `tools/call`.
- * - `resources`        — the catalogue surfaced by `resources/list`.
- * - `prompts`          — the catalogue surfaced by `prompts/list`.
- * - `getPromptHandler` — handler invoked on `prompts/get`.
+ * - `tools`            - the catalogue surfaced by `tools/list`.
+ * - `callToolHandler`  - handler invoked on `tools/call`.
+ * - `resources`        - the catalogue surfaced by `resources/list`.
+ * - `prompts`          - the catalogue surfaced by `prompts/list`.
+ * - `getPromptHandler` - handler invoked on `prompts/get`.
  */
 
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
@@ -203,7 +203,7 @@ export async function startInMemoryServer(
 
   server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
     const uri = req.params.uri;
-    // Several fixture entries may share one uri — the MCP result is an
+    // Several fixture entries may share one uri - the MCP result is an
     // ARRAY for exactly that reason (mcp-skills-11 coverage).
     const matches = (opts.resources ?? []).filter((r) => r.uri === uri);
     if (matches.length === 0) {

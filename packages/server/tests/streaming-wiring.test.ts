@@ -109,7 +109,7 @@ function buildApp(): {
   return { app, dispatcher, runs };
 }
 
-describe('IP-2 — the streaming endpoints actually stream', () => {
+describe('IP-2 - the streaming endpoints actually stream', () => {
   it('POST /agents/:id/stream emits the run events on the advertised subject and completes the run', async () => {
     const { app, dispatcher, runs } = buildApp();
     const res = await app.request('/agents/streamy/stream', {

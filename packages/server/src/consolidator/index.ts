@@ -1,5 +1,5 @@
 /**
- * `@graphorin/server/consolidator` — Phase 14c lifecycle adapter for
+ * `@graphorin/server/consolidator` - Phase 14c lifecycle adapter for
  * the consolidator runtime.
  *
  * @packageDocumentation

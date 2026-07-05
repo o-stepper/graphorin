@@ -15,7 +15,7 @@ import { SecretValue } from '../../src/secrets/secret-value.js';
 
 import { createMemoryAuthTokenStore } from './_helpers.js';
 
-describe('@graphorin/security/auth — token CRUD', () => {
+describe('@graphorin/security/auth - token CRUD', () => {
   it('creates a token whose plaintext parses successfully', async () => {
     const tokenStore = createMemoryAuthTokenStore();
     const pepper = generatePepper();
@@ -141,7 +141,7 @@ describe('@graphorin/security/auth — token CRUD', () => {
     );
   });
 
-  it('rotatePepper is gone — rekeyTokens is the supported rotation (SPL-10)', () => {
+  it('rotatePepper is gone - rekeyTokens is the supported rotation (SPL-10)', () => {
     // The old helper documented an impossible mechanism (re-deriving
     // HMACs to a new pepper without the raw tokens) and delegated all
     // real work to caller-supplied callbacks while never using
@@ -176,9 +176,9 @@ describe('@graphorin/security/auth — token CRUD', () => {
   });
 });
 
-// --- SPL-8/9/11 — secrets-hygiene batch ----------------------------------------
+// --- SPL-8/9/11 - secrets-hygiene batch ----------------------------------------
 
-describe('SPL-11 — weak peppers are rejected wherever a pepper is consumed', () => {
+describe('SPL-11 - weak peppers are rejected wherever a pepper is consumed', () => {
   it('createToken throws WeakPepperError for a 1-byte pepper', async () => {
     const store = createMemoryAuthTokenStore();
     await expect(
@@ -192,7 +192,7 @@ describe('SPL-11 — weak peppers are rejected wherever a pepper is consumed', (
   });
 });
 
-describe('SPL-9 — revocation invalidates the verifier cache immediately', () => {
+describe('SPL-9 - revocation invalidates the verifier cache immediately', () => {
   it('a revoked token fails verification at once when the verifier is passed', async () => {
     const store = createMemoryAuthTokenStore();
     const pepper = SecretValue.fromString('a-sufficiently-long-pepper-value-123456');

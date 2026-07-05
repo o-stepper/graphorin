@@ -11,7 +11,7 @@ import type { EvalReport } from '@graphorin/observability/eval';
 export function renderTerminalReport<I, O>(report: EvalReport<I, O>): string {
   const lines: string[] = [];
   const { summary } = report;
-  lines.push('graphorin/evals — terminal report');
+  lines.push('graphorin/evals - terminal report');
   lines.push('=================================');
   lines.push(`total:   ${summary.total}`);
   lines.push(`passed:  ${summary.passed}`);

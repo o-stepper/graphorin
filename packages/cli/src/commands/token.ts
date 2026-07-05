@@ -1,5 +1,5 @@
 /**
- * `graphorin token` — manage server auth tokens.
+ * `graphorin token` - manage server auth tokens.
  *
  * The subcommand thin-wraps the library functions in
  * `@graphorin/security/auth` (`createToken`, `listTokens`,
@@ -13,7 +13,7 @@
  *  - `graphorin token rekey`
  *  - `graphorin token verify <token>`
  *
- * The raw token bytes are shown to the operator at most once — at the
+ * The raw token bytes are shown to the operator at most once - at the
  * call site of `create` / `rotate` / `rekey`. They are wrapped in a
  * {@link SecretValue} on the way back to keep accidental logging out
  * of the codepath; the CLI prints them via `value.use((s) => ...)` so
@@ -303,7 +303,7 @@ export interface TokenVerifyResult {
 /**
  * Offline checksum verification. Confirms the structural shape, the
  * environment marker, and the CRC checksum but does NOT consult the
- * token store — it only proves the token was minted by a Graphorin
+ * token store - it only proves the token was minted by a Graphorin
  * helper.
  *
  * @stable
@@ -330,7 +330,7 @@ export function runTokenVerify(options: TokenVerifyOptions): TokenVerifyResult {
 
 /**
  * Tiny duration parser. Accepts `Ns`, `Nm`, `Nh`, `Nd`. Returns
- * milliseconds. Throws on invalid input — surfaced as a fail-fast at
+ * milliseconds. Throws on invalid input - surfaced as a fail-fast at
  * the CLI boundary.
  *
  * @internal

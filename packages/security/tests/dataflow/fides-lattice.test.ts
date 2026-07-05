@@ -1,7 +1,7 @@
 /**
  * SDF-8 / FIDES-lattice: feed the PII catalogue into the taint ledger so a tool
  * reading user/PII content (which defaults to the `'internal'` tier, not
- * `'secret'`) can count toward `sensitiveSeen` — making the lethal-trifecta leg
+ * `'secret'`) can count toward `sensitiveSeen` - making the lethal-trifecta leg
  * cover PII exfiltration, not only explicitly secret-tagged tools. Opt-in: a
  * ledger created without `piiSensitivity` is byte-identical to today.
  */
@@ -26,7 +26,7 @@ describe('FIDES-lattice: containsPii', () => {
 });
 
 describe('FIDES-lattice: PII feeds the ledger sensitive leg', () => {
-  it('flips sensitiveSeen on a PII read when piiSensitivity is wired — without a secret tag', () => {
+  it('flips sensitiveSeen on a PII read when piiSensitivity is wired - without a secret tag', () => {
     expect(internalLabel.sensitive).toBe(false); // internal, not secret
     const ledger = createTaintLedger({ piiSensitivity: containsPii });
     ledger.recordOutput(internalLabel, 'customer SSN 123-45-6789');

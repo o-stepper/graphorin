@@ -6,7 +6,7 @@ import type { MCPClient } from '../src/client/index.js';
 import { DEFAULT_DEFER_LOADING_THRESHOLD } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MCPClient.toTools — adapter', () => {
+describe('MCPClient.toTools - adapter', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 
@@ -229,7 +229,7 @@ describe('MCPClient.toTools — adapter', () => {
         {
           name: 'echo_struct',
           inputSchema: {},
-          // No outputSchema declared — the SDK does not validate; the
+          // No outputSchema declared - the SDK does not validate; the
           // adapter forwards `structuredContent` as the typed output.
         },
       ],

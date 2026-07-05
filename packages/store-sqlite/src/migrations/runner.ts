@@ -2,7 +2,7 @@ import type { SqliteConnection } from '../connection.js';
 import { listMigrations, type Migration } from './registry.js';
 
 /**
- * Result row of the `schema_migrations` bookkeeping table — one row per
+ * Result row of the `schema_migrations` bookkeeping table - one row per
  * applied migration.
  *
  * @stable
@@ -114,7 +114,7 @@ function readApplied(conn: SqliteConnection): Map<string, AppliedMigration> {
 }
 
 function computeChecksum(sql: string): string {
-  // Cheap, deterministic checksum — FNV-1a 32-bit. The runner only
+  // Cheap, deterministic checksum - FNV-1a 32-bit. The runner only
   // uses it to detect after-the-fact edits to a migration that was
   // already applied. Cryptographic strength is unnecessary here.
   let hash = 0x811c9dc5;

@@ -2,7 +2,7 @@
  * Zod-to-JSON-Schema projection (tools-01).
  *
  * Providers speak JSON Schema: an OpenAI-shaped `tools[].function.parameters`
- * block, an Anthropic `input_schema`, a code-mode signature — all of them
+ * block, an Anthropic `input_schema`, a code-mode signature - all of them
  * need `{ type: 'object', properties: ... }`, not a live validator object.
  * The documented way to declare a Graphorin tool is a plain Zod schema,
  * and Zod schemas (v3 and v4 alike) have **no `toJSON()`**: serialising one
@@ -17,11 +17,11 @@
  *    package must not grow a `zod-to-json-schema` dependency (its zod v3
  *    peer range conflicts with our `^3.23 || ^4` peer). The converter walks
  *    Zod's *structural* internals instead: `_def.typeName` for v3 classic,
- *    `_zod.def.type` for v4 — so it also works on schema instances created
+ *    `_zod.def.type` for v4 - so it also works on schema instances created
  *    by a different `zod` copy than the one this package resolves.
  * 2. **Loud, bounded degradation.** A node kind the walker does not know
  *    projects to `{}` (accept-anything) and reports through
- *    {@link ProjectSchemaOptions.onUnsupported} — never a throw, never
+ *    {@link ProjectSchemaOptions.onUnsupported} - never a throw, never
  *    silent garbage. Cycles and pathological depth degrade the same way.
  * 3. **Passthrough only for actual JSON Schema.** A plain data object with
  *    no `parse`/`safeParse` functions is assumed to already *be* JSON
@@ -39,7 +39,7 @@ export type JsonSchemaRecord = Record<string, unknown>;
 export interface ProjectSchemaOptions {
   /**
    * Called (at most once per distinct reason per call) when a schema node
-   * cannot be represented and degrades to permissive `{}` — or when a
+   * cannot be represented and degrades to permissive `{}` - or when a
    * validator-like object cannot be projected at all. Wire this to a
    * counter/audit emitter; the converter itself never logs.
    */
@@ -248,7 +248,7 @@ function convertV3(schema: ZodV3Like, ctx: WalkContext, depth: number): JsonSche
     ctx.report('max-depth');
     return {};
   }
-  if (ctx.seen.has(schema)) return {}; // cyclic (z.lazy) — permissive terminator
+  if (ctx.seen.has(schema)) return {}; // cyclic (z.lazy) - permissive terminator
   ctx.seen.add(schema);
   try {
     return annotate(convertV3Node(schema._def, ctx, depth), schema);
@@ -786,8 +786,8 @@ export function looksLikeJsonSchema(value: unknown): value is JsonSchemaRecord {
 }
 
 /**
- * Project a tool's declared `inputSchema` / `outputSchema` — whatever the
- * author supplied — onto a JSON Schema record fit for a provider wire
+ * Project a tool's declared `inputSchema` / `outputSchema` - whatever the
+ * author supplied - onto a JSON Schema record fit for a provider wire
  * body or a code-mode signature. Resolution order:
  *
  * 1. `undefined`/`null` → `undefined`.
@@ -796,7 +796,7 @@ export function looksLikeJsonSchema(value: unknown): value is JsonSchemaRecord {
  * 3. A Zod v4 or v3 schema → {@link zodToJsonSchema}.
  * 4. Plain JSON-Schema-shaped data → passed through as-is.
  * 5. Anything else (an opaque validator this converter cannot read) →
- *    `undefined`, reported via `onUnsupported` — callers substitute a
+ *    `undefined`, reported via `onUnsupported` - callers substitute a
  *    permissive `{}` rather than shipping serialized internals.
  *
  * @stable

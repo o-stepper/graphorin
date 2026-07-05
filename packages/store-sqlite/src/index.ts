@@ -1,10 +1,10 @@
 /**
- * @graphorin/store-sqlite — default SQLite-backed persistence layer for
+ * @graphorin/store-sqlite - default SQLite-backed persistence layer for
  * the Graphorin framework.
  *
  * Bundles:
  * - `MemoryStore`, `CheckpointStore`, `SessionStore`, `TriggerStore`,
- *   `AuthTokenStore`, `OAuthServerStore`, `IdempotencyStore` —
+ *   `AuthTokenStore`, `OAuthServerStore`, `IdempotencyStore` -
  *   complete implementations of every storage contract from
  *   `@graphorin/core/contracts`.
  * - Single-connection layer with WAL + busy-timeout hardening applied
@@ -142,14 +142,14 @@ export interface CreateSqliteStoreOptions {
    * for tests that exercise migrations without the native build.
    */
   readonly skipSqliteVec?: boolean;
-  /** Override constructor — test-only escape hatch. */
+  /** Override constructor - test-only escape hatch. */
   readonly driver?: BetterSqlite3Constructor;
-  /** Override the `sqlite-vec` loader — test-only escape hatch. */
+  /** Override the `sqlite-vec` loader - test-only escape hatch. */
   readonly loadVecExtension?: (db: unknown) => void;
   /** If `true`, skip the WAL hardening pragmas (only for `:memory:`). */
   readonly disableWalHardening?: boolean;
   /**
-   * Sink for non-fatal startup warnings — currently the CS-10 FTS↔rowid
+   * Sink for non-fatal startup warnings - currently the CS-10 FTS↔rowid
    * integrity check. Defaults to `console.warn`.
    */
   readonly warn?: (message: string) => void;
@@ -232,7 +232,7 @@ export async function createSqliteStore(
     // CS-10: surface FTS↔rowid drift loudly at open. The indexes key on the
     // base row's implicit rowid, which a hand-run VACUUM could renumber and
     // silently corrupt; Graphorin never VACUUMs, so this is a guard, not a
-    // hot path. Non-fatal — a warning, never a throw.
+    // hot path. Non-fatal - a warning, never a throw.
     if (options.skipFtsIntegrityCheck !== true) {
       const warning = formatFtsIntegrityWarning(checkFtsIntegrity(conn));
       if (warning !== null) (options.warn ?? console.warn)(warning);

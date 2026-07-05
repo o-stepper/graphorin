@@ -6,7 +6,7 @@
  * swap code points. Folding to NFKC and stripping the zero-width class
  * BEFORE matching closes the cheap half of that surface. Cross-script
  * confusables (e.g. Cyrillic lookalikes) survive NFKC and remain out of
- * scope — the catalogues stay best-effort SIGNAL, never a sole gate.
+ * scope - the catalogues stay best-effort SIGNAL, never a sole gate.
  *
  * @packageDocumentation
  */

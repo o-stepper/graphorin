@@ -1,7 +1,7 @@
 /**
  * Tool-definition pinning (MC-6): stable fingerprints over MCP tool
- * definitions so approve-then-swap rug-pulls — a server changing a
- * tool's description/schema behind an already-approved name — are
+ * definitions so approve-then-swap rug-pulls - a server changing a
+ * tool's description/schema behind an already-approved name - are
  * detectable across snapshots and process restarts.
  *
  * The fingerprint is a sha256 over a key-sorted canonical render of

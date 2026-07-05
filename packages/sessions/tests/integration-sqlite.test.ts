@@ -1,7 +1,7 @@
 /**
  * Integration test against the real `@graphorin/store-sqlite` and
  * `@graphorin/memory` adapters. Verifies that the hybrid facade
- * round-trips through the production storage stack — the package
+ * round-trips through the production storage stack - the package
  * works without the in-memory fixtures, against the SQLite + FTS5
  * implementation that ships with v0.1.
  *
@@ -47,7 +47,7 @@ describe('@graphorin/sessions <> @graphorin/store-sqlite + @graphorin/memory', (
       await session.push({ role: 'user', content: 'Plan me a weekend trip.' });
       await session.push({
         role: 'assistant',
-        content: 'Sure — what kind of trip?',
+        content: 'Sure - what kind of trip?',
         agentId: 'main',
       });
       const messages = await session.list({});

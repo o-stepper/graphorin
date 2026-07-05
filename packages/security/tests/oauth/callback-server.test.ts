@@ -7,7 +7,7 @@ import {
   startLocalCallbackServer,
 } from '../../src/oauth/index.js';
 
-describe('@graphorin/security/oauth — callback server', () => {
+describe('@graphorin/security/oauth - callback server', () => {
   let activeServer: { close: () => Promise<void> } | undefined;
 
   afterEach(async () => {
@@ -81,7 +81,7 @@ describe('@graphorin/security/oauth — callback server', () => {
   it('retries until it finds a free port', async () => {
     const first = await startLocalCallbackServer();
     activeServer = first;
-    // Re-bind on the dynamic port range — the existing listener
+    // Re-bind on the dynamic port range - the existing listener
     // occupies one port; the random-port retry has to skip it.
     const second = await startLocalCallbackServer({
       portRange: [49152, 65535],
@@ -94,7 +94,7 @@ describe('@graphorin/security/oauth — callback server', () => {
 
   it('throws OAuthCallbackPortError when no port in the range can be bound', async () => {
     // Reserve a single-port range, then try to re-bind on the same
-    // port — every attempt fails so the helper raises the typed error.
+    // port - every attempt fails so the helper raises the typed error.
     const first = await startLocalCallbackServer();
     activeServer = first;
     await expect(

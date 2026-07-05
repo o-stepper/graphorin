@@ -1,5 +1,5 @@
 /**
- * Built-in `read_result` — fetch (a range of) a large tool result that was
+ * Built-in `read_result` - fetch (a range of) a large tool result that was
  * stored behind a handle instead of being inlined (P1-4).
  *
  * The agent runtime auto-registers this tool when at least one registered
@@ -8,7 +8,7 @@
  * confined to the spill artifact root, so the model can page through a
  * spilled artifact on demand without the full blob ever entering context.
  *
- * The schema is declared inline with Zod — `@graphorin/tools` declares Zod
+ * The schema is declared inline with Zod - `@graphorin/tools` declares Zod
  * as a (required) peer dependency and consumes it as a runtime value here,
  * mirroring `tool_search`.
  *

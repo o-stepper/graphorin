@@ -57,7 +57,7 @@ const UNTRUSTED_MARKER = '<<<untrusted_content';
  * output. The scanner's 5ms default exists for the per-tool-result
  * hot path; here a compaction already paid for an LLM call, and on a
  * contended host (slow CI runners included) scheduler noise can cross
- * 5ms between pattern iterations — making the scanner return `null`
+ * 5ms between pattern iterations - making the scanner return `null`
  * (verdict unknown) and the security check silently fail open.
  */
 const COMPACTION_SCAN_BUDGET_MS = 50;
@@ -152,12 +152,12 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   // context-engine-01: never split an assistant/tool pair. A purely
   // positional slice can strand a `role:'tool'` message at the head of
   // the preserved window while its `tool_calls` assistant partner is
-  // summarized away — OpenAI-compatible servers 400 on the orphan and
+  // summarized away - OpenAI-compatible servers 400 on the orphan and
   // `invalid-request` is fallback-ineligible, so the run would die right
   // after an otherwise successful compaction. Snap the boundary backward
   // until the preserved slice starts on a non-`tool` message: preserving
   // more than requested is always transcript-safe. (The
-  // clear-tool-results strategy is immune by construction — it replaces
+  // clear-tool-results strategy is immune by construction - it replaces
   // content in place and never removes messages.)
   while (olderCount > 0 && input.messages[olderCount]?.role === 'tool') {
     olderCount -= 1;
@@ -165,7 +165,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   const olderRaw = input.messages.slice(0, olderCount);
   const preservedTail = input.messages.slice(olderCount);
 
-  // C4: keep the most recent USER messages verbatim across compaction —
+  // C4: keep the most recent USER messages verbatim across compaction -
   // only assistant/tool content gets summarized away. User words are the
   // task statement; a paraphrase in the summary routinely drops the
   // constraint that mattered. The carried messages are removed from the
@@ -181,7 +181,7 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   }
   // Degenerate guard: on a tiny (user-dominated) window, carrying users
   // could empty the summarizable slice and turn the whole compaction into
-  // a no-op — there, positional summarization wins.
+  // a no-op - there, positional summarization wins.
   if (carriedUserIndices.size > 0 && carriedUserIndices.size === olderRaw.length) {
     carriedUserIndices.clear();
   }
@@ -229,13 +229,13 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
   if (summarizerTimeoutMs !== undefined) summarizerInput.timeoutMs = summarizerTimeoutMs;
   const summarized = await input.summarizer.summarize(summarizerInput);
 
-  // Section 9 metadata payload — stable shape so consumers can
+  // Section 9 metadata payload - stable shape so consumers can
   // deserialize and reason about a compaction event.
   const metadata: CompactionMetadataPayload = {
     compactedAtIso: new Date(startTs).toISOString(),
     // CE-14: positional labels, prefixed with the compaction instant so
     // they no longer collide across compaction events (core Message has
-    // no id — these are indices into THIS compaction's dropped slice).
+    // no id - these are indices into THIS compaction's dropped slice).
     compactedFromMessageIds: Object.freeze(olderMessages.map((_, idx) => `c${startTs}_msg_${idx}`)),
     compactedFromMessageIndices: Object.freeze(olderMessages.map((_, idx) => idx)),
     compactedFromTokens: await countMessageTokens(olderMessages, counter),
@@ -248,8 +248,8 @@ export async function executeCompaction(input: ExecuteCompactionInput): Promise<
 
   // CE-15: the summary must not launder untrusted content into a
   // trusted system message. When the compacted window carried
-  // untrusted envelopes — or the injection heuristics flag the
-  // summarizer output itself — the LLM-authored body is committed
+  // untrusted envelopes - or the injection heuristics flag the
+  // summarizer output itself - the LLM-authored body is committed
   // inside a derived-trust envelope (sticky across re-compactions:
   // the envelope re-triggers this detection next time around).
   const summaryScan = scanImperativePatterns(summarized.text, undefined, COMPACTION_SCAN_BUDGET_MS);
@@ -328,7 +328,7 @@ async function executeClearStrategy(
 
   const fallback = strategy.summarizeFallback;
   if (fallback !== false && afterClearTokens > input.thresholdTokens) {
-    // Clearing did not reclaim enough — summarize the ALREADY-cleared buffer.
+    // Clearing did not reclaim enough - summarize the ALREADY-cleared buffer.
     const summarized = await executeCompaction({
       ...input,
       messages: outcome.messages,

@@ -40,7 +40,7 @@ function capturingProvider(base: ReturnType<typeof createMockProvider>): {
   return { provider, requests };
 }
 
-describe('AgentConfig.outputType — structured output (AG-3)', () => {
+describe('AgentConfig.outputType - structured output (AG-3)', () => {
   it('valid JSON output is parsed through the schema into result.output', async () => {
     const base = createMockProvider({
       modelId: 'mock',
@@ -124,7 +124,7 @@ describe('AgentConfig.outputType — structured output (AG-3)', () => {
     expect(req?.outputType?.jsonSchema).toEqual(answerJsonSchema);
     // Fallback contract: a single trailing system message instructs
     // JSON-only output and embeds the schema (until adapters consume
-    // ProviderRequest.outputType natively — PS-24).
+    // ProviderRequest.outputType natively - PS-24).
     const last = req?.messages.at(-1);
     expect(last?.role).toBe('system');
     expect(typeof last?.content === 'string' && last.content).toContain('JSON');

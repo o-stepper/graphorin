@@ -5,11 +5,11 @@
  *
  * The runner respects:
  *
- *  - `concurrency` — bounded worker pool. Default `1` (sequential).
- *  - `signal` — propagated to `agent.run(...)` if the agent accepts a
+ *  - `concurrency` - bounded worker pool. Default `1` (sequential).
+ *  - `signal` - propagated to `agent.run(...)` if the agent accepts a
  *    second `{ signal }` argument; the runner stops issuing new work
  *    on the next loop iteration.
- *  - `onProgress` — invoked after every case with a heartbeat so
+ *  - `onProgress` - invoked after every case with a heartbeat so
  *    long-running terminals can paint a progress bar.
  *
  * @packageDocumentation
@@ -44,14 +44,14 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
 
   async function worker(): Promise<void> {
     while (true) {
-      // EB-14: stop dispatching new work on abort, but don't throw — whatever
+      // EB-14: stop dispatching new work on abort, but don't throw - whatever
       // already completed must survive into a partial report.
       if (isAborted(signal)) return;
       const myIndex = nextWorkIndex++;
       if (myIndex >= queue.length) return;
       const item = queue[myIndex];
       if (item === undefined) return;
-      // EB-6: a caller-provided id must still be disambiguated per iteration —
+      // EB-6: a caller-provided id must still be disambiguated per iteration -
       // otherwise iterations>1 emits multiple results under one caseId and
       // JUnit/HTML reporters render indistinguishable testcases.
       const baseId = item.sample.id ?? `case-${item.idx}`;
@@ -64,7 +64,7 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
           signal !== undefined ? { signal } : undefined,
         );
       } catch (err) {
-        // An abort-induced agent failure is not a real scorer failure — drop it
+        // An abort-induced agent failure is not a real scorer failure - drop it
         // so it doesn't pollute the partial report with spurious fails (EB-14).
         if (isAborted(signal)) return;
         const durationMs = Date.now() - startedAt;
@@ -124,7 +124,7 @@ export async function runEvals<I, O>(opts: RunOptions<I, O>): Promise<EvalReport
   await Promise.all(Array.from({ length: workerCount }, () => worker()));
 
   // EB-14: an aborted run resolves with a PARTIAL report (only the cases that
-  // finished) marked `aborted: true`, instead of discarding everything — a
+  // finished) marked `aborted: true`, instead of discarding everything - a
   // long judged run shouldn't lose all completed work to a Ctrl+C. Callers who
   // prefer the old throw-on-abort opt in with `throwOnAbort`.
   if (isAborted(signal)) {
@@ -218,7 +218,7 @@ function summarize<I, O>(
   };
 }
 
-// A plain function call so TypeScript re-reads `signal.aborted` each time —
+// A plain function call so TypeScript re-reads `signal.aborted` each time -
 // the flag flips during an `await` (external mutation) and inline
 // `signal?.aborted === true` checks would otherwise be narrowed away.
 function isAborted(signal: AbortSignal | undefined): boolean {

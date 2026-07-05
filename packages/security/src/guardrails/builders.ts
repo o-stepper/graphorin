@@ -1,6 +1,6 @@
 /**
  * Builders for `defineInputGuardrail(...)` and
- * `defineOutputGuardrail(...)` plus `composeGuardrails(...)` —
+ * `defineOutputGuardrail(...)` plus `composeGuardrails(...)` -
  * the helper that runs a sequence of guardrails with the
  * documented short-circuit semantics on `'block'`.
  *
@@ -20,7 +20,7 @@ import type {
 
 /**
  * Create a typed input guardrail. Thin wrapper around the
- * declarative shape — the helper exists so call-sites stay
+ * declarative shape - the helper exists so call-sites stay
  * declarative.
  *
  * @stable

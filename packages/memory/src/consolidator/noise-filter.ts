@@ -3,7 +3,7 @@
  * standard phase + every light-phase invocation. The defaults are
  * heuristic-only (no LLM); adapters may extend the pipeline through
  * `noiseFilters: [...customFilters]` once the public surface is wired
- * (post-MVP — DEC-134 carve-out).
+ * (post-MVP - DEC-134 carve-out).
  *
  * @packageDocumentation
  */
@@ -184,7 +184,7 @@ function looksLikeCodeOrJson(text: string): boolean {
       JSON.parse(trimmed);
       return true;
     } catch {
-      // Not actually JSON — fall through.
+      // Not actually JSON - fall through.
     }
   }
   return false;

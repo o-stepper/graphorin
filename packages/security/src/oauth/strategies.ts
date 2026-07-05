@@ -27,7 +27,7 @@ export function registerOAuthStrategy(strategy: OAuthStrategy): () => void {
 
 /**
  * Find every strategy that matches the given server descriptor. The
- * matching is `OR` — either the URL or the ID regex matching is
+ * matching is `OR` - either the URL or the ID regex matching is
  * enough to enrol the strategy.
  *
  * @stable

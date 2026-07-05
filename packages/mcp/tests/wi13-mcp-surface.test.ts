@@ -48,7 +48,7 @@ async function build(
 
 // --- resource_link → result handle ------------------------------------------
 
-describe('WI-13 — resource_link → result handle (adaptCallResult)', () => {
+describe('WI-13 - resource_link → result handle (adaptCallResult)', () => {
   it('surfaces a resource_link as a preview + handle instead of inlining the body', () => {
     const out = adaptCallResult({
       result: {
@@ -74,7 +74,7 @@ describe('WI-13 — resource_link → result handle (adaptCallResult)', () => {
     expect(text).toContain('application/json');
     expect(text).toContain('file:///big.json');
     expect(text).toContain('read_result');
-    // The 1 MiB body is NOT inlined — only a compact preview.
+    // The 1 MiB body is NOT inlined - only a compact preview.
     expect(text.length).toBeLessThan(500);
     expect(
       getCounterForTesting('mcp.resource-link.emitted.total', {
@@ -96,7 +96,7 @@ describe('WI-13 — resource_link → result handle (adaptCallResult)', () => {
 
 // --- createMcpResourceReader ------------------------------------------------
 
-describe('WI-13 — createMcpResourceReader', () => {
+describe('WI-13 - createMcpResourceReader', () => {
   it('resolves an MCP resource URI via readResource and pages it', async () => {
     const client = await build({
       resources: [
@@ -196,7 +196,7 @@ describe('WI-13 — createMcpResourceReader', () => {
 
 // --- elicitation ------------------------------------------------------------
 
-describe('WI-13 — elicitation', () => {
+describe('WI-13 - elicitation', () => {
   it('round-trips a server-initiated elicitation through the client handler', async () => {
     let seen: MCPElicitationRequest | undefined;
     const client = await build(
@@ -279,7 +279,7 @@ describe('WI-13 — elicitation', () => {
 
 // --- sampling ---------------------------------------------------------------
 
-describe('WI-13 — sampling', () => {
+describe('WI-13 - sampling', () => {
   it('round-trips a server-initiated sampling request through the client handler', async () => {
     let seen: MCPSamplingRequest | undefined;
     const client = await build(
@@ -384,7 +384,7 @@ describe('WI-13 — sampling', () => {
 
 // --- C6: trust-on-first-use pin store ----------------------------------------
 
-describe('C6 — pinStore: durable trust-on-first-use for tool definitions', () => {
+describe('C6 - pinStore: durable trust-on-first-use for tool definitions', () => {
   const echoTool = (description: string) => ({
     name: 'echo',
     description,
@@ -439,7 +439,7 @@ describe('C6 — pinStore: durable trust-on-first-use for tool definitions', () 
     const first = await build({ tools: [echoTool('v1')] });
     await first.toTools({ pinStore: store });
     const serverId = [...pins.keys()][0] ?? '';
-    const second = await build({ tools: [echoTool('v2 — changed')] });
+    const second = await build({ tools: [echoTool('v2 - changed')] });
     const tools = await second.toTools({ pinStore: store, onPinMismatch: 'warn' });
     expect(tools.map((t) => t.name)).toContain('echo');
     expect(

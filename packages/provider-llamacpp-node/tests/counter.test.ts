@@ -1,5 +1,5 @@
 /**
- * Coverage for `LlamaCppNativeCounter` — wraps `model.tokenize(text)`
+ * Coverage for `LlamaCppNativeCounter` - wraps `model.tokenize(text)`
  * from the loaded GGUF instance.
  */
 import type { Message } from '@graphorin/core';

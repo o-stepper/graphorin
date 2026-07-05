@@ -43,7 +43,7 @@ export class UnvalidatedExporterError extends Error {
   constructor(exporterId: string) {
     super(
       `Exporter "${exporterId}" was registered without withValidation(). All ` +
-        'exporters must be wrapped — see RedactionValidator policy. Wrap with ' +
+        'exporters must be wrapped - see RedactionValidator policy. Wrap with ' +
         "`withValidation(exporter, opts)` or set `validation: 'off'` (NOT recommended) " +
         'on the tracer to opt out explicitly (logs a startup WARN).',
     );

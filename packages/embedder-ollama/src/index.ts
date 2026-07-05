@@ -1,5 +1,5 @@
 /**
- * @graphorin/embedder-ollama — first-class opt-in alternative embedder
+ * @graphorin/embedder-ollama - first-class opt-in alternative embedder
  * for the Graphorin framework. Wraps the local Ollama HTTP API.
  *
  * @packageDocumentation
@@ -160,7 +160,7 @@ export class OllamaEmbedder implements EmbedderProvider {
    * Build the `{ signal }` fetch-init fragment, combining the caller's
    * abort signal (if any) with the per-request timeout so a hung Ollama
    * daemon cannot stall the embed call. Returns `{}` when neither
-   * applies. Call once per fetch — each call mints a fresh timeout.
+   * applies. Call once per fetch - each call mints a fresh timeout.
    */
   #signalInit(opts: EmbedOptions): { signal?: AbortSignal } {
     const timeoutSignal = this.#timeoutMs > 0 ? AbortSignal.timeout(this.#timeoutMs) : undefined;
@@ -171,7 +171,7 @@ export class OllamaEmbedder implements EmbedderProvider {
     return signal === undefined ? {} : { signal };
   }
 
-  /** The canonical embedder id — `'ollama:<model>@<dim-or-digest>'`. */
+  /** The canonical embedder id - `'ollama:<model>@<dim-or-digest>'`. */
   id(): string {
     const dim = this.dim();
     const digest = this.#digest !== null ? `:${this.#digest.slice(0, 12)}` : '';
@@ -179,7 +179,7 @@ export class OllamaEmbedder implements EmbedderProvider {
   }
 
   /**
-   * Output dimension — the explicit `dim` option, the resolved width from the
+   * Output dimension - the explicit `dim` option, the resolved width from the
    * first `embed()`, or a known-family default. PS-11: throws for an unknown
    * model with no `dim` hint instead of returning `0` (which the store would
    * persist and use to create a `float[0]` vec0 table, silently breaking
@@ -198,7 +198,7 @@ export class OllamaEmbedder implements EmbedderProvider {
   }
 
   /**
-   * Deterministic hash over the embedder's full configuration —
+   * Deterministic hash over the embedder's full configuration -
    * including the discovered digest. A model upgrade in the same
    * Ollama instance changes the digest (and therefore the hash), so
    * `lock-on-first` correctly fires a migration path instead of

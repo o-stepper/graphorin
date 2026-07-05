@@ -9,7 +9,7 @@ import { type ParsedSecretRef, parseOrAssert, parseSecretRef } from '../secret-r
 import type { SecretValue } from '../secret-value.js';
 
 /**
- * Internal registry entry — pairs the resolver with the bookkeeping
+ * Internal registry entry - pairs the resolver with the bookkeeping
  * we need for replacement semantics and listing.
  */
 type RegistryEntry = {
@@ -29,7 +29,7 @@ let builtinsInstalled = false;
 export interface RegisterResolverOptions {
   /** When false, throws if a resolver is already registered. Default true. */
   readonly allowReplace?: boolean;
-  /** Internal flag — used by the built-in resolvers; consumers leave this off. */
+  /** Internal flag - used by the built-in resolvers; consumers leave this off. */
   readonly source?: 'builtin' | 'user';
 }
 
@@ -154,7 +154,7 @@ export async function resolveSecret(
 }
 
 /**
- * Optional helper consumed by `validateSecretRefs(...)` — re-parses an
+ * Optional helper consumed by `validateSecretRefs(...)` - re-parses an
  * already-validated `SecretRef`. Kept here so the registry can be the
  * single import surface for downstream wiring.
  *

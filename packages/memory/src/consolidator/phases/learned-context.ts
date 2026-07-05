@@ -1,11 +1,11 @@
 /**
- * Learned-context pass (D3) — Letta-style sleep-time maintenance of a
+ * Learned-context pass (D3) - Letta-style sleep-time maintenance of a
  * persistent, size-bounded, agent-editable digest block. The deep phase
  * rewrites one reserved working-memory block (`learned_context`) from
  * the previous digest + fresh evidence (recent episodes, active
  * insights, active procedures), so every subsequent step's system
  * prompt carries a compact "what I have learned about this user /
- * project" summary inside the stable KV-cache prefix — without
+ * project" summary inside the stable KV-cache prefix - without
  * retrieval latency and without unbounded growth.
  *
  * The block itself is an ordinary working block: it is spliced into
@@ -16,7 +16,7 @@
  *
  * Runs after the deep-phase reflection pass, reusing the same budget /
  * lock / run-audit envelope. Gated off by default at every tier
- * (`learnedContext: false`) — Wave-D trial discipline.
+ * (`learnedContext: false`) - Wave-D trial discipline.
  *
  * @packageDocumentation
  */
@@ -60,13 +60,13 @@ export interface LearnedContextDeps {
   readonly working: WorkingMemory;
   /** Recent-episode evidence source. `null` ⇒ episodes are skipped. */
   readonly episodic: EpisodicMemory | null;
-  /** Storage adapter — supplies active insights + procedures as evidence. */
+  /** Storage adapter - supplies active insights + procedures as evidence. */
   readonly store: MemoryStoreAdapter;
   readonly budget: BudgetTracker;
   /** Character bound enforced on the stored digest. */
   readonly maxChars: number;
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
-  /** Override the wall clock — used by tests. */
+  /** Override the wall clock - used by tests. */
   readonly now?: () => number;
 }
 
@@ -95,7 +95,7 @@ export function normalizeLearnedContext(raw: string, maxChars: number): string |
   return text.length > maxChars ? text.slice(0, maxChars).trimEnd() : text;
 }
 
-/** Build the single rewrite request (pure — testable offline). */
+/** Build the single rewrite request (pure - testable offline). */
 export function buildLearnedContextRequest(args: {
   readonly previous: string;
   readonly episodes: ReadonlyArray<string>;
@@ -164,7 +164,7 @@ export async function runLearnedContextPass(
       }
       const previous = (await deps.working.read(deps.scope, LEARNED_CONTEXT_BLOCK_LABEL)) ?? '';
 
-      // Evidence: recent episodes (incl. quarantined auto-formed ones —
+      // Evidence: recent episodes (incl. quarantined auto-formed ones -
       // they carry the importance signal), ACTIVE insights only (the
       // digest drives behaviour, so quarantined synthesis stays out),
       // and active procedures.

@@ -1,5 +1,5 @@
 /**
- * `toolUsageValidator` — output guardrail that asserts the
+ * `toolUsageValidator` - output guardrail that asserts the
  * structured `toolCalls` produced by the agent against operator
  * policy: required tool names that must appear, forbidden tool
  * names that must not appear, and an optional caller-supplied
@@ -16,7 +16,7 @@ import type { GuardrailResult, OutputGuardrail } from '../types.js';
 
 /**
  * Shape of one observed tool call. Aligned with `ToolCall` from
- * `@graphorin/core` but decoupled — the validator reads only what it
+ * `@graphorin/core` but decoupled - the validator reads only what it
  * needs so deployments can repurpose it for other shapes.
  *
  * @stable

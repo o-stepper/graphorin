@@ -68,7 +68,7 @@ export class EncryptedFileSecretsStore implements SecretsStore {
    * `delete()` calls against the same instance cannot interleave their
    * reads and clobber each other. Cross-process writers are out of
    * scope (see the multi-process topology open question); the atomic
-   * temp+rename below still prevents corruption there — worst case is
+   * temp+rename below still prevents corruption there - worst case is
    * last-write-wins, never a truncated bundle.
    */
   #writeChain: Promise<unknown> = Promise.resolve();
@@ -222,9 +222,9 @@ export class EncryptedFileSecretsStore implements SecretsStore {
       return await this.#readPlaintext();
     } catch (err) {
       // SPL-3: initialise a fresh bundle ONLY when the file does not yet
-      // exist. Any other error — a decrypt / auth-tag mismatch (wrong or
+      // exist. Any other error - a decrypt / auth-tag mismatch (wrong or
       // rotated passphrase, tampered/truncated bundle), bad magic, or
-      // invalid JSON — must propagate so the surrounding `set()` /
+      // invalid JSON - must propagate so the surrounding `set()` /
       // `delete()` fails loud instead of silently overwriting (and thus
       // destroying) every previously-stored secret.
       if ((err as NodeJS.ErrnoException).code === 'ENOENT') {

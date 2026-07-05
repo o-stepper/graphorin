@@ -1,5 +1,5 @@
 /**
- * `graphorin migrate-export <input> --to-schema <X.Y>` — schema-version
+ * `graphorin migrate-export <input> --to-schema <X.Y>` - schema-version
  * migration for `graphorin-session-export/N.N` JSONL files (DEC-155 /
  * ADR-042).
  *

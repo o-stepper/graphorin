@@ -7,7 +7,7 @@
  * handler *only* when the operator supplies the matching callback on
  * {@link CreateMCPClientOptions}. A conforming server will not issue a
  * request for an un-advertised capability, so the default client is inert
- * (no implicit prompting, no implicit model calls — R4).
+ * (no implicit prompting, no implicit model calls - R4).
  *
  * The SDK request/result schemas are kept inside this module; the public
  * surface speaks only the Graphorin-typed {@link MCPElicitationRequest} /
@@ -79,7 +79,7 @@ export function registerClientRequestHandlers(
       const params = request.params;
       // mcp-skills-05 (SEP-1036): URL-mode elicitation carries a URL,
       // not a form schema. The old handler surfaced it as an
-      // empty-schema FORM with the URL invisible — decline it honestly
+      // empty-schema FORM with the URL invisible - decline it honestly
       // until URL elicitation is supported. (We advertise the `form`
       // sub-capability only, so a conforming server never sends this.)
       if ((params as { readonly mode?: unknown }).mode === 'url') {
@@ -119,7 +119,7 @@ export function registerClientRequestHandlers(
     sdkClient.setRequestHandler(CreateMessageRequestSchema, async (request, extra) => {
       incrementCounter('mcp.sampling.requested.total', { server: serverIdRef.current });
       const p = request.params;
-      // mcp-skills-05: protocol 2025-11-25 — "The client MUST return an
+      // mcp-skills-05: protocol 2025-11-25 - "The client MUST return an
       // error if this field is provided but
       // ClientCapabilities.sampling.tools is not declared". We do not
       // declare it; pre-fix a tools-carrying request was silently
@@ -135,7 +135,7 @@ export function registerClientRequestHandlers(
       const samplingRequest: MCPSamplingRequest = {
         messages: p.messages.map((m) => ({
           role: m.role,
-          // MC-13: keep EVERY block — a text+image message must reach the
+          // MC-13: keep EVERY block - a text+image message must reach the
           // operator's handler whole, not truncated to its first block.
           content: contentBlocks(m.content).map((block) => toGraphorinContent(block)),
         })),

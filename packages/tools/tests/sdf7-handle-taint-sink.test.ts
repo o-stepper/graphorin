@@ -13,7 +13,7 @@ import type { SpillWriter } from '../src/result/truncate.js';
 import { makeRunContext } from './fixtures.js';
 
 // A distinctive sentence that lives ONLY in the spilled tail (beyond the
-// preview cap) — if the sink gate fires on it, the taint followed the
+// preview cap) - if the sink gate fires on it, the taint followed the
 // handle read, not the bounded preview.
 const TAIL_SECRET_PLAN =
   'the hidden coordinates are 51.4778 north 0.0014 west under the old observatory clock';
@@ -41,10 +41,10 @@ async function isolatedSpill(): Promise<SpillWriter> {
   };
 }
 
-describe('SDF-7 — spill→read_result→sink triggers the verbatim gate like a direct flow (closed by TL-6)', () => {
+describe('SDF-7 - spill→read_result→sink triggers the verbatim gate like a direct flow (closed by TL-6)', () => {
   it('a sink echoing handle-fetched untrusted content is blocked in enforce mode', async () => {
     // The ledger-backed guard from @graphorin/security via the agent's
-    // builder shape — reproduced minimally here so the tools package
+    // builder shape - reproduced minimally here so the tools package
     // exercises the REAL policy semantics without an agent dependency.
     const { createDataFlowPolicy, createTaintLedger, deriveTaintLabel } = await import(
       '@graphorin/security/dataflow'

@@ -1,5 +1,5 @@
 /**
- * @graphorin/tools — typed tool surface for the Graphorin framework.
+ * @graphorin/tools - typed tool surface for the Graphorin framework.
  *
  * The package owns:
  *

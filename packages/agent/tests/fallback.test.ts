@@ -7,7 +7,7 @@ const make = (kind: ProviderErrorKind): ProviderError => ({
   message: `simulated ${kind}`,
 });
 
-describe('isAgentFallbackEligible — default policy', () => {
+describe('isAgentFallbackEligible - default policy', () => {
   it('flags rate-limit / capacity / context-length as eligible by default', () => {
     expect(isAgentFallbackEligible(make('rate-limit')).eligible).toBe(true);
     expect(isAgentFallbackEligible(make('capacity')).eligible).toBe(true);
@@ -31,7 +31,7 @@ describe('isAgentFallbackEligible — default policy', () => {
   });
 });
 
-describe('isAgentFallbackEligible — operator policy overrides', () => {
+describe('isAgentFallbackEligible - operator policy overrides', () => {
   it('flips rate-limit to ineligible when policy disables it', () => {
     expect(isAgentFallbackEligible(make('rate-limit'), { rateLimitEligible: false }).eligible).toBe(
       false,

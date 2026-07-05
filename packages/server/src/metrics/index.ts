@@ -1,5 +1,5 @@
 /**
- * `@graphorin/server/metrics` — Phase 14c Prometheus exposition layer.
+ * `@graphorin/server/metrics` - Phase 14c Prometheus exposition layer.
  *
  * @packageDocumentation
  */

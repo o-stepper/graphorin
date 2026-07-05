@@ -1,5 +1,5 @@
 /**
- * @graphorin/secret-1password — reference 1Password secret-resolver
+ * @graphorin/secret-1password - reference 1Password secret-resolver
  * adapter for the Graphorin framework.
  *
  * Registers the `op://` scheme on top of `@graphorin/security`'s

@@ -4,7 +4,7 @@ import type { RunState } from './run.js';
  * Predicate consulted by the agent runtime after every step to decide
  * whether the loop should stop.
  *
- * Stop conditions are pure — they look at the current `RunState` and
+ * Stop conditions are pure - they look at the current `RunState` and
  * return a boolean. The runtime never re-orders or short-circuits the
  * order in which operands of `and` / `or` are evaluated, so users can
  * rely on the obvious left-to-right semantics.

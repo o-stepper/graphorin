@@ -4,7 +4,7 @@
  * millisecond), and a 36-bit crypto-quality random suffix (ties the id
  * to the host so different runs do not collide either).
  *
- * The format is intentionally NOT a UUID — UUIDs are 16 bytes once
+ * The format is intentionally NOT a UUID - UUIDs are 16 bytes once
  * decoded; these ids are 18 chars on average which is what the
  * `audit.db` hash chain (Phase 03b) was sized for.
  *

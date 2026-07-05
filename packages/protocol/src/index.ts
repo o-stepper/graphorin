@@ -1,5 +1,5 @@
 /**
- * `@graphorin/protocol` — wire-format contract for the Graphorin
+ * `@graphorin/protocol` - wire-format contract for the Graphorin
  * WebSocket subprotocol.
  *
  * The package is the **single source of truth** for the shape of

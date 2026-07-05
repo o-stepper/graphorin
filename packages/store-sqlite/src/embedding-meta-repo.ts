@@ -2,8 +2,8 @@ import type { SqliteConnection } from './connection.js';
 
 /**
  * Registry row in the `embedding_meta` table. Captures every embedder
- * the database has ever indexed against — both the default and any
- * legacy / migrated peers — together with the names of the per-embedder
+ * the database has ever indexed against - both the default and any
+ * legacy / migrated peers - together with the names of the per-embedder
  * vec0 tables that store the actual vectors per memory tier.
  *
  * @stable
@@ -11,7 +11,7 @@ import type { SqliteConnection } from './connection.js';
 export interface EmbeddingMetaRow {
   /** Canonical id, `'<provider>:<model>@<dim>'`. */
   readonly id: string;
-  /** Adapter family — `'transformersjs'`, `'ollama'`, `'openai'`, `'custom'`, …. */
+  /** Adapter family - `'transformersjs'`, `'ollama'`, `'openai'`, `'custom'`, …. */
   readonly embedderKind: string;
   readonly model: string;
   readonly dim: number;
@@ -29,7 +29,7 @@ export interface EmbeddingMetaRow {
 }
 
 /**
- * Lock-on-first conflict — registering a second active embedder for an
+ * Lock-on-first conflict - registering a second active embedder for an
  * already-locked database fails fast with this error pointing at
  * `graphorin memory migrate` (Phase 15).
  *
@@ -40,7 +40,7 @@ export class EmbedderLockOnFirstError extends Error {
 }
 
 /**
- * Read access for unknown `embedder_id` — the runtime fails fast on
+ * Read access for unknown `embedder_id` - the runtime fails fast on
  * any record write that references an unregistered embedder.
  *
  * @stable
@@ -56,7 +56,7 @@ export class UnknownEmbedderIdError extends Error {
 }
 
 /**
- * Multi-embedder coexistence policy. `'lock-on-first'` is the default —
+ * Multi-embedder coexistence policy. `'lock-on-first'` is the default -
  * the first registered embedder is the only writer; subsequent
  * different embedders must run a migration. `'multi-active'` allows
  * coexistence (read both, write to default). `'auto-migrate'` is a
@@ -115,12 +115,12 @@ export class EmbeddingMetaRepository {
    */
   registerOrReturn(input: RegisterEmbedderInput): EmbeddingMetaRow {
     // PS-11: a dim of 0 (or non-finite) would create a `float[0]` vec0 table
-    // and silently break vector search — most often an Ollama embedder bound
+    // and silently break vector search - most often an Ollama embedder bound
     // for an unknown model before its width was resolved. Reject it loudly.
     if (!Number.isInteger(input.dim) || input.dim <= 0) {
       throw new EmbedderLockOnFirstError(
         `[graphorin/store-sqlite] embedder '${input.id}' has an invalid dim (${String(input.dim)}). ` +
-          'The output dimension must be a positive integer — pass an explicit `dim` to the embedder ' +
+          'The output dimension must be a positive integer - pass an explicit `dim` to the embedder ' +
           '(e.g. ollamaEmbedder({ model, dim })) or resolve it from a first embed before registering.',
       );
     }
@@ -147,13 +147,13 @@ export class EmbeddingMetaRepository {
     }
 
     // store F13: vec0 tables are only ever created with cosine or
-    // euclidean — a 'dot' request was silently rewritten to cosine at
+    // euclidean - a 'dot' request was silently rewritten to cosine at
     // table-create while the meta kept advertising 'dot'. Persist what
     // the table actually computes, and say so.
     if (input.distanceMetric === 'dot') {
       process.stderr.write(
         `[graphorin/store-sqlite] embedder '${input.id}' requested distanceMetric 'dot', which ` +
-          `sqlite-vec tables do not compute — registering as 'cosine' (identical ranking for ` +
+          `sqlite-vec tables do not compute - registering as 'cosine' (identical ranking for ` +
           `L2-normalized embeddings; NOT for unnormalized ones).\n`,
       );
     }
@@ -268,7 +268,7 @@ export interface RegisterEmbedderInput {
  */
 export function slugifyEmbedderId(id: string): string {
   // Cap the input before the regex passes so adversarial inputs cannot
-  // amplify any (linear) regex traversal — the final slug is never
+  // amplify any (linear) regex traversal - the final slug is never
   // longer than 80 chars anyway.
   const bounded = id.length > 256 ? id.slice(0, 256) : id;
   return bounded

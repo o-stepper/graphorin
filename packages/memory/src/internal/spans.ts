@@ -1,7 +1,7 @@
 import type { SessionScope, SpanAttributes, SpanType, Tracer } from '@graphorin/core';
 
 /**
- * Sanitize a `SessionScope` for span attributes — the raw user id is
+ * Sanitize a `SessionScope` for span attributes - the raw user id is
  * surfaced as-is (it is a stable opaque identifier per DEC-005), but
  * session and agent ids are emitted only when defined to avoid
  * polluting the trace with `null` strings.

@@ -21,7 +21,7 @@ function isSink(evaluation: DataFlowEvaluation): boolean {
   );
 }
 
-/** Compose the finding for a tripped flow (metadata only — never bytes). */
+/** Compose the finding for a tripped flow (metadata only - never bytes). */
 function findingFor(
   flow: DataFlowFinding['flow'],
   evaluation: DataFlowEvaluation,
@@ -69,7 +69,7 @@ export function createDataFlowPolicy(config: DataFlowPolicyConfig): DataFlowPoli
         finding = findingFor('untrusted-to-sink', evaluation);
       } else if (derivedTaint === 'strict' && evaluation.untrustedSeen) {
         // C6: every model-driven sink call after untrusted ingestion is
-        // derived from it — the paraphrase-robust (coarse) signal.
+        // derived from it - the paraphrase-robust (coarse) signal.
         finding = findingFor('derived-untrusted-to-sink', evaluation);
       } else if (guardTrifecta && evaluation.untrustedSeen && evaluation.sensitiveSeen) {
         finding = findingFor('lethal-trifecta', evaluation);

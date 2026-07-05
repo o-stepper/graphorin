@@ -40,12 +40,12 @@ export interface GraphorinSpan<T extends SpanType = SpanType> extends AISpan<T> 
 }
 
 /**
- * @internal — sink invoked when a span ends.
+ * @internal - sink invoked when a span ends.
  */
 export type SpanSink = (record: SpanRecord) => void;
 
 /**
- * @internal — parameters passed by the tracer to {@link createSpan}.
+ * @internal - parameters passed by the tracer to {@link createSpan}.
  */
 export interface SpanCreateInput<T extends SpanType = SpanType> {
   readonly type: T;

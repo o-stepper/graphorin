@@ -1,5 +1,5 @@
 /**
- * DMR (Deep Memory Retrieval) loader — the MemGPT/Letta continuity set
+ * DMR (Deep Memory Retrieval) loader - the MemGPT/Letta continuity set
  * derived from Multi-Session Chat (arXiv:2310.08560). DMR's published
  * shape is less standardised than LongMemEval/LOCOMO, so this loader is
  * deliberately tolerant: it accepts a JSON **array** of items, each

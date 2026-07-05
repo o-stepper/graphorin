@@ -205,7 +205,7 @@ afterEach(async () => {
   delete process.env[PEPPER_ENV];
 });
 
-describe('Phase 14c — extended /v1/health', () => {
+describe('Phase 14c - extended /v1/health', () => {
   it('returns the rollup with per-check breakdown (flat shape) and 200 on degraded', async () => {
     const { server } = await bootServer();
     const res = await server.app.request('/v1/health');
@@ -282,7 +282,7 @@ describe('Phase 14c — extended /v1/health', () => {
   });
 });
 
-describe('Phase 14c — /v1/health/secrets', () => {
+describe('Phase 14c - /v1/health/secrets', () => {
   it('requires the secrets:read scope (admin satisfies via wildcard)', async () => {
     const { server, anonBearer, adminBearer } = await bootServer();
     const denied = await server.app.request('/v1/health/secrets', {
@@ -298,7 +298,7 @@ describe('Phase 14c — /v1/health/secrets', () => {
   });
 });
 
-describe('Phase 14c — /v1/metrics Prometheus exposition', () => {
+describe('Phase 14c - /v1/metrics Prometheus exposition', () => {
   it('renders metrics text without authentication when requireAuth=false', async () => {
     const { server } = await bootServer();
     const res = await server.app.request('/v1/metrics');
@@ -311,7 +311,7 @@ describe('Phase 14c — /v1/metrics Prometheus exposition', () => {
   });
 });
 
-describe('Phase 14c — triggers REST routes', () => {
+describe('Phase 14c - triggers REST routes', () => {
   it('GET /v1/triggers requires triggers:read', async () => {
     const { server, bearer, anonBearer } = await bootServer();
     const denied = await server.app.request('/v1/triggers', {
@@ -402,7 +402,7 @@ describe('Phase 14c — triggers REST routes', () => {
     });
     expect(ok.status).toBe(200);
 
-    // IP-17: disable is a NON-destructive flag flip — the trigger
+    // IP-17: disable is a NON-destructive flag flip - the trigger
     // survives, paused; enable restores it; DELETE removes it.
     const all = await scheduler.list();
     expect(all.find((t) => t.id === 'to-disable')?.disabled).toBe(true);
@@ -429,7 +429,7 @@ describe('Phase 14c — triggers REST routes', () => {
   });
 });
 
-describe('Phase 14c — consolidator lifecycle', () => {
+describe('Phase 14c - consolidator lifecycle', () => {
   it('starts in beforeStart and stops on shutdown', async () => {
     const { consolidator, server } = await bootServer();
     expect(consolidator.startCalls).toBe(1);
@@ -452,7 +452,7 @@ describe('Phase 14c — consolidator lifecycle', () => {
   });
 });
 
-describe('Phase 14c — Prometheus metrics live refresh', () => {
+describe('Phase 14c - Prometheus metrics live refresh', () => {
   it('refreshes server uptime + WAL size + triggers fires on every scrape', async () => {
     const { server, scheduler } = await bootServer();
     let fired = 0;
@@ -477,7 +477,7 @@ describe('Phase 14c — Prometheus metrics live refresh', () => {
   });
 });
 
-describe('Phase 14c — replay endpoints (scope enforcement)', () => {
+describe('Phase 14c - replay endpoints (scope enforcement)', () => {
   it('rejects raw replay without traces:read:raw scope', async () => {
     const { server, bearer } = await bootServer();
     const res = await server.app.request('/v1/runs/run-1/replay', {
@@ -570,7 +570,7 @@ describe('Phase 14c — replay endpoints (scope enforcement)', () => {
   });
 });
 
-describe('Phase 14c — POST /v1/audit/verify', () => {
+describe('Phase 14c - POST /v1/audit/verify', () => {
   it('returns chain integrity status', async () => {
     const { server, bearer } = await bootServer();
     const res = await server.app.request('/v1/audit/verify', {
@@ -584,7 +584,7 @@ describe('Phase 14c — POST /v1/audit/verify', () => {
   });
 });
 
-describe('Phase 14c — GET /v1/audit filters (from / to / action)', () => {
+describe('Phase 14c - GET /v1/audit filters (from / to / action)', () => {
   it('forwards from / to / action filter parameters to the AuditApi', async () => {
     let received: Record<string, unknown> | undefined;
     _resetResolversForTesting();

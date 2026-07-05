@@ -32,7 +32,7 @@ describe('check-anthropic-spec script', () => {
           type: 'string',
           stability: 'stable',
         },
-        // New upstream field — should produce drift.
+        // New upstream field - should produce drift.
         'new-experimental-field': {
           since: '2099-01-01',
           required: false,
@@ -65,7 +65,7 @@ describe('check-anthropic-spec script', () => {
     const upstreamPath = join(dir, 'upstream.json');
     await writeFile(upstreamPath, JSON.stringify(upstream), 'utf8');
     const result = spawnSync(process.execPath, [SCRIPT, '--upstream', upstreamPath]);
-    // The bundled snapshot is a superset of `name` — REMOVED entries
+    // The bundled snapshot is a superset of `name` - REMOVED entries
     // are tolerated because the bundled snapshot legitimately tracks
     // additional upstream fields. The script returns 1 when the
     // bundled side is missing fields from upstream; matching subset

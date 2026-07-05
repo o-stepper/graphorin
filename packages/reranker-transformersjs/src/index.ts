@@ -1,5 +1,5 @@
 /**
- * @graphorin/reranker-transformersjs — cross-encoder reranker adapter
+ * @graphorin/reranker-transformersjs - cross-encoder reranker adapter
  * for the Graphorin framework.
  *
  * Wraps `@huggingface/transformers@^4.1.0` to score `(query, passage)`
@@ -25,7 +25,7 @@
  *    multilingual baseline).
  *
  * Operators that want a narrower / language-specific cross-encoder
- * pass an explicit `model` option — the package's defaults
+ * pass an explicit `model` option - the package's defaults
  * deliberately avoid privileging any single language pair.
  *
  * @packageDocumentation

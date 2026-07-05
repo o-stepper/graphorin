@@ -14,7 +14,7 @@ import {
   resolveLocalePack,
 } from '../src/index.js';
 
-describe('context-engine — locale-aware templates (Phase 10d)', () => {
+describe('context-engine - locale-aware templates (Phase 10d)', () => {
   it('exports the bundled English Layer 1 fragments verbatim', () => {
     expect(composeLayer1(enLocalePack, 'full')).toBe(BASE_TEMPLATE_EN_FULL);
     expect(composeLayer1(enLocalePack, 'minimal')).toBe(BASE_TEMPLATE_EN_MINIMAL);
@@ -39,11 +39,11 @@ describe('context-engine — locale-aware templates (Phase 10d)', () => {
     // + working blocks the assembled prompt clears 600.
     expect(fullTokens).toBeGreaterThanOrEqual(500);
     expect(fullTokens).toBeLessThanOrEqual(900);
-    // Minimal template is ~109 heuristic tokens — comfortably under
+    // Minimal template is ~109 heuristic tokens - comfortably under
     // the 200-token ceiling even with a small Layer 5 metadata block.
     expect(minimalTokens).toBeLessThanOrEqual(200);
     // The full template is at least 4× larger than the minimal
-    // template — the documented "education vs delegation" trade-off.
+    // template - the documented "education vs delegation" trade-off.
     expect(fullTokens).toBeGreaterThanOrEqual(minimalTokens * 4);
   });
 
@@ -78,7 +78,7 @@ describe('context-engine — locale-aware templates (Phase 10d)', () => {
   });
 });
 
-describe('context-engine — locale pack fallback (Phase 10d)', () => {
+describe('context-engine - locale pack fallback (Phase 10d)', () => {
   it('resolves the bundled `en` pack when the input id matches', () => {
     const pack = resolveLocalePack({ id: 'en' });
     expect(pack).toBe(enLocalePack);
@@ -90,9 +90,9 @@ describe('context-engine — locale pack fallback (Phase 10d)', () => {
     const partial = defineContextLocalePack({
       id: 'partial-test',
       baseTemplate: { full: '<custom_full/>' },
-      // baseTemplate.minimal omitted — falls back
-      // autoRecallTriggers omitted — falls back
-      // inboundSanitizationPreamble omitted — falls back
+      // baseTemplate.minimal omitted - falls back
+      // autoRecallTriggers omitted - falls back
+      // inboundSanitizationPreamble omitted - falls back
       compactionSummaryTemplate: { preamble: 'CUSTOM PREAMBLE' },
     });
     const pack = resolveLocalePack(partial, {

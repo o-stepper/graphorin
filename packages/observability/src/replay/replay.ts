@@ -1,5 +1,5 @@
 /**
- * `createReplay(...)` — sanitized-by-default replay primitives.
+ * `createReplay(...)` - sanitized-by-default replay primitives.
  *
  * Replay never opens the underlying file directly; callers feed it an
  * iterable of `SpanRecord`s. The {@link createTraceLogReader} helper

@@ -1,5 +1,5 @@
 /**
- * Handoff filter library — a small set of pure, composable functions
+ * Handoff filter library - a small set of pure, composable functions
  * that take the parent agent's message history and return a filtered
  * subset suitable for forwarding to a child agent.
  *
@@ -8,7 +8,7 @@
  * session export (`@graphorin/sessions`) can replay the filter stack
  * even after the runtime implementations evolve.
  *
- * Reasoning content is **always** stripped at the handoff boundary —
+ * Reasoning content is **always** stripped at the handoff boundary -
  * `filters.compose(...)` guarantees `stripReasoning()` runs last so a
  * caller-supplied filter cannot accidentally forward reasoning to a
  * child agent. This is the confidentiality + token-economy default
@@ -35,7 +35,7 @@ const SENSITIVITY_RANK: Record<Sensitivity, number> = {
  * Return `true` iff the message's effective sensitivity is at most
  * `maxTier` (a strictly weaker check than core's
  * `acceptsSensitivity` because the filter library does not have
- * the provider's `acceptsSensitivity[]` array — only a ceiling).
+ * the provider's `acceptsSensitivity[]` array - only a ceiling).
  */
 function withinTier(record: Sensitivity, maxTier: Sensitivity): boolean {
   return SENSITIVITY_RANK[record] <= SENSITIVITY_RANK[maxTier];
@@ -138,7 +138,7 @@ export function lastUser(): DescribedFilter {
 }
 
 /**
- * The full unfiltered history. Discouraged — security-conscious
+ * The full unfiltered history. Discouraged - security-conscious
  * callers should pick {@link lastN} or {@link bySensitivity} instead
  * (a sub-agent rarely needs the parent's entire conversation).
  *

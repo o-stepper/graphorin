@@ -1,6 +1,6 @@
 /**
  * Eleven memory tools registered with `@graphorin/tools` by the
- * `createMemory()` facade — plus an opt-in twelfth, `deep_recall` (P2-4),
+ * `createMemory()` facade - plus an opt-in twelfth, `deep_recall` (P2-4),
  * appended only when iterative retrieval is configured. Each factory
  * takes a {@link MemoryToolDeps} bundle so consumers can scope the tool
  * surface (per-tier ACL, scope resolver, etc.) without rebuilding the
@@ -73,7 +73,7 @@ export interface BuildMemoryToolsOptions {
 }
 
 /**
- * Build the canonical eleven-memory-tool array. Order is stable —
+ * Build the canonical eleven-memory-tool array. Order is stable -
  * consumers can rely on the indices for snapshot tests. `fact_history`
  * (P0-2) and `fact_validate` (P1-4) are appended last so the original
  * nine indices are unchanged. With `{ includeDeepRecall: true }` the

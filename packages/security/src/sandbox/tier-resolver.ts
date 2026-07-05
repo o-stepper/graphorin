@@ -1,5 +1,5 @@
 /**
- * `resolveSandbox(...)` — picks the effective sandbox policy for a
+ * `resolveSandbox(...)` - picks the effective sandbox policy for a
  * tool / skill / trust-level triple per DEC-148.
  *
  * Defaults follow the canonical sandbox tier table:
@@ -102,7 +102,7 @@ export function resolveSandbox(input: ResolveSandboxInput): ResolvedSandboxPolic
     if (operatorRelaxedNetwork) reasonParts.push('override noNetwork=false ignored');
     if (operatorRelaxedFs) reasonParts.push('override noFilesystem=false ignored');
     // SDF-10: an untrusted (forced) tier must keep a positive wall-clock
-    // limit — `timeoutMs:0` (meaning "unbounded") is ignored and falls
+    // limit - `timeoutMs:0` (meaning "unbounded") is ignored and falls
     // back to the tier default; the coercion is itself a forced action.
     const untrustedTimeout = clampForcedTimeout(
       override.timeoutMs,
@@ -122,7 +122,7 @@ export function resolveSandbox(input: ResolveSandboxInput): ResolvedSandboxPolic
     });
   }
 
-  // 'user-defined' or 'trusted' — operator override wins.
+  // 'user-defined' or 'trusted' - operator override wins.
   const kind = override.kind ?? 'worker-threads';
   return Object.freeze({
     kind,
@@ -150,7 +150,7 @@ function clampTimeout(value: number | undefined, fallback: number): number {
 }
 
 /**
- * SDF-10: like `clampTimeout` but for forced (untrusted) tiers — a
+ * SDF-10: like `clampTimeout` but for forced (untrusted) tiers - a
  * non-positive value means "no limit", which is never acceptable here:
  * coerce it to the tier default instead.
  */

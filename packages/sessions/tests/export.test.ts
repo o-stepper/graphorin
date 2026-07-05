@@ -120,7 +120,7 @@ describe('Session export writer + reader', () => {
       },
     ];
     const body = await buildBody(records); // footer declares 2 messages / 2 records
-    // Drop the second message line (simulate truncation) — footer is untouched.
+    // Drop the second message line (simulate truncation) - footer is untouched.
     const lines = body.split('\n').filter((l) => l.length > 0);
     const truncated = `${[lines[0], lines[1], lines[lines.length - 1]].join('\n')}\n`;
     const warns: SessionExportWarning[] = [];

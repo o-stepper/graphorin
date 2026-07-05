@@ -1,5 +1,5 @@
 /**
- * `@graphorin/agent` — agent runtime for the Graphorin framework.
+ * `@graphorin/agent` - agent runtime for the Graphorin framework.
  *
  * The package owns:
  *

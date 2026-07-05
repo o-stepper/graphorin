@@ -70,7 +70,7 @@ afterEach(async () => {
   bearer = undefined;
 });
 
-describe('Routes coverage — branches that the integration suite leaves cold', () => {
+describe('Routes coverage - branches that the integration suite leaves cold', () => {
   beforeEach(async () => {
     await boot();
   });
@@ -154,7 +154,7 @@ describe('Routes coverage — branches that the integration suite leaves cold', 
         async run(_i, opts) {
           opts?.signal?.dispatchEvent(new Event('abort'));
           // Force a thrown error after the abort signal has been
-          // surfaced — mimics what a real agent does on cancellation.
+          // surfaced - mimics what a real agent does on cancellation.
           (opts as { signal: AbortSignal }).signal = makeAbortedSignal();
           throw new Error('aborted');
         },
@@ -351,7 +351,7 @@ describe('Routes coverage — branches that the integration suite leaves cold', 
       body: JSON.stringify({}),
     });
     expect(malformed.status).toBe(400);
-    // periphery-01: fork is honestly 501 now — the old 202 forked nothing.
+    // periphery-01: fork is honestly 501 now - the old 202 forked nothing.
     const ok = await server.app.request('/v1/workflows/wf/fork', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },

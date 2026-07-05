@@ -1,5 +1,5 @@
 /**
- * `graphorin migrate` — apply pending storage migrations.
+ * `graphorin migrate` - apply pending storage migrations.
  *
  * Idempotent: re-running the command after every migration has been
  * applied is a no-op + a successful exit. Failures bubble up with the

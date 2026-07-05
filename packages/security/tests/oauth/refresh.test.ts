@@ -13,7 +13,7 @@ import { SecretValue } from '../../src/secrets/secret-value.js';
 
 import { buildSyntheticServerMetadata, resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — refresh + revoke', () => {
+describe('@graphorin/security/oauth - refresh + revoke', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });
@@ -186,7 +186,7 @@ describe('@graphorin/security/oauth — refresh + revoke', () => {
     expect(params.get('token_type_hint')).toBe('refresh_token');
   });
 
-  it('revokeOAuthToken THROWS when the endpoint is missing — no silent unconfirmed success (SPL-16)', async () => {
+  it('revokeOAuthToken THROWS when the endpoint is missing - no silent unconfirmed success (SPL-16)', async () => {
     let called = false;
     _setRevocationFetcherForTesting(async () => {
       called = true;

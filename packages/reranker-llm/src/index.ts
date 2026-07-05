@@ -1,5 +1,5 @@
 /**
- * @graphorin/reranker-llm — LLM-as-reranker adapter for the Graphorin
+ * @graphorin/reranker-llm - LLM-as-reranker adapter for the Graphorin
  * framework.
  *
  * Asks the configured `Provider` to score `(query, passage)` pairs

@@ -7,7 +7,7 @@
  *   canonical JSON, hashed with the RFC-6962 `0x00` leaf prefix),
  * - **inclusion proofs** ("entry N is in the log with head H"),
  * - **consistency proofs** ("head H2 is an append-only extension of
- *   H1" — the anti-truncation / anti-rewrite check `pruneAudit`-style
+ *   H1" - the anti-truncation / anti-rewrite check `pruneAudit`-style
  *   re-rooting cannot forge),
  * - **Ed25519-signed checkpoints** (signed tree heads) so an operator
  *   can anchor the log externally: persist a signed head out-of-band
@@ -82,7 +82,7 @@ function inclusionPath(m: number, leaves: ReadonlyArray<Buffer>): Buffer[] {
   return [...inclusionPath(m - k, leaves.slice(k)), merkleTreeHash(leaves.slice(0, k))];
 }
 
-/** RFC 6962 §2.1.2 SUBPROOF(m, D[n], b) — consistency path from size `m` to `n`. */
+/** RFC 6962 §2.1.2 SUBPROOF(m, D[n], b) - consistency path from size `m` to `n`. */
 function consistencyPath(
   m: number,
   leaves: ReadonlyArray<Buffer>,
@@ -179,7 +179,7 @@ export async function proveAuditInclusion(
   const { leaves } = await loadLeaves(db, { toSeq: head.lastSeq });
   if (leaves.length !== head.size) {
     throw new Error(
-      `[graphorin/security] audit log size ${leaves.length} does not match head size ${head.size} — the log changed since the head was computed`,
+      `[graphorin/security] audit log size ${leaves.length} does not match head size ${head.size} - the log changed since the head was computed`,
     );
   }
   let leafIndex = -1;
@@ -203,7 +203,7 @@ export async function proveAuditInclusion(
 }
 
 /**
- * Verify an inclusion proof (RFC 6962 §2.1.1 verification algorithm) —
+ * Verify an inclusion proof (RFC 6962 §2.1.1 verification algorithm) -
  * pure; needs only the entry, the proof, and the trusted head.
  *
  * @stable
@@ -269,7 +269,7 @@ export async function proveAuditConsistency(
 
 /**
  * Verify a consistency proof between two heads (RFC 6962 §2.1.2). A
- * `true` result means `newer` is an append-only extension of `older` —
+ * `true` result means `newer` is an append-only extension of `older` -
  * nothing covered by `older` was rewritten, reordered, or truncated.
  *
  * @stable
@@ -286,7 +286,7 @@ export function verifyAuditConsistency(
   }
   // RFC 9162 §2.1.4.2 verification algorithm. When the older size is a
   // power of two its root is a node of the newer tree and is not
-  // repeated in the proof — prepend it as the seed.
+  // repeated in the proof - prepend it as the seed.
   const path = proof.map((hex) => Buffer.from(hex, 'hex'));
   const full = isPowerOfTwo(older.size) ? [Buffer.from(older.rootHash, 'hex'), ...path] : path;
   const seed = full[0];
@@ -328,7 +328,7 @@ function isPowerOfTwo(n: number): boolean {
 /**
  * Ed25519-signed audit checkpoint (a signed tree head). Persist it
  * anywhere outside the writer's reach (a different host, an object
- * store, a ticket) — any later rewrite of the covered prefix fails the
+ * store, a ticket) - any later rewrite of the covered prefix fails the
  * consistency proof against it.
  *
  * @stable
@@ -341,7 +341,7 @@ export interface SignedAuditCheckpoint {
   readonly signedAt: string;
   /** base64url Ed25519 signature over the canonical checkpoint body. */
   readonly signature: string;
-  /** PEM (SPKI) public key — carried for convenience; pin it separately. */
+  /** PEM (SPKI) public key - carried for convenience; pin it separately. */
   readonly publicKeyPem: string;
 }
 
@@ -379,7 +379,7 @@ export async function signAuditCheckpoint(
   opts: {
     readonly privateKeyPem: string;
     readonly writerId: string;
-    /** Override the wall clock — used by tests. */
+    /** Override the wall clock - used by tests. */
     readonly now?: () => number;
   },
 ): Promise<SignedAuditCheckpoint> {
@@ -401,7 +401,7 @@ export async function signAuditCheckpoint(
 
 /**
  * Verify a signed checkpoint's Ed25519 signature against a pinned
- * public key (pure — no database access).
+ * public key (pure - no database access).
  *
  * @stable
  */

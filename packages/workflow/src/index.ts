@@ -1,5 +1,5 @@
 /**
- * `@graphorin/workflow` — step-graph workflow engine for the Graphorin
+ * `@graphorin/workflow` - step-graph workflow engine for the Graphorin
  * framework.
  *
  * The package owns:

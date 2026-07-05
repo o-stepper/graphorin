@@ -12,7 +12,7 @@ import {
   OAuthRevokedError,
 } from '../../src/oauth/errors.js';
 
-describe('@graphorin/security/oauth — typed errors', () => {
+describe('@graphorin/security/oauth - typed errors', () => {
   it('every error carries a stable kind', () => {
     expect(new OAuthDiscoveryError('https://x', 'm').kind).toBe('discovery-failed');
     expect(new OAuthRegistrationUnsupportedError('https://x').kind).toBe(

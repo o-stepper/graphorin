@@ -1,5 +1,5 @@
 /**
- * `@graphorin/server/replay` — Phase 14c scope-enforced replay
+ * `@graphorin/server/replay` - Phase 14c scope-enforced replay
  * endpoints + audit integration.
  *
  * @packageDocumentation

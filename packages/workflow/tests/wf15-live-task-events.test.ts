@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createNode, createWorkflow, InMemoryCheckpointStore, latestValue } from '../src/index.js';
 
-describe('WF-15 — task/custom events stream live, not batched at step settle', () => {
+describe('WF-15 - task/custom events stream live, not batched at step settle', () => {
   it('workflow.task.start is observable while the node is still running', {
     timeout: 10_000,
   }, async () => {
@@ -17,7 +17,7 @@ describe('WF-15 — task/custom events stream live, not batched at step settle',
       nodes: {
         slow: createNode<{ value: number }>({
           name: 'slow',
-          // Completes ONLY after the consumer observed task.start — a
+          // Completes ONLY after the consumer observed task.start - a
           // batched emitter deadlocks here, a live one sails through.
           run: async () => {
             await gate;

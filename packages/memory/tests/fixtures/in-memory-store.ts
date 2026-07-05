@@ -421,7 +421,7 @@ class InMemoryConflictStore implements ConflictMemoryStoreExt {
     if (entry !== undefined) entry.attemptedAt = attemptedAt ?? Date.now();
   }
 
-  /** Test helper — exposes the raw pending input list for assertions. */
+  /** Test helper - exposes the raw pending input list for assertions. */
   rawPending(): ReadonlyArray<PendingConflictInputLike> {
     return this.pending.map((p) => p.input);
   }
@@ -830,7 +830,7 @@ export function createInMemoryStore(
           const vec = factVectors.get(fact.id);
           if (vec === undefined) continue;
           // The default sqlite store gates vector reads by `embedder_id`
-          // — mirror that here so the multi-active strategy can be
+          // - mirror that here so the multi-active strategy can be
           // exercised without a SQL engine.
           if (factEmbedderById.get(fact.id) !== embedderId) continue;
           out.push({ record: fact, score: cosine(vec, embedding) });
@@ -853,7 +853,7 @@ export function createInMemoryStore(
           const old = facts[idx];
           if (old !== undefined) {
             // Mirror the sqlite adapter: close the old validity interval at
-            // the new fact's validFrom (COALESCE — never clobber an explicit
+            // the new fact's validFrom (COALESCE - never clobber an explicit
             // close) so asOf queries exclude the superseded fact (P0-3).
             facts[idx] = {
               ...old,
@@ -899,7 +899,7 @@ export function createInMemoryStore(
           const sig = decaySignals.get(fact.id);
           const archived = sig?.archived ?? false;
           // MCON-6 (real-store parity): archived rows are excluded from
-          // the decay window by default — inspection opts in.
+          // the decay window by default - inspection opts in.
           if (archived && opts.includeArchived !== true) continue;
           out.push({
             id: fact.id,
@@ -1112,7 +1112,7 @@ function factValidAt(fact: Fact, asOf: string): boolean {
   return (from === null || from <= at) && (to === null || to > at);
 }
 
-/** Sort key for `historyOf` — `validFrom`, falling back to `createdAt`. */
+/** Sort key for `historyOf` - `validFrom`, falling back to `createdAt`. */
 function factOrderEpoch(fact: Fact): number {
   return Date.parse(fact.validFrom ?? fact.createdAt);
 }
@@ -1142,13 +1142,13 @@ interface InMemoryEntity {
   embedderId: string | null;
   mergedInto: string | undefined;
   createdAt: string;
-  /** Monotonic insertion order — mirrors the store's `created_at DESC`. */
+  /** Monotonic insertion order - mirrors the store's `created_at DESC`. */
   seq: number;
 }
 
 /**
  * Minimal in-memory {@link GraphMemoryStoreExt} (P2-1) over the shared
- * `facts` array — mirrors `@graphorin/store-sqlite`'s `SqliteGraphStore`
+ * `facts` array - mirrors `@graphorin/store-sqlite`'s `SqliteGraphStore`
  * (find-or-create entities, append-only reversible merges canonicalised
  * via `mergedInto`, one-hop neighbour expansion) so the resolver +
  * `search({ expandHops })` can be exercised offline without a SQL engine.
@@ -1227,7 +1227,7 @@ function createInMemoryGraphStore(facts: Fact[]): GraphMemoryStoreExt {
         if (opts.includeMerged !== true && e.mergedInto !== undefined) continue;
         out.push(e);
       }
-      // Mirror the store's `ORDER BY created_at DESC LIMIT ?` — newest first,
+      // Mirror the store's `ORDER BY created_at DESC LIMIT ?` - newest first,
       // so a flooded store pushes the oldest rows past the candidate cap.
       out.sort((a, b) => b.seq - a.seq);
       return out

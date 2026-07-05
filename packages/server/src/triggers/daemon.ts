@@ -8,7 +8,7 @@
  * is honoured so cron / interval / idle / event triggers survive
  * process restarts as documented in the runtime spec.
  *
- * The daemon never invokes user callbacks itself — those run inside
+ * The daemon never invokes user callbacks itself - those run inside
  * the `Scheduler`. The daemon only owns lifecycle + observability.
  *
  * @packageDocumentation

@@ -1,5 +1,5 @@
 /**
- * `reanchorRecentResults({ ... })` — C4 post-compaction hook.
+ * `reanchorRecentResults({ ... })` - C4 post-compaction hook.
  *
  * A compaction routinely summarizes away tool results the model was
  * actively working from; the summary paraphrases them and the handles
@@ -30,7 +30,7 @@ export interface ReanchorRecentResultsOptions {
   /** Character budget for the whole injected block. Default `4000`. */
   readonly maxChars?: number;
   /**
-   * Optional preview resolver — wire it to the runtime's result reader
+   * Optional preview resolver - wire it to the runtime's result reader
    * (e.g. an adapter over the agent's spill reader). Returns the preview
    * text or `null` when the handle cannot be read; failures are treated
    * as `null`. Without it the hook lists the handles alone, which is

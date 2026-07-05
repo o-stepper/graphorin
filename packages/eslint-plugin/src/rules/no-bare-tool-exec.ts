@@ -6,7 +6,7 @@
  * propagate the abort signal to the underlying I/O so cancellation
  * actually frees resources.
  *
- * The check is intentionally lexical — it scans the function body for
+ * The check is intentionally lexical - it scans the function body for
  * the literal string `signal` (matching `ctx.signal`,
  * `request.signal`, `args.signal`, etc.). False positives are
  * acceptable because the fix is one comment line; false negatives are

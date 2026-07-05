@@ -1,5 +1,5 @@
 /**
- * Auto-recall heuristic — opt-in regex-based pre-call that injects
+ * Auto-recall heuristic - opt-in regex-based pre-call that injects
  * the top-K facts into Layer 6 when the last user message matches one
  * of the configured trigger phrases. (Episode auto-recall is not
  * implemented; episodes are reachable via the `recall_episodes` tool.)

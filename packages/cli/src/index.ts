@@ -1,5 +1,5 @@
 /**
- * `@graphorin/cli` — operator CLI for the Graphorin framework.
+ * `@graphorin/cli` - operator CLI for the Graphorin framework.
  *
  * Phase 14a shipped the minimal `graphorin` binary with three
  * lifecycle commands: `start`, `init`, and `migrate`. Phase 15

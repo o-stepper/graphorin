@@ -1,5 +1,5 @@
 /**
- * `withCostLimit` — enforce per-session / per-run / per-agent /
+ * `withCostLimit` - enforce per-session / per-run / per-agent /
  * per-hour cost ceilings. Couples with {@link withCostTracking} for
  * the underlying accumulator. The middleware is positioned between
  * `withRateLimit` and `withCostTracking` per the canonical order so a
@@ -52,7 +52,7 @@ export const withCostLimit = defineProviderMiddleware<WithCostLimitOptions>({
     const onExceed = opts.onExceed ?? 'throw';
     const resolver = opts.resolveObservedCost;
     const logger = opts.logger ?? defaultLogger;
-    // PS-8: a ceiling without a resolver is a silent no-op — the limits look
+    // PS-8: a ceiling without a resolver is a silent no-op - the limits look
     // enforced but never trip. Warn loudly so the gap is visible. (No ceiling
     // + no resolver is the documented inert placeholder, so it stays quiet.)
     const hasCeiling =

@@ -9,7 +9,7 @@
  * boundary in `@graphorin/sessions` can pass that package's
  * `BUILT_IN_COMMENTARY_PATTERNS` through {@link DeliveryCommentaryConfig}.patterns;
  * the shape is bytes-equal across the two layers (the
- * defense-in-depth posture is the load-bearing property — see
+ * defense-in-depth posture is the load-bearing property - see
  * Phase 11 sanitizer for the storage-write boundary, this module
  * for the wire-emission boundary).
  *
@@ -21,11 +21,11 @@
  * sanitizer in `@graphorin/sessions/commentary` so the two layers
  * are bytes-equal on idempotent re-application.
  *
- *  - `'wrap'` (default) — wraps the matched fragment in a
+ *  - `'wrap'` (default) - wraps the matched fragment in a
  *    `<<<commentary>>>...<<</commentary>>>` envelope so downstream
  *    consumers can choose to render or hide based on context.
- *  - `'strip'` — removes the matched fragment entirely.
- *  - `'pass-through'` — disables the sanitization (operator opt-in
+ *  - `'strip'` - removes the matched fragment entirely.
+ *  - `'pass-through'` - disables the sanitization (operator opt-in
  *    for trusted deployments).
  *
  * @stable
@@ -91,7 +91,7 @@ export interface DeliveryCommentaryDecision {
 
 /**
  * Single audit + counter sink consumed by the sanitizer when a
- * decision fires. Wiring is optional — operators that do not need
+ * decision fires. Wiring is optional - operators that do not need
  * audit telemetry can skip the sink and the sanitizer becomes a
  * pure transform.
  *

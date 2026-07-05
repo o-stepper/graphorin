@@ -58,7 +58,7 @@ function buildMessages(count: number, content = 'X'.repeat(40)): Message[] {
   return out;
 }
 
-describe('context-engine — compaction thresholds (RB-46; Phase 10d)', () => {
+describe('context-engine - compaction thresholds (RB-46; Phase 10d)', () => {
   it('resolves the per-provider trigger threshold for a 200K context window', () => {
     const ratioFloor = Math.floor(200_000 * DEFAULT_THRESHOLD_RATIO);
     const headroom = 200_000 - DEFAULT_RESERVED_FOR_RESPONSE - DEFAULT_RESERVED_FOR_COMPACTION;
@@ -82,7 +82,7 @@ describe('context-engine — compaction thresholds (RB-46; Phase 10d)', () => {
     );
   });
 
-  it("trigger 'never' yields infinity — disables auto-trigger", () => {
+  it("trigger 'never' yields infinity - disables auto-trigger", () => {
     expect(resolveTriggerThreshold({ contextWindow: 200_000, trigger: 'never' })).toBe(
       Number.POSITIVE_INFINITY,
     );
@@ -111,7 +111,7 @@ describe('context-engine — compaction thresholds (RB-46; Phase 10d)', () => {
   });
 });
 
-describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () => {
+describe('context-engine - shouldCompact + compactNow (RB-46; Phase 10d)', () => {
   it('shouldCompact returns false on cloud-tier when buffer under threshold', async () => {
     const engine = createContextEngine({
       providerContextWindow: 200_000,
@@ -263,13 +263,13 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
       // Layer 5 ("memory_metadata") is the first dynamic layer
       // (bucketed in production; here it changes when counters shift).
       // Layers 1-4 are everything before the first `<memory_metadata>`
-      // marker — that is the cache-prefix region per § 6 of the
+      // marker - that is the cache-prefix region per § 6 of the
       // architecture doc.
       const idx = out.indexOf('<memory_metadata>');
       return idx === -1 ? out : out.slice(0, idx);
     };
 
-    // Step N+1 — first post-compaction step (cache prefix changes
+    // Step N+1 - first post-compaction step (cache prefix changes
     // because compaction re-shapes the buffer).
     const step1 = await memory.contextEngine.assemble(memory, {
       scope,
@@ -278,7 +278,7 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
       agentId: 'a1',
       lastUserMessage: 'hello',
     });
-    // Steps N+2 and N+3 — the prefix must be bytes-equal because
+    // Steps N+2 and N+3 - the prefix must be bytes-equal because
     // every input to Layers 1-4 is stable across the two assembly
     // calls (the same persona block, same procedural rule, same
     // base template, same locale).
@@ -335,7 +335,7 @@ describe('context-engine — shouldCompact + compactNow (RB-46; Phase 10d)', () 
   });
 });
 
-describe("CE-6/CE-7 — real hook context, dedup'd preserved turns, anti-thrash", () => {
+describe("CE-6/CE-7 - real hook context, dedup'd preserved turns, anti-thrash", () => {
   it('a custom function-form hook observes the GENUINE result + source (CE-6)', async () => {
     const observed: Array<{ summary: string; source: string; runId: string }> = [];
     const memory = createMemory({
@@ -373,7 +373,7 @@ describe("CE-6/CE-7 — real hook context, dedup'd preserved turns, anti-thrash"
     expect(observed.length).toBe(1);
     expect(observed[0]?.source).toBe('auto-trigger');
     expect(observed[0]?.runId).toBe('run-real');
-    // The old wrapper fabricated summary: '' — the real one is non-empty.
+    // The old wrapper fabricated summary: '' - the real one is non-empty.
     expect((observed[0]?.summary ?? '').length).toBeGreaterThan(0);
   });
 
@@ -439,7 +439,7 @@ describe("CE-6/CE-7 — real hook context, dedup'd preserved turns, anti-thrash"
       memory,
     });
     // The post-compaction buffer may still sit near/above the tiny
-    // threshold — but the guard requires growth before re-firing.
+    // threshold - but the guard requires growth before re-firing.
     expect(await memory.contextEngine.shouldCompact(out.result.trimmedMessages)).toBe(false);
     // New conversation volume past the last outcome re-arms the trigger.
     const grown = [...out.result.trimmedMessages, ...buildMessages(30, 'V'.repeat(800))];
@@ -447,14 +447,14 @@ describe("CE-6/CE-7 — real hook context, dedup'd preserved turns, anti-thrash"
   });
 });
 
-describe('context-engine — trigger evaluation perf (RB-46; Phase 10d)', () => {
+describe('context-engine - trigger evaluation perf (RB-46; Phase 10d)', () => {
   it('shouldCompact with the DEC-131 cache amortization path never invokes the token counter', async () => {
     // E6 de-flake: this used to assert `p95 < 2ms` over 50 awaited wall-clock
-    // samples — the tightest absolute microbenchmark in the suite, and pure
+    // samples - the tightest absolute microbenchmark in the suite, and pure
     // scheduler/GC-jitter roulette on shared Windows CI runners. What DEC-131
     // actually promises is STRUCTURAL: with `precomputedTokens` supplied, the
     // hot path is an O(1) comparison that never re-counts the transcript. So
-    // count counter invocations instead of nanoseconds — deterministic on
+    // count counter invocations instead of nanoseconds - deterministic on
     // every platform, and a far stricter assertion than any time budget.
     let countTextCalls = 0;
     const countingCounter = {
@@ -500,7 +500,7 @@ describe('context-engine — trigger evaluation perf (RB-46; Phase 10d)', () => 
   });
 });
 
-describe('context-engine — compaction effectiveness (CE-12)', () => {
+describe('context-engine - compaction effectiveness (CE-12)', () => {
   it('warns once + reports compactionEffective:false when enabled without a providerContextWindow', () => {
     _resetCompactionWarningForTesting();
     const writes: string[] = [];
@@ -538,12 +538,12 @@ describe('context-engine — compaction effectiveness (CE-12)', () => {
   });
 });
 
-describe('CE-13 — script-aware heuristic + one-time WARN', () => {
+describe('CE-13 - script-aware heuristic + one-time WARN', () => {
   it('counts dense scripts (CJK) at ~1 token/char instead of chars/4', async () => {
     const latin = 'a'.repeat(400);
     const cjk = '記憶圧縮試験'.repeat(40); // 240 CJK chars
     expect(await HEURISTIC_TOKEN_COUNTER.countText(latin)).toBe(100);
-    // Pre-fix: ceil(240/4) = 60 — a ~4x undercount; now 240.
+    // Pre-fix: ceil(240/4) = 60 - a ~4x undercount; now 240.
     expect(await HEURISTIC_TOKEN_COUNTER.countText(cjk)).toBe(240);
     // Mixed text: each script counted by its own rule.
     expect(await HEURISTIC_TOKEN_COUNTER.countText(latin + cjk)).toBe(340);
@@ -575,9 +575,9 @@ describe('CE-13 — script-aware heuristic + one-time WARN', () => {
   });
 });
 
-// --- CE-3/CE-6 — compactNow per-call overrides --------------------------------
+// --- CE-3/CE-6 - compactNow per-call overrides --------------------------------
 
-describe('CE-3/CE-6 — compactNow per-call overrides', () => {
+describe('CE-3/CE-6 - compactNow per-call overrides', () => {
   const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
 
   function makeCompactableMemory() {
@@ -642,9 +642,9 @@ describe('CE-3/CE-6 — compactNow per-call overrides', () => {
   });
 });
 
-// --- CE-15 — compaction summary trust (no laundering) --------------------------
+// --- CE-15 - compaction summary trust (no laundering) --------------------------
 
-describe('CE-15 — compaction summary trust (no laundering)', () => {
+describe('CE-15 - compaction summary trust (no laundering)', () => {
   const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
   const DERIVED_OPEN = '<<<untrusted_content trust="derived" tool="compaction-summarizer">>>';
 
@@ -684,7 +684,7 @@ describe('CE-15 — compaction summary trust (no laundering)', () => {
     const out = await callWith(memory, messages);
     expect(out.result.summaryTrust).toBe('untrusted-derived');
     expect(out.result.summary).toContain(DERIVED_OPEN);
-    // The spliced buffer head carries the envelope — not a bare trusted summary.
+    // The spliced buffer head carries the envelope - not a bare trusted summary.
     const head = out.result.trimmedMessages[0];
     expect(head?.role).toBe('system');
     expect(String(head?.content)).toContain(DERIVED_OPEN);
@@ -749,13 +749,13 @@ describe('CE-15 — compaction summary trust (no laundering)', () => {
     };
     const out = await callWith(memory, messages);
     expect(out.result.summaryTrust).toBe('untrusted-derived');
-    // Exactly ONE closing marker — the envelope's own; the echoed one is neutralized.
+    // Exactly ONE closing marker - the envelope's own; the echoed one is neutralized.
     expect(out.result.summary.split('<<</untrusted_content>>>').length).toBe(2);
     expect(out.result.summary).toContain('[[/untrusted_content]]');
   });
 });
 
-describe('context-engine-01 — summarize boundary never splits an assistant/tool pair', () => {
+describe('context-engine-01 - summarize boundary never splits an assistant/tool pair', () => {
   function makeMemory() {
     return createMemory({
       store: createInMemoryStore(),
@@ -774,7 +774,7 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
     });
   }
 
-  /** [user, (assistant(toolCalls)+tool)*5, user] — a realistic tool loop. */
+  /** [user, (assistant(toolCalls)+tool)*5, user] - a realistic tool loop. */
   function buildToolLoop(): Message[] {
     const out: Message[] = [{ role: 'user', content: 'start '.repeat(60) }];
     for (let i = 1; i <= 5; i++) {
@@ -793,7 +793,7 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
     const memory = makeMemory();
     const messages = buildToolLoop();
     // 12 messages, default preserveRecentTurns 6 ⇒ positional boundary at
-    // index 6, which is tool(t3) — its assistant partner would be
+    // index 6, which is tool(t3) - its assistant partner would be
     // summarized away, producing an orphan the next provider call 400s on.
     expect(messages).toHaveLength(12);
     expect(messages[6]?.role).toBe('tool');
@@ -809,7 +809,7 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
     });
 
     const preserved = out.result.preservedMessages;
-    // The preserved window starts on the assistant that owns t3 — one more
+    // The preserved window starts on the assistant that owns t3 - one more
     // message than requested, never an orphan tool message.
     expect(preserved[0]?.role).toBe('assistant');
     expect(preserved).toHaveLength(7);
@@ -846,7 +846,7 @@ describe('context-engine-01 — summarize boundary never splits an assistant/too
   });
 });
 
-describe('context-engine-02 — post-compaction hooks honour the D2 privacy filter', () => {
+describe('context-engine-02 - post-compaction hooks honour the D2 privacy filter', () => {
   it('a secret persona block and secret rule never reach the essentials on a cloud tier', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
@@ -891,7 +891,7 @@ describe('context-engine-02 — post-compaction hooks honour the D2 privacy filt
   });
 });
 
-describe('context-engine-04 — guard and floor share the full-buffer basis', () => {
+describe('context-engine-04 - guard and floor share the full-buffer basis', () => {
   it('arms the anti-thrash guard against prefix + body + essentials, suppressing an immediate re-trigger', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
@@ -923,7 +923,7 @@ describe('context-engine-04 — guard and floor share the full-buffer basis', ()
       memory,
     });
     // The post-splice full buffer the agent will measure next step:
-    // prefix + trimmed body (+ essentials, empty here — no blocks/rules).
+    // prefix + trimmed body (+ essentials, empty here - no blocks/rules).
     const fullAfterSplice: Message[] = [...prefixMessages, ...out.result.trimmedMessages];
     // Pre-fix the guard was armed with the BODY-only afterTokens, so the
     // full-buffer total always exceeded baseline + 256 and the trigger
@@ -957,7 +957,7 @@ describe('context-engine-04 — guard and floor share the full-buffer basis', ()
   });
 });
 
-describe('buildSummarizerPrompt — dump hardening (context-engine-07/09)', () => {
+describe('buildSummarizerPrompt - dump hardening (context-engine-07/09)', () => {
   // A minimal 4-section stand-in for the real 11-tuple; the prompt
   // builder only maps over the array.
   const TEMPLATE = {
@@ -977,7 +977,7 @@ describe('buildSummarizerPrompt — dump hardening (context-engine-07/09)', () =
         },
       ],
     });
-    // Exactly one opening and one closing marker — the envelope's own.
+    // Exactly one opening and one closing marker - the envelope's own.
     expect(prompt.split('<<</older_messages>>>')).toHaveLength(2);
     expect(prompt.split('<<<older_messages>>>')).toHaveLength(2);
     // The injected payload is still visible as DATA, markers defanged.

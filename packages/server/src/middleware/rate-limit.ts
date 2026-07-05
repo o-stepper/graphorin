@@ -1,7 +1,7 @@
 /**
  * Per-IP sliding-window rate limit. Defends against brute-force
  * authentication probes and naive DoS scenarios. The limit is
- * deliberately conservative — operators with multi-tenant traffic
+ * deliberately conservative - operators with multi-tenant traffic
  * should layer a dedicated reverse proxy on top.
  *
  * @packageDocumentation
@@ -31,7 +31,7 @@ export function createRateLimitMiddleware(
   }
   const windows = new Map<string, Window>();
   const now = options.now ?? Date.now;
-  // IP-10: bound the window map — expired entries are swept once the
+  // IP-10: bound the window map - expired entries are swept once the
   // map crosses the cap so an attacker rotating spoofed XFF values
   // (trustProxy=true deployments) cannot grow it without bound.
   const SWEEP_THRESHOLD = 10_000;

@@ -36,7 +36,7 @@ export interface TextContent {
 
 /**
  * Image attachment. The `image` field accepts either raw bytes or a `URL`
- * — adapters dereference the URL when the provider only accepts inline
+ * - adapters dereference the URL when the provider only accepts inline
  * payloads.
  *
  * @stable
@@ -51,7 +51,7 @@ export interface ImageContent {
 
 /**
  * Audio attachment (e.g. voice messages). Note: voice realtime / TTS / STT
- * are out of scope for v0.1 — these messages are static blobs.
+ * are out of scope for v0.1 - these messages are static blobs.
  *
  * @stable
  */

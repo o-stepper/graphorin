@@ -3,8 +3,8 @@
  *
  * The validator is the building block for the mandatory `withValidation()`
  * wrapper applied to every exporter. It defaults to **default-deny
- * non-public** — values declared above the tier floor are dropped + counted
- * — and runs every value through the catalogue of built-in PII / secret
+ * non-public** - values declared above the tier floor are dropped + counted
+ * - and runs every value through the catalogue of built-in PII / secret
  * patterns.
  *
  * @packageDocumentation

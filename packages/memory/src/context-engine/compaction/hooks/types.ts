@@ -6,7 +6,7 @@
  * pinned facts) into the assembled prompt's Layer 1-4 territory
  * before the cache breakpoint.
  *
- * The hooks are independent of one another — the default order
+ * The hooks are independent of one another - the default order
  * `[reanchorProjectRules(), reanchorPersonaBlock(),
  * reanchorPinnedFacts({ pinnedFactIds: [] })]` is what operators
  * get out of the box without explicit wiring. A hook that throws
@@ -37,7 +37,7 @@ export interface HookDeps {
    * config (context-engine-02). `true` = the provider may see content of
    * this sensitivity. Built-in hooks MUST consult it before re-injecting
    * tier content: `assemble()` filters what ships to the provider, and
-   * the post-compaction splice ships to the SAME provider — without the
+   * the post-compaction splice ships to the SAME provider - without the
    * check, a `secret`-tier persona block / rule / pinned fact that the
    * assembly correctly withheld leaks on the first compaction. Absent
    * (operator-built HookDeps) means no filtering; the engine always
@@ -56,8 +56,8 @@ export interface HookDeps {
 export interface NamedPostCompactionHook {
   readonly id: string;
   /**
-   * `ctx` carries the REAL compaction outcome (CE-6) — result, scope,
-   * runId, sessionId, agentId, source — built by `compactNow` after the
+   * `ctx` carries the REAL compaction outcome (CE-6) - result, scope,
+   * runId, sessionId, agentId, source - built by `compactNow` after the
    * pipeline finishes. Record-form built-ins may ignore it; the
    * function-form wrapper forwards it to the operator's hook verbatim.
    */

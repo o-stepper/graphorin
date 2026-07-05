@@ -3,8 +3,8 @@
  * passage)` pairs; this module turns a `MemoryRecord` of any concrete
  * tier into the best single-passage approximation.
  *
- * The defaults are conservative — text-bearing fields take precedence
- * over IDs / labels — and operators may inject a custom
+ * The defaults are conservative - text-bearing fields take precedence
+ * over IDs / labels - and operators may inject a custom
  * `passageExtractor` when their schema attaches the canonical text
  * elsewhere.
  *
@@ -17,9 +17,9 @@ import type { MemoryRecord } from '@graphorin/core';
  * Returns the best-effort passage text for a {@link MemoryRecord}. The
  * order of preference, top-down:
  *
- *   1. `text` — facts, rules, generic text-bearing tiers.
- *   2. `summary` — episodes.
- *   3. `value` — working-memory blocks.
+ *   1. `text` - facts, rules, generic text-bearing tiers.
+ *   2. `summary` - episodes.
+ *   3. `value` - working-memory blocks.
  *   4. `id` fallback so the reranker never sees an empty passage.
  *
  * @stable

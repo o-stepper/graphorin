@@ -1,5 +1,5 @@
 /**
- * Agent-step-level fan-out — `Agent.fanOut(...)` convenience that
+ * Agent-step-level fan-out - `Agent.fanOut(...)` convenience that
  * spawns N sub-agents in parallel under a bounded-fanout cap with
  * per-child budgets and four built-in merge strategies.
  *
@@ -34,7 +34,7 @@ export interface PerChildBudget {
   /**
    * Max `usage.totalTokens` per child. Enforced **post-hoc** and only
    * for usage-reporting children (an `invoke` that resolves to a full
-   * `AgentResult` — e.g. `() => child.run(input)`); a child returning a
+   * `AgentResult` - e.g. `() => child.run(input)`); a child returning a
    * plain value reports `tokensUsed: 0` and this cap cannot fire.
    */
   readonly tokens?: number;
@@ -67,7 +67,7 @@ export type MergeStrategy<TOutput = unknown> =
 /**
  * Per-child outcome surfaced on
  * {@link FanOutResult.children}. Failed-child isolation: a child
- * that throws produces a `ChildResult` with `status: 'failed'` —
+ * that throws produces a `ChildResult` with `status: 'failed'` -
  * never an exception thrown from the fan-out call itself.
  *
  * @stable
@@ -102,7 +102,7 @@ export interface FanOutResult<TOutput = unknown> {
 export interface FanOutOptions<TOutput = unknown> {
   /**
    * The sub-agents to invoke. Each entry is invoked as a function
-   * returning a `Promise<TOutput>` — the fan-out helper does not
+   * returning a `Promise<TOutput>` - the fan-out helper does not
    * impose an `Agent` shape on the children so the runtime can
    * adapt any callable surface.
    */
@@ -110,7 +110,7 @@ export interface FanOutOptions<TOutput = unknown> {
     readonly agentId: string;
     /**
      * Child callable. Resolve to a plain `TOutput`, or to a full
-     * `AgentResult` (e.g. `() => childAgent.run(input)`) — the fan-out
+     * `AgentResult` (e.g. `() => childAgent.run(input)`) - the fan-out
      * detects the result envelope structurally (`output` + numeric
      * `usage.totalTokens` + `state`), unwraps `output`, and harvests
      * `tokensUsed` / `toolCallCount` so per-child budgets can enforce.
@@ -138,8 +138,8 @@ export interface FanOutOptions<TOutput = unknown> {
    * Sideways-injection merge guard (AG-7): on `'judge-merge'` the
    * fan-out scores each child's source trust and contribution weight
    * against the judge's merged output; a biased merge emits
-   * `agent.lateral-leak.detected` (vector `sideways-injection`) and —
-   * under `strictness: 'detect-and-block'` — throws
+   * `agent.lateral-leak.detected` (vector `sideways-injection`) and -
+   * under `strictness: 'detect-and-block'` - throws
    * {@link MergeBlockedError}.
    */
   readonly mergeGuard?: MergeGuardConfig;
@@ -147,7 +147,7 @@ export interface FanOutOptions<TOutput = unknown> {
   readonly runId: string;
   readonly sessionId: string;
   readonly agentId: string;
-  /** Default — generated from `runId + Date.now()`. */
+  /** Default - generated from `runId + Date.now()`. */
   readonly fanOutId?: string;
 }
 
@@ -187,7 +187,7 @@ function harvestAgentResult(
 
 /**
  * Whitespace-token overlap of a child's output against the merged
- * output, in `[0,1]` — the contribution-weight estimate the merge
+ * output, in `[0,1]` - the contribution-weight estimate the merge
  * guard's docstring contracts (each child scored independently; a
  * judge parroting one child verbatim yields ~1.0 for that child).
  */
@@ -245,7 +245,7 @@ async function runWithSemaphore<TOutput>(
           : child.invoke();
         const raw = await racePromise;
         // AG-16: a child resolving to a full AgentResult reports its
-        // real usage — unwrap the output and harvest the counters.
+        // real usage - unwrap the output and harvest the counters.
         const report = harvestAgentResult(raw);
         const output = (report === undefined ? raw : report.output) as TOutput;
         const tokensUsed = report?.tokensUsed ?? 0;
@@ -294,7 +294,7 @@ async function runWithSemaphore<TOutput>(
           durationMs: Date.now() - start,
         };
       } finally {
-        // AG-16: the duration timer must die on EVERY path — leaving it
+        // AG-16: the duration timer must die on EVERY path - leaving it
         // armed on rejection held the event loop open.
         if (timer !== undefined) clearTimeout(timer);
       }
@@ -322,7 +322,7 @@ async function runWithSemaphore<TOutput>(
 
 /**
  * Run a fan-out and produce the aggregate {@link FanOutResult}.
- * Pure with respect to side effects — the runtime emits events /
+ * Pure with respect to side effects - the runtime emits events /
  * audit rows / counter increments via the supplied `emit` callback.
  *
  * @stable

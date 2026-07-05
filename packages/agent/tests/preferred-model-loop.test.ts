@@ -33,7 +33,7 @@ function counting(base: Provider): { readonly provider: Provider; readonly serve
   return { provider, served: () => served };
 }
 
-describe('AG-15 — preferred-model resolves from CALLED tools, not the advertised catalogue', () => {
+describe('AG-15 - preferred-model resolves from CALLED tools, not the advertised catalogue', () => {
   it('a smart-hinted but never-called tool does not upgrade any step', async () => {
     const base = createMockProvider({
       modelId: 'default-model',

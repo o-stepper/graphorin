@@ -1,5 +1,5 @@
 /**
- * `withCostTracking` — reports `tokensUsed` + `cost` per `provider × model`
+ * `withCostTracking` - reports `tokensUsed` + `cost` per `provider × model`
  * from the `finish` event of every stream / one-shot generation via the
  * `onUsage` hook. For a ready-made process-local accumulator, wire
  * {@link createCostAccumulator}'s `onUsage` and read its `.totals()`; consumers
@@ -33,8 +33,8 @@ export interface CostTrackingTotals {
 
 /**
  * A process-local cost accumulator (PS-8). Wire {@link CostAccumulator.onUsage}
- * into {@link withCostTracking} and read the running totals — keyed by
- * `provider × model` — back via {@link CostAccumulator.totals} /
+ * into {@link withCostTracking} and read the running totals - keyed by
+ * `provider × model` - back via {@link CostAccumulator.totals} /
  * {@link CostAccumulator.totalFor}.
  *
  * @stable
@@ -61,7 +61,7 @@ const ZERO_TOTALS: CostTrackingTotals = Object.freeze({
 });
 
 /**
- * Create a {@link CostAccumulator} — the process-local accumulator described on
+ * Create a {@link CostAccumulator} - the process-local accumulator described on
  * {@link withCostTracking}. Keys totals by `'<providerName>::<modelId>'`.
  *
  * @stable
@@ -185,7 +185,7 @@ function emitUsage(
   const usage = result.usage;
   const price = opts.priceLookup?.({ providerName: next.name, modelId: next.modelId }) ?? null;
   // Reasoning tokens are billed at the output rate (the PS-19 contract
-  // in @graphorin/pricing) — providers that report them separately from
+  // in @graphorin/pricing) - providers that report them separately from
   // completionTokens must not get them for free.
   // Cache legs (core-provider-02): promptTokens INCLUDES cache reads and
   // writes, so subtract them from the base-rate leg and bill each at its

@@ -4,16 +4,16 @@
  * The discriminated union mirrors the three transports the
  * `@modelcontextprotocol/sdk@^1.29.0` package exports:
  *
- * - `'stdio'`           — the primary transport for local MCP servers
+ * - `'stdio'`           - the primary transport for local MCP servers
  *   started as a child process. The transport spawns the configured
  *   command, pipes JSON-RPC over stdio, and tears the child down on
  *   `client.close()`.
- * - `'streamable-http'` — the current default transport for remote MCP
+ * - `'streamable-http'` - the current default transport for remote MCP
  *   servers (the spec-recommended replacement for the legacy SSE
  *   transport). Supports server-assigned `Mcp-Session-Id` + the
  *   `Last-Event-ID` resume handshake when the server advertises it on
  *   `initialize`.
- * - `'sse'`             — the deprecated legacy transport. Kept for
+ * - `'sse'`             - the deprecated legacy transport. Kept for
  *   back-compat with MCP servers that have not yet migrated to the
  *   streamable HTTP transport. The runtime emits one WARN-per-process
  *   on transport selection; the transport is not eligible for the
@@ -49,7 +49,7 @@ export interface StreamableHttpTransportConfig {
   readonly headers?: Readonly<Record<string, string>>;
   /**
    * Optional pre-existing session id. Most operators leave this
-   * unset — the server assigns one on `initialize` and the client
+   * unset - the server assigns one on `initialize` and the client
    * persists it for the lifetime of the connection.
    */
   readonly sessionId?: string;

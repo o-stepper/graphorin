@@ -66,7 +66,7 @@ describe('createIdempotencyMiddleware', () => {
       'Idempotency-Key': 'concurrent-key-0001',
     };
     const body = JSON.stringify({ foo: 'bar' });
-    // Fire both requests without awaiting the first — pre-fix the
+    // Fire both requests without awaiting the first - pre-fix the
     // record landed only after next(), so both missed the cache and
     // both executed (a double agent run).
     const [first, second] = await Promise.all([
@@ -168,7 +168,7 @@ describe('createIdempotencyMiddleware', () => {
   });
 });
 
-describe('IP-6 — principal binding + secret-endpoint exclusion', () => {
+describe('IP-6 - principal binding + secret-endpoint exclusion', () => {
   function buildAuthedApp(): {
     readonly app: Hono<{ Variables: ServerVariables }>;
     readonly store: InMemoryIdempotencyStore;
@@ -253,7 +253,7 @@ describe('IP-6 — principal binding + secret-endpoint exclusion', () => {
       });
     const a = (await (await mint()).json()) as { token: string };
     const b = (await (await mint()).json()) as { token: string };
-    // Re-executed (no replay) — a fresh secret each time…
+    // Re-executed (no replay) - a fresh secret each time…
     expect(a.token).not.toBe(b.token);
     expect(counter()).toBe(2);
     // …and the raw secret is NEVER persisted in the idempotency store.

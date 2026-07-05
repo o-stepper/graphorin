@@ -211,7 +211,7 @@ describe('parallel tool dispatch (WI-04)', () => {
       name: 'sequential',
       instructions: 'noop',
       provider,
-      // Default maxParallelTools (8) — sequential tools must still serialise.
+      // Default maxParallelTools (8) - sequential tools must still serialise.
       tools: [
         trackedTool('seq_a', tracker, 15, 'A', { executionMode: 'sequential' }),
         trackedTool('seq_b', tracker, 15, 'B', { executionMode: 'sequential' }),

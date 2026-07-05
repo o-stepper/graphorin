@@ -10,7 +10,7 @@ import {
   TrustLevelEscalationError,
 } from '../../src/supply-chain/index.js';
 
-describe('@graphorin/security/supply-chain — typed errors', () => {
+describe('@graphorin/security/supply-chain - typed errors', () => {
   it('every error carries a stable kind', () => {
     expect(new SkillSignatureMissingError('skill:x').kind).toBe('signature-missing');
     expect(new SkillSignatureInvalidError('skill:x', 'bad', 'pub').kind).toBe('signature-invalid');

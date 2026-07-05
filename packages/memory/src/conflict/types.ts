@@ -26,7 +26,7 @@ export type ConflictStage =
 
 /**
  * Configurable similarity thresholds for Stage 2 (embedding three-
- * zone). Defaults pinned at `0.95 / 0.85 / 0.4` per RB-02 §8 — the
+ * zone). Defaults pinned at `0.95 / 0.85 / 0.4` per RB-02 §8 - the
  * production values for the default `Xenova/multilingual-e5-base`
  * embedder (DEC-130).
  *
@@ -51,8 +51,8 @@ export const DEFAULT_CONFLICT_THRESHOLDS: ConflictThresholds = Object.freeze({
 });
 
 /**
- * Final pipeline outcome — discriminated union returned by
- * {@link runConflictPipeline}. Mirrors RB-02 §8.1 / DEC-117 — every
+ * Final pipeline outcome - discriminated union returned by
+ * {@link runConflictPipeline}. Mirrors RB-02 §8.1 / DEC-117 - every
  * variant carries the originating `stage` so audit + replay tooling
  * can pattern-match without inspecting the message.
  *
@@ -94,9 +94,9 @@ export type ConflictDecision =
  *
  * The `mode` field is the master switch:
  *
- *  - `'on'` (default) — the multi-stage pipeline runs on every
+ *  - `'on'` (default) - the multi-stage pipeline runs on every
  *    `SemanticMemory.remember(...)` call.
- *  - `'off'` — bypass the pipeline and fall back to 10a's straight-
+ *  - `'off'` - bypass the pipeline and fall back to 10a's straight-
  *    through write. Emits a one-shot WARN (per process) so operators
  *    notice the regression risk.
  *
@@ -131,7 +131,7 @@ export interface StageContext {
 
 /**
  * Per-stage outcome surfaced to the orchestrator. `'admit'` means the
- * stage decided not to short-circuit — the pipeline continues to the
+ * stage decided not to short-circuit - the pipeline continues to the
  * next stage. Every other variant terminates the pipeline.
  *
  * @stable
@@ -229,7 +229,7 @@ export type ReconcileDecision =
  * so reconcile outcomes land in `fact_conflicts` through the same audit
  * path as the inline pipeline (no new stage / schema): `add` → `admit`,
  * `noop` → `dedup`, `update` / `conflict` → `supersede`. All reconcile
- * decisions are stamped with the `defer-to-deep` stage — the reconcile
+ * decisions are stamped with the `defer-to-deep` stage - the reconcile
  * loop is the consolidator's replacement for the deferred deep-judge
  * step it supersedes.
  *

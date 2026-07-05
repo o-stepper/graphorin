@@ -15,7 +15,7 @@
 import { defineLocalePack, type LocalePack } from './types.js';
 
 /**
- * The default English `LocalePack`. Frozen — share the singleton.
+ * The default English `LocalePack`. Frozen - share the singleton.
  *
  * @stable
  */

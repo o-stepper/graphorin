@@ -25,7 +25,7 @@ function makeHit(id: string, score = 1): MemoryHit<Fact> {
 
 const ids = (hits: ReadonlyArray<MemoryHit<Fact>>): string[] => hits.map((h) => h.record.id);
 
-/** nDCG@k with binary gains — small, test-local scorer for the labelled fixture. */
+/** nDCG@k with binary gains - small, test-local scorer for the labelled fixture. */
 function ndcg(ranked: readonly string[], relevant: ReadonlySet<string>, k: number): number {
   let dcg = 0;
   for (let i = 0; i < Math.min(k, ranked.length); i++) {
@@ -38,7 +38,7 @@ function ndcg(ranked: readonly string[], relevant: ReadonlySet<string>, k: numbe
   return idcg === 0 ? 0 : dcg / idcg;
 }
 
-describe('@graphorin/memory/search — fuseWeighted', () => {
+describe('@graphorin/memory/search - fuseWeighted', () => {
   const lists: Array<Array<MemoryHit<Fact>>> = [
     [makeHit('a'), makeHit('b'), makeHit('c')],
     [makeHit('b'), makeHit('c'), makeHit('a')],
@@ -79,7 +79,7 @@ describe('@graphorin/memory/search — fuseWeighted', () => {
   });
 
   it('tuned weights beat RRF on a labelled fixture (nDCG@2)', () => {
-    // FTS list (noisy — no relevant docs) vs vector list (clean). Plain RRF
+    // FTS list (noisy - no relevant docs) vs vector list (clean). Plain RRF
     // floats a noise doc to the top because it ties a relevant doc on rank;
     // up-weighting the trustworthy vector list fixes the ranking.
     const fts = [makeHit('noiseA'), makeHit('noiseB'), makeHit('noiseC')];
@@ -103,7 +103,7 @@ describe('@graphorin/memory/search — fuseWeighted', () => {
   });
 });
 
-describe('@graphorin/memory/search — WeightedRRFReranker', () => {
+describe('@graphorin/memory/search - WeightedRRFReranker', () => {
   it('reports a stable id and defaults k to the canonical 60', () => {
     const r = new WeightedRRFReranker({ weights: [1, 2] });
     expect(r.id).toBe('weighted-rrf');

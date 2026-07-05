@@ -1,5 +1,5 @@
 /**
- * `withValidation(exporter, opts)` — the **mandatory wrapper** applied
+ * `withValidation(exporter, opts)` - the **mandatory wrapper** applied
  * to every exporter. Forwards each span record through a
  * `RedactionValidator` first; drops + counts when a value exceeds the
  * configured tier floor or matches a secret / PII pattern.
@@ -28,7 +28,7 @@ export interface WithValidationOptions extends RedactionValidatorOptions {
   /**
    * Optional pre-built validator. When supplied, the rest of the
    * options on this object are ignored and the supplied validator is
-   * reused — useful for sharing one validator across multiple exporters.
+   * reused - useful for sharing one validator across multiple exporters.
    */
   readonly validator?: RedactionValidatorInstance;
 }
@@ -50,7 +50,7 @@ export function withValidation<E extends TraceExporter>(
     [VALIDATED_EXPORTER_BRAND]: true,
     async export(record: SpanRecord): Promise<void> {
       // RP-18: the validator strips offending attributes (counting each drop)
-      // and always returns an exportable record — a single untagged or
+      // and always returns an exportable record - a single untagged or
       // over-tier attribute no longer makes the whole span vanish from every
       // exporter.
       await exporter.export(sanitizeRecord(record, validator));
@@ -105,7 +105,7 @@ export function sanitizeAttributes(
     });
     if (result === null) {
       // RP-18: this single attribute exceeded the floor (or matched a secret
-      // pattern). Strip it — the validator has already counted the drop — and
+      // pattern). Strip it - the validator has already counted the drop - and
       // keep the rest of the span rather than discarding the whole record.
       continue;
     }

@@ -1,5 +1,5 @@
 /**
- * `evaluatorOptimizer({...})` — Generator → Evaluator iteration
+ * `evaluatorOptimizer({...})` - Generator → Evaluator iteration
  * loop with three rubric kinds and a REQUIRED iteration cap.
  *
  * Iteration boundary discipline: each iteration is a fresh
@@ -65,7 +65,7 @@ export type EvaluatorCallable<TOutput> = (
 
 /**
  * Options accepted by {@link evaluatorOptimizer}. `maxIterations`
- * is REQUIRED — the helper asserts `>= 1` at construction time.
+ * is REQUIRED - the helper asserts `>= 1` at construction time.
  *
  * @stable
  */
@@ -175,7 +175,7 @@ export async function evaluatorOptimizer<TOutput>(
 
   let finalEntry: (typeof iterations)[number];
   if (iterations.length === 0) {
-    // Should only happen on `cancelled` before the first iteration —
+    // Should only happen on `cancelled` before the first iteration -
     // synthesize a no-op final entry.
     finalEntry = {
       iteration: 0,

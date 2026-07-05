@@ -1,5 +1,5 @@
 /**
- * `refreshPricing(...)` — opt-in network call. The framework never
+ * `refreshPricing(...)` - opt-in network call. The framework never
  * invokes this automatically; it exists so the CLI (`graphorin
  * pricing refresh`) and operator scripts can pull a fresh snapshot
  * without re-installing the package.
@@ -23,11 +23,11 @@ import type { ModelPrice, PricingSnapshot } from './types.js';
  * @stable
  */
 export interface RefreshPricingOptions {
-  /** Snapshot URL — typically the upstream pricing JSON. */
+  /** Snapshot URL - typically the upstream pricing JSON. */
   readonly url: string;
   /** Optional headers (auth, conditional GET, etc.). */
   readonly headers?: Readonly<Record<string, string>>;
-  /** Optional fetch override — useful in tests. */
+  /** Optional fetch override - useful in tests. */
   readonly fetchImpl?: typeof fetch;
   /** Override the snapshot date stamped on the result. Defaults to today. */
   readonly snapshotDate?: string;

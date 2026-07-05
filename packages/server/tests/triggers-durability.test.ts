@@ -1,5 +1,5 @@
 /**
- * Triggers durability — simulate a daemon restart by:
+ * Triggers durability - simulate a daemon restart by:
  *
  *   1. Booting an in-memory `TriggerStore` with a clock-controlled
  *      `Scheduler`.
@@ -138,7 +138,7 @@ async function bootDaemon(args: {
   return { fired: args.fires, catchupApplied, daemon, scheduler };
 }
 
-describe('Triggers durability — simulated daemon restart', () => {
+describe('Triggers durability - simulated daemon restart', () => {
   it("catchupPolicy: 'none' (default) drops missed firings on restart", async () => {
     const fires: number[] = [];
     // Start at 2026-05-09 07:00:00 UTC (one hour before the 08:00 cron).
@@ -146,15 +146,15 @@ describe('Triggers durability — simulated daemon restart', () => {
 
     const clock1 = new FakeClock(epoch);
     const ctx1 = await bootDaemon({ clock: clock1, catchupPolicy: 'none', fires });
-    // Advance to 09:00 — first cron fire happens at 08:00.
+    // Advance to 09:00 - first cron fire happens at 08:00.
     await clock1.advance(2 * 60 * 60 * 1000);
     expect(fires).toHaveLength(1);
     await ctx1.daemon.stop();
 
-    // Daemon offline for 36h — would miss 1 cron fire (next day 08:00).
+    // Daemon offline for 36h - would miss 1 cron fire (next day 08:00).
     const clock2 = new FakeClock(clock1.now() + 36 * 60 * 60 * 1000);
     const ctx2 = await bootDaemon({ clock: clock2, catchupPolicy: 'none', fires });
-    // Don't advance — catchup with 'none' should not have fired anything.
+    // Don't advance - catchup with 'none' should not have fired anything.
     expect(fires).toHaveLength(1);
     expect(ctx2.catchupApplied).toBe(0);
     await ctx2.daemon.stop();
@@ -175,10 +175,10 @@ describe('Triggers durability — simulated daemon restart', () => {
     expect(fires).toHaveLength(1);
     await ctx1.daemon.stop();
 
-    // Offline for 36h — one 08:00 boundary (May 10) was genuinely
+    // Offline for 36h - one 08:00 boundary (May 10) was genuinely
     // missed, and the last fire (08:00 May 9, 37h ago) is still inside
     // the 48h window. NOTE (RP-12): the window must exceed the cron
-    // period for catch-up to be possible — with real-miss counting a
+    // period for catch-up to be possible - with real-miss counting a
     // 24h window can never catch up a daily cron.
     const clock2 = new FakeClock(clock1.now() + 36 * 60 * 60 * 1000);
     const before = fires.length;
@@ -210,7 +210,7 @@ describe('Triggers durability — simulated daemon restart', () => {
     expect(fires).toHaveLength(1);
     await ctx1.daemon.stop();
 
-    // Offline for 5 days — would miss ~5 cron fires; cap at maxCatchupRuns=1.
+    // Offline for 5 days - would miss ~5 cron fires; cap at maxCatchupRuns=1.
     const clock2 = new FakeClock(clock1.now() + 5 * 24 * 60 * 60 * 1000);
     const before = fires.length;
     const ctx2 = await bootDaemon({

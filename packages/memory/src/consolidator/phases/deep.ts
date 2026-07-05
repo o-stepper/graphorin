@@ -1,5 +1,5 @@
 /**
- * Deep phase — minimum-viable drain of `conflict_check_pending`. The
+ * Deep phase - minimum-viable drain of `conflict_check_pending`. The
  * MVP scope is exactly the RB-02 cross-cut: read every queued
  * candidate, ask the configured deep-tier provider to choose between
  * `dedup` / `supersede` / `admit`, apply the resolution, and clear
@@ -32,7 +32,7 @@ export interface DeepPhaseDeps {
   readonly budget: BudgetTracker;
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
   readonly tier: 'standard' | 'full' | 'custom';
-  /** Override the wall clock — used by tests + the runtime clock seam. */
+  /** Override the wall clock - used by tests + the runtime clock seam. */
   readonly now?: () => number;
 }
 
@@ -109,7 +109,7 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
       };
 
       for (const row of pending) {
-        // MCON-9: mirror the standard/reflect phases — once the budget
+        // MCON-9: mirror the standard/reflect phases - once the budget
         // pauses mid-run, stop spending instead of draining up to
         // maxConflictsPerRun calls past the ceiling.
         if (deps.budget.snapshot().paused) break;
@@ -121,7 +121,7 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
           existingText = fact?.text ?? null;
         }
         // memory-consolidation-01: the conflicting fact vanished between
-        // enqueue and drain (forgotten / purged / superseded) — there is
+        // enqueue and drain (forgotten / purged / superseded) - there is
         // nothing to judge against. Admit the candidate WITHOUT a
         // provider call: a 'dedup' verdict against "(unknown)" would
         // delete the only surviving copy.
@@ -169,7 +169,7 @@ export async function runDeepPhase(deps: DeepPhaseDeps): Promise<PhaseOutcome> {
         } else if (judge.decision === 'dedup' && conflictingId !== null) {
           // memory-consolidation-01: dedup on an LLM verdict must be a
           // SOFT forget (replayable tombstone), never the GDPR
-          // hard-delete `purge` — "never a destructive delete" (P0-3)
+          // hard-delete `purge` - "never a destructive delete" (P0-3)
           // applies doubly to a background path acting on model output.
           if (typeof semantic.forget === 'function') {
             await semantic.forget(row.factId, judge.reason);
@@ -229,7 +229,7 @@ function buildJudgeRequest(
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: JUDGE_PROMPT,
     temperature: 0,
-    // MCON-14: per-call output cap — the verdict shape is tiny.
+    // MCON-14: per-call output cap - the verdict shape is tiny.
     maxTokens: 256,
     metadata: {
       userId: deps.scope.userId,

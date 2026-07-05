@@ -80,13 +80,13 @@ export function announceTelemetryPosture(
   if (env.GRAPHORIN_TELEMETRY !== undefined) {
     lines.push(
       `[graphorin/observability] info: GRAPHORIN_TELEMETRY=${env.GRAPHORIN_TELEMETRY} ` +
-        '— acknowledged. Telemetry is hardcoded `disabled` in v0.1.',
+        ' - acknowledged. Telemetry is hardcoded `disabled` in v0.1.',
     );
   }
   if (env.GRAPHORIN_NO_PHONE_HOME !== undefined) {
     lines.push(
       `[graphorin/observability] info: GRAPHORIN_NO_PHONE_HOME=${env.GRAPHORIN_NO_PHONE_HOME} ` +
-        '— acknowledged. Graphorin already makes zero outbound calls without explicit user action.',
+        ' - acknowledged. Graphorin already makes zero outbound calls without explicit user action.',
     );
   }
   for (const line of lines) sink(line);

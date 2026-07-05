@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { OAuthFlowAbortedError } from '../../src/oauth/errors.js';
 import { _setBrowserOpenerForTesting, openInBrowser } from '../../src/oauth/index.js';
 
-describe('@graphorin/security/oauth — browser opener', () => {
+describe('@graphorin/security/oauth - browser opener', () => {
   beforeEach(() => {
     _setBrowserOpenerForTesting(null);
   });

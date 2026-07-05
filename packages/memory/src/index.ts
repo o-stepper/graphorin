@@ -1,5 +1,5 @@
 /**
- * `@graphorin/memory` — seven-tier memory system for the Graphorin
+ * `@graphorin/memory` - seven-tier memory system for the Graphorin
  * framework (MST-13: working / session / episodic / semantic /
  * procedural / shared + the read-only insight tier from P1-1).
  *

@@ -1,7 +1,7 @@
 /**
  * C6: taint override for memory-recall tool results. The recall tools are
  * first-party (`sideEffectClass: 'read-only'`), so the data-flow ledger
- * would derive their outputs as trusted — but the CONTENT they return can
+ * would derive their outputs as trusted - but the CONTENT they return can
  * be quarantined or foreign-provenance memory written in an earlier
  * session (the cross-session poisoning leg). This helper computes the
  * `ToolReturn.taint` override that re-arms the ledger at recall: recalled
@@ -23,7 +23,7 @@ export interface RecalledItemLike {
 /**
  * Compute the taint override for a recalled item set: untrusted when ANY
  * item is quarantined or foreign-provenance; `undefined` when all items
- * are first-party active (the common case — zero overhead, no override).
+ * are first-party active (the common case - zero overhead, no override).
  *
  * @stable
  */

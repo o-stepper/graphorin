@@ -8,7 +8,7 @@
  * - `undefined` values are dropped (not stringified to `null`); the
  *   helper rejects raw `undefined` at the top level.
  * - `NaN`, `Infinity`, `-Infinity` are rejected.
- * - `BigInt` is rejected — the audit log never stores big integers.
+ * - `BigInt` is rejected - the audit log never stores big integers.
  * - Strings are emitted with the JSON-spec escape sequences.
  *
  * @packageDocumentation

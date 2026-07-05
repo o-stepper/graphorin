@@ -4,7 +4,7 @@ import { createMCPClientFromSdkTransport } from '../src/client/client.js';
 import type { MCPClient } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MC-1/MC-9 — client eventStore removed; honest session semantics', () => {
+describe('MC-1/MC-9 - client eventStore removed; honest session semantics', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 
@@ -29,7 +29,7 @@ describe('MC-1/MC-9 — client eventStore removed; honest session semantics', ()
       logger: (level, message) => {
         warnings.push({ level, message });
       },
-      // Legacy option removed by MC-1 — runtime coerces to a warn.
+      // Legacy option removed by MC-1 - runtime coerces to a warn.
       ...({ eventStore: { kind: 'legacy' } } as Record<string, unknown>),
     });
     expect(warnings.some((w) => w.level === 'warn' && w.message.includes('eventStore'))).toBe(true);

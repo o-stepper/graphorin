@@ -1,24 +1,24 @@
 /**
- * @graphorin/pricing — bundled LLM pricing snapshot for the Graphorin
+ * @graphorin/pricing - bundled LLM pricing snapshot for the Graphorin
  * framework.
  *
  * Highlights:
  *
- * - {@link BUNDLED_SNAPSHOT} — bundled snapshot covering Anthropic,
+ * - {@link BUNDLED_SNAPSHOT} - bundled snapshot covering Anthropic,
  *   OpenAI, Google, Mistral, Cohere + the local providers
  *   (Ollama / llama.cpp). Each entry carries a per-token price and
  *   the canonical SHA-256 digest of the `entries` array.
- * - {@link lookupPrice} — resolve a `(provider, model)` pair against a
+ * - {@link lookupPrice} - resolve a `(provider, model)` pair against a
  *   snapshot. Returns `null` for unknown entries plus emits one WARN
  *   per process-lifetime per unknown pair.
- * - {@link calculateCost} — multiply a price by token counts for a
+ * - {@link calculateCost} - multiply a price by token counts for a
  *   single LLM call.
- * - {@link diffPricing} — row-by-row delta between two snapshots.
- * - {@link refreshPricing} — opt-in network call. Never automatic.
- * - {@link listMissingModels} — scan trace spans for unknown models;
+ * - {@link diffPricing} - row-by-row delta between two snapshots.
+ * - {@link refreshPricing} - opt-in network call. Never automatic.
+ * - {@link listMissingModels} - scan trace spans for unknown models;
  *   used by `graphorin pricing missing` (Phase 15).
  *
- * The bundled snapshot is intentionally small — operators wanting the
+ * The bundled snapshot is intentionally small - operators wanting the
  * full upstream catalogue should run `refreshPricing(...)` and
  * persist the result to disk.
  *

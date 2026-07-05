@@ -2,7 +2,7 @@
  * Lifecycle wrapper around an externally-built `Consolidator`. Phase
  * 14c wires the runtime into `beforeStart` / `beforeShutdown` so the
  * background pipeline starts and stops cleanly with the daemon. The
- * adapter does not own the consolidator construction — operators
+ * adapter does not own the consolidator construction - operators
  * supply the instance through the `createServer({ consolidator })`
  * option so the framework stays decoupled from the heavy
  * `@graphorin/memory` package.

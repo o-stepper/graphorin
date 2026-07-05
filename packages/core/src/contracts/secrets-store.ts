@@ -3,7 +3,7 @@ import type { SecretRef } from './secret-ref.js';
 import type { SecretValue } from './secret-value.js';
 
 /**
- * Pluggable secret resolver — turns a parsed `SecretRef` into a live
+ * Pluggable secret resolver - turns a parsed `SecretRef` into a live
  * `SecretValue`. Concrete resolvers live in `@graphorin/security` (env,
  * keyring, file, encrypted-file, literal, ref, vault) and in optional
  * adapter packages (`@graphorin/secret-1password`, …).
@@ -59,7 +59,7 @@ export interface SecretsStore {
 
   delete(key: string, scope?: SessionScope): Promise<void>;
 
-  /** Returns metadata about every key — never the values themselves. */
+  /** Returns metadata about every key - never the values themselves. */
   list(scope?: SessionScope): Promise<ReadonlyArray<SecretMetadata>>;
 }
 
@@ -75,7 +75,7 @@ export interface SecretsSetOptions {
 }
 
 /**
- * Public metadata about a stored secret. Safe to log — never carries the
+ * Public metadata about a stored secret. Safe to log - never carries the
  * value itself.
  *
  * @stable

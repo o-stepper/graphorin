@@ -1,14 +1,14 @@
 /**
- * `graphorin doctor` — host health check.
+ * `graphorin doctor` - host health check.
  *
  * Wraps the read-only library helpers in `@graphorin/security/hardening`
  * (`checkPerms`, `checkSecrets`, `checkEncryption`, `checkSystemd`)
  * with `--fix-perms` repair, `--all` aggregation, JSON output for CI
  * pipelines, and exit-code semantics:
  *
- *  - exit `0` — every check passed (`fail` count is `0`).
- *  - exit `1` — at least one check returned `'fail'`.
- *  - exit `2` — invocation could not even start (e.g. config missing
+ *  - exit `0` - every check passed (`fail` count is `0`).
+ *  - exit `1` - at least one check returned `'fail'`.
+ *  - exit `2` - invocation could not even start (e.g. config missing
  *    when `--check-secrets` requires the bootstrapped store).
  *
  * The doctor never writes to disk unless `--fix-perms` is supplied.
@@ -68,7 +68,7 @@ export interface DoctorCommandOptions extends CommonOutputOptions {
   readonly systemdUnit?: string;
   /** Run every check. Equivalent to passing every `--check-*` flag. */
   readonly all?: boolean;
-  /** Test seam — supply a custom systemd executor. */
+  /** Test seam - supply a custom systemd executor. */
   readonly systemdRun?: (cmd: string) => Promise<string>;
 }
 

@@ -88,7 +88,7 @@ async function streamUntilFirstEvent(
       if (accumulated.includes('id:')) break;
     }
   } catch {
-    // request aborted — return whatever we got.
+    // request aborted - return whatever we got.
   }
   try {
     reader.releaseLock();

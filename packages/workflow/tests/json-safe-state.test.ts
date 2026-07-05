@@ -2,7 +2,7 @@
  * WF-10: non-JSON-safe state must fail FAST and identically on every
  * store. `structuredClone` happily round-trips Map/Set/Date with the
  * in-memory store while the production SQLite store JSON.stringify-es
- * them into `{}` / ISO strings without an error — a workflow that
+ * them into `{}` / ISO strings without an error - a workflow that
  * resumed fine all dev cycle silently loses state in production.
  */
 
@@ -30,8 +30,8 @@ function bagWorkflow(value: () => unknown) {
   });
 }
 
-describe('WF-10 — checkpoint state must be JSON-safe on EVERY store', () => {
-  it('a Map in state fails the checkpoint with a typed error naming the channel — even in-memory', async () => {
+describe('WF-10 - checkpoint state must be JSON-safe on EVERY store', () => {
+  it('a Map in state fails the checkpoint with a typed error naming the channel - even in-memory', async () => {
     const events = await collect(
       bagWorkflow(() => new Map([['k', 'v']])).execute({}, { threadId: 'js-1' }),
     );

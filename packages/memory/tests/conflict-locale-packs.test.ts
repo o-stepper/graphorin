@@ -6,7 +6,7 @@ import {
   type LocalePack,
 } from '../src/conflict/locale-packs/index.js';
 
-describe('@graphorin/memory — bundled English locale pack', () => {
+describe('@graphorin/memory - bundled English locale pack', () => {
   it('matches every documented relocation marker', () => {
     const cases = [
       'I just moved to Berlin last week.',

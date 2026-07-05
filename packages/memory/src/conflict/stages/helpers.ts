@@ -35,7 +35,7 @@ export function normaliseSubject(input: string, pack: LocalePack): string {
 
 /**
  * Naive subject / predicate / object split. The locale pack supplies
- * the verb tokens used as predicate normalisers — the first matching
+ * the verb tokens used as predicate normalisers - the first matching
  * verb in the sentence becomes the predicate and splits the rest
  * into subject (left side) and object (right side). The split is
  * intentionally simple: anything more clever lives behind the entity-

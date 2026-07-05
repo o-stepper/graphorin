@@ -1,21 +1,21 @@
 /**
- * @graphorin/eslint-plugin — ESLint plugin for projects that build on
+ * @graphorin/eslint-plugin - ESLint plugin for projects that build on
  * the Graphorin framework.
  *
  * Phase 16 final ruleset:
  *
- *   - `no-secret-unwrap`                  — DEC-020 / ADR-026. Active.
- *   - `no-secret-in-deps`                 — DEC-137. Active.
- *   - `provider-middleware-order`         — DEC-145 / ADR-039. Active.
- *   - `no-implicit-network-call`          — DEC-154 / ADR-041. Active.
- *   - `no-third-party-workflow-aliases`   — DEC-019 / ADR-029. Active.
- *   - `no-bare-tool-exec`                 — principle 3 / DEC-143. Active.
- *   - `tool-description-required`         — Active.
- *   - `tool-examples-recommended`         — Active.
- *   - `tool-parameter-naming`             — Active.
+ *   - `no-secret-unwrap`                  - DEC-020 / ADR-026. Active.
+ *   - `no-secret-in-deps`                 - DEC-137. Active.
+ *   - `provider-middleware-order`         - DEC-145 / ADR-039. Active.
+ *   - `no-implicit-network-call`          - DEC-154 / ADR-041. Active.
+ *   - `no-third-party-workflow-aliases`   - DEC-019 / ADR-029. Active.
+ *   - `no-bare-tool-exec`                 - principle 3 / DEC-143. Active.
+ *   - `tool-description-required`         - Active.
+ *   - `tool-examples-recommended`         - Active.
+ *   - `tool-parameter-naming`             - Active.
  *
- * (The former `no-console-in-public-api` scaffold — a permanent no-op
- * since Phase 01 — was removed in the v0.4 hygiene pass (PS-21) rather
+ * (The former `no-console-in-public-api` scaffold - a permanent no-op
+ * since Phase 01 - was removed in the v0.4 hygiene pass (PS-21) rather
  * than shipped inert.)
  *
  * @packageDocumentation
@@ -87,7 +87,7 @@ const plugin: {
   rules,
   configs: {
     recommended: { plugins: ['@graphorin'], rules: RECOMMENDED_RULES },
-    // `plugins` is filled in below — the flat form maps the namespace to the
+    // `plugins` is filled in below - the flat form maps the namespace to the
     // plugin object itself, which must exist first.
     'flat/recommended': { plugins: {}, rules: RECOMMENDED_RULES },
   },

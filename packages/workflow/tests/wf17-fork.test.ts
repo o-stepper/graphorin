@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createNode, createWorkflow, InMemoryCheckpointStore, latestValue } from '../src/index.js';
 
-describe('WF-17 — fork() produces a self-contained, continuable thread', () => {
+describe('WF-17 - fork() produces a self-contained, continuable thread', () => {
   it('resets parentId on the forked root (no dangling lineage into the source thread)', async () => {
     const checkpointStore = new InMemoryCheckpointStore();
     const wf = createWorkflow<{ value: number }>({

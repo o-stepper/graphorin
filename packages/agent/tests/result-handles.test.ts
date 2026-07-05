@@ -25,7 +25,7 @@ const noopTool: Tool<unknown, unknown, unknown> = {
 
 /**
  * A tool that returns a large structured object and opts into the
- * `'spill-to-file'` truncation strategy with a tiny budget — so the
+ * `'spill-to-file'` truncation strategy with a tiny budget - so the
  * executor spills the body and surfaces a result handle.
  */
 function bigTool(opts: { sensitivity?: 'public' | 'internal' | 'secret' } = {}): {
@@ -71,7 +71,7 @@ afterEach(async () => {
 
 // --- read_result registration gating ----------------------------------------
 
-describe('WI-10 — read_result registration', () => {
+describe('WI-10 - read_result registration', () => {
   it('registers read_result when a tool opts into spill-to-file', () => {
     const provider = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('hi')] });
     const agent = createAgent({
@@ -99,7 +99,7 @@ describe('WI-10 — read_result registration', () => {
 
 // --- handle-aware serialization ---------------------------------------------
 
-describe('WI-10 — large results stay out of context', () => {
+describe('WI-10 - large results stay out of context', () => {
   it('inlines only a bounded preview + handle for a spilled object result (not the full blob)', async () => {
     const { tool, body } = bigTool();
     const provider = createMockProvider({
@@ -141,7 +141,7 @@ describe('WI-10 — large results stay out of context', () => {
     expect(toolMessages.some((c) => c.includes('X'.repeat(2000)))).toBe(false);
   });
 
-  it('does not spill — and surfaces no handle — for a secret-tier tool (sensitivity gate)', async () => {
+  it('does not spill - and surfaces no handle - for a secret-tier tool (sensitivity gate)', async () => {
     const { tool } = bigTool({ sensitivity: 'secret' });
     const provider = createMockProvider({
       modelId: 'mock',
@@ -169,7 +169,7 @@ describe('WI-10 — large results stay out of context', () => {
       // drain
     }
 
-    // The secret body is truncated in place — never written to the shared
+    // The secret body is truncated in place - never written to the shared
     // spill store, so no handle is ever surfaced.
     expect(toolMessages.length).toBeGreaterThan(0);
     expect(toolMessages.every((c) => !c.includes('graphorin-spill:'))).toBe(true);

@@ -59,7 +59,7 @@ export function _setTokenEndpointFetcherForTesting(fetcher: TokenEndpointFetcher
 
 /**
  * POST `params` to the token endpoint and return the parsed JSON
- * body. The helper does not throw on non-2xx responses — the caller
+ * body. The helper does not throw on non-2xx responses - the caller
  * is responsible for branching on `.ok` so error responses can
  * surface the spec-defined `error` / `error_description` fields.
  *

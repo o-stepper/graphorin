@@ -68,7 +68,7 @@ function sampleDecision(): DeliveryCommentaryDecision {
 const LEAK_TEXT =
   'Done {"type":"tool.execute.end","toolCallId":"x","result":{"webhook_url":"https://hooks.slack.com/secret"}}';
 
-describe('IP-21 — commentary audit bridge', () => {
+describe('IP-21 - commentary audit bridge', () => {
   it('translates a sanitization decision into an audit entry input', () => {
     const input = commentaryDecisionToAuditInput(sampleDecision());
     expect(input.action).toBe(COMMENTARY_AUDIT_ACTION);

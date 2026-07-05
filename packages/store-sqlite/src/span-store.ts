@@ -6,7 +6,7 @@
  *   `withValidation(...)` (like every exporter) before handing it to
  *   `createTracer({ exporters })`.
  * - {@link traceSourceForSession} reads a session's spans back as an ordered
- *   `AsyncIterable<SpanRecord>` — exactly the `traceSource` shape
+ *   `AsyncIterable<SpanRecord>` - exactly the `traceSource` shape
  *   `Session.replay()` and the `graphorin memory why` CLI consume.
  *
  * The import of `SpanRecord` / `TraceExporter` is type-only; `@graphorin/core`
@@ -91,7 +91,7 @@ export function createSqliteSpanExporter(
 
 /**
  * Read a session's persisted spans back as an ordered
- * `AsyncIterable<SpanRecord>` — the `traceSource` shape `Session.replay()` and
+ * `AsyncIterable<SpanRecord>` - the `traceSource` shape `Session.replay()` and
  * the `graphorin memory why` CLI consume. Spans are ordered by start time
  * (then span id) so replay reproduces the original run order.
  *

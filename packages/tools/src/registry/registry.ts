@@ -1,5 +1,5 @@
 /**
- * `createToolRegistry(...)` — the strategy-aware registry that hosts
+ * `createToolRegistry(...)` - the strategy-aware registry that hosts
  * every {@link Tool} the agent runtime sees.
  *
  * Lifecycle:
@@ -7,7 +7,7 @@
  *  1. The agent runtime / MCP client / skill loader calls
  *     `register(tool, source)` for every tool. Multiple registrations
  *     with the same `name` from different sources are allowed at this
- *     stage — the registry tracks them in a multi-map.
+ *     stage - the registry tracks them in a multi-map.
  *  2. The agent runtime calls `assertNoDuplicates()` to confirm no
  *     first-party / inline registrations collided (programming
  *     errors fail-fast).
@@ -115,7 +115,7 @@ export interface ToolRegistry {
   searchDeferred(query: string, k?: number): Promise<ReadonlyArray<ToolSearchMatch>>;
   /** Snapshot for tests. */
   size(): number;
-  /** Tear down the registry — clears every entry. */
+  /** Tear down the registry - clears every entry. */
   clear(): void;
 }
 
@@ -266,7 +266,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
     }
 
     const bucket = entriesByName.get(resolved.name) ?? [];
-    // First-party / inline duplicates are programming errors — fail-fast.
+    // First-party / inline duplicates are programming errors - fail-fast.
     if (source.kind === 'first-party') {
       const conflictingFirstParty = bucket.find((e) => e.__source.kind === 'first-party');
       if (conflictingFirstParty !== undefined) {
@@ -279,7 +279,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
       // mcp-skills-04 (adjusted): same-source replace is the designed
       // idempotent refresh path (a toTools() re-run), but it is ALSO
       // how two DISTINCT server instances reporting the same identity
-      // silently swallow each other's tools — the registry cannot tell
+      // silently swallow each other's tools - the registry cannot tell
       // them apart. Count every replace so an identity collision is
       // observable churn instead of a silent swap.
       incrementCounter('tool.registry.same-source-replaced.total', {
@@ -320,7 +320,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
     const bucket = entriesByName.get(name);
     if (bucket === undefined || bucket.length === 0) return undefined;
     if (bucket.length === 1) return bucket[0] as RegistryEntry<TInput, TOutput, TDeps> | undefined;
-    // Multiple registrations under one name — return the first-party
+    // Multiple registrations under one name - return the first-party
     // entry if one exists, otherwise the first registered.
     const firstParty = bucket.find((e) => isFirstPartyLike(e.__source));
     return (firstParty ?? bucket[0]) as RegistryEntry<TInput, TOutput, TDeps> | undefined;
@@ -384,7 +384,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
       if (bucket.length < 2) continue;
       // Only resolve if `ctx.source` is among the colliding sources OR
       // the caller passed a "global" intent (we treat any call as global
-      // — `ctx` is a tag the call carries for audit metadata, not a filter).
+      // - `ctx` is a tag the call carries for audit metadata, not a filter).
       const sources = bucket.map((e) => e.__source);
       void ctx;
       // First-party precedence rule.
@@ -443,7 +443,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
           }
           continue;
         }
-        // 'priority' / 'manual' — first-party always wins.
+        // 'priority' / 'manual' - first-party always wins.
         const losers = bucket.filter((e) => e !== firstParty);
         entriesByName.set(name, [firstParty]);
         incrementCounter('tool.collision.first-party-suppressed.total', {
@@ -604,7 +604,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
         }
         if (matches.size > 0) stagesUsed += 's';
       } catch {
-        // Embedder failure is silent — fall through to BM25.
+        // Embedder failure is silent - fall through to BM25.
       }
     }
 
@@ -721,7 +721,7 @@ export function createToolRegistry(opts: ToolRegistryOptions = {}): ToolRegistry
 }
 
 /**
- * C2: the text a deferred tool is FOUND by — name + description + tags +
+ * C2: the text a deferred tool is FOUND by - name + description + tags +
  * worked-example comments. Example comments routinely carry the concrete
  * phrasing a model searches with ("resize an image to a width"), so
  * indexing them measurably widens recall over name+description alone.
@@ -743,7 +743,7 @@ function toMatch(
 ): ToolSearchMatch {
   const bounded = Math.max(0, Math.min(1, score));
   // tools-01: project the live validator (plain Zod, toJSON-bearing, or
-  // already-JSON-Schema) onto a JSON Schema record — `tool_search` output
+  // already-JSON-Schema) onto a JSON Schema record - `tool_search` output
   // is model-facing, so serialising Zod internals here would ship garbage.
   const inputSchema = projectSchemaToJsonSchema(entry.inputSchema) ?? {};
   // A5: carry the output schema so code-mode can render the signature's return type.

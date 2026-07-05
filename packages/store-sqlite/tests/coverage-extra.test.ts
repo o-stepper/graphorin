@@ -191,7 +191,7 @@ describe('extra coverage', () => {
     });
     expect((await store.sessions.listHandoffs('del-1')).length).toBe(1);
 
-    // store-01: the session's CONTENT must die with the session — the
+    // store-01: the session's CONTENT must die with the session - the
     // pre-fix cascade left `session_messages` (and its FTS rows) plus
     // session-scoped episodes permanently searchable after a hard-delete.
     const contentScope = { userId: 'u1', sessionId: 'del-1' };

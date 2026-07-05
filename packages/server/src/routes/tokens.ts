@@ -87,7 +87,7 @@ export function createTokensRoutes(deps: TokensRoutesDeps): Hono<{ Variables: Se
       ...(parsed.data.label !== undefined ? { label: parsed.data.label } : {}),
       ...(parsed.data.expiresInMs !== undefined ? { expiresInMs: parsed.data.expiresInMs } : {}),
     });
-    // Reveal the raw token exactly once — at creation.
+    // Reveal the raw token exactly once - at creation.
     const raw = await created.raw.use((value) => value);
     return c.json(
       {

@@ -1,5 +1,5 @@
 /**
- * `reanchorPersonaBlock({ blockLabel = 'persona' })` — built-in
+ * `reanchorPersonaBlock({ blockLabel = 'persona' })` - built-in
  * post-compaction hook. Queries `memory.working.read(...)` for the
  * persona block and returns it as a system-content fragment for
  * re-injection.
@@ -25,7 +25,7 @@ export function reanchorPersonaBlock(
       const value = await deps.memory.working.read(deps.scope, blockLabel);
       if (value === null || value.length === 0) return [];
       // context-engine-02: the D2 privacy filter gates re-anchored content
-      // exactly as it gates the assembled prompt — a secret-tier persona
+      // exactly as it gates the assembled prompt - a secret-tier persona
       // block the assembly withheld must not ship to the provider via the
       // post-compaction splice. `read()` returns only the value, so the
       // sensitivity comes from the block listing; a block absent from the

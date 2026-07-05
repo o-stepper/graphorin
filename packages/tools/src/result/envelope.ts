@@ -43,7 +43,7 @@ export function toResultEnvelope<TOutput>(opts: {
   readonly chunks?: ReadonlyArray<ContentChunk>;
 }): ResultEnvelope<TOutput> {
   const { raw, chunks } = opts;
-  // Streaming case — assemble from chunks.
+  // Streaming case - assemble from chunks.
   if (raw === undefined && chunks !== undefined && chunks.length > 0) {
     return assembleFromChunks<TOutput>(chunks);
   }
@@ -136,7 +136,7 @@ function assembleFromChunks<TOutput>(chunks: ReadonlyArray<ContentChunk>): Resul
   // assembled JSON state when only json-delta chunks were received.
   let output: unknown = text.length > 0 ? text : jsonState;
   if (text.length === 0 && jsonState === undefined && contentParts.length > 0) {
-    // Image-only stream — surface an empty string so consumers do not
+    // Image-only stream - surface an empty string so consumers do not
     // get `undefined` output.
     output = '';
   }
@@ -151,7 +151,7 @@ function assembleFromChunks<TOutput>(chunks: ReadonlyArray<ContentChunk>): Resul
 // Path segments that target the prototype chain rather than own
 // properties. The streaming-tool inputs that reach `applyJsonPatch` can
 // originate from untrusted model output, so we refuse to traverse or
-// assign through any of these names — otherwise a path like
+// assign through any of these names - otherwise a path like
 // `/__proto__/polluted` would mutate `Object.prototype`.
 const FORBIDDEN_PATCH_SEGMENTS = new Set(['__proto__', 'prototype', 'constructor']);
 

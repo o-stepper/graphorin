@@ -5,7 +5,7 @@
  * `ServerMessage` event frames; control-plane operations
  * (subscribe / unsubscribe / abort / resume) go through REST.
  *
- * Unlike the WS surface, the SSE responder is not multiplexed —
+ * Unlike the WS surface, the SSE responder is not multiplexed -
  * one HTTP request per session subject. Reconnection is handled by
  * the standard EventSource `Last-Event-ID` mechanism: when the
  * client supplies the header on resume, the responder walks the
@@ -115,7 +115,7 @@ function sseHandler(
       if (replay.droppedCount > 0) {
         await writeReplayMarker(writer as StreamingApi, replay.droppedCount, lastEventId);
       }
-      // Live tail — register a synthetic subscription so the
+      // Live tail - register a synthetic subscription so the
       // dispatcher fans new events into this connection. The
       // dispatcher already validates + sanitizes every frame; here we
       // just write the bytes onto the wire.
@@ -148,12 +148,12 @@ function sseHandler(
         tokenId,
         // The strict-mode subscribe path enforces scope; we trust the
         // outer middleware (`createScopeMiddleware('sessions:read')`)
-        // to gate this handler so we forward an empty scope set —
+        // to gate this handler so we forward an empty scope set -
         // the dispatcher's per-subject scope check still requires
         // the `agents:invoke:<sessionId>` grant.
         grantedScopes,
         send: (frame: ServerMessage) => {
-          // IP-9: bound the queue — a stalled consumer is closed, not
+          // IP-9: bound the queue - a stalled consumer is closed, not
           // buffered into the heap forever.
           if (queue.length >= queueLimit) {
             closedByBackpressure = true;
@@ -191,7 +191,7 @@ function sseHandler(
         return;
       }
       const heartbeat = setInterval(() => {
-        // Fire-and-forget heartbeat comment — clients ignore comment
+        // Fire-and-forget heartbeat comment - clients ignore comment
         // lines (RFC 6455 § 9.1).
         writer.write(': keep-alive\n\n').catch(() => undefined);
       }, keepAliveMs);
@@ -204,7 +204,7 @@ function sseHandler(
       try {
         while (!aborted) {
           if (closedByBackpressure) {
-            // IP-9: the consumer stalled past the queue cap — close the
+            // IP-9: the consumer stalled past the queue cap - close the
             // stream with a terminal lifecycle frame instead of
             // buffering unboundedly.
             await writer.write(

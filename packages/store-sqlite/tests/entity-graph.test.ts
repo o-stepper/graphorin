@@ -133,12 +133,12 @@ describe('P2-1 canonical entities', () => {
     ]);
     expect(await store.graph.findEntityByNormalizedName(SCOPE, 'nobody')).toBeNull();
 
-    // A merged (non-root) name is excluded — only canonical roots resolve.
+    // A merged (non-root) name is excluded - only canonical roots resolve.
     const annie = await store.graph.upsertEntity(SCOPE, { name: 'Annie', normalizedName: 'annie' });
     await store.graph.mergeEntities(SCOPE, annie, anna, 'same person');
     expect(await store.graph.findEntityByNormalizedName(SCOPE, 'annie')).toBeNull();
     // 1100 sequential awaited inserts above blow the default 5 s vitest timeout
-    // on a loaded CI runner (observed ~7 s on windows CI) — give it headroom.
+    // on a loaded CI runner (observed ~7 s on windows CI) - give it headroom.
   }, 20_000);
 
   it('merges are auditable + reversible; distinct entities stay separate', async () => {
@@ -174,7 +174,7 @@ describe('P2-1 one-hop expansion (recursive CTE)', () => {
   });
 
   // Two facts that share the entity "Anna": f1 mentions her as an object,
-  // f2 as a subject. A lexical/vector search for f1 never surfaces f2 —
+  // f2 as a subject. A lexical/vector search for f1 never surfaces f2 -
   // the graph hop does.
   async function chain(): Promise<{ f1: string; f2: string; anna: string }> {
     await store.semantic.remember(
@@ -250,7 +250,7 @@ describe('CS-15 expandOneHop intermediate-fact visibility (multi-hop)', () => {
     store = await makeStore();
   });
 
-  // A —[X]— B —[Y]— C: B is the sole bridge from A's entity X to C's entity Y.
+  // A - [X] - B - [Y] - C: B is the sole bridge from A's entity X to C's entity Y.
   async function bridge(bOver: Partial<Fact> = {}): Promise<void> {
     await store.semantic.remember(mkFact({ id: 'h_a', text: 'alpha', object: 'X' }));
     await store.semantic.remember(

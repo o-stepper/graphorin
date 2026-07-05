@@ -20,7 +20,7 @@ import type { AuditAction, AuditActor, AuditDecision, AuditEntryInput } from './
  * Subscribe the audit-log subsystem to the secrets-layer event
  * emitter. Returns a teardown function that detaches the listener.
  *
- * Failures inside the bridge never propagate — the audit subsystem
+ * Failures inside the bridge never propagate - the audit subsystem
  * cannot tear down the secret-access path.
  *
  * @stable

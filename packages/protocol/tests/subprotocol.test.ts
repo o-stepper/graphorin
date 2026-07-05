@@ -43,7 +43,7 @@ describe('negotiateSubprotocol', () => {
   });
 
   it('handles non-string inputs by returning null', () => {
-    // @ts-expect-error — runtime guard
+    // @ts-expect-error - runtime guard
     expect(negotiateSubprotocol(null)).toBeNull();
   });
 });
@@ -62,7 +62,7 @@ describe('formatTicketSubprotocol / parseTicketSubprotocol', () => {
 
   it('rejects empty ticket values at format time', () => {
     expect(() => formatTicketSubprotocol('')).toThrow(TypeError);
-    // @ts-expect-error — runtime guard
+    // @ts-expect-error - runtime guard
     expect(() => formatTicketSubprotocol(undefined)).toThrow(TypeError);
   });
 

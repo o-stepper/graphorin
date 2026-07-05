@@ -87,7 +87,7 @@ describe('detectRegressions', () => {
     expect(r.findings.find((f) => f.kind === 'avg-duration-increase')).toBeDefined();
   });
 
-  it('does NOT flag duration regressions by default — the gate is opt-in (EB-4)', () => {
+  it('does NOT flag duration regressions by default - the gate is opt-in (EB-4)', () => {
     // avgDuration jumps 100ms -> 5000ms with pass-rate/scores unchanged. The
     // absolute duration gate is environment-sensitive (workstation baseline vs
     // slow CI runner, or real LLM latency jitter), so it must be off unless a

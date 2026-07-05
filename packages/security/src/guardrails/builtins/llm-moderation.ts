@@ -1,13 +1,13 @@
 /**
- * `llmModeration` and `outputModeration` — guardrails that delegate
+ * `llmModeration` and `outputModeration` - guardrails that delegate
  * the actual moderation decision to a caller-supplied callback. The
  * security package does **not** import any provider here; the
  * callback receives the value and returns a structured decision.
  *
- * The agent runtime (Phase 12) wires a real provider — the default
+ * The agent runtime (Phase 12) wires a real provider - the default
  * factory accepts a generic moderation provider (operator-injected
  * OpenAI moderation, Anthropic safety, locally-hosted moderation
- * model, etc.) — without forcing the security package to depend on
+ * model, etc.) - without forcing the security package to depend on
  * `@graphorin/provider`.
  *
  * Reference: the project's security architecture, § Guardrails.

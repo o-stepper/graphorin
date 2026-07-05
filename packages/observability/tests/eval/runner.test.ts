@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { runEval, type Scorer } from '../../src/eval/index.js';
 
-describe('@graphorin/observability/eval — runEval', () => {
+describe('@graphorin/observability/eval - runEval', () => {
   it('runs sequentially, applies scorers, and aggregates a summary', async () => {
     const lengthScorer: Scorer<string, number> = {
       name: 'length',

@@ -34,7 +34,7 @@ async function buildFixtureMemory() {
   return memory;
 }
 
-describe('context-engine — deterministic snapshot (Phase 10d)', () => {
+describe('context-engine - deterministic snapshot (Phase 10d)', () => {
   it('produces a stable layered prompt for the canonical fixture (full mode)', async () => {
     const memory = await buildFixtureMemory();
     const out = await memory.contextEngine.assemble(memory, {

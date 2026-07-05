@@ -1,5 +1,5 @@
 /**
- * C5 — retrieval trust & quality:
+ * C5 - retrieval trust & quality:
  * - rank-time trust discount (quarantined / foreign provenance) with the
  *   `trust` signal surfaced through explainRecall
  * - pure trustDiscount factors
@@ -25,7 +25,7 @@ function makeMemory() {
   });
 }
 
-describe('C5 — trustDiscount factors', () => {
+describe('C5 - trustDiscount factors', () => {
   it('is neutral for first-party active facts', () => {
     expect(trustDiscount({ status: 'active', provenance: 'user' })).toBe(1);
     expect(trustDiscount({ status: 'active' })).toBe(1);
@@ -41,7 +41,7 @@ describe('C5 — trustDiscount factors', () => {
   });
 });
 
-describe('C5 — rank-time trust discount in search', () => {
+describe('C5 - rank-time trust discount in search', () => {
   it('ranks a first-party fact above an equally-similar foreign one and surfaces the trust signal', async () => {
     const memory = makeMemory();
     // Identical text => identical FTS scores; only trust separates them.
@@ -81,12 +81,12 @@ describe('C5 — rank-time trust discount in search', () => {
   });
 });
 
-describe('C5 — fitFusionWeights', () => {
+describe('C5 - fitFusionWeights', () => {
   const hit = (id: string, score: number): MemoryHit<Fact> =>
     ({ record: { id } as Fact, score }) as MemoryHit<Fact>;
 
   it('finds weights that beat plain RRF on a vector-favouring fixture', () => {
-    // Relevant docs d1/d2 rank top on the VECTOR list and bottom on FTS —
+    // Relevant docs d1/d2 rank top on the VECTOR list and bottom on FTS -
     // up-weighting the vector leg must win.
     const cases = [
       {
@@ -124,7 +124,7 @@ describe('C5 — fitFusionWeights', () => {
   });
 });
 
-describe('C5 — extraction decontextualization contract', () => {
+describe('C5 - extraction decontextualization contract', () => {
   it('instructs the extractor to emit self-contained propositions', async () => {
     const captured: string[] = [];
     const provider = {
@@ -169,7 +169,7 @@ describe('C5 — extraction decontextualization contract', () => {
   });
 });
 
-describe('C6 — recallTaint override on recall tools', () => {
+describe('C6 - recallTaint override on recall tools', () => {
   it('marks the result untrusted when any hit is quarantined or foreign', async () => {
     const { recallTaint } = await import('../src/tools/taint.js');
     expect(recallTaint([{ provenance: 'user', status: 'active' }])).toBeUndefined();

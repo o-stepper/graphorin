@@ -51,13 +51,13 @@ function createInMemoryStoreWithoutLifecycleExt(): MemoryStoreAdapter {
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
-describe('@graphorin/memory/tiers — WorkingMemory', () => {
+describe('@graphorin/memory/tiers - WorkingMemory', () => {
   it('a defined-but-unwritten block answers with its defaultValue; append composes with it (MST-8)', async () => {
     const memory = makeMemory();
     memory.working.define(
       defineBlock({ label: 'persona', charLimit: 200, defaultValue: 'Neutral tone.' }),
     );
-    // No write yet — the declared default is readable…
+    // No write yet - the declared default is readable…
     expect(await memory.working.read(SCOPE, 'persona')).toBe('Neutral tone.');
     // …and the first mutation composes with it instead of starting empty.
     await memory.working.append(SCOPE, 'persona', 'Loves brevity.');
@@ -141,7 +141,7 @@ describe('@graphorin/memory/tiers — WorkingMemory', () => {
   });
 });
 
-describe('@graphorin/memory/tiers — SessionMemory', () => {
+describe('@graphorin/memory/tiers - SessionMemory', () => {
   it('push + list + search round-trip', async () => {
     const memory = makeMemory();
     await memory.session.push(SCOPE, { role: 'user', content: 'I love mountain hiking.' });
@@ -187,7 +187,7 @@ describe('@graphorin/memory/tiers — SessionMemory', () => {
     expect(await memory.session.shouldCompact(SCOPE, 100)).toBe(false);
   });
 
-  it('compact never fabricates work counts — it removes nothing and says so (MRET-12)', async () => {
+  it('compact never fabricates work counts - it removes nothing and says so (MRET-12)', async () => {
     const memory = makeMemory();
     for (let i = 0; i < 5; i++) {
       await memory.session.push(SCOPE, { role: 'user', content: `m${i}` });
@@ -214,7 +214,7 @@ describe('@graphorin/memory/tiers — SessionMemory', () => {
   });
 });
 
-describe('@graphorin/memory/tiers — EpisodicMemory', () => {
+describe('@graphorin/memory/tiers - EpisodicMemory', () => {
   it('record + recent + search', async () => {
     const memory = makeMemory();
     const ep = await memory.episodic.record(SCOPE, {
@@ -266,7 +266,7 @@ describe('@graphorin/memory/tiers — EpisodicMemory', () => {
   });
 });
 
-describe('@graphorin/memory/tiers — EpisodicMemory importance + quarantine (P1-2/P1-4)', () => {
+describe('@graphorin/memory/tiers - EpisodicMemory importance + quarantine (P1-2/P1-4)', () => {
   it('record persists provenance + status; quarantined episodes are excluded from default recall', async () => {
     const memory = makeMemory();
     const ep = await memory.episodic.record(SCOPE, {
@@ -330,7 +330,7 @@ describe('@graphorin/memory/tiers — EpisodicMemory importance + quarantine (P1
   });
 });
 
-describe('@graphorin/memory/tiers — SemanticMemory', () => {
+describe('@graphorin/memory/tiers - SemanticMemory', () => {
   it('remember + search round-trip', async () => {
     const memory = makeMemory();
     await memory.semantic.remember(SCOPE, { text: 'lives in Tbilisi' });
@@ -354,7 +354,7 @@ describe('@graphorin/memory/tiers — SemanticMemory', () => {
     const a = await memory.semantic.remember(SCOPE, { text: 'sensitive private detail' });
     const b = await memory.semantic.remember(SCOPE, { text: 'unrelated note' });
     await memory.semantic.purge(SCOPE, a.id);
-    // After purge the fact is gone — even from the search index.
+    // After purge the fact is gone - even from the search index.
     const hits = await memory.semantic.search(SCOPE, 'sensitive');
     expect(hits.find((h) => h.record.id === a.id)).toBeUndefined();
     // Other facts remain intact.
@@ -448,7 +448,7 @@ describe('@graphorin/memory/tiers — SemanticMemory', () => {
   });
 });
 
-describe('@graphorin/memory/tiers — SemanticMemory provenance + quarantine (P1-4)', () => {
+describe('@graphorin/memory/tiers - SemanticMemory provenance + quarantine (P1-4)', () => {
   it('a synthesized (extraction) write lands quarantined and is excluded from default recall', async () => {
     const memory = makeMemory();
     await memory.semantic.remember(SCOPE, {
@@ -505,7 +505,7 @@ describe('@graphorin/memory/tiers — SemanticMemory provenance + quarantine (P1
   });
 });
 
-describe('@graphorin/memory/tiers — neighbors + bi-temporal supersede (P0-3)', () => {
+describe('@graphorin/memory/tiers - neighbors + bi-temporal supersede (P0-3)', () => {
   it('neighbors returns raw vector hits including quarantined facts', async () => {
     const memory = makeMemory({ embedder: createStubEmbedder() });
     // A synthesized (extraction) write lands quarantined.
@@ -561,7 +561,7 @@ describe('@graphorin/memory/tiers — neighbors + bi-temporal supersede (P0-3)',
   });
 });
 
-describe('@graphorin/memory/tiers — temporal (asOf) types', () => {
+describe('@graphorin/memory/tiers - temporal (asOf) types', () => {
   it('FactSearchOptions and EpisodeSearchOptions expose asOf', () => {
     expectTypeOf<FactSearchOptions>().toHaveProperty('asOf');
     expectTypeOf<FactSearchOptions['asOf']>().toEqualTypeOf<string | undefined>();
@@ -577,7 +577,7 @@ describe('@graphorin/memory/tiers — temporal (asOf) types', () => {
   });
 });
 
-describe('@graphorin/memory/tiers — ProceduralMemory', () => {
+describe('@graphorin/memory/tiers - ProceduralMemory', () => {
   it('define + list + remove + activate predicate vocabulary', async () => {
     const memory = makeMemory();
     const r1 = await memory.procedural.define(SCOPE, { text: 'always greet by name' });
@@ -611,7 +611,7 @@ describe('@graphorin/memory/tiers — ProceduralMemory', () => {
   });
 });
 
-describe('@graphorin/memory/tiers — SharedMemory', () => {
+describe('@graphorin/memory/tiers - SharedMemory', () => {
   it('attach + detach + listFor', async () => {
     const memory = makeMemory();
     await memory.shared.attach('rec_1', 'agent_a', SCOPE.userId);
@@ -644,7 +644,7 @@ describe('@graphorin/memory/tiers — SharedMemory', () => {
   });
 });
 
-describe('SemanticMemory.search — tags widen the fusion pool (memory-retrieval-03)', () => {
+describe('SemanticMemory.search - tags widen the fusion pool (memory-retrieval-03)', () => {
   it('a tagged search returns topK tagged hits even when untagged candidates crowd the cut', async () => {
     const memory = makeMemory();
     const scope = { userId: 'tags-user' };
@@ -659,7 +659,7 @@ describe('SemanticMemory.search — tags widen the fusion pool (memory-retrieval
     }
     // Pre-fix: the fused pool was cut to topK BEFORE the record-level
     // tags filter, so the 10 untagged front-runners were kept, then
-    // filtered — the search silently returned zero hits although 10
+    // filtered - the search silently returned zero hits although 10
     // tagged matches exist. The widened pool returns all 10.
     const hits = await memory.semantic.search(scope, 'alpha', { topK: 10, tags: ['work'] });
     expect(hits).toHaveLength(10);

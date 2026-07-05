@@ -20,7 +20,7 @@ import { SecretValue } from '../../src/secrets/secret-value.js';
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('Phase 03b — audit-log DoD conformance', () => {
+describe('Phase 03b - audit-log DoD conformance', () => {
   afterEach(() => {
     _resetAuditDbBindingsForTesting();
     _resetSecretsAuditListenersForTesting();
@@ -179,7 +179,7 @@ describe('Phase 03b — audit-log DoD conformance', () => {
       expect(line.endsWith('\n')).toBe(true);
       const parsed = JSON.parse(line.trim()) as Record<string, unknown>;
       // Round-trip through canonicalJson must yield the same string
-      // (modulo the trailing newline) — that is the determinism contract.
+      // (modulo the trailing newline) - that is the determinism contract.
       expect(`${canonicalJson(parsed)}\n`).toBe(line);
     });
   });

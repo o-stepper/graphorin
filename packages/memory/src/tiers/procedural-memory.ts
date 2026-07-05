@@ -25,7 +25,7 @@ import { detectMemoryInjection } from '../internal/injection-heuristics.js';
 import { withMemorySpan } from '../internal/spans.js';
 import type { MemoryStoreAdapter } from '../internal/storage-adapter.js';
 
-/** Default priority for an *induced* procedure — below the author default
+/** Default priority for an *induced* procedure - below the author default
  * (50) because an induced, still-quarantined procedure is provisional. */
 const INDUCED_PRIORITY = 40;
 
@@ -44,7 +44,7 @@ export interface RuleInput {
    * matched in `activate(...)`'s `customMatchers` argument.
    */
   readonly condition?: string;
-  /** Default `'public'` per DEC-126 — rules are NOT user data. */
+  /** Default `'public'` per DEC-126 - rules are NOT user data. */
   readonly sensitivity?: Sensitivity;
   readonly priority?: number;
   readonly tags?: ReadonlyArray<string>;
@@ -85,7 +85,7 @@ export interface RuleActivationContext {
 }
 
 /**
- * `ProceduralMemory` — standing orders activated when the agent's
+ * `ProceduralMemory` - standing orders activated when the agent's
  * current context matches the rule's predicate. The activation rules
  * are deterministic so the agent runtime + ContextEngine can render
  * the active set into the system prompt every step.
@@ -128,12 +128,12 @@ export class ProceduralMemory {
    * (MCON-2 part 4). A success increments the rule's persistent
    * `successCount`; when `procedurePromotion.afterSuccesses` is
    * configured and a QUARANTINED procedure reaches the threshold it is
-   * promoted through {@link validate} — the injection gate still
+   * promoted through {@link validate} - the injection gate still
    * applies, so a flagged text refuses promotion (surfaced as
    * `refused: true`) no matter how many successes accumulate.
    * Failures are observed but not persisted (no negative counter yet).
    *
-   * Callers decide what "success" means — typically
+   * Callers decide what "success" means - typically
    * `checkSuccessCriteria(...)` over the procedure's stored
    * `successCriteria`, or an operator's judgement.
    *
@@ -265,7 +265,7 @@ export class ProceduralMemory {
           steps: Object.freeze([...induced.steps]),
           variables: Object.freeze([...induced.variables]),
           successCriteria: Object.freeze([...induced.successCriteria]),
-          // Highest-poisoning-risk write in the system — procedures drive
+          // Highest-poisoning-risk write in the system - procedures drive
           // actions, so it lands quarantined + provenance-tagged (P1-4).
           provenance: 'induction' satisfies MemoryProvenance,
           status: 'quarantined' satisfies MemoryStatus,
@@ -328,8 +328,8 @@ export class ProceduralMemory {
    * always-active so callers do not silently lose rules.
    *
    * **Quarantined procedures are excluded** (P1-4 / P2-2): an induced
-   * procedure must not drive actions until validated, so activation — which
-   * feeds the system prompt — never surfaces it.
+   * procedure must not drive actions until validated, so activation - which
+   * feeds the system prompt - never surfaces it.
    */
   async activate(
     scope: SessionScope,
@@ -342,13 +342,13 @@ export class ProceduralMemory {
   }
 
   /**
-   * Runbook content search (D3): "find the procedure for this task" —
+   * Runbook content search (D3): "find the procedure for this task" -
    * lexical recall over rule text, as opposed to predicate
    * {@link activate}. Returns **whole validated procedures** (the full
    * {@link Rule} incl. steps / variables / success criteria) so a match
    * can be followed file-style rather than re-synthesized from
    * fragments. Quarantined (unvalidated induced) procedures are
-   * excluded — they must not drive actions — unless the inspector opts
+   * excluded - they must not drive actions - unless the inspector opts
    * in via `includeQuarantined`.
    *
    * Uses the storage adapter's FTS surface when available
@@ -382,7 +382,7 @@ export class ProceduralMemory {
           return hits;
         }
         // Fallback: offline token-overlap scoring over list(). Coarse by
-        // design — it exists so the runbook surface degrades instead of
+        // design - it exists so the runbook surface degrades instead of
         // disappearing on adapters without an FTS index.
         const tokens = tokenizeForRunbook(query);
         const rules = await this.list(scope);
@@ -438,7 +438,7 @@ export class ProceduralMemory {
           );
         }
         const force = options?.force === true;
-        // No store get-by-id for rules — list() already surfaces quarantined.
+        // No store get-by-id for rules - list() already surfaces quarantined.
         const existing = (await store.list(scope)).find((rule) => rule.id === ruleId) ?? null;
         if (existing !== null && !force) {
           const injection = detectMemoryInjection(existing.text);

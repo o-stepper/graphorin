@@ -15,7 +15,7 @@ import {
 
 import { resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — high-level client', () => {
+describe('@graphorin/security/oauth - high-level client', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
     _setDiscoveryFetcherForTesting(async (url) => {

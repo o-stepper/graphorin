@@ -1,5 +1,5 @@
 /**
- * `GraphorinClient` — ergonomic façade over the
+ * `GraphorinClient` - ergonomic façade over the
  * {@link Transport} contract. Handles:
  *
  *   - WS handshake (`openWebSocketTransport`) with optional ticket flow.
@@ -99,7 +99,7 @@ export interface GraphorinClientOptions {
   /**
    * Session bound to the SSE fallback (IP-3): substituted into the
    * `:sessionId` slot of `sseSessionPath`. Required to connect over
-   * SSE — the old client sent the literal template and could never
+   * SSE - the old client sent the literal template and could never
    * receive an event.
    */
   readonly sessionId?: string;
@@ -133,7 +133,7 @@ export interface GraphorinClientOptions {
    * IP-19: per-RPC reply timeout in milliseconds. When set (and > 0), an RPC
    * that receives no matching reply within this window rejects with a
    * {@link TransportFailedError} instead of hanging forever on a
-   * non-responsive server. Default: unset — no timeout, so a legitimately
+   * non-responsive server. Default: unset - no timeout, so a legitimately
    * slow server reply is never aborted (opt-in).
    */
   readonly rpcTimeoutMs?: number;
@@ -271,11 +271,11 @@ export class GraphorinClient {
       const boundSubject = `session:${this.#options.sessionId ?? ''}/events`;
       if (subject !== boundSubject) {
         throw new TransportFailedError(
-          `subscribe('${subject}') requires the WebSocket transport — the SSE fallback carries only the bound session stream ('${boundSubject}').`,
+          `subscribe('${subject}') requires the WebSocket transport - the SSE fallback carries only the bound session stream ('${boundSubject}').`,
         );
       }
       // periphery-03: a CLOSED bound subscription (a prior terminal
-      // reconnect failure) must not be handed back — recreate it so a
+      // reconnect failure) must not be handed back - recreate it so a
       // recovered client delivers events again.
       if (this.#sseSubscription === undefined || this.#sseSubscription.metadata().closed) {
         this.#sseSubscription = this.#createSubscription({
@@ -289,7 +289,7 @@ export class GraphorinClient {
       return this.#sseSubscription;
     }
     const subject = subjectFor(target);
-    // IP-7: a resubscribe passes the SUBSCRIPTION's own cursor — the
+    // IP-7: a resubscribe passes the SUBSCRIPTION's own cursor - the
     // fresh transport's lastEventId is always undefined, so the old
     // code never consulted the server replay buffer.
     const lastEventId = opts?.sinceEventId ?? this.#transport.lastEventId;
@@ -350,10 +350,10 @@ export class GraphorinClient {
 
   /**
    * Resume a paused (HITL) run. The WebSocket protocol intentionally
-   * does NOT carry a `resume` control message — resumes are durable
+   * does NOT carry a `resume` control message - resumes are durable
    * + idempotent + body-carrying, which maps onto the REST endpoint
    * `POST /v1/runs/:runId/resume`. NOTE (IP-14): the server endpoint
-   * currently answers **501** — server-side durable resume is not
+   * currently answers **501** - server-side durable resume is not
    * implemented yet. Library-mode callers resume directly:
    * `agent.run(result.state, { directive })`.
    */
@@ -475,7 +475,7 @@ export class GraphorinClient {
     }
     const url = this.#sseUrl();
     // periphery-03: resume from where the bound session subscription
-    // left off — without the cursor every reconnect replays the whole
+    // left off - without the cursor every reconnect replays the whole
     // server buffer into the consumer.
     const resumeCursor = this.#sseSubscription?.__lastEventId();
     const transport = await openSseTransport(
@@ -500,14 +500,14 @@ export class GraphorinClient {
 
   #sseUrl(): string {
     const template = this.#options.sseSessionPath ?? '/v1/sessions/:sessionId/events';
-    // IP-3: bind the session into the path — the literal template was
+    // IP-3: bind the session into the path - the literal template was
     // previously sent as-is, so the SSE fallback could never connect
     // to a real session stream.
     if (template.includes(':sessionId')) {
       const sessionId = this.#options.sessionId;
       if (sessionId === undefined || sessionId.length === 0) {
         throw new TransportFailedError(
-          "The SSE fallback needs a session binding — pass `sessionId` in the client options (it fills ':sessionId' in sseSessionPath).",
+          "The SSE fallback needs a session binding - pass `sessionId` in the client options (it fills ':sessionId' in sseSessionPath).",
         );
       }
       return joinUrl(
@@ -672,7 +672,7 @@ export class GraphorinClient {
         const transport = this.#transport;
         if (transport === undefined) continue;
         // periphery-03: on the SSE fallback the connection IS the
-        // subscription — the reconnect already carried the resume
+        // subscription - the reconnect already carried the resume
         // cursor as `Last-Event-ID`, and frames keep flowing into the
         // same bound subscription object. The RPC resubscribe below
         // would call `transport.send(...)`, which the read-only SSE
@@ -685,7 +685,7 @@ export class GraphorinClient {
           try {
             // IP-7: re-establish the server-side subscription with the
             // SUBSCRIPTION's own replay cursor, then re-point the SAME
-            // object at the new server id — the consumer's in-flight
+            // object at the new server id - the consumer's in-flight
             // `for await` survives and the replayed events arrive in
             // the iterator it is already reading. The old code created
             // a NEW subscription and closed this one: the consumer's
@@ -755,7 +755,7 @@ export class GraphorinClient {
         const waiter = waiters.shift();
         if (waiter === undefined) continue;
         // IP-19(c): a waiter blocked in next() must observe the SAME outcome a
-        // fresh next() would after close — reject with closeError when the
+        // fresh next() would after close - reject with closeError when the
         // stream tore down abnormally, rather than silently resolving done:true
         // and swallowing the transport/abort failure.
         if (closeError !== undefined) {
@@ -850,7 +850,7 @@ export class GraphorinClient {
     return new Promise((resolve, reject) => {
       // IP-19: arm an optional reply timer. Wrapping resolve/reject so that
       // EVERY settle path (matching reply, disconnect, transport error) clears
-      // the timer — otherwise a stray timer could reject an already-settled id.
+      // the timer - otherwise a stray timer could reject an already-settled id.
       let timer: ReturnType<typeof setTimeout> | undefined;
       const clear = (): void => {
         if (timer !== undefined) {
@@ -921,11 +921,11 @@ function subjectFor(target: SubscriptionTarget): string {
         return `session:${target.sessionId}/runs/${target.runId}/events`;
       }
       // periphery-09: the server subject grammar has NO bare `run:`
-      // form — the old `run:<id>/events` fallback always failed
+      // form - the old `run:<id>/events` fallback always failed
       // server-side with an opaque unknown-subject error. Fail fast
       // with an actionable message instead.
       throw new TypeError(
-        "subscribe({ target: 'run' }) requires `sessionId` — the server subject grammar has no bare run form. " +
+        "subscribe({ target: 'run' }) requires `sessionId` - the server subject grammar has no bare run form. " +
           "Pass { kind: 'run', runId, sessionId } or use the 'agent' target with the agent id.",
       );
     case 'workflow':

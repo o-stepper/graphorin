@@ -8,7 +8,7 @@ import {
   splitFrontmatter,
 } from '../../src/supply-chain/index.js';
 
-describe('@graphorin/security/supply-chain — frontmatter helpers', () => {
+describe('@graphorin/security/supply-chain - frontmatter helpers', () => {
   it('splits frontmatter and body', () => {
     const skillMd = '---\nname: foo\n---\n# body\n';
     const out = splitFrontmatter(skillMd);

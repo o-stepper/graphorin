@@ -241,7 +241,7 @@ export class SqliteSessionStore implements SessionStoreExt {
     });
   }
 
-  /** RP-6: retention sweep — delete every session matching the policy. */
+  /** RP-6: retention sweep - delete every session matching the policy. */
   async pruneSessions(opts: {
     readonly beforeEpochMs?: number;
     readonly closedOnly?: boolean;
@@ -276,14 +276,14 @@ export class SqliteSessionStore implements SessionStoreExt {
    * store-01: a hard-delete must remove the CONTENT, not just the registry
    * rows. Pre-fix, nothing anywhere deleted `session_messages` (nor its
    * FTS/vec index rows), so a "deleted" conversation stayed permanently
-   * searchable via `memory.session.list/search` — misleading for a
+   * searchable via `memory.session.list/search` - misleading for a
    * privacy-positioned framework and a GDPR hazard for the RP-6 retention
    * sweep. Episodes scoped to the session are purged for the same reason:
    * they quote the session's content. Caller owns the transaction.
    */
   #purgeSessionContent(sessionId: string): void {
     // Index rows first (they key off the base rows' rowid / id). The vec0
-    // deletes mirror the proven per-id pattern of the fact `purge()` path —
+    // deletes mirror the proven per-id pattern of the fact `purge()` path -
     // sqlite-vec virtual tables handle `WHERE <id_col> = ?` reliably.
     this.#conn.run(
       `DELETE FROM session_messages_fts WHERE rowid IN
@@ -326,7 +326,7 @@ export class SqliteSessionStore implements SessionStoreExt {
 
   /** Discover per-embedder vec0 tables by prefix, identifier-validated. */
   #contentVecTables(prefix: 'session_messages_vec_' | 'episodes_vec_'): string[] {
-    // The prefixes are compile-time literals — spell out their LIKE
+    // The prefixes are compile-time literals - spell out their LIKE
     // patterns (underscores escaped) instead of sanitizing at runtime.
     const pattern =
       prefix === 'session_messages_vec_' ? 'session\\_messages\\_vec\\_%' : 'episodes\\_vec\\_%';

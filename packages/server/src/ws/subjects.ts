@@ -5,7 +5,7 @@
  * subject it was emitted into, and the per-subject scope check
  * happens at subscription time.
  *
- * Wildcards are deferred to v0.2+ — the dispatcher rejects any
+ * Wildcards are deferred to v0.2+ - the dispatcher rejects any
  * subject containing `'*'` or `'#'` so the ACL surface stays
  * tractable.
  *
@@ -122,7 +122,7 @@ export function tryParseSubject(raw: string): ParseSubjectResult {
 export function requiredScopeFor(subject: ParsedSubject): ParsedScope {
   switch (subject.kind) {
     // periphery-10: session streams are READ-ONLY, so they gate on
-    // `sessions:read:<sessionId>` — consistent with the SSE route's
+    // `sessions:read:<sessionId>` - consistent with the SSE route's
     // `sessions:read` requirement (which the old `agents:invoke:<x>`
     // requirement silently stacked on top of), and the resource slot
     // is a sessionId under the sessions family instead of overloading
@@ -145,7 +145,7 @@ export function requiredScopeFor(subject: ParsedSubject): ParsedScope {
 }
 
 /**
- * Compatibility shim — re-exports `scopeMatches` so consumers don't
+ * Compatibility shim - re-exports `scopeMatches` so consumers don't
  * have to learn the security package's surface.
  *
  * @stable

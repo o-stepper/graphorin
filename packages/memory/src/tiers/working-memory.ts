@@ -29,7 +29,7 @@ export interface BlockSpec {
    * runs preserve any value already in storage.
    */
   readonly defaultValue?: string;
-  /** Default `'truncate'` — `'reject'` opt-in for strict use cases. */
+  /** Default `'truncate'` - `'reject'` opt-in for strict use cases. */
   readonly overflowPolicy?: 'truncate' | 'reject';
   /** Optional free-form labels surfaced through `tags`. */
   readonly tags?: ReadonlyArray<string>;
@@ -84,7 +84,7 @@ export function defineBlock(spec: BlockSpec): BlockDefinition {
 }
 
 /**
- * `WorkingMemory` — labeled, character-bounded blocks rendered into
+ * `WorkingMemory` - labeled, character-bounded blocks rendered into
  * every system prompt. Operations:
  *
  *  - `define(spec)`: idempotently registers a block definition; the
@@ -260,7 +260,7 @@ export class WorkingMemory {
    *
    * The optional `agentId` argument is reserved for the per-agent
    * filtering Phase 10d wires through. In Phase 10a the argument is
-   * accepted but ignored — the rendering is scope-wide.
+   * accepted but ignored - the rendering is scope-wide.
    */
   async compile(scope: SessionScope, agentId?: string): Promise<string> {
     void agentId;
@@ -291,7 +291,7 @@ export class WorkingMemory {
       async (span) => {
         const definition = this.#requireDefinition(label);
         if (definition.readOnly === true) {
-          // MRET-14: a dedicated kind — the old
+          // MRET-14: a dedicated kind - the old
           // WorkingBlockReplaceMismatchError(label, 0) read as "substring
           // matched 0 times" and misled replace-retry callers.
           throw new WorkingBlockReadOnlyError(label);

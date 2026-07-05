@@ -8,7 +8,7 @@ import {
   WeakPepperError,
 } from '../../src/auth/errors.js';
 
-describe('@graphorin/security/auth — error classes', () => {
+describe('@graphorin/security/auth - error classes', () => {
   it('TokenFormatError carries the input length but never the input itself', () => {
     const err = new TokenFormatError('wrong-prefix', 'bad prefix', 64);
     expect(err.kind).toBe('wrong-prefix');

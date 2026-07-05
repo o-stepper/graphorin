@@ -199,7 +199,7 @@ describe('withRetry honours captured Retry-After headers', () => {
   });
 });
 
-describe('C7 — withTracing parenting + gen_ai attributes', () => {
+describe('C7 - withTracing parenting + gen_ai attributes', () => {
   function recordingTracer() {
     const spans: Array<{
       type: string;

@@ -1,6 +1,6 @@
 /**
  * HTML reporter. Renders an {@link EvalReport} as a self-contained
- * HTML document — no external CSS / JS — so artifact viewers can
+ * HTML document - no external CSS / JS - so artifact viewers can
  * render it directly. Designed to fit on a single page; for richer
  * dashboards consume the JSON reporter instead.
  *

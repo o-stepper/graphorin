@@ -86,7 +86,7 @@ export interface CostBudgets {
 
 /**
  * Callback invoked when an aggregation scope crosses its configured
- * budget. The handler receives a sanitized payload — the secret-free
+ * budget. The handler receives a sanitized payload - the secret-free
  * scope id + the breached numbers.
  *
  * @stable

@@ -1,5 +1,5 @@
 /**
- * `tool({...})` factory — the typed entry point for declaring a
+ * `tool({...})` factory - the typed entry point for declaring a
  * Graphorin {@link Tool}.
  *
  * The factory returns a `Tool` instance with every field normalised
@@ -19,7 +19,7 @@ import type { Tool, ToolExecutionContext, ToolReturn } from '@graphorin/core';
 /**
  * Spec accepted by the {@link tool} factory. Mirrors the {@link Tool}
  * interface but accepts the `execute` field as the second positional
- * parameter or as a property — both work equivalently.
+ * parameter or as a property - both work equivalently.
  *
  * @stable
  */
@@ -82,7 +82,7 @@ export function tool<TInput, TOutput, TDeps = unknown>(
 }
 
 /**
- * Internal — validate the tool name against the registry's character
+ * Internal - validate the tool name against the registry's character
  * grammar. The runtime guards against names that contain characters
  * the per-provider tool-call wire format cannot encode (whitespace,
  * control chars, the separator characters MCP uses for namespacing).
@@ -96,11 +96,11 @@ function validateName(name: unknown): asserts name is string {
       `tool({ name: '${name}' }): 'name' must be at most 128 characters (got ${name.length}).`,
     );
   }
-  // Allow alnum, dot, dash, underscore — the union of every major
+  // Allow alnum, dot, dash, underscore - the union of every major
   // provider's tool-name grammar.
   if (!/^[A-Za-z0-9._-]+$/.test(name)) {
     throw new TypeError(
-      `tool({ name: '${name}' }): 'name' must match /^[A-Za-z0-9._-]+$/ — characters outside that set are rejected by the provider tool-call wire formats we ship.`,
+      `tool({ name: '${name}' }): 'name' must match /^[A-Za-z0-9._-]+$/ - characters outside that set are rejected by the provider tool-call wire formats we ship.`,
     );
   }
 }

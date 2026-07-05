@@ -42,7 +42,7 @@ export function composeLayer2(instructions: string | undefined): string {
 /**
  * Render Layer 4 skills metadata cards. Each entry is a
  * `<skill ... />` self-closing tag so the model sees only the
- * progressive-disclosure metadata — the full SKILL.md body is
+ * progressive-disclosure metadata - the full SKILL.md body is
  * loaded on-demand via `activate_skill(name)` per RB-04.
  *
  * @stable

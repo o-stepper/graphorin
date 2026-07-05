@@ -70,7 +70,7 @@ export interface WorkflowChannelUpdateEvent<TState = unknown> {
    * The merged value, carried ONLY for `ephemeral` channels
    * (workflow-07): their values are wiped from state before the next
    * planning round, so this event is the one place a consumer can
-   * observe them. Persistent channels omit it — read the state instead.
+   * observe them. Persistent channels omit it - read the state instead.
    */
   readonly value?: unknown;
 }
@@ -83,7 +83,7 @@ export interface WorkflowCheckpointWrittenEvent {
 }
 
 /**
- * Workflow paused — for HITL approvals or programmatic `pause(value)`
+ * Workflow paused - for HITL approvals or programmatic `pause(value)`
  * calls. Carries the value passed to `pause(...)` so the caller can
  * choose how to surface the prompt to the user.
  *

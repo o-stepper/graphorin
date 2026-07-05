@@ -7,7 +7,7 @@
 import type { SpanAttributes, SpanAttributeValue, SpanStatus, SpanType } from '@graphorin/core';
 
 /**
- * Discriminator marker — every exporter that has been wrapped via
+ * Discriminator marker - every exporter that has been wrapped via
  * `withValidation(...)` is branded with this symbol so the tracer can
  * fail-fast at startup when a raw exporter is registered.
  *
@@ -36,7 +36,7 @@ export interface SpanRecord<T extends SpanType = SpanType> {
   readonly statusMessage?: string;
   readonly attributes: SpanAttributes;
   readonly events: ReadonlyArray<SpanRecordEvent>;
-  /** Optional per-attribute sensitivity map — see `setAttribute({ sensitivity })`. */
+  /** Optional per-attribute sensitivity map - see `setAttribute({ sensitivity })`. */
   readonly sensitivityByAttribute?: Readonly<Record<string, SpanAttributeValue>>;
   /** Set when the validator dropped the span entirely (replay marker). */
   readonly droppedReason?: string;

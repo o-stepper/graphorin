@@ -155,7 +155,7 @@ describe('WorkerThreadsSandbox', () => {
   });
 });
 
-describe('SDF-9 — process-escape hardening', () => {
+describe('SDF-9 - process-escape hardening', () => {
   it('blocks node:child_process even when fs/network are not restricted (always-blocked escape)', async () => {
     const sandbox = createWorkerThreadsSandbox();
     const result = await sandbox.run(

@@ -15,7 +15,7 @@ function joinText(parts: ReadonlyArray<{ type: string; text?: string }>): string
   return parts.map((p) => (p.type === 'text' ? (p.text ?? '') : '')).join('\n');
 }
 
-describe('context-engine — XML-escape model-writable tags (CE-8)', () => {
+describe('context-engine - XML-escape model-writable tags (CE-8)', () => {
   it('renderAutoRecalledFacts escapes fact tags in the tags="…" attribute', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),

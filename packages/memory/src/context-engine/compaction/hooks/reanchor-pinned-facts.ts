@@ -1,5 +1,5 @@
 /**
- * `reanchorPinnedFacts({ pinnedFactIds, maxTokens })` — built-in
+ * `reanchorPinnedFacts({ pinnedFactIds, maxTokens })` - built-in
  * post-compaction hook. Looks up the explicitly-pinned fact IDs
  * via `memory.semantic.get(...)` and returns them as a
  * system-content fragment with their tags.
@@ -33,7 +33,7 @@ export function reanchorPinnedFacts(options: {
       for (const id of ids) {
         const fact = await deps.memory.semantic.get(deps.scope, id).catch(() => null);
         if (fact === null || fact.deletedAt !== undefined) continue;
-        // context-engine-02: pinning is not a privacy override — a
+        // context-engine-02: pinning is not a privacy override - a
         // secret-tier fact the D2 filter withholds from the assembled
         // prompt must not re-enter via the post-compaction splice.
         if (deps.allowSensitivity !== undefined && !deps.allowSensitivity(fact.sensitivity)) {

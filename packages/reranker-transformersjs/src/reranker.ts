@@ -57,7 +57,7 @@ export interface CrossEncoderRerankerOptions<TRecord extends MemoryRecord = Memo
    */
   readonly idleEvictionMs?: number;
   /**
-   * Optional passage extractor — replaces the default heuristic that
+   * Optional passage extractor - replaces the default heuristic that
    * walks `text → summary → value → label → id`. Useful when a custom
    * `MemoryRecord` schema attaches the canonical text elsewhere.
    */

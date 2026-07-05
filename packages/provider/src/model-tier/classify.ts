@@ -1,5 +1,5 @@
 /**
- * Per-provider model-tier auto-classifier — returns
+ * Per-provider model-tier auto-classifier - returns
  * `'fast' | 'balanced' | 'smart' | undefined` for any model id. The
  * classifier is consumed by the agent runtime (Phase 12) to validate
  * operator-supplied tier mappings and to surface tier-not-mapped
@@ -30,14 +30,14 @@ export interface ClassifierRule {
 }
 
 /**
- * The static rule table. Order matters — higher-specificity entries
+ * The static rule table. Order matters - higher-specificity entries
  * come first (e.g. `claude-haiku` before `claude-`). Tests assert
  * that the table covers the canonical 2026 model families.
  *
  * @stable
  */
 export const CLASSIFIER_RULES: readonly ClassifierRule[] = Object.freeze([
-  // Anthropic — direct. PS-20: the version segment between `claude` and the
+  // Anthropic - direct. PS-20: the version segment between `claude` and the
   // family word can be multi-part (`claude-3-5-haiku`, `claude-3-7-sonnet`) or
   // absent (`claude-haiku-4-5`), so allow zero-or-more `-<digits/dots>` groups.
   { tier: 'fast', family: 'anthropic-haiku', pattern: /^claude(?:-[\d.]+)*-?haiku/ },
@@ -45,7 +45,7 @@ export const CLASSIFIER_RULES: readonly ClassifierRule[] = Object.freeze([
   { tier: 'smart', family: 'anthropic-opus', pattern: /^claude(?:-[\d.]+)*-?opus/ },
   { tier: 'smart', family: 'anthropic-fable', pattern: /^claude.*fable/ },
   { tier: 'smart', family: 'anthropic-mythos', pattern: /^claude.*mythos/ },
-  // Anthropic — via Bedrock.
+  // Anthropic - via Bedrock.
   {
     tier: 'fast',
     family: 'bedrock-claude-haiku',
@@ -111,13 +111,13 @@ function stripFamilyPrefix(model: string): string {
   const slash = model.indexOf('/');
   if (slash !== -1) return model.slice(slash + 1).replace(BEDROCK_REGION_PREFIX, '');
   const deRegioned = model.replace(BEDROCK_REGION_PREFIX, '');
-  // Bedrock ids end in ':<version>' (`anthropic.claude-...-v1:0`) — the
+  // Bedrock ids end in ':<version>' (`anthropic.claude-...-v1:0`) - the
   // colon there is a version separator, not a provider/model split, and
   // the rule patterns are prefix-anchored so the suffix is harmless.
   if (deRegioned.startsWith('anthropic.')) return deRegioned;
   const colon = deRegioned.indexOf(':');
   if (colon !== -1 && !deRegioned.startsWith('http')) {
-    // Skip URL-like values (`http://localhost:8080`) — `:` there is a
+    // Skip URL-like values (`http://localhost:8080`) - `:` there is a
     // port separator, not a provider/model split.
     return deRegioned.slice(colon + 1);
   }

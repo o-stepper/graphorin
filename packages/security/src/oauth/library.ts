@@ -35,7 +35,7 @@ export interface LoginInteractiveOptions {
   readonly serverId: string;
   readonly serverUrl: string;
   readonly storage: OAuthServerStore;
-  /** Default `false` — Authorization Code is the default. */
+  /** Default `false` - Authorization Code is the default. */
   readonly deviceFlow?: boolean;
   /** Pre-existing client identifier; skips DCR when supplied. */
   readonly clientId?: string;

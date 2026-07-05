@@ -44,7 +44,7 @@ describe('extractPairScores', () => {
       ],
     ];
     // The relevance score is the positive (LABEL_1) confidence, so the
-    // irrelevant pair scores low — not 0.95.
+    // irrelevant pair scores low - not 0.95.
     expect(extractPairScores(raw, 2)).toEqual([0.05, 0.8]);
   });
 

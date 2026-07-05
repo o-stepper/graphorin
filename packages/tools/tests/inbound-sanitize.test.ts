@@ -101,7 +101,7 @@ describe('applyInboundSanitization', () => {
       budgetMs: 0.000_01,
     });
     expect(result.scanTimedOut).toBe(true);
-    // When the scan times out we don't strip — body bytes-equal forwarded.
+    // When the scan times out we don't strip - body bytes-equal forwarded.
     expect(result.stripped).toBe(false);
   });
 });

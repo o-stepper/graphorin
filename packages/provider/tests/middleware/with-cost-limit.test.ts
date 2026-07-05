@@ -1,5 +1,5 @@
 /**
- * Coverage for `withCostLimit` — over-limit throw path, warn-only mode,
+ * Coverage for `withCostLimit` - over-limit throw path, warn-only mode,
  * and the no-op behaviour when no resolver is wired.
  */
 import type { Provider, ProviderRequest } from '@graphorin/core';

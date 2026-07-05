@@ -4,7 +4,7 @@ import type { SessionScope } from '../types/session-scope.js';
 /**
  * Lightweight session metadata persisted by the sessions package. The
  * actual `session_messages` rows are owned by `MemoryStore` (single source
- * of truth — the sessions package delegates message CRUD to memory).
+ * of truth - the sessions package delegates message CRUD to memory).
  *
  * @stable
  */
@@ -21,7 +21,7 @@ export interface SessionMetadata {
 
 /**
  * Agent registry entry. Captures stable metadata about every agent that
- * ever produced a message — so JSONL exports / replays can resolve a
+ * ever produced a message - so JSONL exports / replays can resolve a
  * `Message.agentId` to a human-readable name even after the agent was
  * renamed or retired.
  *
@@ -56,7 +56,7 @@ export interface SessionWorkflowRun {
  * `commentary-sanitized`, …) plus per-session-handoff. Adapters can
  * surface the rows verbatim from disk.
  *
- * The `metadata` field is intentionally an open record — storage
+ * The `metadata` field is intentionally an open record - storage
  * adapters serialize it as JSON. Callers should keep it small and
  * never include secret values.
  *
@@ -134,8 +134,8 @@ export interface SessionStoreExt extends SessionStore {
   /** Delete audit rows older than the supplied epoch ms. */
   pruneAuditEntries(beforeEpochMs: number): Promise<number>;
   /**
-   * Hard-delete a session and cascade its session-owned rows — handoffs,
-   * workflow-run attachments, and audit entries (RP-6) — **plus the
+   * Hard-delete a session and cascade its session-owned rows - handoffs,
+   * workflow-run attachments, and audit entries (RP-6) - **plus the
    * session's content**: its `session_messages` rows (with their FTS and
    * vector index entries) and any episodes scoped to the session
    * (store-01). After this call the conversation is no longer retrievable

@@ -1,5 +1,5 @@
 /**
- * `inferReasoningContract` — derive the canonical
+ * `inferReasoningContract` - derive the canonical
  * {@link ReasoningContract} value for a model id. Adapters that wrap
  * cloud-LLM language-model values call this at construction time so
  * the runtime can pick the correct
@@ -77,7 +77,7 @@ export function inferReasoningContract(input: InferReasoningContractInput): Reas
     return 'optional';
   }
   const provider = input.provider?.toLowerCase();
-  // Provider-explicit short-circuits — let cloud-LLM consumers tag
+  // Provider-explicit short-circuits - let cloud-LLM consumers tag
   // their model with `provider: 'anthropic'` even when the modelId is
   // a non-canonical alias (e.g. `legacy-thinking-router`). Prefix /
   // substring matching because the AI SDK reports dotted provider ids
@@ -108,7 +108,7 @@ function stripPrefix(model: string): string {
   const slash = model.indexOf('/');
   if (slash !== -1) return model.slice(slash + 1).replace(BEDROCK_REGION_PREFIX, '');
   const deRegioned = model.replace(BEDROCK_REGION_PREFIX, '');
-  // Bedrock ids end in ':<version>' (`anthropic.claude-...-v1:0`) — the
+  // Bedrock ids end in ':<version>' (`anthropic.claude-...-v1:0`) - the
   // colon there is a version separator, not a provider/model split, and
   // the rule patterns are prefix-anchored so the suffix is harmless.
   if (deRegioned.startsWith('anthropic.')) return deRegioned;

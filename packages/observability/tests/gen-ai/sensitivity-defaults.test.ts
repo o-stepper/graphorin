@@ -1,7 +1,7 @@
 /**
  * Verifies the per-attribute sensitivity tagging defaults catalogue
  * documented in 09-observability.md § "OpenTelemetry GenAI semconv
- * conformance" — every `gen_ai.*` metadata attribute is tagged
+ * conformance" - every `gen_ai.*` metadata attribute is tagged
  * `'public'` so the default `minTier: 'public'` exporter preserves it.
  */
 
@@ -11,12 +11,12 @@ import type { SpanRecord, TraceExporter } from '../../src/exporters/index.js';
 import { emitGenAIAttributes } from '../../src/gen-ai/index.js';
 import { createTracer } from '../../src/tracer/index.js';
 
-describe('@graphorin/observability/gen-ai — per-attribute sensitivity defaults catalogue', () => {
+describe('@graphorin/observability/gen-ai - per-attribute sensitivity defaults catalogue', () => {
   it('every metadata attribute survives the default minTier=public exporter', async () => {
     const records: SpanRecord[] = [];
     const tracer = createTracer({
       exporters: [collector(records)],
-      // Default minTier — most aggressive default-deny posture.
+      // Default minTier - most aggressive default-deny posture.
       warnSink: () => {},
     });
     await tracer.span({ type: 'provider.generate' }, async (span) => {

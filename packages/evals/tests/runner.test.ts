@@ -32,7 +32,7 @@ describe('runEvals', () => {
     expect(report.summary.total).toBe(3);
     const ids = report.results.map((r) => r.caseId).sort();
     expect(ids).toEqual(['sample-iter-0', 'sample-iter-1', 'sample-iter-2']);
-    // Every caseId is unique — JUnit/HTML reporters can key on them.
+    // Every caseId is unique - JUnit/HTML reporters can key on them.
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -138,7 +138,7 @@ describe('runEvals', () => {
       signal: controller.signal,
     });
     expect(report.aborted).toBe(true);
-    // The two completed cases survive — Ctrl+C on a long judged run no longer
+    // The two completed cases survive - Ctrl+C on a long judged run no longer
     // throws away everything that already finished.
     expect(report.results).toHaveLength(2);
     expect(report.summary.total).toBe(2);

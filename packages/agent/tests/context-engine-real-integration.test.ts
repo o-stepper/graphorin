@@ -1,6 +1,6 @@
 /**
  * context-engine-10: drive the REAL `@graphorin/memory` context engine
- * through the agent loop — tool loops (assistant toolCalls + tool
+ * through the agent loop - tool loops (assistant toolCalls + tool
  * messages) crossing the compaction threshold with a realistic system
  * prefix. Pre-existing coverage only exercised a scripted fake engine
  * with text-only turns, which is exactly the seam where the
@@ -8,7 +8,7 @@
  *
  * The mock provider's transcript well-formedness assertion (default ON)
  * validates EVERY post-compaction request: each assistant tool call has
- * its tool result, no orphan tool messages — the structural contract
+ * its tool result, no orphan tool messages - the structural contract
  * OpenAI-shaped providers enforce one step later in production.
  */
 import type { AgentEvent, Tool } from '@graphorin/core';
@@ -44,7 +44,7 @@ function toolRounds(n: number): MockProviderScript[] {
   );
 }
 
-describe('context-engine-10 — REAL engine through the agent loop', () => {
+describe('context-engine-10 - REAL engine through the agent loop', () => {
   it('compacts a tool-looping run and every post-compaction request stays well-formed', async () => {
     const engine = createContextEngine({
       providerContextWindow: 10_000,
@@ -92,7 +92,7 @@ describe('context-engine-10 — REAL engine through the agent loop', () => {
     expect(compacted.beforeTokens).toBeGreaterThan(compacted.afterTokens);
 
     // The final buffer: pinned instructions first, the REAL summary
-    // message present (marker intact), and no dangling tool pair — the
+    // message present (marker intact), and no dangling tool pair - the
     // last provider call already consumed it via the mock's validator.
     const finalMessages = end.result.state.messages;
     expect(finalMessages[0]?.role).toBe('system');
@@ -104,7 +104,7 @@ describe('context-engine-10 — REAL engine through the agent loop', () => {
         m.content.startsWith('<graphorin_compaction_summary>'),
     );
     expect(summaryMessage).toBeDefined();
-    // The summary is NOT the first message — it stays outside the
+    // The summary is NOT the first message - it stays outside the
     // pinned prefix, so a later compaction can re-compact it
     // (context-engine-05).
     expect(finalMessages.indexOf(summaryMessage as (typeof finalMessages)[number])).toBeGreaterThan(

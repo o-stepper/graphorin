@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { LruCache } from '../../src/auth/lru.js';
 
-describe('@graphorin/security/auth — LruCache', () => {
+describe('@graphorin/security/auth - LruCache', () => {
   it('rejects non-positive max', () => {
     expect(() => new LruCache(0)).toThrow(RangeError);
     expect(() => new LruCache(-1)).toThrow(RangeError);

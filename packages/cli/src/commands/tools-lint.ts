@@ -1,5 +1,5 @@
 /**
- * `graphorin tools lint` — RB-49 / suggested DEC-165.
+ * `graphorin tools lint` - RB-49 / suggested DEC-165.
  *
  * Discovers every `tool({...})` registration in the operator's project
  * via static AST analysis (no runtime probe; no `tsc` invocation), runs
@@ -13,7 +13,7 @@
  *   graphorin tools lint [--config <path>] [--threshold <n>]
  *                        [--format <text|json>] [--source <pattern>]
  *
- * ## Grader rubric (RB-49 calibration — 40 + 30 + 30 = 100 points)
+ * ## Grader rubric (RB-49 calibration - 40 + 30 + 30 = 100 points)
  *
  * - **description axis (0..40):** 0 if missing / placeholder / shorter
  *   than 20 chars; 16 if length >= 20; 24 if length >= 30; 32 if
@@ -26,12 +26,12 @@
  *
  * ## Exit codes
  *
- * - `0` — every tool meets or exceeds the threshold.
- * - `1` — at least one tool falls below the threshold.
- * - `2` — invocation could not start (config missing, walker failed).
+ * - `0` - every tool meets or exceeds the threshold.
+ * - `1` - at least one tool falls below the threshold.
+ * - `2` - invocation could not start (config missing, walker failed).
  *
  * The CLI re-uses the rule modules from `@graphorin/eslint-plugin` so
- * the rule logic has a single source of truth — the per-tool grader,
+ * the rule logic has a single source of truth - the per-tool grader,
  * threshold gate, and report formatting are the only logic that lives
  * in the CLI.
  *
@@ -94,7 +94,7 @@ export interface ToolsLintOptions extends CommonOutputOptions {
   /** Override `cwd`. Default `process.cwd()`. */
   readonly cwd?: string;
   /**
-   * Test seam — supply a list of `(file, source)` pairs directly so
+   * Test seam - supply a list of `(file, source)` pairs directly so
    * the test does not need to fish around the filesystem.
    */
   readonly inlineSources?: ReadonlyArray<{ readonly file: string; readonly source: string }>;
@@ -299,7 +299,7 @@ async function collectSources(
       const source = await readFile(file, 'utf8');
       out.push({ file, source });
     } catch {
-      // Best-effort — skip unreadable files.
+      // Best-effort - skip unreadable files.
     }
   }
   return out;

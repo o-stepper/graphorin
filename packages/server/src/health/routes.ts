@@ -118,8 +118,8 @@ export interface MetricsRoutesOptions {
    * replay buffer occupancy) into the registry so the scraped output
    * reflects the moment of the request.
    *
-   * Refresh failures are swallowed — a broken probe never blocks a
-   * Prometheus scrape — and surfaced through the optional `onError`
+   * Refresh failures are swallowed - a broken probe never blocks a
+   * Prometheus scrape - and surfaced through the optional `onError`
    * sink.
    */
   readonly refresh?: () => void | Promise<void>;

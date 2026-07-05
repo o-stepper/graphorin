@@ -1,5 +1,5 @@
 /**
- * @graphorin/embedder-transformersjs — default in-process embedder.
+ * @graphorin/embedder-transformersjs - default in-process embedder.
  *
  * Wraps `@huggingface/transformers@^4.1.0` to produce dense embeddings
  * inside the Graphorin process. Default model
@@ -51,7 +51,7 @@ export interface TransformersJsEmbedderOptions {
   /** Override device (`'cpu'`, `'webgpu'`, …). Default `'cpu'`. */
   readonly device?: string;
   /**
-   * Override the underlying `pipeline` factory — used by the test
+   * Override the underlying `pipeline` factory - used by the test
    * suite to inject a stub. Production callers should leave this
    * unset so the package lazily loads `@huggingface/transformers`.
    */
@@ -165,11 +165,11 @@ export class TransformersJsEmbedder implements EmbedderProvider {
   }
 
   /**
-   * Output dimension — the explicit `dim` option, a known-model
+   * Output dimension - the explicit `dim` option, a known-model
    * default, or the width resolved from the first `embed()`.
    * periphery-05 (the PS-11 fix ported from the Ollama embedder):
    * throws for an unknown model with no `dim` hint instead of silently
-   * assuming 768 — a wrong assumed width bakes a wrong-width id AND a
+   * assuming 768 - a wrong assumed width bakes a wrong-width id AND a
    * wrong-width vec0 table, and the id then CHANGES after the first
    * `embed()` resolves the truth, which `lock-on-first` reads as an
    * embedder swap.
@@ -193,8 +193,8 @@ export class TransformersJsEmbedder implements EmbedderProvider {
       dtype: this.#dtype ?? null,
       device: this.#device ?? null,
       // PS-10: the prefix policy changes the embeddings, so it must change the
-      // id. Only added when active (E5 + not disabled) so non-E5 ids — and the
-      // historical hash of an E5 model with prefixing turned off — are stable.
+      // id. Only added when active (E5 + not disabled) so non-E5 ids - and the
+      // historical hash of an E5 model with prefixing turned off - are stable.
       ...(this.#taskPrefix ? { taskPrefix: 'e5' as const } : {}),
     });
   }
@@ -217,12 +217,12 @@ export class TransformersJsEmbedder implements EmbedderProvider {
     });
     const lastDim = result.dims[result.dims.length - 1] ?? this.#resolvedDim ?? DEFAULT_DIM;
     // periphery-05: a width already published (via `dim` option or a
-    // prior embed) must not silently drift — the vec0 table and the
+    // prior embed) must not silently drift - the vec0 table and the
     // canonical id were derived from it.
     if (this.#resolvedDim !== null && lastDim !== this.#resolvedDim) {
       throw new Error(
         `[graphorin/embedder-transformersjs] Model '${this.#model}' produced ${lastDim}-dim ` +
-          `vectors but the embedder is bound to ${this.#resolvedDim} — check the 'dim' option.`,
+          `vectors but the embedder is bound to ${this.#resolvedDim} - check the 'dim' option.`,
       );
     }
     if (this.#resolvedDim === null) {

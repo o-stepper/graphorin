@@ -1,15 +1,15 @@
 /**
  * Built-in PII / secret detection patterns. The catalogue is intentionally
- * conservative — every pattern has both positive and negative test
+ * conservative - every pattern has both positive and negative test
  * fixtures and is documented so operators understand exactly what is
  * matched.
  *
  * The catalogue is split into two groups:
  *
- * - **secret** — credentials, API tokens, JWTs, private keys. Matches
+ * - **secret** - credentials, API tokens, JWTs, private keys. Matches
  *   are always dropped + counted, regardless of the configured tier
  *   floor.
- * - **pii** — email / phone / IBAN / credit card / SSN / IP address.
+ * - **pii** - email / phone / IBAN / credit card / SSN / IP address.
  *   Subject to the configured tier floor + per-pattern enable / disable
  *   knobs.
  *
@@ -43,7 +43,7 @@ export type BuiltInPatternName =
   | 'ipv6';
 
 /**
- * Pattern category — `secret` matches always force a drop; `pii`
+ * Pattern category - `secret` matches always force a drop; `pii`
  * matches respect the configured `enabledPatterns` allow-list.
  *
  * @stable
@@ -64,7 +64,7 @@ export interface RedactionPattern {
   readonly mask?: string;
   /**
    * Optional per-match predicate (RP-21). When present, a regex hit is only
-   * treated as a real match — and masked — when this returns `true` for the
+   * treated as a real match - and masked - when this returns `true` for the
    * matched substring. Used by the `creditcard` pattern to require a valid
    * Luhn checksum so look-alike digit runs (epoch-ms timestamps, order ids)
    * are not corrupted.
@@ -162,10 +162,10 @@ const PATTERNS: readonly RedactionPattern[] = [
   {
     name: 'creditcard',
     category: 'pii',
-    description: 'Credit card number (13–19 digits, optional spaces / dashes; Luhn-checked).',
+    description: 'Credit card number (13-19 digits, optional spaces / dashes; Luhn-checked).',
     regex: /\b(?:\d[\s-]*?){13,19}\b/g,
     mask: '[REDACTED creditcard]',
-    // RP-21: require a valid Luhn checksum so a 13–19 digit run that is not a
+    // RP-21: require a valid Luhn checksum so a 13-19 digit run that is not a
     // real PAN (millisecond epoch timestamps, order numbers, …) is left alone.
     verify: isLuhnValid,
   },
@@ -229,7 +229,7 @@ export const OPT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS.filter(
 );
 
 /**
- * Full registry — for tooling that wants to introspect every pattern
+ * Full registry - for tooling that wants to introspect every pattern
  * the framework knows about (e.g. CLI `graphorin redaction list`).
  *
  * @stable
@@ -238,7 +238,7 @@ export const ALL_BUILT_IN_PATTERNS: readonly RedactionPattern[] = PATTERNS;
 
 /**
  * Luhn (mod-10) checksum validator used by the `creditcard` pattern (RP-21).
- * Strips spaces / dashes, bounds the length to 13–19 digits, and verifies the
+ * Strips spaces / dashes, bounds the length to 13-19 digits, and verifies the
  * checksum so a digit run that merely *looks* like a PAN is not redacted.
  */
 function isLuhnValid(value: string): boolean {

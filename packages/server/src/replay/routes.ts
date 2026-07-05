@@ -12,7 +12,7 @@
  * entry. The audit write is best-effort: a missing `AuditDb` does not
  * block the replay.
  *
- * The actual replay stream is consumer-supplied — the framework
+ * The actual replay stream is consumer-supplied - the framework
  * accepts a `ReplayApi` from the operator that knows how to load
  * trace events for a `runId` / `sessionId`. Phase 14c only owns the
  * scope check + audit + transport.
@@ -217,7 +217,7 @@ async function maybeAppendAudit(
   try {
     await appendAudit(auditDb, entry);
   } catch {
-    // Best-effort — replay must not be blocked by audit failures.
+    // Best-effort - replay must not be blocked by audit failures.
   }
 }
 

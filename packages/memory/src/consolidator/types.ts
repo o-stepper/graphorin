@@ -35,7 +35,7 @@ export type ConsolidatorTriggerSpec =
 
 /**
  * Tier preset that selects a consolidator behaviour bundle. The
- * `'free'` preset is the default per DEC-144 / ADR-038 — no LLM call
+ * `'free'` preset is the default per DEC-144 / ADR-038 - no LLM call
  * fires until the operator opts in.
  *
  * @stable
@@ -57,7 +57,7 @@ export interface ConsolidatorTriggerReason {
  * handled depends on {@link OnBudgetExceed}: `'pause'` / `'throw'`
  * enforce, `'log'` (the shipped standard/full presets) only WARNs and
  * keeps running. The USD leg accumulates only when a `priceUsage`
- * pricer is configured (memory-consolidation-02) — without one every
+ * pricer is configured (memory-consolidation-02) - without one every
  * call prices at $0 and `maxCostPerDay` can never trip. The default
  * ceiling shape per tier is captured in
  * {@link CONSOLIDATOR_TIER_DEFAULTS}.
@@ -87,7 +87,7 @@ export interface ConsolidatorCeilings {
 
 /**
  * Behaviour applied by the budget enforcer when a ceiling is hit
- * mid-run. `'pause'` is the conservative default — the consolidator
+ * mid-run. `'pause'` is the conservative default - the consolidator
  * skips subsequent runs until the next budget reset; `'log'` keeps
  * running with a WARN; `'throw'` raises a typed
  * {@link BudgetExceededError}.
@@ -115,14 +115,14 @@ export interface ConsolidatorConfig {
   readonly ceilings: ConsolidatorCeilings;
   readonly onExceed: OnBudgetExceed;
   /**
-   * Advisory label for the standard phase's model — recorded on spans /
+   * Advisory label for the standard phase's model - recorded on spans /
    * run telemetry only (MCON-7). Routing happens via
    * `CreateConsolidatorOptions.cheapProvider`; this string disables
    * nothing.
    */
   readonly cheapModel: string | null;
   /**
-   * Advisory label for the deep phase's model — telemetry only
+   * Advisory label for the deep phase's model - telemetry only
    * (MCON-7). Routing happens via
    * `CreateConsolidatorOptions.deepProvider`.
    */
@@ -135,7 +135,7 @@ export interface ConsolidatorConfig {
   /**
    * Capacity-bounded eviction target for the light phase (X-1). When set,
    * each light pass archives the lowest-salience live facts in the LRU
-   * decay window down to this many — **cost / staleness control, not an
+   * decay window down to this many - **cost / staleness control, not an
    * accuracy lever**. `null` (the default at every tier) leaves storage
    * unbounded, so behaviour is identical to pre-X-1. Archiving is a soft,
    * recoverable move; nothing is hard-deleted.
@@ -163,9 +163,9 @@ export interface ConsolidatorConfig {
   readonly formEpisodes: boolean;
   /**
    * Ask the episode-summarization call for an LLM importance score
-   * (1–10, normalized to `[0, 1]`) so episodic triple-signal retrieval
+   * (1-10, normalized to `[0, 1]`) so episodic triple-signal retrieval
    * (recency × relevance × importance) runs on all three signals
-   * (P1-2). Importance is always a *soft* signal — it never gates
+   * (P1-2). Importance is always a *soft* signal - it never gates
    * retention. Defaults track {@link formEpisodes}.
    */
   readonly importanceScoring: boolean;
@@ -174,7 +174,7 @@ export interface ConsolidatorConfig {
    * injection-clean **extraction** fact as `active` instead of quarantined, so
    * routine distillation surfaces in default recall without a manual
    * `memory review --promote`. Injection-flagged facts always stay quarantined
-   * — the security gate is preserved — and episodes / insights / induced
+   * - the security gate is preserved - and episodes / insights / induced
    * procedures are unaffected (they remain quarantined-until-validated).
    * Defaults **off** at every tier: it trades the fail-safe default for
    * convenience and is an explicit operator opt-in.
@@ -186,7 +186,7 @@ export interface ConsolidatorConfig {
    * higher-order, cited insights over recent memories (Generative
    * Agents). Insights land quarantined + `provenance: 'reflection'` and
    * are ranked below the facts they cite. Defaults **on at the `full`
-   * tier only** (off at `free` / `cheap` / `standard` / `custom`) — it
+   * tier only** (off at `free` / `cheap` / `standard` / `custom`) - it
    * is the most LLM-intensive phase. A no-op without an episodic tier
    * or an insight-capable storage adapter.
    */
@@ -203,11 +203,11 @@ export interface ConsolidatorConfig {
    * Contextual retrieval for facts written by the standard phase (P1-3).
    * `'late-chunk'` (default at every tier) relies on the offline
    * situating-context prefix the shared {@link SemanticMemory} computes
-   * for every write — no extra LLM call. `'llm'` is the opt-in
+   * for every write - no extra LLM call. `'llm'` is the opt-in
    * enrichment: the standard phase spends one budgeted cheap-model call
-   * per additive write to author a 1–2 sentence situating prefix, then
+   * per additive write to author a 1-2 sentence situating prefix, then
    * passes it as the write's index text. `'off'` indexes the bare text.
-   * The `'llm'` mode is **consolidator-only** by construction — the hot
+   * The `'llm'` mode is **consolidator-only** by construction - the hot
    * write path never has a provider for contextualization.
    */
   readonly contextualRetrieval: ContextualRetrievalMode;
@@ -217,7 +217,7 @@ export interface ConsolidatorConfig {
    * `learned_context` working block from the previous digest + recent
    * episodes / active insights / active procedures, so the system
    * prompt carries a compact standing summary. Defaults **off at every
-   * tier** (Wave-D trial) — a no-op without a working tier handle.
+   * tier** (Wave-D trial) - a no-op without a working tier handle.
    */
   readonly learnedContext: boolean;
   /** Character bound enforced on the learned-context digest. Default `1200`. */
@@ -258,7 +258,7 @@ export interface ConsolidatorBudgetSnapshot {
  * Status snapshot returned by {@link Consolidator.status}.
  *
  * Public shape: `{ tier, queueDepth, dlqSize, lastRuns,
- * budgetRemaining, deferredRuns }` — extended with a few additional
+ * budgetRemaining, deferredRuns }` - extended with a few additional
  * fields the server health endpoint and the
  * `graphorin consolidator status` CLI consume.
  *
@@ -287,7 +287,7 @@ export interface ConsolidatorStatus {
   readonly deferredRuns: number;
   readonly emptyExtractions: number;
   readonly budget: ConsolidatorBudgetSnapshot;
-  /** Spec alias — surfaces remaining-budget figures at the top level. */
+  /** Spec alias - surfaces remaining-budget figures at the top level. */
   readonly budgetRemaining: {
     readonly tokens: number;
     readonly costUsd: number;
@@ -339,7 +339,7 @@ export type PhaseListener = (
  */
 export interface CreateConsolidatorOptions {
   /**
-   * Storage adapter — supplies the consolidator state, runs, DLQ,
+   * Storage adapter - supplies the consolidator state, runs, DLQ,
    * and per-tier helpers. The default `@graphorin/store-sqlite`
    * adapter exposes everything by construction.
    */
@@ -361,7 +361,7 @@ export interface CreateConsolidatorOptions {
   /**
    * The {@link WorkingMemory} tier instance from the parent
    * `createMemory(...)` facade (D3). Required for the learned-context
-   * pass — without it the pass is a silent no-op even when
+   * pass - without it the pass is a silent no-op even when
    * `learnedContext` is enabled.
    */
   readonly working?: WorkingMemory;
@@ -372,9 +372,9 @@ export interface CreateConsolidatorOptions {
    */
   readonly provider?: Provider | null;
   readonly tracer?: Tracer;
-  /** Override the wall clock — used by tests. */
+  /** Override the wall clock - used by tests. */
   readonly now?: () => number;
-  /** Random source for stable run ids — used by tests. */
+  /** Random source for stable run ids - used by tests. */
   readonly randomId?: () => string;
   readonly triggers?: ReadonlyArray<ConsolidatorTriggerSpec>;
   readonly tier?: ConsolidatorTier;
@@ -384,7 +384,7 @@ export interface CreateConsolidatorOptions {
   /**
    * USD pricer for phase LLM usage (memory-consolidation-02). Wire it
    * to `@graphorin/pricing`'s `calculateCost` (or any per-token rate)
-   * so the `maxCostPerDay` ceiling can actually accumulate spend —
+   * so the `maxCostPerDay` ceiling can actually accumulate spend -
    * without it every phase prices its calls at $0 and the USD ceiling
    * never trips at any tier.
    *
@@ -447,7 +447,7 @@ export interface CreateConsolidatorOptions {
 }
 
 /**
- * Tier preset table. The defaults follow ADR-038 §4 — `'free'`
+ * Tier preset table. The defaults follow ADR-038 §4 - `'free'`
  * disables every LLM phase and pins zero ceilings, the upper tiers
  * widen the budget envelope progressively.
  *

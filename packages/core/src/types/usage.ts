@@ -2,7 +2,7 @@
  * Token / cost metrics for a single LLM call.
  *
  * `cost` is optional because the framework cannot compute it without a
- * pricing snapshot — providers/middleware fill it in (e.g. through the
+ * pricing snapshot - providers/middleware fill it in (e.g. through the
  * separate `@graphorin/pricing` package) when the snapshot is available.
  *
  * @stable

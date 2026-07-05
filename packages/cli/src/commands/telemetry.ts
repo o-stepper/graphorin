@@ -1,5 +1,5 @@
 /**
- * `graphorin telemetry` — informational stubs.
+ * `graphorin telemetry` - informational stubs.
  *
  * The framework promises **zero default telemetry** (DEC-154 /
  * ADR-041). The Phase 15 surface ships the four subcommands as
@@ -10,11 +10,11 @@
  *
  * Surface (per Phase 15 § Telemetry):
  *
- *  - `graphorin telemetry status`  — always reports `disabled`.
- *  - `graphorin telemetry enable`  — refuses with a documentation
+ *  - `graphorin telemetry status`  - always reports `disabled`.
+ *  - `graphorin telemetry enable`  - refuses with a documentation
  *    pointer.
- *  - `graphorin telemetry disable` — no-op success.
- *  - `graphorin telemetry inspect` — informational summary of the
+ *  - `graphorin telemetry disable` - no-op success.
+ *  - `graphorin telemetry inspect` - informational summary of the
  *    promise (no phone home, no version pings, no crash reports).
  *
  * @packageDocumentation
@@ -60,7 +60,7 @@ export function runTelemetryStatus(options: CommonOutputOptions = {}): Telemetry
 export function runTelemetryEnable(options: CommonOutputOptions = {}): TelemetryStatusResult {
   emitReport(options, ZERO_DEFAULT_RESULT, () => {
     const print = options.print ?? defaultPrintSink;
-    print(brand(`telemetry enable refused — the framework promises zero phone-home (DEC-154).`));
+    print(brand(`telemetry enable refused - the framework promises zero phone-home (DEC-154).`));
     print(brand(`an opt-in collector is on the v0.2+ roadmap; see ${PRIVACY_REF}.`));
   });
   process.exitCode = EXIT_CODES.RECOVERABLE_FAILURE;

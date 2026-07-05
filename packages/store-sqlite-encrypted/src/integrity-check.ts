@@ -1,6 +1,6 @@
 /**
  * Integrity-check runner for encrypted databases. sqlite3mc ships no
- * `PRAGMA cipher_integrity_check` (CS-7 — the old call returned an
+ * `PRAGMA cipher_integrity_check` (CS-7 - the old call returned an
  * empty row-set on every real run, so `ok` was always false); the
  * standard `PRAGMA integrity_check` works through the cipher layer
  * once the connection is keyed, which is exactly the property the
@@ -29,7 +29,7 @@ export interface CipherIntegrityCheckResult {
 /**
  * Runs `PRAGMA integrity_check` against the provided connection. The
  * connection MUST already be open with the cipher key applied
- * (typically via {@link createEncryptedConnection}) — a wrong key
+ * (typically via {@link createEncryptedConnection}) - a wrong key
  * surfaces as an open/read error before the pragma runs.
  *
  * The pragma is read-only so it is safe to run from a triggers daemon

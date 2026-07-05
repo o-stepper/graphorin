@@ -27,7 +27,7 @@ export interface EnvSecretsStoreOptions {
   readonly prefix?: string;
   /**
    * Whether `set(...)` is allowed to mutate `process.env`. Defaults to
-   * `false` — the env store is intended for read-only chains where
+   * `false` - the env store is intended for read-only chains where
    * secrets are baked into the host environment.
    */
   readonly allowMutation?: boolean;
@@ -36,7 +36,7 @@ export interface EnvSecretsStoreOptions {
 const REGISTERED_KEYS = new Map<EnvSecretsStore, Set<string>>();
 
 /**
- * `SecretsStore` backed by `process.env`. Read-only by default —
+ * `SecretsStore` backed by `process.env`. Read-only by default -
  * enabling `allowMutation: true` keeps the API workable for tests but
  * still emits a single `console.warn` per mutation.
  *
@@ -92,7 +92,7 @@ export class EnvSecretsStore implements SecretsStore {
     _opts?: SecretsSetOptions,
   ): Promise<void> {
     void _opts;
-    // SPL-16: a refused write must not audit as a success — the no-op
+    // SPL-16: a refused write must not audit as a success - the no-op
     // is recorded as 'denied' so the trail reflects reality.
     if (!this.#allowMutation) {
       console.warn(
@@ -125,7 +125,7 @@ export class EnvSecretsStore implements SecretsStore {
 
   async delete(key: string, _scope?: SessionScope): Promise<void> {
     void _scope;
-    // SPL-16: same honesty as set() — the refused delete audits 'denied'.
+    // SPL-16: same honesty as set() - the refused delete audits 'denied'.
     if (!this.#allowMutation) {
       console.warn(
         `[graphorin/security] EnvSecretsStore.delete('${key}') is a no-op (read-only by default; pass { allowMutation: true } to enable test-only writes).`,

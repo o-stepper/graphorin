@@ -6,7 +6,7 @@ import {
   postToTokenEndpoint,
 } from '../../src/oauth/index.js';
 
-describe('@graphorin/security/oauth — token-endpoint helpers', () => {
+describe('@graphorin/security/oauth - token-endpoint helpers', () => {
   beforeEach(() => {
     _setTokenEndpointFetcherForTesting(null);
   });

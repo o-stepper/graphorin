@@ -1,5 +1,5 @@
 /**
- * Type-level regression tests. These never run — Vitest compiles them as
+ * Type-level regression tests. These never run - Vitest compiles them as
  * part of the test suite, so any breakage here surfaces as a test
  * failure.
  *
@@ -207,7 +207,7 @@ describe('public type surface', () => {
     expectTypeOf<SecretValue>().toHaveProperty('toJSON');
     // [Symbol.toPrimitive], [SECRET_VALUE_BRAND] and the
     // [Symbol.for('nodejs.util.inspect.custom')] entry are well-known
-    // symbol-keyed properties — toHaveProperty cannot type-check those;
+    // symbol-keyed properties - toHaveProperty cannot type-check those;
     // the in-source `interface SecretValue { ... }` declaration carries
     // the structural lock.
   });

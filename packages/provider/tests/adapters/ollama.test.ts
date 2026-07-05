@@ -1,5 +1,5 @@
 /**
- * Coverage for `ollamaAdapter` — feeds a fixture `fetchImpl` returning
+ * Coverage for `ollamaAdapter` - feeds a fixture `fetchImpl` returning
  * a hand-built ndjson `ReadableStream`. Trust-class refusal /
  * acknowledgement and per-tier WARN logging are exercised.
  */
@@ -50,7 +50,7 @@ async function collect(stream: AsyncIterable<ProviderEvent>): Promise<ProviderEv
   return out;
 }
 
-describe('ollamaAdapter — trust class', () => {
+describe('ollamaAdapter - trust class', () => {
   it('refuses to start on a public-cleartext baseUrl', () => {
     expect(() =>
       ollamaAdapter({
@@ -109,7 +109,7 @@ describe('ollamaAdapter — trust class', () => {
   });
 });
 
-describe('ollamaAdapter — streaming', () => {
+describe('ollamaAdapter - streaming', () => {
   it('accumulates text-delta and emits finish with mapped usage', async () => {
     const provider = ollamaAdapter({
       model: 'llama3.1',

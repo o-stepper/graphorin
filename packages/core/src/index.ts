@@ -1,5 +1,5 @@
 /**
- * @graphorin/core — types, contracts, and utilities for the Graphorin
+ * @graphorin/core - types, contracts, and utilities for the Graphorin
  * framework. Dependency-free root package every other `@graphorin/*`
  * package depends on.
  *

@@ -69,7 +69,7 @@ describe('resolveSandbox', () => {
   });
 });
 
-describe('SDF-10 — untrusted-tier wall-clock timeout floor', () => {
+describe('SDF-10 - untrusted-tier wall-clock timeout floor', () => {
   it('an override timeoutMs:0 on the untrusted tier is ignored, yielding a positive forced timeout', () => {
     const policy = resolveSandbox({
       trustLevel: 'untrusted',

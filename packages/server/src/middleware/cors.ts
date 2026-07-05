@@ -28,7 +28,7 @@ export function createCorsMiddleware(
     const isPreflight =
       c.req.method === 'OPTIONS' && c.req.header('access-control-request-method') !== undefined;
     if (origin === undefined) {
-      // Same-origin request — proceed without CORS headers.
+      // Same-origin request - proceed without CORS headers.
       if (isPreflight) {
         return c.body(null, 204);
       }
@@ -41,7 +41,7 @@ export function createCorsMiddleware(
         return c.body(null, 204);
       }
       // Pass the request through but withhold the CORS allow header so
-      // the browser blocks it; do NOT short-circuit the request — the
+      // the browser blocks it; do NOT short-circuit the request - the
       // server-to-server flow must still receive a normal response.
       await next();
       return;

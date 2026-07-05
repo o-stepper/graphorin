@@ -4,7 +4,7 @@
  *
  * Pre-fix the gate ran first on raw `call.args`: a human could approve
  * invalid args X, the repair hook then rewrote them into schema-valid Y,
- * and Y executed without re-gating — a TOCTOU on a security control.
+ * and Y executed without re-gating - a TOCTOU on a security control.
  * Predicates also received raw pre-coercion values their typed signature
  * never promised.
  */
@@ -52,7 +52,7 @@ describe('TL-13: approval evaluates validated input, after repair', () => {
     });
 
     expect(repair.repair).toHaveBeenCalledTimes(1);
-    // The gate saw the repaired args — the exact payload that executed —
+    // The gate saw the repaired args - the exact payload that executed -
     // never the invalid originals.
     expect(seenByGate).toEqual([{ amountUsd: 42 }]);
     expect(executed).toEqual([{ amountUsd: 42 }]);
@@ -70,7 +70,7 @@ describe('TL-13: approval evaluates validated input, after repair', () => {
         inputSchema: z.object({ body: z.string().transform((s) => s.trim()) }),
         needsApproval: (input) => {
           predicateSaw.push(input);
-          return false; // no approval needed — we only probe what it saw
+          return false; // no approval needed - we only probe what it saw
         },
         sideEffectClass: 'side-effecting',
         async execute(input) {

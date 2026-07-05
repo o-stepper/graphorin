@@ -8,7 +8,7 @@ import {
 
 import { buildSyntheticServerMetadata, resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — Dynamic Client Registration', () => {
+describe('@graphorin/security/oauth - Dynamic Client Registration', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });

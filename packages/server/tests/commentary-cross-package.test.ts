@@ -46,7 +46,7 @@ describe('Commentary catalogue cross-package equivalence', () => {
     // Run the delivery-layer sanitizer twice (which models: session-
     // output sanitizer ran first via `Session.push`, then the
     // delivery-layer sanitizer fires on the wire). The second pass
-    // must be bytes-equal — that is the load-bearing property the
+    // must be bytes-equal - that is the load-bearing property the
     // RB-55 defense-in-depth posture relies on.
     const sanitizer = createDeliveryCommentarySanitizer();
     const original = {

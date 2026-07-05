@@ -22,7 +22,7 @@ import { ensureFileMode, verifyFileMode } from '../../src/hardening/file-modes.j
 
 const isPosix = process.platform !== 'win32';
 
-describe('hardening — applyProcessHardening + ensureFileMode integration', () => {
+describe('hardening - applyProcessHardening + ensureFileMode integration', () => {
   if (!isPosix) {
     it.skip('skipped on Windows: POSIX modes are not honoured by NTFS', () => {
       /* noop */

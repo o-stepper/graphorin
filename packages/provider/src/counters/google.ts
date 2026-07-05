@@ -1,5 +1,5 @@
 /**
- * `GoogleAPICounter` — placeholder counter that delegates to
+ * `GoogleAPICounter` - placeholder counter that delegates to
  * `JsTiktokenCounter('cl100k_base')` for now. The full Google `:countTokens`
  * implementation lands in Phase 16 alongside the optional pricing
  * refresher; for v0.1 the proxy is sufficient (verified within ±5% on

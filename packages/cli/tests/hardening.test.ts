@@ -24,7 +24,7 @@ describe('applyHardeningEarly', () => {
 
   it('exits 1 with an actionable error when the process is running as root on POSIX', () => {
     if (process.platform === 'win32') {
-      // Skip — Windows does not honour POSIX UIDs.
+      // Skip - Windows does not honour POSIX UIDs.
       return;
     }
     vi.spyOn(process as unknown as { geteuid(): number }, 'geteuid').mockReturnValue(0);

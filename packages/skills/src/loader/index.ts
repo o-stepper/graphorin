@@ -3,23 +3,23 @@
  *
  * Implements three-tier progressive disclosure:
  *
- * - **Tier 1** (always): {@link Skill.metadata} — parsed at load
+ * - **Tier 1** (always): {@link Skill.metadata} - parsed at load
  *   time from the SKILL.md frontmatter.
- * - **Tier 2** (on activation): {@link Skill.body} — the loader
+ * - **Tier 2** (on activation): {@link Skill.body} - the loader
  *   reads the markdown body lazily; subsequent calls return the
  *   cached value.
- * - **Tier 3** (on demand): {@link Skill.resources} — the loader
+ * - **Tier 3** (on demand): {@link Skill.resources} - the loader
  *   walks the skill directory lazily; resource bytes are only read
  *   when {@link SkillResource.read} is invoked.
  *
  * The loader supports four sources:
  *
- * - `{ kind: 'folder', path }`        — read SKILL.md from disk.
- * - `{ kind: 'npm-package', ... }`    — install via the supply-chain
+ * - `{ kind: 'folder', path }`        - read SKILL.md from disk.
+ * - `{ kind: 'npm-package', ... }`    - install via the supply-chain
  *   helper from `@graphorin/security/supply-chain`, then read.
- * - `{ kind: 'git-repo', ... }`       — shallow-clone via the
+ * - `{ kind: 'git-repo', ... }`       - shallow-clone via the
  *   supply-chain helper, then read.
- * - `{ kind: 'inline', skill: ... }`  — caller supplies the parsed
+ * - `{ kind: 'inline', skill: ... }`  - caller supplies the parsed
  *   payload; the loader only validates the frontmatter. Useful for
  *   tests and bundled defaults.
  *
@@ -296,8 +296,8 @@ async function loadFromFolder(
   // 'trusted'/'trusted-with-scripts' is capped at 'unknown' so a downloaded
   // skill cannot promote itself out of the sandbox + taint-marking. The cap
   // applies to EVERY source kind (mcp-skills-01): npm/git sources previously
-  // took the SKILL.md's self-declared level verbatim, and — because the
-  // signature trust root allows an inline key in the same SKILL.md — a
+  // took the SKILL.md's self-declared level verbatim, and - because the
+  // signature trust root allows an inline key in the same SKILL.md - a
   // malicious package could inline its own key, self-sign, declare
   // 'trusted', and load unsandboxed with no operator involvement. The
   // resolved level is written back onto the metadata so every downstream
@@ -321,7 +321,7 @@ async function loadFromFolder(
         ...(options.signal === undefined ? {} : { signal: options.signal }),
       });
     } catch (err) {
-      // Surface the signature failure as a diagnostic — the supply-
+      // Surface the signature failure as a diagnostic - the supply-
       // chain installer is the one that decides whether to refuse the
       // install based on the resolved trust policy. The folder loader
       // tolerates an unverifiable signature so operators can iterate
@@ -569,7 +569,7 @@ function buildMetadata(
   // Phase 08 § "Frontmatter validator" recognises four explicit trust
   // levels: 'trusted' | 'trusted-with-scripts' | 'unknown' |
   // 'untrusted'. A skill that did not declare the field is treated as
-  // 'unknown' (sandbox forced; signature optional) — that is the
+  // 'unknown' (sandbox forced; signature optional) - that is the
   // default-deny posture per DEC-148 risk mitigation.
   const trustLevel: SkillsTrustLevel = (() => {
     if (
@@ -631,7 +631,7 @@ function appendUntrustedHandoffDiagnostic(
 ): void {
   // Untrusted skills that declared `filter: full` are an explicit
   // attempt to exfiltrate the entire conversation through a sub-agent
-  // — Phase 08 / ADR-040 mandate that we WARN and ignore. The agent
+  // - Phase 08 / ADR-040 mandate that we WARN and ignore. The agent
   // runtime in Phase 12 will refuse the filter regardless of this
   // diagnostic.
   if (metadata.graphorinTrustLevel === 'untrusted') {
@@ -744,8 +744,8 @@ function extractTrustLevel(source: SkillSource): SkillsTrustLevel | undefined {
 }
 
 /**
- * Cap a folder skill's self-declared trust level. A directory on disk —
- * possibly downloaded from the internet — cannot self-promote to a trusted
+ * Cap a folder skill's self-declared trust level. A directory on disk -
+ * possibly downloaded from the internet - cannot self-promote to a trusted
  * tier without an operator override (RP-9): `trusted` /
  * `trusted-with-scripts` collapse to `'unknown'` (sandbox forced, signature
  * optional, outputs taint-marked), while `untrusted` / `unknown` pass
@@ -801,7 +801,7 @@ export function requireHandoffInputFilter(metadata: SkillMetadata): HandoffInput
   if (metadata.graphorinTrustLevel === 'untrusted') {
     throw new InputFilterRequiredError(metadata.name);
   }
-  // `'unknown'` skills require an explicit declaration too — default-
+  // `'unknown'` skills require an explicit declaration too - default-
   // deny posture per Phase 08. Trusted skills inherit the framework's
   // bounded `lastN(10)` default.
   if (metadata.graphorinTrustLevel === 'unknown') {

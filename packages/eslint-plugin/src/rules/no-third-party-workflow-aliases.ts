@@ -5,10 +5,10 @@
  * library-specific names that Graphorin deliberately renamed). The
  * intent is legal hygiene: the framework's primitives are
  * `Directive`, `Dispatch`, `pause`, `LatestValue`, `Reducer`,
- * `Stream`, `Barrier`, `Ephemeral`, `AnyValue` — we never reuse
+ * `Stream`, `Barrier`, `Ephemeral`, `AnyValue` - we never reuse
  * external library identifiers in the public API.
  *
- * The forbidden list is intentionally narrow — we only flag the
+ * The forbidden list is intentionally narrow - we only flag the
  * canonical proper-noun primitives third-party workflow engines use.
  * Rare false positives (e.g. an internal helper named `Send` for an
  * unrelated reason) are mitigated by the per-occurrence opt-out
@@ -77,7 +77,7 @@ const rule: Rule.RuleModule = {
 };
 
 function isInImportSpecifier(node: Identifier): boolean {
-  // Skip identifiers used as keys / property names — those are
+  // Skip identifiers used as keys / property names - those are
   // typically referencing external library exports the user is
   // intentionally importing into a renamed local symbol.
   const parent = (node as Identifier & { parent?: Node }).parent;

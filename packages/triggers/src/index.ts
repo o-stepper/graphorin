@@ -1,5 +1,5 @@
 /**
- * @graphorin/triggers — durable cron / interval / idle / event
+ * @graphorin/triggers - durable cron / interval / idle / event
  * trigger scheduler for the Graphorin framework.
  *
  * @packageDocumentation
@@ -17,9 +17,9 @@ export const VERSION = '0.5.0';
  * Catch-up policy applied when a trigger missed one or more fires
  * while the scheduler was offline.
  *
- * - `'none'` — drop missed fires (default; safest for personal-assistant scenarios).
- * - `'last'` — fire once on resume (best for cron-style daily jobs).
- * - `'all'` — fire each missed run up to `maxCatchupRuns` within `catchupWindowMs`.
+ * - `'none'` - drop missed fires (default; safest for personal-assistant scenarios).
+ * - `'last'` - fire once on resume (best for cron-style daily jobs).
+ * - `'all'` - fire each missed run up to `maxCatchupRuns` within `catchupWindowMs`.
  *
  * @stable
  */
@@ -35,7 +35,7 @@ export interface TriggerOptions {
   /**
    * How far back (from the last successful fire) misses are honored.
    * Catch-up counts REAL missed fires (RP-12), so the window must
-   * exceed the trigger period — a 24h window can never catch up a
+   * exceed the trigger period - a 24h window can never catch up a
    * daily cron whose boundary is itself 24h after the last fire.
    * Default 24h.
    */
@@ -74,7 +74,7 @@ export interface TriggerDeclaration {
 
 /**
  * Build a cron trigger declaration. The expression is validated
- * eagerly — a malformed cron expression throws at registration time,
+ * eagerly - a malformed cron expression throws at registration time,
  * not at first fire.
  *
  * @stable
@@ -176,7 +176,7 @@ export interface CreateSchedulerOptions {
   readonly store: TriggerStore;
   /** Default `'lib'`. Server mode skips the lib-mode warning. */
   readonly mode?: 'lib' | 'server';
-  /** Override the wall clock — used by tests. */
+  /** Override the wall clock - used by tests. */
   readonly now?: () => number;
   /**
    * Override `setTimeout`. The callback receives the chosen delay in
@@ -227,7 +227,7 @@ export function createScheduler(options: CreateSchedulerOptions): Scheduler {
   return new SchedulerImpl(options);
 }
 
-/** Module-scoped flag — one WARN per process. */
+/** Module-scoped flag - one WARN per process. */
 let LIB_MODE_WARNED = false;
 
 /**
@@ -243,7 +243,7 @@ export function _resetLibModeWarningForTesting(): void {
 const DEFAULT_CATCHUP_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 /**
- * Node clamps `setTimeout` delays beyond `2^31 - 1` ms to 1 ms — a
+ * Node clamps `setTimeout` delays beyond `2^31 - 1` ms to 1 ms - a
  * quarterly cron would fire immediately in a hot loop (RP-15). Delays
  * above this arm an intermediate wake-up that re-schedules instead.
  */
@@ -281,7 +281,7 @@ class SchedulerImpl implements Scheduler {
       if (!LIB_MODE_WARNED) {
         LIB_MODE_WARNED = true;
         console.warn(
-          `[graphorin/triggers] running in library mode — triggers fire only while the parent process is alive. ` +
+          `[graphorin/triggers] running in library mode - triggers fire only while the parent process is alive. ` +
             `Pass { acknowledgeLibMode: true } to suppress this warning.`,
         );
         this.#publish({ type: 'lib-mode-warning', id: declaration.id });
@@ -379,7 +379,7 @@ class SchedulerImpl implements Scheduler {
       const durationMs = this.#now() - start;
       this.#publish({ type: 'fire-end', id, durationMs });
       const state = await this.#store.get(id);
-      // RP-13: compute the next fire from THIS fire's timestamp — the
+      // RP-13: compute the next fire from THIS fire's timestamp - the
       // persisted state still carries the PREVIOUS lastFiredAt, which
       // for interval triggers yields `prev + interval ≈ now` and an
       // immediate duplicate via the clamped-to-0 delay. Idle triggers
@@ -407,7 +407,7 @@ class SchedulerImpl implements Scheduler {
     } catch (err) {
       const durationMs = this.#now() - start;
       this.#publish({ type: 'fire-error', id, error: err, durationMs });
-      // RP-14: the one-shot timer is consumed by this fire — recompute
+      // RP-14: the one-shot timer is consumed by this fire - recompute
       // and persist the next fire WITHOUT recording a successful fire
       // (lastFiredAt stays put), and re-arm, so a single callback
       // failure cannot permanently silence a daily cron.
@@ -428,7 +428,7 @@ class SchedulerImpl implements Scheduler {
           if (this.#started) this.#schedule(id, updated);
         }
       } catch {
-        // Best-effort re-arm — a store failure here must not become an
+        // Best-effort re-arm - a store failure here must not become an
         // unhandled rejection out of the timer callback.
       }
     }
@@ -468,7 +468,7 @@ class SchedulerImpl implements Scheduler {
   recordActivity(): void {
     this.#lastActivity = this.#now();
     // periphery (P-14): never (re)arm idle timers on a scheduler that
-    // is not started — a stopped scheduler firing callbacks is a
+    // is not started - a stopped scheduler firing callbacks is a
     // lifecycle violation. The activity timestamp is still recorded so
     // a later start() computes the idle window correctly.
     if (!this.#started) return;
@@ -538,7 +538,7 @@ class SchedulerImpl implements Scheduler {
         // periphery-11: after downtime `last + interval` is in the past;
         // the schedule clamp turned that into an IMMEDIATE fire even
         // under `catchupPolicy: 'none'` ("drop missed fires"). Advance
-        // to the next FUTURE boundary on the original cadence — missed
+        // to the next FUTURE boundary on the original cadence - missed
         // boundaries are the catch-up machinery's business, not the
         // base schedule's. (Cron already behaves this way:
         // `nextFireAfter(now)` is always future.)
@@ -566,7 +566,7 @@ class SchedulerImpl implements Scheduler {
     if (lastFired < now - state.catchupWindowMs) return;
 
     // RP-12: count the REAL missed fires by walking the schedule from
-    // the last successful fire to now — a restart with zero crossed
+    // the last successful fire to now - a restart with zero crossed
     // boundaries must apply zero catch-up (the old code fired `1` /
     // `maxCatchupRuns` times unconditionally).
     const SCAN_CAP = 1000;
@@ -619,7 +619,7 @@ class SchedulerImpl implements Scheduler {
     if (delay < 0) delay = 0;
 
     if (delay > MAX_TIMEOUT_MS) {
-      // RP-15: chunk the wait — the intermediate wake-up re-reads the
+      // RP-15: chunk the wait - the intermediate wake-up re-reads the
       // freshest state and re-schedules (it never fires the callback).
       const handle = this.#setTimeout(() => {
         void this.#store

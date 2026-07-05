@@ -93,7 +93,7 @@ describe('llmJudge', () => {
     expect(r.score).toBeCloseTo(0.3);
   });
 
-  it('throws (scorer error) on a refusal with no SCORE marker — not a silent 0', async () => {
+  it('throws (scorer error) on a refusal with no SCORE marker - not a silent 0', async () => {
     // "On a 0-10 scale, I refuse" trips an old first-integer parser into 0.
     const scorer = llmJudge({ provider: buildProvider('On a 0-10 scale, I refuse.') });
     await expect(scorer.score(CASE)).rejects.toThrow(/SCORE/);

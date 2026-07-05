@@ -5,7 +5,7 @@ import { createMCPClientFromSdkTransport } from '../src/client/client.js';
 import type { MCPClient } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MC-6 — tool-definition pinning + list_changed visibility', () => {
+describe('MC-6 - tool-definition pinning + list_changed visibility', () => {
   let client: MCPClient | undefined;
   let dispose: (() => Promise<void>) | undefined;
 

@@ -3,12 +3,12 @@
  * the batch.
  *
  * `executeOne` is designed not to throw, but a user-supplied hook that
- * does — the canonical example is a throwing `runContext.tracer.span` —
+ * does - the canonical example is a throwing `runContext.tracer.span` -
  * used to be swallowed by the parallel pump's empty `.catch(() => {})`
  * plus the final `filter(r => r !== undefined)`, so the completed batch
  * came back SHORTER than the call list. Downstream, the agent then
  * pushed no `role:'tool'` message for the missing id, leaving a dangling
- * `tool_use` that OpenAI-shaped providers reject one step later — a
+ * `tool_use` that OpenAI-shaped providers reject one step later - a
  * confusing, far-from-cause failure. Both dispatch paths (sequential and
  * parallel) must instead synthesize an `execution_failed` outcome for
  * the affected slot.
@@ -92,7 +92,7 @@ describe('TL-12: executeBatch never drops a slot when executeOne rejects', () =>
       stepNumber: 1,
     });
 
-    // The batch keeps its length and order — no silent drop.
+    // The batch keeps its length and order - no silent drop.
     expect(completed.map((c) => c.call.toolCallId)).toEqual(['c-ok-1', 'c-bad', 'c-ok-2']);
     const bad = completed[1]!.outcome;
     expect('kind' in bad && bad.kind).toBe('execution_failed');

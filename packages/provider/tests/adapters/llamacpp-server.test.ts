@@ -1,5 +1,5 @@
 /**
- * Coverage for `llamaCppServerAdapter` — feeds a fixture `fetchImpl`
+ * Coverage for `llamaCppServerAdapter` - feeds a fixture `fetchImpl`
  * returning hand-built SSE chunks. Trust-class refusal, bearer-auth
  * header injection, tool-call streaming, finish reason mapping, and
  * the `generate()` one-shot are all exercised here.
@@ -49,7 +49,7 @@ async function collect(stream: AsyncIterable<ProviderEvent>): Promise<ProviderEv
   return out;
 }
 
-describe('llamaCppServerAdapter — trust class', () => {
+describe('llamaCppServerAdapter - trust class', () => {
   it('refuses to start on a public-cleartext baseUrl', () => {
     expect(() =>
       llamaCppServerAdapter({
@@ -72,7 +72,7 @@ describe('llamaCppServerAdapter — trust class', () => {
   });
 });
 
-describe('llamaCppServerAdapter — streaming', () => {
+describe('llamaCppServerAdapter - streaming', () => {
   it('streams text-delta chunks and emits finish with mapped usage', async () => {
     const provider = llamaCppServerAdapter({
       model: 'qwen2.5',
@@ -178,7 +178,7 @@ describe('llamaCppServerAdapter — streaming', () => {
   });
 });
 
-describe('llamaCppServerAdapter — generate()', () => {
+describe('llamaCppServerAdapter - generate()', () => {
   it('returns text + toolCalls + usage from a single JSON response', async () => {
     const provider = llamaCppServerAdapter({
       model: 'qwen2.5',

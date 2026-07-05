@@ -2,7 +2,7 @@
  * Helper functions that bridge skill-bundled `Tool` records into the
  * `@graphorin/tools` registry.
  *
- * The skills loader does not import the runtime registry directly —
+ * The skills loader does not import the runtime registry directly -
  * downstream callers (the agent runtime in Phase 12, the test suite,
  * and any user-supplied bootstrap script) materialise the actual
  * `Tool[]` from the skill module surface and feed each one through
@@ -89,7 +89,7 @@ export function stampSkillToolFromMetadata<TInput = unknown, TOutput = unknown, 
     kind: 'skill' as const,
     skillName: metadata.name,
     // 'unknown' inherits the strict sandbox policy of 'untrusted', so
-    // the agent runtime registers the source as untrusted too — that
+    // the agent runtime registers the source as untrusted too - that
     // forces the inbound-sanitization default
     // ('detect-and-strip-and-wrap') and the precedence ladder used by
     // collision resolution to demote it relative to first-party

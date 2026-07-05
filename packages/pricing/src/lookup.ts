@@ -1,5 +1,5 @@
 /**
- * `lookupPrice(...)` — resolve a per-token price for a given
+ * `lookupPrice(...)` - resolve a per-token price for a given
  * (provider, model) pair against a snapshot. Returns `null` when the
  * model is unknown and emits one WARN per process-lifetime per
  * unknown (provider, model) pair.
@@ -25,7 +25,7 @@ export function setLookupWarnSink(sink: (line: string) => void): void {
 let WARN_SINK: (line: string) => void = (line) => console.warn(line);
 
 /**
- * @internal — exposed for tests so the WARN-once cache can be reset.
+ * @internal - exposed for tests so the WARN-once cache can be reset.
  */
 export function _resetLookupWarningsForTesting(): void {
   WARNED.clear();
@@ -68,7 +68,7 @@ export function lookupPrice(
     if (alias !== undefined) return entryToResult(alias, snapshot);
   }
 
-  // Wildcard fallback — used by local providers (`provider: 'ollama', model: '*'`).
+  // Wildcard fallback - used by local providers (`provider: 'ollama', model: '*'`).
   const wildcard = snapshot.entries.find(
     (entry) => entry.provider === args.provider && entry.model === '*',
   );
@@ -113,14 +113,14 @@ function warnOnce(args: LookupPriceArgs): void {
  * for a single LLM call without instantiating the cost tracker.
  *
  * Token-count contract (PS-19):
- * - `inputTokens` **excludes** `cachedReadTokens` and `cacheWriteTokens` —
+ * - `inputTokens` **excludes** `cachedReadTokens` and `cacheWriteTokens` -
  *   the cache legs are billed separately at their own rates, so pass the
  *   non-cached prompt count to avoid double-billing.
  * - `reasoningTokens` are billed at `outputUsdPerToken` unless the model entry
  *   declares an explicit `reasoningUsdPerToken`.
  * - `cacheWriteTokens` are billed at `cacheWriteUsdPerToken` when the entry
  *   declares one, else at the full input rate (a cache write is at minimum a
- *   normal input token — the fallback never under-bills relative to no cache).
+ *   normal input token - the fallback never under-bills relative to no cache).
  *
  * @stable
  */
@@ -151,7 +151,7 @@ export function calculateCost(
   }
   if (args.reasoningTokens !== undefined) {
     // PS-19: reasoning tokens follow completion (output) pricing unless the
-    // entry declares an explicit `reasoningUsdPerToken` — the documented
+    // entry declares an explicit `reasoningUsdPerToken` - the documented
     // contract that was previously billed at $0 for every bundled entry.
     amount += (price.reasoningUsdPerToken ?? price.outputUsdPerToken) * args.reasoningTokens;
   }

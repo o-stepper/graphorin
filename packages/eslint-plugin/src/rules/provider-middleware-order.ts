@@ -91,9 +91,9 @@ function extractFactoryNames(arr: ArrayExpression): { name: string; node: Node }
   for (const elt of arr.elements) {
     if (elt === null) continue;
     // Each element is one of:
-    //   - `withTracing()` / `withRetry({...})` — CallExpression with Identifier callee
-    //   - `withTracing` (factory ref) — Identifier
-    //   - `provider.withTracing()` — CallExpression with MemberExpression callee
+    //   - `withTracing()` / `withRetry({...})` - CallExpression with Identifier callee
+    //   - `withTracing` (factory ref) - Identifier
+    //   - `provider.withTracing()` - CallExpression with MemberExpression callee
     if (elt.type === 'Identifier') {
       out.push({ name: (elt as Identifier).name, node: elt });
       continue;

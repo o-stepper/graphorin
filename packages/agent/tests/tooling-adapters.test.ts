@@ -41,7 +41,7 @@ function fakeSandbox(id: string): SandboxImpl {
   };
 }
 
-/** A scope-free `Memory` stand-in — the adapters only check presence. */
+/** A scope-free `Memory` stand-in - the adapters only check presence. */
 const fakeMemory = {} as unknown as Memory;
 
 /** Yield a macrotask so a parked `drain()` consumer can resume + re-park. */
@@ -49,7 +49,7 @@ const tick = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 0
 
 // --- Adapter A --------------------------------------------------------------
 
-describe('Adapter A — buildSecretResolver', () => {
+describe('Adapter A - buildSecretResolver', () => {
   it('resolves a key via an injected backend', async () => {
     const value = SecretValue.fromString('hunter2');
     const backend = vi.fn(async (key: string) => (key === 'env://OK' ? value : null));
@@ -64,7 +64,7 @@ describe('Adapter A — buildSecretResolver', () => {
     await expect(resolver.resolve('env://MISSING')).resolves.toBeNull();
   });
 
-  it('does not enforce ACL itself — it forwards every key to the backend', async () => {
+  it('does not enforce ACL itself - it forwards every key to the backend', async () => {
     // ACL lives in the executor's accessor (`enforceSecretAcl`), not here.
     const backend = vi.fn(async () => null);
     const resolver = buildSecretResolver({ backend });
@@ -80,7 +80,7 @@ describe('Adapter A — buildSecretResolver', () => {
 
 // --- Adapter B --------------------------------------------------------------
 
-describe('Adapter B — buildSandboxResolver', () => {
+describe('Adapter B - buildSandboxResolver', () => {
   it('returns null for the "none" kind and any unrecognised kind', () => {
     const resolve = buildSandboxResolver();
     expect(resolve(policy('none'))).toBeNull();
@@ -132,7 +132,7 @@ const ALL_TIERS = [
   'untrusted',
 ] as const;
 
-describe('Adapter C — buildMemoryGuard', () => {
+describe('Adapter C - buildMemoryGuard', () => {
   it('returns a null factory and no reader when memory is undefined', () => {
     const wiring = buildMemoryGuard(undefined);
     expect(wiring.memoryRegionReader).toBeUndefined();
@@ -160,7 +160,7 @@ describe('Adapter C — buildMemoryGuard', () => {
   it('returns null for the memory-aware tier when no apiBoundary options are supplied', () => {
     const wiring = buildMemoryGuard(fakeMemory);
     expect(wiring.memoryGuardFactory('memory-aware')).toBeNull();
-    // Other tiers still build — only memory-aware needs the recorder.
+    // Other tiers still build - only memory-aware needs the recorder.
     expect(wiring.memoryGuardFactory('unknown')).not.toBeNull();
   });
 
@@ -192,7 +192,7 @@ describe('createMemoryRegionReader', () => {
 
 // --- Adapter D --------------------------------------------------------------
 
-describe('Adapter D — buildToolTokenCounter', () => {
+describe('Adapter D - buildToolTokenCounter', () => {
   it('defaults to the @graphorin/tools heuristic (4 chars/token)', () => {
     const counter = buildToolTokenCounter();
     expect(counter).toBe(countTokensHeuristic);
@@ -213,7 +213,7 @@ describe('Adapter D — buildToolTokenCounter', () => {
 
 // --- Adapter E --------------------------------------------------------------
 
-describe('Adapter E — createExecutorEventBridge', () => {
+describe('Adapter E - createExecutorEventBridge', () => {
   it('drains buffered events in arrival order after close', async () => {
     const bridge = createExecutorEventBridge<number>();
     bridge.sink(1);
@@ -295,9 +295,9 @@ describe('Adapter E — createExecutorEventBridge', () => {
   });
 });
 
-describe('SDF-1 — memory guard snapshot/verify wired through the loop', () => {
+describe('SDF-1 - memory guard snapshot/verify wired through the loop', () => {
   // Functional (not perf) test; loaded windows CI runners blow the 5s
-  // default — give the agent loop + guard audits explicit headroom.
+  // default - give the agent loop + guard audits explicit headroom.
   it('a memoryGuardTier tool with memory wired emits memory:modification:before/after audits', {
     timeout: 20_000,
   }, async () => {

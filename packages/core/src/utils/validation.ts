@@ -43,7 +43,7 @@ export type ValidationResult<T> =
 
 /**
  * Synchronous validation wrapper. Does **not** swallow errors thrown by
- * the schema's transformations — only normalizes the success / failure
+ * the schema's transformations - only normalizes the success / failure
  * signal.
  *
  * @stable

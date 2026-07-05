@@ -144,7 +144,7 @@ beforeEach(() => {
   _resetBypassWarningForTesting();
 });
 
-describe('createConflictPipeline — defaults', () => {
+describe('createConflictPipeline - defaults', () => {
   it('exposes the bundled English locale pack and default thresholds', () => {
     const pipeline = createConflictPipeline();
     expect(pipeline.localePack.id).toBe('en');
@@ -171,7 +171,7 @@ describe('createConflictPipeline — defaults', () => {
   });
 });
 
-describe('runConflictPipeline — outcomes', () => {
+describe('runConflictPipeline - outcomes', () => {
   it('admits when there are no existing facts (fresh user)', async () => {
     const pipeline = createConflictPipeline();
     const conflicts = recordingConflictStore();
@@ -282,7 +282,7 @@ describe('runConflictPipeline — outcomes', () => {
   });
 });
 
-describe('SemanticMemory.remember — pipeline integration', () => {
+describe('SemanticMemory.remember - pipeline integration', () => {
   it('regression: "lives in Boston" → "moved to Seattle" produces supersede', async () => {
     const memory = createMemory({
       store: createInMemoryStore({ withConflictStore: true }),
@@ -363,7 +363,7 @@ describe('SemanticMemory.remember — pipeline integration', () => {
   });
 });
 
-describe('runConflictPipeline — free-function helper', () => {
+describe('runConflictPipeline - free-function helper', () => {
   it('mirrors createConflictPipeline behaviour for one-shot calls', async () => {
     const conflicts = recordingConflictStore();
     const candidate = fact('lives in Boston', { id: 'cand-once' });
@@ -395,13 +395,13 @@ describe('runConflictPipeline — free-function helper', () => {
       deps,
       options: { thresholds: { cold: 0.1, nearDup: 0.6, hot: 0.9 } },
     });
-    // No regex marker, subject/predicate "Mochi prefers" vs "Mochi enjoys" —
+    // No regex marker, subject/predicate "Mochi prefers" vs "Mochi enjoys" -
     // different predicates, so Stage 4 continues; conflict-check zone → defer.
     expect(decision.kind).toBe('pending');
   });
 });
 
-describe('runConflictPipeline — cancellation', () => {
+describe('runConflictPipeline - cancellation', () => {
   it('throws AbortError when the supplied signal is already aborted', async () => {
     const pipeline = createConflictPipeline();
     const conflicts = recordingConflictStore();
@@ -437,13 +437,13 @@ describe('runConflictPipeline — cancellation', () => {
   });
 });
 
-describe('runConflictPipeline — vector candidate filtering', () => {
+describe('runConflictPipeline - vector candidate filtering', () => {
   it('excludes the candidate fact from its own search hits (no self-dedup)', async () => {
     const pipeline = createConflictPipeline();
     const conflicts = recordingConflictStore();
     const candidate = fact('hello world', { id: 'self-id' });
     // The fake store returns the candidate itself among the vector
-    // hits — the orchestrator must filter it out so the pipeline does
+    // hits - the orchestrator must filter it out so the pipeline does
     // not "dedup against self".
     const deps = fakeStore(
       [{ record: fact('hello world', { id: 'self-id' }), score: 0.99 }],
@@ -455,7 +455,7 @@ describe('runConflictPipeline — vector candidate filtering', () => {
   });
 });
 
-describe('runConflictPipeline — performance', () => {
+describe('runConflictPipeline - performance', () => {
   it('full pipeline median ≤ 50 ms per call on a 50-fact corpus (smoke benchmark)', async () => {
     // RB-02 §8 / Phase 10b spec target ≤ 5 ms per remember excluding
     // the embedder roundtrip. This smoke benchmark uses a 50ms budget
@@ -489,7 +489,7 @@ describe('runConflictPipeline — performance', () => {
   });
 });
 
-describe('runConflictPipeline — span emission', () => {
+describe('runConflictPipeline - span emission', () => {
   it('emits a memory.conflict span per remember(...) with stage + decision attrs', async () => {
     const attrs: Record<string, unknown> = {};
     const recordingTracer: Tracer = {

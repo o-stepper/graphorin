@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
  *
  * MD5 is **not** collision-resistant (practical chosen-prefix
  * collisions exist) and is **not** used as a cryptographic primitive
- * here — it is a fast content-addressing convenience where an
+ * here - it is a fast content-addressing convenience where an
  * adversarial collision merely suppresses a duplicate memory write.
  * Do not use this helper for password hashing, MAC, tamper evidence,
  * or any other security-sensitive use case (use `@graphorin/security`
@@ -26,11 +26,11 @@ export function md5(content: string | Uint8Array): string {
 
 /**
  * Pure-JS XXH32 implementation. Used by the memory-modification guard
- * — fast, non-cryptographic content fingerprinting (`xxhash(content)`
+ * - fast, non-cryptographic content fingerprinting (`xxhash(content)`
  * tracks whether a tool's view of memory has shifted while the LLM was
  * thinking).
  *
- * Not security-sensitive — never use for tampering detection of an
+ * Not security-sensitive - never use for tampering detection of an
  * untrusted attacker; for that the audit log uses SHA-256 (in
  * `@graphorin/security`).
  *

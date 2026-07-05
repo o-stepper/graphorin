@@ -1,5 +1,5 @@
 /**
- * `predicate` — passes when the caller-supplied predicate returns
+ * `predicate` - passes when the caller-supplied predicate returns
  * truthy. The escape hatch for ad-hoc, project-specific scoring rules.
  *
  * @packageDocumentation

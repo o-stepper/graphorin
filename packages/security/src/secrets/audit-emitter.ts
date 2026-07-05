@@ -31,7 +31,7 @@ export type SecretsAuditDecision = 'success' | 'denied' | 'not-found' | 'error';
 
 /**
  * Optional identifier of who initiated the event. The secrets layer
- * never invents identities — it forwards whatever the per-tool ACL or
+ * never invents identities - it forwards whatever the per-tool ACL or
  * factory caller supplied.
  *
  * @stable
@@ -45,7 +45,7 @@ export interface SecretsAuditActor {
 }
 
 /**
- * One audit event. The payload is intentionally minimal — never carry
+ * One audit event. The payload is intentionally minimal - never carry
  * the secret value itself, only metadata that is safe to log
  * (resolver / store identifier, key name, actor pointer).
  *
@@ -101,7 +101,7 @@ export function _resetSecretsAuditListenersForTesting(): void {
 
 /**
  * Emit an event to every subscriber. Listeners that throw are
- * isolated — a faulty listener never tears down the secret access
+ * isolated - a faulty listener never tears down the secret access
  * path.
  *
  * @stable

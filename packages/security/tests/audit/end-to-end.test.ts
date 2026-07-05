@@ -4,7 +4,7 @@
  * audit_log row → verifyAuditChain green.
  *
  * The DoD line is "All operations subscribe to secretsAuditEmitter
- * from Phase 03a — verified by emitting a fixture event and asserting
+ * from Phase 03a - verified by emitting a fixture event and asserting
  * audit_log row." This test exercises a *real* SecretsStore call in
  * place of a fixture event so the cross-cut between the two
  * sub-phases is regression-protected.
@@ -22,7 +22,7 @@ import { MemorySecretsStore } from '../../src/secrets/stores/memory.js';
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('Phase 03b — end-to-end secrets → audit smoke', () => {
+describe('Phase 03b - end-to-end secrets → audit smoke', () => {
   beforeEach(() => {
     _resetSecretsAuditListenersForTesting();
   });
@@ -40,7 +40,7 @@ describe('Phase 03b — end-to-end secrets → audit smoke', () => {
     expect(value).not.toBeNull();
     await store.delete('OPENAI_KEY');
 
-    // Bridge writes are queued asynchronously — flush microtasks.
+    // Bridge writes are queued asynchronously - flush microtasks.
     await new Promise((resolve) => setImmediate(resolve));
 
     expect(await db.count()).toBe(3);

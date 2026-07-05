@@ -1,6 +1,6 @@
 /**
  * Lifecycle event emitter for the OAuth subsystem. Distinct from the
- * audit emitter (which targets the tamper-evident chain) — these
+ * audit emitter (which targets the tamper-evident chain) - these
  * events drive in-process consumers like the MCP client (Phase 09)
  * that needs to react to `mcp.auth.expired` by triggering re-auth.
  *

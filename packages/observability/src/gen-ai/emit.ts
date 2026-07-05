@@ -2,7 +2,7 @@
  * Emission helpers that attach OpenTelemetry GenAI semantic-convention
  * attributes / events to an existing span.
  *
- * The helpers are deliberately additive — they NEVER remove or rename
+ * The helpers are deliberately additive - they NEVER remove or rename
  * existing attributes. The new `gen_ai.*` family sits on top of the
  * Graphorin-prefixed family. Sensitivity defaults follow the catalogue
  * documented alongside the canonical mapping table:
@@ -84,7 +84,7 @@ export function emitGenAIAttributes<T extends SpanType>(
 
 /**
  * Emit per-message OpenTelemetry GenAI span events. The helper records
- * one event per message — the per-message-event emission shape per the
+ * one event per message - the per-message-event emission shape per the
  * OTel semconv discipline (size-bounded individually; safer than the
  * aggregate-attribute shape on large prompts).
  *

@@ -44,7 +44,7 @@ export function createOAuthClient(options: CreateOAuthClientOptions): OAuthClien
   const inMemoryRefresh = new Map<string, SecretValue>();
   const inMemoryId = new Map<string, SecretValue>();
 
-  // SPL-1: the previously-phantom `keyring:oauth:*` refs become real —
+  // SPL-1: the previously-phantom `keyring:oauth:*` refs become real -
   // tokens are written to / loaded from the supplied SecretsStore under
   // the scheme-stripped key, so refresh / revoke / the MCP bridge work
   // across process restarts.

@@ -12,13 +12,13 @@
  *
  * Priority (configurable), highest preserved → first truncated:
  *
- * 1. **identity** — Layer 1 (`graphorin_memory_base` + agent
+ * 1. **identity** - Layer 1 (`graphorin_memory_base` + agent
  *    instructions). Always preserved; truncated last.
- * 2. **memoryMetadata** — Layer 5. Small (~100-300 tokens).
- * 3. **activeRules** — Layer 4 procedural rules.
- * 4. **workingBlocks** — Layer 3.
- * 5. **activeSkills** — Layer 4 skills metadata cards.
- * 6. **autoRecall** — Layer 6. Lowest priority; truncated first.
+ * 2. **memoryMetadata** - Layer 5. Small (~100-300 tokens).
+ * 3. **activeRules** - Layer 4 procedural rules.
+ * 4. **workingBlocks** - Layer 3.
+ * 5. **activeSkills** - Layer 4 skills metadata cards.
+ * 6. **autoRecall** - Layer 6. Lowest priority; truncated first.
  *
  * @packageDocumentation
  */
@@ -79,7 +79,7 @@ export interface LayerCandidate {
 export type OverflowMode = 'truncate' | 'drop';
 
 /**
- * Output of {@link allocate} — one entry per surviving layer in
+ * Output of {@link allocate} - one entry per surviving layer in
  * priority order, plus a `truncated` flag for observability.
  *
  * @stable
@@ -107,7 +107,7 @@ export interface AllocationResult {
 /**
  * Tags opened-but-not-closed in `text`, innermost-first. A heuristic
  * scanner sized for the engine's own XML-ish layer markup
- * (`<memory_blocks>`, `<memory_rules>`, ...) — self-closing tags are
+ * (`<memory_blocks>`, `<memory_rules>`, ...) - self-closing tags are
  * skipped and an unmatched closer is ignored.
  */
 function unclosedTags(text: string): string[] {
@@ -187,7 +187,7 @@ export async function truncateToTokens(
     .join('');
   let truncated = `${kept}${marker}${closers.length > 0 ? `\n${closers}` : ''}`;
   let tokens = await counter.countText(truncated);
-  // Re-closing may push past the cap — shave the kept body until the
+  // Re-closing may push past the cap - shave the kept body until the
   // whole thing (body + marker + closers) fits. Terminates: `kept`
   // shrinks by ≥1 char per pass, and the empty body fits by the
   // `targetTokens > 0` guard above.

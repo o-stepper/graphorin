@@ -1,8 +1,8 @@
 /**
- * `classifyTool(...)` — derive the memory-guard tier for a tool /
+ * `classifyTool(...)` - derive the memory-guard tier for a tool /
  * skill / mcp invocation per DEC-153.
  *
- * The classifier is **structural** — it inspects:
+ * The classifier is **structural** - it inspects:
  *
  * 1. An explicit `memoryGuardTier` field (operator opt-in).
  * 2. The trust level of the source (`'untrusted'` is decisive).
@@ -30,7 +30,7 @@ export interface ClassifiableTool {
   readonly secretsAllowed?: ReadonlyArray<string>;
   /** Operator opt-in tier override. */
   readonly memoryGuardTier?: MemoryGuardTier;
-  /** Source trust level — `'untrusted'` forces the strict tier. */
+  /** Source trust level - `'untrusted'` forces the strict tier. */
   readonly trustLevel?: 'built-in' | 'user-defined' | 'trusted' | 'untrusted';
 }
 
@@ -50,7 +50,7 @@ export const DEFAULT_MEMORY_TAG_PATTERNS: ReadonlyArray<RegExp> = Object.freeze(
 ]);
 
 /**
- * Classify a tool. Pure function — never inspects runtime state.
+ * Classify a tool. Pure function - never inspects runtime state.
  *
  * Precedence (top wins):
  *   1. Operator-set `memoryGuardTier`.

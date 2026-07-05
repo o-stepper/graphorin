@@ -1,5 +1,5 @@
 /**
- * Tests for auto-importance scoring + episode formation (P1-2) — both
+ * Tests for auto-importance scoring + episode formation (P1-2) - both
  * the pure parse/normalize helpers and the end-to-end behaviour driven
  * through the consolidator standard phase against the in-memory
  * fixture. A branching provider serves the extraction response and the
@@ -15,7 +15,7 @@ import { createInMemoryStore, InMemoryEmbeddingRegistry } from './fixtures/in-me
 
 const SCOPE: SessionScope = { userId: 'alex', sessionId: 's1' };
 
-describe('parseEpisode — defensive episode-summary parsing (P1-2)', () => {
+describe('parseEpisode - defensive episode-summary parsing (P1-2)', () => {
   it('parses a well-formed { summary, importance } object', () => {
     expect(parseEpisode('{"summary":"They planned a trip.","importance":7}')).toEqual({
       summary: 'They planned a trip.',
@@ -46,7 +46,7 @@ describe('parseEpisode — defensive episode-summary parsing (P1-2)', () => {
   });
 });
 
-describe('normalizeImportance — [1,10] poignancy → [0,1] (P1-2)', () => {
+describe('normalizeImportance - [1,10] poignancy → [0,1] (P1-2)', () => {
   it('maps the mid + endpoints and clamps out-of-range values into [0,1]', () => {
     expect(normalizeImportance(5)).toBeCloseTo(0.5, 10);
     expect(normalizeImportance(10)).toBe(1);
@@ -135,7 +135,7 @@ async function setup(opts: {
   return memory;
 }
 
-describe('consolidator standard phase — episode formation (P1-2)', () => {
+describe('consolidator standard phase - episode formation (P1-2)', () => {
   it('auto-forms one quarantined episode with a normalized importance score', async () => {
     const provider = episodeProvider({
       facts: [{ text: 'The user is training for a marathon' }],
@@ -220,7 +220,7 @@ describe('consolidator standard phase — episode formation (P1-2)', () => {
 
     const outcome = await memory.consolidator.fireNow('standard', SCOPE);
     expect(outcome?.episodesFormed).toBe(0);
-    expect(provider.calls.length).toBe(1); // extraction only — no episode summary call
+    expect(provider.calls.length).toBe(1); // extraction only - no episode summary call
     expect((await memory.episodic.search(SCOPE, 'tea', { includeQuarantined: true })).length).toBe(
       0,
     );

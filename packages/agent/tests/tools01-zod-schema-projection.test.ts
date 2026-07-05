@@ -3,8 +3,8 @@
  * documented way, and what every first-party tool does) must reach the
  * provider as real JSON Schema `parameters`.
  *
- * Pre-fix, `projectSchema` only honoured `toJSON()` — which no Zod schema
- * has — and passed the raw schema object through, so OpenAI-shaped /
+ * Pre-fix, `projectSchema` only honoured `toJSON()` - which no Zod schema
+ * has - and passed the raw schema object through, so OpenAI-shaped /
  * Ollama / vercel adapters serialised `{"_def":...}` internals (and MCP
  * validators serialised `{}`) as the function-calling schema. The fixture
  * suite masked it by hand-crafting `toJSON` on every test schema; this
@@ -84,7 +84,7 @@ describe('tools-01: plain-Zod tool schemas project to JSON Schema on the wire', 
     const def = toolDefsPerStep[0]?.find((d) => d.name === 'refund_order');
     expect(def).toBeDefined();
     // The definition is what the adapters ship verbatim as `parameters` /
-    // `input_schema` — it must be JSON Schema, not Zod internals.
+    // `input_schema` - it must be JSON Schema, not Zod internals.
     expect(def?.inputSchema).toMatchObject({
       type: 'object',
       required: ['orderId', 'amountUsd'],

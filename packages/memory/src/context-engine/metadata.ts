@@ -1,5 +1,5 @@
 /**
- * `gatherMemoryMetadata(...)` — implements the
+ * `gatherMemoryMetadata(...)` - implements the
  * {@link Memory.metadata} surface for Phase 10d. Aggregates
  * per-tier counts + last-consolidation timestamps + active
  * embedder id + active locale.
@@ -29,7 +29,7 @@ export interface MemoryMetadataDeps {
 }
 
 /**
- * Build the {@link MemoryMetadata} block. Pure async — no side
+ * Build the {@link MemoryMetadata} block. Pure async - no side
  * effects beyond the storage reads.
  *
  * @stable
@@ -38,7 +38,7 @@ export async function gatherMemoryMetadata(
   scope: SessionScope,
   deps: MemoryMetadataDeps,
 ): Promise<MemoryMetadata> {
-  // CE-5 / MST-6: real `COUNT(*)` surfaces per tier — the old
+  // CE-5 / MST-6: real `COUNT(*)` surfaces per tier - the old
   // `search({ query: '*', topK: 1 })` probe was capped at 1 and matched zero
   // rows on real SQLite (`escapeFtsQuery('*')` tokenises to nothing), so a
   // production deploy told the model "Facts: 0" regardless of content. Counts
@@ -74,7 +74,7 @@ export async function gatherMemoryMetadata(
 
 /**
  * Read a tier's `count(scope)` when the adapter exposes it (CE-5), degrading to
- * `0` for adapters that do not — honest, and never the old 0/1 probe.
+ * `0` for adapters that do not - honest, and never the old 0/1 probe.
  */
 async function countOrZero(
   store: { count?(scope: SessionScope): Promise<number> },

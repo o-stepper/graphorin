@@ -1,5 +1,5 @@
 /**
- * Host-bridged source execution — the sandbox primitive behind
+ * Host-bridged source execution - the sandbox primitive behind
  * code-mode / programmatic tool calling (P1-2).
  *
  * The four built-in adapters ({@link createNoneSandbox} et al.) run a
@@ -14,7 +14,7 @@
  * the audited handler runtimes stay byte-identical. It spawns a
  * `node:worker_threads` `Worker`, evaluates the supplied source as the
  * body of an `async (tools) => { … }` function, and exposes `tools` as a
- * set of async functions — one per allowed name — that round-trip each
+ * set of async functions - one per allowed name - that round-trip each
  * call to the parent over the worker `MessagePort`. The parent services
  * the call via the injected {@link BridgedSourceOptions.dispatch} hook
  * (the agent wires this to the real {@link ToolExecutor}, so per-tool
@@ -24,13 +24,13 @@
  * Isolation is the `worker-threads` tier's: a fresh V8 isolate per run,
  * an empty environment (the worker is constructed with `env: {}` and the
  * runtime scrubs `process.env` before user code runs, so host secrets
- * are not visible — TL-9), best-effort `node:fs` / `node:net` import
+ * are not visible - TL-9), best-effort `node:fs` / `node:net` import
  * blocking and a `fetch` refusal (reused from
  * {@link createWorkerThreadsSandbox}), a hard wall-clock timeout via
  * `worker.terminate()`, an optional memory ceiling, and `AbortSignal`
  * cancellation. The **only** channel from the
  * worker to the host is the tool-call RPC, and it serves none but the
- * `allowedTools` names — there is no way to obtain a reference to the
+ * `allowedTools` names - there is no way to obtain a reference to the
  * executor, the registry, or any other host object (functions do not
  * survive `structuredClone`). As with `createWorkerThreadsSandbox`, this
  * is defence in depth, not a guarantee against process-level mischief by
@@ -127,7 +127,7 @@ if (data && data.env) {
 }
 
 // D4 / tools-05 (SDF-9 parity with worker-threads.ts): process-level
-// escapes are ALWAYS blocked — child_process, vm, worker_threads
+// escapes are ALWAYS blocked - child_process, vm, worker_threads
 // (nested), cluster, inspector each trivially defeat the no-fs /
 // no-network flags. Defence in depth; worker threads remain a fault
 // boundary, not a security boundary.
@@ -175,14 +175,14 @@ if (data.noNetwork) {
 
 // Scrub the environment before user code runs: keep only the explicit
 // data.env allowlist. Defence in depth on top of the Worker's env: {}
-// construction; safe after register() — the loader thread captured
+// construction; safe after register() - the loader thread captured
 // GRAPHORIN_SANDBOX_BLOCKED during the synchronous registration.
 const allowedEnv = (data && data.env) || {};
 for (const k of Object.keys(process.env)) {
   if (!Object.prototype.hasOwnProperty.call(allowedEnv, k)) delete process.env[k];
 }
 
-// D4 / tools-05: the ESM resolve hook does not see CJS require() — patch
+// D4 / tools-05: the ESM resolve hook does not see CJS require() - patch
 // Module._load so a createRequire()-based require('child_process') /
 // require('vm') inside bridged code is denied too.
 {
@@ -299,7 +299,7 @@ export async function runBridgedSource(opts: BridgedSourceOptions): Promise<Brid
 
   const worker = new Worker(BRIDGED_RUNTIME, {
     eval: true,
-    // The worker must not inherit the host process.env — the source is
+    // The worker must not inherit the host process.env - the source is
     // model-written, and `return process.env` would exfiltrate host
     // secrets into the conversation (TL-9).
     env: {},
@@ -335,7 +335,7 @@ export async function runBridgedSource(opts: BridgedSourceOptions): Promise<Brid
         const name = message.name ?? '';
         if (!allowed.has(name)) {
           // Defence in depth: the worker only ever advertises allowed
-          // names, but never trust the channel — refuse anything else.
+          // names, but never trust the channel - refuse anything else.
           worker.postMessage({
             type: 'tool-result',
             id,

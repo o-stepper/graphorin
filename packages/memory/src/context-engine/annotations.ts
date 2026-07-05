@@ -7,16 +7,16 @@
  * Every {@link MessageContent} part assembled by the ContextEngine
  * carries two **independent** annotations:
  *
- * - `graphorin.content.origin` — where the content came from. Used
+ * - `graphorin.content.origin` - where the content came from. Used
  *   by D3 (`withRedaction`) under `scanScope: 'untrusted'` to
  *   decide whether to re-scan a part that already passed the D2
  *   sensitivity-tier filter.
- * - `graphorin.content.inbound.trust` — what trust class the source
+ * - `graphorin.content.inbound.trust` - what trust class the source
  *   carries. Used by D4 (`withInboundSanitization`) and by Phase 12
  *   (agent runtime) to gate the per-step preamble injection.
  *
  * Both annotations live as **span attributes only** (observability)
- * — they are never serialized to the wire payload. The wire-stable
+ * - they are never serialized to the wire payload. The wire-stable
  * `ProviderRequest` shape is unchanged by Phase 10d.
  *
  * @packageDocumentation
@@ -60,18 +60,18 @@ export type ContentOrigin =
  * Trust-class discriminator for an assembled message-content part.
  * Sibling axis to {@link ContentOrigin}; the two are independent.
  *
- * - `'trusted'` — built-in framework tools + trusted-skill-bundled
+ * - `'trusted'` - built-in framework tools + trusted-skill-bundled
  *   tools; D4 preamble does NOT fire on steps containing only
  *   these parts.
- * - `'user-defined'` — tools registered via `tool({...})` from user
+ * - `'user-defined'` - tools registered via `tool({...})` from user
  *   application code; D4 preamble fires.
- * - `'untrusted-skill'` — tools bundled by an untrusted skill; D4
+ * - `'untrusted-skill'` - tools bundled by an untrusted skill; D4
  *   preamble fires; default policy is strip-and-wrap.
- * - `'mcp'` — every `Tool` produced by `MCPClient.toTools(...)`; D4
+ * - `'mcp'` - every `Tool` produced by `MCPClient.toTools(...)`; D4
  *   preamble fires; default policy is strip-and-wrap.
- * - `'web-search'` — built-in `web_search` adapter; D4 preamble
+ * - `'web-search'` - built-in `web_search` adapter; D4 preamble
  *   fires; default policy is strip-and-wrap.
- * - `'n/a'` — non-tool-result parts for which the inbound-trust
+ * - `'n/a'` - non-tool-result parts for which the inbound-trust
  *   axis is meaningless (`'user:input'`, `'memory:tier-filtered'`,
  *   `'system:framework'`, `'agent:instructions'`,
  *   `'tool-call:args'`).

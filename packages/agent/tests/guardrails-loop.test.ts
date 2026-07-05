@@ -20,7 +20,7 @@ function capturingProvider(base: ReturnType<typeof createMockProvider>): {
   return { provider, requests };
 }
 
-describe('AgentConfig.guardrails — loop wiring (AG-2 / SDF-4)', () => {
+describe('AgentConfig.guardrails - loop wiring (AG-2 / SDF-4)', () => {
   it('a blocking input guardrail fails the run BEFORE any provider call, with guardrail.tripped', async () => {
     const base = createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('never', 4)] });
     const agent = createAgent({

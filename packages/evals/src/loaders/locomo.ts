@@ -1,5 +1,5 @@
 /**
- * Real LOCOMO dataset loader (arXiv:2402.17753 —
+ * Real LOCOMO dataset loader (arXiv:2402.17753 -
  * https://snap-research.github.io/locomo/). LOCOMO ships as a JSON
  * **array** of samples; each sample bundles one multi-session
  * conversation with many QA pairs over it:
@@ -54,7 +54,7 @@ export interface LoadLocomoOptions {
 
 /**
  * Read a LOCOMO JSON file and return a fully-materialised
- * {@link Dataset} — one case per QA pair, scored against the reference
+ * {@link Dataset} - one case per QA pair, scored against the reference
  * answer string (LLM-judge "J").
  *
  * @stable

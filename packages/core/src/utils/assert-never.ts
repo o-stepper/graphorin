@@ -2,7 +2,7 @@
  * Exhaustiveness helper. Place at the end of a `switch (...)` over a
  * discriminated union: TypeScript narrows the operand to `never` if
  * every variant is handled. Adding a new variant later turns the call
- * site into a compile error — the regression net for our event unions.
+ * site into a compile error - the regression net for our event unions.
  *
  * @example
  * ```ts

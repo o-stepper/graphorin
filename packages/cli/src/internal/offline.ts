@@ -4,7 +4,7 @@
  * promise on the operator-facing side by surfacing the same flag
  * every subcommand obeys.
  *
- * The flag is informational in Phase 14a — the three commands the
+ * The flag is informational in Phase 14a - the three commands the
  * binary ships do NOT make any outbound network calls. A future
  * phase that exposes a network-using subcommand (e.g. `graphorin
  * pricing refresh`) reads {@link isOfflineMode} to short-circuit.
@@ -56,7 +56,7 @@ export function checkOfflineModeBlocked(
   if (!isOfflineMode(env)) return true;
   const sink = options.print ?? ((line: string) => process.stderr.write(`${line}\n`));
   sink(
-    `[graphorin/cli] GRAPHORIN_OFFLINE=1 — refusing to perform '${operation}'. Unset GRAPHORIN_OFFLINE to opt back in.`,
+    `[graphorin/cli] GRAPHORIN_OFFLINE=1 - refusing to perform '${operation}'. Unset GRAPHORIN_OFFLINE to opt back in.`,
   );
   return false;
 }

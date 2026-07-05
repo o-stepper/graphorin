@@ -6,7 +6,7 @@
  * fail-fast helper so consumers see an actionable error rather than a
  * raw `ERR_MODULE_NOT_FOUND`.
  *
- * The peer is loaded lazily — importing this package on its own does
+ * The peer is loaded lazily - importing this package on its own does
  * NOT load the native addon, so callers that only inspect the public
  * helpers (e.g. for documentation generation) pay no native-load cost.
  *

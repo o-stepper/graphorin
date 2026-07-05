@@ -62,8 +62,8 @@ describe('graphorin triggers', () => {
   });
 });
 
-describe('IP-4 — fire reports UNSUPPORTED honestly', () => {
-  it('an existing trigger is NOT silently "queued" — unsupported + exit code 2', async () => {
+describe('IP-4 - fire reports UNSUPPORTED honestly', () => {
+  it('an existing trigger is NOT silently "queued" - unsupported + exit code 2', async () => {
     const cfg = await fixture();
     const { runTriggersStatus: _s } = await import('../src/commands/triggers.js');
     // register a trigger row via the store context the commands share

@@ -10,7 +10,7 @@ import { createTriggersRoutes } from '../src/triggers/routes.js';
 
 /**
  * Build the routes app behind a stub auth middleware granting the
- * trigger scopes — the IP-17 contract under test is route semantics
+ * trigger scopes - the IP-17 contract under test is route semantics
  * (flag-flip vs unregister), not the auth stack.
  */
 async function buildApp(): Promise<{
@@ -46,7 +46,7 @@ async function buildApp(): Promise<{
   return { app, scheduler };
 }
 
-describe('REST trigger routes — IP-17 semantics', () => {
+describe('REST trigger routes - IP-17 semantics', () => {
   it('disable is a flag flip (trigger survives), enable restores it, both round-trip', async () => {
     const { app, scheduler } = await buildApp();
 
@@ -55,7 +55,7 @@ describe('REST trigger routes — IP-17 semantics', () => {
     const disabledBody = (await disable.json()) as { trigger?: { disabled?: boolean } };
     expect(disabledBody.trigger?.disabled).toBe(true);
 
-    // NOT unregistered — the trigger is still listed.
+    // NOT unregistered - the trigger is still listed.
     const list = await scheduler.list();
     expect(list.some((t) => t.id === 'rt')).toBe(true);
     expect(list.find((t) => t.id === 'rt')?.disabled).toBe(true);

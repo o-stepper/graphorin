@@ -1,5 +1,5 @@
 /**
- * `diffPricing(...)` — produce a row-by-row delta between two pricing
+ * `diffPricing(...)` - produce a row-by-row delta between two pricing
  * snapshots. Used by the upcoming `graphorin pricing diff` CLI to
  * surface upstream changes after a `refresh`.
  *

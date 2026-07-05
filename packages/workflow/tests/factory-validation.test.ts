@@ -12,7 +12,7 @@ import {
 
 const cp = (): InMemoryCheckpointStore => new InMemoryCheckpointStore();
 
-describe('createWorkflow — configuration validation', () => {
+describe('createWorkflow - configuration validation', () => {
   it('rejects an empty name', () => {
     expect(() =>
       createWorkflow({

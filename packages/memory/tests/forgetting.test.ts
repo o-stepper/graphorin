@@ -37,7 +37,7 @@ function signals(
   };
 }
 
-describe('consolidator/decay — multi-signal salience (X-1)', () => {
+describe('consolidator/decay - multi-signal salience (X-1)', () => {
   it('collapses to plain retention for an unscored, active, first-party fact', () => {
     const base = retention({
       now: NOW,
@@ -97,7 +97,7 @@ describe('consolidator/decay — multi-signal salience (X-1)', () => {
   });
 });
 
-describe('consolidator/decay — selectForCapacityEviction (X-1)', () => {
+describe('consolidator/decay - selectForCapacityEviction (X-1)', () => {
   const scored = [
     { id: 'a', salience: 0.9 },
     { id: 'b', salience: 0.2 },
@@ -128,14 +128,14 @@ describe('consolidator/decay — selectForCapacityEviction (X-1)', () => {
   });
 });
 
-describe('MST-4 — any non-empty consolidator config implicitly enables', () => {
+describe('MST-4 - any non-empty consolidator config implicitly enables', () => {
   it('decayCapacity alone constructs the real consolidator and the capacity applies', async () => {
     const store = createInMemoryStore({ withConsolidatorStore: true });
     const memory = createMemory({
       store,
       embeddings: new InMemoryEmbeddingRegistry(),
       embedder: createStubEmbedder(),
-      // No tier / provider / enabled — the old allow-list silently
+      // No tier / provider / enabled - the old allow-list silently
       // installed a no-op placeholder for this exact shape.
       consolidator: { decayCapacity: 1, defaultScope: { userId: 'alex' } },
     });
@@ -187,7 +187,7 @@ describe('MST-4 — any non-empty consolidator config implicitly enables', () =>
   });
 });
 
-describe('consolidator light phase — capacity-bounded eviction (X-1)', () => {
+describe('consolidator light phase - capacity-bounded eviction (X-1)', () => {
   function freshAt(id: string, store: ReturnType<typeof createInMemoryStore>): void {
     store.__hooks.setDecaySignals(id, {
       lastAccessedAt: Date.now() - DAY,

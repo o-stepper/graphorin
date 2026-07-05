@@ -140,7 +140,7 @@ export function createStreamingChannel(opts: StreamingChannelOptions): Streaming
         toolName: opts.toolName,
         reason: 'backpressure',
       });
-      // The aggregated buffer is unaffected — append regardless.
+      // The aggregated buffer is unaffected - append regardless.
       chunks.push(chunk);
       chunkCount++;
       addBytes(chunk);

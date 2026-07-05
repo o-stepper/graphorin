@@ -26,7 +26,7 @@ export interface RefreshAccessTokenArgs {
   readonly signal?: AbortSignal;
   /**
    * When `true` and the authorization server **rotates** the refresh
-   * token (RFC 6749 §10.4 / OAuth 2.1 — the token response carries a
+   * token (RFC 6749 §10.4 / OAuth 2.1 - the token response carries a
    * *different* `refresh_token`), best-effort revoke the previous
    * refresh token via {@link revokeOAuthToken}. Defaults to `false` so
    * existing callers are unaffected; servers that already invalidate
@@ -107,7 +107,7 @@ async function doRefresh(args: RefreshAccessTokenArgs): Promise<OAuthSession> {
 
   // Refresh-token rotation (RFC 6749 §10.4 / OAuth 2.1): when the
   // server hands back a *different* refresh token, the previous one
-  // should be retired. Opt-in + best-effort — a revocation failure
+  // should be retired. Opt-in + best-effort - a revocation failure
   // must not fail the refresh the caller is awaiting.
   if (args.revokePreviousOnRotation === true && session.refreshToken !== undefined) {
     const rotated = session.refreshToken.reveal() !== refreshToken.reveal();
@@ -158,7 +158,7 @@ export interface RevokeOAuthTokenArgs {
 /**
  * Revoke an OAuth token via RFC 7009. Honest failure semantics
  * (SPL-1 / SPL-16): a missing revocation endpoint, a network failure,
- * and a non-2xx response all **throw** — the caller decides whether
+ * and a non-2xx response all **throw** - the caller decides whether
  * teardown proceeds, and the audit trail never claims a server-side
  * revocation that was not confirmed.
  *

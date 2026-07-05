@@ -1,16 +1,16 @@
 /**
- * `graphorin triggers` — operate on the durable trigger registry.
+ * `graphorin triggers` - operate on the durable trigger registry.
  *
  * Surface (per Phase 15 § Triggers):
  *
- *  - `graphorin triggers list` — every persisted trigger.
- *  - `graphorin triggers status <id>` — single-trigger detail.
- *  - `graphorin triggers fire <id>` — operator-fired side-effect (admin
+ *  - `graphorin triggers list` - every persisted trigger.
+ *  - `graphorin triggers status <id>` - single-trigger detail.
+ *  - `graphorin triggers fire <id>` - operator-fired side-effect (admin
  *    only). The CLI persists a fire-now signal into `trigger_admin`
  *    that the running scheduler picks up; library-mode triggers
  *    can also be fired by re-running the host process.
- *  - `graphorin triggers disable <id>` — flip the `disabled` column.
- *  - `graphorin triggers prune` — drop orphan rows whose callbackRef
+ *  - `graphorin triggers disable <id>` - flip the `disabled` column.
+ *  - `graphorin triggers prune` - drop orphan rows whose callbackRef
  *    no longer exists in the running registry. Without a running
  *    server the CLI cannot tell which triggers are orphans, so the
  *    helper deletes only triggers whose `disabled` column is true and
@@ -120,7 +120,7 @@ export async function runTriggersFire(
       throw new Error(`[graphorin/cli] trigger '${options.id}' not found.`);
     }
     // IP-4: the old implementation queued a row into a `trigger_admin`
-    // table NOTHING polled and reported success — the fire never
+    // table NOTHING polled and reported success - the fire never
     // happened. Until a daemon-side poll exists, the honest answer is
     // UNSUPPORTED with the working alternative.
     const result = { fired: false, unsupported: true } as const;
@@ -128,7 +128,7 @@ export async function runTriggersFire(
       const print = options.print ?? defaultPrintSink;
       print(
         brand(
-          `direct CLI fire is not wired yet — use the running server: POST /v1/triggers/${options.id}/fire (scope triggers:fire).`,
+          `direct CLI fire is not wired yet - use the running server: POST /v1/triggers/${options.id}/fire (scope triggers:fire).`,
         ),
       );
     });
@@ -175,7 +175,7 @@ export async function runTriggersDisable(
 /** @stable */
 export interface TriggersPruneOptions extends TriggersCommonOptions {
   /**
-   * ISO date / epoch ms — drop disabled triggers whose `lastFiredAt`
+   * ISO date / epoch ms - drop disabled triggers whose `lastFiredAt`
    * (or `createdAt`, when never fired) is older than this cutoff.
    */
   readonly before?: string;

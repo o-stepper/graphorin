@@ -23,7 +23,7 @@ import type { Tracer } from './tracer.js';
  * server, sessions, observability, …) carries `Tool[]` references on
  * its public surface.
  *
- * The interface is intentionally minimal — extension fields covered by
+ * The interface is intentionally minimal - extension fields covered by
  * later phases (per-tool `secretsAllowed` ACL, inbound sanitization
  * policy, result truncation strategy, streaming hint, …) are added
  * **additively** by their owning packages so that v0.1 consumers can
@@ -117,7 +117,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
   readonly truncationStrategy?: TruncationStrategy;
   /**
    * Worked examples shown to the model alongside the tool's
-   * description. Bounded `[1, 5]` — overflow emits a one-time WARN at
+   * description. Bounded `[1, 5]` - overflow emits a one-time WARN at
    * registration. Each example's `input` and `output` is validated
    * against the tool's `inputSchema` / `outputSchema`.
    */
@@ -140,7 +140,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
    * Optional callback returning a deterministic dedup key per
    * `(input, ctx)` tuple. REQUIRED-by-WARN for `'side-effecting'` /
    * `'external-stateful'` tools. The framework does not validate
-   * determinism — that is the operator's contract.
+   * determinism - that is the operator's contract.
    */
   readonly idempotencyKey?: (
     input: TInput,
@@ -148,7 +148,7 @@ export interface Tool<TInput = unknown, TOutput = unknown, TDeps = unknown> {
   ) => string | Promise<string>;
   /**
    * Opt-in flag for streaming-tool execution. The `?: true` typing
-   * rejects `streamingHint: false` on purpose — absence is the
+   * rejects `streamingHint: false` on purpose - absence is the
    * canonical "non-streaming" signal preserving v0.1 behaviour. When
    * `true`, `Tool.execute(...)` may call `ctx.streamContent(...)` /
    * `ctx.reportProgress(...)` and may return `Promise<void>`.
@@ -248,7 +248,7 @@ export interface ToolExecutionContext<TDeps = unknown> {
   readonly logger: Logger;
   /**
    * Per-call secrets accessor. The accessor enforces the tool's
-   * `secretsAllowed` ACL — calling `require(...)` for a key that is
+   * `secretsAllowed` ACL - calling `require(...)` for a key that is
    * not on the allowlist throws `SecretAccessDeniedError`.
    */
   readonly secrets: ToolSecretsAccessor;
@@ -271,7 +271,7 @@ export interface ToolExecutionContext<TDeps = unknown> {
  * Per-call secrets accessor surface. Implemented by the executor; the
  * tool author calls `require(...)` to obtain a `SecretValue` wrapper.
  *
- * The accessor is intentionally narrow — the ACL enforcement happens
+ * The accessor is intentionally narrow - the ACL enforcement happens
  * inside `require(...)`, so the tool author never accidentally
  * unwraps a secret outside the tool's permitted set.
  *

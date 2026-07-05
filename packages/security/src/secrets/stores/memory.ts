@@ -20,7 +20,7 @@ const STORE_SOURCE = 'memory';
  * @stable
  */
 export class MemorySecretsStore implements SecretsStore {
-  /** Stable identifier — surfaced in `getSecretsStoreStatus()`. */
+  /** Stable identifier - surfaced in `getSecretsStoreStatus()`. */
   readonly kind = 'memory' as const;
   readonly #values = new Map<string, { value: SecretValue; meta: SecretMetadata }>();
 

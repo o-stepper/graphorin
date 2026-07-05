@@ -26,7 +26,7 @@ export type { RuleOfTwoProfile, ToolArgumentPolicy } from '@graphorin/security/p
  * Compile the agent's opt-in tool-argument policy + Rule-of-Two profile
  * into a single guard. `ruleOfTwo` is compiled first (yielding a base
  * policy + optional read-only floor); an explicit `toolPolicy` is
- * appended so its rules compose — a forbid in either always wins
+ * appended so its rules compose - a forbid in either always wins
  * (forbid-before-allow). Returns `{ guard: undefined }` when neither is
  * configured (zero overhead on the default path).
  */

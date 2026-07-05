@@ -2,7 +2,7 @@
  * Bridge between the server-token auth audit emitter (SPL-5) and the
  * audit-log subsystem. A single `onAuthAudit(...)` listener translates
  * each emitted event into an `appendAudit(...)` call on the supplied
- * `AuditDb` — the auth layer never writes audit rows across the package
+ * `AuditDb` - the auth layer never writes audit rows across the package
  * boundary itself. Mirrors `bridgeSecretsToAudit` / `bridgeOAuthToAudit`.
  *
  * @packageDocumentation

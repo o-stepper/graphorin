@@ -14,7 +14,7 @@ export const PAUSE_SIGNAL_BRAND: unique symbol = Symbol.for('graphorin.PauseSign
  * catches it, persists state with a pending pause, and suspends the
  * thread until `Workflow.resume(threadId, directive)` is called.
  *
- * Application code should never construct or catch this directly —
+ * Application code should never construct or catch this directly -
  * always go through `pause(...)`.
  *
  * @stable
@@ -57,12 +57,12 @@ const pauseResumeStorage = new AsyncLocalStorage<PauseResumeScope>();
  * {@link PauseSignal} (WF-2: a node body re-executes from the top on
  * every resume, so earlier pauses must replay their already-delivered
  * values and only the FIRST unsatisfied `pause()` suspends again). An
- * empty `values` array behaves exactly like no scope — every `pause()`
- * suspends — which is what a static-gate resume needs so a programmatic
+ * empty `values` array behaves exactly like no scope - every `pause()`
+ * suspends - which is what a static-gate resume needs so a programmatic
  * `pause()` inside the node is never silently satisfied.
  *
  * This helper is the contract between the runtime and `pause(...)`.
- * Consumers of `pause(...)` never call it directly — only the workflow
+ * Consumers of `pause(...)` never call it directly - only the workflow
  * engine wires it up around the resumed node body.
  *
  * @internal

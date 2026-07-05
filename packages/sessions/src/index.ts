@@ -1,5 +1,5 @@
 /**
- * `@graphorin/sessions` — hybrid facade-with-state session module
+ * `@graphorin/sessions` - hybrid facade-with-state session module
  * for the Graphorin framework.
  *
  * Headline capabilities:

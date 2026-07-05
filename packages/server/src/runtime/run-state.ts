@@ -140,7 +140,7 @@ export class RunStateTracker {
       /**
        * IP-15: invoked exactly once per run, the first time it settles into a
        * terminal state. Used to drive the run-count + duration metrics. Never
-       * throws into the tracker — wrap your handler if it might.
+       * throws into the tracker - wrap your handler if it might.
        */
       readonly onTerminal?: (info: TerminalRunInfo) => void;
     } = {},
@@ -208,7 +208,7 @@ export class RunStateTracker {
   ): void {
     const record = this.#records.get(runId);
     if (record === undefined) return;
-    // IP-15: only the FIRST terminal transition counts toward the metrics —
+    // IP-15: only the FIRST terminal transition counts toward the metrics -
     // a run aborted then re-completed must not double-increment.
     const wasTerminal = isTerminalStatus(record.status);
     record.status = status;
@@ -260,7 +260,7 @@ export class RunStateTracker {
   /**
    * Number of runs currently in `pending` or `running`. Useful for
    * snapshots / metrics. Note that `pending` runs hold a reservation
-   * but have not yet started any work — see {@link runningCount} for
+   * but have not yet started any work - see {@link runningCount} for
    * the drain-blocking subset.
    */
   inflightCount(): number {
@@ -273,7 +273,7 @@ export class RunStateTracker {
 
   /**
    * Number of runs with active work in progress (`running`). The
-   * lifecycle drain blocks on this counter only — pending runs are a
+   * lifecycle drain blocks on this counter only - pending runs are a
    * pure reservation (e.g. an awaited WS subscription) and can be
    * aborted immediately when SIGTERM arrives.
    */
@@ -339,7 +339,7 @@ export const DEFAULT_RUN_RETENTION_MS = 5 * 60_000;
 /**
  * IP-16: schedule a periodic prune of terminal run records. Without this the
  * tracker's `prune()` was never called, so every run / stream / workflow left
- * a `RunRecord` (each holding an `AbortController`) in memory forever — an
+ * a `RunRecord` (each holding an `AbortController`) in memory forever - an
  * unbounded leak on a long-living server. Returns a stop function that clears
  * the timer; the timer is `unref`-ed so it never keeps the process alive.
  */

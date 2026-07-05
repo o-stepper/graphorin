@@ -1,5 +1,5 @@
 /**
- * `@graphorin/server/ws` — WebSocket protocol implementation for
+ * `@graphorin/server/ws` - WebSocket protocol implementation for
  * the Graphorin standalone server. Combines the dispatcher (which
  * fans events out to subscribers + applies the delivery-layer
  * commentary sanitization), the in-memory ticket store (browser

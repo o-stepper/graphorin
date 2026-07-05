@@ -8,7 +8,7 @@ import {
   runPackageManager,
 } from '../../src/supply-chain/index.js';
 
-describe('@graphorin/security/supply-chain — package manager helpers', () => {
+describe('@graphorin/security/supply-chain - package manager helpers', () => {
   beforeEach(() => {
     _setPackageManagerForTesting(null);
     _setPackageManagerRunnerForTesting(null);

@@ -20,7 +20,7 @@
  * `migrate-export`, `migrate-config`, `guard`, `telemetry`,
  * `tools lint`).
  *
- * `GRAPHORIN_OFFLINE=1` is honoured by every subcommand — the v0.1
+ * `GRAPHORIN_OFFLINE=1` is honoured by every subcommand - the v0.1
  * surface never makes implicit network calls. Phase 15 commands that
  * do touch the network (e.g. `graphorin pricing refresh`) consult
  * the same flag through the helper in `../internal/offline.ts`.
@@ -116,7 +116,7 @@ async function main(): Promise<void> {
         '  Storage:      storage, audit, memory, consolidator, triggers, migrate-export',
         '  Catalogue:    pricing, skills, tools',
         '',
-        'Honours GRAPHORIN_OFFLINE=1 — the v0.1 surface never makes implicit network calls.',
+        'Honours GRAPHORIN_OFFLINE=1 - the v0.1 surface never makes implicit network calls.',
       ].join('\n'),
     )
     .version(VERSION);
@@ -167,7 +167,7 @@ function registerLifecycleCommands(program: Command): void {
       }) => {
         if (isOfflineMode()) {
           process.stderr.write(
-            '[graphorin/cli] GRAPHORIN_OFFLINE=1 — running with no implicit network calls.\n',
+            '[graphorin/cli] GRAPHORIN_OFFLINE=1 - running with no implicit network calls.\n',
           );
         }
         await runStart({
@@ -202,7 +202,7 @@ function registerLifecycleCommands(program: Command): void {
       }) => {
         if (isOfflineMode()) {
           process.stderr.write(
-            '[graphorin/cli] GRAPHORIN_OFFLINE=1 — init never reaches the network.\n',
+            '[graphorin/cli] GRAPHORIN_OFFLINE=1 - init never reaches the network.\n',
           );
         }
         await runInit({
@@ -224,7 +224,7 @@ function registerLifecycleCommands(program: Command): void {
     .action(async (opts: { config?: string; target?: string }) => {
       if (isOfflineMode()) {
         process.stderr.write(
-          '[graphorin/cli] GRAPHORIN_OFFLINE=1 — migrate is a local-only operation.\n',
+          '[graphorin/cli] GRAPHORIN_OFFLINE=1 - migrate is a local-only operation.\n',
         );
       }
       await runMigrate({
@@ -357,7 +357,7 @@ function registerTokenCommands(program: Command): void {
     });
   token
     .command('verify <token>')
-    .description('Offline checksum verification — never consults the store.')
+    .description('Offline checksum verification - never consults the store.')
     .option('--prefix <prefix>', 'Override the expected token prefix.')
     .option('--json', 'Emit a structured JSON document on stdout.')
     .action((tok: string, opts: { prefix?: string; json?: boolean }) => {

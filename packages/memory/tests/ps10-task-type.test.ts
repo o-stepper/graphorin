@@ -1,5 +1,5 @@
 /**
- * PS-10 — the memory tiers must tag embed calls with the asymmetric retrieval
+ * PS-10 - the memory tiers must tag embed calls with the asymmetric retrieval
  * role: `passage` when embedding content for storage, `query` when embedding a
  * search query. (The transformersjs embedder turns that into the E5 prefix; an
  * untagged embedder simply ignores it.)
@@ -24,7 +24,7 @@ function recordingEmbedder(calls: EmbedCall[]): EmbedderProvider {
     configHash: () => 'rec',
     async embed(texts, opts) {
       calls.push({ texts: [...texts], taskType: opts?.taskType });
-      // A constant unit vector — enough to drive the vector write/search path.
+      // A constant unit vector - enough to drive the vector write/search path.
       return texts.map(() => {
         const v = new Float32Array(8);
         v[0] = 1;
@@ -34,7 +34,7 @@ function recordingEmbedder(calls: EmbedCall[]): EmbedderProvider {
   };
 }
 
-describe('PS-10 — taskType threaded through the memory tiers', () => {
+describe('PS-10 - taskType threaded through the memory tiers', () => {
   it('remember embeds as passage; search embeds as query', async () => {
     const calls: EmbedCall[] = [];
     const memory = createMemory({

@@ -1,5 +1,5 @@
 /**
- * `AnthropicAPICounter` — uses Anthropic's native count-tokens
+ * `AnthropicAPICounter` - uses Anthropic's native count-tokens
  * endpoint when an API key is configured, otherwise falls back to
  * `JsTiktokenCounter`. The native call is opt-in: the user supplies
  * an explicit `apiKey`. The framework never makes the call without
@@ -36,7 +36,7 @@ export interface AnthropicAPICounterOptions {
 /**
  * Counter that talks to `POST /v1/messages/count_tokens` when an API
  * key is configured. Without an API key, the counter delegates to
- * `JsTiktokenCounter('cl100k_base')` — the closest publicly-available
+ * `JsTiktokenCounter('cl100k_base')` - the closest publicly-available
  * proxy for Anthropic's tokenizer.
  *
  * @stable
@@ -99,7 +99,7 @@ export class AnthropicAPICounter implements TokenCounter {
   }
 
   /**
-   * WARN once per counter when the native path degrades — a silent
+   * WARN once per counter when the native path degrades - a silent
    * fallback to cl100k tiktoken undercounts Claude tokens by ~15-20%,
    * so the degradation must be visible.
    */

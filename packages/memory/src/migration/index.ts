@@ -1,5 +1,5 @@
 /**
- * Embedder migration runner — one of the three deliverables that turns
+ * Embedder migration runner - one of the three deliverables that turns
  * `@graphorin/memory` into a long-running, embedder-aware system.
  *
  * @packageDocumentation

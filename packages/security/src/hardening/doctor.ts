@@ -4,15 +4,15 @@
  * + remediation hint. The CLI binary in Phase 15 wraps these helpers
  * as the `graphorin doctor` subcommands.
  *
- * The helpers do not write to disk — they only read. `--fix-perms`
+ * The helpers do not write to disk - they only read. `--fix-perms`
  * is implemented in the CLI by calling `ensureFileMode(...)` /
  * `ensureDirMode(...)` after `checkPerms(...)` reports a drift.
  *
  * References:
- *  - DEC-135 — process hardening (file modes, refuse-as-root).
- *  - DEC-136 — secrets capability matrix
+ *  - DEC-135 - process hardening (file modes, refuse-as-root).
+ *  - DEC-136 - secrets capability matrix
  *    (`getSecretsStoreStatus(...)`).
- *  - DEC-129 — encryption-at-rest opt-in (audit-db binding).
+ *  - DEC-129 - encryption-at-rest opt-in (audit-db binding).
  *
  * @packageDocumentation
  */
@@ -125,7 +125,7 @@ export function checkSecrets(): CheckResult[] {
         check: 'secrets-store',
         status: 'warn',
         message:
-          'createSecretsStore({ kind: "auto" }) has not been called yet — the doctor cannot inspect the store.',
+          'createSecretsStore({ kind: "auto" }) has not been called yet - the doctor cannot inspect the store.',
         hint: 'Bootstrap the host with createSecretsStore({ kind: "auto" }) before running checks.',
       },
     ];
@@ -246,7 +246,7 @@ export function checkSystemd(opts: {
 }
 
 async function defaultRun(_command: string): Promise<string> {
-  // Default impl is conservative — operators must inject a real
+  // Default impl is conservative - operators must inject a real
   // executor (e.g. `node:child_process` `execFile`) to opt in.
   throw new Error(
     'no executor supplied to checkSystemd({ run })). Inject a child-process runner from the host.',

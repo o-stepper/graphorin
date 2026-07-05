@@ -3,7 +3,7 @@
  * `Session.recordToolCassette({...})`.
  *
  * The recorder owns the JSONL writer + the running counters. RP-2: it is **not**
- * auto-wired into the agent runtime — the operator subscribes to the agent's
+ * auto-wired into the agent runtime - the operator subscribes to the agent's
  * `RunContext` events and forwards each `tool.execute.end / .error` into
  * `recorder.recordToolCall(...)` (see `examples/multi-agent-crew`). The recorder
  * is a standalone primitive so tests + lower-level callers can drive it directly.
@@ -45,7 +45,7 @@ export interface ToolCassetteRecorderOptions extends ToolCassetteWriterOptions {
 
 /**
  * Surface returned by {@link createToolCassetteRecorder}. The
- * recorder is async-only — every event the runtime drains is a
+ * recorder is async-only - every event the runtime drains is a
  * Promise so backpressure does not block the agent loop.
  *
  * @stable

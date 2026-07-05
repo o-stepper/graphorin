@@ -1,7 +1,7 @@
 /**
  * Integration test against the real `@graphorin/store-sqlite`
  * `SqliteCheckpointStore`. Verifies that the workflow runtime
- * round-trips through the production durable backend — the package
+ * round-trips through the production durable backend - the package
  * works without the in-memory fixtures, against the SQLite stack that
  * ships with v0.1.
  *

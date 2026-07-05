@@ -19,8 +19,8 @@ export interface MockProviderScript {
  *     "dangling tool_use" 400s OpenAI-compatible servers and Anthropic
  *     alike, and `invalid-request` is fallback-ineligible); and
  *  2. every `role:'tool'` message references a `toolCallId` announced by
- *     a PRECEDING assistant message (an "orphan tool message" — e.g. a
- *     compaction slice that dropped the assistant partner — is equally
+ *     a PRECEDING assistant message (an "orphan tool message" - e.g. a
+ *     compaction slice that dropped the assistant partner - is equally
  *     rejected).
  *
  * Real providers enforce this; the mock harness must too, or the loop can
@@ -46,7 +46,7 @@ export function assertWellFormedTranscript(messages: ReadonlyArray<Message>): vo
   if (dangling.length > 0) {
     throw new Error(
       `malformed transcript: assistant tool call(s) [${dangling.join(', ')}] have no ` +
-        'matching tool message (dangling tool_use — a real provider rejects this request)',
+        'matching tool message (dangling tool_use - a real provider rejects this request)',
     );
   }
 }

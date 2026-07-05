@@ -8,7 +8,7 @@ import type { Message } from './message.js';
  * `HandoffFilter` without an agent dependency.
  *
  * The default for the agent runtime is `lastN(10)` (per the security-first
- * compose policy). Filters should be **pure** — they receive a frozen
+ * compose policy). Filters should be **pure** - they receive a frozen
  * history and return a fresh array.
  *
  * @stable
@@ -17,7 +17,7 @@ export type HandoffFilter = (history: readonly Message[]) => readonly Message[];
 
 /**
  * Declarative handoff target. The value carries a reference to the target
- * agent (`agentId` — looked up at runtime via the `AgentRegistry`) plus
+ * agent (`agentId` - looked up at runtime via the `AgentRegistry`) plus
  * optional metadata used by the runtime when constructing the
  * `transfer_to_<agentName>` virtual tool.
  *
@@ -40,7 +40,7 @@ export interface Handoff {
  * the JSONL session export so a replay can re-construct the filter
  * stack even after the runtime filter implementations evolve.
  *
- * The discriminator `kind` is an open string union — well-known kinds
+ * The discriminator `kind` is an open string union - well-known kinds
  * include `'full' | 'last-n' | 'last-user' | 'summary' |
  * 'sensitivity-filter' | 'compose' | 'custom'`. The accompanying `meta`
  * carries kind-specific data (for example `{ n: 10 }` for `'last-n'`,
@@ -58,14 +58,14 @@ export interface HandoffInputFilterDescriptor {
 
 /**
  * How the parent's secrets surface is propagated to the sub-agent
- * during a handoff. The default — `'inherit-allowlist'` with an empty
- * inherited list — applies the principle of least authority: the sub-
+ * during a handoff. The default - `'inherit-allowlist'` with an empty
+ * inherited list - applies the principle of least authority: the sub-
  * agent inherits only the keys the operator has explicitly named.
  *
- * - `'inherit-allowlist'` — inherit the keys named in
+ * - `'inherit-allowlist'` - inherit the keys named in
  *   `inheritedSecrets`. Empty list = no inheritance.
- * - `'isolated'` — the sub-agent runs with an empty secrets surface.
- * - `'forward-explicit'` — every secret access on the sub-agent's side
+ * - `'isolated'` - the sub-agent runs with an empty secrets surface.
+ * - `'forward-explicit'` - every secret access on the sub-agent's side
  *   must be explicitly broadened by the operator with a recorded
  *   `secretsOverrideReason`.
  *
@@ -100,7 +100,7 @@ export interface HandoffRecord {
   /**
    * Keys inherited by the sub-agent under the
    * `'inherit-allowlist'` / `'forward-explicit'` policies. Never the
-   * secret values themselves — only the public key names.
+   * secret values themselves - only the public key names.
    */
   readonly inheritedSecrets?: ReadonlyArray<string>;
   /**

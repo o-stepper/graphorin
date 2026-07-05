@@ -1,5 +1,5 @@
 /**
- * Adapter barrel — re-exports the four bundled adapters.
+ * Adapter barrel - re-exports the four bundled adapters.
  *
  * @packageDocumentation
  */

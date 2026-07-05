@@ -267,7 +267,7 @@ export class SessionNotFoundError extends SessionError {
 
 /**
  * Thrown by `Session.push(...)` when the session has been closed (RP-6).
- * `close()` is a real lifecycle boundary, not advisory — reopen the session
+ * `close()` is a real lifecycle boundary, not advisory - reopen the session
  * (a fresh `create`) or write to a different one.
  *
  * @stable

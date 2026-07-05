@@ -1,6 +1,6 @@
 /**
  * C1 (core-provider-02 / agent-11): prompt-cache economics at the agent
- * loop level — cache token legs survive per-step and per-run usage
+ * loop level - cache token legs survive per-step and per-run usage
  * aggregation, `cachePolicy` rides every ProviderRequest, the serialized
  * tool catalogue keeps a byte-stable prefix when a promotion lands
  * (handoffs serialize BEFORE the growing promoted section), and
@@ -103,7 +103,7 @@ function createCapturingProvider(scripts: ReadonlyArray<MockProviderScript>): {
   return { provider, requests };
 }
 
-describe('C1 — cache usage aggregation through the loop', () => {
+describe('C1 - cache usage aggregation through the loop', () => {
   it('carries cachedRead/cacheWrite through step.end, result.usage and usageByModel', async () => {
     const { provider } = createCapturingProvider([
       {
@@ -176,7 +176,7 @@ describe('C1 — cache usage aggregation through the loop', () => {
   });
 });
 
-describe('C1 — cachePolicy forwarding', () => {
+describe('C1 - cachePolicy forwarding', () => {
   it('forwards AgentConfig.cachePolicy verbatim on every ProviderRequest', async () => {
     const { provider, requests } = createCapturingProvider([
       {
@@ -205,7 +205,7 @@ describe('C1 — cachePolicy forwarding', () => {
   });
 });
 
-describe('C1 (agent-11) — catalogue prefix stability across promotions', () => {
+describe('C1 (agent-11) - catalogue prefix stability across promotions', () => {
   it('serializes handoffs BEFORE promotions; a promotion appends without moving the prefix', async () => {
     const worker = createAgent({
       name: 'worker',
@@ -251,7 +251,7 @@ describe('C1 (agent-11) — catalogue prefix stability across promotions', () =>
   });
 });
 
-describe("C1 — toolPromotion: 'run-boundary'", () => {
+describe("C1 - toolPromotion: 'run-boundary'", () => {
   it('freezes the advertised catalogue for the run but persists the discovery', async () => {
     const { provider, requests } = createCapturingProvider([
       {

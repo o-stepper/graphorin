@@ -16,7 +16,7 @@ import {
   InMemoryEmbeddingRegistry,
 } from './fixtures/in-memory-store.js';
 
-describe('@graphorin/memory — coverage extras', () => {
+describe('@graphorin/memory - coverage extras', () => {
   it('Consolidator placeholder full lifecycle', async () => {
     const c = createConsolidatorPlaceholder({ tier: 'cheap', triggers: ['idle:30s'] });
     const before = await c.status();

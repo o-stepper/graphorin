@@ -7,7 +7,7 @@ import {
   type RedactionPattern,
 } from '../../src/redaction/patterns.js';
 
-describe('@graphorin/observability/redaction — patterns catalogue', () => {
+describe('@graphorin/observability/redaction - patterns catalogue', () => {
   it('exports exactly 14 default-on built-in patterns', () => {
     expect(BUILT_IN_PATTERNS).toHaveLength(14);
   });
@@ -129,7 +129,7 @@ const FIXTURES: ReadonlyArray<Fixture> = [
   },
 ];
 
-describe('@graphorin/observability/redaction — pattern fixtures (14 default-on)', () => {
+describe('@graphorin/observability/redaction - pattern fixtures (14 default-on)', () => {
   for (const fixture of FIXTURES) {
     const pattern = BUILT_IN_PATTERNS.find((p) => p.name === fixture.name);
     if (pattern === undefined) {
@@ -154,7 +154,7 @@ describe('@graphorin/observability/redaction — pattern fixtures (14 default-on
   }
 });
 
-describe('@graphorin/observability/redaction — every default-on pattern has fixtures', () => {
+describe('@graphorin/observability/redaction - every default-on pattern has fixtures', () => {
   it('FIXTURES covers every default-on pattern', () => {
     const fixtured = new Set(FIXTURES.map((f) => f.name));
     const defaults = new Set<string>();

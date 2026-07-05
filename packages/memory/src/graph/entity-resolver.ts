@@ -6,19 +6,19 @@
  * module folds them into **canonical entities** so the one-hop CTE can
  * traverse relationships. Resolution is layered, cheapest first:
  *
- *   1. **lexical** — exact match on the folded {@link normalizeEntityName}.
- *   2. **embedding** — cosine over candidate name vectors; `≥ mergeThreshold`
+ *   1. **lexical** - exact match on the folded {@link normalizeEntityName}.
+ *   2. **embedding** - cosine over candidate name vectors; `≥ mergeThreshold`
  *      reuses the match.
- *   3. **adjudication** — a middle similarity band (`[adjudicate, merge)`)
+ *   3. **adjudication** - a middle similarity band (`[adjudicate, merge)`)
  *      is *ambiguous*; an opt-in LLM call (provider + `llmAdjudication`)
  *      decides. **Offline / by default the ambiguous band mints a new
- *      entity** — the resolver never auto-merges on weak evidence, because
+ *      entity** - the resolver never auto-merges on weak evidence, because
  *      a wrong merge fuses two distinct people (the stated P2-1 risk).
  *
  * The pure policy ({@link resolveEntityDecision}) is provider-agnostic and
  * does no I/O; {@link EntityResolver} wires it to an injected store +
  * embedder + optional provider. With no embedder it degrades to
- * lexical-only — still useful, and still fully offline.
+ * lexical-only - still useful, and still fully offline.
  *
  * @packageDocumentation
  */
@@ -34,7 +34,7 @@ import type { EntityWithEmbedding, GraphMemoryStoreExt } from '../internal/stora
 
 /** Cosine `≥` this auto-reuses an existing entity (embedding match). */
 export const DEFAULT_MERGE_THRESHOLD = 0.92;
-/** Cosine in `[this, merge)` is *ambiguous* — adjudicate or mint new. */
+/** Cosine in `[this, merge)` is *ambiguous* - adjudicate or mint new. */
 export const DEFAULT_ADJUDICATE_THRESHOLD = 0.82;
 
 /**
@@ -62,7 +62,7 @@ export interface ResolutionCandidate {
   /**
    * MST-11: the embedder that produced `vector`. When both this and the
    * query's `vectorEmbedderId` are known and differ, the candidate is skipped
-   * for embedding comparison — vectors from different models live in different
+   * for embedding comparison - vectors from different models live in different
    * spaces, so their cosine is meaningless. Absent on either side ⇒ compared
    * (byte-identical to the prior behaviour).
    */
@@ -140,7 +140,7 @@ export function resolveEntityDecision(input: ResolveDecisionInput): EntityResolv
   let bestSim = Number.NEGATIVE_INFINITY;
   for (const c of input.candidates) {
     if (c.vector === null || c.vector.length === 0) continue;
-    // MST-11: never compare vectors across embedders — different models live
+    // MST-11: never compare vectors across embedders - different models live
     // in different vector spaces, so their cosine is meaningless. Skip only
     // when both embedder ids are known and differ.
     if (
@@ -192,7 +192,7 @@ export interface EntityResolverDeps {
 const ADJUDICATION_SYSTEM_PROMPT =
   'You decide whether two short names refer to the SAME real-world entity ' +
   '(person, place, org, thing). Reply with a single word: "yes" or "no". ' +
-  'Be conservative — answer "no" unless they are clearly the same entity.';
+  'Be conservative - answer "no" unless they are clearly the same entity.';
 
 /** Build the (pure) adjudication request. Exposed for testing. */
 export function buildAdjudicationRequest(
@@ -255,7 +255,7 @@ export class EntityResolver {
   ): Promise<string | null> {
     const normalizedName = normalizeEntityName(rawName);
     if (normalizedName.length === 0) return null;
-    // 1. Exact lexical match — the cheapest, strongest signal. Resolve it via
+    // 1. Exact lexical match - the cheapest, strongest signal. Resolve it via
     //    an uncapped indexed lookup so an alias of an arbitrarily-old entity
     //    dedups without scanning (and deserializing) the bounded candidate
     //    window, and short-circuits before any embedding call (CS-11). Stores
@@ -263,7 +263,7 @@ export class EntityResolver {
     const exact = await this.#store.findEntityByNormalizedName?.(scope, normalizedName);
     if (exact != null) return exact.id;
     const vector = await this.#embed(rawName, opts.signal);
-    // 2. Without a query vector, embedding dedup is impossible — skip the
+    // 2. Without a query vector, embedding dedup is impossible - skip the
     //    BLOB-deserializing candidate scan entirely and mint a new entity.
     if (vector === null || vector.length === 0) {
       return this.#create(scope, rawName, normalizedName, vector);

@@ -7,7 +7,7 @@ import {
 } from '../src/index.js';
 import { createStubEmbedder, InMemoryEmbeddingRegistry } from './fixtures/in-memory-store.js';
 
-describe('@graphorin/memory/migration — migrateEmbedder', () => {
+describe('@graphorin/memory/migration - migrateEmbedder', () => {
   it('lock-on-first refuses silent embedder swap', async () => {
     const registry = new InMemoryEmbeddingRegistry();
     const source = createStubEmbedder({ id: 'stub:src@8' });

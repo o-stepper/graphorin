@@ -1,5 +1,5 @@
 /**
- * `createCostTracker(...)` — aggregate token + cost figures across
+ * `createCostTracker(...)` - aggregate token + cost figures across
  * spans and provide per-scope queries.
  *
  * The tracker preserves parent-child relationships: when

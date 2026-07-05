@@ -1,5 +1,5 @@
 /**
- * Coverage for `withFallback` — primary failure → secondary success,
+ * Coverage for `withFallback` - primary failure → secondary success,
  * mid-stream failures NOT falling back, predicate gating, and abort
  * propagation.
  */
@@ -74,14 +74,14 @@ async function collect(stream: AsyncIterable<ProviderEvent>): Promise<ProviderEv
   return out;
 }
 
-describe('withFallback — option validation', () => {
+describe('withFallback - option validation', () => {
   it('throws when fallbacks array is empty', () => {
     const primary = scripted({}).provider;
     expect(() => withFallback({ fallbacks: [] })(primary)).toThrow(TypeError);
   });
 });
 
-describe('withFallback — generate()', () => {
+describe('withFallback - generate()', () => {
   it('runs the secondary when the primary throws a transient error', async () => {
     const primary = scripted({ generateThrows: () => ({ kind: 'transient' }) });
     const secondary = scripted({
@@ -139,7 +139,7 @@ describe('withFallback — generate()', () => {
   });
 });
 
-describe('withFallback — stream()', () => {
+describe('withFallback - stream()', () => {
   it('falls back when the primary throws BEFORE yielding any events', async () => {
     const primary = scripted({ streamThrows: () => ({ kind: 'transient' }) });
     const secondary = scripted({

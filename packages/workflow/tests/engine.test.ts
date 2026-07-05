@@ -21,7 +21,7 @@ function eventTypes<T>(events: ReadonlyArray<WorkflowEvent<T>>): string[] {
   return events.map((e) => e.type);
 }
 
-describe('createWorkflow — execute() reference flow', () => {
+describe('createWorkflow - execute() reference flow', () => {
   it('runs validate -> autoApprove -> ship to completion for low-value orders', async () => {
     const checkpointStore = new InMemoryCheckpointStore();
     const wf = buildOrderProcessingWorkflow({ checkpointStore });
@@ -143,7 +143,7 @@ describe('Workflow.fork', () => {
   });
 });
 
-describe('Dispatch — dynamic parallelism', () => {
+describe('Dispatch - dynamic parallelism', () => {
   it('schedules per-item children inside the workflow timeline', async () => {
     interface DState {
       result: ReadonlyArray<string>;
@@ -157,7 +157,7 @@ describe('Dispatch — dynamic parallelism', () => {
       nodes: {
         fanOut: createNode<DState>({
           name: 'fanOut',
-          // workflow-13: dispatches carry the Dispatch brand — a bare
+          // workflow-13: dispatches carry the Dispatch brand - a bare
           // `{ nodeName, args }` object is channel writes, not a dispatch.
           run: () => [
             dispatch('process', { id: 'a' }),

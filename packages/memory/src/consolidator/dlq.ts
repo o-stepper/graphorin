@@ -1,5 +1,5 @@
 /**
- * Dead-letter queue helpers — pure functions used by the standard
+ * Dead-letter queue helpers - pure functions used by the standard
  * + deep phases. The actual persistence lives in the storage
  * adapter's `enqueueFailedBatch / claimReadyBatches / ...` surface.
  *

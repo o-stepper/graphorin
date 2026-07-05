@@ -281,7 +281,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     try {
       subscriber.handle.close(code, reason);
     } catch {
-      // ignore — we are tearing the subscriber down.
+      // ignore - we are tearing the subscriber down.
     }
     for (const id of subscriber.subscriptions) {
       const sub = subscriptions.get(id);
@@ -409,7 +409,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
     // Buffer first so the replay layer captures every event, even
     // when there is no live subscriber. The buffered frame is
     // sanitizer-neutral (the per-subscription dispatch sanitizes
-    // again on the wire so the second pass is idempotent — by
+    // again on the wire so the second pass is idempotent - by
     // construction matching wraps are not re-wrapped).
     const bufferedFrame: ServerEventFrame = {
       v: '1',
@@ -487,7 +487,7 @@ export function createWsDispatcher(options: WsDispatcherOptions = {}): WsDispatc
           reason: 'server-shutdown',
         });
       } catch {
-        // swallow — we are tearing down.
+        // swallow - we are tearing down.
       }
     }
     subscriptions.clear();

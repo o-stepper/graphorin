@@ -1,5 +1,5 @@
 /**
- * IP-15: the Prometheus catalog must be honest — every series in the
+ * IP-15: the Prometheus catalog must be honest - every series in the
  * `/v1/metrics` exposition is either moved by real traffic or absent. This
  * exercises the two newly-wired metrics (run count + duration, idempotency hit
  * ratio) and asserts the five sourceless series are gone.
@@ -60,7 +60,7 @@ async function bootNoAuth(): Promise<GraphorinServer> {
   return server;
 }
 
-describe('IP-15 — the Prometheus catalog only carries series the server moves', () => {
+describe('IP-15 - the Prometheus catalog only carries series the server moves', () => {
   it('moves agent_runs_total + agent_run_duration_seconds on a completed run', async () => {
     const server = await bootNoAuth();
     const run = await server.app.request('/v1/agents/echo/run', {

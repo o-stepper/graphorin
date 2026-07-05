@@ -135,7 +135,7 @@ describe('pause', () => {
     expect(isPauseSignal(threw)).toBe(true);
   });
 
-  it('an EMPTY values array behaves like no scope — every pause() suspends', async () => {
+  it('an EMPTY values array behaves like no scope - every pause() suspends', async () => {
     let threw: unknown;
     await runWithPauseResume([], () => {
       try {

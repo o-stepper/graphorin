@@ -9,7 +9,7 @@ import {
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('@graphorin/security/audit — secrets-bridge', () => {
+describe('@graphorin/security/audit - secrets-bridge', () => {
   beforeEach(() => {
     _resetSecretsAuditListenersForTesting();
   });
@@ -29,7 +29,7 @@ describe('@graphorin/security/audit — secrets-bridge', () => {
       target: 'OPENAI_KEY',
       actor: { kind: 'tool', toolName: 'http.fetch', runId: 'run-7' },
     });
-    // The bridge writes asynchronously — wait for the queue to flush.
+    // The bridge writes asynchronously - wait for the queue to flush.
     await new Promise((resolve) => setImmediate(resolve));
     expect(await db.count()).toBe(1);
     const verify = await verifyAuditChain(db);
@@ -88,7 +88,7 @@ describe('@graphorin/security/audit — secrets-bridge', () => {
     };
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      // No onWriteError — the failure must not be swallowed silently.
+      // No onWriteError - the failure must not be swallowed silently.
       bridgeSecretsToAudit({ db: failingDb });
       emitSecretsAudit({
         action: 'secret:get',

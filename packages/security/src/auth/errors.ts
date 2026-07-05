@@ -53,7 +53,7 @@ export class TokenFormatError extends GraphorinSecretsError {
  */
 export class ScopeParseError extends GraphorinSecretsError {
   override readonly kind: 'scope-parse-error' = 'scope-parse-error';
-  /** Original input string. Safe to log — never carries a secret. */
+  /** Original input string. Safe to log - never carries a secret. */
   readonly input: string;
 
   constructor(input: string, reason: string) {
@@ -83,7 +83,7 @@ export class TokenVerifyOverloadError extends GraphorinSecretsError {
       'token-verify-overload',
       `verifyToken refused: ${inFlight} concurrent verifies in-flight (cap = ${cap}).`,
       {
-        hint: 'Raise maxConcurrentVerify or investigate the upstream caller — a healthy deployment never hits this cap.',
+        hint: 'Raise maxConcurrentVerify or investigate the upstream caller - a healthy deployment never hits this cap.',
       },
     );
     this.inFlight = inFlight;
@@ -123,7 +123,7 @@ export class TokenLockedOutError extends GraphorinSecretsError {
 
 /**
  * Raised when `createToken` / `rekeyTokens` are
- * invoked with a pepper value that fails the strength check — either
+ * invoked with a pepper value that fails the strength check - either
  * below the 32-byte minimum, or a low-entropy / placeholder value
  * (e.g. a long run of identical bytes). See `assessSecretStrength`.
  *

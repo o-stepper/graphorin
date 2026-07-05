@@ -1,5 +1,5 @@
 /**
- * `BedrockAPICounter` — placeholder counter that delegates to
+ * `BedrockAPICounter` - placeholder counter that delegates to
  * `JsTiktokenCounter('cl100k_base')` for now (Bedrock's native
  * `count_tokens` API requires AWS Signature v4; full integration
  * lands in Phase 16). The proxy is sufficient for v0.1 within the

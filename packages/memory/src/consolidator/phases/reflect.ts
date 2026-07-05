@@ -1,9 +1,9 @@
 /**
- * Reflection pass (P1-1) — the deep phase's higher-order synthesis
+ * Reflection pass (P1-1) - the deep phase's higher-order synthesis
  * step, following the Generative-Agents recipe. When the accumulated
  * importance of recent episodes crosses a threshold, ask the model for
  * the few most salient questions, retrieve evidence for each, and
- * synthesize an **insight** the evidence supports — recorded
+ * synthesize an **insight** the evidence supports - recorded
  * quarantined, `provenance: 'reflection'`, and **citing the retrieved
  * memory ids** (citations are set by the framework from the actual
  * evidence, never chosen by the model, so they can never be
@@ -55,7 +55,7 @@ export interface ReflectionDeps {
   /** Upper bound on salient questions asked per pass. */
   readonly maxQuestions: number;
   readonly priceUsage?: (usage: { promptTokens: number; completionTokens: number }) => number;
-  /** Override the wall clock — used by tests. */
+  /** Override the wall clock - used by tests. */
   readonly now?: () => number;
 }
 
@@ -98,7 +98,7 @@ interface Evidence {
 }
 
 /**
- * Run the reflection pass. Idempotent w.r.t. failures — a parse miss or
+ * Run the reflection pass. Idempotent w.r.t. failures - a parse miss or
  * empty synthesis simply yields no insight. Never throws on model
  * output; only storage errors propagate.
  */
@@ -130,9 +130,9 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
       }
 
       // 1. Accumulated-importance gate. Recency, not relevance: list the most
-      //    recent episodes (MCON-1 — the old `'*'` FTS probe matched zero rows
+      //    recent episodes (MCON-1 - the old `'*'` FTS probe matched zero rows
       //    on real SQLite). Auto-formed episodes (P1-2) land
-      //    quarantined, so importance accrues there — include them. Only count
+      //    quarantined, so importance accrues there - include them. Only count
       //    episodes newer than the watermark so a pass with no new episodes
       //    never re-fires the paid synthesis (MCON-13).
       const recentEpisodes = await deps.episodic.listRecent(deps.scope, 50, {
@@ -152,7 +152,7 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
         span.setAttributes({ 'consolidator.reflect.triggered': 0 });
         return empty({ accumulatedImportance: accumulated });
       }
-      // The newest episode this pass will reflect on — persisted as the next
+      // The newest episode this pass will reflect on - persisted as the next
       // watermark so subsequent passes skip everything up to here.
       const advancedWatermark = fresh.reduce(
         (max, episode) => Math.max(max, Date.parse(episode.endedAt)),
@@ -217,7 +217,7 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
           ...factHits.map((h) => ({ id: h.record.id, text: h.record.text })),
           ...epHits.map((h) => ({ id: h.record.id, text: h.record.summary })),
         ]);
-        // Citations are mandatory — no evidence ⇒ no insight.
+        // Citations are mandatory - no evidence ⇒ no insight.
         if (evidence.length === 0) continue;
 
         // 4. Synthesize an insight grounded in that evidence.
@@ -262,7 +262,7 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
       // 5. ExpeL forgetting (MCON-16): decay every existing insight by 1
       // per reflection pass. Retrieval bumps +1 (InsightMemory.search),
       // so an insight recalled since the last pass nets level-or-better
-      // while an unused one slides toward the prune floor — starting
+      // while an unused one slides toward the prune floor - starting
       // salience 2 ⇒ pruned after two idle passes. Fresh insights from
       // THIS pass are exempt (they were inserted above at full salience
       // and have had no retrieval window yet).
@@ -298,7 +298,7 @@ export async function runReflectionPass(deps: ReflectionDeps): Promise<Reflectio
 }
 
 /**
- * Normalise an insight for exact-dedup comparison — lowercased, punctuation
+ * Normalise an insight for exact-dedup comparison - lowercased, punctuation
  * stripped, whitespace collapsed. Two insights that differ only in casing or
  * trailing punctuation collapse to the same key.
  *
@@ -323,7 +323,7 @@ function buildQuestionsRequest(deps: ReflectionDeps, recentSummaries: string): P
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: QUESTIONS_SYSTEM_PROMPT,
     temperature: 0,
-    // MCON-14: per-call output cap — a short question list.
+    // MCON-14: per-call output cap - a short question list.
     maxTokens: 512,
     metadata: scopeMetadata(deps.scope),
     outputType: { kind: 'structured' },
@@ -341,7 +341,7 @@ function buildInsightRequest(
     messages: [{ role: 'user', content: userBlock }],
     systemMessage: INSIGHT_SYSTEM_PROMPT,
     temperature: 0,
-    // MCON-14: per-call output cap — one insight object.
+    // MCON-14: per-call output cap - one insight object.
     maxTokens: 512,
     metadata: scopeMetadata(deps.scope),
     outputType: { kind: 'structured' },
@@ -368,7 +368,7 @@ function dedupeEvidence(items: ReadonlyArray<Evidence>): Evidence[] {
 }
 
 /**
- * Parse the salient-questions response — accepts `{ questions: [...] }`
+ * Parse the salient-questions response - accepts `{ questions: [...] }`
  * or a bare `[...]`, tolerating chatty / fenced output. Returns the
  * trimmed, non-empty string questions (possibly `[]`).
  *
@@ -391,7 +391,7 @@ export function parseQuestions(text: string | undefined): string[] {
 }
 
 /**
- * Parse the insight-synthesis response — accepts `{ insight: string }`
+ * Parse the insight-synthesis response - accepts `{ insight: string }`
  * (or `{ text: string }`), tolerating chatty / fenced output. Returns
  * the trimmed insight text, or `null` when absent / empty (insufficient
  * evidence ⇒ no insight).

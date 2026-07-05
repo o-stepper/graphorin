@@ -1,5 +1,5 @@
 /**
- * `@graphorin/security` sandbox interface — the layered execution
+ * `@graphorin/security` sandbox interface - the layered execution
  * surface tools and skills run inside.
  *
  * The framework's policy is **defence in depth**. Even when a tool
@@ -105,7 +105,7 @@ export const DEFAULT_TIMEOUTS_MS: Readonly<Record<SandboxKind, number>> = Object
 
 /**
  * Default per-tier memory limits (MB). The defaults follow the
- * canonical sandbox tier table — `worker-threads` 256 MB; mandatory
+ * canonical sandbox tier table - `worker-threads` 256 MB; mandatory
  * untrusted-skill tier 128 MB; `isolated-vm` 128 MB.
  *
  * @stable

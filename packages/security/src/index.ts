@@ -1,5 +1,5 @@
 /**
- * @graphorin/security — security primitives for the Graphorin
+ * @graphorin/security - security primitives for the Graphorin
  * framework. Ships the `SecretValue` runtime-safe wrapper, the strict
  * `SecretRef` URI parser, four `SecretsStore` implementations, the
  * pluggable resolver registry, the per-tool ACL primitives, the

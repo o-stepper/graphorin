@@ -3,7 +3,7 @@
  *
  * Implements the field-resolution algorithm from ADR-043:
  *
- * 1. Anthropic-base (top-level, no prefix) — highest priority.
+ * 1. Anthropic-base (top-level, no prefix) - highest priority.
  * 2. `metadata.graphorin.<field>` bucket per upstream `metadata`
  *    convention.
  * 3. `graphorin-<field>` legacy top-level prefix.
@@ -104,7 +104,7 @@ export function resolveSkillField<T = unknown>(
       : undefined;
   // mcp-skills-09 (F-10): the docs' preferred authoring form is the
   // NESTED object (`metadata: { graphorin: { sensitivity: ... } }`),
-  // which YAML parses to a nested record — the old resolver only read
+  // which YAML parses to a nested record - the old resolver only read
   // the flat dotted key (`metadata: { 'graphorin.sensitivity': ... }`)
   // and silently dropped nested values. Both shapes now resolve; the
   // flat key wins when both are present (it was the only working form).
@@ -246,7 +246,7 @@ export function validateFrontmatter(
   const runtimeCompat = resolveAndDiag<string>('runtime-compat');
   // The graphorin-only `version` field carries runtime-compat semantics; the
   // Anthropic-base `metadata.version` is the skill's own version. We honour
-  // both — the loader uses `runtimeCompat` for compat, `version` for
+  // both - the loader uses `runtimeCompat` for compat, `version` for
   // graphorin-runtime-compat-as-version aliasing.
   const version = resolveAndDiag<string>('version');
   const sensitivity = resolveAndDiag<string>('sensitivity');
@@ -521,7 +521,7 @@ function parseHandoffInputFilterStep(raw: unknown): HandoffInputFilterStep | nul
 
 /**
  * Parse the `tools` field. Accepts either an array of strings (tool
- * names — the loader resolves modules through naming convention) or
+ * names - the loader resolves modules through naming convention) or
  * an array of objects with `name`, `module`, `description`, `tags`.
  * Returns `null` for unsupported shapes.
  *
@@ -617,7 +617,7 @@ function evaluateSemverExpression(
 
 function parseSemver(value: string): [number, number, number] | null {
   const trimmed = value.trim();
-  // Strip optional `v` prefix and any pre-release / build metadata —
+  // Strip optional `v` prefix and any pre-release / build metadata -
   // we only care about the canonical `MAJOR.MINOR.PATCH` triple.
   const stripped = trimmed.replace(/^v/u, '').split(/[-+]/u, 1)[0] ?? '';
   const parts = stripped.split('.');

@@ -23,7 +23,7 @@ import type { EvalReport, Scorer } from '@graphorin/observability/eval';
 
 /**
  * Agent shape consumed by the runner. Anything with a `run(input)`
- * method satisfies the contract — the framework's own `Agent` type
+ * method satisfies the contract - the framework's own `Agent` type
  * matches by structural typing.
  *
  * @stable
@@ -56,7 +56,7 @@ export interface RunOptions<I, O> {
   /**
    * How to handle `signal` abort. Default (`false`): stop dispatching and
    * resolve with a **partial** {@link EvalReport} (`aborted: true`) covering
-   * the cases that finished — a long judged run shouldn't lose all completed
+   * the cases that finished - a long judged run shouldn't lose all completed
    * work to a Ctrl+C. Set `true` to throw the abort reason instead.
    */
   readonly throwOnAbort?: boolean;

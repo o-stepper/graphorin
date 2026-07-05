@@ -4,7 +4,7 @@
  * (token + cost), the UTC reset semantics, and the `onExceed`
  * dispatch.
  *
- * The tracker does not perform any I/O — operators surface the live
+ * The tracker does not perform any I/O - operators surface the live
  * counters via `Consolidator.status()` and the persisted snapshot is
  * derived from `consolidator_runs` rows.
  *
@@ -46,7 +46,7 @@ export interface BudgetTrackerOptions {
   /**
    * Sink for the `onExceed: 'log'` WARN (memory-consolidation-02).
    * Defaults to `process.stderr`. One WARN per resource per budget
-   * window — the shipped standard/full presets use `'log'`, so without
+   * window - the shipped standard/full presets use `'log'`, so without
    * it a breached ceiling was completely silent.
    */
   readonly logger?: (message: string) => void;
@@ -77,7 +77,7 @@ export class BudgetTracker {
    * Timestamped spend ledger for `sliding-24h` only. `#maybeReset` trims it to
    * the trailing 24h window and recomputes `#tokens` / `#cost` from it, so the
    * counters reflect a true rolling window instead of being zeroed on every
-   * check (MCON-3). Unused — and never appended to — under `utc` / `local`.
+   * check (MCON-3). Unused - and never appended to - under `utc` / `local`.
    */
   #ledger: Array<{ at: number; tokens: number; cost: number }> = [];
 
@@ -135,7 +135,7 @@ export class BudgetTracker {
   }
 
   /**
-   * Record consumption. Returns the post-record state — `paused` is
+   * Record consumption. Returns the post-record state - `paused` is
    * `true` when the spend pushed past a ceiling under
    * `onExceed: 'pause'`.
    *
@@ -169,7 +169,7 @@ export class BudgetTracker {
    */
   snapshot(): BudgetSnapshot {
     this.#maybeReset();
-    // For the rolling window the "reset" is continuous — the boundary is when
+    // For the rolling window the "reset" is continuous - the boundary is when
     // the oldest in-window spend ages out (24h after it landed).
     const resetAt =
       this.#resetSemantics === 'sliding-24h'
@@ -215,14 +215,14 @@ export class BudgetTracker {
     }
     if (this.#onExceed === 'log' && !this.#warnedThisWindow.has(resource)) {
       // memory-consolidation-02: the type doc always promised "'log'
-      // keeps running with a WARN" — the WARN finally exists. Once per
+      // keeps running with a WARN" - the WARN finally exists. Once per
       // resource per budget window, so a breached daily ceiling is
       // visible without flooding.
       this.#warnedThisWindow.add(resource);
       this.#logger(
         `[graphorin/memory] consolidator ${resource} budget exceeded in phase '${phase}': ` +
           `${resource === 'cost' ? `$${actual.toFixed(4)} > $${budget.toFixed(4)}` : `${actual} > ${budget}`} ` +
-          `(onExceed: 'log' — continuing; switch to 'pause'/'throw' to enforce).`,
+          `(onExceed: 'log' - continuing; switch to 'pause'/'throw' to enforce).`,
       );
     }
   }

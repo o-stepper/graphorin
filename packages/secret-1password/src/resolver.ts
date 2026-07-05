@@ -5,7 +5,7 @@
  *
  * URI shape (per 1Password): `op://<vault>/<item>/[section/]<field>`.
  * The resolver accepts any `op://` URI the CLI accepts (the CLI is
- * the source of truth — we forward verbatim) and rejects only the
+ * the source of truth - we forward verbatim) and rejects only the
  * obvious malformed cases at parse time.
  *
  * 1Password explicitly treats vault / item / field names as
@@ -35,7 +35,7 @@ export interface OnePasswordResolverOptions {
   /**
    * Optional service-account token. When set the resolver forwards it
    * via `OP_SERVICE_ACCOUNT_TOKEN` so the CLI runs in headless mode.
-   * The token is itself a secret — pass a previously-resolved
+   * The token is itself a secret - pass a previously-resolved
    * `SecretValue` and use `.use(...)` to scope its lifetime.
    */
   readonly serviceAccountToken?: string;
@@ -101,7 +101,7 @@ export function createOnePasswordResolver(
           throw new SecretResolutionError(
             'op',
             parsed.raw,
-            `${err.message}${err.hint !== undefined ? ` — hint: ${err.hint}` : ''}`,
+            `${err.message}${err.hint !== undefined ? ` - hint: ${err.hint}` : ''}`,
             { cause: err },
           );
         }

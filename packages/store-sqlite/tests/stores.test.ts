@@ -101,7 +101,7 @@ describe('createSqliteStore', () => {
       createdAt: new Date().toISOString(),
     });
     // FTS5 syntax characters (`*`, `(`, `)`, `"`, boolean keywords, `NEAR/`)
-    // must be quoted away per token — the query must not raise a SqliteError
+    // must be quoted away per token - the query must not raise a SqliteError
     // and must still recall on the legitimate tokens it contains.
     const hits = await store.memory.semantic.search(
       { userId: 'alex' },
@@ -277,7 +277,7 @@ describe('createSqliteStore', () => {
     const all = await semantic.listForDecay(scope, 10, { includeArchived: true });
     expect(all.map((r) => r.id).sort()).toEqual(['d-live', 'd-old']);
 
-    // MRET-7: recall marks access — recency set, strength bumped with a cap.
+    // MRET-7: recall marks access - recency set, strength bumped with a cap.
     const accessedAt = Date.now();
     await semantic.markAccessed(['d-live'], accessedAt);
     const after = (await semantic.listForDecay(scope, 10)).find((r) => r.id === 'd-live');
@@ -345,7 +345,7 @@ describe('createSqliteStore', () => {
     expect(preScrub.some((r) => r.new_value === 'SECRET-NEW lives in Paris')).toBe(true);
 
     // GDPR purge of the NEW fact: its text must vanish from the audit
-    // trail too — including the SUPERSEDE row keyed to the OLD id.
+    // trail too - including the SUPERSEDE row keyed to the OLD id.
     await semantic.purge('hist-new', 'gdpr-request');
     const postScrub = store.connection.all<{ prev_value: string | null; new_value: string | null }>(
       "SELECT prev_value, new_value FROM memory_history WHERE memory_kind = 'fact'",
@@ -411,7 +411,7 @@ describe('createSqliteStore', () => {
     expect(
       store.connection.all('SELECT 1 FROM fact_entities WHERE fact_id = ?', ['fact-graph']).length,
     ).toBe(0);
-    // The canonical entity is shared data, not the purged subject — it stays.
+    // The canonical entity is shared data, not the purged subject - it stays.
     expect(await graph.getEntity(scope, entityId)).not.toBeNull();
   });
 
@@ -452,7 +452,7 @@ describe('createSqliteStore', () => {
     };
     // Empty cache → null.
     expect(await sessionExt.totalCachedTokens(scope)).toBeNull();
-    // Populate the cache via a direct UPDATE — the public API leaves
+    // Populate the cache via a direct UPDATE - the public API leaves
     // it null until the provider layer wires the token counter
     // through (Phase 11 / DEC-131).
     store.connection.run('UPDATE session_messages SET token_count = ? WHERE id = ?', [

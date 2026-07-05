@@ -1,5 +1,5 @@
 /**
- * `CausalityMonitor` — lateral-leak defense primitive that maintains
+ * `CausalityMonitor` - lateral-leak defense primitive that maintains
  * a per-`RunContext` `causalityChain` of bounded depth and refuses
  * to let an assistant message reference information about a denied
  * earlier action.
@@ -37,7 +37,7 @@ export interface CausalityMonitorConfig {
   /**
    * When `true`, emit the chain on every `checkMessage(...)` call
    * (high-cardinality; opt-in for compliance audits). Default
-   * `false` — only emit on detected leaks.
+   * `false` - only emit on detected leaks.
    */
   readonly auditAllChains?: boolean;
 }
@@ -103,7 +103,7 @@ export class CausalityMonitor {
   /**
    * Append an entry to the causality chain, dropping the oldest
    * when the chain exceeds `maxChainDepth`. Bounded-length, no PII,
-   * no secret values — entries are short opaque strings like
+   * no secret values - entries are short opaque strings like
    * `tool:slack-notify`, `tool.error:SecretAccessDenied`,
    * `subagent:research-east`, `compaction:auto-trigger`.
    */
@@ -116,7 +116,7 @@ export class CausalityMonitor {
     }
   }
 
-  /** Reset the chain — e.g. on `agent.run` boundary. */
+  /** Reset the chain - e.g. on `agent.run` boundary. */
   reset(): void {
     this.#chain = [];
   }
@@ -209,7 +209,7 @@ export class CausalityMonitor {
 
   /**
    * Drain the chain to the audit log on `agent.run` completion or
-   * `agent.abort`. The runtime supplies the audit emitter — the
+   * `agent.abort`. The runtime supplies the audit emitter - the
    * primitive itself is storage-agnostic.
    */
   flush(reason: 'agent.run.complete' | 'agent.abort'): {

@@ -127,7 +127,7 @@ let server: GraphorinServer | undefined;
 let bearer: string | undefined;
 let adminBearer: string | undefined;
 
-/** The booted server — every test runs after bootServer() in beforeEach. */
+/** The booted server - every test runs after bootServer() in beforeEach. */
 function srv(): GraphorinServer {
   if (server === undefined) throw new Error('server not booted');
   return server;
@@ -153,7 +153,7 @@ async function bootServer(extraScopes?: ReadonlyArray<string>): Promise<{
     skipListen: true,
     sessions: buildSessionStub(),
     // IP-14: the REAL replay route (replay/routes.ts) must serve even
-    // with the sessions API configured — the old in-sessions stub
+    // with the sessions API configured - the old in-sessions stub
     // shadowed it.
     replay: {
       async loadRunReplay(input: { runId: string; mode: string }) {
@@ -234,7 +234,7 @@ afterEach(async () => {
   adminBearer = undefined;
 });
 
-describe('REST integration — happy + error paths', () => {
+describe('REST integration - happy + error paths', () => {
   beforeEach(async () => {
     await bootServer();
   });
@@ -383,7 +383,7 @@ describe('REST integration — happy + error paths', () => {
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({}),
     });
-    // IP-14: server-side durable resume is not implemented — the old
+    // IP-14: server-side durable resume is not implemented - the old
     // 202 persisted nothing while the client SDK documented it as the
     // durable HITL path. 501 + the library-side pointer is the truth.
     expect(res.status).toBe(501);
@@ -552,7 +552,7 @@ describe('REST integration — happy + error paths', () => {
     });
 
     // IP-14: the REAL replay handler serves (the in-sessions stub that
-    // shadowed it is gone) — 200 with the loaded events, ladder intact.
+    // shadowed it is gone) - 200 with the loaded events, ladder intact.
     const sanitized = await srv().app.request('/v1/sessions/s3/replay', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },

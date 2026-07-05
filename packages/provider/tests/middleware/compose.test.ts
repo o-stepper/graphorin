@@ -101,7 +101,7 @@ describe('composeProviderMiddleware', () => {
     expect(() =>
       composeProviderMiddleware([
         withTracing({}),
-        // @ts-expect-error — testing the runtime guard
+        // @ts-expect-error - testing the runtime guard
         null,
       ])(bareAdapter()),
     ).toThrow(TypeError);

@@ -19,7 +19,7 @@ export type LogFields = Readonly<Record<string, unknown>>;
 /**
  * Pluggable logger contract consumed by every `@graphorin/*` runtime
  * package. The concrete implementation lives in `@graphorin/observability`
- * — declaring the interface here keeps level-zero packages free of an
+ * - declaring the interface here keeps level-zero packages free of an
  * observability dependency.
  *
  * Loggers are intentionally **structured** and **side-effect-free** in the

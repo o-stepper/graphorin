@@ -1,5 +1,5 @@
 /**
- * @graphorin/provider — vendor-neutral LLM provider layer for the
+ * @graphorin/provider - vendor-neutral LLM provider layer for the
  * Graphorin framework.
  *
  * The package owns:

@@ -11,7 +11,7 @@ import { KeyringSecretsStore, SecretRequiredError } from '../../src/secrets/inde
  *
  * - The opt-in is `GRAPHORIN_RUN_KEYRING_INTEGRATION=1`.
  * - On platforms where `@napi-rs/keyring` cannot load (no peer
- *   installed, or the underlying backend unavailable — e.g. headless
+ *   installed, or the underlying backend unavailable - e.g. headless
  *   Linux without a running Secret Service), the test reports an
  *   informative skip rather than failing.
  *
@@ -39,7 +39,7 @@ const probe = await (async (): Promise<{
   }
 })();
 
-describe.skipIf(!probe.available)('KeyringSecretsStore — real keyring (platform-gated)', () => {
+describe.skipIf(!probe.available)('KeyringSecretsStore - real keyring (platform-gated)', () => {
   // Use a unique service prefix per-run so the test never collides
   // with the developer's other Graphorin deployments.
   const service = `graphorin-test-${randomUUID()}`;
@@ -69,9 +69,9 @@ describe.skipIf(!probe.available)('KeyringSecretsStore — real keyring (platfor
 });
 
 if (!probe.available) {
-  describe('KeyringSecretsStore — real keyring (skipped)', () => {
+  describe('KeyringSecretsStore - real keyring (skipped)', () => {
     it.skip(`platform-gated: ${probe.reason}`, () => {
-      // Informative skip — the spec calls for "platform-gated;
+      // Informative skip - the spec calls for "platform-gated;
       // informative skip on platforms without keyring".
     });
   });

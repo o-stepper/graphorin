@@ -7,14 +7,14 @@ import { describe, expect, it } from 'vitest';
 import { createSqliteStore } from '../src/index.js';
 
 /**
- * CS-12 — `supersede()` must not close the old fact (or point its
+ * CS-12 - `supersede()` must not close the old fact (or point its
  * `superseded_by` at the new id) before the new fact is durably written. If the
  * new-fact write fails, the old fact must be left fully intact and still
  * resolvable, never closed in favour of a row that doesn't exist.
  */
 const base = { kind: 'semantic' as const, userId: 'alex', sensitivity: 'internal' as const };
 
-describe('CS-12 — supersede writes the successor before closing the old fact', () => {
+describe('CS-12 - supersede writes the successor before closing the old fact', () => {
   it('a failed new-fact write leaves the old fact open and unlinked', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-cs12-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite`, skipSqliteVec: true });

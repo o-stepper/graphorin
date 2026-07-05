@@ -1,5 +1,5 @@
 /**
- * PS-13 — the native Ollama `/api/chat` path must serialize replayed assistant
+ * PS-13 - the native Ollama `/api/chat` path must serialize replayed assistant
  * `tool_calls` with object `arguments` (not a JSON string) and without the
  * OpenAI-only `id` / `type` fields, which the Go server's unmarshaller rejects.
  */

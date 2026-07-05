@@ -13,7 +13,7 @@ import { CipherPeerMissingError, loadCipherDriver, resolvePassphrase } from './e
  */
 export interface OpenAuditDatabaseOptions {
   readonly path: string;
-  /** Cipher / passphrase resolver — required because audit.db is encrypted. */
+  /** Cipher / passphrase resolver - required because audit.db is encrypted. */
   readonly encryption: Extract<EncryptionConfig, { enabled: true }>;
   /** Optional driver override for tests. */
   readonly driver?: BetterSqlite3Constructor;

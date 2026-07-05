@@ -1,5 +1,5 @@
 /**
- * `createLogger(...)` — structured logger with optional span correlation.
+ * `createLogger(...)` - structured logger with optional span correlation.
  *
  * The logger is a thin wrapper around `console.{log,info,warn,error}`
  * that adds:
@@ -47,7 +47,7 @@ export interface LoggerOptions {
 const LEVELS: ReadonlyArray<LogLevel> = ['trace', 'debug', 'info', 'warn', 'error'] as const;
 
 /**
- * @internal — context used to thread the current span id through nested
+ * @internal - context used to thread the current span id through nested
  * async calls. Exposed via {@link withCurrentSpan} below.
  */
 const SPAN_CONTEXT = createAsyncContext<{ traceId: string; spanId: string }>(

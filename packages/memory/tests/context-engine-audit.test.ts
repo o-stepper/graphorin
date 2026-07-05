@@ -42,7 +42,7 @@ import { createInMemoryStore, InMemoryEmbeddingRegistry } from './fixtures/in-me
 
 const SCOPE = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
 
-describe('Phase 10d audit — Phase 10a interface backwards-compat', () => {
+describe('Phase 10d audit - Phase 10a interface backwards-compat', () => {
   it('memory.compile(scope) returns the documented MemoryContextBlocks shape', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
@@ -65,7 +65,7 @@ describe('Phase 10d audit — Phase 10a interface backwards-compat', () => {
     // An active, author-defined rule IS rendered into the prompt…
     await memory.procedural.define(SCOPE, { text: 'cite sources' });
     // …but a quarantined (e.g. P2-2-induced) rule must NOT reach the system
-    // prompt — it has not been validated. `activate()` already excludes it;
+    // prompt - it has not been validated. `activate()` already excludes it;
     // compile() must agree (MST-3), or a compile()-based prompt builder gets
     // unvalidated induction procedures (the highest memory-poisoning risk).
     const now = new Date().toISOString();
@@ -113,7 +113,7 @@ describe('Phase 10d audit — Phase 10a interface backwards-compat', () => {
   });
 });
 
-describe('Phase 10d audit — token counter adapter (TokenCounter from @graphorin/core)', () => {
+describe('Phase 10d audit - token counter adapter (TokenCounter from @graphorin/core)', () => {
   it('adaptTokenCounter wraps a real TokenCounter and forwards countText', async () => {
     const tokens = new Map<string, number>();
     let calls = 0;
@@ -195,7 +195,7 @@ describe('Phase 10d audit — token counter adapter (TokenCounter from @graphori
     const rendered = renderMessageText(withCall);
     expect(rendered).toContain('[tool-call:code_execute]');
     expect(rendered).toContain(script);
-    // Large tool args must raise the count — pre-fix they contributed ZERO
+    // Large tool args must raise the count - pre-fix they contributed ZERO
     // while the provider serialized and billed for them, so compaction
     // fired late and the provider could 400 with context-length first.
     const withTokens = await countMessageTokens([withCall], HEURISTIC_TOKEN_COUNTER);
@@ -228,7 +228,7 @@ describe('Phase 10d audit — token counter adapter (TokenCounter from @graphori
   });
 });
 
-describe('Phase 10d audit — auto-compaction edge cases', () => {
+describe('Phase 10d audit - auto-compaction edge cases', () => {
   const STUB_SUMMARIZER: CompactionSummarizer = {
     id: 'audit-stub',
     async summarize() {
@@ -425,7 +425,7 @@ describe('Phase 10d audit — auto-compaction edge cases', () => {
   });
 });
 
-describe('Phase 10d audit — `reanchorPinnedFacts` budget enforcement', () => {
+describe('Phase 10d audit - `reanchorPinnedFacts` budget enforcement', () => {
   it('looks up pinned facts and stops once `maxTokens` is exhausted', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
@@ -461,7 +461,7 @@ describe('Phase 10d audit — `reanchorPinnedFacts` budget enforcement', () => {
   });
 });
 
-describe('Phase 10d audit — engine custom hook signatures', () => {
+describe('Phase 10d audit - engine custom hook signatures', () => {
   it('PostCompactionHook function-form is wrapped into a NamedPostCompactionHook with auto-id', async () => {
     let invoked = 0;
     const memory = createMemory({

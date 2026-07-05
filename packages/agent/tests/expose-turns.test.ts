@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createAgent } from '../src/index.js';
 import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
 
-describe('Agent.toTool — exposeTurns semantics', () => {
+describe('Agent.toTool - exposeTurns semantics', () => {
   const subProvider = () =>
     createMockProvider({ modelId: 's', scripts: [textOnlyScript('sub-final-output', 4)] });
 

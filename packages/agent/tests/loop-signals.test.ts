@@ -18,7 +18,7 @@ const noopTool: Tool<unknown, unknown, unknown> = {
   execute: async () => 'ok',
 } as Tool<unknown, unknown, unknown>;
 
-describe('AG-24 — a stop-condition cut is distinguishable from clean completion', () => {
+describe('AG-24 - a stop-condition cut is distinguishable from clean completion', () => {
   it('a run cut by the step cap mid-task fails with code stop-condition', async () => {
     const provider = createMockProvider({
       modelId: 'm',
@@ -60,7 +60,7 @@ describe('AG-24 — a stop-condition cut is distinguishable from clean completio
   });
 });
 
-describe('AG-26 — ghost tool-call-end dropped; file/source surfaced', () => {
+describe('AG-26 - ghost tool-call-end dropped; file/source surfaced', () => {
   it('drops a tool-call-end that has no matching tool-call-start instead of dispatching a nameless tool', async () => {
     const provider = createMockProvider({
       modelId: 'm',

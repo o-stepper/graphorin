@@ -176,7 +176,7 @@ describe('TransformersJsEmbedder', () => {
       pipelineFactory: makeStubPipelineFactory(123),
     });
     // periphery-05 (PS-11 port): an unknown model with no `dim` hint
-    // throws instead of silently assuming 768 — the assumed width baked
+    // throws instead of silently assuming 768 - the assumed width baked
     // a wrong-width id + vec0 table, and the id then CHANGED after the
     // first embed (which lock-on-first reads as an embedder swap).
     expect(() => e.dim()).toThrow(/Unknown embedding width/);

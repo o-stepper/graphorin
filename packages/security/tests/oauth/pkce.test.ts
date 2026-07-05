@@ -9,7 +9,7 @@ import {
   generateState,
 } from '../../src/oauth/pkce.js';
 
-describe('@graphorin/security/oauth — PKCE primitives', () => {
+describe('@graphorin/security/oauth - PKCE primitives', () => {
   it('produces verifiers within the spec-mandated character range', () => {
     for (let i = 0; i < 20; i += 1) {
       const verifier = generatePkceVerifier();

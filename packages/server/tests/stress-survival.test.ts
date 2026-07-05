@@ -1,5 +1,5 @@
 /**
- * Stress test (scaled-down) — verifies the daemon survives concurrent
+ * Stress test (scaled-down) - verifies the daemon survives concurrent
  * agent runs + several active triggers + an active replay session
  * without losing state or crashing.
  *
@@ -41,7 +41,7 @@ afterEach(async () => {
   delete process.env[PEPPER_ENV];
 });
 
-describe('Phase 14c — daemon survival under load', () => {
+describe('Phase 14c - daemon survival under load', () => {
   it('survives 30 concurrent agent runs + 5 trigger fires + 5 sequential replays', {
     timeout: 30_000,
   }, async () => {
@@ -152,7 +152,7 @@ describe('Phase 14c — daemon survival under load', () => {
     }
     expect(triggerFires).toBeGreaterThan(0);
 
-    // /v1/health should still return ok / degraded — never failing.
+    // /v1/health should still return ok / degraded - never failing.
     const health = await server.app.request('/v1/health');
     expect(health.status).toBeLessThan(503);
 

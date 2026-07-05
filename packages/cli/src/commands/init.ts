@@ -1,11 +1,11 @@
 /**
- * `graphorin init` — interactive bootstrap.
+ * `graphorin init` - interactive bootstrap.
  *
  * Writes a fresh `graphorin.config.ts` to the current working
  * directory (or `--out`), prompts the operator for the cloud-upload
  * sensitivity tier + storage encryption opt-in, and prints exactly
  * one bootstrap admin token (held by the operator from this point
- * onward — the tool never persists nor logs the raw value).
+ * onward - the tool never persists nor logs the raw value).
  *
  * `--non-interactive` accepts every choice through flags or env vars
  * so the command works equally well in CI / image-build pipelines.
@@ -176,7 +176,7 @@ export default defineConfig({
   observability: {
     logger: 'json',
   },
-  // IP-5: no top-level 'defaults' block — the strict server-config
+  // IP-5: no top-level 'defaults' block - the strict server-config
   // parser rejects unknown keys, so the old render made a fresh
   // 'graphorin init' fail on the very next migrate/start. The tier you
   // chose at init is recorded below; enforce it via the memory

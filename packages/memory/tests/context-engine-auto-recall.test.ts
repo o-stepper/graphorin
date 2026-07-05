@@ -9,7 +9,7 @@ import {
 } from '../src/index.js';
 import { createInMemoryStore, InMemoryEmbeddingRegistry } from './fixtures/in-memory-store.js';
 
-describe('context-engine — auto-recall heuristic (Phase 10d)', () => {
+describe('context-engine - auto-recall heuristic (Phase 10d)', () => {
   it('English defaults match the documented trigger phrases', () => {
     const strategy = defaultLocaleHeuristicStrategy(enLocalePack);
     expect(

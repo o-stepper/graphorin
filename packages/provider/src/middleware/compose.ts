@@ -24,7 +24,7 @@ import { MiddlewareOrderingError } from '../errors/errors.js';
 export const MIDDLEWARE_KIND: unique symbol = Symbol.for('graphorin.provider.middleware.kind');
 
 /**
- * Canonical middleware ordering — outermost → innermost. The table
+ * Canonical middleware ordering - outermost → innermost. The table
  * is enforced by {@link composeProviderMiddleware} and is part of the
  * provider layer's public contract (DEC-145 / ADR-039).
  *
@@ -33,8 +33,8 @@ export const MIDDLEWARE_KIND: unique symbol = Symbol.for('graphorin.provider.mid
  * Composition is outermost-first, so a request flows top→bottom and a
  * response flows bottom→top:
  *
- * - `withTracing` is outermost so the span wraps everything below —
- *   including retries — and records true end-to-end latency.
+ * - `withTracing` is outermost so the span wraps everything below -
+ *   including retries - and records true end-to-end latency.
  * - `withRetry` sits above the rate/cost limiters so each retry
  *   attempt is independently counted and throttled.
  * - `withRateLimit` → `withCostLimit` → `withCostTracking` form the
@@ -44,7 +44,7 @@ export const MIDDLEWARE_KIND: unique symbol = Symbol.for('graphorin.provider.mid
  *   secondary provider still passes through the redactor.
  * - `withRedaction` is **innermost** (closest to the provider) so it
  *   is the last thing to touch the outbound payload and the first to
- *   touch the inbound stream — guaranteeing every retry, fallback, and
+ *   touch the inbound stream - guaranteeing every retry, fallback, and
  *   cost-tracked request sees an already-redacted payload and no
  *   secret can bypass it.
  *
@@ -73,7 +73,7 @@ interface KindedProvider extends Provider {
 }
 
 /**
- * Symbol used to walk the chain — every wrapper exposes the inner
+ * Symbol used to walk the chain - every wrapper exposes the inner
  * provider so the composer can introspect the full stack at startup.
  *
  * @stable
@@ -121,13 +121,13 @@ export function providerHasMiddleware(provider: Provider, name: string): boolean
 /**
  * Wrap an adapter in a middleware chain whose order is validated
  * against {@link CANONICAL_MIDDLEWARE_ORDER}. The argument array MUST
- * be ordered outermost → innermost — the same way the layers appear
+ * be ordered outermost → innermost - the same way the layers appear
  * in the documented composition example. The composer validates that
  * every kind known to the canonical order is monotonically non-
  * decreasing in index, throws otherwise.
  *
  * Custom middleware whose kind is NOT in the canonical order is
- * silently allowed at any position — operators registering bespoke
+ * silently allowed at any position - operators registering bespoke
  * layers via {@link defineProviderMiddleware} carry the
  * responsibility of placing them sensibly.
  *

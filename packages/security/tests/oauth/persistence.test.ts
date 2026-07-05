@@ -32,7 +32,7 @@ function baseRecord(
   };
 }
 
-describe('SPL-1 — OAuth token persistence is real', () => {
+describe('SPL-1 - OAuth token persistence is real', () => {
   let audits: Array<{ action: string; decision: string; metadata?: Record<string, unknown> }> = [];
   let stopAudit: (() => void) | undefined;
 
@@ -136,7 +136,7 @@ describe('SPL-1 — OAuth token persistence is real', () => {
   });
 });
 
-describe('SPL-12 / SPL-16 — option + audit honesty', () => {
+describe('SPL-12 / SPL-16 - option + audit honesty', () => {
   it('refresh({force:true}) bypasses the in-flight dedupe', async () => {
     const { refreshAccessToken, _resetInflightRefreshForTesting: reset } = await import(
       '../../src/oauth/refresh.js'

@@ -3,7 +3,7 @@
  * REAL `ai` peer (a devDependency), not fixtures. Every request built
  * by the adapter flows through the SDK's actual zod prompt validation
  * (`standardizePrompt`) and tool preparation, so any drift between the
- * conversion layer and the installed SDK fails here — without network.
+ * conversion layer and the installed SDK fails here - without network.
  *
  * Pre-fix, the adapter forwarded Graphorin `ToolDefinition[]` and raw
  * Graphorin messages verbatim; the SDK rejected the second step of any
@@ -314,7 +314,7 @@ describe('prompt-cache economics against the real AI SDK (core-provider-02)', ()
   });
 });
 
-describe('C2 — adapter-level worked-example folding', () => {
+describe('C2 - adapter-level worked-example folding', () => {
   it('folds ToolDefinition.examples into the wire description on the RAW adapter path', async () => {
     let seenParams: Record<string, unknown> | undefined;
     const model = new MockLanguageModelV4({

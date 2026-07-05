@@ -8,7 +8,7 @@ import {
   projectToolApi,
 } from '../src/code-mode/index.js';
 
-/** Minimal execution context — the meta-tools only read `ctx.signal`. */
+/** Minimal execution context - the meta-tools only read `ctx.signal`. */
 const ctx = { signal: new AbortController().signal } as unknown as ToolExecutionContext;
 
 // --- projection -------------------------------------------------------------
@@ -55,7 +55,7 @@ describe('projectToolApi', () => {
   });
 
   it('renders a typed signature from a plain Zod schema (tools-01)', () => {
-    // The documented way to declare a tool — no hand-written toJSON().
+    // The documented way to declare a tool - no hand-written toJSON().
     const projection = projectToolApi([
       {
         name: 'search_orders',

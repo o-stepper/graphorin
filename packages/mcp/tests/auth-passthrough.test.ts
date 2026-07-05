@@ -70,7 +70,7 @@ describe('MC-2: auth passthrough into the MCP transport', () => {
     expect(headers).toEqual(['Bearer tok-1', 'Bearer tok-1', 'Bearer tok-1']);
 
     // Rotate the token in the provider; the very next request must carry
-    // the new token — no client re-creation.
+    // the new token - no client re-creation.
     token = 'tok-2';
     const after = await captureAuthHeaders({ auth: provider, calls: 1 });
     expect(after).toEqual(['Bearer tok-2']);

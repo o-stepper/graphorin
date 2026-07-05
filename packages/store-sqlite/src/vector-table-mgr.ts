@@ -38,7 +38,7 @@ export class VectorTableManager {
     const idColumn = pickIdColumn(kind);
     // CS-3: bind the registered distance metric to the vec0 table so KNN
     // computes the metric the meta advertises (sqlite-vec defaults to L2
-    // otherwise — leaving a 'cosine'-labelled table scoring L2).
+    // otherwise - leaving a 'cosine'-labelled table scoring L2).
     const metric = vecMetric(meta.distanceMetric);
     this.#conn.execMany(
       `CREATE VIRTUAL TABLE IF NOT EXISTS ${quoteIdent(tableName)} USING vec0(${idColumn} TEXT PRIMARY KEY, embedding float[${meta.dim}] distance_metric=${metric});`,
@@ -99,7 +99,7 @@ function pickIdColumn(kind: 'facts' | 'episodes' | 'messages'): string {
   }
 }
 
-/** Quote a SQL identifier — only `[A-Za-z0-9_]` allowed. */
+/** Quote a SQL identifier - only `[A-Za-z0-9_]` allowed. */
 function quoteIdent(ident: string): string {
   if (!/^[A-Za-z0-9_]+$/.test(ident)) {
     throw new Error(`[graphorin/store-sqlite] invalid SQL identifier: ${ident}`);

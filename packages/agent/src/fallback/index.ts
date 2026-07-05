@@ -10,7 +10,7 @@
  * (re-tries the whole step against a different model on rate-limit
  * / capacity / context-length / transient errors). The
  * **request-level** `withFallback` provider middleware
- * (`@graphorin/provider`) is a separate concern — it retries against
+ * (`@graphorin/provider`) is a separate concern - it retries against
  * an alternate provider serving the **same** model concept on
  * transient errors inside one `provider.stream(...)` call.
  *
@@ -33,7 +33,7 @@ export interface AgentFallbackPolicy {
   readonly capacityEligible?: boolean;
   /** Default `true`. */
   readonly contextLengthEligible?: boolean;
-  /** Default `false` — `withRetry` already covers transient errors. */
+  /** Default `false` - `withRetry` already covers transient errors. */
   readonly transientEligible?: boolean;
 }
 

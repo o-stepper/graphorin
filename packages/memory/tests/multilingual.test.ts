@@ -24,7 +24,7 @@ const FIXTURES: ReadonlyArray<{
   { locale: 'pt', text: 'Adora caminhadas na montanha e café expresso.', query: 'caminhadas' },
 ];
 
-describe('@graphorin/memory — multilingual fixtures', () => {
+describe('@graphorin/memory - multilingual fixtures', () => {
   it('semantic search retrieves facts written in any of the bundled fixture locales', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),

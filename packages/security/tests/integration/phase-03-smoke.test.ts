@@ -35,7 +35,7 @@ import { _resetSecretValueAuditListenersForTesting } from '../../src/secrets/sec
 
 import { createMemoryAuditDb } from '../audit/_helpers.js';
 
-describe('Phase 03 aggregate smoke — untrusted skill → ACL deny → audit chain', () => {
+describe('Phase 03 aggregate smoke - untrusted skill → ACL deny → audit chain', () => {
   beforeEach(() => {
     _resetAuditDbBindingsForTesting();
     _resetSecretsAuditListenersForTesting();

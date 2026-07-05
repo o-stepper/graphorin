@@ -1,5 +1,5 @@
 /**
- * Coverage for `vercelAdapter` — feeds a fixture-driven
+ * Coverage for `vercelAdapter` - feeds a fixture-driven
  * `runtimeOverrides` shape so the suite never imports the real
  * `ai` peer dependency. Every documented chunk variant is exercised
  * (text-delta, reasoning-delta, tool-call streaming, finish, error)
@@ -292,7 +292,7 @@ describe('vercelAdapter', () => {
 const _typeWitness: AssistantMessage = { role: 'assistant', content: '' };
 void _typeWitness;
 
-describe('vercelAdapter — AI SDK v7 shapes (PS-6)', () => {
+describe('vercelAdapter - AI SDK v7 shapes (PS-6)', () => {
   const V7_MODEL: LanguageModelLike = {
     provider: 'fixture',
     modelId: 'fixture-model-v7',
@@ -333,7 +333,7 @@ describe('vercelAdapter — AI SDK v7 shapes (PS-6)', () => {
     if (end?.type === 'tool-call-end') {
       expect(end.finalArgs).toEqual({ q: 'x' });
     }
-    // v7 finish carries totalUsage — must not zero out cost tracking.
+    // v7 finish carries totalUsage - must not zero out cost tracking.
     const finish = events.find((e) => e.type === 'finish');
     if (finish?.type === 'finish') {
       expect(finish.usage.totalTokens).toBe(10);

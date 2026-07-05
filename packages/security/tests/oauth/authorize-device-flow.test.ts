@@ -9,7 +9,7 @@ import {
 
 import { buildSyntheticServerMetadata, resetOAuthSubsystem } from './_helpers.js';
 
-describe('@graphorin/security/oauth — Device Authorization Grant', () => {
+describe('@graphorin/security/oauth - Device Authorization Grant', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });

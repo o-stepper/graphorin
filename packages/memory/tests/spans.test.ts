@@ -57,7 +57,7 @@ function recordingTracer(): { tracer: Tracer; spans: RecordedSpan[] } {
   return { tracer, spans };
 }
 
-describe('@graphorin/memory — AISpan emission', () => {
+describe('@graphorin/memory - AISpan emission', () => {
   it('every memory operation emits a span with scope attributes', async () => {
     const { tracer, spans } = recordingTracer();
     const memory = createMemory({

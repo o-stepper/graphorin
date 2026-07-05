@@ -1,5 +1,5 @@
 /**
- * `withFallback` — request-level fallback chain. When the wrapped
+ * `withFallback` - request-level fallback chain. When the wrapped
  * provider raises a fallback-eligible error, the middleware retries
  * the same request against each alternate provider in `fallbacks`.
  * The model concept is preserved: callers wire `[primary, alt1, alt2]`
@@ -97,7 +97,7 @@ async function* fallbackStream(
       lastErr = err;
       if (yieldedAny) {
         // Once we have streamed events, falling back would split the
-        // logical response across providers — propagate instead.
+        // logical response across providers - propagate instead.
         throw err;
       }
       if (i === candidates.length - 1 || !shouldFallback(err)) throw err;
@@ -136,10 +136,10 @@ function defaultShouldFallback(err: unknown): boolean {
     return true;
   }
   // A 429 on the primary is exactly the case a same-model fallback chain
-  // exists for — the alternate deployment has its own rate budget.
+  // exists for - the alternate deployment has its own rate budget.
   if (typeof e.status === 'number' && e.status === 429) return true;
   if (typeof e.status === 'number' && e.status >= 500) return true;
-  // PS-2: the headline fallback scenario — the primary provider is down
+  // PS-2: the headline fallback scenario - the primary provider is down
   // (a local server refusing connections) surfaces as `status: 0`. Treat a
   // network failure as fallback-eligible so the chain advances to the next
   // provider (abort already excluded above).

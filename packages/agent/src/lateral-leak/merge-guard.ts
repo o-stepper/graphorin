@@ -1,5 +1,5 @@
 /**
- * `MergeAgentSidewaysInjectionGuard` — layered on top of the
+ * `MergeAgentSidewaysInjectionGuard` - layered on top of the
  * `Agent.fanOut(...)` `'judge-merge'` strategy. Computes a
  * per-child `sourceTrust` score in `[0.0, 1.0]` and flags merges
  * where a low-trust child's contribution-weight exceeds the
@@ -107,7 +107,7 @@ export interface MergeBiasDecision {
 }
 
 /**
- * Evaluate whether the merge is biased — a child with
+ * Evaluate whether the merge is biased - a child with
  * `sourceTrust < lowTrustThreshold` contributing more than
  * `maxLowTrustWeight` of the merged output.
  *

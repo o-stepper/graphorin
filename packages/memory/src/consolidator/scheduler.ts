@@ -1,12 +1,12 @@
 /**
- * Bridge helpers — wire a {@link Consolidator} into the
+ * Bridge helpers - wire a {@link Consolidator} into the
  * `@graphorin/triggers` Scheduler so trigger declarations fire on
- * the documented schedule (DEC-150 — "same code path lib + server").
+ * the documented schedule (DEC-150 - "same code path lib + server").
  *
  * The bridge is structural: any object that exposes the same shape
  * as `@graphorin/triggers`'s `Scheduler` (a `register(declaration)`
  * method) works. The structural import keeps `@graphorin/memory`
- * dependency-free at the type level — the workspace consumer
+ * dependency-free at the type level - the workspace consumer
  * supplies the actual scheduler at runtime.
  *
  * @packageDocumentation
@@ -20,7 +20,7 @@ import type { ConsolidatorTriggerSpec } from './types.js';
 /**
  * Catch-up policy applied when a trigger missed one or more fires
  * while the scheduler was offline. Mirrors
- * `@graphorin/triggers`'s `CatchupPolicy` — duplicated here so the
+ * `@graphorin/triggers`'s `CatchupPolicy` - duplicated here so the
  * memory package stays import-free at the type level.
  *
  * @stable
@@ -72,18 +72,18 @@ export interface RegisterTriggersOptions {
   readonly scope: SessionScope;
   /**
    * Catch-up policy applied to every registered trigger. Defaults
-   * to `'none'` per DEC-150 — safest for personal-assistant
+   * to `'none'` per DEC-150 - safest for personal-assistant
    * scenarios.
    */
   readonly catchupPolicy?: ConsolidatorCatchupPolicy;
   /** Suppress the per-process library-mode WARN. Defaults to `true`. */
   readonly acknowledgeLibMode?: boolean;
-  /** Optional id prefix — useful when multiple scopes share a scheduler. */
+  /** Optional id prefix - useful when multiple scopes share a scheduler. */
   readonly idPrefix?: string;
   /** Optional tags forwarded to the scheduler. */
   readonly tags?: ReadonlyArray<string>;
   /**
-   * Filter — only register the supplied subset of triggers. By
+   * Filter - only register the supplied subset of triggers. By
    * default every parseable trigger declared on the consolidator is
    * registered (turn / event triggers are skipped because the
    * Scheduler has no way to fire them on its own).
@@ -115,7 +115,7 @@ export interface RegisterTriggersResult {
  * paths converge on the same handler.
  *
  * Turn triggers (`turn:N`) and event triggers (`event:NAME`) are
- * skipped — the scheduler cannot count user turns autonomously, and
+ * skipped - the scheduler cannot count user turns autonomously, and
  * event triggers fire from the consumer's emit path. The runtime
  * caller is responsible for those (e.g. invoking
  * `consolidator.trigger(...)` from the agent loop).

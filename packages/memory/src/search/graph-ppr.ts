@@ -1,5 +1,5 @@
 /**
- * PPR-lite graph scoring (D5) — damped spreading activation over the
+ * PPR-lite graph scoring (D5) - damped spreading activation over the
  * entity-graph neighbourhood, generalizing the flat one-hop expansion.
  * Pure: given the seed facts (the lexical/vector candidates retrieved so
  * far) and the graded neighbours (`{ fact, depth }` from
@@ -23,7 +23,7 @@ export const DEFAULT_PPR_DAMPING = 0.5;
  * `(0, 1]`; a neighbour at `depth` d contributes `damping^d` per seed
  * that reaches it. Since `expandActivation` already returns the MINIMUM
  * depth per neighbour (dedup across seeds), the score here is a pure
- * function of that min-depth — `damping^depth`, clamped to `[0, 1]`.
+ * function of that min-depth - `damping^depth`, clamped to `[0, 1]`.
  * A neighbour list produced with `maxHops: 1` reproduces a flat-ish
  * score of `damping` at every node; `maxHops: 2` separates the tiers.
  *

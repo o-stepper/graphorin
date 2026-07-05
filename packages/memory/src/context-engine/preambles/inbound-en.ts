@@ -5,7 +5,7 @@
  * Phase 12 (agent runtime) can import it directly when wiring
  * the per-step preamble injection.
  *
- * The framework is locale-agnostic — additional preambles plug in
+ * The framework is locale-agnostic - additional preambles plug in
  * through `defineContextLocalePack({ inboundSanitizationPreamble:
  * { text } })`. A partial locale pack falls back to this English
  * default with a one-time WARN per locale.

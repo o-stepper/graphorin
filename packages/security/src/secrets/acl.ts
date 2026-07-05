@@ -45,7 +45,7 @@ export function withToolSecretsContext<T>(ctx: ToolSecretsContext, fn: () => T):
 
 /**
  * Read the active per-tool secrets context, if any. Returns
- * `undefined` outside an explicit `withToolSecretsContext(...)` scope —
+ * `undefined` outside an explicit `withToolSecretsContext(...)` scope -
  * which means "no ACL enforcement".
  *
  * @stable
@@ -87,7 +87,7 @@ export function enforceSecretAcl(key: string): void {
  * Compute the **effective** allowlist for a child scope: intersection
  * of the parent's allowlist and the child's declared list. The
  * intersection is the foundation of the deny-by-default sub-agent
- * inheritance contract — passing an additional key in a child only
+ * inheritance contract - passing an additional key in a child only
  * works when the parent already permits it.
  *
  * @stable
@@ -221,7 +221,7 @@ export async function withSecret<T>(
           durationMs: Date.now() - start,
           ts: start,
         });
-        // Ephemeral scope — dispose only the wrappers we created.
+        // Ephemeral scope - dispose only the wrappers we created.
         if (typeof value === 'string') wrapped.dispose();
       }
     },

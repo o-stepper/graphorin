@@ -1,5 +1,5 @@
 /**
- * `@graphorin/skills` — skills surface for the Graphorin framework.
+ * `@graphorin/skills` - skills surface for the Graphorin framework.
  *
  * The package owns:
  *

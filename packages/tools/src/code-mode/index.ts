@@ -1,9 +1,9 @@
 /**
  * Code-mode / programmatic tool calling (P1-2). Public surface:
  *
- * - {@link projectToolApi} — project a resolved tool set as a typed code
+ * - {@link projectToolApi} - project a resolved tool set as a typed code
  *   API (catalogue + per-tool signatures).
- * - {@link createCodeExecuteTool} / {@link createCodeSearchTool} — the two
+ * - {@link createCodeExecuteTool} / {@link createCodeSearchTool} - the two
  *   Graphorin-named meta-tools the agent advertises in code-mode.
  *
  * The sandbox primitive these build on, `runBridgedSource`, lives in

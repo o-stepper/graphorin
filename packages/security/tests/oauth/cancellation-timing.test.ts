@@ -28,7 +28,7 @@ import { buildSyntheticServerMetadata, resetOAuthSubsystem } from './_helpers.js
  */
 const TEARDOWN_BUDGET_MS = process.env.CI === 'true' ? 500 : 100;
 
-describe('@graphorin/security/oauth — cancellation latency', () => {
+describe('@graphorin/security/oauth - cancellation latency', () => {
   beforeEach(() => {
     resetOAuthSubsystem();
   });
@@ -60,7 +60,7 @@ describe('@graphorin/security/oauth — cancellation latency', () => {
       throw new Error('token endpoint should not be reached');
     });
     _setBrowserOpenerForTesting(async () => {
-      // Park forever — the abort signal must short-circuit the flow.
+      // Park forever - the abort signal must short-circuit the flow.
       await new Promise(() => undefined);
     });
     const controller = new AbortController();

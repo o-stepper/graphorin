@@ -1,12 +1,12 @@
 /**
- * Built-in `tool_search` — deferred-tool catalogue lookup.
+ * Built-in `tool_search` - deferred-tool catalogue lookup.
  *
  * The tool is auto-registered by the agent runtime when the tool
  * registry contains at least one deferred tool (`__effectiveDeferLoading
  * === true`). It is always present (never itself deferred) so the model
  * can discover deferred tools mid-step.
  *
- * The schema is declared inline using Zod — `@graphorin/tools`
+ * The schema is declared inline using Zod - `@graphorin/tools`
  * declares Zod as a (required) peer dependency and consumes it as a
  * runtime value here. The agent runtime supplies the registry
  * reference + an optional embedder via {@link ToolSearchToolOptions}.
@@ -74,7 +74,7 @@ export function createToolSearchTool(
       : 'the matched tools become available on the NEXT step of the agent loop.';
   return tool<ToolSearchInput, ToolSearchOutput>({
     name: 'tool_search',
-    description: `Search the agent's deferred-tool catalogue for tools matching a natural-language query. Returns up to \`k\` matched tools with their name, description, JSON Schema, score, and the ranking stage that produced the match. Invoke this tool BEFORE attempting an unknown tool — ${availabilityText}`,
+    description: `Search the agent's deferred-tool catalogue for tools matching a natural-language query. Returns up to \`k\` matched tools with their name, description, JSON Schema, score, and the ranking stage that produced the match. Invoke this tool BEFORE attempting an unknown tool - ${availabilityText}`,
     inputSchema,
     outputSchema,
     sideEffectClass: 'read-only',

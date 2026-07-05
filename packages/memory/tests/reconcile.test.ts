@@ -70,38 +70,38 @@ function fixedProvider(
   };
 }
 
-describe('preFilterCandidate — cheap, LLM-free routing (stage 1 + stage 2)', () => {
+describe('preFilterCandidate - cheap, LLM-free routing (stage 1 + stage 2)', () => {
   it('routes to add when there are no neighbours (cold)', async () => {
     const out = await preFilterCandidate('totally new fact', []);
     expect(out.route).toBe('add');
   });
 
-  it('routes to noop on an exact (canonical) text match — stage 1', async () => {
+  it('routes to noop on an exact (canonical) text match - stage 1', async () => {
     const out = await preFilterCandidate('Lives in Lisbon', [
       hit('f1', '  lives   in lisbon ', 0.5),
     ]);
     expect(out).toMatchObject({ route: 'noop', targetId: 'f1' });
   });
 
-  it('routes to noop in the hot/near-dup zone — stage 2', async () => {
+  it('routes to noop in the hot/near-dup zone - stage 2', async () => {
     const hot = await preFilterCandidate('q', [hit('f1', 'a', 0.97)]);
     expect(hot).toMatchObject({ route: 'noop', targetId: 'f1' });
     const near = await preFilterCandidate('q', [hit('f1', 'a', 0.88)]);
     expect(near).toMatchObject({ route: 'noop', targetId: 'f1' });
   });
 
-  it('routes to add in the cold zone — stage 2', async () => {
+  it('routes to add in the cold zone - stage 2', async () => {
     const out = await preFilterCandidate('q', [hit('f1', 'a', 0.2)]);
     expect(out.route).toBe('add');
   });
 
-  it('routes to reconcile in the CONFLICT-CHECK mid-zone — stage 2', async () => {
+  it('routes to reconcile in the CONFLICT-CHECK mid-zone - stage 2', async () => {
     const out = await preFilterCandidate('q', [hit('f1', 'a', 0.6)]);
     expect(out.route).toBe('reconcile');
   });
 });
 
-describe('parseReconcile — defensive strict-JSON parsing', () => {
+describe('parseReconcile - defensive strict-JSON parsing', () => {
   const ids = new Set(['t1', 't2']);
 
   it('parses each well-formed action', () => {
@@ -163,7 +163,7 @@ describe('parseReconcile — defensive strict-JSON parsing', () => {
   });
 });
 
-describe('reconcileCandidate — one provider pass with neighbours in view', () => {
+describe('reconcileCandidate - one provider pass with neighbours in view', () => {
   it('returns the parsed decision + token usage and shows neighbours to the model', async () => {
     const provider = fixedProvider('{"action":"update","targetId":"p1","reason":"switched"}');
     const { decision, usage } = await reconcileCandidate({
@@ -195,7 +195,7 @@ describe('reconcileCandidate — one provider pass with neighbours in view', () 
   });
 });
 
-describe('reconcileToConflictDecision — maps onto fact_conflicts decisions', () => {
+describe('reconcileToConflictDecision - maps onto fact_conflicts decisions', () => {
   it('add → admit, noop → dedup, update/conflict → supersede (stage defer-to-deep)', () => {
     expect(reconcileToConflictDecision({ action: 'add', reason: 'r' })).toEqual({
       kind: 'admit',

@@ -61,13 +61,13 @@ const INPUT = (i: number) =>
     decision: 'success',
   }) as const;
 
-describe('appendAudit — concurrent writers serialise on one AuditDb (SPL-4)', () => {
+describe('appendAudit - concurrent writers serialise on one AuditDb (SPL-4)', () => {
   it('N concurrent appendAudit calls produce exactly N contiguous seqs with an intact chain', async () => {
     const db = createStrictAuditDb();
     const N = 16;
 
     // BUG (pre-fix): appendAudit reads db.latest() then inserts with an
-    // await gap between, and nothing serialises across callers — so
+    // await gap between, and nothing serialises across callers - so
     // concurrent calls read the same `last`, compute the same `seq`, and
     // the UNIQUE PK rejects all but one. Writes are lost (silent drop in
     // production, where the rejection routes to an optional onWriteError).

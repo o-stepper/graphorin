@@ -3,9 +3,9 @@
  *
  * Two surfaces:
  *
- * - `emitToolAudit(...)` / `onToolAudit(...)` — sanitized audit-event
+ * - `emitToolAudit(...)` / `onToolAudit(...)` - sanitized audit-event
  *   broadcasting, mirroring the discipline used by `@graphorin/security`.
- * - `incrementCounter(...)` / `snapshotCounters(...)` — in-process
+ * - `incrementCounter(...)` / `snapshotCounters(...)` - in-process
  *   metrics registry exported through {@link CounterSnapshot}.
  *
  * @packageDocumentation
@@ -26,7 +26,7 @@ export {
  * Audit-event emitter for `@graphorin/tools`. Mirrors the discipline
  * used by `@graphorin/security`'s subsystem-specific emitters: a
  * narrow listener registry; never throws across listener boundaries;
- * sanitized metadata only — never the matched value bytes / tool
+ * sanitized metadata only - never the matched value bytes / tool
  * args / tool results.
  *
  * Downstream consumers (the standalone server's audit bridge in Phase
@@ -94,7 +94,7 @@ export type ToolAuditDecision = 'success' | 'denied' | 'error';
 
 /**
  * Sanitized payload emitted by the tool subsystem. Listeners receive
- * only metadata that is safe to log — the actual tool args, the
+ * only metadata that is safe to log - the actual tool args, the
  * matched bytes, the secret values are NEVER forwarded.
  *
  * @stable
@@ -150,7 +150,7 @@ export function _getToolAuditListenerCountForTesting(): number {
 }
 
 /**
- * Emit an audit event. Never throws across listener boundaries —
+ * Emit an audit event. Never throws across listener boundaries -
  * a listener that throws is isolated so it cannot tear down the
  * tool execution path.
  *
@@ -162,7 +162,7 @@ export function emitToolAudit(event: ToolAuditEvent): void {
     try {
       listener(event);
     } catch {
-      // Audit listeners are isolated — never let a faulty listener
+      // Audit listeners are isolated - never let a faulty listener
       // tear down the tool execution path.
     }
   }

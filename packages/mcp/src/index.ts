@@ -1,5 +1,5 @@
 /**
- * `@graphorin/mcp` — Model Context Protocol client for the Graphorin
+ * `@graphorin/mcp` - Model Context Protocol client for the Graphorin
  * framework.
  *
  * The package owns:

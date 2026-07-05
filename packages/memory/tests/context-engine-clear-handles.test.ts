@@ -2,7 +2,7 @@
  * A6 / SOTA-2: recoverable clearing. The zero-LLM clear-old-tool-results tier
  * (SOTA-1) drops content behind a bare placeholder. With an `externalize` seam
  * wired to a spill / read_result registry, the cleared content is instead saved
- * behind a handle and the placeholder references it — so the model can re-fetch
+ * behind a handle and the placeholder references it - so the model can re-fetch
  * the full result via `read_result` instead of losing it. Opt-in: omitted ⇒
  * byte-identical bare placeholder. The spill never fires for a clearing the
  * `clearAtLeast` floor rejects.

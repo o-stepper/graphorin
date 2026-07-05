@@ -1,5 +1,5 @@
 /**
- * `promptInjectionHeuristics` — input guardrail with a small
+ * `promptInjectionHeuristics` - input guardrail with a small
  * regex-only pattern catalogue that catches the canonical 2026
  * trivial-injection reproductions (the "ignore previous
  * instructions" / "you must" / "system prompt:" pattern family).
@@ -7,7 +7,7 @@
  * The catalogue is intentionally conservative; sophisticated
  * injection attacks demand LLM-based moderation (the `llmModeration`
  * guardrail) and an outbound-prompt redaction middleware (Phase 06).
- * The defaults here are defence in depth — they raise the cost of
+ * The defaults here are defence in depth - they raise the cost of
  * trivial reproductions without claiming full immunity. The richer
  * inbound-sanitization middleware that consumes these patterns
  * sandbox-side ships in Phase 06 / Phase 12 per the inbound-trust

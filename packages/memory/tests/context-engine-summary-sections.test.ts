@@ -1,7 +1,7 @@
 /**
  * SOTA-6: add "Errors encountered and resolutions" + "Next steps" to the
  * compaction summary template. Claude Code and Manus independently found these
- * the two costliest omissions — without them the agent repeats already-fixed
+ * the two costliest omissions - without them the agent repeats already-fixed
  * errors and loses direction after a compaction. The harness-filled sections
  * (recent turns + metadata) stay the last two regardless of how many LLM
  * sections precede them.
@@ -23,7 +23,7 @@ describe('SOTA-6: Errors + Next-steps summary sections', () => {
       template: { preamble: enLocalePack.compactionSummaryTemplate.preamble, sections },
       olderMessages: [{ role: 'user', content: 'hi' }],
     });
-    // LLM-produced sections — present, NOT flagged as harness-filled.
+    // LLM-produced sections - present, NOT flagged as harness-filled.
     expect(prompt).toContain('Errors encountered and resolutions\n');
     expect(prompt).toContain('Next steps\n');
     // The last two stay harness-filled no matter how many LLM sections precede.

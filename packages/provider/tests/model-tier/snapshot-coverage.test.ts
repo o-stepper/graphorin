@@ -39,7 +39,7 @@ const REPRESENTATIVE_MODELS: ReadonlyArray<{ provider: string; model: string }> 
  * Models the classifier knows whose public pricing was NOT verifiable at
  * snapshot time. Each entry here is a documented, deliberate gap: cost
  * tracking reports null + one WARN for them until an operator refreshes
- * the snapshot. Shrink this list — never let a model silently join it
+ * the snapshot. Shrink this list - never let a model silently join it
  * (a lookup miss NOT listed here fails the gate).
  */
 const KNOWN_UNPRICED: ReadonlySet<string> = new Set([
@@ -68,7 +68,7 @@ describe('pricing snapshot coverage vs model-tier classifier (core-provider-03)'
 
       const price = lookupPrice({ provider, model }, BUNDLED_SNAPSHOT);
       if (KNOWN_UNPRICED.has(key)) {
-        expect(price, `${key} is listed KNOWN_UNPRICED but now has a price — remove it`).toBeNull();
+        expect(price, `${key} is listed KNOWN_UNPRICED but now has a price - remove it`).toBeNull();
       } else {
         expect(price, `${key} has no bundled price entry and is not KNOWN_UNPRICED`).not.toBeNull();
       }

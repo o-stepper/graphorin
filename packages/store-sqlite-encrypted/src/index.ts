@@ -1,5 +1,5 @@
 /**
- * @graphorin/store-sqlite-encrypted — optional encryption-at-rest
+ * @graphorin/store-sqlite-encrypted - optional encryption-at-rest
  * sub-pack for the Graphorin framework's default SQLite store.
  *
  * Installing this package pulls in the cipher peer driver
@@ -10,20 +10,20 @@
  *
  * The package exposes:
  *
- *  - {@link createEncryptedConnection} — convenience wrapper around
+ *  - {@link createEncryptedConnection} - convenience wrapper around
  *    `openConnection` from `@graphorin/store-sqlite/connection` that
  *    pre-loads the cipher peer.
- *  - {@link encryptDatabase} — converts an unencrypted SQLite file
+ *  - {@link encryptDatabase} - converts an unencrypted SQLite file
  *    into an encrypted one. Backs `graphorin storage encrypt`.
- *  - {@link rekeyDatabase} — re-keys an already encrypted file. Backs
+ *  - {@link rekeyDatabase} - re-keys an already encrypted file. Backs
  *    `graphorin storage rekey`.
- *  - {@link cipherIntegrityCheck} — runs `PRAGMA cipher_integrity_
+ *  - {@link cipherIntegrityCheck} - runs `PRAGMA cipher_integrity_
  *    check`. Used by the triggers daemon's daily verification cron
  *    and the `/v1/health/storage` endpoint.
  *  - {@link DEFAULT_CIPHER}, {@link pragmaSequenceForCipher},
- *    {@link encodePassphraseForPragma} — cipher-config helpers shared
+ *    {@link encodePassphraseForPragma} - cipher-config helpers shared
  *    by the runners and consumable for advanced setups.
- *  - {@link loadCipherPeer} / {@link EncryptedStorePeerMissingError} —
+ *  - {@link loadCipherPeer} / {@link EncryptedStorePeerMissingError} -
  *    explicit peer-loader surface for callers that want to fail-fast
  *    at startup before opening the DB.
  *

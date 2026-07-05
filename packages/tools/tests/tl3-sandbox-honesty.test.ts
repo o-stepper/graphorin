@@ -59,7 +59,7 @@ function sandboxedTool(name: string) {
   });
 }
 
-describe('TL-3 — sandboxPolicy honesty for inline tools', () => {
+describe('TL-3 - sandboxPolicy honesty for inline tools', () => {
   beforeEach(() => resetCountersForTesting());
 
   it('warns once per inline tool that declares a non-none sandboxPolicy', async () => {

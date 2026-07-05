@@ -65,11 +65,11 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     /** Include quarantined episodes (validation/inspector path). P1-4. */
     includeQuarantined?: boolean,
   ): Promise<ReadonlyArray<MemoryHit<Episode>>>;
-  /** Mark an episode archived. Soft-archive — the row stays for replay. */
+  /** Mark an episode archived. Soft-archive - the row stays for replay. */
   archive?(id: string, reason?: string): Promise<void>;
   /**
    * Most-recent episodes by end time (newest first), with no FTS / vector
-   * query — recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
+   * query - recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
    * and the deep-phase reflection gate. The default `@graphorin/store-sqlite`
    * adapter implements it.
    */
@@ -79,13 +79,13 @@ export interface EpisodicMemoryStoreExt extends EpisodicMemoryStore {
     options?: { includeQuarantined?: boolean },
   ): Promise<ReadonlyArray<Episode>>;
   /**
-   * Set an episode's retrieval-trust `status` (MCON-2) — promote a quarantined
+   * Set an episode's retrieval-trust `status` (MCON-2) - promote a quarantined
    * (auto-formed) episode into default recall or re-quarantine an active one,
    * with a `memory_history` audit row. Powers {@link EpisodicMemory.validate}.
    */
   setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
   /**
-   * Count the recall-eligible episodes for the scope (CE-5) — a `COUNT(*)`,
+   * Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`,
    * never materialising rows. Powers honest `metadata()` counts.
    */
   count?(scope: SessionScope): Promise<number>;
@@ -132,13 +132,13 @@ export interface SemanticMemoryStoreExt extends SemanticMemoryStore {
    * Set a fact's retrieval-trust `status` and write a `memory_history`
    * audit row (P1-4). Promotes a quarantined fact to `active` (the
    * validation path) or re-quarantines an active one. Never touches
-   * content / embedding / tombstone — quarantine is a retrieval gate.
+   * content / embedding / tombstone - quarantine is a retrieval gate.
    * Powers {@link SemanticMemory.validate}; the default
    * `@graphorin/store-sqlite` adapter implements it.
    */
   setStatus?(factId: string, status: MemoryStatus, reason?: string): Promise<void>;
   /**
-   * Count the recall-eligible facts for the scope (CE-5) — a `COUNT(*)` with
+   * Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
    * the default recall filters (live, non-archived, non-quarantined), never
    * materialising rows. Powers honest `metadata()` counts.
    */
@@ -209,7 +209,7 @@ export interface SessionMemoryStoreExt extends SessionMemoryStore {
     limit: number,
   ): Promise<ReadonlyArray<SessionMessageRecord>>;
   /**
-   * Count the live messages in the scoped session (CE-5) — a `COUNT(*)`, never
+   * Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
    * materialising rows; `0` for a user-only scope. Powers honest `metadata()`
    * counts instead of `list(...)`-materialising up to 1000 rows.
    */
@@ -290,7 +290,7 @@ export interface ConflictAuditInputLike {
 }
 
 /**
- * Pending-queue payload — Stage 5 (defer-to-deep) hands the row over
+ * Pending-queue payload - Stage 5 (defer-to-deep) hands the row over
  * to the deep-phase LLM judge (Phase 10c).
  *
  * @stable
@@ -345,7 +345,7 @@ export interface ConflictMemoryStoreExt {
    * Stamp `attemptedAt` on a pending row whose judge call failed
    * (MCON-9). The deep phase closes the row as `'judge-unparseable'`
    * on the NEXT failure, so a poisoned row is billed at most twice.
-   * Optional — without it the deep phase falls back to skip-and-retry.
+   * Optional - without it the deep phase falls back to skip-and-retry.
    */
   markAttempted?(id: number, attemptedAt?: number): Promise<void>;
 }
@@ -470,7 +470,7 @@ export interface DlqBatchRow {
  * for Phase 10c. Mirrors the `consolidator_state`,
  * `consolidator_runs`, and `consolidator_failed_batches` tables
  * shipped in Phase 05's migration 009. Adapters that do not
- * implement the surface degrade gracefully — the consolidator runs
+ * implement the surface degrade gracefully - the consolidator runs
  * in stateless mode (no DLQ, no cursor persistence) and emits a
  * one-shot WARN.
  *
@@ -519,7 +519,7 @@ export interface ConsolidatorMemoryStoreExt {
     now: number,
     limit?: number,
   ): Promise<ReadonlyArray<DlqBatchRow>>;
-  /** Mark the row succeeded — removes it from the DLQ. */
+  /** Mark the row succeeded - removes it from the DLQ. */
   markBatchSucceeded(id: string): Promise<void>;
   /**
    * Schedule the next retry attempt. The caller computes
@@ -545,7 +545,7 @@ export interface ConsolidatorMemoryStoreExt {
  * 10c's light phase reads the strength + last-accessed columns and
  * archives facts whose retention curve falls below the configured
  * threshold. Adapters that do not maintain decay columns may omit
- * the surface entirely — the light phase skips the archive step
+ * the surface entirely - the light phase skips the archive step
  * with an INFO log.
  *
  * @stable
@@ -556,7 +556,7 @@ export interface DecayMemoryStoreExt {
    * caller can apply Ebbinghaus retention without scanning the
    * whole table. `limit` defaults to `1000`.
    *
-   * Archived rows are EXCLUDED by default (MCON-6) — they never receive
+   * Archived rows are EXCLUDED by default (MCON-6) - they never receive
    * access bumps, so they would pin the LRU head and saturate the decay
    * window, structurally stopping threshold-archiving and capacity
    * eviction for live facts. Inspection paths pass
@@ -585,7 +585,7 @@ export interface DecayMemoryStoreExt {
       readonly provenance: string | null;
       /**
        * Monotonic retrieval-access counter (D3, migration 027). Feeds
-       * the opt-in `accessReinforcement` salience weight. Optional —
+       * the opt-in `accessReinforcement` salience weight. Optional -
        * adapters without the column omit it (treated as `0`).
        */
       readonly accessCount?: number;
@@ -599,13 +599,13 @@ export interface DecayMemoryStoreExt {
   /**
    * Record a retrieval access for the given facts (MRET-7): stamp
    * `lastAccessedAt` and reinforce `strength` (implementation-capped).
-   * Optional — adapters without decay columns may omit it; callers
+   * Optional - adapters without decay columns may omit it; callers
    * MUST treat failures as non-fatal (the read path never breaks on a
    * bookkeeping write).
    */
   markAccessed?(ids: ReadonlyArray<string>, accessedAt?: number): Promise<void>;
   /**
-   * Narrow decay-column read for exactly the given fact ids (MRET-8) —
+   * Narrow decay-column read for exactly the given fact ids (MRET-8) -
    * powers per-search decay re-ranking without the old O(scope)
    * 1000-row window read. Optional; absent ⇒ the tier falls back to
    * `listForDecay`.
@@ -639,7 +639,7 @@ export interface InsightSearchStoreOptions {
  * (P1-1). The consolidator's reflection pass inserts quarantined,
  * cited insights here; the thin `InsightMemory` read surface lists /
  * searches them; the ExpeL salience loop bumps + prunes them. Search is
- * FTS-only by design — insights are a soft, rank-capped inspector
+ * FTS-only by design - insights are a soft, rank-capped inspector
  * surface, not primary recall.
  *
  * Adapters that opt out leave the property undefined; reflection then
@@ -663,7 +663,7 @@ export interface InsightMemoryStoreExt {
   /** Lookup a single insight by id (`null` when absent / pruned). */
   get?(id: string): Promise<Insight | null>;
   /**
-   * Set an insight's retrieval-trust `status` (MCON-2) — promote a quarantined
+   * Set an insight's retrieval-trust `status` (MCON-2) - promote a quarantined
    * (reflection) insight or re-quarantine an active one, with a
    * `memory_history` audit row. Powers {@link InsightMemory.validate}.
    */
@@ -675,7 +675,7 @@ export interface InsightMemoryStoreExt {
   bumpSalience(id: string, delta: number, reason?: string): Promise<void>;
   /**
    * Soft-delete every salience-0 insight for the scope (the ExpeL
-   * forgetting step). Returns the number pruned. Tombstone only —
+   * forgetting step). Returns the number pruned. Tombstone only -
    * pruned insights stay auditable.
    */
   prune(scope: SessionScope): Promise<number>;
@@ -689,16 +689,16 @@ export interface InsightMemoryStoreExt {
  */
 export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
   /**
-   * Set a rule's retrieval-trust `status` — promote a quarantined (induced)
+   * Set a rule's retrieval-trust `status` - promote a quarantined (induced)
    * procedure into `activate()` or re-quarantine an active one, with a
    * `memory_history` audit row. Powers {@link ProceduralMemory.validate}.
    */
   setStatus?(id: string, status: MemoryStatus, reason?: string): Promise<void>;
   /**
-   * Lexical runbook search over rule text (D3, migration 028) — content
+   * Lexical runbook search over rule text (D3, migration 028) - content
    * recall for "find the procedure for this task", as opposed to
    * predicate activation. Quarantined (unvalidated induced) procedures
-   * are excluded unless the inspector opts in. Optional — adapters
+   * are excluded unless the inspector opts in. Optional - adapters
    * without the index omit it and {@link ProceduralMemory.search} falls
    * back to an in-memory lexical scan over `list(...)`.
    */
@@ -711,7 +711,7 @@ export interface ProceduralMemoryStoreExt extends ProceduralMemoryStore {
    * Record one demonstrated successful reuse of a rule and return the
    * new counter value (MCON-2 part 4). Powers
    * promotion-by-demonstrated-success via
-   * {@link ProceduralMemory.recordOutcome}. Optional — adapters without
+   * {@link ProceduralMemory.recordOutcome}. Optional - adapters without
    * the counter simply never auto-promote.
    */
   recordSuccess?(id: string): Promise<number>;
@@ -828,7 +828,7 @@ export interface GraphMemoryStoreExt {
   /**
    * PPR-lite graded expansion (D5): like {@link expandOneHop} but returns
    * each neighbour with its minimum hop `depth` from the seeds, so the
-   * tier can weight it by damped spreading activation. Optional — stores
+   * tier can weight it by damped spreading activation. Optional - stores
    * without it fall back to flat one-hop expansion.
    */
   expandActivation?(

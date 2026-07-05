@@ -1,5 +1,5 @@
 /**
- * @graphorin/observability — observability primitives for the
+ * @graphorin/observability - observability primitives for the
  * Graphorin framework. Ships:
  *
  * - the typed `AISpan<T>` tracer over OpenTelemetry,

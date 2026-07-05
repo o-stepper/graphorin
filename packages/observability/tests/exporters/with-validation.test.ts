@@ -10,7 +10,7 @@ import {
 } from '../../src/exporters/index.js';
 import { createRedactionValidator } from '../../src/redaction/index.js';
 
-describe('@graphorin/observability/exporters — withValidation', () => {
+describe('@graphorin/observability/exporters - withValidation', () => {
   it('marks the exporter as validated', () => {
     const wrapped = withValidation(createConsoleExporter({ sink: () => {} }));
     expect(isValidatedExporter(wrapped)).toBe(true);
@@ -31,7 +31,7 @@ describe('@graphorin/observability/exporters — withValidation', () => {
       sensitivityByAttribute: { 'graphorin.session.id': 'public', 'tool.input': 'secret' },
     });
     await wrapped.export(record);
-    // RP-18: attribute-granular strip, not a whole-record drop — the span
+    // RP-18: attribute-granular strip, not a whole-record drop - the span
     // still reaches the exporter with the offending attribute removed.
     expect(lines).toHaveLength(1);
     const parsed = JSON.parse(lines[0] ?? '{}');

@@ -101,13 +101,13 @@ describe('SqliteInsightStore (P1-1)', () => {
     const pruned = await store.insights.prune(SCOPE);
     expect(pruned).toBe(1);
 
-    // Tombstoned — unreachable through get/list, but the survivor stays.
+    // Tombstoned - unreachable through get/list, but the survivor stays.
     expect(await store.insights.get('ins_dead')).toBeNull();
     expect(await store.insights.get('ins_live')).not.toBeNull();
     const remaining = await store.insights.list(SCOPE, { includeQuarantined: true });
     expect(remaining.map((i) => i.id)).toEqual(['ins_live']);
 
-    // Idempotent — nothing left at salience 0.
+    // Idempotent - nothing left at salience 0.
     expect(await store.insights.prune(SCOPE)).toBe(0);
   });
 

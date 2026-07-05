@@ -10,7 +10,7 @@ import {
 
 const SCOPE = { userId: 'alex', sessionId: 's1' };
 
-describe('@graphorin/memory/tools — block tools', () => {
+describe('@graphorin/memory/tools - block tools', () => {
   it('block_append + block_replace + block_rethink', async () => {
     const memory = createMemoryWithScope();
     memory.working.define(defineBlock({ label: 'notes', charLimit: 200 }));
@@ -28,7 +28,7 @@ describe('@graphorin/memory/tools — block tools', () => {
   });
 });
 
-describe('@graphorin/memory/tools — fact tools', () => {
+describe('@graphorin/memory/tools - fact tools', () => {
   it('fact_remember + fact_search round-trip', async () => {
     const memory = createMemoryWithScope({ embedder: createStubEmbedder() });
     const remember = findTool(memory.tools, 'fact_remember');
@@ -110,7 +110,7 @@ describe('@graphorin/memory/tools — fact tools', () => {
     const search = findTool(memory.tools, 'fact_search');
     const validate = findTool(memory.tools, 'fact_validate');
     const ctx = makeCtx();
-    // A synthesized (extraction) write lands quarantined — hidden from default recall.
+    // A synthesized (extraction) write lands quarantined - hidden from default recall.
     const quarantined = await memory.semantic.remember(SCOPE, {
       text: 'synthesized claim about the user',
       provenance: 'extraction',
@@ -173,7 +173,7 @@ describe('@graphorin/memory/tools — fact tools', () => {
     const before = (await search.execute({ query: 'instructions' }, ctx)) as { hits: unknown[] };
     expect(before.hits.length).toBe(0);
 
-    // validate() refuses to promote it — the one-turn poisoning chain is closed.
+    // validate() refuses to promote it - the one-turn poisoning chain is closed.
     await expect(validate.execute({ factId: poison.factId }, ctx)).rejects.toBeInstanceOf(
       QuarantinePromotionRefusedError,
     );
@@ -223,7 +223,7 @@ describe('@graphorin/memory/tools — fact tools', () => {
   });
 });
 
-describe('@graphorin/memory/tools — recall tools', () => {
+describe('@graphorin/memory/tools - recall tools', () => {
   it('recall_episodes returns matched episodes', async () => {
     const memory = createMemoryWithScope();
     const recall = findTool(memory.tools, 'recall_episodes');
@@ -252,7 +252,7 @@ describe('@graphorin/memory/tools — recall tools', () => {
   });
 });
 
-describe('@graphorin/memory/tools — guard wiring', () => {
+describe('@graphorin/memory/tools - guard wiring', () => {
   it('memoryGuardTier is set on every memory-mutating tool', () => {
     const memory = createMemoryWithScope();
     const tools = Object.fromEntries(memory.tools.map((t) => [t.name, t]));

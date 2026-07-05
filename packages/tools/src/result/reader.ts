@@ -8,7 +8,7 @@
  *
  * Security: the handle is opaque and resolution is confined to
  * `artifactRoot`; any URI that resolves outside the root (e.g. via `..`)
- * is rejected, so a model — even one steered by injected content — cannot
+ * is rejected, so a model - even one steered by injected content - cannot
  * read arbitrary files. Non-`graphorin-spill:` schemes are rejected
  * (MCP `resource_link` resolution is reserved for WI-13).
  *
@@ -60,7 +60,7 @@ export interface ResultReadOutcome {
   readonly eof: boolean;
   /**
    * Trust class of the producer of the resolved artifact, when the
-   * reader knows it (TL-6) — e.g. the MCP resource reader always
+   * reader knows it (TL-6) - e.g. the MCP resource reader always
    * reports `'mcp-derived'`, and the file reader recovers it from the
    * artifact's taint sidecar (tools-03). The executor re-applies
    * inbound sanitization + dataflow provenance by this class.
@@ -106,7 +106,7 @@ export function createFileResultReader(opts: FileResultReaderOptions): ResultRea
       // tools-03: recover the producer's taint from the sidecar the
       // writer persisted next to the artifact. The executor's in-memory
       // taint map covers neither a second executor sharing the spill
-      // root (code-mode) nor a resumed process — the sidecar does.
+      // root (code-mode) nor a resumed process - the sidecar does.
       const taint = await readSidecarTaint(resolved);
 
       // Line mode wins when a line bound is supplied.
@@ -146,7 +146,7 @@ export function createFileResultReader(opts: FileResultReaderOptions): ResultRea
 /**
  * Read the taint sidecar for an artifact, if present. Absent / corrupt
  * sidecars (artifacts written before tools-03, foreign writers) yield
- * an empty record — the executor then falls back to its in-memory map
+ * an empty record - the executor then falls back to its in-memory map
  * or the reading tool's own class, exactly the pre-sidecar behaviour.
  */
 async function readSidecarTaint(artifactPath: string): Promise<{

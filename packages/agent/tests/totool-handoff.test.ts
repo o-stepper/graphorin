@@ -61,7 +61,7 @@ function parentCtx(args: {
   } as ToolExecutionContext<unknown>;
 }
 
-describe('Agent.toTool — context propagation (AG-17)', () => {
+describe('Agent.toTool - context propagation (AG-17)', () => {
   it('forwards parent deps + sessionId + signal into the sub-agent run', async () => {
     const seen: { deps?: unknown; sessionId?: string } = {};
     const recorder: Tool<unknown, string, unknown> = {
@@ -155,7 +155,7 @@ describe('Agent.toTool — context propagation (AG-17)', () => {
   });
 });
 
-describe('handoff dispatch — error/abort propagation (AG-22)', () => {
+describe('handoff dispatch - error/abort propagation (AG-22)', () => {
   it('a failing handoff target surfaces as a tool error, not an empty success', async () => {
     const target = createAgent({
       name: 'specialist',

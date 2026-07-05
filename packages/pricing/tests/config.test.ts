@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_PRICING_AUTO_REFRESH } from '../src/index.js';
 
-describe('@graphorin/pricing — pricing.autoRefresh defaults', () => {
+describe('@graphorin/pricing - pricing.autoRefresh defaults', () => {
   it('enabled is hardcoded false in v0.1', () => {
     expect(DEFAULT_PRICING_AUTO_REFRESH.enabled).toBe(false);
   });

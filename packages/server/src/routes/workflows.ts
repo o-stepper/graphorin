@@ -153,7 +153,7 @@ export function createWorkflowRoutes(
       }
       const runId = newRunId();
       // periphery-01: the old handler declared the run and returned 202
-      // WITHOUT ever calling `workflow.resume(...)` — the run sat
+      // WITHOUT ever calling `workflow.resume(...)` - the run sat
       // `pending` forever and the advertised SSE URL was never mounted.
       // Resume now mirrors execute: background-iterate + emit on the WS
       // subject; the tracker completes the run.
@@ -265,7 +265,7 @@ export function createWorkflowRoutes(
         );
       }
       // periphery-01: the old handler returned a 202 that forked
-      // nothing — the same class of lie IP-14 removed from the agent
+      // nothing - the same class of lie IP-14 removed from the agent
       // resume route. Honest 501 until the workflow fork primitive is
       // threaded through the registry.
       return c.json(
@@ -300,7 +300,7 @@ function backgroundExecute(
   if (body.threadId !== undefined) opts.threadId = body.threadId;
   void (async () => {
     try {
-      // IP-2: every workflow event reaches the dispatcher — the old
+      // IP-2: every workflow event reaches the dispatcher - the old
       // loop iterated the stream and threw each event away.
       for await (const ev of workflow.execute(body.input ?? {}, opts)) {
         if (tracker.signal.aborted) break;
@@ -323,7 +323,7 @@ function backgroundExecute(
 
 /**
  * periphery-01: mirror of {@link backgroundExecute} for the resume
- * path — iterate `workflow.resume(threadId, {resume})`, emit every
+ * path - iterate `workflow.resume(threadId, {resume})`, emit every
  * event on the run subject, and complete the tracked run.
  */
 function backgroundResume(

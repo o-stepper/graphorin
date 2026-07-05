@@ -62,7 +62,7 @@ function fakeProvider(plan: ProviderResponse[]): Provider {
   };
 }
 
-describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integration', () => {
+describe('@graphorin/memory consolidator <> @graphorin/store-sqlite - integration', () => {
   it('drives standard phase end-to-end against real sqlite', async () => {
     const sqlite = await makeStore();
     try {
@@ -97,7 +97,7 @@ describe('@graphorin/memory consolidator <> @graphorin/store-sqlite — integrat
       const status = await memory.consolidator.status();
       expect(status.budget.tokensUsedToday).toBe(92);
 
-      // P1-4: consolidator-extracted facts are synthesized memory — they
+      // P1-4: consolidator-extracted facts are synthesized memory - they
       // land quarantined and are EXCLUDED from default (action-driving)
       // recall until validated. The poisoning gate, proven end-to-end.
       const recalled = await memory.semantic.search(scope, 'Lisbon');

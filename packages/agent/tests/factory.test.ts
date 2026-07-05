@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createAgent, InvalidAgentConfigError, InvalidPreferredModelError } from '../src/index.js';
 import { createMockProvider, textOnlyScript } from './fixtures/mock-provider.js';
 
-describe('createAgent — construction', () => {
+describe('createAgent - construction', () => {
   it('rejects an empty name', () => {
     const provider = createMockProvider({ modelId: 'm', scripts: [] });
     expect(() =>
@@ -62,7 +62,7 @@ describe('createAgent — construction', () => {
   });
 });
 
-describe('Agent.stream — hello world', () => {
+describe('Agent.stream - hello world', () => {
   it('emits agent.start, text deltas, text.complete, step.end, agent.end on a text-only response', async () => {
     const provider = createMockProvider({
       modelId: 'mock-m',

@@ -95,8 +95,8 @@ export function _resetPipelineFactoryCacheForTesting(): void {
 
 /**
  * True when a classifier label names the *positive* (relevant) class. Matches
- * the conventional binary forms — `LABEL_1`, `positive`, `relevant`,
- * `entailment`, `true`, `yes` — using exact words so it does not mis-fire on a
+ * the conventional binary forms - `LABEL_1`, `positive`, `relevant`,
+ * `entailment`, `true`, `yes` - using exact words so it does not mis-fire on a
  * negative label that merely contains one (`irrelevant` ⊃ `relevant`).
  */
 function isPositiveLabel(label: string): boolean {
@@ -110,7 +110,7 @@ function isPositiveLabel(label: string): boolean {
  * pair order. Cross-encoder classifiers return either a single-best
  * `{label, score}` per pair (the default single-logit bge exports) or an array
  * of `topk` entries. For the array shape we read the POSITIVE label's
- * confidence — NOT the max of any label (PS-16): an irrelevant pair's most
+ * confidence - NOT the max of any label (PS-16): an irrelevant pair's most
  * confident class is the *negative* one, so taking the max would invert the
  * ranking for any 2-label classifier. When no label looks positive (single-logit
  * or unrecognised labels) we fall back to the top score.

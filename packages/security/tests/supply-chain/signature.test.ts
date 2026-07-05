@@ -10,7 +10,7 @@ import {
 
 import { buildSignedSkill, resetSupplyChain, tamperSkillBody } from './_helpers.js';
 
-describe('@graphorin/security/supply-chain — signature verifier', () => {
+describe('@graphorin/security/supply-chain - signature verifier', () => {
   beforeEach(() => {
     resetSupplyChain();
   });

@@ -1,13 +1,13 @@
 /**
- * `graphorin audit` — operate on the tamper-evident audit log
+ * `graphorin audit` - operate on the tamper-evident audit log
  * (`audit.db`).
  *
  * Surface (per Phase 15 § Audit):
  *
- *  - `graphorin audit verify` — full hash chain integrity check.
- *  - `graphorin audit prune --before <date>` — drop entries older than
+ *  - `graphorin audit verify` - full hash chain integrity check.
+ *  - `graphorin audit prune --before <date>` - drop entries older than
  *    a cutoff while preserving the surviving suffix's chain integrity.
- *  - `graphorin audit export --to <file>` — stream every entry as JSONL.
+ *  - `graphorin audit export --to <file>` - stream every entry as JSONL.
  *
  * The CLI opens `audit.db` through the framework default binding
  * registered by `@graphorin/server` (`ensureStoreAuditBinding()`); it
@@ -57,7 +57,7 @@ export interface AuditVerifyResult {
 }
 
 /**
- * `graphorin audit verify` — replay the chain and report the first
+ * `graphorin audit verify` - replay the chain and report the first
  * broken link (if any).
  *
  * @stable
@@ -151,7 +151,7 @@ export interface AuditExportResult {
 }
 
 /**
- * `graphorin audit export --to <file>` — stream every entry as JSONL.
+ * `graphorin audit export --to <file>` - stream every entry as JSONL.
  *
  * @stable
  */
@@ -238,6 +238,6 @@ function parseCutoff(input: string): number {
   return ms;
 }
 
-// Internal type-only consumers — keep in scope so tree-shaking
+// Internal type-only consumers - keep in scope so tree-shaking
 // preserves the entry point.
 void ((_e?: StoredAuditEntry) => undefined);

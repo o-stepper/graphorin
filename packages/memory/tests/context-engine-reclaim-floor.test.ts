@@ -1,6 +1,6 @@
 /**
- * SOTA-4: reclaim-floor (anti-thrash). A compaction whose predicted reclaim —
- * the older, compactable portion — is below `minReclaimTokens` is deferred, so
+ * SOTA-4: reclaim-floor (anti-thrash). A compaction whose predicted reclaim -
+ * the older, compactable portion - is below `minReclaimTokens` is deferred, so
  * the engine does not pay a summarizer call to reclaim a handful of tokens near
  * the threshold (compact-thrash). Opt-in: unset ⇒ byte-identical to today.
  */
@@ -51,13 +51,13 @@ describe('SOTA-4: reclaim-floor anti-thrash', () => {
   });
 
   it('fires when the older portion meets the reclaim floor', async () => {
-    // 10 large messages → older portion (10 − 6 = 4 × ~1000 tokens) ≫ floor.
+    // 10 large messages → older portion (10 - 6 = 4 × ~1000 tokens) ≫ floor.
     const messages = big(10, 4000);
     const e = engine({ thresholdTokens: 50, minReclaimTokens: 1000 });
     expect(await e.shouldCompact(messages)).toBe(true);
   });
 
-  it('is unchanged (fires) when minReclaimTokens is unset — opt-in default', async () => {
+  it('is unchanged (fires) when minReclaimTokens is unset - opt-in default', async () => {
     const messages: Message[] = [
       { role: 'user', content: 'a' },
       { role: 'assistant', content: 'b' },

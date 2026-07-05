@@ -1,5 +1,5 @@
 /**
- * `ClientMessage` — discriminated union of every frame a Graphorin
+ * `ClientMessage` - discriminated union of every frame a Graphorin
  * WebSocket client may send to the server. The wire is hybrid: the
  * control plane uses JSON-RPC-shaped requests / notifications; the
  * data plane uses typed push events emitted exclusively by the server
@@ -33,7 +33,7 @@ const SubscribeParams = z
   .object({
     subject: z.string().min(1),
     // IP-21: `sinceEventId` is the resumption cursor. `lastSequenceId` was a
-    // dead wire field — the client never set it and the server never read it.
+    // dead wire field - the client never set it and the server never read it.
     sinceEventId: z.string().min(1).optional(),
   })
   .strict();
@@ -154,7 +154,7 @@ export type ClientMessage = z.infer<typeof ClientMessageSchema>;
 export type ClientMessageId = z.infer<typeof RpcId>;
 
 /**
- * Type guard helpers — one per `method` literal — so consumers can
+ * Type guard helpers - one per `method` literal - so consumers can
  * narrow the `ClientMessage` union without re-stringifying the
  * discriminator.
  *

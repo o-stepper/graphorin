@@ -28,7 +28,7 @@ async function peerAvailable(): Promise<boolean> {
 
 const available = await peerAvailable();
 
-describe.skipIf(!available)('CS-7 — real cipher peer end-to-end', () => {
+describe.skipIf(!available)('CS-7 - real cipher peer end-to-end', () => {
   it('encrypts a migrated store (FTS rows), rejects keyless opens, searches through the keyed store, and rekeys', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-real-enc-'));
     const plainPath = join(dir, 'data.db');

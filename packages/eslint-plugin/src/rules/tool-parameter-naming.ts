@@ -32,7 +32,7 @@ const rule: Rule.RuleModule = {
     type: 'suggestion',
     docs: {
       description:
-        'Flag ambiguous or numeric-suffix parameter names on `tool({...})` `inputSchema` declarations (RB-49 — write self-documenting parameter names).',
+        'Flag ambiguous or numeric-suffix parameter names on `tool({...})` `inputSchema` declarations (RB-49 - write self-documenting parameter names).',
       recommended: true,
     },
     schema: [],

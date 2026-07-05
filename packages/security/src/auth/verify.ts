@@ -111,7 +111,7 @@ export interface VerifierOptions {
   readonly maxConcurrentVerify?: number;
   /**
    * Cap on distinct IPs tracked in the failure/lockout maps (SPL-19).
-   * Default 10 000 — overflow sweeps expired lockouts, then evicts the
+   * Default 10 000 - overflow sweeps expired lockouts, then evicts the
    * oldest entries.
    */
   readonly maxTrackedIps?: number;
@@ -186,7 +186,7 @@ export class TokenVerifier {
     this.#now = options.now ?? Date.now;
   }
 
-  // SPL-11: a 1-byte pepper makes stolen hashes brute-forceable — the
+  // SPL-11: a 1-byte pepper makes stolen hashes brute-forceable - the
   // strength check runs once, lazily (the constructor is sync), before
   // the first verification.
   #pepperStrengthChecked: Promise<void> | undefined;
@@ -197,8 +197,8 @@ export class TokenVerifier {
 
   /**
    * Run the verify pipeline against a single raw token. Resolves with a
-   * `{ ok: false, reason }` result for every authentication failure —
-   * including IP/token lockout — so callers can map them straight to HTTP
+   * `{ ok: false, reason }` result for every authentication failure -
+   * including IP/token lockout - so callers can map them straight to HTTP
    * responses; it does NOT reject for a failed verification. The single
    * exception is backpressure: when more than `maxConcurrent` verifications
    * are already in flight it throws {@link TokenVerifyOverloadError} so the
@@ -294,7 +294,7 @@ export class TokenVerifier {
 
       // Best-effort last-used update; never block the verify path.
       void this.#tokenStore.recordUse(tokenId, new Date(now).toISOString()).catch(() => {
-        /* swallow — last-used is opportunistic. */
+        /* swallow - last-used is opportunistic. */
       });
 
       emitAuthAudit({ action: 'auth:granted', decision: 'success', ts: now, target: tokenId });
@@ -353,11 +353,11 @@ export class TokenVerifier {
 
   /**
    * Lookup the token id associated with the HMAC hash. The default
-   * implementation walks the full list — subclasses / wrappers can
+   * implementation walks the full list - subclasses / wrappers can
    * pass a custom `AuthTokenStore` that supports an indexed lookup.
    */
   async #findTokenId(hashHex: string): Promise<string | undefined> {
-    // SPL-19: indexed lookup when the store supports it — the re-check
+    // SPL-19: indexed lookup when the store supports it - the re-check
     // keeps the timing-safe comparison on the returned row.
     if (typeof this.#tokenStore.getByHash === 'function') {
       const record = await this.#tokenStore.getByHash(hashHex);
@@ -392,10 +392,10 @@ export class TokenVerifier {
 
   /**
    * SPL-19: an IPv6-rotating attacker must not inflate the per-IP maps
-   * without bound — each map is capped at `maxTrackedIps` (default
+   * without bound - each map is capped at `maxTrackedIps` (default
    * 10 000). On overflow, expired lockouts sweep first; then the
    * oldest-inserted entries evict (insertion order ≈ least recently
-   * created — a bounded approximation, deliberately cheap).
+   * created - a bounded approximation, deliberately cheap).
    */
   #boundIpMaps(now: number): void {
     if (this.#ipLockouts.size > this.#maxTrackedIps) {
@@ -474,7 +474,7 @@ interface CachedAuth {
 
 /**
  * SPL-19 (documented semantics): a TOUCH-RESET window, not a true
- * sliding window — the count resets only after `windowMs` of full
+ * sliding window - the count resets only after `windowMs` of full
  * silence; continuous traffic keeps accumulating within one logical
  * window. Deliberately cheap (two fields per key); operators needing
  * exact sliding semantics put a rate limiter in front of the server.

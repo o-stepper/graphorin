@@ -4,7 +4,7 @@
  *
  * Pre-fix, the pre-screen returned `finishRun` on the FIRST gated call:
  * every later call in the step was never executed, never got an approval
- * request, and never got a `tool` message — the persisted assistant
+ * request, and never got a `tool` message - the persisted assistant
  * message still announced all of them, so the resumed provider request
  * carried dangling `tool_use` ids that real providers 400 on. A second
  * gated call in the same step was dropped with no approval ever
@@ -108,7 +108,7 @@ describe('agent-01: gated call batched with other calls in one step', () => {
     // The non-gated remainder ran BEFORE the suspend; the gated call did not.
     expect(ran).toEqual({ plain_a: 1, plain_c: 1 });
 
-    // Exactly one pending approval — the gated call — and the persisted
+    // Exactly one pending approval - the gated call - and the persisted
     // transcript already has tool messages for both plain calls.
     const state = end.result.state;
     expect(state.pendingApprovals.map((a) => a.toolCallId)).toEqual(['tc-g']);

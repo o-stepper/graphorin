@@ -85,7 +85,7 @@ describe('multi-query / RAG-Fusion (P2-3)', () => {
 
     const hits = await memory.semantic.search(scope, 'alpha');
 
-    expect(provider.calls).toHaveLength(0); // offline default — single-shot
+    expect(provider.calls).toHaveLength(0); // offline default - single-shot
     expect(hits.map((h) => h.record.text)).toEqual(['alpha gizmo']);
   });
 

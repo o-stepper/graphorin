@@ -110,7 +110,7 @@ describe('resolveSkillField (ADR-043 algorithm)', () => {
   });
 });
 
-describe('validateFrontmatter — conflict policy', () => {
+describe('validateFrontmatter - conflict policy', () => {
   const conflictFm = {
     name: 'finance',
     description: 'A finance skill.',
@@ -139,7 +139,7 @@ describe('validateFrontmatter — conflict policy', () => {
   });
 });
 
-describe('validateFrontmatter — required-field detection', () => {
+describe('validateFrontmatter - required-field detection', () => {
   it('reports missing name', () => {
     const v = validateFrontmatter({ description: 'd' });
     const diag = v.diagnostics.find(
@@ -157,7 +157,7 @@ describe('validateFrontmatter — required-field detection', () => {
   });
 });
 
-describe('validateFrontmatter — experimental + spec hints', () => {
+describe('validateFrontmatter - experimental + spec hints', () => {
   it('flags allowed-tools as experimental', () => {
     const v = validateFrontmatter({
       name: 'n',
@@ -200,7 +200,7 @@ describe('validateFrontmatter — experimental + spec hints', () => {
   });
 });
 
-describe('validateFrontmatter — runtime-compat', () => {
+describe('validateFrontmatter - runtime-compat', () => {
   it('passes when the runtime version satisfies the declared range', () => {
     const v = validateFrontmatter(
       {
@@ -227,7 +227,7 @@ describe('validateFrontmatter — runtime-compat', () => {
   });
 });
 
-describe('validateFrontmatter — unknown-field policy', () => {
+describe('validateFrontmatter - unknown-field policy', () => {
   it("'preserve' (default) emits no diagnostic for unrecognised fields", () => {
     const v = validateFrontmatter({ name: 'n', description: 'd', 'mystery-field': 1 });
     expect(v.diagnostics.find((d) => d.kind === 'unknown-field')).toBeUndefined();

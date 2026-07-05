@@ -1,6 +1,6 @@
 /**
  * Cross-platform browser launcher used by the Authorization Code
- * flow. The implementation is intentionally minimal — `child_process`
+ * flow. The implementation is intentionally minimal - `child_process`
  * is enough on every host platform we support and we avoid pulling in
  * the `open` package as a hard dependency.
  *
@@ -68,7 +68,7 @@ export async function openInBrowser(url: string, signal?: AbortSignal): Promise<
     };
 
     child.once('error', () => {
-      // Fall back to printing the URL — never crash the OAuth flow.
+      // Fall back to printing the URL - never crash the OAuth flow.
       // eslint-disable-next-line no-console
       console.log(`Open this URL in your browser to continue: ${url}`);
       settle();
@@ -88,7 +88,7 @@ interface LauncherSpec {
 /**
  * SPL-18: the launcher URL ultimately derives from fetched OAuth
  * discovery metadata. Reject anything that is not a plain http(s) URL,
- * and refuse shell/cmd metacharacters outright — defence in depth on
+ * and refuse shell/cmd metacharacters outright - defence in depth on
  * top of SPL-7's discovery validation.
  */
 function assertSafeLaunchUrl(url: string): void {
@@ -112,18 +112,18 @@ function assertSafeLaunchUrl(url: string): void {
 function resolveLauncher(url: string, plat: NodeJS.Platform = platform()): LauncherSpec {
   assertSafeLaunchUrl(url);
   if (plat === 'darwin') return { command: 'open', args: [url] };
-  // SPL-18: NOT `cmd /c start` — cmd.exe re-parses its command line and
+  // SPL-18: NOT `cmd /c start` - cmd.exe re-parses its command line and
   // `start` re-parses again, so metacharacters in a hostile URL could
   // break out of the argument. `rundll32 url.dll,FileProtocolHandler`
   // hands the URL to the shell's URL handler without a cmd re-parse.
   if (plat === 'win32') {
     return { command: 'rundll32', args: ['url.dll,FileProtocolHandler', url] };
   }
-  // POSIX fallthrough — Linux + BSD + WSL.
+  // POSIX fallthrough - Linux + BSD + WSL.
   return { command: 'xdg-open', args: [url] };
 }
 
-/** @experimental — test seam for the platform-specific launcher (SPL-18). */
+/** @experimental - test seam for the platform-specific launcher (SPL-18). */
 export function _resolveLauncherForTesting(url: string, plat: NodeJS.Platform): LauncherSpec {
   return resolveLauncher(url, plat);
 }

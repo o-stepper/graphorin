@@ -3,7 +3,7 @@
  * model-visible `ToolErrorKind` (tools-06). Anything else a tool throws
  * flattens to `execution_failed`; these carriers keep the taxonomy honest:
  *
- * - {@link ToolRateLimitError} → kind `'rate_limited'` — the upstream
+ * - {@link ToolRateLimitError} → kind `'rate_limited'` - the upstream
  *   service refused the call for pacing reasons; the call is safe to
  *   retry after a delay.
  *
@@ -16,8 +16,8 @@
 /**
  * Throw from a tool's `execute(...)` when the upstream service rate-limits
  * the call. The executor maps it to the `'rate_limited'` ToolErrorKind and
- * surfaces `retryAfterMs` (when known) on the error hint so the model —
- * and any harness-side retry — can pace correctly.
+ * surfaces `retryAfterMs` (when known) on the error hint so the model -
+ * and any harness-side retry - can pace correctly.
  *
  * @stable
  */

@@ -8,12 +8,12 @@
  * trail is left untouched.
  *
  * Three modes:
- * - `'off'` — index the bare canonical text (pre-P1-3 behaviour).
- * - `'late-chunk'` — the **offline default**: prepend a context derived
+ * - `'off'` - index the bare canonical text (pre-P1-3 behaviour).
+ * - `'late-chunk'` - the **offline default**: prepend a context derived
  *   deterministically from the memory's own structured metadata. No LLM
  *   call, so the local-first write path is unchanged in cost.
- * - `'llm'` — an opt-in, **consolidator-only** enrichment: one cheap
- *   provider call writes a 1–2 sentence situating prefix. Confined to the
+ * - `'llm'` - an opt-in, **consolidator-only** enrichment: one cheap
+ *   provider call writes a 1-2 sentence situating prefix. Confined to the
  *   background consolidator (never the hot write path); a failure or empty
  *   completion degrades to {@link contextualize} so a write never wedges.
  *
@@ -33,7 +33,7 @@ export type ContextualRetrievalMode = 'off' | 'late-chunk' | 'llm';
 /**
  * Structural subset of a fact / candidate consumed by the
  * contextualizers. Only **author / extraction-supplied** signals are
- * used — never framework-defaulted fields (e.g. a `validFrom` defaulted
+ * used - never framework-defaulted fields (e.g. a `validFrom` defaulted
  * to write-time) and never opaque scope ids (random uuids would only
  * add noise to the embedding). A candidate with no structured signals
  * yields an empty context, so plain `remember({ text })` writes are
@@ -53,7 +53,7 @@ export interface ContextualizeInput {
 
 const SITUATING_CONTEXT_SYSTEM_PROMPT = [
   'You are a situating-context assistant for a long-running memory store.',
-  'Given one memory and any structured hints, write a single short sentence (≤ 25 words) that situates it — the entities, timeframe, and topic it concerns — so it can be retrieved later by a vaguely-worded question.',
+  'Given one memory and any structured hints, write a single short sentence (≤ 25 words) that situates it - the entities, timeframe, and topic it concerns - so it can be retrieved later by a vaguely-worded question.',
   'Do not restate the memory verbatim and do not add facts that are not implied. Return only the sentence, no preamble.',
 ].join(' ');
 
@@ -90,7 +90,7 @@ export function buildSituatingContext(input: ContextualizeInput): string {
 /**
  * Late-chunking contextualizer (offline default). Prepends the
  * deterministic situating context to the canonical text; a no-op when
- * the candidate carries no structured signals. Pure — never calls a
+ * the candidate carries no structured signals. Pure - never calls a
  * provider.
  *
  * @internal
@@ -106,7 +106,7 @@ const ZERO_USAGE: Usage = Object.freeze({
   totalTokens: 0,
 });
 
-/** Result of the LLM-context enrichment — the index text plus call usage for budgeting. */
+/** Result of the LLM-context enrichment - the index text plus call usage for budgeting. */
 export interface ContextualizeLlmResult {
   readonly indexText: string;
   readonly usage: Usage;
@@ -131,7 +131,7 @@ export async function contextualizeWithLlm(
     messages: [{ role: 'user', content: buildSituatingUserPrompt(input) }],
     systemMessage: SITUATING_CONTEXT_SYSTEM_PROMPT,
     temperature: 0,
-    // MCON-14: per-call output cap — a one-sentence situating prefix.
+    // MCON-14: per-call output cap - a one-sentence situating prefix.
     maxTokens: 256,
     ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
   };
@@ -143,7 +143,7 @@ export async function contextualizeWithLlm(
     }
     return { indexText: `${prefix}\n${input.text}`, usage: response.usage };
   } catch {
-    // Contextualization is an enhancement, not a correctness requirement —
+    // Contextualization is an enhancement, not a correctness requirement -
     // a provider failure must never wedge the underlying write. Fall back
     // to the deterministic late-chunk prefix at zero cost.
     return { indexText: contextualize(input), usage: ZERO_USAGE };

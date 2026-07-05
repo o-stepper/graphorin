@@ -2,7 +2,7 @@
  * Rule: `@graphorin/no-secret-unwrap` (DEC-020 / ADR-026 / Phase 16).
  *
  * Flags member expressions that look like an unprotected unwrap of a
- * `SecretValue` instance — `<expr>.unwrap()` and `<expr>.reveal()` —
+ * `SecretValue` instance - `<expr>.unwrap()` and `<expr>.reveal()` -
  * outside an allow-listed context. The framework convention is:
  *
  *   - Prefer `value.use(fn)` / `value.useBuffer(fn)` for scoped reads;
@@ -10,7 +10,7 @@
  *     callback invocation.
  *   - Use `value.reveal()` only as a one-shot escape hatch with an
  *     adjacent justification. The audit log records the call.
- *   - Never use `value.unwrap()` — it is `@deprecated` and is an alias
+ *   - Never use `value.unwrap()` - it is `@deprecated` and is an alias
  *     for `.reveal()` retained only for the v0.x compatibility window.
  *     The rule reports `unwrap()` as `'error'` even when an
  *     opt-out comment is present so the deprecation cliff stays sharp.
@@ -21,7 +21,7 @@
  * `reveal()` but **not** for `unwrap()` (the deprecation supersedes
  * any local justification).
  *
- * The rule is intentionally lexical — it matches `.unwrap()` /
+ * The rule is intentionally lexical - it matches `.unwrap()` /
  * `.reveal()` on any `MemberExpression` regardless of the receiver
  * type. False positives are tolerated because (a) the receiver is
  * almost always a `SecretValue` in this codebase and (b) the
@@ -50,7 +50,7 @@ const rule: Rule.RuleModule = {
       avoidReveal:
         '`.reveal()` returns the unwrapped secret as a V8 string. Prefer `.use(fn)` so the value is scoped to a single callback. Add `// graphorin-allow-secret-unwrap: <reason>` to opt out.',
       avoidUnwrap:
-        '`.unwrap()` is deprecated — call `.reveal()` (audited) or `.use(fn)` (scoped). The opt-out comment is intentionally NOT honoured for `.unwrap()` so the deprecation stays sharp.',
+        '`.unwrap()` is deprecated - call `.reveal()` (audited) or `.use(fn)` (scoped). The opt-out comment is intentionally NOT honoured for `.unwrap()` so the deprecation stays sharp.',
     },
   },
   create(context: Rule.RuleContext): Rule.RuleListener {

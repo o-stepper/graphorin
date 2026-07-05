@@ -12,7 +12,7 @@ export interface AuthTokenRecord {
   readonly hashHex: string;
   /** Optional human-readable label rendered in CLI listings. */
   readonly label?: string;
-  /** Scope grammar — opaque strings of the form `<resource>:<action>[:<id-or-glob>]`. */
+  /** Scope grammar - opaque strings of the form `<resource>:<action>[:<id-or-glob>]`. */
   readonly scopes: ReadonlyArray<string>;
   readonly createdAt: string;
   readonly expiresAt?: string;
@@ -35,7 +35,7 @@ export interface AuthTokenStore {
   recordUse(id: string, usedAt: string): Promise<void>;
   /**
    * Indexed lookup by HMAC hash (SPL-19). When present, the verifier
-   * uses it on cache-miss instead of walking `list()` — O(1) instead of
+   * uses it on cache-miss instead of walking `list()` - O(1) instead of
    * an O(n) full-table scan per verification.
    */
   getByHash?(hashHex: string): Promise<AuthTokenRecord | null>;

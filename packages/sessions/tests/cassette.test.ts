@@ -180,7 +180,7 @@ describe('Tool cassette format', () => {
   });
 });
 
-describe('Cassette decision engine — sideEffectClass policy', () => {
+describe('Cassette decision engine - sideEffectClass policy', () => {
   const baseRecord = {
     kind: 'tool-call' as const,
     stepNumber: 1,
@@ -301,7 +301,7 @@ describe('Cassette decision engine — sideEffectClass policy', () => {
   });
 });
 
-describe('Tool cassette recorder — flushToFile', () => {
+describe('Tool cassette recorder - flushToFile', () => {
   let tmpDir: string;
   beforeEach(() => {
     tmpDir = mkdtempSync(join(tmpdir(), 'graphorin-cassette-'));

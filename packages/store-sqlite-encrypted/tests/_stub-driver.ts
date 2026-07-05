@@ -121,7 +121,7 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
         if (trimmed === 'page_size') return 4096;
         if (trimmed === 'wal_checkpoint(PASSIVE)') return [{ busy: 0, log: 0, checkpointed: 0 }];
         if (trimmed === 'cipher_integrity_check') {
-          // Real-peer faithful: sqlite3mc has no such pragma — it
+          // Real-peer faithful: sqlite3mc has no such pragma - it
           // returns an empty row-set (CS-7).
           return [];
         }
@@ -145,7 +145,7 @@ export function buildStubDriver(opts: { failIntegrity?: boolean } = {}): {
         const rekeyMatch = /^rekey\s*=\s*(.+)$/.exec(trimmed);
         if (rekeyMatch) {
           // Real-peer faithful: `PRAGMA rekey` re-keys a keyed DB AND
-          // encrypts a plaintext DB in place (no prior key needed) —
+          // encrypts a plaintext DB in place (no prior key needed) -
           // the CS-7 copy+rekey export path relies on the latter.
           this.#key = rekeyMatch[1] ?? null;
           writeStubFile(this.path, {

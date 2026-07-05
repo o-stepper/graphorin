@@ -4,14 +4,14 @@
  * pattern catalogue to the JSON-stringified payload; matched
  * fragments are wrapped in the configured envelope (default) or
  * stripped (per the `'strip'` policy) or passed through (per the
- * `'pass-through'` policy — operator opt-out for trusted
+ * `'pass-through'` policy - operator opt-out for trusted
  * deployments).
  *
  * The sanitizer runs AFTER the `ServerMessage` Zod-validation pass
  * in `@graphorin/protocol` and BEFORE the message hits the wire (so
  * the protocol schema is unchanged; the sanitization is a pure
  * transform applied to validated payloads). It is bytes-equal across
- * the WS / SSE / REST transports — the same input + same policy
+ * the WS / SSE / REST transports - the same input + same policy
  * produces the same output regardless of which transport invoked
  * the sanitizer.
  *
@@ -110,7 +110,7 @@ export function createDeliveryCommentarySanitizer(
     try {
       sink?.onDecision(decision);
     } catch {
-      // Sink errors must never block the wire — swallow + continue.
+      // Sink errors must never block the wire - swallow + continue.
     }
     return Object.freeze({ ...frame, payload: next });
   }

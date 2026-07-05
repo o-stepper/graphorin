@@ -3,12 +3,12 @@
  * so the pepper / passphrase / token paths can fail fast on values that
  * pass a raw length check yet are obviously low quality (e.g. the
  * `"test-pepper-32-bytes-aaaaaaaaaaaa"` placeholder seen in examples
- * and CI smoke runs — 32 bytes, but a 12-byte run of identical
+ * and CI smoke runs - 32 bytes, but a 12-byte run of identical
  * characters and low Shannon entropy).
  *
  * The thresholds are deliberately conservative: a `crypto.randomBytes`
  * value of the required length never trips them (32 random bytes have
- * ~4.5–5 observed bits/byte and a near-zero chance of an 8-byte
+ * ~4.5-5 observed bits/byte and a near-zero chance of an 8-byte
  * identical run), so legitimate secrets are unaffected.
  *
  * @packageDocumentation

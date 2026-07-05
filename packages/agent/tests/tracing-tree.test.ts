@@ -1,5 +1,5 @@
 /**
- * C7 (periphery-04) — the run's spans form ONE tree: agent.run is the
+ * C7 (periphery-04) - the run's spans form ONE tree: agent.run is the
  * root, each agent.step parents under it, and tool.execute parents under
  * the current step. Attributes follow the OTel GenAI conventions.
  */
@@ -111,7 +111,7 @@ function mockProvider(scripts: ReadonlyArray<MockProviderScript>): Provider {
   };
 }
 
-describe('C7 — agent.run / agent.step / tool.execute form one trace tree', () => {
+describe('C7 - agent.run / agent.step / tool.execute form one trace tree', () => {
   it('parents every span correctly and closes them all', async () => {
     const { tracer, spans } = recordingTracer();
     const agent = createAgent({

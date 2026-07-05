@@ -86,12 +86,12 @@ describe('fact importance + decay row (X-1, migration 015)', () => {
     await store.close();
   });
 
-  it('archiveFact is recoverable — flags archived without deleting the row', async () => {
+  it('archiveFact is recoverable - flags archived without deleting the row', async () => {
     const store = await makeStore();
     await store.memory.semantic.remember(fact('f4', 'soon archived'));
     await decayExt(store).archiveFact('f4', 'capacity_exceeded');
 
-    // MCON-6: archived rows leave the default decay window — inspect via opt-in.
+    // MCON-6: archived rows leave the default decay window - inspect via opt-in.
     const row = (await decayExt(store).listForDecay(SCOPE, 10, { includeArchived: true })).find(
       (r) => r.id === 'f4',
     );

@@ -83,7 +83,7 @@ interface DowngradeRecord {
 }
 
 /**
- * Snapshot of the active store chain — surfaces in the
+ * Snapshot of the active store chain - surfaces in the
  * `/v1/health/secrets` admin endpoint (consumed by the standalone
  * server) and the `graphorin doctor --check-secrets` CLI command.
  *
@@ -134,7 +134,7 @@ export function _resetSecretsFactoryForTesting(): void {
 }
 
 /**
- * Detect whether the host is "headless" — that is, no interactive
+ * Detect whether the host is "headless" - that is, no interactive
  * terminal is attached and the process is likely running unattended.
  * The result drives the `'auto'` chain's keyring vs. encrypted-file
  * decision.
@@ -146,7 +146,7 @@ export function detectHeadless(): { headless: boolean; reasons: ReadonlyArray<st
   if (process.env.GRAPHORIN_HEADLESS === '1') reasons.push('GRAPHORIN_HEADLESS=1');
   if (!process.stdout.isTTY) reasons.push('stdout is not a TTY');
   if (!process.stdin.isTTY) reasons.push('stdin is not a TTY');
-  // Note the presence of `CI` but not its value — the value can carry
+  // Note the presence of `CI` but not its value - the value can carry
   // host metadata (runner name, branch, build URL) that CI providers
   // sometimes embed and that should not land in console output.
   if (process.env.CI) reasons.push('CI env detected');
@@ -314,7 +314,7 @@ export async function createSecretsStore(
 ): Promise<SecretsStore> {
   // In library mode, GRAPHORIN_SECRETS_SOURCE acts as the env-var
   // counterpart to the documented `--secrets-source` CLI flag. Caller
-  // overrides via `opts.kind` / `opts.fallbackChain` always win — the
+  // overrides via `opts.kind` / `opts.fallbackChain` always win - the
   // env is the default, never an override.
   const envOverride =
     opts.kind === undefined && opts.fallbackChain === undefined
@@ -338,7 +338,7 @@ export async function createSecretsStore(
     return probe.store;
   }
 
-  // Auto chain — probe each fallback in order.
+  // Auto chain - probe each fallback in order.
   const tried: { kind: Exclude<SecretsStoreKind, 'auto'>; reasons: ReadonlyArray<string> }[] = [];
   for (const candidate of fallbackChain) {
     const probe = await probeKind(candidate, opts);

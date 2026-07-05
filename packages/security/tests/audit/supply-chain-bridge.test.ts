@@ -9,7 +9,7 @@ import {
 
 import { createMemoryAuditDb } from './_helpers.js';
 
-describe('@graphorin/security/audit — supply-chain-bridge', () => {
+describe('@graphorin/security/audit - supply-chain-bridge', () => {
   beforeEach(() => {
     _resetSupplyChainAuditListenersForTesting();
   });

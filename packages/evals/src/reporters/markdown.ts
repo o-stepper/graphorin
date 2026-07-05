@@ -42,7 +42,7 @@ export function renderMarkdownReport<I, O>(report: EvalReport<I, O>): string {
     lines.push('');
     for (const f of failures) {
       const reason = escapeMarkdownInline(f.result.reason ?? '_no reason_');
-      lines.push(`- **${f.scorer}** — ${reason}`);
+      lines.push(`- **${f.scorer}** - ${reason}`);
     }
     lines.push('');
   }

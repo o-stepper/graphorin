@@ -24,7 +24,7 @@ import {
 
 const SCOPE = { userId: 'alex' };
 
-describe('@graphorin/memory — DoD: setReranker reorders correctly', () => {
+describe('@graphorin/memory - DoD: setReranker reorders correctly', () => {
   it('the custom reranker drives the order of SemanticMemory.search results', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),
@@ -78,7 +78,7 @@ describe('@graphorin/memory — DoD: setReranker reorders correctly', () => {
   });
 });
 
-describe('@graphorin/memory — DoD: multi-active reads from both tables', () => {
+describe('@graphorin/memory - DoD: multi-active reads from both tables', () => {
   it('after multi-active migration, search returns rows embedded with either embedder', async () => {
     const store = createInMemoryStore();
     const embeddings = new InMemoryEmbeddingRegistry();
@@ -111,7 +111,7 @@ describe('@graphorin/memory — DoD: multi-active reads from both tables', () =>
     store.__hooks.registerFactEmbedder(targetFact.id, 'stub:tgt@8');
     store.__hooks.registerFactEmbedder(sourceFact.id, 'stub:src@8');
 
-    // Direct adapter probe — the storage layer's `searchVector`
+    // Direct adapter probe - the storage layer's `searchVector`
     // honours the per-record `embedder_id` guard. Each call should
     // surface only the fact attributed to that embedder.
     const sourceVec = (await sourceEmbedder.embed(['fact under source']))[0];
@@ -133,7 +133,7 @@ describe('@graphorin/memory — DoD: multi-active reads from both tables', () =>
   });
 });
 
-describe('@graphorin/memory — DoD: auto-migrate resumes after process kill', () => {
+describe('@graphorin/memory - DoD: auto-migrate resumes after process kill', () => {
   it('two consecutive auto-migrate runs against a stateful queue drain everything', async () => {
     const embeddings = new InMemoryEmbeddingRegistry();
     const sourceEmbedder = createStubEmbedder({ id: 'stub:src@8' });
@@ -146,7 +146,7 @@ describe('@graphorin/memory — DoD: auto-migrate resumes after process kill', (
       configHash: sourceEmbedder.configHash(),
     });
 
-    // MST-12: resumption is caller-driven. This stateful queue IS the cursor —
+    // MST-12: resumption is caller-driven. This stateful queue IS the cursor -
     // the caller's `nextBatch` owns it and it survives across the two
     // `migrateEmbedder(...)` invocations. There is no persisted
     // `migration_state` cursor in the storage adapter today.
@@ -177,7 +177,7 @@ describe('@graphorin/memory — DoD: auto-migrate resumes after process kill', (
       };
     };
 
-    // Run #1 — interrupt after the first batch.
+    // Run #1 - interrupt after the first batch.
     const ctrl = new AbortController();
     let yielded = 0;
     await expect(
@@ -204,11 +204,11 @@ describe('@graphorin/memory — DoD: auto-migrate resumes after process kill', (
     expect(queue.length).toBeGreaterThan(0);
 
     // Source is still registered because the abort happened before
-    // commit — a fresh embedder migration runner must be able to
+    // commit - a fresh embedder migration runner must be able to
     // resume.
     expect(embeddings.listActive().some((r) => r.id === 'stub:src@8')).toBe(true);
 
-    // Run #2 — resumes from the persisted cursor, drains the queue,
+    // Run #2 - resumes from the persisted cursor, drains the queue,
     // commits, retires the source.
     const events2: string[] = [];
     for await (const event of migrateEmbedder({

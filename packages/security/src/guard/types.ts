@@ -3,8 +3,8 @@
  *
  * The guard sits between a tool and the long-lived memory store. Its
  * job is to confirm that the tool only mutated memory through the
- * sanctioned `ctx.memory.*` surface — not through a direct file or
- * SQL escape hatch — and to record any non-tool-mediated mutation.
+ * sanctioned `ctx.memory.*` surface - not through a direct file or
+ * SQL escape hatch - and to record any non-tool-mediated mutation.
  *
  * The guard is **tier-based** per DEC-153. The four tiers trade
  * runtime cost against attack-surface coverage; the framework default

@@ -1,5 +1,5 @@
 /**
- * Dynamic Client Registration (RFC 7591) — minimal client.
+ * Dynamic Client Registration (RFC 7591) - minimal client.
  *
  * The framework only needs the public-client subset (client_id +
  * optional client_secret) for the outbound MCP OAuth flow.

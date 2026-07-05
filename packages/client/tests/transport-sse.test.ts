@@ -25,7 +25,7 @@ function encodeSse(frame: { event?: string; id?: string; data: string }): string
 
 function eventFrame(type: string, eventId: string, payload: unknown): string {
   return encodeSse({
-    event: type, // the server names every event — the IP-3 break
+    event: type, // the server names every event - the IP-3 break
     id: eventId,
     data: JSON.stringify({
       v: '1',
@@ -56,7 +56,7 @@ function streamResponse(chunks: ReadonlyArray<string>): Response {
   });
 }
 
-describe('openSseTransport — server wire-format parity (IP-3)', () => {
+describe('openSseTransport - server wire-format parity (IP-3)', () => {
   it('delivers NAMED server events (the message-only listener saw none) + tracks lastEventId', async () => {
     const captured: { headers?: Record<string, string> } = {};
     const fetchImpl = (async (_url: unknown, init?: RequestInit) => {

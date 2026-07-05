@@ -25,7 +25,7 @@ interface TestState {
 }
 
 // The internal applyWrites/buildInitialState signatures take the erased
-// `Record<string, Channel<unknown>>` view (the engine casts the same way) —
+// `Record<string, Channel<unknown>>` view (the engine casts the same way) -
 // per-key channel generics are intentionally dropped at this boundary.
 const channels = {
   status: latestValue<string>({ default: 'pending' }),
@@ -71,7 +71,7 @@ describe('buildInitialState', () => {
   });
 });
 
-describe('applyWrites — channel merge strategies', () => {
+describe('applyWrites - channel merge strategies', () => {
   it('LatestValue allows a single writer per step', () => {
     const result = applyWrites<TestState>({
       state: { ...buildInitialState<TestState>({ channels, inputState: {} }) },

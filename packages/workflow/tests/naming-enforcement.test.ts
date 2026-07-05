@@ -3,7 +3,7 @@
  * Graphorin's own primitive names (`Directive`, `Dispatch`, `pause`,
  * `LatestValue`, `AnyValue`, `Reducer`, `ListAggregate`, `Stream`,
  * `Barrier`, `Ephemeral`). Identifiers from third-party workflow
- * libraries must NOT appear in this package's source — `git grep`
+ * libraries must NOT appear in this package's source - `git grep`
  * users (and downstream consumers) can rely on hits for these names
  * pointing exclusively at Graphorin code.
  *

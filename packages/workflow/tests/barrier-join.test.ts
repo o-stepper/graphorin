@@ -1,6 +1,6 @@
 /**
- * WF-5: the Barrier channel's `@stable` contract — "completes when
- * every writer in `from` has produced a value" — must gate the join
+ * WF-5: the Barrier channel's `@stable` contract - "completes when
+ * every writer in `from` has produced a value" - must gate the join
  * node in the ENGINE, not just accumulate a keyed map. The adversarial
  * shape is the ASYMMETRIC fan-in: one writer arrives steps later than
  * the other, so any-of edge triggering runs the join early (with a
@@ -32,7 +32,7 @@ function barrierWrite(value: string): Record<string, string> {
   return value as unknown as Record<string, string>;
 }
 
-describe('WF-5 — Barrier joins wait for every writer', () => {
+describe('WF-5 - Barrier joins wait for every writer', () => {
   it('an ASYMMETRIC fan-in runs the join node exactly once, only after a AND c wrote', async () => {
     const joinRuns: Array<Record<string, string>> = [];
     const wf = createWorkflow<JoinState>({
@@ -56,7 +56,7 @@ describe('WF-5 — Barrier joins wait for every writer', () => {
       edges: [
         { from: '__start__', to: 'a' },
         { from: '__start__', to: 'b' },
-        // c arrives one step later than a — the asymmetric leg.
+        // c arrives one step later than a - the asymmetric leg.
         { from: 'b', to: 'c' },
         { from: 'a', to: 'join' },
         { from: 'c', to: 'join' },
@@ -120,7 +120,7 @@ describe('WF-5 — Barrier joins wait for every writer', () => {
       nodes: {
         a: createNode<JoinState>({ name: 'a', run: () => ({ joined: barrierWrite('a-val') }) }),
         // `ghost` is a declared barrier writer that exists but is never
-        // scheduled — the join must not fire with the partial map.
+        // scheduled - the join must not fire with the partial map.
         ghost: createNode<JoinState>({
           name: 'ghost',
           run: () => ({ joined: barrierWrite('ghost-val') }),

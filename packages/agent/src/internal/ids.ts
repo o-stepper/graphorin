@@ -18,7 +18,7 @@ function pad(value: string, width: number): string {
  * 5 random bytes (40 bits) and consume 5 bits per emitted character
  * MSB-first; the leftover bits are discarded. Sourcing from
  * `randomBytes` (uniform over `[0, 256)`) guarantees a uniform
- * distribution over `ALPHABET` — no modulo bias.
+ * distribution over `ALPHABET` - no modulo bias.
  */
 function randomTail(): string {
   const buf = randomBytes(5);

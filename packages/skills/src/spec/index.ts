@@ -130,10 +130,10 @@ export function getGraphorinMapping(field: string): GraphorinMappingEntry | unde
  * Compare an author's `graphorin-anthropic-spec` value against the
  * bundled snapshot date. Returns:
  *
- * - `'same'`        — the author targeted the same snapshot.
- * - `'older'`       — the author targeted an older snapshot.
- * - `'newer'`       — the author targeted a newer snapshot.
- * - `'unparseable'` — the author's value could not be interpreted as
+ * - `'same'`        - the author targeted the same snapshot.
+ * - `'older'`       - the author targeted an older snapshot.
+ * - `'newer'`       - the author targeted a newer snapshot.
+ * - `'unparseable'` - the author's value could not be interpreted as
  *   an ISO-8601 date.
  *
  * @stable

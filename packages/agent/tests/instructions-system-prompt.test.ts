@@ -18,7 +18,7 @@ function fakeAssemblingMemory(content: string, onAssemble?: () => void): Memory 
   return { contextEngine: engine } as unknown as Memory;
 }
 
-describe('Agent — system prompt assembly from `instructions`', () => {
+describe('Agent - system prompt assembly from `instructions`', () => {
   it('injects the agent.instructions string as the first system message before the user input', async () => {
     let capturedRequest: ProviderRequest | undefined;
     const provider = createMockProvider({

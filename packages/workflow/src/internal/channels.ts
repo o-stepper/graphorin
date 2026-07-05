@@ -2,7 +2,7 @@
  * Per-channel atomic write merger. The execution-step semantics
  * documented in `04-workflow-engine.md` § Execution-step semantics
  * require deterministic per-channel apply behaviour even under
- * parallel writes — this module owns that guarantee.
+ * parallel writes - this module owns that guarantee.
  *
  * @packageDocumentation
  */
@@ -13,7 +13,7 @@ import { InvalidChannelWriteError, MultiWriteError, ReducerError } from '../erro
 import { TASKS_CHANNEL } from '../types.js';
 
 /**
- * @internal — single channel write produced by a node task.
+ * @internal - single channel write produced by a node task.
  */
 export interface ChannelWrite {
   readonly nodeName: string;
@@ -24,7 +24,7 @@ export interface ChannelWrite {
 }
 
 /**
- * @internal — combined apply result. The runtime feeds the new state
+ * @internal - combined apply result. The runtime feeds the new state
  * back to the next planning round and ships the bumped versions into
  * the persisted checkpoint so reconstructed runs see the same view.
  */
@@ -36,7 +36,7 @@ export interface ApplyResult<TState extends object> {
    * Merged values of the `ephemeral` channels touched this step
    * (workflow-07). Ephemeral values are wiped from `state` before this
    * function returns, so the engine surfaces them on the
-   * `workflow.channel.update` event instead — the only place a consumer
+   * `workflow.channel.update` event instead - the only place a consumer
    * can ever observe them.
    */
   readonly ephemeralValues: Readonly<Record<string, unknown>>;

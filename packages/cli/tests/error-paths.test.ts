@@ -11,7 +11,7 @@ async function fixture(): Promise<string> {
   return await mkdtemp(join(tmpdir(), 'graphorin-cli-err-'));
 }
 
-describe('runMigrate — error paths', () => {
+describe('runMigrate - error paths', () => {
   it('exits 1 when the config file does not exist', async () => {
     const lines: string[] = [];
     const exit = vi.spyOn(process, 'exit').mockImplementation(((_code?: number) => {
@@ -78,7 +78,7 @@ describe('runMigrate — error paths', () => {
   });
 });
 
-describe('runStart — error paths', () => {
+describe('runStart - error paths', () => {
   it('exits 1 + prints config-invalid when the config schema rejects', async () => {
     const dir = await fixture();
     const cfg = join(dir, 'graphorin.config.json');

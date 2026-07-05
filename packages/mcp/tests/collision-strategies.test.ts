@@ -9,7 +9,7 @@ import { createMCPClientFromSdkTransport } from '../src/client/client.js';
 import type { MCPClient } from '../src/client/index.js';
 import { startInMemoryServer } from './__fixtures__/in-memory-server.js';
 
-describe('MCP collision strategies — registry integration', () => {
+describe('MCP collision strategies - registry integration', () => {
   let dispose: Array<() => Promise<void>> = [];
   let clients: MCPClient[] = [];
 

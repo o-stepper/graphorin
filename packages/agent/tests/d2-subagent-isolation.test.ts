@@ -79,7 +79,7 @@ function capturingProvider(scripts: ReadonlyArray<MockProviderScript>): Provider
   };
 }
 
-describe('D2 — read-only run capability (single-writer constraint)', () => {
+describe('D2 - read-only run capability (single-writer constraint)', () => {
   it('advertises only pure/read-only tools and no handoffs to the model', async () => {
     const wrote = { ran: false };
     const helper = createAgent({
@@ -147,7 +147,7 @@ describe('D2 — read-only run capability (single-writer constraint)', () => {
   });
 });
 
-describe('D2 — context folding at the toTool boundary', () => {
+describe('D2 - context folding at the toTool boundary', () => {
   it('returns a distilled, bounded outcome instead of the raw output', async () => {
     const longText = 'finding: '.concat('x'.repeat(5000));
     const child = createAgent({
@@ -177,7 +177,7 @@ describe('D2 — context folding at the toTool boundary', () => {
   });
 });
 
-describe('D2 — taint propagation across the fold', () => {
+describe('D2 - taint propagation across the fold', () => {
   it('carries the child taint summary as a widen-only ToolReturn override', async () => {
     const untrustedRead: Tool<unknown, unknown, unknown> = {
       name: 'web_fetch',
@@ -212,7 +212,7 @@ describe('D2 — taint propagation across the fold', () => {
     expect(envelope.taint?.untrusted).toBe(true);
     expect(envelope.taint?.sourceKind).toBe('sub-agent');
 
-    // propagateTaint: false restores the raw output shape (fresh child —
+    // propagateTaint: false restores the raw output shape (fresh child -
     // the scripted provider is single-use).
     const child2 = createAgent({
       name: 'browser2',

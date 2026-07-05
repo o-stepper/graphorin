@@ -106,7 +106,7 @@ describe('encryption hooks', () => {
     // Inject a cipher loader that throws CipherPeerMissingError to
     // simulate the cipher peer being absent. The runtime must NOT fall
     // back to the default `better-sqlite3` driver in this case
-    // (DEC-129 / ADR-030 — never silently downgrade).
+    // (DEC-129 / ADR-030 - never silently downgrade).
     const { createSqliteStore } = await import('../src/index.js');
     await expect(
       createSqliteStore({

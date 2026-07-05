@@ -3,7 +3,7 @@ import type { SpanRecord } from '../../src/exporters/index.js';
 import { sanitizeRecord } from '../../src/exporters/with-validation.js';
 import { createRedactionValidator } from '../../src/redaction/index.js';
 
-describe('@graphorin/observability/redaction — performance budget', () => {
+describe('@graphorin/observability/redaction - performance budget', () => {
   it('mean withValidation overhead per span stays under the documented budget', () => {
     const validator = createRedactionValidator({ minTier: 'internal' });
     const record: SpanRecord = {

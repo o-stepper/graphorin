@@ -4,7 +4,7 @@
  * (default `@graphorin/store-sqlite`) supplies the concrete store.
  *
  * Every function returns immutable, frozen records and never logs the
- * raw token value. Audit emission is the caller's responsibility — a
+ * raw token value. Audit emission is the caller's responsibility - a
  * follow-up commit will bridge the helpers to the audit subsystem.
  *
  * @packageDocumentation
@@ -57,7 +57,7 @@ export interface CreatedToken {
 /**
  * Mint a new token, persist its HMAC hash through the injected store,
  * and return the raw token wrapped in a `SecretValue`. The plaintext
- * value is shown to the user exactly once — at the call site of this
+ * value is shown to the user exactly once - at the call site of this
  * function.
  *
  * @stable
@@ -70,7 +70,7 @@ export async function createToken(options: CreateTokenOptions): Promise<CreatedT
   }
 
   const now = options.now ?? Date.now;
-  // SPL-11: a weak pepper makes stolen hashHex offline-brute-forceable —
+  // SPL-11: a weak pepper makes stolen hashHex offline-brute-forceable -
   // enforce strength wherever a pepper is consumed, not only in rotation.
   await assertPepperStrength(options.pepper);
   const generated = generateRawToken({
@@ -141,7 +141,7 @@ export async function revokeToken(
     readonly now?: () => number;
     /**
      * SPL-9: pass the live `TokenVerifier` so revocation invalidates its
-     * LRU entry immediately — without it a revoked token keeps verifying
+     * LRU entry immediately - without it a revoked token keeps verifying
      * from the cache for up to `cacheTtlMaxMs` (default 60s).
      */
     readonly verifier?: { invalidate(rawTokenOrHashHex: string): void };
@@ -311,7 +311,7 @@ async function hmacHexAsync(pepper: SecretValue, raw: string): Promise<string> {
   );
 }
 
-/** @internal — shared with the verifier's lazy first-use check (SPL-11). */
+/** @internal - shared with the verifier's lazy first-use check (SPL-11). */
 export async function assertPepperStrength(pepper: SecretValue): Promise<void> {
   const assessment = await pepper.useBuffer((buf) => assessSecretStrength(buf));
   if (!assessment.ok) {

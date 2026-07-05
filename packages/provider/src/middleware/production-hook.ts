@@ -1,5 +1,5 @@
 /**
- * Production startup hook — fails fast when a security-critical
+ * Production startup hook - fails fast when a security-critical
  * middleware is missing from the composed chain. The default
  * configuration enforces `withRedaction`; consumers can extend the
  * `requiredKinds` list to lock additional middlewares.

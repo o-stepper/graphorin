@@ -1,17 +1,17 @@
 /**
  * Tiny config loader. Resolves the path the operator handed in (or
  * the per-platform default) and returns the raw {@link ServerConfigInput}
- * payload — strict validation happens later via
+ * payload - strict validation happens later via
  * `parseServerConfig(...)` from `@graphorin/server`.
  *
  * Supported file kinds (decided by extension):
  *
- *  - `*.ts`  / `*.mts` / `*.cts` — re-imported through the platform
+ *  - `*.ts`  / `*.mts` / `*.cts` - re-imported through the platform
  *    loader; relies on Node's native TS support (or a registered
- *    loader) — Phase 14a leaves the operator to wire `tsx`, `ts-node`,
+ *    loader) - Phase 14a leaves the operator to wire `tsx`, `ts-node`,
  *    or whatever they prefer when shipping a `.ts` config.
- *  - `*.js`  / `*.mjs`           — dynamic `import()`.
- *  - `*.json`                     — `readFile` + `JSON.parse`.
+ *  - `*.js`  / `*.mjs`           - dynamic `import()`.
+ *  - `*.json`                     - `readFile` + `JSON.parse`.
  *
  * The file is expected to default-export an object built via
  * `defineConfig({...})`.

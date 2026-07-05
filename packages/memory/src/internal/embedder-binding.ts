@@ -31,7 +31,7 @@ export function inferModelName(id: string): string {
 /**
  * Register the supplied embedder with the storage layer's
  * `embedding_meta` registry. Returns the canonical id surfaced to the
- * memory writers. Idempotent — a registry that already knows the id
+ * memory writers. Idempotent - a registry that already knows the id
  * with a matching `configHash` returns the existing row.
  *
  * @internal

@@ -47,7 +47,7 @@ function stripWindowsUrlSlash(p: string): string {
  * The resolver enforces `chmod 0600` on POSIX systems and emits a
  * single console warning per process when the file is found at a wider
  * mode (heuristic: any group/other read or write bits set). Set
- * `?warnOnPermissions=0` in the URI to opt out — typical when reading
+ * `?warnOnPermissions=0` in the URI to opt out - typical when reading
  * Docker `*_FILE` mounts that intentionally use a tmpfs with a wider
  * mode.
  *
@@ -69,7 +69,7 @@ export const fileResolver: SecretResolver = {
     const warnOnPermissions = getQueryParam(parsed, 'warnOnPermissions') !== '0';
     let absolute = path;
     if (!isAbsolute(absolute)) {
-      // Per RFC 3986, file URIs without `//` may be relative — we
+      // Per RFC 3986, file URIs without `//` may be relative - we
       // resolve them against the current working directory and warn
       // because relative paths in production config are a smell.
       absolute = resolve(process.cwd(), absolute);
@@ -128,12 +128,12 @@ export function _resetFileResolverWarningsForTesting(): void {
 }
 
 function toDecodedBuffer(buf: Buffer, encoding: BufferEncoding): Buffer {
-  // `?encoding=utf8` (default) — treat the file as UTF-8 text and trim
+  // `?encoding=utf8` (default) - treat the file as UTF-8 text and trim
   // the trailing newline that most editors insert.
   if (encoding === 'utf8' || encoding === 'utf-8') {
     return Buffer.from(buf.toString('utf8').trimEnd(), 'utf8');
   }
-  // `?encoding=base64` / `?encoding=hex` — the file contains the
+  // `?encoding=base64` / `?encoding=hex` - the file contains the
   // encoded form of an arbitrary byte string; decode it into a Buffer
   // and surface the raw bytes through SecretValue.useBuffer / .use.
   return Buffer.from(buf.toString('utf8').trimEnd(), encoding);

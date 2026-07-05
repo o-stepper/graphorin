@@ -1,15 +1,15 @@
 /**
- * `graphorin consolidator` — inspect and steer the background memory
+ * `graphorin consolidator` - inspect and steer the background memory
  * consolidation pipeline.
  *
  * Surface (per Phase 15 § Consolidator):
  *
- *  - `graphorin consolidator status` — current tier + pending CONFLICT-
+ *  - `graphorin consolidator status` - current tier + pending CONFLICT-
  *    CHECK runs + DLQ size + recent run history.
  *  - `graphorin consolidator set-tier <free|cheap|standard|enterprise>`
- *    — persist the requested tier so the next process startup picks it
+ *    - persist the requested tier so the next process startup picks it
  *    up.
- *  - `graphorin consolidator stop` — pause the consolidator until the
+ *  - `graphorin consolidator stop` - pause the consolidator until the
  *    operator resumes it (next `graphorin start`).
  *
  * The consolidator runs **inside** the server process, so the CLI
@@ -18,7 +18,7 @@
  * writes to (`consolidator_state`, `consolidator_runs`,
  * `consolidator_failed_batches`, `conflict_check_pending`); `set-tier`
  * and `stop` honestly report UNSUPPORTED until a daemon-side control
- * channel exists (IP-4) — nothing polls an admin table.
+ * channel exists (IP-4) - nothing polls an admin table.
  *
  * @packageDocumentation
  */
@@ -74,7 +74,7 @@ export async function runConsolidatorStatus(
       [Date.now() - 24 * 60 * 60_000],
     );
     // MCON-5: the store writes 'running' | 'completed' | 'failed' |
-    // 'partial' | 'deferred' (consolidator-store.ts) — the old queries
+    // 'partial' | 'deferred' (consolidator-store.ts) - the old queries
     // asked for 'success'/'error'/'pending' and always returned 0.
     const success = conn.get<{ n: number }>(
       "SELECT COUNT(*) AS n FROM consolidator_runs WHERE status = 'completed' AND started_at > ?",
@@ -144,7 +144,7 @@ export async function runConsolidatorSetTier(options: ConsolidatorSetTierOptions
   });
   try {
     // IP-4: the old implementation upserted a `consolidator_admin` row
-    // NOTHING polls (neither the daemon nor process startup reads it —
+    // NOTHING polls (neither the daemon nor process startup reads it -
     // createConsolidator takes the tier from opts) and reported
     // success. Honest answer until a daemon-side control channel
     // exists: UNSUPPORTED with the working alternative.
@@ -153,7 +153,7 @@ export async function runConsolidatorSetTier(options: ConsolidatorSetTierOptions
       const print = options.print ?? defaultPrintSink;
       print(
         brand(
-          `runtime tier switching is not wired yet — set the tier in the server config (consolidator.tier: '${options.tier}') and restart, or use the server API when available.`,
+          `runtime tier switching is not wired yet - set the tier in the server config (consolidator.tier: '${options.tier}') and restart, or use the server API when available.`,
         ),
       );
     });
@@ -176,14 +176,14 @@ export async function runConsolidatorStop(
   });
   try {
     // IP-4: the old implementation persisted a pause flag NOTHING
-    // honoured and told the operator the daemon would stop — the worst
+    // honoured and told the operator the daemon would stop - the worst
     // possible lie when someone is trying to stop runaway LLM spend.
     const result = { stopped: false, unsupported: true } as const;
     emitReport(options, result, () => {
       const print = options.print ?? defaultPrintSink;
       print(
         brand(
-          'a CLI stop channel is not wired yet — to stop consolidation NOW, stop the server process (the consolidator runs inside it).',
+          'a CLI stop channel is not wired yet - to stop consolidation NOW, stop the server process (the consolidator runs inside it).',
         ),
       );
       print(

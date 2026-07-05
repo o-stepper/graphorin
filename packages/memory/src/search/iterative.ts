@@ -1,16 +1,16 @@
 /**
- * Agentic / iterative retrieval for hard queries (P2-4) — a **gated**,
+ * Agentic / iterative retrieval for hard queries (P2-4) - a **gated**,
  * CRAG/Self-RAG-style grade-then-reformulate loop.
  *
  * Some multi-hop / temporal questions can't be answered from a single
  * retrieval pass; the naive system returns a confident-but-wrong answer
  * instead of retrieving again. This module adds a small loop: grade the
  * retrieved memories for sufficiency and, when weak, reformulate the
- * query and retrieve once more (optionally widening to the P2-1 graph) —
+ * query and retrieve once more (optionally widening to the P2-1 graph) -
  * up to a hard iteration cap, then **abstain** rather than confabulate.
  *
  * Both CRAG (arXiv:2401.15884) and Self-RAG (arXiv:2310.11511) add
- * latency/cost, so the literature's advice — and this module's design —
+ * latency/cost, so the literature's advice - and this module's design -
  * is to *gate* the loop, not make it default:
  *
  *   1. A cheap, **local** {@link assessQueryDifficulty} heuristic decides
@@ -24,7 +24,7 @@
  *   3. A mandatory iteration cap bounds the worst case regardless of the
  *      grader.
  *
- * The module is provider-agnostic — it imports only `@graphorin/core`
+ * The module is provider-agnostic - it imports only `@graphorin/core`
  * types and never performs I/O itself; {@link runIterativeRetrieval} is a
  * pure orchestrator over an injected `retrieve` function + grader, so the
  * loop is unit-testable without a store or a model.
@@ -39,7 +39,7 @@ export const DEFAULT_MAX_ITERATIONS = 3;
 
 /**
  * Absolute clamp on total retrieval passes, applied regardless of the
- * caller's `maxIterations` — a latency guardrail so a mis-configured
+ * caller's `maxIterations` - a latency guardrail so a mis-configured
  * caller can never unbound the loop.
  */
 export const MAX_ITERATIONS_CEILING = 5;
@@ -54,7 +54,7 @@ const DEFAULT_GRADE_MAX_TOKENS = 256;
 const DEFAULT_MAX_GRADE_SNIPPETS = 8;
 
 // ---------------------------------------------------------------------------
-// Difficulty gate (pure, local — no I/O, no provider)
+// Difficulty gate (pure, local - no I/O, no provider)
 // ---------------------------------------------------------------------------
 
 /**
@@ -106,7 +106,7 @@ const LONG_WORD_COUNT = 12;
 
 /**
  * Score a query's retrieval difficulty with cheap, deterministic, fully
- * **local** heuristics (no I/O). Conservative by design — it prefers to
+ * **local** heuristics (no I/O). Conservative by design - it prefers to
  * leave a query single-shot (`hard: false`) unless several
  * multi-hop / temporal / comparison signals stack up, so the gate adds
  * passes only where they are likely to help. Used by
@@ -187,7 +187,7 @@ export interface RetrievalGradeOptions {
   readonly signal?: AbortSignal;
   /**
    * Reformulations already attempted (MRET-11). Surfaced to the grader
-   * as context so it can propose something genuinely new — the grade
+   * as context so it can propose something genuinely new - the grade
    * itself is ALWAYS judged against the original question, never a
    * reformulation (a narrowed sub-query must not be declared
    * "sufficient" while the original multi-hop question is not).
@@ -201,8 +201,8 @@ export interface RetrievalGradeOptions {
  * {@link createProviderRetrievalGrader}; advanced callers can supply a
  * bespoke grader (e.g. a deterministic heuristic).
  *
- * Implementations MUST degrade gracefully — return a "stop" grade rather
- * than throw — so a grader failure never breaks recall.
+ * Implementations MUST degrade gracefully - return a "stop" grade rather
+ * than throw - so a grader failure never breaks recall.
  *
  * @stable
  */
@@ -226,13 +226,13 @@ export const RETRIEVAL_GRADE_SYSTEM_PROMPT =
   'the question correctly and completely. Respond with ONLY a JSON object: ' +
   '{"sufficient": boolean, "confidence": number between 0 and 1, "reformulation": ' +
   'string or null, "reason": string}. Set "sufficient" to true only if the memories ' +
-  'actually contain the answer — do not guess. When insufficient, set "reformulation" ' +
+  'actually contain the answer - do not guess. When insufficient, set "reformulation" ' +
   'to a single alternative search query likely to retrieve the missing information ' +
   '(vary entities, time frame, or specificity); otherwise null. Output only the JSON ' +
-  'object — no prose, no markdown.';
+  'object - no prose, no markdown.';
 
 /**
- * Build the grade request. Pure — no I/O. Temperature 0 so the verdict
+ * Build the grade request. Pure - no I/O. Temperature 0 so the verdict
  * is as stable as the model allows.
  *
  * @stable
@@ -349,14 +349,14 @@ export interface IterativeRetrievalResult<H> {
   readonly sufficient: boolean;
   /**
    * `true` when the loop exhausted its cap / ran out of reformulations
-   * while still judged insufficient — the caller should abstain rather
+   * while still judged insufficient - the caller should abstain rather
    * than answer from `hits`.
    */
   readonly abstained: boolean;
   /**
    * `true` when the grader actually judged the result at least once
    * (memory-retrieval-02). `false` on the single-shot path (gate not
-   * hard, or no grader configured) — there `sufficient: true` is a
+   * hard, or no grader configured) - there `sufficient: true` is a
    * DEFAULT, not a verdict, and consumers must not read it as one.
    */
   readonly graded: boolean;
@@ -366,7 +366,7 @@ export interface IterativeRetrievalResult<H> {
 
 /**
  * Dependencies injected into {@link runIterativeRetrieval}. The loop does
- * no I/O of its own — `retrieve` and `grader` own all side effects.
+ * no I/O of its own - `retrieve` and `grader` own all side effects.
  *
  * @stable
  */
@@ -435,7 +435,7 @@ export async function runIterativeRetrieval<H>(
   const maxSnippets = Math.max(1, options.maxGradeSnippets ?? DEFAULT_MAX_GRADE_SNIPPETS);
   const signal = options.signal;
 
-  // MRET-2: hits are tracked PER PASS — RAW, including cross-pass
+  // MRET-2: hits are tracked PER PASS - RAW, including cross-pass
   // repeats, so rank fusion can reward consensus between passes. The
   // grade window and the final list dedup by id at read time. The old
   // flat append meant pass 1 saturated the first `maxSnippets` forever
@@ -447,16 +447,16 @@ export async function runIterativeRetrieval<H>(
   const queries: string[] = [query];
   const tried = new Set<string>([query.trim().toLowerCase()]);
 
-  // Pass 1 — always single-shot, no widening.
+  // Pass 1 - always single-shot, no widening.
   accumulate(await deps.retrieve(query, false, signal));
 
   // Gate: the loop is eligible only when the query is judged hard *and* a
-  // grader exists. Otherwise stay single-shot — we did not grade, so we
+  // grader exists. Otherwise stay single-shot - we did not grade, so we
   // make no abstention claim.
   const grader = deps.grader;
   if (!gate.hard || grader === null) {
     // Single-shot: nothing was graded, so `sufficient: true` is a
-    // default — `graded: false` tells consumers not to trust it as a
+    // default - `graded: false` tells consumers not to trust it as a
     // verdict (memory-retrieval-02).
     return finalize(deps, passLists, 1, gate.hard, true, false, false, queries, options.maxResults);
   }
@@ -499,7 +499,7 @@ export async function runIterativeRetrieval<H>(
 
 /**
  * Round-robin interleave of per-pass lists, deduped by id: hit 1 of
- * every pass, then hit 2 of every pass, … — guarantees the latest
+ * every pass, then hit 2 of every pass, … - guarantees the latest
  * pass's top hits enter a window of any size.
  */
 function interleave<H>(
@@ -535,7 +535,7 @@ function finalize<H>(
   queries: ReadonlyArray<string>,
   maxResults: number | undefined,
 ): IterativeRetrievalResult<H> {
-  // MRET-2: re-rank ACROSS passes before the cut — discovery order let
+  // MRET-2: re-rank ACROSS passes before the cut - discovery order let
   // pass-1 noise crowd out the pass-2 hit that actually answers.
   const ranked =
     typeof deps.fuse === 'function'

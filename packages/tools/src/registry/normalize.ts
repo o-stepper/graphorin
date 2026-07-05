@@ -1,5 +1,5 @@
 /**
- * Internal — normalise a freshly-built {@link Tool} into a
+ * Internal - normalise a freshly-built {@link Tool} into a
  * {@link ResolvedTool} carrying every non-public registration-time
  * field the dispatcher / executor reads.
  *
@@ -15,7 +15,7 @@
  *     deferred-default + WARN-once discipline).
  *  8. Resolve the `examplesEagerlyRendered` auto-rule.
  *
- * The function is pure — no audit / counter side-effects. The
+ * The function is pure - no audit / counter side-effects. The
  * registry layer wraps this with its own emitter.
  *
  * @packageDocumentation
@@ -129,7 +129,7 @@ export function normaliseTool<TInput, TOutput, TDeps>(
   // Resolve `sideEffectClass` (with v0.1 transition deferred-default).
   // MCP-derived registrations get the conservative `'external-stateful'`
   // auto-default WITHOUT a WARN (the WARN is suppressed because the
-  // auto-default is the documented source-of-truth on the MCP path —
+  // auto-default is the documented source-of-truth on the MCP path -
   // operators downgrade per-tool via `MCPClient.toTools({ sideEffectClassByTool })`
   // in Phase 09). First-party / skill registrations missing the field
   // get the conservative `'side-effecting'` deferred-default WITH a WARN
@@ -140,7 +140,7 @@ export function normaliseTool<TInput, TOutput, TDeps>(
     if (source.kind === 'mcp') {
       sideEffectClass = 'external-stateful';
       deferredDefaultApplied = true;
-      // No WARN emitted — MCP-default is the source-of-truth.
+      // No WARN emitted - MCP-default is the source-of-truth.
     } else {
       sideEffectClass = 'side-effecting';
       deferredDefaultApplied = true;
@@ -153,7 +153,7 @@ export function normaliseTool<TInput, TOutput, TDeps>(
   }
 
   // TL-3: a non-'none' sandboxPolicy on an inline (first-party) tool is
-  // ADVISORY — the agent runs inline closures in-process. Warn once so a
+  // ADVISORY - the agent runs inline closures in-process. Warn once so a
   // declared-but-not-enforced policy never reads as protection.
   if (
     source.kind === 'first-party' &&
