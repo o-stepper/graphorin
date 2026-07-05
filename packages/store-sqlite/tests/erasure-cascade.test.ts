@@ -8,7 +8,12 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createSqliteStore, type GraphorinSqliteStore } from '../src/index.js';
+import {
+  createSqliteStore,
+  type GraphorinSqliteStore,
+  SESSION_SCOPED_PURGES,
+  SESSION_TABLE_EXEMPTIONS,
+} from '../src/index.js';
 import { listMigrations } from '../src/migrations/registry.js';
 
 async function makeStore(): Promise<GraphorinSqliteStore> {
@@ -135,6 +140,149 @@ describe('W-005 - checkpoint session linkage + delete cascade', () => {
       ['run-prune'],
     );
     expect(row?.n).toBe(0);
+  });
+
+  it('GATE (W-060): every table with a session column is in the purge registry or exempted with a reason', async () => {
+    const store = await makeStore();
+    const tables = store.connection.all<{ name: string }>(
+      "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
+    );
+    const covered = new Set(SESSION_SCOPED_PURGES.map((p) => p.table));
+    const exempt = new Set(Object.keys(SESSION_TABLE_EXEMPTIONS));
+    const undecided: string[] = [];
+    for (const { name } of tables) {
+      const cols = store.connection.all<{ name: string }>(`PRAGMA table_info(${name})`);
+      const hasSessionColumn = cols.some(
+        (c) => c.name === 'scope_session_id' || c.name === 'session_id',
+      );
+      if (!hasSessionColumn) continue;
+      if (!covered.has(name) && !exempt.has(name)) undecided.push(name);
+    }
+    // A new table with a session column MUST get an erasure decision:
+    // add it to SESSION_SCOPED_PURGES or to SESSION_TABLE_EXEMPTIONS
+    // (with the reason erasure is still complete).
+    expect(undecided).toEqual([]);
+    // The registry and exemptions must not drift to nonexistent tables.
+    const live = new Set(tables.map((t) => t.name));
+    for (const entry of SESSION_SCOPED_PURGES) expect(live.has(entry.table)).toBe(true);
+    for (const name of exempt) expect(live.has(name)).toBe(true);
+    // Every exemption carries a human-readable reason.
+    for (const reason of Object.values(SESSION_TABLE_EXEMPTIONS)) {
+      expect(reason.length).toBeGreaterThan(10);
+    }
+  });
+
+  it('W-029: session-scoped facts/insights/rules/blocks/spans die with the session; user-scoped rows survive', async () => {
+    const store = await makeStore();
+    await createSession(store, 's-full');
+    const now = new Date().toISOString();
+    // Session-scoped fact (FTS row via the write path) + entity link.
+    await store.memory.semantic.remember({
+      id: 'f-sess',
+      kind: 'semantic',
+      userId: 'alex',
+      sessionId: 's-full',
+      sensitivity: 'internal',
+      text: 'session-scoped: prefers window seats',
+      createdAt: now,
+    });
+    // User-scoped fact - must survive.
+    await store.memory.semantic.remember({
+      id: 'f-user',
+      kind: 'semantic',
+      userId: 'alex',
+      sensitivity: 'internal',
+      text: 'user-scoped: allergic to peanuts',
+      createdAt: now,
+    });
+    // Entity + link referencing the session fact (FK: link must go first).
+    store.connection.run(
+      "INSERT INTO entities (id, scope_user_id, name, normalized_name, created_at) VALUES ('e1', 'alex', 'Window', 'window', ?)",
+      [Date.now()],
+    );
+    store.connection.run(
+      "INSERT INTO fact_entities (fact_id, entity_id, role, created_at) VALUES ('f-sess', 'e1', 'object', ?)",
+      [Date.now()],
+    );
+    // History rows for the session fact: keyed + value-matching.
+    store.connection.run(
+      `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, created_at)
+       VALUES ('fact', 'f-sess', NULL, 'session-scoped: prefers window seats', 'ADD', 'agent', ?)`,
+      [Date.now()],
+    );
+    store.connection.run(
+      `INSERT INTO memory_history (memory_kind, memory_id, prev_value, new_value, event, source, created_at)
+       VALUES ('fact', 'f-elsewhere', 'session-scoped: prefers window seats', NULL, 'SUPERSEDE', 'agent', ?)`,
+      [Date.now()],
+    );
+    // Insight (base + FTS row, mirroring SqliteInsightStore.insert).
+    store.connection.run(
+      `INSERT INTO insights (id, scope_user_id, scope_session_id, text, cites_json, salience, provenance, status, sensitivity, created_at)
+       VALUES ('i-sess', 'alex', 's-full', 'insight from the session', '[]', 2, 'reflection', 'quarantined', 'internal', ?)`,
+      [Date.now()],
+    );
+    store.connection.run(
+      "INSERT INTO insights_fts (rowid, text) VALUES ((SELECT rowid FROM insights WHERE id = 'i-sess'), 'insight from the session')",
+    );
+    // Rule scoped to the session (through the write path so rules_fts fills).
+    await store.memory.procedural.add({
+      id: 'r-sess',
+      kind: 'procedural',
+      userId: 'alex',
+      sessionId: 's-full',
+      sensitivity: 'internal',
+      text: 'when in session, do the thing',
+      condition: 'always',
+      priority: 1,
+      createdAt: now,
+    });
+    // Working block scoped to the session.
+    await store.memory.working.upsert(
+      { userId: 'alex', sessionId: 's-full' },
+      {
+        id: 'b-sess',
+        kind: 'working',
+        userId: 'alex',
+        sessionId: 's-full',
+        sensitivity: 'internal',
+        label: 'scratch',
+        value: 'scratch content',
+        charLimit: 200,
+        createdAt: now,
+      },
+    );
+    // Span row keyed to the session.
+    store.connection.run(
+      `INSERT INTO spans (span_id, trace_id, parent_id, type, name, start_unix_nano, end_unix_nano, status, attributes_json, events_json, session_id)
+       VALUES ('sp1', 'tr1', NULL, 'agent.run', 'agent.run', 1, 2, 'ok', '{}', '[]', 's-full')`,
+    );
+
+    await store.sessions.deleteSession('s-full');
+
+    const count = (sql: string, params: unknown[] = []) =>
+      store.connection.get<{ n: number }>(sql, params)?.n ?? -1;
+    expect(count("SELECT COUNT(*) AS n FROM facts WHERE id = 'f-sess'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM facts WHERE id = 'f-user'")).toBe(1);
+    expect(count("SELECT COUNT(*) AS n FROM fact_entities WHERE fact_id = 'f-sess'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM insights WHERE id = 'i-sess'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM rules WHERE id = 'r-sess'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM working_blocks WHERE id = 'b-sess'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM spans WHERE session_id = 's-full'")).toBe(0);
+    // FTS sidecars are gone (search the shadow tables directly).
+    expect(count("SELECT COUNT(*) AS n FROM facts_fts WHERE facts_fts MATCH 'window'")).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM insights_fts WHERE insights_fts MATCH 'insight'")).toBe(
+      0,
+    );
+    // History rows survive as event skeletons but carry no content.
+    expect(
+      count(
+        "SELECT COUNT(*) AS n FROM memory_history WHERE memory_kind = 'fact' AND (prev_value LIKE '%window seats%' OR new_value LIKE '%window seats%')",
+      ),
+    ).toBe(0);
+    expect(count("SELECT COUNT(*) AS n FROM memory_history WHERE memory_id = 'f-sess'")).toBe(1);
+    // The user-scoped fact remains findable.
+    const hits = await store.memory.semantic.search({ userId: 'alex' }, { query: 'peanuts' });
+    expect(hits.length).toBe(1);
   });
 
   it("migration 029's backfill recovers session_id from legacy agent state blobs", async () => {

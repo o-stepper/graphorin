@@ -296,63 +296,94 @@ export class SqliteSessionStore implements SessionStoreExt {
   }
 
   /**
-   * store-01: a hard-delete must remove the CONTENT, not just the registry
-   * rows. Pre-fix, nothing anywhere deleted `session_messages` (nor its
-   * FTS/vec index rows), so a "deleted" conversation stayed permanently
-   * searchable via `memory.session.list/search` - misleading for a
-   * privacy-positioned framework and a GDPR hazard for the RP-6 retention
-   * sweep. Episodes scoped to the session are purged for the same reason:
-   * they quote the session's content. Caller owns the transaction.
+   * store-01 / W-029: a hard-delete must remove the CONTENT, not just
+   * the registry rows. The purge is driven by the declarative
+   * {@link SESSION_SCOPED_PURGES} registry so completeness is enforced
+   * by construction: a schema-introspection gate test asserts that
+   * EVERY table carrying a `scope_session_id` / `session_id` column is
+   * either an entry here or explicitly exempted with a reason. Only
+   * rows whose session column equals the deleted session are removed -
+   * user-level rows (`scope_session_id IS NULL`) are untouched.
+   * Caller owns the transaction.
    */
   #purgeSessionContent(sessionId: string): void {
-    // Index rows first (they key off the base rows' rowid / id). The vec0
-    // deletes mirror the proven per-id pattern of the fact `purge()` path -
-    // sqlite-vec virtual tables handle `WHERE <id_col> = ?` reliably.
-    this.#conn.run(
-      `DELETE FROM session_messages_fts WHERE rowid IN
-         (SELECT rowid FROM session_messages WHERE scope_session_id = ?)`,
-      [sessionId],
-    );
-    const messageVecTables = this.#contentVecTables('session_messages_vec_');
-    if (messageVecTables.length > 0) {
-      const messageIds = this.#conn
-        .all<{ id: string }>('SELECT id FROM session_messages WHERE scope_session_id = ?', [
-          sessionId,
-        ])
-        .map((r) => r.id);
-      for (const table of messageVecTables) {
-        for (const id of messageIds) {
-          this.#conn.run(`DELETE FROM ${table} WHERE message_id = ?`, [id]);
-        }
-      }
+    for (const purge of SESSION_SCOPED_PURGES) {
+      this.#purgeOne(purge, sessionId);
     }
-    this.#conn.run('DELETE FROM session_messages WHERE scope_session_id = ?', [sessionId]);
+  }
 
-    this.#conn.run(
-      `DELETE FROM episodes_fts WHERE rowid IN
-         (SELECT rowid FROM episodes WHERE scope_session_id = ?)`,
-      [sessionId],
-    );
-    const episodeVecTables = this.#contentVecTables('episodes_vec_');
-    if (episodeVecTables.length > 0) {
-      const episodeIds = this.#conn
-        .all<{ id: string }>('SELECT id FROM episodes WHERE scope_session_id = ?', [sessionId])
-        .map((r) => r.id);
-      for (const table of episodeVecTables) {
-        for (const id of episodeIds) {
-          this.#conn.run(`DELETE FROM ${table} WHERE episode_id = ?`, [id]);
+  /** Execute one registry entry: sidecars first, then the base rows. */
+  #purgeOne(purge: SessionScopedPurge, sessionId: string): void {
+    const { table, sessionColumn } = purge;
+    // FTS shadow rows key off the base rows' rowid - delete them first.
+    if (purge.fts !== undefined) {
+      this.#conn.run(
+        `DELETE FROM ${purge.fts} WHERE rowid IN
+           (SELECT rowid FROM ${table} WHERE ${sessionColumn} = ?)`,
+        [sessionId],
+      );
+    }
+    // Per-embedder vec0 sidecars mirror the proven per-id pattern of the
+    // fact purge() path - sqlite-vec virtual tables handle
+    // `WHERE <id_col> = ?` reliably.
+    if (purge.vec !== undefined) {
+      const vecTables = this.#contentVecTables(purge.vec.prefix);
+      if (vecTables.length > 0) {
+        const ids = this.#conn
+          .all<{ id: string }>(`SELECT id FROM ${table} WHERE ${sessionColumn} = ?`, [sessionId])
+          .map((r) => r.id);
+        for (const vecTable of vecTables) {
+          for (const id of ids) {
+            this.#conn.run(`DELETE FROM ${vecTable} WHERE ${purge.vec.idColumn} = ?`, [id]);
+          }
         }
       }
     }
-    this.#conn.run('DELETE FROM episodes WHERE scope_session_id = ?', [sessionId]);
+    // store-04 parity: content must not survive in the audit trail.
+    // Scrub the history VALUES (keeping the event skeleton) for every
+    // deleted row, mirroring MemoryStore.purge(): (a) rows keyed to the
+    // id, and (b) for facts, rows VALUE-matching the text (a SUPERSEDE
+    // row carries the new fact's text on the OLD fact's id).
+    if (purge.history !== undefined) {
+      const rows = this.#conn.all<{ id: string; body: string | null }>(
+        `SELECT id, ${purge.history.textColumn} AS body FROM ${table} WHERE ${sessionColumn} = ?`,
+        [sessionId],
+      );
+      for (const row of rows) {
+        this.#conn.run(
+          `UPDATE memory_history SET prev_value = NULL, new_value = NULL
+           WHERE memory_kind = ? AND memory_id = ?`,
+          [purge.history.kind, row.id],
+        );
+        if (purge.history.valueMatch && row.body !== null) {
+          this.#conn.run(
+            `UPDATE memory_history SET prev_value = NULL WHERE memory_kind = ? AND prev_value = ?`,
+            [purge.history.kind, row.body],
+          );
+          this.#conn.run(
+            `UPDATE memory_history SET new_value = NULL WHERE memory_kind = ? AND new_value = ?`,
+            [purge.history.kind, row.body],
+          );
+        }
+      }
+    }
+    // Referencing tables (FK with `foreign_keys = ON`) before the base
+    // rows, or the whole cascade would roll back (CS-1 precedent).
+    for (const ref of purge.refs ?? []) {
+      this.#conn.run(
+        `DELETE FROM ${ref.table} WHERE ${ref.column} IN
+           (SELECT id FROM ${table} WHERE ${sessionColumn} = ?)`,
+        [sessionId],
+      );
+    }
+    this.#conn.run(`DELETE FROM ${table} WHERE ${sessionColumn} = ?`, [sessionId]);
   }
 
   /** Discover per-embedder vec0 tables by prefix, identifier-validated. */
-  #contentVecTables(prefix: 'session_messages_vec_' | 'episodes_vec_'): string[] {
-    // The prefixes are compile-time literals - spell out their LIKE
-    // patterns (underscores escaped) instead of sanitizing at runtime.
-    const pattern =
-      prefix === 'session_messages_vec_' ? 'session\\_messages\\_vec\\_%' : 'episodes\\_vec\\_%';
+  #contentVecTables(prefix: string): string[] {
+    // Registry prefixes are compile-time literals validated by
+    // VALID_IDENTIFIER below; escape their underscores for LIKE.
+    const pattern = `${prefix.replaceAll('_', '\\_')}%`;
     const rows = this.#conn.all<{ name: string }>(
       "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE ? ESCAPE '\\'",
       [pattern],
@@ -360,6 +391,123 @@ export class SqliteSessionStore implements SessionStoreExt {
     return rows.map((r) => r.name).filter((name) => /^[A-Za-z0-9_]+$/.test(name));
   }
 }
+
+/**
+ * One entry of the session-content purge registry: which table holds
+ * session-scoped rows, which column scopes them, and which sidecars
+ * (FTS shadow, per-embedder vec0 tables, FK-referencing tables,
+ * memory-history value scrub) must go with them.
+ *
+ * @stable
+ */
+export interface SessionScopedPurge {
+  /** Base table holding the session-scoped rows. */
+  readonly table: string;
+  /** Column carrying the session id. */
+  readonly sessionColumn: 'scope_session_id' | 'session_id';
+  /** FTS5 shadow table joined by rowid, when the table has one. */
+  readonly fts?: string;
+  /** Per-embedder vec0 sidecar family (name prefix + id column). */
+  readonly vec?: { readonly prefix: string; readonly idColumn: string };
+  /** Tables referencing the base rows - cleared BEFORE the base rows. */
+  readonly refs?: ReadonlyArray<{ readonly table: string; readonly column: string }>;
+  /**
+   * Scrub `memory_history` values for the deleted rows (store-04
+   * parity). `valueMatch` additionally clears history rows whose
+   * values equal the deleted row's text (the SUPERSEDE shape).
+   */
+  readonly history?: {
+    readonly kind: string;
+    readonly textColumn: string;
+    readonly valueMatch: boolean;
+  };
+}
+
+const VALID_IDENTIFIER = /^[A-Za-z0-9_]+$/;
+
+/**
+ * Declarative registry of every session-scoped CONTENT surface the
+ * session hard-delete cascade purges (W-029/W-060). The gate test in
+ * `tests/erasure-cascade.test.ts` diffs this list (plus
+ * {@link SESSION_TABLE_EXEMPTIONS}) against the live schema: a new
+ * table with a session column fails the suite until its author decides
+ * how erasure covers it.
+ *
+ * @stable
+ */
+export const SESSION_SCOPED_PURGES: ReadonlyArray<SessionScopedPurge> = Object.freeze(
+  (
+    [
+      {
+        table: 'session_messages',
+        sessionColumn: 'scope_session_id',
+        fts: 'session_messages_fts',
+        vec: { prefix: 'session_messages_vec_', idColumn: 'message_id' },
+      },
+      {
+        table: 'episodes',
+        sessionColumn: 'scope_session_id',
+        fts: 'episodes_fts',
+        vec: { prefix: 'episodes_vec_', idColumn: 'episode_id' },
+        history: { kind: 'episode', textColumn: 'summary', valueMatch: false },
+      },
+      {
+        table: 'facts',
+        sessionColumn: 'scope_session_id',
+        fts: 'facts_fts',
+        vec: { prefix: 'facts_vec_', idColumn: 'fact_id' },
+        refs: [{ table: 'fact_entities', column: 'fact_id' }],
+        history: { kind: 'fact', textColumn: 'text', valueMatch: true },
+      },
+      {
+        table: 'insights',
+        sessionColumn: 'scope_session_id',
+        fts: 'insights_fts',
+        history: { kind: 'insight', textColumn: 'text', valueMatch: false },
+      },
+      { table: 'rules', sessionColumn: 'scope_session_id', fts: 'rules_fts' },
+      { table: 'working_blocks', sessionColumn: 'scope_session_id' },
+      { table: 'spans', sessionColumn: 'session_id' },
+      { table: 'consolidator_state', sessionColumn: 'scope_session_id' },
+      { table: 'consolidator_runs', sessionColumn: 'scope_session_id' },
+    ] satisfies ReadonlyArray<SessionScopedPurge>
+  ).map((entry) => {
+    // Defense in depth: every identifier interpolated into SQL above
+    // must be a plain identifier, even though all values are
+    // compile-time literals in this module.
+    const names = [
+      entry.table,
+      entry.sessionColumn,
+      entry.fts,
+      entry.vec?.prefix,
+      entry.vec?.idColumn,
+      entry.history?.textColumn,
+      ...(entry.refs ?? []).flatMap((r) => [r.table, r.column]),
+    ];
+    for (const name of names) {
+      if (name !== undefined && !VALID_IDENTIFIER.test(name)) {
+        throw new Error(`SESSION_SCOPED_PURGES: invalid identifier '${name}'`);
+      }
+    }
+    return entry;
+  }),
+);
+
+/**
+ * Session-column-bearing tables intentionally NOT in
+ * {@link SESSION_SCOPED_PURGES}, each with the reason erasure is still
+ * complete. Consumed by the completeness gate test.
+ *
+ * @stable
+ */
+export const SESSION_TABLE_EXEMPTIONS: Readonly<Record<string, string>> = Object.freeze({
+  session_audit: 'lifecycle audit rows - deleted directly by #deleteSessionCascade',
+  session_handoffs: 'handoff bookkeeping - deleted directly by #deleteSessionCascade',
+  session_workflow_runs:
+    'session-to-thread mapping - consumed for checkpoint erasure, then deleted by #deleteSessionCascade',
+  workflow_checkpoints:
+    'erased by #deleteSessionCascade via thread-id collection across namespaces (W-005), not by a plain session-column delete',
+});
 
 interface SessionRow {
   id: string;

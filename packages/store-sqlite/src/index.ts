@@ -99,7 +99,12 @@ import {
 import { listMigrations, type Migration, registerMigration } from './migrations/registry.js';
 import { type AppliedMigration, runMigrations } from './migrations/runner.js';
 import { SqliteOAuthServerStore } from './oauth-server-store.js';
-import { SqliteSessionStore } from './session-store.js';
+import {
+  SESSION_SCOPED_PURGES,
+  SESSION_TABLE_EXEMPTIONS,
+  type SessionScopedPurge,
+  SqliteSessionStore,
+} from './session-store.js';
 import {
   createSqliteSpanExporter,
   SPAN_SESSION_ATTRIBUTE,
@@ -357,6 +362,9 @@ export {
   registerMigration,
   resolvePassphrase,
   runMigrations,
+  SESSION_SCOPED_PURGES,
+  SESSION_TABLE_EXEMPTIONS,
+  type SessionScopedPurge,
   SPAN_SESSION_ATTRIBUTE,
   SqliteAuthTokenStore,
   SqliteBusyError,
