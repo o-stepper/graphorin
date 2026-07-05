@@ -2074,6 +2074,14 @@ export class SqliteGraphStore {
       // silently conducts a link between two otherwise-unrelated records at
       // maxHops > 1. Seeds are also intersected with the caller scope so a
       // foreign fact id can't be used as a traversal root.
+      //
+      // E7 (scale probe): the recursive step uses CROSS JOIN to PIN the join
+      // order at `w` -> fb(PK) -> fe1 -> e1 -> e2 -> fe2. With plain JOINs the
+      // planner is free to demote the recursive-self-reference `w` to the
+      // INNERMOST loop (it can only ever be scanned), yielding
+      // facts-scan x fact_entities-scan x walk-queue-scan per recursive step
+      // - measured at 23.5s for ONE hop-1 expansion over a 300-fact corpus
+      // with hub entities; the pinned order runs the same query in ~10ms.
       `WITH RECURSIVE
          seed_ids(fact_id) AS (
            SELECT f.id FROM facts f
@@ -2085,17 +2093,22 @@ export class SqliteGraphStore {
            UNION
              SELECT fe2.fact_id, w.depth + 1
              FROM walk w
-             JOIN facts fb ON fb.id = w.fact_id
+             CROSS JOIN facts fb
+             CROSS JOIN fact_entities fe1
+             CROSS JOIN entities e1
+             CROSS JOIN entities e2
+             CROSS JOIN fact_entities fe2
+             WHERE w.depth < ?
+               AND fb.id = w.fact_id
                AND fb.scope_user_id = ?
                AND fb.deleted_at IS NULL
                AND fb.archived = 0
                AND (? = 1 OR fb.status != 'quarantined')
                AND (? IS NULL OR ((fb.valid_from IS NULL OR fb.valid_from <= ?) AND (fb.valid_to IS NULL OR fb.valid_to > ?)))
-             JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
-             JOIN entities e1 ON e1.id = fe1.entity_id
-             JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
-             JOIN fact_entities fe2 ON fe2.entity_id = e2.id
-             WHERE w.depth < ?
+               AND fe1.fact_id = w.fact_id
+               AND e1.id = fe1.entity_id
+               AND COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
+               AND fe2.entity_id = e2.id
          )
        SELECT f.* FROM facts f
        WHERE f.id IN (SELECT DISTINCT fact_id FROM walk WHERE depth > 0)
@@ -2110,12 +2123,12 @@ export class SqliteGraphStore {
       [
         seedsJson,
         scope.userId,
+        maxHops,
         scope.userId,
         incQ,
         asOf,
         asOf,
         asOf,
-        maxHops,
         scope.userId,
         incQ,
         asOf,
@@ -2151,6 +2164,7 @@ export class SqliteGraphStore {
     const asOf = resolveFactValidityEpoch(opts.asOf, opts.includeSuperseded);
     const seedsJson = JSON.stringify([...seedFactIds]);
     const rows = this.#conn.all<FactRow & { depth: number }>(
+      // E7: CROSS JOIN pins the recursive-step join order (see expandOneHop).
       `WITH RECURSIVE
          seed_ids(fact_id) AS (
            SELECT f.id FROM facts f
@@ -2162,17 +2176,22 @@ export class SqliteGraphStore {
            UNION
              SELECT fe2.fact_id, w.depth + 1
              FROM walk w
-             JOIN facts fb ON fb.id = w.fact_id
+             CROSS JOIN facts fb
+             CROSS JOIN fact_entities fe1
+             CROSS JOIN entities e1
+             CROSS JOIN entities e2
+             CROSS JOIN fact_entities fe2
+             WHERE w.depth < ?
+               AND fb.id = w.fact_id
                AND fb.scope_user_id = ?
                AND fb.deleted_at IS NULL
                AND fb.archived = 0
                AND (? = 1 OR fb.status != 'quarantined')
                AND (? IS NULL OR ((fb.valid_from IS NULL OR fb.valid_from <= ?) AND (fb.valid_to IS NULL OR fb.valid_to > ?)))
-             JOIN fact_entities fe1 ON fe1.fact_id = w.fact_id
-             JOIN entities e1 ON e1.id = fe1.entity_id
-             JOIN entities e2 ON COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
-             JOIN fact_entities fe2 ON fe2.entity_id = e2.id
-             WHERE w.depth < ?
+               AND fe1.fact_id = w.fact_id
+               AND e1.id = fe1.entity_id
+               AND COALESCE(e2.merged_into, e2.id) = COALESCE(e1.merged_into, e1.id)
+               AND fe2.entity_id = e2.id
          )
        SELECT f.*, MIN(reached.depth) AS depth FROM facts f
        JOIN (SELECT fact_id, MIN(depth) AS depth FROM walk WHERE depth > 0 GROUP BY fact_id) reached
@@ -2189,12 +2208,12 @@ export class SqliteGraphStore {
       [
         seedsJson,
         scope.userId,
+        maxHops,
         scope.userId,
         incQ,
         asOf,
         asOf,
         asOf,
-        maxHops,
         scope.userId,
         incQ,
         asOf,

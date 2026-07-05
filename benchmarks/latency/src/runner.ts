@@ -74,8 +74,15 @@ export async function main(): Promise<void> {
   // Regression tripwire applied at THIS probe's corpus size (factCount),
   // not the 10k-fact MVP design target — see the "MVP design target" note
   // emitted below. Keeps the budget line honest about what was measured.
-  const regressionGateP95Ms = 100;
-  const pass = p95ms < regressionGateP95Ms || smoke;
+  //
+  // E7 (evals-12): the gate used to be `p95 < 100 || smoke` — and CI only
+  // ever ran --smoke, so it could NEVER fire. Smoke now carries its own
+  // catastrophic-only budget instead of a bypass: actual smoke p95 is
+  // sub-millisecond, so 250ms is ~250x headroom (immune to shared-runner
+  // jitter, the repo's EB-4 concern) while still tripping on an accidental
+  // O(n^2) in the search path, which lands in whole seconds.
+  const regressionGateP95Ms = smoke ? 250 : 100;
+  const pass = p95ms < regressionGateP95Ms;
 
   const lines = [
     '# Latency probes — results',
@@ -93,8 +100,8 @@ export async function main(): Promise<void> {
     `| p50 | ${p50ms.toFixed(3)} |`,
     `| p95 | ${p95ms.toFixed(3)} |`,
     `| p99 | ${p99ms.toFixed(3)} |`,
-    `| Regression gate p95 (${String(factCount)} facts) | ${String(regressionGateP95Ms)} ms |`,
-    `| CI pass (smoke relaxes hard gate) | ${pass ? 'yes' : 'no'} |`,
+    `| Regression gate p95 (${String(factCount)} facts${smoke ? ', smoke: catastrophic-only budget' : ''}) | ${String(regressionGateP95Ms)} ms |`,
+    `| CI pass | ${pass ? 'yes' : 'no'} |`,
     '',
     '## MVP design target',
     '',

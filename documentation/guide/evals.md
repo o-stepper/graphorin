@@ -65,7 +65,7 @@ Reports now carry honest statistics: `summary.passRateCi` is a 95% Wilson interv
 
 ## Benchmarks
 
-The `benchmarks/*` workspaces wrap the harness for specific suites — `benchmark-longmemeval`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, and others.The `longmemeval` benchmark ships the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
+The `benchmarks/*` workspaces wrap the harness for specific suites — `benchmark-longmemeval`, `benchmark-memory-smoke`, `benchmark-memory-sim`, `benchmark-latency`, `benchmark-scale` (see [Performance & scale](/guide/performance)), and others. The `longmemeval` benchmark ships the full provider matrix: `--provider stub` (deterministic, offline, plumbing-only) plus a real-provider mode (`--provider ollama|llamacpp|openai-compatible` with `--model`, or the `GRAPHORIN_BENCH_*` env vars); the other benchmarks are stub/fixture-driven. Results stamp the provider, mode, and tokens/query so a number is never reported without the conditions that produced it.
 
 > Real-provider benchmark runs cost real model calls; they are never run by default. The offline stub mode is what keeps the suite green in CI.
 

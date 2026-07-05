@@ -160,6 +160,18 @@ importers:
         specifier: workspace:*
         version: link:../../packages/store-sqlite
 
+  benchmarks/scale:
+    dependencies:
+      '@graphorin/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@graphorin/memory':
+        specifier: workspace:*
+        version: link:../../packages/memory
+      '@graphorin/store-sqlite':
+        specifier: workspace:*
+        version: link:../../packages/store-sqlite
+
   benchmarks/tool-agent:
     dependencies:
       '@graphorin/agent':
