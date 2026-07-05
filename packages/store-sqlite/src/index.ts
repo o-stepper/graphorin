@@ -84,6 +84,7 @@ import {
   checkFtsIntegrity,
   type FtsIntegrityReport,
   formatFtsIntegrityWarning,
+  listCheckedFtsTables,
 } from './fts-integrity.js';
 import {
   type IdempotencyRecord,
@@ -339,6 +340,7 @@ export {
   formatFtsIntegrityWarning,
   type IdempotencyRecord,
   type IdempotencyStore,
+  listCheckedFtsTables,
   listMigrations,
   loadCipherDriver,
   type Migration,
