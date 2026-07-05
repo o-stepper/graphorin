@@ -1,5 +1,6 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
- * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Memory retrieval QA benchmark: loads JSONL cases (facts + question +
  * expected substring), materialises an isolated in-memory SQLite store per
@@ -25,7 +26,7 @@ import {
 import { createMemory, type Memory } from '@graphorin/memory';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 /** Reduces FTS5 mismatches when a period glues onto the last token. */
 function normalizeFactForFts(text: string): string {

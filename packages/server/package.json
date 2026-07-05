@@ -144,10 +144,10 @@
     "provenance": true
   },
   "devDependencies": {
-    "@graphorin/agent": "workspace:>=0.6.0",
-    "@graphorin/memory": "workspace:>=0.6.0",
-    "@graphorin/sessions": "workspace:>=0.6.0",
-    "@graphorin/workflow": "workspace:>=0.6.0",
+    "@graphorin/agent": "workspace:*",
+    "@graphorin/memory": "workspace:*",
+    "@graphorin/sessions": "workspace:*",
+    "@graphorin/workflow": "workspace:*",
     "@types/better-sqlite3": "^7.6.13",
     "@types/ws": "^8.18.1",
     "better-sqlite3": "^12.9.0",

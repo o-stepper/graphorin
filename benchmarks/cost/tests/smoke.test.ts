@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
@@ -7,7 +11,7 @@ import { measureAllScenarios, runCostRegression, SCENARIO_IDS, VERSION } from '.
 
 describe('benchmarks/cost', () => {
   it('exposes VERSION', () => {
-    expect(VERSION).toBe('0.2.0');
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('measures prompt assembly - tool schemas and a richer system prompt grow the count (EB-12)', async () => {

@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
  * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
@@ -19,8 +23,8 @@ const pkg = join(dirname(fileURLToPath(import.meta.url)), '..');
 const fixture = join(pkg, 'data', 'fixture.json');
 
 describe('benchmarks/longmemeval', () => {
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runs fully offline on the fixture with a stub provider', async () => {

@@ -1,13 +1,17 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
 
 import { describe, expect, it } from 'vitest';
 import { measureMemorySearchLatency, VERSION } from '../src/runner.js';
 
 describe('benchmarks/latency', () => {
-  it('exposes VERSION = 0.1.0', () => {
-    expect(VERSION).toBe('0.1.0');
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('reports stable order statistics for hybrid search', async () => {

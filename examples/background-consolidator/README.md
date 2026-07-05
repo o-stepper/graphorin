@@ -308,7 +308,7 @@ The example exports a small, typed surface other packages can build on:
 - `runConsolidatorCycle({ app, turns?, durationMs?, fireTriggerIds? })` - drives a deterministic cycle (synthetic turns + `scheduler.fire(...)`) and returns `{ snapshot, status, eventCounts, turnsDriven, outcomes }`.
 - `BACKGROUND_TICK_TRIGGER_ID`, `IDLE_PROBE_TRIGGER_ID`, `DEFAULT_TRIGGERS` - stable ids and the default consolidator trigger list.
 
-All public files start with the canonical `Graphorin v0.6.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko` header and use only the public types from `@graphorin/agent`, `@graphorin/core`, `@graphorin/memory`, `@graphorin/sessions`, `@graphorin/triggers`, `@graphorin/server`, `@graphorin/store-sqlite`.
+All public files start with the canonical `Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko` header and use only the public types from `@graphorin/agent`, `@graphorin/core`, `@graphorin/memory`, `@graphorin/sessions`, `@graphorin/triggers`, `@graphorin/server`, `@graphorin/store-sqlite`.
 
 ---
 

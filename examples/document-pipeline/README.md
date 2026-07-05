@@ -255,7 +255,7 @@ const v = embed('hello graphorin');
 ## Public API exposed by the example
 
 ```ts
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version; // derived from package.json
 
 export const DOCUMENT_CHANNELS: Readonly<{
   [K in keyof DocumentState]-?: Channel<DocumentState[K]>;

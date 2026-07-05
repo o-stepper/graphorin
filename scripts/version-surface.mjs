@@ -64,8 +64,20 @@ export function trackedTextFiles() {
  *   - 'minor' -> canonical `x.y` (SECURITY.md support line)
  */
 export const VERSION_PATTERNS = [
-  { name: 'md footer', regex: /(?:Project )?Graphorin\*\* · v(\d+\.\d+\.\d+)/g, kind: 'full' },
+  // Footer/attribution lines in every form they occur: `**Graphorin** · v`,
+  // `Project Graphorin · v` (blockquote, no bold), `**Graphorin** v` (middot
+  // after the version instead of before it).
+  {
+    name: 'md footer',
+    regex: /(?:Project )?Graphorin(?:\*\*)?(?: ·)? v(\d+\.\d+\.\d+)/g,
+    kind: 'full',
+  },
   { name: 'readme version line', regex: /- \*\*Version:\*\* v(\d+\.\d+\.\d+)/g, kind: 'full' },
+  { name: 'readme published line', regex: /\*\*Published:\*\* v(\d+\.\d+\.\d+)/g, kind: 'full' },
+  // Sample CLI banner lines quoted in example READMEs (`graphorin v0.6.0
+  // document-pipeline - ...`); the real banner derives from VERSION, so the
+  // quoted expected output must track it.
+  { name: 'example cli banner', regex: /graphorin v(\d+\.\d+\.\d+) /g, kind: 'full' },
   { name: 'readme status line', regex: /\*\*Status:\*\* v(\d+\.\d+\.\d+)/g, kind: 'full' },
   { name: 'version badge url', regex: /badge\/version-v(\d+\.\d+\.\d+)-blue/g, kind: 'full' },
   { name: 'version badge alt', regex: /!\[Version: (\d+\.\d+\.\d+)\]/g, kind: 'full' },

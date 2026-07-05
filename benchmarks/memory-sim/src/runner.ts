@@ -1,5 +1,6 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
- * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Synthetic dialogue memory simulation: seeded PRNG emits short fact
  * strings, persists them via SemanticMemory, then checks whether hybrid
@@ -14,7 +15,7 @@ import type { SessionScope } from '@graphorin/core';
 import { createMemory } from '@graphorin/memory';
 import { createSqliteStore } from '@graphorin/store-sqlite';
 
-export const VERSION = '0.1.0';
+export const VERSION: string = pkg.version;
 
 /** Reduces FTS5 mismatches when a period glues onto the last token. */
 function normalizeFactForFts(text: string): string {
