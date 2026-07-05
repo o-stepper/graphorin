@@ -1,3 +1,4 @@
+import pkg from '../../package.json' with { type: 'json' };
 /**
  * `graphorin doctor` - host health check.
  *
@@ -164,7 +165,7 @@ export async function runDoctor(options: DoctorCommandOptions = {}): Promise<Doc
   }
 
   const report: DoctorReport = Object.freeze({
-    version: '0.6.0',
+    version: pkg.version,
     home,
     platform: process.platform,
     checks: Object.freeze(checks),

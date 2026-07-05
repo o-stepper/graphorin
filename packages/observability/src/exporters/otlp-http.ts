@@ -1,3 +1,4 @@
+import pkg from '../../package.json' with { type: 'json' };
 /**
  * `OTLPHttpExporter` - reference implementation that POSTs span
  * records to an OpenTelemetry HTTP endpoint.
@@ -110,12 +111,12 @@ export function toOtlpEnvelope(record: SpanRecord, serviceName: string): unknown
         resource: {
           attributes: [
             { key: 'service.name', value: { stringValue: serviceName } },
-            { key: 'graphorin.framework.version', value: { stringValue: '0.6.0' } },
+            { key: 'graphorin.framework.version', value: { stringValue: pkg.version } },
           ],
         },
         scopeSpans: [
           {
-            scope: { name: '@graphorin/observability', version: '0.6.0' },
+            scope: { name: '@graphorin/observability', version: pkg.version },
             spans: [
               {
                 traceId: record.traceId,

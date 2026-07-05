@@ -1,8 +1,8 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Offline smoke test: the LongMemEval runner must produce a report on
- * the committed fixture using the deterministic stub provider — no
+ * the committed fixture using the deterministic stub provider - no
  * model, no network.
  */
 
@@ -46,7 +46,7 @@ describe('benchmarks/longmemeval', () => {
 
   it('ingests each conversation once across its QA cases, with sample isolation (EB-11)', async () => {
     // Two samples; every question of one sample shares ONE `haystackSessions`
-    // array reference — exactly as the LOCOMO loader emits them.
+    // array reference - exactly as the LOCOMO loader emits them.
     const sessionsA: MemoryEvalSession[] = [
       {
         id: 's1',

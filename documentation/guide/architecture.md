@@ -147,6 +147,3 @@ Eighteen design principles are encoded into the framework. If a feature contradi
 - [Standalone server](/guide/standalone-server) - promote your assistant to a daemon.
 - [Packages reference](/reference/packages) - every `@graphorin/*` package, one line at a time.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

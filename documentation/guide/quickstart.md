@@ -205,6 +205,3 @@ See [Memory system](/guide/memory-system) for the full tier model and the confli
 - [Providers](/guide/providers) - switch from the stub to Ollama, llama.cpp, or any cloud provider.
 - [Examples](/guide/examples) - full end-to-end example apps in the repository.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

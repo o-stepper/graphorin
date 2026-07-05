@@ -75,10 +75,6 @@ The `benchmarks/*` workspaces wrap the harness for specific suites - `benchmark-
 - [Memory system](/guide/memory-system) - what the memory benchmarks exercise.
 - [Agent runtime](/guide/agent-runtime) - the `agent.run(...)` surface a run drives.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
-
 ## Honest LongMemEval runs (C8)
 
 The LongMemEval runner measures the REAL search path - the old harness-side

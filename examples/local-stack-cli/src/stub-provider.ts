@@ -1,9 +1,9 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` for the local-stack-cli smoke test.
  * The stub never opens a socket, never spawns a child process, and
- * never reads from disk — it inspects the inbound `ProviderRequest`,
+ * never reads from disk - it inspects the inbound `ProviderRequest`,
  * finds the most recent user message, and yields a single
  * `text-delta` followed by a zero-usage `finish`. Smoke coverage
  * therefore runs without any LLM dependency. The echo prefix is

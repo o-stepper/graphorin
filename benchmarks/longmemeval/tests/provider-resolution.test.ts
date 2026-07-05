@@ -1,9 +1,9 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * EB-1: the runner must offer a real-provider CLI path (so a maintainer can
  * seed real baselines) and stamp the provider provenance into every generated
- * RESULTS header — a stub run must never read as a real result. These tests
+ * RESULTS header - a stub run must never read as a real result. These tests
  * stay fully offline: a real provider is only *constructed* (HTTP adapters do
  * not touch the network until `generate()`), never called.
  */
@@ -27,7 +27,7 @@ describe('EB-1: real-provider resolution', () => {
   it('constructs a real Ollama provider from name + model (loopback default)', () => {
     const { provider, label } = resolveBenchProvider({ name: 'ollama', model: 'llama3.1' });
     expect(label).toBe('ollama:llama3.1');
-    // A real provider, NOT the stub — and carrying the requested model id.
+    // A real provider, NOT the stub - and carrying the requested model id.
     expect(provider.name).not.toBe('stub');
     expect(provider.modelId).toBe('llama3.1');
   });

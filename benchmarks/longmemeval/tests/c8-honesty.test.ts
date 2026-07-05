@@ -1,5 +1,5 @@
 /**
- * C8 (evals-01/02/05/06/09) — eval-honesty mechanics, all offline:
+ * C8 (evals-01/02/05/06/09) - eval-honesty mechanics, all offline:
  * - the retrieval/embedder A/B switches drive the REAL library config and
  *   the run completes under every mode
  * - the keyword fan-out booster is gone (recall = the real search path)
@@ -24,11 +24,11 @@ import {
 } from '../src/runner.js';
 import { createDefaultStubProvider } from '../src/stub-provider.js';
 
-// fileURLToPath (not URL.pathname) — pathname yields '/D:/…' on Windows.
+// fileURLToPath (not URL.pathname) - pathname yields '/D:/…' on Windows.
 const PKG_ROOT = fileURLToPath(new URL('..', import.meta.url));
 const FIXTURE = join(PKG_ROOT, 'data', 'fixture.json');
 
-describe('C8 — retrieval/embedder A/B switches', () => {
+describe('C8 - retrieval/embedder A/B switches', () => {
   const modes: RetrievalMode[] = ['default', 'multi-query', 'hyde', 'iterative', 'graph'];
   for (const retrieval of modes) {
     it(`completes the fixture under retrieval='${retrieval}' with the fake embedder`, async () => {
@@ -58,7 +58,7 @@ describe('C8 — retrieval/embedder A/B switches', () => {
   });
 });
 
-describe('C8 — multi-seed variance + abstention aggregates', () => {
+describe('C8 - multi-seed variance + abstention aggregates', () => {
   it('iterations=2 yields two per-iteration pass rates and a stddev', async () => {
     const report = await runLongMemEvalBenchmark({
       datasetPath: FIXTURE,
@@ -74,7 +74,7 @@ describe('C8 — multi-seed variance + abstention aggregates', () => {
   });
 });
 
-describe('C8 — ingest promise cache (evals-09)', () => {
+describe('C8 - ingest promise cache (evals-09)', () => {
   it('ingests a shared haystack exactly once under concurrent cases', async () => {
     let ingests = 0;
     const agent = createMemorySystemAgent({
@@ -99,7 +99,7 @@ describe('C8 — ingest promise cache (evals-09)', () => {
   });
 });
 
-describe('C8 — committed stub baseline is reproducible', () => {
+describe('C8 - committed stub baseline is reproducible', () => {
   it('a fresh stub run shows no regression against the committed baseline', async () => {
     const baselinePath = join(PKG_ROOT, 'baselines', 'longmemeval.fixture.stub.json');
     const baseline = JSON.parse(await readFile(baselinePath, 'utf8'));

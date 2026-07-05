@@ -1,19 +1,23 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/document-pipeline`. Every assertion
  * runs against the real `InMemoryCheckpointStore` shipped by
  * `@graphorin/workflow` so concurrency + channel semantics are
  * exercised end-to-end:
  *
- *  1. `VERSION` mirrors `package.json` (`0.6.0`).
+ *  1. `VERSION` mirrors `package.json`.
  *  2. A 4-page synthetic document drives the pipeline to `completed`
  *     with chunks, embeddings, all 4 page summaries, the index
- *     timestamp, and a populated `parserNotice` — and the per-channel
+ *     timestamp, and a populated `parserNotice` - and the per-channel
  *     update count covers every channel actively written by the run.
  *  3. The exported `DOCUMENT_CHANNELS` record exercises every channel
- *     kind defined by `@graphorin/core` — `latest-value`, `reducer`,
- *     `stream`, `barrier`, `ephemeral`, `any-value` — and every
+ *     kind defined by `@graphorin/core` - `latest-value`, `reducer`,
+ *     `stream`, `barrier`, `ephemeral`, `any-value` - and every
  *     `kind` discriminator surfaces at least once.
  *  4. `Dispatch` parallelism is observable: collecting the run with
  *     `stream: 'tasks'` produces multiple `workflow.task.start` events
@@ -48,9 +52,9 @@ function pages(): ReturnType<typeof buildSyntheticDocument> {
   return buildSyntheticDocument(4);
 }
 
-describe('examples/document-pipeline — smoke', () => {
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+describe('examples/document-pipeline - smoke', () => {
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runs the 4-page pipeline end-to-end with all expected state populated', async () => {

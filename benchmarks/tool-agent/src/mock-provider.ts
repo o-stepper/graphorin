@@ -1,9 +1,9 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic, offline stub `Provider` for the tool-agent benchmark.
  * Each call to `stream(...)` pops the next scripted step and yields its
- * `ProviderEvent`s — no model, no network. Mirrors the agent test fixture
+ * `ProviderEvent`s - no model, no network. Mirrors the agent test fixture
  * (`packages/agent/tests/fixtures/mock-provider.ts`); test fixtures are not
  * importable across package boundaries, so the harness keeps a local copy.
  */

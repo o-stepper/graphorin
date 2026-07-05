@@ -1,9 +1,9 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` for the background-consolidator
  * smoke test. The stub never opens a socket, never spawns a child
- * process, and never reads from disk — it inspects the inbound
+ * process, and never reads from disk - it inspects the inbound
  * `ProviderRequest`, finds the most recent user message, and yields
  * a single `text-delta` containing a synthetic two-sentence
  * "assistant" reply followed by a zero-usage `finish`. CI smoke
@@ -46,7 +46,7 @@ export function stubEchoReply(req: ProviderRequest): string {
   const last = lastUserText(req.messages);
   return (
     `${STUB_ECHO_PREFIX}${last} ` +
-    `Acknowledged. The user shared "${truncate(last, 80)}" — keep this preference noted for future turns.`
+    `Acknowledged. The user shared "${truncate(last, 80)}" - keep this preference noted for future turns.`
   );
 }
 

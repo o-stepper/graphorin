@@ -1,7 +1,7 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Workflow concurrency acceptance demo — library mode. Wires
+ * Workflow concurrency acceptance demo - library mode. Wires
  * `@graphorin/workflow`'s step-graph engine to an eight-node document
  * ingestion pipeline (`parse` → fan-out `chunk` × N → `embed-chunks` +
  * `summarize-page` → `barrier` → `index`, with side nodes
@@ -36,6 +36,8 @@ import {
   stream,
   type Workflow,
 } from '@graphorin/workflow';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { embed } from './embedder-stub.js';
 import {
   CHUNKS_PER_PAGE,
@@ -49,8 +51,7 @@ import {
   NODE_NAMES,
 } from './types.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 /** Default stream mode used by the demo helper unless explicitly overridden. */
 const DEFAULT_STREAM_MODE: StreamMode = 'debug';
@@ -217,7 +218,7 @@ export interface RunDocumentPipelineDemoOptions {
   readonly pages: ReadonlyArray<DocumentPage>;
   readonly checkpointStore: CheckpointStore;
   readonly threadId?: string;
-  /** Stream emission mode — defaults to `'debug'` (every event kind). */
+  /** Stream emission mode - defaults to `'debug'` (every event kind). */
   readonly stream?: StreamMode;
   readonly signal?: AbortSignal;
 }
@@ -295,7 +296,7 @@ export async function main(): Promise<number> {
     threadId: 'demo-doc-4',
   });
   process.stdout.write(
-    `graphorin v${VERSION} document-pipeline — ` +
+    `graphorin v${VERSION} document-pipeline - ` +
       `status=${result.status}, pages=${pages.length}, ` +
       `chunks=${result.finalState.chunks.length}, ` +
       `embeddings=${result.finalState.embeddings.length}, ` +

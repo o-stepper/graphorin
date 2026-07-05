@@ -381,7 +381,9 @@ export interface CreateServerOptions {
 /**
  * @stable
  */
-export const VERSION = '0.6.0';
+import pkg from '../package.json' with { type: 'json' };
+
+export const VERSION: string = pkg.version;
 
 /**
  * Build a fully-wired Graphorin server. The returned handle is

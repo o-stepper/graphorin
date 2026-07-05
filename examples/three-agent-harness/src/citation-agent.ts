@@ -1,8 +1,8 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Minimal `createCitationAgent({...})` post-processing helper used by
- * the research-and-decide variant. Bound to the harness example only —
+ * the research-and-decide variant. Bound to the harness example only -
  * not exported from the framework packages.
  *
  *   1. Split each draft "claim" by sentence (period / question /
@@ -60,7 +60,7 @@ export interface CreateCitationAgentOptions {
    * `agent.citation.bound.total` / `agent.citation.unbound.total`
    * counters. The framework `Tracer` shape currently only spans /
    * counts spans, so we duck-type a `recordCounter(name, n)`
-   * affordance — when the supplied tracer does not implement it,
+   * affordance - when the supplied tracer does not implement it,
    * the helper falls back to in-memory accumulation.
    */
   readonly tracer?: Tracer;

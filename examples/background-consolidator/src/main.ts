@@ -1,10 +1,10 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Long-lived agent + cron triggers acceptance demo. Wires
  * `@graphorin/triggers` cron / interval / idle declarations into a
  * `@graphorin/memory` consolidator running on the `tier: 'cheap'`
- * budget envelope (per RB-15 / DEC-144 — the framework default is
+ * budget envelope (per RB-15 / DEC-144 - the framework default is
  * `'free'`; the example overrides to `'cheap'` so the standard
  * phase actually exercises the LLM extraction path). The
  * consolidator is mounted on a `@graphorin/server` instance so
@@ -13,7 +13,7 @@
  * `TriggerStore` keeps every registration durable across simulated
  * restarts (DEC-150).
  *
- * The example is library-mode by default — the server is created
+ * The example is library-mode by default - the server is created
  * but inert until {@link startBackgroundConsolidator} explicitly
  * binds the listener. The smoke test exercises
  * {@link runConsolidatorCycle}, which drives a deterministic
@@ -49,13 +49,14 @@ import {
   type SchedulerEvent,
   type TriggerDeclaration,
 } from '@graphorin/triggers';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { createStubProvider } from './stub-provider.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 /**
- * Recipe selector. Only `'stub'` ships in v0.1 — the example
+ * Recipe selector. Only `'stub'` ships in v0.1 - the example
  * demonstrates the long-lived consolidator + triggers pattern, which
  * is recipe-agnostic; swap in any `Provider` from
  * `@graphorin/provider` (Ollama, llama.cpp, …) by passing
@@ -73,9 +74,9 @@ const DEFAULT_SESSION_TITLE = 'background-consolidator demo';
  * Default consolidator trigger declarations. The mix demonstrates
  * the three production trigger kinds:
  *
- * - `'turn:3'`           — light phase after every 3 user turns (lib-side).
- * - `'idle:10s'`         — standard phase after 10 s without user activity.
- * - `'cron:0 3 * * *'`   — nightly maintenance window for deep replays.
+ * - `'turn:3'`           - light phase after every 3 user turns (lib-side).
+ * - `'idle:10s'`         - standard phase after 10 s without user activity.
+ * - `'cron:0 3 * * *'`   - nightly maintenance window for deep replays.
  *
  * The numbers are deliberately chatty so the smoke test sees the
  * machinery; production deployments will normally widen the
@@ -109,7 +110,7 @@ export interface CreateAppOptions {
   readonly tier?: ConsolidatorTier;
   /** Override the provider (bypasses the recipe selector). */
   readonly providerOverride?: Provider;
-  /** Process environment override — mostly used by tests. */
+  /** Process environment override - mostly used by tests. */
   readonly env?: NodeJS.ProcessEnv;
   /**
    * Override the consolidator trigger spec list. Defaults to
@@ -124,7 +125,7 @@ export interface CreateAppOptions {
    */
   readonly lightTickIntervalMs?: number;
   /**
-   * Idle probe interval (ms) — a `idle(...)` declaration the
+   * Idle probe interval (ms) - a `idle(...)` declaration the
    * framework registers separately so callers can prove idle-trigger
    * wiring without owning the parsed-from-spec id. Defaults to
    * 30_000.
@@ -147,14 +148,14 @@ export interface BackgroundConsolidatorApp {
   readonly agentId: string;
   readonly scope: SessionScope;
   /**
-   * Trigger ids registered by the framework on construction —
+   * Trigger ids registered by the framework on construction -
    * everything declared on the consolidator's trigger list (cron /
    * idle, parsed by {@link registerConsolidatorTriggers}) plus the
    * standalone `'background-consolidator:*'` declarations the
    * example owns directly.
    */
   readonly registeredTriggerIds: ReadonlyArray<string>;
-  /** Outcome of {@link registerConsolidatorTriggers} — surfaced for tests. */
+  /** Outcome of {@link registerConsolidatorTriggers} - surfaced for tests. */
   readonly registrationResult: RegisterTriggersResult;
   /** Dispose every started subsystem (idempotent). */
   close(): Promise<void>;
@@ -179,7 +180,7 @@ export function buildProvider(recipe: Recipe): Provider {
       acceptsSensitivity: ['public', 'internal', 'secret'],
     });
   }
-  // Exhaustive — `Recipe` only includes `'stub'` in v0.1.
+  // Exhaustive - `Recipe` only includes `'stub'` in v0.1.
   throw new TypeError(
     `[graphorin/example-background-consolidator] No provider builder for recipe='${recipe}'.`,
   );
@@ -190,7 +191,7 @@ export function buildProvider(recipe: Recipe): Provider {
  * scheduler, server handle, and consolidator daemon. The handle's
  * `scheduler` and `consolidator` are eagerly started (lib-mode) so
  * callers can immediately drive {@link runConsolidatorCycle}; the
- * `server` is *created but not started* — call
+ * `server` is *created but not started* - call
  * {@link startBackgroundConsolidator} (or `app.server.start()`) to
  * bind the HTTP listener.
  */
@@ -317,7 +318,7 @@ export async function createBackgroundConsolidatorApp(
 
   let serverStarted = false;
   let closed = false;
-  // Track server-start side-effect through the surface — the
+  // Track server-start side-effect through the surface - the
   // framework does not expose an `isStarted` accessor, so we wrap
   // `server.start` lightly.
   const originalStart = server.start.bind(server);
@@ -374,7 +375,7 @@ export async function createBackgroundConsolidatorApp(
 }
 
 /**
- * Convenience wrapper — calls `app.server.start()` to bind the HTTP
+ * Convenience wrapper - calls `app.server.start()` to bind the HTTP
  * listener (and start the consolidator + triggers daemons through
  * the lifecycle hooks). Returns the same handle so callers can keep
  * driving the cycle programmatically.
@@ -452,7 +453,7 @@ export async function runConsolidatorCycle(
         observeSchedulerEvent(ev);
       }
     } catch {
-      // Best-effort — the scheduler closes the iterator on stop().
+      // Best-effort - the scheduler closes the iterator on stop().
     }
   })();
   function observeSchedulerEvent(ev: SchedulerEvent): void {
@@ -476,7 +477,7 @@ export async function runConsolidatorCycle(
         else if (ev.type === 'agent.error') {
           throw new Error(
             `[graphorin/example-background-consolidator] agent failed mid-turn: ` +
-              `${ev.error.code} — ${ev.error.message}`,
+              `${ev.error.code} - ${ev.error.message}`,
           );
         }
       }
@@ -500,11 +501,11 @@ export async function runConsolidatorCycle(
       try {
         await app.scheduler.fire(id);
       } catch {
-        // Trigger missing — best-effort, surfaced in `eventCounts`.
+        // Trigger missing - best-effort, surfaced in `eventCounts`.
       }
     }
 
-    // Brief settling window — let the (already-resolved) callbacks
+    // Brief settling window - let the (already-resolved) callbacks
     // surface their lifecycle events through the pump above.
     await sleep(Math.min(durationMs, 100));
   } finally {
@@ -592,7 +593,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
   try {
     const cycle = await runConsolidatorCycle({ app, durationMs: 200, turns: 4 });
     process.stdout.write(
-      `graphorin v${VERSION} background-consolidator — ` +
+      `graphorin v${VERSION} background-consolidator - ` +
         `recipe='${app.recipe}', tier='${cycle.status.tier}', ` +
         `running=${cycle.status.running}, ` +
         `turnsDriven=${cycle.turnsDriven}, ` +
@@ -607,7 +608,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
   }
 }
 
-// Re-exported surface markers — keep imported builders alive
+// Re-exported surface markers - keep imported builders alive
 // through tree-shaking so downstream consumers can import them
 // straight from the example barrel as a starter recipe.
 void cron;

@@ -1,9 +1,9 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic stub `Provider` for the three-agent-harness smoke
  * test. The same `Provider` instance powers all three roles
- * (Planner / Generator / Evaluator) — it dispatches on the system
+ * (Planner / Generator / Evaluator) - it dispatches on the system
  * prompt's role marker, fans the response out per role, and yields
  * a single `text-delta` followed by a zero-usage `finish`. No
  * sockets, no child processes, no disk I/O.

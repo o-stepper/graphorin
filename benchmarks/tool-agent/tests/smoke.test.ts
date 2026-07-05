@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
 
 import { describe, expect, it } from 'vitest';

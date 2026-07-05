@@ -458,6 +458,3 @@ Without an explicit `providerAcceptsSensitivity`, the accepted set derives from 
 - [Persistence](/guide/persistence) - SQLite + `sqlite-vec` + FTS5, migrations, and the bi-temporal schema.
 - [Observability](/guide/observability) - what the memory spans look like.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

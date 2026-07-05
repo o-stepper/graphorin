@@ -140,6 +140,3 @@ The skill installer never runs `npm postinstall` scripts on untrusted packages. 
 - [Security](/guide/security) - sandbox tiers + signature trust model.
 - [MCP client](/guide/mcp-client) - how MCP-derived tools coexist with skills.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

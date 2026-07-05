@@ -1,8 +1,8 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * B2 (negative control): the per-ability regression gate the dispatch CI job
- * runs must provably FAIL on a deliberately regressed run — otherwise an empty
+ * runs must provably FAIL on a deliberately regressed run - otherwise an empty
  * `baselines/` plus inert tolerances is gate theater. These exercise the EXACT
  * `REGRESSION_TOLERANCES` the runner gates on (imported, not duplicated), so the
  * proof can never drift from the gate.
@@ -37,9 +37,9 @@ describe('B2: regression-gate negative control', () => {
     expect(detectRegressions(baseline, baseline, REGRESSION_TOLERANCES).hasRegressions).toBe(false);
   });
 
-  it('FAILS on a deliberately regressed run — the gate is not theater', () => {
+  it('FAILS on a deliberately regressed run - the gate is not theater', () => {
     const baseline = report(10, 10, 0.9); // 100% pass, 0.9 avg
-    const regressed = report(5, 10, 0.5); // 50% pass, 0.5 avg — both far past tolerance
+    const regressed = report(5, 10, 0.5); // 50% pass, 0.5 avg - both far past tolerance
     const r = detectRegressions(regressed, baseline, REGRESSION_TOLERANCES);
     expect(r.hasRegressions).toBe(true);
     expect(r.findings.some((f) => f.kind === 'pass-rate-drop')).toBe(true);

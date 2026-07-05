@@ -75,6 +75,3 @@ If you believe you have observed Graphorin making a network call that the runtim
 - [Observability](/guide/observability) - redaction layer.
 - [Standalone server](/guide/standalone-server) - health checks + Prometheus metrics.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

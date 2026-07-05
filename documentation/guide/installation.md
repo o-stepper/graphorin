@@ -120,6 +120,3 @@ pnpm -r test
 
 See the [Contributing guide](/contributing/) for the full development workflow.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

@@ -1,3 +1,4 @@
+import pkg from '../../package.json' with { type: 'json' };
 /**
  * `createMCPClient(...)` - the entry point for opening a typed MCP
  * client connection.
@@ -53,7 +54,7 @@ import type {
 } from './types.js';
 
 const DEFAULT_CLIENT_NAME = 'graphorin-mcp-client';
-const DEFAULT_CLIENT_VERSION = '0.6.0';
+const DEFAULT_CLIENT_VERSION: string = pkg.version;
 
 /**
  * Process-scoped dedup flag for the deprecated SSE transport WARN.

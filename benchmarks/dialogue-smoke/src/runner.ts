@@ -1,10 +1,10 @@
 /**
- * Graphorin v0.1.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin v0.1.0 - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Dialogue smoke test: a few fixed turns carry one structured fact;
  * assistant lines echo acknowledgement. After the turns, the fact should
  * be recoverable from semantic memory via hybrid search (FTS-only when no
- * embedder is configured). This is a wiring smoke check — NOT the published
+ * embedder is configured). This is a wiring smoke check - NOT the published
  * DialSim benchmark (arXiv:2406.13144).
  */
 
@@ -61,7 +61,7 @@ export async function main(): Promise<void> {
   await writeFile(
     join(pkgRoot(), 'RESULTS.md'),
     [
-      '# Dialogue smoke test — results',
+      '# Dialogue smoke test - results',
       '',
       `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
       '',

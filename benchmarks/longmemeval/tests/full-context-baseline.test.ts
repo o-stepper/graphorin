@@ -1,9 +1,9 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * SOTA-1: the runner must offer a full-context baseline (inline the WHOLE
  * haystack, no retrieval) that the memory pipeline is scored against, and report
- * the honest cost axis — tokens/query — alongside accuracy/latency. ConvoMem
+ * the honest cost axis - tokens/query - alongside accuracy/latency. ConvoMem
  * shows full-context beats memory systems below ~150 conversations; the baseline
  * is how Graphorin tells that truth on small corpora. Fully offline: providers
  * are stubs, only the plumbing (mode selection, inlining, metering) is asserted.
@@ -76,7 +76,7 @@ describe('SOTA-1: full-context baseline', () => {
     };
     await agent.run(input);
 
-    // The full haystack reaches the model — the needle AND the very first turn,
+    // The full haystack reaches the model - the needle AND the very first turn,
     // which a top-K memory recall could legitimately drop.
     expect(seenContext).toContain('NEEDLE the vault code is 7741');
     expect(seenContext).toContain('fact number 0 about topic 0');

@@ -116,6 +116,3 @@ A few feature requests have been turned down because they would contradict a pri
 - [Security](/guide/security) - sandbox + audit + supply chain.
 - [Architecture](/guide/architecture) - the layered design.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

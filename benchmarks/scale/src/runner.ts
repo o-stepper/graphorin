@@ -1,12 +1,12 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Memory-store SCALE probe (audit 2026-07-04, E7). Every other benchmark
  * assesses correctness at toy corpus sizes; this one asks "where does the
  * store stop being comfortable?". It seeds a FILE-backed SQLite store with a
- * large synthetic corpus — vectors on (deterministic bag-of-words embedder,
+ * large synthetic corpus - vectors on (deterministic bag-of-words embedder,
  * so vec0 KNN + hybrid RRF run for real) and an entity graph built from
- * s/p/o on every fact — then measures:
+ * s/p/o on every fact - then measures:
  *
  *   - seeding throughput (facts/s, the write path incl. FTS + vec0 + entity
  *     linking)
@@ -45,7 +45,7 @@ function percentile(sorted: number[], p: number): number {
 }
 
 /**
- * Deterministic bag-of-words embedder (FNV-1a hashed tokens, L2-normalized) —
+ * Deterministic bag-of-words embedder (FNV-1a hashed tokens, L2-normalized) -
  * the same shape `@graphorin/benchmark-longmemeval` uses. It has no semantic
  * quality; it exists so the vector leg + vec0 index run for real offline.
  */
@@ -151,7 +151,7 @@ export async function runScaleBenchmark(options: {
   }
   const seedSeconds = (performance.now() - seedStart) / 1000;
 
-  // Hybrid (FTS + vector + RRF) — keyword queries with a known-present token.
+  // Hybrid (FTS + vector + RRF) - keyword queries with a known-present token.
   const hybridLat: number[] = [];
   let hybridHits = 0;
   for (let s = 0; s < options.querySamples; s++) {
@@ -163,11 +163,11 @@ export async function runScaleBenchmark(options: {
     if (hits.length > 0) hybridHits += 1;
   }
 
-  // Graph-expanded search — the P2-1/D5 recursive-CTE + PPR path. Hop-1 is
+  // Graph-expanded search - the P2-1/D5 recursive-CTE + PPR path. Hop-1 is
   // the primary metric; hop-2 is measured with a handful of samples because
   // the fact-level walk re-expands hub-entity fanout (each seed fact's hub
   // project links hundreds of facts, and search seeds the walk with up to
-  // candidateTopK ids) — single hop-2 queries run for SECONDS. That cliff is
+  // candidateTopK ids) - single hop-2 queries run for SECONDS. That cliff is
   // a deliberate finding of this probe, not something to average away.
   const graphLat: number[] = [];
   let graphHits = 0;
@@ -291,7 +291,7 @@ export async function main(): Promise<void> {
   const r = await runScaleBenchmark({ factCount, querySamples, hop2Samples });
 
   const lines = [
-    '# Memory-store scale probe — results',
+    '# Memory-store scale probe - results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',
@@ -324,7 +324,7 @@ export async function main(): Promise<void> {
   );
 
   if (smoke) {
-    // Deterministic plumbing gates only — no wall-clock assertions.
+    // Deterministic plumbing gates only - no wall-clock assertions.
     const problems: string[] = [];
     if (r.hybridHitRate < 0.9) problems.push(`hybrid hit rate ${r.hybridHitRate}`);
     if (r.graphHitRate < 0.9) problems.push(`graph hit rate ${r.graphHitRate}`);

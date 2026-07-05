@@ -1,7 +1,7 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
- * Single-agent local CLI personal assistant — library mode. The
+ * Single-agent local CLI personal assistant - library mode. The
  * module wires `createAgent({...})` to a six-tier `Memory` backed by
  * the SQLite store and the bundled transformers.js embedder, and
  * exposes four LLM recipes (`ollama`, `llamacpp-server`,
@@ -20,10 +20,11 @@ import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, defineBlock, type Memory } from '@graphorin/memory';
 import { createProvider, llamaCppServerAdapter, ollamaAdapter } from '@graphorin/provider';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { createStubProvider } from './stub-provider.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 /** LLM recipes exposed by `GRAPHORIN_LLM_RECIPE`. */
 export type Recipe = 'ollama' | 'llamacpp-server' | 'llamacpp-node' | 'stub';
@@ -147,7 +148,7 @@ export async function buildProvider(
     });
   }
 
-  // recipe === 'llamacpp-node' — the in-process GGUF adapter ships in a
+  // recipe === 'llamacpp-node' - the in-process GGUF adapter ships in a
   // companion package the example does not statically depend on. The
   // dynamic specifier keeps the workspace lockfile untouched while
   // still letting operators opt in by `pnpm add @graphorin/provider-
@@ -282,7 +283,7 @@ export async function runChatTurn(
   }
   if (errored !== undefined) {
     throw new Error(
-      `[graphorin/example-personal-assistant-cli] agent run failed: ${errored.code} — ${errored.message}`,
+      `[graphorin/example-personal-assistant-cli] agent run failed: ${errored.code} - ${errored.message}`,
     );
   }
   return buffer;
@@ -317,7 +318,7 @@ export async function main(
   }
 
   const banner =
-    `graphorin v${VERSION} personal-assistant-cli — recipe='${handle.recipe}', ` +
+    `graphorin v${VERSION} personal-assistant-cli - recipe='${handle.recipe}', ` +
     `model='${handle.provider.modelId}'. Type a message and press Enter; Ctrl+C to exit.\n`;
   stdout.write(banner);
 

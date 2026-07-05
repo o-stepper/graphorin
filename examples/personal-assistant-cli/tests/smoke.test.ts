@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/personal-assistant-cli`. Exercises the
  * stub provider end-to-end (so CI never depends on a live LLM), the
@@ -19,9 +23,9 @@ import {
 } from '../src/main.js';
 import { STUB_ECHO_PREFIX } from '../src/stub-provider.js';
 
-describe('examples/personal-assistant-cli — smoke', () => {
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+describe('examples/personal-assistant-cli - smoke', () => {
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runChatTurn echoes the input deterministically through the stub provider', async () => {

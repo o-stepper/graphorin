@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * The `submit_expense` tool the Slack-bot stub agent invokes. The tool
  * is `'side-effecting'` (it would, in production, write a row to the
@@ -33,7 +33,7 @@ export interface SubmitExpenseInput {
 /**
  * Hand-rolled `ZodLikeSchema` for the tool's input. Avoids a direct
  * `zod` import (the example does not declare a `zod` dependency) and
- * still satisfies the runtime's `ZodLikeSchema` contract — the agent
+ * still satisfies the runtime's `ZodLikeSchema` contract - the agent
  * runtime only requires `parse(...)` / `safeParse(...)` plus a tiny
  * `toJSON()` duck-typed surface so the provider sees a valid JSON
  * Schema.
@@ -112,7 +112,7 @@ export interface CreateSubmitExpenseToolOptions {
 /**
  * Build the `submit_expense` tool. The tool's execute branch is reached
  * only when (a) the amount sits below the approval threshold OR (b) the
- * agent runtime resumed with an approval directive — at the resume
+ * agent runtime resumed with an approval directive - at the resume
  * boundary the runtime synthesizes a tool result message itself and
  * skips re-execution, so this branch only fires for low-value
  * submissions in v0.1.

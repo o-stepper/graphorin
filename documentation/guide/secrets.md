@@ -212,6 +212,3 @@ Every exporter is auto-wrapped with `withValidation(...)` by the tracer factory.
 - [Privacy](/guide/privacy) - the zero-default-telemetry promise.
 - [CLI](/guide/cli) - `graphorin secrets`, `graphorin auth`, `graphorin token`.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

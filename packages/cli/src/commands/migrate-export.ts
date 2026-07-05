@@ -1,3 +1,4 @@
+import pkg from '../../package.json' with { type: 'json' };
 /**
  * `graphorin migrate-export <input> --to-schema <X.Y>` - schema-version
  * migration for `graphorin-session-export/N.N` JSONL files (DEC-155 /
@@ -43,7 +44,7 @@ export interface MigrateExportOptions extends CommonOutputOptions {
   readonly to: string;
   /** Defaults to the writer's current schema (e.g. `'1.0'`). */
   readonly toSchema?: string;
-  /** Surfaced on the meta header. Defaults to `'graphorin-cli@0.6.0'`. */
+  /** Surfaced on the meta header. Defaults to `graphorin-cli@<version>` (the current package version). */
   readonly writer?: string;
 }
 
@@ -85,7 +86,7 @@ export async function runMigrateExport(
 
   const buffer = createBufferSink();
   const writer = createSessionExportWriter(buffer.sink, {
-    writer: options.writer ?? 'graphorin-cli@0.6.0',
+    writer: options.writer ?? `graphorin-cli@${pkg.version}`,
     ...(parsed.meta.embedderIds !== undefined ? { embedderIds: parsed.meta.embedderIds } : {}),
   });
   for (const record of parsed.records) {

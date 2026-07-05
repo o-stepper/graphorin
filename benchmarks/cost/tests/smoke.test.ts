@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  */
 
 import { describe, expect, it } from 'vitest';
@@ -10,13 +10,13 @@ describe('benchmarks/cost', () => {
     expect(VERSION).toBe('0.2.0');
   });
 
-  it('measures prompt assembly — tool schemas and a richer system prompt grow the count (EB-12)', async () => {
+  it('measures prompt assembly - tool schemas and a richer system prompt grow the count (EB-12)', async () => {
     const tokens = await measureAllScenarios();
     const bare = tokens.bare ?? Number.NaN;
     const withTools = tokens['with-tools'] ?? Number.NaN;
     const rich = tokens['rich-instructions'] ?? Number.NaN;
     expect(bare).toBeGreaterThan(0);
-    // Advertising tool schemas grows the assembled prompt — a regression that
+    // Advertising tool schemas grows the assembled prompt - a regression that
     // inflates tool descriptions would be caught here, unlike the old harness.
     expect(withTools).toBeGreaterThan(bare);
     // A longer system prompt grows it too.

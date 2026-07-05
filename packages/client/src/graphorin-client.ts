@@ -1,3 +1,4 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
  * `GraphorinClient` - ergonomic façade over the
  * {@link Transport} contract. Handles:
@@ -241,7 +242,7 @@ export class GraphorinClient {
   async #initializeRpc(): Promise<void> {
     if (this.#transport?.kind !== 'ws') return;
     await this.#sendRpc('initialize', {
-      clientInfo: { name: 'graphorin-client', version: '0.6.0' },
+      clientInfo: { name: 'graphorin-client', version: pkg.version },
     });
   }
 
@@ -968,7 +969,9 @@ function buildRpcFrame(
         jsonrpc: '2.0',
         id,
         method: 'initialize',
-        params: (params ?? { clientInfo: { name: 'graphorin-client', version: '0.6.0' } }) as never,
+        params: (params ?? {
+          clientInfo: { name: 'graphorin-client', version: pkg.version },
+        }) as never,
       };
     case 'subscription.subscribe':
       return {

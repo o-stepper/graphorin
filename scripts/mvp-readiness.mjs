@@ -282,6 +282,12 @@ async function main() {
       cmd: 'pnpm',
       args: ['run', 'check-licenses'],
     },
+    {
+      label: 'check-version-consistency',
+      kind: 'cmd',
+      cmd: 'pnpm',
+      args: ['run', 'check-version-consistency'],
+    },
     { label: 'workspace-audit', kind: 'audit' },
   ]
     .filter(Boolean)

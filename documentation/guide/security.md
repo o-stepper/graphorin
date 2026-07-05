@@ -347,6 +347,3 @@ Failures are categorised by severity and emit actionable remediation steps.
 - [Observability](/guide/observability) - redaction + replay sanitisation.
 - [Standalone server](/guide/standalone-server) - server-token auth, idempotency.
 
----
-
-**Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko

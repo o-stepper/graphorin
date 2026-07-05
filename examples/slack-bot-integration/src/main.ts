@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Slack bot integration acceptance demo. The module wires a small
  * adapter that converts inbound Slack `event_callback` payloads into
@@ -10,11 +10,11 @@
  *
  * Headline scenarios:
  *
- *   - {@link processSlackEvent} — the synchronous fast-path for
+ *   - {@link processSlackEvent} - the synchronous fast-path for
  *     non-approval messages: validate the Slack signature, push the
  *     message into the session, stream the agent reply, mirror it back
  *     to Slack.
- *   - {@link simulateApprovalLifecycle} — the durable HITL story: a
+ *   - {@link simulateApprovalLifecycle} - the durable HITL story: a
  *     high-amount expense suspends the agent on
  *     `tool.approval.requested`; the example posts an "approval needed"
  *     Slack message; the SQLite-backed `CheckpointStore` survives a
@@ -49,6 +49,8 @@ import {
 } from '@graphorin/server';
 import { createSessionManager, type Session, type SessionManager } from '@graphorin/sessions';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+/** Canonical version constant, derived from `package.json` at build time. */
+import pkg from '../package.json' with { type: 'json' };
 import { createSubmitExpenseTool, DEFAULT_APPROVAL_THRESHOLD_USD } from './expense-tool.js';
 import {
   createInMemorySlackClient,
@@ -58,10 +60,9 @@ import {
 } from './slack-stub.js';
 import { createStubProvider } from './stub-provider.js';
 
-/** Canonical version constant — must mirror `package.json`. */
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
-/** Recipe selector. Only `'stub'` ships in v0.1 — production deployments swap providers. */
+/** Recipe selector. Only `'stub'` ships in v0.1 - production deployments swap providers. */
 export type Recipe = 'stub';
 
 const ALL_RECIPES: ReadonlyArray<Recipe> = ['stub'];
@@ -218,7 +219,7 @@ export interface SlackBotApp {
 /** Inputs accepted by {@link SlackBotApp.processSlackEvent}. */
 export interface ProcessSlackEventInput {
   readonly event: SlackEventEnvelope;
-  /** Raw Slack request body — required when verifying the signature. */
+  /** Raw Slack request body - required when verifying the signature. */
   readonly rawBody?: string;
   readonly headers?: Readonly<Record<string, string | undefined>>;
   /** Skip the signature check (used by tests + library-mode callers). */
@@ -431,7 +432,7 @@ export async function createSlackBotApp(
 }
 
 /**
- * Convenience wrapper — calls `app.server.start()` to bind the HTTP
+ * Convenience wrapper - calls `app.server.start()` to bind the HTTP
  * listener. Returns the `{ host, port }` address from the underlying
  * `GraphorinServer.start()`.
  */
@@ -606,7 +607,7 @@ async function processSlackEventInternal(
     } else if (ev.type === 'agent.error') {
       throw new Error(
         `[graphorin/example-slack-bot-integration] agent failed mid-turn: ` +
-          `${ev.error.code} — ${ev.error.message}`,
+          `${ev.error.code} - ${ev.error.message}`,
       );
     }
   }
@@ -703,7 +704,7 @@ async function handleSlackApprovalInternal(
     else if (ev.type === 'agent.error') {
       throw new Error(
         `[graphorin/example-slack-bot-integration] agent resume failed: ` +
-          `${ev.error.code} — ${ev.error.message}`,
+          `${ev.error.code} - ${ev.error.message}`,
       );
     }
   }
@@ -915,7 +916,7 @@ async function buildServer(input: BuildServerInput): Promise<GraphorinServer> {
   server.agents.register({
     id: input.agentId,
     agent: adapter,
-    description: 'Slack bridge bot — routes Slack messages through the Graphorin agent loop.',
+    description: 'Slack bridge bot - routes Slack messages through the Graphorin agent loop.',
     tags: ['slack', 'integration', 'example'],
   });
   // Touch the env so eager linters confirm the env var read path is wired.
@@ -1049,7 +1050,7 @@ export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Pro
       expense: { amount: 500, justification: 'engineering offsite travel' },
     });
     process.stdout.write(
-      `graphorin v${VERSION} slack-bot-integration — ` +
+      `graphorin v${VERSION} slack-bot-integration - ` +
         `recipe='${app.recipe}', happy='${happy.status}', ` +
         `approval='${approval.resume.status}', ` +
         `slackMessages=${approval.slackMessages.length}.\n`,

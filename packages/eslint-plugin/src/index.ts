@@ -21,6 +21,7 @@
  * @packageDocumentation
  */
 
+import pkg from '../package.json' with { type: 'json' };
 import noBareToolExec from './rules/no-bare-tool-exec.js';
 import noImplicitNetworkCall from './rules/no-implicit-network-call.js';
 import noSecretInDeps from './rules/no-secret-in-deps.js';
@@ -31,7 +32,7 @@ import toolDescriptionRequired from './rules/tool-description-required.js';
 import toolExamplesRecommended from './rules/tool-examples-recommended.js';
 import toolParameterNaming from './rules/tool-parameter-naming.js';
 
-export const VERSION = '0.6.0';
+export const VERSION: string = pkg.version;
 
 export const meta = {
   name: '@graphorin/eslint-plugin',

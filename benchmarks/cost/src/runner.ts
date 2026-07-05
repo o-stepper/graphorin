@@ -1,9 +1,10 @@
+import pkg from '../package.json' with { type: 'json' };
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Prompt-assembly token-cost regression harness (EB-12).
  *
- * The old harness counted the raw tokens of five hard-coded messages — it
+ * The old harness counted the raw tokens of five hard-coded messages - it
  * could not see the system prompt, the agent instructions, or the advertised
  * tool schemas, so a regression in *prompt assembly* (a fatter system prompt,
  * heavier tool descriptions) was invisible to it. This harness instead drives
@@ -93,7 +94,7 @@ const PINNED_INPUT =
  * Scenarios are ordered so a regression is attributable: `bare` is the floor;
  * `with-tools` adds advertised tool schemas; `rich-instructions` adds a longer
  * system prompt. By construction each of the latter two assembles a larger
- * prompt than `bare` — the "prompt assembly is measured" invariant the test
+ * prompt than `bare` - the "prompt assembly is measured" invariant the test
  * pins.
  */
 const SCENARIOS: ReadonlyArray<Scenario> = [
@@ -216,7 +217,7 @@ export async function runCostRegression(): Promise<CostRegressionReport> {
   return { results, worstRatio, usd: cost?.amount ?? null };
 }
 
-/** Measure every scenario by id — used by `--update-baseline` and the test. */
+/** Measure every scenario by id - used by `--update-baseline` and the test. */
 export async function measureAllScenarios(): Promise<Record<string, number>> {
   const out: Record<string, number> = {};
   for (const scenario of SCENARIOS) {
@@ -234,7 +235,7 @@ async function updateBaseline(): Promise<void> {
     scenarios,
     toleranceRatio: prior?.toleranceRatio ?? 0.1,
     encoding: prior?.encoding ?? 'cl100k_base',
-    frameworkVersion: '0.6.0',
+    frameworkVersion: pkg.version,
   };
   await writeFile(baselinePath(), `${JSON.stringify(next, null, 2)}\n`, 'utf8');
   console.log(`[benchmark-cost] baseline updated: ${JSON.stringify(scenarios)}`);
@@ -257,7 +258,7 @@ export async function main(): Promise<void> {
     );
   }
   console.log(
-    `[benchmark-cost] Graphorin v${VERSION} — worstRatio=${report.worstRatio.toFixed(4)} tolerance=${maxGrowth} — ${
+    `[benchmark-cost] Graphorin v${VERSION} - worstRatio=${report.worstRatio.toFixed(4)} tolerance=${maxGrowth} - ${
       report.usd !== null
         ? `nominalUsd@gpt-4o-mini-input=${report.usd.toFixed(6)}`
         : 'nominalUsd=unavailable'
@@ -273,7 +274,7 @@ export async function main(): Promise<void> {
     await writeFile(
       join(pkgRoot(), 'RESULTS.md'),
       [
-        '# Prompt-assembly token cost — results',
+        '# Prompt-assembly token cost - results',
         '',
         `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
         '',

@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/multi-agent-crew`. Exercises every
  * RB-33 acceptance scenario against the deterministic stub provider so
@@ -67,9 +71,9 @@ function makeToolContext<TDeps>(deps: TDeps): ToolExecutionContext<TDeps> {
   return ctx as unknown as ToolExecutionContext<TDeps>;
 }
 
-describe('examples/multi-agent-crew — smoke', () => {
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+describe('examples/multi-agent-crew - smoke', () => {
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('runCrew streams supervisor + 2 workers and produces a joined synthesis', async () => {
@@ -221,7 +225,7 @@ describe('examples/multi-agent-crew — smoke', () => {
       expect(String(supervisorDeps?.secret)).toBe('[SECRET]');
       expect(JSON.stringify({ s: supervisorDeps?.secret })).toBe('{"s":"[SECRET]"}');
 
-      // Workers ship `deps: undefined` by default — DEC-137 empty allowlist.
+      // Workers ship `deps: undefined` by default - DEC-137 empty allowlist.
       expect(handle.workers.researcher.config.deps).toBeUndefined();
       expect(handle.workers.writer.config.deps).toBeUndefined();
 

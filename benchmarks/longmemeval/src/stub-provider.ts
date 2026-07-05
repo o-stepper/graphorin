@@ -1,5 +1,5 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Deterministic, offline stub `Provider` for the LongMemEval smoke test
  * (and the default `main()` path). No model, no network. Mirrors the
@@ -8,7 +8,7 @@
  * `packages/reranker-llm/tests/_fixtures.ts`).
  *
  * Inject a real `Provider` via `runLongMemEvalBenchmark({ provider })`
- * for meaningful scores — the stub only proves the harness plumbing.
+ * for meaningful scores - the stub only proves the harness plumbing.
  */
 
 import type { Message, Provider, ProviderRequest, ProviderResponse } from '@graphorin/core';

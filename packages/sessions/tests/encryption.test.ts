@@ -1,3 +1,7 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 import { SessionExportEncryptionRequiredError } from '../src/errors/index.js';
 import {
@@ -27,7 +31,7 @@ describe('Session export AES-256-GCM helpers', () => {
   it('wraps an actual JSONL export through encrypt / decrypt and re-parses correctly', async () => {
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.6.0',
+      writer: `@graphorin/sessions@${pkgVersion}`,
       hash: true,
     });
     await writer.writeRecord({
@@ -56,7 +60,7 @@ describe('Session export AES-256-GCM helpers', () => {
     const key = await deriveSessionExportKey('top-secret-pass', salt);
     const buffer = createBufferSink();
     const writer = createSessionExportWriter(buffer.sink, {
-      writer: '@graphorin/sessions@0.6.0',
+      writer: `@graphorin/sessions@${pkgVersion}`,
       hash: true,
       encrypt: { key },
     });

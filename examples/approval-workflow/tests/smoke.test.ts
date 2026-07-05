@@ -1,5 +1,9 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Smoke coverage for `examples/approval-workflow`. Every assertion
  * runs against the real `SqliteCheckpointStore` from `@graphorin/store-
@@ -66,7 +70,7 @@ async function openStore(): Promise<StoreHandle> {
   };
 }
 
-describe('examples/approval-workflow — smoke', () => {
+describe('examples/approval-workflow - smoke', () => {
   let handle: StoreHandle;
 
   beforeEach(async () => {
@@ -77,8 +81,8 @@ describe('examples/approval-workflow — smoke', () => {
     await handle.close();
   });
 
-  it('exposes VERSION = 0.6.0', () => {
-    expect(VERSION).toBe('0.6.0');
+  it('exposes the package.json version', () => {
+    expect(VERSION).toBe(pkgVersion);
   });
 
   it('auto-approves a $50 expense end-to-end without pausing', async () => {

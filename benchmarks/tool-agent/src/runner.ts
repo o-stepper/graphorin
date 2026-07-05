@@ -1,11 +1,11 @@
 /**
- * Graphorin — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * CLI entry point for the tool-agent harness benchmark. Runs the suite,
  * compares `pass^1` / `pass^k` against `data/baseline.json`, writes
  * `RESULTS.md`, and fails (exit 1) on a regression. `--smoke` runs fewer
  * attempts and never gates; `TOOL_AGENT_REGRESSION_STRICT=0` reports
- * without gating. Fully offline — no model, no network.
+ * without gating. Fully offline - no model, no network.
  */
 
 import { readFile, writeFile } from 'node:fs/promises';
@@ -46,7 +46,7 @@ export async function runToolAgentBenchmark(
 
 function renderResults(metrics: SuiteMetrics, baseline: BaselineFile): string {
   return [
-    '# Tool-agent harness benchmark — results',
+    '# Tool-agent harness benchmark - results',
     '',
     `**Graphorin** v${VERSION} · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>`,
     '',
@@ -95,7 +95,7 @@ export async function main(): Promise<void> {
       `[benchmark-tool-agent] Graphorin v${VERSION}`,
       `tasks=${String(metrics.taskCount)} k=${String(metrics.k)} pass^1=${metrics.passAt1.toFixed(3)} pass^k=${metrics.passAtK.toFixed(3)}`,
       `baseline pass^1=${baseline.passAt1.toFixed(3)} pass^k=${baseline.passAtK.toFixed(3)}`,
-    ].join(' — '),
+    ].join(' - '),
   );
   for (const t of metrics.tasks) {
     if (!t.passAtK) {

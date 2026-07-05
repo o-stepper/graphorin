@@ -1,10 +1,14 @@
+import testPkg from '../package.json' with { type: 'json' };
+
+const pkgVersion: string = testPkg.version;
+
 import { describe, expect, it } from 'vitest';
 
 import * as core from '../src/index.js';
 
 describe('@graphorin/core', () => {
   it('re-exports the canonical version constant', () => {
-    expect(core.VERSION).toBe('0.6.0');
+    expect(core.VERSION).toBe(pkgVersion);
   });
 
   it('re-exports core utilities', () => {

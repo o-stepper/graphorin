@@ -1,5 +1,5 @@
 /**
- * Graphorin v0.6.0 — MIT License — Copyright (c) 2026 Oleksiy Stepurenko
+ * Graphorin - MIT License - Copyright (c) 2026 Oleksiy Stepurenko
  *
  * Minimal `SlackClient` interface plus a deterministic in-memory
  * implementation used by the smoke test. The interface surfaces the
@@ -47,7 +47,7 @@ export interface RecordedSlackMessage extends SlackPostMessageRequest {
   readonly recordedAt: string;
 }
 
-/** In-memory client — exposes the recorded message log. */
+/** In-memory client - exposes the recorded message log. */
 export interface InMemorySlackClient extends SlackClient {
   readonly messages: ReadonlyArray<RecordedSlackMessage>;
   /** Drop every recorded message. Tests reuse this between scenarios. */
