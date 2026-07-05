@@ -380,6 +380,14 @@ describe('consolidator/runtime - deep phase', () => {
     expect(provider.calls.length).toBe(1);
     expect(outcome?.conflictsResolved).toBe(1);
     expect(outcome?.factsUpdated).toBe(1);
+    // W-083: candidate and existing texts reach the judge as delimited
+    // untrusted data blocks, and the system prompt declares them DATA.
+    const judgeCall = provider.calls[0];
+    const content = String(judgeCall?.messages[0]?.content);
+    expect(content.match(/<<<untrusted_content /g) ?? []).toHaveLength(2);
+    expect(content).toContain('origin="judge-candidate"');
+    expect(content).toContain('origin="judge-existing"');
+    expect(String(judgeCall?.systemMessage)).toContain('<<<untrusted_content>>>');
   });
 });
 

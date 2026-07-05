@@ -248,6 +248,13 @@ describe('consolidator deep phase - reflection (P1-1)', () => {
     expect(provider.calls.length).toBe(2);
     // MCON-14: both reflection calls are output-capped.
     expect(provider.calls.every((r) => (r.maxTokens ?? 0) > 0)).toBe(true);
+    // W-083: episode summaries and evidence are delimited as untrusted
+    // data blocks, and the system prompts declare them DATA.
+    for (const call of provider.calls) {
+      expect(String(call.messages[0]?.content)).toContain('<<<untrusted_content ');
+      expect(String(call.messages[0]?.content)).toContain('<<</untrusted_content>>>');
+      expect(String(call.systemMessage)).toContain('<<<untrusted_content>>>');
+    }
 
     // Quarantined (P1-4): excluded from default recall...
     expect((await memory.insights.search(SCOPE, 'marathon')).length).toBe(0);
