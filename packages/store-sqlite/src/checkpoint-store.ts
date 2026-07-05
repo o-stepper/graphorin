@@ -61,8 +61,8 @@ export class SqliteCheckpointStore implements CheckpointStore {
     this.#conn.run(
       `INSERT OR REPLACE INTO workflow_checkpoints (
          id, thread_id, namespace, parent_id, state_json, channel_versions_json,
-         step_number, source, status, node_name, tags_json, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         step_number, source, status, node_name, tags_json, session_id, created_at
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         checkpoint.id,
         threadId,
@@ -75,6 +75,7 @@ export class SqliteCheckpointStore implements CheckpointStore {
         metadata.status,
         metadata.nodeName ?? null,
         metadata.tags ? JSON.stringify(metadata.tags) : null,
+        metadata.sessionId ?? null,
         Date.parse(checkpoint.createdAt),
       ],
     );
@@ -181,6 +182,7 @@ interface CheckpointRow {
   status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   node_name: string | null;
   tags_json: string | null;
+  session_id: string | null;
   created_at: number;
 }
 
@@ -207,6 +209,9 @@ function rowToTuple(row: CheckpointRow): CheckpointTuple {
     status: row.status,
     ...(row.node_name !== null ? { nodeName: row.node_name } : {}),
     ...(row.tags_json !== null ? { tags: JSON.parse(row.tags_json) } : {}),
+    ...(row.session_id !== null && row.session_id !== undefined
+      ? { sessionId: row.session_id }
+      : {}),
   };
   return { checkpoint, metadata };
 }

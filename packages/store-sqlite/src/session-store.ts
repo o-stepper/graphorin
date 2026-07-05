@@ -266,6 +266,29 @@ export class SqliteSessionStore implements SessionStoreExt {
   /** Cascade-delete one session's rows. Caller owns the transaction. */
   #deleteSessionCascade(sessionId: string): void {
     this.#purgeSessionContent(sessionId);
+    // W-005: suspended-run snapshots persist the FULL conversation
+    // (serialized RunState) in workflow_checkpoints. Collect the thread
+    // ids from BOTH linkage sources - the session_workflow_runs mapping
+    // (workflow threads attached via Session.attachWorkflowRun) and the
+    // session_id column stamped by the agent runtime on HITL suspends -
+    // and erase them BEFORE the mapping rows disappear below.
+    const threadIds = new Set<string>();
+    for (const row of this.#conn.all<{ thread_id: string }>(
+      'SELECT thread_id FROM session_workflow_runs WHERE session_id = ?',
+      [sessionId],
+    )) {
+      threadIds.add(row.thread_id);
+    }
+    for (const row of this.#conn.all<{ thread_id: string }>(
+      'SELECT DISTINCT thread_id FROM workflow_checkpoints WHERE session_id = ?',
+      [sessionId],
+    )) {
+      threadIds.add(row.thread_id);
+    }
+    for (const threadId of threadIds) {
+      this.#conn.run('DELETE FROM workflow_pending_writes WHERE thread_id = ?', [threadId]);
+      this.#conn.run('DELETE FROM workflow_checkpoints WHERE thread_id = ?', [threadId]);
+    }
     this.#conn.run('DELETE FROM session_handoffs WHERE session_id = ?', [sessionId]);
     this.#conn.run('DELETE FROM session_workflow_runs WHERE session_id = ?', [sessionId]);
     this.#conn.run('DELETE FROM session_audit WHERE session_id = ?', [sessionId]);

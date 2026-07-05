@@ -191,7 +191,7 @@ export async function* processStepToolCalls<TDeps, TOutput>(
           stepNumber,
           createdAt: new Date().toISOString(),
         },
-        { source: 'sync', status: 'suspended', nodeName: 'agent.run' },
+        { source: 'sync', status: 'suspended', nodeName: 'agent.run', sessionId: state.sessionId },
       );
     }
     return { suspended: true };

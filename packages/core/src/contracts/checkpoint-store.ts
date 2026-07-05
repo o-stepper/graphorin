@@ -43,6 +43,16 @@ export interface CheckpointMetadata {
   readonly status: 'running' | 'suspended' | 'completed' | 'failed' | 'aborted';
   readonly nodeName?: string;
   readonly tags?: ReadonlyArray<string>;
+  /**
+   * Session this checkpoint's state belongs to, when known (W-005).
+   * The agent runtime stamps it on every HITL-suspend write so a
+   * session hard-delete can cascade into `workflow_checkpoints` /
+   * `workflow_pending_writes` without parsing the opaque state blob.
+   * Optional and additive: third-party stores may ignore it, but any
+   * store that also implements `SessionStoreExt.deleteSession` should
+   * use it to honour the full erasure contract.
+   */
+  readonly sessionId?: string;
 }
 
 /**

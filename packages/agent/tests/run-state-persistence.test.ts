@@ -170,6 +170,12 @@ describe('AG-23 - the suspend checkpoint is serialized, stripped, and detached',
     expect((persisted.steps as unknown[]).length).toBe(stepsAtSuspend);
     expect((persisted.messages as unknown[]).length).toBe(messagesAtSuspend);
     expect(JSON.stringify(persisted)).not.toContain('AFTER-SUSPEND');
+
+    // (d) W-005: every suspend write is stamped with the run's session
+    // id so the store's session hard-delete can cascade into it.
+    for (const put of puts) {
+      expect(put.metadata.sessionId).toBe(result.state.sessionId);
+    }
   });
 });
 

@@ -256,7 +256,12 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
         stepNumber: 0,
         createdAt: new Date().toISOString(),
       },
-      { source: 'sync', status: 'suspended', nodeName: 'agent.resume.intent' },
+      {
+        source: 'sync',
+        status: 'suspended',
+        nodeName: 'agent.resume.intent',
+        sessionId: state.sessionId,
+      },
     );
   }
   state.steps.push({
@@ -301,6 +306,7 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
         source: 'sync',
         status: state.status === 'awaiting_approval' ? 'suspended' : 'running',
         nodeName: 'agent.resume.dispatched',
+        sessionId: state.sessionId,
       },
     );
   }
