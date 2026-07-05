@@ -150,6 +150,179 @@ describe('consolidator/runtime - standard phase', () => {
     expect(second?.factsCreated).toBe(0);
   });
 
+  it('W-020: a length-truncated full batch is half-split and every fact survives', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const provider = fakeProvider([
+      // Full-batch call overflows the output cap - the JSON is cut mid-object.
+      {
+        text: '{"facts":[{"text":"User moved to Tbilisi for work"},{"text":"User is training for a mara',
+        usage: { promptTokens: 80, completionTokens: 1024, totalTokens: 1104 },
+        finishReason: 'length',
+      },
+      // First half (message 1) answers fully.
+      {
+        text: '{"facts":[{"text":"User moved to Tbilisi for work"}]}',
+        usage: { promptTokens: 40, completionTokens: 12, totalTokens: 52 },
+        finishReason: 'stop',
+      },
+      // Second half (message 2) answers fully.
+      {
+        text: '{"facts":[{"text":"User is training for a marathon in October"}]}',
+        usage: { promptTokens: 40, completionTokens: 14, totalTokens: 54 },
+        finishReason: 'stop',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: { userId: 'alex', sessionId: 's1' },
+      },
+    });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    await pushUserMessages(memory, scope, [
+      'I just moved to Tbilisi for work and I am loving the food.',
+      'I am training for a marathon in October with a coach.',
+    ]);
+    await memory.consolidator.start();
+
+    const outcome = await memory.consolidator.fireNow('standard', scope);
+    expect(provider.calls.length).toBe(3);
+    expect(outcome?.status).toBe('completed');
+    expect(outcome?.factsCreated).toBe(2);
+    // Pre-fix the truncated JSON parsed to [] and the phase completed
+    // with emptyExtractions=1, silently losing the whole slice.
+    expect(outcome?.emptyExtractions).toBe(0);
+    // All three generate calls are budgeted.
+    expect(outcome?.llmTokensUsed).toBe(1104 + 52 + 54);
+
+    // The cursor advanced exactly once, past the whole batch.
+    const second = await memory.consolidator.fireNow('standard', scope);
+    expect(provider.calls.length).toBe(3);
+    expect(second?.factsCreated).toBe(0);
+  });
+
+  it('W-020: a length-truncated SINGLE message is salvaged, not dropped', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    const provider = fakeProvider([
+      {
+        text: '{"facts":[{"text":"User adopted a cat named Mochi"},{"text":"User also plans to ado',
+        usage: { promptTokens: 30, completionTokens: 1024, totalTokens: 1054 },
+        finishReason: 'length',
+      },
+    ]);
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: { userId: 'alex', sessionId: 's1' },
+      },
+    });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    await pushUserMessages(memory, scope, [
+      'I adopted a cat named Mochi last weekend and could not be happier.',
+    ]);
+    await memory.consolidator.start();
+
+    const outcome = await memory.consolidator.fireNow('standard', scope);
+    expect(provider.calls.length).toBe(1);
+    expect(outcome?.status).toBe('completed');
+    expect(outcome?.factsCreated).toBe(1);
+    expect(outcome?.emptyExtractions).toBe(0);
+    // Exactly the complete prefix was salvaged: one fact, one write
+    // (the half-formed second object was dropped, not invented).
+    const second = await memory.consolidator.fireNow('standard', scope);
+    expect(second?.factsCreated).toBe(0);
+  });
+
+  it('W-020: a sub-slice failure leaves the cursor unmoved; the retry extracts everything', async () => {
+    const store = createInMemoryStore({
+      withConflictStore: true,
+      withConsolidatorStore: true,
+    });
+    // Scripted provider: full-batch 'length', then the first half THROWS;
+    // the retry (next fire) answers the full batch cleanly.
+    let call = 0;
+    const calls: ProviderRequest[] = [];
+    const provider: Provider & { readonly calls: ReadonlyArray<ProviderRequest> } = {
+      name: 'fake',
+      modelId: 'fake:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate(req: ProviderRequest) {
+        calls.push(req);
+        call += 1;
+        if (call === 1) {
+          return {
+            text: '{"facts":[{"text":"trunca',
+            usage: { promptTokens: 60, completionTokens: 1024, totalTokens: 1084 },
+            finishReason: 'length' as const,
+          };
+        }
+        if (call === 2) {
+          throw new Error('provider exploded mid-split');
+        }
+        return {
+          text: '{"facts":[{"text":"User moved to Tbilisi for work"},{"text":"User is training for a marathon"}]}',
+          usage: { promptTokens: 60, completionTokens: 24, totalTokens: 84 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream: () => {
+        throw new Error('not implemented');
+      },
+      get calls() {
+        return calls;
+      },
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: createStubEmbedder(),
+      consolidator: {
+        tier: 'cheap',
+        provider,
+        defaultScope: { userId: 'alex', sessionId: 's1' },
+      },
+    });
+    const scope: SessionScope = { userId: 'alex', sessionId: 's1' };
+    await pushUserMessages(memory, scope, [
+      'I just moved to Tbilisi for work and I am loving the food.',
+      'I am training for a marathon in October with a coach.',
+    ]);
+    await memory.consolidator.start();
+
+    const failed = await memory.consolidator.fireNow('standard', scope);
+    expect(failed?.status).toBe('failed');
+    expect(failed?.factsCreated).toBe(0);
+
+    // Cursor did NOT advance: the retry re-reads the same batch and the
+    // clean response extracts both facts - nothing was lost.
+    const retried = await memory.consolidator.fireNow('standard', scope);
+    expect(retried?.status).toBe('completed');
+    expect(retried?.factsCreated).toBe(2);
+  });
+
   it('throws when standard phase is requested without a provider', async () => {
     const store = createInMemoryStore({ withConsolidatorStore: true });
     const memory = createMemory({

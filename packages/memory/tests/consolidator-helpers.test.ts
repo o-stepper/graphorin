@@ -16,6 +16,7 @@ import {
   shouldArchive,
   tipMessageId,
 } from '../src/consolidator/index.js';
+import { salvageTruncatedExtraction } from '../src/consolidator/phases/standard.js';
 import type { SessionMessageRecord } from '../src/internal/storage-adapter.js';
 
 function makeMessage(
@@ -436,5 +437,40 @@ describe('consolidator tier defaults', () => {
     expect(CONSOLIDATOR_TIER_DEFAULTS.free.phases).toEqual(['light']);
     expect(CONSOLIDATOR_TIER_DEFAULTS.cheap.phases).toEqual(['light', 'standard']);
     expect(CONSOLIDATOR_TIER_DEFAULTS.standard.phases).toEqual(['light', 'standard', 'deep']);
+  });
+});
+
+describe('salvageTruncatedExtraction (W-020)', () => {
+  it('recovers the complete prefix when truncated mid-object', () => {
+    const out = salvageTruncatedExtraction(
+      '{"facts":[{"text":"User lives in Tbilisi"},{"text":"User works in te',
+    );
+    expect(out.map((f) => f.text)).toEqual(['User lives in Tbilisi']);
+  });
+
+  it('recovers the complete prefix when truncated mid-string, tracking escapes and braces', () => {
+    const out = salvageTruncatedExtraction(
+      '{"facts":[{"text":"has } brace and \\" quote"},{"text":"cut here: \\"open',
+    );
+    expect(out.map((f) => f.text)).toEqual(['has } brace and " quote']);
+  });
+
+  it('returns [] when nothing complete survived', () => {
+    expect(salvageTruncatedExtraction(undefined)).toEqual([]);
+    expect(salvageTruncatedExtraction('')).toEqual([]);
+    expect(salvageTruncatedExtraction('no json here')).toEqual([]);
+    expect(salvageTruncatedExtraction('{"facts":[{"text":"unclosed')).toEqual([]);
+  });
+
+  it('keeps everything when the array closed and truncation hit trailing commentary', () => {
+    const out = salvageTruncatedExtraction(
+      '{"facts":[{"text":"a"},{"text":"b"}], "note": "this trail is trunc',
+    );
+    expect(out.map((f) => f.text)).toEqual(['a', 'b']);
+  });
+
+  it('tolerates a fenced block whose closing fence was truncated away', () => {
+    const out = salvageTruncatedExtraction('```json\n{"facts":[{"text":"kept"},{"text":"lost');
+    expect(out.map((f) => f.text)).toEqual(['kept']);
   });
 });

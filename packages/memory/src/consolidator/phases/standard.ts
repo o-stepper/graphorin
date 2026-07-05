@@ -204,16 +204,14 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
       }
 
       const transcript = renderTranscript(filtered.kept);
-      const request = buildRequest(deps, transcript);
-      const response = await deps.provider.generate(request);
-      const usage = response.usage;
-      const cost =
-        deps.priceUsage?.({
-          promptTokens: usage.promptTokens,
-          completionTokens: usage.completionTokens,
-        }) ?? 0;
-
-      const facts = parseExtraction(response.text);
+      // W-020: the extraction handles `finishReason: 'length'` by
+      // half-splitting the batch (or salvaging the complete prefix of a
+      // single-message slice) instead of letting a truncated JSON parse
+      // to `[]` and the runtime advance the cursor over a lossy slice.
+      // Budget recording happens per generate call inside the helper.
+      const extraction = await extractFactsFromSlice(deps, filtered.kept);
+      const facts = extraction.facts;
+      const cost = extraction.costUsd;
       let factsCreated = 0;
       let factsUpdated = 0;
       let conflictsResolved = 0;
@@ -221,9 +219,7 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
       let reconcileCost = 0;
       let contextualTokens = 0;
       let contextualCost = 0;
-      const extractionTokens =
-        (usage.promptTokens ?? 0) + (usage.completionTokens ?? 0) + (usage.reasoningTokens ?? 0);
-      deps.budget.record({ phase: 'standard', tokens: extractionTokens, costUsd: cost });
+      const extractionTokens = extraction.tokens;
 
       for (const fact of facts) {
         if (fact.text.trim().length === 0) continue;
@@ -461,8 +457,13 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
         'consolidator.standard.reconcile_tokens': reconcileTokens,
         'consolidator.standard.episode_tokens': episodeTokens,
         'consolidator.standard.contextual_tokens': contextualTokens,
-        'consolidator.standard.tokens.input': usage.promptTokens,
-        'consolidator.standard.tokens.output': usage.completionTokens,
+        // W-020: 'empty slice' vs 'truncated output' must be
+        // distinguishable - these attrs stay 0 on the ordinary path.
+        'consolidator.standard.extraction_calls': extraction.generateCalls,
+        'consolidator.standard.length_splits': extraction.lengthSplits,
+        'consolidator.standard.truncated_salvage': extraction.truncatedSalvages,
+        'consolidator.standard.tokens.input': extraction.promptTokens,
+        'consolidator.standard.tokens.output': extraction.completionTokens,
         'consolidator.standard.cost.estimate.usd': totalCost,
         'consolidator.budget.remaining.tokens': snapshot.tokensRemaining,
         'consolidator.budget.remaining.usd': snapshot.costRemaining,
@@ -485,6 +486,171 @@ export async function runStandardPhase(deps: StandardPhaseDeps): Promise<PhaseOu
       };
     },
   );
+}
+
+/** Aggregated result of {@link extractFactsFromSlice}. */
+interface SliceExtraction {
+  readonly facts: ReadonlyArray<ExtractedFact>;
+  /** Total extraction tokens across every generate call. */
+  readonly tokens: number;
+  readonly costUsd: number;
+  readonly promptTokens: number;
+  readonly completionTokens: number;
+  readonly generateCalls: number;
+  /** Number of batches that were half-split on `finishReason: 'length'`. */
+  readonly lengthSplits: number;
+  /** Number of single-message slices salvaged from a truncated output. */
+  readonly truncatedSalvages: number;
+}
+
+/**
+ * W-020: run 'render transcript -> generate -> record budget -> parse'
+ * for one slice, handling `finishReason: 'length'`:
+ *
+ * - multi-message slice: split in half (message order preserved) and
+ *   recurse - depth is bounded by log2(maxStandardBatchSize) and each
+ *   call passes `deps.budget.record`, with a pause check before every
+ *   sub-call (a paused budget THROWS, so the runtime lands the batch in
+ *   the DLQ WITHOUT advancing the cursor - the established failure
+ *   semantics). A DLQ route on truncation itself was rejected: replay
+ *   re-reads the same slice with the same output cap and deterministically
+ *   truncates again (the W-081 wedge shape); half-splitting converges.
+ * - single message: salvage the complete prefix of the truncated JSON
+ *   ({@link salvageTruncatedExtraction}) - a lone message that overflows
+ *   the cap cannot be split further, and losing its parseable facts is
+ *   strictly worse than keeping them.
+ *
+ * Facts are only RETURNED here; the caller writes them after every
+ * sub-slice extracted successfully, so a mid-split failure leaves no
+ * partially-committed slice (replay is additionally guarded by the
+ * exact-text dedup, memory-consolidation-07).
+ */
+async function extractFactsFromSlice(
+  deps: StandardPhaseDeps,
+  messages: ReadonlyArray<SessionMessageRecord>,
+): Promise<SliceExtraction> {
+  const request = buildRequest(deps, renderTranscript(messages));
+  const response = await deps.provider.generate(request);
+  const usage = response.usage;
+  const costUsd =
+    deps.priceUsage?.({
+      promptTokens: usage.promptTokens,
+      completionTokens: usage.completionTokens,
+    }) ?? 0;
+  const tokens =
+    (usage.promptTokens ?? 0) + (usage.completionTokens ?? 0) + (usage.reasoningTokens ?? 0);
+  deps.budget.record({ phase: 'standard', tokens, costUsd });
+  const base = {
+    tokens,
+    costUsd,
+    promptTokens: usage.promptTokens ?? 0,
+    completionTokens: usage.completionTokens ?? 0,
+    generateCalls: 1,
+  };
+
+  if (response.finishReason !== 'length') {
+    return {
+      ...base,
+      facts: parseExtraction(response.text),
+      lengthSplits: 0,
+      truncatedSalvages: 0,
+    };
+  }
+
+  if (messages.length === 1) {
+    return {
+      ...base,
+      facts: salvageTruncatedExtraction(response.text),
+      lengthSplits: 0,
+      truncatedSalvages: 1,
+    };
+  }
+
+  const mid = Math.ceil(messages.length / 2);
+  const halves = [messages.slice(0, mid), messages.slice(mid)];
+  const merged: ExtractedFact[] = [];
+  let acc = { ...base, lengthSplits: 1, truncatedSalvages: 0 };
+  for (const half of halves) {
+    if (deps.budget.snapshot().paused) {
+      throw new Error(
+        'standard extraction output was truncated (finishReason=length) and the budget is ' +
+          'paused - aborting the half-split so the batch lands in the DLQ without advancing ' +
+          'the cursor',
+      );
+    }
+    const sub = await extractFactsFromSlice(deps, half);
+    merged.push(...sub.facts);
+    acc = {
+      ...acc,
+      tokens: acc.tokens + sub.tokens,
+      costUsd: acc.costUsd + sub.costUsd,
+      promptTokens: acc.promptTokens + sub.promptTokens,
+      completionTokens: acc.completionTokens + sub.completionTokens,
+      generateCalls: acc.generateCalls + sub.generateCalls,
+      lengthSplits: acc.lengthSplits + sub.lengthSplits,
+      truncatedSalvages: acc.truncatedSalvages + sub.truncatedSalvages,
+    };
+  }
+  return { ...acc, facts: merged };
+}
+
+/**
+ * W-020: recover the complete prefix of a length-truncated extraction.
+ * Walks the `facts` array with string/escape-aware bracket tracking,
+ * cuts the trailing incomplete object, closes the array, and delegates
+ * field validation to {@link parseExtraction}. A salvaged half-formed
+ * fact is acceptable: everything returned here still flows through the
+ * ordinary reconcile / quarantine path. Returns `[]` when nothing
+ * complete survived.
+ *
+ * @internal
+ */
+export function salvageTruncatedExtraction(text: string | undefined): ReadonlyArray<ExtractedFact> {
+  if (text === undefined || text.length === 0) return [];
+  const candidate = stripFence(text);
+  const arrayStart = candidate.indexOf('[');
+  if (arrayStart < 0) return [];
+  let inString = false;
+  let escaped = false;
+  let depth = 0;
+  let lastCompleteEnd = -1;
+  let closedProperly = false;
+  for (let i = arrayStart + 1; i < candidate.length; i += 1) {
+    const ch = candidate[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+      continue;
+    }
+    if (ch === '{' || ch === '[') {
+      depth += 1;
+      continue;
+    }
+    if (ch === '}' || ch === ']') {
+      if (ch === ']' && depth === 0) {
+        // The array itself closed - the truncation happened later.
+        lastCompleteEnd = i;
+        closedProperly = true;
+        break;
+      }
+      depth -= 1;
+      if (depth === 0) lastCompleteEnd = i;
+    }
+  }
+  if (lastCompleteEnd < 0) return [];
+  const arrayText = candidate.slice(arrayStart, lastCompleteEnd + 1);
+  const repaired = `{"facts":${arrayText}${closedProperly ? '' : ']'}}`;
+  try {
+    JSON.parse(repaired);
+  } catch {
+    return [];
+  }
+  return parseExtraction(repaired);
 }
 
 function buildRequest(deps: StandardPhaseDeps, transcript: string): ProviderRequest {
