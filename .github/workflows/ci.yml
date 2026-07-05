@@ -53,8 +53,21 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      # The 30s default-timeout override retires the wall-clock flake
+      # class on shared runners: five different tests blew the 5s vitest
+      # default on degraded runner days (sqlite setup, Argon2id KDF,
+      # server app wiring), each a slow-I/O or CPU-starvation artifact,
+      # never a hang. Local runs keep the strict 5s default; explicit
+      # per-test/per-suite timeouts still take precedence over this
+      # CLI-level default.
+      # Invoked through `turbo run ... --` directly and pinned to bash:
+      # the windows runner's default pwsh strips the bare `--` separator
+      # when spawning native commands, so turbo saw --testTimeout as its
+      # own (unknown) option and printed usage. bash preserves it on
+      # every runner OS.
       - name: Test
-        run: pnpm test
+        shell: bash
+        run: pnpm exec turbo run test -- --testTimeout=30000
 
       - name: Build
         run: pnpm build
