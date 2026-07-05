@@ -46,7 +46,10 @@ async function buildApp(): Promise<{
   return { app, scheduler };
 }
 
-describe('REST trigger routes - IP-17 semantics', () => {
+// buildApp() wires a real server app per test; on loaded windows-latest
+// runners that setup alone has blown the 5 s default per-test timeout.
+// The suite timeout is a ceiling for slow CI I/O, not a perf assertion.
+describe('REST trigger routes - IP-17 semantics', { timeout: 30_000 }, () => {
   it('disable is a flag flip (trigger survives), enable restores it, both round-trip', async () => {
     const { app, scheduler } = await buildApp();
 

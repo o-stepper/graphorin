@@ -14,7 +14,12 @@ import { createSqliteStore } from '../src/index.js';
  */
 const base = { kind: 'semantic' as const, userId: 'alex', sensitivity: 'internal' as const };
 
-describe('CS-12 - supersede writes the successor before closing the old fact', () => {
+// File-backed sqlite setup (mkdtemp + migrations) has blown the 5 s
+// default per-test timeout on loaded windows-latest runners; the suite
+// timeout is a ceiling for slow I/O, not a performance assertion.
+describe('CS-12 - supersede writes the successor before closing the old fact', {
+  timeout: 30_000,
+}, () => {
   it('a failed new-fact write leaves the old fact open and unlinked', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-cs12-'));
     const store = await createSqliteStore({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
