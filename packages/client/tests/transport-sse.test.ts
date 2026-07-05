@@ -81,6 +81,15 @@ describe('openSseTransport - server wire-format parity (IP-3)', () => {
 
     const frames: ServerMessage[] = [];
     const closes: unknown[] = [];
+    // The transport fires onClose only AFTER the read loop finished, i.e.
+    // after every frame of the (finite) fixture stream was dispatched -
+    // awaiting it is a complete barrier. A fixed sleep here flaked on
+    // loaded CI runners: the producer's inter-chunk timers stretch under
+    // load while the single sleep does not.
+    let resolveClosed!: () => void;
+    const closed = new Promise<void>((resolve) => {
+      resolveClosed = resolve;
+    });
     const transport = await openSseTransport(
       {
         url: 'http://local.test/v1/sessions/sess-1/events',
@@ -95,10 +104,11 @@ describe('openSseTransport - server wire-format parity (IP-3)', () => {
         onError: () => {},
         onClose: (r) => {
           closes.push(r);
+          resolveClosed();
         },
       },
     );
-    await new Promise((r) => setTimeout(r, 80));
+    await closed;
 
     // fetch carries the Authorization header natively (EventSource
     // could not without a polyfill).
@@ -149,15 +159,24 @@ describe('openSseTransport - server wire-format parity (IP-3)', () => {
     const fetchImpl = (async () =>
       streamResponse([encodeSse({ event: 'big', id: 'evt-9', data: pretty })])) as typeof fetch;
     const frames: ServerMessage[] = [];
+    let resolveClosed!: () => void;
+    const closed = new Promise<void>((resolve) => {
+      resolveClosed = resolve;
+    });
     await openSseTransport(
       {
         url: 'http://x/v1/sessions/s/events',
         auth: { kind: 'bearer', token: 't' },
         fetch: fetchImpl,
       },
-      { onOpen: () => {}, onFrame: (f) => frames.push(f), onError: () => {}, onClose: () => {} },
+      {
+        onOpen: () => {},
+        onFrame: (f) => frames.push(f),
+        onError: () => {},
+        onClose: () => resolveClosed(),
+      },
     );
-    await new Promise((r) => setTimeout(r, 40));
+    await closed;
     expect((frames[0] as { eventId?: string })?.eventId).toBe('evt-9');
   });
 
