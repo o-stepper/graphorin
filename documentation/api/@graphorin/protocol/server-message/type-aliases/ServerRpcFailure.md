@@ -10,6 +10,6 @@
 type ServerRpcFailure = z.infer<typeof RpcFailure>;
 ```
 
-Defined in: server-message.ts:175
+Defined in: src/server-message.ts:175
 
 ## Stable

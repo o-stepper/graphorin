@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-transformersjs](/api/@graphorin/reranker-transformersjs/index.md) / RerankerDtype
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-transformersjs](/api/@graphorin/reranker-transformersjs/index.md) / [](/api/@graphorin/reranker-transformersjs/README.md) / RerankerDtype
 
 # Type Alias: RerankerDtype
 

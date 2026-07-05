@@ -10,7 +10,7 @@
 function negotiateSubprotocol(clientList): string | null;
 ```
 
-Defined in: subprotocol.ts:87
+Defined in: src/subprotocol.ts:87
 
 Pick the single subprotocol the server should echo back. Returns
 `SUBPROTOCOL_NAME` when the client offered it, or `null` when no

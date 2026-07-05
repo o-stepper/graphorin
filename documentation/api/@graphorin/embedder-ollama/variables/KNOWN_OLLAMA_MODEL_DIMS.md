@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / KNOWN\_OLLAMA\_MODEL\_DIMS
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / [](/api/@graphorin/embedder-ollama/README.md) / KNOWN\_OLLAMA\_MODEL\_DIMS
 
 # Variable: KNOWN\_OLLAMA\_MODEL\_DIMS
 
@@ -10,7 +10,7 @@
 const KNOWN_OLLAMA_MODEL_DIMS: ReadonlyMap<string, number>;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:103
+Defined in: packages/embedder-ollama/src/index.ts:105
 
 Model -> output-dimension hints used to seed the canonical id before the
 first `embed()` resolves the real width from a response. Only single-width

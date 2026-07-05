@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / LlamaCppNativeCounter
+[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / [](/api/@graphorin/provider-llamacpp-node/README.md) / LlamaCppNativeCounter
 
 # Class: LlamaCppNativeCounter
 
-Defined in: counter.ts:34
+Defined in: src/counter.ts:34
 
 Counter that delegates to `model.tokenize(text)` from the loaded
 GGUF instance. Cache invalidation is keyed on the model file path
@@ -27,7 +27,7 @@ upstream.
 new LlamaCppNativeCounter(options): LlamaCppNativeCounter;
 ```
 
-Defined in: counter.ts:39
+Defined in: src/counter.ts:39
 
 #### Parameters
 
@@ -43,8 +43,8 @@ Defined in: counter.ts:39
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | counter.ts:35 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | counter.ts:36 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | src/counter.ts:35 |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | src/counter.ts:36 |
 
 ## Methods
 
@@ -54,7 +54,7 @@ Defined in: counter.ts:39
 count(messages): Promise<number>;
 ```
 
-Defined in: counter.ts:46
+Defined in: src/counter.ts:46
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -80,7 +80,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: counter.ts:55
+Defined in: src/counter.ts:55
 
 Count tokens in a raw text string.
 

@@ -79,4 +79,5 @@ MIT © 2026 [Oleksiy Stepurenko](https://github.com/o-stepper).
 | Module | Description |
 | ------ | ------ |
 | [](/api/@graphorin/pricing/README.md) | @graphorin/pricing - bundled LLM pricing snapshot for the Graphorin framework. |
+| [package.json](/api/@graphorin/pricing/package.json/index.md) | - |
 | [snapshot](/api/@graphorin/pricing/snapshot/index.md) | Bundled pricing snapshot surface. |

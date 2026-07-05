@@ -10,7 +10,7 @@
 function parseTicketSubprotocol(clientList): string | undefined;
 ```
 
-Defined in: subprotocol.ts:67
+Defined in: src/subprotocol.ts:67
 
 Extract the ticket value from a single comma-separated client list
 (e.g. `'graphorin.protocol.v1, ticket.abc-123'`). Returns

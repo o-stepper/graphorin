@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite-encrypted](/api/@graphorin/store-sqlite-encrypted/index.md) / cipherIntegrityCheck
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite-encrypted](/api/@graphorin/store-sqlite-encrypted/index.md) / [](/api/@graphorin/store-sqlite-encrypted/README.md) / cipherIntegrityCheck
 
 # Function: cipherIntegrityCheck()
 

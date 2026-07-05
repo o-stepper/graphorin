@@ -133,6 +133,7 @@ The most-frequently-touched options:
 | [health](/api/@graphorin/server/health/index.md) | `@graphorin/server/health` - Phase 14c health + Prometheus metrics surface. Phase 14a's `/v1/health` is superseded by the extended routes built here when consumers wire the additional probes. |
 | [metrics](/api/@graphorin/server/metrics/index.md) | `@graphorin/server/metrics` - Phase 14c Prometheus exposition layer. |
 | [middleware](/api/@graphorin/server/middleware/index.md) | Middleware barrel for `@graphorin/server`. Every entry is a Hono `MiddlewareHandler`; they are composed by the `createServer({...})` factory in a fixed order: |
+| [package.json](/api/@graphorin/server/package.json/index.md) | - |
 | [registry](/api/@graphorin/server/registry/index.md) | Registry plumbing that lets the server route handlers locate user- defined agents, workflows, sessions, memory, skills, and MCP server bindings without taking a hard peer dependency on every sibling package. |
 | [replay](/api/@graphorin/server/replay/index.md) | `@graphorin/server/replay` - Phase 14c scope-enforced replay endpoints + audit integration. |
 | [sse](/api/@graphorin/server/sse/index.md) | Server-Sent Events fallback transport for `@graphorin/server`. |

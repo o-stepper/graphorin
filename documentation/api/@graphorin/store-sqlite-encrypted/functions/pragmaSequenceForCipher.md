@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite-encrypted](/api/@graphorin/store-sqlite-encrypted/index.md) / pragmaSequenceForCipher
+[Graphorin API reference](/api/index.md) / [@graphorin/store-sqlite-encrypted](/api/@graphorin/store-sqlite-encrypted/index.md) / [](/api/@graphorin/store-sqlite-encrypted/README.md) / pragmaSequenceForCipher
 
 # Function: pragmaSequenceForCipher()
 

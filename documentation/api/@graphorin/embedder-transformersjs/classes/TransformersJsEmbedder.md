@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / TransformersJsEmbedder
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / TransformersJsEmbedder
 
 # Class: TransformersJsEmbedder
 
-Defined in: packages/embedder-transformersjs/src/index.ts:135
+Defined in: packages/embedder-transformersjs/src/index.ts:137
 
 `EmbedderProvider` implementation backed by `@huggingface/transformers`.
 
@@ -24,7 +24,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:135
 new TransformersJsEmbedder(options): TransformersJsEmbedder;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:150
+Defined in: packages/embedder-transformersjs/src/index.ts:152
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:150
 configHash(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:186
+Defined in: packages/embedder-transformersjs/src/index.ts:188
 
 Stable hash of the embedder's configuration (model + revision + opts).
 
@@ -64,7 +64,7 @@ Stable hash of the embedder's configuration (model + revision + opts).
 dim(): number;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:177
+Defined in: packages/embedder-transformersjs/src/index.ts:179
 
 Output dimension - the explicit `dim` option, a known-model
 default, or the width resolved from the first `embed()`.
@@ -91,7 +91,7 @@ embedder swap.
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:202
+Defined in: packages/embedder-transformersjs/src/index.ts:204
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 
@@ -118,7 +118,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 id(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:163
+Defined in: packages/embedder-transformersjs/src/index.ts:165
 
 Stable identifier (e.g. `'transformersjs:Xenova/multilingual-e5-base'`).
 

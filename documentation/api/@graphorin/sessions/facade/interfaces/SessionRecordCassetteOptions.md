@@ -6,7 +6,7 @@
 
 # Interface: SessionRecordCassetteOptions
 
-Defined in: packages/sessions/src/facade.ts:279
+Defined in: packages/sessions/src/facade.ts:280
 
 Options accepted by `Session.recordToolCassette({...})`.
 
@@ -25,6 +25,6 @@ Options accepted by `Session.recordToolCassette({...})`.
 | <a id="property-minruntimeversion"></a> `minRuntimeVersion?` | `readonly` | `string` | - | [`ToolCassetteRecorderOptions`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md).[`minRuntimeVersion`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md#property-minruntimeversion) | packages/sessions/src/cassette/writer.ts:40 |
 | <a id="property-now"></a> `now?` | `readonly` | () => `number` | - | [`ToolCassetteRecorderOptions`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md).[`now`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md#property-now) | packages/sessions/src/cassette/writer.ts:43 |
 | <a id="property-outputpath"></a> `outputPath?` | `readonly` | `string` | Filesystem path the cassette is destined for (used by `flushToFile`). | [`ToolCassetteRecorderOptions`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md).[`outputPath`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md#property-outputpath) | packages/sessions/src/cassette/recorder.ts:43 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | - | - | packages/sessions/src/facade.ts:281 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | - | - | packages/sessions/src/facade.ts:282 |
 | <a id="property-schemaurl"></a> `schemaUrl?` | `readonly` | `string` | - | [`ToolCassetteRecorderOptions`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md).[`schemaUrl`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md#property-schemaurl) | packages/sessions/src/cassette/writer.ts:41 |
-| <a id="property-writer"></a> `writer?` | `readonly` | `string` | - | - | packages/sessions/src/facade.ts:282 |
+| <a id="property-writer"></a> `writer?` | `readonly` | `string` | - | - | packages/sessions/src/facade.ts:283 |

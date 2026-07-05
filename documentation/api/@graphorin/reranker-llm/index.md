@@ -138,66 +138,9 @@ MIT © 2026 Oleksiy Stepurenko
 
 **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/reranker-llm - LLM-as-reranker adapter for the Graphorin
-framework.
+## Modules
 
-Asks the configured `Provider` to score `(query, passage)` pairs
-against a deterministic scoring prompt; runs scoring in parallel
-batches via `Promise.all()`. Drop-in replacement for the built-in
-`RRFReranker`:
-
-```ts
-import { createMemory } from '@graphorin/memory';
-import { createLlmReranker } from '@graphorin/reranker-llm';
-
-const memory = createMemory({
-  store,
-  embedder,
-  reranker: createLlmReranker({ provider }),
-});
-```
-
-Defaults: `temperature: 0`, `batchSize: 5`, `maxScore: 10`. The
-default scoring prompt is English; operators that target a
-different locale pass `scoringPrompt: <localised builder>` per the
-Phase 16 spec (the package's defaults are locale-agnostic, not
-locale-privileging).
-
-## Classes
-
-| Class | Description |
+| Module | Description |
 | ------ | ------ |
-| [LlmReRanker](/api/@graphorin/reranker-llm/classes/LlmReRanker.md) | `ReRanker` implementation. Matches the contract from `@graphorin/memory/search`. |
-
-## Interfaces
-
-| Interface | Description |
-| ------ | ------ |
-| [LlmRerankerOptions](/api/@graphorin/reranker-llm/interfaces/LlmRerankerOptions.md) | Options accepted by [createLlmReranker](/api/@graphorin/reranker-llm/functions/createLlmReranker.md). |
-| [ScoringPrompt](/api/@graphorin/reranker-llm/interfaces/ScoringPrompt.md) | Result of a [ScoringPromptBuilder](/api/@graphorin/reranker-llm/type-aliases/ScoringPromptBuilder.md) call. The system message is forwarded verbatim to the provider; the user message is the per-pair instruction. |
-| [ScoringPromptInput](/api/@graphorin/reranker-llm/interfaces/ScoringPromptInput.md) | Inputs passed to a [ScoringPromptBuilder](/api/@graphorin/reranker-llm/type-aliases/ScoringPromptBuilder.md). |
-
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [PassageExtractor](/api/@graphorin/reranker-llm/type-aliases/PassageExtractor.md) | - |
-| [ScoringPromptBuilder](/api/@graphorin/reranker-llm/type-aliases/ScoringPromptBuilder.md) | Function shape consumed by [createLlmReranker](/api/@graphorin/reranker-llm/functions/createLlmReranker.md). |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [defaultScoringPrompt](/api/@graphorin/reranker-llm/variables/defaultScoringPrompt.md) | Default English scoring prompt. Asks the model to emit a single integer in `[0, maxScore]` and to omit any other text. The passage is wrapped in explicit delimiters and framed as untrusted DATA - never instructions - so a poisoned memory can't steer its own relevance score (PS-14). |
-| [RERANKER\_ID](/api/@graphorin/reranker-llm/variables/RERANKER_ID.md) | - |
-| [VERSION](/api/@graphorin/reranker-llm/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [createLlmReranker](/api/@graphorin/reranker-llm/functions/createLlmReranker.md) | Build an LLM-as-reranker. The reranker is stateless past the provider reference - the provider's own session / connection lifecycle owns the network resources. |
-| [defaultPassageExtractor](/api/@graphorin/reranker-llm/functions/defaultPassageExtractor.md) | Walks `text → summary → value → label → id` to find the best passage representation of a memory record. |
-| [mergeAndDedupe](/api/@graphorin/reranker-llm/functions/mergeAndDedupe.md) | Merge per-source lists, keeping the highest initial score per record id. Pure function; exported for the unit fixture. |
-| [normalizeScore](/api/@graphorin/reranker-llm/functions/normalizeScore.md) | Normalise a raw integer score into `[0, 1]`. Rejects out-of-range inputs by clamping; returns the configured fallback when the input is `null` (parse failed upstream). |
-| [parseIntegerResponse](/api/@graphorin/reranker-llm/functions/parseIntegerResponse.md) | - |
+| [](/api/@graphorin/reranker-llm/README.md) | @graphorin/reranker-llm - LLM-as-reranker adapter for the Graphorin framework. |
+| [package.json](/api/@graphorin/reranker-llm/package.json/index.md) | - |

@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / runToolRules
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / runToolRules
 
 # Function: runToolRules()
 
@@ -10,7 +10,7 @@
 function runToolRules(tool, severityOverrides?): LintFinding[];
 ```
 
-Defined in: tool-discovery.ts:215
+Defined in: src/tool-discovery.ts:215
 
 Run the three RB-49 rules against a discovered tool and return the
 findings. The CLI grader maps these findings into per-axis scores;

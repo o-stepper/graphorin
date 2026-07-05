@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-transformersjs](/api/@graphorin/reranker-transformersjs/index.md) / DEFAULT\_ENGLISH\_MODEL
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-transformersjs](/api/@graphorin/reranker-transformersjs/index.md) / [](/api/@graphorin/reranker-transformersjs/README.md) / DEFAULT\_ENGLISH\_MODEL
 
 # Variable: DEFAULT\_ENGLISH\_MODEL
 

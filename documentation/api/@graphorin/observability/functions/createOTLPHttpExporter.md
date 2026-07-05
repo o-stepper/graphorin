@@ -10,7 +10,7 @@
 function createOTLPHttpExporter(opts): TraceExporter;
 ```
 
-Defined in: packages/observability/src/exporters/otlp-http.ts:55
+Defined in: packages/observability/src/exporters/otlp-http.ts:56
 
 Build a minimal OTLP-over-HTTP trace exporter. Call
 `withValidation(exporter)` before passing the result to

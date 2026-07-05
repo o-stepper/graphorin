@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / LlamaModelInstance
+[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / [](/api/@graphorin/provider-llamacpp-node/README.md) / LlamaModelInstance
 
 # Interface: LlamaModelInstance
 
-Defined in: runtime.ts:23
+Defined in: src/runtime.ts:23
 
 **`Internal`**
 
@@ -16,7 +16,7 @@ Loaded GGUF model.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-traincontextsize"></a> `trainContextSize?` | `readonly` | `number` | runtime.ts:24 |
+| <a id="property-traincontextsize"></a> `trainContextSize?` | `readonly` | `number` | src/runtime.ts:24 |
 
 ## Methods
 
@@ -31,7 +31,7 @@ createContext(args?): Promise<{
 }>;
 ```
 
-Defined in: runtime.ts:26
+Defined in: src/runtime.ts:26
 
 #### Parameters
 
@@ -57,7 +57,7 @@ Defined in: runtime.ts:26
 optional dispose(): Promise<void>;
 ```
 
-Defined in: runtime.ts:30
+Defined in: src/runtime.ts:30
 
 #### Returns
 
@@ -74,7 +74,7 @@ tokenize(text):
   | readonly number[];
 ```
 
-Defined in: runtime.ts:25
+Defined in: src/runtime.ts:25
 
 #### Parameters
 

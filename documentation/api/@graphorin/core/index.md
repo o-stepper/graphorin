@@ -85,5 +85,6 @@ records are still being refined for v0.2.
 | [](/api/@graphorin/core/README.md) | @graphorin/core - types, contracts, and utilities for the Graphorin framework. Dependency-free root package every other `@graphorin/*` package depends on. |
 | [channels](/api/@graphorin/core/channels/index.md) | Workflow channel kinds + control-flow primitives. |
 | [contracts](/api/@graphorin/core/contracts/index.md) | Cross-package contracts for the Graphorin framework. |
+| [package.json](/api/@graphorin/core/package.json/index.md) | - |
 | [types](/api/@graphorin/core/types/index.md) | Plain TypeScript types for the Graphorin framework. |
 | [utils](/api/@graphorin/core/utils/index.md) | Tiny dependency-free helpers used across the @graphorin/* packages. |

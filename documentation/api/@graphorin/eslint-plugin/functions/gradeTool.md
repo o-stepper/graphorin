@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / gradeTool
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / gradeTool
 
 # Function: gradeTool()
 
@@ -10,7 +10,7 @@
 function gradeTool(tool, findings): ToolGraderScore;
 ```
 
-Defined in: tool-discovery.ts:345
+Defined in: src/tool-discovery.ts:345
 
 Compute the per-tool grader score (0..100). Each axis is gated by
 the findings produced for that axis. The rubric is calibrated

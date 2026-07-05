@@ -10,7 +10,7 @@
 function isInitializeRequest(message): message is { id: string | number; jsonrpc: "2.0"; method: "initialize"; params: { capabilities?: Record<string, unknown>; clientInfo: { name: string; version: string } }; v: "1" };
 ```
 
-Defined in: client-message.ts:163
+Defined in: src/client-message.ts:163
 
 Type guard helpers - one per `method` literal - so consumers can
 narrow the `ClientMessage` union without re-stringifying the

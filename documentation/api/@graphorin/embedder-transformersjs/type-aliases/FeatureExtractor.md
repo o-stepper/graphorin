@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / FeatureExtractor
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / FeatureExtractor
 
 # Type Alias: FeatureExtractor
 
@@ -14,7 +14,7 @@ type FeatureExtractor = (texts, options?) => Promise<{
 }>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:84
+Defined in: packages/embedder-transformersjs/src/index.ts:86
 
 **`Internal`**
 

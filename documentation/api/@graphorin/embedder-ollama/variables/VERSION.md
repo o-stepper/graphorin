@@ -2,14 +2,12 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / VERSION
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-ollama](/api/@graphorin/embedder-ollama/index.md) / [](/api/@graphorin/embedder-ollama/README.md) / VERSION
 
 # Variable: VERSION
 
 ```ts
-const VERSION: "0.6.0" = '0.6.0';
+const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:12
-
-Canonical version constant. Mirrors the `package.json` version.
+Defined in: packages/embedder-ollama/src/index.ts:14

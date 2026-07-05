@@ -14,7 +14,7 @@ function cron(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:82
+Defined in: packages/triggers/src/index.ts:84
 
 Build a cron trigger declaration. The expression is validated
 eagerly - a malformed cron expression throws at registration time,

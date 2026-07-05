@@ -10,7 +10,7 @@
 type TriggerCallback = (payload?) => void | Promise<void>;
 ```
 
-Defined in: packages/triggers/src/index.ts:59
+Defined in: packages/triggers/src/index.ts:61
 
 Trigger callback. Receives an optional `payload` for `event`
 triggers; for cron / interval / idle triggers `payload` is

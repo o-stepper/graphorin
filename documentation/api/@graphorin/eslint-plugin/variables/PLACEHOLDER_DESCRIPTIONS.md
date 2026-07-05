@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / PLACEHOLDER\_DESCRIPTIONS
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / PLACEHOLDER\_DESCRIPTIONS
 
 # Variable: PLACEHOLDER\_DESCRIPTIONS
 
@@ -10,7 +10,7 @@
 const PLACEHOLDER_DESCRIPTIONS: ReadonlyArray<string>;
 ```
 
-Defined in: tool-discovery.ts:165
+Defined in: src/tool-discovery.ts:165
 
 Placeholder values the description-required rule treats as
 non-descriptions.

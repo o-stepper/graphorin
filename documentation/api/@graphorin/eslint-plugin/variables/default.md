@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / default
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / default
 
 # Variable: default
 
@@ -23,7 +23,7 @@ const default: {
 };
 ```
 
-Defined in: index.ts:72
+Defined in: src/index.ts:73
 
 PS-17: ship BOTH config shapes. `recommended` is the legacy `.eslintrc` form
 (`plugins: ['@graphorin']`); `flat/recommended` is the ESLint 9+ flat-config
@@ -34,12 +34,12 @@ can `...plugin.configs['flat/recommended']` instead of hand-wiring ten rules.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-configs"></a> `configs` | \{ `flat/recommended`: \{ `plugins`: `Record`\&lt;`string`, `unknown`\&gt;; `rules`: *typeof* `RECOMMENDED_RULES`; \}; `recommended`: \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \}; \} | index.ts:75 |
-| `configs.flat/recommended` | \{ `plugins`: `Record`\&lt;`string`, `unknown`\&gt;; `rules`: *typeof* `RECOMMENDED_RULES`; \} | index.ts:80 |
-| `configs.flat/recommended.plugins` | `Record`\&lt;`string`, `unknown`\&gt; | index.ts:81 |
-| `configs.flat/recommended.rules` | *typeof* `RECOMMENDED_RULES` | index.ts:82 |
-| `configs.recommended` | \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \} | index.ts:76 |
-| `configs.recommended.plugins` | readonly `string`[] | index.ts:77 |
-| `configs.recommended.rules` | *typeof* `RECOMMENDED_RULES` | index.ts:78 |
-| <a id="property-meta"></a> `meta` | *typeof* [`meta`](/api/@graphorin/eslint-plugin/variables/meta.md) | index.ts:73 |
-| <a id="property-rules"></a> `rules` | *typeof* [`rules`](/api/@graphorin/eslint-plugin/variables/rules.md) | index.ts:74 |
+| <a id="property-configs"></a> `configs` | \{ `flat/recommended`: \{ `plugins`: `Record`\&lt;`string`, `unknown`\&gt;; `rules`: *typeof* `RECOMMENDED_RULES`; \}; `recommended`: \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \}; \} | src/index.ts:76 |
+| `configs.flat/recommended` | \{ `plugins`: `Record`\&lt;`string`, `unknown`\&gt;; `rules`: *typeof* `RECOMMENDED_RULES`; \} | src/index.ts:81 |
+| `configs.flat/recommended.plugins` | `Record`\&lt;`string`, `unknown`\&gt; | src/index.ts:82 |
+| `configs.flat/recommended.rules` | *typeof* `RECOMMENDED_RULES` | src/index.ts:83 |
+| `configs.recommended` | \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \} | src/index.ts:77 |
+| `configs.recommended.plugins` | readonly `string`[] | src/index.ts:78 |
+| `configs.recommended.rules` | *typeof* `RECOMMENDED_RULES` | src/index.ts:79 |
+| <a id="property-meta"></a> `meta` | *typeof* [`meta`](/api/@graphorin/eslint-plugin/variables/meta.md) | src/index.ts:74 |
+| <a id="property-rules"></a> `rules` | *typeof* [`rules`](/api/@graphorin/eslint-plugin/variables/rules.md) | src/index.ts:75 |

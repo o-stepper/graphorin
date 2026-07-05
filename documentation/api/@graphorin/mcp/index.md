@@ -317,4 +317,5 @@ MIT - © 2026 Oleksiy Stepurenko.
 | [errors](/api/@graphorin/mcp/errors/index.md) | Typed error union for the `@graphorin/mcp` package. |
 | [helpers](/api/@graphorin/mcp/helpers/index.md) | Helper utilities exposed by `@graphorin/mcp`. |
 | [oauth](/api/@graphorin/mcp/oauth/index.md) | OAuth integration surface for `@graphorin/mcp`. |
+| [package.json](/api/@graphorin/mcp/package.json/index.md) | - |
 | [transport](/api/@graphorin/mcp/transport/index.md) | Transport descriptors + identity helpers for `@graphorin/mcp`. |

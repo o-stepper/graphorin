@@ -160,3 +160,4 @@ MIT © 2026 Oleksiy Stepurenko.
 | [connection](/api/@graphorin/store-sqlite/connection/index.md) | - |
 | [encryption](/api/@graphorin/store-sqlite/encryption/index.md) | Encryption-at-rest interface hooks. |
 | [migrations](/api/@graphorin/store-sqlite/migrations/index.md) | Migration registry + runner for `@graphorin/store-sqlite`. |
+| [package.json](/api/@graphorin/store-sqlite/package.json/index.md) | - |

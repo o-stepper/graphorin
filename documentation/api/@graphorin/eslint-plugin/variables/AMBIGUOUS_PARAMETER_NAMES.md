@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / AMBIGUOUS\_PARAMETER\_NAMES
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / AMBIGUOUS\_PARAMETER\_NAMES
 
 # Variable: AMBIGUOUS\_PARAMETER\_NAMES
 
@@ -10,7 +10,7 @@
 const AMBIGUOUS_PARAMETER_NAMES: ReadonlyArray<string>;
 ```
 
-Defined in: tool-discovery.ts:130
+Defined in: src/tool-discovery.ts:130
 
 Generic identifiers the parameter-naming rule flags as ambiguous.
 Tools whose `inputSchema` references only specific identifiers

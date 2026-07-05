@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / PipelineFactory
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / PipelineFactory
 
 # Type Alias: PipelineFactory
 
@@ -10,7 +10,7 @@
 type PipelineFactory = (task, model, opts) => Promise<FeatureExtractor>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:98
+Defined in: packages/embedder-transformersjs/src/index.ts:100
 
 **`Internal`**
 

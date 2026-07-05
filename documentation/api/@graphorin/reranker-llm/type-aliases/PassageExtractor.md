@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / PassageExtractor
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / PassageExtractor
 
 # Type Alias: PassageExtractor\&lt;TRecord\&gt;
 
@@ -10,7 +10,7 @@
 type PassageExtractor<TRecord> = (record) => string;
 ```
 
-Defined in: text-extraction.ts:12
+Defined in: src/text-extraction.ts:12
 
 ## Type Parameters
 

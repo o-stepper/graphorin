@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / defaultPassageExtractor
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / defaultPassageExtractor
 
 # Function: defaultPassageExtractor()
 
@@ -10,7 +10,7 @@
 function defaultPassageExtractor(record): string;
 ```
 
-Defined in: text-extraction.ts:22
+Defined in: src/text-extraction.ts:22
 
 Walks `text → summary → value → label → id` to find the best
 passage representation of a memory record.

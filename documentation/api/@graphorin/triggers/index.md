@@ -88,3 +88,4 @@ MIT © 2026 Oleksiy Stepurenko.
 | ------ | ------ |
 | [](/api/@graphorin/triggers/README.md) | @graphorin/triggers - durable cron / interval / idle / event trigger scheduler for the Graphorin framework. |
 | [cron](/api/@graphorin/triggers/cron/index.md) | Tiny in-tree 5-field cron parser used by `@graphorin/triggers`. |
+| [package.json](/api/@graphorin/triggers/package.json/index.md) | - |

@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / PARAMETER\_NAMING\_OPT\_OUT\_TAGS
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / PARAMETER\_NAMING\_OPT\_OUT\_TAGS
 
 # Variable: PARAMETER\_NAMING\_OPT\_OUT\_TAGS
 
@@ -10,7 +10,7 @@
 const PARAMETER_NAMING_OPT_OUT_TAGS: ReadonlyArray<string>;
 ```
 
-Defined in: tool-discovery.ts:154
+Defined in: src/tool-discovery.ts:154
 
 Tag values that, when present in a tool's `tags: [...]` literal,
 suppress the parameter-naming rule for that tool. The opt-out

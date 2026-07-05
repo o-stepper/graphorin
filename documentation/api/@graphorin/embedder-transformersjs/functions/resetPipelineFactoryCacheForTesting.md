@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / \_resetPipelineFactoryCacheForTesting
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / \_resetPipelineFactoryCacheForTesting
 
 # Function: \_resetPipelineFactoryCacheForTesting()
 
@@ -10,7 +10,7 @@
 function _resetPipelineFactoryCacheForTesting(): void;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:287
+Defined in: packages/embedder-transformersjs/src/index.ts:289
 
 Test-only cache reset.
 

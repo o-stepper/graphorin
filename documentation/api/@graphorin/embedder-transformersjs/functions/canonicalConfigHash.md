@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / canonicalConfigHash
+[Graphorin API reference](/api/index.md) / [@graphorin/embedder-transformersjs](/api/@graphorin/embedder-transformersjs/index.md) / [](/api/@graphorin/embedder-transformersjs/README.md) / canonicalConfigHash
 
 # Function: canonicalConfigHash()
 
@@ -10,7 +10,7 @@
 function canonicalConfigHash(config): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:321
+Defined in: packages/embedder-transformersjs/src/index.ts:323
 
 Canonical-JSON deterministic hash of an embedder configuration.
 Object keys are sorted lexicographically; primitives flow through as

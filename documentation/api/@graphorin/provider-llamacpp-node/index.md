@@ -87,49 +87,9 @@ discipline rather than enforcing it at runtime.
 - **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko
 - Repository: <https://github.com/o-stepper/graphorin>
 
-@graphorin/provider-llamacpp-node - in-process GGUF execution
-adapter for the Graphorin framework. The package wraps
-`node-llama-cpp@^3.5` to load `.gguf` model files directly into the
-same Node process - no daemon, no port to manage, no GPU contention
-with other processes.
+## Modules
 
-The adapter declares `trust: 'loopback'` permanently because the
-model lives in the same trust boundary as the host process; the
-symmetry mirrors `@graphorin/embedder-transformersjs` (in-process
-embedder; same trust boundary).
-
-The companion package is operationally simpler than the HTTP-shaped
-adapters but does NOT survive a process restart mid-stream - the
-model context lives in the process and is lost on exit. For HITL
-durable mid-stream resume, one of the HTTP-shaped adapters
-(`ollamaAdapter`, `llamaCppServerAdapter`, `openAICompatibleAdapter`)
-is the better choice.
-
-## Classes
-
-| Class | Description |
+| Module | Description |
 | ------ | ------ |
-| [LlamaCppNativeCounter](/api/@graphorin/provider-llamacpp-node/classes/LlamaCppNativeCounter.md) | Counter that delegates to `model.tokenize(text)` from the loaded GGUF instance. Cache invalidation is keyed on the model file path (when supplied) so swapping models invalidates per-message caches upstream. |
-
-## Interfaces
-
-| Interface | Description |
-| ------ | ------ |
-| [LlamaCppNativeCounterOptions](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaCppNativeCounterOptions.md) | Options for [LlamaCppNativeCounter](/api/@graphorin/provider-llamacpp-node/classes/LlamaCppNativeCounter.md). |
-| [LlamaCppNodeAdapterOptions](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaCppNodeAdapterOptions.md) | Options accepted by [llamaCppNodeAdapter](/api/@graphorin/provider-llamacpp-node/functions/llamaCppNodeAdapter.md). |
-| [LlamaCppNodeRuntimeOverrides](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaCppNodeRuntimeOverrides.md) | Test-only shape for injecting fixture-driven runtime behaviour. |
-| [LlamaInstance](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaInstance.md) | `Llama` engine instance (returned by `getLlama()`). |
-| [LlamaModelInstance](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaModelInstance.md) | Loaded GGUF model. |
-| [LlamaSessionInstance](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaSessionInstance.md) | Loaded chat session capable of streaming responses. |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [VERSION](/api/@graphorin/provider-llamacpp-node/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [llamaCppNodeAdapter](/api/@graphorin/provider-llamacpp-node/functions/llamaCppNodeAdapter.md) | Build a Graphorin [Provider](/api/@graphorin/core/interfaces/Provider.md) backed by an in-process GGUF model. The first call lazily loads the `node-llama-cpp` peer + the model file; subsequent calls reuse the cached instances. |
+| [](/api/@graphorin/provider-llamacpp-node/README.md) | @graphorin/provider-llamacpp-node - in-process GGUF execution adapter for the Graphorin framework. The package wraps `node-llama-cpp@^3.5` to load `.gguf` model files directly into the same Node process - no daemon, no port to manage, no GPU contention with other processes. |
+| [package.json](/api/@graphorin/provider-llamacpp-node/package.json/index.md) | - |

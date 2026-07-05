@@ -14,7 +14,7 @@ function idle(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:112
+Defined in: packages/triggers/src/index.ts:114
 
 ## Parameters
 

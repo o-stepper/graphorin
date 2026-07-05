@@ -18,7 +18,7 @@ type GraphorinCloseReason =
   | "protocol.violation";
 ```
 
-Defined in: close-codes.ts:15
+Defined in: src/close-codes.ts:15
 
 Discriminator for every Graphorin-defined close code. The
 matching numeric value is exposed via [CLOSE\_CODE\_VALUES](/api/@graphorin/protocol/close-codes/variables/CLOSE_CODE_VALUES.md).

@@ -14,7 +14,7 @@ function interval(
    options?): TriggerDeclaration;
 ```
 
-Defined in: packages/triggers/src/index.ts:93
+Defined in: packages/triggers/src/index.ts:95
 
 ## Parameters
 

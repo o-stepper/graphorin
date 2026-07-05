@@ -102,7 +102,8 @@ MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/gra
 | Module | Description |
 | ------ | ------ |
 | [](/api/@graphorin/client/README.md) | `@graphorin/client` - reference TypeScript client for the Graphorin standalone server. |
-| [client](/api/@graphorin/client/client/index.md) | `GraphorinClient` - ergonomic façade over the [Transport](/api/@graphorin/client/interfaces/Transport.md) contract. Handles: |
+| [client](/api/@graphorin/client/client/index.md) | - |
 | [errors](/api/@graphorin/client/errors/index.md) | Typed error hierarchy surfaced by `@graphorin/client`. Every error class extends the JavaScript built-in `Error` and exposes a stable `kind` discriminator so consumers can pattern-match without relying on `instanceof` (which behaves badly across module-system boundaries when the package is dual-loaded). |
+| [package.json](/api/@graphorin/client/package.json/index.md) | - |
 | [reconnect](/api/@graphorin/client/reconnect/index.md) | Pure-functional reconnect-backoff helper. Encapsulated in its own module so the GraphorinClient stays free of timing heuristics - and so tests can drive the policy with a deterministic RNG. |
 | [transport](/api/@graphorin/client/transport/index.md) | Transport barrel for `@graphorin/client`. |

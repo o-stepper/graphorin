@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / defaultScoringPrompt
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / defaultScoringPrompt
 
 # Variable: defaultScoringPrompt
 
@@ -10,7 +10,7 @@
 const defaultScoringPrompt: ScoringPromptBuilder;
 ```
 
-Defined in: scoring-prompt.ts:69
+Defined in: src/scoring-prompt.ts:69
 
 Default English scoring prompt. Asks the model to emit a single integer in
 `[0, maxScore]` and to omit any other text. The passage is wrapped in

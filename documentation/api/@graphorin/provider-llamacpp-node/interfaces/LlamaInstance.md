@@ -2,11 +2,11 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / LlamaInstance
+[Graphorin API reference](/api/index.md) / [@graphorin/provider-llamacpp-node](/api/@graphorin/provider-llamacpp-node/index.md) / [](/api/@graphorin/provider-llamacpp-node/README.md) / LlamaInstance
 
 # Interface: LlamaInstance
 
-Defined in: runtime.ts:14
+Defined in: src/runtime.ts:14
 
 **`Internal`**
 
@@ -20,7 +20,7 @@ Defined in: runtime.ts:14
 loadModel(args): Promise<LlamaModelInstance>;
 ```
 
-Defined in: runtime.ts:15
+Defined in: src/runtime.ts:15
 
 #### Parameters
 

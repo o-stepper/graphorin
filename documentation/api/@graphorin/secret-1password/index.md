@@ -175,61 +175,9 @@ MIT © 2026 Oleksiy Stepurenko
 
 **Project Graphorin** · v0.6.0 · MIT License · © 2026 Oleksiy Stepurenko · <https://github.com/o-stepper/graphorin>
 
-@graphorin/secret-1password - reference 1Password secret-resolver
-adapter for the Graphorin framework.
+## Modules
 
-Registers the `op://` scheme on top of `@graphorin/security`'s
-pluggable `SecretResolver` registry by shelling out to the official
-1Password CLI:
-
-```ts
-import { registerResolver } from '@graphorin/security';
-import { onePasswordResolver } from '@graphorin/secret-1password';
-
-registerResolver(onePasswordResolver);
-
-// Anywhere downstream:
-const apiKey = await resolveSecret('op://Personal/OpenAI/api-key');
-```
-
-The adapter is also the canonical template community packages
-should follow when wiring HashiCorp Vault, AWS Secrets Manager, GCP
-Secret Manager, Azure Key Vault, Bitwarden, or Unix `pass` as
-additional `SecretResolver` implementations.
-
-## Classes
-
-| Class | Description |
+| Module | Description |
 | ------ | ------ |
-| [OpCliError](/api/@graphorin/secret-1password/classes/OpCliError.md) | Typed error raised by the CLI wrapper. Carries a `kind` so callers can distinguish operator-fixable failure modes. |
-
-## Interfaces
-
-| Interface | Description |
-| ------ | ------ |
-| [OnePasswordResolverOptions](/api/@graphorin/secret-1password/interfaces/OnePasswordResolverOptions.md) | - |
-| [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) | - |
-| [OpCliReadOptions](/api/@graphorin/secret-1password/interfaces/OpCliReadOptions.md) | - |
-| [OpCliReadResult](/api/@graphorin/secret-1password/interfaces/OpCliReadResult.md) | - |
-
-## Type Aliases
-
-| Type Alias | Description |
-| ------ | ------ |
-| [OpCliErrorKind](/api/@graphorin/secret-1password/type-aliases/OpCliErrorKind.md) | - |
-
-## Variables
-
-| Variable | Description |
-| ------ | ------ |
-| [onePasswordResolver](/api/@graphorin/secret-1password/variables/onePasswordResolver.md) | Cache the default-options resolver so callers that just want the happy-path behaviour can use a constant export. |
-| [VERSION](/api/@graphorin/secret-1password/variables/VERSION.md) | Canonical version constant. Mirrors the `package.json` version. |
-
-## Functions
-
-| Function | Description |
-| ------ | ------ |
-| [createDefaultOpCli](/api/@graphorin/secret-1password/functions/createDefaultOpCli.md) | Default [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) implementation. Spawns `op read --no-color --reveal '<uri>'` with the configured timeout and inherits the parent environment. |
-| [createOnePasswordResolver](/api/@graphorin/secret-1password/functions/createOnePasswordResolver.md) | Build a `SecretResolver` that honours the `op://` scheme. Register with `registerResolver(...)` from `@graphorin/security` at app bootstrap. |
-| [createOpCli](/api/@graphorin/secret-1password/functions/createOpCli.md) | [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) factory with an injectable `spawn` (for tests). Production code uses [createDefaultOpCli](/api/@graphorin/secret-1password/functions/createDefaultOpCli.md). |
-| [normalizeOpUri](/api/@graphorin/secret-1password/functions/normalizeOpUri.md) | Lowercase the authority + path segments of an `op://` URI so two configs that differ only in case resolve to the same value (matching 1Password's case-insensitive behaviour). |
+| [](/api/@graphorin/secret-1password/README.md) | @graphorin/secret-1password - reference 1Password secret-resolver adapter for the Graphorin framework. |
+| [package.json](/api/@graphorin/secret-1password/package.json/index.md) | - |

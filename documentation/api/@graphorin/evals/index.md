@@ -195,5 +195,6 @@ MIT © 2026 Oleksiy Stepurenko
 | [](/api/@graphorin/evals/README.md) | @graphorin/evals - eval framework for the Graphorin framework. |
 | [cli](/api/@graphorin/evals/cli/index.md) | CLI integration helpers. Convenience wrappers that combine the runner + a reporter + an exit-code mapping so consumer scripts can stay short. |
 | [loaders](/api/@graphorin/evals/loaders/index.md) | Dataset loaders. Every loader returns a fully-materialised Dataset that the runner can iterate over without further I/O. Streaming loaders are a post-MVP follow-up. |
+| [package.json](/api/@graphorin/evals/package.json/index.md) | - |
 | [reporters](/api/@graphorin/evals/reporters/index.md) | Barrel export for every shipped reporter. Each renderer takes an `EvalReport` and returns the canonical text representation; the caller decides where to write it (`writeFile`, `process.stdout`, GitHub Actions step summary, etc.). |
 | [scorers](/api/@graphorin/evals/scorers/index.md) | Barrel export for every shipped scorer family. |

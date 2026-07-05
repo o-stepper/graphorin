@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / LintFindingKind
+[Graphorin API reference](/api/index.md) / [@graphorin/eslint-plugin](/api/@graphorin/eslint-plugin/index.md) / [](/api/@graphorin/eslint-plugin/README.md) / LintFindingKind
 
 # Type Alias: LintFindingKind
 
@@ -18,6 +18,6 @@ type LintFindingKind =
   | "parameter-numeric-suffix";
 ```
 
-Defined in: tool-discovery.ts:73
+Defined in: src/tool-discovery.ts:73
 
 ## Stable

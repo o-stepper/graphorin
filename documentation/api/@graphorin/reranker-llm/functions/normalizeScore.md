@@ -2,7 +2,7 @@
 
 ***
 
-[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / normalizeScore
+[Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / normalizeScore
 
 # Function: normalizeScore()
 
@@ -13,7 +13,7 @@ function normalizeScore(
    fallback): number;
 ```
 
-Defined in: reranker.ts:334
+Defined in: src/reranker.ts:334
 
 Normalise a raw integer score into `[0, 1]`. Rejects out-of-range
 inputs by clamping; returns the configured fallback when the input
