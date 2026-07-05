@@ -233,10 +233,16 @@ export async function dispatchToolCall(
               ),
           }),
           new Promise<never>((_, reject) => {
-            inlineTimer = setTimeout(
-              () => reject(new InlineToolTimeoutError(inlineLimitMs)),
-              inlineLimitMs,
-            );
+            inlineTimer = setTimeout(() => {
+              // W-031: actually STOP the tool, not just the await. A
+              // well-behaved tool listening on ctx.signal winds down
+              // instead of running to completion in the background
+              // (double side effects behind an already-reported
+              // timeout). No unhandled rejection: Promise.race keeps
+              // handlers on the losing promise.
+              linkedAbort.abort();
+              reject(new InlineToolTimeoutError(inlineLimitMs));
+            }, inlineLimitMs);
           }),
         ]);
       } finally {
@@ -274,7 +280,14 @@ export function completeExecutionFailure(
   },
 ): CompletedToolCall {
   const { call, tool, runContext, stepNumber, span, executeError, aggregator, durationMs } = input;
-  const cancelled = input.abortSignal.aborted;
+  // W-031 ordering: the inline timer now aborts the LINKED signal, so
+  // "linked signal aborted" no longer implies cancellation - a timeout
+  // must classify as 'timeout'. A REAL cancellation is visible on the
+  // parent run signal and still wins (a cancel racing the timer reads
+  // as aborted, which is what the caller asked for).
+  const parentAborted = runContext.signal.aborted;
+  const timedOut = executeError instanceof InlineToolTimeoutError && !parentAborted;
+  const cancelled = !timedOut && (parentAborted || input.abortSignal.aborted);
   const kind: ToolErrorKind = cancelled
     ? 'aborted'
     : executeError instanceof InlineToolTimeoutError
@@ -292,17 +305,37 @@ export function completeExecutionFailure(
     executeError instanceof ToolRateLimitError && executeError.retryAfterMs !== undefined
       ? `retry after ${executeError.retryAfterMs}ms`
       : undefined;
+  // W-031: 'timeout' defaults to recoverable + retry_later
+  // (recoveryForKind) - the right call for read-only/pure and for
+  // idempotency-keyed tools, but an open invitation to double-execute a
+  // NON-idempotent side-effecting tool whose first (timed-out) call may
+  // still have completed at the remote end (a slow payment API charges
+  // twice). Deterministic policy over the model-facing hint: explicit
+  // fields below win over recoveryForKind in frozenCompleted.
+  const nonIdempotentSideEffectTimeout =
+    kind === 'timeout' &&
+    (tool.__sideEffectClass === 'side-effecting' ||
+      tool.__sideEffectClass === 'external-stateful') &&
+    tool.__hasIdempotencyKey !== true;
+  const timeoutWarning = 'the first invocation may still have completed; do not retry blindly';
+  const baseHint =
+    retryAfterHint ??
+    (partialOutput !== undefined ? 'partial output captured in stream buffer' : undefined);
+  const hint = nonIdempotentSideEffectTimeout
+    ? baseHint !== undefined
+      ? `${baseHint}; ${timeoutWarning}`
+      : timeoutWarning
+    : baseHint;
   const error: ToolError = {
     toolCallId: call.toolCallId,
     toolName: tool.name,
     kind,
     message: cancelled ? 'Tool execution cancelled' : describe(executeError),
     cause: executeError,
-    ...(retryAfterHint !== undefined
-      ? { hint: retryAfterHint }
-      : partialOutput !== undefined
-        ? { hint: 'partial output captured in stream buffer' }
-        : {}),
+    ...(hint !== undefined ? { hint } : {}),
+    ...(nonIdempotentSideEffectTimeout
+      ? { recoverable: false, recoveryHint: 'report_to_user' as const }
+      : {}),
   };
   if (cancelled) {
     incrementCounter('tool.streaming.events.dropped.total', {

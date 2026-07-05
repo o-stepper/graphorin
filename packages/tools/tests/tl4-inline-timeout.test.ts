@@ -54,6 +54,67 @@ describe('TL-4 - inline tools get an enforced wall-clock timeout', () => {
     expect(afterOutcome.output).toBe('alive');
   });
 
+  it('W-031: the tool observes ctx.signal aborting at timeout; kind stays "timeout"', async () => {
+    const registry = createToolRegistry();
+    let sawAbort = false;
+    registry.register(
+      tool({
+        name: 'well_behaved_slow',
+        description: 'slow but listens to ctx.signal',
+        inputSchema: z.object({}),
+        sideEffectClass: 'pure',
+        execute: (_input, ctx) =>
+          new Promise((_resolve, reject) => {
+            ctx.signal?.addEventListener('abort', () => {
+              sawAbort = true;
+              reject(new Error('stopped by abort'));
+            });
+          }),
+      }),
+    );
+    const executor = createToolExecutor({ registry, inlineToolTimeoutMs: 50 });
+    const [completed] = await executor.executeBatch({
+      calls: [{ toolCallId: 'c1', toolName: 'well_behaved_slow', args: {} }],
+      runContext: makeRunContext(),
+      stepNumber: 1,
+    });
+    // Give the microtask queue a beat: the abort listener fires when the
+    // timer trips, before/with the rejection.
+    await new Promise((r) => setTimeout(r, 20));
+    expect(sawAbort).toBe(true);
+    const outcome = completed?.outcome;
+    if (outcome === undefined || !('kind' in outcome)) throw new Error('expected ToolError');
+    // NOT masked as 'aborted' - the linked signal fired because of the
+    // timer, and the parent run signal never aborted.
+    expect(outcome.kind).toBe('timeout');
+  });
+
+  it('W-031 regression: a REAL parent cancellation still classifies as aborted', async () => {
+    const registry = createToolRegistry();
+    registry.register(
+      tool({
+        name: 'hang2',
+        description: 'never settles',
+        inputSchema: z.object({}),
+        sideEffectClass: 'pure',
+        execute: () => new Promise(() => {}),
+      }),
+    );
+    const executor = createToolExecutor({ registry, inlineToolTimeoutMs: 5_000 });
+    const controller = new AbortController();
+    const runContext = { ...makeRunContext(), signal: controller.signal };
+    const pending = executor.executeBatch({
+      calls: [{ toolCallId: 'c1', toolName: 'hang2', args: {} }],
+      runContext,
+      stepNumber: 1,
+    });
+    setTimeout(() => controller.abort(), 30);
+    const [completed] = await pending;
+    const outcome = completed?.outcome;
+    if (outcome === undefined || !('kind' in outcome)) throw new Error('expected ToolError');
+    expect(outcome.kind).toBe('aborted');
+  });
+
   it('a fast tool is unaffected by the timeout', async () => {
     const registry = createToolRegistry();
     registry.register(
