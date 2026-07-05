@@ -129,6 +129,44 @@ export interface RunState {
 }
 
 /**
+ * Read-only projection of {@link RunState} handed to tools and hooks
+ * via {@link RunContext.state} (W-047). Structurally identical to
+ * `RunState` - `RunState` is assignable to it - but every property is
+ * `readonly` and every array a `ReadonlyArray`, so typed tool code
+ * cannot corrupt run bookkeeping (splice `pendingApprovals`, flip
+ * `status`, ...). This is a compile-time contract only: there is no
+ * runtime freeze. A hand-written mirror (not a generic DeepReadonly):
+ * the nested types are already readonly-typed, and keyof-parity with
+ * `RunState` is pinned by type tests.
+ *
+ * @stable
+ */
+export interface ReadonlyRunState {
+  readonly id: string;
+  readonly agentId: string;
+  readonly currentAgentId: string;
+  readonly sessionId: string;
+  readonly userId?: string;
+  readonly status: RunStatus;
+  readonly steps: ReadonlyArray<RunStep>;
+  readonly messages: ReadonlyArray<Message>;
+  readonly pendingApprovals: ReadonlyArray<ToolApproval>;
+  readonly handoffs: ReadonlyArray<HandoffRecord>;
+  readonly usage: Usage;
+  /** See {@link RunState.usageByModel}. */
+  readonly usageByModel?: RunStateUsageByModel;
+  /** See {@link RunState.taintSummary}. */
+  readonly taintSummary?: RunTaintSummary;
+  /** See {@link RunState.promotedTools}. */
+  readonly promotedTools?: ReadonlyArray<string>;
+  /** See {@link RunState.todos}. */
+  readonly todos?: ReadonlyArray<TodoItem>;
+  readonly startedAt: string;
+  readonly finishedAt?: string;
+  readonly error?: RunError;
+}
+
+/**
  * Coarse, serializable data-flow taint summary persisted in {@link RunState}
  * across suspend/resume (AG-19). Structurally identical to
  * `@graphorin/security`'s `TaintLedgerSnapshot`; carries no untrusted text.
@@ -222,7 +260,13 @@ export interface RunContext<TDeps = unknown> {
   readonly usage: UsageAccumulator;
   readonly stepNumber: number;
   readonly messages: ReadonlyArray<Message>;
-  readonly state: RunState;
+  /**
+   * Read-only snapshot of the run's state (W-047). Tools observe the
+   * run; they do not mutate its bookkeeping - writes to `status`,
+   * `pendingApprovals` etc. are compile errors. The runtime keeps the
+   * only mutable reference.
+   */
+  readonly state: ReadonlyRunState;
   /**
    * C7: the current `agent.step` span (when the runtime traces). Spans
    * created inside tool execution parent under it so a run's traces

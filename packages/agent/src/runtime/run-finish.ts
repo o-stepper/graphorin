@@ -30,7 +30,7 @@ export interface RunFinisherDeps {
 export function createRunFinisher<TOutput>(
   deps: RunFinisherDeps,
 ): (
-  state: MutableRunState,
+  state: MutableRunState & RunState,
   snapshot: InternalRunSnapshot<TOutput>,
 ) => AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
   const { pendingManualCompacts, spillWriter, checkpointStore, checkpointPolicy } = deps;
@@ -39,9 +39,13 @@ export function createRunFinisher<TOutput>(
    * Terminal wrapper around {@link finalize}: every exit path of the run
    * loop - completed, failed, aborted, suspended - ends the stream with
    * an `agent.end` event carrying the final {@link AgentResult} (AG-20).
+   *
+   * The parameter is `MutableRunState & RunState`: the single caller
+   * (factory `finishRun`) is typed exactly so, and the intersection lets
+   * {@link finalize} assemble `AgentResult.state` without a cast (W-047).
    */
   async function* finishRunBase(
-    state: MutableRunState,
+    state: MutableRunState & RunState,
     snapshot: InternalRunSnapshot<TOutput>,
   ): AsyncGenerator<AgentEvent<TOutput>, AgentResult<TOutput>, void> {
     // CE-3/AG-13: settle manual-compact requests the loop never serviced -
@@ -69,7 +73,7 @@ export function createRunFinisher<TOutput>(
   }
 
   function finalize(
-    state: MutableRunState,
+    state: MutableRunState & RunState,
     snapshot: InternalRunSnapshot<TOutput>,
   ): AgentResult<TOutput> {
     state.finishedAt = state.finishedAt ?? new Date().toISOString();
@@ -81,7 +85,7 @@ export function createRunFinisher<TOutput>(
       usage: state.usage,
       status: state.status,
       ...(state.error !== undefined ? { error: state.error } : {}),
-      state: state as unknown as RunState,
+      state,
     };
   }
 

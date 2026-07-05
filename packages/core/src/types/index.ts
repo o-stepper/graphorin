@@ -94,6 +94,7 @@ export type {
 } from './message.js';
 export {
   flattenUsageByModel,
+  type ReadonlyRunState,
   type RunContext,
   type RunError,
   type RunState,
