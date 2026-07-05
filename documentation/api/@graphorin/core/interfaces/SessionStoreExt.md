@@ -172,14 +172,22 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 deleteSession(sessionId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:144
+Defined in: packages/core/src/contracts/session-store.ts:152
 
 Hard-delete a session and cascade its session-owned rows - handoffs,
 workflow-run attachments, and audit entries (RP-6) - **plus the
 session's content**: its `session_messages` rows (with their FTS and
 vector index entries) and any episodes scoped to the session
-(store-01). After this call the conversation is no longer retrievable
-through `memory.session.*` search surfaces. A no-op for an unknown id.
+(store-01). The cascade also erases the checkpoints of suspended
+runs (W-005): `workflow_checkpoints` / `workflow_pending_writes`
+rows for every thread linked to the session, whether through the
+workflow-run attachment mapping or through the `sessionId`
+checkpoint metadata the agent runtime stamps on HITL suspends -
+those snapshots embed the full conversation. After this call the
+conversation is no longer retrievable through `memory.session.*`
+search surfaces nor resumable from its checkpoints. A no-op for an
+unknown id. Custom implementations must honour the same contract in
+full - leaving any of these surfaces behind defeats erasure.
 
 #### Parameters
 
@@ -361,7 +369,7 @@ Delete audit rows older than the supplied epoch ms.
 pruneSessions(opts): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:151
+Defined in: packages/core/src/contracts/session-store.ts:159
 
 Retention sweep (RP-6): hard-delete (cascade) every session matching the
 policy. `beforeEpochMs` limits to sessions created before that instant;

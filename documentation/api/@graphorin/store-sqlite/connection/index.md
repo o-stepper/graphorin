@@ -10,6 +10,7 @@
 
 | Class | Description |
 | ------ | ------ |
+| [SqliteBusyError](/api/@graphorin/store-sqlite/connection/classes/SqliteBusyError.md) | Typed wrapper for the driver's raw `SQLITE_BUSY` / `SQLITE_BUSY_SNAPSHOT` errors (W-067): the write lock stayed contended past `busy_timeout`. Carries `code = 'SQLITE_BUSY'` for compatibility with callers that already branch on the driver's `err.code`, plus the driver error as `cause`. No auto-retry by design (deterministic policies; the busy handler already waited the full `busy_timeout`). |
 | [SqliteVecMissingError](/api/@graphorin/store-sqlite/connection/classes/SqliteVecMissingError.md) | - |
 | [WalCheckpointManager](/api/@graphorin/store-sqlite/connection/classes/WalCheckpointManager.md) | Periodic `wal_checkpoint(RESTART)` runner. Invoked by the worker pool every `intervalMs` to bound WAL growth on long-running servers. |
 

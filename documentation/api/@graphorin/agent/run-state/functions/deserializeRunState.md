@@ -10,7 +10,7 @@
 function deserializeRunState(payload, options?): RunState;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:219
+Defined in: packages/agent/src/run-state/index.ts:232
 
 Rehydrate a [RunState](/api/@graphorin/core/interfaces/RunState.md) from the on-disk payload. Throws
 [RunStateVersionUnsupportedError](/api/@graphorin/agent/errors/classes/RunStateVersionUnsupportedError.md) when the payload version

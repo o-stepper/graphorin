@@ -10,7 +10,7 @@
 function createContextEngine(config?): ContextEngine;
 ```
 
-Defined in: packages/memory/src/context-engine/engine.ts:407
+Defined in: packages/memory/src/context-engine/engine.ts:259
 
 Build a ContextEngine instance from the supplied configuration.
 

@@ -22,6 +22,12 @@ Re-exports [AISpan](/api/@graphorin/core/interfaces/AISpan.md)
 
 ***
 
+### AnyTool
+
+Re-exports [AnyTool](/api/@graphorin/core/type-aliases/AnyTool.md)
+
+***
+
 ### AuthTokenRecord
 
 Re-exports [AuthTokenRecord](/api/@graphorin/core/interfaces/AuthTokenRecord.md)
@@ -82,6 +88,12 @@ Re-exports [ComposeProviderMiddleware](/api/@graphorin/core/type-aliases/Compose
 
 ***
 
+### CustomSpanType
+
+Re-exports [CustomSpanType](/api/@graphorin/core/type-aliases/CustomSpanType.md)
+
+***
+
 ### EmbedderProvider
 
 Re-exports [EmbedderProvider](/api/@graphorin/core/interfaces/EmbedderProvider.md)
@@ -124,6 +136,12 @@ Re-exports [FinishReason](/api/@graphorin/core/type-aliases/FinishReason.md)
 
 ***
 
+### KnownSpanType
+
+Re-exports [KnownSpanType](/api/@graphorin/core/type-aliases/KnownSpanType.md)
+
+***
+
 ### ListOptions
 
 Re-exports [ListOptions](/api/@graphorin/core/interfaces/ListOptions.md)
@@ -157,6 +175,12 @@ Re-exports [LogLevel](/api/@graphorin/core/type-aliases/LogLevel.md)
 ### MemoryStore
 
 Re-exports [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md)
+
+***
+
+### MemoryStoreExt
+
+Re-exports [MemoryStoreExt](/api/@graphorin/core/interfaces/MemoryStoreExt.md)
 
 ***
 

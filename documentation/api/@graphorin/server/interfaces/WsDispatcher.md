@@ -64,7 +64,7 @@ Push a lifecycle frame to a single subscription.
 | Parameter | Type |
 | ------ | ------ |
 | `subscriptionId` | `string` |
-| `status` | `"aborted"` \| `"running"` \| `"completed"` \| `"failed"` \| `"paused"` |
+| `status` | `"running"` \| `"completed"` \| `"failed"` \| `"aborted"` \| `"paused"` |
 | `reason?` | `string` |
 
 #### Returns

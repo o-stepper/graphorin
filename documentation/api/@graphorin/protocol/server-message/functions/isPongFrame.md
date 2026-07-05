@@ -10,7 +10,7 @@
 function isPongFrame(message): message is { kind: "pong"; nonce?: string; v: "1" };
 ```
 
-Defined in: src/server-message.ts:209
+Defined in: src/server-message.ts:216
 
 ## Parameters
 

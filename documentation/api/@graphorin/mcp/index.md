@@ -152,7 +152,19 @@ Tool descriptions are always sanitized at registration time using
 the `'detect-and-strip'` variant of the configured policy (the
 wrap envelope is reserved for tool-result bodies inside the
 conversation history; the description goes into the per-step tool
-catalogue verbatim aside from the strip pass).
+catalogue verbatim aside from the strip pass). The same strip pass
+covers the ANNOTATION strings inside the tool's JSON Schemas
+(`description`, `title`, `$comment`, string `examples` at any
+nesting depth) before the schema reaches the provider wire and the
+`tool_search` projection - the Invariant Labs tool-poisoning
+hiding place. Semantic keywords (`enum`, `const`, `pattern`,
+`required`, property names) are never modified, and the TOFU
+fingerprint keeps hashing the RAW definition, so existing pins
+survive and drift detection still sees the original bytes
+(`mcp.tool-schema.injection-flagged.total` counts hits). The text
+of an `isError` result goes through the full configured policy
+(strip + envelope by default) before it reaches the model as a
+tool error message.
 
 ## OAuth integration
 

@@ -6,7 +6,7 @@
 
 # Interface: WorkingMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:39
+Defined in: packages/core/src/contracts/memory-store.ts:62
 
 ## Stable
 
@@ -21,7 +21,7 @@ delete(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:43
+Defined in: packages/core/src/contracts/memory-store.ts:66
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:43
 get(scope, label): Promise<Block | null>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:41
+Defined in: packages/core/src/contracts/memory-store.ts:64
 
 #### Parameters
 
@@ -64,7 +64,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:41
 list(scope): Promise<readonly Block[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:40
+Defined in: packages/core/src/contracts/memory-store.ts:63
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:40
 upsert(scope, block): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:42
+Defined in: packages/core/src/contracts/memory-store.ts:65
 
 #### Parameters
 

@@ -10,6 +10,6 @@
 type ServerErrorFrame = z.infer<typeof ErrorFrame>;
 ```
 
-Defined in: src/server-message.ts:163
+Defined in: src/server-message.ts:170
 
 ## Stable

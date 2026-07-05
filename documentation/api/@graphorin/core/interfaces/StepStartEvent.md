@@ -6,7 +6,7 @@
 
 # Interface: StepStartEvent
 
-Defined in: packages/core/src/types/agent-event.ts:65
+Defined in: packages/core/src/types/agent-event.ts:70
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/core/src/types/agent-event.ts:65
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:67 |
-| <a id="property-type"></a> `type` | `readonly` | `"step.start"` | packages/core/src/types/agent-event.ts:66 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:72 |
+| <a id="property-type"></a> `type` | `readonly` | `"step.start"` | packages/core/src/types/agent-event.ts:71 |

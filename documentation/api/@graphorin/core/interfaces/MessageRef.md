@@ -6,7 +6,7 @@
 
 # Interface: MessageRef
 
-Defined in: packages/core/src/contracts/memory-store.ts:52
+Defined in: packages/core/src/contracts/memory-store.ts:75
 
 Reference returned by `SessionMemoryStore.push(...)`. Carries the
 persisted message id and a sequence number for ordering.
@@ -17,6 +17,6 @@ persisted message id and a sequence number for ordering.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-messageid"></a> `messageId` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:53 |
-| <a id="property-persistedat"></a> `persistedAt` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:55 |
-| <a id="property-sequence"></a> `sequence` | `readonly` | `number` | packages/core/src/contracts/memory-store.ts:54 |
+| <a id="property-messageid"></a> `messageId` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:76 |
+| <a id="property-persistedat"></a> `persistedAt` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:78 |
+| <a id="property-sequence"></a> `sequence` | `readonly` | `number` | packages/core/src/contracts/memory-store.ts:77 |

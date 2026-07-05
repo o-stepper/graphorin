@@ -13,7 +13,7 @@ function registerConsolidatorTriggers(
 options): Promise<RegisterTriggersResult>;
 ```
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:125
+Defined in: packages/memory/src/consolidator/scheduler.ts:138
 
 Register every cron / idle / interval trigger declared on the
 supplied consolidator with the scheduler. Each trigger fires
@@ -30,7 +30,7 @@ caller is responsible for those (e.g. invoking
 
 | Parameter | Type |
 | ------ | ------ |
-| `consolidator` | [`Consolidator`](/api/@graphorin/memory/interfaces/Consolidator.md) |
+| `consolidator` | `ConsolidatorLike` |
 | `scheduler` | [`SchedulerLike`](/api/@graphorin/memory/interfaces/SchedulerLike.md) |
 | `options` | [`RegisterTriggersOptions`](/api/@graphorin/memory/interfaces/RegisterTriggersOptions.md) |
 

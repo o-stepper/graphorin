@@ -10,7 +10,7 @@
 const IMPERATIVE_PREFILTER_SUBSTRINGS: ReadonlyArray<string>;
 ```
 
-Defined in: packages/observability/src/redaction/imperative-patterns.ts:161
+Defined in: packages/observability/src/redaction/imperative-patterns.ts:174
 
 Combined Aho-Corasick-style prefilter set across every pattern.
 Lower-cased substrings; consumers test the body once with the

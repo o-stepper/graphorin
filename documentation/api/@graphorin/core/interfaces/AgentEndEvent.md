@@ -6,7 +6,7 @@
 
 # Interface: AgentEndEvent\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/agent-event.ts:269
+Defined in: packages/core/src/types/agent-event.ts:274
 
 ## Stable
 
@@ -20,6 +20,6 @@ Defined in: packages/core/src/types/agent-event.ts:269
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | packages/core/src/types/agent-event.ts:272 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:271 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | packages/core/src/types/agent-event.ts:270 |
+| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | packages/core/src/types/agent-event.ts:277 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:276 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | packages/core/src/types/agent-event.ts:275 |

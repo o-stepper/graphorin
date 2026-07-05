@@ -10,7 +10,7 @@
 function ensureStoreAuditBinding(): void;
 ```
 
-Defined in: packages/server/src/app.ts:108
+Defined in: packages/server/src/app-audit-binding.ts:27
 
 ## Returns
 

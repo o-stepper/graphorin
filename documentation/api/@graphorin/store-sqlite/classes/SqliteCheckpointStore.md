@@ -45,7 +45,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:22
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:162
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:163
 
 #### Parameters
 
@@ -74,7 +74,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:104
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:105
 
 #### Parameters
 
@@ -105,7 +105,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:139
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:140
 
 #### Parameters
 
@@ -169,7 +169,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:83
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:84
 
 #### Parameters
 

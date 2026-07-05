@@ -28,10 +28,10 @@ top of the standard [AISpan](/api/@graphorin/core/interfaces/AISpan.md) contract
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`id`](/api/@graphorin/core/interfaces/AISpan.md#property-id) | packages/core/dist/contracts/tracer.d.ts:34 |
-| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`parentId`](/api/@graphorin/core/interfaces/AISpan.md#property-parentid) | packages/core/dist/contracts/tracer.d.ts:36 |
-| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`traceId`](/api/@graphorin/core/interfaces/AISpan.md#property-traceid) | packages/core/dist/contracts/tracer.d.ts:35 |
-| <a id="property-type"></a> `type` | `readonly` | `T` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`type`](/api/@graphorin/core/interfaces/AISpan.md#property-type) | packages/core/dist/contracts/tracer.d.ts:33 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`id`](/api/@graphorin/core/interfaces/AISpan.md#property-id) | packages/core/dist/contracts/tracer.d.ts:60 |
+| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`parentId`](/api/@graphorin/core/interfaces/AISpan.md#property-parentid) | packages/core/dist/contracts/tracer.d.ts:62 |
+| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`traceId`](/api/@graphorin/core/interfaces/AISpan.md#property-traceid) | packages/core/dist/contracts/tracer.d.ts:61 |
+| <a id="property-type"></a> `type` | `readonly` | `T` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`type`](/api/@graphorin/core/interfaces/AISpan.md#property-type) | packages/core/dist/contracts/tracer.d.ts:59 |
 
 ## Methods
 
@@ -41,7 +41,7 @@ top of the standard [AISpan](/api/@graphorin/core/interfaces/AISpan.md) contract
 addEvent(name, attrs?): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:40
+Defined in: packages/core/dist/contracts/tracer.d.ts:66
 
 Append a span event (attribute-bearing time-stamped marker).
 
@@ -68,7 +68,7 @@ Append a span event (attribute-bearing time-stamped marker).
 end(): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:46
+Defined in: packages/core/dist/contracts/tracer.d.ts:72
 
 End the span. Idempotent.
 
@@ -88,7 +88,7 @@ End the span. Idempotent.
 recordException(err): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:42
+Defined in: packages/core/dist/contracts/tracer.d.ts:68
 
 Record an exception. Multiple calls are kept in the span event log.
 
@@ -139,7 +139,7 @@ Defined in: packages/observability/src/tracer/span.ts:39
 setAttributes(attrs): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:38
+Defined in: packages/core/dist/contracts/tracer.d.ts:64
 
 Add or replace attributes. Repeated calls are merged (last write wins).
 
@@ -165,7 +165,7 @@ Add or replace attributes. Repeated calls are merged (last write wins).
 setStatus(status, message?): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:44
+Defined in: packages/core/dist/contracts/tracer.d.ts:70
 
 Set the terminal status.
 

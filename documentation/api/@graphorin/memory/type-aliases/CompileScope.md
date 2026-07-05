@@ -10,7 +10,7 @@
 type CompileScope = SessionScope;
 ```
 
-Defined in: packages/memory/src/context-engine/index.ts:149
+Defined in: packages/memory/src/context-engine/io-types.ts:162
 
 Author-time scope passed through to the context engine.
 

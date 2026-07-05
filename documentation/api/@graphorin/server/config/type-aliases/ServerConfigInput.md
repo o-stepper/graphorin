@@ -10,7 +10,7 @@
 type ServerConfigInput = z.input<typeof ServerConfigSchema>;
 ```
 
-Defined in: packages/server/src/config.ts:384
+Defined in: packages/server/src/config.ts:388
 
 Input shape accepted by [defineConfig](/api/@graphorin/server/config/functions/defineConfig.md). Every field is
 optional; missing values fall back to a documented default.

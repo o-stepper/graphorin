@@ -6,7 +6,7 @@
 
 # Interface: ResumeDirective
 
-Defined in: packages/agent/src/types.ts:417
+Defined in: packages/agent/src/types.ts:429
 
 Resume directive accepted by `agent.run(input | RunState, { directive })`.
 
@@ -22,4 +22,4 @@ approvals: [...] } })` to resume.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:418 |
+| <a id="property-approvals"></a> `approvals?` | `readonly` | readonly `ApprovalDecision`[] | packages/agent/src/types.ts:430 |

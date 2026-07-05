@@ -16,6 +16,30 @@ Re-exports [applyInboundSanitization](/api/@graphorin/tools/functions/applyInbou
 
 ***
 
+### neutralizeEnvelopeDelimiters
+
+Re-exports [neutralizeEnvelopeDelimiters](/api/@graphorin/tools/functions/neutralizeEnvelopeDelimiters.md)
+
+***
+
+### NeutralizeEnvelopeDelimitersOptions
+
+Re-exports [NeutralizeEnvelopeDelimitersOptions](/api/@graphorin/tools/interfaces/NeutralizeEnvelopeDelimitersOptions.md)
+
+***
+
 ### SanitizationOutcome
 
 Re-exports [SanitizationOutcome](/api/@graphorin/tools/interfaces/SanitizationOutcome.md)
+
+***
+
+### UNTRUSTED\_CONTENT\_CLOSE
+
+Re-exports [UNTRUSTED_CONTENT_CLOSE](/api/@graphorin/tools/variables/UNTRUSTED_CONTENT_CLOSE.md)
+
+***
+
+### UNTRUSTED\_CONTENT\_OPEN\_PREFIX
+
+Re-exports [UNTRUSTED_CONTENT_OPEN_PREFIX](/api/@graphorin/tools/variables/UNTRUSTED_CONTENT_OPEN_PREFIX.md)

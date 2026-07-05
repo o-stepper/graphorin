@@ -14,7 +14,7 @@ Default `MemoryStore` implementation backed by SQLite + sqlite-vec.
 
 ## Implements
 
-- [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md)
+- [`MemoryStoreExt`](/api/@graphorin/core/interfaces/MemoryStoreExt.md)
 
 ## Constructors
 
@@ -70,7 +70,7 @@ Cleanly close any underlying handles. Idempotent.
 
 #### Implementation of
 
-[`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`close`](/api/@graphorin/core/interfaces/MemoryStore.md#close)
+[`MemoryStoreExt`](/api/@graphorin/core/interfaces/MemoryStoreExt.md).[`close`](/api/@graphorin/core/interfaces/MemoryStoreExt.md#close)
 
 ***
 
@@ -106,7 +106,7 @@ Initialize / migrate the underlying storage. Idempotent.
 
 #### Implementation of
 
-[`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`init`](/api/@graphorin/core/interfaces/MemoryStore.md#init)
+[`MemoryStoreExt`](/api/@graphorin/core/interfaces/MemoryStoreExt.md).[`init`](/api/@graphorin/core/interfaces/MemoryStoreExt.md#init)
 
 ***
 
@@ -135,6 +135,10 @@ their own maintenance schedule; nothing prunes automatically.
 `Promise`\&lt;`number`\&gt;
 
 #### Stable
+
+#### Implementation of
+
+[`MemoryStoreExt`](/api/@graphorin/core/interfaces/MemoryStoreExt.md).[`pruneHistory`](/api/@graphorin/core/interfaces/MemoryStoreExt.md#prunehistory)
 
 ***
 

@@ -32,14 +32,14 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      tokenEnvironments: ZodDefault<ZodArray<ZodString, "many">>;
      tokenPrefix: ZodDefault<ZodString>;
    }, "strict", ZodTypeAny, {
-     kind: "token" | "none";
+     kind: "none" | "token";
      pepperRef?: string;
      perIpFailureThreshold?: number;
      perIpLockoutMs?: number;
      tokenEnvironments: string[];
      tokenPrefix: string;
    }, {
-     kind?: "token" | "none";
+     kind?: "none" | "token";
      pepperRef?: string;
      perIpFailureThreshold?: number;
      perIpLockoutMs?: number;
@@ -198,6 +198,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         perConnectionQueueLimit: number;
         replayBuffer: {
            maxEvents: number;
+           pruneIntervalSeconds: number;
            ttlSeconds: number;
         };
       }, {
@@ -206,6 +207,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         perConnectionQueueLimit?: number;
         replayBuffer?: {
            maxEvents?: ...;
+           pruneIntervalSeconds?: ...;
            ttlSeconds?: ...;
         };
      }>>;
@@ -275,6 +277,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         perConnectionQueueLimit: number;
         replayBuffer: {
            maxEvents: number;
+           pruneIntervalSeconds: number;
            ttlSeconds: number;
         };
      };
@@ -331,6 +334,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         perConnectionQueueLimit?: number;
         replayBuffer?: {
            maxEvents?: ... | ...;
+           pruneIntervalSeconds?: ... | ...;
            ttlSeconds?: ... | ...;
         };
      };
@@ -368,7 +372,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         enabled: boolean;
         passphraseRef?: string;
      };
-     mode: "lib" | "server";
+     mode: "server" | "lib";
      path: string;
      walCheckpointIntervalMs?: number;
    }, {
@@ -377,7 +381,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         enabled?: boolean;
         passphraseRef?: string;
      };
-     mode?: "lib" | "server";
+     mode?: "server" | "lib";
      path?: string;
      walCheckpointIntervalMs?: number;
   }>>;
@@ -389,7 +393,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      path?: string;
   };
   auth: {
-     kind: "token" | "none";
+     kind: "none" | "token";
      pepperRef?: string;
      perIpFailureThreshold?: number;
      perIpLockoutMs?: number;
@@ -459,6 +463,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         perConnectionQueueLimit: number;
         replayBuffer: {
            maxEvents: number;
+           pruneIntervalSeconds: number;
            ttlSeconds: number;
         };
      };
@@ -479,7 +484,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         enabled: boolean;
         passphraseRef?: string;
      };
-     mode: "lib" | "server";
+     mode: "server" | "lib";
      path: string;
      walCheckpointIntervalMs?: number;
   };
@@ -491,7 +496,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      path?: string;
   };
   auth?: {
-     kind?: "token" | "none";
+     kind?: "none" | "token";
      pepperRef?: string;
      perIpFailureThreshold?: number;
      perIpLockoutMs?: number;
@@ -561,6 +566,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         perConnectionQueueLimit?: number;
         replayBuffer?: {
            maxEvents?: number;
+           pruneIntervalSeconds?: number;
            ttlSeconds?: number;
         };
      };
@@ -581,14 +587,14 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
         enabled?: boolean;
         passphraseRef?: string;
      };
-     mode?: "lib" | "server";
+     mode?: "server" | "lib";
      path?: string;
      walCheckpointIntervalMs?: number;
   };
 }>>;
 ```
 
-Defined in: packages/server/src/config.ts:363
+Defined in: packages/server/src/config.ts:367
 
 Zod schema for the resolved [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md). Exposed for
 advanced users that want to validate other config sources (env-only

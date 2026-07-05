@@ -6,7 +6,7 @@
 
 # Interface: SharedMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:125
+Defined in: packages/core/src/contracts/memory-store.ts:148
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:125
 attach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:126
+Defined in: packages/core/src/contracts/memory-store.ts:149
 
 #### Parameters
 
@@ -39,7 +39,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:126
 detach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:127
+Defined in: packages/core/src/contracts/memory-store.ts:150
 
 #### Parameters
 
@@ -60,7 +60,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:127
 listFor(agentId): Promise<readonly MemoryRecord[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:128
+Defined in: packages/core/src/contracts/memory-store.ts:151
 
 #### Parameters
 

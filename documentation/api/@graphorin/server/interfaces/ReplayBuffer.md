@@ -6,7 +6,7 @@
 
 # Interface: ReplayBuffer
 
-Defined in: packages/server/src/ws/replay-buffer.ts:45
+Defined in: packages/server/src/ws/replay-buffer.ts:57
 
 Per-subject replay buffer. Stores up to `maxEvents` per subject
 with a TTL; thread-safe under the single-writer Node event loop
@@ -22,7 +22,7 @@ model.
 forget(subject): void;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:49
+Defined in: packages/server/src/ws/replay-buffer.ts:61
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:49
 prune(): void;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:50
+Defined in: packages/server/src/ws/replay-buffer.ts:62
 
 #### Returns
 
@@ -56,7 +56,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:50
 push(subject, event): void;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:46
+Defined in: packages/server/src/ws/replay-buffer.ts:58
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:46
 replay(subject, sinceEventId): ReplayBufferSlice;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:47
+Defined in: packages/server/src/ws/replay-buffer.ts:59
 
 #### Parameters
 
@@ -105,7 +105,7 @@ Defined in: packages/server/src/ws/replay-buffer.ts:47
 size(subject): number;
 ```
 
-Defined in: packages/server/src/ws/replay-buffer.ts:48
+Defined in: packages/server/src/ws/replay-buffer.ts:60
 
 #### Parameters
 
@@ -116,3 +116,22 @@ Defined in: packages/server/src/ws/replay-buffer.ts:48
 #### Returns
 
 `number`
+
+***
+
+### stats()?
+
+```ts
+optional stats(): ReplayBufferStats;
+```
+
+Defined in: packages/server/src/ws/replay-buffer.ts:69
+
+Occupancy snapshot (W-028). OPTIONAL so external implementations
+of this `@stable` interface keep compiling; `createReplayBuffer`
+always provides it. When absent, the `/v1/metrics` replay-buffer
+gauge degrades to `0`.
+
+#### Returns
+
+[`ReplayBufferStats`](/api/@graphorin/server/ws/interfaces/ReplayBufferStats.md)

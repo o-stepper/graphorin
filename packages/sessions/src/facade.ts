@@ -317,8 +317,16 @@ export interface SessionManager {
     scope: Pick<SessionScope, 'userId' | 'agentId'>,
   ): Promise<ReadonlyArray<SessionMetadata>>;
   /**
-   * Hard-delete a session and cascade its handoffs / workflow runs / audit rows
-   * (RP-6). Message rows are owned by the memory store; purge them separately.
+   * Hard-delete a session (RP-6). The cascade removes the session's
+   * bookkeeping (handoffs, workflow-run attachments, audit rows), the
+   * checkpoints of suspended runs linked to it (W-005), AND its content:
+   * messages and episodes with their FTS/vector index rows plus the full
+   * registry of session-scoped surfaces (facts, insights, rules, working
+   * blocks, spans, consolidator state - see `SESSION_SCOPED_PURGES` in
+   * `@graphorin/store-sqlite`). No separate purge step is required.
+   * Delegates to {@link SessionStoreExt.deleteSession}; authors of custom
+   * `SessionStore` implementations must honour that contract in full, or
+   * "deleted" conversations remain searchable.
    */
   deleteSession(sessionId: string): Promise<void>;
   /**

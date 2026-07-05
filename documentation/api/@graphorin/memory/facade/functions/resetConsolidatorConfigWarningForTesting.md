@@ -10,7 +10,7 @@
 function _resetConsolidatorConfigWarningForTesting(): void;
 ```
 
-Defined in: packages/memory/src/facade.ts:718
+Defined in: packages/memory/src/facade.ts:682
 
 **`Internal`**
 

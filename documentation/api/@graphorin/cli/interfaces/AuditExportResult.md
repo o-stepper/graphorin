@@ -6,7 +6,7 @@
 
 # Interface: AuditExportResult
 
-Defined in: packages/cli/src/commands/audit.ts:148
+Defined in: packages/cli/src/commands/audit.ts:157
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/cli/src/commands/audit.ts:148
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-path"></a> `path` | `readonly` | `string` | packages/cli/src/commands/audit.ts:149 |
-| <a id="property-rows"></a> `rows` | `readonly` | `number` | packages/cli/src/commands/audit.ts:150 |
+| <a id="property-path"></a> `path` | `readonly` | `string` | packages/cli/src/commands/audit.ts:158 |
+| <a id="property-rows"></a> `rows` | `readonly` | `number` | packages/cli/src/commands/audit.ts:159 |

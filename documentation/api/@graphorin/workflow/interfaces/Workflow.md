@@ -58,6 +58,32 @@ Resolve a named persisted approval (D1) - sugar over
 
 ***
 
+### deleteThread()
+
+```ts
+deleteThread(threadId): Promise<void>;
+```
+
+Defined in: packages/workflow/src/types.ts:473
+
+Delete every checkpoint and pending write of `threadId` across all
+namespaces (W-005) - the operator lever for per-thread hygiene and
+targeted erasure requests. Idempotent: deleting an unknown thread
+is a no-op. Deleting a merely-suspended thread (pending approval /
+timer / awakeable) destroys its resume state - the caller decides.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+
+#### Returns
+
+`Promise`\&lt;`void`\&gt;
+
+***
+
 ### execute()
 
 ```ts
@@ -87,7 +113,7 @@ fork(threadId, fromCheckpointId): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/types.ts:466
+Defined in: packages/workflow/src/types.ts:474
 
 #### Parameters
 

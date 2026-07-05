@@ -17,6 +17,6 @@ type SpanAttributeValue =
 | ReadonlyArray<boolean>;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:73
+Defined in: packages/core/src/contracts/tracer.ts:101
 
 ## Stable

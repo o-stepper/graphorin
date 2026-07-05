@@ -16,7 +16,6 @@ stubs + the consolidator placeholder.
 | Interface | Description |
 | ------ | ------ |
 | [CreateMemoryOptions](/api/@graphorin/memory/facade/interfaces/CreateMemoryOptions.md) | Options accepted by [createMemory](/api/@graphorin/memory/facade/functions/createMemory.md). |
-| [Memory](/api/@graphorin/memory/facade/interfaces/Memory.md) | The facade returned by [createMemory](/api/@graphorin/memory/facade/functions/createMemory.md). |
 
 ## Functions
 
@@ -24,3 +23,9 @@ stubs + the consolidator placeholder.
 | ------ | ------ |
 | [\_resetConsolidatorConfigWarningForTesting](/api/@graphorin/memory/facade/functions/resetConsolidatorConfigWarningForTesting.md) | - test seam for the one-time disabled-config warning. |
 | [createMemory](/api/@graphorin/memory/facade/functions/createMemory.md) | Wire every memory subsystem in one call. Returns the typed `Memory` facade ready to be passed into `createAgent({...})`. |
+
+## References
+
+### Memory
+
+Re-exports [Memory](/api/@graphorin/memory/interfaces/Memory.md)

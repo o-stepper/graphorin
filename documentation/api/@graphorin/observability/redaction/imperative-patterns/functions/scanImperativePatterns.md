@@ -15,7 +15,7 @@ function scanImperativePatterns(
   | null;
 ```
 
-Defined in: packages/observability/src/redaction/imperative-patterns.ts:186
+Defined in: packages/observability/src/redaction/imperative-patterns.ts:199
 
 Run the imperative-pattern scan against `body`. Patterns are
 iterated in catalogue order; the prefilter shortcut returns early

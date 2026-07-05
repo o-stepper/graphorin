@@ -240,6 +240,18 @@ Re-exports [MemoryMigrateOptions](/api/@graphorin/cli/interfaces/MemoryMigrateOp
 
 ***
 
+### MemoryPruneHistoryOptions
+
+Re-exports [MemoryPruneHistoryOptions](/api/@graphorin/cli/interfaces/MemoryPruneHistoryOptions.md)
+
+***
+
+### MemoryPruneHistoryResult
+
+Re-exports [MemoryPruneHistoryResult](/api/@graphorin/cli/interfaces/MemoryPruneHistoryResult.md)
+
+***
+
 ### MemoryReviewItem
 
 Re-exports [MemoryReviewItem](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)
@@ -471,6 +483,12 @@ Re-exports [runMemoryInspect](/api/@graphorin/cli/functions/runMemoryInspect.md)
 ### runMemoryMigrate
 
 Re-exports [runMemoryMigrate](/api/@graphorin/cli/functions/runMemoryMigrate.md)
+
+***
+
+### runMemoryPruneHistory
+
+Re-exports [runMemoryPruneHistory](/api/@graphorin/cli/functions/runMemoryPruneHistory.md)
 
 ***
 

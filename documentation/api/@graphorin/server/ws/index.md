@@ -14,6 +14,12 @@ single-use ticket flow), the per-subject replay buffer, the strict
 subject grammar parser + scope check, and the `@hono/node-ws`
 upgrade handler.
 
+## Interfaces
+
+| Interface | Description |
+| ------ | ------ |
+| [ReplayBufferStats](/api/@graphorin/server/ws/interfaces/ReplayBufferStats.md) | Occupancy snapshot returned by [ReplayBuffer.stats](/api/@graphorin/server/interfaces/ReplayBuffer.md#stats). |
+
 ## Type Aliases
 
 | Type Alias | Description |
@@ -25,6 +31,7 @@ upgrade handler.
 | Function | Description |
 | ------ | ------ |
 | [isSubjectAllowed](/api/@graphorin/server/ws/functions/isSubjectAllowed.md) | Compatibility shim - re-exports `scopeMatches` so consumers don't have to learn the security package's surface. |
+| [scheduleReplayBufferPruning](/api/@graphorin/server/ws/functions/scheduleReplayBufferPruning.md) | W-028: schedule a periodic [ReplayBuffer.prune](/api/@graphorin/server/interfaces/ReplayBuffer.md#prune) sweep. Without it TTL expiry only ran lazily inside `push`/`replay`/`size` FOR THE SAME SUBJECT, so every finished run-subject (a fresh runId per run) retained up to `maxEvents` full payloads forever on a long-living server. Mirrors `scheduleRunPruning` (IP-16): `unref`-ed timer, returns a stop function. The sweep applies only the already documented TTL - replay semantics inside the TTL window are unchanged (an immediate `forget` on run completion would break short-disconnect resume of terminal events). |
 
 ## References
 

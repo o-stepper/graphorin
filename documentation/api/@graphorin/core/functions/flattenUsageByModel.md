@@ -10,7 +10,7 @@
 function flattenUsageByModel(byModel): readonly ModelUsage[];
 ```
 
-Defined in: packages/core/src/types/run.ts:169
+Defined in: packages/core/src/types/run.ts:211
 
 Snapshot helper used by `@graphorin/observability` aggregators to
 convert the on-disk `usageByModel` shape into the canonical

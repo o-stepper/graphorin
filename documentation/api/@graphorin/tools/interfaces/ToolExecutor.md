@@ -6,7 +6,7 @@
 
 # Interface: ToolExecutor
 
-Defined in: packages/tools/src/executor/executor.ts:342
+Defined in: packages/tools/src/executor/types.ts:310
 
 Public executor surface.
 
@@ -18,7 +18,7 @@ Public executor surface.
 executeBatch(opts): Promise<readonly CompletedToolCall<unknown>[]>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:344
+Defined in: packages/tools/src/executor/types.ts:312
 
 Run a batch of tool calls.
 
@@ -40,7 +40,7 @@ Run a batch of tool calls.
 executeOne(opts): Promise<CompletedToolCall<unknown>>;
 ```
 
-Defined in: packages/tools/src/executor/executor.ts:346
+Defined in: packages/tools/src/executor/types.ts:314
 
 Run a single tool call.
 

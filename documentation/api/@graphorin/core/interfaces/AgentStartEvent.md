@@ -6,7 +6,7 @@
 
 # Interface: AgentStartEvent
 
-Defined in: packages/core/src/types/agent-event.ts:58
+Defined in: packages/core/src/types/agent-event.ts:63
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:58
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:61 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:60 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.start"` | packages/core/src/types/agent-event.ts:59 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:66 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:65 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.start"` | packages/core/src/types/agent-event.ts:64 |

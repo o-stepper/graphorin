@@ -6,7 +6,7 @@
 
 # Interface: ResolvedTool\&lt;TInput, TOutput, TDeps\&gt;
 
-Defined in: packages/core/src/contracts/tool.ts:197
+Defined in: packages/core/src/contracts/tool.ts:217
 
 Resolved record returned by the `ToolRegistry` getter. Carries every
 non-public registration-time field downstream layers consume
@@ -31,14 +31,14 @@ collision resolution, …) so consumers do not have to recompute it.
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-__effectivedeferloading"></a> `__effectiveDeferLoading` | `readonly` | `boolean` | - | - | packages/core/src/contracts/tool.ts:201 |
-| <a id="property-__examplecount"></a> `__exampleCount` | `readonly` | `number` | - | - | packages/core/src/contracts/tool.ts:205 |
-| <a id="property-__hasidempotencykey"></a> `__hasIdempotencyKey` | `readonly` | `boolean` | - | - | packages/core/src/contracts/tool.ts:203 |
-| <a id="property-__preferredmodel"></a> `__preferredModel?` | `readonly` | \| [`ModelHint`](/api/@graphorin/core/type-aliases/ModelHint.md) \| [`ModelSpec`](/api/@graphorin/core/type-aliases/ModelSpec.md) | - | - | packages/core/src/contracts/tool.ts:206 |
-| <a id="property-__sideeffectclass"></a> `__sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | - | - | packages/core/src/contracts/tool.ts:202 |
-| <a id="property-__source"></a> `__source` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | - | packages/core/src/contracts/tool.ts:200 |
-| <a id="property-__streaminghint"></a> `__streamingHint` | `readonly` | `boolean` | - | - | packages/core/src/contracts/tool.ts:204 |
-| <a id="property-__trustclass"></a> `__trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - | - | packages/core/src/contracts/tool.ts:199 |
+| <a id="property-__effectivedeferloading"></a> `__effectiveDeferLoading` | `readonly` | `boolean` | - | - | packages/core/src/contracts/tool.ts:221 |
+| <a id="property-__examplecount"></a> `__exampleCount` | `readonly` | `number` | - | - | packages/core/src/contracts/tool.ts:225 |
+| <a id="property-__hasidempotencykey"></a> `__hasIdempotencyKey` | `readonly` | `boolean` | - | - | packages/core/src/contracts/tool.ts:223 |
+| <a id="property-__preferredmodel"></a> `__preferredModel?` | `readonly` | \| [`ModelHint`](/api/@graphorin/core/type-aliases/ModelHint.md) \| [`ModelSpec`](/api/@graphorin/core/type-aliases/ModelSpec.md) | - | - | packages/core/src/contracts/tool.ts:226 |
+| <a id="property-__sideeffectclass"></a> `__sideEffectClass` | `readonly` | [`SideEffectClass`](/api/@graphorin/core/type-aliases/SideEffectClass.md) | - | - | packages/core/src/contracts/tool.ts:222 |
+| <a id="property-__source"></a> `__source` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | - | packages/core/src/contracts/tool.ts:220 |
+| <a id="property-__streaminghint"></a> `__streamingHint` | `readonly` | `boolean` | - | - | packages/core/src/contracts/tool.ts:224 |
+| <a id="property-__trustclass"></a> `__trustClass` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | - | - | packages/core/src/contracts/tool.ts:219 |
 | <a id="property-defer_loading"></a> `defer_loading?` | `readonly` | `boolean` | Defer the tool from the per-step catalogue until the model invokes the built-in `tool_search` to look it up. Tools with deferred loading are not advertised to the model on every step, which keeps the input-token cost bounded for installations with dozens of MCP-derived tools. **Default** `false` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md).[`defer_loading`](/api/@graphorin/core/interfaces/Tool.md#property-defer_loading) | packages/core/src/contracts/tool.ts:106 |
 | <a id="property-description"></a> `description` | `readonly` | `string` | - | [`Tool`](/api/@graphorin/core/interfaces/Tool.md).[`description`](/api/@graphorin/core/interfaces/Tool.md#property-description) | packages/core/src/contracts/tool.ts:37 |
 | <a id="property-examples"></a> `examples?` | `readonly` | readonly [`ToolExample`](/api/@graphorin/core/interfaces/ToolExample.md)\&lt;`TInput`, `TOutput`\&gt;[] | Worked examples shown to the model alongside the tool's description. Bounded `[1, 5]` - overflow emits a one-time WARN at registration. Each example's `input` and `output` is validated against the tool's `inputSchema` / `outputSchema`. | [`Tool`](/api/@graphorin/core/interfaces/Tool.md).[`examples`](/api/@graphorin/core/interfaces/Tool.md#property-examples) | packages/core/src/contracts/tool.ts:124 |

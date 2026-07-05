@@ -10,7 +10,7 @@
 function _resetMcpAdapterDedupForTesting(): void;
 ```
 
-Defined in: packages/mcp/src/client/to-tools.ts:52
+Defined in: packages/mcp/src/client/to-tools.ts:53
 
 **`Experimental`**
 

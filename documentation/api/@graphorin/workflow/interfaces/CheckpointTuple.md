@@ -6,7 +6,7 @@
 
 # Interface: CheckpointTuple
 
-Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:52
+Defined in: packages/core/dist/contracts/checkpoint-store.d.ts:62
 
 A checkpoint paired with its sidecar metadata. Returned by
 `CheckpointStore.getTuple(...)` and the `list(...)` iterator.
@@ -17,6 +17,6 @@ A checkpoint paired with its sidecar metadata. Returned by
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-checkpoint"></a> `checkpoint` | `readonly` | [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md) | packages/core/dist/contracts/checkpoint-store.d.ts:53 |
-| <a id="property-metadata"></a> `metadata` | `readonly` | [`CheckpointMetadata`](/api/@graphorin/workflow/interfaces/CheckpointMetadata.md) | packages/core/dist/contracts/checkpoint-store.d.ts:54 |
-| <a id="property-pendingwrites"></a> `pendingWrites?` | `readonly` | readonly [`PendingWrite`](/api/@graphorin/workflow/interfaces/PendingWrite.md)[] | packages/core/dist/contracts/checkpoint-store.d.ts:55 |
+| <a id="property-checkpoint"></a> `checkpoint` | `readonly` | [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md) | packages/core/dist/contracts/checkpoint-store.d.ts:63 |
+| <a id="property-metadata"></a> `metadata` | `readonly` | [`CheckpointMetadata`](/api/@graphorin/workflow/interfaces/CheckpointMetadata.md) | packages/core/dist/contracts/checkpoint-store.d.ts:64 |
+| <a id="property-pendingwrites"></a> `pendingWrites?` | `readonly` | readonly [`PendingWrite`](/api/@graphorin/workflow/interfaces/PendingWrite.md)[] | packages/core/dist/contracts/checkpoint-store.d.ts:65 |
