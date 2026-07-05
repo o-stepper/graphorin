@@ -191,7 +191,7 @@ This example overrides to `tier: 'cheap'` so the standard phase actually fires:
 
 ```ts
 const memory = createMemory({
-  store: store.memory as never,
+  store: store.memory,
   embeddings: store.embeddings,
   consolidator: {
     enabled: true,

@@ -159,6 +159,7 @@ export type {
   AgentToToolOptions,
   CompactionApiResult,
   CompactOptions,
+  HandoffEntry,
   OutputSpec,
   PostCompactionHook,
   PrepareStepHook,

@@ -46,7 +46,8 @@
     "@graphorin/example-trace-helper": "workspace:*",
     "@graphorin/observability": "workspace:*",
     "@graphorin/provider": "workspace:*",
-    "@graphorin/tools": "workspace:*"
+    "@graphorin/tools": "workspace:*",
+    "zod": "^3.25.0"
   },
   "bin": {
     "graphorin-example-multi-agent-crew": "./dist/main.js"

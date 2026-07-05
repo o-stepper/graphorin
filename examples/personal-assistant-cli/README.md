@@ -121,7 +121,7 @@ import { createStubProvider } from './stub-provider.js';
 
 const store = await createSqliteStore({ path: ':memory:', disableWalHardening: true });
 await store.init();
-const memory = createMemory({ store: store.memory as never, embeddings: store.embeddings });
+const memory = createMemory({ store: store.memory, embeddings: store.embeddings });
 const provider = createProvider(createStubProvider(), {
   acceptsSensitivity: ['public', 'internal'],
 });

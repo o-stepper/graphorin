@@ -20,11 +20,10 @@
  */
 
 import process from 'node:process';
-import { type Agent, createAgent, filters } from '@graphorin/agent';
+import { type Agent, createAgent, filters, type HandoffEntry } from '@graphorin/agent';
 import {
   type AgentEvent,
   collect,
-  type HandoffFilter,
   type HandoffInputFilterDescriptor,
   type HandoffRecord,
   type Provider,
@@ -44,6 +43,8 @@ import {
   type SessionManager,
 } from '@graphorin/sessions';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
+import { tool } from '@graphorin/tools';
+import { z } from 'zod';
 /** Canonical version constant, derived from `package.json` at build time. */
 import pkg from '../package.json' with { type: 'json' };
 import { createStubSecret, type StubSecretValue } from './secret-stub.js';
@@ -104,36 +105,30 @@ export function buildDefaultHandoffFilter(): ReturnType<typeof filters.compose> 
   return filters.compose(filters.lastN(10), filters.stripReasoning());
 }
 
-const READ_SECRET_TOOL_SCHEMA = {
-  parse: (v: unknown): unknown => v,
-  safeParse: (v: unknown) => ({ success: true as const, data: v }),
-  toJSON: (): Record<string, unknown> => ({ type: 'object', properties: {} }),
-} as const;
-
 /**
  * Tool factory: a per-agent helper that reads `ctx.runContext.deps`
  * and reports whether the supervisor's secret is reachable. The
  * supervisor sees `secret-len=N`; workers, whose `deps` is `undefined`
  * by default, see `<no-secret>` - proving the DEC-137 isolation
- * invariant.
+ * invariant. Built through the `tool({...})` factory with a real zod
+ * schema so the 0.6.0 Zod-to-JSON-Schema converter projects it onto
+ * the provider wire.
  */
-export function buildReadSecretTool(): Tool<unknown, string, CrewDeps> {
-  const tool: Tool<unknown, string, CrewDeps> = {
+export function buildReadSecretTool(): Tool<Record<string, never>, string, CrewDeps> {
+  return tool({
     name: 'read-secret-from-deps',
     description: 'Probe the agent-level deps for the operator-mounted SecretValue.',
-    inputSchema: READ_SECRET_TOOL_SCHEMA as unknown as Tool<
-      unknown,
-      string,
-      CrewDeps
-    >['inputSchema'],
+    inputSchema: z.object({}),
     sideEffectClass: 'pure',
-    async execute(_input: unknown, ctx: ToolExecutionContext<CrewDeps>): Promise<string> {
+    async execute(
+      _input: Record<string, never>,
+      ctx: ToolExecutionContext<CrewDeps>,
+    ): Promise<string> {
       const secret = ctx.runContext.deps?.secret;
       if (secret === undefined) return '<no-secret>';
       return secret.use((raw) => `secret-len=${raw.length}`);
     },
-  };
-  return tool;
+  });
 }
 
 /**
@@ -196,12 +191,9 @@ export interface SupervisorFactoryOptions extends RoleFactoryOptions {
 export function createSupervisor(options: SupervisorFactoryOptions): Agent<CrewDeps, string> {
   const { provider, researcher, writer } = options;
   const handoffFilter = buildDefaultHandoffFilter();
-  const handoffEntries: ReadonlyArray<{
-    readonly target: Agent<CrewDeps, unknown>;
-    readonly inputFilter: HandoffFilter;
-  }> = [
-    { target: researcher as unknown as Agent<CrewDeps, unknown>, inputFilter: handoffFilter },
-    { target: writer as unknown as Agent<CrewDeps, unknown>, inputFilter: handoffFilter },
+  const handoffEntries: ReadonlyArray<HandoffEntry<CrewDeps>> = [
+    { target: researcher, inputFilter: handoffFilter },
+    { target: writer, inputFilter: handoffFilter },
   ];
   return createAgent<CrewDeps, string>({
     name: SUPERVISOR_NAME,
@@ -282,12 +274,12 @@ export async function runCrew(options: RunCrewOptions = {}): Promise<RunCrewResu
   await store.init();
 
   const memory: Memory = createMemory({
-    store: store.memory as never,
+    store: store.memory,
     embeddings: store.embeddings,
   });
 
   const sessionManager = createSessionManager({
-    store: store.sessions as unknown as Parameters<typeof createSessionManager>[0]['store'],
+    store: store.sessions,
     memory: memory.session,
   });
 

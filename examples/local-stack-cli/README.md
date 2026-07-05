@@ -67,7 +67,7 @@ const store = await createSqliteStore({ path: './.graphorin/local-stack-cli.db',
 await store.init();
 
 const memory = createMemory({
-  store: store.memory as never,
+  store: store.memory,
   embeddings: store.embeddings,
   embedder,
   workingBlocks: [/* persona, local_setup */],

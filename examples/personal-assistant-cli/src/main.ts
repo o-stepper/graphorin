@@ -196,7 +196,7 @@ export async function createAssistant(options: AssistantOptions = {}): Promise<A
     }));
 
   const memory = createMemory({
-    store: store.memory as never,
+    store: store.memory,
     embeddings: store.embeddings,
     ...(embedder !== null ? { embedder } : {}),
     workingBlocks: [
