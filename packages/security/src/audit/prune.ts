@@ -22,12 +22,24 @@
  * `exportAudit(...)` will no longer match the post-prune chain - treat a
  * prune as invalidating the hashes of earlier exports.
  *
+ * The same applies to the D4 Merkle layer (W-062): the RFC-6962 leaves
+ * hash each entry's canonical JSON INCLUDING `prevHash`/`hash`, so
+ * `verifyAuditAgainstCheckpoint(...)` against ANY checkpoint signed
+ * before the prune fails afterwards - BY DESIGN, and indistinguishably
+ * from a truncate-and-re-root attack. Every retention prune must
+ * therefore end with signing + distributing a fresh checkpoint and
+ * marking the old anchors superseded; see the "Retention and
+ * anchoring" runbook in the security guide.
+ *
  * @packageDocumentation
  */
 
 import { computeAuditHash, GENESIS_PREV_HASH } from './append.js';
 import type { AuditDb } from './audit-db.js';
 import type { StoredAuditEntry } from './types.js';
+
+/** W-062: survivors re-hashed per closed-iterator batch (see pruneAudit body). */
+const REWRITE_BATCH_SIZE = 500;
 
 /**
  * Options for `pruneAudit(...)`.
@@ -119,13 +131,34 @@ export async function pruneAudit(
   // recomputed so `verifyAuditChain` keeps reporting a clean chain
   // on the trimmed log. The cryptographic link to the deleted prefix
   // is severed by design - that is the documented retention contract.
+  //
+  // The rewrite is BATCHED (W-062): `iterate()` may hold a live
+  // statement on the underlying connection (the shipped
+  // better-sqlite3 binding does), and writing through the same
+  // connection while an iterator is open throws
+  // "This database connection is busy executing a query". Collect a
+  // bounded batch, let the iterator CLOSE (the early `break`
+  // propagates return() through the generator), then rewrite; memory
+  // stays bounded by the batch size instead of the chain length.
   let prevHash = GENESIS_PREV_HASH;
   let firstSurviving: StoredAuditEntry | undefined;
-  for await (const entry of db.iterate()) {
-    const rewritten = withRehashedChain(entry, prevHash);
-    await db.replaceEntry(rewritten);
-    if (firstSurviving === undefined) firstSurviving = rewritten;
-    prevHash = rewritten.hash;
+  let fromSeq = 0;
+  for (;;) {
+    const batch: StoredAuditEntry[] = [];
+    for await (const entry of db.iterate({ fromSeq })) {
+      batch.push(entry);
+      if (batch.length >= REWRITE_BATCH_SIZE) break;
+    }
+    if (batch.length === 0) break;
+    for (const entry of batch) {
+      const rewritten = withRehashedChain(entry, prevHash);
+      await db.replaceEntry(rewritten);
+      if (firstSurviving === undefined) firstSurviving = rewritten;
+      prevHash = rewritten.hash;
+    }
+    const lastInBatch = batch[batch.length - 1];
+    if (lastInBatch === undefined) break;
+    fromSeq = lastInBatch.seq + 1;
   }
 
   const result: PruneAuditResult = Object.freeze({

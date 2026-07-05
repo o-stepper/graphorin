@@ -105,6 +105,20 @@ const result = await verifyAuditAgainstCheckpoint(auditDb, checkpoint, { publicK
 
 Also available: `computeAuditTreeHead`, `proveAuditInclusion` / `verifyAuditInclusion` ("entry N is in the log with head H"), and `proveAuditConsistency` / `verifyAuditConsistency`. As long as one signed checkpoint survives outside the writer's reach, a rewrite, reorder, or truncate-and-re-root is detectable.
 
+### Retention and anchoring: the re-anchor runbook
+
+`pruneAudit` re-roots the surviving suffix (every surviving entry's `prevHash`/`hash` is recomputed), and the RFC-6962 leaves hash the canonical JSON of each entry INCLUDING those fields - so **verification against any checkpoint signed before the prune MUST fail afterwards, by design**. A legitimate retention prune is cryptographically indistinguishable from the truncate-and-re-root attack this layer exists to detect; only the operator's out-of-band procedure tells them apart. Run every retention prune as one atomic ceremony:
+
+1. Run the prune (`graphorin audit prune --before ...` or `pruneAudit(...)`).
+2. Immediately sign a FRESH checkpoint of the new head: `signAuditCheckpoint(auditDb, { privateKeyPem, writerId })`.
+3. Distribute the new checkpoint to every out-of-band anchor location (other host, object store, ticket).
+4. Revoke or explicitly mark superseded every pre-prune checkpoint, recording the prune timestamp next to them - a later `verifyAuditAgainstCheckpoint` failure against one of them must read as "expected: pre-prune anchor", not as an alarm.
+5. Accept that anchored history restarts at the prune point: inclusion/consistency proofs only cover entries after it.
+
+A pre-prune checkpoint that keeps verifying is the actual alarm (it means the prune did not happen where you think it did).
+
+**Identifier-level erasure limitation.** `pruneAudit` is the only erasure primitive for the audit database and it trims a TIME PREFIX only - selective deletion of the entries of one user / session / actor is not possible without breaking the chain. For GDPR-style identifier-level requests: keep direct identifiers OUT of audit payloads (store opaque ids the primary database can unlink), or erase via a full prefix prune up to the qualifying date, re-anchoring as above.
+
 ## OAuth 2.1 with PKCE
 
 ```mermaid

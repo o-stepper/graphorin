@@ -130,6 +130,15 @@ export async function runAuditPrune(options: AuditPruneOptions): Promise<PruneAu
           `pruned ${result.deleted} audit entries (cutoff=${new Date(cutoff).toISOString()}, surviving from seq=${result.firstSurvivingSeq ?? '<empty>'})`,
         ),
       );
+      // W-062: the prune re-rooted the chain - every Merkle checkpoint
+      // signed BEFORE it now fails verification by design.
+      print(
+        brand(
+          'note: Merkle checkpoints signed before this prune no longer verify (the chain was re-rooted). ' +
+            'Sign and distribute a fresh checkpoint now (signAuditCheckpoint) and mark the old anchors superseded - ' +
+            'see the "Retention and anchoring" runbook in the security guide.',
+        ),
+      );
     });
     return result;
   } finally {
