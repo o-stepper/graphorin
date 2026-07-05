@@ -220,6 +220,7 @@ function buildAdaptedTool(args: BuildAdaptedToolArgs): Tool<unknown, unknown, un
         outputSchema: args.outputSchema,
         serverIdentity: args.serverIdentity,
         toolName: args.graphorinToolName,
+        inboundSanitization: args.inboundSanitization,
         ...(args.logger !== undefined ? { logger: args.logger } : {}),
       });
     },
