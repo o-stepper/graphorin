@@ -136,3 +136,7 @@ By contributing to Graphorin, you agree that your contributions will be licensed
 ---
 
 **Graphorin** · v0.6.1 · MIT License · © 2026 Oleksiy Stepurenko · <https://graphorin.com> · <https://github.com/o-stepper/graphorin>
+
+## Pack gate
+
+CI's `package-shape` job validates the PUBLISHED artifacts (the workspace's `workspace:*` symlinks and shared devDependencies mask packaging defects): `publint` + `@arethetypeswrong/cli` over every packed tarball, then a scratch consumer that installs all 27 tarballs in ONE `npm install` call (load-bearing on Version-Packages branches, where the tarballs name not-yet-published versions and only a simultaneous install lets the `file:` instances satisfy each other) and compiles `scripts/pack-consumer/consumer.ts` under a `moduleResolution` x `zod` matrix with `skipLibCheck: false`. Run it locally with `node scripts/check-package-shape.mjs` (add `--skip-build` after a fresh `pnpm build`; needs registry access). The `--allow-fail zod4` flag tracks the known zod-4 d.ts break until its fix lands - remove it from `ci.yml` together with that fix.

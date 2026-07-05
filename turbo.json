@@ -5,7 +5,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "!dist/**/*.map"],
+      "outputs": ["dist/**"],
       "inputs": ["src/**", "tsconfig.json", "tsdown.config.ts", "package.json"]
     },
     "typecheck": {
