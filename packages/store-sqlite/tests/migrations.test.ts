@@ -65,6 +65,9 @@ describe('migrations', () => {
     expect(names.has('consolidator_failed_batches')).toBe(true);
     expect(names.has('conflict_check_pending')).toBe(true);
     expect(names.has('fact_conflicts')).toBe(true);
+    // Migration 030: the span end-time retention index exists.
+    const spanIndexes = conn.all<{ name: string }>("PRAGMA index_list('spans')");
+    expect(spanIndexes.map((i) => i.name)).toContain('idx_spans_end');
     // Migration 012 added the `conflicting_ids_json` column to
     // `conflict_check_pending` - make sure it actually landed.
     const cols = conn.all<{ name: string }>(

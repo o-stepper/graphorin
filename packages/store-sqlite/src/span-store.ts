@@ -109,6 +109,40 @@ export async function* traceSourceForSession(
   }
 }
 
+/**
+ * Delete every persisted span of one session (W-006). Called by the
+ * session hard-delete cascade (the `spans` entry of
+ * `SESSION_SCOPED_PURGES`); exported for hosts that manage spans out
+ * of band. Returns the number of rows deleted.
+ *
+ * @stable
+ */
+export function deleteSpansForSession(conn: SqliteConnection, sessionId: string): number {
+  const result = conn.run('DELETE FROM spans WHERE session_id = ?', [sessionId]);
+  return result.changes ?? 0;
+}
+
+/**
+ * Age-based span retention (W-008): delete every span that FINISHED
+ * before the cutoff, including rows with `session_id IS NULL` (not
+ * attached to any session, so age is their only deletion path). The
+ * cutoff is epoch **milliseconds** - the ns conversion happens here so
+ * callers never juggle units; sub-ms precision loss at the 2^53
+ * boundary is irrelevant for retention. Backed by the
+ * `idx_spans_end` index (migration 030), so the sweep is not a full
+ * table scan. Returns the number of rows deleted.
+ *
+ * @stable
+ */
+export function pruneSpans(
+  conn: SqliteConnection,
+  opts: { readonly beforeEpochMs: number },
+): number {
+  const cutoffNano = opts.beforeEpochMs * 1e6;
+  const result = conn.run('DELETE FROM spans WHERE end_unix_nano < ?', [cutoffNano]);
+  return result.changes ?? 0;
+}
+
 function rowToSpanRecord(row: SpanRow): SpanRecord {
   const record: Record<string, unknown> = {
     type: row.type,

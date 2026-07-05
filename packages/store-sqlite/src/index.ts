@@ -107,6 +107,8 @@ import {
 } from './session-store.js';
 import {
   createSqliteSpanExporter,
+  deleteSpansForSession,
+  pruneSpans,
   SPAN_SESSION_ATTRIBUTE,
   traceSourceForSession,
 } from './span-store.js';
@@ -332,6 +334,7 @@ export {
   createSqliteSpanExporter,
   type DlqBatchInput,
   type DlqBatchRow,
+  deleteSpansForSession,
   EmbedderLockOnFirstError,
   // embedder registry
   type EmbedderPolicy,
@@ -356,6 +359,7 @@ export {
   type PassphraseResolver,
   type PendingConflictInput,
   type PendingConflictRow,
+  pruneSpans,
   type RegisterEmbedderInput,
   readPragma,
   readWalSize,
