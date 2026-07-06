@@ -34,7 +34,8 @@ export type WorkflowErrorCode =
   | 'node-timeout'
   | 'workflow-version-mismatch'
   | 'workflow-divergence'
-  | 'pause-not-found';
+  | 'pause-not-found'
+  | 'pause-replay-divergence';
 
 /**
  * Base error class for all `@graphorin/workflow` failures.

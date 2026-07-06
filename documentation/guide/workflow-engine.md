@@ -133,6 +133,7 @@ Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Te
 - On resume, the paused node's body re-executes **from the top**. Earlier `pause()` calls inside the same body replay their already-delivered values in order; only the first unsatisfied `pause()` suspends again.
 - **Side effects before a `pause()` run again on every resume of that node.** Make them idempotent, or move them into a separate upstream node (whose completed step is never re-run).
 - A `pauseAt.before` static gate re-runs the gated node with *no* replayed values - operator approval of the node is not an answer to any programmatic `pause()` inside it.
+- **Pause order must be deterministic.** The replay is positional, and each delivered value is journaled together with the identity of the pause it answered (durable-primitive kind, awakeable/approval name). A body whose pause ORDER depends on time, state, or model output now fails loudly with the typed `pause-replay-divergence` error - naming the node plus the expected and actual pause - instead of silently handing a resume value to the wrong wait. Two plain `pause()` calls are indistinguishable and are never flagged; checkpoints written before this check replay their old values unverified.
 
 ### State must be JSON-safe
 

@@ -390,6 +390,16 @@ export interface PendingPauseRecord {
    */
   readonly satisfied?: ReadonlyArray<unknown>;
   /**
+   * W-120: per-value identity of the pause each `satisfied` entry
+   * answered (`kind` for durable primitives, `name` for
+   * awakeables/approvals; `null`/empty for plain `pause()`). Replay
+   * verifies each entry against the CURRENT pause at that cursor and
+   * fails with `pause-replay-divergence` on mismatch. Absent on
+   * checkpoints written before the field existed - those replay
+   * unchecked (back-compat).
+   */
+  readonly satisfiedMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
+  /**
    * Epoch ms at which a durable timer becomes due (D1) - present when
    * the suspension came from `sleepUntil(...)` / `sleepFor(...)`.
    * `workflow.tick(threadId)` resumes the thread once due.

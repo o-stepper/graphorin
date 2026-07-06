@@ -37,6 +37,7 @@ import {
   isApprovalPauseValue,
   isAwakeablePauseValue,
   isPauseSignal,
+  isReplayDivergenceSignal,
   isTimerPauseValue,
   runWithPauseResume,
 } from '@graphorin/core';
@@ -128,6 +129,39 @@ export function namespaceFor(config: { readonly name: string }): string {
   return `workflow/${config.name}`;
 }
 
+/**
+ * W-120: identity of a pause record for the replay-divergence check -
+ * durable-primitive `kind` off the pause value plus the awakeable /
+ * approval `name`. A plain `pause()` yields `{}` (never checked).
+ */
+function pauseMetaOf(record: {
+  readonly value: unknown;
+  readonly name?: string;
+}): { readonly kind?: string; readonly name?: string } {
+  const v = record.value as { readonly kind?: unknown } | null | undefined;
+  const kind = typeof v === 'object' && v !== null && typeof v.kind === 'string' ? v.kind : undefined;
+  return {
+    ...(kind !== undefined ? { kind } : {}),
+    ...(record.name !== undefined ? { name: record.name } : {}),
+  };
+}
+
+function describePauseIdentity(id: { readonly kind?: string; readonly name?: string }): string {
+  const parts: string[] = [];
+  if (id.kind !== undefined) parts.push(`kind '${id.kind}'`);
+  if (id.name !== undefined) parts.push(`name '${id.name}'`);
+  return parts.length > 0 ? parts.join(' / ') : 'a plain pause';
+}
+
+/** W-120: prior satisfiedMeta, padded with nulls for legacy records. */
+function priorMetaOf(record: {
+  readonly satisfied?: ReadonlyArray<unknown>;
+  readonly satisfiedMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
+}): Array<{ readonly kind?: string; readonly name?: string } | null> {
+  if (record.satisfiedMeta !== undefined) return [...record.satisfiedMeta];
+  return (record.satisfied ?? []).map(() => null);
+}
+
 let warnedLegacyAsyncDurability = false;
 
 /**
@@ -162,6 +196,8 @@ interface PlannedTask {
    * every programmatic `pause()` suspends (the static-before case).
    */
   readonly resumeValues?: ReadonlyArray<unknown>;
+  /** W-120: identity of the pause each resume value answers. */
+  readonly resumeMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
   readonly staticBefore?: boolean;
   readonly staticAfter?: boolean;
 }
@@ -380,6 +416,7 @@ export async function* resumeEngine<TState extends object>(
               source: 'resume' as const,
               ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
               resumeValues: pauseRecord.staticBefore ? [] : [...(pauseRecord.satisfied ?? [])],
+              resumeMeta: pauseRecord.staticBefore ? [] : priorMetaOf(pauseRecord),
               ...(pauseRecord.staticBefore ? { staticBefore: true } : {}),
             };
           }
@@ -482,6 +519,11 @@ export async function* resumeEngine<TState extends object>(
               resumeValues: primary.staticBefore
                 ? []
                 : [...(primary.satisfied ?? []), directive?.resume],
+              // W-120: the new directive value answers THIS pause - pin
+              // its identity so a divergent replay is caught.
+              resumeMeta: primary.staticBefore
+                ? []
+                : [...priorMetaOf(primary), pauseMetaOf(primary)],
               ...(primary.staticBefore ? { staticBefore: true } : {}),
             });
           }
@@ -501,6 +543,7 @@ export async function* resumeEngine<TState extends object>(
             source: 'resume',
             ...(record.dispatchArgs !== undefined ? { dispatchArgs: record.dispatchArgs } : {}),
             resumeValues: record.staticBefore ? [] : [...(record.satisfied ?? [])],
+            resumeMeta: record.staticBefore ? [] : priorMetaOf(record),
             ...(record.staticBefore ? { staticBefore: true } : {}),
           });
         }
@@ -794,6 +837,8 @@ async function* driveRun<TState extends object>(
                 source: t.source,
                 ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
                 ...(t.resumeValues !== undefined ? { resumeValues: [...t.resumeValues] } : {}),
+      ...(t.resumeMeta !== undefined ? { resumeMeta: [...t.resumeMeta] } : {}),
+                ...(t.resumeMeta !== undefined ? { resumeMeta: [...t.resumeMeta] } : {}),
                 ...(t.staticBefore === true ? { staticBefore: true } : {}),
               })),
             },
@@ -903,6 +948,17 @@ async function* driveRun<TState extends object>(
         if (isPauseSignal(err)) {
           paused = { value: err.value };
           status = 'paused';
+        } else if (isReplayDivergenceSignal(err)) {
+          // W-120: nondeterministic pause order - fail LOUDLY with the
+          // typed code instead of delivering a value to the wrong pause.
+          status = 'failed';
+          nodeFailure ??= {
+            nodeName: task.nodeName,
+            cause: new WorkflowError(
+              'pause-replay-divergence',
+              `node '${task.nodeName}' paused as ${describePauseIdentity(err.actual)} where the journal recorded ${describePauseIdentity(err.expected)} at cursor ${err.cursor}. The body's pause order depends on state/time/model output - make the branching between pauses deterministic, or key the waits by distinct awakeable names.`,
+            ),
+          };
         } else if (taskController.signal.aborted) {
           status = 'failed';
           nodeFailure ??= {
@@ -1064,6 +1120,9 @@ async function* driveRun<TState extends object>(
           : {}),
         ...(outcome.task.resumeValues !== undefined && outcome.task.resumeValues.length > 0
           ? { satisfied: outcome.task.resumeValues }
+          : {}),
+        ...(outcome.task.resumeMeta !== undefined && outcome.task.resumeMeta.length > 0
+          ? { satisfiedMeta: outcome.task.resumeMeta }
           : {}),
         ...(isTimerPauseValue(pauseValue) ? { wakeAt: pauseValue.wakeAt } : {}),
         ...(isAwakeablePauseValue(pauseValue) || isApprovalPauseValue(pauseValue)
@@ -1505,8 +1564,9 @@ async function runResumedNode<TState extends object>(
   node: WorkflowNode<TState>,
   ctx: WorkflowContext<TState>,
   resumeValues: ReadonlyArray<unknown>,
+  resumeMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>,
 ): Promise<unknown> {
-  return runWithPauseResume(resumeValues, async () => node.run(ctx.state, ctx));
+  return runWithPauseResume(resumeValues, async () => node.run(ctx.state, ctx), resumeMeta);
 }
 
 function directiveUpdateToWrites(nodeName: string, update: unknown): ChannelWrite[] {
@@ -1741,6 +1801,8 @@ interface StepIntentTask {
   readonly source: PlannedTask['source'];
   readonly dispatchArgs?: unknown;
   readonly resumeValues?: ReadonlyArray<unknown>;
+  /** W-120: identity of the pause each resume value answers. */
+  readonly resumeMeta?: ReadonlyArray<{ readonly kind?: string; readonly name?: string } | null>;
   readonly staticBefore?: boolean;
 }
 
@@ -1806,6 +1868,7 @@ function readStepJournal(
       source: t.source === 'resume' ? ('resume' as const) : ('dispatch' as const),
       ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
       ...(t.resumeValues !== undefined ? { resumeValues: [...t.resumeValues] } : {}),
+      ...(t.resumeMeta !== undefined ? { resumeMeta: [...t.resumeMeta] } : {}),
       ...(t.staticBefore === true ? { staticBefore: true } : {}),
     }));
   return { replayWrites, completedNodes, rerunTasks };
@@ -1872,7 +1935,7 @@ async function runNodeWithPolicy<TState extends object>(args: {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         if (task.source === 'resume') {
-          return await runResumedNode(node, ctx, task.resumeValues ?? []);
+          return await runResumedNode(node, ctx, task.resumeValues ?? [], task.resumeMeta);
         }
         return await Promise.resolve(node.run(ctx.state, ctx));
       } catch (err) {
@@ -2037,6 +2100,7 @@ function readLegacyPendingPause(metadata: CheckpointMetadata): PendingPauseRecor
       ...(parsed.staticBefore ? { staticBefore: true } : {}),
       ...(parsed.staticAfter ? { staticAfter: true } : {}),
       ...(Array.isArray(parsed.satisfied) ? { satisfied: parsed.satisfied } : {}),
+      ...(Array.isArray(parsed.satisfiedMeta) ? { satisfiedMeta: parsed.satisfiedMeta } : {}),
     };
   } catch {
     return undefined;

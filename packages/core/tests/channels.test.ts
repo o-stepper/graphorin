@@ -11,7 +11,13 @@ import {
 } from '../src/channels/channels.js';
 import { Directive } from '../src/channels/directive.js';
 import { Dispatch, dispatch } from '../src/channels/dispatch.js';
-import { isPauseSignal, PauseSignal, pause, runWithPauseResume } from '../src/channels/pause.js';
+import {
+  isPauseSignal,
+  isReplayDivergenceSignal,
+  PauseSignal,
+  pause,
+  runWithPauseResume,
+} from '../src/channels/pause.js';
 
 describe('channel constructors', () => {
   it('latestValue', () => {
@@ -145,5 +151,42 @@ describe('pause', () => {
       }
     });
     expect(isPauseSignal(threw)).toBe(true);
+  });
+});
+
+describe('W-120 - pause replay divergence detection', () => {
+  it('a matching identity replays the value', async () => {
+    const result = await runWithPauseResume(
+      ['answer'],
+      () => pause({ kind: 'awakeable', name: 'a' }),
+      [{ kind: 'awakeable', name: 'a' }],
+    );
+    expect(result).toBe('answer');
+  });
+
+  it('a mismatched identity throws the branded divergence signal', async () => {
+    let threw: unknown;
+    await runWithPauseResume(
+      ['answer'],
+      () => {
+        try {
+          pause({ kind: 'awakeable', name: 'b' });
+        } catch (err) {
+          threw = err;
+        }
+      },
+      [{ kind: 'awakeable', name: 'a' }],
+    );
+    expect(isReplayDivergenceSignal(threw)).toBe(true);
+    expect(isPauseSignal(threw)).toBe(false);
+  });
+
+  it('absent meta (legacy) and empty identity (plain pause) replay unchecked', async () => {
+    // No meta at all - old behavior.
+    expect(await runWithPauseResume(['x'], () => pause({ kind: 'timer', wakeAt: 1 }))).toBe('x');
+    // Meta present but empty identity: two plain pauses are
+    // indistinguishable by design.
+    expect(await runWithPauseResume(['y'], () => pause('anything'), [{}])).toBe('y');
+    expect(await runWithPauseResume(['z'], () => pause('anything'), [null])).toBe('z');
   });
 });
