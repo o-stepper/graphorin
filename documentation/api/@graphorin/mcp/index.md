@@ -241,6 +241,38 @@ const issues = await createMCPClient({
 });
 ```
 
+## Managed client (auto-reconnect)
+
+`createMCPClient` connections are deliberately **one-shot**: the SDK
+heals transient Streamable HTTP hiccups itself (`Last-Event-ID`), but
+a dead stdio child or a lost HTTP session kills the client for good -
+and every `Tool` adapted from it closes over the corpse. For
+long-running agents, opt into the managed wrapper:
+
+```ts
+import { createManagedMCPClient } from '@graphorin/mcp';
+
+const client = await createManagedMCPClient({
+  transport: { kind: 'stdio', command: 'linear-mcp' },
+  reconnect: { maxAttempts: 5, initialDelayMs: 500, maxDelayMs: 30_000 },
+});
+const tools = await client.toTools({ pinStore }); // register once
+```
+
+The wrapper implements `MCPClient` by delegating to an inner client it
+rebuilds on transport close (exponential backoff + jitter;
+`mcp.reconnect.attempt/success/gave-up.total` counters). Tools from
+`client.toTools()` close over the **wrapper**, so the same registered
+`Tool` objects keep working across a reconnect - no re-registration.
+After a successful reconnect the wrapper re-runs `toTools()` with the
+last-used options, so the pin comparison / TOFU store re-screens the
+post-reconnect catalogue (a rug-pull across a reconnect is caught and,
+with a pin store, rejected + logged). Two contracts to know: an
+**in-flight call is never retried** (the failed call stays failed;
+retry policy belongs to the executor/model - only the connection
+heals), and the operator's `onTransportClose` fires **once, on final
+failure** (reconnect attempts exhausted), not per outage.
+
 ## Streamable HTTP sessions
 
 When the MCP server assigns an `Mcp-Session-Id` on `initialize`, the

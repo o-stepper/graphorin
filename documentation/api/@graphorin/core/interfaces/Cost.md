@@ -17,5 +17,5 @@ code so that consumers can perform aggregation safely.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-amount"></a> `amount` | `number` | Amount in the smallest fractional unit of the declared currency. | packages/core/src/types/usage.ts:48 |
-| <a id="property-currency"></a> `currency` | `string` | ISO-4217 currency code; default `'USD'`. | packages/core/src/types/usage.ts:50 |
+| <a id="property-amount"></a> `amount` | `number` | Amount in WHOLE units of `currency` - for USD that is dollars, and fractional values are expected (a typical LLM call costs a fraction of a cent, e.g. `0.0042`). This is deliberately NOT "minor units" / cents (W-045): the canonical producer - `calculateCost` in `@graphorin/pricing` - and every consumer (`CostTracker` in `@graphorin/observability`, the memory consolidator's `costUsd` budget, persisted checkpoints) already operate in whole currency units, and sub-cent per-call figures make minor units impractical. Do not divide by 100. | packages/core/src/types/usage.ts:58 |
+| <a id="property-currency"></a> `currency` | `string` | ISO-4217 currency code; default `'USD'`. | packages/core/src/types/usage.ts:60 |

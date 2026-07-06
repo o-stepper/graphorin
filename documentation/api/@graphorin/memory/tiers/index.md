@@ -156,6 +156,12 @@ Re-exports [SemanticMemory](/api/@graphorin/memory/classes/SemanticMemory.md)
 
 ***
 
+### SemanticSearchDefaults
+
+Re-exports [SemanticSearchDefaults](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md)
+
+***
+
 ### SessionCompactionPolicy
 
 Re-exports [SessionCompactionPolicy](/api/@graphorin/memory/interfaces/SessionCompactionPolicy.md)

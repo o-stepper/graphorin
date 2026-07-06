@@ -10,6 +10,6 @@
 const DEFAULT_DIFFICULTY_THRESHOLD: 0.5 = 0.5;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:48
+Defined in: packages/memory/src/search/iterative.ts:49
 
 Default score (0..1) at or above which a query is classified as hard.

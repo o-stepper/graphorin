@@ -10,7 +10,7 @@
 function refreshPricing(opts): Promise<PricingSnapshot>;
 ```
 
-Defined in: pricing/src/refresh.ts:55
+Defined in: pricing/src/refresh.ts:63
 
 Pull a fresh snapshot from the supplied URL and return it. Network
 failures and shape mismatches surface as thrown errors so the CLI

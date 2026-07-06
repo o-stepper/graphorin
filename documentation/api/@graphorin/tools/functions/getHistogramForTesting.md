@@ -10,7 +10,7 @@
 function getHistogramForTesting(name, labels?): readonly number[];
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:150
+Defined in: packages/tools/src/audit/counters.ts:170
 
 **`Experimental`**
 

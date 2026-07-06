@@ -6,9 +6,13 @@
 
 # Interface: ProceduralMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:141
+Defined in: packages/core/src/contracts/memory-store.ts:154
 
 ## Stable
+
+## Extended by
+
+- [`ProceduralMemoryStoreExt`](/api/@graphorin/memory/interfaces/ProceduralMemoryStoreExt.md)
 
 ## Methods
 
@@ -18,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:141
 add(rule): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:142
+Defined in: packages/core/src/contracts/memory-store.ts:155
 
 #### Parameters
 
@@ -38,7 +42,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:142
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:143
+Defined in: packages/core/src/contracts/memory-store.ts:156
 
 #### Parameters
 
@@ -58,7 +62,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:143
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:144
+Defined in: packages/core/src/contracts/memory-store.ts:157
 
 #### Parameters
 

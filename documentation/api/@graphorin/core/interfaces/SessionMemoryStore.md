@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:96
+Defined in: packages/core/src/contracts/memory-store.ts:109
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:96
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:98
+Defined in: packages/core/src/contracts/memory-store.ts:111
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:98
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:103
+Defined in: packages/core/src/contracts/memory-store.ts:116
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -67,7 +67,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:97
+Defined in: packages/core/src/contracts/memory-store.ts:110
 
 #### Parameters
 
@@ -91,7 +91,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:107
+Defined in: packages/core/src/contracts/memory-store.ts:120
 
 #### Parameters
 

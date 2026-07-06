@@ -10,7 +10,7 @@
 function createProviderQueryTransformer(provider, options?): QueryTransformer;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:196
+Defined in: packages/memory/src/search/query-transform.ts:197
 
 Wrap a [Provider](/api/@graphorin/core/interfaces/Provider.md) as a [QueryTransformer](/api/@graphorin/memory/interfaces/QueryTransformer.md). Both methods
 are **resilient**: a provider error or unparseable response degrades

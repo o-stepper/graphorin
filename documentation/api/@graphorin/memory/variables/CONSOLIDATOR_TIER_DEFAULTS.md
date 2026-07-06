@@ -17,6 +17,7 @@ const CONSOLIDATOR_TIER_DEFAULTS: Readonly<Record<ConsolidatorTier, {
   importanceThreshold: number;
   learnedContext: boolean;
   learnedContextMaxChars: number;
+  maxTranscriptChars: number;
   onExceed: OnBudgetExceed;
   phases: ReadonlyArray<ConsolidatorPhase>;
   reflection: boolean;
@@ -25,7 +26,7 @@ const CONSOLIDATOR_TIER_DEFAULTS: Readonly<Record<ConsolidatorTier, {
 }>>;
 ```
 
-Defined in: packages/memory/src/consolidator/types.ts:466
+Defined in: packages/memory/src/consolidator/types.ts:482
 
 Tier preset table. The defaults follow ADR-038 §4 - `'free'`
 disables every LLM phase and pins zero ceilings, the upper tiers

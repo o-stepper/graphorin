@@ -6,7 +6,7 @@
 
 # Interface: IterativeRetrievalOptions
 
-Defined in: packages/memory/src/search/iterative.ts:401
+Defined in: packages/memory/src/search/iterative.ts:402
 
 Options for [runIterativeRetrieval](/api/@graphorin/memory/functions/runIterativeRetrieval.md).
 
@@ -16,9 +16,9 @@ Options for [runIterativeRetrieval](/api/@graphorin/memory/functions/runIterativ
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-difficulty"></a> `difficulty?` | `readonly` | [`DifficultyGateOptions`](/api/@graphorin/memory/interfaces/DifficultyGateOptions.md) | Difficulty-gate tuning. | packages/memory/src/search/iterative.ts:405 |
-| <a id="property-forcehard"></a> `forceHard?` | `readonly` | `boolean` | Skip the heuristic gate and force the loop (still capped). | packages/memory/src/search/iterative.ts:407 |
-| <a id="property-maxgradesnippets"></a> `maxGradeSnippets?` | `readonly` | `number` | Max snippets passed to the grader per pass. Default 8. | packages/memory/src/search/iterative.ts:409 |
-| <a id="property-maxiterations"></a> `maxIterations?` | `readonly` | `number` | Total-pass cap; clamped to `[1, {@link MAX_ITERATIONS_CEILING}]`. | packages/memory/src/search/iterative.ts:403 |
-| <a id="property-maxresults"></a> `maxResults?` | `readonly` | `number` | Cap on the returned hit count (omitted ⇒ all accumulated). | packages/memory/src/search/iterative.ts:411 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/memory/src/search/iterative.ts:412 |
+| <a id="property-difficulty"></a> `difficulty?` | `readonly` | [`DifficultyGateOptions`](/api/@graphorin/memory/interfaces/DifficultyGateOptions.md) | Difficulty-gate tuning. | packages/memory/src/search/iterative.ts:406 |
+| <a id="property-forcehard"></a> `forceHard?` | `readonly` | `boolean` | Skip the heuristic gate and force the loop (still capped). | packages/memory/src/search/iterative.ts:408 |
+| <a id="property-maxgradesnippets"></a> `maxGradeSnippets?` | `readonly` | `number` | Max snippets passed to the grader per pass. Default 8. | packages/memory/src/search/iterative.ts:410 |
+| <a id="property-maxiterations"></a> `maxIterations?` | `readonly` | `number` | Total-pass cap; clamped to `[1, {@link MAX_ITERATIONS_CEILING}]`. | packages/memory/src/search/iterative.ts:404 |
+| <a id="property-maxresults"></a> `maxResults?` | `readonly` | `number` | Cap on the returned hit count (omitted ⇒ all accumulated). | packages/memory/src/search/iterative.ts:412 |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | - | packages/memory/src/search/iterative.ts:413 |

@@ -15,7 +15,7 @@ function runWorkflowInduction(
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:274
+Defined in: packages/memory/src/consolidator/phases/induce.ts:275
 
 Pure orchestrator: induce a procedure from a trajectory.
 

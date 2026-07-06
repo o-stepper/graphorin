@@ -10,6 +10,6 @@
 type ServerSubscribedFrame = z.infer<typeof SubscribedFrame>;
 ```
 
-Defined in: src/server-message.ts:172
+Defined in: src/server-message.ts:184
 
 ## Stable

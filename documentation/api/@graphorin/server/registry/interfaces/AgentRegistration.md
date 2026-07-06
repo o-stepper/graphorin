@@ -6,7 +6,7 @@
 
 # Interface: AgentRegistration
 
-Defined in: packages/server/src/registry/index.ts:139
+Defined in: packages/server/src/registry/index.ts:146
 
 Registration descriptor accepted by [AgentRegistry.register](/api/@graphorin/server/registry/classes/AgentRegistry.md#register).
 
@@ -16,7 +16,7 @@ Registration descriptor accepted by [AgentRegistry.register](/api/@graphorin/ser
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agent"></a> `agent` | `readonly` | [`ServerAgentLike`](/api/@graphorin/server/registry/interfaces/ServerAgentLike.md) | packages/server/src/registry/index.ts:141 |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/server/src/registry/index.ts:142 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:140 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/server/src/registry/index.ts:143 |
+| <a id="property-agent"></a> `agent` | `readonly` | [`ServerAgentLike`](/api/@graphorin/server/registry/interfaces/ServerAgentLike.md) | packages/server/src/registry/index.ts:148 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | packages/server/src/registry/index.ts:149 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/server/src/registry/index.ts:147 |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/server/src/registry/index.ts:150 |

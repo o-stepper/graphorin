@@ -6,7 +6,7 @@
 
 # Class: SemanticMemory
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:396
+Defined in: packages/memory/src/tiers/semantic-memory.ts:429
 
 `SemanticMemory` - long-term factual store. Hybrid (vector + FTS5)
 search merges the two ranked lists through the configured
@@ -28,22 +28,24 @@ instance (`createMemory({ conflictPipeline: { mode: 'off' } })`).
 new SemanticMemory(args): SemanticMemory;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:410
+Defined in: packages/memory/src/tiers/semantic-memory.ts:445
 
 #### Parameters
 
 | Parameter | Type | Description |
 | ------ | ------ | ------ |
-| `args` | \{ `conflictPipeline?`: [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md); `contextualRetrieval?`: `"off"` \| `"late-chunk"`; `embedder`: \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null`; `embedderIdProvider`: () => `string` \| `null`; `entityResolver?`: [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md); `grader?`: [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md); `iterativeMaxIterations?`: `number`; `queryTransformer?`: [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md); `reranker`: [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md); `store`: [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md); `tracer`: [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md); `trustWeights?`: `SalienceWeights`; \} | - |
+| `args` | \{ `conflictPipeline?`: [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md); `contextualRetrieval?`: `"off"` \| `"late-chunk"`; `embedder`: \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null`; `embedderIdProvider`: () => `string` \| `null`; `entityResolver?`: [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md); `grader?`: [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md); `iterativeDifficultyThreshold?`: `number`; `iterativeMaxIterations?`: `number`; `queryTransformer?`: [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md); `reranker`: [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md); `searchDefaults?`: [`SemanticSearchDefaults`](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md); `store`: [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md); `tracer`: [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md); `trustWeights?`: `SalienceWeights`; \} | - |
 | `args.conflictPipeline?` | [`ConflictPipeline`](/api/@graphorin/memory/interfaces/ConflictPipeline.md) | - |
 | `args.contextualRetrieval?` | `"off"` \| `"late-chunk"` | Contextual-retrieval mode for the write path (P1-3). `'late-chunk'` (default) prepends a deterministic situating context to the text that is embedded + FTS-indexed, leaving the canonical `text` untouched; `'off'` indexes the bare text. The hot write path never makes an LLM call - the `'llm'` enrichment is confined to the background consolidator, which supplies a precomputed `indexText`. |
 | `args.embedder` | \| [`EmbedderProvider`](/api/@graphorin/core/interfaces/EmbedderProvider.md) \| `null` | - |
 | `args.embedderIdProvider` | () => `string` \| `null` | - |
 | `args.entityResolver?` | [`EntityResolver`](/api/@graphorin/memory/classes/EntityResolver.md) | Entity resolver for the relation graph (P2-1). When supplied, `remember(...)` resolves a fact's subject / object to canonical entities and links them, enabling `search(..., { expandHops: 1 })`. Omitted (the default) ⇒ writes carry s/p/o but form no entity links, and the write path stays offline + unchanged. |
 | `args.grader?` | [`RetrievalGrader`](/api/@graphorin/memory/interfaces/RetrievalGrader.md) | Retrieval grader for the gated iterative loop (P2-4). When supplied, `searchIterative(...)` can grade a retrieved set and reformulate on hard queries; omitted (the default) ⇒ `searchIterative` runs a single, difficulty-gated pass and makes no provider call. |
+| `args.iterativeDifficultyThreshold?` | `number` | Default difficulty-gate threshold for `searchIterative` (W-088). Omitted ⇒ the gate's built-in `0.5`. Per-call `difficultyThreshold` overrides it. |
 | `args.iterativeMaxIterations?` | `number` | Default total-pass cap for `searchIterative`. Default 3. |
 | `args.queryTransformer?` | [`QueryTransformer`](/api/@graphorin/memory/interfaces/QueryTransformer.md) | Query transformer for multi-query / HyDE retrieval (P2-3). When supplied, `search(..., { multiQuery })` / `{ hyde }` opt into one cheap LLM call to rewrite / hypothesize the query; omitted (the default) ⇒ those options are silent no-ops and search stays offline + single-shot. |
 | `args.reranker` | [`ReRanker`](/api/@graphorin/memory/interfaces/ReRanker.md) | - |
+| `args.searchDefaults?` | [`SemanticSearchDefaults`](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md) | Construction-time retrieval defaults (W-086) merged under every `search(...)` call - see [SemanticSearchDefaults](/api/@graphorin/memory/type-aliases/SemanticSearchDefaults.md). Because the merge happens inside `search()`, the model-facing surfaces (`fact_search`, auto-recall, `deep_recall`) inherit them without any per-surface wiring; per-call options override key-by-key (so e.g. `deep_recall`'s widen-pass `expandHops` still wins). |
 | `args.store` | [`MemoryStoreAdapter`](/api/@graphorin/memory/interfaces/MemoryStoreAdapter.md) | - |
 | `args.tracer` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | - |
 | `args.trustWeights?` | `SalienceWeights` | Weights for the rank-time trust discount (C5). Reuses the eviction-path `SalienceWeights` semantics; defaults to `DEFAULT_SALIENCE_WEIGHTS`. |
@@ -63,7 +65,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1222
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1306
 
 Soft-delete a fact (kept for replay; never hard-deleted).
 
@@ -90,7 +92,7 @@ fuse(
 options?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1260
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1344
 
 Fuse multiple ranked lists outside of a `search()` call.
 
@@ -116,7 +118,7 @@ Fuse multiple ranked lists outside of a `search()` call.
 get(scope, factId): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1038
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1122
 
 Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
@@ -139,7 +141,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 history(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1068
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1152
 
 Return the full bi-temporal supersede chain that `factId` belongs
 to, oldest → newest, including superseded / soft-deleted rows so
@@ -172,7 +174,7 @@ neighbors(
 opts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1029
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1113
 
 Raw vector KNN neighbours for the consolidator's reconcile
 pre-filter (P0-3). Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
@@ -209,7 +211,7 @@ purge(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1241
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1325
 
 Hard-delete a fact (GDPR path). Distinct from [forget](/api/@graphorin/memory/classes/SemanticMemory.md#forget): the
 record is removed from storage entirely instead of soft-archived.
@@ -240,7 +242,7 @@ remember(
 options?): Promise<Fact>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:492
+Defined in: packages/memory/src/tiers/semantic-memory.ts:544
 
 Persist a fact. Returns the stored record. Phase 10b routes every
 call through the multi-stage conflict resolution pipeline; the
@@ -271,7 +273,7 @@ rememberWithDecision(
 options?): Promise<RememberOutcome>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:508
+Defined in: packages/memory/src/tiers/semantic-memory.ts:560
 
 Like [remember](/api/@graphorin/memory/classes/SemanticMemory.md#remember) but returns the pipeline `decision` alongside
 the stored fact. Useful for callers that need to distinguish
@@ -299,7 +301,7 @@ silent dedups (`decision.kind === 'dedup'`) from fresh inserts.
 reranker(): ReRanker;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:481
+Defined in: packages/memory/src/tiers/semantic-memory.ts:533
 
 Currently active reranker.
 
@@ -315,10 +317,10 @@ Currently active reranker.
 search(
    scope, 
    query, 
-opts?): Promise<readonly MemoryHit<Fact>[]>;
+callOpts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:721
+Defined in: packages/memory/src/tiers/semantic-memory.ts:773
 
 Hybrid (vector + FTS5) search merged through the configured reranker.
 
@@ -328,7 +330,7 @@ Hybrid (vector + FTS5) search merged through the configured reranker.
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `query` | `string` |
-| `opts` | [`FactSearchOptions`](/api/@graphorin/memory/interfaces/FactSearchOptions.md) |
+| `callOpts` | [`FactSearchOptions`](/api/@graphorin/memory/interfaces/FactSearchOptions.md) |
 
 #### Returns
 
@@ -345,7 +347,7 @@ searchIterative(
 opts?): Promise<IterativeRecallResult>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:961
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1037
 
 Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
 local heuristic ([assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md)) decides whether the
@@ -385,7 +387,7 @@ difficulty-gated `search` and never calls a provider.
 setReranker(reranker): ReRanker;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:474
+Defined in: packages/memory/src/tiers/semantic-memory.ts:526
 
 Replace the active reranker. Returns the previous instance.
 
@@ -415,7 +417,7 @@ supersede(
 }>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1182
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1266
 
 Mark `oldId` superseded by a new fact. Returns the new record.
 
@@ -462,7 +464,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1108
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1192
 
 Promote a quarantined fact to `active` (P1-4). The validation path
 that admits a synthesized memory into action-driving recall once a
@@ -505,7 +507,7 @@ from a trusted (non-agent) context. Synthesized-but-clean writes
 static fuseRrf<TRecord>(lists, k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1269
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1353
 
 Pure-fusion helper - exposed for callers that already collected results.
 
@@ -537,7 +539,7 @@ static fuseWeighted<TRecord>(
    k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1282
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1366
 
 Pure weighted-fusion helper (X-2) - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by

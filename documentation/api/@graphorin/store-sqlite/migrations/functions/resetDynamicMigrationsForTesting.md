@@ -10,7 +10,7 @@
 function _resetDynamicMigrationsForTesting(): void;
 ```
 
-Defined in: packages/store-sqlite/src/migrations/registry.ts:149
+Defined in: packages/store-sqlite/src/migrations/registry.ts:201
 
 **`Internal`**
 

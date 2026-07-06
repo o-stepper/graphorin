@@ -10,7 +10,7 @@
 type ServerEventFrame = z.infer<typeof EventFrame>;
 ```
 
-Defined in: src/server-message.ts:166
+Defined in: src/server-message.ts:178
 
 Convenience type aliases for callers that want to reference an
 individual variant without `z.infer<typeof X>`.

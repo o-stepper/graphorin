@@ -6,7 +6,7 @@
 
 # Interface: ToolArgumentPolicyGuard
 
-Defined in: packages/tools/src/executor/types.ts:308
+Defined in: packages/tools/src/executor/types.ts:315
 
 Structural adapter for the D4 tool-argument policy (Progent). The
 agent runtime wires `evaluateToolArgumentPolicy` from
@@ -30,7 +30,7 @@ evaluate(input):
 };
 ```
 
-Defined in: packages/tools/src/executor/types.ts:309
+Defined in: packages/tools/src/executor/types.ts:316
 
 #### Parameters
 

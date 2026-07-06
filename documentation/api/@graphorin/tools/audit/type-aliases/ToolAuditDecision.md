@@ -10,7 +10,7 @@
 type ToolAuditDecision = "success" | "denied" | "error";
 ```
 
-Defined in: packages/tools/src/audit/index.ts:93
+Defined in: packages/tools/src/audit/index.ts:94
 
 Decision recorded by an audit event.
 

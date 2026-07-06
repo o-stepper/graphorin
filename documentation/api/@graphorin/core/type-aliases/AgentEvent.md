@@ -47,7 +47,7 @@ type AgentEvent<TOutput> =
   | AgentErrorEvent;
 ```
 
-Defined in: packages/core/src/types/agent-event.ts:24
+Defined in: packages/core/src/types/agent-event.ts:32
 
 Discriminated union of every event produced by `Agent.stream(...)`.
 
@@ -64,6 +64,14 @@ raw union - three variants (`file.generated`, `tool.execute.partial`,
 envelope and leaves `payload` opaque (`z.unknown()`); clients decode
 with `fromWireAgentEvent`. Adding a variant here counts as a
 wire-format change; track it through changesets.
+
+Correlation policy (W-049): events are consumed from a per-run
+stream, so cross-run attribution is the ENVELOPE's job (`subject`
+carries `agentId`/`runId`); an in-payload `runId` exists only on the
+variants that historically carry one and is deliberately NOT
+retrofitted onto the rest. Within one tool lifecycle the correlation
+key is `toolCallId`; `toolName` is duplicated onto the
+`tool.execute.*` variants purely for subscriber convenience.
 
 ## Type Parameters
 

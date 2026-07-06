@@ -10,7 +10,7 @@
 function createServerMetricRegistry(): MetricRegistry;
 ```
 
-Defined in: packages/server/src/metrics/catalog.ts:51
+Defined in: packages/server/src/metrics/catalog.ts:56
 
 Build a fully-registered [MetricRegistry](/api/@graphorin/server/classes/MetricRegistry.md) ready for the
 `/v1/metrics` exposition. The returned registry has every metric

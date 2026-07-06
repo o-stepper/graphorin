@@ -34,6 +34,18 @@ Re-exports [adaptMCPTools](/api/@graphorin/mcp/functions/adaptMCPTools.md)
 
 ***
 
+### createManagedMCPClient
+
+Re-exports [createManagedMCPClient](/api/@graphorin/mcp/functions/createManagedMCPClient.md)
+
+***
+
+### CreateManagedMCPClientOptions
+
+Re-exports [CreateManagedMCPClientOptions](/api/@graphorin/mcp/type-aliases/CreateManagedMCPClientOptions.md)
+
+***
+
 ### createMCPClient
 
 Re-exports [createMCPClient](/api/@graphorin/mcp/functions/createMCPClient.md)
@@ -55,6 +67,12 @@ Re-exports [createMcpResourceReader](/api/@graphorin/mcp/functions/createMcpReso
 ### DEFAULT\_DEFER\_LOADING\_THRESHOLD
 
 Re-exports [DEFAULT_DEFER_LOADING_THRESHOLD](/api/@graphorin/mcp/variables/DEFAULT_DEFER_LOADING_THRESHOLD.md)
+
+***
+
+### ManagedReconnectOptions
+
+Re-exports [ManagedReconnectOptions](/api/@graphorin/mcp/interfaces/ManagedReconnectOptions.md)
 
 ***
 

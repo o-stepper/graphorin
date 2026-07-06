@@ -10,7 +10,7 @@
 function buildInductionRequest(trajectory, options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:134
+Defined in: packages/memory/src/consolidator/phases/induce.ts:135
 
 Build the (pure) induction request. Renders the trajectory as numbered
 steps; caps the rendered steps to keep the prompt bounded.

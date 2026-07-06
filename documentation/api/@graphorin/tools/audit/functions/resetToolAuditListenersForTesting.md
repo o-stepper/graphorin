@@ -10,7 +10,7 @@
 function _resetToolAuditListenersForTesting(): void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:139
+Defined in: packages/tools/src/audit/index.ts:140
 
 **`Experimental`**
 

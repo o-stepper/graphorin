@@ -10,7 +10,7 @@
 function parseServerConfig(input): ServerConfigSpec;
 ```
 
-Defined in: packages/server/src/config.ts:452
+Defined in: packages/server/src/config.ts:462
 
 Parse + validate user input. Returns a strongly-typed
 [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md); throws [ConfigInvalidError](/api/@graphorin/server/errors/classes/ConfigInvalidError.md) on

@@ -6,7 +6,7 @@
 
 # Interface: AgentResult\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/agent-event.ts:545
+Defined in: packages/core/src/types/agent-event.ts:565
 
 Final result of an agent run-loop invocation, returned by
 `agent.run(...)` and carried by the `agent.end` event.
@@ -29,8 +29,8 @@ run resolves with `status: 'awaiting_approval'` and a resumable
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error?` | `readonly` | [`RunError`](/api/@graphorin/core/interfaces/RunError.md) | Populated when the run failed; mirrors `RunState.error`. | packages/core/src/types/agent-event.ts:551 |
-| <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/core/src/types/agent-event.ts:546 |
-| <a id="property-state"></a> `state` | `readonly` | [`RunState`](/api/@graphorin/core/interfaces/RunState.md) | The run's final state. Resumable when `status === 'awaiting_approval'` - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally round-tripped through `runStateToJSON`/`runStateFromJSON` for durability). Treat as an immutable snapshot. | packages/core/src/types/agent-event.ts:558 |
-| <a id="property-status"></a> `status` | `readonly` | [`RunStatus`](/api/@graphorin/core/type-aliases/RunStatus.md) | Terminal status of this run-loop invocation. | packages/core/src/types/agent-event.ts:549 |
-| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | - | packages/core/src/types/agent-event.ts:547 |
+| <a id="property-error"></a> `error?` | `readonly` | [`RunError`](/api/@graphorin/core/interfaces/RunError.md) | Populated when the run failed; mirrors `RunState.error`. | packages/core/src/types/agent-event.ts:571 |
+| <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/core/src/types/agent-event.ts:566 |
+| <a id="property-state"></a> `state` | `readonly` | [`RunState`](/api/@graphorin/core/interfaces/RunState.md) | The run's final state. Resumable when `status === 'awaiting_approval'` - pass it back to `agent.run(...)` / `agent.stream(...)` (optionally round-tripped through `runStateToJSON`/`runStateFromJSON` for durability). Treat as an immutable snapshot. | packages/core/src/types/agent-event.ts:578 |
+| <a id="property-status"></a> `status` | `readonly` | [`RunStatus`](/api/@graphorin/core/type-aliases/RunStatus.md) | Terminal status of this run-loop invocation. | packages/core/src/types/agent-event.ts:569 |
+| <a id="property-usage"></a> `usage` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | - | packages/core/src/types/agent-event.ts:567 |

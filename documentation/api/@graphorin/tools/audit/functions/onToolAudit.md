@@ -10,7 +10,7 @@
 function onToolAudit(listener): () => void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:127
+Defined in: packages/tools/src/audit/index.ts:128
 
 Subscribe to tool-subsystem audit events. Returns a teardown
 function that removes the listener; callers must invoke it on

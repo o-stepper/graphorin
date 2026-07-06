@@ -6,7 +6,7 @@
 
 # Interface: ToolCallEndEvent
 
-Defined in: packages/core/src/types/agent-event.ts:128
+Defined in: packages/core/src/types/agent-event.ts:136
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:128
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-finalargs"></a> `finalArgs` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:131 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:130 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.call.end"` | packages/core/src/types/agent-event.ts:129 |
+| <a id="property-finalargs"></a> `finalArgs` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:139 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:138 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.call.end"` | packages/core/src/types/agent-event.ts:137 |

@@ -10,7 +10,7 @@
 type CostBudgetExceededCallback = (event) => void;
 ```
 
-Defined in: packages/observability/src/cost/types.ts:94
+Defined in: packages/observability/src/cost/types.ts:111
 
 Callback invoked when an aggregation scope crosses its configured
 budget. The handler receives a sanitized payload - the secret-free

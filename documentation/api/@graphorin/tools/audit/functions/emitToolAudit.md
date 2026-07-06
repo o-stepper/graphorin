@@ -10,7 +10,7 @@
 function emitToolAudit(event): void;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:159
+Defined in: packages/tools/src/audit/index.ts:160
 
 Emit an audit event. Never throws across listener boundaries -
 a listener that throws is isolated so it cannot tear down the

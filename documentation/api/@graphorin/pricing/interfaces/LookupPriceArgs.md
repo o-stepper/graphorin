@@ -6,7 +6,7 @@
 
 # Interface: LookupPriceArgs
 
-Defined in: pricing/src/types.ts:61
+Defined in: pricing/src/types.ts:71
 
 Lookup criteria.
 
@@ -16,6 +16,6 @@ Lookup criteria.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-model"></a> `model` | `readonly` | `string` | pricing/src/types.ts:63 |
-| <a id="property-provider"></a> `provider` | `readonly` | `string` | pricing/src/types.ts:62 |
-| <a id="property-region"></a> `region?` | `readonly` | `string` | pricing/src/types.ts:64 |
+| <a id="property-model"></a> `model` | `readonly` | `string` | pricing/src/types.ts:73 |
+| <a id="property-provider"></a> `provider` | `readonly` | `string` | pricing/src/types.ts:72 |
+| <a id="property-region"></a> `region?` | `readonly` | `string` | pricing/src/types.ts:74 |

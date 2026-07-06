@@ -10,7 +10,7 @@
 function createProviderWorkflowInducer(provider, options?): WorkflowInducer;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:226
+Defined in: packages/memory/src/consolidator/phases/induce.ts:227
 
 Resilient provider-backed inducer. A provider throw or unparseable output
 degrades to `null` (no procedure) - induction never breaks the write path.

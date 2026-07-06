@@ -10,7 +10,7 @@
 function resetCountersForTesting(): void;
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:127
+Defined in: packages/tools/src/audit/counters.ts:146
 
 **`Experimental`**
 

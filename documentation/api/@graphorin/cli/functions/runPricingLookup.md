@@ -12,7 +12,7 @@ function runPricingLookup(options):
   | null;
 ```
 
-Defined in: packages/cli/src/commands/pricing.ts:153
+Defined in: packages/cli/src/commands/pricing.ts:170
 
 ## Parameters
 

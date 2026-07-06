@@ -10,7 +10,7 @@
 function runPricingMissing(options): Promise<readonly MissingModelEntry[]>;
 ```
 
-Defined in: packages/cli/src/commands/pricing.ts:187
+Defined in: packages/cli/src/commands/pricing.ts:204
 
 ## Parameters
 

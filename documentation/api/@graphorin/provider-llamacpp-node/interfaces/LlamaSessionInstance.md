@@ -6,7 +6,7 @@
 
 # Interface: LlamaSessionInstance
 
-Defined in: src/runtime.ts:38
+Defined in: src/runtime.ts:49
 
 **`Internal`**
 
@@ -20,7 +20,7 @@ Loaded chat session capable of streaming responses.
 optional dispose(): void;
 ```
 
-Defined in: src/runtime.ts:53
+Defined in: src/runtime.ts:73
 
 Release the per-request context / sequence backing this session.
 node-llama-cpp contexts hold KV-cache memory (hundreds of MB at
@@ -39,7 +39,7 @@ every stream so long-running agents do not leak until OOM.
 promptStreamingResponse(prompt, options?): AsyncIterable<string>;
 ```
 
-Defined in: src/runtime.ts:39
+Defined in: src/runtime.ts:50
 
 #### Parameters
 
@@ -54,3 +54,30 @@ Defined in: src/runtime.ts:39
 #### Returns
 
 `AsyncIterable`\&lt;`string`\&gt;
+
+***
+
+### setChatHistory()?
+
+```ts
+optional setChatHistory(history): void;
+```
+
+Defined in: src/runtime.ts:66
+
+W-096: replace the session's chat history (node-llama-cpp v3
+`setChatHistory`). When present, the adapter feeds multi-turn
+transcripts as REAL chat history + prompts only the last user turn
+- instead of serialising the whole conversation into one
+pseudo-prompt string. Optional: fixtures / custom factories without
+it keep the legacy render-prompt path.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `history` | readonly `LlamaChatHistoryItem`[] |
+
+#### Returns
+
+`void`

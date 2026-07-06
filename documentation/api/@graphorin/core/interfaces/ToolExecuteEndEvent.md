@@ -6,15 +6,16 @@
 
 # Interface: ToolExecuteEndEvent
 
-Defined in: packages/core/src/types/agent-event.ts:177
+Defined in: packages/core/src/types/agent-event.ts:193
 
 ## Stable
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/core/src/types/agent-event.ts:181 |
-| <a id="property-result"></a> `result` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:180 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:179 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.end"` | packages/core/src/types/agent-event.ts:178 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | - | packages/core/src/types/agent-event.ts:199 |
+| <a id="property-result"></a> `result` | `readonly` | `unknown` | - | packages/core/src/types/agent-event.ts:198 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/types/agent-event.ts:195 |
+| <a id="property-toolname"></a> `toolName?` | `readonly` | `string` | See [ToolExecuteStartEvent.toolName](/api/@graphorin/core/interfaces/ToolExecuteStartEvent.md#property-toolname) (W-049). | packages/core/src/types/agent-event.ts:197 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.end"` | - | packages/core/src/types/agent-event.ts:194 |

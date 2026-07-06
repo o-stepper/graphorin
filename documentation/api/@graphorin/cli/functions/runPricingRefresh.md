@@ -10,11 +10,12 @@
 function runPricingRefresh(options): Promise<{
   entries: number;
   out?: string;
+  skipped?: number;
   version: string;
 }>;
 ```
 
-Defined in: packages/cli/src/commands/pricing.ts:86
+Defined in: packages/cli/src/commands/pricing.ts:91
 
 ## Parameters
 
@@ -27,6 +28,7 @@ Defined in: packages/cli/src/commands/pricing.ts:86
 `Promise`\<\{
   `entries`: `number`;
   `out?`: `string`;
+  `skipped?`: `number`;
   `version`: `string`;
 \}\>
 

@@ -6,7 +6,7 @@
 
 # Interface: ToolApprovalRequestedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:192
+Defined in: packages/core/src/types/agent-event.ts:212
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:192
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:195 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:194 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.requested"` | packages/core/src/types/agent-event.ts:193 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:215 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:214 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.approval.requested"` | packages/core/src/types/agent-event.ts:213 |

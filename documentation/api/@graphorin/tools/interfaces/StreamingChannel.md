@@ -6,7 +6,7 @@
 
 # Interface: StreamingChannel
 
-Defined in: packages/tools/src/streaming/channel.ts:75
+Defined in: packages/tools/src/streaming/channel.ts:107
 
 Public channel surface. Implementations are returned by
 [createStreamingChannel](/api/@graphorin/tools/functions/createStreamingChannel.md).
@@ -21,7 +21,7 @@ Public channel surface. Implementations are returned by
 abort(reason): void;
 ```
 
-Defined in: packages/tools/src/streaming/channel.ts:81
+Defined in: packages/tools/src/streaming/channel.ts:113
 
 Mark the channel cancelled (post-cancellation calls are no-ops).
 
@@ -46,7 +46,7 @@ reportProgress(
    message?): void;
 ```
 
-Defined in: packages/tools/src/streaming/channel.ts:77
+Defined in: packages/tools/src/streaming/channel.ts:109
 
 Emit a progress event into the channel.
 
@@ -70,7 +70,7 @@ Emit a progress event into the channel.
 snapshot(): StreamingAggregator;
 ```
 
-Defined in: packages/tools/src/streaming/channel.ts:83
+Defined in: packages/tools/src/streaming/channel.ts:115
 
 Snapshot the aggregated buffer.
 
@@ -86,7 +86,7 @@ Snapshot the aggregated buffer.
 streamContent(chunk): void;
 ```
 
-Defined in: packages/tools/src/streaming/channel.ts:79
+Defined in: packages/tools/src/streaming/channel.ts:111
 
 Emit a content chunk into the channel.
 

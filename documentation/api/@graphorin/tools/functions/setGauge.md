@@ -13,7 +13,7 @@ function setGauge(
    labels?): void;
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:66
+Defined in: packages/tools/src/audit/counters.ts:75
 
 Set a gauge value. Used for one-shot signals like the
 `tool.result.truncation.first-overrun{toolName}` per-tool flag.

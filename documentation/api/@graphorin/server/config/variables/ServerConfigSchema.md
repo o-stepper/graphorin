@@ -13,16 +13,19 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      enabled: ZodDefault<ZodBoolean>;
      passphraseRef: ZodOptional<ZodString>;
      path: ZodOptional<ZodString>;
+     toolEvents: ZodDefault<ZodEnum<["security", "all", "off"]>>;
    }, "strict", ZodTypeAny, {
      cipher?: string;
      enabled: boolean;
      passphraseRef?: string;
      path?: string;
+     toolEvents: "all" | "off" | "security";
    }, {
      cipher?: string;
      enabled?: boolean;
      passphraseRef?: string;
      path?: string;
+     toolEvents?: "all" | "off" | "security";
   }>>;
   auth: ZodDefault<ZodObject<{
      kind: ZodDefault<ZodEnum<["token", "none"]>>;
@@ -428,6 +431,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      enabled: boolean;
      passphraseRef?: string;
      path?: string;
+     toolEvents: "all" | "off" | "security";
   };
   auth: {
      kind: "none" | "token";
@@ -544,6 +548,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
      enabled?: boolean;
      passphraseRef?: string;
      path?: string;
+     toolEvents?: "all" | "off" | "security";
   };
   auth?: {
      kind?: "none" | "token";
@@ -657,7 +662,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
 }>>;
 ```
 
-Defined in: packages/server/src/config.ts:409
+Defined in: packages/server/src/config.ts:419
 
 Zod schema for the resolved [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md). Exposed for
 advanced users that want to validate other config sources (env-only

@@ -6,7 +6,7 @@
 
 # Interface: TrajectoryStep
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:51
+Defined in: packages/memory/src/consolidator/phases/induce.ts:52
 
 One distilled step of an agent trajectory - model-agnostic, so the
 inducer never sees raw provider/tool wire formats.
@@ -17,5 +17,5 @@ inducer never sees raw provider/tool wire formats.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-detail"></a> `detail?` | `readonly` | `string` | Concrete args / observation rendered to text (the value-abstraction source). | packages/memory/src/consolidator/phases/induce.ts:55 |
-| <a id="property-tool"></a> `tool?` | `readonly` | `string` | Tool invoked at this step, when the step was a tool call. | packages/memory/src/consolidator/phases/induce.ts:53 |
+| <a id="property-detail"></a> `detail?` | `readonly` | `string` | Concrete args / observation rendered to text (the value-abstraction source). | packages/memory/src/consolidator/phases/induce.ts:56 |
+| <a id="property-tool"></a> `tool?` | `readonly` | `string` | Tool invoked at this step, when the step was a tool call. | packages/memory/src/consolidator/phases/induce.ts:54 |

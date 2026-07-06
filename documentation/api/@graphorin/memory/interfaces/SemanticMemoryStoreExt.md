@@ -50,7 +50,7 @@ materialising rows. Powers honest `metadata()` counts.
 forget(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:112
+Defined in: packages/core/dist/contracts/memory-store.d.ts:125
 
 #### Parameters
 
@@ -180,7 +180,7 @@ Distinct from [SemanticMemoryStore.forget](/api/@graphorin/memory/interfaces/Sem
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:109
+Defined in: packages/core/dist/contracts/memory-store.d.ts:122
 
 #### Parameters
 
@@ -225,7 +225,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:102
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:110
+Defined in: packages/core/dist/contracts/memory-store.d.ts:123
 
 #### Parameters
 
@@ -320,7 +320,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:111
+Defined in: packages/core/dist/contracts/memory-store.d.ts:124
 
 #### Parameters
 

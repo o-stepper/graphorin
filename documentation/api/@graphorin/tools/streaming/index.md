@@ -16,6 +16,12 @@ Re-exports [createStreamingChannel](/api/@graphorin/tools/functions/createStream
 
 ***
 
+### DEFAULT\_MAX\_BUFFER\_BYTES
+
+Re-exports [DEFAULT_MAX_BUFFER_BYTES](/api/@graphorin/tools/variables/DEFAULT_MAX_BUFFER_BYTES.md)
+
+***
+
 ### StreamingAggregator
 
 Re-exports [StreamingAggregator](/api/@graphorin/tools/interfaces/StreamingAggregator.md)

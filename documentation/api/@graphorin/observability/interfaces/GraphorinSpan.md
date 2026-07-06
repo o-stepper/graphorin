@@ -6,7 +6,7 @@
 
 # Interface: GraphorinSpan\&lt;T\&gt;
 
-Defined in: packages/observability/src/tracer/span.ts:38
+Defined in: packages/observability/src/tracer/span.ts:39
 
 The internal span carries the convenience `setAttribute(...)` method
 exposed by the tracer surface (per-attribute sensitivity tagging) on
@@ -28,22 +28,29 @@ top of the standard [AISpan](/api/@graphorin/core/interfaces/AISpan.md) contract
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`id`](/api/@graphorin/core/interfaces/AISpan.md#property-id) | packages/core/dist/contracts/tracer.d.ts:60 |
-| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`parentId`](/api/@graphorin/core/interfaces/AISpan.md#property-parentid) | packages/core/dist/contracts/tracer.d.ts:62 |
-| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`traceId`](/api/@graphorin/core/interfaces/AISpan.md#property-traceid) | packages/core/dist/contracts/tracer.d.ts:61 |
-| <a id="property-type"></a> `type` | `readonly` | `T` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`type`](/api/@graphorin/core/interfaces/AISpan.md#property-type) | packages/core/dist/contracts/tracer.d.ts:59 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`id`](/api/@graphorin/core/interfaces/AISpan.md#property-id) | packages/core/dist/contracts/tracer.d.ts:76 |
+| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`parentId`](/api/@graphorin/core/interfaces/AISpan.md#property-parentid) | packages/core/dist/contracts/tracer.d.ts:78 |
+| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`traceId`](/api/@graphorin/core/interfaces/AISpan.md#property-traceid) | packages/core/dist/contracts/tracer.d.ts:77 |
+| <a id="property-type"></a> `type` | `readonly` | `T` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md).[`type`](/api/@graphorin/core/interfaces/AISpan.md#property-type) | packages/core/dist/contracts/tracer.d.ts:75 |
 
 ## Methods
 
 ### addEvent()
 
 ```ts
-addEvent(name, attrs?): void;
+addEvent(
+   name, 
+   attrs?, 
+   opts?): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:66
+Defined in: packages/core/dist/contracts/tracer.d.ts:88
 
-Append a span event (attribute-bearing time-stamped marker).
+Append a span event (attribute-bearing time-stamped marker). The
+optional `opts` (W-094) tags the event's attributes with a
+sensitivity tier so the validation exporter can pass safe ones
+through the default-deny floor - untagged attributes keep being
+dropped below the floor.
 
 #### Parameters
 
@@ -51,6 +58,7 @@ Append a span event (attribute-bearing time-stamped marker).
 | ------ | ------ |
 | `name` | `string` |
 | `attrs?` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> |
+| `opts?` | [`AddEventOptions`](/api/@graphorin/core/interfaces/AddEventOptions.md) |
 
 #### Returns
 
@@ -68,7 +76,7 @@ Append a span event (attribute-bearing time-stamped marker).
 end(): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:72
+Defined in: packages/core/dist/contracts/tracer.d.ts:94
 
 End the span. Idempotent.
 
@@ -88,7 +96,7 @@ End the span. Idempotent.
 recordException(err): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:68
+Defined in: packages/core/dist/contracts/tracer.d.ts:90
 
 Record an exception. Multiple calls are kept in the span event log.
 
@@ -117,7 +125,7 @@ setAttribute(
    opts?): void;
 ```
 
-Defined in: packages/observability/src/tracer/span.ts:39
+Defined in: packages/observability/src/tracer/span.ts:40
 
 #### Parameters
 
@@ -139,7 +147,7 @@ Defined in: packages/observability/src/tracer/span.ts:39
 setAttributes(attrs): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:64
+Defined in: packages/core/dist/contracts/tracer.d.ts:80
 
 Add or replace attributes. Repeated calls are merged (last write wins).
 
@@ -165,7 +173,7 @@ Add or replace attributes. Repeated calls are merged (last write wins).
 setStatus(status, message?): void;
 ```
 
-Defined in: packages/core/dist/contracts/tracer.d.ts:70
+Defined in: packages/core/dist/contracts/tracer.d.ts:92
 
 Set the terminal status.
 
