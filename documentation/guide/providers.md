@@ -38,7 +38,7 @@ A `MiddlewareOrderingError` is thrown the moment the array argument violates the
 |---|---|
 | `withTracing` | Attaches `provider.stream` spans through `@graphorin/observability`. |
 | `withRetry` | Exponential backoff + jitter on transient failures. |
-| `withRateLimit` | Per-bucket rate limiting before the request leaves the process. |
+| `withRateLimit` | Per-bucket rate limiting before the request leaves the process: requests per minute, plus an optional `tokensPerMinute` budget (with a pluggable `estimateTokens`) so long-context steps queue on the real binding limit instead of surfacing as provider 429s. |
 | `withCostLimit` | Refuses requests that would breach the configured budget. |
 | `withCostTracking` | Records per-call cost for auditing. |
 | `withFallback` | Composes a chain of fallback providers. |

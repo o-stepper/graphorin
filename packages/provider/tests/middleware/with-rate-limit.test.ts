@@ -178,3 +178,122 @@ describe('withRateLimit - stream surface', () => {
     await expect(consume(wrapped.stream(REQ))).rejects.toBeInstanceOf(RateLimitExceededError);
   });
 });
+
+// W-145: the optional tokensPerMinute dimension. The binding provider
+// limit for agentic workloads is TPM: a 150k-token compacted
+// transcript must not ride the same single RPM slot as a 200-token
+// reranker call.
+describe('withRateLimit - tokensPerMinute (W-145)', () => {
+  const bigReq = (chars: number, maxTokens = 0): ProviderRequest => ({
+    messages: [{ role: 'user', content: 'x'.repeat(chars) }],
+    ...(maxTokens > 0 ? { maxTokens } : {}),
+  });
+
+  it('option validation: tokensPerMinute must be positive when set', () => {
+    expect(() =>
+      withRateLimit({ requestsPerMinute: 60, tokensPerMinute: 0 })(quietProvider()),
+    ).toThrow(RangeError);
+  });
+
+  it('throw mode: a request over the remaining TPM budget throws with a TPM-aware retryAfterMs even when RPM is free', async () => {
+    const now = 0;
+    const wrapped = withRateLimit({
+      requestsPerMinute: 600, // plenty of RPM
+      burst: 100,
+      tokensPerMinute: 600, // 10 tokens / 1000ms
+      nowImpl: () => now,
+    })(quietProvider());
+    // First call drains 400 of the 600-token budget (1600 chars / 4).
+    await wrapped.generate(bigReq(1600));
+    // Second call wants 400 again; only 200 remain -> needs 200 tokens
+    // = 20_000ms at 10 tokens/s, despite ~99 free RPM slots.
+    try {
+      await wrapped.generate(bigReq(1600));
+      throw new Error('expected throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(RateLimitExceededError);
+      expect((err as RateLimitExceededError).retryAfterMs).toBe(20_000);
+    }
+  });
+
+  it('queue mode: the second request waits exactly for the missing TPM tokens, FIFO preserved', async () => {
+    const sleeps: number[] = [];
+    let now = 0;
+    const wrapped = withRateLimit({
+      requestsPerMinute: 600,
+      burst: 100,
+      tokensPerMinute: 600, // 10 tokens / 1000ms
+      mode: 'queue',
+      nowImpl: () => now,
+      sleepImpl: (ms) => {
+        sleeps.push(ms);
+        now += ms;
+        return Promise.resolve();
+      },
+    })(quietProvider());
+    const order: number[] = [];
+    await wrapped.generate(bigReq(1600)); // takes 400 of 600
+    const second = wrapped.generate(bigReq(1600)).then(() => order.push(2));
+    const third = wrapped.generate(bigReq(4)).then(() => order.push(3));
+    await Promise.all([second, third]);
+    // The 400-weight head waited for its missing 200 tokens; the light
+    // request queued BEHIND it (FIFO), not around it.
+    expect(sleeps.length).toBeGreaterThan(0);
+    expect(sleeps[0]).toBe(20_000);
+    expect(order).toEqual([2, 3]);
+  });
+
+  it('uses a custom estimateTokens instead of the heuristic', async () => {
+    const seen: number[] = [];
+    const wrapped = withRateLimit({
+      requestsPerMinute: 600,
+      burst: 100,
+      tokensPerMinute: 1000,
+      estimateTokens: (req) => {
+        const weight = 999;
+        seen.push(weight);
+        void req;
+        return weight;
+      },
+      nowImpl: () => 0,
+    })(quietProvider());
+    await wrapped.generate(REQ);
+    expect(seen).toEqual([999]);
+    // 999 of 1000 spent: the next 999-weight call cannot fit.
+    await expect(wrapped.generate(REQ)).rejects.toBeInstanceOf(RateLimitExceededError);
+  });
+
+  it('clamps a weight above the minute budget instead of deadlocking the queue', async () => {
+    const sleeps: number[] = [];
+    let now = 0;
+    const wrapped = withRateLimit({
+      requestsPerMinute: 600,
+      burst: 100,
+      tokensPerMinute: 100, // tiny budget
+      mode: 'queue',
+      nowImpl: () => now,
+      sleepImpl: (ms) => {
+        sleeps.push(ms);
+        now += ms;
+        return Promise.resolve();
+      },
+    })(quietProvider());
+    // Estimated weight 2500 (10_000 chars / 4) >> 100 budget: clamped
+    // to 100, so it resolves after waiting for a full bucket at most.
+    await wrapped.generate(bigReq(400)); // drains the 100 budget
+    await expect(wrapped.generate(bigReq(10_000))).resolves.toBeDefined();
+    expect(sleeps.length).toBeGreaterThan(0);
+  });
+
+  it('the maxTokens reservation counts into the weight', async () => {
+    const wrapped = withRateLimit({
+      requestsPerMinute: 600,
+      burst: 100,
+      tokensPerMinute: 600,
+      nowImpl: () => 0,
+    })(quietProvider());
+    // 4 chars -> 1 token, plus maxTokens 599 -> weight 600 == budget.
+    await wrapped.generate(bigReq(4, 599));
+    await expect(wrapped.generate(bigReq(4))).rejects.toBeInstanceOf(RateLimitExceededError);
+  });
+});
