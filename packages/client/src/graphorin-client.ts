@@ -112,6 +112,16 @@ export interface GraphorinClientOptions {
   readonly baseUrl: string;
   readonly auth: TransportAuth;
   readonly transport?: TransportPreference;
+  /**
+   * W-152: per-subscription buffer cap. When the `for await` consumer
+   * falls behind and the buffered queue reaches this many frames, the
+   * subscription closes with a typed `flow-overflow` error (mirroring
+   * the server's queue-overflow close) instead of growing the heap
+   * without bound or silently dropping events. Default 10000 (10x the
+   * server's default per-connection limit); `0` disables the cap and
+   * restores the old unbounded behavior.
+   */
+  readonly subscriptionQueueLimit?: number;
   /** Override the WS path (default `'/v1/ws'`). */
   readonly wsPath?: string;
   /**
@@ -152,6 +162,8 @@ export interface SubscriptionMetadata {
   readonly snapshotEventId: string | undefined;
   readonly lastEventId: string | undefined;
   readonly closed: boolean;
+  /** W-152: current buffered (undelivered) event-frame count. */
+  readonly queuedEvents: number;
 }
 
 /**
@@ -737,11 +749,28 @@ export class GraphorinClient {
     let closeError: Error | undefined;
     let lastEventId: string | undefined = args.snapshotEventId;
 
+    const queueLimit = this.#options.subscriptionQueueLimit ?? 10_000;
     const push = (frame: ServerEventFrame): void => {
+      // W-152: frames arriving after close (server-side unsubscribe is
+      // async) must not keep growing a queue nobody will drain.
+      if (closed) return;
       lastEventId = frame.eventId;
       const waiter = waiters.shift();
       if (waiter !== undefined) {
         waiter.resolve({ value: frame, done: false });
+        return;
+      }
+      if (queueLimit > 0 && queue.length >= queueLimit) {
+        // W-152: deterministic policy over silent loss - mirror the
+        // server's queue-overflow close (4006 flow.throttled) with a
+        // typed client error the pending/next for-await observes.
+        close(
+          'aborted',
+          new GraphorinClientError(
+            'flow-overflow',
+            `Subscription '${args.subscriptionId}' buffered ${queue.length} events with no consumer progress (subscriptionQueueLimit=${queueLimit}). Consume the events() iterator faster, raise the limit, or set 0 to disable the cap.`,
+          ),
+        );
         return;
       }
       queue.push(frame);
@@ -815,6 +844,7 @@ export class GraphorinClient {
         snapshotEventId: args.snapshotEventId,
         lastEventId,
         closed,
+        queuedEvents: queue.length,
       }),
       __push: push,
       __pushLifecycle: (frame) => {
