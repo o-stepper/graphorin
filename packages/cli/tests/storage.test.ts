@@ -1,11 +1,12 @@
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdtemp, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 import {
   runStorageCleanupBackups,
+  runStorageCompact,
   runStorageEncrypt,
   runStorageStatus,
 } from '../src/commands/storage.js';
@@ -123,5 +124,69 @@ describe('graphorin storage cleanup-backups', () => {
     // dry-run must not delete anything
     const { readFile } = await import('node:fs/promises');
     await expect(readFile(`${dbPath}.bak`, 'utf8')).resolves.toBe('stale');
+  });
+});
+
+describe('graphorin storage compact (W-064)', () => {
+  it('drains the freelist and shrinks the file on a store created with auto_vacuum=2', async () => {
+    const cfg = await fixture();
+    const dbPath = join(dirname(cfg), 'data.db');
+    const { createSqliteStore } = await import('@graphorin/store-sqlite');
+    const store = await createSqliteStore({ path: dbPath, mode: 'lib', skipSqliteVec: true });
+    await store.init();
+    const pad = 'x'.repeat(2048);
+    for (let i = 0; i < 200; i += 1) {
+      store.connection.run(
+        `INSERT INTO facts (id, scope_user_id, text, sensitivity, created_at)
+         VALUES (?, 'u', ?, 'internal', 1)`,
+        [`f-${i}`, `${i} ${pad}`],
+      );
+    }
+    store.connection.run("DELETE FROM facts WHERE id != 'f-0'", []);
+    await store.close();
+    const sizeBefore = (await stat(dbPath)).size;
+
+    const lines: string[] = [];
+    const out = await runStorageCompact({ config: cfg, print: (l) => lines.push(l) });
+    expect(out.supported).toBe(true);
+    expect(out.autoVacuum).toBe(2);
+    expect(out.freelistBefore).toBeGreaterThan(0);
+    expect(out.freelistAfter).toBe(0);
+    expect(out.reclaimedBytes).toBeGreaterThan(0);
+    expect((await stat(dbPath)).size).toBeLessThan(sizeBefore);
+    expect(lines.some((l) => l.includes('reclaimed'))).toBe(true);
+  });
+
+  it('reports the high-water-mark limitation honestly on a pre-auto_vacuum database and leaves it intact', async () => {
+    const cfg = await fixture();
+    const dbPath = join(dirname(cfg), 'data.db');
+    // A database created before this version: node's bundled SQLite
+    // defaults to auto_vacuum=0, exactly like our own pre-W-064 stores.
+    const { DatabaseSync } = (await import('node:sqlite')) as unknown as {
+      DatabaseSync: new (
+        p: string,
+      ) => {
+        exec(q: string): void;
+        prepare(q: string): { get(): unknown };
+        close(): void;
+      };
+    };
+    const raw = new DatabaseSync(dbPath);
+    raw.exec('CREATE TABLE legacy (a TEXT)');
+    raw.exec("INSERT INTO legacy VALUES ('keep')");
+    raw.close();
+
+    const lines: string[] = [];
+    const out = await runStorageCompact({ config: cfg, print: (l) => lines.push(l) });
+    expect(out.supported).toBe(false);
+    expect(out.autoVacuum).toBe(0);
+    expect(out.reclaimedBytes).toBeUndefined();
+    expect(lines.some((l) => l.includes('auto_vacuum=0'))).toBe(true);
+    expect(lines.some((l) => l.includes('high-water-mark'))).toBe(true);
+    // The command modified nothing: the data is still there.
+    const check = new DatabaseSync(dbPath);
+    const row = check.prepare('SELECT a FROM legacy').get() as { a: string };
+    expect(row.a).toBe('keep');
+    check.close();
   });
 });

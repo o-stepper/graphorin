@@ -56,6 +56,20 @@ Each open runs a cheap FTS↔rowid integrity check and warns on drift; the same
 check is exposed as `checkFtsIntegrity(connection)` (pass
 `skipFtsIntegrityCheck: true` to `createSqliteStore` to disable the open-time
 scan on very large stores).
+
+`PRAGMA incremental_vacuum` is the rowid-safe counterpart: it relocates free
+pages through the pointer map WITHOUT rebuilding tables, so implicit rowids -
+and with them the FTS5 mappings - stay put. Every database Graphorin CREATES
+from this version on is opened with `auto_vacuum=INCREMENTAL`, and
+`graphorin storage compact` drives the vacuum in batches (after a
+`wal_checkpoint(TRUNCATE)`) to return pruned pages to the OS.
+
+Databases created BEFORE this version have `auto_vacuum=0` and keep their
+high-water-mark file size forever: deleted pages are reused for new data but
+never returned to the OS, and retrofitting `auto_vacuum` would require exactly
+the `VACUUM` that is forbidden. `graphorin storage compact` detects this and
+reports the limitation instead of touching the file; to actually reclaim disk,
+initialise a fresh store (it gets `auto_vacuum=2`) and move the data across.
 :::
 
 ## `@graphorin/store-sqlite-encrypted` (encryption-at-rest)

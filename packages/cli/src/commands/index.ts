@@ -155,6 +155,7 @@ export { runStart, type SecretsSourceFlag, type StartCommandOptions } from './st
 export {
   runStorageBackup,
   runStorageCleanupBackups,
+  runStorageCompact,
   runStorageEncrypt,
   runStorageRekey,
   runStorageStatus,
@@ -163,6 +164,8 @@ export {
   type StorageCleanupBackupsOptions,
   type StorageCleanupBackupsResult,
   type StorageCommonOptions,
+  type StorageCompactOptions,
+  type StorageCompactResult,
   type StorageEncryptOptions,
   type StorageRekeyOptions,
   type StorageStatusResult,

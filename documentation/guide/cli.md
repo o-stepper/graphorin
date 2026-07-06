@@ -22,7 +22,7 @@ graphorin migrate-config <path> - migrate an older graphorin.config.* file
 graphorin doctor                - audit POSIX modes + sanity checks
 graphorin token <subcommand>    - create / list / revoke / rotate / rekey / verify
 graphorin secrets <subcommand>  - list / get / set / delete / ref / rotate
-graphorin storage <subcommand>  - status / encrypt / rekey / backup / cleanup-backups
+graphorin storage <subcommand>  - status / encrypt / rekey / backup / cleanup-backups / compact
 graphorin audit <subcommand>    - verify / prune / export
 graphorin memory <subcommand>   - status / inspect / activity / why / review / prune-history / migrate
 graphorin consolidator <subcommand> - status / set-tier / stop
@@ -116,6 +116,17 @@ graphorin auth status                # hasRefreshToken reflects what actually re
 ```
 
 OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free port; tokens land in the configured secrets store. See [Security § OAuth 2.1 with PKCE](/guide/security#oauth-2-1-with-pkce).
+
+## `graphorin storage`
+
+```bash
+graphorin storage status
+graphorin storage cleanup-backups
+graphorin storage compact
+graphorin storage compact --batch-pages 200 --json
+```
+
+`compact` (W-064) returns pruned pages to the OS: it runs `PRAGMA wal_checkpoint(TRUNCATE)` and then batched `PRAGMA incremental_vacuum` - the rowid-safe compaction path (unlike `VACUUM`, which is forbidden because it corrupts the FTS5 rowid mappings). It requires a database created with `auto_vacuum=2`; every database created from this version on qualifies, including encrypted ones. On an older database the command reports the high-water-mark limitation honestly and exits `0` without modifying the file - see [the storage guide](/guide/storage) for the recreation path. `--batch-pages <n>` bounds each vacuum bite (default 1000) so a huge freelist never holds the writer lock long.
 
 ## `graphorin memory`
 

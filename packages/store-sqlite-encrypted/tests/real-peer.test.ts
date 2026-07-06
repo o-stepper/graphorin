@@ -165,3 +165,23 @@ describe.skipIf(!available)('CS-7 - real cipher peer end-to-end', () => {
     enc.close();
   }, 90_000);
 });
+
+describe.skipIf(!available)('W-064 - encrypted parity: incremental auto-vacuum', () => {
+  it('a fresh encrypted database created through createEncryptedConnection gets auto_vacuum=2', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-real-enc-av-'));
+    const { createEncryptedConnection } = await import('../src/connection.js');
+    const conn = await createEncryptedConnection({
+      path: join(dir, 'fresh-encrypted.db'),
+      skipSqliteVec: true,
+      encryption: {
+        enabled: true,
+        passphraseResolver: async () => 'compact-parity-pw',
+      },
+    });
+    // The delegate adds no pragma sequence of its own - the shared
+    // openConnection applies auto_vacuum right after the cipher/key
+    // pragmas, so encrypted databases compact exactly like plain ones.
+    expect(Number(conn.pragma('auto_vacuum', { simple: true }))).toBe(2);
+    conn.close();
+  });
+});

@@ -29,32 +29,9 @@ Before promoting a Graphorin deployment to production:
    - Pick a backend (local SQLite, encrypted SQLite, or a custom adapter).
    - Schedule a snapshot / replication job around `graphorin storage backup <dest>` - an online, consistent page-level copy that is safe under a live writer and preserves rowids. **Never use `VACUUM` or `VACUUM INTO` for backups**: rowid renumbering corrupts the FTS5 external-content mappings on restore.
    - Run `graphorin storage cleanup-backups` periodically to prune stale encryption backups on long-lived deployments.
+   - Run `graphorin storage compact` after large prunes to return freed pages to the OS (rowid-safe batched `incremental_vacuum`; databases created before incremental auto-vacuum keep their high-water-mark size and the command says so honestly).
    - Backups are point-in-time copies: a later erasure (session delete, fact purge) does NOT propagate into backups already taken. Keep backup retention no longer than your erasure obligations and repeat the erasure after any restore - see [Erasure and retention](/guide/privacy#erasure-and-retention).
-   - Review the retention policy (below). Long-term database growth is dominated by side tables, not primary content.
-
-### Retention and database growth
-
-The standalone server runs a unified retention sweep (`config.retention`, default every 6 hours, first sweep immediately at startup). Derived or recoverable data is pruned by default with conservative windows; primary user content is only pruned when you set an explicit `*Days` window. `retention.enabled: false` turns the whole mechanism off.
-
-Growth surfaces:
-
-| Surface (table)                          | What accumulates                         | Prune primitive                              | `config.retention` key            | Default    |
-| ---------------------------------------- | ---------------------------------------- | -------------------------------------------- | --------------------------------- | ---------- |
-| `spans`                                  | Persisted trace spans (telemetry)        | `pruneSpans`                                 | `spansDays`                       | 30 days    |
-| `consolidator_runs`                      | Consolidator run counters                | `SqliteMemoryStore.consolidator.pruneRuns`   | `consolidatorRunsDays`            | 90 days    |
-| `consolidator_failed_batches`            | Exhausted DLQ batches                    | `consolidator.pruneExhaustedBatches`         | `dlqExhaustedDays`                | 30 days    |
-| `idempotency_records`                    | Cached keyed-POST response bodies        | `store.idempotency.prune`                    | `idempotency`                     | on (expired only) |
-| `sessions` (+ cascade)                   | Sessions, handoffs, linked checkpoints   | `store.sessions.pruneSessions`               | `sessionsDays` (+ `sessionsClosedOnly`) | opt-in |
-| `session_audit`                          | Session audit trail                      | `store.sessions.pruneAuditEntries`           | `auditDays`                       | opt-in     |
-| `memory_history`                         | Fact supersede / change history          | `store.memory.pruneHistory`                  | `memoryHistoryDays`               | opt-in     |
-| `workflow_checkpoints` + `workflow_pending_writes` | Terminal workflow threads      | `store.checkpoints.pruneThreads`             | `workflowThreadsDays` (always terminal-only) | opt-in |
-| Replay JSONL directory (filesystem)      | Replay trace files                       | `pruneTraces` from `@graphorin/observability` | not covered - schedule via cron  | manual     |
-
-The replay-JSONL directory is a **filesystem** surface, not a SQLite one: the server sweep deliberately does not touch it. Schedule `pruneTraces` (honouring its `retentionDays`) from cron or a maintenance job.
-
-**Lib-mode (embedders, no server):** nothing sweeps automatically. Schedule the CLI prune commands (`graphorin audit prune`, `graphorin traces prune`) and/or call the store prune APIs from your own scheduler; the same table above tells you which primitive owns each surface.
-
-Note: pruning marks pages free inside the database file; it does not shrink the file on disk - see the [storage guide](/guide/storage) for why `VACUUM` is forbidden and what that means for the file's high-water mark.
+   - Review the retention policy (see [Retention and database growth](#retention-and-database-growth) below). Long-term growth is dominated by side tables, not primary content.
 
 2. **Encryption-at-rest**
    - The audit log is **always** encrypted (mandatory).
@@ -89,6 +66,30 @@ Note: pruning marks pages free inside the database file; it does not shrink the 
    - Confine the audit log to mode `0600`.
    - Confine the database to mode `0640`.
    - Disable core dumps for the service account.
+
+### Retention and database growth
+
+The standalone server runs a unified retention sweep (`config.retention`, default every 6 hours, first sweep immediately at startup). Derived or recoverable data is pruned by default with conservative windows; primary user content is only pruned when you set an explicit `*Days` window. `retention.enabled: false` turns the whole mechanism off.
+
+Growth surfaces:
+
+| Surface (table)                          | What accumulates                         | Prune primitive                              | `config.retention` key            | Default    |
+| ---------------------------------------- | ---------------------------------------- | -------------------------------------------- | --------------------------------- | ---------- |
+| `spans`                                  | Persisted trace spans (telemetry)        | `pruneSpans`                                 | `spansDays`                       | 30 days    |
+| `consolidator_runs`                      | Consolidator run counters                | `SqliteMemoryStore.consolidator.pruneRuns`   | `consolidatorRunsDays`            | 90 days    |
+| `consolidator_failed_batches`            | Exhausted DLQ batches                    | `consolidator.pruneExhaustedBatches`         | `dlqExhaustedDays`                | 30 days    |
+| `idempotency_records`                    | Cached keyed-POST response bodies        | `store.idempotency.prune`                    | `idempotency`                     | on (expired only) |
+| `sessions` (+ cascade)                   | Sessions, handoffs, linked checkpoints   | `store.sessions.pruneSessions`               | `sessionsDays` (+ `sessionsClosedOnly`) | opt-in |
+| `session_audit`                          | Session audit trail                      | `store.sessions.pruneAuditEntries`           | `auditDays`                       | opt-in     |
+| `memory_history`                         | Fact supersede / change history          | `store.memory.pruneHistory`                  | `memoryHistoryDays`               | opt-in     |
+| `workflow_checkpoints` + `workflow_pending_writes` | Terminal workflow threads      | `store.checkpoints.pruneThreads`             | `workflowThreadsDays` (always terminal-only) | opt-in |
+| Replay JSONL directory (filesystem)      | Replay trace files                       | `pruneTraces` from `@graphorin/observability` | not covered - schedule via cron  | manual     |
+
+The replay-JSONL directory is a **filesystem** surface, not a SQLite one: the server sweep deliberately does not touch it. Schedule `pruneTraces` (honouring its `retentionDays`) from cron or a maintenance job.
+
+**Lib-mode (embedders, no server):** nothing sweeps automatically. Schedule the CLI prune commands (`graphorin audit prune`, `graphorin traces prune`) and/or call the store prune APIs from your own scheduler; the same table above tells you which primitive owns each surface.
+
+Note: pruning marks pages free inside the database file; it does not shrink the file on disk by itself. Run `graphorin storage compact` (rowid-safe `incremental_vacuum`) to return the pages to the OS - see the [storage guide](/guide/storage) for why `VACUUM` stays forbidden and why databases created before incremental auto-vacuum keep their high-water-mark size.
 
 ## Systemd
 

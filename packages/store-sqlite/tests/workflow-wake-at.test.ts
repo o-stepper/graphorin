@@ -96,9 +96,9 @@ describe('W-032 - migration 032 and listSuspended', () => {
   it('pre-032 rows (wake_at NULL) stay invisible to the driver', async () => {
     const store = await makeStore();
     await seed(store, 't-legacy', [{ status: 'suspended' }]);
-    expect(await store.checkpoints.listSuspended?.(NS, { dueBefore: Number.MAX_SAFE_INTEGER })).toEqual(
-      [],
-    );
+    expect(
+      await store.checkpoints.listSuspended?.(NS, { dueBefore: Number.MAX_SAFE_INTEGER }),
+    ).toEqual([]);
     await store.close();
   });
 });

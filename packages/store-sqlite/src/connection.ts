@@ -230,6 +230,21 @@ export async function openConnection(options: OpenConnectionOptions): Promise<Sq
     db.pragma(`key = ${cipherPassphrase}`);
   }
 
+  // W-064: incremental auto-vacuum must be declared BEFORE the first
+  // page is written (afterwards only a forbidden VACUUM could switch
+  // it on), so a brand-new database - `page_count == 0`, checked after
+  // the cipher pragmas so the encrypted delegate gets it too - opts in
+  // here. Unlike VACUUM, `PRAGMA incremental_vacuum` relocates free
+  // pages via the ptrmap WITHOUT renumbering implicit rowids, so the
+  // FTS5 external-content mappings stay intact; `graphorin storage
+  // compact` drives it. On a pre-existing database the pragma without
+  // a VACUUM is a no-op by SQLite's spec - the page_count branch just
+  // makes the intent explicit. Databases created before this version
+  // keep their high-water-mark file size (see the storage guide).
+  if ((db.pragma('page_count', { simple: true }) as number) === 0) {
+    db.pragma('auto_vacuum = INCREMENTAL');
+  }
+
   if (!disableWalHardening && !inMemory) {
     for (const pragma of WAL_HARDENING_PRAGMAS) {
       db.pragma(pragma);

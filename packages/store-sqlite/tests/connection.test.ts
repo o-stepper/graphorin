@@ -10,6 +10,8 @@ import {
   WAL_HARDENING_PRAGMAS,
   WalCheckpointManager,
 } from '../src/connection.js';
+import { checkFtsIntegrity } from '../src/fts-integrity.js';
+import { createSqliteStore } from '../src/index.js';
 
 describe('openConnection', () => {
   it(':memory: opens without sqlite-vec and without WAL', async () => {
@@ -201,5 +203,83 @@ describe('W-067: SqliteBusyError + busyTimeoutMs', () => {
     expect(Date.now() - started).toBeLessThan(1_000);
     writer.close();
     reader.close();
+  });
+});
+
+describe('W-064: incremental auto-vacuum + rowid-safe compaction', () => {
+  it('a freshly created file DB gets auto_vacuum=2 (INCREMENTAL)', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-av-'));
+    const conn = await openConnection({ path: `${dir}/fresh.db`, skipSqliteVec: true });
+    expect(readPragma(conn, 'auto_vacuum')).toBe(2);
+    conn.close();
+  });
+
+  it('a pre-existing database keeps its auto_vacuum mode (the pragma is a no-op there)', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-av-legacy-'));
+    const path = `${dir}/legacy.db`;
+    // Simulate a database created before this version: raw driver,
+    // default auto_vacuum=0, at least one page written.
+    const mod = (await import('better-sqlite3')) as unknown as {
+      default: new (p: string) => { exec(q: string): void; close(): void };
+    };
+    const raw = new mod.default(path);
+    raw.exec('CREATE TABLE legacy (a INTEGER)');
+    raw.close();
+    const conn = await openConnection({ path, skipSqliteVec: true });
+    expect(readPragma(conn, 'auto_vacuum')).toBe(0);
+    conn.close();
+  });
+
+  it('mass delete + incremental_vacuum shrinks the freelist while FTS integrity and search survive', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-compact-'));
+    const store = await createSqliteStore({ path: `${dir}/data.db`, skipSqliteVec: true });
+    await store.init();
+    const conn = store.connection;
+    expect(Number(conn.pragma('auto_vacuum', { simple: true }))).toBe(2);
+
+    // Bulk-load facts + their FTS rows the way the store writes them
+    // (facts_fts keyed on facts' implicit rowid).
+    const padding = 'x'.repeat(2000);
+    for (let i = 0; i < 300; i += 1) {
+      conn.run(
+        `INSERT INTO facts (id, scope_user_id, text, sensitivity, created_at)
+         VALUES (?, 'u', ?, 'internal', ?)`,
+        [`fact-${i}`, `token${i} ${padding}`, 1000 + i],
+      );
+      conn.run(
+        `INSERT INTO facts_fts (rowid, text) VALUES ((SELECT rowid FROM facts WHERE id = ?), ?)`,
+        [`fact-${i}`, `token${i} ${padding}`],
+      );
+    }
+    // Hard-delete most rows, keeping FTS in sync like the store does.
+    conn.run(
+      "DELETE FROM facts_fts WHERE rowid IN (SELECT rowid FROM facts WHERE id != 'fact-7')",
+      [],
+    );
+    conn.run("DELETE FROM facts WHERE id != 'fact-7'", []);
+
+    conn.pragma('wal_checkpoint(TRUNCATE)');
+    const before = Number(conn.pragma('freelist_count', { simple: true }));
+    expect(before).toBeGreaterThan(0);
+    let freelist = before;
+    while (freelist > 0) {
+      conn.pragma('incremental_vacuum(64)');
+      const next = Number(conn.pragma('freelist_count', { simple: true }));
+      if (next >= freelist) break;
+      freelist = next;
+    }
+    expect(freelist).toBeLessThan(before);
+    expect(freelist).toBe(0);
+
+    // The key invariant: rowid-keyed FTS mappings survived the page moves.
+    for (const report of checkFtsIntegrity(conn)) {
+      expect(report).toMatchObject({ orphanRows: 0, missingRows: 0 });
+    }
+    const hit = conn.get<{ id: string }>(
+      `SELECT f.id FROM facts_fts JOIN facts f ON f.rowid = facts_fts.rowid WHERE facts_fts MATCH 'token7'`,
+      [],
+    );
+    expect(hit?.id).toBe('fact-7');
+    await store.close();
   });
 });

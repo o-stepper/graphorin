@@ -78,6 +78,7 @@ import {
   runStart,
   runStorageBackup,
   runStorageCleanupBackups,
+  runStorageCompact,
   runStorageEncrypt,
   runStorageRekey,
   runStorageStatus,
@@ -592,6 +593,24 @@ function registerStorageCommands(program: Command): void {
         });
       },
     );
+  storage
+    .command('compact')
+    .description(
+      'Return pruned pages to the OS via batched incremental_vacuum (rowid-safe, unlike the forbidden VACUUM). Requires a database created with auto_vacuum=2; reports the high-water-mark limitation honestly on older files.',
+    )
+    .option('-c, --config <path>', 'Path to the graphorin.config file.')
+    .option(
+      '--batch-pages <n>',
+      'Free pages released per incremental_vacuum batch (keeps writer locks short). Default 1000.',
+    )
+    .option('--json', 'Emit a structured JSON document on stdout.')
+    .action(async (opts: { config?: string; batchPages?: string; json?: boolean }) => {
+      await runStorageCompact({
+        ...(opts.config !== undefined ? { config: opts.config } : {}),
+        ...(opts.batchPages !== undefined ? { batchPages: Number(opts.batchPages) } : {}),
+        ...(opts.json !== undefined ? { json: opts.json } : {}),
+      });
+    });
   storage
     .command('cleanup-backups')
     .description('Drop stale .bak / .tmp.<ts> files left by previous encrypt / rekey runs.')
