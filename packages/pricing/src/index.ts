@@ -35,6 +35,11 @@ export {
   type PricingAutoRefreshConfig,
   type PricingConfig,
 } from './config.js';
+export {
+  convertGenaiPrices,
+  type GenaiPricesConversion,
+  isGenaiPricesShape,
+} from './convert-genai-prices.js';
 export { diffPricing } from './diff.js';
 export {
   _resetLookupWarningsForTesting,

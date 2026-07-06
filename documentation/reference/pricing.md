@@ -70,7 +70,16 @@ When you want the latest prices, opt in explicitly:
 graphorin pricing refresh --url <snapshot-url>
 ```
 
-`--url` is required (there is no baked-in refresh endpoint); pass `--out <file>` to persist the refreshed snapshot. Or programmatically:
+`--url` is required (there is no baked-in refresh endpoint - the no-auto-refresh privacy contract); pass `--out <file>` to persist the refreshed snapshot. Two body formats are accepted (`--format auto | graphorin | genai-prices`, default `auto`):
+
+- the **native** shape (`{ entries: ModelPrice[] }` or a bare array of per-token entries) - the stable escape hatch;
+- the **`@pydantic/genai-prices` dataset** itself (W-097): the published `data.json` from that repository is auto-detected and converted (per-Mtok figures divide into per-token USD, cache read/write legs included). A working example against the upstream dataset:
+
+```bash
+graphorin pricing refresh --url https://raw.githubusercontent.com/pydantic/genai-prices/main/prices/data.json --out prices.json
+```
+
+Model entries the flat converter cannot represent (tiered / conditional pricing) are skipped, counted, and reported by the CLI; the converted snapshot records `conversion: { format: 'genai-prices', skipped }` and stamps `version: 'genai-prices+converted'`. A dataset that declares a non-USD currency is rejected (snapshots are USD-only). Or programmatically:
 
 ```ts
 import { refreshPricing } from '@graphorin/pricing';

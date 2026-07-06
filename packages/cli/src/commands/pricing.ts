@@ -78,14 +78,22 @@ export interface PricingRefreshOptions extends PricingCommonOptions {
    * CLI prints a status summary only; `--out` triggers a JSON write.
    */
   readonly out?: string;
+  /**
+   * W-097: accepted body format - `auto` (default) tries the native
+   * shape then auto-detects the `@pydantic/genai-prices` dataset.
+   */
+  readonly format?: 'auto' | 'graphorin' | 'genai-prices';
   /** Test seam - inject a fetch implementation. */
   readonly fetchImpl?: typeof fetch;
 }
 
 /** @stable */
-export async function runPricingRefresh(
-  options: PricingRefreshOptions,
-): Promise<{ readonly entries: number; readonly version: string; readonly out?: string }> {
+export async function runPricingRefresh(options: PricingRefreshOptions): Promise<{
+  readonly entries: number;
+  readonly version: string;
+  readonly out?: string;
+  readonly skipped?: number;
+}> {
   if (
     !checkOfflineModeBlocked('pricing refresh', {
       ...(options.print !== undefined ? { print: options.print } : {}),
@@ -95,19 +103,28 @@ export async function runPricingRefresh(
   }
   const refreshed = await refreshPricing({
     url: options.url,
+    ...(options.format !== undefined ? { format: options.format } : {}),
     ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
   });
   if (options.out !== undefined) {
     await writeFile(options.out, JSON.stringify(refreshed, null, 2), { mode: 0o600 });
   }
-  const result: { entries: number; version: string; out?: string } = {
+  const result: { entries: number; version: string; out?: string; skipped?: number } = {
     entries: refreshed.entries.length,
     version: refreshed.version,
     ...(options.out !== undefined ? { out: options.out } : {}),
+    ...(refreshed.conversion !== undefined ? { skipped: refreshed.conversion.skipped } : {}),
   };
   emitReport(options, result, () => {
     const print = options.print ?? defaultPrintSink;
     print(brand(`refreshed pricing snapshot v${result.version} (${result.entries} entries).`));
+    if (result.skipped !== undefined) {
+      print(
+        brand(
+          `converted from genai-prices; ${result.skipped} entr${result.skipped === 1 ? 'y' : 'ies'} skipped (tiered/conditional pricing).`,
+        ),
+      );
+    }
     if (result.out !== undefined) print(brand(`written to ${result.out} (mode 0600).`));
   });
   return result;
