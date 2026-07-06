@@ -44,7 +44,7 @@ import { newId } from './internal/ids.js';
 import { InMemoryUsageAccumulator } from './internal/usage-accumulator.js';
 import { CausalityMonitor } from './lateral-leak/causality-monitor.js';
 import { createProgressIO, type ProgressIO } from './progress/index.js';
-import { addModelUsage } from './run-state/index.js';
+import { addModelUsage, serializeRunState } from './run-state/index.js';
 import {
   createCompactMethod,
   createFanOutMethod,
@@ -530,8 +530,15 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // directive did not resolve must not re-enter the provider loop - that
     // would re-issue a dangling tool_use real providers reject. The granted
     // subset (above) HAS executed and is journaled; return the re-suspended
-    // state carrying its results.
-    if (resumed && state.status === 'awaiting_approval') {
+    // state carrying its results. The same guard covers a held 'aborted'
+    // state (W-038, `onPendingApprovals: 'hold'`): its pending approvals
+    // still map to dangling tool_use, so it resumes only through an
+    // explicit directive.
+    if (
+      resumed &&
+      (state.status === 'awaiting_approval' ||
+        (state.status === 'aborted' && state.pendingApprovals.length > 0))
+    ) {
       return yield* finishRun(state, finalSnapshot);
     }
 
@@ -649,11 +656,13 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         const { stepUsage, lastModelId } = chain;
 
         // AG-6: a mid-stream abort that interrupted the stream (no completed
-        // model) ends the run as a cancellation ('aborted', or 'failed' under
-        // the `onPendingApprovals: 'fail'` policy) rather than falling through
-        // to a 'no-provider-completed' failure. When the model DID complete
-        // (e.g. `drain: true` let the step finish), fall through so the step's
-        // tool calls run and the graceful stop happens at the loop top.
+        // model) ends the run as a cancellation - 'aborted', or 'failed'
+        // under `onPendingApprovals: 'fail'` ONLY when approvals are
+        // actually pending (W-038; an empty queue aborts plainly) - rather
+        // than falling through to a 'no-provider-completed' failure. When
+        // the model DID complete (e.g. `drain: true` let the step finish),
+        // fall through so the step's tool calls run and the graceful stop
+        // happens at the loop top.
         if (signal.aborted && !modelSucceeded) {
           yield* emitCancellation<TOutput>(runEnv);
           return yield* finishRun(state, finalSnapshot);
@@ -742,6 +751,36 @@ export function createAgent<TDeps = unknown, TOutput = string>(
             stepNumber,
           );
           if (walked.suspended) {
+            if (walked.abortPending === true) {
+              // W-038: the abort raced the suspend - apply the
+              // `onPendingApprovals` policy to the just-collected
+              // approvals, then persist the FINAL policy-consistent
+              // state as the last checkpoint (the walk skipped its
+              // 'suspended' put so no stale awaiting_approval trail
+              // outlives the aborted outcome).
+              yield* emitCancellation<TOutput>(runEnv);
+              if (config.checkpointStore !== undefined) {
+                await config.checkpointStore.put(
+                  state.id,
+                  'agent',
+                  {
+                    id: state.id,
+                    threadId: state.id,
+                    namespace: 'agent',
+                    state: serializeRunState(state, { stripTracingApiKey: true }),
+                    channelVersions: {},
+                    stepNumber,
+                    createdAt: new Date().toISOString(),
+                  },
+                  {
+                    source: 'sync',
+                    status: state.status === 'failed' ? 'failed' : 'aborted',
+                    nodeName: 'agent.abort',
+                    sessionId: state.sessionId,
+                  },
+                );
+              }
+            }
             return yield* finishRun(state, finalSnapshot);
           }
         }

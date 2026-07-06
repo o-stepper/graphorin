@@ -64,7 +64,11 @@ export async function* processStepToolCalls<TDeps, TOutput>(
   stepExecutor: ToolExecutor,
   execRunContext: RunContext<TDeps>,
   stepNumber: number,
-): AsyncGenerator<AgentEvent<TOutput>, { readonly suspended: boolean }, void> {
+): AsyncGenerator<
+  AgentEvent<TOutput>,
+  { readonly suspended: boolean; readonly abortPending?: boolean },
+  void
+> {
   const { config, state, messages, signal, handoffMap } = env;
   const { toolDataFlowGuard, promotedDeferred, dispatchBatch } = env;
   let batch: ToolCall[] = [];
@@ -176,6 +180,16 @@ export async function* processStepToolCalls<TDeps, TOutput>(
     const taintSnap = toolDataFlowGuard?.snapshotLedger(state.id);
     if (taintSnap !== undefined) state.taintSummary = taintSnap;
     if (promotedDeferred.size > 0) state.promotedTools = [...promotedDeferred];
+    // W-038: an abort that arrived while this step was collecting gated
+    // calls must reach the `onPendingApprovals` policy INSTEAD of the
+    // unconditional suspend - and no 'suspended awaiting_approval'
+    // checkpoint may be written first, or the durable trail would
+    // contradict the aborted outcome and resurrect denied approvals on
+    // resume. The factory applies the policy and persists the final,
+    // policy-consistent state through the same put seam.
+    if (signal.aborted) {
+      return { suspended: true, abortPending: true };
+    }
     if (config.checkpointStore !== undefined) {
       await config.checkpointStore.put(
         state.id,

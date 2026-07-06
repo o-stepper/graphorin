@@ -76,20 +76,32 @@ export { sha256Hex };
 /** The run-scoped context the cancellation path operates on. */
 export interface CancellationEnv {
   readonly state: MutableRunState & RunState;
+  readonly messages: Message[];
   readonly getPendingAbort: () => AbortOptions | undefined;
 }
 
 /**
- * AG-6: shared cancellation path for both the loop-top abort check and a
- * mid-stream provider abort. Yields `agent.cancelling`, applies the
- * `onPendingApprovals` policy, and returns `true` when the run was finalized
- * as 'failed' (the 'fail' policy - the caller must `return finalize(...)`);
+ * AG-6: shared cancellation path for the loop-top abort check, a
+ * mid-stream provider abort, and the abort-during-suspend seam (W-038).
+ * Yields `agent.cancelling`, applies the `onPendingApprovals` policy,
+ * and returns `true` when the run was finalized as 'failed' (the 'fail'
+ * policy WITH live approvals - the caller must `return finalize(...)`);
  * otherwise it sets `state.status = 'aborted'` and returns `false`.
+ *
+ * Policy semantics (W-038):
+ * - `'deny'`: drain every pending approval AND commit a matching tool
+ *   message per drained toolCallId - the transcript must not keep a
+ *   dangling `tool_use` real providers reject on a later resume.
+ * - `'hold'`: keep `pendingApprovals` on the aborted state; resume is
+ *   possible only through an explicit directive.
+ * - `'fail'`: fail the run ONLY when approvals are actually pending -
+ *   an abort with an empty queue is a plain 'aborted', per the
+ *   documented contract.
  */
 export async function* emitCancellation<TOutput>(
   env: CancellationEnv,
 ): AsyncGenerator<AgentEvent<TOutput>, boolean, void> {
-  const { state, getPendingAbort } = env;
+  const { state, messages, getPendingAbort } = env;
   yield {
     type: 'agent.cancelling',
     runId: state.id,
@@ -105,8 +117,11 @@ export async function* emitCancellation<TOutput>(
         toolCallId: approval.toolCallId,
         reason: 'auto-denied: agent.abort()',
       };
+      const text = 'Error: tool approval denied: auto-denied on abort';
+      messages.push({ role: 'tool', toolCallId: approval.toolCallId, content: text });
+      state.messages.push({ role: 'tool', toolCallId: approval.toolCallId, content: text });
     }
-  } else if (policy === 'fail') {
+  } else if (policy === 'fail' && state.pendingApprovals.length > 0) {
     state.status = 'failed';
     state.error = { message: 'aborted with pending approvals', code: 'run-aborted' };
     yield {

@@ -529,11 +529,17 @@ export interface AbortOptions {
   readonly drain?: boolean;
   /**
    * What to do with approvals that were already requested but not
-   * resolved at abort time.
+   * resolved at abort time (W-038).
    *
-   * - `'deny'` (default) - auto-deny pending approvals.
-   * - `'hold'`            - keep the approvals on `RunState.pendingApprovals`.
-   * - `'fail'`            - reject the run with `RunError(code: 'run-aborted')`.
+   * - `'deny'` (default) - auto-deny pending approvals; each drained
+   *   toolCallId gets a matching tool message so the transcript keeps
+   *   no dangling `tool_use`, and the run ends `'aborted'`.
+   * - `'hold'` - keep the approvals on `RunState.pendingApprovals` of
+   *   the `'aborted'` state; such a state re-enters the loop only via
+   *   an explicit resume directive.
+   * - `'fail'` - reject the run with `RunError(code: 'run-aborted')`
+   *   ONLY when approvals are actually pending; an abort with an empty
+   *   queue ends `'aborted'`, never `'failed'`.
    */
   readonly onPendingApprovals?: 'deny' | 'hold' | 'fail';
 }
