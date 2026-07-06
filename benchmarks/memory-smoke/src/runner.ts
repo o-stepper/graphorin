@@ -28,7 +28,14 @@ import { createSqliteStore } from '@graphorin/store-sqlite';
 
 export const VERSION: string = pkg.version;
 
-/** Reduces FTS5 mismatches when a period glues onto the last token. */
+/**
+ * Reduces FTS5 mismatches when a period glues onto the last token.
+ * Deliberately KEPT (W-093): it is a write-side normalisation a real
+ * ingestion pipeline could apply, mirrored 1:1 by the sibling
+ * longmemeval runner's `normalizeForFts` - unlike the removed
+ * query-side fan-out, it does not give the harness a retrieval path
+ * users don't have.
+ */
 function normalizeFactForFts(text: string): string {
   if (text.includes('@')) return text;
   return text.replace(/\.(?=\s|$)/g, '');
@@ -80,125 +87,20 @@ function parseArgs(argv: ReadonlyArray<string>): {
   };
 }
 
-const FTS_STOPWORDS = new Set([
-  'the',
-  'and',
-  'for',
-  'are',
-  'but',
-  'not',
-  'you',
-  'all',
-  'can',
-  'her',
-  'was',
-  'one',
-  'our',
-  'out',
-  'day',
-  'get',
-  'has',
-  'him',
-  'his',
-  'how',
-  'its',
-  'may',
-  'new',
-  'now',
-  'old',
-  'see',
-  'two',
-  'way',
-  'who',
-  'boy',
-  'did',
-  'she',
-  'use',
-  'her',
-  'many',
-  'than',
-  'them',
-  'these',
-  'some',
-  'what',
-  'which',
-  'when',
-  'where',
-  'does',
-  'with',
-  'from',
-  'have',
-  'that',
-  'this',
-  'your',
-  'into',
-  'also',
-  'each',
-  'work',
-  'name',
-  'user',
-  'kind',
-  'type',
-  'list',
-  'will',
-]);
-
-function tokenVariants(token: string): string[] {
-  const out = [token];
-  if (token.endsWith('s') && token.length > 4) out.push(token.slice(0, -1));
-  if (!token.endsWith('s') && token.length > 3) out.push(`${token}s`);
-  return out;
-}
-
-function keywordTokens(question: string): string[] {
-  const raw = question.toLowerCase().match(/[a-z0-9@._-]{2,}/g) ?? [];
-  const out: string[] = [];
-  for (const t of raw) {
-    if (t.length < 3 && !t.includes('@')) continue;
-    if (FTS_STOPWORDS.has(t)) continue;
-    out.push(t);
-  }
-  return out;
-}
-
-async function searchFactsForBenchmark(
-  memory: Memory,
+/**
+ * W-093 (evals-06 parity with the longmemeval runner): answer with the
+ * EXACT retrieval path a user gets - ONE `memory.semantic.search` call
+ * with the raw question. The former stopword/plural fan-out retrieved
+ * through a harness-only path no application code has, so the CI smoke
+ * could mask regressions of the real single-query pipeline.
+ */
+export async function answerQuestion(
+  memory: Pick<Memory, 'semantic'>,
   scope: SessionScope,
   question: string,
 ): Promise<string> {
-  const tokens = keywordTokens(question);
-  const seen = new Set<string>();
-  const texts: string[] = [];
-
-  async function pushHits(
-    hits: ReadonlyArray<{ record: { id: string; text: string } }>,
-  ): Promise<void> {
-    for (const h of hits) {
-      if (seen.has(h.record.id)) continue;
-      seen.add(h.record.id);
-      texts.push(h.record.text);
-    }
-  }
-
-  if (tokens.length === 0) {
-    const hits = await memory.semantic.search(scope, question, { topK: 24 });
-    await pushHits(hits);
-    return texts.join('\n');
-  }
-
-  for (const t of tokens) {
-    for (const variant of tokenVariants(t)) {
-      const hits = await memory.semantic.search(scope, variant, { topK: 12 });
-      await pushHits(hits);
-    }
-  }
-
-  if (texts.length === 0) {
-    const hits = await memory.semantic.search(scope, question, { topK: 24 });
-    await pushHits(hits);
-  }
-
-  return texts.join('\n');
+  const hits = await memory.semantic.search(scope, question, { topK: 24 });
+  return hits.map((h) => h.record.text).join('\n');
 }
 
 function createRetrieverAgent(scope: SessionScope): AgentLike<LocomoCaseInput, string> {
@@ -223,7 +125,7 @@ function createRetrieverAgent(scope: SessionScope): AgentLike<LocomoCaseInput, s
             sensitivity: 'internal',
           });
         }
-        return await searchFactsForBenchmark(memory, scope, input.question);
+        return await answerQuestion(memory, scope, input.question);
       } finally {
         await store.close();
       }
@@ -253,7 +155,7 @@ export async function runLocomoBenchmark(options: {
 }): Promise<EvalReport<LocomoCaseInput, string>> {
   await ensureDatasetReadable(options.datasetPath, options.subset);
   const dataset = await loadJsonlDataset(options.datasetPath, {
-    name: 'locomo-seed',
+    name: 'memory-smoke-seed',
     mapper: (line): { id?: string; input: LocomoCaseInput; expected: string } => {
       const facts = line.facts;
       const question = line.question;
@@ -279,8 +181,8 @@ export async function runLocomoBenchmark(options: {
 
   const scope: SessionScope = {
     userId: 'benchmark-user',
-    sessionId: 'locomo-session',
-    agentId: 'locomo-agent',
+    sessionId: 'memory-smoke-session',
+    agentId: 'memory-smoke-agent',
   };
 
   const agent = createRetrieverAgent(scope);

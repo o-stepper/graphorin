@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { runLocomoBenchmark, VERSION } from '../src/runner.js';
 
-describe('benchmarks/locomo', () => {
+describe('benchmarks/memory-smoke', () => {
   it('exposes the package.json version', () => {
     expect(VERSION).toBe(pkgVersion);
   });
