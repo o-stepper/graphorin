@@ -22,7 +22,7 @@
 
 import process from 'node:process';
 import { type CheckpointStore, collect, Directive, type WorkflowEvent } from '@graphorin/core';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import {
   createNode,
@@ -346,7 +346,7 @@ export async function main(): Promise<number> {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }

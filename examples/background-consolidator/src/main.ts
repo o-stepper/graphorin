@@ -23,7 +23,7 @@
 import process from 'node:process';
 import { type Agent, createAgent } from '@graphorin/agent';
 import type { AgentEvent, Provider, SessionScope } from '@graphorin/core';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import {
   type Consolidator,
   type ConsolidatorStatus,
@@ -575,7 +575,7 @@ function sleep(ms: number): Promise<void> {
 /**
  * CLI entry point. Boots the app against an in-memory SQLite store,
  * runs one cycle, prints the consolidator status, and exits cleanly.
- * The block is gated by `import.meta.url === file:${argv[1]}` so the
+ * The block is gated by the shared `isMainModule` predicate so the
  * module is safely importable from tests + downstream consumers.
  */
 export async function main(args: { readonly env?: NodeJS.ProcessEnv } = {}): Promise<number> {
@@ -611,7 +611,7 @@ void cron;
 void interval;
 void idle;
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }

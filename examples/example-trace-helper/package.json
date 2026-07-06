@@ -21,6 +21,7 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "lint": "biome check .",
     "clean": "rimraf dist .turbo *.tsbuildinfo"
   },

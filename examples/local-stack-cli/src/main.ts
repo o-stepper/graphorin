@@ -19,7 +19,7 @@ import type { Writable } from 'node:stream';
 import { type Agent, createAgent } from '@graphorin/agent';
 import type { AgentEvent, EmbedderProvider, Provider } from '@graphorin/core';
 import { createOllamaEmbedder } from '@graphorin/embedder-ollama';
-import { optionalTracerFromEnv } from '@graphorin/example-trace-helper';
+import { isMainModule, optionalTracerFromEnv } from '@graphorin/example-trace-helper';
 import { createMemory, defineBlock, type Memory } from '@graphorin/memory';
 import { createProvider, ollamaAdapter } from '@graphorin/provider';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
@@ -441,7 +441,7 @@ function stringifyError(err: unknown): string {
   return String(err);
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isMainModule(import.meta.url, process.argv[1])) {
   const exitCode = await main();
   if (exitCode !== 0) process.exit(exitCode);
 }
