@@ -88,3 +88,49 @@ describe('no-secret-unwrap', () => {
     expect(ids).toEqual(['avoidReveal', 'avoidUnwrap']);
   });
 });
+
+/** W-043: the allowReceiverPattern carve-out for non-secret receivers. */
+describe('@graphorin/no-secret-unwrap - allowReceiverPattern (W-043)', () => {
+  const FRAMEWORK_PATH = '/repo/packages/security/src/example.js';
+
+  it('still errors on Zod-style unwrap by default (fixes nothing silently)', () => {
+    const messages = lintSource({
+      source: `const inner = optionalSchema.unwrap();`,
+      rule: 'no-secret-unwrap',
+      filename: FRAMEWORK_PATH,
+    });
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.messageId).toBe('avoidUnwrap');
+  });
+
+  it('skips a receiver matching the configured pattern', () => {
+    const messages = lintSource({
+      source: `const inner = optionalSchema.unwrap();`,
+      rule: 'no-secret-unwrap',
+      filename: FRAMEWORK_PATH,
+      options: [{ allowReceiverPattern: 'Schema$' }],
+    });
+    expect(messages).toEqual([]);
+  });
+
+  it('keeps flagging a non-matching receiver with the option set', () => {
+    const messages = lintSource({
+      source: `const value = secret.unwrap();`,
+      rule: 'no-secret-unwrap',
+      filename: FRAMEWORK_PATH,
+      options: [{ allowReceiverPattern: 'Schema$' }],
+    });
+    expect(messages).toHaveLength(1);
+    expect(messages[0]?.messageId).toBe('avoidUnwrap');
+  });
+
+  it('skips reveal() too when the receiver matches', () => {
+    const messages = lintSource({
+      source: `const inner = resultSchema.reveal();`,
+      rule: 'no-secret-unwrap',
+      filename: FRAMEWORK_PATH,
+      options: [{ allowReceiverPattern: 'Schema$' }],
+    });
+    expect(messages).toEqual([]);
+  });
+});

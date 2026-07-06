@@ -125,7 +125,7 @@ const rule: Rule.RuleModule = {
     // W-039 second stage: only packages whose manifest name matches a
     // configured prefix are "framework code". No resolvable manifest ->
     // fail open (path-only activation, the historical behaviour).
-    const options = (context.options[0] ?? {}) as { packagePrefixes?: readonly string[] };
+    const options = (context.options?.[0] ?? {}) as { packagePrefixes?: readonly string[] };
     const prefixes = options.packagePrefixes ?? ['@graphorin/'];
     const packageName = nearestPackageName(dirname(context.filename));
     if (packageName !== null && !prefixes.some((p) => packageName.startsWith(p))) {
