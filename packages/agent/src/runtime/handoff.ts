@@ -159,6 +159,12 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   };
   state.handoffs.push(handoffRec);
   yield { type: 'handoff', fromAgentId: agentId, toAgentId: targetId };
+  // W-034: `currentAgentId` identifies the agent whose model drives the
+  // NEXT step - the parent resumes driving once the child returns, so
+  // the transfer is scoped to the child observation and restored in
+  // `finally` (both branches, and on generator teardown). The child's
+  // identity is durably recorded by the HandoffRecord + handoff event.
+  const previousAgentId = state.currentAgentId;
   state.currentAgentId = targetId;
   const subAgent = handoff.agent;
   // AG-22: the sub-agent inherits the parent's abort signal,
@@ -168,18 +174,22 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   const subStart = Date.now();
   const subOutputs: string[] = [];
   let subResult: AgentResult<unknown> | undefined;
-  const subStream = subAgent.stream(filtered as Message[], {
-    signal,
-    ...(options.deps !== undefined || config.deps !== undefined
-      ? { deps: (options.deps ?? config.deps) as TDeps }
-      : {}),
-    sessionId,
-  });
-  for await (const subEv of subStream) {
-    if (subEv.type === 'text.complete') subOutputs.push(subEv.text);
-    else if (subEv.type === 'agent.end') {
-      subResult = subEv.result as AgentResult<unknown>;
+  try {
+    const subStream = subAgent.stream(filtered as Message[], {
+      signal,
+      ...(options.deps !== undefined || config.deps !== undefined
+        ? { deps: (options.deps ?? config.deps) as TDeps }
+        : {}),
+      sessionId,
+    });
+    for await (const subEv of subStream) {
+      if (subEv.type === 'text.complete') subOutputs.push(subEv.text);
+      else if (subEv.type === 'agent.end') {
+        subResult = subEv.result as AgentResult<unknown>;
+      }
     }
+  } finally {
+    state.currentAgentId = previousAgentId;
   }
   const subDurationMs = Date.now() - subStart;
   // W-033: fold the child's usage into the parent's accounting on EVERY

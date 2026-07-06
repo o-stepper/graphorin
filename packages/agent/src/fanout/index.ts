@@ -16,7 +16,6 @@
 import { createHash } from 'node:crypto';
 import { type AgentEvent, type FanOutChildMetadata, type Usage, zeroUsage } from '@graphorin/core';
 import { MergeBlockedError } from '../errors/index.js';
-import { accumulateUsage } from '../runtime/messages.js';
 import {
   type ContentOriginKind,
   computeSourceTrust,
@@ -24,6 +23,7 @@ import {
   type MergeGuardConfig,
   type TrustClass,
 } from '../lateral-leak/merge-guard.js';
+import { accumulateUsage } from '../runtime/messages.js';
 
 /**
  * Per-child budget. Defaults derived from the canonical 2026

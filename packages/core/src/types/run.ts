@@ -85,6 +85,12 @@ export interface RunStateUsageByModel {
 export interface RunState {
   readonly id: string;
   readonly agentId: string;
+  /**
+   * The agent whose model drives the NEXT step. During a handoff it is
+   * the target for exactly the child observation window and is restored
+   * to the parent when the child returns (W-034) - the child's identity
+   * is durably recorded in {@link RunState.handoffs}, never here.
+   */
   readonly currentAgentId: string;
   readonly sessionId: string;
   readonly userId?: string;

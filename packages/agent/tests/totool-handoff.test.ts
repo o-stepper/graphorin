@@ -196,6 +196,56 @@ describe('sanitizeHandoffSeed - the child seed is a well-formed transcript', () 
   });
 });
 
+describe('W-034 - currentAgentId is restored after the handoff child returns', () => {
+  function routerWith(childScripts: Parameters<typeof createMockProvider>[0]['scripts']) {
+    const target = createAgent({
+      name: 'specialist',
+      instructions: 'x',
+      provider: createMockProvider({ modelId: 'mock-child', scripts: childScripts }),
+    });
+    const parent = createAgent({
+      name: 'router',
+      instructions: 'route',
+      provider: createMockProvider({
+        modelId: 'mock',
+        scripts: [
+          toolCallScript({
+            toolCallId: 'h1',
+            toolName: 'transfer_to_specialist',
+            args: {},
+            totalTokens: 8,
+          }),
+          textOnlyScript('final', 4),
+        ],
+      }),
+      handoffs: [target],
+    });
+    return { parent, target };
+  }
+
+  it('post-handoff steps are attributed to the parent, HandoffRecord keeps from/to', async () => {
+    const { parent, target } = routerWith([textOnlyScript('done', 20)]);
+    const result = await parent.run('help');
+    expect(result.status).toBe('completed');
+    expect(result.state.currentAgentId).toBe(result.state.agentId);
+    // Every step after the child returned is driven by the parent model.
+    for (const step of result.state.steps) {
+      expect(step.agentId).toBe(result.state.agentId);
+    }
+    const rec = result.state.handoffs[0];
+    expect(rec?.fromAgentId).toBe(result.state.agentId);
+    expect(rec?.toAgentId).toBe(target.id);
+  });
+
+  it('the failed-child branch restores the parent id too', async () => {
+    const { parent } = routerWith([errorScript({ kind: 'unknown', message: 'child boom' })]);
+    const result = await parent.run('help');
+    expect(result.state.currentAgentId).toBe(result.state.agentId);
+    const postHandoffStep = result.state.steps.at(-1);
+    expect(postHandoffStep?.agentId).toBe(result.state.agentId);
+  });
+});
+
 describe('W-033 - child run usage folds into the parent run', () => {
   it('handoff: parent usage/usageByModel include the child tokens, steps stay own-only', async () => {
     const target = createAgent({
