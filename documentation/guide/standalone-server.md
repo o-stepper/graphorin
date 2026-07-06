@@ -86,11 +86,13 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
 | | | On failure the run subject carries a `workflow.error` event whose payload is `{ runId, code, message, hint? }` - `code` is the machine-readable discriminator (`err.code`, falling back to `err.kind`, else `unknown`), so clients retry `checkpoint-version-conflict` and abandon `node-execution-failed` without parsing prose; the same `code` appears on the run-status `error` object. |
-| `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement `resume()`. Scope `workflows:resume:<id>`. |
+| `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). An optional `name` targets a specific awakeable/approval among parallel pauses (W-119; approvals resolve through the same primitive). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement the needed method. Scope `workflows:resume:<id>`. |
 | `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`. Scope `workflows:read:<id>`. |
 | `GET` | `/v1/workflows/:id/checkpoints` | List a thread's checkpoints (`?threadId=...`). Scope `workflows:read:<id>`. |
 | `DELETE` | `/v1/workflows/:id/threads/:threadId` | Delete every checkpoint + pending write of one thread (idempotent; `204` on success, `400` when the entry does not expose `deleteThread()`). Scope `workflows:delete:<id>`. |
-| `POST` | `/v1/workflows/:id/fork` | **Not implemented** on the server surface yet: answers an honest `501`; fork the thread programmatically via the workflow API. Scope `workflows:execute:<id>`. |
+| `POST` | `/v1/workflows/:id/fork` | Fork a new thread from a checkpoint (W-119): body `{ fromThreadId, fromCheckpointId? }`, defaulting to the thread's latest checkpoint; answers `201 { newThreadId }`. Scope `workflows:execute:<id>`. |
+| `POST` | `/v1/workflows/:id/retry` | Replay a failed/aborted thread in the background (W-119): body `{ threadId }`, answers `202 { runId }` with the WS subject. Scope `workflows:resume:<id>`. |
+| `POST` | `/v1/workflows/:id/tick` | Fire a due durable timer synchronously (W-119): body `{ threadId }`, answers `{ fired, nextWakeAt }`. Long node bodies hold the connection - prefer the timer daemon (`createServer({ workflowTimers })`) for regular firing. Scope `workflows:resume:<id>`. |
 | `POST` | `/v1/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 
 ::: info Terminal run state is short-lived
