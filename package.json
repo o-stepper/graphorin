@@ -33,7 +33,7 @@
     "check-version-consistency": "node ./scripts/check-version-consistency.mjs",
     "check-phantom-deps": "node ./scripts/check-phantom-deps.mjs",
     "check-character-rules": "node ./scripts/check-character-rules.mjs",
-    "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test",
+    "check-gates-selftest": "node ./scripts/check-cli-docs.mjs --self-test && node ./scripts/check-example-docs.mjs --self-test && node ./scripts/check-no-network.mjs --self-test && node ./scripts/check-doc-snippets.mjs --self-test && node ./scripts/check-character-rules.mjs --self-test && node ./documentation/scripts/build-llms-txt.mjs --self-test",
     "bump-version": "node ./scripts/bump-version.mjs",
     "smoke-examples": "node ./scripts/smoke-examples.mjs",
     "mvp-readiness": "node ./scripts/mvp-readiness.mjs",
