@@ -239,7 +239,7 @@ createNode({ name: 'fetch', run, timeoutMs: 30_000, retry: { maxAttempts: 3, bac
 
 ### Step journaling (opt-in)
 
-`createWorkflow({ ..., journalSteps: true })` closes the crash-between-execute-and-persist window: before each step the engine journals a step-intent record against the parent checkpoint, and each completed task journals its channel writes as it finishes. Crash recovery from a `running` checkpoint then replays the journaled writes of completed tasks and re-runs **only** the unfinished ones - completed side effects do not repeat. Costs one extra store write per completed task; the first step of a run has no parent checkpoint to journal against and re-runs whole on a crash.
+`createWorkflow({ ..., journalSteps: true })` narrows the crash-between-execute-and-persist window: before each step the engine journals a step-intent record against the parent checkpoint, and each completed task journals its channel writes as it finishes. Crash recovery from a `running` checkpoint then replays the journaled writes of completed tasks exactly once and re-runs **only** the unfinished ones - for the vast majority of crash points, finished work does not repeat. What remains is honest at-least-once for the task's side effects: the journal entry is written **after** the task finishes, so a crash between the effect completing and its writes landing re-runs that task on recovery. For strict once-semantics make the effect idempotent, exactly as the [re-execution contract](#the-re-execution-contract) requires around `pause()`. Costs one extra store write per completed task; the first step of a run has no parent checkpoint to journal against and re-runs whole on a crash.
 
 ## Static `pauseAt`
 
