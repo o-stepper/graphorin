@@ -24,8 +24,8 @@ an operator installs a partial locale pack).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-autorecalltriggers"></a> `autoRecallTriggers?` | `readonly` | `Partial`\&lt;[`AutoRecallTriggers`](/api/@graphorin/memory/interfaces/AutoRecallTriggers.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:124 |
-| <a id="property-basetemplate"></a> `baseTemplate?` | `readonly` | `Partial`\&lt;[`BaseTemplateFragments`](/api/@graphorin/memory/interfaces/BaseTemplateFragments.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:123 |
-| <a id="property-compactionsummarytemplate"></a> `compactionSummaryTemplate?` | `readonly` | `Partial`\&lt;[`CompactionSummaryTemplate`](/api/@graphorin/memory/interfaces/CompactionSummaryTemplate.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:126 |
+| <a id="property-autorecalltriggers"></a> `autoRecallTriggers?` | `readonly` | `Partial`\<[`AutoRecallTriggers`](/api/@graphorin/memory/interfaces/AutoRecallTriggers.md)\> | packages/memory/src/context-engine/locale-packs/types.ts:124 |
+| <a id="property-basetemplate"></a> `baseTemplate?` | `readonly` | `Partial`\<[`BaseTemplateFragments`](/api/@graphorin/memory/interfaces/BaseTemplateFragments.md)\> | packages/memory/src/context-engine/locale-packs/types.ts:123 |
+| <a id="property-compactionsummarytemplate"></a> `compactionSummaryTemplate?` | `readonly` | `Partial`\<[`CompactionSummaryTemplate`](/api/@graphorin/memory/interfaces/CompactionSummaryTemplate.md)\> | packages/memory/src/context-engine/locale-packs/types.ts:126 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/context-engine/locale-packs/types.ts:122 |
-| <a id="property-inboundsanitizationpreamble"></a> `inboundSanitizationPreamble?` | `readonly` | `Partial`\&lt;[`InboundSanitizationPreamble`](/api/@graphorin/memory/interfaces/InboundSanitizationPreamble.md)\&gt; | packages/memory/src/context-engine/locale-packs/types.ts:125 |
+| <a id="property-inboundsanitizationpreamble"></a> `inboundSanitizationPreamble?` | `readonly` | `Partial`\<[`InboundSanitizationPreamble`](/api/@graphorin/memory/interfaces/InboundSanitizationPreamble.md)\> | packages/memory/src/context-engine/locale-packs/types.ts:125 |

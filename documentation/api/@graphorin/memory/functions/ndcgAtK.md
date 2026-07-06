@@ -22,7 +22,7 @@ Binary-gain nDCG@k over a ranked id list.
 | Parameter | Type |
 | ------ | ------ |
 | `rankedIds` | readonly `string`[] |
-| `relevant` | `ReadonlySet`\&lt;`string`\&gt; |
+| `relevant` | `ReadonlySet`\<`string`\> |
 | `k` | `number` |
 
 ## Returns

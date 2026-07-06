@@ -39,4 +39,4 @@ Defined in: packages/memory/src/context-engine/token-counter.ts:29
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>

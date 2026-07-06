@@ -22,10 +22,10 @@ identical bytes (idempotence).
 
 | Parameter | Type |
 | ------ | ------ |
-| `frontmatter` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `frontmatter` | `Record`\<`string`, `unknown`\> |
 
 ## Returns
 
-`Record`\&lt;`string`, `unknown`\&gt;
+`Record`\<`string`, `unknown`\>
 
 ## Stable

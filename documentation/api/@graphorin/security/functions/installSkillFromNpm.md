@@ -22,6 +22,6 @@ Install a skill from the npm registry.
 
 ## Returns
 
-`Promise`\&lt;[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\&gt;
+`Promise`\<[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\>
 
 ## Stable

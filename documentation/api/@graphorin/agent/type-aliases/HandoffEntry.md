@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [](/api/@graphorin/agent/README.md) / HandoffEntry
 
-# Type Alias: HandoffEntry\&lt;TDeps\&gt;
+# Type Alias: HandoffEntry\<TDeps\>
 
 ```ts
 type HandoffEntry<TDeps> = 
@@ -30,7 +30,7 @@ an explicit `{ target, inputFilter? }` envelope.
 
 ## Union Members
 
-[`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\&lt;`TDeps`, `any`\&gt;
+[`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\<`TDeps`, `any`\>
 
 ***
 
@@ -48,6 +48,6 @@ an explicit `{ target, inputFilter? }` envelope.
 | ------ | ------ | ------ | ------ |
 | `forwardEvents?` | `SubagentForwardPolicy` | W-036: which child events forward into the parent stream. | packages/agent/src/types.ts:136 |
 | `inputFilter?` | [`HandoffFilter`](/api/@graphorin/core/type-aliases/HandoffFilter.md) | - | packages/agent/src/types.ts:134 |
-| `target` | [`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\&lt;`TDeps`, `any`\&gt; | - | packages/agent/src/types.ts:133 |
+| `target` | [`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\<`TDeps`, `any`\> | - | packages/agent/src/types.ts:133 |
 
 ## Stable

@@ -4,13 +4,13 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AnyTool
 
-# Type Alias: AnyTool\&lt;TDeps\&gt;
+# Type Alias: AnyTool\<TDeps\>
 
 ```ts
 type AnyTool<TDeps> = Tool<any, any, TDeps>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:194
+Defined in: packages/core/src/contracts/tool.ts:200
 
 Existentially-typed [Tool](/api/@graphorin/core/interfaces/Tool.md) for collection seams (W-100).
 

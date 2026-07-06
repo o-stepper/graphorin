@@ -16,4 +16,4 @@ Configuration for [defineBm25Index](/api/@graphorin/tools/functions/defineBm25In
 | ------ | ------ | ------ | ------ |
 | <a id="property-b"></a> `b?` | `readonly` | `number` | packages/tools/src/registry/bm25.ts:74 |
 | <a id="property-k1"></a> `k1?` | `readonly` | `number` | packages/tools/src/registry/bm25.ts:73 |
-| <a id="property-stopwords"></a> `stopwords?` | `readonly` | `ReadonlySet`\&lt;`string`\&gt; | packages/tools/src/registry/bm25.ts:75 |
+| <a id="property-stopwords"></a> `stopwords?` | `readonly` | `ReadonlySet`\<`string`\> | packages/tools/src/registry/bm25.ts:75 |

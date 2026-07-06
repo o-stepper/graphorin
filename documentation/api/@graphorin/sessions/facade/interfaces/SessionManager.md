@@ -49,7 +49,7 @@ uses the `'wrap'` default).
 
 #### Returns
 
-`Promise`\&lt;[`Session`](/api/@graphorin/sessions/facade/interfaces/Session.md)\&gt;
+`Promise`\<[`Session`](/api/@graphorin/sessions/facade/interfaces/Session.md)\>
 
 ***
 
@@ -80,7 +80,7 @@ Delegates to [SessionStoreExt.deleteSession](/api/@graphorin/core/interfaces/Ses
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -128,7 +128,7 @@ Hydrate an existing session by id.
 
 #### Returns
 
-`Promise`\&lt;[`Session`](/api/@graphorin/sessions/facade/interfaces/Session.md)\&gt;
+`Promise`\<[`Session`](/api/@graphorin/sessions/facade/interfaces/Session.md)\>
 
 ***
 
@@ -177,11 +177,11 @@ List sessions for a scope (newest-first by `createdAt`).
 
 | Parameter | Type |
 | ------ | ------ |
-| `scope` | `Pick`\&lt;[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\&gt; |
+| `scope` | `Pick`\<[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\> |
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\&gt;
+`Promise`\<readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\>
 
 ***
 
@@ -203,7 +203,7 @@ Prune audit rows older than the supplied epoch ms.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -228,7 +228,7 @@ the count deleted. See [SessionStoreExt.pruneSessions](/api/@graphorin/core/inte
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 

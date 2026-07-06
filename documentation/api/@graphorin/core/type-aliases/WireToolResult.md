@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / WireToolResult
 
-# Type Alias: WireToolResult\&lt;TOutput\&gt;
+# Type Alias: WireToolResult\<TOutput\>
 
 ```ts
 type WireToolResult<TOutput> = Omit<ToolResult<TOutput>, "contentParts"> & {

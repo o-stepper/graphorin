@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / WorkflowNodeRun
 
-# Type Alias: WorkflowNodeRun\&lt;TState\&gt;
+# Type Alias: WorkflowNodeRun\<TState\>
 
 ```ts
 type WorkflowNodeRun<TState> = (state, ctx) => 
@@ -20,18 +20,18 @@ Per-node run callback.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `state` | `Readonly`\&lt;`TState`\&gt; |
-| `ctx` | [`WorkflowContext`](/api/@graphorin/workflow/interfaces/WorkflowContext.md)\&lt;`TState`\&gt; |
+| `state` | `Readonly`\<`TState`\> |
+| `ctx` | [`WorkflowContext`](/api/@graphorin/workflow/interfaces/WorkflowContext.md)\<`TState`\> |
 
 ## Returns
 
-  \| `Promise`\<[`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;\>
-  \| [`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;
+  \| `Promise`\<[`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\<`TState`\>\>
+  \| [`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\<`TState`\>
 
 ## Stable

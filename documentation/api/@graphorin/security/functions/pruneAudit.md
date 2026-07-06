@@ -25,6 +25,6 @@ surviving entry's `prevHash` to the genesis value.
 
 ## Returns
 
-`Promise`\&lt;[`PruneAuditResult`](/api/@graphorin/security/interfaces/PruneAuditResult.md)\&gt;
+`Promise`\<[`PruneAuditResult`](/api/@graphorin/security/interfaces/PruneAuditResult.md)\>
 
 ## Stable

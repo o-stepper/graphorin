@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / EvalReport
 
-# Interface: EvalReport\&lt;I, O\&gt;
+# Interface: EvalReport\<I, O\>
 
 Defined in: observability/dist/eval/types.d.ts:74
 
@@ -24,10 +24,10 @@ Final report shape.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-aborted"></a> `aborted?` | `readonly` | `boolean` | `true` when the run was cut short by an aborted signal - `results` and `summary` then cover only the cases that finished before the abort (a partial report). Absent on a normal full run. See `runEvals`. | observability/dist/eval/types.d.ts:110 |
-| <a id="property-results"></a> `results` | `readonly` | readonly [`EvalCaseResult`](/api/@graphorin/evals/interfaces/EvalCaseResult.md)\&lt;`I`, `O`\&gt;[] | - | observability/dist/eval/types.d.ts:75 |
-| <a id="property-summary"></a> `summary` | `readonly` | \{ `avgDurationMs`: `number`; `byScorer`: `Readonly`\<`Record`\&lt;`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\&gt;\>; `failed`: `number`; `passed`: `number`; `passHatK?`: \{ `baseCases`: `number`; `k`: `number`; `value`: `number`; \}; `passRateCi?`: \{ `hi`: `number`; `lo`: `number`; \}; `total`: `number`; \} | - | observability/dist/eval/types.d.ts:76 |
+| <a id="property-results"></a> `results` | `readonly` | readonly [`EvalCaseResult`](/api/@graphorin/evals/interfaces/EvalCaseResult.md)\<`I`, `O`\>[] | - | observability/dist/eval/types.d.ts:75 |
+| <a id="property-summary"></a> `summary` | `readonly` | \{ `avgDurationMs`: `number`; `byScorer`: `Readonly`\<`Record`\<`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\>\>; `failed`: `number`; `passed`: `number`; `passHatK?`: \{ `baseCases`: `number`; `k`: `number`; `value`: `number`; \}; `passRateCi?`: \{ `hi`: `number`; `lo`: `number`; \}; `total`: `number`; \} | - | observability/dist/eval/types.d.ts:76 |
 | `summary.avgDurationMs` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:80 |
-| `summary.byScorer` | `readonly` | `Readonly`\<`Record`\&lt;`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\&gt;\> | - | observability/dist/eval/types.d.ts:81 |
+| `summary.byScorer` | `readonly` | `Readonly`\<`Record`\<`string`, \{ `avgScore`: `number` \| `null`; `failed`: `number`; `passed`: `number`; \}\>\> | - | observability/dist/eval/types.d.ts:81 |
 | `summary.failed` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:79 |
 | `summary.passed` | `readonly` | `number` | - | observability/dist/eval/types.d.ts:78 |
 | `summary.passHatK?` | `readonly` | \{ `baseCases`: `number`; `k`: `number`; `value`: `number`; \} | pass^k stability metric - fraction of base cases whose EVERY repeat iteration passed. Present only when the run used `iterations > 1`. | observability/dist/eval/types.d.ts:99 |

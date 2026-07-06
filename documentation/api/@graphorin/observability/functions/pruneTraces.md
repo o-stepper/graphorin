@@ -23,6 +23,6 @@ window. Returns the deleted files for caller-side accounting.
 
 ## Returns
 
-`Promise`\&lt;readonly `string`[]\&gt;
+`Promise`\<readonly `string`[]\>
 
 ## Stable

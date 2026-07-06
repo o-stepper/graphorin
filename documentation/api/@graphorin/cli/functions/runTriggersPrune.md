@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/triggers.ts:193
 
 ## Returns
 
-`Promise`\&lt;[`TriggersPruneResult`](/api/@graphorin/cli/interfaces/TriggersPruneResult.md)\&gt;
+`Promise`\<[`TriggersPruneResult`](/api/@graphorin/cli/interfaces/TriggersPruneResult.md)\>
 
 ## Stable

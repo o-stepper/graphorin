@@ -14,7 +14,7 @@ Wire twin of [AudioContent](/api/@graphorin/core/interfaces/AudioContent.md).
 
 ## Extends
 
-- `Omit`\&lt;[`AudioContent`](/api/@graphorin/core/interfaces/AudioContent.md), `"audio"`\&gt;
+- `Omit`\<[`AudioContent`](/api/@graphorin/core/interfaces/AudioContent.md), `"audio"`\>
 
 ## Properties
 

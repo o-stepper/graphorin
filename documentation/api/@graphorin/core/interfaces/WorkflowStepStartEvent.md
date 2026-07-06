@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / WorkflowStepStartEvent
 
-# Interface: WorkflowStepStartEvent\&lt;TState\&gt;
+# Interface: WorkflowStepStartEvent\<TState\>
 
 Defined in: packages/core/src/types/workflow-event.ts:32
 

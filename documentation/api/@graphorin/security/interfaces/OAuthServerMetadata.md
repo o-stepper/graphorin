@@ -24,7 +24,7 @@ not use are intentionally elided.
 | <a id="property-granttypessupported"></a> `grantTypesSupported?` | `readonly` | readonly `string`[] | - | packages/security/src/oauth/types.ts:39 |
 | <a id="property-issuer"></a> `issuer` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:29 |
 | <a id="property-jwksuri"></a> `jwksUri?` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:36 |
-| <a id="property-raw"></a> `raw?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | Original discovery payload, captured for diagnostics. | packages/security/src/oauth/types.ts:42 |
+| <a id="property-raw"></a> `raw?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | Original discovery payload, captured for diagnostics. | packages/security/src/oauth/types.ts:42 |
 | <a id="property-registrationendpoint"></a> `registrationEndpoint?` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:32 |
 | <a id="property-responsetypessupported"></a> `responseTypesSupported?` | `readonly` | readonly `string`[] | - | packages/security/src/oauth/types.ts:38 |
 | <a id="property-revocationendpoint"></a> `revocationEndpoint?` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:33 |

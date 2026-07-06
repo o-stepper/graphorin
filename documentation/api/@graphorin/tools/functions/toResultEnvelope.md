@@ -26,12 +26,12 @@ use the `chunks` parameter to materialise the assembled body.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \{ `chunks?`: readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[]; `raw`: \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined`; \} |
+| `opts` | \{ `chunks?`: readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[]; `raw`: \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\<`TOutput`\> \| `undefined`; \} |
 | `opts.chunks?` | readonly [`ContentChunk`](/api/@graphorin/core/type-aliases/ContentChunk.md)[] |
-| `opts.raw` | \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined` |
+| `opts.raw` | \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\<`TOutput`\> \| `undefined` |
 
 ## Returns
 
-[`ResultEnvelope`](/api/@graphorin/tools/interfaces/ResultEnvelope.md)\&lt;`TOutput`\&gt;
+[`ResultEnvelope`](/api/@graphorin/tools/interfaces/ResultEnvelope.md)\<`TOutput`\>
 
 ## Stable

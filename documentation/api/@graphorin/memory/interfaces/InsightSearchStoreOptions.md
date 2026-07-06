@@ -6,7 +6,7 @@
 
 # Interface: InsightSearchStoreOptions
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:641
+Defined in: packages/memory/src/internal/storage-adapter.ts:658
 
 Options accepted by [InsightMemoryStoreExt.search](/api/@graphorin/memory/interfaces/InsightMemoryStoreExt.md#search).
 
@@ -14,5 +14,5 @@ Options accepted by [InsightMemoryStoreExt.search](/api/@graphorin/memory/interf
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/internal/storage-adapter.ts:644 |
-| <a id="property-topk"></a> `topK?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:642 |
+| <a id="property-includequarantined"></a> `includeQuarantined?` | `readonly` | `boolean` | Include quarantined insights (validation / inspector path). | packages/memory/src/internal/storage-adapter.ts:661 |
+| <a id="property-topk"></a> `topK?` | `readonly` | `number` | - | packages/memory/src/internal/storage-adapter.ts:659 |

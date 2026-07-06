@@ -28,12 +28,12 @@ Take items as long as `pred` returns truthy. The first item for which
 
 | Parameter | Type |
 | ------ | ------ |
-| `source` | `AsyncIterable`\&lt;`T`\&gt; |
-| `pred` | (`value`, `index`) => `boolean` \| `Promise`\&lt;`boolean`\&gt; |
+| `source` | `AsyncIterable`\<`T`\> |
+| `pred` | (`value`, `index`) => `boolean` \| `Promise`\<`boolean`\> |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`AsyncIterable`\&lt;`T`\&gt;
+`AsyncIterable`\<`T`\>
 
 ## Stable

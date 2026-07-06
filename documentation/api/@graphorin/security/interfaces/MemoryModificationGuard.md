@@ -17,6 +17,6 @@ via the `createGuard(...)` factory.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-snapshot"></a> `snapshot` | `readonly` | (`reader`) => `Promise`\&lt;[`MemorySnapshot`](/api/@graphorin/security/interfaces/MemorySnapshot.md)\&gt; | Snapshot the relevant regions before tool execution. | packages/security/src/guard/types.ts:88 |
+| <a id="property-snapshot"></a> `snapshot` | `readonly` | (`reader`) => `Promise`\<[`MemorySnapshot`](/api/@graphorin/security/interfaces/MemorySnapshot.md)\> | Snapshot the relevant regions before tool execution. | packages/security/src/guard/types.ts:88 |
 | <a id="property-tier"></a> `tier` | `readonly` | [`MemoryGuardTier`](/api/@graphorin/security/type-aliases/MemoryGuardTier.md) | - | packages/security/src/guard/types.ts:86 |
-| <a id="property-verify"></a> `verify` | `readonly` | (`pre`, `reader`) => `Promise`\&lt;[`GuardVerifyResult`](/api/@graphorin/security/type-aliases/GuardVerifyResult.md)\&gt; | Verify that the post-execution state matches the pre-execution snapshot. | packages/security/src/guard/types.ts:90 |
+| <a id="property-verify"></a> `verify` | `readonly` | (`pre`, `reader`) => `Promise`\<[`GuardVerifyResult`](/api/@graphorin/security/type-aliases/GuardVerifyResult.md)\> | Verify that the post-execution state matches the pre-execution snapshot. | packages/security/src/guard/types.ts:90 |

@@ -29,6 +29,6 @@ Convenience factory equivalent to `new Dispatch(nodeName, args)`.
 
 ## Returns
 
-[`Dispatch`](/api/@graphorin/core/classes/Dispatch.md)\&lt;`TArgs`\&gt;
+[`Dispatch`](/api/@graphorin/core/classes/Dispatch.md)\<`TArgs`\>
 
 ## Stable

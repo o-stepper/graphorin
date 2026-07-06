@@ -28,4 +28,4 @@ Drive `graphorin auth refresh --mcp <id>`.
 
 ## Returns
 
-`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
+`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>

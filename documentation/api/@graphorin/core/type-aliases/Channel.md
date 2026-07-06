@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / Channel
 
-# Type Alias: Channel\&lt;T\&gt;
+# Type Alias: Channel\<T\>
 
 ```ts
 type Channel<T> = 

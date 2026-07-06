@@ -61,7 +61,7 @@ Defined in: src/runtime.ts:30
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -84,6 +84,6 @@ Defined in: src/runtime.ts:25
 
 #### Returns
 
-  \| `Uint32Array`\&lt;`ArrayBufferLike`\&gt;
-  \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt;
+  \| `Uint32Array`\<`ArrayBufferLike`\>
+  \| `Uint8Array`\<`ArrayBufferLike`\>
   \| readonly `number`[]

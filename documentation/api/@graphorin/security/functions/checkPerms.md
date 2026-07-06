@@ -23,6 +23,6 @@ by `graphorin doctor --check-perms`.
 
 ## Returns
 
-`Promise`\&lt;[`CheckResult`](/api/@graphorin/security/interfaces/CheckResult.md)[]\&gt;
+`Promise`\<[`CheckResult`](/api/@graphorin/security/interfaces/CheckResult.md)[]\>
 
 ## Stable

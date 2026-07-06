@@ -32,4 +32,4 @@ Defined in: packages/sessions/src/cassette/writer.ts:28
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

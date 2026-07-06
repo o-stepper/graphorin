@@ -10,7 +10,7 @@
 type ComposeProviderMiddleware = (middlewares) => ProviderMiddleware;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:312
+Defined in: packages/core/src/contracts/provider.ts:314
 
 Type signature for the canonical middleware composer (the runtime
 implementation lives in `@graphorin/provider`).
@@ -24,7 +24,7 @@ is the only blessed entry point for chaining middleware in
 
 | Parameter | Type |
 | ------ | ------ |
-| `middlewares` | `ReadonlyArray`\&lt;[`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)\&gt; |
+| `middlewares` | `ReadonlyArray`\<[`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)\> |
 
 ## Returns
 

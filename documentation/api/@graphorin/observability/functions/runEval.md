@@ -23,10 +23,10 @@ Defined in: packages/observability/src/eval/runner.ts:25
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`RunEvalOptions`](/api/@graphorin/observability/interfaces/RunEvalOptions.md)\&lt;`I`, `O`\&gt; |
+| `opts` | [`RunEvalOptions`](/api/@graphorin/observability/interfaces/RunEvalOptions.md)\<`I`, `O`\> |
 
 ## Returns
 
-`Promise`\<[`EvalReport`](/api/@graphorin/observability/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
+`Promise`\<[`EvalReport`](/api/@graphorin/observability/interfaces/EvalReport.md)\<`I`, `O`\>\>
 
 ## Stable

@@ -15,5 +15,5 @@ Parsed callback query parameters.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-code"></a> `code` | `readonly` | `string` | packages/security/src/oauth/callback-server.ts:46 |
-| <a id="property-raw"></a> `raw` | `readonly` | `ReadonlyMap`\&lt;`string`, `string`\&gt; | packages/security/src/oauth/callback-server.ts:48 |
+| <a id="property-raw"></a> `raw` | `readonly` | `ReadonlyMap`\<`string`, `string`\> | packages/security/src/oauth/callback-server.ts:48 |
 | <a id="property-state"></a> `state?` | `readonly` | `string` | packages/security/src/oauth/callback-server.ts:47 |

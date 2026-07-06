@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/init.ts:60
 
 ## Returns
 
-`Promise`\&lt;[`InitCommandResult`](/api/@graphorin/cli/interfaces/InitCommandResult.md)\&gt;
+`Promise`\<[`InitCommandResult`](/api/@graphorin/cli/interfaces/InitCommandResult.md)\>
 
 ## Stable

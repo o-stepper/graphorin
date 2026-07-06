@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:197
+Defined in: packages/memory/src/internal/storage-adapter.ts:210
 
 Extension of the typed `SessionMemoryStore` with optional
 token-cache + vector-search + cursor-aware reader helpers that
@@ -26,7 +26,7 @@ storage adapters may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:226
+Defined in: packages/memory/src/internal/storage-adapter.ts:239
 
 Count the live messages in the scoped session (CE-5) - a `COUNT(*)`, never
 materialising rows; `0` for a user-only scope. Powers honest `metadata()`
@@ -40,7 +40,7 @@ counts instead of `list(...)`-materialising up to 1000 rows.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -61,7 +61,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:99
 
 #### Returns
 
-`Promise`\&lt;readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\&gt;
+`Promise`\<readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\>
 
 #### Inherited from
 
@@ -78,7 +78,7 @@ optional listMessagesSince(
 limit): Promise<readonly SessionMessageRecord[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:216
+Defined in: packages/memory/src/internal/storage-adapter.ts:229
 
 List messages for the supplied scope past the optional
 `lastMessageId` cursor, oldest-first, capped at `limit`. Used by
@@ -95,7 +95,7 @@ idempotency cursor without rereading already-processed turns.
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionMessageRecord`](/api/@graphorin/memory/interfaces/SessionMessageRecord.md)[]\&gt;
+`Promise`\<readonly [`SessionMessageRecord`](/api/@graphorin/memory/interfaces/SessionMessageRecord.md)[]\>
 
 ***
 
@@ -119,7 +119,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\&gt;
+`Promise`\<readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\>
 
 #### Inherited from
 
@@ -144,7 +144,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:98
 
 #### Returns
 
-`Promise`\&lt;[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\&gt;
+`Promise`\<[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\>
 
 #### Inherited from
 
@@ -161,7 +161,17 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:105
+Defined in: packages/core/dist/contracts/memory-store.d.ts:116
+
+Full-text search over the scoped session messages.
+
+Query precedence (W-127): the POSITIONAL `query` parameter is
+authoritative; when the caller also sets `opts.query` (the field
+exists because [MemorySearchOptions](/api/@graphorin/core/interfaces/MemorySearchOptions.md) is shared with the
+option-object search surfaces), implementations MUST ignore it.
+The duplication is a known wart: narrowing `opts` to
+`Omit<MemorySearchOptions, 'query'>` is a candidate for the next
+major, not a change this line can make compatibly.
 
 #### Parameters
 
@@ -173,7 +183,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:105
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\>[]\>
 
 #### Inherited from
 
@@ -191,7 +201,7 @@ optional searchVector(
 topK): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:198
+Defined in: packages/memory/src/internal/storage-adapter.ts:211
 
 #### Parameters
 
@@ -204,7 +214,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:198
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\>[]\>
 
 ***
 
@@ -214,7 +224,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:198
 optional totalCachedTokens(scope): Promise<number | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:209
+Defined in: packages/memory/src/internal/storage-adapter.ts:222
 
 Sum of `session_messages.token_count` for the supplied scope.
 Returns `null` when the cache is empty / partially populated so
@@ -228,4 +238,4 @@ callers can fall back to a heuristic. Surfaced per DEC-131.
 
 #### Returns
 
-`Promise`\&lt;`number` \| `null`\&gt;
+`Promise`\<`number` \| `null`\>

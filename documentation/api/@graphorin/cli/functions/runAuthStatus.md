@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/auth.ts:205
 
 ## Returns
 
-`Promise`\&lt;[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\&gt;
+`Promise`\<[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\>
 
 ## Stable

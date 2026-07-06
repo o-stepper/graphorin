@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/memory.ts:62
 
 ## Returns
 
-`Promise`\&lt;[`MemoryStatusResult`](/api/@graphorin/cli/interfaces/MemoryStatusResult.md)\&gt;
+`Promise`\<[`MemoryStatusResult`](/api/@graphorin/cli/interfaces/MemoryStatusResult.md)\>
 
 ## Stable

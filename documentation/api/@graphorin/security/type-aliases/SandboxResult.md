@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / SandboxResult
 
-# Type Alias: SandboxResult\&lt;TOutput\&gt;
+# Type Alias: SandboxResult\<TOutput\>
 
 ```ts
 type SandboxResult<TOutput> = 

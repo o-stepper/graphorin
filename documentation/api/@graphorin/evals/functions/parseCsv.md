@@ -24,6 +24,6 @@ column-mapping behaviour without touching the filesystem.
 
 ## Returns
 
-readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[]
+readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\<`string`, `unknown`\>\>\>[]
 
 ## Stable

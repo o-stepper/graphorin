@@ -89,7 +89,7 @@ Defined in: packages/sessions/src/facade.ts:85
 
 #### Returns
 
-`Promise`\&lt;readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\&gt;
+`Promise`\<readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\>
 
 ***
 
@@ -115,7 +115,7 @@ fabricating those fields (the legacy behaviour). Implemented by
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/sessions/facade/interfaces/SessionMessageWithMetadata.md)[]\&gt;
+`Promise`\<readonly [`SessionMessageWithMetadata`](/api/@graphorin/sessions/facade/interfaces/SessionMessageWithMetadata.md)[]\>
 
 ***
 
@@ -136,7 +136,7 @@ Defined in: packages/sessions/src/facade.ts:84
 
 #### Returns
 
-`Promise`\&lt;[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\&gt;
+`Promise`\<[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\>
 
 ***
 
@@ -163,4 +163,4 @@ Defined in: packages/sessions/src/facade.ts:96
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\>[]\>

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AgentEndEvent
 
-# Interface: AgentEndEvent\&lt;TOutput\&gt;
+# Interface: AgentEndEvent\<TOutput\>
 
 Defined in: packages/core/src/types/agent-event.ts:313
 
@@ -20,6 +20,6 @@ Defined in: packages/core/src/types/agent-event.ts:313
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | packages/core/src/types/agent-event.ts:316 |
+| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\<`TOutput`\> | packages/core/src/types/agent-event.ts:316 |
 | <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:315 |
 | <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | packages/core/src/types/agent-event.ts:314 |

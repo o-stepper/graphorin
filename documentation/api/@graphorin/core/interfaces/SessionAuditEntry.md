@@ -31,5 +31,5 @@ never include secret values.
 | `actor.label?` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:73 |
 | <a id="property-at"></a> `at` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:69 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:66 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/session-store.ts:75 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/core/src/contracts/session-store.ts:75 |
 | <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/contracts/session-store.ts:67 |

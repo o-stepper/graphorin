@@ -22,6 +22,6 @@ Construct the tool-usage validator.
 
 ## Returns
 
-[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`unknown`\&gt;
+[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\<`unknown`\>
 
 ## Stable

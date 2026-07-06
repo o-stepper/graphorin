@@ -6,7 +6,7 @@
 
 # Interface: ResultReader
 
-Defined in: packages/tools/src/result/reader.ts:80
+Defined in: packages/tools/src/result/reader.ts:89
 
 Resolves result handles to (ranges of) their backing artifact.
 
@@ -20,7 +20,7 @@ Resolves result handles to (ranges of) their backing artifact.
 read(uri, range?): Promise<ResultReadOutcome>;
 ```
 
-Defined in: packages/tools/src/result/reader.ts:81
+Defined in: packages/tools/src/result/reader.ts:90
 
 #### Parameters
 
@@ -31,4 +31,4 @@ Defined in: packages/tools/src/result/reader.ts:81
 
 #### Returns
 
-`Promise`\&lt;[`ResultReadOutcome`](/api/@graphorin/tools/interfaces/ResultReadOutcome.md)\&gt;
+`Promise`\<[`ResultReadOutcome`](/api/@graphorin/tools/interfaces/ResultReadOutcome.md)\>

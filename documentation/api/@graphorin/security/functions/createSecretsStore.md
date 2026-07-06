@@ -24,6 +24,6 @@ re-wire the `ref:` resolver.
 
 ## Returns
 
-`Promise`\&lt;[`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md)\&gt;
+`Promise`\<[`SecretsStore`](/api/@graphorin/core/interfaces/SecretsStore.md)\>
 
 ## Stable

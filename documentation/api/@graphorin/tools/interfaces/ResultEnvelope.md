@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/tools](/api/@graphorin/tools/index.md) / [](/api/@graphorin/tools/README.md) / ResultEnvelope
 
-# Interface: ResultEnvelope\&lt;TOutput\&gt;
+# Interface: ResultEnvelope\<TOutput\>
 
 Defined in: packages/tools/src/result/envelope.ts:21
 

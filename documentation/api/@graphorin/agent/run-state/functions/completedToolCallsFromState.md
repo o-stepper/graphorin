@@ -24,6 +24,6 @@ Phase 17 example apps and operator-facing dashboards.
 
 ## Returns
 
-readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;[]
+readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\<`unknown`\>[]
 
 ## Stable

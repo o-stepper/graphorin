@@ -44,13 +44,13 @@ position.
 
 | Parameter | Type |
 | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] |
 | `weights` | readonly `number`[] \| `undefined` |
 | `k` | `number` |
 | `labels?` | readonly `string`[] |
 
 ## Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]
 
 ## Stable

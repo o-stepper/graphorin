@@ -21,20 +21,20 @@ execution policy (D1 / workflow-03): `timeoutMs` + `retry`.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \{ `name`: `string`; `retry?`: [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md); `run`: [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt;; `timeoutMs?`: `number`; \} |
+| `opts` | \{ `name`: `string`; `retry?`: [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md); `run`: [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\<`TState`\>; `timeoutMs?`: `number`; \} |
 | `opts.name` | `string` |
 | `opts.retry?` | [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md) |
-| `opts.run` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt; |
+| `opts.run` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\<`TState`\> |
 | `opts.timeoutMs?` | `number` |
 
 ## Returns
 
-[`WorkflowNode`](/api/@graphorin/workflow/interfaces/WorkflowNode.md)\&lt;`TState`\&gt;
+[`WorkflowNode`](/api/@graphorin/workflow/interfaces/WorkflowNode.md)\<`TState`\>
 
 ## Stable

@@ -39,7 +39,7 @@ W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: packages/server/src/registry/index.ts:62
 
 #### Returns
 
-`AsyncIterable`\&lt;`unknown`\&gt;
+`AsyncIterable`\<`unknown`\>
 
 ***
 
@@ -109,7 +109,7 @@ Defined in: packages/server/src/registry/index.ts:90
 
 #### Returns
 
-`Promise`\&lt;`unknown`\&gt;
+`Promise`\<`unknown`\>
 
 ***
 
@@ -129,7 +129,7 @@ Defined in: packages/server/src/registry/index.ts:91
 
 #### Returns
 
-`Promise`\&lt;readonly `unknown`[]\&gt;
+`Promise`\<readonly `unknown`[]\>
 
 ***
 
@@ -160,7 +160,7 @@ W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
 
 #### Returns
 
-`AsyncIterable`\&lt;`unknown`\&gt;
+`AsyncIterable`\<`unknown`\>
 
 ***
 
@@ -187,7 +187,7 @@ Defined in: packages/server/src/registry/index.ts:66
 
 #### Returns
 
-`AsyncIterable`\&lt;`unknown`\&gt;
+`AsyncIterable`\<`unknown`\>
 
 ***
 
@@ -211,7 +211,7 @@ W-119: replay a failed/aborted thread (`POST /:id/retry`).
 
 #### Returns
 
-`AsyncIterable`\&lt;`unknown`\&gt;
+`AsyncIterable`\<`unknown`\>
 
 ***
 

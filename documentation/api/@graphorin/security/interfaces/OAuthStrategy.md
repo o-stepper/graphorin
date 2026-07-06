@@ -20,5 +20,5 @@ Strategy hook contract for per-provider quirks (e.g. Slack
 | <a id="property-id"></a> `id` | `readonly` | `string` | Match against `serverUrl` or `serverId`. | packages/security/src/oauth/types.ts:295 |
 | <a id="property-matchid"></a> `matchId?` | `readonly` | `RegExp` | Optional regex applied to `serverId`. | packages/security/src/oauth/types.ts:299 |
 | <a id="property-matchurl"></a> `matchUrl?` | `readonly` | `RegExp` | Optional regex applied to `serverUrl`. | packages/security/src/oauth/types.ts:297 |
-| <a id="property-onrefreshfailure"></a> `onRefreshFailure?` | `readonly` | (`event`) => `void` \| `Promise`\&lt;`void`\&gt; | Called when a refresh fails. | packages/security/src/oauth/types.ts:306 |
-| <a id="property-ontokenrotation"></a> `onTokenRotation?` | `readonly` | (`event`) => `void` \| `Promise`\&lt;`void`\&gt; | Called after a successful token rotation (refresh + DCR). Lets the strategy update the persisted registration / token refs. | packages/security/src/oauth/types.ts:304 |
+| <a id="property-onrefreshfailure"></a> `onRefreshFailure?` | `readonly` | (`event`) => `void` \| `Promise`\<`void`\> | Called when a refresh fails. | packages/security/src/oauth/types.ts:306 |
+| <a id="property-ontokenrotation"></a> `onTokenRotation?` | `readonly` | (`event`) => `void` \| `Promise`\<`void`\> | Called after a successful token rotation (refresh + DCR). Lets the strategy update the persisted registration / token refs. | packages/security/src/oauth/types.ts:304 |

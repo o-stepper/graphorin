@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / WorkflowEndEvent
 
-# Interface: WorkflowEndEvent\&lt;TState\&gt;
+# Interface: WorkflowEndEvent\<TState\>
 
 Defined in: packages/core/src/types/workflow-event.ts:109
 

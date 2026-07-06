@@ -53,7 +53,7 @@ Embed a batch of strings.
 
 #### Returns
 
-`Promise`\<readonly `Float32Array`\&lt;`ArrayBufferLike`\&gt;[]\>
+`Promise`\<readonly `Float32Array`\<`ArrayBufferLike`\>[]\>
 
 ***
 

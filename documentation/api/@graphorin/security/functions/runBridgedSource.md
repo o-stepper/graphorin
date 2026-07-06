@@ -24,6 +24,6 @@ contract.
 
 ## Returns
 
-`Promise`\&lt;[`BridgedSourceResult`](/api/@graphorin/security/type-aliases/BridgedSourceResult.md)\&gt;
+`Promise`\<[`BridgedSourceResult`](/api/@graphorin/security/type-aliases/BridgedSourceResult.md)\>
 
 ## Stable

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / PassageExtractor
 
-# Type Alias: PassageExtractor\&lt;TRecord\&gt;
+# Type Alias: PassageExtractor\<TRecord\>
 
 ```ts
 type PassageExtractor<TRecord> = (record) => string;

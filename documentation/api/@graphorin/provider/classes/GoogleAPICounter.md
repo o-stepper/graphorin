@@ -61,7 +61,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 #### Implementation of
 
@@ -87,7 +87,7 @@ Count tokens in a raw text string.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 #### Implementation of
 

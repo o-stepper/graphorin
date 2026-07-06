@@ -23,6 +23,6 @@ inert until `start()` is awaited.
 
 ## Returns
 
-`Promise`\&lt;[`GraphorinServer`](/api/@graphorin/server/interfaces/GraphorinServer.md)\&gt;
+`Promise`\<[`GraphorinServer`](/api/@graphorin/server/interfaces/GraphorinServer.md)\>
 
 ## Stable

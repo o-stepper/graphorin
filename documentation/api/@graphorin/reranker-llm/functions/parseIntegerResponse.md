@@ -10,7 +10,18 @@
 function parseIntegerResponse(text): number | null;
 ```
 
-Defined in: src/reranker.ts:313
+Defined in: src/reranker.ts:315
+
+Parse the model's reply into a non-negative integer score.
+
+PS-14 contract: ONLY a bare integer occupying the whole (trimmed)
+reply is accepted (`/^-?\d+$/`) - `'7'`, `'7\n'`, `' 7 '`. Every
+verbose form (`'Score: 7'`, `'7/10'`, prose around a number) returns
+`null` and the reranker substitutes the fallback score. This is a
+deliberate anti-prompt-injection hardening, not a convenience
+parser: a passage that steers the model into prose around a chosen
+number must not smuggle that number through first-integer
+extraction. Negative integers also return `null`.
 
 ## Parameters
 
@@ -21,3 +32,5 @@ Defined in: src/reranker.ts:313
 ## Returns
 
 `number` \| `null`
+
+## Stable

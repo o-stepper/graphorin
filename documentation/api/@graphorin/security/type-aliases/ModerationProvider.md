@@ -26,7 +26,7 @@ decision.
 
 ## Returns
 
-  \| `Promise`\&lt;[`ModerationDecision`](/api/@graphorin/security/interfaces/ModerationDecision.md)\&gt;
+  \| `Promise`\<[`ModerationDecision`](/api/@graphorin/security/interfaces/ModerationDecision.md)\>
   \| [`ModerationDecision`](/api/@graphorin/security/interfaces/ModerationDecision.md)
 
 ## Stable

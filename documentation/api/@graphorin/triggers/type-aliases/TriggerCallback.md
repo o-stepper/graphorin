@@ -24,6 +24,6 @@ triggers; for cron / interval / idle triggers `payload` is
 
 ## Returns
 
-`void` \| `Promise`\&lt;`void`\&gt;
+`void` \| `Promise`\<`void`\>
 
 ## Stable

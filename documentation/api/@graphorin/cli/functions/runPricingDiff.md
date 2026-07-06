@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/pricing.ts:143
 
 ## Returns
 
-`Promise`\&lt;readonly [`PricingDiffEntry`](/api/@graphorin/pricing/interfaces/PricingDiffEntry.md)[]\&gt;
+`Promise`\<readonly [`PricingDiffEntry`](/api/@graphorin/pricing/interfaces/PricingDiffEntry.md)[]\>
 
 ## Stable

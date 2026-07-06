@@ -24,6 +24,6 @@ the Device Authorization Grant when `deviceFlow: true`.
 
 ## Returns
 
-`Promise`\&lt;[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\&gt;
+`Promise`\<[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\>
 
 ## Stable

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [evaluator-optimizer](/api/@graphorin/agent/evaluator-optimizer/index.md) / GeneratorCallable
 
-# Type Alias: GeneratorCallable\&lt;TOutput\&gt;
+# Type Alias: GeneratorCallable\<TOutput\>
 
 ```ts
 type GeneratorCallable<TOutput> = (input, priorCritique, iteration) => Promise<TOutput>;
@@ -32,6 +32,6 @@ iteration) and returns the new candidate output.
 
 ## Returns
 
-`Promise`\&lt;`TOutput`\&gt;
+`Promise`\<`TOutput`\>
 
 ## Stable

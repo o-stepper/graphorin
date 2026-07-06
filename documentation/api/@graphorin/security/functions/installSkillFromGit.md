@@ -24,6 +24,6 @@ responsible for cleanup.
 
 ## Returns
 
-`Promise`\&lt;[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\&gt;
+`Promise`\<[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\>
 
 ## Stable

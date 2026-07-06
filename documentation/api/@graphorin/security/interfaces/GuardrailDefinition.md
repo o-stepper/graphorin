@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / GuardrailDefinition
 
-# Interface: GuardrailDefinition\&lt;TValue\&gt;
+# Interface: GuardrailDefinition\<TValue\>
 
 Defined in: packages/security/src/guardrails/types.ts:79
 
@@ -24,6 +24,6 @@ separate registries.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\<[`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\> | packages/security/src/guardrails/types.ts:82 |
+| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\<`TValue`\> \| `Promise`\<[`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\<`TValue`\>\> | packages/security/src/guardrails/types.ts:82 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"input"` \| `"output"` | packages/security/src/guardrails/types.ts:80 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | packages/security/src/guardrails/types.ts:81 |

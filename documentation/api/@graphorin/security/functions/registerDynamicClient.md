@@ -24,6 +24,6 @@ server using RFC 7591.
 
 ## Returns
 
-`Promise`\&lt;[`DynamicClientRegistrationResult`](/api/@graphorin/security/interfaces/DynamicClientRegistrationResult.md)\&gt;
+`Promise`\<[`DynamicClientRegistrationResult`](/api/@graphorin/security/interfaces/DynamicClientRegistrationResult.md)\>
 
 ## Stable

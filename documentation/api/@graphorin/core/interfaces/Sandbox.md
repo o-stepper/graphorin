@@ -46,8 +46,8 @@ Defined in: packages/core/src/contracts/sandbox.ts:11
 | Parameter | Type |
 | ------ | ------ |
 | `code` | [`SandboxCode`](/api/@graphorin/core/type-aliases/SandboxCode.md) |
-| `opts` | [`SandboxRunOptions`](/api/@graphorin/core/interfaces/SandboxRunOptions.md)\&lt;`TInput`\&gt; |
+| `opts` | [`SandboxRunOptions`](/api/@graphorin/core/interfaces/SandboxRunOptions.md)\<`TInput`\> |
 
 #### Returns
 
-`Promise`\<[`SandboxResult`](/api/@graphorin/core/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\>
+`Promise`\<[`SandboxResult`](/api/@graphorin/core/type-aliases/SandboxResult.md)\<`TOutput`\>\>

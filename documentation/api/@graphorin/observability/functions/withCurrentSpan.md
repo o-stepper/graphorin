@@ -25,11 +25,11 @@ span. The logger picks up the trace + span ids automatically.
 
 | Parameter | Type |
 | ------ | ------ |
-| `span` | \| [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt; \| `undefined` |
-| `fn` | () => `R` \| `Promise`\&lt;`R`\&gt; |
+| `span` | \| [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\> \| `undefined` |
+| `fn` | () => `R` \| `Promise`\<`R`\> |
 
 ## Returns
 
-`R` \| `Promise`\&lt;`R`\&gt;
+`R` \| `Promise`\<`R`\>
 
 ## Stable

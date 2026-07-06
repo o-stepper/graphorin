@@ -27,7 +27,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:28
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -41,7 +41,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:26
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -67,7 +67,7 @@ custom surface) simply opts out.
 
 #### Returns
 
-`Promise`\&lt;`unknown`\&gt;
+`Promise`\<`unknown`\>
 
 ***
 
@@ -81,7 +81,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:27
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -101,7 +101,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:25
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -115,7 +115,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:22
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -129,7 +129,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:24
 
 #### Returns
 
-`Promise`\&lt;[`ConsolidatorStatusLike`](/api/@graphorin/server/interfaces/ConsolidatorStatusLike.md)\&gt;
+`Promise`\<[`ConsolidatorStatusLike`](/api/@graphorin/server/interfaces/ConsolidatorStatusLike.md)\>
 
 ***
 
@@ -143,4 +143,4 @@ Defined in: packages/server/src/consolidator/daemon.ts:23
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

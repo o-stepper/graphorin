@@ -40,11 +40,11 @@ registries cannot accidentally re-inherit a relaxed policy.
 
 | Parameter | Type |
 | ------ | ------ |
-| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; |
-| `skill` | `Pick`\&lt;[`Skill`](/api/@graphorin/skills/interfaces/Skill.md), `"metadata"`\&gt; |
+| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`TInput`, `TOutput`, `TDeps`\> |
+| `skill` | `Pick`\<[`Skill`](/api/@graphorin/skills/interfaces/Skill.md), `"metadata"`\> |
 
 ## Returns
 
-[`StampedSkillTool`](/api/@graphorin/skills/interfaces/StampedSkillTool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
+[`StampedSkillTool`](/api/@graphorin/skills/interfaces/StampedSkillTool.md)\<`TInput`, `TOutput`, `TDeps`\>
 
 ## Stable

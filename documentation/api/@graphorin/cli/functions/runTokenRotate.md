@@ -23,6 +23,6 @@ same scopes. Returns the new raw token bytes once.
 
 ## Returns
 
-`Promise`\&lt;[`TokenCreateResult`](/api/@graphorin/cli/interfaces/TokenCreateResult.md)\&gt;
+`Promise`\<[`TokenCreateResult`](/api/@graphorin/cli/interfaces/TokenCreateResult.md)\>
 
 ## Stable

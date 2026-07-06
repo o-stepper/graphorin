@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / EvalCaseResult
 
-# Interface: EvalCaseResult\&lt;I, O\&gt;
+# Interface: EvalCaseResult\<I, O\>
 
 Defined in: observability/dist/eval/types.d.ts:59
 

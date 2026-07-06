@@ -27,8 +27,8 @@ than `process.exit` so other async tasks finish cleanly.
 
 | Parameter | Type |
 | ------ | ------ |
-| `report` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt; |
-| `regression?` | [`RegressionReport`](/api/@graphorin/evals/interfaces/RegressionReport.md)\&lt;`I`, `O`\&gt; |
+| `report` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\<`I`, `O`\> |
+| `regression?` | [`RegressionReport`](/api/@graphorin/evals/interfaces/RegressionReport.md)\<`I`, `O`\> |
 
 ## Returns
 

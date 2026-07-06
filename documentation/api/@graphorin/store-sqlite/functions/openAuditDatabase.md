@@ -22,6 +22,6 @@ Opens the encrypted `audit.db` file.
 
 ## Returns
 
-`Promise`\&lt;[`AuditDatabase`](/api/@graphorin/store-sqlite/interfaces/AuditDatabase.md)\&gt;
+`Promise`\<[`AuditDatabase`](/api/@graphorin/store-sqlite/interfaces/AuditDatabase.md)\>
 
 ## Stable

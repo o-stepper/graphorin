@@ -24,6 +24,6 @@ backoff and no further reconnects happen.
 
 ## Returns
 
-`Promise`\&lt;[`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)\&gt;
+`Promise`\<[`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)\>
 
 ## Stable

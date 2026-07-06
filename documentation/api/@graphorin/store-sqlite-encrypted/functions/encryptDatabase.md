@@ -20,4 +20,4 @@ Defined in: packages/store-sqlite-encrypted/src/encrypt.ts:114
 
 ## Returns
 
-`Promise`\&lt;[`EncryptDatabaseResult`](/api/@graphorin/store-sqlite-encrypted/interfaces/EncryptDatabaseResult.md)\&gt;
+`Promise`\<[`EncryptDatabaseResult`](/api/@graphorin/store-sqlite-encrypted/interfaces/EncryptDatabaseResult.md)\>

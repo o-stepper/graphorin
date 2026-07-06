@@ -30,6 +30,6 @@ Construct a `Reducer` channel.
 
 ## Returns
 
-[`Reducer`](/api/@graphorin/core/interfaces/Reducer.md)\&lt;`T`\&gt;
+[`Reducer`](/api/@graphorin/core/interfaces/Reducer.md)\<`T`\>
 
 ## Stable

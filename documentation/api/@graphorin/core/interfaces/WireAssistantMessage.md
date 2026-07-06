@@ -14,7 +14,7 @@ Wire twin of [AssistantMessage](/api/@graphorin/core/interfaces/AssistantMessage
 
 ## Extends
 
-- `Omit`\&lt;[`AssistantMessage`](/api/@graphorin/core/interfaces/AssistantMessage.md), `"content"`\&gt;
+- `Omit`\<[`AssistantMessage`](/api/@graphorin/core/interfaces/AssistantMessage.md), `"content"`\>
 
 ## Properties
 

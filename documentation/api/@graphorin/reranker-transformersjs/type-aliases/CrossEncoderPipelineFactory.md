@@ -28,4 +28,4 @@ Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:45
 
 ## Returns
 
-`Promise`\&lt;[`CrossEncoderPipeline`](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipeline.md)\&gt;
+`Promise`\<[`CrossEncoderPipeline`](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipeline.md)\>

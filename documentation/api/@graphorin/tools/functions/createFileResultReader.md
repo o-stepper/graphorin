@@ -10,7 +10,7 @@
 function createFileResultReader(opts): ResultReader;
 ```
 
-Defined in: packages/tools/src/result/reader.ts:97
+Defined in: packages/tools/src/result/reader.ts:106
 
 Build a filesystem-backed [ResultReader](/api/@graphorin/tools/interfaces/ResultReader.md) confined to `artifactRoot`.
 

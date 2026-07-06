@@ -28,6 +28,6 @@ field.
 
 ## Returns
 
-`Promise`\&lt;[`AuditChainVerifyResult`](/api/@graphorin/security/type-aliases/AuditChainVerifyResult.md)\&gt;
+`Promise`\<[`AuditChainVerifyResult`](/api/@graphorin/security/type-aliases/AuditChainVerifyResult.md)\>
 
 ## Stable

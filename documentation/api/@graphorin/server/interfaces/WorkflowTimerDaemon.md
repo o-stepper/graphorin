@@ -30,7 +30,7 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:61
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:63
 
 #### Returns
 
-`Promise`\&lt;[`WorkflowTimerDaemonStatus`](/api/@graphorin/server/interfaces/WorkflowTimerDaemonStatus.md)\&gt;
+`Promise`\<[`WorkflowTimerDaemonStatus`](/api/@graphorin/server/interfaces/WorkflowTimerDaemonStatus.md)\>
 
 ***
 
@@ -58,4 +58,4 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:62
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

@@ -22,7 +22,7 @@ Defined in: packages/server/src/routes/mcp.ts:22
 
 #### Returns
 
-`Promise`\&lt;readonly `unknown`[]\&gt;
+`Promise`\<readonly `unknown`[]\>
 
 ***
 
@@ -45,7 +45,7 @@ Defined in: packages/server/src/routes/mcp.ts:23
 
 #### Returns
 
-`Promise`\&lt;`unknown`\&gt;
+`Promise`\<`unknown`\>
 
 ***
 
@@ -65,4 +65,4 @@ Defined in: packages/server/src/routes/mcp.ts:28
 
 #### Returns
 
-`Promise`\&lt;`boolean`\&gt;
+`Promise`\<`boolean`\>

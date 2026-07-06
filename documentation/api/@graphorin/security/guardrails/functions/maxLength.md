@@ -29,6 +29,6 @@ variant depending on the `stage` option.
 
 ## Returns
 
-[`GuardrailDefinition`](/api/@graphorin/security/interfaces/GuardrailDefinition.md)\&lt;`TValue`\&gt;
+[`GuardrailDefinition`](/api/@graphorin/security/interfaces/GuardrailDefinition.md)\<`TValue`\>
 
 ## Stable

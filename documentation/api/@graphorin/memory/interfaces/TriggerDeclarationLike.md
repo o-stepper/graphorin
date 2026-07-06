@@ -19,7 +19,7 @@ with the real export.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-callback"></a> `callback` | `readonly` | (`payload?`) => `void` \| `Promise`\&lt;`void`\&gt; | packages/memory/src/consolidator/scheduler.ts:67 |
+| <a id="property-callback"></a> `callback` | `readonly` | (`payload?`) => `void` \| `Promise`\<`void`\> | packages/memory/src/consolidator/scheduler.ts:67 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | packages/memory/src/consolidator/scheduler.ts:64 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"idle"` \| `"cron"` \| `"event"` \| `"interval"` | packages/memory/src/consolidator/scheduler.ts:65 |
 | <a id="property-options"></a> `options` | `readonly` | \{ `acknowledgeLibMode?`: `boolean`; `catchupPolicy?`: [`ConsolidatorCatchupPolicy`](/api/@graphorin/memory/type-aliases/ConsolidatorCatchupPolicy.md); `catchupWindowMs?`: `number`; `maxCatchupRuns?`: `number`; `tags?`: readonly `string`[]; \} | packages/memory/src/consolidator/scheduler.ts:68 |

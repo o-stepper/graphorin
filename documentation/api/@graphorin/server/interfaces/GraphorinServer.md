@@ -17,7 +17,7 @@ Public surface returned by [createServer](/api/@graphorin/server/functions/creat
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-agents"></a> `agents` | `readonly` | [`AgentRegistry`](/api/@graphorin/server/registry/classes/AgentRegistry.md) | - | packages/server/src/app.ts:61 |
-| <a id="property-app"></a> `app` | `readonly` | `Hono`\&lt;\{ `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md); \}\&gt; | - | packages/server/src/app.ts:60 |
+| <a id="property-app"></a> `app` | `readonly` | `Hono`\<\{ `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md); \}\> | - | packages/server/src/app.ts:60 |
 | <a id="property-config"></a> `config` | `readonly` | [`ServerConfigSpec`](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md) | - | packages/server/src/app.ts:59 |
 | <a id="property-consolidator"></a> `consolidator` | `readonly` | \| [`ConsolidatorDaemon`](/api/@graphorin/server/interfaces/ConsolidatorDaemon.md) \| `undefined` | Optional consolidator daemon - populated when the operator supplied a `Consolidator` instance via `createServer({ consolidator })`. Phase 14c integration. | packages/server/src/app.ts:89 |
 | <a id="property-listeningon"></a> `listeningOn` | `readonly` | \| \{ `host`: `string`; `port`: `number`; \} \| `undefined` | - | packages/server/src/app.ts:64 |
@@ -69,4 +69,4 @@ Defined in: packages/server/src/app.ts:101
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

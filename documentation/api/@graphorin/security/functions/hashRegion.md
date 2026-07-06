@@ -20,11 +20,11 @@ the surrounding loop.
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `input` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; | `undefined` |
+| `input` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> | `undefined` |
 | `seed` | `number` | `0` |
 
 ## Returns
 
-`Promise`\&lt;`string`\&gt;
+`Promise`\<`string`\>
 
 ## Stable

@@ -22,4 +22,4 @@ Options for [withRetry](/api/@graphorin/provider/variables/withRetry.md).
 | <a id="property-maxdelayms"></a> `maxDelayMs?` | `readonly` | `number` | - | packages/provider/src/middleware/with-retry.ts:24 |
 | <a id="property-maxretries"></a> `maxRetries?` | `readonly` | `number` | - | packages/provider/src/middleware/with-retry.ts:21 |
 | <a id="property-retryableerrors"></a> `retryableErrors?` | `readonly` | (`err`) => `boolean` | - | packages/provider/src/middleware/with-retry.ts:26 |
-| <a id="property-sleepimpl"></a> `sleepImpl?` | `readonly` | (`ms`, `signal?`) => `Promise`\&lt;`void`\&gt; | Optional sleep override (test fixtures use a synchronous resolver). | packages/provider/src/middleware/with-retry.ts:28 |
+| <a id="property-sleepimpl"></a> `sleepImpl?` | `readonly` | (`ms`, `signal?`) => `Promise`\<`void`\> | Optional sleep override (test fixtures use a synchronous resolver). | packages/provider/src/middleware/with-retry.ts:28 |

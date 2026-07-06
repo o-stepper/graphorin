@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/skills](/api/@graphorin/skills/index.md) / [](/api/@graphorin/skills/README.md) / FieldResolution
 
-# Interface: FieldResolution\&lt;T\&gt;
+# Interface: FieldResolution\<T\>
 
 Defined in: packages/skills/src/types/index.ts:137
 

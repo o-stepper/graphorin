@@ -26,6 +26,6 @@ this is the storage-cost hygiene lever.
 
 ## Returns
 
-`Promise`\&lt;[`MemoryPruneHistoryResult`](/api/@graphorin/cli/interfaces/MemoryPruneHistoryResult.md)\&gt;
+`Promise`\<[`MemoryPruneHistoryResult`](/api/@graphorin/cli/interfaces/MemoryPruneHistoryResult.md)\>
 
 ## Stable

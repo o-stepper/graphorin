@@ -40,4 +40,4 @@ closing the audit database.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/memory-guard-bridge.ts:41 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | packages/security/src/audit/memory-guard-bridge.ts:41 |

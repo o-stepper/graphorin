@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/auth.ts:75
 
 ## Returns
 
-`Promise`\&lt;[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\&gt;
+`Promise`\<[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\>
 
 ## Stable

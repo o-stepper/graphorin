@@ -68,4 +68,4 @@ Run one poll pass immediately; resolves with the fired count.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>

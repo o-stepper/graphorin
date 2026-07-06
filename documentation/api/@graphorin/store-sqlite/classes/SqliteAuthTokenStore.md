@@ -110,7 +110,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:49
 
 #### Returns
 
-`Promise`\&lt;readonly [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md)[]\&gt;
+`Promise`\<readonly [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md)[]\>
 
 #### Implementation of
 
@@ -134,7 +134,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:17
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 
@@ -159,7 +159,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:61
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 
@@ -184,7 +184,7 @@ Defined in: packages/store-sqlite/src/auth-token-store.ts:54
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 

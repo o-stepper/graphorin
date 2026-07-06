@@ -30,4 +30,4 @@ Teardown returned by `bridgeAuthToAudit(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/auth-bridge.ts:25 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | packages/security/src/audit/auth-bridge.ts:25 |

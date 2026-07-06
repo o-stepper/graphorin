@@ -6,7 +6,7 @@
 
 # Interface: ConflictMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:346
+Defined in: packages/memory/src/internal/storage-adapter.ts:359
 
 Optional storage extension surfacing the audit + pending queue
 tables Phase 10b owns. Adapters that opt out leave the property
@@ -25,7 +25,7 @@ enqueuePending(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:351
+Defined in: packages/memory/src/internal/storage-adapter.ts:364
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:351
 listPending(scope, limit?): Promise<readonly PendingConflictRowLike[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:352
+Defined in: packages/memory/src/internal/storage-adapter.ts:365
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:352
 
 #### Returns
 
-`Promise`\&lt;readonly [`PendingConflictRowLike`](/api/@graphorin/memory/interfaces/PendingConflictRowLike.md)[]\&gt;
+`Promise`\<readonly [`PendingConflictRowLike`](/api/@graphorin/memory/interfaces/PendingConflictRowLike.md)[]\>
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:352
 optional markAttempted(id, attemptedAt?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:360
+Defined in: packages/memory/src/internal/storage-adapter.ts:373
 
 Stamp `attemptedAt` on a pending row whose judge call failed
 (MCON-9). The deep phase closes the row as `'judge-unparseable'`
@@ -84,7 +84,7 @@ Optional - without it the deep phase falls back to skip-and-retry.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -94,7 +94,7 @@ Optional - without it the deep phase falls back to skip-and-retry.
 markResolved(id, decision): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:353
+Defined in: packages/memory/src/internal/storage-adapter.ts:366
 
 #### Parameters
 
@@ -105,7 +105,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:353
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -118,7 +118,7 @@ recordDecision(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:347
+Defined in: packages/memory/src/internal/storage-adapter.ts:360
 
 #### Parameters
 

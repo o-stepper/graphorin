@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ZodLikeError
 
-# Interface: ZodLikeError\&lt;_TInput\&gt;
+# Interface: ZodLikeError\<_TInput\>
 
 Defined in: packages/core/src/utils/validation.ts:24
 

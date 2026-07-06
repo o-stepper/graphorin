@@ -16,5 +16,5 @@ Defined in: evals/src/loaders/csv.ts:20
 | ------ | ------ | ------ | ------ |
 | <a id="property-delimiter"></a> `delimiter?` | `readonly` | `string` | evals/src/loaders/csv.ts:21 |
 | <a id="property-description"></a> `description?` | `readonly` | `string` | evals/src/loaders/csv.ts:23 |
-| <a id="property-mapper"></a> `mapper?` | `readonly` | (`row`, `index`) => [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`unknown`, `unknown`\&gt; | evals/src/loaders/csv.ts:24 |
+| <a id="property-mapper"></a> `mapper?` | `readonly` | (`row`, `index`) => [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`\> | evals/src/loaders/csv.ts:24 |
 | <a id="property-name"></a> `name?` | `readonly` | `string` | evals/src/loaders/csv.ts:22 |

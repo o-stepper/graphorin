@@ -30,7 +30,7 @@ aggregate-attribute shape on large prompts).
 
 | Parameter | Type |
 | ------ | ------ |
-| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;`T`\&gt; |
+| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<`T`\> |
 | `messages` | readonly [`GenAIMessage`](/api/@graphorin/observability/interfaces/GenAIMessage.md)[] |
 | `opts` | \{ `system?`: `string`; \} |
 | `opts.system?` | `string` |

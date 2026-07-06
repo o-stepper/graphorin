@@ -23,6 +23,6 @@ for tests and for higher-level orchestration in `client.ts`.
 
 ## Returns
 
-`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
+`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
 
 ## Stable

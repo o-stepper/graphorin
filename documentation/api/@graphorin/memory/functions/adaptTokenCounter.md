@@ -29,6 +29,6 @@ before / after count while the provider billed for them.
 
 ## Returns
 
-[`ContextTokenCounter`](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) & `Pick`\&lt;[`TokenCounter`](/api/@graphorin/core/interfaces/TokenCounter.md), `"count"`\&gt;
+[`ContextTokenCounter`](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) & `Pick`\<[`TokenCounter`](/api/@graphorin/core/interfaces/TokenCounter.md), `"count"`\>
 
 ## Stable

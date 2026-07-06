@@ -26,11 +26,11 @@ order. Cancellation propagates to every upstream iterator.
 
 | Parameter | Type |
 | ------ | ------ |
-| `sources` | readonly `AsyncIterable`\&lt;`T`, `any`, `any`\&gt;[] |
+| `sources` | readonly `AsyncIterable`\<`T`, `any`, `any`\>[] |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`AsyncIterable`\&lt;`T`\&gt;
+`AsyncIterable`\<`T`\>
 
 ## Stable

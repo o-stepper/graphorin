@@ -14,7 +14,7 @@ Wire twin of [ToolExecutePartialEvent](/api/@graphorin/core/interfaces/ToolExecu
 
 ## Extends
 
-- `Omit`\&lt;[`ToolExecutePartialEvent`](/api/@graphorin/core/interfaces/ToolExecutePartialEvent.md), `"chunk"`\&gt;
+- `Omit`\<[`ToolExecutePartialEvent`](/api/@graphorin/core/interfaces/ToolExecutePartialEvent.md), `"chunk"`\>
 
 ## Properties
 

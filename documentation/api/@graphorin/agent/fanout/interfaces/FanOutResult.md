@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [fanout](/api/@graphorin/agent/fanout/index.md) / FanOutResult
 
-# Interface: FanOutResult\&lt;TOutput\&gt;
+# Interface: FanOutResult\<TOutput\>
 
 Defined in: packages/agent/src/fanout/index.ts:96
 
@@ -22,7 +22,7 @@ Aggregate result returned by `Agent.fanOut(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-children"></a> `children` | `readonly` | readonly [`ChildResult`](/api/@graphorin/agent/fanout/interfaces/ChildResult.md)\&lt;`TOutput`\&gt;[] | - | packages/agent/src/fanout/index.ts:99 |
+| <a id="property-children"></a> `children` | `readonly` | readonly [`ChildResult`](/api/@graphorin/agent/fanout/interfaces/ChildResult.md)\<`TOutput`\>[] | - | packages/agent/src/fanout/index.ts:99 |
 | <a id="property-fanoutid"></a> `fanOutId` | `readonly` | `string` | - | packages/agent/src/fanout/index.ts:97 |
 | <a id="property-mergedurationms"></a> `mergeDurationMs` | `readonly` | `number` | - | packages/agent/src/fanout/index.ts:100 |
 | <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/agent/src/fanout/index.ts:98 |

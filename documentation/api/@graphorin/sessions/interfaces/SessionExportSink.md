@@ -33,4 +33,4 @@ Defined in: packages/sessions/src/export/writer.ts:104
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/observability](/api/@graphorin/observability/index.md) / [](/api/@graphorin/observability/README.md) / Case
 
-# Interface: Case\&lt;I, O, M\&gt;
+# Interface: Case\<I, O, M\>
 
 Defined in: packages/observability/src/eval/types.ts:14
 
@@ -18,7 +18,7 @@ One sample from an eval dataset.
 | ------ | ------ |
 | `I` | - |
 | `O` | `unknown` |
-| `M` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `M` | `Readonly`\<`Record`\<`string`, `unknown`\>\> |
 
 ## Properties
 

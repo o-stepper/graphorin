@@ -24,6 +24,6 @@ ids) is lost on delete - that is the explicit point of the command.
 
 ## Returns
 
-`Promise`\&lt;[`ConsolidatorDlqClearResult`](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearResult.md)\&gt;
+`Promise`\<[`ConsolidatorDlqClearResult`](/api/@graphorin/cli/interfaces/ConsolidatorDlqClearResult.md)\>
 
 ## Stable

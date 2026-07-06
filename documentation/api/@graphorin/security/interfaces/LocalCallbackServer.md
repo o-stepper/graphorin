@@ -14,7 +14,7 @@ Handle returned by [startLocalCallbackServer](/api/@graphorin/security/functions
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-close"></a> `close` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/oauth/callback-server.ts:74 |
+| <a id="property-close"></a> `close` | `readonly` | () => `Promise`\<`void`\> | packages/security/src/oauth/callback-server.ts:74 |
 | <a id="property-port"></a> `port` | `readonly` | `number` | packages/security/src/oauth/callback-server.ts:72 |
 | <a id="property-redirecturi"></a> `redirectUri` | `readonly` | `string` | packages/security/src/oauth/callback-server.ts:71 |
-| <a id="property-waitforcallback"></a> `waitForCallback` | `readonly` | (`signal?`) => `Promise`\&lt;[`CallbackParams`](/api/@graphorin/security/interfaces/CallbackParams.md)\&gt; | packages/security/src/oauth/callback-server.ts:73 |
+| <a id="property-waitforcallback"></a> `waitForCallback` | `readonly` | (`signal?`) => `Promise`\<[`CallbackParams`](/api/@graphorin/security/interfaces/CallbackParams.md)\> | packages/security/src/oauth/callback-server.ts:73 |

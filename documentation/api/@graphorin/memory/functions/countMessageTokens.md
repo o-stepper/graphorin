@@ -26,6 +26,6 @@ step.
 
 ## Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ## Stable

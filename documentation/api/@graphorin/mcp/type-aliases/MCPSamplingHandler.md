@@ -27,4 +27,4 @@ Handler for server-initiated sampling requests.
 ## Returns
 
   \| [`MCPSamplingResult`](/api/@graphorin/mcp/interfaces/MCPSamplingResult.md)
-  \| `Promise`\&lt;[`MCPSamplingResult`](/api/@graphorin/mcp/interfaces/MCPSamplingResult.md)\&gt;
+  \| `Promise`\<[`MCPSamplingResult`](/api/@graphorin/mcp/interfaces/MCPSamplingResult.md)\>

@@ -9,7 +9,7 @@
 > ESLint rules for projects that build on **Graphorin**.
 
 - **Status:** v0.6.1 - final Phase 16 ruleset.
-- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
+- **License:** [MIT](../../_media/LICENSE-4) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Peer dependency:** `eslint >= 9`.
 

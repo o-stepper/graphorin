@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/skills.ts:185
 
 ## Returns
 
-`Promise`\&lt;[`SkillsMigrateFrontmatterResult`](/api/@graphorin/cli/interfaces/SkillsMigrateFrontmatterResult.md)\&gt;
+`Promise`\<[`SkillsMigrateFrontmatterResult`](/api/@graphorin/cli/interfaces/SkillsMigrateFrontmatterResult.md)\>
 
 ## Stable

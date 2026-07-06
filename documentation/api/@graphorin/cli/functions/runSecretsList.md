@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/secrets.ts:58
 
 ## Returns
 
-`Promise`\&lt;readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\&gt;
+`Promise`\<readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\>
 
 ## Stable

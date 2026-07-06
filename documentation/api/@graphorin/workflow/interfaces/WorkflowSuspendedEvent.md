@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / WorkflowSuspendedEvent
 
-# Interface: WorkflowSuspendedEvent\&lt;TState\&gt;
+# Interface: WorkflowSuspendedEvent\<TState\>
 
 Defined in: packages/core/dist/types/workflow-event.d.ts:73
 

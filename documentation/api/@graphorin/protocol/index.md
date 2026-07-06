@@ -8,11 +8,11 @@
 
 > Wire-format contract for the [Graphorin](https://github.com/o-stepper/graphorin) framework's WebSocket subprotocol.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
 - **Version:** v0.6.1
-- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
+- **License:** [MIT](../../_media/LICENSE-5) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/protocol>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -70,7 +70,7 @@ if (isEventFrame(incoming)) {
 
 ## License
 
-MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/graphorin/blob/main/LICENSE).
+MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](../../_media/LICENSE-5).
 
 ---
 

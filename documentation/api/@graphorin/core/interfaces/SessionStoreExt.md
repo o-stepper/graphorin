@@ -42,7 +42,7 @@ Append a session-lifecycle audit row.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -63,7 +63,7 @@ Defined in: packages/core/src/contracts/session-store.ts:97
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -87,7 +87,7 @@ Defined in: packages/core/src/contracts/session-store.ts:100
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -112,7 +112,7 @@ Defined in: packages/core/src/contracts/session-store.ts:91
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -136,7 +136,7 @@ Defined in: packages/core/src/contracts/session-store.ts:85
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -162,7 +162,7 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -197,7 +197,7 @@ full - leaving any of these surfaces behind defeats erasure.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -241,7 +241,7 @@ List all known agents (including retired ones).
 
 #### Returns
 
-`Promise`\&lt;readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\&gt;
+`Promise`\<readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\>
 
 ***
 
@@ -265,7 +265,7 @@ List recent audit rows for a session, newest-first.
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\&gt;
+`Promise`\<readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\>
 
 ***
 
@@ -285,7 +285,7 @@ Defined in: packages/core/src/contracts/session-store.ts:98
 
 #### Returns
 
-`Promise`\&lt;readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\&gt;
+`Promise`\<readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\>
 
 #### Inherited from
 
@@ -305,11 +305,11 @@ Defined in: packages/core/src/contracts/session-store.ts:87
 
 | Parameter | Type |
 | ------ | ------ |
-| `scope` | `Pick`\&lt;[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\&gt; |
+| `scope` | `Pick`\<[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\> |
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\&gt;
+`Promise`\<readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\>
 
 #### Inherited from
 
@@ -333,7 +333,7 @@ Defined in: packages/core/src/contracts/session-store.ts:101
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\&gt;
+`Promise`\<readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\>
 
 #### Inherited from
 
@@ -359,7 +359,7 @@ Delete audit rows older than the supplied epoch ms.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -386,7 +386,7 @@ Returns the number of sessions deleted.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -406,7 +406,7 @@ Defined in: packages/core/src/contracts/session-store.ts:93
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -459,7 +459,7 @@ Defined in: packages/core/src/contracts/session-store.ts:94
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -480,11 +480,11 @@ Defined in: packages/core/src/contracts/session-store.ts:90
 | Parameter | Type |
 | ------ | ------ |
 | `sessionId` | `string` |
-| `patch` | `Partial`\&lt;[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\&gt; |
+| `patch` | `Partial`\<[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\> |
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -517,4 +517,4 @@ Update the status of a workflow attachment.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

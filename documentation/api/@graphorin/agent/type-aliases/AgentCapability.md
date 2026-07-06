@@ -10,7 +10,7 @@
 type AgentCapability = "read-only";
 ```
 
-Defined in: packages/agent/src/types.ts:502
+Defined in: packages/agent/src/types.ts:503
 
 Run-level capability restriction (D2 - the single-writer constraint
 from multi-agent practice). `'read-only'` makes the run

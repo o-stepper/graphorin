@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ZodLikeSchema
 
-# Interface: ZodLikeSchema\&lt;TOutput, TInput\&gt;
+# Interface: ZodLikeSchema\<TOutput, TInput\>
 
 Defined in: packages/core/src/utils/validation.ts:10
 
@@ -68,4 +68,4 @@ Defined in: packages/core/src/utils/validation.ts:12
 
 #### Returns
 
-[`ZodLikeSafeParseResult`](/api/@graphorin/core/type-aliases/ZodLikeSafeParseResult.md)\&lt;`TOutput`, `TInput`\&gt;
+[`ZodLikeSafeParseResult`](/api/@graphorin/core/type-aliases/ZodLikeSafeParseResult.md)\<`TOutput`, `TInput`\>

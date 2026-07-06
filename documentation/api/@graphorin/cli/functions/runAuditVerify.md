@@ -23,6 +23,6 @@ broken link (if any).
 
 ## Returns
 
-`Promise`\&lt;[`AuditVerifyResult`](/api/@graphorin/cli/interfaces/AuditVerifyResult.md)\&gt;
+`Promise`\<[`AuditVerifyResult`](/api/@graphorin/cli/interfaces/AuditVerifyResult.md)\>
 
 ## Stable

@@ -20,6 +20,6 @@ alone.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-candidate"></a> `candidate` | `readonly` | [`Fact`](/api/@graphorin/core/interfaces/Fact.md) | packages/memory/src/conflict/types.ts:126 |
-| <a id="property-existing"></a> `existing` | `readonly` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[] | packages/memory/src/conflict/types.ts:127 |
+| <a id="property-existing"></a> `existing` | `readonly` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[] | packages/memory/src/conflict/types.ts:127 |
 | <a id="property-localepack"></a> `localePack` | `readonly` | [`LocalePack`](/api/@graphorin/memory/interfaces/LocalePack.md) | packages/memory/src/conflict/types.ts:128 |
 | <a id="property-thresholds"></a> `thresholds` | `readonly` | [`ConflictThresholds`](/api/@graphorin/memory/interfaces/ConflictThresholds.md) | packages/memory/src/conflict/types.ts:129 |

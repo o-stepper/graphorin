@@ -26,6 +26,6 @@ rejection propagates out unchanged.
 
 ## Returns
 
-`Promise`\&lt;readonly [`Skill`](/api/@graphorin/skills/interfaces/Skill.md)[]\&gt;
+`Promise`\<readonly [`Skill`](/api/@graphorin/skills/interfaces/Skill.md)[]\>
 
 ## Stable

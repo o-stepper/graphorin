@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / WorkflowState
 
-# Interface: WorkflowState\&lt;TState\&gt;
+# Interface: WorkflowState\<TState\>
 
 Defined in: packages/workflow/src/types.ts:363
 
@@ -18,7 +18,7 @@ pause payload.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
 
 ## Properties
 

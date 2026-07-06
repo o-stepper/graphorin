@@ -28,4 +28,4 @@ Defined in: packages/observability/src/replay/replay.ts:34
 
 #### Returns
 
-`AsyncIterable`\&lt;[`ReplayEvent`](/api/@graphorin/observability/type-aliases/ReplayEvent.md)\&gt;
+`AsyncIterable`\<[`ReplayEvent`](/api/@graphorin/observability/type-aliases/ReplayEvent.md)\>

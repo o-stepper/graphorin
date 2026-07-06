@@ -32,6 +32,6 @@ route the rotated raws back to the right user.
 
 ## Returns
 
-`Promise`\<`ReadonlyMap`\&lt;`string`, [`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md)\&gt;\>
+`Promise`\<`ReadonlyMap`\<`string`, [`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md)\>\>
 
 ## Stable

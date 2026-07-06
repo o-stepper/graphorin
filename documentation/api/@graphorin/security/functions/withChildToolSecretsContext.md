@@ -25,7 +25,7 @@ active context. Used by `@graphorin/agent` to wire sub-agent calls.
 
 | Parameter | Type |
 | ------ | ------ |
-| `child` | `Omit`\&lt;[`ToolSecretsContext`](/api/@graphorin/security/interfaces/ToolSecretsContext.md), `"parent"`\&gt; |
+| `child` | `Omit`\<[`ToolSecretsContext`](/api/@graphorin/security/interfaces/ToolSecretsContext.md), `"parent"`\> |
 | `fn` | () => `T` |
 
 ## Returns

@@ -6,7 +6,7 @@
 
 # Interface: ResponseMetadata
 
-Defined in: packages/core/src/contracts/provider.ts:201
+Defined in: packages/core/src/contracts/provider.ts:203
 
 Metadata attached to the first `stream-start` event of a stream.
 
@@ -16,7 +16,7 @@ Metadata attached to the first `stream-start` event of a stream.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-createdat"></a> `createdAt?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:205 |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/core/src/contracts/provider.ts:203 |
-| <a id="property-providername"></a> `providerName` | `readonly` | `string` | packages/core/src/contracts/provider.ts:202 |
-| <a id="property-responseid"></a> `responseId?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:204 |
+| <a id="property-createdat"></a> `createdAt?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:207 |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/core/src/contracts/provider.ts:205 |
+| <a id="property-providername"></a> `providerName` | `readonly` | `string` | packages/core/src/contracts/provider.ts:204 |
+| <a id="property-responseid"></a> `responseId?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:206 |

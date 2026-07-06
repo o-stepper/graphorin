@@ -22,6 +22,6 @@ Drive the Device Authorization Grant flow.
 
 ## Returns
 
-`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
+`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
 
 ## Stable

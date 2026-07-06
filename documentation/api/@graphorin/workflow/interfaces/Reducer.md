@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / Reducer
 
-# Interface: Reducer\&lt;T\&gt;
+# Interface: Reducer\<T\>
 
 Defined in: packages/core/dist/channels/channels.d.ts:52
 

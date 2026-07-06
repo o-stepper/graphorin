@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / Workflow
 
-# Interface: Workflow\&lt;TState, TInput\&gt;
+# Interface: Workflow\<TState, TInput\>
 
 Defined in: packages/workflow/src/types.ts:431
 
@@ -16,8 +16,8 @@ Top-level handle returned by [createWorkflow](/api/@graphorin/workflow/factory/f
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
-| `TInput` | `Partial`\&lt;`TState`\&gt; |
+| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
+| `TInput` | `Partial`\<`TState`\> |
 
 ## Properties
 
@@ -54,7 +54,7 @@ Resolve a named persisted approval (D1) - sugar over
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\<`TState`\>\>
 
 ***
 
@@ -80,7 +80,7 @@ timer / awakeable) destroys its resume state - the caller decides.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -101,7 +101,7 @@ Defined in: packages/workflow/src/types.ts:437
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\<`TState`\>\>
 
 ***
 
@@ -146,7 +146,7 @@ Defined in: packages/workflow/src/types.ts:484
 
 #### Returns
 
-`Promise`\<[`WorkflowState`](/api/@graphorin/workflow/interfaces/WorkflowState.md)\&lt;`TState`\&gt;\>
+`Promise`\<[`WorkflowState`](/api/@graphorin/workflow/interfaces/WorkflowState.md)\<`TState`\>\>
 
 ***
 
@@ -166,7 +166,7 @@ Defined in: packages/workflow/src/types.ts:485
 
 #### Returns
 
-`Promise`\&lt;readonly [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md)[]\&gt;
+`Promise`\<readonly [`Checkpoint`](/api/@graphorin/workflow/interfaces/Checkpoint.md)[]\>
 
 ***
 
@@ -197,7 +197,7 @@ Fails with `pause-not-found` when no pending pause carries the name.
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\<`TState`\>\>
 
 ***
 
@@ -217,12 +217,12 @@ Defined in: packages/workflow/src/types.ts:438
 | Parameter | Type |
 | ------ | ------ |
 | `threadId` | `string` |
-| `directive?` | [`Directive`](/api/@graphorin/workflow/classes/Directive.md)\<`Record`\&lt;`string`, `unknown`\&gt;, `unknown`\> |
+| `directive?` | [`Directive`](/api/@graphorin/workflow/classes/Directive.md)\<`Record`\<`string`, `unknown`\>, `unknown`\> |
 | `opts?` | [`WorkflowResumeOptions`](/api/@graphorin/workflow/interfaces/WorkflowResumeOptions.md) |
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\<`TState`\>\>
 
 ***
 
@@ -247,7 +247,7 @@ from their persisted pending writes; only the failed work re-runs.
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\<`TState`\>\>
 
 ***
 

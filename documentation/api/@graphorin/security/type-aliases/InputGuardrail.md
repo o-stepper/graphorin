@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / InputGuardrail
 
-# Type Alias: InputGuardrail\&lt;TValue\&gt;
+# Type Alias: InputGuardrail\<TValue\>
 
 ```ts
 type InputGuardrail<TValue> = GuardrailDefinition<TValue> & {

@@ -24,6 +24,6 @@ when the requested binding identifier is unknown.
 
 ## Returns
 
-`Promise`\&lt;[`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md)\&gt;
+`Promise`\<[`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md)\>
 
 ## Stable

@@ -25,6 +25,6 @@ lives in the optional `@graphorin/secret-vault` package (post-MVP).
 
 ## Returns
 
-`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\&gt;
+`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\>
 
 ## Stable

@@ -30,6 +30,6 @@ Construct a `Stream` channel.
 
 ## Returns
 
-[`Stream`](/api/@graphorin/workflow/interfaces/Stream.md)\&lt;`T`\&gt;
+[`Stream`](/api/@graphorin/workflow/interfaces/Stream.md)\<`T`\>
 
 ## Stable

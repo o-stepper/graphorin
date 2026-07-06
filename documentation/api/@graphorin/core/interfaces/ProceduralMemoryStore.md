@@ -6,7 +6,7 @@
 
 # Interface: ProceduralMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:154
+Defined in: packages/core/src/contracts/memory-store.ts:176
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:154
 add(rule): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:155
+Defined in: packages/core/src/contracts/memory-store.ts:177
 
 #### Parameters
 
@@ -32,7 +32,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:155
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:155
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:156
+Defined in: packages/core/src/contracts/memory-store.ts:178
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:156
 
 #### Returns
 
-`Promise`\&lt;readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\&gt;
+`Promise`\<readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\>
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:156
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:157
+Defined in: packages/core/src/contracts/memory-store.ts:179
 
 #### Parameters
 
@@ -73,4 +73,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:157
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

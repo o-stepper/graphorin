@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [evaluator-optimizer](/api/@graphorin/agent/evaluator-optimizer/index.md) / EvaluatorOptimizerOptions
 
-# Interface: EvaluatorOptimizerOptions\&lt;TOutput\&gt;
+# Interface: EvaluatorOptimizerOptions\<TOutput\>
 
 Defined in: packages/agent/src/evaluator-optimizer/index.ts:72
 
@@ -25,8 +25,8 @@ is REQUIRED - the helper asserts `>= 1` at construction time.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-agentid"></a> `agentId` | `readonly` | `string` | - | packages/agent/src/evaluator-optimizer/index.ts:83 |
 | <a id="property-emit"></a> `emit?` | `readonly` | (`event`) => `void` | Optional event emitter for `agent.evaluator.iteration / converged`. | packages/agent/src/evaluator-optimizer/index.ts:80 |
-| <a id="property-evaluator"></a> `evaluator` | `readonly` | [`EvaluatorCallable`](/api/@graphorin/agent/evaluator-optimizer/type-aliases/EvaluatorCallable.md)\&lt;`TOutput`\&gt; | - | packages/agent/src/evaluator-optimizer/index.ts:74 |
-| <a id="property-generator"></a> `generator` | `readonly` | [`GeneratorCallable`](/api/@graphorin/agent/evaluator-optimizer/type-aliases/GeneratorCallable.md)\&lt;`TOutput`\&gt; | - | packages/agent/src/evaluator-optimizer/index.ts:73 |
+| <a id="property-evaluator"></a> `evaluator` | `readonly` | [`EvaluatorCallable`](/api/@graphorin/agent/evaluator-optimizer/type-aliases/EvaluatorCallable.md)\<`TOutput`\> | - | packages/agent/src/evaluator-optimizer/index.ts:74 |
+| <a id="property-generator"></a> `generator` | `readonly` | [`GeneratorCallable`](/api/@graphorin/agent/evaluator-optimizer/type-aliases/GeneratorCallable.md)\<`TOutput`\> | - | packages/agent/src/evaluator-optimizer/index.ts:73 |
 | <a id="property-maxiterations"></a> `maxIterations` | `readonly` | `number` | - | packages/agent/src/evaluator-optimizer/index.ts:75 |
 | <a id="property-mergestrategy"></a> `mergeStrategy?` | `readonly` | `"last-iteration"` \| `"best-score"` | - | packages/agent/src/evaluator-optimizer/index.ts:77 |
 | <a id="property-rubric"></a> `rubric` | `readonly` | [`Rubric`](/api/@graphorin/agent/evaluator-optimizer/type-aliases/Rubric.md) | - | packages/agent/src/evaluator-optimizer/index.ts:76 |

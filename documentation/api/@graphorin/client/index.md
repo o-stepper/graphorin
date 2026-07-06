@@ -8,11 +8,11 @@
 
 > Reference TypeScript client for the [Graphorin](https://github.com/o-stepper/graphorin) standalone server.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
 - **Version:** v0.6.1
-- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
+- **License:** [MIT](../../_media/LICENSE-2) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/client>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -91,7 +91,7 @@ The client attaches the ticket as a second `Sec-WebSocket-Protocol` token (`tick
 
 ## License
 
-MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/graphorin/blob/main/LICENSE).
+MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](../../_media/LICENSE-2).
 
 ---
 

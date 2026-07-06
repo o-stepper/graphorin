@@ -28,11 +28,11 @@ injectWebSocket(serve(...));
 
 | Parameter | Type |
 | ------ | ------ |
-| `c` | `Context`\&lt;\{ `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md); \}\&gt; |
+| `c` | `Context`\<\{ `Variables`: [`ServerVariables`](/api/@graphorin/server/interfaces/ServerVariables.md); \}\> |
 | `options` | [`WsUpgradeOptions`](/api/@graphorin/server/interfaces/WsUpgradeOptions.md) |
 
 ## Returns
 
-`Promise`\<`WSEvents`\&lt;`unknown`\&gt;\>
+`Promise`\<`WSEvents`\<`unknown`\>\>
 
 ## Stable

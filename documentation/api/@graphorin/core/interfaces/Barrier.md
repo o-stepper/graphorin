@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / Barrier
 
-# Interface: Barrier\&lt;T\&gt;
+# Interface: Barrier\<T\>
 
 Defined in: packages/core/src/channels/channels.ts:102
 

@@ -56,7 +56,7 @@ W-009 compaction - keep the `keepLast` newest checkpoints of one pair.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 #### Implementation of
 
@@ -85,7 +85,7 @@ instead, which is namespace-scoped and protects suspended threads.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 
@@ -147,7 +147,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:120
 
 #### Returns
 
-`AsyncIterable`\&lt;[`CheckpointTuple`](/api/@graphorin/workflow/interfaces/CheckpointTuple.md)\&gt;
+`AsyncIterable`\<[`CheckpointTuple`](/api/@graphorin/workflow/interfaces/CheckpointTuple.md)\>
 
 #### Implementation of
 
@@ -212,7 +212,7 @@ checkpoint decides age + status, suspended pairs survive unless
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 #### Implementation of
 
@@ -245,7 +245,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:40
 
 #### Returns
 
-`Promise`\&lt;`string`\&gt;
+`Promise`\<`string`\>
 
 #### Implementation of
 
@@ -278,7 +278,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:74
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 

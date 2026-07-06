@@ -53,7 +53,7 @@ deleted.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -78,7 +78,7 @@ instead, which is namespace-scoped and protects suspended threads.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -140,7 +140,7 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:176
 
 #### Returns
 
-`AsyncIterable`\&lt;[`CheckpointTuple`](/api/@graphorin/core/interfaces/CheckpointTuple.md)\&gt;
+`AsyncIterable`\<[`CheckpointTuple`](/api/@graphorin/core/interfaces/CheckpointTuple.md)\>
 
 #### Inherited from
 
@@ -213,7 +213,7 @@ of pairs pruned.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -242,7 +242,7 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:154
 
 #### Returns
 
-`Promise`\&lt;`string`\&gt;
+`Promise`\<`string`\>
 
 #### Inherited from
 
@@ -275,7 +275,7 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:162
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 

@@ -65,7 +65,7 @@ forget(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1306
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1310
 
 Soft-delete a fact (kept for replay; never hard-deleted).
 
@@ -79,7 +79,7 @@ Soft-delete a fact (kept for replay; never hard-deleted).
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -92,7 +92,7 @@ fuse(
 options?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1344
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1348
 
 Fuse multiple ranked lists outside of a `search()` call.
 
@@ -101,14 +101,14 @@ Fuse multiple ranked lists outside of a `search()` call.
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `string` |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[][] |
 | `options` | \{ `signal?`: `AbortSignal`; `topK?`: `number`; \} |
 | `options.signal?` | `AbortSignal` |
 | `options.topK?` | `number` |
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
 
 ***
 
@@ -118,7 +118,7 @@ Fuse multiple ranked lists outside of a `search()` call.
 get(scope, factId): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1122
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1126
 
 Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
@@ -131,7 +131,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
 #### Returns
 
-`Promise`\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md) \| `null`\&gt;
+`Promise`\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md) \| `null`\>
 
 ***
 
@@ -141,7 +141,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 history(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1152
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1156
 
 Return the full bi-temporal supersede chain that `factId` belongs
 to, oldest → newest, including superseded / soft-deleted rows so
@@ -159,7 +159,7 @@ a storage adapter that implements
 
 #### Returns
 
-`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
+`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
 
 #### Stable
 
@@ -174,7 +174,7 @@ neighbors(
 opts?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1113
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1117
 
 Raw vector KNN neighbours for the consolidator's reconcile
 pre-filter (P0-3). Unlike [search](/api/@graphorin/memory/classes/SemanticMemory.md#search) this skips FTS, reranking,
@@ -196,7 +196,7 @@ fresh `add`, degrading gracefully to the pre-reconcile behaviour.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
 
 #### Stable
 
@@ -211,7 +211,7 @@ purge(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1325
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1329
 
 Hard-delete a fact (GDPR path). Distinct from [forget](/api/@graphorin/memory/classes/SemanticMemory.md#forget): the
 record is removed from storage entirely instead of soft-archived.
@@ -229,7 +229,7 @@ Requires a storage adapter that implements
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -260,7 +260,7 @@ via `createMemory({ conflictPipeline: { mode: 'off' } })`).
 
 #### Returns
 
-`Promise`\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;
+`Promise`\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>
 
 ***
 
@@ -289,7 +289,7 @@ silent dedups (`decision.kind === 'dedup'`) from fresh inserts.
 
 #### Returns
 
-`Promise`\&lt;[`RememberOutcome`](/api/@graphorin/memory/interfaces/RememberOutcome.md)\&gt;
+`Promise`\<[`RememberOutcome`](/api/@graphorin/memory/interfaces/RememberOutcome.md)\>
 
 #### Stable
 
@@ -334,7 +334,7 @@ Hybrid (vector + FTS5) search merged through the configured reranker.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
 
 ***
 
@@ -347,7 +347,7 @@ searchIterative(
 opts?): Promise<IterativeRecallResult>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1037
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1041
 
 Gated, iterative ("deep") recall for hard queries (P2-4). A cheap
 local heuristic ([assessQueryDifficulty](/api/@graphorin/memory/functions/assessQueryDifficulty.md)) decides whether the
@@ -375,7 +375,7 @@ difficulty-gated `search` and never calls a provider.
 
 #### Returns
 
-`Promise`\&lt;[`IterativeRecallResult`](/api/@graphorin/memory/type-aliases/IterativeRecallResult.md)\&gt;
+`Promise`\<[`IterativeRecallResult`](/api/@graphorin/memory/type-aliases/IterativeRecallResult.md)\>
 
 #### Stable
 
@@ -417,7 +417,7 @@ supersede(
 }>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1266
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1270
 
 Mark `oldId` superseded by a new fact. Returns the new record.
 
@@ -464,7 +464,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1192
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1196
 
 Promote a quarantined fact to `active` (P1-4). The validation path
 that admits a synthesized memory into action-driving recall once a
@@ -495,7 +495,7 @@ from a trusted (non-agent) context. Synthesized-but-clean writes
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Stable
 
@@ -507,7 +507,7 @@ from a trusted (non-agent) context. Synthesized-but-clean writes
 static fuseRrf<TRecord>(lists, k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1353
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1357
 
 Pure-fusion helper - exposed for callers that already collected results.
 
@@ -521,12 +521,12 @@ Pure-fusion helper - exposed for callers that already collected results.
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] | `undefined` |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] | `undefined` |
 | `k` | `number` | `60` |
 
 #### Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]
 
 ***
 
@@ -539,7 +539,7 @@ static fuseWeighted<TRecord>(
    k?): readonly MemoryHit<TRecord>[];
 ```
 
-Defined in: packages/memory/src/tiers/semantic-memory.ts:1366
+Defined in: packages/memory/src/tiers/semantic-memory.ts:1370
 
 Pure weighted-fusion helper (X-2) - like [SemanticMemory.fuseRrf](/api/@graphorin/memory/classes/SemanticMemory.md#fuserrf)
 but scales each list `i`'s reciprocal-rank contribution by
@@ -556,10 +556,10 @@ absent weights reproduce RRF.
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] | `undefined` |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] | `undefined` |
 | `weights` | readonly `number`[] \| `undefined` | `undefined` |
 | `k` | `number` | `60` |
 
 #### Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]

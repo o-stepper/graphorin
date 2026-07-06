@@ -26,6 +26,6 @@ missing cipher peer.
 
 ## Returns
 
-`Promise`\&lt;[`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md)\&gt;
+`Promise`\<[`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md)\>
 
 ## Stable

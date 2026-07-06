@@ -62,7 +62,7 @@ Attach `recordId` to `agentId`. Idempotent.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -89,7 +89,7 @@ Detach `recordId` from `agentId`. Idempotent.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -112,4 +112,4 @@ List every attachment for `agentId`.
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)[]\&gt;
+`Promise`\<readonly [`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)[]\>

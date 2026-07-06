@@ -27,6 +27,6 @@ compromised.
 
 ## Returns
 
-`Promise`\&lt;readonly [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)[]\&gt;
+`Promise`\<readonly [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)[]\>
 
 ## Stable

@@ -23,6 +23,6 @@ semantic memory. Results merged through the configured reranker.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactSearchInput`, `FactSearchOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`FactSearchInput`, `FactSearchOutput`\>
 
 ## Stable

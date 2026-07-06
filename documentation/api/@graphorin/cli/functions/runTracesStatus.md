@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/traces.ts:51
 
 ## Returns
 
-`Promise`\&lt;[`TracesStatusResult`](/api/@graphorin/cli/interfaces/TracesStatusResult.md)\&gt;
+`Promise`\<[`TracesStatusResult`](/api/@graphorin/cli/interfaces/TracesStatusResult.md)\>
 
 ## Stable

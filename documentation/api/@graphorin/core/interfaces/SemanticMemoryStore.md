@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:146
+Defined in: packages/core/src/contracts/memory-store.ts:157
 
 ## Stable
 
@@ -19,10 +19,23 @@ Defined in: packages/core/src/contracts/memory-store.ts:146
 ### forget()
 
 ```ts
-forget(id, reason?): Promise<void>;
+forget(
+   id, 
+   reason?, 
+scope?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:150
+Defined in: packages/core/src/contracts/memory-store.ts:172
+
+Soft-delete a fact. W-154: when `scope` is supplied, adapters that
+support tenant isolation MUST treat a fact outside the scope as a
+deterministic no-op (0 rows changed) - defense in depth so a
+leaked / cross-user id reaching a mutator cannot touch another
+user's memory. Omitting `scope` preserves the historical unscoped
+behaviour (trusted internal callers: consolidator, erasure
+cascades). The parameter is additive - existing adapter
+implementations with the narrower arity remain structurally
+compatible.
 
 #### Parameters
 
@@ -30,10 +43,11 @@ Defined in: packages/core/src/contracts/memory-store.ts:150
 | ------ | ------ |
 | `id` | `string` |
 | `reason?` | `string` |
+| `scope?` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -43,7 +57,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:150
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:147
+Defined in: packages/core/src/contracts/memory-store.ts:158
 
 #### Parameters
 
@@ -53,7 +67,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:147
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -63,7 +77,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:147
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:148
+Defined in: packages/core/src/contracts/memory-store.ts:159
 
 #### Parameters
 
@@ -74,7 +88,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:148
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
 
 ***
 
@@ -87,7 +101,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:149
+Defined in: packages/core/src/contracts/memory-store.ts:160
 
 #### Parameters
 
@@ -99,4 +113,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:149
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

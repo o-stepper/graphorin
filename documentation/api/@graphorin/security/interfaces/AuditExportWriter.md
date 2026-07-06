@@ -18,4 +18,4 @@ output to any sink (file, HTTP response, in-memory buffer).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-write"></a> `write` | `readonly` | (`line`) => `void` \| `Promise`\&lt;`void`\&gt; | packages/security/src/audit/export.ts:29 |
+| <a id="property-write"></a> `write` | `readonly` | (`line`) => `void` \| `Promise`\<`void`\> | packages/security/src/audit/export.ts:29 |

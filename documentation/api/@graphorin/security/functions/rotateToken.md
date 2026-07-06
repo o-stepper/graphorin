@@ -22,7 +22,7 @@ scopes. Useful for grace-period rotations.
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | `Omit`\&lt;[`CreateTokenOptions`](/api/@graphorin/security/interfaces/CreateTokenOptions.md), `"env"` \| `"scopes"` \| `"idOverride"`\&gt; & \{ `env?`: `string`; `id`: `string`; `scopesOverride?`: readonly `string`[]; `verifier?`: \{ `invalidate`: `void`; \}; \} |
+| `options` | `Omit`\<[`CreateTokenOptions`](/api/@graphorin/security/interfaces/CreateTokenOptions.md), `"env"` \| `"scopes"` \| `"idOverride"`\> & \{ `env?`: `string`; `id`: `string`; `scopesOverride?`: readonly `string`[]; `verifier?`: \{ `invalidate`: `void`; \}; \} |
 
 ## Returns
 

@@ -81,7 +81,7 @@
   "modifierTags": ["@hidden", "@internal", "@override", "@stable", "@experimental"],
   "validation": {
     "notExported": false,
-    "invalidLink": false,
+    "invalidLink": true,
     "notDocumented": false
   },
   "sidebar": {

@@ -16,4 +16,4 @@ Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:70
 
 ## Returns
 
-`Promise`\&lt;[`CrossEncoderPipelineFactory`](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipelineFactory.md)\&gt;
+`Promise`\<[`CrossEncoderPipelineFactory`](/api/@graphorin/reranker-transformersjs/type-aliases/CrossEncoderPipelineFactory.md)\>

@@ -30,12 +30,12 @@ surface a structured diagnostic.
 
 | Parameter | Type |
 | ------ | ------ |
-| `frontmatter` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `frontmatter` | `Record`\<`string`, `unknown`\> |
 | `field` | `string` |
 | `fallback?` | `T` |
 
 ## Returns
 
-[`FieldResolution`](/api/@graphorin/skills/interfaces/FieldResolution.md)\&lt;`T`\&gt;
+[`FieldResolution`](/api/@graphorin/skills/interfaces/FieldResolution.md)\<`T`\>
 
 ## Stable

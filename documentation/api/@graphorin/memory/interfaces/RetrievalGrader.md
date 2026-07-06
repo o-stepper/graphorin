@@ -41,4 +41,4 @@ Defined in: packages/memory/src/search/iterative.ts:211
 
 #### Returns
 
-`Promise`\&lt;[`RetrievalGrade`](/api/@graphorin/memory/interfaces/RetrievalGrade.md)\&gt;
+`Promise`\<[`RetrievalGrade`](/api/@graphorin/memory/interfaces/RetrievalGrade.md)\>

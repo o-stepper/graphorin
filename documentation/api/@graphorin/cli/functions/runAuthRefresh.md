@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/auth.ts:147
 
 ## Returns
 
-`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
+`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
 
 ## Stable

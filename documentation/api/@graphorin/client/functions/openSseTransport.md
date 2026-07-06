@@ -25,6 +25,6 @@ streaming response; rejects with a typed
 
 ## Returns
 
-`Promise`\&lt;[`Transport`](/api/@graphorin/client/interfaces/Transport.md)\&gt;
+`Promise`\<[`Transport`](/api/@graphorin/client/interfaces/Transport.md)\>
 
 ## Stable

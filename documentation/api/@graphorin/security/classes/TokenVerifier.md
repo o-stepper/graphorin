@@ -177,6 +177,6 @@ caller sheds load instead of queueing unboundedly.
 
 #### Returns
 
-`Promise`\&lt;[`VerifyResult`](/api/@graphorin/security/type-aliases/VerifyResult.md)\&gt;
+`Promise`\<[`VerifyResult`](/api/@graphorin/security/type-aliases/VerifyResult.md)\>
 
 #### Stable

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AgentResult
 
-# Interface: AgentResult\&lt;TOutput\&gt;
+# Interface: AgentResult\<TOutput\>
 
 Defined in: packages/core/src/types/agent-event.ts:565
 

@@ -32,7 +32,7 @@ Defined in: packages/agent/src/progress/index.ts:85
 
 #### Returns
 
-`Promise`\&lt;readonly [`ProgressArtifactRef`](/api/@graphorin/core/interfaces/ProgressArtifactRef.md)[]\&gt;
+`Promise`\<readonly [`ProgressArtifactRef`](/api/@graphorin/core/interfaces/ProgressArtifactRef.md)[]\>
 
 ***
 
@@ -77,4 +77,4 @@ Defined in: packages/agent/src/progress/index.ts:80
 
 #### Returns
 
-`Promise`\&lt;[`ProgressArtifactRef`](/api/@graphorin/core/interfaces/ProgressArtifactRef.md)\&gt;
+`Promise`\<[`ProgressArtifactRef`](/api/@graphorin/core/interfaces/ProgressArtifactRef.md)\>

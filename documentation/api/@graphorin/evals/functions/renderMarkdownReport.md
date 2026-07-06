@@ -23,7 +23,7 @@ Defined in: evals/src/reporters/markdown.ts:12
 
 | Parameter | Type |
 | ------ | ------ |
-| `report` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt; |
+| `report` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\<`I`, `O`\> |
 
 ## Returns
 

@@ -14,7 +14,7 @@ Options accepted by `Session.recordToolCassette({...})`.
 
 ## Extends
 
-- `Omit`\&lt;[`ToolCassetteRecorderOptions`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md), `"sessionId"` \| `"runId"` \| `"writer"`\&gt;
+- `Omit`\<[`ToolCassetteRecorderOptions`](/api/@graphorin/sessions/interfaces/ToolCassetteRecorderOptions.md), `"sessionId"` \| `"runId"` \| `"writer"`\>
 
 ## Properties
 

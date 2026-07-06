@@ -59,7 +59,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:235
 
 #### Returns
 
-`Promise`\&lt;`boolean`\&gt;
+`Promise`\<`boolean`\>
 
 ***
 
@@ -72,7 +72,16 @@ claimReadyBatches(
 limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:384
+Defined in: packages/store-sqlite/src/consolidator-store.ts:394
+
+W-133: despite the name, this is a plain SELECT of due DLQ batches
+WITHOUT any lease/claim semantics - two concurrent callers see the
+same rows. Serializing concurrent drains is the CALLER's job via
+the CS-8 consolidator scope lock (the runtime always drains under
+it); the worst case of a bypassed lock is duplicated LLM replay
+spend, not corruption. The name is kept because the method sits on
+the stable contract surface - renaming would be a breaking change
+with no behavioural gain.
 
 #### Parameters
 
@@ -84,7 +93,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:384
 
 #### Returns
 
-`Promise`\&lt;readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\&gt;
+`Promise`\<readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\>
 
 ***
 
@@ -104,7 +113,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:362
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -138,7 +147,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:162
 listFailedBatches(scope, limit?): Promise<readonly DlqBatchRow[]>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:464
+Defined in: packages/store-sqlite/src/consolidator-store.ts:474
 
 #### Parameters
 
@@ -149,7 +158,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:464
 
 #### Returns
 
-`Promise`\&lt;readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\&gt;
+`Promise`\<readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\>
 
 ***
 
@@ -203,7 +212,7 @@ markBatchExhausted(
 retryCount?): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:414
+Defined in: packages/store-sqlite/src/consolidator-store.ts:424
 
 #### Parameters
 
@@ -215,7 +224,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:414
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -225,7 +234,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:414
 markBatchSucceeded(id): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:401
+Defined in: packages/store-sqlite/src/consolidator-store.ts:411
 
 #### Parameters
 
@@ -235,7 +244,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:401
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -245,7 +254,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:401
 pruneExhaustedBatches(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:456
+Defined in: packages/store-sqlite/src/consolidator-store.ts:466
 
 W-065: retention for the dead-letter queue. Deletes only EXHAUSTED
 batches (`next_retry_at IS NULL` - parked forever by
@@ -261,7 +270,7 @@ awaiting a retry are never touched (they belong to
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 #### Stable
 
@@ -273,7 +282,7 @@ awaiting a retry are never touched (they belong to
 pruneRuns(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:439
+Defined in: packages/store-sqlite/src/consolidator-store.ts:449
 
 W-065: retention for the per-tick run log. Deletes terminal runs
 that started before the cutoff; in-flight rows
@@ -287,7 +296,7 @@ that started before the cutoff; in-flight rows
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 #### Stable
 
@@ -309,7 +318,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:295
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -329,7 +338,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:278
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -350,7 +359,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:266
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -363,7 +372,7 @@ rescheduleBatch(
 nextRetryAt): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:405
+Defined in: packages/store-sqlite/src/consolidator-store.ts:415
 
 #### Parameters
 
@@ -375,7 +384,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:405
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -396,4 +405,4 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:173
 
 #### Returns
 
-`Promise`\&lt;[`ConsolidatorStateRow`](/api/@graphorin/store-sqlite/interfaces/ConsolidatorStateRow.md)\&gt;
+`Promise`\<[`ConsolidatorStateRow`](/api/@graphorin/store-sqlite/interfaces/ConsolidatorStateRow.md)\>

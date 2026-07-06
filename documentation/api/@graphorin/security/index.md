@@ -113,7 +113,7 @@
   tamper-evident audit log + sandbox / memory-guard / guardrails /
   process-hardening runtime safety + outbound OAuth flows + skills
   supply-chain helpers.
-- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
+- **License:** [MIT](../../_media/LICENSE-6) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 
 ## Installation

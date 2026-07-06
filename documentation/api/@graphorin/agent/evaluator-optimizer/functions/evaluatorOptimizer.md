@@ -25,10 +25,10 @@ Run the Generator → Evaluator iteration loop.
 | Parameter | Type |
 | ------ | ------ |
 | `input` | `string` |
-| `options` | [`EvaluatorOptimizerOptions`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOptions.md)\&lt;`TOutput`\&gt; |
+| `options` | [`EvaluatorOptimizerOptions`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOptions.md)\<`TOutput`\> |
 
 ## Returns
 
-`Promise`\<[`EvaluatorOptimizerOutcome`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md)\&lt;`TOutput`\&gt;\>
+`Promise`\<[`EvaluatorOptimizerOutcome`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md)\<`TOutput`\>\>
 
 ## Stable

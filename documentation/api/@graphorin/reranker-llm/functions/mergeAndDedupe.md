@@ -25,10 +25,10 @@ id. Pure function; exported for the unit fixture.
 
 | Parameter | Type |
 | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] |
 
 ## Returns
 
-readonly `MergedEntry`\&lt;`TRecord`\&gt;[]
+readonly `MergedEntry`\<`TRecord`\>[]
 
 ## Stable

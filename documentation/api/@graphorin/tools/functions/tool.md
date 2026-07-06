@@ -28,11 +28,11 @@ so authors do not have to repeat the input shape.
 
 | Parameter | Type |
 | ------ | ------ |
-| `spec` | [`ToolSpec`](/api/@graphorin/tools/type-aliases/ToolSpec.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; |
+| `spec` | [`ToolSpec`](/api/@graphorin/tools/type-aliases/ToolSpec.md)\<`TInput`, `TOutput`, `TDeps`\> |
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`TInput`, `TOutput`, `TDeps`\>
 
 ## Example
 

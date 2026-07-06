@@ -25,6 +25,6 @@ spans (RP-17). Empty when nothing was recorded.
 
 ## Returns
 
-`Promise`\&lt;[`MemoryWhyResult`](/api/@graphorin/cli/interfaces/MemoryWhyResult.md)\&gt;
+`Promise`\<[`MemoryWhyResult`](/api/@graphorin/cli/interfaces/MemoryWhyResult.md)\>
 
 ## Stable

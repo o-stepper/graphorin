@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / WorkflowEvent
 
-# Type Alias: WorkflowEvent\&lt;TState\&gt;
+# Type Alias: WorkflowEvent\<TState\>
 
 ```ts
 type WorkflowEvent<TState> = 

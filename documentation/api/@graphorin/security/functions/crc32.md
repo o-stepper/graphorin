@@ -21,7 +21,7 @@ without further bit-fiddling.
 
 | Parameter | Type |
 | ------ | ------ |
-| `input` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; |
+| `input` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> |
 
 ## Returns
 

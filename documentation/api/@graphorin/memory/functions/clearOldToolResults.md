@@ -30,4 +30,4 @@ placeholders are skipped on a second pass.
 
 ## Returns
 
-`Promise`\&lt;[`ClearToolResultsOutcome`](/api/@graphorin/memory/interfaces/ClearToolResultsOutcome.md)\&gt;
+`Promise`\<[`ClearToolResultsOutcome`](/api/@graphorin/memory/interfaces/ClearToolResultsOutcome.md)\>

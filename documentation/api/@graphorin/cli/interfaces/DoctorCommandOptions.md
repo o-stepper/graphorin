@@ -29,5 +29,5 @@ Defined in: packages/cli/src/commands/doctor.ts:52
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | `CommonOutputOptions.jsonPrint` | packages/cli/src/internal/output.ts:77 |
 | <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | `CommonOutputOptions.nonInteractive` | packages/cli/src/internal/output.ts:73 |
 | <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam - capture human lines instead of writing to stderr. | `CommonOutputOptions.print` | packages/cli/src/internal/output.ts:75 |
-| <a id="property-systemdrun"></a> `systemdRun?` | `readonly` | (`cmd`) => `Promise`\&lt;`string`\&gt; | Test seam - supply a custom systemd executor. | - | packages/cli/src/commands/doctor.ts:73 |
+| <a id="property-systemdrun"></a> `systemdRun?` | `readonly` | (`cmd`) => `Promise`\<`string`\> | Test seam - supply a custom systemd executor. | - | packages/cli/src/commands/doctor.ts:73 |
 | <a id="property-systemdunit"></a> `systemdUnit?` | `readonly` | `string` | Optional systemd unit identifier (default `graphorin.service`). | - | packages/cli/src/commands/doctor.ts:69 |

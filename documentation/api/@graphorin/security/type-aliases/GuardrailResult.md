@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / GuardrailResult
 
-# Type Alias: GuardrailResult\&lt;TValue\&gt;
+# Type Alias: GuardrailResult\<TValue\>
 
 ```ts
 type GuardrailResult<TValue> = 

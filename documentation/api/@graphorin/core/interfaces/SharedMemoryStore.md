@@ -6,7 +6,7 @@
 
 # Interface: SharedMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:161
+Defined in: packages/core/src/contracts/memory-store.ts:183
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:161
 attach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:162
+Defined in: packages/core/src/contracts/memory-store.ts:184
 
 #### Parameters
 
@@ -29,7 +29,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:162
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -39,7 +39,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:162
 detach(recordId, agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:163
+Defined in: packages/core/src/contracts/memory-store.ts:185
 
 #### Parameters
 
@@ -50,7 +50,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:163
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:163
 listFor(agentId): Promise<readonly MemoryRecord[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:164
+Defined in: packages/core/src/contracts/memory-store.ts:186
 
 #### Parameters
 
@@ -70,4 +70,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:164
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)[]\&gt;
+`Promise`\<readonly [`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)[]\>

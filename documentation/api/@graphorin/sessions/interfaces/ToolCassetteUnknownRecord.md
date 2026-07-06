@@ -18,4 +18,4 @@ via this shape so callers can WARN + skip.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-kind"></a> `kind` | `readonly` | `"unknown"` | packages/sessions/src/cassette/types.ts:211 |
-| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/cassette/types.ts:212 |
+| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/sessions/src/cassette/types.ts:212 |

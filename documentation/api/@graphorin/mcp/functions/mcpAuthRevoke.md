@@ -29,4 +29,4 @@ Drive `graphorin auth revoke --mcp <id>`.
 
 ## Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

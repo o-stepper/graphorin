@@ -30,4 +30,4 @@ Teardown function returned by [bridgeSupplyChainToAudit](/api/@graphorin/securit
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/supply-chain-bridge.ts:31 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | packages/security/src/audit/supply-chain-bridge.ts:31 |

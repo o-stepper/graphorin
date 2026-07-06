@@ -28,12 +28,12 @@ Detect regressions between `current` and `baseline` reports.
 
 | Parameter | Type |
 | ------ | ------ |
-| `current` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt; |
-| `baseline` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt; |
+| `current` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\<`I`, `O`\> |
+| `baseline` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\<`I`, `O`\> |
 | `options` | [`RegressionOptions`](/api/@graphorin/evals/interfaces/RegressionOptions.md) |
 
 ## Returns
 
-[`RegressionReport`](/api/@graphorin/evals/interfaces/RegressionReport.md)\&lt;`I`, `O`\&gt;
+[`RegressionReport`](/api/@graphorin/evals/interfaces/RegressionReport.md)\<`I`, `O`\>
 
 ## Stable

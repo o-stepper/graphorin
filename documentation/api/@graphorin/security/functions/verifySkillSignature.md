@@ -26,6 +26,6 @@ hierarchy.
 
 ## Returns
 
-`Promise`\&lt;[`SkillSignatureVerificationResult`](/api/@graphorin/security/interfaces/SkillSignatureVerificationResult.md)\&gt;
+`Promise`\<[`SkillSignatureVerificationResult`](/api/@graphorin/security/interfaces/SkillSignatureVerificationResult.md)\>
 
 ## Stable

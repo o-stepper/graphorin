@@ -26,10 +26,10 @@ audit rows / counter increments via the supplied `emit` callback.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`FanOutOptions`](/api/@graphorin/agent/fanout/interfaces/FanOutOptions.md)\&lt;`TOutput`\&gt; |
+| `opts` | [`FanOutOptions`](/api/@graphorin/agent/fanout/interfaces/FanOutOptions.md)\<`TOutput`\> |
 
 ## Returns
 
-`Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TOutput`\&gt;\>
+`Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\<`TOutput`\>\>
 
 ## Stable

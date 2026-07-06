@@ -6,7 +6,7 @@
 
 # Interface: ToolSecretsAccessor
 
-Defined in: packages/core/src/contracts/tool.ts:376
+Defined in: packages/core/src/contracts/tool.ts:382
 
 Per-call secrets accessor surface. Implemented by the executor; the
 tool author calls `require(...)` to obtain a `SecretValue` wrapper.
@@ -27,7 +27,7 @@ unwraps a secret outside the tool's permitted set.
 require(key, options?): Promise<SecretValue>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:383
+Defined in: packages/core/src/contracts/tool.ts:389
 
 Resolve a secret by key. Throws `SecretAccessDeniedError` if the
 key is not in the tool's `secretsAllowed` allowlist; throws
@@ -44,7 +44,7 @@ if the key resolves to no value.
 
 ##### Returns
 
-`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\&gt;
+`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\>
 
 #### Call Signature
 
@@ -52,7 +52,7 @@ if the key resolves to no value.
 require(key, options): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:387
+Defined in: packages/core/src/contracts/tool.ts:393
 
 ##### Parameters
 
@@ -64,4 +64,4 @@ Defined in: packages/core/src/contracts/tool.ts:387
 
 ##### Returns
 
-`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\&gt;
+`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\>

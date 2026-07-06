@@ -27,12 +27,12 @@ Take the first `n` items.
 
 | Parameter | Type |
 | ------ | ------ |
-| `source` | `AsyncIterable`\&lt;`T`\&gt; |
+| `source` | `AsyncIterable`\<`T`\> |
 | `n` | `number` |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`AsyncIterable`\&lt;`T`\&gt;
+`AsyncIterable`\<`T`\>
 
 ## Stable

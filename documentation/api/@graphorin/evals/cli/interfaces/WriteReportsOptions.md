@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [cli](/api/@graphorin/evals/cli/index.md) / WriteReportsOptions
 
-# Interface: WriteReportsOptions\&lt;I, O\&gt;
+# Interface: WriteReportsOptions\<I, O\>
 
 Defined in: evals/src/cli/index.ts:67
 
@@ -24,4 +24,4 @@ Defined in: evals/src/cli/index.ts:67
 | <a id="property-basename"></a> `basename?` | `readonly` | `string` | evals/src/cli/index.ts:71 |
 | <a id="property-formats"></a> `formats` | `readonly` | readonly [`ReporterFormat`](/api/@graphorin/evals/cli/type-aliases/ReporterFormat.md)[] | evals/src/cli/index.ts:70 |
 | <a id="property-outdir"></a> `outDir?` | `readonly` | `string` | evals/src/cli/index.ts:69 |
-| <a id="property-report"></a> `report` | `readonly` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt; | evals/src/cli/index.ts:68 |
+| <a id="property-report"></a> `report` | `readonly` | [`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\<`I`, `O`\> | evals/src/cli/index.ts:68 |

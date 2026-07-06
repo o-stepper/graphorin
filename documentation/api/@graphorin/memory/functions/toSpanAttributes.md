@@ -23,6 +23,6 @@ suitable for `AISpan.setAttributes(...)`.
 
 ## Returns
 
-`Readonly`\<`Record`\&lt;`string`, `string`\&gt;\>
+`Readonly`\<`Record`\<`string`, `string`\>\>
 
 ## Stable

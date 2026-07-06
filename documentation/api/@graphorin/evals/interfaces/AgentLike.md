@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / AgentLike
 
-# Interface: AgentLike\&lt;I, O\&gt;
+# Interface: AgentLike\<I, O\>
 
 Defined in: evals/src/types.ts:31
 
@@ -41,4 +41,4 @@ Defined in: evals/src/types.ts:32
 
 #### Returns
 
-`Promise`\&lt;`O`\&gt;
+`Promise`\<`O`\>

@@ -38,4 +38,4 @@ Defined in: packages/memory/src/conflict/types.ts:169
 
 #### Returns
 
-`Promise`\&lt;[`StageOutcome`](/api/@graphorin/memory/type-aliases/StageOutcome.md)\&gt;
+`Promise`\<[`StageOutcome`](/api/@graphorin/memory/type-aliases/StageOutcome.md)\>

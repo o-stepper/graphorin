@@ -16,4 +16,4 @@ Options for `checkPerms(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-expected"></a> `expected` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Map of path → expected POSIX mode. Each entry is checked against `lstat`. Missing files surface as `'warn'` so the doctor can recommend `graphorin init`. | packages/security/src/hardening/doctor.ts:57 |
+| <a id="property-expected"></a> `expected` | `readonly` | `Readonly`\<`Record`\<`string`, `number`\>\> | Map of path → expected POSIX mode. Each entry is checked against `lstat`. Missing files surface as `'warn'` so the doctor can recommend `graphorin init`. | packages/security/src/hardening/doctor.ts:57 |

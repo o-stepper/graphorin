@@ -30,4 +30,4 @@ The `mode` field is the master switch:
 | <a id="property-mode"></a> `mode?` | `readonly` | `"on"` \| `"off"` | - | packages/memory/src/conflict/types.ts:106 |
 | <a id="property-now"></a> `now?` | `readonly` | () => `string` | Inject a deterministic clock. Defaults to `() => new Date().toISOString()`. | packages/memory/src/conflict/types.ts:114 |
 | <a id="property-stage2topk"></a> `stage2TopK?` | `readonly` | `number` | Per-list candidate count fed into Stage 2. Default `5` (RB-02 §8.1). | packages/memory/src/conflict/types.ts:110 |
-| <a id="property-thresholds"></a> `thresholds?` | `readonly` | `Partial`\&lt;[`ConflictThresholds`](/api/@graphorin/memory/interfaces/ConflictThresholds.md)\&gt; | - | packages/memory/src/conflict/types.ts:107 |
+| <a id="property-thresholds"></a> `thresholds?` | `readonly` | `Partial`\<[`ConflictThresholds`](/api/@graphorin/memory/interfaces/ConflictThresholds.md)\> | - | packages/memory/src/conflict/types.ts:107 |

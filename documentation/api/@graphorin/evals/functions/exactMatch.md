@@ -29,6 +29,6 @@ Build an exact-match scorer.
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, `O`\>
 
 ## Stable

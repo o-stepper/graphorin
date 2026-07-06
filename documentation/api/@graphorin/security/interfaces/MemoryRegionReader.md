@@ -18,5 +18,5 @@ raw bytes / a string for hashing.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-read"></a> `read` | `readonly` | (`region`) => `Promise`\<`string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt;\> | Materialise the named region as bytes. | packages/security/src/guard/types.ts:76 |
+| <a id="property-read"></a> `read` | `readonly` | (`region`) => `Promise`\<`string` \| `Uint8Array`\<`ArrayBufferLike`\>\> | Materialise the named region as bytes. | packages/security/src/guard/types.ts:76 |
 | <a id="property-regions"></a> `regions` | `readonly` | readonly `string`[] | Stable list of region names the guard should snapshot. | packages/security/src/guard/types.ts:74 |

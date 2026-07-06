@@ -17,7 +17,7 @@ Options accepted by `OAuthClient.authorizeCode(...)`.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-callbacktimeoutms"></a> `callbackTimeoutMs?` | `readonly` | `number` | Maximum time spent waiting for the callback. Defaults to 5 min. | packages/security/src/oauth/types.ts:206 |
-| <a id="property-openauthorizationurl"></a> `openAuthorizationUrl?` | `readonly` | (`url`, `signal?`) => `void` \| `Promise`\&lt;`void`\&gt; | Function to render the authorization URL to the user. Defaults to `openInBrowser(url)` plus a console fallback. Consumers can plug in their own UI. | packages/security/src/oauth/types.ts:199 |
+| <a id="property-openauthorizationurl"></a> `openAuthorizationUrl?` | `readonly` | (`url`, `signal?`) => `void` \| `Promise`\<`void`\> | Function to render the authorization URL to the user. Defaults to `openInBrowser(url)` plus a console fallback. Consumers can plug in their own UI. | packages/security/src/oauth/types.ts:199 |
 | <a id="property-portrange"></a> `portRange?` | `readonly` | readonly \[`number`, `number`\] | Override the localhost port range. Inclusive on both ends. Defaults to `[49152, 65535]`. | packages/security/src/oauth/types.ts:204 |
 | <a id="property-redirecturi"></a> `redirectUri?` | `readonly` | `string` | Pre-existing redirect URI. When omitted the client will spin up a localhost callback server on a random port in `49152-65535` and use `http://127.0.0.1:<port>/callback`. | packages/security/src/oauth/types.ts:193 |
 | <a id="property-scope"></a> `scope?` | `readonly` | `string` | - | packages/security/src/oauth/types.ts:187 |

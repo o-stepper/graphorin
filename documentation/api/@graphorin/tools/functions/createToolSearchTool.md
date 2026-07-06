@@ -22,6 +22,6 @@ Build a `tool_search` tool bound to a specific registry.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ToolSearchInput`, `ToolSearchOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`ToolSearchInput`, `ToolSearchOutput`\>
 
 ## Stable

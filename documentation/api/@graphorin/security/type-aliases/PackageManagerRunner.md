@@ -22,8 +22,8 @@ actually shelling out.
 
 | Parameter | Type |
 | ------ | ------ |
-| `args` | \{ `args`: `ReadonlyArray`\&lt;`string`\&gt;; `command`: `string`; `cwd?`: `string`; `env?`: `NodeJS.ProcessEnv`; `signal?`: `AbortSignal`; \} |
-| `args.args` | `ReadonlyArray`\&lt;`string`\&gt; |
+| `args` | \{ `args`: `ReadonlyArray`\<`string`\>; `command`: `string`; `cwd?`: `string`; `env?`: `NodeJS.ProcessEnv`; `signal?`: `AbortSignal`; \} |
+| `args.args` | `ReadonlyArray`\<`string`\> |
 | `args.command` | `string` |
 | `args.cwd?` | `string` |
 | `args.env?` | `NodeJS.ProcessEnv` |
@@ -31,4 +31,4 @@ actually shelling out.
 
 ## Returns
 
-`Promise`\&lt;[`PackageManagerResult`](/api/@graphorin/security/interfaces/PackageManagerResult.md)\&gt;
+`Promise`\<[`PackageManagerResult`](/api/@graphorin/security/interfaces/PackageManagerResult.md)\>

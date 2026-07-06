@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [fanout](/api/@graphorin/agent/fanout/index.md) / ChildResult
 
-# Interface: ChildResult\&lt;TOutput\&gt;
+# Interface: ChildResult\<TOutput\>
 
 Defined in: packages/agent/src/fanout/index.ts:76
 

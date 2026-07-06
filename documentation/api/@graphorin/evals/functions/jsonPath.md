@@ -26,6 +26,6 @@ Defined in: evals/src/scorers/code/json-path.ts:22
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `unknown`\&gt;
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, `unknown`\>
 
 ## Stable

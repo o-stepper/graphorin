@@ -26,6 +26,6 @@ actionable hint.
 
 ## Returns
 
-`Promise`\&lt;`StorageEncryptResult`\&gt;
+`Promise`\<`StorageEncryptResult`\>
 
 ## Stable

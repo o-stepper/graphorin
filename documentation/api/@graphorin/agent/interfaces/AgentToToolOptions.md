@@ -6,7 +6,7 @@
 
 # Interface: AgentToToolOptions
 
-Defined in: packages/agent/src/types.ts:509
+Defined in: packages/agent/src/types.ts:510
 
 `agent.toTool({...})` options.
 
@@ -16,11 +16,11 @@ Defined in: packages/agent/src/types.ts:509
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-capability"></a> `capability?` | `readonly` | `"read-only"` | Run the sub-agent under a restricted capability (D2): a `'read-only'` worker cannot execute or advertise writer tools. The orchestrator-worker recipe is `parent (full capability) + workers via toTool({ capability: 'read-only', contextFold: true })`. | packages/agent/src/types.ts:531 |
-| <a id="property-contextfold"></a> `contextFold?` | `readonly` | \| `boolean` \| \{ `maxChars?`: `number`; \} | Context folding at the sub-agent boundary (D2): instead of the raw final output, the parent receives a compact distilled outcome - status, step/tool-call counts, tools used, and the final text clamped to `maxChars` (default 2000). Keeps tool-heavy child runs from flooding the parent window. Default off (raw output). | packages/agent/src/types.ts:539 |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | - | packages/agent/src/types.ts:511 |
-| <a id="property-exposeturns"></a> `exposeTurns?` | `readonly` | `"none"` \| `"all"` \| `"final"` | - | packages/agent/src/types.ts:512 |
-| <a id="property-forwardevents"></a> `forwardEvents?` | `readonly` | `SubagentForwardPolicy` | W-036: which child events forward into the parent stream. | packages/agent/src/types.ts:524 |
-| <a id="property-inputfilter"></a> `inputFilter?` | `readonly` | [`HandoffFilter`](/api/@graphorin/core/type-aliases/HandoffFilter.md) | Shapes the sub-agent seed from the parent history (AG-17): when supplied, the sub-agent is seeded with `[...inputFilter(parentMessages), { role: 'user', content: input }]`. Without a filter the sub-agent sees ONLY the input string - no parent conversation crosses the boundary (least authority by construction; there is no secret-inheritance mechanism at this boundary at all). | packages/agent/src/types.ts:522 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | - | packages/agent/src/types.ts:510 |
-| <a id="property-propagatetaint"></a> `propagateTaint?` | `readonly` | `boolean` | Propagate the child run's coarse taint flags across the fold (D2, default `true`): when the child saw untrusted / sensitive content, the tool result carries a widen-only `taint` override (`sourceKind: 'sub-agent'`) that re-arms the PARENT's data-flow ledger. A no-op when the parent has no `dataFlowPolicy`. Set `false` only for children whose inputs are fully trusted. | packages/agent/src/types.ts:548 |
+| <a id="property-capability"></a> `capability?` | `readonly` | `"read-only"` | Run the sub-agent under a restricted capability (D2): a `'read-only'` worker cannot execute or advertise writer tools. The orchestrator-worker recipe is `parent (full capability) + workers via toTool({ capability: 'read-only', contextFold: true })`. | packages/agent/src/types.ts:532 |
+| <a id="property-contextfold"></a> `contextFold?` | `readonly` | \| `boolean` \| \{ `maxChars?`: `number`; \} | Context folding at the sub-agent boundary (D2): instead of the raw final output, the parent receives a compact distilled outcome - status, step/tool-call counts, tools used, and the final text clamped to `maxChars` (default 2000). Keeps tool-heavy child runs from flooding the parent window. Default off (raw output). | packages/agent/src/types.ts:540 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | - | packages/agent/src/types.ts:512 |
+| <a id="property-exposeturns"></a> `exposeTurns?` | `readonly` | `"none"` \| `"all"` \| `"final"` | - | packages/agent/src/types.ts:513 |
+| <a id="property-forwardevents"></a> `forwardEvents?` | `readonly` | `SubagentForwardPolicy` | W-036: which child events forward into the parent stream. | packages/agent/src/types.ts:525 |
+| <a id="property-inputfilter"></a> `inputFilter?` | `readonly` | [`HandoffFilter`](/api/@graphorin/core/type-aliases/HandoffFilter.md) | Shapes the sub-agent seed from the parent history (AG-17): when supplied, the sub-agent is seeded with `[...inputFilter(parentMessages), { role: 'user', content: input }]`. Without a filter the sub-agent sees ONLY the input string - no parent conversation crosses the boundary (least authority by construction; there is no secret-inheritance mechanism at this boundary at all). | packages/agent/src/types.ts:523 |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | - | packages/agent/src/types.ts:511 |
+| <a id="property-propagatetaint"></a> `propagateTaint?` | `readonly` | `boolean` | Propagate the child run's coarse taint flags across the fold (D2, default `true`): when the child saw untrusted / sensitive content, the tool result carries a widen-only `taint` override (`sourceKind: 'sub-agent'`) that re-arms the PARENT's data-flow ledger. A no-op when the parent has no `dataFlowPolicy`. Set `false` only for children whose inputs are fully trusted. | packages/agent/src/types.ts:549 |

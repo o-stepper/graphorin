@@ -14,7 +14,7 @@ Wire twin of [FileContent](/api/@graphorin/core/interfaces/FileContent.md).
 
 ## Extends
 
-- `Omit`\&lt;[`FileContent`](/api/@graphorin/core/interfaces/FileContent.md), `"file"`\&gt;
+- `Omit`\<[`FileContent`](/api/@graphorin/core/interfaces/FileContent.md), `"file"`\>
 
 ## Properties
 

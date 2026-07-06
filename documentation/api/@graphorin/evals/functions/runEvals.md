@@ -23,10 +23,10 @@ Defined in: evals/src/runner.ts:24
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`RunOptions`](/api/@graphorin/evals/interfaces/RunOptions.md)\&lt;`I`, `O`\&gt; |
+| `opts` | [`RunOptions`](/api/@graphorin/evals/interfaces/RunOptions.md)\<`I`, `O`\> |
 
 ## Returns
 
-`Promise`\<[`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
+`Promise`\<[`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\<`I`, `O`\>\>
 
 ## Stable

@@ -29,6 +29,6 @@ the diagnostics channel of `AsyncLocalStorage` (debugging only).
 
 ## Returns
 
-[`AsyncContext`](/api/@graphorin/core/interfaces/AsyncContext.md)\&lt;`T`\&gt;
+[`AsyncContext`](/api/@graphorin/core/interfaces/AsyncContext.md)\<`T`\>
 
 ## Stable

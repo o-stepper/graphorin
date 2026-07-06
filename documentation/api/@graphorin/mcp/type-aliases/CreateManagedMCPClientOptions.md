@@ -21,7 +21,7 @@ Options for [createManagedMCPClient](/api/@graphorin/mcp/functions/createManaged
 
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| `_clientFactory()?` | (`options`) => `Promise`\&lt;[`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)\&gt; | **`Internal`** Client factory seam - tests inject fake inner clients; production uses [createMCPClient](/api/@graphorin/mcp/functions/createMCPClient.md). | packages/mcp/src/client/managed.ts:56 |
+| `_clientFactory()?` | (`options`) => `Promise`\<[`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)\> | **`Internal`** Client factory seam - tests inject fake inner clients; production uses [createMCPClient](/api/@graphorin/mcp/functions/createMCPClient.md). | packages/mcp/src/client/managed.ts:56 |
 | `reconnect?` | [`ManagedReconnectOptions`](/api/@graphorin/mcp/interfaces/ManagedReconnectOptions.md) | - | packages/mcp/src/client/managed.ts:49 |
 
 ## Stable

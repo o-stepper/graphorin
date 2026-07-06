@@ -29,6 +29,6 @@ Construct an `AnyValue` channel.
 
 ## Returns
 
-[`AnyValue`](/api/@graphorin/core/interfaces/AnyValue.md)\&lt;`T`\&gt;
+[`AnyValue`](/api/@graphorin/core/interfaces/AnyValue.md)\<`T`\>
 
 ## Stable

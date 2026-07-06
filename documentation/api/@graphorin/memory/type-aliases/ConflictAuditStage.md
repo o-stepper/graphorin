@@ -15,7 +15,7 @@ type ConflictAuditStage =
   | "defer-to-deep";
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:260
+Defined in: packages/memory/src/internal/storage-adapter.ts:273
 
 Stable lowercase identifier for the pipeline stage that produced a
 conflict decision. Mirrored byte-for-byte by

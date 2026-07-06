@@ -25,6 +25,6 @@ supplied AbortSignal fires first.
 
 ## Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ## Stable

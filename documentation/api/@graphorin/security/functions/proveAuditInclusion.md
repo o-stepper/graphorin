@@ -28,6 +28,6 @@ the head of size `head.size`. Throws when the entry is not covered.
 
 ## Returns
 
-`Promise`\&lt;[`AuditInclusionProof`](/api/@graphorin/security/interfaces/AuditInclusionProof.md)\&gt;
+`Promise`\<[`AuditInclusionProof`](/api/@graphorin/security/interfaces/AuditInclusionProof.md)\>
 
 ## Stable

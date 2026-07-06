@@ -25,6 +25,6 @@ reachable via `asOf` / inspector paths.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactSupersedeInput`, `FactSupersedeOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`FactSupersedeInput`, `FactSupersedeOutput`\>
 
 ## Stable

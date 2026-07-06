@@ -6,7 +6,7 @@
 
 # Interface: TokenCounter
 
-Defined in: packages/tools/src/result/truncate.ts:28
+Defined in: packages/tools/src/result/truncate.ts:29
 
 Pluggable token counter used by the truncation pipeline. Defaults
 to [countTokensHeuristic](/api/@graphorin/tools/variables/countTokensHeuristic.md) (4 chars per token) when no custom
@@ -23,7 +23,7 @@ counter from `@graphorin/provider/counters`.
 count(text): number;
 ```
 
-Defined in: packages/tools/src/result/truncate.ts:29
+Defined in: packages/tools/src/result/truncate.ts:30
 
 #### Parameters
 

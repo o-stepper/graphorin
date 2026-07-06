@@ -42,7 +42,7 @@ Defined in: packages/server/src/registry/index.ts:30
 
 #### Returns
 
-`Promise`\&lt;`unknown`\&gt;
+`Promise`\<`unknown`\>
 
 ***
 
@@ -71,4 +71,4 @@ run-only fixtures keep working (they emit a single terminal frame).
 
 #### Returns
 
-`AsyncIterable`\&lt;`unknown`\&gt;
+`AsyncIterable`\<`unknown`\>

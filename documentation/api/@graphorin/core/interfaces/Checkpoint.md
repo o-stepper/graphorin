@@ -17,7 +17,7 @@ step.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-channelversions"></a> `channelVersions` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Per-channel monotonic versions used by the workflow scheduler. | packages/core/src/contracts/checkpoint-store.ts:24 |
+| <a id="property-channelversions"></a> `channelVersions` | `readonly` | `Readonly`\<`Record`\<`string`, `number`\>\> | Per-channel monotonic versions used by the workflow scheduler. | packages/core/src/contracts/checkpoint-store.ts:24 |
 | <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:26 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:17 |
 | <a id="property-namespace"></a> `namespace` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:19 |

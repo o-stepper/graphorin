@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / Dataset
 
-# Interface: Dataset\&lt;I, O, M\&gt;
+# Interface: Dataset\<I, O, M\>
 
 Defined in: observability/dist/eval/types.d.ts:23
 
@@ -16,13 +16,13 @@ Defined in: observability/dist/eval/types.d.ts:23
 | ------ | ------ |
 | `I` | - |
 | `O` | `unknown` |
-| `M` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `M` | `Readonly`\<`Record`\<`string`, `unknown`\>\> |
 
 ## Properties
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cases"></a> `cases` | `readonly` | readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`I`, `O`, `M`\&gt;[] | observability/dist/eval/types.d.ts:24 |
+| <a id="property-cases"></a> `cases` | `readonly` | readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `M`\>[] | observability/dist/eval/types.d.ts:24 |
 | <a id="property-metadata"></a> `metadata?` | `readonly` | \{ `createdAt?`: `Date`; `description?`: `string`; `name?`: `string`; \} | observability/dist/eval/types.d.ts:25 |
 | `metadata.createdAt?` | `readonly` | `Date` | observability/dist/eval/types.d.ts:28 |
 | `metadata.description?` | `readonly` | `string` | observability/dist/eval/types.d.ts:27 |

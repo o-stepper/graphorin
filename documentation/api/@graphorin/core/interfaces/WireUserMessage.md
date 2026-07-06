@@ -14,7 +14,7 @@ Wire twin of [UserMessage](/api/@graphorin/core/interfaces/UserMessage.md).
 
 ## Extends
 
-- `Omit`\&lt;[`UserMessage`](/api/@graphorin/core/interfaces/UserMessage.md), `"content"`\&gt;
+- `Omit`\<[`UserMessage`](/api/@graphorin/core/interfaces/UserMessage.md), `"content"`\>
 
 ## Properties
 

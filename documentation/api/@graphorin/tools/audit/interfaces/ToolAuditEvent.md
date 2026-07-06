@@ -26,6 +26,6 @@ matched bytes, the secret values are NEVER forwarded.
 | `context.stepNumber?` | `readonly` | `number` | packages/tools/src/audit/index.ts:112 |
 | `context.toolCallId?` | `readonly` | `string` | packages/tools/src/audit/index.ts:113 |
 | <a id="property-decision"></a> `decision` | `readonly` | [`ToolAuditDecision`](/api/@graphorin/tools/audit/type-aliases/ToolAuditDecision.md) | packages/tools/src/audit/index.ts:107 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/tools/src/audit/index.ts:115 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/tools/src/audit/index.ts:115 |
 | <a id="property-target"></a> `target` | `readonly` | `string` | packages/tools/src/audit/index.ts:106 |
 | <a id="property-ts"></a> `ts` | `readonly` | `number` | packages/tools/src/audit/index.ts:108 |

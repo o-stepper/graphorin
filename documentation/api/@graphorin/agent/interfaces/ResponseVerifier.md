@@ -6,15 +6,16 @@
 
 # Interface: ResponseVerifier
 
-Defined in: packages/agent/src/types.ts:407
+Defined in: packages/agent/src/types.ts:408
 
 A deterministic check over the model's terminal response (C3). Runs
 when the loop is about to complete; `ok: false` feeds `feedback` back
 to the model (as a user message prefixed `[verifier:<id>]`) and the
 loop continues for up to `AgentConfig.maxVerifierRounds` extra rounds.
 
-A verifier that THROWS is treated as passed (and logged): a buggy
-verifier must never take down a run.
+A verifier that THROWS is treated as passed (the `verifier.result`
+event still fires with `ok: true`): a buggy verifier must never
+take down a run.
 
 ## Stable
 
@@ -22,7 +23,7 @@ verifier must never take down a run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:408 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:409 |
 
 ## Methods
 
@@ -34,7 +35,7 @@ verify(ctx):
 | Promise<VerifierResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:409
+Defined in: packages/agent/src/types.ts:410
 
 #### Parameters
 
@@ -48,4 +49,4 @@ Defined in: packages/agent/src/types.ts:409
 #### Returns
 
   \| [`VerifierResult`](/api/@graphorin/agent/type-aliases/VerifierResult.md)
-  \| `Promise`\&lt;[`VerifierResult`](/api/@graphorin/agent/type-aliases/VerifierResult.md)\&gt;
+  \| `Promise`\<[`VerifierResult`](/api/@graphorin/agent/type-aliases/VerifierResult.md)\>

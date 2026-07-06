@@ -29,6 +29,6 @@ instance per `Memory`).
 
 ## Returns
 
-`Promise`\&lt;[`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md)\&gt;
+`Promise`\<[`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md)\>
 
 ## Stable

@@ -26,6 +26,6 @@ the (quarantined) insights that cite it. Pure read-only inspection.
 
 ## Returns
 
-`Promise`\&lt;[`MemoryInspectResult`](/api/@graphorin/cli/interfaces/MemoryInspectResult.md)\&gt;
+`Promise`\<[`MemoryInspectResult`](/api/@graphorin/cli/interfaces/MemoryInspectResult.md)\>
 
 ## Stable

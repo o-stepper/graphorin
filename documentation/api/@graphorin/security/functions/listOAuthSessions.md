@@ -24,6 +24,6 @@ List the audit-safe metadata of every persisted OAuth session.
 
 ## Returns
 
-`Promise`\&lt;readonly [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md)[]\&gt;
+`Promise`\<readonly [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md)[]\>
 
 ## Stable

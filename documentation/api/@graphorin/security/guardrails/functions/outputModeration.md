@@ -28,6 +28,6 @@ Construct an output-side moderation guardrail.
 
 ## Returns
 
-[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`TValue`\&gt;
+[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\<`TValue`\>
 
 ## Stable

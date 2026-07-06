@@ -32,6 +32,6 @@ returns an error.
 
 ## Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ## Stable

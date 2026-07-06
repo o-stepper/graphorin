@@ -26,4 +26,4 @@ Strategy hook used by tests so the unit suite never fetches a real
 
 ## Returns
 
-`Promise`\&lt;`string`\&gt;
+`Promise`\<`string`\>

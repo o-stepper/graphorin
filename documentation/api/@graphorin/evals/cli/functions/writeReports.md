@@ -26,10 +26,10 @@ file. Returns the manifest of written files.
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`WriteReportsOptions`](/api/@graphorin/evals/cli/interfaces/WriteReportsOptions.md)\&lt;`I`, `O`\&gt; |
+| `options` | [`WriteReportsOptions`](/api/@graphorin/evals/cli/interfaces/WriteReportsOptions.md)\<`I`, `O`\> |
 
 ## Returns
 
-`Promise`\&lt;readonly [`WrittenReport`](/api/@graphorin/evals/cli/interfaces/WrittenReport.md)[]\&gt;
+`Promise`\<readonly [`WrittenReport`](/api/@graphorin/evals/cli/interfaces/WrittenReport.md)[]\>
 
 ## Stable

@@ -20,7 +20,7 @@ deployments wire this into their structured logger.
 | Parameter | Type |
 | ------ | ------ |
 | `err` | `unknown` |
-| `entry` | `Omit`\&lt;[`AuditEntryInput`](/api/@graphorin/security/interfaces/AuditEntryInput.md), `"ts"`\&gt; |
+| `entry` | `Omit`\<[`AuditEntryInput`](/api/@graphorin/security/interfaces/AuditEntryInput.md), `"ts"`\> |
 
 ## Returns
 

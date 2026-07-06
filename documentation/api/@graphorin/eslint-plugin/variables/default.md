@@ -34,9 +34,9 @@ can `...plugin.configs['flat/recommended']` instead of hand-wiring ten rules.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| <a id="property-configs"></a> `configs` | \{ `flat/recommended`: \{ `plugins`: `Record`\&lt;`string`, `unknown`\&gt;; `rules`: *typeof* `RECOMMENDED_RULES`; \}; `recommended`: \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \}; \} | src/index.ts:76 |
-| `configs.flat/recommended` | \{ `plugins`: `Record`\&lt;`string`, `unknown`\&gt;; `rules`: *typeof* `RECOMMENDED_RULES`; \} | src/index.ts:81 |
-| `configs.flat/recommended.plugins` | `Record`\&lt;`string`, `unknown`\&gt; | src/index.ts:82 |
+| <a id="property-configs"></a> `configs` | \{ `flat/recommended`: \{ `plugins`: `Record`\<`string`, `unknown`\>; `rules`: *typeof* `RECOMMENDED_RULES`; \}; `recommended`: \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \}; \} | src/index.ts:76 |
+| `configs.flat/recommended` | \{ `plugins`: `Record`\<`string`, `unknown`\>; `rules`: *typeof* `RECOMMENDED_RULES`; \} | src/index.ts:81 |
+| `configs.flat/recommended.plugins` | `Record`\<`string`, `unknown`\> | src/index.ts:82 |
 | `configs.flat/recommended.rules` | *typeof* `RECOMMENDED_RULES` | src/index.ts:83 |
 | `configs.recommended` | \{ `plugins`: readonly `string`[]; `rules`: *typeof* `RECOMMENDED_RULES`; \} | src/index.ts:77 |
 | `configs.recommended.plugins` | readonly `string`[] | src/index.ts:78 |

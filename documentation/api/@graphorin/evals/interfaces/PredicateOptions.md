@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / PredicateOptions
 
-# Interface: PredicateOptions\&lt;I, O\&gt;
+# Interface: PredicateOptions\<I, O\>
 
 Defined in: evals/src/scorers/code/predicate.ts:11
 
@@ -21,5 +21,5 @@ Defined in: evals/src/scorers/code/predicate.ts:11
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`args`) => \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md) \| `Promise`\&lt; \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md)\&gt; | evals/src/scorers/code/predicate.ts:13 |
+| <a id="property-check"></a> `check` | `readonly` | (`args`) => \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md) \| `Promise`\< \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md)\> | evals/src/scorers/code/predicate.ts:13 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | evals/src/scorers/code/predicate.ts:12 |

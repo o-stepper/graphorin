@@ -6,7 +6,7 @@
 
 # Interface: GraphMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:793
+Defined in: packages/memory/src/internal/storage-adapter.ts:820
 
 Optional storage extension for the lightweight in-SQLite relation
 graph (P2-1). Owns the canonical `entities` table, the `fact_entities`
@@ -35,7 +35,7 @@ optional expandActivation(
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:844
+Defined in: packages/memory/src/internal/storage-adapter.ts:871
 
 PPR-lite graded expansion (D5): like [expandOneHop](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md#expandonehop) but returns
 each neighbour with its minimum hop `depth` from the seeds, so the
@@ -68,7 +68,7 @@ expandOneHop(
 opts?): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:833
+Defined in: packages/memory/src/internal/storage-adapter.ts:860
 
 Expand seed facts to neighbours sharing a canonical entity (one-hop CTE).
 
@@ -82,7 +82,7 @@ Expand seed facts to neighbours sharing a canonical entity (one-hop CTE).
 
 #### Returns
 
-`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
+`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
 
 ***
 
@@ -95,11 +95,11 @@ optional factsForEntityName(
 opts?): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:854
+Defined in: packages/memory/src/internal/storage-adapter.ts:881
 
 Exact entity-match retriever (D5): facts linked to the canonical
 entity for `normalizedName`. Optional. Powers a precise
-"facts about &lt;entity&gt;" candidate leg.
+"facts about <entity>" candidate leg.
 
 #### Parameters
 
@@ -111,7 +111,7 @@ entity for `normalizedName`. Optional. Powers a precise
 
 #### Returns
 
-`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
+`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
 
 ***
 
@@ -121,7 +121,7 @@ entity for `normalizedName`. Optional. Powers a precise
 optional findEntityByNormalizedName(scope, normalizedName): Promise<EntityWithEmbedding | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:810
+Defined in: packages/memory/src/internal/storage-adapter.ts:837
 
 Uncapped indexed lookup of the canonical root for an exact normalized
 name. Lets the resolver dedup an exact alias of an arbitrarily-old
@@ -138,7 +138,7 @@ it fall back to the capped lexical scan inside `resolveEntityDecision`.
 
 #### Returns
 
-`Promise`\&lt;`EntityWithEmbedding` \| `null`\&gt;
+`Promise`\<`EntityWithEmbedding` \| `null`\>
 
 ***
 
@@ -148,7 +148,7 @@ it fall back to the capped lexical scan inside `resolveEntityDecision`.
 getEntity(scope, id): Promise<GraphEntity | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:815
+Defined in: packages/memory/src/internal/storage-adapter.ts:842
 
 Lookup one entity by id (any merge state).
 
@@ -161,7 +161,7 @@ Lookup one entity by id (any merge state).
 
 #### Returns
 
-`Promise`\&lt;[`GraphEntity`](/api/@graphorin/core/interfaces/GraphEntity.md) \| `null`\&gt;
+`Promise`\<[`GraphEntity`](/api/@graphorin/core/interfaces/GraphEntity.md) \| `null`\>
 
 ***
 
@@ -174,7 +174,7 @@ linkFactEntity(
 role): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:797
+Defined in: packages/memory/src/internal/storage-adapter.ts:824
 
 Link a fact's subject / object to a canonical entity (idempotent).
 
@@ -188,7 +188,7 @@ Link a fact's subject / object to a canonical entity (idempotent).
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -198,7 +198,7 @@ Link a fact's subject / object to a canonical entity (idempotent).
 listEntities(scope, opts?): Promise<readonly EntityWithEmbedding[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:799
+Defined in: packages/memory/src/internal/storage-adapter.ts:826
 
 Candidate entities for the resolver (roots only unless `includeMerged`).
 
@@ -213,7 +213,7 @@ Candidate entities for the resolver (roots only unless `includeMerged`).
 
 #### Returns
 
-`Promise`\&lt;readonly `EntityWithEmbedding`[]\&gt;
+`Promise`\<readonly `EntityWithEmbedding`[]\>
 
 ***
 
@@ -223,7 +223,7 @@ Candidate entities for the resolver (roots only unless `includeMerged`).
 listMerges(scope, opts?): Promise<readonly EntityMergeRecord[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:828
+Defined in: packages/memory/src/internal/storage-adapter.ts:855
 
 The append-only merge / unmerge ledger, newest first.
 
@@ -237,7 +237,7 @@ The append-only merge / unmerge ledger, newest first.
 
 #### Returns
 
-`Promise`\&lt;readonly `EntityMergeRecord`[]\&gt;
+`Promise`\<readonly `EntityMergeRecord`[]\>
 
 ***
 
@@ -251,7 +251,7 @@ mergeEntities(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:819
+Defined in: packages/memory/src/internal/storage-adapter.ts:846
 
 Merge `fromId` into `intoId`'s root; auditable + reversible.
 
@@ -266,7 +266,7 @@ Merge `fromId` into `intoId`'s root; auditable + reversible.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -276,7 +276,7 @@ Merge `fromId` into `intoId`'s root; auditable + reversible.
 resolveCanonical(scope, id): Promise<string>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:817
+Defined in: packages/memory/src/internal/storage-adapter.ts:844
 
 Follow `mergedInto` to the canonical root id.
 
@@ -289,7 +289,7 @@ Follow `mergedInto` to the canonical root id.
 
 #### Returns
 
-`Promise`\&lt;`string`\&gt;
+`Promise`\<`string`\>
 
 ***
 
@@ -302,7 +302,7 @@ unmergeEntity(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:826
+Defined in: packages/memory/src/internal/storage-adapter.ts:853
 
 Reverse a merge: make `id` a root again + record an audit row.
 
@@ -316,7 +316,7 @@ Reverse a merge: make `id` a root again + record an audit row.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -326,7 +326,7 @@ Reverse a merge: make `id` a root again + record an audit row.
 upsertEntity(scope, input): Promise<string>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:795
+Defined in: packages/memory/src/internal/storage-adapter.ts:822
 
 Find-or-create the canonical (root) entity for the normalized name.
 
@@ -339,4 +339,4 @@ Find-or-create the canonical (root) entity for the normalized name.
 
 #### Returns
 
-`Promise`\&lt;`string`\&gt;
+`Promise`\<`string`\>

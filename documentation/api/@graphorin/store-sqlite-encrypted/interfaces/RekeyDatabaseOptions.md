@@ -17,6 +17,6 @@ Options for [rekeyDatabase](/api/@graphorin/store-sqlite-encrypted/functions/rek
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cipher"></a> `cipher?` | `readonly` | [`EncryptionCipher`](/api/@graphorin/store-sqlite-encrypted/type-aliases/EncryptionCipher.md) | Cipher selection. Default `'sqlcipher'`. | packages/store-sqlite-encrypted/src/rekey.ts:39 |
-| <a id="property-newpassphrase"></a> `newPassphrase` | `readonly` | `string` \| `Buffer`\&lt;`ArrayBufferLike`\&gt; | New passphrase to apply. | packages/store-sqlite-encrypted/src/rekey.ts:37 |
-| <a id="property-oldpassphrase"></a> `oldPassphrase` | `readonly` | `string` \| `Buffer`\&lt;`ArrayBufferLike`\&gt; | Existing passphrase the DB is currently encrypted with. | packages/store-sqlite-encrypted/src/rekey.ts:35 |
+| <a id="property-newpassphrase"></a> `newPassphrase` | `readonly` | `string` \| `Buffer`\<`ArrayBufferLike`\> | New passphrase to apply. | packages/store-sqlite-encrypted/src/rekey.ts:37 |
+| <a id="property-oldpassphrase"></a> `oldPassphrase` | `readonly` | `string` \| `Buffer`\<`ArrayBufferLike`\> | Existing passphrase the DB is currently encrypted with. | packages/store-sqlite-encrypted/src/rekey.ts:35 |
 | <a id="property-path"></a> `path` | `readonly` | `string` | Path to the encrypted DB. | packages/store-sqlite-encrypted/src/rekey.ts:33 |

@@ -24,6 +24,6 @@ than once.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockReplaceInput`, `BlockReplaceOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`BlockReplaceInput`, `BlockReplaceOutput`\>
 
 ## Stable

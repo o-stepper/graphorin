@@ -24,6 +24,6 @@ resolver chain.
 
 ## Returns
 
-`Promise`\&lt;[`SecretsRefResult`](/api/@graphorin/cli/interfaces/SecretsRefResult.md)\&gt;
+`Promise`\<[`SecretsRefResult`](/api/@graphorin/cli/interfaces/SecretsRefResult.md)\>
 
 ## Stable

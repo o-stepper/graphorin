@@ -31,7 +31,7 @@ Strategy hook used by tests to inject a synthetic registration response.
 ## Returns
 
 `Promise`\<\{
-  `json`: () => `Promise`\&lt;`unknown`\&gt;;
+  `json`: () => `Promise`\<`unknown`\>;
   `ok`: `boolean`;
   `status`: `number`;
   `statusText?`: `string`;

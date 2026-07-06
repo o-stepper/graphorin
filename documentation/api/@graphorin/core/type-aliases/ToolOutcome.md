@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ToolOutcome
 
-# Type Alias: ToolOutcome\&lt;TOutput\&gt;
+# Type Alias: ToolOutcome\<TOutput\>
 
 ```ts
 type ToolOutcome<TOutput> = 

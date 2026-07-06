@@ -30,7 +30,7 @@ Emit the footer + any opt-in `--hash` body checksum. Idempotent.
 
 #### Returns
 
-`Promise`\&lt;[`SessionExportFooterRecord`](/api/@graphorin/sessions/interfaces/SessionExportFooterRecord.md)\&gt;
+`Promise`\<[`SessionExportFooterRecord`](/api/@graphorin/sessions/interfaces/SessionExportFooterRecord.md)\>
 
 ***
 
@@ -52,4 +52,4 @@ Write a single body record. The header is emitted lazily.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

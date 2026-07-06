@@ -281,11 +281,11 @@ scopes the V8 string literal to a single call.
 
 | Parameter | Type |
 | ------ | ------ |
-| `fn` | (`raw`) => `T` \| `Promise`\&lt;`T`\&gt; |
+| `fn` | (`raw`) => `T` \| `Promise`\<`T`\> |
 
 #### Returns
 
-`Promise`\&lt;`T`\&gt;
+`Promise`\<`T`\>
 
 #### Stable
 
@@ -317,11 +317,11 @@ through a V8 string would defeat the wrapper's hygiene.
 
 | Parameter | Type |
 | ------ | ------ |
-| `fn` | (`buf`) => `T` \| `Promise`\&lt;`T`\&gt; |
+| `fn` | (`buf`) => `T` \| `Promise`\<`T`\> |
 
 #### Returns
 
-`Promise`\&lt;`T`\&gt;
+`Promise`\<`T`\>
 
 #### Stable
 

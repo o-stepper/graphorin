@@ -41,9 +41,9 @@ engine wires it up around the resumed node body.
 | Parameter | Type |
 | ------ | ------ |
 | `values` | readonly `unknown`[] |
-| `fn` | () => `R` \| `Promise`\&lt;`R`\&gt; |
+| `fn` | () => `R` \| `Promise`\<`R`\> |
 | `meta?` | readonly ( \| [`PauseIdentity`](/api/@graphorin/core/interfaces/PauseIdentity.md) \| `null` \| `undefined`)[] |
 
 ## Returns
 
-`Promise`\&lt;`R`\&gt;
+`Promise`\<`R`\>

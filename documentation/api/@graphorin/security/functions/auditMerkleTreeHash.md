@@ -19,7 +19,7 @@ tree hashes to `SHA-256()` per the RFC.
 
 | Parameter | Type |
 | ------ | ------ |
-| `leaves` | readonly `Buffer`\&lt;`ArrayBufferLike`\&gt;[] |
+| `leaves` | readonly `Buffer`\<`ArrayBufferLike`\>[] |
 
 ## Returns
 

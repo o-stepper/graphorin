@@ -23,6 +23,6 @@ block.
 
 ## Returns
 
-`Record`\&lt;`string`, `unknown`\&gt;
+`Record`\<`string`, `unknown`\>
 
 ## Stable

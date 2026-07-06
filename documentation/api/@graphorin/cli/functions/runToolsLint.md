@@ -23,6 +23,6 @@ the CLI emits to stdout.
 
 ## Returns
 
-`Promise`\&lt;[`ToolsLintReport`](/api/@graphorin/cli/interfaces/ToolsLintReport.md)\&gt;
+`Promise`\<[`ToolsLintReport`](/api/@graphorin/cli/interfaces/ToolsLintReport.md)\>
 
 ## Stable

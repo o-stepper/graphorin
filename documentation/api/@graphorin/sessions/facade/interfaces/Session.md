@@ -39,11 +39,11 @@ Append a handoff record. RP-2: this does **not** auto-fire from
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\&lt;[`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md), `"at"`\&gt; & \{ `at?`: `string`; \} |
+| `record` | `Omit`\<[`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md), `"at"`\> & \{ `at?`: `string`; \} |
 
 #### Returns
 
-`Promise`\&lt;[`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)\&gt;
+`Promise`\<[`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)\>
 
 ***
 
@@ -61,11 +61,11 @@ Attach a workflow run to this session.
 
 | Parameter | Type |
 | ------ | ------ |
-| `run` | `Omit`\&lt;[`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md), `"sessionId"` \| `"attachedAt"`\&gt; & \{ `attachedAt?`: `string`; \} |
+| `run` | `Omit`\<[`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md), `"sessionId"` \| `"attachedAt"`\> & \{ `attachedAt?`: `string`; \} |
 
 #### Returns
 
-`Promise`\&lt;[`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)\&gt;
+`Promise`\<[`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)\>
 
 ***
 
@@ -88,7 +88,7 @@ Recent audit rows for this session, newest-first.
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\&gt;
+`Promise`\<readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\>
 
 ***
 
@@ -104,7 +104,7 @@ Mark the session closed. Idempotent.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -157,7 +157,7 @@ Stream the session as a JSONL session-export 1.0 document.
 
 #### Returns
 
-`Promise`\&lt;[`SessionExportFooterRecord`](/api/@graphorin/sessions/interfaces/SessionExportFooterRecord.md)\&gt;
+`Promise`\<[`SessionExportFooterRecord`](/api/@graphorin/sessions/interfaces/SessionExportFooterRecord.md)\>
 
 ***
 
@@ -188,7 +188,7 @@ forks remain post-v0.1.
 
 #### Returns
 
-`Promise`\&lt;`Session`\&gt;
+`Promise`\<`Session`\>
 
 ***
 
@@ -211,7 +211,7 @@ Filter handoffs by agent + direction.
 
 #### Returns
 
-`Promise`\&lt;readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\&gt;
+`Promise`\<readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\>
 
 ***
 
@@ -233,7 +233,7 @@ List messages - wraps `memory.session.list(scope, ...)`.
 
 #### Returns
 
-`Promise`\&lt;readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\&gt;
+`Promise`\<readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\>
 
 ***
 
@@ -249,7 +249,7 @@ Every handoff in this session, oldest-first.
 
 #### Returns
 
-`Promise`\&lt;readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\&gt;
+`Promise`\<readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\>
 
 ***
 
@@ -263,7 +263,7 @@ Defined in: packages/sessions/src/facade.ts:182
 
 #### Returns
 
-`Promise`\&lt;[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\&gt;
+`Promise`\<[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\>
 
 ***
 
@@ -285,7 +285,7 @@ Persist a new message - wraps `memory.session.push(scope, ...)`.
 
 #### Returns
 
-`Promise`\&lt;[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\&gt;
+`Promise`\<[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\>
 
 ***
 
@@ -329,11 +329,11 @@ Sanitized-by-default replay.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts?` | [`SessionReplayOptions`](/api/@graphorin/sessions/interfaces/SessionReplayOptions.md) & \{ `liveInvocation?`: (`record`) => `Promise`\&lt;\{ `args`: `unknown`; `idempotencyKey?`: `string`; `validateRecordedOutput?`: (`output`) =&gt; `string` \| `null`; \}\>; `traceSource?`: \| `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> \| `Iterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\>; \} |
+| `opts?` | [`SessionReplayOptions`](/api/@graphorin/sessions/interfaces/SessionReplayOptions.md) & \{ `liveInvocation?`: (`record`) => `Promise`\<\{ `args`: `unknown`; `idempotencyKey?`: `string`; `validateRecordedOutput?`: (`output`) => `string` \| `null`; \}\>; `traceSource?`: \| `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\<[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\>, `any`, `any`\> \| `Iterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\<[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\>, `any`, `any`\>; \} |
 
 #### Returns
 
-`AsyncIterable`\&lt;[`SessionReplayEvent`](/api/@graphorin/sessions/type-aliases/SessionReplayEvent.md)\&gt;
+`AsyncIterable`\<[`SessionReplayEvent`](/api/@graphorin/sessions/type-aliases/SessionReplayEvent.md)\>
 
 ***
 
@@ -358,7 +358,7 @@ Hybrid (FTS5) search over messages - wraps `memory.session.search(...)`.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\>[]\>
 
 ***
 
@@ -385,7 +385,7 @@ Update a workflow run's status.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -401,4 +401,4 @@ List workflow runs attached to this session.
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\&gt;
+`Promise`\<readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\>

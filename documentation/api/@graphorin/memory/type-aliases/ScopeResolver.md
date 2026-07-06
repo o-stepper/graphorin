@@ -28,6 +28,6 @@ standalone callers can pass a fixed scope.
 ## Returns
 
   \| [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md)
-  \| `Promise`\&lt;[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md)\&gt;
+  \| `Promise`\<[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md)\>
 
 ## Stable

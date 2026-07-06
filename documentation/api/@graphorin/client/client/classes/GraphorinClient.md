@@ -77,7 +77,7 @@ resolves with the server's `result` payload (typically
 
 #### Returns
 
-`Promise`\&lt;`unknown`\&gt;
+`Promise`\<`unknown`\>
 
 ***
 
@@ -121,7 +121,7 @@ it during another `connect()` returns the same promise.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -138,7 +138,7 @@ Disconnect the underlying transport and abort every pending RPC
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -154,7 +154,7 @@ Send a `ping` RPC and resolve when the server replies with `pong`.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -188,7 +188,7 @@ implemented yet. Library-mode callers resume directly:
 
 #### Returns
 
-`Promise`\&lt;`unknown`\&gt;
+`Promise`\<`unknown`\>
 
 ***
 
@@ -215,4 +215,4 @@ Subscribe to a server-side event stream. Resolves with a
 
 #### Returns
 
-`Promise`\&lt;[`Subscription`](/api/@graphorin/client/client/interfaces/Subscription.md)\&gt;
+`Promise`\<[`Subscription`](/api/@graphorin/client/client/interfaces/Subscription.md)\>

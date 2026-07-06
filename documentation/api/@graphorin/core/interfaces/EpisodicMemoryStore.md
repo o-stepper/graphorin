@@ -6,7 +6,7 @@
 
 # Interface: EpisodicMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:136
+Defined in: packages/core/src/contracts/memory-store.ts:147
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:136
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:142
+Defined in: packages/core/src/contracts/memory-store.ts:153
 
 #### Parameters
 
@@ -32,7 +32,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:142
 
 #### Returns
 
-`Promise`\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\&gt;
+`Promise`\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\>
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:142
 put(episode): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:137
+Defined in: packages/core/src/contracts/memory-store.ts:148
 
 #### Parameters
 
@@ -52,7 +52,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:137
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:137
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:138
+Defined in: packages/core/src/contracts/memory-store.ts:149
 
 #### Parameters
 
@@ -73,4 +73,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:138
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\>[]\>

@@ -41,4 +41,4 @@ Defined in: packages/memory/src/conflict/types.ts:183
 
 #### Returns
 
-`Promise`\&lt;[`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md)\&gt;
+`Promise`\<[`ConflictDecision`](/api/@graphorin/memory/type-aliases/ConflictDecision.md)\>

@@ -26,6 +26,6 @@ policy so the returned [Skill](/api/@graphorin/skills/interfaces/Skill.md) is re
 
 ## Returns
 
-`Promise`\&lt;[`Skill`](/api/@graphorin/skills/interfaces/Skill.md)\&gt;
+`Promise`\<[`Skill`](/api/@graphorin/skills/interfaces/Skill.md)\>
 
 ## Stable

@@ -36,7 +36,7 @@ Defined in: packages/core/src/contracts/session-store.ts:97
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -56,7 +56,7 @@ Defined in: packages/core/src/contracts/session-store.ts:100
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -77,7 +77,7 @@ Defined in: packages/core/src/contracts/session-store.ts:91
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -97,7 +97,7 @@ Defined in: packages/core/src/contracts/session-store.ts:85
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -141,7 +141,7 @@ Defined in: packages/core/src/contracts/session-store.ts:98
 
 #### Returns
 
-`Promise`\&lt;readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\&gt;
+`Promise`\<readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\>
 
 ***
 
@@ -157,11 +157,11 @@ Defined in: packages/core/src/contracts/session-store.ts:87
 
 | Parameter | Type |
 | ------ | ------ |
-| `scope` | `Pick`\&lt;[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\&gt; |
+| `scope` | `Pick`\<[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\> |
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\&gt;
+`Promise`\<readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\>
 
 ***
 
@@ -181,7 +181,7 @@ Defined in: packages/core/src/contracts/session-store.ts:101
 
 #### Returns
 
-`Promise`\&lt;readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\&gt;
+`Promise`\<readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\>
 
 ***
 
@@ -201,7 +201,7 @@ Defined in: packages/core/src/contracts/session-store.ts:93
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -246,7 +246,7 @@ Defined in: packages/core/src/contracts/session-store.ts:94
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -263,8 +263,8 @@ Defined in: packages/core/src/contracts/session-store.ts:90
 | Parameter | Type |
 | ------ | ------ |
 | `sessionId` | `string` |
-| `patch` | `Partial`\&lt;[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\&gt; |
+| `patch` | `Partial`\<[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\> |
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

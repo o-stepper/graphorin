@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/consolidator.ts:64
 
 ## Returns
 
-`Promise`\&lt;[`ConsolidatorStatusResult`](/api/@graphorin/cli/interfaces/ConsolidatorStatusResult.md)\&gt;
+`Promise`\<[`ConsolidatorStatusResult`](/api/@graphorin/cli/interfaces/ConsolidatorStatusResult.md)\>
 
 ## Stable

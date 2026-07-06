@@ -26,10 +26,10 @@ model-load cost.
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`CrossEncoderRerankerOptions`](/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderRerankerOptions.md)\&lt;`TRecord`\&gt; |
+| `options` | [`CrossEncoderRerankerOptions`](/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderRerankerOptions.md)\<`TRecord`\> |
 
 ## Returns
 
-[`TransformersJsReRanker`](/api/@graphorin/reranker-transformersjs/classes/TransformersJsReRanker.md)\&lt;`TRecord`\&gt;
+[`TransformersJsReRanker`](/api/@graphorin/reranker-transformersjs/classes/TransformersJsReRanker.md)\<`TRecord`\>
 
 ## Stable

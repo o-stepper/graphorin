@@ -33,7 +33,7 @@ Emit `eventName` to every registered `event` trigger.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -49,7 +49,7 @@ AsyncIterable lifecycle event stream.
 
 #### Returns
 
-`AsyncIterable`\&lt;[`SchedulerEvent`](/api/@graphorin/triggers/type-aliases/SchedulerEvent.md)\&gt;
+`AsyncIterable`\<[`SchedulerEvent`](/api/@graphorin/triggers/type-aliases/SchedulerEvent.md)\>
 
 ***
 
@@ -72,7 +72,7 @@ Manually fire `id` (used by `graphorin triggers fire`, Phase 15).
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -86,7 +86,7 @@ Defined in: packages/triggers/src/index.ts:207
 
 #### Returns
 
-`Promise`\&lt;readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\&gt;
+`Promise`\<readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\>
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: packages/triggers/src/index.ts:205
 
 #### Returns
 
-`Promise`\&lt;[`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)\&gt;
+`Promise`\<[`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)\>
 
 ***
 
@@ -148,7 +148,7 @@ removal is `unregister(...)`.
 
 #### Returns
 
-`Promise`\&lt;[`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)\&gt;
+`Promise`\<[`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)\>
 
 ***
 
@@ -162,7 +162,7 @@ Defined in: packages/triggers/src/index.ts:208
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -176,7 +176,7 @@ Defined in: packages/triggers/src/index.ts:209
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -196,4 +196,4 @@ Defined in: packages/triggers/src/index.ts:206
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

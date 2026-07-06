@@ -19,7 +19,7 @@ not recognise, sorted by descending occurrence count.
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `spans` | `Iterable`\&lt;[`PricingTraceSpanLike`](/api/@graphorin/pricing/interfaces/PricingTraceSpanLike.md)\&gt; | `undefined` |
+| `spans` | `Iterable`\<[`PricingTraceSpanLike`](/api/@graphorin/pricing/interfaces/PricingTraceSpanLike.md)\> | `undefined` |
 | `snapshot` | [`PricingSnapshot`](/api/@graphorin/pricing/interfaces/PricingSnapshot.md) | `BUNDLED_SNAPSHOT` |
 
 ## Returns

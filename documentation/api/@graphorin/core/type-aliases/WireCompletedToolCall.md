@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / WireCompletedToolCall
 
-# Type Alias: WireCompletedToolCall\&lt;TOutput\&gt;
+# Type Alias: WireCompletedToolCall\<TOutput\>
 
 ```ts
 type WireCompletedToolCall<TOutput> = Omit<CompletedToolCall<TOutput>, "outcome"> & {
@@ -20,7 +20,7 @@ Wire twin of [CompletedToolCall](/api/@graphorin/core/interfaces/CompletedToolCa
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `outcome` | [`WireToolOutcome`](/api/@graphorin/core/type-aliases/WireToolOutcome.md)\&lt;`TOutput`\&gt; | packages/core/src/utils/binary-json.ts:125 |
+| `outcome` | [`WireToolOutcome`](/api/@graphorin/core/type-aliases/WireToolOutcome.md)\<`TOutput`\> | packages/core/src/utils/binary-json.ts:125 |
 
 ## Type Parameters
 

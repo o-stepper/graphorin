@@ -32,4 +32,4 @@ proceed, `{ granted: false, reason? }` to deny.
 
 #### Returns
 
-`Promise`\&lt;`ApprovalDecision`\&gt;
+`Promise`\<`ApprovalDecision`\>

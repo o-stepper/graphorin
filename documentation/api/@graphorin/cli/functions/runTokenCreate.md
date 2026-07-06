@@ -22,6 +22,6 @@ Create a token. Returns the raw value once + the persisted record.
 
 ## Returns
 
-`Promise`\&lt;[`TokenCreateResult`](/api/@graphorin/cli/interfaces/TokenCreateResult.md)\&gt;
+`Promise`\<[`TokenCreateResult`](/api/@graphorin/cli/interfaces/TokenCreateResult.md)\>
 
 ## Stable

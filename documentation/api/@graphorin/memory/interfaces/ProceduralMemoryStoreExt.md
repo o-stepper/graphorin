@@ -6,7 +6,7 @@
 
 # Interface: ProceduralMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:700
+Defined in: packages/memory/src/internal/storage-adapter.ts:722
 
 Extension of the typed `ProceduralMemoryStore` with the optional
 promotion helper that storage adapters may expose (MCON-2).
@@ -25,7 +25,7 @@ promotion helper that storage adapters may expose (MCON-2).
 add(rule): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:129
+Defined in: packages/core/dist/contracts/memory-store.d.ts:151
 
 #### Parameters
 
@@ -35,7 +35,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:129
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -49,7 +49,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:129
 list(scope): Promise<readonly Rule[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:130
+Defined in: packages/core/dist/contracts/memory-store.d.ts:152
 
 #### Parameters
 
@@ -59,7 +59,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:130
 
 #### Returns
 
-`Promise`\&lt;readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\&gt;
+`Promise`\<readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\>
 
 #### Inherited from
 
@@ -73,7 +73,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:130
 optional recordSuccess(id): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:727
+Defined in: packages/memory/src/internal/storage-adapter.ts:754
 
 Record one demonstrated successful reuse of a rule and return the
 new counter value (MCON-2 part 4). Powers
@@ -89,7 +89,7 @@ the counter simply never auto-promote.
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>
 
 ***
 
@@ -99,7 +99,7 @@ the counter simply never auto-promote.
 remove(id, reason?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:131
+Defined in: packages/core/dist/contracts/memory-store.d.ts:153
 
 #### Parameters
 
@@ -110,7 +110,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:131
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Inherited from
 
@@ -127,7 +127,7 @@ optional search(
 opts?): Promise<readonly MemoryHit<Rule>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:715
+Defined in: packages/memory/src/internal/storage-adapter.ts:742
 
 Lexical runbook search over rule text (D3, migration 028) - content
 recall for "find the procedure for this task", as opposed to
@@ -148,7 +148,7 @@ back to an in-memory lexical scan over `list(...)`.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\&gt;[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\>[]\>
 
 ***
 
@@ -158,10 +158,11 @@ back to an in-memory lexical scan over `list(...)`.
 optional setStatus(
    id, 
    status, 
-reason?): Promise<void>;
+   reason?, 
+scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:706
+Defined in: packages/memory/src/internal/storage-adapter.ts:728
 
 Set a rule's retrieval-trust `status` - promote a quarantined (induced)
 procedure into `activate()` or re-quarantine an active one, with a
@@ -174,7 +175,8 @@ procedure into `activate()` or re-quarantine an active one, with a
 | `id` | `string` |
 | `status` | [`MemoryStatus`](/api/@graphorin/core/type-aliases/MemoryStatus.md) |
 | `reason?` | `string` |
+| `scope?` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

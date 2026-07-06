@@ -62,7 +62,7 @@ Defined in: packages/server/src/routes/audit.ts:24
 
 #### Returns
 
-`Promise`\&lt;readonly `unknown`[]\&gt;
+`Promise`\<readonly `unknown`[]\>
 
 ***
 

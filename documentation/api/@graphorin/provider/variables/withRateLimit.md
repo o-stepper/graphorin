@@ -10,7 +10,7 @@
 const withRateLimit: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-rate-limit.ts:52
+Defined in: packages/provider/src/middleware/with-rate-limit.ts:84
 
 ## Parameters
 

@@ -29,6 +29,6 @@ directory recursively when it does not exist.
 
 ## Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ## Stable

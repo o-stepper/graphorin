@@ -92,4 +92,4 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:32
 
 #### Returns
 
-`Promise`\&lt;`number`\&gt;
+`Promise`\<`number`\>

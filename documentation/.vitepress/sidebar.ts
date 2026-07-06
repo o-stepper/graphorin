@@ -55,6 +55,7 @@ const guideSidebar: DefaultTheme.SidebarItem[] = [
       { text: 'Observability', link: '/guide/observability' },
       { text: 'Evals & benchmarks', link: '/guide/evals' },
       { text: 'Performance & scale', link: '/guide/performance' },
+      { text: 'Benchmarks', link: '/guide/benchmarks' },
       { text: 'Security', link: '/guide/security' },
       { text: 'Secrets', link: '/guide/secrets' },
       { text: 'Standalone server', link: '/guide/standalone-server' },

@@ -57,7 +57,7 @@ placeholder.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -101,7 +101,7 @@ any `Session.list({...})` call.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -117,7 +117,7 @@ List every known agent (active + retired).
 
 #### Returns
 
-`Promise`\&lt;readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\&gt;
+`Promise`\<readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\>
 
 ***
 
@@ -141,7 +141,7 @@ display name + tags but preserves the original `registeredAt`.
 
 #### Returns
 
-`Promise`\&lt;[`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)\&gt;
+`Promise`\<[`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)\>
 
 ***
 
@@ -165,7 +165,7 @@ the agent has been hard-deleted.
 
 #### Returns
 
-`Promise`\&lt;[`AgentRegistryLookup`](/api/@graphorin/sessions/agent-registry/type-aliases/AgentRegistryLookup.md)\&gt;
+`Promise`\<[`AgentRegistryLookup`](/api/@graphorin/sessions/agent-registry/type-aliases/AgentRegistryLookup.md)\>
 
 ***
 
@@ -191,7 +191,7 @@ on an unknown id.
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 

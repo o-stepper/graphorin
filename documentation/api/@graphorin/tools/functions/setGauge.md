@@ -24,7 +24,7 @@ Set a gauge value. Used for one-shot signals like the
 | ------ | ------ |
 | `name` | `string` |
 | `value` | `number` |
-| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> |
+| `labels?` | `Readonly`\<`Record`\<`string`, `string` \| `number` \| `boolean`\>\> |
 
 ## Returns
 

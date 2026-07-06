@@ -26,6 +26,6 @@ Defined in: evals/src/scorers/trajectory/argument-validity.ts:27
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\&gt;
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\>
 
 ## Stable

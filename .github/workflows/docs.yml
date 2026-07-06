@@ -65,6 +65,12 @@ jobs:
       - name: Build documentation site (sync + TypeDoc + VitePress + llms.txt)
         run: pnpm --filter @graphorin/docs run build:site
 
+      # W-059: the benchmarks page is generated from the committed
+      # benchConfig-stamped reports; a hand-edited number (or a report
+      # change without regeneration) fails here.
+      - name: Benchmark results page freshness (regen + diff)
+        run: node documentation/scripts/build-benchmark-results.mjs
+
       # W-128: documentation/api (the TypeDoc output) is COMMITTED for
       # GitHub readers, code search, and LLM ingestion, but was only
       # regenerated at version bumps - a PR changing public API or
@@ -72,7 +78,7 @@ jobs:
       # build:site above just regenerated it (build:typedoc +
       # build:sanitise normalize the output), so any diff or untracked
       # page here means the PR forgot the regeneration. Release commits
-      # remain noisy (2826 files) - a accepted trade-off for a tree
+      # remain noisy (2826 files) - an accepted trade-off for a tree
       # that is always fresh. The nightly cron catches drift on quiet
       # branches.
       - name: API reference freshness (regen + diff)

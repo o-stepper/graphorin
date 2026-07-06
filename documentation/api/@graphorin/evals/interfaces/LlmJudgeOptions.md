@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / LlmJudgeOptions
 
-# Interface: LlmJudgeOptions\&lt;I, O\&gt;
+# Interface: LlmJudgeOptions\<I, O\>
 
 Defined in: evals/src/scorers/llm/judge.ts:28
 

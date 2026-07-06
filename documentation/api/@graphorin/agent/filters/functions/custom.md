@@ -20,7 +20,7 @@ the canonical `'custom'` descriptor.
 | Parameter | Type |
 | ------ | ------ |
 | `fn` | [`HandoffFilter`](/api/@graphorin/core/type-aliases/HandoffFilter.md) |
-| `meta?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `meta?` | `Readonly`\<`Record`\<`string`, `unknown`\>\> |
 
 ## Returns
 

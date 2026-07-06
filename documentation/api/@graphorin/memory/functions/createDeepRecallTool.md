@@ -31,6 +31,6 @@ pass, so prefer the cheaper `fact_search` for ordinary lookups.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`DeepRecallInput`, `DeepRecallOutput`\&gt;
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`DeepRecallInput`, `DeepRecallOutput`\>
 
 ## Stable

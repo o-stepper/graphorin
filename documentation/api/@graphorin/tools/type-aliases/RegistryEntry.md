@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/tools](/api/@graphorin/tools/index.md) / [](/api/@graphorin/tools/README.md) / RegistryEntry
 
-# Type Alias: RegistryEntry\&lt;TInput, TOutput, TDeps\&gt;
+# Type Alias: RegistryEntry\<TInput, TOutput, TDeps\>
 
 ```ts
 type RegistryEntry<TInput, TOutput, TDeps> = ResolvedTool<TInput, TOutput, TDeps>;

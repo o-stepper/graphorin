@@ -123,7 +123,7 @@ for await (const event of agent.stream('Plan a trip to Mars')) {
   retries the whole step against the next model on rate-limit /
   capacity / context-length errors; `agent.model.fellback` event
   fires per transition; per-model usage attribution lives in
-  `RunState.usage.byModel`.
+  `RunState.usageByModel`.
 - **Post-compaction hook lifecycle.** When
   `@graphorin/memory.contextEngine` auto-compacts the buffer, the
   runtime fires every registered `postCompactionHooks[i]` between
@@ -176,7 +176,7 @@ reference). The package's `CHANGELOG.md` records every change.
 
 ## License
 
-MIT © Oleksiy Stepurenko. See [LICENSE](https://github.com/o-stepper/graphorin/blob/main/LICENSE) for the full
+MIT © Oleksiy Stepurenko. See [LICENSE](../../_media/LICENSE) for the full
 text.
 
 ---

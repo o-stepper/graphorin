@@ -10,7 +10,7 @@
 function truncateBody(opts): Promise<TruncationOutcome>;
 ```
 
-Defined in: packages/tools/src/result/truncate.ts:171
+Defined in: packages/tools/src/result/truncate.ts:207
 
 Apply the per-strategy truncation pipeline.
 
@@ -26,6 +26,6 @@ Apply the per-strategy truncation pipeline.
 
 ## Returns
 
-`Promise`\&lt;[`TruncationOutcome`](/api/@graphorin/tools/interfaces/TruncationOutcome.md)\&gt;
+`Promise`\<[`TruncationOutcome`](/api/@graphorin/tools/interfaces/TruncationOutcome.md)\>
 
 ## Stable

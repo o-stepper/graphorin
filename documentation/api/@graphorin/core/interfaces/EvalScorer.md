@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / EvalScorer
 
-# Interface: EvalScorer\&lt;TInput, TOutput\&gt;
+# Interface: EvalScorer\<TInput, TOutput\>
 
 Defined in: packages/core/src/contracts/eval-scorer.ts:14
 
@@ -48,8 +48,8 @@ Defined in: packages/core/src/contracts/eval-scorer.ts:17
 
 | Parameter | Type |
 | ------ | ------ |
-| `sample` | [`EvalSample`](/api/@graphorin/core/interfaces/EvalSample.md)\&lt;`TInput`, `TOutput`\&gt; |
+| `sample` | [`EvalSample`](/api/@graphorin/core/interfaces/EvalSample.md)\<`TInput`, `TOutput`\> |
 
 #### Returns
 
-`Promise`\&lt;[`EvalScore`](/api/@graphorin/core/interfaces/EvalScore.md)\&gt;
+`Promise`\<[`EvalScore`](/api/@graphorin/core/interfaces/EvalScore.md)\>

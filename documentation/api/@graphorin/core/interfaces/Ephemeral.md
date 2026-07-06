@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / Ephemeral
 
-# Interface: Ephemeral\&lt;T\&gt;
+# Interface: Ephemeral\<T\>
 
 Defined in: packages/core/src/channels/channels.ts:114
 

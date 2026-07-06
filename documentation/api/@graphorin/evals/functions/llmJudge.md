@@ -23,10 +23,10 @@ Defined in: evals/src/scorers/llm/judge.ts:49
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`LlmJudgeOptions`](/api/@graphorin/evals/interfaces/LlmJudgeOptions.md)\&lt;`I`, `O`\&gt; |
+| `options` | [`LlmJudgeOptions`](/api/@graphorin/evals/interfaces/LlmJudgeOptions.md)\<`I`, `O`\> |
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, `O`\>
 
 ## Stable

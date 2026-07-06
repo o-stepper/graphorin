@@ -27,7 +27,7 @@ accidentally open an unencrypted DB with an empty key.
 
 | Parameter | Type |
 | ------ | ------ |
-| `value` | `string` \| `Buffer`\&lt;`ArrayBufferLike`\&gt; |
+| `value` | `string` \| `Buffer`\<`ArrayBufferLike`\> |
 
 ## Returns
 

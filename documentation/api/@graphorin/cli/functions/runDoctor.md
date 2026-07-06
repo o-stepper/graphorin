@@ -23,6 +23,6 @@ and downstream automations consume the structured payload directly.
 
 ## Returns
 
-`Promise`\&lt;[`DoctorReport`](/api/@graphorin/cli/interfaces/DoctorReport.md)\&gt;
+`Promise`\<[`DoctorReport`](/api/@graphorin/cli/interfaces/DoctorReport.md)\>
 
 ## Stable

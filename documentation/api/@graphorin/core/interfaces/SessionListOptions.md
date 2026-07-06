@@ -6,7 +6,7 @@
 
 # Interface: SessionListOptions
 
-Defined in: packages/core/src/contracts/memory-store.ts:128
+Defined in: packages/core/src/contracts/memory-store.ts:139
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:128
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:131 |
-| <a id="property-lastn"></a> `lastN?` | `readonly` | `number` | packages/core/src/contracts/memory-store.ts:129 |
-| <a id="property-role"></a> `role?` | `readonly` | `"user"` \| `"tool"` \| `"system"` \| `"assistant"` | packages/core/src/contracts/memory-store.ts:132 |
-| <a id="property-sincemessageid"></a> `sinceMessageId?` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:130 |
+| <a id="property-agentid"></a> `agentId?` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:142 |
+| <a id="property-lastn"></a> `lastN?` | `readonly` | `number` | packages/core/src/contracts/memory-store.ts:140 |
+| <a id="property-role"></a> `role?` | `readonly` | `"user"` \| `"tool"` \| `"system"` \| `"assistant"` | packages/core/src/contracts/memory-store.ts:143 |
+| <a id="property-sincemessageid"></a> `sinceMessageId?` | `readonly` | `string` | packages/core/src/contracts/memory-store.ts:141 |

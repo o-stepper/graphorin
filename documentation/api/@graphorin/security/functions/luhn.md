@@ -10,7 +10,7 @@
 function luhn(value): boolean;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:210
+Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:227
 
 Luhn checksum for credit-card validation.
 

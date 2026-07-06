@@ -29,7 +29,7 @@ assumed to be in final-rank order (as returned by `search`).
 
 | Parameter | Type |
 | ------ | ------ |
-| `hits` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[] |
+| `hits` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[] |
 | `opts` | \{ `query`: `string`; `rerankerId`: `string`; \} |
 | `opts.query` | `string` |
 | `opts.rerankerId` | `string` |

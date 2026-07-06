@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/secrets.ts:97
 
 ## Returns
 
-`Promise`\&lt;[`SecretsGetResult`](/api/@graphorin/cli/interfaces/SecretsGetResult.md)\&gt;
+`Promise`\<[`SecretsGetResult`](/api/@graphorin/cli/interfaces/SecretsGetResult.md)\>
 
 ## Stable

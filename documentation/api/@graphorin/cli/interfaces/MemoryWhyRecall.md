@@ -15,5 +15,5 @@ A single decoded recall explanation surfaced by `graphorin memory why`.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-at"></a> `at` | `readonly` | `number` | Span start time (unix nanos) of the recall. | packages/cli/src/commands/memory.ts:575 |
-| <a id="property-results"></a> `results` | `readonly` | readonly \{ `id`: `string`; `rank`: `number`; `score`: `number`; `signals`: `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\>; \}[] | - | packages/cli/src/commands/memory.ts:576 |
+| <a id="property-results"></a> `results` | `readonly` | readonly \{ `id`: `string`; `rank`: `number`; `score`: `number`; `signals`: `Readonly`\<`Record`\<`string`, `number`\>\>; \}[] | - | packages/cli/src/commands/memory.ts:576 |
 | <a id="property-spanid"></a> `spanId` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:573 |

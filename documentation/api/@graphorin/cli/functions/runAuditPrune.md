@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/audit.ts:116
 
 ## Returns
 
-`Promise`\&lt;[`PruneAuditResult`](/api/@graphorin/security/interfaces/PruneAuditResult.md)\&gt;
+`Promise`\<[`PruneAuditResult`](/api/@graphorin/security/interfaces/PruneAuditResult.md)\>
 
 ## Stable

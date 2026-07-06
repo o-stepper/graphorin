@@ -29,6 +29,6 @@ Construct a `LatestValue` channel.
 
 ## Returns
 
-[`LatestValue`](/api/@graphorin/workflow/interfaces/LatestValue.md)\&lt;`T`\&gt;
+[`LatestValue`](/api/@graphorin/workflow/interfaces/LatestValue.md)\<`T`\>
 
 ## Stable

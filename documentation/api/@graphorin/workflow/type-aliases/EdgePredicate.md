@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / EdgePredicate
 
-# Type Alias: EdgePredicate\&lt;TState\&gt;
+# Type Alias: EdgePredicate\<TState\>
 
 ```ts
 type EdgePredicate<TState> = (state) => boolean;
@@ -18,13 +18,13 @@ Predicate evaluated by the engine when deciding which edges to fire.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `state` | `Readonly`\&lt;`TState`\&gt; |
+| `state` | `Readonly`\<`TState`\> |
 
 ## Returns
 

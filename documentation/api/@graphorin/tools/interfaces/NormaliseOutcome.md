@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/tools](/api/@graphorin/tools/index.md) / [](/api/@graphorin/tools/README.md) / NormaliseOutcome
 
-# Interface: NormaliseOutcome\&lt;TInput, TOutput, TDeps\&gt;
+# Interface: NormaliseOutcome\<TInput, TOutput, TDeps\>
 
 Defined in: packages/tools/src/registry/normalize.ts:63
 
@@ -25,5 +25,5 @@ counter increments.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-deferreddefaultapplied"></a> `deferredDefaultApplied` | `readonly` | `boolean` | packages/tools/src/registry/normalize.ts:66 |
-| <a id="property-resolved"></a> `resolved` | `readonly` | [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; | packages/tools/src/registry/normalize.ts:64 |
+| <a id="property-resolved"></a> `resolved` | `readonly` | [`ResolvedTool`](/api/@graphorin/core/interfaces/ResolvedTool.md)\<`TInput`, `TOutput`, `TDeps`\> | packages/tools/src/registry/normalize.ts:64 |
 | <a id="property-warnings"></a> `warnings` | `readonly` | readonly [`NormaliseWarning`](/api/@graphorin/tools/type-aliases/NormaliseWarning.md)[] | packages/tools/src/registry/normalize.ts:65 |

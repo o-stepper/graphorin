@@ -20,10 +20,10 @@ line behaviour without touching the filesystem.
 | Parameter | Type |
 | ------ | ------ |
 | `text` | `string` |
-| `mapper?` | (`line`, `index`) => [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`unknown`, `unknown`\&gt; |
+| `mapper?` | (`line`, `index`) => [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`\> |
 
 ## Returns
 
-readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[]
+readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\<`string`, `unknown`\>\>\>[]
 
 ## Stable

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / WorkflowNode
 
-# Interface: WorkflowNode\&lt;TState\&gt;
+# Interface: WorkflowNode\<TState\>
 
 Defined in: packages/workflow/src/types.ts:168
 
@@ -21,7 +21,7 @@ schedules new tasks instead of writing to channels.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
 
 ## Properties
 
@@ -29,5 +29,5 @@ schedules new tasks instead of writing to channels.
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/workflow/src/types.ts:169 |
 | <a id="property-retry"></a> `retry?` | `readonly` | [`WorkflowNodeRetryPolicy`](/api/@graphorin/workflow/interfaces/WorkflowNodeRetryPolicy.md) | Per-node bounded retry policy (D1 / workflow-03). Retries fire only for thrown failures - never for `pause(...)` suspensions or aborts - with exponential backoff. Overrides [WorkflowConfig.nodeDefaults](/api/@graphorin/workflow/interfaces/WorkflowConfig.md#property-nodedefaults). Absent ⇒ no retries. | packages/workflow/src/types.ts:184 |
-| <a id="property-run"></a> `run` | `readonly` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\&lt;`TState`\&gt; | - | packages/workflow/src/types.ts:170 |
+| <a id="property-run"></a> `run` | `readonly` | [`WorkflowNodeRun`](/api/@graphorin/workflow/type-aliases/WorkflowNodeRun.md)\<`TState`\> | - | packages/workflow/src/types.ts:170 |
 | <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Per-node wall-clock budget in milliseconds (D1 / workflow-03). When the body exceeds it, the task's `ctx.signal` aborts and the task fails with a `node-timeout` error. Overrides [WorkflowConfig.nodeDefaults](/api/@graphorin/workflow/interfaces/WorkflowConfig.md#property-nodedefaults). Absent ⇒ no timeout. | packages/workflow/src/types.ts:177 |

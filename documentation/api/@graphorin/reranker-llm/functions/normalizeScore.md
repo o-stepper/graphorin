@@ -13,7 +13,7 @@ function normalizeScore(
    fallback): number;
 ```
 
-Defined in: src/reranker.ts:334
+Defined in: src/reranker.ts:336
 
 Normalise a raw integer score into `[0, 1]`. Rejects out-of-range
 inputs by clamping; returns the configured fallback when the input

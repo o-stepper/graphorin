@@ -14,7 +14,7 @@ Wire twin of FileGeneratedEvent.
 
 ## Extends
 
-- `Omit`\&lt;`FileGeneratedEvent`, `"data"`\&gt;
+- `Omit`\<`FileGeneratedEvent`, `"data"`\>
 
 ## Properties
 

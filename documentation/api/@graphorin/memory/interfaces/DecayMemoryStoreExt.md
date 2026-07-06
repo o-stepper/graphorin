@@ -6,7 +6,7 @@
 
 # Interface: DecayMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:563
+Defined in: packages/memory/src/internal/storage-adapter.ts:576
 
 Decay-aware extension of the typed `SemanticMemoryStore`. Phase
 10c's light phase reads the strength + last-accessed columns and
@@ -22,10 +22,13 @@ with an INFO log.
 ### archiveFact()
 
 ```ts
-archiveFact(id, reason?): Promise<void>;
+archiveFact(
+   id, 
+   reason?, 
+scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:608
+Defined in: packages/memory/src/internal/storage-adapter.ts:621
 
 Soft-archive a fact (sets `archived = 1`). The audit row in
 `memory_history` records the archive event.
@@ -36,10 +39,11 @@ Soft-archive a fact (sets `archived = 1`). The audit row in
 | ------ | ------ |
 | `id` | `string` |
 | `reason?` | `string` |
+| `scope?` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 ***
 
@@ -54,7 +58,7 @@ optional listDecaySignals(ids): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:623
+Defined in: packages/memory/src/internal/storage-adapter.ts:640
 
 Narrow decay-column read for exactly the given fact ids (MRET-8) -
 powers per-search decay re-ranking without the old O(scope)
@@ -98,7 +102,7 @@ listForDecay(
 }[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:578
+Defined in: packages/memory/src/internal/storage-adapter.ts:591
 
 List facts for the scope ordered by `lastAccessedAt` ASC so the
 caller can apply Ebbinghaus retention without scanning the
@@ -142,10 +146,13 @@ salience score that orders capacity-bounded eviction.
 ### markAccessed()?
 
 ```ts
-optional markAccessed(ids, accessedAt?): Promise<void>;
+optional markAccessed(
+   ids, 
+   accessedAt?, 
+scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:616
+Defined in: packages/memory/src/internal/storage-adapter.ts:629
 
 Record a retrieval access for the given facts (MRET-7): stamp
 `lastAccessedAt` and reinforce `strength` (implementation-capped).
@@ -159,7 +166,8 @@ bookkeeping write).
 | ------ | ------ |
 | `ids` | readonly `string`[] |
 | `accessedAt?` | `number` |
+| `scope?` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>

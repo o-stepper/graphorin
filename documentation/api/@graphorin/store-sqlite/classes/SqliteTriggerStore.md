@@ -6,11 +6,18 @@
 
 # Class: SqliteTriggerStore
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:11
+Defined in: packages/store-sqlite/src/trigger-store.ts:18
 
 Default `TriggerStore` implementation. Backs the `@graphorin/triggers`
 scheduler with persistent rows so cron / interval / idle / event
 triggers survive process restarts (DEC-150).
+
+Concurrency contract (W-133): two scheduler PROCESSES over one
+database file are not a supported deployment (see the storage guide's
+concurrency matrix). `recordFire` still carries a monotonic
+wall-clock fence as best-effort defense in depth for that
+unsupported case - a duplicate fixation with the same-or-earlier
+`firedAt` is a no-op instead of rewinding trigger state.
 
 ## Stable
 
@@ -26,7 +33,7 @@ triggers survive process restarts (DEC-150).
 new SqliteTriggerStore(conn): SqliteTriggerStore;
 ```
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:13
+Defined in: packages/store-sqlite/src/trigger-store.ts:20
 
 #### Parameters
 
@@ -48,7 +55,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:43
+Defined in: packages/store-sqlite/src/trigger-store.ts:50
 
 #### Parameters
 
@@ -74,11 +81,11 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:43
 list(): Promise<readonly TriggerState[]>;
 ```
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:48
+Defined in: packages/store-sqlite/src/trigger-store.ts:55
 
 #### Returns
 
-`Promise`\&lt;readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\&gt;
+`Promise`\<readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\>
 
 #### Implementation of
 
@@ -95,7 +102,17 @@ recordFire(
 nextFireAt?): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:57
+Defined in: packages/store-sqlite/src/trigger-store.ts:75
+
+Persist a fire. W-133: the update carries a monotonic fence -
+a call whose `firedAt` is not strictly later than the stored
+`last_fired_at` changes nothing, so a second (unsupported)
+scheduler process re-fixing an old fire cannot rewind
+`next_fire_at`/`missed_fires`. The fence is wall-clock ms:
+two processes with the IDENTICAL `firedAt` both pass - accepted
+as best-effort for a deployment the docs already exclude. The
+in-process scheduler always calls this once per fire with a fresh
+timestamp, so supported behaviour is unchanged.
 
 #### Parameters
 
@@ -107,7 +124,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:57
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 
@@ -121,7 +138,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:57
 remove(id): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:53
+Defined in: packages/store-sqlite/src/trigger-store.ts:60
 
 #### Parameters
 
@@ -131,7 +148,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:53
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 
@@ -145,7 +162,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:53
 upsert(state): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/trigger-store.ts:17
+Defined in: packages/store-sqlite/src/trigger-store.ts:24
 
 #### Parameters
 
@@ -155,7 +172,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:17
 
 #### Returns
 
-`Promise`\&lt;`void`\&gt;
+`Promise`\<`void`\>
 
 #### Implementation of
 

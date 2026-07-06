@@ -33,7 +33,7 @@ Defined in: packages/sessions/src/facade.ts:129
 | ------ | ------ |
 | `name` | `string` |
 | `value` | `number` |
-| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> |
+| `labels?` | `Readonly`\<`Record`\<`string`, `string`\>\> |
 
 #### Returns
 

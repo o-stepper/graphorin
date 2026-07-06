@@ -18,7 +18,7 @@ many providers gate file ingestion on it.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-causalitychain"></a> `causalityChain?` | `readonly` | readonly `string`[] | See [TextContent.causalityChain](/api/@graphorin/core/interfaces/TextContent.md#property-causalitychain). | packages/core/src/types/message.ts:78 |
-| <a id="property-file"></a> `file` | `readonly` | `Uint8Array`\&lt;`ArrayBufferLike`\&gt; \| `URL` | - | packages/core/src/types/message.ts:74 |
+| <a id="property-file"></a> `file` | `readonly` | `Uint8Array`\<`ArrayBufferLike`\> \| `URL` | - | packages/core/src/types/message.ts:74 |
 | <a id="property-filename"></a> `filename?` | `readonly` | `string` | - | packages/core/src/types/message.ts:76 |
 | <a id="property-mimetype"></a> `mimeType` | `readonly` | `string` | - | packages/core/src/types/message.ts:75 |
 | <a id="property-type"></a> `type` | `readonly` | `"file"` | - | packages/core/src/types/message.ts:73 |

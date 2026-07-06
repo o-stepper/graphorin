@@ -24,6 +24,6 @@ passes when EVERY iteration passed) - the paired unit for
 
 ## Returns
 
-`ReadonlyMap`\&lt;`string`, `boolean`\&gt;
+`ReadonlyMap`\<`string`, `boolean`\>
 
 ## Stable
