@@ -20,9 +20,12 @@
  *   3. POSITIONAL level (bash blocks): a bare positional argument passed to a
  *      command whose `.command('name')` declaration takes none is a drift
  *      (the `graphorin auth login mcp.example.com` class).
- *   4. REVERSE pass: real commands never mentioned in cli.md are reported as
- *      warnings (they do not fail the gate — some commands are deliberately
- *      table-only).
+ *   4. REVERSE pass (W-042 ratchet): a real command never mentioned in
+ *      cli.md FAILS the gate unless listed in KNOWN_UNDOCUMENTED. The
+ *      pass matches only literal `graphorin <group> <sub>` invocations —
+ *      a table row like `graphorin storage <subcommand>` is invisible to
+ *      it on purpose, so pointer sections must spell out each full
+ *      invocation.
  *
  * Mechanism: the binary registers commands in per-group `register<X>Commands`
  * functions. Within a block, a `program.command('x')` call is a TOP-LEVEL
@@ -54,6 +57,23 @@ const CMD_DECL = /\b([a-z]\w*)\s*\.command\(\s*'([^']+)'/g;
 const OPTION_DECL = /\.(?:requiredOption|option)\(\s*'([^']+)'/g;
 /** W-040: `.requiredOption(...)` alone — feeds the required-flag pass. */
 const REQUIRED_OPTION_DECL = /\.requiredOption\(\s*'([^']+)'/g;
+/**
+ * W-042: chained `.argument('<dest>')` declarations - commander's second
+ * positional style. Without this, a command like `storage backup` (decl
+ * `'backup'`, positional via `.argument(...)`) reads as takesArgs=false
+ * and every real invocation false-positives as drift.
+ */
+const ARGUMENT_DECL = /\.argument\(\s*'([^']+)'/;
+
+/**
+ * W-042 ratchet valve: real commands allowed to stay undocumented in
+ * cli.md, each entry with a reason comment. An entry here downgrades the
+ * failure to a warning - keep the list empty unless a command genuinely
+ * cannot be documented yet.
+ *
+ * @type {ReadonlyArray<string>}
+ */
+const KNOWN_UNDOCUMENTED = [];
 
 /** Extract every long/short flag token from a commander flags string. */
 function flagsFrom(decl) {
@@ -125,7 +145,7 @@ export function parseCommandTree(src) {
       for (const m of span.matchAll(REQUIRED_OPTION_DECL)) {
         requiredFlags.push(new Set(flagsFrom(m[1])));
       }
-      const takesArgs = /[<[]/.test(d.decl);
+      const takesArgs = /[<[]/.test(d.decl) || ARGUMENT_DECL.test(span);
       const prev = commandMeta.get(d.key);
       if (prev === undefined) {
         commandMeta.set(d.key, { takesArgs, options, requiredFlags });
@@ -273,7 +293,21 @@ export function diffInvocations(tree, invocations) {
 }
 
 /**
- * Reverse pass: real command paths never mentioned in cli.md. Warnings only.
+ * W-042: split the reverse-pass result into gate-failing entries and
+ * allowlisted (warn-only) ones.
+ * @returns {{ hard: string[], soft: string[] }}
+ */
+export function partitionUndocumented(missing, allowlist) {
+  const allowed = new Set(allowlist);
+  return {
+    hard: missing.filter((m) => !allowed.has(m)),
+    soft: missing.filter((m) => allowed.has(m)),
+  };
+}
+
+/**
+ * Reverse pass: real command paths never mentioned in cli.md. Fails the
+ * gate unless allowlisted (W-042 ratchet).
  * @returns {string[]}
  */
 export function undocumentedCommands(tree, documented) {
@@ -314,13 +348,19 @@ async function run() {
   const violations = [...diffCommands(tree, documented), ...diffInvocations(tree, invocations)];
   for (const v of violations) console.error(`✗ ${v}`);
   const missing = undocumentedCommands(tree, documented);
-  for (const m of missing) {
-    console.warn(`! undocumented real command: 'graphorin ${m}' (warning only)`);
+  const { hard, soft } = partitionUndocumented(missing, KNOWN_UNDOCUMENTED);
+  for (const m of soft) {
+    console.warn(`! undocumented real command: 'graphorin ${m}' (allowlisted)`);
+  }
+  for (const m of hard) {
+    console.error(
+      `✗ undocumented real command: 'graphorin ${m}' — add a section (or a full-invocation pointer) to documentation/guide/cli.md, or allowlist it in KNOWN_UNDOCUMENTED with a reason`,
+    );
   }
   console.log(
-    `[check-cli-docs] checked ${documented.length} documented reference(s) + ${invocations.length} bash invocation(s) against ${tree.topLevel.size} real commands; ${violations.length} drift(s), ${missing.length} undocumented (warn).`,
+    `[check-cli-docs] checked ${documented.length} documented reference(s) + ${invocations.length} bash invocation(s) against ${tree.topLevel.size} real commands; ${violations.length} drift(s), ${hard.length} undocumented (fail), ${soft.length} allowlisted (warn).`,
   );
-  process.exit(violations.length > 0 ? 1 : 0);
+  process.exit(violations.length > 0 || hard.length > 0 ? 1 : 0);
 }
 
 /** Exercise the failure paths against in-memory fixtures. */
@@ -440,7 +480,36 @@ function registerLifecycleCommands(program) {
     bad += 1;
     console.error('✗ self-test — reverse pass missed consolidator stop');
   }
-  const total = cases.length + invocationCases.length + 3;
+  // W-042 (а): outside the allowlist an undocumented command is a hard
+  // failure; (б): an allowlisted one degrades to a warning.
+  const parts = partitionUndocumented(['consolidator stop', 'auth login'], ['auth login']);
+  if (!parts.hard.includes('consolidator stop') || !parts.soft.includes('auth login')) {
+    bad += 1;
+    console.error('✗ self-test — allowlist partition misrouted an entry');
+  }
+  // W-042 (в): a placeholder row (`graphorin consolidator <subcommand>`)
+  // must NOT count as documentation of the concrete subcommands.
+  const placeholderDocs = parseDocumentedCommands('graphorin consolidator <subcommand>');
+  if (!undocumentedCommands(tree, placeholderDocs).includes('consolidator stop')) {
+    bad += 1;
+    console.error('✗ self-test — placeholder syntax wrongly satisfied the reverse pass');
+  }
+  // W-042: a chained `.argument('<dest>')` declaration counts as a
+  // positional, so a real invocation with an argument is not drift.
+  const argTree = parseCommandTree(`
+function registerStorageCommands(program) {
+  const s = program.command('storage');
+  s.command('backup')
+    .description('online copy')
+    .argument('<dest>', 'destination path')
+    .option('--overwrite', 'replace an existing file');
+}
+`);
+  if (argTree.commandMeta.get('storage backup')?.takesArgs !== true) {
+    bad += 1;
+    console.error('✗ self-test — chained .argument() not recognised as a positional');
+  }
+  const total = cases.length + invocationCases.length + 6;
   console.log(
     bad === 0
       ? `[check-cli-docs] self-test: ${total}/${total} ok`

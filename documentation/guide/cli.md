@@ -64,9 +64,14 @@ Failures are categorised by severity (`error`, `warning`, `info`) and emit actio
 graphorin token create --scopes agents:invoke --expires-in 30d
 graphorin token list
 graphorin token revoke <token-id>
+graphorin token rotate <token-id>       # revoke + reissue with the same scopes
+graphorin token rekey                   # re-issue every active token (post-compromise)
+graphorin token verify <token>          # offline checksum check - never consults the store
 ```
 
 Tokens are HMAC-SHA256 over a deployment-wide pepper. The pepper is a `SecretRef` resolved at server boot. See [Security § Server-token authentication](/guide/security#server-token-authentication).
+
+`token rotate` revokes one token and reissues it with the same scopes; `token rekey` does that for **every** active token and is the post-compromise lever. Both accept `--env live|test` (default `live`). `token verify` is fully offline: it confirms the structural shape, the environment marker, and the CRC checksum without touching the store - a malformed token exits with code `1`. Verifying that a token is *active* (not revoked, not expired) still requires the server or `token list`.
 
 ## `graphorin secrets`
 
@@ -121,12 +126,27 @@ OAuth 2.1 with PKCE. The redirect happens on a loopback address bound to a free 
 
 ```bash
 graphorin storage status
+graphorin storage backup ./backups/data.db.bak      # online backup (page-level backup API)
 graphorin storage cleanup-backups
 graphorin storage compact
 graphorin storage compact --batch-pages 200 --json
+graphorin storage encrypt --passphrase-from file:./pass --swap
+graphorin storage rekey --old-passphrase-from file:./old --new-passphrase-from file:./new
 ```
 
+`backup`, `encrypt`, and `rekey` are documented in depth on their own pages rather than here: [Storage](/guide/storage) covers the backup API and the encryption lifecycle, [Persistence](/guide/persistence) the file layout, [Deployment](/guide/deployment) the operational recipes, and [Migration](/guide/migration) the schema side. In one line each: `storage backup` snapshots the live database through the SQLite online-backup API; `storage encrypt --swap` converts a plaintext database to an encrypted one and refuses while a live writer holds the file; `storage rekey` rewraps the encryption key and fails fast with `database is locked` if the server is still running. `encrypt` and `rekey` exit with code `2` unless the optional `@graphorin/store-sqlite-encrypted` sub-pack is installed.
+
 `compact` (W-064) returns pruned pages to the OS: it runs `PRAGMA wal_checkpoint(TRUNCATE)` and then batched `PRAGMA incremental_vacuum` - the rowid-safe compaction path (unlike `VACUUM`, which is forbidden because it corrupts the FTS5 rowid mappings). It requires a database created with `auto_vacuum=2`; every database created from this version on qualifies, including encrypted ones. On an older database the command reports the high-water-mark limitation honestly and exits `0` without modifying the file - see [the storage guide](/guide/storage) for the recreation path. `--batch-pages <n>` bounds each vacuum bite (default 1000) so a huge freelist never holds the writer lock long.
+
+## `graphorin audit`
+
+```bash
+graphorin audit verify                  # walk the hash chain, exit 1 on a break
+graphorin audit export --to ./audit.jsonl
+graphorin audit prune --before 2026-01-01
+```
+
+The audit trail's operator surface lives on the security-focused pages; this section exists so the command diff gate sees the full invocations. `audit verify` recomputes the append-only hash chain and exits `1` when any link fails; `audit export` writes the entries as JSONL for offline retention; `audit prune` deletes entries before a cutoff atomically and warns about re-anchoring when Merkle anchoring is enabled. Details: [Security](/guide/security), [Deployment](/guide/deployment), [Privacy](/guide/privacy).
 
 ## `graphorin memory`
 
@@ -160,6 +180,18 @@ graphorin consolidator dlq-clear --before 2026-06-01  # ...older than a cutoff
 
 > `consolidator set-tier` / `consolidator stop` exit with code `2` (UNSUPPORTED) - there is no runtime control channel into the daemon yet, and the CLI refuses to pretend otherwise (IP-4). To change the tier, edit `consolidator.tier` in the config and restart; to stop consolidation now, stop the server process. `triggers fire` likewise points at the working server route (`POST /v1/triggers/:id/fire`).
 
+## `graphorin triggers`
+
+```bash
+graphorin triggers list                       # every persisted trigger
+graphorin triggers status <id>                # single-trigger detail
+graphorin triggers disable <id>               # flip the disabled column
+graphorin triggers prune --before 2026-06-01  # drop disabled triggers older than the cutoff
+graphorin triggers fire <id>                  # exit 2 - use the server route instead
+```
+
+Operates directly on the durable trigger registry in the store; all subcommands accept `--config` and `--json`. `status` exits `1` when the id does not exist. `prune` removes **disabled** rows only; without `--before` it drops every disabled row. `triggers fire` is honest about not being wired: a daemon-side poll does not exist yet, so it exits with code `2` (UNSUPPORTED) and prints the working alternative - `POST /v1/triggers/:id/fire` (scope `triggers:fire`) on the running server.
+
 ## `graphorin migrate-export`
 
 ```bash
@@ -173,9 +205,13 @@ Produces a deterministic JSONL export - see [Sessions § JSONL export schema 1.0
 ```bash
 graphorin telemetry status
 graphorin telemetry inspect           # dump the resolved exporter + redaction config
+graphorin telemetry enable            # refuses (exit 1) - zero phone-home is the contract
+graphorin telemetry disable           # no-op - telemetry is always disabled
 ```
 
 `status` prints the effective tracing configuration: exporters, redaction patterns, sensitivity allowlists, and the resolved `gen_ai.system` mappings. Honours the same `withValidation(...)` requirement as runtime - there is no way to disable redaction from the CLI.
+
+`enable` and `disable` encode the zero-default-telemetry promise (DEC-154 / ADR-041) as commands: `enable` **refuses** with exit code `1` and points at `SECURITY.md § Privacy & telemetry` (an opt-in collector is roadmap, not reality), and `disable` is a no-op that confirms the already-permanent state. They exist so an operator probing the surface gets the policy as an answer instead of silence.
 
 ## `graphorin traces`
 
@@ -185,6 +221,15 @@ graphorin traces prune --before 2026-06-01      # delete spans that FINISHED bef
 ```
 
 Both operate on the `spans` table written by the SQLite span exporter (the same table that backs `session.replay()` and `graphorin memory why`). `status` reports the row count and the ISO time range of recorded span starts. `prune` deletes spans whose END time is strictly before `--before` (ISO date or epoch milliseconds; the ns conversion happens internally) - including spans not attached to any session, whose only deletion path is age. Session-scoped spans are also removed by the session hard-delete cascade. Put `traces prune` in cron to bound trace growth.
+
+## `graphorin guard`
+
+```bash
+graphorin guard status                        # the four guard tiers + their variants
+graphorin guard explain my-tool --tags web,write --trust-level user-defined
+```
+
+Inspection surface for the memory-modification guard (no store access, purely the classifier). `status` prints the four tiers and the variants each accepts. `explain <toolName>` derives the tier the classifier **would** assign to a tool with the supplied metadata - feed it `--tags`, `--secrets-allowed`, `--trust-level built-in|user-defined|trusted|untrusted`, or `--explicit-tier` to answer "why did my tool end up memory-aware?" before wiring it. Both accept `--json`.
 
 ## Privacy
 
