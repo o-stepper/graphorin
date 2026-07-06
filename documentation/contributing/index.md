@@ -108,6 +108,7 @@ The **body** explains the *why*, not the *what*. One logical change per commit; 
 - **Naming:** files in `kebab-case.ts`, types in `PascalCase`, functions and variables in `camelCase`, constants in `SCREAMING_SNAKE_CASE`, discriminated-union variants as `'kebab-case'` string literals.
 - **Imports:** always use `import type` for type-only imports.
 - **No default exports** in `@graphorin/core` or any other foundation package; named exports only.
+- **Doc snippets are code.** Every ` ```ts ` block on every hand-written documentation page is type-checked by `pnpm run check-doc-snippets` (deny-by-default: new pages are discovered automatically). Write snippets as complete, copy-pasteable programs. The only opt-out is a ` ```ts no-check ` info token on a deliberately partial block; it is visible in the diff and must be justified in the PR description.
 
 ## Testing
 
