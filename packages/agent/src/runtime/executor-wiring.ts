@@ -191,14 +191,12 @@ export function wireToolExecution<TDeps, TOutput>(
                 : {}),
               agentId,
             };
-            const working = (
-              memory as unknown as {
-                working?: { compile?: (s: unknown, a?: string) => Promise<string> };
-              }
-            ).working;
-            if (working?.compile === undefined) return '';
+            // W-054: call the statically-typed `Memory.working.compile`
+            // directly - a signature change must break THIS build, not
+            // silently turn the DEC-153 guard into a no-op through an
+            // unchecked double cast returning ''.
             try {
-              return await working.compile(scope, agentId);
+              return await memory.working.compile(scope, agentId);
             } catch {
               // The reader is best-effort: a failed region read must not
               // turn the guard step into a run failure.
