@@ -16,7 +16,6 @@ import {
   TimerDriverStoreUnsupportedError,
 } from '../src/index.js';
 
-
 const WAKE_AT = Date.parse('2030-01-01T00:00:00.000Z');
 
 async function drain<T>(events: AsyncIterable<T>): Promise<T[]> {

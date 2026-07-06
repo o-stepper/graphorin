@@ -134,12 +134,13 @@ export function namespaceFor(config: { readonly name: string }): string {
  * durable-primitive `kind` off the pause value plus the awakeable /
  * approval `name`. A plain `pause()` yields `{}` (never checked).
  */
-function pauseMetaOf(record: {
-  readonly value: unknown;
+function pauseMetaOf(record: { readonly value: unknown; readonly name?: string }): {
+  readonly kind?: string;
   readonly name?: string;
-}): { readonly kind?: string; readonly name?: string } {
+} {
   const v = record.value as { readonly kind?: unknown } | null | undefined;
-  const kind = typeof v === 'object' && v !== null && typeof v.kind === 'string' ? v.kind : undefined;
+  const kind =
+    typeof v === 'object' && v !== null && typeof v.kind === 'string' ? v.kind : undefined;
   return {
     ...(kind !== undefined ? { kind } : {}),
     ...(record.name !== undefined ? { name: record.name } : {}),
@@ -899,7 +900,7 @@ async function* driveRun<TState extends object>(
                 source: t.source,
                 ...(t.dispatchArgs !== undefined ? { dispatchArgs: t.dispatchArgs } : {}),
                 ...(t.resumeValues !== undefined ? { resumeValues: [...t.resumeValues] } : {}),
-      ...(t.resumeMeta !== undefined ? { resumeMeta: [...t.resumeMeta] } : {}),
+                ...(t.resumeMeta !== undefined ? { resumeMeta: [...t.resumeMeta] } : {}),
                 ...(t.resumeMeta !== undefined ? { resumeMeta: [...t.resumeMeta] } : {}),
                 ...(t.staticBefore === true ? { staticBefore: true } : {}),
               })),

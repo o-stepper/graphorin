@@ -166,7 +166,9 @@ export function createTimerDriver(options: CreateTimerDriverOptions): TimerDrive
           if (result.fired) fired += 1;
           if (result.nextWakeAt !== null) {
             earliestNext =
-              earliestNext === undefined ? result.nextWakeAt : Math.min(earliestNext, result.nextWakeAt);
+              earliestNext === undefined
+                ? result.nextWakeAt
+                : Math.min(earliestNext, result.nextWakeAt);
           }
         } catch (error) {
           if (isBenignConflict(error)) continue;
@@ -183,7 +185,10 @@ export function createTimerDriver(options: CreateTimerDriverOptions): TimerDrive
   function schedule(): void {
     if (!running) return;
     const base = now();
-    const target = nextWakeAt !== undefined ? Math.min(base + pollIntervalMs, nextWakeAt) : base + pollIntervalMs;
+    const target =
+      nextWakeAt !== undefined
+        ? Math.min(base + pollIntervalMs, nextWakeAt)
+        : base + pollIntervalMs;
     const delay = Math.max(25, target - base);
     handle = setT(() => {
       void runPass();

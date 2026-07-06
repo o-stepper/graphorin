@@ -41,9 +41,7 @@ function flipWorkflow(store: InMemoryCheckpointStore) {
       waiter: createNode<FlipState>({
         name: 'waiter',
         run: (state) => {
-          const first = state.flip
-            ? awaitExternal<string>('beta')
-            : awaitExternal<string>('alpha');
+          const first = state.flip ? awaitExternal<string>('beta') : awaitExternal<string>('alpha');
           const second = state.flip
             ? awaitExternal<string>('alpha')
             : awaitExternal<string>('beta');
@@ -76,9 +74,7 @@ function flipThenPlainWorkflow(store: InMemoryCheckpointStore) {
       waiter: createNode<FlipState>({
         name: 'waiter',
         run: (state) => {
-          const first = state.flip
-            ? awaitExternal<string>('beta')
-            : awaitExternal<string>('alpha');
+          const first = state.flip ? awaitExternal<string>('beta') : awaitExternal<string>('alpha');
           const second = pause<string, string>('plain-gate');
           return { first, second };
         },
