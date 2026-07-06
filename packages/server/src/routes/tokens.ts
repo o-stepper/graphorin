@@ -9,6 +9,7 @@
 
 import type { AuthTokenStore } from '@graphorin/core/contracts';
 import { createToken, listTokens, revokeToken, type SecretValue } from '@graphorin/security';
+import { scopeSetMatches, tryParseScope, validateScopeSet } from '@graphorin/security/auth';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -78,6 +79,45 @@ export function createTokensRoutes(deps: TokensRoutesDeps): Hono<{ Variables: Se
         },
         400,
       );
+    }
+    // W-106: reject syntactically-invalid scopes up front - the old
+    // z.string().min(3) accepted garbage that would grant nothing.
+    const syntaxErrors = validateScopeSet(parsed.data.scopes);
+    if (syntaxErrors.length > 0) {
+      return c.json(
+        {
+          error: 'config-invalid',
+          message: 'One or more requested scopes are syntactically invalid.',
+          issues: syntaxErrors.map((e) => ({ message: e.message })),
+        },
+        400,
+      );
+    }
+    // W-106: attenuation-only minting. A token principal can only mint
+    // scopes its OWN grant already covers - `tokens:create` alone must
+    // not transitively zero-out the least-privilege catalogue by minting
+    // `admin:*`. Delegation chains therefore narrow monotonically (the
+    // child's `tokens:create` must itself be covered). The anonymous
+    // principal (IP-13 trusted loopback operator, auth disabled) is
+    // exempt: it already holds `admin:*`.
+    const auth = c.get('state').auth;
+    if (auth.kind === 'token') {
+      const denied = parsed.data.scopes.filter((requested) => {
+        const requestedParsed = tryParseScope(requested);
+        if (requestedParsed === undefined) return true;
+        return !scopeSetMatches(auth.grantedScopes, requestedParsed);
+      });
+      if (denied.length > 0) {
+        return c.json(
+          {
+            error: 'scope-escalation-denied',
+            message:
+              'Attenuation-only minting: a token may only mint scopes covered by its own grant.',
+            denied,
+          },
+          403,
+        );
+      }
     }
     const created = await createToken({
       tokenStore: deps.tokenStore,
