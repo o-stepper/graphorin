@@ -27,7 +27,7 @@ import type {
   ToolMessage,
   UserMessage,
 } from '../types/message.js';
-import type { RunState, RunStep } from '../types/run.js';
+import type { PendingSubRun, RunState, RunStep } from '../types/run.js';
 import type { CompletedToolCall, ToolError, ToolResult } from '../types/tool.js';
 
 /**
@@ -130,10 +130,16 @@ export type WireRunStep = Omit<RunStep, 'toolCalls'> & {
   readonly toolCalls: readonly WireCompletedToolCall[];
 };
 
+/** Wire twin of {@link PendingSubRun}: the child state recurses. @stable */
+export type WirePendingSubRun = Omit<PendingSubRun, 'state'> & {
+  readonly state: WireRunState;
+};
+
 /**
- * JSON-safe twin of {@link RunState}: `messages` and every
- * `steps[].toolCalls[].outcome.contentParts` are projected through the
- * binary codec. Everything else is structurally identical.
+ * JSON-safe twin of {@link RunState}: `messages`, every
+ * `steps[].toolCalls[].outcome.contentParts`, and each parked
+ * `pendingSubRuns[].state` (recursively, W-001) are projected through
+ * the binary codec. Everything else is structurally identical.
  *
  * `pendingApprovals[].args` and `ToolResult.output` are model-produced
  * JSON and are assumed JSON-safe already - the projection does not
@@ -141,9 +147,10 @@ export type WireRunStep = Omit<RunStep, 'toolCalls'> & {
  *
  * @stable
  */
-export type WireRunState = Omit<RunState, 'messages' | 'steps'> & {
+export type WireRunState = Omit<RunState, 'messages' | 'steps' | 'pendingSubRuns'> & {
   readonly messages: readonly WireMessage[];
   readonly steps: readonly WireRunStep[];
+  readonly pendingSubRuns?: readonly WirePendingSubRun[];
 };
 
 const B64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
@@ -375,10 +382,21 @@ function decodeStep(step: WireRunStep): RunStep {
  * @stable
  */
 export function toJsonSafeRunState(state: RunState | WireRunState): WireRunState {
+  const subRuns = state.pendingSubRuns;
   return {
     ...state,
     messages: state.messages.map(toJsonSafeMessage),
     steps: state.steps.map(encodeStep),
+    // W-001: parked child states carry binary-bearing messages of their
+    // own - project them recursively (idempotent, like every codec leg).
+    ...(subRuns !== undefined && subRuns.length > 0
+      ? {
+          pendingSubRuns: subRuns.map((sub) => ({
+            ...sub,
+            state: toJsonSafeRunState(sub.state),
+          })),
+        }
+      : {}),
   } as WireRunState;
 }
 
@@ -390,9 +408,18 @@ export function toJsonSafeRunState(state: RunState | WireRunState): WireRunState
  * @stable
  */
 export function fromJsonSafeRunState(state: WireRunState): RunState {
+  const subRuns = state.pendingSubRuns;
   return {
     ...state,
     messages: state.messages.map(fromJsonSafeMessage),
     steps: state.steps.map(decodeStep),
+    ...(subRuns !== undefined && subRuns.length > 0
+      ? {
+          pendingSubRuns: subRuns.map((sub) => ({
+            ...sub,
+            state: fromJsonSafeRunState(sub.state),
+          })),
+        }
+      : {}),
   } as RunState;
 }

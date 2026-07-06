@@ -413,6 +413,16 @@ export interface ApprovalDecision {
   readonly toolCallId: string;
   readonly granted: boolean;
   readonly reason?: string;
+  /**
+   * W-001: echo of `ToolApproval.subRunToolCallId` for approvals that
+   * belong to a parked sub-agent run. Operators read the pair
+   * (`toolCallId`, `subRunToolCallId`) from `RunState.pendingApprovals`
+   * and return BOTH fields; decisions match on the composite key, so
+   * child-local toolCallId collisions across two parked children never
+   * cross-apply. A decision without this field applies only to the
+   * parent's own (unparked) approvals.
+   */
+  readonly subRunToolCallId?: string;
 }
 
 /**

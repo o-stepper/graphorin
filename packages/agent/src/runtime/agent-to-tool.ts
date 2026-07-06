@@ -65,6 +65,62 @@ export interface ToToolDeps<TDeps, TOutput> {
   ) => AsyncIterable<AgentEvent<TOutput>>;
 }
 
+/**
+ * W-001: well-known marker on every `toTool()` tool object. The
+ * graphorin tool-call walk detects it and executes the sub-agent
+ * INLINE (through the same seam as a handoff) so a child suspending on
+ * `awaiting_approval` parks on the parent instead of throwing from the
+ * executor; the resume router resolves parked toTool sub-runs through
+ * the same refs. `Symbol.for` so duplicate package copies agree.
+ * Foreign harnesses mounting the tool outside the graphorin loop keep
+ * the plain `execute()` behavior (a suspended child throws there).
+ */
+export const SUBAGENT_TOOL: unique symbol = Symbol.for('graphorin.SubAgentTool');
+
+/** Child taint flags carried across the toTool fold (D2). */
+export interface SubAgentFoldTaint {
+  readonly untrusted?: boolean;
+  readonly sensitive?: boolean;
+  readonly sourceKind?: string;
+}
+
+/**
+ * The live references {@link SUBAGENT_TOOL} carries (W-001). Typed
+ * loosely on purpose: the walk is generic over foreign TDeps/TOutput
+ * and only ever passes through values it received from the same
+ * factory instance.
+ */
+export interface SubAgentToolRefs {
+  readonly agentName: string;
+  readonly run: (
+    input: unknown,
+    options?: Record<string, unknown>,
+  ) => Promise<AgentResult<unknown>>;
+  readonly stream: (
+    input: unknown,
+    options?: Record<string, unknown>,
+  ) => AsyncIterable<AgentEvent<unknown>>;
+  /** D2 capability restriction from `AgentToToolOptions.capability`. */
+  readonly capability?: 'read-only';
+  /** Reproduce `execute()`'s seed semantics (inputFilter + input string). */
+  readonly buildSeed: (
+    input: { readonly input: string },
+    parentMessages: ReadonlyArray<Message>,
+  ) => AgentInput;
+  /** Reproduce `execute()`'s output shaping (exposeTurns/contextFold/taint). */
+  readonly shapeCompleted: (
+    result: AgentResult<unknown>,
+    turns: ReadonlyArray<string>,
+  ) => { readonly output: unknown; readonly taint?: SubAgentFoldTaint };
+}
+
+/** Read the {@link SUBAGENT_TOOL} refs off a (possibly wrapped) tool. */
+export function getSubAgentToolRefs(tool: unknown): SubAgentToolRefs | undefined {
+  if (typeof tool !== 'object' || tool === null) return undefined;
+  const refs = (tool as Record<PropertyKey, unknown>)[SUBAGENT_TOOL];
+  return refs === undefined ? undefined : (refs as SubAgentToolRefs);
+}
+
 /** Build the agent's `toTool` method over the factory's run surface. */
 export function createToTool<TDeps, TOutput>(
   deps: ToToolDeps<TDeps, TOutput>,
@@ -120,6 +176,38 @@ export function createToTool<TDeps, TOutput>(
     const propagateTaint = options.propagateTaint !== false;
     const toolName = options.name ?? `subagent_${config.name}`;
     const description = options.description ?? `Invoke sub-agent '${config.name}'.`;
+
+    // Shared by `execute()` and the W-001 inline walk: seed semantics
+    // (least authority - input string only unless an inputFilter opts
+    // parent history in) and completed-result shaping.
+    const buildSeed = (
+      input: { readonly input: string },
+      parentMessages: ReadonlyArray<Message> | undefined,
+    ): AgentInput =>
+      options.inputFilter !== undefined && parentMessages !== undefined
+        ? ([
+            ...options.inputFilter(parentMessages),
+            { role: 'user' as const, content: input.input },
+          ] as Message[])
+        : input.input;
+    const shapeCompleted = (
+      result: AgentResult<TOutput>,
+      turns: ReadonlyArray<string>,
+    ): { readonly output: unknown; readonly taint?: SubAgentFoldTaint } => {
+      const taint = propagateTaint ? taintFromChildState(result.state) : undefined;
+      const output =
+        exposeTurns === 'all'
+          ? foldMaxChars !== null
+            ? foldRunOutcome(result, foldMaxChars)
+            : turns.join('\n\n')
+          : exposeTurns === 'none'
+            ? ''
+            : foldMaxChars !== null
+              ? foldRunOutcome(result, foldMaxChars)
+              : result.output;
+      return { output, ...(taint !== undefined ? { taint } : {}) };
+    };
+
     const schema = {
       parse: (v: unknown): { readonly input: string } => v as { readonly input: string },
       safeParse: (v: unknown) => ({
@@ -158,13 +246,7 @@ export function createToTool<TDeps, TOutput>(
           // workers in an orchestrator-worker fan-out).
           ...(options.capability !== undefined ? { capability: options.capability } : {}),
         };
-        const seed: AgentInput =
-          options.inputFilter !== undefined && ctx !== undefined
-            ? ([
-                ...options.inputFilter(ctx.runContext.messages),
-                { role: 'user' as const, content: input.input },
-              ] as Message[])
-            : input.input;
+        const seed = buildSeed(input, ctx?.runContext.messages);
         if (exposeTurns === 'all') {
           // Replay the streamed text completions as the result so
           // the parent agent sees every turn the sub-agent
@@ -192,16 +274,11 @@ export function createToTool<TDeps, TOutput>(
               }`,
             );
           }
-          const allOutput = (foldMaxChars !== null && endResult !== undefined
-            ? foldRunOutcome(endResult, foldMaxChars)
-            : turns.join('\n\n')) as unknown as TOutput;
-          const allTaint =
-            propagateTaint && endResult !== undefined
-              ? taintFromChildState(endResult.state)
-              : undefined;
-          return (allTaint !== undefined
-            ? { output: allOutput, taint: allTaint }
-            : allOutput) as unknown as TOutput;
+          if (endResult === undefined) return turns.join('\n\n') as unknown as TOutput;
+          const shapedAll = shapeCompleted(endResult, turns);
+          return (shapedAll.taint !== undefined
+            ? { output: shapedAll.output, taint: shapedAll.taint }
+            : shapedAll.output) as unknown as TOutput;
         }
         const result = await run(seed, callOpts);
         // W-033: fold BEFORE the non-completed throw (see 'all' branch).
@@ -215,15 +292,23 @@ export function createToTool<TDeps, TOutput>(
             }`,
           );
         }
-        const taint = propagateTaint ? taintFromChildState(result.state) : undefined;
-        const output = (exposeTurns === 'none'
-          ? ''
-          : foldMaxChars !== null
-            ? foldRunOutcome(result, foldMaxChars)
-            : result.output) as unknown as TOutput;
-        return (taint !== undefined ? { output, taint } : output) as unknown as TOutput;
+        const shaped = shapeCompleted(result, []);
+        return (shaped.taint !== undefined
+          ? { output: shaped.output, taint: shaped.taint }
+          : shaped.output) as unknown as TOutput;
       },
     };
+    // W-001: attach the inline-walk refs (see SUBAGENT_TOOL). Symbol
+    // properties survive the registry's `{...tool}` normalization spread.
+    const refs: SubAgentToolRefs = {
+      agentName: config.name,
+      run: run as unknown as SubAgentToolRefs['run'],
+      stream: stream as unknown as SubAgentToolRefs['stream'],
+      ...(options.capability !== undefined ? { capability: options.capability } : {}),
+      buildSeed,
+      shapeCompleted: shapeCompleted as unknown as SubAgentToolRefs['shapeCompleted'],
+    };
+    (tool as unknown as Record<PropertyKey, unknown>)[SUBAGENT_TOOL] = refs;
     return tool;
   };
 

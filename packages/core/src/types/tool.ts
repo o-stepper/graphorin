@@ -299,6 +299,16 @@ export interface ToolApproval {
   readonly args: unknown;
   readonly reason?: string;
   readonly requestedAt: string;
+  /**
+   * W-001: set when this approval belongs to a PARKED sub-agent run.
+   * It is the PARENT's toolCallId of the parked handoff / sub-agent
+   * call (the `RunState.pendingSubRuns` key), never a child-local id.
+   * Operators echo it back on the matching `ApprovalDecision` so
+   * resume decisions match on the composite (toolCallId,
+   * subRunToolCallId) key - child-local toolCallIds of two different
+   * children may collide.
+   */
+  readonly subRunToolCallId?: string;
 }
 
 /**

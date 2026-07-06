@@ -22,6 +22,7 @@ import type {
 } from '@graphorin/core';
 import { type DescribedFilter, filters as filterLib } from '../filters/index.js';
 import type { Agent, AgentCallOptions, AgentConfig } from '../types.js';
+import type { SubAgentFoldTaint } from './agent-to-tool.js';
 import { foldChildRunUsage, renderToolErrorMessage } from './messages.js';
 import type { MutableRunState } from './run-input.js';
 
@@ -138,8 +139,8 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   call: ToolCall,
   handoff: HandoffEntry<TDeps>,
   stepNumber: number,
-): AsyncGenerator<AgentEvent<TOutput>, void, void> {
-  const { config, options, state, messages, sessionId, agentId, signal, usageAcc } = env;
+): AsyncGenerator<AgentEvent<TOutput>, { readonly suspendRequested: boolean }, void> {
+  const { config, options, state, messages, sessionId, agentId, signal } = env;
   yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
   const filter = (handoff.filter ?? filterLib.defaultHandoffFilter()) as DescribedFilter;
   const filtered = sanitizeHandoffSeed(filter(messages) as Message[]);
@@ -162,19 +163,17 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
   // W-034: `currentAgentId` identifies the agent whose model drives the
   // NEXT step - the parent resumes driving once the child returns, so
   // the transfer is scoped to the child observation and restored in
-  // `finally` (both branches, and on generator teardown). The child's
-  // identity is durably recorded by the HandoffRecord + handoff event.
+  // `finally` (every branch, including the W-001 park, and on generator
+  // teardown). The child's identity is durably recorded by the
+  // HandoffRecord + handoff event.
   const previousAgentId = state.currentAgentId;
   state.currentAgentId = targetId;
   const subAgent = handoff.agent;
-  // AG-22: the sub-agent inherits the parent's abort signal,
-  // deps, and sessionId; its terminal `agent.end` is observed
-  // so a failed/aborted sub-run surfaces as a TOOL ERROR -
-  // never an empty-string success with durationMs 0.
-  const subStart = Date.now();
-  const subOutputs: string[] = [];
-  let subResult: AgentResult<unknown> | undefined;
   try {
+    // AG-22: the sub-agent inherits the parent's abort signal,
+    // deps, and sessionId; its terminal `agent.end` is observed
+    // so a failed/aborted sub-run surfaces as a TOOL ERROR -
+    // never an empty-string success with durationMs 0.
     const subStream = subAgent.stream(filtered as Message[], {
       signal,
       ...(options.deps !== undefined || config.deps !== undefined
@@ -182,20 +181,138 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
         : {}),
       sessionId,
     });
-    for await (const subEv of subStream) {
-      if (subEv.type === 'text.complete') subOutputs.push(subEv.text);
-      else if (subEv.type === 'agent.end') {
-        subResult = subEv.result as AgentResult<unknown>;
-      }
-    }
+    return yield* runSubAgentCall<TDeps, TOutput>(
+      env,
+      call,
+      {
+        agentName: handoff.agent.config.name,
+        subStream: subStream as AsyncIterable<AgentEvent<unknown>>,
+        errorLabel: `handoff to '${targetId}'`,
+        renderCompleted: (_subResult, turns) => ({ output: turns.join('') }),
+      },
+      stepNumber,
+    );
   } finally {
     state.currentAgentId = previousAgentId;
   }
+}
+
+/** Branch-specific spec for the shared sub-run seam (W-001). */
+export interface SubRunSpec {
+  /** The child agent's configured name (parking + usage folding). */
+  readonly agentName: string;
+  readonly subStream: AsyncIterable<AgentEvent<unknown>>;
+  /** Prefix for the failed/aborted tool-error message. */
+  readonly errorLabel: string;
+  /** Shape a completed child into the tool-message payload. */
+  readonly renderCompleted: (
+    subResult: AgentResult<unknown>,
+    turns: ReadonlyArray<string>,
+  ) => { readonly output: unknown; readonly taint?: SubAgentFoldTaint };
+  /** Optional taint sink (the inline toTool path records D2 folds). */
+  readonly recordTaint?: (taint: SubAgentFoldTaint, renderedText: string) => void;
+}
+
+/**
+ * W-001: compose the sub-run routing path. An approval mirrored from a
+ * child that itself parked a grandchild already carries the CHILD-level
+ * routing; prefixing this level's park key keeps the full path intact
+ * (`<parentCallId>/<childCallId>/...`), so each resume level strips one
+ * segment and routes the remainder down. Park-key toolCallIds must not
+ * contain `/` (provider call ids do not).
+ */
+export function composeSubRunPath(parkKey: string, nested: string | undefined): string {
+  return nested === undefined ? parkKey : `${parkKey}/${nested}`;
+}
+
+/** Split one routing segment off a composed sub-run path (W-001). */
+export function splitSubRunPath(path: string): {
+  readonly head: string;
+  readonly rest: string | undefined;
+} {
+  const idx = path.indexOf('/');
+  if (idx === -1) return { head: path, rest: undefined };
+  return { head: path.slice(0, idx), rest: path.slice(idx + 1) };
+}
+
+/** Park (or refresh) a suspended child on the parent state (W-001). */
+function parkSubRun(
+  state: MutableRunState & RunState,
+  call: ToolCall,
+  agentName: string,
+  childState: RunState,
+): void {
+  const entry = {
+    toolCallId: call.toolCallId,
+    toolName: call.toolName,
+    targetAgentName: agentName,
+    state: childState,
+  };
+  const subs = state.pendingSubRuns;
+  if (subs === undefined) {
+    state.pendingSubRuns = [entry];
+    return;
+  }
+  const idx = subs.findIndex((s) => s.toolCallId === call.toolCallId);
+  if (idx === -1) subs.push(entry);
+  else subs[idx] = entry;
+}
+
+/**
+ * W-001: the shared sub-run seam behind handoff and inline `toTool`
+ * execution. Observes the child stream and settles the outcome:
+ *
+ * - `awaiting_approval`: the child PARKS on `state.pendingSubRuns`, its
+ *   pending approvals mirror onto the parent's `pendingApprovals` with
+ *   `subRunToolCallId` set, and the walk suspends the parent once per
+ *   step. The parked toolCallId keeps NO tool message - exactly like a
+ *   directly-gated call - and the resume guard keeps it out of the
+ *   provider loop.
+ * - terminal failure: a typed tool error (the pre-W-001 behavior).
+ * - completed: the branch-shaped output becomes the tool message.
+ *
+ * Usage folds on terminal outcomes only - the child's cumulative usage
+ * folds exactly once when it finally completes or fails, never at a
+ * park (a park would double-count the pre-suspend tokens on resume).
+ */
+export async function* runSubAgentCall<TDeps, TOutput>(
+  env: HandoffRunEnv<TDeps, TOutput>,
+  call: ToolCall,
+  spec: SubRunSpec,
+  stepNumber: number,
+): AsyncGenerator<AgentEvent<TOutput>, { readonly suspendRequested: boolean }, void> {
+  const { state, messages, usageAcc } = env;
+  const subStart = Date.now();
+  const turns: string[] = [];
+  let subResult: AgentResult<unknown> | undefined;
+  for await (const subEv of spec.subStream) {
+    if (subEv.type === 'text.complete') turns.push(subEv.text);
+    else if (subEv.type === 'agent.end') {
+      subResult = subEv.result as AgentResult<unknown>;
+    }
+  }
   const subDurationMs = Date.now() - subStart;
-  // W-033: fold the child's usage into the parent's accounting on EVERY
-  // outcome - tokens were spent whether the child completed or failed.
+
+  if (subResult !== undefined && subResult.status === 'awaiting_approval') {
+    parkSubRun(state, call, spec.agentName, subResult.state);
+    for (const approval of subResult.state.pendingApprovals) {
+      state.pendingApprovals.push({
+        ...approval,
+        subRunToolCallId: composeSubRunPath(call.toolCallId, approval.subRunToolCallId),
+      });
+      yield {
+        type: 'tool.approval.requested',
+        toolCallId: approval.toolCallId,
+        ...(approval.reason !== undefined ? { reason: approval.reason } : {}),
+      };
+    }
+    return { suspendRequested: true };
+  }
+
+  // W-033: fold the child's usage into the parent's accounting on every
+  // TERMINAL outcome - tokens were spent whether it completed or failed.
   if (subResult !== undefined) {
-    foldChildRunUsage(state, usageAcc, subResult.state, handoff.agent.config.name);
+    foldChildRunUsage(state, usageAcc, subResult.state, spec.agentName);
   }
   const stepEntry = state.steps[state.steps.length - 1];
   if (subResult !== undefined && subResult.status !== 'completed') {
@@ -203,7 +320,7 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
       toolCallId: call.toolCallId,
       toolName: call.toolName,
       kind: subResult.status === 'aborted' ? 'aborted' : 'execution_failed',
-      message: `handoff to '${targetId}' ${subResult.status}${
+      message: `${spec.errorLabel} ${subResult.status}${
         subResult.error !== undefined ? `: ${subResult.error.message}` : ''
       }`,
     };
@@ -222,9 +339,15 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
     const text = renderToolErrorMessage(toolError);
     messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
     state.messages.push({ role: 'tool', toolCallId: call.toolCallId, content: text });
-    return;
+    return { suspendRequested: false };
   }
-  const result = subOutputs.join('');
+  const shaped =
+    subResult !== undefined ? spec.renderCompleted(subResult, turns) : { output: turns.join('') };
+  const result =
+    typeof shaped.output === 'string' ? shaped.output : (JSON.stringify(shaped.output) ?? '');
+  if ('taint' in shaped && shaped.taint !== undefined) {
+    spec.recordTaint?.(shaped.taint, result);
+  }
   const completed: CompletedToolCall = {
     call,
     outcome: {
@@ -250,4 +373,5 @@ export async function* executeHandoffToolCall<TDeps, TOutput>(
     toolCallId: call.toolCallId,
     content: result,
   });
+  return { suspendRequested: false };
 }

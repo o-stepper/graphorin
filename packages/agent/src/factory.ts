@@ -55,8 +55,11 @@ import { createToTool } from './runtime/agent-to-tool.js';
 import {
   dispatchResumedApprovals,
   processResumeDirective,
+  processSubRunResumes,
   type ResumedDispatchEnv,
   type ResumeRunEnv,
+  type RoutedSubRunDecision,
+  type SubRunResumeEnv,
 } from './runtime/approvals.js';
 import { type DispatchRunEnv, dispatchToolBatch } from './runtime/dispatch.js';
 import { wireToolExecution } from './runtime/executor-wiring.js';
@@ -399,6 +402,9 @@ export function createAgent<TDeps = unknown, TOutput = string>(
     // kept so the write-ahead intent checkpoint can re-attach them to
     // `pendingApprovals` (a crash-retry against the intent re-dispatches).
     const grantedApprovals: ToolApproval[] = [];
+    // W-001: decisions addressed to PARKED sub-agent runs, grouped by the
+    // parent toolCallId of the park (routed into the children below).
+    const subRunDecisions = new Map<string, RoutedSubRunDecision[]>();
     // Process resume directive - apply approval decisions to any
     // pending approvals captured in the previous suspend.
     if (
@@ -411,6 +417,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         options.directive.approvals,
         resumedApprovedCalls,
         grantedApprovals,
+        subRunDecisions,
       );
     }
     // AG-14: the resumed status is left untouched here. A 'failed' run is NOT
@@ -461,6 +468,7 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       ToolCallWalkEnv<TDeps, TOutput> &
       ResumeRunEnv &
       ResumedDispatchEnv<TDeps, TOutput> &
+      SubRunResumeEnv<TDeps, TOutput> &
       VerifierGateEnv<TDeps, TOutput> &
       RunOutputEnv<TDeps, TOutput>;
     const runEnv: RunLoopEnv = {
@@ -524,6 +532,14 @@ export function createAgent<TDeps = unknown, TOutput = string>(
         resumedApprovedCalls,
         grantedApprovals,
       );
+    }
+
+    // W-001: route sub-run decisions into their parked children (grant
+    // and deny alike - the child settles them in its own transcript). A
+    // child that completes folds back as the parent's tool message; one
+    // that suspends again re-parks and the parent re-suspends below.
+    if (resumed && subRunDecisions.size > 0) {
+      yield* processSubRunResumes<TDeps, TOutput>(runEnv, subRunDecisions);
     }
 
     // AG-14 (suspended half): a resumed run still awaiting approvals the

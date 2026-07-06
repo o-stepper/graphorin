@@ -55,6 +55,7 @@ export {
   ProviderMiddlewareOrderError,
   RunStateMalformedError,
   RunStateVersionUnsupportedError,
+  SubAgentResumeTargetNotFoundError,
   ToolNotFoundError,
 } from './errors/index.js';
 export {
@@ -141,10 +142,17 @@ export {
   RUN_STATE_SCHEMA_VERSION,
   runStateFromJSON,
   runStateToJSON,
+  type SerializedPendingSubRun,
   type SerializedRunState,
   type SerializeRunStateOptions,
   serializeRunState,
 } from './run-state/index.js';
+export {
+  getSubAgentToolRefs,
+  SUBAGENT_TOOL,
+  type SubAgentFoldTaint,
+  type SubAgentToolRefs,
+} from './runtime/agent-to-tool.js';
 export { foldChildRunUsage } from './runtime/messages.js';
 export {
   createReplayProvider,
