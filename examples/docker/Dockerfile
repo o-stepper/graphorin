@@ -30,7 +30,9 @@ WORKDIR /build
 # Pinned package manager — mirrors the workspace `packageManager` field.
 RUN corepack enable && corepack prepare pnpm@10.28.2 --activate
 
-COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
+# tsconfig.base.json is load-bearing: every package tsconfig extends it,
+# so `pnpm -r run build` (tsdown) fails without it in the build context.
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY packages ./packages
 
 RUN pnpm install --frozen-lockfile \
