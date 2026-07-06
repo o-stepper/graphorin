@@ -9,10 +9,34 @@ import type { ProviderEvent } from '@graphorin/core';
 import { ProviderHttpError } from '../errors/errors.js';
 
 /**
+ * W-095: conversion options for the local-adapter message converters.
+ * `multimodal` mirrors the adapter instance's effective
+ * `capabilities.multimodal`; `warn` receives ONE message per convert
+ * call when parts were dropped (adapters dedupe it to once per
+ * instance).
+ *
+ * @internal
+ */
+export interface ChatMessageConversionOptions {
+  readonly multimodal: boolean;
+  readonly warn?: (message: string) => void;
+}
+
+const TEXT_ONLY: ChatMessageConversionOptions = { multimodal: false };
+
+/**
  * Convert a graphorin `Message` to the OpenAI-compatible chat-completion
  * shape. The shape is the lingua-franca of the bundled local adapters
  * (`llamaCppServerAdapter` and `openAICompatibleAdapter`); the
  * native-Ollama path uses its own conversion.
+ *
+ * W-095: with `opts.multimodal === true` image parts are emitted as
+ * OpenAI `image_url` content parts (bytes as a data URI, `URL`s passed
+ * through as strings - the server dereferences; this adapter never
+ * fetches). Audio/file parts have no portable wire form on
+ * OpenAI-compatible servers and are dropped LOUDLY. With
+ * `multimodal: false` (the default) content flattens to a plain string
+ * exactly as before, and any dropped non-text part triggers the warn.
  *
  * @internal
  */
@@ -27,11 +51,18 @@ export function toOpenAIChatMessages(
     }>;
     readonly toolCallId?: string;
   }>,
+  opts: ChatMessageConversionOptions = TEXT_ONLY,
 ): ReadonlyArray<Record<string, unknown>> {
-  return messages.map((msg) => {
+  const dropped = new Set<string>();
+  const converted = messages.map((msg) => {
     const out: Record<string, unknown> = {
       role: msg.role,
-      content: typeof msg.content === 'string' ? msg.content : flattenContent(msg.content),
+      content:
+        typeof msg.content === 'string'
+          ? msg.content
+          : opts.multimodal
+            ? toOpenAIParts(msg.content, dropped)
+            : flattenContent(msg.content, dropped),
     };
     if (msg.toolCalls !== undefined && msg.toolCalls.length > 0) {
       out.tool_calls = msg.toolCalls.map((tc) => ({
@@ -48,6 +79,62 @@ export function toOpenAIChatMessages(
     }
     return out;
   });
+  warnDropped(opts, dropped);
+  return converted;
+}
+
+/** W-095: build the OpenAI `content` parts array for a vision model. */
+function toOpenAIParts(
+  parts: ReadonlyArray<unknown>,
+  dropped: Set<string>,
+): ReadonlyArray<Record<string, unknown>> {
+  const out: Record<string, unknown>[] = [];
+  for (const part of parts) {
+    if (typeof part === 'string') {
+      out.push({ type: 'text', text: part });
+      continue;
+    }
+    if (typeof part !== 'object' || part === null) continue;
+    const obj = part as { type?: string; text?: string; image?: unknown; mimeType?: string };
+    if (obj.type === 'text' && typeof obj.text === 'string') {
+      out.push({ type: 'text', text: obj.text });
+      continue;
+    }
+    if (obj.type === 'image') {
+      const url = imageToUrl(obj.image, obj.mimeType);
+      if (url !== undefined) {
+        out.push({ type: 'image_url', image_url: { url } });
+        continue;
+      }
+    }
+    if (typeof obj.type === 'string') dropped.add(obj.type);
+  }
+  return out;
+}
+
+/**
+ * W-095: bytes become a `data:` URI (default mime `image/png`); `URL`s
+ * pass through as strings - the SERVER dereferences, the adapter makes
+ * no network call of its own.
+ */
+function imageToUrl(image: unknown, mimeType?: string): string | undefined {
+  if (image instanceof URL) return image.toString();
+  if (image instanceof Uint8Array) {
+    const mime = mimeType ?? 'image/png';
+    return `data:${mime};base64,${Buffer.from(image).toString('base64')}`;
+  }
+  return undefined;
+}
+
+/** W-095: one honest WARN per convert call when parts were dropped. */
+function warnDropped(opts: ChatMessageConversionOptions, dropped: Set<string>): void {
+  if (dropped.size === 0 || opts.warn === undefined) return;
+  const kinds = [...dropped].sort().join(', ');
+  opts.warn(
+    opts.multimodal
+      ? `content parts of kind [${kinds}] have no wire mapping on this adapter and were dropped`
+      : `non-text content parts of kind [${kinds}] were dropped - this adapter instance has capabilities.multimodal=false; pass capabilities: { multimodal: true } if the model supports vision`,
+  );
 }
 
 /**
@@ -70,12 +157,27 @@ export function toOllamaChatMessages(
     }>;
     readonly toolCallId?: string;
   }>,
+  opts: ChatMessageConversionOptions = TEXT_ONLY,
 ): ReadonlyArray<Record<string, unknown>> {
-  return messages.map((msg) => {
-    const out: Record<string, unknown> = {
-      role: msg.role,
-      content: typeof msg.content === 'string' ? msg.content : flattenContent(msg.content),
-    };
+  const dropped = new Set<string>();
+  const converted = messages.map((msg) => {
+    let content: string;
+    let images: string[] | undefined;
+    if (typeof msg.content === 'string') {
+      content = msg.content;
+    } else if (opts.multimodal) {
+      // W-095: Ollama's native API takes a per-message `images` array
+      // of RAW base64 strings (no data: prefix). URL images cannot be
+      // inlined on this path (the adapter never fetches) - dropped
+      // loudly.
+      const split = toOllamaContent(msg.content, dropped);
+      content = split.text;
+      images = split.images.length > 0 ? split.images : undefined;
+    } else {
+      content = flattenContent(msg.content, dropped);
+    }
+    const out: Record<string, unknown> = { role: msg.role, content };
+    if (images !== undefined) out.images = images;
     if (msg.toolCalls !== undefined && msg.toolCalls.length > 0) {
       out.tool_calls = msg.toolCalls.map((tc) => ({
         function: {
@@ -86,6 +188,39 @@ export function toOllamaChatMessages(
     }
     return out;
   });
+  warnDropped(opts, dropped);
+  return converted;
+}
+
+/** W-095: split parts into flattened text + raw-base64 image payloads. */
+function toOllamaContent(
+  parts: ReadonlyArray<unknown>,
+  dropped: Set<string>,
+): { readonly text: string; readonly images: string[] } {
+  const buffer: string[] = [];
+  const images: string[] = [];
+  for (const part of parts) {
+    if (typeof part === 'string') {
+      buffer.push(part);
+      continue;
+    }
+    if (typeof part !== 'object' || part === null) continue;
+    const obj = part as { type?: string; text?: string; image?: unknown };
+    if (obj.type === 'text' && typeof obj.text === 'string') {
+      buffer.push(obj.text);
+      continue;
+    }
+    if (obj.type === 'image' && obj.image instanceof Uint8Array) {
+      images.push(Buffer.from(obj.image).toString('base64'));
+      continue;
+    }
+    if (obj.type === 'image') {
+      dropped.add('image (URL - the native Ollama API needs inline bytes)');
+      continue;
+    }
+    if (typeof obj.type === 'string') dropped.add(obj.type);
+  }
+  return { text: buffer.join(''), images };
 }
 
 /**
@@ -107,7 +242,7 @@ function toArgsObject(args: unknown): Record<string, unknown> {
   return typeof args === 'object' && args !== null ? (args as Record<string, unknown>) : {};
 }
 
-function flattenContent(parts: ReadonlyArray<unknown>): string {
+function flattenContent(parts: ReadonlyArray<unknown>, dropped?: Set<string>): string {
   const buffer: string[] = [];
   for (const part of parts) {
     if (typeof part === 'string') {
@@ -118,6 +253,10 @@ function flattenContent(parts: ReadonlyArray<unknown>): string {
       const obj = part as { type?: string; text?: string };
       if (obj.type === 'text' && typeof obj.text === 'string') {
         buffer.push(obj.text);
+      } else if (typeof obj.type === 'string') {
+        // W-095: silently vanishing multimodal content was the bug -
+        // collect the kind so the caller can WARN once.
+        dropped?.add(obj.type);
       }
     }
   }

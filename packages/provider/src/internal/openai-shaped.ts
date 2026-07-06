@@ -27,7 +27,12 @@ import {
   classifyLocalProvider,
   type LocalProviderClassification,
 } from '../trust/classify-local-provider.js';
-import { callJsonHttp, makeStreamStartEvent, toOpenAIChatMessages } from './http.js';
+import {
+  type ChatMessageConversionOptions,
+  callJsonHttp,
+  makeStreamStartEvent,
+  toOpenAIChatMessages,
+} from './http.js';
 import { parseEventStream } from './sse.js';
 import { stripTrailingSlashes } from './url-utils.js';
 
@@ -176,7 +181,13 @@ async function* streamOpenAIShaped(
   url: string,
   req: ProviderRequest,
 ): AsyncIterable<ProviderEvent> {
-  const body = buildBody(opts.model, req, true, opts.capabilities?.structuredOutput ?? true);
+  const body = buildBody(
+    opts.model,
+    req,
+    true,
+    opts.capabilities?.structuredOutput ?? true,
+    conversionOptionsFor(opts),
+  );
   const resp = await callJsonHttp({
     providerName: opts.providerName,
     url,
@@ -284,7 +295,13 @@ async function generateOpenAIShaped(
   url: string,
   req: ProviderRequest,
 ): Promise<ProviderResponse> {
-  const body = buildBody(opts.model, req, false, opts.capabilities?.structuredOutput ?? true);
+  const body = buildBody(
+    opts.model,
+    req,
+    false,
+    opts.capabilities?.structuredOutput ?? true,
+    conversionOptionsFor(opts),
+  );
   const resp = await callJsonHttp({
     providerName: opts.providerName,
     url,
@@ -334,6 +351,7 @@ function buildBody(
   req: ProviderRequest,
   stream: boolean,
   structuredOutput: boolean,
+  conversion: ChatMessageConversionOptions,
 ): Record<string, unknown> {
   const messages =
     req.systemMessage !== undefined
@@ -341,7 +359,7 @@ function buildBody(
       : req.messages;
   const body: Record<string, unknown> = {
     model,
-    messages: toOpenAIChatMessages(messages),
+    messages: toOpenAIChatMessages(messages, conversion),
     stream,
   };
   if (stream) {
@@ -480,6 +498,28 @@ function defaultLogger(level: 'warn' | 'info', message: string, meta?: object): 
   } else {
     fn(`[graphorin/provider] ${message}`);
   }
+}
+
+/**
+ * W-095: one dropped-content WARN per adapter INSTANCE (keyed on the
+ * factory's options object, following KNOWN_LOOPBACK_OVERRIDES_WARNED),
+ * so a chat loop does not repeat it every call.
+ */
+const droppedContentWarned = new WeakSet<object>();
+
+function conversionOptionsFor(opts: {
+  readonly capabilities?: { readonly multimodal?: boolean };
+  readonly logger?: (level: 'warn' | 'info', message: string, meta?: object) => void;
+}): ChatMessageConversionOptions {
+  const log = opts.logger ?? defaultLogger;
+  return {
+    multimodal: opts.capabilities?.multimodal ?? false,
+    warn: (message) => {
+      if (droppedContentWarned.has(opts)) return;
+      droppedContentWarned.add(opts);
+      log('warn', message);
+    },
+  };
 }
 
 interface OpenAIChunk {

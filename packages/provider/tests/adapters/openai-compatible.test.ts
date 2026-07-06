@@ -379,3 +379,59 @@ describe('C2 - adapter-level worked-example folding (OpenAI wire)', () => {
     expect(body.tools?.[0]?.function?.description).toContain('"city":"kyiv"');
   });
 });
+
+describe('W-095 - multimodal image passing', () => {
+  const IMG = new Uint8Array([1, 2, 3]);
+  const RESPONSE = {
+    choices: [{ message: { content: 'a cat' }, finish_reason: 'stop' }],
+    usage: { prompt_tokens: 1, completion_tokens: 2, total_tokens: 3 },
+  };
+  const imageRequest = {
+    messages: [
+      {
+        role: 'user' as const,
+        content: [
+          { type: 'text' as const, text: 'describe' },
+          { type: 'image' as const, image: IMG, mimeType: 'image/jpeg' },
+        ],
+      },
+    ],
+  };
+
+  it('capabilities.multimodal: true puts image_url parts on the wire', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const provider = openAICompatibleAdapter({
+      model: 'llava',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({ jsonOnce: RESPONSE, capture }),
+      logger: () => {},
+      capabilities: { multimodal: true },
+    });
+    const result = await provider.generate(imageRequest);
+    expect(result.text).toBe('a cat');
+    const body = String(capture.init?.body ?? '');
+    expect(body).toContain('"image_url"');
+    expect(body).toContain(`data:image/jpeg;base64,${Buffer.from(IMG).toString('base64')}`);
+  });
+
+  it('default capabilities: body stays a flat string and ONE warn names the dropped kind', async () => {
+    const capture: { url?: string; init?: RequestInit } = {};
+    const warns: string[] = [];
+    const provider = openAICompatibleAdapter({
+      model: 'lmstudio',
+      baseUrl: 'http://127.0.0.1:1234',
+      fetchImpl: makeFetchImpl({ jsonOnce: RESPONSE, capture }),
+      logger: (level, message) => {
+        if (level === 'warn') warns.push(message);
+      },
+    });
+    await provider.generate(imageRequest);
+    await provider.generate(imageRequest);
+    const body = String(capture.init?.body ?? '');
+    expect(body).not.toContain('image_url');
+    expect(body).toContain('"content":"describe"');
+    const dropWarns = warns.filter((w) => w.includes('capabilities.multimodal'));
+    expect(dropWarns).toHaveLength(1);
+    expect(dropWarns[0]).toContain('image');
+  });
+});
