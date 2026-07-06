@@ -21,6 +21,7 @@ import type { Provider, ProviderRequest, SessionScope, Tracer } from '@graphorin
 import { wrapUntrusted } from '../../internal/envelope.js';
 import { newMemoryId } from '../../internal/id.js';
 import { stripMemoryInjectionMarkers } from '../../internal/injection-heuristics.js';
+import { stripFence } from '../../internal/llm-json.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type { InsightMemoryStoreExt } from '../../internal/storage-adapter.js';
 import type { EpisodicMemory } from '../../tiers/episodic-memory.js';
@@ -493,11 +494,6 @@ function tryParse(candidate: string): unknown {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
 }
 
 function sliceBetween(text: string, open: string, close: string): string | null {

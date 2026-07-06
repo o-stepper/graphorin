@@ -23,6 +23,7 @@ import {
   contextualizeWithLlm,
 } from '../../internal/contextualize.js';
 import { newMemoryId } from '../../internal/id.js';
+import { sliceJsonObject, stripFence } from '../../internal/llm-json.js';
 import { withMemorySpan } from '../../internal/spans.js';
 import type {
   ConsolidatorMemoryStoreExt,
@@ -835,18 +836,6 @@ export function normalizeImportance(raw: number | undefined): number | undefined
   if (typeof raw !== 'number' || !Number.isFinite(raw)) return undefined;
   const clamped = Math.min(10, Math.max(1, raw));
   return clamped / 10;
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
-}
-
-function sliceJsonObject(text: string): string | null {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start < 0 || end < start) return null;
-  return text.slice(start, end + 1);
 }
 
 /**

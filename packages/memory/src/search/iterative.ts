@@ -33,6 +33,7 @@
  */
 
 import type { Provider, ProviderRequest } from '@graphorin/core';
+import { stripFence } from '../internal/llm-json.js';
 
 /** Default hard ceiling on total retrieval passes (gate + cap mandatory). */
 export const DEFAULT_MAX_ITERATIONS = 3;
@@ -650,11 +651,6 @@ function tryJson(text: string): unknown {
   } catch {
     return undefined;
   }
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

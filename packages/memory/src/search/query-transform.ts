@@ -23,6 +23,7 @@
  */
 
 import type { Provider, ProviderRequest } from '@graphorin/core';
+import { stripFence } from '../internal/llm-json.js';
 
 /** Default ceiling on reworded variants a provider-backed transformer requests. */
 export const DEFAULT_MAX_QUERY_VARIANTS = 5;
@@ -277,11 +278,6 @@ function sliceJson(text: string): string | null {
   const objEnd = text.lastIndexOf('}');
   if (objStart >= 0 && objEnd > objStart) return text.slice(objStart, objEnd + 1);
   return null;
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

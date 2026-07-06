@@ -35,6 +35,7 @@ import { stage1ExactDedup } from '../conflict/stages/stage1-exact-dedup.js';
 import { stage2EmbeddingThreeZone } from '../conflict/stages/stage2-embedding-three-zone.js';
 import { wrapUntrusted } from '../internal/envelope.js';
 import { stripMemoryInjectionMarkers } from '../internal/injection-heuristics.js';
+import { sliceJsonObject, stripFence } from '../internal/llm-json.js';
 
 /**
  * Pre-filter routing decision. `add` and `noop` are resolved without an
@@ -269,16 +270,4 @@ function synthCandidate(text: string): Fact {
     text,
     createdAt: new Date(0).toISOString(),
   };
-}
-
-function stripFence(text: string): string {
-  const match = /^```[^\n]*\n([\s\S]*?)\n```/u.exec(text.trim());
-  return match?.[1] ?? text;
-}
-
-function sliceJsonObject(text: string): string | null {
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  if (start < 0 || end < start) return null;
-  return text.slice(start, end + 1);
 }
