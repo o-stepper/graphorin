@@ -42,13 +42,15 @@ jobs:
       - name: License allowlist
         run: pnpm run check-licenses
 
-      - name: Verify package signatures (skip on Phase 01 — no published packages yet)
-        run: |
-          if pnpm audit signatures --help >/dev/null 2>&1; then
-            pnpm audit signatures || echo "::warning::pnpm audit signatures reported issues; review before release."
-          else
-            echo "pnpm audit signatures not available in this version; skipping."
-          fi
+      # W-077: pnpm has no `audit signatures` subcommand - the old step
+      # silently ran a second vulnerability audit and swallowed failures
+      # with ::warning. The script installs the workspace's external
+      # dependency union into a scratch project and runs the real
+      # `npm audit signatures` (Sigstore/registry verification), failing
+      # hard on any unverified signature AND on a vacuous zero-verified
+      # pass. A red weekly run escalates via notify-on-failure below.
+      - name: Verify dependency signatures + attestations (npm audit signatures)
+        run: node scripts/check-dep-signatures.mjs
 
   codeql:
     name: CodeQL · javascript-typescript
