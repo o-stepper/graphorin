@@ -127,6 +127,40 @@ describe('@graphorin/observability/tracer - createTracer', () => {
     expect(types).toEqual(['agent.run']);
   });
 
+  it('W-090: a per-type rule drops CHILD spans inside a sampled trace', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((r) => records.push(r));
+    const tracer = createTracer({
+      exporters: [exporter],
+      warnSink: () => {},
+      sampling: { rate: 1, rules: [{ type: 'tool.execute', rate: 0 }] },
+    });
+    await tracer.span({ type: 'agent.run' }, async (root) => {
+      await tracer.span({ type: 'tool.execute', parent: root }, async () => undefined);
+      await tracer.span({ type: 'agent.step', parent: root }, async () => undefined);
+    });
+    await tracer.shutdown();
+    const types = records.map((r) => r.type).sort();
+    // The sampled parent and the un-ruled sibling export; the ruled
+    // child inside the sampled trace does not.
+    expect(types).toEqual(['agent.run', 'agent.step']);
+  });
+
+  it('W-090: without per-type rules, child export is byte-identical to before', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((r) => records.push(r));
+    const tracer = createTracer({
+      exporters: [exporter],
+      warnSink: () => {},
+      sampling: { rate: 1 },
+    });
+    await tracer.span({ type: 'agent.run' }, async (root) => {
+      await tracer.span({ type: 'tool.execute', parent: root }, async () => undefined);
+    });
+    await tracer.shutdown();
+    expect(records.map((r) => r.type).sort()).toEqual(['agent.run', 'tool.execute']);
+  });
+
   it('exposes redaction counters via getMetrics()', async () => {
     const exporter = mockExporter(() => {});
     const tracer = createTracer({
@@ -284,3 +318,34 @@ function mockExporter(onExport: (record: SpanRecord) => void): TraceExporter {
     async shutdown(): Promise<void> {},
   };
 }
+
+describe('W-090 - createSampler parent-based per-type rules', () => {
+  it('rule rate 0 under a sampled parent returns false; rate 1 returns true', () => {
+    const sampler = createSampler({
+      rules: [
+        { type: 'tool.execute', rate: 0 },
+        { type: 'agent.step', rate: 1 },
+      ],
+      random: () => 0.5,
+    });
+    expect(sampler.shouldSample('tool.execute', true)).toBe(false);
+    expect(sampler.shouldSample('agent.step', true)).toBe(true);
+    // Un-ruled children of a sampled parent keep the old pass-through.
+    expect(sampler.shouldSample('memory.embed', true)).toBe(true);
+  });
+
+  it('a rule can NEVER resurrect children of an unsampled parent', () => {
+    const sampler = createSampler({
+      rules: [{ type: 'tool.execute', rate: 1 }],
+      random: () => 0.5,
+    });
+    expect(sampler.shouldSample('tool.execute', false)).toBe(false);
+  });
+
+  it('fractional rule rates are probabilistic with the injected random', () => {
+    const low = createSampler({ rules: [{ type: 'tool.execute', rate: 0.3 }], random: () => 0.2 });
+    expect(low.shouldSample('tool.execute', true)).toBe(true);
+    const high = createSampler({ rules: [{ type: 'tool.execute', rate: 0.3 }], random: () => 0.9 });
+    expect(high.shouldSample('tool.execute', true)).toBe(false);
+  });
+});

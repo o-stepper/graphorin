@@ -21,6 +21,8 @@ flowchart LR
 
 The agent loop opens one `agent.run` span per run and one `agent.step` span per step (C7); `tool.execute` parents under the current step via `RunContext.span`, and a `withTracing`-wrapped provider parents its `provider.stream`/`provider.generate` span under the step via `ProviderRequest.parentSpan` - so a run is ONE trace tree and parent-based sampling has a real parent to follow. Memory-tier spans (`memory.search.semantic`, consolidator phases) still start their own traces today: the tiers hold their own tracer handle and are called outside the step context - a known limitation, not a wiring bug.
 
+Per-type sampling rules act INSIDE a sampled trace too (W-090): under the default parent-based decision maker, `sampling.rules: [{ type: 'tool.execute', rate: 0.01 }]` thins the per-call spans of every sampled `agent.run` - which is where the volume actually lives - instead of only ever applying to root spans. A rule can only downsample: children of an unsampled parent are never resurrected (they would be orphans), and a child dropped by its rule breaks the tree below it - its own descendants inherit `parentSampled=false`. Configurations without rules are byte-identical to before.
+
 Run/step/tool spans carry OTel GenAI attributes (`gen_ai.operation.name` = `invoke_agent` / `execute_tool` / `chat`, `gen_ai.agent.id`, `gen_ai.tool.name`, `gen_ai.request.model`, `gen_ai.usage.input_tokens` / `output_tokens` on close) plus Graphorin-specific ones (`graphorin.run.id`, `graphorin.step.number`, `graphorin.tool.name`, `graphorin.tool.sensitivity`, `graphorin.tool.sandbox.kind`, …).
 
 ## Wiring a tracer
