@@ -179,7 +179,11 @@ export function bytesToBase64(bytes: Uint8Array): string {
  * @stable
  */
 export function base64ToBytes(data: string): Uint8Array {
-  const stripped = data.replace(/=+$/, '');
+  // Strip trailing padding with a loop: /=+$/ backtracks polynomially
+  // on '='-heavy adversarial input (CodeQL js/polynomial-redos).
+  let end = data.length;
+  while (end > 0 && data.charCodeAt(end - 1) === 0x3d /* '=' */) end -= 1;
+  const stripped = data.slice(0, end);
   const out = new Uint8Array(Math.floor((stripped.length * 6) / 8));
   let offset = 0;
   let buffer = 0;
