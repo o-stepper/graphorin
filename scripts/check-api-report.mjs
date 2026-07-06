@@ -77,7 +77,11 @@ if (update) {
 }
 
 const after = readFileSync(REPORT, 'utf8');
-if (after !== before) {
+// Belt-and-braces newline normalization: the config pins
+// newlineKind: 'lf', but a checkout-side autocrlf must never turn the
+// gate into a permanent false positive.
+const normalizeEol = (t) => t.replace(/\r\n/g, '\n');
+if (normalizeEol(after) !== normalizeEol(before)) {
   // Leave the regenerated report in place: `git diff` now SHOWS the
   // surface change, which is exactly what the reviewer needs.
   console.error(

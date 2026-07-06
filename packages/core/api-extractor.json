@@ -51,5 +51,6 @@
         "logLevel": "none"
       }
     }
-  }
+  },
+  "newlineKind": "lf"
 }
