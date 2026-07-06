@@ -293,9 +293,19 @@ export interface WorkflowConfig<TState extends object = Record<string, unknown>>
   /**
    * Maximum number of execution steps before the engine bails out -
    * an infinite-loop safeguard that surfaces as a structured error.
-   * Default: 200.
+   * W-122: counted PER INVOCATION of execute/resume/retry/tick - a
+   * durable thread that cycles through timers and approvals for months
+   * never trips it, and a capped-out invocation is retryable (retry
+   * starts a fresh counter). Default: 200.
    */
   readonly maxSteps?: number;
+  /**
+   * W-122: opt-in LIFETIME quota over the cumulative step number
+   * across every invocation of the thread. Default: undefined (no
+   * lifetime cap). Fails with the same `max-steps-exceeded` code but a
+   * distinct message.
+   */
+  readonly maxTotalSteps?: number;
   /**
    * Grace window (in milliseconds) applied after `AbortSignal.abort()`
    * before in-flight task promises are considered orphaned. Default:

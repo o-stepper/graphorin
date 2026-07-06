@@ -210,6 +210,14 @@ interface RunInternalState<TState extends object> {
   /** Names of nodes that completed during the previous step. */
   lastCompletedNodes: string[];
   stepNumber: number;
+  /**
+   * W-122: steps taken by THIS invocation (execute/resume/retry/tick).
+   * `maxSteps` caps this counter - a long-lived thread cycling through
+   * timers/approvals must not die at 200 CUMULATIVE steps. The
+   * cumulative `stepNumber` stays untouched (WF-4 checkpoint ordering
+   * depends on it) and is capped only by the opt-in `maxTotalSteps`.
+   */
+  stepsThisInvocation: number;
   parentCheckpointId: string | undefined;
   /** Every pause raised by the current suspension (parallel pausers included). */
   pendingPauses: PendingPauseRecord[];
@@ -243,6 +251,7 @@ export async function* runEngine<TState extends object, TInput extends Partial<T
     pendingDynamicTasks: [],
     lastCompletedNodes: [START_NODE],
     stepNumber: 0,
+    stepsThisInvocation: 0,
     parentCheckpointId: undefined,
     pendingPauses: [],
     status: 'running',
@@ -391,13 +400,19 @@ export async function* resumeEngine<TState extends object>(
       // checkpoint - re-running the pause node after a crash, and livelocking a
       // node that pauses twice in a row.
       stepNumber: tuple.checkpoint.stepNumber + 1,
+      stepsThisInvocation: 0,
       parentCheckpointId: tuple.checkpoint.id,
       pendingPauses: [],
       status: 'running',
       closed: false,
     };
 
-    if (status === 'failed' || status === 'aborted') {
+    // W-122: engine-level failures (max-steps cap, loop-top abort)
+    // persist the walk frontier WITHOUT stepTasks - only a NODE failure
+    // records the failed step's task list. Route those through the
+    // suspended-style restore below so a retry continues the edge walk
+    // instead of finding an empty task list and wedging.
+    if ((status === 'failed' || status === 'aborted') && (frontier.stepTasks?.length ?? 0) > 0) {
       // WF-3/WF-6 replay path: completed tasks of the failed step replay
       // from their persisted pending writes; everything else re-runs.
       const stepTasks = frontier.stepTasks ?? [];
@@ -682,7 +697,12 @@ async function* driveRun<TState extends object>(
       });
       throw new WorkflowAbortedError(threadId, signalAbortReason(signal));
     }
-    if (internal.stepNumber >= maxSteps) {
+    // W-122: `maxSteps` caps THIS invocation - the infinite-loop
+    // safeguard it was documented as - so a durable thread cycling
+    // through timers/approvals for months never trips it, and a
+    // capped-out thread becomes retryable (the retry starts a fresh
+    // invocation counter).
+    if (internal.stepsThisInvocation >= maxSteps) {
       // workflow-12: same terminal-status contract for the step cap.
       internal.status = 'failed';
       await persistCheckpoint({
@@ -696,8 +716,26 @@ async function* driveRun<TState extends object>(
       });
       throw new WorkflowError(
         'max-steps-exceeded',
-        `workflow "${config.name}" exceeded the maxSteps cap (${maxSteps}); aborting to prevent runaway execution`,
+        `workflow "${config.name}" exceeded the maxSteps cap (${maxSteps} steps in one invocation); aborting to prevent runaway execution`,
         { hint: 'increase maxSteps on createWorkflow({...}) or check for an infinite edge cycle' },
+      );
+    }
+    // W-122: opt-in LIFETIME quota over the cumulative step number.
+    if (config.maxTotalSteps !== undefined && internal.stepNumber >= config.maxTotalSteps) {
+      internal.status = 'failed';
+      await persistCheckpoint({
+        config,
+        namespace,
+        threadId,
+        internal,
+        durability,
+        status: 'failed',
+        frontier: frontierFromInternal(internal, config),
+      });
+      throw new WorkflowError(
+        'max-steps-exceeded',
+        `workflow "${config.name}" exceeded the maxTotalSteps lifetime cap (${config.maxTotalSteps} cumulative steps across all invocations)`,
+        { hint: 'raise maxTotalSteps on createWorkflow({...}) or retire the thread' },
       );
     }
 
@@ -1383,6 +1421,7 @@ async function* driveRun<TState extends object>(
       internal.parentCheckpointId = checkpointId;
     }
     internal.stepNumber += 1;
+    internal.stepsThisInvocation += 1;
 
     if (signal?.aborted) {
       // workflow-12: mirror the loop-top contract - the step's 'running'
