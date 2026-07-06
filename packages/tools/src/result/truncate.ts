@@ -16,6 +16,10 @@
 
 import path from 'node:path';
 import type { TruncationStrategy } from '@graphorin/core';
+import {
+  type ImperativePattern,
+  scanImperativePatterns,
+} from '@graphorin/observability/redaction';
 
 /**
  * Pluggable token counter used by the truncation pipeline. Defaults
@@ -69,6 +73,17 @@ export interface TruncationOutcome {
    * built-in `read_result` tool.
    */
   readonly resultHandle?: string;
+  /**
+   * W-156: result of the single spill-time imperative-pattern scan
+   * over the FULL body (only set for `'spill-to-file'`, and only when
+   * the scan completed within budget). `true` means the artifact
+   * contains at least one catalogued imperative pattern - including
+   * one a future `read_result` page boundary would split, which the
+   * per-page strip pass cannot see. The executor stores it in the
+   * handle taint map and the default writer persists it in the taint
+   * sidecar.
+   */
+  readonly spillImperativePatternsPresent?: boolean;
   /** Model name of the summarizer (only set for `'summarize'`). */
   readonly summarizerModel?: string;
 }
@@ -118,6 +133,21 @@ export interface SpillWriter {
      * value), persisted alongside the trust class.
      */
     readonly producerSource?: unknown;
+    /**
+     * W-156: whether the framework's single whole-artifact scan found
+     * at least one catalogued imperative pattern in the FULL body
+     * (including patterns a future `read_result` page boundary would
+     * split, invisible to the per-page strip pass). The scan runs
+     * framework-side in `spillToFile` for EVERY writer; PERSISTING the
+     * flag is the writer's job, mirroring `producerTrustClass` /
+     * `sensitivityTier` (the default writer stores it in the taint
+     * sidecar). A custom writer that ignores this field loses only the
+     * read-side flag (the operator counter on later page reads) - the
+     * scan itself and the load-bearing defenses (per-page
+     * untrusted-content envelope, producer taint) are unaffected.
+     * Absent when the scan timed out (unknown is not `false`).
+     */
+    readonly imperativePatternsPresent?: boolean;
   }): Promise<{ readonly path: string; readonly bytes: number }>;
   /**
    * Remove every artifact of one run (TL-10). The agent calls this when
@@ -157,6 +187,15 @@ export interface TruncateOptions {
    * `ToolSource` value; see {@link producerTrustClass}).
    */
   readonly producerSource?: unknown;
+  /**
+   * Pattern catalogue for the W-156 single-scan over the FULL body at
+   * spill time (defaults to the built-in catalogue). The per-page
+   * strip pass in the executor cannot see a pattern split by a
+   * `read_result` page boundary; this whole-artifact scan can.
+   */
+  readonly imperativePatterns?: ReadonlyArray<ImperativePattern>;
+  /** Budget for the spill-time scan in milliseconds. Default `250`. */
+  readonly imperativeBudgetMs?: number;
   readonly signal?: AbortSignal;
 }
 
@@ -270,6 +309,21 @@ async function spillToFile(
     return truncateMiddle(body, maxTokens, originalTokens, counter);
   }
   const extension = looksLikeJson(body) ? 'json' : 'txt';
+  // W-156: single whole-artifact scan BEFORE any writer runs, so the
+  // signal exists for custom `SpillWriter`s too (a scan inside the
+  // default writer would silently vanish for injected writers). The
+  // per-page strip pass in the executor scans each `read_result` page
+  // independently, so an imperative pattern split by a page boundary
+  // evades it in both halves - this scan sees the whole body while it
+  // is still in memory. Best-effort like every pattern scan: a budget
+  // timeout yields `undefined` (unknown), never a false `false`.
+  const imperativeScan = scanImperativePatterns(
+    body,
+    options.imperativePatterns,
+    options.imperativeBudgetMs ?? 250,
+  );
+  const imperativePatternsPresent =
+    imperativeScan === null ? undefined : imperativeScan.hits.length > 0;
   const spill = await options.spill.write({
     runId: options.runId,
     toolCallId: options.toolCallId,
@@ -282,6 +336,7 @@ async function spillToFile(
       ? { producerTrustClass: options.producerTrustClass }
       : {}),
     ...(options.producerSource !== undefined ? { producerSource: options.producerSource } : {}),
+    ...(imperativePatternsPresent !== undefined ? { imperativePatternsPresent } : {}),
   });
   // Opaque, run-scoped handle URI relative to the writer's artifact root -
   // this, not the raw absolute path, is what the model sees in the
@@ -309,6 +364,9 @@ async function spillToFile(
     artifactPath: spill.path,
     artifactBytes: spill.bytes,
     resultHandle: handle,
+    ...(imperativePatternsPresent !== undefined
+      ? { spillImperativePatternsPresent: imperativePatternsPresent }
+      : {}),
   });
 }
 

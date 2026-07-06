@@ -364,6 +364,14 @@ export interface HandleProducerTaint {
   readonly trustClass: ToolTrustClass;
   readonly source: ToolSource;
   readonly sensitivity?: Sensitivity;
+  /**
+   * W-156: the spill-time whole-artifact scan found an imperative
+   * pattern somewhere in the FULL artifact. On a tainted handle read
+   * the executor increments the cross-page operator counter - the
+   * per-page strip pass cannot see a pattern split by a page boundary,
+   * this flag can.
+   */
+  readonly imperativeFlagged?: boolean;
 }
 
 /**

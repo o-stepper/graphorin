@@ -75,7 +75,14 @@ register, and execute tools the model can call:
   `Tool.sensitivity`. Operators that need a sandbox-aware path
   (`'worker-threads'` / `'isolated-vm'` / `'docker'` tier
   filesystems) inject their own writer via
-  `createToolExecutor({ spill })`.
+  `createToolExecutor({ spill })`. The framework scans the FULL body
+  for imperative patterns once at spill time (W-156: a pattern split
+  by a `read_result` page boundary evades the per-page strip pass in
+  both halves) and hands the result to every writer as
+  `imperativePatternsPresent`; a custom writer that does not persist
+  the field loses only that read-side operator signal - the per-page
+  untrusted-content envelope and producer-taint sidecar semantics are
+  unaffected (same limitation class as ignoring the taint fields).
 - **Inbound prompt-injection sanitization** - five-policy pipeline
   (`'pass-through' | 'detect-and-flag' | 'detect-and-strip' |
   'detect-and-wrap' | 'detect-and-strip-and-wrap'`) keyed off the

@@ -89,6 +89,7 @@ export async function runTruncationPhase(
         readonly producerTrustClass?: unknown;
         readonly producerSource?: unknown;
         readonly producerSensitivity?: unknown;
+        readonly producerImperativeFlagged?: unknown;
       }
     | null
     | undefined;
@@ -111,6 +112,9 @@ export async function runTruncationPhase(
             source: readerReportedSource ?? tool.__source,
             ...(typeof readerReported?.producerSensitivity === 'string'
               ? { sensitivity: readerReported.producerSensitivity as Sensitivity }
+              : {}),
+            ...(readerReported?.producerImperativeFlagged === true
+              ? { imperativeFlagged: true }
               : {}),
           }
         : undefined;
@@ -143,6 +147,14 @@ export async function runTruncationPhase(
       ...(effectiveSensitivity !== undefined ? { toolSensitivityTier: effectiveSensitivity } : {}),
       producerTrustClass: effectiveTrustClass,
       producerSource: effectiveSource,
+      // W-156: the spill-time whole-artifact scan uses the operator's
+      // pattern catalogue / budget when configured.
+      ...(rt.options.imperativePatterns !== undefined
+        ? { imperativePatterns: rt.options.imperativePatterns }
+        : {}),
+      ...(rt.options.imperativeBudgetMs !== undefined
+        ? { imperativeBudgetMs: rt.options.imperativeBudgetMs }
+        : {}),
       signal: runContext.signal,
     },
   });
