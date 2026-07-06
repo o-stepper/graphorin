@@ -84,6 +84,14 @@ export interface ExecutorOptions {
    * Default `50`.
    */
   readonly cancellationGraceMs?: number;
+  /**
+   * W-114: cap on the in-memory handle-producer-taint map (TL-6). The
+   * map previously grew for the executor's whole lifetime; at the cap
+   * the OLDEST entry is evicted FIFO - safe, because the on-disk taint
+   * sidecar restores producer taint for evicted handles (the tools-03
+   * fallback). Default 1024.
+   */
+  readonly handleProducerTaintCap?: number;
   /** Pluggable imperative patterns override. */
   readonly imperativePatterns?: ReadonlyArray<ImperativePattern>;
   /**

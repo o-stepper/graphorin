@@ -193,4 +193,52 @@ describe('tools-03 - spill taint sidecar', () => {
     expect(outcome.content).toBe('body');
     expect(outcome.producerTrustClass).toBeUndefined();
   });
+
+  it('W-114: taint survives FIFO eviction from the bounded producer map', async () => {
+    const root = await tmpRoot();
+    const spill = createDefaultSpillWriter({ root, startupSweepTtlMs: false });
+    const runContext = makeRunContext({ runId: 'run-evict' });
+
+    // Cap of 1: the second spill evicts the first handle's map entry.
+    const producerRegistry = untrustedProducerRegistry();
+    producerRegistry.register(
+      createReadResultTool({
+        reader: createFileResultReader({ artifactRoot: root }),
+      }),
+      { kind: 'built-in', subsystem: 'tools' },
+    );
+    const { guard, records } = recordingGuard();
+    const executor = createToolExecutor({
+      registry: producerRegistry,
+      spill,
+      dataFlowGuard: guard,
+      handleProducerTaintCap: 1,
+    });
+    const first = await executor.executeBatch({
+      calls: [{ toolCallId: 'e1', toolName: 'mcp_fetch', args: {} }],
+      runContext,
+      stepNumber: 1,
+    });
+    const firstHandle = (first[0]?.outcome as { resultHandle?: { uri?: string } }).resultHandle
+      ?.uri;
+    if (firstHandle === undefined) throw new Error('expected a spill handle');
+    await executor.executeBatch({
+      calls: [{ toolCallId: 'e2', toolName: 'mcp_fetch', args: {} }],
+      runContext,
+      stepNumber: 2,
+    });
+
+    // Read the EVICTED first handle - the sidecar must restore the
+    // producer taint on the recorded read.
+    records.length = 0;
+    const read = await executor.executeBatch({
+      calls: [{ toolCallId: 'r1', toolName: 'read_result', args: { handle: firstHandle } }],
+      runContext,
+      stepNumber: 3,
+    });
+    const readOutcome = read[0]?.outcome;
+    if (readOutcome === undefined || !('output' in readOutcome)) throw new Error('expected ok');
+    const recorded = records.find((r) => r.toolName === 'read_result');
+    expect(recorded?.trustClass).toBe('mcp-derived');
+  });
 });

@@ -18,7 +18,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
-import { sidecarPathFor } from './spill.js';
+import { SPILL_SIDECAR_SUFFIX, sidecarPathFor } from './spill.js';
 
 /** The only handle scheme this reader resolves. */
 export const SPILL_HANDLE_SCHEME = 'graphorin-spill:';
@@ -201,6 +201,19 @@ function resolveHandle(root: string, uri: string): string {
   }
   const relative = uri.slice(SPILL_HANDLE_SCHEME.length);
   if (relative.length === 0) throw new Error('Empty result handle.');
+  // W-114: defense in depth at the reader (covers code-mode and direct
+  // consumers too): the taint sidecars are metadata, never readable
+  // content, and a well-formed spill handle is exactly
+  // `<runId>/<file>` - anything deeper or flatter is refused.
+  if (relative.endsWith(SPILL_SIDECAR_SUFFIX)) {
+    throw new Error(`Result handle addresses a taint sidecar: ${JSON.stringify(uri)}.`);
+  }
+  const segments = relative.split('/');
+  if (segments.length !== 2 || segments.some((s) => s.length === 0)) {
+    throw new Error(
+      `Malformed result handle (expected "${SPILL_HANDLE_SCHEME}<runId>/<file>"): ${JSON.stringify(uri)}.`,
+    );
+  }
   const resolved = path.resolve(root, ...relative.split('/'));
   if (resolved !== root && !resolved.startsWith(root + path.sep)) {
     throw new Error(`Result handle escapes the artifact root: ${JSON.stringify(uri)}.`);
