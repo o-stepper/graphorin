@@ -18,6 +18,7 @@ import type {
   ToolExecutionContext,
   UsageAccumulator,
 } from '@graphorin/core';
+import { toolReturn } from '@graphorin/core';
 import type { AgentCallOptions, AgentConfig, AgentInput, AgentToToolOptions } from '../types.js';
 import { foldChildRunUsage } from './messages.js';
 
@@ -282,7 +283,7 @@ export function createToTool<TDeps, TOutput>(
           if (endResult === undefined) return turns.join('\n\n') as unknown as TOutput;
           const shapedAll = shapeCompleted(endResult, turns);
           return (shapedAll.taint !== undefined
-            ? { output: shapedAll.output, taint: shapedAll.taint }
+            ? toolReturn({ output: shapedAll.output, taint: shapedAll.taint })
             : shapedAll.output) as unknown as TOutput;
         }
         const result = await run(seed, callOpts);
@@ -299,7 +300,7 @@ export function createToTool<TDeps, TOutput>(
         }
         const shaped = shapeCompleted(result, []);
         return (shaped.taint !== undefined
-          ? { output: shaped.output, taint: shaped.taint }
+          ? toolReturn({ output: shaped.output, taint: shaped.taint })
           : shaped.output) as unknown as TOutput;
       },
     };

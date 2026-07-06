@@ -665,10 +665,14 @@ export async function createMCPClientFromSdkTransport(
           server: serverIdentity.id,
           tool: name,
         });
-        options.logger?.('info', 'mcp.tools.pin-removed: pinned tool disappeared from the catalogue', {
-          server: serverIdentity.id,
-          tool: name,
-        });
+        options.logger?.(
+          'info',
+          'mcp.tools.pin-removed: pinned tool disappeared from the catalogue',
+          {
+            server: serverIdentity.id,
+            tool: name,
+          },
+        );
       }
       // W-079: the explicit operator path to accept a changed catalogue -
       // overwrite the store with the CURRENT snapshot so subsequent
@@ -679,10 +683,14 @@ export async function createMCPClientFromSdkTransport(
         for (const [name, hash] of adapted.fingerprints) refreshed[name] = hash;
         await pinStore.set(serverIdentity.id, refreshed);
         incrementCounter('mcp.tools.pins-updated.total', { server: serverIdentity.id });
-        options.logger?.('info', 'mcp.tools.pins-updated: operator accepted the current catalogue', {
-          server: serverIdentity.id,
-          tools: Object.keys(refreshed).length,
-        });
+        options.logger?.(
+          'info',
+          'mcp.tools.pins-updated: operator accepted the current catalogue',
+          {
+            server: serverIdentity.id,
+            tools: Object.keys(refreshed).length,
+          },
+        );
       }
     }
     return adapted.tools;

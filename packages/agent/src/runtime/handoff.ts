@@ -245,10 +245,7 @@ const LIFECYCLE_FORWARD_TYPES: ReadonlySet<string> = new Set([
   'agent.error',
 ]);
 
-function shouldForwardSubagentEvent(
-  policy: SubagentForwardPolicy,
-  eventType: string,
-): boolean {
+function shouldForwardSubagentEvent(policy: SubagentForwardPolicy, eventType: string): boolean {
   if (policy === 'none') return false;
   if (policy === 'all') return true;
   return LIFECYCLE_FORWARD_TYPES.has(eventType);

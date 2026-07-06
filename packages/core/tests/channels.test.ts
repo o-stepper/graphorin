@@ -166,17 +166,13 @@ describe('W-120 - pause replay divergence detection', () => {
 
   it('a mismatched identity throws the branded divergence signal', async () => {
     let threw: unknown;
-    await runWithPauseResume(
-      ['answer'],
-      () => {
-        try {
-          pause({ kind: 'awakeable', name: 'b' });
-        } catch (err) {
-          threw = err;
-        }
-      },
-      [{ kind: 'awakeable', name: 'a' }],
-    );
+    await runWithPauseResume(['answer'], () => {
+      try {
+        pause({ kind: 'awakeable', name: 'b' });
+      } catch (err) {
+        threw = err;
+      }
+    }, [{ kind: 'awakeable', name: 'a' }]);
     expect(isReplayDivergenceSignal(threw)).toBe(true);
     expect(isPauseSignal(threw)).toBe(false);
   });

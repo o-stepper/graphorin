@@ -99,9 +99,9 @@ describe('W-038 - abort racing the suspend applies the policy', () => {
       .flatMap((m) => (m.role === 'assistant' ? (m.toolCalls ?? []) : []))
       .map((c) => c.toolCallId);
     for (const id of announced) {
-      expect(
-        result.state.messages.some((m) => m.role === 'tool' && m.toolCallId === id),
-      ).toBe(true);
+      expect(result.state.messages.some((m) => m.role === 'tool' && m.toolCallId === id)).toBe(
+        true,
+      );
     }
   });
 

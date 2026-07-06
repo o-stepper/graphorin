@@ -8,6 +8,8 @@
  */
 
 import type { ContentChunk, MessageContent, TextContent, ToolReturn } from '@graphorin/core';
+import { isToolReturnEnvelope, isUnbrandedToolReturn } from '@graphorin/core';
+import { incrementCounter } from '../audit/index.js';
 
 /**
  * Canonical envelope passed through the executor's downstream
@@ -187,10 +189,14 @@ function renderText(value: unknown): string {
 }
 
 function isToolReturn<TOutput>(value: unknown): value is ToolReturn<TOutput> {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    Object.hasOwn(value, 'output') &&
-    !Array.isArray(value)
-  );
+  // W-115: brand-first via the ONE shared guard; the structural
+  // fallback is narrow (own keys within {output, contentParts, taint}),
+  // so `{output, exitCode, stderr}`-style process results pass through
+  // intact instead of being silently stripped to `.output`. Unbranded
+  // matches are counted toward the sniff's future deprecation.
+  if (!isToolReturnEnvelope<TOutput>(value)) return false;
+  if (isUnbrandedToolReturn(value)) {
+    incrementCounter('tool.result.envelope.unbranded-toolreturn.total', undefined);
+  }
+  return true;
 }

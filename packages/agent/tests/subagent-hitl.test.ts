@@ -13,8 +13,8 @@ import {
   createAgent,
   deserializeRunState,
   RUN_STATE_SCHEMA_VERSION,
-  serializeRunState,
   SubAgentResumeTargetNotFoundError,
+  serializeRunState,
 } from '../src/index.js';
 import {
   createMockProvider,
@@ -45,7 +45,11 @@ function gatedTool(name: string, ran: Record<string, number>): Tool<unknown, unk
 
 /** Provider script emitting several tool calls inside a single step. */
 function multiToolCallScript(
-  calls: ReadonlyArray<{ readonly toolCallId: string; readonly toolName: string; readonly args?: unknown }>,
+  calls: ReadonlyArray<{
+    readonly toolCallId: string;
+    readonly toolName: string;
+    readonly args?: unknown;
+  }>,
 ): MockProviderScript {
   const events: ProviderEvent[] = [
     { type: 'stream-start', metadata: { providerName: 'mock', modelId: 'mock' } },
@@ -53,7 +57,11 @@ function multiToolCallScript(
   for (const c of calls) {
     events.push(
       { type: 'tool-call-start', toolCallId: c.toolCallId, toolName: c.toolName },
-      { type: 'tool-call-input-delta', toolCallId: c.toolCallId, argsDelta: JSON.stringify(c.args ?? {}) },
+      {
+        type: 'tool-call-input-delta',
+        toolCallId: c.toolCallId,
+        argsDelta: JSON.stringify(c.args ?? {}),
+      },
       { type: 'tool-call-end', toolCallId: c.toolCallId, finalArgs: c.args ?? {} },
     );
   }
@@ -143,7 +151,7 @@ describe('W-001 (a,b) - handoff child parks and resumes through the parent', () 
     expect(resumed.state.pendingSubRuns).toBeUndefined();
     expect(resumed.state.pendingApprovals).toHaveLength(0);
     // W-033 composes: the child's tokens folded into the parent.
-    expect((resumed.state.usageByModel ?? {})['mock-child']?.totalTokens).toBe(16);
+    expect(resumed.state.usageByModel?.['mock-child']?.totalTokens).toBe(16);
   });
 
   it('(c) a denied child approval completes the child with the denial, parent continues', async () => {

@@ -241,11 +241,7 @@ describe('W-036 - sub-agent lifecycle events forward into the parent stream', ()
           textOnlyScript('final', 4),
         ],
       }),
-      handoffs: [
-        forwardEvents === undefined
-          ? child
-          : ({ target: child, forwardEvents } as never),
-      ],
+      handoffs: [forwardEvents === undefined ? child : ({ target: child, forwardEvents } as never)],
     });
   }
   async function collect(agent: ReturnType<typeof parentFor>) {
@@ -271,9 +267,9 @@ describe('W-036 - sub-agent lifecycle events forward into the parent stream', ()
 
   it("'all' forwards text deltas too; 'none' forwards nothing", async () => {
     const all = await collect(parentFor(childWithTool(), 'all'));
-    expect(
-      all.some((e) => e.type === 'subagent.event' && e.event.type === 'text.delta'),
-    ).toBe(true);
+    expect(all.some((e) => e.type === 'subagent.event' && e.event.type === 'text.delta')).toBe(
+      true,
+    );
     const none = await collect(parentFor(childWithTool(), 'none'));
     expect(none.some((e) => e.type === 'subagent.event')).toBe(false);
   });

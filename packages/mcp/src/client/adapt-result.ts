@@ -16,6 +16,7 @@ import type {
   ToolReturn,
   ZodLikeSchema,
 } from '@graphorin/core';
+import { toolReturn } from '@graphorin/core';
 import { incrementCounter } from '@graphorin/tools/audit';
 import { applyInboundSanitization } from '@graphorin/tools/inbound';
 import { MCPToolExecutionError } from '../errors/index.js';
@@ -160,10 +161,9 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
         if (textParts.length === 0) {
           finalParts.push({ type: 'text', text: JSON.stringify(result.structuredContent) });
         }
-        return Object.freeze({
-          output: validation.data,
-          contentParts: Object.freeze(finalParts),
-        });
+        return Object.freeze(
+          toolReturn({ output: validation.data, contentParts: Object.freeze(finalParts) }),
+        );
       }
       incrementCounter('mcp.structured-content.validation.failure.total', {
         server: serverIdentity.id,
@@ -181,11 +181,15 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
       if (textParts.length === 0) {
         fallbackParts.push({ type: 'text', text: JSON.stringify(result.structuredContent) });
       }
-      return Object.freeze({
-        output:
-          concatenatedText.length > 0 ? concatenatedText : JSON.stringify(result.structuredContent),
-        contentParts: Object.freeze(fallbackParts),
-      });
+      return Object.freeze(
+        toolReturn({
+          output:
+            concatenatedText.length > 0
+              ? concatenatedText
+              : JSON.stringify(result.structuredContent),
+          contentParts: Object.freeze(fallbackParts),
+        }),
+      );
     } else {
       incrementCounter('mcp.structured-content.emitted.total', {
         server: serverIdentity.id,
@@ -195,17 +199,15 @@ export function adaptCallResult(args: AdaptCallResultArgs): ToolReturn<unknown> 
       if (textParts.length === 0) {
         finalParts.push({ type: 'text', text: JSON.stringify(result.structuredContent) });
       }
-      return Object.freeze({
-        output: result.structuredContent,
-        contentParts: Object.freeze(finalParts),
-      });
+      return Object.freeze(
+        toolReturn({ output: result.structuredContent, contentParts: Object.freeze(finalParts) }),
+      );
     }
   }
 
-  return Object.freeze({
-    output: concatenatedText,
-    contentParts: Object.freeze(contentParts),
-  });
+  return Object.freeze(
+    toolReturn({ output: concatenatedText, contentParts: Object.freeze(contentParts) }),
+  );
 }
 
 function mcpContentToMessageContent(

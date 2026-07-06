@@ -90,6 +90,12 @@ export type {
   ToolReturn,
   ToolSecretsAccessor,
 } from './tool.js';
+export {
+  isToolReturnEnvelope,
+  isUnbrandedToolReturn,
+  TOOL_RETURN_BRAND,
+  toolReturn,
+} from './tool.js';
 export type {
   AISpan,
   CustomSpanType,

@@ -190,4 +190,3 @@ describe('MC-6 - tool-definition pinning + list_changed visibility', () => {
     expect(tools.map((tool) => tool.name).sort()).toEqual(['extra', 'search']);
   });
 });
-
