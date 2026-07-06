@@ -64,8 +64,8 @@ export class SqliteCheckpointStore implements CheckpointStoreExt {
     this.#conn.run(
       `INSERT OR REPLACE INTO workflow_checkpoints (
          id, thread_id, namespace, parent_id, state_json, channel_versions_json,
-         step_number, source, status, node_name, tags_json, session_id, created_at
-       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         step_number, source, status, node_name, tags_json, session_id, wake_at, created_at
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         checkpoint.id,
         threadId,
@@ -79,6 +79,7 @@ export class SqliteCheckpointStore implements CheckpointStoreExt {
         metadata.nodeName ?? null,
         metadata.tags ? JSON.stringify(metadata.tags) : null,
         metadata.sessionId ?? null,
+        metadata.wakeAt ?? null,
         Date.parse(checkpoint.createdAt),
       ],
     );
@@ -138,6 +139,39 @@ export class SqliteCheckpointStore implements CheckpointStoreExt {
       };
     }
     return tuple;
+  }
+
+  /**
+   * W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+   * suspended with a due `wake_at`. Latest-per-thread is decided by max
+   * step_number (the same policy as `getTuple`), so a thread whose
+   * newest checkpoint moved on (resumed / completed) never fires.
+   */
+  async listSuspended(
+    namespace: string,
+    opts?: { readonly dueBefore?: number; readonly limit?: number },
+  ): Promise<ReadonlyArray<{ readonly threadId: string; readonly wakeAt: number }>> {
+    const dueBefore = opts?.dueBefore ?? Number.MAX_SAFE_INTEGER;
+    const limit = opts?.limit ?? -1;
+    const rows = this.#conn.all<{ thread_id: string; wake_at: number }>(
+      `SELECT c.thread_id, c.wake_at
+         FROM workflow_checkpoints c
+         JOIN (
+           SELECT thread_id, MAX(step_number) AS max_step
+             FROM workflow_checkpoints
+            WHERE namespace = ?
+            GROUP BY thread_id
+         ) latest
+           ON latest.thread_id = c.thread_id AND latest.max_step = c.step_number
+        WHERE c.namespace = ?
+          AND c.status = 'suspended'
+          AND c.wake_at IS NOT NULL
+          AND c.wake_at <= ?
+        ORDER BY c.wake_at ASC
+        LIMIT ?`,
+      [namespace, namespace, dueBefore, limit],
+    );
+    return rows.map((r) => ({ threadId: r.thread_id, wakeAt: r.wake_at }));
   }
 
   async *list(
@@ -265,6 +299,7 @@ interface CheckpointRow {
   node_name: string | null;
   tags_json: string | null;
   session_id: string | null;
+  wake_at: number | null;
   created_at: number;
 }
 
@@ -294,6 +329,7 @@ function rowToTuple(row: CheckpointRow): CheckpointTuple {
     ...(row.session_id !== null && row.session_id !== undefined
       ? { sessionId: row.session_id }
       : {}),
+    ...(row.wake_at !== null && row.wake_at !== undefined ? { wakeAt: row.wake_at } : {}),
   };
   return { checkpoint, metadata };
 }

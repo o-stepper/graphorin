@@ -175,7 +175,7 @@ import { awaitExternal, requestApproval, sleepFor, sleepUntil } from '@graphorin
 
 // Durable timer: suspends with a persisted wake-at timestamp.
 sleepUntil('2026-08-01T09:00:00Z'); // or sleepFor(ms)
-// Fire due timers from any scheduler:
+// Fire one due timer manually (the timer driver below does this for you):
 const { fired, nextWakeAt } = await workflow.tick(threadId);
 
 // Durable promise (awakeable): suspends under a name until an external
@@ -189,6 +189,22 @@ const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' }
 ```
 
 `getState(threadId).pendingPauses` surfaces the full pending set - timers carry `wakeAt`, awakeables/approvals carry `name` - so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
+
+### Firing durable timers
+
+Nothing needs to poll by hand: `createTimerDriver` ships with the package. The engine stamps the earliest due timer on every suspended checkpoint (`CheckpointMetadata.wakeAt`), the store enumerates due threads (`CheckpointStore.listSuspended` - implemented by the SQLite adapter and `InMemoryCheckpointStore`), and the driver ticks them on a poll loop that re-arms at `min(pollIntervalMs, earliest nextWakeAt)`:
+
+```ts
+import { createTimerDriver } from '@graphorin/workflow';
+
+const driver = createTimerDriver({
+  workflows: [{ workflow, checkpointStore: store.checkpoints }],
+  pollIntervalMs: 30_000,
+});
+driver.start(); // library mode; driver.stop() on shutdown
+```
+
+On the server, wire the same driver through the lifecycle daemon instead: `createServer({ workflowTimers: { driver } })` starts and stops it with the process and reports `sweeps/fired/errors/nextWakeAt` under `checks.workflowTimers` on `/v1/health`. Per-thread tick failures are isolated (`onError`), and a `checkpoint-version-conflict` from two drivers racing the same thread is treated as benign - the store CAS already picked a winner. A custom `CheckpointStore` without `listSuspended` fails fast at `createTimerDriver` with a typed error rather than silently never firing. Threads suspended by versions before the `wake_at` column existed are invisible to the driver until one manual `tick` (or any resume) re-persists them.
 
 ### Per-node timeout and retry
 

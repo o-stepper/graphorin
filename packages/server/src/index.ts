@@ -38,6 +38,7 @@ export {
   ensureStoreAuditBinding,
   type GraphorinServer,
   type TriggersDaemonInput,
+  type WorkflowTimersInput,
 } from './app.js';
 export {
   createDeliveryCommentarySanitizer,
@@ -193,6 +194,13 @@ export {
   type TriggersDaemonStatus,
   type TriggersRoutesDeps,
 } from './triggers/index.js';
+export {
+  type CreateWorkflowTimerDaemonOptions,
+  createWorkflowTimerDaemon,
+  type WorkflowTimerDaemon,
+  type WorkflowTimerDaemonStatus,
+  type WorkflowTimerDriverLike,
+} from './workflows/timer-daemon.js';
 export {
   type BareEventFrame,
   createReplayBuffer,

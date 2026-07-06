@@ -1621,11 +1621,23 @@ async function persistCheckpoint<TState extends object>(
     stepNumber: internal.stepNumber,
     createdAt: now,
   };
+  // W-032: stamp the earliest frontier timer on suspended checkpoints so
+  // `CheckpointStore.listSuspended` can enumerate due threads without
+  // parsing the frontier tags.
+  const wakeAt =
+    status === 'suspended' && args.frontier !== undefined
+      ? args.frontier.pauses.reduce<number | undefined>((min, p) => {
+          const w = (p as { readonly wakeAt?: unknown }).wakeAt;
+          if (typeof w !== 'number') return min;
+          return min === undefined || w < min ? w : min;
+        }, undefined)
+      : undefined;
   const metadata: CheckpointMetadata = {
     source: durability,
     status,
     ...(nodeName !== undefined ? { nodeName } : {}),
     ...(tags !== undefined ? { tags } : {}),
+    ...(wakeAt !== undefined ? { wakeAt } : {}),
   };
 
   try {

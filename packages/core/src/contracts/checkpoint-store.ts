@@ -53,6 +53,16 @@ export interface CheckpointMetadata {
    * use it to honour the full erasure contract.
    */
   readonly sessionId?: string;
+  /**
+   * W-032: earliest due durable timer among this checkpoint's frontier
+   * pauses (epoch ms). The workflow engine stamps it on every
+   * `suspended` write whose frontier holds a timer, so a store's
+   * {@link CheckpointStore.listSuspended} can enumerate due threads
+   * without parsing the opaque tags. Absent on non-timer suspends and
+   * on checkpoints written before the field existed - such threads
+   * need one manual `tick` (or a resume) to become driver-visible.
+   */
+  readonly wakeAt?: number;
 }
 
 /**
@@ -172,6 +182,20 @@ export interface CheckpointStore {
    * instead, which is namespace-scoped and protects suspended threads.
    */
   deleteThread(threadId: string): Promise<void>;
+
+  /**
+   * W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+   * `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
+   * stamped wakeAt). This is what a durable-timer driver polls -
+   * without it an operator would have to keep an external registry of
+   * sleeping threadIds. OPTIONAL so third-party stores compile
+   * unchanged; `createTimerDriver` throws a typed error when the store
+   * lacks it (deterministic policy, no silent no-op).
+   */
+  listSuspended?(
+    namespace: string,
+    opts?: { readonly dueBefore?: number; readonly limit?: number },
+  ): Promise<ReadonlyArray<{ readonly threadId: string; readonly wakeAt: number }>>;
 }
 
 /**

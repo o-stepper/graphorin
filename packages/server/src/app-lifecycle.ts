@@ -44,6 +44,7 @@ import {
   scheduleRunPruning,
 } from './runtime/run-state.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
+import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
 import { scheduleReplayBufferPruning } from './ws/replay-buffer.js';
 
@@ -81,6 +82,7 @@ export interface ServerLifecycleDeps {
   readonly ws: WsLayer;
   readonly triggersDaemon: TriggersDaemon | undefined;
   readonly consolidatorDaemon: ConsolidatorDaemon | undefined;
+  readonly workflowTimerDaemon: WorkflowTimerDaemon | undefined;
 }
 
 /**
@@ -111,6 +113,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
     now,
     triggersDaemon,
     consolidatorDaemon,
+    workflowTimerDaemon,
   } = deps;
   const commentaryAuditSink = deps.ws.commentaryAuditSink;
 
@@ -222,6 +225,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
           ...(wsAdapter !== undefined ? { wsAdapter } : {}),
           ...(triggersDaemon !== undefined ? { triggersDaemon } : {}),
           ...(consolidatorDaemon !== undefined ? { consolidatorDaemon } : {}),
+          ...(workflowTimerDaemon !== undefined ? { workflowTimerDaemon } : {}),
         });
 
         // Start the consolidator first so it is ready to handle fired
@@ -240,6 +244,10 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         }
         if (triggersDaemon !== undefined) {
           await triggersDaemon.start();
+        }
+        // W-032: fire due durable timers from server start onward.
+        if (workflowTimerDaemon !== undefined) {
+          await workflowTimerDaemon.start();
         }
 
         // Sample a couple of gauges immediately so the very first
@@ -346,6 +354,13 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
       }
 
+      if (workflowTimerDaemon !== undefined) {
+        try {
+          await workflowTimerDaemon.stop();
+        } catch (err) {
+          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+        }
+      }
       if (triggersDaemon !== undefined) {
         try {
           await triggersDaemon.stop();
