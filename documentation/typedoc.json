@@ -32,7 +32,10 @@
     "../packages/eslint-plugin",
     "../packages/evals"
   ],
-  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-vitepress-theme"
+  ],
   "out": "api",
   "indexFormat": "table",
   "parametersFormat": "table",
@@ -78,7 +81,13 @@
     "@throws",
     "@typeParam"
   ],
-  "modifierTags": ["@hidden", "@internal", "@override", "@stable", "@experimental"],
+  "modifierTags": [
+    "@hidden",
+    "@internal",
+    "@override",
+    "@stable",
+    "@experimental"
+  ],
   "validation": {
     "notExported": false,
     "invalidLink": true,
@@ -89,5 +98,7 @@
     "format": "vitepress",
     "pretty": true,
     "collapsed": true
-  }
+  },
+  "disableGit": true,
+  "basePath": ".."
 }
