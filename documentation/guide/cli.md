@@ -7,6 +7,8 @@ description: graphorin - the operator CLI for the standalone server. Doctor, sec
 
 `@graphorin/cli` ships the operator CLI for the standalone server and a number of utility commands that work without the server (e.g. `graphorin doctor`, `graphorin migrate-export`). It is built on [`commander`](https://github.com/tj/commander.js) (MIT).
 
+Most commands operate directly on the same SQLite file a live server may hold open. Which commands are safe, which contend for the write lock, and which require stopping the server first is summarised in the [concurrency matrix](/guide/storage#concurrency-matrix). The short version: a concurrent CLI **write** can freeze the server's entire event loop for up to `busy_timeout` (default 5 s) per contended statement - health responses included - so schedule write-side maintenance accordingly.
+
 ```bash
 pnpm dlx @graphorin/cli --help
 ```
