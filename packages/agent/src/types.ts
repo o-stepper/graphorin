@@ -399,8 +399,9 @@ export type VerifierResult =
  * to the model (as a user message prefixed `[verifier:<id>]`) and the
  * loop continues for up to `AgentConfig.maxVerifierRounds` extra rounds.
  *
- * A verifier that THROWS is treated as passed (and logged): a buggy
- * verifier must never take down a run.
+ * A verifier that THROWS is treated as passed (the `verifier.result`
+ * event still fires with `ok: true`): a buggy verifier must never
+ * take down a run.
  *
  * @stable
  */

@@ -230,7 +230,7 @@ On resume a *granted* approval really runs: the approved call is dispatched thro
 
 What re-resuming a **stale pre-execution snapshot** (the suspend-time state, after the call already ran via a different resume) does is bounded, not silent: the journal in that snapshot cannot know about the later execution, so the call is re-executed - at most once per stale resume. If a crash lands between the intent checkpoint and the post-dispatch checkpoint, a retry against the intent state re-dispatches the call (the same at-most-one-re-execution bound). Give payment-class tools an idempotency key (the executor supports per-tool idempotency-key callbacks) if a duplicate would be costly.
 
-The `tool.approval.requested` event carries the `toolCallId` plus the tool's classification metadata. Operators that need to suspend the run combine the event with a snapshot of the current `RunState`:
+The `tool.approval.requested` event is deliberately small: `{ type, toolCallId, reason? }`. The tool name and the vetted arguments are not on the event - read them from `RunState.pendingApprovals` (keyed by the same `toolCallId`). Operators that need to suspend the run combine the event with a snapshot of the current `RunState`, exactly as the example below does:
 
 ```ts no-check
 import { runStateToJSON } from '@graphorin/agent';
