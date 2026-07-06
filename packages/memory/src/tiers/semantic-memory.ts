@@ -130,6 +130,31 @@ export type FusionStrategy =
  *
  * @stable
  */
+/**
+ * Search options an operator may default at construction time via
+ * `createMemory({ searchDefaults })` (W-086) - the advanced-retrieval
+ * switches (fan-out, HyDE, graph expansion, fusion, decay) that the
+ * model-facing surfaces (`fact_search`, auto-recall, `deep_recall`)
+ * cannot reach per-call. Deliberately a `Pick` that EXCLUDES the
+ * trust-sensitive predicates (`includeQuarantined`, `includeSuperseded`,
+ * `trustWeighting`, `owner`): configuration must not be able to silently
+ * weaken trust gates for every caller. Per-call options always win
+ * key-by-key.
+ *
+ * @stable
+ */
+export type SemanticSearchDefaults = Pick<
+  FactSearchOptions,
+  | 'multiQuery'
+  | 'hyde'
+  | 'expandHops'
+  | 'entityMatch'
+  | 'graphScoring'
+  | 'fusion'
+  | 'decay'
+  | 'candidateTopK'
+>;
+
 export interface FactSearchOptions {
   readonly topK?: number;
   readonly signal?: AbortSignal;
@@ -406,6 +431,7 @@ export class SemanticMemory {
   readonly #iterativeMaxIterations: number;
   #reranker: ReRanker;
   readonly #trustWeights: SalienceWeights;
+  readonly #searchDefaults: SemanticSearchDefaults;
 
   constructor(args: {
     store: MemoryStoreAdapter;
@@ -455,6 +481,15 @@ export class SemanticMemory {
      * `DEFAULT_SALIENCE_WEIGHTS`.
      */
     trustWeights?: SalienceWeights;
+    /**
+     * Construction-time retrieval defaults (W-086) merged under every
+     * `search(...)` call - see {@link SemanticSearchDefaults}. Because
+     * the merge happens inside `search()`, the model-facing surfaces
+     * (`fact_search`, auto-recall, `deep_recall`) inherit them without
+     * any per-surface wiring; per-call options override key-by-key (so
+     * e.g. `deep_recall`'s widen-pass `expandHops` still wins).
+     */
+    searchDefaults?: SemanticSearchDefaults;
   }) {
     this.#store = args.store;
     this.#tracer = args.tracer;
@@ -468,6 +503,7 @@ export class SemanticMemory {
     this.#grader = args.grader ?? null;
     this.#iterativeMaxIterations = args.iterativeMaxIterations ?? DEFAULT_MAX_ITERATIONS;
     this.#trustWeights = args.trustWeights ?? DEFAULT_SALIENCE_WEIGHTS;
+    this.#searchDefaults = args.searchDefaults ?? {};
   }
 
   /** Replace the active reranker. Returns the previous instance. */
@@ -721,8 +757,12 @@ export class SemanticMemory {
   async search(
     scope: SessionScope,
     query: string,
-    opts: FactSearchOptions = {},
+    callOpts: FactSearchOptions = {},
   ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    // W-086: construction-time retrieval defaults; per-call options win
+    // key-by-key. The trust predicates are not defaultable by design
+    // (SemanticSearchDefaults excludes them).
+    const opts: FactSearchOptions = { ...this.#searchDefaults, ...callOpts };
     return withMemorySpan(
       this.#tracer,
       'memory.search.semantic',

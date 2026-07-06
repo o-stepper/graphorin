@@ -146,6 +146,23 @@ await memory.semantic.search(scope, 'what does alex like to drink', {
 
 Both are **opt-in**: wire `createMemory({ queryTransform: { provider } })`. With no transformer configured (the default) these options are silent no-ops and search stays offline + single-shot. Reserve them for retrieval-heavy recall - they add provider latency.
 
+### Retrieval defaults for every surface
+
+Per-call options only help code that calls `memory.semantic.search(...)` directly - the model-facing surfaces (`fact_search`, auto-recall, `deep_recall`) expose no `multiQuery`/`expandHops` knobs. `searchDefaults` sets construction-time defaults that every `search()` call inherits, per-call options winning key-by-key:
+
+```ts
+createMemory({
+  store: sqlite.memory,
+  embeddings: sqlite.embeddings,
+  embedder,
+  queryTransform: { provider },          // required for multiQuery / hyde
+  graph: { entityResolution: true },     // required for expandHops / entityMatch
+  searchDefaults: { multiQuery: 3, expandHops: 1 },
+});
+```
+
+Two caveats. The fan-out switches only do something when their backing dependency is configured (`queryTransform` for `multiQuery`/`hyde`, `graph` for `expandHops`/`entityMatch`) - a default without the dependency stays a silent no-op. And the defaults apply to **every** recall, including auto-recall on each turn and each pass of the `deep_recall` loop (whose widen-pass `expandHops` override still wins, since it is per-call) - so they multiply provider cost and latency; opt in deliberately. The trust-sensitive predicates (`includeQuarantined`, `includeSuperseded`, `trustWeighting`, `owner`) are deliberately **not defaultable** - configuration cannot silently weaken trust gates.
+
 ## Relation graph & one-hop expansion
 
 Every fact can carry a `(subject, predicate, object)` triple. When you enable the **entity resolver**, Graphorin folds the subject/object strings into canonical entities - `"Anna"`, `"Anna S."`, `"my sister"` collapse to one entity - via lexical + embedding dedup, with **auditable, reversible merges** (an append-only ledger; `merged_into` is single-level).

@@ -125,6 +125,62 @@ describe('context-engine - auto-recall heuristic (Phase 10d)', () => {
     expect(out.systemMessage.content).toContain('Tbilisi');
   });
 
+  it('W-086: auto-recall inherits createMemory searchDefaults (multi-query fan-out)', async () => {
+    let expansions = 0;
+    const provider = {
+      name: 'expander',
+      modelId: 'expander:test',
+      capabilities: {
+        streaming: false,
+        toolCalling: false,
+        parallelToolCalls: false,
+        multimodal: false,
+        structuredOutput: true,
+        reasoning: false,
+        contextWindow: 32_000,
+        maxOutput: 4_000,
+      },
+      async generate() {
+        expansions += 1;
+        return {
+          text: JSON.stringify(['prefers tea over coffee']),
+          usage: { promptTokens: 5, completionTokens: 5, totalTokens: 10 },
+          finishReason: 'stop' as const,
+        };
+      },
+      stream() {
+        throw new Error('not implemented');
+      },
+    };
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      queryTransform: { provider },
+      searchDefaults: { multiQuery: 2 },
+      contextEngine: {
+        factsAutoRecall: { topK: 3, threshold: 0 },
+        privacy: { providerTrust: 'loopback' },
+      },
+    });
+    const scope = { userId: 'u1', sessionId: 's1', agentId: 'a1' };
+    await memory.semantic.remember(scope, { text: 'do you remember user lives in Tbilisi' });
+    await memory.semantic.remember(scope, { text: 'prefers tea over coffee' });
+    const out = await memory.contextEngine.assemble(memory, {
+      scope,
+      runId: 'r',
+      sessionId: 's1',
+      agentId: 'a1',
+      lastUserMessage: 'do you remember',
+    });
+    expect(out.autoRecall.factsTriggered).toBe(true);
+    // The tea fact does not contain the query substring - it is only
+    // reachable through the fanned-out variant, so its presence proves
+    // auto-recall inherited the construction-time default.
+    expect(expansions).toBe(1);
+    expect(out.systemMessage.content).toContain('Tbilisi');
+    expect(out.systemMessage.content).toContain('tea over coffee');
+  });
+
   it('does NOT inject auto-recall when the trigger phrase is absent', async () => {
     const memory = createMemory({
       store: createInMemoryStore(),

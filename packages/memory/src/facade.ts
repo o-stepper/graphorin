@@ -54,7 +54,7 @@ import type { ReRanker } from './search/types.js';
 import { EpisodicMemory } from './tiers/episodic-memory.js';
 import { InsightMemory } from './tiers/insight-memory.js';
 import { ProceduralMemory } from './tiers/procedural-memory.js';
-import { SemanticMemory } from './tiers/semantic-memory.js';
+import { SemanticMemory, type SemanticSearchDefaults } from './tiers/semantic-memory.js';
 import { SessionMemory } from './tiers/session-memory.js';
 import { SharedMemory } from './tiers/shared-memory.js';
 import { type BlockDefinition, WorkingMemory } from './tiers/working-memory.js';
@@ -82,6 +82,23 @@ export interface CreateMemoryOptions {
   readonly tracer?: Tracer;
   /** Override the reranker used by `SemanticMemory.search`. */
   readonly reranker?: ReRanker;
+  /**
+   * Construction-time retrieval defaults (W-086) merged under every
+   * `SemanticMemory.search(...)` call, per-call options winning
+   * key-by-key. This is how the advanced retrieval stack (multi-query
+   * fan-out, HyDE, graph expansion, entity matching, weighted fusion,
+   * decay ranking) reaches the model-facing surfaces - `fact_search`,
+   * auto-recall and `deep_recall` all funnel through `search()` and
+   * inherit these without custom tools. Deliberately excludes the
+   * trust-sensitive predicates (`includeQuarantined`,
+   * `includeSuperseded`, `trustWeighting`, `owner`) so configuration
+   * cannot silently weaken trust gates. The fan-out switches only take
+   * effect when their backing dependency is configured (`queryTransform`
+   * for `multiQuery`/`hyde`, `graph` for `expandHops`/`entityMatch`) -
+   * and they add provider latency and cost to EVERY recall, including
+   * auto-recall, so opt in deliberately.
+   */
+  readonly searchDefaults?: SemanticSearchDefaults;
   /**
    * Contextual-retrieval mode for the write path (P1-3). `'late-chunk'`
    * (default) prepends a deterministic, offline situating context
@@ -411,6 +428,8 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     ...(options.consolidator?.salienceWeights !== undefined
       ? { trustWeights: options.consolidator.salienceWeights }
       : {}),
+    // W-086: construction-time retrieval defaults for every search().
+    ...(options.searchDefaults !== undefined ? { searchDefaults: options.searchDefaults } : {}),
   });
   // P2-2: build the (opt-in) workflow inducer. Absent ⇒ `null` ⇒
   // `ProceduralMemory.induce(...)` throws and the tier stays offline CRUD.
