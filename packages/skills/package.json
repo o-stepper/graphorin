@@ -76,6 +76,7 @@
   },
   "files": [
     "dist",
+    "src",
     "anthropic-spec-snapshot.json",
     "README.md",
     "CHANGELOG.md",
