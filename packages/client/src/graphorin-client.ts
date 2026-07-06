@@ -111,6 +111,16 @@ export interface GraphorinClientOptions {
    */
   readonly baseUrl: string;
   readonly auth: TransportAuth;
+  /**
+   * Transport selection. Default `'auto'`: WebSocket first, SSE
+   * fallback. W-108 caveat for `'auto'`: SSE carries only the bound
+   * session subject, so when a RECONNECT falls back from WS to SSE,
+   * live WS subscriptions (agent / workflow subjects) cannot be
+   * resumed - they are closed with a `TransportFailedError` (their
+   * `for await` consumers reject immediately instead of hanging).
+   * Force `'ws'` when your application depends on those subscriptions
+   * surviving reconnects.
+   */
   readonly transport?: TransportPreference;
   /**
    * W-152: per-subscription buffer cap. When the `for await` consumer
@@ -692,7 +702,27 @@ export class GraphorinClient {
         // transport rejects; pre-fix that error CLOSED the
         // subscription and the client silently stopped delivering
         // events for the life of the object.
-        if (transport.kind === 'sse') return;
+        if (transport.kind === 'sse') {
+          // W-108: transport 'auto' can reconnect a WS-FIRST client
+          // over SSE when the WS handshake flakes. SSE carries exactly
+          // ONE bound-session subject ('__sse__'); a surviving WS
+          // subscription (agent/workflow subject) is unreachable over
+          // it - no frame will ever route to it and its consumer would
+          // block in `for await` forever. Close them with a typed
+          // error instead of a silent hang (and instead of an endless
+          // WS retry, which would wedge against servers with WS
+          // disabled): the application decides whether to reconnect
+          // with `transport: 'ws'` or read the bound session subject.
+          const fellBack = new TransportFailedError(
+            "Reconnect fell back to SSE; WebSocket subscriptions cannot be resumed over SSE - resubscribe on the bound session subject or force transport: 'ws'.",
+          );
+          for (const [id, sub] of [...this.#subscriptions]) {
+            if (id === '__sse__') continue;
+            this.#subscriptions.delete(id);
+            sub.__close('aborted', fellBack);
+          }
+          return;
+        }
         for (const [oldId, sub] of [...this.#subscriptions]) {
           this.#subscriptions.delete(oldId);
           try {

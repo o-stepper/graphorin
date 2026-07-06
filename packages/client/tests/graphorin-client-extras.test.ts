@@ -265,3 +265,78 @@ describe('GraphorinClient - SSE / fallback / misc', () => {
     await client.disconnect();
   });
 });
+
+describe('W-108 - reconnect fallback from WS to SSE closes surviving WS subscriptions', () => {
+  it('a WS subscription rejects with TransportFailedError instead of hanging forever', async () => {
+    const { configureNextSocket } = await import('./__fixtures__/mock-websocket.js');
+    const client = new GraphorinClient({
+      baseUrl: 'http://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      transport: 'auto',
+      sessionId: 'a',
+      WebSocket: FAKE_WS,
+      fetch: sseFetchStub(),
+      reconnect: { baseMs: 1, maxMs: 2, maxAttempts: 3 },
+    });
+    const connectPromise = client.connect();
+    await ackInitialize();
+    await connectPromise;
+    expect(client.transportKind).toBe('ws');
+
+    // A live WS subscription on an ordinary (non-bound) subject.
+    const socket1 = lastSocket();
+    const subPromise = client.subscribe({ target: 'session', id: 'rc' });
+    await Promise.resolve();
+    const subFrame = JSON.parse(socket1.sent.at(-1) ?? '{}') as { id: string };
+    socket1.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: subFrame.id,
+      result: { subscriptionId: 'sub-1' },
+    });
+    const sub = await subPromise;
+    const consumerOutcome = (async () => {
+      try {
+        for await (const _event of sub.events()) {
+          // The subject never yields - the test drops the transport.
+        }
+        return undefined;
+      } catch (err) {
+        return err;
+      }
+    })();
+
+    // Drop WS; make the NEXT WS handshake fail (wrong subprotocol) so
+    // the 'auto' reconnect falls back to SSE.
+    configureNextSocket({ negotiatedProtocol: 'bogus.subprotocol' });
+    socket1.close(1006, 'connection reset');
+    for (let i = 0; i < 400 && client.transportKind !== 'sse'; i += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+    expect(client.transportKind).toBe('sse');
+
+    // Deterministic typed rejection - guarded by a timeout so a
+    // regression fails loudly instead of hanging the test.
+    const raced = await Promise.race([
+      consumerOutcome,
+      new Promise((resolve) => setTimeout(() => resolve('hung'), 2_000)),
+    ]);
+    expect(raced).toBeInstanceOf(TransportFailedError);
+    expect((raced as Error).message).toContain('cannot be resumed over SSE');
+    expect(sub.metadata().closed).toBe(true);
+
+    // A later read observes the same terminal error.
+    const again = await (async () => {
+      try {
+        for await (const _event of sub.events()) {
+          // unreachable
+        }
+        return undefined;
+      } catch (err) {
+        return err;
+      }
+    })();
+    expect(again).toBeInstanceOf(TransportFailedError);
+    await client.disconnect();
+  });
+});
