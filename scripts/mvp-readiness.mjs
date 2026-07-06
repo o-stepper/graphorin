@@ -334,6 +334,12 @@ async function main() {
       cmd: 'pnpm',
       args: ['run', 'check-phantom-deps'],
     },
+    {
+      label: 'check-gates-selftest',
+      kind: 'cmd',
+      cmd: 'pnpm',
+      args: ['run', 'check-gates-selftest'],
+    },
     { label: 'workspace-audit', kind: 'audit' },
   ]
     .filter(Boolean)

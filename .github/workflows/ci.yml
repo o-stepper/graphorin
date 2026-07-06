@@ -77,6 +77,12 @@ jobs:
       - name: Doc snippets type-check
         run: pnpm run check-doc-snippets
 
+      # W-073: the doc/network gates are regex parsers over evolving inputs;
+      # a silent parser regression would turn them permanently green. Prove
+      # the parsers still bite before trusting their verdicts below.
+      - name: Gate-script self-tests
+        run: pnpm run check-gates-selftest
+
       # DOC-6: diff the CLI guide against the real commander tree — a documented
       # command/subcommand that does not exist (e.g. `consolidator run`) fails here.
       - name: CLI docs command diff

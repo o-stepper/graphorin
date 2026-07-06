@@ -74,8 +74,11 @@ const IMPORT_PATTERNS = [
  * Allow-list — paths relative to the repo root. Each entry corresponds
  * to a documented explicit-user-action code path. Add new entries with
  * a comment explaining why (auditable in `git log`).
+ *
+ * Exported (with {@link isAllowListed}) so the eslint-plugin dogfood
+ * test skips exactly the paths this gate skips - one source of truth.
  */
-const ALLOW_LIST = [
+export const ALLOW_LIST = [
   // OTLP HTTP exporter — fires only when the operator wires an OTLP
   // collector URL into the tracer config (Phase 04).
   'packages/observability/src/exporters/otlp-http.ts',
@@ -129,7 +132,8 @@ async function* walk(root) {
   }
 }
 
-function isAllowListed(relativePath) {
+/** True when `relativePath` (repo-root relative) matches {@link ALLOW_LIST}. */
+export function isAllowListed(relativePath) {
   for (const entry of ALLOW_LIST) {
     if (typeof entry === 'string' && entry === relativePath) return true;
     if (entry instanceof RegExp && entry.test(relativePath)) return true;
@@ -212,12 +216,69 @@ async function main() {
   process.exit(1);
 }
 
+/**
+ * W-073: in-memory fixtures for the two exported seams. A silent parser
+ * regression would turn this gate permanently green; CI runs this mode
+ * (`check-gates-selftest`) so a broken matcher fails loudly instead.
+ */
+function selfTest() {
+  const detectCases = [
+    { label: 'bare fetch call', src: 'const r = await fetch(url);', want: true },
+    { label: 'http.request call', src: "http.request({ host: 'x' });", want: true },
+    { label: 'net.createConnection call', src: 'net.createConnection(80);', want: true },
+    { label: 'new WebSocket', src: "const ws = new WebSocket('wss://x');", want: true },
+    { label: 'static undici import', src: "import { request } from 'undici';", want: true },
+    { label: 'dynamic got import', src: "const got = await import('got');", want: true },
+    { label: 'axios require', src: "const axios = require('axios');", want: true },
+    { label: 'fetch inside a string literal', src: "const s = 'call fetch(x) later';", want: false },
+    { label: 'fetch inside a comment', src: '// fetch(url) would be wrong here\nconst a = 1;', want: false },
+    { label: 'identifier suffix refetch', src: 'await refetch(query);', want: false },
+    { label: 'node:fs import is clean', src: "import { readFile } from 'node:fs/promises';", want: false },
+  ];
+  const allowCases = [
+    { label: 'exact-path entry matches', path: 'packages/pricing/src/refresh.ts', want: true },
+    { label: 'regex entry matches', path: 'packages/security/src/oauth/discovery.ts', want: true },
+    { label: 'non-listed path does not match', path: 'packages/core/src/index.ts', want: false },
+    {
+      label: 'listed basename in wrong package does not match',
+      path: 'packages/core/src/refresh.ts',
+      want: false,
+    },
+  ];
+  let bad = 0;
+  for (const c of detectCases) {
+    const got = detectViolations(c.src).length > 0;
+    if (got !== c.want) {
+      bad += 1;
+      console.error(`self-test FAIL [${c.label}] - expected flagged=${c.want}, got ${got}`);
+    }
+  }
+  for (const c of allowCases) {
+    const got = isAllowListed(c.path);
+    if (got !== c.want) {
+      bad += 1;
+      console.error(`self-test FAIL [${c.label}] - expected ${c.want}, got ${got}`);
+    }
+  }
+  const total = detectCases.length + allowCases.length;
+  console.log(
+    bad === 0
+      ? `[check-no-network] self-test: ${total}/${total} ok`
+      : `[check-no-network] self-test: ${bad} failed`,
+  );
+  process.exit(bad > 0 ? 1 : 0);
+}
+
 // Only run the repo scan when executed directly — importing this module
 // (e.g. for testing `detectViolations`) must not trigger a full scan.
 if (process.argv[1] === __filename) {
-  main().catch((err) => {
-    console.error('check-no-network: ERROR');
-    console.error(err);
-    process.exit(2);
-  });
+  if (process.argv.includes('--self-test')) {
+    selfTest();
+  } else {
+    main().catch((err) => {
+      console.error('check-no-network: ERROR');
+      console.error(err);
+      process.exit(2);
+    });
+  }
 }
