@@ -442,6 +442,35 @@ describe('createSqliteStore', () => {
     expect(hits.some((h) => h.record.id === 'ep-x')).toBe(false);
   });
 
+  it('episodic memory: count() applies the archived filter of its contract (W-155)', async () => {
+    const base = {
+      kind: 'episodic' as const,
+      userId: 'w155',
+      startedAt: new Date(0).toISOString(),
+      endedAt: new Date(60_000).toISOString(),
+      sensitivity: 'internal' as const,
+      createdAt: new Date().toISOString(),
+    };
+    const episodic = store.memory.episodic as unknown as {
+      put(e: Record<string, unknown>): Promise<void>;
+      archive(id: string): Promise<void>;
+      setStatus(id: string, status: string): Promise<void>;
+      count(scope: { userId: string }): Promise<number>;
+    };
+    await episodic.put({ ...base, id: 'w155-a', summary: 'stays live' });
+    await episodic.put({ ...base, id: 'w155-b', summary: 'gets archived' });
+    await episodic.put({ ...base, id: 'w155-c', summary: 'gets quarantined' });
+    expect(await episodic.count({ userId: 'w155' })).toBe(3);
+
+    // Archived episodes leave the count (they left FTS/vector recall).
+    await episodic.archive('w155-b');
+    expect(await episodic.count({ userId: 'w155' })).toBe(2);
+
+    // The quarantined filter does not regress.
+    await episodic.setStatus('w155-c', 'quarantined');
+    expect(await episodic.count({ userId: 'w155' })).toBe(1);
+  });
+
   it('session memory: totalCachedTokens (DEC-131 cache surface)', async () => {
     const scope = { userId: 'alex', sessionId: 's1' };
     const r = await store.memory.session.push(scope, {

@@ -856,11 +856,14 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
 
   /**
    * Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`
-   * with the same default filters as the FTS search (live, non-quarantined).
+   * with the same default filters as the FTS search (live, non-archived,
+   * non-quarantined). W-155: `archived = 0` was missing, so the
+   * "Episodes: N" line of the memory-metadata prompt block drifted from
+   * what recall could actually reach after any `archive()`.
    */
   async count(scope: SessionScope): Promise<number> {
     const row = this.#conn.get<{ n: number }>(
-      "SELECT COUNT(*) AS n FROM episodes WHERE scope_user_id = ? AND deleted_at IS NULL AND status != 'quarantined'",
+      "SELECT COUNT(*) AS n FROM episodes WHERE scope_user_id = ? AND deleted_at IS NULL AND archived = 0 AND status != 'quarantined'",
       [scope.userId],
     );
     return row?.n ?? 0;
