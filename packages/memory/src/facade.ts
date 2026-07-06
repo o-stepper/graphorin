@@ -165,6 +165,14 @@ export interface CreateMemoryOptions {
     readonly maxIterations?: number;
     /** Output-token ceiling per grade call. Default 256. */
     readonly maxTokens?: number;
+    /**
+     * Default difficulty-gate threshold in `[0, 1]` (W-088). The gate's
+     * signal lexicon is **English-only**: on non-English deployments the
+     * auto-gate never fires, so either lower this threshold or rely on
+     * `forceHard` (`deep_recall` already forces the loop). Omitted ⇒ the
+     * built-in `0.5`; per-call `difficultyThreshold` overrides it.
+     */
+    readonly difficultyThreshold?: number;
   };
   /**
    * Opt-in workflow induction (P2-2). When set, `ProceduralMemory.induce(...)`
@@ -423,6 +431,9 @@ export function createMemory(options: CreateMemoryOptions): Memory {
     ...(grader !== null ? { grader } : {}),
     ...(options.iterativeRetrieval?.maxIterations !== undefined
       ? { iterativeMaxIterations: options.iterativeRetrieval.maxIterations }
+      : {}),
+    ...(options.iterativeRetrieval?.difficultyThreshold !== undefined
+      ? { iterativeDifficultyThreshold: options.iterativeRetrieval.difficultyThreshold }
       : {}),
     // C5: the same weights drive eviction salience and rank-time trust.
     ...(options.consolidator?.salienceWeights !== undefined

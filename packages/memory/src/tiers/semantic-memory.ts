@@ -338,6 +338,14 @@ export interface IterativeSearchOptions extends FactSearchOptions {
    * requests and tests.
    */
   readonly forceHard?: boolean;
+  /**
+   * Difficulty-gate threshold in `[0, 1]` for THIS call (W-088). The
+   * gate's signal lexicon is **English-only** - for non-English
+   * deployments lower the threshold or use {@link forceHard}. Omitted ⇒
+   * the facade default (`iterativeRetrieval.difficultyThreshold`) or the
+   * built-in `0.5`.
+   */
+  readonly difficultyThreshold?: number;
 }
 
 /**
@@ -429,6 +437,7 @@ export class SemanticMemory {
   readonly #entityResolver: EntityResolver | null;
   readonly #grader: RetrievalGrader | null;
   readonly #iterativeMaxIterations: number;
+  readonly #iterativeDifficultyThreshold: number | undefined;
   #reranker: ReRanker;
   readonly #trustWeights: SalienceWeights;
   readonly #searchDefaults: SemanticSearchDefaults;
@@ -476,6 +485,12 @@ export class SemanticMemory {
     /** Default total-pass cap for `searchIterative`. Default 3. */
     iterativeMaxIterations?: number;
     /**
+     * Default difficulty-gate threshold for `searchIterative` (W-088).
+     * Omitted ⇒ the gate's built-in `0.5`. Per-call
+     * `difficultyThreshold` overrides it.
+     */
+    iterativeDifficultyThreshold?: number;
+    /**
      * Weights for the rank-time trust discount (C5). Reuses the
      * eviction-path `SalienceWeights` semantics; defaults to
      * `DEFAULT_SALIENCE_WEIGHTS`.
@@ -502,6 +517,7 @@ export class SemanticMemory {
     this.#entityResolver = args.entityResolver ?? null;
     this.#grader = args.grader ?? null;
     this.#iterativeMaxIterations = args.iterativeMaxIterations ?? DEFAULT_MAX_ITERATIONS;
+    this.#iterativeDifficultyThreshold = args.iterativeDifficultyThreshold;
     this.#trustWeights = args.trustWeights ?? DEFAULT_SALIENCE_WEIGHTS;
     this.#searchDefaults = args.searchDefaults ?? {};
   }
@@ -1054,12 +1070,20 @@ export class SemanticMemory {
             // pass-1 noise (discovery order silently dropped it).
             fuse: (lists) => fuseRrf(lists, 60),
           },
-          {
-            maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
-            maxResults: opts.topK ?? 10,
-            ...(opts.forceHard !== undefined ? { forceHard: opts.forceHard } : {}),
-            ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
-          },
+          (() => {
+            // W-088: per-call threshold wins over the facade default.
+            const difficultyThreshold =
+              opts.difficultyThreshold ?? this.#iterativeDifficultyThreshold;
+            return {
+              maxIterations: opts.maxIterations ?? this.#iterativeMaxIterations,
+              maxResults: opts.topK ?? 10,
+              ...(opts.forceHard !== undefined ? { forceHard: opts.forceHard } : {}),
+              ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+              ...(difficultyThreshold !== undefined
+                ? { difficulty: { threshold: difficultyThreshold } }
+                : {}),
+            };
+          })(),
         );
         span.setAttributes({
           'memory.search.semantic.iterative.gate_hard': result.gateHard,

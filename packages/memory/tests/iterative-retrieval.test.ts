@@ -452,6 +452,45 @@ describe('searchIterative + deep_recall wiring (P2-4)', () => {
     expect(r.abstained).toBe(false);
   });
 
+  it('W-088: per-call difficultyThreshold lowers the gate for a single multi-hop query', async () => {
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+    });
+    const scope = { userId: 'alex' };
+    await memory.semantic.remember(scope, { text: 'sushi recommendation from Nino' });
+
+    // One lone multi-hop signal scores 0.4: below the default 0.5 gate,
+    // above an explicit 0.3.
+    const query = 'who recommended sushi';
+    const byDefault = await memory.semantic.searchIterative(scope, query);
+    expect(byDefault.gateHard).toBe(false);
+
+    const lowered = await memory.semantic.searchIterative(scope, query, {
+      difficultyThreshold: 0.3,
+    });
+    expect(lowered.gateHard).toBe(true);
+  });
+
+  it('W-088: iterativeRetrieval.difficultyThreshold reaches the gate as the facade default', async () => {
+    const provider = scriptProvider(['{"sufficient": true, "confidence": 0.9}']);
+    const memory = createMemory({
+      store: createInMemoryStore(),
+      embeddings: new InMemoryEmbeddingRegistry(),
+      iterativeRetrieval: { provider, difficultyThreshold: 0.3 },
+    });
+    const scope = { userId: 'alex' };
+    await memory.semantic.remember(scope, { text: 'sushi recommendation from Nino' });
+
+    const r = await memory.semantic.searchIterative(scope, 'who recommended sushi');
+    expect(r.gateHard).toBe(true);
+    // Per-call still wins over the facade default.
+    const strict = await memory.semantic.searchIterative(scope, 'who recommended sushi', {
+      difficultyThreshold: 0.9,
+    });
+    expect(strict.gateHard).toBe(false);
+  });
+
   it('hard query: reformulation surfaces a fact the first pass missed', async () => {
     const provider = scriptProvider([
       '{"sufficient": false, "confidence": 0.2, "reformulation": "sapiens"}',

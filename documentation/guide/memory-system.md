@@ -206,6 +206,11 @@ if (result.abstained) {
 
 Exposed programmatically as `searchIterative(...)` and as the gated **`deep_recall`** tool (the twelfth tool). Omit `iterativeRetrieval` and `searchIterative` degrades to one difficulty-gated pass with **no provider call**, and the tool surface stays at eleven.
 
+Two properties of the difficulty gate to plan around:
+
+- **The gate's signal lexicon is English-only.** Its multi-hop / temporal / comparison markers are English words, so on non-English deployments the auto-gate never fires. `deep_recall` is unaffected (it always forces the loop); for programmatic `searchIterative` either pass `forceHard: true` or lower the threshold.
+- **The threshold is configurable** (default `0.5` - conservative on purpose, a single multi-hop signal scores `0.4` and stays single-shot): per-call via `searchIterative(scope, q, { difficultyThreshold: 0.3 })`, or as a construction-time default via `createMemory({ iterativeRetrieval: { provider, difficultyThreshold: 0.3 } })` (per-call wins). Even a mis-gated call still returns a valid single-shot result with `graded: false`.
+
 ## Multi-stage conflict resolution
 
 ```mermaid
