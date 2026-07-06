@@ -89,7 +89,7 @@ const rule: Rule.RuleModule = {
         // W-043 carve-out: a receiver whose source text matches the
         // configured pattern is not a SecretValue (Zod schemas,
         // Rust-style results) - skip both report paths.
-        if (allowReceiver !== null && allowReceiver.test(context.sourceCode.getText(me.object))) {
+        if (allowReceiver?.test(context.sourceCode.getText(me.object)) === true) {
           return;
         }
         if (propName === 'unwrap') {

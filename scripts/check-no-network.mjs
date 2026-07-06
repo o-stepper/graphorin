@@ -239,10 +239,22 @@ function selfTest() {
     { label: 'static undici import', src: "import { request } from 'undici';", want: true },
     { label: 'dynamic got import', src: "const got = await import('got');", want: true },
     { label: 'axios require', src: "const axios = require('axios');", want: true },
-    { label: 'fetch inside a string literal', src: "const s = 'call fetch(x) later';", want: false },
-    { label: 'fetch inside a comment', src: '// fetch(url) would be wrong here\nconst a = 1;', want: false },
+    {
+      label: 'fetch inside a string literal',
+      src: "const s = 'call fetch(x) later';",
+      want: false,
+    },
+    {
+      label: 'fetch inside a comment',
+      src: '// fetch(url) would be wrong here\nconst a = 1;',
+      want: false,
+    },
     { label: 'identifier suffix refetch', src: 'await refetch(query);', want: false },
-    { label: 'node:fs import is clean', src: "import { readFile } from 'node:fs/promises';", want: false },
+    {
+      label: 'node:fs import is clean',
+      src: "import { readFile } from 'node:fs/promises';",
+      want: false,
+    },
   ];
   const allowCases = [
     { label: 'exact-path entry matches', path: 'packages/pricing/src/refresh.ts', want: true },
