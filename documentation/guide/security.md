@@ -222,6 +222,8 @@ A sink trips the policy on any of three signals:
 | `derived-untrusted-to-sink` | (`derivedTaint: 'strict'`, opt-in) ANY sink fires after untrusted content entered the run - CaMeL-style control-flow integrity, paraphrase-robust by construction | deliberately coarse - size it in shadow mode first |
 | `lethal-trifecta` | the sink fires while **both** untrusted **and** secret-tier data have entered the run, even without a provable verbatim carry | conservative - disable with `guardTrifecta: false` |
 
+> **The trifecta leg cannot arm without sensitivity tags.** No built-in tool ships with `sensitivity: 'secret'`. If none of *your* tools declares a sensitivity within `sensitiveTiers` and `treatPiiAsSensitive` is off, the `lethal-trifecta` signal can never fire - the only active default signal is the verbatim `untrusted-to-sink` probe, which a paraphrasing injection bypasses. The agent runtime prints one warning at construction when it detects this configuration. Recommended adoption ladder: (1) start in `'shadow'`; (2) tag the tools that read private data with `sensitivity: 'secret'`; (3) widen with `sensitiveTiers` / `treatPiiAsSensitive` if your private data lives at `'internal'`; (4) add `derivedTaint: 'strict'` for paraphrase-robust control-flow integrity; then switch to `'enforce'`.
+
 Three modes (`DataFlowMode`):
 
 | Mode | Behaviour |

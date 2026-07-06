@@ -427,3 +427,76 @@ describe('C6 - derived taint at the agent guard', () => {
     expect(cleanVerdict.action).toBe('allow');
   });
 });
+
+describe('W-103 - non-armable trifecta leg warning at wiring', () => {
+  const mkTool = (
+    name: string,
+    extra: Partial<Tool<unknown, unknown, unknown>> = {},
+  ): Tool<unknown, unknown, unknown> =>
+    ({
+      name,
+      description: 'w103 fixture',
+      inputSchema: passthroughSchema,
+      async execute() {
+        return 'ok';
+      },
+      ...extra,
+    }) as Tool<unknown, unknown, unknown>;
+
+  async function construct(
+    policy: Record<string, unknown> | undefined,
+    tools: ReadonlyArray<Tool<unknown, unknown, unknown>>,
+  ): Promise<void> {
+    const { createMockProvider } = await import('./fixtures/mock-provider.js');
+    createAgent({
+      name: 'w103',
+      instructions: 'x',
+      provider: createMockProvider({ modelId: 'mock', scripts: [textOnlyScript('ok', 4)] }),
+      tools,
+      ...(policy !== undefined ? { dataFlowPolicy: policy as never } : {}),
+    });
+  }
+
+  function armWarnings(spy: { mock: { calls: unknown[][] } }): number {
+    return spy.mock.calls.filter((c) => String(c[0]).includes('lethal-trifecta leg cannot arm'))
+      .length;
+  }
+
+  it('warns exactly once when the policy is on but no tool can arm the sensitive leg', async () => {
+    const { vi } = await import('vitest');
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await construct({ mode: 'shadow' }, [mkTool('web_fetch')]);
+      expect(armWarnings(spy)).toBe(1);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('stays silent when a tool is tagged, PII is widened, trifecta is off, or the policy is absent', async () => {
+    const { vi } = await import('vitest');
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await construct({ mode: 'shadow' }, [mkTool('read_secret', { sensitivity: 'secret' })]);
+      await construct({ mode: 'shadow', treatPiiAsSensitive: true }, [mkTool('plain')]);
+      await construct({ mode: 'shadow', guardTrifecta: false }, [mkTool('plain')]);
+      await construct(undefined, [mkTool('plain')]);
+      expect(armWarnings(spy)).toBe(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('a widened sensitiveTiers arms on internal-tier tools (no warn)', async () => {
+    const { vi } = await import('vitest');
+    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      await construct({ mode: 'shadow', sensitiveTiers: ['secret', 'internal'] }, [
+        mkTool('crm_read', { sensitivity: 'internal' }),
+      ]);
+      expect(armWarnings(spy)).toBe(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});

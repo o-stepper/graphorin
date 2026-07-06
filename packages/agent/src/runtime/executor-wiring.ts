@@ -223,6 +223,32 @@ export function wireToolExecution<TDeps, TOutput>(
     config.dataFlowPolicy !== undefined && config.dataFlowPolicy.mode !== 'off'
       ? buildDataFlowGuard(config.dataFlowPolicy)
       : undefined;
+  // W-103: the lethal-trifecta leg arms only when some tool can classify
+  // as `sensitive` - by default that means `sensitivity: 'secret'`, and
+  // no built-in tool ships with that tag. An operator who enables the
+  // policy without tagging private-data tools silently gets only the
+  // best-effort verbatim probe. One deterministic warn at construction
+  // (mirrors the memoryGuardTier warn above); tools registered later are
+  // not scanned - this is a wiring aid, not a gate.
+  if (
+    toolDataFlowGuard !== undefined &&
+    (config.dataFlowPolicy?.guardTrifecta ?? true) &&
+    config.dataFlowPolicy?.treatPiiAsSensitive !== true
+  ) {
+    const effectiveTiers = config.dataFlowPolicy?.sensitiveTiers ?? (['secret'] as const);
+    const anySensitiveTool = (config.tools ?? []).some(
+      (t) => t.sensitivity !== undefined && effectiveTiers.includes(t.sensitivity),
+    );
+    if (!anySensitiveTool) {
+      console.warn(
+        '[graphorin/agent] dataFlowPolicy is enabled but no registered tool declares a ' +
+          "sensitivity within sensitiveTiers (default ['secret']) and treatPiiAsSensitive is " +
+          'off - the lethal-trifecta leg cannot arm; only the best-effort verbatim ' +
+          "untrusted-to-sink probe is active. Tag private-data tools (sensitivity: 'secret') " +
+          'or widen sensitiveTiers / treatPiiAsSensitive.',
+      );
+    }
+  }
   // D4 Progent tool-argument policy + Rule-of-Two floor. `ruleOfTwo`
   // compiles to a policy (+ a read-only capability floor when it denies
   // external side effects); an explicit `toolPolicy` composes on top
