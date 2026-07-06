@@ -67,6 +67,13 @@ hybrid p95 ~5 ms and hop-1 graph p95 ~53 ms.
 - **DB size** budgets roughly linearly: ~1.3 KiB/fact at 64-dim vectors and
   short texts (vector table + FTS index dominate). 1M facts of this shape
   would be ~1.3 GiB.
+- **Long-term growth is dominated by side tables, not facts.** Spans,
+  idempotency response bodies, consolidator run counters, session audit rows,
+  memory history and terminal workflow checkpoints all accumulate per
+  *activity*, not per remembered fact. The standalone server sweeps the
+  derived surfaces by default (`config.retention`); in lib-mode schedule the
+  prune primitives yourself - see the
+  [deployment guide](/guide/deployment#retention-and-database-growth).
 - **One writer.** SQLite is single-writer: keep one process writing per DB
   file (the k8s template pins `replicas: 1` for exactly this reason).
 

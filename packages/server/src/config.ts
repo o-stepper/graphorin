@@ -112,6 +112,19 @@ export interface ServerConfigSpec {
       readonly passphraseRef?: SecretRefString;
     };
   };
+  readonly retention: {
+    readonly enabled: boolean;
+    readonly intervalMs: number;
+    readonly spansDays: number;
+    readonly consolidatorRunsDays: number;
+    readonly dlqExhaustedDays: number;
+    readonly idempotency: boolean;
+    readonly sessionsDays?: number;
+    readonly sessionsClosedOnly: boolean;
+    readonly memoryHistoryDays?: number;
+    readonly workflowThreadsDays?: number;
+    readonly auditDays?: number;
+  };
   readonly audit: {
     readonly enabled: boolean;
     readonly path?: string;
@@ -291,6 +304,35 @@ const storageSchema = z
   .strict()
   .default({});
 
+/**
+ * W-010 / W-008 retention policy. Default-on ONLY for derived or
+ * recoverable data (span telemetry, consolidator run counters, the
+ * exhausted consolidator DLQ, expired idempotency response bodies).
+ * Primary user content - sessions, memory history, workflow threads,
+ * the session audit trail - is never touched unless the operator sets
+ * the matching `*Days` window explicitly.
+ */
+const retentionSchema = z
+  .object({
+    enabled: z.boolean().default(true),
+    intervalMs: z
+      .number()
+      .int()
+      .positive()
+      .default(6 * 60 * 60 * 1000),
+    spansDays: z.number().positive().default(30),
+    consolidatorRunsDays: z.number().positive().default(90),
+    dlqExhaustedDays: z.number().positive().default(30),
+    idempotency: z.boolean().default(true),
+    sessionsDays: z.number().positive().optional(),
+    sessionsClosedOnly: z.boolean().default(true),
+    memoryHistoryDays: z.number().positive().optional(),
+    workflowThreadsDays: z.number().positive().optional(),
+    auditDays: z.number().positive().optional(),
+  })
+  .strict()
+  .default({});
+
 const auditSchema = z
   .object({
     enabled: z.boolean().default(false),
@@ -368,6 +410,7 @@ export const ServerConfigSchema = z
   .object({
     server: serverSchema,
     storage: storageSchema,
+    retention: retentionSchema,
     audit: auditSchema,
     secrets: secretsSchema,
     auth: authSchema,

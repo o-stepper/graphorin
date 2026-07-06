@@ -177,6 +177,15 @@ export {
   type WorkflowRoutesDeps,
 } from './routes/index.js';
 export {
+  createConsoleRetentionLog,
+  type RetentionConfig,
+  type RetentionLog,
+  type RetentionLogLevel,
+  type RetentionStoreLike,
+  type ScheduleRetentionOptions,
+  scheduleRetentionSweeps,
+} from './runtime/retention.js';
+export {
   type RunDescriptor,
   type RunHandle,
   type RunStateSnapshot,

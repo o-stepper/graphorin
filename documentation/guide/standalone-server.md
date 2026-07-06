@@ -254,6 +254,10 @@ export default defineConfig({
 
 The CLI command `graphorin start --config graphorin.config.mjs` boots the server. The config loader reads `.ts` / `.js` / `.mjs` / `.json` files (TOML is not supported); `defineConfig` is a typed pass-through that gives editor autocomplete over the full schema, and every field is optional with a documented default.
 
+### Retention
+
+The `retention` section drives a unified periodic sweep over the store's growth surfaces (default: every 6 hours, plus one sweep immediately at startup). Derived data is pruned out of the box - spans older than `spansDays` (30), consolidator run counters older than `consolidatorRunsDays` (90), exhausted DLQ batches older than `dlqExhaustedDays` (30), and expired idempotency records (`idempotency: true`). Primary user content is strictly opt-in: sessions (`sessionsDays`, with `sessionsClosedOnly` defaulting to `true`), the session audit trail (`auditDays`), memory history (`memoryHistoryDays`) and terminal workflow threads (`workflowThreadsDays`) are only touched when you set the matching window. `retention: { enabled: false }` disables the sweep entirely. Each surface is isolated: one failing prune logs a warning (via the `observability.logger` flavour) and never blocks the others. See the [deployment guide](/guide/deployment#retention-and-database-growth) for the full growth-surface table, including the file-based replay-JSONL directory that must be pruned via cron instead.
+
 ## Process model
 
 Recommended deployment patterns:

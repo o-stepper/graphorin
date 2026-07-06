@@ -375,6 +375,11 @@ export const DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS = 60 * 60_000;
  * path already refuses to replay (IETF-draft semantics unchanged).
  * Best-effort: store errors are swallowed. Same shape as
  * {@link scheduleRunPruning}: `unref`-ed timer + stop function.
+ *
+ * Since W-010 the standalone server drives this surface through the
+ * unified retention scheduler (`config.retention.idempotency`); this
+ * standalone primitive remains for embedders running the store
+ * without the server.
  */
 export function scheduleIdempotencyPruning(
   store: { prune(olderThan: number): Promise<number> },
