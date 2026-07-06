@@ -24,5 +24,10 @@ describe('benchmark-scale harness', () => {
     expect(r.entities).toBeGreaterThan(0);
     expect(r.dbBytes).toBeGreaterThan(0);
     expect(r.lightPhaseSeconds).not.toBeNull();
-  }, 60_000);
+    // 180s: the full harness (seed + FTS + vector + graph + light phase)
+    // needs >60s wall on a degraded 2-core windows runner - the same
+    // slow-I/O flake class the CI-wide 30s default retired, but this test
+    // owns an explicit timeout, which takes precedence. Not a hang: the
+    // run completes and the assertions are shape checks, not perf gates.
+  }, 180_000);
 });
