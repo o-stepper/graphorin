@@ -348,6 +348,87 @@ describe('migrations', () => {
     conn2.close();
   });
 
+  it('W-111: migration 022 dedups duplicate session sequences before creating the unique index', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-w111-'));
+    const conn = await openConnection({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
+    // Freeze the database at the schema BEFORE 022 - the exact state of
+    // a real deployment that ran the racy MAX+1 writer and now upgrades.
+    runMigrations(conn, { upTo: '021' });
+    const frozen = listAppliedMigrations(conn).map((m) => m.version);
+    expect(frozen).toContain('021');
+    expect(frozen).not.toContain('022');
+
+    const insert = (id: string, session: string, sequence: number, createdAt: number) =>
+      conn.run(
+        'INSERT INTO session_messages (id, scope_user_id, scope_session_id, role, content_json, sequence, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [id, 'alex', session, 'user', '"m"', sequence, createdAt],
+      );
+    // The race artifact: two writers minted the same sequence twice.
+    // The (2, 2500) / (2, 3000) pair is deliberately out of insertion
+    // order to prove created_at is the tiebreak, not rowid.
+    insert('m1', 's-dup', 1, 1_000);
+    insert('m2', 's-dup', 1, 2_000);
+    insert('m3', 's-dup', 2, 3_000);
+    insert('m4', 's-dup', 2, 2_500);
+    // A session WITHOUT duplicates keeps its sequence values untouched.
+    insert('c1', 's-clean', 5, 1_000);
+    insert('c2', 's-clean', 7, 2_000);
+
+    const priorOrder = conn
+      .all<{ id: string }>(
+        "SELECT id FROM session_messages WHERE scope_session_id = 's-dup' ORDER BY sequence, created_at, rowid",
+      )
+      .map((r) => r.id);
+
+    // Full run: without the preflight, 022's CREATE UNIQUE INDEX throws
+    // on the duplicates and the store can never start.
+    runMigrations(conn);
+    const indexes = conn
+      .all<{ name: string }>("PRAGMA index_list('session_messages')")
+      .map((i) => i.name);
+    expect(indexes).toContain('idx_session_messages_session_sequence');
+
+    const after = conn.all<{ id: string; sequence: number }>(
+      "SELECT id, sequence FROM session_messages WHERE scope_session_id = 's-dup' ORDER BY sequence",
+    );
+    expect(after.map((r) => r.id)).toEqual(priorOrder);
+    expect(after.map((r) => r.sequence)).toEqual([1, 2, 3, 4]);
+    const clean = conn.all<{ sequence: number }>(
+      "SELECT sequence FROM session_messages WHERE scope_session_id = 's-clean' ORDER BY sequence",
+    );
+    expect(clean.map((r) => r.sequence)).toEqual([5, 7]);
+    conn.close();
+  });
+
+  it('W-111: preflight runs inside the pending transaction only, never on an applied migration', async () => {
+    _resetDynamicMigrationsForTesting();
+    let calls = 0;
+    registerMigration({
+      version: '920',
+      name: 'preflight-probe',
+      sql: 'CREATE TABLE IF NOT EXISTS preflight_probe (id TEXT PRIMARY KEY);',
+      owner: 'test',
+      preflight: (c) => {
+        calls += 1;
+        // Runs BEFORE the migration's SQL: the table must not exist yet.
+        const t = c.get<{ name: string }>(
+          "SELECT name FROM sqlite_master WHERE type='table' AND name='preflight_probe'",
+        );
+        expect(t).toBeUndefined();
+      },
+    });
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-mig-preflight-'));
+    const conn = await openConnection({ path: `${dir}/db.sqlite`, skipSqliteVec: true });
+    runMigrations(conn);
+    expect(calls).toBe(1);
+    // Re-run on the fully-migrated DB: the version is already applied,
+    // so the preflight must NOT fire again.
+    runMigrations(conn);
+    expect(calls).toBe(1);
+    conn.close();
+    _resetDynamicMigrationsForTesting();
+  });
+
   it('FTS5 multilingual tokenizer indexes Russian + English + URLs + emails + diacritics', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-fts-'));
     const conn = await openConnection({

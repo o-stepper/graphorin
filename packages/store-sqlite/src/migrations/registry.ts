@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { SqliteConnection } from '../connection.js';
 
 /**
  * Single source of truth for the bundled migration SQL files. The runner
@@ -25,6 +26,17 @@ export interface Migration {
   readonly sql: string;
   /** Owning module - surfaced in error messages. */
   readonly owner: string;
+  /**
+   * W-111: optional data-repair hook. The runner invokes it INSIDE the
+   * migration's transaction, immediately BEFORE `sql`, and only when
+   * the migration is actually pending. It exists so a migration whose
+   * DDL cannot tolerate pre-existing bad data (e.g. a CREATE UNIQUE
+   * INDEX over rows that already contain duplicates) can repair that
+   * data first WITHOUT editing the SQL file - the file stays
+   * byte-identical, so the checksum tamper-guard keeps holding for
+   * databases that already applied the version.
+   */
+  readonly preflight?: (conn: SqliteConnection) => void;
 }
 
 const MODULE_PATH = fileURLToPath(import.meta.url);
@@ -67,6 +79,44 @@ const BUILTIN_OWNERS: Readonly<Record<string, string>> = {
   '032': '@graphorin/store-sqlite (workflow durable-timer wake_at enumeration)',
 };
 
+/**
+ * W-111: data-repair preflights for bundled migrations, keyed by
+ * version (see {@link Migration.preflight}).
+ */
+const BUILTIN_PREFLIGHTS: Readonly<Record<string, (conn: SqliteConnection) => void>> = {
+  // 022 creates UNIQUE(scope_session_id, sequence) over EXISTING rows.
+  // A database that actually hit the MAX+1 race 022 was written to fix
+  // (two writers appending to one session) already holds duplicate
+  // sequence values, so the CREATE UNIQUE INDEX would throw - and
+  // store.init() (hence the server and CLI) could never start on
+  // exactly the databases that need the fix. Deterministically
+  // renumber ONLY the sessions that contain duplicates, preserving
+  // relative order via (sequence, created_at, rowid). Rowids and ids
+  // are untouched; sessions without duplicates keep their sequence
+  // values byte-for-byte.
+  '022': (conn) => {
+    conn.execMany(`
+      UPDATE session_messages
+      SET sequence = renumbered.new_sequence
+      FROM (
+        SELECT rowid AS row_id,
+               ROW_NUMBER() OVER (
+                 PARTITION BY scope_session_id
+                 ORDER BY sequence, created_at, rowid
+               ) AS new_sequence
+        FROM session_messages
+        WHERE scope_session_id IN (
+          SELECT scope_session_id
+          FROM session_messages
+          GROUP BY scope_session_id, sequence
+          HAVING COUNT(*) > 1
+        )
+      ) AS renumbered
+      WHERE session_messages.rowid = renumbered.row_id;
+    `);
+  },
+};
+
 const dynamicMigrations: Migration[] = [];
 
 function loadBuiltinMigrations(): Migration[] {
@@ -79,11 +129,13 @@ function loadBuiltinMigrations(): Migration[] {
     const [, version, name] = match;
     if (version === undefined || name === undefined) continue;
     const sql = readFileSync(join(MIGRATIONS_DIR, entry.name), 'utf8');
+    const preflight = BUILTIN_PREFLIGHTS[version];
     migrations.push({
       version,
       name,
       sql,
       owner: BUILTIN_OWNERS[version] ?? '@graphorin/store-sqlite',
+      ...(preflight !== undefined ? { preflight } : {}),
     });
   }
   return migrations.sort((a, b) => a.version.localeCompare(b.version));
