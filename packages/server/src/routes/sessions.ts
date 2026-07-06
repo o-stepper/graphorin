@@ -138,76 +138,99 @@ export function createSessionRoutes(deps: SessionRoutesDeps): Hono<{ Variables: 
     return c.json({ session }, 201);
   });
 
-  app.get('/:id', createScopeMiddleware('sessions:read'), async (c) => {
-    const id = c.req.param('id');
-    const session = await deps.sessions.get(id);
-    if (session === null) {
-      return c.json({ error: 'session-not-found', message: `Session '${id}' not found.` }, 404);
-    }
-    return c.json({ session });
-  });
+  // W-107: per-resource requirement - a token scoped to ONE session
+  // reads it on every surface (WS subjects already gated per-resource;
+  // wide two-segment grants keep covering three-segment requirements).
+  app.get(
+    '/:id',
+    createScopeMiddleware((_path, params) => `sessions:read:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const session = await deps.sessions.get(id);
+      if (session === null) {
+        return c.json({ error: 'session-not-found', message: `Session '${id}' not found.` }, 404);
+      }
+      return c.json({ session });
+    },
+  );
 
-  app.delete('/:id', createScopeMiddleware('sessions:write'), async (c) => {
-    const id = c.req.param('id');
-    const removed = await deps.sessions.remove(id);
-    if (!removed) {
-      return c.json({ error: 'session-not-found', message: `Session '${id}' not found.` }, 404);
-    }
-    return c.body(null, 204);
-  });
+  app.delete(
+    '/:id',
+    createScopeMiddleware((_path, params) => `sessions:write:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const removed = await deps.sessions.remove(id);
+      if (!removed) {
+        return c.json({ error: 'session-not-found', message: `Session '${id}' not found.` }, 404);
+      }
+      return c.body(null, 204);
+    },
+  );
 
-  app.get('/:id/messages', createScopeMiddleware('sessions:read'), async (c) => {
-    const id = c.req.param('id');
-    const parsed = MessagesQuerySchema.safeParse({ limit: c.req.query('limit') });
-    if (!parsed.success) {
-      return c.json(
-        {
-          error: 'config-invalid',
-          message: 'Invalid messages query.',
-          issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
-        },
-        400,
-      );
-    }
-    const opts: { limit?: number } = {};
-    if (parsed.data.limit !== undefined) opts.limit = parsed.data.limit;
-    const messages = await deps.sessions.listMessages(id, opts);
-    return c.json({ sessionId: id, messages });
-  });
+  app.get(
+    '/:id/messages',
+    createScopeMiddleware((_path, params) => `sessions:read:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const parsed = MessagesQuerySchema.safeParse({ limit: c.req.query('limit') });
+      if (!parsed.success) {
+        return c.json(
+          {
+            error: 'config-invalid',
+            message: 'Invalid messages query.',
+            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+          },
+          400,
+        );
+      }
+      const opts: { limit?: number } = {};
+      if (parsed.data.limit !== undefined) opts.limit = parsed.data.limit;
+      const messages = await deps.sessions.listMessages(id, opts);
+      return c.json({ sessionId: id, messages });
+    },
+  );
 
-  app.get('/:id/handoffs', createScopeMiddleware('sessions:read'), async (c) => {
-    const id = c.req.param('id');
-    const handoffs = await deps.sessions.listHandoffs(id);
-    return c.json({ sessionId: id, handoffs });
-  });
+  app.get(
+    '/:id/handoffs',
+    createScopeMiddleware((_path, params) => `sessions:read:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const handoffs = await deps.sessions.listHandoffs(id);
+      return c.json({ sessionId: id, handoffs });
+    },
+  );
 
-  app.post('/:id/export', createScopeMiddleware('sessions:export'), async (c) => {
-    const id = c.req.param('id');
-    if (deps.sessions.exportSession === undefined) {
-      return c.json(
-        { error: 'session-export-unsupported', message: 'Export is not enabled.' },
-        400,
-      );
-    }
-    const parsed = ExportBodySchema.safeParse(await safelyParseJson(c));
-    if (!parsed.success) {
-      return c.json(
-        {
-          error: 'config-invalid',
-          message: 'Invalid export body.',
-          issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
-        },
-        400,
-      );
-    }
-    const exportOpts: { includeAuditEntries?: boolean; hash?: boolean } = {};
-    if (parsed.data.includeAuditEntries !== undefined) {
-      exportOpts.includeAuditEntries = parsed.data.includeAuditEntries;
-    }
-    if (parsed.data.hash !== undefined) exportOpts.hash = parsed.data.hash;
-    const result = await deps.sessions.exportSession(id, exportOpts);
-    return c.json({ sessionId: id, export: result });
-  });
+  app.post(
+    '/:id/export',
+    createScopeMiddleware((_path, params) => `sessions:export:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      if (deps.sessions.exportSession === undefined) {
+        return c.json(
+          { error: 'session-export-unsupported', message: 'Export is not enabled.' },
+          400,
+        );
+      }
+      const parsed = ExportBodySchema.safeParse(await safelyParseJson(c));
+      if (!parsed.success) {
+        return c.json(
+          {
+            error: 'config-invalid',
+            message: 'Invalid export body.',
+            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+          },
+          400,
+        );
+      }
+      const exportOpts: { includeAuditEntries?: boolean; hash?: boolean } = {};
+      if (parsed.data.includeAuditEntries !== undefined) {
+        exportOpts.includeAuditEntries = parsed.data.includeAuditEntries;
+      }
+      if (parsed.data.hash !== undefined) exportOpts.hash = parsed.data.hash;
+      const result = await deps.sessions.exportSession(id, exportOpts);
+      return c.json({ sessionId: id, export: result });
+    },
+  );
 
   // IP-14: the session-replay route lives in `replay/routes.ts` (the
   // scope-laddered, audit-backed implementation). The Phase-14a stub

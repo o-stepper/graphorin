@@ -18,7 +18,7 @@
 import { Hono } from 'hono';
 
 import type { ServerVariables } from '../internal/context.js';
-import { createScopeMiddleware } from '../middleware/scope.js';
+import { createAuthenticatedMiddleware } from '../middleware/scope.js';
 import type { WsTicketStore } from '../ws/ticket.js';
 
 /**
@@ -39,7 +39,12 @@ export interface AuthRoutesDeps {
 export function createAuthRoutes(deps: AuthRoutesDeps): Hono<{ Variables: ServerVariables }> {
   const app = new Hono<{ Variables: ServerVariables }>();
 
-  app.post('/session/ws-ticket', createScopeMiddleware('agents:invoke'), (c) => {
+  // W-107: the ticket ADDS no rights - it carries the principal's own
+  // scopes and every subscribe is per-subject gated on the dispatcher -
+  // so possession of a valid principal is the whole requirement. The
+  // old `agents:invoke` gate locked read-only tokens out of the
+  // browser WS path entirely.
+  app.post('/session/ws-ticket', createAuthenticatedMiddleware(), (c) => {
     const auth = c.get('state').auth;
     // IP-13: in the no-auth loopback mode (`auth.kind='none'`) there is no
     // bearer token, but the anonymous principal is fully authorized - mint a

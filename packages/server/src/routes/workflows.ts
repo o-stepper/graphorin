@@ -255,7 +255,12 @@ export function createWorkflowRoutes(
         { subject, ...(deps.dispatcher !== undefined ? { dispatcher: deps.dispatcher } : {}) },
       );
       return c.json(
-        { runId, threadId: parsed.data.threadId, status: 'running', subscribe: { websocket: subject } },
+        {
+          runId,
+          threadId: parsed.data.threadId,
+          status: 'running',
+          subscribe: { websocket: subject },
+        },
         202,
       );
     },
@@ -304,7 +309,10 @@ export function createWorkflowRoutes(
         });
       } catch (err) {
         const wire = toWireError(err);
-        return c.json({ error: wire.code, message: wire.message }, wire.code === 'thread-not-found' ? 404 : 400);
+        return c.json(
+          { error: wire.code, message: wire.message },
+          wire.code === 'thread-not-found' ? 404 : 400,
+        );
       }
     },
   );

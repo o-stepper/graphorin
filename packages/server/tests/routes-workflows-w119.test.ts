@@ -4,8 +4,13 @@
  * (the honest-501 retires). Registered workflows are genuine
  * `@graphorin/workflow` instances, so this is end-to-end.
  */
-import { _resetResolversForTesting, installBuiltinResolvers, resolveSecret } from '@graphorin/security/secrets';
+
 import { createToken } from '@graphorin/security/auth';
+import {
+  _resetResolversForTesting,
+  installBuiltinResolvers,
+  resolveSecret,
+} from '@graphorin/security/secrets';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import {
   awaitExternal,
@@ -277,7 +282,6 @@ describe('W-119 - server workflow surface', () => {
       id: 'bare',
       workflow: {
         name: 'bare',
-        // biome-ignore lint/correctness/useYield: minimal fixture
         execute: async function* () {},
       } as never,
     });

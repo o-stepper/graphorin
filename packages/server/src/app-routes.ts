@@ -47,8 +47,8 @@ import {
 import type { RunStateTracker } from './runtime/run-state.js';
 import { createSseRoutes } from './sse/index.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
-import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import { createTriggersRoutes } from './triggers/routes.js';
+import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
 import { createWsUpgradeEvents } from './ws/upgrade.js';
 

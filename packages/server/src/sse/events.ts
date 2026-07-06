@@ -76,7 +76,9 @@ export function createSseRoutes(deps: SseRoutesDeps): Hono<{ Variables: ServerVa
   const app = new Hono<{ Variables: ServerVariables }>();
   app.get(
     '/:id/events',
-    createScopeMiddleware('sessions:read'),
+    // W-107: per-resource, mirroring the WS subject gate - a token
+    // scoped to one session streams it over the browser SSE fallback.
+    createScopeMiddleware((_path, params) => `sessions:read:${params.id}`),
     sseHandler(deps.dispatcher, sanitizer, keepAliveMs, deps.perConnectionQueueLimit ?? 1000),
   );
   return app;
@@ -146,11 +148,11 @@ function sseHandler(
       const handle = {
         id: subscriberId,
         tokenId,
-        // The strict-mode subscribe path enforces scope; we trust the
-        // outer middleware (`createScopeMiddleware('sessions:read')`)
-        // to gate this handler so we forward an empty scope set -
-        // the dispatcher's per-subject scope check still requires
-        // the `agents:invoke:<sessionId>` grant.
+        // The strict-mode subscribe path enforces scope; the outer
+        // middleware gates this handler per-resource
+        // (`sessions:read:<sessionId>`, W-107) and the dispatcher's
+        // per-subject check requires the same grant - the two layers
+        // are consistent for session-scoped tokens.
         grantedScopes,
         send: (frame: ServerMessage) => {
           // IP-9: bound the queue - a stalled consumer is closed, not

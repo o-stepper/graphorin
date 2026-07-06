@@ -390,3 +390,28 @@ export function scheduleIdempotencyPruning(
   }
   return () => clearInterval(timer);
 }
+
+/**
+ * W-107: the per-resource scope a caller must hold to touch this run.
+ * `'read'` gates state inspection; `'control'` gates abort/resume.
+ * Derived from the run descriptor: agent runs bind to
+ * `agents:{read|invoke}:<agentId>`, workflow runs to
+ * `workflows:{read|execute}:<workflowId>`. Runs without a descriptor id
+ * (not produced by the current trackers) fall back to the bare scope.
+ */
+export function requiredRunScope(
+  snapshot: Pick<RunStateSnapshot, 'agentId' | 'workflowId'>,
+  action: 'read' | 'control',
+): string {
+  if (snapshot.workflowId !== undefined) {
+    return action === 'read'
+      ? `workflows:read:${snapshot.workflowId}`
+      : `workflows:execute:${snapshot.workflowId}`;
+  }
+  if (snapshot.agentId !== undefined) {
+    return action === 'read'
+      ? `agents:read:${snapshot.agentId}`
+      : `agents:invoke:${snapshot.agentId}`;
+  }
+  return action === 'read' ? 'agents:read' : 'agents:invoke';
+}
