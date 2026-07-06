@@ -1344,7 +1344,19 @@ export class SemanticMemory {
         ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
       });
       if (pseudo === null || pseudo.trim().length === 0) return [];
-      return this.#tryVectorSearch(scope, pseudo, topK, opts.asOf, opts.includeQuarantined);
+      // W-144: the HyDE leg carries the SAME predicate set as the direct
+      // FTS / vector / graph / entity legs - an includeSuperseded audit
+      // search must not silently evaluate this leg validity-now, and the
+      // owner filter belongs in-store, not post-fusion.
+      return this.#tryVectorSearch(
+        scope,
+        pseudo,
+        topK,
+        opts.asOf,
+        opts.includeQuarantined,
+        opts.includeSuperseded,
+        opts.owner,
+      );
     } catch {
       return [];
     }

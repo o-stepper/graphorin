@@ -155,6 +155,46 @@ describe('HyDE (P2-3)', () => {
     expect(embedder.embedded).toContain(pseudo);
   });
 
+  it('W-144: the HyDE leg carries includeSuperseded and owner like the direct vector leg', async () => {
+    const provider = spyProvider({ hypothetical: 'recalled: the runbook lives in confluence' });
+    const store = createInMemoryStore();
+    type SearchVectorFn = NonNullable<typeof store.semantic.searchVector>;
+    const original = store.semantic.searchVector;
+    if (original === undefined) throw new Error('fixture must expose searchVector');
+    const captured: Array<Parameters<SearchVectorFn>> = [];
+    (store.semantic as { searchVector: SearchVectorFn }).searchVector = async (...args) => {
+      captured.push(args);
+      return original.call(store.semantic, ...args);
+    };
+    const memory = createMemory({
+      store,
+      embeddings: new InMemoryEmbeddingRegistry(),
+      embedder: spyEmbedder(),
+      queryTransform: { provider },
+    });
+    await memory.semantic.remember(
+      scope,
+      { text: 'the deploy runbook lives in confluence' },
+      PIPELINE_OFF,
+    );
+
+    captured.length = 0;
+    await memory.semantic.search(scope, 'where are the docs', {
+      hyde: true,
+      includeSuperseded: true,
+      owner: 'agent',
+    });
+
+    // Direct vector leg + HyDE leg - and BOTH must carry the predicates
+    // in-store (the HyDE call used to drop them, so an includeSuperseded
+    // audit search silently evaluated that leg validity-now).
+    expect(captured).toHaveLength(2);
+    for (const args of captured) {
+      expect(args[6]).toBe(true);
+      expect(args[7]).toBe('agent');
+    }
+  });
+
   it('skips the hypothetical LLM call when no embedder is configured', async () => {
     const provider = spyProvider({ hypothetical: 'x' });
     const memory = createMemory({
