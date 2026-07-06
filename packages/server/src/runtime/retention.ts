@@ -191,15 +191,21 @@ export function scheduleRetentionSweeps(options: ScheduleRetentionOptions): () =
   const consolidator = consolidatorOf(store);
 
   let sweeping = false;
+  let stopped = false;
 
   const sweep = async (): Promise<void> => {
     if (sweeping) return;
     sweeping = true;
     const counts: Record<string, number> = {};
     const runSurface = async (surface: string, prune: () => Promise<number>): Promise<void> => {
+      // The immediate startup sweep can outlive a fast stop() (tests,
+      // tight restart loops); the store may already be closed then, so
+      // bail between surfaces instead of warning on every one.
+      if (stopped) return;
       try {
         counts[surface] = await prune();
       } catch (err) {
+        if (stopped) return;
         log('warn', `retention sweep failed for ${surface}`, {
           surface,
           error: err instanceof Error ? err.message : String(err),
@@ -256,7 +262,7 @@ export function scheduleRetentionSweeps(options: ScheduleRetentionOptions): () =
       }
       // Quiet on a no-op sweep (fresh DBs, tight restart loops): the
       // INFO line only appears when the sweep actually deleted rows.
-      if (Object.values(counts).some((n) => n > 0)) {
+      if (!stopped && Object.values(counts).some((n) => n > 0)) {
         log('info', 'retention sweep complete', counts);
       }
     } finally {
@@ -271,5 +277,8 @@ export function scheduleRetentionSweeps(options: ScheduleRetentionOptions): () =
   if (typeof (timer as { unref?: () => void }).unref === 'function') {
     (timer as { unref: () => void }).unref();
   }
-  return () => clearInterval(timer);
+  return () => {
+    stopped = true;
+    clearInterval(timer);
+  };
 }
