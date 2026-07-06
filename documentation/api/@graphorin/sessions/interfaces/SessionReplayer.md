@@ -38,7 +38,7 @@ Run the replay engine. The caller threads in:
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`SessionReplayOptions`](/api/@graphorin/sessions/interfaces/SessionReplayOptions.md) & \{ `liveInvocation?`: (`record`) => `Promise`\&lt;\{ `args`: `unknown`; `idempotencyKey?`: `string`; `validateRecordedOutput?`: (`output`) =&gt; `string` \| `null`; \}\>; `target`: `string`; `traceSource?`: \| `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> \| `Iterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\>; \} |
+| `options` | [`SessionReplayOptions`](/api/@graphorin/sessions/interfaces/SessionReplayOptions.md) & \{ `liveInvocation?`: (`record`) => `Promise`\&lt;\{ `args`: `unknown`; `idempotencyKey?`: `string`; `validateRecordedOutput?`: (`output`) =&gt; `string` \| `null`; \}\>; `target`: `string`; `traceSource?`: \| `AsyncIterable`\&lt;[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\&gt; \| `Iterable`\&lt;[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\&gt;; \} |
 
 #### Returns
 

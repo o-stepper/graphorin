@@ -40,6 +40,6 @@ results without exception handling.
 
 ## Returns
 
-`Promise`\<[`ComposedGuardrailResult`](/api/@graphorin/security/type-aliases/ComposedGuardrailResult.md)\&lt;`TValue`\&gt;\>
+`Promise`\&lt;[`ComposedGuardrailResult`](/api/@graphorin/security/type-aliases/ComposedGuardrailResult.md)\&lt;`TValue`\&gt;\&gt;
 
 ## Stable

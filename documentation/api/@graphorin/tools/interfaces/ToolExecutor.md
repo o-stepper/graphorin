@@ -30,7 +30,7 @@ Run a batch of tool calls.
 
 #### Returns
 
-`Promise`\<readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;[]\>
+`Promise`\&lt;readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;[]\&gt;
 
 ***
 
@@ -58,4 +58,4 @@ Run a single tool call.
 
 #### Returns
 
-`Promise`\<[`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;\>
+`Promise`\&lt;[`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;\&gt;

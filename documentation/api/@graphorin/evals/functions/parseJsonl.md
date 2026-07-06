@@ -24,6 +24,6 @@ line behaviour without touching the filesystem.
 
 ## Returns
 
-readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[]
+readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`unknown`, `unknown`, `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt;\>[]
 
 ## Stable

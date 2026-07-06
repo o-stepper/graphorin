@@ -22,7 +22,7 @@ Options accepted by [ollamaAdapter](/api/@graphorin/provider/adapters/ollama/fun
 | <a id="property-capabilities"></a> `capabilities?` | `readonly` | `Partial`\&lt;[`ProviderCapabilities`](/api/@graphorin/core/interfaces/ProviderCapabilities.md)\&gt; | - | packages/provider/src/adapters/ollama.ts:67 |
 | <a id="property-chatpath"></a> `chatPath?` | `readonly` | `string` | - | packages/provider/src/adapters/ollama.ts:57 |
 | <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | - | packages/provider/src/adapters/ollama.ts:59 |
-| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | - | packages/provider/src/adapters/ollama.ts:58 |
+| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt; | - | packages/provider/src/adapters/ollama.ts:58 |
 | <a id="property-logger"></a> `logger?` | `readonly` | (`level`, `message`, `meta?`) => `void` | - | packages/provider/src/adapters/ollama.ts:69 |
 | <a id="property-model"></a> `model` | `readonly` | `string` | - | packages/provider/src/adapters/ollama.ts:55 |
 | <a id="property-name"></a> `name?` | `readonly` | `string` | - | packages/provider/src/adapters/ollama.ts:68 |

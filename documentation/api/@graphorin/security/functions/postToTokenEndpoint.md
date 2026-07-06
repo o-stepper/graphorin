@@ -25,7 +25,7 @@ surface the spec-defined `error` / `error_description` fields.
 | Parameter | Type |
 | ------ | ------ |
 | `endpoint` | `string` |
-| `params` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> |
+| `params` | `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt; |
 | `options` | \{ `basicAuth?`: `string`; `signal?`: `AbortSignal`; \} |
 | `options.basicAuth?` | `string` |
 | `options.signal?` | `AbortSignal` |

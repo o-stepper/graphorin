@@ -16,4 +16,4 @@ Tool result envelope returned by `callTool(...)`.
 | ------ | ------ | ------ | ------ |
 | <a id="property-content"></a> `content` | `readonly` | readonly [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md)[] | packages/mcp/src/client/types.ts:307 |
 | <a id="property-iserror"></a> `isError?` | `readonly` | `boolean` | packages/mcp/src/client/types.ts:309 |
-| <a id="property-structuredcontent"></a> `structuredContent?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/mcp/src/client/types.ts:308 |
+| <a id="property-structuredcontent"></a> `structuredContent?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/mcp/src/client/types.ts:308 |

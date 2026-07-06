@@ -28,6 +28,6 @@ Defined in: evals/src/loaders/from-traces.ts:34
 
 ## Returns
 
-`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`I`, `O`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>\>
+`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`I`, `O`, `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt;\>\>
 
 ## Stable

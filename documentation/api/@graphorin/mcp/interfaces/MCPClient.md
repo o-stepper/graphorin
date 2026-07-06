@@ -229,4 +229,4 @@ Defined in: packages/mcp/src/client/types.ts:396
 
 #### Returns
 
-`Promise`\<readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[]\>
+`Promise`\&lt;readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[]\&gt;

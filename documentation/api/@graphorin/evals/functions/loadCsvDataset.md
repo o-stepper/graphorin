@@ -21,6 +21,6 @@ Defined in: evals/src/loaders/csv.ts:28
 
 ## Returns
 
-`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>\>
+`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`unknown`, `unknown`, `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt;\>\>
 
 ## Stable

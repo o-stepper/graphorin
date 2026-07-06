@@ -50,4 +50,4 @@ Defined in: packages/core/src/contracts/sandbox.ts:11
 
 #### Returns
 
-`Promise`\<[`SandboxResult`](/api/@graphorin/core/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\>
+`Promise`\&lt;[`SandboxResult`](/api/@graphorin/core/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\&gt;

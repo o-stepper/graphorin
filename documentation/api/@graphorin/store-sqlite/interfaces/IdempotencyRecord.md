@@ -24,6 +24,6 @@ draft-07 (`DEC-142 / ADR-036`).
 | <a id="property-key"></a> `key` | `readonly` | `string` | - | packages/store-sqlite/src/idempotency-store.ts:12 |
 | <a id="property-requesthash"></a> `requestHash` | `readonly` | `string` | - | packages/store-sqlite/src/idempotency-store.ts:13 |
 | <a id="property-response"></a> `response` | `readonly` | `unknown` | Cached response body - adapter-specific encoding (JSON in v0.1). | packages/store-sqlite/src/idempotency-store.ts:16 |
-| <a id="property-responseheaders"></a> `responseHeaders?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | - | packages/store-sqlite/src/idempotency-store.ts:17 |
+| <a id="property-responseheaders"></a> `responseHeaders?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt; | - | packages/store-sqlite/src/idempotency-store.ts:17 |
 | <a id="property-scope"></a> `scope?` | `readonly` | `string` | - | packages/store-sqlite/src/idempotency-store.ts:18 |
 | <a id="property-statuscode"></a> `statusCode` | `readonly` | `number` | - | packages/store-sqlite/src/idempotency-store.ts:14 |

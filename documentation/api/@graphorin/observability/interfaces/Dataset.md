@@ -16,7 +16,7 @@ Defined in: packages/observability/src/eval/types.ts:24
 | ------ | ------ |
 | `I` | - |
 | `O` | `unknown` |
-| `M` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `M` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 ## Properties
 

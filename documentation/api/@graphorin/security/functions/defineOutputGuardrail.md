@@ -25,7 +25,7 @@ declarative shape.
 
 | Parameter | Type |
 | ------ | ------ |
-| `spec` | `Omit`\<[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`TValue`\&gt;, `"kind"`\> |
+| `spec` | `Omit`\&lt;[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`TValue`\&gt;, `"kind"`\&gt; |
 
 ## Returns
 

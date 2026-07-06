@@ -59,7 +59,7 @@ Defined in: packages/core/src/contracts/logger.ts:34
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 #### Returns
 
@@ -80,7 +80,7 @@ Defined in: packages/core/src/contracts/logger.ts:37
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 #### Returns
 
@@ -101,7 +101,7 @@ Defined in: packages/core/src/contracts/logger.ts:35
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 #### Returns
 
@@ -122,7 +122,7 @@ Defined in: packages/core/src/contracts/logger.ts:33
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 #### Returns
 
@@ -143,7 +143,7 @@ Defined in: packages/core/src/contracts/logger.ts:36
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 #### Returns
 

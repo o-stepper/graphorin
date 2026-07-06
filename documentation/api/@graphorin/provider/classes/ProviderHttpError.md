@@ -32,10 +32,10 @@ Defined in: packages/provider/src/errors/errors.ts:266
 
 | Parameter | Type |
 | ------ | ------ |
-| `args` | \{ `cause?`: `unknown`; `errorKind?`: [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md); `headers?`: `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\>; `message`: `string`; `providerName`: `string`; `status`: `number`; \} |
+| `args` | \{ `cause?`: `unknown`; `errorKind?`: [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md); `headers?`: `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt;; `message`: `string`; `providerName`: `string`; `status`: `number`; \} |
 | `args.cause?` | `unknown` |
 | `args.errorKind?` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) |
-| `args.headers?` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> |
+| `args.headers?` | `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt; |
 | `args.message` | `string` |
 | `args.providerName` | `string` |
 | `args.status` | `number` |
@@ -54,7 +54,7 @@ Defined in: packages/provider/src/errors/errors.ts:266
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`cause`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
 | <a id="property-errorkind"></a> `errorKind` | `readonly` | [`ProviderErrorKind`](/api/@graphorin/core/type-aliases/ProviderErrorKind.md) | `undefined` | The canonical `ProviderErrorKind` mapped from the HTTP status via [classifyHttpStatus](/api/@graphorin/provider/functions/classifyHttpStatus.md) (the `kind` field keeps its stable `'provider-http'` discriminant). Middleware predicates consult this so a 429 fails over / retries as a rate limit. | - | - | packages/provider/src/errors/errors.ts:258 |
-| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | `undefined` | Backoff-relevant response headers captured from the failed response (`retry-after`, `x-ratelimit-*`), lowercased. `withRetry`'s Retry-After hint reader consumes them. | - | - | packages/provider/src/errors/errors.ts:264 |
+| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt; | `undefined` | Backoff-relevant response headers captured from the failed response (`retry-after`, `x-ratelimit-*`), lowercased. `withRetry`'s Retry-After hint reader consumes them. | - | - | packages/provider/src/errors/errors.ts:264 |
 | <a id="property-hint"></a> `hint?` | `readonly` | `string` | `undefined` | Optional remediation hint shown alongside the message. | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`hint`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-hint) | packages/provider/src/errors/errors.ts:23 |
 | <a id="property-kind"></a> `kind` | `readonly` | `string` | `undefined` | Stable discriminant - `'middleware-ordering'`, `'rate-limit-exceeded'`, … | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`kind`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-kind) | packages/provider/src/errors/errors.ts:21 |
 | <a id="property-message"></a> `message` | `public` | `string` | `undefined` | - | - | [`GraphorinProviderError`](/api/@graphorin/provider/classes/GraphorinProviderError.md).[`message`](/api/@graphorin/provider/classes/GraphorinProviderError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |

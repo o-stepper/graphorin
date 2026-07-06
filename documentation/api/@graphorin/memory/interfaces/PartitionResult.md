@@ -24,6 +24,6 @@ audit trail.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-counters"></a> `counters` | `readonly` | `Readonly`\<`Record`\&lt;[`PrivacyDecisionReason`](/api/@graphorin/memory/type-aliases/PrivacyDecisionReason.md), `number`\&gt;\> | packages/memory/src/context-engine/privacy-filter.ts:157 |
+| <a id="property-counters"></a> `counters` | `readonly` | `Readonly`\&lt;`Record`\&lt;[`PrivacyDecisionReason`](/api/@graphorin/memory/type-aliases/PrivacyDecisionReason.md), `number`\&gt;\&gt; | packages/memory/src/context-engine/privacy-filter.ts:157 |
 | <a id="property-dropped"></a> `dropped` | `readonly` | readonly \{ `reason`: [`PrivacyDecisionReason`](/api/@graphorin/memory/type-aliases/PrivacyDecisionReason.md); `record`: `TRecord`; \}[] | packages/memory/src/context-engine/privacy-filter.ts:153 |
 | <a id="property-kept"></a> `kept` | `readonly` | readonly `TRecord`[] | packages/memory/src/context-engine/privacy-filter.ts:152 |

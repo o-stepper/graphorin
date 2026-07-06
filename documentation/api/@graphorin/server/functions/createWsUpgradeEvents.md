@@ -33,6 +33,6 @@ injectWebSocket(serve(...));
 
 ## Returns
 
-`Promise`\<`WSEvents`\&lt;`unknown`\&gt;\>
+`Promise`\&lt;`WSEvents`\&lt;`unknown`\&gt;\&gt;
 
 ## Stable

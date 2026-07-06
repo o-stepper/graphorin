@@ -18,4 +18,4 @@ Inspect the once-per-process WARN registry. Used by tests.
 
 ## Returns
 
-`ReadonlyMap`\<`string`, `ReadonlySet`\&lt;`string`\&gt;\>
+`ReadonlyMap`\&lt;`string`, `ReadonlySet`\&lt;`string`\&gt;\&gt;

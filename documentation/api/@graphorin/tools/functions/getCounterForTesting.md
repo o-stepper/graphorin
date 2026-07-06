@@ -22,7 +22,7 @@ make assertions on specific counter increments.
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> |
+| `labels?` | `Readonly`\&lt;`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\&gt; |
 
 ## Returns
 

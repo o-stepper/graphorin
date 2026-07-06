@@ -16,7 +16,7 @@ Defined in: observability/dist/eval/types.d.ts:23
 | ------ | ------ |
 | `I` | - |
 | `O` | `unknown` |
-| `M` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `M` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 ## Properties
 

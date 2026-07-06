@@ -25,7 +25,7 @@ parameter or as a property - both work equivalently.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `execute()` | (`input`, `ctx`) => `Promise`\< \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined`\> | packages/tools/src/builder/tool.ts:30 |
+| `execute()` | (`input`, `ctx`) => `Promise`\&lt; \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined`\&gt; | packages/tools/src/builder/tool.ts:30 |
 
 ## Type Parameters
 

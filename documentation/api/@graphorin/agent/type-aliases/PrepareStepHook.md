@@ -31,7 +31,7 @@ return overrides applied to the next provider call only.
 
 ## Returns
 
-  \| `Promise`\<[`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;\>
+  \| `Promise`\&lt;[`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;\&gt;
   \| [`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;
 
 ## Stable

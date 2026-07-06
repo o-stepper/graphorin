@@ -17,7 +17,7 @@ keep the same shape across consumers.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/security/src/oauth/events.ts:33 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/security/src/oauth/events.ts:33 |
 | <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/security/src/oauth/events.ts:32 |
 | <a id="property-serverid"></a> `serverId` | `readonly` | `string` | packages/security/src/oauth/events.ts:30 |
 | <a id="property-ts"></a> `ts` | `readonly` | `number` | packages/security/src/oauth/events.ts:31 |

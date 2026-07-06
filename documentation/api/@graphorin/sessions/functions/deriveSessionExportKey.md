@@ -25,6 +25,6 @@ produce the same key.
 
 ## Returns
 
-`Promise`\<`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\>
+`Promise`\&lt;`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\&gt;
 
 ## Stable

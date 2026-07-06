@@ -272,6 +272,6 @@ Snapshot for tests / assertions.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `counters` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:202 |
-| `gauges` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:203 |
-| `summaries` | `Record`\<`string`, `ReadonlyArray`\<\{ `count`: `number`; `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `samples`: `ReadonlyArray`\&lt;`number`\&gt;; `sum`: `number`; \}\>\> | packages/server/src/metrics/registry.ts:204 |
+| `counters` | `Record`\&lt;`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\&gt; | packages/server/src/metrics/registry.ts:202 |
+| `gauges` | `Record`\&lt;`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\&gt; | packages/server/src/metrics/registry.ts:203 |
+| `summaries` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `count`: `number`; `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `samples`: `ReadonlyArray`\&lt;`number`\&gt;; `sum`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:204 |

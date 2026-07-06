@@ -22,7 +22,7 @@ always 64-char hex SHA-256 digests.
 | <a id="property-context"></a> `context?` | `readonly` | [`AuditContext`](/api/@graphorin/security/interfaces/AuditContext.md) | packages/security/src/audit/types.ts:129 |
 | <a id="property-decision"></a> `decision` | `readonly` | [`AuditDecision`](/api/@graphorin/security/type-aliases/AuditDecision.md) | packages/security/src/audit/types.ts:128 |
 | <a id="property-hash"></a> `hash` | `readonly` | `string` | packages/security/src/audit/types.ts:132 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/security/src/audit/types.ts:130 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/security/src/audit/types.ts:130 |
 | <a id="property-prevhash"></a> `prevHash` | `readonly` | `string` | packages/security/src/audit/types.ts:131 |
 | <a id="property-seq"></a> `seq` | `readonly` | `number` | packages/security/src/audit/types.ts:123 |
 | <a id="property-target"></a> `target` | `readonly` | `string` | packages/security/src/audit/types.ts:127 |

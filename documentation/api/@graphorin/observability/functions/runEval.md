@@ -27,6 +27,6 @@ Defined in: packages/observability/src/eval/runner.ts:25
 
 ## Returns
 
-`Promise`\<[`EvalReport`](/api/@graphorin/observability/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
+`Promise`\&lt;[`EvalReport`](/api/@graphorin/observability/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\&gt;
 
 ## Stable

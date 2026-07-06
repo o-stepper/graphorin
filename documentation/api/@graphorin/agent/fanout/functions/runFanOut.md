@@ -30,6 +30,6 @@ audit rows / counter increments via the supplied `emit` callback.
 
 ## Returns
 
-`Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TOutput`\&gt;\>
+`Promise`\&lt;[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TOutput`\&gt;\&gt;
 
 ## Stable

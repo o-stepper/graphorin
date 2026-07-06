@@ -17,7 +17,7 @@ Defined in: packages/observability/src/tracer/span-names.ts:33
 | Parameter | Type |
 | ------ | ------ |
 | `type` | [`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md) |
-| `attrs?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
+| `attrs?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
 
 ## Returns
 

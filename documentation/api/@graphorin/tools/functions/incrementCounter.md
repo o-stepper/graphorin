@@ -24,7 +24,7 @@ deterministic.
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
 | `name` | `string` | `undefined` |
-| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> | `undefined` |
+| `labels?` | `Readonly`\&lt;`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\&gt; | `undefined` |
 | `by?` | `number` | `1` |
 
 ## Returns

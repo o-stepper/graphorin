@@ -31,7 +31,7 @@ Per-node run callback.
 
 ## Returns
 
-  \| `Promise`\<[`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;\>
+  \| `Promise`\&lt;[`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;\&gt;
   \| [`NodeRunResult`](/api/@graphorin/workflow/type-aliases/NodeRunResult.md)\&lt;`TState`\&gt;
 
 ## Stable

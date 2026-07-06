@@ -54,7 +54,7 @@ Resolve a named persisted approval (D1) - sugar over
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\&lt;[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\&gt;
 
 ***
 
@@ -101,7 +101,7 @@ Defined in: packages/workflow/src/types.ts:437
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\&lt;[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\&gt;
 
 ***
 
@@ -146,7 +146,7 @@ Defined in: packages/workflow/src/types.ts:484
 
 #### Returns
 
-`Promise`\<[`WorkflowState`](/api/@graphorin/workflow/interfaces/WorkflowState.md)\&lt;`TState`\&gt;\>
+`Promise`\&lt;[`WorkflowState`](/api/@graphorin/workflow/interfaces/WorkflowState.md)\&lt;`TState`\&gt;\&gt;
 
 ***
 
@@ -197,7 +197,7 @@ Fails with `pause-not-found` when no pending pause carries the name.
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\&lt;[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\&gt;
 
 ***
 
@@ -217,12 +217,12 @@ Defined in: packages/workflow/src/types.ts:438
 | Parameter | Type |
 | ------ | ------ |
 | `threadId` | `string` |
-| `directive?` | [`Directive`](/api/@graphorin/workflow/classes/Directive.md)\<`Record`\&lt;`string`, `unknown`\&gt;, `unknown`\> |
+| `directive?` | [`Directive`](/api/@graphorin/workflow/classes/Directive.md)\&lt;`Record`\&lt;`string`, `unknown`\&gt;, `unknown`\&gt; |
 | `opts?` | [`WorkflowResumeOptions`](/api/@graphorin/workflow/interfaces/WorkflowResumeOptions.md) |
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\&lt;[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\&gt;
 
 ***
 
@@ -247,7 +247,7 @@ from their persisted pending writes; only the failed work re-runs.
 
 #### Returns
 
-`AsyncIterable`\<[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\>
+`AsyncIterable`\&lt;[`WorkflowEvent`](/api/@graphorin/workflow/type-aliases/WorkflowEvent.md)\&lt;`TState`\&gt;\&gt;
 
 ***
 

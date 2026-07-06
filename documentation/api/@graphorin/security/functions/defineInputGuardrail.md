@@ -26,7 +26,7 @@ declarative.
 
 | Parameter | Type |
 | ------ | ------ |
-| `spec` | `Omit`\<[`InputGuardrail`](/api/@graphorin/security/type-aliases/InputGuardrail.md)\&lt;`TValue`\&gt;, `"kind"`\> |
+| `spec` | `Omit`\&lt;[`InputGuardrail`](/api/@graphorin/security/type-aliases/InputGuardrail.md)\&lt;`TValue`\&gt;, `"kind"`\&gt; |
 
 ## Returns
 

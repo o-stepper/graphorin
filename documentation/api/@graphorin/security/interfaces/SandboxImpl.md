@@ -51,7 +51,7 @@ Defined in: packages/core/dist/contracts/sandbox.d.ts:12
 
 #### Returns
 
-`Promise`\<[`SandboxResult`](/api/@graphorin/security/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\>
+`Promise`\&lt;[`SandboxResult`](/api/@graphorin/security/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\&gt;
 
 #### Inherited from
 

@@ -104,7 +104,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 
 #### Returns
 
-`Promise`\<readonly `Float32Array`\&lt;`ArrayBufferLike`\&gt;[]\>
+`Promise`\&lt;readonly `Float32Array`\&lt;`ArrayBufferLike`\&gt;[]\&gt;
 
 #### Implementation of
 

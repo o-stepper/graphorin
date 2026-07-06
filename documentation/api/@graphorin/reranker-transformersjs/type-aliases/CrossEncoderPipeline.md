@@ -29,4 +29,4 @@ Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:39
 
 `Promise`\<
   \| `ReadonlyArray`\&lt;[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\&gt;
-  \| `ReadonlyArray`\<`ReadonlyArray`\&lt;[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\&gt;\>\>
+  \| `ReadonlyArray`\&lt;`ReadonlyArray`\&lt;[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\&gt;\&gt;\>

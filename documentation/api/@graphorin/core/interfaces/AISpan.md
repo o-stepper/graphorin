@@ -56,7 +56,7 @@ dropped below the floor.
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `attrs?` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> |
+| `attrs?` | `Readonly`\&lt;`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\&gt; |
 | `opts?` | [`AddEventOptions`](/api/@graphorin/core/interfaces/AddEventOptions.md) |
 
 #### Returns

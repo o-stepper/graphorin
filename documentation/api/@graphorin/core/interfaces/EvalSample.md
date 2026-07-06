@@ -27,4 +27,4 @@ A single sample from an eval dataset.
 | <a id="property-expected"></a> `expected?` | `readonly` | `TOutput` | packages/core/src/contracts/eval-scorer.ts:28 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/eval-scorer.ts:26 |
 | <a id="property-input"></a> `input` | `readonly` | `TInput` | packages/core/src/contracts/eval-scorer.ts:27 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/eval-scorer.ts:30 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/core/src/contracts/eval-scorer.ts:30 |

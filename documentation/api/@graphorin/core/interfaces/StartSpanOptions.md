@@ -22,6 +22,6 @@ Span constructor parameters.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-attrs"></a> `attrs?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> | packages/core/src/contracts/tracer.ts:162 |
+| <a id="property-attrs"></a> `attrs?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\&gt; | packages/core/src/contracts/tracer.ts:162 |
 | <a id="property-parent"></a> `parent?` | `readonly` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt; | packages/core/src/contracts/tracer.ts:163 |
 | <a id="property-type"></a> `type` | `readonly` | `T` | packages/core/src/contracts/tracer.ts:161 |

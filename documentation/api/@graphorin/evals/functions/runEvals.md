@@ -27,6 +27,6 @@ Defined in: evals/src/runner.ts:24
 
 ## Returns
 
-`Promise`\<[`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\>
+`Promise`\&lt;[`EvalReport`](/api/@graphorin/evals/interfaces/EvalReport.md)\&lt;`I`, `O`\&gt;\&gt;
 
 ## Stable

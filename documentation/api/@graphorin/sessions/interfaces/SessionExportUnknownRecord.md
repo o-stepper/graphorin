@@ -18,4 +18,4 @@ via this shape so consumers can WARN + skip.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-kind"></a> `kind` | `readonly` | `"unknown"` | packages/sessions/src/export/types.ts:220 |
-| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/export/types.ts:221 |
+| <a id="property-raw"></a> `raw` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/sessions/src/export/types.ts:221 |

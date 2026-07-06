@@ -39,7 +39,7 @@ Defined in: packages/skills/src/types/index.ts:257
 
 #### Returns
 
-`Promise`\<`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\>
+`Promise`\&lt;`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\&gt;
 
 ***
 

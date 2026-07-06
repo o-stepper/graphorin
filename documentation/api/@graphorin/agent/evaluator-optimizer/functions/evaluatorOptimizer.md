@@ -29,6 +29,6 @@ Run the Generator → Evaluator iteration loop.
 
 ## Returns
 
-`Promise`\<[`EvaluatorOptimizerOutcome`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md)\&lt;`TOutput`\&gt;\>
+`Promise`\&lt;[`EvaluatorOptimizerOutcome`](/api/@graphorin/agent/evaluator-optimizer/interfaces/EvaluatorOptimizerOutcome.md)\&lt;`TOutput`\&gt;\&gt;
 
 ## Stable

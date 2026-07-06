@@ -18,6 +18,6 @@ to Prometheus metrics.
 
 | Property | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-droppedbyreason"></a> `droppedByReason` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Drops by reason; the four built-in reasons + any custom ones. | packages/observability/src/redaction/types.ts:56 |
+| <a id="property-droppedbyreason"></a> `droppedByReason` | `Readonly`\&lt;`Record`\&lt;`string`, `number`\&gt;\&gt; | Drops by reason; the four built-in reasons + any custom ones. | packages/observability/src/redaction/types.ts:56 |
 | <a id="property-droppedtotal"></a> `droppedTotal` | `number` | Total values dropped by the validator. | packages/observability/src/redaction/types.ts:54 |
-| <a id="property-matchesbypattern"></a> `matchesByPattern` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Pattern-matching counters keyed by pattern name. | packages/observability/src/redaction/types.ts:58 |
+| <a id="property-matchesbypattern"></a> `matchesByPattern` | `Readonly`\&lt;`Record`\&lt;`string`, `number`\&gt;\&gt; | Pattern-matching counters keyed by pattern name. | packages/observability/src/redaction/types.ts:58 |

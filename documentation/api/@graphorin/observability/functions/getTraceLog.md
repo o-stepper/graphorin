@@ -24,6 +24,6 @@ skipped (the iterator keeps going); the generator only ever yields parsed
 
 ## Returns
 
-`AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;\>
+`AsyncIterable`\&lt;[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;\&gt;
 
 ## Stable

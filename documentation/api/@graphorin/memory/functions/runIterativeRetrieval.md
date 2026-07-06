@@ -38,6 +38,6 @@ again (widened) and re-grade; otherwise **abstain**.
 
 ## Returns
 
-`Promise`\<[`IterativeRetrievalResult`](/api/@graphorin/memory/interfaces/IterativeRetrievalResult.md)\&lt;`H`\&gt;\>
+`Promise`\&lt;[`IterativeRetrievalResult`](/api/@graphorin/memory/interfaces/IterativeRetrievalResult.md)\&lt;`H`\&gt;\&gt;
 
 ## Stable

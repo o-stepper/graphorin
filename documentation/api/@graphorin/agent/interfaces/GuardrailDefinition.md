@@ -24,6 +24,6 @@ separate registries.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\<[`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\> | packages/security/dist/guardrails/types.d.ts:78 |
+| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\&lt;[`GuardrailResult`](/api/@graphorin/agent/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\&gt; | packages/security/dist/guardrails/types.d.ts:78 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"output"` \| `"input"` | packages/security/dist/guardrails/types.d.ts:76 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | packages/security/dist/guardrails/types.d.ts:77 |

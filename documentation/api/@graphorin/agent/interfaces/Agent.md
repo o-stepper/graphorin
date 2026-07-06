@@ -98,7 +98,7 @@ strategy decides whether to propagate).
 
 #### Returns
 
-`Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TFanOutOutput`\&gt;\>
+`Promise`\&lt;[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TFanOutOutput`\&gt;\&gt;
 
 ***
 
@@ -139,7 +139,7 @@ Defined in: packages/agent/src/types.ts:654
 
 #### Returns
 
-`Promise`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;\>
+`Promise`\&lt;[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;\&gt;
 
 ***
 
@@ -180,7 +180,7 @@ Defined in: packages/agent/src/types.ts:650
 
 #### Returns
 
-`AsyncIterable`\<[`AgentEvent`](/api/@graphorin/core/type-aliases/AgentEvent.md)\&lt;`TOutput`\&gt;\>
+`AsyncIterable`\&lt;[`AgentEvent`](/api/@graphorin/core/type-aliases/AgentEvent.md)\&lt;`TOutput`\&gt;\&gt;
 
 ***
 

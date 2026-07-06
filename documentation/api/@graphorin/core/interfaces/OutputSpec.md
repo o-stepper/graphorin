@@ -18,5 +18,5 @@ Zod-based variants live in the runtime packages.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-description"></a> `description?` | `readonly` | `string` | packages/core/src/contracts/provider.ts:288 |
-| <a id="property-jsonschema"></a> `jsonSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/provider.ts:289 |
+| <a id="property-jsonschema"></a> `jsonSchema?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/core/src/contracts/provider.ts:289 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"text"` \| `"structured"` | packages/core/src/contracts/provider.ts:287 |

@@ -14,7 +14,7 @@ Defined in: evals/src/loaders/from-traces.ts:16
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-payload"></a> `payload` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | evals/src/loaders/from-traces.ts:19 |
+| <a id="property-payload"></a> `payload` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | evals/src/loaders/from-traces.ts:19 |
 | <a id="property-runid"></a> `runId` | `readonly` | `string` | evals/src/loaders/from-traces.ts:17 |
 | <a id="property-timestamp"></a> `timestamp?` | `readonly` | `string` | evals/src/loaders/from-traces.ts:20 |
 | <a id="property-type"></a> `type` | `readonly` | `string` | evals/src/loaders/from-traces.ts:18 |

@@ -329,7 +329,7 @@ Sanitized-by-default replay.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts?` | [`SessionReplayOptions`](/api/@graphorin/sessions/interfaces/SessionReplayOptions.md) & \{ `liveInvocation?`: (`record`) => `Promise`\&lt;\{ `args`: `unknown`; `idempotencyKey?`: `string`; `validateRecordedOutput?`: (`output`) =&gt; `string` \| `null`; \}\>; `traceSource?`: \| `AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\> \| `Iterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\>; \} |
+| `opts?` | [`SessionReplayOptions`](/api/@graphorin/sessions/interfaces/SessionReplayOptions.md) & \{ `liveInvocation?`: (`record`) => `Promise`\&lt;\{ `args`: `unknown`; `idempotencyKey?`: `string`; `validateRecordedOutput?`: (`output`) =&gt; `string` \| `null`; \}\>; `traceSource?`: \| `AsyncIterable`\&lt;[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\&gt; \| `Iterable`\&lt;[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;, `any`, `any`\&gt;; \} |
 
 #### Returns
 
@@ -358,7 +358,7 @@ Hybrid (FTS5) search over messages - wraps `memory.session.search(...)`.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
+`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\&gt;
 
 ***
 
