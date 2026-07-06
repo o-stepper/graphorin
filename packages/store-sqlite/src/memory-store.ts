@@ -671,7 +671,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
         const tableName = this.#vectorMgr.ensureTable('episodes', meta);
         this.#conn.run(
           `INSERT OR REPLACE INTO ${tableName} (episode_id, embedding) VALUES (?, ?)`,
-          [episode.id, Buffer.from(options.embedding.vector.buffer)],
+          [episode.id, f32ToBlob(options.embedding.vector)],
         );
       }
       this.#conn.run(
@@ -772,7 +772,7 @@ class EpisodicMemoryStoreImpl implements EpisodicMemoryStore {
     const asOfEpoch = asOf !== undefined ? toEpoch(asOf) : null;
     const runKnn = (k: number): ReadonlyArray<EpisodeRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
-        Buffer.from(embedding.buffer),
+        f32ToBlob(embedding),
         k,
         scope.userId,
         embedderId,
@@ -976,7 +976,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
         const tableName = this.#vectorMgr.ensureTable('facts', meta);
         this.#conn.run(`INSERT OR REPLACE INTO ${tableName} (fact_id, embedding) VALUES (?, ?)`, [
           fact.id,
-          Buffer.from(options.embedding.vector.buffer),
+          f32ToBlob(options.embedding.vector),
         ]);
       }
       this.#conn.run(
@@ -1062,7 +1062,7 @@ class SemanticMemoryStoreImpl implements SemanticMemoryStore {
     const owners = normalizeOwnerFilter(owner);
     const runKnn = (k: number): ReadonlyArray<FactRow & { distance: number }> => {
       const binds: Array<Buffer | string | number> = [
-        Buffer.from(embedding.buffer),
+        f32ToBlob(embedding),
         k,
         scope.userId,
         embedderId,

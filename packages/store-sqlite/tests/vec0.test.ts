@@ -348,4 +348,90 @@ describe('store-03 - episode KNN over-fetch (MRET-9 ported)', () => {
     expect(hits.every((h) => h.record.id.startsWith('min-'))).toBe(true);
     await store.close();
   });
+
+  // W-153: Float32Array VIEWS with a non-zero byteOffset (the standard
+  // subarray idiom of batched embedders) must serialize to exactly
+  // their own bytes. Pre-fix, Buffer.from(vec.buffer) serialized the
+  // WHOLE underlying buffer: dim checks passed (vector.length is the
+  // view length) and the failure surfaced later as an opaque vec0
+  // dimension error.
+  it('facts + episodes accept Float32Array views with byteOffset != 0 (W-153)', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'graphorin-store-sqlite-vec-'));
+    const store = await createSqliteStore({ path: `${dir}/db.sqlite` });
+    await store.init();
+    const meta = store.embeddings.registerOrReturn({
+      id: 'stub:view@4',
+      embedderKind: 'stub',
+      model: 'view',
+      dim: 4,
+      configHash: 'cfg-view',
+    });
+
+    // One big batch buffer holding two 4-dim vectors; the second one
+    // starts at byteOffset 16.
+    const batch = new Float32Array([9, 9, 9, 9, 1, 0, 0, 0]);
+    const view = batch.subarray(4); // [1, 0, 0, 0], byteOffset 16
+    expect(view.byteOffset).toBe(16);
+
+    const semantic = store.memory.semantic as unknown as {
+      rememberWithEmbedding(
+        f: import('@graphorin/core').Fact,
+        opts: { embedding: { embedderId: string; vector: Float32Array } },
+      ): Promise<void>;
+      searchVector(
+        scope: { userId: string },
+        embedding: Float32Array,
+        embedderId: string,
+        topK: number,
+      ): Promise<ReadonlyArray<{ record: { id: string } }>>;
+    };
+    await semantic.rememberWithEmbedding(
+      {
+        id: 'view-fact',
+        kind: 'semantic',
+        userId: 'alex',
+        sensitivity: 'internal',
+        text: 'stored through a view',
+        createdAt: new Date().toISOString(),
+      },
+      { embedding: { embedderId: meta.id, vector: view } },
+    );
+
+    // Query with ANOTHER non-zero-offset view.
+    const queryBatch = new Float32Array([7, 7, 7, 7, 1, 0, 0, 0]);
+    const queryView = queryBatch.subarray(4);
+    const hits = await semantic.searchVector({ userId: 'alex' }, queryView, meta.id, 3);
+    expect(hits.map((h) => h.record.id)).toContain('view-fact');
+
+    // Episodes side: putWithEmbedding + searchVector with views.
+    const episodic = store.memory.episodic as unknown as {
+      putWithEmbedding(
+        e: import('@graphorin/core').Episode,
+        opts: { embedding: { embedderId: string; vector: Float32Array } },
+      ): Promise<void>;
+      searchVector(
+        scope: { userId: string },
+        embedding: Float32Array,
+        embedderId: string,
+        topK: number,
+      ): Promise<ReadonlyArray<{ record: { id: string } }>>;
+    };
+    await episodic.putWithEmbedding(
+      {
+        id: 'view-episode',
+        kind: 'episodic',
+        userId: 'alex',
+        sensitivity: 'internal',
+        summary: 'stored through a view',
+        startedAt: new Date().toISOString(),
+        endedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      },
+      { embedding: { embedderId: meta.id, vector: view } },
+    );
+    const epHits = await episodic.searchVector({ userId: 'alex' }, queryView, meta.id, 3);
+    expect(epHits.map((h) => h.record.id)).toContain('view-episode');
+
+    await store.close();
+  });
 });
