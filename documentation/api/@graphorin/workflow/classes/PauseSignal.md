@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / PauseSignal
 
-# Class: PauseSignal\<TValue\>
+# Class: PauseSignal\&lt;TValue\&gt;
 
 Defined in: packages/core/dist/channels/pause.d.ts:20
 
@@ -45,7 +45,7 @@ Defined in: packages/core/dist/channels/pause.d.ts:23
 
 #### Returns
 
-`PauseSignal`\<`TValue`\>
+`PauseSignal`\&lt;`TValue`\&gt;
 
 #### Overrides
 

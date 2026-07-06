@@ -28,6 +28,6 @@ stable eleven.
 
 ## Returns
 
-readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`unknown`, `unknown`, `unknown`\>[]
+readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[]
 
 ## Stable

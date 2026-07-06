@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / Dispatch
 
-# Class: Dispatch\<TArgs\>
+# Class: Dispatch\&lt;TArgs\&gt;
 
 Defined in: packages/core/src/channels/dispatch.ts:12
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/channels/dispatch.ts:24
 
 #### Returns
 
-`Dispatch`\<`TArgs`\>
+`Dispatch`\&lt;`TArgs`\&gt;
 
 ## Properties
 

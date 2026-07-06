@@ -20,4 +20,4 @@ tier the user explicitly opted out of).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-resolvehandler"></a> `resolveHandler` | `readonly` | (`code`) => \| [`NoneSandboxHandler`](/api/@graphorin/security/type-aliases/NoneSandboxHandler.md)\<`unknown`, `unknown`\> \| `undefined` | Resolver for `code.kind === 'handler'` invocations. The framework default registers built-in trusted tool handlers at startup. | packages/security/src/sandbox/none.ts:53 |
+| <a id="property-resolvehandler"></a> `resolveHandler` | `readonly` | (`code`) => \| [`NoneSandboxHandler`](/api/@graphorin/security/type-aliases/NoneSandboxHandler.md)\&lt;`unknown`, `unknown`\&gt; \| `undefined` | Resolver for `code.kind === 'handler'` invocations. The framework default registers built-in trusted tool handlers at startup. | packages/security/src/sandbox/none.ts:53 |

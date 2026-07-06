@@ -26,6 +26,6 @@ have; use `--user` to narrow.
 
 ## Returns
 
-`Promise`\<readonly [`ConsolidatorDlqEntry`](/api/@graphorin/cli/interfaces/ConsolidatorDlqEntry.md)[]\>
+`Promise`\&lt;readonly [`ConsolidatorDlqEntry`](/api/@graphorin/cli/interfaces/ConsolidatorDlqEntry.md)[]\&gt;
 
 ## Stable

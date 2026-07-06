@@ -9,7 +9,7 @@
 Defined in: packages/observability/src/redaction/imperative-patterns.ts:50
 
 One entry in the imperative-pattern catalogue. The shape mirrors
-BUILT\_IN\_PATTERNS so consumers can share scan / replace
+`BUILT_IN_PATTERNS` so consumers can share scan / replace
 machinery, but the fields are typed as imperative-only so the two
 catalogues do not accidentally merge.
 

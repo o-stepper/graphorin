@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [](/api/@graphorin/agent/README.md) / Agent
 
-# Interface: Agent\<TDeps, TOutput\>
+# Interface: Agent\&lt;TDeps, TOutput\&gt;
 
 Defined in: packages/agent/src/types.ts:647
 
@@ -23,7 +23,7 @@ Public agent surface returned by [createAgent](/api/@graphorin/agent/factory/fun
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\<`TDeps`, `TOutput`\> | - | packages/agent/src/types.ts:649 |
+| <a id="property-config"></a> `config` | `readonly` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; | - | packages/agent/src/types.ts:649 |
 | <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/agent/src/types.ts:648 |
 | <a id="property-progress"></a> `progress` | `readonly` | `AgentProgressIO` | Structured handoff-artifact APIs. Persists / reads UTF-8 text artifacts under the configured artifact root; cross-run reads require an explicit `runId` cursor on the read options. | packages/agent/src/types.ts:678 |
 | <a id="property-registry"></a> `registry?` | `readonly` | [`ToolRegistry`](/api/@graphorin/tools/interfaces/ToolRegistry.md) | The unified tool registry assembled at `createAgent(...)` warm-up (Principle #12): every first-party + skill tool, with cross-source name collisions resolved deterministically. Read-only and exposed for inspection; the run loop and `tool_search` consume it. Always present on agents built by `createAgent(...)`. | packages/agent/src/types.ts:686 |
@@ -66,7 +66,7 @@ Defined in: packages/agent/src/types.ts:662
 
 #### Returns
 
-`Promise`\<[`CompactionApiResult`](/api/@graphorin/agent/interfaces/CompactionApiResult.md)\>
+`Promise`\&lt;[`CompactionApiResult`](/api/@graphorin/agent/interfaces/CompactionApiResult.md)\&gt;
 
 ***
 
@@ -94,11 +94,11 @@ strategy decides whether to propagate).
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | `AgentFanOutOptions`\<`TFanOutOutput`\> |
+| `options` | `AgentFanOutOptions`\&lt;`TFanOutOutput`\&gt; |
 
 #### Returns
 
-`Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\<`TFanOutOutput`\>\>
+`Promise`\<[`FanOutResult`](/api/@graphorin/agent/fanout/interfaces/FanOutResult.md)\&lt;`TFanOutOutput`\&gt;\>
 
 ***
 
@@ -135,11 +135,11 @@ Defined in: packages/agent/src/types.ts:654
 | Parameter | Type |
 | ------ | ------ |
 | `input` | \| [`RunState`](/api/@graphorin/core/interfaces/RunState.md) \| [`AgentInput`](/api/@graphorin/agent/type-aliases/AgentInput.md) |
-| `options?` | [`AgentCallOptions`](/api/@graphorin/agent/interfaces/AgentCallOptions.md)\<`TDeps`\> |
+| `options?` | [`AgentCallOptions`](/api/@graphorin/agent/interfaces/AgentCallOptions.md)\&lt;`TDeps`\&gt; |
 
 #### Returns
 
-`Promise`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\<`TOutput`\>\>
+`Promise`\<[`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt;\>
 
 ***
 
@@ -176,11 +176,11 @@ Defined in: packages/agent/src/types.ts:650
 | Parameter | Type |
 | ------ | ------ |
 | `input` | \| [`RunState`](/api/@graphorin/core/interfaces/RunState.md) \| [`AgentInput`](/api/@graphorin/agent/type-aliases/AgentInput.md) |
-| `options?` | [`AgentCallOptions`](/api/@graphorin/agent/interfaces/AgentCallOptions.md)\<`TDeps`\> |
+| `options?` | [`AgentCallOptions`](/api/@graphorin/agent/interfaces/AgentCallOptions.md)\&lt;`TDeps`\&gt; |
 
 #### Returns
 
-`AsyncIterable`\<[`AgentEvent`](/api/@graphorin/core/type-aliases/AgentEvent.md)\<`TOutput`\>\>
+`AsyncIterable`\<[`AgentEvent`](/api/@graphorin/core/type-aliases/AgentEvent.md)\&lt;`TOutput`\&gt;\>
 
 ***
 

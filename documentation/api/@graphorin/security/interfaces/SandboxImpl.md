@@ -47,11 +47,11 @@ Defined in: packages/core/dist/contracts/sandbox.d.ts:12
 | Parameter | Type |
 | ------ | ------ |
 | `code` | [`SandboxCode`](/api/@graphorin/security/type-aliases/SandboxCode.md) |
-| `opts` | [`SandboxRunOptions`](/api/@graphorin/security/interfaces/SandboxRunOptions.md)\<`TInput`\> |
+| `opts` | [`SandboxRunOptions`](/api/@graphorin/security/interfaces/SandboxRunOptions.md)\&lt;`TInput`\&gt; |
 
 #### Returns
 
-`Promise`\<[`SandboxResult`](/api/@graphorin/security/type-aliases/SandboxResult.md)\<`TOutput`\>\>
+`Promise`\<[`SandboxResult`](/api/@graphorin/security/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\>
 
 #### Inherited from
 

@@ -30,6 +30,6 @@ Construct a `Barrier` channel.
 
 ## Returns
 
-[`Barrier`](/api/@graphorin/core/interfaces/Barrier.md)\<`T`\>
+[`Barrier`](/api/@graphorin/core/interfaces/Barrier.md)\&lt;`T`\&gt;
 
 ## Stable

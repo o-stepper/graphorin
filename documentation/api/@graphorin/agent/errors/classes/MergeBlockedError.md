@@ -9,7 +9,7 @@
 Defined in: packages/agent/src/errors/index.ts:240
 
 Thrown by `Agent.fanOut(...)` when the configured
-MergeAgentSidewaysInjectionGuard fires with strictness
+`MergeAgentSidewaysInjectionGuard` fires with strictness
 `'detect-and-block'`.
 
 ## Stable

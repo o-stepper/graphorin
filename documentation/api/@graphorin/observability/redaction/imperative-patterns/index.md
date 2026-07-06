@@ -8,7 +8,7 @@
 
 Imperative-pattern catalogue for inbound prompt-injection defence.
 
-Sibling to BUILT\_IN\_PATTERNS (PII / secrets) - the two
+Sibling to `BUILT_IN_PATTERNS` (PII / secrets) - the two
 catalogues are disjoint by construction. The imperative catalogue
 is consumed by the inbound sanitization layer in `@graphorin/tools`
 to scan tool / MCP results before they reach the agent's message
@@ -28,7 +28,7 @@ on typical 16 KB tool results.
 
 | Interface | Description |
 | ------ | ------ |
-| [ImperativePattern](/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ImperativePattern.md) | One entry in the imperative-pattern catalogue. The shape mirrors BUILT\_IN\_PATTERNS so consumers can share scan / replace machinery, but the fields are typed as imperative-only so the two catalogues do not accidentally merge. |
+| [ImperativePattern](/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ImperativePattern.md) | One entry in the imperative-pattern catalogue. The shape mirrors `BUILT_IN_PATTERNS` so consumers can share scan / replace machinery, but the fields are typed as imperative-only so the two catalogues do not accidentally merge. |
 | [ScanResult](/api/@graphorin/observability/redaction/imperative-patterns/interfaces/ScanResult.md) | Compiled scan helper. Returns the list of pattern names that fired AND the number of bytes the strip would remove if applied. Bounded by the budget hint - when exceeded, returns `null` to let the caller apply the best-effort `'detect-failed'` annotation. |
 
 ## Type Aliases

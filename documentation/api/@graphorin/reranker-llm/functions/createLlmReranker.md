@@ -26,10 +26,10 @@ lifecycle owns the network resources.
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`LlmRerankerOptions`](/api/@graphorin/reranker-llm/interfaces/LlmRerankerOptions.md)\<`TRecord`\> |
+| `options` | [`LlmRerankerOptions`](/api/@graphorin/reranker-llm/interfaces/LlmRerankerOptions.md)\&lt;`TRecord`\&gt; |
 
 ## Returns
 
-[`LlmReRanker`](/api/@graphorin/reranker-llm/classes/LlmReRanker.md)\<`TRecord`\>
+[`LlmReRanker`](/api/@graphorin/reranker-llm/classes/LlmReRanker.md)\&lt;`TRecord`\&gt;
 
 ## Stable

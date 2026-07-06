@@ -28,6 +28,6 @@ Concurrent calls against the same `AuditDb` are serialised so the
 
 ## Returns
 
-`Promise`\<[`StoredAuditEntry`](/api/@graphorin/security/interfaces/StoredAuditEntry.md)\>
+`Promise`\&lt;[`StoredAuditEntry`](/api/@graphorin/security/interfaces/StoredAuditEntry.md)\&gt;
 
 ## Stable

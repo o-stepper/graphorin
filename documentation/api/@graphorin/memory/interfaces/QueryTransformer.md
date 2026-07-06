@@ -47,7 +47,7 @@ transformation is unavailable or the model returns nothing usable.
 
 #### Returns
 
-`Promise`\<readonly `string`[]\>
+`Promise`\&lt;readonly `string`[]\&gt;
 
 ***
 
@@ -72,4 +72,4 @@ its vector neighbours into the result.
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`\&lt;`string` \| `null`\&gt;

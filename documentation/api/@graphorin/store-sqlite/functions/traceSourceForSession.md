@@ -26,6 +26,6 @@ the `graphorin memory why` CLI consume. Spans are ordered by start time
 
 ## Returns
 
-`AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\<[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\>\>
+`AsyncIterable`\<[`SpanRecord`](/api/@graphorin/observability/interfaces/SpanRecord.md)\&lt;[`SpanType`](/api/@graphorin/core/type-aliases/SpanType.md)\&gt;\>
 
 ## Stable

@@ -44,7 +44,7 @@ if the key resolves to no value.
 
 ##### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\&gt;
 
 #### Call Signature
 
@@ -64,4 +64,4 @@ Defined in: packages/core/src/contracts/tool.ts:393
 
 ##### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\&gt;

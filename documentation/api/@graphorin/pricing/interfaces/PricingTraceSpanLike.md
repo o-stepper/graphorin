@@ -18,4 +18,4 @@ pricing package stays free of an observability dependency.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-attributes"></a> `attributes` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | pricing/src/types.ts:114 |
+| <a id="property-attributes"></a> `attributes` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | pricing/src/types.ts:114 |

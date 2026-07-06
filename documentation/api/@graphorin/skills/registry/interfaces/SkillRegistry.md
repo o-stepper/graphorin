@@ -29,7 +29,7 @@ Defined in: packages/skills/src/registry/index.ts:101
 
 #### Returns
 
-`Promise`\<readonly [`ActivatedSkill`](/api/@graphorin/skills/interfaces/ActivatedSkill.md)[]\>
+`Promise`\&lt;readonly [`ActivatedSkill`](/api/@graphorin/skills/interfaces/ActivatedSkill.md)[]\&gt;
 
 ***
 

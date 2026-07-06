@@ -25,6 +25,6 @@ browser hits the path.
 
 ## Returns
 
-`Promise`\<[`LocalCallbackServer`](/api/@graphorin/security/interfaces/LocalCallbackServer.md)\>
+`Promise`\&lt;[`LocalCallbackServer`](/api/@graphorin/security/interfaces/LocalCallbackServer.md)\&gt;
 
 ## Stable

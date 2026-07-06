@@ -14,7 +14,7 @@ Wire twin of [ImageContent](/api/@graphorin/core/interfaces/ImageContent.md).
 
 ## Extends
 
-- `Omit`\<[`ImageContent`](/api/@graphorin/core/interfaces/ImageContent.md), `"image"`\>
+- `Omit`\&lt;[`ImageContent`](/api/@graphorin/core/interfaces/ImageContent.md), `"image"`\&gt;
 
 ## Properties
 

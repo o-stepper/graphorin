@@ -19,7 +19,7 @@ parts - see `vercel-messages.ts`); the streaming chunks emitted by
 the AI SDK are translated back onto Graphorin `ProviderEvent`s.
 
 The adapter auto-detects the model's
-import('@graphorin/core').ReasoningContract from its
+`ReasoningContract` from its
 `modelId` (e.g. Anthropic Claude → `'round-trip-required'`,
 OpenAI o1 / o3 → `'hidden'`, Gemini reasoning variants →
 `'hidden'`, everything else → `'optional'`). Callers can override

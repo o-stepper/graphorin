@@ -8,7 +8,7 @@
 
 Defined in: packages/security/dist/supply-chain/types.d.ts:76
 
-Result of a verifySkillSignature call.
+Result of a `verifySkillSignature` call.
 
 ## Stable
 

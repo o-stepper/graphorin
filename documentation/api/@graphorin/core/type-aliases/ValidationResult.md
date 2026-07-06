@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ValidationResult
 
-# Type Alias: ValidationResult\<T\>
+# Type Alias: ValidationResult\&lt;T\&gt;
 
 ```ts
 type ValidationResult<T> = 

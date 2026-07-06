@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AISpan
 
-# Interface: AISpan\<T\>
+# Interface: AISpan\&lt;T\&gt;
 
 Defined in: packages/core/src/contracts/tracer.ts:132
 
@@ -56,7 +56,7 @@ dropped below the floor.
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `attrs?` | `Readonly`\<`Record`\<`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\>\> |
+| `attrs?` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> |
 | `opts?` | [`AddEventOptions`](/api/@graphorin/core/interfaces/AddEventOptions.md) |
 
 #### Returns

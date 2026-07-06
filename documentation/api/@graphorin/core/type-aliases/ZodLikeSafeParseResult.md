@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ZodLikeSafeParseResult
 
-# Type Alias: ZodLikeSafeParseResult\<TOutput, TInput\>
+# Type Alias: ZodLikeSafeParseResult\&lt;TOutput, TInput\&gt;
 
 ```ts
 type ZodLikeSafeParseResult<TOutput, TInput> = 

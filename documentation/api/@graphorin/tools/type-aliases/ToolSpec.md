@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/tools](/api/@graphorin/tools/index.md) / [](/api/@graphorin/tools/README.md) / ToolSpec
 
-# Type Alias: ToolSpec\<TInput, TOutput, TDeps\>
+# Type Alias: ToolSpec\&lt;TInput, TOutput, TDeps\&gt;
 
 ```ts
 type ToolSpec<TInput, TOutput, TDeps> = Omit<Tool<TInput, TOutput, TDeps>, "execute"> & {
@@ -25,7 +25,7 @@ parameter or as a property - both work equivalently.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `execute()` | (`input`, `ctx`) => `Promise`\< \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\<`TOutput`\> \| `undefined`\> | packages/tools/src/builder/tool.ts:30 |
+| `execute()` | (`input`, `ctx`) => `Promise`\< \| `TOutput` \| [`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt; \| `undefined`\> | packages/tools/src/builder/tool.ts:30 |
 
 ## Type Parameters
 

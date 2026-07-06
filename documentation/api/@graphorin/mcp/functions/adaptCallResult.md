@@ -26,4 +26,4 @@ backward-compatible TextContent mirror.
 
 ## Returns
 
-[`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\<`unknown`\>
+[`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`unknown`\&gt;

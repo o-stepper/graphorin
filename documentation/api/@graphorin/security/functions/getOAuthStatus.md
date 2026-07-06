@@ -24,6 +24,6 @@ Build the snapshot returned by `graphorin auth status` (Phase 15).
 
 ## Returns
 
-`Promise`\<[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\>
+`Promise`\&lt;[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\&gt;
 
 ## Stable

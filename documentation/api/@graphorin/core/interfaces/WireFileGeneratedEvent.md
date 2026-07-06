@@ -8,13 +8,13 @@
 
 Defined in: packages/core/src/types/agent-event-wire.ts:43
 
-Wire twin of FileGeneratedEvent.
+Wire twin of `FileGeneratedEvent`.
 
 ## Stable
 
 ## Extends
 
-- `Omit`\<`FileGeneratedEvent`, `"data"`\>
+- `Omit`\&lt;`FileGeneratedEvent`, `"data"`\&gt;
 
 ## Properties
 

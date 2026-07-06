@@ -44,7 +44,7 @@ W-154: with `scope`, adapters no-op unless the row belongs to it.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -67,7 +67,7 @@ never materialising rows. Powers honest `metadata()` counts.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -87,7 +87,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:129
 
 #### Returns
 
-`Promise`\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\>
+`Promise`\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\&gt;
 
 #### Inherited from
 
@@ -122,7 +122,7 @@ adapter implements it.
 
 #### Returns
 
-`Promise`\<readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\>
+`Promise`\&lt;readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\&gt;
 
 ***
 
@@ -142,7 +142,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:127
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -167,7 +167,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:57
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -188,7 +188,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:128
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
 
 #### Inherited from
 
@@ -223,7 +223,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:58
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
 
 ***
 
@@ -254,4 +254,4 @@ with a `memory_history` audit row. Powers [EpisodicMemory.validate](/api/@grapho
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

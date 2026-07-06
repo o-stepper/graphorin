@@ -19,4 +19,4 @@ Lifecycle event surfaced by the reader. Every `'unknown-record'`
 | ------ | ------ | ------ | ------ |
 | <a id="property-kind"></a> `kind` | `readonly` | \| `"unknown-record"` \| `"schema-future-minor"` \| `"embedder-mismatch-dropped"` \| `"reasoning-meta-extension"` \| `"footer-count-mismatch"` | packages/sessions/src/export/reader.ts:57 |
 | <a id="property-message"></a> `message` | `readonly` | `string` | packages/sessions/src/export/reader.ts:63 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/sessions/src/export/reader.ts:64 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/export/reader.ts:64 |

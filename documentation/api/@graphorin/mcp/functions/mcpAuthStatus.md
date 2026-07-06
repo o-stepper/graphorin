@@ -22,4 +22,4 @@ Drive `graphorin auth status --mcp`.
 
 ## Returns
 
-`Promise`\<[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\>
+`Promise`\&lt;[`OAuthStatusSnapshot`](/api/@graphorin/security/interfaces/OAuthStatusSnapshot.md)\&gt;

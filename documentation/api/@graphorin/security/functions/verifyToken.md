@@ -30,6 +30,6 @@ stateless variant constructs a one-shot verifier per call and is
 
 ## Returns
 
-`Promise`\<[`VerifyResult`](/api/@graphorin/security/type-aliases/VerifyResult.md)\>
+`Promise`\&lt;[`VerifyResult`](/api/@graphorin/security/type-aliases/VerifyResult.md)\&gt;
 
 ## Stable

@@ -32,7 +32,7 @@ Defined in: packages/server/src/replay/routes.ts:36
 
 #### Returns
 
-`Promise`\<[`ReplayResponse`](/api/@graphorin/server/interfaces/ReplayResponse.md)\>
+`Promise`\&lt;[`ReplayResponse`](/api/@graphorin/server/interfaces/ReplayResponse.md)\&gt;
 
 ***
 
@@ -56,4 +56,4 @@ Defined in: packages/server/src/replay/routes.ts:42
 
 #### Returns
 
-`Promise`\<[`ReplayResponse`](/api/@graphorin/server/interfaces/ReplayResponse.md)\>
+`Promise`\&lt;[`ReplayResponse`](/api/@graphorin/server/interfaces/ReplayResponse.md)\&gt;

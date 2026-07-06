@@ -17,6 +17,6 @@ objects so callers cannot accidentally mutate the registry.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-counters"></a> `counters` | `readonly` | `Readonly`\<`Record`\<`string`, `number`\>\> | - | packages/tools/src/audit/counters.ts:112 |
-| <a id="property-histograms"></a> `histograms` | `readonly` | `Readonly`\<`Record`\<`string`, `ReadonlyArray`\<`number`\>\>\> | - | packages/tools/src/audit/counters.ts:113 |
-| <a id="property-kinds"></a> `kinds` | `readonly` | `Readonly`\<`Record`\<`string`, `"counter"` \| `"gauge"`\>\> | W-051: per-key instrument kind - `'counter'` (monotonic; bridge with a delta-inc) vs `'gauge'` (absolute; bridge with a set). Keys mirror `counters`. | packages/tools/src/audit/counters.ts:119 |
+| <a id="property-counters"></a> `counters` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | - | packages/tools/src/audit/counters.ts:112 |
+| <a id="property-histograms"></a> `histograms` | `readonly` | `Readonly`\<`Record`\<`string`, `ReadonlyArray`\&lt;`number`\&gt;\>\> | - | packages/tools/src/audit/counters.ts:113 |
+| <a id="property-kinds"></a> `kinds` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `"counter"` \| `"gauge"`\&gt;\> | W-051: per-key instrument kind - `'counter'` (monotonic; bridge with a delta-inc) vs `'gauge'` (absolute; bridge with a set). Keys mirror `counters`. | packages/tools/src/audit/counters.ts:119 |

@@ -19,7 +19,7 @@ Hash a buffer or a string, returning the 32-bit digest as an
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `input` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> | `undefined` |
+| `input` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; | `undefined` |
 | `seed` | `number` | `0` |
 
 ## Returns

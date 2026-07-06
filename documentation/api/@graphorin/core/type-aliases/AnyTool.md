@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AnyTool
 
-# Type Alias: AnyTool\<TDeps\>
+# Type Alias: AnyTool\&lt;TDeps\&gt;
 
 ```ts
 type AnyTool<TDeps> = Tool<any, any, TDeps>;

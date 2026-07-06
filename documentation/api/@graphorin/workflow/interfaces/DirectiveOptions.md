@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / DirectiveOptions
 
-# Interface: DirectiveOptions\<TUpdate, TResume\>
+# Interface: DirectiveOptions\&lt;TUpdate, TResume\&gt;
 
 Defined in: packages/core/dist/channels/directive.d.ts:32
 
@@ -16,7 +16,7 @@ Constructor parameters for `Directive`.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TUpdate` | `Record`\<`string`, `unknown`\> |
+| `TUpdate` | `Record`\&lt;`string`, `unknown`\&gt; |
 | `TResume` | `unknown` |
 
 ## Properties

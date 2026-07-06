@@ -26,4 +26,4 @@ Strategy hook used by tests to inject synthetic token responses.
 
 ## Returns
 
-`Promise`\<[`TokenEndpointResponse`](/api/@graphorin/security/interfaces/TokenEndpointResponse.md)\>
+`Promise`\&lt;[`TokenEndpointResponse`](/api/@graphorin/security/interfaces/TokenEndpointResponse.md)\&gt;

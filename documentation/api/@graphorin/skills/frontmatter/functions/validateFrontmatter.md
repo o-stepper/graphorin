@@ -19,7 +19,7 @@ the `graphorin-*` extension catalogue.
 
 | Parameter | Type |
 | ------ | ------ |
-| `frontmatter` | `Record`\<`string`, `unknown`\> |
+| `frontmatter` | `Record`\&lt;`string`, `unknown`\&gt; |
 | `options` | [`ValidateFrontmatterOptions`](/api/@graphorin/skills/frontmatter/interfaces/ValidateFrontmatterOptions.md) |
 
 ## Returns

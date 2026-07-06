@@ -40,7 +40,7 @@ materialising rows. Powers honest `metadata()` counts.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -75,7 +75,7 @@ compatible.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -101,7 +101,7 @@ Lookup a single fact by id (returns `null` when absent or soft-deleted).
 
 #### Returns
 
-`Promise`\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md) \| `null`\>
+`Promise`\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md) \| `null`\&gt;
 
 ***
 
@@ -130,7 +130,7 @@ cycle-safe; returns `[]` for an unknown id. Powers
 
 #### Returns
 
-`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
+`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
 
 ***
 
@@ -159,7 +159,7 @@ in default recall until the successor is validated, at which point
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -188,7 +188,7 @@ Distinct from [SemanticMemoryStore.forget](/api/@graphorin/memory/interfaces/Sem
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -208,7 +208,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:133
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -233,7 +233,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:110
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -254,7 +254,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:134
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 #### Inherited from
 
@@ -293,7 +293,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:111
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 ***
 
@@ -327,7 +327,7 @@ Powers [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.m
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -352,7 +352,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:135
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 

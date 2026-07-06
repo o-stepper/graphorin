@@ -26,6 +26,6 @@ revocation that was not confirmed.
 
 ## Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ## Stable

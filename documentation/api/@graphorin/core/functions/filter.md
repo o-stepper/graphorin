@@ -27,12 +27,12 @@ Filter values produced by `source`. The predicate may be async.
 
 | Parameter | Type |
 | ------ | ------ |
-| `source` | `AsyncIterable`\<`T`\> |
-| `pred` | (`value`, `index`) => `boolean` \| `Promise`\<`boolean`\> |
+| `source` | `AsyncIterable`\&lt;`T`\&gt; |
+| `pred` | (`value`, `index`) => `boolean` \| `Promise`\&lt;`boolean`\&gt; |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`AsyncIterable`\<`T`\>
+`AsyncIterable`\&lt;`T`\&gt;
 
 ## Stable

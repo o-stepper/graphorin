@@ -272,6 +272,6 @@ Snapshot for tests / assertions.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `counters` | `Record`\<`string`, `ReadonlyArray`\<\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\>\> | packages/server/src/metrics/registry.ts:202 |
-| `gauges` | `Record`\<`string`, `ReadonlyArray`\<\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\>\> | packages/server/src/metrics/registry.ts:203 |
-| `summaries` | `Record`\<`string`, `ReadonlyArray`\<\{ `count`: `number`; `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `samples`: `ReadonlyArray`\<`number`\>; `sum`: `number`; \}\>\> | packages/server/src/metrics/registry.ts:204 |
+| `counters` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:202 |
+| `gauges` | `Record`\<`string`, `ReadonlyArray`\&lt;\{ `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `value`: `number`; \}\&gt;\> | packages/server/src/metrics/registry.ts:203 |
+| `summaries` | `Record`\<`string`, `ReadonlyArray`\<\{ `count`: `number`; `labels`: [`LabelSet`](/api/@graphorin/server/type-aliases/LabelSet.md); `samples`: `ReadonlyArray`\&lt;`number`\&gt;; `sum`: `number`; \}\>\> | packages/server/src/metrics/registry.ts:204 |

@@ -39,7 +39,7 @@ Defined in: packages/skills/src/types/index.ts:257
 
 #### Returns
 
-`Promise`\<`Uint8Array`\<`ArrayBufferLike`\>\>
+`Promise`\<`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\>
 
 ***
 
@@ -59,4 +59,4 @@ Defined in: packages/skills/src/types/index.ts:258
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;

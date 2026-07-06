@@ -27,10 +27,10 @@ exercise the extraction without touching the filesystem.
 | Parameter | Type |
 | ------ | ------ |
 | `text` | `string` |
-| `options` | [`FromTracesOptions`](/api/@graphorin/evals/interfaces/FromTracesOptions.md)\<`I`, `O`\> |
+| `options` | [`FromTracesOptions`](/api/@graphorin/evals/interfaces/FromTracesOptions.md)\&lt;`I`, `O`\&gt; |
 
 ## Returns
 
-[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`I`, `O`\>
+[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\&lt;`I`, `O`\&gt;
 
 ## Stable

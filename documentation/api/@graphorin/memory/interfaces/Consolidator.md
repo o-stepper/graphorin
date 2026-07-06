@@ -50,7 +50,7 @@ Drain DLQ rows whose `nextRetryAt` <= now.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -132,7 +132,7 @@ Pause the consolidator until the next budget reset.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -184,7 +184,7 @@ this in `beforeStart`.
 
 #### Returns
 
-`Promise`\<[`RegisterTriggersResult`](/api/@graphorin/memory/interfaces/RegisterTriggersResult.md)\>
+`Promise`\&lt;[`RegisterTriggersResult`](/api/@graphorin/memory/interfaces/RegisterTriggersResult.md)\&gt;
 
 ***
 
@@ -200,7 +200,7 @@ Resume after `pause()`.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -222,7 +222,7 @@ Replace the active tier - recomputes ceilings + phase set.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -236,7 +236,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:76
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -250,7 +250,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:79
 
 #### Returns
 
-`Promise`\<[`ConsolidatorStatus`](/api/@graphorin/memory/interfaces/ConsolidatorStatus.md)\>
+`Promise`\&lt;[`ConsolidatorStatus`](/api/@graphorin/memory/interfaces/ConsolidatorStatus.md)\&gt;
 
 ***
 
@@ -264,7 +264,7 @@ Defined in: packages/memory/src/consolidator/runtime.ts:77
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 

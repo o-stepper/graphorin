@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/reranker-llm](/api/@graphorin/reranker-llm/index.md) / [](/api/@graphorin/reranker-llm/README.md) / LlmReRanker
 
-# Class: LlmReRanker\<TRecord\>
+# Class: LlmReRanker\&lt;TRecord\&gt;
 
 Defined in: src/reranker.ts:97
 
@@ -37,11 +37,11 @@ Defined in: src/reranker.ts:113
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`LlmRerankerOptions`](/api/@graphorin/reranker-llm/interfaces/LlmRerankerOptions.md)\<`TRecord`\> |
+| `options` | [`LlmRerankerOptions`](/api/@graphorin/reranker-llm/interfaces/LlmRerankerOptions.md)\&lt;`TRecord`\&gt; |
 
 #### Returns
 
-`LlmReRanker`\<`TRecord`\>
+`LlmReRanker`\&lt;`TRecord`\&gt;
 
 ## Properties
 
@@ -146,12 +146,12 @@ sorted by `score` descending.
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `string` |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TInputRecord`\>[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TInputRecord`\&gt;[][] |
 | `options` | [`ReRankOptions`](/api/@graphorin/memory/interfaces/ReRankOptions.md) |
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TInputRecord`\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TInputRecord`\&gt;[]\>
 
 #### Implementation of
 

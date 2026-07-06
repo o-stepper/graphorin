@@ -55,9 +55,9 @@ sorted by `score` descending.
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `string` |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] |
 | `options?` | [`ReRankOptions`](/api/@graphorin/memory/interfaces/ReRankOptions.md) |
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]\>

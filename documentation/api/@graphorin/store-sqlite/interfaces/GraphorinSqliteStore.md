@@ -41,7 +41,7 @@ Close the connection + stop the checkpoint manager. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -57,4 +57,4 @@ Initialize the store: run migrations + start checkpoint manager.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

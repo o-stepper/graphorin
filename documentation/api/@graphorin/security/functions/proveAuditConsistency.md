@@ -28,6 +28,6 @@ is a prefix of the log at `newer.size`.
 
 ## Returns
 
-`Promise`\<readonly `string`[]\>
+`Promise`\&lt;readonly `string`[]\&gt;
 
 ## Stable

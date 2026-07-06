@@ -19,6 +19,6 @@ payloads.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-causalitychain"></a> `causalityChain?` | `readonly` | readonly `string`[] | See [TextContent.causalityChain](/api/@graphorin/core/interfaces/TextContent.md#property-causalitychain). | packages/core/src/types/message.ts:49 |
-| <a id="property-image"></a> `image` | `readonly` | `Uint8Array`\<`ArrayBufferLike`\> \| `URL` | - | packages/core/src/types/message.ts:46 |
+| <a id="property-image"></a> `image` | `readonly` | `Uint8Array`\&lt;`ArrayBufferLike`\&gt; \| `URL` | - | packages/core/src/types/message.ts:46 |
 | <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | - | packages/core/src/types/message.ts:47 |
 | <a id="property-type"></a> `type` | `readonly` | `"image"` | - | packages/core/src/types/message.ts:45 |

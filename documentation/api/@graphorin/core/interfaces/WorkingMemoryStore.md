@@ -33,7 +33,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:79
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:77
 
 #### Returns
 
-`Promise`\<[`Block`](/api/@graphorin/core/interfaces/Block.md) \| `null`\>
+`Promise`\&lt;[`Block`](/api/@graphorin/core/interfaces/Block.md) \| `null`\&gt;
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:76
 
 #### Returns
 
-`Promise`\<readonly [`Block`](/api/@graphorin/core/interfaces/Block.md)[]\>
+`Promise`\&lt;readonly [`Block`](/api/@graphorin/core/interfaces/Block.md)[]\&gt;
 
 ***
 
@@ -95,4 +95,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:78
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

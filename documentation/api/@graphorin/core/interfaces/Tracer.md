@@ -32,7 +32,7 @@ Force-flush any pending spans.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -58,12 +58,12 @@ Convenience wrapper: start a span, run `fn` inside, and call
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`StartSpanOptions`](/api/@graphorin/core/interfaces/StartSpanOptions.md)\<`T`\> |
-| `fn` | (`span`) => `R` \| `Promise`\<`R`\> |
+| `opts` | [`StartSpanOptions`](/api/@graphorin/core/interfaces/StartSpanOptions.md)\&lt;`T`\&gt; |
+| `fn` | (`span`) => `R` \| `Promise`\&lt;`R`\&gt; |
 
 #### Returns
 
-`Promise`\<`R`\>
+`Promise`\&lt;`R`\&gt;
 
 ***
 
@@ -85,8 +85,8 @@ Defined in: packages/core/src/contracts/tracer.ts:174
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`StartSpanOptions`](/api/@graphorin/core/interfaces/StartSpanOptions.md)\<`T`\> |
+| `opts` | [`StartSpanOptions`](/api/@graphorin/core/interfaces/StartSpanOptions.md)\&lt;`T`\&gt; |
 
 #### Returns
 
-[`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<`T`\>
+[`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;`T`\&gt;

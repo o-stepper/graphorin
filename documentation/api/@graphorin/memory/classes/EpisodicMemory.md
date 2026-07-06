@@ -68,7 +68,7 @@ manually).
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -90,7 +90,7 @@ Lookup a single episode by id.
 
 #### Returns
 
-`Promise`\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\>
+`Promise`\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\&gt;
 
 ***
 
@@ -121,7 +121,7 @@ quarantined episodes (the importance source for the reflection gate).
 
 #### Returns
 
-`Promise`\<readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\>
+`Promise`\&lt;readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\&gt;
 
 ***
 
@@ -145,7 +145,7 @@ List the most recent episodes (no embedding required).
 
 #### Returns
 
-`Promise`\<readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\>
+`Promise`\&lt;readonly [`Episode`](/api/@graphorin/core/interfaces/Episode.md)[]\&gt;
 
 ***
 
@@ -168,7 +168,7 @@ Persist an episode + its embedding (when an embedder is configured).
 
 #### Returns
 
-`Promise`\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\>
+`Promise`\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;
 
 ***
 
@@ -199,7 +199,7 @@ relevance term as a normalized fallback.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
 
 ***
 
@@ -233,4 +233,4 @@ stored summary and **refuses** promotion of an injection-flagged episode
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

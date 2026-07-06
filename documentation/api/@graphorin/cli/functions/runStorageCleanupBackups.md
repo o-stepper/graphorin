@@ -24,6 +24,6 @@ leave intermediate copies around.
 
 ## Returns
 
-`Promise`\<[`StorageCleanupBackupsResult`](/api/@graphorin/cli/interfaces/StorageCleanupBackupsResult.md)\>
+`Promise`\&lt;[`StorageCleanupBackupsResult`](/api/@graphorin/cli/interfaces/StorageCleanupBackupsResult.md)\&gt;
 
 ## Stable

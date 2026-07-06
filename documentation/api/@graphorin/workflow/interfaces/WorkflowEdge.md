@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / WorkflowEdge
 
-# Interface: WorkflowEdge\<TState\>
+# Interface: WorkflowEdge\&lt;TState\&gt;
 
 Defined in: packages/workflow/src/types.ts:254
 
@@ -18,7 +18,7 @@ fire when the source node completes.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
+| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
 
 ## Properties
 
@@ -26,4 +26,4 @@ fire when the source node completes.
 | ------ | ------ | ------ | ------ |
 | <a id="property-from"></a> `from` | `readonly` | `string` | packages/workflow/src/types.ts:255 |
 | <a id="property-to"></a> `to` | `readonly` | `string` | packages/workflow/src/types.ts:256 |
-| <a id="property-when"></a> `when?` | `readonly` | [`EdgePredicate`](/api/@graphorin/workflow/type-aliases/EdgePredicate.md)\<`TState`\> | packages/workflow/src/types.ts:257 |
+| <a id="property-when"></a> `when?` | `readonly` | [`EdgePredicate`](/api/@graphorin/workflow/type-aliases/EdgePredicate.md)\&lt;`TState`\&gt; | packages/workflow/src/types.ts:257 |

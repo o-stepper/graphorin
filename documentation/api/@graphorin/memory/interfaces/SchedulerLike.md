@@ -32,7 +32,7 @@ Defined in: packages/memory/src/consolidator/scheduler.ts:51
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 
@@ -52,4 +52,4 @@ Defined in: packages/memory/src/consolidator/scheduler.ts:52
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

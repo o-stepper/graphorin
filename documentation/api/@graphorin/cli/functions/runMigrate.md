@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/migrate.ts:37
 
 ## Returns
 
-`Promise`\<[`MigrateCommandResult`](/api/@graphorin/cli/interfaces/MigrateCommandResult.md)\>
+`Promise`\&lt;[`MigrateCommandResult`](/api/@graphorin/cli/interfaces/MigrateCommandResult.md)\&gt;
 
 ## Stable

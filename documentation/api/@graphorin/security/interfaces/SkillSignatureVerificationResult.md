@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/supply-chain/types.ts:75
 
-Result of a [verifySkillSignature](/api/@graphorin/security/functions/verifySkillSignature.md) call.
+Result of a `verifySkillSignature` call.
 
 ## Stable
 

@@ -29,12 +29,12 @@ Cancellation via `signal` is honored.
 
 | Parameter | Type |
 | ------ | ------ |
-| `source` | `AsyncIterable`\<`T`\> |
-| `fn` | (`value`, `index`) => `U` \| `Promise`\<`U`\> |
+| `source` | `AsyncIterable`\&lt;`T`\&gt; |
+| `fn` | (`value`, `index`) => `U` \| `Promise`\&lt;`U`\&gt; |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`AsyncIterable`\<`U`\>
+`AsyncIterable`\&lt;`U`\&gt;
 
 ## Stable

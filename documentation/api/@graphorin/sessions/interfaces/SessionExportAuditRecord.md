@@ -26,6 +26,6 @@ verify the chain segment.
 | <a id="property-at"></a> `at` | `readonly` | `string` | packages/sessions/src/export/types.ts:170 |
 | <a id="property-hash"></a> `hash?` | `readonly` | `string` | packages/sessions/src/export/types.ts:178 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"audit"` | packages/sessions/src/export/types.ts:167 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/sessions/src/export/types.ts:176 |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/sessions/src/export/types.ts:176 |
 | <a id="property-prevhash"></a> `prevHash?` | `readonly` | `string` | packages/sessions/src/export/types.ts:177 |
 | <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/sessions/src/export/types.ts:168 |

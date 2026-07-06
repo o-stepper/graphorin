@@ -9,7 +9,7 @@
 Migration registry + runner for `@graphorin/store-sqlite`.
 
 The default `createSqliteStore({ ... })` factory invokes
-[runMigrations](/api/@graphorin/store-sqlite/functions/runMigrations.md) during MemoryStore.init; downstream
+[runMigrations](/api/@graphorin/store-sqlite/functions/runMigrations.md) during `MemoryStore.init`; downstream
 packages register additional migrations via [registerMigration](/api/@graphorin/store-sqlite/functions/registerMigration.md)
 before the first `init()` call.
 

@@ -19,5 +19,5 @@ Options for `createDockerSandbox(...)`.
 | <a id="property-defaulttimeoutms"></a> `defaultTimeoutMs?` | `readonly` | `number` | Default wall-clock timeout (ms). Defaults to 30000. | packages/security/src/sandbox/docker.ts:86 |
 | <a id="property-image"></a> `image?` | `readonly` | `string` | Container image. Defaults to a no-op stub the operator must override; the framework deliberately does not ship an image. | packages/security/src/sandbox/docker.ts:79 |
 | <a id="property-memorylimitmb"></a> `memoryLimitMb?` | `readonly` | `number` | Memory limit (MB). Defaults to 512. | packages/security/src/sandbox/docker.ts:88 |
-| <a id="property-peerloader"></a> `peerLoader?` | `readonly` | () => `Promise`\<`DockerodeModule`\> | Override the peer-dep loader. Tests inject a stub here. | packages/security/src/sandbox/docker.ts:92 |
+| <a id="property-peerloader"></a> `peerLoader?` | `readonly` | () => `Promise`\&lt;`DockerodeModule`\&gt; | Override the peer-dep loader. Tests inject a stub here. | packages/security/src/sandbox/docker.ts:92 |
 | <a id="property-socketpath"></a> `socketPath?` | `readonly` | `string` | Hostname for the Docker daemon socket. Forwarded to `new Dockerode({ socketPath })`. Defaults to the platform default. | packages/security/src/sandbox/docker.ts:84 |

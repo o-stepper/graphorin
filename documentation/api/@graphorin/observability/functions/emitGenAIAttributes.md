@@ -26,7 +26,7 @@ the per-attribute sensitivity defaults catalogue.
 
 | Parameter | Type |
 | ------ | ------ |
-| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<`T`\> |
+| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;`T`\&gt; |
 | `attrs` | [`GenAIAttributes`](/api/@graphorin/observability/interfaces/GenAIAttributes.md) |
 
 ## Returns

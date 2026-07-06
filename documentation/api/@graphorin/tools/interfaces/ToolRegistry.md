@@ -101,7 +101,7 @@ Defined in: packages/tools/src/registry/registry.ts:79
 
 #### Returns
 
-  \| [`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)\<`TInput`, `TOutput`, `TDeps`\>
+  \| [`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
   \| `undefined`
 
 ***
@@ -194,12 +194,12 @@ Defined in: packages/tools/src/registry/registry.ts:74
 
 | Parameter | Type |
 | ------ | ------ |
-| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`TInput`, `TOutput`, `TDeps`\> |
+| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; |
 | `source?` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) |
 
 #### Returns
 
-[`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)\<`TInput`, `TOutput`, `TDeps`\>
+[`RegistryEntry`](/api/@graphorin/tools/type-aliases/RegistryEntry.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
 
 ***
 
@@ -224,7 +224,7 @@ regex name-match final fallback.
 
 #### Returns
 
-`Promise`\<readonly [`ToolSearchMatch`](/api/@graphorin/tools/interfaces/ToolSearchMatch.md)[]\>
+`Promise`\&lt;readonly [`ToolSearchMatch`](/api/@graphorin/tools/interfaces/ToolSearchMatch.md)[]\&gt;
 
 ***
 

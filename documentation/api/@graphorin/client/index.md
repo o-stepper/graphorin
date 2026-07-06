@@ -8,11 +8,11 @@
 
 > Reference TypeScript client for the [Graphorin](https://github.com/o-stepper/graphorin) standalone server.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
 - **Version:** v0.6.1
-- **License:** [MIT](../../_media/LICENSE-2) (© 2026 Oleksiy Stepurenko)
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/client>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 
@@ -91,7 +91,7 @@ The client attaches the ticket as a second `Sec-WebSocket-Protocol` token (`tick
 
 ## License
 
-MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](../../_media/LICENSE-2).
+MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](https://github.com/o-stepper/graphorin/blob/main/LICENSE).
 
 ---
 
@@ -105,5 +105,5 @@ MIT © 2026 Oleksiy Stepurenko. See [`LICENSE`](../../_media/LICENSE-2).
 | [client](/api/@graphorin/client/client/index.md) | - |
 | [errors](/api/@graphorin/client/errors/index.md) | Typed error hierarchy surfaced by `@graphorin/client`. Every error class extends the JavaScript built-in `Error` and exposes a stable `kind` discriminator so consumers can pattern-match without relying on `instanceof` (which behaves badly across module-system boundaries when the package is dual-loaded). |
 | [package.json](/api/@graphorin/client/package.json/index.md) | - |
-| [reconnect](/api/@graphorin/client/reconnect/index.md) | Pure-functional reconnect-backoff helper. Encapsulated in its own module so the GraphorinClient stays free of timing heuristics - and so tests can drive the policy with a deterministic RNG. |
+| [reconnect](/api/@graphorin/client/reconnect/index.md) | Pure-functional reconnect-backoff helper. Encapsulated in its own module so the `GraphorinClient` stays free of timing heuristics - and so tests can drive the policy with a deterministic RNG. |
 | [transport](/api/@graphorin/client/transport/index.md) | Transport barrel for `@graphorin/client`. |

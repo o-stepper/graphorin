@@ -8,11 +8,11 @@
 
 > Standalone server runtime for the [Graphorin](https://github.com/o-stepper/graphorin) framework.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/o-stepper/graphorin/blob/main/LICENSE)
 [![Node.js: 22+](https://img.shields.io/badge/Node.js-22%2B-43853d.svg)](https://nodejs.org)
 
 - **Version:** v0.6.1
-- **License:** [MIT](../../_media/LICENSE-7) (© 2026 Oleksiy Stepurenko)
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) (© 2026 Oleksiy Stepurenko)
 - **Repository:** <https://github.com/o-stepper/graphorin/tree/main/packages/server>
 - **Issues:** <https://github.com/o-stepper/graphorin/issues>
 

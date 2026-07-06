@@ -34,12 +34,12 @@ results without exception handling.
 
 | Parameter | Type |
 | ------ | ------ |
-| `guardrails` | readonly [`GuardrailDefinition`](/api/@graphorin/security/interfaces/GuardrailDefinition.md)\<`TValue`\>[] |
+| `guardrails` | readonly [`GuardrailDefinition`](/api/@graphorin/security/interfaces/GuardrailDefinition.md)\&lt;`TValue`\&gt;[] |
 | `value` | `TValue` |
 | `ctx` | [`GuardrailContext`](/api/@graphorin/security/interfaces/GuardrailContext.md) |
 
 ## Returns
 
-`Promise`\<[`ComposedGuardrailResult`](/api/@graphorin/security/type-aliases/ComposedGuardrailResult.md)\<`TValue`\>\>
+`Promise`\<[`ComposedGuardrailResult`](/api/@graphorin/security/type-aliases/ComposedGuardrailResult.md)\&lt;`TValue`\&gt;\>
 
 ## Stable

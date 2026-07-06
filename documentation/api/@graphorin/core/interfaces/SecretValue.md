@@ -160,11 +160,11 @@ synchronous / asynchronous turn.
 
 | Parameter | Type |
 | ------ | ------ |
-| `fn` | (`raw`) => `T` \| `Promise`\<`T`\> |
+| `fn` | (`raw`) => `T` \| `Promise`\&lt;`T`\&gt; |
 
 #### Returns
 
-`Promise`\<`T`\>
+`Promise`\&lt;`T`\&gt;
 
 ***
 
@@ -190,8 +190,8 @@ V8 string would defeat the wrapper's hygiene.
 
 | Parameter | Type |
 | ------ | ------ |
-| `fn` | (`buf`) => `T` \| `Promise`\<`T`\> |
+| `fn` | (`buf`) => `T` \| `Promise`\&lt;`T`\&gt; |
 
 #### Returns
 
-`Promise`\<`T`\>
+`Promise`\&lt;`T`\&gt;

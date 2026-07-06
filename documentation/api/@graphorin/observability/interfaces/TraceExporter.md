@@ -40,7 +40,7 @@ Forward a finished span record. Implementations should be cheap.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -56,7 +56,7 @@ Flush any buffered spans. Called on `tracer.shutdown()`.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -72,4 +72,4 @@ Close any underlying resources. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

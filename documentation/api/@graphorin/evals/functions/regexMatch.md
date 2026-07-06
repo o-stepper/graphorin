@@ -26,6 +26,6 @@ Defined in: evals/src/scorers/code/regex.ts:18
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, `unknown`\>
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `unknown`\&gt;
 
 ## Stable

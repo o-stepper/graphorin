@@ -15,6 +15,6 @@ A tool-search match `code_search` can fold in (deferred pool).
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-description"></a> `description` | `readonly` | `string` | - | packages/tools/src/code-mode/meta-tools.ts:42 |
-| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | - | packages/tools/src/code-mode/meta-tools.ts:43 |
+| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | - | packages/tools/src/code-mode/meta-tools.ts:43 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/tools/src/code-mode/meta-tools.ts:41 |
-| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | A5: the matched tool's output schema, when declared (renders a return type). | packages/tools/src/code-mode/meta-tools.ts:45 |
+| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | A5: the matched tool's output schema, when declared (renders a return type). | packages/tools/src/code-mode/meta-tools.ts:45 |

@@ -50,7 +50,7 @@ Defined in: packages/skills/src/types/index.ts:282
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 ***
 
@@ -84,7 +84,7 @@ Defined in: packages/skills/src/types/index.ts:283
 
 #### Returns
 
-`Promise`\<readonly [`SkillResource`](/api/@graphorin/skills/interfaces/SkillResource.md)[]\>
+`Promise`\&lt;readonly [`SkillResource`](/api/@graphorin/skills/interfaces/SkillResource.md)[]\&gt;
 
 ***
 

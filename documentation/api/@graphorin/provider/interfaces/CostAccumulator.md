@@ -74,4 +74,4 @@ Snapshot of every tracked `provider::model` → totals.
 
 #### Returns
 
-`ReadonlyMap`\<`string`, [`CostTrackingTotals`](/api/@graphorin/provider/interfaces/CostTrackingTotals.md)\>
+`ReadonlyMap`\&lt;`string`, [`CostTrackingTotals`](/api/@graphorin/provider/interfaces/CostTrackingTotals.md)\&gt;

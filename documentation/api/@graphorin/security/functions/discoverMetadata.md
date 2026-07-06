@@ -26,6 +26,6 @@ OpenID Connect Discovery).
 
 ## Returns
 
-`Promise`\<[`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md)\>
+`Promise`\&lt;[`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md)\&gt;
 
 ## Stable

@@ -15,7 +15,7 @@ middleware against the same surface.
 
 ## Extends
 
-- `Record`\<`string`, `unknown`\>
+- `Record`\&lt;`string`, `unknown`\&gt;
 
 ## Indexable
 

@@ -9,7 +9,7 @@
 Typed error union for the `@graphorin/mcp` package.
 
 Every error carries a stable lowercase [MCPErrorKind](/api/@graphorin/mcp/errors/type-aliases/MCPErrorKind.md)
-discriminator, an actionable MCPError.hint field where
+discriminator, an actionable [GraphorinMCPError.hint](/api/@graphorin/mcp/errors/classes/GraphorinMCPError.md#property-hint) field where
 applicable, and an optional structured `metadata` bag the audit
 emitter persists alongside the standard `runId` / `sessionId`
 context.
@@ -26,7 +26,7 @@ context.
 | [MCPInvalidConfigError](/api/@graphorin/mcp/errors/classes/MCPInvalidConfigError.md) | Raised on invalid `createMCPClient(...)` configuration. |
 | [MCPProtocolError](/api/@graphorin/mcp/errors/classes/MCPProtocolError.md) | Raised on JSON-RPC / MCP protocol-level errors. |
 | [MCPToolExecutionError](/api/@graphorin/mcp/errors/classes/MCPToolExecutionError.md) | Raised when the MCP server reports a tool-level failure (`CallToolResult.isError === true`, MC-4). The server's content text rides in the message so the model keeps its self-correction signal - while the executor records a real tool FAILURE (audit, retry and error policies all engage) instead of a fake success. |
-| [MCPToolNotFoundError](/api/@graphorin/mcp/errors/classes/MCPToolNotFoundError.md) | Raised when MCPClient.callTool is invoked for an unknown tool. |
+| [MCPToolNotFoundError](/api/@graphorin/mcp/errors/classes/MCPToolNotFoundError.md) | Raised when `MCPClient.callTool` is invoked for an unknown tool. |
 | [MCPToolPinningError](/api/@graphorin/mcp/errors/classes/MCPToolPinningError.md) | Raised when a pinned tool-definition fingerprint does not match the server's current definition and `onPinMismatch: 'reject'` is set (MC-6) - the approve-then-swap rug-pull posture. |
 | [MCPTransportNotSupportedError](/api/@graphorin/mcp/errors/classes/MCPTransportNotSupportedError.md) | Raised when an operator requests a transport / capability that the runtime does not support (e.g. `resumable: true` on `stdio`). |
 
@@ -34,7 +34,7 @@ context.
 
 | Interface | Description |
 | ------ | ------ |
-| [MCPErrorMetadata](/api/@graphorin/mcp/errors/interfaces/MCPErrorMetadata.md) | Common metadata bag attached to every MCPError. |
+| [MCPErrorMetadata](/api/@graphorin/mcp/errors/interfaces/MCPErrorMetadata.md) | Common metadata bag attached to every [GraphorinMCPError](/api/@graphorin/mcp/errors/classes/GraphorinMCPError.md). |
 
 ## Type Aliases
 

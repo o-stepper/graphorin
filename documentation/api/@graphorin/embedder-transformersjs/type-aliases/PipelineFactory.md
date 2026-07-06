@@ -30,4 +30,4 @@ Pipeline-factory shape used for dependency injection in tests.
 
 ## Returns
 
-`Promise`\<[`FeatureExtractor`](/api/@graphorin/embedder-transformersjs/type-aliases/FeatureExtractor.md)\>
+`Promise`\&lt;[`FeatureExtractor`](/api/@graphorin/embedder-transformersjs/type-aliases/FeatureExtractor.md)\&gt;

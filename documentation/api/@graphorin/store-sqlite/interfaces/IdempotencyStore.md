@@ -33,7 +33,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:34
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -82,7 +82,7 @@ so expired rows no longer accumulate forever (W-065).
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -102,4 +102,4 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:32
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

@@ -17,6 +17,6 @@ Configuration for opt-in `--encrypt` / `--sign`.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cipher"></a> `cipher?` | `readonly` | `"aes256gcm"` | - | packages/sessions/src/export/writer.ts:64 |
-| <a id="property-key"></a> `key?` | `readonly` | `Uint8Array`\<`ArrayBufferLike`\> | Pre-derived 32-byte key. Mutually exclusive with `passphrase`. Use [deriveSessionExportKey](/api/@graphorin/sessions/functions/deriveSessionExportKey.md) to pre-derive deterministically from a passphrase. | packages/sessions/src/export/writer.ts:70 |
-| <a id="property-passphrase"></a> `passphrase?` | `readonly` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> | Passphrase + salt the writer derives a key from at write time. The same salt MUST be supplied to the importer. | packages/sessions/src/export/writer.ts:75 |
-| <a id="property-salt"></a> `salt?` | `readonly` | `Uint8Array`\<`ArrayBufferLike`\> | - | packages/sessions/src/export/writer.ts:76 |
+| <a id="property-key"></a> `key?` | `readonly` | `Uint8Array`\&lt;`ArrayBufferLike`\&gt; | Pre-derived 32-byte key. Mutually exclusive with `passphrase`. Use [deriveSessionExportKey](/api/@graphorin/sessions/functions/deriveSessionExportKey.md) to pre-derive deterministically from a passphrase. | packages/sessions/src/export/writer.ts:70 |
+| <a id="property-passphrase"></a> `passphrase?` | `readonly` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; | Passphrase + salt the writer derives a key from at write time. The same salt MUST be supplied to the importer. | packages/sessions/src/export/writer.ts:75 |
+| <a id="property-salt"></a> `salt?` | `readonly` | `Uint8Array`\&lt;`ArrayBufferLike`\&gt; | - | packages/sessions/src/export/writer.ts:76 |

@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/checkpoint-store-memory.ts:36
 
-Pure in-memory CheckpointStore implementation. Thread-safe
+Pure in-memory `CheckpointStore` implementation. Thread-safe
 within a single Node.js event loop because every mutation is
 synchronous; concurrent runs that share the same instance will see
 a consistent view.
@@ -56,7 +56,7 @@ W-009 compaction - keep the `keepLast` newest checkpoints of one pair.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Implementation of
 
@@ -85,7 +85,7 @@ instead, which is namespace-scoped and protects suspended threads.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -147,7 +147,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:120
 
 #### Returns
 
-`AsyncIterable`\<[`CheckpointTuple`](/api/@graphorin/workflow/interfaces/CheckpointTuple.md)\>
+`AsyncIterable`\&lt;[`CheckpointTuple`](/api/@graphorin/workflow/interfaces/CheckpointTuple.md)\&gt;
 
 #### Implementation of
 
@@ -212,7 +212,7 @@ checkpoint decides age + status, suspended pairs survive unless
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Implementation of
 
@@ -245,7 +245,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:40
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 #### Implementation of
 
@@ -278,7 +278,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:74
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 

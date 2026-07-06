@@ -22,4 +22,4 @@ Drive `graphorin auth list --mcp`.
 
 ## Returns
 
-`Promise`\<readonly [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md)[]\>
+`Promise`\&lt;readonly [`OAuthSessionMetadata`](/api/@graphorin/security/interfaces/OAuthSessionMetadata.md)[]\&gt;

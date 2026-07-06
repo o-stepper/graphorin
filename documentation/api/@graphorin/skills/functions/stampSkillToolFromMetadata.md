@@ -27,11 +27,11 @@ fixtures and tests do not have to materialise a full [Skill](/api/@graphorin/ski
 
 | Parameter | Type |
 | ------ | ------ |
-| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`TInput`, `TOutput`, `TDeps`\> |
+| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; |
 | `metadata` | [`SkillMetadata`](/api/@graphorin/skills/interfaces/SkillMetadata.md) |
 
 ## Returns
 
-[`StampedSkillTool`](/api/@graphorin/skills/interfaces/StampedSkillTool.md)\<`TInput`, `TOutput`, `TDeps`\>
+[`StampedSkillTool`](/api/@graphorin/skills/interfaces/StampedSkillTool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
 
 ## Stable

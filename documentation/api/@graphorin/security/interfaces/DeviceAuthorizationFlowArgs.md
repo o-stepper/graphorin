@@ -18,4 +18,4 @@ Internal arguments fed into [runDeviceAuthorizationFlow](/api/@graphorin/securit
 | <a id="property-options"></a> `options` | `readonly` | [`AuthorizeDeviceOptions`](/api/@graphorin/security/interfaces/AuthorizeDeviceOptions.md) | - | packages/security/src/oauth/authorize-device-flow.ts:52 |
 | <a id="property-registration"></a> `registration` | `readonly` | [`OAuthRegistration`](/api/@graphorin/security/interfaces/OAuthRegistration.md) | - | packages/security/src/oauth/authorize-device-flow.ts:51 |
 | <a id="property-serverid"></a> `serverId` | `readonly` | `string` | - | packages/security/src/oauth/authorize-device-flow.ts:49 |
-| <a id="property-sleep"></a> `sleep?` | `readonly` | (`ms`, `signal?`) => `Promise`\<`void`\> | Sleep helper. Defaults to `setTimeout`. Tests use this to fast- forward the polling cadence. | packages/security/src/oauth/authorize-device-flow.ts:57 |
+| <a id="property-sleep"></a> `sleep?` | `readonly` | (`ms`, `signal?`) => `Promise`\&lt;`void`\&gt; | Sleep helper. Defaults to `setTimeout`. Tests use this to fast- forward the polling cadence. | packages/security/src/oauth/authorize-device-flow.ts:57 |

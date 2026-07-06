@@ -21,7 +21,7 @@ deletion counts after each sweep. Defaults to a no-op.
 | ------ | ------ |
 | `level` | [`RetentionLogLevel`](/api/@graphorin/server/type-aliases/RetentionLogLevel.md) |
 | `message` | `string` |
-| `fields?` | `Record`\<`string`, `unknown`\> |
+| `fields?` | `Record`\&lt;`string`, `unknown`\&gt; |
 
 ## Returns
 

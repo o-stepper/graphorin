@@ -143,7 +143,7 @@ Defined in: packages/store-sqlite/src/driver-types.ts:55
 
 #### Returns
 
-`IterableIterator`\<`T`\>
+`IterableIterator`\&lt;`T`\&gt;
 
 ***
 

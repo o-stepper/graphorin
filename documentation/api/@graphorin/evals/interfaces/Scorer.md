@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/evals](/api/@graphorin/evals/index.md) / [](/api/@graphorin/evals/README.md) / Scorer
 
-# Interface: Scorer\<I, O\>
+# Interface: Scorer\&lt;I, O\&gt;
 
 Defined in: observability/dist/eval/types.d.ts:46
 
@@ -37,11 +37,11 @@ Defined in: observability/dist/eval/types.d.ts:48
 
 | Parameter | Type |
 | ------ | ------ |
-| `args` | \{ `case`: [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`\>; `durationMs`: `number`; `output`: `O`; \} |
-| `args.case` | [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`\> |
+| `args` | \{ `case`: [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`I`, `O`\&gt;; `durationMs`: `number`; `output`: `O`; \} |
+| `args.case` | [`Case`](/api/@graphorin/evals/interfaces/Case.md)\&lt;`I`, `O`\&gt; |
 | `args.durationMs` | `number` |
 | `args.output` | `O` |
 
 #### Returns
 
-`Promise`\<[`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md)\>
+`Promise`\&lt;[`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md)\&gt;

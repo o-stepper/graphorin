@@ -31,10 +31,10 @@ is `false`.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`ToolContextOptions`](/api/@graphorin/tools/interfaces/ToolContextOptions.md)\<`TDeps`\> |
+| `opts` | [`ToolContextOptions`](/api/@graphorin/tools/interfaces/ToolContextOptions.md)\&lt;`TDeps`\&gt; |
 
 ## Returns
 
-[`ToolExecutionContext`](/api/@graphorin/core/interfaces/ToolExecutionContext.md)\<`TDeps`\>
+[`ToolExecutionContext`](/api/@graphorin/core/interfaces/ToolExecutionContext.md)\&lt;`TDeps`\&gt;
 
 ## Stable

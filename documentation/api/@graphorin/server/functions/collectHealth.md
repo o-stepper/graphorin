@@ -22,6 +22,6 @@ Build the aggregate health summary from runtime probes.
 
 ## Returns
 
-`Promise`\<[`HealthSummary`](/api/@graphorin/server/interfaces/HealthSummary.md)\>
+`Promise`\&lt;[`HealthSummary`](/api/@graphorin/server/interfaces/HealthSummary.md)\&gt;
 
 ## Stable

@@ -29,6 +29,6 @@ Construct an `Ephemeral` channel.
 
 ## Returns
 
-[`Ephemeral`](/api/@graphorin/workflow/interfaces/Ephemeral.md)\<`T`\>
+[`Ephemeral`](/api/@graphorin/workflow/interfaces/Ephemeral.md)\&lt;`T`\&gt;
 
 ## Stable

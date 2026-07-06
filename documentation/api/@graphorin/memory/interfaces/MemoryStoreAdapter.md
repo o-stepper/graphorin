@@ -21,7 +21,7 @@ implement the minimum and leave the optional members undefined.
 
 ## Extends
 
-- `Omit`\<[`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md), `"session"` \| `"episodic"` \| `"semantic"` \| `"procedural"`\>
+- `Omit`\&lt;[`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md), `"session"` \| `"episodic"` \| `"semantic"` \| `"procedural"`\&gt;
 
 ## Properties
 
@@ -33,7 +33,7 @@ implement the minimum and leave the optional members undefined.
 | <a id="property-graph"></a> `graph?` | `readonly` | [`GraphMemoryStoreExt`](/api/@graphorin/memory/interfaces/GraphMemoryStoreExt.md) | Optional relation-graph surface (P2-1). Defined on the default `@graphorin/store-sqlite` adapter; omitted ⇒ entity resolution on write is a no-op and `search({ expandHops })` skips expansion. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:937 |
 | <a id="property-insights"></a> `insights?` | `readonly` | [`InsightMemoryStoreExt`](/api/@graphorin/memory/interfaces/InsightMemoryStoreExt.md) | Optional reflection insight surface (P1-1). Defined on the default `@graphorin/store-sqlite` adapter; omitted ⇒ reflection is a no-op and `InsightMemory` reads return empty. **Stable** | - | packages/memory/src/internal/storage-adapter.ts:929 |
 | <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStoreExt`](/api/@graphorin/memory/interfaces/ProceduralMemoryStoreExt.md) | - | - | packages/memory/src/internal/storage-adapter.ts:905 |
-| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStoreExt`](/api/@graphorin/memory/interfaces/SemanticMemoryStoreExt.md) & `Partial`\<[`DecayMemoryStoreExt`](/api/@graphorin/memory/interfaces/DecayMemoryStoreExt.md)\> | - | - | packages/memory/src/internal/storage-adapter.ts:904 |
+| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStoreExt`](/api/@graphorin/memory/interfaces/SemanticMemoryStoreExt.md) & `Partial`\&lt;[`DecayMemoryStoreExt`](/api/@graphorin/memory/interfaces/DecayMemoryStoreExt.md)\&gt; | - | - | packages/memory/src/internal/storage-adapter.ts:904 |
 | <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStoreExt`](/api/@graphorin/memory/interfaces/SessionMemoryStoreExt.md) | - | - | packages/memory/src/internal/storage-adapter.ts:902 |
 | <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | - | `Omit.shared` | packages/core/dist/contracts/memory-store.d.ts:37 |
 | <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | - | `Omit.working` | packages/core/dist/contracts/memory-store.d.ts:32 |
@@ -52,7 +52,7 @@ Cleanly close any underlying handles. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -74,7 +74,7 @@ Initialize / migrate the underlying storage. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 

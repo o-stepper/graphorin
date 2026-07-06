@@ -85,7 +85,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:55
 
 #### Returns
 
-`Promise`\<readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\>
+`Promise`\&lt;readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\&gt;
 
 #### Implementation of
 
@@ -124,7 +124,7 @@ timestamp, so supported behaviour is unchanged.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -148,7 +148,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:60
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -172,7 +172,7 @@ Defined in: packages/store-sqlite/src/trigger-store.ts:24
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 

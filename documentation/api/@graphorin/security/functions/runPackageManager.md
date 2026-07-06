@@ -29,6 +29,6 @@ stderr; a non-zero exit code is reported to the caller via the
 
 ## Returns
 
-`Promise`\<[`PackageManagerResult`](/api/@graphorin/security/interfaces/PackageManagerResult.md)\>
+`Promise`\&lt;[`PackageManagerResult`](/api/@graphorin/security/interfaces/PackageManagerResult.md)\&gt;
 
 ## Stable

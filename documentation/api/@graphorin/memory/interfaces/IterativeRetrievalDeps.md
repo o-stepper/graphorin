@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/memory](/api/@graphorin/memory/index.md) / [](/api/@graphorin/memory/README.md) / IterativeRetrievalDeps
 
-# Interface: IterativeRetrievalDeps\<H\>
+# Interface: IterativeRetrievalDeps\&lt;H\&gt;
 
 Defined in: packages/memory/src/search/iterative.ts:374
 
@@ -100,7 +100,7 @@ P2-1 one-hop graph expansion).
 
 #### Returns
 
-`Promise`\<readonly `H`[]\>
+`Promise`\&lt;readonly `H`[]\&gt;
 
 ***
 

@@ -27,7 +27,7 @@ for those; the audit log uses SHA-256).
 
 | Parameter | Type |
 | ------ | ------ |
-| `content` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> |
+| `content` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; |
 
 ## Returns
 

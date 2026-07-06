@@ -23,6 +23,6 @@ messages.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`ConversationSearchInput`, `ConversationSearchOutput`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ConversationSearchInput`, `ConversationSearchOutput`\&gt;
 
 ## Stable

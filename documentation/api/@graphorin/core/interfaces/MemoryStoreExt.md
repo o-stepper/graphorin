@@ -45,7 +45,7 @@ Cleanly close any underlying handles. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -65,7 +65,7 @@ Initialize / migrate the underlying storage. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -98,4 +98,4 @@ storage-cost hygiene lever - nothing prunes automatically.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;

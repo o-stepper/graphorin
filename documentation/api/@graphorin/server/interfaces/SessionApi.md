@@ -37,7 +37,7 @@ Defined in: packages/server/src/routes/sessions.ts:38
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: packages/server/src/routes/sessions.ts:51
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 
@@ -80,7 +80,7 @@ Defined in: packages/server/src/routes/sessions.ts:37
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 
@@ -102,7 +102,7 @@ Defined in: packages/server/src/routes/sessions.ts:33
 
 #### Returns
 
-`Promise`\<readonly `unknown`[]\>
+`Promise`\&lt;readonly `unknown`[]\&gt;
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: packages/server/src/routes/sessions.ts:50
 
 #### Returns
 
-`Promise`\<readonly `unknown`[]\>
+`Promise`\&lt;readonly `unknown`[]\&gt;
 
 ***
 
@@ -144,7 +144,7 @@ Defined in: packages/server/src/routes/sessions.ts:46
 
 #### Returns
 
-`Promise`\<readonly `unknown`[]\>
+`Promise`\&lt;readonly `unknown`[]\&gt;
 
 ***
 
@@ -164,7 +164,7 @@ Defined in: packages/server/src/routes/sessions.ts:45
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;
 
 ***
 
@@ -187,4 +187,4 @@ Defined in: packages/server/src/routes/sessions.ts:58
 
 #### Returns
 
-`AsyncIterable`\<`unknown`\>
+`AsyncIterable`\&lt;`unknown`\&gt;

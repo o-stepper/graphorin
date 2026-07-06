@@ -30,7 +30,7 @@ Defined in: packages/server/src/routes/memory.ts:63
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: packages/server/src/routes/memory.ts:61
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;
 
 ***
 
@@ -70,8 +70,8 @@ Defined in: packages/server/src/routes/memory.ts:60
 
 | Parameter | Type |
 | ------ | ------ |
-| `input` | \{ `metadata?`: `Record`\<`string`, `unknown`\>; `scope`: \{ `agentId?`: `string`; `sessionId?`: `string`; `userId`: `string`; \}; `sensitivity?`: `"public"` \| `"internal"` \| `"secret"`; `text`: `string`; \} |
-| `input.metadata?` | `Record`\<`string`, `unknown`\> |
+| `input` | \{ `metadata?`: `Record`\&lt;`string`, `unknown`\&gt;; `scope`: \{ `agentId?`: `string`; `sessionId?`: `string`; `userId`: `string`; \}; `sensitivity?`: `"public"` \| `"internal"` \| `"secret"`; `text`: `string`; \} |
+| `input.metadata?` | `Record`\&lt;`string`, `unknown`\&gt; |
 | `input.scope` | \{ `agentId?`: `string`; `sessionId?`: `string`; `userId`: `string`; \} |
 | `input.scope.agentId?` | `string` |
 | `input.scope.sessionId?` | `string` |
@@ -109,7 +109,7 @@ Defined in: packages/server/src/routes/memory.ts:59
 
 #### Returns
 
-`Promise`\<readonly `unknown`[]\>
+`Promise`\&lt;readonly `unknown`[]\&gt;
 
 ***
 

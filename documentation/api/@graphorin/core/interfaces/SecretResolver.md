@@ -40,4 +40,4 @@ Defined in: packages/core/src/contracts/secrets-store.ts:16
 
 #### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\&gt;

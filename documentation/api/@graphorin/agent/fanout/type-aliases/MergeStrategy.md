@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [fanout](/api/@graphorin/agent/fanout/index.md) / MergeStrategy
 
-# Type Alias: MergeStrategy\<TOutput\>
+# Type Alias: MergeStrategy\&lt;TOutput\&gt;
 
 ```ts
 type MergeStrategy<TOutput> = 

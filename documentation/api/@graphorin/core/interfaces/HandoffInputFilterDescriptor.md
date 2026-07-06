@@ -29,4 +29,4 @@ assume an exhaustive switch.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-kind"></a> `kind` | `readonly` | `string` | packages/core/src/types/handoff.ts:55 |
-| <a id="property-meta"></a> `meta?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/core/src/types/handoff.ts:56 |
+| <a id="property-meta"></a> `meta?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/types/handoff.ts:56 |

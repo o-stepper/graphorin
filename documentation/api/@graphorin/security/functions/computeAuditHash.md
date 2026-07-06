@@ -19,7 +19,7 @@ for tooling that wants to recompute hashes outside the verifier.
 
 | Parameter | Type |
 | ------ | ------ |
-| `entry` | `Omit`\<[`StoredAuditEntry`](/api/@graphorin/security/interfaces/StoredAuditEntry.md), `"hash"`\> |
+| `entry` | `Omit`\&lt;[`StoredAuditEntry`](/api/@graphorin/security/interfaces/StoredAuditEntry.md), `"hash"`\&gt; |
 
 ## Returns
 

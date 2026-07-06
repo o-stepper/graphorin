@@ -27,7 +27,7 @@
   ordering precision at the cost of model variance).
 - **Default scoring prompt:** English; locale-agnostic by design.
   Operators targeting non-English deployments pass `scoringPrompt:
-  <localised builder>`.
+  &lt;localised builder&gt;`.
 
 ---
 

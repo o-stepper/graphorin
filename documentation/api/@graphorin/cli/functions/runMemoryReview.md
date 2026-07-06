@@ -26,6 +26,6 @@ unless `--force` is supplied after review (MCON-2).
 
 ## Returns
 
-`Promise`\<[`MemoryReviewResult`](/api/@graphorin/cli/interfaces/MemoryReviewResult.md)\>
+`Promise`\&lt;[`MemoryReviewResult`](/api/@graphorin/cli/interfaces/MemoryReviewResult.md)\&gt;
 
 ## Stable

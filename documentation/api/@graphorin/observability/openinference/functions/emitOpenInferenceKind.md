@@ -27,7 +27,7 @@ no PII.
 
 | Parameter | Type |
 | ------ | ------ |
-| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<`T`\> |
+| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;`T`\&gt; |
 
 ## Returns
 

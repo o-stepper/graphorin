@@ -29,7 +29,7 @@ Strategy hook used by tests so the unit suite never hits the network.
 ## Returns
 
 `Promise`\<\{
-  `json`: () => `Promise`\<`unknown`\>;
+  `json`: () => `Promise`\&lt;`unknown`\&gt;;
   `ok`: `boolean`;
   `status`: `number`;
 \}\>

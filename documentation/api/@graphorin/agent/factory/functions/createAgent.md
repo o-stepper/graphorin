@@ -25,10 +25,10 @@ Build a fresh [Agent](/api/@graphorin/agent/interfaces/Agent.md) from the suppli
 
 | Parameter | Type |
 | ------ | ------ |
-| `config` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\<`TDeps`, `TOutput`\> |
+| `config` | [`AgentConfig`](/api/@graphorin/agent/interfaces/AgentConfig.md)\&lt;`TDeps`, `TOutput`\&gt; |
 
 ## Returns
 
-[`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\<`TDeps`, `TOutput`\>
+[`Agent`](/api/@graphorin/agent/interfaces/Agent.md)\&lt;`TDeps`, `TOutput`\&gt;
 
 ## Stable

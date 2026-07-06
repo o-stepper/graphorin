@@ -31,7 +31,7 @@ Strategy hook used by tests to stub the device-authorization request.
 ## Returns
 
 `Promise`\<\{
-  `json`: () => `Promise`\<`unknown`\>;
+  `json`: () => `Promise`\&lt;`unknown`\&gt;;
   `ok`: `boolean`;
   `status`: `number`;
   `statusText?`: `string`;

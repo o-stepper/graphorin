@@ -27,4 +27,4 @@ Handler for server-initiated elicitation requests.
 ## Returns
 
   \| [`MCPElicitationResult`](/api/@graphorin/mcp/type-aliases/MCPElicitationResult.md)
-  \| `Promise`\<[`MCPElicitationResult`](/api/@graphorin/mcp/type-aliases/MCPElicitationResult.md)\>
+  \| `Promise`\&lt;[`MCPElicitationResult`](/api/@graphorin/mcp/type-aliases/MCPElicitationResult.md)\&gt;

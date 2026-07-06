@@ -25,13 +25,13 @@ surface the spec-defined `error` / `error_description` fields.
 | Parameter | Type |
 | ------ | ------ |
 | `endpoint` | `string` |
-| `params` | `Readonly`\<`Record`\<`string`, `string`\>\> |
+| `params` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> |
 | `options` | \{ `basicAuth?`: `string`; `signal?`: `AbortSignal`; \} |
 | `options.basicAuth?` | `string` |
 | `options.signal?` | `AbortSignal` |
 
 ## Returns
 
-`Promise`\<[`TokenEndpointResponse`](/api/@graphorin/security/interfaces/TokenEndpointResponse.md)\>
+`Promise`\&lt;[`TokenEndpointResponse`](/api/@graphorin/security/interfaces/TokenEndpointResponse.md)\&gt;
 
 ## Stable

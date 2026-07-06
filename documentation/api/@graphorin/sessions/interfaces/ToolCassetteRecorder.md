@@ -28,7 +28,7 @@ Close the cassette + return the footer. Idempotent.
 
 #### Returns
 
-`Promise`\<[`ToolCassetteFooterRecord`](/api/@graphorin/sessions/interfaces/ToolCassetteFooterRecord.md)\>
+`Promise`\&lt;[`ToolCassetteFooterRecord`](/api/@graphorin/sessions/interfaces/ToolCassetteFooterRecord.md)\&gt;
 
 ***
 
@@ -71,11 +71,11 @@ Record an `audit` chain segment.
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\<[`CassetteAuditRecord`](/api/@graphorin/sessions/interfaces/CassetteAuditRecord.md), `"kind"`\> |
+| `record` | `Omit`\&lt;[`CassetteAuditRecord`](/api/@graphorin/sessions/interfaces/CassetteAuditRecord.md), `"kind"`\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -93,11 +93,11 @@ Record a `compaction` event.
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\<[`CompactionRecord`](/api/@graphorin/sessions/interfaces/CompactionRecord.md), `"kind"`\> |
+| `record` | `Omit`\&lt;[`CompactionRecord`](/api/@graphorin/sessions/interfaces/CompactionRecord.md), `"kind"`\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -115,11 +115,11 @@ Record a `model-fallback` chain advance.
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\<[`ModelFallbackRecord`](/api/@graphorin/sessions/interfaces/ModelFallbackRecord.md), `"kind"`\> |
+| `record` | `Omit`\&lt;[`ModelFallbackRecord`](/api/@graphorin/sessions/interfaces/ModelFallbackRecord.md), `"kind"`\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -137,11 +137,11 @@ Record a `progress-artifact-ref` spilled-artifact event.
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\<[`ProgressArtifactRefRecord`](/api/@graphorin/sessions/interfaces/ProgressArtifactRefRecord.md), `"kind"`\> |
+| `record` | `Omit`\&lt;[`ProgressArtifactRefRecord`](/api/@graphorin/sessions/interfaces/ProgressArtifactRefRecord.md), `"kind"`\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -159,11 +159,11 @@ Record a `tool-call` event. Computes hashes lazily.
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\<[`ToolCallRecord`](/api/@graphorin/sessions/interfaces/ToolCallRecord.md), `"kind"` \| `"sha256OfArgs"` \| `"sha256OfOutput"`\> |
+| `record` | `Omit`\&lt;[`ToolCallRecord`](/api/@graphorin/sessions/interfaces/ToolCallRecord.md), `"kind"` \| `"sha256OfArgs"` \| `"sha256OfOutput"`\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -181,11 +181,11 @@ Record a `tool-search-resolved` lazy-load event.
 
 | Parameter | Type |
 | ------ | ------ |
-| `record` | `Omit`\<[`ToolSearchResolvedRecord`](/api/@graphorin/sessions/interfaces/ToolSearchResolvedRecord.md), `"kind"`\> |
+| `record` | `Omit`\&lt;[`ToolSearchResolvedRecord`](/api/@graphorin/sessions/interfaces/ToolSearchResolvedRecord.md), `"kind"`\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 

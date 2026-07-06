@@ -27,6 +27,6 @@ Defined in: evals/src/scorers/prebuilt/index.ts:24
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, `O`\>
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
 
 ## Stable

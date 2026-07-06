@@ -17,7 +17,7 @@ by convention; raw scores can be carried in `details`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-details"></a> `details?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/core/src/contracts/eval-scorer.ts:43 |
+| <a id="property-details"></a> `details?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/core/src/contracts/eval-scorer.ts:43 |
 | <a id="property-pass"></a> `pass?` | `readonly` | `boolean` | packages/core/src/contracts/eval-scorer.ts:41 |
 | <a id="property-rationale"></a> `rationale?` | `readonly` | `string` | packages/core/src/contracts/eval-scorer.ts:42 |
 | <a id="property-value"></a> `value` | `readonly` | `number` | packages/core/src/contracts/eval-scorer.ts:40 |

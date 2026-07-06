@@ -22,6 +22,6 @@ Build a `read_result` tool bound to a specific [ResultReader](/api/@graphorin/to
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`ReadResultInput`, `ReadResultOutput`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`ReadResultInput`, `ReadResultOutput`\&gt;
 
 ## Stable

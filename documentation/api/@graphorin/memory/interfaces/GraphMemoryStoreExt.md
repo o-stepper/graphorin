@@ -82,7 +82,7 @@ Expand seed facts to neighbours sharing a canonical entity (one-hop CTE).
 
 #### Returns
 
-`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
+`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
 
 ***
 
@@ -99,7 +99,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:881
 
 Exact entity-match retriever (D5): facts linked to the canonical
 entity for `normalizedName`. Optional. Powers a precise
-"facts about <entity>" candidate leg.
+"facts about &lt;entity&gt;" candidate leg.
 
 #### Parameters
 
@@ -111,7 +111,7 @@ entity for `normalizedName`. Optional. Powers a precise
 
 #### Returns
 
-`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
+`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
 
 ***
 
@@ -138,7 +138,7 @@ it fall back to the capped lexical scan inside `resolveEntityDecision`.
 
 #### Returns
 
-`Promise`\<`EntityWithEmbedding` \| `null`\>
+`Promise`\&lt;`EntityWithEmbedding` \| `null`\&gt;
 
 ***
 
@@ -161,7 +161,7 @@ Lookup one entity by id (any merge state).
 
 #### Returns
 
-`Promise`\<[`GraphEntity`](/api/@graphorin/core/interfaces/GraphEntity.md) \| `null`\>
+`Promise`\&lt;[`GraphEntity`](/api/@graphorin/core/interfaces/GraphEntity.md) \| `null`\&gt;
 
 ***
 
@@ -188,7 +188,7 @@ Link a fact's subject / object to a canonical entity (idempotent).
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -213,7 +213,7 @@ Candidate entities for the resolver (roots only unless `includeMerged`).
 
 #### Returns
 
-`Promise`\<readonly `EntityWithEmbedding`[]\>
+`Promise`\&lt;readonly `EntityWithEmbedding`[]\&gt;
 
 ***
 
@@ -237,7 +237,7 @@ The append-only merge / unmerge ledger, newest first.
 
 #### Returns
 
-`Promise`\<readonly `EntityMergeRecord`[]\>
+`Promise`\&lt;readonly `EntityMergeRecord`[]\&gt;
 
 ***
 
@@ -266,7 +266,7 @@ Merge `fromId` into `intoId`'s root; auditable + reversible.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -289,7 +289,7 @@ Follow `mergedInto` to the canonical root id.
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 ***
 
@@ -316,7 +316,7 @@ Reverse a merge: make `id` a root again + record an audit row.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -339,4 +339,4 @@ Find-or-create the canonical (root) entity for the normalized name.
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;

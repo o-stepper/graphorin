@@ -49,7 +49,7 @@ clock during tests.
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;
 
 ***
 
@@ -78,7 +78,7 @@ oldest backlog drains first.
 
 #### Returns
 
-`Promise`\<readonly [`DlqBatchRow`](/api/@graphorin/memory/interfaces/DlqBatchRow.md)[]\>
+`Promise`\&lt;readonly [`DlqBatchRow`](/api/@graphorin/memory/interfaces/DlqBatchRow.md)[]\&gt;
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:534
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -143,7 +143,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:563
 
 #### Returns
 
-`Promise`\<readonly [`DlqBatchRow`](/api/@graphorin/memory/interfaces/DlqBatchRow.md)[]\>
+`Promise`\&lt;readonly [`DlqBatchRow`](/api/@graphorin/memory/interfaces/DlqBatchRow.md)[]\&gt;
 
 ***
 
@@ -217,7 +217,7 @@ exhaustion.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -239,7 +239,7 @@ Mark the row succeeded - removes it from the DLQ.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -259,7 +259,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:516
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -279,7 +279,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:515
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -300,7 +300,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:513
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -329,7 +329,7 @@ consolidator.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -350,4 +350,4 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:504
 
 #### Returns
 
-`Promise`\<[`ConsolidatorStateRow`](/api/@graphorin/memory/interfaces/ConsolidatorStateRow.md)\>
+`Promise`\&lt;[`ConsolidatorStateRow`](/api/@graphorin/memory/interfaces/ConsolidatorStateRow.md)\&gt;

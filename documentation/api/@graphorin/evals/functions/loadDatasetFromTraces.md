@@ -24,10 +24,10 @@ Defined in: evals/src/loaders/from-traces.ts:34
 | Parameter | Type |
 | ------ | ------ |
 | `path` | `string` |
-| `options` | [`FromTracesOptions`](/api/@graphorin/evals/interfaces/FromTracesOptions.md)\<`I`, `O`\> |
+| `options` | [`FromTracesOptions`](/api/@graphorin/evals/interfaces/FromTracesOptions.md)\&lt;`I`, `O`\&gt; |
 
 ## Returns
 
-`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`I`, `O`, `Readonly`\<`Record`\<`string`, `unknown`\>\>\>\>
+`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`I`, `O`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>\>
 
 ## Stable

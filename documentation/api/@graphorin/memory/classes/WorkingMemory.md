@@ -73,7 +73,7 @@ Append `content` to a block (with a newline separator).
 
 #### Returns
 
-`Promise`\<[`Block`](/api/@graphorin/core/interfaces/Block.md)\>
+`Promise`\&lt;[`Block`](/api/@graphorin/core/interfaces/Block.md)\&gt;
 
 ***
 
@@ -102,7 +102,7 @@ can share the same block without duplicating storage.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -132,7 +132,7 @@ accepted but ignored - the rendering is scope-wide.
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 ***
 
@@ -222,7 +222,7 @@ Detach a working block from an agent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -249,7 +249,7 @@ Soft-delete a block.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -271,7 +271,7 @@ List active (non-deleted) blocks for the supplied scope.
 
 #### Returns
 
-`Promise`\<readonly [`Block`](/api/@graphorin/core/interfaces/Block.md)[]\>
+`Promise`\&lt;readonly [`Block`](/api/@graphorin/core/interfaces/Block.md)[]\&gt;
 
 ***
 
@@ -294,7 +294,7 @@ Read a single block's value (or `null` when absent).
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`\&lt;`string` \| `null`\&gt;
 
 ***
 
@@ -325,7 +325,7 @@ the substring is missing or appears more than once.
 
 #### Returns
 
-`Promise`\<[`Block`](/api/@graphorin/core/interfaces/Block.md)\>
+`Promise`\&lt;[`Block`](/api/@graphorin/core/interfaces/Block.md)\&gt;
 
 ***
 
@@ -348,11 +348,11 @@ Run `mutator(current) => next` and persist the result.
 | ------ | ------ |
 | `scope` | [`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md) |
 | `label` | `string` |
-| `mutator` | (`current`) => `string` \| `Promise`\<`string`\> |
+| `mutator` | (`current`) => `string` \| `Promise`\&lt;`string`\&gt; |
 
 #### Returns
 
-`Promise`\<[`Block`](/api/@graphorin/core/interfaces/Block.md)\>
+`Promise`\&lt;[`Block`](/api/@graphorin/core/interfaces/Block.md)\&gt;
 
 ***
 
@@ -379,4 +379,4 @@ Replace a block's value entirely. Honours overflow policy.
 
 #### Returns
 
-`Promise`\<[`Block`](/api/@graphorin/core/interfaces/Block.md)\>
+`Promise`\&lt;[`Block`](/api/@graphorin/core/interfaces/Block.md)\&gt;

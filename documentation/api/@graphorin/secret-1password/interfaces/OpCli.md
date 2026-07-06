@@ -34,4 +34,4 @@ exceeds the timeout.
 
 #### Returns
 
-`Promise`\<[`OpCliReadResult`](/api/@graphorin/secret-1password/interfaces/OpCliReadResult.md)\>
+`Promise`\&lt;[`OpCliReadResult`](/api/@graphorin/secret-1password/interfaces/OpCliReadResult.md)\&gt;

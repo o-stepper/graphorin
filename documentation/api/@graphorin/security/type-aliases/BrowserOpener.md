@@ -26,4 +26,4 @@ browser.
 
 ## Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

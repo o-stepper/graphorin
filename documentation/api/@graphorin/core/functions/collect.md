@@ -24,11 +24,11 @@ Drain an `AsyncIterable` into an array.
 
 | Parameter | Type |
 | ------ | ------ |
-| `source` | `AsyncIterable`\<`T`\> |
+| `source` | `AsyncIterable`\&lt;`T`\&gt; |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`Promise`\<`T`[]\>
+`Promise`\&lt;`T`[]\&gt;
 
 ## Stable

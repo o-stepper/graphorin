@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/memory](/api/@graphorin/memory/index.md) / [](/api/@graphorin/memory/README.md) / IterativeRetrievalResult
 
-# Interface: IterativeRetrievalResult\<H\>
+# Interface: IterativeRetrievalResult\&lt;H\&gt;
 
 Defined in: packages/memory/src/search/iterative.ts:342
 

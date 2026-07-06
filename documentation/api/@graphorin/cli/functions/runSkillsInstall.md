@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/skills.ts:67
 
 ## Returns
 
-`Promise`\<[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\>
+`Promise`\&lt;[`SkillInstallationStatus`](/api/@graphorin/security/interfaces/SkillInstallationStatus.md)\&gt;
 
 ## Stable

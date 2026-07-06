@@ -26,6 +26,6 @@ Apply the per-strategy truncation pipeline.
 
 ## Returns
 
-`Promise`\<[`TruncationOutcome`](/api/@graphorin/tools/interfaces/TruncationOutcome.md)\>
+`Promise`\&lt;[`TruncationOutcome`](/api/@graphorin/tools/interfaces/TruncationOutcome.md)\&gt;
 
 ## Stable

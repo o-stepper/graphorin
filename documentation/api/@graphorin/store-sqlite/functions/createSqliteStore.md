@@ -23,6 +23,6 @@ every contract implementation; call `init()` once before first use.
 
 ## Returns
 
-`Promise`\<[`GraphorinSqliteStore`](/api/@graphorin/store-sqlite/interfaces/GraphorinSqliteStore.md)\>
+`Promise`\&lt;[`GraphorinSqliteStore`](/api/@graphorin/store-sqlite/interfaces/GraphorinSqliteStore.md)\&gt;
 
 ## Stable

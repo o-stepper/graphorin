@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [evaluator-optimizer](/api/@graphorin/agent/evaluator-optimizer/index.md) / EvaluatorOptimizerOutcome
 
-# Interface: EvaluatorOptimizerOutcome\<TOutput\>
+# Interface: EvaluatorOptimizerOutcome\&lt;TOutput\&gt;
 
 Defined in: packages/agent/src/evaluator-optimizer/index.ts:91
 

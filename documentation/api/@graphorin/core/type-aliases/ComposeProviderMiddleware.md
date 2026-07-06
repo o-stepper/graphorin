@@ -24,7 +24,7 @@ is the only blessed entry point for chaining middleware in
 
 | Parameter | Type |
 | ------ | ------ |
-| `middlewares` | `ReadonlyArray`\<[`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)\> |
+| `middlewares` | `ReadonlyArray`\&lt;[`ProviderMiddleware`](/api/@graphorin/core/type-aliases/ProviderMiddleware.md)\&gt; |
 
 ## Returns
 

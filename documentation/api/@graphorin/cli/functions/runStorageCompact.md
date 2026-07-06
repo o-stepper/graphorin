@@ -34,6 +34,6 @@ freed pages do not linger in the -wal file.
 
 ## Returns
 
-`Promise`\<[`StorageCompactResult`](/api/@graphorin/cli/interfaces/StorageCompactResult.md)\>
+`Promise`\&lt;[`StorageCompactResult`](/api/@graphorin/cli/interfaces/StorageCompactResult.md)\&gt;
 
 ## Stable

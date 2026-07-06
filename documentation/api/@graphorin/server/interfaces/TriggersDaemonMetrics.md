@@ -19,5 +19,5 @@ publishes lifecycle events.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-catchupapplied"></a> `catchupApplied` | `readonly` | `number` | packages/server/src/triggers/daemon.ts:44 |
-| <a id="property-fires"></a> `fires` | `readonly` | `ReadonlyMap`\<`string`, \{ `error`: `number`; `success`: `number`; \}\> | packages/server/src/triggers/daemon.ts:43 |
+| <a id="property-fires"></a> `fires` | `readonly` | `ReadonlyMap`\&lt;`string`, \{ `error`: `number`; `success`: `number`; \}\&gt; | packages/server/src/triggers/daemon.ts:43 |
 | <a id="property-libmodewarnings"></a> `libModeWarnings` | `readonly` | `number` | packages/server/src/triggers/daemon.ts:45 |

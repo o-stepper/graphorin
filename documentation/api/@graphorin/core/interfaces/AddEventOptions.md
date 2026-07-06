@@ -19,4 +19,4 @@ ALL of them - including `exception.type` from `recordException`.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Default tier applied to every attribute of this event. | packages/core/src/contracts/tracer.ts:119 |
-| <a id="property-sensitivitybyattribute"></a> `sensitivityByAttribute?` | `readonly` | `Readonly`\<`Record`\<`string`, [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)\>\> | Per-attribute overrides; win over [AddEventOptions.sensitivity](/api/@graphorin/core/interfaces/AddEventOptions.md#property-sensitivity). | packages/core/src/contracts/tracer.ts:121 |
+| <a id="property-sensitivitybyattribute"></a> `sensitivityByAttribute?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)\&gt;\> | Per-attribute overrides; win over [AddEventOptions.sensitivity](/api/@graphorin/core/interfaces/AddEventOptions.md#property-sensitivity). | packages/core/src/contracts/tracer.ts:121 |

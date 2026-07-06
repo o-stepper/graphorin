@@ -25,6 +25,6 @@ are returned in the cipher peer's hex form (`x'<hex>'`).
 
 ## Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 ## Stable

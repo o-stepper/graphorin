@@ -25,6 +25,6 @@ pointer when the operator did not supply the embedder factory module
 
 ## Returns
 
-`Promise`\<`never`\>
+`Promise`\&lt;`never`\&gt;
 
 ## Stable

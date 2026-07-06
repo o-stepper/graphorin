@@ -34,6 +34,6 @@ Ensure a file is at the supplied POSIX mode. The function:
 
 ## Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ## Stable

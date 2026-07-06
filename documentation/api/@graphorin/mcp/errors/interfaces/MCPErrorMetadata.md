@@ -8,7 +8,7 @@
 
 Defined in: packages/mcp/src/errors/index.ts:35
 
-Common metadata bag attached to every MCPError.
+Common metadata bag attached to every [GraphorinMCPError](/api/@graphorin/mcp/errors/classes/GraphorinMCPError.md).
 
 ## Properties
 

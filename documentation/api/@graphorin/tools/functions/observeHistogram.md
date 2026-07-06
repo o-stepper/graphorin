@@ -25,7 +25,7 @@ application is responsible for periodic histogram aggregation.
 | ------ | ------ |
 | `name` | `string` |
 | `value` | `number` |
-| `labels?` | `Readonly`\<`Record`\<`string`, `string` \| `number` \| `boolean`\>\> |
+| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> |
 
 ## Returns
 

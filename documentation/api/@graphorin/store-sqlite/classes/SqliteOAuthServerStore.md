@@ -59,7 +59,7 @@ Remove the record for `id`.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -109,7 +109,7 @@ Snapshot of all stored records, ordered by `id`.
 
 #### Returns
 
-`Promise`\<readonly [`OAuthServerRecord`](/api/@graphorin/core/interfaces/OAuthServerRecord.md)[]\>
+`Promise`\&lt;readonly [`OAuthServerRecord`](/api/@graphorin/core/interfaces/OAuthServerRecord.md)[]\&gt;
 
 #### Implementation of
 
@@ -135,7 +135,7 @@ Insert or replace the record for `id`.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -158,11 +158,11 @@ Apply a partial update to the record at `id`.
 | Parameter | Type |
 | ------ | ------ |
 | `id` | `string` |
-| `patch` | `Partial`\<[`OAuthServerRecord`](/api/@graphorin/core/interfaces/OAuthServerRecord.md)\> |
+| `patch` | `Partial`\&lt;[`OAuthServerRecord`](/api/@graphorin/core/interfaces/OAuthServerRecord.md)\&gt; |
 
 #### Returns
 
-`Promise`\<[`OAuthServerRecord`](/api/@graphorin/core/interfaces/OAuthServerRecord.md)\>
+`Promise`\&lt;[`OAuthServerRecord`](/api/@graphorin/core/interfaces/OAuthServerRecord.md)\&gt;
 
 #### Implementation of
 

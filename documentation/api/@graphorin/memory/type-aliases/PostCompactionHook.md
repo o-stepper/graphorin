@@ -24,6 +24,6 @@ trimmed message buffer (re-injected Context Essentials).
 
 ## Returns
 
-`Promise`\<`ReadonlyArray`\<[`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)\>\>
+`Promise`\<`ReadonlyArray`\&lt;[`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)\&gt;\>
 
 ## Stable

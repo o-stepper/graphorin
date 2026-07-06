@@ -23,6 +23,6 @@ signatures as text (eager substring match + the deferred pool).
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`CodeSearchInput`, `string`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`CodeSearchInput`, `string`\&gt;
 
 ## Stable

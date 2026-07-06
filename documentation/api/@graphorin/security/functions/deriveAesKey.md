@@ -18,11 +18,11 @@ Derive a 32-byte AES-256-GCM key from a passphrase + salt.
 
 | Parameter | Type |
 | ------ | ------ |
-| `passphrase` | `string` \| `Buffer`\<`ArrayBufferLike`\> |
+| `passphrase` | `string` \| `Buffer`\&lt;`ArrayBufferLike`\&gt; |
 | `salt` | `Buffer` |
 
 ## Returns
 
-`Promise`\<`Buffer`\<`ArrayBufferLike`\>\>
+`Promise`\<`Buffer`\&lt;`ArrayBufferLike`\&gt;\>
 
 ## Stable

@@ -9,7 +9,7 @@
 Defined in: packages/agent/src/errors/index.ts:227
 
 Thrown by `runStateFromJSON(...)` when the supplied JSON does not
-shape-match the documented SerializedRunState.
+shape-match the documented `SerializedRunState`.
 
 ## Stable
 

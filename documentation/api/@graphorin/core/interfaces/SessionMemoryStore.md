@@ -33,7 +33,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:111
 
 #### Returns
 
-`Promise`\<readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\>
+`Promise`\&lt;readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\&gt;
 
 ***
 
@@ -57,7 +57,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 
 #### Returns
 
-`Promise`\<readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\>
+`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\&gt;
 
 ***
 
@@ -78,7 +78,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:110
 
 #### Returns
 
-`Promise`\<[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\>
+`Promise`\&lt;[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\&gt;
 
 ***
 
@@ -113,4 +113,4 @@ major, not a change this line can make compatibly.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>

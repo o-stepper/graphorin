@@ -43,7 +43,7 @@ Soft-archive a fact (sets `archived = 1`). The audit row in
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -170,4 +170,4 @@ bookkeeping write).
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

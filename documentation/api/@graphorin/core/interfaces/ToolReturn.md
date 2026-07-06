@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ToolReturn
 
-# Interface: ToolReturn\<TOutput\>
+# Interface: ToolReturn\&lt;TOutput\&gt;
 
 Defined in: packages/core/src/contracts/tool.ts:242
 

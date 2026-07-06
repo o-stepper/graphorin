@@ -40,7 +40,7 @@ instead, which is namespace-scoped and protects suspended threads.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:176
 
 #### Returns
 
-`AsyncIterable`\<[`CheckpointTuple`](/api/@graphorin/core/interfaces/CheckpointTuple.md)\>
+`AsyncIterable`\&lt;[`CheckpointTuple`](/api/@graphorin/core/interfaces/CheckpointTuple.md)\&gt;
 
 ***
 
@@ -160,7 +160,7 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:154
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 ***
 
@@ -189,4 +189,4 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:162
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

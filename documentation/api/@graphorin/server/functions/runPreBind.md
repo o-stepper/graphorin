@@ -20,6 +20,6 @@ Defined in: packages/server/src/lifecycle/pre-bind.ts:74
 
 ## Returns
 
-`Promise`\<[`PreBindResult`](/api/@graphorin/server/interfaces/PreBindResult.md)\>
+`Promise`\&lt;[`PreBindResult`](/api/@graphorin/server/interfaces/PreBindResult.md)\&gt;
 
 ## Stable

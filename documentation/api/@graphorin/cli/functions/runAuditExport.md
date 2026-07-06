@@ -22,6 +22,6 @@ Defined in: packages/cli/src/commands/audit.ts:171
 
 ## Returns
 
-`Promise`\<[`AuditExportResult`](/api/@graphorin/cli/interfaces/AuditExportResult.md)\>
+`Promise`\&lt;[`AuditExportResult`](/api/@graphorin/cli/interfaces/AuditExportResult.md)\&gt;
 
 ## Stable

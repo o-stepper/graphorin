@@ -33,7 +33,7 @@ Force a refresh, regardless of expiry.
 
 #### Returns
 
-`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
+`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
 
 ***
 
@@ -49,4 +49,4 @@ Resolve an `Authorization: Bearer ...` header.
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;

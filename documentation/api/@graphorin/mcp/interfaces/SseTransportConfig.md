@@ -14,7 +14,7 @@ Options for the deprecated `'sse'` transport.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-fetch"></a> `fetch?` | `readonly` | (`input`, `init?`) => `Promise`\<`Response`\> | packages/mcp/src/transport/types.ts:65 |
-| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\<`string`, `string`\>\> | packages/mcp/src/transport/types.ts:64 |
+| <a id="property-fetch"></a> `fetch?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | packages/mcp/src/transport/types.ts:65 |
+| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | packages/mcp/src/transport/types.ts:64 |
 | <a id="property-kind"></a> `kind` | `readonly` | `"sse"` | packages/mcp/src/transport/types.ts:62 |
 | <a id="property-url"></a> `url` | `readonly` | `string` \| `URL` | packages/mcp/src/transport/types.ts:63 |

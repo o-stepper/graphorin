@@ -78,7 +78,7 @@ Defined in: packages/core/src/contracts/auth-token-store.ts:33
 
 #### Returns
 
-`Promise`\<readonly [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md)[]\>
+`Promise`\&lt;readonly [`AuthTokenRecord`](/api/@graphorin/core/interfaces/AuthTokenRecord.md)[]\&gt;
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: packages/core/src/contracts/auth-token-store.ts:31
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -119,7 +119,7 @@ Defined in: packages/core/src/contracts/auth-token-store.ts:35
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -140,4 +140,4 @@ Defined in: packages/core/src/contracts/auth-token-store.ts:34
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

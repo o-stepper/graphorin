@@ -9,7 +9,7 @@
 Defined in: packages/sessions/src/cassette/types.ts:81
 
 Per-`Tool.execute(...)` invocation. The canonical record kind that
-the ToolCassetteReplayPolicy consumes during replay.
+the `ToolCassetteReplayPolicy` consumes during replay.
 
 ## Stable
 

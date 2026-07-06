@@ -66,7 +66,7 @@ Cleanly close any underlying handles. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -102,7 +102,7 @@ Initialize / migrate the underlying storage. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -132,7 +132,7 @@ their own maintenance schedule; nothing prunes automatically.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Stable
 

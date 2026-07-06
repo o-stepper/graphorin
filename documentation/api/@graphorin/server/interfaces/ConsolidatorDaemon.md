@@ -28,7 +28,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:77
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:79
 
 #### Returns
 
-`Promise`\<[`ConsolidatorStatusLike`](/api/@graphorin/server/interfaces/ConsolidatorStatusLike.md)\>
+`Promise`\&lt;[`ConsolidatorStatusLike`](/api/@graphorin/server/interfaces/ConsolidatorStatusLike.md)\&gt;
 
 ***
 
@@ -56,4 +56,4 @@ Defined in: packages/server/src/consolidator/daemon.ts:78
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

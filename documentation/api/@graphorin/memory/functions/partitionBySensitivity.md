@@ -29,6 +29,6 @@ Partition a record list against the supplied filter context.
 
 ## Returns
 
-[`PartitionResult`](/api/@graphorin/memory/interfaces/PartitionResult.md)\<`TRecord`\>
+[`PartitionResult`](/api/@graphorin/memory/interfaces/PartitionResult.md)\&lt;`TRecord`\&gt;
 
 ## Stable

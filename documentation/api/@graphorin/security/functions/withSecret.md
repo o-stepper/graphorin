@@ -30,12 +30,12 @@ to wrap manually. Records a single audit event per scope.
 | Parameter | Type |
 | ------ | ------ |
 | `value` | \| `string` \| [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) |
-| `fn` | (`raw`) => `T` \| `Promise`\<`T`\> |
+| `fn` | (`raw`) => `T` \| `Promise`\&lt;`T`\&gt; |
 | `opts` | \{ `caller?`: `string`; \} |
 | `opts.caller?` | `string` |
 
 ## Returns
 
-`Promise`\<`T`\>
+`Promise`\&lt;`T`\&gt;
 
 ## Stable

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/security](/api/@graphorin/security/index.md) / [](/api/@graphorin/security/README.md) / NoneSandboxHandler
 
-# Type Alias: NoneSandboxHandler\<TInput, TOutput\>
+# Type Alias: NoneSandboxHandler\&lt;TInput, TOutput\&gt;
 
 ```ts
 type NoneSandboxHandler<TInput, TOutput> = (input, signal) => Promise<TOutput> | TOutput;
@@ -32,6 +32,6 @@ handlers at startup.
 
 ## Returns
 
-`Promise`\<`TOutput`\> \| `TOutput`
+`Promise`\&lt;`TOutput`\&gt; \| `TOutput`
 
 ## Stable

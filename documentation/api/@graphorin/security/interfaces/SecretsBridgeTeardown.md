@@ -40,4 +40,4 @@ closing the audit database.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | packages/security/src/audit/secrets-bridge.ts:47 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/secrets-bridge.ts:47 |

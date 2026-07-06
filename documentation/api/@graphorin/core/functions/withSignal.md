@@ -25,11 +25,11 @@ underlying iterator's `return()` is called and the loop exits cleanly.
 
 | Parameter | Type |
 | ------ | ------ |
-| `source` | `AsyncIterable`\<`T`\> |
+| `source` | `AsyncIterable`\&lt;`T`\&gt; |
 | `signal?` | `AbortSignal` |
 
 ## Returns
 
-`AsyncIterable`\<`T`\>
+`AsyncIterable`\&lt;`T`\&gt;
 
 ## Stable

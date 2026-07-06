@@ -18,7 +18,7 @@ Defined in: packages/cli/src/commands/pricing.ts:74
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\<`Response`\> | Test seam - inject a fetch implementation. | - | packages/cli/src/commands/pricing.ts:87 |
+| <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | Test seam - inject a fetch implementation. | - | packages/cli/src/commands/pricing.ts:87 |
 | <a id="property-format"></a> `format?` | `readonly` | `"graphorin"` \| `"auto"` \| `"genai-prices"` | W-097: accepted body format - `auto` (default) tries the native shape then auto-detects the `@pydantic/genai-prices` dataset. | - | packages/cli/src/commands/pricing.ts:85 |
 | <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-json) | packages/cli/src/internal/output.ts:71 |
 | <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |

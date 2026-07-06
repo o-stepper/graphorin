@@ -18,7 +18,7 @@ MCP spec subset we consume.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-description"></a> `description` | `readonly` | `string` | packages/mcp/src/client/types.ts:272 |
-| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/mcp/src/client/types.ts:273 |
+| <a id="property-inputschema"></a> `inputSchema` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/mcp/src/client/types.ts:273 |
 | <a id="property-name"></a> `name` | `readonly` | `string` | packages/mcp/src/client/types.ts:271 |
-| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\<`string`, `unknown`\>\> | packages/mcp/src/client/types.ts:274 |
+| <a id="property-outputschema"></a> `outputSchema?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | packages/mcp/src/client/types.ts:274 |
 | <a id="property-title"></a> `title?` | `readonly` | `string` | packages/mcp/src/client/types.ts:275 |

@@ -25,6 +25,6 @@ function.
 
 ## Returns
 
-`Promise`\<[`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md)\>
+`Promise`\&lt;[`CreatedToken`](/api/@graphorin/security/interfaces/CreatedToken.md)\&gt;
 
 ## Stable

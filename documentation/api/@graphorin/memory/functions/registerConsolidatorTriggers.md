@@ -36,6 +36,6 @@ caller is responsible for those (e.g. invoking
 
 ## Returns
 
-`Promise`\<[`RegisterTriggersResult`](/api/@graphorin/memory/interfaces/RegisterTriggersResult.md)\>
+`Promise`\&lt;[`RegisterTriggersResult`](/api/@graphorin/memory/interfaces/RegisterTriggersResult.md)\&gt;
 
 ## Stable

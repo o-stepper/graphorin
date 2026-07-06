@@ -20,7 +20,7 @@ Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:39
 
 | Parameter | Type |
 | ------ | ------ |
-| `pairs` | `ReadonlyArray`\<\{ `text`: `string`; `text_pair`: `string`; \}\> |
+| `pairs` | `ReadonlyArray`\&lt;\{ `text`: `string`; `text_pair`: `string`; \}\&gt; |
 | `options?` | \{ `signal?`: `AbortSignal`; `topk?`: `number`; \} |
 | `options.signal?` | `AbortSignal` |
 | `options.topk?` | `number` |
@@ -28,5 +28,5 @@ Defined in: packages/reranker-transformersjs/src/cross-encoder.ts:39
 ## Returns
 
 `Promise`\<
-  \| `ReadonlyArray`\<[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\>
-  \| `ReadonlyArray`\<`ReadonlyArray`\<[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\>\>\>
+  \| `ReadonlyArray`\&lt;[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\&gt;
+  \| `ReadonlyArray`\<`ReadonlyArray`\&lt;[`ClassifierResult`](/api/@graphorin/reranker-transformersjs/interfaces/ClassifierResult.md)\&gt;\>\>

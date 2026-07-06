@@ -21,12 +21,12 @@ thin so deployments without systemd report a clean skip.
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | \{ `run?`: (`command`) => `Promise`\<`string`\>; `unit?`: `string`; \} |
-| `opts.run?` | (`command`) => `Promise`\<`string`\> |
+| `opts` | \{ `run?`: (`command`) => `Promise`\&lt;`string`\&gt;; `unit?`: `string`; \} |
+| `opts.run?` | (`command`) => `Promise`\&lt;`string`\&gt; |
 | `opts.unit?` | `string` |
 
 ## Returns
 
-`Promise`\<[`CheckResult`](/api/@graphorin/security/interfaces/CheckResult.md)[]\>
+`Promise`\&lt;[`CheckResult`](/api/@graphorin/security/interfaces/CheckResult.md)[]\&gt;
 
 ## Stable

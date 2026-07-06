@@ -20,7 +20,7 @@ Encode `data` as URL-safe base64 without padding.
 
 | Parameter | Type |
 | ------ | ------ |
-| `data` | `string` \| `Buffer`\<`ArrayBufferLike`\> \| `Uint8Array`\<`ArrayBufferLike`\> |
+| `data` | `string` \| `Buffer`\&lt;`ArrayBufferLike`\&gt; \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; |
 
 ## Returns
 

@@ -44,4 +44,4 @@ function-form wrapper forwards it to the operator's hook verbatim.
 
 #### Returns
 
-`Promise`\<readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[]\>
+`Promise`\&lt;readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[]\&gt;

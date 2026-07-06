@@ -22,7 +22,7 @@ middleware does not fabricate a $0 USD cost entry.
 
 | Parameter | Type |
 | ------ | ------ |
-| `tracker` | `Pick`\<[`CostTracker`](/api/@graphorin/observability/interfaces/CostTracker.md), `"record"`\> |
+| `tracker` | `Pick`\&lt;[`CostTracker`](/api/@graphorin/observability/interfaces/CostTracker.md), `"record"`\&gt; |
 | `ids` | \| [`CostTrackerDelegateIds`](/api/@graphorin/observability/type-aliases/CostTrackerDelegateIds.md) \| ((`info`) => [`CostTrackerDelegateIds`](/api/@graphorin/observability/type-aliases/CostTrackerDelegateIds.md)) |
 
 ## Returns

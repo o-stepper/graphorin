@@ -32,4 +32,4 @@ Defined in: src/runtime.ts:15
 
 #### Returns
 
-`Promise`\<[`LlamaModelInstance`](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaModelInstance.md)\>
+`Promise`\&lt;[`LlamaModelInstance`](/api/@graphorin/provider-llamacpp-node/interfaces/LlamaModelInstance.md)\&gt;

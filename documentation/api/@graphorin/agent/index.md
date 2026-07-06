@@ -176,7 +176,7 @@ reference). The package's `CHANGELOG.md` records every change.
 
 ## License
 
-MIT © Oleksiy Stepurenko. See [LICENSE](../../_media/LICENSE) for the full
+MIT © Oleksiy Stepurenko. See [LICENSE](https://github.com/o-stepper/graphorin/blob/main/LICENSE) for the full
 text.
 
 ---

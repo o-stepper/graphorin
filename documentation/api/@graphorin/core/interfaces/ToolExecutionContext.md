@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / ToolExecutionContext
 
-# Interface: ToolExecutionContext\<TDeps\>
+# Interface: ToolExecutionContext\&lt;TDeps\&gt;
 
 Defined in: packages/core/src/contracts/tool.ts:345
 
@@ -27,7 +27,7 @@ scoped to the tool's `secretsAllowed` ACL.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-logger"></a> `logger` | `readonly` | [`Logger`](/api/@graphorin/core/interfaces/Logger.md) | - | packages/core/src/contracts/tool.ts:350 |
-| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\<`TDeps`\> | - | packages/core/src/contracts/tool.ts:347 |
+| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\&lt;`TDeps`\&gt; | - | packages/core/src/contracts/tool.ts:347 |
 | <a id="property-secrets"></a> `secrets` | `readonly` | [`ToolSecretsAccessor`](/api/@graphorin/core/interfaces/ToolSecretsAccessor.md) | Per-call secrets accessor. The accessor enforces the tool's `secretsAllowed` ACL - calling `require(...)` for a key that is not on the allowlist throws `SecretAccessDeniedError`. | packages/core/src/contracts/tool.ts:356 |
 | <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | - | packages/core/src/contracts/tool.ts:348 |
 | <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:346 |

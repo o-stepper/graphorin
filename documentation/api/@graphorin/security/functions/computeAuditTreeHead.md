@@ -25,6 +25,6 @@ the audit log.
 
 ## Returns
 
-`Promise`\<[`AuditTreeHead`](/api/@graphorin/security/interfaces/AuditTreeHead.md)\>
+`Promise`\&lt;[`AuditTreeHead`](/api/@graphorin/security/interfaces/AuditTreeHead.md)\&gt;
 
 ## Stable

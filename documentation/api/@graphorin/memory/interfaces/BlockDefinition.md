@@ -24,6 +24,6 @@ compiled into the system prompt every step.
 | <a id="property-label"></a> `label` | `readonly` | `string` | packages/memory/src/tiers/working-memory.ts:46 |
 | <a id="property-overflowpolicy"></a> `overflowPolicy` | `readonly` | `"truncate"` \| `"reject"` | packages/memory/src/tiers/working-memory.ts:53 |
 | <a id="property-readonly"></a> `readOnly` | `readonly` | `boolean` | packages/memory/src/tiers/working-memory.ts:51 |
-| <a id="property-schema"></a> `schema?` | `readonly` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\<`unknown`, `unknown`\> | packages/memory/src/tiers/working-memory.ts:48 |
+| <a id="property-schema"></a> `schema?` | `readonly` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\&lt;`unknown`, `unknown`\&gt; | packages/memory/src/tiers/working-memory.ts:48 |
 | <a id="property-sensitivity"></a> `sensitivity` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | packages/memory/src/tiers/working-memory.ts:50 |
 | <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/memory/src/tiers/working-memory.ts:54 |

@@ -25,4 +25,4 @@ policy (DEC-135).
 
 ## Returns
 
-`Readonly`\<`Record`\<`string`, `number`\>\>
+`Readonly`\<`Record`\&lt;`string`, `number`\&gt;\>

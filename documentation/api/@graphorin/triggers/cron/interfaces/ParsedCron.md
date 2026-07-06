@@ -14,9 +14,9 @@ Defined in: packages/triggers/src/cron.ts:51
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-day"></a> `day` | `readonly` | `ReadonlySet`\<`number`\> | packages/triggers/src/cron.ts:55 |
-| <a id="property-dayofweek"></a> `dayOfWeek` | `readonly` | `ReadonlySet`\<`number`\> | packages/triggers/src/cron.ts:57 |
+| <a id="property-day"></a> `day` | `readonly` | `ReadonlySet`\&lt;`number`\&gt; | packages/triggers/src/cron.ts:55 |
+| <a id="property-dayofweek"></a> `dayOfWeek` | `readonly` | `ReadonlySet`\&lt;`number`\&gt; | packages/triggers/src/cron.ts:57 |
 | <a id="property-expression"></a> `expression` | `readonly` | `string` | packages/triggers/src/cron.ts:52 |
-| <a id="property-hour"></a> `hour` | `readonly` | `ReadonlySet`\<`number`\> | packages/triggers/src/cron.ts:54 |
-| <a id="property-minute"></a> `minute` | `readonly` | `ReadonlySet`\<`number`\> | packages/triggers/src/cron.ts:53 |
-| <a id="property-month"></a> `month` | `readonly` | `ReadonlySet`\<`number`\> | packages/triggers/src/cron.ts:56 |
+| <a id="property-hour"></a> `hour` | `readonly` | `ReadonlySet`\&lt;`number`\&gt; | packages/triggers/src/cron.ts:54 |
+| <a id="property-minute"></a> `minute` | `readonly` | `ReadonlySet`\&lt;`number`\&gt; | packages/triggers/src/cron.ts:53 |
+| <a id="property-month"></a> `month` | `readonly` | `ReadonlySet`\&lt;`number`\&gt; | packages/triggers/src/cron.ts:56 |

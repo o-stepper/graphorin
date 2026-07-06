@@ -29,7 +29,7 @@ where a thrown error is the natural failure mode.
 
 | Parameter | Type |
 | ------ | ------ |
-| `schema` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\<`T`\> |
+| `schema` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\&lt;`T`\&gt; |
 | `data` | `unknown` |
 | `what?` | `string` |
 

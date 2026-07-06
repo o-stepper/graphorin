@@ -35,7 +35,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:151
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -59,7 +59,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:152
 
 #### Returns
 
-`Promise`\<readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\>
+`Promise`\&lt;readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\&gt;
 
 #### Inherited from
 
@@ -89,7 +89,7 @@ the counter simply never auto-promote.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -110,7 +110,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:153
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Inherited from
 
@@ -148,7 +148,7 @@ back to an in-memory lexical scan over `list(...)`.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\&gt;[]\>
 
 ***
 
@@ -179,4 +179,4 @@ procedure into `activate()` or re-quarantine an active one, with a
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

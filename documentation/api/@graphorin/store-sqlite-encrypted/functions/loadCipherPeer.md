@@ -18,6 +18,6 @@ connection-open in the same process) share one native handle.
 
 ## Returns
 
-`Promise`\<[`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md)\>
+`Promise`\&lt;[`BetterSqlite3Constructor`](/api/@graphorin/store-sqlite/type-aliases/BetterSqlite3Constructor.md)\&gt;
 
 ## Stable

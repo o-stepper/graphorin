@@ -28,11 +28,11 @@ helper from a generic `AISpan<T>`.
 
 | Parameter | Type |
 | ------ | ------ |
-| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<`T`\> |
+| `span` | [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;`T`\&gt; |
 
 ## Returns
 
-  \| [`GraphorinSpan`](/api/@graphorin/observability/interfaces/GraphorinSpan.md)\<`T`\>
+  \| [`GraphorinSpan`](/api/@graphorin/observability/interfaces/GraphorinSpan.md)\&lt;`T`\&gt;
   \| `null`
 
 ## Stable

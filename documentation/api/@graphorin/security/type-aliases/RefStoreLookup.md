@@ -28,4 +28,4 @@ active without taking a hard dependency on the store module.
 
 ## Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\&gt;

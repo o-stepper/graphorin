@@ -25,6 +25,6 @@ deployments still surface the URL to the operator.
 
 ## Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ## Stable

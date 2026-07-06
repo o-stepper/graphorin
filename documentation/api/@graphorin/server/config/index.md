@@ -29,7 +29,7 @@ exact path of every failing field, not just a generic
 | ------ | ------ |
 | [DeliveryCommentaryPolicyConfig](/api/@graphorin/server/config/type-aliases/DeliveryCommentaryPolicyConfig.md) | - |
 | [IdempotencyRequireKeyMode](/api/@graphorin/server/config/type-aliases/IdempotencyRequireKeyMode.md) | - |
-| [SecretRefString](/api/@graphorin/server/config/type-aliases/SecretRefString.md) | String literal that flags a value as a `SecretRef` URI. The server's pre-bind step resolves every `*Ref` field through the `@graphorin/security` resolver registry before binding the listener; an unresolvable ref fails fast with import('./errors/index.js').PrebindSecretUnresolvableError. |
+| [SecretRefString](/api/@graphorin/server/config/type-aliases/SecretRefString.md) | String literal that flags a value as a `SecretRef` URI. The server's pre-bind step resolves every `*Ref` field through the `@graphorin/security` resolver registry before binding the listener; an unresolvable ref fails fast with `PrebindSecretUnresolvableError`. |
 | [SecretsSource](/api/@graphorin/server/config/type-aliases/SecretsSource.md) | Selector for which `SecretsStore` flavour the server activates. Mirrors `--secrets-source` from DEC-136. |
 | [ServerConfigInput](/api/@graphorin/server/config/type-aliases/ServerConfigInput.md) | Input shape accepted by [defineConfig](/api/@graphorin/server/config/functions/defineConfig.md). Every field is optional; missing values fall back to a documented default. |
 

@@ -33,11 +33,11 @@ again (widened) and re-grade; otherwise **abstain**.
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `string` |
-| `deps` | [`IterativeRetrievalDeps`](/api/@graphorin/memory/interfaces/IterativeRetrievalDeps.md)\<`H`\> |
+| `deps` | [`IterativeRetrievalDeps`](/api/@graphorin/memory/interfaces/IterativeRetrievalDeps.md)\&lt;`H`\&gt; |
 | `options` | [`IterativeRetrievalOptions`](/api/@graphorin/memory/interfaces/IterativeRetrievalOptions.md) |
 
 ## Returns
 
-`Promise`\<[`IterativeRetrievalResult`](/api/@graphorin/memory/interfaces/IterativeRetrievalResult.md)\<`H`\>\>
+`Promise`\<[`IterativeRetrievalResult`](/api/@graphorin/memory/interfaces/IterativeRetrievalResult.md)\&lt;`H`\&gt;\>
 
 ## Stable

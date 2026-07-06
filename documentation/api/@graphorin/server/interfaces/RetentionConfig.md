@@ -9,7 +9,7 @@
 Defined in: packages/server/src/runtime/retention.ts:46
 
 Mirror of the `config.retention` section of
-import('../config.js').ServerConfigSpec.
+`ServerConfigSpec`.
 
 ## Stable
 

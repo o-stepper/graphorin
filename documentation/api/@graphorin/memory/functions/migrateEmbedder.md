@@ -32,6 +32,6 @@ strategy:
 
 ## Returns
 
-`AsyncGenerator`\<[`MigrationProgress`](/api/@graphorin/memory/interfaces/MigrationProgress.md), `void`, `unknown`\>
+`AsyncGenerator`\&lt;[`MigrationProgress`](/api/@graphorin/memory/interfaces/MigrationProgress.md), `void`, `unknown`\&gt;
 
 ## Stable

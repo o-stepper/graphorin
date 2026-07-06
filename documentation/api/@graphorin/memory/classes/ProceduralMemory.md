@@ -74,7 +74,7 @@ feeds the system prompt - never surfaces it.
 
 #### Returns
 
-`Promise`\<readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\>
+`Promise`\&lt;readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\&gt;
 
 ***
 
@@ -97,7 +97,7 @@ Persist a rule. Returns the stored record.
 
 #### Returns
 
-`Promise`\<[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\>
+`Promise`\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\&gt;
 
 ***
 
@@ -130,7 +130,7 @@ configured (`createMemory({ procedureInduction: { provider } })`).
 
 #### Returns
 
-`Promise`\<[`Rule`](/api/@graphorin/core/interfaces/Rule.md) \| `null`\>
+`Promise`\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md) \| `null`\&gt;
 
 ***
 
@@ -159,7 +159,7 @@ induce a procedure. The success signal is `status === 'completed'`.
 
 #### Returns
 
-`Promise`\<[`Rule`](/api/@graphorin/core/interfaces/Rule.md) \| `null`\>
+`Promise`\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md) \| `null`\&gt;
 
 ***
 
@@ -181,7 +181,7 @@ List every active (non-deleted) rule for the supplied scope.
 
 #### Returns
 
-`Promise`\<readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\>
+`Promise`\&lt;readonly [`Rule`](/api/@graphorin/core/interfaces/Rule.md)[]\&gt;
 
 ***
 
@@ -256,7 +256,7 @@ Soft-delete a rule.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -298,7 +298,7 @@ keep working without the index.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Rule`](/api/@graphorin/core/interfaces/Rule.md)\&gt;[]\>
 
 ***
 
@@ -332,4 +332,4 @@ drive *actions*, so this gate matters most for them.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

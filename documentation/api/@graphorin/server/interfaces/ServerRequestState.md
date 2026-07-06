@@ -10,7 +10,7 @@ Defined in: packages/server/src/internal/context.ts:39
 
 Request-scoped variables surfaced through `c.var` in Hono. The
 server's middleware populates these fields incrementally; route
-handlers consume them through getRequestState.
+handlers consume them through `getRequestState`.
 
 ## Stable
 

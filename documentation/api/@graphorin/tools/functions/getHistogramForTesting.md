@@ -21,7 +21,7 @@ Read a single histogram observation list (returns `[]` when absent).
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `labels?` | `Readonly`\<`Record`\<`string`, `string` \| `number` \| `boolean`\>\> |
+| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> |
 
 ## Returns
 

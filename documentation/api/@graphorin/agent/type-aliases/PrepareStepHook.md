@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/agent](/api/@graphorin/agent/index.md) / [](/api/@graphorin/agent/README.md) / PrepareStepHook
 
-# Type Alias: PrepareStepHook\<TDeps\>
+# Type Alias: PrepareStepHook\&lt;TDeps\&gt;
 
 ```ts
 type PrepareStepHook<TDeps> = (ctx) => 
@@ -27,11 +27,11 @@ return overrides applied to the next provider call only.
 
 | Parameter | Type |
 | ------ | ------ |
-| `ctx` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\<`TDeps`\> |
+| `ctx` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\&lt;`TDeps`\&gt; |
 
 ## Returns
 
-  \| `Promise`\<[`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\<`TDeps`\>\>
-  \| [`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\<`TDeps`\>
+  \| `Promise`\<[`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;\>
+  \| [`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;
 
 ## Stable

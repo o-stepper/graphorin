@@ -21,7 +21,7 @@ Returns `null` when no signature block is present.
 
 | Parameter | Type |
 | ------ | ------ |
-| `frontmatter` | `Record`\<`string`, `unknown`\> |
+| `frontmatter` | `Record`\&lt;`string`, `unknown`\&gt; |
 
 ## Returns
 

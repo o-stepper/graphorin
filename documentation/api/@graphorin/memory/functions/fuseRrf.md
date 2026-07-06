@@ -30,12 +30,12 @@ wrapping of the public surface.
 
 | Parameter | Type |
 | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] |
 | `k` | `number` |
 | `labels?` | readonly `string`[] |
 
 ## Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
 
 ## Stable

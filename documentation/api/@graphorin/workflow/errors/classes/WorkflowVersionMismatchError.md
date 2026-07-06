@@ -9,7 +9,7 @@
 Defined in: packages/workflow/src/errors/index.ts:226
 
 Thrown on resume when the stored frontier was written by a different
-WorkflowConfig.version (D1 / workflow-14) - replaying
+`WorkflowConfig.version` (D1 / workflow-14) - replaying
 persisted state through changed code must fail loudly, not silently
 diverge. Opt out per call via `allowVersionMismatch`.
 

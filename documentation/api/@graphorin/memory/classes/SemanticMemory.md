@@ -79,7 +79,7 @@ Soft-delete a fact (kept for replay; never hard-deleted).
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -101,14 +101,14 @@ Fuse multiple ranked lists outside of a `search()` call.
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `string` |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[][] |
 | `options` | \{ `signal?`: `AbortSignal`; `topK?`: `number`; \} |
 | `options.signal?` | `AbortSignal` |
 | `options.topK?` | `number` |
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 ***
 
@@ -131,7 +131,7 @@ Lookup a single fact by id. Returns `null` for soft-deleted / missing.
 
 #### Returns
 
-`Promise`\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md) \| `null`\>
+`Promise`\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md) \| `null`\&gt;
 
 ***
 
@@ -159,7 +159,7 @@ a storage adapter that implements
 
 #### Returns
 
-`Promise`\<readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\>
+`Promise`\&lt;readonly [`Fact`](/api/@graphorin/core/interfaces/Fact.md)[]\&gt;
 
 #### Stable
 
@@ -196,7 +196,7 @@ fresh `add`, degrading gracefully to the pre-reconcile behaviour.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 #### Stable
 
@@ -229,7 +229,7 @@ Requires a storage adapter that implements
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -260,7 +260,7 @@ via `createMemory({ conflictPipeline: { mode: 'off' } })`).
 
 #### Returns
 
-`Promise`\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>
+`Promise`\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;
 
 ***
 
@@ -289,7 +289,7 @@ silent dedups (`decision.kind === 'dedup'`) from fresh inserts.
 
 #### Returns
 
-`Promise`\<[`RememberOutcome`](/api/@graphorin/memory/interfaces/RememberOutcome.md)\>
+`Promise`\&lt;[`RememberOutcome`](/api/@graphorin/memory/interfaces/RememberOutcome.md)\&gt;
 
 #### Stable
 
@@ -334,7 +334,7 @@ Hybrid (vector + FTS5) search merged through the configured reranker.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 ***
 
@@ -375,7 +375,7 @@ difficulty-gated `search` and never calls a provider.
 
 #### Returns
 
-`Promise`\<[`IterativeRecallResult`](/api/@graphorin/memory/type-aliases/IterativeRecallResult.md)\>
+`Promise`\&lt;[`IterativeRecallResult`](/api/@graphorin/memory/type-aliases/IterativeRecallResult.md)\&gt;
 
 #### Stable
 
@@ -495,7 +495,7 @@ from a trusted (non-agent) context. Synthesized-but-clean writes
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Stable
 
@@ -521,12 +521,12 @@ Pure-fusion helper - exposed for callers that already collected results.
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] | `undefined` |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] | `undefined` |
 | `k` | `number` | `60` |
 
 #### Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]
 
 ***
 
@@ -556,10 +556,10 @@ absent weights reproduce RRF.
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[][] | `undefined` |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[][] | `undefined` |
 | `weights` | readonly `number`[] \| `undefined` | `undefined` |
 | `k` | `number` | `60` |
 
 #### Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TRecord`\>[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]

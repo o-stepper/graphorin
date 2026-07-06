@@ -16,6 +16,6 @@ String literal that flags a value as a `SecretRef` URI. The
 server's pre-bind step resolves every `*Ref` field through the
 `@graphorin/security` resolver registry before binding the
 listener; an unresolvable ref fails fast with
-import('./errors/index.js').PrebindSecretUnresolvableError.
+`PrebindSecretUnresolvableError`.
 
 ## Stable

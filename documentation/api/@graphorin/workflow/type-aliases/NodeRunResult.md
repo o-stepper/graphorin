@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / NodeRunResult
 
-# Type Alias: NodeRunResult\<TState\>
+# Type Alias: NodeRunResult\&lt;TState\&gt;
 
 ```ts
 type NodeRunResult<TState> = 
@@ -31,6 +31,6 @@ Permissible return shapes from a node's `run(...)` callback.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
+| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
 
 ## Stable

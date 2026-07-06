@@ -14,7 +14,7 @@ Wire twin of [ToolMessage](/api/@graphorin/core/interfaces/ToolMessage.md).
 
 ## Extends
 
-- `Omit`\<[`ToolMessage`](/api/@graphorin/core/interfaces/ToolMessage.md), `"content"`\>
+- `Omit`\&lt;[`ToolMessage`](/api/@graphorin/core/interfaces/ToolMessage.md), `"content"`\&gt;
 
 ## Properties
 

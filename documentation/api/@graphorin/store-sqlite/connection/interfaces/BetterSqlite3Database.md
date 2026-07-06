@@ -43,7 +43,7 @@ survive - unlike `VACUUM INTO`).
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 

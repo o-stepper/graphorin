@@ -40,6 +40,6 @@ approved.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`FactValidateInput`, `FactValidateOutput`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`FactValidateInput`, `FactValidateOutput`\&gt;
 
 ## Stable

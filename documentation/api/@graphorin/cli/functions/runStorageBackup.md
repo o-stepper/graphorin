@@ -27,6 +27,6 @@ renumbers rowids and corrupts the FTS mapping on restore.
 
 ## Returns
 
-`Promise`\<[`StorageBackupResult`](/api/@graphorin/cli/interfaces/StorageBackupResult.md)\>
+`Promise`\&lt;[`StorageBackupResult`](/api/@graphorin/cli/interfaces/StorageBackupResult.md)\&gt;
 
 ## Stable

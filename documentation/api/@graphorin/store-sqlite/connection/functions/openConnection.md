@@ -29,6 +29,6 @@ Opens a connection. Side effects (in this order):
 
 ## Returns
 
-`Promise`\<[`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md)\>
+`Promise`\&lt;[`SqliteConnection`](/api/@graphorin/store-sqlite/connection/interfaces/SqliteConnection.md)\&gt;
 
 ## Stable

@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:119
 
-Thrown when Workflow.resume cannot find the named thread.
+Thrown when `Workflow.resume` cannot find the named thread.
 
 ## Extends
 

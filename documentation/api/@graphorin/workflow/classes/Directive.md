@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / Directive
 
-# Class: Directive\<TUpdate, TResume\>
+# Class: Directive\&lt;TUpdate, TResume\&gt;
 
 Defined in: packages/core/dist/channels/directive.d.ts:21
 
@@ -30,7 +30,7 @@ of the public API).
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TUpdate` | `Record`\<`string`, `unknown`\> |
+| `TUpdate` | `Record`\&lt;`string`, `unknown`\&gt; |
 | `TResume` | `unknown` |
 
 ## Constructors
@@ -47,11 +47,11 @@ Defined in: packages/core/dist/channels/directive.d.ts:25
 
 | Parameter | Type |
 | ------ | ------ |
-| `opts` | [`DirectiveOptions`](/api/@graphorin/workflow/interfaces/DirectiveOptions.md)\<`TUpdate`, `TResume`\> |
+| `opts` | [`DirectiveOptions`](/api/@graphorin/workflow/interfaces/DirectiveOptions.md)\&lt;`TUpdate`, `TResume`\&gt; |
 
 #### Returns
 
-`Directive`\<`TUpdate`, `TResume`\>
+`Directive`\&lt;`TUpdate`, `TResume`\&gt;
 
 ## Properties
 

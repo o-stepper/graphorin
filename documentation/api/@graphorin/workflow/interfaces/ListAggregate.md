@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / ListAggregate
 
-# Interface: ListAggregate\<T\>
+# Interface: ListAggregate\&lt;T\&gt;
 
 Defined in: packages/core/dist/channels/channels.d.ts:62
 

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / WireAgentEvent
 
-# Type Alias: WireAgentEvent\<TOutput\>
+# Type Alias: WireAgentEvent\&lt;TOutput\&gt;
 
 ```ts
 type WireAgentEvent<TOutput> = 

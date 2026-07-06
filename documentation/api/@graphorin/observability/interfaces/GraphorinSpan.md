@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/observability](/api/@graphorin/observability/index.md) / [](/api/@graphorin/observability/README.md) / GraphorinSpan
 
-# Interface: GraphorinSpan\<T\>
+# Interface: GraphorinSpan\&lt;T\&gt;
 
 Defined in: packages/observability/src/tracer/span.ts:39
 
@@ -16,7 +16,7 @@ top of the standard [AISpan](/api/@graphorin/core/interfaces/AISpan.md) contract
 
 ## Extends
 
-- [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\<`T`\>
+- [`AISpan`](/api/@graphorin/core/interfaces/AISpan.md)\&lt;`T`\&gt;
 
 ## Type Parameters
 
@@ -57,7 +57,7 @@ dropped below the floor.
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `attrs?` | `Readonly`\<`Record`\<`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\>\> |
+| `attrs?` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> |
 | `opts?` | [`AddEventOptions`](/api/@graphorin/core/interfaces/AddEventOptions.md) |
 
 #### Returns

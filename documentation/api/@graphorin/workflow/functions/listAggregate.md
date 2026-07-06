@@ -29,6 +29,6 @@ Construct a `ListAggregate` channel.
 
 ## Returns
 
-[`ListAggregate`](/api/@graphorin/workflow/interfaces/ListAggregate.md)\<`T`\>
+[`ListAggregate`](/api/@graphorin/workflow/interfaces/ListAggregate.md)\&lt;`T`\&gt;
 
 ## Stable

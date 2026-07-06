@@ -49,4 +49,4 @@ Defined in: packages/agent/src/types.ts:410
 #### Returns
 
   \| [`VerifierResult`](/api/@graphorin/agent/type-aliases/VerifierResult.md)
-  \| `Promise`\<[`VerifierResult`](/api/@graphorin/agent/type-aliases/VerifierResult.md)\>
+  \| `Promise`\&lt;[`VerifierResult`](/api/@graphorin/agent/type-aliases/VerifierResult.md)\&gt;

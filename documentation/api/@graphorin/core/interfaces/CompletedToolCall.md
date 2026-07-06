@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / CompletedToolCall
 
-# Interface: CompletedToolCall\<TOutput\>
+# Interface: CompletedToolCall\&lt;TOutput\&gt;
 
 Defined in: packages/core/src/types/tool.ts:320
 
@@ -24,5 +24,5 @@ on `RunState.completedToolCalls` after a successful or failed run.
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
 | <a id="property-call"></a> `call` | `readonly` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) | packages/core/src/types/tool.ts:321 |
-| <a id="property-outcome"></a> `outcome` | `readonly` | [`ToolOutcome`](/api/@graphorin/core/type-aliases/ToolOutcome.md)\<`TOutput`\> | packages/core/src/types/tool.ts:322 |
+| <a id="property-outcome"></a> `outcome` | `readonly` | [`ToolOutcome`](/api/@graphorin/core/type-aliases/ToolOutcome.md)\&lt;`TOutput`\&gt; | packages/core/src/types/tool.ts:322 |
 | <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/tool.ts:323 |

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / LatestValue
 
-# Interface: LatestValue\<T\>
+# Interface: LatestValue\&lt;T\&gt;
 
 Defined in: packages/core/src/channels/channels.ts:46
 

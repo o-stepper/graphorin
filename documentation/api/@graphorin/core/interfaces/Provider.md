@@ -47,7 +47,7 @@ Optional: provider-native input token counter.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -69,7 +69,7 @@ Convenience wrapper that consumes the stream into a single result.
 
 #### Returns
 
-`Promise`\<[`ProviderResponse`](/api/@graphorin/core/interfaces/ProviderResponse.md)\>
+`Promise`\&lt;[`ProviderResponse`](/api/@graphorin/core/interfaces/ProviderResponse.md)\&gt;
 
 ***
 
@@ -91,4 +91,4 @@ Returns an async stream of fine-grained provider events.
 
 #### Returns
 
-`AsyncIterable`\<[`ProviderEvent`](/api/@graphorin/core/type-aliases/ProviderEvent.md)\>
+`AsyncIterable`\&lt;[`ProviderEvent`](/api/@graphorin/core/type-aliases/ProviderEvent.md)\&gt;

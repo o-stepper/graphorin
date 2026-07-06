@@ -19,7 +19,7 @@ without taking an observability dependency.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-bymodel"></a> `byModel` | `readonly` | `ReadonlyMap`\<`string`, [`ModelUsage`](/api/@graphorin/core/interfaces/ModelUsage.md)\> | Per-model breakdown; preserves call counts for observability. | packages/core/src/types/usage.ts:93 |
+| <a id="property-bymodel"></a> `byModel` | `readonly` | `ReadonlyMap`\&lt;`string`, [`ModelUsage`](/api/@graphorin/core/interfaces/ModelUsage.md)\&gt; | Per-model breakdown; preserves call counts for observability. | packages/core/src/types/usage.ts:93 |
 | <a id="property-total"></a> `total` | `readonly` | [`Usage`](/api/@graphorin/core/interfaces/Usage.md) | Current rolled-up totals across every model that has been added. | packages/core/src/types/usage.ts:91 |
 
 ## Methods

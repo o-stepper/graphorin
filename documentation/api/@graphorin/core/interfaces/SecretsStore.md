@@ -37,7 +37,7 @@ Defined in: packages/core/src/contracts/secrets-store.ts:60
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -60,7 +60,7 @@ Returns the secret if it exists, `null` otherwise.
 
 #### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md) \| `null`\&gt;
 
 ***
 
@@ -82,7 +82,7 @@ Returns metadata about every key - never the values themselves.
 
 #### Returns
 
-`Promise`\<readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\>
+`Promise`\&lt;readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\&gt;
 
 ***
 
@@ -107,7 +107,7 @@ throw `SecretAccessDeniedError`.
 
 #### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/core/interfaces/SecretValue.md)\&gt;
 
 ***
 
@@ -135,4 +135,4 @@ Persist a secret. Implementations auto-wrap a plain string into a
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

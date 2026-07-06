@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:64
 
-Thrown by createWorkflow on configuration validation failure.
+Thrown by `createWorkflow` on configuration validation failure.
 
 ## Extends
 

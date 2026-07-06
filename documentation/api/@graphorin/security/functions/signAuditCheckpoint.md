@@ -26,6 +26,6 @@ Compute and sign the current tree head.
 
 ## Returns
 
-`Promise`\<[`SignedAuditCheckpoint`](/api/@graphorin/security/interfaces/SignedAuditCheckpoint.md)\>
+`Promise`\&lt;[`SignedAuditCheckpoint`](/api/@graphorin/security/interfaces/SignedAuditCheckpoint.md)\&gt;
 
 ## Stable

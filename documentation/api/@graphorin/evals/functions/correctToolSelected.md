@@ -26,6 +26,6 @@ Defined in: evals/src/scorers/trajectory/correct-tool-selected.ts:24
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\>
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, [`Trajectory`](/api/@graphorin/evals/interfaces/Trajectory.md)\&gt;
 
 ## Stable

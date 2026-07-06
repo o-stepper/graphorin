@@ -25,7 +25,7 @@ untrusted attacker; for that the audit log uses SHA-256 (in
 
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
-| `input` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> | `undefined` |
+| `input` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; | `undefined` |
 | `seed` | `number` | `0` |
 
 ## Returns

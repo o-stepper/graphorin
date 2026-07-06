@@ -77,4 +77,4 @@ Close the subscription on the server. Idempotent.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

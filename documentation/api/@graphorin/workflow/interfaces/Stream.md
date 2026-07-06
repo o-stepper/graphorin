@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/workflow](/api/@graphorin/workflow/index.md) / [](/api/@graphorin/workflow/README.md) / Stream
 
-# Interface: Stream\<T\>
+# Interface: Stream\&lt;T\&gt;
 
 Defined in: packages/core/dist/channels/channels.d.ts:72
 

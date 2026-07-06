@@ -28,6 +28,6 @@ Construct the language-whitelist guardrail.
 
 ## Returns
 
-[`InputGuardrail`](/api/@graphorin/security/type-aliases/InputGuardrail.md)\<`TValue`\>
+[`InputGuardrail`](/api/@graphorin/security/type-aliases/InputGuardrail.md)\&lt;`TValue`\&gt;
 
 ## Stable

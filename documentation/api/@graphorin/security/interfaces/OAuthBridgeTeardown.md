@@ -30,4 +30,4 @@ Teardown function returned by [bridgeOAuthToAudit](/api/@graphorin/security/func
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | packages/security/src/audit/oauth-bridge.ts:31 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/oauth-bridge.ts:31 |

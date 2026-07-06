@@ -100,7 +100,7 @@ can pattern-match without inspecting the message.
 | Name | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ |
 | `candidateId` | `string` | The candidate id that was admitted as `pending`. | packages/memory/src/conflict/types.ts:84 |
-| `conflictingIds` | `ReadonlyArray`\<`string`\> | Top-K conflicting existing fact ids from Stage 2's vector search. | packages/memory/src/conflict/types.ts:86 |
+| `conflictingIds` | `ReadonlyArray`\&lt;`string`\&gt; | Top-K conflicting existing fact ids from Stage 2's vector search. | packages/memory/src/conflict/types.ts:86 |
 | `kind` | `"pending"` | - | packages/memory/src/conflict/types.ts:81 |
 | `reason?` | `string` | - | packages/memory/src/conflict/types.ts:88 |
 | `similarity?` | `number` | - | packages/memory/src/conflict/types.ts:87 |

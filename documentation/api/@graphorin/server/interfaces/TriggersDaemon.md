@@ -46,7 +46,7 @@ Defined in: packages/server/src/triggers/daemon.ts:68
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: packages/server/src/triggers/daemon.ts:70
 
 #### Returns
 
-`Promise`\<[`TriggersDaemonStatus`](/api/@graphorin/server/interfaces/TriggersDaemonStatus.md)\>
+`Promise`\&lt;[`TriggersDaemonStatus`](/api/@graphorin/server/interfaces/TriggersDaemonStatus.md)\&gt;
 
 ***
 
@@ -74,4 +74,4 @@ Defined in: packages/server/src/triggers/daemon.ts:69
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

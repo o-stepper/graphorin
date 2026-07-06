@@ -17,7 +17,7 @@ are out of scope for v0.1 - these messages are static blobs.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-audio"></a> `audio` | `readonly` | `Uint8Array`\<`ArrayBufferLike`\> \| `URL` | - | packages/core/src/types/message.ts:60 |
+| <a id="property-audio"></a> `audio` | `readonly` | `Uint8Array`\&lt;`ArrayBufferLike`\&gt; \| `URL` | - | packages/core/src/types/message.ts:60 |
 | <a id="property-causalitychain"></a> `causalityChain?` | `readonly` | readonly `string`[] | See [TextContent.causalityChain](/api/@graphorin/core/interfaces/TextContent.md#property-causalitychain). | packages/core/src/types/message.ts:63 |
 | <a id="property-mimetype"></a> `mimeType?` | `readonly` | `string` | - | packages/core/src/types/message.ts:61 |
 | <a id="property-type"></a> `type` | `readonly` | `"audio"` | - | packages/core/src/types/message.ts:59 |

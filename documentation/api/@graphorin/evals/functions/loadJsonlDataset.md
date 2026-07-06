@@ -25,6 +25,6 @@ number.
 
 ## Returns
 
-`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\<`string`, `unknown`\>\>\>\>
+`Promise`\<[`Dataset`](/api/@graphorin/evals/interfaces/Dataset.md)\<`unknown`, `unknown`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>\>
 
 ## Stable

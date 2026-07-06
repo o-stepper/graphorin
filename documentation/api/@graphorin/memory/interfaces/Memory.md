@@ -26,7 +26,7 @@ The facade returned by [createMemory](/api/@graphorin/memory/facade/functions/cr
 | <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemory`](/api/@graphorin/memory/classes/SemanticMemory.md) | - | packages/memory/src/memory-interface.ts:130 |
 | <a id="property-session"></a> `session` | `readonly` | [`SessionMemory`](/api/@graphorin/memory/classes/SessionMemory.md) | - | packages/memory/src/memory-interface.ts:128 |
 | <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemory`](/api/@graphorin/memory/classes/SharedMemory.md) | - | packages/memory/src/memory-interface.ts:132 |
-| <a id="property-tools"></a> `tools` | `readonly` | readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`unknown`, `unknown`, `unknown`\>[] | - | packages/memory/src/memory-interface.ts:139 |
+| <a id="property-tools"></a> `tools` | `readonly` | readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[] | - | packages/memory/src/memory-interface.ts:139 |
 | <a id="property-working"></a> `working` | `readonly` | [`WorkingMemory`](/api/@graphorin/memory/classes/WorkingMemory.md) | - | packages/memory/src/memory-interface.ts:127 |
 
 ## Methods
@@ -53,7 +53,7 @@ directly for the full six-layer assembly.
 
 #### Returns
 
-`Promise`\<[`MemoryContextBlocks`](/api/@graphorin/memory/interfaces/MemoryContextBlocks.md)\>
+`Promise`\&lt;[`MemoryContextBlocks`](/api/@graphorin/memory/interfaces/MemoryContextBlocks.md)\&gt;
 
 ***
 
@@ -91,4 +91,4 @@ Counter snapshot consumed by Phase 10d's metadata layer.
 
 #### Returns
 
-`Promise`\<[`MemoryMetadata`](/api/@graphorin/core/interfaces/MemoryMetadata.md)\>
+`Promise`\&lt;[`MemoryMetadata`](/api/@graphorin/core/interfaces/MemoryMetadata.md)\&gt;

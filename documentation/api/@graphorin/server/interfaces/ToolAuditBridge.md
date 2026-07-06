@@ -16,5 +16,5 @@ Handle returned by [bridgeToolAuditToAudit](/api/@graphorin/server/functions/bri
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | Resolve once every queued audit write has settled. | packages/server/src/tools-audit-bridge.ts:79 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | Resolve once every queued audit write has settled. | packages/server/src/tools-audit-bridge.ts:79 |
 | <a id="property-stop"></a> `stop` | `readonly` | () => `void` | Unsubscribe from the tool-audit bus. | packages/server/src/tools-audit-bridge.ts:77 |

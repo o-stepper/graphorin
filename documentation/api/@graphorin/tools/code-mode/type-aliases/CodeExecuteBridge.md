@@ -26,4 +26,4 @@ can route the inner call through the real executor under the same
 
 ## Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;

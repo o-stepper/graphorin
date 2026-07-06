@@ -35,6 +35,6 @@ whatever fits.
 
 ## Returns
 
-`Promise`\<[`AllocationResult`](/api/@graphorin/memory/interfaces/AllocationResult.md)\>
+`Promise`\&lt;[`AllocationResult`](/api/@graphorin/memory/interfaces/AllocationResult.md)\&gt;
 
 ## Stable

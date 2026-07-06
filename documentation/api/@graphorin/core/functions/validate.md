@@ -26,11 +26,11 @@ signal.
 
 | Parameter | Type |
 | ------ | ------ |
-| `schema` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\<`T`\> |
+| `schema` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\&lt;`T`\&gt; |
 | `data` | `unknown` |
 
 ## Returns
 
-[`ValidationResult`](/api/@graphorin/core/type-aliases/ValidationResult.md)\<`T`\>
+[`ValidationResult`](/api/@graphorin/core/type-aliases/ValidationResult.md)\&lt;`T`\&gt;
 
 ## Stable

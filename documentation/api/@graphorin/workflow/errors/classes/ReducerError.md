@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:363
 
-Thrown when a Reducer channel's `reduce(...)` callback throws.
+Thrown when a `Reducer` channel's `reduce(...)` callback throws.
 
 ## Extends
 

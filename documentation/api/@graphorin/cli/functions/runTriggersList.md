@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/triggers.ts:41
 
 ## Returns
 
-`Promise`\<readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\>
+`Promise`\&lt;readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\&gt;
 
 ## Stable

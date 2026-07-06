@@ -56,7 +56,7 @@ Lookup a single insight by id.
 
 #### Returns
 
-`Promise`\<[`Insight`](/api/@graphorin/core/interfaces/Insight.md) \| `null`\>
+`Promise`\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md) \| `null`\&gt;
 
 ***
 
@@ -79,7 +79,7 @@ Most-recent insights for the scope (newest first).
 
 #### Returns
 
-`Promise`\<readonly [`Insight`](/api/@graphorin/core/interfaces/Insight.md)[]\>
+`Promise`\&lt;readonly [`Insight`](/api/@graphorin/core/interfaces/Insight.md)[]\&gt;
 
 ***
 
@@ -106,7 +106,7 @@ FTS keyword search over insight text.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\>
 
 ***
 
@@ -139,4 +139,4 @@ unless an operator passes `{ force: true }` from a trusted context.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

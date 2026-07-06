@@ -30,7 +30,7 @@ Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:44
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `attrs?` | `Readonly`\<`Record`\<`string`, `unknown`\>\> |
+| `attrs?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 

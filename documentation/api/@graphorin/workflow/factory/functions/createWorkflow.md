@@ -20,17 +20,17 @@ rather than mid-execution.
 
 | Type Parameter | Default type |
 | ------ | ------ |
-| `TState` *extends* `object` | `Record`\<`string`, `unknown`\> |
-| `TInput` *extends* `Partial`\<`TState`\> | `Partial`\<`TState`\> |
+| `TState` *extends* `object` | `Record`\&lt;`string`, `unknown`\&gt; |
+| `TInput` *extends* `Partial`\&lt;`TState`\&gt; | `Partial`\&lt;`TState`\&gt; |
 
 ## Parameters
 
 | Parameter | Type |
 | ------ | ------ |
-| `config` | [`WorkflowConfig`](/api/@graphorin/workflow/interfaces/WorkflowConfig.md)\<`TState`\> |
+| `config` | [`WorkflowConfig`](/api/@graphorin/workflow/interfaces/WorkflowConfig.md)\&lt;`TState`\&gt; |
 
 ## Returns
 
-[`Workflow`](/api/@graphorin/workflow/interfaces/Workflow.md)\<`TState`, `TInput`\>
+[`Workflow`](/api/@graphorin/workflow/interfaces/Workflow.md)\&lt;`TState`, `TInput`\&gt;
 
 ## Stable

@@ -17,7 +17,7 @@ Full prompt-redaction policy.
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-action"></a> `action?` | `readonly` | `"throw"` \| `"redact"` \| `"block-and-prompt-user"` | Action on detection. Defaults to `'redact'`. | packages/provider/src/middleware/with-redaction.ts:90 |
-| <a id="property-bytrustclass"></a> `byTrustClass?` | `readonly` | `Partial`\<`Record`\<[`LocalProviderTrust`](/api/@graphorin/provider/type-aliases/LocalProviderTrust.md), `Partial`\<`PromptRedactionPolicy`\>\>\> | Per-trust-class override block. | packages/provider/src/middleware/with-redaction.ts:100 |
+| <a id="property-bytrustclass"></a> `byTrustClass?` | `readonly` | `Partial`\<`Record`\<[`LocalProviderTrust`](/api/@graphorin/provider/type-aliases/LocalProviderTrust.md), `Partial`\&lt;`PromptRedactionPolicy`\&gt;\>\> | Per-trust-class override block. | packages/provider/src/middleware/with-redaction.ts:100 |
 | <a id="property-detectsecretvalue"></a> `detectSecretValue?` | `readonly` | `boolean` | Detect `SecretValue` instances anywhere in the request. | packages/provider/src/middleware/with-redaction.ts:96 |
 | <a id="property-failclosed"></a> `failClosed?` | `readonly` | `boolean` | Throw on the first hit instead of redacting in-place. | packages/provider/src/middleware/with-redaction.ts:92 |
 | <a id="property-logger"></a> `logger?` | `readonly` | (`message`, `meta?`) => `void` | Optional logger override. Defaults to `console.warn`. | packages/provider/src/middleware/with-redaction.ts:104 |

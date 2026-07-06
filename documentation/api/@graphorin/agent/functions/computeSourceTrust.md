@@ -19,7 +19,7 @@ Compose `baseline * provenance * historyAdjustment` and clamp.
 | Parameter | Type |
 | ------ | ------ |
 | `input` | [`ChildTrustInput`](/api/@graphorin/agent/interfaces/ChildTrustInput.md) |
-| `overrides` | `Readonly`\<`Record`\<`string`, `number`\>\> |
+| `overrides` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> |
 
 ## Returns
 

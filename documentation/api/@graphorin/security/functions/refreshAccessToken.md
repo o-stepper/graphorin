@@ -24,6 +24,6 @@ resolved session.
 
 ## Returns
 
-`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
+`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
 
 ## Stable

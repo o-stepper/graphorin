@@ -8,7 +8,7 @@
 
 Defined in: packages/security/src/supply-chain/signature.ts:73
 
-Options accepted by [verifySkillSignature](/api/@graphorin/security/functions/verifySkillSignature.md).
+Options accepted by `verifySkillSignature`.
 
 ## Stable
 

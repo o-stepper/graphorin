@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/skills](/api/@graphorin/skills/index.md) / [](/api/@graphorin/skills/README.md) / StampedSkillTool
 
-# Interface: StampedSkillTool\<TInput, TOutput, TDeps\>
+# Interface: StampedSkillTool\&lt;TInput, TOutput, TDeps\&gt;
 
 Defined in: packages/skills/src/registry/bridge.ts:23
 
@@ -26,4 +26,4 @@ Result of [stampSkillTool](/api/@graphorin/skills/functions/stampSkillTool.md).
 | <a id="property-resolvedsandbox"></a> `resolvedSandbox` | `readonly` | [`ResolvedSandboxPolicy`](/api/@graphorin/security/interfaces/ResolvedSandboxPolicy.md) | Resolved sandbox policy after the tier resolver ran. | packages/skills/src/registry/bridge.ts:27 |
 | <a id="property-sandboxforced"></a> `sandboxForced` | `readonly` | `boolean` | `true` when the resolver overrode the operator's choice. | packages/skills/src/registry/bridge.ts:29 |
 | <a id="property-source"></a> `source` | `readonly` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) | - | packages/skills/src/registry/bridge.ts:25 |
-| <a id="property-tool"></a> `tool` | `readonly` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`TInput`, `TOutput`, `TDeps`\> | - | packages/skills/src/registry/bridge.ts:24 |
+| <a id="property-tool"></a> `tool` | `readonly` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; | - | packages/skills/src/registry/bridge.ts:24 |

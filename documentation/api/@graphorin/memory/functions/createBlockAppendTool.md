@@ -23,6 +23,6 @@ memory block.
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`BlockAppendInput`, `BlockAppendOutput`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`BlockAppendInput`, `BlockAppendOutput`\&gt;
 
 ## Stable

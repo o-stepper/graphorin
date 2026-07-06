@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/storage.ts:410
 
 ## Returns
 
-`Promise`\<`StorageRekeyResult`\>
+`Promise`\&lt;`StorageRekeyResult`\&gt;
 
 ## Stable

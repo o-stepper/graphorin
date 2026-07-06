@@ -69,7 +69,7 @@ latest id - safe, but time-travel/fork targets are gone.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Implementation of
 
@@ -98,7 +98,7 @@ instead, which is namespace-scoped and protects suspended threads.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -160,7 +160,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:177
 
 #### Returns
 
-`AsyncIterable`\<[`CheckpointTuple`](/api/@graphorin/core/interfaces/CheckpointTuple.md)\>
+`AsyncIterable`\&lt;[`CheckpointTuple`](/api/@graphorin/core/interfaces/CheckpointTuple.md)\&gt;
 
 #### Implementation of
 
@@ -236,7 +236,7 @@ writer lock across the whole table.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Implementation of
 
@@ -269,7 +269,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:29
 
 #### Returns
 
-`Promise`\<`string`\>
+`Promise`\&lt;`string`\&gt;
 
 #### Implementation of
 
@@ -302,7 +302,7 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:88
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 

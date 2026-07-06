@@ -32,7 +32,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:153
 
 #### Returns
 
-`Promise`\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\>
+`Promise`\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md) \| `null`\&gt;
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:148
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -73,4 +73,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:149
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>

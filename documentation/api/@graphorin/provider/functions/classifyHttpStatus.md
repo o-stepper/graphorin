@@ -13,7 +13,7 @@ function classifyHttpStatus(status, bodyText?): ProviderErrorKind;
 Defined in: packages/provider/src/errors/errors.ts:229
 
 Map an HTTP status (plus optional error-body text) onto the
-canonical import('@graphorin/core').ProviderErrorKind. One
+canonical `ProviderErrorKind`. One
 shared table so `withRetry` / `withFallback` and consumers switching
 on the documented kinds see consistent values from every HTTP
 adapter:

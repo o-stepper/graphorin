@@ -24,7 +24,7 @@ Grid-search fusion weights against labelled cases (C5).
 
 | Parameter | Type |
 | ------ | ------ |
-| `cases` | readonly [`FitFusionCase`](/api/@graphorin/memory/interfaces/FitFusionCase.md)\<`TRecord`\>[] |
+| `cases` | readonly [`FitFusionCase`](/api/@graphorin/memory/interfaces/FitFusionCase.md)\&lt;`TRecord`\&gt;[] |
 | `options` | [`FitFusionOptions`](/api/@graphorin/memory/interfaces/FitFusionOptions.md) |
 
 ## Returns

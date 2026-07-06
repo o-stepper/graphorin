@@ -27,6 +27,6 @@ fires `open` (i.e. the upgrade succeeded + the subprotocol matches
 
 ## Returns
 
-`Promise`\<[`Transport`](/api/@graphorin/client/interfaces/Transport.md)\>
+`Promise`\&lt;[`Transport`](/api/@graphorin/client/interfaces/Transport.md)\&gt;
 
 ## Stable

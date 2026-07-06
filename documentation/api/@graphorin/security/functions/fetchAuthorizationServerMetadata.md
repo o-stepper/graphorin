@@ -25,6 +25,6 @@ Fetch authorization-server metadata (RFC 8414). Tries
 
 ## Returns
 
-`Promise`\<[`OAuthServerMetadata`](/api/@graphorin/security/interfaces/OAuthServerMetadata.md)\>
+`Promise`\&lt;[`OAuthServerMetadata`](/api/@graphorin/security/interfaces/OAuthServerMetadata.md)\&gt;
 
 ## Stable

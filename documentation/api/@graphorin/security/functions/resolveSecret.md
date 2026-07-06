@@ -27,6 +27,6 @@ surface.
 
 ## Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/security/classes/SecretValue.md)\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/security/classes/SecretValue.md)\&gt;
 
 ## Stable

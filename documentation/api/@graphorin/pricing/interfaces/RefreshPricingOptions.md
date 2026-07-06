@@ -18,9 +18,9 @@ a real network call.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\<`Response`\> | Optional fetch override - useful in tests. | pricing/src/refresh.ts:32 |
+| <a id="property-fetchimpl"></a> `fetchImpl?` | `readonly` | (`input`, `init?`) => `Promise`\&lt;`Response`\&gt; | Optional fetch override - useful in tests. | pricing/src/refresh.ts:32 |
 | <a id="property-format"></a> `format?` | `readonly` | `"genai-prices"` \| `"auto"` \| `"graphorin"` | W-097: accepted body format. `'auto'` (default) tries the native graphorin shape, then auto-detects + converts the `@pydantic/genai-prices` dataset; the explicit values pin one format and fail fast on anything else. | pricing/src/refresh.ts:53 |
-| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\<`string`, `string`\>\> | Optional headers (auth, conditional GET, etc.). | pricing/src/refresh.ts:30 |
+| <a id="property-headers"></a> `headers?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> | Optional headers (auth, conditional GET, etc.). | pricing/src/refresh.ts:30 |
 | <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | Caller-supplied abort signal, combined with the timeout. | pricing/src/refresh.ts:46 |
 | <a id="property-snapshotdate"></a> `snapshotDate?` | `readonly` | `string` | Override the snapshot date stamped on the result. Defaults to today. | pricing/src/refresh.ts:34 |
 | <a id="property-timeoutms"></a> `timeoutMs?` | `readonly` | `number` | Hard timeout for the network fetch in milliseconds. Default `30000`. Aborts the request (and throws) if the upstream is slow or unreachable so `graphorin pricing refresh` cannot hang. Pass an explicit [RefreshPricingOptions.signal](/api/@graphorin/pricing/interfaces/RefreshPricingOptions.md#property-signal) to manage cancellation yourself; the two are combined. | pricing/src/refresh.ts:44 |

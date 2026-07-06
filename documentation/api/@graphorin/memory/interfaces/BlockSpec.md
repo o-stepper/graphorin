@@ -23,6 +23,6 @@ Author-time block specification accepted by
 | <a id="property-label"></a> `label` | `readonly` | `string` | - | packages/memory/src/tiers/working-memory.ts:18 |
 | <a id="property-overflowpolicy"></a> `overflowPolicy?` | `readonly` | `"truncate"` \| `"reject"` | Default `'truncate'` - `'reject'` opt-in for strict use cases. | packages/memory/src/tiers/working-memory.ts:33 |
 | <a id="property-readonly"></a> `readOnly?` | `readonly` | `boolean` | Default `false`. | packages/memory/src/tiers/working-memory.ts:26 |
-| <a id="property-schema"></a> `schema?` | `readonly` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\<`unknown`, `unknown`\> | - | packages/memory/src/tiers/working-memory.ts:20 |
+| <a id="property-schema"></a> `schema?` | `readonly` | [`ZodLikeSchema`](/api/@graphorin/core/interfaces/ZodLikeSchema.md)\&lt;`unknown`, `unknown`\&gt; | - | packages/memory/src/tiers/working-memory.ts:20 |
 | <a id="property-sensitivity"></a> `sensitivity?` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Default `'internal'`. | packages/memory/src/tiers/working-memory.ts:24 |
 | <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | Optional free-form labels surfaced through `tags`. | packages/memory/src/tiers/working-memory.ts:35 |

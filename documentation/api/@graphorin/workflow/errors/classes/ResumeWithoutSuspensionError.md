@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:158
 
-Thrown by Workflow.resume when the named thread is not in a suspended state.
+Thrown by `Workflow.resume` when the named thread is not in a suspended state.
 
 ## Extends
 

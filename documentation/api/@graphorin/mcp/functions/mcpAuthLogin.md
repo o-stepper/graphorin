@@ -22,4 +22,4 @@ Drive `graphorin auth login --mcp <id>`.
 
 ## Returns
 
-`Promise`\<[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\>
+`Promise`\&lt;[`LoginInteractiveResult`](/api/@graphorin/security/interfaces/LoginInteractiveResult.md)\&gt;

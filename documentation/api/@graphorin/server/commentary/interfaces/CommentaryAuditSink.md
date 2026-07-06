@@ -21,7 +21,7 @@ await any in-flight audit writes.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\<`void`\> | Resolve once every queued audit write has settled. | packages/server/src/commentary/audit-bridge.ts:61 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | Resolve once every queued audit write has settled. | packages/server/src/commentary/audit-bridge.ts:61 |
 
 ## Methods
 

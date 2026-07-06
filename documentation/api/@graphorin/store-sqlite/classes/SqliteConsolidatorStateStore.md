@@ -59,7 +59,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:235
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;
 
 ***
 
@@ -93,7 +93,7 @@ with no behavioural gain.
 
 #### Returns
 
-`Promise`\<readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\>
+`Promise`\&lt;readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\&gt;
 
 ***
 
@@ -113,7 +113,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:362
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -158,7 +158,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:474
 
 #### Returns
 
-`Promise`\<readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\>
+`Promise`\&lt;readonly [`DlqBatchRow`](/api/@graphorin/store-sqlite/interfaces/DlqBatchRow.md)[]\&gt;
 
 ***
 
@@ -224,7 +224,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:424
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -244,7 +244,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:411
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -270,7 +270,7 @@ awaiting a retry are never touched (they belong to
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Stable
 
@@ -296,7 +296,7 @@ that started before the cutoff; in-flight rows
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Stable
 
@@ -318,7 +318,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:295
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -338,7 +338,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:278
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -359,7 +359,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:266
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -384,7 +384,7 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:415
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -405,4 +405,4 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:173
 
 #### Returns
 
-`Promise`\<[`ConsolidatorStateRow`](/api/@graphorin/store-sqlite/interfaces/ConsolidatorStateRow.md)\>
+`Promise`\&lt;[`ConsolidatorStateRow`](/api/@graphorin/store-sqlite/interfaces/ConsolidatorStateRow.md)\&gt;

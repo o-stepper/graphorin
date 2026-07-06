@@ -28,7 +28,7 @@ Defined in: packages/server/src/routes/skills.ts:23
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: packages/server/src/routes/skills.ts:24
 
 #### Returns
 
-`Promise`\<`unknown`\>
+`Promise`\&lt;`unknown`\&gt;
 
 ***
 

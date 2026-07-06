@@ -15,7 +15,7 @@ agent runtime, workflow engine, server, …) lives in a sibling package and
 depends on the interfaces declared here.
 
 - **Status:** v0.6.1 - type and contract surface for the v0.1 release line.
-- **License:** [MIT](../../_media/LICENSE-3) - © 2026 Oleksiy Stepurenko.
+- **License:** [MIT](https://github.com/o-stepper/graphorin/blob/main/LICENSE) - © 2026 Oleksiy Stepurenko.
 - **Engines:** Node.js 22+ (ESM only).
 - **Runtime dependencies:** none.
 - **Peer dependency:** `zod` (`^3.23 || ^4`) - used for schema-typed values

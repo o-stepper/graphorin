@@ -39,6 +39,6 @@ a deliberately narrow structural sniff (own keys within
 
 ## Returns
 
-[`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\<`TOutput`\>
+[`ToolReturn`](/api/@graphorin/core/interfaces/ToolReturn.md)\&lt;`TOutput`\&gt;
 
 ## Stable

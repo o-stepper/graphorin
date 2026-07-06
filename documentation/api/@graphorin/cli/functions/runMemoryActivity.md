@@ -26,6 +26,6 @@ the most recent conflict decisions. Pure read-only inspection.
 
 ## Returns
 
-`Promise`\<[`MemoryActivityResult`](/api/@graphorin/cli/interfaces/MemoryActivityResult.md)\>
+`Promise`\&lt;[`MemoryActivityResult`](/api/@graphorin/cli/interfaces/MemoryActivityResult.md)\&gt;
 
 ## Stable

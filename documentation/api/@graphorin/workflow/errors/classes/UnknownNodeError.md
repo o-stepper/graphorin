@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:108
 
-Thrown by createWorkflow when an edge references a node that is not registered.
+Thrown by `createWorkflow` when an edge references a node that is not registered.
 
 ## Extends
 

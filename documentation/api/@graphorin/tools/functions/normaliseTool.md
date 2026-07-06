@@ -29,11 +29,11 @@ conservative-default branches.
 
 | Parameter | Type |
 | ------ | ------ |
-| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`TInput`, `TOutput`, `TDeps`\> |
+| `tool` | [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt; |
 | `source` | [`ToolSource`](/api/@graphorin/core/type-aliases/ToolSource.md) |
 
 ## Returns
 
-[`NormaliseOutcome`](/api/@graphorin/tools/interfaces/NormaliseOutcome.md)\<`TInput`, `TOutput`, `TDeps`\>
+[`NormaliseOutcome`](/api/@graphorin/tools/interfaces/NormaliseOutcome.md)\&lt;`TInput`, `TOutput`, `TDeps`\&gt;
 
 ## Stable

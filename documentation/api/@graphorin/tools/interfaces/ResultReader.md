@@ -31,4 +31,4 @@ Defined in: packages/tools/src/result/reader.ts:90
 
 #### Returns
 
-`Promise`\<[`ResultReadOutcome`](/api/@graphorin/tools/interfaces/ResultReadOutcome.md)\>
+`Promise`\&lt;[`ResultReadOutcome`](/api/@graphorin/tools/interfaces/ResultReadOutcome.md)\&gt;

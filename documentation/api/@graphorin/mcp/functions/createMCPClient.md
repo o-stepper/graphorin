@@ -22,6 +22,6 @@ Open a typed MCP client connection.
 
 ## Returns
 
-`Promise`\<[`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)\>
+`Promise`\&lt;[`MCPClient`](/api/@graphorin/mcp/interfaces/MCPClient.md)\&gt;
 
 ## Stable

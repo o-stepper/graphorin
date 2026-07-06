@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/storage.ts:68
 
 ## Returns
 
-`Promise`\<[`StorageStatusResult`](/api/@graphorin/cli/interfaces/StorageStatusResult.md)\>
+`Promise`\&lt;[`StorageStatusResult`](/api/@graphorin/cli/interfaces/StorageStatusResult.md)\&gt;
 
 ## Stable

@@ -53,7 +53,7 @@ Defined in: src/runtime.ts:50
 
 #### Returns
 
-`AsyncIterable`\<`string`\>
+`AsyncIterable`\&lt;`string`\&gt;
 
 ***
 

@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AsyncContext
 
-# Interface: AsyncContext\<T\>
+# Interface: AsyncContext\&lt;T\&gt;
 
 Defined in: packages/core/src/utils/async-context.ts:17
 
@@ -133,8 +133,8 @@ Run `fn` inside a fresh scope carrying `value` (async-friendly).
 | Parameter | Type |
 | ------ | ------ |
 | `value` | `T` |
-| `fn` | () => `Promise`\<`R`\> |
+| `fn` | () => `Promise`\&lt;`R`\&gt; |
 
 #### Returns
 
-`Promise`\<`R`\>
+`Promise`\&lt;`R`\&gt;

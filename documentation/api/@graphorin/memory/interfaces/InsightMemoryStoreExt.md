@@ -48,7 +48,7 @@ floor is the value at which [prune](/api/@graphorin/memory/interfaces/InsightMem
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -70,7 +70,7 @@ Lookup a single insight by id (`null` when absent / pruned).
 
 #### Returns
 
-`Promise`\<[`Insight`](/api/@graphorin/core/interfaces/Insight.md) \| `null`\>
+`Promise`\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md) \| `null`\&gt;
 
 ***
 
@@ -92,7 +92,7 @@ Persist a synthesized insight (idempotent on `id`).
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -115,7 +115,7 @@ Most-recent insights for the scope (newest first).
 
 #### Returns
 
-`Promise`\<readonly [`Insight`](/api/@graphorin/core/interfaces/Insight.md)[]\>
+`Promise`\&lt;readonly [`Insight`](/api/@graphorin/core/interfaces/Insight.md)[]\&gt;
 
 ***
 
@@ -139,7 +139,7 @@ pruned insights stay auditable.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 ***
 
@@ -166,7 +166,7 @@ FTS keyword search over insight text.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\>
 
 ***
 
@@ -197,4 +197,4 @@ Set an insight's retrieval-trust `status` (MCON-2) - promote a quarantined
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

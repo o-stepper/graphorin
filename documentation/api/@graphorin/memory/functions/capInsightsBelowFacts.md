@@ -28,11 +28,11 @@ Pure + deterministic - does not mutate its inputs.
 
 | Parameter | Type |
 | ------ | ------ |
-| `factHits` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[] |
-| `insightHits` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\>[] |
+| `factHits` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[] |
+| `insightHits` | readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[] |
 
 ## Returns
 
-readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\>[]
+readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]
 
 ## Stable

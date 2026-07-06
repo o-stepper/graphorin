@@ -58,7 +58,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:365
 
 #### Returns
 
-`Promise`\<readonly [`PendingConflictRowLike`](/api/@graphorin/memory/interfaces/PendingConflictRowLike.md)[]\>
+`Promise`\&lt;readonly [`PendingConflictRowLike`](/api/@graphorin/memory/interfaces/PendingConflictRowLike.md)[]\&gt;
 
 ***
 
@@ -84,7 +84,7 @@ Optional - without it the deep phase falls back to skip-and-retry.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -105,7 +105,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:366
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 

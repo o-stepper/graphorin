@@ -26,7 +26,7 @@ Defined in: packages/sessions/src/cassette/writer.ts:55
 
 #### Returns
 
-`Promise`\<[`ToolCassetteFooterRecord`](/api/@graphorin/sessions/interfaces/ToolCassetteFooterRecord.md)\>
+`Promise`\&lt;[`ToolCassetteFooterRecord`](/api/@graphorin/sessions/interfaces/ToolCassetteFooterRecord.md)\&gt;
 
 ***
 
@@ -46,4 +46,4 @@ Defined in: packages/sessions/src/cassette/writer.ts:54
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

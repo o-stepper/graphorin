@@ -51,7 +51,7 @@ Defined in: packages/mcp/src/client/types.ts:374
 
 #### Returns
 
-`Promise`\<[`MCPCallToolResult`](/api/@graphorin/mcp/interfaces/MCPCallToolResult.md)\>
+`Promise`\&lt;[`MCPCallToolResult`](/api/@graphorin/mcp/interfaces/MCPCallToolResult.md)\&gt;
 
 ***
 
@@ -65,7 +65,7 @@ Defined in: packages/mcp/src/client/types.ts:397
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -116,7 +116,7 @@ Defined in: packages/mcp/src/client/types.ts:373
 
 #### Returns
 
-`Promise`\<readonly [`MCPPromptDefinition`](/api/@graphorin/mcp/interfaces/MCPPromptDefinition.md)[]\>
+`Promise`\&lt;readonly [`MCPPromptDefinition`](/api/@graphorin/mcp/interfaces/MCPPromptDefinition.md)[]\&gt;
 
 ***
 
@@ -137,7 +137,7 @@ Defined in: packages/mcp/src/client/types.ts:372
 
 #### Returns
 
-`Promise`\<readonly [`MCPResourceDefinition`](/api/@graphorin/mcp/interfaces/MCPResourceDefinition.md)[]\>
+`Promise`\&lt;readonly [`MCPResourceDefinition`](/api/@graphorin/mcp/interfaces/MCPResourceDefinition.md)[]\&gt;
 
 ***
 
@@ -158,7 +158,7 @@ Defined in: packages/mcp/src/client/types.ts:371
 
 #### Returns
 
-`Promise`\<readonly [`MCPToolDefinition`](/api/@graphorin/mcp/interfaces/MCPToolDefinition.md)[]\>
+`Promise`\&lt;readonly [`MCPToolDefinition`](/api/@graphorin/mcp/interfaces/MCPToolDefinition.md)[]\&gt;
 
 ***
 
@@ -185,7 +185,7 @@ FIRST item - a WARN + counter fire when that happens; use
 
 #### Returns
 
-`Promise`\<[`MCPResourceContent`](/api/@graphorin/mcp/interfaces/MCPResourceContent.md)\>
+`Promise`\&lt;[`MCPResourceContent`](/api/@graphorin/mcp/interfaces/MCPResourceContent.md)\&gt;
 
 ***
 
@@ -209,7 +209,7 @@ Every content item of the resource (mcp-skills-11).
 
 #### Returns
 
-`Promise`\<readonly [`MCPResourceContent`](/api/@graphorin/mcp/interfaces/MCPResourceContent.md)[]\>
+`Promise`\&lt;readonly [`MCPResourceContent`](/api/@graphorin/mcp/interfaces/MCPResourceContent.md)[]\&gt;
 
 ***
 
@@ -229,4 +229,4 @@ Defined in: packages/mcp/src/client/types.ts:396
 
 #### Returns
 
-`Promise`\<readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`unknown`, `unknown`, `unknown`\>[]\>
+`Promise`\<readonly [`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`unknown`, `unknown`, `unknown`\&gt;[]\>

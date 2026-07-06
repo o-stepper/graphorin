@@ -19,6 +19,6 @@ binary-keyed cipher variants.
 
 ## Returns
 
-`Promise`\<`string` \| `Buffer`\>
+`Promise`\&lt;`string` \| `Buffer`\&gt;
 
 ## Stable

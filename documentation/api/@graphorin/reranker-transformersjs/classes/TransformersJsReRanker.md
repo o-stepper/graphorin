@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/reranker-transformersjs](/api/@graphorin/reranker-transformersjs/index.md) / [](/api/@graphorin/reranker-transformersjs/README.md) / TransformersJsReRanker
 
-# Class: TransformersJsReRanker\<TRecord\>
+# Class: TransformersJsReRanker\&lt;TRecord\&gt;
 
 Defined in: packages/reranker-transformersjs/src/reranker.ts:102
 
@@ -37,11 +37,11 @@ Defined in: packages/reranker-transformersjs/src/reranker.ts:124
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`CrossEncoderRerankerOptions`](/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderRerankerOptions.md)\<`TRecord`\> |
+| `options` | [`CrossEncoderRerankerOptions`](/api/@graphorin/reranker-transformersjs/interfaces/CrossEncoderRerankerOptions.md)\&lt;`TRecord`\&gt; |
 
 #### Returns
 
-`TransformersJsReRanker`\<`TRecord`\>
+`TransformersJsReRanker`\&lt;`TRecord`\&gt;
 
 ## Properties
 
@@ -124,12 +124,12 @@ sorted by `score` descending.
 | Parameter | Type |
 | ------ | ------ |
 | `query` | `string` |
-| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TInputRecord`\>[][] |
+| `lists` | readonly readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TInputRecord`\&gt;[][] |
 | `options` | [`ReRankOptions`](/api/@graphorin/memory/interfaces/ReRankOptions.md) |
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<`TInputRecord`\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TInputRecord`\&gt;[]\>
 
 #### Implementation of
 

@@ -19,7 +19,7 @@ Tokenise a body - lowercase, alphanumeric runs only, drop stopwords.
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
 | `text` | `string` | `undefined` |
-| `stopwords` | `ReadonlySet`\<`string`\> | `DEFAULT_STOPWORDS` |
+| `stopwords` | `ReadonlySet`\&lt;`string`\&gt; | `DEFAULT_STOPWORDS` |
 
 ## Returns
 

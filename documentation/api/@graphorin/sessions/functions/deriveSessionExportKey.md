@@ -20,11 +20,11 @@ produce the same key.
 
 | Parameter | Type |
 | ------ | ------ |
-| `passphrase` | `string` \| `Uint8Array`\<`ArrayBufferLike`\> |
+| `passphrase` | `string` \| `Uint8Array`\&lt;`ArrayBufferLike`\&gt; |
 | `salt` | `Uint8Array` |
 
 ## Returns
 
-`Promise`\<`Uint8Array`\<`ArrayBufferLike`\>\>
+`Promise`\<`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\>
 
 ## Stable

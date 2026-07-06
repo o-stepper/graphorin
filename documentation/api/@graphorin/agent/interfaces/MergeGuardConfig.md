@@ -19,5 +19,5 @@ Per-agent guard configuration accepted by
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-lowtrustthreshold"></a> `lowTrustThreshold?` | `readonly` | `number` | Default `0.5`. | packages/agent/src/lateral-leak/merge-guard.ts:61 |
 | <a id="property-maxlowtrustweight"></a> `maxLowTrustWeight?` | `readonly` | `number` | Default `0.3`. | packages/agent/src/lateral-leak/merge-guard.ts:59 |
-| <a id="property-sourcetrustoverrides"></a> `sourceTrustOverrides?` | `readonly` | `Readonly`\<`Record`\<`string`, `number`\>\> | Operator overrides for known agent ids. | packages/agent/src/lateral-leak/merge-guard.ts:63 |
+| <a id="property-sourcetrustoverrides"></a> `sourceTrustOverrides?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> | Operator overrides for known agent ids. | packages/agent/src/lateral-leak/merge-guard.ts:63 |
 | <a id="property-strictness"></a> `strictness` | `readonly` | `"off"` \| `"detect"` \| `"detect-and-flag"` \| `"detect-and-block"` | - | packages/agent/src/lateral-leak/merge-guard.ts:57 |

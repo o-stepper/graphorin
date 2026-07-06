@@ -34,7 +34,7 @@ Assemble the layered system prompt for a single step.
 
 #### Returns
 
-`Promise`\<[`AssembledPrompt`](/api/@graphorin/memory/interfaces/AssembledPrompt.md)\>
+`Promise`\&lt;[`AssembledPrompt`](/api/@graphorin/memory/interfaces/AssembledPrompt.md)\&gt;
 
 ***
 
@@ -134,4 +134,4 @@ is warm.
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;

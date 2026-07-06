@@ -24,6 +24,6 @@ Delete spans that FINISHED before the cutoff (see `pruneSpans` in
 
 ## Returns
 
-`Promise`\<[`TracesPruneResult`](/api/@graphorin/cli/interfaces/TracesPruneResult.md)\>
+`Promise`\&lt;[`TracesPruneResult`](/api/@graphorin/cli/interfaces/TracesPruneResult.md)\&gt;
 
 ## Stable

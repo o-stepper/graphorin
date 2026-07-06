@@ -23,6 +23,6 @@ relevance × importance).
 
 ## Returns
 
-[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\<`RecallEpisodesInput`, `RecallEpisodesOutput`\>
+[`Tool`](/api/@graphorin/core/interfaces/Tool.md)\&lt;`RecallEpisodesInput`, `RecallEpisodesOutput`\&gt;
 
 ## Stable

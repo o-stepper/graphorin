@@ -24,6 +24,6 @@ can surface them to the operator.
 
 ## Returns
 
-`Promise`\<[`PricingSnapshot`](/api/@graphorin/pricing/interfaces/PricingSnapshot.md)\>
+`Promise`\&lt;[`PricingSnapshot`](/api/@graphorin/pricing/interfaces/PricingSnapshot.md)\&gt;
 
 ## Stable

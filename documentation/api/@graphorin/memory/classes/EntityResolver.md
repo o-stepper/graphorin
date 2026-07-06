@@ -64,7 +64,7 @@ relation label, never an entity). Idempotent on re-link.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -94,4 +94,4 @@ name that normalizes to empty (no entity).
 
 #### Returns
 
-`Promise`\<`string` \| `null`\>
+`Promise`\&lt;`string` \| `null`\&gt;

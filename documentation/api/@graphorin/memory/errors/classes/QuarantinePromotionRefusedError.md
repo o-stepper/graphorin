@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/errors/index.ts:227
 
-Raised by SemanticMemory.validate (P1-4 / MRET-3) when a caller
+Raised by `SemanticMemory.validate` (P1-4 / MRET-3) when a caller
 tries to promote a fact whose quarantine was triggered by the offline
 injection heuristics. Such a fact is a memory-poisoning candidate: the
 agent's own `fact_validate` tool must never be able to admit it into

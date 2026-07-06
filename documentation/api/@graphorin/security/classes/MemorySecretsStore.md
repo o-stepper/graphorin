@@ -81,7 +81,7 @@ Defined in: packages/security/src/secrets/stores/memory.ts:85
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -108,7 +108,7 @@ Returns the secret if it exists, `null` otherwise.
 
 #### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) \| `null`\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) \| `null`\&gt;
 
 #### Implementation of
 
@@ -134,7 +134,7 @@ Returns metadata about every key - never the values themselves.
 
 #### Returns
 
-`Promise`\<readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\>
+`Promise`\&lt;readonly [`SecretMetadata`](/api/@graphorin/core/interfaces/SecretMetadata.md)[]\&gt;
 
 #### Implementation of
 
@@ -163,7 +163,7 @@ throw `SecretAccessDeniedError`.
 
 #### Returns
 
-`Promise`\<[`SecretValue`](/api/@graphorin/security/classes/SecretValue.md)\>
+`Promise`\&lt;[`SecretValue`](/api/@graphorin/security/classes/SecretValue.md)\&gt;
 
 #### Implementation of
 
@@ -195,7 +195,7 @@ Persist a secret. Implementations auto-wrap a plain string into a
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 

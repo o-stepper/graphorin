@@ -19,8 +19,8 @@ Only cases present in both maps are compared (by base case id).
 
 | Parameter | Type |
 | ------ | ------ |
-| `current` | `ReadonlyMap`\<`string`, `boolean`\> |
-| `baseline` | `ReadonlyMap`\<`string`, `boolean`\> |
+| `current` | `ReadonlyMap`\&lt;`string`, `boolean`\&gt; |
+| `baseline` | `ReadonlyMap`\&lt;`string`, `boolean`\&gt; |
 
 ## Returns
 

@@ -14,7 +14,7 @@ be resolved via `resolveOrPlaceholder(...)`.
 
 The registry is in-memory + write-through to the configured
 `SessionStoreExt`. The package-level singleton instance is owned by
-the createSessionManager facade in `./facade.ts`; consumers
+the `createSessionManager` facade in `./facade.ts`; consumers
 never construct an `AgentRegistry` directly.
 
 ## Classes

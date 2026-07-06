@@ -22,6 +22,6 @@ List token metadata.
 
 ## Returns
 
-`Promise`\<readonly [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)[]\>
+`Promise`\&lt;readonly [`TokenMetadata`](/api/@graphorin/security/interfaces/TokenMetadata.md)[]\&gt;
 
 ## Stable

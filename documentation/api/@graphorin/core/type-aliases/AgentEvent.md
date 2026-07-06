@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / AgentEvent
 
-# Type Alias: AgentEvent\<TOutput\>
+# Type Alias: AgentEvent\&lt;TOutput\&gt;
 
 ```ts
 type AgentEvent<TOutput> = 

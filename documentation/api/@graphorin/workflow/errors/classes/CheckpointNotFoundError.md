@@ -8,7 +8,7 @@
 
 Defined in: packages/workflow/src/errors/index.ts:130
 
-Thrown when Workflow.fork cannot find the named checkpoint.
+Thrown when `Workflow.fork` cannot find the named checkpoint.
 
 ## Extends
 

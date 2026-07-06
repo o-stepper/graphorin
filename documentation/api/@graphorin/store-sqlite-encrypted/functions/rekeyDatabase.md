@@ -25,6 +25,6 @@ post-rekey integrity check fails.
 
 ## Returns
 
-`Promise`\<[`RekeyDatabaseResult`](/api/@graphorin/store-sqlite-encrypted/interfaces/RekeyDatabaseResult.md)\>
+`Promise`\&lt;[`RekeyDatabaseResult`](/api/@graphorin/store-sqlite-encrypted/interfaces/RekeyDatabaseResult.md)\&gt;
 
 ## Stable

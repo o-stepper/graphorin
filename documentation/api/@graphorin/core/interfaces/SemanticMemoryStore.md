@@ -47,7 +47,7 @@ compatible.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -67,7 +67,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:158
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -88,7 +88,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:159
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 ***
 
@@ -113,4 +113,4 @@ Defined in: packages/core/src/contracts/memory-store.ts:160
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

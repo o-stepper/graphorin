@@ -25,6 +25,6 @@ lifecycle owner; this function is the trim primitive.
 
 ## Returns
 
-`Promise`\<[`CompactionResult`](/api/@graphorin/memory/interfaces/CompactionResult.md)\>
+`Promise`\&lt;[`CompactionResult`](/api/@graphorin/memory/interfaces/CompactionResult.md)\&gt;
 
 ## Stable

@@ -23,13 +23,13 @@ the `EncryptedFileSecretsStore` so the wire format stays in one place.
 | Parameter | Type |
 | ------ | ------ |
 | `bundle` | `Buffer` |
-| `passphrase` | `string` \| `Buffer`\<`ArrayBufferLike`\> |
+| `passphrase` | `string` \| `Buffer`\&lt;`ArrayBufferLike`\&gt; |
 
 ## Returns
 
 `Promise`\<\{
-  `meta`: `Record`\<`string`, `unknown`\>;
-  `values`: `Record`\<`string`, `unknown`\>;
+  `meta`: `Record`\&lt;`string`, `unknown`\&gt;;
+  `values`: `Record`\&lt;`string`, `unknown`\&gt;;
 \}\>
 
 ## Stable

@@ -42,7 +42,7 @@ Run the Authorization Code + PKCE flow.
 
 #### Returns
 
-`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
+`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
 
 ***
 
@@ -64,7 +64,7 @@ Run the Device Authorization Grant.
 
 #### Returns
 
-`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
+`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
 
 ***
 
@@ -88,7 +88,7 @@ Run discovery. Returns the cached value when available.
 
 #### Returns
 
-`Promise`\<[`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md)\>
+`Promise`\&lt;[`DiscoveredMetadata`](/api/@graphorin/security/interfaces/DiscoveredMetadata.md)\&gt;
 
 ***
 
@@ -114,7 +114,7 @@ the same network round-trip.
 
 #### Returns
 
-`Promise`\<[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\>
+`Promise`\&lt;[`OAuthSession`](/api/@graphorin/security/interfaces/OAuthSession.md)\&gt;
 
 ***
 
@@ -142,7 +142,7 @@ Run Dynamic Client Registration. The metadata's
 
 #### Returns
 
-`Promise`\<[`DynamicClientRegistrationResult`](/api/@graphorin/security/interfaces/DynamicClientRegistrationResult.md)\>
+`Promise`\&lt;[`DynamicClientRegistrationResult`](/api/@graphorin/security/interfaces/DynamicClientRegistrationResult.md)\&gt;
 
 ***
 
@@ -166,7 +166,7 @@ Revoke the current session against the discovered revocation endpoint.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 

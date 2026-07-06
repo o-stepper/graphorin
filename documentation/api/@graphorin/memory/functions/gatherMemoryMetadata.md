@@ -24,6 +24,6 @@ effects beyond the storage reads.
 
 ## Returns
 
-`Promise`\<[`MemoryMetadata`](/api/@graphorin/core/interfaces/MemoryMetadata.md)\>
+`Promise`\&lt;[`MemoryMetadata`](/api/@graphorin/core/interfaces/MemoryMetadata.md)\&gt;
 
 ## Stable

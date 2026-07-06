@@ -23,10 +23,10 @@ Defined in: evals/src/scorers/code/predicate.ts:21
 
 | Parameter | Type |
 | ------ | ------ |
-| `options` | [`PredicateOptions`](/api/@graphorin/evals/interfaces/PredicateOptions.md)\<`I`, `O`\> |
+| `options` | [`PredicateOptions`](/api/@graphorin/evals/interfaces/PredicateOptions.md)\&lt;`I`, `O`\&gt; |
 
 ## Returns
 
-[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\<`I`, `O`\>
+[`Scorer`](/api/@graphorin/evals/interfaces/Scorer.md)\&lt;`I`, `O`\&gt;
 
 ## Stable

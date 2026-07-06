@@ -4,7 +4,7 @@
 
 [Graphorin API reference](/api/index.md) / [@graphorin/core](/api/@graphorin/core/index.md) / [](/api/@graphorin/core/README.md) / WorkflowChannelUpdateEvent
 
-# Interface: WorkflowChannelUpdateEvent\<TState\>
+# Interface: WorkflowChannelUpdateEvent\&lt;TState\&gt;
 
 Defined in: packages/core/src/types/workflow-event.ts:64
 

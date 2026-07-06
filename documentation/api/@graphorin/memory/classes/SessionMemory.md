@@ -61,7 +61,7 @@ the sessions facade for participant attribution.
 
 #### Returns
 
-`Promise`\<readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\>
+`Promise`\&lt;readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\&gt;
 
 ***
 
@@ -93,7 +93,7 @@ exists at this layer.
 
 #### Returns
 
-`Promise`\<[`SessionCompactionResult`](/api/@graphorin/memory/interfaces/SessionCompactionResult.md)\>
+`Promise`\&lt;[`SessionCompactionResult`](/api/@graphorin/memory/interfaces/SessionCompactionResult.md)\&gt;
 
 ***
 
@@ -147,7 +147,7 @@ List messages for the supplied scope.
 
 #### Returns
 
-`Promise`\<readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\>
+`Promise`\&lt;readonly [`Message`](/api/@graphorin/core/type-aliases/Message.md)[]\&gt;
 
 ***
 
@@ -172,7 +172,7 @@ Delegates to the store when it supports the richer read.
 
 #### Returns
 
-`Promise`\<readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\>
+`Promise`\&lt;readonly [`SessionMessageWithMetadata`](/api/@graphorin/core/interfaces/SessionMessageWithMetadata.md)[]\&gt;
 
 ***
 
@@ -195,7 +195,7 @@ Persist a message. Returns the storage reference.
 
 #### Returns
 
-`Promise`\<[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\>
+`Promise`\&lt;[`MessageRef`](/api/@graphorin/core/interfaces/MessageRef.md)\&gt;
 
 ***
 
@@ -224,7 +224,7 @@ Hybrid (FTS5) search over the session messages.
 
 #### Returns
 
-`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\<[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\>[]\>
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>
 
 ***
 
@@ -258,6 +258,6 @@ second argument can be either:
 
 #### Returns
 
-`Promise`\<`boolean`\>
+`Promise`\&lt;`boolean`\&gt;
 
 #### Stable

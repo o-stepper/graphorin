@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/context-engine/locale-packs/types.ts:37
 
-Layer 1 template fragments. The composeTemplate function
+Layer 1 template fragments. The `composeTemplate` function
 picks the right fragment based on `memoryBaseMode`.
 
 ## Stable

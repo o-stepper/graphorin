@@ -64,7 +64,7 @@ Append a session-lifecycle audit row.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -89,7 +89,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:135
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -113,7 +113,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:168
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -138,7 +138,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:90
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -162,7 +162,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:35
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -188,7 +188,7 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -214,7 +214,7 @@ RP-6: hard-delete a session + its handoffs / workflow runs / audit rows.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -262,7 +262,7 @@ List all known agents (including retired ones).
 
 #### Returns
 
-`Promise`\<readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\>
+`Promise`\&lt;readonly [`AgentRegistryEntry`](/api/@graphorin/core/interfaces/AgentRegistryEntry.md)[]\&gt;
 
 #### Implementation of
 
@@ -290,7 +290,7 @@ List recent audit rows for a session, newest-first.
 
 #### Returns
 
-`Promise`\<readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\>
+`Promise`\&lt;readonly [`SessionAuditEntry`](/api/@graphorin/core/interfaces/SessionAuditEntry.md)[]\&gt;
 
 #### Implementation of
 
@@ -314,7 +314,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:160
 
 #### Returns
 
-`Promise`\<readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\>
+`Promise`\&lt;readonly [`HandoffRecord`](/api/@graphorin/core/interfaces/HandoffRecord.md)[]\&gt;
 
 #### Implementation of
 
@@ -334,11 +334,11 @@ Defined in: packages/store-sqlite/src/session-store.ts:57
 
 | Parameter | Type |
 | ------ | ------ |
-| `scope` | `Pick`\<[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\> |
+| `scope` | `Pick`\&lt;[`SessionScope`](/api/@graphorin/core/interfaces/SessionScope.md), `"userId"` \| `"agentId"`\&gt; |
 
 #### Returns
 
-`Promise`\<readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\>
+`Promise`\&lt;readonly [`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)[]\&gt;
 
 #### Implementation of
 
@@ -362,7 +362,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:187
 
 #### Returns
 
-`Promise`\<readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\>
+`Promise`\&lt;readonly [`SessionWorkflowRun`](/api/@graphorin/core/interfaces/SessionWorkflowRun.md)[]\&gt;
 
 #### Implementation of
 
@@ -388,7 +388,7 @@ Delete audit rows older than the supplied epoch ms.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Implementation of
 
@@ -416,7 +416,7 @@ RP-6: retention sweep - delete every session matching the policy.
 
 #### Returns
 
-`Promise`\<`number`\>
+`Promise`\&lt;`number`\&gt;
 
 #### Implementation of
 
@@ -440,7 +440,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:97
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -493,7 +493,7 @@ Defined in: packages/store-sqlite/src/session-store.ts:110
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -514,11 +514,11 @@ Defined in: packages/store-sqlite/src/session-store.ts:73
 | Parameter | Type |
 | ------ | ------ |
 | `sessionId` | `string` |
-| `patch` | `Partial`\<[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\> |
+| `patch` | `Partial`\&lt;[`SessionMetadata`](/api/@graphorin/core/interfaces/SessionMetadata.md)\&gt; |
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 
@@ -551,7 +551,7 @@ Update the status of a workflow attachment.
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 #### Implementation of
 

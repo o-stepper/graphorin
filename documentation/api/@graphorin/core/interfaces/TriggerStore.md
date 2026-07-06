@@ -49,7 +49,7 @@ Defined in: packages/core/src/contracts/trigger-store.ts:37
 
 #### Returns
 
-`Promise`\<readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\>
+`Promise`\&lt;readonly [`TriggerState`](/api/@graphorin/core/interfaces/TriggerState.md)[]\&gt;
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: packages/core/src/contracts/trigger-store.ts:39
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -94,7 +94,7 @@ Defined in: packages/core/src/contracts/trigger-store.ts:38
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;
 
 ***
 
@@ -114,4 +114,4 @@ Defined in: packages/core/src/contracts/trigger-store.ts:35
 
 #### Returns
 
-`Promise`\<`void`\>
+`Promise`\&lt;`void`\&gt;

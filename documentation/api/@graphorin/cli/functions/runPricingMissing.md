@@ -20,6 +20,6 @@ Defined in: packages/cli/src/commands/pricing.ts:204
 
 ## Returns
 
-`Promise`\<readonly [`MissingModelEntry`](/api/@graphorin/pricing/interfaces/MissingModelEntry.md)[]\>
+`Promise`\&lt;readonly [`MissingModelEntry`](/api/@graphorin/pricing/interfaces/MissingModelEntry.md)[]\&gt;
 
 ## Stable

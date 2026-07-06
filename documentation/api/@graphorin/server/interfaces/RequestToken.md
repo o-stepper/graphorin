@@ -14,7 +14,7 @@ the contract documented in the runtime architecture (Phase 14a §
 Authentication / authorization middleware: "populates `c.var.token:
 { id, label, scopes, env }`").
 
-Read this through getRequestToken so consumers do not have
+Read this through `getRequestToken` so consumers do not have
 to remember the variable key.
 
 ## Stable

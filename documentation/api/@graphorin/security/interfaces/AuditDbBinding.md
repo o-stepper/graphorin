@@ -22,4 +22,4 @@ wants one appends it after `openAuditDb(...)` resolves.)
 | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-description"></a> `description` | `readonly` | `string` | Human-readable description for diagnostics. | packages/security/src/audit/audit-db.ts:69 |
 | <a id="property-id"></a> `id` | `readonly` | [`AuditDbBindingId`](/api/@graphorin/security/type-aliases/AuditDbBindingId.md) | Identifier of the binding. | packages/security/src/audit/audit-db.ts:67 |
-| <a id="property-open"></a> `open` | `readonly` | (`options`) => `Promise`\<[`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md)\> | Open the audit database. | packages/security/src/audit/audit-db.ts:71 |
+| <a id="property-open"></a> `open` | `readonly` | (`options`) => `Promise`\&lt;[`AuditDb`](/api/@graphorin/security/interfaces/AuditDb.md)\&gt; | Open the audit database. | packages/security/src/audit/audit-db.ts:71 |

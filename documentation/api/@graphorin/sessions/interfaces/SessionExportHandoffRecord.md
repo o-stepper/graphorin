@@ -8,7 +8,7 @@
 
 Defined in: packages/sessions/src/export/types.ts:145
 
-Single handoff record. Mirrors HandoffRecord byte-for-byte
+Single handoff record. Mirrors `HandoffRecord` byte-for-byte
 plus the session id.
 
 ## Stable

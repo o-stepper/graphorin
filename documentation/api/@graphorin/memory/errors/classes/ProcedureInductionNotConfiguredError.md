@@ -8,7 +8,7 @@
 
 Defined in: packages/memory/src/errors/index.ts:258
 
-Raised when ProceduralMemory.induce (P2-2) is called but no
+Raised when `ProceduralMemory.induce` (P2-2) is called but no
 workflow inducer was configured. Induction abstracts concrete values into
 variables, which needs a provider - so the capability is opt-in and the
 default (offline) procedural tier never silently no-ops a requested
