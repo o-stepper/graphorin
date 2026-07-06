@@ -65,6 +65,14 @@ export interface AdaptedToolsResult {
   readonly resolvedInboundSanitization: InboundSanitizationPolicy;
   readonly toolCount: number;
   readonly deferralThreshold: number;
+  /**
+   * W-105: tool names the operator downgraded below the sink classes
+   * via `sideEffectClassByTool` (`'read-only'` / `'pure'`). Each such
+   * tool leaves EVERY sink check - the dataflow gate, the Rule-of-Two
+   * writer forbid, the read-only capability gate - so operator audits
+   * should review this list. Empty when no override downgrades.
+   */
+  readonly downgradedTools: ReadonlyArray<string>;
 }
 
 /**
@@ -107,10 +115,29 @@ export function adaptMCPTools(args: {
   });
 
   const tools: Tool[] = [];
+  const downgradedTools: string[] = [];
   for (const definition of filtered) {
     const namespacedName =
       namespace.length === 0 ? definition.name : `${namespace}.${definition.name}`;
     const sideEffectClass = opts.sideEffectClassByTool?.[namespacedName] ?? 'external-stateful';
+    // W-105: a downgrade below the sink classes is an explicit operator
+    // trust decision with wide consequences - the tool leaves every sink
+    // check (dataflow gate, Rule-of-Two writer forbid, read-only
+    // capability gate). One WARN per tool at adaptation time + a result
+    // field so audits can pick it up; the server's own readOnlyHint is
+    // deliberately never trusted for this.
+    if (sideEffectClass === 'read-only' || sideEffectClass === 'pure') {
+      downgradedTools.push(namespacedName);
+      args.logger?.(
+        'warn',
+        `mcp.tools.side-effect-downgraded: operator override classifies '${namespacedName}' as '${sideEffectClass}' - the tool leaves every sink check (dataflow gate, Rule-of-Two writer forbid, read-only capability gate)`,
+        {
+          server: args.serverIdentity.id,
+          tool: namespacedName,
+          sideEffectClass,
+        },
+      );
+    }
     const preferredModel = opts.preferredModelByTool?.[namespacedName];
     // W-018: strip imperative payloads from schema ANNOTATIONS
     // (description / title / $comment / string examples at any depth -
@@ -176,6 +203,7 @@ export function adaptMCPTools(args: {
     resolvedInboundSanitization: resolvedInbound,
     toolCount: total,
     deferralThreshold: threshold,
+    downgradedTools: Object.freeze(downgradedTools),
   });
 }
 
