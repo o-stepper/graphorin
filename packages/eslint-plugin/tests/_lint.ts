@@ -19,9 +19,15 @@ export function lintSource(args: {
   rule: keyof typeof plugin.rules;
   filename?: string;
   severity?: 'error' | 'warn';
+  /** Rule options array (the part after the severity in a config entry). */
+  options?: readonly unknown[];
 }): Linter.LintMessage[] {
   const filename = args.filename ?? '/repo/packages/example/src/example.js';
   const linter = new Linter({ cwd: dirname(filename) });
+  const entry: Linter.RuleEntry =
+    args.options !== undefined
+      ? ([args.severity ?? 'error', ...args.options] as Linter.RuleEntry)
+      : (args.severity ?? 'error');
   const config: Linter.Config[] = [
     {
       files: ['**/*.js'],
@@ -30,7 +36,7 @@ export function lintSource(args: {
         sourceType: 'module',
       },
       plugins: { '@graphorin': plugin as never },
-      rules: { [`@graphorin/${String(args.rule)}`]: args.severity ?? 'error' },
+      rules: { [`@graphorin/${String(args.rule)}`]: entry },
     },
   ];
   const messages = linter.verify(args.source, config, filename);

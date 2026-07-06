@@ -21,11 +21,25 @@
  * to wait for CI to flag a missed network gate.
  *
  * The rule is intentionally limited to the framework's own code paths
- * - consumer applications can call `fetch` freely. The rule activates
- * whenever the linted file path matches `/packages/<pkg>/src/`.
+ * - consumer applications can call `fetch` freely. Activation is
+ * two-stage (W-039): the linted file path must match
+ * `/packages/<pkg>/src/` AND the nearest package.json's `name` must
+ * start with one of `options[0].packagePrefixes` (default
+ * `['@graphorin/']`), so a downstream pnpm monorepo with the standard
+ * `packages/*\/src` layout no longer gets errors on its own `fetch()`
+ * calls just for adopting `flat/recommended`.
+ *
+ * FAIL-OPEN fallback: when no package.json resolves above the file
+ * (virtual paths in editor buffers or programmatic `Linter` runs), the
+ * rule activates on the path match alone - exactly the pre-W-039
+ * behaviour, so a resolution hiccup can only over-flag framework-shaped
+ * paths, never silently disable the guard.
  *
  * @packageDocumentation
  */
+
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 
 import type { Rule } from 'eslint';
 import type {
@@ -41,6 +55,35 @@ import { nodeHasNearbyComment } from './_comment-utils.js';
 const ALLOW_TAG = /graphorin-allow-network/;
 const FRAMEWORK_PATH_RE = /\bpackages\/[a-z0-9_-]+\/src\b/;
 
+/**
+ * Directory -> nearest package.json `name` (or null when none
+ * resolves). Module-level so one walk serves every file of a package
+ * within a lint run.
+ */
+const packageNameCache = new Map<string, string | null>();
+
+/** Walk up from `fileDir` to the nearest package.json name (cached). */
+function nearestPackageName(fileDir: string): string | null {
+  const cached = packageNameCache.get(fileDir);
+  if (cached !== undefined) return cached;
+  let name: string | null = null;
+  let dir = fileDir;
+  for (;;) {
+    try {
+      const raw = readFileSync(join(dir, 'package.json'), 'utf8');
+      const parsed = JSON.parse(raw) as { name?: unknown };
+      name = typeof parsed.name === 'string' ? parsed.name : null;
+      break;
+    } catch {
+      const parent = dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  }
+  packageNameCache.set(fileDir, name);
+  return name;
+}
+
 const NETWORK_CALLEES = new Set(['fetch', 'XMLHttpRequest']);
 const HTTP_VERBS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'request']);
 const CLIENT_NAMESPACE_VERBS = new Set(['request', 'stream', 'fetch', 'get', 'post']);
@@ -55,7 +98,18 @@ const rule: Rule.RuleModule = {
         'Disallow direct network primitives (`fetch`, `axios`/`undici`/`got`, `http.request`, raw `net`/`tls`/`dgram` sockets, `WebSocket`/`EventSource`/`XMLHttpRequest`, HTTP-client imports) in `@graphorin/*` framework code without an explicit opt-out comment (DEC-154).',
       recommended: true,
     },
-    schema: [],
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          packagePrefixes: {
+            type: 'array',
+            items: { type: 'string' },
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
     messages: {
       forbidden:
         "direct network call '{{callee}}' in framework code; user actions must initiate network I/O. Add `// graphorin-allow-network: <reason>` to opt out.",
@@ -64,7 +118,17 @@ const rule: Rule.RuleModule = {
     },
   },
   create(context: Rule.RuleContext): Rule.RuleListener {
-    if (!FRAMEWORK_PATH_RE.test(context.filename.replace(/\\/g, '/'))) {
+    const filename = context.filename.replace(/\\/g, '/');
+    if (!FRAMEWORK_PATH_RE.test(filename)) {
+      return {};
+    }
+    // W-039 second stage: only packages whose manifest name matches a
+    // configured prefix are "framework code". No resolvable manifest ->
+    // fail open (path-only activation, the historical behaviour).
+    const options = (context.options[0] ?? {}) as { packagePrefixes?: readonly string[] };
+    const prefixes = options.packagePrefixes ?? ['@graphorin/'];
+    const packageName = nearestPackageName(dirname(context.filename));
+    if (packageName !== null && !prefixes.some((p) => packageName.startsWith(p))) {
       return {};
     }
     return {

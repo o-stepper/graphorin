@@ -41,6 +41,10 @@ const CALL_PATTERNS = [
   ['EventSource', /\bnew\s+EventSource\s*\(/m],
   // EB-10: namespace-bound HTTP-client calls, e.g. `undici.request(...)`.
   ['undici/got call', /\b(?:undici|got)\.(?:request|stream|fetch|get|post)\s*\(/m],
+  // W-039 lockstep: the eslint-plugin rule flags axios call sites; give
+  // the script the same reach so the two matchers agree (axios was
+  // previously import-only here).
+  ['axios call', /\baxios(?:\.(?:get|post|put|patch|delete|head|options|request))?\s*\(/m],
 ];
 
 /**
