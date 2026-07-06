@@ -234,6 +234,15 @@ export interface ResolvedTool<TInput = unknown, TOutput = unknown, TDeps = unkno
  * @stable
  */
 export interface ToolReturn<TOutput = unknown> {
+  /**
+   * W-115: envelope brand set by the {@link toolReturn} factory.
+   * `Symbol.for`, so duplicate package copies agree. Prefer branding:
+   * the structural fallback in the executor is deliberately narrow
+   * (own keys within `{output, contentParts, taint}`), and plain data
+   * that happens to be exactly `{ output: X }` is ambiguous by
+   * construction - brand it (or rename the field) to disambiguate.
+   */
+  readonly [TOOL_RETURN_BRAND]?: true;
   readonly output: TOutput;
   readonly contentParts?: ReadonlyArray<MessageContent>;
   /**
@@ -249,6 +258,73 @@ export interface ToolReturn<TOutput = unknown> {
     readonly sensitive?: boolean;
     readonly sourceKind?: string;
   };
+}
+
+/**
+ * W-115: cross-realm brand for the {@link ToolReturn} envelope
+ * (`SECRET_VALUE_BRAND` precedent - `Symbol.for` survives duplicate
+ * package copies).
+ *
+ * @stable
+ */
+export const TOOL_RETURN_BRAND: unique symbol = Symbol.for('graphorin.ToolReturn');
+
+/**
+ * W-115: build a BRANDED {@link ToolReturn} envelope. The executor
+ * unwraps branded envelopes unconditionally; unbranded objects fall to
+ * a deliberately narrow structural sniff (own keys within
+ * `{output, contentParts, taint}`), so a tool legitimately returning
+ * `{ output, exitCode, stderr }` is no longer silently stripped to its
+ * `output` field.
+ *
+ * @stable
+ */
+export function toolReturn<TOutput>(fields: {
+  readonly output: TOutput;
+  readonly contentParts?: ReadonlyArray<MessageContent>;
+  readonly taint?: ToolReturn<TOutput>['taint'];
+}): ToolReturn<TOutput> {
+  return {
+    [TOOL_RETURN_BRAND]: true,
+    output: fields.output,
+    ...(fields.contentParts !== undefined ? { contentParts: fields.contentParts } : {}),
+    ...(fields.taint !== undefined ? { taint: fields.taint } : {}),
+  };
+}
+
+/**
+ * W-115: the ONE guard for the ToolReturn envelope (the executor and
+ * the registry example-normalizer both consume it). Brand first; the
+ * structural fallback accepts only objects whose OWN enumerable keys
+ * all belong to the canonical envelope shape - `{output, exitCode}`
+ * style process results pass through intact.
+ *
+ * @stable
+ */
+export function isToolReturnEnvelope<TOutput = unknown>(
+  value: unknown,
+): value is ToolReturn<TOutput> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  if ((value as Record<PropertyKey, unknown>)[TOOL_RETURN_BRAND] === true) return true;
+  if (!Object.hasOwn(value, 'output')) return false;
+  for (const key of Object.keys(value)) {
+    if (key !== 'output' && key !== 'contentParts' && key !== 'taint') return false;
+  }
+  return true;
+}
+
+/**
+ * W-115: `true` when {@link isToolReturnEnvelope} matched WITHOUT the
+ * brand - observability for the future deprecation of the structural
+ * sniff.
+ *
+ * @stable
+ */
+export function isUnbrandedToolReturn(value: unknown): boolean {
+  return (
+    isToolReturnEnvelope(value) &&
+    (value as unknown as Record<PropertyKey, unknown>)[TOOL_RETURN_BRAND] !== true
+  );
 }
 
 /**

@@ -29,6 +29,7 @@ import type {
   AgentEvent,
   AgentResult,
   FileGeneratedEvent,
+  SubagentEvent,
   ToolExecutePartialEvent,
 } from './agent-event.js';
 import type { ContentChunk } from './tool.js';
@@ -70,13 +71,25 @@ export interface WireAgentEndEvent<TOutput = string>
  *
  * @stable
  */
+/**
+ * Wire twin of {@link SubagentEvent} (W-036): the wrapped child event
+ * projects recursively - a forwarded child `agent.end` carries a full
+ * `RunState` of its own.
+ *
+ * @stable
+ */
+export interface WireSubagentEvent extends Omit<SubagentEvent, 'event'> {
+  readonly event: WireAgentEvent<unknown>;
+}
+
 export type WireAgentEvent<TOutput = string> =
   | Exclude<
       AgentEvent<TOutput>,
-      FileGeneratedEvent | ToolExecutePartialEvent | AgentEndEvent<TOutput>
+      FileGeneratedEvent | ToolExecutePartialEvent | AgentEndEvent<TOutput> | SubagentEvent
     >
   | WireFileGeneratedEvent
   | WireToolExecutePartialEvent
+  | WireSubagentEvent
   | WireAgentEndEvent<TOutput>;
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -135,6 +148,9 @@ export function toWireAgentEvent<TOutput = string>(
         ...ev,
         result: { ...ev.result, state: toJsonSafeRunState(ev.result.state) },
       };
+    case 'subagent.event':
+      // W-036: the wrapped child event projects recursively.
+      return { ...ev, event: toWireAgentEvent(ev.event) };
     default:
       return ev as WireAgentEvent<TOutput>;
   }
@@ -169,6 +185,8 @@ export function fromWireAgentEvent<TOutput = string>(
           state: fromJsonSafeRunState(ev.result.state as unknown as WireRunState),
         },
       } as AgentEvent<TOutput>;
+    case 'subagent.event':
+      return { ...ev, event: fromWireAgentEvent(ev.event) } as AgentEvent<TOutput>;
     default:
       return ev as AgentEvent<TOutput>;
   }

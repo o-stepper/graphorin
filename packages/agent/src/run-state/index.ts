@@ -75,9 +75,28 @@ export interface SerializedRunState {
   readonly promotedTools?: ReadonlyArray<string>;
   /** D6: journaled structured plan/todo list. */
   readonly todos?: ReadonlyArray<TodoItem>;
+  /**
+   * W-001: parked sub-agent runs. Each child snapshot is itself a full
+   * `SerializedRunState` - version-stamped and secret-redacted
+   * recursively, to any nesting depth.
+   */
+  readonly pendingSubRuns?: ReadonlyArray<SerializedPendingSubRun>;
   readonly startedAt: string;
   readonly finishedAt?: string;
   readonly error?: { readonly message: string; readonly code: string; readonly details?: unknown };
+}
+
+/**
+ * Serialized twin of core's `PendingSubRun` (W-001): the parked child
+ * state travels as its own versioned {@link SerializedRunState}.
+ *
+ * @stable
+ */
+export interface SerializedPendingSubRun {
+  readonly toolCallId: string;
+  readonly toolName: string;
+  readonly targetAgentName: string;
+  readonly state: SerializedRunState;
 }
 
 /**
@@ -113,6 +132,22 @@ export function serializeRunState(
   // contentParts) must be projected to their JSON-safe wire form BEFORE
   // the detach stringify below, or they corrupt silently.
   const wire = toJsonSafeRunState(state);
+  // W-001: each parked child state serializes through THIS function
+  // recursively (from the live `state`, not the wire projection) so
+  // every nested snapshot carries its own `version` stamp and passes
+  // the same secret redaction - a naive stringify would smuggle an
+  // unversioned live child through the checkpoint.
+  const pendingSubRuns =
+    state.pendingSubRuns !== undefined && state.pendingSubRuns.length > 0
+      ? state.pendingSubRuns.map(
+          (sub): SerializedPendingSubRun => ({
+            toolCallId: sub.toolCallId,
+            toolName: sub.toolName,
+            targetAgentName: sub.targetAgentName,
+            state: serializeRunState(sub.state, options),
+          }),
+        )
+      : undefined;
   const out: SerializedRunState = {
     version: RUN_STATE_SCHEMA_VERSION,
     id: wire.id,
@@ -130,6 +165,7 @@ export function serializeRunState(
     ...(wire.taintSummary !== undefined ? { taintSummary: wire.taintSummary } : {}),
     ...(wire.promotedTools !== undefined ? { promotedTools: wire.promotedTools } : {}),
     ...(wire.todos !== undefined ? { todos: wire.todos } : {}),
+    ...(pendingSubRuns !== undefined ? { pendingSubRuns } : {}),
     startedAt: wire.startedAt,
     ...(wire.finishedAt !== undefined ? { finishedAt: wire.finishedAt } : {}),
     ...(wire.error !== undefined ? { error: wire.error } : {}),
@@ -404,7 +440,27 @@ export function deserializeRunState(payload: unknown, options: DeserializeOption
   // W-004: decode base64/href envelopes back into Uint8Array/URL. Legacy
   // 1.0/1.1 payloads whose binary fields were stringify-corrupted into
   // numeric-key objects are repaired best-effort inside the codec.
-  return fromJsonSafeRunState(wire);
+  const rehydrated = fromJsonSafeRunState(wire);
+  // W-001: rehydrate each parked child through THIS function recursively
+  // (the child payload is its own versioned SerializedRunState).
+  if (Array.isArray(payload.pendingSubRuns) && payload.pendingSubRuns.length > 0) {
+    const subs = payload.pendingSubRuns
+      .filter(isRecord)
+      .filter(
+        (s): s is Record<string, unknown> & { toolCallId: string; toolName: string } =>
+          typeof s.toolCallId === 'string' && typeof s.toolName === 'string',
+      )
+      .map((s) => ({
+        toolCallId: s.toolCallId,
+        toolName: s.toolName,
+        targetAgentName: typeof s.targetAgentName === 'string' ? s.targetAgentName : s.toolName,
+        state: deserializeRunState(s.state, options),
+      }));
+    if (subs.length > 0) {
+      (rehydrated as { pendingSubRuns?: RunState['pendingSubRuns'] }).pendingSubRuns = subs;
+    }
+  }
+  return rehydrated;
 }
 
 /** Convenience JSON-string parser pairing with {@link runStateToJSON}. */

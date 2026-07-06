@@ -6,7 +6,7 @@
 
 # Class: WorkflowRegistry
 
-Defined in: packages/server/src/registry/index.ts:199
+Defined in: packages/server/src/registry/index.ts:222
 
 ## Stable
 
@@ -32,7 +32,7 @@ describe(id):
   | undefined;
 ```
 
-Defined in: packages/server/src/registry/index.ts:235
+Defined in: packages/server/src/registry/index.ts:258
 
 #### Parameters
 
@@ -55,7 +55,7 @@ get(id):
   | undefined;
 ```
 
-Defined in: packages/server/src/registry/index.ts:215
+Defined in: packages/server/src/registry/index.ts:238
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: packages/server/src/registry/index.ts:215
 has(id): boolean;
 ```
 
-Defined in: packages/server/src/registry/index.ts:219
+Defined in: packages/server/src/registry/index.ts:242
 
 #### Parameters
 
@@ -96,7 +96,7 @@ Defined in: packages/server/src/registry/index.ts:219
 list(): readonly WorkflowSummary[];
 ```
 
-Defined in: packages/server/src/registry/index.ts:223
+Defined in: packages/server/src/registry/index.ts:246
 
 #### Returns
 
@@ -110,7 +110,7 @@ readonly [`WorkflowSummary`](/api/@graphorin/server/registry/interfaces/Workflow
 register(entry): void;
 ```
 
-Defined in: packages/server/src/registry/index.ts:202
+Defined in: packages/server/src/registry/index.ts:225
 
 #### Parameters
 
@@ -130,7 +130,7 @@ Defined in: packages/server/src/registry/index.ts:202
 size(): number;
 ```
 
-Defined in: packages/server/src/registry/index.ts:245
+Defined in: packages/server/src/registry/index.ts:268
 
 #### Returns
 
@@ -144,7 +144,7 @@ Defined in: packages/server/src/registry/index.ts:245
 unregister(id): boolean;
 ```
 
-Defined in: packages/server/src/registry/index.ts:211
+Defined in: packages/server/src/registry/index.ts:234
 
 #### Parameters
 

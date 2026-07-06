@@ -14,7 +14,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import type { AgentEvent, FanOutChildMetadata } from '@graphorin/core';
+import { type AgentEvent, type FanOutChildMetadata, type Usage, zeroUsage } from '@graphorin/core';
 import { MergeBlockedError } from '../errors/index.js';
 import {
   type ContentOriginKind,
@@ -23,6 +23,7 @@ import {
   type MergeGuardConfig,
   type TrustClass,
 } from '../lateral-leak/merge-guard.js';
+import { accumulateUsage } from '../runtime/messages.js';
 
 /**
  * Per-child budget. Defaults derived from the canonical 2026
@@ -80,6 +81,11 @@ export interface ChildResult<TOutput = unknown> {
   readonly tokensUsed: number;
   readonly toolCallCount: number;
   readonly durationMs: number;
+  /**
+   * Full usage breakdown, present only for usage-reporting children
+   * (an `invoke` resolving to a full `AgentResult`, W-033).
+   */
+  readonly usage?: Usage;
 }
 
 /**
@@ -92,6 +98,13 @@ export interface FanOutResult<TOutput = unknown> {
   readonly output: TOutput;
   readonly children: ReadonlyArray<ChildResult<TOutput>>;
   readonly mergeDurationMs: number;
+  /**
+   * Sum of every usage-reporting child's usage (W-033); zero when no
+   * child reported. The fan-out helper never mutates the parent run's
+   * live state (it runs outside the loop and would race it) - folding
+   * this into the parent run's accounting is the caller's decision.
+   */
+  readonly usage: Usage;
 }
 
 /**
@@ -161,15 +174,22 @@ const DEFAULT_MAX_CONCURRENT_CHILDREN = 4;
  * negligible; children whose genuine output looks like this should
  * resolve a plain value instead.
  */
-function harvestAgentResult(
-  value: unknown,
-):
-  | { readonly output: unknown; readonly tokensUsed: number; readonly toolCallCount: number }
+function harvestAgentResult(value: unknown):
+  | {
+      readonly output: unknown;
+      readonly tokensUsed: number;
+      readonly toolCallCount: number;
+      readonly usage?: Usage;
+    }
   | undefined {
   if (typeof value !== 'object' || value === null) return undefined;
   const v = value as {
     readonly output?: unknown;
-    readonly usage?: { readonly totalTokens?: unknown };
+    readonly usage?: {
+      readonly totalTokens?: unknown;
+      readonly promptTokens?: unknown;
+      readonly completionTokens?: unknown;
+    };
     readonly state?: { readonly id?: unknown; readonly status?: unknown; readonly steps?: unknown };
   };
   if (!('output' in v)) return undefined;
@@ -182,7 +202,16 @@ function harvestAgentResult(
       if (Array.isArray(calls)) toolCallCount += calls.length;
     }
   }
-  return { output: v.output, tokensUsed: v.usage.totalTokens, toolCallCount };
+  const usage =
+    typeof v.usage.promptTokens === 'number' && typeof v.usage.completionTokens === 'number'
+      ? (v.usage as Usage)
+      : undefined;
+  return {
+    output: v.output,
+    tokensUsed: v.usage.totalTokens,
+    toolCallCount,
+    ...(usage !== undefined ? { usage } : {}),
+  };
 }
 
 /**
@@ -267,6 +296,7 @@ async function runWithSemaphore<TOutput>(
             tokensUsed,
             toolCallCount,
             durationMs: Date.now() - start,
+            ...(report?.usage !== undefined ? { usage: report.usage } : {}),
           };
         }
         return {
@@ -276,6 +306,7 @@ async function runWithSemaphore<TOutput>(
           tokensUsed,
           toolCallCount,
           durationMs: Date.now() - start,
+          ...(report?.usage !== undefined ? { usage: report.usage } : {}),
         };
       } catch (cause) {
         const message = cause instanceof Error ? cause.message : String(cause);
@@ -477,10 +508,16 @@ export async function runFanOut<TOutput>(
     childMetadata,
   });
 
+  const usage = zeroUsage();
+  for (const r of results) {
+    if (r.usage !== undefined) accumulateUsage(usage, r.usage);
+  }
+
   return {
     fanOutId,
     output: merged,
     children: results,
     mergeDurationMs,
+    usage,
   };
 }

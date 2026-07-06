@@ -363,4 +363,33 @@ describe('IP-2 - the streaming endpoints actually stream', () => {
     expect(wire).toContain('t-99');
     expect(runs.snapshot(body.runId)?.status).toBe('completed');
   });
+
+  it('W-151: POST /agents/:id/stream rejects a malformed body with the same 400 as /run and registers no run', async () => {
+    const { app, runs } = buildApp();
+    const before = runs.runningCount();
+    const bad = await app.request('/agents/streamy/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: 'x', bogusField: true }),
+    });
+    expect(bad.status).toBe(400);
+    const badBody = (await bad.json()) as { error: string; issues: unknown[] };
+    expect(badBody.error).toBe('config-invalid');
+    expect(badBody.issues.length).toBeGreaterThan(0);
+    // No run registered, nothing launched on an empty prompt.
+    expect(runs.runningCount()).toBe(before);
+
+    // The identical input against /run produces the identical envelope.
+    const run = await app.request('/agents/streamy/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: 'x', bogusField: true }),
+    });
+    expect(run.status).toBe(400);
+    expect(await run.json()).toEqual(badBody);
+
+    // An EMPTY body stays valid (schema default) - 202 as before.
+    const empty = await app.request('/agents/streamy/stream', { method: 'POST' });
+    expect(empty.status).toBe(202);
+  });
 });

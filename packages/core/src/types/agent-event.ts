@@ -56,8 +56,27 @@ export type AgentEvent<TOutput = string> =
   | StepEndEvent
   | GuardrailTrippedEvent
   | VerifierResultEvent
+  | SubagentEvent
   | AgentEndEvent<TOutput>
   | AgentErrorEvent;
+
+/**
+ * W-036: a CHILD sub-agent's event forwarded into the parent stream,
+ * wrapped so it never aliases the parent's own step/run events. Which
+ * child events forward is governed by the `forwardEvents` policy on
+ * the handoff entry / `AgentToToolOptions` (default `'lifecycle'`).
+ *
+ * @stable
+ */
+export interface SubagentEvent {
+  readonly type: 'subagent.event';
+  /** The PARENT-side toolCallId of the handoff / sub-agent call. */
+  readonly toolCallId: string;
+  /** The child agent's configured name. */
+  readonly agentName: string;
+  /** The child's event, verbatim. */
+  readonly event: AgentEvent<unknown>;
+}
 
 /** @stable */
 export interface AgentStartEvent {

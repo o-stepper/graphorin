@@ -109,7 +109,15 @@ export function assembleResultPhase(
   if (truncation.resultHandle !== undefined) {
     // TL-6: remember who produced this artifact so a later read
     // re-applies the producer's taint (effective values chain taint
-    // across re-spills of handle reads too).
+    // across re-spills of handle reads too). W-114: the map is bounded
+    // (FIFO eviction) - an evicted handle's taint is restored from its
+    // on-disk sidecar on read, so eviction never loses taint.
+    const cap = rt.options.handleProducerTaintCap ?? 1024;
+    while (cap > 0 && rt.handleProducerTaint.size >= cap) {
+      const oldest = rt.handleProducerTaint.keys().next().value;
+      if (oldest === undefined) break;
+      rt.handleProducerTaint.delete(oldest);
+    }
     rt.handleProducerTaint.set(truncation.resultHandle, {
       trustClass: effectiveTrustClass,
       source: effectiveSource,

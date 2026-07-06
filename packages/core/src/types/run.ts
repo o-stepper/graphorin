@@ -85,6 +85,12 @@ export interface RunStateUsageByModel {
 export interface RunState {
   readonly id: string;
   readonly agentId: string;
+  /**
+   * The agent whose model drives the NEXT step. During a handoff it is
+   * the target for exactly the child observation window and is restored
+   * to the parent when the child returns (W-034) - the child's identity
+   * is durably recorded in {@link RunState.handoffs}, never here.
+   */
   readonly currentAgentId: string;
   readonly sessionId: string;
   readonly userId?: string;
@@ -123,9 +129,37 @@ export interface RunState {
    * prompt each turn). Absent until the agent writes one.
    */
   todos?: ReadonlyArray<TodoItem>;
+  /**
+   * W-001: sub-agent runs parked on this (parent) run because the
+   * child suspended with `awaiting_approval`. Each entry snapshots the
+   * suspended child state; the child's pending approvals are mirrored
+   * onto this run's `pendingApprovals` with `subRunToolCallId` set to
+   * the entry's `toolCallId`. Absent until a child parks.
+   */
+  pendingSubRuns?: PendingSubRun[];
   readonly startedAt: string;
   finishedAt?: string;
   error?: RunError;
+}
+
+/**
+ * One sub-agent run parked on its parent because the child suspended
+ * awaiting approvals (W-001). `state` is a JSON-compatible snapshot of
+ * the suspended child run; in serialized form (the agent package's
+ * `SerializedRunState`) it carries the child's own version-stamped,
+ * secret-redacted snapshot, recursively.
+ *
+ * @stable
+ */
+export interface PendingSubRun {
+  /** The PARENT's toolCallId of the parked handoff / sub-agent call. */
+  readonly toolCallId: string;
+  /** The parent-side tool name (`transfer_to_<name>` or the toTool name). */
+  readonly toolName: string;
+  /** The child agent's configured name (for diagnostics and usage folding). */
+  readonly targetAgentName: string;
+  /** Suspended child run state (carries the child's own pendingApprovals). */
+  readonly state: RunState;
 }
 
 /**
@@ -161,6 +195,8 @@ export interface ReadonlyRunState {
   readonly promotedTools?: ReadonlyArray<string>;
   /** See {@link RunState.todos}. */
   readonly todos?: ReadonlyArray<TodoItem>;
+  /** See {@link RunState.pendingSubRuns}. */
+  readonly pendingSubRuns?: ReadonlyArray<PendingSubRun>;
   readonly startedAt: string;
   readonly finishedAt?: string;
   readonly error?: RunError;

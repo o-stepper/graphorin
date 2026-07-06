@@ -22,6 +22,7 @@ export type AgentRuntimeErrorCode =
   | 'tool-not-found'
   | 'handoff-target-not-found'
   | 'multiple-handoffs-in-step'
+  | 'sub-run-resume-target-not-found'
   | 'run-aborted'
   | 'middleware-order-violation'
   | 'progress-write-failed'
@@ -172,6 +173,27 @@ export class MultipleHandoffsInStepError extends AgentRuntimeError {
       'MultipleHandoffsInStepError',
     );
     this.handoffNames = handoffNames;
+  }
+}
+
+/**
+ * Thrown when a resume directive routes a decision into a parked
+ * sub-agent run (W-001) but the resuming agent instance cannot resolve
+ * the target: the parked toolName matches neither a configured handoff
+ * target nor a `toTool` sub-agent tool. Resume a parked sub-run on the
+ * SAME parent instance (or an identically-configured one).
+ *
+ * @stable
+ */
+export class SubAgentResumeTargetNotFoundError extends AgentRuntimeError {
+  readonly toolName: string;
+  constructor(toolName: string, detail: string) {
+    super(
+      'sub-run-resume-target-not-found',
+      `Cannot resume parked sub-agent run for tool '${toolName}': ${detail}. Parked sub-runs resume only on a parent instance configured with the same handoff target or toTool sub-agent tool.`,
+      'SubAgentResumeTargetNotFoundError',
+    );
+    this.toolName = toolName;
   }
 }
 

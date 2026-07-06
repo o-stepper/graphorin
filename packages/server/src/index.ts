@@ -38,6 +38,7 @@ export {
   ensureStoreAuditBinding,
   type GraphorinServer,
   type TriggersDaemonInput,
+  type WorkflowTimersInput,
 } from './app.js';
 export {
   createDeliveryCommentarySanitizer,
@@ -176,6 +177,15 @@ export {
   type WorkflowRoutesDeps,
 } from './routes/index.js';
 export {
+  createConsoleRetentionLog,
+  type RetentionConfig,
+  type RetentionLog,
+  type RetentionLogLevel,
+  type RetentionStoreLike,
+  type ScheduleRetentionOptions,
+  scheduleRetentionSweeps,
+} from './runtime/retention.js';
+export {
   type RunDescriptor,
   type RunHandle,
   type RunStateSnapshot,
@@ -193,6 +203,13 @@ export {
   type TriggersDaemonStatus,
   type TriggersRoutesDeps,
 } from './triggers/index.js';
+export {
+  type CreateWorkflowTimerDaemonOptions,
+  createWorkflowTimerDaemon,
+  type WorkflowTimerDaemon,
+  type WorkflowTimerDaemonStatus,
+  type WorkflowTimerDriverLike,
+} from './workflows/timer-daemon.js';
 export {
   type BareEventFrame,
   createReplayBuffer,

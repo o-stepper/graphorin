@@ -16,10 +16,11 @@ caller resumes the run with a granted/denied decision.
 
 ## Properties
 
-| Property | Modifier | Type | Defined in |
-| ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | packages/core/src/types/tool.ts:299 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/tool.ts:300 |
-| <a id="property-requestedat"></a> `requestedAt` | `readonly` | `string` | packages/core/src/types/tool.ts:301 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/tool.ts:297 |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | packages/core/src/types/tool.ts:298 |
+| Property | Modifier | Type | Description | Defined in |
+| ------ | ------ | ------ | ------ | ------ |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | - | packages/core/src/types/tool.ts:299 |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | - | packages/core/src/types/tool.ts:300 |
+| <a id="property-requestedat"></a> `requestedAt` | `readonly` | `string` | - | packages/core/src/types/tool.ts:301 |
+| <a id="property-subruntoolcallid"></a> `subRunToolCallId?` | `readonly` | `string` | W-001: set when this approval belongs to a PARKED sub-agent run. It is the PARENT's toolCallId of the parked handoff / sub-agent call (the `RunState.pendingSubRuns` key), never a child-local id. Operators echo it back on the matching `ApprovalDecision` so resume decisions match on the composite (toolCallId, subRunToolCallId) key - child-local toolCallIds of two different children may collide. | packages/core/src/types/tool.ts:311 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/types/tool.ts:297 |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | - | packages/core/src/types/tool.ts:298 |

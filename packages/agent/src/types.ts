@@ -9,6 +9,7 @@
 import type {
   AgentEvent,
   AgentResult,
+  AISpan,
   AnyTool,
   CheckpointStore,
   HandoffFilter,
@@ -131,7 +132,19 @@ export type HandoffEntry<TDeps = unknown> =
       // biome-ignore lint/suspicious/noExplicitAny: existential TOutput (see above)
       readonly target: Agent<TDeps, any>;
       readonly inputFilter?: HandoffFilter;
+      /** W-036: which child events forward into the parent stream. */
+      readonly forwardEvents?: SubagentForwardPolicy;
     };
+
+/**
+ * W-036: sub-agent event-forwarding policy. `'lifecycle'` (default)
+ * forwards tool execution/approval, guardrail, lateral-leak,
+ * compaction and error events - never the high-frequency text deltas;
+ * `'all'` forwards everything; `'none'` keeps the child a black box.
+ *
+ * @stable
+ */
+export type SubagentForwardPolicy = 'none' | 'lifecycle' | 'all';
 
 /**
  * The full options object accepted by {@link createAgent}.
@@ -413,6 +426,16 @@ export interface ApprovalDecision {
   readonly toolCallId: string;
   readonly granted: boolean;
   readonly reason?: string;
+  /**
+   * W-001: echo of `ToolApproval.subRunToolCallId` for approvals that
+   * belong to a parked sub-agent run. Operators read the pair
+   * (`toolCallId`, `subRunToolCallId`) from `RunState.pendingApprovals`
+   * and return BOTH fields; decisions match on the composite key, so
+   * child-local toolCallId collisions across two parked children never
+   * cross-apply. A decision without this field applies only to the
+   * parent's own (unparked) approvals.
+   */
+  readonly subRunToolCallId?: string;
 }
 
 /**
@@ -453,6 +476,15 @@ export interface AgentCallOptions<TDeps> {
    * resuming a suspended run.
    */
   readonly capability?: AgentCapability;
+  /**
+   * W-036: parent span for this run's `agent.run` root span - a
+   * multi-agent invocation forms ONE trace tree (the child's run span
+   * parents under the caller's step/tool span). The runtime supplies it
+   * automatically for handoffs and `toTool` sub-agents. Like
+   * `capability`, it is NOT persisted in `RunState`: re-supply on
+   * resume when stitching matters.
+   */
+  readonly parentSpan?: AISpan;
 }
 
 /**
@@ -488,6 +520,8 @@ export interface AgentToToolOptions {
    * boundary at all).
    */
   readonly inputFilter?: HandoffFilter;
+  /** W-036: which child events forward into the parent stream. */
+  readonly forwardEvents?: SubagentForwardPolicy;
   /**
    * Run the sub-agent under a restricted capability (D2): a
    * `'read-only'` worker cannot execute or advertise writer tools. The
@@ -529,11 +563,17 @@ export interface AbortOptions {
   readonly drain?: boolean;
   /**
    * What to do with approvals that were already requested but not
-   * resolved at abort time.
+   * resolved at abort time (W-038).
    *
-   * - `'deny'` (default) - auto-deny pending approvals.
-   * - `'hold'`            - keep the approvals on `RunState.pendingApprovals`.
-   * - `'fail'`            - reject the run with `RunError(code: 'run-aborted')`.
+   * - `'deny'` (default) - auto-deny pending approvals; each drained
+   *   toolCallId gets a matching tool message so the transcript keeps
+   *   no dangling `tool_use`, and the run ends `'aborted'`.
+   * - `'hold'` - keep the approvals on `RunState.pendingApprovals` of
+   *   the `'aborted'` state; such a state re-enters the loop only via
+   *   an explicit resume directive.
+   * - `'fail'` - reject the run with `RunError(code: 'run-aborted')`
+   *   ONLY when approvals are actually pending; an abort with an empty
+   *   queue ends `'aborted'`, never `'failed'`.
    */
   readonly onPendingApprovals?: 'deny' | 'hold' | 'fail';
 }

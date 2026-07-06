@@ -88,6 +88,14 @@ for (const tool of tools) {
 }
 ```
 
+### Discovery contract (W-044)
+
+The discovery is **text-based by design** (one implementation serves both the CLI and the ESLint rules). Its contract:
+
+- **Comment-aware.** Discovery and grading run over a comment-blanked view of the source: a commented-out `tool({...})` is never discovered, a commented-out property inside a live literal is never extracted, and a commented email inside a live `examples:` block never penalizes the axis. `DiscoveredTool.source` keeps the original text for reports; grading consumes `DiscoveredTool.gradingSource`. String, template, and (conservatively) regex literals are left untouched, and a `tool(` inside a string never matches.
+- **False positives.** Any callee whose last lexical token is `tool(` matches - including method calls like `.tool(` and same-named local helpers. Renamed or wrapped invocations (`const t = tool; t({...})`) are NOT seen. This is the accepted cost of the text-based surface.
+- **Anti-degenerate description guard.** A description of 80+ chars scores the top tier only if it looks like prose: under 4 unique words, or one word carrying more than half the text, caps the axis at 16.
+
 ## Versioning
 
 `@graphorin/eslint-plugin` follows the same lockstep release as the rest of the `@graphorin/*` packages while the framework is on the `0.x` line. Once Graphorin reaches `1.0`, the plugin will move to its own release cadence.

@@ -6,7 +6,7 @@
 
 # Interface: WireFileGeneratedEvent
 
-Defined in: packages/core/src/types/agent-event-wire.ts:42
+Defined in: packages/core/src/types/agent-event-wire.ts:43
 
 Wire twin of FileGeneratedEvent.
 
@@ -20,6 +20,6 @@ Wire twin of FileGeneratedEvent.
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-data"></a> `data` | `readonly` | [`EncodedBytes`](/api/@graphorin/core/interfaces/EncodedBytes.md) | - | packages/core/src/types/agent-event-wire.ts:43 |
-| <a id="property-mimetype"></a> `mimeType` | `readonly` | `string` | `Omit.mimeType` | packages/core/src/types/agent-event.ts:227 |
-| <a id="property-type"></a> `type` | `readonly` | `"file.generated"` | `Omit.type` | packages/core/src/types/agent-event.ts:226 |
+| <a id="property-data"></a> `data` | `readonly` | [`EncodedBytes`](/api/@graphorin/core/interfaces/EncodedBytes.md) | - | packages/core/src/types/agent-event-wire.ts:44 |
+| <a id="property-mimetype"></a> `mimeType` | `readonly` | `string` | `Omit.mimeType` | packages/core/src/types/agent-event.ts:246 |
+| <a id="property-type"></a> `type` | `readonly` | `"file.generated"` | `Omit.type` | packages/core/src/types/agent-event.ts:245 |

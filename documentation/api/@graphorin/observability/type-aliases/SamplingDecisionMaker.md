@@ -10,6 +10,6 @@
 type SamplingDecisionMaker = "parent-based" | "always-on" | "rate-limit";
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:13
+Defined in: packages/observability/src/tracer/sampling.ts:16
 
 ## Stable

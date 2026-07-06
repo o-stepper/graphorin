@@ -324,6 +324,12 @@ function validateConfig<TState extends object>(config: WorkflowConfig<TState>): 
     throw new InvalidWorkflowConfigError('maxSteps must be a positive integer');
   }
   if (
+    config.maxTotalSteps !== undefined &&
+    (config.maxTotalSteps < 1 || !Number.isInteger(config.maxTotalSteps))
+  ) {
+    throw new InvalidWorkflowConfigError('maxTotalSteps must be a positive integer');
+  }
+  if (
     config.cancelGraceMs !== undefined &&
     (config.cancelGraceMs < 0 || !Number.isFinite(config.cancelGraceMs))
   ) {

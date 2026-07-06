@@ -10,7 +10,7 @@
 function discoverToolCallsInSource(file, source): DiscoveredTool[];
 ```
 
-Defined in: src/tool-discovery.ts:183
+Defined in: src/tool-discovery.ts:209
 
 Discover every `tool({...})` invocation in a source string. The
 returned findings are stable + frozen so callers can pass them

@@ -6,7 +6,7 @@
 
 # Interface: CheckpointStore
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:143
+Defined in: packages/core/src/contracts/checkpoint-store.ts:153
 
 Pluggable checkpoint storage interface. The default implementation
 lives in `@graphorin/store-sqlite`.
@@ -25,7 +25,7 @@ lives in `@graphorin/store-sqlite`.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:174
+Defined in: packages/core/src/contracts/checkpoint-store.ts:184
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -55,7 +55,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:160
+Defined in: packages/core/src/contracts/checkpoint-store.ts:170
 
 #### Parameters
 
@@ -82,7 +82,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:166
+Defined in: packages/core/src/contracts/checkpoint-store.ts:176
 
 #### Parameters
 
@@ -98,6 +98,43 @@ Defined in: packages/core/src/contracts/checkpoint-store.ts:166
 
 ***
 
+### listSuspended()?
+
+```ts
+optional listSuspended(namespace, opts?): Promise<readonly {
+  threadId: string;
+  wakeAt: number;
+}[]>;
+```
+
+Defined in: packages/core/src/contracts/checkpoint-store.ts:195
+
+W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+`suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
+stamped wakeAt). This is what a durable-timer driver polls -
+without it an operator would have to keep an external registry of
+sleeping threadIds. OPTIONAL so third-party stores compile
+unchanged; `createTimerDriver` throws a typed error when the store
+lacks it (deterministic policy, no silent no-op).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `namespace` | `string` |
+| `opts?` | \{ `dueBefore?`: `number`; `limit?`: `number`; \} |
+| `opts.dueBefore?` | `number` |
+| `opts.limit?` | `number` |
+
+#### Returns
+
+`Promise`\<readonly \{
+  `threadId`: `string`;
+  `wakeAt`: `number`;
+\}[]\>
+
+***
+
 ### put()
 
 ```ts
@@ -109,7 +146,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:144
+Defined in: packages/core/src/contracts/checkpoint-store.ts:154
 
 #### Parameters
 
@@ -138,7 +175,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:152
+Defined in: packages/core/src/contracts/checkpoint-store.ts:162
 
 #### Parameters
 

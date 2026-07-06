@@ -10,7 +10,7 @@
 const PARAMETER_NAMING_OPT_OUT_TAGS: ReadonlyArray<string>;
 ```
 
-Defined in: src/tool-discovery.ts:154
+Defined in: src/tool-discovery.ts:180
 
 Tag values that, when present in a tool's `tags: [...]` literal,
 suppress the parameter-naming rule for that tool. The opt-out

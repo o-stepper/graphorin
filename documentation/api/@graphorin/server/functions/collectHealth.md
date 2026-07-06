@@ -10,7 +10,7 @@
 function collectHealth(options): Promise<HealthSummary>;
 ```
 
-Defined in: packages/server/src/health/checks.ts:147
+Defined in: packages/server/src/health/checks.ts:163
 
 Build the aggregate health summary from runtime probes.
 

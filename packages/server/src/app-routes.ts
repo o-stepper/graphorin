@@ -48,6 +48,7 @@ import type { RunStateTracker } from './runtime/run-state.js';
 import { createSseRoutes } from './sse/index.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import { createTriggersRoutes } from './triggers/routes.js';
+import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
 import { createWsUpgradeEvents } from './ws/upgrade.js';
 
@@ -75,6 +76,7 @@ export interface MountRoutesContext {
   readonly wsAdapter?: ReturnType<typeof createNodeWebSocket>;
   readonly triggersDaemon?: TriggersDaemon;
   readonly consolidatorDaemon?: ConsolidatorDaemon;
+  readonly workflowTimerDaemon?: WorkflowTimerDaemon;
 }
 
 /** IP-23: is `host` a loopback interface (so an open /metrics is not exposed)? */
@@ -98,6 +100,7 @@ export function mountRoutes(
         ctx.consolidatorDaemon,
         ctx.wsDispatcher,
         config,
+        ctx.workflowTimerDaemon,
       ));
   const health = createExtendedHealthRoutes({
     version: ctx.version,
@@ -270,6 +273,7 @@ function buildDefaultHealthProbes(
   consolidatorDaemon: ConsolidatorDaemon | undefined,
   dispatcher: WsDispatcher | undefined,
   config: ServerConfigSpec,
+  workflowTimerDaemon?: WorkflowTimerDaemon,
 ): HealthCheckOptions {
   const out: {
     -readonly [K in keyof HealthCheckOptions]?: HealthCheckOptions[K];
@@ -283,6 +287,7 @@ function buildDefaultHealthProbes(
   };
   if (triggersDaemon !== undefined) out.triggers = triggersDaemon;
   if (consolidatorDaemon !== undefined) out.consolidator = consolidatorDaemon;
+  if (workflowTimerDaemon !== undefined) out.workflowTimers = workflowTimerDaemon;
   if (dispatcher !== undefined) {
     const sizes = dispatcher.size();
     // The dispatcher only exposes (subscribers, subscriptions); the

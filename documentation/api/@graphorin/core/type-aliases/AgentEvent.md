@@ -42,6 +42,7 @@ type AgentEvent<TOutput> =
   | StepEndEvent
   | GuardrailTrippedEvent
   | VerifierResultEvent
+  | SubagentEvent
   | AgentEndEvent<TOutput>
   | AgentErrorEvent;
 ```

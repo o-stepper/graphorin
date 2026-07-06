@@ -66,6 +66,10 @@
                 "link": "/api/@graphorin/agent/errors/classes/RunStateVersionUnsupportedError.md"
               },
               {
+                "text": "SubAgentResumeTargetNotFoundError",
+                "link": "/api/@graphorin/agent/errors/classes/SubAgentResumeTargetNotFoundError.md"
+              },
+              {
                 "text": "ToolNotFoundError",
                 "link": "/api/@graphorin/agent/errors/classes/ToolNotFoundError.md"
               }
@@ -415,6 +419,10 @@
             "text": "Interfaces",
             "collapsed": true,
             "items": [
+              {
+                "text": "SerializedPendingSubRun",
+                "link": "/api/@graphorin/agent/run-state/interfaces/SerializedPendingSubRun.md"
+              },
               {
                 "text": "SerializedRunState",
                 "link": "/api/@graphorin/agent/run-state/interfaces/SerializedRunState.md"

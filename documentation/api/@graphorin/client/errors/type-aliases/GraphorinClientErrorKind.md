@@ -19,6 +19,7 @@ type GraphorinClientErrorKind =
   | "run-not-found"
   | "server-error"
   | "aborted"
+  | "flow-overflow"
   | "invalid-server-frame";
 ```
 

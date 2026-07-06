@@ -2,10 +2,14 @@
  * Workflow REST routes.
  *
  *   POST   /workflows/:id/execute              (idempotent; scope `workflows:execute`)
- *   POST   /workflows/:id/resume               (scope `workflows:resume[:id]`)
+ *   POST   /workflows/:id/resume               (scope `workflows:resume[:id]`;
+ *                                               `name` targets an awakeable/approval, W-119)
+ *   POST   /workflows/:id/retry                (scope `workflows:resume[:id]`, W-119)
+ *   POST   /workflows/:id/tick                 (scope `workflows:resume[:id]`, W-119)
  *   GET    /workflows/:id/state                (scope `workflows:read`)
  *   GET    /workflows/:id/checkpoints          (scope `workflows:read`)
- *   POST   /workflows/:id/fork                 (scope `workflows:execute`)
+ *   POST   /workflows/:id/fork                 (scope `workflows:execute`; real fork, W-119)
+ *   DELETE /workflows/:id/threads/:threadId    (scope `workflows:delete`)
  *
  * @packageDocumentation
  */
@@ -47,6 +51,18 @@ const ResumeBodySchema = z
   .object({
     threadId: z.string().min(1),
     resume: z.unknown().optional(),
+    /**
+     * W-119: awakeable/approval name. When present the resume routes
+     * through `resolveAwakeable(threadId, name, resume)` - `approve` is
+     * the same primitive, no alias route needed.
+     */
+    name: z.string().min(1).optional(),
+  })
+  .strict();
+
+const ThreadBodySchema = z
+  .object({
+    threadId: z.string().min(1),
   })
   .strict();
 
@@ -143,7 +159,16 @@ export function createWorkflowRoutes(
           400,
         );
       }
-      if (workflow.resume === undefined) {
+      if (parsed.data.name !== undefined && workflow.resolveAwakeable === undefined) {
+        return c.json(
+          {
+            error: 'workflow-resume-unsupported',
+            message: `Workflow '${id}' does not implement resolveAwakeable().`,
+          },
+          400,
+        );
+      }
+      if (parsed.data.name === undefined && workflow.resume === undefined) {
         return c.json(
           {
             error: 'workflow-resume-unsupported',
@@ -179,6 +204,116 @@ export function createWorkflowRoutes(
         },
         202,
       );
+    },
+  );
+
+  // W-119: replay a failed/aborted thread. Background-iterated like
+  // resume; the run subject carries the events.
+  app.post(
+    '/:id/retry',
+    createScopeMiddleware((_path, params) => `workflows:resume:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const workflow = deps.workflows.get(id);
+      if (workflow === undefined) {
+        const err = new WorkflowNotFoundError(id);
+        return c.json({ error: err.kind, message: err.message }, 404);
+      }
+      const parsed = ThreadBodySchema.safeParse(await safelyParseJson(c));
+      if (!parsed.success) {
+        return c.json(
+          {
+            error: 'config-invalid',
+            message: 'Invalid retry body.',
+            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+          },
+          400,
+        );
+      }
+      if (workflow.retry === undefined) {
+        return c.json(
+          {
+            error: 'workflow-retry-unsupported',
+            message: `Workflow '${id}' does not implement retry().`,
+          },
+          400,
+        );
+      }
+      const runId = newRunId();
+      const tracker = deps.runs.start(runId, {
+        kind: 'workflow',
+        workflowId: id,
+        threadId: parsed.data.threadId,
+      });
+      const subject = `workflow:${id}/runs/${runId}/events`;
+      const retryFn = workflow.retry.bind(workflow);
+      backgroundIterate(
+        () => retryFn(parsed.data.threadId, { signal: tracker.signal }),
+        tracker,
+        deps.runs,
+        runId,
+        { subject, ...(deps.dispatcher !== undefined ? { dispatcher: deps.dispatcher } : {}) },
+      );
+      return c.json(
+        {
+          runId,
+          threadId: parsed.data.threadId,
+          status: 'running',
+          subscribe: { websocket: subject },
+        },
+        202,
+      );
+    },
+  );
+
+  // W-119: fire a due durable timer synchronously. Long node bodies
+  // hold the HTTP connection - documented; wire the timer daemon
+  // (createServer({ workflowTimers })) for regular firing instead.
+  app.post(
+    '/:id/tick',
+    createScopeMiddleware((_path, params) => `workflows:resume:${params.id}`),
+    async (c) => {
+      const id = c.req.param('id');
+      const workflow = deps.workflows.get(id);
+      if (workflow === undefined) {
+        const err = new WorkflowNotFoundError(id);
+        return c.json({ error: err.kind, message: err.message }, 404);
+      }
+      const parsed = ThreadBodySchema.safeParse(await safelyParseJson(c));
+      if (!parsed.success) {
+        return c.json(
+          {
+            error: 'config-invalid',
+            message: 'Invalid tick body.',
+            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
+          },
+          400,
+        );
+      }
+      if (workflow.tick === undefined) {
+        return c.json(
+          {
+            error: 'workflow-tick-unsupported',
+            message: `Workflow '${id}' does not implement tick().`,
+          },
+          400,
+        );
+      }
+      try {
+        const result = await workflow.tick(parsed.data.threadId);
+        return c.json({
+          workflowId: id,
+          threadId: parsed.data.threadId,
+          fired: result.fired,
+          nextWakeAt: result.nextWakeAt,
+        });
+      } catch (err) {
+        const wire = toWireError(err);
+        return c.json(
+          { error: wire.code, message: wire.message },
+          wire.code === 'thread-not-found' ? 404 : 400,
+        );
+      }
     },
   );
 
@@ -294,21 +429,61 @@ export function createWorkflowRoutes(
           400,
         );
       }
-      // periphery-01: the old handler returned a 202 that forked
-      // nothing - the same class of lie IP-14 removed from the agent
-      // resume route. Honest 501 until the workflow fork primitive is
-      // threaded through the registry.
-      return c.json(
-        {
-          error: 'workflow-fork-not-implemented',
-          message:
-            'Workflow fork is not implemented on the server surface yet. ' +
-            'Fork the thread programmatically via the workflow API.',
-          workflowId: id,
-          fork: parsed.data,
-        },
-        501,
-      );
+      // W-119: the fork primitive is now threaded through the registry -
+      // the periphery-01 honest-501 kept its promise and retires here.
+      if (workflow.fork === undefined) {
+        return c.json(
+          {
+            error: 'workflow-fork-unsupported',
+            message: `Workflow '${id}' does not implement fork().`,
+          },
+          400,
+        );
+      }
+      try {
+        let fromCheckpointId = parsed.data.fromCheckpointId;
+        if (fromCheckpointId === undefined) {
+          if (workflow.getState === undefined) {
+            return c.json(
+              {
+                error: 'config-invalid',
+                message:
+                  'fromCheckpointId is required: this workflow does not expose getState() to derive the latest checkpoint.',
+              },
+              400,
+            );
+          }
+          const state = (await workflow.getState(parsed.data.fromThreadId)) as {
+            readonly checkpointId?: unknown;
+          };
+          if (typeof state?.checkpointId !== 'string') {
+            return c.json(
+              {
+                error: 'checkpoint-not-found',
+                message: `Thread '${parsed.data.fromThreadId}' has no checkpoint to fork from.`,
+              },
+              404,
+            );
+          }
+          fromCheckpointId = state.checkpointId;
+        }
+        const forked = await workflow.fork(parsed.data.fromThreadId, fromCheckpointId);
+        return c.json(
+          {
+            workflowId: id,
+            fromThreadId: parsed.data.fromThreadId,
+            fromCheckpointId,
+            newThreadId: forked.newThreadId,
+          },
+          201,
+        );
+      } catch (err) {
+        const wire = toWireError(err);
+        return c.json(
+          { error: wire.code, message: wire.message },
+          wire.code === 'thread-not-found' || wire.code === 'checkpoint-not-found' ? 404 : 400,
+        );
+      }
     },
   );
 
@@ -356,9 +531,12 @@ function backgroundExecute(
 }
 
 /**
- * periphery-01: mirror of {@link backgroundExecute} for the resume
- * path - iterate `workflow.resume(threadId, {resume})`, emit every
- * event on the run subject, and complete the tracked run.
+ * periphery-01 / W-119: mirror of {@link backgroundExecute} for the
+ * resume path. A `name` in the body routes through
+ * `resolveAwakeable(threadId, name, resume)`; a plain resume goes
+ * through `resume(threadId, {resume})`. Both receive the tracker's
+ * AbortSignal so `runs.abort(runId)` actually cancels the iteration
+ * (parity with backgroundExecute - the old path dropped it).
  */
 function backgroundResume(
   workflow: NonNullable<ReturnType<WorkflowRegistry['get']>>,
@@ -371,15 +549,45 @@ function backgroundResume(
     readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
   },
 ): void {
-  const resume = workflow.resume;
-  if (resume === undefined) return;
+  const { resume, resolveAwakeable } = workflow;
+  const name = body.name;
+  const factory =
+    name !== undefined && resolveAwakeable !== undefined
+      ? () =>
+          resolveAwakeable.call(workflow, body.threadId, name, body.resume, {
+            signal: tracker.signal,
+          })
+      : resume !== undefined
+        ? () =>
+            resume.call(
+              workflow,
+              body.threadId,
+              body.resume !== undefined ? { resume: body.resume } : {},
+              { signal: tracker.signal },
+            )
+        : undefined;
+  if (factory === undefined) return;
+  backgroundIterate(factory, tracker, runs, runId, streaming);
+}
+
+/**
+ * W-119: shared background iteration for resume / named resume / retry -
+ * emit every event on the run subject, complete the tracked run, wrap
+ * failures in the W-052 wire envelope.
+ */
+function backgroundIterate(
+  factory: () => AsyncIterable<unknown>,
+  tracker: { readonly signal: AbortSignal },
+  runs: RunStateTracker,
+  runId: string,
+  streaming: {
+    readonly subject: string;
+    readonly dispatcher?: import('../ws/dispatcher.js').WsDispatcher;
+  },
+): void {
   void (async () => {
     try {
-      for await (const ev of resume.call(
-        workflow,
-        body.threadId,
-        body.resume !== undefined ? { resume: body.resume } : {},
-      )) {
+      for await (const ev of factory()) {
         if (tracker.signal.aborted) break;
         const type =
           typeof (ev as { type?: unknown }).type === 'string'

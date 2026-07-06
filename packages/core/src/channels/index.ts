@@ -49,11 +49,14 @@ export {
   sleepUntil,
   TIMER_PAUSE_KIND,
 } from './durable.js';
-export type { PauseResumeScope } from './pause.js';
+export type { PauseIdentity, PauseResumeScope } from './pause.js';
 export {
   isPauseSignal,
+  isReplayDivergenceSignal,
   PAUSE_SIGNAL_BRAND,
   PauseSignal,
   pause,
+  REPLAY_DIVERGENCE_BRAND,
+  ReplayDivergenceSignal,
   runWithPauseResume,
 } from './pause.js';

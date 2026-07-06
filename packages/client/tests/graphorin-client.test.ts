@@ -521,3 +521,100 @@ describe('IP-7 - the same iterator survives a reconnect with the replay cursor',
     await client.disconnect();
   });
 });
+
+describe('W-152 - bounded per-subscription queue', () => {
+  async function openSub(client: GraphorinClient) {
+    await connectAndAck(client);
+    const socket = lastSocket();
+    const subPromise = client.subscribe({ target: 'session', id: 'q' });
+    await Promise.resolve();
+    const sentFrame = JSON.parse(socket.sent.at(-1) ?? '{}') as { id: string };
+    socket.fireMessage({
+      v: '1',
+      jsonrpc: '2.0',
+      id: sentFrame.id,
+      result: { subscriptionId: 'sub-q', snapshotEventId: 'evt-0' },
+    } satisfies ServerMessage);
+    const sub = await subPromise;
+    const fire = (n: number) => {
+      socket.fireMessage({
+        v: '1',
+        kind: 'event',
+        eventId: `evt-${n}`,
+        subscriptionId: 'sub-q',
+        subject: 'session:q/events',
+        type: 'text.delta',
+        payload: { delta: String(n) },
+      } satisfies ServerMessage);
+    };
+    return { sub, fire };
+  }
+
+  it('overflow closes the subscription with a typed flow-overflow error, queue never exceeds the limit', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+      subscriptionQueueLimit: 5,
+    });
+    const { sub, fire } = await openSub(client);
+    for (let i = 1; i <= 6; i += 1) fire(i);
+    expect(sub.metadata().queuedEvents).toBeLessThanOrEqual(5);
+    expect(sub.metadata().closed).toBe(true);
+    // The buffered frames drain, then the overflow error surfaces.
+    const iter = sub.events()[Symbol.asyncIterator]();
+    for (let i = 1; i <= 5; i += 1) {
+      const item = await iter.next();
+      expect(item.done).toBe(false);
+    }
+    await expect(iter.next()).rejects.toMatchObject({ kind: 'flow-overflow' });
+    await client.disconnect();
+  });
+
+  it('push after close does not grow the queue', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+      subscriptionQueueLimit: 3,
+    });
+    const { sub, fire } = await openSub(client);
+    for (let i = 1; i <= 4; i += 1) fire(i);
+    expect(sub.metadata().closed).toBe(true);
+    const depth = sub.metadata().queuedEvents;
+    fire(99);
+    fire(100);
+    expect(sub.metadata().queuedEvents).toBe(depth);
+    await client.disconnect();
+  });
+
+  it('metadata().queuedEvents tracks depth before and after consumption', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+    });
+    const { sub, fire } = await openSub(client);
+    fire(1);
+    fire(2);
+    expect(sub.metadata().queuedEvents).toBe(2);
+    const iter = sub.events()[Symbol.asyncIterator]();
+    await iter.next();
+    expect(sub.metadata().queuedEvents).toBe(1);
+    await client.disconnect();
+  });
+
+  it('subscriptionQueueLimit: 0 keeps the old unbounded behavior', async () => {
+    const client = new GraphorinClient({
+      baseUrl: 'ws://localhost',
+      auth: { kind: 'bearer', token: 't' },
+      WebSocket: FAKE_WS,
+      subscriptionQueueLimit: 0,
+    });
+    const { sub, fire } = await openSub(client);
+    for (let i = 1; i <= 50; i += 1) fire(i);
+    expect(sub.metadata().closed).toBe(false);
+    expect(sub.metadata().queuedEvents).toBe(50);
+    await client.disconnect();
+  });
+});

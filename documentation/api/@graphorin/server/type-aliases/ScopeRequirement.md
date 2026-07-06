@@ -15,7 +15,7 @@ type ScopeRequirement =
   | ParsedScope);
 ```
 
-Defined in: packages/server/src/middleware/scope.ts:22
+Defined in: packages/server/src/middleware/scope.ts:27
 
 Required-scope spec accepted by [createScopeMiddleware](/api/@graphorin/server/functions/createScopeMiddleware.md). Either
 a single string (`'agents:invoke'`), a parsed scope, or a function

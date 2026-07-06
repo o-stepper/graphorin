@@ -37,12 +37,23 @@ function fakeWs(sent: string[]): Parameters<NonNullable<WSEvents['onMessage']>>[
   } as unknown as Parameters<NonNullable<WSEvents['onMessage']>>[1];
 }
 
-function makeOptions(aborted: Array<{ runId: string; reason: string }>): WsUpgradeOptions {
+function makeOptions(
+  aborted: Array<{ runId: string; reason: string }>,
+  known: Record<string, { agentId?: string; workflowId?: string }> = {
+    'run-1': { agentId: 'agent-a' },
+  },
+): WsUpgradeOptions {
   return {
     dispatcher: { registerSubscriber: () => ({ unregister: () => {} }) },
     tickets: { consume: () => ({ ok: false }) },
     verifier: { verify: async () => ({ ok: false }) },
     runs: {
+      // W-107: the cancel gate resolves the run first and requires the
+      // OWNING resource's control scope.
+      snapshot: (runId: string) =>
+        known[runId] !== undefined
+          ? { runId, status: 'running', startedAt: 0, ...known[runId] }
+          : undefined,
       abort: (runId: string, reason: string) => {
         aborted.push({ runId, reason });
         return true;
@@ -117,5 +128,36 @@ describe('IP-8: WS cancel scope enforcement', () => {
   it('notifications/cancelled with agents:invoke aborts the run', async () => {
     const { aborted } = await drive(['agents:invoke'], [INIT, CANCELLED_NOTIF]);
     expect(aborted).toEqual([{ runId: 'run-1', reason: 'mcp-cancel' }]);
+  });
+
+  it('W-107: a three-segment grant for the OWNING agent cancels; a foreign one is denied', async () => {
+    const own = await drive(['agents:invoke:agent-a'], [INIT, CANCEL]);
+    expect(own.aborted.map((a) => a.runId)).toEqual(['run-1']);
+
+    const foreign = await drive(['agents:invoke:agent-z'], [INIT, CANCEL]);
+    expect(foreign.aborted).toEqual([]);
+    const denied = foreign.sent.map((s) => JSON.parse(s) as { error?: { message?: string } });
+    expect(denied.some((m) => m.error?.message?.includes('agents:invoke:agent-a'))).toBe(true);
+  });
+
+  it('W-107: an unknown run answers RUN_NOT_FOUND before any scope check', async () => {
+    const cancelUnknown = JSON.stringify({
+      v: '1',
+      jsonrpc: '2.0',
+      id: 9,
+      method: 'run.cancel',
+      params: { runId: 'run-missing' },
+    });
+    const { aborted, sent } = await drive([], [INIT, cancelUnknown]);
+    expect(aborted).toEqual([]);
+    const frames = sent.map((s) => JSON.parse(s) as { error?: { code?: number } });
+    expect(frames.some((m) => m.error !== undefined)).toBe(true);
+  });
+
+  it('W-107: notifications/cancelled honours the per-resource grant silently', async () => {
+    const foreign = await drive(['agents:invoke:agent-z'], [INIT, CANCELLED_NOTIF]);
+    expect(foreign.aborted).toEqual([]);
+    const own = await drive(['agents:invoke:agent-a'], [INIT, CANCELLED_NOTIF]);
+    expect(own.aborted.map((a) => a.runId)).toEqual(['run-1']);
   });
 });

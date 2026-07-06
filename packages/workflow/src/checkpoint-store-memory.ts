@@ -167,6 +167,32 @@ export class InMemoryCheckpointStore implements CheckpointStoreExt {
   }
 
   /**
+   * W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+   * suspended with a due `wakeAt` - parity with the SQLite adapter.
+   */
+  async listSuspended(
+    namespace: string,
+    opts?: { readonly dueBefore?: number; readonly limit?: number },
+  ): Promise<ReadonlyArray<{ readonly threadId: string; readonly wakeAt: number }>> {
+    const out: Array<{ threadId: string; wakeAt: number }> = [];
+    for (const key of this.#threadIndex.keys()) {
+      const sep = key.indexOf('::');
+      const threadId = key.slice(0, sep);
+      const ns = key.slice(sep + 2);
+      if (ns !== namespace) continue;
+      const ids = this.#threadIndex.get(key) ?? [];
+      const latest = this.#latestStored(threadId, ns, ids);
+      if (latest === undefined || latest.metadata.status !== 'suspended') continue;
+      const wakeAt = latest.metadata.wakeAt;
+      if (typeof wakeAt !== 'number') continue;
+      if (opts?.dueBefore !== undefined && wakeAt > opts.dueBefore) continue;
+      out.push({ threadId, wakeAt });
+    }
+    out.sort((a, b) => a.wakeAt - b.wakeAt);
+    return opts?.limit !== undefined ? out.slice(0, opts.limit) : out;
+  }
+
+  /**
    * W-009 retention sweep - parity with the SQLite implementation:
    * namespace-SCOPED (entries key as `threadId::namespace`), latest
    * checkpoint decides age + status, suspended pairs survive unless

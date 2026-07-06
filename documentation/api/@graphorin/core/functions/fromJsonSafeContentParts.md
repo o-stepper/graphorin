@@ -10,7 +10,7 @@
 function fromJsonSafeContentParts(parts): readonly MessageContent[];
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:294
+Defined in: packages/core/src/utils/binary-json.ts:305
 
 Inverse of [toJsonSafeContentParts](/api/@graphorin/core/functions/toJsonSafeContentParts.md). Accepts legacy corrupted
 payloads (numeric-key byte objects) and repairs them best-effort.

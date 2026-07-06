@@ -6,7 +6,7 @@
 
 # Interface: EncryptionCheck
 
-Defined in: packages/server/src/health/checks.ts:64
+Defined in: packages/server/src/health/checks.ts:65
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/server/src/health/checks.ts:64
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-enabled"></a> `enabled` | `readonly` | `boolean` | - | packages/server/src/health/checks.ts:65 |
-| <a id="property-message"></a> `message?` | `readonly` | `string` | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`message`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-message) | packages/server/src/health/checks.ts:42 |
-| <a id="property-peerdepinstalled"></a> `peerDepInstalled` | `readonly` | `boolean` | - | packages/server/src/health/checks.ts:66 |
-| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`status`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-status) | packages/server/src/health/checks.ts:41 |
+| <a id="property-enabled"></a> `enabled` | `readonly` | `boolean` | - | packages/server/src/health/checks.ts:66 |
+| <a id="property-message"></a> `message?` | `readonly` | `string` | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`message`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-message) | packages/server/src/health/checks.ts:43 |
+| <a id="property-peerdepinstalled"></a> `peerDepInstalled` | `readonly` | `boolean` | - | packages/server/src/health/checks.ts:67 |
+| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | [`BaseHealthCheck`](/api/@graphorin/server/interfaces/BaseHealthCheck.md).[`status`](/api/@graphorin/server/interfaces/BaseHealthCheck.md#property-status) | packages/server/src/health/checks.ts:42 |

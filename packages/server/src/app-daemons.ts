@@ -11,6 +11,8 @@ import type { ConsolidatorDaemon, ConsolidatorLike } from './consolidator/daemon
 import { createConsolidatorDaemon } from './consolidator/daemon.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
 import { createTriggersDaemon } from './triggers/daemon.js';
+import type { WorkflowTimerDaemon, WorkflowTimerDriverLike } from './workflows/timer-daemon.js';
+import { createWorkflowTimerDaemon } from './workflows/timer-daemon.js';
 
 /**
  * Discriminated union accepted by `CreateServerOptions.triggers`. A
@@ -24,16 +26,23 @@ export type TriggersDaemonInput =
   | { readonly daemon: TriggersDaemon }
   | { readonly scheduler: import('@graphorin/triggers').Scheduler };
 
+/** W-032: accepted forms for `createServer({ workflowTimers })`. */
+export type WorkflowTimersInput =
+  | { readonly daemon: WorkflowTimerDaemon }
+  | { readonly driver: WorkflowTimerDriverLike };
+
 /** Subset of `CreateServerOptions` consumed by {@link buildDaemons}. */
 export interface BuildDaemonsOptions {
   readonly triggers?: TriggersDaemonInput | undefined;
   readonly consolidator?: ConsolidatorLike | undefined;
+  readonly workflowTimers?: WorkflowTimersInput | undefined;
 }
 
 /** Daemon handles constructed (or adopted) by {@link buildDaemons}. */
 export interface BuiltDaemons {
   readonly triggersDaemon: TriggersDaemon | undefined;
   readonly consolidatorDaemon: ConsolidatorDaemon | undefined;
+  readonly workflowTimerDaemon: WorkflowTimerDaemon | undefined;
 }
 
 /**
@@ -53,5 +62,12 @@ export function buildDaemons(options: BuildDaemonsOptions): BuiltDaemons {
   if (options.consolidator !== undefined) {
     consolidatorDaemon = createConsolidatorDaemon({ consolidator: options.consolidator });
   }
-  return { triggersDaemon, consolidatorDaemon };
+  let workflowTimerDaemon: WorkflowTimerDaemon | undefined;
+  if (options.workflowTimers !== undefined) {
+    workflowTimerDaemon =
+      'daemon' in options.workflowTimers
+        ? options.workflowTimers.daemon
+        : createWorkflowTimerDaemon({ driver: options.workflowTimers.driver });
+  }
+  return { triggersDaemon, consolidatorDaemon, workflowTimerDaemon };
 }

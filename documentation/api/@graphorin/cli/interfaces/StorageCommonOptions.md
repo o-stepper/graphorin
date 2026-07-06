@@ -18,6 +18,7 @@ Defined in: packages/cli/src/commands/storage.ts:48
 
 - [`StorageBackupOptions`](/api/@graphorin/cli/interfaces/StorageBackupOptions.md)
 - [`StorageCleanupBackupsOptions`](/api/@graphorin/cli/interfaces/StorageCleanupBackupsOptions.md)
+- [`StorageCompactOptions`](/api/@graphorin/cli/interfaces/StorageCompactOptions.md)
 - [`StorageEncryptOptions`](/api/@graphorin/cli/interfaces/StorageEncryptOptions.md)
 - [`StorageRekeyOptions`](/api/@graphorin/cli/interfaces/StorageRekeyOptions.md)
 

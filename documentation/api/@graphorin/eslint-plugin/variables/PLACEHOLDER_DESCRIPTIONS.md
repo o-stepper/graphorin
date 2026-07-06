@@ -10,7 +10,7 @@
 const PLACEHOLDER_DESCRIPTIONS: ReadonlyArray<string>;
 ```
 
-Defined in: src/tool-discovery.ts:165
+Defined in: src/tool-discovery.ts:191
 
 Placeholder values the description-required rule treats as
 non-descriptions.

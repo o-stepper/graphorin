@@ -10,7 +10,7 @@
 function createFactSearchTool(deps): Tool<FactSearchInput, FactSearchOutput>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:274
+Defined in: packages/memory/src/tools/fact-tools.ts:275
 
 `fact_search` - hybrid (vector + FTS5) search over the user's
 semantic memory. Results merged through the configured reranker.

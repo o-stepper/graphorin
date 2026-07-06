@@ -97,7 +97,7 @@ describe('POST /v1/session/ws-ticket', () => {
     delete process.env.GRAPHORIN_TEST_PEPPER_WS2;
   });
 
-  it('rejects an authenticated token without the agents:invoke scope', async () => {
+  it('W-107: a read-only token mints a ticket - the ticket adds no rights of its own', async () => {
     _resetResolversForTesting();
     installBuiltinResolvers();
     process.env.GRAPHORIN_TEST_PEPPER_WS3 = 'pepper-with-plenty-of-entropy-aB3xK9-XX3';
@@ -132,7 +132,13 @@ describe('POST /v1/session/ws-ticket', () => {
       method: 'POST',
       headers: { Authorization: `Bearer ${raw}` },
     });
-    expect(res.status).toBe(403);
+    // W-107: possession of a valid principal is the whole requirement -
+    // the ticket carries the principal's OWN scopes and every subscribe
+    // is per-subject gated, so a read-only token gets its browser WS
+    // path. Unauthenticated requests still get 401.
+    expect(res.status).toBe(201);
+    const unauthed = await server.app.request('/v1/session/ws-ticket', { method: 'POST' });
+    expect(unauthed.status).toBe(401);
 
     await server.stop();
     delete process.env.GRAPHORIN_TEST_PEPPER_WS3;

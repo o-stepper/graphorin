@@ -6,7 +6,7 @@
 
 # Interface: ToolCallDeltaEvent
 
-Defined in: packages/core/src/types/agent-event.ts:102
+Defined in: packages/core/src/types/agent-event.ts:121
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:102
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-argsdelta"></a> `argsDelta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:105 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:104 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.call.delta"` | packages/core/src/types/agent-event.ts:103 |
+| <a id="property-argsdelta"></a> `argsDelta` | `readonly` | `string` | packages/core/src/types/agent-event.ts:124 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:123 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.call.delta"` | packages/core/src/types/agent-event.ts:122 |

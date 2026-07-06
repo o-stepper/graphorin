@@ -136,11 +136,20 @@ for await (const event of stream) {
   after: ['chargeCard'] }` to suspend without hand-rolling
   `pause(...)` inside the node body.
 - **Durable primitives.** `sleepFor(ms)` / `sleepUntil(iso)` suspend a
-  thread on a durable timer (`workflow.tick()` fires due timers after
-  a restart); `awaitExternal(name)` parks the thread on an awakeable
-  that `workflow.resolveAwakeable(threadId, name, value)` completes;
-  `requestApproval(payload)` + `workflow.approve(threadId, approvalId,
-  decision)` persist a typed approval round-trip. Per-node
+  thread on a durable timer; `awaitExternal(name)` parks the thread on
+  an awakeable that `workflow.resolveAwakeable(threadId, name, value)`
+  completes; `requestApproval(payload)` + `workflow.approve(threadId,
+  approvalId, decision)` persist a typed approval round-trip.
+- **Firing durable timers (W-032).** `createTimerDriver({ workflows:
+  [{ workflow, checkpointStore }] })` polls each store's
+  `listSuspended(namespace, { dueBefore })` (the engine stamps
+  `CheckpointMetadata.wakeAt` on timer suspends) and calls
+  `workflow.tick(threadId)` on due threads - `start()`/`stop()` in
+  library mode, or hand the driver to `createServer({ workflowTimers:
+  { driver } })` for lifecycle + `/v1/health` integration. A store
+  without `listSuspended` fails fast with
+  `TimerDriverStoreUnsupportedError`; manual `workflow.tick()` remains
+  available for one-off firing. Per-node
   `timeoutMs` / `retry` (via `nodeDefaults` or per node) bound flaky
   steps with `node-timeout`; `WorkflowConfig.version` pins a
   definition to its checkpoints (`workflow-version-mismatch` /

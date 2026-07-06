@@ -375,6 +375,11 @@ export const DEFAULT_IDEMPOTENCY_PRUNE_INTERVAL_MS = 60 * 60_000;
  * path already refuses to replay (IETF-draft semantics unchanged).
  * Best-effort: store errors are swallowed. Same shape as
  * {@link scheduleRunPruning}: `unref`-ed timer + stop function.
+ *
+ * Since W-010 the standalone server drives this surface through the
+ * unified retention scheduler (`config.retention.idempotency`); this
+ * standalone primitive remains for embedders running the store
+ * without the server.
  */
 export function scheduleIdempotencyPruning(
   store: { prune(olderThan: number): Promise<number> },
@@ -389,4 +394,29 @@ export function scheduleIdempotencyPruning(
     (timer as { unref: () => void }).unref();
   }
   return () => clearInterval(timer);
+}
+
+/**
+ * W-107: the per-resource scope a caller must hold to touch this run.
+ * `'read'` gates state inspection; `'control'` gates abort/resume.
+ * Derived from the run descriptor: agent runs bind to
+ * `agents:{read|invoke}:<agentId>`, workflow runs to
+ * `workflows:{read|execute}:<workflowId>`. Runs without a descriptor id
+ * (not produced by the current trackers) fall back to the bare scope.
+ */
+export function requiredRunScope(
+  snapshot: Pick<RunStateSnapshot, 'agentId' | 'workflowId'>,
+  action: 'read' | 'control',
+): string {
+  if (snapshot.workflowId !== undefined) {
+    return action === 'read'
+      ? `workflows:read:${snapshot.workflowId}`
+      : `workflows:execute:${snapshot.workflowId}`;
+  }
+  if (snapshot.agentId !== undefined) {
+    return action === 'read'
+      ? `agents:read:${snapshot.agentId}`
+      : `agents:invoke:${snapshot.agentId}`;
+  }
+  return action === 'read' ? 'agents:read' : 'agents:invoke';
 }

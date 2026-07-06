@@ -6,7 +6,7 @@
 
 # Class: WorkflowError
 
-Defined in: packages/workflow/src/errors/index.ts:44
+Defined in: packages/workflow/src/errors/index.ts:45
 
 Base error class for all `@graphorin/workflow` failures.
 
@@ -48,7 +48,7 @@ new WorkflowError(
    opts?): WorkflowError;
 ```
 
-Defined in: packages/workflow/src/errors/index.ts:49
+Defined in: packages/workflow/src/errors/index.ts:50
 
 #### Parameters
 
@@ -74,9 +74,9 @@ Error.constructor
 
 | Property | Modifier | Type | Description | Overrides | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | `Error.cause` | - | packages/workflow/src/errors/index.ts:46 |
-| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | - | - | packages/workflow/src/errors/index.ts:45 |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | - | - | packages/workflow/src/errors/index.ts:47 |
+| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | `Error.cause` | - | packages/workflow/src/errors/index.ts:47 |
+| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | - | - | packages/workflow/src/errors/index.ts:46 |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | - | - | packages/workflow/src/errors/index.ts:48 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | - | `Error.message` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | - | `Error.name` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | - | `Error.stack` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

@@ -6,7 +6,7 @@
 
 # Interface: ToolCallStartEvent
 
-Defined in: packages/core/src/types/agent-event.ts:94
+Defined in: packages/core/src/types/agent-event.ts:113
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:94
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-args"></a> `args` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:98 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:96 |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:97 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.call.start"` | packages/core/src/types/agent-event.ts:95 |
+| <a id="property-args"></a> `args` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:117 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:115 |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:116 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.call.start"` | packages/core/src/types/agent-event.ts:114 |

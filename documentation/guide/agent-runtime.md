@@ -247,6 +247,14 @@ for await (const event of agent.stream('Summarise the status of my last order', 
 }
 ```
 
+### Approvals across the sub-agent boundary
+
+Durable HITL composes through handoffs and `toTool` sub-agents: a child that suspends on an approval-gated tool no longer surfaces as a terminal tool error. Instead the suspended child run **parks on the parent** (`RunState.pendingSubRuns`), the child's pending approvals are mirrored onto the parent's `pendingApprovals` with `subRunToolCallId` set to the parent-side call id, and the parent suspends exactly like a directly-gated call.
+
+The operator protocol: read the pair (`toolCallId`, `subRunToolCallId`) from `RunState.pendingApprovals` and echo **both** fields back in each `ApprovalDecision`. Decisions match on the composite key, so child-local `toolCallId` collisions across two parked children can never cross-apply; a decision without `subRunToolCallId` applies only to the parent's own approvals - it silently skips parked ones, so omitting the echo is the common integration mistake. Nested parks compose to any depth: `subRunToolCallId` is a `/`-separated path (one segment per level), and each resume level strips one segment and routes the remainder down.
+
+Resume the parked sub-run on the **same parent instance** (or one configured with the same handoff target / `toTool` tool under the same name): the router resolves the child through the handoff map or the tool's `SUBAGENT_TOOL` refs, and throws a typed `SubAgentResumeTargetNotFoundError` when neither exists. On grant the child's gated side effect executes exactly once inside the child, the child's shaped output becomes the parent's tool message for the parked call, and the child's usage folds into the parent's accounting. A child that suspends again (nested or partial grants) re-parks and the parent re-suspends with the remainder.
+
 ## Multi-agent
 
 `agent.toTool({ name, description, exposeTurns, inputFilter })` wraps an agent as a typed tool the parent agent can call (AG-17). The parent's abort signal, `deps`, and `sessionId` propagate into the sub-run; a non-completed sub-run (failed/aborted) surfaces as a **tool error**, never an empty-string success.
@@ -291,7 +299,15 @@ Handoffs use a built-in filter library to shape the payload that crosses the bou
 
 ## Cancellation
 
-`agent.abort({ drain, onPendingApprovals })` is hard-kill by default with a 50 ms grace window. Set `drain: true` to wait for the current step to complete; choose how pending approvals behave with `onPendingApprovals: 'deny' | 'hold' | 'fail'` (default `'deny'`).
+`agent.abort({ drain, onPendingApprovals })` is hard-kill by default. The often-quoted 50 ms grace is a property of the **tools executor**, not the agent loop: in-flight tools observe the propagated signal and get `cancellationGraceMs` (default 50) to settle before their result is discarded. Set `drain: true` to let the in-flight provider stream finish instead of interrupting it mid-event.
+
+`onPendingApprovals` decides what happens to approvals that were requested but unresolved at abort time - including the case where the abort races the suspend itself (the step collected gated calls and would otherwise park):
+
+- `'deny'` (default) - every pending approval is auto-denied AND gets a matching tool message, so the persisted transcript keeps no dangling `tool_use`; the run ends `aborted`.
+- `'hold'` - the run ends `aborted` with `pendingApprovals` intact (in the state and in the final checkpoint). A held state does not re-enter the provider loop on a bare `run(state)`; resume it with an explicit `directive.approvals`.
+- `'fail'` - the run ends `failed` with `error.code: 'run-aborted'` **only when approvals are actually pending**; aborting with an empty queue ends `aborted`, never `failed`.
+
+When the abort races a suspend, no `awaiting_approval` checkpoint is written first - the last persisted checkpoint reflects the final, policy-consistent state, so a later resume can never resurrect approvals that were already denied.
 
 ## Stop conditions
 

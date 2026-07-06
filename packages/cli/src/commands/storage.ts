@@ -193,6 +193,125 @@ export async function runStorageBackup(
 }
 
 /** @stable */
+export interface StorageCompactOptions extends StorageCommonOptions {
+  /**
+   * Free pages released per `PRAGMA incremental_vacuum(N)` batch. Small
+   * batches keep the writer lock short on a huge freelist.
+   * @default 1000
+   */
+  readonly batchPages?: number;
+}
+
+/** @stable */
+export interface StorageCompactResult {
+  readonly path: string;
+  /** Raw `PRAGMA auto_vacuum` value: 0 none, 1 full, 2 incremental. */
+  readonly autoVacuum: number;
+  /** `true` when the database supports incremental compaction. */
+  readonly supported: boolean;
+  readonly freelistBefore?: number;
+  readonly freelistAfter?: number;
+  readonly pageSize?: number;
+  /** `page_size * (freelistBefore - freelistAfter)`. */
+  readonly reclaimedBytes?: number;
+}
+
+/**
+ * W-064: `graphorin storage compact` - return pruned pages to the OS.
+ * `VACUUM` stays forbidden (it renumbers implicit rowids and corrupts
+ * the FTS5 external-content mappings), but `PRAGMA incremental_vacuum`
+ * relocates free pages via the ptrmap WITHOUT rebuilding tables, so it
+ * is rowid-safe. Requires `auto_vacuum=2`, which `openConnection` sets
+ * on every database it CREATES from this version on; on an older
+ * database the command reports the limitation honestly (exit 0, file
+ * untouched) - the only way out is recreating the store (fresh init +
+ * `migrate-export` / import, or re-remember), because switching
+ * auto_vacuum on retroactively needs the very VACUUM that is banned.
+ * The vacuum runs in batches so a huge freelist never holds the writer
+ * lock in one long bite; the WAL is checkpoint-TRUNCATEd first so
+ * freed pages do not linger in the -wal file.
+ *
+ * @stable
+ */
+export async function runStorageCompact(
+  options: StorageCompactOptions = {},
+): Promise<StorageCompactResult> {
+  const { openStoreContext } = await import('../internal/store-context.js');
+  const batchPages = options.batchPages ?? 1000;
+  const ctx = await openStoreContext({
+    ...(options.config !== undefined ? { config: options.config } : {}),
+    // Compaction is a page-level operation: never migrate the schema
+    // (an older server may own this database), never refuse on a
+    // pending migration either.
+    skipInit: true,
+  });
+  let out: StorageCompactResult;
+  try {
+    const conn = ctx.store.connection;
+    const autoVacuum = Number(conn.pragma('auto_vacuum', { simple: true }));
+    if (autoVacuum !== 2) {
+      out = Object.freeze({
+        path: conn.path,
+        autoVacuum,
+        supported: false,
+      });
+    } else {
+      const pageSize = Number(conn.pragma('page_size', { simple: true }));
+      // Flush the WAL first so already-checkpointed free pages are in
+      // the main file and the -wal file shrinks too.
+      conn.pragma('wal_checkpoint(TRUNCATE)');
+      const freelistBefore = Number(conn.pragma('freelist_count', { simple: true }));
+      let freelist = freelistBefore;
+      while (freelist > 0) {
+        conn.pragma(`incremental_vacuum(${batchPages})`);
+        const next = Number(conn.pragma('freelist_count', { simple: true }));
+        if (next >= freelist) break; // no progress - stop rather than spin
+        freelist = next;
+      }
+      const freelistAfter = freelist;
+      // In WAL mode the main file only shrinks at a checkpoint - flush
+      // again so the reclaimed bytes leave the disk immediately.
+      conn.pragma('wal_checkpoint(TRUNCATE)');
+      out = Object.freeze({
+        path: conn.path,
+        autoVacuum,
+        supported: true,
+        freelistBefore,
+        freelistAfter,
+        pageSize,
+        reclaimedBytes: Math.max(0, (freelistBefore - freelistAfter) * pageSize),
+      });
+    }
+  } finally {
+    await ctx.close();
+  }
+  emitReport(options, out, () => {
+    const print = options.print ?? defaultPrintSink;
+    print(brand('storage compact'));
+    if (!out.supported) {
+      print(
+        `  ${statusMarker('warn')} auto_vacuum=${out.autoVacuum} - incremental compaction unavailable.`,
+      );
+      print('        This database was created before incremental auto-vacuum was enabled;');
+      print(
+        '        its file keeps the high-water-mark size (freed pages are reused, not returned to the OS).',
+      );
+      print(
+        '        To reclaim disk: initialise a fresh store (new databases get auto_vacuum=2) and move the data',
+      );
+      print(
+        '        across (graphorin migrate-export / import); VACUUM stays forbidden - it corrupts FTS5 rowid mappings.',
+      );
+      return;
+    }
+    print(
+      `  ${statusMarker('ok')} ${out.path}: freelist ${out.freelistBefore} -> ${out.freelistAfter} pages, reclaimed ${formatSize(out.reclaimedBytes)}`,
+    );
+  });
+  return out;
+}
+
+/** @stable */
 export interface StorageEncryptOptions extends StorageCommonOptions {
   /** SecretRef URI for the new passphrase. */
   readonly passphraseFrom: string;

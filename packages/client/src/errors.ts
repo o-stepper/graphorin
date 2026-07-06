@@ -56,6 +56,13 @@ export type GraphorinClientErrorKind =
   | 'run-not-found'
   | 'server-error'
   | 'aborted'
+  /**
+   * W-152: the per-subscription client buffer hit
+   * `subscriptionQueueLimit` because the `for await` consumer fell
+   * behind the event flow; the subscription is closed with this typed
+   * error instead of growing the heap or silently dropping frames.
+   */
+  | 'flow-overflow'
   | 'invalid-server-frame';
 
 /**

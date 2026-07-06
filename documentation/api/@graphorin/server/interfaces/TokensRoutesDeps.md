@@ -6,7 +6,7 @@
 
 # Interface: TokensRoutesDeps
 
-Defined in: packages/server/src/routes/tokens.ts:22
+Defined in: packages/server/src/routes/tokens.ts:23
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/server/src/routes/tokens.ts:22
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-allowedenvs"></a> `allowedEnvs` | `readonly` | readonly `string`[] | packages/server/src/routes/tokens.ts:26 |
-| <a id="property-defaultenv"></a> `defaultEnv` | `readonly` | `string` | packages/server/src/routes/tokens.ts:25 |
-| <a id="property-pepper"></a> `pepper` | `readonly` | `SecretValue$1` | packages/server/src/routes/tokens.ts:24 |
-| <a id="property-tokenstore"></a> `tokenStore` | `readonly` | [`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md) | packages/server/src/routes/tokens.ts:23 |
+| <a id="property-allowedenvs"></a> `allowedEnvs` | `readonly` | readonly `string`[] | packages/server/src/routes/tokens.ts:27 |
+| <a id="property-defaultenv"></a> `defaultEnv` | `readonly` | `string` | packages/server/src/routes/tokens.ts:26 |
+| <a id="property-pepper"></a> `pepper` | `readonly` | `SecretValue$1` | packages/server/src/routes/tokens.ts:25 |
+| <a id="property-tokenstore"></a> `tokenStore` | `readonly` | [`AuthTokenStore`](/api/@graphorin/core/interfaces/AuthTokenStore.md) | packages/server/src/routes/tokens.ts:24 |

@@ -133,10 +133,13 @@ Graphorin deliberately uses **snapshot-resume, not deterministic replay** (no Te
 - On resume, the paused node's body re-executes **from the top**. Earlier `pause()` calls inside the same body replay their already-delivered values in order; only the first unsatisfied `pause()` suspends again.
 - **Side effects before a `pause()` run again on every resume of that node.** Make them idempotent, or move them into a separate upstream node (whose completed step is never re-run).
 - A `pauseAt.before` static gate re-runs the gated node with *no* replayed values - operator approval of the node is not an answer to any programmatic `pause()` inside it.
+- **Pause order must be deterministic.** The replay is positional, and each delivered value is journaled together with the identity of the pause it answered (durable-primitive kind, awakeable/approval name). A body whose pause ORDER depends on time, state, or model output now fails loudly with the typed `pause-replay-divergence` error - naming the node plus the expected and actual pause - instead of silently handing a resume value to the wrong wait. Two plain `pause()` calls are indistinguishable and are never flagged; checkpoints written before this check replay their old values unverified.
 
 ### State must be JSON-safe
 
 Checkpoint state must survive a JSON round-trip and this is enforced identically on every store: a `Map`/`Set`/`Date`/class instance in a channel fails the checkpoint immediately with the typed `state-not-serializable` error naming the channel and path - instead of round-tripping in dev (in-memory `structuredClone`) and silently degrading to `{}`/strings under the SQLite store.
+
+The same gate covers everything else that rides the checkpoint (W-121): pause values and approval payloads, `Dispatch` args, satisfied resume values, and operator directives. A `Date` passed as `Directive({ resume })` fails at resume ENTRY (pseudo-channel `<directive>`), before the node body runs - previously it persisted as an ISO string and the body silently received a string on the next replay.
 
 ### Durability modes
 
@@ -175,7 +178,7 @@ import { awaitExternal, requestApproval, sleepFor, sleepUntil } from '@graphorin
 
 // Durable timer: suspends with a persisted wake-at timestamp.
 sleepUntil('2026-08-01T09:00:00Z'); // or sleepFor(ms)
-// Fire due timers from any scheduler:
+// Fire one due timer manually (the timer driver below does this for you):
 const { fired, nextWakeAt } = await workflow.tick(threadId);
 
 // Durable promise (awakeable): suspends under a name until an external
@@ -189,6 +192,22 @@ const decision = requestApproval<{ ok: boolean }>('deploy-prod', { env: 'prod' }
 ```
 
 `getState(threadId).pendingPauses` surfaces the full pending set - timers carry `wakeAt`, awakeables/approvals carry `name` - so schedulers and approval UIs can render what a thread is waiting for. Resolving a name that is not pending fails with `pause-not-found`.
+
+### Firing durable timers
+
+Nothing needs to poll by hand: `createTimerDriver` ships with the package. The engine stamps the earliest due timer on every suspended checkpoint (`CheckpointMetadata.wakeAt`), the store enumerates due threads (`CheckpointStore.listSuspended` - implemented by the SQLite adapter and `InMemoryCheckpointStore`), and the driver ticks them on a poll loop that re-arms at `min(pollIntervalMs, earliest nextWakeAt)`:
+
+```ts
+import { createTimerDriver } from '@graphorin/workflow';
+
+const driver = createTimerDriver({
+  workflows: [{ workflow, checkpointStore: store.checkpoints }],
+  pollIntervalMs: 30_000,
+});
+driver.start(); // library mode; driver.stop() on shutdown
+```
+
+On the server, wire the same driver through the lifecycle daemon instead: `createServer({ workflowTimers: { driver } })` starts and stops it with the process and reports `sweeps/fired/errors/nextWakeAt` under `checks.workflowTimers` on `/v1/health`. Per-thread tick failures are isolated (`onError`), and a `checkpoint-version-conflict` from two drivers racing the same thread is treated as benign - the store CAS already picked a winner. A custom `CheckpointStore` without `listSuspended` fails fast at `createTimerDriver` with a typed error rather than silently never firing. Threads suspended by versions before the `wake_at` column existed are invisible to the driver until one manual `tick` (or any resume) re-persists them.
 
 ### Per-node timeout and retry
 
@@ -278,7 +297,7 @@ Use `agent.fanOut(...)` when:
 
 `WorkflowError` is the base class with a stable `code` discriminator. The full `WorkflowErrorCode` union covers:
 
-`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
+`invalid-config`, `invalid-channel-write`, `multi-write-into-latest-value`, `unknown-node`, `thread-not-found`, `checkpoint-not-found`, `checkpoint-version-conflict`, `resume-without-suspension`, `concurrent-resume-rejected`, `pause-not-found`, `workflow-aborted`, `workflow-cancel-timeout` (the cancellation grace expired with tasks still unsettled), `max-steps-exceeded` (the `maxSteps` runaway cap fired - counted PER INVOCATION of execute/resume/retry/tick since W-122, so long-lived timer/approval threads never trip it and a capped invocation is retryable; the opt-in `maxTotalSteps` adds a lifetime quota under the same code), `pause-replay-divergence` (W-120: the body's pause order diverged from the journal), `node-execution-failed`, `node-timeout` (a per-node `timeoutMs` expired), `reducer-failed`, `state-validation-failed`, `workflow-version-mismatch`, `workflow-divergence`, `dead-end`, `state-not-serializable`. (`cycle-detected` was removed: cycles are legal in this engine - runaway loops are bounded by `maxSteps`.)
 
 Two of these are planning-honesty guarantees: a conditional fan where **no** edge fires and no `__end__` edge is satisfied raises `dead-end` instead of silently completing, and non-JSON-safe channel values raise `state-not-serializable` at the first checkpoint on every store.
 

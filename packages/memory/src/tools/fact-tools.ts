@@ -1,4 +1,5 @@
 import type { Tool } from '@graphorin/core';
+import { toolReturn } from '@graphorin/core';
 import { tool } from '@graphorin/tools';
 import { z } from 'zod';
 import { recallTaint } from './taint.js';
@@ -313,7 +314,7 @@ export function createFactSearchTool(
       // C6: recalled quarantined / foreign-provenance content re-arms the
       // taint ledger - the cross-session poisoning leg.
       const taint = recallTaint(hits.map((h) => h.record));
-      return taint === undefined ? output : { output, taint };
+      return taint === undefined ? output : toolReturn({ output, taint });
     },
   });
 }

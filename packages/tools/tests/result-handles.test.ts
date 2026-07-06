@@ -138,7 +138,13 @@ describe('WI-10 - createFileResultReader', () => {
   it('rejects a handle that escapes the artifact root (path traversal)', async () => {
     const { root } = await seedArtifact('run-1/call-1.txt', 'secret');
     const reader = createFileResultReader({ artifactRoot: root });
+    // W-114: the deep traversal now trips the shape guard first (a spill
+    // handle is exactly <runId>/<file>); a 2-segment traversal still
+    // reaches the escape check. Both are rejected.
     await expect(reader.read('graphorin-spill:../../../etc/passwd')).rejects.toThrow(
+      /Malformed result handle/,
+    );
+    await expect(reader.read('graphorin-spill:../passwd')).rejects.toThrow(
       /escapes the artifact root/,
     );
   });
@@ -182,5 +188,45 @@ describe('WI-10 - createReadResultTool', () => {
     await fs
       .rm(path.join(writer.artifactRoot, 'rr-run'), { recursive: true, force: true })
       .catch(() => {});
+  });
+
+  it('W-114: a cross-run handle is denied by default and allowed with allowCrossRun', async () => {
+    const { root } = await seedArtifact('other-run/call-9.txt', 'foreign body');
+    const reader = createFileResultReader({ artifactRoot: root });
+    const scoped = createReadResultTool({ reader });
+    const ctx = { runContext: { runId: 'my-run' } } as never;
+    await expect(
+      scoped.execute({ handle: 'graphorin-spill:other-run/call-9.txt' }, ctx),
+    ).rejects.toThrow(/cross-run reads are disabled/);
+
+    const open = createReadResultTool({ reader, allowCrossRun: true });
+    const out = (await open.execute({ handle: 'graphorin-spill:other-run/call-9.txt' }, ctx)) as {
+      content: string;
+    };
+    expect(out.content).toBe('foreign body');
+
+    // The SAME run's handle always reads.
+    const { root: ownRoot } = await seedArtifact('my-run/call-1.txt', 'mine');
+    const ownScoped = createReadResultTool({
+      reader: createFileResultReader({ artifactRoot: ownRoot }),
+    });
+    const own = (await ownScoped.execute({ handle: 'graphorin-spill:my-run/call-1.txt' }, ctx)) as {
+      content: string;
+    };
+    expect(own.content).toBe('mine');
+  });
+
+  it('W-114: sidecar handles and malformed shapes are refused at the reader', async () => {
+    const { root } = await seedArtifact('run-1/call-1.txt', 'content');
+    const reader = createFileResultReader({ artifactRoot: root });
+    await expect(reader.read('graphorin-spill:run-1/call-1.txt.meta.json')).rejects.toThrow(
+      /taint sidecar/,
+    );
+    await expect(reader.read('graphorin-spill:run-1/deep/call-1.txt')).rejects.toThrow(
+      /Malformed result handle/,
+    );
+    await expect(reader.read('graphorin-spill:flat.txt')).rejects.toThrow(
+      /Malformed result handle/,
+    );
   });
 });

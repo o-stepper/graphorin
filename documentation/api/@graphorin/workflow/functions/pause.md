@@ -10,7 +10,7 @@
 function pause<TValue, TResume>(value): TResume;
 ```
 
-Defined in: packages/core/dist/channels/pause.d.ts:75
+Defined in: packages/core/dist/channels/pause.d.ts:120
 
 Programmatically suspend the current workflow node. The `value` is
 surfaced to callers via the `WorkflowSuspendedEvent.value` field; the

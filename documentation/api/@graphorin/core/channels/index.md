@@ -134,6 +134,12 @@ Re-exports [isPauseSignal](/api/@graphorin/core/functions/isPauseSignal.md)
 
 ***
 
+### isReplayDivergenceSignal
+
+Re-exports [isReplayDivergenceSignal](/api/@graphorin/core/functions/isReplayDivergenceSignal.md)
+
+***
+
 ### isTimerPauseValue
 
 Re-exports [isTimerPauseValue](/api/@graphorin/core/functions/isTimerPauseValue.md)
@@ -176,6 +182,12 @@ Re-exports [PAUSE_SIGNAL_BRAND](/api/@graphorin/core/variables/PAUSE_SIGNAL_BRAN
 
 ***
 
+### PauseIdentity
+
+Re-exports [PauseIdentity](/api/@graphorin/core/interfaces/PauseIdentity.md)
+
+***
+
 ### PauseResumeScope
 
 Re-exports [PauseResumeScope](/api/@graphorin/core/interfaces/PauseResumeScope.md)
@@ -197,6 +209,18 @@ Re-exports [reducer](/api/@graphorin/core/functions/reducer.md)
 ### Reducer
 
 Re-exports [Reducer](/api/@graphorin/core/interfaces/Reducer.md)
+
+***
+
+### REPLAY\_DIVERGENCE\_BRAND
+
+Re-exports [REPLAY_DIVERGENCE_BRAND](/api/@graphorin/core/variables/REPLAY_DIVERGENCE_BRAND.md)
+
+***
+
+### ReplayDivergenceSignal
+
+Re-exports [ReplayDivergenceSignal](/api/@graphorin/core/classes/ReplayDivergenceSignal.md)
 
 ***
 

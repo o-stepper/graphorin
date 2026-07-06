@@ -29,6 +29,7 @@ callers can `switch` on it without parsing messages.
 | [ProviderMiddlewareOrderError](/api/@graphorin/agent/errors/classes/ProviderMiddlewareOrderError.md) | Thrown by `createAgent({...})` when the supplied `composeProviderMiddleware` chain violates the canonical inside-out ordering (DEC-145 / ADR-039). |
 | [RunStateMalformedError](/api/@graphorin/agent/errors/classes/RunStateMalformedError.md) | Thrown by `runStateFromJSON(...)` when the supplied JSON does not shape-match the documented SerializedRunState. |
 | [RunStateVersionUnsupportedError](/api/@graphorin/agent/errors/classes/RunStateVersionUnsupportedError.md) | Thrown by `runStateFromJSON(...)` when the version field in the serialized state is from a future major version of the framework. |
+| [SubAgentResumeTargetNotFoundError](/api/@graphorin/agent/errors/classes/SubAgentResumeTargetNotFoundError.md) | Thrown when a resume directive routes a decision into a parked sub-agent run (W-001) but the resuming agent instance cannot resolve the target: the parked toolName matches neither a configured handoff target nor a `toTool` sub-agent tool. Resume a parked sub-run on the SAME parent instance (or an identically-configured one). |
 | [ToolNotFoundError](/api/@graphorin/agent/errors/classes/ToolNotFoundError.md) | Thrown by the agent loop when the model emits a tool call referring to an unregistered tool (the model hallucinated a name). |
 
 ## Type Aliases

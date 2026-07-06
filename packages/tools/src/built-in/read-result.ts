@@ -19,13 +19,36 @@ import type { Tool } from '@graphorin/core';
 import { z } from 'zod';
 import { incrementCounter } from '../audit/index.js';
 import { tool } from '../builder/index.js';
-import type { ResultReader, ResultReadRange } from '../result/reader.js';
+import { type ResultReader, type ResultReadRange, SPILL_HANDLE_SCHEME } from '../result/reader.js';
 
 /** Configuration for {@link createReadResultTool}. */
 export interface ReadResultToolOptions {
   readonly reader: ResultReader;
   /** Default `maxBytes` when the model does not pass one. Default `65536`. */
   readonly defaultMaxBytes?: number;
+  /**
+   * W-114: allow reading spill handles that belong to ANOTHER run.
+   * Default `false`: spill artifacts live for days under the TTL sweep
+   * (confidential bodies included), and a model steered by injection
+   * could otherwise page through other runs' results. Opt in only for
+   * deliberate cross-run flows (e.g. a parent folding a sub-agent's
+   * handle, whose child run has its own runId).
+   */
+  readonly allowCrossRun?: boolean;
+}
+
+/**
+ * W-114: extract the owning runId from a spill handle
+ * (`graphorin-spill:<runId>/<toolCallId>.<ext>` - the format pinned by
+ * the truncation spill writer). `undefined` when the handle is not a
+ * spill URI or has no path segment.
+ */
+function spillHandleRunId(handle: string): string | undefined {
+  if (!handle.startsWith(SPILL_HANDLE_SCHEME)) return undefined;
+  const relative = handle.slice(SPILL_HANDLE_SCHEME.length);
+  const slash = relative.indexOf('/');
+  if (slash <= 0) return undefined;
+  return relative.slice(0, slash);
 }
 
 const inputSchema = z.object({
@@ -96,7 +119,22 @@ export function createReadResultTool(
     sandboxPolicy: 'none',
     sensitivity: 'internal',
     tags: ['built-in', 'result-handle'],
-    async execute(input) {
+    async execute(input, ctx) {
+      // W-114: spill handles are RUN-SCOPED by default. Resume of the
+      // same run keeps its runId, so paging across a suspend still
+      // works; reading another run's artifacts requires the explicit
+      // `allowCrossRun` opt-in. Fail closed - the model sees a plain
+      // execution_failed.
+      if (opts.allowCrossRun !== true) {
+        const owner = spillHandleRunId(input.handle);
+        const currentRunId = (ctx?.runContext as { readonly runId?: string } | undefined)?.runId;
+        if (owner !== undefined && currentRunId !== undefined && owner !== currentRunId) {
+          incrementCounter('tool.result.read.cross-run-denied.total', undefined);
+          throw new Error(
+            `read_result: handle belongs to run '${owner}', not the current run - cross-run reads are disabled (set allowCrossRun on createReadResultTool for deliberate cross-run flows).`,
+          );
+        }
+      }
       const range: ResultReadRange = {
         ...(input.offset !== undefined ? { offset: input.offset } : {}),
         ...(input.length !== undefined ? { length: input.length } : {}),

@@ -50,7 +50,7 @@ compactThread(
 keepLast): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:226
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:260
 
 W-009 compaction: keep only the `keepLast` newest checkpoints (by
 step_number) of one `(thread_id, namespace)` pair. Resume reads the
@@ -83,7 +83,7 @@ latest id - safe, but time-travel/fork targets are gone.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:166
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:200
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -117,7 +117,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:108
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:109
 
 #### Parameters
 
@@ -148,7 +148,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:143
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:177
 
 #### Parameters
 
@@ -168,13 +168,51 @@ Defined in: packages/store-sqlite/src/checkpoint-store.ts:143
 
 ***
 
+### listSuspended()
+
+```ts
+listSuspended(namespace, opts?): Promise<readonly {
+  threadId: string;
+  wakeAt: number;
+}[]>;
+```
+
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:150
+
+W-032: enumerate threads whose LATEST checkpoint in `namespace` is
+suspended with a due `wake_at`. Latest-per-thread is decided by max
+step_number (the same policy as `getTuple`), so a thread whose
+newest checkpoint moved on (resumed / completed) never fires.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `namespace` | `string` |
+| `opts?` | \{ `dueBefore?`: `number`; `limit?`: `number`; \} |
+| `opts.dueBefore?` | `number` |
+| `opts.limit?` | `number` |
+
+#### Returns
+
+`Promise`\<readonly \{
+  `threadId`: `string`;
+  `wakeAt`: `number`;
+\}[]\>
+
+#### Implementation of
+
+[`CheckpointStoreExt`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md).[`listSuspended`](/api/@graphorin/core/interfaces/CheckpointStoreExt.md#listsuspended)
+
+***
+
 ### pruneThreads()
 
 ```ts
 pruneThreads(opts): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:188
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:222
 
 W-009 retention sweep. Policy: a `(thread_id, namespace)` pair
 qualifies when its LATEST checkpoint (by step_number) is older than
@@ -250,7 +288,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/checkpoint-store.ts:87
+Defined in: packages/store-sqlite/src/checkpoint-store.ts:88
 
 #### Parameters
 

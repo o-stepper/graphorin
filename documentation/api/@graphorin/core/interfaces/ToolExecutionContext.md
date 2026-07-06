@@ -6,7 +6,7 @@
 
 # Interface: ToolExecutionContext\&lt;TDeps\&gt;
 
-Defined in: packages/core/src/contracts/tool.ts:263
+Defined in: packages/core/src/contracts/tool.ts:339
 
 Per-call execution context handed to `Tool.execute(...)`. Carries the
 stable `toolCallId`, the parent `RunContext`, an `AbortSignal` tied to
@@ -26,12 +26,12 @@ scoped to the tool's `secretsAllowed` ACL.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-logger"></a> `logger` | `readonly` | [`Logger`](/api/@graphorin/core/interfaces/Logger.md) | - | packages/core/src/contracts/tool.ts:268 |
-| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\&lt;`TDeps`\&gt; | - | packages/core/src/contracts/tool.ts:265 |
-| <a id="property-secrets"></a> `secrets` | `readonly` | [`ToolSecretsAccessor`](/api/@graphorin/core/interfaces/ToolSecretsAccessor.md) | Per-call secrets accessor. The accessor enforces the tool's `secretsAllowed` ACL - calling `require(...)` for a key that is not on the allowlist throws `SecretAccessDeniedError`. | packages/core/src/contracts/tool.ts:274 |
-| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | - | packages/core/src/contracts/tool.ts:266 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:264 |
-| <a id="property-tracer"></a> `tracer` | `readonly` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | - | packages/core/src/contracts/tool.ts:267 |
+| <a id="property-logger"></a> `logger` | `readonly` | [`Logger`](/api/@graphorin/core/interfaces/Logger.md) | - | packages/core/src/contracts/tool.ts:344 |
+| <a id="property-runcontext"></a> `runContext` | `readonly` | [`RunContext`](/api/@graphorin/core/interfaces/RunContext.md)\&lt;`TDeps`\&gt; | - | packages/core/src/contracts/tool.ts:341 |
+| <a id="property-secrets"></a> `secrets` | `readonly` | [`ToolSecretsAccessor`](/api/@graphorin/core/interfaces/ToolSecretsAccessor.md) | Per-call secrets accessor. The accessor enforces the tool's `secretsAllowed` ACL - calling `require(...)` for a key that is not on the allowlist throws `SecretAccessDeniedError`. | packages/core/src/contracts/tool.ts:350 |
+| <a id="property-signal"></a> `signal` | `readonly` | `AbortSignal` | - | packages/core/src/contracts/tool.ts:342 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:340 |
+| <a id="property-tracer"></a> `tracer` | `readonly` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | - | packages/core/src/contracts/tool.ts:343 |
 
 ## Methods
 
@@ -44,7 +44,7 @@ reportProgress(
    message?): void;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:281
+Defined in: packages/core/src/contracts/tool.ts:357
 
 Emit a progress event to subscribers of `agent.stream(...)`. No-op
 on tools without `streamingHint: true` AND on aborted streams. The
@@ -71,7 +71,7 @@ percentage when both fields are present.
 streamContent(chunk): void;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:287
+Defined in: packages/core/src/contracts/tool.ts:363
 
 Emit one chunk of content. Concatenated into the tool's assembled
 `output` per the buffer-becomes-output discipline. No-op on tools

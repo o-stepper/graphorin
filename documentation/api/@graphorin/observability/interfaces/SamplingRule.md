@@ -6,9 +6,14 @@
 
 # Interface: SamplingRule
 
-Defined in: packages/observability/src/tracer/sampling.ts:20
+Defined in: packages/observability/src/tracer/sampling.ts:28
 
-Per-span-type rate override.
+Per-span-type rate override. Applies on the probabilistic root path
+AND (W-090) to children of a sampled parent under `'parent-based'` -
+`{ type: 'tool.execute', rate: 0.01 }` thins the per-call spans
+inside every sampled `agent.run` trace. A child dropped by its rule
+breaks the tree below it: its own descendants inherit
+`parentSampled=false`.
 
 ## Stable
 
@@ -16,5 +21,5 @@ Per-span-type rate override.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-rate"></a> `rate` | `readonly` | `number` | packages/observability/src/tracer/sampling.ts:22 |
-| <a id="property-type"></a> `type` | `readonly` | `string` | packages/observability/src/tracer/sampling.ts:21 |
+| <a id="property-rate"></a> `rate` | `readonly` | `number` | packages/observability/src/tracer/sampling.ts:30 |
+| <a id="property-type"></a> `type` | `readonly` | `string` | packages/observability/src/tracer/sampling.ts:29 |

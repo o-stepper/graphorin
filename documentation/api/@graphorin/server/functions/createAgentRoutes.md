@@ -12,7 +12,7 @@ function createAgentRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/agents.ts:56
+Defined in: packages/server/src/routes/agents.ts:60
 
 ## Parameters
 

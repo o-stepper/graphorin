@@ -10,7 +10,7 @@
 function isPauseSignal(err): err is PauseSignal<unknown>;
 ```
 
-Defined in: packages/core/src/channels/pause.ts:108
+Defined in: packages/core/src/channels/pause.ts:210
 
 Cross-realm safe type guard for `PauseSignal`.
 

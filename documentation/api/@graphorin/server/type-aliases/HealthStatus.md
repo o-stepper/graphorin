@@ -10,6 +10,6 @@
 type HealthStatus = "ok" | "warn" | "fail";
 ```
 
-Defined in: packages/server/src/health/checks.ts:28
+Defined in: packages/server/src/health/checks.ts:29
 
 ## Stable

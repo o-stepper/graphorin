@@ -24,7 +24,7 @@
 import process from 'node:process';
 import { createSqliteStore, type GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { Hono } from 'hono';
-import { buildDaemons, type TriggersDaemonInput } from './app-daemons.js';
+import { buildDaemons, type TriggersDaemonInput, type WorkflowTimersInput } from './app-daemons.js';
 import { createLifecycle } from './app-lifecycle.js';
 import { attachGlobalMiddleware } from './app-middleware.js';
 import { buildWsLayer } from './app-ws.js';
@@ -41,12 +41,13 @@ import type { ReplayApi } from './replay/index.js';
 import type { AuditApi, McpApi, MemoryApi, SessionApi, SkillsApi } from './routes/index.js';
 import { RunStateTracker } from './runtime/run-state.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
+import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
 
 // Stable re-exports - both were born in this module and stay
 // importable from `./app.js` (and the package barrel) unchanged.
 export { ensureStoreAuditBinding } from './app-audit-binding.js';
-export type { TriggersDaemonInput } from './app-daemons.js';
+export type { TriggersDaemonInput, WorkflowTimersInput } from './app-daemons.js';
 
 /**
  * Public surface returned by {@link createServer}.
@@ -86,6 +87,11 @@ export interface GraphorinServer {
    * consolidator })`. Phase 14c integration.
    */
   readonly consolidator: ConsolidatorDaemon | undefined;
+  /**
+   * W-032: optional workflow durable-timer daemon - populated when the
+   * operator wired a `createTimerDriver(...)` at construction time.
+   */
+  readonly workflowTimers: WorkflowTimerDaemon | undefined;
   /**
    * Phase 14c Prometheus registry. Always present; sample updates
    * are observable via `metrics.snapshot()`.
@@ -132,6 +138,13 @@ export interface CreateServerOptions {
    * should wrap with the daemon adapter.
    */
   readonly triggers?: TriggersDaemonInput;
+  /**
+   * W-032: optional workflow durable-timer surface - pass a
+   * `createTimerDriver(...)` built over your workflows + checkpoint
+   * stores (`{ driver }`), or a pre-built daemon. The server starts
+   * and stops it with the lifecycle and reports it on `/v1/health`.
+   */
+  readonly workflowTimers?: WorkflowTimersInput;
   /**
    * Optional replay API consumed by the scope-enforced replay
    * endpoints. Phase 14c.
@@ -246,7 +259,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
   // Request-state / CORS / CSRF / rate-limit - see `app-middleware.ts`.
   attachGlobalMiddleware(app, config, now);
 
-  const { triggersDaemon, consolidatorDaemon } = buildDaemons(options);
+  const { triggersDaemon, consolidatorDaemon, workflowTimerDaemon } = buildDaemons(options);
 
   const ws = buildWsLayer(app, config, now);
 
@@ -265,6 +278,7 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     ws,
     triggersDaemon,
     consolidatorDaemon,
+    workflowTimerDaemon,
   });
 
   const handle: GraphorinServer = {
@@ -286,6 +300,9 @@ export async function createServer(options: CreateServerOptions = {}): Promise<G
     },
     get consolidator() {
       return consolidatorDaemon;
+    },
+    get workflowTimers() {
+      return workflowTimerDaemon;
     },
     get listeningOn() {
       return lifecycle.listeningOn;

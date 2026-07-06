@@ -6,7 +6,7 @@
 
 # Interface: Sampler
 
-Defined in: packages/observability/src/tracer/sampling.ts:69
+Defined in: packages/observability/src/tracer/sampling.ts:77
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/observability/src/tracer/sampling.ts:69
 shouldIncludeChunkContent(): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:75
+Defined in: packages/observability/src/tracer/sampling.ts:83
 
 Returns whether chunk *content* should travel through the exporter.
 
@@ -34,7 +34,7 @@ Returns whether chunk *content* should travel through the exporter.
 shouldRecordEvent(name): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:73
+Defined in: packages/observability/src/tracer/sampling.ts:81
 
 Decide whether a span event of the given name should be recorded.
 
@@ -56,7 +56,7 @@ Decide whether a span event of the given name should be recorded.
 shouldSample(type, parentSampled?): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:71
+Defined in: packages/observability/src/tracer/sampling.ts:79
 
 Decide whether a span of the given type should be recorded.
 

@@ -2,7 +2,10 @@
  * Head + tail sampling helpers. The tracer pairs the configured
  * sampler with a per-type override registry so chatty span types
  * (`memory.embed`, `tool.execute.partial`, …) can be downsampled
- * without affecting the rest of the trace stream.
+ * without affecting the rest of the trace stream. Under the default
+ * `'parent-based'` decision maker the per-type rules apply to CHILDREN
+ * of a sampled trace too (W-090) - a rule can only downsample inside a
+ * sampled trace, never resurrect children of an unsampled parent.
  *
  * @packageDocumentation
  */
@@ -13,7 +16,12 @@ import type { SpanType } from '@graphorin/core';
 export type SamplingDecisionMaker = 'parent-based' | 'always-on' | 'rate-limit';
 
 /**
- * Per-span-type rate override.
+ * Per-span-type rate override. Applies on the probabilistic root path
+ * AND (W-090) to children of a sampled parent under `'parent-based'` -
+ * `{ type: 'tool.execute', rate: 0.01 }` thins the per-call spans
+ * inside every sampled `agent.run` trace. A child dropped by its rule
+ * breaks the tree below it: its own descendants inherit
+ * `parentSampled=false`.
  *
  * @stable
  */
@@ -105,7 +113,20 @@ export function createSampler(opts: SamplingOptions = {}): Sampler {
         // decision. A child of an unsampled parent is NOT recorded (it would
         // otherwise be an orphan); a root span (no parent) falls through to
         // the rate.
-        if (parentSampled === true) return true;
+        //
+        // W-090: a per-type rule ACTS on children of a sampled parent -
+        // that is where the volume lives (`tool.execute` inside a sampled
+        // `agent.run` trace), and the docstring always promised it. A rule
+        // never resurrects children of an UNSAMPLED parent (orphans); a
+        // child dropped by its rule makes its own descendants inherit
+        // parentSampled=false.
+        if (parentSampled === true) {
+          const rule = ruleByType.get(type);
+          if (rule === undefined) return true;
+          if (rule >= 1) return true;
+          if (rule <= 0) return false;
+          return random() < rule;
+        }
         if (parentSampled === false) return false;
       }
       if (decisionMaker === 'rate-limit') {

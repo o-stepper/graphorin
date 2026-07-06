@@ -35,7 +35,7 @@ import type {
   ZodLikeError,
   ZodLikeSchema,
 } from '@graphorin/core';
-import { MODEL_HINTS } from '@graphorin/core';
+import { isToolReturnEnvelope, MODEL_HINTS } from '@graphorin/core';
 
 import {
   defaultInboundSanitization,
@@ -293,11 +293,7 @@ function validateExamples<TInput, TOutput>(
   });
 }
 
-function isToolReturn(value: unknown): value is { readonly output: unknown } {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'output' in value &&
-    Object.hasOwn(value, 'output')
-  );
-}
+// W-115: the guard lives in ONE place (core, next to the factory) -
+// the example-normalizer and the executor envelope agree by import.
+const isToolReturn = (value: unknown): value is { readonly output: unknown } =>
+  isToolReturnEnvelope(value);

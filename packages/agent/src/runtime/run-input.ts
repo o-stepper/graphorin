@@ -36,6 +36,8 @@ export interface MutableRunState {
   error?: RunState['error'];
   finishedAt?: string;
   usageByModel?: RunState['usageByModel'];
+  /** W-001: parked sub-agent runs (see {@link RunState.pendingSubRuns}). */
+  pendingSubRuns?: RunState['pendingSubRuns'];
 }
 
 export interface InternalRunSnapshot<TOutput> {

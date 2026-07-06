@@ -15,6 +15,24 @@
  * dynamic import will not be picked up by this lint surface; that
  * is the documented contract for the v0.1 lint surface.
  *
+ * **Comment-awareness (W-044).** Discovery AND grading run over a
+ * comment-blanked view of the source: line-comment and block-comment
+ * content is replaced with spaces (newlines preserved, so line numbers
+ * and offsets never shift) while string/template literals - and,
+ * conservatively, regex literals - are left untouched. A
+ * commented-out `tool({...})` is therefore never discovered, and a
+ * commented-out property (or a commented email inside a live
+ * `examples:` block) never feeds the grader. The ORIGINAL slice stays
+ * available as {@link DiscoveredTool.source} for reports; grading
+ * paths consume {@link DiscoveredTool.gradingSource}.
+ *
+ * **False-positive contract.** The scanner matches ANY callee whose
+ * last lexical token is `tool(` - including method calls like
+ * `.tool(` and locally-defined helpers that happen to share the name.
+ * Renamed or wrapped invocations (`const t = tool; t({...})`) are NOT
+ * seen. This is the accepted cost of the text-based surface that lets
+ * the CLI and the ESLint rules share one implementation (RB-49).
+ *
  * **Per-tool grader rubric (RB-49 calibration):**
  *
  *   - **description axis (0..40 points):**
@@ -61,10 +79,18 @@ export interface DiscoveredTool {
   /** Tags declared on the call (best-effort). */
   readonly tags: ReadonlyArray<string>;
   /**
-   * Raw object-literal source. Useful for tests + as a context blob
-   * when the CLI needs to surface the original source in a report.
+   * Raw object-literal source (ORIGINAL text, comments included).
+   * Useful for tests + as a context blob when the CLI needs to
+   * surface the original source in a report.
    */
   readonly source: string;
+  /**
+   * W-044: the same slice with comments blanked - what discovery
+   * parsed and what every grading path (examples PII scan,
+   * description/parameter scoring) consumes. Same length and line
+   * structure as `source`.
+   */
+  readonly gradingSource: string;
 }
 
 /**
@@ -182,21 +208,153 @@ const MAX_EXAMPLES = 5;
  */
 export function discoverToolCallsInSource(file: string, source: string): DiscoveredTool[] {
   const out: DiscoveredTool[] = [];
+  // W-044: scan and parse over the comment-blanked view - a
+  // commented-out `tool({...})` is invisible, and commented braces or
+  // quotes can no longer derail the brace matcher. Offsets are shared
+  // with the original source (blanking preserves length + newlines).
+  // The REGEX additionally searches a strings-blanked view so a
+  // `tool(` inside a string/template literal never matches; literals
+  // are still parsed from the strings-intact view.
+  const blanked = blankComments(source);
+  const searchable = blankStringContents(blanked);
   const regex = /\btool\s*\(\s*\{/g;
-  let match: RegExpExecArray | null = regex.exec(source);
+  let match: RegExpExecArray | null = regex.exec(searchable);
   while (match !== null) {
     const objectStart = match.index + match[0].length - 1;
-    const objectEnd = matchBrace(source, objectStart);
+    const objectEnd = matchBrace(blanked, objectStart);
     if (objectEnd > 0) {
       const literal = source.slice(objectStart, objectEnd + 1);
+      const gradingLiteral = blanked.slice(objectStart, objectEnd + 1);
       const line = countLines(source, match.index);
-      const tool = parseToolLiteral(file, line, literal);
+      const tool = parseToolLiteral(file, line, literal, gradingLiteral);
       if (tool !== null) out.push(tool);
     }
     regex.lastIndex = objectEnd + 1;
-    match = regex.exec(source);
+    match = regex.exec(searchable);
   }
   return out;
+}
+
+/**
+ * W-044: blank the CONTENTS of string/template literals (quotes kept,
+ * newlines preserved) so the discovery regex cannot match `tool(`
+ * inside prose. Used only for SEARCHING - parsing reads the
+ * strings-intact view.
+ */
+function blankStringContents(source: string): string {
+  const out = source.split('');
+  let inString: '"' | "'" | '`' | null = null;
+  let i = 0;
+  while (i < source.length) {
+    const ch = source[i] as string;
+    if (inString !== null) {
+      if (ch === '\\') {
+        out[i] = ' ';
+        if (i + 1 < source.length && source[i + 1] !== '\n') out[i + 1] = ' ';
+        i += 2;
+        continue;
+      }
+      if (ch === inString) {
+        inString = null;
+        i += 1;
+        continue;
+      }
+      if (ch !== '\n') out[i] = ' ';
+      i += 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      inString = ch as '"' | "'" | '`';
+    }
+    i += 1;
+  }
+  return out.join('');
+}
+
+/**
+ * W-044: replace line-comment and block-comment CONTENT with spaces
+ * while preserving every newline (offsets and 1-indexed lines never
+ * shift).
+ * String and template literals pass through untouched; regex literals
+ * are tracked with the classic prev-significant-token heuristic so a
+ * `/` inside one is never mistaken for a comment opener - when in
+ * doubt the scanner does NOT blank.
+ *
+ * @stable
+ */
+export function blankComments(source: string): string {
+  const out = source.split('');
+  let inString: '"' | "'" | '`' | null = null;
+  let prevSignificant = '';
+  let i = 0;
+  const isRegexStartContext = (): boolean =>
+    prevSignificant === '' || '([{=,:;!&|?+-*%<>~^'.includes(prevSignificant);
+  while (i < source.length) {
+    const ch = source[i] as string;
+    if (inString !== null) {
+      if (ch === '\\') {
+        i += 2;
+        continue;
+      }
+      if (ch === inString) inString = null;
+      i += 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      inString = ch as '"' | "'" | '`';
+      prevSignificant = ch;
+      i += 1;
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '/') {
+      while (i < source.length && source[i] !== '\n') {
+        out[i] = ' ';
+        i += 1;
+      }
+      continue;
+    }
+    if (ch === '/' && source[i + 1] === '*') {
+      out[i] = ' ';
+      out[i + 1] = ' ';
+      i += 2;
+      while (i < source.length && !(source[i] === '*' && source[i + 1] === '/')) {
+        if (source[i] !== '\n') out[i] = ' ';
+        i += 1;
+      }
+      if (i < source.length) {
+        out[i] = ' ';
+        out[i + 1] = ' ';
+        i += 2;
+      }
+      continue;
+    }
+    if (ch === '/' && isRegexStartContext()) {
+      // Conservative regex-literal skip: consume to the closing
+      // unescaped '/', honouring character classes.
+      let j = i + 1;
+      let inClass = false;
+      while (j < source.length && source[j] !== '\n') {
+        const cj = source[j] as string;
+        if (cj === '\\') {
+          j += 2;
+          continue;
+        }
+        if (cj === '[') inClass = true;
+        else if (cj === ']') inClass = false;
+        else if (cj === '/' && !inClass) break;
+        j += 1;
+      }
+      if (j < source.length && source[j] === '/') {
+        prevSignificant = '/';
+        i = j + 1;
+        continue;
+      }
+      // No closing slash on the line - not a regex; fall through.
+    }
+    if (!/\s/.test(ch)) prevSignificant = ch;
+    i += 1;
+  }
+  return out.join('');
 }
 
 /** Email PII pattern used by the examples-pii sub-check. */
@@ -284,7 +442,9 @@ export function runToolRules(
     // PII sub-check - fires once per matched email pattern in the
     // examples block. Operators usually want synthetic data, not real
     // addresses scraped from the corpus.
-    const emailMatch = EMAIL_PATTERN.exec(extractExamplesBlock(tool.source));
+    // W-044: grade over the blanked slice - a commented-out email
+    // inside a LIVE literal must not penalize the axis.
+    const emailMatch = EMAIL_PATTERN.exec(extractExamplesBlock(tool.gradingSource));
     if (emailMatch !== null) {
       const matched = emailMatch[0] as string;
       findings.push(
@@ -367,11 +527,29 @@ export function gradeTool(
 function scoreDescription(tool: DiscoveredTool, findings: ReadonlyArray<LintFinding>): number {
   if (findings.length > 0) return 0;
   const desc = tool.description?.trim() ?? '';
-  if (desc.length >= 80) return 40;
-  if (desc.length >= 50) return 32;
-  if (desc.length >= 30) return 24;
-  if (desc.length >= MIN_DESCRIPTION_LENGTH) return 16;
-  return 0;
+  let lengthScore = 0;
+  if (desc.length >= 80) lengthScore = 40;
+  else if (desc.length >= 50) lengthScore = 32;
+  else if (desc.length >= 30) lengthScore = 24;
+  else if (desc.length >= MIN_DESCRIPTION_LENGTH) lengthScore = 16;
+  // W-044 anti-degenerate guard: 80 chars of repeated lorem must not
+  // score like real prose. Deterministic and deliberately narrow -
+  // real descriptions have at least 4 distinct words and no single
+  // word carrying more than half the text - so the RB-49 calibration
+  // fixtures are untouched. Degenerate text caps at the lowest
+  // non-zero tier (16).
+  if (lengthScore > 16 && desc.length > 0) {
+    const words = desc
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((w) => w.length > 0);
+    const counts = new Map<string, number>();
+    for (const w of words) counts.set(w, (counts.get(w) ?? 0) + 1);
+    const unique = counts.size;
+    const topShare = words.length === 0 ? 0 : Math.max(...counts.values()) / words.length;
+    if (unique < 4 || topShare > 0.5) return 16;
+  }
+  return lengthScore;
 }
 
 function scoreExamples(tool: DiscoveredTool, findings: ReadonlyArray<LintFinding>): number {
@@ -542,14 +720,22 @@ function extractParameterNames(literal: string): string[] {
   return names;
 }
 
-function parseToolLiteral(file: string, line: number, literal: string): DiscoveredTool | null {
-  const name = readStringProp(literal, 'name') ?? '<anonymous>';
-  const description = readStringProp(literal, 'description');
-  const examples = countArrayProp(literal, 'examples');
-  const tagsArr = countArrayProp(literal, 'tags');
+function parseToolLiteral(
+  file: string,
+  line: number,
+  literal: string,
+  gradingLiteral: string,
+): DiscoveredTool | null {
+  // W-044: every extraction parses the BLANKED slice so commented-out
+  // properties inside a live literal never count; string values are
+  // preserved verbatim by the blanker.
+  const name = readStringProp(gradingLiteral, 'name') ?? '<anonymous>';
+  const description = readStringProp(gradingLiteral, 'description');
+  const examples = countArrayProp(gradingLiteral, 'examples');
+  const tagsArr = countArrayProp(gradingLiteral, 'tags');
   const tags: string[] = [];
   if (tagsArr.present && tagsArr.count > 0) {
-    const m = /tags\s*:\s*\[([^\]]*)\]/.exec(literal);
+    const m = /tags\s*:\s*\[([^\]]*)\]/.exec(gradingLiteral);
     if (m !== null) {
       const inner = (m[1] as string) ?? '';
       const tagRegex = /['"`]([^'"`]+)['"`]/g;
@@ -560,7 +746,7 @@ function parseToolLiteral(file: string, line: number, literal: string): Discover
       }
     }
   }
-  const parameterNames = extractParameterNames(literal);
+  const parameterNames = extractParameterNames(gradingLiteral);
   return Object.freeze({
     file,
     line,
@@ -571,6 +757,7 @@ function parseToolLiteral(file: string, line: number, literal: string): Discover
     parameterNames: Object.freeze(parameterNames),
     tags: Object.freeze(tags),
     source: literal,
+    gradingSource: gradingLiteral,
   });
 }
 

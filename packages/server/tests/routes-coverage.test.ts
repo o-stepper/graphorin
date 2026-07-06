@@ -351,13 +351,15 @@ describe('Routes coverage - branches that the integration suite leaves cold', ()
       body: JSON.stringify({}),
     });
     expect(malformed.status).toBe(400);
-    // periphery-01: fork is honestly 501 now - the old 202 forked nothing.
+    // W-119: fork is REAL now (the periphery-01 honest-501 retired) - a
+    // registered workflow that does not expose fork() answers a typed 400.
     const ok = await server.app.request('/v1/workflows/wf/fork', {
       method: 'POST',
       headers: { Authorization: `Bearer ${bearer}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ fromThreadId: 't', fromCheckpointId: 'c' }),
     });
-    expect(ok.status).toBe(501);
+    expect(ok.status).toBe(400);
+    expect(((await ok.json()) as { error: string }).error).toBe('workflow-fork-unsupported');
   });
 
   it('POST /v1/tokens rejects unknown env with 400', async () => {

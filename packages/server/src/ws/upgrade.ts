@@ -43,12 +43,13 @@ import {
   SUBPROTOCOL_NAME,
 } from '@graphorin/protocol';
 import type { ParsedScope, TokenVerifier } from '@graphorin/security/auth';
-import { parseScope, scopeMatches } from '@graphorin/security/auth';
+import { parseScope } from '@graphorin/security/auth';
 import type { Context } from 'hono';
 import type { WSContext, WSEvents } from 'hono/ws';
 
 import type { ServerVariables } from '../internal/context.js';
-import type { RunStateTracker } from '../runtime/run-state.js';
+import { checkScope } from '../middleware/scope.js';
+import { type RunStateTracker, requiredRunScope } from '../runtime/run-state.js';
 import type { WsDispatcher } from './dispatcher.js';
 import type { WsTicket, WsTicketStore } from './ticket.js';
 
@@ -166,12 +167,21 @@ export async function createWsUpgradeEvents(
       }
       const message = parsed.data;
       if (isCancelledNotification(message)) {
-        // IP-8: only an initialized connection holding `agents:invoke` may
-        // cancel a run. A notification carries no id, so an unauthorised one
-        // is silently ignored (there is no error channel) rather than aborting
-        // an arbitrary run.
-        if (initialized && grantsInvokeScope(auth.grantedScopes)) {
-          options.runs?.abort(message.params.requestId, 'mcp-cancel');
+        // IP-8 / W-107: only an initialized connection whose grant covers
+        // the run's OWNING resource may cancel it. A notification carries
+        // no id, so an unauthorised one is silently ignored (there is no
+        // error channel) rather than aborting an arbitrary run.
+        if (initialized) {
+          const snapshot = options.runs?.snapshot(message.params.requestId);
+          if (
+            snapshot !== undefined &&
+            checkScope(
+              { kind: 'token', grantedScopes: auth.grantedScopes } as never,
+              requiredRunScope(snapshot, 'control'),
+            )
+          ) {
+            options.runs?.abort(message.params.requestId, 'mcp-cancel');
+          }
         }
         return;
       }
@@ -276,18 +286,31 @@ export async function createWsUpgradeEvents(
         return;
       }
       if (isRunCancelRequest(message)) {
-        // IP-8: mirror the REST `POST /runs/:runId/abort` scope gate so a
-        // bearer token cannot abort an arbitrary run without `agents:invoke`.
-        if (!grantsInvokeScope(auth.grantedScopes)) {
+        // IP-8 / W-107: mirror the REST `POST /runs/:runId/abort` gate at
+        // the same per-resource granularity - snapshot first (unknown run
+        // answers RUN_NOT_FOUND, matching REST's 404-before-403 order),
+        // then require the OWNING agent's/workflow's control scope.
+        const runId = message.params.runId;
+        const snapshot = options.runs?.snapshot(runId);
+        if (snapshot === undefined) {
+          sendRpcError(
+            ws,
+            message.id,
+            RPC_ERROR_CODES.RUN_NOT_FOUND,
+            `Run '${runId}' is not active.`,
+          );
+          return;
+        }
+        const required = requiredRunScope(snapshot, 'control');
+        if (!checkScope({ kind: 'token', grantedScopes: auth.grantedScopes } as never, required)) {
           sendRpcError(
             ws,
             message.id,
             RPC_ERROR_CODES.SCOPE_DENIED,
-            "Token lacks required scope 'agents:invoke'.",
+            `Token lacks required scope '${required}'.`,
           );
           return;
         }
-        const runId = message.params.runId;
         const aborted = options.runs?.abort(runId, message.params.reason ?? 'rpc-cancel') === true;
         if (!aborted) {
           sendRpcError(
@@ -414,25 +437,10 @@ async function resolveUpgradeAuth(
 }
 
 /**
- * IP-8: the `agents:invoke` scope required to cancel a run over the WS
- * transport - the same requirement the REST `POST /runs/:runId/abort` route
- * enforces. `scopeMatches` honours wildcards (`agents:*`, `admin:*`).
- */
-const INVOKE_SCOPE: ParsedScope = parseScope('agents:invoke');
-
-/**
- * IP-13: full scope grant handed to a no-auth (`auth.kind='none'`) upgrade.
- * `admin:*` matches every required scope, including the {@link INVOKE_SCOPE}
- * gate on run cancellation.
+ * IP-13: the anonymous trusted-loopback principal (auth disabled) holds
+ * `admin:*` so every per-subject and per-run check passes uniformly.
  */
 const ANONYMOUS_WS_SCOPES: ReadonlyArray<ParsedScope> = [parseScope('admin:*')];
-
-function grantsInvokeScope(granted: ReadonlyArray<ParsedScope>): boolean {
-  for (const scope of granted) {
-    if (scopeMatches(scope, INVOKE_SCOPE)) return true;
-  }
-  return false;
-}
 
 function acceptTicket(ticket: WsTicket): ResolvedUpgradeAuth {
   return {

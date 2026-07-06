@@ -22,9 +22,13 @@ import { z } from 'zod';
 import { AgentNotFoundError } from '../errors/index.js';
 import type { ServerVariables } from '../internal/context.js';
 import { newRequestId } from '../internal/ids.js';
-import { createScopeMiddleware } from '../middleware/scope.js';
+import {
+  checkScope,
+  createAuthenticatedMiddleware,
+  createScopeMiddleware,
+} from '../middleware/scope.js';
 import type { AgentRegistry } from '../registry/index.js';
-import type { RunStateTracker } from '../runtime/run-state.js';
+import { type RunStateTracker, requiredRunScope } from '../runtime/run-state.js';
 
 /**
  * @stable
@@ -87,14 +91,7 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
       }
       const parsed = RunBodySchema.safeParse(await safelyParseJson(c));
       if (!parsed.success) {
-        return c.json(
-          {
-            error: 'config-invalid',
-            message: 'Invalid run body.',
-            issues: parsed.error.issues.map((i) => ({ path: i.path, message: i.message })),
-          },
-          400,
-        );
+        return invalidBodyResponse(c, parsed.error);
       }
       const runId = newRunId();
       const sessionId = parsed.data.sessionId;
@@ -139,11 +136,19 @@ export function createAgentRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Serv
         const err = new AgentNotFoundError(id);
         return c.json({ error: err.kind, message: err.message }, 404);
       }
-      const runId = newRunId();
+      // W-151: validate the body BEFORE any run is registered - the old
+      // handler swallowed a failed parse and launched the agent on an
+      // empty prompt, burning provider tokens behind a 202 that looked
+      // successful. Identical validation to the sibling /run route
+      // (empty/absent bodies stay valid via the schema default).
       const parsed = RunBodySchema.safeParse(await safelyParseJson(c));
-      const sessionId = parsed.success ? parsed.data.sessionId : undefined;
-      const userId = parsed.success ? parsed.data.userId : undefined;
-      const input = parsed.success ? (parsed.data.input ?? '') : '';
+      if (!parsed.success) {
+        return invalidBodyResponse(c, parsed.error);
+      }
+      const runId = newRunId();
+      const sessionId = parsed.data.sessionId;
+      const userId = parsed.data.userId;
+      const input = parsed.data.input ?? '';
       // IP-2: actually run the agent. The old handler parsed the input
       // and threw it away - the run sat 'pending' forever while the 202
       // advertised subjects nothing would ever emit on.
@@ -251,17 +256,44 @@ function backgroundStreamAgent(
 export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: ServerVariables }> {
   const app = new Hono<{ Variables: ServerVariables }>();
 
-  app.get('/:runId/state', createScopeMiddleware('agents:read'), (c) => {
+  // W-107: run control binds to the run's OWNING resource. The
+  // requirement is only known after the snapshot resolves the
+  // descriptor, so the outer gate is authentication-only and the
+  // handlers authorize imperatively: 404 for unknown runs first
+  // (runIds are unguessable newRequestId values and ephemeral - the
+  // ordering is deliberate and matches WS run.cancel), then 403 when
+  // the grant does not cover the owning agent/workflow. Bare
+  // `agents:read`/`agents:invoke` grants keep covering their
+  // per-resource requirements.
+  app.get('/:runId/state', createAuthenticatedMiddleware(), (c) => {
     const runId = c.req.param('runId');
     const state = deps.runs.snapshot(runId);
     if (state === undefined) {
       return c.json({ error: 'run-not-found', message: `Run '${runId}' is not registered.` }, 404);
     }
+    const required = requiredRunScope(state, 'read');
+    if (!checkScope(c.get('state').auth, required)) {
+      return c.json(
+        { error: 'scope-denied', message: `Token lacks required scope '${required}'.` },
+        403,
+      );
+    }
     return c.json(state);
   });
 
-  app.post('/:runId/abort', createScopeMiddleware('agents:invoke'), (c) => {
+  app.post('/:runId/abort', createAuthenticatedMiddleware(), (c) => {
     const runId = c.req.param('runId');
+    const state = deps.runs.snapshot(runId);
+    if (state === undefined) {
+      return c.json({ error: 'run-not-found', message: `Run '${runId}' is not registered.` }, 404);
+    }
+    const required = requiredRunScope(state, 'control');
+    if (!checkScope(c.get('state').auth, required)) {
+      return c.json(
+        { error: 'scope-denied', message: `Token lacks required scope '${required}'.` },
+        403,
+      );
+    }
     const aborted = deps.runs.abort(runId);
     if (!aborted) {
       return c.json({ error: 'run-not-found', message: `Run '${runId}' is not registered.` }, 404);
@@ -269,11 +301,18 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
     return c.json({ runId, status: 'aborted' });
   });
 
-  app.post('/:runId/resume', createScopeMiddleware('agents:invoke'), async (c) => {
+  app.post('/:runId/resume', createAuthenticatedMiddleware(), async (c) => {
     const runId = c.req.param('runId');
     const state = deps.runs.snapshot(runId);
     if (state === undefined) {
       return c.json({ error: 'run-not-found', message: `Run '${runId}' is not registered.` }, 404);
+    }
+    const requiredResume = requiredRunScope(state, 'control');
+    if (!checkScope(c.get('state').auth, requiredResume)) {
+      return c.json(
+        { error: 'scope-denied', message: `Token lacks required scope '${requiredResume}'.` },
+        403,
+      );
     }
     // IP-14: a 202 that persists nothing and resumes nothing is a lie
     // the client SDK was built on. Until the server can rehydrate the
@@ -295,6 +334,24 @@ export function createRunRoutes(deps: AgentRoutesDeps): Hono<{ Variables: Server
   });
 
   return app;
+}
+
+/**
+ * W-151: byte-identical 400 for an invalid run/stream body - both
+ * sibling routes validate through this one helper.
+ */
+function invalidBodyResponse(
+  c: Context<{ Variables: ServerVariables }>,
+  error: { issues: ReadonlyArray<{ path: ReadonlyArray<PropertyKey>; message: string }> },
+) {
+  return c.json(
+    {
+      error: 'config-invalid',
+      message: 'Invalid run body.',
+      issues: error.issues.map((i) => ({ path: i.path, message: i.message })),
+    },
+    400,
+  );
 }
 
 async function safelyParseJson(c: Context<{ Variables: ServerVariables }>): Promise<unknown> {

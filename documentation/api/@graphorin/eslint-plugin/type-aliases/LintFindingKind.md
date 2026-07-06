@@ -18,6 +18,6 @@ type LintFindingKind =
   | "parameter-numeric-suffix";
 ```
 
-Defined in: src/tool-discovery.ts:73
+Defined in: src/tool-discovery.ts:99
 
 ## Stable

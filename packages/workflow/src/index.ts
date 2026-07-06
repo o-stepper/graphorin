@@ -111,8 +111,17 @@ export {
   WorkflowVersionMismatchError,
 } from './errors/index.js';
 export { createWorkflow } from './factory.js';
-export { CHECKPOINT_SCHEMA_VERSION } from './internal/engine.js';
+export { CHECKPOINT_SCHEMA_VERSION, namespaceFor } from './internal/engine.js';
 export { createNode } from './node.js';
+export {
+  type CreateTimerDriverOptions,
+  createTimerDriver,
+  type TickableWorkflow,
+  type TimerDriver,
+  type TimerDriverEntry,
+  type TimerDriverStatus,
+  TimerDriverStoreUnsupportedError,
+} from './timer-driver.js';
 export type {
   DispatchLike,
   DurabilityMode,

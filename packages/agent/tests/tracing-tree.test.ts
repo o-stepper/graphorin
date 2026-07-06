@@ -161,4 +161,104 @@ describe('C7 - agent.run / agent.step / tool.execute form one trace tree', () =>
     expect(tools[0]?.parentId).toBe(steps[0]?.id);
     expect(tools[0]?.attrs['gen_ai.tool.name']).toBe('echo');
   });
+
+  it('W-036: a handoff child agent.run span parents under the parent agent.step span', async () => {
+    const { tracer, spans } = recordingTracer();
+    const target = createAgent({
+      name: 'specialist',
+      instructions: 'x',
+      provider: mockProvider([textOnlyScript('done', 8)]),
+      tracer,
+    });
+    const parent = createAgent({
+      name: 'router',
+      instructions: 'route',
+      provider: mockProvider([
+        toolCallScript({
+          toolCallId: 'h1',
+          toolName: 'transfer_to_specialist',
+          args: {},
+          totalTokens: 8,
+        }),
+        textOnlyScript('final', 4),
+      ]),
+      handoffs: [target],
+      tracer,
+    });
+    for await (const _ev of parent.stream('go')) {
+      /* drain */
+    }
+    const runs = spans.filter((s) => s.type === 'agent.run');
+    expect(runs).toHaveLength(2);
+    const parentRun = runs[0];
+    const childRun = runs[1];
+    expect(parentRun?.parentId).toBeUndefined();
+    // One tree: the child run parents under the parent's live step span.
+    const parentSteps = spans.filter(
+      (s) => s.type === 'agent.step' && s.parentId === parentRun?.id,
+    );
+    expect(childRun?.parentId).toBe(parentSteps[0]?.id);
+  });
+
+  it('W-036: a toTool child agent.run span parents under the calling step span', async () => {
+    const { tracer, spans } = recordingTracer();
+    const child = createAgent({
+      name: 'worker',
+      instructions: 'x',
+      provider: mockProvider([textOnlyScript('done', 8)]),
+      tracer,
+    });
+    const parent = createAgent({
+      name: 'boss',
+      instructions: 'x',
+      provider: mockProvider([
+        toolCallScript({
+          toolCallId: 'tc-sub',
+          toolName: 'subagent_worker',
+          args: { input: 'go' },
+          totalTokens: 8,
+        }),
+        textOnlyScript('final', 4),
+      ]),
+      tools: [child.toTool() as never],
+      tracer,
+    });
+    for await (const _ev of parent.stream('go')) {
+      /* drain */
+    }
+    const runs = spans.filter((s) => s.type === 'agent.run');
+    expect(runs).toHaveLength(2);
+    expect(runs[1]?.parentId).toBeDefined();
+  });
+
+  it('W-033: run-span gen_ai.usage.* includes handoff-child tokens', async () => {
+    const { tracer, spans } = recordingTracer();
+    const target = createAgent({
+      name: 'specialist',
+      instructions: 'x',
+      provider: mockProvider([textOnlyScript('done', 20)]),
+    });
+    const parent = createAgent({
+      name: 'router',
+      instructions: 'route',
+      provider: mockProvider([
+        toolCallScript({
+          toolCallId: 'h1',
+          toolName: 'transfer_to_specialist',
+          args: {},
+          totalTokens: 8,
+        }),
+        textOnlyScript('final', 4),
+      ]),
+      handoffs: [target],
+      tracer,
+    });
+    for await (const _ev of parent.stream('go')) {
+      /* drain */
+    }
+    const run = spans.find((s) => s.type === 'agent.run');
+    // Prompt halves: 4 + 2 (parent steps) + 10 (child) = 16.
+    expect(run?.attrs['gen_ai.usage.input_tokens']).toBe(16);
+    expect(run?.attrs['gen_ai.usage.output_tokens']).toBe(16);
+  });
 });

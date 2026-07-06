@@ -86,11 +86,13 @@ Most domain routes below mount **only when the corresponding adapter is passed t
 | `GET` | `/v1/workflows` | List configured workflows. |
 | `POST` | `/v1/workflows/:id/execute` | Start a workflow run in the background: `202` with `runId` + the WS subject (`workflow:<id>/runs/<runId>/events`). Scope `workflows:execute:<id>`. |
 | | | On failure the run subject carries a `workflow.error` event whose payload is `{ runId, code, message, hint? }` - `code` is the machine-readable discriminator (`err.code`, falling back to `err.kind`, else `unknown`), so clients retry `checkpoint-version-conflict` and abandon `node-execution-failed` without parsing prose; the same `code` appears on the run-status `error` object. |
-| `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement `resume()`. Scope `workflows:resume:<id>`. |
+| `POST` | `/v1/workflows/:id/resume` | Resume a paused workflow thread (`threadId` in the body). An optional `name` targets a specific awakeable/approval among parallel pauses (W-119; approvals resolve through the same primitive). Mirrors execute: the run iterates in the background, `202` + `runId` + WS subject; `400` when the workflow does not implement the needed method. Scope `workflows:resume:<id>`. |
 | `GET` | `/v1/workflows/:id/state` | Read a thread's state (`?threadId=...`); `400` when the workflow does not implement `getState()`. Scope `workflows:read:<id>`. |
 | `GET` | `/v1/workflows/:id/checkpoints` | List a thread's checkpoints (`?threadId=...`). Scope `workflows:read:<id>`. |
 | `DELETE` | `/v1/workflows/:id/threads/:threadId` | Delete every checkpoint + pending write of one thread (idempotent; `204` on success, `400` when the entry does not expose `deleteThread()`). Scope `workflows:delete:<id>`. |
-| `POST` | `/v1/workflows/:id/fork` | **Not implemented** on the server surface yet: answers an honest `501`; fork the thread programmatically via the workflow API. Scope `workflows:execute:<id>`. |
+| `POST` | `/v1/workflows/:id/fork` | Fork a new thread from a checkpoint (W-119): body `{ fromThreadId, fromCheckpointId? }`, defaulting to the thread's latest checkpoint; answers `201 { newThreadId }`. Scope `workflows:execute:<id>`. |
+| `POST` | `/v1/workflows/:id/retry` | Replay a failed/aborted thread in the background (W-119): body `{ threadId }`, answers `202 { runId }` with the WS subject. Scope `workflows:resume:<id>`. |
+| `POST` | `/v1/workflows/:id/tick` | Fire a due durable timer synchronously (W-119): body `{ threadId }`, answers `{ fired, nextWakeAt }`. Long node bodies hold the connection - prefer the timer daemon (`createServer({ workflowTimers })`) for regular firing. Scope `workflows:resume:<id>`. |
 | `POST` | `/v1/session/ws-ticket` | Mint a single-use WebSocket session ticket. |
 
 ::: info Terminal run state is short-lived
@@ -144,7 +146,7 @@ for await (const event of sub.events()) {
 
 The browser-friendly client is published as `@graphorin/client` and depends only on `@graphorin/protocol`. SSE is the documented fallback for environments that cannot upgrade to WebSocket.
 
-Cancelling a run over the socket - the `run.cancel` request and the `notifications/cancelled` notification - requires the same **`agents:invoke`** scope as the REST `POST /v1/runs/:runId/abort` route. A `run.cancel` from a token without it is rejected with `SCOPE_DENIED` (`-32003`); a `notifications/cancelled` without it (or before `initialize`) is silently ignored, since a notification carries no id to reply on.
+Cancelling a run over the socket - the `run.cancel` request and the `notifications/cancelled` notification - requires the run's OWNING resource scope, exactly like the REST `POST /v1/runs/:runId/abort` route (W-107): `agents:invoke:<agentId>` for agent runs, `workflows:execute:<workflowId>` for workflow runs; bare two-segment grants keep covering the per-resource requirement. Both surfaces resolve the run first (an unknown runId answers `RUN_NOT_FOUND` / `404` before any scope evaluation; runIds are unguessable and ephemeral, so this ordering is deliberate). A `run.cancel` outside the grant is rejected with `SCOPE_DENIED` (`-32003`) naming the required scope; a `notifications/cancelled` outside it (or before `initialize`) is silently ignored, since a notification carries no id to reply on. Session reads are symmetric too: `GET /v1/sessions/:id` (+`/messages`, `/handoffs`, `/export`, `DELETE`) and the SSE `GET /v1/sessions/:id/events` fallback require `sessions:<verb>:<sessionId>` per-resource, matching the WS subject gate - a bare two-segment `sessions:read` remains the global administrative read. `POST /v1/session/ws-ticket` requires only authentication: the ticket adds no rights (it carries the principal's own scopes, and every subscribe is per-subject gated).
 
 ## Triggers
 
@@ -251,6 +253,10 @@ export default defineConfig({
 ```
 
 The CLI command `graphorin start --config graphorin.config.mjs` boots the server. The config loader reads `.ts` / `.js` / `.mjs` / `.json` files (TOML is not supported); `defineConfig` is a typed pass-through that gives editor autocomplete over the full schema, and every field is optional with a documented default.
+
+### Retention
+
+The `retention` section drives a unified periodic sweep over the store's growth surfaces (default: every 6 hours, plus one sweep immediately at startup). Derived data is pruned out of the box - spans older than `spansDays` (30), consolidator run counters older than `consolidatorRunsDays` (90), exhausted DLQ batches older than `dlqExhaustedDays` (30), and expired idempotency records (`idempotency: true`). Primary user content is strictly opt-in: sessions (`sessionsDays`, with `sessionsClosedOnly` defaulting to `true`), the session audit trail (`auditDays`), memory history (`memoryHistoryDays`) and terminal workflow threads (`workflowThreadsDays`) are only touched when you set the matching window. `retention: { enabled: false }` disables the sweep entirely. Each surface is isolated: one failing prune logs a warning (via the `observability.logger` flavour) and never blocks the others. See the [deployment guide](/guide/deployment#retention-and-database-growth) for the full growth-surface table, including the file-based replay-JSONL directory that must be pruned via cron instead.
 
 ## Process model
 

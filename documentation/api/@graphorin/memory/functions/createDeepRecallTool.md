@@ -10,7 +10,7 @@
 function createDeepRecallTool(deps): Tool<DeepRecallInput, DeepRecallOutput>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:251
+Defined in: packages/memory/src/tools/recall-tools.ts:252
 
 `deep_recall` - gated, multi-pass ("deep") recall over the user's
 factual memory for HARD questions (P2-4). A local difficulty gate keeps

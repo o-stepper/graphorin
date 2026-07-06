@@ -25,7 +25,7 @@ type MergeStrategy<TOutput> =
 };
 ```
 
-Defined in: packages/agent/src/fanout/index.ts:55
+Defined in: packages/agent/src/fanout/index.ts:56
 
 Built-in merge-strategy taxonomy.
 

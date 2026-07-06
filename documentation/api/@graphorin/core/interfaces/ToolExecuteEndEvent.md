@@ -6,7 +6,7 @@
 
 # Interface: ToolExecuteEndEvent
 
-Defined in: packages/core/src/types/agent-event.ts:158
+Defined in: packages/core/src/types/agent-event.ts:177
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:158
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/core/src/types/agent-event.ts:162 |
-| <a id="property-result"></a> `result` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:161 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:160 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.end"` | packages/core/src/types/agent-event.ts:159 |
+| <a id="property-durationms"></a> `durationMs` | `readonly` | `number` | packages/core/src/types/agent-event.ts:181 |
+| <a id="property-result"></a> `result` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:180 |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:179 |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.execute.end"` | packages/core/src/types/agent-event.ts:178 |

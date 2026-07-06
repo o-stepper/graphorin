@@ -206,6 +206,18 @@ const FIXTURES: Record<AgentEvent['type'], AgentEvent> = {
   'step.end': { type: 'step.end', stepNumber: 1, usage: zeroUsage() },
   'guardrail.tripped': { type: 'guardrail.tripped', guardrailName: 'g', phase: 'input' },
   'verifier.result': { type: 'verifier.result', verifierId: 'v', ok: true, stepNumber: 1 },
+  // W-036: the wrapped child event must itself be binary-bearing so
+  // this gate proves the RECURSIVE projection.
+  'subagent.event': {
+    type: 'subagent.event',
+    toolCallId: 'h1',
+    agentName: 'child',
+    event: {
+      type: 'agent.end',
+      runId: 'r-child',
+      result: { output: 'done', usage: zeroUsage(), status: 'completed', state: multimodalState() },
+    },
+  },
   // The agent.end fixture MUST be multimodal - a state without binary
   // payloads would make this gate vacuous.
   'agent.end': {
@@ -253,6 +265,19 @@ describe('WireAgentEvent - every variant survives JSON and round-trips (W-046)',
         };
         expect(outcome.contentParts[0]?.image).toBeInstanceOf(Uint8Array);
         expect(outcome.contentParts[0]?.image).toEqual(BYTES);
+      } else if (type === 'subagent.event') {
+        // W-036: the wrapped child event decodes RECURSIVELY.
+        const decoded = back as unknown as {
+          event: { result: { state: RunState } };
+        };
+        const message = decoded.event.result.state.messages[0] as {
+          content: readonly unknown[];
+        };
+        const image = message.content[0] as { image: Uint8Array };
+        const file = message.content[1] as unknown as { file: URL };
+        expect(image.image).toBeInstanceOf(Uint8Array);
+        expect(image.image).toEqual(BYTES);
+        expect(file.file).toBeInstanceOf(URL);
       } else {
         // Non-binary variants must be untouched by the projection.
         expect(toWireAgentEvent(ev)).toBe(ev);

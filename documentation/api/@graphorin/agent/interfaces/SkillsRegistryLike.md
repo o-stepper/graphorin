@@ -6,7 +6,7 @@
 
 # Interface: SkillsRegistryLike
 
-Defined in: packages/agent/src/types.ts:112
+Defined in: packages/agent/src/types.ts:113
 
 Skill-registry shape consumed by the agent loop. Implementations
 live in `@graphorin/skills`. We accept any structurally-compatible
@@ -23,7 +23,7 @@ surface.
 optional list(): readonly unknown[];
 ```
 
-Defined in: packages/agent/src/types.ts:113
+Defined in: packages/agent/src/types.ts:114
 
 #### Returns
 

@@ -6,7 +6,7 @@
 
 # Interface: TodoItem
 
-Defined in: packages/core/src/types/run.ts:196
+Defined in: packages/core/src/types/run.ts:232
 
 One item in the agent's structured plan (D6). `status` drives both
 the recitation rendering and progress reporting; `id` lets a
@@ -18,6 +18,6 @@ status-flip mutation target an item without rewriting the list.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/run.ts:198 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/types/run.ts:197 |
-| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"pending"` \| `"in_progress"` | packages/core/src/types/run.ts:199 |
+| <a id="property-content"></a> `content` | `readonly` | `string` | packages/core/src/types/run.ts:234 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/types/run.ts:233 |
+| <a id="property-status"></a> `status` | `readonly` | `"completed"` \| `"pending"` \| `"in_progress"` | packages/core/src/types/run.ts:235 |

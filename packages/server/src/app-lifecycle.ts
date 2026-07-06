@@ -38,12 +38,10 @@ import type { MetricRegistry } from './metrics/registry.js';
 import type { AgentRegistry, WorkflowRegistry } from './registry/index.js';
 import type { ReplayApi } from './replay/index.js';
 import type { AuditApi, McpApi, MemoryApi, SessionApi, SkillsApi } from './routes/index.js';
-import {
-  type RunStateTracker,
-  scheduleIdempotencyPruning,
-  scheduleRunPruning,
-} from './runtime/run-state.js';
+import { createConsoleRetentionLog, scheduleRetentionSweeps } from './runtime/retention.js';
+import { type RunStateTracker, scheduleRunPruning } from './runtime/run-state.js';
 import type { TriggersDaemon } from './triggers/daemon.js';
+import type { WorkflowTimerDaemon } from './workflows/timer-daemon.js';
 import type { WsDispatcher, WsTicketStore } from './ws/index.js';
 import { scheduleReplayBufferPruning } from './ws/replay-buffer.js';
 
@@ -81,6 +79,7 @@ export interface ServerLifecycleDeps {
   readonly ws: WsLayer;
   readonly triggersDaemon: TriggersDaemon | undefined;
   readonly consolidatorDaemon: ConsolidatorDaemon | undefined;
+  readonly workflowTimerDaemon: WorkflowTimerDaemon | undefined;
 }
 
 /**
@@ -111,6 +110,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
     now,
     triggersDaemon,
     consolidatorDaemon,
+    workflowTimerDaemon,
   } = deps;
   const commentaryAuditSink = deps.ws.commentaryAuditSink;
 
@@ -122,8 +122,9 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
   let stopRunPruning: (() => void) | undefined;
   // W-028: stops the periodic WS replay-buffer TTL sweep on shutdown.
   let stopReplayBufferPruning: (() => void) | undefined;
-  // W-061: stops the periodic idempotency-record sweep on shutdown.
-  let stopIdempotencyPruning: (() => void) | undefined;
+  // W-010: stops the unified retention sweep (spans, consolidator runs,
+  // DLQ, idempotency + the opt-in content surfaces) on shutdown.
+  let stopRetention: (() => void) | undefined;
   let auditDb: AuditDb | undefined;
   let preBind: Awaited<ReturnType<typeof runPreBind>> | undefined;
   let verifier: TokenVerifier | undefined;
@@ -222,6 +223,7 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
           ...(wsAdapter !== undefined ? { wsAdapter } : {}),
           ...(triggersDaemon !== undefined ? { triggersDaemon } : {}),
           ...(consolidatorDaemon !== undefined ? { consolidatorDaemon } : {}),
+          ...(workflowTimerDaemon !== undefined ? { workflowTimerDaemon } : {}),
         });
 
         // Start the consolidator first so it is ready to handle fired
@@ -240,6 +242,10 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         }
         if (triggersDaemon !== undefined) {
           await triggersDaemon.start();
+        }
+        // W-032: fire due durable timers from server start onward.
+        if (workflowTimerDaemon !== undefined) {
+          await workflowTimerDaemon.start();
         }
 
         // Sample a couple of gauges immediately so the very first
@@ -272,11 +278,17 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
           });
         }
 
-        // W-061: expired idempotency records (full response bodies of
-        // keyed POSTs) were only ever rejected on read, never removed;
-        // sweep them hourly. Runs after runPreBind, so migrations have
-        // applied.
-        stopIdempotencyPruning = scheduleIdempotencyPruning(store.idempotency, now);
+        // W-010 / W-008: the unified retention sweep over every SQLite
+        // growth surface, including the W-061 idempotency sweep it
+        // subsumes. Runs after runPreBind, so migrations have applied;
+        // the first sweep fires immediately.
+        const retentionLog = createConsoleRetentionLog(config.observability.logger);
+        stopRetention = scheduleRetentionSweeps({
+          store,
+          config: config.retention,
+          now,
+          ...(retentionLog !== undefined ? { log: retentionLog } : {}),
+        });
 
         if (options.skipListen !== true) {
           serverInstance = serve({
@@ -330,9 +342,9 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
       // W-028: halt the replay-buffer TTL sweep symmetrically.
       stopReplayBufferPruning?.();
       stopReplayBufferPruning = undefined;
-      // W-061: halt the idempotency sweep symmetrically.
-      stopIdempotencyPruning?.();
-      stopIdempotencyPruning = undefined;
+      // W-010: halt the retention sweep symmetrically.
+      stopRetention?.();
+      stopRetention = undefined;
       const drainTimeoutMs = force === true ? 0 : config.server.shutdown.drainTimeoutMs;
       try {
         if (options.hooks?.beforeShutdown !== undefined) {
@@ -346,6 +358,13 @@ export function createLifecycle(deps: ServerLifecycleDeps): ServerLifecycle {
         await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
       }
 
+      if (workflowTimerDaemon !== undefined) {
+        try {
+          await workflowTimerDaemon.stop();
+        } catch (err) {
+          await emitError(options.hooks, { error: err, phase: 'beforeShutdown' });
+        }
+      }
       if (triggersDaemon !== undefined) {
         try {
           await triggersDaemon.stop();

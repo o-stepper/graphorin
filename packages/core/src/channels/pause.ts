@@ -31,6 +31,88 @@ export class PauseSignal<TValue = unknown> extends Error {
 }
 
 /**
+ * Brand attached to the signal thrown by `pause(value)` when the
+ * positional replay diverges from the journaled pause identity
+ * (W-120). Cross-realm safe like {@link PAUSE_SIGNAL_BRAND}.
+ *
+ * @stable
+ */
+export const REPLAY_DIVERGENCE_BRAND: unique symbol = Symbol.for(
+  'graphorin.ReplayDivergenceSignal',
+);
+
+/**
+ * Identity of one pause as recorded next to its satisfied resume value
+ * (W-120): the durable-primitive `kind` (`timer` / `awakeable` /
+ * `approval`) and the awakeable/approval `name`. A plain `pause()` has
+ * neither - two plain pauses are indistinguishable BY DESIGN (no
+ * false positives; the check is deliberately conservative).
+ *
+ * @stable
+ */
+export interface PauseIdentity {
+  readonly kind?: string;
+  readonly name?: string;
+}
+
+/**
+ * Thrown by `pause(value)` during replay when the CURRENT pause's
+ * identity does not match what the journal recorded for this cursor
+ * position (W-120): the node body's pause order depends on
+ * time/state/LLM output, so a positional replay would silently hand a
+ * resume value to the wrong pause. The workflow engine converts this
+ * into a typed `pause-replay-divergence` WorkflowError.
+ *
+ * @stable
+ */
+export class ReplayDivergenceSignal extends Error {
+  readonly [REPLAY_DIVERGENCE_BRAND]: true = true;
+  readonly expected: PauseIdentity;
+  readonly actual: PauseIdentity;
+  readonly cursor: number;
+
+  constructor(expected: PauseIdentity, actual: PauseIdentity, cursor: number) {
+    super(
+      `graphorin: pause replay divergence at cursor ${cursor}: paused as ${describeIdentity(actual)} where the journal recorded ${describeIdentity(expected)}`,
+    );
+    this.name = 'ReplayDivergenceSignal';
+    this.expected = expected;
+    this.actual = actual;
+    this.cursor = cursor;
+  }
+}
+
+/** Cross-realm safe type guard for {@link ReplayDivergenceSignal}. @stable */
+export function isReplayDivergenceSignal(err: unknown): err is ReplayDivergenceSignal {
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    (err as Record<symbol, unknown>)[REPLAY_DIVERGENCE_BRAND] === true
+  );
+}
+
+function describeIdentity(id: PauseIdentity): string {
+  const parts: string[] = [];
+  if (id.kind !== undefined) parts.push(`kind '${id.kind}'`);
+  if (id.name !== undefined) parts.push(`name '${id.name}'`);
+  return parts.length > 0 ? parts.join(' / ') : 'a plain pause';
+}
+
+/**
+ * Extract the {@link PauseIdentity} of a pause payload: generic field
+ * access only (no import of the durable-primitive types - that would
+ * cycle).
+ */
+function identityOfPauseValue(value: unknown): PauseIdentity {
+  if (typeof value !== 'object' || value === null) return {};
+  const v = value as { readonly kind?: unknown; readonly name?: unknown };
+  return {
+    ...(typeof v.kind === 'string' ? { kind: v.kind } : {}),
+    ...(typeof v.name === 'string' ? { name: v.name } : {}),
+  };
+}
+
+/**
  * Resume-injection scope set by the workflow runtime around the second
  * (and later) invocations of a paused node body. When the scope is
  * present, `pause(...)` consults it to decide whether to throw a fresh
@@ -46,6 +128,11 @@ export class PauseSignal<TValue = unknown> extends Error {
 export interface PauseResumeScope {
   /** Ordered resume values replayed to successive `pause()` calls (WF-2). */
   readonly values: ReadonlyArray<unknown>;
+  /**
+   * W-120: per-value identity of the pause each value answered.
+   * Absent (legacy checkpoints) or `null`/empty entries skip the check.
+   */
+  readonly meta?: ReadonlyArray<PauseIdentity | null | undefined>;
   cursor: number;
 }
 
@@ -70,8 +157,9 @@ const pauseResumeStorage = new AsyncLocalStorage<PauseResumeScope>();
 export function runWithPauseResume<R>(
   values: ReadonlyArray<unknown>,
   fn: () => R | Promise<R>,
+  meta?: ReadonlyArray<PauseIdentity | null | undefined>,
 ): Promise<R> {
-  const scope: PauseResumeScope = { values, cursor: 0 };
+  const scope: PauseResumeScope = { values, ...(meta !== undefined ? { meta } : {}), cursor: 0 };
   return pauseResumeStorage.run(scope, async () => fn());
 }
 
@@ -93,6 +181,20 @@ export function runWithPauseResume<R>(
 export function pause<TValue, TResume = unknown>(value: TValue): TResume {
   const scope = pauseResumeStorage.getStore();
   if (scope !== undefined && scope.cursor < scope.values.length) {
+    // W-120: verify the replayed value is answering the SAME pause the
+    // journal recorded at this cursor. Legacy checkpoints (no meta) and
+    // plain pauses (empty identity) replay unchecked - conservative by
+    // design, false positives are impossible.
+    const expected = scope.meta?.[scope.cursor];
+    if (expected != null && (expected.kind !== undefined || expected.name !== undefined)) {
+      const actual = identityOfPauseValue(value);
+      if (
+        (expected.kind !== undefined && expected.kind !== actual.kind) ||
+        (expected.name !== undefined && expected.name !== actual.name)
+      ) {
+        throw new ReplayDivergenceSignal(expected, actual, scope.cursor);
+      }
+    }
     const next = scope.values[scope.cursor];
     scope.cursor += 1;
     return next as TResume;

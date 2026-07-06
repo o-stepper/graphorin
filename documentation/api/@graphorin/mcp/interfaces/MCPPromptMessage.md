@@ -6,7 +6,7 @@
 
 # Interface: MCPPromptMessage
 
-Defined in: packages/mcp/src/client/types.ts:392
+Defined in: packages/mcp/src/client/types.ts:398
 
 Single prompt message returned by `getPrompt(...)`.
 
@@ -14,5 +14,5 @@ Single prompt message returned by `getPrompt(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-content"></a> `content` | `readonly` | [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md) | packages/mcp/src/client/types.ts:394 |
-| <a id="property-role"></a> `role` | `readonly` | `"user"` \| `"assistant"` | packages/mcp/src/client/types.ts:393 |
+| <a id="property-content"></a> `content` | `readonly` | [`MCPContentPart`](/api/@graphorin/mcp/type-aliases/MCPContentPart.md) | packages/mcp/src/client/types.ts:400 |
+| <a id="property-role"></a> `role` | `readonly` | `"user"` \| `"assistant"` | packages/mcp/src/client/types.ts:399 |

@@ -10,7 +10,7 @@
 function fromJsonSafeMessage(message): Message;
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:318
+Defined in: packages/core/src/utils/binary-json.ts:329
 
 Inverse of [toJsonSafeMessage](/api/@graphorin/core/functions/toJsonSafeMessage.md).
 

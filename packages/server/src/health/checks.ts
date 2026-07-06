@@ -15,6 +15,7 @@ import type { GraphorinSqliteStore } from '@graphorin/store-sqlite';
 import { readWalSize } from '@graphorin/store-sqlite';
 import type { ConsolidatorDaemon } from '../consolidator/daemon.js';
 import type { TriggersDaemon } from '../triggers/daemon.js';
+import type { WorkflowTimerDaemon } from '../workflows/timer-daemon.js';
 
 /** @stable */
 export interface ReplayBufferProbe {
@@ -103,7 +104,20 @@ export type HealthCheck =
   | EncryptionCheck
   | ConsolidatorCheck
   | TriggersCheck
+  | WorkflowTimersCheck
   | ReplayBufferCheck;
+
+/** W-032: durable-timer driver health. @stable */
+export interface WorkflowTimersCheck {
+  readonly status: HealthStatus;
+  readonly running: boolean;
+  readonly sweeps: number;
+  readonly fired: number;
+  readonly errors: number;
+  readonly lastSweepAt?: string;
+  readonly nextWakeAt?: string;
+  readonly message?: string;
+}
 
 /** @stable */
 export interface HealthChecks {
@@ -113,6 +127,7 @@ export interface HealthChecks {
   readonly encryption?: EncryptionCheck;
   readonly consolidator?: ConsolidatorCheck;
   readonly triggers?: TriggersCheck;
+  readonly workflowTimers?: WorkflowTimersCheck;
   readonly replayBuffer?: ReplayBufferCheck;
 }
 
@@ -126,6 +141,7 @@ export interface HealthSummary {
 export interface HealthCheckOptions {
   readonly store?: GraphorinSqliteStore;
   readonly triggers?: TriggersDaemon;
+  readonly workflowTimers?: WorkflowTimerDaemon;
   readonly consolidator?: ConsolidatorDaemon;
   readonly replayBuffer?: ReplayBufferProbe;
   readonly secretsActive?: string;
@@ -239,6 +255,30 @@ export async function collectHealth(options: HealthCheckOptions): Promise<Health
         active: 0,
         disabled: 0,
         deferred: 0,
+        message: err instanceof Error ? err.message : String(err),
+      };
+    }
+  }
+
+  if (options.workflowTimers !== undefined) {
+    try {
+      const status = await options.workflowTimers.status();
+      checks.workflowTimers = {
+        status: status.errors > 0 ? 'warn' : 'ok',
+        running: status.running,
+        sweeps: status.sweeps,
+        fired: status.fired,
+        errors: status.errors,
+        ...(status.lastSweepAt !== undefined ? { lastSweepAt: status.lastSweepAt } : {}),
+        ...(status.nextWakeAt !== undefined ? { nextWakeAt: status.nextWakeAt } : {}),
+      };
+    } catch (err) {
+      checks.workflowTimers = {
+        status: 'fail',
+        running: false,
+        sweeps: 0,
+        fired: 0,
+        errors: 0,
         message: err instanceof Error ? err.message : String(err),
       };
     }

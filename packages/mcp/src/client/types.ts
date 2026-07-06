@@ -222,8 +222,14 @@ export interface MCPToToolsOptions {
    * `mcp.tools.pin-mismatch.total` and continues; `'reject'` (the
    * default WHEN a `pinStore` is wired - a persisted first approval is
    * an explicit trust decision) throws `MCPToolPinningError`.
+   *
+   * W-079: `'accept-and-update'` is the documented operator path to
+   * ACCEPT a legitimate catalogue change: after the comparison (and its
+   * counters/logs) the store is overwritten with the current snapshot
+   * (`mcp.tools.pins-updated.total`), so subsequent calls are clean -
+   * an explicit re-trust decision, never a silent default.
    */
-  readonly onPinMismatch?: 'warn' | 'reject';
+  readonly onPinMismatch?: 'warn' | 'reject' | 'accept-and-update';
   /**
    * C6: durable trust-on-first-use pin storage. On the first `toTools()`
    * the current definition fingerprints are RECORDED

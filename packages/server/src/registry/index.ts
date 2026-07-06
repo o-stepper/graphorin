@@ -56,7 +56,30 @@ export interface ServerWorkflowLike {
     input: unknown,
     options?: { readonly signal?: AbortSignal; readonly threadId?: string },
   ): AsyncIterable<unknown>;
-  resume?(threadId: string, directive?: { readonly resume?: unknown }): AsyncIterable<unknown>;
+  resume?(
+    threadId: string,
+    directive?: { readonly resume?: unknown },
+    opts?: { readonly signal?: AbortSignal },
+  ): AsyncIterable<unknown>;
+  /** W-119: replay a failed/aborted thread (`POST /:id/retry`). */
+  retry?(threadId: string, opts?: { readonly signal?: AbortSignal }): AsyncIterable<unknown>;
+  /** W-119: fire a due durable timer (`POST /:id/tick`). */
+  tick?(
+    threadId: string,
+    opts?: { readonly now?: number },
+  ): Promise<{ readonly fired: boolean; readonly nextWakeAt: number | null }>;
+  /**
+   * W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
+   * `name`) - `approve` is the same primitive under the hood.
+   */
+  resolveAwakeable?(
+    threadId: string,
+    name: string,
+    value?: unknown,
+    opts?: { readonly signal?: AbortSignal },
+  ): AsyncIterable<unknown>;
+  /** W-119: fork a new thread from a checkpoint (`POST /:id/fork`). */
+  fork?(threadId: string, fromCheckpointId: string): Promise<{ readonly newThreadId: string }>;
   getState?(threadId: string): Promise<unknown>;
   listCheckpoints?(threadId: string): Promise<ReadonlyArray<unknown>>;
   /** W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`). */

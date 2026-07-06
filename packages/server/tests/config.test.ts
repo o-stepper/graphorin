@@ -54,4 +54,28 @@ describe('parseServerConfig', () => {
     const value = defineConfig({ server: { port: 1234 } });
     expect(value).toEqual({ server: { port: 1234 } });
   });
+
+  it('W-010: retention defaults - derived data on, primary content opt-in', () => {
+    const config = parseServerConfig({});
+    expect(config.retention.enabled).toBe(true);
+    expect(config.retention.intervalMs).toBe(6 * 60 * 60 * 1000);
+    expect(config.retention.spansDays).toBe(30);
+    expect(config.retention.consolidatorRunsDays).toBe(90);
+    expect(config.retention.dlqExhaustedDays).toBe(30);
+    expect(config.retention.idempotency).toBe(true);
+    expect(config.retention.sessionsClosedOnly).toBe(true);
+    expect(config.retention.sessionsDays).toBeUndefined();
+    expect(config.retention.memoryHistoryDays).toBeUndefined();
+    expect(config.retention.workflowThreadsDays).toBeUndefined();
+    expect(config.retention.auditDays).toBeUndefined();
+  });
+
+  it('W-010: retention rejects non-positive day windows', () => {
+    expect(() => parseServerConfig({ retention: { spansDays: -1 } })).toThrowError(
+      ConfigInvalidError,
+    );
+    expect(() => parseServerConfig({ retention: { sessionsDays: 0 } })).toThrowError(
+      ConfigInvalidError,
+    );
+  });
 });

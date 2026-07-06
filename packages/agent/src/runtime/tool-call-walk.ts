@@ -25,9 +25,15 @@ import type { ToolExecutor } from '@graphorin/tools/executor';
 import type { ToolRegistry } from '@graphorin/tools/registry';
 import { serializeRunState } from '../run-state/index.js';
 import type { AgentConfig } from '../types.js';
+import { getSubAgentToolRefs, type SubAgentToolRefs } from './agent-to-tool.js';
 import { invokeNeedsApproval, safeParseGatedArgs } from './approvals.js';
 import type { DispatchBatchFn } from './dispatch.js';
-import { executeHandoffToolCall, type HandoffEntry, type HandoffRunEnv } from './handoff.js';
+import {
+  executeHandoffToolCall,
+  type HandoffEntry,
+  type HandoffRunEnv,
+  runSubAgentCall,
+} from './handoff.js';
 import { renderToolErrorMessage } from './messages.js';
 import type { AssistantCommitEnv } from './run-gates.js';
 import { isApprovalGated } from './tool-wiring.js';
@@ -64,7 +70,11 @@ export async function* processStepToolCalls<TDeps, TOutput>(
   stepExecutor: ToolExecutor,
   execRunContext: RunContext<TDeps>,
   stepNumber: number,
-): AsyncGenerator<AgentEvent<TOutput>, { readonly suspended: boolean }, void> {
+): AsyncGenerator<
+  AgentEvent<TOutput>,
+  { readonly suspended: boolean; readonly abortPending?: boolean },
+  void
+> {
   const { config, state, messages, signal, handoffMap } = env;
   const { toolDataFlowGuard, promotedDeferred, dispatchBatch } = env;
   let batch: ToolCall[] = [];
@@ -77,7 +87,11 @@ export async function* processStepToolCalls<TDeps, TOutput>(
         yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
         batch = [];
       }
-      yield* executeHandoffToolCall<TDeps, TOutput>(env, call, handoff, stepNumber);
+      const handed = yield* executeHandoffToolCall<TDeps, TOutput>(env, call, handoff, stepNumber);
+      // W-001: the handoff child suspended awaiting approvals - it
+      // parked on the parent and the parent suspends once per step
+      // exactly like a directly-gated call.
+      if (handed.suspendRequested) stepApprovalsRequested += 1;
       continue;
     }
 
@@ -157,6 +171,27 @@ export async function* processStepToolCalls<TDeps, TOutput>(
       continue;
     }
 
+    // W-001: `toTool` sub-agent tools execute INLINE through the same
+    // seam as a handoff (never through the executor, which cannot
+    // suspend a run) - a child that parks on `awaiting_approval`
+    // suspends the parent instead of surfacing a terminal tool error.
+    const subRefs = getSubAgentToolRefs(resolvedTool);
+    if (subRefs !== undefined) {
+      if (batch.length > 0) {
+        yield* dispatchBatch(batch, stepExecutor, execRunContext, stepNumber);
+        batch = [];
+      }
+      const subbed = yield* executeSubAgentToolCall<TDeps, TOutput>(
+        env,
+        call,
+        subRefs,
+        execRunContext,
+        stepNumber,
+      );
+      if (subbed.suspendRequested) stepApprovalsRequested += 1;
+      continue;
+    }
+
     batch.push(call);
   }
 
@@ -176,6 +211,16 @@ export async function* processStepToolCalls<TDeps, TOutput>(
     const taintSnap = toolDataFlowGuard?.snapshotLedger(state.id);
     if (taintSnap !== undefined) state.taintSummary = taintSnap;
     if (promotedDeferred.size > 0) state.promotedTools = [...promotedDeferred];
+    // W-038: an abort that arrived while this step was collecting gated
+    // calls must reach the `onPendingApprovals` policy INSTEAD of the
+    // unconditional suspend - and no 'suspended awaiting_approval'
+    // checkpoint may be written first, or the durable trail would
+    // contradict the aborted outcome and resurrect denied approvals on
+    // resume. The factory applies the policy and persists the final,
+    // policy-consistent state through the same put seam.
+    if (signal.aborted) {
+      return { suspended: true, abortPending: true };
+    }
     if (config.checkpointStore !== undefined) {
       await config.checkpointStore.put(
         state.id,
@@ -197,4 +242,59 @@ export async function* processStepToolCalls<TDeps, TOutput>(
     return { suspended: true };
   }
   return { suspended: false };
+}
+
+/**
+ * W-001: execute a `toTool` sub-agent call INLINE (mirroring the
+ * handoff seam): reproduce `execute()`'s seed and output shaping via
+ * the tool's {@link SubAgentToolRefs}, and settle through the shared
+ * {@link runSubAgentCall} so a suspending child parks instead of
+ * throwing. The D2 taint fold that the executor would have applied from
+ * the ToolReturn envelope is recorded directly on the data-flow guard.
+ */
+async function* executeSubAgentToolCall<TDeps, TOutput>(
+  env: ToolCallWalkEnv<TDeps, TOutput>,
+  call: ToolCall,
+  refs: SubAgentToolRefs,
+  execRunContext: RunContext<TDeps>,
+  stepNumber: number,
+): AsyncGenerator<AgentEvent<TOutput>, { readonly suspendRequested: boolean }, void> {
+  const { config, options, messages, sessionId, signal, toolDataFlowGuard } = env;
+  yield { type: 'tool.execute.start', toolCallId: call.toolCallId };
+  const rawInput = (call.args ?? {}) as { readonly input?: unknown };
+  const input = { input: typeof rawInput.input === 'string' ? rawInput.input : '' };
+  const parentSpan = env.getCurrentStepSpan?.();
+  const callOpts: Record<string, unknown> = {
+    signal,
+    ...(options.deps !== undefined || config.deps !== undefined
+      ? { deps: options.deps ?? config.deps }
+      : {}),
+    sessionId,
+    ...(refs.capability !== undefined ? { capability: refs.capability } : {}),
+    // W-036: one trace tree through the inline walk too.
+    ...(parentSpan !== undefined ? { parentSpan } : {}),
+  };
+  const seed = refs.buildSeed(input, messages);
+  const subStream = refs.stream(seed, callOpts);
+  return yield* runSubAgentCall<TDeps, TOutput>(
+    env,
+    call,
+    {
+      agentName: refs.agentName,
+      subStream,
+      errorLabel: `sub-agent '${refs.agentName}'`,
+      renderCompleted: refs.shapeCompleted,
+      ...(refs.forwardEvents !== undefined ? { forwardEvents: refs.forwardEvents } : {}),
+      recordTaint: (taint, renderedText) => {
+        toolDataFlowGuard?.record({
+          toolName: call.toolName,
+          trustClass: 'first-party-user-defined',
+          taintOverride: taint,
+          outputText: renderedText,
+          runContext: execRunContext as RunContext,
+        });
+      },
+    },
+    stepNumber,
+  );
 }

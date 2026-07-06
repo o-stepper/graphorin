@@ -18,7 +18,7 @@ type WireContentChunk =
 };
 ```
 
-Defined in: packages/core/src/types/agent-event-wire.ts:37
+Defined in: packages/core/src/types/agent-event-wire.ts:38
 
 Wire twin of the binary [ContentChunk](/api/@graphorin/core/type-aliases/ContentChunk.md) variant.
 
