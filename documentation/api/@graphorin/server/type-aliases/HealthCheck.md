@@ -14,9 +14,10 @@ type HealthCheck =
   | EncryptionCheck
   | ConsolidatorCheck
   | TriggersCheck
+  | WorkflowTimersCheck
   | ReplayBufferCheck;
 ```
 
-Defined in: packages/server/src/health/checks.ts:99
+Defined in: packages/server/src/health/checks.ts:100
 
 ## Stable

@@ -6,7 +6,7 @@
 
 # Interface: PauseResumeScope
 
-Defined in: packages/core/src/channels/pause.ts:46
+Defined in: packages/core/src/channels/pause.ts:128
 
 **`Internal`**
 
@@ -24,5 +24,6 @@ to be re-architected as a state machine.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cursor"></a> `cursor` | `public` | `number` | - | packages/core/src/channels/pause.ts:49 |
-| <a id="property-values"></a> `values` | `readonly` | readonly `unknown`[] | Ordered resume values replayed to successive `pause()` calls (WF-2). | packages/core/src/channels/pause.ts:48 |
+| <a id="property-cursor"></a> `cursor` | `public` | `number` | - | packages/core/src/channels/pause.ts:136 |
+| <a id="property-meta"></a> `meta?` | `readonly` | readonly ( \| [`PauseIdentity`](/api/@graphorin/core/interfaces/PauseIdentity.md) \| `null` \| `undefined`)[] | W-120: per-value identity of the pause each value answered. Absent (legacy checkpoints) or `null`/empty entries skip the check. | packages/core/src/channels/pause.ts:135 |
+| <a id="property-values"></a> `values` | `readonly` | readonly `unknown`[] | Ordered resume values replayed to successive `pause()` calls (WF-2). | packages/core/src/channels/pause.ts:130 |

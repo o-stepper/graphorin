@@ -6,7 +6,7 @@
 
 # Interface: HealthChecks
 
-Defined in: packages/server/src/health/checks.ts:109
+Defined in: packages/server/src/health/checks.ts:123
 
 ## Stable
 
@@ -14,10 +14,11 @@ Defined in: packages/server/src/health/checks.ts:109
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-consolidator"></a> `consolidator?` | `readonly` | [`ConsolidatorCheck`](/api/@graphorin/server/interfaces/ConsolidatorCheck.md) | packages/server/src/health/checks.ts:114 |
-| <a id="property-embedder"></a> `embedder?` | `readonly` | [`EmbedderCheck`](/api/@graphorin/server/interfaces/EmbedderCheck.md) | packages/server/src/health/checks.ts:111 |
-| <a id="property-encryption"></a> `encryption?` | `readonly` | [`EncryptionCheck`](/api/@graphorin/server/interfaces/EncryptionCheck.md) | packages/server/src/health/checks.ts:113 |
-| <a id="property-replaybuffer"></a> `replayBuffer?` | `readonly` | [`ReplayBufferCheck`](/api/@graphorin/server/interfaces/ReplayBufferCheck.md) | packages/server/src/health/checks.ts:116 |
-| <a id="property-secrets"></a> `secrets?` | `readonly` | [`SecretsCheck`](/api/@graphorin/server/interfaces/SecretsCheck.md) | packages/server/src/health/checks.ts:112 |
-| <a id="property-storage"></a> `storage?` | `readonly` | [`StorageCheck`](/api/@graphorin/server/interfaces/StorageCheck.md) | packages/server/src/health/checks.ts:110 |
-| <a id="property-triggers"></a> `triggers?` | `readonly` | [`TriggersCheck`](/api/@graphorin/server/interfaces/TriggersCheck.md) | packages/server/src/health/checks.ts:115 |
+| <a id="property-consolidator"></a> `consolidator?` | `readonly` | [`ConsolidatorCheck`](/api/@graphorin/server/interfaces/ConsolidatorCheck.md) | packages/server/src/health/checks.ts:128 |
+| <a id="property-embedder"></a> `embedder?` | `readonly` | [`EmbedderCheck`](/api/@graphorin/server/interfaces/EmbedderCheck.md) | packages/server/src/health/checks.ts:125 |
+| <a id="property-encryption"></a> `encryption?` | `readonly` | [`EncryptionCheck`](/api/@graphorin/server/interfaces/EncryptionCheck.md) | packages/server/src/health/checks.ts:127 |
+| <a id="property-replaybuffer"></a> `replayBuffer?` | `readonly` | [`ReplayBufferCheck`](/api/@graphorin/server/interfaces/ReplayBufferCheck.md) | packages/server/src/health/checks.ts:131 |
+| <a id="property-secrets"></a> `secrets?` | `readonly` | [`SecretsCheck`](/api/@graphorin/server/interfaces/SecretsCheck.md) | packages/server/src/health/checks.ts:126 |
+| <a id="property-storage"></a> `storage?` | `readonly` | [`StorageCheck`](/api/@graphorin/server/interfaces/StorageCheck.md) | packages/server/src/health/checks.ts:124 |
+| <a id="property-triggers"></a> `triggers?` | `readonly` | [`TriggersCheck`](/api/@graphorin/server/interfaces/TriggersCheck.md) | packages/server/src/health/checks.ts:129 |
+| <a id="property-workflowtimers"></a> `workflowTimers?` | `readonly` | `WorkflowTimersCheck` | packages/server/src/health/checks.ts:130 |

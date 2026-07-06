@@ -6,7 +6,7 @@
 
 # Class: AgentRuntimeError
 
-Defined in: packages/agent/src/errors/index.ts:39
+Defined in: packages/agent/src/errors/index.ts:40
 
 Base class for every error thrown from `@graphorin/agent`.
 
@@ -25,6 +25,7 @@ Base class for every error thrown from `@graphorin/agent`.
 - [`ToolNotFoundError`](/api/@graphorin/agent/errors/classes/ToolNotFoundError.md)
 - [`ConcurrentRunError`](/api/@graphorin/agent/errors/classes/ConcurrentRunError.md)
 - [`MultipleHandoffsInStepError`](/api/@graphorin/agent/errors/classes/MultipleHandoffsInStepError.md)
+- [`SubAgentResumeTargetNotFoundError`](/api/@graphorin/agent/errors/classes/SubAgentResumeTargetNotFoundError.md)
 - [`RunStateVersionUnsupportedError`](/api/@graphorin/agent/errors/classes/RunStateVersionUnsupportedError.md)
 - [`RunStateMalformedError`](/api/@graphorin/agent/errors/classes/RunStateMalformedError.md)
 - [`MergeBlockedError`](/api/@graphorin/agent/errors/classes/MergeBlockedError.md)
@@ -43,7 +44,7 @@ new AgentRuntimeError(
    name?): AgentRuntimeError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:41
+Defined in: packages/agent/src/errors/index.ts:42
 
 #### Parameters
 
@@ -68,7 +69,7 @@ Error.constructor
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | `Error.cause` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | - | packages/agent/src/errors/index.ts:40 |
+| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | - | packages/agent/src/errors/index.ts:41 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | `Error.message` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | `Error.name` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | `Error.stack` | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

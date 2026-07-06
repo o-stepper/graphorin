@@ -10,6 +10,6 @@
 type HealthRollup = "ok" | "degraded" | "failing";
 ```
 
-Defined in: packages/server/src/health/checks.ts:31
+Defined in: packages/server/src/health/checks.ts:32
 
 ## Stable

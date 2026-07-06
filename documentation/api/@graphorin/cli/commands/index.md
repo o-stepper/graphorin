@@ -672,6 +672,12 @@ Re-exports [runStorageCleanupBackups](/api/@graphorin/cli/functions/runStorageCl
 
 ***
 
+### runStorageCompact
+
+Re-exports [runStorageCompact](/api/@graphorin/cli/functions/runStorageCompact.md)
+
+***
+
 ### runStorageEncrypt
 
 Re-exports [runStorageEncrypt](/api/@graphorin/cli/functions/runStorageEncrypt.md)
@@ -933,6 +939,18 @@ Re-exports [StorageCleanupBackupsResult](/api/@graphorin/cli/interfaces/StorageC
 ### StorageCommonOptions
 
 Re-exports [StorageCommonOptions](/api/@graphorin/cli/interfaces/StorageCommonOptions.md)
+
+***
+
+### StorageCompactOptions
+
+Re-exports [StorageCompactOptions](/api/@graphorin/cli/interfaces/StorageCompactOptions.md)
+
+***
+
+### StorageCompactResult
+
+Re-exports [StorageCompactResult](/api/@graphorin/cli/interfaces/StorageCompactResult.md)
 
 ***
 

@@ -6,7 +6,7 @@
 
 # Interface: BaseHealthCheck
 
-Defined in: packages/server/src/health/checks.ts:40
+Defined in: packages/server/src/health/checks.ts:41
 
 Common discriminator carried on every per-subsystem check entry.
 Concrete shapes extend this with subsystem-specific fields per the
@@ -28,5 +28,5 @@ documented contract.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-message"></a> `message?` | `readonly` | `string` | packages/server/src/health/checks.ts:42 |
-| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | packages/server/src/health/checks.ts:41 |
+| <a id="property-message"></a> `message?` | `readonly` | `string` | packages/server/src/health/checks.ts:43 |
+| <a id="property-status"></a> `status` | `readonly` | [`HealthStatus`](/api/@graphorin/server/type-aliases/HealthStatus.md) | packages/server/src/health/checks.ts:42 |

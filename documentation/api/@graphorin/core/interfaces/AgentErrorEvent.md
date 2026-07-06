@@ -6,7 +6,7 @@
 
 # Interface: AgentErrorEvent
 
-Defined in: packages/core/src/types/agent-event.ts:281
+Defined in: packages/core/src/types/agent-event.ts:300
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:281
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/core/src/types/agent-event.ts:283 |
-| `error.code` | `readonly` | `string` | packages/core/src/types/agent-event.ts:283 |
-| `error.message` | `readonly` | `string` | packages/core/src/types/agent-event.ts:283 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.error"` | packages/core/src/types/agent-event.ts:282 |
+| <a id="property-error"></a> `error` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/core/src/types/agent-event.ts:302 |
+| `error.code` | `readonly` | `string` | packages/core/src/types/agent-event.ts:302 |
+| `error.message` | `readonly` | `string` | packages/core/src/types/agent-event.ts:302 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.error"` | packages/core/src/types/agent-event.ts:301 |

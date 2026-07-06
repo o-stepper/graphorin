@@ -10,7 +10,7 @@
 function createFactSupersedeTool(deps): Tool<FactSupersedeInput, FactSupersedeOutput>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:329
+Defined in: packages/memory/src/tools/fact-tools.ts:330
 
 `fact_supersede` - soft-supersede an old fact by storing a new one
 that replaces it. The old fact is kept for replay but no longer

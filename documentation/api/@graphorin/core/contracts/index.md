@@ -142,6 +142,18 @@ Re-exports [FinishReason](/api/@graphorin/core/type-aliases/FinishReason.md)
 
 ***
 
+### isToolReturnEnvelope
+
+Re-exports [isToolReturnEnvelope](/api/@graphorin/core/functions/isToolReturnEnvelope.md)
+
+***
+
+### isUnbrandedToolReturn
+
+Re-exports [isUnbrandedToolReturn](/api/@graphorin/core/functions/isUnbrandedToolReturn.md)
+
+***
+
 ### KnownSpanType
 
 Re-exports [KnownSpanType](/api/@graphorin/core/type-aliases/KnownSpanType.md)
@@ -568,6 +580,12 @@ Re-exports [Tool](/api/@graphorin/core/interfaces/Tool.md)
 
 ***
 
+### TOOL\_RETURN\_BRAND
+
+Re-exports [TOOL_RETURN_BRAND](/api/@graphorin/core/variables/TOOL_RETURN_BRAND.md)
+
+***
+
 ### ToolChoice
 
 Re-exports [ToolChoice](/api/@graphorin/core/type-aliases/ToolChoice.md)
@@ -595,6 +613,12 @@ Re-exports [ToolExample](/api/@graphorin/core/interfaces/ToolExample.md)
 ### ToolExecutionContext
 
 Re-exports [ToolExecutionContext](/api/@graphorin/core/interfaces/ToolExecutionContext.md)
+
+***
+
+### toolReturn
+
+Re-exports [toolReturn](/api/@graphorin/core/functions/toolReturn.md)
 
 ***
 

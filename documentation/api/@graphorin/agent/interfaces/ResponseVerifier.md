@@ -6,7 +6,7 @@
 
 # Interface: ResponseVerifier
 
-Defined in: packages/agent/src/types.ts:394
+Defined in: packages/agent/src/types.ts:407
 
 A deterministic check over the model's terminal response (C3). Runs
 when the loop is about to complete; `ok: false` feeds `feedback` back
@@ -22,7 +22,7 @@ verifier must never take down a run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:395 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | packages/agent/src/types.ts:408 |
 
 ## Methods
 
@@ -34,7 +34,7 @@ verify(ctx):
 | Promise<VerifierResult>;
 ```
 
-Defined in: packages/agent/src/types.ts:396
+Defined in: packages/agent/src/types.ts:409
 
 #### Parameters
 

@@ -6,7 +6,7 @@
 
 # Class: ReducerError
 
-Defined in: packages/workflow/src/errors/index.ts:356
+Defined in: packages/workflow/src/errors/index.ts:363
 
 Thrown when a Reducer channel's `reduce(...)` callback throws.
 
@@ -22,7 +22,7 @@ Thrown when a Reducer channel's `reduce(...)` callback throws.
 new ReducerError(channel, cause): ReducerError;
 ```
 
-Defined in: packages/workflow/src/errors/index.ts:359
+Defined in: packages/workflow/src/errors/index.ts:366
 
 #### Parameters
 
@@ -43,10 +43,10 @@ Defined in: packages/workflow/src/errors/index.ts:359
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`cause`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-cause) | packages/workflow/src/errors/index.ts:46 |
-| <a id="property-channel"></a> `channel` | `readonly` | `string` | - | - | packages/workflow/src/errors/index.ts:357 |
-| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`code`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-code) | packages/workflow/src/errors/index.ts:45 |
-| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`hint`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-hint) | packages/workflow/src/errors/index.ts:47 |
+| <a id="property-cause"></a> `cause?` | `readonly` | `unknown` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`cause`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-cause) | packages/workflow/src/errors/index.ts:47 |
+| <a id="property-channel"></a> `channel` | `readonly` | `string` | - | - | packages/workflow/src/errors/index.ts:364 |
+| <a id="property-code"></a> `code` | `readonly` | [`WorkflowErrorCode`](/api/@graphorin/workflow/errors/type-aliases/WorkflowErrorCode.md) | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`code`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-code) | packages/workflow/src/errors/index.ts:46 |
+| <a id="property-hint"></a> `hint?` | `readonly` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`hint`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-hint) | packages/workflow/src/errors/index.ts:48 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`message`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`name`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-name) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`WorkflowError`](/api/@graphorin/workflow/errors/classes/WorkflowError.md).[`stack`](/api/@graphorin/workflow/errors/classes/WorkflowError.md#property-stack) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

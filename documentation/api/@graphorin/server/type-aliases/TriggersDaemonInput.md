@@ -16,7 +16,7 @@ type TriggersDaemonInput =
 };
 ```
 
-Defined in: packages/server/src/app-daemons.ts:23
+Defined in: packages/server/src/app-daemons.ts:25
 
 Discriminated union accepted by `CreateServerOptions.triggers`. A
 caller may either supply a fully-built daemon (e.g. constructed

@@ -6,7 +6,7 @@
 
 # Interface: AgentModelFellbackEvent
 
-Defined in: packages/core/src/types/agent-event.ts:334
+Defined in: packages/core/src/types/agent-event.ts:353
 
 Emitted exactly once per agent-level model-fallback transition.
 Identifies the failed primary, the next model in
@@ -23,12 +23,12 @@ subsequent events flow.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:338 |
-| <a id="property-attempt"></a> `attempt` | `readonly` | `number` | packages/core/src/types/agent-event.ts:343 |
-| <a id="property-from"></a> `from` | `readonly` | `string` | packages/core/src/types/agent-event.ts:339 |
-| <a id="property-reason"></a> `reason` | `readonly` | `"rate-limit"` \| `"capacity"` \| `"context-length"` \| `"transient"` | packages/core/src/types/agent-event.ts:341 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:336 |
-| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:337 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:342 |
-| <a id="property-to"></a> `to` | `readonly` | `string` | packages/core/src/types/agent-event.ts:340 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.model.fellback"` | packages/core/src/types/agent-event.ts:335 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:357 |
+| <a id="property-attempt"></a> `attempt` | `readonly` | `number` | packages/core/src/types/agent-event.ts:362 |
+| <a id="property-from"></a> `from` | `readonly` | `string` | packages/core/src/types/agent-event.ts:358 |
+| <a id="property-reason"></a> `reason` | `readonly` | `"rate-limit"` \| `"capacity"` \| `"context-length"` \| `"transient"` | packages/core/src/types/agent-event.ts:360 |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:355 |
+| <a id="property-sessionid"></a> `sessionId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:356 |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/agent-event.ts:361 |
+| <a id="property-to"></a> `to` | `readonly` | `string` | packages/core/src/types/agent-event.ts:359 |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.model.fellback"` | packages/core/src/types/agent-event.ts:354 |

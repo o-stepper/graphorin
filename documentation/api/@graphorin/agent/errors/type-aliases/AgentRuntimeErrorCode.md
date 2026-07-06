@@ -16,6 +16,7 @@ type AgentRuntimeErrorCode =
   | "tool-not-found"
   | "handoff-target-not-found"
   | "multiple-handoffs-in-step"
+  | "sub-run-resume-target-not-found"
   | "run-aborted"
   | "middleware-order-violation"
   | "progress-write-failed"

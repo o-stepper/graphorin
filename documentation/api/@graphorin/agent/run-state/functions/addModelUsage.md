@@ -13,7 +13,7 @@ function addModelUsage(
    delta): void;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:460
+Defined in: packages/agent/src/run-state/index.ts:516
 
 Append a per-model usage entry to [RunState.usageByModel](/api/@graphorin/core/interfaces/RunState.md#property-usagebymodel).
 Mutates the supplied state in place - used by the agent runtime's

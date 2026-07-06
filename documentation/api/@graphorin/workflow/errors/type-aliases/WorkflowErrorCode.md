@@ -28,7 +28,8 @@ type WorkflowErrorCode =
   | "node-timeout"
   | "workflow-version-mismatch"
   | "workflow-divergence"
-  | "pause-not-found";
+  | "pause-not-found"
+  | "pause-replay-divergence";
 ```
 
 Defined in: packages/workflow/src/errors/index.ts:16

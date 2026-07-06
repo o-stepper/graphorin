@@ -11,26 +11,18 @@ type WireAgentEvent<TOutput> =
   | Exclude<AgentEvent<TOutput>, 
   | FileGeneratedEvent
   | ToolExecutePartialEvent
-  | AgentEndEvent<TOutput>>
+  | AgentEndEvent<TOutput>
+  | SubagentEvent>
   | WireFileGeneratedEvent
   | WireToolExecutePartialEvent
+  | WireSubagentEvent
 | WireAgentEndEvent<TOutput>;
 ```
 
-Defined in: packages/core/src/types/agent-event-wire.ts:73
-
-JSON-safe twin of [AgentEvent](/api/@graphorin/core/type-aliases/AgentEvent.md): the three binary-bearing
-variants are replaced by their wire twins, every other variant
-passes through structurally unchanged.
-
-This is the actual payload shape a server puts on the wire (inside
-the `{ eventId, subject, type, payload }` envelope) - see
-[toWireAgentEvent](/api/@graphorin/core/functions/toWireAgentEvent.md).
+Defined in: packages/core/src/types/agent-event-wire.ts:85
 
 ## Type Parameters
 
 | Type Parameter | Default type |
 | ------ | ------ |
 | `TOutput` | `string` |
-
-## Stable

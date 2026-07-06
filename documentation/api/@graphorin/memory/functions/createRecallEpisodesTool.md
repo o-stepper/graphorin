@@ -10,7 +10,7 @@
 function createRecallEpisodesTool(deps): Tool<RecallEpisodesInput, RecallEpisodesOutput>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:152
+Defined in: packages/memory/src/tools/recall-tools.ts:153
 
 `recall_episodes` - triple-signal episode retrieval (recency ×
 relevance × importance).

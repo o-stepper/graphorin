@@ -10,7 +10,7 @@
 const AMBIGUOUS_PARAMETER_NAMES: ReadonlyArray<string>;
 ```
 
-Defined in: src/tool-discovery.ts:130
+Defined in: src/tool-discovery.ts:156
 
 Generic identifiers the parameter-naming rule flags as ambiguous.
 Tools whose `inputSchema` references only specific identifiers

@@ -6,7 +6,7 @@
 
 # Interface: ToolSecretsAccessor
 
-Defined in: packages/core/src/contracts/tool.ts:300
+Defined in: packages/core/src/contracts/tool.ts:376
 
 Per-call secrets accessor surface. Implemented by the executor; the
 tool author calls `require(...)` to obtain a `SecretValue` wrapper.
@@ -27,7 +27,7 @@ unwraps a secret outside the tool's permitted set.
 require(key, options?): Promise<SecretValue>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:307
+Defined in: packages/core/src/contracts/tool.ts:383
 
 Resolve a secret by key. Throws `SecretAccessDeniedError` if the
 key is not in the tool's `secretsAllowed` allowlist; throws
@@ -52,7 +52,7 @@ if the key resolves to no value.
 require(key, options): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:311
+Defined in: packages/core/src/contracts/tool.ts:387
 
 ##### Parameters
 

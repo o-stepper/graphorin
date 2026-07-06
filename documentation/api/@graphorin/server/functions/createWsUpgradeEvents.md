@@ -10,7 +10,7 @@
 function createWsUpgradeEvents(c, options): Promise<WSEvents<unknown>>;
 ```
 
-Defined in: packages/server/src/ws/upgrade.ts:103
+Defined in: packages/server/src/ws/upgrade.ts:104
 
 Build the `WSEvents` callback bag the Hono helper consumes. The
 function takes the request `Context` so the upgrade can read the

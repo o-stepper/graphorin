@@ -10,7 +10,7 @@
 function createFactRememberTool(deps): Tool<FactRememberInput, FactRememberOutput>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:231
+Defined in: packages/memory/src/tools/fact-tools.ts:232
 
 `fact_remember` - persist a single semantic fact. The minimum-viable
 pipeline writes the fact straight through with MD5 deduplication;

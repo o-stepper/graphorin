@@ -27,7 +27,7 @@ Minimal shape the server needs from a `Workflow`. Mirrors the
 optional deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:63
+Defined in: packages/server/src/registry/index.ts:86
 
 W-005: per-thread checkpoint erasure (`DELETE /:id/threads/:threadId`).
 
@@ -66,13 +66,40 @@ Defined in: packages/server/src/registry/index.ts:55
 
 ***
 
+### fork()?
+
+```ts
+optional fork(threadId, fromCheckpointId): Promise<{
+  newThreadId: string;
+}>;
+```
+
+Defined in: packages/server/src/registry/index.ts:82
+
+W-119: fork a new thread from a checkpoint (`POST /:id/fork`).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `fromCheckpointId` | `string` |
+
+#### Returns
+
+`Promise`\<\{
+  `newThreadId`: `string`;
+\}\>
+
+***
+
 ### getState()?
 
 ```ts
 optional getState(threadId): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:60
+Defined in: packages/server/src/registry/index.ts:83
 
 #### Parameters
 
@@ -92,7 +119,7 @@ Defined in: packages/server/src/registry/index.ts:60
 optional listCheckpoints(threadId): Promise<readonly unknown[]>;
 ```
 
-Defined in: packages/server/src/registry/index.ts:61
+Defined in: packages/server/src/registry/index.ts:84
 
 #### Parameters
 
@@ -106,10 +133,44 @@ Defined in: packages/server/src/registry/index.ts:61
 
 ***
 
+### resolveAwakeable()?
+
+```ts
+optional resolveAwakeable(
+   threadId, 
+   name, 
+   value?, 
+opts?): AsyncIterable<unknown>;
+```
+
+Defined in: packages/server/src/registry/index.ts:75
+
+W-119: resolve a NAMED awakeable/approval (`POST /:id/resume` with
+`name`) - `approve` is the same primitive under the hood.
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `name` | `string` |
+| `value?` | `unknown` |
+| `opts?` | \{ `signal?`: `AbortSignal`; \} |
+| `opts.signal?` | `AbortSignal` |
+
+#### Returns
+
+`AsyncIterable`\&lt;`unknown`\&gt;
+
+***
+
 ### resume()?
 
 ```ts
-optional resume(threadId, directive?): AsyncIterable<unknown>;
+optional resume(
+   threadId, 
+   directive?, 
+opts?): AsyncIterable<unknown>;
 ```
 
 Defined in: packages/server/src/registry/index.ts:59
@@ -121,7 +182,63 @@ Defined in: packages/server/src/registry/index.ts:59
 | `threadId` | `string` |
 | `directive?` | \{ `resume?`: `unknown`; \} |
 | `directive.resume?` | `unknown` |
+| `opts?` | \{ `signal?`: `AbortSignal`; \} |
+| `opts.signal?` | `AbortSignal` |
 
 #### Returns
 
 `AsyncIterable`\&lt;`unknown`\&gt;
+
+***
+
+### retry()?
+
+```ts
+optional retry(threadId, opts?): AsyncIterable<unknown>;
+```
+
+Defined in: packages/server/src/registry/index.ts:65
+
+W-119: replay a failed/aborted thread (`POST /:id/retry`).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `opts?` | \{ `signal?`: `AbortSignal`; \} |
+| `opts.signal?` | `AbortSignal` |
+
+#### Returns
+
+`AsyncIterable`\&lt;`unknown`\&gt;
+
+***
+
+### tick()?
+
+```ts
+optional tick(threadId, opts?): Promise<{
+  fired: boolean;
+  nextWakeAt: number | null;
+}>;
+```
+
+Defined in: packages/server/src/registry/index.ts:67
+
+W-119: fire a due durable timer (`POST /:id/tick`).
+
+#### Parameters
+
+| Parameter | Type |
+| ------ | ------ |
+| `threadId` | `string` |
+| `opts?` | \{ `now?`: `number`; \} |
+| `opts.now?` | `number` |
+
+#### Returns
+
+`Promise`\<\{
+  `fired`: `boolean`;
+  `nextWakeAt`: `number` \| `null`;
+\}\>

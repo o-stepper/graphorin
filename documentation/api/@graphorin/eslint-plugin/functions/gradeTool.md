@@ -10,7 +10,7 @@
 function gradeTool(tool, findings): ToolGraderScore;
 ```
 
-Defined in: src/tool-discovery.ts:345
+Defined in: src/tool-discovery.ts:505
 
 Compute the per-tool grader score (0..100). Each axis is gated by
 the findings produced for that axis. The rubric is calibrated

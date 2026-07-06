@@ -14,33 +14,45 @@ Defined in: packages/server/src/config.ts:46
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-audit"></a> `audit` | `readonly` | \{ `cipher?`: `string`; `enabled`: `boolean`; `passphraseRef?`: `string`; `path?`: `string`; \} | packages/server/src/config.ts:115 |
-| `audit.cipher?` | `readonly` | `string` | packages/server/src/config.ts:119 |
-| `audit.enabled` | `readonly` | `boolean` | packages/server/src/config.ts:116 |
-| `audit.passphraseRef?` | `readonly` | `string` | packages/server/src/config.ts:118 |
-| `audit.path?` | `readonly` | `string` | packages/server/src/config.ts:117 |
-| <a id="property-auth"></a> `auth` | `readonly` | \{ `kind`: `"none"` \| `"token"`; `pepperRef?`: `string`; `perIpFailureThreshold?`: `number`; `perIpLockoutMs?`: `number`; `tokenEnvironments`: readonly `string`[]; `tokenPrefix`: `string`; \} | packages/server/src/config.ts:125 |
-| `auth.kind` | `readonly` | `"none"` \| `"token"` | packages/server/src/config.ts:126 |
-| `auth.pepperRef?` | `readonly` | `string` | packages/server/src/config.ts:127 |
-| `auth.perIpFailureThreshold?` | `readonly` | `number` | packages/server/src/config.ts:130 |
-| `auth.perIpLockoutMs?` | `readonly` | `number` | packages/server/src/config.ts:131 |
-| `auth.tokenEnvironments` | `readonly` | readonly `string`[] | packages/server/src/config.ts:129 |
-| `auth.tokenPrefix` | `readonly` | `string` | packages/server/src/config.ts:128 |
-| <a id="property-hardening"></a> `hardening` | `readonly` | \{ `applyOnStart`: `boolean`; `refuseRoot`: `boolean`; `umask`: `number`; \} | packages/server/src/config.ts:136 |
-| `hardening.applyOnStart` | `readonly` | `boolean` | packages/server/src/config.ts:137 |
-| `hardening.refuseRoot` | `readonly` | `boolean` | packages/server/src/config.ts:138 |
-| `hardening.umask` | `readonly` | `number` | packages/server/src/config.ts:139 |
-| <a id="property-health"></a> `health` | `readonly` | \{ `walWarnThresholdBytes`: `number`; \} | packages/server/src/config.ts:146 |
-| `health.walWarnThresholdBytes` | `readonly` | `number` | packages/server/src/config.ts:147 |
-| <a id="property-metrics"></a> `metrics` | `readonly` | \{ `enabled`: `boolean`; `path`: `string`; `requireAuth`: `boolean`; \} | packages/server/src/config.ts:141 |
-| `metrics.enabled` | `readonly` | `boolean` | packages/server/src/config.ts:142 |
-| `metrics.path` | `readonly` | `string` | packages/server/src/config.ts:143 |
-| `metrics.requireAuth` | `readonly` | `boolean` | packages/server/src/config.ts:144 |
-| <a id="property-observability"></a> `observability` | `readonly` | \{ `logger`: `"json"` \| `"pretty"` \| `"silent"`; \} | packages/server/src/config.ts:133 |
-| `observability.logger` | `readonly` | `"json"` \| `"pretty"` \| `"silent"` | packages/server/src/config.ts:134 |
-| <a id="property-secrets"></a> `secrets` | `readonly` | \{ `source`: [`SecretsSource`](/api/@graphorin/server/config/type-aliases/SecretsSource.md); `strict`: `boolean`; \} | packages/server/src/config.ts:121 |
-| `secrets.source` | `readonly` | [`SecretsSource`](/api/@graphorin/server/config/type-aliases/SecretsSource.md) | packages/server/src/config.ts:122 |
-| `secrets.strict` | `readonly` | `boolean` | packages/server/src/config.ts:123 |
+| <a id="property-audit"></a> `audit` | `readonly` | \{ `cipher?`: `string`; `enabled`: `boolean`; `passphraseRef?`: `string`; `path?`: `string`; \} | packages/server/src/config.ts:128 |
+| `audit.cipher?` | `readonly` | `string` | packages/server/src/config.ts:132 |
+| `audit.enabled` | `readonly` | `boolean` | packages/server/src/config.ts:129 |
+| `audit.passphraseRef?` | `readonly` | `string` | packages/server/src/config.ts:131 |
+| `audit.path?` | `readonly` | `string` | packages/server/src/config.ts:130 |
+| <a id="property-auth"></a> `auth` | `readonly` | \{ `kind`: `"none"` \| `"token"`; `pepperRef?`: `string`; `perIpFailureThreshold?`: `number`; `perIpLockoutMs?`: `number`; `tokenEnvironments`: readonly `string`[]; `tokenPrefix`: `string`; \} | packages/server/src/config.ts:138 |
+| `auth.kind` | `readonly` | `"none"` \| `"token"` | packages/server/src/config.ts:139 |
+| `auth.pepperRef?` | `readonly` | `string` | packages/server/src/config.ts:140 |
+| `auth.perIpFailureThreshold?` | `readonly` | `number` | packages/server/src/config.ts:143 |
+| `auth.perIpLockoutMs?` | `readonly` | `number` | packages/server/src/config.ts:144 |
+| `auth.tokenEnvironments` | `readonly` | readonly `string`[] | packages/server/src/config.ts:142 |
+| `auth.tokenPrefix` | `readonly` | `string` | packages/server/src/config.ts:141 |
+| <a id="property-hardening"></a> `hardening` | `readonly` | \{ `applyOnStart`: `boolean`; `refuseRoot`: `boolean`; `umask`: `number`; \} | packages/server/src/config.ts:149 |
+| `hardening.applyOnStart` | `readonly` | `boolean` | packages/server/src/config.ts:150 |
+| `hardening.refuseRoot` | `readonly` | `boolean` | packages/server/src/config.ts:151 |
+| `hardening.umask` | `readonly` | `number` | packages/server/src/config.ts:152 |
+| <a id="property-health"></a> `health` | `readonly` | \{ `walWarnThresholdBytes`: `number`; \} | packages/server/src/config.ts:159 |
+| `health.walWarnThresholdBytes` | `readonly` | `number` | packages/server/src/config.ts:160 |
+| <a id="property-metrics"></a> `metrics` | `readonly` | \{ `enabled`: `boolean`; `path`: `string`; `requireAuth`: `boolean`; \} | packages/server/src/config.ts:154 |
+| `metrics.enabled` | `readonly` | `boolean` | packages/server/src/config.ts:155 |
+| `metrics.path` | `readonly` | `string` | packages/server/src/config.ts:156 |
+| `metrics.requireAuth` | `readonly` | `boolean` | packages/server/src/config.ts:157 |
+| <a id="property-observability"></a> `observability` | `readonly` | \{ `logger`: `"json"` \| `"pretty"` \| `"silent"`; \} | packages/server/src/config.ts:146 |
+| `observability.logger` | `readonly` | `"json"` \| `"pretty"` \| `"silent"` | packages/server/src/config.ts:147 |
+| <a id="property-retention"></a> `retention` | `readonly` | \{ `auditDays?`: `number`; `consolidatorRunsDays`: `number`; `dlqExhaustedDays`: `number`; `enabled`: `boolean`; `idempotency`: `boolean`; `intervalMs`: `number`; `memoryHistoryDays?`: `number`; `sessionsClosedOnly`: `boolean`; `sessionsDays?`: `number`; `spansDays`: `number`; `workflowThreadsDays?`: `number`; \} | packages/server/src/config.ts:115 |
+| `retention.auditDays?` | `readonly` | `number` | packages/server/src/config.ts:126 |
+| `retention.consolidatorRunsDays` | `readonly` | `number` | packages/server/src/config.ts:119 |
+| `retention.dlqExhaustedDays` | `readonly` | `number` | packages/server/src/config.ts:120 |
+| `retention.enabled` | `readonly` | `boolean` | packages/server/src/config.ts:116 |
+| `retention.idempotency` | `readonly` | `boolean` | packages/server/src/config.ts:121 |
+| `retention.intervalMs` | `readonly` | `number` | packages/server/src/config.ts:117 |
+| `retention.memoryHistoryDays?` | `readonly` | `number` | packages/server/src/config.ts:124 |
+| `retention.sessionsClosedOnly` | `readonly` | `boolean` | packages/server/src/config.ts:123 |
+| `retention.sessionsDays?` | `readonly` | `number` | packages/server/src/config.ts:122 |
+| `retention.spansDays` | `readonly` | `number` | packages/server/src/config.ts:118 |
+| `retention.workflowThreadsDays?` | `readonly` | `number` | packages/server/src/config.ts:125 |
+| <a id="property-secrets"></a> `secrets` | `readonly` | \{ `source`: [`SecretsSource`](/api/@graphorin/server/config/type-aliases/SecretsSource.md); `strict`: `boolean`; \} | packages/server/src/config.ts:134 |
+| `secrets.source` | `readonly` | [`SecretsSource`](/api/@graphorin/server/config/type-aliases/SecretsSource.md) | packages/server/src/config.ts:135 |
+| `secrets.strict` | `readonly` | `boolean` | packages/server/src/config.ts:136 |
 | <a id="property-server"></a> `server` | `readonly` | \{ `basePath`: `string`; `cors`: \{ `allowCredentials`: `boolean`; `allowHeaders`: readonly `string`[]; `allowMethods`: readonly `string`[]; `allowOrigins`: readonly `string`[]; `maxAgeSeconds`: `number`; \}; `csrf`: \{ `cookieName`: `string`; `enabled`: `boolean`; `headerName`: `string`; `safeMethods`: readonly `string`[]; \}; `host`: `string`; `idempotency`: \{ `checkBodyFingerprint`: `boolean`; `enabled`: `boolean`; `lruCacheSize`: `number`; `requireKey`: [`IdempotencyRequireKeyMode`](/api/@graphorin/server/config/type-aliases/IdempotencyRequireKeyMode.md); `ttlSeconds`: `number`; \}; `port`: `number`; `rateLimit`: \{ `enabled`: `boolean`; `perIpRequests`: `number`; `windowMs`: `number`; \}; `shutdown`: \{ `drainTimeoutMs`: `number`; \}; `sse`: \{ `enabled`: `boolean`; `keepAliveMs`: `number`; `path`: `string`; \}; `stream`: \{ `disconnectGracePeriodMs`: `number`; `disconnectPolicy`: `"continue"` \| `"pause-on-disconnect"` \| `"abort-on-disconnect"`; `perConnectionQueueLimit`: `number`; `replayBuffer`: \{ `maxEvents`: `number`; `pruneIntervalSeconds`: `number`; `ttlSeconds`: `number`; \}; \}; `trustProxy`: `boolean`; `ws`: \{ `commentarySanitization`: \{ `applyToEvents`: readonly `string`[]; `policy`: [`DeliveryCommentaryPolicyConfig`](/api/@graphorin/server/config/type-aliases/DeliveryCommentaryPolicyConfig.md); \}; `enabled`: `boolean`; `path`: `string`; `ticketTtlMs`: `number`; \}; \} | packages/server/src/config.ts:47 |
 | `server.basePath` | `readonly` | `string` | packages/server/src/config.ts:50 |
 | `server.cors` | `readonly` | \{ `allowCredentials`: `boolean`; `allowHeaders`: readonly `string`[]; `allowMethods`: readonly `string`[]; `allowOrigins`: readonly `string`[]; `maxAgeSeconds`: `number`; \} | packages/server/src/config.ts:51 |

@@ -10,7 +10,7 @@
 function toJsonSafeContentParts(parts): readonly WireMessageContent[];
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:282
+Defined in: packages/core/src/utils/binary-json.ts:293
 
 Project multimodal content parts into their JSON-safe wire form.
 Text and reasoning parts pass through untouched.

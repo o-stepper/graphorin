@@ -24,9 +24,10 @@ conversation (images, files, audio, …).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-contentparts"></a> `contentParts?` | `readonly` | readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | - | packages/core/src/contracts/tool.ts:238 |
-| <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/core/src/contracts/tool.ts:237 |
-| <a id="property-taint"></a> `taint?` | `readonly` | \{ `sensitive?`: `boolean`; `sourceKind?`: `string`; `untrusted?`: `boolean`; \} | C6: per-result taint override the data-flow ledger honours when recording this output. Lets a FIRST-PARTY tool whose CONTENT is not first-party (e.g. memory recall returning quarantined / foreign-provenance facts) re-arm the taint ledger, closing the cross-session poisoning leg. Flags only ever WIDEN the derived label (they cannot launder an untrusted tool's output into trusted). | packages/core/src/contracts/tool.ts:247 |
-| `taint.sensitive?` | `readonly` | `boolean` | - | packages/core/src/contracts/tool.ts:249 |
-| `taint.sourceKind?` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:250 |
-| `taint.untrusted?` | `readonly` | `boolean` | - | packages/core/src/contracts/tool.ts:248 |
+| <a id="property-tool_return_brand"></a> `[TOOL_RETURN_BRAND]?` | `readonly` | `true` | W-115: envelope brand set by the [toolReturn](/api/@graphorin/core/functions/toolReturn.md) factory. `Symbol.for`, so duplicate package copies agree. Prefer branding: the structural fallback in the executor is deliberately narrow (own keys within `{output, contentParts, taint}`), and plain data that happens to be exactly `{ output: X }` is ambiguous by construction - brand it (or rename the field) to disambiguate. | packages/core/src/contracts/tool.ts:245 |
+| <a id="property-contentparts"></a> `contentParts?` | `readonly` | readonly [`MessageContent`](/api/@graphorin/core/type-aliases/MessageContent.md)[] | - | packages/core/src/contracts/tool.ts:247 |
+| <a id="property-output"></a> `output` | `readonly` | `TOutput` | - | packages/core/src/contracts/tool.ts:246 |
+| <a id="property-taint"></a> `taint?` | `readonly` | \{ `sensitive?`: `boolean`; `sourceKind?`: `string`; `untrusted?`: `boolean`; \} | C6: per-result taint override the data-flow ledger honours when recording this output. Lets a FIRST-PARTY tool whose CONTENT is not first-party (e.g. memory recall returning quarantined / foreign-provenance facts) re-arm the taint ledger, closing the cross-session poisoning leg. Flags only ever WIDEN the derived label (they cannot launder an untrusted tool's output into trusted). | packages/core/src/contracts/tool.ts:256 |
+| `taint.sensitive?` | `readonly` | `boolean` | - | packages/core/src/contracts/tool.ts:258 |
+| `taint.sourceKind?` | `readonly` | `string` | - | packages/core/src/contracts/tool.ts:259 |
+| `taint.untrusted?` | `readonly` | `boolean` | - | packages/core/src/contracts/tool.ts:257 |

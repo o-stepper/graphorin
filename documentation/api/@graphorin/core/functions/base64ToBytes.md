@@ -10,7 +10,7 @@
 function base64ToBytes(data): Uint8Array;
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:181
+Defined in: packages/core/src/utils/binary-json.ts:188
 
 Decode standard base64 (padding optional). Throws on characters
 outside the base64 alphabet.

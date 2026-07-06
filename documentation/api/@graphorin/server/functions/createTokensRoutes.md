@@ -12,7 +12,7 @@ function createTokensRoutes(deps): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/routes/tokens.ts:41
+Defined in: packages/server/src/routes/tokens.ts:42
 
 ## Parameters
 

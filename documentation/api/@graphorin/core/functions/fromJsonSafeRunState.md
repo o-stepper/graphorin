@@ -10,7 +10,7 @@
 function fromJsonSafeRunState(state): RunState;
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:388
+Defined in: packages/core/src/utils/binary-json.ts:410
 
 Inverse of [toJsonSafeRunState](/api/@graphorin/core/functions/toJsonSafeRunState.md). Best-effort: legacy corrupted
 binary fields (numeric-key byte objects from schema <= 1.1 payloads)

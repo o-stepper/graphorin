@@ -6,7 +6,7 @@
 
 # Class: ProtocolInjectionRejectError
 
-Defined in: packages/agent/src/errors/index.ts:240
+Defined in: packages/agent/src/errors/index.ts:262
 
 Thrown by the protocol-injection guard when the operator selected
 the strictest deployment posture (`escapePolicy: 'reject'`) and a
@@ -27,7 +27,7 @@ outbound boundary.
 new ProtocolInjectionRejectError(boundary, matchedPattern): ProtocolInjectionRejectError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:243
+Defined in: packages/agent/src/errors/index.ts:265
 
 #### Parameters
 
@@ -48,10 +48,10 @@ Defined in: packages/agent/src/errors/index.ts:243
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-boundary"></a> `boundary` | `readonly` | `string` | - | - | packages/agent/src/errors/index.ts:241 |
+| <a id="property-boundary"></a> `boundary` | `readonly` | `string` | - | - | packages/agent/src/errors/index.ts:263 |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`cause`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`code`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-code) | packages/agent/src/errors/index.ts:40 |
-| <a id="property-matchedpattern"></a> `matchedPattern` | `readonly` | `string` | - | - | packages/agent/src/errors/index.ts:242 |
+| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`code`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-code) | packages/agent/src/errors/index.ts:41 |
+| <a id="property-matchedpattern"></a> `matchedPattern` | `readonly` | `string` | - | - | packages/agent/src/errors/index.ts:264 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`message`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`name`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-name) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`stack`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-stack) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

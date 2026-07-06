@@ -6,7 +6,7 @@
 
 # Interface: ToolGraderScore
 
-Defined in: src/tool-discovery.ts:109
+Defined in: src/tool-discovery.ts:135
 
 ## Stable
 
@@ -14,12 +14,12 @@ Defined in: src/tool-discovery.ts:109
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-axes"></a> `axes` | `readonly` | \{ `description`: `number`; `examples`: `number`; `parameterNaming`: `number`; \} | src/tool-discovery.ts:114 |
-| `axes.description` | `readonly` | `number` | src/tool-discovery.ts:115 |
-| `axes.examples` | `readonly` | `number` | src/tool-discovery.ts:116 |
-| `axes.parameterNaming` | `readonly` | `number` | src/tool-discovery.ts:117 |
-| <a id="property-file"></a> `file` | `readonly` | `string` | src/tool-discovery.ts:111 |
-| <a id="property-findings"></a> `findings` | `readonly` | readonly [`LintFinding`](/api/@graphorin/eslint-plugin/interfaces/LintFinding.md)[] | src/tool-discovery.ts:119 |
-| <a id="property-line"></a> `line` | `readonly` | `number` | src/tool-discovery.ts:112 |
-| <a id="property-score"></a> `score` | `readonly` | `number` | src/tool-discovery.ts:113 |
-| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | src/tool-discovery.ts:110 |
+| <a id="property-axes"></a> `axes` | `readonly` | \{ `description`: `number`; `examples`: `number`; `parameterNaming`: `number`; \} | src/tool-discovery.ts:140 |
+| `axes.description` | `readonly` | `number` | src/tool-discovery.ts:141 |
+| `axes.examples` | `readonly` | `number` | src/tool-discovery.ts:142 |
+| `axes.parameterNaming` | `readonly` | `number` | src/tool-discovery.ts:143 |
+| <a id="property-file"></a> `file` | `readonly` | `string` | src/tool-discovery.ts:137 |
+| <a id="property-findings"></a> `findings` | `readonly` | readonly [`LintFinding`](/api/@graphorin/eslint-plugin/interfaces/LintFinding.md)[] | src/tool-discovery.ts:145 |
+| <a id="property-line"></a> `line` | `readonly` | `number` | src/tool-discovery.ts:138 |
+| <a id="property-score"></a> `score` | `readonly` | `number` | src/tool-discovery.ts:139 |
+| <a id="property-toolname"></a> `toolName` | `readonly` | `string` | src/tool-discovery.ts:136 |

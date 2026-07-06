@@ -10,7 +10,7 @@
 function registerMigration(migration): void;
 ```
 
-Defined in: packages/store-sqlite/src/migrations/registry.ts:126
+Defined in: packages/store-sqlite/src/migrations/registry.ts:127
 
 Register a runtime-supplied migration. Used by downstream packages
 that want to ship their schema alongside the bundled set without

@@ -12,7 +12,7 @@ function createScopeMiddleware(requirement): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/scope.ts:30
+Defined in: packages/server/src/middleware/scope.ts:35
 
 ## Parameters
 

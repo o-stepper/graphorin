@@ -7,10 +7,13 @@
 # Function: runWithPauseResume()
 
 ```ts
-function runWithPauseResume<R>(values, fn): Promise<R>;
+function runWithPauseResume<R>(
+   values, 
+   fn, 
+meta?): Promise<R>;
 ```
 
-Defined in: packages/core/src/channels/pause.ts:70
+Defined in: packages/core/src/channels/pause.ts:157
 
 **`Internal`**
 
@@ -39,6 +42,7 @@ engine wires it up around the resumed node body.
 | ------ | ------ |
 | `values` | readonly `unknown`[] |
 | `fn` | () => `R` \| `Promise`\&lt;`R`\&gt; |
+| `meta?` | readonly ( \| [`PauseIdentity`](/api/@graphorin/core/interfaces/PauseIdentity.md) \| `null` \| `undefined`)[] |
 
 ## Returns
 

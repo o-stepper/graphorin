@@ -6,7 +6,7 @@
 
 # Class: EvaluatorOptimizerConfigError
 
-Defined in: packages/agent/src/errors/index.ts:92
+Defined in: packages/agent/src/errors/index.ts:93
 
 Thrown by `evaluatorOptimizer({...})` when `maxIterations < 1` at
 construction time. The helper purposely surfaces the misuse early
@@ -26,7 +26,7 @@ rather than failing on the first run.
 new EvaluatorOptimizerConfigError(reason): EvaluatorOptimizerConfigError;
 ```
 
-Defined in: packages/agent/src/errors/index.ts:93
+Defined in: packages/agent/src/errors/index.ts:94
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/agent/src/errors/index.ts:93
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
 | <a id="property-cause"></a> `cause?` | `public` | `unknown` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`cause`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-cause) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es2022.error.d.ts:26 |
-| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`code`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-code) | packages/agent/src/errors/index.ts:40 |
+| <a id="property-code"></a> `code` | `readonly` | [`AgentRuntimeErrorCode`](/api/@graphorin/agent/errors/type-aliases/AgentRuntimeErrorCode.md) | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`code`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-code) | packages/agent/src/errors/index.ts:41 |
 | <a id="property-message"></a> `message` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`message`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-message) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1077 |
 | <a id="property-name"></a> `name` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`name`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-name) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1076 |
 | <a id="property-stack"></a> `stack?` | `public` | `string` | - | [`AgentRuntimeError`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).[`stack`](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md#property-stack) | node\_modules/.pnpm/typescript@5.9.3/node\_modules/typescript/lib/lib.es5.d.ts:1078 |

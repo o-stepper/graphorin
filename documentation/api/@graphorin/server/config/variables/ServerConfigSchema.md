@@ -86,6 +86,43 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
    }, {
      logger?: "json" | "pretty" | "silent";
   }>>;
+  retention: ZodDefault<ZodObject<{
+     auditDays: ZodOptional<ZodNumber>;
+     consolidatorRunsDays: ZodDefault<ZodNumber>;
+     dlqExhaustedDays: ZodDefault<ZodNumber>;
+     enabled: ZodDefault<ZodBoolean>;
+     idempotency: ZodDefault<ZodBoolean>;
+     intervalMs: ZodDefault<ZodNumber>;
+     memoryHistoryDays: ZodOptional<ZodNumber>;
+     sessionsClosedOnly: ZodDefault<ZodBoolean>;
+     sessionsDays: ZodOptional<ZodNumber>;
+     spansDays: ZodDefault<ZodNumber>;
+     workflowThreadsDays: ZodOptional<ZodNumber>;
+   }, "strict", ZodTypeAny, {
+     auditDays?: number;
+     consolidatorRunsDays: number;
+     dlqExhaustedDays: number;
+     enabled: boolean;
+     idempotency: boolean;
+     intervalMs: number;
+     memoryHistoryDays?: number;
+     sessionsClosedOnly: boolean;
+     sessionsDays?: number;
+     spansDays: number;
+     workflowThreadsDays?: number;
+   }, {
+     auditDays?: number;
+     consolidatorRunsDays?: number;
+     dlqExhaustedDays?: number;
+     enabled?: boolean;
+     idempotency?: boolean;
+     intervalMs?: number;
+     memoryHistoryDays?: number;
+     sessionsClosedOnly?: boolean;
+     sessionsDays?: number;
+     spansDays?: number;
+     workflowThreadsDays?: number;
+  }>>;
   secrets: ZodDefault<ZodObject<{
      source: ZodDefault<ZodEnum<["auto", "keyring", "encrypted-file", "env"]>>;
      strict: ZodDefault<ZodBoolean>;
@@ -416,6 +453,19 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
   observability: {
      logger: "json" | "pretty" | "silent";
   };
+  retention: {
+     auditDays?: number;
+     consolidatorRunsDays: number;
+     dlqExhaustedDays: number;
+     enabled: boolean;
+     idempotency: boolean;
+     intervalMs: number;
+     memoryHistoryDays?: number;
+     sessionsClosedOnly: boolean;
+     sessionsDays?: number;
+     spansDays: number;
+     workflowThreadsDays?: number;
+  };
   secrets: {
      source: "auto" | "keyring" | "encrypted-file" | "env";
      strict: boolean;
@@ -519,6 +569,19 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
   observability?: {
      logger?: "json" | "pretty" | "silent";
   };
+  retention?: {
+     auditDays?: number;
+     consolidatorRunsDays?: number;
+     dlqExhaustedDays?: number;
+     enabled?: boolean;
+     idempotency?: boolean;
+     intervalMs?: number;
+     memoryHistoryDays?: number;
+     sessionsClosedOnly?: boolean;
+     sessionsDays?: number;
+     spansDays?: number;
+     workflowThreadsDays?: number;
+  };
   secrets?: {
      source?: "auto" | "keyring" | "encrypted-file" | "env";
      strict?: boolean;
@@ -594,7 +657,7 @@ const ServerConfigSchema: ZodDefault<ZodObject<{
 }>>;
 ```
 
-Defined in: packages/server/src/config.ts:367
+Defined in: packages/server/src/config.ts:409
 
 Zod schema for the resolved [ServerConfigSpec](/api/@graphorin/server/config/interfaces/ServerConfigSpec.md). Exposed for
 advanced users that want to validate other config sources (env-only

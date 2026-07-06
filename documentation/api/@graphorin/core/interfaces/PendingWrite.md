@@ -6,7 +6,7 @@
 
 # Interface: PendingWrite
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:77
+Defined in: packages/core/src/contracts/checkpoint-store.ts:87
 
 Per-task pending write. Captured when a task in an execution step
 succeeds while a sibling task fails: the next resume attempt skips the
@@ -18,7 +18,7 @@ already-completed work.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-channel"></a> `channel` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:80 |
-| <a id="property-index"></a> `index` | `readonly` | `number` | - | packages/core/src/contracts/checkpoint-store.ts:79 |
-| <a id="property-taskid"></a> `taskId` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:78 |
-| <a id="property-value"></a> `value` | `readonly` | `unknown` | Serialized value blob - adapter-specific encoding. | packages/core/src/contracts/checkpoint-store.ts:82 |
+| <a id="property-channel"></a> `channel` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:90 |
+| <a id="property-index"></a> `index` | `readonly` | `number` | - | packages/core/src/contracts/checkpoint-store.ts:89 |
+| <a id="property-taskid"></a> `taskId` | `readonly` | `string` | - | packages/core/src/contracts/checkpoint-store.ts:88 |
+| <a id="property-value"></a> `value` | `readonly` | `unknown` | Serialized value blob - adapter-specific encoding. | packages/core/src/contracts/checkpoint-store.ts:92 |
