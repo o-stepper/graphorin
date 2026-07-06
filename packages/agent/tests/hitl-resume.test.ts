@@ -316,3 +316,111 @@ describe('Agent - HITL approval flow', () => {
     expect(reparsed.pendingApprovals[0]?.toolCallId).toBe('tc-1');
   });
 });
+
+describe('W-035 - stepNumber stays monotonic across suspend/resume', () => {
+  it('two suspend/resume cycles yield strictly unique, continuing step numbers', async () => {
+    const spanStepNumbers: number[] = [];
+    const startSpan = (opts: { type: string; attrs?: Record<string, unknown> }) => {
+      const record = (a: Record<string, unknown>) => {
+        const n = a['graphorin.step.number'];
+        if (opts.type === 'agent.step' && typeof n === 'number') spanStepNumbers.push(n);
+      };
+      record({ ...(opts.attrs ?? {}) });
+      return {
+        type: opts.type,
+        id: 'x',
+        traceId: 't',
+        setAttributes: (a: Record<string, unknown>) => record(a),
+        addEvent() {},
+        recordException() {},
+        setStatus() {},
+        end() {},
+      };
+    };
+    const tracer = {
+      startSpan,
+      async span(opts: { type: string }, fn: (s: unknown) => unknown) {
+        return fn(startSpan(opts));
+      },
+      async shutdown() {},
+    } as never;
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'noop',
+      provider: createMockProvider({
+        modelId: 'mock',
+        scripts: [
+          toolCallScript({
+            toolCallId: 'tc-1',
+            toolName: 'send_email',
+            args: { to: 'a@b.c', body: 'one' },
+            totalTokens: 10,
+          }),
+          toolCallScript({
+            toolCallId: 'tc-2',
+            toolName: 'send_email',
+            args: { to: 'a@b.c', body: 'two' },
+            totalTokens: 10,
+          }),
+          textOnlyScript('all sent', 6),
+        ],
+      }),
+      tools: [buildSendEmailTool()],
+      tracer,
+    });
+
+    const run1 = await agent.run('email Alice twice');
+    expect(run1.status).toBe('awaiting_approval');
+    const run2 = await agent.run(run1.state, {
+      directive: { approvals: [{ toolCallId: 'tc-1', granted: true }] },
+    });
+    expect(run2.status).toBe('awaiting_approval');
+    const run3 = await agent.run(run2.state, {
+      directive: { approvals: [{ toolCallId: 'tc-2', granted: true }] },
+    });
+    expect(run3.status).toBe('completed');
+
+    const numbers = run3.state.steps.map((s) => s.stepNumber);
+    // Strictly unique: no resume step aliases 0 and no post-resume step
+    // collides with a pre-suspend one.
+    expect(new Set(numbers).size).toBe(numbers.length);
+    // The journal numbering continues: every resume-dispatch step is
+    // max-so-far + 1, so the sequence is strictly increasing.
+    for (let i = 1; i < numbers.length; i++) {
+      expect(numbers[i]).toBeGreaterThan(numbers[i - 1] as number);
+    }
+    expect(numbers[0]).toBe(1);
+    expect(Math.min(...numbers)).toBeGreaterThan(0);
+    // Span attribution mirrors the journal: unique step numbers only.
+    expect(new Set(spanStepNumbers).size).toBe(spanStepNumbers.length);
+  });
+
+  it('resume-dispatch step events continue the numbering (no step 0)', async () => {
+    const agent = createAgent({
+      name: 'mailer',
+      instructions: 'noop',
+      provider: createMockProvider({
+        modelId: 'mock',
+        scripts: [
+          toolCallScript({
+            toolCallId: 'tc-email',
+            toolName: 'send_email',
+            args: { to: 'a@b.c', body: 'hi' },
+            totalTokens: 10,
+          }),
+          textOnlyScript('sent', 4),
+        ],
+      }),
+      tools: [buildSendEmailTool()],
+    });
+    const suspended = await agent.run('email Alice');
+    expect(suspended.status).toBe('awaiting_approval');
+    expect(suspended.state.steps.map((s) => s.stepNumber)).toEqual([1]);
+    const resumed = await agent.run(suspended.state, {
+      directive: { approvals: [{ toolCallId: 'tc-email', granted: true }] },
+    });
+    expect(resumed.status).toBe('completed');
+    const numbers = resumed.state.steps.map((s) => s.stepNumber);
+    expect(numbers).toEqual([1, 2, 3]);
+  });
+});

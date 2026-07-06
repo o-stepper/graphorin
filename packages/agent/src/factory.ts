@@ -535,7 +535,10 @@ export function createAgent<TDeps = unknown, TOutput = string>(
       return yield* finishRun(state, finalSnapshot);
     }
 
-    let stepNumber = 0;
+    // W-035: seed from the journal so post-resume steps continue the
+    // numbering instead of colliding with pre-suspend steps (a fresh
+    // run's empty journal keeps the historical 0 start).
+    let stepNumber = state.steps.reduce((max, s) => Math.max(max, s.stepNumber), 0);
     // C3: verifier-triggered continuation rounds consumed this run.
     let verifierRoundsUsed = 0;
     // AG-15: tools the model actually called on the PREVIOUS step - the

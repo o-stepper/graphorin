@@ -230,6 +230,11 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
   grantedApprovals: ToolApproval[],
 ): AsyncGenerator<AgentEvent<TOutput>, void, void> {
   const { config, state, messages, runContextBase, toolExecutor, dispatchBatch } = env;
+  // W-035: the resume step continues the journal's numbering instead of
+  // aliasing step 0 - `RunStep.stepNumber` stays unique across any
+  // number of suspend/resume cycles (replay itself keys on toolCallId
+  // and never depends on this number).
+  const resumeStepNumber = state.steps.reduce((max, s) => Math.max(max, s.stepNumber), 0) + 1;
   // agent-02 write-ahead intent: persist a checkpoint equivalent to
   // the pre-dispatch suspended state (granted approvals re-attached
   // to `pendingApprovals`) BEFORE any side effect runs. A crash-retry
@@ -253,7 +258,7 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
         namespace: 'agent',
         state: intentState,
         channelVersions: {},
-        stepNumber: 0,
+        stepNumber: resumeStepNumber,
         createdAt: new Date().toISOString(),
       },
       {
@@ -265,7 +270,7 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
     );
   }
   state.steps.push({
-    stepNumber: 0,
+    stepNumber: resumeStepNumber,
     startedAt: new Date().toISOString(),
     endedAt: new Date().toISOString(),
     usage: zeroUsage(),
@@ -279,8 +284,8 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
   yield* dispatchBatch(
     resumedApprovedCalls,
     toolExecutor,
-    { ...runContextBase, stepNumber: 0, messages },
-    0,
+    { ...runContextBase, stepNumber: resumeStepNumber, messages },
+    resumeStepNumber,
     { disableRepair: true },
   );
   // agent-02: persist the journaled post-dispatch state. From THIS
@@ -299,7 +304,7 @@ export async function* dispatchResumedApprovals<TDeps, TOutput>(
         namespace: 'agent',
         state: serializeRunState(state, { stripTracingApiKey: true }),
         channelVersions: {},
-        stepNumber: 0,
+        stepNumber: resumeStepNumber,
         createdAt: new Date().toISOString(),
       },
       {
