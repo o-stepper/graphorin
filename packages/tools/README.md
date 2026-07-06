@@ -24,8 +24,8 @@ register, and execute tools the model can call:
     out;
   - approval flow (`needsApproval` predicate ⟶ blocking gate);
   - per-tool secrets ACL scoping via
-    `@graphorin/security/secrets`’s `withChildToolSecretsContext`;
-  - sandbox-policy resolution via `@graphorin/security/sandbox`’s
+    `@graphorin/security/secrets`'s `withChildToolSecretsContext`;
+  - sandbox-policy resolution via `@graphorin/security/sandbox`'s
     `resolveSandbox(...)` plus an optional `sandboxResolver`
     injection point that the skill loader / agent runtime wires
     when sandbox-bundled code (skills, MCP-derived handlers) needs

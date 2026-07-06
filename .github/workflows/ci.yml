@@ -127,6 +127,12 @@ jobs:
       - name: Phantom dependency gate
         run: pnpm run check-phantom-deps
 
+      # W-149: the 0.6.0 character-rules sweep (ASCII punctuation in all
+      # markdown) regressed exactly where it had no gate; this keeps
+      # tracked md + NOTICE free of em/en dashes and curly quotes.
+      - name: Character rules gate
+        run: pnpm run check-character-rules
+
       # Runs on the ubuntu+node22 leg only by design (same rationale as
       # examples-smoke): the benchmarks measure framework logic the
       # OS/node matrix already covers; repeating them on macos/windows or
