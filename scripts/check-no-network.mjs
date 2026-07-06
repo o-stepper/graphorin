@@ -91,15 +91,20 @@ export const ALLOW_LIST = [
   // Skill signature verifier — explicit user action; resolves the
   // publisher key over the configured well-known URL (Phase 03d).
   'packages/security/src/supply-chain/signature.ts',
-  // Provider adapters — Phase 06 will fill the directory; preemptively
-  // allow-list to keep the guard green when Phase 06 lands.
-  /^packages\/provider\//,
-  // MCP client transports — Phase 09.
-  /^packages\/mcp\//,
-  // Embedder model downloads — Phase 05.
-  /^packages\/embedder-[A-Za-z-]+\//,
-  // Storage backends — Phase 05+.
-  /^packages\/store-[A-Za-z-]+\//,
+  // W-074: the former whole-package entries (provider/, mcp/,
+  // embedder-*/, store-*/) are gone. A scan with an emptied allow-list
+  // shows zero detectable primitives in those packages: their network
+  // paths all take an injected `fetchImpl ?? globalThis.fetch`
+  // reference instead of calling the bare primitive, so the directory
+  // regexes shielded nothing while hiding any future implicit call in
+  // their utils/config helpers. A new legitimate transport file that
+  // does call a bare primitive should get its own pointed entry here.
+  //
+  // Design note: the shipped eslint-plugin rule no-implicit-network-call
+  // polices the same promise for ESLint consumers; this repo lints with
+  // Biome, so the rule is exercised by the eslint-plugin dogfood test
+  // (W-039) against these same ALLOW_LIST entries rather than by adding
+  // a second linter toolchain.
 ];
 
 const PACKAGES_DIR = join(ROOT, 'packages');
