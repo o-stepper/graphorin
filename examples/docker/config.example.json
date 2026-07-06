@@ -1,0 +1,29 @@
+{
+  "server": {
+    "host": "0.0.0.0",
+    "port": 8080
+  },
+  "auth": {
+    "kind": "token",
+    "pepperRef": "file:/run/secrets/graphorin/pepper"
+  },
+  "storage": {
+    "path": "/data/data.db",
+    "mode": "server",
+    "encryption": {
+      "enabled": true,
+      "passphraseRef": "file:/run/secrets/graphorin/db-passphrase"
+    }
+  },
+  "audit": {
+    "enabled": true,
+    "passphraseRef": "file:/run/secrets/graphorin/audit-passphrase"
+  },
+  "secrets": {
+    "source": "auto",
+    "strict": false
+  },
+  "observability": {
+    "logger": "json"
+  }
+}

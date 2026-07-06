@@ -15,9 +15,9 @@ docker build -t graphorin:latest -f examples/docker/Dockerfile .
 
 The container needs a **JSON config mounted at `/etc/graphorin/config.json`**
 (the image `CMD` passes it via `--config`; the loader reads `.json`/`.js`/`.mjs`,
-not TOML). Start from
-[`../systemd/config.example.json`](../systemd/config.example.json) and point
-any `file:` secret refs under `/run/secrets/graphorin/`:
+not TOML). Start from the container-tuned
+[`config.example.json`](./config.example.json) in this directory - its `file:`
+secret refs already point under `/run/secrets/graphorin/`:
 
 ```bash
 docker run --rm \
@@ -25,17 +25,30 @@ docker run --rm \
   --security-opt no-new-privileges \
   --cap-drop=ALL \
   -v graphorin-data:/data \
-  -v "$PWD/config.json:/etc/graphorin/config.json:ro" \
+  -v "$PWD/examples/docker/config.example.json:/etc/graphorin/config.json:ro" \
   -v /run/secrets/graphorin:/run/secrets/graphorin:ro \
   -p 8080:8080 \
   graphorin:latest
 ```
 
+> **Container-specific config rules.** Inside a container the server **must
+> bind `0.0.0.0`** - with the server default `127.0.0.1` the published port
+> (`-p 8080:8080`) is unreachable from outside, while the image
+> `HEALTHCHECK` (which probes `127.0.0.1` in-container) keeps reporting
+> `healthy`. The database **must live under `/data`**: it is the only
+> writable volume under the recommended `--read-only` root FS. The sibling
+> [`../systemd/config.example.json`](../systemd/config.example.json) makes
+> the opposite choices (`127.0.0.1`, `/var/lib/graphorin`) because they are
+> right for a host service - do not reuse it here. JSON allows no comments,
+> so these rules live in this README rather than the config files.
+
 The flags mirror the framework's process-hardening discipline (refuse-to-run-as-root,
 `umask 0o077`, dropped capabilities, read-only root FS, no new privileges).
 Mount secrets (pepper, DB passphrases) read-only rather than baking them into
 the image. Without the config mount the CLI exits immediately with
-"config file not found". See
+"config file not found". Remember the in-container `HEALTHCHECK` confirms
+**liveness only** - probe the published port from outside (as the smoke
+workflow does) to prove reachability. See
 [Standalone server](../../documentation/guide/standalone-server.md)
 and [Security](../../documentation/guide/security.md).
 

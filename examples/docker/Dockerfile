@@ -8,8 +8,8 @@
 #   docker build -t graphorin:latest -f examples/docker/Dockerfile .
 #
 # Run (a JSON config mounted at /etc/graphorin/config.json is REQUIRED -
-# the CMD below passes it via --config; see
-# examples/systemd/config.example.json for a starter):
+# the CMD below passes it via --config; start from the container-tuned
+# examples/docker/config.example.json - 0.0.0.0 bind, /data storage):
 #   docker run --rm \
 #     --read-only --tmpfs /tmp \
 #     --security-opt no-new-privileges \
