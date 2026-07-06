@@ -96,7 +96,20 @@ export function emitGenAIMessageEvents<T extends SpanType>(
   opts: { readonly system?: string } = {},
 ): void {
   for (const message of messages) {
-    span.addEvent(eventNameFor(message.role), buildEventAttrs(message, opts.system));
+    // W-094: structural metadata (role, provider name, message name,
+    // tool-call id) is 'public' so a message event survives the default
+    // export floor as a marker; the CONTENT (and tool-call payloads)
+    // stays 'internal' - exported only when the operator opted the
+    // floor up, with the PII patterns applying there.
+    span.addEvent(eventNameFor(message.role), buildEventAttrs(message, opts.system), {
+      sensitivity: 'internal',
+      sensitivityByAttribute: {
+        'gen_ai.message.role': 'public',
+        'gen_ai.system': 'public',
+        'gen_ai.message.name': 'public',
+        'gen_ai.tool.call.id': 'public',
+      },
+    });
   }
 }
 

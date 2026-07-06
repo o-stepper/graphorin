@@ -7,6 +7,7 @@
  */
 
 import type {
+  AddEventOptions,
   AISpan,
   Sensitivity,
   SpanAttributes,
@@ -90,13 +91,28 @@ export function createSpan<T extends SpanType>(input: SpanCreateInput<T>): Graph
         sensitivities[name] = opts.sensitivity;
       }
     },
-    addEvent(name: string, attrs?: SpanAttributes): void {
+    addEvent(name: string, attrs?: SpanAttributes, opts?: AddEventOptions): void {
       if (ended) return;
       if (!input.recordEvent(name)) return;
+      // W-094: resolve the event default + per-attribute overrides into
+      // one map the validation exporter consumes. Untagged attributes
+      // stay untagged - default-deny below the floor is preserved.
+      const eventSensitivities: Record<string, 'public' | 'internal' | 'secret'> = {};
+      if (opts?.sensitivity !== undefined) {
+        for (const key of Object.keys(attrs ?? {})) {
+          eventSensitivities[key] = opts.sensitivity;
+        }
+      }
+      for (const [key, tier] of Object.entries(opts?.sensitivityByAttribute ?? {})) {
+        eventSensitivities[key] = tier;
+      }
       events.push({
         name,
         timeUnixNano: Math.floor(input.now() * 1_000_000),
         attributes: Object.freeze({ ...(attrs ?? {}) }) as SpanAttributes,
+        ...(Object.keys(eventSensitivities).length > 0
+          ? { sensitivityByAttribute: Object.freeze(eventSensitivities) }
+          : {}),
       });
     },
     recordException(err: unknown): void {
@@ -111,6 +127,15 @@ export function createSpan<T extends SpanType>(input: SpanCreateInput<T>): Graph
         name: 'exception',
         timeUnixNano: Math.floor(input.now() * 1_000_000),
         attributes: attrs,
+        // W-094: the CLASS NAME of an error is safe and load-bearing for
+        // out-of-the-box error dashboards - tag it 'public'. Message +
+        // stacktrace stay 'internal' (paritous with the un-sanitized
+        // statusMessage; the PII patterns still apply at that floor).
+        sensitivityByAttribute: Object.freeze({
+          'exception.type': 'public',
+          'exception.message': 'internal',
+          'exception.stacktrace': 'internal',
+        }),
       });
     },
     setStatus(s: SpanStatus, message?: string): void {

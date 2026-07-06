@@ -97,6 +97,7 @@ export {
   toolReturn,
 } from './tool.js';
 export type {
+  AddEventOptions,
   AISpan,
   CustomSpanType,
   KnownSpanType,

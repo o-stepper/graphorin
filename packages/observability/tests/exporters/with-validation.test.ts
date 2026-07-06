@@ -154,3 +154,50 @@ function sampleRecord(overrides: Partial<SpanRecord>): SpanRecord {
     ...(overrides.parentId === undefined ? {} : { parentId: overrides.parentId }),
   };
 }
+
+describe('W-094 - event-attribute sensitivity', () => {
+  it('a public-tagged event attribute survives the default floor; untagged ones still drop', async () => {
+    const lines: string[] = [];
+    const wrapped = withValidation(createConsoleExporter({ sink: (line) => lines.push(line) }), {
+      minTier: 'public',
+    });
+    const record = sampleRecord({
+      events: [
+        {
+          name: 'checkpoint',
+          timeUnixNano: 5,
+          attributes: { phase: 'verify', payload: 'not for export' },
+          sensitivityByAttribute: { phase: 'public' },
+        },
+      ],
+    });
+    await wrapped.export(record);
+    const parsed = JSON.parse(lines[0] ?? '{}');
+    expect(parsed.events[0].attributes.phase).toBe('verify');
+    expect(parsed.events[0].attributes.payload).toBeUndefined();
+  });
+
+  it('onViolation distinguishes event attributes from span attributes via origin', async () => {
+    const seen: Array<{ attribute?: string; origin?: string }> = [];
+    const wrapped = withValidation(createConsoleExporter({ sink: () => {} }), {
+      minTier: 'public',
+      onViolation: (violation) => {
+        seen.push({
+          ...(violation.attribute !== undefined ? { attribute: violation.attribute } : {}),
+          ...((violation as { origin?: string }).origin !== undefined
+            ? { origin: (violation as { origin?: string }).origin }
+            : {}),
+        });
+      },
+    });
+    const record = sampleRecord({
+      attributes: { spanSecret: 'x' },
+      events: [{ name: 'checkpoint', timeUnixNano: 5, attributes: { eventSecret: 'y' } }],
+    });
+    await wrapped.export(record);
+    const eventDrop = seen.find((v) => v.attribute === 'eventSecret');
+    const spanDrop = seen.find((v) => v.attribute === 'spanSecret');
+    expect(eventDrop?.origin).toBe('event:checkpoint');
+    expect(spanDrop?.origin).toBeUndefined();
+  });
+});

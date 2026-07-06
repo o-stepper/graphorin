@@ -349,3 +349,41 @@ describe('W-090 - createSampler parent-based per-type rules', () => {
     expect(high.shouldSample('tool.execute', true)).toBe(false);
   });
 });
+
+describe('W-094 - exception events survive the default floor with a public type', () => {
+  it('recordException exports exception.type but not message/stacktrace out of the box', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((record) => records.push(record));
+    const tracer = createTracer({ exporters: [exporter], warnSink: () => {} });
+    await tracer
+      .span({ type: 'agent.run' }, async (span) => {
+        span.recordException(new RangeError('boom with user@example.com inside'));
+      })
+      .catch(() => {});
+    await tracer.shutdown();
+    const exception = records[0]?.events.find((event) => event.name === 'exception');
+    expect(exception).toBeDefined();
+    // The class name is public - error dashboards work out of the box.
+    expect(exception?.attributes['exception.type']).toBe('RangeError');
+    // Message + stacktrace stay 'internal' - above the default floor.
+    expect(exception?.attributes['exception.message']).toBeUndefined();
+    expect(exception?.attributes['exception.stacktrace']).toBeUndefined();
+  });
+
+  it('addEvent opts let any event attribute pass without shifting the global floor', async () => {
+    const records: SpanRecord[] = [];
+    const exporter = mockExporter((record) => records.push(record));
+    const tracer = createTracer({ exporters: [exporter], warnSink: () => {} });
+    await tracer.span({ type: 'agent.run' }, async (span) => {
+      span.addEvent(
+        'gate.decision',
+        { verdict: 'allow', rationale: 'internal details' },
+        { sensitivityByAttribute: { verdict: 'public' } },
+      );
+    });
+    await tracer.shutdown();
+    const event = records[0]?.events.find((entry) => entry.name === 'gate.decision');
+    expect(event?.attributes.verdict).toBe('allow');
+    expect(event?.attributes.rationale).toBeUndefined();
+  });
+});

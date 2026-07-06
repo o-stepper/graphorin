@@ -94,6 +94,7 @@ export function sanitizeAttributes(
   sensitivities: Readonly<Record<string, SpanAttributeValue>>,
   validator: RedactionValidatorInstance,
   spanType?: string,
+  origin?: string,
 ): SpanAttributes {
   const out: Record<string, SpanAttributeValue> = {};
   for (const [key, value] of Object.entries(attrs)) {
@@ -101,7 +102,13 @@ export function sanitizeAttributes(
     const result = validator.validate({
       value,
       tier,
-      context: spanType === undefined ? { attribute: key } : { attribute: key, spanType },
+      context: {
+        attribute: key,
+        ...(spanType !== undefined ? { spanType } : {}),
+        // W-094: lets onViolation / droppedByReason tell an EVENT
+        // attribute from a span attribute.
+        ...(origin !== undefined ? { origin } : {}),
+      },
     });
     if (result === null) {
       // RP-18: this single attribute exceeded the floor (or matched a secret
@@ -124,7 +131,19 @@ export function sanitizeEvents(
 ): SpanRecord['events'] {
   const out: SpanRecord['events'][number][] = [];
   for (const event of events) {
-    const sanitizedAttrs = sanitizeAttributes(event.attributes, {}, validator, spanType);
+    // W-094: honour the per-event sensitivity map recorded by
+    // `addEvent(..., opts)` (pre-fix an empty map was passed here, so
+    // EVERY event attribute - including `exception.type` - was dropped
+    // under the default 'public' floor). Untagged attributes still
+    // default-deny; the `event:<name>` origin distinguishes event drops
+    // from span-attribute drops in onViolation.
+    const sanitizedAttrs = sanitizeAttributes(
+      event.attributes,
+      event.sensitivityByAttribute ?? {},
+      validator,
+      spanType,
+      `event:${event.name}`,
+    );
     out.push({ name: event.name, timeUnixNano: event.timeUnixNano, attributes: sanitizedAttrs });
   }
   return out;
