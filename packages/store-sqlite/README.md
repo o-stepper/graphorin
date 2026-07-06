@@ -11,9 +11,11 @@ higher-level package (`@graphorin/memory`, `@graphorin/sessions`,
 
 The package owns:
 
-- **Connection lifecycle** - a single `better-sqlite3` connection in
-  library mode; an opt-in `WorkerPool` wrapper (1 writer + N readers)
-  in server mode. WAL hardening pragmas are mandatory:
+- **Connection lifecycle** - a single synchronous `better-sqlite3`
+  connection in BOTH modes; `mode: 'server'` only auto-starts the
+  periodic WAL checkpoint timer, `mode: 'lib'` starts it when
+  `walCheckpointIntervalMs` is set explicitly. WAL hardening pragmas
+  are mandatory:
   `journal_mode=WAL`, `synchronous=NORMAL`, `busy_timeout=5000`,
   `mmap_size=128 MiB`, `temp_store=MEMORY`, `cache_size=-64000`,
   `foreign_keys=ON`. A `CheckpointManager` performs periodic
@@ -102,18 +104,24 @@ await store.memory.semantic.remember({
 await store.close();
 ```
 
-## Server mode (WorkerPool)
+## Server mode
 
 ```ts
 const store = await createSqliteStore({
   path: './assistant.db',
   mode: 'server',
-  workerPool: {
-    readers: 4,
-    walCheckpointIntervalMs: 5 * 60 * 1000,
-  },
+  walCheckpointIntervalMs: 5 * 60 * 1000,
 });
 ```
+
+The only difference from `'lib'` is lifecycle wiring: `'server'`
+auto-starts the periodic `PRAGMA wal_checkpoint(RESTART)` timer
+(`walCheckpointIntervalMs`, default 5 minutes), while `'lib'` runs it
+only when the interval is passed explicitly. There is no worker pool
+and no reader fan-out - a single synchronous connection serves both
+modes. For what is safe to run against the file while a server holds
+it, see the
+[concurrency matrix](https://graphorin.com/guide/storage#concurrency-matrix).
 
 ## Migrations
 
