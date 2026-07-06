@@ -56,6 +56,11 @@ export interface CostSnapshot {
   /** W-092: aggregated prompt-cache WRITE tokens (0 when never recorded). */
   readonly cacheWriteTokens: number;
   readonly callCount: number;
+  /**
+   * Aggregated cost in WHOLE currency units (W-045; for USD - dollars,
+   * fractional values expected). Same convention as core `Cost.amount`
+   * and `@graphorin/pricing.calculateCost` - never minor units.
+   */
   readonly cost: Cost | null;
   /**
    * RP-22: `true` when records carrying differing currencies were aggregated
