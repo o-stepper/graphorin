@@ -10,7 +10,7 @@
 function isApprovalPauseValue(value): value is ApprovalPauseValue;
 ```
 
-Defined in: packages/core/dist/channels/durable.d.ts:59
+Defined in: [packages/core/dist/channels/durable.d.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/durable.d.ts#L59)
 
 Type guard for [ApprovalPauseValue](/api/@graphorin/workflow/interfaces/ApprovalPauseValue.md).
 

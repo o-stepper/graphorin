@@ -10,7 +10,7 @@
 const OPAQUE_ONLY_SCHEMES: ReadonlySet<string>;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:27
+Defined in: [packages/security/src/secrets/secret-ref.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L27)
 
 Schemes that **forbid** an authority component (no `//` allowed).
 

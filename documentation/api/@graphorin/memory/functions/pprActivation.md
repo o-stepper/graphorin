@@ -10,7 +10,7 @@
 function pprActivation(neighbours, damping?): number[];
 ```
 
-Defined in: packages/memory/src/search/graph-ppr.ts:32
+Defined in: [packages/memory/src/search/graph-ppr.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/graph-ppr.ts#L32)
 
 Compute PPR-lite activation for graded neighbours. `damping` in
 `(0, 1]`; a neighbour at `depth` d contributes `damping^d` per seed

@@ -10,7 +10,7 @@
 function revokeOAuthToken(args): Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:167
+Defined in: [packages/security/src/oauth/refresh.ts:167](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/refresh.ts#L167)
 
 Revoke an OAuth token via RFC 7009. Honest failure semantics
 (SPL-1 / SPL-16): a missing revocation endpoint, a network failure,

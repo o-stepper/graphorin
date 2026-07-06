@@ -6,7 +6,7 @@
 
 # Class: InMemoryCheckpointStore
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:36
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L36)
 
 Pure in-memory `CheckpointStore` implementation. Thread-safe
 within a single Node.js event loop because every mutation is
@@ -42,7 +42,7 @@ compactThread(
 keepLast): Promise<number>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:230
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:230](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L230)
 
 W-009 compaction - keep the `keepLast` newest checkpoints of one pair.
 
@@ -70,7 +70,7 @@ W-009 compaction - keep the `keepLast` newest checkpoints of one pair.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:156
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:156](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L156)
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -104,7 +104,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:96
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L96)
 
 #### Parameters
 
@@ -135,7 +135,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:120
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L120)
 
 #### Parameters
 
@@ -164,7 +164,7 @@ listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:173
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:173](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L173)
 
 W-032: enumerate threads whose LATEST checkpoint in `namespace` is
 suspended with a due `wakeAt` - parity with the SQLite adapter.
@@ -197,7 +197,7 @@ suspended with a due `wakeAt` - parity with the SQLite adapter.
 pruneThreads(opts): Promise<number>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:201
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:201](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L201)
 
 W-009 retention sweep - parity with the SQLite implementation:
 namespace-SCOPED (entries key as `threadId::namespace`), latest
@@ -231,7 +231,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:40
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L40)
 
 #### Parameters
 
@@ -264,7 +264,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:74
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L74)
 
 #### Parameters
 
@@ -292,7 +292,7 @@ Defined in: packages/workflow/src/checkpoint-store-memory.ts:74
 size(): number;
 ```
 
-Defined in: packages/workflow/src/checkpoint-store-memory.ts:254
+Defined in: [packages/workflow/src/checkpoint-store-memory.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/checkpoint-store-memory.ts#L254)
 
 Test-only helper that exposes the raw count of stored checkpoints
 - handy for assertions like "the runtime wrote exactly N

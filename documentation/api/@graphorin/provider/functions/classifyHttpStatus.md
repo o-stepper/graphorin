@@ -10,7 +10,7 @@
 function classifyHttpStatus(status, bodyText?): ProviderErrorKind;
 ```
 
-Defined in: packages/provider/src/errors/errors.ts:229
+Defined in: [packages/provider/src/errors/errors.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/errors/errors.ts#L229)
 
 Map an HTTP status (plus optional error-body text) onto the
 canonical `ProviderErrorKind`. One

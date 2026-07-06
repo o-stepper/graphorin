@@ -6,7 +6,7 @@
 
 # Interface: TraceExporter
 
-Defined in: packages/observability/src/exporters/types.ts:69
+Defined in: [packages/observability/src/exporters/types.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L69)
 
 A trace exporter contract. Exporters consume a stream of finished
 spans and forward them to a sink (console, file, OTLP wire, …).
@@ -17,8 +17,8 @@ spans and forward them to a sink (console, file, OTLP wire, …).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-validated_exporter_brand"></a> `[VALIDATED_EXPORTER_BRAND]?` | `readonly` | `true` | **`Internal`** Branded-marker stub. Set by `withValidation(...)` to signal that the exporter has been wrapped. Direct exporters omit the brand and the tracer fails fast at startup. | packages/observability/src/exporters/types.ts:84 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | - | packages/observability/src/exporters/types.ts:70 |
+| <a id="property-validated_exporter_brand"></a> `[VALIDATED_EXPORTER_BRAND]?` | `readonly` | `true` | **`Internal`** Branded-marker stub. Set by `withValidation(...)` to signal that the exporter has been wrapped. Direct exporters omit the brand and the tracer fails fast at startup. | [packages/observability/src/exporters/types.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L84) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | - | [packages/observability/src/exporters/types.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L70) |
 
 ## Methods
 
@@ -28,7 +28,7 @@ spans and forward them to a sink (console, file, OTLP wire, …).
 export(record): Promise<void>;
 ```
 
-Defined in: packages/observability/src/exporters/types.ts:72
+Defined in: [packages/observability/src/exporters/types.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L72)
 
 Forward a finished span record. Implementations should be cheap.
 
@@ -50,7 +50,7 @@ Forward a finished span record. Implementations should be cheap.
 flush(): Promise<void>;
 ```
 
-Defined in: packages/observability/src/exporters/types.ts:74
+Defined in: [packages/observability/src/exporters/types.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L74)
 
 Flush any buffered spans. Called on `tracer.shutdown()`.
 
@@ -66,7 +66,7 @@ Flush any buffered spans. Called on `tracer.shutdown()`.
 shutdown(): Promise<void>;
 ```
 
-Defined in: packages/observability/src/exporters/types.ts:76
+Defined in: [packages/observability/src/exporters/types.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/types.ts#L76)
 
 Close any underlying resources. Idempotent.
 

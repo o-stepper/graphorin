@@ -12,7 +12,7 @@ function _setPackageManagerForTesting(detector):
   | null;
 ```
 
-Defined in: packages/security/src/supply-chain/package-manager.ts:69
+Defined in: [packages/security/src/supply-chain/package-manager.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/package-manager.ts#L69)
 
 **`Experimental`**
 

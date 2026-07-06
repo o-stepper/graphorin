@@ -10,7 +10,7 @@
 function decryptBody(body, key): Uint8Array;
 ```
 
-Defined in: packages/sessions/src/export/reader.ts:315
+Defined in: [packages/sessions/src/export/reader.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/reader.ts#L315)
 
 Decrypt a body that was written with `encryptBody(...)`. The layout
 is `[iv (12)][ciphertext][tag (16)]`.

@@ -6,7 +6,7 @@
 
 # Class: VectorTableManager
 
-Defined in: packages/store-sqlite/src/vector-table-mgr.ts:11
+Defined in: [packages/store-sqlite/src/vector-table-mgr.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/vector-table-mgr.ts#L11)
 
 Lazy-creator for per-embedder `vec0` virtual tables. The first write
 for `(entity, embedder_id)` creates the corresponding `*_vec_<slug>`
@@ -22,7 +22,7 @@ virtual table; subsequent writes hit the cached existence check.
 new VectorTableManager(conn): VectorTableManager;
 ```
 
-Defined in: packages/store-sqlite/src/vector-table-mgr.ts:15
+Defined in: [packages/store-sqlite/src/vector-table-mgr.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/vector-table-mgr.ts#L15)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/store-sqlite/src/vector-table-mgr.ts:15
 ensureTable(kind, meta): string;
 ```
 
-Defined in: packages/store-sqlite/src/vector-table-mgr.ts:35
+Defined in: [packages/store-sqlite/src/vector-table-mgr.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/vector-table-mgr.ts#L35)
 
 Ensures the per-embedder vec0 table for `kind` exists. Returns the
 concrete table name (which the caller uses in their `INSERT INTO`
@@ -69,7 +69,7 @@ concrete table name (which the caller uses in their `INSERT INTO`
 knownTables(): readonly string[];
 ```
 
-Defined in: packages/store-sqlite/src/vector-table-mgr.ts:51
+Defined in: [packages/store-sqlite/src/vector-table-mgr.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/vector-table-mgr.ts#L51)
 
 **`Internal`**
 

@@ -10,7 +10,7 @@
 function createBlockRethinkTool(deps): Tool<BlockRethinkInput, BlockRethinkOutput>;
 ```
 
-Defined in: packages/memory/src/tools/block-tools.ts:152
+Defined in: [packages/memory/src/tools/block-tools.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/block-tools.ts#L152)
 
 `block_rethink` - rewrite a working memory block from scratch.
 

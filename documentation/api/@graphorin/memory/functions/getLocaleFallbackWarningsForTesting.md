@@ -10,7 +10,7 @@
 function _getLocaleFallbackWarningsForTesting(): ReadonlyMap<string, ReadonlySet<string>>;
 ```
 
-Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:31
+Defined in: [packages/memory/src/context-engine/locale-packs/resolver.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/resolver.ts#L31)
 
 **`Internal`**
 
@@ -18,4 +18,4 @@ Inspect the once-per-process WARN registry. Used by tests.
 
 ## Returns
 
-`ReadonlyMap`\&lt;`string`, `ReadonlySet`\&lt;`string`\&gt;\&gt;
+`ReadonlyMap`\<`string`, `ReadonlySet`\&lt;`string`\&gt;\>

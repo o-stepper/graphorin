@@ -10,7 +10,7 @@
 function xxhash32(input, seed?): string;
 ```
 
-Defined in: packages/security/src/guard/xxhash.ts:20
+Defined in: [packages/security/src/guard/xxhash.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/xxhash.ts#L20)
 
 Hash a buffer or a string, returning the 32-bit digest as an
 8-character lowercase hex string.

@@ -18,7 +18,7 @@ type ToolCassetteRecordKind =
   | "footer";
 ```
 
-Defined in: packages/sessions/src/cassette/types.ts:41
+Defined in: [packages/sessions/src/cassette/types.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L41)
 
 Discriminator on every cassette record.
 

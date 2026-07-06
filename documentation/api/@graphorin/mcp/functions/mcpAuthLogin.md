@@ -10,7 +10,7 @@
 function mcpAuthLogin(options): Promise<LoginInteractiveResult>;
 ```
 
-Defined in: packages/mcp/src/oauth/library.ts:27
+Defined in: [packages/mcp/src/oauth/library.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/oauth/library.ts#L27)
 
 Drive `graphorin auth login --mcp <id>`.
 

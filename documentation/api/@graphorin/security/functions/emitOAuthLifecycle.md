@@ -10,7 +10,7 @@
 function emitOAuthLifecycle(event): void;
 ```
 
-Defined in: packages/security/src/oauth/events.ts:59
+Defined in: [packages/security/src/oauth/events.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/events.ts#L59)
 
 Emit a lifecycle event. Listeners that throw are isolated from the
 OAuth fast path.

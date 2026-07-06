@@ -10,7 +10,7 @@
 type SessionReplayMode = "sanitized" | "raw";
 ```
 
-Defined in: packages/sessions/src/replay/types.ts:29
+Defined in: [packages/sessions/src/replay/types.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/replay/types.ts#L29)
 
 Mode discriminator. `'sanitized'` is the default; `'raw'` requires
 the `traces:read:raw` scope.

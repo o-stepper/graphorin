@@ -10,7 +10,7 @@
 function runConflictPipeline(args): Promise<ConflictDecision>;
 ```
 
-Defined in: packages/memory/src/conflict/pipeline.ts:50
+Defined in: [packages/memory/src/conflict/pipeline.ts:50](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/pipeline.ts#L50)
 
 One-shot helper that mirrors RB-02 §8.1's `runConflictPipeline({...})`
 spec - convenient for callers that do not need to pre-build + cache

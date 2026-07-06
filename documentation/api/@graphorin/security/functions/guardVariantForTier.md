@@ -14,7 +14,7 @@ function guardVariantForTier(tier):
   | "STRICT_FULL_GUARD";
 ```
 
-Defined in: packages/security/src/guard/factory.ts:57
+Defined in: [packages/security/src/guard/factory.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/factory.ts#L57)
 
 Look up the guard variant identifier for a tier. Useful for
 structured logging.

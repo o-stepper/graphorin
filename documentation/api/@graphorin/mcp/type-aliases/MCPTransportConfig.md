@@ -13,7 +13,7 @@ type MCPTransportConfig =
   | SseTransportConfig;
 ```
 
-Defined in: packages/mcp/src/transport/types.ts:24
+Defined in: [packages/mcp/src/transport/types.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/transport/types.ts#L24)
 
 Transport descriptors accepted by [createMCPClient](/api/@graphorin/mcp/functions/createMCPClient.md).
 

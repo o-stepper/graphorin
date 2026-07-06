@@ -6,7 +6,7 @@
 
 # Interface: AnyValue\&lt;T\&gt;
 
-Defined in: packages/core/src/channels/channels.ts:57
+Defined in: [packages/core/src/channels/channels.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L57)
 
 Overwrite-on-write - collisions are silently allowed (last-write-wins
 semantics within a step).
@@ -23,5 +23,5 @@ semantics within a step).
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | `T` | packages/core/src/channels/channels.ts:59 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"any-value"` | packages/core/src/channels/channels.ts:58 |
+| <a id="property-default"></a> `default?` | `readonly` | `T` | [packages/core/src/channels/channels.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L59) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"any-value"` | [packages/core/src/channels/channels.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L58) |

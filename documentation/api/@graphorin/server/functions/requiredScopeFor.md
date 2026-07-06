@@ -10,7 +10,7 @@
 function requiredScopeFor(subject): ParsedScope;
 ```
 
-Defined in: packages/server/src/ws/subjects.ts:122
+Defined in: [packages/server/src/ws/subjects.ts:122](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/subjects.ts#L122)
 
 Required scope literal for every subject kind, expressed as a
 `ParsedScope`. The matcher `scopeMatches(granted, required)` uses

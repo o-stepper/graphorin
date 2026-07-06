@@ -10,7 +10,7 @@
 function auditLeafHash(entry): Buffer;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:47
+Defined in: [packages/security/src/audit/merkle.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L47)
 
 RFC 6962 leaf hash: `SHA-256(0x00 || leaf-bytes)`.
 

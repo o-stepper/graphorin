@@ -10,7 +10,7 @@
 function deriveAesKey(passphrase, salt): Promise<Buffer<ArrayBufferLike>>;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:115
+Defined in: [packages/security/src/secrets/resolvers/encrypted-file.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/encrypted-file.ts#L115)
 
 Derive a 32-byte AES-256-GCM key from a passphrase + salt.
 
@@ -23,6 +23,6 @@ Derive a 32-byte AES-256-GCM key from a passphrase + salt.
 
 ## Returns
 
-`Promise`\&lt;`Buffer`\&lt;`ArrayBufferLike`\&gt;\&gt;
+`Promise`\<`Buffer`\&lt;`ArrayBufferLike`\&gt;\>
 
 ## Stable

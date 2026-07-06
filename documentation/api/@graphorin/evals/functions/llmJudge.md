@@ -10,7 +10,7 @@
 function llmJudge<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/llm/judge.ts:49
+Defined in: [packages/evals/src/scorers/llm/judge.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/llm/judge.ts#L49)
 
 ## Type Parameters
 

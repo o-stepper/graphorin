@@ -6,7 +6,7 @@
 
 # Interface: DeliveryCommentarySanitizer
 
-Defined in: packages/server/src/commentary/sanitizer.ts:46
+Defined in: [packages/server/src/commentary/sanitizer.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L46)
 
 Public surface returned by [createDeliveryCommentarySanitizer](/api/@graphorin/server/functions/createDeliveryCommentarySanitizer.md).
 
@@ -16,9 +16,9 @@ Public surface returned by [createDeliveryCommentarySanitizer](/api/@graphorin/s
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-applytoevents"></a> `applyToEvents` | `readonly` | readonly `string`[] | packages/server/src/commentary/sanitizer.ts:48 |
-| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`DeliveryCommentaryPattern`](/api/@graphorin/server/interfaces/DeliveryCommentaryPattern.md)[] | packages/server/src/commentary/sanitizer.ts:49 |
-| <a id="property-policy"></a> `policy` | `readonly` | [`DeliveryCommentaryPolicy`](/api/@graphorin/server/type-aliases/DeliveryCommentaryPolicy.md) | packages/server/src/commentary/sanitizer.ts:47 |
+| <a id="property-applytoevents"></a> `applyToEvents` | `readonly` | readonly `string`[] | [packages/server/src/commentary/sanitizer.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L48) |
+| <a id="property-patterns"></a> `patterns` | `readonly` | readonly [`DeliveryCommentaryPattern`](/api/@graphorin/server/interfaces/DeliveryCommentaryPattern.md)[] | [packages/server/src/commentary/sanitizer.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L49) |
+| <a id="property-policy"></a> `policy` | `readonly` | [`DeliveryCommentaryPolicy`](/api/@graphorin/server/type-aliases/DeliveryCommentaryPolicy.md) | [packages/server/src/commentary/sanitizer.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L47) |
 
 ## Methods
 
@@ -36,7 +36,7 @@ sanitize(frame, transport): {
 };
 ```
 
-Defined in: packages/server/src/commentary/sanitizer.ts:60
+Defined in: [packages/server/src/commentary/sanitizer.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/sanitizer.ts#L60)
 
 Sanitize the payload of a single `event` frame. Returns the
 (possibly-replaced) frame; emits an audit decision via the
@@ -77,10 +77,10 @@ The frame is returned unchanged when:
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `eventId` | `string` | packages/protocol/dist/server-message.d.ts:103 |
-| `kind` | `"event"` | packages/protocol/dist/server-message.d.ts:100 |
-| `payload?` | `unknown` | packages/protocol/dist/server-message.d.ts:104 |
-| `subject` | `string` | packages/protocol/dist/server-message.d.ts:102 |
-| `subscriptionId` | `string` | packages/protocol/dist/server-message.d.ts:101 |
-| `type` | `string` | packages/protocol/dist/server-message.d.ts:99 |
-| `v` | `"1"` | packages/protocol/dist/server-message.d.ts:98 |
+| `eventId` | `string` | [packages/protocol/dist/server-message.d.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L103) |
+| `kind` | `"event"` | [packages/protocol/dist/server-message.d.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L100) |
+| `payload?` | `unknown` | [packages/protocol/dist/server-message.d.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L104) |
+| `subject` | `string` | [packages/protocol/dist/server-message.d.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L102) |
+| `subscriptionId` | `string` | [packages/protocol/dist/server-message.d.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L101) |
+| `type` | `string` | [packages/protocol/dist/server-message.d.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L99) |
+| `v` | `"1"` | [packages/protocol/dist/server-message.d.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/dist/server-message.d.ts#L98) |

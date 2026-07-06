@@ -10,7 +10,7 @@
 function createFactForgetTool(deps): Tool<FactForgetInput, FactForgetOutput>;
 ```
 
-Defined in: packages/memory/src/tools/fact-tools.ts:363
+Defined in: [packages/memory/src/tools/fact-tools.ts:363](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/fact-tools.ts#L363)
 
 `fact_forget` - soft-delete a fact (kept for replay; never hard-
 deleted at this layer).

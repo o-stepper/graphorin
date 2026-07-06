@@ -10,7 +10,7 @@
 const SUBPROTOCOL_NAME: "graphorin.protocol.v1" = 'graphorin.protocol.v1';
 ```
 
-Defined in: src/subprotocol.ts:22
+Defined in: [packages/protocol/src/subprotocol.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/subprotocol.ts#L22)
 
 Canonical subprotocol identifier for the v1 wire format.
 

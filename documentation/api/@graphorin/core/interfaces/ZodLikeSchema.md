@@ -6,7 +6,7 @@
 
 # Interface: ZodLikeSchema\&lt;TOutput, TInput\&gt;
 
-Defined in: packages/core/src/utils/validation.ts:10
+Defined in: [packages/core/src/utils/validation.ts:10](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L10)
 
 Type-only Zod compatibility shim. We declare a structural type for the
 subset of `zod` we depend on so that `@graphorin/core` can be type-
@@ -27,8 +27,8 @@ peer dependency).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-_input"></a> `_input?` | `readonly` | `TInput` | - | packages/core/src/utils/validation.ts:15 |
-| <a id="property-_output"></a> `_output?` | `readonly` | `TOutput` | Internal phantom used by Zod for inference. We don't dereference it. | packages/core/src/utils/validation.ts:14 |
+| <a id="property-_input"></a> `_input?` | `readonly` | `TInput` | - | [packages/core/src/utils/validation.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L15) |
+| <a id="property-_output"></a> `_output?` | `readonly` | `TOutput` | Internal phantom used by Zod for inference. We don't dereference it. | [packages/core/src/utils/validation.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L14) |
 
 ## Methods
 
@@ -38,7 +38,7 @@ peer dependency).
 parse(data): TOutput;
 ```
 
-Defined in: packages/core/src/utils/validation.ts:11
+Defined in: [packages/core/src/utils/validation.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L11)
 
 #### Parameters
 
@@ -58,7 +58,7 @@ Defined in: packages/core/src/utils/validation.ts:11
 safeParse(data): ZodLikeSafeParseResult<TOutput, TInput>;
 ```
 
-Defined in: packages/core/src/utils/validation.ts:12
+Defined in: [packages/core/src/utils/validation.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/validation.ts#L12)
 
 #### Parameters
 

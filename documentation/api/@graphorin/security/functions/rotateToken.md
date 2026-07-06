@@ -13,7 +13,7 @@ function rotateToken(options): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/auth/crud.ts:169
+Defined in: [packages/security/src/auth/crud.ts:169](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/crud.ts#L169)
 
 Revoke a token and immediately mint a fresh one with the same
 scopes. Useful for grace-period rotations.

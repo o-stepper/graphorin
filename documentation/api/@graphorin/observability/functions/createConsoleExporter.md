@@ -10,7 +10,7 @@
 function createConsoleExporter(opts?): TraceExporter;
 ```
 
-Defined in: packages/observability/src/exporters/console.ts:33
+Defined in: [packages/observability/src/exporters/console.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/exporters/console.ts#L33)
 
 Build a console-based trace exporter. Call `withValidation(exporter)`
 before passing the result to `createTracer({ exporters })`.

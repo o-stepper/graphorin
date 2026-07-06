@@ -10,7 +10,7 @@
 function _setCipherPeerForTesting(ctor): void;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/cipher-peer.ts:75
+Defined in: [packages/store-sqlite-encrypted/src/cipher-peer.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/cipher-peer.ts#L75)
 
 **`Internal`**
 

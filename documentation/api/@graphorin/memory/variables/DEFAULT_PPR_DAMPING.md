@@ -10,6 +10,6 @@
 const DEFAULT_PPR_DAMPING: 0.5 = 0.5;
 ```
 
-Defined in: packages/memory/src/search/graph-ppr.ts:19
+Defined in: [packages/memory/src/search/graph-ppr.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/graph-ppr.ts#L19)
 
 Default damping applied per hop (activation × damping^depth).

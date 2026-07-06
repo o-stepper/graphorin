@@ -94,6 +94,8 @@
   "basePath": "..",
   "packageOptions": {
     "disableGit": true,
-    "basePath": "../.."
-  }
+    "basePath": "../..",
+    "sourceLinkTemplate": "https://github.com/o-stepper/graphorin/blob/main/{path}#L{line}"
+  },
+  "sourceLinkTemplate": "https://github.com/o-stepper/graphorin/blob/main/{path}#L{line}"
 }

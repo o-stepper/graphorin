@@ -10,7 +10,7 @@
 function computeEntriesDigest(entries): string;
 ```
 
-Defined in: pricing/src/snapshot/bundled.ts:276
+Defined in: [packages/pricing/src/snapshot/bundled.ts:276](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/snapshot/bundled.ts#L276)
 
 **`Internal`**
 

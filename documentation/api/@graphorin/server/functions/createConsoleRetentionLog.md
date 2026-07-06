@@ -12,7 +12,7 @@ function createConsoleRetentionLog(flavour):
   | undefined;
 ```
 
-Defined in: packages/server/src/runtime/retention.ts:130
+Defined in: [packages/server/src/runtime/retention.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/retention.ts#L130)
 
 Console-backed [RetentionLog](/api/@graphorin/server/type-aliases/RetentionLog.md) honouring the
 `observability.logger` config flavour. Returns `undefined` for

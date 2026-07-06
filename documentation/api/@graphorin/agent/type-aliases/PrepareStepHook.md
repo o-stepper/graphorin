@@ -12,7 +12,7 @@ type PrepareStepHook<TDeps> = (ctx) =>
 | PrepareStepOverrides<TDeps>;
 ```
 
-Defined in: packages/agent/src/types.ts:84
+Defined in: [packages/agent/src/types.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/types.ts#L84)
 
 Per-step override hook. Receives the current `RunContext` and may
 return overrides applied to the next provider call only.
@@ -31,7 +31,7 @@ return overrides applied to the next provider call only.
 
 ## Returns
 
-  \| `Promise`\&lt;[`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;\&gt;
+  \| `Promise`\<[`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;\>
   \| [`PrepareStepOverrides`](/api/@graphorin/agent/interfaces/PrepareStepOverrides.md)\&lt;`TDeps`\&gt;
 
 ## Stable

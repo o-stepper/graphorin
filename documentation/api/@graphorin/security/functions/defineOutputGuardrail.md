@@ -10,7 +10,7 @@
 function defineOutputGuardrail<TValue>(spec): OutputGuardrail<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builders.ts:40
+Defined in: [packages/security/src/guardrails/builders.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builders.ts#L40)
 
 Create a typed output guardrail. Thin wrapper around the
 declarative shape.
@@ -25,7 +25,7 @@ declarative shape.
 
 | Parameter | Type |
 | ------ | ------ |
-| `spec` | `Omit`\&lt;[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`TValue`\&gt;, `"kind"`\&gt; |
+| `spec` | `Omit`\<[`OutputGuardrail`](/api/@graphorin/security/type-aliases/OutputGuardrail.md)\&lt;`TValue`\&gt;, `"kind"`\> |
 
 ## Returns
 

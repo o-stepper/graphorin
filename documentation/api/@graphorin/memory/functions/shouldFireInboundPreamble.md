@@ -10,7 +10,7 @@
 function shouldFireInboundPreamble(annotations): boolean;
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:155
+Defined in: [packages/memory/src/context-engine/annotations.ts:155](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L155)
 
 Decide whether the per-step inbound-sanitization preamble (D4)
 should fire for an assembled message list. The preamble fires

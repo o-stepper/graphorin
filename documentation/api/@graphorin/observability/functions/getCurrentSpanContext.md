@@ -15,7 +15,7 @@ function getCurrentSpanContext():
   | undefined;
 ```
 
-Defined in: packages/observability/src/logger/logger.ts:77
+Defined in: [packages/observability/src/logger/logger.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/logger/logger.ts#L77)
 
 Read the current span context (if any). Useful for callers that
 want to attach span metadata to bespoke records.

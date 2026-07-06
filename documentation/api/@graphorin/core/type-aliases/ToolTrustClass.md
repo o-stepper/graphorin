@@ -16,7 +16,7 @@ type ToolTrustClass =
   | "web-search";
 ```
 
-Defined in: packages/core/src/types/tool.ts:111
+Defined in: [packages/core/src/types/tool.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L111)
 
 Trust class assigned to a registered tool. The class is computed at
 registration time from the registration source and the declared

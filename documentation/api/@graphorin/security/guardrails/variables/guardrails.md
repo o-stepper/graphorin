@@ -18,7 +18,7 @@ const guardrails: Readonly<{
 }>;
 ```
 
-Defined in: packages/security/src/guardrails/index.ts:65
+Defined in: [packages/security/src/guardrails/index.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/index.ts#L65)
 
 Bundled namespace of built-in guardrail factories. Mirrors the
 `guardrails.maxLength({ ... })` style used by the framework's

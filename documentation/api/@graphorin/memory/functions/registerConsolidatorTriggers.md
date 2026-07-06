@@ -13,7 +13,7 @@ function registerConsolidatorTriggers(
 options): Promise<RegisterTriggersResult>;
 ```
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:138
+Defined in: [packages/memory/src/consolidator/scheduler.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/scheduler.ts#L138)
 
 Register every cron / idle / interval trigger declared on the
 supplied consolidator with the scheduler. Each trigger fires

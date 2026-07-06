@@ -10,7 +10,7 @@
 function resolveLocalePack(input, options?): ContextLocalePack;
 ```
 
-Defined in: packages/memory/src/context-engine/locale-packs/resolver.ts:86
+Defined in: [packages/memory/src/context-engine/locale-packs/resolver.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/resolver.ts#L86)
 
 Materialize a locale pack from a partial input + the English
 fallback. Pure: no I/O outside the bounded WARN registry.

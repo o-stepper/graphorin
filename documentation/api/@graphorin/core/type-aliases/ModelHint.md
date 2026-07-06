@@ -10,7 +10,7 @@
 type ModelHint = "fast" | "balanced" | "smart";
 ```
 
-Defined in: packages/core/src/contracts/preferred-model.ts:23
+Defined in: [packages/core/src/contracts/preferred-model.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L23)
 
 Cost-tier vocabulary for declaring a preferred model on a tool or
 agent. Provider-agnostic at the tool-author level; the operator-side

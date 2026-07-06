@@ -10,7 +10,7 @@
 type AuthAuditDecision = "success" | "denied" | "error";
 ```
 
-Defined in: packages/security/src/auth/audit-emitter.ts:29
+Defined in: [packages/security/src/auth/audit-emitter.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/audit-emitter.ts#L29)
 
 Outcome of a single auth audit event.
 

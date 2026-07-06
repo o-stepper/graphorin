@@ -16,7 +16,7 @@ type GenAIToolType =
   | "file_search";
 ```
 
-Defined in: packages/observability/src/gen-ai/types.ts:37
+Defined in: [packages/observability/src/gen-ai/types.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L37)
 
 `gen_ai.tool.type` enum value. Defaults to `'function'` for
 user-defined and MCP-derived tools without explicit declaration.

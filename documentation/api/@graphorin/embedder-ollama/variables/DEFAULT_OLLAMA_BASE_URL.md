@@ -10,7 +10,7 @@
 const DEFAULT_OLLAMA_BASE_URL: "http://127.0.0.1:11434" = 'http://127.0.0.1:11434';
 ```
 
-Defined in: packages/embedder-ollama/src/index.ts:22
+Defined in: [packages/embedder-ollama/src/index.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-ollama/src/index.ts#L22)
 
 Default Ollama base URL. Operators that run Ollama on a non-default
 port pass an explicit `baseUrl`.

@@ -27,7 +27,7 @@ type AgentRuntimeErrorCode =
   | "concurrent-run";
 ```
 
-Defined in: packages/agent/src/errors/index.ts:16
+Defined in: [packages/agent/src/errors/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/errors/index.ts#L16)
 
 Stable code discriminator surfaced on every [AgentRuntimeError](/api/@graphorin/agent/errors/classes/AgentRuntimeError.md).
 

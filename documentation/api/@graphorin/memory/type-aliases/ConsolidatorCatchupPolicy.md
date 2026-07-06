@@ -10,7 +10,7 @@
 type ConsolidatorCatchupPolicy = "none" | "last" | "all";
 ```
 
-Defined in: packages/memory/src/consolidator/scheduler.ts:27
+Defined in: [packages/memory/src/consolidator/scheduler.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/scheduler.ts#L27)
 
 Catch-up policy applied when a trigger missed one or more fires
 while the scheduler was offline. Mirrors

@@ -10,7 +10,7 @@
 function onAuthAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/auth/audit-emitter.ts:66
+Defined in: [packages/security/src/auth/audit-emitter.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/audit-emitter.ts#L66)
 
 Subscribe to auth audit events. Returns an unsubscribe function.
 

@@ -10,7 +10,7 @@
 const literalResolver: SecretResolver;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/literal.ts:70
+Defined in: [packages/security/src/secrets/resolvers/literal.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/literal.ts#L70)
 
 Resolver for the `literal:` scheme. Triple-gated and tests-only.
 

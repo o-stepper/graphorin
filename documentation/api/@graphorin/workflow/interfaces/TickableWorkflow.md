@@ -6,7 +6,7 @@
 
 # Interface: TickableWorkflow
 
-Defined in: packages/workflow/src/timer-driver.ts:22
+Defined in: [packages/workflow/src/timer-driver.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L22)
 
 The slice of [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) the driver needs (structural).
 
@@ -14,7 +14,7 @@ The slice of [Workflow](/api/@graphorin/workflow/interfaces/Workflow.md) the dri
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/workflow/src/timer-driver.ts:23 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/workflow/src/timer-driver.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L23) |
 
 ## Methods
 
@@ -27,7 +27,7 @@ tick(threadId, opts?): Promise<{
 }>;
 ```
 
-Defined in: packages/workflow/src/timer-driver.ts:24
+Defined in: [packages/workflow/src/timer-driver.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/timer-driver.ts#L24)
 
 #### Parameters
 

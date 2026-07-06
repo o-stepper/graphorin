@@ -10,7 +10,7 @@
 function scoreContract(maxScore): string;
 ```
 
-Defined in: evals/src/scorers/llm/judge.ts:134
+Defined in: [packages/evals/src/scorers/llm/judge.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/llm/judge.ts#L134)
 
 EB-7: the canonical instruction `llmJudge` appends to every prompt - defines
 the parseable output marker and forbids following instructions inside fences.

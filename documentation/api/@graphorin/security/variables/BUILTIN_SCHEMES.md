@@ -10,7 +10,7 @@
 const BUILTIN_SCHEMES: ReadonlyArray<string>;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:12
+Defined in: [packages/security/src/secrets/secret-ref.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L12)
 
 Set of scheme names the parser knows about by default. Every entry
 corresponds to a built-in resolver shipped from `./resolvers/`.

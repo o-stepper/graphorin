@@ -10,7 +10,7 @@
 function cipherIntegrityCheck(conn): CipherIntegrityCheckResult;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/integrity-check.ts:40
+Defined in: [packages/store-sqlite-encrypted/src/integrity-check.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/integrity-check.ts#L40)
 
 Runs `PRAGMA integrity_check` against the provided connection. The
 connection MUST already be open with the cipher key applied

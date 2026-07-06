@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/skills/src/index.ts:40
+Defined in: [packages/skills/src/index.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/index.ts#L40)

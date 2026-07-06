@@ -6,7 +6,7 @@
 
 # Interface: GuardrailTrippedEvent
 
-Defined in: packages/core/src/types/agent-event.ts:290
+Defined in: [packages/core/src/types/agent-event.ts:290](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L290)
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/core/src/types/agent-event.ts:290
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-guardrailname"></a> `guardrailName` | `readonly` | `string` | packages/core/src/types/agent-event.ts:292 |
-| <a id="property-phase"></a> `phase` | `readonly` | `"output"` \| `"input"` | packages/core/src/types/agent-event.ts:293 |
-| <a id="property-reason"></a> `reason?` | `readonly` | `string` | packages/core/src/types/agent-event.ts:294 |
-| <a id="property-type"></a> `type` | `readonly` | `"guardrail.tripped"` | packages/core/src/types/agent-event.ts:291 |
+| <a id="property-guardrailname"></a> `guardrailName` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:292](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L292) |
+| <a id="property-phase"></a> `phase` | `readonly` | `"output"` \| `"input"` | [packages/core/src/types/agent-event.ts:293](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L293) |
+| <a id="property-reason"></a> `reason?` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:294](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L294) |
+| <a id="property-type"></a> `type` | `readonly` | `"guardrail.tripped"` | [packages/core/src/types/agent-event.ts:291](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L291) |

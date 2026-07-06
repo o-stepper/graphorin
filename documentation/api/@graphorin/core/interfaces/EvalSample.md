@@ -6,7 +6,7 @@
 
 # Interface: EvalSample\&lt;TInput, TOutput\&gt;
 
-Defined in: packages/core/src/contracts/eval-scorer.ts:25
+Defined in: [packages/core/src/contracts/eval-scorer.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L25)
 
 A single sample from an eval dataset.
 
@@ -23,8 +23,8 @@ A single sample from an eval dataset.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-actual"></a> `actual` | `readonly` | `TOutput` | packages/core/src/contracts/eval-scorer.ts:29 |
-| <a id="property-expected"></a> `expected?` | `readonly` | `TOutput` | packages/core/src/contracts/eval-scorer.ts:28 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/eval-scorer.ts:26 |
-| <a id="property-input"></a> `input` | `readonly` | `TInput` | packages/core/src/contracts/eval-scorer.ts:27 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/core/src/contracts/eval-scorer.ts:30 |
+| <a id="property-actual"></a> `actual` | `readonly` | `TOutput` | [packages/core/src/contracts/eval-scorer.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L29) |
+| <a id="property-expected"></a> `expected?` | `readonly` | `TOutput` | [packages/core/src/contracts/eval-scorer.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L28) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/core/src/contracts/eval-scorer.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L26) |
+| <a id="property-input"></a> `input` | `readonly` | `TInput` | [packages/core/src/contracts/eval-scorer.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L27) |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | [packages/core/src/contracts/eval-scorer.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/eval-scorer.ts#L30) |

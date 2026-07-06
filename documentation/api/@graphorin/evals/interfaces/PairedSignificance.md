@@ -6,7 +6,7 @@
 
 # Interface: PairedSignificance
 
-Defined in: evals/src/stats.ts:125
+Defined in: [packages/evals/src/stats.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L125)
 
 Result of [pairedPassSignificance](/api/@graphorin/evals/functions/pairedPassSignificance.md).
 
@@ -16,7 +16,7 @@ Result of [pairedPassSignificance](/api/@graphorin/evals/functions/pairedPassSig
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-improved"></a> `improved` | `readonly` | `number` | baseline-fail -> current-pass count (the improvements). | evals/src/stats.ts:131 |
-| <a id="property-pairs"></a> `pairs` | `readonly` | `number` | Cases present in BOTH runs (the paired sample). | evals/src/stats.ts:127 |
-| <a id="property-pvalue"></a> `pValue` | `readonly` | `number` | Two-sided p-value from McNemar's test (continuity-corrected normal approximation over the discordant pairs). `1` when there are no discordant pairs - identical outcomes are never "significant". | evals/src/stats.ts:137 |
-| <a id="property-regressed"></a> `regressed` | `readonly` | `number` | baseline-pass -> current-fail count (the regressions). | evals/src/stats.ts:129 |
+| <a id="property-improved"></a> `improved` | `readonly` | `number` | baseline-fail -> current-pass count (the improvements). | [packages/evals/src/stats.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L131) |
+| <a id="property-pairs"></a> `pairs` | `readonly` | `number` | Cases present in BOTH runs (the paired sample). | [packages/evals/src/stats.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L127) |
+| <a id="property-pvalue"></a> `pValue` | `readonly` | `number` | Two-sided p-value from McNemar's test (continuity-corrected normal approximation over the discordant pairs). `1` when there are no discordant pairs - identical outcomes are never "significant". | [packages/evals/src/stats.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L137) |
+| <a id="property-regressed"></a> `regressed` | `readonly` | `number` | baseline-pass -> current-fail count (the regressions). | [packages/evals/src/stats.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/stats.ts#L129) |

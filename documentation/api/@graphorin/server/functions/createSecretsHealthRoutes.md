@@ -12,7 +12,7 @@ function createSecretsHealthRoutes(): Hono<{
 }>;
 ```
 
-Defined in: packages/server/src/health/routes.ts:74
+Defined in: [packages/server/src/health/routes.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/routes.ts#L74)
 
 Authed health route. Mounted at `${base}/health/secrets` AFTER the
 auth middleware so the scope check has a verified token to inspect.

@@ -10,7 +10,7 @@
 function createWsDispatcher(options?): WsDispatcher;
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:213
+Defined in: [packages/server/src/ws/dispatcher.ts:213](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L213)
 
 Build a fresh dispatcher.
 

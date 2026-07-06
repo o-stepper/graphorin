@@ -10,7 +10,7 @@
 function exitOnFailures<I, O>(report, regression?): void;
 ```
 
-Defined in: evals/src/cli/index.ts:51
+Defined in: [packages/evals/src/cli/index.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L51)
 
 Set `process.exitCode` to `1` when at least one case failed, or
 when a regression report contains findings. Uses `exitCode` rather

@@ -10,7 +10,7 @@
 function normalizeForPiiMatching(text): string;
 ```
 
-Defined in: packages/security/src/guardrails/normalize.ts:41
+Defined in: [packages/security/src/guardrails/normalize.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/normalize.ts#L41)
 
 Case-preserving variant of [normalizeForMatching](/api/@graphorin/security/functions/normalizeForMatching.md) for the PII
 catalogue (W-150): NFKC + zero-width strip WITHOUT lowercasing.

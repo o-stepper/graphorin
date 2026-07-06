@@ -10,7 +10,7 @@
 function parseDuration(input): number;
 ```
 
-Defined in: packages/cli/src/commands/token.ts:340
+Defined in: [packages/cli/src/commands/token.ts:340](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/token.ts#L340)
 
 **`Internal`**
 

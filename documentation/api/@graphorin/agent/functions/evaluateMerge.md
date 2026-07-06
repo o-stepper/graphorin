@@ -10,7 +10,7 @@
 function evaluateMerge(perChild, cfg): MergeBiasDecision;
 ```
 
-Defined in: packages/agent/src/lateral-leak/merge-guard.ts:120
+Defined in: [packages/agent/src/lateral-leak/merge-guard.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/merge-guard.ts#L120)
 
 Evaluate whether the merge is biased - a child with
 `sourceTrust < lowTrustThreshold` contributing more than

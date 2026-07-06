@@ -12,6 +12,6 @@ type StreamingEvent =
   | ToolExecutePartialEvent;
 ```
 
-Defined in: packages/tools/src/streaming/channel.ts:27
+Defined in: [packages/tools/src/streaming/channel.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/streaming/channel.ts#L27)
 
 Discriminated union of streaming events the channel forwards.

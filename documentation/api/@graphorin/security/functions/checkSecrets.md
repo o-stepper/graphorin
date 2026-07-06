@@ -10,7 +10,7 @@
 function checkSecrets(): CheckResult[];
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:120
+Defined in: [packages/security/src/hardening/doctor.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/doctor.ts#L120)
 
 Wrapper around `getSecretsStoreStatus(...)` from the secrets
 subsystem. Surfaces any active downgrade as a `'warn'` and

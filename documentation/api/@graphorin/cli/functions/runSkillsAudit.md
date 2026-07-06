@@ -10,7 +10,7 @@
 function runSkillsAudit(options?): readonly SkillInstallationStatus[];
 ```
 
-Defined in: packages/cli/src/commands/skills.ts:146
+Defined in: [packages/cli/src/commands/skills.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/skills.ts#L146)
 
 ## Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorStatePatch
 
-Defined in: packages/store-sqlite/src/consolidator-store.ts:41
+Defined in: [packages/store-sqlite/src/consolidator-store.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L41)
 
 ## Stable
 
@@ -14,10 +14,10 @@ Defined in: packages/store-sqlite/src/consolidator-store.ts:41
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-activelockacquiredat"></a> `activeLockAcquiredAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:47 |
-| <a id="property-activelockheldby"></a> `activeLockHeldBy?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:46 |
-| <a id="property-lastcompletedat"></a> `lastCompletedAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:44 |
-| <a id="property-lastphase"></a> `lastPhase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | packages/store-sqlite/src/consolidator-store.ts:43 |
-| <a id="property-lastprocessedmessageid"></a> `lastProcessedMessageId?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/consolidator-store.ts:42 |
-| <a id="property-nexteligibleat"></a> `nextEligibleAt?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:45 |
-| <a id="property-reflectionwatermark"></a> `reflectionWatermark?` | `readonly` | `number` \| `null` | packages/store-sqlite/src/consolidator-store.ts:48 |
+| <a id="property-activelockacquiredat"></a> `activeLockAcquiredAt?` | `readonly` | `number` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L47) |
+| <a id="property-activelockheldby"></a> `activeLockHeldBy?` | `readonly` | `string` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L46) |
+| <a id="property-lastcompletedat"></a> `lastCompletedAt?` | `readonly` | `number` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L44) |
+| <a id="property-lastphase"></a> `lastPhase?` | `readonly` | `"light"` \| `"standard"` \| `"deep"` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L43) |
+| <a id="property-lastprocessedmessageid"></a> `lastProcessedMessageId?` | `readonly` | `string` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L42) |
+| <a id="property-nexteligibleat"></a> `nextEligibleAt?` | `readonly` | `number` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L45) |
+| <a id="property-reflectionwatermark"></a> `reflectionWatermark?` | `readonly` | `number` \| `null` | [packages/store-sqlite/src/consolidator-store.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/consolidator-store.ts#L48) |

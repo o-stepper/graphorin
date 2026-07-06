@@ -10,4 +10,4 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/triggers/src/index.ts:16
+Defined in: [packages/triggers/src/index.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L16)

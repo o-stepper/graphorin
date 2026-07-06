@@ -13,7 +13,7 @@ function composeGuardrails<TValue>(
 ctx): Promise<ComposedGuardrailResult<TValue>>;
 ```
 
-Defined in: packages/security/src/guardrails/builders.ts:58
+Defined in: [packages/security/src/guardrails/builders.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builders.ts#L58)
 
 Compose a sequence of guardrails into a single check that runs
 them in order. The first `'block'` short-circuits; `'warn'` is
@@ -40,6 +40,6 @@ results without exception handling.
 
 ## Returns
 
-`Promise`\&lt;[`ComposedGuardrailResult`](/api/@graphorin/security/type-aliases/ComposedGuardrailResult.md)\&lt;`TValue`\&gt;\&gt;
+`Promise`\<[`ComposedGuardrailResult`](/api/@graphorin/security/type-aliases/ComposedGuardrailResult.md)\&lt;`TValue`\&gt;\>
 
 ## Stable

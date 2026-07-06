@@ -6,7 +6,7 @@
 
 # Interface: WorkflowTimerDaemon
 
-Defined in: packages/server/src/workflows/timer-daemon.ts:60
+Defined in: [packages/server/src/workflows/timer-daemon.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L60)
 
 Stateful handle returned by [createWorkflowTimerDaemon](/api/@graphorin/server/functions/createWorkflowTimerDaemon.md).
 
@@ -16,7 +16,7 @@ Stateful handle returned by [createWorkflowTimerDaemon](/api/@graphorin/server/f
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-driver"></a> `driver` | `readonly` | [`WorkflowTimerDriverLike`](/api/@graphorin/server/interfaces/WorkflowTimerDriverLike.md) | packages/server/src/workflows/timer-daemon.ts:64 |
+| <a id="property-driver"></a> `driver` | `readonly` | [`WorkflowTimerDriverLike`](/api/@graphorin/server/interfaces/WorkflowTimerDriverLike.md) | [packages/server/src/workflows/timer-daemon.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L64) |
 
 ## Methods
 
@@ -26,7 +26,7 @@ Stateful handle returned by [createWorkflowTimerDaemon](/api/@graphorin/server/f
 start(): Promise<void>;
 ```
 
-Defined in: packages/server/src/workflows/timer-daemon.ts:61
+Defined in: [packages/server/src/workflows/timer-daemon.ts:61](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L61)
 
 #### Returns
 
@@ -40,7 +40,7 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:61
 status(): Promise<WorkflowTimerDaemonStatus>;
 ```
 
-Defined in: packages/server/src/workflows/timer-daemon.ts:63
+Defined in: [packages/server/src/workflows/timer-daemon.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L63)
 
 #### Returns
 
@@ -54,7 +54,7 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:63
 stop(): Promise<void>;
 ```
 
-Defined in: packages/server/src/workflows/timer-daemon.ts:62
+Defined in: [packages/server/src/workflows/timer-daemon.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L62)
 
 #### Returns
 

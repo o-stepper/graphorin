@@ -10,7 +10,7 @@
 function createOpCli(deps?): OpCli;
 ```
 
-Defined in: packages/secret-1password/src/op-cli.ts:127
+Defined in: [packages/secret-1password/src/op-cli.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/op-cli.ts#L127)
 
 [OpCli](/api/@graphorin/secret-1password/interfaces/OpCli.md) factory with an injectable `spawn` (for tests). Production
 code uses [createDefaultOpCli](/api/@graphorin/secret-1password/functions/createDefaultOpCli.md).

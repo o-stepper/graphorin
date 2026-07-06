@@ -10,7 +10,7 @@
 function stampSkillToolFromMetadata<TInput, TOutput, TDeps>(tool, metadata): StampedSkillTool<TInput, TOutput, TDeps>;
 ```
 
-Defined in: packages/skills/src/registry/bridge.ts:66
+Defined in: [packages/skills/src/registry/bridge.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/registry/bridge.ts#L66)
 
 Lower-level variant accepting a raw [SkillMetadata](/api/@graphorin/skills/interfaces/SkillMetadata.md) so
 fixtures and tests do not have to materialise a full [Skill](/api/@graphorin/skills/interfaces/Skill.md).

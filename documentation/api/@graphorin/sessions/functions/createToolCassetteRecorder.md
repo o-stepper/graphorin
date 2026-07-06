@@ -10,7 +10,7 @@
 function createToolCassetteRecorder(options): ToolCassetteRecorder;
 ```
 
-Defined in: packages/sessions/src/cassette/recorder.ts:92
+Defined in: [packages/sessions/src/cassette/recorder.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/recorder.ts#L92)
 
 Build a recorder that buffers every record into memory and flushes
 to disk on `flushToFile()`. The recorder is intentionally

@@ -6,7 +6,7 @@
 
 # Interface: StorageCleanupBackupsResult
 
-Defined in: packages/cli/src/commands/storage.ts:461
+Defined in: [packages/cli/src/commands/storage.ts:461](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L461)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/cli/src/commands/storage.ts:461
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-directory"></a> `directory` | `readonly` | `string` | packages/cli/src/commands/storage.ts:462 |
-| <a id="property-dryrun"></a> `dryRun` | `readonly` | `boolean` | packages/cli/src/commands/storage.ts:464 |
-| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | packages/cli/src/commands/storage.ts:463 |
+| <a id="property-directory"></a> `directory` | `readonly` | `string` | [packages/cli/src/commands/storage.ts:462](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L462) |
+| <a id="property-dryrun"></a> `dryRun` | `readonly` | `boolean` | [packages/cli/src/commands/storage.ts:464](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L464) |
+| <a id="property-removed"></a> `removed` | `readonly` | readonly `string`[] | [packages/cli/src/commands/storage.ts:463](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L463) |

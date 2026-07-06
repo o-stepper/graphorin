@@ -10,7 +10,7 @@
 function anyValue<T>(opts?): AnyValue<T>;
 ```
 
-Defined in: packages/core/dist/channels/channels.d.ts:110
+Defined in: [packages/core/dist/channels/channels.d.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts#L110)
 
 Construct an `AnyValue` channel.
 

@@ -6,7 +6,7 @@
 
 # Interface: LoadDmrOptions
 
-Defined in: evals/src/loaders/dmr.ts:38
+Defined in: [packages/evals/src/loaders/dmr.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/dmr.ts#L38)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: evals/src/loaders/dmr.ts:38
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description surfaced in `Dataset.metadata.description`. | evals/src/loaders/dmr.ts:44 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional dataset name surfaced in `Dataset.metadata.name`. | evals/src/loaders/dmr.ts:42 |
-| <a id="property-path"></a> `path` | `readonly` | `string` | Local path to the DMR JSON (under `benchmarks/.datasets/`). | evals/src/loaders/dmr.ts:40 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description surfaced in `Dataset.metadata.description`. | [packages/evals/src/loaders/dmr.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/dmr.ts#L44) |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional dataset name surfaced in `Dataset.metadata.name`. | [packages/evals/src/loaders/dmr.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/dmr.ts#L42) |
+| <a id="property-path"></a> `path` | `readonly` | `string` | Local path to the DMR JSON (under `benchmarks/.datasets/`). | [packages/evals/src/loaders/dmr.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/dmr.ts#L40) |

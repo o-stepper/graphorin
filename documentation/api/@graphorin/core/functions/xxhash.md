@@ -10,7 +10,7 @@
 function xxhash(input, seed?): string;
 ```
 
-Defined in: packages/core/src/utils/hash.ts:39
+Defined in: [packages/core/src/utils/hash.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/hash.ts#L39)
 
 Pure-JS XXH32 implementation. Used by the memory-modification guard
 - fast, non-cryptographic content fingerprinting (`xxhash(content)`

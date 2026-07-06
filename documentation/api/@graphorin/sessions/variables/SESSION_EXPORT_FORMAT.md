@@ -10,7 +10,7 @@
 const SESSION_EXPORT_FORMAT: "graphorin-session-export" = 'graphorin-session-export';
 ```
 
-Defined in: packages/sessions/src/export/types.ts:31
+Defined in: [packages/sessions/src/export/types.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L31)
 
 Stable canonical format identifier surfaced in every header.
 

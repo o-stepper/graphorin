@@ -6,7 +6,7 @@
 
 # Interface: LookupPriceArgs
 
-Defined in: pricing/src/types.ts:71
+Defined in: [packages/pricing/src/types.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/types.ts#L71)
 
 Lookup criteria.
 
@@ -16,6 +16,6 @@ Lookup criteria.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-model"></a> `model` | `readonly` | `string` | pricing/src/types.ts:73 |
-| <a id="property-provider"></a> `provider` | `readonly` | `string` | pricing/src/types.ts:72 |
-| <a id="property-region"></a> `region?` | `readonly` | `string` | pricing/src/types.ts:74 |
+| <a id="property-model"></a> `model` | `readonly` | `string` | [packages/pricing/src/types.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/types.ts#L73) |
+| <a id="property-provider"></a> `provider` | `readonly` | `string` | [packages/pricing/src/types.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/types.ts#L72) |
+| <a id="property-region"></a> `region?` | `readonly` | `string` | [packages/pricing/src/types.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/types.ts#L74) |

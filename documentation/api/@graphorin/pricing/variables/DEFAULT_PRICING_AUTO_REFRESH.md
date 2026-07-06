@@ -10,7 +10,7 @@
 const DEFAULT_PRICING_AUTO_REFRESH: PricingAutoRefreshConfig;
 ```
 
-Defined in: pricing/src/config.ts:27
+Defined in: [packages/pricing/src/config.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/config.ts#L27)
 
 Default auto-refresh configuration.
 

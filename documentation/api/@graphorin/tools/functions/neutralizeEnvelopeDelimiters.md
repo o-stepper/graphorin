@@ -10,7 +10,7 @@
 function neutralizeEnvelopeDelimiters(body, options?): string;
 ```
 
-Defined in: packages/tools/src/inbound/envelope.ts:90
+Defined in: [packages/tools/src/inbound/envelope.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/inbound/envelope.ts#L90)
 
 Replace untrusted-content envelope markers embedded in `body` with
 the visible `[[` / `]]` bracket-substitution so the body cannot

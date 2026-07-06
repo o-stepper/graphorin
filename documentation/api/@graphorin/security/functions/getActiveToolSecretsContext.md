@@ -12,7 +12,7 @@ function getActiveToolSecretsContext():
   | undefined;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:53
+Defined in: [packages/security/src/secrets/acl.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L53)
 
 Read the active per-tool secrets context, if any. Returns
 `undefined` outside an explicit `withToolSecretsContext(...)` scope -

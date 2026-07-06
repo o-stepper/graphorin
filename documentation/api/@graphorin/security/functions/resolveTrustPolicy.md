@@ -10,7 +10,7 @@
 function resolveTrustPolicy(source, trustLevel): ResolvedSkillTrustPolicy;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:132
+Defined in: [packages/security/src/supply-chain/policy.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/policy.ts#L132)
 
 Resolve the trust policy for a (source, trust-level) tuple. The
 resolver enforces the project-wide rule that npm/git installs

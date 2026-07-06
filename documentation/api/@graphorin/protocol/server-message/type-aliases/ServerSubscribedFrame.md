@@ -10,6 +10,6 @@
 type ServerSubscribedFrame = z.infer<typeof SubscribedFrame>;
 ```
 
-Defined in: src/server-message.ts:184
+Defined in: [packages/protocol/src/server-message.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L184)
 
 ## Stable

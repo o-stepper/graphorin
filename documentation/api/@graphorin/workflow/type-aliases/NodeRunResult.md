@@ -16,7 +16,7 @@ type NodeRunResult<TState> =
 | Partial<TState>>;
 ```
 
-Defined in: packages/workflow/src/types.ts:221
+Defined in: [packages/workflow/src/types.ts:221](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L221)
 
 Permissible return shapes from a node's `run(...)` callback.
 

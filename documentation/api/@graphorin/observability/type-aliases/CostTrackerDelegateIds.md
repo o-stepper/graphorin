@@ -10,7 +10,7 @@
 type CostTrackerDelegateIds = Pick<CostRecordInput, "spanId" | "parentSpanId" | "runId" | "sessionId" | "agentId" | "userId">;
 ```
 
-Defined in: packages/observability/src/cost/delegate.ts:49
+Defined in: [packages/observability/src/cost/delegate.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/delegate.ts#L49)
 
 Attribution ids for one recorded call. `spanId` is mandatory (the
 tracker keys rollups on it); everything else is optional scope

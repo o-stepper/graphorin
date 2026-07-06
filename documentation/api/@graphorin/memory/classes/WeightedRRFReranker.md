@@ -6,7 +6,7 @@
 
 # Class: WeightedRRFReranker
 
-Defined in: packages/memory/src/search/rrf.ts:73
+Defined in: [packages/memory/src/search/rrf.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L73)
 
 Weighted-RRF reranker (X-2). Fuses parallel ranked lists through
 [fuseWeighted](/api/@graphorin/memory/functions/fuseWeighted.md), applying a per-list `weights[i]` so a caller who
@@ -34,7 +34,7 @@ record id, and it preserves the upstream `signals` on each hit.
 new WeightedRRFReranker(args): WeightedRRFReranker;
 ```
 
-Defined in: packages/memory/src/search/rrf.ts:78
+Defined in: [packages/memory/src/search/rrf.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L78)
 
 #### Parameters
 
@@ -52,9 +52,9 @@ Defined in: packages/memory/src/search/rrf.ts:78
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `"weighted-rrf"` | Stable lowercase identifier surfaced on every span. | packages/memory/src/search/rrf.ts:74 |
-| <a id="property-k"></a> `k` | `readonly` | `number` | - | packages/memory/src/search/rrf.ts:75 |
-| <a id="property-weights"></a> `weights` | `readonly` | readonly `number`[] | - | packages/memory/src/search/rrf.ts:76 |
+| <a id="property-id"></a> `id` | `readonly` | `"weighted-rrf"` | Stable lowercase identifier surfaced on every span. | [packages/memory/src/search/rrf.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L74) |
+| <a id="property-k"></a> `k` | `readonly` | `number` | - | [packages/memory/src/search/rrf.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L75) |
+| <a id="property-weights"></a> `weights` | `readonly` | readonly `number`[] | - | [packages/memory/src/search/rrf.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L76) |
 
 ## Methods
 
@@ -67,7 +67,7 @@ rerank<TRecord>(
 options?): Promise<readonly MemoryHit<TRecord>[]>;
 ```
 
-Defined in: packages/memory/src/search/rrf.ts:96
+Defined in: [packages/memory/src/search/rrf.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/rrf.ts#L96)
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be
@@ -89,7 +89,7 @@ sorted by `score` descending.
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TRecord`\&gt;[]\>
 
 #### Implementation of
 

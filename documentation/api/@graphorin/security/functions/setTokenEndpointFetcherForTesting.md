@@ -10,7 +10,7 @@
 function _setTokenEndpointFetcherForTesting(fetcher): void;
 ```
 
-Defined in: packages/security/src/oauth/token-endpoint.ts:56
+Defined in: [packages/security/src/oauth/token-endpoint.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/token-endpoint.ts#L56)
 
 **`Experimental`**
 

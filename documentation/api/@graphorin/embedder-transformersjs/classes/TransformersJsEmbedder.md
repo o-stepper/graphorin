@@ -6,7 +6,7 @@
 
 # Class: TransformersJsEmbedder
 
-Defined in: packages/embedder-transformersjs/src/index.ts:137
+Defined in: [packages/embedder-transformersjs/src/index.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L137)
 
 `EmbedderProvider` implementation backed by `@huggingface/transformers`.
 
@@ -24,7 +24,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:137
 new TransformersJsEmbedder(options): TransformersJsEmbedder;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:152
+Defined in: [packages/embedder-transformersjs/src/index.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L152)
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/embedder-transformersjs/src/index.ts:152
 configHash(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:188
+Defined in: [packages/embedder-transformersjs/src/index.ts:188](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L188)
 
 Stable hash of the embedder's configuration (model + revision + opts).
 
@@ -64,7 +64,7 @@ Stable hash of the embedder's configuration (model + revision + opts).
 dim(): number;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:179
+Defined in: [packages/embedder-transformersjs/src/index.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L179)
 
 Output dimension - the explicit `dim` option, a known-model
 default, or the width resolved from the first `embed()`.
@@ -91,7 +91,7 @@ embedder swap.
 embed(texts, opts?): Promise<readonly Float32Array<ArrayBufferLike>[]>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:204
+Defined in: [packages/embedder-transformersjs/src/index.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L204)
 
 Compute embeddings for a batch of texts. Returns one vector per text.
 
@@ -104,7 +104,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 
 #### Returns
 
-`Promise`\&lt;readonly `Float32Array`\&lt;`ArrayBufferLike`\&gt;[]\&gt;
+`Promise`\<readonly `Float32Array`\&lt;`ArrayBufferLike`\&gt;[]\>
 
 #### Implementation of
 
@@ -118,7 +118,7 @@ Compute embeddings for a batch of texts. Returns one vector per text.
 id(): string;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:165
+Defined in: [packages/embedder-transformersjs/src/index.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L165)
 
 Stable identifier (e.g. `'transformersjs:Xenova/multilingual-e5-base'`).
 

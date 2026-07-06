@@ -10,6 +10,6 @@
 type TriggerKind = "cron" | "interval" | "idle" | "event";
 ```
 
-Defined in: packages/triggers/src/index.ts:31
+Defined in: [packages/triggers/src/index.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/triggers/src/index.ts#L31)
 
 ## Stable

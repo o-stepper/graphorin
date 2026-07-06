@@ -12,7 +12,7 @@ function getHardeningStatus():
   | undefined;
 ```
 
-Defined in: packages/security/src/hardening/apply.ts:124
+Defined in: [packages/security/src/hardening/apply.ts:124](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L124)
 
 Read the resolved hardening status. Returns `undefined` when
 `applyProcessHardening(...)` has not been called yet.

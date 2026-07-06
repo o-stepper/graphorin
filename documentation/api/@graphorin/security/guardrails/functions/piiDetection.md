@@ -10,7 +10,7 @@
 function piiDetection<TValue>(opts?): GuardrailDefinition<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:144
+Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:144](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L144)
 
 Construct the PII detection guardrail.
 

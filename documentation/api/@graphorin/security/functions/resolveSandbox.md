@@ -10,7 +10,7 @@
 function resolveSandbox(input): ResolvedSandboxPolicy;
 ```
 
-Defined in: packages/security/src/sandbox/tier-resolver.ts:77
+Defined in: [packages/security/src/sandbox/tier-resolver.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/tier-resolver.ts#L77)
 
 Resolve the effective sandbox policy. Pure function; side-effect
 free (the caller is responsible for emitting any WARN / audit

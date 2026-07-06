@@ -6,7 +6,7 @@
 
 # Interface: ApplyProcessHardeningOptions
 
-Defined in: packages/security/src/hardening/apply.ts:29
+Defined in: [packages/security/src/hardening/apply.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L29)
 
 Options for `applyProcessHardening(...)`.
 
@@ -16,8 +16,8 @@ Options for `applyProcessHardening(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-allowroot"></a> `allowRoot?` | `readonly` | `boolean` | Allow the framework to run as root even when `refuseRoot` is `true`. Operators must opt in deliberately after reviewing DEC-135. | packages/security/src/hardening/apply.ts:42 |
-| <a id="property-preferfchmod"></a> `preferFchmod?` | `readonly` | `boolean` | When the host process started with `--permission`, prefer `fs.fchmod()` over `fs.chmod()` (CVE-2024-36137). The flag is mostly informational here; downstream `ensureFileMode(...)` reads the field via `getHardeningStatus(...)`. | packages/security/src/hardening/apply.ts:49 |
-| <a id="property-refuseroot"></a> `refuseRoot?` | `readonly` | `boolean` | Refuse to run as root on POSIX hosts. Defaults to `true`. The framework deliberately makes the safe path the default. | packages/security/src/hardening/apply.ts:34 |
-| <a id="property-umask"></a> `umask?` | `readonly` | `number` | Override the default umask (`0o077`). | packages/security/src/hardening/apply.ts:36 |
-| <a id="property-warn"></a> `warn?` | `readonly` | (`message`) => `void` | Optional WARN logger. | packages/security/src/hardening/apply.ts:51 |
+| <a id="property-allowroot"></a> `allowRoot?` | `readonly` | `boolean` | Allow the framework to run as root even when `refuseRoot` is `true`. Operators must opt in deliberately after reviewing DEC-135. | [packages/security/src/hardening/apply.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L42) |
+| <a id="property-preferfchmod"></a> `preferFchmod?` | `readonly` | `boolean` | When the host process started with `--permission`, prefer `fs.fchmod()` over `fs.chmod()` (CVE-2024-36137). The flag is mostly informational here; downstream `ensureFileMode(...)` reads the field via `getHardeningStatus(...)`. | [packages/security/src/hardening/apply.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L49) |
+| <a id="property-refuseroot"></a> `refuseRoot?` | `readonly` | `boolean` | Refuse to run as root on POSIX hosts. Defaults to `true`. The framework deliberately makes the safe path the default. | [packages/security/src/hardening/apply.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L34) |
+| <a id="property-umask"></a> `umask?` | `readonly` | `number` | Override the default umask (`0o077`). | [packages/security/src/hardening/apply.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L36) |
+| <a id="property-warn"></a> `warn?` | `readonly` | (`message`) => `void` | Optional WARN logger. | [packages/security/src/hardening/apply.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L51) |

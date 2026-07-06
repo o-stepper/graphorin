@@ -6,7 +6,7 @@
 
 # Interface: SerializedMessage
 
-Defined in: packages/provider/src/counters/serialize.ts:17
+Defined in: [packages/provider/src/counters/serialize.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/serialize.ts#L17)
 
 **`Internal`**
 
@@ -17,6 +17,6 @@ counter actually feeds the tokenizer.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-role"></a> `role` | `readonly` | `string` | packages/provider/src/counters/serialize.ts:18 |
-| <a id="property-text"></a> `text` | `readonly` | `string` | packages/provider/src/counters/serialize.ts:19 |
-| <a id="property-toolcalls"></a> `toolCalls` | `readonly` | readonly \{ `args`: `string`; `name`: `string`; \}[] | packages/provider/src/counters/serialize.ts:20 |
+| <a id="property-role"></a> `role` | `readonly` | `string` | [packages/provider/src/counters/serialize.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/serialize.ts#L18) |
+| <a id="property-text"></a> `text` | `readonly` | `string` | [packages/provider/src/counters/serialize.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/serialize.ts#L19) |
+| <a id="property-toolcalls"></a> `toolCalls` | `readonly` | readonly \{ `args`: `string`; `name`: `string`; \}[] | [packages/provider/src/counters/serialize.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/serialize.ts#L20) |

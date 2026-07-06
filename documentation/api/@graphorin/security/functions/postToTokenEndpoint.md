@@ -13,7 +13,7 @@ function postToTokenEndpoint(
 options?): Promise<TokenEndpointResponse>;
 ```
 
-Defined in: packages/security/src/oauth/token-endpoint.ts:68
+Defined in: [packages/security/src/oauth/token-endpoint.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/token-endpoint.ts#L68)
 
 POST `params` to the token endpoint and return the parsed JSON
 body. The helper does not throw on non-2xx responses - the caller
@@ -25,7 +25,7 @@ surface the spec-defined `error` / `error_description` fields.
 | Parameter | Type |
 | ------ | ------ |
 | `endpoint` | `string` |
-| `params` | `Readonly`\&lt;`Record`\&lt;`string`, `string`\&gt;\&gt; |
+| `params` | `Readonly`\<`Record`\&lt;`string`, `string`\&gt;\> |
 | `options` | \{ `basicAuth?`: `string`; `signal?`: `AbortSignal`; \} |
 | `options.basicAuth?` | `string` |
 | `options.signal?` | `AbortSignal` |

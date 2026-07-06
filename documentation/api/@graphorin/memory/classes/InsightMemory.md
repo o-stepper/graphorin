@@ -6,7 +6,7 @@
 
 # Class: InsightMemory
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:49
+Defined in: [packages/memory/src/tiers/insight-memory.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L49)
 
 `InsightMemory` - list / search reflection insights. A no-op (returns
 empty) when the storage adapter does not expose the optional
@@ -22,7 +22,7 @@ empty) when the storage adapter does not expose the optional
 new InsightMemory(args): InsightMemory;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:53
+Defined in: [packages/memory/src/tiers/insight-memory.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L53)
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/memory/src/tiers/insight-memory.ts:53
 get(id): Promise<Insight | null>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:118
+Defined in: [packages/memory/src/tiers/insight-memory.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L118)
 
 Lookup a single insight by id.
 
@@ -66,7 +66,7 @@ Lookup a single insight by id.
 list(scope, opts?): Promise<readonly Insight[]>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:99
+Defined in: [packages/memory/src/tiers/insight-memory.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L99)
 
 Most-recent insights for the scope (newest first).
 
@@ -92,7 +92,7 @@ search(
 opts?): Promise<readonly MemoryHit<Insight>[]>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:59
+Defined in: [packages/memory/src/tiers/insight-memory.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L59)
 
 FTS keyword search over insight text.
 
@@ -106,7 +106,7 @@ FTS keyword search over insight text.
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\>
 
 ***
 
@@ -120,7 +120,7 @@ validate(
 options?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/tiers/insight-memory.ts:130
+Defined in: [packages/memory/src/tiers/insight-memory.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tiers/insight-memory.ts#L130)
 
 Promote a quarantined insight out of quarantine (MCON-2). Mirrors
 [SemanticMemory.validate](/api/@graphorin/memory/classes/SemanticMemory.md#validate): re-derives the injection verdict from the

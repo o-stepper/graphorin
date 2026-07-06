@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorLike
 
-Defined in: packages/server/src/consolidator/daemon.ts:21
+Defined in: [packages/server/src/consolidator/daemon.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L21)
 
 Structurally-typed view of the `@graphorin/memory` Consolidator
 surface. Importing the full type would force a hard dependency on
@@ -23,7 +23,7 @@ for the lifecycle integration + the `/v1/health` aggregator.
 optional drainDlq(): Promise<number>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:28
+Defined in: [packages/server/src/consolidator/daemon.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L28)
 
 #### Returns
 
@@ -37,7 +37,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:28
 optional pause(): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:26
+Defined in: [packages/server/src/consolidator/daemon.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L26)
 
 #### Returns
 
@@ -51,7 +51,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:26
 optional registerWithScheduler(scheduler): Promise<unknown>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:36
+Defined in: [packages/server/src/consolidator/daemon.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L36)
 
 Register the consolidator's cron / idle triggers with the server's
 triggers scheduler so background consolidation actually fires (MCON-4).
@@ -77,7 +77,7 @@ custom surface) simply opts out.
 optional resume(): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:27
+Defined in: [packages/server/src/consolidator/daemon.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L27)
 
 #### Returns
 
@@ -91,7 +91,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:27
 optional setTier(tier): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:25
+Defined in: [packages/server/src/consolidator/daemon.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L25)
 
 #### Parameters
 
@@ -111,7 +111,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:25
 start(): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:22
+Defined in: [packages/server/src/consolidator/daemon.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L22)
 
 #### Returns
 
@@ -125,7 +125,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:22
 status(): Promise<ConsolidatorStatusLike>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:24
+Defined in: [packages/server/src/consolidator/daemon.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L24)
 
 #### Returns
 
@@ -139,7 +139,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:24
 stop(): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:23
+Defined in: [packages/server/src/consolidator/daemon.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L23)
 
 #### Returns
 

@@ -6,7 +6,7 @@
 
 # Class: HeuristicCounter
 
-Defined in: packages/provider/src/counters/heuristic.ts:39
+Defined in: [packages/provider/src/counters/heuristic.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/heuristic.ts#L39)
 
 Counter that estimates tokens via simple character division. The
 estimator is deterministic and side-effect-free apart from the
@@ -26,7 +26,7 @@ one-time WARN.
 new HeuristicCounter(options?): HeuristicCounter;
 ```
 
-Defined in: packages/provider/src/counters/heuristic.ts:47
+Defined in: [packages/provider/src/counters/heuristic.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/heuristic.ts#L47)
 
 #### Parameters
 
@@ -42,8 +42,8 @@ Defined in: packages/provider/src/counters/heuristic.ts:47
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | packages/provider/src/counters/heuristic.ts:40 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | packages/provider/src/counters/heuristic.ts:41 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | [packages/provider/src/counters/heuristic.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/heuristic.ts#L40) |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | [packages/provider/src/counters/heuristic.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/heuristic.ts#L41) |
 
 ## Methods
 
@@ -53,7 +53,7 @@ Defined in: packages/provider/src/counters/heuristic.ts:47
 count(messages): Promise<number>;
 ```
 
-Defined in: packages/provider/src/counters/heuristic.ts:59
+Defined in: [packages/provider/src/counters/heuristic.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/heuristic.ts#L59)
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -79,7 +79,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: packages/provider/src/counters/heuristic.ts:69
+Defined in: [packages/provider/src/counters/heuristic.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/heuristic.ts#L69)
 
 Count tokens in a raw text string.
 

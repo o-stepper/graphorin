@@ -10,7 +10,7 @@
 type SideEffectClass = "pure" | "read-only" | "side-effecting" | "external-stateful";
 ```
 
-Defined in: packages/core/src/types/tool.ts:59
+Defined in: [packages/core/src/types/tool.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L59)
 
 Side-effect classification declared by a tool author.
 

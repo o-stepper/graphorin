@@ -10,7 +10,7 @@
 const SUMMARY_TEMPLATE_VERSION: "1.3" = '1.3';
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:42
+Defined in: [packages/memory/src/context-engine/compaction/templates/summary-9-section.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/templates/summary-9-section.ts#L42)
 
 Template version surfaced into the summary's section 9 metadata.
 Bumped when the section structure / preamble wording changes in

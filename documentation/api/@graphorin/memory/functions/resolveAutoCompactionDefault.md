@@ -10,7 +10,7 @@
 function resolveAutoCompactionDefault(trustClass): AutoCompactionDefault;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/thresholds.ts:90
+Defined in: [packages/memory/src/context-engine/compaction/thresholds.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/thresholds.ts#L90)
 
 ## Parameters
 

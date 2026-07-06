@@ -10,7 +10,7 @@
 function __resetVercelRuntimeCache(): void;
 ```
 
-Defined in: packages/provider/src/adapters/vercel.ts:704
+Defined in: [packages/provider/src/adapters/vercel.ts:704](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/adapters/vercel.ts#L704)
 
 **`Internal`**
 

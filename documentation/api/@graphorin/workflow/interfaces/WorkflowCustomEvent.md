@@ -6,7 +6,7 @@
 
 # Interface: WorkflowCustomEvent
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:108
+Defined in: [packages/core/dist/types/workflow-event.d.ts:108](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L108)
 
 Application-defined event emitted from inside a workflow node via
 `ctx.emit(name, payload)`. The runtime never produces these on its own.
@@ -17,6 +17,6 @@ Application-defined event emitted from inside a workflow node via
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:110 |
-| <a id="property-payload"></a> `payload` | `readonly` | `unknown` | packages/core/dist/types/workflow-event.d.ts:111 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.custom"` | packages/core/dist/types/workflow-event.d.ts:109 |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L110) |
+| <a id="property-payload"></a> `payload` | `readonly` | `unknown` | [packages/core/dist/types/workflow-event.d.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L111) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.custom"` | [packages/core/dist/types/workflow-event.d.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L109) |

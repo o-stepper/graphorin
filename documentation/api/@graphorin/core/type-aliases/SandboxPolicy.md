@@ -10,7 +10,7 @@
 type SandboxPolicy = "none" | "sandboxed" | "isolated" | "docker";
 ```
 
-Defined in: packages/core/src/types/tool.ts:12
+Defined in: [packages/core/src/types/tool.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L12)
 
 Sandbox isolation level requested for a tool's `execute` method.
 

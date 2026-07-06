@@ -10,7 +10,7 @@
 function refreshPricing(opts): Promise<PricingSnapshot>;
 ```
 
-Defined in: pricing/src/refresh.ts:63
+Defined in: [packages/pricing/src/refresh.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/refresh.ts#L63)
 
 Pull a fresh snapshot from the supplied URL and return it. Network
 failures and shape mismatches surface as thrown errors so the CLI

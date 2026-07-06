@@ -10,7 +10,7 @@
 function stripSensitiveOutputs(): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:227
+Defined in: [packages/agent/src/filters/index.ts:227](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L227)
 
 Strip tool messages whose `content` carries the literal token
 `[REDACTED:secret]` or whose `secret` annotation marks the body as

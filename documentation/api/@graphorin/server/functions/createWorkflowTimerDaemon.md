@@ -10,7 +10,7 @@
 function createWorkflowTimerDaemon(options): WorkflowTimerDaemon;
 ```
 
-Defined in: packages/server/src/workflows/timer-daemon.ts:70
+Defined in: [packages/server/src/workflows/timer-daemon.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L70)
 
 ## Parameters
 

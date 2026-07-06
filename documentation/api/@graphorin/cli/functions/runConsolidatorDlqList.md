@@ -10,7 +10,7 @@
 function runConsolidatorDlqList(options?): Promise<readonly ConsolidatorDlqEntry[]>;
 ```
 
-Defined in: packages/cli/src/commands/consolidator.ts:232
+Defined in: [packages/cli/src/commands/consolidator.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L232)
 
 W-065: make the permanent `dead-letter queue: N` status warning
 actionable. Operator-level (DB-wide) view, like the `dlqSize`

@@ -10,7 +10,7 @@
 const DEFAULT_DELIVERY_COMMENTARY_PATTERNS: ReadonlyArray<DeliveryCommentaryPattern>;
 ```
 
-Defined in: packages/server/src/commentary/built-in-patterns.ts:28
+Defined in: [packages/server/src/commentary/built-in-patterns.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/built-in-patterns.ts#L28)
 
 The framework-shipped catalogue. Snapshot bytes-equal across the
 `ws` / `sse` / `rest` transports; idempotent on a single payload

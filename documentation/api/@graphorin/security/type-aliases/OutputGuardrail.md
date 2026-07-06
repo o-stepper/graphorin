@@ -12,7 +12,7 @@ type OutputGuardrail<TValue> = GuardrailDefinition<TValue> & {
 };
 ```
 
-Defined in: packages/security/src/guardrails/types.ts:102
+Defined in: [packages/security/src/guardrails/types.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L102)
 
 Output guardrail discriminator.
 
@@ -20,7 +20,7 @@ Output guardrail discriminator.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `kind` | `"output"` | packages/security/src/guardrails/types.ts:103 |
+| `kind` | `"output"` | [packages/security/src/guardrails/types.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L103) |
 
 ## Type Parameters
 

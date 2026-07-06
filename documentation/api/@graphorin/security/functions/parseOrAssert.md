@@ -10,7 +10,7 @@
 function parseOrAssert(input): ParsedSecretRef;
 ```
 
-Defined in: packages/security/src/secrets/secret-ref.ts:685
+Defined in: [packages/security/src/secrets/secret-ref.ts:685](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-ref.ts#L685)
 
 Convenience: parse if the input looks like a URI, otherwise throw a
 `naked-string` parse error. Used by `resolveSecret(...)`.

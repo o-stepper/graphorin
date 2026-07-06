@@ -10,7 +10,7 @@
 function __resetTiktokenCache(): void;
 ```
 
-Defined in: packages/provider/src/counters/js-tiktoken.ts:133
+Defined in: [packages/provider/src/counters/js-tiktoken.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/js-tiktoken.ts#L133)
 
 **`Internal`**
 

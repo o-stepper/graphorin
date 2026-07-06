@@ -10,7 +10,7 @@
 function signAuditCheckpoint(db, opts): Promise<SignedAuditCheckpoint>;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:377
+Defined in: [packages/security/src/audit/merkle.ts:377](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L377)
 
 Compute and sign the current tree head.
 

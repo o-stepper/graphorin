@@ -10,7 +10,7 @@
 function recordInstallation(status): void;
 ```
 
-Defined in: packages/security/src/supply-chain/audit.ts:20
+Defined in: [packages/security/src/supply-chain/audit.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit.ts#L20)
 
 Record an installation. Called automatically by the npm + git
 installers; exposed for tests + custom installers.

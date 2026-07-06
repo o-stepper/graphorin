@@ -10,7 +10,7 @@
 function _resetHardeningStatusForTesting(): void;
 ```
 
-Defined in: packages/security/src/hardening/apply.ts:133
+Defined in: [packages/security/src/hardening/apply.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L133)
 
 **`Experimental`**
 

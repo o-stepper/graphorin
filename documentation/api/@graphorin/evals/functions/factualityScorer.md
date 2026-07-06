@@ -10,7 +10,7 @@
 function factualityScorer<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/prebuilt/index.ts:31
+Defined in: [packages/evals/src/scorers/prebuilt/index.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/prebuilt/index.ts#L31)
 
 ## Type Parameters
 

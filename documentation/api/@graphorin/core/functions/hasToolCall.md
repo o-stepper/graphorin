@@ -10,7 +10,7 @@
 function hasToolCall(toolName): StopCondition;
 ```
 
-Defined in: packages/core/src/types/stop-condition.ts:43
+Defined in: [packages/core/src/types/stop-condition.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L43)
 
 Stop as soon as the most recent assistant message contains a tool call
 with the given name.

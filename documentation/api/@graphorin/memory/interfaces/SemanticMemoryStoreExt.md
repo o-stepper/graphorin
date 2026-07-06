@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:109
+Defined in: [packages/memory/src/internal/storage-adapter.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L109)
 
 Extension of the typed `SemanticMemoryStore` with optional
 embedding-aware helpers + lifecycle helpers that storage adapters
@@ -26,7 +26,7 @@ may expose.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:158
+Defined in: [packages/memory/src/internal/storage-adapter.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L158)
 
 Count the recall-eligible facts for the scope (CE-5) - a `COUNT(*)` with
 the default recall filters (live, non-archived, non-quarantined), never
@@ -53,7 +53,7 @@ forget(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:147
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:147](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L147)
 
 Soft-delete a fact. W-154: when `scope` is supplied, adapters that
 support tenant isolation MUST treat a fact outside the scope as a
@@ -89,7 +89,7 @@ compatible.
 optional get(id): Promise<Fact | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:138
+Defined in: [packages/memory/src/internal/storage-adapter.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L138)
 
 Lookup a single fact by id (returns `null` when absent or soft-deleted).
 
@@ -111,7 +111,7 @@ Lookup a single fact by id (returns `null` when absent or soft-deleted).
 optional historyOf(scope, factId): Promise<readonly Fact[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:184
+Defined in: [packages/memory/src/internal/storage-adapter.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L184)
 
 Walk the bi-temporal supersede chain that `factId` belongs to and
 return every fact in it, oldest → newest (by `validFrom`),
@@ -140,7 +140,7 @@ cycle-safe; returns `[]` for an unknown id. Powers
 optional linkPendingSupersede(newId, oldId): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:174
+Defined in: [packages/memory/src/internal/storage-adapter.ts:174](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L174)
 
 W-019: record a PENDING supersede link - set `newId.supersedes =
 oldId` WITHOUT closing the old fact's validity interval. Used when
@@ -172,7 +172,7 @@ optional purge(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:164
+Defined in: [packages/memory/src/internal/storage-adapter.ts:164](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L164)
 
 Hard-delete a fact (GDPR path). The audit log row is preserved
 but the row itself + every per-embedder vec0 entry is removed.
@@ -198,7 +198,7 @@ Distinct from [SemanticMemoryStore.forget](/api/@graphorin/memory/interfaces/Sem
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:133
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L133)
 
 #### Parameters
 
@@ -222,7 +222,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:133
 optional rememberWithEmbedding(fact, options): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:110
+Defined in: [packages/memory/src/internal/storage-adapter.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L110)
 
 #### Parameters
 
@@ -243,7 +243,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:110
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:134
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L134)
 
 #### Parameters
 
@@ -254,7 +254,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:134
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 #### Inherited from
 
@@ -276,7 +276,7 @@ optional searchVector(
 owner?): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:111
+Defined in: [packages/memory/src/internal/storage-adapter.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L111)
 
 #### Parameters
 
@@ -293,7 +293,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:111
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 ***
 
@@ -307,7 +307,7 @@ optional setStatus(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:147
+Defined in: [packages/memory/src/internal/storage-adapter.ts:147](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L147)
 
 Set a fact's retrieval-trust `status` and write a `memory_history`
 audit row (P1-4). Promotes a quarantined fact to `active` (the
@@ -340,7 +340,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:135
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L135)
 
 #### Parameters
 

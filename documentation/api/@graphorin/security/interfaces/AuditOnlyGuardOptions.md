@@ -6,7 +6,7 @@
 
 # Interface: AuditOnlyGuardOptions
 
-Defined in: packages/security/src/guard/audit-only-guard.ts:27
+Defined in: [packages/security/src/guard/audit-only-guard.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-only-guard.ts#L27)
 
 Options for `createAuditOnlyGuard(...)`.
 
@@ -16,4 +16,4 @@ Options for `createAuditOnlyGuard(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-actor"></a> `actor?` | `readonly` | [`MemoryGuardActor`](/api/@graphorin/security/interfaces/MemoryGuardActor.md) | Optional actor pointer surfaced through audit events. | packages/security/src/guard/audit-only-guard.ts:29 |
+| <a id="property-actor"></a> `actor?` | `readonly` | [`MemoryGuardActor`](/api/@graphorin/security/interfaces/MemoryGuardActor.md) | Optional actor pointer surfaced through audit events. | [packages/security/src/guard/audit-only-guard.ts:29](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-only-guard.ts#L29) |

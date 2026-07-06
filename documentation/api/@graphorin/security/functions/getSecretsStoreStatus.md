@@ -12,7 +12,7 @@ function getSecretsStoreStatus():
   | undefined;
 ```
 
-Defined in: packages/security/src/secrets/factory.ts:111
+Defined in: [packages/security/src/secrets/factory.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/factory.ts#L111)
 
 Read the status of the currently-active `SecretsStore`. Returns
 `undefined` if `createSecretsStore(...)` has not been called yet.

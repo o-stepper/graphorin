@@ -10,7 +10,7 @@
 function runGuardStatus(options?): readonly GuardStatusEntry[];
 ```
 
-Defined in: packages/cli/src/commands/guard.ts:53
+Defined in: [packages/cli/src/commands/guard.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/guard.ts#L53)
 
 ## Parameters
 

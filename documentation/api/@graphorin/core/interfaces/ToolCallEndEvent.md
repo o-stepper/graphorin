@@ -6,7 +6,7 @@
 
 # Interface: ToolCallEndEvent
 
-Defined in: packages/core/src/types/agent-event.ts:136
+Defined in: [packages/core/src/types/agent-event.ts:136](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L136)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: packages/core/src/types/agent-event.ts:136
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-finalargs"></a> `finalArgs` | `readonly` | `unknown` | packages/core/src/types/agent-event.ts:139 |
-| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:138 |
-| <a id="property-type"></a> `type` | `readonly` | `"tool.call.end"` | packages/core/src/types/agent-event.ts:137 |
+| <a id="property-finalargs"></a> `finalArgs` | `readonly` | `unknown` | [packages/core/src/types/agent-event.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L139) |
+| <a id="property-toolcallid"></a> `toolCallId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L138) |
+| <a id="property-type"></a> `type` | `readonly` | `"tool.call.end"` | [packages/core/src/types/agent-event.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L137) |

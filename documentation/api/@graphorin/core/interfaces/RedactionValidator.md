@@ -6,7 +6,7 @@
 
 # Interface: RedactionValidator
 
-Defined in: packages/core/src/contracts/redaction-validator.ts:15
+Defined in: [packages/core/src/contracts/redaction-validator.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/redaction-validator.ts#L15)
 
 Wraps every observability exporter (OTLP, console, JSONL replay log,
 …) and refuses to forward attributes that exceed the configured
@@ -23,8 +23,8 @@ config without taking an observability dependency.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the policy in use (`'default-deny-internal'`, …). | packages/core/src/contracts/redaction-validator.ts:17 |
-| <a id="property-mintier"></a> `minTier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Lowest tier that may pass through the validator. | packages/core/src/contracts/redaction-validator.ts:19 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the policy in use (`'default-deny-internal'`, …). | [packages/core/src/contracts/redaction-validator.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/redaction-validator.ts#L17) |
+| <a id="property-mintier"></a> `minTier` | `readonly` | [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md) | Lowest tier that may pass through the validator. | [packages/core/src/contracts/redaction-validator.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/redaction-validator.ts#L19) |
 
 ## Methods
 
@@ -36,7 +36,7 @@ validate(input):
   | null;
 ```
 
-Defined in: packages/core/src/contracts/redaction-validator.ts:24
+Defined in: [packages/core/src/contracts/redaction-validator.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/redaction-validator.ts#L24)
 
 Validate (and optionally rewrite) an attribute payload. Returns the
 sanitized value or `null` if the entire record must be dropped.

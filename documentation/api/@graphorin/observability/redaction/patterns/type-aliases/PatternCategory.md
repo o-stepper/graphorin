@@ -10,7 +10,7 @@
 type PatternCategory = "secret" | "pii";
 ```
 
-Defined in: packages/observability/src/redaction/patterns.ts:51
+Defined in: [packages/observability/src/redaction/patterns.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/patterns.ts#L51)
 
 Pattern category - `secret` matches always force a drop; `pii`
 matches respect the configured `enabledPatterns` allow-list.

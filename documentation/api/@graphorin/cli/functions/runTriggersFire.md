@@ -13,7 +13,7 @@ function runTriggersFire(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:114
+Defined in: [packages/cli/src/commands/triggers.ts:114](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L114)
 
 ## Parameters
 

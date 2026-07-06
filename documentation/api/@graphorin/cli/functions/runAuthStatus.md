@@ -10,7 +10,7 @@
 function runAuthStatus(options?): Promise<OAuthStatusSnapshot>;
 ```
 
-Defined in: packages/cli/src/commands/auth.ts:205
+Defined in: [packages/cli/src/commands/auth.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/auth.ts#L205)
 
 ## Parameters
 

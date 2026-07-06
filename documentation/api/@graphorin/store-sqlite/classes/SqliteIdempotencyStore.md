@@ -6,7 +6,7 @@
 
 # Class: SqliteIdempotencyStore
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:49
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L49)
 
 Default `IdempotencyStore` implementation.
 
@@ -24,7 +24,7 @@ Default `IdempotencyStore` implementation.
 new SqliteIdempotencyStore(conn): SqliteIdempotencyStore;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:51
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L51)
 
 #### Parameters
 
@@ -44,7 +44,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:51
 delete(key): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:92
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L92)
 
 #### Parameters
 
@@ -70,7 +70,7 @@ get(key): Promise<
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:73
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L73)
 
 #### Parameters
 
@@ -96,7 +96,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:73
 prune(olderThan): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:96
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L96)
 
 Delete records whose expiry is older than the supplied epoch-ms
 instant. Production caller: the server's hourly
@@ -125,7 +125,7 @@ so expired rows no longer accumulate forever (W-065).
 put(record): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:55
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L55)
 
 #### Parameters
 

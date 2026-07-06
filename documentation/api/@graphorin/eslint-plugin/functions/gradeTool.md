@@ -10,7 +10,7 @@
 function gradeTool(tool, findings): ToolGraderScore;
 ```
 
-Defined in: src/tool-discovery.ts:505
+Defined in: [packages/eslint-plugin/src/tool-discovery.ts:505](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/tool-discovery.ts#L505)
 
 Compute the per-tool grader score (0..100). Each axis is gated by
 the findings produced for that axis. The rubric is calibrated

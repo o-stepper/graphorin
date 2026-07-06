@@ -10,7 +10,7 @@
 function onWithSecretAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/secrets/acl.ts:153
+Defined in: [packages/security/src/secrets/acl.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/acl.ts#L153)
 
 Subscribe to `withSecret(...)` scope events.
 

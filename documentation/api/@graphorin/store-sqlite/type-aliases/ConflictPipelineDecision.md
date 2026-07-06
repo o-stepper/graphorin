@@ -10,7 +10,7 @@
 type ConflictPipelineDecision = "admit" | "dedup" | "supersede" | "pending" | "judge-unparseable";
 ```
 
-Defined in: packages/store-sqlite/src/conflict-store.ts:39
+Defined in: [packages/store-sqlite/src/conflict-store.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/conflict-store.ts#L39)
 
 Final outcome the pipeline produced for a candidate fact write.
 `'admit'` is the default no-conflict path; the other variants record

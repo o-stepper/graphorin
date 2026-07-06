@@ -6,7 +6,7 @@
 
 # Interface: SessionStoreExt
 
-Defined in: packages/core/src/contracts/session-store.ts:115
+Defined in: [packages/core/src/contracts/session-store.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L115)
 
 Optional extension surface for storage adapters that expose the
 additional capabilities `@graphorin/sessions` consumes.
@@ -30,7 +30,7 @@ Implementations: `SqliteSessionStore` (`@graphorin/store-sqlite`).
 appendAuditEntry(entry): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:128
+Defined in: [packages/core/src/contracts/session-store.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L128)
 
 Append a session-lifecycle audit row.
 
@@ -52,7 +52,7 @@ Append a session-lifecycle audit row.
 appendHandoff(sessionId, record): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:97
+Defined in: [packages/core/src/contracts/session-store.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L97)
 
 #### Parameters
 
@@ -77,7 +77,7 @@ Defined in: packages/core/src/contracts/session-store.ts:97
 attachWorkflowRun(run): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:100
+Defined in: [packages/core/src/contracts/session-store.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L100)
 
 #### Parameters
 
@@ -101,7 +101,7 @@ Defined in: packages/core/src/contracts/session-store.ts:100
 closeSession(sessionId, closedAt): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:91
+Defined in: [packages/core/src/contracts/session-store.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L91)
 
 #### Parameters
 
@@ -126,7 +126,7 @@ Defined in: packages/core/src/contracts/session-store.ts:91
 createSession(metadata): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:85
+Defined in: [packages/core/src/contracts/session-store.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L85)
 
 #### Parameters
 
@@ -150,7 +150,7 @@ Defined in: packages/core/src/contracts/session-store.ts:85
 deleteAgent(agentId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:117
+Defined in: [packages/core/src/contracts/session-store.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L117)
 
 Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 
@@ -172,7 +172,7 @@ Hard-delete an agent. Used by `AgentRegistry.delete(...)`.
 deleteSession(sessionId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:152
+Defined in: [packages/core/src/contracts/session-store.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L152)
 
 Hard-delete a session and cascade its session-owned rows - handoffs,
 workflow-run attachments, and audit entries (RP-6) - **plus the
@@ -209,7 +209,7 @@ getSession(sessionId): Promise<
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:86
+Defined in: [packages/core/src/contracts/session-store.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L86)
 
 #### Parameters
 
@@ -235,7 +235,7 @@ Defined in: packages/core/src/contracts/session-store.ts:86
 listAgents(): Promise<readonly AgentRegistryEntry[]>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:119
+Defined in: [packages/core/src/contracts/session-store.ts:119](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L119)
 
 List all known agents (including retired ones).
 
@@ -251,7 +251,7 @@ List all known agents (including retired ones).
 listAuditEntries(sessionId, opts?): Promise<readonly SessionAuditEntry[]>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:130
+Defined in: [packages/core/src/contracts/session-store.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L130)
 
 List recent audit rows for a session, newest-first.
 
@@ -275,7 +275,7 @@ List recent audit rows for a session, newest-first.
 listHandoffs(sessionId): Promise<readonly HandoffRecord[]>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:98
+Defined in: [packages/core/src/contracts/session-store.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L98)
 
 #### Parameters
 
@@ -299,7 +299,7 @@ Defined in: packages/core/src/contracts/session-store.ts:98
 listSessions(scope): Promise<readonly SessionMetadata[]>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:87
+Defined in: [packages/core/src/contracts/session-store.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L87)
 
 #### Parameters
 
@@ -323,7 +323,7 @@ Defined in: packages/core/src/contracts/session-store.ts:87
 listWorkflowRuns(sessionId): Promise<readonly SessionWorkflowRun[]>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:101
+Defined in: [packages/core/src/contracts/session-store.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L101)
 
 #### Parameters
 
@@ -347,7 +347,7 @@ Defined in: packages/core/src/contracts/session-store.ts:101
 pruneAuditEntries(beforeEpochMs): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:135
+Defined in: [packages/core/src/contracts/session-store.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L135)
 
 Delete audit rows older than the supplied epoch ms.
 
@@ -369,7 +369,7 @@ Delete audit rows older than the supplied epoch ms.
 pruneSessions(opts): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:159
+Defined in: [packages/core/src/contracts/session-store.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L159)
 
 Retention sweep (RP-6): hard-delete (cascade) every session matching the
 policy. `beforeEpochMs` limits to sessions created before that instant;
@@ -396,7 +396,7 @@ Returns the number of sessions deleted.
 registerAgent(entry): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:93
+Defined in: [packages/core/src/contracts/session-store.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L93)
 
 #### Parameters
 
@@ -422,7 +422,7 @@ resolveAgent(agentId): Promise<
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:95
+Defined in: [packages/core/src/contracts/session-store.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L95)
 
 #### Parameters
 
@@ -448,7 +448,7 @@ Defined in: packages/core/src/contracts/session-store.ts:95
 retireAgent(agentId, retiredAt): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:94
+Defined in: [packages/core/src/contracts/session-store.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L94)
 
 #### Parameters
 
@@ -473,7 +473,7 @@ Defined in: packages/core/src/contracts/session-store.ts:94
 updateSession(sessionId, patch): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:90
+Defined in: [packages/core/src/contracts/session-store.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L90)
 
 #### Parameters
 
@@ -502,7 +502,7 @@ updateWorkflowRunStatus(
 status): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/session-store.ts:121
+Defined in: [packages/core/src/contracts/session-store.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/session-store.ts#L121)
 
 Update the status of a workflow attachment.
 

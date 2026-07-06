@@ -12,7 +12,7 @@ function runSkillsInspect(options): Promise<
 | null>;
 ```
 
-Defined in: packages/cli/src/commands/skills.ts:117
+Defined in: [packages/cli/src/commands/skills.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/skills.ts#L117)
 
 ## Parameters
 

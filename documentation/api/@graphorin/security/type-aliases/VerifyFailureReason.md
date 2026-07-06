@@ -16,7 +16,7 @@ type VerifyFailureReason =
   | "token-locked-out";
 ```
 
-Defined in: packages/security/src/auth/verify.ts:70
+Defined in: [packages/security/src/auth/verify.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/verify.ts#L70)
 
 Reasons a verify call can fail. Each value is a stable lowercase
 discriminator suitable for direct logging.

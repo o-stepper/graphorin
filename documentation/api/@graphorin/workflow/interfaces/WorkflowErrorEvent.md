@@ -6,7 +6,7 @@
 
 # Interface: WorkflowErrorEvent
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:94
+Defined in: [packages/core/dist/types/workflow-event.d.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L94)
 
 ## Stable
 
@@ -14,8 +14,8 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:94
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-error"></a> `error` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | packages/core/dist/types/workflow-event.d.ts:97 |
-| `error.code` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:99 |
-| `error.message` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:98 |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:96 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.error"` | packages/core/dist/types/workflow-event.d.ts:95 |
+| <a id="property-error"></a> `error` | `readonly` | \{ `code`: `string`; `message`: `string`; \} | [packages/core/dist/types/workflow-event.d.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L97) |
+| `error.code` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L99) |
+| `error.message` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L98) |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L96) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.error"` | [packages/core/dist/types/workflow-event.d.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L95) |

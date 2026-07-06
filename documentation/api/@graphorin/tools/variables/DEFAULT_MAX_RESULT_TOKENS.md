@@ -10,6 +10,6 @@
 const DEFAULT_MAX_RESULT_TOKENS: 16384 = 16384;
 ```
 
-Defined in: packages/tools/src/registry/normalize.ts:94
+Defined in: [packages/tools/src/registry/normalize.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/registry/normalize.ts#L94)
 
 Default value cap used for tool result tokens.

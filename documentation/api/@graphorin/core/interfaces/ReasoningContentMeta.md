@@ -6,7 +6,7 @@
 
 # Interface: ReasoningContentMeta
 
-Defined in: packages/core/src/types/message.ts:115
+Defined in: [packages/core/src/types/message.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L115)
 
 Opaque metadata round-tripped on `ReasoningContent`. Adapter-defined
 keys; consumers must NOT introspect or modify the contents.
@@ -23,6 +23,6 @@ keys; consumers must NOT introspect or modify the contents.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-data"></a> `data?` | `readonly` | `string` | packages/core/src/types/message.ts:118 |
-| <a id="property-provider"></a> `provider?` | `readonly` | `string` | packages/core/src/types/message.ts:116 |
-| <a id="property-signature"></a> `signature?` | `readonly` | `string` | packages/core/src/types/message.ts:117 |
+| <a id="property-data"></a> `data?` | `readonly` | `string` | [packages/core/src/types/message.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L118) |
+| <a id="property-provider"></a> `provider?` | `readonly` | `string` | [packages/core/src/types/message.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L116) |
+| <a id="property-signature"></a> `signature?` | `readonly` | `string` | [packages/core/src/types/message.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L117) |

@@ -10,7 +10,7 @@
 function formatFtsIntegrityWarning(reports): string | null;
 ```
 
-Defined in: packages/store-sqlite/src/fts-integrity.ts:93
+Defined in: [packages/store-sqlite/src/fts-integrity.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/fts-integrity.ts#L93)
 
 Format an [checkFtsIntegrity](/api/@graphorin/store-sqlite/functions/checkFtsIntegrity.md) result as a single warning line, or
 `null` when the indexes are consistent. Used at store-open time.

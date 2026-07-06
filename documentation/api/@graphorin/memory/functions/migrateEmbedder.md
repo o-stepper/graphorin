@@ -10,7 +10,7 @@
 function migrateEmbedder(options): AsyncGenerator<MigrationProgress, void, unknown>;
 ```
 
-Defined in: packages/memory/src/migration/embedder-migration.ts:127
+Defined in: [packages/memory/src/migration/embedder-migration.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L127)
 
 Stream embedder migrations as `AsyncIterable<MigrationProgress>`.
 

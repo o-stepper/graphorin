@@ -6,7 +6,7 @@
 
 # Interface: GoogleAPICounterOptions
 
-Defined in: packages/provider/src/counters/google.ts:20
+Defined in: [packages/provider/src/counters/google.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L20)
 
 Options for [GoogleAPICounter](/api/@graphorin/provider/classes/GoogleAPICounter.md).
 
@@ -16,5 +16,5 @@ Options for [GoogleAPICounter](/api/@graphorin/provider/classes/GoogleAPICounter
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id?` | `readonly` | `string` | packages/provider/src/counters/google.ts:22 |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | packages/provider/src/counters/google.ts:21 |
+| <a id="property-id"></a> `id?` | `readonly` | `string` | [packages/provider/src/counters/google.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L22) |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | [packages/provider/src/counters/google.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/google.ts#L21) |

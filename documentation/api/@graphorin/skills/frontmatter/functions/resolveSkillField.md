@@ -13,7 +13,7 @@ function resolveSkillField<T>(
 fallback?): FieldResolution<T>;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:93
+Defined in: [packages/skills/src/frontmatter/index.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L93)
 
 Resolve a single field across the four field-resolution tiers.
 Returns the resolved value plus the source tier the value came from

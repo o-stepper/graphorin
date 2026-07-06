@@ -10,7 +10,7 @@
 function classifyTool(tool, patterns?): MemoryGuardTier;
 ```
 
-Defined in: packages/security/src/guard/classifier.ts:63
+Defined in: [packages/security/src/guard/classifier.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/classifier.ts#L63)
 
 Classify a tool. Pure function - never inspects runtime state.
 

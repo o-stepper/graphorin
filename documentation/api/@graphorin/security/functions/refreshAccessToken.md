@@ -10,7 +10,7 @@
 function refreshAccessToken(args): Promise<OAuthSession>;
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:52
+Defined in: [packages/security/src/oauth/refresh.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/refresh.ts#L52)
 
 Refresh the access token. Identical concurrent invocations share a
 single in-flight request; subsequent callers observe the same

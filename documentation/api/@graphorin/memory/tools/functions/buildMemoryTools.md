@@ -10,7 +10,7 @@
 function buildMemoryTools(deps, options?): readonly Tool<unknown, unknown, unknown>[];
 ```
 
-Defined in: packages/memory/src/tools/index.ts:85
+Defined in: [packages/memory/src/tools/index.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/index.ts#L85)
 
 Build the canonical eleven-memory-tool array. Order is stable -
 consumers can rely on the indices for snapshot tests. `fact_history`

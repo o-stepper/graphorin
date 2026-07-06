@@ -10,7 +10,7 @@
 function listAggregate<T>(opts?): ListAggregate<T>;
 ```
 
-Defined in: packages/core/dist/channels/channels.d.ts:126
+Defined in: [packages/core/dist/channels/channels.d.ts:126](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts#L126)
 
 Construct a `ListAggregate` channel.
 

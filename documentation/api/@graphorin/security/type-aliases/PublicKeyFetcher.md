@@ -10,7 +10,7 @@
 type PublicKeyFetcher = (url, signal?) => Promise<string>;
 ```
 
-Defined in: packages/security/src/supply-chain/signature.ts:32
+Defined in: [packages/security/src/supply-chain/signature.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/signature.ts#L32)
 
 **`Experimental`**
 

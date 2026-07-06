@@ -10,7 +10,7 @@
 function runSkillsInstall(options): Promise<SkillInstallationStatus>;
 ```
 
-Defined in: packages/cli/src/commands/skills.ts:67
+Defined in: [packages/cli/src/commands/skills.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/skills.ts#L67)
 
 ## Parameters
 

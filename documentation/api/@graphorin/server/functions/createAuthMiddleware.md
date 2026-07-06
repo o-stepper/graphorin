@@ -12,7 +12,7 @@ function createAuthMiddleware(options): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/auth.ts:130
+Defined in: [packages/server/src/middleware/auth.ts:130](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/auth.ts#L130)
 
 Build the bearer-token middleware. The middleware always sets
 `c.var.state.auth`, even on the unauthenticated branch, so

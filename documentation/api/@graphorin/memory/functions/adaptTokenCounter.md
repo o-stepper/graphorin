@@ -10,7 +10,7 @@
 function adaptTokenCounter(counter): ContextTokenCounter & Pick<TokenCounter, "count">;
 ```
 
-Defined in: packages/memory/src/context-engine/token-counter.ts:76
+Defined in: [packages/memory/src/context-engine/token-counter.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/token-counter.ts#L76)
 
 Wrap a real [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) into the narrower
 [ContextTokenCounter](/api/@graphorin/memory/interfaces/ContextTokenCounter.md) surface - PRESERVING the native

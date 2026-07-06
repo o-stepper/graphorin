@@ -6,7 +6,7 @@
 
 # Interface: AgentEndEvent\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/agent-event.ts:313
+Defined in: [packages/core/src/types/agent-event.ts:313](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L313)
 
 ## Stable
 
@@ -20,6 +20,6 @@ Defined in: packages/core/src/types/agent-event.ts:313
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | packages/core/src/types/agent-event.ts:316 |
-| <a id="property-runid"></a> `runId` | `readonly` | `string` | packages/core/src/types/agent-event.ts:315 |
-| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | packages/core/src/types/agent-event.ts:314 |
+| <a id="property-result"></a> `result` | `readonly` | [`AgentResult`](/api/@graphorin/core/interfaces/AgentResult.md)\&lt;`TOutput`\&gt; | [packages/core/src/types/agent-event.ts:316](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L316) |
+| <a id="property-runid"></a> `runId` | `readonly` | `string` | [packages/core/src/types/agent-event.ts:315](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L315) |
+| <a id="property-type"></a> `type` | `readonly` | `"agent.end"` | [packages/core/src/types/agent-event.ts:314](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/agent-event.ts#L314) |

@@ -10,7 +10,7 @@
 type EvaluatorCallable<TOutput> = (input, candidate, rubric, iteration) => Promise<EvaluatorOutcome>;
 ```
 
-Defined in: packages/agent/src/evaluator-optimizer/index.ts:59
+Defined in: [packages/agent/src/evaluator-optimizer/index.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/evaluator-optimizer/index.ts#L59)
 
 Evaluator callable shape. Receives the original user input + the
 candidate output and returns the structured outcome.

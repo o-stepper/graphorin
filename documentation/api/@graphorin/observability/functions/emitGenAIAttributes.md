@@ -10,7 +10,7 @@
 function emitGenAIAttributes<T>(span, attrs): void;
 ```
 
-Defined in: packages/observability/src/gen-ai/emit.ts:55
+Defined in: [packages/observability/src/gen-ai/emit.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/emit.ts#L55)
 
 Attach the canonical `gen_ai.*` attribute set to a span. The helper
 is additive on the existing Graphorin-prefixed attributes and applies

@@ -12,7 +12,7 @@ type WireToolOutcome<TOutput> =
   | ToolError;
 ```
 
-Defined in: packages/core/src/utils/binary-json.ts:118
+Defined in: [packages/core/src/utils/binary-json.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/binary-json.ts#L118)
 
 Wire twin of `ToolOutcome`.
 

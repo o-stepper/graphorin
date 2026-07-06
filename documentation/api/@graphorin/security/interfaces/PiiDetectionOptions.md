@@ -6,7 +6,7 @@
 
 # Interface: PiiDetectionOptions
 
-Defined in: packages/security/src/guardrails/builtins/pii-detection.ts:78
+Defined in: [packages/security/src/guardrails/builtins/pii-detection.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L78)
 
 Options for `piiDetection(...)`.
 
@@ -16,8 +16,8 @@ Options for `piiDetection(...)`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-action"></a> `action?` | `readonly` | `"block"` \| `"warn"` \| `"rewrite"` | Action to take on a match. Defaults to `'rewrite'` (mask the detected substring with `[REDACTED:<kind>]`). | packages/security/src/guardrails/builtins/pii-detection.ts:87 |
-| <a id="property-extrapatterns"></a> `extraPatterns?` | `readonly` | readonly [`PiiPattern`](/api/@graphorin/security/interfaces/PiiPattern.md)[] | Additional patterns merged with the default catalogue. | packages/security/src/guardrails/builtins/pii-detection.ts:80 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Override guardrail name. | packages/security/src/guardrails/builtins/pii-detection.ts:91 |
-| <a id="property-patterns"></a> `patterns?` | `readonly` | readonly [`PiiPattern`](/api/@graphorin/security/interfaces/PiiPattern.md)[] | Replace the default catalogue entirely. | packages/security/src/guardrails/builtins/pii-detection.ts:82 |
-| <a id="property-stage"></a> `stage?` | `readonly` | `"input"` \| `"output"` | Stage the guardrail applies to. Defaults to `'input'`. | packages/security/src/guardrails/builtins/pii-detection.ts:89 |
+| <a id="property-action"></a> `action?` | `readonly` | `"block"` \| `"warn"` \| `"rewrite"` | Action to take on a match. Defaults to `'rewrite'` (mask the detected substring with `[REDACTED:<kind>]`). | [packages/security/src/guardrails/builtins/pii-detection.ts:87](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L87) |
+| <a id="property-extrapatterns"></a> `extraPatterns?` | `readonly` | readonly [`PiiPattern`](/api/@graphorin/security/interfaces/PiiPattern.md)[] | Additional patterns merged with the default catalogue. | [packages/security/src/guardrails/builtins/pii-detection.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L80) |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Override guardrail name. | [packages/security/src/guardrails/builtins/pii-detection.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L91) |
+| <a id="property-patterns"></a> `patterns?` | `readonly` | readonly [`PiiPattern`](/api/@graphorin/security/interfaces/PiiPattern.md)[] | Replace the default catalogue entirely. | [packages/security/src/guardrails/builtins/pii-detection.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L82) |
+| <a id="property-stage"></a> `stage?` | `readonly` | `"input"` \| `"output"` | Stage the guardrail applies to. Defaults to `'input'`. | [packages/security/src/guardrails/builtins/pii-detection.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/pii-detection.ts#L89) |

@@ -10,7 +10,7 @@
 function createEncryptedConnection(options): Promise<SqliteConnection>;
 ```
 
-Defined in: packages/store-sqlite-encrypted/src/connection.ts:35
+Defined in: [packages/store-sqlite-encrypted/src/connection.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite-encrypted/src/connection.ts#L35)
 
 Opens an encrypted SQLite connection. Differs from `openConnection`
 only in that the cipher peer driver is preloaded - callers that

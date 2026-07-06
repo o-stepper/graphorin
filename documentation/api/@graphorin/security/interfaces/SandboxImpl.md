@@ -6,7 +6,7 @@
 
 # Interface: SandboxImpl
 
-Defined in: packages/security/src/sandbox/sandbox.ts:60
+Defined in: [packages/security/src/sandbox/sandbox.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/sandbox.ts#L60)
 
 Concrete `Sandbox` implementation contract. Extends the core
 interface with a discriminator + capability advertisement.
@@ -21,9 +21,9 @@ interface with a discriminator + capability advertisement.
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`SandboxCapabilities`](/api/@graphorin/security/interfaces/SandboxCapabilities.md) | What the adapter can enforce; surfaced through `resolveSandbox(...)`. | - | packages/security/src/sandbox/sandbox.ts:64 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the sandbox flavor (`'worker-threads'`, `'isolated-vm'`, …). | [`Sandbox`](/api/@graphorin/core/interfaces/Sandbox.md).[`id`](/api/@graphorin/core/interfaces/Sandbox.md#property-id) | packages/core/dist/contracts/sandbox.d.ts:11 |
-| <a id="property-kind"></a> `kind` | `readonly` | [`SandboxKind`](/api/@graphorin/security/type-aliases/SandboxKind.md) | Discriminator. | - | packages/security/src/sandbox/sandbox.ts:62 |
+| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`SandboxCapabilities`](/api/@graphorin/security/interfaces/SandboxCapabilities.md) | What the adapter can enforce; surfaced through `resolveSandbox(...)`. | - | [packages/security/src/sandbox/sandbox.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/sandbox.ts#L64) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Identifier of the sandbox flavor (`'worker-threads'`, `'isolated-vm'`, …). | [`Sandbox`](/api/@graphorin/core/interfaces/Sandbox.md).[`id`](/api/@graphorin/core/interfaces/Sandbox.md#property-id) | [packages/core/dist/contracts/sandbox.d.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts#L11) |
+| <a id="property-kind"></a> `kind` | `readonly` | [`SandboxKind`](/api/@graphorin/security/type-aliases/SandboxKind.md) | Discriminator. | - | [packages/security/src/sandbox/sandbox.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/sandbox/sandbox.ts#L62) |
 
 ## Methods
 
@@ -33,7 +33,7 @@ interface with a discriminator + capability advertisement.
 run<TInput, TOutput>(code, opts): Promise<SandboxResult<TOutput>>;
 ```
 
-Defined in: packages/core/dist/contracts/sandbox.d.ts:12
+Defined in: [packages/core/dist/contracts/sandbox.d.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts#L12)
 
 #### Type Parameters
 
@@ -51,7 +51,7 @@ Defined in: packages/core/dist/contracts/sandbox.d.ts:12
 
 #### Returns
 
-`Promise`\&lt;[`SandboxResult`](/api/@graphorin/security/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\&gt;
+`Promise`\<[`SandboxResult`](/api/@graphorin/security/type-aliases/SandboxResult.md)\&lt;`TOutput`\&gt;\>
 
 #### Inherited from
 

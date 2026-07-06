@@ -10,7 +10,7 @@
 type DeliveryCommentaryPolicy = "wrap" | "strip" | "pass-through";
 ```
 
-Defined in: packages/server/src/commentary/types.ts:33
+Defined in: [packages/server/src/commentary/types.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/types.ts#L33)
 
 Operator-facing policy. Identical semantics to the session-output
 sanitizer in `@graphorin/sessions/commentary` so the two layers

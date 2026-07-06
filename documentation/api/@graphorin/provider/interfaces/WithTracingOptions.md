@@ -6,7 +6,7 @@
 
 # Interface: WithTracingOptions
 
-Defined in: packages/provider/src/middleware/with-tracing.ts:24
+Defined in: [packages/provider/src/middleware/with-tracing.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-tracing.ts#L24)
 
 Options for [withTracing](/api/@graphorin/provider/variables/withTracing.md).
 
@@ -16,4 +16,4 @@ Options for [withTracing](/api/@graphorin/provider/variables/withTracing.md).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-tracer"></a> `tracer?` | `readonly` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | Tracer instance. Defaults to a no-op tracer if unset. | packages/provider/src/middleware/with-tracing.ts:26 |
+| <a id="property-tracer"></a> `tracer?` | `readonly` | [`Tracer`](/api/@graphorin/core/interfaces/Tracer.md) | Tracer instance. Defaults to a no-op tracer if unset. | [packages/provider/src/middleware/with-tracing.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-tracing.ts#L26) |

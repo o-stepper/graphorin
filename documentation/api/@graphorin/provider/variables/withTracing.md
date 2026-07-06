@@ -10,7 +10,7 @@
 const withTracing: (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/with-tracing.ts:32
+Defined in: [packages/provider/src/middleware/with-tracing.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/with-tracing.ts#L32)
 
 ## Parameters
 

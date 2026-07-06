@@ -15,7 +15,7 @@ type MessageContent =
   | ReasoningContent;
 ```
 
-Defined in: packages/core/dist/types/message.d.ts:15
+Defined in: [packages/core/dist/types/message.d.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/message.d.ts#L15)
 
 A single multimodal content part attached to a chat-style message.
 

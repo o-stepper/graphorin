@@ -13,7 +13,7 @@ function proveAuditInclusion(
 head): Promise<AuditInclusionProof>;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:174
+Defined in: [packages/security/src/audit/merkle.ts:174](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L174)
 
 Produce an RFC-6962 inclusion proof for the entry at `seq` against
 the head of size `head.size`. Throws when the entry is not covered.

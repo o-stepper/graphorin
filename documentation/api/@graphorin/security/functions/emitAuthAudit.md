@@ -10,7 +10,7 @@
 function emitAuthAudit(event): void;
 ```
 
-Defined in: packages/security/src/auth/audit-emitter.ts:93
+Defined in: [packages/security/src/auth/audit-emitter.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/audit-emitter.ts#L93)
 
 Emit an auth audit event to every subscriber. Listener exceptions are
 isolated from the auth path.

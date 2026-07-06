@@ -10,7 +10,7 @@
 function registerAuditDbBinding(binding, opts?): () => void;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:139
+Defined in: [packages/security/src/audit/audit-db.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/audit-db.ts#L139)
 
 Register a concrete binding. The framework default
 (`better-sqlite3-multiple-ciphers`) is registered by

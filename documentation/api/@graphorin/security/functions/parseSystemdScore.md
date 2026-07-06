@@ -10,7 +10,7 @@
 function parseSystemdScore(output): number | undefined;
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:262
+Defined in: [packages/security/src/hardening/doctor.ts:262](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/doctor.ts#L262)
 
 Parse the score line from `systemd-analyze security`. The line
 normally looks like `→ Overall exposure level for ...: 7.4 OK`.

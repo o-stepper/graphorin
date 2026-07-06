@@ -13,7 +13,7 @@ function revokeOAuthSession(
 options?): Promise<void>;
 ```
 
-Defined in: packages/security/src/oauth/library.ts:182
+Defined in: [packages/security/src/oauth/library.ts:182](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/library.ts#L182)
 
 Revoke the OAuth session for `serverId`. The function always tears
 the persisted record down even when the revocation endpoint

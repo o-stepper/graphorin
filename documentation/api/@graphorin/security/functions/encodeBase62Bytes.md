@@ -10,7 +10,7 @@
 function encodeBase62Bytes(bytes, width): string;
 ```
 
-Defined in: packages/security/src/auth/token-format.ts:204
+Defined in: [packages/security/src/auth/token-format.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L204)
 
 Encode a byte buffer as base62 with a fixed-length output. The
 routine treats the bytes as a big-endian unbounded integer and

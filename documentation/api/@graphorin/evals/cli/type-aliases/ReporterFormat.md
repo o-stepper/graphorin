@@ -10,7 +10,7 @@
 type ReporterFormat = "terminal" | "markdown" | "json" | "junit" | "html";
 ```
 
-Defined in: evals/src/cli/index.ts:64
+Defined in: [packages/evals/src/cli/index.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/cli/index.ts#L64)
 
 Reporter ids accepted by [writeReports](/api/@graphorin/evals/cli/functions/writeReports.md).
 

@@ -6,7 +6,7 @@
 
 # Interface: ResultHandle
 
-Defined in: packages/core/src/types/tool.ts:193
+Defined in: [packages/core/src/types/tool.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L193)
 
 An opaque, run-scoped reference to a large tool result that was stored
 out of the conversation buffer rather than inlined in full. The agent
@@ -21,9 +21,9 @@ context window (P1-4).
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-bytes"></a> `bytes?` | `readonly` | `number` | Total byte size of the full stored artifact, when known. | packages/core/src/types/tool.ts:206 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"spill-file"` \| `"resource-link"` | Backing store kind. `'spill-file'` today; `'resource-link'` is reserved for MCP (WI-13). | packages/core/src/types/tool.ts:202 |
-| <a id="property-mediatype"></a> `mediaType?` | `readonly` | `string` | MIME type of the stored artifact, when known. | packages/core/src/types/tool.ts:208 |
-| <a id="property-preview"></a> `preview` | `readonly` | `string` | A bounded preview of the full body (already inlined alongside the handle). | packages/core/src/types/tool.ts:204 |
-| <a id="property-producertrustclass"></a> `producerTrustClass?` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | Trust class of the tool that PRODUCED the stored body (TL-6). `read_result` re-applies inbound sanitization and dataflow provenance by this class, so an untrusted spill cannot launder to trusted through the built-in reader. | packages/core/src/types/tool.ts:215 |
-| <a id="property-uri"></a> `uri` | `readonly` | `string` | Opaque, run-scoped URI - e.g. `graphorin-spill:<runId>/<toolCallId>.json` for a spill artifact. Never a raw filesystem path: the reader resolves it within the configured artifact root, so the model cannot use it to read arbitrary files. | packages/core/src/types/tool.ts:200 |
+| <a id="property-bytes"></a> `bytes?` | `readonly` | `number` | Total byte size of the full stored artifact, when known. | [packages/core/src/types/tool.ts:206](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L206) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"spill-file"` \| `"resource-link"` | Backing store kind. `'spill-file'` today; `'resource-link'` is reserved for MCP (WI-13). | [packages/core/src/types/tool.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L202) |
+| <a id="property-mediatype"></a> `mediaType?` | `readonly` | `string` | MIME type of the stored artifact, when known. | [packages/core/src/types/tool.ts:208](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L208) |
+| <a id="property-preview"></a> `preview` | `readonly` | `string` | A bounded preview of the full body (already inlined alongside the handle). | [packages/core/src/types/tool.ts:204](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L204) |
+| <a id="property-producertrustclass"></a> `producerTrustClass?` | `readonly` | [`ToolTrustClass`](/api/@graphorin/core/type-aliases/ToolTrustClass.md) | Trust class of the tool that PRODUCED the stored body (TL-6). `read_result` re-applies inbound sanitization and dataflow provenance by this class, so an untrusted spill cannot launder to trusted through the built-in reader. | [packages/core/src/types/tool.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L215) |
+| <a id="property-uri"></a> `uri` | `readonly` | `string` | Opaque, run-scoped URI - e.g. `graphorin-spill:<runId>/<toolCallId>.json` for a spill artifact. Never a raw filesystem path: the reader resolves it within the configured artifact root, so the model cannot use it to read arbitrary files. | [packages/core/src/types/tool.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L200) |

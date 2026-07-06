@@ -6,7 +6,7 @@
 
 # Class: AgentRegistry
 
-Defined in: packages/sessions/src/agent-registry.ts:64
+Defined in: [packages/sessions/src/agent-registry.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L64)
 
 In-memory + write-through registry of agent metadata.
 
@@ -20,7 +20,7 @@ In-memory + write-through registry of agent metadata.
 new AgentRegistry(args): AgentRegistry;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:69
+Defined in: [packages/sessions/src/agent-registry.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L69)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/sessions/src/agent-registry.ts:69
 delete(id, opts?): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:127
+Defined in: [packages/sessions/src/agent-registry.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L127)
 
 Hard-delete an agent. Subsequent `resolveOrPlaceholder(id)`
 returns `{ kind: 'unknown', id }` so replay can substitute a
@@ -69,7 +69,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:140
+Defined in: [packages/sessions/src/agent-registry.ts:140](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L140)
 
 Best-effort lookup. Returns `null` when the agent is unknown.
 
@@ -93,7 +93,7 @@ Best-effort lookup. Returns `null` when the agent is unknown.
 hydrate(): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:79
+Defined in: [packages/sessions/src/agent-registry.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L79)
 
 Hydrate the in-memory cache from the store. Useful when a process
 boots after a restart and wants the agent catalogue ready before
@@ -111,7 +111,7 @@ any `Session.list({...})` call.
 list(): Promise<readonly AgentRegistryEntry[]>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:151
+Defined in: [packages/sessions/src/agent-registry.ts:151](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L151)
 
 List every known agent (active + retired).
 
@@ -127,7 +127,7 @@ List every known agent (active + retired).
 register(id, opts): Promise<AgentRegistryEntry>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:89
+Defined in: [packages/sessions/src/agent-registry.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L89)
 
 Idempotent registration. Re-registering the same id refreshes the
 display name + tags but preserves the original `registeredAt`.
@@ -151,7 +151,7 @@ display name + tags but preserves the original `registeredAt`.
 resolveOrPlaceholder(id): Promise<AgentRegistryLookup>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:160
+Defined in: [packages/sessions/src/agent-registry.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L160)
 
 Replay-safe lookup. Returns `{ kind: 'agent', agent }` when the id
 is known (active or retired), or `{ kind: 'unknown', id }` when
@@ -175,7 +175,7 @@ the agent has been hard-deleted.
 retire(id, opts?): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:110
+Defined in: [packages/sessions/src/agent-registry.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L110)
 
 Soft-retire an agent. Subsequent `resolveOrPlaceholder(id)` still
 returns the metadata (with `retiredAt` set) so replay shows
@@ -201,7 +201,7 @@ on an unknown id.
 snapshot(): readonly AgentRegistryEntry[];
 ```
 
-Defined in: packages/sessions/src/agent-registry.ts:170
+Defined in: [packages/sessions/src/agent-registry.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/agent-registry.ts#L170)
 
 Snapshot of the in-memory cache. Used by JSONL export to embed
 `kind: 'agent'` records without an extra round-trip to the store.

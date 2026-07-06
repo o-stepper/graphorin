@@ -10,7 +10,7 @@
 const END_NODE: "__end__";
 ```
 
-Defined in: packages/workflow/src/types.ts:34
+Defined in: [packages/workflow/src/types.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L34)
 
 Sentinel name reserved for the implicit terminal node. Edges
 pointing at `__end__` complete the workflow.

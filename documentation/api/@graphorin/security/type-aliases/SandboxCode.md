@@ -24,7 +24,7 @@ type SandboxCode =
 };
 ```
 
-Defined in: packages/core/dist/contracts/sandbox.d.ts:21
+Defined in: [packages/core/dist/contracts/sandbox.d.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/sandbox.d.ts#L21)
 
 Description of the code to run in the sandbox. Either a JS source
 string, a path to a JS file, or a fully-qualified handler reference

@@ -10,7 +10,7 @@
 type Sensitivity = "public" | "internal" | "secret";
 ```
 
-Defined in: packages/core/src/types/sensitivity.ts:13
+Defined in: [packages/core/src/types/sensitivity.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/sensitivity.ts#L13)
 
 Sensitivity tier for any piece of data flowing through Graphorin.
 

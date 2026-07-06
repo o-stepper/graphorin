@@ -6,7 +6,7 @@
 
 # Interface: VerificationResult
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:113
+Defined in: [packages/memory/src/consolidator/phases/induce.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L113)
 
 Result of self-verifying a reuse against an induced procedure's criteria.
 
@@ -14,5 +14,5 @@ Result of self-verifying a reuse against an induced procedure's criteria.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-unmet"></a> `unmet` | `readonly` | readonly `string`[] | Criteria not satisfied by the observed signals. | packages/memory/src/consolidator/phases/induce.ts:117 |
-| <a id="property-verified"></a> `verified` | `readonly` | `boolean` | True only when the procedure has criteria and every one is met. | packages/memory/src/consolidator/phases/induce.ts:115 |
+| <a id="property-unmet"></a> `unmet` | `readonly` | readonly `string`[] | Criteria not satisfied by the observed signals. | [packages/memory/src/consolidator/phases/induce.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L117) |
+| <a id="property-verified"></a> `verified` | `readonly` | `boolean` | True only when the procedure has criteria and every one is met. | [packages/memory/src/consolidator/phases/induce.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L115) |

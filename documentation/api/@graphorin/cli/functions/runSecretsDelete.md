@@ -12,7 +12,7 @@ function runSecretsDelete(options): Promise<{
 }>;
 ```
 
-Defined in: packages/cli/src/commands/secrets.ts:165
+Defined in: [packages/cli/src/commands/secrets.ts:165](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/secrets.ts#L165)
 
 ## Parameters
 

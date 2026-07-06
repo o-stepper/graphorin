@@ -10,7 +10,7 @@
 function _setPublicKeyFetcherForTesting(fetcher): void;
 ```
 
-Defined in: packages/security/src/supply-chain/signature.ts:41
+Defined in: [packages/security/src/supply-chain/signature.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/signature.ts#L41)
 
 **`Experimental`**
 

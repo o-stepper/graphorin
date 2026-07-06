@@ -6,7 +6,7 @@
 
 # Interface: WorkflowInducer
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:105
+Defined in: [packages/memory/src/consolidator/phases/induce.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L105)
 
 Provider-agnostic seam: turn one successful trajectory into a procedure.
 Returns `null` when nothing inducible (degraded provider, empty output) -
@@ -24,7 +24,7 @@ induce(trajectory, options?): Promise<
 | null>;
 ```
 
-Defined in: packages/memory/src/consolidator/phases/induce.ts:106
+Defined in: [packages/memory/src/consolidator/phases/induce.ts:106](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/phases/induce.ts#L106)
 
 #### Parameters
 

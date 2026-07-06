@@ -6,7 +6,7 @@
 
 # Interface: CreateWorkflowTimerDaemonOptions
 
-Defined in: packages/server/src/workflows/timer-daemon.ts:51
+Defined in: [packages/server/src/workflows/timer-daemon.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L51)
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/server/src/workflows/timer-daemon.ts:51
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-driver"></a> `driver` | `readonly` | [`WorkflowTimerDriverLike`](/api/@graphorin/server/interfaces/WorkflowTimerDriverLike.md) | packages/server/src/workflows/timer-daemon.ts:52 |
+| <a id="property-driver"></a> `driver` | `readonly` | [`WorkflowTimerDriverLike`](/api/@graphorin/server/interfaces/WorkflowTimerDriverLike.md) | [packages/server/src/workflows/timer-daemon.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/workflows/timer-daemon.ts#L52) |

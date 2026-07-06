@@ -6,7 +6,7 @@
 
 # Interface: Sampler
 
-Defined in: packages/observability/src/tracer/sampling.ts:77
+Defined in: [packages/observability/src/tracer/sampling.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L77)
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/observability/src/tracer/sampling.ts:77
 shouldIncludeChunkContent(): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:83
+Defined in: [packages/observability/src/tracer/sampling.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L83)
 
 Returns whether chunk *content* should travel through the exporter.
 
@@ -34,7 +34,7 @@ Returns whether chunk *content* should travel through the exporter.
 shouldRecordEvent(name): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:81
+Defined in: [packages/observability/src/tracer/sampling.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L81)
 
 Decide whether a span event of the given name should be recorded.
 
@@ -56,7 +56,7 @@ Decide whether a span event of the given name should be recorded.
 shouldSample(type, parentSampled?): boolean;
 ```
 
-Defined in: packages/observability/src/tracer/sampling.ts:79
+Defined in: [packages/observability/src/tracer/sampling.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/sampling.ts#L79)
 
 Decide whether a span of the given type should be recorded.
 

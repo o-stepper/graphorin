@@ -10,7 +10,7 @@
 function applyProcessHardening(opts?): HardeningStatus;
 ```
 
-Defined in: packages/security/src/hardening/apply.ts:83
+Defined in: [packages/security/src/hardening/apply.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/apply.ts#L83)
 
 Apply process-level hardening. The function returns the resolved
 status so consumers can record it (e.g. forward to the audit log).

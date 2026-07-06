@@ -10,7 +10,7 @@
 function createDefaultCounter(options): TokenCounter;
 ```
 
-Defined in: packages/provider/src/counters/dispatcher.ts:86
+Defined in: [packages/provider/src/counters/dispatcher.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/counters/dispatcher.ts#L86)
 
 Build the recommended [TokenCounter](/api/@graphorin/core/interfaces/TokenCounter.md) for the given
 `(provider, model)` pair. The dispatch table:

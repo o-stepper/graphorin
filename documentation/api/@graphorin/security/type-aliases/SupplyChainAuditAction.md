@@ -15,7 +15,7 @@ type SupplyChainAuditAction =
   | "skill:install-denied";
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:15
+Defined in: [packages/security/src/supply-chain/audit-emitter.ts:15](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit-emitter.ts#L15)
 
 Discriminator for `SupplyChainAuditEvent`.
 

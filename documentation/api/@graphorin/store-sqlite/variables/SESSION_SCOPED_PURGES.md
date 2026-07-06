@@ -10,7 +10,7 @@
 const SESSION_SCOPED_PURGES: ReadonlyArray<SessionScopedPurge>;
 ```
 
-Defined in: packages/store-sqlite/src/session-store.ts:438
+Defined in: [packages/store-sqlite/src/session-store.ts:438](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/session-store.ts#L438)
 
 Declarative registry of every session-scoped CONTENT surface the
 session hard-delete cascade purges (W-029/W-060). The gate test in

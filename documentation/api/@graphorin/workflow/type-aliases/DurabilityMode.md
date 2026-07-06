@@ -10,7 +10,7 @@
 type DurabilityMode = "sync" | "exit";
 ```
 
-Defined in: packages/workflow/src/types.ts:57
+Defined in: [packages/workflow/src/types.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L57)
 
 Allowed durability modes for the checkpoint writer.
 

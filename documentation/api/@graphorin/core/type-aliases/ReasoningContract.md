@@ -10,7 +10,7 @@
 type ReasoningContract = "hidden" | "round-trip-required" | "optional";
 ```
 
-Defined in: packages/core/src/contracts/reasoning-retention.ts:52
+Defined in: [packages/core/src/contracts/reasoning-retention.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/reasoning-retention.ts#L52)
 
 Capability declaration on `ProviderCapabilities` describing how the
 provider treats reasoning content. The field is auto-populated per

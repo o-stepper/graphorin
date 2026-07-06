@@ -6,7 +6,7 @@
 
 # Interface: PredicateOptions\&lt;I, O\&gt;
 
-Defined in: evals/src/scorers/code/predicate.ts:11
+Defined in: [packages/evals/src/scorers/code/predicate.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/predicate.ts#L11)
 
 ## Stable
 
@@ -21,5 +21,5 @@ Defined in: evals/src/scorers/code/predicate.ts:11
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`args`) => \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md) \| `Promise`\&lt; \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md)\&gt; | evals/src/scorers/code/predicate.ts:13 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | evals/src/scorers/code/predicate.ts:12 |
+| <a id="property-check"></a> `check` | `readonly` | (`args`) => \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md) \| `Promise`\&lt; \| `boolean` \| [`ScoreResult`](/api/@graphorin/evals/interfaces/ScoreResult.md)\&gt; | [packages/evals/src/scorers/code/predicate.ts:13](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/predicate.ts#L13) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/evals/src/scorers/code/predicate.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/predicate.ts#L12) |

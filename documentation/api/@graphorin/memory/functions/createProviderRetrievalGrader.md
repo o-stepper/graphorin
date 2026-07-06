@@ -10,7 +10,7 @@
 function createProviderRetrievalGrader(provider, options?): RetrievalGrader;
 ```
 
-Defined in: packages/memory/src/search/iterative.ts:311
+Defined in: [packages/memory/src/search/iterative.ts:311](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/iterative.ts#L311)
 
 Wrap a [Provider](/api/@graphorin/core/interfaces/Provider.md) as a [RetrievalGrader](/api/@graphorin/memory/interfaces/RetrievalGrader.md). **Resilient**: a
 provider error or unparseable response degrades to the

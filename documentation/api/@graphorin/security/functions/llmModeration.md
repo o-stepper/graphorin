@@ -10,7 +10,7 @@
 function llmModeration<TValue>(opts): InputGuardrail<TValue>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/llm-moderation.ts:73
+Defined in: [packages/security/src/guardrails/builtins/llm-moderation.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/llm-moderation.ts#L73)
 
 Construct an input-side moderation guardrail.
 

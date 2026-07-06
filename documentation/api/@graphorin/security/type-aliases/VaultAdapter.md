@@ -10,7 +10,7 @@
 type VaultAdapter = (ref, ctx) => Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/vault.ts:17
+Defined in: [packages/security/src/secrets/resolvers/vault.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/vault.ts#L17)
 
 Concrete adapter signature plugged into `setVaultAdapter(...)`. The
 built-in resolver only ships the **pattern** - a real Vault adapter

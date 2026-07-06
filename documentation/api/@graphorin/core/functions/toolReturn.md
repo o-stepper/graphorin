@@ -10,7 +10,7 @@
 function toolReturn<TOutput>(fields): ToolReturn<TOutput>;
 ```
 
-Defined in: packages/core/src/contracts/tool.ts:288
+Defined in: [packages/core/src/contracts/tool.ts:288](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tool.ts#L288)
 
 W-115: build a BRANDED [ToolReturn](/api/@graphorin/core/interfaces/ToolReturn.md) envelope. The executor
 unwraps branded envelopes unconditionally; unbranded objects fall to

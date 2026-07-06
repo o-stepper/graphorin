@@ -17,7 +17,7 @@ type Channel<T> =
 | Ephemeral<T>;
 ```
 
-Defined in: packages/core/src/channels/channels.ts:31
+Defined in: [packages/core/src/channels/channels.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L31)
 
 Discriminated union of every channel descriptor.
 

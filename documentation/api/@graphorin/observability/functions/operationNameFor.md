@@ -12,7 +12,7 @@ function operationNameFor(type):
   | undefined;
 ```
 
-Defined in: packages/observability/src/gen-ai/operation-mapping.ts:78
+Defined in: [packages/observability/src/gen-ai/operation-mapping.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/operation-mapping.ts#L78)
 
 Resolve the canonical `gen_ai.operation.name` value for a Graphorin
 span type. Returns `undefined` if no mapping exists (e.g. for

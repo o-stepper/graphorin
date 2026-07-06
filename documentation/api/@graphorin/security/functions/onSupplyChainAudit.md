@@ -10,7 +10,7 @@
 function onSupplyChainAudit(listener): () => void;
 ```
 
-Defined in: packages/security/src/supply-chain/audit-emitter.ts:67
+Defined in: [packages/security/src/supply-chain/audit-emitter.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit-emitter.ts#L67)
 
 Subscribe to supply-chain audit events. The audit-log subsystem
 registers exactly one listener.

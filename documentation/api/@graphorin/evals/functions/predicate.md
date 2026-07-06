@@ -10,7 +10,7 @@
 function predicate<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/code/predicate.ts:21
+Defined in: [packages/evals/src/scorers/code/predicate.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/predicate.ts#L21)
 
 ## Type Parameters
 

@@ -10,7 +10,7 @@
 function md5(content): string;
 ```
 
-Defined in: packages/core/src/utils/hash.ts:17
+Defined in: [packages/core/src/utils/hash.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/utils/hash.ts#L17)
 
 MD5 hex digest. Used by the memory layer for content deduplication
 (`MD5(content)` is the dedup key for incoming facts / messages).

@@ -6,7 +6,7 @@
 
 # Interface: AISpan\&lt;T\&gt;
 
-Defined in: packages/core/src/contracts/tracer.ts:132
+Defined in: [packages/core/src/contracts/tracer.ts:132](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L132)
 
 Typed span. Generic over `SpanType` so consumers can specialize a
 function on a particular span kind without losing the discriminator.
@@ -27,10 +27,10 @@ function on a particular span kind without losing the discriminator.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:134 |
-| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:136 |
-| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | packages/core/src/contracts/tracer.ts:135 |
-| <a id="property-type"></a> `type` | `readonly` | `T` | packages/core/src/contracts/tracer.ts:133 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/core/src/contracts/tracer.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L134) |
+| <a id="property-parentid"></a> `parentId?` | `readonly` | `string` | [packages/core/src/contracts/tracer.ts:136](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L136) |
+| <a id="property-traceid"></a> `traceId` | `readonly` | `string` | [packages/core/src/contracts/tracer.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L135) |
+| <a id="property-type"></a> `type` | `readonly` | `T` | [packages/core/src/contracts/tracer.ts:133](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L133) |
 
 ## Methods
 
@@ -43,7 +43,7 @@ addEvent(
    opts?): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:146
+Defined in: [packages/core/src/contracts/tracer.ts:146](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L146)
 
 Append a span event (attribute-bearing time-stamped marker). The
 optional `opts` (W-094) tags the event's attributes with a
@@ -56,7 +56,7 @@ dropped below the floor.
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `attrs?` | `Readonly`\&lt;`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\&gt; |
+| `attrs?` | `Readonly`\<`Record`\&lt;`string`, [`SpanAttributeValue`](/api/@graphorin/core/type-aliases/SpanAttributeValue.md)\&gt;\> |
 | `opts?` | [`AddEventOptions`](/api/@graphorin/core/interfaces/AddEventOptions.md) |
 
 #### Returns
@@ -71,7 +71,7 @@ dropped below the floor.
 end(): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:152
+Defined in: [packages/core/src/contracts/tracer.ts:152](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L152)
 
 End the span. Idempotent.
 
@@ -87,7 +87,7 @@ End the span. Idempotent.
 recordException(err): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:148
+Defined in: [packages/core/src/contracts/tracer.ts:148](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L148)
 
 Record an exception. Multiple calls are kept in the span event log.
 
@@ -109,7 +109,7 @@ Record an exception. Multiple calls are kept in the span event log.
 setAttributes(attrs): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:138
+Defined in: [packages/core/src/contracts/tracer.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L138)
 
 Add or replace attributes. Repeated calls are merged (last write wins).
 
@@ -131,7 +131,7 @@ Add or replace attributes. Repeated calls are merged (last write wins).
 setStatus(status, message?): void;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:150
+Defined in: [packages/core/src/contracts/tracer.ts:150](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L150)
 
 Set the terminal status.
 

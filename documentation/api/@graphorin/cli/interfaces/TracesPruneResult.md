@@ -6,7 +6,7 @@
 
 # Interface: TracesPruneResult
 
-Defined in: packages/cli/src/commands/traces.ts:103
+Defined in: [packages/cli/src/commands/traces.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/traces.ts#L103)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/cli/src/commands/traces.ts:103
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-cutoff"></a> `cutoff` | `readonly` | `string` | packages/cli/src/commands/traces.ts:105 |
-| <a id="property-removed"></a> `removed` | `readonly` | `number` | packages/cli/src/commands/traces.ts:104 |
+| <a id="property-cutoff"></a> `cutoff` | `readonly` | `string` | [packages/cli/src/commands/traces.ts:105](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/traces.ts#L105) |
+| <a id="property-removed"></a> `removed` | `readonly` | `number` | [packages/cli/src/commands/traces.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/traces.ts#L104) |

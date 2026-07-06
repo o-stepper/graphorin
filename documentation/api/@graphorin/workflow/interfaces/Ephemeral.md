@@ -6,7 +6,7 @@
 
 # Interface: Ephemeral\&lt;T\&gt;
 
-Defined in: packages/core/dist/channels/channels.d.ts:93
+Defined in: [packages/core/dist/channels/channels.d.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts#L93)
 
 Value scoped to a single execution step - discarded when the step
 ends.
@@ -23,5 +23,5 @@ ends.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-default"></a> `default?` | `readonly` | `T` | packages/core/dist/channels/channels.d.ts:95 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"ephemeral"` | packages/core/dist/channels/channels.d.ts:94 |
+| <a id="property-default"></a> `default?` | `readonly` | `T` | [packages/core/dist/channels/channels.d.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts#L95) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"ephemeral"` | [packages/core/dist/channels/channels.d.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/channels/channels.d.ts#L94) |

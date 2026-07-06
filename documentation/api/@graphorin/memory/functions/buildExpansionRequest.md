@@ -13,7 +13,7 @@ function buildExpansionRequest(
    options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/search/query-transform.ts:109
+Defined in: [packages/memory/src/search/query-transform.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/query-transform.ts#L109)
 
 Build the multi-query expansion request. Pure - no I/O. A higher
 temperature is used deliberately so the variants diverge (the

@@ -6,7 +6,7 @@
 
 # Interface: EpisodicMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:56
+Defined in: [packages/memory/src/internal/storage-adapter.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L56)
 
 Extension of the typed `EpisodicMemoryStore` with optional
 embedding-aware helpers + lifecycle helpers that storage adapters
@@ -29,7 +29,7 @@ optional archive(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:72
+Defined in: [packages/memory/src/internal/storage-adapter.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L72)
 
 Mark an episode archived. Soft-archive - the row stays for replay.
 W-154: with `scope`, adapters no-op unless the row belongs to it.
@@ -54,7 +54,7 @@ W-154: with `scope`, adapters no-op unless the row belongs to it.
 optional count(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:99
+Defined in: [packages/memory/src/internal/storage-adapter.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L99)
 
 Count the recall-eligible episodes for the scope (CE-5) - a `COUNT(*)`,
 never materialising rows. Powers honest `metadata()` counts.
@@ -77,7 +77,7 @@ never materialising rows. Powers honest `metadata()` counts.
 get(id): Promise<Episode | null>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:129
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L129)
 
 #### Parameters
 
@@ -104,7 +104,7 @@ optional listRecent(
 options?): Promise<readonly Episode[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:79
+Defined in: [packages/memory/src/internal/storage-adapter.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L79)
 
 Most-recent episodes by end time (newest first), with no FTS / vector
 query - recency, not relevance (MCON-1). Powers `EpisodicMemory.recent()`
@@ -132,7 +132,7 @@ adapter implements it.
 put(episode): Promise<void>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:127
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:127](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L127)
 
 #### Parameters
 
@@ -156,7 +156,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:127
 optional putWithEmbedding(episode, options): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:57
+Defined in: [packages/memory/src/internal/storage-adapter.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L57)
 
 #### Parameters
 
@@ -177,7 +177,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:57
 search(scope, opts): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/core/dist/contracts/memory-store.d.ts:128
+Defined in: [packages/core/dist/contracts/memory-store.d.ts:128](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/contracts/memory-store.d.ts#L128)
 
 #### Parameters
 
@@ -188,7 +188,7 @@ Defined in: packages/core/dist/contracts/memory-store.d.ts:128
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
 
 #### Inherited from
 
@@ -208,7 +208,7 @@ optional searchVector(
 includeQuarantined?): Promise<readonly MemoryHit<Episode>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:58
+Defined in: [packages/memory/src/internal/storage-adapter.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L58)
 
 #### Parameters
 
@@ -223,7 +223,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:58
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Episode`](/api/@graphorin/core/interfaces/Episode.md)\&gt;[]\>
 
 ***
 
@@ -237,7 +237,7 @@ optional setStatus(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:89
+Defined in: [packages/memory/src/internal/storage-adapter.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L89)
 
 Set an episode's retrieval-trust `status` (MCON-2) - promote a quarantined
 (auto-formed) episode into default recall or re-quarantine an active one,

@@ -6,7 +6,7 @@
 
 # Interface: TriggerStore
 
-Defined in: packages/core/src/contracts/trigger-store.ts:34
+Defined in: [packages/core/src/contracts/trigger-store.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/trigger-store.ts#L34)
 
 Pluggable persistent storage for triggers. Default impl lives in
 `@graphorin/store-sqlite`.
@@ -23,7 +23,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/trigger-store.ts:36
+Defined in: [packages/core/src/contracts/trigger-store.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/trigger-store.ts#L36)
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Defined in: packages/core/src/contracts/trigger-store.ts:36
 list(): Promise<readonly TriggerState[]>;
 ```
 
-Defined in: packages/core/src/contracts/trigger-store.ts:37
+Defined in: [packages/core/src/contracts/trigger-store.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/trigger-store.ts#L37)
 
 #### Returns
 
@@ -62,7 +62,7 @@ recordFire(
 nextFireAt?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/trigger-store.ts:39
+Defined in: [packages/core/src/contracts/trigger-store.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/trigger-store.ts#L39)
 
 #### Parameters
 
@@ -84,7 +84,7 @@ Defined in: packages/core/src/contracts/trigger-store.ts:39
 remove(id): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/trigger-store.ts:38
+Defined in: [packages/core/src/contracts/trigger-store.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/trigger-store.ts#L38)
 
 #### Parameters
 
@@ -104,7 +104,7 @@ Defined in: packages/core/src/contracts/trigger-store.ts:38
 upsert(state): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/trigger-store.ts:35
+Defined in: [packages/core/src/contracts/trigger-store.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/trigger-store.ts#L35)
 
 #### Parameters
 

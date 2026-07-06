@@ -10,7 +10,7 @@
 function finalStateCorrect<I>(options): Scorer<I, Trajectory>;
 ```
 
-Defined in: evals/src/scorers/trajectory/final-state-correct.ts:28
+Defined in: [packages/evals/src/scorers/trajectory/final-state-correct.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/trajectory/final-state-correct.ts#L28)
 
 ## Type Parameters
 

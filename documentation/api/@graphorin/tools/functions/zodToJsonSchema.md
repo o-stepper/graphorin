@@ -10,7 +10,7 @@
 function zodToJsonSchema(schema, opts?): JsonSchemaRecord;
 ```
 
-Defined in: packages/tools/src/schema/to-json-schema.ts:739
+Defined in: [packages/tools/src/schema/to-json-schema.ts:739](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/schema/to-json-schema.ts#L739)
 
 Convert a Zod schema instance (v3 classic or v4) to a JSON Schema
 record. Structural: works across `zod` copies and never executes user

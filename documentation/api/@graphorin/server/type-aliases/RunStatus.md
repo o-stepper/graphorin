@@ -10,7 +10,7 @@
 type RunStatus = "pending" | "running" | "completed" | "failed" | "aborted";
 ```
 
-Defined in: packages/server/src/runtime/run-state.ts:25
+Defined in: [packages/server/src/runtime/run-state.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/run-state.ts#L25)
 
 Stable status discriminator for a run snapshot. Mirrors the values
 exposed on the public REST surface.

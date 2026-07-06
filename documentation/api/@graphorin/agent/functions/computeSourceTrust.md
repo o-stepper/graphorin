@@ -10,7 +10,7 @@
 function computeSourceTrust(input, overrides?): number;
 ```
 
-Defined in: packages/agent/src/lateral-leak/merge-guard.ts:84
+Defined in: [packages/agent/src/lateral-leak/merge-guard.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/merge-guard.ts#L84)
 
 Compose `baseline * provenance * historyAdjustment` and clamp.
 
@@ -19,7 +19,7 @@ Compose `baseline * provenance * historyAdjustment` and clamp.
 | Parameter | Type |
 | ------ | ------ |
 | `input` | [`ChildTrustInput`](/api/@graphorin/agent/interfaces/ChildTrustInput.md) |
-| `overrides` | `Readonly`\&lt;`Record`\&lt;`string`, `number`\&gt;\&gt; |
+| `overrides` | `Readonly`\<`Record`\&lt;`string`, `number`\&gt;\> |
 
 ## Returns
 

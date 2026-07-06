@@ -38,7 +38,7 @@ type GenAIOperationName =
   | "replay.skipped";
 ```
 
-Defined in: packages/observability/src/gen-ai/types.ts:51
+Defined in: [packages/observability/src/gen-ai/types.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/gen-ai/types.ts#L51)
 
 Canonical `gen_ai.operation.name` enum used per the OpenTelemetry
 GenAI semantic conventions for AI agent + framework spans.

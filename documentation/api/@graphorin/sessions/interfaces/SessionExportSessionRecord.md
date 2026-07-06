@@ -6,7 +6,7 @@
 
 # Interface: SessionExportSessionRecord
 
-Defined in: packages/sessions/src/export/types.ts:89
+Defined in: [packages/sessions/src/export/types.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L89)
 
 Single session metadata row.
 
@@ -16,12 +16,12 @@ Single session metadata row.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | packages/sessions/src/export/types.ts:93 |
-| <a id="property-closedat"></a> `closedAt?` | `readonly` | `string` | packages/sessions/src/export/types.ts:98 |
-| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | packages/sessions/src/export/types.ts:96 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/sessions/src/export/types.ts:91 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"session"` | packages/sessions/src/export/types.ts:90 |
-| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | packages/sessions/src/export/types.ts:95 |
-| <a id="property-title"></a> `title?` | `readonly` | `string` | packages/sessions/src/export/types.ts:94 |
-| <a id="property-updatedat"></a> `updatedAt?` | `readonly` | `string` | packages/sessions/src/export/types.ts:97 |
-| <a id="property-userid"></a> `userId` | `readonly` | `string` | packages/sessions/src/export/types.ts:92 |
+| <a id="property-agentid"></a> `agentId` | `readonly` | `string` | [packages/sessions/src/export/types.ts:93](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L93) |
+| <a id="property-closedat"></a> `closedAt?` | `readonly` | `string` | [packages/sessions/src/export/types.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L98) |
+| <a id="property-createdat"></a> `createdAt` | `readonly` | `string` | [packages/sessions/src/export/types.ts:96](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L96) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/sessions/src/export/types.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L91) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"session"` | [packages/sessions/src/export/types.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L90) |
+| <a id="property-tags"></a> `tags?` | `readonly` | readonly `string`[] | [packages/sessions/src/export/types.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L95) |
+| <a id="property-title"></a> `title?` | `readonly` | `string` | [packages/sessions/src/export/types.ts:94](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L94) |
+| <a id="property-updatedat"></a> `updatedAt?` | `readonly` | `string` | [packages/sessions/src/export/types.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L97) |
+| <a id="property-userid"></a> `userId` | `readonly` | `string` | [packages/sessions/src/export/types.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/types.ts#L92) |

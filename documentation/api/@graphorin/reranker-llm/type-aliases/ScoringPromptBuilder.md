@@ -10,7 +10,7 @@
 type ScoringPromptBuilder = (input) => ScoringPrompt;
 ```
 
-Defined in: src/scoring-prompt.ts:39
+Defined in: [packages/reranker-llm/src/scoring-prompt.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/scoring-prompt.ts#L39)
 
 Function shape consumed by [createLlmReranker](/api/@graphorin/reranker-llm/functions/createLlmReranker.md).
 

@@ -10,7 +10,7 @@
 const VERSION: string = pkg.version;
 ```
 
-Defined in: packages/core/src/index.ts:18
+Defined in: [packages/core/src/index.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/index.ts#L18)
 
 Canonical version constant, derived from `package.json` at build
 time so a release bump never has to edit source.

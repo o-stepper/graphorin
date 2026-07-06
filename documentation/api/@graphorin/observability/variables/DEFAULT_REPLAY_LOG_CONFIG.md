@@ -10,7 +10,7 @@
 const DEFAULT_REPLAY_LOG_CONFIG: Omit<Required<ReplayLogConfig>, "path">;
 ```
 
-Defined in: packages/observability/src/replay/config.ts:54
+Defined in: [packages/observability/src/replay/config.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/config.ts#L54)
 
 Default values for the replay log configuration.
 

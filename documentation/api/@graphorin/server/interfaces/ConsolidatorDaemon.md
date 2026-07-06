@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorDaemon
 
-Defined in: packages/server/src/consolidator/daemon.ts:76
+Defined in: [packages/server/src/consolidator/daemon.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L76)
 
 ## Stable
 
@@ -14,7 +14,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:76
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-consolidator"></a> `consolidator` | `readonly` | [`ConsolidatorLike`](/api/@graphorin/server/interfaces/ConsolidatorLike.md) | packages/server/src/consolidator/daemon.ts:80 |
+| <a id="property-consolidator"></a> `consolidator` | `readonly` | [`ConsolidatorLike`](/api/@graphorin/server/interfaces/ConsolidatorLike.md) | [packages/server/src/consolidator/daemon.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L80) |
 
 ## Methods
 
@@ -24,7 +24,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:76
 start(): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:77
+Defined in: [packages/server/src/consolidator/daemon.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L77)
 
 #### Returns
 
@@ -38,7 +38,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:77
 status(): Promise<ConsolidatorStatusLike>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:79
+Defined in: [packages/server/src/consolidator/daemon.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L79)
 
 #### Returns
 
@@ -52,7 +52,7 @@ Defined in: packages/server/src/consolidator/daemon.ts:79
 stop(): Promise<void>;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:78
+Defined in: [packages/server/src/consolidator/daemon.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L78)
 
 #### Returns
 

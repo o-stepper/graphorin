@@ -32,7 +32,7 @@ type ReplayEvent =
 };
 ```
 
-Defined in: packages/observability/src/replay/types.ts:59
+Defined in: [packages/observability/src/replay/types.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/types.ts#L59)
 
 Single record yielded by the replay iterator.
 

@@ -10,7 +10,7 @@
 function costTrackerUsageDelegate(tracker, ids): (info) => void;
 ```
 
-Defined in: packages/observability/src/cost/delegate.ts:63
+Defined in: [packages/observability/src/cost/delegate.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/cost/delegate.ts#L63)
 
 Build an `onUsage` callback that records into `tracker`. Pass either
 static ids (a provider instance bound to one session) or a resolver

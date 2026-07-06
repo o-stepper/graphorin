@@ -6,7 +6,7 @@
 
 # Class: KeyringSecretsStore
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:35
+Defined in: [packages/security/src/secrets/stores/keyring.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L35)
 
 `SecretsStore` backed by `@napi-rs/keyring`.
 
@@ -24,7 +24,7 @@ Defined in: packages/security/src/secrets/stores/keyring.ts:35
 new KeyringSecretsStore(opts?): KeyringSecretsStore;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:39
+Defined in: [packages/security/src/secrets/stores/keyring.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L39)
 
 #### Parameters
 
@@ -40,7 +40,7 @@ Defined in: packages/security/src/secrets/stores/keyring.ts:39
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-kind"></a> `kind` | `readonly` | `"keyring"` | packages/security/src/secrets/stores/keyring.ts:36 |
+| <a id="property-kind"></a> `kind` | `readonly` | `"keyring"` | [packages/security/src/secrets/stores/keyring.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L36) |
 
 ## Methods
 
@@ -50,7 +50,7 @@ Defined in: packages/security/src/secrets/stores/keyring.ts:39
 delete(key, _scope?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:95
+Defined in: [packages/security/src/secrets/stores/keyring.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L95)
 
 #### Parameters
 
@@ -75,7 +75,7 @@ Defined in: packages/security/src/secrets/stores/keyring.ts:95
 get(key, _scope?): Promise<SecretValue | null>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:44
+Defined in: [packages/security/src/secrets/stores/keyring.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L44)
 
 Returns the secret if it exists, `null` otherwise.
 
@@ -102,7 +102,7 @@ Returns the secret if it exists, `null` otherwise.
 list(_scope?): Promise<readonly SecretMetadata[]>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:104
+Defined in: [packages/security/src/secrets/stores/keyring.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L104)
 
 Returns metadata about every key - never the values themselves.
 
@@ -128,7 +128,7 @@ Returns metadata about every key - never the values themselves.
 require(key, _scope?): Promise<SecretValue>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:67
+Defined in: [packages/security/src/secrets/stores/keyring.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L67)
 
 Returns the secret or throws. Implementations enforce the per-tool
 `secretsAllowed` ACL: if the current tool context disallows `key`,
@@ -160,7 +160,7 @@ set(
 _opts?): Promise<void>;
 ```
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:81
+Defined in: [packages/security/src/secrets/stores/keyring.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L81)
 
 Persist a secret. Implementations auto-wrap a plain string into a
 `SecretValue` so callers don't have to.

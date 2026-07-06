@@ -13,7 +13,7 @@ function verifyAuditConsistency(
    proof): boolean;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:277
+Defined in: [packages/security/src/audit/merkle.ts:277](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L277)
 
 Verify a consistency proof between two heads (RFC 6962 §2.1.2). A
 `true` result means `newer` is an append-only extension of `older` -

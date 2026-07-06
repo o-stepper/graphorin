@@ -10,7 +10,7 @@
 function defineContextLocalePack(input): PartialContextLocalePack;
 ```
 
-Defined in: packages/memory/src/context-engine/locale-packs/types.ts:135
+Defined in: [packages/memory/src/context-engine/locale-packs/types.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/locale-packs/types.ts#L135)
 
 Build a [ContextLocalePack](/api/@graphorin/memory/interfaces/ContextLocalePack.md) from a partial input. Missing
 fields fall back to the English default at compose time.

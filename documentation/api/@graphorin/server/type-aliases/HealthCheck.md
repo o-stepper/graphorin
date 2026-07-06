@@ -18,6 +18,6 @@ type HealthCheck =
   | ReplayBufferCheck;
 ```
 
-Defined in: packages/server/src/health/checks.ts:100
+Defined in: [packages/server/src/health/checks.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/health/checks.ts#L100)
 
 ## Stable

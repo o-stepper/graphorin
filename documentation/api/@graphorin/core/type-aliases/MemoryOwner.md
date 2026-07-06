@@ -10,7 +10,7 @@
 type MemoryOwner = "user" | "agent" | "shared";
 ```
 
-Defined in: packages/core/src/types/memory.ts:68
+Defined in: [packages/core/src/types/memory.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/memory.ts#L68)
 
 Principal a memory belongs to (D3) - the *who-owns-this* dimension,
 orthogonal to [MemoryProvenance](/api/@graphorin/core/type-aliases/MemoryProvenance.md) (*where-it-came-from*):

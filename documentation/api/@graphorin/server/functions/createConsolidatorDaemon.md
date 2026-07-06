@@ -10,7 +10,7 @@
 function createConsolidatorDaemon(options): ConsolidatorDaemon;
 ```
 
-Defined in: packages/server/src/consolidator/daemon.ts:86
+Defined in: [packages/server/src/consolidator/daemon.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/consolidator/daemon.ts#L86)
 
 ## Parameters
 

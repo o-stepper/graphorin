@@ -10,7 +10,7 @@
 type GuardrailAction = "block" | "warn" | "rewrite";
 ```
 
-Defined in: packages/security/src/guardrails/types.ts:33
+Defined in: [packages/security/src/guardrails/types.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L33)
 
 Action requested by a failing guardrail.
 

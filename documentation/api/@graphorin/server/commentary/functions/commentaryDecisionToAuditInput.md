@@ -10,7 +10,7 @@
 function commentaryDecisionToAuditInput(decision): AuditEntryInput;
 ```
 
-Defined in: packages/server/src/commentary/audit-bridge.ts:33
+Defined in: [packages/server/src/commentary/audit-bridge.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/commentary/audit-bridge.ts#L33)
 
 Translate a sanitizer decision into an audit entry. The digests + matched
 pattern bucket land in `metadata`; raw payloads never do (the sanitizer only

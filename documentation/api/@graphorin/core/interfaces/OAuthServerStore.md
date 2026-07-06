@@ -6,7 +6,7 @@
 
 # Interface: OAuthServerStore
 
-Defined in: packages/core/src/contracts/oauth-server-store.ts:67
+Defined in: [packages/core/src/contracts/oauth-server-store.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/oauth-server-store.ts#L67)
 
 Pluggable storage for OAuth server registrations + token metadata.
 
@@ -25,7 +25,7 @@ is wired up.
 delete(id): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/oauth-server-store.ts:77
+Defined in: [packages/core/src/contracts/oauth-server-store.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/oauth-server-store.ts#L77)
 
 Remove the record for `id`.
 
@@ -49,7 +49,7 @@ get(id): Promise<
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/oauth-server-store.ts:71
+Defined in: [packages/core/src/contracts/oauth-server-store.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/oauth-server-store.ts#L71)
 
 Read the record for `id`, returning `null` when absent.
 
@@ -73,7 +73,7 @@ Read the record for `id`, returning `null` when absent.
 list(): Promise<readonly OAuthServerRecord[]>;
 ```
 
-Defined in: packages/core/src/contracts/oauth-server-store.ts:73
+Defined in: [packages/core/src/contracts/oauth-server-store.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/oauth-server-store.ts#L73)
 
 Snapshot of all stored records, ordered by `id`.
 
@@ -89,7 +89,7 @@ Snapshot of all stored records, ordered by `id`.
 put(record): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/oauth-server-store.ts:69
+Defined in: [packages/core/src/contracts/oauth-server-store.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/oauth-server-store.ts#L69)
 
 Insert or replace the record for `id`.
 
@@ -111,7 +111,7 @@ Insert or replace the record for `id`.
 update(id, patch): Promise<OAuthServerRecord>;
 ```
 
-Defined in: packages/core/src/contracts/oauth-server-store.ts:75
+Defined in: [packages/core/src/contracts/oauth-server-store.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/oauth-server-store.ts#L75)
 
 Apply a partial update to the record at `id`.
 

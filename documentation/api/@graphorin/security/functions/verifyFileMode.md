@@ -13,7 +13,7 @@ function verifyFileMode(path, expected): Promise<{
 }>;
 ```
 
-Defined in: packages/security/src/hardening/file-modes.ts:98
+Defined in: [packages/security/src/hardening/file-modes.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/file-modes.ts#L98)
 
 Read the current POSIX mode and report whether it matches.
 

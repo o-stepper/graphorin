@@ -10,7 +10,7 @@
 const DEFAULT_INJECTION_PATTERNS: ReadonlyArray<RegExp>;
 ```
 
-Defined in: packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts:34
+Defined in: [packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/builtins/prompt-injection-heuristics.ts#L34)
 
 Default catalogue of injection patterns. The patterns are
 case-insensitive and match common phrasings of the canonical

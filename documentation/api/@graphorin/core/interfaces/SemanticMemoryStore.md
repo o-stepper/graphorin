@@ -6,7 +6,7 @@
 
 # Interface: SemanticMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:157
+Defined in: [packages/core/src/contracts/memory-store.ts:157](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L157)
 
 ## Stable
 
@@ -25,7 +25,7 @@ forget(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:172
+Defined in: [packages/core/src/contracts/memory-store.ts:172](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L172)
 
 Soft-delete a fact. W-154: when `scope` is supplied, adapters that
 support tenant isolation MUST treat a fact outside the scope as a
@@ -57,7 +57,7 @@ compatible.
 remember(fact): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:158
+Defined in: [packages/core/src/contracts/memory-store.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L158)
 
 #### Parameters
 
@@ -77,7 +77,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:158
 search(scope, opts): Promise<readonly MemoryHit<Fact>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:159
+Defined in: [packages/core/src/contracts/memory-store.ts:159](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L159)
 
 #### Parameters
 
@@ -88,7 +88,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:159
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Fact`](/api/@graphorin/core/interfaces/Fact.md)\&gt;[]\>
 
 ***
 
@@ -101,7 +101,7 @@ supersede(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:160
+Defined in: [packages/core/src/contracts/memory-store.ts:160](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L160)
 
 #### Parameters
 

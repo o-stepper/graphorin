@@ -10,7 +10,7 @@
 function runSkillsMigrateFrontmatter(options?): Promise<SkillsMigrateFrontmatterResult>;
 ```
 
-Defined in: packages/cli/src/commands/skills.ts:185
+Defined in: [packages/cli/src/commands/skills.ts:185](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/skills.ts#L185)
 
 ## Parameters
 

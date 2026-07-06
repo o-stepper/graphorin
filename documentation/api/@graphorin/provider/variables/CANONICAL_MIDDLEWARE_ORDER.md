@@ -10,7 +10,7 @@
 const CANONICAL_MIDDLEWARE_ORDER: readonly string[];
 ```
 
-Defined in: packages/provider/src/middleware/compose.ts:53
+Defined in: [packages/provider/src/middleware/compose.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L53)
 
 Canonical middleware ordering - outermost → innermost. The table
 is enforced by [composeProviderMiddleware](/api/@graphorin/provider/functions/composeProviderMiddleware.md) and is part of the

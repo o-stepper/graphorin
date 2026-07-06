@@ -10,7 +10,7 @@
 function setRefStoreLookup(lookup): void;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/ref.ts:32
+Defined in: [packages/security/src/secrets/resolvers/ref.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/ref.ts#L32)
 
 Wire up the `ref:` resolver against the active `SecretsStore`. The
 factory calls this whenever it activates a new store; tests use it

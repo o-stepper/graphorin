@@ -10,7 +10,7 @@
 function runTelemetryInspect(options?): TelemetryStatusResult;
 ```
 
-Defined in: packages/cli/src/commands/telemetry.ts:80
+Defined in: [packages/cli/src/commands/telemetry.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/telemetry.ts#L80)
 
 ## Parameters
 

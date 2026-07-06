@@ -6,7 +6,7 @@
 
 # Class: WorkflowRegistry
 
-Defined in: packages/server/src/registry/index.ts:229
+Defined in: [packages/server/src/registry/index.ts:229](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L229)
 
 ## Stable
 
@@ -32,7 +32,7 @@ describe(id):
   | undefined;
 ```
 
-Defined in: packages/server/src/registry/index.ts:265
+Defined in: [packages/server/src/registry/index.ts:265](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L265)
 
 #### Parameters
 
@@ -55,7 +55,7 @@ get(id):
   | undefined;
 ```
 
-Defined in: packages/server/src/registry/index.ts:245
+Defined in: [packages/server/src/registry/index.ts:245](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L245)
 
 #### Parameters
 
@@ -76,7 +76,7 @@ Defined in: packages/server/src/registry/index.ts:245
 has(id): boolean;
 ```
 
-Defined in: packages/server/src/registry/index.ts:249
+Defined in: [packages/server/src/registry/index.ts:249](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L249)
 
 #### Parameters
 
@@ -96,7 +96,7 @@ Defined in: packages/server/src/registry/index.ts:249
 list(): readonly WorkflowSummary[];
 ```
 
-Defined in: packages/server/src/registry/index.ts:253
+Defined in: [packages/server/src/registry/index.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L253)
 
 #### Returns
 
@@ -110,7 +110,7 @@ readonly [`WorkflowSummary`](/api/@graphorin/server/registry/interfaces/Workflow
 register(entry): void;
 ```
 
-Defined in: packages/server/src/registry/index.ts:232
+Defined in: [packages/server/src/registry/index.ts:232](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L232)
 
 #### Parameters
 
@@ -130,7 +130,7 @@ Defined in: packages/server/src/registry/index.ts:232
 size(): number;
 ```
 
-Defined in: packages/server/src/registry/index.ts:275
+Defined in: [packages/server/src/registry/index.ts:275](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L275)
 
 #### Returns
 
@@ -144,7 +144,7 @@ Defined in: packages/server/src/registry/index.ts:275
 unregister(id): boolean;
 ```
 
-Defined in: packages/server/src/registry/index.ts:241
+Defined in: [packages/server/src/registry/index.ts:241](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/registry/index.ts#L241)
 
 #### Parameters
 

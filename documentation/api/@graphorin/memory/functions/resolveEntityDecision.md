@@ -10,7 +10,7 @@
 function resolveEntityDecision(input): EntityResolveDecision;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:129
+Defined in: [packages/memory/src/graph/entity-resolver.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L129)
 
 Pure resolution policy: lexical exact match → embedding cosine →
 ambiguous band → new. No I/O; deterministic. The caller decides what

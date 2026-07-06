@@ -10,7 +10,7 @@
 type RetentionLog = (level, message, fields?) => void;
 ```
 
-Defined in: packages/server/src/runtime/retention.ts:99
+Defined in: [packages/server/src/runtime/retention.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/runtime/retention.ts#L99)
 
 Logging seam: `warn` on a failed surface, `info` with per-surface
 deletion counts after each sweep. Defaults to a no-op.

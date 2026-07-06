@@ -10,7 +10,7 @@
 function acceptsSensitivity(accepts, record): boolean;
 ```
 
-Defined in: packages/core/src/types/sensitivity.ts:33
+Defined in: [packages/core/src/types/sensitivity.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/sensitivity.ts#L33)
 
 Return `true` iff `record` is allowed to flow to a sink declaring `accepts`.
 

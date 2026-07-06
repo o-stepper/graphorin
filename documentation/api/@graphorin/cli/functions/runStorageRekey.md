@@ -10,7 +10,7 @@
 function runStorageRekey(options): Promise<StorageRekeyResult>;
 ```
 
-Defined in: packages/cli/src/commands/storage.ts:410
+Defined in: [packages/cli/src/commands/storage.ts:410](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/storage.ts#L410)
 
 ## Parameters
 

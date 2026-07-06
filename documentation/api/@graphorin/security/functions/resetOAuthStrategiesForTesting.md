@@ -10,7 +10,7 @@
 function _resetOAuthStrategiesForTesting(): void;
 ```
 
-Defined in: packages/security/src/oauth/strategies.ts:66
+Defined in: [packages/security/src/oauth/strategies.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/strategies.ts#L66)
 
 **`Experimental`**
 

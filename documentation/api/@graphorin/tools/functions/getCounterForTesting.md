@@ -10,7 +10,7 @@
 function getCounterForTesting(name, labels?): number;
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:158
+Defined in: [packages/tools/src/audit/counters.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L158)
 
 **`Experimental`**
 
@@ -22,7 +22,7 @@ make assertions on specific counter increments.
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `labels?` | `Readonly`\&lt;`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\&gt; |
+| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> |
 
 ## Returns
 

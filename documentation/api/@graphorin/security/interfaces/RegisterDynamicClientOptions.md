@@ -6,7 +6,7 @@
 
 # Interface: RegisterDynamicClientOptions
 
-Defined in: packages/security/src/oauth/dynamic-client-registration.ts:66
+Defined in: [packages/security/src/oauth/dynamic-client-registration.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L66)
 
 Options accepted by [registerDynamicClient](/api/@graphorin/security/functions/registerDynamicClient.md).
 
@@ -16,11 +16,11 @@ Options accepted by [registerDynamicClient](/api/@graphorin/security/functions/r
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-applicationtype"></a> `applicationType?` | `readonly` | `"native"` \| `"web"` | packages/security/src/oauth/dynamic-client-registration.ts:72 |
-| <a id="property-clientname"></a> `clientName` | `readonly` | `string` | packages/security/src/oauth/dynamic-client-registration.ts:67 |
-| <a id="property-extra"></a> `extra?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/security/src/oauth/dynamic-client-registration.ts:73 |
-| <a id="property-granttypes"></a> `grantTypes?` | `readonly` | readonly `string`[] | packages/security/src/oauth/dynamic-client-registration.ts:70 |
-| <a id="property-redirecturis"></a> `redirectUris?` | `readonly` | readonly `string`[] | packages/security/src/oauth/dynamic-client-registration.ts:68 |
-| <a id="property-scope"></a> `scope?` | `readonly` | `string` | packages/security/src/oauth/dynamic-client-registration.ts:69 |
-| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | packages/security/src/oauth/dynamic-client-registration.ts:74 |
-| <a id="property-tokenendpointauthmethod"></a> `tokenEndpointAuthMethod?` | `readonly` | `string` | packages/security/src/oauth/dynamic-client-registration.ts:71 |
+| <a id="property-applicationtype"></a> `applicationType?` | `readonly` | `"native"` \| `"web"` | [packages/security/src/oauth/dynamic-client-registration.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L72) |
+| <a id="property-clientname"></a> `clientName` | `readonly` | `string` | [packages/security/src/oauth/dynamic-client-registration.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L67) |
+| <a id="property-extra"></a> `extra?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | [packages/security/src/oauth/dynamic-client-registration.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L73) |
+| <a id="property-granttypes"></a> `grantTypes?` | `readonly` | readonly `string`[] | [packages/security/src/oauth/dynamic-client-registration.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L70) |
+| <a id="property-redirecturis"></a> `redirectUris?` | `readonly` | readonly `string`[] | [packages/security/src/oauth/dynamic-client-registration.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L68) |
+| <a id="property-scope"></a> `scope?` | `readonly` | `string` | [packages/security/src/oauth/dynamic-client-registration.ts:69](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L69) |
+| <a id="property-signal"></a> `signal?` | `readonly` | `AbortSignal` | [packages/security/src/oauth/dynamic-client-registration.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L74) |
+| <a id="property-tokenendpointauthmethod"></a> `tokenEndpointAuthMethod?` | `readonly` | `string` | [packages/security/src/oauth/dynamic-client-registration.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/dynamic-client-registration.ts#L71) |

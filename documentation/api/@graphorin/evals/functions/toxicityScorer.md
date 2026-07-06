@@ -10,7 +10,7 @@
 function toxicityScorer<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/prebuilt/index.ts:24
+Defined in: [packages/evals/src/scorers/prebuilt/index.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/prebuilt/index.ts#L24)
 
 ## Type Parameters
 

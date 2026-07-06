@@ -10,7 +10,7 @@
 function assertPolicyAllows(packageName, policy): void;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:117
+Defined in: [packages/security/src/supply-chain/policy.ts:117](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/policy.ts#L117)
 
 Throw [SkillInstallDeniedError](/api/@graphorin/security/classes/SkillInstallDeniedError.md) when the policy resolves to
 `'deny'`. Returns silently otherwise so callers can chain it

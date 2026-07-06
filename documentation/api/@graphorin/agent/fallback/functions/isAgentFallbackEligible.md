@@ -10,7 +10,7 @@
 function isAgentFallbackEligible(error, policy?): AgentFallbackEligibility;
 ```
 
-Defined in: packages/agent/src/fallback/index.ts:76
+Defined in: [packages/agent/src/fallback/index.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/fallback/index.ts#L76)
 
 Pure dispatcher that maps a [ProviderError](/api/@graphorin/core/interfaces/ProviderError.md) to one of four
 eligible reasons or to `eligible: false` if the error is on the

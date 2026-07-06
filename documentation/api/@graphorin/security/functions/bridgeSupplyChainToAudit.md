@@ -10,7 +10,7 @@
 function bridgeSupplyChainToAudit(opts): SupplyChainBridgeTeardown;
 ```
 
-Defined in: packages/security/src/audit/supply-chain-bridge.ts:40
+Defined in: [packages/security/src/audit/supply-chain-bridge.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/supply-chain-bridge.ts#L40)
 
 Subscribe the audit-log subsystem to the supply-chain audit
 emitter.

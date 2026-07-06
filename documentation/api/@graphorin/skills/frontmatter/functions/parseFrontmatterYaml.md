@@ -10,7 +10,7 @@
 function parseFrontmatterYaml(frontmatter): Record<string, unknown>;
 ```
 
-Defined in: packages/skills/src/frontmatter/index.ts:68
+Defined in: [packages/skills/src/frontmatter/index.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/frontmatter/index.ts#L68)
 
 Parse the YAML frontmatter into a record. Returns `{}` for an empty
 block.

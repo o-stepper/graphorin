@@ -10,7 +10,7 @@
 function getSpecSnapshot(): SpecSnapshot;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:81
+Defined in: [packages/skills/src/spec/index.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L81)
 
 Return the currently active snapshot. Loads the bundled JSON file
 on first call, then caches the parsed object.

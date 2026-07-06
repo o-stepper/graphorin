@@ -10,7 +10,7 @@
 type EncryptionCipher = "sqlcipher" | "chacha20" | "aes256cbc" | "aes128cbc" | "rc4";
 ```
 
-Defined in: packages/store-sqlite/src/encryption/index.ts:27
+Defined in: [packages/store-sqlite/src/encryption/index.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/encryption/index.ts#L27)
 
 Cipher selection, validated against the real sqlite3mc vocabulary
 (CS-13 - `'wxsqlite3'` is the library's name, not a cipher; the peer

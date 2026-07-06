@@ -6,7 +6,7 @@
 
 # Interface: MemoryStoreExt
 
-Defined in: packages/core/src/contracts/memory-store.ts:60
+Defined in: [packages/core/src/contracts/memory-store.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L60)
 
 Maintenance extension over [MemoryStore](/api/@graphorin/core/interfaces/MemoryStore.md) (W-066), mirroring
 the `SessionStoreExt` precedent: capabilities the sqlite adapter
@@ -24,12 +24,12 @@ compiling.
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`episodic`](/api/@graphorin/core/interfaces/MemoryStore.md#property-episodic) | packages/core/src/contracts/memory-store.ts:40 |
-| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`procedural`](/api/@graphorin/core/interfaces/MemoryStore.md#property-procedural) | packages/core/src/contracts/memory-store.ts:42 |
-| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`semantic`](/api/@graphorin/core/interfaces/MemoryStore.md#property-semantic) | packages/core/src/contracts/memory-store.ts:41 |
-| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`session`](/api/@graphorin/core/interfaces/MemoryStore.md#property-session) | packages/core/src/contracts/memory-store.ts:39 |
-| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`shared`](/api/@graphorin/core/interfaces/MemoryStore.md#property-shared) | packages/core/src/contracts/memory-store.ts:43 |
-| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`working`](/api/@graphorin/core/interfaces/MemoryStore.md#property-working) | packages/core/src/contracts/memory-store.ts:38 |
+| <a id="property-episodic"></a> `episodic` | `readonly` | [`EpisodicMemoryStore`](/api/@graphorin/core/interfaces/EpisodicMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`episodic`](/api/@graphorin/core/interfaces/MemoryStore.md#property-episodic) | [packages/core/src/contracts/memory-store.ts:40](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L40) |
+| <a id="property-procedural"></a> `procedural` | `readonly` | [`ProceduralMemoryStore`](/api/@graphorin/core/interfaces/ProceduralMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`procedural`](/api/@graphorin/core/interfaces/MemoryStore.md#property-procedural) | [packages/core/src/contracts/memory-store.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L42) |
+| <a id="property-semantic"></a> `semantic` | `readonly` | [`SemanticMemoryStore`](/api/@graphorin/core/interfaces/SemanticMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`semantic`](/api/@graphorin/core/interfaces/MemoryStore.md#property-semantic) | [packages/core/src/contracts/memory-store.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L41) |
+| <a id="property-session"></a> `session` | `readonly` | [`SessionMemoryStore`](/api/@graphorin/core/interfaces/SessionMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`session`](/api/@graphorin/core/interfaces/MemoryStore.md#property-session) | [packages/core/src/contracts/memory-store.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L39) |
+| <a id="property-shared"></a> `shared` | `readonly` | [`SharedMemoryStore`](/api/@graphorin/core/interfaces/SharedMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`shared`](/api/@graphorin/core/interfaces/MemoryStore.md#property-shared) | [packages/core/src/contracts/memory-store.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L43) |
+| <a id="property-working"></a> `working` | `readonly` | [`WorkingMemoryStore`](/api/@graphorin/core/interfaces/WorkingMemoryStore.md) | [`MemoryStore`](/api/@graphorin/core/interfaces/MemoryStore.md).[`working`](/api/@graphorin/core/interfaces/MemoryStore.md#property-working) | [packages/core/src/contracts/memory-store.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L38) |
 
 ## Methods
 
@@ -39,7 +39,7 @@ compiling.
 close(): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:48
+Defined in: [packages/core/src/contracts/memory-store.ts:48](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L48)
 
 Cleanly close any underlying handles. Idempotent.
 
@@ -59,7 +59,7 @@ Cleanly close any underlying handles. Idempotent.
 init(): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:46
+Defined in: [packages/core/src/contracts/memory-store.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L46)
 
 Initialize / migrate the underlying storage. Idempotent.
 
@@ -79,7 +79,7 @@ Initialize / migrate the underlying storage. Idempotent.
 pruneHistory(olderThanMs): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:71
+Defined in: [packages/core/src/contracts/memory-store.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L71)
 
 Delete `memory_history` rows older than the given AGE in
 milliseconds. The argument is an AGE (the implementation computes

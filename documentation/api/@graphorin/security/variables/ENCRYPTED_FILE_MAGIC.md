@@ -10,7 +10,7 @@
 const ENCRYPTED_FILE_MAGIC: 16777216 = 0x01_00_00_00;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/encrypted-file.ts:34
+Defined in: [packages/security/src/secrets/resolvers/encrypted-file.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/encrypted-file.ts#L34)
 
 On-disk format of an encrypted bundle:
 

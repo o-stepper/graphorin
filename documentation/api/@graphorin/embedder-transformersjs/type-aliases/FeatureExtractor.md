@@ -14,7 +14,7 @@ type FeatureExtractor = (texts, options?) => Promise<{
 }>;
 ```
 
-Defined in: packages/embedder-transformersjs/src/index.ts:86
+Defined in: [packages/embedder-transformersjs/src/index.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/embedder-transformersjs/src/index.ts#L86)
 
 **`Internal`**
 

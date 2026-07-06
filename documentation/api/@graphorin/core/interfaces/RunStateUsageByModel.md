@@ -6,7 +6,7 @@
 
 # Interface: RunStateUsageByModel
 
-Defined in: packages/core/src/types/run.ts:67
+Defined in: [packages/core/src/types/run.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/run.ts#L67)
 
 Per-model usage breakdown carried alongside the aggregate
 [Usage](/api/@graphorin/core/interfaces/Usage.md) on [RunState](/api/@graphorin/core/interfaces/RunState.md). Populated by the per-step retry

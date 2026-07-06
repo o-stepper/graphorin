@@ -6,7 +6,7 @@
 
 # Interface: Provider
 
-Defined in: packages/core/src/contracts/provider.ts:18
+Defined in: [packages/core/src/contracts/provider.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L18)
 
 Vendor-neutral LLM provider interface. Concrete adapters live in
 `@graphorin/provider` (and companion packages such as
@@ -22,10 +22,10 @@ one-shot generation methods.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-acceptssensitivity"></a> `acceptsSensitivity?` | `readonly` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | Sensitivity tiers this provider is allowed to receive. Used by the ContextEngine sensitivity filter (D2) and the outbound redaction middleware (D3) to decide what content is safe to forward. | packages/core/src/contracts/provider.ts:37 |
-| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ProviderCapabilities`](/api/@graphorin/core/interfaces/ProviderCapabilities.md) | - | packages/core/src/contracts/provider.ts:21 |
-| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:20 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | - | packages/core/src/contracts/provider.ts:19 |
+| <a id="property-acceptssensitivity"></a> `acceptsSensitivity?` | `readonly` | readonly [`Sensitivity`](/api/@graphorin/core/type-aliases/Sensitivity.md)[] | Sensitivity tiers this provider is allowed to receive. Used by the ContextEngine sensitivity filter (D2) and the outbound redaction middleware (D3) to decide what content is safe to forward. | [packages/core/src/contracts/provider.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L37) |
+| <a id="property-capabilities"></a> `capabilities` | `readonly` | [`ProviderCapabilities`](/api/@graphorin/core/interfaces/ProviderCapabilities.md) | - | [packages/core/src/contracts/provider.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L21) |
+| <a id="property-modelid"></a> `modelId` | `readonly` | `string` | - | [packages/core/src/contracts/provider.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L20) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | - | [packages/core/src/contracts/provider.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L19) |
 
 ## Methods
 
@@ -35,7 +35,7 @@ one-shot generation methods.
 optional countTokens(req): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:30
+Defined in: [packages/core/src/contracts/provider.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L30)
 
 Optional: provider-native input token counter.
 
@@ -57,7 +57,7 @@ Optional: provider-native input token counter.
 generate(req): Promise<ProviderResponse>;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:27
+Defined in: [packages/core/src/contracts/provider.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L27)
 
 Convenience wrapper that consumes the stream into a single result.
 
@@ -79,7 +79,7 @@ Convenience wrapper that consumes the stream into a single result.
 stream(req): AsyncIterable<ProviderEvent>;
 ```
 
-Defined in: packages/core/src/contracts/provider.ts:24
+Defined in: [packages/core/src/contracts/provider.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/provider.ts#L24)
 
 Returns an async stream of fine-grained provider events.
 

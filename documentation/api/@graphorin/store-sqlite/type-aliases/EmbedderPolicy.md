@@ -10,7 +10,7 @@
 type EmbedderPolicy = "lock-on-first" | "multi-active" | "auto-migrate";
 ```
 
-Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:67
+Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:67](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L67)
 
 Multi-embedder coexistence policy. `'lock-on-first'` is the default -
 the first registered embedder is the only writer; subsequent

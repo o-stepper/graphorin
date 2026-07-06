@@ -17,7 +17,7 @@ type MemoryGuardAuditAction =
   | "memory:guard:exceeded-budget";
 ```
 
-Defined in: packages/security/src/guard/audit-emitter.ts:34
+Defined in: [packages/security/src/guard/audit-emitter.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guard/audit-emitter.ts#L34)
 
 Discriminator for `MemoryGuardAuditEvent` variants. The audit log
 stores the values verbatim under the canonical

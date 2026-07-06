@@ -12,7 +12,7 @@ function lookupPrice(args, snapshot?):
   | null;
 ```
 
-Defined in: pricing/src/lookup.ts:43
+Defined in: [packages/pricing/src/lookup.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/pricing/src/lookup.ts#L43)
 
 Resolve a per-token price for the (provider, model) pair. Returns
 `null` when the snapshot does not contain an entry for the model.

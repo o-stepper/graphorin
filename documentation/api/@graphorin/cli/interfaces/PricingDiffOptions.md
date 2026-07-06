@@ -6,7 +6,7 @@
 
 # Interface: PricingDiffOptions
 
-Defined in: packages/cli/src/commands/pricing.ts:134
+Defined in: [packages/cli/src/commands/pricing.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L134)
 
 ## Stable
 
@@ -18,8 +18,8 @@ Defined in: packages/cli/src/commands/pricing.ts:134
 
 | Property | Modifier | Type | Description | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-json) | packages/cli/src/internal/output.ts:71 |
-| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-jsonprint) | packages/cli/src/internal/output.ts:77 |
-| <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-noninteractive) | packages/cli/src/internal/output.ts:73 |
-| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam - capture human lines instead of writing to stderr. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-print) | packages/cli/src/internal/output.ts:75 |
-| <a id="property-snapshot"></a> `snapshot` | `readonly` | `string` | Path to a JSON file containing a `PricingSnapshot`. The CLI diffs this against the bundled snapshot. | - | packages/cli/src/commands/pricing.ts:139 |
+| <a id="property-json"></a> `json?` | `readonly` | `boolean` | Emit a structured JSON document instead of human-readable text. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`json`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-json) | [packages/cli/src/internal/output.ts:71](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L71) |
+| <a id="property-jsonprint"></a> `jsonPrint?` | `readonly` | `JsonSink` | Test seam - capture JSON documents instead of writing to stdout. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`jsonPrint`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-jsonprint) | [packages/cli/src/internal/output.ts:77](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L77) |
+| <a id="property-noninteractive"></a> `nonInteractive?` | `readonly` | `boolean` | Force `--non-interactive` semantics (skip prompts; require flags / env). | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`nonInteractive`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-noninteractive) | [packages/cli/src/internal/output.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L73) |
+| <a id="property-print"></a> `print?` | `readonly` | `PrintSink` | Test seam - capture human lines instead of writing to stderr. | [`PricingCommonOptions`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md).[`print`](/api/@graphorin/cli/interfaces/PricingCommonOptions.md#property-print) | [packages/cli/src/internal/output.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/internal/output.ts#L75) |
+| <a id="property-snapshot"></a> `snapshot` | `readonly` | `string` | Path to a JSON file containing a `PricingSnapshot`. The CLI diffs this against the bundled snapshot. | - | [packages/cli/src/commands/pricing.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/pricing.ts#L139) |

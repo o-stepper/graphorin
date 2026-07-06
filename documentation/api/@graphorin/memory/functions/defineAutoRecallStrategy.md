@@ -12,7 +12,7 @@ function defineAutoRecallStrategy(opts): AutoRecallStrategy & {
 };
 ```
 
-Defined in: packages/memory/src/context-engine/auto-recall.ts:73
+Defined in: [packages/memory/src/context-engine/auto-recall.ts:73](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/auto-recall.ts#L73)
 
 Builder for application-supplied custom strategies. Accepts a
 raw function and returns a tagged version so the engine can

@@ -10,7 +10,7 @@
 type EdgePredicate<TState> = (state) => boolean;
 ```
 
-Defined in: packages/workflow/src/types.ts:243
+Defined in: [packages/workflow/src/types.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/workflow/src/types.ts#L243)
 
 Predicate evaluated by the engine when deciding which edges to fire.
 

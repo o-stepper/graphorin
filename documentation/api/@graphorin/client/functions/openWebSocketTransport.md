@@ -10,7 +10,7 @@
 function openWebSocketTransport(options, listeners): Promise<Transport>;
 ```
 
-Defined in: packages/client/src/transport/ws.ts:44
+Defined in: [packages/client/src/transport/ws.ts:44](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/ws.ts#L44)
 
 Open a WebSocket transport. Resolves once the underlying socket
 fires `open` (i.e. the upgrade succeeded + the subprotocol matches

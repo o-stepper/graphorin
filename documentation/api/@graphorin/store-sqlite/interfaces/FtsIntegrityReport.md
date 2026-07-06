@@ -6,7 +6,7 @@
 
 # Interface: FtsIntegrityReport
 
-Defined in: packages/store-sqlite/src/fts-integrity.ts:51
+Defined in: [packages/store-sqlite/src/fts-integrity.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/fts-integrity.ts#L51)
 
 One FTS table's integrity finding.
 
@@ -14,5 +14,5 @@ One FTS table's integrity finding.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-orphanrows"></a> `orphanRows` | `readonly` | `number` | FTS rows whose `rowid` matches no row in the base table. | packages/store-sqlite/src/fts-integrity.ts:55 |
-| <a id="property-table"></a> `table` | `readonly` | `string` | The FTS table inspected. | packages/store-sqlite/src/fts-integrity.ts:53 |
+| <a id="property-orphanrows"></a> `orphanRows` | `readonly` | `number` | FTS rows whose `rowid` matches no row in the base table. | [packages/store-sqlite/src/fts-integrity.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/fts-integrity.ts#L55) |
+| <a id="property-table"></a> `table` | `readonly` | `string` | The FTS table inspected. | [packages/store-sqlite/src/fts-integrity.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/fts-integrity.ts#L53) |

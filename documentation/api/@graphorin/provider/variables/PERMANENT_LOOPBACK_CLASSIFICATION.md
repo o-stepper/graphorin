@@ -10,7 +10,7 @@
 const PERMANENT_LOOPBACK_CLASSIFICATION: LocalProviderClassification;
 ```
 
-Defined in: packages/provider/src/trust/classify-local-provider.ts:250
+Defined in: [packages/provider/src/trust/classify-local-provider.ts:250](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/trust/classify-local-provider.ts#L250)
 
 Permanent loopback classification used by in-process adapters
 (e.g. the `llamaCppNodeAdapter` companion package). Adapters that

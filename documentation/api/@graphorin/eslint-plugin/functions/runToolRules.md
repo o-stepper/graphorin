@@ -10,7 +10,7 @@
 function runToolRules(tool, severityOverrides?): LintFinding[];
 ```
 
-Defined in: src/tool-discovery.ts:373
+Defined in: [packages/eslint-plugin/src/tool-discovery.ts:373](https://github.com/o-stepper/graphorin/blob/main/packages/eslint-plugin/src/tool-discovery.ts#L373)
 
 Run the three RB-49 rules against a discovered tool and return the
 findings. The CLI grader maps these findings into per-axis scores;

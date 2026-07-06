@@ -6,7 +6,7 @@
 
 # Interface: ConflictMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:359
+Defined in: [packages/memory/src/internal/storage-adapter.ts:359](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L359)
 
 Optional storage extension surfacing the audit + pending queue
 tables Phase 10b owns. Adapters that opt out leave the property
@@ -25,7 +25,7 @@ enqueuePending(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:364
+Defined in: [packages/memory/src/internal/storage-adapter.ts:364](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L364)
 
 #### Parameters
 
@@ -47,7 +47,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:364
 listPending(scope, limit?): Promise<readonly PendingConflictRowLike[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:365
+Defined in: [packages/memory/src/internal/storage-adapter.ts:365](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L365)
 
 #### Parameters
 
@@ -68,7 +68,7 @@ Defined in: packages/memory/src/internal/storage-adapter.ts:365
 optional markAttempted(id, attemptedAt?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:373
+Defined in: [packages/memory/src/internal/storage-adapter.ts:373](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L373)
 
 Stamp `attemptedAt` on a pending row whose judge call failed
 (MCON-9). The deep phase closes the row as `'judge-unparseable'`
@@ -94,7 +94,7 @@ Optional - without it the deep phase falls back to skip-and-retry.
 markResolved(id, decision): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:366
+Defined in: [packages/memory/src/internal/storage-adapter.ts:366](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L366)
 
 #### Parameters
 
@@ -118,7 +118,7 @@ recordDecision(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:360
+Defined in: [packages/memory/src/internal/storage-adapter.ts:360](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L360)
 
 #### Parameters
 

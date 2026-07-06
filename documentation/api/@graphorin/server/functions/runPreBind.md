@@ -10,7 +10,7 @@
 function runPreBind(options): Promise<PreBindResult>;
 ```
 
-Defined in: packages/server/src/lifecycle/pre-bind.ts:74
+Defined in: [packages/server/src/lifecycle/pre-bind.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/lifecycle/pre-bind.ts#L74)
 
 ## Parameters
 

@@ -6,7 +6,7 @@
 
 # Interface: CreateTriggersDaemonOptions
 
-Defined in: packages/server/src/triggers/daemon.ts:51
+Defined in: [packages/server/src/triggers/daemon.ts:51](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L51)
 
 ## Stable
 
@@ -14,5 +14,5 @@ Defined in: packages/server/src/triggers/daemon.ts:51
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-scheduler"></a> `scheduler` | `readonly` | [`Scheduler`](/api/@graphorin/triggers/interfaces/Scheduler.md) | - | packages/server/src/triggers/daemon.ts:52 |
-| <a id="property-warn"></a> `warn?` | `readonly` | (`message`) => `void` | Optional logger. Defaults to the standard error stream so the daemon never depends on the framework logger directly. | packages/server/src/triggers/daemon.ts:57 |
+| <a id="property-scheduler"></a> `scheduler` | `readonly` | [`Scheduler`](/api/@graphorin/triggers/interfaces/Scheduler.md) | - | [packages/server/src/triggers/daemon.ts:52](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L52) |
+| <a id="property-warn"></a> `warn?` | `readonly` | (`message`) => `void` | Optional logger. Defaults to the standard error stream so the daemon never depends on the framework logger directly. | [packages/server/src/triggers/daemon.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/triggers/daemon.ts#L57) |

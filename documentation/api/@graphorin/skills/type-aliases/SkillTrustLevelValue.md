@@ -10,7 +10,7 @@
 type SkillTrustLevelValue = SkillsTrustLevel;
 ```
 
-Defined in: packages/skills/src/types/index.ts:58
+Defined in: [packages/skills/src/types/index.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L58)
 
 Trust level applied to a loaded skill. Mirrors the supply-chain
 trust ladder + the loader's `'unknown'` extension so callers do

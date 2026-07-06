@@ -6,7 +6,7 @@
 
 # Class: CausalityMonitor
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:82
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L82)
 
 In-memory primitive instantiated per `RunContext`. Bounded-depth
 append discipline keeps the memory footprint trivial even on long
@@ -22,7 +22,7 @@ runs.
 new CausalityMonitor(cfg): CausalityMonitor;
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:89
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L89)
 
 #### Parameters
 
@@ -38,10 +38,10 @@ Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:89
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-auditallchains"></a> `auditAllChains` | `readonly` | `boolean` | packages/agent/src/lateral-leak/causality-monitor.ts:86 |
-| <a id="property-denialpatterns"></a> `denialPatterns` | `readonly` | readonly `RegExp`[] | packages/agent/src/lateral-leak/causality-monitor.ts:85 |
-| <a id="property-maxchaindepth"></a> `maxChainDepth` | `readonly` | `number` | packages/agent/src/lateral-leak/causality-monitor.ts:84 |
-| <a id="property-strictness"></a> `strictness` | `readonly` | [`CausalityMonitorStrictness`](/api/@graphorin/agent/type-aliases/CausalityMonitorStrictness.md) | packages/agent/src/lateral-leak/causality-monitor.ts:83 |
+| <a id="property-auditallchains"></a> `auditAllChains` | `readonly` | `boolean` | [packages/agent/src/lateral-leak/causality-monitor.ts:86](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L86) |
+| <a id="property-denialpatterns"></a> `denialPatterns` | `readonly` | readonly `RegExp`[] | [packages/agent/src/lateral-leak/causality-monitor.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L85) |
+| <a id="property-maxchaindepth"></a> `maxChainDepth` | `readonly` | `number` | [packages/agent/src/lateral-leak/causality-monitor.ts:84](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L84) |
+| <a id="property-strictness"></a> `strictness` | `readonly` | [`CausalityMonitorStrictness`](/api/@graphorin/agent/type-aliases/CausalityMonitorStrictness.md) | [packages/agent/src/lateral-leak/causality-monitor.ts:83](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L83) |
 
 ## Accessors
 
@@ -53,7 +53,7 @@ Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:89
 get chain(): readonly string[];
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:99
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L99)
 
 Snapshot the current causality chain.
 
@@ -69,7 +69,7 @@ readonly `string`[]
 checkMessage(content): CausalityMonitorCheck;
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:129
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:129](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L129)
 
 Inspect a candidate assistant-visible string and return whether
 the lateral-leak defense should fire. Pure decision based on
@@ -96,7 +96,7 @@ flush(reason): {
 };
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:215
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:215](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L215)
 
 Drain the chain to the audit log on `agent.run` completion or
 `agent.abort`. The runtime supplies the audit emitter - the
@@ -119,8 +119,8 @@ primitive itself is storage-agnostic.
 
 | Name | Type | Defined in |
 | ------ | ------ | ------ |
-| `chain` | readonly `string`[] | packages/agent/src/lateral-leak/causality-monitor.ts:216 |
-| `reason` | `"agent.run.complete"` \| `"agent.abort"` | packages/agent/src/lateral-leak/causality-monitor.ts:217 |
+| `chain` | readonly `string`[] | [packages/agent/src/lateral-leak/causality-monitor.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L216) |
+| `reason` | `"agent.run.complete"` \| `"agent.abort"` | [packages/agent/src/lateral-leak/causality-monitor.ts:217](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L217) |
 
 ***
 
@@ -130,7 +130,7 @@ primitive itself is storage-agnostic.
 recordCall(entry): void;
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:110
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L110)
 
 Append an entry to the causality chain, dropping the oldest
 when the chain exceeds `maxChainDepth`. Bounded-length, no PII,
@@ -156,7 +156,7 @@ no secret values - entries are short opaque strings like
 reset(): void;
 ```
 
-Defined in: packages/agent/src/lateral-leak/causality-monitor.ts:120
+Defined in: [packages/agent/src/lateral-leak/causality-monitor.ts:120](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/causality-monitor.ts#L120)
 
 Reset the chain - e.g. on `agent.run` boundary.
 

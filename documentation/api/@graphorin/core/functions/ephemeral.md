@@ -10,7 +10,7 @@
 function ephemeral<T>(opts?): Ephemeral<T>;
 ```
 
-Defined in: packages/core/src/channels/channels.ts:202
+Defined in: [packages/core/src/channels/channels.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/channels/channels.ts#L202)
 
 Construct an `Ephemeral` channel.
 

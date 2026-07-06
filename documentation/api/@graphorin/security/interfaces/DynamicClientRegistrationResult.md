@@ -6,7 +6,7 @@
 
 # Interface: DynamicClientRegistrationResult
 
-Defined in: packages/security/src/oauth/types.ts:134
+Defined in: [packages/security/src/oauth/types.ts:134](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/types.ts#L134)
 
 Result of the Dynamic Client Registration round-trip.
 
@@ -16,8 +16,8 @@ Result of the Dynamic Client Registration round-trip.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-clientid"></a> `clientId` | `readonly` | `string` | packages/security/src/oauth/types.ts:135 |
-| <a id="property-clientidissuedat"></a> `clientIdIssuedAt?` | `readonly` | `number` | packages/security/src/oauth/types.ts:137 |
-| <a id="property-clientsecret"></a> `clientSecret?` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | packages/security/src/oauth/types.ts:136 |
-| <a id="property-clientsecretexpiresat"></a> `clientSecretExpiresAt?` | `readonly` | `number` | packages/security/src/oauth/types.ts:138 |
-| <a id="property-raw"></a> `raw?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | packages/security/src/oauth/types.ts:139 |
+| <a id="property-clientid"></a> `clientId` | `readonly` | `string` | [packages/security/src/oauth/types.ts:135](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/types.ts#L135) |
+| <a id="property-clientidissuedat"></a> `clientIdIssuedAt?` | `readonly` | `number` | [packages/security/src/oauth/types.ts:137](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/types.ts#L137) |
+| <a id="property-clientsecret"></a> `clientSecret?` | `readonly` | [`SecretValue`](/api/@graphorin/security/classes/SecretValue.md) | [packages/security/src/oauth/types.ts:136](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/types.ts#L136) |
+| <a id="property-clientsecretexpiresat"></a> `clientSecretExpiresAt?` | `readonly` | `number` | [packages/security/src/oauth/types.ts:138](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/types.ts#L138) |
+| <a id="property-raw"></a> `raw?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | [packages/security/src/oauth/types.ts:139](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/types.ts#L139) |

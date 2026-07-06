@@ -6,7 +6,7 @@
 
 # Interface: ReplayAuditBridge
 
-Defined in: packages/observability/src/replay/types.ts:31
+Defined in: [packages/observability/src/replay/types.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/types.ts#L31)
 
 Audit-bridge contract used by the replay layer. Every replay
 invocation emits one entry through the bridge - sanitized + raw
@@ -24,7 +24,7 @@ a hard dependency on the security package.
 emit(event): void;
 ```
 
-Defined in: packages/observability/src/replay/types.ts:32
+Defined in: [packages/observability/src/replay/types.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/replay/types.ts#L32)
 
 #### Parameters
 

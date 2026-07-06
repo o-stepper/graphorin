@@ -6,7 +6,7 @@
 
 # Interface: CheckpointStoreExt
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:235
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:235](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L235)
 
 Retention extension over [CheckpointStore](/api/@graphorin/core/interfaces/CheckpointStore.md) (W-009). The engine
 intentionally never deletes finished threads itself - a completed
@@ -34,7 +34,7 @@ compactThread(
 keepLast): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:255
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L255)
 
 Keep only the `keepLast` most recent checkpoints (by `stepNumber`)
 of one `(threadId, namespace)` pair, deleting older ones together
@@ -63,7 +63,7 @@ deleted.
 deleteThread(threadId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:184
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:184](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L184)
 
 Full erasure primitive: delete every checkpoint and pending write of
 this thread across ALL namespaces. Namespace-blind by contract -
@@ -97,7 +97,7 @@ getTuple(
 | null>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:170
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L170)
 
 #### Parameters
 
@@ -128,7 +128,7 @@ list(
 opts?): AsyncIterable<CheckpointTuple>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:176
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:176](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L176)
 
 #### Parameters
 
@@ -157,7 +157,7 @@ optional listSuspended(namespace, opts?): Promise<readonly {
 }[]>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:195
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L195)
 
 W-032: enumerate threads whose LATEST checkpoint in `namespace` is
 `suspended` with a due `wakeAt` (`<= opts.dueBefore`, default: any
@@ -195,7 +195,7 @@ lacks it (deterministic policy, no silent no-op).
 pruneThreads(opts): Promise<number>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:245
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:245](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L245)
 
 Namespace-scoped retention sweep: for every `(threadId, namespace)`
 pair matching the policy, delete that pair's checkpoints and pending
@@ -228,7 +228,7 @@ put(
 opts?): Promise<string>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:154
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:154](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L154)
 
 #### Parameters
 
@@ -261,7 +261,7 @@ putWrites(
 taskId): Promise<void>;
 ```
 
-Defined in: packages/core/src/contracts/checkpoint-store.ts:162
+Defined in: [packages/core/src/contracts/checkpoint-store.ts:162](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/checkpoint-store.ts#L162)
 
 #### Parameters
 

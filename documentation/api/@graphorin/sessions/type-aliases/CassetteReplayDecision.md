@@ -48,7 +48,7 @@ type CassetteReplayDecision =
 };
 ```
 
-Defined in: packages/sessions/src/cassette/replay.ts:39
+Defined in: [packages/sessions/src/cassette/replay.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/replay.ts#L39)
 
 Single decision the replay engine reports per cassette record.
 

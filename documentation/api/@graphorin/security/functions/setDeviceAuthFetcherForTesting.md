@@ -10,7 +10,7 @@
 function _setDeviceAuthFetcherForTesting(fetcher): void;
 ```
 
-Defined in: packages/security/src/oauth/authorize-device-flow.ts:43
+Defined in: [packages/security/src/oauth/authorize-device-flow.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/authorize-device-flow.ts#L43)
 
 **`Experimental`**
 

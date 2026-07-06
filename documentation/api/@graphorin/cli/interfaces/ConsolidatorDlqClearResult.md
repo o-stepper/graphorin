@@ -6,7 +6,7 @@
 
 # Interface: ConsolidatorDlqClearResult
 
-Defined in: packages/cli/src/commands/consolidator.ts:304
+Defined in: [packages/cli/src/commands/consolidator.ts:304](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L304)
 
 ## Stable
 
@@ -14,4 +14,4 @@ Defined in: packages/cli/src/commands/consolidator.ts:304
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-removed"></a> `removed` | `readonly` | `number` | packages/cli/src/commands/consolidator.ts:305 |
+| <a id="property-removed"></a> `removed` | `readonly` | `number` | [packages/cli/src/commands/consolidator.ts:305](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/consolidator.ts#L305) |

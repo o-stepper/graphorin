@@ -10,7 +10,7 @@
 function not(condition): StopCondition;
 ```
 
-Defined in: packages/core/src/types/stop-condition.ts:103
+Defined in: [packages/core/src/types/stop-condition.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/stop-condition.ts#L103)
 
 Negate the supplied condition.
 

@@ -10,7 +10,7 @@
 function createCodeExecuteTool(opts): Tool<CodeExecuteInput, string>;
 ```
 
-Defined in: packages/tools/src/code-mode/meta-tools.ts:216
+Defined in: [packages/tools/src/code-mode/meta-tools.ts:216](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/code-mode/meta-tools.ts#L216)
 
 Build the `code_execute` meta-tool. Its output is the script's final
 value rendered as a string, so the executor's `maxResultTokens` /

@@ -6,7 +6,7 @@
 
 # Interface: ConflictAuditRow
 
-Defined in: packages/store-sqlite/src/conflict-store.ts:74
+Defined in: [packages/store-sqlite/src/conflict-store.ts:74](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/conflict-store.ts#L74)
 
 Row shape returned from `recordDecision(...)`.
 
@@ -16,5 +16,5 @@ Row shape returned from `recordDecision(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `number` | packages/store-sqlite/src/conflict-store.ts:76 |
-| <a id="property-id"></a> `id` | `readonly` | `number` | packages/store-sqlite/src/conflict-store.ts:75 |
+| <a id="property-detectedat"></a> `detectedAt` | `readonly` | `number` | [packages/store-sqlite/src/conflict-store.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/conflict-store.ts#L76) |
+| <a id="property-id"></a> `id` | `readonly` | `number` | [packages/store-sqlite/src/conflict-store.ts:75](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/conflict-store.ts#L75) |

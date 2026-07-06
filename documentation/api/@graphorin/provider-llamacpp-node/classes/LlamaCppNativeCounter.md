@@ -6,7 +6,7 @@
 
 # Class: LlamaCppNativeCounter
 
-Defined in: src/counter.ts:34
+Defined in: [packages/provider-llamacpp-node/src/counter.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/counter.ts#L34)
 
 Counter that delegates to `model.tokenize(text)` from the loaded
 GGUF instance. Cache invalidation is keyed on the model file path
@@ -27,7 +27,7 @@ upstream.
 new LlamaCppNativeCounter(options): LlamaCppNativeCounter;
 ```
 
-Defined in: src/counter.ts:39
+Defined in: [packages/provider-llamacpp-node/src/counter.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/counter.ts#L39)
 
 #### Parameters
 
@@ -43,8 +43,8 @@ Defined in: src/counter.ts:39
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | src/counter.ts:35 |
-| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | src/counter.ts:36 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | Human-readable identifier (`'js-tiktoken@cl100k_base'`, …). | [packages/provider-llamacpp-node/src/counter.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/counter.ts#L35) |
+| <a id="property-version"></a> `version` | `readonly` | `string` | Tokenizer version string used for cache invalidation. | [packages/provider-llamacpp-node/src/counter.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/counter.ts#L36) |
 
 ## Methods
 
@@ -54,7 +54,7 @@ Defined in: src/counter.ts:39
 count(messages): Promise<number>;
 ```
 
-Defined in: src/counter.ts:46
+Defined in: [packages/provider-llamacpp-node/src/counter.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/counter.ts#L46)
 
 Count tokens in a list of `Message`s (system/user/assistant/tool).
 
@@ -80,7 +80,7 @@ Count tokens in a list of `Message`s (system/user/assistant/tool).
 countText(text): Promise<number>;
 ```
 
-Defined in: src/counter.ts:55
+Defined in: [packages/provider-llamacpp-node/src/counter.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/provider-llamacpp-node/src/counter.ts#L55)
 
 Count tokens in a raw text string.
 

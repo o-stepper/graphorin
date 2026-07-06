@@ -6,7 +6,7 @@
 
 # Interface: MemoryReviewResult
 
-Defined in: packages/cli/src/commands/memory.ts:691
+Defined in: [packages/cli/src/commands/memory.ts:691](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L691)
 
 ## Stable
 
@@ -14,10 +14,10 @@ Defined in: packages/cli/src/commands/memory.ts:691
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-episodes"></a> `episodes` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | packages/cli/src/commands/memory.ts:695 |
-| <a id="property-facts"></a> `facts` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | packages/cli/src/commands/memory.ts:694 |
-| <a id="property-insights"></a> `insights` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | packages/cli/src/commands/memory.ts:696 |
-| <a id="property-procedures"></a> `procedures` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | packages/cli/src/commands/memory.ts:697 |
-| <a id="property-promoted"></a> `promoted?` | `readonly` | \{ `id`: `string`; `type`: `string`; \} | Set when `--promote <id>` succeeded. | packages/cli/src/commands/memory.ts:693 |
-| `promoted.id` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:693 |
-| `promoted.type` | `readonly` | `string` | - | packages/cli/src/commands/memory.ts:693 |
+| <a id="property-episodes"></a> `episodes` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | [packages/cli/src/commands/memory.ts:695](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L695) |
+| <a id="property-facts"></a> `facts` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | [packages/cli/src/commands/memory.ts:694](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L694) |
+| <a id="property-insights"></a> `insights` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | [packages/cli/src/commands/memory.ts:696](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L696) |
+| <a id="property-procedures"></a> `procedures` | `readonly` | readonly [`MemoryReviewItem`](/api/@graphorin/cli/interfaces/MemoryReviewItem.md)[] | - | [packages/cli/src/commands/memory.ts:697](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L697) |
+| <a id="property-promoted"></a> `promoted?` | `readonly` | \{ `id`: `string`; `type`: `string`; \} | Set when `--promote <id>` succeeded. | [packages/cli/src/commands/memory.ts:693](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L693) |
+| `promoted.id` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:693](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L693) |
+| `promoted.type` | `readonly` | `string` | - | [packages/cli/src/commands/memory.ts:693](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L693) |

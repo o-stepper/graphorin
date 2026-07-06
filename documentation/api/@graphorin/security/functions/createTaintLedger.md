@@ -10,7 +10,7 @@
 function createTaintLedger(opts?): TaintLedger;
 ```
 
-Defined in: packages/security/src/dataflow/ledger.ts:92
+Defined in: [packages/security/src/dataflow/ledger.ts:92](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/dataflow/ledger.ts#L92)
 
 Create a run-scoped [TaintLedger](/api/@graphorin/security/interfaces/TaintLedger.md).
 

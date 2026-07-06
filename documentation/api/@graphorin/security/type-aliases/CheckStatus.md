@@ -10,7 +10,7 @@
 type CheckStatus = "ok" | "warn" | "fail" | "skip";
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:32
+Defined in: [packages/security/src/hardening/doctor.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/doctor.ts#L32)
 
 Discriminator for individual check outcomes.
 

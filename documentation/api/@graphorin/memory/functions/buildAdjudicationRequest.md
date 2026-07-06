@@ -13,7 +13,7 @@ function buildAdjudicationRequest(
    options?): ProviderRequest;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:198
+Defined in: [packages/memory/src/graph/entity-resolver.ts:198](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L198)
 
 Build the (pure) adjudication request. Exposed for testing.
 

@@ -10,7 +10,7 @@
 type EmbedderMigrationStrategy = "lock-on-first" | "multi-active" | "auto-migrate";
 ```
 
-Defined in: packages/memory/src/migration/embedder-migration.ts:23
+Defined in: [packages/memory/src/migration/embedder-migration.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/migration/embedder-migration.ts#L23)
 
 Coexistence policy for embedder swaps.
 

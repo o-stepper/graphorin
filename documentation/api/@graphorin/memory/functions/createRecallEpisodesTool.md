@@ -10,7 +10,7 @@
 function createRecallEpisodesTool(deps): Tool<RecallEpisodesInput, RecallEpisodesOutput>;
 ```
 
-Defined in: packages/memory/src/tools/recall-tools.ts:153
+Defined in: [packages/memory/src/tools/recall-tools.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/recall-tools.ts#L153)
 
 `recall_episodes` - triple-signal episode retrieval (recency ×
 relevance × importance).

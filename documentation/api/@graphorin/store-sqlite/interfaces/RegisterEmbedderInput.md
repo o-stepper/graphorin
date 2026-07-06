@@ -6,7 +6,7 @@
 
 # Interface: RegisterEmbedderInput
 
-Defined in: packages/store-sqlite/src/embedding-meta-repo.ts:252
+Defined in: [packages/store-sqlite/src/embedding-meta-repo.ts:252](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L252)
 
 Input for [EmbeddingMetaRepository.registerOrReturn](/api/@graphorin/store-sqlite/classes/EmbeddingMetaRepository.md#registerorreturn). The
 `embedder_id` is the canonical lookup key; `configHash` is a
@@ -18,10 +18,10 @@ deterministic hash over the embedder's full configuration.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-confighash"></a> `configHash` | `readonly` | `string` | packages/store-sqlite/src/embedding-meta-repo.ts:258 |
-| <a id="property-dim"></a> `dim` | `readonly` | `number` | packages/store-sqlite/src/embedding-meta-repo.ts:256 |
-| <a id="property-distancemetric"></a> `distanceMetric?` | `readonly` | `"cosine"` \| `"dot"` \| `"euclidean"` | packages/store-sqlite/src/embedding-meta-repo.ts:257 |
-| <a id="property-embedderkind"></a> `embedderKind` | `readonly` | `string` | packages/store-sqlite/src/embedding-meta-repo.ts:254 |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/store-sqlite/src/embedding-meta-repo.ts:253 |
-| <a id="property-model"></a> `model` | `readonly` | `string` | packages/store-sqlite/src/embedding-meta-repo.ts:255 |
-| <a id="property-notes"></a> `notes?` | `readonly` | `string` \| `null` | packages/store-sqlite/src/embedding-meta-repo.ts:259 |
+| <a id="property-confighash"></a> `configHash` | `readonly` | `string` | [packages/store-sqlite/src/embedding-meta-repo.ts:258](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L258) |
+| <a id="property-dim"></a> `dim` | `readonly` | `number` | [packages/store-sqlite/src/embedding-meta-repo.ts:256](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L256) |
+| <a id="property-distancemetric"></a> `distanceMetric?` | `readonly` | `"cosine"` \| `"dot"` \| `"euclidean"` | [packages/store-sqlite/src/embedding-meta-repo.ts:257](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L257) |
+| <a id="property-embedderkind"></a> `embedderKind` | `readonly` | `string` | [packages/store-sqlite/src/embedding-meta-repo.ts:254](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L254) |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/store-sqlite/src/embedding-meta-repo.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L253) |
+| <a id="property-model"></a> `model` | `readonly` | `string` | [packages/store-sqlite/src/embedding-meta-repo.ts:255](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L255) |
+| <a id="property-notes"></a> `notes?` | `readonly` | `string` \| `null` | [packages/store-sqlite/src/embedding-meta-repo.ts:259](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/embedding-meta-repo.ts#L259) |

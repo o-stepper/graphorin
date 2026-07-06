@@ -15,7 +15,7 @@ type ModelSpec =
 };
 ```
 
-Defined in: packages/core/src/contracts/preferred-model.ts:56
+Defined in: [packages/core/src/contracts/preferred-model.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L56)
 
 Concrete provider declaration used at site of the per-tool hint
 override (Phase 07), the per-tier mapping

@@ -10,7 +10,7 @@
 function createInitialRunState(args): RunState;
 ```
 
-Defined in: packages/agent/src/run-state/index.ts:485
+Defined in: [packages/agent/src/run-state/index.ts:485](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/run-state/index.ts#L485)
 
 Build a fresh, minimal [RunState](/api/@graphorin/core/interfaces/RunState.md) for a new run. Helper used
 by `createAgent({...})` so consumers can construct deterministic

@@ -10,7 +10,7 @@
 function createRegisteredEvent(opts): ToolAuditEvent;
 ```
 
-Defined in: packages/tools/src/audit/index.ts:179
+Defined in: [packages/tools/src/audit/index.ts:179](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/index.ts#L179)
 
 Convenience factory for the `tool:registered` audit row. Carries
 the resolved trust class + side-effect class + per-tool fields the

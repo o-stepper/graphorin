@@ -10,7 +10,7 @@
 function createTracer(opts): GraphorinTracer;
 ```
 
-Defined in: packages/observability/src/tracer/tracer.ts:118
+Defined in: [packages/observability/src/tracer/tracer.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/tracer/tracer.ts#L118)
 
 Build a [GraphorinTracer](/api/@graphorin/observability/interfaces/GraphorinTracer.md) from the supplied options. Every
 exporter passed in must already be wrapped via

@@ -10,7 +10,7 @@
 function runToolsLint(options?): Promise<ToolsLintReport>;
 ```
 
-Defined in: packages/cli/src/commands/tools-lint.ts:161
+Defined in: [packages/cli/src/commands/tools-lint.ts:161](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/tools-lint.ts#L161)
 
 Run the discovery + grader pipeline. Returns the structured report
 the CLI emits to stdout.

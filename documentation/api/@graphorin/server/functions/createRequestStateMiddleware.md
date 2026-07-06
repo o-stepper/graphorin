@@ -12,7 +12,7 @@ function createRequestStateMiddleware(options?): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/request-state.ts:47
+Defined in: [packages/server/src/middleware/request-state.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/request-state.ts#L47)
 
 ## Parameters
 

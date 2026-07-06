@@ -14,7 +14,7 @@ type Message =
   | ToolMessage;
 ```
 
-Defined in: packages/core/src/types/message.ts:141
+Defined in: [packages/core/src/types/message.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/message.ts#L141)
 
 Chat message. The shape is provider-agnostic: adapters convert it to /
 from the wire format.

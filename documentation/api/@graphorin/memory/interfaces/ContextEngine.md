@@ -6,7 +6,7 @@
 
 # Interface: ContextEngine
 
-Defined in: packages/memory/src/memory-interface.ts:55
+Defined in: [packages/memory/src/memory-interface.ts:55](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L55)
 
 Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextEngine.md) instance returned by
 [createContextEngine](/api/@graphorin/memory/functions/createContextEngine.md).
@@ -21,7 +21,7 @@ Public surface of the [ContextEngine](/api/@graphorin/memory/interfaces/ContextE
 assemble(memory, input): Promise<AssembledPrompt>;
 ```
 
-Defined in: packages/memory/src/memory-interface.ts:57
+Defined in: [packages/memory/src/memory-interface.ts:57](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L57)
 
 Assemble the layered system prompt for a single step.
 
@@ -51,7 +51,7 @@ compactNow(input): Promise<{
 }>;
 ```
 
-Defined in: packages/memory/src/memory-interface.ts:88
+Defined in: [packages/memory/src/memory-interface.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L88)
 
 Run a compaction call. Phase 12 calls this when the trigger
 fires (`source: 'auto-trigger'`) or the operator invokes
@@ -96,7 +96,7 @@ fires (`source: 'auto-trigger'`) or the operator invokes
 config(): ResolvedContextEngineConfig;
 ```
 
-Defined in: packages/memory/src/memory-interface.ts:118
+Defined in: [packages/memory/src/memory-interface.ts:118](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L118)
 
 Resolved configuration snapshot.
 
@@ -112,7 +112,7 @@ Resolved configuration snapshot.
 shouldCompact(messages, options?): Promise<boolean>;
 ```
 
-Defined in: packages/memory/src/memory-interface.ts:68
+Defined in: [packages/memory/src/memory-interface.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/memory-interface.ts#L68)
 
 Trigger evaluation primitive used by Phase 12 (agent runtime)
 at the top of every step. Returns `true` when the in-flight

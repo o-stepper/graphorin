@@ -10,7 +10,7 @@
 function withCurrentSpan<R>(span, fn): R | Promise<R>;
 ```
 
-Defined in: packages/observability/src/logger/logger.ts:63
+Defined in: [packages/observability/src/logger/logger.ts:63](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/logger/logger.ts#L63)
 
 Run `fn` with the supplied span as the "current" log-correlation
 span. The logger picks up the trace + span ids automatically.

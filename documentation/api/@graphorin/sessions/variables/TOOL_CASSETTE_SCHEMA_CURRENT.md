@@ -10,7 +10,7 @@
 const TOOL_CASSETTE_SCHEMA_CURRENT: "1.0" = '1.0';
 ```
 
-Defined in: packages/sessions/src/cassette/types.ts:19
+Defined in: [packages/sessions/src/cassette/types.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/cassette/types.ts#L19)
 
 Stable canonical schema version supported by this writer.
 

@@ -24,7 +24,7 @@ type WsDispatcherWarning =
 };
 ```
 
-Defined in: packages/server/src/ws/dispatcher.ts:59
+Defined in: [packages/server/src/ws/dispatcher.ts:59](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/ws/dispatcher.ts#L59)
 
 Discriminator surfaced to the optional warn sink.
 

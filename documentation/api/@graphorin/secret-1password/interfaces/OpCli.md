@@ -6,7 +6,7 @@
 
 # Interface: OpCli
 
-Defined in: packages/secret-1password/src/op-cli.ts:23
+Defined in: [packages/secret-1password/src/op-cli.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/op-cli.ts#L23)
 
 ## Stable
 
@@ -18,7 +18,7 @@ Defined in: packages/secret-1password/src/op-cli.ts:23
 read(uri, options?): Promise<OpCliReadResult>;
 ```
 
-Defined in: packages/secret-1password/src/op-cli.ts:30
+Defined in: [packages/secret-1password/src/op-cli.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/secret-1password/src/op-cli.ts#L30)
 
 Resolve a single `op://...` reference. Returns the **trimmed**
 stdout. Throws [OpCliError](/api/@graphorin/secret-1password/classes/OpCliError.md) when the binary is missing, the

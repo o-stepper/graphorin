@@ -10,7 +10,7 @@
 type LogFields = Readonly<Record<string, unknown>>;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:17
+Defined in: [packages/core/src/contracts/logger.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L17)
 
 Free-form structured fields that accompany a log record. Values must be
 JSON-serializable; concrete loggers redact `SecretValue` and other

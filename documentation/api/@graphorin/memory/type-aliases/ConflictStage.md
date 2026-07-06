@@ -15,7 +15,7 @@ type ConflictStage =
   | "defer-to-deep";
 ```
 
-Defined in: packages/memory/src/conflict/types.ts:20
+Defined in: [packages/memory/src/conflict/types.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/types.ts#L20)
 
 Stable lowercase identifier of the pipeline stage. Mirrored
 byte-for-byte by `@graphorin/store-sqlite`'s `ConflictPipelineStage`

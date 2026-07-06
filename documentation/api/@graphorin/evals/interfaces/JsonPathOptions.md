@@ -6,7 +6,7 @@
 
 # Interface: JsonPathOptions
 
-Defined in: evals/src/scorers/code/json-path.ts:12
+Defined in: [packages/evals/src/scorers/code/json-path.ts:12](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/json-path.ts#L12)
 
 ## Stable
 
@@ -14,6 +14,6 @@ Defined in: evals/src/scorers/code/json-path.ts:12
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-equals"></a> `equals` | `readonly` | `unknown` | Expected value. Compared by deep-equality. | evals/src/scorers/code/json-path.ts:16 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | evals/src/scorers/code/json-path.ts:18 |
-| <a id="property-path"></a> `path` | `readonly` | `string` | Dot-separated path (`'data.user.id'`). | evals/src/scorers/code/json-path.ts:14 |
+| <a id="property-equals"></a> `equals` | `readonly` | `unknown` | Expected value. Compared by deep-equality. | [packages/evals/src/scorers/code/json-path.ts:16](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/json-path.ts#L16) |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name override. | [packages/evals/src/scorers/code/json-path.ts:18](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/json-path.ts#L18) |
+| <a id="property-path"></a> `path` | `readonly` | `string` | Dot-separated path (`'data.user.id'`). | [packages/evals/src/scorers/code/json-path.ts:14](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/code/json-path.ts#L14) |

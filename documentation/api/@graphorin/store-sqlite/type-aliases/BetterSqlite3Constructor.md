@@ -10,7 +10,7 @@
 type BetterSqlite3Constructor = (filename, options?) => BetterSqlite3Database;
 ```
 
-Defined in: packages/store-sqlite/src/driver-types.ts:70
+Defined in: [packages/store-sqlite/src/driver-types.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/driver-types.ts#L70)
 
 **`Internal`**
 

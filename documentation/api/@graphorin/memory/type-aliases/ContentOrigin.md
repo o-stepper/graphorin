@@ -18,7 +18,7 @@ type ContentOrigin =
   | "tool-call:args";
 ```
 
-Defined in: packages/memory/src/context-engine/annotations.ts:49
+Defined in: [packages/memory/src/context-engine/annotations.ts:49](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/annotations.ts#L49)
 
 Origin discriminator for an assembled message-content part. The
 non-ContextEngine origins (`'user:input'`, `'tool:result'`,

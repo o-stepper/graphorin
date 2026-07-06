@@ -10,7 +10,7 @@
 function isRpcFailure(message): message is { error: { code: number; data?: unknown; message: string }; id: string | number; jsonrpc: "2.0"; v: "1" };
 ```
 
-Defined in: src/server-message.ts:243
+Defined in: [packages/protocol/src/server-message.ts:243](https://github.com/o-stepper/graphorin/blob/main/packages/protocol/src/server-message.ts#L243)
 
 ## Parameters
 

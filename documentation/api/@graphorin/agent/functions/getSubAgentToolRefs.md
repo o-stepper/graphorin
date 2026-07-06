@@ -12,7 +12,7 @@ function getSubAgentToolRefs(tool):
   | undefined;
 ```
 
-Defined in: packages/agent/src/runtime/agent-to-tool.ts:121
+Defined in: [packages/agent/src/runtime/agent-to-tool.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/agent-to-tool.ts#L121)
 
 Read the [SUBAGENT\_TOOL](/api/@graphorin/agent/variables/SUBAGENT_TOOL.md) refs off a (possibly wrapped) tool.
 

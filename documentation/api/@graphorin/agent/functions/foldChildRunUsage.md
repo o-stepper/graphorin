@@ -14,7 +14,7 @@ function foldChildRunUsage(
    childName): void;
 ```
 
-Defined in: packages/agent/src/runtime/messages.ts:256
+Defined in: [packages/agent/src/runtime/messages.ts:256](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/runtime/messages.ts#L256)
 
 Fold a completed (or failed - tokens were spent either way) child
 run's usage into the parent run's accounting: `state.usage`,

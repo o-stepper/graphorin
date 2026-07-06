@@ -10,7 +10,7 @@
 const MODEL_HINTS: readonly ModelHint[];
 ```
 
-Defined in: packages/core/src/contracts/preferred-model.ts:30
+Defined in: [packages/core/src/contracts/preferred-model.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/preferred-model.ts#L30)
 
 Discriminated string-literal triple for type-level work.
 

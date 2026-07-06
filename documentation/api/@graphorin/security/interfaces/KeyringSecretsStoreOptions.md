@@ -6,7 +6,7 @@
 
 # Interface: KeyringSecretsStoreOptions
 
-Defined in: packages/security/src/secrets/stores/keyring.ts:22
+Defined in: [packages/security/src/secrets/stores/keyring.ts:22](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L22)
 
 Options for `KeyringSecretsStore`.
 
@@ -16,4 +16,4 @@ Options for `KeyringSecretsStore`.
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-service"></a> `service?` | `readonly` | `string` | Service prefix for every entry. Defaults to `'graphorin'` so users can find every Graphorin-owned credential in their OS keychain. | packages/security/src/secrets/stores/keyring.ts:27 |
+| <a id="property-service"></a> `service?` | `readonly` | `string` | Service prefix for every entry. Defaults to `'graphorin'` so users can find every Graphorin-owned credential in their OS keychain. | [packages/security/src/secrets/stores/keyring.ts:27](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/stores/keyring.ts#L27) |

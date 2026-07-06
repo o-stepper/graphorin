@@ -6,7 +6,7 @@
 
 # Interface: FromTracesOptions\&lt;I, O\&gt;
 
-Defined in: evals/src/loaders/from-traces.ts:24
+Defined in: [packages/evals/src/loaders/from-traces.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/from-traces.ts#L24)
 
 ## Stable
 
@@ -21,6 +21,6 @@ Defined in: evals/src/loaders/from-traces.ts:24
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description surfaced in `Dataset.metadata.description`. | evals/src/loaders/from-traces.ts:30 |
-| <a id="property-extract"></a> `extract` | `readonly` | (`events`) => \| [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt;\> \| `null` | Distil one `Case<I, O>` from every group of events sharing a `runId`. | evals/src/loaders/from-traces.ts:26 |
-| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name surfaced in `Dataset.metadata.name`. | evals/src/loaders/from-traces.ts:28 |
+| <a id="property-description"></a> `description?` | `readonly` | `string` | Optional description surfaced in `Dataset.metadata.description`. | [packages/evals/src/loaders/from-traces.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/from-traces.ts#L30) |
+| <a id="property-extract"></a> `extract` | `readonly` | (`events`) => \| [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\> \| `null` | Distil one `Case<I, O>` from every group of events sharing a `runId`. | [packages/evals/src/loaders/from-traces.ts:26](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/from-traces.ts#L26) |
+| <a id="property-name"></a> `name?` | `readonly` | `string` | Optional name surfaced in `Dataset.metadata.name`. | [packages/evals/src/loaders/from-traces.ts:28](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/from-traces.ts#L28) |

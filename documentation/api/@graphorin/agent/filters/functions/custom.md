@@ -10,7 +10,7 @@
 function custom(fn, meta?): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:307
+Defined in: [packages/agent/src/filters/index.ts:307](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L307)
 
 Wrap a caller-supplied function as a [DescribedFilter](/api/@graphorin/agent/filters/interfaces/DescribedFilter.md) with
 the canonical `'custom'` descriptor.
@@ -20,7 +20,7 @@ the canonical `'custom'` descriptor.
 | Parameter | Type |
 | ------ | ------ |
 | `fn` | [`HandoffFilter`](/api/@graphorin/core/type-aliases/HandoffFilter.md) |
-| `meta?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
+| `meta?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 ## Returns
 

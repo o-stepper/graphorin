@@ -44,36 +44,50 @@ const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
 process.stdout.write(result.stdout ?? '');
 process.stderr.write(result.stderr ?? '');
 
+// NOTE: this script must NEVER call process.exit() - on CI the stdio
+// are pipes, writes are asynchronous, and an immediate exit truncates
+// everything buffered (the first failures were undiagnosable exactly
+// because the verdict, the tail, and typedoc's own [error] lines died
+// in the buffer). Setting process.exitCode lets node flush and exit
+// naturally.
 if (result.status !== 0) {
-  // CI log viewers truncate long streams from the middle, and the
-  // interesting lines (typedoc's [error] entries + the run summary)
-  // sit at the END - re-print them compactly so a failure is
-  // diagnosable from the visible tail.
+  // CI log viewers also truncate long streams, and the interesting
+  // lines (typedoc's [error] entries + the run summary) sit at the
+  // END - re-print them compactly so a failure is diagnosable.
   if (result.error) console.error(`[run-typedoc-checked] spawn error: ${result.error}`);
   const tail = output.split('\n').slice(-120).join('\n');
   console.error('[run-typedoc-checked] last 120 lines of typedoc output:');
   console.error(tail);
   console.error(`[run-typedoc-checked] typedoc exited ${result.status}.`);
-  process.exit(result.status ?? 1);
+  process.exitCode = result.status ?? 1;
 }
 
-const offenders = output
-  .split('\n')
-  .filter((line) => LINK_WARNING_RE.test(line))
-  // Strip ANSI colour codes for a clean report (the ESC byte is the
-  // point here, so the regex is built from its char code to keep the
-  // source free of control characters).
-  .map((line) => line.replace(ANSI_RE, '').trim());
-
-if (offenders.length > 0) {
-  console.error(
-    `\n[run-typedoc-checked] FAIL - ${offenders.length} {@link} validation warning(s) (W-130):`,
-  );
-  for (const line of offenders) console.error(`  ${line}`);
-  console.error(
-    '\nFix the TSDoc link (prefer a resolvable target; use plain `code` text for ' +
-      'cross-package/unexported references) - see the wave-6 W-130 sweep for examples.',
-  );
-  process.exit(1);
+if (process.exitCode !== undefined && process.exitCode !== 0) {
+  // typedoc already failed; skip the link scan (its input is partial).
+} else {
+  runLinkScan();
 }
-console.log('[run-typedoc-checked] OK - no {@link} validation warnings.');
+
+function runLinkScan() {
+  const offenders = output
+    .split('\n')
+    .filter((line) => LINK_WARNING_RE.test(line))
+    // Strip ANSI colour codes for a clean report (the ESC byte is the
+    // point here, so the regex is built from its char code to keep the
+    // source free of control characters).
+    .map((line) => line.replace(ANSI_RE, '').trim());
+
+  if (offenders.length > 0) {
+    console.error(
+      `\n[run-typedoc-checked] FAIL - ${offenders.length} {@link} validation warning(s) (W-130):`,
+    );
+    for (const line of offenders) console.error(`  ${line}`);
+    console.error(
+      '\nFix the TSDoc link (prefer a resolvable target; use plain `code` text for ' +
+        'cross-package/unexported references) - see the wave-6 W-130 sweep for examples.',
+    );
+    process.exitCode = 1;
+    return;
+  }
+  console.log('[run-typedoc-checked] OK - no {@link} validation warnings.');
+}

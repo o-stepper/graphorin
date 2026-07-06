@@ -10,7 +10,7 @@
 function loadSkillFromSource(source, options?): Promise<Skill>;
 ```
 
-Defined in: packages/skills/src/loader/index.ts:125
+Defined in: [packages/skills/src/loader/index.ts:125](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/loader/index.ts#L125)
 
 Load a single skill from any supported source. The loader runs the
 full frontmatter validator and resolves the supply-chain trust

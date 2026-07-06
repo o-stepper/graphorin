@@ -10,7 +10,7 @@
 function defineProviderMiddleware<T>(args): (opts) => ProviderMiddleware;
 ```
 
-Defined in: packages/provider/src/middleware/compose.ts:193
+Defined in: [packages/provider/src/middleware/compose.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/compose.ts#L193)
 
 Decorator factory used internally by every built-in middleware. The
 returned function attaches the canonical kind discriminator and the

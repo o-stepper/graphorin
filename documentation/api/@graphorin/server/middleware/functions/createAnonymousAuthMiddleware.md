@@ -12,7 +12,7 @@ function createAnonymousAuthMiddleware(): MiddlewareHandler<{
 }>;
 ```
 
-Defined in: packages/server/src/middleware/auth.ts:38
+Defined in: [packages/server/src/middleware/auth.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/middleware/auth.ts#L38)
 
 Build the no-auth middleware mounted when `auth.kind = 'none'`. It stamps
 `state.auth = { kind: 'anonymous', grantedScopes: [admin:*] }` so the

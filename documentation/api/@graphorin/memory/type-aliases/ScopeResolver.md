@@ -12,7 +12,7 @@ type ScopeResolver = (ctx) =>
 | Promise<SessionScope>;
 ```
 
-Defined in: packages/memory/src/tools/types.ts:17
+Defined in: [packages/memory/src/tools/types.ts:17](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/tools/types.ts#L17)
 
 Resolver that produces the live [SessionScope](/api/@graphorin/core/interfaces/SessionScope.md) for the tool
 call from the surrounding agent run context. The agent runtime

@@ -10,7 +10,7 @@
 function _getInflightRefreshKeysForTesting(): readonly string[];
 ```
 
-Defined in: packages/security/src/oauth/refresh.ts:76
+Defined in: [packages/security/src/oauth/refresh.ts:76](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/refresh.ts#L76)
 
 **`Experimental`**
 

@@ -10,7 +10,7 @@
 function bridgeToolAuditToAudit(db, options?): ToolAuditBridge;
 ```
 
-Defined in: packages/server/src/tools-audit-bridge.ts:88
+Defined in: [packages/server/src/tools-audit-bridge.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/server/src/tools-audit-bridge.ts#L88)
 
 Subscribe the audit chain to the tools audit bus. Returns a handle
 whose `stop()` MUST run on shutdown (the bus is process-global).

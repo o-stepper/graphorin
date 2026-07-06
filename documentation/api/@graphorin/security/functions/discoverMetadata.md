@@ -10,7 +10,7 @@
 function discoverMetadata(serverUrl, signal?): Promise<DiscoveredMetadata>;
 ```
 
-Defined in: packages/security/src/oauth/discovery.ts:62
+Defined in: [packages/security/src/oauth/discovery.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/discovery.ts#L62)
 
 Resolve full discovery metadata for `serverUrl`. The pipeline
 tries the protected-resource metadata first (RFC 9728), then falls

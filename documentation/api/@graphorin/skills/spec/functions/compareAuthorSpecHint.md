@@ -10,7 +10,7 @@
 function compareAuthorSpecHint(authorValue): "same" | "older" | "newer" | "unparseable";
 ```
 
-Defined in: packages/skills/src/spec/index.ts:141
+Defined in: [packages/skills/src/spec/index.ts:141](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L141)
 
 Compare an author's `graphorin-anthropic-spec` value against the
 bundled snapshot date. Returns:

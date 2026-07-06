@@ -18,7 +18,7 @@ function verifyOffline(input, opts?):
 };
 ```
 
-Defined in: packages/security/src/auth/token-format.ts:393
+Defined in: [packages/security/src/auth/token-format.ts:393](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/token-format.ts#L393)
 
 Cheap structural pre-filter used before doing any HMAC or DB work.
 Identical to `parseToken` but returns the boolean shape that the

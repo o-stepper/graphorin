@@ -10,7 +10,7 @@
 function createInMemoryOAuthServerStore(): OAuthServerStore;
 ```
 
-Defined in: packages/security/src/oauth/in-memory-store.ts:20
+Defined in: [packages/security/src/oauth/in-memory-store.ts:20](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/oauth/in-memory-store.ts#L20)
 
 Create a new in-memory OAuth server store. Records are kept in
 insertion order so `list()` returns deterministic snapshots.

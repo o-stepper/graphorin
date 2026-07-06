@@ -6,7 +6,7 @@
 
 # Interface: ToolExecutor
 
-Defined in: packages/tools/src/executor/types.ts:330
+Defined in: [packages/tools/src/executor/types.ts:330](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L330)
 
 Public executor surface.
 
@@ -18,7 +18,7 @@ Public executor surface.
 executeBatch(opts): Promise<readonly CompletedToolCall<unknown>[]>;
 ```
 
-Defined in: packages/tools/src/executor/types.ts:332
+Defined in: [packages/tools/src/executor/types.ts:332](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L332)
 
 Run a batch of tool calls.
 
@@ -30,7 +30,7 @@ Run a batch of tool calls.
 
 #### Returns
 
-`Promise`\&lt;readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;[]\&gt;
+`Promise`\<readonly [`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;[]\>
 
 ***
 
@@ -40,7 +40,7 @@ Run a batch of tool calls.
 executeOne(opts): Promise<CompletedToolCall<unknown>>;
 ```
 
-Defined in: packages/tools/src/executor/types.ts:334
+Defined in: [packages/tools/src/executor/types.ts:334](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L334)
 
 Run a single tool call.
 
@@ -58,4 +58,4 @@ Run a single tool call.
 
 #### Returns
 
-`Promise`\&lt;[`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;\&gt;
+`Promise`\<[`CompletedToolCall`](/api/@graphorin/core/interfaces/CompletedToolCall.md)\&lt;`unknown`\&gt;\>

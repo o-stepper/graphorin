@@ -10,7 +10,7 @@
 type RedactionViolationCallback = (violation) => void;
 ```
 
-Defined in: packages/observability/src/redaction/types.ts:21
+Defined in: [packages/observability/src/redaction/types.ts:21](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/types.ts#L21)
 
 Optional sink invoked every time the validator drops a value or
 masks a pattern. Useful for emitting custom metrics, audit entries,

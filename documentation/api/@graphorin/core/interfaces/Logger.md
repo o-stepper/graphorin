@@ -6,7 +6,7 @@
 
 # Interface: Logger
 
-Defined in: packages/core/src/contracts/logger.ts:32
+Defined in: [packages/core/src/contracts/logger.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L32)
 
 Pluggable logger contract consumed by every `@graphorin/*` runtime
 package. The concrete implementation lives in `@graphorin/observability`
@@ -28,7 +28,7 @@ batch.
 child(fields): Logger;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:43
+Defined in: [packages/core/src/contracts/logger.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L43)
 
 Return a child logger with `fields` merged into every record's
 structured payload. Useful for binding `runId` / `sessionId` /
@@ -52,14 +52,14 @@ structured payload. Useful for binding `runId` / `sessionId` /
 debug(message, fields?): void;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:34
+Defined in: [packages/core/src/contracts/logger.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L34)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
+| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 
@@ -73,14 +73,14 @@ Defined in: packages/core/src/contracts/logger.ts:34
 error(message, fields?): void;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:37
+Defined in: [packages/core/src/contracts/logger.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L37)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
+| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 
@@ -94,14 +94,14 @@ Defined in: packages/core/src/contracts/logger.ts:37
 info(message, fields?): void;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:35
+Defined in: [packages/core/src/contracts/logger.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L35)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
+| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 
@@ -115,14 +115,14 @@ Defined in: packages/core/src/contracts/logger.ts:35
 trace(message, fields?): void;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:33
+Defined in: [packages/core/src/contracts/logger.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L33)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
+| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 
@@ -136,14 +136,14 @@ Defined in: packages/core/src/contracts/logger.ts:33
 warn(message, fields?): void;
 ```
 
-Defined in: packages/core/src/contracts/logger.ts:36
+Defined in: [packages/core/src/contracts/logger.ts:36](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/logger.ts#L36)
 
 #### Parameters
 
 | Parameter | Type |
 | ------ | ------ |
 | `message` | `string` |
-| `fields?` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; |
+| `fields?` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> |
 
 #### Returns
 

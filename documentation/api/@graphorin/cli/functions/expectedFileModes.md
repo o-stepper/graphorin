@@ -10,7 +10,7 @@
 function expectedFileModes(home): Readonly<Record<string, number>>;
 ```
 
-Defined in: packages/cli/src/commands/doctor.ts:191
+Defined in: [packages/cli/src/commands/doctor.ts:191](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/doctor.ts#L191)
 
 **`Internal`**
 
@@ -25,4 +25,4 @@ policy (DEC-135).
 
 ## Returns
 
-`Readonly`\&lt;`Record`\&lt;`string`, `number`\&gt;\&gt;
+`Readonly`\<`Record`\&lt;`string`, `number`\&gt;\>

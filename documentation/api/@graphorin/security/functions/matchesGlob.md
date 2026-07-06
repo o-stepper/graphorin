@@ -10,7 +10,7 @@
 function matchesGlob(packageName, pattern): boolean;
 ```
 
-Defined in: packages/security/src/supply-chain/policy.ts:200
+Defined in: [packages/security/src/supply-chain/policy.ts:200](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/policy.ts#L200)
 
 Glob match for npm package patterns. Implements:
 

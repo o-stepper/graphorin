@@ -12,7 +12,7 @@ function getKnownField(field):
   | undefined;
 ```
 
-Defined in: packages/skills/src/spec/index.ts:115
+Defined in: [packages/skills/src/spec/index.ts:115](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/spec/index.ts#L115)
 
 Resolve a known-field entry by name. Returns `undefined` if the
 field is not part of the upstream specification.

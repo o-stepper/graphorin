@@ -6,7 +6,7 @@
 
 # Interface: IdempotencyStore
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:31
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L31)
 
 Pluggable idempotency cache. The `@graphorin/server` package
 (Phase 14) consumes this surface; the schema itself ships in
@@ -23,7 +23,7 @@ SQL tables.
 delete(key): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:34
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L34)
 
 #### Parameters
 
@@ -45,7 +45,7 @@ get(key): Promise<
 | null>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:33
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L33)
 
 #### Parameters
 
@@ -67,7 +67,7 @@ Defined in: packages/store-sqlite/src/idempotency-store.ts:33
 prune(olderThan): Promise<number>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:41
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L41)
 
 Delete records whose expiry is older than the supplied epoch-ms
 instant. Production caller: the server's hourly
@@ -92,7 +92,7 @@ so expired rows no longer accumulate forever (W-065).
 put(record): Promise<void>;
 ```
 
-Defined in: packages/store-sqlite/src/idempotency-store.ts:32
+Defined in: [packages/store-sqlite/src/idempotency-store.ts:32](https://github.com/o-stepper/graphorin/blob/main/packages/store-sqlite/src/idempotency-store.ts#L32)
 
 #### Parameters
 

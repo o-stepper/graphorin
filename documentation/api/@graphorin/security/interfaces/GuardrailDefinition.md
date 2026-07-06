@@ -6,7 +6,7 @@
 
 # Interface: GuardrailDefinition\&lt;TValue\&gt;
 
-Defined in: packages/security/src/guardrails/types.ts:79
+Defined in: [packages/security/src/guardrails/types.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L79)
 
 Definition of a single guardrail. The `kind` discriminator lets
 downstream code tell input from output guardrails without juggling
@@ -24,6 +24,6 @@ separate registries.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\&lt;[`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\&gt; | packages/security/src/guardrails/types.ts:82 |
-| <a id="property-kind"></a> `kind` | `readonly` | `"input"` \| `"output"` | packages/security/src/guardrails/types.ts:80 |
-| <a id="property-name"></a> `name` | `readonly` | `string` | packages/security/src/guardrails/types.ts:81 |
+| <a id="property-check"></a> `check` | `readonly` | (`value`, `ctx`) => \| [`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt; \| `Promise`\<[`GuardrailResult`](/api/@graphorin/security/type-aliases/GuardrailResult.md)\&lt;`TValue`\&gt;\> | [packages/security/src/guardrails/types.ts:82](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L82) |
+| <a id="property-kind"></a> `kind` | `readonly` | `"input"` \| `"output"` | [packages/security/src/guardrails/types.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L80) |
+| <a id="property-name"></a> `name` | `readonly` | `string` | [packages/security/src/guardrails/types.ts:81](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/guardrails/types.ts#L81) |

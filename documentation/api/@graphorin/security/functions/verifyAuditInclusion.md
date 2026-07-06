@@ -13,7 +13,7 @@ function verifyAuditInclusion(
    head): boolean;
 ```
 
-Defined in: packages/security/src/audit/merkle.ts:211
+Defined in: [packages/security/src/audit/merkle.ts:211](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/merkle.ts#L211)
 
 Verify an inclusion proof (RFC 6962 §2.1.1 verification algorithm) -
 pure; needs only the entry, the proof, and the trusted head.

@@ -6,7 +6,7 @@
 
 # Class: LlmReRanker\&lt;TRecord\&gt;
 
-Defined in: src/reranker.ts:97
+Defined in: [packages/reranker-llm/src/reranker.ts:97](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L97)
 
 `ReRanker` implementation. Matches the contract from
 `@graphorin/memory/search`.
@@ -31,7 +31,7 @@ Defined in: src/reranker.ts:97
 new LlmReRanker<TRecord>(options): LlmReRanker<TRecord>;
 ```
 
-Defined in: src/reranker.ts:113
+Defined in: [packages/reranker-llm/src/reranker.ts:113](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L113)
 
 #### Parameters
 
@@ -47,13 +47,13 @@ Defined in: src/reranker.ts:113
 
 | Property | Modifier | Type | Default value | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-batchsize"></a> `batchSize` | `readonly` | `number` | `undefined` | - | src/reranker.ts:101 |
-| <a id="property-fallbackscore"></a> `fallbackScore` | `readonly` | `number` | `undefined` | - | src/reranker.ts:104 |
-| <a id="property-id"></a> `id` | `readonly` | `"llm-judge"` | `RERANKER_ID` | Stable lowercase identifier surfaced on every span. | src/reranker.ts:98 |
-| <a id="property-maxoutputtokens"></a> `maxOutputTokens` | `readonly` | `number` | `undefined` | - | src/reranker.ts:103 |
-| <a id="property-maxscore"></a> `maxScore` | `readonly` | `number` | `undefined` | - | src/reranker.ts:100 |
-| <a id="property-provider"></a> `provider` | `readonly` | [`Provider`](/api/@graphorin/core/interfaces/Provider.md) | `undefined` | - | src/reranker.ts:99 |
-| <a id="property-temperature"></a> `temperature` | `readonly` | `number` | `undefined` | - | src/reranker.ts:102 |
+| <a id="property-batchsize"></a> `batchSize` | `readonly` | `number` | `undefined` | - | [packages/reranker-llm/src/reranker.ts:101](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L101) |
+| <a id="property-fallbackscore"></a> `fallbackScore` | `readonly` | `number` | `undefined` | - | [packages/reranker-llm/src/reranker.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L104) |
+| <a id="property-id"></a> `id` | `readonly` | `"llm-judge"` | `RERANKER_ID` | Stable lowercase identifier surfaced on every span. | [packages/reranker-llm/src/reranker.ts:98](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L98) |
+| <a id="property-maxoutputtokens"></a> `maxOutputTokens` | `readonly` | `number` | `undefined` | - | [packages/reranker-llm/src/reranker.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L103) |
+| <a id="property-maxscore"></a> `maxScore` | `readonly` | `number` | `undefined` | - | [packages/reranker-llm/src/reranker.ts:100](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L100) |
+| <a id="property-provider"></a> `provider` | `readonly` | [`Provider`](/api/@graphorin/core/interfaces/Provider.md) | `undefined` | - | [packages/reranker-llm/src/reranker.ts:99](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L99) |
+| <a id="property-temperature"></a> `temperature` | `readonly` | `number` | `undefined` | - | [packages/reranker-llm/src/reranker.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L102) |
 
 ## Accessors
 
@@ -65,7 +65,7 @@ Defined in: src/reranker.ts:113
 get invocationCount(): number;
 ```
 
-Defined in: src/reranker.ts:142
+Defined in: [packages/reranker-llm/src/reranker.ts:142](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L142)
 
 Number of `rerank(...)` invocations since construction. Surfaced
 for observability + the test suite.
@@ -86,7 +86,7 @@ for observability + the test suite.
 get lastErrorCount(): number;
 ```
 
-Defined in: src/reranker.ts:162
+Defined in: [packages/reranker-llm/src/reranker.ts:162](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L162)
 
 Number of per-passage provider failures swallowed (→ `fallbackScore`) on
 the most recent `rerank(...)` (PS-15). A non-zero value means the ranking
@@ -106,7 +106,7 @@ is partially degraded - surface it for observability.
 get lastPromptTokens(): number;
 ```
 
-Defined in: src/reranker.ts:153
+Defined in: [packages/reranker-llm/src/reranker.ts:153](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L153)
 
 Rough total prompt-tokens spent on the most-recent rerank call.
 Returned by the provider on each `generate(...)`; we expose the
@@ -129,7 +129,7 @@ rerank<TInputRecord>(
 options?): Promise<readonly MemoryHit<TInputRecord>[]>;
 ```
 
-Defined in: src/reranker.ts:166
+Defined in: [packages/reranker-llm/src/reranker.ts:166](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-llm/src/reranker.ts#L166)
 
 Rerank one or more parallel ranked lists and return the fused
 top-K (default `topK = 10`). Each input list must already be
@@ -151,7 +151,7 @@ sorted by `score` descending.
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TInputRecord`\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;`TInputRecord`\&gt;[]\>
 
 #### Implementation of
 

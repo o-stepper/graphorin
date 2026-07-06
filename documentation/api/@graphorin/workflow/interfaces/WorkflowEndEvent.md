@@ -6,7 +6,7 @@
 
 # Interface: WorkflowEndEvent\&lt;TState\&gt;
 
-Defined in: packages/core/dist/types/workflow-event.d.ts:88
+Defined in: [packages/core/dist/types/workflow-event.d.ts:88](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L88)
 
 ## Stable
 
@@ -20,6 +20,6 @@ Defined in: packages/core/dist/types/workflow-event.d.ts:88
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-state"></a> `state` | `readonly` | `TState` | packages/core/dist/types/workflow-event.d.ts:91 |
-| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | packages/core/dist/types/workflow-event.d.ts:90 |
-| <a id="property-type"></a> `type` | `readonly` | `"workflow.end"` | packages/core/dist/types/workflow-event.d.ts:89 |
+| <a id="property-state"></a> `state` | `readonly` | `TState` | [packages/core/dist/types/workflow-event.d.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L91) |
+| <a id="property-threadid"></a> `threadId` | `readonly` | `string` | [packages/core/dist/types/workflow-event.d.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L90) |
+| <a id="property-type"></a> `type` | `readonly` | `"workflow.end"` | [packages/core/dist/types/workflow-event.d.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/core/dist/types/workflow-event.d.ts#L89) |

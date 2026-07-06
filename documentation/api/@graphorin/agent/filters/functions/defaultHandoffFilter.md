@@ -10,7 +10,7 @@
 function defaultHandoffFilter(): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:321
+Defined in: [packages/agent/src/filters/index.ts:321](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L321)
 
 The canonical default applied by the agent runtime to every
 `Agent.toTool(...)` and `handoff(...)` invocation when the caller

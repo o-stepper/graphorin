@@ -10,7 +10,7 @@
 function openAuditDb(options): Promise<AuditDb>;
 ```
 
-Defined in: packages/security/src/audit/audit-db.ts:202
+Defined in: [packages/security/src/audit/audit-db.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/audit-db.ts#L202)
 
 Open an audit database. The function fails fast with
 `AuditDbCipherUnavailableError` when no binding is registered, or

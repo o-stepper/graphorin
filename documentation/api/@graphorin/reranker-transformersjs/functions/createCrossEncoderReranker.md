@@ -10,7 +10,7 @@
 function createCrossEncoderReranker<TRecord>(options?): TransformersJsReRanker<TRecord>;
 ```
 
-Defined in: packages/reranker-transformersjs/src/reranker.ts:90
+Defined in: [packages/reranker-transformersjs/src/reranker.ts:90](https://github.com/o-stepper/graphorin/blob/main/packages/reranker-transformersjs/src/reranker.ts#L90)
 
 Build a cross-encoder reranker. Lazy: the pipeline is constructed on
 the first `rerank()` call so packaging the reranker pays no

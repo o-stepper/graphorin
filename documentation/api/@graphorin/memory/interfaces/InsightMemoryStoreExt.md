@@ -6,7 +6,7 @@
 
 # Interface: InsightMemoryStoreExt
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:679
+Defined in: [packages/memory/src/internal/storage-adapter.ts:679](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L679)
 
 Optional storage extension for the reflection `insights` table
 (P1-1). The consolidator's reflection pass inserts quarantined,
@@ -33,7 +33,7 @@ bumpSalience(
 reason?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:707
+Defined in: [packages/memory/src/internal/storage-adapter.ts:707](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L707)
 
 Adjust an insight's ExpeL salience by `delta`, clamped at 0. The
 floor is the value at which [prune](/api/@graphorin/memory/interfaces/InsightMemoryStoreExt.md#prune) removes it.
@@ -58,7 +58,7 @@ floor is the value at which [prune](/api/@graphorin/memory/interfaces/InsightMem
 optional get(id): Promise<Insight | null>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:691
+Defined in: [packages/memory/src/internal/storage-adapter.ts:691](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L691)
 
 Lookup a single insight by id (`null` when absent / pruned).
 
@@ -80,7 +80,7 @@ Lookup a single insight by id (`null` when absent / pruned).
 insert(insight): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:681
+Defined in: [packages/memory/src/internal/storage-adapter.ts:681](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L681)
 
 Persist a synthesized insight (idempotent on `id`).
 
@@ -102,7 +102,7 @@ Persist a synthesized insight (idempotent on `id`).
 list(scope, opts?): Promise<readonly Insight[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:683
+Defined in: [packages/memory/src/internal/storage-adapter.ts:683](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L683)
 
 Most-recent insights for the scope (newest first).
 
@@ -125,7 +125,7 @@ Most-recent insights for the scope (newest first).
 prune(scope): Promise<number>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:713
+Defined in: [packages/memory/src/internal/storage-adapter.ts:713](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L713)
 
 Soft-delete every salience-0 insight for the scope (the ExpeL
 forgetting step). Returns the number pruned. Tombstone only -
@@ -152,7 +152,7 @@ search(
 opts?): Promise<readonly MemoryHit<Insight>[]>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:685
+Defined in: [packages/memory/src/internal/storage-adapter.ts:685](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L685)
 
 FTS keyword search over insight text.
 
@@ -166,7 +166,7 @@ FTS keyword search over insight text.
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`Insight`](/api/@graphorin/core/interfaces/Insight.md)\&gt;[]\>
 
 ***
 
@@ -180,7 +180,7 @@ optional setStatus(
 scope?): Promise<void>;
 ```
 
-Defined in: packages/memory/src/internal/storage-adapter.ts:697
+Defined in: [packages/memory/src/internal/storage-adapter.ts:697](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/internal/storage-adapter.ts#L697)
 
 Set an insight's retrieval-trust `status` (MCON-2) - promote a quarantined
 (reflection) insight or re-quarantine an active one, with a

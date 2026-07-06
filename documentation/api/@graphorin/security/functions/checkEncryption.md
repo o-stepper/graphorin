@@ -10,7 +10,7 @@
 function checkEncryption(): CheckResult[];
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:166
+Defined in: [packages/security/src/hardening/doctor.ts:166](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/doctor.ts#L166)
 
 Verify that an encrypted-SQLite binding is registered for the
 audit log. The framework refuses to open the audit log without an

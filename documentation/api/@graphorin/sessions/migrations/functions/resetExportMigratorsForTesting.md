@@ -10,7 +10,7 @@
 function _resetExportMigratorsForTesting(): void;
 ```
 
-Defined in: packages/sessions/src/migrations/index.ts:95
+Defined in: [packages/sessions/src/migrations/index.ts:95](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/migrations/index.ts#L95)
 
 **`Internal`**
 

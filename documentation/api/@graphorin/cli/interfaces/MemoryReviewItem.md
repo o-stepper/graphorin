@@ -6,7 +6,7 @@
 
 # Interface: MemoryReviewItem
 
-Defined in: packages/cli/src/commands/memory.ts:684
+Defined in: [packages/cli/src/commands/memory.ts:684](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L684)
 
 A single quarantined memory row surfaced by `graphorin memory review`.
 
@@ -14,6 +14,6 @@ A single quarantined memory row surfaced by `graphorin memory review`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-id"></a> `id` | `readonly` | `string` | packages/cli/src/commands/memory.ts:685 |
-| <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | packages/cli/src/commands/memory.ts:687 |
-| <a id="property-text"></a> `text` | `readonly` | `string` | packages/cli/src/commands/memory.ts:686 |
+| <a id="property-id"></a> `id` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:685](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L685) |
+| <a id="property-provenance"></a> `provenance` | `readonly` | `string` \| `null` | [packages/cli/src/commands/memory.ts:687](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L687) |
+| <a id="property-text"></a> `text` | `readonly` | `string` | [packages/cli/src/commands/memory.ts:686](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/memory.ts#L686) |

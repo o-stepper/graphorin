@@ -10,7 +10,7 @@
 function normalizeEntityName(name): string;
 ```
 
-Defined in: packages/memory/src/graph/entity-resolver.ts:91
+Defined in: [packages/memory/src/graph/entity-resolver.ts:91](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/graph/entity-resolver.ts#L91)
 
 Fold an entity surface form into a canonical lexical key: Unicode
 NFKC, lowercased, internal whitespace collapsed, surrounding

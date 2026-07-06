@@ -10,7 +10,7 @@
 function deriveSessionExportKey(passphrase, salt): Promise<Uint8Array<ArrayBufferLike>>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:253
+Defined in: [packages/sessions/src/export/writer.ts:253](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L253)
 
 Derive a 32-byte AES key from a passphrase + salt. Exposed for
 symmetry with the importer, which must supply the same salt to
@@ -25,6 +25,6 @@ produce the same key.
 
 ## Returns
 
-`Promise`\&lt;`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\&gt;
+`Promise`\<`Uint8Array`\&lt;`ArrayBufferLike`\&gt;\>
 
 ## Stable

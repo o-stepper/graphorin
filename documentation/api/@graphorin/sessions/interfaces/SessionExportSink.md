@@ -6,7 +6,7 @@
 
 # Interface: SessionExportSink
 
-Defined in: packages/sessions/src/export/writer.ts:103
+Defined in: [packages/sessions/src/export/writer.ts:103](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L103)
 
 Sink that consumes already-serialized JSONL lines (each carrying its
 trailing newline). The default [createBufferSink](/api/@graphorin/sessions/functions/createBufferSink.md) accumulates
@@ -23,7 +23,7 @@ sink built on `node:stream`.
 write(line): Promise<void>;
 ```
 
-Defined in: packages/sessions/src/export/writer.ts:104
+Defined in: [packages/sessions/src/export/writer.ts:104](https://github.com/o-stepper/graphorin/blob/main/packages/sessions/src/export/writer.ts#L104)
 
 #### Parameters
 

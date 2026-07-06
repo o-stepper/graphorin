@@ -10,7 +10,7 @@
 function parseSlashCommand(raw): SlashCommandActivation;
 ```
 
-Defined in: packages/skills/src/activation/index.ts:39
+Defined in: [packages/skills/src/activation/index.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/activation/index.ts#L39)
 
 Parse a single message body for a `/skill:<name>` invocation. The
 grammar accepts:

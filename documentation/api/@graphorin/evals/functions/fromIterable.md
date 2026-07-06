@@ -10,7 +10,7 @@
 function fromIterable<I, O>(cases, options?): Dataset<I, O>;
 ```
 
-Defined in: evals/src/loaders/iterable.ts:11
+Defined in: [packages/evals/src/loaders/iterable.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/loaders/iterable.ts#L11)
 
 ## Type Parameters
 
@@ -23,7 +23,7 @@ Defined in: evals/src/loaders/iterable.ts:11
 
 | Parameter | Type |
 | ------ | ------ |
-| `cases` | \| `Iterable`\<[`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt;\>, `any`, `any`\> \| readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt;\>[] |
+| `cases` | \| `Iterable`\<[`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>, `any`, `any`\> \| readonly [`Case`](/api/@graphorin/evals/interfaces/Case.md)\<`I`, `O`, `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\>\>[] |
 | `options` | \{ `description?`: `string`; `name?`: `string`; \} |
 | `options.description?` | `string` |
 | `options.name?` | `string` |

@@ -10,7 +10,7 @@
 function foldToolExamples(tools): readonly ToolDefinition[];
 ```
 
-Defined in: packages/provider/src/tool-examples.ts:31
+Defined in: [packages/provider/src/tool-examples.ts:31](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/tool-examples.ts#L31)
 
 Fold each tool's `examples` into its `description` and drop the structured
 field. Non-destructive: a tool with no examples is returned by reference, and

@@ -6,7 +6,7 @@
 
 # Interface: SecretsAuditEvent
 
-Defined in: packages/security/src/secrets/audit-emitter.ts:54
+Defined in: [packages/security/src/secrets/audit-emitter.ts:54](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L54)
 
 One audit event. The payload is intentionally minimal - never carry
 the secret value itself, only metadata that is safe to log
@@ -18,10 +18,10 @@ the secret value itself, only metadata that is safe to log
 
 | Property | Modifier | Type | Description | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="property-action"></a> `action` | `readonly` | [`SecretsAuditAction`](/api/@graphorin/security/type-aliases/SecretsAuditAction.md) | Discriminator. | packages/security/src/secrets/audit-emitter.ts:56 |
-| <a id="property-actor"></a> `actor?` | `readonly` | [`SecretsAuditActor`](/api/@graphorin/security/interfaces/SecretsAuditActor.md) | Optional actor pointer. | packages/security/src/secrets/audit-emitter.ts:70 |
-| <a id="property-decision"></a> `decision` | `readonly` | [`SecretsAuditDecision`](/api/@graphorin/security/type-aliases/SecretsAuditDecision.md) | Outcome. | packages/security/src/secrets/audit-emitter.ts:58 |
-| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\&lt;`Record`\&lt;`string`, `unknown`\&gt;\&gt; | Optional structured metadata. Must be safe to log. | packages/security/src/secrets/audit-emitter.ts:72 |
-| <a id="property-source"></a> `source` | `readonly` | `string` | Stable identifier of the SecretsStore / resolver that fired the event. | packages/security/src/secrets/audit-emitter.ts:62 |
-| <a id="property-target"></a> `target` | `readonly` | `string` | Target of the action. For `secret:*` events this is the secret key; for `secrets:downgrade` events this is the kind of store the factory downgraded to (e.g. `'env'`). | packages/security/src/secrets/audit-emitter.ts:68 |
-| <a id="property-ts"></a> `ts` | `readonly` | `number` | Epoch milliseconds at which the event fired. | packages/security/src/secrets/audit-emitter.ts:60 |
+| <a id="property-action"></a> `action` | `readonly` | [`SecretsAuditAction`](/api/@graphorin/security/type-aliases/SecretsAuditAction.md) | Discriminator. | [packages/security/src/secrets/audit-emitter.ts:56](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L56) |
+| <a id="property-actor"></a> `actor?` | `readonly` | [`SecretsAuditActor`](/api/@graphorin/security/interfaces/SecretsAuditActor.md) | Optional actor pointer. | [packages/security/src/secrets/audit-emitter.ts:70](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L70) |
+| <a id="property-decision"></a> `decision` | `readonly` | [`SecretsAuditDecision`](/api/@graphorin/security/type-aliases/SecretsAuditDecision.md) | Outcome. | [packages/security/src/secrets/audit-emitter.ts:58](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L58) |
+| <a id="property-metadata"></a> `metadata?` | `readonly` | `Readonly`\<`Record`\&lt;`string`, `unknown`\&gt;\> | Optional structured metadata. Must be safe to log. | [packages/security/src/secrets/audit-emitter.ts:72](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L72) |
+| <a id="property-source"></a> `source` | `readonly` | `string` | Stable identifier of the SecretsStore / resolver that fired the event. | [packages/security/src/secrets/audit-emitter.ts:62](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L62) |
+| <a id="property-target"></a> `target` | `readonly` | `string` | Target of the action. For `secret:*` events this is the secret key; for `secrets:downgrade` events this is the kind of store the factory downgraded to (e.g. `'env'`). | [packages/security/src/secrets/audit-emitter.ts:68](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L68) |
+| <a id="property-ts"></a> `ts` | `readonly` | `number` | Epoch milliseconds at which the event fired. | [packages/security/src/secrets/audit-emitter.ts:60](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/audit-emitter.ts#L60) |

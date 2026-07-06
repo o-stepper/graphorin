@@ -10,7 +10,7 @@
 const DEFAULT_VALIDATION_CONFIG: Required<Pick<ValidationConfig, "minTier" | "failOnUnredactedSensitive">>;
 ```
 
-Defined in: packages/observability/src/redaction/config.ts:45
+Defined in: [packages/observability/src/redaction/config.ts:45](https://github.com/o-stepper/graphorin/blob/main/packages/observability/src/redaction/config.ts#L45)
 
 Default validation configuration. Mirrors the runtime defaults used
 by `createTracer({ ... })` when `validation` is omitted.

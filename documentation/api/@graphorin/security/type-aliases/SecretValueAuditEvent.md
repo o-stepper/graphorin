@@ -20,7 +20,7 @@ type SecretValueAuditEvent = {
 };
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:33
+Defined in: [packages/security/src/secrets/secret-value.ts:33](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L33)
 
 Hook signature subscribed by the audit log. The audit log is wired up
 by a sibling sub-package; this module merely calls every registered
@@ -37,7 +37,7 @@ each unwrap event.
 readonly action: "reveal" | "use" | "use-buffer" | "dispose" | "construct";
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:34
+Defined in: [packages/security/src/secrets/secret-value.ts:34](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L34)
 
 ***
 
@@ -47,7 +47,7 @@ Defined in: packages/security/src/secrets/secret-value.ts:34
 readonly optional caller?: string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:39
+Defined in: [packages/security/src/secrets/secret-value.ts:39](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L39)
 
 Best-effort caller name (set by `withSecret(...)` if active).
 
@@ -59,7 +59,7 @@ Best-effort caller name (set by `withSecret(...)` if active).
 readonly length: number;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:41
+Defined in: [packages/security/src/secrets/secret-value.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L41)
 
 Length of the underlying buffer in bytes. Safe to log.
 
@@ -71,7 +71,7 @@ Length of the underlying buffer in bytes. Safe to log.
 readonly optional scopeId?: string;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:37
+Defined in: [packages/security/src/secrets/secret-value.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L37)
 
 Best-effort caller scope (set by `withSecret(...)` if active).
 
@@ -86,7 +86,7 @@ readonly optional source?: {
 };
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:35
+Defined in: [packages/security/src/secrets/secret-value.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L35)
 
 #### ref?
 
@@ -108,6 +108,6 @@ readonly optional resolver?: string;
 readonly ts: number;
 ```
 
-Defined in: packages/security/src/secrets/secret-value.ts:43
+Defined in: [packages/security/src/secrets/secret-value.ts:43](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/secret-value.ts#L43)
 
 Epoch milliseconds at the moment of the event.

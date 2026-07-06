@@ -10,7 +10,7 @@
 function bridgeSecretsToAudit(options): SecretsBridgeTeardown;
 ```
 
-Defined in: packages/security/src/audit/secrets-bridge.ts:64
+Defined in: [packages/security/src/audit/secrets-bridge.ts:64](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/secrets-bridge.ts#L64)
 
 Subscribe the audit-log subsystem to the secrets-layer audit
 emitter. Returns a teardown function.

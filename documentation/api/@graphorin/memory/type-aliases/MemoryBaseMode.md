@@ -10,7 +10,7 @@
 type MemoryBaseMode = "full" | "minimal";
 ```
 
-Defined in: packages/memory/src/context-engine/templates/composer.ts:19
+Defined in: [packages/memory/src/context-engine/templates/composer.ts:19](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/templates/composer.ts#L19)
 
 Layer 1 mode discriminator. `'full'` ships the full educational
 template (~250-350 tok); `'minimal'` ships the shortened version

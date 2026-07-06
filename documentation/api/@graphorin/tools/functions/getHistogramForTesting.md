@@ -10,7 +10,7 @@
 function getHistogramForTesting(name, labels?): readonly number[];
 ```
 
-Defined in: packages/tools/src/audit/counters.ts:170
+Defined in: [packages/tools/src/audit/counters.ts:170](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/audit/counters.ts#L170)
 
 **`Experimental`**
 
@@ -21,7 +21,7 @@ Read a single histogram observation list (returns `[]` when absent).
 | Parameter | Type |
 | ------ | ------ |
 | `name` | `string` |
-| `labels?` | `Readonly`\&lt;`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\&gt; |
+| `labels?` | `Readonly`\<`Record`\&lt;`string`, `string` \| `number` \| `boolean`\&gt;\> |
 
 ## Returns
 

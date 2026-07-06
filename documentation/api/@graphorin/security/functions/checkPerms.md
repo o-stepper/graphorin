@@ -10,7 +10,7 @@
 function checkPerms(opts): Promise<CheckResult[]>;
 ```
 
-Defined in: packages/security/src/hardening/doctor.ts:66
+Defined in: [packages/security/src/hardening/doctor.ts:66](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/doctor.ts#L66)
 
 Verify that a set of paths carry the expected POSIX modes. Used
 by `graphorin doctor --check-perms`.

@@ -6,7 +6,7 @@
 
 # Interface: DataFlowGuard
 
-Defined in: packages/tools/src/executor/types.ts:195
+Defined in: [packages/tools/src/executor/types.ts:195](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L195)
 
 Provenance / data-flow guard the executor consults at the tool
 boundary. Decisions and per-run taint state live in the
@@ -21,7 +21,7 @@ and audits it. See `@graphorin/security/dataflow`.
 inspect(input): DataFlowVerdict;
 ```
 
-Defined in: packages/tools/src/executor/types.ts:202
+Defined in: [packages/tools/src/executor/types.ts:202](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L202)
 
 Sink gate: decide whether a `side-effecting` / `external-stateful`
 tool may run given what untrusted/sensitive content has entered the
@@ -46,7 +46,7 @@ executor emits the audit row and enforces a `'block'`.
 record(input): void;
 ```
 
-Defined in: packages/tools/src/executor/types.ts:207
+Defined in: [packages/tools/src/executor/types.ts:207](https://github.com/o-stepper/graphorin/blob/main/packages/tools/src/executor/types.ts#L207)
 
 Record one successful output's provenance so later sink gates can
 detect untrusted-to-sink flows. Called for every successful result.

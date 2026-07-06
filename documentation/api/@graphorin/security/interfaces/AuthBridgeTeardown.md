@@ -6,7 +6,7 @@
 
 # Interface: AuthBridgeTeardown()
 
-Defined in: packages/security/src/audit/auth-bridge.ts:23
+Defined in: [packages/security/src/audit/auth-bridge.ts:23](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L23)
 
 Teardown returned by `bridgeAuthToAudit(...)`.
 
@@ -16,7 +16,7 @@ Teardown returned by `bridgeAuthToAudit(...)`.
 AuthBridgeTeardown(): void;
 ```
 
-Defined in: packages/security/src/audit/auth-bridge.ts:24
+Defined in: [packages/security/src/audit/auth-bridge.ts:24](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L24)
 
 Teardown returned by `bridgeAuthToAudit(...)`.
 
@@ -30,4 +30,4 @@ Teardown returned by `bridgeAuthToAudit(...)`.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | packages/security/src/audit/auth-bridge.ts:25 |
+| <a id="property-drain"></a> `drain` | `readonly` | () => `Promise`\&lt;`void`\&gt; | [packages/security/src/audit/auth-bridge.ts:25](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/audit/auth-bridge.ts#L25) |

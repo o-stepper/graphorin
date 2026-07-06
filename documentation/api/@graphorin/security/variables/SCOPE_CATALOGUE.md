@@ -10,7 +10,7 @@
 const SCOPE_CATALOGUE: ReadonlyArray<string>;
 ```
 
-Defined in: packages/security/src/auth/scope.ts:149
+Defined in: [packages/security/src/auth/scope.ts:149](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/auth/scope.ts#L149)
 
 Canonical catalogue of scopes recognised by the framework. Wider
 deployments are free to introduce additional scope strings; the

@@ -10,7 +10,7 @@
 function defineLocalePack(input): LocalePack;
 ```
 
-Defined in: packages/memory/src/conflict/locale-packs/types.ts:102
+Defined in: [packages/memory/src/conflict/locale-packs/types.ts:102](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/conflict/locale-packs/types.ts#L102)
 
 Builder used by application code that wants to ship a custom pack:
 

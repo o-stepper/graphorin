@@ -10,7 +10,7 @@
 const vaultResolver: SecretResolver;
 ```
 
-Defined in: packages/security/src/secrets/resolvers/vault.ts:42
+Defined in: [packages/security/src/secrets/resolvers/vault.ts:42](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/secrets/resolvers/vault.ts#L42)
 
 Built-in `vault://` resolver. Acts as a router for an optional
 adapter - when no adapter is registered, it raises a typed

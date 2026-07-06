@@ -10,7 +10,7 @@
 function helpfulnessScorer<I, O>(options): Scorer<I, O>;
 ```
 
-Defined in: evals/src/scorers/prebuilt/index.ts:38
+Defined in: [packages/evals/src/scorers/prebuilt/index.ts:38](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/scorers/prebuilt/index.ts#L38)
 
 ## Type Parameters
 

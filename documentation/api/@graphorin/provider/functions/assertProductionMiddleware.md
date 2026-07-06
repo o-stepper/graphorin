@@ -10,7 +10,7 @@
 function assertProductionMiddleware(provider, options?): void;
 ```
 
-Defined in: packages/provider/src/middleware/production-hook.ts:35
+Defined in: [packages/provider/src/middleware/production-hook.ts:35](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/middleware/production-hook.ts#L35)
 
 Throw [MissingProductionMiddlewareError](/api/@graphorin/provider/classes/MissingProductionMiddlewareError.md) if a required
 middleware is missing from the chain rooted at `provider`. The

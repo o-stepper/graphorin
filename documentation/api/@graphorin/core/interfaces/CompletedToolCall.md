@@ -6,7 +6,7 @@
 
 # Interface: CompletedToolCall\&lt;TOutput\&gt;
 
-Defined in: packages/core/src/types/tool.ts:320
+Defined in: [packages/core/src/types/tool.ts:320](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L320)
 
 A `ToolCall` paired with its outcome and execution metadata. Captured
 on `RunState.completedToolCalls` after a successful or failed run.
@@ -23,6 +23,6 @@ on `RunState.completedToolCalls` after a successful or failed run.
 
 | Property | Modifier | Type | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="property-call"></a> `call` | `readonly` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) | packages/core/src/types/tool.ts:321 |
-| <a id="property-outcome"></a> `outcome` | `readonly` | [`ToolOutcome`](/api/@graphorin/core/type-aliases/ToolOutcome.md)\&lt;`TOutput`\&gt; | packages/core/src/types/tool.ts:322 |
-| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | packages/core/src/types/tool.ts:323 |
+| <a id="property-call"></a> `call` | `readonly` | [`ToolCall`](/api/@graphorin/core/interfaces/ToolCall.md) | [packages/core/src/types/tool.ts:321](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L321) |
+| <a id="property-outcome"></a> `outcome` | `readonly` | [`ToolOutcome`](/api/@graphorin/core/type-aliases/ToolOutcome.md)\&lt;`TOutput`\&gt; | [packages/core/src/types/tool.ts:322](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L322) |
+| <a id="property-stepnumber"></a> `stepNumber` | `readonly` | `number` | [packages/core/src/types/tool.ts:323](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/types/tool.ts#L323) |

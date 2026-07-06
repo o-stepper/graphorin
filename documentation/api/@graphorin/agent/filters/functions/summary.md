@@ -10,7 +10,7 @@
 function summary(text): DescribedFilter;
 ```
 
-Defined in: packages/agent/src/filters/index.ts:158
+Defined in: [packages/agent/src/filters/index.ts:158](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/filters/index.ts#L158)
 
 Replace the parent's history with a single system message carrying
 the supplied summary. Used by callers that wire in an LLM-based

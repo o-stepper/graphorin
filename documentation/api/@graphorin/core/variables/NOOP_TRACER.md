@@ -10,7 +10,7 @@
 const NOOP_TRACER: Tracer;
 ```
 
-Defined in: packages/core/src/contracts/tracer.ts:193
+Defined in: [packages/core/src/contracts/tracer.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/tracer.ts#L193)
 
 Minimal no-op tracer. Useful as a typed default when downstream code
 needs a non-null `Tracer` without taking the observability dependency.

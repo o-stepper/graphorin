@@ -10,7 +10,7 @@
 function explainRecall<TRecord>(hits, opts): RecallExplanation;
 ```
 
-Defined in: packages/memory/src/search/explain.ts:78
+Defined in: [packages/memory/src/search/explain.ts:78](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/search/explain.ts#L78)
 
 Build a [RecallExplanation](/api/@graphorin/memory/interfaces/RecallExplanation.md) from a ranked hit list. Pure and
 deterministic: it surfaces whatever per-signal scores the hybrid

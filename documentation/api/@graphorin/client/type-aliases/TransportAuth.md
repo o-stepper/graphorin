@@ -18,7 +18,7 @@ type TransportAuth =
 };
 ```
 
-Defined in: packages/client/src/transport/types.ts:53
+Defined in: [packages/client/src/transport/types.ts:53](https://github.com/o-stepper/graphorin/blob/main/packages/client/src/transport/types.ts#L53)
 
 Authentication strategy passed to a transport. The bearer-token
 shape is consumed by both transports (WS via the

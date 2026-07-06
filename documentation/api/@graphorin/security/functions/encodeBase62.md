@@ -10,7 +10,7 @@
 function encodeBase62(bytes, padTo?): string;
 ```
 
-Defined in: packages/security/src/hardening/crypto.ts:65
+Defined in: [packages/security/src/hardening/crypto.ts:65](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/hardening/crypto.ts#L65)
 
 Encode a `Uint8Array` as base62url. The optional `padTo` argument
 left-pads the output with the base62 zero character so every

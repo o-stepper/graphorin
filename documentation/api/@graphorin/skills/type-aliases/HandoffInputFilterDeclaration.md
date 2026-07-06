@@ -27,7 +27,7 @@ type HandoffInputFilterDeclaration =
 };
 ```
 
-Defined in: packages/skills/src/types/index.ts:205
+Defined in: [packages/skills/src/types/index.ts:205](https://github.com/o-stepper/graphorin/blob/main/packages/skills/src/types/index.ts#L205)
 
 `graphorin-handoff-input-filter` declaration recognised by the
 loader. The runtime resolves the declaration into the actual filter

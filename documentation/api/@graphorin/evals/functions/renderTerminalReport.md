@@ -10,7 +10,7 @@
 function renderTerminalReport<I, O>(report): string;
 ```
 
-Defined in: evals/src/reporters/terminal.ts:11
+Defined in: [packages/evals/src/reporters/terminal.ts:11](https://github.com/o-stepper/graphorin/blob/main/packages/evals/src/reporters/terminal.ts#L11)
 
 ## Type Parameters
 

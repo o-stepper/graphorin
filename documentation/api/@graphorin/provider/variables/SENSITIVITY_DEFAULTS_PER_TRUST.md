@@ -10,7 +10,7 @@
 const SENSITIVITY_DEFAULTS_PER_TRUST: Readonly<Record<LocalProviderTrust, ReadonlyArray<Sensitivity>>>;
 ```
 
-Defined in: packages/provider/src/trust/classify-local-provider.ts:46
+Defined in: [packages/provider/src/trust/classify-local-provider.ts:46](https://github.com/o-stepper/graphorin/blob/main/packages/provider/src/trust/classify-local-provider.ts#L46)
 
 Per-tier default sensitivity envelope. Lifted to a constant so
 downstream code (and tests) can import it without re-deriving the

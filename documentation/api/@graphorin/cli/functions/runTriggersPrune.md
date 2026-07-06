@@ -10,7 +10,7 @@
 function runTriggersPrune(options?): Promise<TriggersPruneResult>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:193
+Defined in: [packages/cli/src/commands/triggers.ts:193](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L193)
 
 ## Parameters
 

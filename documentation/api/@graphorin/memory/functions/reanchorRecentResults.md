@@ -10,7 +10,7 @@
 function reanchorRecentResults(options?): NamedPostCompactionHook;
 ```
 
-Defined in: packages/memory/src/context-engine/compaction/hooks/reanchor-recent-results.ts:47
+Defined in: [packages/memory/src/context-engine/compaction/hooks/reanchor-recent-results.ts:47](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/context-engine/compaction/hooks/reanchor-recent-results.ts#L47)
 
 Build a `reanchorRecentResults` hook (C4).
 

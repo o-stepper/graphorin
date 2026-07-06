@@ -10,7 +10,7 @@
 function createConsolidator(opts): Consolidator;
 ```
 
-Defined in: packages/memory/src/consolidator/runtime.ts:121
+Defined in: [packages/memory/src/consolidator/runtime.ts:121](https://github.com/o-stepper/graphorin/blob/main/packages/memory/src/consolidator/runtime.ts#L121)
 
 Build the runtime consolidator.
 

@@ -10,7 +10,7 @@
 function runTriggersList(options?): Promise<readonly TriggerState[]>;
 ```
 
-Defined in: packages/cli/src/commands/triggers.ts:41
+Defined in: [packages/cli/src/commands/triggers.ts:41](https://github.com/o-stepper/graphorin/blob/main/packages/cli/src/commands/triggers.ts#L41)
 
 ## Parameters
 

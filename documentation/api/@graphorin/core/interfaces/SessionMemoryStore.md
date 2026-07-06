@@ -6,7 +6,7 @@
 
 # Interface: SessionMemoryStore
 
-Defined in: packages/core/src/contracts/memory-store.ts:109
+Defined in: [packages/core/src/contracts/memory-store.ts:109](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L109)
 
 ## Stable
 
@@ -22,7 +22,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:109
 list(scope, opts?): Promise<readonly Message[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:111
+Defined in: [packages/core/src/contracts/memory-store.ts:111](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L111)
 
 #### Parameters
 
@@ -43,7 +43,7 @@ Defined in: packages/core/src/contracts/memory-store.ts:111
 optional listWithMetadata(scope, opts?): Promise<readonly SessionMessageWithMetadata[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:116
+Defined in: [packages/core/src/contracts/memory-store.ts:116](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L116)
 
 List messages with their persisted identity (RP-5). Optional: stores that
 don't implement it fall back to `list` + fabricated ids on the export path.
@@ -67,7 +67,7 @@ don't implement it fall back to `list` + fabricated ids on the export path.
 push(scope, message): Promise<MessageRef>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:110
+Defined in: [packages/core/src/contracts/memory-store.ts:110](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L110)
 
 #### Parameters
 
@@ -91,7 +91,7 @@ search(
 opts?): Promise<readonly MemoryHit<MemoryRecord>[]>;
 ```
 
-Defined in: packages/core/src/contracts/memory-store.ts:131
+Defined in: [packages/core/src/contracts/memory-store.ts:131](https://github.com/o-stepper/graphorin/blob/main/packages/core/src/contracts/memory-store.ts#L131)
 
 Full-text search over the scoped session messages.
 
@@ -113,4 +113,4 @@ major, not a change this line can make compatibly.
 
 #### Returns
 
-`Promise`\&lt;readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\&gt;
+`Promise`\<readonly [`MemoryHit`](/api/@graphorin/core/interfaces/MemoryHit.md)\&lt;[`MemoryRecord`](/api/@graphorin/core/interfaces/MemoryRecord.md)\&gt;[]\>

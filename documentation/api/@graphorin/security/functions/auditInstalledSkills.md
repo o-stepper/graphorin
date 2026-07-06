@@ -10,7 +10,7 @@
 function auditInstalledSkills(): readonly SkillInstallationStatus[];
 ```
 
-Defined in: packages/security/src/supply-chain/audit.ts:30
+Defined in: [packages/security/src/supply-chain/audit.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/security/src/supply-chain/audit.ts#L30)
 
 Snapshot of every installation recorded in this process. Returns a
 fresh frozen array so callers cannot mutate the registry.

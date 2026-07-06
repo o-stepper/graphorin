@@ -6,7 +6,7 @@
 
 # Interface: ProgressIO
 
-Defined in: packages/agent/src/progress/index.ts:79
+Defined in: [packages/agent/src/progress/index.ts:79](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/progress/index.ts#L79)
 
 Public surface returned by [createProgressIO](/api/@graphorin/agent/progress/functions/createProgressIO.md). Used by the
 agent runtime to back `agent.progress.write / read`.
@@ -21,7 +21,7 @@ agent runtime to back `agent.progress.write / read`.
 read(currentRunId, options?): Promise<readonly ProgressArtifactRef[]>;
 ```
 
-Defined in: packages/agent/src/progress/index.ts:85
+Defined in: [packages/agent/src/progress/index.ts:85](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/progress/index.ts#L85)
 
 #### Parameters
 
@@ -42,7 +42,7 @@ Defined in: packages/agent/src/progress/index.ts:85
 rootFor(runId): string;
 ```
 
-Defined in: packages/agent/src/progress/index.ts:89
+Defined in: [packages/agent/src/progress/index.ts:89](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/progress/index.ts#L89)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ write(
 options?): Promise<ProgressArtifactRef>;
 ```
 
-Defined in: packages/agent/src/progress/index.ts:80
+Defined in: [packages/agent/src/progress/index.ts:80](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/progress/index.ts#L80)
 
 #### Parameters
 

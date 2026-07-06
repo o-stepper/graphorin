@@ -10,7 +10,7 @@
 type ProtocolBoundary = "sse" | "http-header" | "ws" | "rest-body" | "audit";
 ```
 
-Defined in: packages/agent/src/lateral-leak/protocol-guard.ts:30
+Defined in: [packages/agent/src/lateral-leak/protocol-guard.ts:30](https://github.com/o-stepper/graphorin/blob/main/packages/agent/src/lateral-leak/protocol-guard.ts#L30)
 
 Per-boundary identifier used by the runtime when calling the
 guard.

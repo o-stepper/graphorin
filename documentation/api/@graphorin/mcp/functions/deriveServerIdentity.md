@@ -10,7 +10,7 @@
 function deriveServerIdentity(transport, serverInfoName?): ServerIdentity;
 ```
 
-Defined in: packages/mcp/src/helpers/identity.ts:37
+Defined in: [packages/mcp/src/helpers/identity.ts:37](https://github.com/o-stepper/graphorin/blob/main/packages/mcp/src/helpers/identity.ts#L37)
 
 Compute the canonical [ServerIdentity](/api/@graphorin/mcp/type-aliases/ServerIdentity.md) for the supplied
 transport. The id is suitable for use as a registry key and as the
