@@ -745,6 +745,13 @@ export class SemanticMemory {
         // a transformer is configured; otherwise this is just `[query]`
         // (single-shot, no provider call - the offline default).
         const queries = await this.#expandQueries(query, opts);
+        // W-087: one batched embed call for the whole fan-out (null on
+        // the single-shot path or on failure - per-variant fallback).
+        const variantVectors = await this.#tryBatchEmbedQueries(queries);
+        // W-087: kick the HyDE LLM call off NOW so it overlaps with the
+        // FTS + vector legs below; #tryHyde never rejects (it returns []
+        // on any failure), so an early start cannot leak a rejection.
+        const hydeHitsPromise = this.#tryHyde(scope, query, opts, candidateTopK);
         const lists: Array<ReadonlyArray<MemoryHit<Fact>>> = [];
         const listWeights: number[] = [];
         // MRET-13: retriever-kind labels in lockstep with `lists` so the
@@ -769,15 +776,27 @@ export class SemanticMemory {
           lists.push(ftsHits);
           listWeights.push(wFts);
           listLabels.push(`fts_${queries.indexOf(q)}`);
-          const vectorHits = await this.#tryVectorSearch(
-            scope,
-            q,
-            candidateTopK,
-            opts.asOf,
-            opts.includeQuarantined,
-            opts.includeSuperseded,
-            opts.owner,
-          );
+          const preVector = variantVectors?.get(q);
+          const vectorHits =
+            preVector !== undefined
+              ? await this.#vectorSearchWithVector(
+                  scope,
+                  preVector,
+                  candidateTopK,
+                  opts.asOf,
+                  opts.includeQuarantined,
+                  opts.includeSuperseded,
+                  opts.owner,
+                )
+              : await this.#tryVectorSearch(
+                  scope,
+                  q,
+                  candidateTopK,
+                  opts.asOf,
+                  opts.includeQuarantined,
+                  opts.includeSuperseded,
+                  opts.owner,
+                );
           if (vectorHits.length > 0) {
             lists.push(vectorHits);
             listWeights.push(wVector);
@@ -790,8 +809,9 @@ export class SemanticMemory {
           }
         }
         // P2-3 HyDE: embed a hypothetical answer and fuse its neighbours
-        // (a vector list ⇒ it takes the `vector` weight).
-        const hydeHits = await this.#tryHyde(scope, query, opts, candidateTopK);
+        // (a vector list ⇒ it takes the `vector` weight). Started before
+        // the fan-out loop (W-087) - awaited here.
+        const hydeHits = await hydeHitsPromise;
         if (hydeHits.length > 0) {
           lists.push(hydeHits);
           listWeights.push(wVector);
@@ -1490,6 +1510,36 @@ export class SemanticMemory {
     // PS-10: a search query is the `query` role for asymmetric (E5) embedders.
     const [vector] = await this.#embedder.embed([query], { taskType: 'query' });
     if (vector === undefined) return [];
+    return this.#vectorSearchWithVector(
+      scope,
+      vector,
+      topK,
+      asOf,
+      includeQuarantined,
+      includeSuperseded,
+      owner,
+    );
+  }
+
+  /**
+   * W-087: the store half of {@link SemanticMemory.#tryVectorSearch} -
+   * runs the KNN read against an ALREADY-COMPUTED query vector so the
+   * multi-query fan-out can batch its N variant embeddings into one
+   * `embed([q1..qN])` call instead of N provider round-trips.
+   */
+  async #vectorSearchWithVector(
+    scope: SessionScope,
+    vector: Float32Array,
+    topK: number,
+    asOf?: string,
+    includeQuarantined?: boolean,
+    includeSuperseded?: boolean,
+    owner?: MemoryOwner | ReadonlyArray<MemoryOwner>,
+  ): Promise<ReadonlyArray<MemoryHit<Fact>>> {
+    const embedderId = this.#embedderIdProvider();
+    if (embedderId === null || typeof this.#store.semantic.searchVector !== 'function') {
+      return [];
+    }
     return this.#store.semantic.searchVector(
       scope,
       vector,
@@ -1500,6 +1550,37 @@ export class SemanticMemory {
       includeSuperseded,
       owner,
     );
+  }
+
+  /**
+   * W-087: embed every fan-out variant in ONE embedder call. Returns
+   * `null` - and the caller degrades to the per-variant path - when
+   * there is no fan-out, no vector surface, or the batch call fails; a
+   * batching failure must never fail the search.
+   */
+  async #tryBatchEmbedQueries(
+    queries: ReadonlyArray<string>,
+  ): Promise<ReadonlyMap<string, Float32Array> | null> {
+    if (queries.length <= 1) return null;
+    if (
+      this.#embedder === null ||
+      this.#embedderIdProvider() === null ||
+      typeof this.#store.semantic.searchVector !== 'function'
+    ) {
+      return null;
+    }
+    try {
+      const vectors = await this.#embedder.embed([...queries], { taskType: 'query' });
+      if (vectors.length !== queries.length) return null;
+      const byQuery = new Map<string, Float32Array>();
+      queries.forEach((q, i) => {
+        const v = vectors[i];
+        if (v !== undefined) byQuery.set(q, v);
+      });
+      return byQuery;
+    } catch {
+      return null;
+    }
   }
 
   /**
